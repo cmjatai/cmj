@@ -1,0 +1,223 @@
+{% load i18n staticfiles sass_tags menus %}
+<!DOCTYPE html>
+<!--[if IE 8]> <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="pt-br">
+<!--<![endif]-->
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="theme-color" content="#006556">
+    <title>{% block head_title %}{% trans 'Câmara Municipal de Jataí - Goiás' %}{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block head_content %}
+      <link rel="icon" href="{% static 'img/logo.png' %}"  type="image/png" >
+      {# Styles #}
+      <link rel="stylesheet" href="{% static 'components-font-awesome/css/font-awesome.css' %}">
+      <link rel="stylesheet" href="{% sass_src 'bootstrap-sass/assets/stylesheets/_bootstrap.scss' %}" type="text/css">
+      <link rel="stylesheet" href="{% static 'drunken-parrot-flat-ui/css/drunken-parrot.css' %}">
+      <link rel="stylesheet" href="{% sass_src 'styles/app.scss' %}" type="text/css">
+
+      <link rel="stylesheet" href="{% static 'jquery-ui/themes/cupertino/jquery-ui.min.css' %}">
+
+      {# Scripts #}
+      {# modernizr must be in head (see http://modernizr.com/docs/#installing) #}
+    {% endblock %}
+
+  </head>
+
+  <body class="{% block body_class %}{%endblock%}">
+    <div class="page fadein">
+      <nav class="navbar">
+        <div class="container{{fluid}}">
+          <div class="navbar-header">
+            {% block button_toogle %}
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+            {% endblock %}
+            <a class="navbar-brand" href="/">
+                C<small>âmara</small> M<small>unicipal de</small> J<small>ataí</small>
+            </a>
+          </div>
+          <div class="navbar-collapse collapse">
+            <div class="nav-flex">
+              <ul class="nav navbar-nav navbar-right" id="autenticacao">
+                {% if user and not user.is_anonymous %}
+                  <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                      {{ user.get_full_name|default:user.email }}
+                      <span class="caret"></span>
+                      {% for us in user.social_auth.all %}
+                        {% if us.provider == 'facebook' %}
+                          <img class="avatar" src="http://graph.facebook.com/v2.6/{{us.uid}}/picture?height=46" />
+                        {% endif %}
+                      {% endfor %}
+                    </a>
+                    <ul class="dropdown-menu">
+                      <li><a href="{% url 'cmj.auth2:logout' %}">{% trans "Sair" %}</a></li>
+                    </ul>
+                  </li>
+                {% else %}
+                <li>
+                  <a href="{% url 'cmj.auth2:login' %}">
+                    {% trans "Acessar" %}
+                  </a>
+                </li>
+                 {% endif %}
+              </ul>
+            </div>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+
+      {% block global_container %}
+        {% block navigation %}
+          <nav class="navbar nabvar-menu">
+            <div class="container{{fluid}}">
+              <div id="navbar" class="navbar-collapse collapse">
+                <div class="nav-flex">
+                  <ul class="nav navbar-nav navbar-right nav-acessar" id="autenticacao">
+                    {% if user and not user.is_anonymous %}
+                      <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                          {{ user.get_full_name|default:user.email }}
+                          <span class="caret"></span>
+                          {% if user.social_auth.all.0.provider == 'facebook' %}
+                            <img class="avatar" src="http://graph.facebook.com/v2.6/{{user.social_auth.all.0.uid}}/picture?height=46" />
+                          {% endif %}
+                        </a>
+                        <ul class="dropdown-menu menu-right">
+                          <li><a href="{% url 'cmj.auth2:logout' %}">{% trans "Sair" %}</a></li>
+                        </ul>
+                      </li>
+                    {% else %}
+                    <li>
+                      <a href="{% url 'cmj.auth2:login' %}">
+                        {% trans "Acessar" %}
+                      </a>
+                    </li>
+                     {% endif %}
+                  </ul>
+                  <ul class="nav navbar-nav">
+                      <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Vereadores<span class="caret"></span></a>
+                        <ul class="dropdown-menu menu-left">
+
+                        </ul>
+                      </li>
+                      <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Ex<span class="caret"></span></a>
+                        <ul class="dropdown-menu menu-left">
+                          <li class="nav__sub-item"><a class="nav__sub-link" href="#">Sub1</a></li>
+                          <li class="nav__sub-item">
+                            <a class="nav__sub-link" href="#">Sub2</a>
+                            <ul class="dropdown-menu menu-left">
+                              <li class="nav__sub-item"><a class="nav__sub-link" href="#">Sub1</a></li>
+                              <li class="nav__sub-item">
+                                <a class="nav__sub-link" href="#">Sub2</a>
+                                <ul class="dropdown-menu menu-left">
+                                  <li class="nav__sub-item"><a class="nav__sub-link" href="#">Sub1</a></li>
+                                  <li class="nav__sub-item"><a class="nav__sub-link" href="#">Sub2</a></li>
+                                </ul>
+                              </li>
+                            </ul>
+                          </li>
+                        </ul>
+                      </li>
+                  </ul>
+                </div>
+              </div><!--/.nav-collapse -->
+            </div>
+          </nav>
+        {% endblock navigation %}
+
+        {# Header #}
+        {% block main_header %}
+          <header class="masthead">
+            <div class="container{{fluid}}">
+              <small class="slogan"><i>{% trans '...' %}</i></small>
+              {% block sections_nav %} {% subnav %}.../...{% endblock sections_nav %}
+            </div>
+          </header>
+        {% endblock main_header %}
+
+        {# Main content #}
+        {% block content_container %}
+          <main id="content" class="content page__row">
+
+            <div class="container{{fluid}}">
+
+              {# Feedback messages #}
+              {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade in" role="alert">
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                  </button>
+                  {{ message|safe }}
+                </div>
+              {% endfor %}
+
+              {# Content header #}
+              {% block base_header %}
+                <div class="clearfix">
+
+                  {% block title %}
+                    <h1 class="page-header">
+                      {% if title %}
+                        {{ title|safe|linebreaksbr }}
+                      {% elif object %}
+                        {{ object|safe|linebreaksbr }}
+                      {% endif %}
+                    </h1>
+                  {% endblock %}
+
+                </div>
+              {% endblock base_header %}
+
+
+              {% block base_content %}{% endblock %}
+
+
+            </div>
+          </main>
+        {% endblock content_container %}
+      {% endblock global_container %}
+    </div>
+  {% block login_container %}
+  {% endblock%}
+
+  <footer id="footer" class="footer page__row">
+    <div class="container">
+      Departamento de Tecnologia de Informação e Comunicação
+    </div>
+  </footer>
+
+
+
+    {% block foot_js %}
+      <!-- Bootstrap core JavaScript ================================================== -->
+      <!-- Placed at the end of the document so the pages load faster -->
+      <script type="text/javascript" src="{% static 'jquery/dist/jquery.min.js' %}"></script>
+      <script type="text/javascript" src="{% static 'bootstrap-sass/assets/javascripts/bootstrap.min.js' %}"></script>
+
+      <script type="text/javascript" src="{% static 'jquery-ui/jquery-ui.min.js' %}"></script>
+      <script type="text/javascript" src="{% static 'jquery-ui/ui/i18n/datepicker-pt-BR.js' %}"></script>
+
+      <script type="text/javascript" src="{% static 'jQuery-runner/build/jquery.runner.js' %}"></script>
+      <script type="text/javascript" src="{% static 'jquery-mask-plugin/dist/jquery.mask.js' %}"></script>
+
+      <script src="{% static 'tinymce/tinymce.min.js' %}"></script>
+      <script type="text/javascript" src="{% static 'jsdiff/diff.min.js' %}"></script>
+
+      <script type="text/javascript" src="{% static 'js/app.js' %}"></script>
+
+      {% block extra_js %}{% endblock %}
+
+    {% endblock foot_js %}
+
+  </body>
+</html>

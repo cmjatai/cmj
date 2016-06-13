@@ -43,7 +43,6 @@ htmlcov/
 nosetests.xml
 coverage.xml
 *,cover
-.hypothesis/
 
 # Translations
 *.mo
@@ -52,11 +51,41 @@ coverage.xml
 # Django stuff:
 *.log
 
+*.swp
+
 # Sphinx documentation
 docs/_build/
 
 # PyBuilder
 target/
 
-#Ipython Notebook
-.ipynb_checkpoints
+# PyCharm
+.idea/
+.iml
+.eml
+
+# SASS
+.sass-cache
+*.css.map
+
+# Others
+.env
+.bak
+*~
+*.orig
+
+# Dev tools configuration files
+.idea/
+.project
+.pydevproject
+.settings
+.vagrant
+*.sublime-project
+*.sublime-workspace
+
+# specific to this project
+collected_static
+bower
+bower_components
+media
+

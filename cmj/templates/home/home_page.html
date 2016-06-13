@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags %}
+
+{% block body_class %}homepage{% endblock %}
+
+{% block base_content %}
+
+    {{ page.descricao|richtext }}
+
+
+
+{% endblock %}

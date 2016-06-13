@@ -1,0 +1,666 @@
+@import url(http://fonts.googleapis.com/css?family=Graduate:400,700,300);
+@import url(https://fonts.googleapis.com/css?family=Roboto:400,100,300,700,500);
+@import url(http://fonts.googleapis.com/css?family=Raleway:400,700,300);
+@import url(http://fonts.googleapis.com/css?family=Kaushan+Script);
+@import url(https://fonts.googleapis.com/css?family=Cabin+Condensed);
+@import url(https://fonts.googleapis.com/css?family=Muli:300);
+@import url(https://fonts.googleapis.com/css?family=Lato:100,300);
+
+@import "bootstrap/variables.scss";
+@import "header";
+
+$topo_color_bg_principal: #006556;
+$topo_color_border: #d03800;
+$topo_color_text_inverse: white;
+$topo_color_text: #006556;
+$hover_background_10p: rgba(0,0,0,0.1);
+$hover_background_20p: rgba(0,0,0,0.2);
+$hover_background_50p: rgba(0,0,0,0.5);
+$hover_background_10pw: rgba(205,255,200,0.1);
+$hover_background_20pw: rgba(205,255,200,.2);
+@mixin placeholder($color, $opacity, $fontsize, $fontweight) {
+  &::-webkit-input-placeholder {
+    color: $color !important;
+    opacity: $opacity;
+    font-size: $fontsize;
+    font-weight: $fontweight;
+  }
+  &::-moz-placeholder {
+    color: $color !important;
+    opacity: $opacity;
+    font-size: $fontsize;
+    font-weight: $fontweight;
+  }
+  &::-moz-placeholder {
+    color: $color !important;
+    opacity: $opacity;
+    font-size: $fontsize;
+    font-weight: $fontweight;
+  }
+  &:-ms-input-placeholder {
+    color: $color !important;
+    opacity: $opacity;
+    font-size: $fontsize;
+    font-weight: $fontweight;
+  }
+}
+
+body, html {
+  background: #f0efe7 url(/static/images/body.jpg);
+}
+
+// ADJUST NAVBAR ########################################
+$menu-height: 40px;
+$padding-menu-top: 5px;
+.navbar {
+  border-radius: 0;
+  border-width: 0;
+  background-color: $topo_color_bg_principal;
+  margin: 0;
+  min-height: 0;
+  .avatar {
+    border-radius: 50%;
+    height: $menu-height;
+    margin-left: 0.5em;
+  }
+  .navbar-toggle {
+    &:hover {
+      background-color: $hover_background_10p;
+    }
+  }
+  .icon-bar {
+    background-color: $topo_color_text_inverse;
+  }
+  a.navbar-brand {
+    font-size: 25px;
+    line-height: 1em;
+    color: $topo_color_text_inverse;
+    font-family: "Graduate";
+    padding: 13px 13px 10px 30px;
+    display: block;
+    position: relative;
+    margin: 0 !important;
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: $menu-height + 2 * $padding-menu-top;
+      opacity: 0.35;
+      background: transparent url("/static/img/bg_cmj_topo_menu_box_left.png") no-repeat scroll left top;
+      background-size: auto $navbar-height;
+    }
+  }
+  .navbar-nav {
+
+    li {
+      position: relative;
+      a {
+        color: $topo_color_text_inverse;
+        line-height: $menu-height;
+        padding-top: $padding-menu-top;
+        padding-bottom: $padding-menu-top;
+        font-family: "Lato";
+        font-weight: 300;
+        letter-spacing: 0.5px;
+        font-size: 1.3em;
+
+        &:hover, &:focus {
+          background: $hover_background_10pw;
+        }
+      }
+      & > .dropdown-menu {
+        background-color: $topo_color_bg_principal;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: $topo_color_text_inverse;
+        min-width: 250px;
+        margin: 0;
+        padding: 0;
+        & > li {
+          & > a {
+            padding: 0 1em;
+            line-height: 2em;
+          }
+        }
+        .menu-left {
+          top: 3px;
+          left: 100%;
+          margin-left: -5px;
+        }
+        .menu-right {
+          top:0;
+          right: 100%;
+          margin-right: -5px;
+        }
+      }
+      &:hover {
+        & > a,
+        & > a:focus,
+        & > a:hover {
+          background: $hover_background_10pw;
+          color: #fff;
+        }
+        & > .dropdown-menu{
+          display:block;
+        }
+        & > .menu-classes {
+          right: 0;
+          left: 0;
+          position: fixed;
+          top: 126px;
+          bottom: auto;
+        }
+      }
+    }
+    & > li {
+        border: 1px solid transparent;
+        border-top: 0px;
+      & > .menu-left {
+        left: 1em;
+        top: 100%;
+        margin-top: -1em;
+        border-radius: 4px;
+      }
+      & > .menu-right {
+        right: 0;
+      }
+      & > .dropdown-menu {
+      }
+      &:hover {
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-top: 0px;
+      }
+    }
+  }
+  .nav-flex {
+    display: block;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    .nav {
+      flex: 0 0 auto;
+    }
+    .navbar-form {
+      flex: 1 0 auto;
+      padding: 0;
+      .form-group {
+        width: 100%;
+        .form-control {
+          padding-left: 43px;
+          background: url("/static/img/search_box_icon36.png") no-repeat 5px center;
+          width: 100%;
+          border-radius: 0;
+          border: 0;
+          background-color: lighten($topo_color_bg_principal, 5%);
+          color: #e0b002;
+          font-size: 1.2em;
+          height: 39px;
+          @include placeholder(#90886c, 1, 100%, normal);
+        }
+      }
+    }
+  }
+  &.nabvar-menu {
+    border-color: $topo_color_border;
+    border-top-width: 1px;
+    background-color: $topo_color_bg_principal;
+    .container {
+      padding: 0;
+    }
+    .navbar-nav {
+      & > li {
+        a {
+          line-height: 3em;
+        }
+      }
+    }
+  }
+}
+.nav-acessar {
+  display: none;
+}
+// ADJUST topo ########################################
+.masthead {
+  .slogan {
+    color: $topo_color_border;
+    float: right;
+  }
+}
+.page-header {
+  padding: 0;
+  margin: 0 0 0 1em;
+  color: $topo_color_border;
+}
+a {
+  color: $topo_color_border;
+}
+a:focus,
+a:hover {
+  color: darken($topo_color_border, 20%);
+}
+// ADJUST lateral direita ########################################
+// ADJUST interno ########################################
+// ADJUST DRUNKEN PARROT STYLES ########################################
+.btn-primary {
+  background-color: lighten($topo_color_border, 30%);
+  &:hover {
+    background-color: lighten($topo_color_border, 15%);
+    border-color: lighten($topo_color_border, 15%);
+  }
+}
+.panel-primary {
+  border-color: $topo_color_border;
+  .panel-heading {
+    background-color: $topo_color_border;
+    color: lighten($topo_color_border, 20%);
+  }
+  .panel-footer {
+    padding: 0;
+    background-color: $topo_color_border;
+    border-width: 0;
+    small {
+      color: lighten($topo_color_border, 20%);
+      text-align: center;
+      display: block;
+    }
+  }
+  .panel-body {
+    padding: 0;
+    .panel-empty {
+      padding: 1em;
+    }
+  }
+}
+.h1,
+h1 {
+  font-size: 35px;
+}
+.h2,
+h2 {
+  font-size: 24px;
+}
+.h3,
+h3 {
+  font-size: 20px;
+}
+.h4,
+h4 {
+  font-size: 16px;
+}
+.h5,
+h5 {
+  font-size: 14px;
+}
+.h6,
+h6 {
+  font-size: 12px;
+}
+// #### footer ###########################################
+// based on http://getbootstrap.com/examples/sticky-footer
+$footer-height: 30px;
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  margin-bottom: $footer-height + 20px;
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: $footer-height;
+  background: $topo_color_bg_principal none repeat scroll 0 0;
+  color: lighten($topo_color_bg_principal, 20%);
+  text-align: center;
+  font-size: 1em;
+}
+// ADJUST tela de login ########################################
+.html-login {
+  background-color: $topo_color_bg_principal;
+  a.navbar-brand {
+    font-size: 50px;
+  }
+}
+.container-login {
+  background-color: $topo_color_bg_principal;
+  color: $topo_color_text_inverse;
+  min-height: 100%;
+  position: relative;
+  margin: 0;
+  .logo-cmj {
+    position: absolute;
+    opacity: 0.35;
+    right: 1em;
+    margin-left: 1em;
+    max-width: 100%;
+  }
+  .label0,
+  .label1,
+  .label2,
+  .label3,
+  .label4 {
+    margin: 10% 0 1em 5%;
+    color: white;
+    font-weight: normal;
+    font-size: 3em;
+  }
+  .label2 {
+    margin-top: 4%;
+    margin-bottom: 0.5em;
+  }
+  .label3, .label4 {
+    margin-top: 4%;
+    margin-bottom: 0.5em;
+  }
+  input {
+    border-radius: 0;
+    border: 0;
+    border-top: 1px solid transparentize($topo_color_bg_principal, 0.8);
+    padding: 1em;
+    font-size: 1.7em;
+    height: 3.5em;
+    background-color: rgba(255, 255, 255, 0.8);
+    &:focus {
+      background-color: white;
+    }
+    @include placeholder($topo_color_bg_principal, 0.5, 1em, normal);
+  }
+  .btns-login {
+    margin: 4em auto 0;
+    display: block;
+    max-width: 767px;
+    .btn-login {
+      color: rgba(255, 255, 255, 0.8);
+      display: inline-block;
+      background-color: rgba(255, 255, 255, 0.1);
+      width: 100%;
+      letter-spacing: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      margin-top: 1em;
+      line-height: 50px;
+      text-align: center;
+      font-family: "Graduate";
+      &:hover {
+        border: 1px solid #fff;
+        color: #fff;
+        background-color: rgba(255, 255, 255, 0.2);
+      }
+    }
+  }
+  .btns-login-3 {
+    margin-top: 1em;
+  }
+  .alert-danger {
+    color:white;
+    background-color: #aa0000;
+    border-radius: 0;
+    margin: 20px;
+
+  }
+}
+// #### pagination ########################################
+.pagination {
+  padding-top: 25px;
+}
+.container,
+.container-fluid {
+  transition: all 1s ease;
+}
+
+
+
+
+
+@media screen and (max-width: 1280px) {
+  .html-login {
+    a.navbar-brand {
+      font-size: 45px;
+    }
+  }
+  .container-login {
+
+    .label0 {
+      margin-top: 4%;
+    }
+    ,
+    .label1 {
+      margin-top: 2%;
+      margin-bottom: 0.5em;
+    }
+    ,
+    .label2 {
+      margin-top: 2%;
+      margin-bottom: 0.2em;
+    }
+    ,
+    .label3 {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+    .btns-login {
+      margin-top: 1em;
+    }
+    .btns-login-3 {
+      margin-top: 0;
+    }
+  }
+}
+@media screen and (max-width: 800px) {
+  .container-login {
+    .logo-cmj {
+      opacity: 0.16;
+      right: auto;
+      max-width: 80%;
+      left: 50%;
+      top: -2em;
+      transform: translateX(-50%);
+    }
+    .btns-login {
+      margin-top: 0.5em;
+      .btn-login {
+        letter-spacing: 2px;
+      }
+    }
+  }
+}
+@media screen and (max-width: 800px) and (orientation: portrait) {
+  .html-login {
+    a.navbar-brand {
+      font-size: 35px;
+    }
+  }
+  .container-login {
+
+    .label0 {
+      margin-top: 30%;
+    }
+
+    .label1 {
+      margin-top: 25%;
+    }
+
+    .label2 {
+      margin-top: 25%;
+      margin-bottom: 1em;
+    }
+
+    .label3 {
+      margin-top: 20%;
+      margin-bottom: 1em;
+    }
+    input {}
+    .btns-login {
+      max-width: 600px;
+      margin-top: 4em;
+    }
+  }
+}
+@media screen and (max-width: 800px) and (orientation: landscape) {
+  .html-login {
+    a.navbar-brand {
+      font-size: 25px;
+    }
+  }
+  .container-login {
+    .label0,
+    .label1,
+    .label2,
+    .label3,
+    .label4 {
+      margin: 0 0 0.2em 5%;
+      font-size: 1.5em;
+    }
+    .label1,
+    .label2,
+    .label3,
+    .label4 {
+      margin: 0 0 0 5%;
+      font-size: 1.2em;
+    }
+    input {
+      font-size: 1.3em;
+      padding: 0 1em;
+      height: 2em;
+    }
+    .btns-login {
+      margin-top: 0;
+    }
+  }
+}
+@media screen and (max-width: 767px) {
+  $footer-height: 25px;
+  body {
+    margin-bottom: $footer-height + 20px;
+  }
+  .footer {
+    font-size: 0.8em;
+    height: $footer-height;
+  }
+  .navbar {
+    .nav-flex {
+      display: block;
+    }
+    .navbar-nav {
+      & > li {
+        & > .dropdown-menu {
+          border: 0px
+        }
+      }
+      li {
+        a {
+        }
+        & > .dropdown-menu {
+          border: 0px solid rgba(255, 255, 255, 0.3);
+          .menu-left {
+            margin-left: 5px;
+          }
+          .menu-right {
+            margin-right: 5px;
+          }
+        }
+      }
+    }
+  }
+
+  .nav-acessar {
+    display: block;
+  }
+}
+@media screen and (max-width: 480px) and (orientation: portrait) {
+  .container-login {
+    .label0,
+    .label1,
+    .label2,
+    .label3,
+    .label4 {
+      margin: 20% 0 0.4em 5%;
+      font-size: 1.8em;
+    }
+    .label1 {
+      margin-top: 15%;
+    }
+    .label2,
+    .label3,
+    .label4 {
+      margin-top: 5%;
+    }
+
+    input {
+      font-size: 1.2em;
+      padding: 0 1em;
+      height: 3em;
+    }
+    .btns-login {
+      margin-top: 2em;
+      max-width: 500px;
+    }
+    .btns-login-2,  {
+      margin-top: 1em;
+    }
+    .btns-login-3, {
+      margin-top: 0em;
+      .btn-login {
+        line-height: 42px;
+      }
+    }
+  }
+}
+@media screen and (max-width: 480px) {
+  .navbar {
+    a.navbar-brand {
+      padding: 15px 0 10px 10px;
+      font-size: 21px;
+    }
+  }
+
+}
+
+
+@media screen and (min-width: 1281px) {
+  .navbar a.navbar-brand {
+    font-size: 40px;
+    padding: 4px 13px 4px 30px;
+  }
+  .html-login {
+    a.navbar-brand {
+      font-size: 50px;
+    }
+  }
+  .container-login {
+
+    .label0 {
+      margin-top: 7%;
+    }
+    ,
+    .label1 {
+      margin-top: 5%;
+      margin-bottom: 0.5em;
+    }
+    ,
+    .label2 {
+      margin-top: 7%;
+      margin-bottom: 0.2em;
+    }
+    ,
+    .label3 {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+    .btns-login {
+      margin-top: 1em;
+    }
+    .btns-login-3 {
+      margin-top: 0;
+    }
+  }
+}
+
+
+
+@media print {
+  .masthead {
+    display: none;
+  }
+}

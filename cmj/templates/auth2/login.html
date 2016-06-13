@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load i18n social_utils staticfiles sass_tags %}
+{% block button_toogle %}{%endblock%}
+{% block global_container %}{%endblock%}
+{% block login_container %}
+
+  <!-- O bloco comentado é para ser implementado após as autorizacoes -->
+  <!-- {% if next %}
+    {% if user.is_authenticated %}
+      <p>Você não tem acesso a esta página. Se quiser continuar, faça o Login.</p>
+
+      {% else %}
+        <p>Por favor, faça o Login para acessar esta página.</p>
+      {% endif %}
+
+  {% endif %} -->
+
+<div class="container-login container-fluid">
+  <div class="container-">
+    <img  class="logo-cmj" src="{% static 'img/logo.png' %}" />
+    <div class="row">
+      <div class="col-xs-12">
+        <form id="login-form" method="post" action="{% url 'cmj.auth2:login' %}">
+          {% csrf_token %}
+
+
+          <div class="label{{backends.backends|length}}">{% trans "Entrar no Portal" %}</div>
+
+          <div class="row">
+            {% if form.errors %}
+              <div class="alert alert-danger">Usuário e/ou Senha inválidos.
+              </div>
+            {% endif %}
+          </div>
+
+
+
+          <div class="row">
+            <div class="input_username">
+                {{ form.username }}
+            </div>
+            <div class="input_password">
+                {{ form.password }}
+            </div>
+          </div>
+
+          <input  type="hidden" name="next" value="{{ next }}" />
+
+          <div class="btns-login container btns-login-{{backends.backends|length}}">
+              <button class="btn-login" type="submit" value="login" />{% trans "Iniciar Sessão" %}</button>
+
+              {% for backend in backends.backends %}
+                <a class="btn-login" id="{{ backend }}-button" name="{{ backend }}"
+                  title = "{% blocktrans with backend_name=backend|social_title %}Acessar com {{ backend_name }}{% endblocktrans %}"
+                  href="{% url 'social:begin' backend=backend %}?next=/">
+                  <img src="{% static backend|social_icon %}" />
+                  {% blocktrans with backend_name=backend|social_title %}Acessar com {{ backend_name }}{% endblocktrans %}
+                </a>
+              {% endfor %}
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock  %}
+
+{% block extra_js %}
+
+
+  <script>
+    {% if not user.is_authenticated %}
+     $("#autenticacao") .css("display","none");
+    $("html").addClass('html-login');
+    {% endif %}
+  </script>
+
+{% endblock %}
