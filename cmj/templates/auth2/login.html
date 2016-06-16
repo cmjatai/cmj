@@ -20,7 +20,7 @@
     <img  class="logo-cmj" src="{% static 'img/logo.png' %}" />
     <div class="row">
       <div class="col-xs-12">
-        <form id="login-form" method="post" action="{% url 'cmj.auth2:login' %}">
+        <form id="login-form" method="post" action="{% url 'cmj.core:login' %}">
           {% csrf_token %}
 
 

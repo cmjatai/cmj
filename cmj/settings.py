@@ -35,9 +35,8 @@ LOGIN_URL = '/login/?next='
 
 # CMJ_APPS business apps in dependency order
 CMJ_APPS = (
-    'cmj.auth2',
+    'cmj.core',
     'cmj.home',
-
     'sapl',
 )
 
@@ -145,7 +144,7 @@ WSGI_APPLICATION = 'cmj.wsgi.application'
 
 WAGTAIL_SITE_NAME = 'Portal da Câmara Municipal de Jataí'
 
-AUTH_USER_MODEL = 'auth2.User'
+AUTH_USER_MODEL = 'core.User'
 
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
@@ -189,7 +188,7 @@ SOCIAL_BACKEND_INFO = {
         'title': 'Facebook',
         'icon': 'img/icon-facebook.png',
     },
-    'google-oauth2': {
+    'google-ocore': {
         'title': 'Google',
         'icon': 'img/icon-google-plus.png',
     },

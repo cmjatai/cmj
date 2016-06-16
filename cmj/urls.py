@@ -34,28 +34,41 @@ import sapl.protocoloadm.urls
 import sapl.relatorios.urls
 import sapl.sessao.urls
 
-import cmj.auth2.urls
+import cmj.core.urls
 
+#url('', include('django.contrib.auth.urls', namespace='auth')),
+# url(r'^sapl/', include(sapl.urls)),
+"""
+url(r'^sapl/', include(sapl.comissoes.urls)),
+url(r'^sapl/', include(sapl.sessao.urls)),
+url(r'^sapl/', include(sapl.parlamentares.urls)),
+url(r'^sapl/', include(sapl.materia.urls)),
+url(r'^sapl/', include(sapl.norma.urls)),
+url(r'^sapl/', include(sapl.lexml.urls)),
+url(r'^sapl/', include(sapl.painel.urls)),
+url(r'^sapl/', include(sapl.protocoloadm.urls)),
+url(r'^sapl/', include(sapl.compilacao.urls)),
+url(r'^sapl/', include(sapl.relatorios.urls)),
+url(r'^sapl/', include(sapl.base.urls)),"""
 
 urlpatterns = [
     url(r'^django-admin/', admin.site.urls),
 
     url('', include('social.apps.django_app.urls', namespace='social')),
-    url(r'', include(cmj.auth2.urls)),
+    url(r'', include(cmj.core.urls)),
 
-    #url('', include('django.contrib.auth.urls', namespace='auth')),
-    # url(r'^sapl/', include(sapl.urls)),
-    url(r'^sapl/', include(sapl.comissoes.urls)),
-    url(r'^sapl/', include(sapl.sessao.urls)),
-    url(r'^sapl/', include(sapl.parlamentares.urls)),
-    url(r'^sapl/', include(sapl.materia.urls)),
-    url(r'^sapl/', include(sapl.norma.urls)),
-    url(r'^sapl/', include(sapl.lexml.urls)),
-    url(r'^sapl/', include(sapl.painel.urls)),
-    url(r'^sapl/', include(sapl.protocoloadm.urls)),
-    url(r'^sapl/', include(sapl.compilacao.urls)),
-    url(r'^sapl/', include(sapl.relatorios.urls)),
-    url(r'^sapl/', include(sapl.base.urls)),
+
+    url(r'', include(sapl.comissoes.urls)),
+    url(r'', include(sapl.sessao.urls)),
+    url(r'', include(sapl.parlamentares.urls)),
+    url(r'', include(sapl.materia.urls)),
+    url(r'', include(sapl.norma.urls)),
+    url(r'', include(sapl.lexml.urls)),
+    url(r'', include(sapl.painel.urls)),
+    url(r'', include(sapl.protocoloadm.urls)),
+    url(r'', include(sapl.compilacao.urls)),
+    url(r'', include(sapl.relatorios.urls)),
+    url(r'', include(sapl.base.urls)),
 
     url(r'^admin/', include(wagtailadmin_urls)),
     url(r'^search/', include(wagtailsearch_urls)),

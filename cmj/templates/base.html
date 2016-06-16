@@ -44,32 +44,30 @@
             </a>
           </div>
           <div class="navbar-collapse collapse">
-            <div class="nav-flex">
-              <ul class="nav navbar-nav navbar-right" id="autenticacao">
-                {% if user and not user.is_anonymous %}
-                  <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                      {{ user.get_full_name|default:user.email }}
-                      <span class="caret"></span>
-                      {% for us in user.social_auth.all %}
-                        {% if us.provider == 'facebook' %}
-                          <img class="avatar" src="http://graph.facebook.com/v2.6/{{us.uid}}/picture?height=46" />
-                        {% endif %}
-                      {% endfor %}
-                    </a>
-                    <ul class="dropdown-menu">
-                      <li><a href="{% url 'cmj.auth2:logout' %}">{% trans "Sair" %}</a></li>
-                    </ul>
-                  </li>
-                {% else %}
-                <li>
-                  <a href="{% url 'cmj.auth2:login' %}">
-                    {% trans "Acessar" %}
+            <ul class="nav navbar-nav navbar-right" id="autenticacao">
+              {% if user and not user.is_anonymous %}
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                    {{ user.get_full_name|default:user.email }}
+                    <span class="caret"></span>
+                    {% for us in user.social_auth.all %}
+                      {% if us.provider == 'facebook' %}
+                        <img class="avatar" src="http://graph.facebook.com/v2.6/{{us.uid}}/picture?height=46" />
+                      {% endif %}
+                    {% endfor %}
                   </a>
+                  <ul class="dropdown-menu">
+                    <li><a href="{% url 'cmj.core:logout' %}">{% trans "Sair" %}</a></li>
+                  </ul>
                 </li>
-                 {% endif %}
-              </ul>
-            </div>
+              {% else %}
+              <li>
+                <a href="{% url 'cmj.core:login' %}">
+                  {% trans "Acessar" %}
+                </a>
+              </li>
+               {% endif %}
+            </ul>
           </div><!--/.nav-collapse -->
         </div>
       </nav>
@@ -79,57 +77,117 @@
           <nav class="navbar nabvar-menu">
             <div class="container{{fluid}}">
               <div id="navbar" class="navbar-collapse collapse">
-                <div class="nav-flex">
-                  <ul class="nav navbar-nav navbar-right nav-acessar" id="autenticacao">
-                    {% if user and not user.is_anonymous %}
-                      <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                          {{ user.get_full_name|default:user.email }}
-                          <span class="caret"></span>
-                          {% if user.social_auth.all.0.provider == 'facebook' %}
-                            <img class="avatar" src="http://graph.facebook.com/v2.6/{{user.social_auth.all.0.uid}}/picture?height=46" />
-                          {% endif %}
-                        </a>
-                        <ul class="dropdown-menu menu-right">
-                          <li><a href="{% url 'cmj.auth2:logout' %}">{% trans "Sair" %}</a></li>
-                        </ul>
-                      </li>
-                    {% else %}
-                    <li>
-                      <a href="{% url 'cmj.auth2:login' %}">
-                        {% trans "Acessar" %}
+                <ul class="nav navbar-nav navbar-right nav-acessar" id="autenticacao">
+                  {% if user and not user.is_anonymous %}
+                    <li class="dropdown">
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                        {{ user.get_full_name|default:user.email }}
+                        <span class="caret"></span>
+                        {% if user.social_auth.all.0.provider == 'facebook' %}
+                          <img class="avatar" src="http://graph.facebook.com/v2.6/{{user.social_auth.all.0.uid}}/picture?height=46" />
+                        {% endif %}
                       </a>
+                      <ul class="dropdown-menu menu-right">
+                        <li><a href="{% url 'cmj.core:logout' %}">{% trans "Sair" %}</a></li>
+                      </ul>
                     </li>
-                     {% endif %}
-                  </ul>
-                  <ul class="nav navbar-nav">
-                      <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Vereadores<span class="caret"></span></a>
-                        <ul class="dropdown-menu menu-left">
+                  {% else %}
+                  <li>
+                    <a href="{% url 'cmj.core:login' %}">
+                      {% trans "Acessar" %}
+                    </a>
+                  </li>
+                   {% endif %}
+                </ul>
+                <ul class="nav navbar-nav">
 
-                        </ul>
-                      </li>
-                      <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Ex<span class="caret"></span></a>
-                        <ul class="dropdown-menu menu-left">
-                          <li class="nav__sub-item"><a class="nav__sub-link" href="#">Sub1</a></li>
-                          <li class="nav__sub-item">
-                            <a class="nav__sub-link" href="#">Sub2</a>
-                            <ul class="dropdown-menu menu-left">
-                              <li class="nav__sub-item"><a class="nav__sub-link" href="#">Sub1</a></li>
-                              <li class="nav__sub-item">
-                                <a class="nav__sub-link" href="#">Sub2</a>
-                                <ul class="dropdown-menu menu-left">
-                                  <li class="nav__sub-item"><a class="nav__sub-link" href="#">Sub1</a></li>
-                                  <li class="nav__sub-item"><a class="nav__sub-link" href="#">Sub2</a></li>
-                                </ul>
-                              </li>
-                            </ul>
-                          </li>
-                        </ul>
-                      </li>
+
+
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Institucional <span class="caret"></span></a>
+                  <ul class="dropdown-menu menu-left">
+                    <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'sapl.parlamentares:mesa_diretora' %}">Mesa Diretora</a></li>
+                    <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'sapl.comissoes:comissao_list' %}">Comissões</a></li>
+                    <!-- <li class="nav__sub-item"><a class="dropdown-toggle" href="#">Bancadas</a></li> -->
+                    <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'sapl.parlamentares:parlamentar_list' %}">Parlamentares</a></li>
                   </ul>
-                </div>
+                </li>
+
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Protocolo <span class="caret"></span></a>
+                  <ul class="dropdown-menu menu-left">
+                    <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'sapl.protocoloadm:protocolo' %}">Pesquisar Protocolo</a></li>
+                    <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'sapl.protocoloadm:pesq_doc_adm' %}">Pesquisar Documento Administrativo</a></li>
+                    <!-- <li class="nav__sub-item"><a class="dropdown-toggle" href="/materia">Protocolo Legislativo</a></li> -->
+                    {# <li class="nav__sub-item"><a class="dropdown-toggle" href="">Protocolo Geral</a></li> #}
+                    {# <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'sapl.protocoloadm:proposicao' %}">Proposições</a></li> #}
+                  </ul>
+                </li>
+
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Atividade Legislativa <span class="caret"></span></a>
+                  <ul class="dropdown-menu menu-left">
+                    <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'sapl.materia:proposicao_list' %}">Proposições</a></li>
+                    <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'sapl.materia:materialegislativa_list' %}">Matérias Legislativas</a></li>
+                    <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'sapl.sessao:sessaoplenaria_list' %}">Sessões Plenárias</a></li>
+                    <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'sapl.sessao:list_pauta_sessao' %}">Pautas das Sessões</a></li>
+                    <!-- <li class="nav__sub-item"><a class="dropdown-toggle" href="#">Atas das Sessões</a></li>
+                    <li class="nav__sub-item"><a class="dropdown-toggle" href="#">Reuniões das Comissões</a></li>
+                    <li class="nav__sub-item"><a class="dropdown-toggle" href="#">Tramitação em Lote</a></li>
+                    <li class="nav__sub-item"><a class="dropdown-toggle" href="#">Impressos</a></li>
+                    <li class="nav__sub-item"><a class="dropdown-toggle" href="#">Relatórios</a></li> -->
+                  </ul>
+                </li>
+
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans 'Legislação'%} <span class="caret"></span></a>
+                  <ul class="dropdown-menu menu-left">
+                    <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'sapl.norma:norma_pesquisa'%}">{% trans 'Pesquisar Normas Jurídicas'%}</a></li>
+                    <!-- <li class="nav__sub-item"><a class="dropdown-toggle" href="#">Índice de Assuntos</a></li> -->
+                  </ul>
+                </li>
+
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Sistema <span class="caret"></span></a>
+                  <ul class="dropdown-menu menu-left">
+                    <li class="nav__sub-item"><a class="dropdown-toggle" href="/sistema">Tabelas Auxiliares</a></li>
+<!--                     <li class="nav__sub-item"><a class="dropdown-toggle" href="#">Provedor LexML</a></li>
+                    <li class="nav__sub-item"><a class="dropdown-toggle" href="#">Publicador LexML</a></li>
+                    <li class="nav__sub-item"><a class="dropdown-toggle" href="#">Gerenciar Usuários</a></li>
+                    <li class="nav__sub-item"><a class="dropdown-toggle" href="#">Backup e Restauração</a></li>
+                    <li class="nav__sub-item"><a class="dropdown-toggle" href="#">Migração de Dados</a></li>
+                    <li class="nav__sub-item"><a class="dropdown-toggle" href="#">Sobre</a></li>
+                    <li class="nav__sub-item"><a class="dropdown-toggle" href="#">ZopeEdit Windows</a></li>
+                    <li class="nav__sub-item"><a class="dropdown-toggle" href="#">Troca de Senha</a></li> -->
+                  </ul>
+                </li>
+
+
+
+                    <li class="dropdown">
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Ex<span class="caret"></span></a>
+                      <ul class="dropdown-menu menu-left">
+                        <li class="nav__sub-item">
+                          <a class="dropdown-toggle" href="#">Sub1</a>
+                        </li>
+                        <li class="nav__sub-item">
+                          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Sub 2<span class="caret"></span></a>
+                          <ul class="dropdown-menu menu-left">
+                            <li class="nav__sub-item">
+                              <a class="dropdown-toggle" href="#">Sub1</a>
+                            </li>
+                            <li class="nav__sub-item">
+                              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Sub 2<span class="caret"></span></a>
+                              <ul class="dropdown-menu menu-left">
+                                <li class="nav__sub-item"><a class="dropdown-toggle" href="#">Sub1</a></li>
+                                <li class="nav__sub-item"><a class="dropdown-toggle" href="#">Sub2</a></li>
+                              </ul>
+                            </li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </li>
+                </ul>
               </div><!--/.nav-collapse -->
             </div>
           </nav>
@@ -139,8 +197,8 @@
         {% block main_header %}
           <header class="masthead">
             <div class="container{{fluid}}">
-              <small class="slogan"><i>{% trans '...' %}</i></small>
-              {% block sections_nav %} {% subnav %}.../...{% endblock sections_nav %}
+              <small class="slogan"><i></i></small>
+              {% block sections_nav %}{% subnav %}{% endblock sections_nav %}
             </div>
           </header>
         {% endblock main_header %}
@@ -151,15 +209,6 @@
 
             <div class="container{{fluid}}">
 
-              {# Feedback messages #}
-              {% for message in messages %}
-                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade in" role="alert">
-                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                  </button>
-                  {{ message|safe }}
-                </div>
-              {% endfor %}
 
               {# Content header #}
               {% block base_header %}
@@ -178,6 +227,15 @@
                 </div>
               {% endblock base_header %}
 
+              {# Feedback messages #}
+              {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade in" role="alert">
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                  </button>
+                  {{ message|safe }}
+                </div>
+              {% endfor %}
 
               {% block base_content %}{% endblock %}
 

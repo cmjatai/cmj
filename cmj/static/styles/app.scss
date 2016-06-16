@@ -9,10 +9,17 @@
 @import "bootstrap/variables.scss";
 @import "header";
 
-$topo_color_bg_principal: #006556;
-$topo_color_border: #d03800;
-$topo_color_text_inverse: white;
-$topo_color_text: #006556;
+$color_topo_bg: #006556;
+$color_topo_border: #f0efe7;
+
+$color_text_inverse: white;
+$color_text: #006556;
+
+$color_main_bg: #f0efe7;
+
+$color_container_bg: rgba(255, 255, 255, 0.5);
+$color_container_border: white;
+
 $hover_background_10p: rgba(0,0,0,0.1);
 $hover_background_20p: rgba(0,0,0,0.2);
 $hover_background_50p: rgba(0,0,0,0.5);
@@ -45,17 +52,21 @@ $hover_background_20pw: rgba(205,255,200,.2);
   }
 }
 
+.bgmain {
+
+}
+
 body, html {
-  background: #f0efe7 url(/static/images/body.jpg);
+  background: $color_main_bg url(/static/img/bg.png);
 }
 
 // ADJUST NAVBAR ########################################
 $menu-height: 40px;
 $padding-menu-top: 5px;
 .navbar {
+  background: $color_topo_bg url(/static/img/bg.png);
   border-radius: 0;
   border-width: 0;
-  background-color: $topo_color_bg_principal;
   margin: 0;
   min-height: 0;
   .avatar {
@@ -69,12 +80,12 @@ $padding-menu-top: 5px;
     }
   }
   .icon-bar {
-    background-color: $topo_color_text_inverse;
+    background-color: $color_text_inverse;
   }
   a.navbar-brand {
     font-size: 25px;
     line-height: 1em;
-    color: $topo_color_text_inverse;
+    color: $color_text_inverse;
     font-family: "Graduate";
     padding: 13px 13px 10px 30px;
     display: block;
@@ -93,11 +104,10 @@ $padding-menu-top: 5px;
     }
   }
   .navbar-nav {
-
-    li {
+    li { /* Para todo item e subitem*/
       position: relative;
-      a {
-        color: $topo_color_text_inverse;
+      a { /* Para todo link*/
+        color: $color_text_inverse;
         line-height: $menu-height;
         padding-top: $padding-menu-top;
         padding-bottom: $padding-menu-top;
@@ -105,112 +115,9 @@ $padding-menu-top: 5px;
         font-weight: 300;
         letter-spacing: 0.5px;
         font-size: 1.3em;
-
+        margin: 0px;
         &:hover, &:focus {
           background: $hover_background_10pw;
-        }
-      }
-      & > .dropdown-menu {
-        background-color: $topo_color_bg_principal;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        color: $topo_color_text_inverse;
-        min-width: 250px;
-        margin: 0;
-        padding: 0;
-        & > li {
-          & > a {
-            padding: 0 1em;
-            line-height: 2em;
-          }
-        }
-        .menu-left {
-          top: 3px;
-          left: 100%;
-          margin-left: -5px;
-        }
-        .menu-right {
-          top:0;
-          right: 100%;
-          margin-right: -5px;
-        }
-      }
-      &:hover {
-        & > a,
-        & > a:focus,
-        & > a:hover {
-          background: $hover_background_10pw;
-          color: #fff;
-        }
-        & > .dropdown-menu{
-          display:block;
-        }
-        & > .menu-classes {
-          right: 0;
-          left: 0;
-          position: fixed;
-          top: 126px;
-          bottom: auto;
-        }
-      }
-    }
-    & > li {
-        border: 1px solid transparent;
-        border-top: 0px;
-      & > .menu-left {
-        left: 1em;
-        top: 100%;
-        margin-top: -1em;
-        border-radius: 4px;
-      }
-      & > .menu-right {
-        right: 0;
-      }
-      & > .dropdown-menu {
-      }
-      &:hover {
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-top: 0px;
-      }
-    }
-  }
-  .nav-flex {
-    display: block;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    .nav {
-      flex: 0 0 auto;
-    }
-    .navbar-form {
-      flex: 1 0 auto;
-      padding: 0;
-      .form-group {
-        width: 100%;
-        .form-control {
-          padding-left: 43px;
-          background: url("/static/img/search_box_icon36.png") no-repeat 5px center;
-          width: 100%;
-          border-radius: 0;
-          border: 0;
-          background-color: lighten($topo_color_bg_principal, 5%);
-          color: #e0b002;
-          font-size: 1.2em;
-          height: 39px;
-          @include placeholder(#90886c, 1, 100%, normal);
-        }
-      }
-    }
-  }
-  &.nabvar-menu {
-    border-color: $topo_color_border;
-    border-top-width: 1px;
-    background-color: $topo_color_bg_principal;
-    .container {
-      padding: 0;
-    }
-    .navbar-nav {
-      & > li {
-        a {
-          line-height: 3em;
         }
       }
     }
@@ -221,45 +128,105 @@ $padding-menu-top: 5px;
 }
 // ADJUST topo ########################################
 .masthead {
+  margin-top: 1em;
+  margin-right: 2em;
+  z-index: 10;
   .slogan {
-    color: $topo_color_border;
+    color: $color_topo_bg;
     float: right;
+  }
+  .nav-tabs {
+    border-bottom: 0px;
+    li {
+      a {
+        border-bottom: 0px;
+        &:hover {
+          border-bottom: 0px;
+          background: darken($color_main_bg, 4%) url(/static/img/bg.png);
+        }
+      }
+      &.active {
+        a {
+          background: darken($color_main_bg, 4%) url(/static/img/bg.png);
+          border-color: $color_container_border;
+          border-bottom: 1px;
+        }
+      }
+    }
   }
 }
 .page-header {
-  padding: 0;
-  margin: 0 0 0 1em;
-  color: $topo_color_border;
+  padding: 0.6em 1em 0.2em;
+  margin: 0em $grid-gutter-width / -2 1em $grid-gutter-width / -2 ;
+  color: $color_topo_bg;
+  background: darken($color_main_bg, 3%) url(/static/img/bg.png);
+  border-radius: 5px 5px 0 0;
+  border-bottom-color: 1px solid $color_container_border;
 }
 a {
-  color: $topo_color_border;
+  color: $color_topo_bg;
 }
 a:focus,
 a:hover {
-  color: darken($topo_color_border, 20%);
+  color: darken($color_topo_bg, 20%);
 }
 // ADJUST lateral direita ########################################
 // ADJUST interno ########################################
-// ADJUST DRUNKEN PARROT STYLES ########################################
-.btn-primary {
-  background-color: lighten($topo_color_border, 30%);
-  &:hover {
-    background-color: lighten($topo_color_border, 15%);
-    border-color: lighten($topo_color_border, 15%);
+
+main {
+  .container, .container-fluid {
+    background-color: $color_container_bg;
+    border: 1px solid $color_container_border;
+    border-radius: 5px;
+  }
+
+  .item-action-or-input {
+    border-color: darken($color_main_bg, 10%);
+    &:hover {
+      border-color: darken($color_main_bg, 20%);
+      box-shadow: 0 0 30px  lighten($color_main_bg, 3%);
+    }
+    &:focus, &:active {
+      border-color: darken($color_main_bg, 30%);
+      box-shadow: 0 0 30px  lighten($color_main_bg, 3%);
+    }
+  }
+  .form-control, .btn-default {
+    @extend .item-action-or-input;
+  }
+  .btn-default {
+    color: darken($color_main_bg, 60%);
+    &:hover {
+      color: darken($color_main_bg, 70%);
+      background-color: $color_main_bg;
+    }
   }
 }
+.table > thead > tr > th, .table > thead > tr > td, .table > tbody > tr > th, .table > tbody > tr > td, .table > tfoot > tr > th, .table > tfoot > tr > td {
+  border-top-color: darken($color_main_bg, 10%);
+  border-bottom-width: 0;
+}
+
+.btn-primary {
+  background-color: lighten(#337ab7, 0%);
+  &:hover {
+    background-color: lighten(#337ab7, 5%);
+    border-color: lighten(#337ab7, 5%);
+  }
+}
+// ADJUST DRUNKEN PARROT STYLES ########################################
 .panel-primary {
-  border-color: $topo_color_border;
+  border-color: $color_topo_bg;
   .panel-heading {
-    background-color: $topo_color_border;
-    color: lighten($topo_color_border, 20%);
+    background-color: $color_topo_bg;
+    color: lighten($color_topo_bg, 20%);
   }
   .panel-footer {
     padding: 0;
-    background-color: $topo_color_border;
+    background-color: $color_topo_bg;
     border-width: 0;
     small {
-      color: lighten($topo_color_border, 20%);
+      color: lighten($color_topo_bg, 20%);
       text-align: center;
       display: block;
     }
@@ -303,6 +270,7 @@ html {
   min-height: 100%;
 }
 body {
+
   margin-bottom: $footer-height + 20px;
 }
 .footer {
@@ -311,21 +279,28 @@ body {
   width: 100%;
   /* Set the fixed height of the footer here */
   height: $footer-height;
-  background: $topo_color_bg_principal none repeat scroll 0 0;
-  color: lighten($topo_color_bg_principal, 20%);
+  background: $color_topo_bg none repeat scroll 0 0;
+  color: lighten($color_topo_bg, 20%);
   text-align: center;
   font-size: 1em;
 }
 // ADJUST tela de login ########################################
-.html-login {
-  background-color: $topo_color_bg_principal;
+.html-login, {
+  background-color: $color_topo_bg;
+  background-image: none;
   a.navbar-brand {
     font-size: 50px;
   }
+  body, .navbar {
+    background-color: $color_topo_bg;
+    background-image: none;
+
+
+  }
 }
 .container-login {
-  background-color: $topo_color_bg_principal;
-  color: $topo_color_text_inverse;
+  background-color: $color_topo_bg;
+  color: $color_text_inverse;
   min-height: 100%;
   position: relative;
   margin: 0;
@@ -357,7 +332,7 @@ body {
   input {
     border-radius: 0;
     border: 0;
-    border-top: 1px solid transparentize($topo_color_bg_principal, 0.8);
+    border-top: 1px solid transparentize($color_topo_bg, 0.8);
     padding: 1em;
     font-size: 1.7em;
     height: 3.5em;
@@ -365,7 +340,8 @@ body {
     &:focus {
       background-color: white;
     }
-    @include placeholder($topo_color_bg_principal, 0.5, 1em, normal);
+    @include placeholder($color_topo_bg, 0.5, 1em, normal);
+
   }
   .btns-login {
     margin: 4em auto 0;
@@ -614,9 +590,107 @@ body {
       font-size: 21px;
     }
   }
-
 }
 
+@media screen and (min-width: 768px) {
+  .navbar {
+    .navbar-nav {
+      li { /* Para todo item e subitem*/
+        a { /* Para todo link*/
+          color: $color_text_inverse;
+          line-height: $menu-height;
+          padding-top: $padding-menu-top;
+          padding-bottom: $padding-menu-top;
+          font-family: "Lato";
+          font-weight: 300;
+          letter-spacing: 0.5px;
+          font-size: 1.3em;
+          &:hover, &:focus {
+            background: $hover_background_10pw;
+          }
+        }
+        & > .dropdown-menu { /* para todo submenu */
+          background-color: $color_topo_bg;
+          border: 1px solid rgba(255, 255, 255, 0.3);
+          color: $color_text_inverse;
+          min-width: 250px;
+          margin: 0;
+          padding: 0;
+          & > li {
+            & > a {
+              padding: 0 1em;
+              line-height: 2em;
+            }
+          }
+          .menu-left {
+            top: 0.5em;
+            left: 100%;
+            margin-left: -1em;
+
+          }
+          .menu-right {
+            top:0;
+            right: 100%;
+            margin-right: -5px;
+          }
+        }
+        &:hover {  /* Hover Para todo item e subitem*/
+          & > a,
+          & > a:focus,
+          & > a:hover {
+            background: $hover_background_10pw;
+            color: #fff;
+          }
+          & > .dropdown-menu{
+            display:block;
+          }
+          & > .menu-classes {
+            right: 0;
+            left: 0;
+            position: fixed;
+            top: 126px;
+            bottom: auto;
+          }
+        }
+      }
+      & > li { /* Para os itens raiz de uma navbar*/
+          border: 1px solid transparent;
+          border-bottom-width: 0px;
+        & > .menu-left {
+          left: 1em;
+          top: 100%;
+          margin-top: -0.7em;
+          border-radius: 4px;
+          right: auto;
+        }
+        & > .menu-right {
+          right: 0;
+        }
+        & > .dropdown-menu {
+        }
+        &:hover {
+          border-color: rgba(#f0efe7, 0.3);
+          border-bottom-color: #f0efe7;
+        }
+      }
+    }
+    &.nabvar-menu {  /* para a navbar principal - que se diferencia das demais*/
+      border-color: transparentize($color_topo_bg, 0.2);
+      border-top-width: 1px;
+      .container {
+        padding: 0;
+      }
+      .navbar-nav {
+        & > li {
+          margin-top: 1em;
+          a {
+            line-height: 2em;
+          }
+        }
+      }
+    }
+  }
+}
 
 @media screen and (min-width: 1281px) {
   .navbar a.navbar-brand {
