@@ -1,16 +1,18 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load i18n common_tags%}
 
 {% block base_content %}
 
 <div class="actions btn-group pull-right" role="group">
+  {% if view.create_url %}
   <a href="{{ view.create_url }}" class="btn btn-default">
     {% blocktrans with verbose_name=view.verbose_name %} Adicionar {{ verbose_name }} {% endblocktrans %}
   </a>
+  {% endif %}
   {% block more_buttons %}{% endblock more_buttons %}
 </div>
 
-<br/><br/>
+<br/><br/><br/>
 {% block extra_content %} {% endblock %}
 
 {% if not rows %}
@@ -31,7 +33,7 @@
       <td>
         {% if href %}
         <a href="{{ href }}">{{ value }}</a>
-        {% else %}
+        {% elif valu != 'core.Cep.None' %}
           {{ value|safe }}
         {% endif %}
       </td>

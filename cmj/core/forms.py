@@ -1,11 +1,20 @@
 
+from crispy_forms.bootstrap import FieldWithButtons, StrictButton
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.forms import UserCreationForm as BaseUserCreationForm, UserChangeForm as BaseUserChangeForm
 from django.utils.translation import ugettext_lazy as _
+from django_filters.filterset import FilterSet
+from haystack.backends import SQ
+from haystack.forms import SearchForm
+from haystack.inputs import AutoQuery
 from image_cropping.widgets import ImageCropWidget, CropWidget
+from sapl.crispy_layout_mixin import to_row
+import django_filters
 
-from cmj.core.models import User
+from cmj.core.models import User, Trecho, TipoLogradouro
 
 
 class LoginForm(AuthenticationForm):
@@ -68,3 +77,33 @@ class UserForm(UserChangeForm):
             'avatar': CustomImageCropWidget(),
             'cropping': CropWidget(),
         }
+
+
+class TrechoFilterSet(FilterSet):
+
+    logradouro__nome = django_filters.CharFilter(lookup_expr='icontains')
+
+    class Meta:
+        model = Trecho
+        fields = ['logradouro__nome']
+        order_by = ['logradouro__nome']
+
+
+class LogradouroSearchForm(SearchForm):
+
+    def __init__(self, *args, **kwargs):
+        super(LogradouroSearchForm, self).__init__(*args, **kwargs)
+        self.fields['q'].label = _('Perquisar Por Endereços')
+        row1 = to_row([(FieldWithButtons('q', StrictButton("Pesquisar")), 12)])
+
+        self.helper = FormHelper()
+        self.helper.form_method = 'GET'
+        self.helper.layout = Layout(
+            row1
+        )
+
+    def search(self):
+        # First, store the SearchQuerySet received from other processing.
+        sqs = super(LogradouroSearchForm, self).search()
+
+        return sqs

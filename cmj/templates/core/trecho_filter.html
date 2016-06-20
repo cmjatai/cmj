@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block base_content %}
+    <form action="" method="get">
+        {{ filter.form.as_p }}
+        <input type="submit" />
+    </form>
+    {% for obj in page_obj %}
+        {{obj.tipo.nome}} {{ obj.logradouro.nome }} - {{ obj.bairro.nome }} - {{ obj.municipio.nome }} - {{ obj.cep.first}}<br>
+        
+        {% if forloop.last %}
+			{% include "paginacao.html" %}
+		{% endif %}
+    {% endfor %}
+{% endblock %}

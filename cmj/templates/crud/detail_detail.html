@@ -6,11 +6,11 @@
   <div class="clearfix">
     {% block actions %}
       <div class="actions btn-group btn-group-xs" role="group">
-        {% if view.list_url %}
-          <a href="{{ view.list_url }}" class="btn btn-default">{% trans 'Listar' %} {{view.verbose_name}}</a>
+        {% if view.detail_list_url %}
+          <a href="{{ view.detail_list_url }}" class="btn btn-default">{% trans 'Listar' %} {{view.verbose_name}}</a>
         {% endif %}
-        {% if view.create_url %}
-          <a href="{{ view.create_url }}" class="btn btn-default">
+        {% if view.detail_create_url %}
+          <a href="{{ view.detail_create_url }}" class="btn btn-default">
             {% blocktrans with verbose_name=view.verbose_name %} Adicionar {{ verbose_name }} {% endblocktrans %}
           </a>
         {% endif %}

@@ -32,7 +32,7 @@ def subnav(context, path=None):
         app = request.resolver_match.app_name
         app_template = app.split('.')
         app_template = app_template[1] if app_template[
-            0] == 'sapl' and len(app_template) > 1 else app_template[0]
+            0] == 'cmj' and len(app_template) > 1 else app_template[0]
 
         yaml_path = '%s/subnav.yaml' % app_template
 
@@ -43,9 +43,10 @@ def subnav(context, path=None):
                 A função nativa abaixo busca em todos os Loaders Configurados.
             """
             yaml_template = template.loader.get_template(yaml_path)
-            menu = yaml.load(open(yaml_template.origin.name, 'r'))
+            rendered = yaml_template.render()
+            menu = yaml.load(rendered)
             resolve_urls_inplace(menu, root_pk, app, request.path)
-        except:
+        except Exception as e:
             pass
 
     return {'menu': menu}

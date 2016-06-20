@@ -1,0 +1,32 @@
+{% load i18n %}
+Cep:
+  {% trans 'Número do CEP' %}:
+  - numero
+
+RegiaoMunicipal:
+  {% trans 'Região Municipal' %}:
+  - tipo nome:8
+
+Distrito:
+  {% trans 'Distrito' %}:
+  - nome
+
+Bairro:
+  {% trans 'Bairro' %}:
+  - nome
+
+TipoLogradouro:
+  {% trans 'Tipos de Logradouro' %}:
+  - nome
+
+Logradouro:
+  {% trans 'Logradouro' %}:
+  - nome
+
+Trecho:
+  {% trans 'Trecho' %}:
+  - tipo logradouro:8
+  - municipio bairro distrito:2 regiao_municipal:2
+  - lado numero_inicial numero_final
+  - cep
+

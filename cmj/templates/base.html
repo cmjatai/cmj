@@ -1,4 +1,4 @@
-{% load i18n staticfiles sass_tags menus %}
+{% load i18n staticfiles sass_tags menus common_tags%}
 <!DOCTYPE html>
 <!--[if IE 8]> <html class="no-js lt-ie9" lang="en"> <![endif]-->
 <!--[if gt IE 8]><!-->
@@ -101,7 +101,31 @@
                 </ul>
                 <ul class="nav navbar-nav">
 
+                  {% if perms.core.menu_pessoas %}
+                    <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'cmj.cerimonial:pessoa_list' %}">{% trans "Pessoas" %}</a></li>
+                  {% endif %}
+                  {% if perms.core.menu_dados_auxiliares %}
+                    <li class="dropdown">
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Dados Auxiliares" %}<span class="caret"></span></a>
+                      <ul class="dropdown-menu menu-left">
+                          {% if perms.core.search_trecho %}<li class="nav__sub-item"><a href="{% url 'cmj.core:search_view' %}">{% trans "Consultar base de Cep's e Endereços" %}</a></li>{% endif %}
+                          {% if perms.cerimonial.list_operadoratelefonia %}<li class="nav__sub-item"><a href="{% url 'cmj.cerimonial:operadoratelefonia_list' %}">{% model_verbose_name_plural "cmj.cerimonial.models.OperadoraTelefonia"%}</a></li>{% endif %}
+                      </ul>
+                    </li>
+                  {% endif %}
 
+                      {% comment %}
+                  <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Institucional <span class="caret"></span></a>
+                    <ul class="dropdown-menu menu-left">
+                        <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'sapl.parlamentares:mesa_diretora' %}">Mesa Diretora</a></li>
+                        <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'sapl.comissoes:comissao_list' %}">Comissões</a></li>
+                        <!-- <li class="nav__sub-item"><a class="dropdown-toggle" href="#">Bancadas</a></li> -->
+                      <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'sapl.parlamentares:parlamentar_list' %}">Parlamentares</a></li>
+                    </ul>
+                  </li>
+                      {% endcomment %}
+              {% comment %}
 
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Institucional <span class="caret"></span></a>
@@ -187,6 +211,7 @@
                         </li>
                       </ul>
                     </li>
+              {% endcomment %}
                 </ul>
               </div><!--/.nav-collapse -->
             </div>

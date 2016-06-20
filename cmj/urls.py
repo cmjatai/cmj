@@ -13,6 +13,21 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
+#url('', include('django.contrib.auth.urls', namespace='auth')),
+# url(r'^sapl/', include(sapl.urls)),
+"""
+url(r'^sapl/', include(sapl.comissoes.urls)),
+url(r'^sapl/', include(sapl.sessao.urls)),
+url(r'^sapl/', include(sapl.parlamentares.urls)),
+url(r'^sapl/', include(sapl.materia.urls)),
+url(r'^sapl/', include(sapl.norma.urls)),
+url(r'^sapl/', include(sapl.lexml.urls)),
+url(r'^sapl/', include(sapl.painel.urls)),
+url(r'^sapl/', include(sapl.protocoloadm.urls)),
+url(r'^sapl/', include(sapl.compilacao.urls)),
+url(r'^sapl/', include(sapl.relatorios.urls)),
+url(r'^sapl/', include(sapl.base.urls)),"""
+
 from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
@@ -34,29 +49,17 @@ import sapl.protocoloadm.urls
 import sapl.relatorios.urls
 import sapl.sessao.urls
 
+import cmj.cerimonial.urls
 import cmj.core.urls
 
-#url('', include('django.contrib.auth.urls', namespace='auth')),
-# url(r'^sapl/', include(sapl.urls)),
-"""
-url(r'^sapl/', include(sapl.comissoes.urls)),
-url(r'^sapl/', include(sapl.sessao.urls)),
-url(r'^sapl/', include(sapl.parlamentares.urls)),
-url(r'^sapl/', include(sapl.materia.urls)),
-url(r'^sapl/', include(sapl.norma.urls)),
-url(r'^sapl/', include(sapl.lexml.urls)),
-url(r'^sapl/', include(sapl.painel.urls)),
-url(r'^sapl/', include(sapl.protocoloadm.urls)),
-url(r'^sapl/', include(sapl.compilacao.urls)),
-url(r'^sapl/', include(sapl.relatorios.urls)),
-url(r'^sapl/', include(sapl.base.urls)),"""
 
 urlpatterns = [
     url(r'^django-admin/', admin.site.urls),
 
     url('', include('social.apps.django_app.urls', namespace='social')),
-    url(r'', include(cmj.core.urls)),
 
+    url(r'', include(cmj.core.urls)),
+    url(r'', include(cmj.cerimonial.urls)),
 
     url(r'', include(sapl.comissoes.urls)),
     url(r'', include(sapl.sessao.urls)),
@@ -71,7 +74,7 @@ urlpatterns = [
     url(r'', include(sapl.base.urls)),
 
     url(r'^admin/', include(wagtailadmin_urls)),
-    url(r'^search/', include(wagtailsearch_urls)),
+    url(r'^search_wagtail/', include(wagtailsearch_urls)),
     url(r'^documentos/', include(wagtaildocs_urls)),
     url(r'', include(wagtail_urls)),
 
@@ -85,7 +88,6 @@ if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL,
                           document_root=settings.STATIC_ROOT)
 
-if settings.DEBUG:
     urlpatterns += [
         url(r'^media/(?P<path>.*)$', view_static_server, {
             'document_root': settings.MEDIA_ROOT,

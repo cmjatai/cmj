@@ -104,6 +104,10 @@ def create_barcode(value):
 YES_NO_CHOICES = [(True, _('Sim')), (False, _('Não'))]
 
 
+NONE_YES_NO_CHOICES = [(None, _('---------')),
+                       (True, _('Sim')), (False, _('Não'))]
+
+
 def listify(function):
     @wraps(function)
     def f(*args, **kwargs):

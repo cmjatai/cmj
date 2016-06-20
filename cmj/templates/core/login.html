@@ -70,10 +70,9 @@
 
 
   <script>
-    {% if not user.is_authenticated %}
+
      $("#autenticacao") .css("display","none");
     $("html").addClass('html-login');
-    {% endif %}
   </script>
 
 {% endblock %}

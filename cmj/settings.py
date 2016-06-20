@@ -38,6 +38,8 @@ CMJ_APPS = (
     'cmj.core',
     'cmj.home',
     'sapl',
+
+    'cmj.cerimonial'
 )
 
 INSTALLED_APPS = (
@@ -61,6 +63,9 @@ INSTALLED_APPS = (
     'sass_processor',
     'rest_framework',
 
+    'haystack',
+    # "elasticstack",
+
     'wagtail.wagtailforms',
     'wagtail.wagtailredirects',
     'wagtail.wagtailembeds',
@@ -77,6 +82,9 @@ INSTALLED_APPS = (
     'modelcluster',
 
     'wagtail.contrib.modeladmin',
+
+
+
 
 )
 
@@ -183,16 +191,14 @@ SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
 }
 
 SOCIAL_BACKEND_INFO = {
-
     'facebook': {
         'title': 'Facebook',
         'icon': 'img/icon-facebook.png',
     },
-    'google-ocore': {
+    'google-oauth2': {
         'title': 'Google',
         'icon': 'img/icon-google-plus.png',
     },
-
 }
 # twitter não está funcinando com a customização do auth.User,
 # ao menos localmente... testar em um domínio válido.
@@ -232,10 +238,10 @@ STATICFILES_FINDERS = (
 )
 
 
-MEDIA_ROOT = BASE_DIR.parent.child("media")
+MEDIA_ROOT = PROJECT_DIR.child("media")
 MEDIA_URL = '/media/'
 
-MEDIA_PROTECTED_ROOT = BASE_DIR.parent.child("media_protected")
+MEDIA_PROTECTED_ROOT = PROJECT_DIR.child("media_protected")
 
 DAB_FIELD_RENDERER = \
     'django_admin_bootstrapped.renderers.BootstrapFieldRenderer'
@@ -280,3 +286,32 @@ EMAIL_PORT = config('EMAIL_PORT', cast=int)
 
 MAX_DOC_UPLOAD_SIZE = 5 * 1024 * 1024  # 5MB
 MAX_IMAGE_UPLOAD_SIZE = 2 * 1024 * 1024  # 2MB
+
+# django-haystack: http://django-haystack.readthedocs.org/
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+        'URL': 'http://127.0.0.1:9200/',
+        'INDEX_NAME': 'haystack',
+    },
+}
+
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
+        'PATH': PROJECT_DIR.child('whoosh_index'),
+    },
+}
+
+
+"""HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'elasticstack.backends.ConfigurableElasticSearchEngine',
+        'URL': 'http://127.0.0.1:9200/',
+        'INDEX_NAME': 'haystack',
+    },
+}
+"""
+
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+#ELASTICSEARCH_DEFAULT_ANALYZER = "snowball"

@@ -5,5 +5,3 @@ django-debug-toolbar==1.4
 ipdb==0.9.0
 pygraphviz==1.3rc2
 pytest-ipdb==0.1-prerelease2
-flack8
-flack8-docstrings

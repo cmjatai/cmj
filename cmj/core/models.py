@@ -89,6 +89,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     class Meta(AbstractBaseUser.Meta):
         abstract = False
+        permissions = (
+            ("menu_dados_auxiliares", _('Mostrar Menu Dados Auxiliares')),
+            ("menu_pessoas", _('Mostrar Menu de Cadastro de Pessoas')),
+        )
 
     def __unicode__(self):
         return self.get_display_name()
@@ -190,34 +194,26 @@ class RegiaoMunicipal(models.Model):
         default='AU',
         choices=TIPO_CHOICES, verbose_name='Tipo da Região')
 
-    municipio = models.ForeignKey(
-        Municipio,
-        related_name='regioes_municipais_set',
-        verbose_name=_('Municipio'))
-
     class Meta:
         verbose_name = _('Região Municipal')
         verbose_name_plural = _('Regiões Municipais')
         unique_together = (
-            ('nome', 'tipo', 'municipio'),)
+            ('nome', 'tipo'),)
 
     def __str__(self):
-        return '%s - %s - %s' % (
-            self.nome, self.get_tipo_display(), self.municipio)
+        return '%s - %s' % (
+            self.nome, self.get_tipo_display())
 
 
 class Distrito(models.Model):
     nome = models.CharField(
-        max_length=254, verbose_name=_('Nome do Distrito'))
-    regiao_municipal = models.ForeignKey(
-        RegiaoMunicipal,
-        related_name='distritos_set',
-        verbose_name=_('Região Municipal'))
+        max_length=254,
+        verbose_name=_('Nome do Distrito'),
+        unique=True)
 
     class Meta:
         verbose_name = _('Distrito')
         verbose_name_plural = _("Distritos")
-        unique_together = (('nome', 'regiao_municipal'), )
 
     def __str__(self):
         return self.nome
@@ -225,22 +221,13 @@ class Distrito(models.Model):
 
 class Bairro(models.Model):
     nome = models.CharField(
-        max_length=254, verbose_name=_('Bairro'))
-    distrito = models.ForeignKey(
-        Distrito,
-        blank=True, null=True, default=None,
-        related_name='bairros_set',
-        verbose_name=_('Distrito'))
-    regiao_municipal = models.ForeignKey(
-        RegiaoMunicipal,
-        blank=True, null=True, default=None,
-        related_name='bairros_set',
-        verbose_name=_('Região Municipal'))
+        max_length=254,
+        verbose_name=_('Bairro'),
+        unique=True)
 
     class Meta:
         verbose_name = _('Bairro')
         verbose_name_plural = _("Bairros")
-        unique_together = (('nome', 'distrito', 'regiao_municipal'), )
 
     def __str__(self):
         return self.nome
@@ -248,7 +235,9 @@ class Bairro(models.Model):
 
 class TipoLogradouro(models.Model):
     nome = models.CharField(
-        max_length=254, verbose_name=_('Tipo de Logradouro'), unique=True)
+        max_length=254,
+        verbose_name=_('Tipo de Logradouro'),
+        unique=True)
 
     class Meta:
         verbose_name = _('Tipo de Logradouro')
@@ -260,21 +249,16 @@ class TipoLogradouro(models.Model):
 
 class Logradouro(models.Model):
     nome = models.CharField(
-        max_length=254, verbose_name=_('Logradouro'))
-
-    tipo = models.ForeignKey(
-        TipoLogradouro,
-        blank=True, null=True, default=None,
-        related_name='logradouros_set',
-        verbose_name=_('Tipo de Logradouro'))
+        max_length=254,
+        verbose_name=_('Logradouro'),
+        unique=True)
 
     class Meta:
         verbose_name = _('Logradouro')
         verbose_name_plural = _("Logradouros")
-        unique_together = (('nome', 'tipo'), )
 
     def __str__(self):
-        return '%s %s' % (self.tipo, self.nome)
+        return self.nome
 
 
 class Trecho(CmjModelMixin):
@@ -283,6 +267,12 @@ class Trecho(CmjModelMixin):
         blank=True, null=True, default=None,
         related_name='trechos_set',
         verbose_name=_('Logradouro'))
+
+    tipo = models.ForeignKey(
+        TipoLogradouro,
+        blank=True, null=True, default=None,
+        related_name='trechos_set',
+        verbose_name=_('Tipo de Logradouro'))
 
     bairro = models.ForeignKey(
         Bairro,
@@ -302,9 +292,14 @@ class Trecho(CmjModelMixin):
         related_name='trechos_set',
         verbose_name=_('Região Municipal'))
 
+    municipio = models.ForeignKey(
+        Municipio,
+        related_name='trechos_set',
+        verbose_name=_('Município'))
+
     LADO_CHOICES = [
         ('NA', _('Não Aplicável')),
-        ('AL', _('Ambos os lados')),
+        ('AL', _('Ambos os Lados')),
         ('LE', _('Lado Esquerdo')),
         ('LD', _('Lado Direito'))]
 
@@ -330,23 +325,37 @@ class Trecho(CmjModelMixin):
     class Meta:
         verbose_name = _('Trecho de Logradouro')
         verbose_name_plural = _("Trechos de Logradouro")
+        ordering = [
+            'municipio__nome',
+            'regiao_municipal__nome',
+            'distrito__nome',
+            'bairro__nome',
+            'logradouro__nome']
         unique_together = (
-            ('logradouro',
-             'bairro',
-             'distrito',
-             'regiao_municipal',
-             'lado',
-             'numero_inicial',
-             'numero_final'),)
+            ('municipio',
+                'regiao_municipal',
+                'distrito',
+                'bairro',
+                'logradouro',
+                'tipo',
+                'lado',
+                'numero_inicial',
+                'numero_final'),)
+        permissions = (
+            ("search_trecho", _('Consultar base de Trechos.')),
+        )
 
     def __str__(self):
+        uf = str(self.municipio.uf) if self.municipio else ''
+        municipio = str(self.municipio.nome) + '-' if self.municipio else ''
+        tipo = str(self.tipo) + ' ' if self.tipo else ''
         logradouro = str(self.logradouro) + ' - ' if self.logradouro else ''
         bairro = self.bairro.nome + ' - ' if self.bairro else ''
         distrito = self.distrito.nome + ' - ' if self.distrito else ''
         rm = self.regiao_municipal.nome + \
             ' - ' if self.regiao_municipal else ''
 
-        return '%s%s%s%s%s' % (
-            logradouro, bairro, distrito, rm, ' - '.join(
+        return '%s%s%s%s%s%s%s [%s]' % (
+            tipo, logradouro, bairro, distrito, rm, municipio, uf, ' - '.join(
                 self.cep.values_list('numero', flat=True))
         )

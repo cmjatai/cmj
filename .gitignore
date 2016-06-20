@@ -88,4 +88,5 @@ collected_static
 bower
 bower_components
 media
+whoosh_index/
 

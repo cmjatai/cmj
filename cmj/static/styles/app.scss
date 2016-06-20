@@ -1,4 +1,5 @@
-@import url(http://fonts.googleapis.com/css?family=Graduate:400,700,300);
+@import url(http://fonts.googleapis.com/css?family=Graduate:400);
+
 @import url(https://fonts.googleapis.com/css?family=Roboto:400,100,300,700,500);
 @import url(http://fonts.googleapis.com/css?family=Raleway:400,700,300);
 @import url(http://fonts.googleapis.com/css?family=Kaushan+Script);
@@ -202,6 +203,16 @@ main {
     }
   }
 }
+.control-label {
+  color: $color_text;
+}
+.form-control-static {
+  font-size: 1.2em;
+}
+.table {
+  background-color: rgba(#000, 0.02);
+}
+
 .table > thead > tr > th, .table > thead > tr > td, .table > tbody > tr > th, .table > tbody > tr > td, .table > tfoot > tr > th, .table > tfoot > tr > td {
   border-top-color: darken($color_main_bg, 10%);
   border-bottom-width: 0;
@@ -619,7 +630,7 @@ body {
           & > li {
             & > a {
               padding: 0 1em;
-              line-height: 2em;
+              line-height: 2.5em;
             }
           }
           .menu-left {
@@ -734,7 +745,10 @@ body {
 
 
 @media print {
-  .masthead {
+  .masthead, .btn-group {
     display: none;
+  }
+  a[href]:after {
+    content: none !important;
   }
 }

@@ -1,0 +1,37 @@
+{% extends "sistema.html" %}
+{% load i18n crispy_forms_tags common_tags %}
+
+{% block base_content %}
+
+  <fieldset>
+  <legend><h1>{% trans "Tabelas Auxiliares" %}</h2></legend>
+    <h2>Módulo de Endereços</h2>
+    <div class="row">
+      <div class="col-md-6"><a href="{% url 'cmj.core:trecho_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.core.models.Trecho"%}</a></div>
+      <div class="col-md-6"><a href="{% url 'cmj.core:cep_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.core.models.Cep"%}</a></div>
+      <div class="col-md-6"><a href="{% url 'cmj.core:logradouro_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.core.models.Logradouro"%}</a></div>
+      <div class="col-md-6"><a href="{% url 'cmj.core:tipologradouro_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.core.models.TipoLogradouro"%}</a></div>
+      <div class="col-md-6"><a href="{% url 'cmj.core:bairro_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.core.models.Bairro"%}</a></div>
+      <div class="col-md-6"><a href="{% url 'cmj.core:distrito_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.core.models.Distrito"%}</a></div>
+      <div class="col-md-6"><a href="{% url 'cmj.core:regiaomunicipal_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.core.models.RegiaoMunicipal"%}</a></div>
+    </div>
+    <h2>Módulo Cerimonial / Gestão de Gabinetes</h2>
+    <div class="row">
+      <div class="col-md-6"><a href="{% url 'cmj.cerimonial:statusvisita_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.cerimonial.models.StatusVisita"%}</a></div>
+      <div class="col-md-6"><a href="{% url 'cmj.cerimonial:tipotelefone_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.cerimonial.models.TipoTelefone"%}</a></div>
+      <div class="col-md-6"><a href="{% url 'cmj.cerimonial:tipoendereco_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.cerimonial.models.TipoEndereco"%}</a></div>
+      <div class="col-md-6"><a href="{% url 'cmj.cerimonial:tipoemail_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.cerimonial.models.TipoEmail"%}</a></div>
+      <div class="col-md-6"><a href="{% url 'cmj.cerimonial:parentesco_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.cerimonial.models.Parentesco"%}</a></div>
+      <div class="col-md-6"><a href="{% url 'cmj.cerimonial:estadocivil_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.cerimonial.models.EstadoCivil"%}</a></div>
+      <div class="col-md-6"><a href="{% url 'cmj.cerimonial:tipoautoridade_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.cerimonial.models.TipoAutoridade"%}</a></div>
+      <div class="col-md-6"><a href="{% url 'cmj.cerimonial:tipolocaltrabalho_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.cerimonial.models.TipoLocalTrabalho"%}</a></div>
+      <div class="col-md-6"><a href="{% url 'cmj.cerimonial:nivelinstrucao_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.cerimonial.models.NivelInstrucao"%}</a></div>
+      <div class="col-md-6"><a href="{% url 'cmj.cerimonial:operadoratelefonia_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.cerimonial.models.OperadoraTelefonia"%}</a></div>
+  </fieldset>
+
+  <br><br><br>
+  <fieldset>
+  <legend><h1>{% trans "Tabelas Auxiliares do SAPL" %}</h2></legend>
+    {{block.super}}
+  </fieldset>
+{% endblock base_content %}

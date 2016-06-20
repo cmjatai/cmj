@@ -1,0 +1,48 @@
+{% load i18n %}
+StatusVisita:
+  {% trans 'Status de Visitas' %}:
+  - descricao
+TipoTelefone:
+  {% trans 'Tipo de Telefone' %}:
+  - descricao
+TipoEndereco:
+  {% trans 'Tipo de Endereço' %}:
+  - descricao
+TipoEmail:
+  {% trans 'Tipo de Email' %}:
+  - descricao
+Parentesco:
+  {% trans 'Parentesco' %}:
+  - descricao
+EstadoCivil:
+  {% trans 'Estado Civil' %}:
+  - descricao
+TipoAutoridade:
+  {% trans 'Tipo de Autoridade' %}:
+  - descricao
+TipoLocalTrabalho:
+  {% trans 'Tipo do Local de Trabalho' %}:
+  - descricao
+NivelInstrucao:
+  {% trans 'Nivel de Instrução' %}:
+  - descricao
+OperadoraTelefonia:
+  {% trans 'Operadora de Telefonia' %}:
+  - descricao
+Pessoa:
+  {% trans 'Dados Básicos' %}:
+  - nome
+  - data_nascimento estado_civil sexo
+  - nivel_instrucao:4 naturalidade tem_filhos quantos_filhos
+  {% trans 'Pais' %}:
+  - nome_pai nome_mae
+  {% trans 'Documentos' %}:
+  - numero_sus cpf titulo_eleitor
+  - rg rg_orgao_expedidor rg_data_expedicao ativo
+Telefone:
+  {% trans 'Telefone' %}:
+  - ddd:2 numero:3 tipo:3 operadora:4
+  - proprio:3 de_quem_e
+Email:
+  {% trans 'Email' %}:
+  - email:6 tipo preferencial
