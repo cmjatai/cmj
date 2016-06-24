@@ -21,6 +21,10 @@ class DataMigrator:
 
     def migrate(self, pini, pfim):
 
+        Trecho.objects.all().delete()
+        Cep.objects.all().delete()
+        print('Excluiu')
+
         rm = RegiaoMunicipal.objects.filter(nome='Sede do Município')
 
         if rm.exists():
@@ -58,7 +62,8 @@ class DataMigrator:
             logradouro = None
             tl = None
             for item in model.objects.order_by(
-                    'cidade', 'bairro', 'tp_logradouro', 'logradouro').all():
+                'cidade', 'bairro', 'tp_logradouro', 'logradouro').filter(
+                    cidade='Jataí'):
 
                 if not municipio or\
                         municipio.uf != uf_upper or\
@@ -81,7 +86,7 @@ class DataMigrator:
                     municipio.save()
                     print('C-', municipio.nome)
 
-                str_cep = item.cep.replace('-', '')
+                str_cep = item.cep  # .replace('-', '')
                 try:
                     cep = Cep.objects.get(numero=str_cep)
                 except:

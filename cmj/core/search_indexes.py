@@ -5,7 +5,7 @@ from haystack import indexes
 from cmj.core.models import Trecho
 
 
-class EnderecoIndex(indexes.SearchIndex, indexes.Indexable):
+class trechoIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.EdgeNgramField(document=True)
     display = indexes.CharField(indexed=False)
 

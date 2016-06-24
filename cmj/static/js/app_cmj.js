@@ -1,4 +1,142 @@
-function SetCookie(cookieName,cookieValue,nDays) {
+function TrechoSearch(opts) {
+    $(function() {
+        var cts_clear = $('body').children(".cts"); // Container Trecho Search
+        if (cts_clear.length > 0)
+            $(cts_clear).remove();
+
+
+
+        $("input[name='endereco']").each(function() {
+            var input = $(this);
+            var input_row_fluid = $(input.closest('.row-fluid'));
+            var cts = $('<div class="cts"/>');
+            var qOld = input.val();
+            var qNew = input.val();
+            var intervalKeyPress = null;
+            input.after(cts);
+
+            var cts_show = function(){
+                var row_fluid_position = input_row_fluid[0].getBoundingClientRect();
+                var input_position = input.context.getBoundingClientRect();
+                cts.animate({
+                    'top': input_position.bottom ,
+                    'left':  input_position.left + 7,
+                    'right':  row_fluid_position.right - row_fluid_position.width
+                },400);
+                //cts.css('top', input_position.bottom);
+                //cts.css('left', input_position.left + 7);
+                //cts.css('right', row_fluid_position.right - row_fluid_position.width);
+            }
+            var cts_hidden = function() {
+                cts.css('visibility', 'hidden');
+            }
+
+            $(window).resize(cts_hidden);
+            $(window).scroll(cts_hidden);
+
+            var zoomListeners = [cts_hidden];
+            var lastWidth = 0;
+            var pollZoomFireEvent = function() {
+              var widthNow = $(window).width();
+              if (lastWidth == widthNow) return;
+              lastWidth = widthNow;
+              // Length changed, user must have zoomed, invoke listeners.
+              for (i = zoomListeners.length - 1; i >= 0; --i) {
+                zoomListeners[i]();
+              }
+            }
+            setInterval(pollZoomFireEvent, 300);
+
+            var flag_newkeypress = false;
+            var flag_get_run_ajax = false;
+            var keyUpEndereco = function() {
+                if (qOld != qNew) {
+                    qOld = qNew;
+                    return;
+                }
+                if (!flag_newkeypress)
+                    return;
+                flag_newkeypress = false;
+
+                if (flag_get_run_ajax)
+                    return;
+                flag_get_run_ajax = true;
+
+                var formData = {
+                    'q'      : qNew,
+                    'format' : 'json',
+                }
+                $.get(opts.api_rest_list, formData).done( function(data) {
+                    cts.html('');
+                    cts_show();
+                    cts.css('visibility', (data.results.length == 0 ? 'hidden': 'visible'));
+
+                    $.each(data.results, function(index, item_data ) {
+                        var its = $('<div class="its"/>'); // Item de Trecho Search
+                        its.append(item_data.display);
+                        cts.append(its);
+
+
+                        its.on('click', function(event, set_data_endereco) {
+                            var pk = this.data;
+                            var formData = {
+                                'format'            : 'json',
+                            }
+                            var url = opts.api_rest_retrieve;
+                            url = url.replace('0', pk)
+                            $.get(url, formData, function(retrivie_data) {
+                                $("input[name='trecho']").val(pk);
+                                if (set_data_endereco !== undefined && set_data_endereco)
+                                    $("input[name='endereco']").attr('data', retrivie_data.tipo_descricao + ' ' + retrivie_data.logradouro_descricao);
+                                else
+                                    $("input[name='endereco']").val(retrivie_data.tipo_descricao + ' ' + retrivie_data.logradouro_descricao);
+                                $("input[name='bairro']").val(retrivie_data.bairro_descricao);
+                                $("input[name='cep']").val(retrivie_data.cep[0]);
+                                $("select[name='distrito']").val(retrivie_data.distrito_id);
+                                $("select[name='regiao_municipal']").val(retrivie_data.regiao_municipal_id);
+                                $("select[name='municipio']").val(retrivie_data.municipio_id);
+                                $("select[name='uf']").val(retrivie_data.uf);
+
+                            });
+                        });
+
+                        its[0].data =  item_data.pk;
+
+                        if (data.results.length == 1)
+                            its.trigger('click', true)
+
+
+                    });
+                }).always(function() {
+                    flag_get_run_ajax = false;
+                });
+            };
+            input.on('keyup', function() {
+                //var d = new Date();
+                //console.log(d.getSeconds()+'.'+d.getMilliseconds());
+                if (intervalKeyPress == null)
+                    intervalKeyPress = setInterval(keyUpEndereco, 700);
+                flag_newkeypress = true;
+                qNew = input.val();
+                if (qNew == qOld || qNew.length < 3) {
+                    cts.css('visibility', 'hidden');
+                    return;
+                }
+            }).on('blur', function() {
+                var input_data = $(this).attr('data');
+                if (input_data !== undefined && input_data != '')
+                   $(this).val(input_data);
+
+                setTimeout(function() {
+                    cts.css('visibility', 'hidden');
+                },300);
+            });
+        });
+    });
+}
+
+
+/*function SetCookie(cookieName,cookieValue,nDays) {
     var today = new Date();
     var expire = new Date();
     if (nDays==null || nDays==0) nDays=1;
@@ -64,11 +202,5 @@ function refreshMask() {
 
 
 $(document).ready(function(){
-    refreshDatePicker();
-    refreshMask();
-    initTinymce("texto-rico");
-
-    $("input[name='search']").focus();
-
-
 });
+*/

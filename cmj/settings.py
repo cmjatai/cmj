@@ -42,6 +42,10 @@ CMJ_APPS = (
     'cmj.cerimonial'
 )
 
+INITIAL_VALUE_FORMS_UF = config('INITIAL_VALUE_FORMS_UF')
+INITIAL_VALUE_FORMS_MUNICIPIO = config('INITIAL_VALUE_FORMS_MUNICIPIO')
+INITIAL_VALUE_FORMS_CEP = config('INITIAL_VALUE_FORMS_CEP')
+
 INSTALLED_APPS = (
     'django_admin_bootstrapped',  # must come before django.contrib.admin
     'django.contrib.admin',
@@ -262,8 +266,9 @@ BOWER_INSTALLED_APPS = (
 )
 
 # Additional search paths for SASS files when using the @import statement
-SASS_PROCESSOR_INCLUDE_DIRS = (BOWER_COMPONENTS_ROOT.child(
-    'bower_components', 'bootstrap-sass', 'assets', 'stylesheets'),
+SASS_PROCESSOR_INCLUDE_DIRS = (
+    BOWER_COMPONENTS_ROOT.child(
+        'bower_components', 'bootstrap-sass', 'assets', 'stylesheets'),
 )
 
 # FIXME update cripy-forms and remove this
@@ -288,13 +293,13 @@ MAX_DOC_UPLOAD_SIZE = 5 * 1024 * 1024  # 5MB
 MAX_IMAGE_UPLOAD_SIZE = 2 * 1024 * 1024  # 2MB
 
 # django-haystack: http://django-haystack.readthedocs.org/
-HAYSTACK_CONNECTIONS = {
+"""HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
         'URL': 'http://127.0.0.1:9200/',
         'INDEX_NAME': 'haystack',
     },
-}
+}"""
 
 HAYSTACK_CONNECTIONS = {
     'default': {

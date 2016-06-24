@@ -2,8 +2,9 @@ from django.conf.urls import url, include
 
 from cmj.cerimonial.views import StatusVisitaCrud, TipoTelefoneCrud,\
     TipoEnderecoCrud, TipoEmailCrud, ParentescoCrud, EstadoCivilCrud,\
-    TipoAutoridadeCrud, TipoLocalTrabalhoCrud, NivelInstrucaoCrud, PessoaCrud,\
-    TelefoneCrud, OperadoraTelefoniaCrud, EmailCrud
+    TipoAutoridadeCrud, TipoLocalTrabalhoCrud, NivelInstrucaoCrud, ContatoCrud,\
+    TelefoneCrud, OperadoraTelefoniaCrud, EmailCrud,\
+    PronomeTratamentoCrud, DependenteCrud, LocalTrabalhoCrud, EnderecoCrud
 
 from .apps import AppConfig
 
@@ -13,8 +14,10 @@ app_name = AppConfig.name
 
 urlpatterns = [
 
-    url(r'^pessoa/', include(
-        PessoaCrud.get_urls() + TelefoneCrud.get_urls() + EmailCrud.get_urls()
+    url(r'^contato/', include(
+        ContatoCrud.get_urls() + TelefoneCrud.get_urls() +
+        EmailCrud.get_urls() + DependenteCrud.get_urls() +
+        LocalTrabalhoCrud.get_urls() + EnderecoCrud.get_urls()
     )),
 
     url(r'^sistema/cerimonial/statusvisita/',
@@ -37,4 +40,6 @@ urlpatterns = [
         include(OperadoraTelefoniaCrud.get_urls())),
     url(r'^sistema/cerimonial/nivelinstrucao/',
         include(NivelInstrucaoCrud.get_urls())),
+    url(r'^sistema/cerimonial/pronometratamento/',
+        include(PronomeTratamentoCrud.get_urls())),
 ]

@@ -13,12 +13,15 @@
     {% block head_content %}
       <link rel="icon" href="{% static 'img/logo.png' %}"  type="image/png" >
       {# Styles #}
-      <link rel="stylesheet" href="{% static 'components-font-awesome/css/font-awesome.css' %}">
-      <link rel="stylesheet" href="{% sass_src 'bootstrap-sass/assets/stylesheets/_bootstrap.scss' %}" type="text/css">
+      {% comment %}
       <link rel="stylesheet" href="{% static 'drunken-parrot-flat-ui/css/drunken-parrot.css' %}">
+      {% endcomment %}
+      <link rel="stylesheet" href="{% sass_src 'bootstrap-sass/assets/stylesheets/_bootstrap.scss' %}" type="text/css">
+
       <link rel="stylesheet" href="{% sass_src 'styles/app.scss' %}" type="text/css">
 
       <link rel="stylesheet" href="{% static 'jquery-ui/themes/cupertino/jquery-ui.min.css' %}">
+      <link rel="stylesheet" href="{% static 'components-font-awesome/css/font-awesome.css' %}">
 
       {# Scripts #}
       {# modernizr must be in head (see http://modernizr.com/docs/#installing) #}
@@ -101,15 +104,17 @@
                 </ul>
                 <ul class="nav navbar-nav">
 
-                  {% if perms.core.menu_pessoas %}
-                    <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'cmj.cerimonial:pessoa_list' %}">{% trans "Pessoas" %}</a></li>
+                  {% if perms.core.menu_contatos %}
+                    <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'cmj.cerimonial:contato_list' %}">{% trans "Contatos" %}</a></li>
                   {% endif %}
                   {% if perms.core.menu_dados_auxiliares %}
                     <li class="dropdown">
                       <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Dados Auxiliares" %}<span class="caret"></span></a>
                       <ul class="dropdown-menu menu-left">
+                          {% if perms.core.menu_tabelas_auxiliares %}<li class="nav__sub-item"><a href="{% url 'cmj.core:tabelas_auxiliares' %}">{% trans "Tabelas" %}</a></li>{% endif %}
                           {% if perms.core.search_trecho %}<li class="nav__sub-item"><a href="{% url 'cmj.core:search_view' %}">{% trans "Consultar base de Cep's e Endereços" %}</a></li>{% endif %}
                           {% if perms.cerimonial.list_operadoratelefonia %}<li class="nav__sub-item"><a href="{% url 'cmj.cerimonial:operadoratelefonia_list' %}">{% model_verbose_name_plural "cmj.cerimonial.models.OperadoraTelefonia"%}</a></li>{% endif %}
+                          {% if perms.cerimonial.list_nivelinstrucao %}<li class="nav__sub-item"><a href="{% url 'cmj.cerimonial:nivelinstrucao_list' %}">{% model_verbose_name_plural "cmj.cerimonial.models.NivelInstrucao"%}</a></li>{% endif %}
                       </ul>
                     </li>
                   {% endif %}
@@ -297,6 +302,7 @@
       <script type="text/javascript" src="{% static 'jsdiff/diff.min.js' %}"></script>
 
       <script type="text/javascript" src="{% static 'js/app.js' %}"></script>
+      <script type="text/javascript" src="{% static 'js/app_cmj.js' %}"></script>
 
       {% block extra_js %}{% endblock %}
 

@@ -1,7 +1,13 @@
 {% load i18n %}
-- title: {% trans 'Início' %}
-  url: pessoa_detail
+- title: {% trans 'Dados Básicos' %}
+  url: contato_detail
+- title: {% trans 'Endereços' %}
+  url: endereco_list
 - title: {% trans 'Telefones' %}
   url: telefone_list
 - title: {% trans "Email's" %}
   url: email_list
+- title: {% trans "Locais de Trabalho" %}
+  url: localtrabalho_list
+- title: {% trans "Dependentes" %}
+  url: dependente_list

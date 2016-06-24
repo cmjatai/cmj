@@ -71,17 +71,22 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=30, blank=True)
-    is_staff = models.BooleanField(_('staff status'), default=False,
-                                   help_text=_('Designates whether the user can log into this admin '
-                                               'site.'))
-    is_active = models.BooleanField(_('active'), default=True,
-                                    help_text=_('Designates whether this user should be treated as '
-                                                'active. Unselect this instead of deleting accounts.'))
+    is_staff = models.BooleanField(
+        _('staff status'), default=False,
+        help_text=_('Designates whether the user can log into this admin '
+                    'site.'))
+    is_active = models.BooleanField(
+        _('active'), default=True,
+        help_text=_('Designates whether this user should be treated as '
+                    'active. Unselect this instead of deleting accounts.'))
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
-    avatar = ImageCropField(_('profile picture'), upload_to="avatars/",
-                            validators=[avatar_validation], null=True, blank=True)
-    cropping = ImageRatioField('avatar', '70x70', help_text=_(
-        'Note that the preview above will only be updated after you submit the form.'))
+    avatar = ImageCropField(
+        _('profile picture'), upload_to="avatars/",
+        validators=[avatar_validation], null=True, blank=True)
+    cropping = ImageRatioField(
+        'avatar', '70x70', help_text=_(
+            'Note that the preview above will only be updated after '
+            'you submit the form.'))
 
     objects = UserManager()
 
@@ -91,10 +96,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         abstract = False
         permissions = (
             ("menu_dados_auxiliares", _('Mostrar Menu Dados Auxiliares')),
-            ("menu_pessoas", _('Mostrar Menu de Cadastro de Pessoas')),
+            ("menu_tabelas_auxiliares", _('Mostrar Menu de '
+                                          'Tabelas Auxiliares')),
+            ("menu_contatos", _('Mostrar Menu de Cadastro de Contatos')),
         )
 
-    def __unicode__(self):
+    def __str__(self):
         return self.get_display_name()
 
     def get_full_name(self):
@@ -170,7 +177,7 @@ class CmjModelMixin(models.Model):
 
 
 class Cep(models.Model):
-    numero = models.CharField(max_length=8, verbose_name=_('CEP'), unique=True)
+    numero = models.CharField(max_length=9, verbose_name=_('CEP'), unique=True)
 
     class Meta:
         verbose_name = _('CEP')
@@ -355,7 +362,9 @@ class Trecho(CmjModelMixin):
         rm = self.regiao_municipal.nome + \
             ' - ' if self.regiao_municipal else ''
 
-        return '%s%s%s%s%s%s%s [%s]' % (
-            tipo, logradouro, bairro, distrito, rm, municipio, uf, ' - '.join(
-                self.cep.values_list('numero', flat=True))
+        join_cep = ' - '.join(self.cep.values_list('numero', flat=True))
+        join_cep = ' - ' + join_cep if join_cep else ''
+
+        return '%s%s%s%s%s%s%s%s' % (
+            tipo, logradouro, bairro, distrito, rm, municipio, uf, join_cep
         )
