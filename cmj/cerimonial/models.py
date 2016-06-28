@@ -1,4 +1,5 @@
 
+from django.contrib.auth.models import Group
 from django.db import models
 from django.db.models.deletion import SET_NULL, PROTECT, CASCADE
 from django.utils.translation import ugettext_lazy as _
@@ -6,8 +7,9 @@ from sapl.parlamentares.models import Parlamentar, Municipio, Partido
 from sapl.utils import UF
 
 from cmj.core.models import CmjModelMixin, Trecho, Distrito, RegiaoMunicipal,\
-    User, CmjAuditoriaModelMixin
-from cmj.utils import YES_NO_CHOICES, NONE_YES_NO_CHOICES
+    CmjAuditoriaModelMixin
+from cmj.utils import YES_NO_CHOICES, NONE_YES_NO_CHOICES,\
+    get_settings_auth_user_model
 
 
 class DescricaoAbstractModel(models.Model):
@@ -132,7 +134,7 @@ class AreaTrabalho(CmjAuditoriaModelMixin):
         blank=True, null=True, on_delete=CASCADE)
 
     operadores = models.ManyToManyField(
-        User,
+        get_settings_auth_user_model(),
         through='OperadorAreaTrabalho',
         through_fields=('area_trabalho', 'operador'),
         symmetrical=False,
@@ -149,7 +151,7 @@ class AreaTrabalho(CmjAuditoriaModelMixin):
 class OperadorAreaTrabalho(CmjAuditoriaModelMixin):
 
     operador = models.ForeignKey(
-        User,
+        get_settings_auth_user_model(),
         verbose_name=_('Operador da Área de Trabalho'),
         related_name='operadores_areatrabalho_set',
         on_delete=CASCADE)
@@ -160,8 +162,10 @@ class OperadorAreaTrabalho(CmjAuditoriaModelMixin):
         verbose_name=_('Área de Trabalho'),
         on_delete=CASCADE)
 
-    administrador = models.BooleanField(
-        choices=YES_NO_CHOICES, verbose_name=_('Administrador da Área?'))
+    grupos_associados = models.ManyToManyField(
+        Group,
+        verbose_name=_('Grupos Associados'),
+        related_name='operadores_areatrabalho_set')
 
     @property
     def operador_name(self):
@@ -252,7 +256,7 @@ class Contato(CmjModelMixin):
         blank=True, null=True, on_delete=CASCADE)
 
     perfil_user = models.ForeignKey(
-        User,
+        get_settings_auth_user_model(),
         verbose_name=_('Perfil do Usuário'),
         related_name='contatos_set',
         blank=True, null=True, on_delete=CASCADE)

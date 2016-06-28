@@ -62,10 +62,9 @@ class OperadorAreaTrabalhoCrud(DetailMasterCrud):
             oats = OperadorAreaTrabalho.objects.filter(
                 area_trabalho_id=area_trabalho_id)
             for oat in oats:
+
                 globalrules.rules.groups_remove_user(
-                    oat.operador, [
-                        globalrules.GROUP_WORKSPACE_MANAGERS,
-                        globalrules.GROUP_WORKSPACE_USERS, ])
+                    oat.operador, oat.grupos_associados.values_list('name', flat=True))
 
                 globalrules.rules.groups_add_user(
                     oat.operador, [
@@ -76,97 +75,38 @@ class OperadorAreaTrabalhoCrud(DetailMasterCrud):
     class UpdateView(DetailMasterCrud.UpdateView):
 
         def form_valid(self, form):
-            adm = OperadorAreaTrabalho.objects.filter(
-                administrador=True).exclude(pk=self.object.pk).first()
-            self.object = form.save(commit=False)
+            old = OperadorAreaTrabalho.objects.get(pk=self.object.pk)
 
-            if not adm and not self.object.administrador:
-                form._errors['administrador'] = ErrorList([_(
-                    'A Área de Trabalho não pode ficar '
-                    'sem um Administrador. Este campo não '
-                    'pode ser alterado de Sim para Não. '
-                    'Apenas de Não para Sim. Edite outro '
-                    'operador e o defina como administrador e '
-                    'este deixará de ser.')])
-                return self.form_invalid(form)
-
-            oper = OperadorAreaTrabalho.objects.filter(
-                operador_id=self.object.operador_id,
-                area_trabalho_id=self.object.area_trabalho_id
-            ).exclude(
-                pk=self.object.pk).first()
-
-            if oper:
-                form._errors['operador'] = ErrorList([_(
-                    'Este Operador já está registrado '
-                    'nesta Área de Trabalho.')])
-                return self.form_invalid(form)
+            groups = list(old.grupos_associados.values_list('name', flat=True))
+            globalrules.rules.groups_remove_user(old.operador, groups)
 
             response = super().form_valid(form)
 
-            if self.object.administrador:
-                OperadorAreaTrabalho.objects.filter(
-                    area_trabalho_id=self.object.area_trabalho_id).exclude(
-                    pk=self.object.pk).update(administrador=False)
-
-            self.reload_groups(self.object.area_trabalho_id)
+            groups = list(self.object.grupos_associados.values_list(
+                'name', flat=True))
+            globalrules.rules.groups_add_user(self.object.operador, groups)
 
             return response
 
     class CreateView(DetailMasterCrud.CreateView):
 
         def form_valid(self, form):
-            adm = OperadorAreaTrabalho.objects.filter(
-                administrador=True).first()
-            self.object = form.save(commit=False)
-
-            if not adm and not self.object.administrador:
-                form._errors['administrador'] = ErrorList([_(
-                    'A Área de Trabalho não pode ficar '
-                    'sem um Administrador. O primeiro registro '
-                    'deve ser de um Administrador.')])
-                return self.form_invalid(form)
-
-            oper = OperadorAreaTrabalho.objects.filter(
-                operador_id=self.object.operador_id,
-                area_trabalho_id=self.object.area_trabalho_id
-            ).first()
-
-            if oper:
-                form._errors['operador'] = ErrorList([_(
-                    'Este Operador já está registrado '
-                    'nesta Área de Trabalho.')])
-                return self.form_invalid(form)
-
             response = super().form_valid(form)
 
-            if self.object.administrador:
-                OperadorAreaTrabalho.objects.filter(
-                    area_trabalho_id=self.object.area_trabalho_id).exclude(
-                    pk=self.object.pk).update(administrador=False)
-
-            self.reload_groups(self.object.area_trabalho_id)
+            groups = list(self.object.grupos_associados.values_list(
+                'name', flat=True))
+            globalrules.rules.groups_add_user(self.object.operador, groups)
 
             return response
 
-    class DeleteView(DetailMasterCrud.DeleteView):
+    class DeleteView11(DetailMasterCrud.DeleteView):
 
         def post(self, request, *args, **kwargs):
 
             self.object = self.get_object()
-
-            if self.object.administrador:
-                messages.add_message(
-                    request, messages.ERROR, _(
-                        'O Administrador não pode ser excluido diretamente. '
-                        'Primeiro você deve delegar a função de administrador '
-                        'a outro operador!'))
-                return HttpResponseRedirect(self.detail_url)
-
-            globalrules.rules.groups_remove_user(
-                self.object.operador, [
-                    globalrules.GROUP_WORKSPACE_MANAGERS,
-                    globalrules.GROUP_WORKSPACE_USERS, ])
+            groups = list(
+                self.object.grupos_associados.values_list('name', flat=True))
+            globalrules.rules.groups_remove_user(self.object.operador, groups)
 
             return DetailMasterCrud.DeleteView.post(
                 self, request, *args, **kwargs)
@@ -355,3 +295,65 @@ class DependentePerfilCrud(PerfilDetailCrudPermission):
     class BaseMixin(PerfilDetailCrudPermission.BaseMixin):
         list_field_names = ['parentesco', 'nome', 'nome_social',
                             'data_nascimento', 'sexo', 'identidade_genero', ]
+
+
+"""
+
+    class CreateView11(DetailMasterCrud.CreateView):
+
+        def form_valid(self, form):
+            adm = OperadorAreaTrabalho.objects.filter(
+                administrador=True).first()
+            self.object = form.save(commit=False)
+
+            if not adm and not self.object.administrador:
+                form._errors['administrador'] = ErrorList([_(
+                    'A Área de Trabalho não pode ficar '
+                    'sem um Administrador. O primeiro registro '
+                    'deve ser de um Administrador.')])
+                return self.form_invalid(form)
+
+            oper = OperadorAreaTrabalho.objects.filter(
+                operador_id=self.object.operador_id,
+                area_trabalho_id=self.object.area_trabalho_id
+            ).first()
+
+            if oper:
+                form._errors['operador'] = ErrorList([_(
+                    'Este Operador já está registrado '
+                    'nesta Área de Trabalho.')])
+                return self.form_invalid(form)
+
+            response = super().form_valid(form)
+
+            if self.object.administrador:
+                OperadorAreaTrabalho.objects.filter(
+                    area_trabalho_id=self.object.area_trabalho_id).exclude(
+                    pk=self.object.pk).update(administrador=False)
+
+            self.reload_groups(self.object.area_trabalho_id)
+
+            return response
+
+    class DeleteView11(DetailMasterCrud.DeleteView):
+
+        def post(self, request, *args, **kwargs):
+
+            self.object = self.get_object()
+
+            if self.object.administrador:
+                messages.add_message(
+                    request, messages.ERROR, _(
+                        'O Administrador não pode ser excluido diretamente. '
+                        'Primeiro você deve delegar a função de administrador '
+                        'a outro operador!'))
+                return HttpResponseRedirect(self.detail_url)
+
+            globalrules.rules.groups_remove_user(
+                self.object.operador, [
+                    globalrules.GROUP_WORKSPACE_MANAGERS,
+                    globalrules.GROUP_WORKSPACE_USERS, ])
+
+            return DetailMasterCrud.DeleteView.post(
+                self, request, *args, **kwargs)
+"""
