@@ -1,16 +1,18 @@
+
 from django.db import models
 from django.db.models.deletion import SET_NULL, PROTECT, CASCADE
-from django.utils.translation import ugettext_lazy as _, string_concat
-from sapl.parlamentares.models import Parlamentar, Municipio
+from django.utils.translation import ugettext_lazy as _
+from sapl.parlamentares.models import Parlamentar, Municipio, Partido
 from sapl.utils import UF
 
-from cmj.core.models import CmjModelMixin, Trecho, Distrito, RegiaoMunicipal
+from cmj.core.models import CmjModelMixin, Trecho, Distrito, RegiaoMunicipal,\
+    User, CmjAuditoriaModelMixin
 from cmj.utils import YES_NO_CHOICES, NONE_YES_NO_CHOICES
 
 
 class DescricaoAbstractModel(models.Model):
     descricao = models.CharField(
-        default='', max_length=254, verbose_name=_('Nome / Discrição'))
+        default='', max_length=254, verbose_name=_('Nome / Descrição'))
 
     class Meta:
         abstract = True
@@ -104,8 +106,8 @@ class TipoLocalTrabalho(DescricaoAbstractModel):
 class NivelInstrucao(DescricaoAbstractModel):
 
     class Meta:
-        verbose_name = _('Nível Instrução')
-        verbose_name_plural = _('Níveis Instrução')
+        verbose_name = _('Nível de Instrução')
+        verbose_name_plural = _('Níveis de Instrução')
 
 
 class OperadoraTelefonia(DescricaoAbstractModel):
@@ -113,6 +115,66 @@ class OperadoraTelefonia(DescricaoAbstractModel):
     class Meta:
         verbose_name = _('Operadora de Telefonia')
         verbose_name_plural = _('Operadoras de Telefonia')
+
+
+class AreaTrabalho(CmjAuditoriaModelMixin):
+
+    nome = models.CharField(max_length=100, blank=True, default='',
+                            verbose_name=_('Nome'))
+
+    descricao = models.CharField(
+        default='', max_length=254, verbose_name=_('Descrição'))
+
+    parlamentar = models.ForeignKey(
+        Parlamentar,
+        verbose_name=_('Parlamentar'),
+        related_name='contatos_set',
+        blank=True, null=True, on_delete=CASCADE)
+
+    operadores = models.ManyToManyField(
+        User,
+        through='OperadorAreaTrabalho',
+        through_fields=('area_trabalho', 'operador'),
+        symmetrical=False,
+        related_name='area_trabalho_set')
+
+    class Meta:
+        verbose_name = _('Área de Trabalho')
+        verbose_name_plural = _('Áreas de Trabalho')
+
+    def __str__(self):
+        return self.nome
+
+
+class OperadorAreaTrabalho(CmjAuditoriaModelMixin):
+
+    operador = models.ForeignKey(
+        User,
+        verbose_name=_('Operador da Área de Trabalho'),
+        related_name='operadores_areatrabalho_set',
+        on_delete=CASCADE)
+
+    area_trabalho = models.ForeignKey(
+        AreaTrabalho,
+        related_name='operadores_areatrabalho_set',
+        verbose_name=_('Área de Trabalho'),
+        on_delete=CASCADE)
+
+    administrador = models.BooleanField(
+        choices=YES_NO_CHOICES, verbose_name=_('Administrador da Área?'))
+
+    @property
+    def operador_name(self):
+        return '%s - %s' % (
+            self.operador.get_display_name(),
+            self.operador.email)
+
+    class Meta:
+        verbose_name = _('Operador da Área de Trabalho')
+        verbose_name_plural = _('Operadores da Área de Trabalho')
+
+    def __str__(self):
+        return self.operador.get_display_name()
 
 
 class Contato(CmjModelMixin):
@@ -183,9 +245,15 @@ class Contato(CmjModelMixin):
     ativo = models.BooleanField(choices=YES_NO_CHOICES,
                                 default=True, verbose_name=_('Ativo?'))
 
-    parlamentar = models.ForeignKey(
-        Parlamentar,
-        verbose_name=_('Parlamentar Associado'),
+    workspace = models.ForeignKey(
+        AreaTrabalho,
+        verbose_name=_('Área de Trabalho'),
+        related_name='contatos_set',
+        blank=True, null=True, on_delete=CASCADE)
+
+    perfil_user = models.ForeignKey(
+        User,
+        verbose_name=_('Perfil do Usuário'),
         related_name='contatos_set',
         blank=True, null=True, on_delete=CASCADE)
 
@@ -205,6 +273,21 @@ class Contato(CmjModelMixin):
 
     def __str__(self):
         return self.nome
+
+
+class PerfilManager(models.Manager):
+
+    def for_user(self, user):
+        return super(
+            PerfilManager, self).get_queryset().get(
+            perfil_user=user)
+
+
+class Perfil(Contato):
+    objects = PerfilManager()
+
+    class Meta:
+        proxy = True
 
 
 class Telefone(CmjModelMixin):
@@ -244,6 +327,14 @@ class Telefone(CmjModelMixin):
         return '(%s) %s - (%s)' % (self.ddd, self.numero, self.contato.nome)
 
 
+class TelefonePerfil(Telefone):
+
+    class Meta:
+        proxy = True
+        verbose_name = _('Telefone do Perfil')
+        verbose_name_plural = _('Telefones do Perfil')
+
+
 class Email(CmjModelMixin):
 
     contato = models.ForeignKey(
@@ -264,6 +355,14 @@ class Email(CmjModelMixin):
 
     def __str__(self):
         return self.email
+
+
+class EmailPerfil(Email):
+
+    class Meta:
+        proxy = True
+        verbose_name = _('Email do Perfil')
+        verbose_name_plural = _("Email's do Perfil")
 
 
 class Dependente(CmjModelMixin):
@@ -311,6 +410,14 @@ class Dependente(CmjModelMixin):
 
     def __str__(self):
         return self.nome
+
+
+class DependentePerfil(Dependente):
+
+    class Meta:
+        proxy = True
+        verbose_name = _('Dependente do Perfil')
+        verbose_name_plural = _('Dependentes do Perfil')
 
 
 class LocalTrabalho(CmjModelMixin):
@@ -395,6 +502,14 @@ class LocalTrabalho(CmjModelMixin):
         return self.nome
 
 
+class LocalTrabalhoPerfil(LocalTrabalho):
+
+    class Meta:
+        proxy = True
+        verbose_name = _('Local de Trabalho do Perfil')
+        verbose_name_plural = _('Locais de Trabalho do Perfil')
+
+
 class Endereco(CmjModelMixin):
     contato = models.ForeignKey(Contato,
                                 verbose_name=('Contato'),
@@ -459,15 +574,28 @@ class Endereco(CmjModelMixin):
         numero = (' - ' + self.numero) if self.numero else ''
         return self.endereco + numero
 
-app_models = list(Contato._meta.app_config.get_models())
-for m in app_models:
-    permissions = (
-        ("list_" + m._meta.model_name,
-         string_concat(
-             _('Visualizaçao da lista de'), ' ', m._meta.verbose_name_plural)),
-        ("detail_" + m._meta.model_name,
-         string_concat(
-             _('Visualização dos detalhes de'), ' ',
-             m._meta.verbose_name_plural)),
-    )
-    m._meta.permissions = tuple(list(permissions) + list(m._meta.permissions))
+
+class EnderecoPerfil(Endereco):
+
+    class Meta:
+        proxy = True
+        verbose_name = _('Endereço do Perfil')
+        verbose_name_plural = _('Endereços do Perfil')
+
+
+class FiliacaoPartidaria(models.Model):
+    contato = models.ForeignKey(Contato,
+                                verbose_name=('Contato'),
+                                related_name='filiacoes_partidarias_set',
+                                on_delete=CASCADE)
+
+    data = models.DateField(verbose_name=_('Data de Filiação'))
+    partido = models.ForeignKey(Partido,
+                                related_name='filiacoes_partidarias_set',
+                                verbose_name=Partido._meta.verbose_name)
+    data_desfiliacao = models.DateField(
+        blank=True, null=True, verbose_name=_('Data de Desfiliação'))
+
+    class Meta:
+        verbose_name = _('Filiação Partidária')
+        verbose_name_plural = _('Filiações Partidárias')

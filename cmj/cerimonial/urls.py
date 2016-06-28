@@ -4,7 +4,10 @@ from cmj.cerimonial.views import StatusVisitaCrud, TipoTelefoneCrud,\
     TipoEnderecoCrud, TipoEmailCrud, ParentescoCrud, EstadoCivilCrud,\
     TipoAutoridadeCrud, TipoLocalTrabalhoCrud, NivelInstrucaoCrud, ContatoCrud,\
     TelefoneCrud, OperadoraTelefoniaCrud, EmailCrud,\
-    PronomeTratamentoCrud, DependenteCrud, LocalTrabalhoCrud, EnderecoCrud
+    PronomeTratamentoCrud, DependenteCrud, LocalTrabalhoCrud, EnderecoCrud,\
+    PerfilCrud, EnderecoPerfilCrud, LocalTrabalhoPerfilCrud, EmailPerfilCrud,\
+    TelefonePerfilCrud, DependentePerfilCrud, AreaTrabalhoCrud,\
+    OperadorAreaTrabalhoCrud
 
 from .apps import AppConfig
 
@@ -17,8 +20,17 @@ urlpatterns = [
     url(r'^contato/', include(
         ContatoCrud.get_urls() + TelefoneCrud.get_urls() +
         EmailCrud.get_urls() + DependenteCrud.get_urls() +
-        LocalTrabalhoCrud.get_urls() + EnderecoCrud.get_urls()
+        LocalTrabalhoCrud.get_urls() + EnderecoCrud.get_urls() +
+        PerfilCrud.get_urls()
     )),
+
+    url(r'^perfil/', include(EnderecoPerfilCrud.get_urls() +
+                             LocalTrabalhoPerfilCrud.get_urls() +
+                             EmailPerfilCrud.get_urls() +
+                             TelefonePerfilCrud.get_urls() +
+                             DependentePerfilCrud.get_urls() +
+                             PerfilCrud.get_urls()
+                             )),
 
     url(r'^sistema/cerimonial/statusvisita/',
         include(StatusVisitaCrud.get_urls())),
@@ -42,4 +54,8 @@ urlpatterns = [
         include(NivelInstrucaoCrud.get_urls())),
     url(r'^sistema/cerimonial/pronometratamento/',
         include(PronomeTratamentoCrud.get_urls())),
+    url(r'^sistema/cerimonial/areatrabalho/',
+        include(AreaTrabalhoCrud.get_urls())),
+    url(r'^sistema/cerimonial/operadorareatrabalho/',
+        include(OperadorAreaTrabalhoCrud.get_urls())),
 ]

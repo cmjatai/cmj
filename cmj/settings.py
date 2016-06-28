@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 from decouple import AutoConfig
 from dj_database_url import parse as db_url
+from django.utils.translation import ugettext_lazy as _
 from easy_thumbnails.conf import Settings as thumbnail_settings
 from sapl import settings as sapl_settings
 from unipath import Path
@@ -39,7 +40,12 @@ CMJ_APPS = (
     'cmj.home',
     'sapl',
 
-    'cmj.cerimonial'
+    'cmj.cerimonial',
+
+
+    # manter sempre como o último da lista de apps
+    'cmj.globalrules'
+
 )
 
 INITIAL_VALUE_FORMS_UF = config('INITIAL_VALUE_FORMS_UF')

@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth import get_user_model
 from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
@@ -8,8 +9,13 @@ from django.utils.translation import ugettext_lazy as _
 from image_cropping import ImageCropField, ImageRatioField
 from sapl.parlamentares.models import Municipio
 
+from cmj.core.rules import SEARCH_TRECHO
+from cmj.globalrules.globalrules import rules
+from cmj.utils import get_settings_auth_user_model
 
-# Create your models here.
+from .rules import MENU_PERMS_FOR_USERS
+
+
 class UserManager(BaseUserManager):
     use_in_migrations = True
 
@@ -31,7 +37,9 @@ class UserManager(BaseUserManager):
         try:
             user.save(using=self._db)
         except:
-            user = User.objects.get_by_natural_key(email)
+            user = self.model.objects.get_by_natural_key(email)
+
+        rules.group_social_users_add_user(user)
         return user
 
     def create_user(self, email, password=None, **extra_fields):
@@ -94,12 +102,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     class Meta(AbstractBaseUser.Meta):
         abstract = False
-        permissions = (
-            ("menu_dados_auxiliares", _('Mostrar Menu Dados Auxiliares')),
-            ("menu_tabelas_auxiliares", _('Mostrar Menu de '
-                                          'Tabelas Auxiliares')),
-            ("menu_contatos", _('Mostrar Menu de Cadastro de Contatos')),
-        )
+        permissions = MENU_PERMS_FOR_USERS
 
     def __str__(self):
         return self.get_display_name()
@@ -174,6 +177,17 @@ class CmjModelMixin(models.Model):
             force_update=force_update,
             using=using,
             update_fields=update_fields)
+
+
+class CmjAuditoriaModelMixin(CmjModelMixin):
+
+    owner = models.ForeignKey(
+        get_settings_auth_user_model(), verbose_name=_('owner'), related_name='+')
+    modifier = models.ForeignKey(
+        get_settings_auth_user_model(), verbose_name=_('modifier'), related_name='+')
+
+    class Meta:
+        abstract = True
 
 
 class Cep(models.Model):
@@ -348,9 +362,7 @@ class Trecho(CmjModelMixin):
                 'lado',
                 'numero_inicial',
                 'numero_final'),)
-        permissions = (
-            ("search_trecho", _('Consultar base de Trechos.')),
-        )
+        permissions = SEARCH_TRECHO
 
     def __str__(self):
         uf = str(self.municipio.uf) if self.municipio else ''

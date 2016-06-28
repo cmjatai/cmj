@@ -14,6 +14,5 @@ class HomePage(Page):
     ]
 
     class Meta:
-        verbose_name = _('Página')
+        verbose_name = _('Página..')
         verbose_name_plural = _('Páginas')
-        

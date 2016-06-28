@@ -1,7 +1,5 @@
 
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.http.response import JsonResponse
 from django.utils.translation import ugettext_lazy as _
 from django_filters.views import FilterView
 from haystack.generic_views import SearchView
@@ -9,17 +7,19 @@ from haystack.query import SearchQuerySet, EmptySearchQuerySet
 from rest_framework import viewsets, mixins
 from rest_framework.authentication import SessionAuthentication,\
     BasicAuthentication
-from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 from sapl.crud.base import Crud, make_pagination
 from whoosh.lang import snowball
 
 from cmj.core.forms import TrechoFilterSet, LogradouroSearchForm
 from cmj.core.models import Cep, TipoLogradouro, Logradouro, RegiaoMunicipal,\
     Distrito, Bairro, Trecho
+from cmj.core.rules import rules_patterns
 from cmj.core.serializers import TrechoSearchSerializer, TrechoSerializer
+from cmj.globalrules import globalrules
 
+
+globalrules.rules.config_groups(rules_patterns)
 
 CepCrud = Crud.build(Cep, 'cep')
 RegiaoMunicipalCrud = Crud.build(RegiaoMunicipal, 'regiao_municipal')

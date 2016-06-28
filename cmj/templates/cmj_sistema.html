@@ -5,6 +5,11 @@
 
   <fieldset>
   <legend><h1>{% trans "Tabelas Auxiliares" %}</h2></legend>
+    <h2>Módulo de Área de Trabalho</h2>
+    <div class="row">
+      <div class="col-md-6"><a href="{% url 'cmj.cerimonial:areatrabalho_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.cerimonial.models.AreaTrabalho"%}</a></div>
+      <div class="col-md-6"><a href="{% url 'cmj.cerimonial:operadorareatrabalho_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.cerimonial.models.OperadorAreaTrabalho"%}</a></div>
+    </div>
     <h2>Módulo de Endereços</h2>
     <div class="row">
       <div class="col-md-6"><a href="{% url 'cmj.core:trecho_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.core.models.Trecho"%}</a></div>

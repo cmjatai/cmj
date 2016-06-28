@@ -13,15 +13,14 @@
     {% block head_content %}
       <link rel="icon" href="{% static 'img/logo.png' %}"  type="image/png" >
       {# Styles #}
-      {% comment %}
-      <link rel="stylesheet" href="{% static 'drunken-parrot-flat-ui/css/drunken-parrot.css' %}">
-      {% endcomment %}
-      <link rel="stylesheet" href="{% sass_src 'bootstrap-sass/assets/stylesheets/_bootstrap.scss' %}" type="text/css">
 
+<link rel="stylesheet" href="{% sass_src 'bootstrap-sass/assets/stylesheets/_bootstrap.scss' %}" type="text/css">
+      <link rel="stylesheet" href="{% static 'components-font-awesome/css/font-awesome.css' %}">
+      <link rel="stylesheet" href="{% sass_src 'styles/header.scss' %}" type="text/css">
+      <link rel="stylesheet" href="{% static 'drunken-parrot-flat-ui/css/drunken-parrot.css' %}">
       <link rel="stylesheet" href="{% sass_src 'styles/app.scss' %}" type="text/css">
 
       <link rel="stylesheet" href="{% static 'jquery-ui/themes/cupertino/jquery-ui.min.css' %}">
-      <link rel="stylesheet" href="{% static 'components-font-awesome/css/font-awesome.css' %}">
 
       {# Scripts #}
       {# modernizr must be in head (see http://modernizr.com/docs/#installing) #}
@@ -60,8 +59,10 @@
                     {% endfor %}
                   </a>
                   <ul class="dropdown-menu">
+                    <li><a href="{% url 'cmj.cerimonial:perfil_detail' %}">{% trans "Meu Perfil" %}</a></li>
                     <li><a href="{% url 'cmj.core:logout' %}">{% trans "Sair" %}</a></li>
                   </ul>
+
                 </li>
               {% else %}
               <li>
@@ -91,6 +92,7 @@
                         {% endif %}
                       </a>
                       <ul class="dropdown-menu menu-right">
+                        <li><a href="{% url 'cmj.cerimonial:perfil_detail' %}">{% trans "Meu Perfil" %}</a></li>
                         <li><a href="{% url 'cmj.core:logout' %}">{% trans "Sair" %}</a></li>
                       </ul>
                     </li>
@@ -107,6 +109,7 @@
                   {% if perms.core.menu_contatos %}
                     <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'cmj.cerimonial:contato_list' %}">{% trans "Contatos" %}</a></li>
                   {% endif %}
+
                   {% if perms.core.menu_dados_auxiliares %}
                     <li class="dropdown">
                       <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Dados Auxiliares" %}<span class="caret"></span></a>
