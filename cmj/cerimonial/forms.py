@@ -99,7 +99,7 @@ class OperadorAreaTrabalhoForm(ModelForm):
 
     class Meta:
         model = OperadorAreaTrabalho
-        fields = ['operador',
+        fields = ['user',
                   'grupos_associados']
 
     def __init__(self, *args, **kwargs):

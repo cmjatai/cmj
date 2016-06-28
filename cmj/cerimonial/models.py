@@ -136,7 +136,7 @@ class AreaTrabalho(CmjAuditoriaModelMixin):
     operadores = models.ManyToManyField(
         get_settings_auth_user_model(),
         through='OperadorAreaTrabalho',
-        through_fields=('area_trabalho', 'operador'),
+        through_fields=('area_trabalho', 'user'),
         symmetrical=False,
         related_name='area_trabalho_set')
 
@@ -150,7 +150,7 @@ class AreaTrabalho(CmjAuditoriaModelMixin):
 
 class OperadorAreaTrabalho(CmjAuditoriaModelMixin):
 
-    operador = models.ForeignKey(
+    user = models.ForeignKey(
         get_settings_auth_user_model(),
         verbose_name=_('Operador da Área de Trabalho'),
         related_name='operadores_areatrabalho_set',
@@ -168,17 +168,17 @@ class OperadorAreaTrabalho(CmjAuditoriaModelMixin):
         related_name='operadores_areatrabalho_set')
 
     @property
-    def operador_name(self):
+    def user_name(self):
         return '%s - %s' % (
-            self.operador.get_display_name(),
-            self.operador.email)
+            self.user.get_display_name(),
+            self.user.email)
 
     class Meta:
         verbose_name = _('Operador')
         verbose_name_plural = _('Operadores')
 
     def __str__(self):
-        return self.operador.get_display_name()
+        return self.user.get_display_name()
 
 
 class Contato(CmjModelMixin):

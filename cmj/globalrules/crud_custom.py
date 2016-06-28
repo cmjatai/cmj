@@ -1,3 +1,4 @@
+from compressor.utils.decorators import cached_property
 from django.conf.urls import url
 from django.contrib.auth import logout
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -21,18 +22,32 @@ LIST, DETAIL, ADD, CHANGE, DELETE =\
     '.list_', '.detail_', '.add_', '.change_', '.delete_',
 
 
-class PermissionRequiredWithAnonymousAccessMixin(PermissionRequiredMixin):
+class PermissionRequiredContainerCrudMixin(PermissionRequiredMixin):
 
-    def get_permission_required(self):
-        # Se permission_required é Vazio é permitido acesso anônimo
-        if not self.permission_required:
-            return ()
+    def has_permission(self):
+        perms = self.get_permission_required()
+        return self.request.user.has_perms(perms) if perms[0] else True
 
-        if isinstance(self.permission_required, six.string_types):
-            perms = (self.permission_required, )
-        else:
-            perms = self.permission_required
-        return perms
+    def dispatch(self, request, *args, **kwargs):
+        if not self.has_permission():
+            return self.handle_no_permission()
+
+        params = {'pk': kwargs['pk']}
+
+        if self.container_field:
+            params[self.container_field] = request.user.pk
+
+        if not self.model.objects.filter(**params).exists():
+            raise Http404()
+
+        return super(PermissionRequiredMixin, self).dispatch(
+            request, *args, **kwargs)
+
+    @cached_property
+    def container_field(self):
+        if not hasattr(self.crud, 'container_field'):
+            self.crud.container_field = ''
+        return self.crud.container_field
 
 
 class DetailMasterCrud(Crud):
@@ -76,25 +91,62 @@ class DetailMasterCrud(Crud):
                 if self.request.user.has_perm(self.permission(DELETE)) else ''
 
     class ListView(
-            PermissionRequiredWithAnonymousAccessMixin, CrudListView):
-        permission_required = LIST,
+            PermissionRequiredContainerCrudMixin, CrudListView):
+        permission_required = (LIST, )
+
+        def get_queryset(self):
+            queryset = CrudListView.get_queryset(self)
+            if not self.request.user.is_authenticated():
+                return queryset
+
+            if self.container_field:
+                params = {}
+                params[self.container_field] = self.request.user.pk
+                return queryset.filter(**params)
+
+            return queryset
+
+        def dispatch(self, request, *args, **kwargs):
+            return PermissionRequiredMixin.dispatch(self, request, *args, **kwargs)
 
     class CreateView(
-            PermissionRequiredWithAnonymousAccessMixin, CrudCreateView):
-        permission_required = (ADD,)
+            PermissionRequiredContainerCrudMixin, CrudCreateView):
+        permission_required = (ADD, )
+
+        def dispatch(self, request, *args, **kwargs):
+            return super(PermissionRequiredMixin, self).dispatch(
+                request, *args, **kwargs)
 
         def form_valid(self, form):
             self.object = form.save(commit=False)
             try:
                 self.object.owner = self.request.user
                 self.object.modifier = self.request.user
+
+                if self.container_field:
+                    container = self.container_field.split('__')
+
+                    if len(container) > 1:
+                        if hasattr(self.object, container[0]):
+                            container_model = getattr(
+                                self.model, container[0]).field.related_model
+
+                            params = {}
+                            params[
+                                '__'.join(container[1:])] = self.request.user.pk
+
+                            container_data = container_model.objects.filter(
+                                **params).first()
+
+                            setattr(self.object, container[0], container_data)
+
             except:
                 pass
 
             return super().form_valid(form)
 
     class UpdateView(
-            PermissionRequiredWithAnonymousAccessMixin, CrudUpdateView):
+            PermissionRequiredContainerCrudMixin, CrudUpdateView):
         permission_required = (CHANGE, )
 
         def form_valid(self, form):
@@ -107,13 +159,13 @@ class DetailMasterCrud(Crud):
             return super().form_valid(form)
 
     class DeleteView(
-            PermissionRequiredWithAnonymousAccessMixin, CrudDeleteView):
-        permission_required = DELETE,
+            PermissionRequiredContainerCrudMixin, CrudDeleteView):
+        permission_required = (DELETE, )
 
     class DetailView(
-            PermissionRequiredWithAnonymousAccessMixin,
+            PermissionRequiredContainerCrudMixin,
             CrudDetailView, MultipleObjectMixin):
-        permission_required = DETAIL,
+        permission_required = (DETAIL, )
         # Os colados nesta lista abaixo, nos models devem ter
         # ou atributos ou propertiers
         list_field_names_model_set = ['nome', ]
@@ -222,17 +274,6 @@ class MasterDetailCrudPermission(DetailMasterCrud):
 
     class BaseMixin(DetailMasterCrud.BaseMixin):
 
-        def __init__(self, **kwargs):
-            self.app_label = self.crud.model._meta.app_label
-            self.model_name = self.crud.model._meta.model_name
-            if hasattr(self, 'permission_required') and\
-                    self.permission_required:
-                self.permission_required = tuple((
-                    self.permission(pr) for pr in self.permission_required))
-
-        def permission(self, radical):
-            return '%s%s%s' % (self.app_label, radical, self.model_name)
-
         @property
         def list_url(self):
             return self.resolve_url(base.LIST, args=(self.kwargs['pk'],))\
@@ -275,6 +316,11 @@ class MasterDetailCrudPermission(DetailMasterCrud):
         def get_url_regex(cls):
             return r'^(?P<pk>\d+)/%s$' % cls.model._meta.model_name
 
+        def dispatch(self, request, *args, **kwargs):
+
+            return PermissionRequiredMixin.dispatch(
+                self, request, *args, **kwargs)
+
         def get_context_data(self, **kwargs):
             context = CrudListView.get_context_data(
                 self, **kwargs)
@@ -282,18 +328,37 @@ class MasterDetailCrudPermission(DetailMasterCrud):
             parent_model = getattr(
                 self.model, self.crud.parent_field).field.related_model
 
-            parent_object = parent_model.objects.get(pk=kwargs['root_pk'])
+            params = {'pk': kwargs['root_pk']}
+
+            if self.container_field:
+                container = self.container_field.split('__')
+                if len(container) > 1:
+                    params['__'.join(container[1:])] = self.request.user.pk
+
+            try:
+                parent_object = parent_model.objects.get(**params)
+            except:
+                raise Http404()
 
             context['title'] = '%s (%s)' % (context['title'], parent_object)
             return context
 
         def get_queryset(self):
             qs = super(CrudListView, self).get_queryset()
+
             kwargs = {self.crud.parent_field: self.kwargs['pk']}
+
+            if self.container_field:
+                kwargs[self.container_field] = self.request.user.pk
+
             return qs.filter(**kwargs)
 
     class CreateView(DetailMasterCrud.CreateView):
         permission_required = ADD,
+
+        def dispatch(self, request, *args, **kwargs):
+            return PermissionRequiredMixin.dispatch(
+                self, request, *args, **kwargs)
 
         @classmethod
         def get_url_regex(cls):

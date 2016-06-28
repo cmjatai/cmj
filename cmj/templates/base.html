@@ -115,14 +115,17 @@
                     <li class="dropdown">
                       <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Dados Auxiliares" %}<span class="caret"></span></a>
                       <ul class="dropdown-menu menu-left">
-
-                          {% if perms.core.menu_tabelas_auxiliares %}<li class="nav__sub-item"><a href="{% url 'cmj.core:tabelas_auxiliares' %}">{% trans "Tabelas" %}</a></li>{% endif %}
-                          {% if perms.core.menu_area_trabalho %}<li class="nav__sub-item"><a href="{% url 'cmj.cerimonial:areatrabalho_list' %}">{% trans "Áreas de Trabalho" %}</a></li>{% endif %}
-
                           {% if perms.core.search_trecho %}<li class="nav__sub-item"><a href="{% url 'cmj.core:search_view' %}">{% trans "Consultar base de Cep's e Endereços" %}</a></li>{% endif %}
 
                           {% if perms.cerimonial.list_operadoratelefonia %}<li class="nav__sub-item"><a href="{% url 'cmj.cerimonial:operadoratelefonia_list' %}">{% model_verbose_name_plural "cmj.cerimonial.models.OperadoraTelefonia"%}</a></li>{% endif %}
                           {% if perms.cerimonial.list_nivelinstrucao %}<li class="nav__sub-item"><a href="{% url 'cmj.cerimonial:nivelinstrucao_list' %}">{% model_verbose_name_plural "cmj.cerimonial.models.NivelInstrucao"%}</a></li>{% endif %}
+
+                          {% if perms.core.menu_tabelas_auxiliares or perms.core.menu_area_trabalho %}
+                            <li role="separator" class="divider"></li>
+                          {% endif %}
+                          {% if perms.core.menu_tabelas_auxiliares %}<li class="nav__sub-item"><a href="{% url 'cmj.core:tabelas_auxiliares' %}">{% trans "Tabelas" %}</a></li>{% endif %}
+                          {% if perms.core.menu_area_trabalho %}<li class="nav__sub-item"><a href="{% url 'cmj.cerimonial:areatrabalho_list' %}">{% trans "Áreas de Trabalho" %}</a></li>{% endif %}
+
 
                       </ul>
                     </li>

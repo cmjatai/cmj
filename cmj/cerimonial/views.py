@@ -59,7 +59,7 @@ class AreaTrabalhoCrud(DetailMasterCrud):
             return context
 
     class DetailView(DetailMasterCrud.DetailView):
-        list_field_names_model_set = ['operador_name', ]
+        list_field_names_model_set = ['user_name', ]
 
 
 class OperadorAreaTrabalhoCrud(MasterDetailCrudPermission):
@@ -83,13 +83,13 @@ class OperadorAreaTrabalhoCrud(MasterDetailCrudPermission):
             old = OperadorAreaTrabalho.objects.get(pk=self.object.pk)
 
             groups = list(old.grupos_associados.values_list('name', flat=True))
-            globalrules.rules.groups_remove_user(old.operador, groups)
+            globalrules.rules.groups_remove_user(old.user, groups)
 
             response = super().form_valid(form)
 
             groups = list(self.object.grupos_associados.values_list(
                 'name', flat=True))
-            globalrules.rules.groups_add_user(self.object.operador, groups)
+            globalrules.rules.groups_add_user(self.object.user, groups)
 
             return response
 
@@ -101,12 +101,12 @@ class OperadorAreaTrabalhoCrud(MasterDetailCrudPermission):
         def form_valid(self, form):
             self.object = form.save(commit=False)
             oper = OperadorAreaTrabalho.objects.filter(
-                operador_id=self.object.operador_id,
+                user_id=self.object.user_id,
                 area_trabalho_id=self.object.area_trabalho_id
             ).first()
 
             if oper:
-                form._errors['operador'] = ErrorList([_(
+                form._errors['user'] = ErrorList([_(
                     'Este Operador já está registrado '
                     'nesta Área de Trabalho.')])
                 return self.form_invalid(form)
@@ -115,7 +115,7 @@ class OperadorAreaTrabalhoCrud(MasterDetailCrudPermission):
 
             groups = list(self.object.grupos_associados.values_list(
                 'name', flat=True))
-            globalrules.rules.groups_add_user(self.object.operador, groups)
+            globalrules.rules.groups_add_user(self.object.user, groups)
 
             return response
 
@@ -126,7 +126,7 @@ class OperadorAreaTrabalhoCrud(MasterDetailCrudPermission):
             self.object = self.get_object()
             groups = list(
                 self.object.grupos_associados.values_list('name', flat=True))
-            globalrules.rules.groups_remove_user(self.object.operador, groups)
+            globalrules.rules.groups_remove_user(self.object.user, groups)
 
             return MasterDetailCrudPermission.DeleteView.post(
                 self, request, *args, **kwargs)
@@ -145,15 +145,24 @@ class OperadoraTelefoniaCrud(DetailMasterCrud):
 class ContatoCrud(DetailMasterCrud):
     model_set = None
     model = Contato
+    container_field = 'workspace__operadores'
 
     class BaseMixin(DetailMasterCrud.BaseMixin):
         list_field_names = ['nome', 'nome_social', 'data_nascimento',
                             'estado_civil', 'sexo', 'identidade_genero', ]
 
+    class ListView(DetailMasterCrud.ListView):
+
+        def get_queryset(self):
+
+            queryset = DetailMasterCrud.ListView.get_queryset(self)
+            return queryset
+
 
 class DependenteCrud(MasterDetailCrudPermission):
     model = Dependente
     parent_field = 'contato'
+    container_field = 'contato__workspace__operadores'
 
     class BaseMixin(MasterDetailCrudPermission.BaseMixin):
         list_field_names = ['parentesco', 'nome', 'nome_social',
@@ -163,6 +172,7 @@ class DependenteCrud(MasterDetailCrudPermission):
 class TelefoneCrud(MasterDetailCrudPermission):
     model = Telefone
     parent_field = 'contato'
+    container_field = 'contato__workspace__operadores'
 
     class BaseMixin(MasterDetailCrudPermission.BaseMixin):
         list_field_names = ['ddd', 'numero', 'tipo', 'operadora']
@@ -170,7 +180,7 @@ class TelefoneCrud(MasterDetailCrudPermission):
     class UpdateView(MasterDetailCrudPermission.UpdateView):
 
         def post(self, request, *args, **kwargs):
-            response = TelefoneCrud.UpdateView.post(
+            response = MasterDetailCrudPermission.UpdateView.post(
                 self, request, *args, **kwargs)
 
             if self.object.preferencial:
@@ -183,6 +193,7 @@ class TelefoneCrud(MasterDetailCrudPermission):
 class EmailCrud(MasterDetailCrudPermission):
     model = Email
     parent_field = 'contato'
+    container_field = 'contato__workspace__operadores'
 
     class BaseMixin(MasterDetailCrudPermission.BaseMixin):
         list_field_names = ['email', 'tipo', 'preferencial']
@@ -203,6 +214,7 @@ class EmailCrud(MasterDetailCrudPermission):
 class LocalTrabalhoCrud(MasterDetailCrudPermission):
     model = LocalTrabalho
     parent_field = 'contato'
+    container_field = 'contato__workspace__operadores'
 
     class BaseMixin(MasterDetailCrudPermission.BaseMixin):
         list_field_names = ['nome', 'nome_social', 'tipo', 'data_inicio']
@@ -219,6 +231,7 @@ class LocalTrabalhoCrud(MasterDetailCrudPermission):
 class EnderecoCrud(MasterDetailCrudPermission):
     model = Endereco
     parent_field = 'contato'
+    container_field = 'contato__workspace__operadores'
 
     class CreateView(MasterDetailCrudPermission.CreateView):
         form_class = EnderecoForm

@@ -123,20 +123,24 @@ body, html {
           background: $hover_background_10pw;
         }
       }
+      &.divider {
+        margin: 3px 0;
+        background-color: rgba(255, 255, 255, 0.3);
+      }
     }
   }
   &.navbar-area-trabalho {
     background:none;
     ul {
       position: relative;
-      right: 0;
       float: right;
-      margin-right: $grid-gutter-width * -0.5;
+      margin: 0 $grid-gutter-width * -0.5 0.5em 0;
       background: darken($color_main_bg, 15%) url(/static/img/bg.png);
       border-radius: 0 0 0 6px;
       border: 1px solid white;
       border-top: 1px;
       border-right: 0px;
+
       li {
         border: 0;
         a {
