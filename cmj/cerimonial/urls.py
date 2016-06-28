@@ -24,13 +24,18 @@ urlpatterns = [
         PerfilCrud.get_urls()
     )),
 
-    url(r'^perfil/', include(EnderecoPerfilCrud.get_urls() +
-                             LocalTrabalhoPerfilCrud.get_urls() +
-                             EmailPerfilCrud.get_urls() +
-                             TelefonePerfilCrud.get_urls() +
-                             DependentePerfilCrud.get_urls() +
-                             PerfilCrud.get_urls()
-                             )),
+    url(r'^perfil/', include(
+        EnderecoPerfilCrud.get_urls() +
+        LocalTrabalhoPerfilCrud.get_urls() +
+        EmailPerfilCrud.get_urls() +
+        TelefonePerfilCrud.get_urls() +
+        DependentePerfilCrud.get_urls() +
+        PerfilCrud.get_urls()
+    )),
+
+    url(r'^areatrabalho/', include(AreaTrabalhoCrud.get_urls() +
+                                   OperadorAreaTrabalhoCrud.get_urls()
+                                   )),
 
     url(r'^sistema/cerimonial/statusvisita/',
         include(StatusVisitaCrud.get_urls())),
@@ -54,8 +59,5 @@ urlpatterns = [
         include(NivelInstrucaoCrud.get_urls())),
     url(r'^sistema/cerimonial/pronometratamento/',
         include(PronomeTratamentoCrud.get_urls())),
-    url(r'^sistema/cerimonial/areatrabalho/',
-        include(AreaTrabalhoCrud.get_urls())),
-    url(r'^sistema/cerimonial/operadorareatrabalho/',
-        include(OperadorAreaTrabalhoCrud.get_urls())),
+
 ]

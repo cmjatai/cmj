@@ -3,16 +3,19 @@
 
 {% block base_content %}
 
-<div class="actions btn-group pull-right" role="group">
-  {% if view.create_url %}
-  <a href="{{ view.create_url }}" class="btn btn-default">
-    {% blocktrans with verbose_name=view.verbose_name %} Adicionar {{ verbose_name }} {% endblocktrans %}
-  </a>
-  {% endif %}
-  {% block more_buttons %}{% endblock more_buttons %}
+<div class="context-actions clearfix">
+  {% block actions %}
+    <div class="actions btn-group pull-right btn-group-lg" role="group">
+      {% if view.create_url %}
+      <a href="{{ view.create_url }}" class="btn btn-default">
+        {% blocktrans with verbose_name=view.verbose_name %} Adicionar {{ verbose_name }} {% endblocktrans %}
+      </a>
+      {% endif %}
+      {% block more_buttons %}{% endblock more_buttons %}
+    </div>
+  {% endblock actions %}
 </div>
 
-<br/><br/><br/>
 {% block extra_content %} {% endblock %}
 
 {% if not rows %}

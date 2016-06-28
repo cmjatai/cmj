@@ -109,5 +109,5 @@ AreaTrabalho:
   - descricao
 OperadorAreaTrabalho:
   {% trans 'Operador de Área de Trabalho' %}:
-  - operador area_trabalho
+  - operador
   - grupos_associados

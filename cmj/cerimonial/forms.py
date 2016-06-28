@@ -4,7 +4,7 @@ from django.forms.models import ModelForm
 from sapl.parlamentares.models import Municipio
 
 from cmj import settings
-from cmj.cerimonial.models import LocalTrabalho, Endereco
+from cmj.cerimonial.models import LocalTrabalho, Endereco, OperadorAreaTrabalho
 from cmj.core.models import Trecho
 
 
@@ -93,3 +93,19 @@ class EnderecoForm(ModelForm):
 
         self.fields['trecho'].queryset = Trecho.objects.all()
         self.fields['trecho'].widget = forms.HiddenInput()
+
+
+class OperadorAreaTrabalhoForm(ModelForm):
+
+    class Meta:
+        model = OperadorAreaTrabalho
+        fields = ['operador',
+                  'grupos_associados']
+
+    def __init__(self, *args, **kwargs):
+
+        super(OperadorAreaTrabalhoForm, self).__init__(*args, **kwargs)
+        self.fields[
+            'grupos_associados'].widget = forms.CheckboxSelectMultiple()
+        self.fields['grupos_associados'].queryset = self.fields[
+            'grupos_associados'].queryset.order_by('name')

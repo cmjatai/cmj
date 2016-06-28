@@ -78,8 +78,9 @@
 
       {% block global_container %}
         {% block navigation %}
-          <nav class="navbar nabvar-menu">
+          <nav class="navbar navbar-menu">
             <div class="container{{fluid}}">
+
               <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav navbar-right nav-acessar" id="autenticacao">
                   {% if user and not user.is_anonymous %}
@@ -114,10 +115,15 @@
                     <li class="dropdown">
                       <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Dados Auxiliares" %}<span class="caret"></span></a>
                       <ul class="dropdown-menu menu-left">
+
                           {% if perms.core.menu_tabelas_auxiliares %}<li class="nav__sub-item"><a href="{% url 'cmj.core:tabelas_auxiliares' %}">{% trans "Tabelas" %}</a></li>{% endif %}
+                          {% if perms.core.menu_area_trabalho %}<li class="nav__sub-item"><a href="{% url 'cmj.cerimonial:areatrabalho_list' %}">{% trans "Áreas de Trabalho" %}</a></li>{% endif %}
+
                           {% if perms.core.search_trecho %}<li class="nav__sub-item"><a href="{% url 'cmj.core:search_view' %}">{% trans "Consultar base de Cep's e Endereços" %}</a></li>{% endif %}
+
                           {% if perms.cerimonial.list_operadoratelefonia %}<li class="nav__sub-item"><a href="{% url 'cmj.cerimonial:operadoratelefonia_list' %}">{% model_verbose_name_plural "cmj.cerimonial.models.OperadoraTelefonia"%}</a></li>{% endif %}
                           {% if perms.cerimonial.list_nivelinstrucao %}<li class="nav__sub-item"><a href="{% url 'cmj.cerimonial:nivelinstrucao_list' %}">{% model_verbose_name_plural "cmj.cerimonial.models.NivelInstrucao"%}</a></li>{% endif %}
+
                       </ul>
                     </li>
                   {% endif %}
@@ -224,6 +230,9 @@
               </div><!--/.nav-collapse -->
             </div>
           </nav>
+
+
+
         {% endblock navigation %}
 
         {# Header #}
@@ -256,9 +265,20 @@
                       {% endif %}
                     </h1>
                   {% endblock %}
-
                 </div>
               {% endblock base_header %}
+
+              <nav class="navbar navbar-area-trabalho">
+                    {% for at in area_trabalho %}
+                      {% if forloop.first %}
+                        <ul class="nav navbar-nav" >
+                      {% endif %}
+                        <li><a href="#">{{at.nome}}</a></li>
+                      {% if forloop.last %}
+                        </ul>
+                      {% endif %}
+                    {% endfor %}
+              </nav>
 
               {# Feedback messages #}
               {% for message in messages %}

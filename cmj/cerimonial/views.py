@@ -6,7 +6,8 @@ from django.http.response import HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.edit import FormMixin
 
-from cmj.cerimonial.forms import LocalTrabalhoForm, EnderecoForm
+from cmj.cerimonial.forms import LocalTrabalhoForm, EnderecoForm,\
+    OperadorAreaTrabalhoForm
 from cmj.cerimonial.models import StatusVisita, TipoTelefone, TipoEndereco,\
     TipoEmail, Parentesco, EstadoCivil, TipoAutoridade, TipoLocalTrabalho,\
     NivelInstrucao, Contato, Telefone, OperadoraTelefonia, Email,\
@@ -43,37 +44,41 @@ TipoLocalTrabalhoCrud = DetailMasterCrud.build(
 PronomeTratamentoCrud = DetailMasterCrud.build(
     PronomeTratamento, None, 'pronometratamento')
 
+# ------------- Area de Trabalho Master e Details ----------------------------
+
 
 class AreaTrabalhoCrud(DetailMasterCrud):
-    model_set = 'operadores_areatrabalho_set'
     model = AreaTrabalho
+
+    class BaseMixin(DetailMasterCrud.BaseMixin):
+
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            context[
+                'subnav_template_name'] = 'cerimonial/subnav_areatrabalho.yaml'
+            return context
 
     class DetailView(DetailMasterCrud.DetailView):
         list_field_names_model_set = ['operador_name', ]
 
 
-class OperadorAreaTrabalhoCrud(DetailMasterCrud):
+class OperadorAreaTrabalhoCrud(MasterDetailCrudPermission):
+    parent_field = 'area_trabalho'
     model = OperadorAreaTrabalho
     help_path = 'operadorareatrabalho'
 
-    class BaseMixin(DetailMasterCrud.BaseMixin):
+    class BaseMixin(MasterDetailCrudPermission.BaseMixin):
 
-        def reload_groups(self, area_trabalho_id):
-            oats = OperadorAreaTrabalho.objects.filter(
-                area_trabalho_id=area_trabalho_id)
-            for oat in oats:
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            context[
+                'subnav_template_name'] = 'cerimonial/subnav_areatrabalho.yaml'
+            return context
 
-                globalrules.rules.groups_remove_user(
-                    oat.operador, oat.grupos_associados.values_list('name', flat=True))
+    class UpdateView(MasterDetailCrudPermission.UpdateView):
+        form_class = OperadorAreaTrabalhoForm
 
-                globalrules.rules.groups_add_user(
-                    oat.operador, [
-                        globalrules.GROUP_WORKSPACE_USERS,
-                        globalrules.GROUP_WORKSPACE_MANAGERS
-                        if oat.administrador else None])
-
-    class UpdateView(DetailMasterCrud.UpdateView):
-
+        # TODO tornar operador readonly na edição
         def form_valid(self, form):
             old = OperadorAreaTrabalho.objects.get(pk=self.object.pk)
 
@@ -88,9 +93,24 @@ class OperadorAreaTrabalhoCrud(DetailMasterCrud):
 
             return response
 
-    class CreateView(DetailMasterCrud.CreateView):
+    class CreateView(MasterDetailCrudPermission.CreateView):
+        form_class = OperadorAreaTrabalhoForm
+        # TODO mostrar apenas usuários que não possuem grupo ou que são de
+        # acesso social
 
         def form_valid(self, form):
+            self.object = form.save(commit=False)
+            oper = OperadorAreaTrabalho.objects.filter(
+                operador_id=self.object.operador_id,
+                area_trabalho_id=self.object.area_trabalho_id
+            ).first()
+
+            if oper:
+                form._errors['operador'] = ErrorList([_(
+                    'Este Operador já está registrado '
+                    'nesta Área de Trabalho.')])
+                return self.form_invalid(form)
+
             response = super().form_valid(form)
 
             groups = list(self.object.grupos_associados.values_list(
@@ -99,7 +119,7 @@ class OperadorAreaTrabalhoCrud(DetailMasterCrud):
 
             return response
 
-    class DeleteView11(DetailMasterCrud.DeleteView):
+    class DeleteView(MasterDetailCrudPermission.DeleteView):
 
         def post(self, request, *args, **kwargs):
 
@@ -108,7 +128,7 @@ class OperadorAreaTrabalhoCrud(DetailMasterCrud):
                 self.object.grupos_associados.values_list('name', flat=True))
             globalrules.rules.groups_remove_user(self.object.operador, groups)
 
-            return DetailMasterCrud.DeleteView.post(
+            return MasterDetailCrudPermission.DeleteView.post(
                 self, request, *args, **kwargs)
 
 
@@ -118,6 +138,8 @@ class OperadoraTelefoniaCrud(DetailMasterCrud):
 
     class DetailView(DetailMasterCrud.DetailView):
         list_field_names_model_set = ['numero_nome_contato', ]
+
+# ------------- Contato Master e Details ----------------------------
 
 
 class ContatoCrud(DetailMasterCrud):

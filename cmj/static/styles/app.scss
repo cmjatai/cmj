@@ -46,11 +46,17 @@ body, html {
       font-weight: normal;
     }
 }
-// ajuste bootstrap ########################################
-.container {
-    padding-left: $grid-gutter-width;
-    padding-right: $grid-gutter-width;
+
+// #### conserta radios e checkboxes escondidas pelo drunken parrot ############
+// FIXME ajustar após solução definitiva
+.checkbox input, .radio input {
+    display: initial;
 }
+
+
+
+// ajuste bootstrap ########################################
+
 .row-fluid:before, .row-fluid:after {
     content: " ";
     display: table;
@@ -81,10 +87,10 @@ body, html {
   }
   a.navbar-brand {
     font-size: 25px;
-    line-height: 1em;
+    line-height: 40px;
     color: $color_text_inverse;
     font-family: "Graduate";
-    padding: 13px 13px 10px 30px;
+    padding: 0 0 0 30px;
     display: block;
     position: relative;
     margin: 0 !important;
@@ -106,8 +112,8 @@ body, html {
       a { /* Para todo link*/
         color: $color_text_inverse;
         line-height: $menu-height;
-        padding-top: $padding-menu-top;
-        padding-bottom: $padding-menu-top;
+        padding-top: 0;
+        padding-bottom: 0;
         font-family: "Lato";
         font-weight: 300;
         letter-spacing: 0.5px;
@@ -119,6 +125,28 @@ body, html {
       }
     }
   }
+  &.navbar-area-trabalho {
+    background:none;
+    ul {
+      position: relative;
+      right: 0;
+      float: right;
+      margin-right: $grid-gutter-width * -0.5;
+      background: darken($color_main_bg, 15%) url(/static/img/bg.png);
+      border-radius: 0 0 0 6px;
+      border: 1px solid white;
+      border-top: 1px;
+      border-right: 0px;
+      li {
+        border: 0;
+        a {
+          font-size: 1em;
+          line-height: 1.65;
+          color: darken($color_main_bg, 60%)
+        }
+      }
+    }
+  }
 }
 .nav-acessar {
   display: none;
@@ -126,7 +154,6 @@ body, html {
 // ADJUST topo ########################################
 .masthead {
   margin-top: 1em;
-  margin-right: 1em;
   z-index: 10;
   .slogan {
     color: $color_topo_bg;
@@ -134,6 +161,7 @@ body, html {
   }
   .nav-tabs {
     border-bottom: 0px;
+    margin-right: $grid-gutter-width;
     li {
       a {
         border-bottom: 0px;
@@ -156,7 +184,7 @@ body, html {
 }
 .page-header {
   padding: 0.6em 1em 0.2em;
-  margin: 0em $grid-gutter-width * -1 1em $grid-gutter-width * -1 ;
+  margin: 0em $grid-gutter-width * -0.5 0 $grid-gutter-width * -0.5 ;
   color: $color_topo_bg;
   background: darken($color_main_bg, 3%) url(/static/img/bg.png);
   border-radius: 5px 5px 0 0;
@@ -170,6 +198,8 @@ a:hover {
   color: darken($color_topo_bg, 20%);
 }
 // ADJUST lateral direita ########################################
+
+
 // ADJUST interno ########################################
 
 main {
@@ -217,7 +247,12 @@ main {
   border-bottom-width: 0;
   font-weight: normal;
 }
-
+.context-actions{
+  margin: 1em 1em;
+  .actions {
+    margin: 0.5em;
+  }
+}
 
 // #### CRUD DETAIL ########################################
 p.control-label {
@@ -567,6 +602,9 @@ body {
     height: $footer-height;
   }
   .navbar {
+    a.navbar-brand {
+      line-height: 49px;
+    }
     .nav-flex {
       display: block;
     }
@@ -590,11 +628,29 @@ body {
         }
       }
     }
+    &.navbar-area-trabalho {
+      ul {
+        margin-top: 0;
+      }
+    }
   }
 
   .nav-acessar {
     display: block;
   }
+  main {
+    .container, .container-fluid {
+      margin: $grid-gutter-width * 0.25;
+    }
+  }
+
+  .context-actions{
+    margin: 0.5em;
+    .actions {
+      margin: 0.5em 0;
+    }
+  }
+
 }
 @media screen and (max-width: 480px) and (orientation: portrait) {
   .container-login {
@@ -638,27 +694,43 @@ body {
 @media screen and (max-width: 480px) {
   .navbar {
     a.navbar-brand {
-      padding: 15px 0 10px 10px;
+      padding: 0 0 0 10px;
       font-size: 21px;
     }
+  }
+
+  .nav-acessar {
+    ul {
+      margin: 0 !important;
+    }
+    a {
+      font-size: 1em !important;
+    }
+    display: block;
+  }
+
+  .page-header {
+      padding: 0.4em 0.3em 0.3em;
+      font-size: 1.5em;
   }
 }
 
 @media screen and (min-width: 768px) {
   .navbar {
+    .container {
+      padding-left: 0;
+      padding-right: 0;
+    }
     .navbar-right {
       .dropdown-menu {
         right: -1px;
       }
-
     }
     .navbar-nav {
       li { /* Para todo item e subitem*/
         a { /* Para todo link*/
           color: $color_text_inverse;
           line-height: $menu-height;
-          padding-top: $padding-menu-top;
-          padding-bottom: $padding-menu-top;
           font-family: "Lato";
           font-weight: 300;
           letter-spacing: 0.5px;
@@ -732,7 +804,7 @@ body {
         }
       }
     }
-    &.nabvar-menu {  /* para a navbar principal - que se diferencia das demais*/
+    &.navbar-menu {  /* para a navbar principal - que se diferencia das demais*/
       border-color: transparentize($color_topo_bg, 0.2);
       border-top-width: 1px;
       .container {
@@ -753,7 +825,7 @@ body {
 @media screen and (min-width: 1281px) {
   .navbar a.navbar-brand {
     font-size: 40px;
-    padding: 4px 13px 4px 30px;
+    padding: 0 0 0 30px;
   }
   .html-login {
     a.navbar-brand {

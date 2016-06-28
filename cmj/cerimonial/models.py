@@ -174,8 +174,8 @@ class OperadorAreaTrabalho(CmjAuditoriaModelMixin):
             self.operador.email)
 
     class Meta:
-        verbose_name = _('Operador da Área de Trabalho')
-        verbose_name_plural = _('Operadores da Área de Trabalho')
+        verbose_name = _('Operador')
+        verbose_name_plural = _('Operadores')
 
     def __str__(self):
         return self.operador.get_display_name()

@@ -4,8 +4,6 @@ function TrechoSearch(opts) {
         if (cts_clear.length > 0)
             $(cts_clear).remove();
 
-
-
         $("input[name='endereco']").each(function() {
             var input = $(this);
             var input_row_fluid = $(input.closest('.row-fluid'));

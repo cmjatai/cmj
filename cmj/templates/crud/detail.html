@@ -3,9 +3,9 @@
 
 {% block base_content %}
 
-  <div class="clearfix">
+  <div class="context-actions clearfix">
     {% block actions %}
-      <div class="actions btn-group btn-group-xs" role="group">
+      <div class="actions btn-group btn-group-sm" role="group">
         {% if view.list_url %}
           <a href="{{ view.list_url }}" class="btn btn-default">{% trans 'Listar' %} {{view.verbose_name_plural}}</a>
         {% endif %}
@@ -27,6 +27,7 @@
       {% endif %}
     {% endblock actions %}
   </div>
+
   {% block detail_content %}
     {% for fieldset in view.layout_display %}
     <h2 class="legend">{{ fieldset.legend }}</h2>
