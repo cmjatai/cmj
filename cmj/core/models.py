@@ -2,15 +2,17 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
+from django.core.exceptions import PermissionDenied
 from django.db import models
 from django.db.models import permalink
+from django.db.models.deletion import PROTECT
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from image_cropping import ImageCropField, ImageRatioField
 from sapl.parlamentares.models import Municipio
 
 from cmj.core.rules import SEARCH_TRECHO
-from cmj.globalrules.globalrules import rules
+from cmj.globalrules.globalrules import rules, GROUP_SOCIAL_USERS
 from cmj.utils import get_settings_auth_user_model
 
 from .rules import MENU_PERMS_FOR_USERS
@@ -126,6 +128,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_absolute_url(self):
         return 'users_profile', [self.pk], {}
 
+    def delete(self, using=None, keep_parents=False):
+
+        if self.groups.all().exclude(name=GROUP_SOCIAL_USERS).exists():
+            raise PermissionDenied(
+                _('Você não possui permissão para se autoremover do Portal!'))
+
+        return AbstractBaseUser.delete(self, using=using, keep_parents=keep_parents)
+
 
 class CmjModelMixin(models.Model):
     created = models.DateTimeField(
@@ -182,9 +192,15 @@ class CmjModelMixin(models.Model):
 class CmjAuditoriaModelMixin(CmjModelMixin):
 
     owner = models.ForeignKey(
-        get_settings_auth_user_model(), verbose_name=_('owner'), related_name='+')
+        get_settings_auth_user_model(),
+        verbose_name=_('owner'),
+        related_name='+',
+        on_delete=PROTECT)
     modifier = models.ForeignKey(
-        get_settings_auth_user_model(), verbose_name=_('modifier'), related_name='+')
+        get_settings_auth_user_model(),
+        verbose_name=_('modifier'),
+        related_name='+',
+        on_delete=PROTECT)
 
     class Meta:
         abstract = True

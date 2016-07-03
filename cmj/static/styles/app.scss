@@ -117,7 +117,7 @@ body, html {
         font-family: "Lato";
         font-weight: 300;
         letter-spacing: 0.5px;
-        font-size: 1.3em;
+        font-size: 1em;
         margin: 0px;
         &:hover, &:focus {
           background: $hover_background_10pw;
@@ -134,7 +134,7 @@ body, html {
     ul {
       position: relative;
       float: right;
-      margin: 0 $grid-gutter-width * -0.5 0.5em 0;
+      margin: 0 $grid-gutter-width * -0.5 0 0;
       background: darken($color_main_bg, 15%) url(/static/img/bg.png);
       border-radius: 0 0 0 6px;
       border: 1px solid white;
@@ -180,7 +180,6 @@ body, html {
           background: darken($color_main_bg, 4%) url(/static/img/bg.png);
           border-color: $color_container_border;
           border-bottom: 1px;
-
         }
       }
     }
@@ -189,10 +188,11 @@ body, html {
 .page-header {
   padding: 0.6em 1em 0.2em;
   margin: 0em $grid-gutter-width * -0.5 0 $grid-gutter-width * -0.5 ;
-  color: $color_topo_bg;
+  color: transparentize($color_topo_bg, 0.3);
   background: darken($color_main_bg, 3%) url(/static/img/bg.png);
   border-radius: 5px 5px 0 0;
   border-bottom: 1px solid $color_container_border;
+  font-weight: normal;
 }
 a {
   color: $color_topo_bg;
@@ -220,8 +220,9 @@ main {
       box-shadow: 0 0 30px  lighten($color_main_bg, 3%);
     }
     &:focus, &:active {
-      border-color: darken($color_main_bg, 30%);
+      border-color: darken($color_main_bg, 40%);
       box-shadow: 0 0 30px  lighten($color_main_bg, 3%);
+        background-color:  darken($color_container_bg, 10%);
     }
   }
   .form-control, .btn-default {
@@ -235,27 +236,38 @@ main {
     }
   }
 }
+
 .control-label {
   color: $color_text;
   font-weight: normal;
 }
-.form-control-static {
-  font-size: 1.2em;
+
+
+.container-table {
+  padding-left: $grid-gutter-width / 2;
+  padding-right: $grid-gutter-width / 2;
+  overflow: hidden;
 }
+
 .table {
-  background-color: rgba(#000, 0.02);
+  border: 1px solid darken($color_main_bg, 5%);
 }
 
 .table > thead > tr > th, .table > thead > tr > td, .table > tbody > tr > th, .table > tbody > tr > td, .table > tfoot > tr > th, .table > tfoot > tr > td {
-  border-top-color: darken($color_main_bg, 10%);
+  border-top-color: darken($color_main_bg, 5%);
   border-bottom-width: 0;
   font-weight: normal;
 }
+
 .context-actions{
-  margin: 1em 1em;
+  margin: 0;
   .actions {
-    margin: 0.5em;
+    margin: $grid-gutter-width $grid-gutter-width/2 $grid-gutter-width;
   }
+}
+
+.alert {
+  margin: $grid-gutter-width $grid-gutter-width/2 $grid-gutter-width;
 }
 
 // #### CRUD DETAIL ########################################
@@ -264,27 +276,34 @@ p.control-label {
   margin-bottom: 0;
 }
 
-// copied from bootstrap _forms.scss legend
-// using @extend would require importing parts of bootstrap again and overriding drunken parrot css
-//   @import "bootstrap/mixins.scss";
-//   @import "bootstrap/forms.scss";
+.form-control-static {
+  font-size: 1.2em;
+  background-color: $color_container_bg;
+  border-bottom: 1px solid $color_container_border;
+  line-height: 1.5em;
+  padding-bottom: 3px;
+  min-height: 2em;
+}
 
-.legend {
+.legend, legend { // tag legend para crud updates
   clear:both;
   display: block;
   width: 100%;
   padding: 0;
-  margin-bottom: $line-height-computed;
+  margin: $grid-gutter-width 0 $grid-gutter-width/2;
   font-size: ($font-size-base * 1.5);
   line-height: inherit;
   color: $legend-color;
   border: 0;
   border-bottom: 1px solid $legend-border-color;
+  font-weight: normal;
+  font-family: "SourceSansProSemiBold", Helvetica, Arial, sans-serif;
+
 }
 
 // #### CRUD UPDATE ########################################
 
-.cts {
+.cts {  // container trecho search
   position: fixed;
   background-color: white;
   z-index: 1;
@@ -294,7 +313,7 @@ p.control-label {
   visibility: hidden;
   overflow: hidden;
 
-  .its {
+  .its {  // item trecho search
     padding: 0.3em 0.7em;
     cursor: pointer;
     &:nth-child(even) {
@@ -305,6 +324,11 @@ p.control-label {
     }
   }
 }
+.form-group {
+  margin-bottom: $grid-gutter-width;
+}
+
+
 // ADJUST DRUNKEN PARROT STYLES ########################################
 .panel-primary {
   border-color: $color_topo_bg;
@@ -515,6 +539,9 @@ body {
   }
 }
 @media screen and (max-width: 800px) {
+  .container {
+    width: auto;
+  }
   .container-login {
     .logo-cmj {
       opacity: 0.16;
@@ -725,19 +752,15 @@ body {
       padding-left: 0;
       padding-right: 0;
     }
+    .navbar-collapse {
+      padding: 0px;
+    }
     .navbar-right {
-      .dropdown-menu {
-        right: -1px;
-      }
+      margin: 0px;
     }
     .navbar-nav {
       li { /* Para todo item e subitem*/
         a { /* Para todo link*/
-          color: $color_text_inverse;
-          line-height: $menu-height;
-          font-family: "Lato";
-          font-weight: 300;
-          letter-spacing: 0.5px;
           font-size: 1.3em;
           &:hover, &:focus {
             background: $hover_background_10pw;
@@ -760,7 +783,6 @@ body {
             top: 0.5em;
             left: 100%;
             margin-left: -1em;
-
           }
           .menu-right {
             top:0;
@@ -791,16 +813,17 @@ body {
           border: 1px solid transparent;
           border-bottom-width: 0px;
         & > .menu-left {
-          left: 1em;
-          top: 100%;
-          margin-top: -0.7em;
-          border-radius: 4px;
+          left: 0.5em;
           right: auto;
         }
         & > .menu-right {
-          right: 0;
+          right: 0.5em;
+          left: auto;
         }
         & > .dropdown-menu {
+          top: 100%;
+          margin-top: -0.6em;
+          border-radius: 4px;
         }
         &:hover {
           border-color: rgba(#f0efe7, 0.3);
@@ -825,6 +848,32 @@ body {
     }
   }
 }
+
+@media screen and (max-width: 800px) {
+  .navbar {
+    .nav.navbar-nav {
+      li { /* Para todo item e subitem*/
+        a { /* Para todo link*/
+          font-size: 1.02em;
+          padding-left: $grid-gutter-width/3;
+          padding-right: $grid-gutter-width/3;
+        }
+      }
+      & > li { /* Para os itens raiz de uma navbar*/
+        & > .menu-left {
+          left: 0.3em;
+        }
+        & > .menu-right {
+          right: 0.3em;
+        }
+        & > .dropdown-menu {
+          margin-top: -0.4em;
+        }
+      }
+    }
+  }
+}
+
 
 @media screen and (min-width: 1281px) {
   .navbar a.navbar-brand {

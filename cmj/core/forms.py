@@ -14,7 +14,7 @@ from image_cropping.widgets import ImageCropWidget, CropWidget
 from sapl.crispy_layout_mixin import to_row
 import django_filters
 
-from cmj.core.models import User, Trecho, TipoLogradouro
+from cmj.core.models import Trecho, TipoLogradouro, User
 
 
 class LoginForm(AuthenticationForm):

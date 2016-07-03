@@ -26,7 +26,9 @@ class Rules:
         g.save()
 
     def _config_group(self, group, rules):
-        g = Group.objects.get_or_create(name=group)[0]
+        g = Group.objects.get_or_create(name=group)
+        if not isinstance(g, Group):
+            g = g[0]
         try:
             for model, perms in rules:
                 self.associar(g, model, perms)

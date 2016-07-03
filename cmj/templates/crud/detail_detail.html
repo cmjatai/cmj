@@ -47,34 +47,36 @@
     {% endfor %}
   {% endblock detail_content %}
 
-  {% if not rows %}
-    <p>{{ NO_ENTRIES_MSG }}</p>
-  {% else %}
-    <table class="table table-striped table-hover">
-      <thead>
+  <div class="container-table">
+    {% if not rows %}
+      <p>{{ NO_ENTRIES_MSG }}</p>
+    {% else %}
+      <table class="table table-striped table-hover">
+        <thead>
+          <tr>
+            {% for name in headers %}
+            <th>{{ name }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+        {% for value_list in rows %}
         <tr>
-          {% for name in headers %}
-          <th>{{ name }}</th>
+          {% for value, href in value_list %}
+          <td>
+            {% if href %}
+            <a href="{{ href }}">{{ value }}</a>
+            {% elif valu != 'core.Cep.None' %}
+              {{ value|safe }}
+            {% endif %}
+          </td>
           {% endfor %}
         </tr>
-      </thead>
-      <tbody>
-      {% for value_list in rows %}
-      <tr>
-        {% for value, href in value_list %}
-        <td>
-          {% if href %}
-          <a href="{{ href }}">{{ value }}</a>
-          {% elif valu != 'core.Cep.None' %}
-            {{ value|safe }}
-          {% endif %}
-        </td>
         {% endfor %}
-      </tr>
-      {% endfor %}
-    </tbody>
-    </table>
-  {% endif %}
+      </tbody>
+      </table>
+    {% endif %}
+  </div>
 
   {% include "paginacao.html" %}
 

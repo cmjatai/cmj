@@ -1,16 +1,16 @@
 from django.contrib import admin
+from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import ugettext_lazy as _
 from image_cropping import ImageCroppingMixin
 
 from cmj.utils import register_all_models_in_admin
+
 from .forms import UserChangeForm, UserCreationForm
 from .models import User
 
 
 # Register your models here.
-
-
 class UserAdmin(BaseUserAdmin, ImageCroppingMixin, admin.ModelAdmin):
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
@@ -33,6 +33,6 @@ class UserAdmin(BaseUserAdmin, ImageCroppingMixin, admin.ModelAdmin):
     ordering = ('email',)
     filter_horizontal = ('groups', 'user_permissions',)
 
-admin.site.register(User, UserAdmin)
+admin.site.register(get_user_model(), UserAdmin)
 
 register_all_models_in_admin(__name__)

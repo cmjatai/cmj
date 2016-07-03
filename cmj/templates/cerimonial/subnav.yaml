@@ -11,3 +11,5 @@
   url: localtrabalho_list
 - title: {% trans "Dependentes" %}
   url: dependente_list
+- title: {% trans "Filiação Partidária" %}
+  url: filiacaopartidaria_list

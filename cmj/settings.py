@@ -18,6 +18,11 @@ from sapl import settings as sapl_settings
 from unipath import Path
 
 
+"""@property    gerar nomes para urls
+def pretty_name(self):
+    return "{0}.{1}".format(slugify(self.title),
+            get_extension(self.file.name))"""
+
 config = AutoConfig()
 
 BASE_DIR = Path(__file__).ancestor(1)

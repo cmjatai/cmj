@@ -2,6 +2,7 @@ from compressor.utils.decorators import cached_property
 from django.conf.urls import url
 from django.contrib.auth import logout
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http.response import Http404
 from django.shortcuts import redirect
@@ -16,6 +17,7 @@ from sapl.crud.base import Crud, CrudBaseMixin, CrudListView, CrudCreateView,\
     CrudUpdateView, CrudDeleteView, CrudDetailView, make_pagination
 
 from cmj.cerimonial.models import Perfil
+from cmj.globalrules.globalrules import GROUP_SOCIAL_USERS
 
 
 LIST, DETAIL, ADD, CHANGE, DELETE =\
@@ -32,13 +34,14 @@ class PermissionRequiredContainerCrudMixin(PermissionRequiredMixin):
         if not self.has_permission():
             return self.handle_no_permission()
 
-        params = {'pk': kwargs['pk']}
+        if 'pk' in kwargs:
+            params = {'pk': kwargs['pk']}
 
-        if self.container_field:
-            params[self.container_field] = request.user.pk
+            if self.container_field:
+                params[self.container_field] = request.user.pk
 
-        if not self.model.objects.filter(**params).exists():
-            raise Http404()
+            if not self.model.objects.filter(**params).exists():
+                raise Http404()
 
         return super(PermissionRequiredMixin, self).dispatch(
             request, *args, **kwargs)
@@ -48,6 +51,16 @@ class PermissionRequiredContainerCrudMixin(PermissionRequiredMixin):
         if not hasattr(self.crud, 'container_field'):
             self.crud.container_field = ''
         return self.crud.container_field
+
+    @cached_property
+    def container_field_set(self):
+        if not hasattr(self.crud, 'container_field_set'):
+            self.crud.container_field_set = ''
+        return self.crud.container_field_set
+
+    @cached_property
+    def is_contained(self):
+        return self.container_field_set or self.container_field
 
 
 class DetailMasterCrud(Crud):
@@ -107,7 +120,8 @@ class DetailMasterCrud(Crud):
             return queryset
 
         def dispatch(self, request, *args, **kwargs):
-            return PermissionRequiredMixin.dispatch(self, request, *args, **kwargs)
+            return PermissionRequiredMixin.dispatch(
+                self, request, *args, **kwargs)
 
     class CreateView(
             PermissionRequiredContainerCrudMixin, CrudCreateView):
@@ -132,14 +146,13 @@ class DetailMasterCrud(Crud):
                                 self.model, container[0]).field.related_model
 
                             params = {}
-                            params[
-                                '__'.join(container[1:])] = self.request.user.pk
+                            params['__'.join(
+                                container[1:])] = self.request.user.pk
 
                             container_data = container_model.objects.filter(
                                 **params).first()
 
                             setattr(self.object, container[0], container_data)
-
             except:
                 pass
 
@@ -166,9 +179,9 @@ class DetailMasterCrud(Crud):
             PermissionRequiredContainerCrudMixin,
             CrudDetailView, MultipleObjectMixin):
         permission_required = (DETAIL, )
-        # Os colados nesta lista abaixo, nos models devem ter
-        # ou atributos ou propertiers
-        list_field_names_model_set = ['nome', ]
+        # Os colados nesta lista abaixo, nos models devem ter,
+        # ou atributos, ou propertiers
+        list_field_names_set = ['nome', ]
 
         paginate_by = 10
         no_entries_msg = _('Nenhum registro Associado.')
@@ -183,7 +196,7 @@ class DetailMasterCrud(Crud):
                 return [getattr(
                     self.object, self.crud.model_set).model._meta.get_field(
                     fieldname).verbose_name
-                    for fieldname in self.list_field_names_model_set]
+                    for fieldname in self.list_field_names_set]
             except:
                 return [getattr(
                     self.object,
@@ -208,13 +221,13 @@ class DetailMasterCrud(Crud):
                     get_field_display(obj, name)[1],
                     self.resolve_model_set_url(base.DETAIL, args=(obj.id,))
                     if i == 0 else None)
-                    for i, name in enumerate(self.list_field_names_model_set)]
+                    for i, name in enumerate(self.list_field_names_set)]
             except:
                 return [(
                     getattr(obj, name),
                     self.resolve_model_set_url(base.DETAIL, args=(obj.id,))
                     if i == 0 else None)
-                    for i, name in enumerate(self.list_field_names_model_set)]
+                    for i, name in enumerate(self.list_field_names_set)]
 
         def get_object(self, queryset=None):
             return self.object
@@ -227,9 +240,17 @@ class DetailMasterCrud(Crud):
             return self.render_to_response(context)
 
         def get_queryset(self):
-            # TODO implementar model_filter para filtrar por grandes escopos
-            object_list = getattr(self.object, self.crud.model_set).all()
-            return object_list
+            queryset = getattr(self.object, self.crud.model_set).all()
+
+            if not self.request.user.is_authenticated():
+                return queryset
+
+            if self.container_field_set:
+                params = {}
+                params[self.container_field_set] = self.request.user.pk
+                return queryset.filter(**params)
+
+            return queryset
 
         def get_context_data(self, **kwargs):
             if hasattr(self.crud, 'model_set') and self.crud.model_set:
@@ -507,12 +528,21 @@ class PerfilAbstractCrud(DetailMasterCrud):
 
     class DeleteView(DetailMasterCrud.DeleteView):
 
+        def check_permission(self):
+            if self.object.perfil_user.groups.all().exclude(
+                    name=GROUP_SOCIAL_USERS).exists():
+                raise PermissionDenied(
+                    _('Você não possui permissão '
+                      'para se autoremover do Portal!'))
+
         def get(self, request, *args, **kwargs):
 
             try:
                 self.object = self.model.objects.for_user(request.user)
             except:
                 return redirect(reverse('cmj.cerimonial:perfil_create'))
+
+            self.check_permission()
 
             return self.render_to_response(self.get_context_data())
 
@@ -523,9 +553,8 @@ class PerfilAbstractCrud(DetailMasterCrud):
             except:
                 return redirect(reverse('cmj.cerimonial:perfil_create'))
 
-            self.object.perfil_user.is_active = False
-            self.object.perfil_user.save()
-            self.object.delete()
+            self.check_permission()
+            self.object.perfil_user.delete()
 
             logout(request)
 

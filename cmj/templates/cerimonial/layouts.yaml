@@ -70,6 +70,9 @@ Endereco:
   - tipo bairro distrito
   - regiao_municipal municipio:4 uf:3
   - trecho
+FiliacaoPartidaria:
+  {% trans 'Filiação Partidária' %}:
+  - partido:6 data data_desfiliacao
 Perfil:
   {% trans 'Dados Básicos' %}:
   - forma_tratamento:2 nome:5 nome_social:3 apelido

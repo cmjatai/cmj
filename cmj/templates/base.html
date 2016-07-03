@@ -58,7 +58,7 @@
                       {% endif %}
                     {% endfor %}
                   </a>
-                  <ul class="dropdown-menu">
+                  <ul class="dropdown-menu menu-right">
                     <li><a href="{% url 'cmj.cerimonial:perfil_detail' %}">{% trans "Meu Perfil" %}</a></li>
                     <li><a href="{% url 'cmj.core:logout' %}">{% trans "Sair" %}</a></li>
                   </ul>
@@ -92,7 +92,7 @@
                           <img class="avatar" src="http://graph.facebook.com/v2.6/{{user.social_auth.all.0.uid}}/picture?height=46" />
                         {% endif %}
                       </a>
-                      <ul class="dropdown-menu menu-right">
+                      <ul class="dropdown-menu me menu-rightnu-right">
                         <li><a href="{% url 'cmj.cerimonial:perfil_detail' %}">{% trans "Meu Perfil" %}</a></li>
                         <li><a href="{% url 'cmj.core:logout' %}">{% trans "Sair" %}</a></li>
                       </ul>
@@ -111,27 +111,7 @@
                     <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'cmj.cerimonial:contato_list' %}">{% trans "Contatos" %}</a></li>
                   {% endif %}
 
-                  {% if perms.core.menu_dados_auxiliares %}
-                    <li class="dropdown">
-                      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Dados Auxiliares" %}<span class="caret"></span></a>
-                      <ul class="dropdown-menu menu-left">
-                          {% if perms.core.search_trecho %}<li class="nav__sub-item"><a href="{% url 'cmj.core:search_view' %}">{% trans "Consultar base de Cep's e Endereços" %}</a></li>{% endif %}
 
-                          {% if perms.cerimonial.list_operadoratelefonia %}<li class="nav__sub-item"><a href="{% url 'cmj.cerimonial:operadoratelefonia_list' %}">{% model_verbose_name_plural "cmj.cerimonial.models.OperadoraTelefonia"%}</a></li>{% endif %}
-                          {% if perms.cerimonial.list_nivelinstrucao %}<li class="nav__sub-item"><a href="{% url 'cmj.cerimonial:nivelinstrucao_list' %}">{% model_verbose_name_plural "cmj.cerimonial.models.NivelInstrucao"%}</a></li>{% endif %}
-
-                          {% if perms.core.menu_tabelas_auxiliares or perms.core.menu_area_trabalho %}
-                            <li role="separator" class="divider"></li>
-                          {% endif %}
-                          {% if perms.core.menu_tabelas_auxiliares %}<li class="nav__sub-item"><a href="{% url 'cmj.core:tabelas_auxiliares' %}">{% trans "Tabelas" %}</a></li>{% endif %}
-                          {% if perms.core.menu_area_trabalho %}<li class="nav__sub-item"><a href="{% url 'cmj.cerimonial:areatrabalho_list' %}">{% trans "Áreas de Trabalho" %}</a></li>{% endif %}
-
-
-                      </ul>
-                    </li>
-                  {% endif %}
-
-                      {% comment %}
                   <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Institucional <span class="caret"></span></a>
                     <ul class="dropdown-menu menu-left">
@@ -141,8 +121,7 @@
                       <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'sapl.parlamentares:parlamentar_list' %}">Parlamentares</a></li>
                     </ul>
                   </li>
-                      {% endcomment %}
-              {% comment %}
+                      {% comment %}
 
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Institucional <span class="caret"></span></a>
@@ -227,9 +206,35 @@
                           </ul>
                         </li>
                       </ul>
-                    </li>
               {% endcomment %}
+                    </li>
                 </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+
+                  {% if perms.core.menu_dados_auxiliares %}
+                    <li class="dropdown">
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Dados Auxiliares" %}<span class="caret"></span></a>
+                      <ul class="dropdown-menu menu-right">
+                          {% if perms.core.search_trecho %}<li class="nav__sub-item"><a href="{% url 'cmj.core:search_view' %}">{% trans "Consultar base de Cep's e Endereços" %}</a></li>{% endif %}
+
+                          {% if perms.cerimonial.list_operadoratelefonia %}<li class="nav__sub-item"><a href="{% url 'cmj.cerimonial:operadoratelefonia_list' %}">{% model_verbose_name_plural "cmj.cerimonial.models.OperadoraTelefonia"%}</a></li>{% endif %}
+                          {% if perms.cerimonial.list_nivelinstrucao %}<li class="nav__sub-item"><a href="{% url 'cmj.cerimonial:nivelinstrucao_list' %}">{% model_verbose_name_plural "cmj.cerimonial.models.NivelInstrucao"%}</a></li>{% endif %}
+                          {% if perms.cerimonial.list_estadocivil %}<li class="nav__sub-item"><a href="{% url 'cmj.cerimonial:estadocivil_list' %}">{% model_verbose_name_plural "cmj.cerimonial.models.EstadoCivil"%}</a></li>{% endif %}
+                          {% if perms.parlamentares.detail_partido %}<li class="nav__sub-item"><a href="{% url 'cmj.cerimonial:partido_list' %}">{% model_verbose_name_plural "sapl.parlamentares.models.Partido"%}</a></li>{% endif %}
+
+                          {% if perms.core.menu_tabelas_auxiliares or perms.core.menu_area_trabalho %}
+                            <li role="separator" class="divider"></li>
+                          {% endif %}
+                          {% if perms.core.menu_tabelas_auxiliares %}<li class="nav__sub-item"><a href="{% url 'cmj.core:tabelas_auxiliares' %}">{% trans "Tabelas" %}</a></li>{% endif %}
+                          {% if perms.core.menu_area_trabalho %}<li class="nav__sub-item"><a href="{% url 'cmj.cerimonial:areatrabalho_list' %}">{% trans "Áreas de Trabalho" %}</a></li>{% endif %}
+
+                      </ul>
+                    </li>
+                  {% endif %}
+                </ul>
+
+
               </div><!--/.nav-collapse -->
             </div>
           </nav>
@@ -271,17 +276,21 @@
                 </div>
               {% endblock base_header %}
 
-              <nav class="navbar navbar-area-trabalho">
+              {% block base_workspace %}
+                {% if view.is_contained %}
+                  <nav class="navbar navbar-area-trabalho">
                     {% for at in area_trabalho %}
                       {% if forloop.first %}
                         <ul class="nav navbar-nav" >
                       {% endif %}
-                        <li><a href="#">{{at.nome}}</a></li>
+                        <li><a>{{at.nome}}</a></li>
                       {% if forloop.last %}
                         </ul>
                       {% endif %}
                     {% endfor %}
-              </nav>
+                  </nav>
+                {% endif %}
+              {% endblock base_workspace %}
 
               {# Feedback messages #}
               {% for message in messages %}
@@ -334,5 +343,22 @@
 
     {% endblock foot_js %}
 
+    <script>
+      window.fbAsyncInit = function() {
+        FB.init({
+          appId      : '150874375319738',
+          xfbml      : true,
+          version    : 'v2.6'
+        });
+      };
+
+      (function(d, s, id){
+         var js, fjs = d.getElementsByTagName(s)[0];
+         if (d.getElementById(id)) {return;}
+         js = d.createElement(s); js.id = id;
+         js.src = "//connect.facebook.net/pt_BR/sdk.js";
+         fjs.parentNode.insertBefore(js, fjs);
+       }(document, 'script', 'facebook-jssdk'));
+    </script>
   </body>
 </html>

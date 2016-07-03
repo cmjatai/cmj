@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load i18n%}
+
+{% block title %}
+    <h1 class="page-header">{% trans "Sem Permissão de Acesso!" %}</h1>
+{% endblock %}
+
+{% block base_content %}
+  <div class="alert alert-danger text-">
+     <h3>
+       {{ exception }}
+     </h3>
+  </div>
+{% endblock %}

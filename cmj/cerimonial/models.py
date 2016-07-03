@@ -130,7 +130,7 @@ class AreaTrabalho(CmjAuditoriaModelMixin):
     parlamentar = models.ForeignKey(
         Parlamentar,
         verbose_name=_('Parlamentar'),
-        related_name='contatos_set',
+        related_name='area_trabalho_set',
         blank=True, null=True, on_delete=CASCADE)
 
     operadores = models.ManyToManyField(
@@ -600,6 +600,13 @@ class FiliacaoPartidaria(models.Model):
     data_desfiliacao = models.DateField(
         blank=True, null=True, verbose_name=_('Data de Desfiliação'))
 
+    @property
+    def contato_nome(self):
+        return str(self.contato)
+
     class Meta:
         verbose_name = _('Filiação Partidária')
         verbose_name_plural = _('Filiações Partidárias')
+
+    def __str__(self):
+        return str(self.partido)
