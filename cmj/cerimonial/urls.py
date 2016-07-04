@@ -8,7 +8,7 @@ from cmj.cerimonial.views import ContatoCrud, TelefoneCrud, EmailCrud,\
     TipoEnderecoCrud, TipoEmailCrud, ParentescoCrud, EstadoCivilCrud,\
     TipoAutoridadeCrud, TipoLocalTrabalhoCrud, OperadoraTelefoniaCrud,\
     NivelInstrucaoCrud, PronomeTratamentoCrud, PartidoCrud,\
-    LocalTrabalhoFragmentFormPronomesView
+    ContatoFragmentFormPronomesView
 
 from .apps import AppConfig
 
@@ -39,7 +39,7 @@ urlpatterns = [
                                    )),
 
     url(r'^sistema/cerimonial/tipoautoridade/(?P<pk>\d+)/pronomes_form',
-        LocalTrabalhoFragmentFormPronomesView.as_view(), name='list_pronomes'),
+        ContatoFragmentFormPronomesView.as_view(), name='list_pronomes'),
 
     url(r'^sistema/cerimonial/statusvisita/',
         include(StatusVisitaCrud.get_urls())),

@@ -311,7 +311,7 @@ class Contato(CmjSearchMixin, CmjModelMixin):
         AreaTrabalho,
         verbose_name=_('Área de Trabalho'),
         related_name='contato_set',
-        blank=True, null=True, on_delete=CASCADE)
+        blank=True, null=True, on_delete=PROTECT)
 
     perfil_user = models.ForeignKey(
         get_settings_auth_user_model(),
@@ -321,6 +321,23 @@ class Contato(CmjSearchMixin, CmjModelMixin):
 
     profissao = models.CharField(
         max_length=254, blank=True, verbose_name=_('Profissão'))
+
+    tipo_autoridade = models.ForeignKey(
+        TipoAutoridade,
+        verbose_name=TipoAutoridade._meta.verbose_name,
+        related_name='contato_set',
+        blank=True, null=True, on_delete=SET_NULL)
+
+    cargo = models.CharField(max_length=254, blank=True, default='',
+                             verbose_name=_('Cargo/Função'))
+
+    pronome_tratamento = models.ForeignKey(
+        PronomeTratamento,
+        verbose_name=PronomeTratamento._meta.verbose_name,
+        related_name='contato_set',
+        blank=True, null=True, on_delete=SET_NULL,
+        help_text=_('O pronome de tratamento é opcional, mas será \
+        obrigatório caso seja selecionado um tipo de autoridade.'))
 
     @cached_property
     def fields_search(self):
@@ -559,26 +576,12 @@ class LocalTrabalho(CmjModelMixin):
     data_fim = models.DateField(
         blank=True, null=True, verbose_name=_('Data de Fim'))
 
-    tipo_autoridade = models.ForeignKey(
-        TipoAutoridade,
-        verbose_name=TipoAutoridade._meta.verbose_name,
-        related_name='localtrabalho_set',
-        blank=True, null=True, on_delete=SET_NULL)
-
-    cargo = models.CharField(max_length=254, blank=True, default='',
-                             verbose_name=_('Cargo/Função'))
-
-    pronome_tratamento = models.ForeignKey(
-        PronomeTratamento,
-        verbose_name=PronomeTratamento._meta.verbose_name,
-        related_name='localtrabalho_set',
-        blank=True, null=True, on_delete=SET_NULL,
-        help_text=_('O pronome de tratamento é opcional, mas será \
-        obrigatório caso seja selecionado um tipo de autoridade.'))
-
     preferencial = models.BooleanField(
         choices=YES_NO_CHOICES,
         default=True, verbose_name=_('Preferencial?'))
+
+    cargo = models.CharField(max_length=254, blank=True, default='',
+                             verbose_name=_('Cargo/Função'))
 
     class Meta:
         verbose_name = _('Local de Trabalho')

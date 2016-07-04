@@ -51,8 +51,9 @@ Contato:
   {% trans 'Documentos' %}:
   - numero_sus cpf titulo_eleitor
   - rg rg_orgao_expedidor rg_data_expedicao ativo
-  {% trans 'Profissão' %}:
-  - profissao
+  {% trans 'Profissão/Tratamento' %}:
+  - profissao tipo_autoridade:5
+  - pronome_tratamento
 Telefone:
   {% trans 'Telefone' %}:
   - ddd:2 numero:3 tipo:3 operadora:4
@@ -67,15 +68,12 @@ Dependente:
 LocalTrabalho:
   {% trans 'Dados Básicos' %}:
   - nome:6 nome_social:4 preferencial
-  - data_inicio data_fim tipo
+  - data_inicio:2 data_fim:2 cargo tipo
   {% trans 'Endereço' %}:
   - trecho
   - endereco:6 numero complemento cep
   - bairro distrito
   - regiao_municipal municipio:4 uf:3
-  {% trans 'Tratamento' %}:
-  - tipo_autoridade:5 cargo
-  - pronome_tratamento
 Endereco:
   {% trans 'Endereço' %}:
   - endereco:6 numero complemento cep
@@ -90,8 +88,9 @@ Perfil:
   - nome:5 nome_social:3 apelido
   - data_nascimento estado_civil sexo identidade_genero
   - nivel_instrucao:4 naturalidade tem_filhos quantos_filhos
-  {% trans 'Profissão' %}:
+  {% trans 'Profissão/Tratamento' %}:
   - profissao
+  - pronome_tratamento
 TelefonePerfil:
   {% trans 'Telefone' %}:
   - ddd:2 numero:3 tipo:3 operadora:4
@@ -106,15 +105,12 @@ DependentePerfil:
 LocalTrabalhoPerfil:
   {% trans 'Dados Básicos' %}:
   - nome:6 nome_social:4 preferencial
-  - data_inicio data_fim tipo
+  - data_inicio:2 data_fim:2 cargo tipo
   {% trans 'Endereço' %}:
   - trecho
   - endereco:6 numero complemento cep
   - bairro distrito
   - regiao_municipal municipio:4 uf:3
-  {% trans 'Tratamento' %}:
-  - cargo
-  - pronome_tratamento
 EnderecoPerfil:
   {% trans 'Endereço' %}:
   - endereco:6 numero complemento cep

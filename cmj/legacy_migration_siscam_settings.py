@@ -7,7 +7,8 @@ from .settings import *  # flake8: noqa
 
 
 config = AutoConfig()
-config.config = Config(RepositoryEnv(os.path.abspath('cmj/legacy_siscam/.env')))
+config.config = Config(
+    RepositoryEnv(os.path.abspath('cmj/legacy_siscam/.env')))
 
 INSTALLED_APPS += (
     'cmj.legacy_siscam',  # legacy reversed model definitions
@@ -16,7 +17,3 @@ INSTALLED_APPS += (
 DATABASES['legacy_siscam'] = config('DATABASE_URL', cast=db_url,)
 
 DATABASE_ROUTERS = ['cmj.legacy_siscam.router.LegacyRouter', ]
-
-MOMMY_CUSTOM_FIELDS_GEN = {
-    'django.db.models.ForeignKey': 'cmj.legacy_siscam.migration.make_with_log'
-}

@@ -4,10 +4,6 @@
 {% block extra_js %}
 
   <script type="text/javascript">
-    TrechoSearch({
-      'api_rest_list': '{% url 'cmj.core:trecho_search_rest_json'%}',
-      'api_rest_retrieve': '{% url 'cmj.core:trecho_rest_json' 0 %}',
-    });
 
     function atualizaPronomes(event) {
       var _this = $(event.currentTarget)

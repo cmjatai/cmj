@@ -4,6 +4,7 @@ from django.contrib.auth import logout
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 from django.http.response import Http404
 from django.shortcuts import redirect
 from django.utils import six
@@ -16,8 +17,10 @@ from sapl.crud import base
 from sapl.crud.base import Crud, CrudBaseMixin, CrudListView, CrudCreateView,\
     CrudUpdateView, CrudDeleteView, CrudDetailView, make_pagination
 
+from cmj.cerimonial.forms import PerfilForm
 from cmj.cerimonial.models import Perfil
 from cmj.globalrules.globalrules import GROUP_SOCIAL_USERS
+from cmj.utils import normalize
 
 
 LIST, DETAIL, ADD, CHANGE, DELETE =\
@@ -107,8 +110,37 @@ class DetailMasterCrud(Crud):
             PermissionRequiredContainerCrudMixin, CrudListView):
         permission_required = (LIST, )
 
+        def get_context_data(self, **kwargs):
+            if hasattr(self, 'form_search_class'):
+                q = str(self.request.GET.get('q'))\
+                    if 'q' in self.request.GET else ''
+
+                if 'form' not in kwargs:
+                    kwargs['form'] = self.form_search_class(initial={'q': q})
+
+            return super().get_context_data(**kwargs)
+
         def get_queryset(self):
             queryset = CrudListView.get_queryset(self)
+
+            # form_search_class
+            # só pode ser usado em models que herdam de CmjSearchMixin
+            if hasattr(self, 'form_search_class'):
+                request = self.request
+                if request.GET.get('q') is not None:
+                    query = normalize(str(request.GET.get('q')))
+
+                    query = query.split(' ')
+                    if query:
+                        q = Q()
+                        for item in query:
+                            if not item:
+                                continue
+                            q = q & Q(search__icontains=item)
+
+                        if q:
+                            queryset = queryset.filter(q)
+
             if not self.request.user.is_authenticated():
                 return queryset
 
@@ -136,25 +168,30 @@ class DetailMasterCrud(Crud):
             try:
                 self.object.owner = self.request.user
                 self.object.modifier = self.request.user
-
-                if self.container_field:
-                    container = self.container_field.split('__')
-
-                    if len(container) > 1:
-                        if hasattr(self.object, container[0]):
-                            container_model = getattr(
-                                self.model, container[0]).field.related_model
-
-                            params = {}
-                            params['__'.join(
-                                container[1:])] = self.request.user.pk
-
-                            container_data = container_model.objects.filter(
-                                **params).first()
-
-                            setattr(self.object, container[0], container_data)
             except:
                 pass
+
+            if self.container_field:
+                container = self.container_field.split('__')
+
+                if len(container) > 1:
+                    if hasattr(self.object, container[0]):
+                        container_model = getattr(
+                            self.model, container[0]).field.related_model
+
+                        params = {}
+                        params['__'.join(
+                            container[1:])] = self.request.user.pk
+
+                        container_data = container_model.objects.filter(
+                            **params).first()
+
+                        if not container_data:
+                            raise Exception(
+                                _('Não é permitido adicionar um Contato '
+                                  'sem estar em uma Área de Trabalho.'))
+
+                        setattr(self.object, container[0], container_data)
 
             return super().form_valid(form)
 
@@ -504,6 +541,9 @@ class PerfilAbstractCrud(DetailMasterCrud):
 
     class UpdateView(DetailMasterCrud.UpdateView):
 
+        form_class = PerfilForm
+        template_name = 'cerimonial/contato_form.html'
+
         def get(self, request, *args, **kwargs):
 
             try:
@@ -561,6 +601,9 @@ class PerfilAbstractCrud(DetailMasterCrud):
             return redirect('/login')
 
     class CreateView(DetailMasterCrud.CreateView):
+
+        form_class = PerfilForm
+        template_name = 'cerimonial/contato_form.html'
 
         def get(self, request, *args, **kwargs):
             if request.user.is_authenticated():

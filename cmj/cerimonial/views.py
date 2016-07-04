@@ -13,7 +13,8 @@ from sapl.parlamentares.models import Partido, Parlamentar, Filiacao
 
 from cmj.cerimonial.forms import LocalTrabalhoForm, EnderecoForm,\
     OperadorAreaTrabalhoForm, TipoAutoridadeForm,\
-    LocalTrabalhoFragmentPronomesForm, LocalTrabalhoPerfilForm
+    LocalTrabalhoPerfilForm, ListWithSearchForm,\
+    ContatoFragmentPronomesForm, ContatoForm
 from cmj.cerimonial.models import StatusVisita, TipoTelefone, TipoEndereco,\
     TipoEmail, Parentesco, EstadoCivil, TipoAutoridade, TipoLocalTrabalho,\
     NivelInstrucao, Contato, Telefone, OperadoraTelefonia, Email,\
@@ -250,26 +251,15 @@ class ContatoCrud(DetailMasterCrud):
             return context"""
 
     class ListView(DetailMasterCrud.ListView):
+        form_search_class = ListWithSearchForm
 
-        def get_queryset(self):
-            queryset = DetailMasterCrud.ListView.get_queryset(self)
+    class CreateView(DetailMasterCrud.CreateView):
+        form_class = ContatoForm
+        template_name = 'cerimonial/contato_form.html'
 
-            request = self.request
-            if request.GET.get('q') is not None:
-                query = normalize(str(request.GET.get('q')))
-
-                query = query.split(' ')
-                if query:
-                    q = Q()
-                    for item in query:
-                        if not item:
-                            continue
-                        q = q & Q(search__icontains=item)
-
-                    if q:
-                        queryset = queryset.filter(q)
-
-            return queryset
+    class UpdateView(DetailMasterCrud.UpdateView):
+        form_class = ContatoForm
+        template_name = 'cerimonial/contato_form.html'
 
 
 class FiliacaoPartidariaCrud(MasterDetailCrudPermission):
@@ -351,16 +341,16 @@ class LocalTrabalhoCrud(MasterDetailCrudPermission):
 
     class CreateView(PreferencialMixin, MasterDetailCrudPermission.CreateView):
         form_class = LocalTrabalhoForm
-        template_name = 'cerimonial/localtrabalho_form.html'
+        template_name = 'core/crispy_form_with_trecho_search.html'
 
     class UpdateView(PreferencialMixin, MasterDetailCrudPermission.UpdateView):
         form_class = LocalTrabalhoForm
-        template_name = 'cerimonial/localtrabalho_form.html'
+        template_name = 'core/crispy_form_with_trecho_search.html'
 
 
 # TODO: view está sem nenhum tipo de autenticação.
-class LocalTrabalhoFragmentFormPronomesView(FormView):
-    form_class = LocalTrabalhoFragmentPronomesForm
+class ContatoFragmentFormPronomesView(FormView):
+    form_class = ContatoFragmentPronomesForm
     template_name = 'crud/ajax_form.html'
 
     def get_initial(self):

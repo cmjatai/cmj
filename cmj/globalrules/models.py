@@ -9,6 +9,7 @@ from sapl.settings import SAPL_APPS
 
 from cmj.settings import CMJ_APPS
 
+
 app_configs = list(apps.get_app_configs())
 
 for ac in app_configs:
@@ -112,3 +113,6 @@ def create_proxy_permissions(
 models.signals.post_migrate.connect(
     receiver=create_proxy_permissions,
     dispatch_uid="django.contrib.auth.management.create_permissions")
+
+
+# migrate_siscam()

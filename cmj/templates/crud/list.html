@@ -1,16 +1,16 @@
 {% extends "base.html" %}
-{% load i18n common_tags%}
+{% load i18n common_tags crispy_forms_tags%}
 
 {% block base_content %}
 
 <div class="context-actions clearfix">
 
-  <form class="navbar-form navbar-left" role="search">
-    <div class="form-group">
-      <input type="text" name="q" value="{{request.GET.q}}" class="form-control" placeholder="Filtrar Lista">
-    </div>
-    <button type="search" class="btn btn-default">Filtrar</button>
-  </form>
+  <div class="actions col-sm-7">
+    {% if form %}
+      {% crispy form %}
+    {% endif %}
+  </div>
+
 
   {% block actions %}
     <div class="actions btn-group pull-right btn-group-lg" role="group">
