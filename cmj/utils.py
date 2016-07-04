@@ -1,6 +1,6 @@
 from datetime import date
 from functools import wraps
-
+from unicodedata import normalize as unicodedata_normalize
 from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
@@ -8,6 +8,11 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from floppyforms import ClearableFileInput
 import magic
+
+
+def normalize(txt):
+    return unicodedata_normalize(
+        'NFKD', txt).encode('ASCII', 'ignore').decode('ASCII')
 
 
 def get_settings_auth_user_model():

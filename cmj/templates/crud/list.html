@@ -4,6 +4,14 @@
 {% block base_content %}
 
 <div class="context-actions clearfix">
+
+  <form class="navbar-form navbar-left" role="search">
+    <div class="form-group">
+      <input type="text" name="q" value="{{request.GET.q}}" class="form-control" placeholder="Filtrar Lista">
+    </div>
+    <button type="search" class="btn btn-default">Filtrar</button>
+  </form>
+
   {% block actions %}
     <div class="actions btn-group pull-right btn-group-lg" role="group">
       {% if view.create_url %}

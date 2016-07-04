@@ -2,16 +2,18 @@
 from django.contrib import messages
 from django.contrib.auth.models import Group
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 from django.forms.utils import ErrorList
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic.edit import FormMixin
+from django.views.generic.edit import FormMixin, FormView
 from sapl.crud.base import DETAIL, CrudListView
 from sapl.parlamentares.models import Partido, Parlamentar, Filiacao
 
 from cmj.cerimonial.forms import LocalTrabalhoForm, EnderecoForm,\
-    OperadorAreaTrabalhoForm
+    OperadorAreaTrabalhoForm, TipoAutoridadeForm,\
+    LocalTrabalhoFragmentPronomesForm, LocalTrabalhoPerfilForm
 from cmj.cerimonial.models import StatusVisita, TipoTelefone, TipoEndereco,\
     TipoEmail, Parentesco, EstadoCivil, TipoAutoridade, TipoLocalTrabalho,\
     NivelInstrucao, Contato, Telefone, OperadoraTelefonia, Email,\
@@ -22,6 +24,7 @@ from cmj.cerimonial.rules import rules_patterns
 from cmj.globalrules import globalrules
 from cmj.globalrules.crud_custom import DetailMasterCrud,\
     MasterDetailCrudPermission, PerfilAbstractCrud, PerfilDetailCrudPermission
+from cmj.utils import normalize
 
 
 globalrules.rules.config_groups(rules_patterns)
@@ -35,15 +38,10 @@ TipoEnderecoCrud = DetailMasterCrud.build(TipoEndereco, None, 'tipoendereco')
 TipoEmailCrud = DetailMasterCrud.build(TipoEmail, None, 'tipoemail')
 ParentescoCrud = DetailMasterCrud.build(Parentesco, None, 'parentesco')
 
-AreaTrabalhoCrud = DetailMasterCrud.build(AreaTrabalho, None, 'areatrabalho')
 
-
-TipoAutoridadeCrud = DetailMasterCrud.build(
-    TipoAutoridade, None, 'tipoautoriadade')
 TipoLocalTrabalhoCrud = DetailMasterCrud.build(
     TipoLocalTrabalho, None, 'tipolocaltrabalho')
-PronomeTratamentoCrud = DetailMasterCrud.build(
-    PronomeTratamento, None, 'pronometratamento')
+
 
 # ------------- Area de Trabalho Master e Details ----------------------------
 
@@ -64,7 +62,7 @@ class AreaTrabalhoCrud(DetailMasterCrud):
 
 
 class OperadorAreaTrabalhoCrud(MasterDetailCrudPermission):
-    parent_field = 'area_trabalho'
+    parent_field = 'areatrabalho'
     model = OperadorAreaTrabalho
     help_path = 'operadorareatrabalho'
 
@@ -103,7 +101,7 @@ class OperadorAreaTrabalhoCrud(MasterDetailCrudPermission):
             self.object = form.save(commit=False)
             oper = OperadorAreaTrabalho.objects.filter(
                 user_id=self.object.user_id,
-                area_trabalho_id=self.object.area_trabalho_id
+                areatrabalho_id=self.object.areatrabalho_id
             ).first()
 
             if oper:
@@ -134,7 +132,7 @@ class OperadorAreaTrabalhoCrud(MasterDetailCrudPermission):
 
 
 class OperadoraTelefoniaCrud(DetailMasterCrud):
-    model_set = 'telefones_set'
+    model_set = 'telefone_set'
     model = OperadoraTelefonia
     container_field_set = 'contato__workspace__operadores'
 
@@ -143,20 +141,20 @@ class OperadoraTelefoniaCrud(DetailMasterCrud):
 
 
 class NivelInstrucaoCrud(DetailMasterCrud):
-    model_set = 'contatos_set'
+    model_set = 'contato_set'
     model = NivelInstrucao
     container_field_set = 'workspace__operadores'
 
 
 class EstadoCivilCrud(DetailMasterCrud):
-    model_set = 'contatos_set'
+    model_set = 'contato_set'
     model = EstadoCivil
     container_field_set = 'workspace__operadores'
 
 
 class PartidoCrud(DetailMasterCrud):
     help_text = 'partidos'
-    model_set = 'filiacoes_partidarias_set'
+    model_set = 'filiacaopartidaria_set'
     model = Partido
     container_field_set = 'contato__workspace__operadores'
     # container_field = 'filiacoes_partidarias_set__contato__workspace__operadores'
@@ -204,6 +202,35 @@ class PartidoCrud(DetailMasterCrud):
             return queryset"""
 
 
+class PronomeTratamentoCrud(DetailMasterCrud):
+    help_text = 'pronometratamento'
+    model = PronomeTratamento
+
+    class BaseMixin(DetailMasterCrud.BaseMixin):
+        list_field_names = [
+            'nome_por_extenso',
+            'abreviatura_singular_m',
+            'abreviatura_plural_m',
+            'vocativo_direto_singular_m',
+            'vocativo_indireto_singular_m',
+            'enderecamento_singular_m', ]
+
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+
+            context['fluid'] = '-fluid'
+            return context
+
+
+class TipoAutoridadeCrud(DetailMasterCrud):
+    help_text = 'tipoautoriadade'
+    model = TipoAutoridade
+
+    class BaseMixin(DetailMasterCrud.BaseMixin):
+        list_field_names = ['descricao']
+        form_class = TipoAutoridadeForm
+
+
 # ------------- Contato Master e Details ----------------------------
 
 
@@ -216,11 +243,32 @@ class ContatoCrud(DetailMasterCrud):
         list_field_names = ['nome', 'nome_social', 'data_nascimento',
                             'estado_civil', 'sexo', 'identidade_genero', ]
 
+        """def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+
+            context['fluid'] = '-fluid'
+            return context"""
+
     class ListView(DetailMasterCrud.ListView):
 
         def get_queryset(self):
-
             queryset = DetailMasterCrud.ListView.get_queryset(self)
+
+            request = self.request
+            if request.GET.get('q') is not None:
+                query = normalize(str(request.GET.get('q')))
+
+                query = query.split(' ')
+                if query:
+                    q = Q()
+                    for item in query:
+                        if not item:
+                            continue
+                        q = q & Q(search__icontains=item)
+
+                    if q:
+                        queryset = queryset.filter(q)
+
             return queryset
 
 
@@ -240,6 +288,19 @@ class DependenteCrud(MasterDetailCrudPermission):
                             'data_nascimento', 'sexo', 'identidade_genero', ]
 
 
+class PreferencialMixin:
+
+    def post(self, request, *args, **kwargs):
+        response = super(PreferencialMixin, self).post(
+            self, request, *args, **kwargs)
+
+        if self.object.preferencial:
+            query_filter = {self.crud.parent_field: self.object.contato}
+            self.crud.model.objects.filter(**query_filter).exclude(
+                pk=self.object.pk).update(preferencial=False)
+        return response
+
+
 class TelefoneCrud(MasterDetailCrudPermission):
     model = Telefone
     parent_field = 'contato'
@@ -249,10 +310,13 @@ class TelefoneCrud(MasterDetailCrudPermission):
         list_field_names = [
             'ddd', 'numero', 'tipo', 'operadora', 'preferencial']
 
-    class UpdateView(MasterDetailCrudPermission.UpdateView):
+    class UpdateView(MasterDetailCrudPermission.UpdateView, PreferencialMixin):
+        pass
+
+    class CreateView(MasterDetailCrudPermission.CreateView):
 
         def post(self, request, *args, **kwargs):
-            response = MasterDetailCrudPermission.UpdateView.post(
+            response = MasterDetailCrudPermission.CreateView.post(
                 self, request, *args, **kwargs)
 
             if self.object.preferencial:
@@ -270,17 +334,11 @@ class EmailCrud(MasterDetailCrudPermission):
     class BaseMixin(MasterDetailCrudPermission.BaseMixin):
         list_field_names = ['email', 'tipo', 'preferencial']
 
-    class UpdateView(MasterDetailCrudPermission.UpdateView):
+    class CreateView(PreferencialMixin, MasterDetailCrudPermission.CreateView):
+        pass
 
-        def post(self, request, *args, **kwargs):
-            response = EmailCrud.UpdateView.post(
-                self, request, *args, **kwargs)
-
-            if self.object.preferencial:
-                Email.objects.filter(
-                    contato_id=self.object.contato_id).exclude(
-                    pk=self.object.pk).update(preferencial=False)
-            return response
+    class UpdateView(PreferencialMixin, MasterDetailCrudPermission.UpdateView):
+        pass
 
 
 class LocalTrabalhoCrud(MasterDetailCrudPermission):
@@ -291,13 +349,34 @@ class LocalTrabalhoCrud(MasterDetailCrudPermission):
     class BaseMixin(MasterDetailCrudPermission.BaseMixin):
         list_field_names = ['nome', 'nome_social', 'tipo', 'data_inicio']
 
-    class CreateView(MasterDetailCrudPermission.CreateView):
+    class CreateView(PreferencialMixin, MasterDetailCrudPermission.CreateView):
         form_class = LocalTrabalhoForm
-        template_name = 'cerimonial/crispy_form_with_trecho_search.html'
+        template_name = 'cerimonial/localtrabalho_form.html'
 
-    class UpdateView(MasterDetailCrudPermission.UpdateView):
+    class UpdateView(PreferencialMixin, MasterDetailCrudPermission.UpdateView):
         form_class = LocalTrabalhoForm
-        template_name = 'cerimonial/crispy_form_with_trecho_search.html'
+        template_name = 'cerimonial/localtrabalho_form.html'
+
+
+# TODO: view está sem nenhum tipo de autenticação.
+class LocalTrabalhoFragmentFormPronomesView(FormView):
+    form_class = LocalTrabalhoFragmentPronomesForm
+    template_name = 'crud/ajax_form.html'
+
+    def get_initial(self):
+        initial = FormView.get_initial(self)
+
+        try:
+            initial['instance'] = TipoAutoridade.objects.get(
+                pk=self.kwargs['pk'])
+        except:
+            pass
+
+        return initial
+
+    def get(self, request, *args, **kwargs):
+
+        return FormView.get(self, request, *args, **kwargs)
 
 
 class EnderecoCrud(MasterDetailCrudPermission):
@@ -307,11 +386,11 @@ class EnderecoCrud(MasterDetailCrudPermission):
 
     class CreateView(MasterDetailCrudPermission.CreateView):
         form_class = EnderecoForm
-        template_name = 'cerimonial/crispy_form_with_trecho_search.html'
+        template_name = 'core/crispy_form_with_trecho_search.html'
 
     class UpdateView(MasterDetailCrudPermission.UpdateView):
         form_class = EnderecoForm
-        template_name = 'cerimonial/crispy_form_with_trecho_search.html'
+        template_name = 'core/crispy_form_with_trecho_search.html'
 
 
 # ------------- Peril Master e Details ----------------------------
@@ -331,11 +410,11 @@ class EnderecoPerfilCrud(PerfilDetailCrudPermission):
     class CreateView(PerfilDetailCrudPermission.CreateView):
 
         form_class = EnderecoForm
-        template_name = 'cerimonial/crispy_form_with_trecho_search.html'
+        template_name = 'core/crispy_form_with_trecho_search.html'
 
     class UpdateView(PerfilDetailCrudPermission.UpdateView):
         form_class = EnderecoForm
-        template_name = 'cerimonial/crispy_form_with_trecho_search.html'
+        template_name = 'core/crispy_form_with_trecho_search.html'
 
 
 class TelefonePerfilCrud(PerfilDetailCrudPermission):
@@ -346,17 +425,11 @@ class TelefonePerfilCrud(PerfilDetailCrudPermission):
         list_field_names = [
             'ddd', 'numero', 'tipo', 'operadora', 'preferencial']
 
-    class UpdateView(PerfilDetailCrudPermission.UpdateView):
+    class UpdateView(PreferencialMixin, PerfilDetailCrudPermission.UpdateView):
+        pass
 
-        def post(self, request, *args, **kwargs):
-            response = PerfilDetailCrudPermission.UpdateView.post(
-                self, request, *args, **kwargs)
-
-            if self.object.preferencial:
-                Telefone.objects.filter(
-                    contato_id=self.object.contato_id).exclude(
-                    pk=self.object.pk).update(preferencial=False)
-            return response
+    class CreateView(PreferencialMixin, PerfilDetailCrudPermission.CreateView):
+        pass
 
 
 class EmailPerfilCrud(PerfilDetailCrudPermission):
@@ -366,17 +439,11 @@ class EmailPerfilCrud(PerfilDetailCrudPermission):
     class BaseMixin(PerfilDetailCrudPermission.BaseMixin):
         list_field_names = ['email', 'tipo', 'preferencial']
 
-    class UpdateView(PerfilDetailCrudPermission.UpdateView):
+    class UpdateView(PreferencialMixin, PerfilDetailCrudPermission.UpdateView):
+        pass
 
-        def post(self, request, *args, **kwargs):
-            response = PerfilDetailCrudPermission.UpdateView.post(
-                self, request, *args, **kwargs)
-
-            if self.object.preferencial:
-                Email.objects.filter(
-                    contato_id=self.object.contato_id).exclude(
-                    pk=self.object.pk).update(preferencial=False)
-            return response
+    class CreateView(PreferencialMixin, PerfilDetailCrudPermission.CreateView):
+        pass
 
 
 class LocalTrabalhoPerfilCrud(PerfilDetailCrudPermission):
@@ -386,12 +453,12 @@ class LocalTrabalhoPerfilCrud(PerfilDetailCrudPermission):
     class BaseMixin(PerfilDetailCrudPermission.BaseMixin):
         list_field_names = ['nome', 'nome_social', 'tipo', 'data_inicio']
 
-    class CreateView(PerfilDetailCrudPermission.CreateView):
-        form_class = LocalTrabalhoForm
+    class CreateView(PreferencialMixin, PerfilDetailCrudPermission.CreateView):
+        form_class = LocalTrabalhoPerfilForm
         template_name = 'cerimonial/crispy_form_with_trecho_search.html'
 
-    class UpdateView(PerfilDetailCrudPermission.UpdateView):
-        form_class = LocalTrabalhoForm
+    class UpdateView(PreferencialMixin, PerfilDetailCrudPermission.UpdateView):
+        form_class = LocalTrabalhoPerfilForm
         template_name = 'cerimonial/crispy_form_with_trecho_search.html'
 
 

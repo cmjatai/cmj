@@ -155,7 +155,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'social.apps.django_app.context_processors.backends',
                 'social.apps.django_app.context_processors.login_redirect',
-                'cmj.context_processors.area_trabalho',
+                'cmj.context_processors.areatrabalho',
             ],
             'debug': DEBUG,
             'loaders': ['django.template.loaders.filesystem.Loader',
@@ -268,7 +268,7 @@ CRISPY_FAIL_SILENTLY = not DEBUG
 BOWER_COMPONENTS_ROOT = PROJECT_DIR.child("bower")
 BOWER_INSTALLED_APPS = (
     'bootstrap-sass#3.3.6',
-    'components-font-awesome#4.5.0',
+    'components-font-awesome#4.6.3',
     'tinymce#4.3.3',
     'jquery-ui#1.11.4',
     'jquery-runner#2.3.3',

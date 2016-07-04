@@ -7,7 +7,8 @@ from cmj.cerimonial.views import ContatoCrud, TelefoneCrud, EmailCrud,\
     OperadorAreaTrabalhoCrud, StatusVisitaCrud, TipoTelefoneCrud,\
     TipoEnderecoCrud, TipoEmailCrud, ParentescoCrud, EstadoCivilCrud,\
     TipoAutoridadeCrud, TipoLocalTrabalhoCrud, OperadoraTelefoniaCrud,\
-    NivelInstrucaoCrud, PronomeTratamentoCrud, PartidoCrud
+    NivelInstrucaoCrud, PronomeTratamentoCrud, PartidoCrud,\
+    LocalTrabalhoFragmentFormPronomesView
 
 from .apps import AppConfig
 
@@ -36,6 +37,9 @@ urlpatterns = [
     url(r'^areatrabalho/', include(AreaTrabalhoCrud.get_urls() +
                                    OperadorAreaTrabalhoCrud.get_urls()
                                    )),
+
+    url(r'^sistema/cerimonial/tipoautoridade/(?P<pk>\d+)/pronomes_form',
+        LocalTrabalhoFragmentFormPronomesView.as_view(), name='list_pronomes'),
 
     url(r'^sistema/cerimonial/statusvisita/',
         include(StatusVisitaCrud.get_urls())),

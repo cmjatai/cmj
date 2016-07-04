@@ -564,7 +564,7 @@ class PerfilAbstractCrud(DetailMasterCrud):
 
         def get(self, request, *args, **kwargs):
             if request.user.is_authenticated():
-                if request.user.contatos_set.exists():
+                if request.user.contato_set.exists():
                     return redirect(reverse('cmj.cerimonial:perfil_detail'))
 
             return DetailMasterCrud.CreateView.get(self, request, *args, **kwargs)

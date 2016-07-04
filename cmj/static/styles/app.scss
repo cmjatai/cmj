@@ -46,12 +46,25 @@ body, html {
       font-weight: normal;
     }
 }
+.input-icon {
+  [class*="fa-"] {
+      transform: translateY(-50%);
+      margin-top: 0px;
+  }
+  .form-control {
+    text-indent: 40px;
+  }
+}
+
+.radio-inline, .checkbox-inline {
+  margin-top: 0px;
+}
 
 // #### conserta radios e checkboxes escondidas pelo drunken parrot ############
 // FIXME ajustar após solução definitiva
-.checkbox input, .radio input {
-    display: initial;
-}
+//.checkbox input, .radio input {
+//    display: initial;
+//}
 
 
 
@@ -157,7 +170,7 @@ body, html {
 }
 // ADJUST topo ########################################
 .masthead {
-  margin-top: 1em;
+  margin-top: $grid-gutter-width;
   z-index: 10;
   .slogan {
     color: $color_topo_bg;
@@ -212,6 +225,10 @@ main {
     border: 1px solid $color_container_border;
     border-radius: 5px;
   }
+  .container-fluid {
+    margin: 0 $grid-gutter-width;
+  }
+
 
   .item-action-or-input {
     border-color: darken($color_main_bg, 10%);
@@ -251,12 +268,18 @@ main {
 
 .table {
   border: 1px solid darken($color_main_bg, 5%);
+  td {
+    ul {
+        margin-bottom: 0px;
+    }
+  }
 }
 
 .table > thead > tr > th, .table > thead > tr > td, .table > tbody > tr > th, .table > tbody > tr > td, .table > tfoot > tr > th, .table > tfoot > tr > td {
   border-top-color: darken($color_main_bg, 5%);
   border-bottom-width: 0;
   font-weight: normal;
+  vertical-align: middle;
 }
 
 .context-actions{
@@ -278,7 +301,6 @@ p.control-label {
 
 .form-control-static {
   font-size: 1.2em;
-  background-color: $color_container_bg;
   border-bottom: 1px solid $color_container_border;
   line-height: 1.5em;
   padding-bottom: 3px;
@@ -671,7 +693,7 @@ body {
   }
   main {
     .container, .container-fluid {
-      margin: $grid-gutter-width * 0.25;
+      margin: 0 $grid-gutter-width * 0.25;
     }
   }
 

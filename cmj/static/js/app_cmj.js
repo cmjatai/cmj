@@ -102,6 +102,9 @@ function TrechoSearch(opts) {
 
                         if (data.results.length == 1)
                             its.trigger('click', true)
+                        else {
+                            input.attr('data', '');
+                        }
 
 
                     });

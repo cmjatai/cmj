@@ -19,7 +19,8 @@ EstadoCivil:
   - descricao
 TipoAutoridade:
   {% trans 'Tipo de Autoridade' %}:
-  - descricao:8 pronome_tratamento
+  - descricao
+  - pronomes
 TipoLocalTrabalho:
   {% trans 'Tipo do Local de Trabalho' %}:
   - descricao
@@ -30,11 +31,19 @@ OperadoraTelefonia:
   {% trans 'Operadora de Telefonia' %}:
   - descricao
 PronomeTratamento:
-  {% trans 'Pronome de Tratamento' %}:
-  - nome:6 abreviatura:2 descricao
+  {% trans 'Dados Básicos' %}:
+  - nome_por_extenso
+  {% trans 'Abreviaturas' %}:
+  - abreviatura_singular_m abreviatura_plural_m abreviatura_singular_f abreviatura_plural_f
+  {% trans 'Vocativos' %}:
+  - vocativo_direto_singular_m vocativo_direto_plural_m vocativo_direto_singular_f vocativo_direto_plural_f
+  - vocativo_indireto_singular_m vocativo_indireto_plural_m vocativo_indireto_singular_f vocativo_indireto_plural_f
+  {% trans 'Endereçamentos' %}:
+  - enderecamento_singular_m enderecamento_plural_m
+  - enderecamento_singular_f enderecamento_plural_f
 Contato:
   {% trans 'Dados Básicos' %}:
-  - forma_tratamento:2 nome:5 nome_social:3 apelido
+  - nome:6 nome_social:3 apelido
   - data_nascimento estado_civil sexo identidade_genero
   - nivel_instrucao:4 naturalidade tem_filhos quantos_filhos
   {% trans 'Pais' %}:
@@ -57,13 +66,16 @@ Dependente:
   - data_nascimento sexo identidade_genero nivel_instrucao
 LocalTrabalho:
   {% trans 'Dados Básicos' %}:
-  - forma_tratamento:3 nome:5 nome_social:4
+  - nome:6 nome_social:4 preferencial
   - data_inicio data_fim tipo
   {% trans 'Endereço' %}:
   - trecho
   - endereco:6 numero complemento cep
   - bairro distrito
   - regiao_municipal municipio:4 uf:3
+  {% trans 'Tratamento' %}:
+  - tipo_autoridade:5 cargo
+  - pronome_tratamento
 Endereco:
   {% trans 'Endereço' %}:
   - endereco:6 numero complemento cep
@@ -75,7 +87,7 @@ FiliacaoPartidaria:
   - partido:6 data data_desfiliacao
 Perfil:
   {% trans 'Dados Básicos' %}:
-  - forma_tratamento:2 nome:5 nome_social:3 apelido
+  - nome:5 nome_social:3 apelido
   - data_nascimento estado_civil sexo identidade_genero
   - nivel_instrucao:4 naturalidade tem_filhos quantos_filhos
   {% trans 'Profissão' %}:
@@ -83,23 +95,26 @@ Perfil:
 TelefonePerfil:
   {% trans 'Telefone' %}:
   - ddd:2 numero:3 tipo:3 operadora:4
-  - proprio:3 de_quem_e preferencial
+  - proprio:3 de_quem_e preferencial permissao
 EmailPerfil:
   {% trans 'Email' %}:
-  - email:6 tipo preferencial
+  - email:4 tipo:4 preferencial permissao
 DependentePerfil:
   {% trans 'Dados Básicos' %}:
   - parentesco:2 nome:5 nome_social:3 apelido:2
   - data_nascimento sexo identidade_genero nivel_instrucao
 LocalTrabalhoPerfil:
   {% trans 'Dados Básicos' %}:
-  - forma_tratamento:3 nome:5 nome_social:4
+  - nome:6 nome_social:4 preferencial
   - data_inicio data_fim tipo
   {% trans 'Endereço' %}:
   - trecho
   - endereco:6 numero complemento cep
   - bairro distrito
   - regiao_municipal municipio:4 uf:3
+  {% trans 'Tratamento' %}:
+  - cargo
+  - pronome_tratamento
 EnderecoPerfil:
   {% trans 'Endereço' %}:
   - endereco:6 numero complemento cep

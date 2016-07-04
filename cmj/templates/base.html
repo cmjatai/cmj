@@ -14,10 +14,10 @@
       <link rel="icon" href="{% static 'img/logo.png' %}"  type="image/png" >
       {# Styles #}
 
-<link rel="stylesheet" href="{% sass_src 'bootstrap-sass/assets/stylesheets/_bootstrap.scss' %}" type="text/css">
-      <link rel="stylesheet" href="{% static 'components-font-awesome/css/font-awesome.css' %}">
+      <link rel="stylesheet" href="{% sass_src 'bootstrap-sass/assets/stylesheets/_bootstrap.scss' %}" type="text/css">
       <link rel="stylesheet" href="{% sass_src 'styles/header.scss' %}" type="text/css">
       <link rel="stylesheet" href="{% static 'drunken-parrot-flat-ui/css/drunken-parrot.css' %}">
+      <link rel="stylesheet" href="{% static 'components-font-awesome/css/font-awesome.css' %}">
       <link rel="stylesheet" href="{% sass_src 'styles/app.scss' %}" type="text/css">
 
       <link rel="stylesheet" href="{% static 'jquery-ui/themes/cupertino/jquery-ui.min.css' %}">
@@ -247,7 +247,18 @@
         {% block main_header %}
           <header class="masthead">
             <div class="container{{fluid}}">
-              <small class="slogan"><i></i></small>
+
+              {% if user.is_anonymous %}
+                <div class="btn-group btn-group-justified btn-group-lg" role="group" aria-label="...">
+                  <a href="#" class="btn btn-detault">Licitações e Contratos</a>
+                  <a href="#" class="btn btn-detault">Legislação Municipal</a>
+                  <a href="#" class="btn btn-detault">Sessões</a>
+                  <a href="#" class="btn btn-detault">Matérias em Tramitação</a>
+                  <a href="#" class="btn btn-detault">Diário Oficial</a>
+                </div>
+              {% endif %}
+
+
               {% block sections_nav %}{% subnav %}{% endblock sections_nav %}
             </div>
           </header>
@@ -279,7 +290,7 @@
               {% block base_workspace %}
                 {% if view.is_contained %}
                   <nav class="navbar navbar-area-trabalho">
-                    {% for at in area_trabalho %}
+                    {% for at in areatrabalho %}
                       {% if forloop.first %}
                         <ul class="nav navbar-nav" >
                       {% endif %}
@@ -332,6 +343,8 @@
 
       <script type="text/javascript" src="{% static 'jQuery-runner/build/jquery.runner.js' %}"></script>
       <script type="text/javascript" src="{% static 'jquery-mask-plugin/dist/jquery.mask.js' %}"></script>
+      <script type="text/javascript" src="{% static 'drunken-parrot-flat-ui/js/checkbox.js' %}"></script>
+      <script type="text/javascript" src="{% static 'drunken-parrot-flat-ui/js/radio.js' %}"></script>
 
       <script src="{% static 'tinymce/tinymce.min.js' %}"></script>
       <script type="text/javascript" src="{% static 'jsdiff/diff.min.js' %}"></script>

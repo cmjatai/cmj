@@ -1,3 +1,4 @@
+
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
@@ -13,7 +14,7 @@ from sapl.parlamentares.models import Municipio
 
 from cmj.core.rules import SEARCH_TRECHO
 from cmj.globalrules.globalrules import rules, GROUP_SOCIAL_USERS
-from cmj.utils import get_settings_auth_user_model
+from cmj.utils import get_settings_auth_user_model, normalize
 
 from .rules import MENU_PERMS_FOR_USERS
 
@@ -135,6 +136,25 @@ class User(AbstractBaseUser, PermissionsMixin):
                 _('Você não possui permissão para se autoremover do Portal!'))
 
         return AbstractBaseUser.delete(self, using=using, keep_parents=keep_parents)
+
+
+class CmjSearchMixin(models.Model):
+
+    search = models.TextField(blank=True, default='')
+
+    class Meta:
+        abstract = True
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+
+        if hasattr(self, 'fields_search'):
+            search = ''
+            for field in self.fields_search:
+                search += str(getattr(self, field)) + ' '
+            self.search = normalize(search)
+
+        return super(CmjSearchMixin, self).save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
 
 
 class CmjModelMixin(models.Model):

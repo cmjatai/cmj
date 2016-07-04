@@ -1,0 +1,27 @@
+{% extends "core/crispy_form_with_trecho_search.html" %}
+{% load i18n crispy_forms_tags %}
+
+{% block extra_js %}
+
+  <script type="text/javascript">
+    TrechoSearch({
+      'api_rest_list': '{% url 'cmj.core:trecho_search_rest_json'%}',
+      'api_rest_retrieve': '{% url 'cmj.core:trecho_rest_json' 0 %}',
+    });
+
+    function atualizaPronomes(event) {
+      var _this = $(event.currentTarget)
+      var url_get_pronomes = '{% url 'cmj.cerimonial:list_pronomes' 0 %}';
+      var pk = _this.val()
+      if (pk != '')
+        url_get_pronomes = url_get_pronomes.replace('0', pk);
+
+      $.get(url_get_pronomes, function(data) {
+        var new_obj = $(data);
+        var old_obj = $('#'+new_obj[0].id).replaceWith(new_obj);
+
+      });
+    }
+  </script>
+
+{% endblock %}
