@@ -13,3 +13,5 @@
   url: dependente_list
 - title: {% trans "Filiação Partidária" %}
   url: filiacaopartidaria_list
+- title: {% trans "Processos" %}
+  url: processocontato_list

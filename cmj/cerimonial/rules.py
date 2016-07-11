@@ -4,12 +4,15 @@ from sapl.parlamentares.models import Partido
 from cmj.cerimonial.models import Perfil, Endereco, Email, Telefone,\
     LocalTrabalho, Dependente, Contato, EnderecoPerfil, EmailPerfil,\
     TelefonePerfil, LocalTrabalhoPerfil, DependentePerfil, OperadoraTelefonia,\
-    NivelInstrucao, EstadoCivil, FiliacaoPartidaria
+    NivelInstrucao, EstadoCivil, FiliacaoPartidaria, AssuntoProcesso, Processo,\
+    ProcessoContato
 from cmj.core.models import Trecho
-from cmj.core.rules import menu_contatos, menu_dados_auxiliares, search_trecho
+from cmj.core.rules import menu_contatos, menu_dados_auxiliares, search_trecho,\
+    menu_processos
 from cmj.globalrules.crud_custom import LIST, ADD, DETAIL, CHANGE, DELETE
 from cmj.globalrules.globalrules import GROUP_SOCIAL_USERS,\
-    GROUP_WORKSPACE_OPER_CONTATOS, GROUP_WORKSPACE_MANAGERS
+    GROUP_WORKSPACE_OPER_CONTATOS, GROUP_WORKSPACE_MANAGERS,\
+    GROUP_WORKSPACE_OPER_PROCESSOS
 
 
 rules_group_social_users = (
@@ -45,9 +48,19 @@ rules_group_workspace_oper_contatos = (
         (FiliacaoPartidaria, [LIST, ADD, DETAIL, CHANGE, DELETE]),
     ]
 )
-
+rules_group_workspace_oper_processos = (
+    GROUP_WORKSPACE_OPER_PROCESSOS, [
+        (get_user_model(), [
+            menu_processos,
+            menu_dados_auxiliares]),
+        (AssuntoProcesso, [LIST, ADD, DETAIL, CHANGE, DELETE]),
+        (Processo, [LIST, ADD, DETAIL, CHANGE, DELETE]),
+        (ProcessoContato, [LIST, ADD, DETAIL, CHANGE, DELETE]),
+    ]
+)
 rules_patterns = [
     rules_group_social_users,
     rules_group_workspace_managers,
     rules_group_workspace_oper_contatos,
+    rules_group_workspace_oper_processos,
 ]

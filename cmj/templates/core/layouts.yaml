@@ -13,7 +13,8 @@ Distrito:
 
 Bairro:
   {% trans 'Bairro' %}:
-  - nome
+  - codigo:3 nome
+  - outros_nomes
 
 TipoLogradouro:
   {% trans 'Tipos de Logradouro' %}:
@@ -30,3 +31,11 @@ Trecho:
   - lado numero_inicial numero_final
   - cep
 
+AreaTrabalho:
+  {% trans 'Área de Trabalho' %}:
+  - nome:5 parlamentar
+  - descricao
+OperadorAreaTrabalho:
+  {% trans 'Operador de Área de Trabalho' %}:
+  - user
+  - grupos_associados

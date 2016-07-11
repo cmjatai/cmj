@@ -15,9 +15,8 @@
       <div class="col-md-6"><a href="{% url 'cmj.core:distrito_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.core.models.Distrito"%}</a></div>
       <div class="col-md-6"><a href="{% url 'cmj.core:regiaomunicipal_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.core.models.RegiaoMunicipal"%}</a></div>
     </div>
-    <h2>Módulo Cerimonial / Gestão de Gabinetes</h2>
+    <h2>Módulo Cerimonial / Contatos</h2>
     <div class="row">
-      <div class="col-md-6"><a href="{% url 'cmj.cerimonial:statusvisita_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.cerimonial.models.StatusVisita"%}</a></div>
       <div class="col-md-6"><a href="{% url 'cmj.cerimonial:tipotelefone_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.cerimonial.models.TipoTelefone"%}</a></div>
       <div class="col-md-6"><a href="{% url 'cmj.cerimonial:tipoendereco_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.cerimonial.models.TipoEndereco"%}</a></div>
       <div class="col-md-6"><a href="{% url 'cmj.cerimonial:tipoemail_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.cerimonial.models.TipoEmail"%}</a></div>
@@ -28,6 +27,15 @@
       <div class="col-md-6"><a href="{% url 'cmj.cerimonial:nivelinstrucao_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.cerimonial.models.NivelInstrucao"%}</a></div>
       <div class="col-md-6"><a href="{% url 'cmj.cerimonial:operadoratelefonia_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.cerimonial.models.OperadoraTelefonia"%}</a></div>
       <div class="col-md-6"><a href="{% url 'cmj.cerimonial:pronometratamento_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.cerimonial.models.PronomeTratamento"%}</a></div>
+    </div>
+    <h2>Módulo Cerimonial / Processos</h2>
+    <div class="row">
+      <div class="col-md-6"><a href="{% url 'cmj.cerimonial:statusprocesso_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.cerimonial.models.StatusProcesso"%}</a></div>
+      <div class="col-md-6"><a href="{% url 'cmj.cerimonial:classificacaoprocesso_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.cerimonial.models.ClassificacaoProcesso"%}</a></div>
+      <div class="col-md-6"><a href="{% url 'cmj.cerimonial:topicoprocesso_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.cerimonial.models.TopicoProcesso"%}</a></div>
+
+    </div>
+
   </fieldset>
 
   <br><br><br>

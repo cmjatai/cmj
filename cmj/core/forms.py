@@ -5,6 +5,7 @@ from crispy_forms.layout import Layout
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.forms import UserCreationForm as BaseUserCreationForm, UserChangeForm as BaseUserChangeForm
+from django.forms.models import ModelForm
 from django.utils.translation import ugettext_lazy as _
 from django_filters.filterset import FilterSet
 from haystack.backends import SQ
@@ -14,7 +15,7 @@ from image_cropping.widgets import ImageCropWidget, CropWidget
 from sapl.crispy_layout_mixin import to_row
 import django_filters
 
-from cmj.core.models import Trecho, TipoLogradouro, User
+from cmj.core.models import Trecho, TipoLogradouro, User, OperadorAreaTrabalho
 
 
 class LoginForm(AuthenticationForm):
@@ -107,3 +108,19 @@ class LogradouroSearchForm(SearchForm):
         sqs = super(LogradouroSearchForm, self).search()
 
         return sqs
+
+
+class OperadorAreaTrabalhoForm(ModelForm):
+
+    class Meta:
+        model = OperadorAreaTrabalho
+        fields = ['user',
+                  'grupos_associados']
+
+    def __init__(self, *args, **kwargs):
+
+        super(OperadorAreaTrabalhoForm, self).__init__(*args, **kwargs)
+        self.fields[
+            'grupos_associados'].widget = forms.CheckboxSelectMultiple()
+        self.fields['grupos_associados'].queryset = self.fields[
+            'grupos_associados'].queryset.order_by('name')

@@ -1,3 +1,17 @@
+
+
+/*function refreshMask() {
+    $('[name="telefone"]').mask("(00) 00000-0000", {placeholder:"(___) _____ -____", reverse: true});
+    $('.telefone').mask("(999) 99999-9999", {placeholder:"(___) _____ -____", reverse: true});
+    $('.cpf').mask("000.000.000-00", {placeholder:"___.___.___-__"});
+    $('.cep').mask("00000-000", {placeholder:"_____-___"});
+    $('.rg').mask("0.000.000", {placeholder:"_.___.___"});
+    $('.titulo_eleitor').mask("0000.0000.0000.0000", {placeholder:"____.____.____.____"});
+    $('.dateinput').mask('00/00/0000', {placeholder:"__/__/____"});
+    $('.hora').mask("00:00", {placeholder:"hh:mm"});
+    $('.hora_hms').mask("00:00:00", {placeholder:"hh:mm:ss"});
+}
+*/
 function TrechoSearch(opts) {
     $(function() {
         var cts_clear = $('body').children(".cts"); // Container Trecho Search
@@ -190,16 +204,6 @@ function refreshDatePicker() {
     $('.dateinput').datepicker();
 }
 
-function refreshMask() {
-    $('.telefone').mask("(99) 9999-9999", {placeholder:"(__) ____ -____"});
-    $('.cpf').mask("000.000.000-00", {placeholder:"___.___.___-__"});
-    $('.cep').mask("00000-000", {placeholder:"_____-___"});
-    $('.rg').mask("0.000.000", {placeholder:"_.___.___"});
-    $('.titulo_eleitor').mask("0000.0000.0000.0000", {placeholder:"____.____.____.____"});
-    $('.dateinput').mask('00/00/0000', {placeholder:"__/__/____"});
-    $('.hora').mask("00:00", {placeholder:"hh:mm"});
-    $('.hora_hms').mask("00:00:00", {placeholder:"hh:mm:ss"});
-}
 
 
 $(document).ready(function(){

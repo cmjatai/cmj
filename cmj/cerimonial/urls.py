@@ -3,12 +3,14 @@ from django.conf.urls import url, include
 from cmj.cerimonial.views import ContatoCrud, TelefoneCrud, EmailCrud,\
     DependenteCrud, LocalTrabalhoCrud, EnderecoCrud, FiliacaoPartidariaCrud,\
     EnderecoPerfilCrud, LocalTrabalhoPerfilCrud, EmailPerfilCrud,\
-    TelefonePerfilCrud, DependentePerfilCrud, PerfilCrud, AreaTrabalhoCrud,\
-    OperadorAreaTrabalhoCrud, StatusVisitaCrud, TipoTelefoneCrud,\
+    TelefonePerfilCrud, DependentePerfilCrud, PerfilCrud, \
+    TipoTelefoneCrud,\
     TipoEnderecoCrud, TipoEmailCrud, ParentescoCrud, EstadoCivilCrud,\
     TipoAutoridadeCrud, TipoLocalTrabalhoCrud, OperadoraTelefoniaCrud,\
-    NivelInstrucaoCrud, PronomeTratamentoCrud, PartidoCrud,\
-    ContatoFragmentFormPronomesView
+    NivelInstrucaoCrud, PronomeTratamentoCrud, \
+    ContatoFragmentFormPronomesView, StatusProcessoCrud, TopicoProcessoCrud,\
+    ClassificacaoProcessoCrud, ProcessoMasterCrud, AssuntoProcessoCrud,\
+    ContatoFragmentFormSearchView, ProcessoContatoCrud
 
 from .apps import AppConfig
 
@@ -22,8 +24,13 @@ urlpatterns = [
         ContatoCrud.get_urls() + TelefoneCrud.get_urls() +
         EmailCrud.get_urls() + DependenteCrud.get_urls() +
         LocalTrabalhoCrud.get_urls() + EnderecoCrud.get_urls() +
-        FiliacaoPartidariaCrud.get_urls()
+        FiliacaoPartidariaCrud.get_urls() + ProcessoContatoCrud.get_urls()
     )),
+
+    url(r'^contato/ajax_search_radio_list',
+        ContatoFragmentFormSearchView.as_view(),
+        name='ajax_search_contatos'),
+
 
     url(r'^perfil/', include(
         EnderecoPerfilCrud.get_urls() +
@@ -34,15 +41,24 @@ urlpatterns = [
         PerfilCrud.get_urls()
     )),
 
-    url(r'^areatrabalho/', include(AreaTrabalhoCrud.get_urls() +
-                                   OperadorAreaTrabalhoCrud.get_urls()
-                                   )),
+    url(r'^processo/', include(
+        ProcessoMasterCrud.get_urls()
+    )),
+
+    url(r'^assuntoprocesso/', include(
+        AssuntoProcessoCrud.get_urls()
+    )),
+
 
     url(r'^sistema/cerimonial/tipoautoridade/(?P<pk>\d+)/pronomes_form',
         ContatoFragmentFormPronomesView.as_view(), name='list_pronomes'),
 
-    url(r'^sistema/cerimonial/statusvisita/',
-        include(StatusVisitaCrud.get_urls())),
+    url(r'^sistema/cerimonial/statusprocesso/',
+        include(StatusProcessoCrud.get_urls())),
+    url(r'^sistema/cerimonial/classificacaoprocesso/',
+        include(ClassificacaoProcessoCrud.get_urls())),
+    url(r'^sistema/cerimonial/topicoprocesso/',
+        include(TopicoProcessoCrud.get_urls())),
     url(r'^sistema/cerimonial/tipotelefone/',
         include(TipoTelefoneCrud.get_urls())),
     url(r'^sistema/cerimonial/tipoendereco/',
@@ -63,7 +79,6 @@ urlpatterns = [
         include(NivelInstrucaoCrud.get_urls())),
     url(r'^sistema/cerimonial/pronometratamento/',
         include(PronomeTratamentoCrud.get_urls())),
-    url(r'^sistema/parlamentar/partido/', include(PartidoCrud.get_urls())),
 
 
 ]

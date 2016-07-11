@@ -5,7 +5,9 @@ from django.utils.translation import ugettext_lazy as _
 
 GROUP_SOCIAL_USERS = _('Usuários de Login Social')
 
-GROUP_WORKSPACE_OPER_CONTATOS = _('Área de Trabalho - Operadores de Contatos ')
+GROUP_WORKSPACE_OPER_CONTATOS = _('Área de Trabalho - Operadores de Contatos')
+GROUP_WORKSPACE_OPER_PROCESSOS = _(
+    'Área de Trabalho - Operadores de Processos')
 GROUP_WORKSPACE_MANAGERS = _('Área de Trabalho - Gestores')
 
 

@@ -71,7 +71,7 @@ urlpatterns = [
     url(r'', include(sapl.protocoloadm.urls)),
     url(r'', include(sapl.compilacao.urls)),
     url(r'', include(sapl.relatorios.urls)),
-    url(r'', include(sapl.base.urls)),
+    url(r'^sapl/', include(sapl.base.urls)),
 
     url(r'^admin/', include(wagtailadmin_urls)),
     url(r'^search_wagtail/', include(wagtailsearch_urls)),

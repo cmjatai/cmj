@@ -1,17 +1,23 @@
+from datetime import date
+
 from crispy_forms.bootstrap import InlineRadios, FieldWithButtons, StrictButton
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Field, Row, Layout
+from crispy_forms.layout import Field, Row, Layout, Fieldset, Div
+from crispy_forms.templatetags.crispy_forms_field import css_class
 from django import forms
+from django.db.models import Q
 from django.forms import widgets
 from django.forms.models import ModelForm
 from django.utils.translation import ugettext_lazy as _
-from sapl.crispy_layout_mixin import to_column
+from sapl.crispy_layout_mixin import to_column, SaplFormLayout, to_fieldsets
 from sapl.parlamentares.models import Municipio
 
 from cmj import settings
-from cmj.cerimonial.models import LocalTrabalho, Endereco, OperadorAreaTrabalho,\
-    TipoAutoridade, PronomeTratamento, Contato, Perfil
+from cmj.cerimonial.models import LocalTrabalho, Endereco,\
+    TipoAutoridade, PronomeTratamento, Contato, Perfil, Processo,\
+    IMPORTANCIA_CHOICE, AssuntoProcesso, StatusProcesso, ProcessoContato
 from cmj.core.models import Trecho
+from cmj.utils import normalize
 
 
 class ListTextWidget(forms.TextInput):
@@ -150,7 +156,8 @@ class ContatoForm(ModelForm):
                   'rg',
                   'rg_orgao_expedidor',
                   'rg_data_expedicao',
-                  'ativo'
+                  'ativo',
+                  'observacoes'
                   ]
 
     def __init__(self, *args, **kwargs):
@@ -216,6 +223,11 @@ class PerfilForm(ContatoForm):
                   'pronome_tratamento',
                   ]
 
+    def __init__(self, *args, **kwargs):
+
+        super(PerfilForm, self).__init__(*args, **kwargs)
+        self.fields['pronome_tratamento'].help_text = ''
+
 
 class ContatoFragmentPronomesForm(forms.Form):
 
@@ -247,6 +259,7 @@ class ContatoFragmentPronomesForm(forms.Form):
                 p.vocativo_indireto_singular_m,
                 p.enderecamento_singular_m))
             for p in self.fields['pronome_tratamento'].queryset]
+
         self.fields['pronome_tratamento'].help_text = _('O pronome de \
         tratamento é opcional, mas será \
         obrigatório caso seja selecionado um tipo de autoridade.')
@@ -270,7 +283,10 @@ class EnderecoForm(ModelForm):
                   'cep',
                   'bairro',
                   'municipio',
-                  'uf']
+                  'uf',
+                  'preferencial',
+                  'observacoes',
+                  'ponto_referencia']
 
     def __init__(self, *args, **kwargs):
 
@@ -287,21 +303,9 @@ class EnderecoForm(ModelForm):
         self.fields['trecho'].queryset = Trecho.objects.all()
         self.fields['trecho'].widget = forms.HiddenInput()
 
-
-class OperadorAreaTrabalhoForm(ModelForm):
-
-    class Meta:
-        model = OperadorAreaTrabalho
-        fields = ['user',
-                  'grupos_associados']
-
-    def __init__(self, *args, **kwargs):
-
-        super(OperadorAreaTrabalhoForm, self).__init__(*args, **kwargs)
-        self.fields[
-            'grupos_associados'].widget = forms.CheckboxSelectMultiple()
-        self.fields['grupos_associados'].queryset = self.fields[
-            'grupos_associados'].queryset.order_by('name')
+        # Utilizando template bootstrap3 customizado
+        self.fields['preferencial'].widget = forms.RadioSelect()
+        self.fields['preferencial'].inline_class = True
 
 
 class TipoAutoridadeForm(ModelForm):
@@ -338,7 +342,8 @@ class TipoAutoridadeForm(ModelForm):
 
 class ListWithSearchForm(forms.Form):
     q = forms.CharField(required=False, label='',
-                        widget=forms.TextInput(attrs={'type': 'search'}))
+                        widget=forms.TextInput(
+                            attrs={'type': 'search'}))
 
     class Meta:
         fields = ['q']
@@ -350,9 +355,171 @@ class ListWithSearchForm(forms.Form):
         self.helper.form_method = 'GET'
         self.helper.layout = Layout(
             FieldWithButtons(
-                Field('q', placeholder=_('Filtrar Lista')),
+                Field('q',
+                      placeholder=_('Filtrar Lista'),
+                      css_class='input-lg'),
                 StrictButton(
-                    _('Filtrar'), css_class='btn-default',
+                    _('Filtrar'), css_class='btn-default btn-lg',
                     type='submit'))
         )
         super(ListWithSearchForm, self).__init__(*args, **kwargs)
+
+
+class ProcessoForm(ModelForm):
+    q = forms.CharField(
+        required=False,
+        label='Busca por Contatos',
+        widget=forms.TextInput(
+            attrs={'type': 'search'}))
+
+    class Meta:
+        model = Processo
+        fields = ['data',
+                  'titulo',
+                  'importancia',
+                  'status',
+                  'descricao',
+                  'classificacoes',
+                  'observacoes',
+                  'solucao',
+                  'q', 'contatos']
+
+    def __init__(self, *args, **kwargs):
+        yaml_layout = kwargs.pop('yaml_layout')
+
+        q_field = FieldWithButtons(
+            Field('q',
+                  placeholder=_('Filtrar Lista'),
+                  autocomplete='off'),
+            StrictButton(
+                _('Filtrar'), css_class='btn-default',
+                type='button', onclick='atualizaContatos(event)'))
+
+        q = [_('Seleção de Contatos'),
+             [(q_field, 6),
+              (Div(Field('contatos'), id='contatos_bloco_selecionados'), 6)]
+             ]
+        yaml_layout.append(q)
+
+        self.helper = FormHelper()
+        self.helper.layout = SaplFormLayout(*yaml_layout)
+
+        super(ProcessoForm, self).__init__(*args, **kwargs)
+
+        if not self.instance.pk:
+            self.fields['data'].initial = date.today()
+
+        self.fields['descricao'].widget = forms.Textarea(
+            attrs={'rows': '5'})
+
+        # Utilizando template bootstrap3 customizado
+        self.fields['importancia'].widget = forms.RadioSelect()
+        self.fields['importancia'].inline_class = True
+        self.fields['importancia'].choices = IMPORTANCIA_CHOICE
+
+        self.fields['status'].widget = forms.RadioSelect()
+        # self.fields['status'].inline_class = True
+        self.fields['status'].choices = [
+            (ass.pk, ass) for ass in StatusProcesso.objects.order_by('id')]
+
+        self.fields['classificacoes'].widget = forms.CheckboxSelectMultiple()
+        # self.fields['classificacoes'].inline_class = True
+
+        self.fields['contatos'].widget = forms.CheckboxSelectMultiple()
+
+        self.fields['contatos'].queryset = Contato.objects.all()
+
+        self.fields['contatos'].choices = [
+            (c.pk, c) for c in self.instance.contatos.order_by('nome')]\
+            if self.instance.pk else []
+
+
+class ProcessoContatoForm(ModelForm):
+
+    class Meta:
+        model = ProcessoContato
+        fields = ['data',
+                  'titulo',
+                  'importancia',
+                  'status',
+                  'descricao',
+                  'classificacoes',
+                  'observacoes',
+                  'solucao']
+
+    def __init__(self, *args, **kwargs):
+        super(ProcessoContatoForm, self).__init__(*args, **kwargs)
+
+        if not self.instance.pk:
+            self.fields['data'].initial = date.today()
+
+        self.fields['descricao'].widget = forms.Textarea(
+            attrs={'rows': '5'})
+
+        # Utilizando template bootstrap3 customizado
+        self.fields['importancia'].widget = forms.RadioSelect()
+        self.fields['importancia'].inline_class = True
+        self.fields['importancia'].choices = IMPORTANCIA_CHOICE
+
+        self.fields['status'].widget = forms.RadioSelect()
+        # self.fields['status'].inline_class = True
+        self.fields['status'].choices = [
+            (ass.pk, ass) for ass in StatusProcesso.objects.order_by('id')]
+
+        self.fields['classificacoes'].widget = forms.CheckboxSelectMultiple()
+        # self.fields['classificacoes'].inline_class = True
+
+
+class ContatoFragmentSearchForm(forms.Form):
+    q = forms.CharField(
+        required=False,
+        label='Busca por Contatos',
+        widget=forms.TextInput(
+            attrs={'type': 'search'}))
+
+    contatos_search = forms.ModelChoiceField(
+        label='',
+        queryset=Contato.objects.all(),
+        required=False)
+
+    def __init__(self, *args, **kwargs):
+
+        super(ContatoFragmentSearchForm, self).__init__(*args, **kwargs)
+
+        q_field = FieldWithButtons(
+            Field('q',
+                  placeholder=_('Filtrar Lista'),
+                  autocomplete='off'),
+            StrictButton(
+                _('Filtrar'), css_class='btn-default',
+                type='button', onclick='atualizaContatos(event)'))
+
+        self.fields['contatos_search'].widget = forms.CheckboxSelectMultiple()
+
+        queryset = Contato.objects.filter(
+            workspace=self.initial['workspace'])
+
+        query = normalize(self.initial['q'])
+
+        query = query.split(' ')
+        if query:
+            q = Q()
+            for item in query:
+                if not item:
+                    continue
+                q = q & Q(search__icontains=item)
+
+            if q:
+                queryset = queryset.filter(q)
+
+        queryset = queryset[:10]
+        self.fields['contatos_search'].queryset = queryset
+
+        self.fields['contatos_search'].choices = [(c.pk, c) for c in queryset]
+
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            Div(q_field,
+                Field('contatos_search'), id='contatos_bloco_search'))
+        self.helper.form_tag = False
+        self.helper.disable_csrf = True

@@ -89,4 +89,5 @@ bower
 bower_components
 media
 whoosh_index/
-
+.ipynb_checkpoints
+*.ipynb

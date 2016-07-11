@@ -1,0 +1,36 @@
+{% extends "core/crispy_form_with_trecho_search.html" %}
+{% load i18n crispy_forms_tags %}
+
+{% block extra_js %}
+
+  <script type="text/javascript">
+    function updatebind_change() {
+      $('#contatos_bloco_selecionados input').on('change', function(event) {
+        if (!event.currentTarget.checked)
+          event.currentTarget.parentElement.remove();
+      });
+    }
+    function atualizaContatos(event) {
+      var _this = $("#id_q");
+      var url_get_contatos = '{% url 'cmj.cerimonial:ajax_search_contatos' %}';
+      var q = _this.val()
+      updatebind_change();
+      $.get(url_get_contatos, 'q='+q, function(data) {
+        var parent = _this.closest('.form-group').parent();
+        parent.html(data);
+        $( "#div_id_contatos_search div, #div_id_contatos div" ).sortable({
+          connectWith: ".controls",
+          stop: function( event, ui ) {
+            var i = ui.item.find('input')
+            i.prop( "checked", true );
+            i.prop( 'name', 'contatos');
+            i.trigger('click');
+            updatebind_change()
+          }
+        }).disableSelection();
+      });
+    }
+    updatebind_change()
+  </script>
+
+{% endblock %}

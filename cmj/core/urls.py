@@ -6,7 +6,8 @@ from django.views.generic.base import TemplateView
 from cmj.core.forms import LoginForm
 from cmj.core.views import CepCrud, RegiaoMunicipalCrud, DistritoCrud,\
     BairroCrud, TipoLogradouroCrud, LogradouroCrud, TrechoCrud, \
-    TrechoJsonSearchView, TrechoSearchView, TrechoJsonView
+    TrechoJsonSearchView, TrechoSearchView, TrechoJsonView, AreaTrabalhoCrud,\
+    OperadorAreaTrabalhoCrud, PartidoCrud
 
 from .apps import AppConfig
 
@@ -22,14 +23,18 @@ urlpatterns = [
                                     }}, name='login'),
     url(r'^logout/$', v_auth.logout, {'next_page': '/login'}, name='logout', ),
 
-    url(r'^enderecos/', login_required(TrechoSearchView.as_view()),
-        name='search_view'),
+    url(r'^enderecos/', login_required(
+        TrechoSearchView.as_view()), name='search_view'),
+
+    url(r'^areatrabalho/', include(AreaTrabalhoCrud.get_urls() +
+                                   OperadorAreaTrabalhoCrud.get_urls())),
+
 
     url(r'^api/enderecos.json', TrechoJsonSearchView.as_view(
         {'get': 'list'}), name='trecho_search_rest_json'),
-
     url(r'^api/trecho.json/(?P<pk>[0-9]+)$', TrechoJsonView.as_view(
         {'get': 'retrieve'}), name='trecho_rest_json'),
+
 
     url(r'^sistema/core/cep/', include(CepCrud.get_urls())),
     url(r'^sistema/core/regiaomunicipal/',
@@ -40,15 +45,16 @@ urlpatterns = [
         include(TipoLogradouroCrud.get_urls())),
     url(r'^sistema/core/logradouro/', include(LogradouroCrud.get_urls())),
     url(r'^sistema/core/trecho/', include(TrechoCrud.get_urls())),
+    url(r'^sistema/parlamentar/partido/', include(PartidoCrud.get_urls())),
 
 
     url(r'^sistema/$', permission_required(
-        'core.menu_tabelas_auxiliares', login_url='login')(
+        'core.menu_tabelas_auxiliares', login_url='cmj.core:login')(
         TemplateView.as_view(template_name='cmj_sistema.html')),
         name="tabelas_auxiliares"),
 
     url(r'^sistema$', permission_required(
-        'core.menu_tabelas_auxiliares', login_url='login')(
+        'core.menu_tabelas_auxiliares', login_url='cmj.core:login')(
         TemplateView.as_view(template_name='cmj_sistema.html')),
         name="tabelas_auxiliares"),
 ]

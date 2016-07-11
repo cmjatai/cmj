@@ -1,7 +1,4 @@
 {% load i18n %}
-StatusVisita:
-  {% trans 'Status de Visitas' %}:
-  - descricao
 TipoTelefone:
   {% trans 'Tipo de Telefone' %}:
   - descricao
@@ -54,9 +51,11 @@ Contato:
   {% trans 'Profissão/Tratamento' %}:
   - profissao tipo_autoridade:5
   - pronome_tratamento
+  {% trans 'Observações' %}:
+  - observacoes
 Telefone:
   {% trans 'Telefone' %}:
-  - ddd:2 numero:3 tipo:3 operadora:4
+  - telefone:5 tipo:3 operadora:4
   - proprio:3 de_quem_e preferencial
 Email:
   {% trans 'Email' %}:
@@ -76,9 +75,11 @@ LocalTrabalho:
   - regiao_municipal municipio:4 uf:3
 Endereco:
   {% trans 'Endereço' %}:
-  - endereco:6 numero complemento cep
-  - tipo bairro distrito
-  - regiao_municipal municipio:4 uf:3
+  - tipo:4 preferencial
+  - endereco:5 numero complemento:3 cep
+  - bairro distrito regiao_municipal
+  - ponto_referencia municipio:3 uf:2
+  - observacoes
   - trecho
 FiliacaoPartidaria:
   {% trans 'Filiação Partidária' %}:
@@ -93,7 +94,7 @@ Perfil:
   - pronome_tratamento
 TelefonePerfil:
   {% trans 'Telefone' %}:
-  - ddd:2 numero:3 tipo:3 operadora:4
+  - telefone:5 tipo:3 operadora:4
   - proprio:3 de_quem_e preferencial permissao
 EmailPerfil:
   {% trans 'Email' %}:
@@ -117,11 +118,26 @@ EnderecoPerfil:
   - tipo bairro distrito
   - regiao_municipal municipio:4 uf:3
   - trecho
-AreaTrabalho:
-  {% trans 'Área de Trabalho' %}:
-  - nome:5 parlamentar
+StatusProcesso:
+  {% trans 'Status de Processo' %}:
   - descricao
-OperadorAreaTrabalho:
-  {% trans 'Operador de Área de Trabalho' %}:
-  - user
-  - grupos_associados
+ClassificacaoProcesso:
+  {% trans 'Classificação de Processo' %}:
+  - descricao
+TopicoProcesso:
+  {% trans 'Tópico de Processo' %}:
+  - descricao
+AssuntoProcesso:
+  {% trans 'Assunto de Processo' %}:
+  - descricao
+Processo:
+  {% trans 'Dados Básicos' %}:
+  - data:2 titulo importancia:4
+  - descricao status:2 classificacoes:2
+  - observacoes solucao
+  - contatos
+ProcessoLayoutForForm:
+  {% trans 'Dados Básicos' %}:
+  - data:2 titulo importancia:4
+  - descricao status:2 classificacoes:2
+  - observacoes solucao

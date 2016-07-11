@@ -8,7 +8,7 @@ from sapl.parlamentares.models import Parlamentar, Municipio, Partido
 from sapl.utils import UF
 
 from cmj.core.models import CmjModelMixin, Trecho, Distrito, RegiaoMunicipal,\
-    CmjAuditoriaModelMixin, CmjSearchMixin
+    CmjAuditoriaModelMixin, CmjSearchMixin, AreaTrabalho
 from cmj.utils import YES_NO_CHOICES, NONE_YES_NO_CHOICES,\
     get_settings_auth_user_model
 
@@ -17,6 +17,18 @@ FEMININO = 'F'
 MASCULINO = 'M'
 SEXO_CHOICE = ((FEMININO, _('Feminino')),
                (MASCULINO, _('Masculino')))
+
+
+IMP_BAIXA = 'B'
+IMP_MEDIA = 'M'
+IMP_ALTA = 'A'
+IMP_CRITICA = 'C'
+IMPORTANCIA_CHOICE = (
+    (IMP_BAIXA, _('Baixa')),
+    (IMP_MEDIA, _('Média')),
+    (IMP_ALTA, _('Alta')),
+    (IMP_CRITICA, _('Crítica')),
+)
 
 
 class DescricaoAbstractModel(models.Model):
@@ -28,13 +40,6 @@ class DescricaoAbstractModel(models.Model):
 
     def __str__(self):
         return self.descricao
-
-
-class StatusVisita(DescricaoAbstractModel):
-
-    class Meta:
-        verbose_name = _('Status da Visita')
-        verbose_name_plural = _('Status das Visitas')
 
 
 class TipoTelefone(DescricaoAbstractModel):
@@ -181,69 +186,7 @@ class OperadoraTelefonia(DescricaoAbstractModel):
         verbose_name_plural = _('Operadoras de Telefonia')
 
 
-class AreaTrabalho(CmjAuditoriaModelMixin):
-
-    nome = models.CharField(max_length=100, blank=True, default='',
-                            verbose_name=_('Nome'))
-
-    descricao = models.CharField(
-        default='', max_length=254, verbose_name=_('Descrição'))
-
-    parlamentar = models.ForeignKey(
-        Parlamentar,
-        verbose_name=_('Parlamentar'),
-        related_name='areatrabalho_set',
-        blank=True, null=True, on_delete=CASCADE)
-
-    operadores = models.ManyToManyField(
-        get_settings_auth_user_model(),
-        through='OperadorAreaTrabalho',
-        through_fields=('areatrabalho', 'user'),
-        symmetrical=False,
-        related_name='areatrabalho_set')
-
-    class Meta:
-        verbose_name = _('Área de Trabalho')
-        verbose_name_plural = _('Áreas de Trabalho')
-
-    def __str__(self):
-        return self.nome
-
-
-class OperadorAreaTrabalho(CmjAuditoriaModelMixin):
-
-    user = models.ForeignKey(
-        get_settings_auth_user_model(),
-        verbose_name=_('Operador da Área de Trabalho'),
-        related_name='operadorareatrabalho_set',
-        on_delete=CASCADE)
-
-    areatrabalho = models.ForeignKey(
-        AreaTrabalho,
-        related_name='operadorareatrabalho_set',
-        verbose_name=_('Área de Trabalho'),
-        on_delete=CASCADE)
-
-    grupos_associados = models.ManyToManyField(
-        Group,
-        verbose_name=_('Grupos Associados'),
-        related_name='operadorareatrabalho_set')
-
-    @property
-    def user_name(self):
-        return '%s - %s' % (
-            self.user.get_display_name(),
-            self.user.email)
-
-    class Meta:
-        verbose_name = _('Operador')
-        verbose_name_plural = _('Operadores')
-
-    def __str__(self):
-        return self.user.get_display_name()
-
-
-class Contato(CmjSearchMixin, CmjModelMixin):
+class Contato(CmjSearchMixin, CmjAuditoriaModelMixin):
 
     nome = models.CharField(max_length=100, verbose_name=_('Nome'))
 
@@ -339,6 +282,10 @@ class Contato(CmjSearchMixin, CmjModelMixin):
         help_text=_('O pronome de tratamento é opcional, mas será \
         obrigatório caso seja selecionado um tipo de autoridade.'))
 
+    observacoes = models.TextField(
+        blank=True, default='',
+        verbose_name=_('Outros observações sobre o Contato'))
+
     @cached_property
     def fields_search(self):
         return ['nome',
@@ -372,19 +319,26 @@ class Perfil(Contato):
 class Telefone(CmjModelMixin):
 
     contato = models.ForeignKey(
-        Contato, on_delete=CASCADE, verbose_name=_('Contato'))
+        Contato, on_delete=CASCADE,
+        verbose_name=_('Contato'),
+        related_name="telefone_set")
     operadora = models.ForeignKey(
         OperadoraTelefonia, on_delete=SET_NULL,
         related_name='telefone_set',
         blank=True, null=True,
         verbose_name=OperadoraTelefonia._meta.verbose_name)
     tipo = models.ForeignKey(
-        TipoTelefone, on_delete=PROTECT, verbose_name='Tipo')
-    ddd = models.CharField(max_length=3, verbose_name='DDD')
-    numero = models.CharField(max_length=20, verbose_name='Número')
+        TipoTelefone,
+        blank=True, null=True,
+        on_delete=SET_NULL,
+        related_name='telefone_set',
+        verbose_name='Tipo')
+    telefone = models.CharField(max_length=100,
+                                verbose_name='Número do Telefone')
 
-    proprio = models.BooleanField(choices=YES_NO_CHOICES,
-                                  default=True, verbose_name=_('Próprio?'))
+    proprio = models.NullBooleanField(
+        choices=NONE_YES_NO_CHOICES,
+        blank=True, null=True, verbose_name=_('Próprio?'))
 
     de_quem_e = models.CharField(
         max_length=40, verbose_name='De quem é?', blank=True,
@@ -409,7 +363,7 @@ class Telefone(CmjModelMixin):
         verbose_name_plural = _('Telefones')
 
     def __str__(self):
-        return '(%s) %s - (%s)' % (self.ddd, self.numero, self.contato.nome)
+        return self.telefone
 
 
 class TelefonePerfil(Telefone):
@@ -423,11 +377,15 @@ class TelefonePerfil(Telefone):
 class Email(CmjModelMixin):
 
     contato = models.ForeignKey(
-        Contato, on_delete=CASCADE, verbose_name=_('Contato'))
+        Contato, on_delete=CASCADE,
+        verbose_name=_('Contato'),
+        related_name="email_set")
     tipo = models.ForeignKey(
         TipoEmail,
         blank=True, null=True,
-        on_delete=PROTECT, verbose_name='Tipo')
+        on_delete=SET_NULL,
+        related_name='email_set',
+        verbose_name='Tipo')
     email = models.EmailField(verbose_name='Email')
 
     preferencial = models.BooleanField(
@@ -458,9 +416,12 @@ class EmailPerfil(Email):
 
 class Dependente(CmjModelMixin):
 
-    parentesco = models.ForeignKey(Parentesco, verbose_name=_('Parentesco'))
+    parentesco = models.ForeignKey(Parentesco,
+                                   on_delete=PROTECT,
+                                   related_name='+',
+                                   verbose_name=_('Parentesco'))
     contato = models.ForeignKey(Contato,
-                                verbose_name=('Contato'),
+                                verbose_name=_('Contato'),
                                 related_name='dependente_set',
                                 on_delete=CASCADE)
     nome = models.CharField(max_length=100, verbose_name=_('Nome'))
@@ -510,7 +471,7 @@ class DependentePerfil(Dependente):
 
 class LocalTrabalho(CmjModelMixin):
     contato = models.ForeignKey(Contato,
-                                verbose_name=('Contato'),
+                                verbose_name=_('Contato'),
                                 related_name='localtrabalho_set',
                                 on_delete=CASCADE)
     nome = models.CharField(
@@ -547,7 +508,7 @@ class LocalTrabalho(CmjModelMixin):
     endereco = models.CharField(
         max_length=254, blank=True, default='',
         verbose_name=_('Endereço'),
-        help_text=_('O campo endereço também é um campo de busca, nele '
+        help_text=_('O campo endereço também é um campo de busca. Nele '
                     'você pode digitar qualquer informação, inclusive '
                     'digitar o cep para localizar o endereço, e vice-versa!'))
 
@@ -601,7 +562,7 @@ class LocalTrabalhoPerfil(LocalTrabalho):
 
 class Endereco(CmjModelMixin):
     contato = models.ForeignKey(Contato,
-                                verbose_name=('Contato'),
+                                verbose_name=_('Contato'),
                                 related_name='endereco_set',
                                 on_delete=CASCADE)
 
@@ -652,8 +613,21 @@ class Endereco(CmjModelMixin):
         related_name='endereco_set',
         blank=True, null=True, on_delete=SET_NULL)
 
-    complemento = models.CharField(max_length=30, blank=True, default='',
+    complemento = models.CharField(max_length=254, blank=True, default='',
                                    verbose_name=_('Complemento'))
+
+    ponto_referencia = models.CharField(max_length=254, blank=True, default='',
+                                        verbose_name=_('Pontos de Referência'))
+
+    observacoes = models.TextField(
+        blank=True, default='',
+        verbose_name=_('Outros observações sobre o Endereço'))
+
+    preferencial = models.BooleanField(
+        choices=YES_NO_CHOICES,
+        default=True, verbose_name=_('Preferencial?'))
+    """help_text=_('Correspondências automáticas serão geradas sempre '
+                'para os endereços preferenciais.')"""
 
     class Meta:
         verbose_name = _('Endereço')
@@ -674,7 +648,7 @@ class EnderecoPerfil(Endereco):
 
 class FiliacaoPartidaria(models.Model):
     contato = models.ForeignKey(Contato,
-                                verbose_name=('Contato'),
+                                verbose_name=_('Contato'),
                                 related_name='filiacaopartidaria_set',
                                 on_delete=CASCADE)
 
@@ -695,3 +669,119 @@ class FiliacaoPartidaria(models.Model):
 
     def __str__(self):
         return str(self.partido)
+# -----------------------------------------------------------------
+# -----------------------------------------------------------------
+#  PROCESSOS
+# -----------------------------------------------------------------
+# -----------------------------------------------------------------
+
+
+class StatusProcesso(DescricaoAbstractModel):
+
+    class Meta:
+        verbose_name = _('Status de Processo')
+        verbose_name_plural = _('Status de Processos')
+
+
+class ClassificacaoProcesso(DescricaoAbstractModel):
+
+    class Meta:
+        verbose_name = _('Classificacao de Processo')
+        verbose_name_plural = _('Classificações de Processos')
+
+
+class TopicoProcesso(DescricaoAbstractModel):
+
+    class Meta:
+        verbose_name = _('Tópico de Processo')
+        verbose_name_plural = _('Tópicos de Processos')
+
+
+class AssuntoProcesso(DescricaoAbstractModel):
+
+    workspace = models.ForeignKey(
+        AreaTrabalho,
+        verbose_name=_('Área de Trabalho'),
+        related_name='assuntoprocesso_set',
+        on_delete=PROTECT)
+
+    class Meta:
+        verbose_name = _('Assunto de Processo')
+        verbose_name_plural = _('Assuntos de Processos')
+
+
+class Processo(CmjSearchMixin, CmjAuditoriaModelMixin):
+
+    titulo = models.CharField(max_length=254, verbose_name=_('Título'))
+
+    data = models.DateField(verbose_name=_('Data de Abertura'))
+
+    descricao = models.TextField(
+        blank=True, default='',
+        verbose_name=_('Descrição do Processo'))
+
+    observacoes = models.TextField(
+        blank=True, default='',
+        verbose_name=_('Outras observações sobre o Processo'))
+
+    solucao = models.TextField(
+        blank=True, default='',
+        verbose_name=_('Solução do Processo'))
+
+    contatos = models.ManyToManyField(Contato,
+                                      blank=True,
+                                      verbose_name=_(
+                                          'Contatos Interessados do Processo'),
+                                      related_name='processo_set',)
+
+    status = models.ForeignKey(StatusProcesso,
+                               blank=True, null=True,
+                               verbose_name=_('Status do Processo'),
+                               related_name='processo_set',
+                               on_delete=SET_NULL)
+
+    importancia = models.CharField(
+        max_length=1, blank=True,
+        verbose_name=_('Importância'), choices=IMPORTANCIA_CHOICE)
+
+    topicos = models.ManyToManyField(
+        TopicoProcesso,
+        related_name='processo_set',
+        verbose_name=_('Tópicos'))
+
+    classificacoes = models.ManyToManyField(
+        ClassificacaoProcesso, blank=True,
+        related_name='processo_set',
+        verbose_name=_('Classificações'),)
+
+    assuntos = models.ManyToManyField(
+        AssuntoProcesso,
+        related_name='processo_set',
+        verbose_name=_('Assuntos'),)
+
+    workspace = models.ForeignKey(
+        AreaTrabalho,
+        verbose_name=_('Área de Trabalho'),
+        related_name='processo_set',
+        on_delete=PROTECT)
+
+    class Meta:
+        verbose_name = _('Processo')
+        verbose_name_plural = _('Processos')
+
+    def __str__(self):
+        return str(self.titulo)
+
+    @cached_property
+    def fields_search(self):
+        return ['titulo',
+                'observacoes',
+                'descricao']
+
+
+class ProcessoContato(Processo):
+
+    class Meta:
+        proxy = True
+        verbose_name = _('Processo')
+        verbose_name_plural = _('Processos')

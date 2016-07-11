@@ -5,10 +5,12 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.db.models import Q
+from django.db.models.base import Model
 from django.http.response import Http404
 from django.shortcuts import redirect
 from django.utils import six
 from django.utils.decorators import classonlymethod
+from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import ContextMixin
 from django.views.generic.list import MultipleObjectMixin
@@ -110,6 +112,45 @@ class DetailMasterCrud(Crud):
             PermissionRequiredContainerCrudMixin, CrudListView):
         permission_required = (LIST, )
 
+        paginate_by = 30
+
+        def get_rows(self, object_list):
+            return [self._as_row(obj) for obj in object_list]
+
+        def get_headers(self):
+            r = []
+            for fieldname in self.list_field_names:
+                if isinstance(fieldname, tuple):
+                    s = [force_text(self.model._meta.get_field(
+                        fn).verbose_name) for fn in fieldname]
+                    s = ' / '.join(s)
+                    r.append(s)
+                else:
+                    r.append(
+                        self.model._meta.get_field(fieldname).verbose_name)
+            return r
+
+        def _as_row(self, obj):
+            r = []
+            for i, name in enumerate(self.list_field_names):
+                url = self.resolve_url(
+                    base.DETAIL, args=(obj.id,)) if i == 0 else None
+
+                if url and hasattr(self.crud, 'is_m2m') and self.crud.is_m2m:
+                    url = url + ('?pkk=' + self.kwargs['pk']
+                                 if 'pk' in self.kwargs else '')
+
+                if isinstance(name, tuple):
+                    s = ''
+                    for j, n in enumerate(name):
+                        ss = get_field_display(obj, n)[1]
+                        ss = (' - ' + ss) if ss and j != 0 and s else ss
+                        s += ss
+                    r.append((s, url))
+                else:
+                    r.append((get_field_display(obj, name)[1], url))
+            return r
+
         def get_context_data(self, **kwargs):
             if hasattr(self, 'form_search_class'):
                 q = str(self.request.GET.get('q'))\
@@ -117,8 +158,10 @@ class DetailMasterCrud(Crud):
 
                 if 'form' not in kwargs:
                     kwargs['form'] = self.form_search_class(initial={'q': q})
-
-            return super().get_context_data(**kwargs)
+            count = self.object_list.count()
+            context = super().get_context_data(**kwargs)
+            context['count'] = count
+            return context
 
         def get_queryset(self):
             queryset = CrudListView.get_queryset(self)
@@ -175,22 +218,32 @@ class DetailMasterCrud(Crud):
                 container = self.container_field.split('__')
 
                 if len(container) > 1:
-                    if hasattr(self.object, container[0]):
-                        container_model = getattr(
-                            self.model, container[0]).field.related_model
+                    container_model = getattr(
+                        self.model, container[0]).field.related_model
 
-                        params = {}
-                        params['__'.join(
-                            container[1:])] = self.request.user.pk
+                    params = {}
+                    params['__'.join(
+                        container[1:])] = self.request.user.pk
 
-                        container_data = container_model.objects.filter(
-                            **params).first()
+                    if 'pk' in self.kwargs:
+                        params['pk'] = self.kwargs['pk']
 
-                        if not container_data:
-                            raise Exception(
-                                _('Não é permitido adicionar um Contato '
-                                  'sem estar em uma Área de Trabalho.'))
+                    container_data = container_model.objects.filter(
+                        **params).first()
 
+                    if not container_data:
+                        raise Exception(
+                            _('Não é permitido adicionar um registro '
+                              'sem estar em uma Área de Trabalho.'))
+
+                    if hasattr(self.crud, 'is_m2m') and self.crud.is_m2m:
+                        setattr(
+                            self.object, container[1], getattr(
+                                container_data, container[1]))
+                        response = super().form_valid(form)
+                        getattr(self.object, container[0]).add(container_data)
+                        return response
+                    else:
                         setattr(self.object, container[0], container_data)
 
             return super().form_valid(form)
@@ -220,7 +273,7 @@ class DetailMasterCrud(Crud):
         # ou atributos, ou propertiers
         list_field_names_set = ['nome', ]
 
-        paginate_by = 10
+        paginate_by = 20
         no_entries_msg = _('Nenhum registro Associado.')
 
         def get_rows(self, object_list):
@@ -291,7 +344,9 @@ class DetailMasterCrud(Crud):
 
         def get_context_data(self, **kwargs):
             if hasattr(self.crud, 'model_set') and self.crud.model_set:
+                count = self.object_list.count()
                 context = MultipleObjectMixin.get_context_data(self, **kwargs)
+                context['count'] = count
                 if self.paginate_by:
                     page_obj = context['page_obj']
                     paginator = context['paginator']
@@ -316,6 +371,18 @@ class DetailMasterCrud(Crud):
 
             return context
 
+        @property
+        def model_set_verbose_name(self):
+            return getattr(
+                self.object,
+                self.crud.model_set).model._meta.verbose_name
+
+        @property
+        def model_set_verbose_name_plural(self):
+            return getattr(
+                self.object,
+                self.crud.model_set).model._meta.verbose_name_plural
+
     @classonlymethod
     def build(cls, _model, _model_set, _help_path):
 
@@ -329,6 +396,7 @@ class DetailMasterCrud(Crud):
 
 
 class MasterDetailCrudPermission(DetailMasterCrud):
+    is_m2m = False
 
     class BaseMixin(DetailMasterCrud.BaseMixin):
 
@@ -344,12 +412,14 @@ class MasterDetailCrudPermission(DetailMasterCrud):
 
         @property
         def detail_url(self):
-            return super().detail_url\
+            pkk = self.request.GET['pkk'] if 'pkk' in self.request.GET else ''
+            return (super().detail_url + (('?pkk=' + pkk) if pkk else ''))\
                 if self.request.user.has_perm(self.permission(DETAIL)) else ''
 
         @property
         def update_url(self):
-            return super().update_url\
+            pkk = self.request.GET['pkk'] if 'pkk' in self.request.GET else ''
+            return (super().update_url + (('?pkk=' + pkk) if pkk else ''))\
                 if self.request.user.has_perm(self.permission(CHANGE)) else ''
 
         @property
@@ -359,13 +429,31 @@ class MasterDetailCrudPermission(DetailMasterCrud):
 
         def get_context_data(self, **kwargs):
             obj = getattr(self, 'object', None)
+            parent_object = None
             if obj:
-                root_pk = getattr(obj, self.crud.parent_field).pk
+                parent_object = getattr(obj, self.crud.parent_field)
+                if not isinstance(parent_object, Model):
+                    if parent_object.count() > 1:
+                        if 'pkk' not in self.request.GET:
+                            raise Http404
+                        root_pk = self.request.GET['pkk']
+                        parent_object = parent_object.filter(id=root_pk)
+
+                    parent_object = parent_object.first()
+
+                    if not parent_object:
+                        raise Http404
+                root_pk = parent_object.pk
             else:
                 root_pk = self.kwargs['pk']  # in list and create
             kwargs.setdefault('root_pk', root_pk)
-            return super(CrudBaseMixin,
-                         self).get_context_data(**kwargs)
+            context = super(CrudBaseMixin, self).get_context_data(**kwargs)
+
+            if parent_object:
+                context[
+                    'title'] = '%s <small>(%s)</small>' % (self.object, parent_object)
+
+            return context
 
     class ListView(DetailMasterCrud.ListView):
         permission_required = LIST,
@@ -379,9 +467,23 @@ class MasterDetailCrudPermission(DetailMasterCrud):
             return PermissionRequiredMixin.dispatch(
                 self, request, *args, **kwargs)
 
+        def get(self, request, *args, **kwargs):
+            response = DetailMasterCrud.ListView.get(
+                self, request, *args, **kwargs)
+
+            if 'list' not in request.GET:
+                count = self.object_list.count()
+                if count == 1:
+                    self.object = self.object_list[0]
+                    return redirect(
+                        self.detail_url + ('?pkk=' + kwargs['pk']
+                                           if self.crud.is_m2m else ''))
+            return response
+
         def get_context_data(self, **kwargs):
-            context = CrudListView.get_context_data(
-                self, **kwargs)
+            count = self.object_list.count()
+            context = CrudListView.get_context_data(self, **kwargs)
+            context['count'] = count
 
             parent_model = getattr(
                 self.model, self.crud.parent_field).field.related_model
@@ -398,7 +500,9 @@ class MasterDetailCrudPermission(DetailMasterCrud):
             except:
                 raise Http404()
 
-            context['title'] = '%s (%s)' % (context['title'], parent_object)
+            context[
+                'title'] = '%s <small>(%s)</small>' % (
+                context['title'], parent_object)
             return context
 
         def get_queryset(self):
@@ -425,11 +529,37 @@ class MasterDetailCrudPermission(DetailMasterCrud):
         def get_form(self, form_class=None):
             form = super(CrudCreateView,
                          self).get_form(self.form_class)
-            field = self.model._meta.get_field(self.crud.parent_field)
-            parent = field.related_model.objects.get(pk=self.kwargs['pk'])
-
-            setattr(form.instance, self.crud.parent_field, parent)
+            """if not self.crud.is_m2m:
+                field = self.model._meta.get_field(self.crud.parent_field)
+                parent = field.related_model.objects.get(pk=self.kwargs['pk'])
+                setattr(form.instance, self.crud.parent_field, parent)"""
             return form
+
+        def get_context_data(self, **kwargs):
+            context = DetailMasterCrud.CreateView.get_context_data(
+                self, **kwargs)
+
+            params = {'pk': self.kwargs['pk']}
+            if self.container_field:
+                parent_model = getattr(
+                    self.model, self.crud.parent_field).field.related_model
+
+                container = self.container_field.split('__')
+                if len(container) > 1:
+                    params['__'.join(container[1:])] = self.request.user.pk
+
+                try:
+                    parent = parent_model.objects.get(**params)
+                except:
+                    raise Http404()
+            else:
+                field = self.model._meta.get_field(self.crud.parent_field)
+                parent = field.related_model.objects.get(**params)
+            if parent:
+                context['title'] = '%s <small>(%s)</small>' % (
+                    context['title'], parent)
+
+            return context
 
     class UpdateView(DetailMasterCrud.UpdateView):
         permission_required = CHANGE,
@@ -446,7 +576,22 @@ class MasterDetailCrudPermission(DetailMasterCrud):
             return r'^%s/(?P<pk>\d+)/delete$' % cls.model._meta.model_name
 
         def get_success_url(self):
-            pk = getattr(self.get_object(), self.crud.parent_field).pk
+            parent_object = getattr(
+                self.get_object(), self.crud.parent_field)
+            if not isinstance(parent_object, Model):
+                if parent_object.count() > 1:
+                    if 'pkk' not in self.request.GET:
+                        raise Http404
+                    root_pk = self.request.GET['pkk']
+                    parent_object = parent_object.filter(id=root_pk)
+
+                parent_object = parent_object.first()
+
+                if not parent_object:
+                    raise Http404
+            root_pk = parent_object.pk
+
+            pk = root_pk
             return self.resolve_url(base.LIST, args=(pk,))
 
     class DetailView(DetailMasterCrud.DetailView):
@@ -460,7 +605,22 @@ class MasterDetailCrudPermission(DetailMasterCrud):
         @property
         def detail_list_url(self):
             if self.request.user.has_perm(self.permission(LIST)):
-                pk = getattr(self.get_object(), self.crud.parent_field).pk
+                parent_object = getattr(
+                    self.get_object(), self.crud.parent_field)
+                if not isinstance(parent_object, Model):
+                    if parent_object.count() > 1:
+                        if 'pkk' not in self.request.GET:
+                            raise Http404
+                        root_pk = self.request.GET['pkk']
+                        parent_object = parent_object.filter(id=root_pk)
+
+                    parent_object = parent_object.first()
+
+                    if not parent_object:
+                        raise Http404
+                root_pk = parent_object.pk
+
+                pk = root_pk
                 return self.resolve_url(base.LIST, args=(pk,))
             else:
                 return ''
@@ -468,7 +628,21 @@ class MasterDetailCrudPermission(DetailMasterCrud):
         @property
         def detail_create_url(self):
             if self.request.user.has_perm(self.permission(ADD)):
-                pk = getattr(self.get_object(), self.crud.parent_field).pk
+                parent_object = getattr(
+                    self.get_object(), self.crud.parent_field)
+                if not isinstance(parent_object, Model):
+                    if parent_object.count() > 1:
+                        if 'pkk' not in self.request.GET:
+                            raise Http404
+                        root_pk = self.request.GET['pkk']
+                        parent_object = parent_object.filter(id=root_pk)
+
+                    parent_object = parent_object.first()
+
+                    if not parent_object:
+                        raise Http404
+                root_pk = parent_object.pk
+                pk = root_pk
                 return self.resolve_url(base.CREATE, args=(pk,))
             else:
                 return ''

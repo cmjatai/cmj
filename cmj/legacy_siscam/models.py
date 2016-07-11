@@ -461,49 +461,86 @@ class Permissoes(models.Model):
 
 
 class Pessoa(models.Model):
+    # ok
     cpf = models.CharField(max_length=15, blank=True, null=True)
+    # ok
     nome = models.CharField(max_length=10000, blank=True, null=True)
+    # ok
     logradouro = models.CharField(max_length=10000, blank=True, null=True)
+    # ok
     complemento = models.CharField(max_length=30, blank=True, null=True)
+    # ok
     cep = models.CharField(max_length=9, blank=True, null=True)
+    # ok
     bairro = models.CharField(max_length=10000, blank=True, null=True)
+    # ok
     cidade = models.CharField(max_length=30, blank=True, null=True)
+    # ok
     estado = models.CharField(max_length=2, blank=True, null=True)
+
     # Field name made lowercase.
+    # ok
     telefonefixo = models.CharField(
         db_column='telefoneFixo', max_length=10000, blank=True, null=True)
     # Field name made lowercase.
+    # ok
     telefonecelular = models.CharField(
         db_column='telefoneCelular', max_length=20, blank=True, null=True)
+
+    # ok
     email = models.CharField(max_length=50, blank=True, null=True)
+
+    # ok
     rg = models.CharField(max_length=30, blank=True, null=True)
+    # ok
     orgaorg = models.CharField(max_length=20, blank=True, null=True)
+    # ok
     nomepai = models.CharField(max_length=50, blank=True, null=True)
+    # ok
     nomemae = models.CharField(max_length=50, blank=True, null=True)
+    # ok
     naturalidade = models.CharField(max_length=50, blank=True, null=True)
+
     # Field name made lowercase.
+    # ok
     alteradopor = models.ForeignKey(
         'Usuario', models.DO_NOTHING,
         db_column='alteradoPor',
         blank=True, null=True,
         related_name="pessoas_set")
     # Field name made lowercase.
+    # ok
     alteradoem = models.DateTimeField(
         db_column='alteradoEm', blank=True, null=True)
+
+    # ok
     dataexprg = models.DateTimeField(blank=True, null=True)
+    # ok
     datanascimento = models.DateTimeField(blank=True, null=True)
+
+    # ok
     excluido = models.NullBooleanField()
+    # ok
     ativo = models.NullBooleanField()
+    # ok
     foto = models.BinaryField(blank=True, null=True)
     # Field name made lowercase.
+    # ok
     estadocivil = models.CharField(
         db_column='estadoCivil', max_length=1, blank=True, null=True)
+
     parentesco = models.IntegerField(blank=True, null=True)
+
+    # ok
     sexo = models.CharField(max_length=1, blank=True, null=True)
+    # ok
     numsus = models.CharField(max_length=10000, blank=True, null=True)
+
+    # ok
     visitado = models.ForeignKey(
         'Usuario', models.DO_NOTHING, db_column='visitado', blank=True, null=True,
         related_name="sisitados_set")
+
     empresa = models.CharField(max_length=50, blank=True, null=True)
     # Field name made lowercase.
     telefonecomercial = models.CharField(

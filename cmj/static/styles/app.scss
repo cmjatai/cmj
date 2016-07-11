@@ -56,8 +56,10 @@ body, html {
   }
 }
 
-.radio-inline, .checkbox-inline {
+.radio, .checkbox, .radio-inline, .checkbox-inline {
   margin-top: 0px;
+  margin-bottom: $grid-gutter-width / 2;
+  padding-left:  $grid-gutter-width * 1.2;
 }
 
 // #### conserta radios e checkboxes escondidas pelo drunken parrot ############
@@ -147,18 +149,17 @@ body, html {
     ul {
       position: relative;
       float: right;
-      margin: 0 $grid-gutter-width * -0.5 0 0;
+      margin: $grid-gutter-width * -0.6 0 0 0;
       background: darken($color_main_bg, 15%) url(/static/img/bg.png);
-      border-radius: 0 0 0 6px;
+      border-radius: 0;
       border: 1px solid white;
-      border-top: 1px;
-      border-right: 0px;
 
       li {
         border: 0;
         a {
+          padding: 0 $grid-gutter-width * 0.5 - 1 0 $grid-gutter-width * 0.5;
           font-size: 1em;
-          line-height: 1.65;
+          line-height: 1.25;
           color: darken($color_main_bg, 60%)
         }
       }
@@ -199,13 +200,14 @@ body, html {
   }
 }
 .page-header {
-  padding: 0.6em 1em 0.2em;
+  padding: $grid-gutter-width $grid-gutter-width $grid-gutter-width * 0.75 $grid-gutter-width * 1.5;
   margin: 0em $grid-gutter-width * -0.5 0 $grid-gutter-width * -0.5 ;
   color: transparentize($color_topo_bg, 0.3);
   background: darken($color_main_bg, 3%) url(/static/img/bg.png);
   border-radius: 5px 5px 0 0;
   border-bottom: 1px solid $color_container_border;
   font-weight: normal;
+  font-size: 2em;
 }
 a {
   color: $color_topo_bg;
@@ -251,6 +253,14 @@ main {
       color: darken($color_main_bg, 70%);
       background-color: $color_main_bg;
     }
+    &.btn-excluir {
+      color: $btn-danger-bg;
+      &:hover {
+        color: $btn-danger-color;
+        border-color: lighten($btn-danger-bg, 5%);
+        background-color: lighten($btn-danger-bg, 5%);
+      }
+    }
   }
 }
 
@@ -264,6 +274,17 @@ main {
   padding-left: $grid-gutter-width / 2;
   padding-right: $grid-gutter-width / 2;
   overflow: hidden;
+}
+.result-count {
+  position: absolute;
+  color: darken($color_main_bg, 40%);
+  margin-left: 0.5 * $grid-gutter-width;
+  margin-top: -0.55 * $grid-gutter-width;
+  line-height: $grid-gutter-width * 0.75;
+  padding: 4px 0.5 * $grid-gutter-width 2px;
+  border: 1px solid  darken($color_main_bg, 5%);
+  background-color: white;
+
 }
 
 .table {
@@ -283,9 +304,12 @@ main {
 }
 
 .context-actions{
-  margin: 0;
+  margin: 0 0 $grid-gutter-width;
   .actions {
-    margin: $grid-gutter-width $grid-gutter-width/2 $grid-gutter-width;
+    margin: $grid-gutter-width $grid-gutter-width/2 0;
+    .form-group {
+      margin-bottom: 0;
+    }
   }
 }
 
@@ -306,13 +330,15 @@ p.control-label {
   padding-bottom: 3px;
   min-height: 2em;
 }
+fieldset {
+  margin: $grid-gutter-width 0 $grid-gutter-width/2;
 
+}
 .legend, legend { // tag legend para crud updates
   clear:both;
   display: block;
   width: 100%;
   padding: 0;
-  margin: $grid-gutter-width 0 $grid-gutter-width/2;
   font-size: ($font-size-base * 1.5);
   line-height: inherit;
   color: $legend-color;
@@ -349,8 +375,35 @@ p.control-label {
 .form-group {
   margin-bottom: $grid-gutter-width;
 }
+#contatos_bloco_selecionados {
+  .controls {
+    padding: 12px 10px 0;
+    background-color: white;
+    border: 1px solid #dcdac8;
+    border-radius: 4px;
+    min-height: 30px;
+  }
+}
 
-
+#contatos_bloco_search #div_id_contatos_search {
+  .controls:last-child {
+    padding: 0;
+    background-color: white;
+    border: 1px solid #dcdac8;
+    border-radius: 4px;
+    min-height: 30px;
+    label {
+      margin: 0;
+      padding: 5px;
+      &:not(:last-child) {
+        border-bottom: 1px solid #dcdac8;
+      }
+      span {
+        display: none;
+      }
+    }
+  }
+}
 // ADJUST DRUNKEN PARROT STYLES ########################################
 .panel-primary {
   border-color: $color_topo_bg;
@@ -399,6 +452,11 @@ h5 {
 h6 {
   font-size: 12px;
 }
+.input-lg, .btn-lg {
+  height: 50px;
+}
+
+
 // #### footer ###########################################
 // based on http://getbootstrap.com/examples/sticky-footer
 $footer-height: 30px;
@@ -681,11 +739,7 @@ body {
         }
       }
     }
-    &.navbar-area-trabalho {
-      ul {
-        margin-top: 0;
-      }
-    }
+
   }
 
   .nav-acessar {
@@ -750,22 +804,34 @@ body {
       padding: 0 0 0 10px;
       font-size: 21px;
     }
+    &.navbar-area-trabalho {
+      ul {
+        margin: $grid-gutter-width * -0.5 $grid-gutter-width * -0.5 - 1 0 0;
+        li {
+          a {
+            font-size: 0.8em !important;
+            padding-top: 2px;
+          }
+        }
+      }
+    }
   }
 
   .nav-acessar {
+    display: block;
     ul {
       margin: 0 !important;
     }
     a {
       font-size: 1em !important;
     }
-    display: block;
   }
 
   .page-header {
       padding: 0.4em 0.3em 0.3em;
       font-size: 1.5em;
   }
+
 }
 
 @media screen and (min-width: 768px) {
@@ -867,6 +933,11 @@ body {
           }
         }
       }
+    }
+  }
+  .context-actions {
+    .search {
+      max-width: 60%;
     }
   }
 }

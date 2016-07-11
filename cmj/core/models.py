@@ -2,15 +2,15 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
-from django.contrib.auth.models import PermissionsMixin
+from django.contrib.auth.models import PermissionsMixin, Group
 from django.core.exceptions import PermissionDenied
 from django.db import models
 from django.db.models import permalink
-from django.db.models.deletion import PROTECT
+from django.db.models.deletion import PROTECT, CASCADE
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from image_cropping import ImageCropField, ImageRatioField
-from sapl.parlamentares.models import Municipio
+from sapl.parlamentares.models import Municipio, Parlamentar
 
 from cmj.core.rules import SEARCH_TRECHO
 from cmj.globalrules.globalrules import rules, GROUP_SOCIAL_USERS
@@ -226,12 +226,75 @@ class CmjAuditoriaModelMixin(CmjModelMixin):
         abstract = True
 
 
+class AreaTrabalho(CmjAuditoriaModelMixin):
+
+    nome = models.CharField(max_length=100, blank=True, default='',
+                            verbose_name=_('Nome'))
+
+    descricao = models.CharField(
+        default='', max_length=254, verbose_name=_('Descrição'))
+
+    parlamentar = models.ForeignKey(
+        Parlamentar,
+        verbose_name=_('Parlamentar'),
+        related_name='areatrabalho_set',
+        blank=True, null=True, on_delete=CASCADE)
+
+    operadores = models.ManyToManyField(
+        get_settings_auth_user_model(),
+        through='OperadorAreaTrabalho',
+        through_fields=('areatrabalho', 'user'),
+        symmetrical=False,
+        related_name='areatrabalho_set')
+
+    class Meta:
+        verbose_name = _('Área de Trabalho')
+        verbose_name_plural = _('Áreas de Trabalho')
+
+    def __str__(self):
+        return self.nome
+
+
+class OperadorAreaTrabalho(CmjAuditoriaModelMixin):
+
+    user = models.ForeignKey(
+        get_settings_auth_user_model(),
+        verbose_name=_('Operador da Área de Trabalho'),
+        related_name='operadorareatrabalho_set',
+        on_delete=CASCADE)
+
+    areatrabalho = models.ForeignKey(
+        AreaTrabalho,
+        related_name='operadorareatrabalho_set',
+        verbose_name=_('Área de Trabalho'),
+        on_delete=CASCADE)
+
+    grupos_associados = models.ManyToManyField(
+        Group,
+        verbose_name=_('Grupos Associados'),
+        related_name='operadorareatrabalho_set')
+
+    @property
+    def user_name(self):
+        return '%s - %s' % (
+            self.user.get_display_name(),
+            self.user.email)
+
+    class Meta:
+        verbose_name = _('Operador')
+        verbose_name_plural = _('Operadores')
+
+    def __str__(self):
+        return self.user.get_display_name()
+
+
 class Cep(models.Model):
     numero = models.CharField(max_length=9, verbose_name=_('CEP'), unique=True)
 
     class Meta:
         verbose_name = _('CEP')
         verbose_name_plural = _("CEP's")
+        ordering = ('numero'),
 
     def __str__(self):
         return self.numero
@@ -282,7 +345,16 @@ class Bairro(models.Model):
         verbose_name=_('Bairro'),
         unique=True)
 
+    codigo = models.PositiveIntegerField(verbose_name='Código',
+                                         help_text=_('Código do Bairro no Cadastro Oficial do Município'))
+
+    outros_nomes = models.TextField(
+        blank=True,
+        verbose_name=_('Outros Nomes'),
+        help_text=_('Ocorrências similares'))
+
     class Meta:
+        ordering = ('nome',)
         verbose_name = _('Bairro')
         verbose_name_plural = _("Bairros")
 
