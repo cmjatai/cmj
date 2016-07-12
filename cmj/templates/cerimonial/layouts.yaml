@@ -49,7 +49,7 @@ Contato:
   - numero_sus cpf titulo_eleitor
   - rg rg_orgao_expedidor rg_data_expedicao ativo
   {% trans 'Profissão/Tratamento' %}:
-  - profissao tipo_autoridade:5
+  - cargo profissao tipo_autoridade
   - pronome_tratamento
   {% trans 'Observações' %}:
   - observacoes
@@ -59,7 +59,7 @@ Telefone:
   - proprio:3 de_quem_e preferencial
 Email:
   {% trans 'Email' %}:
-  - email:6 tipo preferencial
+  - email:6 tipo preferencial permissao
 Dependente:
   {% trans 'Dados Básicos' %}:
   - parentesco:2 nome:5 nome_social:3 apelido:2
@@ -134,10 +134,12 @@ Processo:
   {% trans 'Dados Básicos' %}:
   - data:2 titulo importancia:4
   - descricao status:2 classificacoes:2
+  - topicos:4 assuntos
   - observacoes solucao
   - contatos
 ProcessoLayoutForForm:
   {% trans 'Dados Básicos' %}:
   - data:2 titulo importancia:4
   - descricao status:2 classificacoes:2
+  - topicos:4 assuntos
   - observacoes solucao

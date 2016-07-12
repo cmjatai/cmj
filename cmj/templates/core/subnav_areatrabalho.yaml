@@ -1,5 +1,5 @@
 {% load i18n %}
 - title: {% trans 'Início' %}
-  url: areatrabalho_list
+  url: areatrabalho_detail
 - title: {% trans 'Operadores' %}
   url: operadorareatrabalho_list

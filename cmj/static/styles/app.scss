@@ -149,7 +149,7 @@ body, html {
     ul {
       position: relative;
       float: right;
-      margin: $grid-gutter-width * -0.6 0 0 0;
+      margin: $grid-gutter-width * -0.6 $grid-gutter-width / 2 0 0;
       background: darken($color_main_bg, 15%) url(/static/img/bg.png);
       border-radius: 0;
       border: 1px solid white;
@@ -325,10 +325,14 @@ p.control-label {
 
 .form-control-static {
   font-size: 1.2em;
-  border-bottom: 1px solid $color_container_border;
+  border-bottom: 1px solid darken($color_main_bg, 5%);
   line-height: 1.5em;
   padding-bottom: 3px;
   min-height: 2em;
+  background: transparentize($color_main_bg, 0.4);
+  ul {
+    padding-left: $grid-gutter-width * 1.2;
+  }
 }
 fieldset {
   margin: $grid-gutter-width 0 $grid-gutter-width/2;
@@ -375,26 +379,47 @@ fieldset {
 .form-group {
   margin-bottom: $grid-gutter-width;
 }
-#contatos_bloco_selecionados {
-  .controls {
-    padding: 12px 10px 0;
-    background-color: white;
-    border: 1px solid #dcdac8;
-    border-radius: 4px;
-    min-height: 30px;
+
+.controls-radio, .controls-checkbox {
+  padding:0;
+  background-color: white;
+  border: 1px solid #dcdac8;
+  border-radius: 4px;
+  min-height: 30px;
+  overflow: hidden;
+  label.checkbox, label.radio{
+    margin: 0;
+    padding: ceil($grid-gutter-width / 3);
+    padding-left: $grid-gutter-width * 2;
+    .icons {
+      top:  ceil($grid-gutter-width / 3);
+      left: $grid-gutter-width / 2;
+    }
+    &:hover {
+      background-color: $color_main_bg;
+    }
+  }
+  .help-block {
+    margin: $grid-gutter-width / 2;
+    padding: $grid-gutter-width / 2;
+    border: 2px dashed darken($color_main_bg, 5%);
   }
 }
 
-#contatos_bloco_search #div_id_contatos_search {
-  .controls:last-child {
-    padding: 0;
-    background-color: white;
-    border: 1px solid #dcdac8;
-    border-radius: 4px;
-    min-height: 30px;
+.form-group-contatos-search {
+  .controls-radio, .controls-checkbox {
+    overflow: none;
+    &:last-child {
+      padding: 0;
+      background-color: white;
+      border: 1px solid #dcdac8;
+      border-radius: 4px;
+      min-height: 30px;
+    }
     label {
       margin: 0;
       padding: 5px;
+      background-color: white;
       &:not(:last-child) {
         border-bottom: 1px solid #dcdac8;
       }

@@ -157,7 +157,8 @@ class ContatoForm(ModelForm):
                   'rg_orgao_expedidor',
                   'rg_data_expedicao',
                   'ativo',
-                  'observacoes'
+                  'observacoes',
+                  'cargo'
                   ]
 
     def __init__(self, *args, **kwargs):
@@ -221,6 +222,7 @@ class PerfilForm(ContatoForm):
                   'quantos_filhos',
                   'profissao',
                   'pronome_tratamento',
+                  'cargo'
                   ]
 
     def __init__(self, *args, **kwargs):
@@ -382,22 +384,30 @@ class ProcessoForm(ModelForm):
                   'classificacoes',
                   'observacoes',
                   'solucao',
-                  'q', 'contatos']
+                  'q',
+                  'contatos',
+                  'topicos',
+                  'assuntos']
 
     def __init__(self, *args, **kwargs):
         yaml_layout = kwargs.pop('yaml_layout')
 
-        q_field = FieldWithButtons(
-            Field('q',
-                  placeholder=_('Filtrar Lista'),
-                  autocomplete='off'),
-            StrictButton(
-                _('Filtrar'), css_class='btn-default',
-                type='button', onclick='atualizaContatos(event)'))
+        q_field = Div(
+            FieldWithButtons(
+                Field('q',
+                      placeholder=_('Filtrar Lista'),
+                      autocomplete='off',
+                      type='search',
+                      onkeypress='atualizaContatos(event)'),
+                StrictButton(
+                    _('Filtrar'), css_class='btn-default',
+                    type='button', onclick='atualizaContatos(event)')),
+            Div(css_class='form-group-contato-search')
+        )
 
         q = [_('Seleção de Contatos'),
              [(q_field, 6),
-              (Div(Field('contatos'), id='contatos_bloco_selecionados'), 6)]
+              (Div(Field('contatos'), css_class='form-group-contatos'), 6)]
              ]
         yaml_layout.append(q)
 
@@ -408,6 +418,9 @@ class ProcessoForm(ModelForm):
 
         if not self.instance.pk:
             self.fields['data'].initial = date.today()
+
+        self.fields['q'].help_text = _('Digite parte do nome, nome social ou '
+                                       'apelido do Contato que você procura.')
 
         self.fields['descricao'].widget = forms.Textarea(
             attrs={'rows': '5'})
@@ -433,6 +446,10 @@ class ProcessoForm(ModelForm):
             (c.pk, c) for c in self.instance.contatos.order_by('nome')]\
             if self.instance.pk else []
 
+        self.fields['contatos'].help_text = _(
+            'Procure por Contatos na caixa de buscas e arraste '
+            'para esta caixa os Contatos interessados neste Processo.')
+
 
 class ProcessoContatoForm(ModelForm):
 
@@ -445,7 +462,9 @@ class ProcessoContatoForm(ModelForm):
                   'descricao',
                   'classificacoes',
                   'observacoes',
-                  'solucao']
+                  'solucao',
+                  'topicos',
+                  'assuntos']
 
     def __init__(self, *args, **kwargs):
         super(ProcessoContatoForm, self).__init__(*args, **kwargs)
@@ -471,11 +490,11 @@ class ProcessoContatoForm(ModelForm):
 
 
 class ContatoFragmentSearchForm(forms.Form):
-    q = forms.CharField(
+    """q = forms.CharField(
         required=False,
         label='Busca por Contatos',
         widget=forms.TextInput(
-            attrs={'type': 'search'}))
+            attrs={'type': 'search'}))"""
 
     contatos_search = forms.ModelChoiceField(
         label='',
@@ -486,18 +505,19 @@ class ContatoFragmentSearchForm(forms.Form):
 
         super(ContatoFragmentSearchForm, self).__init__(*args, **kwargs)
 
-        q_field = FieldWithButtons(
+        """q_field = FieldWithButtons(
             Field('q',
                   placeholder=_('Filtrar Lista'),
                   autocomplete='off'),
             StrictButton(
                 _('Filtrar'), css_class='btn-default',
-                type='button', onclick='atualizaContatos(event)'))
+                type='button', onclick='atualizaContatos(event)'))"""
 
         self.fields['contatos_search'].widget = forms.CheckboxSelectMultiple()
 
         queryset = Contato.objects.filter(
-            workspace=self.initial['workspace'])
+            workspace=self.initial['workspace']).exclude(
+            pk__in=self.initial['pks_exclude'])
 
         query = normalize(self.initial['q'])
 
@@ -519,7 +539,8 @@ class ContatoFragmentSearchForm(forms.Form):
 
         self.helper = FormHelper()
         self.helper.layout = Layout(
-            Div(q_field,
-                Field('contatos_search'), id='contatos_bloco_search'))
+            Div(
+                Field('contatos_search'),
+                css_class='form-group-contatos-search'))
         self.helper.form_tag = False
         self.helper.disable_csrf = True

@@ -4,33 +4,62 @@
 {% block extra_js %}
 
   <script type="text/javascript">
-    function updatebind_change() {
-      $('#contatos_bloco_selecionados input').on('change', function(event) {
+    function changeHideShow() {
+      var help = $('.form-group-contatos .help-block');
+      if (help.parent().children().length > 1)
+        help.css('display', 'none');
+      else {
+        help.css('display', 'block');
+      }
+    }
+    function updateBindChange() {
+      changeHideShow();
+      $('.form-group-contatos input').on('change', function(event) {
         if (!event.currentTarget.checked)
           event.currentTarget.parentElement.remove();
+        changeHideShow();
       });
     }
     function atualizaContatos(event) {
+      if (event.type == 'keypress' && event.keyCode != 13)
+        return;
+
+      var pks_exclude = $(".form-group-contatos input:checkbox[name=contatos]:checked").map(function(){return $(this).val()}).get()
+
       var _this = $("#id_q");
       var url_get_contatos = '{% url 'cmj.cerimonial:ajax_search_contatos' %}';
       var q = _this.val()
-      updatebind_change();
-      $.get(url_get_contatos, 'q='+q, function(data) {
-        var parent = _this.closest('.form-group').parent();
-        parent.html(data);
-        $( "#div_id_contatos_search div, #div_id_contatos div" ).sortable({
+      updateBindChange();
+      $.get(url_get_contatos, {'q':q, 'pks_exclude':pks_exclude}, function(data) {
+        var parent = _this.closest('.form-group').siblings();
+        parent.replaceWith(data);
+
+        $( ".form-group-contatos-search div, .form-group-contatos div" ).sortable({
           connectWith: ".controls",
+          items: "label",
           stop: function( event, ui ) {
-            var i = ui.item.find('input')
-            i.prop( "checked", true );
-            i.prop( 'name', 'contatos');
-            i.trigger('click');
-            updatebind_change()
+            var value = ui.item.find('input').val();
+            var text =  ui.item.text()
+            var items = ui.item.parent().find('input[value="'+value+'"]');
+            if (items.length > 1) {
+                alert('"'+text.replace(/(^\s+|\s+$)/g, "")+'" já está na lista de contatos selecionados.');
+                $(this).sortable('cancel');
+            }
+            else {
+              var i = ui.item.find('input')
+              i.prop( "checked", true );
+              i.prop( 'name', 'contatos');
+              i.trigger('click');
+              updateBindChange()
+            }
           }
         }).disableSelection();
       });
     }
-    updatebind_change()
+    updateBindChange();
+    $(document).on("keypress", "form", function(event) {
+        return event.keyCode != 13;
+    });
   </script>
 
 {% endblock %}

@@ -444,6 +444,7 @@ class ContatoFragmentFormSearchView(FormView):
                 operadores=self.request.user.pk)[0]
             initial['q'] = self.request.GET[
                 'q'] if 'q' in self.request.GET else ''
+            initial['pks_exclude'] = self.request.GET.getlist('pks_exclude[]')
         except:
             raise PermissionDenied(_('Sem permissão de Acesso!'))
 

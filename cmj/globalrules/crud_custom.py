@@ -529,10 +529,10 @@ class MasterDetailCrudPermission(DetailMasterCrud):
         def get_form(self, form_class=None):
             form = super(CrudCreateView,
                          self).get_form(self.form_class)
-            """if not self.crud.is_m2m:
+            if not self.crud.is_m2m:
                 field = self.model._meta.get_field(self.crud.parent_field)
                 parent = field.related_model.objects.get(pk=self.kwargs['pk'])
-                setattr(form.instance, self.crud.parent_field, parent)"""
+                setattr(form.instance, self.crud.parent_field, parent)
             return form
 
         def get_context_data(self, **kwargs):

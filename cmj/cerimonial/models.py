@@ -37,6 +37,7 @@ class DescricaoAbstractModel(models.Model):
 
     class Meta:
         abstract = True
+        ordering = ('descricao',)
 
     def __str__(self):
         return self.descricao
@@ -316,7 +317,7 @@ class Perfil(Contato):
         proxy = True
 
 
-class Telefone(CmjModelMixin):
+class Telefone(CmjAuditoriaModelMixin):
 
     contato = models.ForeignKey(
         Contato, on_delete=CASCADE,
@@ -374,7 +375,7 @@ class TelefonePerfil(Telefone):
         verbose_name_plural = _('Telefones do Perfil')
 
 
-class Email(CmjModelMixin):
+class Email(CmjAuditoriaModelMixin):
 
     contato = models.ForeignKey(
         Contato, on_delete=CASCADE,
@@ -414,7 +415,7 @@ class EmailPerfil(Email):
         verbose_name_plural = _("Email's do Perfil")
 
 
-class Dependente(CmjModelMixin):
+class Dependente(CmjAuditoriaModelMixin):
 
     parentesco = models.ForeignKey(Parentesco,
                                    on_delete=PROTECT,
@@ -447,12 +448,6 @@ class Dependente(CmjModelMixin):
         blank=True, null=True, on_delete=SET_NULL,
         verbose_name=_('Nivel de Instrução'))
 
-    parentesco = models.ForeignKey(
-        Parentesco,
-        related_name='dependente_set',
-        blank=True, null=True, on_delete=SET_NULL,
-        verbose_name=_('Parentesco'))
-
     class Meta:
         verbose_name = _('Dependente')
         verbose_name_plural = _('Dependentes')
@@ -469,7 +464,7 @@ class DependentePerfil(Dependente):
         verbose_name_plural = _('Dependentes do Perfil')
 
 
-class LocalTrabalho(CmjModelMixin):
+class LocalTrabalho(CmjAuditoriaModelMixin):
     contato = models.ForeignKey(Contato,
                                 verbose_name=_('Contato'),
                                 related_name='localtrabalho_set',
@@ -541,8 +536,12 @@ class LocalTrabalho(CmjModelMixin):
         choices=YES_NO_CHOICES,
         default=True, verbose_name=_('Preferencial?'))
 
-    cargo = models.CharField(max_length=254, blank=True, default='',
-                             verbose_name=_('Cargo/Função'))
+    cargo = models.CharField(
+        max_length=254, blank=True, default='',
+        verbose_name=_('Cargo/Função'),
+        help_text=_('Ao definir um cargo e função aqui, o'
+                    'Cargo/Função preenchido na aba "Dados Básicos", '
+                    'será desconsiderado ao gerar impressos!'))
 
     class Meta:
         verbose_name = _('Local de Trabalho')
@@ -560,7 +559,7 @@ class LocalTrabalhoPerfil(LocalTrabalho):
         verbose_name_plural = _('Locais de Trabalho do Perfil')
 
 
-class Endereco(CmjModelMixin):
+class Endereco(CmjAuditoriaModelMixin):
     contato = models.ForeignKey(Contato,
                                 verbose_name=_('Contato'),
                                 related_name='endereco_set',
@@ -646,7 +645,7 @@ class EnderecoPerfil(Endereco):
         verbose_name_plural = _('Endereços do Perfil')
 
 
-class FiliacaoPartidaria(models.Model):
+class FiliacaoPartidaria(CmjAuditoriaModelMixin):
     contato = models.ForeignKey(Contato,
                                 verbose_name=_('Contato'),
                                 related_name='filiacaopartidaria_set',
@@ -697,7 +696,7 @@ class TopicoProcesso(DescricaoAbstractModel):
         verbose_name_plural = _('Tópicos de Processos')
 
 
-class AssuntoProcesso(DescricaoAbstractModel):
+class AssuntoProcesso(DescricaoAbstractModel, CmjAuditoriaModelMixin):
 
     workspace = models.ForeignKey(
         AreaTrabalho,
@@ -731,7 +730,7 @@ class Processo(CmjSearchMixin, CmjAuditoriaModelMixin):
     contatos = models.ManyToManyField(Contato,
                                       blank=True,
                                       verbose_name=_(
-                                          'Contatos Interessados do Processo'),
+                                          'Contatos Interessados no Processo'),
                                       related_name='processo_set',)
 
     status = models.ForeignKey(StatusProcesso,
@@ -745,7 +744,7 @@ class Processo(CmjSearchMixin, CmjAuditoriaModelMixin):
         verbose_name=_('Importância'), choices=IMPORTANCIA_CHOICE)
 
     topicos = models.ManyToManyField(
-        TopicoProcesso,
+        TopicoProcesso, blank=True,
         related_name='processo_set',
         verbose_name=_('Tópicos'))
 
@@ -755,7 +754,7 @@ class Processo(CmjSearchMixin, CmjAuditoriaModelMixin):
         verbose_name=_('Classificações'),)
 
     assuntos = models.ManyToManyField(
-        AssuntoProcesso,
+        AssuntoProcesso, blank=True,
         related_name='processo_set',
         verbose_name=_('Assuntos'),)
 
