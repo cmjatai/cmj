@@ -142,6 +142,15 @@ Instalação e configuração das dependências do projeto
       EMAIL_HOST = [Insira este parâmetro]
       EMAIL_HOST_USER = [Insira este parâmetro]
       EMAIL_HOST_PASSWORD = [Insira este parâmetro]
+      SOCIAL_AUTH_FACEBOOK_KEY = [Insira este parâmetro]
+      SOCIAL_AUTH_FACEBOOK_SECRET = [Insira este parâmetro]
+      SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = [Insira este parâmetro]
+      SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = [Insira este parâmetro]
+      SOCIAL_AUTH_TWITTER_KEY = [Insira este parâmetro]
+      SOCIAL_AUTH_TWITTER_SECRET = [Insira este parâmetro]
+      INITIAL_VALUE_FORMS_UF = [Insira este parâmetro]
+      INITIAL_VALUE_FORMS_MUNICIPIO = [Insira este parâmetro]
+      INITIAL_VALUE_FORMS_CEP = [Insira este parâmetro]
 
     * Uma configuração mínima para atender os procedimentos acima seria::
 
@@ -153,6 +162,16 @@ Instalação e configuração das dependências do projeto
         EMAIL_HOST =
         EMAIL_HOST_USER =
         EMAIL_HOST_PASSWORD =
+        SOCIAL_AUTH_FACEBOOK_KEY =
+        SOCIAL_AUTH_FACEBOOK_SECRET =
+        SOCIAL_AUTH_GOOGLE_OAUTH2_KEY =
+        SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET =
+        SOCIAL_AUTH_TWITTER_KEY =
+        SOCIAL_AUTH_TWITTER_SECRET =
+        INITIAL_VALUE_FORMS_UF = 'GO'
+        INITIAL_VALUE_FORMS_MUNICIPIO = 'Jataí'
+        INITIAL_VALUE_FORMS_CEP = '75800-000'
+
 
 
 
