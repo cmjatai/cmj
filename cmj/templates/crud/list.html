@@ -35,7 +35,7 @@
       <thead>
         <tr>
           {% for name in headers %}
-          <th>{{ name }}</th>
+            <th><a href="?o={% if 'o' not in request.GET and forloop.counter == 1 or 'o' in request.GET and forloop.counter|safe == request.GET.o %}-{%endif%}{{forloop.counter}}{%if request.GET.page %}&page={{request.GET.page}}{%endif%}">{{ name }}</a></th>
           {% endfor %}
         </tr>
       </thead>

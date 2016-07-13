@@ -45,35 +45,35 @@ class DescricaoAbstractModel(models.Model):
 
 class TipoTelefone(DescricaoAbstractModel):
 
-    class Meta:
+    class Meta(DescricaoAbstractModel.Meta):
         verbose_name = _('Tipo de Telefone')
         verbose_name_plural = _('Tipos de Telefone')
 
 
 class TipoEndereco(DescricaoAbstractModel):
 
-    class Meta:
+    class Meta(DescricaoAbstractModel.Meta):
         verbose_name = _('Tipo de Endereço')
         verbose_name_plural = _('Tipos de Endereço')
 
 
 class TipoEmail(DescricaoAbstractModel):
 
-    class Meta:
+    class Meta(DescricaoAbstractModel.Meta):
         verbose_name = _('Tipo de Email')
         verbose_name_plural = _('Tipos de Email')
 
 
 class Parentesco(DescricaoAbstractModel):
 
-    class Meta:
+    class Meta(DescricaoAbstractModel.Meta):
         verbose_name = _('Parentesco')
         verbose_name_plural = _('Parentescos')
 
 
 class EstadoCivil(DescricaoAbstractModel):
 
-    class Meta:
+    class Meta(DescricaoAbstractModel.Meta):
         verbose_name = _('Estado Civil')
         verbose_name_plural = _('Estados Civis')
 
@@ -161,28 +161,28 @@ class TipoAutoridade(DescricaoAbstractModel):
         PronomeTratamento,
         related_name='tipoautoridade_set')
 
-    class Meta:
+    class Meta(DescricaoAbstractModel.Meta):
         verbose_name = _('Tipo de Autoridade')
         verbose_name_plural = _('Tipos de Autoridade')
 
 
 class TipoLocalTrabalho(DescricaoAbstractModel):
 
-    class Meta:
+    class Meta(DescricaoAbstractModel.Meta):
         verbose_name = _('Tipo do Local de Trabalho')
         verbose_name_plural = _('Tipos de Local de Trabalho')
 
 
 class NivelInstrucao(DescricaoAbstractModel):
 
-    class Meta:
+    class Meta(DescricaoAbstractModel.Meta):
         verbose_name = _('Nível de Instrução')
         verbose_name_plural = _('Níveis de Instrução')
 
 
 class OperadoraTelefonia(DescricaoAbstractModel):
 
-    class Meta:
+    class Meta(DescricaoAbstractModel.Meta):
         verbose_name = _('Operadora de Telefonia')
         verbose_name_plural = _('Operadoras de Telefonia')
 
@@ -677,21 +677,21 @@ class FiliacaoPartidaria(CmjAuditoriaModelMixin):
 
 class StatusProcesso(DescricaoAbstractModel):
 
-    class Meta:
+    class Meta(DescricaoAbstractModel.Meta):
         verbose_name = _('Status de Processo')
         verbose_name_plural = _('Status de Processos')
 
 
 class ClassificacaoProcesso(DescricaoAbstractModel):
 
-    class Meta:
+    class Meta(DescricaoAbstractModel.Meta):
         verbose_name = _('Classificacao de Processo')
         verbose_name_plural = _('Classificações de Processos')
 
 
 class TopicoProcesso(DescricaoAbstractModel):
 
-    class Meta:
+    class Meta(DescricaoAbstractModel.Meta):
         verbose_name = _('Tópico de Processo')
         verbose_name_plural = _('Tópicos de Processos')
 
@@ -704,7 +704,7 @@ class AssuntoProcesso(DescricaoAbstractModel, CmjAuditoriaModelMixin):
         related_name='assuntoprocesso_set',
         on_delete=PROTECT)
 
-    class Meta:
+    class Meta(DescricaoAbstractModel.Meta):
         verbose_name = _('Assunto de Processo')
         verbose_name_plural = _('Assuntos de Processos')
 
@@ -767,6 +767,7 @@ class Processo(CmjSearchMixin, CmjAuditoriaModelMixin):
     class Meta:
         verbose_name = _('Processo')
         verbose_name_plural = _('Processos')
+        ordering = ('titulo', )
 
     def __str__(self):
         return str(self.titulo)

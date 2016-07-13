@@ -107,7 +107,7 @@ class ContatoCrud(DetailMasterCrud):
 
     class BaseMixin(DetailMasterCrud.BaseMixin):
         list_field_names = ['nome', 'nome_social', 'data_nascimento',
-                            'estado_civil', 'sexo', 'identidade_genero', ]
+                            'estado_civil', 'sexo', ]
 
         """def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
@@ -123,7 +123,8 @@ class ContatoCrud(DetailMasterCrud):
                 # migrate_siscam()
                 return HttpResponse('migração executada!')
 
-            return DetailMasterCrud.ListView.get(self, request, *args, **kwargs)
+            return DetailMasterCrud.ListView.get(
+                self, request, *args, **kwargs)
 
     class CreateView(DetailMasterCrud.CreateView):
         form_class = ContatoForm
@@ -402,6 +403,12 @@ class ProcessoMasterCrud(DetailMasterCrud):
     container_field = 'workspace__operadores'
 
     class BaseMixin(DetailMasterCrud.BaseMixin):
+        list_field_names = ['data',
+                            ('titulo', 'contatos'),
+                            'assuntos',
+                            ('status',
+                             'classificacoes',)
+                            ]
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
@@ -422,6 +429,9 @@ class ProcessoMasterCrud(DetailMasterCrud):
 
             kwargs.update({'yaml_layout': self.get_layout()})
             return kwargs
+
+    class ListView(DetailMasterCrud.ListView):
+        form_search_class = ListWithSearchForm
 
     class CreateView(DetailMasterCrud.CreateView):
         form_class = ProcessoForm
@@ -461,6 +471,13 @@ class ProcessoContatoCrud(MasterDetailCrudPermission):
     help_path = 'processo'
     is_m2m = True
     container_field = 'contatos__workspace__operadores'
+
+    class BaseMixin(MasterDetailCrudPermission.BaseMixin):
+        list_field_names = ['data',
+                            'titulo',
+                            'assuntos',
+                            'status',
+                            'classificacoes']
 
     class CreateView(MasterDetailCrudPermission.CreateView):
         layout_key = 'ProcessoLayoutForForm'

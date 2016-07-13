@@ -351,6 +351,7 @@ class ListWithSearchForm(forms.Form):
         fields = ['q']
 
     def __init__(self, *args, **kwargs):
+        super(ListWithSearchForm, self).__init__(*args, **kwargs)
 
         self.helper = FormHelper()
         self.form_class = 'form-inline'
@@ -364,7 +365,6 @@ class ListWithSearchForm(forms.Form):
                     _('Filtrar'), css_class='btn-default btn-lg',
                     type='submit'))
         )
-        super(ListWithSearchForm, self).__init__(*args, **kwargs)
 
 
 class ProcessoForm(ModelForm):
@@ -423,7 +423,7 @@ class ProcessoForm(ModelForm):
                                        'apelido do Contato que você procura.')
 
         self.fields['descricao'].widget = forms.Textarea(
-            attrs={'rows': '5'})
+            attrs={'rows': '8'})
 
         # Utilizando template bootstrap3 customizado
         self.fields['importancia'].widget = forms.RadioSelect()
@@ -473,7 +473,7 @@ class ProcessoContatoForm(ModelForm):
             self.fields['data'].initial = date.today()
 
         self.fields['descricao'].widget = forms.Textarea(
-            attrs={'rows': '5'})
+            attrs={'rows': '8'})
 
         # Utilizando template bootstrap3 customizado
         self.fields['importancia'].widget = forms.RadioSelect()

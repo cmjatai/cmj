@@ -144,7 +144,9 @@ class DetailMasterCrud(Crud):
                     s = ''
                     for j, n in enumerate(name):
                         ss = get_field_display(obj, n)[1]
-                        ss = (' - ' + ss) if ss and j != 0 and s else ss
+                        ss = (
+                            ('<br>' if '<ul>' in ss else ' - ') + ss)\
+                            if ss and j != 0 and s else ss
                         s += ss
                     r.append((s, url))
                 else:
@@ -184,13 +186,53 @@ class DetailMasterCrud(Crud):
                         if q:
                             queryset = queryset.filter(q)
 
+            list_field_names = self.list_field_names
+            o = '1'
+            if 'o' in self.request.GET:
+                o = self.request.GET['o']
+            desc = '-' if o.startswith('-') else ''
+
+            try:
+                fo = list_field_names[
+                    (abs(int(o)) - 1) % len(list_field_names)]
+
+                if not isinstance(fo, str):
+                    fo = fo[0]
+
+                model = self.model
+                fm = model._meta.get_field(fo)
+                if hasattr(fm, 'related_model') and fm.related_model:
+                    rmo = fm.related_model._meta.ordering
+                    if rmo:
+                        rmo = rmo[0]
+                        if not isinstance(rmo, str):
+                            rmo = rmo[0]
+                        fo = '%s__%s' % (fo, rmo)
+
+                fo = desc + fo
+
+                model = self.model
+                mo = model._meta.ordering
+                if mo:
+                    mo = mo[0]
+                    if not isinstance(mo, str):
+                        mo = mo[0]
+                    fo = (fo, mo)
+                if isinstance(fo, str):
+                    fo = (fo, )
+
+                queryset = queryset.order_by(*fo)
+
+            except:
+                pass
+
             if not self.request.user.is_authenticated():
                 return queryset
 
             if self.container_field:
                 params = {}
                 params[self.container_field] = self.request.user.pk
-                return queryset.filter(**params)
+                queryset = queryset.filter(**params)
 
             return queryset
 
@@ -506,12 +548,12 @@ class MasterDetailCrudPermission(DetailMasterCrud):
             return context
 
         def get_queryset(self):
-            qs = super(CrudListView, self).get_queryset()
+            qs = super().get_queryset()
 
             kwargs = {self.crud.parent_field: self.kwargs['pk']}
 
-            if self.container_field:
-                kwargs[self.container_field] = self.request.user.pk
+            """if self.container_field:
+                kwargs[self.container_field] = self.request.user.pk"""
 
             return qs.filter(**kwargs)
 

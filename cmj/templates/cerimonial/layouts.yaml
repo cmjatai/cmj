@@ -133,13 +133,13 @@ AssuntoProcesso:
 Processo:
   {% trans 'Dados Básicos' %}:
   - data:2 titulo importancia:4
-  - descricao status:2 classificacoes:2
   - topicos:4 assuntos
+  - descricao status:2 classificacoes:2
   - observacoes solucao
   - contatos
 ProcessoLayoutForForm:
   {% trans 'Dados Básicos' %}:
   - data:2 titulo importancia:4
-  - descricao status:2 classificacoes:2
   - topicos:4 assuntos
+  - descricao status:2 classificacoes:2
   - observacoes solucao
