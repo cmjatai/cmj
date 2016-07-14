@@ -544,3 +544,27 @@ class ContatoFragmentSearchForm(forms.Form):
                 css_class='form-group-contatos-search'))
         self.helper.form_tag = False
         self.helper.disable_csrf = True
+
+
+class ImpressoEnderecamentoContatoForm(forms.Form):
+    q = forms.CharField(required=False, label='',
+                        widget=forms.TextInput(
+                            attrs={'type': 'search'}))
+
+    class Meta:
+        fields = ['q']
+
+    def __init__(self, *args, **kwargs):
+        super(ImpressoEnderecamentoContatoForm, self).__init__(*args, **kwargs)
+
+        self.helper = FormHelper()
+        self.form_class = 'form-inline'
+        self.helper.form_method = 'GET'
+        self.helper.layout = Layout(
+            FieldWithButtons(
+                Field('q',
+                      placeholder=_('Filtrar Lista')),
+                StrictButton(
+                    _('Filtrar'), css_class='btn-default',
+                    type='submit'))
+        )

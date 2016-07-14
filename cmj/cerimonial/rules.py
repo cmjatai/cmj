@@ -8,7 +8,7 @@ from cmj.cerimonial.models import Perfil, Endereco, Email, Telefone,\
     ProcessoContato
 from cmj.core.models import Trecho
 from cmj.core.rules import menu_contatos, menu_dados_auxiliares, search_trecho,\
-    menu_processos
+    menu_processos, menu_relatorios
 from cmj.globalrules.crud_custom import LIST, ADD, DETAIL, CHANGE, DELETE
 from cmj.globalrules.globalrules import GROUP_SOCIAL_USERS,\
     GROUP_WORKSPACE_OPER_CONTATOS, GROUP_WORKSPACE_MANAGERS,\
@@ -33,13 +33,15 @@ rules_group_workspace_oper_contatos = (
     GROUP_WORKSPACE_OPER_CONTATOS, [
         (get_user_model(), [
             menu_contatos,
-            menu_dados_auxiliares]),
+            menu_dados_auxiliares,
+            menu_relatorios]),
         (Trecho, [search_trecho]),
         (OperadoraTelefonia, [LIST, DETAIL]),
         (NivelInstrucao, [LIST, DETAIL]),
         (EstadoCivil, [LIST, DETAIL]),
         (Partido, [LIST, DETAIL]),
-        (Contato, [LIST, ADD, DETAIL, CHANGE, DELETE]),
+        (Contato, [LIST, ADD, DETAIL, CHANGE, DELETE,
+                   'print_impressoenderecamento']),
         (Endereco, [LIST, ADD, DETAIL, CHANGE, DELETE]),
         (Email, [LIST, ADD, DETAIL, CHANGE, DELETE]),
         (Telefone, [LIST, ADD, DETAIL, CHANGE, DELETE]),
@@ -52,7 +54,8 @@ rules_group_workspace_oper_processos = (
     GROUP_WORKSPACE_OPER_PROCESSOS, [
         (get_user_model(), [
             menu_processos,
-            menu_dados_auxiliares]),
+            menu_dados_auxiliares,
+            menu_relatorios]),
         (AssuntoProcesso, [LIST, ADD, DETAIL, CHANGE, DELETE]),
         (Processo, [LIST, ADD, DETAIL, CHANGE, DELETE]),
         (ProcessoContato, [LIST, ADD, DETAIL, CHANGE, DELETE]),

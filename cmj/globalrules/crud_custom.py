@@ -33,7 +33,8 @@ class PermissionRequiredContainerCrudMixin(PermissionRequiredMixin):
 
     def has_permission(self):
         perms = self.get_permission_required()
-        return self.request.user.has_perms(perms) if perms[0] else True
+        # Torna a view pública se não possuir o atributo permission_required
+        return self.request.user.has_perms(perms) if len(perms) else True
 
     def dispatch(self, request, *args, **kwargs):
         if not self.has_permission():
@@ -53,15 +54,18 @@ class PermissionRequiredContainerCrudMixin(PermissionRequiredMixin):
 
     @cached_property
     def container_field(self):
-        if not hasattr(self.crud, 'container_field'):
+        if hasattr(self, 'crud') and not hasattr(self.crud, 'container_field'):
             self.crud.container_field = ''
-        return self.crud.container_field
+        if hasattr(self, 'crud'):
+            return self.crud.container_field
 
     @cached_property
     def container_field_set(self):
-        if not hasattr(self.crud, 'container_field_set'):
+        if hasattr(self, 'crud') and\
+                not hasattr(self.crud, 'container_field_set'):
             self.crud.container_field_set = ''
-        return self.crud.container_field_set
+        if hasattr(self, 'crud'):
+            return self.crud.container_field_set
 
     @cached_property
     def is_contained(self):
@@ -73,15 +77,18 @@ class DetailMasterCrud(Crud):
     class BaseMixin(CrudBaseMixin):
 
         def __init__(self, **kwargs):
-            self.app_label = self.crud.model._meta.app_label
-            self.model_name = self.crud.model._meta.model_name
+            obj = self.crud if hasattr(self, 'crud') else self
+            self.app_label = obj.model._meta.app_label
+            self.model_name = obj.model._meta.model_name
             if hasattr(self, 'permission_required') and\
                     self.permission_required:
                 self.permission_required = tuple((
                     self.permission(pr) for pr in self.permission_required))
 
-        def permission(self, radical):
-            return '%s%s%s' % (self.app_label, radical, self.model_name)
+        def permission(self, rad):
+            return '%s%s%s' % (self.app_label if rad.endswith('_') else '',
+                               rad,
+                               self.model_name if rad.endswith('_') else '')
 
         @property
         def list_url(self):
@@ -136,7 +143,8 @@ class DetailMasterCrud(Crud):
                 url = self.resolve_url(
                     base.DETAIL, args=(obj.id,)) if i == 0 else None
 
-                if url and hasattr(self.crud, 'is_m2m') and self.crud.is_m2m:
+                if url and hasattr(self, 'crud') and\
+                        hasattr(self.crud, 'is_m2m') and self.crud.is_m2m:
                     url = url + ('?pkk=' + self.kwargs['pk']
                                  if 'pk' in self.kwargs else '')
 
@@ -278,7 +286,8 @@ class DetailMasterCrud(Crud):
                             _('Não é permitido adicionar um registro '
                               'sem estar em uma Área de Trabalho.'))
 
-                    if hasattr(self.crud, 'is_m2m') and self.crud.is_m2m:
+                    if hasattr(self, 'crud') and\
+                            hasattr(self.crud, 'is_m2m') and self.crud.is_m2m:
                         setattr(
                             self.object, container[1], getattr(
                                 container_data, container[1]))
@@ -325,14 +334,16 @@ class DetailMasterCrud(Crud):
             if not self.object_list:
                 return []
             try:
+                obj = self.crud if hasattr(self, 'crud') else self
                 return [getattr(
-                    self.object, self.crud.model_set).model._meta.get_field(
+                    self.object, obj.model_set).model._meta.get_field(
                     fieldname).verbose_name
                     for fieldname in self.list_field_names_set]
             except:
+                obj = self.crud if hasattr(self, 'crud') else self
                 return [getattr(
                     self.object,
-                    self.crud.model_set).model._meta.verbose_name_plural]
+                    obj.model_set).model._meta.verbose_name_plural]
 
         def url_model_set_name(self, suffix):
             return '%s_%s' % (
@@ -341,8 +352,9 @@ class DetailMasterCrud(Crud):
                 suffix)
 
         def resolve_model_set_url(self, suffix, args=None):
+            obj = self.crud if hasattr(self, 'crud') else self
             namespace = getattr(
-                self.object, self.crud.model_set).model._meta.app_config.name
+                self.object, obj.model_set).model._meta.app_config.name
             return reverse('%s:%s' % (
                 namespace, self.url_model_set_name(suffix)),
                 args=args)
@@ -366,13 +378,15 @@ class DetailMasterCrud(Crud):
 
         def get(self, request, *args, **kwargs):
             self.object = self.model.objects.get(pk=kwargs.get('pk'))
-            if hasattr(self.crud, 'model_set') and self.crud.model_set:
+            obj = self.crud if hasattr(self, 'crud') else self
+            if hasattr(obj, 'model_set') and obj.model_set:
                 self.object_list = self.get_queryset()
             context = self.get_context_data(object=self.object)
             return self.render_to_response(context)
 
         def get_queryset(self):
-            queryset = getattr(self.object, self.crud.model_set).all()
+            obj = self.crud if hasattr(self, 'crud') else self
+            queryset = getattr(self.object, obj.model_set).all()
 
             if not self.request.user.is_authenticated():
                 return queryset
@@ -385,7 +399,8 @@ class DetailMasterCrud(Crud):
             return queryset
 
         def get_context_data(self, **kwargs):
-            if hasattr(self.crud, 'model_set') and self.crud.model_set:
+            obj = self.crud if hasattr(self, 'crud') else self
+            if hasattr(obj, 'model_set') and obj.model_set:
                 count = self.object_list.count()
                 context = MultipleObjectMixin.get_context_data(self, **kwargs)
                 context['count'] = count
@@ -415,15 +430,17 @@ class DetailMasterCrud(Crud):
 
         @property
         def model_set_verbose_name(self):
+            obj = self.crud if hasattr(self, 'crud') else self
             return getattr(
                 self.object,
-                self.crud.model_set).model._meta.verbose_name
+                obj.model_set).model._meta.verbose_name
 
         @property
         def model_set_verbose_name_plural(self):
+            obj = self.crud if hasattr(self, 'crud') else self
             return getattr(
                 self.object,
-                self.crud.model_set).model._meta.verbose_name_plural
+                obj.model_set).model._meta.verbose_name_plural
 
     @classonlymethod
     def build(cls, _model, _model_set, _help_path):
@@ -470,10 +487,11 @@ class MasterDetailCrudPermission(DetailMasterCrud):
                 if self.request.user.has_perm(self.permission(DELETE)) else ''
 
         def get_context_data(self, **kwargs):
-            obj = getattr(self, 'object', None)
+            obj = self.crud if hasattr(self, 'crud') else self
+            object = getattr(self, 'object', None)
             parent_object = None
-            if obj:
-                parent_object = getattr(obj, self.crud.parent_field)
+            if object:
+                parent_object = getattr(object, obj.parent_field)
                 if not isinstance(parent_object, Model):
                     if parent_object.count() > 1:
                         if 'pkk' not in self.request.GET:
@@ -514,21 +532,23 @@ class MasterDetailCrudPermission(DetailMasterCrud):
                 self, request, *args, **kwargs)
 
             if 'list' not in request.GET:
+                obj = self.crud if hasattr(self, 'crud') else self
                 count = self.object_list.count()
                 if count == 1:
                     self.object = self.object_list[0]
                     return redirect(
                         self.detail_url + ('?pkk=' + kwargs['pk']
-                                           if self.crud.is_m2m else ''))
+                                           if obj.is_m2m else ''))
             return response
 
         def get_context_data(self, **kwargs):
+            obj = self.crud if hasattr(self, 'crud') else self
             count = self.object_list.count()
             context = CrudListView.get_context_data(self, **kwargs)
             context['count'] = count
 
             parent_model = getattr(
-                self.model, self.crud.parent_field).field.related_model
+                self.model, obj.parent_field).field.related_model
 
             params = {'pk': kwargs['root_pk']}
 
@@ -548,9 +568,10 @@ class MasterDetailCrudPermission(DetailMasterCrud):
             return context
 
         def get_queryset(self):
+            obj = self.crud if hasattr(self, 'crud') else self
             qs = super().get_queryset()
 
-            kwargs = {self.crud.parent_field: self.kwargs['pk']}
+            kwargs = {obj.parent_field: self.kwargs['pk']}
 
             """if self.container_field:
                 kwargs[self.container_field] = self.request.user.pk"""
@@ -569,22 +590,24 @@ class MasterDetailCrudPermission(DetailMasterCrud):
             return r'^(?P<pk>\d+)/%s/create$' % cls.model._meta.model_name
 
         def get_form(self, form_class=None):
+            obj = self.crud if hasattr(self, 'crud') else self
             form = super(CrudCreateView,
                          self).get_form(self.form_class)
-            if not self.crud.is_m2m:
-                field = self.model._meta.get_field(self.crud.parent_field)
+            if not obj.is_m2m:
+                field = self.model._meta.get_field(obj.parent_field)
                 parent = field.related_model.objects.get(pk=self.kwargs['pk'])
-                setattr(form.instance, self.crud.parent_field, parent)
+                setattr(form.instance, obj.parent_field, parent)
             return form
 
         def get_context_data(self, **kwargs):
+            obj = self.crud if hasattr(self, 'crud') else self
             context = DetailMasterCrud.CreateView.get_context_data(
                 self, **kwargs)
 
             params = {'pk': self.kwargs['pk']}
             if self.container_field:
                 parent_model = getattr(
-                    self.model, self.crud.parent_field).field.related_model
+                    self.model, obj.parent_field).field.related_model
 
                 container = self.container_field.split('__')
                 if len(container) > 1:
@@ -595,7 +618,7 @@ class MasterDetailCrudPermission(DetailMasterCrud):
                 except:
                     raise Http404()
             else:
-                field = self.model._meta.get_field(self.crud.parent_field)
+                field = self.model._meta.get_field(obj.parent_field)
                 parent = field.related_model.objects.get(**params)
             if parent:
                 context['title'] = '%s <small>(%s)</small>' % (
@@ -618,8 +641,9 @@ class MasterDetailCrudPermission(DetailMasterCrud):
             return r'^%s/(?P<pk>\d+)/delete$' % cls.model._meta.model_name
 
         def get_success_url(self):
+            obj = self.crud if hasattr(self, 'crud') else self
             parent_object = getattr(
-                self.get_object(), self.crud.parent_field)
+                self.get_object(), obj.parent_field)
             if not isinstance(parent_object, Model):
                 if parent_object.count() > 1:
                     if 'pkk' not in self.request.GET:
@@ -646,9 +670,10 @@ class MasterDetailCrudPermission(DetailMasterCrud):
 
         @property
         def detail_list_url(self):
+            obj = self.crud if hasattr(self, 'crud') else self
             if self.request.user.has_perm(self.permission(LIST)):
                 parent_object = getattr(
-                    self.get_object(), self.crud.parent_field)
+                    self.get_object(), obj.parent_field)
                 if not isinstance(parent_object, Model):
                     if parent_object.count() > 1:
                         if 'pkk' not in self.request.GET:
@@ -669,9 +694,10 @@ class MasterDetailCrudPermission(DetailMasterCrud):
 
         @property
         def detail_create_url(self):
+            obj = self.crud if hasattr(self, 'crud') else self
             if self.request.user.has_perm(self.permission(ADD)):
                 parent_object = getattr(
-                    self.get_object(), self.crud.parent_field)
+                    self.get_object(), obj.parent_field)
                 if not isinstance(parent_object, Model):
                     if parent_object.count() > 1:
                         if 'pkk' not in self.request.GET:

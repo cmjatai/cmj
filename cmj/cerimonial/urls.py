@@ -1,5 +1,6 @@
 from django.conf.urls import url, include
 
+from cmj.cerimonial.reports import ImpressoEnderecamentoContatoView
 from cmj.cerimonial.views import ContatoCrud, TelefoneCrud, EmailCrud,\
     DependenteCrud, LocalTrabalhoCrud, EnderecoCrud, FiliacaoPartidariaCrud,\
     EnderecoPerfilCrud, LocalTrabalhoPerfilCrud, EmailPerfilCrud,\
@@ -49,6 +50,9 @@ urlpatterns = [
         AssuntoProcessoCrud.get_urls()
     )),
 
+    url(r'^reports/cerimonial/enderecamentos',
+        ImpressoEnderecamentoContatoView.as_view(),
+        name='print_impressoenderecamento'),
 
     url(r'^sistema/cerimonial/tipoautoridade/(?P<pk>\d+)/pronomes_form',
         ContatoFragmentFormPronomesView.as_view(), name='list_pronomes'),
@@ -79,6 +83,4 @@ urlpatterns = [
         include(NivelInstrucaoCrud.get_urls())),
     url(r'^sistema/cerimonial/pronometratamento/',
         include(PronomeTratamentoCrud.get_urls())),
-
-
 ]

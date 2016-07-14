@@ -297,6 +297,10 @@ class Contato(CmjSearchMixin, CmjAuditoriaModelMixin):
         verbose_name = _('Contato')
         verbose_name_plural = _('Contatos')
         ordering = ['nome']
+        permissions = (
+            ('print_impressoenderecamento',
+             _('Pode Imprimir Impressos de Endereçamento')),
+        )
 
     def __str__(self):
         return self.nome
