@@ -15,7 +15,8 @@ from image_cropping.widgets import ImageCropWidget, CropWidget
 from sapl.crispy_layout_mixin import to_row
 import django_filters
 
-from cmj.core.models import Trecho, TipoLogradouro, User, OperadorAreaTrabalho
+from cmj.core.models import Trecho, TipoLogradouro, User, OperadorAreaTrabalho,\
+    ImpressoEnderecamento
 
 
 class LoginForm(AuthenticationForm):
@@ -124,3 +125,27 @@ class OperadorAreaTrabalhoForm(ModelForm):
             'grupos_associados'].widget = forms.CheckboxSelectMultiple()
         self.fields['grupos_associados'].queryset = self.fields[
             'grupos_associados'].queryset.order_by('name')
+
+
+class ImpressoEnderecamentoForm(ModelForm):
+
+    class Meta:
+        model = ImpressoEnderecamento
+        fields = ['nome',
+                  'tipo',
+                  'largura_pagina',
+                  'altura_pagina',
+                  'margem_esquerda',
+                  'margem_superior',
+                  'colunasfolha',
+                  'linhasfolha',
+                  'larguraetiqueta',
+                  'alturaetiqueta',
+                  'entre_colunas',
+                  'entre_linhas',
+                  'fontesizebase',
+                  ]
+
+    def __init__(self, *args, **kwargs):
+
+        super(ImpressoEnderecamentoForm, self).__init__(*args, **kwargs)

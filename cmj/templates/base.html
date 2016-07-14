@@ -232,12 +232,13 @@
                         <li class="dropdown-header">{% trans "Tabelas da Área de Trabalho" %}</li>
                         {% if perms.cerimonial.list_assuntoprocesso %}<li class="nav__sub-item"><a href="{% url 'cmj.cerimonial:assuntoprocesso_list' %}">{% model_verbose_name_plural "cmj.cerimonial.models.AssuntoProcesso"%}</a></li>{% endif %}
 
-                        {% if perms.core.menu_tabelas_auxiliares or perms.core.menu_area_trabalho %}
+                        {% if perms.core.menu_tabelas_auxiliares or perms.core.menu_area_trabalho or perms.core.menu_impresso_enderecamento%}
                           <li role="separator" class="divider"></li>
                           <li class="dropdown-header">{% trans "Tabelas do Sistema" %}</li>
                         {% endif %}
                         {% if perms.core.menu_tabelas_auxiliares %}<li class="nav__sub-item"><a href="{% url 'cmj.core:tabelas_auxiliares' %}">{% trans "Tabelas" %}</a></li>{% endif %}
                         {% if perms.core.menu_area_trabalho %}<li class="nav__sub-item"><a href="{% url 'cmj.core:areatrabalho_list' %}">{% trans "Áreas de Trabalho" %}</a></li>{% endif %}
+                        {% if perms.core.menu_impresso_enderecamento %}<li class="nav__sub-item"><a href="{% url 'cmj.core:impressoenderecamento_list' %}">{% trans "Impressos de Endereçamento" %}</a></li>{% endif %}
 
                       </ul>
                     </li>

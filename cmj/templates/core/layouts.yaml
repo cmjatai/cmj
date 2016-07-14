@@ -39,3 +39,11 @@ OperadorAreaTrabalho:
   {% trans 'Operador de Área de Trabalho' %}:
   - user
   - grupos_associados
+ImpressoEnderecamento:
+  {% trans 'Dados Básicos' %}:
+    - nome:8 tipo
+  {% trans 'Sobre a Página' %}:
+    - largura_pagina altura_pagina margem_esquerda margem_superior
+  {% trans 'Sobre a Etiqueta' %}:
+    - colunasfolha linhasfolha entre_colunas entre_linhas
+    - larguraetiqueta alturaetiqueta fontesizebase

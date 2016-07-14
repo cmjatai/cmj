@@ -16,9 +16,10 @@ from sapl.parlamentares.models import Partido, Filiacao
 from whoosh.lang import snowball
 
 from cmj.core.forms import TrechoFilterSet, LogradouroSearchForm,\
-    OperadorAreaTrabalhoForm
+    OperadorAreaTrabalhoForm, ImpressoEnderecamentoForm
 from cmj.core.models import Cep, TipoLogradouro, Logradouro, RegiaoMunicipal,\
-    Distrito, Bairro, Trecho, AreaTrabalho, OperadorAreaTrabalho
+    Distrito, Bairro, Trecho, AreaTrabalho, OperadorAreaTrabalho,\
+    ImpressoEnderecamento
 from cmj.core.rules import rules_patterns
 from cmj.core.serializers import TrechoSearchSerializer, TrechoSerializer
 from cmj.globalrules import globalrules
@@ -136,6 +137,7 @@ class TrechoJsonView(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
 
 class AreaTrabalhoCrud(DetailMasterCrud):
     model = AreaTrabalho
+    model_set = 'operadorareatrabalho_set'
 
     class BaseMixin(DetailMasterCrud.BaseMixin):
 
@@ -266,3 +268,13 @@ class PartidoCrud(DetailMasterCrud):
                 return queryset.filter(**params)
 
             return queryset"""
+
+
+class ImpressoEnderecamentoCrud(DetailMasterCrud):
+    model = ImpressoEnderecamento
+
+    class UpdateView(DetailMasterCrud.UpdateView):
+        form_class = ImpressoEnderecamentoForm
+
+    class CreateView(DetailMasterCrud.CreateView):
+        form_class = ImpressoEnderecamentoForm

@@ -1,3 +1,73 @@
+function ImpressoEnderecamentoRenderer(opts) {
+    $(function() {
+
+
+        var ier = $('body').children(".ier");
+        if (ier.length > 0)
+            $(ier).remove();
+        ier = $('<div class="ier"/>');
+        eb = $('<div class="etiqueta"/>');
+
+        var form = $('form');
+        form.after(ier);
+
+        var resize = function(event) {
+            var largura_pagina = parseFloat(form[0].elements['largura_pagina'].value);
+            var altura_pagina = parseFloat(form[0].elements['altura_pagina'].value);
+
+            var razao = altura_pagina / largura_pagina;
+            var conversao = ier.width() / largura_pagina;
+            ier.height(ier.width() * razao);
+
+            var margem_esquerda = parseFloat(form[0].elements['margem_esquerda'].value) * conversao;
+            var margem_superior = parseFloat(form[0].elements['margem_superior'].value) * conversao;
+
+            var colunasfolha = parseInt(form[0].elements['colunasfolha'].value);
+            var linhasfolha = parseInt(form[0].elements['linhasfolha'].value);
+
+            var entre_colunas = parseFloat(form[0].elements['entre_colunas'].value) * conversao;
+            var entre_linhas = parseFloat(form[0].elements['entre_linhas'].value) * conversao;
+
+            var larguraetiqueta = parseFloat(form[0].elements['larguraetiqueta'].value) * conversao;
+            var alturaetiqueta = parseFloat(form[0].elements['alturaetiqueta'].value) * conversao;
+
+            var total_etiquetas = colunasfolha * linhasfolha;
+
+            var etiquetas = $('.ier .etiqueta');
+            while (etiquetas.length < total_etiquetas) {
+                etiquetas.push(eb.clone())
+                ier.append(etiquetas[etiquetas.length-1]);
+            }
+            while ($('.ier .etiqueta').length > total_etiquetas)
+                $('.ier .etiqueta').last().remove();
+            etiquetas = $('.ier .etiqueta');
+            etiquetas.width(larguraetiqueta);
+            etiquetas.height(alturaetiqueta);
+
+            for (var i = 0; i < etiquetas.length; i++) {
+                var left = margem_esquerda;
+                var top = margem_superior;
+
+                var quociente = i / colunasfolha | 0;
+                var resto = i % colunasfolha;
+
+                console.log(quociente + ' = '+ resto)
+
+                if (resto > 0)
+                    left += (resto) * entre_colunas + (resto) * larguraetiqueta;
+                if (quociente > 0)
+                    top += (quociente) * entre_linhas + (quociente) * alturaetiqueta;
+                etiquetas[i].style.left = left + 'px';
+                etiquetas[i].style.top = top + 'px';
+            }
+        }
+        $(window).resize(resize);
+        form.change(resize);
+        $(window).trigger('resize');
+    });
+}
+
+
 
 
 /*function refreshMask() {

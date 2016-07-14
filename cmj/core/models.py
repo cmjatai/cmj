@@ -135,7 +135,8 @@ class User(AbstractBaseUser, PermissionsMixin):
             raise PermissionDenied(
                 _('Você não possui permissão para se autoremover do Portal!'))
 
-        return AbstractBaseUser.delete(self, using=using, keep_parents=keep_parents)
+        return AbstractBaseUser.delete(
+            self, using=using, keep_parents=keep_parents)
 
 
 class CmjSearchMixin(models.Model):
@@ -488,3 +489,77 @@ class Trecho(CmjModelMixin):
         return '%s%s%s%s%s%s%s%s' % (
             tipo, logradouro, bairro, distrito, rm, municipio, uf, join_cep
         )
+
+
+class ImpressoEnderecamento(models.Model):
+    nome = models.CharField(max_length=254, verbose_name='Nome do Impresso')
+
+    TIPO_CHOICES = [
+        ('ET', _('Folha de Etiquetas')),
+        ('EV', _('Envelopes'))]
+
+    tipo = models.CharField(
+        max_length=2,
+        default='ET',
+        choices=TIPO_CHOICES, verbose_name='Tipo do Impresso')
+
+    largura_pagina = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        verbose_name=_('Largura da Página'),
+        help_text=_('Em centímetros'))
+    altura_pagina = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        verbose_name=_('Altura da Página'),
+        help_text=_('Em centímetros'))
+
+    margem_esquerda = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        verbose_name=_('Margem Esquerda'),
+        help_text=_('Em centímetros'))
+    margem_superior = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        verbose_name=_('Margem Superior'),
+        help_text=_('Em centímetros'))
+
+    colunasfolha = models.PositiveSmallIntegerField(
+        verbose_name=_('Colunas'))
+    linhasfolha = models.PositiveSmallIntegerField(
+        verbose_name=_('Linhas'))
+
+    larguraetiqueta = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        verbose_name=_('Largura da Etiqueta'),
+        help_text=_('Em centímetros'))
+    alturaetiqueta = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        verbose_name=_('Altura da Etiquta'),
+        help_text=_('Em centímetros'))
+
+    entre_colunas = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        verbose_name=_('Distância Entre Colunas'),
+        help_text=_('Em centímetros'))
+    entre_linhas = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        verbose_name=_('Distância Entre Linhas'),
+        help_text=_('Em centímetros'))
+
+    fontesizebase = models.DecimalField(
+        max_digits=5, decimal_places=2,
+        verbose_name=_('Tamanho da Letra'),
+        help_text=_('Em Pixels'))
+
+    class Meta:
+        verbose_name = _('Impresso para Endereçamento')
+        verbose_name_plural = _("Impressos para Endereçamento")
+
+    def __str__(self):
+        return self.nome

@@ -1,0 +1,17 @@
+{% extends "crud/form.html" %}
+{% load i18n crispy_forms_tags %}
+
+{% block extra_js %}
+
+  <script type="text/javascript">
+
+
+    $(document).ready(function(){
+        $(this).on("keypress", "form", function(event) {
+            return event.keyCode != 13;
+        });
+        ImpressoEnderecamentoRenderer();
+    });
+
+  </script>
+{% endblock %}
