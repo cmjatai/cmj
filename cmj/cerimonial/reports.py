@@ -1,7 +1,9 @@
 
+from datetime import date
 from math import ceil, floor
 
 from braces.views import PermissionRequiredMixin
+from django.contrib import messages
 from django.http.response import HttpResponse
 from django.template.defaultfilters import lower
 from django.utils.encoding import force_text
@@ -43,9 +45,12 @@ class ImpressoEnderecamentoContatoView(PermissionRequiredMixin, FilterView):
         self.filterset = self.get_filterset(filterset_class)
         self.object_list = self.filterset.qs
 
-        if 'print' not in request.GET:
+        if 'print' not in request.GET or not self.object_list.exists():
             context = self.get_context_data(filter=self.filterset,
                                             object_list=self.object_list)
+            if not self.object_list.exists():
+                messages.error(request, _('Não existe Contatos com as '
+                                          'condições definidas na busca!'))
             return self.render_to_response(context)
 
         response = HttpResponse(content_type='application/pdf')
@@ -99,6 +104,10 @@ class ImpressoEnderecamentoContatoView(PermissionRequiredMixin, FilterView):
         stylesheet.add(ParagraphStyle(name='nome_style',
                                       fontName="Helvetica-Bold",
                                       fontSize=fs,
+                                      leading=fs * 1.3))
+        stylesheet.add(ParagraphStyle(name='endereco_style',
+                                      fontName="Helvetica",
+                                      fontSize=fs * 0.9,
                                       leading=fs))
 
         pagesize = (float(impresso.largura_pagina) * cm,
@@ -162,8 +171,26 @@ class ImpressoEnderecamentoContatoView(PermissionRequiredMixin, FilterView):
                         contato.sexo)), stylesheet['pronome_style']))
 
         story.append(Paragraph(contato.nome, stylesheet['nome_style']))
+
+        endpref = contato.endereco_set.filter(
+            preferencial=True).first()
+        if endpref:
+            endereco = endpref.endereco +\
+                (' - ' + endpref.numero if endpref.numero else '') +\
+                (' - ' + endpref.complemento if endpref.complemento else '')
+
+            story.append(Paragraph(endereco, stylesheet['endereco_style']))
+
+            b_m_uf = '%s - %s-%s' % (endpref.bairro,
+                                     endpref.municipio.nome,
+                                     endpref.uf)
+
+            story.append(Paragraph(b_m_uf, stylesheet['endereco_style']))
+            story.append(Paragraph(endpref.cep, stylesheet['endereco_style']))
+
         return story
 
+    # obsoleto
     def drawText(self, p, x, y, contato):
 
         fs = int(self.impresso.fontsize)

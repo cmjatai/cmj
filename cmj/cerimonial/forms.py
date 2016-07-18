@@ -21,7 +21,7 @@ from django.forms.models import ModelForm
 from django.utils.translation import ugettext_lazy as _
 from django_filters.filters import CharFilter, ChoiceFilter, NumberFilter,\
     MethodFilter, DateFromToRangeFilter, ModelChoiceFilter, RangeFilter
-from django_filters.filterset import FilterSet
+from django_filters.filterset import FilterSet, STRICTNESS
 from sapl.crispy_layout_mixin import to_column, SaplFormLayout, to_fieldsets,\
     form_actions, to_row
 from sapl.parlamentares.models import Municipio
@@ -609,18 +609,11 @@ class MethodRangeFilter(MethodFilter, RangeFilter):
 
 
 class SubmitFilterPrint(BaseInput):
-    """
-    Used to create a Submit button descriptor for the {% crispy %} template tag::
 
-        submit = Submit('Search the Site', 'search this site')
-
-    .. note:: The first argument is also slugified and turned into the id for the submit button.
-    """
     input_type = 'submit'
 
     def __init__(self, *args, **kwargs):
-        self.field_classes = 'submit submitButton' if get_template_pack(
-        ) == 'uni_form' else 'btn'
+        self.field_classes = 'btn'
         super(SubmitFilterPrint, self).__init__(*args, **kwargs)
 
 
@@ -657,19 +650,26 @@ class ImpressoEnderecamentoContatoFilterSet(FilterSet):
         label=_('Idade entre:'),
         widget=RangeWidgetNumber)
 
-    def filter_idade(self, queryset, value):
-        if not value.start or not value.stop:
-            return queryset
+    strict = STRICTNESS.IGNORE
 
-        idi = int(value.start)
-        idf = int(value.stop)
+    def clean_idade(self):
+        pass
+
+    def filter_idade(self, queryset, value):
+        idi = int(value.start) if value.start is not None else 0
+        idf = int(value.stop) if value.stop is not None else 2014
+
+        if idi > idf:
+            a = idi
+            idi = idf
+            idf = a
 
         # lim inicial-dt.mais antiga
-        li = date.today() - relativedelta(years=idf)
+        li = date.today() - relativedelta(years=idf + 1)
         # lim final - dt. mais nova
         lf = date.today() - relativedelta(years=idi)
 
-        return queryset.filter(data_nascimento__gte=li,
+        return queryset.filter(data_nascimento__gt=li,
                                data_nascimento__lte=lf)
 
     def filter_search(self, queryset, value):
@@ -697,6 +697,10 @@ class ImpressoEnderecamentoContatoFilterSet(FilterSet):
 
         now = datetime.datetime.strptime(value[0], "%d/%m/%Y").date()
         then = datetime.datetime.strptime(value[1], "%d/%m/%Y").date()
+        if now > then:
+            a = now
+            now = then
+            then = a
 
         # Build the list of month/day tuples.
         monthdays = [(now.month, now.day)]
@@ -725,10 +729,10 @@ class ImpressoEnderecamentoContatoFilterSet(FilterSet):
                   'data_nascimento',
                   'tipo_autoridade', ]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, data=None, queryset=None, prefix=None, strict=None):
 
         super(ImpressoEnderecamentoContatoFilterSet, self).__init__(
-            *args, **kwargs)
+            data=data, queryset=queryset, prefix=prefix, strict=strict)
 
         row1 = to_row([
             ('search', 4),

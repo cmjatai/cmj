@@ -24,7 +24,7 @@
               {{ obj.nome|safe }}
           </td>
           <td>
-              {{ obj.data_nascimento }}
+              {{ obj.data_nascimento }}<small><small> - {{obj.data_nascimento|age }}</small></small>
           </td>
         </tr>
       {% endfor %}
