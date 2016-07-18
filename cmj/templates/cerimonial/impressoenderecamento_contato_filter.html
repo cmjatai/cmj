@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load i18n common_tags crispy_forms_tags%}
+
+{% block base_content %}
+  <div class="context-actions clearfix">
+      {% if filter.form %}
+        {% crispy filter.form %}
+      {% endif %}
+  </div>
+  {% block extra_content %} {% endblock %}
+  <div class="container-table">
+    <div class="result-count">{% blocktrans with verbose_name_plural=view.verbose_name_plural %}Total de {{ verbose_name_plural }}: <strong>{{count}}</strong>{% endblocktrans %}</div>
+    <table class="table table-striped table-hover">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Data de Nascimento</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for obj in page_obj %}
+        <tr>
+          <td>
+              {{ obj.nome|safe }}
+          </td>
+          <td>
+              {{ obj.data_nascimento }}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+    </table>
+  </div>
+  {% include "paginacao.html" %}
+{% endblock %}
+
+{% block extra_js %}
+  <script type="text/javascript">
+    $(document).on("keypress", "form", function(event) {
+        return event.keyCode != 10003;
+    });
+  </script>
+{% endblock %}

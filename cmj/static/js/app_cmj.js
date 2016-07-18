@@ -14,22 +14,23 @@ function ImpressoEnderecamentoRenderer(opts) {
         var resize = function(event) {
             var largura_pagina = parseFloat(form[0].elements['largura_pagina'].value);
             var altura_pagina = parseFloat(form[0].elements['altura_pagina'].value);
+            var rotate = form[0].elements['rotate'].value == 'True';
 
             var razao = altura_pagina / largura_pagina;
             var conversao = ier.width() / largura_pagina;
             ier.height(ier.width() * razao);
 
-            var margem_esquerda = parseFloat(form[0].elements['margem_esquerda'].value) * conversao;
-            var margem_superior = parseFloat(form[0].elements['margem_superior'].value) * conversao;
+            var margem_esquerda = parseFloat(form[0].elements[rotate?'margem_superior':'margem_esquerda'].value) * conversao;
+            var margem_superior = parseFloat(form[0].elements[rotate?'margem_esquerda':'margem_superior'].value) * conversao;
 
             var colunasfolha = parseInt(form[0].elements['colunasfolha'].value);
             var linhasfolha = parseInt(form[0].elements['linhasfolha'].value);
 
-            var entre_colunas = parseFloat(form[0].elements['entre_colunas'].value) * conversao;
-            var entre_linhas = parseFloat(form[0].elements['entre_linhas'].value) * conversao;
+            var entre_colunas = parseFloat(form[0].elements[rotate?'entre_linhas':'entre_colunas'].value) * conversao;
+            var entre_linhas = parseFloat(form[0].elements[rotate?'entre_colunas':'entre_linhas'].value) * conversao;
 
-            var larguraetiqueta = parseFloat(form[0].elements['larguraetiqueta'].value) * conversao;
-            var alturaetiqueta = parseFloat(form[0].elements['alturaetiqueta'].value) * conversao;
+            var larguraetiqueta = parseFloat(form[0].elements[rotate?'alturaetiqueta':'larguraetiqueta'].value) * conversao;
+            var alturaetiqueta = parseFloat(form[0].elements[rotate?'larguraetiqueta':'alturaetiqueta'].value) * conversao;
 
             var total_etiquetas = colunasfolha * linhasfolha;
 
@@ -57,8 +58,12 @@ function ImpressoEnderecamentoRenderer(opts) {
                     left += (resto) * entre_colunas + (resto) * larguraetiqueta;
                 if (quociente > 0)
                     top += (quociente) * entre_linhas + (quociente) * alturaetiqueta;
+
                 etiquetas[i].style.left = left + 'px';
-                etiquetas[i].style.top = top + 'px';
+                if (rotate)
+                    etiquetas[i].style.bottom = top + 'px';
+                else
+                    etiquetas[i].style.top = top + 'px';
             }
         }
         $(window).resize(resize);

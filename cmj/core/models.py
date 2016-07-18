@@ -14,7 +14,7 @@ from sapl.parlamentares.models import Municipio, Parlamentar
 
 from cmj.core.rules import SEARCH_TRECHO
 from cmj.globalrules.globalrules import rules, GROUP_SOCIAL_USERS
-from cmj.utils import get_settings_auth_user_model, normalize
+from cmj.utils import get_settings_auth_user_model, normalize, YES_NO_CHOICES
 
 from .rules import MENU_PERMS_FOR_USERS
 
@@ -552,10 +552,15 @@ class ImpressoEnderecamento(models.Model):
         verbose_name=_('Distância Entre Linhas'),
         help_text=_('Em centímetros'))
 
-    fontesizebase = models.DecimalField(
+    fontsize = models.DecimalField(
         max_digits=5, decimal_places=2,
         verbose_name=_('Tamanho da Letra'),
         help_text=_('Em Pixels'))
+
+    rotate = models.BooleanField(
+        default=False,
+        choices=YES_NO_CHOICES,
+        verbose_name=_('Rotacionar Texto'))
 
     class Meta:
         verbose_name = _('Impresso para Endereçamento')

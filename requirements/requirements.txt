@@ -32,3 +32,4 @@ django-haystack
 Whoosh==2.7.0
 elasticsearch
 elasticstack
+python-dateutil

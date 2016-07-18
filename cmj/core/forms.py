@@ -143,9 +143,12 @@ class ImpressoEnderecamentoForm(ModelForm):
                   'alturaetiqueta',
                   'entre_colunas',
                   'entre_linhas',
-                  'fontesizebase',
+                  'fontsize',
+                  'rotate'
                   ]
 
     def __init__(self, *args, **kwargs):
 
         super(ImpressoEnderecamentoForm, self).__init__(*args, **kwargs)
+        self.fields['rotate'].widget = forms.RadioSelect()
+        self.fields['rotate'].inline_class = True

@@ -1,23 +1,37 @@
-from datetime import date
+from _functools import reduce
+from datetime import date, timedelta
+import datetime
+import decimal
+import operator
 
 from crispy_forms.bootstrap import InlineRadios, FieldWithButtons, StrictButton
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Field, Row, Layout, Fieldset, Div
+from crispy_forms.layout import Field, Row, Layout, Fieldset, Div, Button,\
+    Submit, BaseInput
 from crispy_forms.templatetags.crispy_forms_field import css_class
+from crispy_forms.utils import get_template_pack
+from dateutil.relativedelta import relativedelta
 from django import forms
+from django.core.exceptions import ValidationError
+from django.db import models
 from django.db.models import Q
+from django.db.models.expressions import Func
 from django.forms import widgets
 from django.forms.models import ModelForm
 from django.utils.translation import ugettext_lazy as _
-from sapl.crispy_layout_mixin import to_column, SaplFormLayout, to_fieldsets
+from django_filters.filters import CharFilter, ChoiceFilter, NumberFilter,\
+    MethodFilter, DateFromToRangeFilter, ModelChoiceFilter, RangeFilter
+from django_filters.filterset import FilterSet
+from sapl.crispy_layout_mixin import to_column, SaplFormLayout, to_fieldsets,\
+    form_actions, to_row
 from sapl.parlamentares.models import Municipio
 
 from cmj import settings
 from cmj.cerimonial.models import LocalTrabalho, Endereco,\
     TipoAutoridade, PronomeTratamento, Contato, Perfil, Processo,\
     IMPORTANCIA_CHOICE, AssuntoProcesso, StatusProcesso, ProcessoContato
-from cmj.core.models import Trecho
-from cmj.utils import normalize
+from cmj.core.models import Trecho, ImpressoEnderecamento
+from cmj.utils import normalize, YES_NO_CHOICES
 
 
 class ListTextWidget(forms.TextInput):
@@ -546,25 +560,207 @@ class ContatoFragmentSearchForm(forms.Form):
         self.helper.disable_csrf = True
 
 
-class ImpressoEnderecamentoContatoForm(forms.Form):
-    q = forms.CharField(required=False, label='',
-                        widget=forms.TextInput(
-                            attrs={'type': 'search'}))
+class RangeWidgetNumber(forms.MultiWidget):
 
-    class Meta:
-        fields = ['q']
+    def __init__(self, attrs=None):
+        widgets = (forms.NumberInput(
+            attrs={'class': 'numberinput',
+                   'placeholder': 'Inicial'}),
+                   forms.NumberInput(
+            attrs={'class': 'numberinput',
+                   'placeholder': 'Final'}))
+        super(RangeWidgetNumber, self).__init__(widgets, attrs)
+
+    def decompress(self, value):
+        if value:
+            return [value.start, value.stop]
+        return [None, None]
+
+    def format_output(self, rendered_widgets):
+        html = '<div class="col-sm-6">%s</div><div class="col-sm-6">%s</div>'\
+            % tuple(rendered_widgets)
+        return '<div class="row">%s</div>' % html
+
+
+class RangeWidgetOverride(forms.MultiWidget):
+
+    def __init__(self, attrs=None):
+        widgets = (forms.DateInput(format='%d/%m/%Y',
+                                   attrs={'class': 'dateinput',
+                                          'placeholder': 'Inicial'}),
+                   forms.DateInput(format='%d/%m/%Y',
+                                   attrs={'class': 'dateinput',
+                                          'placeholder': 'Final'}))
+        super(RangeWidgetOverride, self).__init__(widgets, attrs)
+
+    def decompress(self, value):
+        if value:
+            return [value.start, value.stop]
+        return [None, None]
+
+    def format_output(self, rendered_widgets):
+        html = '<div class="col-sm-6">%s</div><div class="col-sm-6">%s</div>'\
+            % tuple(rendered_widgets)
+        return '<div class="row">%s</div>' % html
+
+
+class MethodRangeFilter(MethodFilter, RangeFilter):
+    pass
+
+
+class SubmitFilterPrint(BaseInput):
+    """
+    Used to create a Submit button descriptor for the {% crispy %} template tag::
+
+        submit = Submit('Search the Site', 'search this site')
+
+    .. note:: The first argument is also slugified and turned into the id for the submit button.
+    """
+    input_type = 'submit'
 
     def __init__(self, *args, **kwargs):
-        super(ImpressoEnderecamentoContatoForm, self).__init__(*args, **kwargs)
+        self.field_classes = 'submit submitButton' if get_template_pack(
+        ) == 'uni_form' else 'btn'
+        super(SubmitFilterPrint, self).__init__(*args, **kwargs)
 
-        self.helper = FormHelper()
-        self.form_class = 'form-inline'
-        self.helper.form_method = 'GET'
-        self.helper.layout = Layout(
-            FieldWithButtons(
-                Field('q',
-                      placeholder=_('Filtrar Lista')),
-                StrictButton(
-                    _('Filtrar'), css_class='btn-default',
-                    type='submit'))
+
+def filter_impresso(queryset, value):
+    return queryset
+
+
+class ImpressoEnderecamentoContatoFilterSet(FilterSet):
+
+    filter_overrides = {models.DateField: {
+        'filter_class': MethodFilter,
+        'extra': lambda f: {
+            'label': '%s (%s)' % (f.verbose_name, _('Inicial - Final')),
+            'widget': RangeWidgetOverride}
+    }}
+
+    FEMININO = 'F'
+    MASCULINO = 'M'
+    AMBOS = ''
+    SEXO_CHOICE = ((AMBOS, _('Ambos')),
+                   (FEMININO, _('Feminino')),
+                   (MASCULINO, _('Masculino')))
+
+    FILHOS_CHOICE = [(None, _('Ambos'))] + YES_NO_CHOICES
+
+    search = MethodFilter()
+    sexo = ChoiceFilter(choices=SEXO_CHOICE)
+    tem_filhos = ChoiceFilter(choices=FILHOS_CHOICE)
+
+    impresso = ModelChoiceFilter(required=True,
+                                 queryset=ImpressoEnderecamento.objects.all(),
+                                 action=filter_impresso)
+    idade = MethodRangeFilter(
+        label=_('Idade entre:'),
+        widget=RangeWidgetNumber)
+
+    def filter_idade(self, queryset, value):
+        if not value.start or not value.stop:
+            return queryset
+
+        idi = int(value.start)
+        idf = int(value.stop)
+
+        # lim inicial-dt.mais antiga
+        li = date.today() - relativedelta(years=idf)
+        # lim final - dt. mais nova
+        lf = date.today() - relativedelta(years=idi)
+
+        return queryset.filter(data_nascimento__gte=li,
+                               data_nascimento__lte=lf)
+
+    def filter_search(self, queryset, value):
+
+        query = normalize(value)
+
+        query = query.split(' ')
+        if query:
+            q = Q()
+            for item in query:
+                if not item:
+                    continue
+                q = q & Q(search__icontains=item)
+
+            if q:
+                queryset = queryset.filter(q)
+        return queryset
+
+    def filter_data_nascimento(self, queryset, value):
+        #_where = "date_part('year', age(timestamp '%s', data_nascimento)) != date_part('year', age(timestamp '%s', data_nascimento))"
+        # return queryset.extra(where=_where, params=value)
+
+        if not value[0] or not value[1]:
+            return queryset
+
+        now = datetime.datetime.strptime(value[0], "%d/%m/%Y").date()
+        then = datetime.datetime.strptime(value[1], "%d/%m/%Y").date()
+
+        # Build the list of month/day tuples.
+        monthdays = [(now.month, now.day)]
+        while now <= then:
+            monthdays.append((now.month, now.day))
+            now += timedelta(days=1)
+
+        # Tranform each into queryset keyword args.
+        monthdays = (dict(zip(("data_nascimento__month", "data_nascimento__day"), t))
+                     for t in monthdays)
+
+        # Compose the djano.db.models.Q objects together for a single query.
+        query = reduce(operator.or_, (Q(**d) for d in monthdays))
+
+        # Run the query.
+        return queryset.extra(select={
+            'month': 'extract( month from data_nascimento )',
+            'day': 'extract( day from data_nascimento )', }
+        ).order_by('month', 'day', 'nome').filter(query)
+
+    class Meta:
+        model = Contato
+        fields = ['search',
+                  'sexo',
+                  'tem_filhos',
+                  'data_nascimento',
+                  'tipo_autoridade', ]
+
+    def __init__(self, *args, **kwargs):
+
+        super(ImpressoEnderecamentoContatoFilterSet, self).__init__(
+            *args, **kwargs)
+
+        row1 = to_row([
+            ('search', 4),
+            ('sexo', 2),
+            ('tem_filhos', 2),
+            ('data_nascimento', 4)])
+
+        row_action = to_row([
+            ('tipo_autoridade', 3),
+            ('impresso', 3),
+            ('idade', 3),
+            (Div(SubmitFilterPrint(
+                'filter',
+                value=_('Filtrar'), css_class='btn-default',
+                type='submit'),
+                SubmitFilterPrint(
+                'print',
+                value=_('Imprimir'), css_class='btn-primary',
+                type='submit'), css_class='btn-group pull-right'), 3),
+        ])
+
+        self.form.helper = FormHelper()
+        self.form.helper.form_method = 'GET'
+        self.form.helper.layout = Layout(
+            row1,
+            row_action
         )
+
+        self.form.fields['search'].label = _(
+            'Filtrar por Nome/Nome Social/Apelido')
+        self.form.fields['data_nascimento'].label = '%s (%s)' % (
+            _('Data de Aniversário'), _('Inicial - Final'))
+
+        self.form.fields['tem_filhos'].label = _('Com filhos?')
+        self.form.fields['tem_filhos'].choices[0] = (None, _('Ambos'))
