@@ -18,6 +18,7 @@ from django.db.models import Q
 from django.db.models.expressions import Func
 from django.forms import widgets
 from django.forms.models import ModelForm
+from django.http.request import QueryDict
 from django.utils.translation import ugettext_lazy as _
 from django_filters.filters import CharFilter, ChoiceFilter, NumberFilter,\
     MethodFilter, DateFromToRangeFilter, ModelChoiceFilter, RangeFilter
@@ -608,6 +609,14 @@ class MethodRangeFilter(MethodFilter, RangeFilter):
     pass
 
 
+class MethodChoiceFilter(MethodFilter, ChoiceFilter):
+    pass
+
+
+class MethodNumberFilter(MethodFilter, NumberFilter):
+    pass
+
+
 class SubmitFilterPrint(BaseInput):
 
     input_type = 'submit'
@@ -637,27 +646,65 @@ class ImpressoEnderecamentoContatoFilterSet(FilterSet):
                    (FEMININO, _('Feminino')),
                    (MASCULINO, _('Masculino')))
 
+    DEPOIS_PRONOME = 'DP'
+    LINHA_NOME = 'LN'
+    DEPOIS_NOME = 'DN'
+    LOCAL_CARGO_CHOICE = ((DEPOIS_PRONOME, _('Depois do Pronome '
+                                             'de tratamento')),
+                          (LINHA_NOME, _('Antes do Nome do Contato')),
+                          (DEPOIS_NOME, _('Entre o Nome do Contato '
+                                          'e seu Endereço')))
+
     FILHOS_CHOICE = [(None, _('Ambos'))] + YES_NO_CHOICES
 
     search = MethodFilter()
     sexo = ChoiceFilter(choices=SEXO_CHOICE)
     tem_filhos = ChoiceFilter(choices=FILHOS_CHOICE)
-
-    impresso = ModelChoiceFilter(required=True,
-                                 queryset=ImpressoEnderecamento.objects.all(),
-                                 action=filter_impresso)
     idade = MethodRangeFilter(
         label=_('Idade entre:'),
         widget=RangeWidgetNumber)
 
-    strict = STRICTNESS.IGNORE
+    impresso = ModelChoiceFilter(
+        required=False,
+        queryset=ImpressoEnderecamento.objects.all(),
+        action=filter_impresso)
+    imprimir_pronome = MethodChoiceFilter(
+        choices=YES_NO_CHOICES,
+        initial=False)
+    imprimir_cargo = MethodChoiceFilter(
+        choices=YES_NO_CHOICES, initial=False)
 
-    def clean_idade(self):
-        pass
+    fontsize = MethodNumberFilter(
+        label=_('Tamanho da Fonte'), initial='',
+        max_value=100, min_value=0, max_digits=3, decimal_places=0,)
+
+    nome_maiusculo = MethodChoiceFilter(
+        label=_('Nome em Maiúsculo'),
+        choices=YES_NO_CHOICES, initial=False)
+
+    local_cargo = MethodChoiceFilter(
+        label=_('Local para imprimir o Cargo'),
+        choices=LOCAL_CARGO_CHOICE, initial=False)
+
+    def filter_fontsize(self, queryset, value):
+        return queryset
+
+    def filter_local_cargo(self, queryset, value):
+        return queryset
+
+    def filter_imprimir_pronome(self, queryset, value):
+        return queryset
+
+    def filter_imprimir_cargo(self, queryset, value):
+        return queryset
+
+    def filter_nome_maiusculo(self, queryset, value):
+        return queryset
 
     def filter_idade(self, queryset, value):
         idi = int(value.start) if value.start is not None else 0
-        idf = int(value.stop) if value.stop is not None else 2014
+        idf = int(
+            value.stop) if value.stop is not None else date.today().year - 2
 
         if idi > idf:
             a = idi
@@ -709,7 +756,8 @@ class ImpressoEnderecamentoContatoFilterSet(FilterSet):
             now += timedelta(days=1)
 
         # Tranform each into queryset keyword args.
-        monthdays = (dict(zip(("data_nascimento__month", "data_nascimento__day"), t))
+        monthdays = (dict(zip(("data_nascimento__month",
+                               "data_nascimento__day"), t))
                      for t in monthdays)
 
         # Compose the djano.db.models.Q objects together for a single query.
@@ -727,44 +775,69 @@ class ImpressoEnderecamentoContatoFilterSet(FilterSet):
                   'sexo',
                   'tem_filhos',
                   'data_nascimento',
-                  'tipo_autoridade', ]
+                  'tipo_autoridade']
 
-    def __init__(self, data=None, queryset=None, prefix=None, strict=None):
+    def __init__(self, data=None,
+                 queryset=None, prefix=None, strict=None, **kwargs):
 
         super(ImpressoEnderecamentoContatoFilterSet, self).__init__(
-            data=data, queryset=queryset, prefix=prefix, strict=strict)
+            data=data,
+            queryset=queryset, prefix=prefix, strict=strict, **kwargs)
 
-        row1 = to_row([
-            ('search', 4),
-            ('sexo', 2),
-            ('tem_filhos', 2),
-            ('data_nascimento', 4)])
-
-        row_action = to_row([
-            ('tipo_autoridade', 3),
-            ('impresso', 3),
-            ('idade', 3),
-            (Div(SubmitFilterPrint(
-                'filter',
-                value=_('Filtrar'), css_class='btn-default',
-                type='submit'),
-                SubmitFilterPrint(
-                'print',
-                value=_('Imprimir'), css_class='btn-primary',
-                type='submit'), css_class='btn-group pull-right'), 3),
+        col1 = to_row([
+            ('search', 12),
+            ('sexo', 3),
+            ('tem_filhos', 3),
+            ('data_nascimento', 6),
+            ('tipo_autoridade', 6),
+            ('idade', 6),
         ])
+
+        col2 = to_row([
+            ('impresso', 12),
+            ('fontsize', 4),
+            ('nome_maiusculo', 4),
+            ('imprimir_pronome', 4),
+            ('imprimir_cargo', 5),
+            ('local_cargo', 7),
+
+        ])
+
+        row = to_row(
+            [(Fieldset(
+                _('Informações para Seleção de Contatos'),
+                col1,
+                to_row([(SubmitFilterPrint(
+                    'filter',
+                    value=_('Filtrar'), css_class='btn-default pull-right',
+                    type='submit'), 12)])), 6),
+             (Fieldset(
+                 _('Informações para Impressão'),
+                 col2,
+                 to_row([(SubmitFilterPrint(
+                     'print',
+                     value=_('Imprimir'), css_class='btn-primary pull-right',
+                     type='submit'), 12)])), 6)])
 
         self.form.helper = FormHelper()
         self.form.helper.form_method = 'GET'
         self.form.helper.layout = Layout(
-            row1,
-            row_action
+            row,
         )
 
         self.form.fields['search'].label = _(
             'Filtrar por Nome/Nome Social/Apelido')
         self.form.fields['data_nascimento'].label = '%s (%s)' % (
-            _('Data de Aniversário'), _('Inicial - Final'))
+            _('Aniversário'), _('Inicial - Final'))
 
         self.form.fields['tem_filhos'].label = _('Com filhos?')
         self.form.fields['tem_filhos'].choices[0] = (None, _('Ambos'))
+
+        self.form.fields['imprimir_pronome'].widget = forms.RadioSelect()
+        self.form.fields['imprimir_pronome'].inline_class = True
+
+        self.form.fields['imprimir_cargo'].widget = forms.RadioSelect()
+        self.form.fields['imprimir_cargo'].inline_class = True
+
+        self.form.fields['nome_maiusculo'].widget = forms.RadioSelect()
+        self.form.fields['nome_maiusculo'].inline_class = True

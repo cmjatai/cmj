@@ -4,6 +4,7 @@ from math import ceil, floor
 
 from braces.views import PermissionRequiredMixin
 from django.contrib import messages
+from django.forms.utils import ErrorList
 from django.http.response import HttpResponse
 from django.template.defaultfilters import lower
 from django.utils.encoding import force_text
@@ -35,31 +36,39 @@ class ImpressoEnderecamentoContatoView(PermissionRequiredMixin, FilterView):
 
     paginate_by = 30
 
-    """def post(self, request, *args, **kwargs):
-        qr = self.request.POST.copy()
-        self.request.GET = qr
-        return FilterView.get(self, self.request, *args, **kwargs)"""
+    @property
+    def verbose_name(self):
+        return self.model._meta.verbose_name
+
+    @property
+    def verbose_name_plural(self):
+        return self.model._meta.verbose_name_plural
 
     def get(self, request, *args, **kwargs):
         filterset_class = self.get_filterset_class()
         self.filterset = self.get_filterset(filterset_class)
         self.object_list = self.filterset.qs
 
-        if 'print' not in request.GET or not self.object_list.exists():
-            context = self.get_context_data(filter=self.filterset,
-                                            object_list=self.object_list)
-            if not self.object_list.exists():
-                messages.error(request, _('Não existe Contatos com as '
-                                          'condições definidas na busca!'))
-            return self.render_to_response(context)
+        if 'print' in request.GET and self.object_list.exists():
+            if self.filterset.form.cleaned_data['impresso']:
+                response = HttpResponse(content_type='application/pdf')
+                response['Content-Disposition'] = \
+                    'inline; filename="impresso_enderecamento.pdf"'
+                self.build_pdf(response)
+                return response
+            else:
+                self.filterset.form._errors['impresso'] = ErrorList([_(
+                    'Selecione o tipo de impresso a ser usado!')])
 
-        response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = \
-            'inline; filename="impresso_enderecamento.pdf"'
+        context = self.get_context_data(filter=self.filterset,
+                                        object_list=self.object_list)
 
-        self.build_pdf(response)
+        if len(request.GET) and not len(self.filterset.form.errors)\
+                and not self.object_list.exists():
+            messages.error(request, _('Não existe Contatos com as '
+                                      'condições definidas na busca!'))
 
-        return response
+        return self.render_to_response(context)
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -94,7 +103,10 @@ class ImpressoEnderecamentoContatoView(PermissionRequiredMixin, FilterView):
         cleaned_data = self.filterset.form.cleaned_data
 
         impresso = cleaned_data['impresso']
+
         fs = int(impresso.fontsize)
+        if cleaned_data['fontsize']:
+            fs = int(cleaned_data['fontsize'])
 
         stylesheet = StyleSheet1()
         stylesheet.add(ParagraphStyle(name='pronome_style',
@@ -153,8 +165,8 @@ class ImpressoEnderecamentoContatoView(PermissionRequiredMixin, FilterView):
                       bottomPadding=fs / 3,
                       topPadding=fs / 3,
                       rightPadding=fs / 3,
-                      showBoundary=1)
-            f.drawBoundary(p)
+                      showBoundary=0)
+            # f.drawBoundary(p)
             f.addFromList(self.createParagraphs(contato, stylesheet), p)
 
         p.showPage()
@@ -162,15 +174,51 @@ class ImpressoEnderecamentoContatoView(PermissionRequiredMixin, FilterView):
 
     def createParagraphs(self, contato, stylesheet):
 
+        cleaned_data = self.filterset.form.cleaned_data
+
+        imprimir_cargo = (cleaned_data['imprimir_cargo'] == 'True')\
+            if 'imprimir_cargo' in cleaned_data and\
+            cleaned_data['imprimir_cargo'] else False
+
+        local_cargo = cleaned_data['local_cargo']\
+            if 'local_cargo' in cleaned_data and\
+            cleaned_data['local_cargo'] else ''
+
         story = []
+
+        linha_pronome = ''
+
         if contato.pronome_tratamento:
-            story.append(Paragraph(
-                getattr(
+            if 'imprimir_pronome' in cleaned_data and\
+                    cleaned_data['imprimir_pronome'] == 'True':
+                linha_pronome = getattr(
                     contato.pronome_tratamento,
                     'enderecamento_singular_%s' % lower(
-                        contato.sexo)), stylesheet['pronome_style']))
+                        contato.sexo))
 
-        story.append(Paragraph(contato.nome, stylesheet['nome_style']))
+        if local_cargo == ImpressoEnderecamentoContatoFilterSet.DEPOIS_PRONOME\
+                and imprimir_cargo and (linha_pronome or contato.cargo):
+            linha_pronome = '%s - %s' % (linha_pronome, contato.cargo)
+
+        if linha_pronome:
+            story.append(Paragraph(
+                linha_pronome, stylesheet['pronome_style']))
+
+        linha_nome = contato.nome.upper()\
+            if 'nome_maiusculo' in cleaned_data and\
+            cleaned_data['nome_maiusculo'] == 'True' else contato.nome
+
+        if local_cargo == ImpressoEnderecamentoContatoFilterSet.LINHA_NOME\
+                and imprimir_cargo:
+            linha_nome = '%s %s' % (contato.cargo, linha_nome)
+            linha_nome = linha_nome.strip()
+
+        story.append(Paragraph(linha_nome, stylesheet['nome_style']))
+
+        if local_cargo == ImpressoEnderecamentoContatoFilterSet.DEPOIS_NOME\
+                and imprimir_cargo and contato.cargo:
+            story.append(
+                Paragraph(contato.cargo, stylesheet['endereco_style']))
 
         endpref = contato.endereco_set.filter(
             preferencial=True).first()
@@ -181,9 +229,10 @@ class ImpressoEnderecamentoContatoView(PermissionRequiredMixin, FilterView):
 
             story.append(Paragraph(endereco, stylesheet['endereco_style']))
 
-            b_m_uf = '%s - %s-%s' % (endpref.bairro,
-                                     endpref.municipio.nome,
-                                     endpref.uf)
+            b_m_uf = '%s - %s - %s' % (
+                endpref.bairro,
+                endpref.municipio.nome if endpref.municipio else '',
+                endpref.uf)
 
             story.append(Paragraph(b_m_uf, stylesheet['endereco_style']))
             story.append(Paragraph(endpref.cep, stylesheet['endereco_style']))

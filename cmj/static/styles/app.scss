@@ -378,6 +378,9 @@ fieldset {
 }
 .form-group {
   margin-bottom: $grid-gutter-width;
+  &.disabled {
+    opacity: 0.4;
+  }
 }
 
 .controls-radio, .controls-checkbox {
@@ -385,14 +388,17 @@ fieldset {
   background-color: white;
   border: 1px solid #dcdac8;
   border-radius: 4px;
-  min-height: 30px;
+  min-height: $grid-gutter-width * 2 - 2;
   overflow: hidden;
   label.checkbox, label.radio{
     margin: 0;
-    padding: ceil($grid-gutter-width / 3);
+    padding: 0;
+    padding-right: ceil($grid-gutter-width / 3);
     padding-left: $grid-gutter-width * 2;
+    line-height: $grid-gutter-width * 2 - 2;
+    min-height: $grid-gutter-width * 2 - 2;
     .icons {
-      top:  ceil($grid-gutter-width / 3);
+      top:  ceil($grid-gutter-width / 2) - 1;
       left: $grid-gutter-width / 2;
     }
     &:hover {
@@ -417,8 +423,11 @@ fieldset {
       min-height: 30px;
     }
     label {
+
+      min-height: 0;
       margin: 0;
       padding: 5px;
+      line-height: inherit;
       background-color: white;
       &:not(:last-child) {
         border-bottom: 1px solid #dcdac8;
