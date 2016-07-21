@@ -8,7 +8,7 @@ from sapl.parlamentares.models import Parlamentar, Municipio, Partido
 from sapl.utils import UF
 
 from cmj.core.models import CmjModelMixin, Trecho, Distrito, RegiaoMunicipal,\
-    CmjAuditoriaModelMixin, CmjSearchMixin, AreaTrabalho
+    CmjAuditoriaModelMixin, CmjSearchMixin, AreaTrabalho, Bairro
 from cmj.utils import YES_NO_CHOICES, NONE_YES_NO_CHOICES,\
     get_settings_auth_user_model
 
@@ -603,8 +603,11 @@ class Endereco(CmjAuditoriaModelMixin):
     numero = models.CharField(max_length=50, blank=True, default='',
                               verbose_name=_('Número'))
 
-    bairro = models.CharField(max_length=254, blank=True, default='',
-                              verbose_name=_('Bairro'))
+    bairro = models.ForeignKey(
+        Bairro,
+        verbose_name=Bairro._meta.verbose_name,
+        related_name='endereco_set',
+        blank=True, null=True, on_delete=SET_NULL)
     distrito = models.ForeignKey(
         Distrito,
         verbose_name=Distrito._meta.verbose_name,

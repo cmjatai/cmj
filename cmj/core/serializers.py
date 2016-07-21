@@ -19,9 +19,8 @@ class TrechoSerializer(serializers.Serializer):
         source='tipo')
     logradouro_descricao = serializers.StringRelatedField(
         source='logradouro')
-    bairro_descricao = serializers.StringRelatedField(
-        source='bairro')
 
+    bairro_id = serializers.IntegerField()
     distrito_id = serializers.IntegerField()
     regiao_municipal_id = serializers.IntegerField()
     municipio_id = serializers.IntegerField()

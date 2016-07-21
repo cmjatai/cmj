@@ -177,23 +177,21 @@ function TrechoSearch(opts) {
                                     $("input[name='endereco']").attr('data', retrivie_data.tipo_descricao + ' ' + retrivie_data.logradouro_descricao);
                                 else
                                     $("input[name='endereco']").val(retrivie_data.tipo_descricao + ' ' + retrivie_data.logradouro_descricao);
-                                $("input[name='bairro']").val(retrivie_data.bairro_descricao);
+                                $("select[name='bairro']").val(retrivie_data.bairro_id);
                                 $("input[name='cep']").val(retrivie_data.cep[0]);
                                 $("select[name='distrito']").val(retrivie_data.distrito_id);
                                 $("select[name='regiao_municipal']").val(retrivie_data.regiao_municipal_id);
                                 $("select[name='municipio']").val(retrivie_data.municipio_id);
                                 $("select[name='uf']").val(retrivie_data.uf);
-
                             });
                         });
 
                         its[0].data =  item_data.pk;
-
-                        if (data.results.length == 1)
+                        /*if (data.results.length == 1)
                             its.trigger('click', true)
                         else {
                             input.attr('data', '');
-                        }
+                        }*/
 
 
                     });
