@@ -4,7 +4,13 @@ from cmj.core.models import Trecho
 
 class TrechoSearchSerializer(serializers.Serializer):
     pk = serializers.IntegerField()
-    display = serializers.CharField()
+    display = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Trecho
+
+    def get_display(self, obj):
+        return str(obj)
 
 
 class UfListingField(serializers.RelatedField):

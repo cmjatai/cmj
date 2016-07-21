@@ -1,4 +1,5 @@
 
+from compressor.utils.decorators import cached_property
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
@@ -147,13 +148,24 @@ class CmjSearchMixin(models.Model):
         abstract = True
 
     def save(self, force_insert=False, force_update=False, using=None,
-             update_fields=None):
+             update_fields=None, auto_update_search=True):
 
-        if hasattr(self, 'fields_search'):
+        if auto_update_search and hasattr(self, 'fields_search'):
             search = ''
-            for field in self.fields_search:
-                search += str(getattr(self, field)) + ' '
-            self.search = normalize(search)
+            for str_field in self.fields_search:
+                fields = str_field.split('__')
+                if len(fields) == 1:
+                    try:
+                        search += str(getattr(self, str_field)) + ' '
+                    except:
+                        pass
+                else:
+                    _self = self
+                    for field in fields:
+                        _self = getattr(_self, field)
+                    search += str(_self) + ' '
+            self.search = search
+        self.search = normalize(self.search)
 
         return super(CmjSearchMixin, self).save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
 
@@ -391,7 +403,7 @@ class Logradouro(models.Model):
         return self.nome
 
 
-class Trecho(CmjModelMixin):
+class Trecho(CmjSearchMixin, CmjModelMixin):
     logradouro = models.ForeignKey(
         Logradouro,
         blank=True, null=True, default=None,
@@ -452,6 +464,17 @@ class Trecho(CmjModelMixin):
         related_name='trechos_set',
         verbose_name=_('Cep'))
 
+    @cached_property
+    def fields_search(self):
+        return [
+            'tipo__nome',
+            'logradouro__nome',
+            'bairro__nome',
+            'distrito__nome',
+            'regiao_municipal__nome',
+            'municipio__nome',
+            'cep']
+
     class Meta:
         verbose_name = _('Trecho de Logradouro')
         verbose_name_plural = _("Trechos de Logradouro")
@@ -471,7 +494,6 @@ class Trecho(CmjModelMixin):
                 'lado',
                 'numero_inicial',
                 'numero_final'),)
-        permissions = SEARCH_TRECHO
 
     def __str__(self):
         uf = str(self.municipio.uf) if self.municipio else ''

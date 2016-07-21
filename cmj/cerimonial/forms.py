@@ -357,31 +357,6 @@ class TipoAutoridadeForm(ModelForm):
         """
 
 
-class ListWithSearchForm(forms.Form):
-    q = forms.CharField(required=False, label='',
-                        widget=forms.TextInput(
-                            attrs={'type': 'search'}))
-
-    class Meta:
-        fields = ['q']
-
-    def __init__(self, *args, **kwargs):
-        super(ListWithSearchForm, self).__init__(*args, **kwargs)
-
-        self.helper = FormHelper()
-        self.form_class = 'form-inline'
-        self.helper.form_method = 'GET'
-        self.helper.layout = Layout(
-            FieldWithButtons(
-                Field('q',
-                      placeholder=_('Filtrar Lista'),
-                      css_class='input-lg'),
-                StrictButton(
-                    _('Filtrar'), css_class='btn-default btn-lg',
-                    type='submit'))
-        )
-
-
 class ProcessoForm(ModelForm):
     q = forms.CharField(
         required=False,

@@ -6,7 +6,7 @@ from django.views.generic.base import TemplateView
 from cmj.core.forms import LoginForm
 from cmj.core.views import CepCrud, RegiaoMunicipalCrud, DistritoCrud,\
     BairroCrud, TipoLogradouroCrud, LogradouroCrud, TrechoCrud, \
-    TrechoJsonSearchView, TrechoSearchView, TrechoJsonView, AreaTrabalhoCrud,\
+    TrechoJsonSearchView, TrechoJsonView, AreaTrabalhoCrud,\
     OperadorAreaTrabalhoCrud, PartidoCrud, ImpressoEnderecamentoCrud
 
 from .apps import AppConfig
@@ -23,8 +23,8 @@ urlpatterns = [
                                     }}, name='login'),
     url(r'^logout/$', v_auth.logout, {'next_page': '/login'}, name='logout', ),
 
-    url(r'^enderecos/', login_required(
-        TrechoSearchView.as_view()), name='search_view'),
+    # url(r'^enderecos/', login_required(
+    #    TrechoSearchView.as_view()), name='search_view'),
 
     url(r'^areatrabalho/', include(AreaTrabalhoCrud.get_urls() +
                                    OperadorAreaTrabalhoCrud.get_urls())),

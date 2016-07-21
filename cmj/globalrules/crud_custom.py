@@ -1,4 +1,8 @@
 from compressor.utils.decorators import cached_property
+from crispy_forms.bootstrap import FieldWithButtons, StrictButton
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Field
+from django import forms
 from django.conf.urls import url
 from django.contrib.auth import logout
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -27,6 +31,31 @@ from cmj.utils import normalize
 
 LIST, DETAIL, ADD, CHANGE, DELETE =\
     '.list_', '.detail_', '.add_', '.change_', '.delete_',
+
+
+class ListWithSearchForm(forms.Form):
+    q = forms.CharField(required=False, label='',
+                        widget=forms.TextInput(
+                            attrs={'type': 'search'}))
+
+    class Meta:
+        fields = ['q']
+
+    def __init__(self, *args, **kwargs):
+        super(ListWithSearchForm, self).__init__(*args, **kwargs)
+
+        self.helper = FormHelper()
+        self.form_class = 'form-inline'
+        self.helper.form_method = 'GET'
+        self.helper.layout = Layout(
+            FieldWithButtons(
+                Field('q',
+                      placeholder=_('Filtrar Lista'),
+                      css_class='input-lg'),
+                StrictButton(
+                    _('Filtrar'), css_class='btn-default btn-lg',
+                    type='submit'))
+        )
 
 
 class PermissionRequiredContainerCrudMixin(PermissionRequiredMixin):

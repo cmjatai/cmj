@@ -6,8 +6,7 @@ from django.views.generic.edit import FormView
 from sapl.crispy_layout_mixin import CrispyLayoutFormMixin
 
 from cmj.cerimonial.forms import LocalTrabalhoForm, EnderecoForm,\
-    TipoAutoridadeForm,\
-    LocalTrabalhoPerfilForm, ListWithSearchForm,\
+    TipoAutoridadeForm, LocalTrabalhoPerfilForm,\
     ContatoFragmentPronomesForm, ContatoForm, ProcessoForm,\
     ContatoFragmentSearchForm, ProcessoContatoForm
 from cmj.cerimonial.models import TipoTelefone, TipoEndereco,\
@@ -22,7 +21,8 @@ from cmj.cerimonial.rules import rules_patterns
 from cmj.core.models import AreaTrabalho
 from cmj.globalrules import globalrules
 from cmj.globalrules.crud_custom import DetailMasterCrud,\
-    MasterDetailCrudPermission, PerfilAbstractCrud, PerfilDetailCrudPermission
+    MasterDetailCrudPermission, PerfilAbstractCrud, PerfilDetailCrudPermission,\
+    ListWithSearchForm
 
 
 #from cmj.legacy_siscam.migration import migrate_siscam

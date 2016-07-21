@@ -233,7 +233,7 @@
                       <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Dados Auxiliares" %}<span class="caret"></span></a>
                       <ul class="dropdown-menu menu-right">
                         <li class="dropdown-header">{% trans "Consultas" %}</li>
-                        {% if perms.core.search_trecho %}<li class="nav__sub-item"><a href="{% url 'cmj.core:search_view' %}">{% trans "Consultar base de Cep's e Endereços" %}</a></li>{% endif %}
+                        {% if perms.core.search_trecho %}<li class="nav__sub-item"><a href="{% url 'cmj.core:trecho_list' %}">{% trans "Consultar base de Cep's e Endereços" %}</a></li>{% endif %}
 
                         {% if perms.cerimonial.list_operadoratelefonia %}<li class="nav__sub-item"><a href="{% url 'cmj.cerimonial:operadoratelefonia_list' %}">{% model_verbose_name_plural "cmj.cerimonial.models.OperadoraTelefonia"%}</a></li>{% endif %}
                         {% if perms.cerimonial.list_nivelinstrucao %}<li class="nav__sub-item"><a href="{% url 'cmj.cerimonial:nivelinstrucao_list' %}">{% model_verbose_name_plural "cmj.cerimonial.models.NivelInstrucao"%}</a></li>{% endif %}

@@ -1,22 +1,19 @@
 
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 from django.forms.utils import ErrorList
 from django.shortcuts import redirect
 from django.utils.translation import ugettext_lazy as _
 from django_filters.views import FilterView
-from haystack.generic_views import SearchView
-from haystack.query import SearchQuerySet, EmptySearchQuerySet
 from rest_framework import viewsets, mixins
 from rest_framework.authentication import SessionAuthentication,\
     BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
 from sapl.crud.base import Crud, make_pagination
 from sapl.parlamentares.models import Partido, Filiacao
-from whoosh.lang import snowball
 
-from cmj.core.forms import TrechoFilterSet, LogradouroSearchForm,\
-    OperadorAreaTrabalhoForm, ImpressoEnderecamentoForm
+from cmj.core.forms import OperadorAreaTrabalhoForm, ImpressoEnderecamentoForm
 from cmj.core.models import Cep, TipoLogradouro, Logradouro, RegiaoMunicipal,\
     Distrito, Bairro, Trecho, AreaTrabalho, OperadorAreaTrabalho,\
     ImpressoEnderecamento
@@ -24,7 +21,8 @@ from cmj.core.rules import rules_patterns
 from cmj.core.serializers import TrechoSearchSerializer, TrechoSerializer
 from cmj.globalrules import globalrules
 from cmj.globalrules.crud_custom import DetailMasterCrud,\
-    MasterDetailCrudPermission
+    MasterDetailCrudPermission, ListWithSearchForm
+from cmj.utils import normalize
 
 
 globalrules.rules.config_groups(rules_patterns)
@@ -37,55 +35,63 @@ BairroCrud = DetailMasterCrud.build(Bairro, None, 'bairro')
 TipoLogradouroCrud = DetailMasterCrud.build(
     TipoLogradouro, None, 'tipo_logradouro')
 LogradouroCrud = DetailMasterCrud.build(Logradouro, None, 'logradouro')
-TrechoCrud = DetailMasterCrud.build(Trecho, None, 'trecho')
 
 
-# dict e primeiro def abaixo não estão sendo usados mas são um lembrete
-# para uso se stemmers
-STEMMERS = {
-    'pt-BR': snowball.portugese.PortugueseStemmer()
-}
+class TrechoCrud(DetailMasterCrud):
+    help_text = 'trecho'
+    model = Trecho
+
+    class BaseMixin(DetailMasterCrud.BaseMixin):
+        list_field_names = [
+            ('tipo', 'logradouro'), 'bairro', 'municipio', 'cep']
+
+    class ListView(DetailMasterCrud.ListView):
+        form_search_class = ListWithSearchForm
+
+        def get(self, request, *args, **kwargs):
+            """trechos = Trecho.objects.all()
+            for t in trechos:
+                t.search = str(t)
+                t.save(auto_update_search=False)"""
+            return DetailMasterCrud.ListView.get(
+                self, request, *args, **kwargs)
+
+        def get_context_data(self, **kwargs):
+            context = DetailMasterCrud.ListView.get_context_data(
+                self, **kwargs)
+            context['title'] = _("Base de Cep's e Endereços")
+            return context
+
+    class CreateView(DetailMasterCrud.CreateView):
+
+        def post(self, request, *args, **kwargs):
+            response = super(DetailMasterCrud.CreateView, self).post(
+                self, request, *args, **kwargs)
+
+            # FIXME: necessário enquanto o metodo save não tratar fields  m2m
+            self.object.search = str(self.object)
+            self.object.save(auto_update_search=False)
+
+            return response
+
+    class UpdateView(DetailMasterCrud.UpdateView):
+
+        def post(self, request, *args, **kwargs):
+            response = super(DetailMasterCrud.UpdateView, self).post(
+                self, request, *args, **kwargs)
+
+            # FIXME: necessário enquanto o metodo save não tratar fields  m2m
+            self.object.search = str(self.object)
+            self.object.save(auto_update_search=False)
+
+            return response
 
 
-def stem(text, lang):
-    stemmer = STEMMERS.get(lang)
+"""
 
-    if not stemmer:
-        return ''
-
-    text_stemmed = []
-    for term in text.split(' '):
-        term = stemmer.stem(term)
-        text_stemmed.append(term)
-    text_stemmed = ' '.join(text_stemmed)
-
-    return text_stemmed
-
-# view usando django-filter... não está sendo usado
-
-
-class EnderecoPesquisaView(FilterView):
-    filterset_class = TrechoFilterSet
-
-    paginate_by = 100
-
-    def get_context_data(self, **kwargs):
-        context = super(EnderecoPesquisaView,
-                        self).get_context_data(**kwargs)
-        context['title'] = _('Pesquisa de Endereços')
-        paginator = context['paginator']
-        page_obj = context['page_obj']
-
-        context['page_range'] = make_pagination(
-            page_obj.number, paginator.num_pages)
-
-        return context
-
-
-class TrechoSearchView(PermissionRequiredMixin, SearchView):
+class TrechoSearchView(PermissionRequiredMixin, FilterView):
     template_name = 'search/search.html'
-    queryset = SearchQuerySet()
-    form_class = LogradouroSearchForm
+    filterset_class = TrechoFilterSet
     permission_required = 'core.search_trecho'
 
     paginate_by = 20
@@ -108,7 +114,7 @@ class TrechoSearchView(PermissionRequiredMixin, SearchView):
             del qr['page']
         context['filter_url'] = ('&' + qr.urlencode()) if len(qr) > 0 else ''
 
-        return context
+        return context"""
 
 
 class TrechoJsonSearchView(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -119,11 +125,21 @@ class TrechoJsonSearchView(mixins.ListModelMixin, viewsets.GenericViewSet):
 
     def get_queryset(self, *args, **kwargs):
         request = self.request
-        queryset = EmptySearchQuerySet()
+        queryset = Trecho.objects.all()
 
         if request.GET.get('q') is not None:
-            query = request.GET.get('q')
-            queryset = SearchQuerySet().auto_query(query, 'text')
+            query = normalize(str(request.GET.get('q')))
+
+            query = query.split(' ')
+            if query:
+                q = Q()
+                for item in query:
+                    if not item:
+                        continue
+                    q = q & Q(search__icontains=item)
+
+                if q:
+                    queryset = queryset.filter(q)
 
         return queryset
 

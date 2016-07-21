@@ -35,7 +35,7 @@ rules_group_workspace_oper_contatos = (
             menu_contatos,
             menu_dados_auxiliares,
             menu_relatorios]),
-        (Trecho, [search_trecho]),
+        (Trecho, [LIST, DETAIL]),
         (OperadoraTelefonia, [LIST, DETAIL]),
         (NivelInstrucao, [LIST, DETAIL]),
         (EstadoCivil, [LIST, DETAIL]),

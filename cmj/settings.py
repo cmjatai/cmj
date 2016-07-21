@@ -78,7 +78,7 @@ INSTALLED_APPS = (
     'sass_processor',
     'rest_framework',
 
-    'haystack',
+    #'haystack',
     # "elasticstack",
 
     'wagtail.wagtailforms',
@@ -313,13 +313,13 @@ MAX_IMAGE_UPLOAD_SIZE = 2 * 1024 * 1024  # 2MB
     },
 }"""
 
-HAYSTACK_CONNECTIONS = {
+"""HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
         'PATH': PROJECT_DIR.child('whoosh_index'),
     },
 }
-
+"""
 
 """HAYSTACK_CONNECTIONS = {
     'default': {
@@ -330,5 +330,5 @@ HAYSTACK_CONNECTIONS = {
 }
 """
 
-HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+#HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 #ELASTICSEARCH_DEFAULT_ANALYZER = "snowball"

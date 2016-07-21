@@ -1,10 +1,5 @@
-from unicodedata import normalize
 
-from haystack import indexes
-
-from cmj.core.models import Trecho
-
-
+"""
 class TrechoIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.EdgeNgramField(document=True)
     display = indexes.CharField(indexed=False)
@@ -22,4 +17,4 @@ class TrechoIndex(indexes.SearchIndex, indexes.Indexable):
             'NFKD', txt).encode('ASCII', 'ignore').decode('ASCII')
 
     def prepare_display(self, obj):
-        return str(obj)
+        return str(obj)"""
