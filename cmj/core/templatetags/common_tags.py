@@ -63,3 +63,15 @@ def age(data):
         _('dia') if idade.days else '',
         's' if idade.days > 1 else '')
     return '%s%s%s' % (years.strip(), months.strip(), days.strip())
+
+
+@register.filter
+def str2intabs(value):
+    if not isinstance(value, str):
+        return ''
+    try:
+        v = int(value)
+        v = abs(v)
+        return v
+    except:
+        return ''

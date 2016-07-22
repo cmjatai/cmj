@@ -13,6 +13,7 @@ from django.db.models.base import Model
 from django.http.response import Http404
 from django.shortcuts import redirect
 from django.utils import six
+from django.utils.datastructures import OrderedSet
 from django.utils.decorators import classonlymethod
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
@@ -38,6 +39,9 @@ class ListWithSearchForm(forms.Form):
                         widget=forms.TextInput(
                             attrs={'type': 'search'}))
 
+    o = forms.CharField(required=False, label='',
+                        widget=forms.HiddenInput())
+
     class Meta:
         fields = ['q']
 
@@ -48,6 +52,7 @@ class ListWithSearchForm(forms.Form):
         self.form_class = 'form-inline'
         self.helper.form_method = 'GET'
         self.helper.layout = Layout(
+            Field('o'),
             FieldWithButtons(
                 Field('q',
                       placeholder=_('Filtrar Lista'),
@@ -191,15 +196,29 @@ class DetailMasterCrud(Crud):
             return r
 
         def get_context_data(self, **kwargs):
+
             if hasattr(self, 'form_search_class'):
                 q = str(self.request.GET.get('q'))\
                     if 'q' in self.request.GET else ''
 
+                o = self.request.GET['o'] if 'o' in self.request.GET else '1'
+
                 if 'form' not in kwargs:
-                    kwargs['form'] = self.form_search_class(initial={'q': q})
+                    kwargs['form'] = self.form_search_class(
+                        initial={'q': q, 'o': o})
             count = self.object_list.count()
             context = super().get_context_data(**kwargs)
             context['count'] = count
+
+            qr = self.request.GET.copy()
+            if 'page' in qr:
+                del qr['page']
+            context['filter_url'] = (
+                '&' + qr.urlencode()) if len(qr) > 0 else ''
+            if 'o' in qr:
+                del qr['o']
+            context['ordering_url'] = (
+                '&' + qr.urlencode()) if len(qr) > 0 else ''
             return context
 
         def get_queryset(self):
@@ -230,35 +249,36 @@ class DetailMasterCrud(Crud):
             desc = '-' if o.startswith('-') else ''
 
             try:
-                fo = list_field_names[
+                fields_for_ordering = list_field_names[
                     (abs(int(o)) - 1) % len(list_field_names)]
 
-                if not isinstance(fo, str):
-                    fo = fo[0]
+                if isinstance(fields_for_ordering, str):
+                    fields_for_ordering = [fields_for_ordering, ]
 
+                ordering = ()
                 model = self.model
-                fm = model._meta.get_field(fo)
-                if hasattr(fm, 'related_model') and fm.related_model:
-                    rmo = fm.related_model._meta.ordering
-                    if rmo:
-                        rmo = rmo[0]
-                        if not isinstance(rmo, str):
+                for fo in fields_for_ordering:
+                    fm = model._meta.get_field(fo)
+                    if hasattr(fm, 'related_model') and fm.related_model:
+                        rmo = fm.related_model._meta.ordering
+                        if rmo:
                             rmo = rmo[0]
-                        fo = '%s__%s' % (fo, rmo)
+                            if not isinstance(rmo, str):
+                                rmo = rmo[0]
+                            fo = '%s__%s' % (fo, rmo)
 
-                fo = desc + fo
+                    fo = desc + fo
+                    ordering += (fo,)
 
                 model = self.model
-                mo = model._meta.ordering
-                if mo:
-                    mo = mo[0]
-                    if not isinstance(mo, str):
-                        mo = mo[0]
-                    fo = (fo, mo)
-                if isinstance(fo, str):
-                    fo = (fo, )
-
-                queryset = queryset.order_by(*fo)
+                model_ordering = model._meta.ordering
+                if model_ordering:
+                    if isinstance(model_ordering, str):
+                        model_ordering = (model_ordering,)
+                    for mo in model_ordering:
+                        if mo not in ordering:
+                            ordering = ordering + (mo, )
+                queryset = queryset.order_by(*ordering)
 
             except:
                 pass

@@ -384,6 +384,7 @@ class TipoLogradouro(models.Model):
     class Meta:
         verbose_name = _('Tipo de Logradouro')
         verbose_name_plural = _("Tipos de Logradouros")
+        ordering = ('nome',)
 
     def __str__(self):
         return self.nome
@@ -398,6 +399,7 @@ class Logradouro(models.Model):
     class Meta:
         verbose_name = _('Logradouro')
         verbose_name_plural = _("Logradouros")
+        ordering = ('nome',)
 
     def __str__(self):
         return self.nome
@@ -483,6 +485,7 @@ class Trecho(CmjSearchMixin, CmjModelMixin):
             'regiao_municipal__nome',
             'distrito__nome',
             'bairro__nome',
+            'tipo__nome',
             'logradouro__nome']
         unique_together = (
             ('municipio',

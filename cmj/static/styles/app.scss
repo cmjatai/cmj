@@ -80,6 +80,13 @@ body, html {
     clear: both;
 }
 
+.caret {
+  /* Por padrão caret aponta para baixo*/
+  &.top {
+    transform: rotate(180deg);
+  }
+}
+
 // ADJUST NAVBAR ########################################
 .navbar {
   background: $color_topo_bg url(/static/img/bg.png);
@@ -301,6 +308,17 @@ main {
   border-bottom-width: 0;
   font-weight: normal;
   vertical-align: middle;
+}
+.table-link-ordering > thead > tr > th, .table-link-ordering > tbody > tr > th, .table-link-ordering > tfoot > tr > th {
+    padding: 0;
+    a {
+      display: block;
+      padding: $grid-gutter-width 0.35 * $grid-gutter-width;
+      &:hover {
+        background-color: $hover_background_05p;
+      }
+    }
+
 }
 
 .context-actions{

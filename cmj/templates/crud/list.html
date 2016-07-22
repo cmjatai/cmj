@@ -31,11 +31,20 @@
 {% else %}
   <div class="container-table">
     <div class="result-count">{% blocktrans with verbose_name_plural=view.verbose_name_plural %}Total de {{ verbose_name_plural }}: <strong>{{count}}</strong>{% endblocktrans %}</div>
-    <table class="table table-striped table-hover">
+    <table class="table table-striped table-hover table-link-ordering">
       <thead>
         <tr>
           {% for name in headers %}
-            <th><a href="?o={% if 'o' not in request.GET and forloop.counter == 1 or 'o' in request.GET and forloop.counter|safe == request.GET.o %}-{%endif%}{{forloop.counter}}{%if request.GET.page %}&page={{request.GET.page}}{%endif%}">{{ name }}</a></th>
+            <th>
+              <a title="{% trans 'Clique para alterar a ordem a listagem'%}" href="?o={% if 'o' not in request.GET and forloop.counter == 1 or 'o' in request.GET and forloop.counter|safe == request.GET.o %}-{%endif%}{{forloop.counter}}{{ordering_url}}">{{ name }}
+              {% if 'o' not in request.GET and forloop.counter == 1 or 'o' in request.GET and forloop.counter|safe == request.GET.o %}
+                <span class="caret top" title="{% trans 'Listado na Ordem Ascendente'%}"></span>
+              {% elif 'o' in request.GET and forloop.counter == request.GET.o|str2intabs %}
+                <span class="caret" title="{% trans 'Listado na Ordem Descendente'%}"></span>
+              {%endif%}
+              </a>
+
+            </th>
           {% endfor %}
         </tr>
       </thead>
