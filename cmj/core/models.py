@@ -171,6 +171,13 @@ class CmjSearchMixin(models.Model):
 
 
 class CmjModelMixin(models.Model):
+    # para migração
+    """created = models.DateTimeField(
+        verbose_name=_('created'),
+        editable=True, auto_now_add=False)
+    modified = models.DateTimeField(
+        verbose_name=_('modified'), editable=True, auto_now=False)"""
+    # para produção
     created = models.DateTimeField(
         verbose_name=_('created'),
         editable=False, auto_now_add=True)
@@ -358,8 +365,10 @@ class Bairro(models.Model):
         verbose_name=_('Bairro'),
         unique=True)
 
-    codigo = models.PositiveIntegerField(verbose_name='Código',
-                                         help_text=_('Código do Bairro no Cadastro Oficial do Município'))
+    codigo = models.PositiveIntegerField(
+        default=0,
+        verbose_name='Código',
+        help_text=_('Código do Bairro no Cadastro Oficial do Município'))
 
     outros_nomes = models.TextField(
         blank=True,

@@ -529,6 +529,7 @@ class Pessoa(models.Model):
     estadocivil = models.CharField(
         db_column='estadoCivil', max_length=1, blank=True, null=True)
 
+    # ok
     parentesco = models.IntegerField(blank=True, null=True)
 
     # ok
@@ -674,20 +675,34 @@ class Usuario(models.Model):
 
 
 class Visitas(models.Model):
+    # ok
     data = models.DateTimeField()
+    # ok
     assunto = models.CharField(max_length=10000, blank=True, null=True)
+    # ok
     status = models.ForeignKey(
         Statusvisitas, models.DO_NOTHING, db_column='status')
+
+    # ok
     descricao = models.CharField(max_length=10000, blank=True, null=True)
+    # ok
     observacao = models.CharField(max_length=10000, blank=True, null=True)
+
+    # ok
     # Field name made lowercase.
     alteradoem = models.DateTimeField(
         db_column='alteradoEm', blank=True, null=True)
+
+    # ok
     excluido = models.NullBooleanField()
+
+    # ok
     # Field name made lowercase.
     idpessoa = models.ForeignKey(
         Pessoa, models.DO_NOTHING, db_column='idPessoa', blank=True, null=True)
+
     # Field name made lowercase.
+    # ok
     alteradopor = models.ForeignKey(
         Usuario, models.DO_NOTHING, db_column='alteradoPor', blank=True, null=True)
 

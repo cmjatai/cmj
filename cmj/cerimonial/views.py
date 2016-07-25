@@ -25,7 +25,6 @@ from cmj.globalrules.crud_custom import DetailMasterCrud,\
     ListWithSearchForm
 
 
-#from cmj.legacy_siscam.migration import migrate_siscam
 globalrules.rules.config_groups(rules_patterns)
 
 # -------------  Details Master Crud build----------------------------
@@ -120,7 +119,8 @@ class ContatoCrud(DetailMasterCrud):
 
         def get(self, request, *args, **kwargs):
             if 'action' in request.GET and request.GET['action'] == 'import':
-                # migrate_siscam()
+                from cmj.legacy_siscam.migration import migrate_siscam
+                migrate_siscam()
                 return HttpResponse('migração executada!')
 
             return DetailMasterCrud.ListView.get(
@@ -396,6 +396,21 @@ class DependentePerfilCrud(PerfilDetailCrudPermission):
 class AssuntoProcessoCrud(DetailMasterCrud):
     model = AssuntoProcesso
     container_field = 'workspace__operadores'
+    model_set = 'processo_set'
+
+    class BaseMixin(DetailMasterCrud.BaseMixin):
+
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            context['subnav_template_name'] = \
+                'cerimonial/subnav_assuntoprocesso.yaml'
+            return context
+
+    class DetailView(DetailMasterCrud.DetailView):
+        list_field_names_set = ['data',
+                                'titulo',
+                                'contatos'
+                                ]
 
 
 class ProcessoMasterCrud(DetailMasterCrud):

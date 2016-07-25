@@ -718,7 +718,7 @@ class AssuntoProcesso(DescricaoAbstractModel, CmjAuditoriaModelMixin):
 
 class Processo(CmjSearchMixin, CmjAuditoriaModelMixin):
 
-    titulo = models.CharField(max_length=254, verbose_name=_('Título'))
+    titulo = models.CharField(max_length=9999, verbose_name=_('Título'))
 
     data = models.DateField(verbose_name=_('Data de Abertura'))
 
