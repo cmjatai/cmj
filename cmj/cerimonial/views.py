@@ -8,7 +8,7 @@ from sapl.crispy_layout_mixin import CrispyLayoutFormMixin
 from cmj.cerimonial.forms import LocalTrabalhoForm, EnderecoForm,\
     TipoAutoridadeForm, LocalTrabalhoPerfilForm,\
     ContatoFragmentPronomesForm, ContatoForm, ProcessoForm,\
-    ContatoFragmentSearchForm, ProcessoContatoForm
+    ContatoFragmentSearchForm, ProcessoContatoForm, ListWithSearchProcessoForm
 from cmj.cerimonial.models import TipoTelefone, TipoEndereco,\
     TipoEmail, Parentesco, EstadoCivil, TipoAutoridade, TipoLocalTrabalho,\
     NivelInstrucao, Contato, Telefone, OperadoraTelefonia, Email,\
@@ -18,11 +18,11 @@ from cmj.cerimonial.models import TipoTelefone, TipoEndereco,\
     StatusProcesso, ClassificacaoProcesso, TopicoProcesso, Processo,\
     AssuntoProcesso, ProcessoContato
 from cmj.cerimonial.rules import rules_patterns
+from cmj.core.forms import ListWithSearchForm
 from cmj.core.models import AreaTrabalho
 from cmj.globalrules import globalrules
 from cmj.globalrules.crud_custom import DetailMasterCrud,\
-    MasterDetailCrudPermission, PerfilAbstractCrud, PerfilDetailCrudPermission,\
-    ListWithSearchForm
+    MasterDetailCrudPermission, PerfilAbstractCrud, PerfilDetailCrudPermission
 
 
 globalrules.rules.config_groups(rules_patterns)
@@ -446,7 +446,16 @@ class ProcessoMasterCrud(DetailMasterCrud):
             return kwargs
 
     class ListView(DetailMasterCrud.ListView):
-        form_search_class = ListWithSearchForm
+        form_search_class = ListWithSearchProcessoForm
+
+        def get_queryset(self):
+            queryset = DetailMasterCrud.ListView.get_queryset(self)
+
+            assunto = self.request.GET.get('assunto', '')
+
+            if assunto:
+                queryset = queryset.filter(assuntos=assunto)
+            return queryset
 
     class CreateView(DetailMasterCrud.CreateView):
         form_class = ProcessoForm

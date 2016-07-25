@@ -13,7 +13,8 @@ from rest_framework.permissions import IsAuthenticated
 from sapl.crud.base import Crud, make_pagination
 from sapl.parlamentares.models import Partido, Filiacao
 
-from cmj.core.forms import OperadorAreaTrabalhoForm, ImpressoEnderecamentoForm
+from cmj.core.forms import OperadorAreaTrabalhoForm, ImpressoEnderecamentoForm,\
+    ListWithSearchForm
 from cmj.core.models import Cep, TipoLogradouro, Logradouro, RegiaoMunicipal,\
     Distrito, Bairro, Trecho, AreaTrabalho, OperadorAreaTrabalho,\
     ImpressoEnderecamento
@@ -21,7 +22,7 @@ from cmj.core.rules import rules_patterns
 from cmj.core.serializers import TrechoSearchSerializer, TrechoSerializer
 from cmj.globalrules import globalrules
 from cmj.globalrules.crud_custom import DetailMasterCrud,\
-    MasterDetailCrudPermission, ListWithSearchForm
+    MasterDetailCrudPermission
 from cmj.utils import normalize
 
 

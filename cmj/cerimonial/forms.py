@@ -31,6 +31,7 @@ from cmj import settings
 from cmj.cerimonial.models import LocalTrabalho, Endereco,\
     TipoAutoridade, PronomeTratamento, Contato, Perfil, Processo,\
     IMPORTANCIA_CHOICE, AssuntoProcesso, StatusProcesso, ProcessoContato
+from cmj.core.forms import ListWithSearchForm
 from cmj.core.models import Trecho, ImpressoEnderecamento
 from cmj.utils import normalize, YES_NO_CHOICES
 
@@ -816,3 +817,19 @@ class ImpressoEnderecamentoContatoFilterSet(FilterSet):
 
         self.form.fields['nome_maiusculo'].widget = forms.RadioSelect()
         self.form.fields['nome_maiusculo'].inline_class = True
+
+
+class ListWithSearchProcessoForm(ListWithSearchForm):
+
+    assunto = forms.ModelChoiceField(
+        label=_('Filtrar por Assunto'),
+        queryset=AssuntoProcesso.objects.all(),
+        required=False)
+
+    class Meta(ListWithSearchForm.Meta):
+        pass
+
+    def __init__(self, *args, **kwargs):
+        super(ListWithSearchProcessoForm, self).__init__(*args, **kwargs)
+
+        self.helper.layout.fields.append(Field('assunto'))

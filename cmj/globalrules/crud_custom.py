@@ -34,35 +34,6 @@ LIST, DETAIL, ADD, CHANGE, DELETE =\
     '.list_', '.detail_', '.add_', '.change_', '.delete_',
 
 
-class ListWithSearchForm(forms.Form):
-    q = forms.CharField(required=False, label='',
-                        widget=forms.TextInput(
-                            attrs={'type': 'search'}))
-
-    o = forms.CharField(required=False, label='',
-                        widget=forms.HiddenInput())
-
-    class Meta:
-        fields = ['q']
-
-    def __init__(self, *args, **kwargs):
-        super(ListWithSearchForm, self).__init__(*args, **kwargs)
-
-        self.helper = FormHelper()
-        self.form_class = 'form-inline'
-        self.helper.form_method = 'GET'
-        self.helper.layout = Layout(
-            Field('o'),
-            FieldWithButtons(
-                Field('q',
-                      placeholder=_('Filtrar Lista'),
-                      css_class='input-lg'),
-                StrictButton(
-                    _('Filtrar'), css_class='btn-default btn-lg',
-                    type='submit'))
-        )
-
-
 class PermissionRequiredContainerCrudMixin(PermissionRequiredMixin):
 
     def has_permission(self):

@@ -1,7 +1,7 @@
 
 from crispy_forms.bootstrap import FieldWithButtons, StrictButton
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout
+from crispy_forms.layout import Layout, Field
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.forms import UserCreationForm as BaseUserCreationForm, UserChangeForm as BaseUserChangeForm
@@ -120,3 +120,32 @@ class ImpressoEnderecamentoForm(ModelForm):
         super(ImpressoEnderecamentoForm, self).__init__(*args, **kwargs)
         self.fields['rotate'].widget = forms.RadioSelect()
         self.fields['rotate'].inline_class = True
+
+
+class ListWithSearchForm(forms.Form):
+    q = forms.CharField(required=False, label='',
+                        widget=forms.TextInput(
+                            attrs={'type': 'search'}))
+
+    o = forms.CharField(required=False, label='',
+                        widget=forms.HiddenInput())
+
+    class Meta:
+        fields = ['q', 'o']
+
+    def __init__(self, *args, **kwargs):
+        super(ListWithSearchForm, self).__init__(*args, **kwargs)
+
+        self.helper = FormHelper()
+        self.form_class = 'form-inline'
+        self.helper.form_method = 'GET'
+        self.helper.layout = Layout(
+            Field('o'),
+            FieldWithButtons(
+                Field('q',
+                      placeholder=_('Filtrar Lista'),
+                      css_class='input-lg'),
+                StrictButton(
+                    _('Filtrar'), css_class='btn-default btn-lg',
+                    type='submit'))
+        )
