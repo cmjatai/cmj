@@ -113,3 +113,4 @@ def create_proxy_permissions(
 models.signals.post_migrate.connect(
     receiver=create_proxy_permissions,
     dispatch_uid="django.contrib.auth.management.create_permissions")
+

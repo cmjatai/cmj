@@ -38,6 +38,7 @@ class Rules:
             print(group, e)
 
     def config_groups(self, group_rules):
+        
         for group, rules in group_rules:
             self._config_group(group, rules)
 

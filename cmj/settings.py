@@ -27,6 +27,8 @@ config = AutoConfig()
 
 BASE_DIR = Path(__file__).ancestor(1)
 PROJECT_DIR = Path(__file__).ancestor(2)
+print(BASE_DIR)
+print(PROJECT_DIR)
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY')
