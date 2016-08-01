@@ -35,9 +35,12 @@ PronomeTratamento:
   {% trans 'Vocativos' %}:
   - vocativo_direto_singular_m vocativo_direto_plural_m vocativo_direto_singular_f vocativo_direto_plural_f
   - vocativo_indireto_singular_m vocativo_indireto_plural_m vocativo_indireto_singular_f vocativo_indireto_plural_f
+  {% trans 'Prefixos' %}:
+  - prefixo_nome_singular_m prefixo_nome_plural_m
+  - prefixo_nome_singular_f prefixo_nome_plural_f
   {% trans 'Endereçamentos' %}:
-  - enderecamento_singular_m enderecamento_plural_m
-  - enderecamento_singular_f enderecamento_plural_f
+    - enderecamento_singular_m enderecamento_plural_m
+    - enderecamento_singular_f enderecamento_plural_f
 Contato:
   {% trans 'Dados Básicos' %}:
   - nome:6 nome_social:3 apelido

@@ -147,6 +147,22 @@ class PronomeTratamento(models.Model):
         default='', max_length=254, verbose_name=_(
             'Endereçamento Plural Feminino'))
 
+    prefixo_nome_singular_m = models.CharField(
+        default='', max_length=254, verbose_name=_(
+            'Prefixo Singular Masculino'))
+
+    prefixo_nome_singular_f = models.CharField(
+        default='', max_length=254, verbose_name=_(
+            'Prefixo Singular Feminino'))
+
+    prefixo_nome_plural_m = models.CharField(
+        default='', max_length=254, verbose_name=_(
+            'Prefixo Plural Masculino'))
+
+    prefixo_nome_plural_f = models.CharField(
+        default='', max_length=254, verbose_name=_(
+            'Prefixo Plural Feminino'))
+
     class Meta:
         verbose_name = _('Pronome de Tratamento')
         verbose_name_plural = _('Pronomes de tratamento')

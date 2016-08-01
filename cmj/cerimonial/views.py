@@ -74,10 +74,10 @@ class PronomeTratamentoCrud(DetailMasterCrud):
     class BaseMixin(DetailMasterCrud.BaseMixin):
         list_field_names = [
             'nome_por_extenso',
-            'abreviatura_singular_m',
-            'abreviatura_plural_m',
+            ('abreviatura_singular_m', 'abreviatura_plural_m',),
             'vocativo_direto_singular_m',
             'vocativo_indireto_singular_m',
+            ('prefixo_nome_singular_m', 'prefixo_nome_singular_f'),
             'enderecamento_singular_m', ]
 
         def get_context_data(self, **kwargs):

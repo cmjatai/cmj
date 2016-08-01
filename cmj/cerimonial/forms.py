@@ -191,17 +191,20 @@ class ContatoForm(ModelForm):
 
         self.fields['pronome_tratamento'].widget = forms.RadioSelect()
         self.fields['pronome_tratamento'].queryset = \
-            PronomeTratamento.objects.order_by('nome_por_extenso')
+            PronomeTratamento.objects.order_by(
+                'prefixo_nome_singular_m', 'nome_por_extenso')
 
         if 'tipo_autoridade' in self.fields and\
                 instance and instance.tipo_autoridade:
             pronomes_choice = instance.tipo_autoridade.pronomes.order_by(
-                'nome_por_extenso')
+                'prefixo_nome_singular_m', 'nome_por_extenso')
         else:
             pronomes_choice = self.fields['pronome_tratamento'].queryset
 
         self.fields['pronome_tratamento'].choices = [
-            (p.pk, '%s - %s - %s - %s - %s - %s' % (
+            (p.pk, '%s, %s - %s - %s - %s - %s - %s - %s' % (
+                p.prefixo_nome_singular_m,
+                p.prefixo_nome_singular_f,
                 p.nome_por_extenso,
                 p.abreviatura_singular_m,
                 p.abreviatura_plural_m,
@@ -263,13 +266,17 @@ class ContatoFragmentPronomesForm(forms.Form):
 
         if 'instance' in self.initial:
             self.fields['pronome_tratamento'].queryset = self.initial[
-                'instance'].pronomes.order_by('nome_por_extenso')
+                'instance'].pronomes.order_by(
+                'prefixo_nome_singular_m', 'nome_por_extenso')
         else:
             self.fields['pronome_tratamento'].queryset = \
-                PronomeTratamento.objects.order_by('nome_por_extenso')
+                PronomeTratamento.objects.order_by(
+                'prefixo_nome_singular_m', 'nome_por_extenso')
 
         self.fields['pronome_tratamento'].choices = [
-            (p.pk, '%s - %s - %s - %s - %s - %s' % (
+            (p.pk, '%s, %s - %s - %s - %s - %s - %s - %s' % (
+                p.prefixo_nome_singular_m,
+                p.prefixo_nome_singular_f,
                 p.nome_por_extenso,
                 p.abreviatura_singular_m,
                 p.abreviatura_plural_m,

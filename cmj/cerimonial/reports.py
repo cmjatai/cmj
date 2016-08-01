@@ -187,6 +187,7 @@ class ImpressoEnderecamentoContatoView(PermissionRequiredMixin, FilterView):
         story = []
 
         linha_pronome = ''
+        prefixo_nome = ''
 
         if contato.pronome_tratamento:
             if 'imprimir_pronome' in cleaned_data and\
@@ -195,6 +196,10 @@ class ImpressoEnderecamentoContatoView(PermissionRequiredMixin, FilterView):
                     contato.pronome_tratamento,
                     'enderecamento_singular_%s' % lower(
                         contato.sexo))
+            prefixo_nome = getattr(
+                contato.pronome_tratamento,
+                'prefixo_nome_singular_%s' % lower(
+                    contato.sexo))
 
         if local_cargo == ImpressoEnderecamentoContatoFilterSet.DEPOIS_PRONOME\
                 and imprimir_cargo and (linha_pronome or contato.cargo):
@@ -204,14 +209,17 @@ class ImpressoEnderecamentoContatoView(PermissionRequiredMixin, FilterView):
             story.append(Paragraph(
                 linha_pronome, stylesheet['pronome_style']))
 
-        linha_nome = contato.nome.upper()\
-            if 'nome_maiusculo' in cleaned_data and\
-            cleaned_data['nome_maiusculo'] == 'True' else contato.nome
+        linha_nome = contato.nome
 
         if local_cargo == ImpressoEnderecamentoContatoFilterSet.LINHA_NOME\
                 and imprimir_cargo:
-            linha_nome = '%s %s' % (contato.cargo, linha_nome)
+
+            linha_nome = '%s %s %s' % (contato.cargo, prefixo_nome, linha_nome)
             linha_nome = linha_nome.strip()
+
+        linha_nome = linha_nome.upper()\
+            if 'nome_maiusculo' in cleaned_data and\
+            cleaned_data['nome_maiusculo'] == 'True' else linha_nome
 
         story.append(Paragraph(linha_nome, stylesheet['nome_style']))
 
