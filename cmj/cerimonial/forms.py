@@ -347,9 +347,10 @@ class TipoAutoridadeForm(ModelForm):
         self.fields[
             'pronomes'].widget = forms.CheckboxSelectMultiple()
 
-        self.fields[
-            'pronomes'].choices = [
-            (p.pk, '%s - %s - %s - %s - %s - %s' % (
+        self.fields['pronomes'].choices = [
+            (p.pk, '%s, %s - %s - %s - %s - %s - %s - %s' % (
+                p.prefixo_nome_singular_m,
+                p.prefixo_nome_singular_f,
                 p.nome_por_extenso,
                 p.abreviatura_singular_m,
                 p.abreviatura_plural_m,
@@ -357,7 +358,8 @@ class TipoAutoridadeForm(ModelForm):
                 p.vocativo_indireto_singular_m,
                 p.enderecamento_singular_m))
             for p in self.fields[
-                'pronomes'].queryset.order_by('nome_por_extenso')]
+                'pronomes'].queryset.order_by(
+                'prefixo_nome_singular_m', 'nome_por_extenso')]
         """
         self.fields['pronomes'] = Field(
             'pronomes',
