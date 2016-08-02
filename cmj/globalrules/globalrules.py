@@ -8,6 +8,8 @@ GROUP_SOCIAL_USERS = _('Usuários de Login Social')
 GROUP_WORKSPACE_OPER_CONTATOS = _('Área de Trabalho - Operadores de Contatos')
 GROUP_WORKSPACE_OPER_PROCESSOS = _(
     'Área de Trabalho - Operadores de Processos')
+GROUP_WORKSPACE_OPER_GRUPO_CONTATOS = _(
+    'Área de Trabalho - Operadores de Grupos de Contatos')
 GROUP_WORKSPACE_MANAGERS = _('Área de Trabalho - Gestores')
 
 
@@ -38,7 +40,7 @@ class Rules:
             print(group, e)
 
     def config_groups(self, group_rules):
-        
+
         for group, rules in group_rules:
             self._config_group(group, rules)
 

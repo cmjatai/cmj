@@ -30,7 +30,8 @@ from sapl.parlamentares.models import Municipio
 from cmj import settings
 from cmj.cerimonial.models import LocalTrabalho, Endereco,\
     TipoAutoridade, PronomeTratamento, Contato, Perfil, Processo,\
-    IMPORTANCIA_CHOICE, AssuntoProcesso, StatusProcesso, ProcessoContato
+    IMPORTANCIA_CHOICE, AssuntoProcesso, StatusProcesso, ProcessoContato,\
+    GrupoDeContatos
 from cmj.core.forms import ListWithSearchForm
 from cmj.core.models import Trecho, ImpressoEnderecamento
 from cmj.utils import normalize, YES_NO_CHOICES
@@ -406,8 +407,8 @@ class ProcessoForm(ModelForm):
         )
 
         q = [_('Seleção de Contatos'),
-             [(q_field, 6),
-              (Div(Field('contatos'), css_class='form-group-contatos'), 6)]
+             [(q_field, 5),
+              (Div(Field('contatos'), css_class='form-group-contatos'), 7)]
              ]
         yaml_layout.append(q)
 
@@ -653,6 +654,10 @@ class ImpressoEnderecamentoContatoFilterSet(FilterSet):
         required=False,
         queryset=ImpressoEnderecamento.objects.all(),
         action=filter_impresso)
+    """grupo = ModelChoiceFilter(
+        required=False,
+        queryset=GrupoDeContatos.objects.all(),
+        action=filter_grupo)"""
     imprimir_pronome = MethodChoiceFilter(
         choices=YES_NO_CHOICES,
         initial=False)
@@ -842,3 +847,59 @@ class ListWithSearchProcessoForm(ListWithSearchForm):
         super(ListWithSearchProcessoForm, self).__init__(*args, **kwargs)
 
         self.helper.layout.fields.append(Field('assunto'))
+
+
+class GrupoDeContatosForm(ModelForm):
+    q = forms.CharField(
+        required=False,
+        label='Busca por Contatos',
+        widget=forms.TextInput(
+            attrs={'type': 'search'}))
+
+    class Meta:
+        model = GrupoDeContatos
+        fields = ['nome',
+                  'q',
+                  'contatos', ]
+
+    def __init__(self, *args, **kwargs):
+        yaml_layout = kwargs.pop('yaml_layout')
+
+        q_field = Div(
+            FieldWithButtons(
+                Field('q',
+                      placeholder=_('Filtrar Lista'),
+                      autocomplete='off',
+                      type='search',
+                      onkeypress='atualizaContatos(event)'),
+                StrictButton(
+                    _('Filtrar'), css_class='btn-default',
+                    type='button', onclick='atualizaContatos(event)')),
+            Div(css_class='form-group-contato-search')
+        )
+
+        q = [_('Seleção de Contatos'),
+             [(q_field, 5),
+              (Div(Field('contatos'), css_class='form-group-contatos'), 7)]
+             ]
+        yaml_layout.append(q)
+
+        self.helper = FormHelper()
+        self.helper.layout = SaplFormLayout(*yaml_layout)
+
+        super(GrupoDeContatosForm, self).__init__(*args, **kwargs)
+
+        self.fields['q'].help_text = _('Digite parte do nome, nome social ou '
+                                       'apelido do Contato que você procura.')
+
+        self.fields['contatos'].widget = forms.CheckboxSelectMultiple()
+
+        self.fields['contatos'].queryset = Contato.objects.all()
+
+        self.fields['contatos'].choices = [
+            (c.pk, c) for c in self.instance.contatos.order_by('nome')]\
+            if self.instance.pk else []
+
+        self.fields['contatos'].help_text = _(
+            'Procure por Contatos na caixa de buscas e arraste '
+            'para esta caixa os Contatos interessados neste Processo.')

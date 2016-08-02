@@ -808,3 +808,30 @@ class ProcessoContato(Processo):
         proxy = True
         verbose_name = _('Processo')
         verbose_name_plural = _('Processos')
+
+
+class GrupoDeContatos(CmjAuditoriaModelMixin):
+
+    nome = models.CharField(max_length=100,
+                            unique=True,
+                            verbose_name=_('Nome do Grupo'))
+
+    contatos = models.ManyToManyField(Contato,
+                                      blank=True,
+                                      verbose_name=_(
+                                          'Contatos do Grupo'),
+                                      related_name='grupodecontatos_set',)
+
+    workspace = models.ForeignKey(
+        AreaTrabalho,
+        verbose_name=_('Área de Trabalho'),
+        related_name='grupodecontatos_set',
+        on_delete=PROTECT)
+
+    class Meta:
+        verbose_name = _('Grupo de Contatos')
+        verbose_name_plural = _('Grupos de Contatos')
+        ordering = ('nome', )
+
+    def __str__(self):
+        return str(self.nome)

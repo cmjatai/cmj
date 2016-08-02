@@ -111,6 +111,10 @@
                     <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'cmj.cerimonial:contato_list' %}">{% trans "Contatos" %}</a></li>
                   {% endif %}
 
+                  {% if perms.core.menu_grupocontatos %}
+                    <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'cmj.cerimonial:grupodecontatos_list' %}">{% trans "Grupos" %}</a></li>
+                  {% endif %}
+
 
                   {% if perms.core.menu_processos %}
                     <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'cmj.cerimonial:processo_list' %}">{% trans "Processos" %}</a></li>

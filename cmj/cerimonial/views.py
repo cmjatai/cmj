@@ -8,7 +8,8 @@ from sapl.crispy_layout_mixin import CrispyLayoutFormMixin
 from cmj.cerimonial.forms import LocalTrabalhoForm, EnderecoForm,\
     TipoAutoridadeForm, LocalTrabalhoPerfilForm,\
     ContatoFragmentPronomesForm, ContatoForm, ProcessoForm,\
-    ContatoFragmentSearchForm, ProcessoContatoForm, ListWithSearchProcessoForm
+    ContatoFragmentSearchForm, ProcessoContatoForm, ListWithSearchProcessoForm,\
+    GrupoDeContatosForm
 from cmj.cerimonial.models import TipoTelefone, TipoEndereco,\
     TipoEmail, Parentesco, EstadoCivil, TipoAutoridade, TipoLocalTrabalho,\
     NivelInstrucao, Contato, Telefone, OperadoraTelefonia, Email,\
@@ -16,7 +17,7 @@ from cmj.cerimonial.models import TipoTelefone, TipoEndereco,\
     DependentePerfil, LocalTrabalhoPerfil,\
     EmailPerfil, TelefonePerfil, EnderecoPerfil, FiliacaoPartidaria,\
     StatusProcesso, ClassificacaoProcesso, TopicoProcesso, Processo,\
-    AssuntoProcesso, ProcessoContato
+    AssuntoProcesso, ProcessoContato, GrupoDeContatos
 from cmj.cerimonial.rules import rules_patterns
 from cmj.core.forms import ListWithSearchForm
 from cmj.core.models import AreaTrabalho
@@ -460,10 +461,12 @@ class ProcessoMasterCrud(DetailMasterCrud):
     class CreateView(DetailMasterCrud.CreateView):
         form_class = ProcessoForm
         layout_key = 'ProcessoLayoutForForm'
+        template_name = 'cerimonial/crispy_form_with_contato_search.html'
 
     class UpdateView(DetailMasterCrud.UpdateView):
         form_class = ProcessoForm
         layout_key = 'ProcessoLayoutForForm'
+        template_name = 'cerimonial/crispy_form_with_contato_search.html'
 
 
 class ContatoFragmentFormSearchView(FormView):
@@ -525,3 +528,44 @@ class ProcessoContatoCrud(MasterDetailCrudPermission):
 
     class ListView(MasterDetailCrudPermission.ListView):
         layout_key = 'ProcessoLayoutForForm'
+
+
+class GrupoDeContatosMasterCrud(DetailMasterCrud):
+    model = GrupoDeContatos
+    container_field = 'workspace__operadores'
+
+    model_set = 'contatos'
+
+    class BaseMixin(DetailMasterCrud.BaseMixin):
+        list_field_names = ['nome']
+        list_field_names_set = ['nome', 'telefone_set', 'email_set']
+        layout_key = 'GrupoDeContatosLayoutForForm'
+
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            context[
+                'subnav_template_name'] = 'cerimonial/subnav_grupocontato.yaml'
+            return context
+
+        def get_form(self, form_class=None):
+            try:
+                form = super(CrispyLayoutFormMixin, self).get_form(form_class)
+            except AttributeError as e:
+                # simply return None if there is no get_form on super
+                pass
+            else:
+                return form
+
+        def get_form_kwargs(self):
+            kwargs = super().get_form_kwargs()
+
+            kwargs.update({'yaml_layout': self.get_layout()})
+            return kwargs
+
+    class CreateView(DetailMasterCrud.CreateView):
+        template_name = 'cerimonial/crispy_form_with_contato_search.html'
+        form_class = GrupoDeContatosForm
+
+    class UpdateView(DetailMasterCrud.UpdateView):
+        template_name = 'cerimonial/crispy_form_with_contato_search.html'
+        form_class = GrupoDeContatosForm

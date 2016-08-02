@@ -355,9 +355,14 @@ class DetailMasterCrud(Crud):
                 return []
             try:
                 obj = self.crud if hasattr(self, 'crud') else self
-                return [getattr(
-                    self.object, obj.model_set).model._meta.get_field(
-                    fieldname).verbose_name
+                return [
+                    (getattr(
+                        self.object, obj.model_set).model._meta.get_field(
+                        fieldname).verbose_name
+                     if hasattr(self.object, fieldname) else
+                        getattr(
+                        self.object, obj.model_set).model._meta.get_field(
+                        fieldname).related_model._meta.verbose_name_plural)
                     for fieldname in self.list_field_names_set]
             except:
                 obj = self.crud if hasattr(self, 'crud') else self
@@ -386,7 +391,7 @@ class DetailMasterCrud(Crud):
                     self.resolve_model_set_url(base.DETAIL, args=(obj.id,))
                     if i == 0 else None)
                     for i, name in enumerate(self.list_field_names_set)]
-            except:
+            except Exception as e:
                 return [(
                     getattr(obj, name),
                     self.resolve_model_set_url(base.DETAIL, args=(obj.id,))

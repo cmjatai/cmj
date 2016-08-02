@@ -146,3 +146,6 @@ ProcessoLayoutForForm:
   - topicos:4 assuntos
   - descricao status:2 classificacoes:2
   - observacoes solucao
+GrupoDeContatosLayoutForForm:
+  {% trans 'Dados Básicos' %}:
+  - nome

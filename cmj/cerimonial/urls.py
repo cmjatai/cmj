@@ -11,7 +11,8 @@ from cmj.cerimonial.views import ContatoCrud, TelefoneCrud, EmailCrud,\
     NivelInstrucaoCrud, PronomeTratamentoCrud, \
     ContatoFragmentFormPronomesView, StatusProcessoCrud, TopicoProcessoCrud,\
     ClassificacaoProcessoCrud, ProcessoMasterCrud, AssuntoProcessoCrud,\
-    ContatoFragmentFormSearchView, ProcessoContatoCrud
+    ContatoFragmentFormSearchView, ProcessoContatoCrud,\
+    GrupoDeContatosMasterCrud
 
 from .apps import AppConfig
 
@@ -42,13 +43,17 @@ urlpatterns = [
         PerfilCrud.get_urls()
     )),
 
+    url(r'^grupo/', include(
+        GrupoDeContatosMasterCrud.get_urls()
+    )),
+
     url(r'^processo/', include(
         ProcessoMasterCrud.get_urls()
     )),
-
     url(r'^assuntoprocesso/', include(
         AssuntoProcessoCrud.get_urls()
     )),
+
 
     url(r'^reports/cerimonial/enderecamentos',
         ImpressoEnderecamentoContatoView.as_view(),

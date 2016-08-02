@@ -5,14 +5,14 @@ from cmj.cerimonial.models import Perfil, Endereco, Email, Telefone,\
     LocalTrabalho, Dependente, Contato, EnderecoPerfil, EmailPerfil,\
     TelefonePerfil, LocalTrabalhoPerfil, DependentePerfil, OperadoraTelefonia,\
     NivelInstrucao, EstadoCivil, FiliacaoPartidaria, AssuntoProcesso, Processo,\
-    ProcessoContato
+    ProcessoContato, GrupoDeContatos
 from cmj.core.models import Trecho
 from cmj.core.rules import menu_contatos, menu_dados_auxiliares, search_trecho,\
-    menu_processos, menu_relatorios
+    menu_processos, menu_relatorios, menu_grupocontatos
 from cmj.globalrules.crud_custom import LIST, ADD, DETAIL, CHANGE, DELETE
 from cmj.globalrules.globalrules import GROUP_SOCIAL_USERS,\
     GROUP_WORKSPACE_OPER_CONTATOS, GROUP_WORKSPACE_MANAGERS,\
-    GROUP_WORKSPACE_OPER_PROCESSOS
+    GROUP_WORKSPACE_OPER_PROCESSOS, GROUP_WORKSPACE_OPER_GRUPO_CONTATOS
 
 
 rules_group_social_users = (
@@ -34,6 +34,7 @@ rules_group_workspace_oper_contatos = (
         (get_user_model(), [
             menu_contatos,
             menu_dados_auxiliares,
+            menu_grupocontatos,
             menu_relatorios]),
         (Trecho, [LIST, DETAIL]),
         (OperadoraTelefonia, [LIST, DETAIL]),
@@ -48,6 +49,16 @@ rules_group_workspace_oper_contatos = (
         (LocalTrabalho, [LIST, ADD, DETAIL, CHANGE, DELETE]),
         (Dependente, [LIST, ADD, DETAIL, CHANGE, DELETE]),
         (FiliacaoPartidaria, [LIST, ADD, DETAIL, CHANGE, DELETE]),
+    ]
+)
+
+rules_group_workspace_oper_grupo_contatos = (
+    GROUP_WORKSPACE_OPER_GRUPO_CONTATOS, [
+        (get_user_model(), [
+            menu_contatos,
+            menu_grupocontatos, ]),
+        (GrupoDeContatos, [LIST, ADD, DETAIL, CHANGE, DELETE]),
+        (Contato, [LIST, DETAIL, ]),
     ]
 )
 rules_group_workspace_oper_processos = (
@@ -65,5 +76,6 @@ rules_patterns = [
     rules_group_social_users,
     rules_group_workspace_managers,
     rules_group_workspace_oper_contatos,
+    rules_group_workspace_oper_grupo_contatos,
     rules_group_workspace_oper_processos,
 ]
