@@ -28,8 +28,7 @@ from cmj.globalrules.crud_custom import DetailMasterCrud,\
 
 globalrules.rules.config_groups(rules_patterns)
 
-# -------------  Details Master Crud build----------------------------
-
+# ---- Details Master Crud build ---------------------------
 TipoTelefoneCrud = DetailMasterCrud.build(TipoTelefone, None, 'tipotelefone')
 TipoEnderecoCrud = DetailMasterCrud.build(TipoEndereco, None, 'tipoendereco')
 TipoEmailCrud = DetailMasterCrud.build(TipoEmail, None, 'tipoemail')
@@ -44,9 +43,8 @@ ClassificacaoProcessoCrud = DetailMasterCrud.build(
 TopicoProcessoCrud = DetailMasterCrud.build(
     TopicoProcesso, None, 'topicoprocesso')
 
-# -------------  Details Master Crud herança----------------------------
 
-
+# ---- Details Master Crud herança ---------------------------
 class OperadoraTelefoniaCrud(DetailMasterCrud):
     model_set = 'telefone_set'
     model = OperadoraTelefonia
@@ -97,8 +95,7 @@ class TipoAutoridadeCrud(DetailMasterCrud):
         form_class = TipoAutoridadeForm
 
 
-# ------------- Contato Master e Details ----------------------------
-
+# ---- Contato Master e Details ----------------------------
 
 class ContatoCrud(DetailMasterCrud):
     model_set = None
@@ -206,10 +203,12 @@ class LocalTrabalhoCrud(MasterDetailCrudPermission):
 
     class CreateView(PreferencialMixin, MasterDetailCrudPermission.CreateView):
         form_class = LocalTrabalhoForm
+        layout_key = 'LocalTrabalhoLayoutForForm'
         template_name = 'core/crispy_form_with_trecho_search.html'
 
     class UpdateView(PreferencialMixin, MasterDetailCrudPermission.UpdateView):
         form_class = LocalTrabalhoForm
+        layout_key = 'LocalTrabalhoLayoutForForm'
         template_name = 'core/crispy_form_with_trecho_search.html'
 
 
@@ -245,15 +244,14 @@ class EnderecoCrud(MasterDetailCrudPermission):
 
     class CreateView(PreferencialMixin, MasterDetailCrudPermission.CreateView):
         form_class = EnderecoForm
-        template_name = 'core/crispy_form_with_trecho_search.html'
+        layout_key = 'EnderecoLayoutForForm'
 
     class UpdateView(PreferencialMixin, MasterDetailCrudPermission.UpdateView):
         form_class = EnderecoForm
-        template_name = 'core/crispy_form_with_trecho_search.html'
+        layout_key = 'EnderecoLayoutForForm'
 
 
-# ------------- Peril Master e Details ----------------------------
-
+# ---- Peril Master e Details ----------------------------
 class PerfilCrud(PerfilAbstractCrud):
     pass
 
@@ -392,7 +390,7 @@ class DependentePerfilCrud(PerfilDetailCrudPermission):
 """
 
 
-# ------------- Processo Master e Details ----------------------------
+# ---- Processo Master e Details ----------------------------
 
 class AssuntoProcessoCrud(DetailMasterCrud):
     model = AssuntoProcesso
@@ -446,6 +444,17 @@ class ProcessoMasterCrud(DetailMasterCrud):
             kwargs.update({'yaml_layout': self.get_layout()})
             return kwargs
 
+        def get_initial(self):
+            initial = FormView.get_initial(self)
+
+            try:
+                initial['workspace'] = AreaTrabalho.objects.filter(
+                    operadores=self.request.user.pk)[0]
+            except:
+                raise PermissionDenied(_('Sem permissão de Acesso!'))
+
+            return initial
+
     class ListView(DetailMasterCrud.ListView):
         form_search_class = ListWithSearchProcessoForm
 
@@ -461,12 +470,10 @@ class ProcessoMasterCrud(DetailMasterCrud):
     class CreateView(DetailMasterCrud.CreateView):
         form_class = ProcessoForm
         layout_key = 'ProcessoLayoutForForm'
-        template_name = 'cerimonial/crispy_form_with_contato_search.html'
 
     class UpdateView(DetailMasterCrud.UpdateView):
         form_class = ProcessoForm
         layout_key = 'ProcessoLayoutForForm'
-        template_name = 'cerimonial/crispy_form_with_contato_search.html'
 
 
 class ContatoFragmentFormSearchView(FormView):
@@ -506,9 +513,21 @@ class ProcessoContatoCrud(MasterDetailCrudPermission):
                             'status',
                             'classificacoes']
 
+        def get_initial(self):
+            initial = FormView.get_initial(self)
+
+            try:
+                initial['workspace'] = AreaTrabalho.objects.filter(
+                    operadores=self.request.user.pk)[0]
+            except:
+                raise PermissionDenied(_('Sem permissão de Acesso!'))
+
+            return initial
+
     class CreateView(MasterDetailCrudPermission.CreateView):
         layout_key = 'ProcessoLayoutForForm'
         form_class = ProcessoContatoForm
+        template_name = 'cerimonial/processo_form.html'
 
         """def form_valid(self, form):
             response = MasterDetailCrudPermission.CreateView.form_valid(
@@ -522,6 +541,7 @@ class ProcessoContatoCrud(MasterDetailCrudPermission):
     class UpdateView(MasterDetailCrudPermission.UpdateView):
         layout_key = 'ProcessoLayoutForForm'
         form_class = ProcessoContatoForm
+        template_name = 'cerimonial/processo_form.html'
 
     class DetailView(MasterDetailCrudPermission.DetailView):
         layout_key = 'Processo'

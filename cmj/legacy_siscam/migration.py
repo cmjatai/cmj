@@ -141,7 +141,7 @@ def migrate_siscam():
         trecho75800000.save()
         trecho75800000.cep.add(cep75800000)
 
-    contador_contato = 21900
+    contador_contato = 0
     for upk, apk in router_usuario_areatrabalho:
 
         w = AreaTrabalho.objects.get(pk=apk)

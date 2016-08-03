@@ -275,15 +275,18 @@
           <header class="masthead">
             <div class="container{{fluid}}">
 
-              {% if user.is_anonymous %}
-                <div class="btn-group btn-group-justified btn-group-lg" role="group" aria-label="...">
-                  <a href="#" class="btn btn-detault">Licitações e Contratos</a>
-                  <a href="#" class="btn btn-detault">Legislação Municipal</a>
-                  <a href="#" class="btn btn-detault">Sessões</a>
-                  <a href="#" class="btn btn-detault">Matérias em Tramitação</a>
-                  <a href="#" class="btn btn-detault">Diário Oficial</a>
-                </div>
-              {% endif %}
+              {% comment %}
+
+                {% if user.is_anonymous %}
+                  <div class="btn-group btn-group-justified btn-group-lg" role="group" aria-label="...">
+                    <a href="#" class="btn btn-detault">Licitações e Contratos</a>
+                    <a href="#" class="btn btn-detault">Legislação Municipal</a>
+                    <a href="#" class="btn btn-detault">Sessões</a>
+                    <a href="#" class="btn btn-detault">Matérias em Tramitação</a>
+                    <a href="#" class="btn btn-detault">Diário Oficial</a>
+                  </div>
+                {% endif %}
+              {% endcomment %}
 
 
               {% block sections_nav %}{% subnav %}{% endblock sections_nav %}

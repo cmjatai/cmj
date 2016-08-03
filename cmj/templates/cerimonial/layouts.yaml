@@ -70,13 +70,28 @@ Dependente:
 LocalTrabalho:
   {% trans 'Dados Básicos' %}:
   - nome:6 nome_social:4 preferencial
-  - data_inicio:2 data_fim:2 cargo tipo
+  - data_inicio:2 data_fim:2 cargo:5 tipo
+  {% trans 'Endereço' %}:
+  - endereco:6 numero complemento cep
+  - bairro distrito
+  - regiao_municipal municipio:4 uf:3
+LocalTrabalhoLayoutForForm:
+  {% trans 'Dados Básicos' %}:
+  - nome:6 nome_social:4 preferencial
+  - data_inicio:2 data_fim:2 cargo:5 tipo
   {% trans 'Endereço' %}:
   - trecho
   - endereco:6 numero complemento cep
   - bairro distrito
   - regiao_municipal municipio:4 uf:3
 Endereco:
+  {% trans 'Endereço' %}:
+  - tipo:4 preferencial
+  - endereco:5 numero complemento:3 cep
+  - bairro distrito regiao_municipal
+  - ponto_referencia municipio:3 uf:2
+  - observacoes
+EnderecoLayoutForForm:
   {% trans 'Endereço' %}:
   - tipo:4 preferencial
   - endereco:5 numero complemento:3 cep
@@ -136,16 +151,18 @@ AssuntoProcesso:
 Processo:
   {% trans 'Dados Básicos' %}:
   - data:2 titulo importancia:4
-  - topicos:4 assuntos
-  - descricao status:2 classificacoes:2
-  - observacoes solucao
+  - topicos:4 assuntos status:2 classificacoes:2
+  - descricao
+  - observacoes
+  - solucao
   - contatos
 ProcessoLayoutForForm:
   {% trans 'Dados Básicos' %}:
   - data:2 titulo importancia:4
-  - topicos:4 assuntos
-  - descricao status:2 classificacoes:2
-  - observacoes solucao
+  - topicos:4 assuntos status:2 classificacoes:2
+  - descricao
+  - observacoes
+  - solucao
 GrupoDeContatosLayoutForForm:
   {% trans 'Dados Básicos' %}:
   - nome

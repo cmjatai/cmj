@@ -9,7 +9,7 @@
   </div>
   {% block extra_content %} {% endblock %}
   <div class="container-table">
-    <div class="result-count">{% blocktrans with verbose_name_plural=view.verbose_name_plural %}Total de {{ verbose_name_plural }}: <strong>{{count}}</strong>{% endblocktrans %}</div>
+    <div class="result-count">{% blocktrans with verbose_name_plural=view.verbose_name_plural %}Total de {{ verbose_name_plural }} Selecionados: <strong>{{count}}</strong>{% endblocktrans %}</div>
     <table class="table table-striped table-hover">
       <thead>
         <tr>

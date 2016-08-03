@@ -423,8 +423,10 @@ class ProcessoForm(ModelForm):
         self.fields['q'].help_text = _('Digite parte do nome, nome social ou '
                                        'apelido do Contato que você procura.')
 
-        self.fields['descricao'].widget = forms.Textarea(
-            attrs={'rows': '8'})
+        self.fields['topicos'].widget = forms.SelectMultiple(
+            attrs={'size': '8'})
+        self.fields['assuntos'].widget = forms.SelectMultiple(
+            attrs={'size': '8'})
 
         # Utilizando template bootstrap3 customizado
         self.fields['importancia'].widget = forms.RadioSelect()
@@ -439,14 +441,14 @@ class ProcessoForm(ModelForm):
         self.fields['classificacoes'].widget = forms.CheckboxSelectMultiple()
         # self.fields['classificacoes'].inline_class = True
 
+        self.fields['assuntos'].queryset = AssuntoProcesso.objects.filter(
+            workspace=self.initial['workspace'])
+
         self.fields['contatos'].widget = forms.CheckboxSelectMultiple()
-
         self.fields['contatos'].queryset = Contato.objects.all()
-
         self.fields['contatos'].choices = [
             (c.pk, c) for c in self.instance.contatos.order_by('nome')]\
             if self.instance.pk else []
-
         self.fields['contatos'].help_text = _(
             'Procure por Contatos na caixa de buscas e arraste '
             'para esta caixa os Contatos interessados neste Processo.')
@@ -473,8 +475,10 @@ class ProcessoContatoForm(ModelForm):
         if not self.instance.pk:
             self.fields['data'].initial = date.today()
 
-        self.fields['descricao'].widget = forms.Textarea(
-            attrs={'rows': '8'})
+        self.fields['topicos'].widget = forms.SelectMultiple(
+            attrs={'size': '8'})
+        self.fields['assuntos'].widget = forms.SelectMultiple(
+            attrs={'size': '8'})
 
         # Utilizando template bootstrap3 customizado
         self.fields['importancia'].widget = forms.RadioSelect()
@@ -488,6 +492,9 @@ class ProcessoContatoForm(ModelForm):
 
         self.fields['classificacoes'].widget = forms.CheckboxSelectMultiple()
         # self.fields['classificacoes'].inline_class = True
+
+        self.fields['assuntos'].queryset = AssuntoProcesso.objects.filter(
+            workspace=self.initial['workspace'])
 
 
 class ContatoFragmentSearchForm(forms.Form):
@@ -603,6 +610,10 @@ class MethodNumberFilter(MethodFilter, NumberFilter):
     pass
 
 
+class MethodModelChoiceFilter(MethodFilter, ModelChoiceFilter):
+    pass
+
+
 class SubmitFilterPrint(BaseInput):
 
     input_type = 'submit'
@@ -654,10 +665,11 @@ class ImpressoEnderecamentoContatoFilterSet(FilterSet):
         required=False,
         queryset=ImpressoEnderecamento.objects.all(),
         action=filter_impresso)
-    """grupo = ModelChoiceFilter(
+
+    grupo = MethodModelChoiceFilter(
         required=False,
-        queryset=GrupoDeContatos.objects.all(),
-        action=filter_grupo)"""
+        queryset=GrupoDeContatos.objects.all())
+
     imprimir_pronome = MethodChoiceFilter(
         choices=YES_NO_CHOICES,
         initial=False)
@@ -669,7 +681,7 @@ class ImpressoEnderecamentoContatoFilterSet(FilterSet):
         max_value=100, min_value=0, max_digits=3, decimal_places=0,)
 
     nome_maiusculo = MethodChoiceFilter(
-        label=_('Nome em Maiúsculo'),
+        label=_('Nome Maiúsculo'),
         choices=YES_NO_CHOICES, initial=False)
 
     local_cargo = MethodChoiceFilter(
@@ -677,6 +689,10 @@ class ImpressoEnderecamentoContatoFilterSet(FilterSet):
         choices=LOCAL_CARGO_CHOICE, initial=False)
 
     def filter_fontsize(self, queryset, value):
+        return queryset
+
+    def filter_grupo(self, queryset, value):
+        queryset = queryset.filter(grupodecontatos_set=value)
         return queryset
 
     def filter_local_cargo(self, queryset, value):
@@ -770,17 +786,20 @@ class ImpressoEnderecamentoContatoFilterSet(FilterSet):
     def __init__(self, data=None,
                  queryset=None, prefix=None, strict=None, **kwargs):
 
+        workspace = kwargs.pop('workspace')
+
         super(ImpressoEnderecamentoContatoFilterSet, self).__init__(
             data=data,
             queryset=queryset, prefix=prefix, strict=strict, **kwargs)
 
         col1 = to_row([
-            ('search', 12),
+            ('search', 6),
             ('sexo', 3),
             ('tem_filhos', 3),
             ('data_nascimento', 6),
-            ('tipo_autoridade', 6),
             ('idade', 6),
+            ('tipo_autoridade', 6),
+            ('grupo', 6),
         ])
 
         col2 = to_row([
@@ -816,7 +835,7 @@ class ImpressoEnderecamentoContatoFilterSet(FilterSet):
         )
 
         self.form.fields['search'].label = _(
-            'Filtrar por Nome/Nome Social/Apelido')
+            'Nome/Nome Social/Apelido')
         self.form.fields['data_nascimento'].label = '%s (%s)' % (
             _('Aniversário'), _('Inicial - Final'))
 
@@ -831,6 +850,9 @@ class ImpressoEnderecamentoContatoFilterSet(FilterSet):
 
         self.form.fields['nome_maiusculo'].widget = forms.RadioSelect()
         self.form.fields['nome_maiusculo'].inline_class = True
+
+        self.form.fields['grupo'].queryset = GrupoDeContatos.objects.filter(
+            workspace=workspace)
 
 
 class ListWithSearchProcessoForm(ListWithSearchForm):

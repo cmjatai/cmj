@@ -530,8 +530,12 @@ class LocalTrabalho(CmjAuditoriaModelMixin):
     numero = models.CharField(max_length=50, blank=True, default='',
                               verbose_name=_('Número'))
 
-    bairro = models.CharField(max_length=254, blank=True, default='',
-                              verbose_name=_('Bairro'))
+    bairro = models.ForeignKey(
+        Bairro,
+        verbose_name=Bairro._meta.verbose_name,
+        related_name='localtrabalho_set',
+        blank=True, null=True, on_delete=SET_NULL)
+
     distrito = models.ForeignKey(
         Distrito,
         verbose_name=Distrito._meta.verbose_name,
@@ -559,7 +563,7 @@ class LocalTrabalho(CmjAuditoriaModelMixin):
     cargo = models.CharField(
         max_length=254, blank=True, default='',
         verbose_name=_('Cargo/Função'),
-        help_text=_('Ao definir um cargo e função aqui, o'
+        help_text=_('Ao definir um cargo e função aqui, o '
                     'Cargo/Função preenchido na aba "Dados Básicos", '
                     'será desconsiderado ao gerar impressos!'))
 

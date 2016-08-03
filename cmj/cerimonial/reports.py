@@ -4,6 +4,7 @@ from math import ceil, floor
 
 from braces.views import PermissionRequiredMixin
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied
 from django.forms.utils import ErrorList
 from django.http.response import HttpResponse
 from django.template.defaultfilters import lower
@@ -23,6 +24,7 @@ from sapl.crud.base import make_pagination
 
 from cmj.cerimonial.forms import ImpressoEnderecamentoContatoFilterSet
 from cmj.cerimonial.models import Contato
+from cmj.core.models import AreaTrabalho
 
 
 class ImpressoEnderecamentoContatoView(PermissionRequiredMixin, FilterView):
@@ -69,6 +71,16 @@ class ImpressoEnderecamentoContatoView(PermissionRequiredMixin, FilterView):
                                       'condições definidas na busca!'))
 
         return self.render_to_response(context)
+
+    def get_filterset(self, filterset_class):
+        kwargs = self.get_filterset_kwargs(filterset_class)
+        try:
+            kwargs['workspace'] = AreaTrabalho.objects.filter(
+                operadores=self.request.user.pk)[0]
+        except:
+            raise PermissionDenied(_('Sem permissão de Acesso!'))
+
+        return filterset_class(**kwargs)
 
     def get_queryset(self):
         qs = super().get_queryset()
