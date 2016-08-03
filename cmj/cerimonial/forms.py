@@ -31,7 +31,7 @@ from cmj import settings
 from cmj.cerimonial.models import LocalTrabalho, Endereco,\
     TipoAutoridade, PronomeTratamento, Contato, Perfil, Processo,\
     IMPORTANCIA_CHOICE, AssuntoProcesso, StatusProcesso, ProcessoContato,\
-    GrupoDeContatos
+    GrupoDeContatos, TopicoProcesso
 from cmj.core.forms import ListWithSearchForm
 from cmj.core.models import Trecho, ImpressoEnderecamento
 from cmj.utils import normalize, YES_NO_CHOICES
@@ -425,8 +425,12 @@ class ProcessoForm(ModelForm):
 
         self.fields['topicos'].widget = forms.SelectMultiple(
             attrs={'size': '8'})
+        self.fields['topicos'].queryset = TopicoProcesso.objects.all()
+
         self.fields['assuntos'].widget = forms.SelectMultiple(
             attrs={'size': '8'})
+        self.fields['assuntos'].queryset = AssuntoProcesso.objects.filter(
+            workspace=self.initial['workspace'])
 
         # Utilizando template bootstrap3 customizado
         self.fields['importancia'].widget = forms.RadioSelect()
@@ -440,9 +444,6 @@ class ProcessoForm(ModelForm):
 
         self.fields['classificacoes'].widget = forms.CheckboxSelectMultiple()
         # self.fields['classificacoes'].inline_class = True
-
-        self.fields['assuntos'].queryset = AssuntoProcesso.objects.filter(
-            workspace=self.initial['workspace'])
 
         self.fields['contatos'].widget = forms.CheckboxSelectMultiple()
         self.fields['contatos'].queryset = Contato.objects.all()
@@ -477,8 +478,12 @@ class ProcessoContatoForm(ModelForm):
 
         self.fields['topicos'].widget = forms.SelectMultiple(
             attrs={'size': '8'})
+        self.fields['topicos'].queryset = TopicoProcesso.objects.all()
+
         self.fields['assuntos'].widget = forms.SelectMultiple(
             attrs={'size': '8'})
+        self.fields['assuntos'].queryset = AssuntoProcesso.objects.filter(
+            workspace=self.initial['workspace'])
 
         # Utilizando template bootstrap3 customizado
         self.fields['importancia'].widget = forms.RadioSelect()
@@ -863,12 +868,16 @@ class ListWithSearchProcessoForm(ListWithSearchForm):
         required=False)
 
     class Meta(ListWithSearchForm.Meta):
+        fields = ['q', 'o', 'assunto']
         pass
 
     def __init__(self, *args, **kwargs):
         super(ListWithSearchProcessoForm, self).__init__(*args, **kwargs)
 
         self.helper.layout.fields.append(Field('assunto'))
+
+        self.fields['assunto'].queryset = AssuntoProcesso.objects.filter(
+            workspace=self.initial['workspace'])
 
 
 class GrupoDeContatosForm(ModelForm):

@@ -1,1 +1,3 @@
 {% load i18n %}
+- title: {% trans 'Assunto de Processos' %}
+  url: assuntoprocesso_list

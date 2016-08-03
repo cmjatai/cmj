@@ -175,8 +175,11 @@ class DetailMasterCrud(Crud):
                 o = self.request.GET['o'] if 'o' in self.request.GET else '1'
 
                 if 'form' not in kwargs:
+                    initial = self.get_initial() if hasattr(
+                        self, 'get_initial') else {}
+                    initial.update({'q': q, 'o': o})
                     kwargs['form'] = self.form_search_class(
-                        initial={'q': q, 'o': o})
+                        initial=initial)
             count = self.object_list.count()
             context = super().get_context_data(**kwargs)
             context['count'] = count

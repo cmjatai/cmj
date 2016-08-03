@@ -406,15 +406,15 @@ fieldset {
   background-color: white;
   border: 1px solid #dcdac8;
   border-radius: 4px;
-  min-height: $grid-gutter-width * 2 - 2;
+  min-height: $grid-gutter-width * 2;
   overflow: hidden;
   label.checkbox, label.radio{
     margin: 0;
     padding: 0;
     padding-right: ceil($grid-gutter-width / 3);
     padding-left: $grid-gutter-width * 2;
-    line-height: $grid-gutter-width * 2 - 2;
-    min-height: $grid-gutter-width * 2 - 2;
+    line-height: $grid-gutter-width * 2 - 1;
+    min-height: $grid-gutter-width * 2 - 1;
     .icons {
       top:  ceil($grid-gutter-width / 2) - 1;
       left: $grid-gutter-width / 2;

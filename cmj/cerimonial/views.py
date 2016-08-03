@@ -445,7 +445,7 @@ class ProcessoMasterCrud(DetailMasterCrud):
             return kwargs
 
         def get_initial(self):
-            initial = FormView.get_initial(self)
+            initial = {}
 
             try:
                 initial['workspace'] = AreaTrabalho.objects.filter(
@@ -514,7 +514,7 @@ class ProcessoContatoCrud(MasterDetailCrudPermission):
                             'classificacoes']
 
         def get_initial(self):
-            initial = FormView.get_initial(self)
+            initial = {}
 
             try:
                 initial['workspace'] = AreaTrabalho.objects.filter(
