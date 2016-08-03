@@ -108,7 +108,7 @@ Perfil:
   - data_nascimento estado_civil sexo identidade_genero
   - nivel_instrucao:4 naturalidade tem_filhos quantos_filhos
   {% trans 'Profissão/Tratamento' %}:
-  - profissao
+  - profissao cargo
   - pronome_tratamento
 TelefonePerfil:
   {% trans 'Telefone' %}:

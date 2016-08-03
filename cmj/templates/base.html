@@ -59,7 +59,10 @@
                     {% endfor %}
                   </a>
                   <ul class="dropdown-menu menu-right">
+                    {% comment %}
+
                     <li><a href="{% url 'cmj.cerimonial:perfil_detail' %}">{% trans "Meu Perfil" %}</a></li>
+                    {% endcomment %}
                     <li><a href="{% url 'cmj.core:logout' %}">{% trans "Sair" %}</a></li>
                   </ul>
 
