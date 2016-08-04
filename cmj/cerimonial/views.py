@@ -1,5 +1,6 @@
 
 from django.core.exceptions import PermissionDenied
+from django.db.models.aggregates import Max
 from django.http.response import HttpResponse
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.edit import FormView
@@ -112,6 +113,17 @@ class ContatoCrud(DetailMasterCrud):
             context['fluid'] = '-fluid'
             return context"""
 
+        def get_initial(self):
+            initial = {}
+
+            try:
+                initial['workspace'] = AreaTrabalho.objects.filter(
+                    operadores=self.request.user.pk)[0]
+            except:
+                raise PermissionDenied(_('Sem permissão de Acesso!'))
+
+            return initial
+
     class ListView(DetailMasterCrud.ListView):
         form_search_class = ListWithSearchForm
 
@@ -131,6 +143,16 @@ class ContatoCrud(DetailMasterCrud):
     class UpdateView(DetailMasterCrud.UpdateView):
         form_class = ContatoForm
         template_name = 'cerimonial/contato_form.html'
+
+        def form_valid(self, form):
+            response = super().form_valid(form)
+
+            grupos = list(form.cleaned_data['grupodecontatos_set'])
+            self.object.grupodecontatos_set.clear()
+            if grupos:
+                self.object.grupodecontatos_set.add(*grupos)
+
+            return response
 
 
 class FiliacaoPartidariaCrud(MasterDetailCrudPermission):
@@ -548,6 +570,11 @@ class ProcessoContatoCrud(MasterDetailCrudPermission):
 
     class ListView(MasterDetailCrudPermission.ListView):
         layout_key = 'ProcessoLayoutForForm'
+
+        def get_queryset(self):
+            qs = MasterDetailCrudPermission.ListView.get_queryset(self)
+            qs = qs.annotate(pk_unico=Max('pk'))
+            return qs
 
 
 class GrupoDeContatosMasterCrud(DetailMasterCrud):

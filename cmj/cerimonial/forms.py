@@ -12,12 +12,13 @@ from crispy_forms.templatetags.crispy_forms_field import css_class
 from crispy_forms.utils import get_template_pack
 from dateutil.relativedelta import relativedelta
 from django import forms
+from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
 from django.db.models.expressions import Func
 from django.forms import widgets
-from django.forms.models import ModelForm
+from django.forms.models import ModelForm, ModelMultipleChoiceField
 from django.http.request import QueryDict
 from django.utils.translation import ugettext_lazy as _
 from django_filters.filters import CharFilter, ChoiceFilter, NumberFilter,\
@@ -175,8 +176,16 @@ class ContatoForm(ModelForm):
                   'rg_data_expedicao',
                   'ativo',
                   'observacoes',
-                  'cargo'
+                  'cargo',
+                  'grupodecontatos_set'
                   ]
+
+    grupodecontatos_set = ModelMultipleChoiceField(
+        queryset=GrupoDeContatos.objects.all(),
+        required=False,
+        label='',
+        widget=FilteredSelectMultiple('grupodecontatos_set', False),
+    )
 
     def __init__(self, *args, **kwargs):
 
@@ -213,6 +222,15 @@ class ContatoForm(ModelForm):
                 p.vocativo_indireto_singular_m,
                 p.enderecamento_singular_m))
             for p in pronomes_choice]
+
+        self.fields[
+            'grupodecontatos_set'].widget = forms.CheckboxSelectMultiple()
+        self.fields['grupodecontatos_set'].inline_class = True
+        self.fields['grupodecontatos_set'].queryset = \
+            GrupoDeContatos.objects.filter(workspace=self.initial['workspace'])
+        if self.instance:
+            self.fields['grupodecontatos_set'].initial = list(
+                self.instance.grupodecontatos_set.all())
 
     def clean(self):
         pronome = self.cleaned_data['pronome_tratamento']
@@ -497,9 +515,6 @@ class ProcessoContatoForm(ModelForm):
 
         self.fields['classificacoes'].widget = forms.CheckboxSelectMultiple()
         # self.fields['classificacoes'].inline_class = True
-
-        self.fields['assuntos'].queryset = AssuntoProcesso.objects.filter(
-            workspace=self.initial['workspace'])
 
 
 class ContatoFragmentSearchForm(forms.Form):

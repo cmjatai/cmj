@@ -45,7 +45,9 @@ Contato:
   {% trans 'Dados Básicos' %}:
   - nome:6 nome_social:3 apelido
   - data_nascimento estado_civil sexo identidade_genero
-  - nivel_instrucao:4 naturalidade tem_filhos quantos_filhos
+  - nivel_instrucao:4 naturalidade tem_filhos quantos_filhos  
+  {% trans 'Grupos' %}:
+  - grupodecontatos_set
   {% trans 'Pais' %}:
   - nome_pai nome_mae
   {% trans 'Documentos' %}:
