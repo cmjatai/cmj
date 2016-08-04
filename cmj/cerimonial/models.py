@@ -317,6 +317,8 @@ class Contato(CmjSearchMixin, CmjAuditoriaModelMixin):
             ('print_impressoenderecamento',
              _('Pode Imprimir Impressos de Endereçamento')),
         )
+        unique_together = (
+            ('nome', 'data_nascimento', 'workspace', 'perfil_user'),)
 
     def __str__(self):
         return self.nome
