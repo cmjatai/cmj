@@ -228,7 +228,7 @@ class ContatoForm(ModelForm):
         self.fields['grupodecontatos_set'].inline_class = True
         self.fields['grupodecontatos_set'].queryset = \
             GrupoDeContatos.objects.filter(workspace=self.initial['workspace'])
-        if self.instance:
+        if self.instance and self.instance.pk:
             self.fields['grupodecontatos_set'].initial = list(
                 self.instance.grupodecontatos_set.all())
 

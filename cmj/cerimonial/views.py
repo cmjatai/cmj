@@ -140,6 +140,16 @@ class ContatoCrud(DetailMasterCrud):
         form_class = ContatoForm
         template_name = 'cerimonial/contato_form.html'
 
+        def form_valid(self, form):
+            response = super().form_valid(form)
+
+            grupos = list(form.cleaned_data['grupodecontatos_set'])
+            self.object.grupodecontatos_set.clear()
+            if grupos:
+                self.object.grupodecontatos_set.add(*grupos)
+
+            return response
+
     class UpdateView(DetailMasterCrud.UpdateView):
         form_class = ContatoForm
         template_name = 'cerimonial/contato_form.html'
