@@ -221,12 +221,13 @@ class ImpressoEnderecamentoContatoView(PermissionRequiredMixin, FilterView):
             story.append(Paragraph(
                 linha_pronome, stylesheet['pronome_style']))
 
-        linha_nome = contato.nome
+        linha_nome = '%s %s' % (prefixo_nome, contato.nome)\
+            if prefixo_nome else contato.nome
 
         if local_cargo == ImpressoEnderecamentoContatoFilterSet.LINHA_NOME\
                 and imprimir_cargo:
 
-            linha_nome = '%s %s %s' % (contato.cargo, prefixo_nome, linha_nome)
+            linha_nome = '%s %s' % (contato.cargo, linha_nome)
             linha_nome = linha_nome.strip()
 
         linha_nome = linha_nome.upper()\
