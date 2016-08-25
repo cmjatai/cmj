@@ -229,8 +229,11 @@
                       <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Relatórios" %}<span class="caret"></span></a>
                       <ul class="dropdown-menu menu-right">
                         <li class="dropdown-header">{% trans "Contatos" %}</li>
+
+
                         {% if perms.cerimonial.print_impressoenderecamento %}<li class="nav__sub-item"><a href="{% url 'cmj.cerimonial:print_impressoenderecamento' %}">{% trans "Etiquetas e Envelopes" %}</a></li>{% endif %}
                         <li class="dropdown-header">{% trans "Processos" %}</li>
+                        {% if perms.cerimonial.print_rel_contato_agrupado_por_processo %}<li class="nav__sub-item"><a href="{% url 'cmj.cerimonial:print_rel_contato_agrupado_por_processo' %}">{% trans "Contatos Agrupados Por Processo" %}</a></li>{% endif %}
                       </ul>
                     </li>
                   {% endif %}

@@ -316,6 +316,8 @@ class Contato(CmjSearchMixin, CmjAuditoriaModelMixin):
         permissions = (
             ('print_impressoenderecamento',
              _('Pode Imprimir Impressos de Endereçamento')),
+            ('print_rel_contato_agrupado_por_processo',
+             _('Pode Imprimir Relatório de Contatos Agrupados por Processo')),
         )
         unique_together = (
             ('nome', 'data_nascimento', 'workspace', 'perfil_user'),)

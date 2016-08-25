@@ -22,7 +22,8 @@ from django.forms.models import ModelForm, ModelMultipleChoiceField
 from django.http.request import QueryDict
 from django.utils.translation import ugettext_lazy as _
 from django_filters.filters import CharFilter, ChoiceFilter, NumberFilter,\
-    MethodFilter, DateFromToRangeFilter, ModelChoiceFilter, RangeFilter
+    MethodFilter, DateFromToRangeFilter, ModelChoiceFilter, RangeFilter,\
+    MultipleChoiceFilter, ModelMultipleChoiceFilter
 from django_filters.filterset import FilterSet, STRICTNESS
 from sapl.crispy_layout_mixin import to_column, SaplFormLayout, to_fieldsets,\
     form_actions, to_row
@@ -626,11 +627,19 @@ class MethodChoiceFilter(MethodFilter, ChoiceFilter):
     pass
 
 
+class MethodMultipleChoiceFilter(MethodFilter, MultipleChoiceFilter):
+    pass
+
+
 class MethodNumberFilter(MethodFilter, NumberFilter):
     pass
 
 
 class MethodModelChoiceFilter(MethodFilter, ModelChoiceFilter):
+    pass
+
+
+class MethodModelMultipleChoiceFilter(MethodFilter, ModelMultipleChoiceFilter):
     pass
 
 
@@ -873,6 +882,194 @@ class ImpressoEnderecamentoContatoFilterSet(FilterSet):
 
         self.form.fields['grupo'].queryset = GrupoDeContatos.objects.filter(
             workspace=workspace)
+
+
+class ContatoAgrupadoPorProcessoFilterSet(FilterSet):
+
+    filter_overrides = {models.DateField: {
+        'filter_class': MethodFilter,
+        'extra': lambda f: {
+            'label': '%s (%s)' % (f.verbose_name, _('Inicial - Final')),
+            'widget': RangeWidgetOverride}
+    }}
+
+    AGRUPADO_POR_NADA = 'sem_agrupamento'
+    AGRUPADO_POR_TITULO = 'titulo'
+    AGRUPADO_POR_IMPORTANCIA = 'importancia'
+    AGRUPADO_POR_TOPICO = 'topicos__descricao'
+    AGRUPADO_POR_ASSUNTO = 'assuntos__descricao'
+    AGRUPADO_POR_STATUS = 'status__descricao'
+    AGRUPADO_POR_CLASSIFICACAO = 'classificacoes__descricao'
+
+    AGRUPAMENTO_CHOICE = (
+        (AGRUPADO_POR_NADA, _('Sem Agrupamento')),
+        (AGRUPADO_POR_TITULO, _('Por Título de Processos')),
+        (AGRUPADO_POR_IMPORTANCIA,
+         _('Por Importância')),
+        (AGRUPADO_POR_TOPICO,
+         _('Por Tópicos')),
+        (AGRUPADO_POR_ASSUNTO,
+         _('Por Assuntos')),
+        (AGRUPADO_POR_STATUS,
+         _('Por Status')),
+        (AGRUPADO_POR_CLASSIFICACAO,
+         _('Por Classificação')),
+    )
+
+    search = MethodFilter()
+
+    agrupamento = MethodChoiceFilter(
+        required=False,
+        choices=AGRUPAMENTO_CHOICE)
+
+    importancia = MethodMultipleChoiceFilter(
+        required=False,
+        choices=IMPORTANCIA_CHOICE)
+
+    status = MethodModelMultipleChoiceFilter(
+        required=False,
+        queryset=StatusProcesso.objects.all())
+
+    def filter_agrupamento(self, queryset, value):
+        return queryset
+
+    def filter_importancia(self, queryset, value):
+        if not value:
+            return queryset
+
+        q = None
+        for i in value:
+            q = q | Q(importancia=i) if q else Q(importancia=i)
+        return queryset.filter(q)
+
+    def filter_status(self, queryset, value):
+        if not value:
+            return queryset
+
+        q = None
+        for sta in value:
+            q = q | Q(status=sta) if q else Q(status=sta)
+        return queryset.filter(q)
+
+    def filter_data(self, queryset, value):
+
+        if not value[0] or not value[1]:
+            return queryset
+
+        inicial = datetime.datetime.strptime(value[0], "%d/%m/%Y").date()
+        final = datetime.datetime.strptime(value[1], "%d/%m/%Y").date()
+        if inicial > final:
+            inicial, final = final, inicial
+
+        range_select = Q(data__range=[inicial, final])
+
+        # Run the query.
+        return queryset.filter(range_select)
+
+    def filter_search(self, queryset, value):
+
+        query = normalize(value)
+
+        query = query.split(' ')
+        if query:
+            q = Q()
+            for item in query:
+                if not item:
+                    continue
+                q = q & Q(search__icontains=item)
+
+            if q:
+                queryset = queryset.filter(q)
+        return queryset
+
+    class Meta:
+        model = Processo
+        fields = ['search',
+                  'data',
+                  'topicos',
+                  'importancia',
+                  'classificacoes',
+                  'assuntos',
+                  'status', ]
+
+    def __init__(self, data=None,
+                 queryset=None, prefix=None, strict=None, **kwargs):
+
+        workspace = kwargs.pop('workspace')
+
+        super(ContatoAgrupadoPorProcessoFilterSet, self).__init__(
+            data=data,
+            queryset=queryset, prefix=prefix, strict=strict, **kwargs)
+
+        c1_row1 = to_row([
+            ('search', 7),
+            ('data', 5),
+            ('importancia', 4),
+            ('status', 4),
+            ('classificacoes', 4),
+            ('topicos', 6),
+            ('assuntos', 6),
+        ])
+
+        col1 = Fieldset(
+            _('Informações para Seleção de Processos'),
+            c1_row1,
+            to_row([
+                (SubmitFilterPrint(
+                    'filter',
+                    value=_('Filtrar'),
+                    css_class='btn-default pull-right',
+                    type='submit'), 12)
+            ]))
+
+        col2 = Fieldset(
+            _('Inf p/ Impressão'),
+            'agrupamento',
+
+            SubmitFilterPrint(
+                'print',
+                value=_('Imprimir'),
+                css_class='btn-primary pull-right',
+                type='submit')
+        )
+
+        rows = to_row([
+            (col1, 9),
+            (col2, 3),
+        ])
+
+        self.form.helper = FormHelper()
+        self.form.helper.form_method = 'GET'
+        self.form.helper.layout = Layout(
+            rows,
+        )
+
+        self.form.fields['search'].label = _('Filtrar Títulos de Processos')
+
+        self.form.fields['topicos'].widget = forms.SelectMultiple(
+            attrs={'size': '7'})
+        self.form.fields['topicos'].queryset = TopicoProcesso.objects.all()
+
+        self.form.fields['assuntos'].widget = forms.SelectMultiple(
+            attrs={'size': '7'})
+        self.form.fields['assuntos'].queryset = AssuntoProcesso.objects.filter(
+            workspace=workspace)
+
+        self.form.fields['importancia'].widget = forms.CheckboxSelectMultiple()
+        #self.form.fields['importancia'].inline_class = True
+
+        self.form.fields[
+            'classificacoes'].widget = forms.CheckboxSelectMultiple()
+
+        self.form.fields['status'].widget = forms.CheckboxSelectMultiple()
+        #self.form.fields['status'].inline_class = True
+        self.form.fields['status'].choices = list(
+            self.form.fields['status'].choices)
+        del self.form.fields['status'].choices[0]
+
+        self.form.fields['agrupamento'].label = _(
+            'Agrupar Contatos')
+        self.form.fields['agrupamento'].widget = forms.RadioSelect()
 
 
 class ListWithSearchProcessoForm(ListWithSearchForm):
