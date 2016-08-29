@@ -442,7 +442,7 @@ class RelatorioContatoAgrupadoPorProcessoView(
                 continue
             for cell in value:
                 if isinstance(cell, list):
-                    t._argH[i] = (rowHeights / 2) * (
+                    t._argH[i] = (rowHeights) * (
                         len(cell) - (0 if len(cell) > 1 else 0))
                     break
 
