@@ -7,7 +7,7 @@ DJANGODIR=/home/sapl31/cmj                     # Django project directory (*)
 SOCKFILE=/home/sapl31/cmj/run/gunicorn.sock    # we will communicate using this unix socket (*)
 USER=sapl31                                   # the user to run as (*)
 GROUP=sapl31                                  # the group to run as (*)
-NUM_WORKERS=9                                   # how many worker processes should Gunicorn spawn (*)
+NUM_WORKERS=4                                   # how many worker processes should Gunicorn spawn (*)
                                                 # NUM_WORKERS = 2 * CPUS + 1
 DJANGO_SETTINGS_MODULE=cmj.settings            # which settings file should Django use (*)
 DJANGO_WSGI_MODULE=cmj.wsgi                    # WSGI module name (*)
@@ -31,3 +31,4 @@ exec gunicorn ${DJANGO_WSGI_MODULE}:application \
   --workers $NUM_WORKERS \
   --user $USER \
   --bind=unix:$SOCKFILE
+  --timeout 600

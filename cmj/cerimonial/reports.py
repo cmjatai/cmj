@@ -1,5 +1,6 @@
 
-from datetime import date
+from _io import BytesIO
+from datetime import date, datetime
 from math import ceil, floor
 
 from braces.views import PermissionRequiredMixin
@@ -26,7 +27,7 @@ from reportlab.pdfgen import canvas
 from reportlab.platypus.doctemplate import SimpleDocTemplate
 from reportlab.platypus.frames import Frame
 from reportlab.platypus.para import Paragraph
-from reportlab.platypus.tables import Table, TableStyle
+from reportlab.platypus.tables import Table, TableStyle, LongTable
 from sapl.crud.base import make_pagination
 
 from cmj.cerimonial.forms import ImpressoEnderecamentoContatoFilterSet,\
@@ -386,24 +387,28 @@ class RelatorioContatoAgrupadoPorProcessoView(
 
         elements = []
 
+        #print('data ini', datetime.now())
         data = self.get_data()
+        #print('data fim', datetime.now())
 
         style = TableStyle([
+            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            ('LEADING', (0, 0), (-1, -1), 7),
             ('GRID', (0, 0), (-1, -1), 0.1, colors.black),
             ('INNERGRID', (0, 0), (-1, -1), 0.1, colors.black),
-            ('TOPPADDING', (0, 0), (-1, -1), 2),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
+            ('TOPPADDING', (0, 0), (-1, -1), 0),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
             ('LEFTPADDING', (0, 0), (-1, -1), 3),
             ('RIGHTPADDING', (0, 0), (-1, -1), 3),
         ])
         style.add('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
 
+        #print('enumerate ini', datetime.now())
         for i, value in enumerate(data):
             if len(value) <= 1:
                 style.add('SPAN', (0, i), (-1, i))
 
             if len(value) == 0:
-                style.add('LEADING', (0, i), (-1, i), 5)
                 style.add('INNERGRID', (0, i), (-1, i), 0, colors.black),
                 style.add('GRID', (0, i), (-1, i), -1, colors.white)
                 style.add('LINEABOVE', (0, i), (-1, i), 0.1, colors.black)
@@ -411,10 +416,13 @@ class RelatorioContatoAgrupadoPorProcessoView(
             if len(value) == 1:
                 style.add('LINEABOVE', (0, i), (-1, i), 0.1, colors.black)
 
+        #print('enumerate fim', datetime.now())
         # if not agrupamento or agrupamento == 'sem_agrupamento':
         #    style.add('ALIGN', (0, 0), (0, -1), 'CENTER')
 
-        t = Table(data)
+        #print('table ini', datetime.now())
+        rowHeights = 20
+        t = LongTable(data, rowHeights=rowHeights, splitByRow=True)
         t.setStyle(style)
         if len(t._argW) == 5:
             t._argW[0] = 1.8 * cm
@@ -428,8 +436,20 @@ class RelatorioContatoAgrupadoPorProcessoView(
             t._argW[2] = 11.5 * cm
             t._argW[3] = 3 * cm
 
-        elements.append(t)
+        for i, value in enumerate(data):
+            if len(value) == 0:
+                t._argH[i] = 7
+                continue
+            for cell in value:
+                if isinstance(cell, list):
+                    t._argH[i] = (rowHeights / 2) * (
+                        len(cell) - (0 if len(cell) > 1 else 0))
+                    break
 
+        elements.append(t)
+        #print('table fim', datetime.now())
+
+        #print('build ini', datetime.now())
         doc = SimpleDocTemplate(
             response,
             pagesize=landscape(A4),
@@ -438,8 +458,21 @@ class RelatorioContatoAgrupadoPorProcessoView(
             topMargin=1.1 * cm,
             bottomMargin=0.8 * cm)
         doc.build(elements)
+        #print('build fim', datetime.now())
 
     def get_data(self):
+        """data ini 2016-08-29 09:45:43.018039
+        data fim 2016-08-29 09:47:16.667659
+        enumerate ini 2016-08-29 09:47:16.667745
+        enumerate fim 2016-08-29 09:47:16.671923
+        table ini 2016-08-29 09:47:16.671954
+        table fim 2016-08-29 09:47:17.233298
+        doc ini 2016-08-29 09:47:17.233338
+        doc fim 2016-08-29 10:13:36.675347"""
+        # 211 páginas
+        # 6723
+
+        MAX_TITULO = 80
 
         s = getSampleStyleSheet()
         h3 = s["Heading3"]
@@ -454,26 +487,33 @@ class RelatorioContatoAgrupadoPorProcessoView(
         h5.alignment = TA_CENTER
 
         s = s["BodyText"]
-        s.wordWrap = 'LTR'
+        s.wordWrap = None  # 'LTR'
         s.spaceBefore = 0
         s.fontSize = 8
-        s.leading = 10
+        s.leading = 8
+
+        s_min = getSampleStyleSheet()
+        s_min = s_min["BodyText"]
+        s_min.wordWrap = None  # 'LTR'
+        s_min.spaceBefore = 0
+        s_min.fontSize = 6
+        s_min.leading = 8
 
         s_center = getSampleStyleSheet()
         s_center = s_center["BodyText"]
-        s_center.wordWrap = 'LTR'
+        s_center.wordWrap = None  # 'LTR'
         s_center.spaceBefore = 0
         s_center.alignment = TA_CENTER
         s_center.fontSize = 8
-        s_center.leading = 10
+        s_center.leading = 8
 
         s_right = getSampleStyleSheet()
         s_right = s_right["BodyText"]
-        s_right.wordWrap = 'LTR'
+        s_right.wordWrap = None  # 'LTR'
         s_right.spaceBefore = 0
         s_right.alignment = TA_RIGHT
         s_right.fontSize = 8
-        s_right.leading = 10
+        s_right.leading = 8
 
         cleaned_data = self.filterset.form.cleaned_data
 
@@ -568,9 +608,9 @@ class RelatorioContatoAgrupadoPorProcessoView(
                 item = [
                     Paragraph(p.data.strftime('%d/%m/%Y'), s_center),
                     Paragraph(
-                        str(p.titulo) if len(p.titulo) < 1000
-                        else p.titulo[:1000] +
-                        force_text(_(' (Continua...)')), s)]
+                        str(p.titulo) if len(p.titulo) < MAX_TITULO
+                        else p.titulo[:MAX_TITULO] +
+                        force_text(_(' (Continua...)')), s if len(p.titulo) < MAX_TITULO else s_min)]
 
                 contatos_query = p.contatos.all()
 
@@ -604,7 +644,7 @@ class RelatorioContatoAgrupadoPorProcessoView(
 
                     endereco = '%s - %s - %s - %s' % (
                         endereco,
-                        endpref.bairro,
+                        endpref.bairro if endpref.bairro else '',
                         endpref.municipio.nome
                         if endpref.municipio else '',
                         endpref.uf)
@@ -615,7 +655,7 @@ class RelatorioContatoAgrupadoPorProcessoView(
                     lambda x: str(x), list(contato.telefone_set.all())
                 )) if contato.telefone_set.exists() else ''
 
-                telefones.append(Paragraph(tels, s_right))
+                telefones.append((Paragraph(tels, s_center)))
 
                 if agrupamento:
                     params = {'contatos': contato,
@@ -643,9 +683,12 @@ class RelatorioContatoAgrupadoPorProcessoView(
                         if agrupamento != 'titulo':
                             titulo.append(
                                 Paragraph(
-                                    str(ps.titulo) if len(ps.titulo) < 1000
-                                    else ps.titulo[:1000] +
-                                    force_text(_(' (Continua...)')), s))
+                                    str(ps.titulo)
+                                    if len(ps.titulo) < MAX_TITULO
+                                    else ps.titulo[:MAX_TITULO] +
+                                    force_text(_(' (Continua...)')),
+                                    s if len(ps.titulo) < MAX_TITULO
+                                    else s_min))
                     if not ps:
                         data_abertura.append(Paragraph('-----', s_center))
                         if agrupamento != 'titulo':
@@ -666,6 +709,9 @@ class RelatorioContatoAgrupadoPorProcessoView(
 
                     data.append(item)
 
+                    """if len(data) > 2000:
+                        return data"""
+
             if not agrupamento:
                 if len(contatos) == 0:
                     item.append('-----')
@@ -675,5 +721,8 @@ class RelatorioContatoAgrupadoPorProcessoView(
                     item.append(telefones)
 
                 data.append(item)
+
+                """if len(data) > 2000:
+                    return data"""
 
         return data
