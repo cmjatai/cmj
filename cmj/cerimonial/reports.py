@@ -264,7 +264,7 @@ class ImpressoEnderecamentoContatoView(PermissionRequiredMixin, FilterView):
             story.append(Paragraph(endereco, stylesheet['endereco_style']))
 
             b_m_uf = '%s - %s - %s' % (
-                endpref.bairro,
+                endpref.bairro if endpref.bairro else '',
                 endpref.municipio.nome if endpref.municipio else '',
                 endpref.uf)
 
