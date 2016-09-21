@@ -695,9 +695,8 @@ class ImpressoEnderecamentoContatoFilterSet(FilterSet):
         queryset=ImpressoEnderecamento.objects.all(),
         action=filter_impresso)
 
-    grupo = MethodModelChoiceFilter(
-        required=False,
-        queryset=GrupoDeContatos.objects.all())
+    grupo = MethodChoiceFilter(
+        required=False)
 
     imprimir_pronome = MethodChoiceFilter(
         choices=YES_NO_CHOICES,
@@ -721,7 +720,10 @@ class ImpressoEnderecamentoContatoFilterSet(FilterSet):
         return queryset
 
     def filter_grupo(self, queryset, value):
-        queryset = queryset.filter(grupodecontatos_set=value)
+        if value == '0':
+            queryset = queryset.filter(grupodecontatos_set__isnull=True)
+        elif value != '':
+            queryset = queryset.filter(grupodecontatos_set=value)
         return queryset
 
     def filter_local_cargo(self, queryset, value):
@@ -880,8 +882,11 @@ class ImpressoEnderecamentoContatoFilterSet(FilterSet):
         self.form.fields['nome_maiusculo'].widget = forms.RadioSelect()
         self.form.fields['nome_maiusculo'].inline_class = True
 
-        self.form.fields['grupo'].queryset = GrupoDeContatos.objects.filter(
-            workspace=workspace)
+        self.form.fields['grupo'].choices = [
+            ('', '-------'),
+            ('0', _('Apenas Contatos sem Grupo')),
+        ] + [(g.pk, str(g)) for g in GrupoDeContatos.objects.filter(
+            workspace=workspace)]
 
 
 class ContatoAgrupadoPorProcessoFilterSet(FilterSet):
