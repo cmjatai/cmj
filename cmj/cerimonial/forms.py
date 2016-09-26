@@ -1170,15 +1170,7 @@ class ContatoAgrupadoPorGrupoFilterSet(FilterSet):
 
     def filter_grupo(self, queryset, value):
         if value:
-            if len(value) == 1:
-                queryset = queryset.filter(grupodecontatos_set=value)
-            else:
-                q = None
-                for v in value:
-                    if not q:
-                        q = Q(grupodecontatos_set=v)
-                    q = q | Q(grupodecontatos_set=v)
-                queryset = queryset.filter(q)
+            queryset = queryset.filter(grupodecontatos_set__in=value)
 
         return queryset.order_by('grupodecontatos_set__nome', 'nome')
 
