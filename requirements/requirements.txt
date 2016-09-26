@@ -26,6 +26,5 @@ python-magic==0.4.10
 gunicorn==19.4.5
 python-social-auth
 git+git://github.com/interlegis/trml2pdf.git
-git+git://github.com/interlegis/sapl.git
 wagtail
 python-dateutil

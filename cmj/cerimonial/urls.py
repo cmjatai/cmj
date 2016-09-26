@@ -1,7 +1,8 @@
 from django.conf.urls import url, include
 
 from cmj.cerimonial.reports import ImpressoEnderecamentoContatoView,\
-    RelatorioContatoAgrupadoPorProcessoView
+    RelatorioContatoAgrupadoPorProcessoView,\
+    RelatorioContatoAgrupadoPorGrupoView
 from cmj.cerimonial.views import ContatoCrud, TelefoneCrud, EmailCrud,\
     DependenteCrud, LocalTrabalhoCrud, EnderecoCrud, FiliacaoPartidariaCrud,\
     EnderecoPerfilCrud, LocalTrabalhoPerfilCrud, EmailPerfilCrud,\
@@ -63,6 +64,12 @@ urlpatterns = [
     url(r'^reports/cerimonial/contatos_por_processo',
         RelatorioContatoAgrupadoPorProcessoView.as_view(),
         name='print_rel_contato_agrupado_por_processo'),
+
+    url(r'^reports/cerimonial/contatos_por_grupo',
+        RelatorioContatoAgrupadoPorGrupoView.as_view(),
+        name='print_rel_contato_agrupado_por_grupo'),
+
+
 
     url(r'^sistema/cerimonial/tipoautoridade/(?P<pk>\d+)/pronomes_form',
         ContatoFragmentFormPronomesView.as_view(), name='list_pronomes'),

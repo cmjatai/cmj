@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load i18n common_tags crispy_forms_tags%}
+
+{% block base_content %}
+  <div class="context-actions clearfix">
+      {% if filter.form %}
+        {% crispy filter.form %}
+      {% endif %}
+  </div>
+  {% block extra_content %} {% endblock %}
+  <div class="container-table">
+    <div class="result-count">{% blocktrans with verbose_name_plural=view.verbose_name_plural %}Total de {{ verbose_name_plural }} Selecionados: <strong>{{count}}</strong>{% endblocktrans %}</div>
+    <table class="table table-striped table-hover">
+      <thead>
+        <tr>
+          <th>Grupo</th>
+          <th>Nome</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for obj in page_obj %}
+        <tr>
+          <td>
+              {% for grupo in obj.grupodecontatos_set.all%}
+                {% if forloop.first %}
+                  <ul>
+                {% endif %}
+                  <li>{{grupo.nome}}</li>
+                {% if forloop.last %}
+                  </ul>
+                {% endif %}
+              {% endfor %}
+              {{ obj.grupocontato_set.all}}
+          </td>
+            <td>
+                {{ obj.nome|safe }}
+            </td>
+
+        </tr>
+      {% endfor %}
+    </tbody>
+    </table>
+  </div>
+  {% include "paginacao.html" %}
+{% endblock %}

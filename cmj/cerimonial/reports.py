@@ -31,7 +31,7 @@ from reportlab.platypus.tables import Table, TableStyle, LongTable
 from sapl.crud.base import make_pagination
 
 from cmj.cerimonial.forms import ImpressoEnderecamentoContatoFilterSet,\
-    ContatoAgrupadoPorProcessoFilterSet
+    ContatoAgrupadoPorProcessoFilterSet, ContatoAgrupadoPorGrupoFilterSet
 from cmj.cerimonial.models import Contato, Processo
 from cmj.core.models import AreaTrabalho
 
@@ -294,6 +294,94 @@ class ImpressoEnderecamentoContatoView(PermissionRequiredMixin, FilterView):
         textobject.textOut(contato.nome)
 
         p.drawText(textobject)
+
+
+class RelatorioContatoAgrupadoPorGrupoView(
+        PermissionRequiredMixin, FilterView):
+    permission_required = 'cerimonial.print_rel_contato_agrupado_por_grupo'
+    filterset_class = ContatoAgrupadoPorGrupoFilterSet
+    model = Contato
+    template_name = "cerimonial/filter_contato_agrupado_por_grupo.html"
+    container_field = 'workspace__operadores'
+
+    paginate_by = 30
+
+    @cached_property
+    def is_contained(self):
+        return True
+
+    @property
+    def verbose_name(self):
+        return self.model._meta.verbose_name
+
+    @property
+    def verbose_name_plural(self):
+        return self.model._meta.verbose_name_plural
+
+    def get(self, request, *args, **kwargs):
+        filterset_class = self.get_filterset_class()
+        self.filterset = self.get_filterset(filterset_class)
+        self.object_list = self.filterset.qs
+
+        if 'print' in request.GET and self.object_list.exists():
+            response = HttpResponse(content_type='application/pdf')
+            response['Content-Disposition'] = \
+                'inline; filename="relatorio.pdf"'
+            self.build_pdf(response)
+            return response
+
+        context = self.get_context_data(filter=self.filterset,
+                                        object_list=self.object_list)
+
+        if len(request.GET) and not len(self.filterset.form.errors)\
+                and not self.object_list.exists():
+            messages.error(request, _('Não existe Conato com as '
+                                      'condições definidas na busca!'))
+
+        return self.render_to_response(context)
+
+    def get_filterset(self, filterset_class):
+        kwargs = self.get_filterset_kwargs(filterset_class)
+        try:
+            kwargs['workspace'] = AreaTrabalho.objects.filter(
+                operadores=self.request.user.pk)[0]
+        except:
+            raise PermissionDenied(_('Sem permissão de Acesso!'))
+
+        return filterset_class(**kwargs)
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        kwargs = {}
+        if self.container_field:
+            kwargs[self.container_field] = self.request.user.pk
+
+        return qs.filter(**kwargs)
+
+    def get_context_data(self, **kwargs):
+        count = self.object_list.count()
+        context = super(RelatorioContatoAgrupadoPorGrupoView,
+                        self).get_context_data(**kwargs)
+        context['count'] = count
+
+        context['title'] = _(
+            'Relatório de Contatos Com Agrupamento Por Grupos')
+        paginator = context['paginator']
+        page_obj = context['page_obj']
+
+        context['page_range'] = make_pagination(
+            page_obj.number, paginator.num_pages)
+
+        qr = self.request.GET.copy()
+        if 'page' in qr:
+            del qr['page']
+        context['filter_url'] = ('&' + qr.urlencode()) if len(qr) > 0 else ''
+
+        return context
+
+    def build_pdf(self, response):
+
+        cleaned_data = self.filterset.form.cleaned_data
 
 
 class RelatorioContatoAgrupadoPorProcessoView(

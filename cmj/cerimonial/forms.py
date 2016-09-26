@@ -1151,3 +1151,86 @@ class GrupoDeContatosForm(ModelForm):
         self.fields['contatos'].help_text = _(
             'Procure por Contatos na caixa de buscas e arraste '
             'para esta caixa os Contatos interessados neste Processo.')
+
+
+class ContatoAgrupadoPorGrupoFilterSet(FilterSet):
+    search = MethodFilter()
+
+    municipio = MethodModelChoiceFilter(
+        required=False,
+        queryset=Municipio.objects.all())
+
+    grupo = MethodModelMultipleChoiceFilter(
+        required=False,
+        queryset=GrupoDeContatos.objects.all())
+
+    def filter_municipio(self, queryset, value):
+        queryset = queryset.filter(endereco_set__municipio=value)
+        return queryset
+
+    def filter_grupo(self, queryset, value):
+        if value:
+            if len(value) == 1:
+                queryset = queryset.filter(grupodecontatos_set=value)
+            else:
+                q = None
+                for v in value:
+                    if not q:
+                        q = Q(grupodecontatos_set=v)
+                    q = q | Q(grupodecontatos_set=v)
+                queryset = queryset.filter(q)
+
+        return queryset.order_by('grupodecontatos_set__nome', 'nome')
+
+    class Meta:
+        model = Contato
+
+    def __init__(self, data=None,
+                 queryset=None, prefix=None, strict=None, **kwargs):
+
+        workspace = kwargs.pop('workspace')
+
+        super(ContatoAgrupadoPorGrupoFilterSet, self).__init__(
+            data=data,
+            queryset=queryset, prefix=prefix, strict=strict, **kwargs)
+
+        c1_row1 = to_row([
+            ('municipio', 7),
+            ('grupo', 7),
+        ])
+
+        col1 = Fieldset(
+            _('Informações para Seleção de Contados'),
+            c1_row1,
+            to_row([
+                (SubmitFilterPrint(
+                    'filter',
+                    value=_('Filtrar'),
+                    css_class='btn-default pull-right',
+                    type='submit'), 12)
+            ]))
+
+        col2 = Fieldset(
+            _('Inf p/ Impressão'),
+
+            SubmitFilterPrint(
+                'print',
+                value=_('Imprimir'),
+                css_class='btn-primary pull-right',
+                type='submit')
+        )
+
+        rows = to_row([
+            (col1, 9),
+            (col2, 3),
+        ])
+
+        self.form.helper = FormHelper()
+        self.form.helper.form_method = 'GET'
+        self.form.helper.layout = Layout(
+            rows,
+        )
+
+        self.form.fields['grupo'].queryset = GrupoDeContatos.objects.filter(
+            workspace=workspace)
+        self.form.fields['municipio'].queryset = Municipio.objects.all()
