@@ -5,6 +5,7 @@ from django.http.response import HttpResponse
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.edit import FormView
 from sapl.crispy_layout_mixin import CrispyLayoutFormMixin
+from sapl.crud.base import CrudAux, Crud, MasterDetailCrud
 
 from cmj.cerimonial.forms import LocalTrabalhoForm, EnderecoForm,\
     TipoAutoridadeForm, LocalTrabalhoPerfilForm,\
@@ -23,55 +24,55 @@ from cmj.cerimonial.rules import rules_patterns
 from cmj.core.forms import ListWithSearchForm
 from cmj.core.models import AreaTrabalho
 from cmj.globalrules import globalrules
-from cmj.globalrules.crud_custom import DetailMasterCrud,\
-    MasterDetailCrudPermission, PerfilAbstractCrud, PerfilDetailCrudPermission
+from cmj.globalrules.crud_custom import PerfilAbstractCrud,\
+    PerfilDetailCrudPermission
 
 
 globalrules.rules.config_groups(rules_patterns)
 
 # ---- Details Master Crud build ---------------------------
-TipoTelefoneCrud = DetailMasterCrud.build(TipoTelefone, None, 'tipotelefone')
-TipoEnderecoCrud = DetailMasterCrud.build(TipoEndereco, None, 'tipoendereco')
-TipoEmailCrud = DetailMasterCrud.build(TipoEmail, None, 'tipoemail')
-ParentescoCrud = DetailMasterCrud.build(Parentesco, None, 'parentesco')
+TipoTelefoneCrud = CrudAux.build(TipoTelefone, None, 'tipotelefone')
+TipoEnderecoCrud = CrudAux.build(TipoEndereco, None, 'tipoendereco')
+TipoEmailCrud = CrudAux.build(TipoEmail, None, 'tipoemail')
+ParentescoCrud = CrudAux.build(Parentesco, None, 'parentesco')
 
-TipoLocalTrabalhoCrud = DetailMasterCrud.build(
+TipoLocalTrabalhoCrud = CrudAux.build(
     TipoLocalTrabalho, None, 'tipolocaltrabalho')
-StatusProcessoCrud = DetailMasterCrud.build(
+StatusProcessoCrud = CrudAux.build(
     StatusProcesso, None, 'statusprocesso')
-ClassificacaoProcessoCrud = DetailMasterCrud.build(
+ClassificacaoProcessoCrud = CrudAux.build(
     ClassificacaoProcesso, None, 'classificacaoprocesso')
-TopicoProcessoCrud = DetailMasterCrud.build(
+TopicoProcessoCrud = CrudAux.build(
     TopicoProcesso, None, 'topicoprocesso')
 
 
 # ---- Details Master Crud herança ---------------------------
-class OperadoraTelefoniaCrud(DetailMasterCrud):
+class OperadoraTelefoniaCrud(Crud):
     model_set = 'telefone_set'
     model = OperadoraTelefonia
     container_field_set = 'contato__workspace__operadores'
 
-    class DetailView(DetailMasterCrud.DetailView):
+    class DetailView(Crud.DetailView):
         list_field_names_set = ['numero_nome_contato', ]
 
 
-class NivelInstrucaoCrud(DetailMasterCrud):
+class NivelInstrucaoCrud(Crud):
     model_set = 'contato_set'
     model = NivelInstrucao
     container_field_set = 'workspace__operadores'
 
 
-class EstadoCivilCrud(DetailMasterCrud):
+class EstadoCivilCrud(Crud):
     model_set = 'contato_set'
     model = EstadoCivil
     container_field_set = 'workspace__operadores'
 
 
-class PronomeTratamentoCrud(DetailMasterCrud):
+class PronomeTratamentoCrud(Crud):
     help_text = 'pronometratamento'
     model = PronomeTratamento
 
-    class BaseMixin(DetailMasterCrud.BaseMixin):
+    class BaseMixin(Crud.BaseMixin):
         list_field_names = [
             'nome_por_extenso',
             ('abreviatura_singular_m', 'abreviatura_plural_m',),
@@ -87,23 +88,23 @@ class PronomeTratamentoCrud(DetailMasterCrud):
             return context
 
 
-class TipoAutoridadeCrud(DetailMasterCrud):
+class TipoAutoridadeCrud(Crud):
     help_text = 'tipoautoriadade'
     model = TipoAutoridade
 
-    class BaseMixin(DetailMasterCrud.BaseMixin):
+    class BaseMixin(Crud.BaseMixin):
         list_field_names = ['descricao']
         form_class = TipoAutoridadeForm
 
 
 # ---- Contato Master e Details ----------------------------
 
-class ContatoCrud(DetailMasterCrud):
+class ContatoCrud(Crud):
     model_set = None
     model = Contato
     container_field = 'workspace__operadores'
 
-    class BaseMixin(DetailMasterCrud.BaseMixin):
+    class BaseMixin(Crud.BaseMixin):
         list_field_names = ['nome', 'nome_social', 'data_nascimento',
                             'estado_civil', 'sexo', ]
 
@@ -124,7 +125,7 @@ class ContatoCrud(DetailMasterCrud):
 
             return initial
 
-    class ListView(DetailMasterCrud.ListView):
+    class ListView(Crud.ListView):
         form_search_class = ListWithSearchForm
 
         def get(self, request, *args, **kwargs):
@@ -133,10 +134,10 @@ class ContatoCrud(DetailMasterCrud):
                 migrate_siscam()
                 return HttpResponse('migração executada!')
 
-            return DetailMasterCrud.ListView.get(
+            return Crud.ListView.get(
                 self, request, *args, **kwargs)
 
-    class CreateView(DetailMasterCrud.CreateView):
+    class CreateView(Crud.CreateView):
         form_class = ContatoForm
         template_name = 'cerimonial/contato_form.html'
 
@@ -150,7 +151,7 @@ class ContatoCrud(DetailMasterCrud):
 
             return response
 
-    class UpdateView(DetailMasterCrud.UpdateView):
+    class UpdateView(Crud.UpdateView):
         form_class = ContatoForm
         template_name = 'cerimonial/contato_form.html'
 
@@ -165,18 +166,18 @@ class ContatoCrud(DetailMasterCrud):
             return response
 
 
-class FiliacaoPartidariaCrud(MasterDetailCrudPermission):
+class FiliacaoPartidariaCrud(MasterDetailCrud):
     model = FiliacaoPartidaria
     parent_field = 'contato'
     container_field = 'contato__workspace__operadores'
 
 
-class DependenteCrud(MasterDetailCrudPermission):
+class DependenteCrud(MasterDetailCrud):
     model = Dependente
     parent_field = 'contato'
     container_field = 'contato__workspace__operadores'
 
-    class BaseMixin(MasterDetailCrudPermission.BaseMixin):
+    class BaseMixin(MasterDetailCrud.BaseMixin):
         list_field_names = ['parentesco', 'nome', 'nome_social',
                             'data_nascimento', 'sexo', 'identidade_genero', ]
 
@@ -194,51 +195,51 @@ class PreferencialMixin:
         return response
 
 
-class TelefoneCrud(MasterDetailCrudPermission):
+class TelefoneCrud(MasterDetailCrud):
     model = Telefone
     parent_field = 'contato'
     container_field = 'contato__workspace__operadores'
 
-    class BaseMixin(MasterDetailCrudPermission.BaseMixin):
+    class BaseMixin(MasterDetailCrud.BaseMixin):
         list_field_names = [
             'telefone', 'tipo', 'operadora', 'preferencial']
 
-    class UpdateView(PreferencialMixin, MasterDetailCrudPermission.UpdateView):
+    class UpdateView(PreferencialMixin, MasterDetailCrud.UpdateView):
         pass
 
-    class CreateView(PreferencialMixin, MasterDetailCrudPermission.CreateView):
+    class CreateView(PreferencialMixin, MasterDetailCrud.CreateView):
         pass
 
 
-class EmailCrud(MasterDetailCrudPermission):
+class EmailCrud(MasterDetailCrud):
     model = Email
     parent_field = 'contato'
     container_field = 'contato__workspace__operadores'
 
-    class BaseMixin(MasterDetailCrudPermission.BaseMixin):
+    class BaseMixin(MasterDetailCrud.BaseMixin):
         list_field_names = ['email', 'tipo', 'preferencial']
 
-    class CreateView(PreferencialMixin, MasterDetailCrudPermission.CreateView):
+    class CreateView(PreferencialMixin, MasterDetailCrud.CreateView):
         pass
 
-    class UpdateView(PreferencialMixin, MasterDetailCrudPermission.UpdateView):
+    class UpdateView(PreferencialMixin, MasterDetailCrud.UpdateView):
         pass
 
 
-class LocalTrabalhoCrud(MasterDetailCrudPermission):
+class LocalTrabalhoCrud(MasterDetailCrud):
     model = LocalTrabalho
     parent_field = 'contato'
     container_field = 'contato__workspace__operadores'
 
-    class BaseMixin(MasterDetailCrudPermission.BaseMixin):
+    class BaseMixin(MasterDetailCrud.BaseMixin):
         list_field_names = ['nome', 'nome_social', 'tipo', 'data_inicio']
 
-    class CreateView(PreferencialMixin, MasterDetailCrudPermission.CreateView):
+    class CreateView(PreferencialMixin, MasterDetailCrud.CreateView):
         form_class = LocalTrabalhoForm
         layout_key = 'LocalTrabalhoLayoutForForm'
         template_name = 'core/crispy_form_with_trecho_search.html'
 
-    class UpdateView(PreferencialMixin, MasterDetailCrudPermission.UpdateView):
+    class UpdateView(PreferencialMixin, MasterDetailCrud.UpdateView):
         form_class = LocalTrabalhoForm
         layout_key = 'LocalTrabalhoLayoutForForm'
         template_name = 'core/crispy_form_with_trecho_search.html'
@@ -265,20 +266,20 @@ class ContatoFragmentFormPronomesView(FormView):
         return FormView.get(self, request, *args, **kwargs)
 
 
-class EnderecoCrud(MasterDetailCrudPermission):
+class EnderecoCrud(MasterDetailCrud):
     model = Endereco
     parent_field = 'contato'
     container_field = 'contato__workspace__operadores'
 
-    class BaseMixin(MasterDetailCrudPermission.BaseMixin):
+    class BaseMixin(MasterDetailCrud.BaseMixin):
         list_field_names = [('endereco', 'numero'), 'complemento', 'cep',
                             ('bairro', 'municipio', 'uf'), 'preferencial']
 
-    class CreateView(PreferencialMixin, MasterDetailCrudPermission.CreateView):
+    class CreateView(PreferencialMixin, MasterDetailCrud.CreateView):
         form_class = EnderecoForm
         layout_key = 'EnderecoLayoutForForm'
 
-    class UpdateView(PreferencialMixin, MasterDetailCrudPermission.UpdateView):
+    class UpdateView(PreferencialMixin, MasterDetailCrud.UpdateView):
         form_class = EnderecoForm
         layout_key = 'EnderecoLayoutForForm'
 
@@ -362,7 +363,7 @@ class DependentePerfilCrud(PerfilDetailCrudPermission):
 
 """
 
-    class CreateView11(DetailMasterCrud.CreateView):
+    class CreateView11(Crud.CreateView):
 
         def form_valid(self, form):
             adm = OperadorAreaTrabalho.objects.filter(
@@ -398,7 +399,7 @@ class DependentePerfilCrud(PerfilDetailCrudPermission):
 
             return response
 
-    class DeleteView11(DetailMasterCrud.DeleteView):
+    class DeleteView11(Crud.DeleteView):
 
         def post(self, request, *args, **kwargs):
 
@@ -417,19 +418,19 @@ class DependentePerfilCrud(PerfilDetailCrudPermission):
                     globalrules.GROUP_WORKSPACE_MANAGERS,
                     globalrules.GROUP_WORKSPACE_USERS, ])
 
-            return DetailMasterCrud.DeleteView.post(
+            return Crud.DeleteView.post(
                 self, request, *args, **kwargs)
 """
 
 
 # ---- Processo Master e Details ----------------------------
 
-class AssuntoProcessoCrud(DetailMasterCrud):
+class AssuntoProcessoCrud(Crud):
     model = AssuntoProcesso
     container_field = 'workspace__operadores'
     model_set = 'processo_set'
 
-    class BaseMixin(DetailMasterCrud.BaseMixin):
+    class BaseMixin(Crud.BaseMixin):
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
@@ -437,18 +438,18 @@ class AssuntoProcessoCrud(DetailMasterCrud):
                 'cerimonial/subnav_assuntoprocesso.yaml'
             return context
 
-    class DetailView(DetailMasterCrud.DetailView):
+    class DetailView(Crud.DetailView):
         list_field_names_set = ['data',
                                 'titulo',
                                 'contatos'
                                 ]
 
 
-class ProcessoMasterCrud(DetailMasterCrud):
+class ProcessoMasterCrud(Crud):
     model = Processo
     container_field = 'workspace__operadores'
 
-    class BaseMixin(DetailMasterCrud.BaseMixin):
+    class BaseMixin(Crud.BaseMixin):
         list_field_names = ['data',
                             ('titulo', 'contatos'),
                             'assuntos',
@@ -487,11 +488,11 @@ class ProcessoMasterCrud(DetailMasterCrud):
 
             return initial
 
-    class ListView(DetailMasterCrud.ListView):
+    class ListView(Crud.ListView):
         form_search_class = ListWithSearchProcessoForm
 
         def get_queryset(self):
-            queryset = DetailMasterCrud.ListView.get_queryset(self)
+            queryset = Crud.ListView.get_queryset(self)
 
             assunto = self.request.GET.get('assunto', '')
 
@@ -499,11 +500,11 @@ class ProcessoMasterCrud(DetailMasterCrud):
                 queryset = queryset.filter(assuntos=assunto)
             return queryset
 
-    class CreateView(DetailMasterCrud.CreateView):
+    class CreateView(Crud.CreateView):
         form_class = ProcessoForm
         layout_key = 'ProcessoLayoutForForm'
 
-    class UpdateView(DetailMasterCrud.UpdateView):
+    class UpdateView(Crud.UpdateView):
         form_class = ProcessoForm
         layout_key = 'ProcessoLayoutForForm'
 
@@ -531,14 +532,14 @@ class ContatoFragmentFormSearchView(FormView):
         return FormView.get(self, request, *args, **kwargs)
 
 
-class ProcessoContatoCrud(MasterDetailCrudPermission):
+class ProcessoContatoCrud(MasterDetailCrud):
     parent_field = 'contatos'
     model = ProcessoContato
     help_path = 'processo'
     is_m2m = True
     container_field = 'contatos__workspace__operadores'
 
-    class BaseMixin(MasterDetailCrudPermission.BaseMixin):
+    class BaseMixin(MasterDetailCrud.BaseMixin):
         list_field_names = ['data',
                             'titulo',
                             'assuntos',
@@ -556,13 +557,13 @@ class ProcessoContatoCrud(MasterDetailCrudPermission):
 
             return initial
 
-    class CreateView(MasterDetailCrudPermission.CreateView):
+    class CreateView(MasterDetailCrud.CreateView):
         layout_key = 'ProcessoLayoutForForm'
         form_class = ProcessoContatoForm
         template_name = 'cerimonial/processo_form.html'
 
         """def form_valid(self, form):
-            response = MasterDetailCrudPermission.CreateView.form_valid(
+            response = MasterDetailCrud.CreateView.form_valid(
                 self, form)
 
             pk = self.kwargs['pk']
@@ -570,30 +571,30 @@ class ProcessoContatoCrud(MasterDetailCrudPermission):
 
             return response"""
 
-    class UpdateView(MasterDetailCrudPermission.UpdateView):
+    class UpdateView(MasterDetailCrud.UpdateView):
         layout_key = 'ProcessoLayoutForForm'
         form_class = ProcessoContatoForm
         template_name = 'cerimonial/processo_form.html'
 
-    class DetailView(MasterDetailCrudPermission.DetailView):
+    class DetailView(MasterDetailCrud.DetailView):
         layout_key = 'Processo'
 
-    class ListView(MasterDetailCrudPermission.ListView):
+    class ListView(MasterDetailCrud.ListView):
         layout_key = 'ProcessoLayoutForForm'
 
         def get_queryset(self):
-            qs = MasterDetailCrudPermission.ListView.get_queryset(self)
+            qs = MasterDetailCrud.ListView.get_queryset(self)
             qs = qs.annotate(pk_unico=Max('pk'))
             return qs
 
 
-class GrupoDeContatosMasterCrud(DetailMasterCrud):
+class GrupoDeContatosMasterCrud(Crud):
     model = GrupoDeContatos
     container_field = 'workspace__operadores'
 
     model_set = 'contatos'
 
-    class BaseMixin(DetailMasterCrud.BaseMixin):
+    class BaseMixin(Crud.BaseMixin):
         list_field_names = ['nome']
         list_field_names_set = ['nome', 'telefone_set', 'email_set']
         layout_key = 'GrupoDeContatosLayoutForForm'
@@ -619,10 +620,10 @@ class GrupoDeContatosMasterCrud(DetailMasterCrud):
             kwargs.update({'yaml_layout': self.get_layout()})
             return kwargs
 
-    class CreateView(DetailMasterCrud.CreateView):
+    class CreateView(Crud.CreateView):
         template_name = 'cerimonial/crispy_form_with_contato_search.html'
         form_class = GrupoDeContatosForm
 
-    class UpdateView(DetailMasterCrud.UpdateView):
+    class UpdateView(Crud.UpdateView):
         template_name = 'cerimonial/crispy_form_with_contato_search.html'
         form_class = GrupoDeContatosForm

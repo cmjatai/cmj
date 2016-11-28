@@ -422,7 +422,8 @@ class ProcessoForm(ModelForm):
                 StrictButton(
                     _('Filtrar'), css_class='btn-default',
                     type='button', onclick='atualizaContatos(event)')),
-            Div(css_class='form-group-contato-search')
+            Div(css_class='form-group-contato-search '
+                'controls-radio-checkbox')
         )
 
         q = [_('Seleção de Contatos'),
@@ -570,7 +571,8 @@ class ContatoFragmentSearchForm(forms.Form):
         self.helper.layout = Layout(
             Div(
                 Field('contatos_search'),
-                css_class='form-group-contatos-search'))
+                css_class='form-group-contatos-search '
+                'controls-radio-checkbox'))
         self.helper.form_tag = False
         self.helper.disable_csrf = True
 
@@ -1169,8 +1171,7 @@ class ContatoAgrupadoPorGrupoFilterSet(FilterSet):
         return queryset
 
     def filter_grupo(self, queryset, value):
-        if value:
-            queryset = queryset.filter(grupodecontatos_set__in=value)
+        queryset = queryset.filter(grupodecontatos_set__in=value)
 
         return queryset.order_by('grupodecontatos_set__nome', 'nome')
 

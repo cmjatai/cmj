@@ -10,7 +10,7 @@ from rest_framework import viewsets, mixins
 from rest_framework.authentication import SessionAuthentication,\
     BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
-from sapl.crud.base import Crud, make_pagination
+from sapl.crud.base import Crud, make_pagination, CrudAux, MasterDetailCrud
 from sapl.parlamentares.models import Partido, Filiacao
 
 from cmj.core.forms import OperadorAreaTrabalhoForm, ImpressoEnderecamentoForm,\
@@ -21,32 +21,30 @@ from cmj.core.models import Cep, TipoLogradouro, Logradouro, RegiaoMunicipal,\
 from cmj.core.rules import rules_patterns
 from cmj.core.serializers import TrechoSearchSerializer, TrechoSerializer
 from cmj.globalrules import globalrules
-from cmj.globalrules.crud_custom import DetailMasterCrud,\
-    MasterDetailCrudPermission
 from cmj.utils import normalize
 
 
 globalrules.rules.config_groups(rules_patterns)
 
-CepCrud = DetailMasterCrud.build(Cep, None, 'cep')
-RegiaoMunicipalCrud = DetailMasterCrud.build(
+CepCrud = CrudAux.build(Cep, None, 'cep')
+RegiaoMunicipalCrud = CrudAux.build(
     RegiaoMunicipal, None,  'regiao_municipal')
-DistritoCrud = DetailMasterCrud.build(Distrito, None, 'distrito')
-BairroCrud = DetailMasterCrud.build(Bairro, None, 'bairro')
-TipoLogradouroCrud = DetailMasterCrud.build(
+DistritoCrud = CrudAux.build(Distrito, None, 'distrito')
+BairroCrud = CrudAux.build(Bairro, None, 'bairro')
+TipoLogradouroCrud = CrudAux.build(
     TipoLogradouro, None, 'tipo_logradouro')
-LogradouroCrud = DetailMasterCrud.build(Logradouro, None, 'logradouro')
+LogradouroCrud = CrudAux.build(Logradouro, None, 'logradouro')
 
 
-class TrechoCrud(DetailMasterCrud):
+class TrechoCrud(CrudAux):
     help_text = 'trecho'
     model = Trecho
 
-    class BaseMixin(DetailMasterCrud.BaseMixin):
+    class BaseMixin(CrudAux.BaseMixin):
         list_field_names = [
             ('tipo', 'logradouro'), 'bairro', 'municipio', 'cep']
 
-    class ListView(DetailMasterCrud.ListView):
+    class ListView(CrudAux.ListView):
         form_search_class = ListWithSearchForm
 
         def get(self, request, *args, **kwargs):
@@ -54,19 +52,19 @@ class TrechoCrud(DetailMasterCrud):
             for t in trechos:
                 t.search = str(t)
                 t.save(auto_update_search=False)"""
-            return DetailMasterCrud.ListView.get(
+            return CrudAux.ListView.get(
                 self, request, *args, **kwargs)
 
         def get_context_data(self, **kwargs):
-            context = DetailMasterCrud.ListView.get_context_data(
+            context = CrudAux.ListView.get_context_data(
                 self, **kwargs)
             context['title'] = _("Base de Cep's e Endereços")
             return context
 
-    class CreateView(DetailMasterCrud.CreateView):
+    class CreateView(CrudAux.CreateView):
 
         def post(self, request, *args, **kwargs):
-            response = super(DetailMasterCrud.CreateView, self).post(
+            response = super(CrudAux.CreateView, self).post(
                 self, request, *args, **kwargs)
 
             # FIXME: necessário enquanto o metodo save não tratar fields  m2m
@@ -75,10 +73,10 @@ class TrechoCrud(DetailMasterCrud):
 
             return response
 
-    class UpdateView(DetailMasterCrud.UpdateView):
+    class UpdateView(CrudAux.UpdateView):
 
         def post(self, request, *args, **kwargs):
-            response = super(DetailMasterCrud.UpdateView, self).post(
+            response = super(CrudAux.UpdateView, self).post(
                 self, request, *args, **kwargs)
 
             # FIXME: necessário enquanto o metodo save não tratar fields  m2m
@@ -152,27 +150,27 @@ class TrechoJsonView(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     queryset = Trecho.objects.all()
 
 
-class AreaTrabalhoCrud(DetailMasterCrud):
+class AreaTrabalhoCrud(Crud):
     model = AreaTrabalho
     model_set = 'operadorareatrabalho_set'
 
-    class BaseMixin(DetailMasterCrud.BaseMixin):
+    class BaseMixin(Crud.BaseMixin):
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
             context['subnav_template_name'] = 'core/subnav_areatrabalho.yaml'
             return context
 
-    class DetailView(DetailMasterCrud.DetailView):
+    class DetailView(Crud.DetailView):
         list_field_names_set = ['user_name', ]
 
 
-class OperadorAreaTrabalhoCrud(MasterDetailCrudPermission):
+class OperadorAreaTrabalhoCrud(MasterDetailCrud):
     parent_field = 'areatrabalho'
     model = OperadorAreaTrabalho
     help_path = 'operadorareatrabalho'
 
-    class BaseMixin(MasterDetailCrudPermission.BaseMixin):
+    class BaseMixin(MasterDetailCrud.BaseMixin):
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
@@ -180,7 +178,7 @@ class OperadorAreaTrabalhoCrud(MasterDetailCrudPermission):
                 'subnav_template_name'] = 'core/subnav_areatrabalho.yaml'
             return context
 
-    class UpdateView(MasterDetailCrudPermission.UpdateView):
+    class UpdateView(MasterDetailCrud.UpdateView):
         form_class = OperadorAreaTrabalhoForm
 
         # TODO tornar operador readonly na edição
@@ -198,7 +196,7 @@ class OperadorAreaTrabalhoCrud(MasterDetailCrudPermission):
 
             return response
 
-    class CreateView(MasterDetailCrudPermission.CreateView):
+    class CreateView(MasterDetailCrud.CreateView):
         form_class = OperadorAreaTrabalhoForm
         # TODO mostrar apenas usuários que não possuem grupo ou que são de
         # acesso social
@@ -224,7 +222,7 @@ class OperadorAreaTrabalhoCrud(MasterDetailCrudPermission):
 
             return response
 
-    class DeleteView(MasterDetailCrudPermission.DeleteView):
+    class DeleteView(MasterDetailCrud.DeleteView):
 
         def post(self, request, *args, **kwargs):
 
@@ -233,21 +231,21 @@ class OperadorAreaTrabalhoCrud(MasterDetailCrudPermission):
                 self.object.grupos_associados.values_list('name', flat=True))
             globalrules.rules.groups_remove_user(self.object.user, groups)
 
-            return MasterDetailCrudPermission.DeleteView.post(
+            return MasterDetailCrud.DeleteView.post(
                 self, request, *args, **kwargs)
 
 
-class PartidoCrud(DetailMasterCrud):
+class PartidoCrud(Crud):
     help_text = 'partidos'
     model_set = 'filiacaopartidaria_set'
     model = Partido
     container_field_set = 'contato__workspace__operadores'
     # container_field = 'filiacoes_partidarias_set__contato__workspace__operadores'
 
-    class DetailView(DetailMasterCrud.DetailView):
+    class DetailView(Crud.DetailView):
         list_field_names_set = ['contato_nome', ]
 
-    class ListView(DetailMasterCrud.ListView):
+    class ListView(Crud.ListView):
 
         def get(self, request, *args, **kwargs):
 
@@ -267,7 +265,7 @@ class PartidoCrud(DetailMasterCrud):
             """else:
                 self.kwargs['queryset_liberar_sem_container'] = True"""
 
-            return DetailMasterCrud.ListView.get(
+            return Crud.ListView.get(
                 self, request, *args, **kwargs)
 
         """def get_queryset(self):
@@ -287,11 +285,11 @@ class PartidoCrud(DetailMasterCrud):
             return queryset"""
 
 
-class ImpressoEnderecamentoCrud(DetailMasterCrud):
+class ImpressoEnderecamentoCrud(Crud):
     model = ImpressoEnderecamento
 
-    class UpdateView(DetailMasterCrud.UpdateView):
+    class UpdateView(Crud.UpdateView):
         form_class = ImpressoEnderecamentoForm
 
-    class CreateView(DetailMasterCrud.CreateView):
+    class CreateView(Crud.CreateView):
         form_class = ImpressoEnderecamentoForm

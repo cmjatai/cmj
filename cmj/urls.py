@@ -37,6 +37,7 @@ from wagtail.wagtailadmin import urls as wagtailadmin_urls
 from wagtail.wagtailcore import urls as wagtail_urls
 from wagtail.wagtaildocs import urls as wagtaildocs_urls
 from wagtail.wagtailsearch import urls as wagtailsearch_urls
+import sapl.api.urls
 import sapl.base.urls
 import sapl.comissoes.urls
 import sapl.compilacao.urls
@@ -71,6 +72,7 @@ urlpatterns = [
     url(r'', include(sapl.protocoloadm.urls)),
     url(r'', include(sapl.compilacao.urls)),
     url(r'', include(sapl.relatorios.urls)),
+    url(r'', include(sapl.api.urls)),
     url(r'^sapl/', include(sapl.base.urls)),
 
     url(r'^admin/', include(wagtailadmin_urls)),

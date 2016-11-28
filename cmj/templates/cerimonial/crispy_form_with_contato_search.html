@@ -16,7 +16,7 @@
       changeHideShow();
       $('.form-group-contatos input').on('change', function(event) {
         if (!event.currentTarget.checked)
-          event.currentTarget.parentElement.remove();
+          event.currentTarget.parentElement.parentElement.remove();
         changeHideShow();
       });
     }
@@ -33,10 +33,11 @@
       $.get(url_get_contatos, {'q':q, 'pks_exclude':pks_exclude}, function(data) {
         var parent = _this.closest('.form-group').siblings();
         parent.replaceWith(data);
+        OptionalCustomFrontEnd();
 
         $( ".form-group-contatos-search div, .form-group-contatos div" ).sortable({
           connectWith: ".controls",
-          items: "label",
+          items: "div.checkbox",
           stop: function( event, ui ) {
             var value = ui.item.find('input').val();
             var text =  ui.item.text()

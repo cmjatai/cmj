@@ -129,14 +129,29 @@ MIDDLEWARE_CLASSES = (
     'wagtail.wagtailredirects.middleware.RedirectMiddleware',
 )
 
+
 REST_FRAMEWORK = {
-    # Use Django's standard `django.contrib.auth` permissions,
-    # or allow read-only access for unauthenticated users.
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
-    ],
-    'PAGE_SIZE': 10
+    "DEFAULT_RENDERER_CLASSES": (
+        "rest_framework.renderers.JSONRenderer",
+        # "rest_framework.renderers.BrowsableAPIRenderer",
+    ),
+    "DEFAULT_PARSER_CLASSES": (
+        "rest_framework.parsers.JSONParser",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticated",
+        "sapl.api.permissions.DjangoModelPermissions",
+    ),
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework.authentication.SessionAuthentication",
+    ),
+    "DEFAULT_PAGINATION_CLASS": "sapl.api.pagination.StandardPagination",
+    "DEFAULT_FILTER_BACKENDS": (
+        "rest_framework.filters.SearchFilter",
+        "rest_framework.filters.DjangoFilterBackend",
+    ),
 }
+
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
@@ -269,14 +284,14 @@ CRISPY_FAIL_SILENTLY = not DEBUG
 
 BOWER_COMPONENTS_ROOT = PROJECT_DIR.child("bower")
 BOWER_INSTALLED_APPS = (
-    'bootstrap-sass#3.3.6',
-    'components-font-awesome#4.6.3',
-    'tinymce#4.3.3',
-    'jquery-ui#1.11.4',
-    'jquery-runner#2.3.3',
-    'jQuery-Mask-Plugin#1.13.4',
-    'jsdiff#2.2.1',
-    'https://github.com/hoarrd/drunken-parrot-flat-ui.git',
+    'jquery#3.1.1',
+    'bootstrap-sass#3.3.7',
+    'components-font-awesome#4.7.0',
+    'tinymce#4.4.3',
+    'jquery-ui#1.12.1',
+    'jQuery-Mask-Plugin#1.14.0',
+    'jsdiff#2.2.2',
+    'https://github.com/interlegis/drunken-parrot-flat-ui.git',
 )
 
 # Additional search paths for SASS files when using the @import statement
