@@ -9,6 +9,7 @@ menu_grupocontatos = "menu_grupocontatos"
 menu_processos = "menu_processos"
 menu_impresso_enderecamento = "menu_impresso_enderecamento"
 menu_relatorios = "menu_relatorios"
+menu_administracao = "menu_administracao"
 
 MENU_PERMS_FOR_USERS = (
     (menu_dados_auxiliares, _('Mostrar Menu Dados Auxiliares')),
@@ -21,6 +22,7 @@ MENU_PERMS_FOR_USERS = (
      _('Mostrar Menu de Impressos de Endereçamento')),
     (menu_relatorios,
      _('Mostrar Menu de Relatórios')),
+    (menu_administracao, _('Mostrar Menu de Administração')),
 )
 
 

@@ -32,11 +32,8 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.views.generic.base import TemplateView
 from django.views.static import serve as view_static_server
-from wagtail.wagtailadmin import urls as wagtailadmin_urls
-from wagtail.wagtailcore import urls as wagtail_urls
-from wagtail.wagtaildocs import urls as wagtaildocs_urls
-from wagtail.wagtailsearch import urls as wagtailsearch_urls
 import sapl.api.urls
 import sapl.base.urls
 import sapl.comissoes.urls
@@ -55,7 +52,10 @@ import cmj.core.urls
 
 
 urlpatterns = [
-    url(r'^django-admin/', admin.site.urls),
+    url(r'^admin/', admin.site.urls),
+
+    url(r'^$', TemplateView.as_view(template_name='index.html')),
+    url(r'^message$', TemplateView.as_view(template_name='base.html')),
 
     url('', include('social.apps.django_app.urls', namespace='social')),
 
@@ -75,10 +75,7 @@ urlpatterns = [
     url(r'', include(sapl.api.urls)),
     url(r'^sapl/', include(sapl.base.urls)),
 
-    url(r'^admin/', include(wagtailadmin_urls)),
-    url(r'^search_wagtail/', include(wagtailsearch_urls)),
-    url(r'^documentos/', include(wagtaildocs_urls)),
-    url(r'', include(wagtail_urls)),
+
 
 ]
 

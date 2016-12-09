@@ -44,7 +44,6 @@ LOGIN_URL = '/login/?next='
 # CMJ_APPS business apps in dependency order
 CMJ_APPS = (
     'cmj.core',
-    'cmj.home',
     'sapl',
 
     'cmj.cerimonial',
@@ -80,26 +79,9 @@ INSTALLED_APPS = (
     'sass_processor',
     'rest_framework',
 
-    #'haystack',
+    # 'haystack',
     # "elasticstack",
-
-    'wagtail.wagtailforms',
-    'wagtail.wagtailredirects',
-    'wagtail.wagtailembeds',
-    'wagtail.wagtailsites',
-    'wagtail.wagtailusers',
-    'wagtail.wagtailsnippets',
-    'wagtail.wagtaildocs',
-    'wagtail.wagtailimages',
-    'wagtail.wagtailsearch',
-    'wagtail.wagtailadmin',
-    'wagtail.wagtailcore',
-
     'taggit',
-    'modelcluster',
-
-    'wagtail.contrib.modeladmin',
-
 
 
 
@@ -124,9 +106,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-
-    'wagtail.wagtailcore.middleware.SiteMiddleware',
-    'wagtail.wagtailredirects.middleware.RedirectMiddleware',
 )
 
 
@@ -182,8 +161,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'cmj.wsgi.application'
-
-WAGTAIL_SITE_NAME = 'Portal da Câmara Municipal de Jataí'
 
 AUTH_USER_MODEL = 'core.User'
 

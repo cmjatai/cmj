@@ -13,19 +13,19 @@ from cmj.core.models import AreaTrabalho
 
 if __name__ == "__main__":
 
-    at = AreaTrabalho.objects.get(pk=1)
+    at = AreaTrabalho.objects.get(pk=5)
     print(at.nome)
 
-    processos = Processo.objects.filter(
-        workspace=6).order_by('titulo').distinct('titulo').values_list('titulo', flat=True)
-
-    with open('/home/leandro/relatorio_adilson_carvalho.csv', 'w') as cf:
+    """processos = Processo.objects.filter(
+        workspace=5).order_by('titulo').distinct('titulo').values_list('titulo', flat=True)
+    """
+    with open('/home/leandro/relatorio_joaorosa.csv', 'w') as cf:
         writer = csv.writer(cf, delimiter=',',
                             quotechar='"',
                             quoting=csv.QUOTE_MINIMAL)
 
         contatos = Contato.objects.filter(
-            workspace=1).order_by(
+            workspace=5).order_by(
             'endereco_set__bairro__nome',
             'endereco_set__endereco',
             'nome')
