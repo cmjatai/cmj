@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% load sigad_filters %}
+{% load common_tags %}
+{% load i18n %}
+
+{% block base_content %}
+
+  {# FIXME is this the best markup to use? #}
+  <div class="clearfix">
+    {% block actions %}
+      <dl class="sub-nav right">
+        <dd><a href="{{ view.update_url }}" class="button">{% trans 'Editar' %}</a></dd>
+        <dd><a href="{{ view.delete_url }}" class="button alert">{% trans 'Excluir' %}</a></dd>
+      </dl>
+    {% endblock actions %}
+    {% block sections_nav %}{% endblock %}
+  </div>
+
+  {% block detail_content %}
+
+    <h1>{{ object.titulo|default:'' }}</h1>
+
+<fieldset>
+    <legend>Identificação Básica</legend>
+    <div class="row">
+
+
+        {% if object.media_of %}
+
+            <div class="columns large-6">
+                <div id="div_id_data" class="holder">
+                    <img src="{% url 'sigad:media_get' object.pk 'large' object.pk %}" alt="" />
+                </div>
+            </div>
+            <div class="columns large-3">
+                <div id="div_id_data" class="holder">
+                    <label>{% verbose_name object 'data'%}</label>
+                    <p>{{ object.data|date:'d/m/Y' }}</p>
+                </div>
+            </div>
+            <div class="columns large-3">
+                <div id="div_id_privacidade" class="holder">
+                    <label>{% verbose_name object 'privacidade'%}</label>
+                    <p>{{ object.get_privacidade_display }}</p>
+                </div>
+            </div>
+
+        {% else %}
+	        <div class="columns large-6">
+	            <div id="div_id_data" class="holder">
+	                <label>{% verbose_name object 'data'%}</label>
+	                <p>{{ object.data|date:'d/m/Y' }}</p>
+	            </div>
+	        </div>
+	        <div class="columns large-6">
+	            <div id="div_id_privacidade" class="holder">
+	                <label>{% verbose_name object 'privacidade'%}</label>
+	                <p>{{ object.get_privacidade_display }}</p>
+	            </div>
+	        </div>
+        {% endif %}
+
+    </div>
+</fieldset>
+
+
+{% if object.descricao %}
+	<fieldset>
+	    <legend>{% verbose_name object 'descricao'%}</legend>
+	    <div class="row">
+	        <div class="columns large-12">
+	            <div id="div_id_descricao" class="holder">
+	                <p>{{ object.descricao|safe }}</p>
+	            </div>
+	        </div>
+	    </div>
+	</fieldset>
+{% endif %}
+
+{% if object.texto %}
+	<fieldset>
+	    <legend>{% verbose_name object 'texto'%}</legend>
+	    <div class="row">
+	        <div class="columns large-12">
+	            <div id="div_id_texto" class="holder">
+	                <p>{{ object.texto|safe }}</p>
+	            </div>
+	        </div>
+	    </div>
+	</fieldset>
+{% endif %}
+
+{# TODO: Implementar analise de tipos de mídias#}
+{% if not object.media_of %}
+    <fieldset>
+        <legend>{% verbose_name object 'media_of'%}</legend>
+        {% for docmedia in object.docmedias_set.all %}
+            <div class="row">
+                <div class="columns large-12">
+                    {% if docmedia.media.last.content_type|startswith:'image' %}
+                        <img src="{% url 'sigad:media_get' object.pk '.100' docmedia.pk %}" width="100px" alt="" />
+                    {%else %}
+                        <a href="{% url 'sigad:media_get' object.pk '' docmedia.pk %}">{{docmedia.media.last.simple_name}}</a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </fieldset>
+{% endif %}
+
+
+{% endblock detail_content %}
+
+{% endblock base_content %}

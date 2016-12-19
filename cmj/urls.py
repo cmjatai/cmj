@@ -12,10 +12,7 @@ Class-based views
 Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
-"""
-#url('', include('django.contrib.auth.urls', namespace='auth')),
-# url(r'^sapl/', include(sapl.urls)),
-"""
+
 url(r'^sapl/', include(sapl.comissoes.urls)),
 url(r'^sapl/', include(sapl.sessao.urls)),
 url(r'^sapl/', include(sapl.parlamentares.urls)),
@@ -49,6 +46,7 @@ import sapl.sessao.urls
 
 import cmj.cerimonial.urls
 import cmj.core.urls
+import cmj.sigad.urls
 
 
 urlpatterns = [
@@ -74,6 +72,9 @@ urlpatterns = [
     url(r'', include(sapl.relatorios.urls)),
     url(r'', include(sapl.api.urls)),
     url(r'^sapl/', include(sapl.base.urls)),
+
+
+    url(r'', include(cmj.sigad.urls)),
 
 
 
