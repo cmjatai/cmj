@@ -229,6 +229,8 @@
                         {{ title|safe|linebreaksbr }}
                       {% elif object %}
                         {{ object|safe|linebreaksbr }}
+                      {% elif view.title %}
+                        {{ view.title|safe|linebreaksbr }}
                       {% endif %}
                     </h1>
                   {% endblock %}

@@ -9,14 +9,12 @@ app_name = AppConfig.name
 
 urlpatterns_sigad = [
 
-    url(r'^classe/import',
-        views.Pcasp2016ImportView.as_view(), name='pcasp2016_import'),
-
     url(r'^classe/create$',
         views.ClasseCreateView.as_view(), name='classe_create'),
 
     url(r'^classe/(?P<pk>[0-9]+)/create$',
         views.ClasseCreateView.as_view(), name='subclasse_create'),
+
 
     url(r'^classe/(?P<pk>[0-9]+)/edit$',
         views.ClasseUpdateView.as_view(), name='classe_edit'),
@@ -27,6 +25,23 @@ urlpatterns_sigad = [
     url(r'^classe/(?P<pk>[0-9]+)$',
         views.ClasseListView.as_view(), name='subclasse_list'),
 
+    url(r'^(?P<path>.*)$',
+        views.PathView.as_view(), name='path_view'),
+
+]
+
+urlpatterns = [
+    url(r'', include(urlpatterns_sigad))
+
+]
+"""
+urlpatterns_sigad = [
+
+    url(r'^classe/import',
+        views.Pcasp2016ImportView.as_view(), name='pcasp2016_import'),
+
+    url(r'^classe/create$',
+        views.ClasseCreateView.as_view(), name='classe_create'),
 
     url(r'^documento/create$',
         views.DocumentoCreateView.as_view(), name='documento_create'),
@@ -43,4 +58,4 @@ urlpatterns_sigad = [
 urlpatterns = [
     url(r'^sigad/', include(urlpatterns_sigad))
 
-]
+]"""

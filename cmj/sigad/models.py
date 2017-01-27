@@ -3,13 +3,22 @@ import os
 
 from PIL import Image
 from PIL.Image import NEAREST
-from django.contrib.auth.models import User, Permission
+from django.conf import settings
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.fields import GenericForeignKey,\
+    GenericRelation
+from django.contrib.contenttypes.models import ContentType
+from django.core import serializers
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.utils.functional import cached_property
+from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
+from django_extensions.db.fields.json import JSONField
 
-from sapl import settings
+from cmj import sigad
+from cmj.utils import get_settings_auth_user_model
 
 
 STATUS_PRIVATE = 99
@@ -36,21 +45,53 @@ PERFIL_CLASSE = ((
 )
 
 
-class AuditLog(models.Model):
-    modified = models.DateTimeField(
-        verbose_name=_('modified'), editable=False, auto_now=True)
-    modifier = models.ForeignKey(
-        User, verbose_name=_('modifier'), related_name='+')
+class Parent(models.Model):
+
+    parent = models.ForeignKey(
+        'self',
+        blank=True, null=True, default=None,
+        related_name='childs',
+        verbose_name=_('Filhos'))
+
+    related_classes = models.ManyToManyField(
+        'self', blank=True,
+        verbose_name=_('Classes Relacionadas'))
+
+    class Meta:
+        abstract = True
+
+    @property
+    def parents(self):
+        if not self.parent:
+            return []
+
+        parents = self.parent.parents + [self.parent, ]
+        return parents
 
 
-class SigadModelMixin(models.Model):
+class CMSMixin(models.Model):
     created = models.DateTimeField(
         verbose_name=_('created'),
         editable=False, auto_now_add=True)
-    owner = models.ForeignKey(
-        User, verbose_name=_('owner'), related_name='+')
 
-    audit_log
+    public_date = models.DateTimeField(null=True, default=None,
+                                       verbose_name=_('Data de Início de Publicação'))
+
+    public_end_date = models.DateTimeField(
+        null=True, default=None,
+        verbose_name=_('Data de Fim de Publicação'))
+
+    owner = models.ForeignKey(
+        get_settings_auth_user_model(), verbose_name=_('owner'), related_name='+')
+
+    descricao = models.TextField(
+        verbose_name=_('Descrição'),
+        blank=True, null=True, default=None)
+
+    visibilidade = models.IntegerField(
+        _('Visibilidade'),
+        choices=VISIBILIDADE_STATUS,
+        default=STATUS_PRIVATE)
 
     class Meta:
         abstract = True
@@ -61,7 +102,7 @@ class SigadModelMixin(models.Model):
         """
         from django.core.exceptions import ValidationError
 
-        super(SigadModelMixin, self).clean()
+        super(CMSMixin, self).clean()
 
         for field_tuple in self._meta.unique_together[:]:
             unique_filter = {}
@@ -86,31 +127,122 @@ class SigadModelMixin(models.Model):
                     raise ValidationError(msg)
 
 
-class Classe(SigadModelMixin):
+class Revisao(models.Model):
 
-    codigo = models.PositiveIntegerField(verbose_name=_('Código'))
-    nome = models.CharField(
-        verbose_name=_('Nome da Classe'),
-        max_length=250)
-    descricao = models.TextField(
-        verbose_name=_('Descrição'),
+    data = models.DateTimeField(
+        verbose_name=_('created'),
+        editable=False, auto_now_add=True)
+    user = models.ForeignKey(
+        get_settings_auth_user_model(),
+        verbose_name=_('user'), related_name='+')
+
+    json = JSONField(verbose_name=_('Json'))
+
+    content_type = models.ForeignKey(
+        ContentType,
         blank=True, null=True, default=None)
+    object_id = models.PositiveIntegerField(
+        blank=True, null=True, default=None)
+    content_object = GenericForeignKey('content_type', 'object_id')
 
-    parent = models.ForeignKey(
-        'self',
-        blank=True, null=True, default=None,
-        related_name='subclasses',
-        verbose_name=_('Classes Subordinadas'))
+    class Meta:
+        ordering = ('-data',)
+        verbose_name = _('Revisão')
+        verbose_name_plural = _('Revisões')
 
-    visibilidade = models.IntegerField(
-        _('Visibilidade'),
-        choices=VISIBILIDADE_STATUS,
-        default=STATUS_PRIVATE)
+    @classmethod
+    def gerar_revisao(cls, instance_model, user):
+        revisao = Revisao()
+        revisao.user = user
+        revisao.content_object = instance_model
+        revisao.json = serializers.serialize("json", (instance_model,))
+        revisao.save()
+
+
+class Slugged(Parent):
+    titulo = models.CharField(
+        verbose_name=_('Título'),
+        max_length=250)
+
+    slug = models.SlugField(max_length=2000)
+
+    revisoes = GenericRelation(Revisao, related_query_name='revisoes')
+
+    class Meta:
+        abstract = True
+
+    def save(self, *args, **kwargs):
+        self.slug = self.generate_unique_slug()
+        super(Slugged, self).save(*args, **kwargs)
+
+    def generate_unique_slug(self):
+        concret_model = None
+        for kls in reversed(self.__class__.__mro__):
+            if issubclass(kls, Slugged) and not kls._meta.abstract:
+                concret_model = kls
+
+        slug = slugify(self.titulo)
+        parents_slug = self.parent.slug if self.parent else ''
+
+        i = 0
+        while True:
+            if i > 0:
+                if i > 1:
+                    slug = slug.rsplit("-", 1)[0]
+                slug = "%s-%s" % (slug, i)
+
+            try:
+
+                obj = concret_model.objects.get(
+                    **{'slug': parents_slug + '/' + slug})
+                if obj == self:
+                    raise ObjectDoesNotExist
+
+            except ObjectDoesNotExist:
+                break
+            i += 1
+        return parents_slug + '/' + slug
+
+    @cached_property
+    def nivel(self):
+        parents = self.parents
+        return len(parents)
+
+    @property
+    def strparents(self):
+        if not self.parent:
+            return []
+
+        parents = self.parent.strparents + [self.parent.titulo, ]
+        return parents
+
+    def __str__(self):
+        parents = self.strparents
+        parents.append(self.titulo)
+
+        return ':'.join(parents)
+
+
+class Classe(Slugged, CMSMixin):
+
+    codigo = models.PositiveIntegerField(verbose_name=_('Código'), default=0)
 
     perfil = models.IntegerField(
         _('Perfil da Classe'),
         choices=PERFIL_CLASSE,
         default=CLASSE_ESTRUTURAL)
+
+    class Meta:
+        ordering = ('codigo', '-public_date',)
+
+        unique_together = (
+            ('slug', 'parent', ),
+        )
+        verbose_name = _('Classe')
+        verbose_name_plural = _('Classes')
+        permissions = (
+            ('view_subclasse', _('Visualização de Subclasses')),
+        )
 
     @cached_property
     def conta(self):
@@ -120,47 +252,10 @@ class Classe(SigadModelMixin):
             ct[0] = '{:03,d}'.format(int(ct[0]))
         return '.'.join(ct)
 
-    @cached_property
-    def nivel(self):
-        parents = self.parents
-        return len(parents)
 
-    @property
-    def parents(self):
-        if not self.parent:
-            return []
-
-        parents = self.parent.parents + [self.parent, ]
-        return parents
-
-    @property
-    def strparents(self):
-        if not self.parent:
-            return []
-
-        parents = self.parent.strparents + [self.parent.nome, ]
-        return parents
-
-    def __str__(self):
-        parents = self.strparents
-        parents.append(self.nome)
-
-        return ':'.join(parents)
-
-    class Meta:
-        ordering = ('codigo',)
-        unique_together = (
-            ('codigo', 'parent'),
-        )
-        verbose_name = _('Classe')
-        verbose_name_plural = _('Classes')
-        permissions = (
-            ('view_subclasse', _('Visualização de Subclasses')),
-        )
-
-
-class PermissionsUserClasse(SigadModelMixin):
-    user = models.ForeignKey(User, verbose_name=_('Usuário'))
+class PermissionsUserClasse(CMSMixin):
+    user = models.ForeignKey(
+        get_settings_auth_user_model(), verbose_name=_('Usuário'))
     classe = models.ForeignKey(Classe, verbose_name=_('Classe'))
     permission = models.ForeignKey(Permission, verbose_name=_('Permissão'))
 
@@ -170,7 +265,7 @@ class PermissionsUserClasse(SigadModelMixin):
         )
         verbose_name = _('Permissão de Usuário para Classe')
         verbose_name_plural = _('Permissões de Usuários para Classes')
-
+"""
 
 class Documento(SigadModelMixin):
 
@@ -194,11 +289,6 @@ class Documento(SigadModelMixin):
     hora_publicacao = models.TimeField(
         blank=True, null=True, default=None,
         verbose_name=_('Horário de Publicação'))
-
-    visibilidade = models.IntegerField(
-        _('Visibilidade'),
-        choices=VISIBILIDADE_STATUS,
-        default=STATUS_PRIVATE)
 
     parent = models.ForeignKey(
         'self',
@@ -224,7 +314,6 @@ class Documento(SigadModelMixin):
         return self.titulo
 
     class Meta:
-        ordering = ('modified',)
         verbose_name = _('Documento')
         verbose_name_plural = _('Documentos')
         permissions = (
@@ -265,7 +354,7 @@ class Media(models.Model):
         verbose_name=_('created'),
         editable=False, auto_now_add=True)
     owner = models.ForeignKey(
-        User, verbose_name=_('owner'), related_name='+')
+        get_settings_auth_user_model(), verbose_name=_('owner'), related_name='+')
 
     file = models.FileField(
         blank=True,
@@ -334,3 +423,4 @@ class Media(models.Model):
         ordering = ('-created',)
         verbose_name = _('Mídia')
         verbose_name_plural = _('Mídias')
+"""

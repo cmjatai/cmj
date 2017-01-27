@@ -1,66 +1,45 @@
-{% extends "base_sigad.html" %}
+{% extends "crud/detail.html" %}
 {% load i18n %}
 {% load common_tags %}
 
-{% block sections_nav %}
-    <dl class="sub-nav" style="right: none; left: 0.5em;">
-        <dd><a class="fi-page-multiple" href="{% url 'sigad:classe_list'%}"></a></dd>
-        {% if object %}
-            {% for parent in object.parents %}
-                <dd><a href="{% url 'sigad:subclasse_list' parent.pk%}" title="{{parent.conta}}">{{parent.nome|title}}</a></dd>
-            {% endfor %}
-            <dd><a href="{% url 'sigad:subclasse_list' object.pk%}" title="{{object.conta}}">{{object.nome|title}}</a></dd>
-        {% endif %}
-    </dl>
-{% endblock sections_nav%}
-
-{% block base_content %}
-<dl class="sub-nav">
-    {% if perms.add_classe %}
-    <dd><a href="{% if object %}{% url 'sigad:subclasse_create' object.pk%}{% else %}{% url 'sigad:classe_create'%}{% endif %}">
-            {% trans 'Adicionar'%} {%model_verbose_name 'sigad.models.Classe'%}</a></dd>
-    {% endif %}
-    
-    {% if object and perms.change_classe %}
-        <dd><a href="{% url 'sigad:classe_edit' object.pk%}">
-            {% trans 'Editar'%} {%model_verbose_name 'sigad.models.Classe'%} {{object.nome}}</a></dd>
-    {% endif %}
-</dl>
-
-{% if object and object.perfil != 2 and object_list or not object and object_list%}
-    <table class="table table-hover" width="100%">
-        <caption></caption>
-        <thead>
-            <tr>
-                <th>{% fieldclass_verbose_name 'sigad.models.Classe' 'codigo' %}</th>
-                <th>{% fieldclass_verbose_name 'sigad.models.Classe' 'nome' %}</th>
-                <th>{% fieldclass_verbose_name 'sigad.models.Classe' 'visibilidade' %}</th>
-                <th>{% fieldclass_verbose_name 'sigad.models.Classe' 'perfil' %}</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for classe in object_list %}
-            <tr>
-                <td><a href="{% url 'sigad:subclasse_list' classe.pk %}">{{ classe.conta }}</a></td>
-                <td>{{ classe.nome }}</td>
-                <td>{{ classe.get_visibilidade_display }}</td>
-                <td>{{ classe.get_perfil_display }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+{% if view.update_url %}
+teste
 {% endif %}
-
-{% if object and object.perfil %}
-    <br>
-    <hr>
-    <h2>
-      Documentos da Classe {{object.nome}}<br>Conta: {{object.conta}}
-
-    </h2>
-
-
-{% endif %}
+{% block detail_content %}
+  {% if object and object.perfil != 2 and object_list or not object and object_list%}
+      <table class="table table-hover" width="100%">
+          <caption></caption>
+          <thead>
+              <tr>
+                  <th>{% fieldclass_verbose_name 'cmj.sigad.models.Classe' 'titulo' %}</th>
+                  <th>{% fieldclass_verbose_name 'cmj.sigad.models.Classe' 'visibilidade' %}</th>
+                  <th>{% fieldclass_verbose_name 'cmj.sigad.models.Classe' 'perfil' %}</th>
+                  <th>{% fieldclass_verbose_name 'cmj.sigad.models.Classe' 'codigo' %}</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for classe in object_list %}
+              <tr>
+                  <td><a href="{% url 'cmj.sigad:subclasse_list' classe.pk %}">{{ classe.titulo }}</a></td>
+                  <td>{{ classe.get_visibilidade_display }}</td>
+                  <td>{{ classe.get_perfil_display }}</td>
+                  <td>{{ classe.conta }}</td>
+              </tr>
+              {% endfor %}
+          </tbody>
+      </table>
+  {% endif %}
+  
+  {% if object and object.perfil %}
+      <br>
+      <hr>
+      <h2>
+        Documentos da Classe {{object.nome}}<br>Conta: {{object.conta}}
+  
+      </h2>
+  
+  
+  {% endif %}
 
 
 {% endblock %}

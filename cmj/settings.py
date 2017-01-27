@@ -47,6 +47,7 @@ CMJ_APPS = (
     'sapl',
 
     'cmj.cerimonial',
+    'cmj.sigad',
 
 
     # manter sempre como o último da lista de apps

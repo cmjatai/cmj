@@ -1,22 +1,4 @@
-from operator import attrgetter
-
-from braces.views import PermissionRequiredMixin, FormMessagesMixin
-from django.contrib.auth.decorators import login_required
-from django.core.urlresolvers import reverse_lazy
-from django.db.models.aggregates import Max
-from django.http.response import HttpResponse, Http404
-from django.shortcuts import get_object_or_404
-from django.utils.decorators import method_decorator
-from django.utils.translation import ugettext_lazy as _
-from django.views.generic.base import View
-from django.views.generic.detail import DetailView
-from django.views.generic.edit import CreateView, UpdateView
-from django.views.generic.list import ListView
-from cmj.sigad import forms, models
-from cmj.sigad.models import Documento, Classe, PermissionsUserClasse, Media,\
-    VersionedMedia
-
-
+"""
 class DocumentoMixin(object):
 
     def get_initial(self):
@@ -34,120 +16,168 @@ class DocumentoMixin(object):
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         return super(DocumentoMixin, self).dispatch(*args, **kwargs)
+"""
+
+from operator import attrgetter
+
+from braces.views import PermissionRequiredMixin, FormMessagesMixin
+from django.core.urlresolvers import reverse_lazy
+from django.db.models.aggregates import Max
+from django.http.response import Http404
+from django.shortcuts import get_object_or_404
+from django.utils.translation import ugettext_lazy as _
+from django.views.generic.base import View, TemplateView
+from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.list import ListView
+
+from cmj.sigad import forms, models
+from cmj.sigad.models import Classe, Revisao, PermissionsUserClasse
 
 
-class ClasseCreateView(FormMessagesMixin, CreateView):
-    form_valid_message = _('Classe criada com sucesso!')
-    form_invalid_message = _('Existem erros no formulário de cadastro!')
-    template_name = 'sigad/form.html'
-    form_class = forms.ClasseForm
+class PathView(TemplateView):
+    template_name = 'index.html'
+
+    def get(self, request, *args, **kwargs):
+
+        print(self.kwargs['path'])
+
+        return TemplateView.get(self, request, *args, **kwargs)
+
+
+class ClasseParentMixin:
+    _parent = None
+
+    @property
+    def parent(self):
+        if 'pk' not in self.kwargs:
+            self._parent = None
+            return None
+
+        if not self._parent or (self._parent and
+                                self._parent.pk != self.kwargs['pk']):
+            self._parent = get_object_or_404(Classe, pk=self.kwargs['pk'])
+
+        return self._parent
+
+    @property
+    def verbose_name(self):
+        return self.model._meta.verbose_name
+
+    @property
+    def verbose_name_plural(self):
+        return self.model._meta.verbose_name_plural
+
+    @property
+    def title(self):
+        if not self.parent:
+            return _('Cadastro de Classe Geral')
+
+        return '%s <small>(%s)</small>' % (
+            self.parent, _('Cadastro de SubClasse'))
 
     @property
     def cancel_url(self):
         if 'pk' not in self.kwargs:
-            return reverse_lazy('sigad:classe_list')
+            return reverse_lazy('cmj.sigad:classe_list')
         else:
             return reverse_lazy(
-                'sigad:subclasse_list',
+                'cmj.sigad:subclasse_list',
                 kwargs={'pk': self.kwargs['pk']})
-
-    @property
-    def title(self):
-        if 'pk' not in self.kwargs:
-            self.parent = None
-            return _('Cadastro de Classe Geral')
-
-        if not hasattr(self, 'parent') or (
-                hasattr(self, 'parent') and
-                self.kwargs['pk'] != self.parent.pk):
-            self.parent = get_object_or_404(Classe, pk=self.kwargs['pk'])
-
-        return self.parent
 
     def get_success_url(self):
         return reverse_lazy(
-            'sigad:subclasse_list',
+            'cmj.sigad:subclasse_list',
             kwargs={'pk': self.object.id})
 
-    def get_initial(self):
-        self.title
-        if self.parent:
-            self.initial = {'parent': self.parent}
 
-            codigo__max = Classe.objects.filter(
-                parent=self.parent).order_by('codigo').aggregate(Max('codigo'))
-
-            self.initial['codigo'] = codigo__max['codigo__max'] + 1
-
-        return CreateView.get_initial(self)
-
-    def post(self, request, *args, **kwargs):
-        self.title
-        return super(ClasseCreateView, self).post(request, *args, **kwargs)
+class ClasseCreateView(ClasseParentMixin,
+                       FormMessagesMixin,
+                       PermissionRequiredMixin,
+                       CreateView):
+    permission_required = 'sigad.add_classe'
+    form_valid_message = _('Classe criada com sucesso!')
+    form_invalid_message = _('Existem erros no formulário de cadastro!')
+    template_name = 'sigad/form.html'
+    form_class = forms.ClasseForm
+    model = Classe
 
     def form_valid(self, form):
 
         self.object = form.save(commit=False)
-        self.object.owner = self.request.user
-        self.object.modifier = self.request.user
-        self.object.parent = self.parent
-        self.object.save()
 
+        self.object.owner = self.request.user
+
+        if self.parent:
+            self.object.parent = self.parent
+
+        response = super(ClasseCreateView, self).form_valid(form)
+
+        Revisao.gerar_revisao(self.object, self.request.user)
         if self.object.visibilidade == models.STATUS_PUBLIC:
             parents = self.object.parents
             for p in parents:
                 p.visibilidade = models.STATUS_PUBLIC
                 p.save()
+                Revisao.gerar_revisao(p, self.request.user)
 
-        return super(ClasseCreateView, self).form_valid(form)
+        return response
+
+    def get_initial(self):
+        self.initial = {'parent': self.parent}
+
+        cod__max = Classe.objects.filter(
+            parent=self.parent).order_by('codigo').aggregate(Max('codigo'))
+
+        self.initial['codigo'] = cod__max['codigo__max'] + \
+            1 if cod__max['codigo__max'] else 1
+
+        return CreateView.get_initial(self)
 
 
-class ClasseUpdateView(FormMessagesMixin, UpdateView):
+class ClasseUpdateView(ClasseParentMixin,
+                       FormMessagesMixin,
+                       PermissionRequiredMixin,
+                       UpdateView):
+    permission_required = 'sigad.change_classe'
     form_valid_message = _('Classe Alterada com sucesso!')
     form_invalid_message = _('Existem erros no formulário!')
     template_name = 'sigad/form.html'
     form_class = forms.ClasseForm
     model = Classe
 
-    @property
-    def cancel_url(self):
-        return reverse_lazy(
-            'sigad:subclasse_list',
-            kwargs={'pk': self.kwargs['pk']})
-
-    @property
-    def title(self):
-        self.parent = get_object_or_404(Classe, pk=self.kwargs['pk']).parent
-        return self.parent
-
-    def get_success_url(self):
-        return reverse_lazy(
-            'sigad:subclasse_list',
-            kwargs={'pk': self.object.id})
-
     def get_initial(self):
-        self.title
-        if self.parent:
-            self.initial = {'parent': self.parent}
+        self.initial = {'parent': self.parent.parent}
         return UpdateView.get_initial(self)
 
-    def post(self, request, *args, **kwargs):
-        self.title
-        return super(ClasseUpdateView, self).post(request, *args, **kwargs)
-
     def form_valid(self, form):
-        self.object = form.save(commit=False)
-        self.object.modifier = self.request.user
-        self.object.parent = self.parent
-        self.object.save()
+        Revisao.gerar_revisao(form.instance, self.request.user)
         return super(ClasseUpdateView, self).form_valid(form)
 
 
-class ClasseListView(PermissionRequiredMixin, ListView):
+class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
     permission_required = 'sigad.view_subclasse'
 
     model = Classe
     template_name = 'sigad/classe_list.html'
+
+    @property
+    def create_url(self):
+        if not self.request.user.has_perm('sigad.add_classe'):
+            return ''
+        if 'pk' not in self.kwargs:
+            return reverse_lazy('cmj.sigad:classe_create')
+        else:
+            return reverse_lazy(
+                'cmj.sigad:subclasse_create',
+                kwargs={'pk': self.kwargs['pk']})
+
+    @property
+    def update_url(self):
+        if not self.request.user.has_perm('sigad.change_classe'):
+            return ''
+        return reverse_lazy(
+            'cmj.sigad:classe_edit',
+            kwargs={'pk': self.kwargs['pk']})
 
     def dispatch(self, request, *args, **kwargs):
         self.object = None
@@ -279,7 +309,7 @@ class ClasseListView(PermissionRequiredMixin, ListView):
                             qs.append(p)
 
         return sorted(qs, key=attrgetter('codigo'))
-
+"""
 
 class DocumentoCreateView(
         PermissionRequiredMixin,
@@ -474,3 +504,5 @@ class Pcasp2016ImportView(View):
                 replace('  ', '').replace('–', '-'))
 
         return HttpResponse(content, content_type='text/plain; charset=utf8')
+
+"""

@@ -3,10 +3,10 @@ from crispy_forms.layout import Fieldset
 from django import forms
 from django.forms.models import ModelForm
 from django.utils.translation import ugettext_lazy as _
+from sapl.crispy_layout_mixin import to_row, SaplFormLayout
 
-from crispy_layout_mixin import to_row, SaplFormLayout
-from sigad import models
-from sigad.models import Documento, Classe
+from cmj.sigad import models
+from cmj.sigad.models import Classe
 
 
 class UpLoadImportFileForm(forms.Form):
@@ -28,10 +28,6 @@ error_messages = {
 
 class ClasseForm(ModelForm):
 
-    codigo = forms.IntegerField(
-        label=Classe._meta.get_field('codigo').verbose_name)
-    nome = forms.CharField(
-        label=Classe._meta.get_field('nome').verbose_name)
     visibilidade = forms.ChoiceField(
         label=Classe._meta.get_field('visibilidade').verbose_name,
         choices=models.VISIBILIDADE_STATUS)
@@ -50,19 +46,20 @@ class ClasseForm(ModelForm):
 
     class Meta:
         model = Classe
-        fields = ['codigo',
-                  'nome',
-                  'visibilidade',
-                  'perfil',
-                  'descricao',
-                  'parent'
-                  ]
+        fields = [
+            'codigo',
+            'titulo',
+            'visibilidade',
+            'perfil',
+            'descricao',
+            'parent'
+        ]
 
     def __init__(self, *args, **kwargs):
 
         row1 = to_row([
-            ('codigo', 3),
-            ('nome', 9),
+            ('codigo', 4),
+            ('titulo', 8),
         ])
 
         row2 = to_row([
@@ -75,14 +72,13 @@ class ClasseForm(ModelForm):
 
         self.helper = FormHelper()
         self.helper.layout = SaplFormLayout(
-
             Fieldset(_('Identificação Básica'),
-                     row1, row2, row3,
-                     css_class="large-12"))
+                     row1, row2, row3))
 
         super(ClasseForm, self).__init__(*args, **kwargs)
 
 
+"""
 class DocumentoForm(ModelForm):
 
     titulo = forms.CharField(label=_('Título'))
@@ -157,3 +153,4 @@ class DocumentoForm(ModelForm):
         super(DocumentoForm, self).__init__(*args, **kwargs)
         self.fields['medias_file'].widget.attrs.update(
             {'multiple': 'multiple'})
+"""
