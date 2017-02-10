@@ -22,10 +22,10 @@
       url: sapl.sessao:pesquisar_pauta
     - title: {% trans 'Tramitação em Lote' %}
       url: sapl.materia:primeira_tramitacao_em_lote
-      check_permission: materia.list_tramitacao {% comment %} FIXME transformar para checagens de menu_[funcionalidade]{% endcomment%}
+      check_permission: materia.list_tramitacao {% comment %} FIXME transformar para checagens de menu_[funcionalidade] {% endcomment %}
     - title: {% trans 'Acessório em Lote' %}
       url: sapl.materia:acessorio_em_lote
-      check_permission: materia.list_documentoacessorio {% comment %} FIXME transformar para checagens de menu_[funcionalidade]{% endcomment%}
+      check_permission: materia.list_documentoacessorio {% comment %} FIXME transformar para checagens de menu_[funcionalidade] {% endcomment %}
 
 - title: {% trans 'Legislação' %}
   url: sapl.norma:norma_pesquisa
@@ -41,3 +41,4 @@
     - title: {% trans 'Documentos Administrativos' %}
       {% if 'documentos_administrativos'|get_config_attr == 'R' %}check_permission: protolcoloadm.list_documentoadministrativo{%endif%}
       url: sapl.protocoloadm:pesq_doc_adm
+

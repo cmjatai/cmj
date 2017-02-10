@@ -12,18 +12,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% block head_content %}
       <link rel="icon" href="{% static 'img/logo.png' %}"  type="image/png" >
-      {# Styles #}
 
-      <link rel="stylesheet" href="{% sass_src 'bootstrap-sass/assets/stylesheets/_bootstrap.scss' %}" type="text/css">
-      <link rel="stylesheet" href="{% sass_src 'styles/header.scss' %}" type="text/css">
+      {% comment %} Importa bootstrap customizado {% endcomment %}
+      <link rel="stylesheet" href="{% sass_src 'styles/2017/header.scss' %}" type="text/css">
+
+      {% comment %} aplica drunken {% endcomment %}
       <link rel="stylesheet" href="{% static 'drunken-parrot-flat-ui/css/drunken-parrot.css' %}">
+
+      {% comment %} aplica font-awesome {% endcomment %}
       <link rel="stylesheet" href="{% static 'components-font-awesome/css/font-awesome.css' %}">
-      <link rel="stylesheet" href="{% sass_src 'styles/app.scss' %}" type="text/css">
+
+      {% comment %} customizações de layout para área pública apartir de 2017 {% endcomment %}
+      <link rel="stylesheet" href="{% sass_src 'styles/2017/app.scss' %}" type="text/css">
 
       <link rel="stylesheet" href="{% static 'jquery-ui/themes/cupertino/jquery-ui.min.css' %}">
 
-      {# Scripts #}
-      {# modernizr must be in head (see http://modernizr.com/docs/#installing) #}
     {% endblock %}
 
   </head>
@@ -60,7 +63,6 @@
                   </a>
                   <ul class="dropdown-menu menu-right">
                     {% comment %}
-
                     <li><a href="{% url 'cmj.cerimonial:perfil_detail' %}">{% trans "Meu Perfil" %}</a></li>
                     {% endcomment %}
                     <li><a href="{% url 'cmj.core:logout' %}">{% trans "Sair" %}</a></li>
@@ -130,7 +132,7 @@
                         {% if perms.core.menu_relatorios %}
                           <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Relatórios" %}<span class="caret"></span></a>
-                            <ul class="dropdown-menu menu-right">
+                            <ul class="dropdown-menu menu-left">
                               <li class="dropdown-header">{% trans "Contatos" %}</li>
                               {% if perms.cerimonial.print_impressoenderecamento %}<li class="nav__sub-item"><a href="{% url 'cmj.cerimonial:print_impressoenderecamento' %}">{% trans "Etiquetas e Envelopes" %}</a></li>{% endif %}
                               <li class="dropdown-header">{% trans "Processos" %}</li>
@@ -140,13 +142,10 @@
                             </ul>
                           </li>
                         {% endif %}
-
-
                       </ul>
                     </li>
                   {% endif %}
                 </ul>
-
                 <ul class="nav navbar-nav navbar-right">
                   {% if perms.core.menu_dados_auxiliares or perms.base.view_tabelas_auxiliares%}
                     <li class="dropdown">

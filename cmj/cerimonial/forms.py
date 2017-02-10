@@ -432,6 +432,12 @@ class ProcessoForm(ModelForm):
              ]
         yaml_layout.append(q)
 
+        for fieldset in yaml_layout:
+            for linha in fieldset:
+                for idx, field in enumerate(linha):
+                    if field[0] == 'importancia':
+                        linha[idx] = (InlineRadios('importancia'), field[1])
+
         self.helper = FormHelper()
         self.helper.layout = SaplFormLayout(*yaml_layout)
 
@@ -454,7 +460,6 @@ class ProcessoForm(ModelForm):
 
         # Utilizando template bootstrap3 customizado
         self.fields['importancia'].widget = forms.RadioSelect()
-        self.fields['importancia'].inline_class = True
         self.fields['importancia'].choices = IMPORTANCIA_CHOICE
 
         self.fields['status'].widget = forms.RadioSelect()

@@ -20,7 +20,8 @@ class DocumentoMixin(object):
 
 from operator import attrgetter
 
-from braces.views import PermissionRequiredMixin, FormMessagesMixin
+from braces.views import FormMessagesMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.urlresolvers import reverse_lazy
 from django.db.models.aggregates import Max
 from django.http.response import Http404
@@ -29,19 +30,54 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import View, TemplateView
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
+from sapl.parlamentares.models import Partido
 
 from cmj.sigad import forms, models
 from cmj.sigad.models import Classe, Revisao, PermissionsUserClasse
 
 
 class PathView(TemplateView):
-    template_name = 'index.html'
+    template_name = 'base_path.html'
+    documento = None
+    classe = None
 
     def get(self, request, *args, **kwargs):
 
-        print(self.kwargs['path'])
+        print(self.kwargs['slug'])
+        #p = Partido()
+        # p.save()
 
         return TemplateView.get(self, request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = TemplateView.get_context_data(self, **kwargs)
+
+        if self.documento:
+            context['title'] = 'documento'
+        elif self.classe:
+            context['title'] = self.classe.titulo
+
+        return context
+
+    def dispatch(self, request, *args, **kwargs):
+        slug = kwargs.get('slug', '')
+
+        if slug:
+            print(slug)
+            slug = slug.split('/')
+            try:
+                self.classe = Classe.objects.get(slug=slug[-1])
+            except:
+                pass
+
+        if not slug:
+            self.template_name = 'path/pagina_inicial.html'
+            return TemplateView.dispatch(self, request, *args, **kwargs)
+
+        if not self.documento and not self.classe:
+            raise Http404()
+
+        return TemplateView.dispatch(self, request, *args, **kwargs)
 
 
 class ClasseParentMixin:
@@ -179,63 +215,6 @@ class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
             'cmj.sigad:classe_edit',
             kwargs={'pk': self.kwargs['pk']})
 
-    def dispatch(self, request, *args, **kwargs):
-        self.object = None
-        if 'pk' in self.kwargs:
-            self.object = get_object_or_404(Classe, pk=self.kwargs['pk'])
-
-            has_permission = self.check_permissions(request)
-
-            if not has_permission:
-                if not request.user.is_superuser and \
-                        self.object.visibilidade != models.STATUS_PUBLIC:
-                    has_permission = False
-
-                    pubs = Classe.objects.filter(
-                        visibilidade=models.STATUS_PUBLIC).select_related(
-                        'parent', 'parent__parent')
-                    for pub in pubs:
-                        parents = pub.parents
-                        for p in parents[::-1]:
-                            if p == self.object:
-                                has_permission = True
-                                break
-                        if has_permission:
-                            break
-
-                    if not has_permission and not request.user.is_anonymous():
-                        if (self.object.visibilidade ==
-                                models.STATUS_PRIVATE and
-                                self.object.owner != request.user):
-                            has_permission = False
-                        else:
-                            pr = self.permission_required.split('.')
-                            puc_list = PermissionsUserClasse.objects.filter(
-                                user=request.user,
-                                permission__content_type__app_label=pr[0],
-                                permission__codename=pr[1]).select_related(
-                                    'classe__parent', 'classe__parent__parent')
-                            for puc in puc_list:
-                                if puc.classe == self.object:
-                                    has_permission = True
-                                    break
-
-                                parents = puc.classe.parents
-                                for p in parents[::-1]:
-                                    if p == self.object:
-                                        has_permission = True
-                                        break
-                                if has_permission:
-                                    break
-                    if not has_permission:
-                        return self.handle_no_permission(request)
-
-        return ListView.dispatch(self, request, *args, **kwargs)
-
-    def get(self, request, *args, **kwargs):
-
-        return ListView.get(self, request, *args, **kwargs)
-
     def get_context_data(self, **kwargs):
         context = {}
         context['object'] = self.object
@@ -250,13 +229,12 @@ class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
         else:
             qpub = Classe.objects.filter(parent_id=self.kwargs['pk'])
 
-        if self.check_permissions(self.request):
+        if self.has_permission():
             return qpub
 
         qpub = qpub.filter(visibilidade=models.STATUS_PUBLIC)
 
         qs = list(qpub)
-
         ''' Inclui os filhos da classe atual de visualização que
         possuam algum herdeiro que seja público'''
         pubs = Classe.objects.filter(
@@ -309,6 +287,97 @@ class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
                             qs.append(p)
 
         return sorted(qs, key=attrgetter('codigo'))
+
+    def dispatch(self, request, *args, **kwargs):
+        self.object = None
+        if 'pk' in self.kwargs:
+            self.object = get_object_or_404(Classe, pk=self.kwargs['pk'])
+
+            has_permission = self.has_permission()
+
+            if not has_permission:
+                if not request.user.is_superuser and \
+                        self.object.visibilidade != models.STATUS_PUBLIC:
+                    has_permission = False
+
+                    # FIXME: refatorar e analisar apartir de self.object
+                    pubs = Classe.objects.filter(
+                        visibilidade=models.STATUS_PUBLIC).select_related(
+                        'parent', 'parent__parent')
+                    for pub in pubs:
+                        parents = pub.parents
+                        for p in parents[::-1]:
+                            if p == self.object:
+                                has_permission = True
+                                break
+                        if has_permission:
+                            break
+
+                    if not has_permission and not request.user.is_anonymous():
+                        if (self.object.visibilidade ==
+                                models.STATUS_PRIVATE and
+                                self.object.owner != request.user):
+                            has_permission = False
+                        else:
+                            pr = self.permission_required.split('.')
+                            puc_list = PermissionsUserClasse.objects.filter(
+                                user=request.user,
+                                permission__content_type__app_label=pr[0],
+                                permission__codename=pr[1]).select_related(
+                                    'classe__parent', 'classe__parent__parent')
+                            for puc in puc_list:
+                                if puc.classe == self.object:
+                                    has_permission = True
+                                    break
+
+                                parents = puc.classe.parents
+                                for p in parents[::-1]:
+                                    if p == self.object:
+                                        has_permission = True
+                                        break
+                                if has_permission:
+                                    break
+                    if not has_permission:
+                        return self.handle_no_permission(request)
+
+        return ListView.dispatch(self, request, *args, **kwargs)
+
+
+class DocumentoPmImportView(TemplateView):
+
+    template_name = 'path/pagina_inicial.html'
+
+    def get(self, request, *args, **kwargs):
+
+        if not request.user.is_superuser:
+            raise Http404()
+
+        import urllib3
+        import json
+
+        http = urllib3.PoolManager()
+
+        p = 1
+        s = 100
+        news = []
+        while True:
+            print(p)
+            r = http.request('GET', ('www.camarajatai.go.gov.br'
+                                     '/portal/json/jsonclient/json'
+                                     '?page=%s&step=%s') % (
+                p, s))
+
+            jdata = json.loads(r.data.decode('utf-8'))
+
+            for n in jdata:
+                news.append(n)
+
+            if len(jdata) < s:
+                break
+            p += 1
+
+        return TemplateView.get(self, request, *args, **kwargs)
+
 """
 
 class DocumentoCreateView(

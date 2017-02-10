@@ -16,6 +16,8 @@ from django.utils.functional import cached_property
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields.json import JSONField
+from sapl.materia.models import MateriaLegislativa
+from sapl.parlamentares.models import Parlamentar
 
 from cmj import sigad
 from cmj.utils import get_settings_auth_user_model
@@ -71,8 +73,7 @@ class Parent(models.Model):
 
 class CMSMixin(models.Model):
     created = models.DateTimeField(
-        verbose_name=_('created'),
-        editable=False, auto_now_add=True)
+        verbose_name=_('created'), editable=False, auto_now_add=True)
 
     public_date = models.DateTimeField(null=True, default=None,
                                        verbose_name=_('Data de Início de Publicação'))
@@ -172,8 +173,15 @@ class Slugged(Parent):
         abstract = True
 
     def save(self, *args, **kwargs):
+        slug_old = self.slug
         self.slug = self.generate_unique_slug()
         super(Slugged, self).save(*args, **kwargs)
+
+        if self.slug == slug_old:
+            return
+
+        for child in self.childs.all():
+            child.save()
 
     def generate_unique_slug(self):
         concret_model = None
@@ -192,8 +200,8 @@ class Slugged(Parent):
                 slug = "%s-%s" % (slug, i)
 
             try:
-
                 obj = concret_model.objects.get(
+                    #    **{'slug': slug, 'parent': self.parent})
                     **{'slug': parents_slug + '/' + slug})
                 if obj == self:
                     raise ObjectDoesNotExist
@@ -201,6 +209,7 @@ class Slugged(Parent):
             except ObjectDoesNotExist:
                 break
             i += 1
+
         return parents_slug + '/' + slug
 
     @cached_property
@@ -265,42 +274,34 @@ class PermissionsUserClasse(CMSMixin):
         )
         verbose_name = _('Permissão de Usuário para Classe')
         verbose_name_plural = _('Permissões de Usuários para Classes')
-"""
 
-class Documento(SigadModelMixin):
 
-    titulo = models.CharField(
-        verbose_name=_('Título'),
-        max_length=250,
-        blank=True, null=True, default=None)
-    descricao = models.TextField(
-        verbose_name=_('Descrição'),
-        blank=True, null=True, default=None)
+class Documento(Slugged, CMSMixin):
+
     texto = models.TextField(
         verbose_name=_('Texto'),
         blank=True, null=True, default=None)
 
-    data_documento = models.DateTimeField(
-        verbose_name=_('Data do Documento'))
+    old_path = models.TextField(
+        verbose_name=_('Path no Portal Modelo 1.0'),
+        blank=True, null=True, default=None)
+    old_json = models.TextField(
+        verbose_name=_('Json no Portal Modelo 1.0'),
+        blank=True, null=True, default=None)
 
-    data_publicacao = models.DateField(
-        blank=True, null=True, default=None,
-        verbose_name=_('Data de Publicação'))
-    hora_publicacao = models.TimeField(
-        blank=True, null=True, default=None,
-        verbose_name=_('Horário de Publicação'))
+    parlamentares = models.ManyToManyField(Parlamentar,
+                                           related_name='documentos',
+                                           verbose_name=_('Parlamentares'))
 
-    parent = models.ForeignKey(
-        'self',
-        blank=True, null=True, default=None,
-        related_name='documentos_set',
-        verbose_name=_('Documentos'))
+    materias = models.ManyToManyField(MateriaLegislativa,
+                                      related_name='documentos',
+                                      verbose_name=_('Matérias Relacionadas'))
 
     classe = models.ForeignKey(
         Classe,
         related_name='classes',
         verbose_name=_('Classes'))
-
+    """
     ''' se media_of estiver preenchido significa que a instancia
     do documento é uma midia de algum documento
     - TODO: verificar a necessidade de ser OneToOneField'''
@@ -308,7 +309,7 @@ class Documento(SigadModelMixin):
         'self',
         blank=True, null=True, default=None,
         related_name='docmedias_set',
-        verbose_name=_('Mídias do Documento'))
+        verbose_name=_('Mídias do Documento'))"""
 
     def __str__(self):
         return self.titulo
@@ -322,7 +323,7 @@ class Documento(SigadModelMixin):
              _('Visualização das mídias do Documento')),
         )
 
-
+"""
 class VersionedMedia(models.Model):
 
     documento = models.OneToOneField(

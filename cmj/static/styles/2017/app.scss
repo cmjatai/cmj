@@ -102,12 +102,12 @@ body, html {
     }
   }
   .icon-bar {
-    background-color: $color_text_inverse;
+    background-color: white;
   }
   a.navbar-brand {
     font-size: 25px;
     line-height: 40px;
-    color: $color_text_inverse;
+    color: white;
     font-family: "Graduate";
     padding: 0 0 0 30px;
     display: block;
@@ -961,7 +961,6 @@ body {
           background-color: $color_topo_bg;
           border: 1px solid rgba(255, 255, 255, 0.3);
           color: $color_text_inverse;
-          min-width: 250px;
           margin: 0;
           padding: 0;
           & > li {
@@ -974,6 +973,7 @@ body {
             top: 0.5em;
             left: 100%;
             margin-left: -1em;
+            right: auto;
           }
           .menu-right {
             top:0;
