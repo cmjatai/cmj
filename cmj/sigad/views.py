@@ -18,6 +18,7 @@ class DocumentoMixin(object):
         return super(DocumentoMixin, self).dispatch(*args, **kwargs)
 """
 
+from datetime import datetime, timedelta
 from operator import attrgetter
 
 from braces.views import FormMessagesMixin
@@ -26,6 +27,7 @@ from django.core.urlresolvers import reverse_lazy
 from django.db.models.aggregates import Max
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404
+from django.utils.dateparse import parse_date
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import View, TemplateView
 from django.views.generic.edit import CreateView, UpdateView
@@ -33,7 +35,7 @@ from django.views.generic.list import ListView
 from sapl.parlamentares.models import Partido
 
 from cmj.sigad import forms, models
-from cmj.sigad.models import Classe, Revisao, PermissionsUserClasse
+from cmj.sigad.models import Classe, Revisao, PermissionsUserClasse, Documento
 
 
 class PathView(TemplateView):
@@ -44,31 +46,24 @@ class PathView(TemplateView):
     def get(self, request, *args, **kwargs):
 
         print(self.kwargs['slug'])
-        #p = Partido()
-        # p.save()
 
         return TemplateView.get(self, request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = TemplateView.get_context_data(self, **kwargs)
 
-        if self.documento:
-            context['title'] = 'documento'
-        elif self.classe:
-            context['title'] = self.classe.titulo
+        context['object'] = self.documento if self.documento else self.classe
+        context['path'] = '-path'
 
         return context
 
     def dispatch(self, request, *args, **kwargs):
         slug = kwargs.get('slug', '')
 
-        if slug:
-            print(slug)
-            slug = slug.split('/')
-            try:
-                self.classe = Classe.objects.get(slug=slug[-1])
-            except:
-                pass
+        try:
+            self.classe = Classe.objects.get(slug='/' + slug)
+        except:
+            self.documento = Documento.objects.get(slug='/' + slug)
 
         if not slug:
             self.template_name = 'path/pagina_inicial.html'
@@ -76,6 +71,9 @@ class PathView(TemplateView):
 
         if not self.documento and not self.classe:
             raise Http404()
+
+        if self.documento:
+            self.template_name = 'path/path_documento.html'
 
         return TemplateView.dispatch(self, request, *args, **kwargs)
 
@@ -349,32 +347,83 @@ class DocumentoPmImportView(TemplateView):
 
     def get(self, request, *args, **kwargs):
 
-        if not request.user.is_superuser:
-            raise Http404()
-
         import urllib3
         import json
 
-        http = urllib3.PoolManager()
+        func = request.GET.get('func', '0')
 
-        p = 1
-        s = 100
-        news = []
-        while True:
-            print(p)
-            r = http.request('GET', ('www.camarajatai.go.gov.br'
-                                     '/portal/json/jsonclient/json'
-                                     '?page=%s&step=%s') % (
-                p, s))
+        if func == '0':
+            # Importa ultimas notícias cadastradas e adiciona como privado
+            if not request.user.is_superuser:
+                raise Http404()
 
-            jdata = json.loads(r.data.decode('utf-8'))
+            http = urllib3.PoolManager()
 
-            for n in jdata:
-                news.append(n)
+            p = 1
+            s = 100
+            news = []
+            while True:
+                print(p)
+                r = http.request('GET', ('www.camarajatai.go.gov.br'
+                                         '/portal/json/jsonclient/json'
+                                         '?page=%s&step=%s') % (
+                    p, s))
 
-            if len(jdata) < s:
-                break
-            p += 1
+                jdata = json.loads(r.data.decode('utf-8'))
+
+                stop = False
+                for n in jdata:
+                    if Documento.objects.filter(old_path=n['path']).exists():
+                        stop = True
+                        break
+
+                    news.append(n)
+                    # print(n['date'])
+
+                if stop or len(jdata) < s:
+                    break
+                p += 1
+
+            news.reverse()
+
+            for n in news:
+                n_date = ' '.join(n['date'].lower().split()[:2])
+                n_effective = ' '.join(n['effective'].lower().split()[:2])
+
+                gmt = n['date'].rsplit(' ', 1)[-1]
+
+                gmt = 2 if gmt == 'gmt-2' else 3 if gmt == 'gmt-3' else 0
+
+                d = Documento()
+                try:
+                    d.created = datetime.strptime(
+                        n_date, '%Y/%m/%d %H:%M:%S.%f') - timedelta(hours=gmt)
+                except:
+                    try:
+                        d.created = datetime.strptime(
+                            n_date, '%Y/%m/%d %H:%M:%S') - timedelta(hours=gmt)
+                    except:
+                        d.created = datetime.now()
+
+                try:
+                    d.public_date = datetime.strptime(
+                        n_effective, '%Y/%m/%d %H:%M:%S.%f') - timedelta(hours=gmt)
+                except:
+                    try:
+                        d.public_date = datetime.strptime(
+                            n_effective, '%Y/%m/%d %H:%M:%S') - timedelta(hours=gmt)
+                    except:
+                        d.public_date = datetime.now()
+
+                d.owner = request.user
+                d.descricao = n['description']
+                d.titulo = n['title']
+                d.texto = n['text']
+                d.visibilidade = 0 if n['review_state'] == 'published' else 99
+                d.old_path = n['path']
+                d.old_json = json.dumps(n)
+                d.classe_id = 1
+                d.save()
 
         return TemplateView.get(self, request, *args, **kwargs)
 

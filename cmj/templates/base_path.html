@@ -1,7 +1,42 @@
 {% extends "base.html" %}
 {% load i18n %}
 
+{% block html_class %}html{{path}}{%endblock%}
+{% block body_class %}body{{path}}{%endblock%}
+
+{% block header_content %}
+    <div class="btn-group btn-group-justified btn-group-lg" role="group" aria-label="...">
+      <a href="#" class="btn btn-detault">Licitações e Contratos</a>
+      <a href="#" class="btn btn-detault">Legislação Municipal</a>
+      <a href="#" class="btn btn-detault">Sessões</a>
+      <a href="#" class="btn btn-detault">Matérias em Tramitação</a>
+      <a href="#" class="btn btn-detault">Diário Oficial</a>
+    </div>
+{% endblock %}
+
+{% block base_header %}
+
+  {% block title %}
+    <span class="path-title">
+        {{ object.titulo|safe|linebreaksbr }}
+    </span>
+  {% endblock %}
+  <div class="path-data-pub">
+    <span>
+      {% comment %}
+        FIXME tratar histórico de revisão e publicação/privacidade
+      {% endcomment %}
+      <i class="fa fa-clock-o" aria-hidden="true"></i>
+      {% trans "Publicado em" %} {{object.public_date|date:"d"}} {% trans "de" %} {{object.public_date|date:"F"}} {% trans "de" %} {{object.public_date|date:"Y"}}
+    </span>
+  </div>
+
+  <span class="path-description">
+    {% block descricao %}
+      {{object.descricao}}
+    {% endblock %}
+  </span>
 
 
-{% block title%}{{block.super}}
+
 {% endblock %}

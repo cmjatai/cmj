@@ -73,7 +73,7 @@ class Parent(models.Model):
 
 class CMSMixin(models.Model):
     created = models.DateTimeField(
-        verbose_name=_('created'), editable=False, auto_now_add=True)
+        verbose_name=_('created'))  # , editable=False, auto_now_add=True)
 
     public_date = models.DateTimeField(null=True, default=None,
                                        verbose_name=_('Data de Início de Publicação'))

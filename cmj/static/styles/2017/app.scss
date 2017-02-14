@@ -224,12 +224,16 @@ a:hover {
 
 
 // ADJUST interno ########################################
+.body-path, .html-path {
+
+}
 
 main {
   .container, .container-fluid {
     background-color: $color_container_bg;
     border: 1px solid $color_container_border;
     border-radius: 5px;
+    transition: all 1s ease;
   }
   .container-fluid {
     margin: 0 $grid-gutter-width;
@@ -664,11 +668,6 @@ body {
 .pagination {
   padding-top: 25px;
 }
-.container,
-.container-fluid {
-  transition: all 1s ease;
-}
-
 
 // #### ImpressoEnderecamentoRenderer #####################
 
@@ -684,10 +683,67 @@ body {
   }
 }
 
-
+// #### containers ########################################
+main {
+  .container-path {
+    width: 60%;
+    background-color: transparent;
+    border: 0px solid;
+    font-family: "Lato";
+    font-size: 1.7em;
+    font-weight: 300;
+  }
+}
+.container-path {
+  .path-title {
+    text-align: center;
+    margin: 1em 0 0em;
+    font-size: 1.3em;
+    display: block;
+    font-weight: 800;
+  }
+  .path-description {
+    display: block;
+    font-weight: normal;
+    color: $color_topo_bg;
+    margin-bottom: 1em;
+    font-size: 90%;
+    margin-left: 25%;
+    margin-right: 15%;
+    text-align: right;
+    font-style: italic;
+  }
+  .path-data-pub {
+    border-top: 1px solid white;
+    text-align: center;
+    font-size: 0.6em;
+    margin: 0.5em 0 1em;
+    color: #888;
+    line-height: 1;
+    display: block;
+    span {
+      display: inline-block;
+      margin: 0px;
+      line-height: 2em;
+      &:before {
+        margin: 0 -5px;
+        content: '';
+        display: block;
+        height: 3px;
+        background-color: white;
+      }
+    }
+  }
+}
 
 
 @media screen and (max-width: 1280px) {
+  main {
+    .container-path {
+      width: 75%;
+      font-size: 1.5em;
+    }
+  }
   .html-login {
     a.navbar-brand {
       font-size: 45px;
@@ -721,7 +777,23 @@ body {
     }
   }
 }
+
+
+@media screen and (max-width: 1091px) {
+  main {
+    .container-path {
+      width: 80%;
+    }
+  }
+}
+
 @media screen and (max-width: 800px) {
+  main {
+    .container-path {
+      width: auto;
+      font-size: 1.3em;
+    }
+  }
   .container {
     width: auto;
   }

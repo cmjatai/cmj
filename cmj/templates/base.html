@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <!--[if IE 8]> <html class="no-js lt-ie9" lang="en"> <![endif]-->
 <!--[if gt IE 8]><!-->
-<html class="no-js" lang="pt-br">
+<html class="no-js {% block html_class %}{%endblock%}" lang="pt-br">
 <!--<![endif]-->
 
   <head>
@@ -191,20 +191,9 @@
         {% block main_header %}
           <header class="masthead">
             <div class="container{{fluid}}">
+              {% block header_content %}
 
-              {% comment %}
-
-                {% if user.is_anonymous %}
-                  <div class="btn-group btn-group-justified btn-group-lg" role="group" aria-label="...">
-                    <a href="#" class="btn btn-detault">Licitações e Contratos</a>
-                    <a href="#" class="btn btn-detault">Legislação Municipal</a>
-                    <a href="#" class="btn btn-detault">Sessões</a>
-                    <a href="#" class="btn btn-detault">Matérias em Tramitação</a>
-                    <a href="#" class="btn btn-detault">Diário Oficial</a>
-                  </div>
-                {% endif %}
-              {% endcomment %}
-
+              {% endblock %}
 
               {% block sections_nav %}{% subnav %}{% endblock sections_nav %}
             </div>
@@ -215,7 +204,7 @@
         {% block content_container %}
           <main id="content" class="content page__row">
 
-            <div class="container{{fluid}}">
+            <div class="container container{{fluid}}{{path}}">
 
 
               {# Content header #}
@@ -263,8 +252,6 @@
               {% endfor %}
 
               {% block base_content %}{% endblock %}
-
-
             </div>
           </main>
         {% endblock content_container %}
