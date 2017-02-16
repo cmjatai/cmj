@@ -32,6 +32,116 @@ body, html {
   background: $color_main_bg url(/static/img/bg.png);
 }
 
+/* Background colors */
+.bg-red,
+.bg-yellow,
+.bg-aqua,
+.bg-blue,
+.bg-light-blue,
+.bg-green,
+.bg-navy,
+.bg-teal,
+.bg-olive,
+.bg-lime,
+.bg-orange,
+.bg-fuchsia,
+.bg-purple,
+.bg-maroon,
+.bg-black {
+  color: #f9f9f9 !important;
+}
+.bg-gray {
+  background-color: #eaeaec !important;
+}
+.bg-black {
+  background-color: #222222 !important;
+}
+.bg-red {
+  background-color: #f56954 !important;
+}
+.bg-yellow {
+  background-color: #f39c12 !important;
+}
+.bg-aqua {
+  background-color: #00c0ee !important;
+}
+.bg-blue {
+  background-color: #0073b7 !important;
+}
+.bg-light-blue {
+  background-color: #3c8dbc !important;
+}
+.bg-green {
+  background-color: #00a65a !important;
+}
+.bg-navy {
+  background-color: #001f3f !important;
+}
+.bg-teal {
+  background-color: #39cccc !important;
+}
+.bg-olive {
+  background-color: #3d9970 !important;
+}
+.bg-lime {
+  background-color: #01ff70 !important;
+}
+.bg-orange {
+  background-color: #ff851b !important;
+}
+.bg-fuchsia {
+  background-color: #f012be !important;
+}
+.bg-purple {
+  background-color: #932ab6 !important;
+}
+.bg-maroon {
+  background-color: #85144b !important;
+}
+/* Text colors */
+.text-red {
+  color: #f56954 !important;
+}
+.text-yellow {
+  color: #f39c12 !important;
+}
+.text-aqua {
+  color: #00c0ef !important;
+}
+.text-blue {
+  color: #0073b7 !important;
+}
+.text-light-blue {
+  color: #3c8dbc !important;
+}
+.text-green {
+  color: #00a65a !important;
+}
+.text-navy {
+  color: #001f3f !important;
+}
+.text-teal {
+  color: #39cccc !important;
+}
+.text-olive {
+  color: #3d9970 !important;
+}
+.text-lime {
+  color: #01ff70 !important;
+}
+.text-orange {
+  color: #ff851b !important;
+}
+.text-fuchsia {
+  color: #f012be !important;
+}
+.text-purple {
+  color: #932ab6 !important;
+}
+.text-maroon {
+  color: #85144b !important;
+}
+
 // drunken-parrot flat ui ########################################
 
 
@@ -404,36 +514,6 @@ fieldset {
     opacity: 0.4;
   }
 }
-/*
-.controls-radio, .controls-checkbox {
-  padding:0;
-  background-color: white;
-  border: 1px solid #dcdac8;
-  border-radius: 4px;
-  min-height: $grid-gutter-width * 2;
-  overflow: hidden;
-  label.checkbox, label.radio{
-    margin: 0;
-    padding: 0;
-    padding-right: ceil($grid-gutter-width / 3);
-    padding-left: $grid-gutter-width * 2;
-    line-height: $grid-gutter-width * 2 - 1;
-    min-height: $grid-gutter-width * 2 - 1;
-    .icons {
-      top:  ceil($grid-gutter-width / 2) - 1;
-      left: $grid-gutter-width / 2;
-    }
-    &:hover {
-      background-color: $color_main_bg;
-    }
-  }
-  .help-block {
-    margin: $grid-gutter-width / 2;
-    padding: $grid-gutter-width / 2;
-    border: 2px dashed darken($color_main_bg, 5%);
-  }
-}
-*/
 
 .controls-file {
   padding: 10px;
@@ -558,7 +638,6 @@ html {
   min-height: 100%;
 }
 body {
-
   margin-bottom: $footer-height + 20px;
 }
 .footer {
@@ -572,6 +651,7 @@ body {
   text-align: center;
   font-size: 1em;
 }
+
 // ADJUST tela de login ########################################
 .html-login, {
   background-color: $color_topo_bg;
@@ -582,8 +662,6 @@ body {
   body, .navbar {
     background-color: $color_topo_bg;
     background-image: none;
-
-
   }
 }
 .container-login {
@@ -683,6 +761,93 @@ body {
   }
 }
 
+// #### row-canais ########################################
+.row-canais {
+  margin-left: -1 * $grid-gutter-width;
+  margin-right: -1 * $grid-gutter-width;
+  /*display: flex;
+  width: 100%;
+  & > div {
+    width: auto;
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+  }
+  .canal-sessao {
+    width: 10%;
+    & + div {
+      width: 23.3334%;
+    }
+  }*/
+
+  .icon {
+    position: absolute;
+    top: 0;
+    right: 5px;
+    z-index: 0;
+    font-size: 70px;
+    color: rgba(0, 0, 0, 0.15);
+    transition: all 0.4s ease;
+    width: 100%;
+    height: 100%;
+    text-align: right;
+    &.icon-atividade-legislativa {
+      background: url(/static/img/icon_materia_legislativa.png) no-repeat right;
+      opacity: 0.2;
+    }
+    &.icon-diario-oficial {
+      background: url(/static/img/icon_diario_oficial.png) no-repeat right;
+      opacity: 0.2;
+    }
+    &.icon-sessao-plenaria {
+      background: url(/static/img/icon_plenarias.png) no-repeat right;
+      opacity: 0.2;
+    }
+    &.icon-norma-juridica {
+      background: url(/static/img/icon_normas_juridicas.png) no-repeat right;
+      opacity: 0.2;
+    }
+
+    &.icon-licitacao {
+      background: url(/static/img/icon_licitacao.png) no-repeat right;
+      opacity: 0.2;
+    }
+
+
+  }
+  .box {
+    position: relative;
+    border: 0px solid rgba(255, 255, 255, 0.5);
+    border-radius: 2px;
+    margin-bottom: $grid-gutter-width;
+    height: 100px;
+    &:hover {
+      .icon {
+        transform: scale(1.15);
+        right: 15px;
+      }
+    }
+
+  }
+  .inner {
+    position: relative;
+    z-index: 1;
+    font-size: 1.8em;
+    font-variant: small-caps;
+    line-height: 1.2em;
+    height: 100%;
+    a {
+      position: relative;
+      display: block;
+      color: inherit;
+      padding: 16px 7px 0 30%;
+      text-indent: -18%;
+      height: 100%;
+      &:hover {
+        background-color: $hover_background_20p;
+      }
+    }
+  }
+}
 // #### containers ########################################
 main {
   .container-path {
@@ -774,6 +939,24 @@ main {
     }
     .btns-login-3 {
       margin-top: 0;
+    }
+  }
+
+  // #### row-canais ########################################
+  .row-canais {
+    .icon {
+      font-size: 53px;
+    }
+    .box {
+      height: 75px;
+    }
+    .inner {
+      font-size: 1.4em;
+      line-height: 1em;
+      a {
+        padding: 16px 7px 0 30%;
+        text-indent: -18%;
+      }
     }
   }
 }

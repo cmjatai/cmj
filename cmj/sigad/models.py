@@ -301,6 +301,7 @@ class Documento(Slugged, CMSMixin):
         Classe,
         related_name='classes',
         verbose_name=_('Classes'))
+
     """
     ''' se media_of estiver preenchido significa que a instancia
     do documento é uma midia de algum documento

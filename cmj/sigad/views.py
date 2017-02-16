@@ -63,7 +63,10 @@ class PathView(TemplateView):
         try:
             self.classe = Classe.objects.get(slug='/' + slug)
         except:
-            self.documento = Documento.objects.get(slug='/' + slug)
+            try:
+                self.documento = Documento.objects.get(slug='/' + slug)
+            except:
+                pass
 
         if not slug:
             self.template_name = 'path/pagina_inicial.html'

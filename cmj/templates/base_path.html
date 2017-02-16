@@ -5,12 +5,62 @@
 {% block body_class %}body{{path}}{%endblock%}
 
 {% block header_content %}
-    <div class="btn-group btn-group-justified btn-group-lg" role="group" aria-label="...">
-      <a href="#" class="btn btn-detault">Licitações e Contratos</a>
-      <a href="#" class="btn btn-detault">Legislação Municipal</a>
-      <a href="#" class="btn btn-detault">Sessões</a>
-      <a href="#" class="btn btn-detault">Matérias em Tramitação</a>
-      <a href="#" class="btn btn-detault">Diário Oficial</a>
+    <div class="row row-canais">
+      <div class="col-md-2 col-xs-2">
+        <div class="box bg-aqua">
+          <div class="icon icon-licitacao">
+          </div>
+          <div class="inner">
+            <a href="http://sislegis.camarajatai.go.gov.br/publicacoes/" class="">Licitações e Contratos</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2 col-xs-2">
+        <div class="box bg-green">
+          <div class="icon icon-norma-juridica">
+          </div>
+          <div class="inner">
+            <a href="http://sapl.camarajatai.go.gov.br/sapl/qs?d=-&tc=tn" class="">Legislação<br>Municipal</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2 col-xs-2">
+        <div class="box bg-yellow">
+          <div class="icon icon-sessao-plenaria">
+          </div>
+          <div class="inner">
+            <a href="http://sapl.camarajatai.go.gov.br/sapl/consultas/sessao_plenaria" class="">Sessões<br>Plenárias</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2 col-xs-2">
+        <div class="box bg-red">
+          <div class="icon icon-atividade-legislativa">
+          </div>
+          <div class="inner">
+            <a href="http://sapl.camarajatai.go.gov.br/sapl/qs?d=-&tc=tm" class="">Atividade<br>Legislativa</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2 col-xs-2">
+        <div class="box bg-maroon">
+          <div class="icon icon-diario-oficial">
+          </div>
+          <div class="inner">
+            <a href="http://sapl.camarajatai.go.gov.br/sapl/qs?d=-&tc=td" class="">Diário<br>Oficial</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2 col-xs-2">
+        <div class="box bg-purple">
+          <div class="icon">
+            <i class="fa fa-bar-chart"></i>
+          </div>
+          <div class="inner">
+            <a href="http://camaradejatai.sigepnet.com.br/?portal=1" class="">Prestação<br>de Contas</a>
+          </div>
+        </div>
+      </div>
     </div>
 {% endblock %}
 
