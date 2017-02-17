@@ -91,4 +91,4 @@ media
 whoosh_index/
 .ipynb_checkpoints
 *.ipynb
-importar*.py
+scripts/
