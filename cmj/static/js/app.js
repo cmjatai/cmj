@@ -207,6 +207,26 @@ function OptionalCustomFrontEnd() {
     }
     instance.init();
 }
+var pathNext = $('.path-next');
+var pathPrevious = $('.path-previous');
+
+function eventActionsNextPrevious() {
+    /*$('main').mousemove(function(event) {
+        if (event.clientX >= 0.5 * this.clientWidth) {
+            pathPrevious.removeClass('hover');
+            pathNext.addClass('hover');
+        }
+        else {
+            pathNext.removeClass('hover');
+            pathPrevious.addClass('hover');
+        }
+
+    });*/
+    $(window).scroll(function(event) {
+        console.log(event)
+    });
+
+}
 
 $(document).ready(function(){
     refreshDatePicker();
@@ -214,4 +234,6 @@ $(document).ready(function(){
     autorModal();
     initTinymce();
     OptionalCustomFrontEnd();
+
+    eventActionsNextPrevious();
 });

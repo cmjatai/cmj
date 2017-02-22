@@ -73,7 +73,7 @@ class Parent(models.Model):
 
 class CMSMixin(models.Model):
     created = models.DateTimeField(
-        verbose_name=_('created'))  # , editable=False, auto_now_add=True)
+        verbose_name=_('created'), editable=False, auto_now_add=True)
 
     public_date = models.DateTimeField(null=True, default=None,
                                        verbose_name=_('Data de Início de Publicação'))
@@ -190,7 +190,7 @@ class Slugged(Parent):
                 concret_model = kls
 
         slug = slugify(self.titulo)
-        parents_slug = self.parent.slug if self.parent else ''
+        parents_slug = (self.parent.slug + '/') if self.parent else ''
 
         i = 0
         while True:
@@ -202,7 +202,7 @@ class Slugged(Parent):
             try:
                 obj = concret_model.objects.get(
                     #    **{'slug': slug, 'parent': self.parent})
-                    **{'slug': parents_slug + '/' + slug})
+                    **{'slug': parents_slug + slug})
                 if obj == self:
                     raise ObjectDoesNotExist
 
@@ -210,7 +210,9 @@ class Slugged(Parent):
                 break
             i += 1
 
-        return parents_slug + '/' + slug
+        slug = parents_slug + slug
+
+        return slug
 
     @cached_property
     def nivel(self):
@@ -299,7 +301,7 @@ class Documento(Slugged, CMSMixin):
 
     classe = models.ForeignKey(
         Classe,
-        related_name='classes',
+        related_name='documento_set',
         verbose_name=_('Classes'))
 
     """
@@ -315,7 +317,12 @@ class Documento(Slugged, CMSMixin):
     def __str__(self):
         return self.titulo
 
+    @property
+    def absolute_slug(self):
+        return '%s/%s' % (self.classe.slug, self.slug)
+
     class Meta:
+        ordering = ('public_date', )
         verbose_name = _('Documento')
         verbose_name_plural = _('Documentos')
         permissions = (

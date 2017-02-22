@@ -32,10 +32,10 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import View, TemplateView
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
-from sapl.parlamentares.models import Partido
 
 from cmj.sigad import forms, models
-from cmj.sigad.models import Classe, Revisao, PermissionsUserClasse, Documento
+from cmj.sigad.models import Classe, Revisao, PermissionsUserClasse, Documento,\
+    STATUS_PUBLIC
 
 
 class PathView(TemplateView):
@@ -55,22 +55,44 @@ class PathView(TemplateView):
         context['object'] = self.documento if self.documento else self.classe
         context['path'] = '-path'
 
+        if self.documento:
+            next = Documento.objects.filter(
+                public_date__gte=self.documento.public_date,
+                visibilidade=STATUS_PUBLIC,
+            ).exclude(
+                id=self.documento.id).first()
+            context['next'] = next
+
+            previous = Documento.objects.filter(
+                public_date__lte=self.documento.public_date,
+                visibilidade=STATUS_PUBLIC
+            ).exclude(
+                id=self.documento.id).last()
+            context['previous'] = previous
+
+            # d.get_previous_by_created
+            # d.get_next_by_created
         return context
 
     def dispatch(self, request, *args, **kwargs):
         slug = kwargs.get('slug', '')
 
-        try:
-            self.classe = Classe.objects.get(slug='/' + slug)
-        except:
-            try:
-                self.documento = Documento.objects.get(slug='/' + slug)
-            except:
-                pass
-
         if not slug:
             self.template_name = 'path/pagina_inicial.html'
             return TemplateView.dispatch(self, request, *args, **kwargs)
+
+        try:
+            self.classe = Classe.objects.get(slug=slug)
+        except:
+
+            slug = slug.split('/')
+
+            try:
+                self.documento = Documento.objects.get(
+                    slug=slug[-1],
+                    classe__slug='/'.join(slug[:-1]))
+            except:
+                pass
 
         if not self.documento and not self.classe:
             raise Http404()
@@ -390,8 +412,14 @@ class DocumentoPmImportView(TemplateView):
             news.reverse()
 
             for n in news:
+
                 n_date = ' '.join(n['date'].lower().split()[:2])
+                if len(n_date) == 10:
+                    n_date += ' 00:00:00'
+
                 n_effective = ' '.join(n['effective'].lower().split()[:2])
+                if len(n_effective) == 10:
+                    n_effective += ' 00:00:00'
 
                 gmt = n['date'].rsplit(' ', 1)[-1]
 

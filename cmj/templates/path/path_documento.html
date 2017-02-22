@@ -1,6 +1,44 @@
 {% extends "base_path.html" %}
 {% load i18n %}
 
+{% block base_functions %}
+{% if next %}
+  <div class="path-direction path-next">
+    <a href="{% url 'cmj.sigad:path_view' next.absolute_slug %}">
+      <i class="fa fa-chevron-right" aria-hidden="true"></i>
+    </a>
+      <div class="inner">
+        <div class="titulo">
+          <a href="{% url 'cmj.sigad:path_view' next.absolute_slug %}">
+            {{next.titulo}}
+          </a>
+        </div>
+        <div class="descricao">
+          {{next.descricao}}
+        </div>
+      </div>
+  </div>
+{% endif %}
+
+  {% if previous %}
+    <div class="path-direction path-previous">
+      <a href="{% url 'cmj.sigad:path_view' previous.absolute_slug %}">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+      </a>
+      <div class="inner">
+        <div class="titulo">
+          <a href="{% url 'cmj.sigad:path_view' previous.absolute_slug %}">
+            {{previous.titulo}}
+          </a>
+        </div>
+        <div class="descricao">
+          {{previous.descricao}}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}
+
 {% block base_content %}
   {{object.texto|safe}}
 {% endblock %}

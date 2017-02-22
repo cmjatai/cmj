@@ -652,96 +652,6 @@ body {
   font-size: 1em;
 }
 
-// ADJUST tela de login ########################################
-.html-login, {
-  background-color: $color_topo_bg;
-  background-image: none;
-  a.navbar-brand {
-    font-size: 50px;
-  }
-  body, .navbar {
-    background-color: $color_topo_bg;
-    background-image: none;
-  }
-}
-.container-login {
-  background-color: $color_topo_bg;
-  color: $color_text_inverse;
-  min-height: 100%;
-  position: relative;
-  margin: 0;
-  .logo-cmj {
-    position: absolute;
-    opacity: 0.35;
-    right: 1em;
-    margin-left: 1em;
-    max-width: 100%;
-  }
-  .label0,
-  .label1,
-  .label2,
-  .label3,
-  .label4 {
-    margin: 10% 0 1em 5%;
-    color: white;
-    font-weight: normal;
-    font-size: 3em;
-  }
-  .label2 {
-    margin-top: 4%;
-    margin-bottom: 0.5em;
-  }
-  .label3, .label4 {
-    margin-top: 4%;
-    margin-bottom: 0.5em;
-  }
-  input {
-    border-radius: 0;
-    border: 0;
-    border-top: 1px solid transparentize($color_topo_bg, 0.8);
-    padding: 1em;
-    font-size: 1.7em;
-    height: 3.5em;
-    background-color: rgba(255, 255, 255, 0.8);
-    &:focus {
-      background-color: white;
-    }
-    @include placeholder($color_topo_bg, 0.5, 1em, normal);
-
-  }
-  .btns-login {
-    margin: 4em auto 0;
-    display: block;
-    max-width: 767px;
-    .btn-login {
-      color: rgba(255, 255, 255, 0.8);
-      display: inline-block;
-      background-color: rgba(255, 255, 255, 0.1);
-      width: 100%;
-      letter-spacing: 4px;
-      border: 1px solid rgba(255, 255, 255, 0.8);
-      margin-top: 1em;
-      line-height: 50px;
-      text-align: center;
-      font-family: "Graduate";
-      &:hover {
-        border: 1px solid #fff;
-        color: #fff;
-        background-color: rgba(255, 255, 255, 0.2);
-      }
-    }
-  }
-  .btns-login-3 {
-    margin-top: 1em;
-  }
-  .alert-danger {
-    color:white;
-    background-color: #aa0000;
-    border-radius: 0;
-    margin: 20px;
-
-  }
-}
 // #### pagination ########################################
 .pagination {
   padding-top: 25px;
@@ -763,70 +673,55 @@ body {
 
 // #### row-canais ########################################
 .row-canais {
-  margin-left: -1 * $grid-gutter-width;
-  margin-right: -1 * $grid-gutter-width;
-  /*display: flex;
-  width: 100%;
-  & > div {
-    width: auto;
-    flex: 1 1 auto;
-    flex-wrap: wrap;
-  }
-  .canal-sessao {
-    width: 10%;
-    & + div {
-      width: 23.3334%;
+    & > div {
+      padding-left: 0px;
+      padding-right: 0px;
     }
-  }*/
-
   .icon {
     position: absolute;
     top: 0;
     right: 5px;
     z-index: 0;
-    font-size: 70px;
+    font-size: 60px;
     color: rgba(0, 0, 0, 0.15);
     transition: all 0.4s ease;
     width: 100%;
     height: 100%;
     text-align: right;
+    background-position: right;
+    background-repeat: no-repeat;
+    opacity: 0.15;
     &.icon-atividade-legislativa {
-      background: url(/static/img/icon_materia_legislativa.png) no-repeat right;
-      opacity: 0.2;
+      background-image: url(/static/img/icon_materia_legislativa.png);
     }
     &.icon-diario-oficial {
-      background: url(/static/img/icon_diario_oficial.png) no-repeat right;
-      opacity: 0.2;
+      background-image: url(/static/img/icon_diario_oficial.png);
     }
     &.icon-sessao-plenaria {
-      background: url(/static/img/icon_plenarias.png) no-repeat right;
-      opacity: 0.2;
+      background-image: url(/static/img/icon_plenarias.png);
     }
     &.icon-norma-juridica {
-      background: url(/static/img/icon_normas_juridicas.png) no-repeat right;
-      opacity: 0.2;
+      background-image: url(/static/img/icon_normas_juridicas.png);
     }
-
     &.icon-licitacao {
-      background: url(/static/img/icon_licitacao.png) no-repeat right;
-      opacity: 0.2;
+      background-image: url(/static/img/icon_licitacao.png);
     }
-
-
+    &.icon-transparencia {
+      background-image: url(/static/img/icon_transparencia.png);
+    }
   }
   .box {
     position: relative;
-    border: 0px solid rgba(255, 255, 255, 0.5);
-    border-radius: 2px;
+    border: 0px solid #fff;
+    border-radius: 0px;
     margin-bottom: $grid-gutter-width;
-    height: 100px;
+    height: 75px;
     &:hover {
       .icon {
         transform: scale(1.15);
-        right: 15px;
+        right: 10px;
       }
     }
-
   }
   .inner {
     position: relative;
@@ -839,8 +734,8 @@ body {
       position: relative;
       display: block;
       color: inherit;
-      padding: 16px 7px 0 30%;
-      text-indent: -18%;
+      padding: 5px 5px 5px 40px;
+      text-indent: -30px;
       height: 100%;
       &:hover {
         background-color: $hover_background_20p;
@@ -848,10 +743,94 @@ body {
     }
   }
 }
+// #### actions path next previous ########################################
+
+.path-direction {
+  position: fixed;
+  top:35%;
+  &.scroll_down {
+    & > a {
+      background-color: rgba(#0689c2,.3);
+    }
+  }
+  &.scroll_up {
+    & > a {
+      background-color: rgba(#0689c2,.4);
+    }
+  }
+  & > a {
+    background: rgba(#0689c2,.4) url(/static/img/bg.png);
+    color: white;
+    display: inline-block;
+    border-radius: 50%;
+    &:hover {
+      background-color: #0689c2;
+    }
+  }
+  .inner {
+    display: none;
+  }
+  &:hover {
+    .inner {
+      top: 3.1em;
+      display: block;
+      position: absolute;
+      margin: 0 10px;
+      background: darken($color_main_bg, 4%) url(/static/img/bg.png);
+      font-size: 80%;
+      border-radius: 2px;
+      border: 1px solid white;
+      box-shadow: 3px 3px 10px  lighten($hover_background_50p, 3%);
+      .titulo {
+        a {
+          color: #443;
+          &:hover {
+            color: black;
+          }
+        }
+        white-space: nowrap;
+        background: darken($color_main_bg, 8%) url(/static/img/bg.png);
+        padding: 5px 10px;
+        font-weight: 600;
+      }
+      .descricao {
+        color: #006556;
+        font-size: 90%;
+        font-style: italic;
+        padding: 10px;
+      }
+    }
+  }
+}
+.path-next {
+  right: -1.6em;
+  text-align: right;
+  a {
+    padding: 1.2em 1.7em 1.0em 0.5em;
+  }
+  &:hover {
+    .inner {
+      right: 2.2em;
+    }
+  }
+}
+.path-previous {
+  left: -1.6em;
+  text-align: left;
+  a {
+    padding: 1.2em 0.5em 1.0em 1.7em;
+  }
+
+  &:hover {
+    .inner {
+      left: 2.2em;
+    }
+  }
+}
+
 // #### containers ########################################
 main {
   .container-path {
-    width: 60%;
     background-color: transparent;
     border: 0px solid;
     font-family: "Lato";
@@ -859,6 +838,7 @@ main {
     font-weight: 300;
   }
 }
+
 .container-path {
   .path-title {
     text-align: center;
@@ -901,166 +881,80 @@ main {
   }
 }
 
-
-@media screen and (max-width: 1280px) {
-  main {
-    .container-path {
-      width: 75%;
-      font-size: 1.5em;
-    }
-  }
-  .html-login {
-    a.navbar-brand {
-      font-size: 45px;
-    }
-  }
-  .container-login {
-
-    .label0 {
-      margin-top: 4%;
-    }
-    ,
-    .label1 {
-      margin-top: 2%;
-      margin-bottom: 0.5em;
-    }
-    ,
-    .label2 {
-      margin-top: 2%;
-      margin-bottom: 0.2em;
-    }
-    ,
-    .label3 {
-      margin-top: 0;
-      margin-bottom: 0;
-    }
-    .btns-login {
-      margin-top: 1em;
-    }
-    .btns-login-3 {
-      margin-top: 0;
-    }
-  }
-
-  // #### row-canais ########################################
+@media screen and (max-width: 1199px) {
   .row-canais {
-    .icon {
-      font-size: 53px;
-    }
-    .box {
-      height: 75px;
-    }
     .inner {
-      font-size: 1.4em;
-      line-height: 1em;
+      font-size: 1.5em;
+      font-variant: small-caps;
+      line-height: 1.2em;
       a {
-        padding: 16px 7px 0 30%;
-        text-indent: -18%;
+        padding: 10px 5px 5px 35px;
+        text-indent: -25px;
+        height: 100%;
       }
     }
   }
 }
 
-
-@media screen and (max-width: 1091px) {
-  main {
-    .container-path {
-      width: 80%;
+@media screen and (max-width: 991px) {
+  .masthead {
+    margin-top: 10px;
+  }
+  .row-canais {
+    margin-left: 0px;
+    margin-right: 0px;
+    & > div {
+      padding-left: 0px;
+      padding-right: 0px;
+    }
+    .icon {
+      position: absolute;
+      right: 2px;
+      font-size: 50px;
+      background-size: 50%;
+    }
+    .box {
+      margin-bottom: $grid-gutter-width / 2;
+      height: 60px;
+    }
+    .inner {
+      font-size: 1.3em;
+      line-height: 1.2em;
+      height: 100%;
+      a {
+        padding: 5px 5px 5px 27px;
+        text-indent: -20px;
+      }
     }
   }
-}
 
-@media screen and (max-width: 800px) {
   main {
     .container-path {
-      width: auto;
       font-size: 1.3em;
     }
   }
+  .container-path {
+    .path-title {
+      font-size: 1.2em;
+    }
+    .path-description {
+      margin-left: 20%;
+      margin-right: 10%;
+    }
+  }
+
+
+}
+
+
+
+@media screen and (max-width: 800px) {
+
   .container {
     width: auto;
   }
-  .container-login {
-    .logo-cmj {
-      opacity: 0.16;
-      right: auto;
-      max-width: 80%;
-      left: 50%;
-      top: -2em;
-      transform: translateX(-50%);
-    }
-    .btns-login {
-      margin-top: 0.5em;
-      .btn-login {
-        letter-spacing: 2px;
-      }
-    }
-  }
 }
-@media screen and (max-width: 800px) and (orientation: portrait) {
-  .html-login {
-    a.navbar-brand {
-      font-size: 35px;
-    }
-  }
-  .container-login {
 
-    .label0 {
-      margin-top: 30%;
-    }
-
-    .label1 {
-      margin-top: 25%;
-    }
-
-    .label2 {
-      margin-top: 25%;
-      margin-bottom: 1em;
-    }
-
-    .label3 {
-      margin-top: 20%;
-      margin-bottom: 1em;
-    }
-    input {}
-    .btns-login {
-      max-width: 600px;
-      margin-top: 4em;
-    }
-  }
-}
-@media screen and (max-width: 800px) and (orientation: landscape) {
-  .html-login {
-    a.navbar-brand {
-      font-size: 25px;
-    }
-  }
-  .container-login {
-    .label0,
-    .label1,
-    .label2,
-    .label3,
-    .label4 {
-      margin: 0 0 0.2em 5%;
-      font-size: 1.5em;
-    }
-    .label1,
-    .label2,
-    .label3,
-    .label4 {
-      margin: 0 0 0 5%;
-      font-size: 1.2em;
-    }
-    input {
-      font-size: 1.3em;
-      padding: 0 1em;
-      height: 2em;
-    }
-    .btns-login {
-      margin-top: 0;
-    }
-  }
-}
 @media screen and (max-width: 767px) {
   $footer-height: 25px;
   body {
@@ -1097,7 +991,6 @@ main {
         }
       }
     }
-
   }
 
   .nav-acessar {
@@ -1108,7 +1001,6 @@ main {
       margin: 0 $grid-gutter-width * 0.25;
     }
   }
-
   .context-actions{
     margin: 0.5em;
     .actions {
@@ -1116,46 +1008,117 @@ main {
     }
   }
 
-}
-@media screen and (max-width: 480px) and (orientation: portrait) {
-  .container-login {
-    .label0,
-    .label1,
-    .label2,
-    .label3,
-    .label4 {
-      margin: 20% 0 0.4em 5%;
-      font-size: 1.8em;
+  .masthead {
+    margin-top: 1px;
+  }
+  .row-canais {
+    margin-left: -10px;
+    margin-right: -10px;
+    & > div {
+      padding-left: 0px;
+      padding-right: 0px;
     }
-    .label1 {
-      margin-top: 15%;
+    .icon {
+      position: absolute;
+      top: 5px;
+      right: 0;
+      left: 0;
+      width: 100%;
+      height: 28px;
+      display: block;
+      background-size: 32%;
+      background-position: center;
+      opacity: 0.6;
     }
-    .label2,
-    .label3,
-    .label4 {
-      margin-top: 5%;
+    .box {
+      height: auto;
     }
+    .inner {
+      position: relative;
+      font-size: 1em;
+      font-variant: normal;
 
-    input {
-      font-size: 1.2em;
-      padding: 0 1em;
-      height: 3em;
-    }
-    .btns-login {
-      margin-top: 2em;
-      max-width: 500px;
-    }
-    .btns-login-2,  {
-      margin-top: 1em;
-    }
-    .btns-login-3, {
-      margin-top: 0em;
-      .btn-login {
-        line-height: 42px;
+      text-align: center;
+      line-height: 1em;
+      a {
+        position: relative;
+        padding: 38px 0px 3px 0px;
+        text-indent: 0;
       }
     }
   }
+
+  .path-next {
+    right: -1.6em;
+    a {
+
+      padding: 1.2em 1.7em 1.0em 0.5em;
+    }
+    &:hover {
+      left: 1.6em;
+      .inner {
+        right: 2.2em;
+        .titulo {
+          white-space: normal;
+        }
+
+      }
+    }
+  }
+  .path-previous {
+    left: -1.6em;
+    a {
+      padding: 1.2em 0.5em 1.0em 1.7em;
+    }
+
+    &:hover {
+      right: 1.6em;
+      .inner {
+        left: 2.2em;
+        .titulo {
+          white-space: normal;
+        }
+
+      }
+    }
+  }
+
+  .container-path {
+    .path-title {
+      margin-top: 0.5em;
+    }
+  }
+
 }
+
+@media screen and (max-width: 600px) {
+  .masthead {
+    margin-top: 1px;
+  }
+  .row-canais {
+    .inner {
+      font-size: 0.8em;
+    }
+  }
+
+  main {
+    .container-path {
+      font-size: 1.28em;
+    }
+  }
+  .container-path {
+    .path-title {
+      font-size: 1em;
+    }
+    .path-description {
+      margin-left: 10%;
+      margin-right: 5%;
+    }
+  }
+
+
+}
+
 @media screen and (max-width: 480px) {
   .navbar {
     a.navbar-brand {
@@ -1190,6 +1153,20 @@ main {
       font-size: 1.5em;
   }
 
+  .row-canais {
+    .icon {
+      top: 0px;
+      height: 25px;
+      background-size: 40%;
+    }
+    .inner {
+      font-size: 0.55em;
+      line-height: 1em;
+      a {
+        padding: 30px 0px 3px 0px;
+      }
+    }
+  }
 }
 
 @media screen and (min-width: 768px) {
@@ -1328,44 +1305,10 @@ main {
 
 @media screen and (min-width: 1281px) {
   .navbar a.navbar-brand {
-    font-size: 40px;
+    font-size: 35px;
     padding: 0 0 0 30px;
   }
-  .html-login {
-    a.navbar-brand {
-      font-size: 50px;
-    }
-  }
-  .container-login {
-
-    .label0 {
-      margin-top: 7%;
-    }
-    ,
-    .label1 {
-      margin-top: 5%;
-      margin-bottom: 0.5em;
-    }
-    ,
-    .label2 {
-      margin-top: 7%;
-      margin-bottom: 0.2em;
-    }
-    ,
-    .label3 {
-      margin-top: 0;
-      margin-bottom: 0;
-    }
-    .btns-login {
-      margin-top: 1em;
-    }
-    .btns-login-3 {
-      margin-top: 0;
-    }
-  }
 }
-
-
 
 @media print {
   .masthead, .btn-group {
