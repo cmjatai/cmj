@@ -221,10 +221,10 @@ function eventActionsNextPrevious() {
             pathPrevious.addClass('hover');
         }
 
-    });*/
+    });
     $(window).scroll(function(event) {
         console.log(event)
-    });
+    });*/
 
 }
 
@@ -232,7 +232,7 @@ $(document).ready(function(){
     refreshDatePicker();
     refreshMask();
     autorModal();
-    initTinymce();
+    //initTinymce();
     OptionalCustomFrontEnd();
 
     eventActionsNextPrevious();

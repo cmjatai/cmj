@@ -1,0 +1,36 @@
+{
+  "name": "cmj",
+  "version": "1.0.0",
+  "description": "*********************************************** CMJ - Câmara Municipal de Jataí - Goías ***********************************************",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cmjatai/cmj.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cmjatai/cmj/issues"
+  },
+  "homepage": "https://github.com/cmjatai/cmj#readme",
+  "dependencies": {
+    "babel": "^6.23.0",
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2",
+    "react-fetch": "0.0.9",
+    "webpack": "^2.2.1",
+    "webpack-dev-server": "^2.4.1"
+  },
+  "devDependencies": {
+    "babel-core": "^6.23.1",
+    "babel-loader": "^6.3.2",
+    "babel-preset-es2015": "^6.22.0",
+    "babel-preset-react": "^6.23.0",
+    "webpack": "^2.2.1",
+    "webpack-bundle-tracker": "^0.2.0",
+    "webpack-dev-server": "^2.4.1"
+  }
+}

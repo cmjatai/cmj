@@ -89,7 +89,7 @@ function TrechoSearch(opts) {
 
             var cts_show = function(){
                 var row_fluid_position = input_row_fluid[0].getBoundingClientRect();
-                var input_position = input.context.getBoundingClientRect();
+                var input_position = input[0].getBoundingClientRect();
                 cts.animate({
                     'top': input_position.bottom ,
                     'left':  input_position.left + 7,

@@ -57,7 +57,8 @@ urlpatterns = [
     #url(r'^$', TemplateView.as_view(template_name='index.html')),
     url(r'^message$', TemplateView.as_view(template_name='base.html')),
 
-    url('', include('social.apps.django_app.urls', namespace='social')),
+    #url('', include('social.apps.django_app.urls', namespace='social')),
+    url('', include('social_django.urls', namespace='social')),
 
     url(r'', include(cmj.core.urls)),
     url(r'', include(cmj.cerimonial.urls)),
@@ -75,6 +76,7 @@ urlpatterns = [
     url(r'', include(sapl.api.urls)),
     url(r'^sapl/', include(sapl.base.urls)),
 
+    url(r'^react$', TemplateView.as_view(template_name='index.html')),
 
 
     url(r'', include(cmj.sigad.urls)),
