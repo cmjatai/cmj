@@ -71,13 +71,15 @@
     </span>
   {% endblock %}
   <div class="path-data-pub">
-    <span>
-      {% comment %}
-        FIXME tratar histórico de revisão e publicação/privacidade
-      {% endcomment %}
-      <i class="fa fa-clock-o" aria-hidden="true"></i>
-      {% trans "Publicado em" %} {{object.public_date|date:"d"}} {% trans "de" %} {{object.public_date|date:"F"}} {% trans "de" %} {{object.public_date|date:"Y"}}
-    </span>
+    {% block historico_publicacao %}
+      <span>
+        {% comment %}
+          FIXME tratar histórico de revisão e publicação/privacidade
+        {% endcomment %}
+        <i class="fa fa-clock-o" aria-hidden="true"></i>
+        {% trans "Publicado em" %} {{object.public_date|date:"d"}} {% trans "de" %} {{object.public_date|date:"F"}} {% trans "de" %} {{object.public_date|date:"Y"}}
+      </span>
+    {% endblock %}   
   </div>
 
   <span class="path-description">

@@ -2,23 +2,23 @@
 {% load i18n %}
 
 {% block base_functions %}
-{% if next %}
-  <div class="path-direction path-next">
-    <a href="{% url 'cmj.sigad:path_view' next.absolute_slug %}">
-      <i class="fa fa-chevron-right" aria-hidden="true"></i>
-    </a>
-      <div class="inner">
-        <div class="titulo">
-          <a href="{% url 'cmj.sigad:path_view' next.absolute_slug %}">
-            {{next.titulo}}
-          </a>
+  {% if next %}
+    <div class="path-direction path-next">
+      <a href="{% url 'cmj.sigad:path_view' next.absolute_slug %}">
+        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+      </a>
+        <div class="inner">
+          <div class="titulo">
+            <a href="{% url 'cmj.sigad:path_view' next.absolute_slug %}">
+              {{next.titulo}}
+            </a>
+          </div>
+          <div class="descricao">
+            {{next.descricao}}
+          </div>
         </div>
-        <div class="descricao">
-          {{next.descricao}}
-        </div>
-      </div>
-  </div>
-{% endif %}
+    </div>
+  {% endif %}
 
   {% if previous %}
     <div class="path-direction path-previous">
@@ -40,5 +40,19 @@
 {% endblock %}
 
 {% block base_content %}
+
+  {% comment %}
+    {% if url_imagem_capa %}
+      <img style="width: 100%" src="http://www.camarajatai.go.gov.br{{url_imagem_capa}}" alt="" />
+      <br><br>
+    {% endif %}
+  {% endcomment %}
+
   {{object.texto|safe}}
+{% endblock %}
+
+{% block cmj_extra_content %}
+  <div class="container-fluid container{{path}}">
+    extra
+  </div>
 {% endblock %}

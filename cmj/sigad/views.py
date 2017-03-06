@@ -32,6 +32,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import View, TemplateView
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
+from sapl.parlamentares.models import Parlamentar
 
 from cmj.sigad import forms, models
 from cmj.sigad.models import Classe, Revisao, PermissionsUserClasse, Documento,\
@@ -52,6 +53,9 @@ class PathView(TemplateView):
     def get_context_data(self, **kwargs):
         context = TemplateView.get_context_data(self, **kwargs)
 
+        if not self.documento and not self.classe:
+            return context
+
         context['object'] = self.documento if self.documento else self.classe
         context['path'] = '-path'
 
@@ -70,8 +74,10 @@ class PathView(TemplateView):
                 id=self.documento.id).last()
             context['previous'] = previous
 
-            # d.get_previous_by_created
-            # d.get_next_by_created
+        elif self.classe:
+            context['object_list'] = self.classe.documento_set.order_by(
+                '-public_date').all()[:10]
+
         return context
 
     def dispatch(self, request, *args, **kwargs):
@@ -99,6 +105,8 @@ class PathView(TemplateView):
 
         if self.documento:
             self.template_name = 'path/path_documento.html'
+        else:
+            self.template_name = 'path/path_classe.html'
 
         return TemplateView.dispatch(self, request, *args, **kwargs)
 
@@ -455,6 +463,87 @@ class DocumentoPmImportView(TemplateView):
                 d.old_json = json.dumps(n)
                 d.classe_id = 1
                 d.save()
+
+        elif func == '1':
+            # liga as notícias aos parlamentares
+
+            url_parts = (
+                (7, 1, 1, 'Adilson-Carvalho'),
+                (165, 1, 1, 'carvalhinho/noticias/'),
+                (12, 1, 1, 'Vereadores/gildenicio-santos/'),
+                (8, 1, 1, '/Vereadores/Joao-Rosa/'),
+                (168, 1, 1, '/Vereadores/david-pires/'),
+                (167, 1, 1, '/Vereadores/katia-carvalho/'),
+                (166, 1, 1, '/Vereadores/jose-prado-carapo/'),
+                (14, 1, 1, '/Vereadores/thiago-maggioni/'),
+                (2, 1, 1, '/Vereadores/mauro-bento-filho/'),
+                (9, 1, 1, '/Vereadores/Marcos-Antonio/'),
+                (13, 1, 1, 'vereadores-2013-2016/vinicius-luz/'),
+                (11, 1, 1, 'vereadores-2013-2016/Nilton-Cesar-Soro/'),
+                (1, 1, 1, 'vereadores-2013-2016/Geovaci-Peres/'),
+                (16, 1, 1, 'vereadores-2013-2016/carlos-miranda/'),
+                (6, 1, 1, 'vereadores-2013-2016/Genio-Euripedes/'),
+
+                (152, 1, 1, 'Vereadores_2009-2012/Ediglan-Maia'),
+                (6, 1, 1, 'Vereadores_2009-2012/Genio-Euripedes/'),
+                (4, 1, 1, 'Vereadores_2009-2012/Vilma-Feitosa/'),
+                (3, 1, 1, 'Vereadores_2009-2012/Nelson-Antonio/'),
+                (5, 1, 1, 'Vereadores_2009-2012/Pr-Luiz-Carlos/'),
+
+
+                (6, 1, 1, 'Vereadores_2005-2008/genio-euripedes'),
+                (128, 1, 1, 'Vereadores_2005-2008/alcides-fazolino'),
+                (157, 1, 1, 'Vereadores_2005-2008/abimael-silva'),
+                (152, 1, 1, 'Vereadores_2005-2008/ediglan-maia'),
+                (155, 1, 1, 'Vereadores_2005-2008/maria-jose'),
+                (156, 1, 1, 'Vereadores_2005-2008/soraia-rodrigues'),
+                (154, 1, 1, 'Vereadores_2005-2008/joao-wesley'),
+                (158, 1, 1, 'Vereadores_2005-2008/andre-pires'),
+
+
+                (0, 1, 3, '/portal/tv/cmj-noticias/'),
+                (0, 1, 4, '/portal/tv/sessoes/'),
+                (0, 1, 5, '/portal/tv/fala-vereador/'),
+                (0, 1, 6, '/portal/tv/a-voz-da-comunidade/'),
+
+                (0, 1, 9, '/portal/radio/momento-camara'),
+
+
+            )
+
+            for u in url_parts:
+
+                docs = Documento.objects.filter(
+                    classe=u[1],
+                    parlamentares__isnull=True,
+                    old_path__contains=u[3])
+
+                if u[0]:
+                    parlamentar = Parlamentar.objects.get(pk=u[0])
+
+                for doc in docs:
+                    if u[0]:
+                        doc.parlamentares.add(parlamentar)
+
+                    if u[1] != u[2]:
+                        doc.classe_id = u[2]
+                        doc.save()
+
+            Documento.objects.filter(
+                old_path__startswith='/portal/radio/programacao/').delete()
+
+            Documento.objects.filter(
+                old_path__startswith='/portal/videosdiversos/').delete()
+
+            docs = Documento.objects.filter(
+                classe=1,
+                parlamentares__isnull=True).exclude(
+                    old_path__startswith='/portal/noticias/noticias/')
+
+            for doc in docs:
+                print(doc.old_path)
+
+            print(docs.count())
 
         return TemplateView.get(self, request, *args, **kwargs)
 
