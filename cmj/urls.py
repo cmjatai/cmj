@@ -78,10 +78,6 @@ urlpatterns = [
 
     url(r'^react$', TemplateView.as_view(template_name='index.html')),
 
-
-    url(r'', include(cmj.sigad.urls)),
-
-
 ]
 
 admin.site.site_header = 'Cmj'
@@ -97,3 +93,8 @@ if settings.DEBUG:
             'document_root': settings.MEDIA_ROOT,
         }),
     ]
+
+
+urlpatterns += [
+    url(r'', include(cmj.sigad.urls)),
+]

@@ -64,12 +64,6 @@
 {% endblock %}
 
 {% block base_header %}
-
-  {% block title %}
-    <span class="path-title">
-        {{ object.titulo|safe|linebreaksbr }}
-    </span>
-  {% endblock %}
   <div class="path-data-pub">
     {% block historico_publicacao %}
       <span>
@@ -79,13 +73,17 @@
         <i class="fa fa-clock-o" aria-hidden="true"></i>
         {% trans "Publicado em" %} {{object.public_date|date:"d"}} {% trans "de" %} {{object.public_date|date:"F"}} {% trans "de" %} {{object.public_date|date:"Y"}}
       </span>
-    {% endblock %}   
+    {% endblock %}
   </div>
+  {% block title %}
+    <span class="path-title">
+        {{ object.titulo|safe|linebreaksbr }}
+    </span>
+  {% endblock %}
 
   <span class="path-description">
     {% block descricao %}
       {{object.descricao}}
     {% endblock %}
   </span>
-
 {% endblock %}

@@ -7,7 +7,7 @@
 
 {% for documento in object_list %}
   <a href="{% url 'cmj.sigad:path_view' documento.absolute_slug %}">
-    {{documento.titulo}}
+     {{documento.titulo}}
   </a><br>
 
 {% endfor %}

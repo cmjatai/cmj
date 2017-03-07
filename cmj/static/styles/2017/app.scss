@@ -487,6 +487,11 @@ fieldset {
 
 // #### CRUD UPDATE ########################################
 
+.avatar-parlamentar {
+  height: 42px;
+  width: 42px;
+}
+
 .cts {  // container trecho search
   position: fixed;
   background-color: white;
@@ -714,7 +719,7 @@ body {
     position: relative;
     border: 0px solid #fff;
     border-radius: 0px;
-    margin-bottom: $grid-gutter-width;
+    margin-bottom: $grid-gutter-width * 1.5;
     height: 75px;
     &:hover {
       .icon {
@@ -782,16 +787,17 @@ body {
       border: 1px solid white;
       box-shadow: 3px 3px 10px  lighten($hover_background_50p, 3%);
       .titulo {
+        white-space: nowrap;
+        background: darken($color_main_bg, 8%) url(/static/img/bg.png);
+        padding: 5px 10px;
+        font-weight: 600;
+
         a {
           color: #443;
           &:hover {
             color: black;
           }
         }
-        white-space: nowrap;
-        background: darken($color_main_bg, 8%) url(/static/img/bg.png);
-        padding: 5px 10px;
-        font-weight: 600;
       }
       .descricao {
         color: #006556;
@@ -821,6 +827,7 @@ body {
     padding: 1.2em 0.5em 1.0em 1.7em;
   }
 
+
   &:hover {
     .inner {
       left: 2.2em;
@@ -836,33 +843,36 @@ main {
     font-family: "Lato";
     font-size: 1.7em;
     font-weight: 300;
+    position: relative;
   }
 }
 
 .container-path {
   .path-title {
-    text-align: center;
-    margin: 1em 0 0em;
+    text-align: left;
+    margin-top: 0.8em;
+    margin-bottom: 0.8em;
     font-size: 1.3em;
     display: block;
     font-weight: 800;
+    line-height: 1.2em;
   }
   .path-description {
     display: block;
     font-weight: normal;
     color: $color_topo_bg;
-    margin-bottom: 1em;
+    margin-bottom: 0.9em;
     font-size: 90%;
-    margin-left: 25%;
-    margin-right: 15%;
-    text-align: right;
+    margin-left: 10%;
+    margin-right: 10%;
+    text-align: left;
     font-style: italic;
   }
   .path-data-pub {
     border-top: 1px solid white;
     text-align: center;
     font-size: 0.6em;
-    margin: 0.5em 0 1em;
+    margin: 0 -10px;
     color: #888;
     line-height: 1;
     display: block;
@@ -880,6 +890,64 @@ main {
     }
   }
 }
+.path-parlamentares {
+  float: right;
+  clear: right;
+  text-align: right;
+
+  .avatar {
+    padding: 0 0 0 0;
+    display: inline-block;
+    opacity: 0.75;
+    /*border: 2px solid white;
+    padding: 5px;
+    background: $color_main_bg url(/static/img/bg.png);*/
+    img {
+      border: 0px solid transparent;
+      border-radius: 50%;
+      width: 100%;
+    }
+    &:hover {
+      opacity: 1;
+    }
+
+  }
+
+  .linebreak {
+    display: none;
+    &:nth-child(5n) {
+      display: block;
+    }
+  }
+  .avatar1 {
+    width: 250px;
+    margin: $grid-gutter-width * 1.3 -10px 20px 20px;
+  }
+  .avatar2 {
+    width: 150px;
+    margin: $grid-gutter-width * 1.3 -10px 0 20px;
+  }
+  .avatar3 {
+    width: 110px;
+    margin:  $grid-gutter-width * 1.3  -10px 0 15px;
+  }
+  .avatar4 {
+    width: 90px;
+    margin:  $grid-gutter-width * 1.3  -10px 0 15px;
+  }
+  .avatar5 {
+    width: 70px;
+    margin:  $grid-gutter-width * 1.3  -10px 0 12px;
+  }
+  .avatar99 {
+    margin: 5px 5px 5px -3px;
+    &:first-child {
+      margin-left: 10px;
+    }
+  }
+}
+
+
 
 @media screen and (max-width: 1199px) {
   .row-canais {
@@ -897,6 +965,7 @@ main {
 }
 
 @media screen and (max-width: 991px) {
+
   .masthead {
     margin-top: 10px;
   }
@@ -943,6 +1012,11 @@ main {
     }
   }
 
+  .path-parlamentares {
+    .avatar1 {
+      width: 150px;
+    }
+  }
 
 }
 
@@ -953,6 +1027,14 @@ main {
   .container {
     width: auto;
   }
+
+  .path-parlamentares {
+    .avatar1 {
+      width: 120px;
+      margin-right:10px;
+    }
+  }
+
 }
 
 @media screen and (max-width: 767px) {
@@ -1116,6 +1198,12 @@ main {
     }
   }
 
+  .path-parlamentares {
+    .avatar1 {
+      width: 100px;
+      margin:15px 15px 0 15px;
+    }
+  }
 
 }
 
@@ -1167,9 +1255,17 @@ main {
       }
     }
   }
+  .path-parlamentares {
+    .avatar1 {
+      width: 60px;
+      margin:40px 5px 0 5px;
+    }
+  }
 }
 
 @media screen and (min-width: 768px) {
+
+
   .navbar {
     .container {
       padding-left: 0;
@@ -1265,6 +1361,8 @@ main {
           margin-top: 1em;
           a {
             line-height: 2em;
+            font-size: 1em;
+            padding: 0 5px;
           }
         }
       }
@@ -1296,6 +1394,20 @@ main {
         }
         & > .dropdown-menu {
           margin-top: -0.4em;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 992px) {
+  .navbar {
+    &.navbar-menu {  /* para a navbar principal - que se diferencia das demais*/
+      .navbar-nav {
+        & > li {
+          a {
+            font-size: 1.2em;
+          }
         }
       }
     }

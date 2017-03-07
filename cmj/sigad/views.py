@@ -60,8 +60,10 @@ class PathView(TemplateView):
         context['path'] = '-path'
 
         if self.documento:
+
             next = Documento.objects.filter(
                 public_date__gte=self.documento.public_date,
+                classe=self.documento.classe,
                 visibilidade=STATUS_PUBLIC,
             ).exclude(
                 id=self.documento.id).first()
@@ -69,6 +71,7 @@ class PathView(TemplateView):
 
             previous = Documento.objects.filter(
                 public_date__lte=self.documento.public_date,
+                classe=self.documento.classe,
                 visibilidade=STATUS_PUBLIC
             ).exclude(
                 id=self.documento.id).last()
@@ -515,7 +518,7 @@ class DocumentoPmImportView(TemplateView):
 
                 docs = Documento.objects.filter(
                     classe=u[1],
-                    parlamentares__isnull=True,
+                    # parlamentares__isnull=True,
                     old_path__contains=u[3])
 
                 if u[0]:
@@ -523,6 +526,7 @@ class DocumentoPmImportView(TemplateView):
 
                 for doc in docs:
                     if u[0]:
+                        doc.parlamentares.clear()
                         doc.parlamentares.add(parlamentar)
 
                     if u[1] != u[2]:
