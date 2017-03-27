@@ -719,7 +719,7 @@ body {
     position: relative;
     border: 0px solid #fff;
     border-radius: 0px;
-    margin-bottom: $grid-gutter-width * 1.5;
+    margin-bottom: $grid-gutter-width;
     height: 75px;
     &:hover {
       .icon {
@@ -748,11 +748,122 @@ body {
     }
   }
 }
-// #### actions path next previous ########################################
+// #### containers ########################################
+main {
+  .container-path {
+    background-color: transparent;
+    border: 0px solid;
+    font-family: "Lato";
+    font-size: 1.7em;
+    font-weight: 300;
+    position: static;
+  }
+}
 
+.container-path {
+  .path-title {
+    text-align: center;
+    margin-top: 1.8em;
+    margin-bottom: 0.8em;
+    font-size: 1.3em;
+    display: block;
+    font-weight: 800;
+    line-height: 1.2em;
+  }
+  .path-description {
+    display: block;
+    font-weight: normal;
+    color: $color_topo_bg;
+    margin-bottom: 0.9em;
+    font-size: 90%;
+    margin-left: 10%;
+    margin-right: 10%;
+    text-align: center;
+    font-style: italic;
+  }
+  .path-data-pub {
+    border-top: 1px solid white;
+    text-align: center;
+    font-size: 0.6em;
+    margin: 0;
+    color: #888;
+    line-height: 1;
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+
+    span {
+      display: inline-block;
+      margin: 0px;
+      line-height: 2em;
+      &:before {
+        margin: 0 -5px;
+        content: '';
+        display: block;
+        height: 3px;
+        background-color: white;
+      }
+    }
+  }
+}
+
+.path-parlamentares {
+  float: right;
+  clear: right;
+  text-align: right;
+  margin: $grid-gutter-width 0 0px 10px;
+
+  &:first-child {
+    margin-top: $grid-gutter-width;
+  }
+
+  .avatar {
+    padding: 0 0 0 0;
+    display: inline-block;
+    opacity: 0.75;
+    margin-left: 10px;
+    /*border: 2px solid white;
+    padding: 5px;
+    background: $color_main_bg url(/static/img/bg.png);*/
+    img {
+      border: 0px solid transparent;
+      border-radius: 50%;
+      width: 100%;
+    }
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  .linebreak {
+    display: none;
+    &:nth-child(5n) {
+      display: block;
+    }
+  }
+  .avatar1 {
+    width: 250px;
+  }
+  .avatar2 {
+    width: 170px;
+  }
+  .avatar3 {
+    width: 130px;
+  }
+  .avatar4 {
+    width: 90px;
+  }
+  .avatar5 {
+    width: 70px;
+  }
+}
+
+// #### actions path next previous ########################################
 .path-direction {
   position: fixed;
-  top:35%;
+  bottom:20%;
+  z-index: 2000;
   &.scroll_down {
     & > a {
       background-color: rgba(#0689c2,.3);
@@ -764,7 +875,8 @@ body {
     }
   }
   & > a {
-    background: rgba(#0689c2,.4) url(/static/img/bg.png);
+    position: relative;
+    background: rgba(#0689c2,.35) url(/static/img/bg.png);
     color: white;
     display: inline-block;
     border-radius: 50%;
@@ -777,7 +889,8 @@ body {
   }
   &:hover {
     .inner {
-      top: 3.1em;
+      z-index: 2000;
+      bottom: 3.1em;
       display: block;
       position: absolute;
       margin: 0 10px;
@@ -791,6 +904,7 @@ body {
         background: darken($color_main_bg, 8%) url(/static/img/bg.png);
         padding: 5px 10px;
         font-weight: 600;
+        margin-bottom: 6px;
 
         a {
           color: #443;
@@ -807,7 +921,17 @@ body {
       }
     }
   }
+  .path-parlamentares {
+    margin: 0px 5px 5px 5px;
+    .avatar {
+      display: inline-block;
+      margin: 0 0 0 5px;;
+      float:right;
+      width: 60px;
+    }
+  }
 }
+
 .path-next {
   right: -1.6em;
   text-align: right;
@@ -826,123 +950,9 @@ body {
   a {
     padding: 1.2em 0.5em 1.0em 1.7em;
   }
-
-
   &:hover {
     .inner {
       left: 2.2em;
-    }
-  }
-}
-
-// #### containers ########################################
-main {
-  .container-path {
-    background-color: transparent;
-    border: 0px solid;
-    font-family: "Lato";
-    font-size: 1.7em;
-    font-weight: 300;
-    position: relative;
-  }
-}
-
-.container-path {
-  .path-title {
-    text-align: left;
-    margin-top: 0.8em;
-    margin-bottom: 0.8em;
-    font-size: 1.3em;
-    display: block;
-    font-weight: 800;
-    line-height: 1.2em;
-  }
-  .path-description {
-    display: block;
-    font-weight: normal;
-    color: $color_topo_bg;
-    margin-bottom: 0.9em;
-    font-size: 90%;
-    margin-left: 10%;
-    margin-right: 10%;
-    text-align: left;
-    font-style: italic;
-  }
-  .path-data-pub {
-    border-top: 1px solid white;
-    text-align: center;
-    font-size: 0.6em;
-    margin: 0 -10px;
-    color: #888;
-    line-height: 1;
-    display: block;
-    span {
-      display: inline-block;
-      margin: 0px;
-      line-height: 2em;
-      &:before {
-        margin: 0 -5px;
-        content: '';
-        display: block;
-        height: 3px;
-        background-color: white;
-      }
-    }
-  }
-}
-.path-parlamentares {
-  float: right;
-  clear: right;
-  text-align: right;
-
-  .avatar {
-    padding: 0 0 0 0;
-    display: inline-block;
-    opacity: 0.75;
-    /*border: 2px solid white;
-    padding: 5px;
-    background: $color_main_bg url(/static/img/bg.png);*/
-    img {
-      border: 0px solid transparent;
-      border-radius: 50%;
-      width: 100%;
-    }
-    &:hover {
-      opacity: 1;
-    }
-
-  }
-
-  .linebreak {
-    display: none;
-    &:nth-child(5n) {
-      display: block;
-    }
-  }
-  .avatar1 {
-    width: 250px;
-    margin: $grid-gutter-width * 1.3 -10px 20px 20px;
-  }
-  .avatar2 {
-    width: 150px;
-    margin: $grid-gutter-width * 1.3 -10px 0 20px;
-  }
-  .avatar3 {
-    width: 110px;
-    margin:  $grid-gutter-width * 1.3  -10px 0 15px;
-  }
-  .avatar4 {
-    width: 90px;
-    margin:  $grid-gutter-width * 1.3  -10px 0 15px;
-  }
-  .avatar5 {
-    width: 70px;
-    margin:  $grid-gutter-width * 1.3  -10px 0 12px;
-  }
-  .avatar99 {
-    margin: 5px 5px 5px -3px;
-    &:first-child {
-      margin-left: 10px;
     }
   }
 }
@@ -997,24 +1007,40 @@ main {
     }
   }
 
-  main {
-    .container-path {
-      font-size: 1.3em;
-    }
-  }
   .container-path {
+    font-size: 1.3em;
+    .path-data-pub {
+      text-align: left;
+      span {
+        margin-left: 20px;
+
+      }
+    }
     .path-title {
       font-size: 1.2em;
     }
     .path-description {
-      margin-left: 20%;
+      margin-left: 10%;
       margin-right: 10%;
     }
   }
 
   .path-parlamentares {
+    margin-top: 10px;
+    &:first-child {
+      margin-top: 10px;
+    }
+    .avatar {
+      margin-left: 5px;
+    }
     .avatar1 {
       width: 150px;
+    }
+    .avatar2 {
+      width: 120px;
+    }
+    .avatar3 {
+      width: 100px;
     }
   }
 
@@ -1029,9 +1055,17 @@ main {
   }
 
   .path-parlamentares {
+
     .avatar1 {
       width: 120px;
-      margin-right:10px;
+    }
+  }
+
+  .path-direction {
+    .path-parlamentares {
+      .avatar {
+        width: 50px;
+      }
     }
   }
 
@@ -1080,7 +1114,7 @@ main {
   }
   main {
     .container, .container-fluid {
-      margin: 0 $grid-gutter-width * 0.25;
+      padding: 0 $grid-gutter-width * 0.25;
     }
   }
   .context-actions{
@@ -1160,17 +1194,19 @@ main {
         .titulo {
           white-space: normal;
         }
-
       }
     }
   }
 
-  .container-path {
-    .path-title {
-      margin-top: 0.5em;
+  .path-parlamentares {
+    margin-right: 5px;
+    .avatar1 {
+      width: 120px;
+    }
+    .avatar3 {
+      width: 120px;
     }
   }
-
 }
 
 @media screen and (max-width: 600px) {
@@ -1193,7 +1229,7 @@ main {
       font-size: 1em;
     }
     .path-description {
-      margin-left: 10%;
+      margin-left: 5%;
       margin-right: 5%;
     }
   }
@@ -1201,9 +1237,30 @@ main {
   .path-parlamentares {
     .avatar1 {
       width: 100px;
-      margin:15px 15px 0 15px;
+    }
+    .avatar2 {
+      width: 95px;
+    }
+    .avatar3 {
+      width: 85px;
+    }
+    .avatar4 {
+      width: 75px;
+    }
+    .avatar5 {
+      width: 65px;
     }
   }
+
+
+  .path-direction {
+    .path-parlamentares {
+      .avatar {
+        width: 45px;
+      }
+    }
+  }
+
 
 }
 
@@ -1256,15 +1313,25 @@ main {
     }
   }
   .path-parlamentares {
-    .avatar1 {
-      width: 60px;
-      margin:40px 5px 0 5px;
+    .avatar3, .avatar4 {
+      width: 65px;
+    }
+     .avatar5 {
+      width: 55px;
     }
   }
+
+  .path-direction {
+    .path-parlamentares {
+      .avatar {
+        width: 36px;
+      }
+    }
+  }
+
 }
 
 @media screen and (min-width: 768px) {
-
 
   .navbar {
     .container {

@@ -1,5 +1,5 @@
 {% extends "base_path.html" %}
-{% load i18n %}
+{% load i18n sigad_filters %}
 
 {% block base_functions %}
   {% if next %}
@@ -16,16 +16,16 @@
             {% with next.parlamentares.count as count_parlamentares %}
               {% for parlamentar in next.parlamentares.all %}
 
-                {% if forloop.counter0 > 0 and forloop.counter0|divisibleby:"5" %}
+                {% if forloop.counter0 > 0 and forloop.counter0|organize_direction_avatars:count_parlamentares  %}
                   </div>
                 {% endif %}
 
-                {% if forloop.counter0|divisibleby:"5" %}
+                {% if forloop.counter0|organize_direction_avatars:count_parlamentares %}
                   <div class="path-parlamentares">
                 {% endif %}
 
                   {% if parlamentar.fotografia %}
-                    <a class="avatar avatar5 avatar99" href="#">
+                    <a class="avatar" href="#">
                       <img src="{{ parlamentar.fotografia.url }}">
                     </a>
                   {% endif %}
@@ -59,16 +59,16 @@
             {% with previous.parlamentares.count as count_parlamentares %}
               {% for parlamentar in previous.parlamentares.all %}
 
-                {% if forloop.counter0 > 0 and forloop.counter0|divisibleby:"5" %}
+                {% if forloop.counter0 > 0 and forloop.counter0|organize_direction_avatars:count_parlamentares  %}
                   </div>
                 {% endif %}
 
-                {% if forloop.counter0|divisibleby:"5" %}
+                {% if forloop.counter0|organize_direction_avatars:count_parlamentares %}
                   <div class="path-parlamentares">
                 {% endif %}
 
                   {% if parlamentar.fotografia %}
-                    <a class="avatar avatar5 avatar99" href="#">
+                    <a class="avatar" href="#">
                       <img src="{{ parlamentar.fotografia.url }}">
                     </a>
                   {% endif %}
@@ -94,11 +94,11 @@
 {% with object.parlamentares.count as count_parlamentares %}
   {% for parlamentar in object.parlamentares.all %}
 
-    {% if forloop.counter0 > 0 and forloop.counter0|divisibleby:"5" %}
+    {% if forloop.counter0 > 0 and forloop.counter0|organize_avatars:count_parlamentares %}
       </div>
     {% endif %}
 
-    {% if forloop.counter0|divisibleby:"5" %}
+    {% if forloop.counter0|organize_avatars:count_parlamentares %}
       <div class="path-parlamentares">
     {% endif %}
 
@@ -132,9 +132,19 @@
       <img style="width: 100%" src="http://www.camarajatai.go.gov.br{{url_imagem_capa}}" alt="" />
       <br><br>
     {% endif %}
+{{object.id}}
   {% endcomment %}
 
-  {{object.texto|safe}}
+  {% for child in object.childs.view_childs %}
+    {% if child.tipo == child.TPD_TEXTO %}
+      {{child.texto|safe}}
+    {%elif child.tipo == child.TPD_IMAGE %}
+      <img style="width: 100%" src="/documento/{{child.id}}/media/{{child.id}}" alt="" />
+
+    {% endif %}
+
+  {% endfor %}
+
 {% endblock %}
 
 {% block cmj_extra_content %}

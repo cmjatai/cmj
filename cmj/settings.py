@@ -70,6 +70,7 @@ INSTALLED_APPS = (
     'floppyforms',
     'sass_processor',
     'rest_framework',
+    'reversion',
 
     # 'haystack',
     # "elasticstack",
@@ -87,6 +88,7 @@ INSTALLED_APPS = INSTALLED_APPS + tuple(
 
 
 MIDDLEWARE_CLASSES = (
+    'reversion.middleware.RevisionMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',

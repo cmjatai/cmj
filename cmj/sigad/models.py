@@ -18,6 +18,7 @@ from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields.json import JSONField
 from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
+import reversion
 
 from cmj import sigad
 from cmj.utils import get_settings_auth_user_model
@@ -87,6 +88,10 @@ class CMSMixin(models.Model):
 
     descricao = models.TextField(
         verbose_name=_('Descrição'),
+        blank=True, null=True, default=None)
+
+    autor = models.TextField(
+        verbose_name=_('Autor'),
         blank=True, null=True, default=None)
 
     visibilidade = models.IntegerField(
@@ -163,7 +168,8 @@ class Revisao(models.Model):
 class Slugged(Parent):
     titulo = models.CharField(
         verbose_name=_('Título'),
-        max_length=250)
+        max_length=250,
+        blank=True, null=True, default=None)
 
     slug = models.SlugField(max_length=2000)
 
@@ -174,7 +180,10 @@ class Slugged(Parent):
 
     def save(self, *args, **kwargs):
         slug_old = self.slug
-        self.slug = self.generate_unique_slug()
+
+        if self.titulo:
+            self.slug = self.generate_unique_slug()
+
         super(Slugged, self).save(*args, **kwargs)
 
         if self.slug == slug_old:
@@ -278,7 +287,37 @@ class PermissionsUserClasse(CMSMixin):
         verbose_name_plural = _('Permissões de Usuários para Classes')
 
 
+class DocumentoManager(models.Manager):
+    use_for_related_fields = True
+
+    def view_childs(self):
+        qs = self.get_queryset()
+        return qs.order_by('ordem')
+
+
 class Documento(Slugged, CMSMixin):
+    objects = DocumentoManager()
+
+    TPD_DOC = 0
+    TPD_TEXTO = 100
+    TPD_VIDEO = 800
+    TPD_IMAGE = 900
+
+    tipo_parte_doc_choice = (
+        (TPD_TEXTO, _('Texto')),
+        (TPD_VIDEO, _('Vídeo')),
+        (TPD_IMAGE, _('Imagem')),
+    )
+
+    tipo_parte_doc = {
+        TPD_TEXTO: {
+            'view': {
+            },
+
+            'edit': {
+            }
+        }
+    }
 
     texto = models.TextField(
         verbose_name=_('Texto'),
@@ -292,17 +331,26 @@ class Documento(Slugged, CMSMixin):
         blank=True, null=True, default=None)
 
     parlamentares = models.ManyToManyField(Parlamentar,
-                                           related_name='documentos',
+                                           related_name='documento_set',
                                            verbose_name=_('Parlamentares'))
 
     materias = models.ManyToManyField(MateriaLegislativa,
-                                      related_name='documentos',
+                                      related_name='documento_set',
                                       verbose_name=_('Matérias Relacionadas'))
 
     classe = models.ForeignKey(
         Classe,
         related_name='documento_set',
-        verbose_name=_('Classes'))
+        verbose_name=_('Classes'),
+        blank=True, null=True, default=None)
+
+    tipo = models.IntegerField(
+        _('Tipo da Parte do Documento'),
+        choices=tipo_parte_doc_choice,
+        default=TPD_DOC)
+
+    ordem = models.IntegerField(
+        _('Ordem de Renderização'), default=0)
 
     """
     ''' se media_of estiver preenchido significa que a instancia
@@ -315,7 +363,7 @@ class Documento(Slugged, CMSMixin):
         verbose_name=_('Mídias do Documento'))"""
 
     def __str__(self):
-        return self.titulo
+        return self.titulo or ''
 
     @property
     def absolute_slug(self):
@@ -331,13 +379,13 @@ class Documento(Slugged, CMSMixin):
              _('Visualização das mídias do Documento')),
         )
 
-"""
-class VersionedMedia(models.Model):
+
+class Midia(models.Model):
 
     documento = models.OneToOneField(
         Documento,
         verbose_name=_('Mídia'),
-        related_name='media')
+        related_name='midia')
 
     class Meta:
         verbose_name = _('Mídia Versionada')
@@ -350,15 +398,25 @@ class VersionedMedia(models.Model):
 
 def media_path(instance, filename):
     return './sigad/documento/%s/media/%s/%s' % (
-        instance.vm.documento_id,
-        instance.vm_id,
+        instance.midia.documento_id,
+        instance.midia_id,
         filename)
 
 media_protected = FileSystemStorage(
     location=settings.MEDIA_PROTECTED_ROOT, base_url='DO_NOT_USE')
 
+ALINHAMENTO_LEFT = 0
+ALINHAMENTO_JUSTIFY = 1
+ALINHAMENTO_RIGHT = 2
 
-class Media(models.Model):
+alinhamento_choice = (
+    (ALINHAMENTO_LEFT, _('Alinhamento Esquerdo')),
+    (ALINHAMENTO_JUSTIFY, _('Alinhamento Completo')),
+    (ALINHAMENTO_RIGHT, _('Alinhamento Direito')),
+)
+
+
+class VersaoDeMidia(models.Model):
     created = models.DateTimeField(
         verbose_name=_('created'),
         editable=False, auto_now_add=True)
@@ -376,9 +434,14 @@ class Media(models.Model):
         max_length=250,
         default='')
 
-    vm = models.ForeignKey(
-        VersionedMedia, verbose_name=_('Mídia Versionada'),
+    midia = models.ForeignKey(
+        Midia, verbose_name=_('Mídia Versionada'),
         related_name='versions')
+
+    alinhamento = models.IntegerField(
+        _('Alinhamento'),
+        choices=alinhamento_choice,
+        default=ALINHAMENTO_LEFT)
 
     @cached_property
     def simple_name(self):
@@ -432,4 +495,3 @@ class Media(models.Model):
         ordering = ('-created',)
         verbose_name = _('Mídia')
         verbose_name_plural = _('Mídias')
-"""

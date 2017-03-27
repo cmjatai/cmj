@@ -23,20 +23,24 @@ from operator import attrgetter
 
 from braces.views import FormMessagesMixin
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.core.files import File
+from django.core.files.temp import NamedTemporaryFile
 from django.core.urlresolvers import reverse_lazy
 from django.db.models.aggregates import Max
-from django.http.response import Http404
+from django.http.response import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.dateparse import parse_date
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import View, TemplateView
+from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
+from docutils.nodes import image
 from sapl.parlamentares.models import Parlamentar
 
 from cmj.sigad import forms, models
 from cmj.sigad.models import Classe, Revisao, PermissionsUserClasse, Documento,\
-    STATUS_PUBLIC
+    STATUS_PUBLIC, Midia, VersaoDeMidia
 
 
 class PathView(TemplateView):
@@ -419,6 +423,7 @@ class DocumentoPmImportView(TemplateView):
                 if stop or len(jdata) < s:
                     break
                 p += 1
+                # break
 
             news.reverse()
 
@@ -460,12 +465,53 @@ class DocumentoPmImportView(TemplateView):
                 d.owner = request.user
                 d.descricao = n['description']
                 d.titulo = n['title']
-                d.texto = n['text']
                 d.visibilidade = 0 if n['review_state'] == 'published' else 99
                 d.old_path = n['path']
                 d.old_json = json.dumps(n)
                 d.classe_id = 1
                 d.save()
+
+                ordem = 0
+                if n['image']:
+                    ordem += 1
+                    image = Documento()
+                    image.autor = n['image_caption']
+                    image.visibilidade = 0
+                    image.ordem = ordem
+                    image.titulo = 'image'
+                    image.owner = request.user
+                    image.parent = d
+                    image.tipo = Documento.TPD_IMAGE
+                    image.save()
+
+                    midia = Midia()
+                    midia.documento = image
+                    midia.save()
+
+                    versao = VersaoDeMidia()
+                    versao.midia = midia
+                    versao.owner = request.user
+                    versao.save()
+
+                    file = http.request('GET', ('www.camarajatai.go.gov.br%s'
+                                                ) % (n['image']))
+
+                    img_temp = NamedTemporaryFile(delete=True)
+                    img_temp.write(file.data)
+                    img_temp.flush()
+                    versao.file.save("image.jpg", File(img_temp), save=True)
+
+                if n['text']:
+                    ordem += 1
+                    texto = Documento()
+                    texto.texto = n['text']
+                    texto.visibilidade = 0
+                    texto.ordem = ordem
+                    texto.owner = request.user
+                    texto.parent = d
+                    texto.tipo = Documento.TPD_TEXTO
+
+                    texto.save()
 
         elif func == '1':
             # liga as notícias aos parlamentares
@@ -552,7 +598,6 @@ class DocumentoPmImportView(TemplateView):
         return TemplateView.get(self, request, *args, **kwargs)
 
 """
-
 class DocumentoCreateView(
         PermissionRequiredMixin,
         FormMessagesMixin,
@@ -600,6 +645,7 @@ class DocumentoCreateView(
         except Exception as e:
             print(e)
         return HttpResponse("post")
+"""
 
 
 class DocumentoPermissionRequiredMixin(PermissionRequiredMixin):
@@ -640,29 +686,29 @@ class MediaDetailView(DocumentoPermissionRequiredMixin, DetailView):
     def get(self, request, *args, **kwargs):
         try:
             doc = Documento.objects.get(pk=kwargs['media_id'])
-            media = doc.media.last
+            midia = doc.midia.last
         except Exception as e:
             raise Http404
 
         if 'resize' in kwargs and kwargs['resize']:
             try:
-                file = media.thumbnail(kwargs['resize'])
+                file = midia.thumbnail(kwargs['resize'])
             except Exception as e:
-                file = media.file
+                file = midia.file
         else:
-            file = media.file
+            file = midia.file
 
         response = HttpResponse(
-            file, content_type=media.content_type)
+            file, content_type=midia.content_type)
 
         response['Cache-Control'] = 'no-cache'
         response['Pragma'] = 'no-cache'
         response['Expires'] = 0
         response['Content-Disposition'] = 'inline; filename=' + \
-            media.file.name
+            midia.file.name
         return response
 
-
+"""
 class Pcasp2016ImportView(View):
 
     def get(self, request, *args, **kwargs):
@@ -745,6 +791,4 @@ class Pcasp2016ImportView(View):
                 row['TÍTULO'].replace('\n', '').
                 replace('  ', '').replace('–', '-'))
 
-        return HttpResponse(content, content_type='text/plain; charset=utf8')
-
-"""
+        return HttpResponse(content, content_type='text/plain; charset=utf8')"""
