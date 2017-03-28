@@ -35,7 +35,6 @@ from django.views.generic.base import View, TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
-from docutils.nodes import image
 from sapl.parlamentares.models import Parlamentar
 
 from cmj.sigad import forms, models
