@@ -52,6 +52,30 @@ class PathView(TemplateView):
 
         print(self.kwargs['slug'])
 
+        if self.documento and self.documento.tipo == Documento.TPD_IMAGE:
+            try:
+                midia = self.documento.midia.last
+            except Exception as e:
+                raise Http404
+
+            if 'resize' in kwargs and kwargs['resize']:
+                try:
+                    file = midia.thumbnail(kwargs['resize'])
+                except Exception as e:
+                    file = midia.file
+            else:
+                file = midia.file
+
+            response = HttpResponse(
+                file, content_type=midia.content_type)
+
+            response['Cache-Control'] = 'no-cache'
+            response['Pragma'] = 'no-cache'
+            response['Expires'] = 0
+            response['Content-Disposition'] = 'inline; filename=' + \
+                midia.file.name
+            return response
+
         return TemplateView.get(self, request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -64,9 +88,9 @@ class PathView(TemplateView):
         context['path'] = '-path'
 
         if self.documento:
-
             next = Documento.objects.filter(
                 public_date__gte=self.documento.public_date,
+                created__gte=self.documento.created,
                 classe=self.documento.classe,
                 visibilidade=STATUS_PUBLIC,
             ).exclude(
@@ -75,6 +99,7 @@ class PathView(TemplateView):
 
             previous = Documento.objects.filter(
                 public_date__lte=self.documento.public_date,
+                created__lte=self.documento.created,
                 classe=self.documento.classe,
                 visibilidade=STATUS_PUBLIC
             ).exclude(
@@ -82,7 +107,8 @@ class PathView(TemplateView):
             context['previous'] = previous
 
         elif self.classe:
-            context['object_list'] = self.classe.documento_set.order_by(
+            context['object_list'] = self.classe.documento_set.filter(
+                public_date__isnull=False).order_by(
                 '-public_date').all()[:10]
 
         return context
@@ -105,7 +131,22 @@ class PathView(TemplateView):
                     slug=slug[-1],
                     classe__slug='/'.join(slug[:-1]))
             except:
-                pass
+
+                slug.reverse()
+
+                for i, item in enumerate(slug):
+                    try:
+                        slug_part = slug[:i + 1]
+                        slug_part.reverse()
+                        slug_class = slug[i + 1:]
+                        slug_class.reverse()
+                        print(slug_class, slug_part)
+                        self.documento = Documento.objects.get(
+                            slug='/'.join(slug_part),
+                            classe__slug='/'.join(slug_class))
+                        break
+                    except:
+                        pass
 
         if not self.documento and not self.classe:
             raise Http404()
@@ -478,10 +519,11 @@ class DocumentoPmImportView(TemplateView):
                     image.autor = n['image_caption']
                     image.visibilidade = 0
                     image.ordem = ordem
-                    image.titulo = 'image'
+                    image.titulo = 'midia'
                     image.owner = request.user
                     image.parent = d
                     image.tipo = Documento.TPD_IMAGE
+                    image.classe_id = 1
                     image.save()
 
                     midia = Midia()
@@ -491,6 +533,7 @@ class DocumentoPmImportView(TemplateView):
                     versao = VersaoDeMidia()
                     versao.midia = midia
                     versao.owner = request.user
+                    versao.content_type = 'image/jpeg'
                     versao.save()
 
                     file = http.request('GET', ('www.camarajatai.go.gov.br%s'
@@ -594,6 +637,11 @@ class DocumentoPmImportView(TemplateView):
                 print(doc.old_path)
 
             print(docs.count())
+
+            for doc in Documento.objects.filter(parent__isnull=False):
+                for child in doc.childs.view_childs():
+                    child.classe_id = doc.classe_id
+                    child.save()
 
         return TemplateView.get(self, request, *args, **kwargs)
 

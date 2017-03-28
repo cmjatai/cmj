@@ -139,7 +139,7 @@
     {% if child.tipo == child.TPD_TEXTO %}
       {{child.texto|safe}}
     {%elif child.tipo == child.TPD_IMAGE %}
-      <img style="width: 100%" src="/documento/{{child.id}}/media/{{child.id}}" alt="" />
+      <img style="width: 100%" src="/{{child.absolute_slug}}" alt="" />
 
     {% endif %}
 

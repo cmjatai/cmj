@@ -818,6 +818,10 @@ main {
     margin-top: $grid-gutter-width;
   }
 
+  &:last-of-type {
+    margin-bottom: $grid-gutter-width;
+  }
+
   .avatar {
     padding: 0 0 0 0;
     display: inline-block;
@@ -888,6 +892,7 @@ main {
     display: none;
   }
   &:hover {
+    min-width: 40%;
     .inner {
       z-index: 2000;
       bottom: 3.1em;
@@ -1429,7 +1434,7 @@ main {
           a {
             line-height: 2em;
             font-size: 1em;
-            padding: 0 5px;
+            padding: 0 10px;
           }
         }
       }

@@ -112,12 +112,17 @@
                 </ul>
 
                 <ul class="nav navbar-nav">
-                  {% block sections_navbar %} {% navbar 'navbar.yaml' %}{% endblock sections_navbar %}
+                  {% comment %}
+                    {% block sections_navbar %} {% navbar 'navbar.yaml' %}{% endblock sections_navbar %}
 
-                  {% if areatrabalho %}{% comment %}Menu SAAP{% endcomment %}
+                  {% if areatrabalho %}
                     <li class="dropdown">
                       <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "SAAP" %}<span class="caret"></span></a>
                       <ul class="dropdown-menu menu-left">
+                      </ul>
+                    </li>
+                  {% endif %}
+                  {% endcomment %}
                         {% if perms.core.menu_contatos %}
                           <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'cmj.cerimonial:contato_list' %}">{% trans "Contatos" %}</a></li>
                         {% endif %}
@@ -129,6 +134,9 @@
                         {% endif %}
 
 
+
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
                         {% if perms.core.menu_relatorios %}
                           <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Relatórios" %}<span class="caret"></span></a>
@@ -142,11 +150,6 @@
                             </ul>
                           </li>
                         {% endif %}
-                      </ul>
-                    </li>
-                  {% endif %}
-                </ul>
-                <ul class="nav navbar-nav navbar-right">
                   {% if perms.core.menu_dados_auxiliares or perms.base.view_tabelas_auxiliares%}
                     <li class="dropdown">
                       <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Dados Auxiliares" %}<span class="caret"></span></a>
