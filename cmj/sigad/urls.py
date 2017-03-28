@@ -28,10 +28,6 @@ urlpatterns_sigad = [
     url(r'^documento/pm_import$',
         views.DocumentoPmImportView.as_view(), name='documento_pm_import'),
 
-    url(r'^documento/(?P<pk>[0-9]+)'
-        '/media\.?(?P<resize>\w+)?/(?P<media_id>[0-9]+)$',
-        views.MediaDetailView.as_view(), name='media_get'),
-
     url(r'^(?P<slug>.*)$',
         views.PathView.as_view(), name='path_view'),
 ]

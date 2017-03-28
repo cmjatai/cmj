@@ -233,6 +233,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = PROJECT_DIR.child("collected_static")
 STATICFILES_DIRS = (
     BASE_DIR.child("static"),
+    BASE_DIR.child("static").child('2017'),
     sapl_settings.STATICFILES_DIRS[0],
     PROJECT_DIR.child('assets'))
 
