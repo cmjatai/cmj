@@ -11,11 +11,12 @@ from django.db.models.deletion import PROTECT, CASCADE
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from image_cropping import ImageCropField, ImageRatioField
-from sapl.parlamentares.models import Municipio, Parlamentar
+from sapl.parlamentares.models import Parlamentar
 
 from cmj.core.rules import SEARCH_TRECHO
 from cmj.globalrules.globalrules import rules, GROUP_SOCIAL_USERS
-from cmj.utils import get_settings_auth_user_model, normalize, YES_NO_CHOICES
+from cmj.utils import get_settings_auth_user_model, normalize, YES_NO_CHOICES,\
+    UF
 
 from .rules import MENU_PERMS_FOR_USERS
 
@@ -246,6 +247,34 @@ class CmjAuditoriaModelMixin(CmjModelMixin):
         abstract = True
 
 
+class Municipio(models.Model):  # Localidade
+    # TODO filter on migration leaving only cities
+
+    REGIAO_CHOICES = (
+        ('CO', 'Centro-Oeste'),
+        ('NE', 'Nordeste'),
+        ('NO', 'Norte'),
+        ('SE', 'Sudeste'),  # TODO convert on migrate SD => SE
+        ('SL', 'Sul'),
+        ('EX', 'Exterior'),
+    )
+
+    nome = models.CharField(max_length=50, blank=True)
+    uf = models.CharField(
+        max_length=2, blank=True, choices=UF)
+    regiao = models.CharField(
+        max_length=2, blank=True, choices=REGIAO_CHOICES)
+
+    class Meta:
+        verbose_name = _('Município')
+        verbose_name_plural = _('Municípios')
+
+    def __str__(self):
+        return _('%(nome)s - %(uf)s (%(regiao)s)') % {
+            'nome': self.nome, 'uf': self.uf, 'regiao': self.regiao
+        }
+
+
 class AreaTrabalho(CmjAuditoriaModelMixin):
 
     nome = models.CharField(max_length=100, blank=True, default='',
@@ -254,11 +283,11 @@ class AreaTrabalho(CmjAuditoriaModelMixin):
     descricao = models.CharField(
         default='', max_length=254, verbose_name=_('Descrição'))
 
-    parlamentar = models.ForeignKey(
+    """parlamentar = models.ForeignKey(
         Parlamentar,
         verbose_name=_('Parlamentar'),
         related_name='areatrabalho_set',
-        blank=True, null=True, on_delete=CASCADE)
+        blank=True, null=True, on_delete=CASCADE)"""
 
     operadores = models.ManyToManyField(
         get_settings_auth_user_model(),
