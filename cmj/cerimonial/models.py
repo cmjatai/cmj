@@ -4,11 +4,11 @@ from django.contrib.auth.models import Group
 from django.db import models
 from django.db.models.deletion import SET_NULL, PROTECT, CASCADE
 from django.utils.translation import ugettext_lazy as _
-from sapl.parlamentares.models import Parlamentar, Municipio, Partido
+from sapl.parlamentares.models import Parlamentar, Partido
 from sapl.utils import UF
 
 from cmj.core.models import CmjModelMixin, Trecho, Distrito, RegiaoMunicipal,\
-    CmjAuditoriaModelMixin, CmjSearchMixin, AreaTrabalho, Bairro
+    CmjAuditoriaModelMixin, CmjSearchMixin, AreaTrabalho, Bairro, Municipio
 from cmj.utils import YES_NO_CHOICES, NONE_YES_NO_CHOICES,\
     get_settings_auth_user_model
 

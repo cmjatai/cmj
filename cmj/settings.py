@@ -8,6 +8,10 @@ from easy_thumbnails.conf import Settings as thumbnail_settings
 from sapl import settings as sapl_settings
 from unipath import Path
 
+import logging
+from sapl.temp_suppress_crispy_form_warnings import \
+    SUPRESS_CRISPY_FORM_WARNINGS_LOGGING
+import sys
 
 """@property    gerar nomes para urls
 def pretty_name(self):
@@ -328,3 +332,42 @@ MAX_IMAGE_UPLOAD_SIZE = 2 * 1024 * 1024  # 2MB
 
 #HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 #ELASTICSEARCH_DEFAULT_ANALYZER = "snowball"
+
+
+
+
+# FIXME update cripy-forms and remove this
+# hack to suppress many annoying warnings from crispy_forms
+# see sapl.temp_suppress_crispy_form_warnings
+LOGGING = SUPRESS_CRISPY_FORM_WARNINGS_LOGGING
+
+
+
+LOGGING_CONSOLE = config('LOGGING_CONSOLE', default=False, cast=bool)
+if DEBUG and LOGGING_CONSOLE:
+    # Descomentar linha abaixo fará com que logs aparecam, inclusive SQL
+    #LOGGING['handlers']['console']['level'] = 'DEBUG'
+    LOGGING['loggers']['django']['level'] = 'DEBUG'
+    LOGGING.update({
+        'formatters': {
+            'verbose': {
+                'format': '%(levelname)s %(asctime)s %(pathname)s '
+                '%(funcName)s %(message)s'
+            },
+            'simple': {
+                'format': '%(levelname)s %(message)s'
+            },
+        },
+    })
+    LOGGING['handlers']['console']['formatter'] = 'verbose'
+    LOGGING['loggers'][BASE_DIR.name] = {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+    }
+
+
+def excepthook(*args):
+    logging.getLogger(BASE_DIR.name).error(
+        'Uncaught exception:', exc_info=args)
+
+sys.excepthook = excepthook

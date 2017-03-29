@@ -102,7 +102,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='localtrabalho',
             name='municipio',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='localtrabalho_set', to='parlamentares.Municipio', verbose_name='Município'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='localtrabalho_set', to='core.Municipio', verbose_name='Município'),
         ),
         migrations.AddField(
             model_name='localtrabalho',
@@ -187,7 +187,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='endereco',
             name='municipio',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='endereco_set', to='parlamentares.Municipio', verbose_name='Município'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='endereco_set', to='core.Municipio', verbose_name='Município'),
         ),
         migrations.AddField(
             model_name='endereco',
