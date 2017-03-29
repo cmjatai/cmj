@@ -824,7 +824,6 @@ class ProcessoContato(Processo):
 class GrupoDeContatos(CmjAuditoriaModelMixin):
 
     nome = models.CharField(max_length=100,
-                            unique=True,
                             verbose_name=_('Nome do Grupo'))
 
     contatos = models.ManyToManyField(Contato,

@@ -10,8 +10,6 @@ from rest_framework import viewsets, mixins
 from rest_framework.authentication import SessionAuthentication,\
     BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
-from sapl.crud.base import Crud, make_pagination, CrudAux, MasterDetailCrud
-from sapl.parlamentares.models import Partido, Filiacao
 
 from cmj.core.forms import OperadorAreaTrabalhoForm, ImpressoEnderecamentoForm,\
     ListWithSearchForm
@@ -20,8 +18,10 @@ from cmj.core.models import Cep, TipoLogradouro, Logradouro, RegiaoMunicipal,\
     ImpressoEnderecamento
 from cmj.core.rules import rules_patterns
 from cmj.core.serializers import TrechoSearchSerializer, TrechoSerializer
+from cmj.crud.base import Crud, CrudAux, MasterDetailCrud
 from cmj.globalrules import globalrules
 from cmj.utils import normalize
+from sapl.parlamentares.models import Partido, Filiacao
 
 
 globalrules.rules.config_groups(rules_patterns)
