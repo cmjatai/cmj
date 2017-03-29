@@ -27,7 +27,6 @@ from django_filters.filters import CharFilter, ChoiceFilter, NumberFilter,\
 from django_filters.filterset import FilterSet, STRICTNESS
 from sapl.crispy_layout_mixin import to_column, SaplFormLayout, to_fieldsets,\
     form_actions, to_row
-from sapl.parlamentares.models import Municipio
 
 from cmj import settings
 from cmj.cerimonial.models import LocalTrabalho, Endereco,\
@@ -35,7 +34,7 @@ from cmj.cerimonial.models import LocalTrabalho, Endereco,\
     IMPORTANCIA_CHOICE, AssuntoProcesso, StatusProcesso, ProcessoContato,\
     GrupoDeContatos, TopicoProcesso
 from cmj.core.forms import ListWithSearchForm
-from cmj.core.models import Trecho, ImpressoEnderecamento
+from cmj.core.models import Municipio, Trecho, ImpressoEnderecamento
 from cmj.utils import normalize, YES_NO_CHOICES
 
 
