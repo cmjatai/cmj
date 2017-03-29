@@ -1,0 +1,1504 @@
+
+@import "variables";
+
+@mixin placeholder($color, $opacity, $fontsize, $fontweight) {
+  &::-webkit-input-placeholder {
+    color: $color !important;
+    opacity: $opacity;
+    font-size: $fontsize;
+    font-weight: $fontweight;
+  }
+  &::-moz-placeholder {
+    color: $color !important;
+    opacity: $opacity;
+    font-size: $fontsize;
+    font-weight: $fontweight;
+  }
+  &::-moz-placeholder {
+    color: $color !important;
+    opacity: $opacity;
+    font-size: $fontsize;
+    font-weight: $fontweight;
+  }
+  &:-ms-input-placeholder {
+    color: $color !important;
+    opacity: $opacity;
+    font-size: $fontsize;
+    font-weight: $fontweight;
+  }
+}
+
+body, html {
+  background: $color_main_bg url(/static/img/bg.png);
+}
+
+/* Background colors */
+.bg-red,
+.bg-yellow,
+.bg-aqua,
+.bg-blue,
+.bg-light-blue,
+.bg-green,
+.bg-navy,
+.bg-teal,
+.bg-olive,
+.bg-lime,
+.bg-orange,
+.bg-fuchsia,
+.bg-purple,
+.bg-maroon,
+.bg-black {
+  color: #f9f9f9 !important;
+}
+.bg-gray {
+  background-color: #eaeaec !important;
+}
+.bg-black {
+  background-color: #222222 !important;
+}
+.bg-red {
+  background-color: #f56954 !important;
+}
+.bg-yellow {
+  background-color: #f39c12 !important;
+}
+.bg-aqua {
+  background-color: #00c0ee !important;
+}
+.bg-blue {
+  background-color: #0073b7 !important;
+}
+.bg-light-blue {
+  background-color: #3c8dbc !important;
+}
+.bg-green {
+  background-color: #00a65a !important;
+}
+.bg-navy {
+  background-color: #001f3f !important;
+}
+.bg-teal {
+  background-color: #39cccc !important;
+}
+.bg-olive {
+  background-color: #3d9970 !important;
+}
+.bg-lime {
+  background-color: #01ff70 !important;
+}
+.bg-orange {
+  background-color: #ff851b !important;
+}
+.bg-fuchsia {
+  background-color: #f012be !important;
+}
+.bg-purple {
+  background-color: #932ab6 !important;
+}
+.bg-maroon {
+  background-color: #85144b !important;
+}
+/* Text colors */
+.text-red {
+  color: #f56954 !important;
+}
+.text-yellow {
+  color: #f39c12 !important;
+}
+.text-aqua {
+  color: #00c0ef !important;
+}
+.text-blue {
+  color: #0073b7 !important;
+}
+.text-light-blue {
+  color: #3c8dbc !important;
+}
+.text-green {
+  color: #00a65a !important;
+}
+.text-navy {
+  color: #001f3f !important;
+}
+.text-teal {
+  color: #39cccc !important;
+}
+.text-olive {
+  color: #3d9970 !important;
+}
+.text-lime {
+  color: #01ff70 !important;
+}
+.text-orange {
+  color: #ff851b !important;
+}
+.text-fuchsia {
+  color: #f012be !important;
+}
+.text-purple {
+  color: #932ab6 !important;
+}
+.text-maroon {
+  color: #85144b !important;
+}
+
+// drunken-parrot flat ui ########################################
+
+
+.btn-link:hover, .btn-link:focus {
+    color: #23527c;
+    text-decoration: underline;
+    background-color: transparent;
+}
+.has-error .help-block, .has-error .control-label, .has-error .radio, .has-error .checkbox, .has-error .radio-inline, .has-error .checkbox-inline, .has-error.radio label, .has-error.checkbox label, .has-error.radio-inline label, .has-error.checkbox-inline label {
+    color: #a94442;
+    strong {
+      font-weight: normal;
+    }
+}
+.input-icon {
+  [class*="fa-"] {
+      transform: translateY(-50%);
+      margin-top: 0px;
+  }
+  .form-control {
+    text-indent: 40px;
+  }
+}
+
+
+
+
+// #### conserta radios e checkboxes escondidas pelo drunken parrot ############
+// FIXME ajustar após solução definitiva
+//.checkbox input, .radio input {
+//    display: initial;
+//}
+
+
+
+// ajuste bootstrap ########################################
+
+.row-fluid:before, .row-fluid:after {
+    content: " ";
+    display: table;
+}
+.row-fluid:after {
+    clear: both;
+}
+
+.caret {
+  /* Por padrão caret aponta para baixo*/
+  &.top {
+    transform: rotate(180deg);
+  }
+}
+
+// ADJUST NAVBAR ########################################
+.navbar {
+  background: $color_topo_bg url(/static/img/bg.png);
+  border-radius: 0;
+  border-width: 0;
+  margin: 0;
+  min-height: 0;
+  .avatar {
+    border-radius: 50%;
+    height: $menu-height;
+    margin-left: 0.5em;
+  }
+  .navbar-toggle {
+    &:hover {
+      background-color: $hover_background_10p;
+    }
+  }
+  .icon-bar {
+    background-color: white;
+  }
+  a.navbar-brand {
+    font-size: 25px;
+    line-height: 40px;
+    color: white;
+    font-family: "Graduate";
+    padding: 0 0 0 30px;
+    display: block;
+    position: relative;
+    margin: 0 !important;
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: $menu-height + 2 * $padding-menu-top;
+      opacity: 0.35;
+      background: transparent url("/static/img/bg_cmj_topo_menu_box_left.png") no-repeat scroll left top;
+      background-size: auto $navbar-height;
+    }
+  }
+  .navbar-nav {
+    li { /* Para todo item e subitem*/
+      position: relative;
+      a { /* Para todo link*/
+        color: $color_text_inverse;
+        line-height: $menu-height;
+        padding-top: 0;
+        padding-bottom: 0;
+        font-family: "Lato";
+        font-weight: 300;
+        letter-spacing: 0.5px;
+        font-size: 1em;
+        margin: 0px;
+        &:hover, &:focus {
+          background: $hover_background_10pw;
+        }
+      }
+      &.divider {
+        margin: 3px 0;
+        background-color: rgba(255, 255, 255, 0.3);
+      }
+    }
+  }
+  &.navbar-area-trabalho {
+    background:none;
+    ul {
+      position: relative;
+      float: right;
+      margin: $grid-gutter-width * -0.6 $grid-gutter-width / 2 0 0;
+      background: darken($color_main_bg, 15%) url(/static/img/bg.png);
+      border-radius: 0;
+      border: 1px solid white;
+
+      li {
+        border: 0;
+        a {
+          padding: 0 $grid-gutter-width * 0.5 - 1 0 $grid-gutter-width * 0.5;
+          font-size: 1em;
+          line-height: 1.25;
+          color: darken($color_main_bg, 60%)
+        }
+      }
+    }
+  }
+}
+.nav-acessar {
+  display: none;
+}
+// ADJUST topo ########################################
+.masthead {
+  margin-top: $grid-gutter-width;
+  z-index: 10;
+  .slogan {
+    color: $color_topo_bg;
+    float: right;
+  }
+  .nav-tabs {
+    border-bottom: 0px;
+    margin-right: $grid-gutter-width;
+    li {
+      a {
+        border-bottom: 0px;
+        padding: 7px 10px 4px;
+        &:hover {
+          border-bottom: 0px;
+          background: darken($color_main_bg, 4%) url(/static/img/bg.png);
+        }
+      }
+      &.active {
+        a {
+          background: darken($color_main_bg, 4%) url(/static/img/bg.png);
+          border-color: $color_container_border;
+          border-bottom: 1px;
+        }
+      }
+    }
+  }
+}
+.page-header {
+  padding: $grid-gutter-width $grid-gutter-width $grid-gutter-width * 0.75 $grid-gutter-width * 1.5;
+  margin: 0em $grid-gutter-width * -0.5 0 $grid-gutter-width * -0.5 ;
+  color: transparentize($color_topo_bg, 0.3);
+  background: darken($color_main_bg, 3%) url(/static/img/bg.png);
+  border-radius: 5px 5px 0 0;
+  border-bottom: 1px solid $color_container_border;
+  font-weight: normal;
+  font-size: 2em;
+}
+a {
+  color: $color_topo_bg;
+}
+a:focus,
+a:hover {
+  color: darken($color_topo_bg, 20%);
+}
+// ADJUST lateral direita ########################################
+
+
+// ADJUST interno ########################################
+.body-path, .html-path {
+
+}
+
+main {
+  .container, .container-fluid {
+    background-color: $color_container_bg;
+    border: 1px solid $color_container_border;
+    border-radius: 5px;
+    transition: all 1s ease;
+  }
+  .container-fluid {
+    margin: 0;
+  }
+
+
+  .item-action-or-input {
+    border-color: darken($color_main_bg, 10%);
+    &:hover {
+      border-color: darken($color_main_bg, 20%);
+      box-shadow: 0 0 30px  lighten($color_main_bg, 3%);
+    }
+    &:focus, &:active {
+      border-color: darken($color_main_bg, 40%);
+      box-shadow: 0 0 30px  lighten($color_main_bg, 3%);
+        background-color:  darken($color_container_bg, 10%);
+    }
+  }
+  .form-control, .btn-default {
+    @extend .item-action-or-input;
+  }
+  .btn-default {
+    color: darken($color_main_bg, 60%);
+    &:hover {
+      color: darken($color_main_bg, 70%);
+      background-color: $color_main_bg;
+    }
+    &.btn-excluir {
+      color: $btn-danger-bg;
+      &:hover {
+        color: $btn-danger-color;
+        border-color: lighten($btn-danger-bg, 5%);
+        background-color: lighten($btn-danger-bg, 5%);
+      }
+    }
+  }
+}
+
+.control-label {
+  color: $color_text;
+  font-weight: normal;
+}
+
+
+.container-table {
+  padding-left: $grid-gutter-width / 2;
+  padding-right: $grid-gutter-width / 2;
+  overflow: hidden;
+}
+.result-count {
+  position: absolute;
+  color: darken($color_main_bg, 40%);
+  margin-left: 0.5 * $grid-gutter-width;
+  margin-top: -0.55 * $grid-gutter-width;
+  line-height: $grid-gutter-width * 0.75;
+  padding: 4px 0.5 * $grid-gutter-width 2px;
+  border: 1px solid  darken($color_main_bg, 5%);
+  background-color: white;
+
+}
+
+.table {
+  border: 1px solid darken($color_main_bg, 5%);
+  td {
+    ul {
+        margin-bottom: 0px;
+    }
+  }
+}
+
+.table > thead > tr > th, .table > thead > tr > td, .table > tbody > tr > th, .table > tbody > tr > td, .table > tfoot > tr > th, .table > tfoot > tr > td {
+  border-top-color: darken($color_main_bg, 5%);
+  border-bottom-width: 0;
+  font-weight: normal;
+  vertical-align: middle;
+}
+.table-link-ordering > thead > tr > th, .table-link-ordering > tbody > tr > th, .table-link-ordering > tfoot > tr > th {
+    padding: 0;
+    a {
+      display: block;
+      padding: $grid-gutter-width 0.35 * $grid-gutter-width;
+      &:hover {
+        background-color: $hover_background_05p;
+      }
+    }
+
+}
+
+.context-actions{
+  margin: 0 0 $grid-gutter-width;
+  .actions {
+    margin: $grid-gutter-width $grid-gutter-width/2 0;
+    .form-group {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.alert {
+  margin: $grid-gutter-width $grid-gutter-width/2 $grid-gutter-width;
+}
+
+// #### CRUD DETAIL ########################################
+p.control-label {
+  font-weight: bold;
+  margin-bottom: 0;
+}
+
+.form-control-static {
+  font-size: 1.2em;
+  border-bottom: 1px solid darken($color_main_bg, 5%);
+  line-height: 1.5em;
+  padding-bottom: 3px;
+  min-height: 2em;
+  background: transparentize($color_main_bg, 0.4);
+  ul {
+    padding-left: $grid-gutter-width * 1.2;
+  }
+}
+/*
+fieldset {
+  margin: $grid-gutter-width 0 $grid-gutter-width/2;
+}
+*/
+
+
+.legend, legend { // tag legend para crud updates
+  clear:both;
+  display: block;
+  width: 100%;
+  padding: 0;
+  font-size: ($font-size-base * 1.5);
+  line-height: inherit;
+  color: $legend-color;
+  border: 0;
+  border-bottom: 1px solid $legend-border-color;
+  font-weight: normal;
+  font-family: "SourceSansProSemiBold", Helvetica, Arial, sans-serif;
+
+}
+
+// #### CRUD UPDATE ########################################
+
+.avatar-parlamentar {
+  height: 42px;
+  width: 42px;
+}
+
+.cts {  // container trecho search
+  position: fixed;
+  background-color: white;
+  z-index: 1;
+  border: 1px solid #dcdac8;
+  border-radius: 4px;
+  margin-top: -0.4em;
+  visibility: hidden;
+  overflow: hidden;
+
+  .its {  // item trecho search
+    padding: 0.3em 0.7em;
+    cursor: pointer;
+    &:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    &:hover {
+      background-color: #f0f0f0;
+    }
+  }
+}
+.form-group {
+  margin-bottom: $grid-gutter-width;
+  &.disabled {
+    opacity: 0.4;
+  }
+}
+
+.controls-file {
+  padding: 10px;
+  border: 1px solid #d6e1e5;
+  border-radius: 4px;
+
+  label.checkbox-inline {
+    margin: 0px;
+    display: block;
+  }
+}
+
+.controls-radio-checkbox {
+  padding: 0px;
+  border: 1px solid #d6e1e5;
+  border-radius: 4px;
+  min-height: 20px;
+  background-color: white;
+
+  .help-block {
+    margin: $grid-gutter-width / 2;
+    padding: $grid-gutter-width / 2;
+    border: 2px dashed #d6e1e5;
+  }
+
+  label {
+    padding: 5px;
+    .icons {
+      top:  5px;
+      left: 8px;
+    }
+    &.checkbox-inline, &.radio-inline {
+      padding: 8px;
+      padding-left: 36px;
+      .icons {
+        top:  8px;
+        left: 8px;
+      }
+    }
+  }
+  .checkbox, .radio, .checkbox-inline, .radio-inline  {
+      margin: 0;
+    &:hover {
+      background-color: #d6e1e5;
+    }
+  }
+}
+
+.form-group-contatos-search {
+  .checkbox {
+    padding-left: $grid-gutter-width / 4;
+  }
+  label {
+        min-height: 0;
+        margin: 0;
+        padding: 5px;
+        line-height: inherit;
+    span, input {
+      display: none;
+    }
+  }
+}
+
+// ADJUST DRUNKEN PARROT STYLES ########################################
+.panel-primary {
+  border-color: $color_topo_bg;
+  .panel-heading {
+    background-color: $color_topo_bg;
+    color: lighten($color_topo_bg, 20%);
+  }
+  .panel-footer {
+    padding: 0;
+    background-color: $color_topo_bg;
+    border-width: 0;
+    small {
+      color: lighten($color_topo_bg, 20%);
+      text-align: center;
+      display: block;
+    }
+  }
+  .panel-body {
+    padding: 0;
+    .panel-empty {
+      padding: 1em;
+    }
+  }
+}
+.h1,
+h1 {
+  font-size: 35px;
+}
+.h2,
+h2 {
+  font-size: 24px;
+}
+.h3,
+h3 {
+  font-size: 20px;
+}
+.h4,
+h4 {
+  font-size: 16px;
+}
+.h5,
+h5 {
+  font-size: 14px;
+}
+.h6,
+h6 {
+  font-size: 12px;
+}
+.input-lg, .btn-lg {
+  height: 50px;
+}
+
+
+// #### footer ###########################################
+// based on http://getbootstrap.com/examples/sticky-footer
+$footer-height: 30px;
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  margin-bottom: $footer-height + 20px;
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: $footer-height;
+  background: $color_topo_bg none repeat scroll 0 0;
+  color: lighten($color_topo_bg, 20%);
+  text-align: center;
+  font-size: 1em;
+}
+
+// #### pagination ########################################
+.pagination {
+  padding-top: 25px;
+}
+
+// #### ImpressoEnderecamentoRenderer #####################
+
+.ier {
+  background: darken($color_main_bg, 10%) url(/static/img/bg.png);
+  height: 100px;
+  margin: 0 $grid-gutter-width / 2 $grid-gutter-width $grid-gutter-width / 2;
+  overflow: hidden;
+  position: relative;
+  .etiqueta {
+    position: absolute;
+    background: white;
+  }
+}
+
+// #### row-canais ########################################
+.row-canais {
+    & > div {
+      padding-left: 0px;
+      padding-right: 0px;
+    }
+  .icon {
+    position: absolute;
+    top: 0;
+    right: 5px;
+    z-index: 0;
+    font-size: 60px;
+    color: rgba(0, 0, 0, 0.15);
+    transition: all 0.4s ease;
+    width: 100%;
+    height: 100%;
+    text-align: right;
+    background-position: right;
+    background-repeat: no-repeat;
+    opacity: 0.15;
+    &.icon-atividade-legislativa {
+      background-image: url(/static/img/icon_materia_legislativa.png);
+    }
+    &.icon-diario-oficial {
+      background-image: url(/static/img/icon_diario_oficial.png);
+    }
+    &.icon-sessao-plenaria {
+      background-image: url(/static/img/icon_plenarias.png);
+    }
+    &.icon-norma-juridica {
+      background-image: url(/static/img/icon_normas_juridicas.png);
+    }
+    &.icon-licitacao {
+      background-image: url(/static/img/icon_licitacao.png);
+    }
+    &.icon-transparencia {
+      background-image: url(/static/img/icon_transparencia.png);
+    }
+  }
+  .box {
+    position: relative;
+    border: 0px solid #fff;
+    border-radius: 0px;
+    margin-bottom: $grid-gutter-width;
+    height: 75px;
+    &:hover {
+      .icon {
+        transform: scale(1.15);
+        right: 10px;
+      }
+    }
+  }
+  .inner {
+    position: relative;
+    z-index: 1;
+    font-size: 1.8em;
+    font-variant: small-caps;
+    line-height: 1.2em;
+    height: 100%;
+    a {
+      position: relative;
+      display: block;
+      color: inherit;
+      padding: 5px 5px 5px 40px;
+      text-indent: -30px;
+      height: 100%;
+      &:hover {
+        background-color: $hover_background_20p;
+      }
+    }
+  }
+}
+// #### containers ########################################
+main {
+  .container-path {
+    background-color: transparent;
+    border: 0px solid;
+    font-family: "Lato";
+    font-size: 1.7em;
+    font-weight: 300;
+    position: static;
+  }
+}
+
+.container-path {
+  .path-title {
+    text-align: center;
+    margin-top: 1.8em;
+    margin-bottom: 0.8em;
+    font-size: 1.3em;
+    display: block;
+    font-weight: 800;
+    line-height: 1.2em;
+  }
+  .path-description {
+    display: block;
+    font-weight: normal;
+    color: $color_topo_bg;
+    margin-bottom: 0.9em;
+    font-size: 90%;
+    margin-left: 10%;
+    margin-right: 10%;
+    text-align: center;
+    font-style: italic;
+  }
+  .path-data-pub {
+    border-top: 1px solid white;
+    text-align: center;
+    font-size: 0.6em;
+    margin: 0;
+    color: #888;
+    line-height: 1;
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+
+    span {
+      display: inline-block;
+      margin: 0px;
+      line-height: 2em;
+      &:before {
+        margin: 0 -5px;
+        content: '';
+        display: block;
+        height: 3px;
+        background-color: white;
+      }
+    }
+  }
+}
+
+.path-parlamentares {
+  float: right;
+  clear: right;
+  text-align: right;
+  margin: $grid-gutter-width 0 0px 10px;
+
+  &:first-child {
+    margin-top: $grid-gutter-width;
+  }
+
+  &:last-of-type {
+    margin-bottom: $grid-gutter-width;
+  }
+
+  .avatar {
+    padding: 0 0 0 0;
+    display: inline-block;
+    opacity: 0.75;
+    margin-left: 10px;
+    /*border: 2px solid white;
+    padding: 5px;
+    background: $color_main_bg url(/static/img/bg.png);*/
+    img {
+      border: 0px solid transparent;
+      border-radius: 50%;
+      width: 100%;
+    }
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  .linebreak {
+    display: none;
+    &:nth-child(5n) {
+      display: block;
+    }
+  }
+  .avatar1 {
+    width: 250px;
+  }
+  .avatar2 {
+    width: 170px;
+  }
+  .avatar3 {
+    width: 130px;
+  }
+  .avatar4 {
+    width: 90px;
+  }
+  .avatar5 {
+    width: 70px;
+  }
+}
+
+// #### actions path next previous ########################################
+.path-direction {
+  position: fixed;
+  bottom:20%;
+  z-index: 2000;
+  &.scroll_down {
+    & > a {
+      background-color: rgba(#0689c2,.3);
+    }
+  }
+  &.scroll_up {
+    & > a {
+      background-color: rgba(#0689c2,.4);
+    }
+  }
+  & > a {
+    position: relative;
+    background: rgba(#0689c2,.35) url(/static/img/bg.png);
+    color: white;
+    display: inline-block;
+    border-radius: 50%;
+    &:hover {
+      background-color: #0689c2;
+    }
+  }
+  .inner {
+    display: none;
+  }
+  &:hover {
+    min-width: 40%;
+    .inner {
+      z-index: 2000;
+      bottom: 3.1em;
+      display: block;
+      position: absolute;
+      margin: 0 10px;
+      background: darken($color_main_bg, 4%) url(/static/img/bg.png);
+      font-size: 80%;
+      border-radius: 2px;
+      border: 1px solid white;
+      box-shadow: 3px 3px 10px  lighten($hover_background_50p, 3%);
+      .titulo {
+        white-space: nowrap;
+        background: darken($color_main_bg, 8%) url(/static/img/bg.png);
+        padding: 5px 10px;
+        font-weight: 600;
+        margin-bottom: 6px;
+
+        a {
+          color: #443;
+          &:hover {
+            color: black;
+          }
+        }
+      }
+      .descricao {
+        color: #006556;
+        font-size: 90%;
+        font-style: italic;
+        padding: 10px;
+      }
+    }
+  }
+  .path-parlamentares {
+    margin: 0px 5px 5px 5px;
+    .avatar {
+      display: inline-block;
+      margin: 0 0 0 5px;;
+      float:right;
+      width: 60px;
+    }
+  }
+}
+
+.path-next {
+  right: -1.6em;
+  text-align: right;
+  a {
+    padding: 1.2em 1.7em 1.0em 0.5em;
+  }
+  &:hover {
+    .inner {
+      right: 2.2em;
+    }
+  }
+}
+.path-previous {
+  left: -1.6em;
+  text-align: left;
+  a {
+    padding: 1.2em 0.5em 1.0em 1.7em;
+  }
+  &:hover {
+    .inner {
+      left: 2.2em;
+    }
+  }
+}
+
+
+
+@media screen and (max-width: 1199px) {
+  .row-canais {
+    .inner {
+      font-size: 1.5em;
+      font-variant: small-caps;
+      line-height: 1.2em;
+      a {
+        padding: 10px 5px 5px 35px;
+        text-indent: -25px;
+        height: 100%;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 991px) {
+
+  .masthead {
+    margin-top: 10px;
+  }
+  .row-canais {
+    margin-left: 0px;
+    margin-right: 0px;
+    & > div {
+      padding-left: 0px;
+      padding-right: 0px;
+    }
+    .icon {
+      position: absolute;
+      right: 2px;
+      font-size: 50px;
+      background-size: 50%;
+    }
+    .box {
+      margin-bottom: $grid-gutter-width / 2;
+      height: 60px;
+    }
+    .inner {
+      font-size: 1.3em;
+      line-height: 1.2em;
+      height: 100%;
+      a {
+        padding: 5px 5px 5px 27px;
+        text-indent: -20px;
+      }
+    }
+  }
+
+  .container-path {
+    font-size: 1.3em;
+    .path-data-pub {
+      text-align: left;
+      span {
+        margin-left: 20px;
+
+      }
+    }
+    .path-title {
+      font-size: 1.2em;
+    }
+    .path-description {
+      margin-left: 10%;
+      margin-right: 10%;
+    }
+  }
+
+  .path-parlamentares {
+    margin-top: 10px;
+    &:first-child {
+      margin-top: 10px;
+    }
+    .avatar {
+      margin-left: 5px;
+    }
+    .avatar1 {
+      width: 150px;
+    }
+    .avatar2 {
+      width: 120px;
+    }
+    .avatar3 {
+      width: 100px;
+    }
+  }
+
+}
+
+
+
+@media screen and (max-width: 800px) {
+
+  .container {
+    width: auto;
+  }
+
+  .path-parlamentares {
+
+    .avatar1 {
+      width: 120px;
+    }
+  }
+
+  .path-direction {
+    .path-parlamentares {
+      .avatar {
+        width: 50px;
+      }
+    }
+  }
+
+}
+
+@media screen and (max-width: 767px) {
+  $footer-height: 25px;
+  body {
+    margin-bottom: $footer-height + 20px;
+  }
+  .footer {
+    font-size: 0.8em;
+    height: $footer-height;
+  }
+  .navbar {
+    a.navbar-brand {
+      line-height: 49px;
+    }
+    .nav-flex {
+      display: block;
+    }
+    .navbar-nav {
+      & > li {
+        & > .dropdown-menu {
+          border: 0px
+        }
+      }
+      li {
+        a {
+        }
+        & > .dropdown-menu {
+          border: 0px solid rgba(255, 255, 255, 0.3);
+          .menu-left {
+            margin-left: 5px;
+          }
+          .menu-right {
+            margin-right: 5px;
+          }
+        }
+      }
+    }
+  }
+
+  .nav-acessar {
+    display: block;
+  }
+  main {
+    .container, .container-fluid {
+      padding: 0 $grid-gutter-width * 0.25;
+    }
+  }
+  .context-actions{
+    margin: 0.5em;
+    .actions {
+      margin: 0.5em 0;
+    }
+  }
+
+  .masthead {
+    margin-top: 1px;
+  }
+  .row-canais {
+    margin-left: -10px;
+    margin-right: -10px;
+    & > div {
+      padding-left: 0px;
+      padding-right: 0px;
+    }
+    .icon {
+      position: absolute;
+      top: 5px;
+      right: 0;
+      left: 0;
+      width: 100%;
+      height: 28px;
+      display: block;
+      background-size: 32%;
+      background-position: center;
+      opacity: 0.6;
+    }
+    .box {
+      height: auto;
+    }
+    .inner {
+      position: relative;
+      font-size: 1em;
+      font-variant: normal;
+
+      text-align: center;
+      line-height: 1em;
+      a {
+        position: relative;
+        padding: 38px 0px 3px 0px;
+        text-indent: 0;
+      }
+    }
+  }
+
+  .path-next {
+    right: -1.6em;
+    a {
+
+      padding: 1.2em 1.7em 1.0em 0.5em;
+    }
+    &:hover {
+      left: 1.6em;
+      .inner {
+        right: 2.2em;
+        .titulo {
+          white-space: normal;
+        }
+
+      }
+    }
+  }
+  .path-previous {
+    left: -1.6em;
+    a {
+      padding: 1.2em 0.5em 1.0em 1.7em;
+    }
+
+    &:hover {
+      right: 1.6em;
+      .inner {
+        left: 2.2em;
+        .titulo {
+          white-space: normal;
+        }
+      }
+    }
+  }
+
+  .path-parlamentares {
+    margin-right: 5px;
+    .avatar1 {
+      width: 120px;
+    }
+    .avatar3 {
+      width: 120px;
+    }
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .masthead {
+    margin-top: 1px;
+  }
+  .row-canais {
+    .inner {
+      font-size: 0.8em;
+    }
+  }
+
+  main {
+    .container-path {
+      font-size: 1.28em;
+    }
+  }
+  .container-path {
+    .path-title {
+      font-size: 1em;
+    }
+    .path-description {
+      margin-left: 5%;
+      margin-right: 5%;
+    }
+  }
+
+  .path-parlamentares {
+    .avatar1 {
+      width: 100px;
+    }
+    .avatar2 {
+      width: 95px;
+    }
+    .avatar3 {
+      width: 85px;
+    }
+    .avatar4 {
+      width: 75px;
+    }
+    .avatar5 {
+      width: 65px;
+    }
+  }
+
+
+  .path-direction {
+    .path-parlamentares {
+      .avatar {
+        width: 45px;
+      }
+    }
+  }
+
+
+}
+
+@media screen and (max-width: 480px) {
+  .navbar {
+    a.navbar-brand {
+      padding: 0 0 0 10px;
+      font-size: 21px;
+    }
+    &.navbar-area-trabalho {
+      ul {
+        margin: $grid-gutter-width * -0.5 $grid-gutter-width * -0.5 - 1 0 0;
+        li {
+          a {
+            font-size: 0.8em !important;
+            padding-top: 2px;
+          }
+        }
+      }
+    }
+  }
+
+  .nav-acessar {
+    display: block;
+    ul {
+      margin: 0 !important;
+    }
+    a {
+      font-size: 1em !important;
+    }
+  }
+
+  .page-header {
+      padding: 0.4em 0.3em 0.3em;
+      font-size: 1.5em;
+  }
+
+  .row-canais {
+    .icon {
+      top: 0px;
+      height: 25px;
+      background-size: 40%;
+    }
+    .inner {
+      font-size: 0.55em;
+      line-height: 1em;
+      a {
+        padding: 30px 0px 3px 0px;
+      }
+    }
+  }
+  .path-parlamentares {
+    .avatar3, .avatar4 {
+      width: 65px;
+    }
+     .avatar5 {
+      width: 55px;
+    }
+  }
+
+  .path-direction {
+    .path-parlamentares {
+      .avatar {
+        width: 36px;
+      }
+    }
+  }
+
+}
+
+@media screen and (min-width: 768px) {
+
+  .navbar {
+    .container {
+      padding-left: 0;
+      padding-right: 0;
+    }
+    .navbar-collapse {
+      padding: 0px;
+    }
+    .navbar-right {
+      margin: 0px;
+    }
+    .navbar-nav {
+      li { /* Para todo item e subitem*/
+        a { /* Para todo link*/
+          font-size: 1.2em;
+          &:hover, &:focus {
+            background: $hover_background_10pw;
+          }
+        }
+        & > .dropdown-menu { /* para todo submenu */
+          background-color: $color_topo_bg;
+          border: 1px solid rgba(255, 255, 255, 0.3);
+          color: $color_text_inverse;
+          margin: 0;
+          padding: 0;
+          & > li {
+            & > a {
+              padding: 0 1em;
+              line-height: 2.1em;
+            }
+          }
+          .menu-left {
+            top: 0.5em;
+            left: 100%;
+            margin-left: -1em;
+            right: auto;
+          }
+          .menu-right {
+            top:0;
+            right: 100%;
+            margin-right: -5px;
+          }
+        }
+        &:hover {  /* Hover Para todo item e subitem*/
+          & > a,
+          & > a:focus,
+          & > a:hover {
+            background: $hover_background_10pw;
+            color: #fff;
+          }
+          & > .dropdown-menu{
+            display:block;
+          }
+          & > .menu-classes {
+            right: 0;
+            left: 0;
+            position: fixed;
+            top: 126px;
+            bottom: auto;
+          }
+        }
+      }
+      & > li { /* Para os itens raiz de uma navbar*/
+          border: 1px solid transparent;
+          border-bottom-width: 0px;
+        & > .menu-left {
+          left: 0.5em;
+          right: auto;
+        }
+        & > .menu-right {
+          right: 0.5em;
+          left: auto;
+        }
+        & > .dropdown-menu {
+          top: 100%;
+          margin-top: -0.6em;
+          border-radius: 4px;
+        }
+        &:hover {
+          border-color: rgba(#f0efe7, 0.3);
+          border-bottom-color: #f0efe7;
+        }
+      }
+    }
+    &.navbar-menu {  /* para a navbar principal - que se diferencia das demais*/
+      border-color: transparentize($color_topo_bg, 0.2);
+      border-top-width: 1px;
+      .container {
+        padding: 0;
+      }
+      .navbar-nav {
+        & > li {
+          margin-top: 1em;
+          a {
+            line-height: 2em;
+            font-size: 1em;
+            padding: 0 10px;
+          }
+        }
+      }
+    }
+  }
+  .context-actions {
+    .search {
+      max-width: 60%;
+    }
+  }
+}
+
+@media screen and (max-width: 800px) {
+  .navbar {
+    .nav.navbar-nav {
+      li { /* Para todo item e subitem*/
+        a { /* Para todo link*/
+          font-size: 1.02em;
+          padding-left: $grid-gutter-width/3;
+          padding-right: $grid-gutter-width/3;
+        }
+      }
+      & > li { /* Para os itens raiz de uma navbar*/
+        & > .menu-left {
+          left: 0.3em;
+        }
+        & > .menu-right {
+          right: 0.3em;
+        }
+        & > .dropdown-menu {
+          margin-top: -0.4em;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 992px) {
+  .navbar {
+    &.navbar-menu {  /* para a navbar principal - que se diferencia das demais*/
+      .navbar-nav {
+        & > li {
+          a {
+            font-size: 1.2em;
+          }
+        }
+      }
+    }
+  }
+}
+
+
+@media screen and (min-width: 1281px) {
+  .navbar a.navbar-brand {
+    font-size: 35px;
+    padding: 0 0 0 30px;
+  }
+}
+
+@media print {
+  .masthead, .btn-group {
+    display: none;
+  }
+  a[href]:after {
+    content: none !important;
+  }
+}
