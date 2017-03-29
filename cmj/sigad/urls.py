@@ -28,8 +28,8 @@ urlpatterns_sigad = [
     url(r'^documento/pm_import$',
         views.DocumentoPmImportView.as_view(), name='documento_pm_import'),
 
-    # url(r'^(?P<slug>.*)$',
-    #    views.PathView.as_view(), name='path_view'),
+    url(r'^(?P<slug>.*)$',
+        views.PathView.as_view(), name='path_view'),
 ]
 
 urlpatterns = [
