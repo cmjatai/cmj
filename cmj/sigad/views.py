@@ -28,24 +28,26 @@ from django.core.files.temp import NamedTemporaryFile
 from django.core.urlresolvers import reverse_lazy
 from django.db.models.aggregates import Max
 from django.http.response import Http404, HttpResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.utils.dateparse import parse_date
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import View, TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView
-from django.views.generic.list import ListView
+from django.views.generic.list import ListView, MultipleObjectMixin
 from sapl.parlamentares.models import Parlamentar
 
 from cmj.sigad import forms, models
 from cmj.sigad.models import Classe, Revisao, PermissionsUserClasse, Documento,\
     STATUS_PUBLIC, Midia, VersaoDeMidia
+from cmj.utils import make_pagination
 
 
-class PathView(TemplateView):
+class PathView(MultipleObjectMixin, TemplateView):
     template_name = 'base_path.html'
     documento = None
     classe = None
+    paginate_by = 30
 
     def get(self, request, *args, **kwargs):
 
@@ -78,15 +80,12 @@ class PathView(TemplateView):
         return TemplateView.get(self, request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        context = TemplateView.get_context_data(self, **kwargs)
 
         if not self.documento and not self.classe:
-            return context
-
-        context['object'] = self.documento if self.documento else self.classe
-        context['path'] = '-path'
+            return TemplateView.get_context_data(self, **kwargs)
 
         if self.documento:
+            context = TemplateView.get_context_data(self, **kwargs)
             next = Documento.objects.filter(
                 public_date__gte=self.documento.public_date,
                 created__gte=self.documento.created,
@@ -106,24 +105,38 @@ class PathView(TemplateView):
             context['previous'] = previous
 
         elif self.classe:
-            context['object_list'] = self.classe.documento_set.filter(
+            kwargs['object_list'] = self.classe.documento_set.filter(
                 public_date__isnull=False).order_by(
-                '-public_date').all()[:10]
+                '-public_date').all()
+            self.object_list = kwargs['object_list']
+            context = super().get_context_data(**kwargs)
+
+            if self.paginate_by:
+                page_obj = context['page_obj']
+                paginator = context['paginator']
+                context['page_range'] = make_pagination(
+                    page_obj.number, paginator.num_pages)
+
+        context['object'] = self.documento if self.documento else self.classe
+        context['path'] = '-path'
 
         return context
 
     def dispatch(self, request, *args, **kwargs):
         slug = kwargs.get('slug', '')
 
+        slug = slug.split('/')
+        slug = [s for s in slug if s]
+
         if not slug:
+            # FIXME - pagina inicial
+            return redirect('/noticias')
             self.template_name = 'path/pagina_inicial.html'
             return TemplateView.dispatch(self, request, *args, **kwargs)
 
         try:
-            self.classe = Classe.objects.get(slug=slug)
+            self.classe = Classe.objects.get(slug='/'.join(slug))
         except:
-
-            slug = slug.split('/')
 
             try:
                 self.documento = Documento.objects.get(

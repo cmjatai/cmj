@@ -405,6 +405,7 @@ def media_path(instance, filename):
 media_protected = FileSystemStorage(
     location=settings.MEDIA_PROTECTED_ROOT, base_url='DO_NOT_USE')
 
+
 ALINHAMENTO_LEFT = 0
 ALINHAMENTO_JUSTIFY = 1
 ALINHAMENTO_RIGHT = 2
@@ -444,35 +445,43 @@ class VersaoDeMidia(models.Model):
         default=ALINHAMENTO_LEFT)
 
     @cached_property
+    def css_class(self):
+        classes = {ALINHAMENTO_LEFT: 'container-left',
+                   ALINHAMENTO_JUSTIFY: 'container-justify',
+                   ALINHAMENTO_RIGHT: 'container-right', }
+        return classes[self.alinhamento]
+
+    @cached_property
     def simple_name(self):
         return self.file.name.split('/')[-1]
 
-    def thumbnail(self, width=100):
+    def thumbnail(self, width='thumb'):
         sizes = {
-            'verysmall': (24, 24),
-            'small': (48, 48),
-            'thumb': (96, 96),
-            'medium': (256, 256),
-            'large': (512, 512),
-            'verylarge': (768, 768),
+            '24': (24, 24),
+            '48': (48, 48),
+            '96': (96, 96),
+            '128': (128, 128),
+            '256': (256, 256),
+            '512': (512, 512),
+            '768': (768, 768),
         }
-        try:
+        """try:
             w = int(width)
             sizes[str(width)] = w, w
             width = str(width)
         except:
-            pass
+            pass"""
 
-        nf = '%s%s' % (media_protected.location, self.file.name[1:])
+        if width not in sizes:
+            width = '96'
+
+        nf = '%s/%s' % (media_protected.location, self.file.name)
         nft = nf.split('/')
         nft = '%s/%s.%s' % ('/'.join(nft[:-1]), width, nft[-1])
 
         if os.path.exists(nft):
             file = io.open(nft, 'rb')
             return file
-
-        if width not in sizes:
-            width = 'thumb'
 
         im = Image.open(nf)
         if sizes[width][0] >= im.width:

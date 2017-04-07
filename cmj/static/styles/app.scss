@@ -513,6 +513,7 @@ fieldset {
     }
   }
 }
+
 .form-group {
   margin-bottom: $grid-gutter-width;
   &.disabled {
@@ -806,6 +807,19 @@ main {
       }
     }
   }
+  .path-imagem {
+    padding: 0.5em 0.5em 0.4em 0;
+    img {
+      width: 100%;
+    }
+    &.container-left {
+      width: 45%;
+      float: left;
+      &.img128{
+        width: 128px;
+      }
+    }
+  }
 }
 
 .path-parlamentares {
@@ -863,6 +877,50 @@ main {
   }
 }
 
+.path-item-list {
+  margin-bottom: $grid-gutter-width;
+  .inner {
+    z-index: 2000;
+    display: block;
+    margin: 0;
+    background: darken($color_main_bg, 4%) url(/static/img/bg.png);
+    font-size: 80%;
+    border-radius: 2px;
+    border: 1px solid white;
+    .titulo {
+      background: darken($color_main_bg, 5%) url(/static/img/bg.png);
+      padding: 5px 10px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      a {
+        color: #443;
+        &:hover {
+          color: black;
+        }
+      }
+    }
+    .descricao {
+      color: #006556;
+      font-size: 90%;
+      font-style: italic;
+      padding: 10px;
+    }
+  }
+  .path-parlamentares {
+    margin: 0px 5px 5px 5px;
+    .avatar {
+      display: inline-block;
+      margin: 0 0 0 5px;;
+      float:right;
+      width: 60px;
+    }
+  }
+  .path-imagem {
+    padding-left: 0.5em;
+  }
+}
+
+
 // #### actions path next previous ########################################
 .path-direction {
   position: fixed;
@@ -887,9 +945,6 @@ main {
     &:hover {
       background-color: #0689c2;
     }
-  }
-  .inner {
-    display: none;
   }
   &:hover {
     min-width: 40%;
@@ -935,6 +990,9 @@ main {
       width: 60px;
     }
   }
+  .path-imagem {
+    padding-left: 0.5em;
+  }
 }
 
 .path-next {
@@ -942,6 +1000,9 @@ main {
   text-align: right;
   a {
     padding: 1.2em 1.7em 1.0em 0.5em;
+  }
+  .inner {
+    display: none;
   }
   &:hover {
     .inner {
@@ -954,6 +1015,9 @@ main {
   text-align: left;
   a {
     padding: 1.2em 0.5em 1.0em 1.7em;
+  }
+  .inner {
+    display: none;
   }
   &:hover {
     .inner {
@@ -1210,6 +1274,12 @@ main {
     }
     .avatar3 {
       width: 120px;
+    }
+  }
+
+  .container-path {
+    .path-imagem {
+      padding: 0.2em;
     }
   }
 }

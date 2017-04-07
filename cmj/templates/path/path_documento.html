@@ -13,6 +13,13 @@
             {{next.titulo}}
           </a>
         </div>
+
+          {% if next.childs.view_childs.first.tipo == next.childs.view_childs.first.TPD_IMAGE %}
+            <div class="path-imagem {{next.childs.view_childs.first.midia.last.css_class}} img128">
+              <img src="/{{next.childs.view_childs.first.absolute_slug}}.128" alt="" />
+            </div>
+          {% endif %}
+
             {% with next.parlamentares.count as count_parlamentares %}
               {% for parlamentar in next.parlamentares.all %}
 
@@ -56,6 +63,14 @@
             {{previous.titulo}}
           </a>
         </div>
+
+          {% if previous.childs.view_childs.first.tipo == previous.childs.view_childs.first.TPD_IMAGE %}
+            <div class="path-imagem {{previous.childs.view_childs.first.midia.last.css_class}} img128">
+              <img src="/{{previous.childs.view_childs.first.absolute_slug}}.128" alt="" />
+            </div>
+          {% endif %}
+
+
             {% with previous.parlamentares.count as count_parlamentares %}
               {% for parlamentar in previous.parlamentares.all %}
 
@@ -118,20 +133,12 @@
 {% endwith %}
 
 
-
-
-
-
   {{block.super}}
 {% endblock %}
 
 {% block base_content %}
 
   {% comment %}
-    {% if url_imagem_capa %}
-      <img style="width: 100%" src="http://www.camarajatai.go.gov.br{{url_imagem_capa}}" alt="" />
-      <br><br>
-    {% endif %}
 {{object.id}}
   {% endcomment %}
 
@@ -139,7 +146,9 @@
     {% if child.tipo == child.TPD_TEXTO %}
       {{child.texto|safe}}
     {%elif child.tipo == child.TPD_IMAGE %}
-      <img style="width: 100%" src="/{{child.absolute_slug}}" alt="" />
+      <div class="path-imagem {{child.midia.last.css_class}}">
+        <img src="/{{child.absolute_slug}}.768" alt="" />
+      </div>
 
     {% endif %}
 

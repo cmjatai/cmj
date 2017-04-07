@@ -1,22 +1,23 @@
 """
 Django settings for CMJ project.
 """
+"""@property    gerar nomes para urls
+def pretty_name(self):
+    return "{0}.{1}".format(slugify(self.title),
+            get_extension(self.file.name))"""
+
+import logging
+import sys
+
 from decouple import AutoConfig
 from dj_database_url import parse as db_url
 from django.utils.translation import ugettext_lazy as _
 from easy_thumbnails.conf import Settings as thumbnail_settings
 from sapl import settings as sapl_settings
-from unipath import Path
-
-import logging
 from sapl.temp_suppress_crispy_form_warnings import \
     SUPRESS_CRISPY_FORM_WARNINGS_LOGGING
-import sys
+from unipath import Path
 
-"""@property    gerar nomes para urls
-def pretty_name(self):
-    return "{0}.{1}".format(slugify(self.title),
-            get_extension(self.file.name))"""
 
 config = AutoConfig()
 
@@ -76,8 +77,11 @@ INSTALLED_APPS = (
     'rest_framework',
     'reversion',
 
-    # 'haystack',
-    # "elasticstack",
+    'haystack',
+    'whoosh',
+
+
+
     'taggit',
     'webpack_loader',
 )
@@ -304,43 +308,18 @@ EMAIL_PORT = config('EMAIL_PORT', cast=int)
 MAX_DOC_UPLOAD_SIZE = 5 * 1024 * 1024  # 5MB
 MAX_IMAGE_UPLOAD_SIZE = 2 * 1024 * 1024  # 2MB
 
-# django-haystack: http://django-haystack.readthedocs.org/
-"""HAYSTACK_CONNECTIONS = {
-    'default': {
-        'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
-        'URL': 'http://127.0.0.1:9200/',
-        'INDEX_NAME': 'haystack',
-    },
-}"""
-
-"""HAYSTACK_CONNECTIONS = {
+HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
-        'PATH': PROJECT_DIR.child('whoosh_index'),
+        'PATH': PROJECT_DIR.child('whoosh'),
     },
 }
-"""
-
-"""HAYSTACK_CONNECTIONS = {
-    'default': {
-        'ENGINE': 'elasticstack.backends.ConfigurableElasticSearchEngine',
-        'URL': 'http://127.0.0.1:9200/',
-        'INDEX_NAME': 'haystack',
-    },
-}
-"""
-
-#HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
-#ELASTICSEARCH_DEFAULT_ANALYZER = "snowball"
-
-
 
 
 # FIXME update cripy-forms and remove this
 # hack to suppress many annoying warnings from crispy_forms
 # see sapl.temp_suppress_crispy_form_warnings
 LOGGING = SUPRESS_CRISPY_FORM_WARNINGS_LOGGING
-
 
 
 LOGGING_CONSOLE = config('LOGGING_CONSOLE', default=False, cast=bool)
