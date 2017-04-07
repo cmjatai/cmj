@@ -123,6 +123,7 @@
                     </li>
                   {% endif %}
                   {% endcomment %}
+                         <li class="nav__sub-item"><a class="dropdown-toggle" href="/noticias">{% trans "Notícias" %}</a></li>
                         {% if perms.core.menu_contatos %}
                           <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'cmj.cerimonial:contato_list' %}">{% trans "Contatos" %}</a></li>
                         {% endif %}
