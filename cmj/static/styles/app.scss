@@ -913,7 +913,7 @@ main {
         }
       }
     }
-    
+
     .descricao {
       color: #006556;
       font-size: 90%;
@@ -927,7 +927,7 @@ main {
       color: #888;
       display: block;
       text-align: center;
-      padding-top: 5px;
+      padding-top: 0px;
     }
   }
 
@@ -959,6 +959,9 @@ main {
       padding: 0 0 0 $grid-gutter-width / 2;
       width: 20%;
       float: right;
+    }
+    .data-pub {
+      padding-top: 5px;
     }
   }
 }
