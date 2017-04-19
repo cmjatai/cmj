@@ -9,50 +9,59 @@
 
 <div class="row">
   {% for documento in object_list %}
-    <div class="path-item-list col-lg-8 col-lg-offset-2">
+    <div class="path-item-list col-lg-10 col-lg-offset-1">
       <div class="inner">
+
+        {% with documento.parlamentares.count as count_parlamentares %}
+          {% for parlamentar in documento.parlamentares.all %}
+
+            {% if forloop.counter0 > 0 and forloop.counter0|organize_direction_avatars:count_parlamentares  %}
+              </div>
+            {% endif %}
+
+            {% if forloop.counter0|organize_direction_avatars:count_parlamentares %}
+              <div class="path-parlamentares">
+            {% endif %}
+
+              {% if parlamentar.fotografia %}
+                <a class="avatar" href="#">
+                  <img src="{{ parlamentar.fotografia.url }}">
+                </a>
+              {% endif %}
+
+            {% if not forloop.last %}
+              <span class="linebreak"></span>
+            {% else %}
+              </div>
+            {% endif %}
+          {% endfor %}
+        {% endwith %}
+
         <div class="titulo">
           <a href="{% url 'cmj.sigad:path_view' documento.absolute_slug %}">
             {{documento.titulo}}
           </a>
         </div>
 
-          {% if documento.childs.view_childs.first.tipo == documento.childs.view_childs.first.TPD_IMAGE %}
-            <div class="path-imagem {{documento.childs.view_childs.first.midia.last.css_class}}">
-              <img src="/{{documento.childs.view_childs.first.absolute_slug}}.512" alt="" />
-            </div>
-          {% endif %}
 
-            {% with documento.parlamentares.count as count_parlamentares %}
-              {% for parlamentar in documento.parlamentares.all %}
-
-                {% if forloop.counter0 > 0 and forloop.counter0|organize_direction_avatars:count_parlamentares  %}
-                  </div>
-                {% endif %}
-
-                {% if forloop.counter0|organize_direction_avatars:count_parlamentares %}
-                  <div class="path-parlamentares">
-                {% endif %}
-
-                  {% if parlamentar.fotografia %}
-                    <a class="avatar" href="#">
-                      <img src="{{ parlamentar.fotografia.url }}">
-                    </a>
-                  {% endif %}
-
-                {% if not forloop.last %}
-                  <span class="linebreak"></span>
-                {% else %}
-                  </div>
-                {% endif %}
-
-              {% endfor %}
-            {% endwith %}
+        {% if documento.childs.view_childs.first.tipo == documento.childs.view_childs.first.TPD_IMAGE %}
+          <div class="path-imagem {{documento.childs.view_childs.first.midia.last.css_class}}">
+            <img src="/{{documento.childs.view_childs.first.absolute_slug}}.512" alt="" />
+        <span class="data-pub">
+          {% comment %}
+            FIXME tratar histórico de revisão e publicação/privacidade
+          {% endcomment %}
+          <i class="fa fa-clock-o" aria-hidden="true"></i>
+          {{documento.public_date|date:"d"}} {% trans "de" %} {{documento.public_date|date:"F"}} {% trans "de" %} {{documento.public_date|date:"Y"}}
+        </span>
+          </div>
+        {% endif %}
 
         <div class="descricao">
           {{documento.descricao}}
         </div>
         <div class="clearfix"></div>
+
       </div>
     </div>
   {% endfor %}

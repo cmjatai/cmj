@@ -815,9 +815,22 @@ main {
     &.container-left {
       width: 45%;
       float: left;
-      &.img128{
+      &.img128 {
         width: 128px;
       }
+    }
+    &.container-right {
+      width: 45%;
+      float: right;
+      &.img128 {
+        width: 128px;
+      }
+    }
+  }
+  .pagination {
+    a {
+      font-size: 0.7em;
+      padding: 5px 15px;
     }
   }
 }
@@ -883,40 +896,70 @@ main {
     z-index: 2000;
     display: block;
     margin: 0;
-    background: darken($color_main_bg, 4%) url(/static/img/bg.png);
+    /*background: lighten($color_main_bg, 1%) url(/static/img/bg.png);*/
     font-size: 80%;
-    border-radius: 2px;
-    border: 1px solid white;
+    /*border-radius: 2px;*/
+    border-top: 1px solid white;
+
     .titulo {
-      background: darken($color_main_bg, 5%) url(/static/img/bg.png);
-      padding: 5px 10px;
+      /*background: lighten($color_main_bg, 1%) url(/static/img/bg.png);*/
+      padding: $grid-gutter-width/3 0 $grid-gutter-width/4 0;
       font-weight: 600;
-      margin-bottom: 6px;
       a {
         color: #443;
         &:hover {
           color: black;
+          text-decoration: underline;
         }
       }
     }
+    
     .descricao {
       color: #006556;
       font-size: 90%;
       font-style: italic;
-      padding: 10px;
+      padding: 0;
+      padding-bottom: $grid-gutter-width;
+    }
+
+    .data-pub {
+      font-size: 0.6em;
+      color: #888;
+      display: block;
+      text-align: center;
+      padding-top: 5px;
     }
   }
+
+  &:first-child {
+    .inner {
+      border-top: 0px solid white;
+    }
+  }
+
   .path-parlamentares {
-    margin: 0px 5px 5px 5px;
+    margin: 0px 0px 5px 5px;
+    &:first-child {
+      margin-top: 10px;
+    }
     .avatar {
       display: inline-block;
-      margin: 0 0 0 5px;;
+      margin: 0 0 0 5px;
       float:right;
       width: 60px;
     }
   }
+
   .path-imagem {
-    padding-left: 0.5em;
+    &.container-left {
+      padding: 0 $grid-gutter-width / 2 0 0;
+      width: 20%;
+    }
+    &.container-right {
+      padding: 0 0 0 $grid-gutter-width / 2;
+      width: 20%;
+      float: right;
+    }
   }
 }
 

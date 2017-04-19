@@ -422,7 +422,8 @@ class VersaoDeMidia(models.Model):
         verbose_name=_('created'),
         editable=False, auto_now_add=True)
     owner = models.ForeignKey(
-        get_settings_auth_user_model(), verbose_name=_('owner'), related_name='+')
+        get_settings_auth_user_model(),
+        verbose_name=_('owner'), related_name='+')
 
     file = models.FileField(
         blank=True,
