@@ -924,11 +924,14 @@ main {
     }
 
     .data-pub {
-      font-size: 0.6em;
+      font-size: 0.55em;
       color: #888;
       display: block;
       text-align: center;
       padding-top: 0px;
+      position: absolute;
+      top:1px;
+      right:$grid-gutter-width / 1.5;
     }
   }
 
