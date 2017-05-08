@@ -896,14 +896,15 @@ main {
     z-index: 2000;
     display: block;
     margin: 0;
-    /*background: lighten($color_main_bg, 1%) url(/static/img/bg.png);*/
+    background: lighten($color_main_bg, 5%) url(/static/img/bg.png);
     font-size: 80%;
     /*border-radius: 2px;*/
     border-top: 1px solid white;
+    padding: $grid-gutter-width/4 $grid-gutter-width/2 0;
 
     .titulo {
       /*background: lighten($color_main_bg, 1%) url(/static/img/bg.png);*/
-      padding: $grid-gutter-width/3 0 $grid-gutter-width/4 0;
+      padding: 0 0 $grid-gutter-width/4 0;
       font-weight: 600;
       a {
         color: #443;
@@ -933,7 +934,7 @@ main {
 
   &:first-child {
     .inner {
-      border-top: 0px solid white;
+      border-top: 1px solid white;
     }
   }
 
@@ -952,7 +953,7 @@ main {
 
   .path-imagem {
     &.container-left {
-      padding: 0 $grid-gutter-width / 2 0 0;
+      padding: 0 $grid-gutter-width / 2 $grid-gutter-width / 2  0;
       width: 20%;
     }
     &.container-right {

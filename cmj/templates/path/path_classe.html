@@ -37,6 +37,13 @@
           {% endfor %}
         {% endwith %}
 
+        <span class="data-pub">
+          {% comment %}
+            FIXME tratar histórico de revisão e publicação/privacidade
+          {% endcomment %}
+          <i class="fa fa-clock-o" aria-hidden="true"></i>
+          {{documento.public_date|date:"d"}} {% trans "de" %} {{documento.public_date|date:"F"}} {% trans "de" %} {{documento.public_date|date:"Y"}}
+        </span>
         <div class="titulo">
           <a href="{% url 'cmj.sigad:path_view' documento.absolute_slug %}">
             {{documento.titulo}}
@@ -47,27 +54,16 @@
         {% if documento.childs.view_childs.first.tipo == documento.childs.view_childs.first.TPD_IMAGE %}
           <div class="path-imagem {{documento.childs.view_childs.first.midia.last.css_class}}">
             <img src="/{{documento.childs.view_childs.first.absolute_slug}}.512" alt="" />
-            <span class="data-pub">
-              {% comment %}
-                FIXME tratar histórico de revisão e publicação/privacidade
-              {% endcomment %}
-              <i class="fa fa-clock-o" aria-hidden="true"></i>
-              {{documento.public_date|date:"d"}} {% trans "de" %} {{documento.public_date|date:"F"}} {% trans "de" %} {{documento.public_date|date:"Y"}}
-            </span>
+
           </div>
         {% else %}
-          <span class="data-pub">
-            {% comment %}
-              FIXME tratar histórico de revisão e publicação/privacidade
-            {% endcomment %}
-            <i class="fa fa-clock-o" aria-hidden="true"></i>
-            {{documento.public_date|date:"d"}} {% trans "de" %} {{documento.public_date|date:"F"}} {% trans "de" %} {{documento.public_date|date:"Y"}}
-          </span>
         {% endif %}
 
-        <div class="descricao">
-          {{documento.descricao}}
-        </div>
+        {% if documento.descricao %}
+          <div class="descricao">
+            {{documento.descricao}}
+          </div>
+        {% endif %}
         <div class="clearfix"></div>
 
       </div>

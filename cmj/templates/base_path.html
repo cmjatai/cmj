@@ -66,27 +66,30 @@
 {% block base_header %}
   <div style="position:relative;">
 
-    <div class="path-data-pub">
-      {% block historico_publicacao %}
-        <span>
-          {% comment %}
-            FIXME tratar histórico de revisão e publicação/privacidade
-          {% endcomment %}
-          <i class="fa fa-clock-o" aria-hidden="true"></i>
-          {% trans "Publicado em" %} {{object.public_date|date:"d"}} {% trans "de" %} {{object.public_date|date:"F"}} {% trans "de" %} {{object.public_date|date:"Y"}}
-        </span>
-      {% endblock %}
-    </div>
+    {% if object.descricao %}
+      <div class="path-data-pub">
+        {% block historico_publicacao %}
+          <span>
+            {% comment %}
+              FIXME tratar histórico de revisão e publicação/privacidade
+            {% endcomment %}
+            <i class="fa fa-clock-o" aria-hidden="true"></i>
+            {% trans "Publicado em" %} {{object.public_date|date:"d"}} {% trans "de" %} {{object.public_date|date:"F"}} {% trans "de" %} {{object.public_date|date:"Y"}}
+          </span>
+        {% endblock %}
+      </div>
+    {% endif %}
   </div>
   {% block title %}
     <span class="path-title">
         {{ object.titulo|safe|linebreaksbr }}
     </span>
   {% endblock %}
-
-  <span class="path-description">
-    {% block descricao %}
-      {{object.descricao}}
-    {% endblock %}
-  </span>
+  {% if object.descricao %}
+    <span class="path-description">
+      {% block descricao %}
+        {{object.descricao}}
+      {% endblock %}
+    </span>
+  {% endif %}
 {% endblock %}
