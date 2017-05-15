@@ -900,6 +900,7 @@ main {
     font-size: 80%;
     /*border-radius: 2px;*/
     border-top: 1px solid white;
+    border-bottom: 1px solid #fafafa;
     padding: $grid-gutter-width/4 $grid-gutter-width/2 0;
 
     .titulo {
@@ -925,7 +926,7 @@ main {
 
     .data-pub {
       font-size: 0.55em;
-      color: #888;
+      color: #aaa;
       display: block;
       text-align: center;
       padding-top: 0px;
@@ -944,7 +945,7 @@ main {
   .path-parlamentares {
     margin: 0px 0px 5px 5px;
     &:first-child {
-      margin-top: 10px;
+      margin-top:$grid-gutter-width / 1.5;
     }
     .avatar {
       display: inline-block;

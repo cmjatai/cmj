@@ -22,6 +22,7 @@ from datetime import datetime, timedelta
 from operator import attrgetter
 
 from braces.views import FormMessagesMixin
+from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
@@ -569,8 +570,8 @@ class DocumentoPmImportView(TemplateView):
                     texto.save()
 
         elif func == '1':
-            # liga as notícias aos parlamentares
 
+            # liga as notícias aos parlamentares
             url_parts = (
                 (7, 1, 1, 'Adilson-Carvalho'),
                 (165, 1, 1, 'carvalhinho/noticias/'),
@@ -611,12 +612,9 @@ class DocumentoPmImportView(TemplateView):
                 (0, 1, 6, '/portal/tv/a-voz-da-comunidade/'),
 
                 (0, 1, 9, '/portal/radio/momento-camara'),
-
-
             )
 
             for u in url_parts:
-
                 docs = Documento.objects.filter(
                     classe=u[1],
                     # parlamentares__isnull=True,
@@ -654,6 +652,38 @@ class DocumentoPmImportView(TemplateView):
                 for child in doc.childs.view_childs():
                     child.classe_id = doc.classe_id
                     child.save()
+
+        elif func == '2':
+
+            import os
+
+            http = urllib3.PoolManager()
+
+            for p in Parlamentar.objects.all():
+                p.fotografia.delete()
+
+                mypath = '%s/sapl/public/parlamentar/%s' % (
+                    settings.MEDIA_ROOT, p.pk)
+
+                print(p.nome_parlamentar)
+
+                if os.path.exists(mypath):
+                    onlyfiles = [
+                        f for f in os.listdir(mypath)
+                        if os.path.isfile(os.path.join(mypath, f))]
+
+                    for f in onlyfiles:
+                        os.remove(mypath + '/' + f)
+
+                file = http.request(
+                    'GET', ('sapl.camarajatai.go.gov.br/sapl/'
+                            'sapl_documentos/parlamentar/fotos/'
+                            '%s_foto_parlamentar') % (p.pk, ))
+
+                img_temp = NamedTemporaryFile(delete=True)
+                img_temp.write(file.data)
+                img_temp.flush()
+                p.fotografia.save("image.jpg", File(img_temp), save=True)
 
         return TemplateView.get(self, request, *args, **kwargs)
 
