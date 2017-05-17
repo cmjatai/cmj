@@ -1,6 +1,6 @@
 from django.conf.urls import include, url
 
-from cmj.sigad import views
+from cmj.sigad import views, imports
 
 from .apps import AppConfig
 
@@ -26,7 +26,7 @@ urlpatterns_sigad = [
         views.ClasseListView.as_view(), name='subclasse_list'),
 
     url(r'^documento/pm_import$',
-        views.DocumentoPmImportView.as_view(), name='documento_pm_import'),
+        imports.DocumentoPmImportView.as_view(), name='documento_pm_import'),
 
     url(r'^(?P<slug>[^.]*)\.?(?P<resize>\w+)?$',
         views.PathView.as_view(), name='path_view'),
