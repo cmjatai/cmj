@@ -88,10 +88,12 @@ collected_static
 bower
 bower_components
 media
+media_protected
 whoosh_index/
 .ipynb_checkpoints
 *.ipynb
 scripts/
+run/
 webpack-stats.json
 
 # Dependency directories
