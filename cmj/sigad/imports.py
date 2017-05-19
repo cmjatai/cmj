@@ -1,5 +1,5 @@
 from datetime import timedelta
-import datetime
+from datetime import datetime
 
 from django.conf import settings
 from django.core.files.base import File

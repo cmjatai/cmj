@@ -235,21 +235,6 @@ LOCALE_PATHS = (
     BASE_DIR.child('locale'),
 )
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.8/howto/static-files/
-STATIC_URL = '/static/'
-STATIC_ROOT = PROJECT_DIR.child("collected_static")
-STATICFILES_DIRS = (
-    BASE_DIR.child("static"),
-    sapl_settings.STATICFILES_DIRS[0],
-    PROJECT_DIR.child('assets'))
-
-STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'djangobower.finders.BowerFinder',
-    'sass_processor.finders.CssFinder',
-)
 
 WEBPACK_LOADER = {
     'DEFAULT': {
@@ -281,9 +266,26 @@ BOWER_INSTALLED_APPS = (
     'https://github.com/cmjatai/drunken-parrot-flat-ui.git',
 )
 
+STATIC_URL = '/static/'
+STATIC_ROOT = PROJECT_DIR.child("collected_static")
+STATICFILES_DIRS = (
+    BASE_DIR.child("static"),
+    sapl_settings.STATICFILES_DIRS[0],
+    PROJECT_DIR.child('assets')
+)
+
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'djangobower.finders.BowerFinder',
+    'sass_processor.finders.CssFinder',
+)
+
+
+
 # Additional search paths for SASS files when using the @import statement
 SASS_PROCESSOR_INCLUDE_DIRS = (
-    BOWER_COMPONENTS_ROOT.child(
+   BOWER_COMPONENTS_ROOT.child(
         'bower_components', 'bootstrap-sass', 'assets', 'stylesheets'),
 )
 

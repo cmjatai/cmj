@@ -30,5 +30,7 @@ $container-desktop:            (1040px + $grid-gutter-width) !default;
 $screen-lg:                    1400px !default;
 $container-large-desktop:      (1340px + $grid-gutter-width) !default;*/
 
+$icon-font-path: "../bootstrap/fonts/" !default;
+
 // variaveis bootstrap ########################################
 @import "bootstrap/variables";
