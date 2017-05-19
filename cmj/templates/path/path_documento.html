@@ -105,7 +105,6 @@
 {% endblock %}
 
 {% block base_header %}
-
 {% with object.parlamentares.count as count_parlamentares %}
   {% for parlamentar in object.parlamentares.all %}
 
@@ -132,14 +131,16 @@
   {% endfor %}
 {% endwith %}
 
-
   {{block.super}}
 {% endblock %}
 
 {% block base_content %}
+  {% if perms.sigad.change_documento %}
+    <a href="{% url 'cmj.sigad:documento_edit' object.id %}">{% trans "[Editar]" %}</a>
+  {% endif %}
 
   {% comment %}
-{{object.id}}
+  {{object.id}}
   {% endcomment %}
 
   {% for child in object.childs.view_childs %}

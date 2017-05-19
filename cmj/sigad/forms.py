@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from sapl.crispy_layout_mixin import to_row, SaplFormLayout
 
 from cmj.sigad import models
-from cmj.sigad.models import Classe
+from cmj.sigad.models import Classe, Documento
 
 
 class UpLoadImportFileForm(forms.Form):
@@ -78,56 +78,12 @@ class ClasseForm(ModelForm):
         super(ClasseForm, self).__init__(*args, **kwargs)
 
 
-"""
 class DocumentoForm(ModelForm):
-
-    titulo = forms.CharField(label=_('Título'))
-    descricao = forms.CharField(
-        label=_('Descrição'),
-        widget=forms.Textarea,
-        required=False)
-    texto = forms.CharField(
-        label='Texto',
-        widget=forms.Textarea,
-        required=False)
-
-    privacidade = forms.ChoiceField(
-        required=True,
-        label=_('Privacidade'),
-        choices=models.VISIBILIDADE_STATUS,
-        widget=forms.Select())
-
-    data = forms.DateField(
-        label=_('Data do Documento'),
-        input_formats=['%d/%m/%Y'],
-        required=True,
-        widget=forms.DateInput(
-            format='%d/%m/%Y'),
-        error_messages=error_messages
-    )
-    medias_file = forms.FileField(
-        required=False,
-        label=_('Mídias deste Documento')
-    )
-
-    parent = forms.ModelChoiceField(queryset=Documento.objects.all(),
-                                    widget=forms.HiddenInput(),
-                                    required=False)
-
-    pk = forms.IntegerField(widget=forms.HiddenInput(),
-                            required=False)
 
     class Meta:
         model = Documento
         fields = ['titulo',
-                  'data_documento',
-                  'data_publicacao',
-                  'hora_publicacao',
                   'descricao',
-                  'texto',
-                  'privacidade',
-                  'parent',
-                  'pk'
                   ]
 
     def __init__(self, *args, **kwargs):
@@ -136,21 +92,10 @@ class DocumentoForm(ModelForm):
         self.helper.layout = SaplFormLayout(
             to_row([
                 ('titulo', 6),
-                ('data', 3),
-                ('privacidade', 3),
             ]),
             to_row([
                 ('descricao', 12)
             ]),
-            to_row([
-                ('texto', 12),
-            ]),
-            to_row([
-                ('medias_file', 12),
-            ])
         )
 
         super(DocumentoForm, self).__init__(*args, **kwargs)
-        self.fields['medias_file'].widget.attrs.update(
-            {'multiple': 'multiple'})
-"""

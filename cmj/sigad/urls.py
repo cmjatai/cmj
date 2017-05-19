@@ -28,12 +28,17 @@ urlpatterns_sigad = [
     url(r'^documento/pm_import$',
         imports.DocumentoPmImportView.as_view(), name='documento_pm_import'),
 
-    url(r'^(?P<slug>[^.]*)\.?(?P<resize>\w+)?$',
-        views.PathView.as_view(), name='path_view'),
+    url(r'^documento/(?P<pk>[0-9]+)/edit$',
+        views.DocumentoUpdateView.as_view(), name='documento_edit'),
+
+
 ]
 
 urlpatterns = [
-    url(r'', include(urlpatterns_sigad))
+    url(r'', include(urlpatterns_sigad)),
+
+    url(r'^(?P<slug>[^.]*)\.?(?P<resize>\w+)?$',
+        views.PathView.as_view(), name='path_view'),
 
 ]
 """

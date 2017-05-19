@@ -1,5 +1,5 @@
-from datetime import timedelta
 from datetime import datetime
+from datetime import timedelta
 
 from django.conf import settings
 from django.core.files.base import File
@@ -149,7 +149,7 @@ class DocumentoPmImportView(TemplateView):
         elif func == 'imagens':
 
             docs = Documento.objects.exclude(
-                old_json__contains='"image": ""')
+                old_json__icontains='"image": ""')
             print(docs.count())
             print(docs[100].slug)
 

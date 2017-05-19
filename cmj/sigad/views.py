@@ -39,6 +39,7 @@ from django.views.generic.list import ListView, MultipleObjectMixin
 from sapl.parlamentares.models import Parlamentar
 
 from cmj.sigad import forms, models
+from cmj.sigad.forms import DocumentoForm
 from cmj.sigad.models import Classe, Revisao, PermissionsUserClasse, Documento,\
     STATUS_PUBLIC, Midia, VersaoDeMidia
 from cmj.utils import make_pagination
@@ -87,6 +88,7 @@ class PathView(MultipleObjectMixin, TemplateView):
 
         if self.documento:
             context = TemplateView.get_context_data(self, **kwargs)
+
             next = Documento.objects.filter(
                 public_date__gte=self.documento.public_date,
                 created__gte=self.documento.created,
@@ -632,3 +634,15 @@ class DocumentoPermissionRequiredMixin(PermissionRequiredMixin):
 class DocumentoDetailView(DocumentoPermissionRequiredMixin, DetailView):
     permission_required = ('sigad.view_documento')
     model = Documento
+
+
+class DocumentoUpdateView(DocumentoPermissionRequiredMixin, UpdateView):
+    permission_required = ('sigad.change_documento')
+    model = Documento
+    form_class = DocumentoForm
+    template_name = 'crud/form.html'
+
+    def get_success_url(self):
+        return reverse_lazy(
+            'cmj.sigad:path_view',
+            kwargs={'slug': self.object.absolute_slug})
