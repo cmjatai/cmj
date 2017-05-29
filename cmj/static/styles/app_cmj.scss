@@ -834,6 +834,9 @@ main {
     }
   }
 }
+.container-versions {
+  display: none;
+}
 
 .path-parlamentares {
   float: right;
@@ -896,7 +899,7 @@ main {
     z-index: 2000;
     display: block;
     margin: 0;
-    background: lighten($color_main_bg, 5%) url(/static/img/bg.png);
+    background: lighten($color_main_bg, 15%) url(/static/img/bg.png);
     font-size: 80%;
     /*border-radius: 2px;*/
     border-top: 1px solid white;

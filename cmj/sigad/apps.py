@@ -7,3 +7,6 @@ class AppConfig(apps.AppConfig):
     label = 'sigad'
     verbose_name = _('Sistema Informatizado '
                      'de Gestão Arquivística de Documentos')
+
+    def ready(self):
+        from . import signals

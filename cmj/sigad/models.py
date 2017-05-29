@@ -16,6 +16,7 @@ from django.utils.functional import cached_property
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields.json import JSONField
+from reversion.models import Version
 from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
 import reversion
@@ -99,6 +100,8 @@ class CMSMixin(models.Model):
         choices=VISIBILIDADE_STATUS,
         default=STATUS_PRIVATE)
 
+    versions = GenericRelation(Version)
+
     class Meta:
         abstract = True
 
@@ -151,6 +154,11 @@ class Revisao(models.Model):
         blank=True, null=True, default=None)
     content_object = GenericForeignKey('content_type', 'object_id')
 
+    visibilidade = models.IntegerField(
+        _('Visibilidade'),
+        choices=VISIBILIDADE_STATUS,
+        blank=True, null=True, default=None)
+
     class Meta:
         ordering = ('-data',)
         verbose_name = _('Revisão')
@@ -162,6 +170,10 @@ class Revisao(models.Model):
         revisao.user = user
         revisao.content_object = instance_model
         revisao.json = serializers.serialize("json", (instance_model,))
+
+        if hasattr(instance_model, 'visibilidade'):
+            revisao.visibilidade = instance_model.visibilidade
+
         revisao.save()
 
 

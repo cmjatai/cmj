@@ -74,7 +74,27 @@
               FIXME tratar histórico de revisão e publicação/privacidade
             {% endcomment %}
             <i class="fa fa-clock-o" aria-hidden="true"></i>
-            {% trans "Publicado em" %} {{object.public_date|date:"d"}} {% trans "de" %} {{object.public_date|date:"F"}} {% trans "de" %} {{object.public_date|date:"Y"}}
+            {% if object.public_date %}
+              {% trans "Publicado em" %} {{object.public_date|date:"d"}} {% trans "de" %} {{object.public_date|date:"F"}} {% trans "de" %} {{object.public_date|date:"Y"}}
+            {% else %}
+              {% trans "Criado em" %} {{object.created|date:"d"}} {% trans "de" %} {{object.created|date:"F"}} {% trans "de" %} {{object.created|date:"Y"}}
+            {% endif %}
+
+            <div class="container-versions">
+              <span>+</span>
+              <div class="versions">
+                {% for v in object.versions.all %}
+                    <div class="">
+                      {{v.revision.date_created}}
+                    </div>
+                {% endfor %}
+
+              </div>
+            </div>
+
+
+
+
           </span>
         {% endblock %}
       </div>

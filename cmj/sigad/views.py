@@ -646,3 +646,7 @@ class DocumentoUpdateView(DocumentoPermissionRequiredMixin, UpdateView):
         return reverse_lazy(
             'cmj.sigad:path_view',
             kwargs={'slug': self.object.absolute_slug})
+
+#    def form_valid(self, form):
+#        Revisao.gerar_revisao(form.instance, self.request.user)
+#        return super(DocumentoUpdateView, self).form_valid(form)
