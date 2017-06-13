@@ -1656,9 +1656,10 @@ main {
 @media screen and (min-width: 1200px) {
 
 .container-footer {
-  .path-imagem.container-left, .path-imagem.container-right,  {
+  .path-imagem.container-left, .path-imagem.container-right {
     width: 45%;
   }
+}
 }
 
 @media screen and (min-width: 1281px) {
