@@ -833,11 +833,12 @@ main {
     }
   }
   .path-imagem {
-    padding: 0.5em 0.5em 0.4em 0;
+    padding: 0 0 0.4em 0;
     img {
       width: 100%;
     }
     &.container-left {
+      padding: 0.5em 0.5em 0.4em 0;
       width: 45%;
       float: left;
       &.img128 {
@@ -845,6 +846,7 @@ main {
       }
     }
     &.container-right {
+      padding: 0.5em 0 0.4em 0.5em;
       width: 45%;
       float: right;
       &.img128 {
