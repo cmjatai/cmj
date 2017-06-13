@@ -12,6 +12,8 @@ from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.storage import FileSystemStorage
 from django.db import models
+from django.db.models import Q
+from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
@@ -73,6 +75,53 @@ class Parent(models.Model):
         return parents
 
 
+class Revisao(models.Model):
+
+    data = models.DateTimeField(
+        verbose_name=_('created'),
+        editable=False, auto_now_add=True)
+    user = models.ForeignKey(
+        get_settings_auth_user_model(),
+        verbose_name=_('user'), related_name='+')
+
+    json = JSONField(verbose_name=_('Json'))
+
+    content_type = models.ForeignKey(
+        ContentType,
+        blank=True, null=True, default=None)
+    object_id = models.PositiveIntegerField(
+        blank=True, null=True, default=None)
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    visibilidade = models.IntegerField(
+        _('Visibilidade'),
+        choices=VISIBILIDADE_STATUS,
+        blank=True, null=True, default=None)
+
+    class Meta:
+        ordering = ('-data',)
+        verbose_name = _('Revisão')
+        verbose_name_plural = _('Revisões')
+
+    @classmethod
+    def gerar_revisao(cls, instance_model, user):
+        revisao = Revisao()
+
+        if user:
+            revisao.user = user
+        else:
+            revisao.user_id = 1  # FIXME: necessário para execuções manual...
+            # resolver no model
+
+        revisao.content_object = instance_model
+        revisao.json = serializers.serialize("json", (instance_model,))
+
+        if hasattr(instance_model, 'visibilidade'):
+            revisao.visibilidade = instance_model.visibilidade
+
+        revisao.save()
+
+
 class CMSMixin(models.Model):
     created = models.DateTimeField(
         verbose_name=_('created'), editable=False, auto_now_add=True)
@@ -100,7 +149,7 @@ class CMSMixin(models.Model):
         choices=VISIBILIDADE_STATUS,
         default=STATUS_PRIVATE)
 
-    versions = GenericRelation(Version)
+    revisoes = GenericRelation(Revisao, related_query_name='revisoes')
 
     class Meta:
         abstract = True
@@ -136,47 +185,6 @@ class CMSMixin(models.Model):
                     raise ValidationError(msg)
 
 
-class Revisao(models.Model):
-
-    data = models.DateTimeField(
-        verbose_name=_('created'),
-        editable=False, auto_now_add=True)
-    user = models.ForeignKey(
-        get_settings_auth_user_model(),
-        verbose_name=_('user'), related_name='+')
-
-    json = JSONField(verbose_name=_('Json'))
-
-    content_type = models.ForeignKey(
-        ContentType,
-        blank=True, null=True, default=None)
-    object_id = models.PositiveIntegerField(
-        blank=True, null=True, default=None)
-    content_object = GenericForeignKey('content_type', 'object_id')
-
-    visibilidade = models.IntegerField(
-        _('Visibilidade'),
-        choices=VISIBILIDADE_STATUS,
-        blank=True, null=True, default=None)
-
-    class Meta:
-        ordering = ('-data',)
-        verbose_name = _('Revisão')
-        verbose_name_plural = _('Revisões')
-
-    @classmethod
-    def gerar_revisao(cls, instance_model, user):
-        revisao = Revisao()
-        revisao.user = user
-        revisao.content_object = instance_model
-        revisao.json = serializers.serialize("json", (instance_model,))
-
-        if hasattr(instance_model, 'visibilidade'):
-            revisao.visibilidade = instance_model.visibilidade
-
-        revisao.save()
-
-
 class Slugged(Parent):
     titulo = models.CharField(
         verbose_name=_('Título'),
@@ -184,8 +192,6 @@ class Slugged(Parent):
         blank=True, null=True, default=None)
 
     slug = models.SlugField(max_length=2000)
-
-    revisoes = GenericRelation(Revisao, related_query_name='revisoes')
 
     class Meta:
         abstract = True
@@ -305,6 +311,17 @@ class DocumentoManager(models.Manager):
     def view_childs(self):
         qs = self.get_queryset()
         return qs.order_by('ordem')
+
+    def view_public_docs(self):
+        qs = self.get_queryset()
+
+        qs = qs.filter(
+            Q(public_end_date__gte=timezone.now()) |
+            Q(public_end_date__isnull=True),
+
+            public_date__lte=timezone.now(),
+            visibilidade=STATUS_PUBLIC).order_by('-public_date')
+        return qs
 
 
 class Documento(Slugged, CMSMixin):

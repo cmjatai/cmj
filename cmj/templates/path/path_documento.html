@@ -158,7 +158,11 @@
 {% endblock %}
 
 {% block cmj_extra_content %}
-  <div class="container-fluid container{{path}}">
-    ...
+  <div class="container-fluid container-footer">
+    <div class="container  container{{path}}">
+      {% with 'path-item-list col-lg-3' as css_class %}
+        {% include "path/path_list_docs.html" %}
+      {% endwith %}
+    </div>
   </div>
 {% endblock %}

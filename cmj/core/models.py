@@ -108,6 +108,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     class Meta(AbstractBaseUser.Meta):
         abstract = False
         permissions = MENU_PERMS_FOR_USERS
+        ordering = ('first_name', 'last_name')
 
     def __str__(self):
         return self.get_display_name()

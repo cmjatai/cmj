@@ -30,6 +30,7 @@ from django.core.urlresolvers import reverse_lazy
 from django.db.models.aggregates import Max
 from django.http.response import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
+from django.utils import timezone
 from django.utils.dateparse import parse_date
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import View, TemplateView
@@ -40,7 +41,7 @@ from sapl.parlamentares.models import Parlamentar
 
 from cmj.sigad import forms, models
 from cmj.sigad.forms import DocumentoForm
-from cmj.sigad.models import Classe, Revisao, PermissionsUserClasse, Documento,\
+from cmj.sigad.models import Classe, PermissionsUserClasse, Documento,\
     STATUS_PUBLIC, Midia, VersaoDeMidia
 from cmj.utils import make_pagination
 
@@ -89,23 +90,29 @@ class PathView(MultipleObjectMixin, TemplateView):
         if self.documento:
             context = TemplateView.get_context_data(self, **kwargs)
 
-            next = Documento.objects.filter(
-                public_date__gte=self.documento.public_date,
-                created__gte=self.documento.created,
-                classe=self.documento.classe,
-                visibilidade=STATUS_PUBLIC,
-            ).exclude(
-                id=self.documento.id).first()
-            context['next'] = next
+            parlamentar = self.documento.parlamentares.first()
 
-            previous = Documento.objects.filter(
-                public_date__lte=self.documento.public_date,
-                created__lte=self.documento.created,
+            next = Documento.objects.view_public_docs().filter(
+                public_date__gte=self.documento.public_date,
                 classe=self.documento.classe,
-                visibilidade=STATUS_PUBLIC
+                parlamentares=parlamentar
             ).exclude(
                 id=self.documento.id).last()
+            context['next'] = next
+
+            previous = Documento.objects.view_public_docs().filter(
+                public_date__lte=self.documento.public_date,
+                classe=self.documento.classe,
+                parlamentares=parlamentar
+            ).exclude(
+                id=self.documento.id).first()
             context['previous'] = previous
+
+            docs = Documento.objects.view_public_docs(
+            ).exclude(id=self.documento.id
+                      ).filter(
+                parlamentares=parlamentar)[:4]
+            context['object_list'] = docs
 
         elif self.classe:
             kwargs['object_list'] = self.classe.documento_set.filter(
@@ -242,13 +249,13 @@ class ClasseCreateView(ClasseParentMixin,
 
         response = super(ClasseCreateView, self).form_valid(form)
 
-        Revisao.gerar_revisao(self.object, self.request.user)
+        # Revisao.gerar_revisao(self.object, self.request.user)
         if self.object.visibilidade == models.STATUS_PUBLIC:
             parents = self.object.parents
             for p in parents:
                 p.visibilidade = models.STATUS_PUBLIC
                 p.save()
-                Revisao.gerar_revisao(p, self.request.user)
+                # Revisao.gerar_revisao(p, self.request.user)
 
         return response
 
@@ -280,7 +287,7 @@ class ClasseUpdateView(ClasseParentMixin,
         return UpdateView.get_initial(self)
 
     def form_valid(self, form):
-        Revisao.gerar_revisao(form.instance, self.request.user)
+        # Revisao.gerar_revisao(form.instance, self.request.user)
         return super(ClasseUpdateView, self).form_valid(form)
 
 

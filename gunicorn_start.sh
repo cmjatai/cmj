@@ -2,7 +2,7 @@
 
 # As seen in http://tutos.readthedocs.org/en/latest/source/ndg.html
 
-NAME="SAPL"                                     # Name of the application (*)
+NAME="CMJ"                                     # Name of the application (*)
 DJANGODIR=/home/sapl31/cmj                     # Django project directory (*)
 SOCKFILE=/home/sapl31/cmj/run/gunicorn.sock    # we will communicate using this unix socket (*)
 USER=sapl31                                   # the user to run as (*)

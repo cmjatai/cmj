@@ -1,7 +1,7 @@
 from django.db.models.signals import post_save
 from reversion.revisions import create_revision
 from reversion.signals import post_revision_commit
-from cmj.sigad.models import Documento, Revisao
+from cmj.sigad.models import Documento, Revisao, CMSMixin
 
 
 def save_revision_documents(sender, **kwargs):
@@ -12,7 +12,7 @@ def save_revision_documents(sender, **kwargs):
         return
 
     for version in versions:
-        if not isinstance(version.object, Revisao):
+        if CMSMixin in type.mro(type(version.object)):
             with create_revision(False):
                 Revisao.gerar_revisao(
                     version.object, version.revision.user)

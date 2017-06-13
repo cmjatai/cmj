@@ -644,7 +644,7 @@ html {
   min-height: 100%;
 }
 body {
-  margin-bottom: $footer-height + 20px;
+  margin-bottom: $footer-height;
 }
 .footer {
   position: absolute;
@@ -759,6 +759,12 @@ main {
     font-weight: 300;
     position: static;
   }
+  .container-footer {
+    background: white url(/static/img/bg.png);
+    margin: $grid-gutter-width 0 0 0;
+    border: 0px;
+    border-radius: 0;
+  }
 }
 
 .container-path {
@@ -794,10 +800,11 @@ main {
     left: 0;
     right: 0;
 
-    span {
+    .container-versions  {
       display: inline-block;
+      position:static;
       margin: 0px;
-      line-height: 2em;
+      line-height: 2;
       &:before {
         margin: 0 -5px;
         content: '';
@@ -805,6 +812,24 @@ main {
         height: 3px;
         background-color: white;
       }
+      a{
+        display: block;
+      }
+      a[aria-expanded="true"] {
+        background-color: white;
+      }
+      span {
+        display: block;
+        background-color: white;
+        text-align: left;
+        line-height: 1;
+        padding: 5px;
+      }
+      /*.collapse, .collapsing {
+        right: 0px;
+        top: 0;
+        position: absolute;
+      }*/
     }
   }
   .path-imagem {
@@ -835,7 +860,6 @@ main {
   }
 }
 .container-versions {
-  display: none;
 }
 
 .path-parlamentares {
@@ -978,7 +1002,7 @@ main {
 // #### actions path next previous ########################################
 .path-direction {
   position: fixed;
-  bottom:20%;
+  bottom:50%;
   z-index: 2000;
   &.scroll_down {
     & > a {
@@ -1079,7 +1103,14 @@ main {
     }
   }
 }
-
+.container-footer {
+  .path-item-list .inner {
+      padding-top: 20px;
+  }
+  .path-parlamentares {
+    display: none;
+  }
+}
 
 
 @media screen and (max-width: 1199px) {
