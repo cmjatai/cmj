@@ -3,7 +3,7 @@ import React from 'react';
 class App extends React.Component {
     render(){
         return (
-            <h2>Hello Django - React</h2>
+            <h2>Hello Django - React...</h2>
         );
     }
 }

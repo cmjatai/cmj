@@ -105,6 +105,8 @@
 {% endblock %}
 
 {% block base_header %}
+
+
 {% with object.parlamentares.count as count_parlamentares %}
   {% for parlamentar in object.parlamentares.all %}
 

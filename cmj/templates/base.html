@@ -25,14 +25,14 @@
 
       <link rel="stylesheet" href="{% static 'jquery-ui/themes/cupertino/jquery-ui.min.css' %}">
       {% comment %} customizações de layout para área pública apartir de 2017 {% endcomment %}
-      <link rel="stylesheet" href="{% sass_src 'styles/app_cmj.scss' %}" type="text/css">
+      <link rel="stylesheet" href="{% sass_src 'styles/app_cmj.scss' %}?time={% now "jS F Y H:i:s" %}" type="text/css">
 
     {% endblock %}
 
   </head>
 
   <body class="{% block body_class %}{%endblock%}">
-    <div class="page fadein">
+    <div class="page fadein screen-lg">
       <nav class="navbar">
         <div class="container{{fluid}}">
           <div class="navbar-header">
@@ -195,18 +195,63 @@
         {% block main_header %}
           <header class="masthead">
             <div class="container{{fluid}}">
-              {% block header_content %}
-
-              {% endblock %}
-
-              {% block sections_nav %}{% subnav %}{% endblock sections_nav %}
+              <div class="container-left">
+                {% block header_content %}
+                  <div class="row-canais">
+                      <div class="box bg-aqua">
+                        <div class="icon icon-licitacao">
+                        </div>
+                        <div class="inner">
+                          <a href="http://sislegis.camarajatai.go.gov.br/publicacoes/" class="">Licitações e Contratos</a>
+                        </div>
+                      </div>
+                      <div class="box bg-green">
+                        <div class="icon icon-norma-juridica">
+                        </div>
+                        <div class="inner">
+                          <a href="http://sapl.camarajatai.go.gov.br/sapl/qs?d=-&tc=tn" class="">Legislação<br>Municipal</a>
+                        </div>
+                      </div>
+                      <div class="box bg-yellow">
+                        <div class="icon icon-sessao-plenaria">
+                        </div>
+                        <div class="inner">
+                          <a href="http://sapl.camarajatai.go.gov.br/sapl/consultas/sessao_plenaria" class="">Sessões<br>Plenárias</a>
+                        </div>
+                      </div>
+                      <div class="box bg-red">
+                        <div class="icon icon-atividade-legislativa">
+                        </div>
+                        <div class="inner">
+                          <a href="http://sapl.camarajatai.go.gov.br/sapl/qs?d=-&tc=tm" class="">Atividade<br>Legislativa</a>
+                        </div>
+                      </div>
+                      <div class="box bg-maroon">
+                        <div class="icon icon-diario-oficial">
+                        </div>
+                        <div class="inner">
+                          <a href="http://sapl.camarajatai.go.gov.br/sapl/qs?d=-&tc=td" class="">Diário<br>Oficial</a>
+                        </div>
+                      </div>
+                      <div class="box bg-purple">
+                        <div class="icon icon-transparencia">
+                        </div>
+                        <div class="inner">
+                          <a href="http://camaradejatai.sigepnet.com.br/?portal=1" class="">Prestação<br>de Contas</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                {% endblock %}
+                {% block sections_nav %}{% subnav %}{% endblock sections_nav %}
+              </div>
             </div>
           </header>
         {% endblock main_header %}
 
         {# Main content #}
         {% block content_container %}
-          <main id="content" class="content page__row">
+          <main id="content" class="content page__row screen-lg">
 
             <div class="container container{{fluid}}{{path}}">
 
@@ -268,7 +313,7 @@
   {% block login_container %}
   {% endblock%}
 
-  <footer id="footer" class="footer page__row">
+  <footer id="footer" class="footer page__row screen-lg">
     <div class="container">
       Departamento de Tecnologia de Informação e Comunicação
     </div>

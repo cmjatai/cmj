@@ -5,6 +5,13 @@
     <div class="{{css_class}}">
       <div class="inner">
 
+        <div class="titulo">
+          <a href="{% url 'cmj.sigad:path_view' documento.absolute_slug %}">
+            {{documento.titulo}}
+          </a>
+        </div>
+
+
         {% with documento.parlamentares.count as count_parlamentares %}
           {% for parlamentar in documento.parlamentares.all %}
 
@@ -37,12 +44,6 @@
           <i class="fa fa-clock-o" aria-hidden="true"></i>
           {{documento.public_date|date:"d"}} {% trans "de" %} {{documento.public_date|date:"F"}} {% trans "de" %} {{documento.public_date|date:"Y"}}
         </span>
-        <div class="titulo">
-          <a href="{% url 'cmj.sigad:path_view' documento.absolute_slug %}">
-            {{documento.titulo}}
-          </a>
-        </div>
-
 
         {% if documento.childs.view_childs.first.tipo == documento.childs.view_childs.first.TPD_IMAGE %}
           <div class="path-imagem {{documento.childs.view_childs.first.midia.last.css_class}}">

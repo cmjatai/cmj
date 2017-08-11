@@ -168,15 +168,6 @@ body, html {
 
 
 
-
-// #### conserta radios e checkboxes escondidas pelo drunken parrot ############
-// FIXME ajustar após solução definitiva
-//.checkbox input, .radio input {
-//    display: initial;
-//}
-
-
-
 // ajuste bootstrap ########################################
 
 .row-fluid:before, .row-fluid:after {
@@ -313,6 +304,7 @@ body, html {
     }
   }
 }
+
 .page-header {
   padding: $grid-gutter-width $grid-gutter-width $grid-gutter-width * 0.75 $grid-gutter-width * 1.5;
   margin: 0em $grid-gutter-width * -0.5 0 $grid-gutter-width * -0.5 ;
@@ -722,6 +714,8 @@ body {
     border-radius: 0px;
     margin-bottom: $grid-gutter-width;
     height: 75px;
+    width: 16.6667%;
+    float: left;
     &:hover {
       .icon {
         transform: scale(1.15);
@@ -930,7 +924,7 @@ main {
     /*border-radius: 2px;*/
     border-top: 1px solid white;
     border-bottom: 1px solid #fafafa;
-    padding: $grid-gutter-width/4 $grid-gutter-width/2 0;
+    padding: $grid-gutter-width/2 $grid-gutter-width/2 0;
 
     .titulo {
       /*background: lighten($color_main_bg, 1%) url(/static/img/bg.png);*/
@@ -961,7 +955,7 @@ main {
       padding-top: 0px;
       position: absolute;
       top:1px;
-      right:$grid-gutter-width / 1.5;
+      left:$grid-gutter-width / 1.5;
     }
   }
 
@@ -972,7 +966,8 @@ main {
   }
 
   .path-parlamentares {
-    margin: 0px 0px 5px 5px;
+    margin: 0px 5px 5px 0px;
+    float: left;
     &:first-child {
       margin-top:$grid-gutter-width / 1.5;
     }
@@ -1645,12 +1640,11 @@ main {
 }
 
 @media screen and (min-width: 1200px) {
-
-.container-footer {
-  .path-imagem.container-left, .path-imagem.container-right {
-    width: 45%;
+  .container-footer {
+    .path-imagem.container-left, .path-imagem.container-right {
+      width: 45%;
+    }
   }
-}
 }
 
 @media screen and (min-width: 1281px) {
@@ -1658,9 +1652,57 @@ main {
     font-size: 35px;
     padding: 0 0 0 30px;
   }
+
+}
+
+@media screen and (min-width: 1400px) {
+  .fixme_menulateral {
+    .screen-lg {
+      padding-left: 16.66667%;
+    }
+    .path-direction {
+      &.path-previous {
+        left:16.66667%;
+        margin-left: -1.6em;
+      }
+    }
+    .masthead {
+      .container-left {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left:0;
+        width: 16.66667%;
+        z-index: 2001;
+        .row-canais {
+          height: 100%;
+          .box {
+            margin-bottom: 0px;
+            height: 8.3334%;
+            float: none;
+            width: 100%;
+
+            &:hover {
+              .icon {
+                transform: scale(1.15);
+                right: 30px;
+              }
+            }
+          }
+          .inner {
+            a {
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 @media print {
+  .screen-lg {
+    padding-left: 0;
+  }
   .masthead, .btn-group {
     display: none;
   }
