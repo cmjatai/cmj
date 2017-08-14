@@ -924,7 +924,7 @@ main {
     /*border-radius: 2px;*/
     border-top: 1px solid white;
     border-bottom: 1px solid #fafafa;
-    padding: $grid-gutter-width/2 $grid-gutter-width/2 0;
+    padding: $grid-gutter-width $grid-gutter-width 0;
 
     .titulo {
       /*background: lighten($color_main_bg, 1%) url(/static/img/bg.png);*/

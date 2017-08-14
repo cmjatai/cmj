@@ -90,7 +90,7 @@ class PathView(MultipleObjectMixin, TemplateView):
         if self.documento:
             context = TemplateView.get_context_data(self, **kwargs)
 
-            parlamentar = self.documento.parlamentares.all()
+            parlamentares = self.documento.parlamentares.all()
 
             next = Documento.objects.view_public_docs().filter(
                 public_date__gte=self.documento.public_date,
@@ -107,10 +107,19 @@ class PathView(MultipleObjectMixin, TemplateView):
             context['previous'] = previous
 
             docs = Documento.objects.view_public_docs(
-            ).exclude(id=self.documento.id
-                      ).filter(
-                parlamentares__in=parlamentar)[:4]
-            context['object_list'] = docs
+            ).exclude(id=self.documento.id)
+
+            if parlamentares.exists():
+                docs = docs.filter(
+                    parlamentares__in=parlamentares)
+            else:
+                docs = docs.filter(parlamentares__isnull=True)
+
+            if parlamentares.count() > 4:
+                docs = docs.distinct(
+                    'parlamentares__id').order_by('parlamentares__id')
+
+            context['object_list'] = docs[:4]
 
         elif self.classe:
             kwargs['object_list'] = self.classe.documento_set.filter(

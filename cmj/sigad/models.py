@@ -378,18 +378,9 @@ class Documento(Slugged, CMSMixin):
         choices=tipo_parte_doc_choice,
         default=TPD_DOC)
 
+    # Possui ordem de renderização se não é um TPD_DOC
     ordem = models.IntegerField(
         _('Ordem de Renderização'), default=0)
-
-    """
-    ''' se media_of estiver preenchido significa que a instancia
-    do documento é uma midia de algum documento
-    - TODO: verificar a necessidade de ser OneToOneField'''
-    media_of = models.ForeignKey(
-        'self',
-        blank=True, null=True, default=None,
-        related_name='docmedias_set',
-        verbose_name=_('Mídias do Documento'))"""
 
     def __str__(self):
         return self.titulo or ''
