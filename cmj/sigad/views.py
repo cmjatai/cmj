@@ -23,6 +23,7 @@ from operator import attrgetter
 
 from braces.views import FormMessagesMixin
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.models import Permission
 from django.core.files import File
@@ -36,14 +37,15 @@ from django.utils.dateparse import parse_date
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import View, TemplateView
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView, MultipleObjectMixin
 from sapl.parlamentares.models import Parlamentar
+import reversion
 
 from cmj.sigad import forms, models
 from cmj.sigad.forms import DocumentoForm
 from cmj.sigad.models import Classe, PermissionsUserClasse, Documento,\
-    STATUS_PUBLIC, Midia, VersaoDeMidia, PermissionsUserDocumento
+    STATUS_PUBLIC, Midia, VersaoDeMidia, PermissionsUserDocumento, Revisao
 from cmj.utils import make_pagination
 
 
@@ -661,6 +663,74 @@ class DocumentoPermissionRequiredMixin(PermissionRequiredMixin):
 class DocumentoDetailView(DocumentoPermissionRequiredMixin, DetailView):
     permission_required = ('sigad.view_documento')
     model = Documento
+
+
+class DocumentoDeleteView(DocumentoPermissionRequiredMixin, DeleteView):
+    permission_required = ('sigad.delete_documento')
+    model = Documento
+    template_name = 'crud/confirm_delete.html'
+
+    def get_success_url(self):
+        return reverse_lazy(
+            'cmj.sigad:path_view',
+            kwargs={'slug': self.object.classe.slug})
+
+    def documento_permitido(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        if self.object.parte_de_documento():
+            parent = self.object.parent
+            while parent.parent and parent.parte_de_documento():
+                parent = parent.parent
+
+            messages.error(
+                self.request,
+                _('Parte de Documentos não são excluidos '
+                  'via Exclusão de Documento'))
+            return False, redirect(reverse_lazy(
+                'cmj.sigad:path_view',
+                kwargs={'slug': parent.absolute_slug}))
+
+        return True, None
+
+    def get(self, request, *args, **kwargs):
+        documento_permitido = self.documento_permitido(
+            request, *args, **kwargs)
+
+        if documento_permitido[0]:
+            return DeleteView.get(self, request, *args, **kwargs)
+        else:
+            return documento_permitido[1]
+
+    def delete_doc(self, doc):
+        # trans  midia, caso exista, para ult rev de cada descendente
+
+        childs = doc.childs.view_childs()
+
+        for child in childs:
+            self.delete_doc(child)
+
+        ultima_revisao = doc.revisoes.first()
+        if not ultima_revisao:
+            ultima_revisao = Revisao.gerar_revisao(doc, self.request.user)
+
+        if hasattr(doc, 'midia'):
+            midia = doc.midia
+
+            midia.documento = None
+            midia.revisao = ultima_revisao
+            midia.save()
+
+    def delete(self, request, *args, **kwargs):
+        documento_permitido = self.documento_permitido(
+            request, *args, **kwargs)
+
+        if not documento_permitido[0]:
+            return documento_permitido[1]
+
+        self.delete_doc(self.object)
+
+        return DeleteView.delete(self, request, *args, **kwargs)
 
 
 class DocumentoUpdateView(DocumentoPermissionRequiredMixin, UpdateView):

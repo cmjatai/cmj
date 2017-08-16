@@ -31,6 +31,9 @@ urlpatterns_sigad = [
     url(r'^documento/(?P<pk>[0-9]+)/edit$',
         views.DocumentoUpdateView.as_view(), name='documento_edit'),
 
+    url(r'^documento/(?P<pk>[0-9]+)/delete$',
+        views.DocumentoDeleteView.as_view(), name='documento_delete'),
+
 
 ]
 

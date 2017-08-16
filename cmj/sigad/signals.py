@@ -1,6 +1,8 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_delete
+from django.dispatch.dispatcher import receiver
 from reversion.revisions import create_revision
-from reversion.signals import post_revision_commit
+from reversion.signals import post_revision_commit, pre_revision_commit
+
 from cmj.sigad.models import Documento, Revisao, CMSMixin
 
 
@@ -18,3 +20,10 @@ def save_revision_documents(sender, **kwargs):
                     version.object, version.revision.user)
 
 post_revision_commit.connect(save_revision_documents, sender=create_revision)
+
+
+@receiver(pre_delete, sender=Documento, dispatch_uid='documento_delete_signal')
+def log_deleted_documento(sender, instance, using, **kwargs):
+    print('passou log_deleted_documento pk = %s, parent = %s' % (
+        instance.pk,
+        instance.parent.pk if instance.parent else ''))

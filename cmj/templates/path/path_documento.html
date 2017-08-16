@@ -140,6 +140,9 @@
   {% if perms.sigad.change_documento %}
     <a href="{% url 'cmj.sigad:documento_edit' object.id %}">{% trans "[Editar]" %}</a>
   {% endif %}
+    {% if perms.sigad.delete_documento %}
+      <a href="{% url 'cmj.sigad:documento_delete' object.id %}">{% trans "[Excluir]" %}</a>
+    {% endif %}
 
   {% comment %}
   {{object.id}}

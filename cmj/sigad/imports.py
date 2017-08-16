@@ -7,12 +7,13 @@ from django.core.files.temp import NamedTemporaryFile
 from django.http.response import Http404
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import TemplateView
+from reversion.views import RevisionMixin
 from sapl.parlamentares.models import Parlamentar
 
-from cmj.sigad.models import Documento, Midia, VersaoDeMidia
+from cmj.sigad.models import Documento, Midia, VersaoDeMidia, Revisao
 
 
-class DocumentoPmImportView(TemplateView):
+class DocumentoPmImportView(RevisionMixin, TemplateView):
 
     template_name = 'path/pagina_inicial.html'
 
@@ -101,6 +102,7 @@ class DocumentoPmImportView(TemplateView):
                 d.old_json = json.dumps(n)
                 d.classe_id = 1
                 d.save()
+                Revisao.gerar_revisao(d, request.user)
 
                 ordem = 0
                 if n['image']:
@@ -115,6 +117,7 @@ class DocumentoPmImportView(TemplateView):
                     image.tipo = Documento.TPD_IMAGE
                     image.classe_id = 1
                     image.save()
+                    Revisao.gerar_revisao(image, request.user)
 
                     midia = Midia()
                     midia.documento = image
@@ -145,6 +148,7 @@ class DocumentoPmImportView(TemplateView):
                     texto.tipo = Documento.TPD_TEXTO
 
                     texto.save()
+                    Revisao.gerar_revisao(texto, request.user)
 
         elif func == 'imagens':
 

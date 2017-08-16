@@ -24,11 +24,13 @@ from cmj.utils import get_settings_auth_user_model
 
 
 STATUS_PRIVATE = 99
-STATUS_RESTRICT = 1
+STATUS_RESTRICT_PERMISSION = 2
+STATUS_RESTRICT_USER = 1
 STATUS_PUBLIC = 0
 
 VISIBILIDADE_STATUS = (
-    (STATUS_RESTRICT, _('Restrito')),
+    (STATUS_RESTRICT_PERMISSION, _('Restrição por Permissão')),
+    (STATUS_RESTRICT_USER, _('Restrição por Usuário')),
     (STATUS_PRIVATE, _('Privado')),
     (STATUS_PUBLIC, _('Público')),
 )
@@ -116,6 +118,7 @@ class Revisao(models.Model):
             revisao.visibilidade = instance_model.visibilidade
 
         revisao.save()
+        return revisao
 
 
 class CMSMixin(models.Model):
@@ -145,10 +148,21 @@ class CMSMixin(models.Model):
         choices=VISIBILIDADE_STATUS,
         default=STATUS_PRIVATE)
 
-    revisoes = GenericRelation(Revisao, related_query_name='revisoes')
-
     class Meta:
         abstract = True
+
+    @property
+    def revisoes(self):
+        # implementado como property, e não como GR, devido a necessidade
+        # de manter a Revisão se o Documento for excluido.
+        concret_model = None
+        for kls in reversed(self.__class__.__mro__):
+            if issubclass(kls, CMSMixin) and not kls._meta.abstract:
+                concret_model = kls
+        qs = Revisao.objects.filter(
+            content_type=ContentType.objects.get_for_model(concret_model),
+            object_id=self.pk)
+        return qs
 
     def clean(self):
         """
@@ -381,9 +395,16 @@ class Documento(Slugged, CMSMixin):
     def __str__(self):
         return self.titulo or ''
 
+    def parte_de_documento(self):
+        return self.tipo != self.TPD_DOC
+
     @property
     def absolute_slug(self):
         return '%s/%s' % (self.classe.slug, self.slug)
+
+    def delete(self, using=None, keep_parents=False):
+
+        return Slugged.delete(self, using=using, keep_parents=keep_parents)
 
     class Meta:
         ordering = ('public_date', )
@@ -414,7 +435,14 @@ class Midia(models.Model):
 
     documento = models.OneToOneField(
         Documento,
-        verbose_name=_('Mídia'),
+        blank=True, null=True, default=None,
+        verbose_name=_('Documento'),
+        related_name='midia')
+
+    revisao = models.OneToOneField(
+        Revisao,
+        blank=True, null=True, default=None,
+        verbose_name=_('Revisão'),
         related_name='midia')
 
     class Meta:
