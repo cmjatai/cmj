@@ -18,12 +18,8 @@ from django.utils.functional import cached_property
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields.json import JSONField
-from reversion.models import Version
 from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
-import reversion
-
-from cmj import sigad
 from cmj.utils import get_settings_auth_user_model
 
 
@@ -398,6 +394,20 @@ class Documento(Slugged, CMSMixin):
             ('view_documento_media',
              _('Visualização das mídias do Documento')),
         )
+
+
+class PermissionsUserDocumento(CMSMixin):
+    user = models.ForeignKey(
+        get_settings_auth_user_model(), verbose_name=_('Usuário'))
+    documento = models.ForeignKey(Documento, verbose_name=_('Documento'))
+    permission = models.ForeignKey(Permission, verbose_name=_('Permissão'))
+
+    class Meta:
+        unique_together = (
+            ('user', 'documento', 'permission'),
+        )
+        verbose_name = _('Permissão de Usuário para Documento')
+        verbose_name_plural = _('Permissões de Usuários para Documentos')
 
 
 class Midia(models.Model):

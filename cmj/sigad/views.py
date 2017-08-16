@@ -24,6 +24,7 @@ from operator import attrgetter
 from braces.views import FormMessagesMixin
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.models import Permission
 from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
 from django.core.urlresolvers import reverse_lazy
@@ -42,7 +43,7 @@ from sapl.parlamentares.models import Parlamentar
 from cmj.sigad import forms, models
 from cmj.sigad.forms import DocumentoForm
 from cmj.sigad.models import Classe, PermissionsUserClasse, Documento,\
-    STATUS_PUBLIC, Midia, VersaoDeMidia
+    STATUS_PUBLIC, Midia, VersaoDeMidia, PermissionsUserDocumento
 from cmj.utils import make_pagination
 
 
@@ -621,28 +622,40 @@ class MediaDetailView(DocumentoPermissionRequiredMixin, DetailView):
 
 class DocumentoPermissionRequiredMixin(PermissionRequiredMixin):
 
-    def dispatch(self, request, *args, **kwargs):
+    def has_permission(self):
         self.object = self.get_object()
+        has_permission = True
         if self.object:
-            has_permission = True
+            if not self.request.user.is_superuser:
 
-            if not request.user.is_superuser:
-                if self.object.privacidade == \
-                        models.DOCUMENTO_ORIGINAL_RESTRITO:
-                    has_permission = self.check_permissions(request)
-                elif self.object.privacidade == models.DOCUMENTO_PRIVADO and \
-                        request.user != self.object.owner:
+                # se documento é privado e usuário que acessá não é o dono
+                # não terá permissão.
+                if self.object.visibilidade == models.STATUS_PRIVATE and \
+                        self.request.user != self.object.owner:
                     has_permission = False
 
-            if not has_permission:
-                return self.handle_no_permission(request)
+                # se documento é público, testa se usuário tem permissão.
+                elif self.object.visibilidade == models.STATUS_PUBLIC:
+                    has_permission = super().has_permission()
 
-        if request.method.lower() in self.http_method_names:
-            handler = getattr(
-                self, request.method.lower(), self.http_method_not_allowed)
-        else:
-            handler = self.http_method_not_allowed
-        return handler(request, *args, **kwargs)
+                # se documento é restrito, analisa quais usuários possuem
+                # permission_required para o documento
+                elif self.object.visibilidade == models.STATUS_RESTRICT:
+
+                    perms = self.get_permission_required()
+
+                    for perm in perms:
+                        perm = perm.split('.')
+
+                        if not PermissionsUserDocumento.objects.filter(
+                                permission__content_type__app_label=perm[0],
+                                permission__codename=perm[1],
+                                user=self.request.user,
+                                documento=self.object).exists():
+                            has_permission = False
+                            break
+
+        return has_permission
 
 
 class DocumentoDetailView(DocumentoPermissionRequiredMixin, DetailView):
