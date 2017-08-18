@@ -45,7 +45,7 @@
   {% if object.descricao %}
     <span class="path-description">
       {% block descricao %}
-        {{object.descricao}}
+        {{object.descricao|striptags|safe}}
       {% endblock %}
     </span>
   {% endif %}

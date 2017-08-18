@@ -125,15 +125,17 @@ class CMSMixin(models.Model):
     created = models.DateTimeField(
         verbose_name=_('created'), editable=False, auto_now_add=True)
 
-    public_date = models.DateTimeField(null=True, default=None,
-                                       verbose_name=_('Data de Início de Publicação'))
+    public_date = models.DateTimeField(
+        null=True, default=None,
+        verbose_name=_('Data de Início de Publicação'))
 
     public_end_date = models.DateTimeField(
         null=True, default=None,
         verbose_name=_('Data de Fim de Publicação'))
 
     owner = models.ForeignKey(
-        get_settings_auth_user_model(), verbose_name=_('owner'), related_name='+')
+        get_settings_auth_user_model(),
+        verbose_name=_('owner'), related_name='+')
 
     descricao = models.TextField(
         verbose_name=_('Descrição'),
@@ -339,12 +341,14 @@ class Documento(Slugged, CMSMixin):
 
     TPD_DOC = 0
     TPD_TEXTO = 100
+    TPD_CONTAINER = 700
     TPD_VIDEO = 800
     TPD_IMAGE = 900
 
     tipo_parte_doc_choice = (
         (TPD_TEXTO, _('Texto')),
         (TPD_VIDEO, _('Vídeo')),
+        (TPD_CONTAINER, _('Container')),
         (TPD_IMAGE, _('Imagem')),
     )
 
@@ -369,13 +373,13 @@ class Documento(Slugged, CMSMixin):
         verbose_name=_('Json no Portal Modelo 1.0'),
         blank=True, null=True, default=None)
 
-    parlamentares = models.ManyToManyField(Parlamentar,
-                                           related_name='documento_set',
-                                           verbose_name=_('Parlamentares'))
+    parlamentares = models.ManyToManyField(
+        Parlamentar, related_name='documento_set',
+        verbose_name=_('Parlamentares'))
 
-    materias = models.ManyToManyField(MateriaLegislativa,
-                                      related_name='documento_set',
-                                      verbose_name=_('Matérias Relacionadas'))
+    materias = models.ManyToManyField(
+        MateriaLegislativa, related_name='documento_set',
+        verbose_name=_('Matérias Relacionadas'))
 
     classe = models.ForeignKey(
         Classe,
@@ -392,6 +396,12 @@ class Documento(Slugged, CMSMixin):
     ordem = models.IntegerField(
         _('Ordem de Renderização'), default=0)
 
+    referencias = models.ManyToManyField(
+        'self',
+        through='ReferenciaEntreDocumentos',
+        through_fields=('referenciado', 'referente'),
+        symmetrical=False,)
+
     def __str__(self):
         return self.titulo or ''
 
@@ -402,10 +412,6 @@ class Documento(Slugged, CMSMixin):
     def absolute_slug(self):
         return '%s/%s' % (self.classe.slug, self.slug)
 
-    def delete(self, using=None, keep_parents=False):
-
-        return Slugged.delete(self, using=using, keep_parents=keep_parents)
-
     class Meta:
         ordering = ('public_date', )
         verbose_name = _('Documento')
@@ -415,6 +421,22 @@ class Documento(Slugged, CMSMixin):
             ('view_documento_media',
              _('Visualização das mídias do Documento')),
         )
+
+
+class ReferenciaEntreDocumentos(models.Model):
+    # TODO - IMPLEMENTAR VISIBILIDADE NA REFERENCIA...
+    # SIGNIFICA QUE O DOC PRIVADO PODE SER PÚBLICO POR REFERENCIA
+    # TRATAR SEGURANÇA PARA QUEM REALIZAR ESSA MUDANÇA DE VISIBILIDADE
+    referenciado = models.ForeignKey(Documento, related_name='referenciado',
+                                     verbose_name=_('Documento Referenciado'),
+                                     on_delete=models.PROTECT)
+    referente = models.ForeignKey(Documento, related_name='referente',
+                                  verbose_name=_('Documento Referente'),
+                                  on_delete=models.PROTECT)
+
+    # Possui ordem de renderização
+    ordem = models.IntegerField(
+        _('Ordem de Renderização'), default=0)
 
 
 class PermissionsUserDocumento(CMSMixin):
@@ -502,6 +524,13 @@ class VersaoDeMidia(models.Model):
         _('Alinhamento'),
         choices=alinhamento_choice,
         default=ALINHAMENTO_LEFT)
+
+    def delete(self, using=None, keep_parents=False):
+        if self.file:
+            self.file.delete()
+
+        return models.Model.delete(
+            self, using=using, keep_parents=keep_parents)
 
     @cached_property
     def css_class(self):

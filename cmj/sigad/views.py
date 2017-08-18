@@ -50,6 +50,7 @@ from cmj.utils import make_pagination
 
 
 class PathView(MultipleObjectMixin, TemplateView):
+    # TODO: IMPLEMENTAR PERMISSOES NO PATHVIEW
     template_name = 'base_path.html'
     documento = None
     classe = None

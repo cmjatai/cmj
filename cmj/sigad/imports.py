@@ -4,18 +4,49 @@ from datetime import timedelta
 from django.conf import settings
 from django.core.files.base import File
 from django.core.files.temp import NamedTemporaryFile
+from django.db.models.aggregates import Max
 from django.http.response import Http404
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import TemplateView
 from reversion.views import RevisionMixin
 from sapl.parlamentares.models import Parlamentar
 
-from cmj.sigad.models import Documento, Midia, VersaoDeMidia, Revisao
+from cmj.sigad import models
+from cmj.sigad.models import Documento, Midia, VersaoDeMidia, Revisao, Classe
 
 
 class DocumentoPmImportView(RevisionMixin, TemplateView):
 
     template_name = 'path/pagina_inicial.html'
+
+    def get_codigo_classe(self, parent):
+
+        cod__max = Classe.objects.filter(
+            parent=parent).order_by('codigo').aggregate(Max('codigo'))
+
+        return cod__max['codigo__max'] + 1 if cod__max['codigo__max'] else 1
+
+    def get_or_create_classe(
+        self,
+            titulo,
+            parent=None,
+            visibilidade=1,
+            perfil=1):
+
+        classe = Classe.objects.filter(
+            titulo=titulo,
+            parent=parent).first()
+        if not classe:
+            classe = Classe()
+            classe.codigo = self.get_codigo_classe(parent)
+            classe.titulo = titulo
+            classe.visibilidade = visibilidade
+            classe.perfil = perfil
+            classe.parent = parent
+            classe.owner = self.request.user
+
+            classe.save()
+        return classe
 
     def get(self, request, *args, **kwargs):
 
@@ -28,7 +59,104 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
 
         func = request.GET.get('func', 'noticias')
 
-        if func == 'noticias':
+        if func == 'fotografia':
+            http = urllib3.PoolManager()
+
+            r = http.request('GET', ('http://localhost:8080/fotografia/'
+                                     'evento.do?action=evento_lista_json'))
+
+            fotografia = self.get_or_create_classe(
+                'Fotografia', perfil=models.CLASSE_ESTRUTURAL)
+
+            jdata = json.loads(r.data.decode('utf-8'))
+            jdata = jdata[0:2]
+
+            anos = {}
+            for evento in jdata:
+                data = datetime.strptime(
+                    evento['data'], '%Y-%m-%d %H:%M:%S.%f')
+                anos[str(data.year)] = True
+            anos = list(anos.keys())
+            anos.sort()
+
+            pasta_ano = {}
+            for ano in anos:
+                pasta_ano[ano] = self.get_or_create_classe(
+                    ano, parent=fotografia, perfil=models.CLASSE_DOCUMENTAL)
+                pasta_ano[ano].documento_set.all().delete()
+
+            for evento in jdata:
+                data = datetime.strptime(
+                    evento['data'], '%Y-%m-%d %H:%M:%S.%f')
+
+                ano = str(data.year)
+                old_path = ('/fotografia/evento.do?action=evento_view&id=%s' %
+                            evento['id'])
+
+                documento = Documento.objects.filter(
+                    old_path=old_path).first()
+
+                if not documento:
+                    documento = Documento()
+                    documento.old_path = old_path
+                    documento.old_json = json.dumps(evento)
+                    documento.titulo = evento['epigrafe']
+                    documento.descricao = evento['ementa']
+                    documento.public_date = data
+                    documento.classe = pasta_ano[ano]
+                    documento.tipo = Documento.TPD_DOC
+                    documento.owner = request.user
+                    documento.save()
+                    Revisao.gerar_revisao(documento, request.user)
+
+                ordem = 0
+                for midia_id_import in evento['midias']:
+                    ordem += 1
+                    old_path_midia = ('/fotografia/'
+                                      'midia.do?action=midia_view'
+                                      '&escala=Real&idImage=%s'
+                                      % midia_id_import)
+
+                    image = Documento.objects.filter(
+                        old_path=old_path_midia).first()
+                    if image:
+                        continue
+
+                    image = Documento()
+                    image.autor = 'Hélio Domingos'
+                    image.visibilidade = models.STATUS_RESTRICT_USER
+                    image.ordem = ordem
+                    image.titulo = 'midia'
+                    image.owner = request.user
+                    image.parent = documento
+                    image.tipo = Documento.TPD_IMAGE
+                    image.classe = pasta_ano[ano]
+                    image.save()
+                    Revisao.gerar_revisao(image, request.user)
+
+                    midia = Midia()
+                    midia.documento = image
+                    midia.save()
+
+                    versao = VersaoDeMidia()
+                    versao.midia = midia
+                    versao.owner = request.user
+                    versao.content_type = 'image/jpeg'
+                    versao.alinhamento = models.ALINHAMENTO_JUSTIFY
+                    versao.save()
+
+                    # TODO implementar captura de fotos sem writeCredits
+                    file = http.request(
+                        'GET', 'http://187.6.249.155%s' % old_path_midia)
+
+                    img_temp = NamedTemporaryFile(delete=True)
+                    img_temp.write(file.data)
+                    img_temp.flush()
+                    versao.file.save("image.jpg", File(img_temp), save=True)
+
+                    print(midia_id_import)
+
+        elif func == 'noticias':
             http = urllib3.PoolManager()
 
             p = 1

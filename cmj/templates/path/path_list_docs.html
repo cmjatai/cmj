@@ -47,7 +47,7 @@
           {{documento.public_date|date:"d"}} {% trans "de" %} {{documento.public_date|date:"F"}} {% trans "de" %} {{documento.public_date|date:"Y"}}
         </span>
 
-        {% if documento.childs.view_childs.first.tipo == documento.childs.view_childs.first.TPD_IMAGE %}
+        {% if documento.childs.view_childs.first and documento.childs.view_childs.first.tipo == documento.TPD_IMAGE %}
           <div class="path-imagem {{documento.childs.view_childs.first.midia.last.css_class}}">
             <img src="/{{documento.childs.view_childs.first.absolute_slug}}.512" alt="" />
 
@@ -57,7 +57,7 @@
 
         {% if documento.descricao %}
           <div class="descricao">
-            {{documento.descricao}}
+            {{documento.descricao|striptags|safe}}
           </div>
         {% endif %}
         <div class="clearfix"></div>
