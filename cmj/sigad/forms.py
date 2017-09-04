@@ -83,6 +83,7 @@ class DocumentoForm(ModelForm):
     class Meta:
         model = Documento
         fields = ['titulo',
+                  'template_doc',
                   'descricao',
                   ]
 
@@ -91,7 +92,7 @@ class DocumentoForm(ModelForm):
         self.helper = FormHelper()
         self.helper.layout = SaplFormLayout(
             to_row([
-                ('titulo', 6),
+                ('titulo', 6), ('template_doc', 3),
             ]),
             to_row([
                 ('descricao', 12)

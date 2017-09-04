@@ -913,6 +913,98 @@ main {
   }
 }
 
+.container-thumbnails {
+  .content-image {
+    float: left;
+    width: auto;
+    &:hover {
+      border-color: black;
+    }
+    .image {
+      padding: 5px;
+      display: inline-block;
+      width: 100%;
+      height: 150px;
+      cursor: pointer;
+    }
+    img {
+      height: auto;
+      width: auto;
+      max-height: 100%;
+      max-width: 100%;
+
+      opacity: 0.8;
+      &:hover {
+        opacity: 1;
+      }
+    }
+
+    .anotacoes {
+      display: none;
+    }
+    &.show-image {
+      float: none;
+      position: relative;
+      background: #002900;
+      opacity: 1;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      &::before {
+        content: '';
+        position: absolute;
+        visibility: inherit;
+        border-bottom: 15px dashed #002900;
+        border-right: 15px solid transparent;
+        border-left: 15px solid transparent;
+        top: -15px;
+      }
+
+      &.wait {
+        opacity: 0.5;
+      }
+      .inner {
+        height:  100%;
+      }
+      .image {
+        height:  100%;
+        padding: 30px;
+        width: auto;
+        max-width: 66.666%;
+      }
+      .anotacoes {
+        display: inline-block;
+      }
+      img {
+        /*height: auto;
+        width: 100%;*/
+        opacity: 1;
+        box-shadow: 0 5px 35px rgba(0,0,0,.65);
+      }
+    }
+
+    &.show-image2 {
+      position: fixed;
+      z-index: 2001;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+
+      width: 100%;
+      border: 1px solid transparent;
+      a {
+        height:  auto;
+        display: block;
+      }
+      img {
+        height: 100%;
+        width: auto;
+        opacity: 1;
+      }
+    }
+  }
+}
+
 .path-item-list {
   margin-bottom: $grid-gutter-width;
   .inner {
@@ -1368,6 +1460,32 @@ main {
 }
 
 @media screen and (max-width: 600px) {
+
+.container-thumbnails {
+  .content-image {
+    &.show-image {
+      &::before {
+        border-bottom-width: 10px;
+        border-right-width: 10px;
+        border-left-width: 10px ;
+        top: -10px;
+      }
+      .image {
+        max-width: none;
+        padding: 0px;
+      }
+    }
+    .image {
+      padding: 2px;
+      height: 100px;
+    }
+    img {
+
+    }
+  }
+}
+
+
   .masthead {
     margin-top: 1px;
   }

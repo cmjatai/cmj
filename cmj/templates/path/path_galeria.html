@@ -1,0 +1,11 @@
+{% load i18n sigad_filters %}
+
+{% comment %}
+{% for doc in container.documentos_citados.all %}
+  <img src="/{{doc.absolute_slug}}.512" alt="" />
+{% endfor %}
+
+{% endcomment %}
+{% for ref_doc in container.cita.all %}
+  <img src="/{{container.absolute_slug}}/{{ref_doc.slug}}.512" alt="" />
+{% endfor %}

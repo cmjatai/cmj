@@ -12,12 +12,16 @@ from reversion.views import RevisionMixin
 from sapl.parlamentares.models import Parlamentar
 
 from cmj.sigad import models
-from cmj.sigad.models import Documento, Midia, VersaoDeMidia, Revisao, Classe
+from cmj.sigad.models import Documento, Midia, VersaoDeMidia, Revisao, Classe,\
+    ReferenciaEntreDocumentos
 
 
 class DocumentoPmImportView(RevisionMixin, TemplateView):
 
     template_name = 'path/pagina_inicial.html'
+
+    endereco_fotografia = 'http://187.6.249.155'
+    end_local_fotog = 'http://localhost:8080'
 
     def get_codigo_classe(self, parent):
 
@@ -62,14 +66,15 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
         if func == 'fotografia':
             http = urllib3.PoolManager()
 
-            r = http.request('GET', ('http://localhost:8080/fotografia/'
-                                     'evento.do?action=evento_lista_json'))
+            r = http.request('GET', ('%s/fotografia/'
+                                     'evento.do?action=evento_lista_json' %
+                                     self.endereco_fotografia))
 
             fotografia = self.get_or_create_classe(
                 'Fotografia', perfil=models.CLASSE_ESTRUTURAL)
 
             jdata = json.loads(r.data.decode('utf-8'))
-            jdata = jdata[0:2]
+            jdata = jdata[3:4]
 
             anos = {}
             for evento in jdata:
@@ -126,7 +131,8 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                     image.autor = 'Hélio Domingos'
                     image.visibilidade = models.STATUS_RESTRICT_USER
                     image.ordem = ordem
-                    image.titulo = 'midia'
+                    image.old_path = old_path_midia
+                    image.titulo = ''
                     image.owner = request.user
                     image.parent = documento
                     image.tipo = Documento.TPD_IMAGE
@@ -147,7 +153,8 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
 
                     # TODO implementar captura de fotos sem writeCredits
                     file = http.request(
-                        'GET', 'http://187.6.249.155%s' % old_path_midia)
+                        'GET', '%s%s' % (self.endereco_fotografia,
+                                         old_path_midia,))
 
                     img_temp = NamedTemporaryFile(delete=True)
                     img_temp.write(file.data)
@@ -183,7 +190,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                 if stop or len(jdata) < s:
                     break
                 p += 1
-                # break
+                break
 
             news.reverse()
 
@@ -239,7 +246,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                     image.autor = n['image_caption']
                     image.visibilidade = 0
                     image.ordem = ordem
-                    image.titulo = 'midia'
+                    image.titulo = ''
                     image.owner = request.user
                     image.parent = d
                     image.tipo = Documento.TPD_IMAGE
@@ -277,6 +284,45 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
 
                     texto.save()
                     Revisao.gerar_revisao(texto, request.user)
+
+                if n['url_source_album']:
+                    ordem += 1
+                    r = http.request('GET', '%s%s' % (self.end_local_fotog,
+                                                      n['url_source_album']))
+
+                    jdata = json.loads(r.data.decode('utf-8'))
+
+                    container = Documento()
+                    container.autor = n['image_caption']
+                    container.visibilidade = 0
+                    container.ordem = ordem
+                    container.titulo = ''
+                    container.owner = request.user
+                    container.parent = d
+                    container.tipo = Documento.TPD_CONTAINER
+                    container.classe_id = 1
+                    container.save()
+                    Revisao.gerar_revisao(d, request.user)
+
+                    ord_ref = 1
+                    for item in jdata:
+                        old_path_midia = ('/fotografia/'
+                                          'midia.do?action=midia_view'
+                                          '&escala=Real&idImage=%s'
+                                          % item['id'])
+
+                        referenciado = Documento.objects.filter(
+                            old_path=old_path_midia).first()
+
+                        if referenciado:
+                            ref = ReferenciaEntreDocumentos()
+                            ref.referenciado = referenciado
+                            ref.referente = container
+                            ref.ordem = ord_ref
+                            ref.titulo = ''
+
+                            ref.save()
+                            ord_ref += 1
 
         elif func == 'imagens':
 

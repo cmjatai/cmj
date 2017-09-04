@@ -34,6 +34,7 @@
   <body class="{% block body_class %}{%endblock%}">
     <div class="page fadein screen-lg">
       <nav class="navbar">
+
         <div class="container{{fluid}}">
           <div class="navbar-header">
             {% block button_toogle %}
@@ -252,7 +253,7 @@
         {% block content_container %}
           <main id="content" class="content page__row screen-lg">
 
-            <div class="container container{{fluid}}{{path}}">
+            <div class="{% block main_container_class %}container container{{fluid}}{{path}}{% endblock %}">
 
 
               {# Content header #}

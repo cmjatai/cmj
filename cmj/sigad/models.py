@@ -18,8 +18,10 @@ from django.utils.functional import cached_property
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields.json import JSONField
+from model_utils.choices import Choices
 from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
+
 from cmj.utils import get_settings_auth_user_model
 
 
@@ -46,6 +48,16 @@ PERFIL_CLASSE = ((
     CLASSE_DOCUMENTAL, _('Classe de Conteúdo')),
     (
     CLASSE_MISTA, _('Classe Mista'))
+)
+
+DOC_TEMPLATES_CHOICE_FILES = {
+    1: 'path/path_documento.html',
+    2: 'path/path_thumbnails.html'
+}
+
+DOC_TEMPLATES_CHOICE = Choices(
+    (1, 'noticia', _('Notícia Pública')),
+    (2, 'galeria', _('Galeria de Imagens')),
 )
 
 
@@ -212,7 +224,12 @@ class Slugged(Parent):
         slug_old = self.slug
 
         if self.titulo:
-            self.slug = self.generate_unique_slug()
+            slug = self.titulo
+        else:
+            super(Slugged, self).save(*args, **kwargs)
+            slug = str(self.id)
+
+        self.slug = self.generate_unique_slug(slug)
 
         super(Slugged, self).save(*args, **kwargs)
 
@@ -222,13 +239,14 @@ class Slugged(Parent):
         for child in self.childs.all():
             child.save()
 
-    def generate_unique_slug(self):
+    def generate_unique_slug(self, slug):
         concret_model = None
         for kls in reversed(self.__class__.__mro__):
             if issubclass(kls, Slugged) and not kls._meta.abstract:
                 concret_model = kls
 
-        slug = slugify(self.titulo)
+        slug = slugify(slug)
+
         parents_slug = (self.parent.slug + '/') if self.parent else ''
 
         i = 0
@@ -281,6 +299,17 @@ class Classe(Slugged, CMSMixin):
         _('Perfil da Classe'),
         choices=PERFIL_CLASSE,
         default=CLASSE_ESTRUTURAL)
+
+    template_doc_padrao = models.IntegerField(
+        _('Template para o Documento'),
+        choices=DOC_TEMPLATES_CHOICE,
+        default=DOC_TEMPLATES_CHOICE.noticia)
+
+    # FIXME: flexibilizar o template de renderização da classe
+    """template_classe = models.IntegerField(
+        _('Template da Classe'),
+        choices=DOC_TEMPLATES_CHOICE,
+        default=DOC_TEMPLATES_CHOICE.noticia)"""
 
     class Meta:
         ordering = ('codigo', '-public_date',)
@@ -392,14 +421,19 @@ class Documento(Slugged, CMSMixin):
         choices=tipo_parte_doc_choice,
         default=TPD_DOC)
 
+    template_doc = models.IntegerField(
+        _('Template para o Documento'),
+        choices=DOC_TEMPLATES_CHOICE,
+        default=DOC_TEMPLATES_CHOICE.noticia)
+
     # Possui ordem de renderização se não é um TPD_DOC
     ordem = models.IntegerField(
         _('Ordem de Renderização'), default=0)
 
-    referencias = models.ManyToManyField(
+    documentos_citados = models.ManyToManyField(
         'self',
         through='ReferenciaEntreDocumentos',
-        through_fields=('referenciado', 'referente'),
+        through_fields=('referente', 'referenciado'),
         symmetrical=False,)
 
     def __str__(self):
@@ -423,16 +457,16 @@ class Documento(Slugged, CMSMixin):
         )
 
 
-class ReferenciaEntreDocumentos(models.Model):
+class ReferenciaEntreDocumentos(Slugged):
     # TODO - IMPLEMENTAR VISIBILIDADE NA REFERENCIA...
     # SIGNIFICA QUE O DOC PRIVADO PODE SER PÚBLICO POR REFERENCIA
     # TRATAR SEGURANÇA PARA QUEM REALIZAR ESSA MUDANÇA DE VISIBILIDADE
-    referenciado = models.ForeignKey(Documento, related_name='referenciado',
-                                     verbose_name=_('Documento Referenciado'),
-                                     on_delete=models.PROTECT)
-    referente = models.ForeignKey(Documento, related_name='referente',
+    referente = models.ForeignKey(Documento, related_name='cita',
                                   verbose_name=_('Documento Referente'),
                                   on_delete=models.PROTECT)
+    referenciado = models.ForeignKey(Documento, related_name='citado_em',
+                                     verbose_name=_('Documento Referenciado'),
+                                     on_delete=models.PROTECT)
 
     # Possui ordem de renderização
     ordem = models.IntegerField(
@@ -552,6 +586,7 @@ class VersaoDeMidia(models.Model):
             '256': (256, 256),
             '512': (512, 512),
             '768': (768, 768),
+            '1024': (1024, 1024),
         }
         """try:
             w = int(width)

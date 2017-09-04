@@ -45,12 +45,12 @@ import reversion
 from cmj.sigad import forms, models
 from cmj.sigad.forms import DocumentoForm
 from cmj.sigad.models import Classe, PermissionsUserClasse, Documento,\
-    STATUS_PUBLIC, Midia, VersaoDeMidia, PermissionsUserDocumento, Revisao
+    STATUS_PUBLIC, Midia, VersaoDeMidia, PermissionsUserDocumento, Revisao,\
+    ReferenciaEntreDocumentos
 from cmj.utils import make_pagination
 
 
 class PathView(MultipleObjectMixin, TemplateView):
-    # TODO: IMPLEMENTAR PERMISSOES NO PATHVIEW
     template_name = 'base_path.html'
     documento = None
     classe = None
@@ -143,7 +143,25 @@ class PathView(MultipleObjectMixin, TemplateView):
 
         return context
 
+    def busca_doc_slug(self, slug):
+        # busca documento dentro de classes de nivel > 1
+        for i, item in enumerate(slug):
+            try:
+                slug_part = slug[:i + 1]
+                slug_part.reverse()
+                slug_class = slug[i + 1:]
+                slug_class.reverse()
+                print(slug_class, slug_part)
+                return Documento.objects.get(
+                    slug='/'.join(slug_part),
+                    classe__slug='/'.join(slug_class))
+                break
+            except:
+                pass
+        return None
+
     def dispatch(self, request, *args, **kwargs):
+
         slug = kwargs.get('slug', '')
 
         slug = slug.split('/')
@@ -156,10 +174,12 @@ class PathView(MultipleObjectMixin, TemplateView):
             return TemplateView.dispatch(self, request, *args, **kwargs)
 
         try:
+            # verifica se o slug é uma classe
             self.classe = Classe.objects.get(slug='/'.join(slug))
         except:
 
             try:
+                # se documento é filho de uma classe de primeiro nivel
                 self.documento = Documento.objects.get(
                     slug=slug[-1],
                     classe__slug='/'.join(slug[:-1]))
@@ -167,27 +187,35 @@ class PathView(MultipleObjectMixin, TemplateView):
 
                 slug.reverse()
 
-                for i, item in enumerate(slug):
-                    try:
-                        slug_part = slug[:i + 1]
-                        slug_part.reverse()
-                        slug_class = slug[i + 1:]
-                        slug_class.reverse()
-                        print(slug_class, slug_part)
-                        self.documento = Documento.objects.get(
-                            slug='/'.join(slug_part),
-                            classe__slug='/'.join(slug_class))
-                        break
-                    except:
-                        pass
+                self.documento = self.busca_doc_slug(slug)
+
+                # se nao encontrou, verifica se é um slug por referencia
+                if not self.documento:
+                    slug_ref = slug[1:]
+                    self.documento = self.busca_doc_slug(slug_ref)
+
+                    if self.documento:
+                        try:
+                            ref = ReferenciaEntreDocumentos.objects.get(
+                                slug=slug[0])
+                            self.documento = ref.referenciado
+                        except:
+                            pass
+
+        if self.documento and self.documento.tipo not in (Documento.TPD_DOC,
+                                                          Documento.TPD_IMAGE):
+            raise Http404()
 
         if not self.documento and not self.classe:
             raise Http404()
 
         if self.documento:
-            self.template_name = 'path/path_documento.html'
+            self.template_name = models.DOC_TEMPLATES_CHOICE_FILES[
+                self.documento.template_doc]
         else:
             self.template_name = 'path/path_classe.html'
+
+        # TODO: COM DOCUMENTO E/OU CLASSE SELECIONADO... VERIFICAR PERMISSÕES.
 
         return TemplateView.dispatch(self, request, *args, **kwargs)
 
@@ -739,6 +767,10 @@ class DocumentoUpdateView(DocumentoPermissionRequiredMixin, UpdateView):
     model = Documento
     form_class = DocumentoForm
     template_name = 'crud/form.html'
+
+    @property
+    def cancel_url(self):
+        return self.get_success_url()
 
     def get_success_url(self):
         return reverse_lazy(

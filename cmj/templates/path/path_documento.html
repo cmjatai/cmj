@@ -137,29 +137,33 @@
 {% endblock %}
 
 {% block base_content %}
-  {% if perms.sigad.change_documento %}
-    <a href="{% url 'cmj.sigad:documento_edit' object.id %}">{% trans "[Editar]" %}</a>
-  {% endif %}
-    {% if perms.sigad.delete_documento %}
-      <a href="{% url 'cmj.sigad:documento_delete' object.id %}">{% trans "[Excluir]" %}</a>
+  {% block controls_content %}
+    {% if perms.sigad.change_documento %}
+      <a href="{% url 'cmj.sigad:documento_edit' object.id %}">{% trans "[Editar]" %}</a>
     {% endif %}
+      {% if perms.sigad.delete_documento %}
+        <a href="{% url 'cmj.sigad:documento_delete' object.id %}">{% trans "[Excluir]" %}</a>
+      {% endif %}
+  {% endblock %}
+  {% block render_content %}
 
-  {% comment %}
-  {{object.id}}
-  {% endcomment %}
 
   {% for child in object.childs.view_childs %}
     {% if child.tipo == child.TPD_TEXTO %}
       {{child.texto|safe}}
     {%elif child.tipo == child.TPD_IMAGE %}
       <div class="path-imagem {{child.midia.last.css_class}}">
-        <img src="/{{child.absolute_slug}}.768" alt="" />
+        <img src="/{{child.absolute_slug}}.512" alt="" />
       </div>
-
+      {%elif child.tipo == child.TPD_CONTAINER %}
+        {% with child as container %}
+          {% include "path/path_galeria.html" %}
+        {% endwith %}
     {% endif %}
 
   {% endfor %}
 
+  {% endblock %}
 {% endblock %}
 
 {% block cmj_extra_content %}
