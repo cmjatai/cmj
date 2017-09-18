@@ -15,6 +15,7 @@ django-model-utils==2.5
 django-sass-processor==0.4.6
 django-image-cropping==1.0.3
 django-reversion==2.0.8
+django-taggit
 djangorestframework
 drfdocs
 easy-thumbnails==2.3
