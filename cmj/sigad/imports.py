@@ -21,7 +21,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
     template_name = 'path/pagina_inicial.html'
 
     endereco_fotografia = 'http://187.6.249.155'
-    end_local_fotog = 'http://localhost:8080'
+    end_local_fotog = 'http://10.3.163.1'
 
     def get_codigo_classe(self, parent):
 
@@ -68,13 +68,16 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
 
             r = http.request('GET', ('%s/fotografia/'
                                      'evento.do?action=evento_lista_json' %
-                                     self.endereco_fotografia))
+                                     self.end_local_fotog))
 
             fotografia = self.get_or_create_classe(
                 'Fotografia', perfil=models.CLASSE_ESTRUTURAL)
 
-            jdata = json.loads(r.data.decode('utf-8'))
-            jdata = jdata[4:5]
+            data = r.data.decode('utf-8')
+            # print('data: ', data)
+            # return TemplateView.get(self, request, *args, **kwargs)
+            jdata = json.loads(data)
+            #jdata = jdata[4:5]
 
             anos = {}
             for evento in jdata:
@@ -91,6 +94,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                 pasta_ano[ano].documento_set.all().delete()
 
             for evento in jdata:
+                print(evento['epigrafe'])
                 data = datetime.strptime(
                     evento['data'], '%Y-%m-%d %H:%M:%S.%f')
 
@@ -110,6 +114,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                     documento.public_date = data
                     documento.classe = pasta_ano[ano]
                     documento.tipo = Documento.TPD_DOC
+                    documento.template_doc = 2
                     documento.owner = request.user
                     documento.save()
                     Revisao.gerar_revisao(documento, request.user)
@@ -133,7 +138,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                     ordem += 1
                     old_path_midia = ('/fotografia/'
                                       'midia.do?action=midia_view'
-                                      '&escala=Real&idImage=%s'
+                                      '&escala=cmj_import&idImage=%s'
                                       % midia_id_import)
 
                     image = Documento.objects.filter(
