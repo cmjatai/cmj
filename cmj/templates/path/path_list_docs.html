@@ -47,13 +47,17 @@
           {{documento.public_date|date:"d"}} {% trans "de" %} {{documento.public_date|date:"F"}} {% trans "de" %} {{documento.public_date|date:"Y"}}
         </span>
 
-        {% if documento.childs.view_childs.first and documento.childs.view_childs.first.tipo == documento.TPD_IMAGE %}
-          <div class="path-imagem {{documento.childs.view_childs.first.midia.last.css_class}}">
-            <img src="/{{documento.childs.view_childs.first.absolute_slug}}.512" alt="" />
-
-          </div>
-        {% else %}
-        {% endif %}
+        {% comment %} primeiro container, o primeiro item {% endcomment %}
+        {% with documento.childs.view_childs.first as primeiro_container %}
+          {% with primeiro_container.childs.view_childs.first as primeiro_item %}
+            {% if primeiro_item.tipo == primeiro_item.TPD_IMAGE %}
+              <div class="path-imagem {{primeiro_item.css_class}}">
+                <img src="/{{primeiro_item.absolute_slug}}.512" alt="" />
+              </div>
+            {% else %}
+            {% endif %}
+          {% endwith %}
+        {% endwith %}
 
         {% if documento.descricao %}
           <div class="descricao">

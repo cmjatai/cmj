@@ -15,6 +15,7 @@
         <tr>
           <th>Nome</th>
           <th>Data de Nascimento</th>
+          <th>Telefones</th>
         </tr>
       </thead>
       <tbody>
@@ -25,6 +26,13 @@
           </td>
           <td>
               {{ obj.data_nascimento }}<small><small> - {{obj.data_nascimento|age }}</small></small>
+          </td>
+          <td>
+            <ul>
+              {% for telefone in obj.telefone_set.all %}
+                <li>{{telefone.telefone}}</li>
+              {% endfor %}
+            </ul>
           </td>
         </tr>
       {% endfor %}

@@ -1,6 +1,8 @@
 {% extends "base_path.html" %}
 {% load i18n sigad_filters %}
 
+{% block main_container_class %}container-path{% endblock %}
+
 {% block base_functions %}
   {% if next %}
     <div class="path-direction path-next">
@@ -105,35 +107,36 @@
 {% endblock %}
 
 {% block base_header %}
+<div class="container">
+  {% with object.parlamentares.count as count_parlamentares %}
+    {% for parlamentar in object.parlamentares.all %}
 
-
-{% with object.parlamentares.count as count_parlamentares %}
-  {% for parlamentar in object.parlamentares.all %}
-
-    {% if forloop.counter0 > 0 and forloop.counter0|organize_avatars:count_parlamentares %}
-      </div>
-    {% endif %}
-
-    {% if forloop.counter0|organize_avatars:count_parlamentares %}
-      <div class="path-parlamentares">
-    {% endif %}
-
-      {% if parlamentar.fotografia %}
-        <a class="avatar avatar{% if count_parlamentares >= 5 %}5{%else%}{{count_parlamentares}}{% endif %}" href="#">
-          <img src="{{ parlamentar.fotografia.url }}">
-        </a>
+      {% if forloop.counter0 > 0 and forloop.counter0|organize_avatars:count_parlamentares %}
+        </div>
       {% endif %}
 
-    {% if not forloop.last %}
-      <span class="linebreak"></span>
-    {% else %}
-      </div>
-    {% endif %}
+      {% if forloop.counter0|organize_avatars:count_parlamentares %}
+        <div class="path-parlamentares">
+      {% endif %}
 
-  {% endfor %}
-{% endwith %}
+        {% if parlamentar.fotografia %}
+          <a class="avatar avatar{% if count_parlamentares >= 5 %}5{%else%}{{count_parlamentares}}{% endif %}" href="#">
+            <img src="{{ parlamentar.fotografia.url }}">
+          </a>
+        {% endif %}
+
+      {% if not forloop.last %}
+        <span class="linebreak"></span>
+      {% else %}
+        </div>
+      {% endif %}
+
+    {% endfor %}
+  {% endwith %}
 
   {{block.super}}
+
+</div>
 {% endblock %}
 
 {% block base_content %}
@@ -147,20 +150,29 @@
   {% endblock %}
   {% block render_content %}
 
-
-  {% for child in object.childs.view_childs %}
-    {% if child.tipo == child.TPD_TEXTO %}
-      {{child.texto|safe}}
-    {%elif child.tipo == child.TPD_IMAGE %}
-      <div class="path-imagem {{child.midia.last.css_class}}">
-        <img src="/{{child.absolute_slug}}.512" alt="" />
-      </div>
-      {%elif child.tipo == child.TPD_CONTAINER %}
-        {% with child as container %}
-          {% include "path/path_galeria.html" %}
-        {% endwith %}
-    {% endif %}
-
+  {% for container in object.childs.view_childs %}
+    <div class="container{% if container.tipo == container.TPD_CONTAINER_EXTENDIDO%}-fluid{% endif %} {% if forloop.first%}container-first{% endif %}">
+      {% for child in container.childs.view_childs %}
+        {% if child.tipo == child.TPD_TEXTO %}
+          {{child.texto|safe}}
+        {% elif child.tipo == child.TPD_IMAGE %}
+          <div class="path-imagem {{child.css_class}}">
+            <img src="/{{child.absolute_slug}}.512" alt="" />
+          </div>
+          {% elif child.tipo == child.TPD_GALLERY %}
+              {% with child as container %}
+                {% include "path/path_galeria.html" %}
+              {% endwith %}
+        {% endif %}
+      {% endfor %}
+      {% if forloop.first %}
+        <div class="painel-corte">
+          <div class="btn btn-success">
+            {% trans "Continuar Lendo" %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
   {% endfor %}
 
   {% endblock %}
@@ -174,4 +186,16 @@
       {% endwith %}
     </div>
   </div>
+{% endblock %}
+
+
+{% block extra_js  %}
+
+
+<script type="text/javascript">
+  $(document).ready(function(){
+    ContainerFirst();
+    Gallery();
+  });
+</script>
 {% endblock %}

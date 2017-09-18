@@ -32,4 +32,6 @@ git+git://github.com/interlegis/trml2pdf.git
 python-dateutil
 django-webpack-loader
 textract==1.5.0
+WeasyPrint==0.30
 whoosh==2.7.4
+pysolr==3.6.0

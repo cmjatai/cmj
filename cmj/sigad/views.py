@@ -216,6 +216,10 @@ class PathView(MultipleObjectMixin, TemplateView):
             self.template_name = 'path/path_classe.html'
 
         # TODO: COM DOCUMENTO E/OU CLASSE SELECIONADO... VERIFICAR PERMISSÕES.
+        # em casos de documento referenciados, apesar de na hora do cadastro
+        # do documento referente ter recebido acesso, parece ser mais prudente
+        # verificar novamente a permissão para entrega visto que o mantenedor
+        # do documento referenciado pode alterar sua regra de permissão.
 
         return TemplateView.dispatch(self, request, *args, **kwargs)
 

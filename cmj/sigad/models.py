@@ -368,17 +368,31 @@ class DocumentoManager(models.Manager):
 class Documento(Slugged, CMSMixin):
     objects = DocumentoManager()
 
+    ALINHAMENTO_LEFT = 0
+    ALINHAMENTO_JUSTIFY = 1
+    ALINHAMENTO_RIGHT = 2
+
+    alinhamento_choice = (
+        (ALINHAMENTO_LEFT, _('Alinhamento Esquerdo')),
+        (ALINHAMENTO_JUSTIFY, _('Alinhamento Completo')),
+        (ALINHAMENTO_RIGHT, _('Alinhamento Direito')),
+    )
+
     TPD_DOC = 0
     TPD_TEXTO = 100
-    TPD_CONTAINER = 700
+    TPD_CONTAINER_SIMPLES = 700
+    TPD_CONTAINER_EXTENDIDO = 701
     TPD_VIDEO = 800
     TPD_IMAGE = 900
+    TPD_GALLERY = 901
 
     tipo_parte_doc_choice = (
         (TPD_TEXTO, _('Texto')),
         (TPD_VIDEO, _('Vídeo')),
-        (TPD_CONTAINER, _('Container')),
+        (TPD_CONTAINER_SIMPLES, _('Container Simples')),
+        (TPD_CONTAINER_EXTENDIDO, _('Container Extendido')),
         (TPD_IMAGE, _('Imagem')),
+        (TPD_GALLERY, _('Galeria de Imagens')),
     )
 
     tipo_parte_doc = {
@@ -430,6 +444,11 @@ class Documento(Slugged, CMSMixin):
     ordem = models.IntegerField(
         _('Ordem de Renderização'), default=0)
 
+    alinhamento = models.IntegerField(
+        _('Alinhamento'),
+        choices=alinhamento_choice,
+        default=ALINHAMENTO_LEFT)
+
     documentos_citados = models.ManyToManyField(
         'self',
         through='ReferenciaEntreDocumentos',
@@ -437,7 +456,7 @@ class Documento(Slugged, CMSMixin):
         symmetrical=False,)
 
     def __str__(self):
-        return self.titulo or ''
+        return self.titulo or self.get_tipo_display()
 
     def parte_de_documento(self):
         return self.tipo != self.TPD_DOC
@@ -445,6 +464,13 @@ class Documento(Slugged, CMSMixin):
     @property
     def absolute_slug(self):
         return '%s/%s' % (self.classe.slug, self.slug)
+
+    @cached_property
+    def css_class(self):
+        classes = {self.ALINHAMENTO_LEFT: 'alinhamento-left',
+                   self.ALINHAMENTO_JUSTIFY: 'alinhamento-justify',
+                   self.ALINHAMENTO_RIGHT: 'alinhamento-right'}
+        return classes[self.alinhamento]
 
     class Meta:
         ordering = ('public_date', )
@@ -471,6 +497,9 @@ class ReferenciaEntreDocumentos(Slugged):
     # Possui ordem de renderização
     ordem = models.IntegerField(
         _('Ordem de Renderização'), default=0)
+
+    class Meta:
+        ordering = ('referenciado', 'ordem')
 
 
 class PermissionsUserDocumento(CMSMixin):
@@ -520,17 +549,6 @@ media_protected = FileSystemStorage(
     location=settings.MEDIA_PROTECTED_ROOT, base_url='DO_NOT_USE')
 
 
-ALINHAMENTO_LEFT = 0
-ALINHAMENTO_JUSTIFY = 1
-ALINHAMENTO_RIGHT = 2
-
-alinhamento_choice = (
-    (ALINHAMENTO_LEFT, _('Alinhamento Esquerdo')),
-    (ALINHAMENTO_JUSTIFY, _('Alinhamento Completo')),
-    (ALINHAMENTO_RIGHT, _('Alinhamento Direito')),
-)
-
-
 class VersaoDeMidia(models.Model):
     created = models.DateTimeField(
         verbose_name=_('created'),
@@ -554,24 +572,12 @@ class VersaoDeMidia(models.Model):
         Midia, verbose_name=_('Mídia Versionada'),
         related_name='versions')
 
-    alinhamento = models.IntegerField(
-        _('Alinhamento'),
-        choices=alinhamento_choice,
-        default=ALINHAMENTO_LEFT)
-
     def delete(self, using=None, keep_parents=False):
         if self.file:
             self.file.delete()
 
         return models.Model.delete(
             self, using=using, keep_parents=keep_parents)
-
-    @cached_property
-    def css_class(self):
-        classes = {ALINHAMENTO_LEFT: 'container-left',
-                   ALINHAMENTO_JUSTIFY: 'container-justify',
-                   ALINHAMENTO_RIGHT: 'container-right', }
-        return classes[self.alinhamento]
 
     @cached_property
     def simple_name(self):

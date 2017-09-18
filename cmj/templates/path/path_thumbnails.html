@@ -2,20 +2,23 @@
 {% load i18n sigad_filters %}
 {% block main_container_class %}container-path container-fluid{% endblock %}
 {% block render_content %}
-<div class="container-thumbnails">
-  {% for doc in object.childs.view_childs %}
-      <div class="content-image">
-        <div class="inner">
-          <div class="image">
-              <img src="/{{doc.absolute_slug}}.256" data-src="/{{doc.absolute_slug}}" alt="" />
-          </div>
-          <div class="anotacoes">
-            {{doc.titulo}}
+
+{% for container in object.childs.view_childs %}
+  <div class="container{% if container.tipo == container.TPD_CONTAINER_EXTENDIDO%}-fluid{% endif %} container-thumbnails">
+    {% for doc in container.childs.view_childs %}
+        <div class="content-image">
+          <div class="inner">
+            <div class="image">
+                <img src="/{{doc.absolute_slug}}.256" data-src="/{{doc.absolute_slug}}" alt="" />
+            </div>
+            <div class="anotacoes">
+              {{doc.titulo}}
+            </div>
           </div>
         </div>
-      </div>
-  {% endfor %}
-</div>
+    {% endfor %}
+  </div>
+{% endfor %}
 
 {% endblock %}
 

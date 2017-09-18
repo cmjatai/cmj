@@ -74,7 +74,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                 'Fotografia', perfil=models.CLASSE_ESTRUTURAL)
 
             jdata = json.loads(r.data.decode('utf-8'))
-            jdata = jdata[3:4]
+            jdata = jdata[4:5]
 
             anos = {}
             for evento in jdata:
@@ -114,6 +114,20 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                     documento.save()
                     Revisao.gerar_revisao(documento, request.user)
 
+                container = documento.childs.view_childs().first()
+
+                if not container:
+
+                    container = Documento()
+                    container.titulo = ''
+                    container.descricao = ''
+                    container.classe = pasta_ano[ano]
+                    container.tipo = Documento.TPD_CONTAINER_EXTENDIDO
+                    container.owner = request.user
+                    container.parent = documento
+                    container.save()
+                    Revisao.gerar_revisao(container, request.user)
+
                 ordem = 0
                 for midia_id_import in evento['midias']:
                     ordem += 1
@@ -124,6 +138,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
 
                     image = Documento.objects.filter(
                         old_path=old_path_midia).first()
+
                     if image:
                         continue
 
@@ -134,7 +149,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                     image.old_path = old_path_midia
                     image.titulo = ''
                     image.owner = request.user
-                    image.parent = documento
+                    image.parent = container
                     image.tipo = Documento.TPD_IMAGE
                     image.classe = pasta_ano[ano]
                     image.save()
@@ -148,7 +163,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                     versao.midia = midia
                     versao.owner = request.user
                     versao.content_type = 'image/jpeg'
-                    versao.alinhamento = models.ALINHAMENTO_JUSTIFY
+                    versao.alinhamento = Documento.ALINHAMENTO_JUSTIFY
                     versao.save()
 
                     # TODO implementar captura de fotos sem writeCredits
@@ -190,7 +205,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                 if stop or len(jdata) < s:
                     break
                 p += 1
-                break
+                break  # comentar para importar tudo
 
             news.reverse()
 
@@ -239,6 +254,19 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                 d.save()
                 Revisao.gerar_revisao(d, request.user)
 
+                container = d.childs.view_childs().first()
+                if not container:
+                    container = Documento()
+                    container.titulo = ''
+                    container.descricao = ''
+                    container.classe_id = 1
+                    container.tipo = Documento.TPD_CONTAINER_SIMPLES
+                    container.owner = request.user
+                    container.parent = d
+                    container.ordem = 1
+                    container.save()
+                    Revisao.gerar_revisao(container, request.user)
+
                 ordem = 0
                 if n['image']:
                     ordem += 1
@@ -248,7 +276,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                     image.ordem = ordem
                     image.titulo = ''
                     image.owner = request.user
-                    image.parent = d
+                    image.parent = container
                     image.tipo = Documento.TPD_IMAGE
                     image.classe_id = 1
                     image.save()
@@ -279,7 +307,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                     texto.visibilidade = 0
                     texto.ordem = ordem
                     texto.owner = request.user
-                    texto.parent = d
+                    texto.parent = container
                     texto.tipo = Documento.TPD_TEXTO
 
                     texto.save()
@@ -292,17 +320,28 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
 
                     jdata = json.loads(r.data.decode('utf-8'))
 
-                    container = Documento()
-                    container.autor = n['image_caption']
-                    container.visibilidade = 0
-                    container.ordem = ordem
-                    container.titulo = ''
-                    container.owner = request.user
-                    container.parent = d
-                    container.tipo = Documento.TPD_CONTAINER
-                    container.classe_id = 1
-                    container.save()
-                    Revisao.gerar_revisao(d, request.user)
+                    cont_gallery = Documento()
+                    cont_gallery.titulo = ''
+                    cont_gallery.descricao = ''
+                    cont_gallery.classe_id = 1
+                    cont_gallery.tipo = Documento.TPD_CONTAINER_EXTENDIDO
+                    cont_gallery.owner = request.user
+                    cont_gallery.parent = d
+                    cont_gallery.ordem = 2
+                    cont_gallery.save()
+                    Revisao.gerar_revisao(cont_gallery, request.user)
+
+                    galeria = Documento()
+                    galeria.autor = n['image_caption']
+                    galeria.visibilidade = 0
+                    galeria.ordem = ordem
+                    galeria.titulo = ''
+                    galeria.owner = request.user
+                    galeria.parent = cont_gallery
+                    galeria.tipo = Documento.TPD_GALLERY
+                    galeria.classe_id = 1
+                    galeria.save()
+                    Revisao.gerar_revisao(galeria, request.user)
 
                     ord_ref = 1
                     for item in jdata:
@@ -317,7 +356,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                         if referenciado:
                             ref = ReferenciaEntreDocumentos()
                             ref.referenciado = referenciado
-                            ref.referente = container
+                            ref.referente = galeria
                             ref.ordem = ord_ref
                             ref.titulo = ''
 
