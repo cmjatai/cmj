@@ -21,7 +21,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
     template_name = 'path/pagina_inicial.html'
 
     endereco_fotografia = 'http://187.6.249.155'
-    end_local_fotog = 'http://10.3.163.1'
+    end_local_fotog = endereco_fotografia  # 'http://10.3.163.1'
 
     def get_codigo_classe(self, parent):
 
@@ -77,7 +77,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
             # print('data: ', data)
             # return TemplateView.get(self, request, *args, **kwargs)
             jdata = json.loads(data)
-            #jdata = jdata[4:5]
+            jdata = jdata[7:8]
 
             anos = {}
             for evento in jdata:
@@ -91,19 +91,19 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
             for ano in anos:
                 pasta_ano[ano] = self.get_or_create_classe(
                     ano, parent=fotografia, perfil=models.CLASSE_DOCUMENTAL)
-                pasta_ano[ano].documento_set.all().delete()
+                # pasta_ano[ano].documento_set.all().delete()
 
             for evento in jdata:
                 print(evento['epigrafe'])
-                data = datetime.strptime(
-                    evento['data'], '%Y-%m-%d %H:%M:%S.%f')
 
-                ano = str(data.year)
                 old_path = ('/fotografia/evento.do?action=evento_view&id=%s' %
                             evento['id'])
-
                 documento = Documento.objects.filter(
                     old_path=old_path).first()
+
+                data = datetime.strptime(
+                    evento['data'], '%Y-%m-%d %H:%M:%S.%f')
+                ano = str(data.year)
 
                 if not documento:
                     documento = Documento()
@@ -149,7 +149,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
 
                     image = Documento()
                     image.autor = 'Hélio Domingos'
-                    image.visibilidade = models.STATUS_RESTRICT_USER
+                    image.visibilidade = Documento.STATUS_RESTRICT_USER
                     image.ordem = ordem
                     image.old_path = old_path_midia
                     image.titulo = ''
@@ -171,7 +171,6 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                     versao.alinhamento = Documento.ALINHAMENTO_JUSTIFY
                     versao.save()
 
-                    # TODO implementar captura de fotos sem writeCredits
                     file = http.request(
                         'GET', '%s%s' % (self.endereco_fotografia,
                                          old_path_midia,))
@@ -352,7 +351,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                     for item in jdata:
                         old_path_midia = ('/fotografia/'
                                           'midia.do?action=midia_view'
-                                          '&escala=Real&idImage=%s'
+                                          '&escala=cmj_import&idImage=%s'
                                           % item['id'])
 
                         referenciado = Documento.objects.filter(

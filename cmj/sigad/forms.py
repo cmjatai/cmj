@@ -30,7 +30,7 @@ class ClasseForm(ModelForm):
 
     visibilidade = forms.ChoiceField(
         label=Classe._meta.get_field('visibilidade').verbose_name,
-        choices=models.VISIBILIDADE_STATUS)
+        choices=Documento.VISIBILIDADE_STATUS)
     perfil = forms.ChoiceField(
         label=Classe._meta.get_field('perfil').verbose_name,
         choices=models.PERFIL_CLASSE)

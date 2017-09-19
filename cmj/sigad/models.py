@@ -24,20 +24,6 @@ from sapl.parlamentares.models import Parlamentar
 
 from cmj.utils import get_settings_auth_user_model
 
-
-STATUS_PRIVATE = 99
-STATUS_RESTRICT_PERMISSION = 2
-STATUS_RESTRICT_USER = 1
-STATUS_PUBLIC = 0
-
-VISIBILIDADE_STATUS = (
-    (STATUS_RESTRICT_PERMISSION, _('Restrição por Permissão')),
-    (STATUS_RESTRICT_USER, _('Restrição por Usuário')),
-    (STATUS_PRIVATE, _('Privado')),
-    (STATUS_PUBLIC, _('Público')),
-)
-
-
 CLASSE_ESTRUTURAL = 0
 CLASSE_DOCUMENTAL = 1
 CLASSE_MISTA = 2
@@ -87,6 +73,18 @@ class Parent(models.Model):
 
 class Revisao(models.Model):
 
+    STATUS_PRIVATE = 99
+    STATUS_RESTRICT_PERMISSION = 2
+    STATUS_RESTRICT_USER = 1
+    STATUS_PUBLIC = 0
+
+    VISIBILIDADE_STATUS = (
+        (STATUS_RESTRICT_PERMISSION, _('Restrição por Permissão')),
+        (STATUS_RESTRICT_USER, _('Restrição por Usuário')),
+        (STATUS_PRIVATE, _('Privado')),
+        (STATUS_PUBLIC, _('Público')),
+    )
+
     data = models.DateTimeField(
         verbose_name=_('created'),
         editable=False, auto_now_add=True)
@@ -134,6 +132,19 @@ class Revisao(models.Model):
 
 
 class CMSMixin(models.Model):
+
+    STATUS_PRIVATE = 99
+    STATUS_RESTRICT_PERMISSION = 2
+    STATUS_RESTRICT_USER = 1
+    STATUS_PUBLIC = 0
+
+    VISIBILIDADE_STATUS = (
+        (STATUS_RESTRICT_PERMISSION, _('Restrição por Permissão')),
+        (STATUS_RESTRICT_USER, _('Restrição por Usuário')),
+        (STATUS_PRIVATE, _('Privado')),
+        (STATUS_PUBLIC, _('Público')),
+    )
+
     created = models.DateTimeField(
         verbose_name=_('created'), editable=False, auto_now_add=True)
 
@@ -361,7 +372,7 @@ class DocumentoManager(models.Manager):
             Q(public_end_date__isnull=True),
 
             public_date__lte=timezone.now(),
-            visibilidade=STATUS_PUBLIC).order_by('-public_date')
+            visibilidade=Documento.STATUS_PUBLIC).order_by('-public_date')
         return qs
 
 
@@ -489,7 +500,7 @@ class ReferenciaEntreDocumentos(Slugged):
     # TRATAR SEGURANÇA PARA QUEM REALIZAR ESSA MUDANÇA DE VISIBILIDADE
     referente = models.ForeignKey(Documento, related_name='cita',
                                   verbose_name=_('Documento Referente'),
-                                  on_delete=models.PROTECT)
+                                  on_delete=models.CASCADE)
     referenciado = models.ForeignKey(Documento, related_name='citado_em',
                                      verbose_name=_('Documento Referenciado'),
                                      on_delete=models.PROTECT)

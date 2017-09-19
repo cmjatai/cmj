@@ -44,9 +44,8 @@ import reversion
 
 from cmj.sigad import forms, models
 from cmj.sigad.forms import DocumentoForm
-from cmj.sigad.models import Classe, PermissionsUserClasse, Documento,\
-    STATUS_PUBLIC, Midia, VersaoDeMidia, PermissionsUserDocumento, Revisao,\
-    ReferenciaEntreDocumentos
+from cmj.sigad.models import Documento, Classe, ReferenciaEntreDocumentos,\
+    PermissionsUserClasse, PermissionsUserDocumento, Revisao
 from cmj.utils import make_pagination
 
 
@@ -665,7 +664,7 @@ class DocumentoPermissionRequiredMixin(PermissionRequiredMixin):
 
                 # se documento é privado e usuário que acessá não é o dono
                 # não terá permissão.
-                if self.object.visibilidade == models.STATUS_PRIVATE and \
+                if self.object.visibilidade == Documento.STATUS_PRIVATE and \
                         self.request.user != self.object.owner:
                     has_permission = False
 
@@ -675,7 +674,7 @@ class DocumentoPermissionRequiredMixin(PermissionRequiredMixin):
 
                 # se documento é restrito, analisa quais usuários possuem
                 # permission_required para o documento
-                elif self.object.visibilidade == models.STATUS_RESTRICT:
+                elif self.object.visibilidade == Documento.STATUS_RESTRICT:
 
                     perms = self.get_permission_required()
 
