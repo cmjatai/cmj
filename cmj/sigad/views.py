@@ -240,17 +240,29 @@ class PathView(MultipleObjectMixin, TemplateView):
 
             elif obj[0].visibilidade == CMSMixin.STATUS_RESTRICT:
 
-                if obj[0].permissions_user_set.filter(
-                        user=request.user,
-                        permission__codename=obj[1]).exists():
-                    pass
-                elif obj[0].permissions_user_set.filter(
-                    user__isnull=True,
-                    permission__codename=obj[1]).exists() and\
-                        request.user.has_perm('sigad.' + obj[1]):
-                    pass
-                else:
-                    raise Http404()
+                parent = obj[0]
+
+                while parent and not parent.permissions_user_set.exists():
+                    parent = parent.parent
+
+                if not parent and obj[0].__class__ == Documento:
+                    parent = obj[0].classe
+
+                    while parent and not parent.permissions_user_set.exists():
+                        parent = parent.parent
+
+                if parent:
+                    if parent.permissions_user_set.filter(
+                            user=request.user,
+                            permission__codename=obj[1]).exists():
+                        pass
+                    elif parent.permissions_user_set.filter(
+                        user__isnull=True,
+                        permission__codename=obj[1]).exists() and\
+                            request.user.has_perm('sigad.' + obj[1]):
+                        pass
+                    else:
+                        raise Http404()
 
         return TemplateView.dispatch(self, request, *args, **kwargs)
 
