@@ -47,7 +47,7 @@ from cmj.crud.base import MasterDetailCrud
 from cmj.sigad import forms, models
 from cmj.sigad.forms import DocumentoForm
 from cmj.sigad.models import Documento, Classe, ReferenciaEntreDocumentos,\
-    PermissionsUserClasse, PermissionsUserDocumento, Revisao
+    PermissionsUserClasse, PermissionsUserDocumento, Revisao, CMSMixin
 from cmj.utils import make_pagination
 
 
@@ -223,28 +223,31 @@ class PathView(MultipleObjectMixin, TemplateView):
         # do documento referenciado pode alterar sua regra de permissão.
 
         # Verificação para classes:
-        if self.classe:
+
+        obj = (self.documento if self.documento else self.classe,
+               'view_documento' if self.documento else 'view_pathclasse')
+        if obj[0]:
             u = request.user
-            if u.is_anonymous() and self.classe.visibilidade != \
-                    Classe.STATUS_PUBLIC:
+            if u.is_anonymous() and obj[0].visibilidade != \
+                    CMSMixin.STATUS_PUBLIC:
                 raise Http404()
 
-            elif self.classe.visibilidade == Classe.STATUS_PRIVATE:
-                if self.classe.owner != request.user:
+            elif obj[0].visibilidade == CMSMixin.STATUS_PRIVATE:
+                if obj[0].owner != request.user:
                     raise Http404()
-                if not request.user.has_perm('sigad.view_pathclasse'):
+                if not request.user.has_perm('sigad.' + obj[1]):
                     raise PermissionDenied()
 
-            elif self.classe.visibilidade == Classe.STATUS_RESTRICT:
+            elif obj[0].visibilidade == CMSMixin.STATUS_RESTRICT:
 
-                if self.classe.permissions_user_set.filter(
+                if obj[0].permissions_user_set.filter(
                         user=request.user,
-                        permission__codename='view_pathclasse').exists():
+                        permission__codename=obj[1]).exists():
                     pass
-                elif self.classe.permissions_user_set.filter(
+                elif obj[0].permissions_user_set.filter(
                     user__isnull=True,
-                    permission__codename='view_pathclasse').exists() and\
-                        request.user.has_perm('sigad.view_pathclasse'):
+                    permission__codename=obj[1]).exists() and\
+                        request.user.has_perm('sigad.' + obj[1]):
                     pass
                 else:
                     raise Http404()
@@ -517,6 +520,23 @@ class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
                         return self.handle_no_permission()
 
         return ListView.dispatch(self, request, *args, **kwargs)
+
+
+class PermissionsUserDocumentoCrud(MasterDetailCrud):
+    model = PermissionsUserDocumento
+    parent_field = 'documento'
+
+    class BaseMixin(MasterDetailCrud.BaseMixin):
+        list_field_names = ['permission',  'user', ]
+
+        def get_context_data(self, **kwargs):
+
+            ctxt = MasterDetailCrud.BaseMixin.get_context_data(self, **kwargs)
+
+            if 'pk' in self.kwargs:
+                ctxt['subnav_template_name'] = 'sigad/subnav_documento.yaml'
+
+            return ctxt
 
 
 class PermissionsUserClasseCrud(MasterDetailCrud):
@@ -829,6 +849,13 @@ class DocumentoUpdateView(DocumentoPermissionRequiredMixin, UpdateView):
         return reverse_lazy(
             'cmj.sigad:path_view',
             kwargs={'slug': self.object.absolute_slug})
+
+    def get_context_data(self, **kwargs):
+
+        ctxt = UpdateView.get_context_data(self, **kwargs)
+        if 'pk' in self.kwargs:
+            ctxt['subnav_template_name'] = 'sigad/subnav_documento.yaml'
+        return ctxt
 
 #    def form_valid(self, form):
 #        Revisao.gerar_revisao(form.instance, self.request.user)

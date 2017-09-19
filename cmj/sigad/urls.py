@@ -1,7 +1,8 @@
 from django.conf.urls import include, url
 
 from cmj.sigad import views, imports
-from cmj.sigad.views import PermissionsUserClasseCrud
+from cmj.sigad.views import PermissionsUserClasseCrud,\
+    PermissionsUserDocumentoCrud
 
 from .apps import AppConfig
 
@@ -25,6 +26,7 @@ urlpatterns_sigad = [
 
     url(r'^classe/', include(PermissionsUserClasseCrud.get_urls())),
 
+
     url(r'^classe/(?P<pk>[0-9]+)$',
         views.ClasseListView.as_view(), name='subclasse_list'),
 
@@ -36,6 +38,9 @@ urlpatterns_sigad = [
 
     url(r'^documento/(?P<pk>[0-9]+)/delete$',
         views.DocumentoDeleteView.as_view(), name='documento_delete'),
+
+    url(r'^documento/', include(PermissionsUserDocumentoCrud.get_urls())),
+
 
 
 ]

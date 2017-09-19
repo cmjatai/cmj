@@ -2,3 +2,6 @@
 PermissionsUserClasse:
   {% trans 'Usuários com Acesso' %}:
   - user permission
+PermissionsUserDocumento:
+  {% trans 'Usuários com Acesso' %}:
+  - user permission

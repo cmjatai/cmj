@@ -353,6 +353,11 @@ class PermissionsUserClasse(CMSMixin):
     def __str__(self):
         return '%s - %s' % (self.permission, self.user or '')
 
+    def validate_unique(self, exclude=None):
+        if 'classe' in exclude:
+            exclude.remove('classe')
+        CMSMixin.validate_unique(self, exclude=exclude)
+
     class Meta:
         unique_together = (
             ('user', 'classe', 'permission'),
@@ -518,9 +523,12 @@ class ReferenciaEntreDocumentos(Slugged):
 
 
 class PermissionsUserDocumento(CMSMixin):
-    user = models.ForeignKey(
-        get_settings_auth_user_model(), verbose_name=_('Usuário'))
-    documento = models.ForeignKey(Documento, verbose_name=_('Documento'))
+    user = models.ForeignKey(get_settings_auth_user_model(),
+                             blank=True, null=True, default=None,
+                             verbose_name=_('Usuário'))
+    documento = models.ForeignKey(Documento,
+                                  related_name='permissions_user_set',
+                                  verbose_name=_('Documento'))
     permission = models.ForeignKey(Permission, verbose_name=_('Permissão'))
 
     class Meta:

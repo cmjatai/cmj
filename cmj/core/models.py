@@ -172,22 +172,7 @@ class CmjSearchMixin(models.Model):
         return super(CmjSearchMixin, self).save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
 
 
-class CmjModelMixin(models.Model):
-    # para migração
-    """created = models.DateTimeField(
-        verbose_name=_('created'),
-        editable=True, auto_now_add=False)
-    modified = models.DateTimeField(
-        verbose_name=_('modified'), editable=True, auto_now=False)"""
-    # para produção
-    created = models.DateTimeField(
-        verbose_name=_('created'),
-        editable=False, auto_now_add=True)
-    modified = models.DateTimeField(
-        verbose_name=_('modified'), editable=False, auto_now=True)
-
-    class Meta:
-        abstract = True
+class CmjCleanMixin:
 
     def clean(self):
         """
@@ -195,7 +180,7 @@ class CmjModelMixin(models.Model):
         """
         from django.core.exceptions import ValidationError
 
-        super(CmjModelMixin, self).clean()
+        super(CmjCleanMixin, self).clean()
 
         for field_tuple in self._meta.unique_together[:]:
             unique_filter = {}
@@ -218,6 +203,24 @@ class CmjModelMixin(models.Model):
                     msg = self.unique_error_message(
                         self.__class__, tuple(unique_fields))
                     raise ValidationError(msg)
+
+
+class CmjModelMixin(CmjCleanMixin, models.Model):
+    # para migração
+    """created = models.DateTimeField(
+        verbose_name=_('created'),
+        editable=True, auto_now_add=False)
+    modified = models.DateTimeField(
+        verbose_name=_('modified'), editable=True, auto_now=False)"""
+    # para produção
+    created = models.DateTimeField(
+        verbose_name=_('created'),
+        editable=False, auto_now_add=True)
+    modified = models.DateTimeField(
+        verbose_name=_('modified'), editable=False, auto_now=True)
+
+    class Meta:
+        abstract = True
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None, clean=True):
