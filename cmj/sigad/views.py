@@ -26,6 +26,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.models import Permission
+from django.core.exceptions import PermissionDenied
 from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
 from django.core.urlresolvers import reverse_lazy
@@ -42,6 +43,7 @@ from django.views.generic.list import ListView, MultipleObjectMixin
 from sapl.parlamentares.models import Parlamentar
 import reversion
 
+from cmj.crud.base import MasterDetailCrud
 from cmj.sigad import forms, models
 from cmj.sigad.forms import DocumentoForm
 from cmj.sigad.models import Documento, Classe, ReferenciaEntreDocumentos,\
@@ -150,7 +152,7 @@ class PathView(MultipleObjectMixin, TemplateView):
                 slug_part.reverse()
                 slug_class = slug[i + 1:]
                 slug_class.reverse()
-                print(slug_class, slug_part)
+                # print(slug_class, slug_part)
                 return Documento.objects.get(
                     slug='/'.join(slug_part),
                     classe__slug='/'.join(slug_class))
@@ -219,6 +221,29 @@ class PathView(MultipleObjectMixin, TemplateView):
         # do documento referente ter recebido acesso, parece ser mais prudente
         # verificar novamente a permissão para entrega visto que o mantenedor
         # do documento referenciado pode alterar sua regra de permissão.
+
+        # Verificação para classes:
+        if self.classe:
+            u = request.user
+            if u.is_anonymous() and self.classe.visibilidade != \
+                    Classe.STATUS_PUBLIC:
+                raise Http404()
+
+            elif self.classe.visibilidade == Classe.STATUS_PRIVATE:
+                if self.classe.owner != request.user:
+                    raise Http404()
+                if not request.user.has_perm('view_pathclasse'):
+                    raise PermissionDenied()
+
+            elif self.classe.visibilidade == Classe.STATUS_RESTRICT_USER:
+                if not self.classe.permissions_user_set.filter(
+                        user=request.user,
+                        permission__codename='view_pathclasse').exists():
+                    raise Http404()
+
+            elif self.classe.visibilidade == Classe.STATUS_RESTRICT_PERMISSION:
+                if not request.user.has_perm('view_pathclasse'):
+                    raise Http404()
 
         return TemplateView.dispatch(self, request, *args, **kwargs)
 
@@ -292,10 +317,10 @@ class ClasseCreateView(ClasseParentMixin,
         response = super(ClasseCreateView, self).form_valid(form)
 
         # Revisao.gerar_revisao(self.object, self.request.user)
-        if self.object.visibilidade == models.STATUS_PUBLIC:
+        if self.object.visibilidade == Classe.STATUS_PUBLIC:
             parents = self.object.parents
             for p in parents:
-                p.visibilidade = models.STATUS_PUBLIC
+                p.visibilidade = Classe.STATUS_PUBLIC
                 p.save()
                 # Revisao.gerar_revisao(p, self.request.user)
 
@@ -362,6 +387,10 @@ class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
         context = {}
         context['object'] = self.object
 
+        if self.object:
+            if self.object.visibilidade == Classe.STATUS_RESTRICT_USER:
+                context['subnav_template_name'] = 'sigad/subnav_classe.yaml'
+
         return ListView.get_context_data(self, **context)
 
     def get_queryset(self):
@@ -375,13 +404,13 @@ class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
         if self.has_permission():
             return qpub
 
-        qpub = qpub.filter(visibilidade=models.STATUS_PUBLIC)
+        qpub = qpub.filter(visibilidade=Classe.STATUS_PUBLIC)
 
         qs = list(qpub)
         ''' Inclui os filhos da classe atual de visualização que
         possuam algum herdeiro que seja público'''
         pubs = Classe.objects.filter(
-            visibilidade=models.STATUS_PUBLIC).select_related(
+            visibilidade=Classe.STATUS_PUBLIC).select_related(
             'parent', 'parent__parent')
         for pub in pubs:
             parents = pub.parents
@@ -440,12 +469,12 @@ class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
 
             if not has_permission:
                 if not request.user.is_superuser and \
-                        self.object.visibilidade != models.STATUS_PUBLIC:
+                        self.object.visibilidade != Classe.STATUS_PUBLIC:
                     has_permission = False
 
                     # FIXME: refatorar e analisar apartir de self.object
                     pubs = Classe.objects.filter(
-                        visibilidade=models.STATUS_PUBLIC).select_related(
+                        visibilidade=Classe.STATUS_PUBLIC).select_related(
                         'parent', 'parent__parent')
                     for pub in pubs:
                         parents = pub.parents
@@ -458,7 +487,7 @@ class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
 
                     if not has_permission and not request.user.is_anonymous():
                         if (self.object.visibilidade ==
-                                models.STATUS_PRIVATE and
+                                Classe.STATUS_PRIVATE and
                                 self.object.owner != request.user):
                             has_permission = False
                         else:
@@ -481,9 +510,26 @@ class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
                                 if has_permission:
                                     break
                     if not has_permission:
-                        return self.handle_no_permission(request)
+                        return self.handle_no_permission()
 
         return ListView.dispatch(self, request, *args, **kwargs)
+
+
+class PermissionsUserClasseCrud(MasterDetailCrud):
+    model = PermissionsUserClasse
+    parent_field = 'classe'
+
+    class BaseMixin(MasterDetailCrud.BaseMixin):
+        list_field_names = ['user', 'classe', 'permission', ]
+
+        def get_context_data(self, **kwargs):
+
+            ctxt = MasterDetailCrud.BaseMixin.get_context_data(self, **kwargs)
+
+            if 'pk' in self.kwargs:
+                ctxt['subnav_template_name'] = 'sigad/subnav_classe.yaml'
+
+            return ctxt
 
 
 """
@@ -669,7 +715,7 @@ class DocumentoPermissionRequiredMixin(PermissionRequiredMixin):
                     has_permission = False
 
                 # se documento é público, testa se usuário tem permissão.
-                elif self.object.visibilidade == models.STATUS_PUBLIC:
+                elif self.object.visibilidade == Documento.STATUS_PUBLIC:
                     has_permission = super().has_permission()
 
                 # se documento é restrito, analisa quais usuários possuem

@@ -1,6 +1,7 @@
 from django.conf.urls import include, url
 
 from cmj.sigad import views, imports
+from cmj.sigad.views import PermissionsUserClasseCrud
 
 from .apps import AppConfig
 
@@ -21,6 +22,8 @@ urlpatterns_sigad = [
 
     url(r'^classe$',
         views.ClasseListView.as_view(), name='classe_list'),
+
+    url(r'^classe/', include(PermissionsUserClasseCrud.get_urls())),
 
     url(r'^classe/(?P<pk>[0-9]+)$',
         views.ClasseListView.as_view(), name='subclasse_list'),

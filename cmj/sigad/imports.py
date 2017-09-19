@@ -116,6 +116,8 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                     documento.tipo = Documento.TPD_DOC
                     documento.template_doc = 2
                     documento.owner = request.user
+                    documento.visibilidade = \
+                        Documento.STATUS_RESTRICT_PERMISSION
                     documento.save()
                     Revisao.gerar_revisao(documento, request.user)
 
@@ -130,6 +132,8 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                     container.tipo = Documento.TPD_CONTAINER_EXTENDIDO
                     container.owner = request.user
                     container.parent = documento
+                    container.visibilidade = \
+                        Documento.STATUS_RESTRICT_PERMISSION
                     container.save()
                     Revisao.gerar_revisao(container, request.user)
 
@@ -149,7 +153,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
 
                     image = Documento()
                     image.autor = 'Hélio Domingos'
-                    image.visibilidade = Documento.STATUS_RESTRICT_USER
+                    image.visibilidade = Documento.STATUS_RESTRICT_PERMISSION
                     image.ordem = ordem
                     image.old_path = old_path_midia
                     image.titulo = ''
@@ -190,7 +194,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
             news = []
             while True:
                 print(p)
-                r = http.request('GET', ('www.camarajatai.go.gov.br'
+                r = http.request('GET', ('http://187.6.249.157'
                                          '/portal/json/jsonclient/json'
                                          '?page=%s&step=%s') % (
                     p, s))
@@ -209,7 +213,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                 if stop or len(jdata) < s:
                     break
                 p += 1
-                break  # comentar para importar tudo
+                # break  # comentar para importar tudo
 
             news.reverse()
 
@@ -268,6 +272,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                     container.owner = request.user
                     container.parent = d
                     container.ordem = 1
+                    container.visibilidade = d.visibilidade
                     container.save()
                     Revisao.gerar_revisao(container, request.user)
 
@@ -283,6 +288,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                     image.parent = container
                     image.tipo = Documento.TPD_IMAGE
                     image.classe_id = 1
+                    image.visibilidade = d.visibilidade
                     image.save()
                     Revisao.gerar_revisao(image, request.user)
 
@@ -296,7 +302,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                     versao.content_type = 'image/jpeg'
                     versao.save()
 
-                    file = http.request('GET', ('www.camarajatai.go.gov.br%s'
+                    file = http.request('GET', ('http://187.6.249.157%s'
                                                 ) % (n['image']))
 
                     img_temp = NamedTemporaryFile(delete=True)
@@ -308,7 +314,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                     ordem += 1
                     texto = Documento()
                     texto.texto = n['text']
-                    texto.visibilidade = 0
+                    texto.visibilidade = d.visibilidade
                     texto.ordem = ordem
                     texto.owner = request.user
                     texto.parent = container
@@ -318,11 +324,23 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                     Revisao.gerar_revisao(texto, request.user)
 
                 if n['url_source_album']:
-                    ordem += 1
-                    r = http.request('GET', '%s%s' % (self.end_local_fotog,
-                                                      n['url_source_album']))
 
-                    jdata = json.loads(r.data.decode('utf-8'))
+                    print('%s%s' % (self.end_local_fotog,
+                                    n['url_source_album']))
+
+                    jdata = []
+                    try:
+                        r = http.request('GET', '%s%s' % (
+                            self.end_local_fotog,
+                            n['url_source_album']))
+                        jdata = json.loads(r.data.decode('utf-8'))
+                    except:
+                        pass
+
+                    if not jdata:
+                        continue
+
+                    ordem += 1
 
                     cont_gallery = Documento()
                     cont_gallery.titulo = ''
@@ -332,12 +350,13 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                     cont_gallery.owner = request.user
                     cont_gallery.parent = d
                     cont_gallery.ordem = 2
+                    cont_gallery.visibilidade = d.visibilidade
                     cont_gallery.save()
                     Revisao.gerar_revisao(cont_gallery, request.user)
 
                     galeria = Documento()
                     galeria.autor = n['image_caption']
-                    galeria.visibilidade = 0
+                    galeria.visibilidade = d.visibilidade
                     galeria.ordem = ordem
                     galeria.titulo = ''
                     galeria.owner = request.user
@@ -453,7 +472,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
 
             print(docs.count())
 
-            for doc in Documento.objects.filter(parent__isnull=False):
+            for doc in Documento.objects.filter(parent__isnull=False)[:100]:
                 for child in doc.childs.view_childs():
                     child.classe_id = doc.classe_id
                     child.save()

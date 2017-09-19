@@ -332,6 +332,7 @@ class Classe(Slugged, CMSMixin):
         verbose_name_plural = _('Classes')
         permissions = (
             ('view_subclasse', _('Visualização de Subclasses')),
+            ('view_pathclasse', _('Visualização de Classe via Path')),
         )
 
     @cached_property
@@ -346,7 +347,8 @@ class Classe(Slugged, CMSMixin):
 class PermissionsUserClasse(CMSMixin):
     user = models.ForeignKey(
         get_settings_auth_user_model(), verbose_name=_('Usuário'))
-    classe = models.ForeignKey(Classe, verbose_name=_('Classe'))
+    classe = models.ForeignKey(Classe, verbose_name=_('Classe'),
+                               related_name='permissions_user_set')
     permission = models.ForeignKey(Permission, verbose_name=_('Permissão'))
 
     class Meta:
