@@ -1,0 +1,5 @@
+{% load i18n %}
+- title: {% trans 'Classe e SubClasses' %}
+  url: subclasse_list
+- title: {% trans 'Usuários com Acesso' %}
+  url: permissionsuserclasse_list
