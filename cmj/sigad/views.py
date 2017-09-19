@@ -174,6 +174,7 @@ class PathView(MultipleObjectMixin, TemplateView):
             self.template_name = 'path/pagina_inicial.html'
             return TemplateView.dispatch(self, request, *args, **kwargs)
 
+        referente = None
         try:
             # verifica se o slug é uma classe
             self.classe = Classe.objects.get(slug='/'.join(slug))
@@ -200,6 +201,7 @@ class PathView(MultipleObjectMixin, TemplateView):
                             ref = ReferenciaEntreDocumentos.objects.get(
                                 slug=slug[0])
                             self.documento = ref.referenciado
+                            referente = ref.referente
                         except:
                             pass
 
@@ -224,8 +226,12 @@ class PathView(MultipleObjectMixin, TemplateView):
 
         # Verificação para classes:
 
-        obj = (self.documento if self.documento else self.classe,
-               'view_documento' if self.documento else 'view_pathclasse')
+        obj = [self.documento if self.documento else self.classe,
+               'view_documento' if self.documento else 'view_pathclasse']
+
+        if referente:
+            obj[0] = referente
+
         if obj[0]:
             u = request.user
             if u.is_anonymous() and obj[0].visibilidade != \
