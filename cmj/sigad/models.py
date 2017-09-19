@@ -134,13 +134,11 @@ class Revisao(models.Model):
 class CMSMixin(models.Model):
 
     STATUS_PRIVATE = 99
-    STATUS_RESTRICT_PERMISSION = 2
-    STATUS_RESTRICT_USER = 1
+    STATUS_RESTRICT = 1
     STATUS_PUBLIC = 0
 
     VISIBILIDADE_STATUS = (
-        (STATUS_RESTRICT_PERMISSION, _('Restrição por Permissão')),
-        (STATUS_RESTRICT_USER, _('Restrição por Usuário')),
+        (STATUS_RESTRICT, _('Restrito')),
         (STATUS_PRIVATE, _('Privado')),
         (STATUS_PUBLIC, _('Público')),
     )
@@ -345,8 +343,9 @@ class Classe(Slugged, CMSMixin):
 
 
 class PermissionsUserClasse(CMSMixin):
-    user = models.ForeignKey(
-        get_settings_auth_user_model(), verbose_name=_('Usuário'))
+    user = models.ForeignKey(get_settings_auth_user_model(),
+                             blank=True, null=True, default=None,
+                             verbose_name=_('Usuário'))
     classe = models.ForeignKey(Classe, verbose_name=_('Classe'),
                                related_name='permissions_user_set')
     permission = models.ForeignKey(Permission, verbose_name=_('Permissão'))

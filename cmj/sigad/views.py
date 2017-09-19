@@ -232,17 +232,21 @@ class PathView(MultipleObjectMixin, TemplateView):
             elif self.classe.visibilidade == Classe.STATUS_PRIVATE:
                 if self.classe.owner != request.user:
                     raise Http404()
-                if not request.user.has_perm('view_pathclasse'):
+                if not request.user.has_perm('sigad.view_pathclasse'):
                     raise PermissionDenied()
 
-            elif self.classe.visibilidade == Classe.STATUS_RESTRICT_USER:
-                if not self.classe.permissions_user_set.filter(
-                        user=request.user,
-                        permission__codename='view_pathclasse').exists():
-                    raise Http404()
+            elif self.classe.visibilidade == Classe.STATUS_RESTRICT:
 
-            elif self.classe.visibilidade == Classe.STATUS_RESTRICT_PERMISSION:
-                if not request.user.has_perm('view_pathclasse'):
+                if self.classe.permissions_user_set.filter(
+                        user=request.user,
+                        permission__codename='sigad.view_pathclasse').exists():
+                    pass
+                elif self.classe.permissions_user_set.filter(
+                    user__isnull=True,
+                    permission__codename='view_pathclasse').exists() and\
+                        request.user.has_perm('sigad.view_pathclasse'):
+                    pass
+                else:
                     raise Http404()
 
         return TemplateView.dispatch(self, request, *args, **kwargs)
@@ -388,7 +392,7 @@ class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
         context['object'] = self.object
 
         if self.object:
-            if self.object.visibilidade == Classe.STATUS_RESTRICT_USER:
+            if self.object.visibilidade == Classe.STATUS_RESTRICT:
                 context['subnav_template_name'] = 'sigad/subnav_classe.yaml'
 
         return ListView.get_context_data(self, **context)
