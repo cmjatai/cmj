@@ -239,7 +239,7 @@ class PathView(MultipleObjectMixin, TemplateView):
 
                 if self.classe.permissions_user_set.filter(
                         user=request.user,
-                        permission__codename='sigad.view_pathclasse').exists():
+                        permission__codename='view_pathclasse').exists():
                     pass
                 elif self.classe.permissions_user_set.filter(
                     user__isnull=True,
@@ -524,7 +524,7 @@ class PermissionsUserClasseCrud(MasterDetailCrud):
     parent_field = 'classe'
 
     class BaseMixin(MasterDetailCrud.BaseMixin):
-        list_field_names = ['user', 'classe', 'permission', ]
+        list_field_names = ['permission',  'user', ]
 
         def get_context_data(self, **kwargs):
 

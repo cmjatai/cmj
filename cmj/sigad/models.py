@@ -350,6 +350,9 @@ class PermissionsUserClasse(CMSMixin):
                                related_name='permissions_user_set')
     permission = models.ForeignKey(Permission, verbose_name=_('Permissão'))
 
+    def __str__(self):
+        return '%s - %s' % (self.permission, self.user or '')
+
     class Meta:
         unique_together = (
             ('user', 'classe', 'permission'),
