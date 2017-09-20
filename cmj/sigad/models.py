@@ -70,6 +70,12 @@ class Parent(models.Model):
         parents = self.parent.parents + [self.parent, ]
         return parents
 
+    def tree2list(self):
+        yield self
+        for child in self.childs.view_childs():
+            for item in child.tree2list():
+                yield item
+
 
 class Revisao(models.Model):
 
