@@ -282,10 +282,9 @@ STATICFILES_FINDERS = (
 )
 
 
-
 # Additional search paths for SASS files when using the @import statement
 SASS_PROCESSOR_INCLUDE_DIRS = (
-   BOWER_COMPONENTS_ROOT.child(
+    BOWER_COMPONENTS_ROOT.child(
         'bower_components', 'bootstrap-sass', 'assets', 'stylesheets'),
 )
 
@@ -322,7 +321,6 @@ HAYSTACK_CONNECTIONS = {
 # hack to suppress many annoying warnings from crispy_forms
 # see sapl.temp_suppress_crispy_form_warnings
 LOGGING = SUPRESS_CRISPY_FORM_WARNINGS_LOGGING
-
 
 LOGGING_CONSOLE = config('LOGGING_CONSOLE', default=False, cast=bool)
 if DEBUG and LOGGING_CONSOLE:

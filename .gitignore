@@ -92,7 +92,8 @@ media_protected
 whoosh_index/
 .ipynb_checkpoints
 *.ipynb
-scripts/
+scripts_local/
+cmj/legacy/scripts/
 run/
 webpack-stats.json
 

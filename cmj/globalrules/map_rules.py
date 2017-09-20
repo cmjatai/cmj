@@ -14,7 +14,7 @@ from cmj.globalrules import (RP_ADD, RP_CHANGE, RP_DELETE, RP_DETAIL, RP_LIST,
                              GROUP_SAAP_WORKSPACE_MANAGERS,
                              GROUP_SAAP_WORKSPACE_OPER_GRUPO_CONTATOS,
                              GROUP_SAAP_WORKSPACE_OPER_PROCESSOS,
-                             menu_processos)
+                             menu_processos, GROUP_ANONYMOUS)
 
 
 __base__ = [RP_LIST, RP_DETAIL, RP_ADD, RP_CHANGE, RP_DELETE]
@@ -90,10 +90,16 @@ rules_saap_group_workspace_oper_processos = {
         (ProcessoContato, __base__),
     ]
 }
-
+# não possui efeito e é usada nos testes que verificam se todos os models estão
+# neste arquivo rules.py
+rules_group_anonymous = {
+    'group': GROUP_ANONYMOUS,
+    'rules': []
+}
 
 rules_patterns = [
     rules_group_social_users,
+    rules_group_anonymous,
     rules_saap_group_workspace_managers,
     rules_saap_group_workspace_oper_contatos,
     rules_saap_group_workspace_oper_grupo_contatos,
