@@ -11,14 +11,41 @@ from django.db.models.deletion import PROTECT, CASCADE
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from image_cropping import ImageCropField, ImageRatioField
-from sapl.parlamentares.models import Parlamentar
 
-from cmj.core.rules import SEARCH_TRECHO
-from cmj.globalrules.globalrules import rules, GROUP_SOCIAL_USERS
+from cmj.globalrules import MENU_PERMS_FOR_USERS, GROUP_SOCIAL_USERS
 from cmj.utils import get_settings_auth_user_model, normalize, YES_NO_CHOICES,\
     UF
 
-from .rules import MENU_PERMS_FOR_USERS
+
+def group_social_users_add_user(self, user):
+    if user.groups.filter(name=GROUP_SOCIAL_USERS).exists():
+        return
+
+    g = Group.objects.get_or_create(name=GROUP_SOCIAL_USERS)[0]
+    user.groups.add(g)
+    user.save()
+
+
+def groups_remove_user(self, user, groups_name):
+    if not isinstance(groups_name, list):
+        groups_name = [groups_name, ]
+    for group_name in groups_name:
+        if not group_name or not user.groups.filter(
+                name=group_name).exists():
+            continue
+        g = Group.objects.get_or_create(name=group_name)[0]
+        user.groups.remove(g)
+
+
+def groups_add_user(self, user, groups_name):
+    if not isinstance(groups_name, list):
+        groups_name = [groups_name, ]
+    for group_name in groups_name:
+        if not group_name or user.groups.filter(
+                name=group_name).exists():
+            continue
+        g = Group.objects.get_or_create(name=group_name)[0]
+        user.groups.add(g)
 
 
 class UserManager(BaseUserManager):
@@ -44,7 +71,7 @@ class UserManager(BaseUserManager):
         except:
             user = self.model.objects.get_by_natural_key(email)
 
-        rules.group_social_users_add_user(user)
+        group_social_users_add_user(user)
         return user
 
     def create_user(self, email, password=None, **extra_fields):

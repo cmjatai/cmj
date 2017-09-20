@@ -10,21 +10,17 @@ from rest_framework import viewsets, mixins
 from rest_framework.authentication import SessionAuthentication,\
     BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
+from sapl.parlamentares.models import Partido, Filiacao
 
 from cmj.core.forms import OperadorAreaTrabalhoForm, ImpressoEnderecamentoForm,\
     ListWithSearchForm
 from cmj.core.models import Cep, TipoLogradouro, Logradouro, RegiaoMunicipal,\
     Distrito, Bairro, Trecho, AreaTrabalho, OperadorAreaTrabalho,\
-    ImpressoEnderecamento
-from cmj.core.rules import rules_patterns
+    ImpressoEnderecamento, groups_remove_user, groups_add_user
 from cmj.core.serializers import TrechoSearchSerializer, TrechoSerializer
 from cmj.crud.base import Crud, CrudAux, MasterDetailCrud
-from cmj.globalrules import globalrules
 from cmj.utils import normalize
-from sapl.parlamentares.models import Partido, Filiacao
 
-
-globalrules.rules.config_groups(rules_patterns)
 
 CepCrud = CrudAux.build(Cep, None, 'cep')
 RegiaoMunicipalCrud = CrudAux.build(
@@ -186,13 +182,13 @@ class OperadorAreaTrabalhoCrud(MasterDetailCrud):
             old = OperadorAreaTrabalho.objects.get(pk=self.object.pk)
 
             groups = list(old.grupos_associados.values_list('name', flat=True))
-            globalrules.rules.groups_remove_user(old.user, groups)
+            groups_remove_user(old.user, groups)
 
             response = super().form_valid(form)
 
             groups = list(self.object.grupos_associados.values_list(
                 'name', flat=True))
-            globalrules.rules.groups_add_user(self.object.user, groups)
+            groups_add_user(self.object.user, groups)
 
             return response
 
@@ -218,7 +214,7 @@ class OperadorAreaTrabalhoCrud(MasterDetailCrud):
 
             groups = list(self.object.grupos_associados.values_list(
                 'name', flat=True))
-            globalrules.rules.groups_add_user(self.object.user, groups)
+            groups_add_user(self.object.user, groups)
 
             return response
 
@@ -229,7 +225,7 @@ class OperadorAreaTrabalhoCrud(MasterDetailCrud):
             self.object = self.get_object()
             groups = list(
                 self.object.grupos_associados.values_list('name', flat=True))
-            globalrules.rules.groups_remove_user(self.object.user, groups)
+            groups_remove_user(self.object.user, groups)
 
             return MasterDetailCrud.DeleteView.post(
                 self, request, *args, **kwargs)

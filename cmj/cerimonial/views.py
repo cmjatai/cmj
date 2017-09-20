@@ -4,6 +4,7 @@ from django.db.models.aggregates import Max
 from django.http.response import HttpResponse
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.edit import FormView
+from sapl.crispy_layout_mixin import CrispyLayoutFormMixin
 
 from cmj.cerimonial.forms import LocalTrabalhoForm, EnderecoForm,\
     TipoAutoridadeForm, LocalTrabalhoPerfilForm,\
@@ -18,17 +19,12 @@ from cmj.cerimonial.models import TipoTelefone, TipoEndereco,\
     EmailPerfil, TelefonePerfil, EnderecoPerfil, FiliacaoPartidaria,\
     StatusProcesso, ClassificacaoProcesso, TopicoProcesso, Processo,\
     AssuntoProcesso, ProcessoContato, GrupoDeContatos
-from cmj.cerimonial.rules import rules_patterns
 from cmj.core.forms import ListWithSearchForm
 from cmj.core.models import AreaTrabalho
 from cmj.crud.base import CrudAux, Crud, MasterDetailCrud
-from cmj.globalrules import globalrules
 from cmj.globalrules.crud_custom import PerfilAbstractCrud,\
     PerfilDetailCrudPermission
-from sapl.crispy_layout_mixin import CrispyLayoutFormMixin
 
-
-globalrules.rules.config_groups(rules_patterns)
 
 # ---- Details Master Crud build ---------------------------
 TipoTelefoneCrud = CrudAux.build(TipoTelefone, None, 'tipotelefone')
