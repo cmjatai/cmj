@@ -165,7 +165,7 @@
               {% endwith %}
         {% endif %}
       {% endfor %}
-      {% if forloop.first %}
+      {% if forloop.first and not forloop.last %}
         <div class="painel-corte">
           <div class="btn btn-success">
             {% trans "Continuar Lendo" %}

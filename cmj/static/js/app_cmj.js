@@ -657,10 +657,18 @@ function Gallery() {
 
 
 function ContainerFirst() {
-    var first = $('.container-first').css('height', window.innerHeight * 0.6);
-    first.find('.btn').click(function() {
-        this.parentElement.remove();
+    var first = $('.container-first');
+    if (first.height() > window.innerHeight) {
+        first.css('height', window.innerHeight * 0.6);
+        btn = first.find('.btn').click(function() {
+            this.parentElement.remove();
+            first.css('height', '');
+            first.removeClass('container-first');
+        });
+    }
+    else {
+        first.removeClass('.container-first');
         first.css('height', '');
-        first.removeClass('container-first');
-    })
+        first.find('.painel-corte').remove();
+    }
 }
