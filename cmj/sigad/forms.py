@@ -85,6 +85,7 @@ class DocumentoForm(ModelForm):
         fields = ['titulo',
                   'template_doc',
                   'descricao',
+                  'visibilidade'
                   ]
 
     def __init__(self, *args, **kwargs):
@@ -92,7 +93,7 @@ class DocumentoForm(ModelForm):
         self.helper = FormHelper()
         self.helper.layout = SaplFormLayout(
             to_row([
-                ('titulo', 6), ('template_doc', 3),
+                ('titulo', 6), ('template_doc', 3), ('visibilidade', 3),
             ]),
             to_row([
                 ('descricao', 12)

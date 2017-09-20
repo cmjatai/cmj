@@ -551,8 +551,7 @@ class PermissionsUserDocumentoCrud(MasterDetailCrud):
 
             ctxt = MasterDetailCrud.BaseMixin.get_context_data(self, **kwargs)
 
-            if 'pk' in self.kwargs:
-                ctxt['subnav_template_name'] = 'sigad/subnav_documento.yaml'
+            ctxt['subnav_template_name'] = 'sigad/subnav_documento.yaml'
 
             return ctxt
 
@@ -871,7 +870,8 @@ class DocumentoUpdateView(DocumentoPermissionRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
 
         ctxt = UpdateView.get_context_data(self, **kwargs)
-        if 'pk' in self.kwargs:
+        if 'pk' in self.kwargs and self.object.visibilidade == \
+                Documento.STATUS_RESTRICT:
             ctxt['subnav_template_name'] = 'sigad/subnav_documento.yaml'
         return ctxt
 

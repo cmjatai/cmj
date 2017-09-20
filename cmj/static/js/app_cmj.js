@@ -647,10 +647,6 @@ function Gallery() {
 
         instance.addEventClick();
 
-        if ('ontouchstart' in document)
-            $('.container-gallery .path-direction').css('display', 'none');
-
-
     }
     instance.init();
 }
