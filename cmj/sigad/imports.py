@@ -68,7 +68,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                                  self.end_local_fotog))
 
         fotografia = self.get_or_create_classe(
-            'Fotografia', perfil=models.CLASSE_ESTRUTURAL)
+            'Banco de Imagens', perfil=models.CLASSE_ESTRUTURAL)
 
         data = r.data.decode('utf-8')
         # print('data: ', data)

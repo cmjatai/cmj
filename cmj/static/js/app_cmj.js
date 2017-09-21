@@ -655,11 +655,14 @@ function ContainerFirst() {
     var first = $('.container-first');
     if (first.height() > window.innerHeight * 2) {
         first.css('height', window.innerHeight * 0.6);
-        btn = first.find('.btn').click(function() {
+        var btn = first.find('.btn').click(function() {
             this.parentElement.remove();
             first.css('height', '');
             first.removeClass('container-first');
         });
+        if (btn.length === 0) {
+            first.css('height', '');
+        }
     }
     else {
         first.removeClass('.container-first');

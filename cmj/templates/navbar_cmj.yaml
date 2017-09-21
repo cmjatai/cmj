@@ -2,5 +2,3 @@
 
 - title: {% trans 'Notícias' %}
   url: /noticias
-- title: {% trans 'Galerias' %}
-  url: /galerias
