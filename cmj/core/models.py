@@ -17,7 +17,7 @@ from cmj.utils import get_settings_auth_user_model, normalize, YES_NO_CHOICES,\
     UF
 
 
-def group_social_users_add_user(self, user):
+def group_social_users_add_user(user):
     if user.groups.filter(name=GROUP_SOCIAL_USERS).exists():
         return
 
@@ -26,7 +26,7 @@ def group_social_users_add_user(self, user):
     user.save()
 
 
-def groups_remove_user(self, user, groups_name):
+def groups_remove_user(user, groups_name):
     if not isinstance(groups_name, list):
         groups_name = [groups_name, ]
     for group_name in groups_name:
@@ -37,7 +37,7 @@ def groups_remove_user(self, user, groups_name):
         user.groups.remove(g)
 
 
-def groups_add_user(self, user, groups_name):
+def groups_add_user(user, groups_name):
     if not isinstance(groups_name, list):
         groups_name = [groups_name, ]
     for group_name in groups_name:
@@ -365,7 +365,7 @@ class OperadorAreaTrabalho(CmjAuditoriaModelMixin):
         verbose_name_plural = _('Operadores')
 
     def __str__(self):
-        return self.user.get_display_name()
+        return self.user_name
 
 
 class Cep(models.Model):

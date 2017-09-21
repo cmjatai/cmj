@@ -302,6 +302,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                 texto.ordem = ordem
                 texto.owner = request.user
                 texto.parent = container
+                texto.classe_id = 1
                 texto.tipo = Documento.TPD_TEXTO
 
                 texto.save()
