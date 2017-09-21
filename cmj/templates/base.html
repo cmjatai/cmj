@@ -113,30 +113,26 @@
                 </ul>
 
                 <ul class="nav navbar-nav">
-                  {% comment %}
-                    {% block sections_navbar %} {% navbar 'navbar.yaml' %}{% endblock sections_navbar %}
-
                   {% if areatrabalho %}
                     <li class="dropdown">
-                      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "SAAP" %}<span class="caret"></span></a>
-                      <ul class="dropdown-menu menu-left">
+                      <a class="dropdown-toggle" href="#fakeLink" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Portal" %}<span class="caret"></span></a>
+                      <ul class="dropdown-menu menu-left" role="menu">
+                        {% navbar 'navbar_cmj.yaml' %}
                       </ul>
                     </li>
+                    {% if perms.core.menu_contatos %}
+                      <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'cmj.cerimonial:contato_list' %}">{% trans "Contatos" %}</a></li>
+                    {% endif %}
+                    {% if perms.core.menu_grupocontatos %}
+                      <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'cmj.cerimonial:grupodecontatos_list' %}">{% trans "Grupos" %}</a></li>
+                    {% endif %}
+                    {% if perms.core.menu_processos %}
+                      <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'cmj.cerimonial:processo_list' %}">{% trans "Processos" %}</a></li>
+                    {% endif %}
+
+                  {% else %}
+                    {% navbar 'navbar_cmj.yaml' %}
                   {% endif %}
-                  {% endcomment %}
-                         <li class="nav__sub-item"><a class="dropdown-toggle" href="/noticias">{% trans "Notícias" %}</a></li>
-                        {% if perms.core.menu_contatos %}
-                          <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'cmj.cerimonial:contato_list' %}">{% trans "Contatos" %}</a></li>
-                        {% endif %}
-                        {% if perms.core.menu_grupocontatos %}
-                          <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'cmj.cerimonial:grupodecontatos_list' %}">{% trans "Grupos" %}</a></li>
-                        {% endif %}
-                        {% if perms.core.menu_processos %}
-                          <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'cmj.cerimonial:processo_list' %}">{% trans "Processos" %}</a></li>
-                        {% endif %}
-
-
-
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                         {% if perms.core.menu_relatorios %}

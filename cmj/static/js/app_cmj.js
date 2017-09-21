@@ -30,8 +30,6 @@ function isElementInViewport (el) {
 
 function ImpressoEnderecamentoRenderer(opts) {
     $(function() {
-
-
         var ier = $('body').children(".ier");
         if (ier.length > 0)
             $(ier).remove();
@@ -322,7 +320,7 @@ function Gallery() {
             }
         } else {
             if (div_image.parentElement.offsetWidth != div_image.parentElement.parentElement.offsetWidth) {
-                div_image.style.padding = div_image.offsetHeight * 0.1 + 'px';
+                div_image.style.padding = div_image.offsetHeight * 0.04 + 'px';
                 div_image.style.paddingTop = (div_image.offsetHeight - img.height) / 2 + 'px';
             }
             else {
@@ -590,6 +588,7 @@ function Gallery() {
                 if (!next.hasClass('gallery-show'))
                     return false;
 
+
                 $(next[0].data.parentElement.parentElement).animate({
                     scrollLeft: next[0].data.offsetLeft - view.width() / 2 + next[0].data.offsetWidth / 2
                 }, 300);
@@ -654,7 +653,7 @@ function Gallery() {
 
 function ContainerFirst() {
     var first = $('.container-first');
-    if (first.height() > window.innerHeight) {
+    if (first.height() > window.innerHeight * 2) {
         first.css('height', window.innerHeight * 0.6);
         btn = first.find('.btn').click(function() {
             this.parentElement.remove();

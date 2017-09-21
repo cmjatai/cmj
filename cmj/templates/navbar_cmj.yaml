@@ -1,0 +1,6 @@
+{% load i18n common_tags %}
+
+- title: {% trans 'Notícias' %}
+  url: /noticias
+- title: {% trans 'Galerias' %}
+  url: /galerias

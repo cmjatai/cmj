@@ -7,6 +7,7 @@ from django.utils import six
 from django.utils.translation import ugettext_lazy as _, string_concat
 import pytest
 
+from cmj.core.models import User
 from cmj.globalrules import CMJ_GROUPS, map_rules
 from scripts.lista_urls import lista_urls
 

@@ -74,7 +74,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
         # print('data: ', data)
         # return TemplateView.get(self, request, *args, **kwargs)
         jdata = json.loads(data)
-        # jdata = jdata[7:8]
+        jdata = jdata[0:10]
 
         anos = {}
         for evento in jdata:
@@ -198,7 +198,8 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
             if stop or len(jdata) < s:
                 break
             p += 1
-            # break  # comentar para importar tudo
+
+            break  # comentar para importar tudo
 
         news.reverse()
 

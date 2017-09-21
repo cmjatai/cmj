@@ -764,7 +764,6 @@ main {
   position: relative;
   overflow: hidden;
   margin-bottom: $grid-gutter-width;
-  height: 300px;
   .painel-corte {
     position: absolute;
     left: 0px;
@@ -1027,6 +1026,10 @@ main {
     .show-autor {
       font-size: 80%;
     }
+    .show-titulo {
+      line-height: 1.2em;
+      padding-bottom: 0.8em;
+    }
 
   }
 
@@ -1073,6 +1076,14 @@ main {
     position: absolute;
     a {
       border-radius: 0px;
+      background-color: transparent;
+      background-image: none;
+      opacity: 0.5;
+      font-size: 1.5em;
+      &:hover {
+        background-color: transparent;
+        opacity: 1;
+      }
     }
     &.path-next a {
       padding-left: 0.25em;
@@ -1435,9 +1446,6 @@ main {
     .show-contexto {
       width: 42%;
     }
-    .path-direction {
-      display: none;
-    }
 
     .gallery-thumbnails {
       height: 96px;
@@ -1477,6 +1485,11 @@ main {
   }
   .container-gallery {
     line-height: 1.2;
+    .show-contexto {
+      .show-titulo {
+        padding: 0px;
+      }
+    }
   }
 }
 

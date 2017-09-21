@@ -218,19 +218,14 @@ class PathView(MultipleObjectMixin, TemplateView):
         else:
             self.template_name = 'path/path_classe.html'
 
-        # TODO: COM DOCUMENTO E/OU CLASSE SELECIONADO... VERIFICAR PERMISSÕES.
-        # em casos de documento referenciados, apesar de na hora do cadastro
-        # do documento referente ter recebido acesso, parece ser mais prudente
-        # verificar novamente a permissão para entrega visto que o mantenedor
-        # do documento referenciado pode alterar sua regra de permissão.
-
-        # Verificação para classes:
-
         obj = [self.documento if self.documento else self.classe,
                'view_documento' if self.documento else 'view_pathclasse']
 
         if referente:
-            obj[0] = referente
+            if obj[0].visibilidade != CMSMixin.STATUS_PRIVATE:
+                obj[0] = referente
+            else:
+                raise Http404()
 
         if obj[0]:
             u = request.user
