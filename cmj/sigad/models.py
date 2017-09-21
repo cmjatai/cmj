@@ -47,6 +47,17 @@ DOC_TEMPLATES_CHOICE = Choices(
 )
 
 
+CLASSE_TEMPLATES_CHOICE_FILES = {
+    1: 'path/path_classe.html',
+    2: 'path/path_galeria.html'
+}
+
+CLASSE_TEMPLATES_CHOICE = Choices(
+    (1, 'lista_em_linha', _('Listagem Simples em Linha')),
+    (2, 'galeria', _('Galeria Pública de Albuns')),
+)
+
+
 class Parent(models.Model):
 
     parent = models.ForeignKey(
@@ -320,6 +331,11 @@ class Classe(Slugged, CMSMixin):
         choices=DOC_TEMPLATES_CHOICE,
         default=DOC_TEMPLATES_CHOICE.noticia)
 
+    template_classe = models.IntegerField(
+        _('Template para a Classe'),
+        choices=CLASSE_TEMPLATES_CHOICE,
+        default=CLASSE_TEMPLATES_CHOICE.lista_em_linha)
+
     # FIXME: flexibilizar o template de renderização da classe
     """template_classe = models.IntegerField(
         _('Template da Classe'),
@@ -464,7 +480,7 @@ class Documento(Slugged, CMSMixin):
     template_doc = models.IntegerField(
         _('Template para o Documento'),
         choices=DOC_TEMPLATES_CHOICE,
-        default=DOC_TEMPLATES_CHOICE.noticia)
+        blank=True, null=True, default=None)
 
     # Possui ordem de renderização se não é um TPD_DOC
     ordem = models.IntegerField(

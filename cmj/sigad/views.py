@@ -127,9 +127,15 @@ class PathView(MultipleObjectMixin, TemplateView):
             context['object_list'] = docs[:4]
 
         elif self.classe:
-            kwargs['object_list'] = self.classe.documento_set.filter(
-                public_date__isnull=False).order_by(
-                '-public_date').all()
+            template = self.classe.template_classe
+            if template == models.CLASSE_TEMPLATES_CHOICE.lista_em_linha:
+                kwargs['object_list'] = self.classe.documento_set.filter(
+                    public_date__isnull=False).order_by(
+                    '-public_date').all()
+            elif template == models.CLASSE_TEMPLATES_CHOICE.galeria:
+                kwargs['object_list'] = Documento.objects.filter(
+                    tipo=Documento.TPD_GALLERY)
+
             self.object_list = kwargs['object_list']
             context = super().get_context_data(**kwargs)
 
@@ -213,10 +219,15 @@ class PathView(MultipleObjectMixin, TemplateView):
             raise Http404()
 
         if self.documento:
-            self.template_name = models.DOC_TEMPLATES_CHOICE_FILES[
-                self.documento.template_doc]
+            if self.documento.template_doc:
+                self.template_name = models.DOC_TEMPLATES_CHOICE_FILES[
+                    self.documento.template_doc]
+            else:
+                self.template_name = models.DOC_TEMPLATES_CHOICE_FILES[
+                    self.documento.classe.template_doc_padrao]
         else:
-            self.template_name = 'path/path_classe.html'
+            self.template_name = models.CLASSE_TEMPLATES_CHOICE_FILES[
+                self.classe.template_classe]
 
         obj = [self.documento if self.documento else self.classe,
                'view_documento' if self.documento else 'view_pathclasse']
