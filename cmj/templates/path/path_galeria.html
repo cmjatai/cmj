@@ -1,0 +1,26 @@
+{% extends "base_path.html" %}
+{% load i18n sigad_filters %}
+{% block main_container_class %}container-path container-fluid{% endblock %}
+{% block historico_publicacao %}{% endblock %}
+{% block title %}
+
+{% endblock %}
+{% block base_content %}
+
+<div class="row">
+  {% for galeria in object_list %}
+    <div class="col-lg-3">
+      <a href="/{{galeria.parents.0.absolute_slug}}">
+        <div class="thumbnail">
+          <img src="/{{galeria.absolute_slug}}/{{galeria.cita.first.slug}}.1024" />
+          <div class="caption">
+            <h3>{{galeria.parents.0}}</h3>
+            <p>{{galeria.parents.0.descricao}}</p>
+          </div>
+        </div>
+      </a>
+    </div>
+  {% endfor %}
+</div>
+  {% include "paginacao.html" %}
+{% endblock %}
