@@ -325,6 +325,9 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                 if not jdata:
                     continue
 
+                if len(jdata) == 1 and jdata[0]['id'] == "0":
+                    continue
+
                 ordem += 1
 
                 cont_gallery = Documento()

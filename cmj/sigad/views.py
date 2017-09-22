@@ -133,8 +133,8 @@ class PathView(MultipleObjectMixin, TemplateView):
                     public_date__isnull=False).order_by(
                     '-public_date').all()
             elif template == models.CLASSE_TEMPLATES_CHOICE.galeria:
-                kwargs['object_list'] = Documento.objects.filter(
-                    tipo=Documento.TPD_GALLERY)
+                kwargs['object_list'] = Documento.objects.view_public_docs(
+                ).filter(tipo=Documento.TPD_GALLERY)
 
             self.object_list = kwargs['object_list']
             context = super().get_context_data(**kwargs)
