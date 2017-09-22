@@ -406,6 +406,18 @@ class DocumentoManager(models.Manager):
             visibilidade=Documento.STATUS_PUBLIC).order_by('-public_date')
         return qs
 
+    def view_public_gallery(self):
+        qs = self.get_queryset()
+
+        qs = qs.filter(
+            Q(parent__parent__public_end_date__gte=timezone.now()) |
+            Q(parent__parent__public_end_date__isnull=True),
+
+            parent__parent__public_date__lte=timezone.now(),
+            parent__parent__visibilidade=Documento.STATUS_PUBLIC
+        ).order_by('-parent__parent__public_date')
+        return qs
+
 
 class Documento(Slugged, CMSMixin):
     objects = DocumentoManager()
