@@ -20,6 +20,8 @@ class DocumentoMixin(object):
 
 from datetime import datetime, timedelta
 from operator import attrgetter
+import io
+import zipfile
 
 from braces.views import FormMessagesMixin
 from django.conf import settings
@@ -61,29 +63,52 @@ class PathView(MultipleObjectMixin, TemplateView):
 
         print(self.kwargs['slug'])
 
-        if self.documento and self.documento.tipo == Documento.TPD_IMAGE:
-            try:
-                midia = self.documento.midia.last
-            except Exception as e:
-                raise Http404
-
-            if 'resize' in kwargs and kwargs['resize']:
+        if self.documento:
+            if self.documento.tipo == Documento.TPD_IMAGE:
                 try:
-                    file = midia.thumbnail(kwargs['resize'])
+                    midia = self.documento.midia.last
                 except Exception as e:
+                    raise Http404
+
+                if 'resize' in kwargs and kwargs['resize']:
+                    try:
+                        file = midia.thumbnail(kwargs['resize'])
+                    except Exception as e:
+                        file = midia.file
+                else:
                     file = midia.file
-            else:
-                file = midia.file
 
-            response = HttpResponse(
-                file, content_type=midia.content_type)
+                response = HttpResponse(
+                    file, content_type=midia.content_type)
 
-            response['Cache-Control'] = 'no-cache'
-            response['Pragma'] = 'no-cache'
-            response['Expires'] = 0
-            response['Content-Disposition'] = 'inline; filename=' + \
-                midia.file.name
-            return response
+                response['Cache-Control'] = 'no-cache'
+                response['Pragma'] = 'no-cache'
+                response['Expires'] = 0
+                response['Content-Disposition'] = 'inline; filename=' + \
+                    midia.file.name
+                return response
+
+            elif self.documento.tipo == Documento.TPD_GALLERY and \
+                    'zipfile' in request.GET:
+                file_buffer = io.BytesIO()
+                with zipfile.ZipFile(file_buffer, 'w') as file:
+                    for f in self.documento.documentos_citados.view_childs():
+                        file.write(f.midia.last.file.path,
+                                   arcname='%s-%s' % (
+                                       f.id,
+                                       f.midia.last.file.path.split(
+                                           '/')[-1]))
+
+                response = HttpResponse(file_buffer.getvalue(),
+                                        content_type='application/zip')
+
+                response['Cache-Control'] = 'no-cache'
+                response['Pragma'] = 'no-cache'
+                response['Expires'] = 0
+                response['Content-Disposition'] = \
+                    'inline; filename=%s.zip' % self.documento.parents[0].slug
+
+                return response
 
         return TemplateView.get(self, request, *args, **kwargs)
 
@@ -95,36 +120,39 @@ class PathView(MultipleObjectMixin, TemplateView):
         if self.documento:
             context = TemplateView.get_context_data(self, **kwargs)
 
-            parlamentares = self.documento.parlamentares.all()
-
-            next = Documento.objects.view_public_docs().filter(
-                public_date__gte=self.documento.public_date,
-                classe=self.documento.classe,
-            ).exclude(
-                id=self.documento.id).last()
-            context['next'] = next
-
-            previous = Documento.objects.view_public_docs().filter(
-                public_date__lte=self.documento.public_date,
-                classe=self.documento.classe,
-            ).exclude(
-                id=self.documento.id).first()
-            context['previous'] = previous
-
-            docs = Documento.objects.view_public_docs(
-            ).exclude(id=self.documento.id)
-
-            if parlamentares.exists():
-                docs = docs.filter(
-                    parlamentares__in=parlamentares)
+            if self.documento.tipo == Documento.TPD_GALLERY:
+                self.template_name = 'path/path_gallery.html'
             else:
-                docs = docs.filter(parlamentares__isnull=True)
+                parlamentares = self.documento.parlamentares.all()
 
-            if parlamentares.count() > 4:
-                docs = docs.distinct(
-                    'parlamentares__id').order_by('parlamentares__id')
+                next = Documento.objects.view_public_docs().filter(
+                    public_date__gte=self.documento.public_date,
+                    classe=self.documento.classe,
+                ).exclude(
+                    id=self.documento.id).last()
+                context['next'] = next
 
-            context['object_list'] = docs[:4]
+                previous = Documento.objects.view_public_docs().filter(
+                    public_date__lte=self.documento.public_date,
+                    classe=self.documento.classe,
+                ).exclude(
+                    id=self.documento.id).first()
+                context['previous'] = previous
+
+                docs = Documento.objects.view_public_docs(
+                ).exclude(id=self.documento.id)
+
+                if parlamentares.exists():
+                    docs = docs.filter(
+                        parlamentares__in=parlamentares)
+                else:
+                    docs = docs.filter(parlamentares__isnull=True)
+
+                if parlamentares.count() > 4:
+                    docs = docs.distinct(
+                        'parlamentares__id').order_by('parlamentares__id')
+
+                context['object_list'] = docs[:4]
 
         elif self.classe:
             template = self.classe.template_classe
@@ -133,8 +161,7 @@ class PathView(MultipleObjectMixin, TemplateView):
                     public_date__isnull=False).order_by(
                     '-public_date').all()
             elif template == models.CLASSE_TEMPLATES_CHOICE.galeria:
-                kwargs['object_list'] = Documento.objects.view_public_gallery(
-                ).filter(tipo=Documento.TPD_GALLERY)
+                kwargs['object_list'] = Documento.objects.view_public_gallery()
 
             self.object_list = kwargs['object_list']
             context = super().get_context_data(**kwargs)
@@ -189,8 +216,8 @@ class PathView(MultipleObjectMixin, TemplateView):
             try:
                 # se documento é filho de uma classe de primeiro nivel
                 self.documento = Documento.objects.get(
-                    slug=slug[-1],
-                    classe__slug='/'.join(slug[:-1]))
+                    slug='/'.join(slug[1:]),
+                    classe__slug=slug[0])
             except:
 
                 slug.reverse()
@@ -211,8 +238,8 @@ class PathView(MultipleObjectMixin, TemplateView):
                         except:
                             pass
 
-        if self.documento and self.documento.tipo not in (Documento.TPD_DOC,
-                                                          Documento.TPD_IMAGE):
+        if self.documento and self.documento.tipo not in (
+                Documento.TPD_DOC, Documento.TPD_IMAGE, Documento.TPD_GALLERY):
             raise Http404()
 
         if not self.documento and not self.classe:

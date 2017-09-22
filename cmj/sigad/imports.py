@@ -74,9 +74,10 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
         # print('data: ', data)
         # return TemplateView.get(self, request, *args, **kwargs)
         jdata = json.loads(data)
-        jdata = jdata[0:5]
+        jdata = jdata[0:40]
 
         anos = {}
+        print(len(jdata))
         for evento in jdata:
             data = datetime.strptime(
                 evento['data'], '%Y-%m-%d %H:%M:%S.%f')
@@ -90,6 +91,11 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                 ano, parent=fotografia, perfil=models.CLASSE_DOCUMENTAL)
 
         for evento in jdata:
+
+            if 'Sessão ordinária' in evento['epigrafe']:
+                print('Pulando...', evento['epigrafe'])
+                continue
+
             old_path = ('/fotografia/evento.do?action=evento_view&id=%s' %
                         evento['id'])
 
@@ -199,7 +205,8 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                 break
             p += 1
 
-            break  # comentar para importar tudo
+            if p == 6:
+                break  # comentar para importar tudo
 
         news.reverse()
 

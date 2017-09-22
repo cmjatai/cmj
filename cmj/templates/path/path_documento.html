@@ -160,7 +160,7 @@
             <img src="/{{child.absolute_slug}}.512" alt="" />
           </div>
           {% elif child.tipo == child.TPD_GALLERY %}
-              {% with child as container %}
+              {% with child as object %}
                 {% include "path/path_gallery.html" %}
               {% endwith %}
         {% endif %}
@@ -195,7 +195,7 @@
 <script type="text/javascript">
   $(document).ready(function(){
     ContainerFirst();
-    Gallery();
+    Gallery().init();
   });
 </script>
 {% endblock %}

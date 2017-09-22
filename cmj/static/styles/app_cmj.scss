@@ -1093,7 +1093,110 @@ main {
     }
   }
 }
+.container-albuns {
+  padding-left: $grid-gutter-width / 2 - 2;
+  .row > div {
+    padding: 0 0px 2px 2px;
+  }
+  .album-item-list {
+    position: relative;
+    overflow: hidden;
+    .image {
+      height: 200px;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: 50% center;
+    }
+    .show-descricao{
+      display: none;
+    }
+    .show-texto {
+      position: absolute;
+      padding: $grid-gutter-width * 0.75;
+      bottom: 0px;
+      color: white;
+      text-shadow: 0 1px 1px #000;
+      line-height: 1.2;
+      font-size: 65%;
+      font-weight: bold;
+      small {
+        display: block;
+      }
+    }
+    .show-contexto {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      top: 0;
+      background: linear-gradient(0deg, rgba(0, 0, 0, 0.9) 0px, transparent 40%, transparent);
+      transition: top 0.15s ease-in-out;
+      .btn-actions {
+        height: 0px;
+        width: 100%;
+        overflow: hidden;
+        transition: height 0.15s ease-in-out;
+        text-align: right;
+        position: absolute;
+        bottom: $grid-gutter-width;
+        right: $grid-gutter-width;
+        a {
+          color: rgba(#fff, 0.7);
+          &:hover {
+            color: white;
+          }
+        }
+      }
+      a {
+        display: block;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        top: 0;
+      }
+      &:hover {
+        transition: top 0.15s ease-in-out;
+        top: -30%;
+        .show-texto {
+          line-height: 1.5;
+          bottom: 10px;
+          transition: all 0.15s ease-in-out;
+        }
+        .btn-actions {
+          height: 28px;
+          transition: height 0.15s ease-in-out;
+        }
+      }
+    }
+  }
+  .albuns-show-gallery {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
+    .container-gallery {
+      margin: 0;
+    }
+    .btn-close {
+      color: rgba(#fff, 0.7);
+      position: absolute;
+      right: 0;
+      top: 0;
+      z-index: 1;
+      display: inline-block;
+      cursor: pointer;
+      line-height: 1em;
+      padding: 10px;
+      &:hover {
+        color: #fff;
+      }
 
+    }
+  }
+}
 
 .path-parlamentares {
   float: right;
@@ -1572,6 +1675,9 @@ main {
   main {
     .container, .container-fluid {
       padding: 0 $grid-gutter-width * 0.25;
+    }
+    .row {
+      margin:  0 $grid-gutter-width * -0.25;
     }
   }
   .context-actions{

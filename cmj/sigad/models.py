@@ -412,9 +412,10 @@ class DocumentoManager(models.Manager):
         qs = qs.filter(
             Q(parent__parent__public_end_date__gte=timezone.now()) |
             Q(parent__parent__public_end_date__isnull=True),
-
             parent__parent__public_date__lte=timezone.now(),
-            parent__parent__visibilidade=Documento.STATUS_PUBLIC
+            parent__parent__visibilidade=Documento.STATUS_PUBLIC,
+
+            tipo=Documento.TPD_GALLERY
         ).order_by('-parent__parent__public_date')
         return qs
 

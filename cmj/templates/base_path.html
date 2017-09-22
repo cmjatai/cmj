@@ -6,9 +6,8 @@
 
 
 {% block base_header %}
-  <div style="position:relative;">
-
-    {% if object.descricao %}
+  {% if object.descricao %}
+    <div style="position:relative;">
       <div class="path-data-pub">
         {% block historico_publicacao %}
           <div class="container-versions">
@@ -35,8 +34,8 @@
           </div>
         {% endblock %}
       </div>
-    {% endif %}
-  </div>
+    </div>
+  {% endif %}
   {% block title %}
     <span class="path-title">
         {{ object.titulo|safe|linebreaksbr }}

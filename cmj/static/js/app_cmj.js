@@ -283,18 +283,23 @@ function Gallery() {
     instance.resize = function(e, ajustaShowImage=true) {
         instance.galerias.each(function(idx_galeria, _galeria) {
             var galeria = $(_galeria);
-            var height = (window.innerWidth > window.innerHeight ? window.innerHeight * 0.9 : window.innerWidth)
-
+            var height;
             var strHeight;
-            if (window.innerWidth > window.innerHeight)
-                strHeight = 'height'
+            if (galeria.closest('.albuns-show-gallery')) {
+                height = window.innerHeight;
+                strHeight = 'height';
+            }
+            else {
+                height = (window.innerWidth > window.innerHeight ? window.innerHeight * 0.9 : window.innerWidth)
+                if (window.innerWidth > window.innerHeight)
+                    strHeight = 'height';
+                else
+                    strHeight = 'min-height';
+            }
 
-            else
-                strHeight = 'min-height';
-
-            var inner = galeria.find('.gallery-inner').css(strHeight, height + 'px');
-            var galleryShow = galeria.find('.gallery-show').css(strHeight, height - galeria.find('.gallery-thumbnails')[0].offsetHeight);
-            galleryShow.css('width', inner[0].offsetWidth + 'px');
+                var inner = galeria.find('.gallery-inner').css(strHeight, height + 'px');
+                var galleryShow = galeria.find('.gallery-show').css(strHeight, height - galeria.find('.gallery-thumbnails')[0].offsetHeight);
+                galleryShow.css('width', inner[0].offsetWidth + 'px');
 
             if (ajustaShowImage)
                 instance.ajustaShowImage(galleryShow.find('img')[0]);
@@ -647,7 +652,8 @@ function Gallery() {
         instance.addEventClick();
 
     }
-    instance.init();
+    // para ser reusada sem recriar objeto Gallery deve ser comentado
+    //instance.init();
 }
 
 

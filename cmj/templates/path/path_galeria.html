@@ -1,26 +1,66 @@
 {% extends "base_path.html" %}
 {% load i18n sigad_filters %}
-{% block main_container_class %}container-path container-fluid{% endblock %}
+{% block main_container_class %}container-path container-albuns container-fluid{% endblock %}
 {% block historico_publicacao %}{% endblock %}
 {% block title %}
 
 {% endblock %}
 {% block base_content %}
+<div class="albuns-show-gallery hidden">
 
+</div>
 <div class="row">
   {% for galeria in object_list %}
-    <div class="col-lg-3 col-md-4 col-sm-6">
-      <a href="/{{galeria.parents.0.absolute_slug}}">
-        <div class="thumbnail">
-          <img src="/{{galeria.absolute_slug}}/{{galeria.cita.first.slug}}.1024" />
-          <div class="caption">
-            <h3>{{galeria.parents.0}}</h3>
-            <p>{{galeria.parents.0.descricao}}</p>
+    <div class="col-lg-3 col-md-4 col-xs-6">
+      <div class="album-item-list">
+        <div class="album-inner">
+          <div class="album-show">
+            <div class="show-image">
+              <div class="image" style="background-image: url('/{{galeria.absolute_slug}}/{{galeria.cita.first.slug}}.512')">
+              </div>
+            </div>
+            <div class="show-contexto">
+              <a href="/{{galeria.absolute_slug}}" >
+                <div class="show-texto">
+                  <div class="show-titulo">
+                    {{galeria.parents.0}}
+                    <small>
+                      {{galeria.documentos_citados.count}} fotos
+                    </small>
+                  </div>
+                  <div class="show-descricao">
+                    {{galeria.parents.0.descricao}}
+                  </div>
+                </div>
+              </a>
+              <div class="btn-actions">
+                  <a href="/{{galeria.absolute_slug}}?zipfile" title="{% trans "Baixar fotos do Album" %}">
+                  <i class="fa fa-download fa-2" aria-hidden="true"></i>
+                  </a>
+              </div>
+            </div>
           </div>
         </div>
-      </a>
+      </div>
     </div>
   {% endfor %}
 </div>
   {% include "paginacao.html" %}
+{% endblock %}
+
+{% block extra_js  %}
+  <script type="text/javascript">
+    $(document).ready(function(){
+      $('.container-albuns .show-contexto > a').click(function() {
+        $.get(this.href).done(function(data) {
+          $('.albuns-show-gallery').removeClass('hidden').html(data);
+          $('.albuns-show-gallery .btn-close').removeClass('hidden').click(function() {
+            $('.albuns-show-gallery').html('').addClass('hidden');
+          });
+          Gallery().init();
+        });
+        return false;
+      });
+    });
+  </script>
 {% endblock %}

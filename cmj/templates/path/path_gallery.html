@@ -1,13 +1,8 @@
 {% load i18n sigad_filters %}
-
-{% comment %}
-{% for doc in container.documentos_citados.all %}
-  <img src="/{{doc.absolute_slug}}.512" alt="" />
-{% endfor %}
-
-{% endcomment %}
 <div class="container-gallery">
-
+  <span class="btn-close hidden">
+    <i class="fa fa-times fa-3" aria-hidden="true"></i>
+  </span>
   <div class="gallery-inner">
     <div class="gallery-show active">
       <div class="show-image">
@@ -15,7 +10,7 @@
           <div class="progress hidden">
             <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
           </div>
-          <img src="/{{container.absolute_slug}}/{{container.cita.first.slug}}" alt="" />
+          <img src="/{{object.absolute_slug}}/{{object.cita.first.slug}}" alt="" />
         </div>
       </div>
       <div class="show-contexto">
@@ -25,23 +20,23 @@
     </div>
     <div class="gallery-thumbnails">
       <div class="thumb-scroll">
-      {% for ref_doc in container.cita.all %}
+      {% for ref_doc in object.cita.all %}
         <div class="gallery-item">
-          <img src="/{{container.absolute_slug}}/{{ref_doc.slug}}.256" data-src="/{{container.absolute_slug}}/{{ref_doc.slug}}.1024"  alt="" />
+          <img src="/{{object.absolute_slug}}/{{ref_doc.slug}}.256" data-src="/{{object.absolute_slug}}/{{ref_doc.slug}}.1024"  alt="" />
 
             <div class="show-texto">
               <div class="show-titulo">
                 {% if ref_doc.titulo %}
                   titulo: {{ref_doc.titulo}}. {{forloop.counter}}
                 {% else %}
-                  {{container.parent.parent.titulo}}. {{forloop.counter}}
+                  {{object.parent.parent.titulo}}. {{forloop.counter}}
                 {% endif %}
               </div>
               <div class="show-descricao">
                 {% if ref_doc.descricao %}
                   titulo: {{ref_doc.descricao}}. {{forloop.counter}}
                 {% else %}
-                  {{container.parent.parent.descricao}}. {{forloop.counter}}
+                  {{object.parent.parent.descricao}}. {{forloop.counter}}
                 {% endif %}
               </div>
               <div class="show-autor">
