@@ -9,7 +9,7 @@
 
 <div class="row">
   {% for galeria in object_list %}
-    <div class="col-lg-3">
+    <div class="col-lg-3 col-md-4 col-sm-6">
       <a href="/{{galeria.parents.0.absolute_slug}}">
         <div class="thumbnail">
           <img src="/{{galeria.absolute_slug}}/{{galeria.cita.first.slug}}.1024" />
