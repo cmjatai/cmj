@@ -304,7 +304,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
 
                         ref.ordem = ord_ref
                         ref.save()
-                        if midia['id'] == album['idMCp']:
+                        if midia['id'] != album['idMCp']:
                             ord_ref += 1
 
         # PORTAL MODELO - captura todas as notícias do portal modelo 1.0
