@@ -1029,7 +1029,10 @@ main {
       color: #bbb;
     }
     .show-autor {
-      font-size: 80%;
+      font-size: 60%;
+      position: absolute;
+      top: 0;
+      left: 0;
     }
     .show-titulo {
       line-height: 1.2em;
@@ -1079,6 +1082,9 @@ main {
   }
   .path-direction {
     position: absolute;
+    &:hover {
+      min-width: auto;
+    }
     a {
       border-radius: 0px;
       background-color: transparent;
@@ -1858,9 +1864,17 @@ main {
       height: auto;
       left: 0px;
       background: rgba(#222422, 0.7);
+      .show-sep {
+        display: none;
+      }
       .show-texto {
-        padding: 0px;
+        padding: 0px 5px;
         font-size: 53%;
+        width: auto;
+      }
+      .show-autor {
+        position: relative;
+        text-align: right;
       }
     }
   }

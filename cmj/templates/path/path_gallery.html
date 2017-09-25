@@ -23,24 +23,34 @@
       {% for ref_doc in object.cita.all %}
         <div class="gallery-item">
           <img src="/{{object.absolute_slug}}/{{ref_doc.slug}}.256" data-src="/{{object.absolute_slug}}/{{ref_doc.slug}}.1024"  alt="" />
-
             <div class="show-texto">
               <div class="show-titulo">
                 {% if ref_doc.titulo %}
-                  titulo: {{ref_doc.titulo}}. {{forloop.counter}}
+                  {{ref_doc.titulo}}
+                {% elif object.titulo %}
+                  {{object.titulo}}
                 {% else %}
-                  {{object.parent.parent.titulo}}. {{forloop.counter}}
+                  {{object.parents.0.titulo}}
                 {% endif %}
               </div>
               <div class="show-descricao">
                 {% if ref_doc.descricao %}
-                  titulo: {{ref_doc.descricao}}. {{forloop.counter}}
+                  {{ref_doc.descricao}}.
+                {% elif object.descricao %}
+                  {{object.descricao}}
                 {% else %}
-                  {{object.parent.parent.descricao}}. {{forloop.counter}}
+                  {{object.parents.0.descricao}}
                 {% endif %}
               </div>
               <div class="show-autor">
-                autor: {{ref_doc.autor}}.
+                Foto:
+                {% if ref_doc.autor %}
+                  {{ref_doc.autor}}.
+                {% elif object.autor %}
+                  {{object.autor}}
+                {% else %}
+                  {{object.parents.0.autor}}
+                {% endif %}
               </div>
             </div>
 

@@ -285,7 +285,7 @@ function Gallery() {
             var galeria = $(_galeria);
             var height;
             var strHeight;
-            if (galeria.closest('.albuns-show-gallery')) {
+            if (galeria.closest('.albuns-show-gallery').length === 1) {
                 height = window.innerHeight;
                 strHeight = 'height';
             }
@@ -297,9 +297,9 @@ function Gallery() {
                     strHeight = 'min-height';
             }
 
-                var inner = galeria.find('.gallery-inner').css(strHeight, height + 'px');
-                var galleryShow = galeria.find('.gallery-show').css(strHeight, height - galeria.find('.gallery-thumbnails')[0].offsetHeight);
-                galleryShow.css('width', inner[0].offsetWidth + 'px');
+            var inner = galeria.find('.gallery-inner').css(strHeight, height + 'px');
+            var galleryShow = galeria.find('.gallery-show').css(strHeight, height - galeria.find('.gallery-thumbnails')[0].offsetHeight);
+            galleryShow.css('width', inner[0].offsetWidth + 'px');
 
             if (ajustaShowImage)
                 instance.ajustaShowImage(galleryShow.find('img')[0]);
@@ -317,12 +317,11 @@ function Gallery() {
         img.style.height = 'auto';
 
         if (div_image.offsetHeight > div_image.offsetWidth) {
-            if (div_image.parentElement.offsetWidth != div_image.parentElement.parentElement.offsetWidth) {
+            //if (div_image.parentElement.offsetWidth != div_image.parentElement.parentElement.offsetWidth) {
                 div_image.style.paddingTop = (div_image.offsetHeight - img.height) / 2 + 'px';
-            }
-            else {
-                img.style.height = '50px';
-            }
+            //}
+            //else {
+            //}
         } else {
             if (div_image.parentElement.offsetWidth != div_image.parentElement.parentElement.offsetWidth) {
                 div_image.style.padding = div_image.offsetHeight * 0.04 + 'px';
