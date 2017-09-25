@@ -205,8 +205,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                 break
             p += 1
 
-            if p == 6:
-                break  # comentar para importar tudo
+            break  # comentar para importar tudo
 
         news.reverse()
 

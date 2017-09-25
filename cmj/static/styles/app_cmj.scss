@@ -713,10 +713,14 @@ body {
     border: 0px solid #fff;
     border-radius: 0px;
     margin-bottom: $grid-gutter-width;
-    height: 75px;
+    height: 60px;
     width: 16.6667%;
     float: left;
+    opacity: 0.55;
+    transition: opacity 0.2s ease-in-out;
     &:hover {
+      opacity: 1;
+      transition: opacity 0.4s ease-in-out;
       .icon {
         transform: scale(1.15);
         right: 10px;
@@ -728,7 +732,7 @@ body {
     z-index: 1;
     font-size: 1.8em;
     font-variant: small-caps;
-    line-height: 1.2em;
+    line-height: 0.9em;
     height: 100%;
     a {
       position: relative;
@@ -742,6 +746,7 @@ body {
       }
     }
   }
+
 }
 // #### containers ########################################
 main {
@@ -1094,18 +1099,41 @@ main {
   }
 }
 .container-albuns {
-  padding-left: $grid-gutter-width / 2 - 2;
   .row > div {
-    padding: 0 0px 2px 2px;
+    padding: 0 10px 20px 10px;
+
+    &:nth-child(1) {
+      width: 66.666%;
+      .album-item-list {
+        .show-image {
+          height: 520px;
+        }
+      }
+    }
+    &:nth-child(4) {
+      .album-item-list {
+        .show-image {
+          height: 520px;
+        }
+      }
+    }
+    &:nth-child(5) {
+      width: 66.666%;
+    }
   }
   .album-item-list {
     position: relative;
     overflow: hidden;
+    .show-image {
+      height: 250px;
+    }
     .image {
-      height: 200px;
+      transition: all 0.4s ease;
+      height: 100%;
       background-size: cover;
       background-repeat: no-repeat;
       background-position: 50% center;
+      opacity: 0.7;
     }
     .show-descricao{
       display: none;
@@ -1167,6 +1195,14 @@ main {
           height: 28px;
           transition: height 0.15s ease-in-out;
         }
+      }
+    }
+
+    &:hover {
+      .image {
+        transition: all 0.4s ease;
+        opacity: 1;
+        transform: scale(1.15);
       }
     }
   }
@@ -1452,12 +1488,14 @@ main {
 
 @media screen and (max-width: 1199px) {
   .row-canais {
+    .box {
+      height: 48px;
+    }
     .inner {
-      font-size: 1.5em;
+      font-size: 1.4em;
       font-variant: small-caps;
-      line-height: 1.2em;
       a {
-        padding: 10px 5px 5px 35px;
+        padding: 5px 5px 5px 35px;
         text-indent: -25px;
         height: 100%;
       }
@@ -1485,14 +1523,12 @@ main {
     }
     .box {
       margin-bottom: $grid-gutter-width / 2;
-      height: 60px;
     }
     .inner {
       font-size: 1.3em;
-      line-height: 1.2em;
       height: 100%;
       a {
-        padding: 5px 5px 5px 27px;
+        padding: 6px 5px 5px 27px;
         text-indent: -20px;
       }
     }
@@ -1559,6 +1595,28 @@ main {
             padding: 3px;
           }
         }
+      }
+    }
+  }
+  .container-albuns {
+    .row > div {
+      &:nth-child(1) {
+        width: 100%;
+        .album-item-list {
+          .show-image {
+            height: 250px;
+          }
+        }
+      }
+      &:nth-child(4) {
+        .album-item-list {
+          .show-image {
+            height: 520px;
+          }
+        }
+      }
+      &:nth-child(5) {
+        width: 50%;
       }
     }
   }
@@ -1718,7 +1776,6 @@ main {
       font-variant: normal;
 
       text-align: center;
-      line-height: 1em;
       a {
         position: relative;
         padding: 38px 0px 3px 0px;
@@ -1807,6 +1864,18 @@ main {
       }
     }
   }
+  .container-albuns {
+    .row > div {
+      padding: 0 5px 10px 5px;
+      &:nth-child(4) {
+        .album-item-list {
+          .show-image {
+            height: 510px;
+          }
+        }
+      }
+    }
+  }
 }
 
 @media screen and (max-width: 600px) {
@@ -1888,6 +1957,30 @@ main {
     }
   }
 
+  .container-albuns {
+    .row > div {
+      .album-item-list {
+        .show-image {
+          height: 200px;
+        }
+      }
+
+      &:nth-child(1) {
+        .album-item-list {
+          .show-image {
+            height: 200px;
+          }
+        }
+      }
+      &:nth-child(4) {
+        .album-item-list {
+          .show-image {
+            height: 410px;
+          }
+        }
+      }
+    }
+  }
 
 }
 
@@ -1962,7 +2055,6 @@ main {
 
   .navbar {
     .container {
-      padding-left: 0;
       padding-right: 0;
     }
     .navbar-collapse {

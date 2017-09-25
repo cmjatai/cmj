@@ -5,8 +5,7 @@ from PIL import Image
 from PIL.Image import NEAREST
 from django.conf import settings
 from django.contrib.auth.models import Permission
-from django.contrib.contenttypes.fields import GenericForeignKey,\
-    GenericRelation
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
@@ -335,12 +334,6 @@ class Classe(Slugged, CMSMixin):
         _('Template para a Classe'),
         choices=CLASSE_TEMPLATES_CHOICE,
         default=CLASSE_TEMPLATES_CHOICE.lista_em_linha)
-
-    # FIXME: flexibilizar o template de renderização da classe
-    """template_classe = models.IntegerField(
-        _('Template da Classe'),
-        choices=DOC_TEMPLATES_CHOICE,
-        default=DOC_TEMPLATES_CHOICE.noticia)"""
 
     class Meta:
         ordering = ('codigo', '-public_date',)
