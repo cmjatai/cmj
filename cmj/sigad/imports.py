@@ -211,10 +211,20 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                     '&escala=cmj_import&idImage=%s'
                     % album['idMCp'])
 
-            if Documento.objects.filter(
-                    old_path=capa,
-                    citado_em__isnull=False).exists():
+            noticia = Documento.objects.filter(old_path=capa,
+                                               citado_em__isnull=False)
+            if noticia.exists():
                 print ('Já existe album associado a notícia:', album['tit'])
+
+                img = noticia.first()
+
+                if img:
+                    d = img.citado_em.all().first().referente
+                    d.titulo = album['tit']
+                    d.descricao = album['dscr']
+                    d.save()
+                    Revisao.gerar_revisao(d, request.user)
+
                 continue
 
             album_path = ("/fotografia/album.do?action=album_json&id=%s"
