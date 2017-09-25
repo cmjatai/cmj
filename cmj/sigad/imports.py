@@ -200,7 +200,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
         for album in jdata:
 
             evento_path = ('/fotografia/evento.do?action=evento_view&id=%s' %
-                           album['id'])
+                           album['evento_id'])
 
             if not Documento.objects.filter(old_path=evento_path).exists():
                 print ('não existe evento associado:', album['id'])
