@@ -115,9 +115,6 @@ class PathView(MultipleObjectMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
 
-        if not self.documento and not self.classe:
-            return TemplateView.get_context_data(self, **kwargs)
-
         if self.documento:
             context = TemplateView.get_context_data(self, **kwargs)
 
@@ -172,7 +169,8 @@ class PathView(MultipleObjectMixin, TemplateView):
                 paginator = context['paginator']
                 context['page_range'] = make_pagination(
                     page_obj.number, paginator.num_pages)
-
+        else:
+            context = TemplateView.get_context_data(self, **kwargs)
         context['object'] = self.documento if self.documento else self.classe
         context['path'] = '-path'
 

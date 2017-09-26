@@ -1297,6 +1297,8 @@ main {
 
 .path-item-list {
   margin-bottom: $grid-gutter-width;
+
+
   .inner {
     z-index: 2000;
     display: block;
@@ -1373,6 +1375,22 @@ main {
     }
     .data-pub {
       padding-top: 5px;
+    }
+  }
+}
+
+.container-path111:not(.container-footer) {
+  .path-item-list {
+    &:nth-child(1) {
+      width: 66.6666%;
+    }
+    &:nth-child(2) {
+    }
+    &:nth-child(3) {
+    }
+    &:nth-child(4) {
+    }
+    &:nth-child(5) {
     }
   }
 }

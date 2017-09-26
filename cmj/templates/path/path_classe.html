@@ -2,12 +2,16 @@
 {% load i18n sigad_filters %}
 
 {% block historico_publicacao %}{% endblock %}
+{% block title %}
+
+{% endblock %}
 {% block base_content %}
 
-
-    {% with 'path-item-list col-lg-10 col-lg-offset-1' as css_class %}
+  <div class="row">
+    {% with 'path-item-list t col-lg-10 col-lg-offset-1' as css_class %}
       {% include "path/path_list_docs.html" %}
     {% endwith %}
+  </div>
 
 
   {% include "paginacao.html" %}
