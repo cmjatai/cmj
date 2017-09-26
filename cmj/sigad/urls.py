@@ -3,7 +3,6 @@ from django.conf.urls import include, url
 from cmj.sigad import views, imports
 from cmj.sigad.views import PermissionsUserClasseCrud,\
     PermissionsUserDocumentoCrud
-
 from .apps import AppConfig
 
 

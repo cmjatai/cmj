@@ -1,9 +1,10 @@
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Fieldset
 from django import forms
-from django.forms.models import ModelForm
+from django.forms.models import ModelForm, ModelMultipleChoiceField
 from django.utils.translation import ugettext_lazy as _
 from sapl.crispy_layout_mixin import to_row, SaplFormLayout
+from sapl.parlamentares.models import Parlamentar
 
 from cmj.sigad import models
 from cmj.sigad.models import Classe, Documento
@@ -84,12 +85,19 @@ class ClasseForm(ModelForm):
 
 class DocumentoForm(ModelForm):
 
+    parlamentares = ModelMultipleChoiceField(
+        queryset=Parlamentar.objects.all(), required=False,
+        label=Parlamentar._meta.verbose_name_plural,
+        widget=forms.SelectMultiple(attrs={'size': '10'})
+    )
+
     class Meta:
         model = Documento
         fields = ['titulo',
                   'template_doc',
                   'descricao',
-                  'visibilidade'
+                  'visibilidade',
+                  'parlamentares'
                   ]
 
     def __init__(self, *args, **kwargs):
@@ -100,8 +108,13 @@ class DocumentoForm(ModelForm):
                 ('titulo', 6), ('template_doc', 3), ('visibilidade', 3),
             ]),
             to_row([
-                ('descricao', 12)
+                ('descricao', 8),
+                ('parlamentares', 4)
             ]),
         )
 
         super(DocumentoForm, self).__init__(*args, **kwargs)
+
+        self.fields['parlamentares'].choices = [
+            ('0', '--------------')] + list(
+            self.fields['parlamentares'].choices)

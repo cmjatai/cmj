@@ -266,24 +266,24 @@
 
             <div class="{% block main_container_class %}container container{{fluid}}{{path}} container-box{% endblock %}">
 
-
               {# Content header #}
-              {% block base_header %}
-                <div class="clearfix">
-
-                  {% block title %}
-                    <h1 class="page-header">
-                      {% if title %}
-                        {{ title|safe|linebreaksbr }}
-                      {% elif object %}
-                        {{ object|safe|linebreaksbr }}
-                      {% elif view.title %}
-                        {{ view.title|safe|linebreaksbr }}
-                      {% endif %}
-                    </h1>
-                  {% endblock %}
-                </div>
-              {% endblock base_header %}
+              {% block base_container_header %}
+                {% block base_header %}
+                  <div class="clearfix">
+                    {% block title %}
+                      <h1 class="page-header">
+                        {% if title %}
+                          {{ title|safe|linebreaksbr }}
+                        {% elif object %}
+                          {{ object|safe|linebreaksbr }}
+                        {% elif view.title %}
+                          {{ view.title|safe|linebreaksbr }}
+                        {% endif %}
+                      </h1>
+                    {% endblock %}
+                  </div>
+                {% endblock base_header %}
+              {% endblock base_container_header %}
 
               {% block base_workspace %}
                 {% if view.is_contained %}

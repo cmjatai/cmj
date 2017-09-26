@@ -106,37 +106,7 @@
   {% endif %}
 {% endblock %}
 
-{% block base_header %}
-<div class="container">
-  {% with object.parlamentares.count as count_parlamentares %}
-    {% for parlamentar in object.parlamentares.all %}
-
-      {% if forloop.counter0 > 0 and forloop.counter0|organize_avatars:count_parlamentares %}
-        </div>
-      {% endif %}
-
-      {% if forloop.counter0|organize_avatars:count_parlamentares %}
-        <div class="path-parlamentares">
-      {% endif %}
-
-        {% if parlamentar.fotografia %}
-          <a class="avatar avatar{% if count_parlamentares >= 5 %}5{%else%}{{count_parlamentares}}{% endif %}" href="#">
-            <img src="{{ parlamentar.fotografia.url }}">
-          </a>
-        {% endif %}
-
-      {% if not forloop.last %}
-        <span class="linebreak"></span>
-      {% else %}
-        </div>
-      {% endif %}
-
-    {% endfor %}
-  {% endwith %}
-
-  {{block.super}}
-
-</div>
+{% block base_container_header %}
 {% endblock %}
 
 {% block base_content %}
@@ -152,6 +122,42 @@
 
   {% for container in object.childs.view_childs %}
     <div class="container{% if container.tipo == container.TPD_CONTAINER_EXTENDIDO%}-fluid{% endif %} {% if forloop.first%}container-first{% endif %}">
+
+
+      {% if forloop.first %}
+          {% with object.parlamentares.count as count_parlamentares %}
+            {% for parlamentar in object.parlamentares.all %}
+
+              {% if forloop.counter0 > 0 and forloop.counter0|organize_avatars:count_parlamentares %}
+                </div>
+              {% endif %}
+
+              {% if forloop.counter0|organize_avatars:count_parlamentares %}
+                <div class="path-parlamentares">
+              {% endif %}
+
+                {% if parlamentar.fotografia %}
+                  <a class="avatar avatar{% if count_parlamentares >= 5 %}5{%else%}{{count_parlamentares}}{% endif %}" href="#">
+                    <img src="{{ parlamentar.fotografia.url }}">
+                  </a>
+                {% endif %}
+
+              {% if not forloop.last %}
+                <span class="linebreak"></span>
+              {% else %}
+                </div>
+              {% endif %}
+
+            {% endfor %}
+          {% endwith %}
+
+
+          {% block base_header %}
+            {{block.super}}
+          {% endblock %}
+
+      {% endif %}
+
       {% for child in container.childs.view_childs %}
         {% if child.tipo == child.TPD_TEXTO %}
           {{child.texto|safe}}

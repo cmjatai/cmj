@@ -922,16 +922,6 @@ class CrudAux(Crud):
     class BaseMixin(Crud.BaseMixin):
         subnav_template_name = None
 
-        def __init__(self, **kwargs):
-            super().__init__(**kwargs)
-            """
-            Mantem as permissões individuais geradas pelo Crud através do
-            Modelo e adiciona a obrigatoriedade de permissão para view
-            tabelas auxiliares.
-            """
-            self.permission_required = self.permission_required + \
-                self.crud.permission_required
-
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
             """Força o template filter subnav em base/templatetags/menus.py
@@ -939,7 +929,8 @@ class CrudAux(Crud):
             Se o valor de subnav_template_name é nulo faz o filter subnav
             não abrir o padrão e nem um outro arquivo.
             """
-            context['subnav_template_name'] = self.subnav_template_name
+            if 'subnav_template_name' not in context:
+                context['subnav_template_name'] = self.subnav_template_name
             return context
 
     @classonlymethod
@@ -1070,7 +1061,11 @@ class MasterDetailCrud(Crud):
 
             else:
                 parent_model = getattr(
-                    self.model, obj.parent_field).field.related_model
+                    self.model, obj.parent_field)
+                if isinstance(parent_model.field, ForeignKey):
+                    parent_model = parent_model.field.related_model
+                else:
+                    parent_model = parent_model.rel.related_model
 
             params = {'pk': kwargs['root_pk']}
 
@@ -1159,8 +1154,12 @@ class MasterDetailCrud(Crud):
                             parent_object = getattr(parent_object, field)
 
                 else:
-                    parent_model = getattr(
-                        parent_model, obj.parent_field).field.related_model
+                    parent_model = getattr(self.model, obj.parent_field)
+                    if isinstance(parent_model.field, ForeignKey):
+                        parent_model = parent_model.field.related_model
+                    else:
+                        parent_model = parent_model.rel.related_model
+
                     parent_object = parent_model.objects.get(**params)
 
                 context['root_pk'] = parent_object.pk

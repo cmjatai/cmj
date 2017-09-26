@@ -31,7 +31,7 @@ from django.contrib.auth.models import Permission
 from django.core.exceptions import PermissionDenied
 from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
-from django.core.urlresolvers import reverse_lazy
+from django.core.urlresolvers import reverse_lazy, reverse
 from django.db.models.aggregates import Max
 from django.http.response import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
@@ -42,6 +42,7 @@ from django.views.generic.base import View, TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView, MultipleObjectMixin
+from sapl.crispy_layout_mixin import read_layout_from_yaml
 from sapl.parlamentares.models import Parlamentar
 import reversion
 
@@ -573,22 +574,6 @@ class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
         return ListView.dispatch(self, request, *args, **kwargs)
 
 
-class PermissionsUserDocumentoCrud(MasterDetailCrud):
-    model = PermissionsUserDocumento
-    parent_field = 'documento'
-
-    class BaseMixin(MasterDetailCrud.BaseMixin):
-        list_field_names = ['permission',  'user', ]
-
-        def get_context_data(self, **kwargs):
-
-            ctxt = MasterDetailCrud.BaseMixin.get_context_data(self, **kwargs)
-
-            ctxt['subnav_template_name'] = 'sigad/subnav_documento.yaml'
-
-            return ctxt
-
-
 class PermissionsUserClasseCrud(MasterDetailCrud):
     model = PermissionsUserClasse
     parent_field = 'classe'
@@ -903,11 +888,21 @@ class DocumentoUpdateView(DocumentoPermissionRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
 
         ctxt = UpdateView.get_context_data(self, **kwargs)
-        if 'pk' in self.kwargs and self.object.visibilidade == \
-                Documento.STATUS_RESTRICT:
-            ctxt['subnav_template_name'] = 'sigad/subnav_documento.yaml'
+        ctxt['subnav_template_name'] = 'sigad/subnav_documento.yaml'
         return ctxt
 
-#    def form_valid(self, form):
-#        Revisao.gerar_revisao(form.instance, self.request.user)
-#        return super(DocumentoUpdateView, self).form_valid(form)
+
+class PermissionsUserDocumentoCrud(MasterDetailCrud):
+    model = PermissionsUserDocumento
+    parent_field = 'documento'
+
+    class BaseMixin(MasterDetailCrud.BaseMixin):
+        list_field_names = ['permission',  'user', ]
+
+        def get_context_data(self, **kwargs):
+
+            ctxt = MasterDetailCrud.BaseMixin.get_context_data(self, **kwargs)
+
+            ctxt['subnav_template_name'] = 'sigad/subnav_documento.yaml'
+
+            return ctxt
