@@ -35,20 +35,7 @@
     <div class="page fadein screen-lg">
       <nav class="navbar">
 
-        <div class="container{{fluid}}">
-          <div class="navbar-header">
-            {% block button_toogle %}
-              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
-            {% endblock %}
-            <a class="navbar-brand" href="/">
-                C<small>âmara</small> M<small>unicipal de</small> J<small>ataí</small>
-            </a>
-          </div>
+        <div class="container{{fluid}} container-header">
           <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right" id="autenticacao">
               {% if user and not user.is_anonymous %}
@@ -79,6 +66,27 @@
                {% endif %}
             </ul>
           </div><!--/.nav-collapse -->
+          {% block button_toogle %}
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+          {% endblock %}
+          {% block social_links %}
+              <div class="navbar-social-links">
+                <a href="https://www.facebook.com/cmjatai"><i class="fa fa-facebook" aria-hidden="true"></i></a>
+                <a href="https://www.youtube.com/c/camaradejatai?sub_confirmation=1"><i class="fa fa-youtube-play" aria-hidden="true"></i></a>
+                <a href="https://twitter.com/cmjatai"><i class="fa fa-twitter" aria-hidden="true"></i></a>
+              </div>
+          {% endblock %}
+          <div class="navbar-header">
+            <a class="navbar-brand" href="/">
+                C<small>âmara</small> M<small>unicipal de</small> J<small>ataí</small>
+            </a>
+          </div>
+
         </div>
       </nav>
 
@@ -326,6 +334,9 @@
 
   <footer id="footer" class="footer page__row screen-lg">
     <div class="container">
+
+
+
       Departamento de Tecnologia de Informação e Comunicação
     </div>
   </footer>
