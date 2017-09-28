@@ -304,6 +304,7 @@ body, html {
     float: right;
   }
   .nav-tabs {
+    margin-top: 10px;
     border-bottom: 0px;
     margin-right: $grid-gutter-width;
     li {
@@ -1204,6 +1205,7 @@ main {
   }
 }
 .container-albuns {
+  margin-top: 10px;
   .row > div {
     padding: 0 10px 20px 10px;
 
@@ -1229,6 +1231,7 @@ main {
   .album-item-list {
     position: relative;
     overflow: hidden;
+    box-shadow: 2px 2px 5px #776;
     .show-image {
       height: 250px;
     }
