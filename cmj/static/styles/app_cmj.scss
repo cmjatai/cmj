@@ -207,7 +207,7 @@ body, html {
     background-color: white;
   }
   a.navbar-brand {
-    font-size: 25px;
+    font-size: 20px;
     line-height: 40px;
     color: white;
     font-family: "Graduate";
@@ -272,6 +272,7 @@ body, html {
     }
   }
   .container-header{
+
     .navbar-social-links {
       float: right;
       i {
@@ -284,7 +285,6 @@ body, html {
         padding: 4px 15px 0;
         &:hover {
           color: rgba(white, 1);
-
         }
       }
     }
@@ -295,7 +295,6 @@ body, html {
 }
 // ADJUST topo ########################################
 .masthead {
-  margin-top: $grid-gutter-width;
   z-index: 10;
   .slogan {
     color: $color_topo_bg;
@@ -341,7 +340,138 @@ a:focus,
 a:hover {
   color: darken($color_topo_bg, 20%);
 }
-// ADJUST lateral direita ########################################
+// ADJUST lateral esquerda ########################################
+
+#wrapper {
+  transition: all 0.5s ease;
+  z-index: 2001;
+  aside {
+    width: 10px;
+    transition: all 0.5s ease;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    background: $color_main_bg url(/static/img/bg.png);
+    z-index: 2001;
+  }
+  #menu-toggle {
+    position: absolute;
+    left: 100%;
+    top: 20px;
+    margin-left: -0.5 * $grid-gutter-width;
+    padding: 5px;
+    color: rgba(white, 0.8);
+    z-index: 1;
+    line-height: 0;
+    &:hover {
+      color: white;
+    }
+    .fa-chevron-circle-left {
+      display: none;
+    }
+    .fa-chevron-circle-right {
+      display: inline;
+    }
+  }
+}
+// #### Canais ########################################
+.canais-absolute, .canais-relative, .canais-columns {
+    & > div {
+      padding-left: 0px;
+      padding-right: 0px;
+    }
+  .icon {
+    position: absolute;
+    top: 0;
+    right: 5px;
+    z-index: 0;
+    font-size: 60px;
+    color: rgba(0, 0, 0, 0.15);
+    transition: all 0.4s ease;
+    width: 100%;
+    height: 100%;
+    text-align: right;
+    background-position: right;
+    background-repeat: no-repeat;
+    opacity: 0.15;
+    &.icon-atividade-legislativa {
+      background-image: url(/static/img/icon_materia_legislativa.png);
+    }
+    &.icon-diario-oficial {
+      background-image: url(/static/img/icon_diario_oficial.png);
+    }
+    &.icon-sessao-plenaria {
+      background-image: url(/static/img/icon_plenarias.png);
+    }
+    &.icon-norma-juridica {
+      background-image: url(/static/img/icon_normas_juridicas.png);
+    }
+    &.icon-licitacao {
+      background-image: url(/static/img/icon_licitacao.png);
+    }
+    &.icon-transparencia {
+      background-image: url(/static/img/icon_transparencia.png);
+    }
+  }
+  .box {
+    position: relative;
+    border: 0px solid #fff;
+    border-radius: 0px;
+    height: 16.666%;
+    width: 100%;
+    opacity: 0.55;
+    transition: opacity 0.2s ease-in-out;
+    overflow: hidden;
+    &:hover {
+      opacity: 1;
+      transition: opacity 0.4s ease-in-out;
+      .icon {
+        transform: scale(1.15);
+        right: 10px;
+      }
+    }
+  }
+  .inner {
+    position: relative;
+    z-index: 1;
+    font-size: 1.8em;
+    font-variant: small-caps;
+    line-height: 0.9em;
+    height: 100%;
+    a {
+      position: relative;
+      display: block;
+      color: inherit;
+      padding: 5px 5px 5px 40px;
+      text-indent: -30px;
+      height: 100%;
+      &:hover {
+        background-color: $hover_background_20p;
+      }
+    }
+  }
+}
+.canais-absolute {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+.canais-relative {
+  margin: 0 -10px;
+}
+.canais-columns {
+  padding: 0px;
+  height: 80px;
+  .box {
+    width: 16.6666%;
+    float: left;
+    height: 100%;
+  }
+}
+
 
 
 // ADJUST interno ########################################
@@ -350,6 +480,7 @@ a:hover {
 }
 
 main {
+
   .container-box, .container-box-fluid {
     background-color: $color_container_bg;
     border: 1px solid $color_container_border;
@@ -391,6 +522,7 @@ main {
       }
     }
   }
+
 }
 
 .control-label {
@@ -688,85 +820,7 @@ body {
   }
 }
 
-// #### row-canais ########################################
-.row-canais {
-    & > div {
-      padding-left: 0px;
-      padding-right: 0px;
-    }
-  .icon {
-    position: absolute;
-    top: 0;
-    right: 5px;
-    z-index: 0;
-    font-size: 60px;
-    color: rgba(0, 0, 0, 0.15);
-    transition: all 0.4s ease;
-    width: 100%;
-    height: 100%;
-    text-align: right;
-    background-position: right;
-    background-repeat: no-repeat;
-    opacity: 0.15;
-    &.icon-atividade-legislativa {
-      background-image: url(/static/img/icon_materia_legislativa.png);
-    }
-    &.icon-diario-oficial {
-      background-image: url(/static/img/icon_diario_oficial.png);
-    }
-    &.icon-sessao-plenaria {
-      background-image: url(/static/img/icon_plenarias.png);
-    }
-    &.icon-norma-juridica {
-      background-image: url(/static/img/icon_normas_juridicas.png);
-    }
-    &.icon-licitacao {
-      background-image: url(/static/img/icon_licitacao.png);
-    }
-    &.icon-transparencia {
-      background-image: url(/static/img/icon_transparencia.png);
-    }
-  }
-  .box {
-    position: relative;
-    border: 0px solid #fff;
-    border-radius: 0px;
-    margin-bottom: $grid-gutter-width;
-    height: 60px;
-    width: 16.6667%;
-    float: left;
-    opacity: 0.55;
-    transition: opacity 0.2s ease-in-out;
-    &:hover {
-      opacity: 1;
-      transition: opacity 0.4s ease-in-out;
-      .icon {
-        transform: scale(1.15);
-        right: 10px;
-      }
-    }
-  }
-  .inner {
-    position: relative;
-    z-index: 1;
-    font-size: 1.8em;
-    font-variant: small-caps;
-    line-height: 0.9em;
-    height: 100%;
-    a {
-      position: relative;
-      display: block;
-      color: inherit;
-      padding: 5px 5px 5px 40px;
-      text-indent: -30px;
-      height: 100%;
-      &:hover {
-        background-color: $hover_background_20p;
-      }
-    }
-  }
 
-}
 // #### containers ########################################
 main {
   .container-path {
@@ -975,7 +1029,6 @@ main {
 
 .container-gallery {
   margin: 0 $grid-gutter-width / -2;
-  z-index: 2001;
   position: relative;
 
   .gallery-inner {
@@ -1170,7 +1223,7 @@ main {
       color: white;
       text-shadow: 0 1px 1px #000;
       line-height: 1.2;
-      font-size: 65%;
+      font-size: 90%;
       font-weight: bold;
       small {
         display: block;
@@ -1237,7 +1290,7 @@ main {
     bottom: 0;
     left: 0;
     right: 0;
-    z-index: 1;
+    z-index: 9999;
     .container-gallery {
       margin: 0;
     }
@@ -1504,9 +1557,12 @@ main {
     }
   }
 }
+
 .path-previous {
   left: -1.6em;
   text-align: left;
+
+  transition: left 0.5s ease;
   a {
     padding: 1.2em 0.5em 1.0em 1.7em;
   }
@@ -1528,22 +1584,17 @@ main {
   }
 }
 
-
-@media screen and (max-width: 1199px) {
-  .row-canais {
-    .box {
-      height: 48px;
-    }
-    .inner {
-      font-size: 1.4em;
-      font-variant: small-caps;
-      a {
-        padding: 5px 5px 5px 35px;
-        text-indent: -25px;
-        height: 100%;
+@media screen and (max-width: 1185px + $width-wrapper-lg ) {
+  #wrapper.toggled {
+    .container {
+      &.toggled {
+        width: auto;
       }
     }
   }
+}
+
+@media screen and (max-width: 1199px) {
 }
 
 @media screen and (max-width: 991px) {
@@ -1551,31 +1602,24 @@ main {
   .masthead {
     margin-top: 10px;
   }
-  .row-canais {
-    margin-left: 0px;
-    margin-right: 0px;
-    & > div {
-      padding-left: 0px;
-      padding-right: 0px;
-    }
-    .icon {
-      position: absolute;
-      right: 2px;
-      font-size: 50px;
-      background-size: 50%;
-    }
-    .box {
-      margin-bottom: $grid-gutter-width / 2;
-    }
-    .inner {
-      font-size: 1.3em;
-      height: 100%;
-      a {
-        padding: 6px 5px 5px 27px;
-        text-indent: -20px;
+  .navbar {
+
+    .container-header{
+      padding: 0 5px;
+      .navbar-header {
+        margin: 0 -5px;
+      }
+      .navbar-social-links {
+        i {
+          font-size: 160%;
+        }
+        a {
+          padding: 4px 7px 0;
+        }
       }
     }
   }
+
 
   .container-path {
     font-size: 1.3em;
@@ -1669,9 +1713,6 @@ main {
 
 @media screen and (max-width: 800px) {
 
-  .container {
-    width: auto;
-  }
 
   .path-parlamentares {
 
@@ -1742,9 +1783,6 @@ main {
     height: $footer-height;
   }
   .navbar {
-    a.navbar-brand {
-      line-height: 39px;
-    }
     .nav-flex {
       display: block;
     }
@@ -1790,41 +1828,6 @@ main {
 
   .masthead {
     margin-top: 1px;
-  }
-  .row-canais {
-    margin-left: -10px;
-    margin-right: -10px;
-    & > div {
-      padding-left: 0px;
-      padding-right: 0px;
-    }
-    .icon {
-      position: absolute;
-      top: 5px;
-      right: 0;
-      left: 0;
-      width: 100%;
-      height: 28px;
-      display: block;
-      background-size: 32%;
-      background-position: center;
-      opacity: 0.6;
-    }
-    .box {
-      height: auto;
-    }
-    .inner {
-      position: relative;
-      font-size: 1em;
-      font-variant: normal;
-
-      text-align: center;
-      a {
-        position: relative;
-        padding: 38px 0px 3px 0px;
-        text-indent: 0;
-      }
-    }
   }
 
   .path-next {
@@ -1930,42 +1933,33 @@ main {
 }
 
 @media screen and (max-width: 600px) {
-
-.container-thumbnails {
-  .content-image {
-    &.show-image {
-      &::before {
-        border-bottom-width: 10px;
-        border-right-width: 10px;
-        border-left-width: 10px ;
-        top: -10px;
+  .container-thumbnails {
+    .content-image {
+      &.show-image {
+        &::before {
+          border-bottom-width: 10px;
+          border-right-width: 10px;
+          border-left-width: 10px ;
+          top: -10px;
+        }
+        .image {
+          max-width: none;
+          padding: 0px;
+        }
       }
       .image {
-        max-width: none;
-        padding: 0px;
+        padding: 2px;
+        height: 100px;
+      }
+      img {
+
       }
     }
-    .image {
-      padding: 2px;
-      height: 100px;
-    }
-    img {
-
-    }
   }
-}
-
-
 
   .masthead {
     margin-top: 1px;
   }
-  .row-canais {
-    .inner {
-      font-size: 0.8em;
-    }
-  }
-
   main {
     .container-path {
       font-size: 1.28em;
@@ -2093,20 +2087,7 @@ main {
       font-size: 1.5em;
   }
 
-  .row-canais {
-    .icon {
-      top: 0px;
-      height: 25px;
-      background-size: 40%;
-    }
-    .inner {
-      font-size: 0.55em;
-      line-height: 1em;
-      a {
-        padding: 30px 0px 3px 0px;
-      }
-    }
-  }
+
   .path-parlamentares {
     .avatar3, .avatar4 {
       width: 65px;
@@ -2126,10 +2107,39 @@ main {
 
 }
 
+
 @media screen and (min-width: 768px) {
+  #wrapper {
+    &.toggled {
+      transition: all 0.5s ease;
+      padding-left: $width-wrapper-lg;
+      aside {
+          transition: all 0.5s ease;
+          width: $width-wrapper-lg;
+      }
+
+      #menu-toggle {
+        .fa-chevron-circle-right {
+          display: none;
+        }
+        .fa-chevron-circle-left {
+          display: inline;
+        }
+      }
+    }
+  }
+  .path-previous {
+    &.toggled {
+      left: $width-wrapper-lg - 43px;
+    }
+  }
+
+  .canais-relative {
+    display: none;
+  }
   .navbar {
     .container {
-      padding-right: 0;
+      padding: 0;
       position: relative;
     }
     .navbar-collapse {
@@ -2229,12 +2239,17 @@ main {
     &.navbar-menu {  /* para a navbar principal - que se diferencia das demais*/
       border-color: transparentize($color_topo_bg, 0.2);
       border-top-width: 1px;
+      background-color: darken($color_topo_bg, 7);
+
       .container {
         padding: 0;
       }
       .navbar-nav {
         & > li {
           margin-top: 1em;
+          & > a {
+            color: #9c9;
+          }
           a {
             line-height: 2em;
             font-size: 1em;
@@ -2250,7 +2265,52 @@ main {
       max-width: 60%;
     }
   }
+}
 
+@media screen and (max-width: 1199px) {
+    #wrapper {
+      &.toggled {
+        padding-left: $width-wrapper-xs;
+        aside {
+            width: $width-wrapper-xs;
+        }
+      }
+    }
+    .path-previous {
+      &.toggled {
+        left: $width-wrapper-xs - 43px;
+      }
+    }
+    .canais-absolute {
+      & > div {
+      }
+      .icon {
+        position: absolute;
+        top: 10%;
+        right: 0;
+        left: 0;
+        bottom: 0px;
+        width: 100%;
+        display: block;
+        background-size: 40%;
+        background-position: top;
+        opacity: 0.6;
+      }
+      .inner {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: auto;
+        font-size: 1.5em;
+
+        text-align: center;
+        a {
+          position: relative;
+          padding: 100% 0px 10% 0px;
+          text-indent: 0;
+        }
+      }
+    }
 }
 
 @media screen and (max-width: 800px) {
@@ -2290,6 +2350,8 @@ main {
       }
     }
   }
+
+
 }
 
 @media screen and (min-width: 1200px) {
@@ -2297,6 +2359,10 @@ main {
     .path-imagem.alinhamento-left, .path-imagem.alinhamento-right {
       width: 49.9%;
     }
+  }
+  .navbar a.navbar-brand {
+    font-size: 28px;
+    padding: 0 0 0 30px;
   }
 }
 
@@ -2318,52 +2384,15 @@ main {
 }
 
 @media screen and (min-width: 1400px) {
-  .fixme_menulateral {
-    .screen-lg {
-      padding-left: 16.66667%;
-    }
-    .path-direction {
-      &.path-previous {
-        left:16.66667%;
-        margin-left: -1.6em;
-      }
-    }
-    .masthead {
-      .container-left {
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        left:0;
-        width: 16.66667%;
-        z-index: 2001;
-        .row-canais {
-          height: 100%;
-          .box {
-            margin-bottom: 0px;
-            height: 8.3334%;
-            float: none;
-            width: 100%;
 
-            &:hover {
-              .icon {
-                transform: scale(1.15);
-                right: 30px;
-              }
-            }
-          }
-          .inner {
-            a {
-            }
-          }
-        }
-      }
-    }
-  }
 }
 
 @media print {
   .screen-lg {
     padding-left: 0;
+  }
+  #wrapper.toggled {
+    padding: 0px;
   }
   .masthead, .btn-group {
     display: none;

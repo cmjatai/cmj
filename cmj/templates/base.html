@@ -22,7 +22,6 @@
       {% comment %} aplica font-awesome {% endcomment %}
       <link rel="stylesheet" href="{% static 'components-font-awesome/css/font-awesome.css' %}">
 
-
       <link rel="stylesheet" href="{% static 'jquery-ui/themes/cupertino/jquery-ui.min.css' %}">
       {% comment %} customizações de layout para área pública apartir de 2017 {% endcomment %}
       <link rel="stylesheet" href="{% sass_src 'styles/app_cmj.scss' %}?time={% now "jS F Y H:i:s" %}" type="text/css">
@@ -32,9 +31,20 @@
   </head>
 
   <body class="{% block body_class %}{%endblock%}">
-    <div class="page fadein screen-lg">
-      <nav class="navbar">
+    <div class="page fadein" {% block id_wrapper %}id="wrapper"{% endblock %}>
+      {% block canais_absolute %}
+        <aside>
+          <div class="canais-absolute">
+            <a href="#menu-toggle" id="menu-toggle">
+              <i class="fa fa-2x fa-chevron-circle-left" aria-hidden="true"></i>
+              <i class="fa fa-2x fa-chevron-circle-right" aria-hidden="true"></i>
+            </a>
 
+            {% include "base_sidebar.html" %}
+          </div>
+        </aside>
+        {% endblock canais_absolute%}
+      <nav class="navbar">
         <div class="container{{fluid}} container-header">
           <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right" id="autenticacao">
@@ -157,6 +167,13 @@
                     {% navbar 'navbar_cmj.yaml' %}
                   {% endif %}
                 </ul>
+
+                {% block menu_canais_relative %}
+                  <div class="canais-relative">
+                    {% include "base_sidebar.html" %}
+                  </div>
+                {% endblock %}
+
                 <ul class="nav navbar-nav navbar-right">
                         {% if perms.core.menu_relatorios %}
                           <li class="dropdown">
@@ -216,52 +233,6 @@
           <header class="masthead">
             <div class="container{{fluid}}">
               <div class="container-left">
-                {% block header_content %}
-                  <div class="row-canais">
-                      <div class="box bg-aqua">
-                        <div class="icon icon-licitacao">
-                        </div>
-                        <div class="inner">
-                          <a href="http://sislegis.camarajatai.go.gov.br/publicacoes/" class="">Licitações e Contratos</a>
-                        </div>
-                      </div>
-                      <div class="box bg-green">
-                        <div class="icon icon-norma-juridica">
-                        </div>
-                        <div class="inner">
-                          <a href="http://sapl.camarajatai.go.gov.br/sapl/qs?d=-&tc=tn" class="">Legislação<br>Municipal</a>
-                        </div>
-                      </div>
-                      <div class="box bg-yellow">
-                        <div class="icon icon-sessao-plenaria">
-                        </div>
-                        <div class="inner">
-                          <a href="http://sapl.camarajatai.go.gov.br/sapl/consultas/sessao_plenaria" class="">Sessões<br>Plenárias</a>
-                        </div>
-                      </div>
-                      <div class="box bg-red">
-                        <div class="icon icon-atividade-legislativa">
-                        </div>
-                        <div class="inner">
-                          <a href="http://sapl.camarajatai.go.gov.br/sapl/qs?d=-&tc=tm" class="">Atividade<br>Legislativa</a>
-                        </div>
-                      </div>
-                      <div class="box bg-maroon">
-                        <div class="icon icon-diario-oficial">
-                        </div>
-                        <div class="inner">
-                          <a href="http://sapl.camarajatai.go.gov.br/sapl/qs?d=-&tc=td" class="">Diário<br>Oficial</a>
-                        </div>
-                      </div>
-                      <div class="box bg-purple">
-                        <div class="icon icon-transparencia">
-                        </div>
-                        <div class="inner">
-                          <a href="http://camaradejatai.sigepnet.com.br/?portal=1" class="">Prestação<br>de Contas</a>
-                        </div>
-                      </div>
-                    </div>
-                {% endblock header_content%}
                 {% block sections_nav %}{% subnav %}{% endblock sections_nav %}
               </div>
             </div>
@@ -269,9 +240,8 @@
         {% endblock main_header %}
 
         {# Main content #}
-        {% block content_container %}
           <main id="content" class="content page__row screen-lg">
-
+        {% block content_container %}
             <div class="{% block main_container_class %}container container{{fluid}}{{path}} container-box{% endblock %}">
 
               {# Content header #}
@@ -325,8 +295,8 @@
             </div>
 
             {% block cmj_extra_content %}{% endblock %}
-          </main>
         {% endblock content_container %}
+          </main>
       {% endblock global_container %}
     </div>
   {% block login_container %}
@@ -334,9 +304,6 @@
 
   <footer id="footer" class="footer page__row screen-lg">
     <div class="container">
-
-
-
       Departamento de Tecnologia de Informação e Comunicação
     </div>
   </footer>
@@ -369,6 +336,18 @@
     {% endblock foot_js %}
 
     <script>
+
+    $(document).ready(function(){
+        //$("#wrapper, #wrapper .container, #wrapper .path-previous").toggleClass("toggled ");
+        $("#menu-toggle").click(function(e) {
+            e.preventDefault();
+            $("#wrapper, .path-previous").toggleClass("toggled");
+            $(".container").toggleClass("container-toggled ");
+        });
+
+    });
+
+
       window.fbAsyncInit = function() {
         FB.init({
           appId      : '150874375319738',

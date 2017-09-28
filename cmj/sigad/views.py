@@ -202,7 +202,7 @@ class PathView(MultipleObjectMixin, TemplateView):
 
         if not slug:
             # FIXME - pagina inicial
-            return redirect('/noticias')
+            # return redirect('/noticias')
             self.template_name = 'path/pagina_inicial.html'
             return TemplateView.dispatch(self, request, *args, **kwargs)
 

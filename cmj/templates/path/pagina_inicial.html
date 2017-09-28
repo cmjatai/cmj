@@ -1,9 +1,15 @@
-{% extends "base_path.html" %}
+{% extends "base.html" %}
 {% load i18n %}
-{% block base_header %}
+{% block id_wrapper %}{% endblock %}
+{% block menu_canais_relative %}{% endblock %}
 
+{% block canais_absolute %}
 {% endblock %}
 
-{% block title %}
+{% block main_header %}{% endblock %}
 
+{% block content_container %}
+  <div class="container-fluid canais-columns">
+    {% include "base_sidebar.html" %}
+  </div>
 {% endblock %}
