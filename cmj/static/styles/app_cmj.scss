@@ -197,6 +197,9 @@ body, html {
     height: $menu-height;
     margin-left: 0.5em;
   }
+  .navbar-header {
+    float:left;
+  }
   .navbar-toggle {
     margin: 5px 0 3px 0px;
     &:hover {
@@ -342,40 +345,6 @@ a:hover {
 }
 // ADJUST lateral esquerda ########################################
 
-#wrapper {
-  transition: all 0.5s ease;
-  z-index: 2001;
-  aside {
-    width: 10px;
-    transition: all 0.5s ease;
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    background: $color_main_bg url(/static/img/bg.png);
-    z-index: 2001;
-  }
-  #menu-toggle {
-    position: absolute;
-    left: 100%;
-    top: 20px;
-    margin-left: -0.5 * $grid-gutter-width;
-    padding: 5px;
-    color: rgba(white, 0.8);
-    z-index: 1;
-    line-height: 0;
-    &:hover {
-      color: white;
-    }
-    .fa-chevron-circle-left {
-      display: none;
-    }
-    .fa-chevron-circle-right {
-      display: inline;
-    }
-  }
-}
-// #### Canais ########################################
 .canais-absolute, .canais-relative, .canais-columns {
     & > div {
       padding-left: 0px;
@@ -472,6 +441,64 @@ a:hover {
   }
 }
 
+#wrapper {
+  transition: all 0.5s ease;
+  z-index: 2001;
+  padding-left: 10px;
+  aside {
+    width: 10px;
+    transition: all 0.5s ease;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    background: $color_main_bg url(/static/img/bg.png);
+    z-index: 2001;
+  }
+  #menu-toggle {
+    position: absolute;
+    left: 100%;
+    top: 21px;
+    margin-left: -0.5 * $grid-gutter-width;
+    padding: 5px;
+    color: rgba(white, 0.8);
+    z-index: 1;
+    line-height: 0;
+    &:hover {
+      color: white;
+    }
+    .fa-chevron-circle-left {
+      display: none;
+    }
+    .fa-chevron-circle-right {
+      display: inline;
+    }
+  }
+  &.toggled {
+    #menu-toggle {
+      .fa-chevron-circle-right {
+        display: none;
+      }
+      .fa-chevron-circle-left {
+        display: inline;
+      }
+    }
+  }
+
+  &:not(.toggled) {
+    .canais-absolute {
+      .inner {
+        font-size: 0;
+      }
+      .icon {
+        width: 0;
+      }
+    }
+  }
+}
+
+
+
 
 
 // ADJUST interno ########################################
@@ -480,7 +507,6 @@ a:hover {
 }
 
 main {
-
   .container-box, .container-box-fluid {
     background-color: $color_container_bg;
     border: 1px solid $color_container_border;
@@ -490,7 +516,6 @@ main {
   .container-fluid {
     margin: 0;
   }
-
 
   .item-action-or-input {
     border-color: darken($color_main_bg, 10%);
@@ -842,6 +867,7 @@ main {
   position: relative;
   overflow: hidden;
   margin-bottom: $grid-gutter-width;
+  margin-top: $grid-gutter-width;
   .painel-corte {
     position: absolute;
     left: 0px;
@@ -1028,8 +1054,9 @@ main {
 }
 
 .container-gallery {
-  margin: 0 $grid-gutter-width / -2;
+  margin: 0 $grid-gutter-width / -2 0 0;
   position: relative;
+  z-index: 2001;
 
   .gallery-inner {
     position: relative;
@@ -1368,7 +1395,7 @@ main {
 }
 
 .path-item-list {
-  margin-bottom: $grid-gutter-width;
+  margin-top: $grid-gutter-width;
 
 
   .inner {
@@ -1559,7 +1586,7 @@ main {
 }
 
 .path-previous {
-  left: -1.6em;
+  left: -33px;
   text-align: left;
 
   transition: left 0.5s ease;
@@ -1595,13 +1622,14 @@ main {
 }
 
 @media screen and (max-width: 1199px) {
+  .path-previous {
+    &.toggled {
+      left: $width-wrapper-xs - 43px;
+    }
+  }
 }
 
 @media screen and (max-width: 991px) {
-
-  .masthead {
-    margin-top: 10px;
-  }
   .navbar {
 
     .container-header{
@@ -1712,15 +1740,11 @@ main {
 
 
 @media screen and (max-width: 800px) {
-
-
   .path-parlamentares {
-
     .avatar1 {
       width: 120px;
     }
   }
-
   .path-direction {
     .path-parlamentares {
       .avatar {
@@ -1744,6 +1768,39 @@ main {
       .show-texto {
         padding: 3px;
         font-size: 70%;
+      }
+    }
+  }
+
+  .path-direction {
+    bottom: 25%;
+  }
+  .canais-absolute {
+    & > div {
+    }
+    .icon {
+      position: absolute;
+      top: 10%;
+      right: 0;
+      left: 0;
+      bottom: 0px;
+      width: 100%;
+      display: block;
+      background-size: 20%;
+      background-position: top;
+      opacity: 0.6;
+    }
+    .inner {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: auto;
+      font-size: 1.5em;
+      text-align: center;
+      a {
+        position: relative;
+        padding: 100% 0px 10% 0px;
+        text-indent: 0;
       }
     }
   }
@@ -1811,12 +1868,27 @@ main {
   .nav-acessar {
     display: block;
   }
+
+  #wrapper {
+    #menu-toggle {
+      top: 18px;
+      margin-left: -7px;
+      font-size: 70%;
+    }
+  }
+
   main {
     .container, .container-fluid {
       padding: 0 $grid-gutter-width * 0.25;
     }
     .row {
       margin:  0 $grid-gutter-width * -0.25;
+    }
+    .container-path {
+      font-size: 1.28em;
+      .path-imagem {
+        padding: 0.2em;
+      }
     }
   }
   .context-actions{
@@ -1829,11 +1901,9 @@ main {
   .masthead {
     margin-top: 1px;
   }
-
   .path-next {
     right: -1.6em;
     a {
-
       padding: 1.2em 1.7em 1.0em 0.5em;
     }
     &:hover {
@@ -1848,11 +1918,13 @@ main {
     }
   }
   .path-previous {
-    left: -1.6em;
+    left: -23px;
+    &.toggled {
+      left: $width-wrapper-xs - 33px;
+    }
     a {
       padding: 1.2em 0.5em 1.0em 1.7em;
     }
-
     &:hover {
       right: 1.6em;
       .inner {
@@ -1874,11 +1946,6 @@ main {
     }
   }
 
-  .container-path {
-    .path-imagem {
-      padding: 0.2em;
-    }
-  }
 
 
   .container-gallery {
@@ -1930,6 +1997,9 @@ main {
       }
     }
   }
+  .container-first {
+    margin-top: 0px;
+  }
 }
 
 @media screen and (max-width: 600px) {
@@ -1959,11 +2029,6 @@ main {
 
   .masthead {
     margin-top: 1px;
-  }
-  main {
-    .container-path {
-      font-size: 1.28em;
-    }
   }
   .container-path {
     .path-title {
@@ -2118,19 +2183,6 @@ main {
           width: $width-wrapper-lg;
       }
 
-      #menu-toggle {
-        .fa-chevron-circle-right {
-          display: none;
-        }
-        .fa-chevron-circle-left {
-          display: inline;
-        }
-      }
-    }
-  }
-  .path-previous {
-    &.toggled {
-      left: $width-wrapper-lg - 43px;
     }
   }
 
@@ -2268,50 +2320,49 @@ main {
 }
 
 @media screen and (max-width: 1199px) {
-    #wrapper {
-      &.toggled {
-        padding-left: $width-wrapper-xs;
-        aside {
-            width: $width-wrapper-xs;
-        }
+  .path-item-list {
+    margin-top: $grid-gutter-width /2;
+  }
+  #wrapper {
+    &.toggled {
+      padding-left: $width-wrapper-xs;
+      aside {
+          width: $width-wrapper-xs;
       }
     }
-    .path-previous {
-      &.toggled {
-        left: $width-wrapper-xs - 43px;
+  }
+  .canais-absolute {
+    & > div {
+    }
+    .icon {
+      position: absolute;
+      top: 10%;
+      right: 0;
+      left: 0;
+      bottom: 0px;
+      width: 100%;
+      display: block;
+      background-size: 40%;
+      background-position: top;
+      opacity: 0.6;
+    }
+    .inner {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: auto;
+      font-size: 1.5em;
+      text-align: center;
+      a {
+        position: relative;
+        padding: 100% 0px 10% 0px;
+        text-indent: 0;
       }
     }
-    .canais-absolute {
-      & > div {
-      }
-      .icon {
-        position: absolute;
-        top: 10%;
-        right: 0;
-        left: 0;
-        bottom: 0px;
-        width: 100%;
-        display: block;
-        background-size: 40%;
-        background-position: top;
-        opacity: 0.6;
-      }
-      .inner {
-        position: absolute;
-        bottom: 0;
-        width: 100%;
-        height: auto;
-        font-size: 1.5em;
-
-        text-align: center;
-        a {
-          position: relative;
-          padding: 100% 0px 10% 0px;
-          text-indent: 0;
-        }
-      }
-    }
+  }
 }
+
+
 
 @media screen and (max-width: 800px) {
   .navbar {
@@ -2336,6 +2387,36 @@ main {
       }
     }
   }
+
+  .canais-absolute {
+    .icon {
+      background-size: 25%;
+    }
+    .inner {
+      font-size: 1.3em;
+    }
+  }
+}
+
+@media screen and (max-width: 800px) and (orientation: landscape) {
+  .canais-absolute {
+    .icon {
+      top: -5px;
+      width: 100%;
+      background-size: 22%;
+      background-position: right bottom;
+    }
+    .inner {
+      top: 0;
+      width: 100%;
+      font-size: 1.2em;
+      text-align: left;
+      a {
+        padding: 7px 5px 5px 30px;
+        text-indent: -20px;
+      }
+    }
+  }
 }
 
 @media screen and (min-width: 992px) {
@@ -2350,8 +2431,6 @@ main {
       }
     }
   }
-
-
 }
 
 @media screen and (min-width: 1200px) {
@@ -2363,6 +2442,11 @@ main {
   .navbar a.navbar-brand {
     font-size: 28px;
     padding: 0 0 0 30px;
+  }
+  .path-previous {
+    &.toggled {
+      left: $width-wrapper-lg - 43px;
+    }
   }
 }
 

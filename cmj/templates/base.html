@@ -46,6 +46,11 @@
         {% endblock canais_absolute%}
       <nav class="navbar">
         <div class="container{{fluid}} container-header">
+          <div class="navbar-header">
+            <a class="navbar-brand" href="/">
+                C<small>âmara</small> M<small>unicipal de</small> J<small>ataí</small>
+            </a>
+          </div>
           <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right" id="autenticacao">
               {% if user and not user.is_anonymous %}
@@ -91,11 +96,7 @@
                 <a href="https://twitter.com/cmjatai"><i class="fa fa-twitter" aria-hidden="true"></i></a>
               </div>
           {% endblock %}
-          <div class="navbar-header">
-            <a class="navbar-brand" href="/">
-                C<small>âmara</small> M<small>unicipal de</small> J<small>ataí</small>
-            </a>
-          </div>
+
 
         </div>
       </nav>
@@ -169,9 +170,12 @@
                 </ul>
 
                 {% block menu_canais_relative %}
+                  {% comment %}
+
                   <div class="canais-relative">
                     {% include "base_sidebar.html" %}
                   </div>
+                  {% endcomment %}
                 {% endblock %}
 
                 <ul class="nav navbar-nav navbar-right">
@@ -342,11 +346,10 @@
         $("#menu-toggle").click(function(e) {
             e.preventDefault();
             $("#wrapper, .path-previous").toggleClass("toggled");
-            $(".container").toggleClass("container-toggled ");
+            $(".container").toggleClass("toggled ");
         });
 
     });
-
 
       window.fbAsyncInit = function() {
         FB.init({
