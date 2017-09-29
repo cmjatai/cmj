@@ -459,13 +459,13 @@ a:hover {
   #menu-toggle {
     position: absolute;
     left: 100%;
-    top: 21px;
-    margin-left: -0.5 * $grid-gutter-width;
-    padding: 5px;
-    color: rgba(white, 0.8);
+    top: 22px;
+    margin-left: -26px;
+    color: rgba(black, 0.8);
     z-index: 1;
     line-height: 0;
-    &:hover {
+    padding: 5px;
+    &:hover, &:active {
       color: white;
     }
     .fa-chevron-circle-left {
@@ -475,8 +475,28 @@ a:hover {
       display: inline;
     }
   }
+
+
   &.toggled {
+    transition: all 0.5s ease;
+    padding-left: $width-wrapper-lg;
+    aside {
+        transition: all 0.5s ease;
+        width: $width-wrapper-lg;
+    }
+    .path-previous {
+        left: $width-wrapper-lg - 43px;
+    }
+
     #menu-toggle {
+      color: rgba(white, 0.4);
+      top: 0px;
+      &:hover  {
+        color: white;
+      }
+      &:active  {
+        color: rgba(white, 0.4);
+      }
       .fa-chevron-circle-right {
         display: none;
       }
@@ -485,7 +505,6 @@ a:hover {
       }
     }
   }
-
   &:not(.toggled) {
     .canais-absolute {
       .inner {
@@ -1399,8 +1418,6 @@ main {
 
 .path-item-list {
   margin-top: $grid-gutter-width;
-
-
   .inner {
     z-index: 2000;
     display: block;
@@ -1468,11 +1485,11 @@ main {
   .path-imagem {
     &.alinhamento-left {
       padding: 0 $grid-gutter-width / 2 $grid-gutter-width / 2  0;
-      width: 20%;
+      width: 30%;
     }
     &.alinhamento-right {
       padding: 0 0 0 $grid-gutter-width / 2;
-      width: 20%;
+      width: 30%;
       float: right;
     }
     .data-pub {
@@ -1591,7 +1608,6 @@ main {
 .path-previous {
   left: -33px;
   text-align: left;
-
   transition: left 0.5s ease;
   a {
     padding: 1.2em 0.5em 1.0em 1.7em;
@@ -1625,16 +1641,48 @@ main {
 }
 
 @media screen and (max-width: 1199px) {
-  .path-previous {
+  #wrapper {
     &.toggled {
-      left: $width-wrapper-xs - 43px;
+      padding-left: $width-wrapper-sm;
+      aside {
+          width: $width-wrapper-sm;
+      }
+      .path-previous {
+          left: $width-wrapper-sm - 43px;
+      }
+    }
+  }
+  .canais-absolute {
+    .icon {
+      position: absolute;
+      top: 10%;
+      right: 0;
+      left: 0;
+      bottom: 0px;
+      width: 100%;
+      display: block;
+      background-size: 40%;
+      background-position: top;
+      opacity: 0.6;
+    }
+    .inner {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: auto;
+      font-size: 1.5em;
+      text-align: center;
+      a {
+        position: relative;
+        padding: 100% 0px 10% 0px;
+        text-indent: 0;
+      }
     }
   }
 }
 
 @media screen and (max-width: 991px) {
   .navbar {
-
     .container-header{
       padding: 0 5px;
       .navbar-header {
@@ -1763,6 +1811,35 @@ main {
       }
     }
   }
+
+  .canais-absolute {
+    .icon {
+      position: absolute;
+      top: 10%;
+      right: 0;
+      left: 0;
+      bottom: 0px;
+      width: 100%;
+      display: block;
+      background-size: 45%;
+      background-position: top;
+      opacity: 0.6;
+    }
+    .inner {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: auto;
+      font-size: 1.5em;
+      text-align: center;
+      a {
+        position: relative;
+        padding: 100% 0px 10% 0px;
+        text-indent: 0;
+      }
+    }
+  }
+
 }
 
 @media screen and (max-width: 800px) and (orientation: landscape) {
@@ -1778,32 +1855,20 @@ main {
   .path-direction {
     bottom: 25%;
   }
+
   .canais-absolute {
-    & > div {
-    }
     .icon {
-      position: absolute;
-      top: 10%;
-      right: 0;
-      left: 0;
-      bottom: 0px;
-      width: 100%;
-      display: block;
-      background-size: 20%;
-      background-position: top;
-      opacity: 0.6;
+      top: -5px;
+      background-size: 22%;
+      background-position: 96% bottom;
     }
     .inner {
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      height: auto;
-      font-size: 1.5em;
-      text-align: center;
+      top: 0;
+      font-size: 1.1em;
+      text-align: left;
       a {
-        position: relative;
-        padding: 100% 0px 10% 0px;
-        text-indent: 0;
+        padding: 7px 5px 5px 30px;
+        text-indent: -20px;
       }
     }
   }
@@ -1831,7 +1896,6 @@ main {
     }
   }
 }
-
 
 @media screen and (max-width: 767px) {
   $footer-height: 25px;
@@ -1870,14 +1934,6 @@ main {
 
   .nav-acessar {
     display: block;
-  }
-
-  #wrapper {
-    #menu-toggle {
-      top: 18px;
-      margin-left: -7px;
-      font-size: 70%;
-    }
   }
 
   main {
@@ -1922,9 +1978,6 @@ main {
   }
   .path-previous {
     left: -23px;
-    &.toggled {
-      left: $width-wrapper-xs - 33px;
-    }
     a {
       padding: 1.2em 0.5em 1.0em 1.7em;
     }
@@ -1939,6 +1992,19 @@ main {
     }
   }
 
+  #wrapper {
+    #menu-toggle {
+      top: 26px;
+      margin-left: -19px;
+      font-size: 70%;
+    }
+    &.toggled {
+      .path-previous {
+        left: $width-wrapper-sm - 33px;
+      }
+    }
+  }
+
   .path-parlamentares {
     margin-right: 5px;
     .avatar1 {
@@ -1949,8 +2015,6 @@ main {
     }
   }
 
-
-
   .container-gallery {
     margin: 0 $grid-gutter-width * -0.25;
     .show-image {
@@ -1959,14 +2023,12 @@ main {
         padding: 0px;
       }
     }
-
     .gallery-thumbnails {
       height: 48px;
       .gallery-item {
         height: 48px;
       }
     }
-
     .show-contexto {
       position: absolute;
       bottom: 0px;
@@ -1988,6 +2050,7 @@ main {
       }
     }
   }
+
   .container-albuns {
     .row > div {
       padding: 0 5px 10px 5px;
@@ -2000,6 +2063,7 @@ main {
       }
     }
   }
+
   .container-first {
     margin-top: 0px;
   }
@@ -2061,6 +2125,27 @@ main {
     }
   }
 
+  .path-item-list {
+    .inner {
+      padding: $grid-gutter-width * 0.7 $grid-gutter-width / 2 0;
+      .titulo {
+        line-height: 1.3;
+      }
+    }
+    .path-imagem {
+      &.alinhamento-left {
+        padding: 0 $grid-gutter-width / 4 $grid-gutter-width / 4  0;
+        width: 50%;
+      }
+      &.alinhamento-right {
+        padding: 0 0 0 $grid-gutter-width / 2;
+        width: 40%;
+      }
+      .data-pub {
+        padding-top: 5px;
+      }
+    }
+  }
 
   .path-direction {
     .path-parlamentares {
@@ -2095,6 +2180,31 @@ main {
     }
   }
 
+  #wrapper {
+    .path-previous {
+        left: -19px;
+    }
+    &.toggled {
+      padding-left: $width-wrapper-xs;
+      aside {
+          width: $width-wrapper-xs;
+      }
+      .path-previous {
+          left: $width-wrapper-xs - 28px;
+      }
+    }
+  }
+  .canais-absolute {
+    .icon {
+      background-size: 50%;
+    }
+    .inner {
+      font-size: 1em;
+      a {
+        padding: 100% 0px 5% 0px;
+      }
+    }
+  }
 }
 
 @media screen and (max-width: 480px) {
@@ -2139,7 +2249,11 @@ main {
     }
 
   }
-
+  main {
+    .container-path {
+      font-size: 1.15em;
+    }
+  }
   .nav-acessar {
     display: block;
     ul {
@@ -2173,22 +2287,21 @@ main {
     }
   }
 
+  .container-footer {
+    .path-item-list {
+      padding: 0 5px;
+      .data-pub {
+        font-size: 0.7em;
+      }
+      .inner {
+        padding: 15px 0 0 0;
+      }
+    }
+  }
 }
 
 
 @media screen and (min-width: 768px) {
-  #wrapper {
-    &.toggled {
-      transition: all 0.5s ease;
-      padding-left: $width-wrapper-lg;
-      aside {
-          transition: all 0.5s ease;
-          width: $width-wrapper-lg;
-      }
-
-    }
-  }
-
   .canais-relative {
     display: none;
   }
@@ -2313,7 +2426,6 @@ main {
         }
       }
     }
-
   }
   .context-actions {
     .search {
@@ -2325,43 +2437,6 @@ main {
 @media screen and (max-width: 1199px) {
   .path-item-list {
     margin-top: $grid-gutter-width /2;
-  }
-  #wrapper {
-    &.toggled {
-      padding-left: $width-wrapper-xs;
-      aside {
-          width: $width-wrapper-xs;
-      }
-    }
-  }
-  .canais-absolute {
-    & > div {
-    }
-    .icon {
-      position: absolute;
-      top: 10%;
-      right: 0;
-      left: 0;
-      bottom: 0px;
-      width: 100%;
-      display: block;
-      background-size: 40%;
-      background-position: top;
-      opacity: 0.6;
-    }
-    .inner {
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      height: auto;
-      font-size: 1.5em;
-      text-align: center;
-      a {
-        position: relative;
-        padding: 100% 0px 10% 0px;
-        text-indent: 0;
-      }
-    }
   }
 }
 
@@ -2391,35 +2466,9 @@ main {
     }
   }
 
-  .canais-absolute {
-    .icon {
-      background-size: 25%;
-    }
-    .inner {
-      font-size: 1.3em;
-    }
-  }
 }
 
 @media screen and (max-width: 800px) and (orientation: landscape) {
-  .canais-absolute {
-    .icon {
-      top: -5px;
-      width: 100%;
-      background-size: 22%;
-      background-position: right bottom;
-    }
-    .inner {
-      top: 0;
-      width: 100%;
-      font-size: 1.2em;
-      text-align: left;
-      a {
-        padding: 7px 5px 5px 30px;
-        text-indent: -20px;
-      }
-    }
-  }
 }
 
 @media screen and (min-width: 992px) {
@@ -2445,11 +2494,6 @@ main {
   .navbar a.navbar-brand {
     font-size: 28px;
     padding: 0 0 0 30px;
-  }
-  .path-previous {
-    &.toggled {
-      left: $width-wrapper-lg - 43px;
-    }
   }
 }
 

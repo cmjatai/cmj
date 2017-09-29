@@ -58,7 +58,7 @@ class PathView(MultipleObjectMixin, TemplateView):
     template_name = 'base_path.html'
     documento = None
     classe = None
-    paginate_by = 30
+    paginate_by = 31
 
     def get(self, request, *args, **kwargs):
 

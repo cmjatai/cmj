@@ -35,7 +35,8 @@ $icon-font-path: "../bootstrap/fonts/" !default;
 // variaveis wrapper ########################################
 
 $width-wrapper-lg: 270px !default;
-$width-wrapper-xs: 135px !default;
+$width-wrapper-sm: 135px !default;
+$width-wrapper-xs: 80px !default;
 
 // variaveis bootstrap ########################################
 @import "bootstrap/variables";

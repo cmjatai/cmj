@@ -24,7 +24,11 @@
 
       <link rel="stylesheet" href="{% static 'jquery-ui/themes/cupertino/jquery-ui.min.css' %}">
       {% comment %} customizações de layout para área pública apartir de 2017 {% endcomment %}
-      <link rel="stylesheet" href="{% sass_src 'styles/app_cmj.scss' %}?time={% now "jS F Y H:i:s" %}" type="text/css">
+      {% if user.is_superuser %}
+        <link rel="stylesheet" href="{% sass_src 'styles/app_cmj.scss' %}?time={% now "jS F Y H:i:s" %}" type="text/css">
+      {% else %}
+        <link rel="stylesheet" href="{% sass_src 'styles/app_cmj.scss' %}" type="text/css">
+      {% endif %}
 
     {% endblock %}
 
@@ -342,10 +346,10 @@
     <script>
 
     $(document).ready(function(){
-        //$("#wrapper, #wrapper .container, #wrapper .path-previous").toggleClass("toggled ");
+        //$("#wrapper, #wrapper .container").toggleClass("toggled ");
         $("#menu-toggle").click(function(e) {
             e.preventDefault();
-            $("#wrapper, .path-previous").toggleClass("toggled");
+            $("#wrapper").toggleClass("toggled");
             $(".container").toggleClass("toggled ");
         });
 
