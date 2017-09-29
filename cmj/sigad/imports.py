@@ -151,7 +151,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                 image.visibilidade = Documento.STATUS_RESTRICT
                 image.ordem = ordem
                 image.old_path = old_path_midia
-                image.titulo = ''
+                image.titulo = documento.titulo
                 image.owner = request.user
                 image.parent = container
                 image.tipo = Documento.TPD_IMAGE

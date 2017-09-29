@@ -23,13 +23,13 @@
               <a href="/{{galeria.absolute_slug}}" >
                 <div class="show-texto">
                   <div class="show-titulo">
-                    {{galeria.titulo}}
+                    {{galeria.parents.0.titulo}}
                     <small>
                       {{galeria.documentos_citados.count}} fotos
                     </small>
                   </div>
                   <div class="show-descricao">
-                    {{galeria.descricao}}
+                    {{galeria.parents.0.descricao}}
                   </div>
                 </div>
               </a>
