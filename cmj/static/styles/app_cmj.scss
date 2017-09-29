@@ -1296,6 +1296,8 @@ main {
         bottom: $grid-gutter-width;
         right: $grid-gutter-width;
         a {
+          display: inline-block;
+          left: auto;
           color: rgba(#fff, 0.7);
           &:hover {
             color: white;
