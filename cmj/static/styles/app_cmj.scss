@@ -881,6 +881,8 @@ main {
     margin: $grid-gutter-width 0 0 0;
     border: 0px;
     border-radius: 0;
+    position: relative;
+    z-index: 2001;
   }
 }
 .container-first {
@@ -1451,11 +1453,11 @@ main {
     z-index: 2000;
     display: block;
     margin: 0;
-    background: lighten($color_main_bg, 15%) url(/static/img/bg.png);
+    // background: lighten($color_main_bg, 15%) url(/static/img/bg.png);
     font-size: 80%;
     /*border-radius: 2px;*/
     border-top: 1px solid white;
-    border-bottom: 1px solid #fafafa;
+    //border-bottom: 1px solid #fafafa;
     padding: $grid-gutter-width * 0.8 $grid-gutter-width * 0.8 $grid-gutter-width * 0.4;
 
     .titulo {
@@ -1474,7 +1476,6 @@ main {
     .descricao {
       color: #006556;
       font-size: 90%;
-      font-style: italic;
       padding: 0;
       padding-bottom: $grid-gutter-width;
     }
@@ -1511,7 +1512,7 @@ main {
   }
 
   .path-parlamentares {
-    margin: 0px 5px 5px 0px;
+    margin: 0px 15px 5px 0px;
     float: left;
     &:first-child {
       margin-top:$grid-gutter-width / 1.5;
@@ -1525,13 +1526,13 @@ main {
   }
 
   .path-imagem {
-    width: 40%;
+    width: 50%;
     line-height: 0;
     position: relative;
     overflow: hidden;
     .imagem {
       width: 100%;
-      height: 180px;
+      height: 200px;
       display: inline-block;
       background-size: cover;
       background-repeat: no-repeat;
@@ -1571,6 +1572,7 @@ main {
     }
   }
 }
+
 
 .container-path111:not(.container-footer) {
   .path-item-list {
@@ -1695,12 +1697,19 @@ main {
     }
   }
 }
+
 .container-footer {
-  .path-item-list .inner {
-      padding-top: 20px;
-  }
   .path-parlamentares {
     display: none;
+  }
+  .path-item-list {
+    .inner {
+      .data-pub {
+        position: static;
+        text-align: right;
+        padding: 0 0 5px;
+      }
+    }
   }
 }
 
@@ -2113,6 +2122,9 @@ main {
     }
   }
   .path-item-list {
+    .path-parlamentares {
+      margin: 0px 5px 5px 0px;
+    }
     .inner {
       font-size: 90%;
     }
@@ -2205,7 +2217,7 @@ main {
   }
   .container-path {
     .path-title {
-      font-size: 1em;
+      font-size: 1.15em;
     }
     .path-description {
       margin-left: 5%;
@@ -2236,10 +2248,10 @@ main {
       padding: 0;
       .titulo {
         line-height: 1.2;
-        padding: 0 $grid-gutter-width / 2 $grid-gutter-width * 0.3 ;
+        padding: 0 $grid-gutter-width * 0.3 $grid-gutter-width * 0.3 ;
       }
       .descricao {
-        padding: 0 $grid-gutter-width / 2 $grid-gutter-width * 0.3 ;
+        padding: 0 $grid-gutter-width * 0.3 $grid-gutter-width * 0.3 ;
       }
       .data-pub {
         position: static;
@@ -2439,7 +2451,7 @@ main {
         font-size: 0.7em;
       }
       .inner {
-        padding: 15px 0 0 0;
+        padding: 0;
       }
     }
   }
@@ -2588,12 +2600,10 @@ main {
       max-width: 60%;
     }
   }
+
 }
 
 @media screen and (max-width: 1199px) {
-  .path-item-list {
-    margin-top: $grid-gutter-width /2;
-  }
 }
 
 
@@ -2639,14 +2649,26 @@ main {
       }
     }
   }
+
+  .container-footer {
+    .path-item-list {
+      margin-top: $grid-gutter-width * 0.5;
+      .inner {
+        padding: 0;
+      }
+      .path-imagem {
+          width: 100%;
+          margin: 0px;
+          padding: 0;
+      }
+      .imagem {
+        height: 140px;
+      }
+    }
+  }
 }
 
 @media screen and (min-width: 1200px) {
-  .container-footer {
-    .path-imagem.alinhamento-left, .path-imagem.alinhamento-right {
-      width: 49.9%;
-    }
-  }
   .navbar a.navbar-brand {
     font-size: 28px;
     padding: 0 0 0 30px;
