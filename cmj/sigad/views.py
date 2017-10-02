@@ -76,11 +76,10 @@ class PaginaInicialView(TemplateView):
 
         docs = Documento.objects.view_public_docs()
 
-        docs = docs.filter(
-            parlamentares__mandato__legislatura_id=legislatura_atual.id
-        ).annotate(
+        docs = docs.annotate(
             count_parlamentar=Count("parlamentares", distinct=True)
         ).filter(
+            parlamentares__mandato__legislatura_id=legislatura_atual.id,
             count_parlamentar=1
         ).values_list('id', flat=True)
 
