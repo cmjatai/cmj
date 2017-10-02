@@ -32,7 +32,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
 from django.core.urlresolvers import reverse_lazy, reverse
-from django.db.models.aggregates import Max
+from django.db.models.aggregates import Max, Count
 from django.http.response import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
@@ -43,7 +43,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView, MultipleObjectMixin
 from sapl.crispy_layout_mixin import read_layout_from_yaml
-from sapl.parlamentares.models import Parlamentar
+from sapl.parlamentares.models import Parlamentar, Legislatura
 import reversion
 
 from cmj.crud.base import MasterDetailCrud
@@ -52,6 +52,53 @@ from cmj.sigad.forms import DocumentoForm
 from cmj.sigad.models import Documento, Classe, ReferenciaEntreDocumentos,\
     PermissionsUserClasse, PermissionsUserDocumento, Revisao, CMSMixin
 from cmj.utils import make_pagination
+
+
+class PaginaInicialView(TemplateView):
+
+    template_name = 'path/pagina_inicial.html'
+
+    def get_context_data(self, **kwargs):
+        context = TemplateView.get_context_data(self, **kwargs)
+        context['path'] = '-path'
+
+        np = self.get_noticias_dos_parlamentares()
+
+        context['noticias_dos_parlamentares'] = np
+
+        context['noticias_destaque'] = Documento.objects.view_public_docs(
+        ).filter(parlamentares__isnull=True,
+                 classe_id=1)[:4]
+        return context
+
+    def get_noticias_dos_parlamentares(self):
+        legislatura_atual = Legislatura.objects.first()
+
+        docs = Documento.objects.view_public_docs()
+
+        docs = docs.filter(
+            parlamentares__mandato__legislatura_id=legislatura_atual.id
+        ).annotate(
+            count_parlamentar=Count("parlamentares", distinct=True)
+        ).filter(
+            count_parlamentar=1
+        ).values_list('id', flat=True)
+
+        docs = Documento.objects.filter(
+            id__in=docs
+        ).distinct(
+            'parlamentares__id'
+        ).order_by(
+            'parlamentares__id', '-public_date'
+        ).values_list('id', flat=True)
+
+        docs = Documento.objects.filter(
+            id__in=docs
+        ).order_by(
+            '-public_date'
+        )
+
+        return docs
 
 
 class PathView(MultipleObjectMixin, TemplateView):
@@ -201,6 +248,7 @@ class PathView(MultipleObjectMixin, TemplateView):
         slug = [s for s in slug if s]
 
         if not slug:
+            raise Http404()
             # FIXME - pagina inicial
             # return redirect('/noticias')
             self.template_name = 'path/pagina_inicial.html'

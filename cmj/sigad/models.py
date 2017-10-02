@@ -396,7 +396,8 @@ class DocumentoManager(models.Manager):
             Q(public_end_date__isnull=True),
 
             public_date__lte=timezone.now(),
-            visibilidade=Documento.STATUS_PUBLIC).order_by('-public_date')
+            visibilidade=Documento.STATUS_PUBLIC,
+            parent__isnull=True).order_by('-public_date')
         return qs
 
     def view_public_gallery(self):

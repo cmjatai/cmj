@@ -35,7 +35,7 @@
   </head>
 
   <body class="{% block body_class %}{%endblock%}">
-    <div class="page fadein" {% block id_wrapper %}id="wrapper"{% endblock %}>
+    <div class="page fadein" id="{% block id_wrapper %}wrapper{% endblock %}">
       {% block canais_absolute %}
         <aside>
           <div class="canais-absolute">

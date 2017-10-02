@@ -13,7 +13,6 @@
                   <a class="img-contexto" href="{% url 'cmj.sigad:path_view' documento.absolute_slug %}">
                     <div class="texto">
                       <div class="titulo">{{primeiro_item.titulo|default:''}}</div>
-
                     </div>
                   </a>
                   <div class="autor">{{primeiro_item.autor|default:''}}</div>
@@ -23,6 +22,7 @@
             {% endwith %}
           {% endwith %}
 
+
           <span class="data-pub">
             {% comment %}
               FIXME tratar histórico de revisão e publicação/privacidade
@@ -31,16 +31,33 @@
             {{documento.public_date|date:"d"}} {% trans "de" %} {{documento.public_date|date:"F"}} {% trans "de" %} {{documento.public_date|date:"Y"}}
           </span>
 
-          <div class="titulo">
-            <a href="{% url 'cmj.sigad:path_view' documento.absolute_slug %}">
-              {{documento.titulo}}
+          {% if pagina_inicial %}
+            <a class="tags tag-parlamentar" href="#">
+                {{ documento.parlamentares.first.nome_parlamentar}}
             </a>
-          </div>
+          {% endif %}
+
+          {% if not pagina_inicial %}
+            <div class="titulo">
+              <a href="{% url 'cmj.sigad:path_view' documento.absolute_slug %}">
+                {{documento.titulo}}
+              </a>
+            </div>
+          {% endif %}
+
+
+          {% if pagina_inicial %}
+            <div class="row">
+              <div class="col-xs-3 col-md-push-9">
+          {% endif %}
+
 
           {% for parlamentar in documento.parlamentares.all %}
             {% if forloop.counter0 > 0 and forloop.counter0|organize_direction_avatars:count_parlamentares  %}
               </div>
+
             {% endif %}
+
 
             {% if forloop.counter0|organize_direction_avatars:count_parlamentares %}
               <div class="path-parlamentares">
@@ -59,9 +76,28 @@
             {% endif %}
           {% endfor %}
 
+
+
+          {% if pagina_inicial %}
+          <div class="clearfix"></div>
+            </div>
+            <div class="col-xs-9 col-md-pull-3">
+              <div class="titulo">
+                <a href="{% url 'cmj.sigad:path_view' documento.absolute_slug %}">
+                  {{documento.titulo}}
+                </a>
+              </div>
+          {% endif %}
+
           {% if documento.descricao %}
             <div class="descricao">
               {{documento.descricao|striptags|safe}}
+            </div>
+          {% endif %}
+
+          {% if pagina_inicial %}
+                    <div class="clearfix"></div>
+              </div>
             </div>
           {% endif %}
 
