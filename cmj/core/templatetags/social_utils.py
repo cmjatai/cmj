@@ -26,4 +26,5 @@ def social_link_share(context, obj=None):
         context['request'].scheme,
         context['request'].get_host(),
         obj.absolute_slug),
-        'text': obj.titulo}
+        'text': obj.titulo,
+        'superuser': context['request'].user.is_superuser}

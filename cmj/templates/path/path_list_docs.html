@@ -5,21 +5,19 @@
       {% with documento.parlamentares.count as count_parlamentares %}
         <div class="inner">
           {% comment %} primeiro container, o primeiro item {% endcomment %}
-          {% with documento.childs.view_childs.first as primeiro_container %}
-            {% with primeiro_container.childs.view_childs.first as primeiro_item %}
-              {% if primeiro_item.tipo == primeiro_item.TPD_IMAGE %}
-                <div class="path-imagem {{primeiro_item.css_class}}">
-                  <div class="imagem" style="background-image: url(/{{primeiro_item.absolute_slug}}.512)"></div>
+          {% with documento.imagem_representativa as imagem %}
+              {% if imagem %}
+                <div class="path-imagem {{imagem.css_class}}">
+                  <div class="imagem" style="background-image: url(/{{imagem.absolute_slug}}.512)"></div>
                   <a class="img-contexto" href="{% url 'cmj.sigad:path_view' documento.absolute_slug %}">
                     <div class="texto">
-                      <div class="titulo">{{primeiro_item.titulo|default:''}}</div>
+                      <div class="titulo">{{imagem.titulo|default:''}}</div>
                     </div>
                   </a>
-                  <div class="autor">{{primeiro_item.autor|default:''}}</div>
+                  <div class="autor">{{imagem.autor|default:''}}</div>
                 </div>
               {% else %}
               {% endif %}
-            {% endwith %}
           {% endwith %}
 
 

@@ -514,6 +514,19 @@ class Documento(Slugged, CMSMixin):
     def absolute_slug(self):
         return '%s/%s' % (self.classe.slug, self.slug)
 
+    def imagem_representativa(self):
+
+        if self.tipo == Documento.TPD_IMAGE:
+            return self
+
+        for item in self.childs.view_childs():
+            img = item.imagem_representativa()
+
+            if img:
+                return img
+
+        return None
+
     @cached_property
     def css_class(self):
         classes = {self.ALINHAMENTO_LEFT: 'alinhamento-left',
