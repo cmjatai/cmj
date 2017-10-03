@@ -160,7 +160,7 @@
 
       {% for child in container.childs.view_childs %}
         {% if child.tipo == child.TPD_TEXTO %}
-          {{child.texto|safe}}
+          {{child.texto|urlize|safe}}
         {% elif child.tipo == child.TPD_IMAGE %}
 
           <div class="path-imagem {{child.css_class}}">

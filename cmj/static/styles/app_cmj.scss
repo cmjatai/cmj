@@ -1,6 +1,4 @@
-
 @import "variables";
-
 @mixin placeholder($color, $opacity, $fontsize, $fontweight) {
   &::-webkit-input-placeholder {
     color: $color !important;
@@ -276,20 +274,20 @@ body, html {
   }
   .container-header{
 
-    .navbar-social-links {
-      float: right;
-      i {
-        line-height: 38px;
-        font-size: 1.6em;
-      }
-      a {
-        display: inline-block;
-        color: rgba(white, 0.6);
-        padding: 4px 15px 0;
-        &:hover {
-          color: rgba(white, 1);
-        }
-      }
+  }
+}
+.navbar-social-links {
+  float: right;
+  i {
+    line-height: 38px;
+    font-size: 1.6em;
+  }
+  a {
+    display: inline-block;
+    color: rgba(white, 0.6);
+    padding: 4px 15px 0;
+    &:hover {
+      color: rgba(white, 1);
     }
   }
 }
@@ -439,6 +437,11 @@ a:hover {
     width: 16.6666%;
     float: left;
     height: 100%;
+    &:hover {
+      .icon {
+        right: 0px;
+      }
+    }
   }
 }
 
@@ -535,6 +538,9 @@ a:hover {
 main {
   .container-fluid {
     margin: 0;
+  }
+  .container.container-box {
+    margin-top: 20px;
   }
 
   .item-action-or-input {
@@ -1020,7 +1026,6 @@ main {
       text-align: right;
       font-size: 0.6em;
       float: right;
-      padding-right: 3px;
     }
   }
   .pagination {
@@ -1754,7 +1759,7 @@ main {
       padding: 0 0 10px;
     }
     .descricao {
-      font-size: 70%;
+      font-size: 85%;
     }
     .path-parlamentares {
       margin: 0px;
@@ -1798,23 +1803,26 @@ main {
         padding: 0 5px;
       }
     }
-    .row {
-      &:first-child > div {
-        padding: 0;
+    &:first-child > div {
+      padding: 0;
+    }
+    &:not(:first-child) > div {
+      padding: 0 1px 0 0;
+      .path-item-list {
+        font-size: 90%;
       }
-      &:not(:first-child) > div {
-        padding: 0 1px 0 0;
+    }
+    &:first-child {
+      .path-item-list {
+        @extend .container-box;
+        border-radius: 0;
+        font-size: 120%;
       }
-      &:first-child {
-          .path-item-list {
-            @extend .container-box;
-            border-radius: 0;
-          }
-        .texto {
-        }
-        .imagem {
-          height: 360px;
-        }
+      .texto {
+        padding: 0 10px;
+      }
+      .imagem {
+        height: 360px;
       }
     }
   }
@@ -2334,7 +2342,7 @@ main {
     }
 
     .container-noticias-destaque {
-      .row:first-child {
+      &:first-child {
         margin: 0 -10px;
         .path-item-list {
           margin-top: 0px;
@@ -2343,7 +2351,8 @@ main {
           padding: 0 10px;
         }
       }
-      .row:not(:first-child) {
+      &:not(:first-child) {
+        margin: 0 -10px;
         & > div {
           width: 100%;
         }
@@ -2359,7 +2368,6 @@ main {
       }
     }
   }
-
 }
 
 @media screen and (max-width: 600px) {
@@ -2534,22 +2542,36 @@ main {
     }
   }
   .tags {
-    padding: 10px 10px 5px;
+    padding: 0px 10px 5px;
   }
+
   #pagina-inicial {
     .path-item-list {
       .avatar {
+        width: 80px;
       }
+    }
+    .container-box-parlamentares {
+      margin-left: -8px;
+      margin-right: -8px;
       .inner {
+        padding-left: 0;
+        padding-right: 0;
+      }
+      .titulo {
+        padding: 0px 5px 0 0;
+      }
+      .descricao {
+        padding: 5px 10px 20px;
       }
     }
     .container-noticias-destaque {
-      .row:first-child {
+      &:first-child {
         .imagem {
           height: 250px;
         }
       }
-      .row:not(:first-child) {
+      &:not(:first-child) {
         .path-item-list {
           .path-imagem {
             &.alinhamento-justify {
@@ -2664,7 +2686,7 @@ main {
     .inner {
       font-size: 0.8em;
       a {
-        padding: 23px 0px 3px 0px;
+        padding: 28px 0px 3px 0px;
       }
     }
   }

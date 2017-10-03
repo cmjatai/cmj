@@ -1,9 +1,8 @@
 {% load i18n sigad_filters %}
 
-<div class="container-noticias-destaque">
 {% for documento in object_list %}
   {% if forloop.first %}
-    <div class="row">
+    <div class="row container-noticias-destaque">
       <div class="col-xs-12">
   {% else %}
     <div class="col-xs-6 col-sm-4">
@@ -20,12 +19,14 @@
                 </a>
                 <div class="autor">{{primeiro_item.autor|default:''}}</div>
               </div>
-              <a href="{% url 'cmj.sigad:path_view' documento.absolute_slug %}">
-                <div class="texto">
-                  <div class="titulo">{{documento.titulo}}</div>
-                  <div class="descricao">{{documento.descricao}}</div>
+              <div class="texto">
+                <div class="titulo">
+                  <a href="{% url 'cmj.sigad:path_view' documento.absolute_slug %}">
+                    {{documento.titulo}}
+                  </a>
                 </div>
-              </a>
+                <div class="descricao">{{documento.descricao}} </div>
+              </div>
             {% else %}
             {% endif %}
           {% endwith %}
@@ -36,7 +37,7 @@
     {% if forloop.first %}
         </div>
       </div>
-      <div class="row">
+      <div class="row container-noticias-destaque">
     {% elif forloop.last %}
       </div>
         </div>
@@ -44,4 +45,3 @@
       </div>
     {% endif %}
 {% endfor %}
-</div>

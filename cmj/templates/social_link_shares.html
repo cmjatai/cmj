@@ -1,0 +1,7 @@
+{% load i18n%}
+{% if user.is_superuser %}
+<div class="navbar-social-links">
+  <a href="https://www.facebook.com/sharer/sharer.php?u={{url}}"><i class="fa fa-facebook" aria-hidden="true"></i></a>
+  <a href="https://twitter.com/intent/tweet?text={{text|urlencode}}&url={{url}}"><i class="fa fa-twitter" aria-hidden="true"></i></a>
+</div>
+{% endif %}

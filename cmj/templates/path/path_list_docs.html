@@ -1,4 +1,4 @@
-{% load i18n sigad_filters %}
+{% load i18n sigad_filters social_utils %}
 
 {% for documento in object_list %}
     <div class="{{css_class}}">
@@ -35,6 +35,7 @@
             <a class="tags tag-parlamentar" href="#">
                 {{ documento.parlamentares.first.nome_parlamentar}}
             </a>
+            {% social_link_share documento %}
           {% endif %}
 
           {% if not pagina_inicial %}
@@ -79,7 +80,7 @@
 
 
           {% if pagina_inicial %}
-          <div class="clearfix"></div>
+            <div class="clearfix"></div>
             </div>
             <div class="col-xs-9 col-md-pull-3">
               <div class="titulo">

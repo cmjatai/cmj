@@ -18,3 +18,12 @@ def social_icon(backend):
 @register.filter
 def social_title(backend):
     return get_backend_info(backend).get('title')
+
+
+@register.inclusion_tag('social_link_shares.html', takes_context=True)
+def social_link_share(context, obj=None):
+    return {'url': '%s://%s/%s' % (
+        context['request'].scheme,
+        context['request'].get_host(),
+        obj.absolute_slug),
+        'text': obj.titulo}
