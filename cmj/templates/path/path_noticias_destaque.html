@@ -1,4 +1,4 @@
-{% load i18n sigad_filters %}
+{% load i18n sigad_filters social_utils%}
 
 {% for documento in object_list %}
   {% if forloop.first %}
@@ -25,7 +25,11 @@
                     {{documento.titulo}}
                   </a>
                 </div>
-                <div class="descricao">{{documento.descricao}} </div>
+
+                <div class="descricao">
+                  {% social_link_share documento 'top-right icon-block'%}
+                  {{documento.descricao}}
+                </div>
               </div>
             {% else %}
             {% endif %}

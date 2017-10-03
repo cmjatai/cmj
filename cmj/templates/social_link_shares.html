@@ -1,8 +1,6 @@
 {% load i18n%}
-{% if superuser %}
-<br><br><br>
-<div class="navbar-social-links">
-  <a href="https://www.facebook.com/sharer/sharer.php?u={{url}}"><i class="fa fa-facebook" aria-hidden="true"></i></a>
-  <a href="https://twitter.com/intent/tweet?text={{text|urlencode}}&url={{url}}"><i class="fa fa-twitter" aria-hidden="true"></i></a>
+
+<div class="navbar-social-links {{css_class}}">
+  <a title="{% trans "Compartilhar no Facebook" %}" href="https://www.facebook.com/sharer/sharer.php?u={{url}}"><i class="fa fa-facebook" aria-hidden="true"></i></a>
+  <a title="{% trans "Compartilhar no Twitter" %}" href="https://twitter.com/intent/tweet?text={{text|urlencode}}&url={{url}}"><i class="fa fa-twitter" aria-hidden="true"></i></a>
 </div>
-{% endif %}

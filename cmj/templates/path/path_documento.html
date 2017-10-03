@@ -1,5 +1,5 @@
 {% extends "base_path.html" %}
-{% load i18n sigad_filters %}
+{% load i18n sigad_filters social_utils %}
 
 {% block main_container_class %}container-path{% endblock %}
 
@@ -153,14 +153,15 @@
 
 
           {% block base_header %}
-            {{block.super}}
+             {{block.super}}
+
           {% endblock %}
 
       {% endif %}
 
       {% for child in container.childs.view_childs %}
         {% if child.tipo == child.TPD_TEXTO %}
-          {{child.texto|urlize|safe}}
+          {{child.texto|safe|urlize}}
         {% elif child.tipo == child.TPD_IMAGE %}
 
           <div class="path-imagem {{child.css_class}}">

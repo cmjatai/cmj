@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load i18n social_utils%}
 
 {% block html_class %}html{{path}}{%endblock%}
 {% block body_class %}body{{path}}{%endblock%}
@@ -34,6 +34,7 @@
           </div>
         {% endblock %}
       </div>
+      {% social_link_share object 'top-right'%}
     </div>
   {% endif %}
   {% block title %}
@@ -41,7 +42,9 @@
         {{ object.titulo|safe|linebreaksbr }}
     </span>
   {% endblock %}
+
   {% if object.descricao %}
+
     <span class="path-description">
       {% block descricao %}
         {{object.descricao|striptags|safe}}

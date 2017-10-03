@@ -20,7 +20,6 @@
               {% endif %}
           {% endwith %}
 
-
           <span class="data-pub">
             {% comment %}
               FIXME tratar histórico de revisão e publicação/privacidade
@@ -33,7 +32,8 @@
             <a class="tags tag-parlamentar" href="#">
                 {{ documento.parlamentares.first.nome_parlamentar}}
             </a>
-            {% social_link_share documento %}
+              {% social_link_share documento %}
+              <div class="clearfix"></div>
           {% endif %}
 
           {% if not pagina_inicial %}
@@ -44,19 +44,15 @@
             </div>
           {% endif %}
 
-
           {% if pagina_inicial %}
             <div class="row">
               <div class="col-xs-3 col-md-push-9">
           {% endif %}
 
-
           {% for parlamentar in documento.parlamentares.all %}
             {% if forloop.counter0 > 0 and forloop.counter0|organize_direction_avatars:count_parlamentares  %}
               </div>
-
             {% endif %}
-
 
             {% if forloop.counter0|organize_direction_avatars:count_parlamentares %}
               <div class="path-parlamentares">
@@ -95,7 +91,7 @@
           {% endif %}
 
           {% if pagina_inicial %}
-                    <div class="clearfix"></div>
+                <div class="clearfix"></div>
               </div>
             </div>
           {% endif %}

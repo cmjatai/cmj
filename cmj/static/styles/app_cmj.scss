@@ -183,7 +183,7 @@ body, html {
   }
 }
 
-// ADJUST NAVBAR ########################################
+
 .navbar {
   background: $color_topo_bg url(/static/img/bg.png);
   border-radius: 0;
@@ -273,22 +273,24 @@ body, html {
     }
   }
   .container-header{
-
-  }
-}
-.navbar-social-links {
-  float: right;
-  i {
-    line-height: 38px;
-    font-size: 1.6em;
-  }
-  a {
-    display: inline-block;
-    color: rgba(white, 0.6);
-    padding: 4px 15px 0;
-    &:hover {
-      color: rgba(white, 1);
+    .navbar-social-links {
+      float: right;
+      a {
+        display: inline-block;
+        padding: 4px 15px 0;
+        i {
+          line-height: 38px;
+          font-size: 1.5em;
+          color: rgba(white, 0.6);
+        }
+        &:hover {
+          i {
+            color: rgba(white, 1);
+          }
+        }
+      }
     }
+
   }
 }
 .nav-acessar {
@@ -1720,22 +1722,6 @@ main {
 }
 
 
-// #### tags ########################################
-
-.tags {
-  display: inline-block;
-  position: relative;
-  width: 100%;
-  color: #a97905;
-  font-weight: bold;
-  font-size: 70%;
-  float: left;
-  line-height: 1;
-  &:hover {
-    text-decoration: underline;
-    color: darken(#a97905, 5);
-  }
-}
 
 // #### pagina inicial ########################################
 
@@ -1779,6 +1765,9 @@ main {
           padding: 2px;
         }
       }
+    }
+    .navbar-social-links {
+      float: right;
     }
   }
 
@@ -1824,6 +1813,55 @@ main {
       .imagem {
         height: 360px;
       }
+    }
+  }
+}
+
+// #### tags ########################################
+
+.tags {
+  display: inline-block;
+  position: relative;
+  color: #a97905;
+  font-weight: bold;
+  font-size: 0.8em;
+  line-height: 2.1;
+  &:hover {
+    text-decoration: underline;
+    color: darken(#a97905, 5);
+  }
+}
+// ADJUST NAVBAR ########################################
+
+.navbar-social-links {
+  display: inline-block;
+  padding: 0;
+  line-height: 1;
+  z-index: 1;
+  a {
+      padding: 0 5px;
+    i {
+      color: rgba(green, 0.3);
+      &:hover {
+        color: rgba(green, 1);
+      }
+    }
+  }
+  &.top-right {
+    float: right;
+    font-size: 1.5em;
+    position: absolute;
+    right: 0;
+    top: 5px;
+    a {
+      padding: 0 10px;
+    }
+  }
+  &.icon-block {
+    a {
+      display: block;
+      padding: 0 5px 10px;
+
     }
   }
 }
@@ -2017,6 +2055,10 @@ main {
     }
     .container-box-parlamentares {
         margin-left: 0;
+
+      .navbar-social-links {
+        padding: 10px 10px 0;
+      }
     }
   }
 }
