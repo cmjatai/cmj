@@ -27,4 +27,5 @@ def social_link_share(context, obj=None, css_class=''):
         context['request'].get_host(),
         obj.absolute_slug),
         'text': obj.titulo,
-        'css_class': css_class}
+        'css_class': css_class,
+        'text_whatsapp': '%s. Segue o link: ' % obj.titulo}

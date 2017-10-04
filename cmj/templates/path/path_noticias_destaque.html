@@ -27,8 +27,16 @@
                 </div>
 
                 <div class="descricao">
-                  {% social_link_share documento 'top-right icon-block'%}
+                  {% if forloop.first %}
+                    {% social_link_share documento 'top-right pull-right icon-block'%}
+                  {% endif %}
+
                   {{documento.descricao}}
+
+                  {% if not forloop.first %}
+                    {% social_link_share documento 'top-right pull-right'%}
+                  {% endif %}
+                  <div class="clearfix"></div>
                 </div>
               </div>
             {% else %}
