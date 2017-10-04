@@ -12,6 +12,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     {% block meta_tags %}
+      <meta name="description" content="{{object.descricao|striptags|safe}}">
+
       <meta property="fb:app_id" content="150874375319738">
       <meta property="fb:admins" content="cmjatai">
       <meta property="og:locale" content="pt_BR">
@@ -24,9 +26,9 @@
 
       {% with object.imagem_representativa_metatags as doc_imagem %}
         {% if doc_imagem and doc_imagem.absolute_slug%}
-          <meta property="og:image" content="{{request.scheme}}://{{request.get_host}}/{{doc_imagem.absolute_slug}}">
+          <meta property="og:image" content="{{request.scheme}}://{{request.get_host}}/{{doc_imagem.absolute_slug}}.768">
           <meta property="og:image:type" content="{{doc_imagem.midia.last.content_type}}">
-          <meta name="twitter:image" content="{{request.scheme}}://{{request.get_host}}/{{doc_imagem.absolute_slug}}.512">
+          <meta name="twitter:image" content="{{request.scheme}}://{{request.get_host}}/{{doc_imagem.absolute_slug}}.768">
 
           <meta property="og:image:width" content="{{doc_imagem.midia.last.width}}">
           <meta property="og:image:height" content="{{doc_imagem.midia.last.height}}">
