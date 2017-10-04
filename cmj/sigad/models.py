@@ -659,6 +659,18 @@ class VersaoDeMidia(models.Model):
     def simple_name(self):
         return self.file.name.split('/')[-1]
 
+    @cached_property
+    def width(self):
+        nf = '%s/%s' % (media_protected.location, self.file.name)
+        im = Image.open(nf)
+        return im.width
+
+    @cached_property
+    def height(self):
+        nf = '%s/%s' % (media_protected.location, self.file.name)
+        im = Image.open(nf)
+        return im.height
+
     def thumbnail(self, width='thumb'):
         sizes = {
             '24': (24, 24),

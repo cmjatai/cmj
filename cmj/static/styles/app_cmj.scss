@@ -1767,6 +1767,18 @@ main {
     }
     .navbar-social-links {
       float: right;
+      a {
+        i {
+          color: rgba(#a97905, 0.6);
+        }
+        &:hover {
+          i {
+            color: rgba(#a97905, 1);
+          }
+        }
+      }
+
+
     }
   }
 
