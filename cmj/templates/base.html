@@ -20,7 +20,7 @@
       <meta property="og:title" content="{% if object.titulo %}{{object.titulo}}{% else %}Câmara Municipal de Jataí{% endif %}">
       <meta property="og:description" content="{{object.descricao|striptags|safe}}">
 
-      {% with object.imagem_representativa as doc_imagem %}
+      {% with object.imagem_representativa_metatags as doc_imagem %}
         {% if doc_imagem and doc_imagem.absolute_slug%}
           <meta property="og:image" content="{{request.scheme}}://{{request.get_host}}/{{doc_imagem.absolute_slug}}.1024">
           <meta property="og:image:type" content="{{doc_imagem.midia.last.content_type}}">
