@@ -514,7 +514,7 @@ class Documento(Slugged, CMSMixin):
     def absolute_slug(self):
         return '%s/%s' % (self.classe.slug, self.slug)
 
-    def imagem_representativa(self):
+    def _imagem_representativa(self):
 
         if self.tipo == Documento.TPD_IMAGE:
             return self
@@ -526,6 +526,17 @@ class Documento(Slugged, CMSMixin):
                 return img
 
         return None
+
+    def imagem_representativa(self):
+        img = self._imagem_representativa()
+
+        if img:
+            return img
+
+        if not self.parlamentares.exists():
+            return None
+
+        return self.parlamentares.first()
 
     @cached_property
     def css_class(self):

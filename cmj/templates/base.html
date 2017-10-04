@@ -18,19 +18,25 @@
       <meta property="og:url" content="{{request.scheme}}://{{request.get_host}}{% if object.absolute_slug %}/{{ object.absolute_slug }}{% endif %}">
       <meta property="og:site_name" content="Portal da Câmara Municipal de Jataí - Goiás">
       <meta property="og:title" content="{% if object.titulo %}{{object.titulo}}{% else %}Câmara Municipal de Jataí{% endif %}">
-      <meta property="og:description" content="{{object.descricao}}">
+      <meta property="og:description" content="{{object.descricao|striptags|safe}}">
+
       {% with object.imagem_representativa as doc_imagem %}
-        {% if doc_imagem %}
+        {% if doc_imagem and doc_imagem.absolute_slug%}
           <meta property="og:image" content="{{request.scheme}}://{{request.get_host}}/{{doc_imagem.absolute_slug}}.1024">
           <meta property="og:image:type" content="{{doc_imagem.midia.last.content_type}}">
-		      <meta name="twitter:image" content="{{request.scheme}}://{{request.get_host}}/{{doc_imagem.absolute_slug}}.1024">
+          <meta name="twitter:image" content="{{request.scheme}}://{{request.get_host}}/{{doc_imagem.absolute_slug}}.1024">
+        {% elif doc_imagem.fotografia %}
+          <meta property="og:image" content="{{request.scheme}}://{{request.get_host}}{{doc_imagem.fotografia.url}}">
+          <meta property="og:image:type" content="image/jpeg">
+          <meta name="twitter:image" content="{{request.scheme}}://{{request.get_host}}{{doc_imagem.fotografia.url}}">
         {% endif %}
       {% endwith %}
 
-			<meta name="twitter:description" content="{{object.descricao}}">
+      <meta name="twitter:description" content="{{object.descricao|striptags|safe}}">
       <meta name="twitter:card" content="summary_large_image">
-			<meta name="twitter:site" content="@cmjatai">
-			<meta name="twitter:title" content="{% if object.titulo %}{{object.titulo}}{% else %}Câmara Municipal de Jataí{% endif %}">
+      <meta name="twitter:site" content="@cmjatai">
+      <meta name="twitter:title" content="{% if object.titulo %}{{object.titulo|linebreaksbr|striptags}}{% else %}Câmara Municipal de Jataí{% endif %}">
+
     {% endblock %}
     {% block head_content %}
       <link rel="icon" href="{% static 'img/logo.png' %}"  type="image/png" >
@@ -115,7 +121,7 @@
               <span class="icon-bar"></span>
             </button>
           {% endblock %}
-          
+
           {% block social_links %}
             <div class="navbar-social-links">
               <a href="https://www.facebook.com/cmjatai"><i class="fa fa-facebook" aria-hidden="true"></i></a>

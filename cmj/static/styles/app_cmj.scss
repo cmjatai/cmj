@@ -931,8 +931,7 @@ main {
     color: $color_topo_bg;
     margin-bottom: 0.9em;
     font-size: 90%;
-    margin-left: 10%;
-    margin-right: 10%;
+    margin-left: 5%;
     text-align: center;
     font-style: italic;
   }
@@ -1850,7 +1849,7 @@ main {
   &.top-right {
     float: right;
     font-size: 1.5em;
-    position: absolute;
+    position: relative;
     right: 0;
     top: 5px;
     a {
@@ -1962,8 +1961,8 @@ main {
       font-size: 1.2em;
     }
     .path-description {
-      margin-left: 10%;
-      margin-right: 10%;
+      margin-left: 5%;
+      margin-right: 0%;
     }
   }
 
@@ -2592,6 +2591,9 @@ main {
       .avatar {
         width: 80px;
       }
+      .path-parlamentares {
+        text-align: right;
+      }
     }
     .container-box-parlamentares {
       margin-left: -8px;
@@ -2630,7 +2632,7 @@ main {
 @media screen and (max-width: 480px) {
   .navbar {
     a.navbar-brand {
-      padding: 0 0 0 10px;
+      padding: 0 0 0 5px;
       font-size: 16px;
     }
     button.navbar-toggle {
