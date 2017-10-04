@@ -13,19 +13,20 @@
 
     {% block meta_tags %}
       <meta property="fb:app_id" content="150874375319738">
+      <meta property="fb:admins" content="cmjatai">
       <meta property="og:locale" content="pt_BR">
 
       <meta property="og:url" content="{{request.scheme}}://{{request.get_host}}{% if object.absolute_slug %}/{{ object.absolute_slug }}{% endif %}">
       <meta property="og:site_name" content="Portal da Câmara Municipal de Jataí - Goiás">
       <meta property="og:title" content="{% if object.titulo %}{{object.titulo}}{% else %}Câmara Municipal de Jataí{% endif %}">
       <meta property="og:description" content="{{object.descricao|striptags|safe}}">
-      <meta property="og:type" content="website">
+      <meta property="og:type" content="government">
 
       {% with object.imagem_representativa_metatags as doc_imagem %}
         {% if doc_imagem and doc_imagem.absolute_slug%}
           <meta property="og:image" content="{{request.scheme}}://{{request.get_host}}/{{doc_imagem.absolute_slug}}">
           <meta property="og:image:type" content="{{doc_imagem.midia.last.content_type}}">
-          <meta name="twitter:image" content="{{request.scheme}}://{{request.get_host}}/{{doc_imagem.absolute_slug}}">
+          <meta name="twitter:image" content="{{request.scheme}}://{{request.get_host}}/{{doc_imagem.absolute_slug}}.512">
 
           <meta property="og:image:width" content="{{doc_imagem.midia.last.width}}">
           <meta property="og:image:height" content="{{doc_imagem.midia.last.height}}">
@@ -37,6 +38,7 @@
         {% endif %}
       {% endwith %}
 
+      <meta name="twitter:url" content="{{request.scheme}}://{{request.get_host}}{% if object.absolute_slug %}/{{ object.absolute_slug }}{% endif %}">
       <meta name="twitter:description" content="{{object.descricao|striptags|safe}}">
       <meta name="twitter:card" content="summary_large_image">
       <meta name="twitter:site" content="@cmjatai">
