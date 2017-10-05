@@ -19,6 +19,7 @@ from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import ContextMixin
 from django.views.generic.list import MultipleObjectMixin
+from sapl.crispy_layout_mixin import get_field_display
 from sapl.crud import base
 from sapl.crud.base import Crud, CrudListView, CrudCreateView, CrudDetailView,\
     CrudUpdateView, CrudDeleteView, MasterDetailCrud
@@ -26,7 +27,8 @@ from sapl.rules import map_rules
 
 from cmj.cerimonial.forms import PerfilForm
 from cmj.cerimonial.models import Perfil
-from cmj.globalrules.globalrules import GROUP_SOCIAL_USERS
+from cmj.globalrules import (RP_ADD, RP_CHANGE, RP_DELETE, RP_DETAIL, RP_LIST)
+from cmj.globalrules import GROUP_SOCIAL_USERS
 from cmj.utils import normalize
 
 
@@ -212,31 +214,31 @@ class PerfilDetailCrudPermission(MasterDetailCrud):
 
         @property
         def list_url(self):
-            return self.resolve_url(base.LIST)\
-                if self.request.user.has_perm(self.permission(LIST)) else ''
+            return self.resolve_url(base.ACTION_LIST)\
+                if self.request.user.has_perm(self.permission(RP_LIST)) else ''
 
         @property
         def create_url(self):
-            return self.resolve_url(base.CREATE)\
-                if self.request.user.has_perm(self.permission(ADD)) else ''
+            return self.resolve_url(base.ACTION_CREATE)\
+                if self.request.user.has_perm(self.permission(RP_ADD)) else ''
 
         @property
         def detail_url(self):
             return self.resolve_url(
-                base.DETAIL, args=(self.object.id,))\
-                if self.request.user.has_perm(self.permission(DETAIL)) else ''
+                base.ACTION_DETAIL, args=(self.object.id,))\
+                if self.request.user.has_perm(self.permission(RP_DETAIL)) else ''
 
         @property
         def update_url(self):
             return self.resolve_url(
-                base.UPDATE, args=(self.object.id,))\
-                if self.request.user.has_perm(self.permission(CHANGE)) else ''
+                base.ACTION_UPDATE, args=(self.object.id,))\
+                if self.request.user.has_perm(self.permission(RP_CHANGE)) else ''
 
         @property
         def delete_url(self):
             return self.resolve_url(
-                base.DELETE, args=(self.object.id,))\
-                if self.request.user.has_perm(self.permission(DELETE)) else ''
+                base.ACTION_DELETE, args=(self.object.id,))\
+                if self.request.user.has_perm(self.permission(RP_DELETE)) else ''
 
         def get_context_data(self, **kwargs):
             obj = getattr(self, 'object', None)

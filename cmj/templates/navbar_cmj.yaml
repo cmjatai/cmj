@@ -1,0 +1,10 @@
+{% load i18n common_tags %}
+
+- title: {% trans 'Página Inicial' %}
+  url: /
+- title: {% trans 'Notícias' %}
+  url: /noticias
+- title: {% trans 'Galerias' %}
+  children:
+  - title: {% trans 'Imagens' %}
+    url: /galerias/imagens

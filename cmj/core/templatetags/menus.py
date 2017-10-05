@@ -1,9 +1,9 @@
+import yaml
 from django import template
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
-from sapl.utils import sapl_logger
-import yaml
 
+from sapl.utils import sapl_logger
 
 register = template.Library()
 
@@ -72,8 +72,7 @@ def nav_run(context, path=None):
             """
         try:
             yaml_template = template.loader.get_template(yaml_path)
-        except Exception as e:
-            print(e)
+        except:
             return
 
         try:

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block id_wrapper %}pagina-inicial{% endblock %}
+{% block menu_canais_relative %}{% endblock %}
+{% block canais_absolute %}{% endblock %}
+{% block base_header %}{% endblock %}
+
+{% block main_header %}
+  <div class="container-fluid canais-columns">
+    {% include "base_sidebar.html" %}
+  </div>
+{% endblock %}
+
+{% block main_container_class %}container container{{fluid}}{{path}}{% endblock %}
+{% block base_content %}
+  <div class="row">
+    <div class="col-md-8">
+
+      {% with noticias_destaque as object_list %}
+        {% include "path/path_noticias_destaque.html" %}
+      {% endwith %}
+
+    </div>
+    <div class="col-md-4">
+      {% with noticias_dos_parlamentares as object_list %}
+        {% with 'path-item-list container-box-parlamentares' as css_class %}
+        {% with True as pagina_inicial %}
+          {% include "path/path_list_docs.html" %}
+        {% endwith %}
+        {% endwith %}
+      {% endwith %}
+    </div>
+  </div>
+{% endblock %}

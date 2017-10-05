@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load i18n social_utils%}
+
+{% block html_class %}html{{path}}{%endblock%}
+{% block body_class %}body{{path}}{%endblock%}
+
+
+{% block base_header %}
+  {% if object.descricao %}
+    <div style="position:relative;">
+      <div class="path-title-classe">
+        {{object.classe}}
+      </div>
+      <div class="path-data-pub">
+        {% block historico_publicacao %}
+          <div class="container-versions">
+            <a href="#list-revisoes" role="button" data-toggle="collapse" aria-expanded="false" aria-controls="list-revisoes">
+
+              {% comment %}
+                FIXME tratar histórico de revisão e publicação/privacidade
+              {% endcomment %}
+              <i class="fa fa-clock-o" aria-hidden="true"></i>
+              {% if object.public_date %}
+                {% trans "Publicado em" %} {{object.public_date|date:"d"}} {% trans "de" %} {{object.public_date|date:"F"}} {% trans "de" %} {{object.public_date|date:"Y"}}
+              {% else %}
+                {% trans "Criado em" %} {{object.created|date:"d"}} {% trans "de" %} {{object.created|date:"F"}} {% trans "de" %} {{object.created|date:"Y"}}
+              {% endif %}
+            </a>
+            <div class="collapse" id="list-revisoes">
+              {% for rev in object.revisoes.all %}
+                  <span class="">
+                    {{rev.get_visibilidade_display}} - {{rev.data}} - {% trans "por:" %} {{rev.user.first_name|default:rev.user.email}}
+                  </span>
+              {% endfor %}
+
+            </div>
+          </div>
+        {% endblock %}
+      </div>
+
+    </div>
+  {% endif %}
+  {% block title %}
+    <span class="path-title">
+        {{ object.titulo|safe|linebreaksbr }}
+    </span>
+  {% endblock %}
+
+  {% if object.descricao %}
+    <span class="path-description">
+      {% block descricao %}
+        {{object.descricao|striptags|safe}}
+      {% endblock %}
+      {% social_link_share object 'top-right block'%}
+    </span>
+  {% endif %}
+{% endblock %}

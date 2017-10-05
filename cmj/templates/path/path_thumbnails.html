@@ -1,0 +1,241 @@
+{% extends "path/path_documento.html" %}
+{% load i18n sigad_filters %}
+{% block main_container_class %}container-path container-fluid{% endblock %}
+{% block render_content %}
+
+{% for container in object.childs.view_childs %}
+  <div class="container{% if container.tipo == container.TPD_CONTAINER_EXTENDIDO%}-fluid{% endif %} container-thumbnails">
+    {% for doc in container.childs.view_childs %}
+        <div class="content-image">
+          <div class="inner">
+            <div class="image">
+                <img src="/{{doc.absolute_slug}}.256" data-src="/{{doc.absolute_slug}}" alt="" />
+            </div>
+            <div class="anotacoes">
+              {{doc.titulo}}
+            </div>
+          </div>
+        </div>
+    {% endfor %}
+  </div>
+{% endfor %}
+
+{% endblock %}
+
+{% block extra_js  %}
+<script type="text/javascript">
+  $(document).ready(function(){
+
+    var setStyleWithEndNameClass = function(endNameClass, attr, value) {
+      for (var s = 0; s < document.styleSheets.length; s++) {
+        rules = document.styleSheets[s].rules || document.styleSheets[s].cssRules;
+        for (var r = 0; r < rules.length;r++) {
+          if (rules[r].selectorText !== undefined && rules[r].selectorText.endsWith(endNameClass)) {
+            rules[r].style[attr] = value;
+          }
+        }
+      }
+    }
+
+    var onclick_content_image = function(event) {
+      var _this;
+      var _this_clone;
+      var offset_this;
+
+      if (event.type === 'click') {
+        _this = this;
+        _this_clone = this.cloneNode(true);
+
+        $('.container-thumbnails > .clearfix').remove();
+        if ($(this).hasClass('show-image')) {
+          var top = $('.show-image').prev().offset().top - 10;
+
+          $('.show-image').remove();
+            $('html, body').animate({
+                scrollTop: top
+            }, 300);
+          return;
+        }
+        $('.show-image').remove();
+        offset_this = $(_this).offset();
+        var next = $(_this).next();
+
+        var offset_next = next.length > 0 ? next.offset() : null;
+        if (next.length > 0 && offset_this.left < offset_next.left) {
+          do {
+            _this = next[0];
+            next = next.next();
+            offset_next = next.length > 0 ? next.offset() : offset_next;
+          } while (next.length > 0 && offset_this.left < offset_next.left);
+        }
+
+        _this.after(_this_clone);
+
+        $(_this_clone).before($('<div class="clearfix"></div>'));
+        $(_this_clone).addClass('show-image');
+        $(_this_clone).addClass('wait');
+        setStyleWithEndNameClass('show-image::before', 'left', offset_this.left+ 'px');
+
+        _this_clone.onclick = onclick_content_image;
+
+        var margens = 0;
+        if (_this.clientWidth > _this.clientHeight) {
+          margens = _this.clientHeight / 2;
+        }
+        else {
+          margens = _this.clientWidth / 2;
+        }
+        if (margens * 5 > window.innerHeight)
+          margens = 0;
+
+        _this_clone.style.height = (window.innerHeight - margens * 3) + 'px';
+
+        var img = _this_clone.getElementsByTagName('img')[0];
+        var img_width = img.width;
+        var func_monitora = function() {
+          setTimeout(function() {
+
+            if (img.width === img_width)
+              func_monitora();
+            else {
+              $(_this_clone).removeClass('wait');
+            }
+          }, 100);
+        }
+        func_monitora();
+        img.src = img.getAttribute('data-src');
+        $('html, body').animate({
+              scrollTop: $(_this_clone).offset().top - margens * 2
+          }, 300);
+      }
+      else {
+        _this = $('.show-image');
+        if (_this.length === 0)
+          return;
+
+        var vizinho = _this.prev().prev()[0];
+        var margens = 0;
+
+        if (vizinho.clientWidth > vizinho.clientHeight) {
+          margens = vizinho.clientHeight / 2;
+        }
+        else {
+          margens = vizinho.clientWidth / 2;
+        }
+        if (margens * 5 > window.innerHeight)
+          margens = 0;
+        _this[0].style.height = (window.innerHeight - margens * 3) + 'px';
+        setTimeout(function () {
+          $('html, body').animate({
+                scrollTop: $(_this[0]).offset().top - margens * 2
+            }, 300);
+
+        }, 500);
+      }
+
+    };
+    $('.content-image').click(onclick_content_image);
+    $(window).resize(onclick_content_image);
+
+
+    var resize_images = function(event) {
+      var imagens = document.getElementsByClassName('container-thumbnails');
+      if (imagens.length == 0)
+        return;
+
+      var width_container = imagens[0].clientWidth;
+      imagens = imagens[0].getElementsByClassName('content-image');
+      if (!imagens instanceof Array)
+        imagens = [imagens, ];
+
+      var linhas = [];
+      var offset_old = null;
+      var linha = [];
+      for (var item = 0; item < imagens.length;item++) {
+        imagens.item(item).querySelector('img').style.height= '150px';
+      }
+
+      for (var item = 0; item < imagens.length;item++) {
+        var offset_item =  $(imagens.item(item)).offset();
+        if (offset_old === null) {
+          offset_old = offset_item;
+          linha.push(imagens.item(item));
+          linhas.push(linha);
+          continue;
+        }
+
+        if (offset_old.left > offset_item.left) {
+          linha = [];
+          linhas.push(linha);
+        }
+        linha.push(imagens.item(item));
+        offset_old = offset_item;
+      }
+
+      linhas.forEach(function(linha, idx) {
+        var func = function() {
+          console.log(idx);
+          var width = 0;
+          linha.forEach(function(item, idx_item) {
+            width += item.getBoundingClientRect().width;
+          });
+          if (width < width_container) {
+            linha.forEach(function(item, idx_item) {
+              var imagem = item.querySelector("img");
+              imagem.style.height = (imagem.clientHeight + 1) + 'px';
+            });
+          }
+          else {
+            linha.forEach(function(item, idx_item) {
+              var imagem = item.querySelector("img");
+              imagem.style.height = (imagem.clientHeight - 2) + 'px';
+            });
+            return true;
+          }
+        }
+        var func_run = function() {
+          setTimeout(function () {
+            var result = func();
+            if (!result)
+              func_run();
+          }, 100);
+        }
+        func_run();
+      });
+      console.log(width_container);
+    }
+
+    /*var flag_resize_imagens;
+    window.onresize = function(event) {
+          clearTimeout(flag_resize_imagens);
+          flag_resize_imagens = setTimeout(
+            function() {
+              resize_images(event);
+            }, 1000);
+    }
+
+    //setTimeout(resize_images, 100);
+
+    var onclick_content_image = function() {
+      var _this = this;
+
+      if ($(this).hasClass('show-image2')) {
+        $('.show-image2').removeClass('show-image2');
+        return;
+      }
+      $('.show-image2').removeClass('show-image2');
+
+
+      $(_this).addClass('show-image2');
+
+      var img = _this.getElementsByTagName('img')[0];
+      $(img).ready(function(){
+        console.log('teste');
+      });
+      img.src = img.getAttribute('data-src');
+    };
+    $('.content-image').click(onclick_content_image);*/
+  });
+
+</script>
+{% endblock %}

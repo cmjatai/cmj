@@ -1,0 +1,7 @@
+{% load i18n%}
+
+<div class="navbar-social-links {{css_class}}">
+  <a class="facebook" target="_blank" title="{% trans "Compartilhar no Facebook" %}" href="https://www.facebook.com/sharer/sharer.php?u={{url}}"><i class="fa fa-facebook" aria-hidden="true"></i></a>
+  <a class="twitter" target="_blank" title="{% trans "Compartilhar no Twitter" %}" href="https://twitter.com/intent/tweet?text={{text|urlencode}}&url={{url}}"><i class="fa fa-twitter" aria-hidden="true"></i></a>
+  <a class="whatsapp" title="{% trans "Compartilhar no WhatsApp" %}" href="whatsapp://send?text={{text|urlencode}}. {{url}}"><i class="fa fa-whatsapp" aria-hidden="true"></i></a>
+</div>

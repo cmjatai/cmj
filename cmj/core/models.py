@@ -11,13 +11,41 @@ from django.db.models.deletion import PROTECT, CASCADE
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from image_cropping import ImageCropField, ImageRatioField
-from sapl.parlamentares.models import Municipio, Parlamentar
 
-from cmj.core.rules import SEARCH_TRECHO
-from cmj.globalrules.globalrules import rules, GROUP_SOCIAL_USERS
-from cmj.utils import get_settings_auth_user_model, normalize, YES_NO_CHOICES
+from cmj.globalrules import MENU_PERMS_FOR_USERS, GROUP_SOCIAL_USERS
+from cmj.utils import get_settings_auth_user_model, normalize, YES_NO_CHOICES,\
+    UF
 
-from .rules import MENU_PERMS_FOR_USERS
+
+def group_social_users_add_user(user):
+    if user.groups.filter(name=GROUP_SOCIAL_USERS).exists():
+        return
+
+    g = Group.objects.get_or_create(name=GROUP_SOCIAL_USERS)[0]
+    user.groups.add(g)
+    user.save()
+
+
+def groups_remove_user(user, groups_name):
+    if not isinstance(groups_name, list):
+        groups_name = [groups_name, ]
+    for group_name in groups_name:
+        if not group_name or not user.groups.filter(
+                name=group_name).exists():
+            continue
+        g = Group.objects.get_or_create(name=group_name)[0]
+        user.groups.remove(g)
+
+
+def groups_add_user(user, groups_name):
+    if not isinstance(groups_name, list):
+        groups_name = [groups_name, ]
+    for group_name in groups_name:
+        if not group_name or user.groups.filter(
+                name=group_name).exists():
+            continue
+        g = Group.objects.get_or_create(name=group_name)[0]
+        user.groups.add(g)
 
 
 class UserManager(BaseUserManager):
@@ -43,7 +71,7 @@ class UserManager(BaseUserManager):
         except:
             user = self.model.objects.get_by_natural_key(email)
 
-        rules.group_social_users_add_user(user)
+        group_social_users_add_user(user)
         return user
 
     def create_user(self, email, password=None, **extra_fields):
@@ -107,6 +135,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     class Meta(AbstractBaseUser.Meta):
         abstract = False
         permissions = MENU_PERMS_FOR_USERS
+        ordering = ('first_name', 'last_name')
 
     def __str__(self):
         return self.get_display_name()
@@ -170,22 +199,7 @@ class CmjSearchMixin(models.Model):
         return super(CmjSearchMixin, self).save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
 
 
-class CmjModelMixin(models.Model):
-    # para migração
-    """created = models.DateTimeField(
-        verbose_name=_('created'),
-        editable=True, auto_now_add=False)
-    modified = models.DateTimeField(
-        verbose_name=_('modified'), editable=True, auto_now=False)"""
-    # para produção
-    created = models.DateTimeField(
-        verbose_name=_('created'),
-        editable=False, auto_now_add=True)
-    modified = models.DateTimeField(
-        verbose_name=_('modified'), editable=False, auto_now=True)
-
-    class Meta:
-        abstract = True
+class CmjCleanMixin:
 
     def clean(self):
         """
@@ -193,7 +207,7 @@ class CmjModelMixin(models.Model):
         """
         from django.core.exceptions import ValidationError
 
-        super(CmjModelMixin, self).clean()
+        super(CmjCleanMixin, self).clean()
 
         for field_tuple in self._meta.unique_together[:]:
             unique_filter = {}
@@ -216,6 +230,24 @@ class CmjModelMixin(models.Model):
                     msg = self.unique_error_message(
                         self.__class__, tuple(unique_fields))
                     raise ValidationError(msg)
+
+
+class CmjModelMixin(CmjCleanMixin, models.Model):
+    # para migração
+    """created = models.DateTimeField(
+        verbose_name=_('created'),
+        editable=True, auto_now_add=False)
+    modified = models.DateTimeField(
+        verbose_name=_('modified'), editable=True, auto_now=False)"""
+    # para produção
+    created = models.DateTimeField(
+        verbose_name=_('created'),
+        editable=False, auto_now_add=True)
+    modified = models.DateTimeField(
+        verbose_name=_('modified'), editable=False, auto_now=True)
+
+    class Meta:
+        abstract = True
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None, clean=True):
@@ -246,6 +278,34 @@ class CmjAuditoriaModelMixin(CmjModelMixin):
         abstract = True
 
 
+class Municipio(models.Model):  # Localidade
+    # TODO filter on migration leaving only cities
+
+    REGIAO_CHOICES = (
+        ('CO', 'Centro-Oeste'),
+        ('NE', 'Nordeste'),
+        ('NO', 'Norte'),
+        ('SE', 'Sudeste'),  # TODO convert on migrate SD => SE
+        ('SL', 'Sul'),
+        ('EX', 'Exterior'),
+    )
+
+    nome = models.CharField(max_length=50, blank=True)
+    uf = models.CharField(
+        max_length=2, blank=True, choices=UF)
+    regiao = models.CharField(
+        max_length=2, blank=True, choices=REGIAO_CHOICES)
+
+    class Meta:
+        verbose_name = _('Município')
+        verbose_name_plural = _('Municípios')
+
+    def __str__(self):
+        return _('%(nome)s - %(uf)s (%(regiao)s)') % {
+            'nome': self.nome, 'uf': self.uf, 'regiao': self.regiao
+        }
+
+
 class AreaTrabalho(CmjAuditoriaModelMixin):
 
     nome = models.CharField(max_length=100, blank=True, default='',
@@ -254,11 +314,11 @@ class AreaTrabalho(CmjAuditoriaModelMixin):
     descricao = models.CharField(
         default='', max_length=254, verbose_name=_('Descrição'))
 
-    parlamentar = models.ForeignKey(
+    """parlamentar = models.ForeignKey(
         Parlamentar,
         verbose_name=_('Parlamentar'),
         related_name='areatrabalho_set',
-        blank=True, null=True, on_delete=CASCADE)
+        blank=True, null=True, on_delete=CASCADE)"""
 
     operadores = models.ManyToManyField(
         get_settings_auth_user_model(),
@@ -305,7 +365,7 @@ class OperadorAreaTrabalho(CmjAuditoriaModelMixin):
         verbose_name_plural = _('Operadores')
 
     def __str__(self):
-        return self.user.get_display_name()
+        return self.user_name
 
 
 class Cep(models.Model):

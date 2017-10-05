@@ -27,7 +27,6 @@ from django_filters.filters import CharFilter, ChoiceFilter, NumberFilter,\
 from django_filters.filterset import FilterSet, STRICTNESS
 from sapl.crispy_layout_mixin import to_column, SaplFormLayout, to_fieldsets,\
     form_actions, to_row
-from sapl.parlamentares.models import Municipio
 
 from cmj import settings
 from cmj.cerimonial.models import LocalTrabalho, Endereco,\
@@ -35,7 +34,7 @@ from cmj.cerimonial.models import LocalTrabalho, Endereco,\
     IMPORTANCIA_CHOICE, AssuntoProcesso, StatusProcesso, ProcessoContato,\
     GrupoDeContatos, TopicoProcesso
 from cmj.core.forms import ListWithSearchForm
-from cmj.core.models import Trecho, ImpressoEnderecamento
+from cmj.core.models import Municipio, Trecho, ImpressoEnderecamento
 from cmj.utils import normalize, YES_NO_CHOICES
 
 
@@ -432,6 +431,12 @@ class ProcessoForm(ModelForm):
              ]
         yaml_layout.append(q)
 
+        for fieldset in yaml_layout:
+            for linha in fieldset:
+                for idx, field in enumerate(linha):
+                    if field[0] == 'importancia':
+                        linha[idx] = (InlineRadios('importancia'), field[1])
+
         self.helper = FormHelper()
         self.helper.layout = SaplFormLayout(*yaml_layout)
 
@@ -454,7 +459,6 @@ class ProcessoForm(ModelForm):
 
         # Utilizando template bootstrap3 customizado
         self.fields['importancia'].widget = forms.RadioSelect()
-        self.fields['importancia'].inline_class = True
         self.fields['importancia'].choices = IMPORTANCIA_CHOICE
 
         self.fields['status'].widget = forms.RadioSelect()

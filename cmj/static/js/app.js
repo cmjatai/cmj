@@ -8,8 +8,6 @@ function initTinymce(elements, readonly=false) {
         menubar: "edit format table tools",
         toolbar: "undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent",
         tools: "inserttable",
-        border_css: "/static/styles/style_tinymce.css",
-        content_css: "/static/styles/style_tinymce.css",
     }
 
     if (readonly) {
@@ -207,11 +205,33 @@ function OptionalCustomFrontEnd() {
     }
     instance.init();
 }
+var pathNext = $('.path-next');
+var pathPrevious = $('.path-previous');
+
+function eventActionsNextPrevious() {
+    /*$('main').mousemove(function(event) {
+        if (event.clientX >= 0.5 * this.clientWidth) {
+            pathPrevious.removeClass('hover');
+            pathNext.addClass('hover');
+        }
+        else {
+            pathNext.removeClass('hover');
+            pathPrevious.addClass('hover');
+        }
+
+    });
+    $(window).scroll(function(event) {
+        console.log(event)
+    });*/
+
+}
 
 $(document).ready(function(){
     refreshDatePicker();
     refreshMask();
     autorModal();
-    initTinymce();
+    //initTinymce();
     OptionalCustomFrontEnd();
+
+    eventActionsNextPrevious();
 });

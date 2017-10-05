@@ -1,8 +1,11 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.shortcuts import redirect
 from django.utils.translation import ugettext_lazy as _
 from image_cropping import ImageCroppingMixin
+from reversion.models import Revision
+from sapl.base.admin import RevisionAdmin
 
 from cmj.utils import register_all_models_in_admin
 

@@ -1,0 +1,59 @@
+{% load i18n sigad_filters social_utils%}
+
+{% for documento in object_list %}
+  {% if forloop.first %}
+    <div class="row container-noticias-destaque">
+      <div class="col-xs-12">
+  {% else %}
+    <div class="col-xs-6 col-sm-4">
+  {% endif %}
+    <div class="path-item-list">
+      <div class="inner">
+        {% comment %} primeiro container, o primeiro item {% endcomment %}
+        {% with documento.childs.view_childs.first as primeiro_container %}
+          {% with primeiro_container.childs.view_childs.first as primeiro_item %}
+            {% if primeiro_item.tipo == primeiro_item.TPD_IMAGE %}
+              <div class="path-imagem alinhamento-justify">
+                <div class="imagem" style="background-image: url(/{{primeiro_item.absolute_slug}}.512)"></div>
+                <a class="img-contexto" href="{% url 'cmj.sigad:path_view' documento.absolute_slug %}">
+                </a>
+                <div class="autor">{{primeiro_item.autor|default:''}}</div>
+              </div>
+              <div class="texto">
+                <div class="titulo">
+                  <a href="{% url 'cmj.sigad:path_view' documento.absolute_slug %}">
+                    {{documento.titulo}}
+                  </a>
+                </div>
+
+                <div class="descricao">
+                  {% if forloop.first %}
+                    {% social_link_share documento 'top-right pull-right icon-block'%}
+                  {% endif %}
+
+                  {{documento.descricao}}
+
+                  {% if not forloop.first %}
+                    {% social_link_share documento 'top-right pull-right'%}
+                  {% endif %}
+                  <div class="clearfix"></div>
+                </div>
+              </div>
+            {% else %}
+            {% endif %}
+          {% endwith %}
+        {% endwith %}
+      </div>
+    </div>
+
+    {% if forloop.first %}
+        </div>
+      </div>
+      <div class="row container-noticias-destaque">
+    {% elif forloop.last %}
+      </div>
+        </div>
+    {% else %}
+      </div>
+    {% endif %}
+{% endfor %}

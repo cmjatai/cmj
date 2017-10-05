@@ -1,0 +1,45 @@
+{% extends "crud/detail.html" %}
+{% load i18n %}
+{% load common_tags %}
+
+{% if view.update_url %}
+teste
+{% endif %}
+{% block detail_content %}
+  {% if object and object.perfil != 2 and object_list or not object and object_list%}
+      <table class="table table-hover" width="100%">
+          <caption></caption>
+          <thead>
+              <tr>
+                  <th>{% fieldclass_verbose_name 'cmj.sigad.models.Classe' 'titulo' %}</th>
+                  <th>{% fieldclass_verbose_name 'cmj.sigad.models.Classe' 'visibilidade' %}</th>
+                  <th>{% fieldclass_verbose_name 'cmj.sigad.models.Classe' 'perfil' %}</th>
+                  <th>{% fieldclass_verbose_name 'cmj.sigad.models.Classe' 'codigo' %}</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for classe in object_list %}
+              <tr>
+                  <td><a href="{% url 'cmj.sigad:subclasse_list' classe.pk %}">{{ classe.titulo }}</a></td>
+                  <td>{{ classe.get_visibilidade_display }}</td>
+                  <td>{{ classe.get_perfil_display }}</td>
+                  <td>{{ classe.conta }}</td>
+              </tr>
+              {% endfor %}
+          </tbody>
+      </table>
+  {% endif %}
+
+  {% if object and object.perfil %}
+      <br>
+      <hr>
+      <h2>
+        Documentos da Classe {{object.nome}}<br>Conta: {{object.conta}}
+
+      </h2>
+
+
+  {% endif %}
+
+
+{% endblock %}

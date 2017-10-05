@@ -1,0 +1,104 @@
+{% load i18n sigad_filters social_utils %}
+
+{% for documento in object_list %}
+    <div class="{{css_class}}">
+      {% with documento.parlamentares.count as count_parlamentares %}
+        <div class="inner">
+          {% comment %} primeiro container, o primeiro item {% endcomment %}
+          {% with documento.imagem_representativa as imagem %}
+              {% if imagem %}
+                <div class="path-imagem {{imagem.css_class}}">
+                  <div class="imagem" style="background-image: url(/{{imagem.absolute_slug}}.512)"></div>
+                  <a class="img-contexto" href="{% url 'cmj.sigad:path_view' documento.absolute_slug %}">
+                    <div class="texto">
+                      <div class="titulo">{{imagem.titulo|default:''}}</div>
+                    </div>
+                  </a>
+                  <div class="autor">{{imagem.autor|default:''}}</div>
+                </div>
+              {% else %}
+              {% endif %}
+          {% endwith %}
+
+          <span class="data-pub">
+            {% comment %}
+              FIXME tratar histórico de revisão e publicação/privacidade
+            {% endcomment %}
+            <i class="fa fa-clock-o" aria-hidden="true"></i>
+            {{documento.public_date|date:"d"}} {% trans "de" %} {{documento.public_date|date:"F"}} {% trans "de" %} {{documento.public_date|date:"Y"}}
+          </span>
+
+          {% if pagina_inicial %}
+            <a class="tags tag-parlamentar" href="#">
+                {{ documento.parlamentares.first.nome_parlamentar}}
+            </a>
+              {% social_link_share documento %}
+              <div class="clearfix"></div>
+          {% endif %}
+
+          {% if not pagina_inicial %}
+            <div class="titulo">
+              <a href="{% url 'cmj.sigad:path_view' documento.absolute_slug %}">
+                {{documento.titulo}}
+              </a>
+            </div>
+          {% endif %}
+
+          {% if pagina_inicial %}
+            <div class="row">
+              <div class="col-xs-3 col-md-push-9">
+          {% endif %}
+
+          {% for parlamentar in documento.parlamentares.all %}
+            {% if forloop.counter0 > 0 and forloop.counter0|organize_direction_avatars:count_parlamentares  %}
+              </div>
+            {% endif %}
+
+            {% if forloop.counter0|organize_direction_avatars:count_parlamentares %}
+              <div class="path-parlamentares">
+            {% endif %}
+
+              {% if parlamentar.fotografia %}
+                <a class="avatar" href="#">
+                  <img src="{{ parlamentar.fotografia.url }}">
+                </a>
+              {% endif %}
+
+            {% if not forloop.last %}
+              <span class="linebreak"></span>
+            {% else %}
+              </div>
+            {% endif %}
+          {% endfor %}
+
+
+
+          {% if pagina_inicial %}
+            <div class="clearfix"></div>
+            </div>
+            <div class="col-xs-9 col-md-pull-3">
+              <div class="titulo">
+                <a href="{% url 'cmj.sigad:path_view' documento.absolute_slug %}">
+                  {{documento.titulo}}
+                </a>
+              </div>
+          {% endif %}
+
+          {% if documento.descricao %}
+            <div class="descricao">
+              {{documento.descricao|striptags|safe}}
+            </div>
+          {% endif %}
+
+          {% if pagina_inicial %}
+                <div class="clearfix"></div>
+              </div>
+            </div>
+          {% endif %}
+
+          <div class="clearfix"></div>
+
+        </div>
+      {% endwith %}
+    </div>
+{% endfor %}

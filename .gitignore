@@ -70,6 +70,7 @@ target/
 
 # Others
 .env
+client_secrets.json
 .bak
 *~
 *.orig
@@ -88,7 +89,21 @@ collected_static
 bower
 bower_components
 media
+media_protected
 whoosh_index/
 .ipynb_checkpoints
 *.ipynb
-importar*.py
+scripts_local/
+cmj/legacy/scripts/
+run/
+webpack-stats.json
+
+# Dependency directories
+node_modules
+jspm_packages
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history

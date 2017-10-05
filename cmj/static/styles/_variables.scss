@@ -2,13 +2,13 @@
 $color_topo_bg: #006556;
 $color_topo_border: #f0efe7;
 
-$color_text_inverse: white;
+$color_text_inverse: #4effa0;
 $color_text: #006556;
 
-$color_main_bg: #f0efe7;
+$color_main_bg: #fff; //(255, 255, 255, 0.5); //#fff; //
 
-$color_container_bg: rgba(255, 255, 255, 0.5);
-$color_container_border: white;
+$color_container_bg: #f0efe7;
+$color_container_border: darken(#f0efe7, 5);
 
 $hover_background_05p: rgba(0,0,0,0.05);
 $hover_background_10p: rgba(0,0,0,0.1);
@@ -23,7 +23,20 @@ $grid-gutter-width: 20px !default;
 
 $menu-height: 40px !default;
 $padding-menu-top: 5px !default;
+/*
+$screen-md:                     1092px !default;
+$container-desktop:            (1040px + $grid-gutter-width) !default;
 
+$screen-lg:                    1400px !default;
+$container-large-desktop:      (1340px + $grid-gutter-width) !default;*/
+
+$icon-font-path: "../bootstrap/fonts/" !default;
+
+// variaveis wrapper ########################################
+
+$width-wrapper-lg: 270px !default;
+$width-wrapper-sm: 135px !default;
+$width-wrapper-xs: 80px !default;
 
 // variaveis bootstrap ########################################
 @import "bootstrap/variables";

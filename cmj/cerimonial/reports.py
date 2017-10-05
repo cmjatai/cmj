@@ -28,12 +28,12 @@ from reportlab.platypus.doctemplate import SimpleDocTemplate
 from reportlab.platypus.frames import Frame
 from reportlab.platypus.para import Paragraph
 from reportlab.platypus.tables import Table, TableStyle, LongTable
-from sapl.crud.base import make_pagination
 
 from cmj.cerimonial.forms import ImpressoEnderecamentoContatoFilterSet,\
     ContatoAgrupadoPorProcessoFilterSet, ContatoAgrupadoPorGrupoFilterSet
 from cmj.cerimonial.models import Contato, Processo
 from cmj.core.models import AreaTrabalho
+from cmj.crud.base import make_pagination
 
 
 class ImpressoEnderecamentoContatoView(PermissionRequiredMixin, FilterView):

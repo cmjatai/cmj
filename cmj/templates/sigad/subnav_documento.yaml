@@ -1,0 +1,5 @@
+{% load i18n %}
+- title: {% trans 'Edição' %}
+  url: documento_edit
+- title: {% trans 'Usuários com Acesso' %}
+  url: permissionsuserdocumento_list

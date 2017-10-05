@@ -21,7 +21,8 @@ urlpatterns = [
                                     'extra_context': {
                                         'fluid': '-fluid'
                                     }}, name='login'),
-    url(r'^logout/$', v_auth.logout, {'next_page': '/login'}, name='logout', ),
+    url(r'^logout/$', v_auth.logout,
+        {'next_page': '/'}, name='logout', ),
 
     # url(r'^enderecos/', login_required(
     #    TrechoSearchView.as_view()), name='search_view'),

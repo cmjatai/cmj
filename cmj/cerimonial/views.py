@@ -5,7 +5,6 @@ from django.http.response import HttpResponse
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.edit import FormView
 from sapl.crispy_layout_mixin import CrispyLayoutFormMixin
-from sapl.crud.base import CrudAux, Crud, MasterDetailCrud
 
 from cmj.cerimonial.forms import LocalTrabalhoForm, EnderecoForm,\
     TipoAutoridadeForm, LocalTrabalhoPerfilForm,\
@@ -20,15 +19,12 @@ from cmj.cerimonial.models import TipoTelefone, TipoEndereco,\
     EmailPerfil, TelefonePerfil, EnderecoPerfil, FiliacaoPartidaria,\
     StatusProcesso, ClassificacaoProcesso, TopicoProcesso, Processo,\
     AssuntoProcesso, ProcessoContato, GrupoDeContatos
-from cmj.cerimonial.rules import rules_patterns
 from cmj.core.forms import ListWithSearchForm
 from cmj.core.models import AreaTrabalho
-from cmj.globalrules import globalrules
+from cmj.crud.base import CrudAux, Crud, MasterDetailCrud
 from cmj.globalrules.crud_custom import PerfilAbstractCrud,\
     PerfilDetailCrudPermission
 
-
-globalrules.rules.config_groups(rules_patterns)
 
 # ---- Details Master Crud build ---------------------------
 TipoTelefoneCrud = CrudAux.build(TipoTelefone, None, 'tipotelefone')
@@ -209,6 +205,11 @@ class TelefoneCrud(MasterDetailCrud):
 
     class CreateView(PreferencialMixin, MasterDetailCrud.CreateView):
         pass
+
+    class ListView(MasterDetailCrud.ListView):
+
+        def get(self, request, *args, **kwargs):
+            return MasterDetailCrud.ListView.get(self, request, *args, **kwargs)
 
 
 class EmailCrud(MasterDetailCrud):

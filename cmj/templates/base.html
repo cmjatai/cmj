@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <!--[if IE 8]> <html class="no-js lt-ie9" lang="en"> <![endif]-->
 <!--[if gt IE 8]><!-->
-<html class="no-js" lang="pt-br">
+<html class="no-js {% block html_class %}{%endblock%}" lang="pt-br">
 <!--<![endif]-->
 
   <head>
@@ -10,37 +10,85 @@
     <meta name="theme-color" content="#006556">
     <title>{% block head_title %}{% trans 'Câmara Municipal de Jataí - Goiás' %}{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    {% block meta_tags %}
+      <meta name="description" content="{{object.descricao|striptags|safe}}">
+
+      <meta property="fb:app_id" content="150874375319738">
+      <meta property="fb:admins" content="cmjatai">
+      <meta property="og:locale" content="pt_BR">
+
+      <meta property="og:url" content="{{request.scheme}}://{{request.get_host}}{% if object.absolute_slug %}/{{ object.absolute_slug }}{% endif %}">
+      <meta property="og:site_name" content="Portal da Câmara Municipal de Jataí - Goiás">
+      <meta property="og:title" content="{% if object.titulo %}{{object.titulo}}{% else %}Câmara Municipal de Jataí{% endif %}">
+      <meta property="og:description" content="{{object.descricao|striptags|safe}}">
+      <meta property="og:type" content="website">
+
+      {% with object.imagem_representativa_metatags as doc_imagem %}
+        {% if doc_imagem and doc_imagem.absolute_slug%}
+          <meta property="og:image" content="{{request.scheme}}://{{request.get_host}}/{{doc_imagem.absolute_slug}}.768">
+          <meta property="og:image:type" content="{{doc_imagem.midia.last.content_type}}">
+          <meta name="twitter:image" content="{{request.scheme}}://{{request.get_host}}/{{doc_imagem.absolute_slug}}.768">
+
+          <meta property="og:image:width" content="{{doc_imagem.midia.last.width}}">
+          <meta property="og:image:height" content="{{doc_imagem.midia.last.height}}">
+
+        {% elif doc_imagem.fotografia %}
+          <meta property="og:image" content="{{request.scheme}}://{{request.get_host}}{{doc_imagem.fotografia.url}}">
+          <meta property="og:image:type" content="image/jpeg">
+          <meta name="twitter:image" content="{{request.scheme}}://{{request.get_host}}{{doc_imagem.fotografia.url}}">
+        {% endif %}
+      {% endwith %}
+
+      <meta name="twitter:url" content="{{request.scheme}}://{{request.get_host}}{% if object.absolute_slug %}/{{ object.absolute_slug }}{% endif %}">
+      <meta name="twitter:description" content="{{object.descricao|striptags|safe}}">
+      <meta name="twitter:card" content="summary_large_image">
+      <meta name="twitter:site" content="@cmjatai">
+      <meta name="twitter:creator" content="@cmjatai">
+      <meta name="twitter:title" content="{% if object.titulo %}{{object.titulo|linebreaksbr|striptags}}{% else %}Câmara Municipal de Jataí{% endif %}">
+
+    {% endblock %}
     {% block head_content %}
       <link rel="icon" href="{% static 'img/logo.png' %}"  type="image/png" >
-      {# Styles #}
 
-      <link rel="stylesheet" href="{% sass_src 'bootstrap-sass/assets/stylesheets/_bootstrap.scss' %}" type="text/css">
+      {% comment %} Importa bootstrap customizado {% endcomment %}
       <link rel="stylesheet" href="{% sass_src 'styles/header.scss' %}" type="text/css">
+
+      {% comment %} aplica drunken {% endcomment %}
       <link rel="stylesheet" href="{% static 'drunken-parrot-flat-ui/css/drunken-parrot.css' %}">
+
+      {% comment %} aplica font-awesome {% endcomment %}
       <link rel="stylesheet" href="{% static 'components-font-awesome/css/font-awesome.css' %}">
-      <link rel="stylesheet" href="{% sass_src 'styles/app.scss' %}" type="text/css">
 
       <link rel="stylesheet" href="{% static 'jquery-ui/themes/cupertino/jquery-ui.min.css' %}">
+      {% comment %} customizações de layout para área pública apartir de 2017 {% endcomment %}
+      {% if user.is_superuser %}
+        <link rel="stylesheet" href="{% sass_src 'styles/app_cmj.scss' %}?time={% now "jS F Y H:i:s" %}" type="text/css">
+      {% else %}
+        <link rel="stylesheet" href="{% sass_src 'styles/app_cmj.scss' %}" type="text/css">
+      {% endif %}
 
-      {# Scripts #}
-      {# modernizr must be in head (see http://modernizr.com/docs/#installing) #}
     {% endblock %}
 
   </head>
 
   <body class="{% block body_class %}{%endblock%}">
-    <div class="page fadein">
+    <div class="page fadein" id="{% block id_wrapper %}wrapper{% endblock %}">
+      {% block canais_absolute %}
+        <aside>
+          <div class="canais-absolute">
+            <a href="#menu-toggle" id="menu-toggle">
+              <i class="fa fa-2x fa-chevron-circle-left" aria-hidden="true"></i>
+              <i class="fa fa-2x fa-chevron-circle-right" aria-hidden="true"></i>
+            </a>
+
+            {% include "base_sidebar.html" %}
+          </div>
+        </aside>
+        {% endblock canais_absolute%}
       <nav class="navbar">
-        <div class="container{{fluid}}">
+        <div class="container{{fluid}} container-header">
           <div class="navbar-header">
-            {% block button_toogle %}
-              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
-            {% endblock %}
             <a class="navbar-brand" href="/">
                 C<small>âmara</small> M<small>unicipal de</small> J<small>ataí</small>
             </a>
@@ -60,7 +108,6 @@
                   </a>
                   <ul class="dropdown-menu menu-right">
                     {% comment %}
-
                     <li><a href="{% url 'cmj.cerimonial:perfil_detail' %}">{% trans "Meu Perfil" %}</a></li>
                     {% endcomment %}
                     <li><a href="{% url 'cmj.core:logout' %}">{% trans "Sair" %}</a></li>
@@ -76,6 +123,24 @@
                {% endif %}
             </ul>
           </div><!--/.nav-collapse -->
+          {% block button_toogle %}
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+          {% endblock %}
+
+          {% block social_links %}
+            <div class="navbar-social-links">
+              <a href="https://www.facebook.com/cmjatai"><i class="fa fa-facebook" aria-hidden="true"></i></a>
+              <a href="https://www.youtube.com/c/camaradejatai?sub_confirmation=1"><i class="fa fa-youtube-play" aria-hidden="true"></i></a>
+              <a href="https://twitter.com/cmjatai"><i class="fa fa-twitter" aria-hidden="true"></i></a>
+            </div>
+          {% endblock %}
+
+
         </div>
       </nav>
 
@@ -110,27 +175,57 @@
                 </ul>
 
                 <ul class="nav navbar-nav">
-                  {% block sections_navbar %} {% navbar 'navbar.yaml' %}{% endblock sections_navbar %}
-
-                  {% if areatrabalho %}{% comment %}Menu SAAP{% endcomment %}
+                  {% if areatrabalho %}
                     <li class="dropdown">
-                      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "SAAP" %}<span class="caret"></span></a>
-                      <ul class="dropdown-menu menu-left">
-                        {% if perms.core.menu_contatos %}
-                          <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'cmj.cerimonial:contato_list' %}">{% trans "Contatos" %}</a></li>
-                        {% endif %}
-                        {% if perms.core.menu_grupocontatos %}
-                          <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'cmj.cerimonial:grupodecontatos_list' %}">{% trans "Grupos" %}</a></li>
-                        {% endif %}
-                        {% if perms.core.menu_processos %}
-                          <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'cmj.cerimonial:processo_list' %}">{% trans "Processos" %}</a></li>
-                        {% endif %}
+                      <a class="dropdown-toggle" href="#fakeLink" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Portal" %}<span class="caret"></span></a>
+                      <ul class="dropdown-menu menu-left" role="menu">
+                        {% navbar 'navbar_cmj.yaml' %}
+                      </ul>
+                    </li>
+                    {% if perms.core.menu_contatos %}
+                      <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'cmj.cerimonial:contato_list' %}">{% trans "Contatos" %}</a></li>
+                    {% endif %}
+                    {% if perms.core.menu_grupocontatos %}
+                      <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'cmj.cerimonial:grupodecontatos_list' %}">{% trans "Grupos" %}</a></li>
+                    {% endif %}
+                    {% if perms.core.menu_processos %}
+                      <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'cmj.cerimonial:processo_list' %}">{% trans "Processos" %}</a></li>
+                    {% endif %}
 
+                    {% if perms.sigad.view_documento %}
+                      <li class="nav__sub-item">
+                        <a class="dropdown-toggle" href="#fakeLink" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Banco de Imagens" %}<span class="caret"></span></a>
+                        <ul class="dropdown-menu menu-left" role="menu">
 
+                          <li class="nav__sub-item"><a class="dropdown-toggle" href="/banco-de-imagens/2017">{% trans "2017" %}</a></li>
+                          <li class="nav__sub-item"><a class="dropdown-toggle" href="/banco-de-imagens/2016">{% trans "2016" %}</a></li>
+                          <li class="nav__sub-item"><a class="dropdown-toggle" href="/banco-de-imagens/2015">{% trans "2015" %}</a></li>
+                          <li class="nav__sub-item"><a class="dropdown-toggle" href="/banco-de-imagens/2014">{% trans "2014" %}</a></li>
+                          <li class="nav__sub-item"><a class="dropdown-toggle" href="/banco-de-imagens/2013">{% trans "2013" %}</a></li>
+
+                        </ul>
+                      </li>
+                    {% endif %}
+
+                  {% else %}
+                    {% navbar 'navbar_cmj.yaml' %}
+                  {% endif %}
+                </ul>
+
+                {% block menu_canais_relative %}
+                  {% comment %}
+
+                  <div class="canais-relative">
+                    {% include "base_sidebar.html" %}
+                  </div>
+                  {% endcomment %}
+                {% endblock %}
+
+                <ul class="nav navbar-nav navbar-right">
                         {% if perms.core.menu_relatorios %}
                           <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Relatórios" %}<span class="caret"></span></a>
-                            <ul class="dropdown-menu menu-right">
+                            <ul class="dropdown-menu menu-left">
                               <li class="dropdown-header">{% trans "Contatos" %}</li>
                               {% if perms.cerimonial.print_impressoenderecamento %}<li class="nav__sub-item"><a href="{% url 'cmj.cerimonial:print_impressoenderecamento' %}">{% trans "Etiquetas e Envelopes" %}</a></li>{% endif %}
                               <li class="dropdown-header">{% trans "Processos" %}</li>
@@ -140,14 +235,6 @@
                             </ul>
                           </li>
                         {% endif %}
-
-
-                      </ul>
-                    </li>
-                  {% endif %}
-                </ul>
-
-                <ul class="nav navbar-nav navbar-right">
                   {% if perms.core.menu_dados_auxiliares or perms.base.view_tabelas_auxiliares%}
                     <li class="dropdown">
                       <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Dados Auxiliares" %}<span class="caret"></span></a>
@@ -192,48 +279,36 @@
         {% block main_header %}
           <header class="masthead">
             <div class="container{{fluid}}">
-
-              {% comment %}
-
-                {% if user.is_anonymous %}
-                  <div class="btn-group btn-group-justified btn-group-lg" role="group" aria-label="...">
-                    <a href="#" class="btn btn-detault">Licitações e Contratos</a>
-                    <a href="#" class="btn btn-detault">Legislação Municipal</a>
-                    <a href="#" class="btn btn-detault">Sessões</a>
-                    <a href="#" class="btn btn-detault">Matérias em Tramitação</a>
-                    <a href="#" class="btn btn-detault">Diário Oficial</a>
-                  </div>
-                {% endif %}
-              {% endcomment %}
-
-
-              {% block sections_nav %}{% subnav %}{% endblock sections_nav %}
+              <div class="container-left">
+                {% block sections_nav %}{% subnav %}{% endblock sections_nav %}
+              </div>
             </div>
           </header>
         {% endblock main_header %}
 
         {# Main content #}
+          <main id="content" class="content page__row screen-lg">
         {% block content_container %}
-          <main id="content" class="content page__row">
-
-            <div class="container{{fluid}}">
-
+            <div class="{% block main_container_class %}container container{{fluid}}{{path}} container-box{% endblock %}">
 
               {# Content header #}
-              {% block base_header %}
-                <div class="clearfix">
-
-                  {% block title %}
-                    <h1 class="page-header">
-                      {% if title %}
-                        {{ title|safe|linebreaksbr }}
-                      {% elif object %}
-                        {{ object|safe|linebreaksbr }}
-                      {% endif %}
-                    </h1>
-                  {% endblock %}
-                </div>
-              {% endblock base_header %}
+              {% block base_container_header %}
+                {% block base_header %}
+                  <div class="clearfix">
+                    {% block title %}
+                      <h1 class="page-header">
+                        {% if title %}
+                          {{ title|safe|linebreaksbr }}
+                        {% elif object %}
+                          {{ object|safe|linebreaksbr }}
+                        {% elif view.title %}
+                          {{ view.title|safe|linebreaksbr }}
+                        {% endif %}
+                      </h1>
+                    {% endblock %}
+                  </div>
+                {% endblock base_header %}
+              {% endblock base_container_header %}
 
               {% block base_workspace %}
                 {% if view.is_contained %}
@@ -261,18 +336,20 @@
                 </div>
               {% endfor %}
 
+              {% block base_functions %}{% endblock %}
+
               {% block base_content %}{% endblock %}
-
-
             </div>
-          </main>
+
+            {% block cmj_extra_content %}{% endblock %}
         {% endblock content_container %}
+          </main>
       {% endblock global_container %}
     </div>
   {% block login_container %}
   {% endblock%}
 
-  <footer id="footer" class="footer page__row">
+  <footer id="footer" class="footer page__row screen-lg">
     <div class="container">
       Departamento de Tecnologia de Informação e Comunicação
     </div>
@@ -306,6 +383,17 @@
     {% endblock foot_js %}
 
     <script>
+
+    $(document).ready(function(){
+        //$("#wrapper, #wrapper .container").toggleClass("toggled ");
+        $("#menu-toggle").click(function(e) {
+            e.preventDefault();
+            $("#wrapper").toggleClass("toggled");
+            $(".container").toggleClass("toggled ");
+        });
+
+    });
+
       window.fbAsyncInit = function() {
         FB.init({
           appId      : '150874375319738',
