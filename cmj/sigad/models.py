@@ -17,11 +17,15 @@ from django.utils.functional import cached_property
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields.json import JSONField
+from googleapiclient import sample_tools
+from googleapiclient.discovery import build
 from model_utils.choices import Choices
+from oauth2client import client
 from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
 
 from cmj.utils import get_settings_auth_user_model
+
 
 CLASSE_ESTRUTURAL = 0
 CLASSE_DOCUMENTAL = 1
@@ -315,8 +319,67 @@ class Slugged(Parent):
 
         return ':'.join(parents)
 
+    @property
+    def absolute_slug(self):
+        raise NotImplementedError(_('Método não implementado pela subclasse!'))
 
-class Classe(Slugged, CMSMixin):
+# short_service = build(
+#    'urlshortener', 'v1', developerKey=settings.GOOGLE_URL_SHORTENER_KEY)
+
+
+def short_url(**kwargs):
+
+    import urllib3
+    import json
+
+    domain = kwargs.get('domain', 'http://www2.camarajatai.go.gov.br')
+
+    slug = kwargs.get('slug', '')
+
+    fields = {
+        'longUrl': '%s/%s' % (domain, slug),
+    }
+
+    encoded_data = json.dumps(fields).encode('utf-8')
+
+    http = urllib3.PoolManager()
+    r = http.request(
+        'POST',
+        'https://www.googleapis.com/urlshortener/v1/url?'
+        'fields=id&key=' + settings.GOOGLE_URL_SHORTENER_KEY,
+        body=encoded_data,
+        headers={'Content-Type': 'application/json'})
+
+    try:
+        data = r.data.decode('utf-8')
+        jdata = json.loads(data)
+
+        return jdata['id']
+    except Exception as e:
+        print(e)
+        return ''
+
+
+class ShortUrl(Slugged):
+
+    url_short = models.TextField(
+        verbose_name=_('Link Curto'),
+        blank=True, null=True, default=None)
+
+    def short_url(self):
+        if self.url_short:
+            return self.url_short
+
+        self.url_short = short_url(slug=self.absolute_slug)
+        self.save()
+
+        return self.url_short
+
+    class Meta:
+        abstract = True
+
+
+class Classe(ShortUrl, CMSMixin):
 
     codigo = models.PositiveIntegerField(verbose_name=_('Código'), default=0)
 
@@ -414,7 +477,7 @@ class DocumentoManager(models.Manager):
         return qs
 
 
-class Documento(Slugged, CMSMixin):
+class Documento(ShortUrl, CMSMixin):
     objects = DocumentoManager()
 
     ALINHAMENTO_LEFT = 0

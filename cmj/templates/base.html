@@ -22,7 +22,7 @@
       <meta property="og:site_name" content="Portal da Câmara Municipal de Jataí - Goiás">
       <meta property="og:title" content="{% if object.titulo %}{{object.titulo}}{% else %}Câmara Municipal de Jataí{% endif %}">
       <meta property="og:description" content="{{object.descricao|striptags|safe}}">
-      <meta property="og:type" content="government">
+      <meta property="og:type" content="website">
 
       {% with object.imagem_representativa_metatags as doc_imagem %}
         {% if doc_imagem and doc_imagem.absolute_slug%}

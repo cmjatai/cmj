@@ -122,8 +122,6 @@
 
   {% for container in object.childs.view_childs %}
     <div class="container{% if container.tipo == container.TPD_CONTAINER_EXTENDIDO%}-fluid{% endif %} {% if forloop.first%}container-first{% endif %}">
-
-
       {% if forloop.first %}
           {% with object.parlamentares.count as count_parlamentares %}
             {% for parlamentar in object.parlamentares.all %}
@@ -196,6 +194,7 @@
   {% endfor %}
 
   {% endblock %}
+
 {% endblock %}
 
 {% block cmj_extra_content %}
