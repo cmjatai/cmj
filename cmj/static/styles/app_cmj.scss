@@ -27,7 +27,9 @@
 }
 
 body, html {
-  background: $color_main_bg url(/static/img/bg.png);
+  background: $color_main_bg;
+
+  //background: $color_main_bg url(/static/img/bg.png);
 }
 
 /* Background colors */
@@ -519,6 +521,9 @@ a:hover {
       }
     }
   }
+  .navbar-menu {
+    margin-bottom: 20px;
+  }
 }
 
 // ADJUST interno ########################################
@@ -538,7 +543,7 @@ main {
     margin: 0;
   }
   .container.container-box {
-    margin-top: 20px;
+    //margin-top: 20px;
   }
 
   .item-action-or-input {
@@ -621,7 +626,13 @@ main {
         background-color: $hover_background_05p;
       }
     }
+}
 
+.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: lighten($color_container_bg, 3);
+}
+.table-striped > tbody > tr:hover {
+    background-color: darken($color_container_bg, 10);
 }
 
 .context-actions{
@@ -932,7 +943,7 @@ main {
     font-style: italic;
   }
   .path-data-pub {
-    border-top: 1px solid white;
+    border-top: 1px solid $color_container_bg;
     text-align: center;
     font-size: 0.6em;
     margin: 0;
@@ -953,7 +964,7 @@ main {
         content: '';
         display: block;
         height: 3px;
-        background-color: white;
+        background-color: $color_container_bg;
       }
       a{
         display: block;
@@ -1719,15 +1730,11 @@ main {
 
 
 // #### pagina inicial ########################################
-
-
-
-
 #pagina-inicial {
   .path-item-list {
     margin-bottom: 0px;
     &:not(:first-child) {
-      margin-top: 0px;
+      margin-top: 1px;
     }
     .avatar {
       width: 100%;
@@ -1741,6 +1748,7 @@ main {
     }
     .descricao {
       font-size: 85%;
+      padding-bottom: 20px;
     }
     .path-parlamentares {
       margin: 0px;
@@ -1748,7 +1756,7 @@ main {
     }
   }
   .container-box-parlamentares {
-    @extend .container-box;
+    //@extend .container-box;
     border: 0px;
     border-radius: 0;
     margin-left: 10px;
@@ -1785,7 +1793,6 @@ main {
         padding: 0;
       }
       .descricao {
-        padding: 0;
       }
       .titulo {
         padding: 5px 0 0 0;
@@ -1808,7 +1815,7 @@ main {
     }
     &:first-child {
       .path-item-list {
-        @extend .container-box;
+        //@extend .container-box;
         border-radius: 0;
         font-size: 120%;
       }

@@ -5,10 +5,10 @@ $color_topo_border: #f0efe7;
 $color_text_inverse: #4effa0;
 $color_text: #006556;
 
-$color_main_bg: #f0efe7; //#fff; //
+$color_main_bg: #fff; //(255, 255, 255, 0.5); //#fff; //
 
-$color_container_bg: rgba(255, 255, 255, 0.5);
-$color_container_border: white;
+$color_container_bg: #f0efe7;
+$color_container_border: darken(#f0efe7, 5);
 
 $hover_background_05p: rgba(0,0,0,0.05);
 $hover_background_10p: rgba(0,0,0,0.1);
