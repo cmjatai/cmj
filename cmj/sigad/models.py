@@ -419,6 +419,10 @@ class Classe(ShortUrl, CMSMixin):
             ct[0] = '{:03,d}'.format(int(ct[0]))
         return '.'.join(ct)
 
+    @property
+    def absolute_slug(self):
+        return self.slug
+
 
 class PermissionsUserClasse(CMSMixin):
     user = models.ForeignKey(get_settings_auth_user_model(),
