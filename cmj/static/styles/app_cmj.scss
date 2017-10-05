@@ -276,6 +276,7 @@ body, html {
   }
   .container-header{
     .navbar-social-links {
+      padding-right: 10px;
       float: right;
       a {
         display: inline-block;
@@ -923,6 +924,19 @@ main {
 }
 
 .container-path {
+  margin-top: 20px;
+  margin-bottom: 100px;
+  a {
+    color: #a97905;
+    &:hover {
+      color: darken(#a97905, 15%);
+    }
+  }
+  .path-title-classe {
+    font-size: 120%;
+    line-height: 1;
+    padding-left: 10px;
+  }
   .path-title {
     text-align: center;
     margin-top: 1.8em;
@@ -943,7 +957,7 @@ main {
     font-style: italic;
   }
   .path-data-pub {
-    border-top: 1px solid $color_container_bg;
+    border-top: 1px solid transparentize(#a97905, 0.6);
     text-align: center;
     font-size: 0.6em;
     margin: 0;
@@ -964,7 +978,7 @@ main {
         content: '';
         display: block;
         height: 3px;
-        background-color: $color_container_bg;
+        background-color: transparentize(#a97905, 0.6);
       }
       a{
         display: block;
@@ -995,14 +1009,14 @@ main {
       width: 100%;
     }
     &.alinhamento-left {
-      padding: 0.5em 0.5em 0.4em 0;
+      padding: 0.5em 1em 0.4em 0;
       float: left;
       &.img128 {
         width: 128px;
       }
     }
     &.alinhamento-right {
-      padding: 0.5em 0 0.4em 0.5em;
+      padding: 0.5em 0 0.4em 1em;
       float: right;
       &.img128 {
         width: 128px;
@@ -1247,6 +1261,7 @@ main {
       min-width: auto;
     }
     a {
+      color: white;
       border-radius: 0px;
       background-color: transparent;
       background-image: none;
@@ -1412,7 +1427,7 @@ main {
   margin: $grid-gutter-width 0 0px 10px;
 
   &:first-child {
-    margin-top: $grid-gutter-width;
+    margin-top: $grid-gutter-width * 3;
   }
 
   &:last-of-type {
@@ -1461,7 +1476,7 @@ main {
 }
 
 .path-item-list {
-  margin-top: $grid-gutter-width;
+  //margin-top: $grid-gutter-width;
   position: relative;
   .inner {
     z-index: 2000;
@@ -2005,7 +2020,7 @@ main {
   .path-parlamentares {
     margin-top: 10px;
     &:first-child {
-      margin-top: 10px;
+      margin-top: 50px;
     }
     .avatar {
       margin-left: 5px;
@@ -2502,6 +2517,8 @@ main {
     margin-top: 1px;
   }
   .container-path {
+    margin-top: 0px;
+    margin-bottom: 50px;
     .path-title {
       font-size: 1.15em;
     }
@@ -2512,6 +2529,9 @@ main {
   }
 
   .path-parlamentares {
+    &:first-child {
+      margin-top: 35px;
+    }
     .avatar1 {
       width: 100px;
     }
@@ -2723,6 +2743,7 @@ main {
         margin: 0 -5px;
       }
       .navbar-social-links {
+        padding-right: 0;
         i {
           font-size: 120%;
         }

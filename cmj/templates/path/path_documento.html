@@ -123,37 +123,35 @@
   {% for container in object.childs.view_childs %}
     <div class="container{% if container.tipo == container.TPD_CONTAINER_EXTENDIDO%}-fluid{% endif %} {% if forloop.first%}container-first{% endif %}">
       {% if forloop.first %}
-          {% with object.parlamentares.count as count_parlamentares %}
-            {% for parlamentar in object.parlamentares.all %}
+        {% with object.parlamentares.count as count_parlamentares %}
+          {% for parlamentar in object.parlamentares.all %}
 
-              {% if forloop.counter0 > 0 and forloop.counter0|organize_avatars:count_parlamentares %}
-                </div>
+            {% if forloop.counter0 > 0 and forloop.counter0|organize_avatars:count_parlamentares %}
+              </div>
+            {% endif %}
+
+            {% if forloop.counter0|organize_avatars:count_parlamentares %}
+              <div class="path-parlamentares">
+            {% endif %}
+
+              {% if parlamentar.fotografia %}
+                <a class="avatar avatar{% if count_parlamentares >= 5 %}5{%else%}{{count_parlamentares}}{% endif %}" href="#">
+                  <img src="{{ parlamentar.fotografia.url }}">
+                </a>
               {% endif %}
 
-              {% if forloop.counter0|organize_avatars:count_parlamentares %}
-                <div class="path-parlamentares">
-              {% endif %}
+            {% if not forloop.last %}
+              <span class="linebreak"></span>
+            {% else %}
+              </div>
+            {% endif %}
 
-                {% if parlamentar.fotografia %}
-                  <a class="avatar avatar{% if count_parlamentares >= 5 %}5{%else%}{{count_parlamentares}}{% endif %}" href="#">
-                    <img src="{{ parlamentar.fotografia.url }}">
-                  </a>
-                {% endif %}
+          {% endfor %}
+        {% endwith %}
 
-              {% if not forloop.last %}
-                <span class="linebreak"></span>
-              {% else %}
-                </div>
-              {% endif %}
-
-            {% endfor %}
-          {% endwith %}
-
-
-          {% block base_header %}
-             {{block.super}}
-
-          {% endblock %}
+        {% block base_header %}
+           {{block.super}}
+        {% endblock %}
 
       {% endif %}
 

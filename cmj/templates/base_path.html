@@ -8,6 +8,9 @@
 {% block base_header %}
   {% if object.descricao %}
     <div style="position:relative;">
+      <div class="path-title-classe">
+        {{object.classe}}
+      </div>
       <div class="path-data-pub">
         {% block historico_publicacao %}
           <div class="container-versions">
