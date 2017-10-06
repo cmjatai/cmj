@@ -21,10 +21,9 @@
   {% block render_content %}
 
       <div style="position:relative;">
-        <small class="pull-right"><a href="/{{object.parents.0.absolute_slug}}">Abrir Notícia da Imagem</a></small>
+        <small class="pull-right"><a href="/{{referencia.referente.parents.0.absolute_slug}}">Abrir Notícia da Imagem</a></small>
         <div class="path-title-classe">
           {{object.get_tipo_display}}
-
         </div>
         <div class="path-data-pub">
           {% block historico_publicacao %}

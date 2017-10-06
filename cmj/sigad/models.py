@@ -602,6 +602,10 @@ class Documento(ShortUrl, CMSMixin):
         if self.tipo == Documento.TPD_IMAGE:
             return self
 
+        elif self.tipo == Documento.TPD_GALLERY:
+            citado = self.cita.first()
+            return citado
+
         for item in self.childs.view_childs():
             img = item.imagem_representativa()
 
