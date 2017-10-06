@@ -104,6 +104,7 @@ class PathView(MultipleObjectMixin, TemplateView):
     template_name = 'base_path.html'
     documento = None
     classe = None
+    referencia = None
     paginate_by = 31
 
     def get(self, request, *args, **kwargs):
@@ -116,6 +117,11 @@ class PathView(MultipleObjectMixin, TemplateView):
                     midia = self.documento.midia.last
                 except Exception as e:
                     raise Http404
+
+                page = kwargs.get('page', None)
+
+                if page:
+                    return TemplateView.get(self, request, *args, **kwargs)
 
                 if 'resize' in kwargs and kwargs['resize']:
                     try:
@@ -161,26 +167,39 @@ class PathView(MultipleObjectMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
 
-        if self.documento:
+        if self.referencia:
+            context = TemplateView.get_context_data(self, **kwargs)
+            context['object'] = self.referencia.referente.parents[0]
+            context['referencia'] = self.referencia
+
+        elif self.documento:
             context = TemplateView.get_context_data(self, **kwargs)
 
             if self.documento.tipo == Documento.TPD_GALLERY:
                 self.template_name = 'path/path_gallery.html'
+
+            elif self.documento.tipo == Documento.TPD_IMAGE:
+                self.template_name = 'path/path_imagem.html'
+                context['object'] = self.documento
+                context['referencia'] = None
             else:
                 parlamentares = self.documento.parlamentares.all()
 
-                next = Documento.objects.view_public_docs().filter(
-                    public_date__gte=self.documento.public_date,
-                    classe=self.documento.classe,
-                ).exclude(
-                    id=self.documento.id).last()
+                if self.documento.public_date:
+                    next = Documento.objects.view_public_docs().filter(
+                        public_date__gte=self.documento.public_date,
+                        classe=self.documento.classe,
+                    ).exclude(
+                        id=self.documento.id).last()
+                    previous = Documento.objects.view_public_docs().filter(
+                        public_date__lte=self.documento.public_date,
+                        classe=self.documento.classe,
+                    ).exclude(
+                        id=self.documento.id).first()
+                else:
+                    next = None
+                    previous = None
                 context['next'] = next
-
-                previous = Documento.objects.view_public_docs().filter(
-                    public_date__lte=self.documento.public_date,
-                    classe=self.documento.classe,
-                ).exclude(
-                    id=self.documento.id).first()
                 context['previous'] = previous
 
                 docs = Documento.objects.view_public_docs(
@@ -197,6 +216,8 @@ class PathView(MultipleObjectMixin, TemplateView):
                         'parlamentares__id').order_by('parlamentares__id')
 
                 context['object_list'] = docs[:4]
+
+            context['object'] = self.documento
 
         elif self.classe:
             template = self.classe.template_classe
@@ -215,9 +236,9 @@ class PathView(MultipleObjectMixin, TemplateView):
                 paginator = context['paginator']
                 context['page_range'] = make_pagination(
                     page_obj.number, paginator.num_pages)
+            context['object'] = self.classe
         else:
             context = TemplateView.get_context_data(self, **kwargs)
-        context['object'] = self.documento if self.documento else self.classe
         context['path'] = '-path'
 
         return context
@@ -280,7 +301,7 @@ class PathView(MultipleObjectMixin, TemplateView):
                             ref = ReferenciaEntreDocumentos.objects.get(
                                 slug=slug[0])
                             self.documento = ref.referenciado
-                            referente = ref.referente
+                            self.referencia = ref
                         except:
                             pass
 
@@ -305,9 +326,9 @@ class PathView(MultipleObjectMixin, TemplateView):
         obj = [self.documento if self.documento else self.classe,
                'view_documento' if self.documento else 'view_pathclasse']
 
-        if referente:
+        if self.referencia:
             if obj[0].visibilidade != CMSMixin.STATUS_PRIVATE:
-                obj[0] = referente
+                obj[0] = self.referencia.referente
             else:
                 raise Http404()
 

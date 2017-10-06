@@ -51,7 +51,7 @@ urlpatterns = [
     url(r'^$',
         views.PaginaInicialView.as_view(), name='pagina_inicial_view'),
 
-    url(r'^(?P<slug>[^.]*)\.?(?P<resize>\w+)?$',
+    url(r'^(?P<slug>[^.]*)\.?(?P<resize>\d+)?\.?(?P<page>\w+)?$',
         views.PathView.as_view(), name='path_view'),
 
 ]

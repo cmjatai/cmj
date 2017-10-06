@@ -1,0 +1,85 @@
+{% extends "base_path.html" %}
+{% load i18n sigad_filters social_utils %}
+
+{% block main_container_class %}container container-path{% endblock %}
+
+{% block base_functions %}
+{% endblock %}
+
+{% block base_container_header %}
+{% endblock %}
+
+{% block base_content %}
+  {% block controls_content %}
+    {% if perms.sigad.change_documento %}
+      <a href="{% url 'cmj.sigad:documento_edit' object.id %}">{% trans "[Editar]" %}</a>
+    {% endif %}
+      {% if perms.sigad.delete_documento %}
+        <a href="{% url 'cmj.sigad:documento_delete' object.id %}">{% trans "[Excluir]" %}</a>
+      {% endif %}
+  {% endblock %}
+  {% block render_content %}
+
+      <div style="position:relative;">
+        <small class="pull-right"><a href="/{{object.parents.0.absolute_slug}}">Abrir Notícia da Imagem</a></small>
+        <div class="path-title-classe">
+          {{object.get_tipo_display}}
+
+        </div>
+        <div class="path-data-pub">
+          {% block historico_publicacao %}
+            <div class="container-versions">
+              <a href="#list-revisoes" role="button" data-toggle="collapse" aria-expanded="false" aria-controls="list-revisoes">
+                {% comment %}
+                  FIXME tratar histórico de revisão e publicação/privacidade
+                {% endcomment %}
+                <i class="fa fa-clock-o" aria-hidden="true"></i>
+                {% if object.public_date %}
+                  {% trans "Publicado em" %} {{object.public_date|date:"d"}} {% trans "de" %} {{object.public_date|date:"F"|lower}} {% trans "de" %} {{object.public_date|date:"Y"}}
+                {% else %}
+                  {% trans "Criado em" %} {{object.created|date:"d"}} {% trans "de" %} {{object.created|date:"F"|lower}} {% trans "de" %} {{object.created|date:"Y"}}
+                {% endif %}
+              </a>
+              <div class="collapse" id="list-revisoes">
+                {% for rev in object.revisoes.all %}
+                    <span class="">
+                      {{rev.get_visibilidade_display}} - {{rev.data}} - {% trans "por:" %} {{rev.user.first_name|default:rev.user.email}}
+                    </span>
+                {% endfor %}
+
+              </div>
+            </div>
+          {% endblock %}
+        </div>
+
+      </div>
+    {% block title %}
+      <span class="path-title">
+          {% if object.titulo %}
+            {{ object.titulo|safe|linebreaksbr }}
+          {% else %}
+            {{ object.parents.0.titulo|safe|linebreaksbr }}
+          {% endif %}
+      </span>
+    {% endblock %}
+
+    <span class="path-description">
+      {% block descricao %}
+        {% if object.descricao %}
+          {{object.descricao|striptags|safe}}
+        {% else %}
+          {{ object.parents.0.descricao|striptags|safe }}
+        {% endif %}
+      {% endblock %}
+      {% social_link_share object 'top-right block'%}
+    </span>
+
+    <a href="/{{object.absolute_slug}}" target="_blank">
+      {% if referencia %}
+        <img width="100%" src="/{{referencia.absolute_slug}}.1024" alt="" />
+      {% else %}
+        <img width="100%" src="/{{object.absolute_slug}}.1024" alt="" />
+      {% endif %}
+    </a>
+  {% endblock %}
+{% endblock %}

@@ -84,6 +84,14 @@ class Parent(models.Model):
         parents = self.parent.parents + [self.parent, ]
         return parents
 
+    @property
+    def parents_and_me(self):
+        if not self.parent:
+            return [self]
+
+        parents = self.parent.parents + [self.parent, self]
+        return parents
+
     def tree2list(self):
         yield self
         for child in self.childs.view_childs():
@@ -366,9 +374,11 @@ class ShortUrl(Slugged):
         verbose_name=_('Link Curto'),
         blank=True, null=True, default=None)
 
-    def short_url(self):
+    def short_url(self, sufix=None):
         if self.url_short:
             return self.url_short
+
+        slug = self.absolute_slug + sufix if sufix else ''
 
         self.url_short = short_url(slug=self.absolute_slug)
         self.save()
@@ -610,6 +620,11 @@ class Documento(ShortUrl, CMSMixin):
             return None
 
         return self.parlamentares.first()
+
+    def short_url(self):
+        return super().short_url(
+            sufix='.page'
+            if self.tipo == Documento.TPD_IMAGE else None)
 
     @cached_property
     def css_class(self):

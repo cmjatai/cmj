@@ -257,7 +257,6 @@ function Gallery() {
                 var width = 0;
                 var galeria = $(_galeria);
 
-
                 galeria.find('.gallery-item').each(function(index, item) {
                     width = width + item.offsetWidth;
                 });
