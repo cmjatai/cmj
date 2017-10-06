@@ -18,10 +18,10 @@
       <meta property="fb:admins" content="cmjatai">
       <meta property="og:locale" content="pt_BR">
 
-      <meta property="og:url" content="{{request.scheme}}://{{request.get_host}}{% if object.absolute_slug %}/{{ object.absolute_slug }}{% endif %}">
+      <meta property="og:url" content="{{request.scheme}}://{{request.get_host}}{% if object.tipo == object.TPD_IMAGE %}/{{ object.absolute_slug }}.page{% else %}/{{ object.absolute_slug }}{% endif %}">
       <meta property="og:site_name" content="Portal da Câmara Municipal de Jataí - Goiás">
-      <meta property="og:title" content="{% if object.titulo %}{{object.titulo}}{% else %}Câmara Municipal de Jataí{% endif %}">
-      <meta property="og:description" content="{{object.descricao|striptags|safe}}">
+      <meta property="og:title" content="{% if object.titulo %}{{object.titulo}}{% elif object.parents_and_me.0.titulo %}{{object.parents_and_me.0.titulo}}{% else %}Câmara Municipal de Jataí{% endif %}">
+      <meta property="og:description" content="{{object.parents_and_me.0.descricao|striptags|safe}}">
       <meta property="og:type" content="website">
 
       {% with object.imagem_representativa_metatags as doc_imagem %}
