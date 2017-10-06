@@ -284,7 +284,8 @@ class PathView(MultipleObjectMixin, TemplateView):
                         except:
                             pass
 
-        if self.documento and not 100 >= self.documento.tipo < 900:
+        if self.documento and self.documento.tipo >= 100 and \
+                self.documento.tipo < 900:
             raise Http404()
 
         if not self.documento and not self.classe:

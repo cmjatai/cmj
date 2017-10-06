@@ -1199,8 +1199,9 @@ main {
       padding: $grid-gutter-width * 2 $grid-gutter-width / 4 $grid-gutter-width / 4 $grid-gutter-width;
     }
     .show-descricao {
-      font-size: 80%;
+      font-size: 75%;
       color: #bbb;
+      line-height: 1.1em;
     }
     .show-autor {
       font-size: 60%;
