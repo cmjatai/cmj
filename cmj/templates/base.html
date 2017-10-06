@@ -10,20 +10,17 @@
     <meta name="theme-color" content="#006556">
     <title>{% block head_title %}{% trans 'Câmara Municipal de Jataí - Goiás' %}{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     {% block meta_tags %}
-      <meta name="description" content="{{object.descricao|striptags|safe}}">
+      <meta name="description" content="{% if object.referente %}{{object.referente.descricao|striptags|safe}}{% else %}{{object.parents_and_me.descricao|striptags|safe}}{%endif%}">
 
       <meta property="fb:app_id" content="150874375319738">
       <meta property="fb:admins" content="cmjatai">
       <meta property="og:locale" content="pt_BR">
-
       <meta property="og:url" content="{{request.scheme}}://{{request.get_host}}{% if object.tipo == object.TPD_IMAGE %}/{{ object.absolute_slug }}.page{% else %}/{{ object.absolute_slug }}{% endif %}">
       <meta property="og:site_name" content="Portal da Câmara Municipal de Jataí - Goiás">
-      <meta property="og:title" content="{% if object.titulo %}{{object.titulo}}{% elif object.parents_and_me.0.titulo %}{{object.parents_and_me.0.titulo}}{% else %}Câmara Municipal de Jataí{% endif %}">
-      <meta property="og:description" content="{{object.parents_and_me.0.descricao|striptags|safe}}">
       <meta property="og:type" content="website">
-
+      <meta property="og:title" content="{% if object.titulo %}{{object.titulo}}{% elif object.parents_and_me.0.titulo %}{{object.parents_and_me.0.titulo}}{% elif object.referente %}object.referente.titulo{% else %}Câmara Municipal de Jataí{% endif %}">
+      <meta property="og:description" content="{% if object.referente %}{{object.referente.descricao|striptags|safe}}{% else %}{{object.parents_and_me.descricao|striptags|safe}}{%endif%}">
       {% with object.imagem_representativa_metatags as doc_imagem %}
         {% if doc_imagem and doc_imagem.absolute_slug%}
           <meta property="og:image" content="{{request.scheme}}://{{request.get_host}}/{{doc_imagem.absolute_slug}}.768">

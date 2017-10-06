@@ -1133,6 +1133,10 @@ main {
   position: relative;
   z-index: 2001;
 
+  .navbar-social-links a i {
+    color: #bbb;
+  }
+
   .gallery-inner {
     position: relative;
     display: inline-block;
