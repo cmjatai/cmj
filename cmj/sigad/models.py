@@ -380,7 +380,7 @@ class ShortUrl(Slugged):
 
         slug = self.absolute_slug + sufix if sufix else ''
 
-        self.url_short = short_url(slug=self.absolute_slug)
+        self.url_short = short_url(slug=slug)
         self.save()
 
         return self.url_short
