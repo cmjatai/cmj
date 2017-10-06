@@ -497,6 +497,7 @@ class Documento(ShortUrl, CMSMixin):
 
     TD_DOC = 0
     TD_BI = 10
+    TD_GALERIA_PUBLICA = 20
     TPD_TEXTO = 100
     TPD_CONTAINER_SIMPLES = 700
     TPD_CONTAINER_EXTENDIDO = 701
@@ -507,6 +508,7 @@ class Documento(ShortUrl, CMSMixin):
     tipo_parte_doc_choice = (
         (TD_DOC, _('Documento')),
         (TD_BI, _('Banco de Imagem')),
+        (TD_GALERIA_PUBLICA, _('Galeria Pública')),
         (TPD_TEXTO, _('Texto')),
         (TPD_VIDEO, _('Vídeo')),
         (TPD_CONTAINER_SIMPLES, _('Container Simples')),
@@ -732,15 +734,21 @@ class VersaoDeMidia(models.Model):
 
     @cached_property
     def width(self):
-        nf = '%s/%s' % (media_protected.location, self.file.name)
-        im = Image.open(nf)
-        return im.width
+        try:
+            nf = '%s/%s' % (media_protected.location, self.file.name)
+            im = Image.open(nf)
+            return im.width
+        except:
+            return 0
 
     @cached_property
     def height(self):
-        nf = '%s/%s' % (media_protected.location, self.file.name)
-        im = Image.open(nf)
-        return im.height
+        try:
+            nf = '%s/%s' % (media_protected.location, self.file.name)
+            im = Image.open(nf)
+            return im.height
+        except:
+            return 0
 
     def thumbnail(self, width='thumb'):
         sizes = {
