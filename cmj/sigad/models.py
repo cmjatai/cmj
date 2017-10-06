@@ -662,6 +662,11 @@ class ReferenciaEntreDocumentos(ShortUrl):
     class Meta:
         ordering = ('referenciado', 'ordem')
 
+    def short_url(self):
+        return super().short_url(
+            sufix='.page'
+            if self.referenciado.tipo == Documento.TPD_IMAGE else None)
+
     @property
     def absolute_slug(self):
         return '%s/%s' % (self.referente.absolute_slug, self.slug)
