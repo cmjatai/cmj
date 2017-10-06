@@ -629,7 +629,7 @@ class Documento(ShortUrl, CMSMixin):
         )
 
 
-class ReferenciaEntreDocumentos(Slugged):
+class ReferenciaEntreDocumentos(ShortUrl):
     # TODO - IMPLEMENTAR VISIBILIDADE NA REFERENCIA...
     # SIGNIFICA QUE O DOC PRIVADO PODE SER PÚBLICO POR REFERENCIA
     # TRATAR SEGURANÇA PARA QUEM REALIZAR ESSA MUDANÇA DE VISIBILIDADE
@@ -646,6 +646,10 @@ class ReferenciaEntreDocumentos(Slugged):
 
     class Meta:
         ordering = ('referenciado', 'ordem')
+
+    @property
+    def absolute_slug(self):
+        return '%s/%s' % (self.referente.absolute_slug, self.slug)
 
 
 class PermissionsUserDocumento(CMSMixin):

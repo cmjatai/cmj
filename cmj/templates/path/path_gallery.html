@@ -1,4 +1,4 @@
-{% load i18n sigad_filters %}
+{% load i18n sigad_filters social_utils %}
 <div class="container-gallery">
   <span class="btn-close hidden">
     <i class="fa fa-times fa-3" aria-hidden="true"></i>
@@ -10,7 +10,7 @@
           <div class="progress hidden">
             <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
           </div>
-          <img src="/{{object.absolute_slug}}/{{object.cita.first.slug}}.96" alt="" />
+          <img src="/{{object.cita.first.absolute_slug}}.96" alt="" />
         </div>
       </div>
       <div class="show-contexto">
@@ -22,9 +22,11 @@
       <div class="thumb-scroll">
       {% for ref_doc in object.cita.all %}
         <div class="gallery-item">
-          <img src="/{{object.absolute_slug}}/{{ref_doc.slug}}.256" data-src="/{{object.absolute_slug}}/{{ref_doc.slug}}.1024"  alt="" />
+          <img src="/{{ref_doc.absolute_slug}}.256" data-src="/{{ref_doc.absolute_slug}}.1024"  alt="" />
             <div class="show-texto">
+                {% social_link_share ref_doc 'top-right block'%}
               <div class="show-titulo">
+
                 {% if ref_doc.titulo %}
                   {{ref_doc.titulo}}
                 {% elif object.titulo %}
@@ -41,6 +43,7 @@
                 {% else %}
                   {{object.parents.0.descricao}}
                 {% endif %}
+
               </div>
               <div class="show-autor">
                 Foto:
