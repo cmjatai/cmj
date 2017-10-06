@@ -21,9 +21,9 @@
               {% endcomment %}
               <i class="fa fa-clock-o" aria-hidden="true"></i>
               {% if object.public_date %}
-                {% trans "Publicado em" %} {{object.public_date|date:"d"}} {% trans "de" %} {{object.public_date|date:"F"}} {% trans "de" %} {{object.public_date|date:"Y"}}
+                {% trans "Publicado em" %} {{object.public_date|date:"d"}} {% trans "de" %} {{object.public_date|date:"F"|lower}} {% trans "de" %} {{object.public_date|date:"Y"}}
               {% else %}
-                {% trans "Criado em" %} {{object.created|date:"d"}} {% trans "de" %} {{object.created|date:"F"}} {% trans "de" %} {{object.created|date:"Y"}}
+                {% trans "Criado em" %} {{object.created|date:"d"}} {% trans "de" %} {{object.created|date:"F"|lower}} {% trans "de" %} {{object.created|date:"Y"}}
               {% endif %}
             </a>
             <div class="collapse" id="list-revisoes">

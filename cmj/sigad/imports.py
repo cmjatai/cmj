@@ -119,7 +119,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
             documento.descricao = evento['ementa']
             documento.public_date = data
             documento.classe = pasta_ano[ano]
-            documento.tipo = Documento.TPD_DOC
+            documento.tipo = Documento.TD_DOC
             documento.template_doc = 2
             documento.owner = request.user
             documento.visibilidade = Documento.STATUS_RESTRICT
@@ -261,7 +261,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                 documento.descricao = album['dscr']
                 documento.public_date = evento.public_date
                 documento.classe = classe_albuns
-                documento.tipo = Documento.TPD_DOC
+                documento.tipo = Documento.TD_DOC
                 documento.template_doc = DOC_TEMPLATES_CHOICE.noticia
                 documento.owner = request.user
                 documento.visibilidade = Documento.STATUS_PUBLIC

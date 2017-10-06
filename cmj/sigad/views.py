@@ -284,8 +284,8 @@ class PathView(MultipleObjectMixin, TemplateView):
                         except:
                             pass
 
-        if self.documento and self.documento.tipo not in (
-                Documento.TPD_DOC, Documento.TPD_IMAGE, Documento.TPD_GALLERY):
+        if self.documento and self.documento.tipo >= 100 and \
+                self.documento.tipo < 900:
             raise Http404()
 
         if not self.documento and not self.classe:
