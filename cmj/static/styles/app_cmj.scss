@@ -280,9 +280,8 @@ body, html {
       float: right;
       a {
         display: inline-block;
-        padding: 4px 15px 0;
         i {
-          line-height: 38px;
+          line-height: 42px;
           font-size: 1.5em;
           color: rgba(white, 0.6);
         }
@@ -1992,7 +1991,6 @@ main {
           font-size: 160%;
         }
         a {
-          padding: 4px 7px 0;
         }
       }
     }
@@ -2747,12 +2745,8 @@ main {
         i {
           font-size: 120%;
         }
-        a {
-          padding: 4px 7px 0;
-        }
       }
     }
-
   }
   main {
     .container-path {
@@ -2776,7 +2770,6 @@ main {
       padding: 0.4em 0.3em 0.3em;
       font-size: 1.5em;
   }
-
 
   .path-parlamentares {
     .avatar3, .avatar4 {

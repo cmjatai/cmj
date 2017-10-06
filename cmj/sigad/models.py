@@ -464,6 +464,7 @@ class DocumentoManager(models.Manager):
 
             public_date__lte=timezone.now(),
             visibilidade=Documento.STATUS_PUBLIC,
+            tipo=Documento.TD_DOC,
             parent__isnull=True).order_by('-public_date')
         return qs
 
@@ -494,7 +495,8 @@ class Documento(ShortUrl, CMSMixin):
         (ALINHAMENTO_RIGHT, _('Alinhamento Direito')),
     )
 
-    TPD_DOC = 0
+    TD_DOC = 0
+    TD_BI = 10
     TPD_TEXTO = 100
     TPD_CONTAINER_SIMPLES = 700
     TPD_CONTAINER_EXTENDIDO = 701
@@ -503,6 +505,8 @@ class Documento(ShortUrl, CMSMixin):
     TPD_GALLERY = 901
 
     tipo_parte_doc_choice = (
+        (TD_DOC, _('Documento')),
+        (TD_BI, _('Banco de Imagem')),
         (TPD_TEXTO, _('Texto')),
         (TPD_VIDEO, _('Vídeo')),
         (TPD_CONTAINER_SIMPLES, _('Container Simples')),
@@ -549,14 +553,14 @@ class Documento(ShortUrl, CMSMixin):
     tipo = models.IntegerField(
         _('Tipo da Parte do Documento'),
         choices=tipo_parte_doc_choice,
-        default=TPD_DOC)
+        default=TD_DOC)
 
     template_doc = models.IntegerField(
         _('Template para o Documento'),
         choices=DOC_TEMPLATES_CHOICE,
         blank=True, null=True, default=None)
 
-    # Possui ordem de renderização se não é um TPD_DOC
+    # Possui ordem de renderização se não é um TD_DOC
     ordem = models.IntegerField(
         _('Ordem de Renderização'), default=0)
 
@@ -575,7 +579,7 @@ class Documento(ShortUrl, CMSMixin):
         return self.titulo or self.get_tipo_display()
 
     def parte_de_documento(self):
-        return self.tipo != self.TPD_DOC
+        return self.tipo >= 100
 
     @property
     def absolute_slug(self):
