@@ -170,8 +170,7 @@ class PathView(MultipleObjectMixin, TemplateView):
         if self.referencia:
             self.template_name = 'path/path_imagem.html'
             context = TemplateView.get_context_data(self, **kwargs)
-            context['object'] = self.referencia.referente.parents[0]
-            context['referencia'] = self.referencia
+            context['object'] = self.referencia
 
         elif self.documento:
             context = TemplateView.get_context_data(self, **kwargs)

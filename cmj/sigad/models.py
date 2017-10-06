@@ -383,6 +383,8 @@ class ShortUrl(Slugged):
         self.url_short = short_url(slug=slug)
         self.save()
 
+        print('url_short', self.url_short, slug)
+
         return self.url_short
 
     class Meta:
