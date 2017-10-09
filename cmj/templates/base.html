@@ -198,23 +198,24 @@
                       <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'cmj.cerimonial:processo_list' %}">{% trans "Processos" %}</a></li>
                     {% endif %}
 
-                    {% if perms.sigad.view_documento %}
-                      <li class="nav__sub-item">
-                        <a class="dropdown-toggle" href="#fakeLink" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Banco de Imagens" %}<span class="caret"></span></a>
-                        <ul class="dropdown-menu menu-left" role="menu">
-
-                          <li class="nav__sub-item"><a class="dropdown-toggle" href="/banco-de-imagens/2017">{% trans "2017" %}</a></li>
-                          <li class="nav__sub-item"><a class="dropdown-toggle" href="/banco-de-imagens/2016">{% trans "2016" %}</a></li>
-                          <li class="nav__sub-item"><a class="dropdown-toggle" href="/banco-de-imagens/2015">{% trans "2015" %}</a></li>
-                          <li class="nav__sub-item"><a class="dropdown-toggle" href="/banco-de-imagens/2014">{% trans "2014" %}</a></li>
-                          <li class="nav__sub-item"><a class="dropdown-toggle" href="/banco-de-imagens/2013">{% trans "2013" %}</a></li>
-
-                        </ul>
-                      </li>
-                    {% endif %}
 
                   {% else %}
                     {% navbar 'navbar_cmj.yaml' %}
+                  {% endif %}
+
+                  {% if perms.sigad.view_documento %}
+                    <li class="nav__sub-item">
+                      <a class="dropdown-toggle" href="#fakeLink" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Banco de Imagens" %}<span class="caret"></span></a>
+                      <ul class="dropdown-menu menu-left" role="menu">
+
+                        <li class="nav__sub-item"><a class="dropdown-toggle" href="/banco-de-imagens/2017">{% trans "2017" %}</a></li>
+                        <li class="nav__sub-item"><a class="dropdown-toggle" href="/banco-de-imagens/2016">{% trans "2016" %}</a></li>
+                        <li class="nav__sub-item"><a class="dropdown-toggle" href="/banco-de-imagens/2015">{% trans "2015" %}</a></li>
+                        <li class="nav__sub-item"><a class="dropdown-toggle" href="/banco-de-imagens/2014">{% trans "2014" %}</a></li>
+                        <li class="nav__sub-item"><a class="dropdown-toggle" href="/banco-de-imagens/2013">{% trans "2013" %}</a></li>
+
+                      </ul>
+                    </li>
                   {% endif %}
                 </ul>
 
