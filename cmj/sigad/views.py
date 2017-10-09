@@ -120,7 +120,7 @@ class PathView(MultipleObjectMixin, TemplateView):
 
                 page = kwargs.get('page', None)
 
-                if page:
+                if page == 'page':
                     return TemplateView.get(self, request, *args, **kwargs)
 
                 if 'resize' in kwargs and kwargs['resize']:

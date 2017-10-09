@@ -674,6 +674,15 @@ class ReferenciaEntreDocumentos(ShortUrl):
             if self.referenciado.tipo == Documento.TPD_IMAGE else None)
 
     @property
+    def parents(self):
+        _self = self.referente
+        if not _self.parent:
+            return []
+
+        parents = _self.parent.parents + [_self.parent, ]
+        return parents
+
+    @property
     def absolute_slug(self):
         return '%s/%s' % (self.referente.absolute_slug, self.slug)
 

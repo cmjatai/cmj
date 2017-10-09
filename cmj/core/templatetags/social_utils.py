@@ -30,6 +30,11 @@ def social_link_share(context, obj=None, css_class=''):
             context['request'].get_host(),
             obj.absolute_slug)
 
+    descricao = getattr(obj, 'descricao')\
+        if hasattr(obj, 'descricao') else obj.parents[0].descricao
+
     return {'url': url,
-        'text': obj.titulo,
-        'css_class': css_class,}
+            'titulo': obj.titulo,
+            'descricao': descricao,
+            'css_class': css_class,
+            'whatsapp_text': '%s%s' % (obj.titulo, '')}
