@@ -188,19 +188,37 @@ class PathView(MultipleObjectMixin, TemplateView):
 
                 if self.documento.public_date:
 
-                    next = Documento.objects.view_public_docs().filter(
-                        public_date__gte=self.documento.public_date,
-                        classe=self.documento.classe,
-                        parlamentares=parlamentares,
-                    ).exclude(
-                        id=self.documento.id).last()
+                    if parlamentares:
 
-                    previous = Documento.objects.view_public_docs().filter(
-                        public_date__lte=self.documento.public_date,
-                        classe=self.documento.classe,
-                        parlamentares=parlamentares,
-                    ).exclude(
-                        id=self.documento.id).first()
+                        next = Documento.objects.view_public_docs().filter(
+                            public_date__gte=self.documento.public_date,
+                            classe=self.documento.classe,
+                            parlamentares=parlamentares,
+                        ).exclude(
+                            id=self.documento.id).last()
+
+                        previous = Documento.objects.view_public_docs().filter(
+                            public_date__lte=self.documento.public_date,
+                            classe=self.documento.classe,
+                            parlamentares=parlamentares,
+                        ).exclude(
+                            id=self.documento.id).first()
+                    else:
+
+                        next = Documento.objects.view_public_docs().filter(
+                            public_date__gte=self.documento.public_date,
+                            classe=self.documento.classe,
+                            parlamentares__isnull=True,
+                        ).exclude(
+                            id=self.documento.id).last()
+
+                        previous = Documento.objects.view_public_docs().filter(
+                            public_date__lte=self.documento.public_date,
+                            classe=self.documento.classe,
+                            parlamentares__isnull=True,
+                        ).exclude(
+                            id=self.documento.id).first()
+
                 else:
                     next = None
                     previous = None
