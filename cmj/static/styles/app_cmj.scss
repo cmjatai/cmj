@@ -424,6 +424,7 @@ a:hover {
     }
   }
 }
+
 .canais-absolute {
   position: absolute;
   top: 0;
@@ -431,11 +432,13 @@ a:hover {
   bottom: 0;
   right: 0;
 }
+
 .canais-relative {
   margin: 0 -10px;
 }
+
 .canais-columns {
-  padding: 1px 0 0 0;
+  padding: 0;
   height: 58px;
   .box {
     width: 16.6666%;
@@ -911,8 +914,7 @@ main {
     right: 0px;
     bottom: 0px;
     padding-top: 30%;
-    background: linear-gradient(to top,  rgba(lighten($color_main_bg, 2),1) 0, rgba(255,255,255,0) 100%);
-
+    background: linear-gradient(to top,  rgba(darken($color_main_bg, 5),1) 0, rgba(255,255,255,0) 70%);
 
     text-align: center;
     .btn {
@@ -1423,7 +1425,6 @@ main {
     }
   }
 }
-
 .path-parlamentares {
   float: right;
   clear: right;
@@ -1479,6 +1480,7 @@ main {
   }
 }
 
+
 .path-item-list {
   //margin-top: $grid-gutter-width;
   position: relative;
@@ -1489,8 +1491,8 @@ main {
     // background: lighten($color_main_bg, 15%) url(/static/img/bg.png);
     font-size: 80%;
     /*border-radius: 2px;*/
-    border-top: 1px solid white;
-    //border-bottom: 1px solid #fafafa;
+    //border-top: 1px solid white;
+    border-bottom: 1px solid #aaa;
     padding: $grid-gutter-width * 0.8 $grid-gutter-width * 0.8 $grid-gutter-width * 0.4;
 
     .titulo {
@@ -1606,6 +1608,34 @@ main {
   }
 }
 
+.container-path-parlamentar {
+  .path-parlamentares {
+    .avatar {
+      opacity: 1;
+      border-radius: 50% 0 0 0;
+      background-color: white;
+      img {
+        opacity: 0.75;
+        transition: opacity 0.3s ease;
+      }
+      &:hover {
+        img {
+        transition: opacity 0.3s ease;
+          opacity: 1;
+        }
+      }
+    }
+  }
+  .path-title {
+    border-bottom: 1px solid transparentize(#a97905, 0.6);
+    font-size: 200%;
+  }
+  .path-item-list {
+    .path-parlamentares {
+      display: none;
+    }
+  }
+}
 
 .container-path111:not(.container-footer) {
   .path-item-list {
@@ -2624,7 +2654,7 @@ main {
 
   #wrapper {
     .path-previous {
-        left: -19px;
+        left: -24px;
     }
     &.toggled {
       padding-left: $width-wrapper-xs;
@@ -2923,7 +2953,7 @@ main {
     }
     &.navbar-menu {  /* para a navbar principal - que se diferencia das demais*/
       border-color: transparentize($color_topo_bg, 0.2);
-      border-top-width: 1px;
+      border: 0px;
       background-color: darken($color_topo_bg, 7);
 
       .container {

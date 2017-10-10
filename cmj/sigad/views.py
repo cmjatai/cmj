@@ -50,7 +50,8 @@ from cmj.crud.base import MasterDetailCrud
 from cmj.sigad import forms, models
 from cmj.sigad.forms import DocumentoForm
 from cmj.sigad.models import Documento, Classe, ReferenciaEntreDocumentos,\
-    PermissionsUserClasse, PermissionsUserDocumento, Revisao, CMSMixin
+    PermissionsUserClasse, PermissionsUserDocumento, Revisao, CMSMixin,\
+    CLASSE_TEMPLATES_CHOICE
 from cmj.utils import make_pagination
 
 
@@ -186,19 +187,24 @@ class PathView(MultipleObjectMixin, TemplateView):
                 parlamentares = self.documento.parlamentares.all()
 
                 if self.documento.public_date:
+
                     next = Documento.objects.view_public_docs().filter(
                         public_date__gte=self.documento.public_date,
                         classe=self.documento.classe,
+                        parlamentares=parlamentares,
                     ).exclude(
                         id=self.documento.id).last()
+
                     previous = Documento.objects.view_public_docs().filter(
                         public_date__lte=self.documento.public_date,
                         classe=self.documento.classe,
+                        parlamentares=parlamentares,
                     ).exclude(
                         id=self.documento.id).first()
                 else:
                     next = None
                     previous = None
+
                 context['next'] = next
                 context['previous'] = previous
 
@@ -227,6 +233,12 @@ class PathView(MultipleObjectMixin, TemplateView):
                     '-public_date').all()
             elif template == models.CLASSE_TEMPLATES_CHOICE.galeria:
                 kwargs['object_list'] = Documento.objects.view_public_gallery()
+
+            elif template == models.CLASSE_TEMPLATES_CHOICE.parlamentar:
+                kwargs['object_list'] = \
+                    self.classe.parlamentar.documento_set.filter(
+                    public_date__isnull=False).order_by(
+                    '-public_date').all()
 
             self.object_list = kwargs['object_list']
             context = super().get_context_data(**kwargs)
@@ -269,10 +281,15 @@ class PathView(MultipleObjectMixin, TemplateView):
 
         if not slug:
             raise Http404()
-            # FIXME - pagina inicial
-            # return redirect('/noticias')
-            self.template_name = 'path/pagina_inicial.html'
-            return TemplateView.dispatch(self, request, *args, **kwargs)
+
+        return self._dispatch(request, *args, **kwargs)
+
+    def _dispatch(self, request, *args, **kwargs):
+
+        slug = kwargs.get('slug', '')
+
+        slug = slug.split('/')
+        slug = [s for s in slug if s]
 
         referente = None
         try:
@@ -371,6 +388,34 @@ class PathView(MultipleObjectMixin, TemplateView):
                         raise Http404()
 
         return TemplateView.dispatch(self, request, *args, **kwargs)
+
+
+class PathParlamentarView(PathView):
+
+    def get(self, request, *args, **kwargs):
+        return PathView.get(self, request, *args, **kwargs)
+
+    def dispatch(self, request, *args, **kwargs):
+
+        slug = kwargs.get('slug', '')
+
+        slug = slug.split('/')
+        slug = [s for s in slug if s]
+
+        if not slug:
+            kwargs['slug'] = 'parlamentar/' + kwargs['parlamentar']
+
+        return self._dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+
+        if self.classe.template_classe != \
+                CLASSE_TEMPLATES_CHOICE.parlamentares:
+            return PathView.get_context_data(self, **kwargs)
+
+        context = TemplateView.get_context_data(self, **kwargs)
+
+        return context
 
 
 class ClasseParentMixin:

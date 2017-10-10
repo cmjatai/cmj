@@ -385,7 +385,12 @@
       <script type="text/javascript" src="{% static 'jsdiff/diff.min.js' %}"></script>
 
       <script type="text/javascript" src="{% static 'js/app.js' %}"></script>
+
+      {% if user.is_superuser %}
+      <script type="text/javascript" src="{% static 'js/app_cmj.js' %}?time={% now "jS F Y H:i:s" %}"></script>
+      {% else %}
       <script type="text/javascript" src="{% static 'js/app_cmj.js' %}"></script>
+      {% endif %}
 
       {% block extra_js %}{% endblock %}
 

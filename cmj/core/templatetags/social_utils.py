@@ -37,4 +37,4 @@ def social_link_share(context, obj=None, css_class=''):
             'titulo': obj.titulo,
             'descricao': descricao,
             'css_class': css_class,
-            'whatsapp_text': '%s%s' % (obj.titulo, '')}
+            'whatsapp_text': '*%s*\n%s' % (obj.titulo, descricao)}

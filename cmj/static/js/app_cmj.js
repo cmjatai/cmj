@@ -657,8 +657,8 @@ function Gallery() {
 
 function ContainerFirst() {
     var first = $('.container-first');
-    if (first.height() > window.innerHeight * 2) {
-        first.css('height', window.innerHeight * 0.6);
+    if (first.height() > window.innerHeight) {
+        first.css('height', window.innerHeight);
         var btn = first.find('.btn').click(function() {
             this.parentElement.remove();
             first.css('height', '');

@@ -52,12 +52,16 @@ DOC_TEMPLATES_CHOICE = Choices(
 
 CLASSE_TEMPLATES_CHOICE_FILES = {
     1: 'path/path_classe.html',
-    2: 'path/path_galeria.html'
+    2: 'path/path_galeria.html',
+    3: 'path/path_parlamentares.html',
+    4: 'path/path_parlamentar.html',
 }
 
 CLASSE_TEMPLATES_CHOICE = Choices(
     (1, 'lista_em_linha', _('Listagem Simples em Linha')),
     (2, 'galeria', _('Galeria Pública de Albuns')),
+    (3, 'parlamentares', _('Página dos Parlamentares')),
+    (4, 'parlamentar', _('Página individual de Parlamentar')),
 )
 
 
@@ -409,6 +413,11 @@ class Classe(ShortUrl, CMSMixin):
         _('Template para a Classe'),
         choices=CLASSE_TEMPLATES_CHOICE,
         default=CLASSE_TEMPLATES_CHOICE.lista_em_linha)
+
+    parlamentar = models.ForeignKey(
+        Parlamentar, related_name='classe_set',
+        verbose_name=_('Parlamentar'),
+        blank=True, null=True, default=None)
 
     class Meta:
         ordering = ('codigo', '-public_date',)

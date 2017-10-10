@@ -29,7 +29,7 @@
           </span>
 
           {% if pagina_inicial %}
-            <a class="tags tag-parlamentar" href="#">
+            <a class="tags tag-parlamentar" href="/{{ documento.parlamentares.first.classe_set.first.absolute_slug }}">
                 {{ documento.parlamentares.first.nome_parlamentar}}
             </a>
               {% social_link_share documento %}
@@ -59,7 +59,7 @@
             {% endif %}
 
               {% if parlamentar.fotografia %}
-                <a class="avatar" href="#">
+                <a class="avatar" href="/{{ parlamentar.classe_set.first.absolute_slug }}">
                   <img src="{{ parlamentar.fotografia.url }}">
                 </a>
               {% endif %}

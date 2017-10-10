@@ -55,14 +55,16 @@ class ClasseForm(ModelForm):
             'descricao',
             'parent',
             'template_doc_padrao',
-            'template_classe'
+            'template_classe',
+            'parlamentar'
         ]
 
     def __init__(self, *args, **kwargs):
 
         row1 = to_row([
-            ('codigo', 4),
-            ('titulo', 8),
+            ('codigo', 2),
+            ('titulo', 6),
+            ('parlamentar', 4),
         ])
 
         row2 = to_row([

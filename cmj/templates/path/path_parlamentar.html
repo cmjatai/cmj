@@ -1,0 +1,46 @@
+{% extends "base_path.html" %}
+{% load i18n sigad_filters %}
+
+{% block main_container_class %}container-path container-path-parlamentar{% endblock %}
+{% block base_header %}
+  {% block controls_content %}
+    {% if perms.sigad.change_classe %}
+      <a href="{% url 'cmj.sigad:classe_edit' object.id %}">{% trans "[Editar]" %}</a>
+    {% endif %}
+  {% endblock %}
+  <div class="container">
+    <div class="path-parlamentares">
+    {% if object.parlamentar.fotografia %}
+      <a class="avatar avatar1" href="/{{ object.absolute_slug }}">
+        <img src="{{ object.parlamentar.fotografia.url }}">
+      </a>
+    {% endif %}
+    </div>
+    {% block title %}
+      {{block.super}}
+    {% endblock %}
+  </div>
+
+{% endblock %}
+
+{% block base_content %}
+
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        {% with 'path-item-list' as css_class %}
+          {% include "path/path_list_docs.html" %}
+        {% endwith %}
+      </div>
+    </div>
+    {% include "paginacao.html" %}
+  </div>
+
+
+{% endblock %}
+
+{% block cmj_extra_content %}
+  <div class="container-fluid container{{fluid}}{{path}}">
+    ...
+  </div>
+{% endblock %}

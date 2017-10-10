@@ -14,7 +14,8 @@ from sapl.parlamentares.models import Parlamentar
 
 from cmj.sigad import models
 from cmj.sigad.models import Documento, Midia, VersaoDeMidia, Revisao, Classe,\
-    ReferenciaEntreDocumentos, DOC_TEMPLATES_CHOICE
+    ReferenciaEntreDocumentos, DOC_TEMPLATES_CHOICE, CMSMixin,\
+    CLASSE_TEMPLATES_CHOICE
 
 
 class DocumentoPmImportView(RevisionMixin, TemplateView):
@@ -41,7 +42,9 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
         classe = Classe.objects.filter(
             titulo=titulo,
             parent=parent).first()
+        created = False
         if not classe:
+            created = True
             classe = Classe()
             classe.codigo = self.get_codigo_classe(parent)
             classe.titulo = titulo
@@ -51,7 +54,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
             classe.owner = self.request.user
 
             classe.save()
-        return classe
+        return classe, created
 
     def get(self, request, *args, **kwargs):
 
@@ -69,13 +72,13 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                                  self.end_local_fotog))
 
         fotografia = self.get_or_create_classe(
-            'Banco de Imagens', perfil=models.CLASSE_ESTRUTURAL)
+            'Banco de Imagens', perfil=models.CLASSE_ESTRUTURAL)[0]
 
         data = r.data.decode('utf-8')
         # print('data: ', data)
         # return TemplateView.get(self, request, *args, **kwargs)
         jdata = json.loads(data)
-        jdata = jdata[0:30]
+        jdata = jdata[0:5]
 
         anos = {}
         print(len(jdata))
@@ -89,7 +92,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
         pasta_ano = {}
         for ano in anos:
             pasta_ano[ano] = self.get_or_create_classe(
-                ano, parent=fotografia, perfil=models.CLASSE_DOCUMENTAL)
+                ano, parent=fotografia, perfil=models.CLASSE_DOCUMENTAL)[0]
 
         for evento in jdata:
 
@@ -583,6 +586,31 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
 
         Documento.objects.filter(
             old_path__startswith='/portal/videosdiversos/').delete()
+
+        parlamentar, created_parlamentar = self.get_or_create_classe(
+            'Parlamentar',
+            visibilidade=CMSMixin.STATUS_PUBLIC,
+            perfil=models.CLASSE_ESTRUTURAL)
+
+        if created_parlamentar:
+            parlamentar.template_classe = \
+                CLASSE_TEMPLATES_CHOICE.parlamentares
+            parlamentar.save()
+
+        pms = pm.all()
+
+        for p in pms:
+            classe_parlamentar, created = self.get_or_create_classe(
+                p.nome_parlamentar,
+                parent=parlamentar,
+                visibilidade=CMSMixin.STATUS_PUBLIC,
+                perfil=models.CLASSE_ESTRUTURAL)
+
+            if created:
+                classe_parlamentar.template_classe = \
+                    CLASSE_TEMPLATES_CHOICE.parlamentar
+                classe_parlamentar.parlamentar = p
+                classe_parlamentar.save()
 
         """if func == 'avatars':
 
