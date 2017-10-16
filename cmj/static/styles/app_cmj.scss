@@ -1965,6 +1965,11 @@ main {
       .path-previous {
           left: $width-wrapper-sm - 43px;
       }
+      .container-gallery {
+        .path-previous {
+            left: -38px;
+        }
+      }
     }
   }
   .canais-absolute {
@@ -2000,8 +2005,6 @@ main {
         margin-left: 0;
       }
     }
-
-
     .container-box-parlamentares {
       .navbar-social-links {
         a {
@@ -2009,6 +2012,24 @@ main {
           height: 1.5em;
           line-height: 1.6em;
         }
+      }
+    }
+  }
+
+  .container-gallery {
+    .show-image {
+      width: 59%;
+    }
+    .show-contexto {
+      width: 40%;
+      .show-titulo {
+        padding-bottom: 0.4em;
+      }
+      .show-texto {
+        padding-top: 20px;
+      }
+      .show-autor {
+        font-size: 50%
       }
     }
   }

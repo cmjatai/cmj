@@ -646,6 +646,7 @@ function Gallery() {
 
         instance.resize();
         window.onresize = instance.resize;
+        $('.container-gallery').on('resize', instance.resize);
 
         instance.addEventClick();
 
