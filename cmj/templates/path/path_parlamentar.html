@@ -26,13 +26,11 @@
 {% block base_content %}
 
   <div class="container">
-    <div class="row">
-      <div class="col-md-12">
-        {% with 'path-item-list' as css_class %}
-          {% include "path/path_list_docs.html" %}
-        {% endwith %}
-      </div>
-    </div>
+    {% with 3 as split_row %}
+      {% with 'path-item-list col-md-4' as css_class %}
+        {% include "path/path_list_docs.html" %}
+      {% endwith %}
+    {% endwith %}
     {% include "paginacao.html" %}
   </div>
 

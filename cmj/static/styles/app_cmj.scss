@@ -1492,7 +1492,6 @@ main {
     font-size: 80%;
     /*border-radius: 2px;*/
     //border-top: 1px solid white;
-    border-bottom: 1px solid #aaa;
     padding: $grid-gutter-width * 0.8 $grid-gutter-width * 0.8 $grid-gutter-width * 0.4;
 
     .titulo {
@@ -1523,7 +1522,8 @@ main {
       padding-top: 0px;
       position: absolute;
       top:1px;
-      right:$grid-gutter-width / 1.5;
+      left:$grid-gutter-width / 1.5;
+      border-top: 1px solid #aaa;
     }
     &:hover {
       .path-imagem {
@@ -1537,12 +1537,6 @@ main {
           }
         }
       }
-    }
-  }
-
-  &:first-child {
-    .inner {
-      border-top: 1px solid white;
     }
   }
 
@@ -1610,48 +1604,56 @@ main {
 
 .container-path-parlamentar {
   .path-parlamentares {
+    float: left;
+    margin: 0 0 10px 0;
+    &:first-child {
+      margin-top: 0px;
+    }
     .avatar {
+      margin: 0;
       opacity: 1;
-      border-radius: 50% 0 0 0;
+      border-radius: 0 50% 50% 0;
       background-color: white;
       img {
         opacity: 0.75;
         transition: opacity 0.3s ease;
+        border: 2px solid $color_topo_bg;
+        padding: 3px;
       }
       &:hover {
         img {
-        transition: opacity 0.3s ease;
+          transition: opacity 0.3s ease;
           opacity: 1;
         }
       }
     }
   }
   .path-title {
-    border-bottom: 1px solid transparentize(#a97905, 0.6);
+    border-bottom: 2px solid rgba($color_topo_bg, 0.7);
     font-size: 200%;
+    margin-top: 0em;
   }
   .path-item-list {
     .path-parlamentares {
       display: none;
     }
   }
-}
-
-.container-path111:not(.container-footer) {
-  .path-item-list {
-    &:nth-child(1) {
-      width: 66.6666%;
-    }
-    &:nth-child(2) {
-    }
-    &:nth-child(3) {
-    }
-    &:nth-child(4) {
-    }
-    &:nth-child(5) {
+  .row:first-child {
+    .path-item-list:first-child {
+      width: 66.666%;
+      .titulo {
+        font-size: 200%;
+      }
+      .descricao {
+        font-size: 200%;
+      }
+      .data-pub {
+        display: none;
+      }
     }
   }
 }
+
 
 
 // #### actions path next previous ########################################
@@ -1844,7 +1846,7 @@ main {
       .descricao {
       }
       .titulo {
-        padding: 5px 0 0 0;
+        padding: 5px 0 10px 0;
       }
       .imagem {
         height: 120px;
@@ -1869,7 +1871,15 @@ main {
         font-size: 120%;
       }
       .texto {
-        padding: 0 10px;
+        margin: 20px 0 20px 20px;
+        padding: 0 10px 0 20px;;
+        border-left: 4px solid #a97905;
+      }
+      .descricao {
+        padding: 0px;
+      }
+      .titulo {
+        padding: 0;
       }
       .imagem {
         height: 360px;
@@ -2191,6 +2201,24 @@ main {
       }
     }
   }
+
+
+
+  .container-path-parlamentar {
+    .row:first-child {
+      .path-item-list:first-child {
+        width: 100%;
+        .titulo {
+          font-size: 180%;
+        }
+        .descricao {
+          font-size: 140%;
+        }
+      }
+    }
+  }
+
+
 }
 
 @media screen and (max-width: 800px) {
@@ -2520,8 +2548,10 @@ main {
           margin-top: 0px;
         }
         .texto {
-          padding: 0 10px;
+          padding: 0 5px;
+          margin: 10px 0 10px 10px;
         }
+
       }
       &:not(:first-child) {
         margin: 0 -10px;
@@ -2739,7 +2769,7 @@ main {
         padding-right: 0;
       }
       .titulo {
-        padding: 0px 5px 0 0;
+        padding: 0px 10px 0;
       }
       .descricao {
         padding: 5px 10px 20px;

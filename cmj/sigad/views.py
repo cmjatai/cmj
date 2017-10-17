@@ -32,6 +32,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
 from django.core.urlresolvers import reverse_lazy, reverse
+from django.core.validators import slug_re
 from django.db.models.aggregates import Max, Count
 from django.http.response import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
@@ -294,9 +295,6 @@ class PathView(MultipleObjectMixin, TemplateView):
 
         slug = kwargs.get('slug', '')
 
-        slug = slug.split('/')
-        slug = [s for s in slug if s]
-
         if not slug:
             raise Http404()
 
@@ -306,8 +304,9 @@ class PathView(MultipleObjectMixin, TemplateView):
 
         slug = kwargs.get('slug', '')
 
-        slug = slug.split('/')
-        slug = [s for s in slug if s]
+        if isinstance(slug, str):
+            slug = slug.split('/')
+            slug = [s for s in slug if s]
 
         referente = None
         try:
@@ -417,11 +416,8 @@ class PathParlamentarView(PathView):
 
         slug = kwargs.get('slug', '')
 
-        slug = slug.split('/')
-        slug = [s for s in slug if s]
-
         if not slug:
-            kwargs['slug'] = 'parlamentar/' + kwargs['parlamentar']
+            kwargs['slug'] = ['parlamentar', kwargs['parlamentar']]
 
         return self._dispatch(request, *args, **kwargs)
 

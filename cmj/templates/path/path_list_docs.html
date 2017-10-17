@@ -1,6 +1,17 @@
 {% load i18n sigad_filters social_utils %}
 
 {% for documento in object_list %}
+  {% if split_row %}
+
+    {% if forloop.counter0 > 0 and forloop.counter0|divisibleby:split_row %}
+      </div>
+    {% endif %}
+
+    {% if forloop.counter0|divisibleby:split_row %}
+      <div class="row">
+    {% endif %}
+
+  {% endif %}
     <div class="{{css_class}}">
       {% with documento.parlamentares.count as count_parlamentares %}
         <div class="inner">
@@ -101,4 +112,8 @@
         </div>
       {% endwith %}
     </div>
+
+  {% if split_row %}
+    {% if forloop.last %}</div>{% endif %}
+  {% endif %}
 {% endfor %}

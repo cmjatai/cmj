@@ -1,35 +1,55 @@
 import re
+from datetime import date
+from functools import lru_cache
+from subprocess import PIPE, call
 
 import pkg_resources
+import reversion
 import yaml
 from django.apps import apps
 from django.apps.config import AppConfig
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import connections, models
-from django.db.models import CharField, TextField, ProtectedError
+from django.db import connections, transaction
+from django.db.models import Count, Max
 from django.db.models.base import ModelBase
-from model_mommy import mommy
-from model_mommy.mommy import foreign_key_required, make
 
-from sapl.base.models import Autor, ProblemaMigracao
+from sapl.base.models import AppConfig as AppConf
+from sapl.base.models import (Autor, CasaLegislativa, ProblemaMigracao,
+                              TipoAutor)
 from sapl.comissoes.models import Comissao, Composicao, Participacao
-from sapl.materia.models import (Proposicao, StatusTramitacao, TipoDocumento,
+from sapl.legacy.models import TipoNumeracaoProtocolo
+from sapl.materia.models import (AcompanhamentoMateria, Proposicao,
+                                 StatusTramitacao, TipoDocumento,
                                  TipoMateriaLegislativa, TipoProposicao,
                                  Tramitacao)
-from sapl.norma.models import AssuntoNorma, NormaJuridica
-from sapl.parlamentares.models import Parlamentar
-from sapl.protocoloadm.models import StatusTramitacaoAdministrativo
-from sapl.sessao.models import ExpedienteMateria, OrdemDia, SessaoPlenaria
+from sapl.norma.models import (AssuntoNorma, NormaJuridica, NormaRelacionada,
+                               TipoVinculoNormaJuridica)
+from sapl.parlamentares.models import (Legislatura, Mandato, Parlamentar,
+                                       TipoAfastamento)
+from sapl.protocoloadm.models import (DocumentoAdministrativo, Protocolo,
+                                      StatusTramitacaoAdministrativo)
+from sapl.sessao.models import ExpedienteMateria, OrdemDia, RegistroVotacao
+from sapl.settings import PROJECT_DIR
 from sapl.utils import normalize
 
 # BASE ######################################################################
 #  apps to be migrated, in app dependency order (very important)
 appconfs = [apps.get_app_config(n) for n in [
-    'parlamentares', ]]
+    'parlamentares',
+    'comissoes',
+    'base',
+    'materia',
+    'norma',
+    'sessao',
+    'lexml',
+    'protocoloadm', ]]
 
 unique_constraints = []
 one_to_one_constraints = []
+primeira_vez = []
 
 name_sets = [set(m.__name__ for m in ac.get_models()) for ac in appconfs]
 
@@ -94,44 +114,36 @@ def warn(msg):
     print('CUIDADO! ' + msg)
 
 
+class ForeignKeyFaltando(ObjectDoesNotExist):
+    'Uma FK aponta para um registro inexistente'
+    pass
+
+
+@lru_cache()
+def _get_all_ids_from_model(model):
+    # esta função para uso apenas em get_fk_related
+    return set(model.objects.values_list('id', flat=True))
+
+
 def get_fk_related(field, value, label=None):
-    if value is None and field.null is False:
-        value = 0
-    if value is not None:
-        try:
-            value = field.related_model.objects.get(id=value)
-        except ObjectDoesNotExist:
-            msg = 'FK [%s] não encontrada para valor %s ' \
-                '(em %s %s)' % (
-                    field.name, value,
-                    field.model.__name__, label or '---')
-            if value == 0:
-                if not field.null:
-                    fields_dict = get_fields_dict(field.related_model)
-                    value = mommy.make(field.related_model,
-                                       **fields_dict)
-                    descricao = 'stub criado para campos não nuláveis!'
-                    save_relation(value, [field.name], msg, descricao,
-                                  eh_stub=True)
-                    warn(msg + ' => ' + descricao)
-                else:
-                    value = None
-            else:
-                if field.model._meta.label == 'sessao.RegistroVotacao' and \
-                        field.name == 'ordem':
-                    return value
-                value = make_stub(field.related_model, value)
-                descricao = 'stub criado para entrada orfã!'
-                warn(msg + ' => ' + descricao)
-                save_relation(value, [field.name], msg, descricao,
-                              eh_stub=True)
-        else:
-            assert value
-    return value
+    if value is None and field.null:
+        return None
+
+    # if field.related_model.objects.filter(id=value).exists():
+    if value in _get_all_ids_from_model(field.related_model):
+        return value
+    else:
+        msg = 'FK [%s] não encontrada para o valor %s (em %s %s)' % (
+            field.name, value, field.model.__name__, label or '---')
+        warn(msg)
+        raise ForeignKeyFaltando(msg)
 
 
-def get_field(model, fieldname):
-    return model._meta.get_field(fieldname)
+def exec_sql_file(path, db='default'):
+    with open(path) as arq:
+        sql = arq.read()
+    with connections[db].cursor() as cursor:
+        cursor.execute(sql)
 
 
 def exec_sql(sql, db='default'):
@@ -151,103 +163,117 @@ def iter_sql_records(sql, db):
         yield record
 
 
-def delete_constraints(model):
-    # pega nome da unique constraint dado o nome da tabela
-    table = model._meta.db_table
-    cursor = exec_sql("SELECT conname FROM pg_constraint WHERE conrelid = "
-                      "(SELECT oid FROM pg_class WHERE relname LIKE "
-                      "'%s') and contype = 'u';" % (table))
-    result = ()
-    result = cursor.fetchall()
-    # se existir um resultado, unique constraint será deletado
-    for r in result:
-        if r[0].endswith('key'):
-            words_list = r[0].split('_')
-            one_to_one_constraints.append([table, r[0], words_list, model])
-        else:
-            args = None
-            args_list = []
-            if model._meta.unique_together:
-                args = model._meta.unique_together[0]
-                args_list = list(args)
-            unique_constraints.append([table, r[0], args_list, model])
-        warn('Excluindo unique constraint de nome %s' % r[0])
-        exec_sql("ALTER TABLE %s DROP CONSTRAINT %s;" %
-                 (table, r[0]))
-
-
-def recreate_constraints():
-    if one_to_one_constraints:
-        for constraint in one_to_one_constraints:
-            table, name, args, model = constraint
-            args_string = ''
-            args_string = "(" + "_".join(map(str, args[2:-1])) + ")"
-            exec_sql("ALTER TABLE %s ADD CONSTRAINT %s UNIQUE %s;" %
-                     (table, name, args_string))
-    if unique_constraints:
-        for constraint in unique_constraints:
-            table, name, args, model = constraint
-            for i in range(len(args)):
-                if isinstance(model._meta.get_field(args[i]),
-                              models.ForeignKey):
-                    args[i] = args[i] + '_id'
-            args_string = ''
-            args_string += "(" + ', '.join(map(str, args)) + ")"
-            exec_sql("ALTER TABLE %s ADD CONSTRAINT %s UNIQUE %s;" %
-                     (table, name, args_string))
-    one_to_one_constraints.clear()
-    unique_constraints.clear()
-
-
-def stub_desnecessario(obj):
-    lista_fields = [
-        f for f in obj._meta.get_fields()
-        if (f.one_to_many or f.one_to_one) and f.auto_created
-    ]
-    desnecessario = not any(
-        rr.related_model.objects.filter(**{rr.field.name: obj}).exists()
-        for rr in lista_fields)
-    return desnecessario
-
-
-def save_with_id(new, id):
-    sequence_name = '%s_id_seq' % type(new)._meta.db_table
-    cursor = exec_sql('SELECT last_value from %s;' % sequence_name)
-    (last_value,) = cursor.fetchone()
-    if last_value == 1 or id != last_value + 1:
-        # we explicitly set the next id if last_value == 1
-        # because last_value == 1 for a table containing either 0 or 1 records
-        # (we would have trouble for id == 2 and a missing id == 1)
-        exec_sql('ALTER SEQUENCE %s RESTART WITH %s;' % (sequence_name, id))
-    new.save()
-    assert new.id == id, 'New id is different from provided!'
+def get_last_value(model):
+    last_value = model.objects.all().aggregate(Max('pk'))
+    return last_value['pk__max'] or 0
 
 
 def save_relation(obj, nome_campo='', problema='', descricao='',
-                  eh_stub=False):
+                  eh_stub=False, critico=False):
     link = ProblemaMigracao(
         content_object=obj, nome_campo=nome_campo, problema=problema,
-        descricao=descricao, eh_stub=eh_stub,
-    )
+        descricao=descricao, eh_stub=eh_stub, critico=critico)
     link.save()
 
 
-def make_stub(model, id):
-    fields_dict = get_fields_dict(model)
-    new = mommy.prepare(model, **fields_dict)
-    save_with_id(new, id)
+def fill_vinculo_norma_juridica():
+    lista = [('A', 'Altera o(a)',
+              'Alterado(a) pelo(a)'),
+             ('R', 'Revoga integralmente o(a)',
+              'Revogado(a) integralmente pelo(a)'),
+             ('P', 'Revoga parcialmente o(a)',
+              'Revogado(a) parcialmente pelo(a)'),
+             ('T', 'Revoga integralmente por consolidação',
+              'Revogado(a) integralmente por consolidação'),
+             ('C', 'Norma correlata',
+              'Norma correlata'),
+             ('S', 'Ressalva o(a)',
+              'Ressalvada pelo(a)'),
+             ('E', 'Reedita o(a)',
+              'Reeditada pelo(a)'),
+             ('I', 'Reedita com alteração o(a)',
+              'Reeditada com alteração pelo(a)'),
+             ('G', 'Regulamenta o(a)',
+              'Regulamentada pelo(a)'),
+             ('K', 'Suspende parcialmente o(a)',
+              'Suspenso(a) parcialmente pelo(a)'),
+             ('L', 'Suspende integralmente o(a)',
+              'Suspenso(a) integralmente pelo(a)'),
+             ('N', 'Julga integralmente inconstitucional',
+              'Julgada integralmente inconstitucional'),
+             ('O', 'Julga parcialmente inconstitucional',
+              'Julgada parcialmente inconstitucional')]
+    lista_objs = [TipoVinculoNormaJuridica(
+        sigla=item[0], descricao_ativa=item[1], descricao_passiva=item[2])
+        for item in lista]
+    TipoVinculoNormaJuridica.objects.bulk_create(lista_objs)
 
-    return new
+
+def fill_dados_basicos():
+    # Ajusta sequencia numérica e cria base.AppConfig
+    letra = 'A'
+    try:
+        tipo = TipoNumeracaoProtocolo.objects.latest('dat_inicial_protocolo')
+        if 'POR ANO' in tipo.des_numeracao_protocolo:
+            letra = 'A'
+        elif 'POR LEGISLATURA' in tipo.des_numeracao_protocolo:
+            letra = 'L'
+        elif 'CONSECUTIVO' in tipo.des_numeracao_protocolo:
+            letra = 'U'
+    except Exception as e:
+        pass
+    appconf = AppConf(sequencia_numeracao=letra)
+    appconf.save()
+
+    # Cria instância de CasaLegislativa
+    casa = CasaLegislativa()
+    casa.save()
 
 
-def get_fields_dict(model):
-    all_fields = model._meta.get_fields()
-    fields_dict = {}
-    fields_dict = {f.name: '????????????'[:f.max_length]
-                   for f in all_fields
-                   if isinstance(f, (CharField, TextField)) and
-                   not f.choices and not f.blank}
-    return fields_dict
+# Uma anomalia no sapl 2.5 causa a duplicação de registros de votação.
+# Essa duplicação deve ser eliminada para que não haja erro no sapl 3.1
+def excluir_registrovotacao_duplicados():
+    duplicatas_ids = RegistroVotacao.objects.values(
+        'materia', 'ordem', 'expediente').annotate(
+            Count('id')).order_by().filter(id__count__gt=1)
+    duplicatas_queryset = RegistroVotacao.objects.filter(
+        materia__in=[item['materia'] for item in duplicatas_ids])
+
+    for dup in duplicatas_queryset:
+        lista_dups = duplicatas_queryset.filter(
+            materia=dup.materia, expediente=dup.expediente, ordem=dup.ordem)
+        primeiro_registro = lista_dups[0]
+        lista_dups = lista_dups.exclude(pk=primeiro_registro.pk)
+        for objeto in lista_dups:
+            if (objeto.pk > primeiro_registro.pk):
+                try:
+                    objeto.delete()
+                except:
+                    assert 0
+            else:
+                try:
+                    primeiro_registro.delete()
+                    primeiro_registro = objeto
+                except:
+                    assert 0
+
+
+def delete_old(legacy_model, cols_values):
+    # ajuste necessário por conta de cósigos html em txt_expediente
+    if legacy_model.__name__ == 'ExpedienteSessaoPlenaria':
+        cols_values.pop('txt_expediente')
+
+    def eq_clause(col, value):
+        if value is None:
+            return '{} IS NULL'.format(col)
+        else:
+            return '{}="{}"'.format(col, value)
+
+    delete_sql = 'delete from {} where {}'.format(
+        legacy_model._meta.db_table,
+        ' and '.join([eq_clause(col, value)
+                      for col, value in cols_values.items()]))
+    exec_sql(delete_sql, 'legacy')
 
 
 class DataMigrator:
@@ -263,92 +289,70 @@ class DataMigrator:
         for field in new._meta.fields:
             old_field_name = renames.get(field.name)
             field_type = field.get_internal_type()
-            msg = ("O valor do campo %s (%s) da model %s era inválido" %
-                   (field.name, field_type, field.model.__name__))
             if old_field_name:
                 old_value = getattr(old, old_field_name)
-                if isinstance(field, models.ForeignKey):
-                    old_type = type(old)  # not necessarily a model
-                    if hasattr(old_type, '_meta') and \
-                            old_type._meta.pk.name != 'id':
+
+                if field_type == 'ForeignKey':
+                    # not necessarily a model
+                    if hasattr(old, '_meta') and old._meta.pk.name != 'id':
                         label = old.pk
                     else:
                         label = '-- SEM PK --'
+                    fk_field_name = '{}_id'.format(field.name)
                     value = get_fk_related(field, old_value, label)
+                    setattr(new, fk_field_name, value)
                 else:
                     value = getattr(old, old_field_name)
-                if field_type == 'DateField' and \
-                        not field.null and value is None:
-                    descricao = 'A data 0001-01-01 foi colocada no lugar'
-                    problema = 'O valor da data era nulo ou inválido'
-                    warn(msg +
-                         ' => ' + descricao)
-                    value = '0001-01-01'
-                    self.data_mudada['obj'] = new
-                    self.data_mudada['descricao'] = descricao
-                    self.data_mudada['problema'] = problema
-                    self.data_mudada.setdefault('nome_campo', []).\
-                        append(field.name)
-                if field_type == 'CharField' or field_type == 'TextField':
-                    if value is None or value == 'None':
+                    # TODO rever esse DateField após as mudança para datas com
+                    # timezone
+                    if field_type == 'DateField' and \
+                            not field.null and value is None:
+                        # TODO REVER ISSO
+                        descricao = 'A data 1111-11-11 foi colocada no lugar'
+                        problema = 'O valor da data era nulo ou inválido'
+                        warn("O valor do campo %s (%s) do model %s "
+                             "era inválido => %s" % (
+                                 field.name, field_type,
+                                 field.model.__name__, descricao))
+                        value = date(1111, 11, 11)
+                        self.data_mudada['obj'] = new
+                        self.data_mudada['descricao'] = descricao
+                        self.data_mudada['problema'] = problema
+                        self.data_mudada.setdefault('nome_campo', []).\
+                            append(field.name)
+                    if (field_type in ['CharField', 'TextField']
+                            and value in [None, 'None']):
                         value = ''
-                if field.model._meta.label == 'sessao.RegistroVotacao' and \
-                        field.name == 'ordem' and \
-                        not isinstance(value, OrdemDia):
-                    try:
-                        new_value = ExpedienteMateria.objects.get(pk=value)
-                        setattr(new, 'expediente', new_value)
-                        setattr(new, field.name, None)
-                        continue
-                    except ObjectDoesNotExist:
-                        msg = 'FK [%s] não encontrada para valor %s ' \
-                            '(em %s %s)' % (
-                                field.name, value,
-                                field.model.__name__, label or '---')
-                        value = make_stub(field.related_model, value)
-                        descricao = 'stub criado para entrada orfã!'
-                        warn(msg + ' => ' + descricao)
-                        save_relation(value, [field.name], msg, descricao,
-                                      eh_stub=True)
-                setattr(new, field.name, value)
-            elif field.model.__name__ == 'TipoAutor' and \
-                    field.name == 'content_type':
-                try:
-                    value = field.related_model.objects.get(
-                        model=normalize(new.descricao.lower()).replace(' ',
-                                                                       ''))
-                except ObjectDoesNotExist:
-                    value = None
-                setattr(new, field.name, value)
+                    setattr(new, field.name, value)
 
-    def migrate(self, obj=appconfs):
+    def migrate(self, obj=appconfs, interativo=True):
         # warning: model/app migration order is of utmost importance
-        self.to_delete = []
-        ProblemaMigracao.objects.all().delete()
-        #get_user_model().objects.exclude(is_superuser=True).delete()
+        exec_sql_file(PROJECT_DIR.child(
+            'sapl', 'legacy', 'scripts', 'fix_tables.sql'), 'legacy')
 
+        # excluindo database antigo.
+        if interativo:
+            info('Todos os dados do banco serão excluidos. '
+                 'Recomendamos que faça backup do banco sapl '
+                 'antes de continuar.')
+            info('Deseja continuar? [s/n]')
+            resposta = input()
+            if resposta.lower() in ['s', 'sim', 'y', 'yes']:
+                pass
+            else:
+                info('Migração cancelada.')
+                return 0
+        info('Excluindo entradas antigas do banco.')
+        call([PROJECT_DIR.child('manage.py'), 'flush',
+              '--database=default', '--no-input'], stdout=PIPE)
+
+        fill_vinculo_norma_juridica()
+        fill_dados_basicos()
         info('Começando migração: %s...' % obj)
         self._do_migrate(obj)
-        # exclude logically deleted in legacy base
-        info('Deletando models com ind_excluido...')
-        while self.to_delete:
-            for obj in self.to_delete:
-                try:
-                    obj.delete()
-                    self.to_delete.remove(obj)
-                except ProtectedError:
-                    msg = 'A entrada de PK %s da model %s não pode ser ' \
-                        'excluida' % (obj.pk, obj._meta.model_name)
-                    descricao = 'Um ou mais objetos protegidos '
-                    warn(msg + ' => ' + descricao)
-                    save_relation(obj=obj, problema=msg,
-                                  descricao=descricao, eh_stub=False)
 
-        info('Deletando stubs desnecessários...')
-        while self.delete_stubs():
-            pass
-        info('Recriando unique constraints...')
-        recreate_constraints()
+        info('Excluindo possíveis duplicações em RegistroVotacao...')
+        excluir_registrovotacao_duplicados()
 
     def _do_migrate(self, obj):
         if isinstance(obj, AppConfig):
@@ -377,26 +381,29 @@ class DataMigrator:
         legacy_model = legacy_app.get_model(legacy_model_name)
         legacy_pk_name = legacy_model._meta.pk.name
 
-        # Clear all model entries
-        # They may have been created in a previous migration attempt
-        try:
-            model.objects.all().delete()
-        except ProtectedError:
-            Proposicao.objects.all().delete()
-            model.objects.all().delete()
-        delete_constraints(model)
-
         # setup migration strategy for tables with or without a pk
         if legacy_pk_name == 'id':
             # There is no pk in the legacy table
             def save(new, old):
-                new.save()
+                with reversion.create_revision():
+                    new.save()
+                    reversion.set_comment('Objeto criado pela migração')
+
+                # apaga registro do legado
+                delete_old(legacy_model, old.__dict__)
 
             old_records = iter_sql_records(
                 'select * from ' + legacy_model._meta.db_table, 'legacy')
         else:
             def save(new, old):
-                save_with_id(new, getattr(old, legacy_pk_name))
+                with reversion.create_revision():
+                    # salva new com id de old
+                    new.id = getattr(old, legacy_pk_name)
+                    new.save()
+                    reversion.set_comment('Objeto criado pela migração')
+
+                # apaga registro do legado
+                delete_old(legacy_model, {legacy_pk_name: new.id})
 
             old_records = legacy_model.objects.all().order_by(legacy_pk_name)
 
@@ -404,50 +411,97 @@ class DataMigrator:
         ajuste_depois_salvar = AJUSTE_DEPOIS_SALVAR.get(model)
 
         # convert old records to new ones
-        for old in old_records:
-            new = model()
-            self.populate_renamed_fields(new, old)
-            if ajuste_antes_salvar:
-                ajuste_antes_salvar(new, old)
-            save(new, old)
-            if ajuste_depois_salvar:
-                ajuste_depois_salvar(new, old)
-            if self.data_mudada:
-                save_relation(**self.data_mudada)
-                self.data_mudada.clear()
-            if getattr(old, 'ind_excluido', False):
-                self.to_delete.append(new)
+        with transaction.atomic():
+            for old in old_records:
+                if getattr(old, 'ind_excluido', False):
+                    # não migramos registros marcados como excluídos
+                    continue
+                new = model()
+                try:
+                    self.populate_renamed_fields(new, old)
+                    if ajuste_antes_salvar:
+                        ajuste_antes_salvar(new, old)
+                except ForeignKeyFaltando:
+                    # tentamos preencher uma FK e o ojeto relacionado
+                    # não existe
+                    # então este é um objeo órfão: simplesmente ignoramos
+                    continue
+                else:
+                    save(new, old)
+                    if ajuste_depois_salvar:
+                        ajuste_depois_salvar(new, old)
 
-    def delete_stubs(self):
-        excluidos = 0
-        for obj in ProblemaMigracao.objects.all():
-            if obj.content_object and obj.eh_stub:
-                original = obj.content_type.get_all_objects_for_this_type(
-                    id=obj.object_id)
-                if stub_desnecessario(original[0]):
-                    qtd_exclusoes, *_ = original.delete()
-                    assert qtd_exclusoes == 1
-                    qtd_exclusoes, *_ = obj.delete()
-                    assert qtd_exclusoes == 1
-                    excluidos = excluidos + 1
-            elif not obj.content_object and not obj.eh_stub:
-                qtd_exclusoes, *_ = obj.delete()
-                assert qtd_exclusoes == 1
-                excluidos = excluidos + 1
-        return excluidos
+                    if self.data_mudada:
+                        with reversion.create_revision():
+                            save_relation(**self.data_mudada)
+                            self.data_mudada.clear()
+                            reversion.set_comment(
+                                'Ajuste de data pela migração')
 
 
-def migrate(obj=appconfs):
+def migrate(obj=appconfs, interativo=True):
     dm = DataMigrator()
-    dm.migrate(obj)
+    dm.migrate(obj, interativo)
 
 
 # MIGRATION_ADJUSTMENTS #####################################################
 
-def adjust_ordemdia(new, old):
-    # Prestar atenção
+def adjust_acompanhamentomateria(new, old):
+    new.confirmado = True
+
+
+def adjust_documentoadministrativo(new, old):
+    if new.numero_protocolo:
+        protocolo = Protocolo.objects.filter(
+            numero=new.numero_protocolo, ano=new.ano)
+        if not protocolo:
+            protocolo = Protocolo.objects.filter(
+                numero=new.numero_protocolo, ano=new.ano + 1)
+            print('PROTOCOLO ENCONTRADO APENAS PARA O ANO SEGUINTE!!!!! '
+                  'DocumentoAdministrativo: {}, numero_protocolo: {}, '
+                  'ano doc adm: {}'.format(
+                      old.cod_documento, new.numero_protocolo, new.ano))
+        if not protocolo:
+            raise ForeignKeyFaltando(
+                'Protocolo {} faltando '
+                '(referenciado no documento administrativo {}'.format(
+                    new.numero_protocolo, old.cod_documento))
+        assert len(protocolo) == 1
+        new.protocolo = protocolo[0]
+
+
+def adjust_mandato(new, old):
+    if old.dat_fim_mandato:
+        new.data_fim_mandato = old.dat_fim_mandato
+    if not new.data_fim_mandato:
+        legislatura = Legislatura.objects.latest('data_fim')
+        new.data_fim_mandato = legislatura.data_fim
+        new.data_expedicao_diploma = legislatura.data_inicio
+    if not new.data_inicio_mandato:
+        new.data_inicio_mandato = new.legislatura.data_inicio
+        new.data_fim_mandato = new.legislatura.data_fim
+
+
+def adjust_ordemdia_antes_salvar(new, old):
+    new.votacao_aberta = False
+
     if not old.tip_votacao:
         new.tipo_votacao = 1
+
+    if old.num_ordem is None:
+        new.numero_ordem = 999999999
+
+
+def adjust_ordemdia_depois_salvar(new, old):
+    if old.num_ordem is None and new.numero_ordem == 999999999:
+        with reversion.create_revision():
+            problema = 'OrdemDia de PK %s tinha seu valor de numero ordem'\
+                ' nulo.' % old.pk
+            descricao = 'O valor %s foi colocado no lugar.' % new.numero_ordem
+            warn(problema + ' => ' + descricao)
+            save_relation(obj=new, problema=problema,
+                          descricao=descricao, eh_stub=False)
+            reversion.set_comment('OrdemDia sem número da ordem.')
 
 
 def adjust_parlamentar(new, old):
@@ -463,7 +517,7 @@ def adjust_parlamentar(new, old):
 
 def adjust_participacao(new, old):
     composicao = Composicao()
-    composicao.comissao, composicao.periodo = [
+    composicao.comissao_id, composicao.periodo_id = [
         get_fk_related(Composicao._meta.get_field(name), value)
         for name, value in (('comissao', old.cod_comissao),
                             ('periodo', old.cod_periodo_comp))]
@@ -474,21 +528,97 @@ def adjust_participacao(new, old):
         assert len(already_created) == 1  # we must never have made 2 copies
         [composicao] = already_created
     else:
-        composicao.save()
+        with reversion.create_revision():
+            composicao.save()
+            reversion.set_comment('Objeto criado pela migração')
     new.composicao = composicao
 
 
-def adjust_sessaoplenaria(new, old):
-    assert not old.tip_expediente
+def adjust_proposicao_antes_salvar(new, old):
+    if new.data_envio:
+        new.ano = new.data_envio.year
+
+
+def adjust_proposicao_depois_salvar(new, old):
+    if not hasattr(old.dat_envio, 'year') or old.dat_envio.year == 1800:
+        msg = "O valor do campo data_envio (DateField) da model Proposicao"\
+            " era inválido"
+        descricao = 'A data 1111-11-11 foi colocada no lugar'
+        problema = 'O valor da data era nulo ou inválido'
+        warn(msg + ' => ' + descricao)
+        new.data_envio = date(1111, 11, 11)
+        with reversion.create_revision():
+            save_relation(obj=new, problema=problema,
+                          descricao=descricao, eh_stub=False)
+            reversion.set_comment('Ajuste de data pela migração')
+
+
+def adjust_normarelacionada(new, old):
+    tipo = TipoVinculoNormaJuridica.objects.filter(sigla=old.tip_vinculo)
+    assert len(tipo) == 1
+    new.tipo_vinculo = tipo[0]
+
+
+def adjust_protocolo_antes_salvar(new, old):
+    if old.num_protocolo is None:
+        new.numero = old.cod_protocolo
+
+
+def adjust_protocolo_depois_salvar(new, old):
+    if old.num_protocolo is None:
+        with reversion.create_revision():
+            problema = 'Número do protocolo de PK %s é nulo' % new.pk
+            descricao = 'Número do protocolo alterado para %s!' % new.numero
+            warn(problema + ' => ' + descricao)
+            save_relation(obj=new, problema=problema,
+                          descricao=descricao, eh_stub=False)
+            reversion.set_comment('Número de protocolo teve que ser alterado')
+
+
+def adjust_registrovotacao_antes_salvar(new, old):
+    ordem_dia = OrdemDia.objects.filter(
+        pk=old.cod_ordem, materia=old.cod_materia)
+    expediente_materia = ExpedienteMateria.objects.filter(
+        pk=old.cod_ordem, materia=old.cod_materia)
+
+    if ordem_dia and not expediente_materia:
+        new.ordem = ordem_dia[0]
+    if not ordem_dia and expediente_materia:
+        new.expediente = expediente_materia[0]
+
+
+def adjust_registrovotacao_depois_salvar(new, old):
+    if not new.ordem and not new.expediente:
+        with reversion.create_revision():
+            problema = 'RegistroVotacao de PK %s não possui nenhuma OrdemDia'\
+                ' ou ExpedienteMateria.' % old.pk
+            descricao = 'RevistroVotacao deve ter no mínimo uma ordem do dia'\
+                ' ou expediente vinculado.'
+            warn(problema + ' => ' + descricao)
+            save_relation(obj=new, problema=problema,
+                          descricao=descricao, eh_stub=False)
+            reversion.set_comment('RegistroVotacao sem ordem ou expediente')
+
+
+def adjust_tipoafastamento(new, old):
+    if old.ind_afastamento == 1:
+        new.indicador = 'A'
 
 
 def adjust_tipoproposicao(new, old):
     if old.ind_mat_ou_doc == 'M':
-        new.tipo_conteudo_related = TipoMateriaLegislativa.objects.get(
+        tipo_materia = TipoMateriaLegislativa.objects.filter(
             pk=old.tip_mat_ou_doc)
+        if tipo_materia:
+            new.tipo_conteudo_related = tipo_materia[0]
+        else:
+            raise ForeignKeyFaltando
     elif old.ind_mat_ou_doc == 'D':
-        new.tipo_conteudo_related = TipoDocumento.objects.get(
-            pk=old.tip_mat_ou_doc)
+        tipo_documento = TipoDocumento.objects.filter(pk=old.tip_mat_ou_doc)
+        if tipo_documento:
+            new.tipo_conteudo_related = tipo_documento[0]
+        else:
+            raise ForeignKeyFaltando
 
 
 def adjust_statustramitacao(new, old):
@@ -509,6 +639,14 @@ def adjust_tramitacao(new, old):
         new.turno = 'U'
 
 
+def adjust_tipo_autor(new, old):
+    model_apontado = normalize(new.descricao.lower()).replace(' ', '')
+    content_types = ContentType.objects.filter(
+        model=model_apontado).exclude(app_label='legacy')
+    assert len(content_types) <= 1
+    new.content_type = content_types[0] if content_types else None
+
+
 def adjust_normajuridica_antes_salvar(new, old):
     # Ajusta choice de esfera_federacao
     # O 'S' vem de 'Selecionar'. Na versão antiga do SAPL, quando uma opção do
@@ -521,36 +659,80 @@ def adjust_normajuridica_antes_salvar(new, old):
 
 def adjust_normajuridica_depois_salvar(new, old):
     # Ajusta relação M2M
-    lista_pks_assunto = old.cod_assunto.split(',')
+
+    if not old.cod_assunto:  # it can be null or empty
+        return
+
+    # lista de pks separadas por vírgulas (ignorando strings vazias)
+    lista_pks_assunto = [int(pk) for pk in old.cod_assunto.split(',') if pk]
+
     for pk_assunto in lista_pks_assunto:
-        new.assuntos.add(AssuntoNorma.objects.get(pk=pk_assunto))
+        try:
+            new.assuntos.add(AssuntoNorma.objects.get(pk=pk_assunto))
+        except ObjectDoesNotExist:
+            pass  # ignora assuntos inexistentes
 
 
 def adjust_autor(new, old):
     if old.cod_parlamentar:
-        new.autor_related = Parlamentar.objects.get(pk=old.cod_parlamentar)
+        try:
+            new.autor_related = Parlamentar.objects.get(pk=old.cod_parlamentar)
+        except ObjectDoesNotExist:
+            # ignoramos o autor órfão
+            raise ForeignKeyFaltando('Parlamentar inexiste para autor')
+        else:
+            new.nome = new.autor_related.nome_parlamentar
+
     elif old.cod_comissao:
-        new.autor_related = Comissao.objects.get(pk=old.cod_comissao)
+        try:
+            new.autor_related = Comissao.objects.get(pk=old.cod_comissao)
+        except ObjectDoesNotExist:
+            # ignoramos o autor órfão
+            raise ForeignKeyFaltando('Comissao inexiste para autor')
+        else:
+            new.nome = new.autor_related.nome
 
     if old.col_username:
-        if not get_user_model().objects.filter(
-                username=old.col_username).exists():
-            user = get_user_model()(
-                username=old.col_username, password=12345)
-            user.save()
-            new.user = user
-        else:
-            new.user = get_user_model().objects.filter(
-                username=old.col_username)[0]
+        user_model = get_user_model()
+        if not user_model.objects.filter(username=old.col_username).exists():
+            # cria um novo ususaŕio para o autor
+            user = user_model(username=old.col_username)
+            user.set_password(12345)
+            with reversion.create_revision():
+                user.save()
+                reversion.set_comment(
+                    'Usuário criado pela migração para o autor {}'.format(
+                        old.cod_autor))
+            grupo_autor = Group.objects.get(name="Autor")
+            user.groups.add(grupo_autor)
+
+
+def adjust_comissao(new, old):
+    if not old.dat_extincao and not old.dat_fim_comissao:
+        new.ativa = True
+    elif old.dat_extincao and date.today() < new.data_extincao or \
+            old.dat_fim_comissao and date.today() < new.data_fim_comissao:
+        new.ativa = True
+    else:
+        new.ativa = False
 
 
 AJUSTE_ANTES_SALVAR = {
     Autor: adjust_autor,
+    TipoAutor: adjust_tipo_autor,
+    AcompanhamentoMateria: adjust_acompanhamentomateria,
+    Comissao: adjust_comissao,
+    DocumentoAdministrativo: adjust_documentoadministrativo,
+    Mandato: adjust_mandato,
     NormaJuridica: adjust_normajuridica_antes_salvar,
-    OrdemDia: adjust_ordemdia,
+    NormaRelacionada: adjust_normarelacionada,
+    OrdemDia: adjust_ordemdia_antes_salvar,
     Parlamentar: adjust_parlamentar,
     Participacao: adjust_participacao,
-    SessaoPlenaria: adjust_sessaoplenaria,
+    Proposicao: adjust_proposicao_antes_salvar,
+    Protocolo: adjust_protocolo_antes_salvar,
+    RegistroVotacao: adjust_registrovotacao_antes_salvar,
+    TipoAfastamento: adjust_tipoafastamento,
     TipoProposicao: adjust_tipoproposicao,
     StatusTramitacao: adjust_statustramitacao,
     StatusTramitacaoAdministrativo: adjust_statustramitacaoadm,
@@ -559,34 +741,22 @@ AJUSTE_ANTES_SALVAR = {
 
 AJUSTE_DEPOIS_SALVAR = {
     NormaJuridica: adjust_normajuridica_depois_salvar,
+    OrdemDia: adjust_ordemdia_depois_salvar,
+    Proposicao: adjust_proposicao_depois_salvar,
+    Protocolo: adjust_protocolo_depois_salvar,
+    RegistroVotacao: adjust_registrovotacao_depois_salvar,
 }
 
 # CHECKS ####################################################################
 
 
-def get_ind_excluido(obj):
-    legacy_model = legacy_app.get_model(type(obj).__name__)
-    return getattr(legacy_model.objects.get(
-        **{legacy_model._meta.pk.name: obj.id}), 'ind_excluido', False)
+def get_ind_excluido(new):
+    legacy_model = legacy_app.get_model(type(new).__name__)
+    old = legacy_model.objects.get(**{legacy_model._meta.pk.name: new.id})
+    return getattr(old, 'ind_excluido', False)
 
 
 def check_app_no_ind_excluido(app):
     for model in app.models.values():
-        assert not any(get_ind_excluido(obj) for obj in model.objects.all())
+        assert not any(get_ind_excluido(new) for new in model.objects.all())
     print('OK!')
-
-# MOMMY MAKE WITH LOG  ######################################################
-
-
-def make_with_log(model, _quantity=None, make_m2m=False, **attrs):
-    fields_dict = get_fields_dict(model)
-    stub = make(model, _quantity, make_m2m, **fields_dict)
-    problema = 'Um stub foi necessário durante a criação de um outro stub'
-    descricao = 'Essa entrada é necessária para um dos stubs criados'
-    ' anteriormente'
-    warn(problema)
-    save_relation(obj=stub, problema=problema,
-                  descricao=descricao, eh_stub=True)
-    return stub
-
-make_with_log.required = foreign_key_required
