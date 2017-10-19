@@ -1480,9 +1480,20 @@ main {
   }
 }
 
+.page:not(#pagina-inicial) {
+  .path-item-list {
+    //margin-top: $grid-gutter-width;
+    position: relative;
+    &:hover {
+      background: $color_main_bg url(/static/img/bg.png);
+    }
+  }
+
+}
 
 .path-item-list {
-  //margin-top: $grid-gutter-width;
+  padding-top: $grid-gutter-width / 4;
+  margin-bottom: $grid-gutter-width / 2;
   position: relative;
   .inner {
     z-index: 2000;
@@ -1511,7 +1522,7 @@ main {
       color: #006556;
       font-size: 90%;
       padding: 0;
-      padding-bottom: $grid-gutter-width;
+      padding-bottom: $grid-gutter-width / 2;
     }
 
     .data-pub {
@@ -1521,7 +1532,7 @@ main {
       text-align: center;
       padding-top: 0px;
       position: absolute;
-      top:1px;
+      top:5px;
       left:$grid-gutter-width / 1.5;
       border-top: 1px solid #ccc;
     }
@@ -1624,33 +1635,37 @@ main {
         position: relative;
       }
     }
+
+    .navbar-social-links {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      a {
+        i {
+          text-shadow: 0px 0px 10px rgba(0,0,0,0.4);
+          color: #ddd;
+        }
+        &:hover {
+          i {
+
+            text-shadow: none;
+            color: white;
+          }
+        }
+      }
+    }
   }
   .path-header {
     //border-bottom: 1px solid $color_topo_bg;;
     position: relative;
     box-shadow: -3px 1px 3px 0 rgba(0,0,0,0.25), 5px 1px 100px 0 rgba(#fff, 0.5);
-    background: $color_main_bg url(/static/img/bg.png);
+    background: darken($color_main_bg,5) url(/static/img/bg.png);
   }
   .path-title {
+    padding-top: 4px;
     margin: 0;
     line-height: 2em;
     text-align: right;
-  }
-  .navbar-social-links {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    a {
-      i {
-        color: rgba(#fff, 0.6);
-      }
-      &:hover {
-        i {
-          color: rgba(white, 1);
-        }
-      }
-    }
-
   }
   .path-parlamentares {
     margin: 0 0 0 20px;

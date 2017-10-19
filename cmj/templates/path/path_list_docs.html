@@ -20,7 +20,7 @@
               {% if imagem %}
                 <div class="path-imagem {{imagem.css_class}}">
                   <div class="imagem" style="background-image: url(/{{imagem.absolute_slug}}.512)"></div>
-                  <a class="img-contexto" href="{% url 'cmj.sigad:path_view' documento.absolute_slug %}">
+                  <a class="img-contexto" href="{% if prefixo_slug %}/{{prefixo_slug}}{% endif %}/{{documento.absolute_slug }}">
                     <div class="texto">
                       <div class="titulo">{{imagem.titulo|default:''}}</div>
                     </div>
@@ -49,7 +49,7 @@
 
           {% if not pagina_inicial %}
             <div class="titulo">
-              <a href="/{{prefixo_slug}}{% url 'cmj.sigad:path_view' documento.absolute_slug %}">
+              <a href="{% if prefixo_slug %}/{{prefixo_slug}}{% endif %}/{{documento.absolute_slug }}">
                 {{documento.titulo}}
               </a>
             </div>
@@ -57,7 +57,7 @@
 
           {% if pagina_inicial %}
             <div class="row">
-              <div class="col-xs-3 col-md-push-9">
+              <div class="col-xs-3 col-xs-push-9">
           {% endif %}
 
           {% for parlamentar in documento.parlamentares.all %}
@@ -87,7 +87,7 @@
           {% if pagina_inicial %}
             <div class="clearfix"></div>
             </div>
-            <div class="col-xs-9 col-md-pull-3">
+            <div class="col-xs-9 col-xs-pull-3">
               <div class="titulo">
                 <a href="/{{documento.url_prefixo_parlamentar}}/{{documento.absolute_slug}}">
                   {{documento.titulo}}
@@ -96,8 +96,12 @@
           {% endif %}
 
           {% if documento.descricao %}
+
             <div class="descricao">
               {{documento.descricao|striptags|safe}}
+              {% if not pagina_inicial and documento.tipo = documento.STATUS_PUBLIC %}
+                {% social_link_share documento 'pull-right'%}
+              {% endif %}
             </div>
           {% endif %}
 
