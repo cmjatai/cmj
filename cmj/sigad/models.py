@@ -432,6 +432,14 @@ class Classe(ShortUrl, CMSMixin):
             ('view_pathclasse', _('Visualização de Classe via Path')),
         )
 
+    def imagem_representativa(self):
+
+        return self.parlamentar
+
+    def imagem_representativa_metatags(self):
+
+        return self.parlamentar
+
     @cached_property
     def conta(self):
         ct = [str(p.codigo) for p in self.parents]
@@ -641,6 +649,19 @@ class Documento(ShortUrl, CMSMixin):
             sufix='.page'
             if self.tipo == Documento.TPD_IMAGE else None)
 
+    def url_prefixo_parlamentar(self):
+        if self.parlamentares.count() != 1:
+            return ''
+
+        p = self.parlamentares.first()
+
+        c = p.classe_set.first()
+
+        if not c:
+            return ''
+
+        return c.absolute_slug
+
     @cached_property
     def css_class(self):
         classes = {self.ALINHAMENTO_LEFT: 'alinhamento-left',
@@ -741,6 +762,7 @@ def media_path(instance, filename):
         instance.midia.documento_id,
         instance.midia_id,
         filename)
+
 
 media_protected = FileSystemStorage(
     location=settings.MEDIA_PROTECTED_ROOT, base_url='DO_NOT_USE')

@@ -9,7 +9,6 @@
   {% endif %}
     <div class="path-item-list">
       <div class="inner">
-        {% comment %} primeiro container, o primeiro item {% endcomment %}
         {% with documento.childs.view_childs.first as primeiro_container %}
           {% with primeiro_container.childs.view_childs.first as primeiro_item %}
             {% if primeiro_item.tipo == primeiro_item.TPD_IMAGE %}

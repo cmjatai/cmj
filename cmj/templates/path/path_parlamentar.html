@@ -1,34 +1,56 @@
 {% extends "base_path.html" %}
-{% load i18n sigad_filters %}
+{% load i18n sigad_filters staticfiles social_utils%}
 
 {% block main_container_class %}container-path container-path-parlamentar{% endblock %}
 {% block base_header %}
+  <div class="container-fluid container-topo-parlamentar">
+    <div class="inner">
+      <div class="path-capa" style="background-image: url({{ object.parlamentar.fotografia.url }});">
+          <div class="container-social">
+            <div class="container">
+              {% social_link_share object %}
+
+            </div>
+          </div>
+      </div>
+
+      <div class="path-header">
+        <div class="container">
+          {% block title %}
+            {{block.super}}
+          {% endblock %}
+          <div class="path-parlamentares">
+            <a class="avatar avatar1" href="/{{ object.absolute_slug }}">
+              {% if object.parlamentar.fotografia %}
+                  <img src="{{ object.parlamentar.fotografia.url }}">
+              {% else %}
+                  <img src="{% static 'img/perfil.jpg' %}">
+              {% endif %}
+            </a>
+          </div>
+        </div>
+      </div>
+
+
+
+    </div>
+  </div>
+
   {% block controls_content %}
     {% if perms.sigad.change_classe %}
       <a href="{% url 'cmj.sigad:classe_edit' object.id %}">{% trans "[Editar]" %}</a>
     {% endif %}
   {% endblock %}
-  <div class="container">
-    <div class="path-parlamentares">
-    {% if object.parlamentar.fotografia %}
-      <a class="avatar avatar1" href="/{{ object.absolute_slug }}">
-        <img src="{{ object.parlamentar.fotografia.url }}">
-      </a>
-    {% endif %}
-    </div>
-    {% block title %}
-      {{block.super}}
-    {% endblock %}
-  </div>
-
 {% endblock %}
 
 {% block base_content %}
 
   <div class="container">
-    {% with 3 as split_row %}
-      {% with 'path-item-list col-md-4' as css_class %}
-        {% include "path/path_list_docs.html" %}
+    {% with slug|join:'/' as prefixo_slug %}
+      {% with 3 as split_row %}
+        {% with 'path-item-list col-md-4' as css_class %}
+          {% include "path/path_list_docs.html" %}
+        {% endwith %}
       {% endwith %}
     {% endwith %}
     {% include "paginacao.html" %}

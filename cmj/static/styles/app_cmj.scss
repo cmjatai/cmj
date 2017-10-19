@@ -1523,7 +1523,7 @@ main {
       position: absolute;
       top:1px;
       left:$grid-gutter-width / 1.5;
-      border-top: 1px solid #aaa;
+      border-top: 1px solid #ccc;
     }
     &:hover {
       .path-imagem {
@@ -1603,22 +1603,72 @@ main {
 }
 
 .container-path-parlamentar {
+  margin-top: 0px;
+  .container-topo-parlamentar {
+    margin-top: -1 * $grid-gutter-width;
+    margin-bottom: $grid-gutter-width * 2;
+    padding: 0px;
+  }
+  .path-capa {
+    height: 400px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: 50% center;
+    position: relative;
+    .container-social {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      left: 0;
+      .container {
+        position: relative;
+      }
+    }
+  }
+  .path-header {
+    //border-bottom: 1px solid $color_topo_bg;;
+    position: relative;
+    box-shadow: -3px 1px 3px 0 rgba(0,0,0,0.25), 5px 1px 100px 0 rgba(#fff, 0.5);
+    background: $color_main_bg url(/static/img/bg.png);
+  }
+  .path-title {
+    margin: 0;
+    line-height: 2em;
+    text-align: right;
+  }
+  .navbar-social-links {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    a {
+      i {
+        color: rgba(#fff, 0.6);
+      }
+      &:hover {
+        i {
+          color: rgba(white, 1);
+        }
+      }
+    }
+
+  }
   .path-parlamentares {
-    float: left;
-    margin: 0 0 10px 0;
+    margin: 0 0 0 20px;
+    position: absolute;
+    bottom: -70%;
     &:first-child {
       margin-top: 0px;
     }
     .avatar {
       margin: 0;
       opacity: 1;
-      border-radius: 0 50% 50% 0;
+      border-radius: 50%;
       background-color: white;
       img {
         opacity: 0.75;
         transition: opacity 0.3s ease;
-        border: 2px solid $color_topo_bg;
-        padding: 3px;
+        padding: 6px;
+        box-shadow: 5px 1px 30px 0 rgba(#fff, 0.6);
       }
       &:hover {
         img {
@@ -1627,11 +1677,6 @@ main {
         }
       }
     }
-  }
-  .path-title {
-    border-bottom: 2px solid rgba($color_topo_bg, 0.7);
-    font-size: 200%;
-    margin-top: 0em;
   }
   .path-item-list {
     .path-parlamentares {
@@ -1773,6 +1818,7 @@ main {
         position: static;
         text-align: right;
         padding: 0 0 5px;
+        border: 0px;
       }
     }
   }
@@ -2043,6 +2089,18 @@ main {
       }
     }
   }
+
+  .path-parlamentares {
+    .avatar1 {
+      width: 200px;
+    }
+  }
+
+  .container-path-parlamentar {
+    .path-capa {
+      height: 300px;
+    }
+  }
 }
 
 @media screen and (max-width: 991px) {
@@ -2289,6 +2347,25 @@ main {
         padding: 6px 3px 3px 10px;
         text-indent: -5px;
       }
+    }
+  }
+
+  .container-path-parlamentar {
+    .container-topo-parlamentar {
+      margin-bottom: $grid-gutter-width;
+    }
+    .path-parlamentares {
+      margin-left: 5px;
+      bottom: -40%;
+      .avatar {
+        img {
+          box-shadow: 3px 1px 20px 0 rgba(255, 255, 255, 0.6);
+          padding: 4px;
+        }
+      }
+    }
+    .path-title {
+      line-height: 1.9em;
     }
   }
 }
@@ -2792,7 +2869,6 @@ main {
       }
     }
   }
-
 }
 
 @media screen and (max-width: 480px) {

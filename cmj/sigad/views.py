@@ -187,6 +187,10 @@ class PathView(MultipleObjectMixin, TemplateView):
             else:
                 parlamentares = self.documento.parlamentares.all()
 
+                if hasattr(self, 'parlamentar') and self.parlamentar:
+                    parlamentares = parlamentares.filter(
+                        pk=self.parlamentar.parlamentar.pk)
+
                 if self.documento.public_date:
 
                     if parlamentares:
@@ -194,14 +198,14 @@ class PathView(MultipleObjectMixin, TemplateView):
                         next = Documento.objects.view_public_docs().filter(
                             public_date__gte=self.documento.public_date,
                             classe=self.documento.classe,
-                            parlamentares=parlamentares,
+                            parlamentares__in=parlamentares,
                         ).exclude(
                             id=self.documento.id).last()
 
                         previous = Documento.objects.view_public_docs().filter(
                             public_date__lte=self.documento.public_date,
                             classe=self.documento.classe,
-                            parlamentares=parlamentares,
+                            parlamentares__in=parlamentares,
                         ).exclude(
                             id=self.documento.id).first()
                     else:
@@ -298,15 +302,18 @@ class PathView(MultipleObjectMixin, TemplateView):
         if not slug:
             raise Http404()
 
-        return self._dispatch(request, *args, **kwargs)
+        self._pre_dispatch(request, *args, **kwargs)
 
-    def _dispatch(self, request, *args, **kwargs):
+        return TemplateView.dispatch(self, request, *args, **kwargs)
+
+    def _pre_dispatch(self, request, *args, **kwargs):
 
         slug = kwargs.get('slug', '')
 
         if isinstance(slug, str):
             slug = slug.split('/')
             slug = [s for s in slug if s]
+        slug = list(filter(lambda x: x, slug))
 
         referente = None
         try:
@@ -404,8 +411,6 @@ class PathView(MultipleObjectMixin, TemplateView):
                     else:
                         raise Http404()
 
-        return TemplateView.dispatch(self, request, *args, **kwargs)
-
 
 class PathParlamentarView(PathView):
 
@@ -416,14 +421,19 @@ class PathParlamentarView(PathView):
 
         slug = kwargs.get('slug', '')
 
-        if not slug:
-            kwargs['slug'] = ['parlamentar', kwargs['parlamentar']]
+        if slug:
+            self._pre_dispatch(request, *args, **kwargs)
 
-        return self._dispatch(request, *args, **kwargs)
+        # recupera classe de parlamentar avaliando permissões
+        kwargs['slug'] = ['parlamentar', kwargs['parlamentar']]
+        self._pre_dispatch(request, *args, **kwargs)
+        self.parlamentar = self.classe
+
+        return TemplateView.dispatch(self, request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
 
-        if self.classe.template_classe != \
+        if self.parlamentar.template_classe != \
                 CLASSE_TEMPLATES_CHOICE.parlamentares:
             return PathView.get_context_data(self, **kwargs)
 
