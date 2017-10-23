@@ -151,9 +151,8 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'social_django.context_processors.backends',
                 'social_django.context_processors.login_redirect',
-
-
                 'cmj.context_processors.areatrabalho',
+                'cmj.context_processors.debug',
             ],
             'debug': DEBUG,
             'loaders': ['django.template.loaders.filesystem.Loader',
