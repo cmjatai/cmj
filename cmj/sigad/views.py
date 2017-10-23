@@ -424,6 +424,7 @@ class PathParlamentarView(PathView):
         if slug:
             self._pre_dispatch(request, *args, **kwargs)
 
+        classe = self.classe
         # recupera classe de parlamentar avaliando permissões
         kwargs['slug'] = ['parlamentar', kwargs['parlamentar']]
         self._pre_dispatch(request, *args, **kwargs)
@@ -435,9 +436,11 @@ class PathParlamentarView(PathView):
 
         if self.parlamentar.template_classe != \
                 CLASSE_TEMPLATES_CHOICE.parlamentares:
-            return PathView.get_context_data(self, **kwargs)
+            context = PathView.get_context_data(self, **kwargs)
 
-        context = TemplateView.get_context_data(self, **kwargs)
+        else:
+            context = TemplateView.get_context_data(self, **kwargs)
+            context['object'] = self.classe
 
         return context
 

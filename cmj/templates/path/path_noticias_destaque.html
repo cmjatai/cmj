@@ -13,7 +13,7 @@
           {% with primeiro_container.childs.view_childs.first as primeiro_item %}
             {% if primeiro_item.tipo == primeiro_item.TPD_IMAGE %}
               <div class="path-imagem alinhamento-justify">
-                <div class="imagem" style="background-image: url(/{{primeiro_item.absolute_slug}}.512)"></div>
+                <div class="imagem" style="background-image: url(/{{primeiro_item.absolute_slug}}.1024)"></div>
                 <a class="img-contexto" href="{% url 'cmj.sigad:path_view' documento.absolute_slug %}">
                 </a>
                 <div class="autor">{{primeiro_item.autor|default:''}}</div>
