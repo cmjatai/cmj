@@ -9,6 +9,9 @@
 <div class="albuns-show-gallery hidden">
 
 </div>
+  <form class="hidden" method="post">
+    {% csrf_token %}
+  </form>
 <div class="row">
   {% for galeria in object_list %}
     <div class="col-md-4 col-xs-6">
@@ -51,8 +54,16 @@
 {% block extra_js  %}
   <script type="text/javascript">
     $(document).ready(function(){
+      var csrfmiddlewaretoken = $('input[name="csrfmiddlewaretoken"]')[0].value
+
+      var form_data = {
+        'csrfmiddlewaretoken': csrfmiddlewaretoken
+      }
+
       $('.container-albuns .show-contexto > a').click(function() {
-        $.get(this.href).done(function(data) {
+
+        $.post(this.href, form_data)
+          .done(function(data) {
           $('.albuns-show-gallery').removeClass('hidden').html(data);
           $('.albuns-show-gallery .btn-close').removeClass('hidden').click(function() {
             $('.albuns-show-gallery').html('').addClass('hidden');

@@ -34,7 +34,7 @@ from django.core.files.temp import NamedTemporaryFile
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.core.validators import slug_re
 from django.db.models.aggregates import Max, Count
-from django.http.response import Http404, HttpResponse
+from django.http.response import Http404, HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
 from django.utils.dateparse import parse_date
@@ -109,6 +109,9 @@ class PathView(MultipleObjectMixin, TemplateView):
     referencia = None
     paginate_by = 31
 
+    def post(self, request, *args, **kwargs):
+        return self.get(request, *args, **kwargs)
+
     def get(self, request, *args, **kwargs):
 
         print(self.kwargs['slug'])
@@ -164,6 +167,10 @@ class PathView(MultipleObjectMixin, TemplateView):
                     'inline; filename=%s.zip' % self.documento.parents[0].slug
 
                 return response
+
+            elif self.documento.tipo == Documento.TPD_GALLERY and \
+                    request.META['REQUEST_METHOD'] == 'GET':
+                return HttpResponseForbidden()
 
         return TemplateView.get(self, request, *args, **kwargs)
 
@@ -441,6 +448,10 @@ class PathParlamentarView(PathView):
         else:
             context = TemplateView.get_context_data(self, **kwargs)
             context['object'] = self.classe
+
+            context['legislaturas'] = Legislatura.objects.all()
+
+            # for l in Legislatura.objects.all():
 
         return context
 
