@@ -531,6 +531,10 @@ a:hover {
 .body-path, .html-path {
 
 }
+.bg-back-image {
+  background: $color_main_bg url(/static/img/bg.png);
+
+}
 
 .container-box, .container-box-fluid {
   background-color: $color_container_bg;
@@ -539,13 +543,12 @@ a:hover {
   transition: all 1s ease;
 }
 
+.container-fluid {
+  margin: 0;
+}
+
 main {
-  .container-fluid {
-    margin: 0;
-  }
-  .container.container-box {
-    //margin-top: 20px;
-  }
+
 
   .item-action-or-input {
     border-color: darken($color_main_bg, 10%);
@@ -1423,20 +1426,8 @@ main {
     }
   }
 }
-.path-parlamentares {
-  float: right;
-  clear: right;
-  text-align: right;
-  margin: $grid-gutter-width 0 0px 10px;
 
-  &:first-child {
-    margin-top: $grid-gutter-width * 3;
-  }
-
-  &:last-of-type {
-    margin-bottom: $grid-gutter-width;
-  }
-
+.container-avatar {
   .avatar {
     padding: 0 0 0 0;
     display: inline-block;
@@ -1454,13 +1445,6 @@ main {
       opacity: 1;
     }
   }
-
-  .linebreak {
-    display: none;
-    &:nth-child(5n) {
-      display: block;
-    }
-  }
   .avatar1 {
     width: 250px;
   }
@@ -1475,6 +1459,29 @@ main {
   }
   .avatar5 {
     width: 70px;
+  }
+}
+
+.path-parlamentares {
+  @extend .container-avatar;
+  float: right;
+  clear: right;
+  text-align: right;
+  margin: $grid-gutter-width 0 0px 10px;
+
+  &:first-child {
+    margin-top: $grid-gutter-width * 3;
+  }
+
+  &:last-of-type {
+    margin-bottom: $grid-gutter-width;
+  }
+
+  .linebreak {
+    display: none;
+    &:nth-child(5n) {
+      display: block;
+    }
   }
 }
 
@@ -1837,7 +1844,116 @@ main {
   }
 }
 
+.container-legislaturas {
+  padding: 0px;
+  margin-top: -$grid-gutter-width;
+  position: relative;
+  font-family: "Lato";
+  text-align: center;
+  a {
+    color: black;
+    line-height: 45px;
+    display: inline-block;
+    vertical-align: middle;
+    border: 1px solid transparent;
+    span, small {
+      white-space: nowrap;
+      display: block;
+    }
+  }
+  .active {
+    @extend .bg-back-image;
+    font-weight: bold;
+    font-size: 140%;
+    background-color: $hover_background_10p;
+  }
+  .selected {
+    color:gray;
+    border: 1px solid #bbb;
+    border-radius: 3px;
+  }
+  .tags {
+    display: block;
+    text-align: left;
+    font-size: 130%;
+    font-variant: small-caps;
+    &:hover {
+      text-decoration: none;
+    }
+  }
+  .inner-topo {
+    padding: $grid-gutter-width 0;
+    @extend .bg-back-image;
+  }
+  .inner-legis {
+    padding: $grid-gutter-width;
+  }
+  .inner-titulo {
+    line-height: 3.5em;
+    font-size: 180%;
+    padding: 0 $grid-gutter-width;
+    border-radius: 10px;
+  }
+  .inner-sessoes {
+    border: solid white;
+    border-width: 0px 0 0 2px;
+    padding-bottom: $grid-gutter-width;
+    a {
+      border: 1px solid #bbb;
+      border-radius: 3px;
+      padding: 0px 15px;
+      margin: 0 $grid-gutter-width / 3 $grid-gutter-width;
+      &:hover {
+        border-color: $color_topo_bg;
+        background: $color_topo_bg;
+        color: white;
+      }
+    }
+  }
+  .inner-legis {
+    font-size: 120%;
+    border: solid white;
+    border-width: 2px 0 0 0px;
+  }
 
+  .avatar {
+    margin: 1em;
+  }
+  .inner-mesa {
+    text-align: left;
+    border: solid white;
+    border-width: 2px 0 0 2px;
+    a {
+      line-height: 1.2;
+        text-align: center;
+    }
+  }
+  .inner-ativos {
+    @extend .bg-back-image;
+    background-color: $hover_background_05p;
+    padding-bottom: $grid-gutter-width * 2;
+    .avatar {
+      margin: 0.5em;
+    }
+  }
+  .inner-inativos {
+    @extend .bg-back-image;
+    background-color: $hover_background_10p;
+    min-height: 0px;
+    .avatar {
+      opacity: 0.5;
+    }
+  }
+  .inner-suplentes {
+    @extend .bg-back-image;
+    background-color: $hover_background_20p;
+    min-height: 0px;
+  }
+
+
+
+
+}
 
 // #### pagina inicial ########################################
 #pagina-inicial {
@@ -3188,6 +3304,15 @@ main {
     font-size: 28px;
     padding: 0 0 0 30px;
   }
+
+  .container-legislaturas {
+    .avatar2 {
+        width: 200px;
+    }
+    .avatar3 {
+        width: 140px;
+    }
+  }
 }
 
 @media screen and (min-width: 1281px) {
@@ -3209,6 +3334,14 @@ main {
 
 @media screen and (min-width: 1400px) {
 
+  .container-legislaturas {
+    .avatar2 {
+        width: 250px;
+    }
+    .avatar3 {
+        width: 190px;
+    }
+  }
 }
 
 @media print {

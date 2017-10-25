@@ -33,6 +33,7 @@ from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.core.validators import slug_re
+from django.db.models import F
 from django.db.models.aggregates import Max, Count
 from django.http.response import Http404, HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect
@@ -449,9 +450,82 @@ class PathParlamentarView(PathView):
             context = TemplateView.get_context_data(self, **kwargs)
             context['object'] = self.classe
 
-            context['legislaturas'] = Legislatura.objects.all()
+            legislatura_ativa = int(self.request.GET.get('l', '0'))
+            sl_ativa = int(self.request.GET.get('sl', '0'))
+            parlamentar_ativo = int(self.request.GET.get('p', '0'))
 
-            # for l in Legislatura.objects.all():
+            legs = Legislatura.objects
+            pms = Parlamentar.objects
+
+            if parlamentar_ativo:
+                context['parlamentar_ativo'] = pms.get(pk=parlamentar_ativo)
+
+            legislaturas = []
+            context['legislatura_ativa'] = 0
+            context['sessaolegislativa_ativa'] = 0
+            for l in legs.all():
+
+                if l.numero < 17:
+                    continue
+
+                if not legislatura_ativa and l.atual() or \
+                        l.pk == legislatura_ativa:
+                    context['legislatura_ativa'] = l
+
+                leg = {
+                    'legislatura': l,
+                    'sessoes': [],
+                    'parlamentares': []
+                }
+
+                fs = l.sessaolegislativa_set.first()
+                for s in l.sessaolegislativa_set.all():
+
+                    if s.pk == sl_ativa or not sl_ativa and s == fs and \
+                            s.legislatura == context['legislatura_ativa']:
+                        context['sessaolegislativa_ativa'] = s
+                        if s.pk == sl_ativa:
+                            context['legislatura_ativa'] = l
+
+                    # if s.legislatura != context['legislatura_ativa']:
+                    #    continue
+
+                    sessao = {
+                        'sessao': s, }
+
+                    if s == context['sessaolegislativa_ativa']:
+                        sessao.update({
+                            'mesa': [
+                                p for p in pms.filter(
+                                    mandato__legislatura=l,
+                                    composicaomesa__sessao_legislativa=s
+                                ).annotate(
+                                    cargo_mesa=F(
+                                        'composicaomesa__cargo__descricao')
+                                ).order_by('composicaomesa__cargo__descricao')
+                            ],
+                            'parlamentares': [
+                                p for p in pms.filter(
+                                    mandato__legislatura=l
+                                ).exclude(
+                                    composicaomesa__sessao_legislativa=s
+                                ).annotate(
+                                    afastado=F('mandato__tipo_afastamento'),
+                                    titular=F('mandato__titular')
+                                ).order_by('-ativo',
+                                           '-mandato__titular',
+                                           'nome_parlamentar')]
+                        })
+
+                    leg['sessoes'].append(sessao)
+
+                if not leg['sessoes'] and l == context['legislatura_ativa']:
+                    for p in pms.filter(mandato__legislatura=l):
+                        leg['parlamentares'].append(p)
+
+                legislaturas.append(leg)
+
+            context['legislaturas'] = legislaturas
 
         return context
 

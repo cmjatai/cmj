@@ -4,6 +4,8 @@
   url: /
 - title: {% trans 'Notícias' %}
   url: /noticias
+- title: {% trans 'Parlamentares' %}
+  url: /parlamentar
 - title: {% trans 'Galerias' %}
   children:
   - title: {% trans 'Imagens' %}
