@@ -465,8 +465,8 @@ class PathParlamentarView(PathView):
             context['sessaolegislativa_ativa'] = 0
             for l in legs.all():
 
-                if l.numero < 17:
-                    continue
+                # if l.numero < 17:
+                #    continue
 
                 if not legislatura_ativa and l.atual() or \
                         l.pk == legislatura_ativa:

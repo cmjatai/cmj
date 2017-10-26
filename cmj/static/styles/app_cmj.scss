@@ -548,8 +548,6 @@ a:hover {
 }
 
 main {
-
-
   .item-action-or-input {
     border-color: darken($color_main_bg, 10%);
     &:hover {
@@ -1852,7 +1850,7 @@ main {
   text-align: center;
   a {
     color: black;
-    line-height: 45px;
+    line-height: 2em;
     display: inline-block;
     vertical-align: middle;
     border: 1px solid transparent;
@@ -1882,38 +1880,44 @@ main {
     }
   }
   .inner-topo {
-    padding: $grid-gutter-width 0;
     @extend .bg-back-image;
+    padding: $grid-gutter-width 0;
   }
-  .inner-legis {
-    padding: $grid-gutter-width;
-  }
+
   .inner-titulo {
-    line-height: 3.5em;
-    font-size: 180%;
-    padding: 0 $grid-gutter-width;
-    border-radius: 10px;
+    font-size: 130%;
+    padding: 0 $grid-gutter-width $grid-gutter-width;
+    width: 100%;
+    span {
+      border-radius: 10px;
+      padding: $grid-gutter-width / 2;
+    }
   }
+
+  .inner-legis {
+    font-size: 120%;
+    border: solid #bbb;
+    border-width: 0px 1px 0 0
+  }
+
   .inner-sessoes {
-    border: solid white;
-    border-width: 0px 0 0 2px;
     padding-bottom: $grid-gutter-width;
     a {
-      border: 1px solid #bbb;
-      border-radius: 3px;
       padding: 0px 15px;
-      margin: 0 $grid-gutter-width / 3 $grid-gutter-width;
-      &:hover {
+      margin: $grid-gutter-width / 2 $grid-gutter-width / 3 0;
+      border: 1px solid #bbb;
+    }
+  }
+
+  .inner-sessoes, .inner-legis {
+    a {
+      border-radius: 3px;
+      &:hover:not(.active):not(.inner-titulo):not(.selected) {
         border-color: $color_topo_bg;
         background: $color_topo_bg;
         color: white;
       }
     }
-  }
-  .inner-legis {
-    font-size: 120%;
-    border: solid white;
-    border-width: 2px 0 0 0px;
   }
 
   .avatar {
@@ -1921,11 +1925,15 @@ main {
   }
   .inner-mesa {
     text-align: left;
-    border: solid white;
-    border-width: 2px 0 0 2px;
+    border: solid #bbb;
+    border-width: 1px 0 0 1px;
+    margin-left: -$grid-gutter-width / 2 - 1px;
     a {
       line-height: 1.2;
-        text-align: center;
+      text-align: center;
+    }
+    .inner-parla {
+      margin: 0 $grid-gutter-width;
     }
   }
   .inner-ativos {
@@ -2359,7 +2367,7 @@ main {
         margin-left: 0;
 
       .navbar-social-links {
-        padding: 10px 10px 0;
+        padding: 0px 10px 0;
 
         a {
           width: 1.5em;
@@ -2400,6 +2408,14 @@ main {
           font-size: 140%;
         }
       }
+    }
+  }
+  .container-legislaturas {
+    .inner-legis {
+      border-width: 0 0 1px 0;
+    }
+    .inner-mesa {
+      text-align: center;
     }
   }
 }
@@ -2589,22 +2605,22 @@ main {
     display: block;
   }
 
+  .container, .container-fluid {
+    padding: 0 $grid-gutter-width * 0.25;
+  }
+  .row {
+    margin:  0 $grid-gutter-width * -0.25;
+  }
   main {
-    .container, .container-fluid {
-      padding: 0 $grid-gutter-width * 0.25;
-    }
-    .row {
-      margin:  0 $grid-gutter-width * -0.25;
-    }
     .container-path {
       font-size: 1.28em;
       .path-imagem {
         padding: 0.2em;
       }
     }
-    .canais-columns {
-      padding: 0px;
-    }
+  }
+  .canais-columns {
+    padding: 0px;
   }
   .context-actions{
     margin: 0.5em;
@@ -2770,6 +2786,12 @@ main {
           }
         }
       }
+    }
+  }
+  .container-legislaturas {
+    padding: 0px;
+    .inner-mesa {
+      border-width: 1px 0 0 0;
     }
   }
 }
@@ -2960,7 +2982,7 @@ main {
         width: 80px;
       }
       .path-parlamentares {
-        text-align: right;
+        text-align: center;
       }
     }
     .container-box-parlamentares {
@@ -2991,6 +3013,21 @@ main {
             }
           }
         }
+      }
+    }
+  }
+
+  .container-legislaturas {
+    .avatar {
+      margin: 0.3em;
+    }
+    .avatar2 {
+      width: 150px;
+    }
+    .inner-sessoes {
+      .active {
+        margin-left: 7em;
+        margin-right: 7em;
       }
     }
   }
@@ -3029,8 +3066,12 @@ main {
       }
       .navbar-social-links {
         padding-right: 0;
-        i {
-          font-size: 120%;
+        a {
+          width: 1.6em;
+          height: 1.6em;
+        }
+        a i {
+          font-size: 110%;
         }
       }
     }
@@ -3094,6 +3135,33 @@ main {
       font-size: 0.8em;
       a {
         padding: 28px 0px 3px 0px;
+      }
+    }
+  }
+
+  .container-legislaturas {
+    .avatar {
+      margin: 0.3em;
+      font-size: 70%;
+    }
+    .avatar2 {
+      width: 100px;
+    }
+    .avatar3 {
+      width: 85px;
+    }
+    .inner-titulo {
+      font-size: 100%;
+    }
+    .inner-sessoes {
+      .active {
+        margin-left: 3em;
+        margin-right: 3em;
+      }
+    }
+    .inner-mesa {
+      .inner-parla {
+        margin: 0px;
       }
     }
   }

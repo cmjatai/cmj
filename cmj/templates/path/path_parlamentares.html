@@ -15,60 +15,62 @@
   <div class="inner">
     <div class="inner-topo">
       <div class="row-fluid">
-        <div class="col-md-4">
-          <a class="active inner-titulo">
-            {{legislatura_ativa}}
-          </a>
-        </div>
-        <div class="col-md-8 inner-sessoes">
-            <div class="col-xs-12 tags">
-              Sessões Legislativas
-            </div>
-            {% for leg in legislaturas %}
-              {% if leg.legislatura == legislatura_ativa %}
-                {% for sessao in leg.sessoes %}
-                    <a href="?sl={{sessao.sessao.pk}}" class="{% if sessao.sessao == sessaolegislativa_ativa %}active{% endif %}">{{sessao.sessao}}</a>
-                {% endfor %}
-              {% endif %}
-            {% endfor %}
-        </div>
-      </div>
-      <div class="row-fluid">
-        <div class="col-md-2">
-          <div class="row inner-legis">
-            <div class="col-xs-12 tags">
-              Legislaturas
-            </div>
-            {% for leg in legislaturas %}
-              <a href="?l={{leg.legislatura.pk}}" title="{{leg.legislatura}}" class="col-xs-4 {% if leg.legislatura == legislatura_ativa%}selected{% endif %}">
-                {{leg.legislatura.numero}}
-              </a>
-            {% endfor %}
+        <div class="col-md-4 inner-legis">
+          <div class="col-xs-12 tags">
+            Legislaturas
           </div>
+          <a class="inner-titulo">
+            <span class="active">
+              {{legislatura_ativa.numero}}º<br>
+              ({{legislatura_ativa.data_inicio.year}} - {{legislatura_ativa.data_fim.year}})
+            </span>
+          </a>
 
+          {% for leg in legislaturas %}
+            <a href="?l={{leg.legislatura.pk}}" title="{{leg.legislatura}}" class="col-xs-2 col-md-3 {% if leg.legislatura == legislatura_ativa%}selected{% endif %}">
+              {{leg.legislatura.numero}}º
+            </a>
+          {% endfor %}
+          <div class="clearfix">
+
+          </div>
         </div>
-        <div class="col-md-10">
+        <div class="col-md-8">
+          <div class="row inner-sessoes">
+              <div class="col-xs-12 tags">
+                Sessões Legislativas
+              </div>
+              {% for leg in legislaturas %}
+                {% if leg.legislatura == legislatura_ativa %}
+                  {% for sessao in leg.sessoes %}
+                      <a href="?sl={{sessao.sessao.pk}}" class="{% if sessao.sessao == sessaolegislativa_ativa %}active{% endif %}">{{sessao.sessao}}</a>
+                  {% endfor %}
+                {% endif %}
+              {% endfor %}
+          </div>
           <div class="row container-avatar inner-mesa">
             <div class="col-xs-12 tags">Mesa Diretora</div>
-            {% for leg in legislaturas %}
-              {% if leg.legislatura == legislatura_ativa %}
-                {% for sessao in leg.sessoes %}
-                  {% if sessao.sessao == sessaolegislativa_ativa %}
-                    {% for parlamentar in sessao.mesa %}
-                        <a class="avatar avatar2" href="/{{parlamentar.classe_set.first.absolute_slug}}" class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">
-                        {% if parlamentar.fotografia %}
-                            <img src="{{ parlamentar.fotografia.url }}">
-                        {% else %}
-                            <img src="{% static 'img/perfil.jpg' %}">
-                        {% endif %}
-                          <span>{{parlamentar}}</span>
-                          <small>{{parlamentar.cargo_mesa}}</small>
-                        </a>
-                    {% endfor %}
-                  {% endif %}
-                {% endfor %}
-              {% endif %}
-            {% endfor %}
+            <div class="inner-parla">
+              {% for leg in legislaturas %}
+                {% if leg.legislatura == legislatura_ativa %}
+                  {% for sessao in leg.sessoes %}
+                    {% if sessao.sessao == sessaolegislativa_ativa %}
+                      {% for parlamentar in sessao.mesa %}
+                          <a class="avatar avatar2" href="/{{parlamentar.classe_set.first.absolute_slug}}" class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">
+                          {% if parlamentar.fotografia %}
+                              <img src="{{ parlamentar.fotografia.url }}">
+                          {% else %}
+                              <img src="{% static 'img/perfil.jpg' %}">
+                          {% endif %}
+                            <span>{{parlamentar}}</span>
+                            <small>{{parlamentar.cargo_mesa}}</small>
+                          </a>
+                      {% endfor %}
+                    {% endif %}
+                  {% endfor %}
+                {% endif %}
+              {% endfor %}
+            </div>
           </div>
         </div>
       </div>
@@ -76,7 +78,7 @@
 
     <div class="row-fluid">
       <div class="col-xs-12 container-avatar inner-ativos">
-        <div class="tags">Parlamentares</div>
+        <div class="row tags">Parlamentares</div>
         {% for leg in legislaturas %}
           {% if leg.legislatura == legislatura_ativa %}
             {% for sessao in leg.sessoes %}
