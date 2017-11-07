@@ -293,6 +293,7 @@ class PerfilCrud(PerfilAbstractCrud):
 class EnderecoPerfilCrud(PerfilDetailCrudPermission):
     model = EnderecoPerfil
     parent_field = 'contato'
+    help_path = ''
 
     class BaseMixin(PerfilDetailCrudPermission.BaseMixin):
         list_field_names = [
@@ -311,6 +312,7 @@ class EnderecoPerfilCrud(PerfilDetailCrudPermission):
 class TelefonePerfilCrud(PerfilDetailCrudPermission):
     model = TelefonePerfil
     parent_field = 'contato'
+    help_path = ''
 
     class BaseMixin(PerfilDetailCrudPermission.BaseMixin):
         list_field_names = [
@@ -326,6 +328,7 @@ class TelefonePerfilCrud(PerfilDetailCrudPermission):
 class EmailPerfilCrud(PerfilDetailCrudPermission):
     model = EmailPerfil
     parent_field = 'contato'
+    help_path = ''
 
     class BaseMixin(PerfilDetailCrudPermission.BaseMixin):
         list_field_names = ['email', 'tipo', 'preferencial']
@@ -340,6 +343,7 @@ class EmailPerfilCrud(PerfilDetailCrudPermission):
 class LocalTrabalhoPerfilCrud(PerfilDetailCrudPermission):
     model = LocalTrabalhoPerfil
     parent_field = 'contato'
+    help_path = ''
 
     class BaseMixin(PerfilDetailCrudPermission.BaseMixin):
         list_field_names = ['nome', 'nome_social', 'tipo', 'data_inicio']
@@ -356,6 +360,7 @@ class LocalTrabalhoPerfilCrud(PerfilDetailCrudPermission):
 class DependentePerfilCrud(PerfilDetailCrudPermission):
     model = DependentePerfil
     parent_field = 'contato'
+    help_path = ''
 
     class BaseMixin(PerfilDetailCrudPermission.BaseMixin):
         list_field_names = ['parentesco', 'nome', 'nome_social',

@@ -35,6 +35,7 @@ from cmj.utils import normalize
 class PerfilAbstractCrud(Crud):
     model_set = None
     model = Perfil
+    help_path = ''
 
     class Meta:
         abstract = True

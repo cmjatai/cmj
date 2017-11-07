@@ -433,12 +433,14 @@ class Classe(ShortUrl, CMSMixin):
         )
 
     def imagem_representativa(self):
-
-        return self.parlamentar
+        if hasattr(self, 'parlamentar'):
+            return self.parlamentar
+        return None
 
     def imagem_representativa_metatags(self):
-
-        return self.parlamentar
+        if hasattr(self, 'parlamentar'):
+            return self.parlamentar
+        return None
 
     @cached_property
     def conta(self):

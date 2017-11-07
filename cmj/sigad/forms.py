@@ -21,6 +21,7 @@ class UpLoadImportFileForm(forms.Form):
         self.fields['import_file'].widget.attrs.update(
             {'multiple': 'multiple'})
 
+
 error_messages = {
     'required': _('Este campo é obrigatório'),
     'invalid': _('Formato inválido.')

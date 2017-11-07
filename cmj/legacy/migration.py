@@ -1,11 +1,8 @@
-import re
 from datetime import date
-from functools import lru_cache
+from functools import lru_cache, partial
 from subprocess import PIPE, call
+import re
 
-import pkg_resources
-import reversion
-import yaml
 from django.apps import apps
 from django.apps.config import AppConfig
 from django.contrib.auth import get_user_model
@@ -15,10 +12,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import connections, transaction
 from django.db.models import Count, Max
 from django.db.models.base import ModelBase
-
-from sapl.base.models import AppConfig as AppConf
 from sapl.base.models import (Autor, CasaLegislativa, ProblemaMigracao,
                               TipoAutor)
+from sapl.base.models import AppConfig as AppConf
 from sapl.comissoes.models import Comissao, Composicao, Participacao
 from sapl.legacy.models import TipoNumeracaoProtocolo
 from sapl.materia.models import (AcompanhamentoMateria, Proposicao,
@@ -28,12 +24,17 @@ from sapl.materia.models import (AcompanhamentoMateria, Proposicao,
 from sapl.norma.models import (AssuntoNorma, NormaJuridica, NormaRelacionada,
                                TipoVinculoNormaJuridica)
 from sapl.parlamentares.models import (Legislatura, Mandato, Parlamentar,
-                                       TipoAfastamento)
+                                       Partido, TipoAfastamento)
 from sapl.protocoloadm.models import (DocumentoAdministrativo, Protocolo,
                                       StatusTramitacaoAdministrativo)
 from sapl.sessao.models import ExpedienteMateria, OrdemDia, RegistroVotacao
-from sapl.settings import PROJECT_DIR
 from sapl.utils import normalize
+import pkg_resources
+import reversion
+import yaml
+
+from cmj.settings import PROJECT_DIR
+
 
 # BASE ######################################################################
 #  apps to be migrated, in app dependency order (very important)
@@ -139,17 +140,128 @@ def get_fk_related(field, value, label=None):
         raise ForeignKeyFaltando(msg)
 
 
-def exec_sql_file(path, db='default'):
-    with open(path) as arq:
-        sql = arq.read()
-    with connections[db].cursor() as cursor:
-        cursor.execute(sql)
-
-
 def exec_sql(sql, db='default'):
     cursor = connections[db].cursor()
     cursor.execute(sql)
     return cursor
+
+# UNIFORMIZAÇÃO DO BANCO ANTES DA MIGRAÇÃO ###############################
+
+
+SQL_NAO_TEM_TABELA = '''
+   SELECT count(*)
+   FROM information_schema.columns
+   WHERE table_schema=database()
+     AND TABLE_NAME="{}"
+'''
+SQL_NAO_TEM_COLUNA = SQL_NAO_TEM_TABELA + ' AND COLUMN_NAME="{}"'
+
+exec_legado = partial(exec_sql, db='legacy')
+
+
+def existe_tabela_no_legado(tabela):
+    sql = SQL_NAO_TEM_TABELA.format(tabela)
+    return exec_legado(sql).fetchone()[0]
+
+
+def existe_coluna_no_legado(tabela, coluna):
+    sql = SQL_NAO_TEM_COLUNA.format(tabela, coluna)
+    return exec_legado(sql).fetchone()[0] > 0
+
+
+def garante_coluna_no_legado(tabela, spec_coluna):
+    coluna = spec_coluna.split()[0]
+    if not existe_coluna_no_legado(tabela, coluna):
+        exec_legado('ALTER TABLE {} ADD COLUMN {}'.format(tabela, spec_coluna))
+    assert existe_coluna_no_legado(tabela, coluna)
+
+
+def garante_tabela_no_legado(create_table):
+    tabela = create_table.strip().splitlines()[0].split()[2]
+    if not existe_tabela_no_legado(tabela):
+        exec_legado(create_table)
+        assert existe_tabela_no_legado(tabela)
+
+
+def uniformiza_banco():
+    exec_legado('''
+      SELECT replace(@@sql_mode,"STRICT_TRANS_TABLES,","ALLOW_INVALID_DATES");
+    ''')
+
+    # ajusta data zero em proposicao
+    # isso é necessário para poder alterar a tabela a seguir
+    exec_legado('''
+        UPDATE proposicao SET dat_envio = "1800-01-01" WHERE dat_envio = 0;
+        alter table proposicao modify dat_envio datetime;
+        UPDATE proposicao SET dat_envio = NULL where dat_envio = "1800-01-01";
+        ''')
+
+    garante_coluna_no_legado('proposicao',
+                             'num_proposicao int(11) NULL')
+
+    garante_coluna_no_legado('tipo_materia_legislativa',
+                             'ind_num_automatica BOOLEAN NULL DEFAULT FALSE')
+
+    garante_coluna_no_legado('tipo_materia_legislativa',
+                             'quorum_minimo_votacao int(11) NULL')
+
+    # Cria campos cod_presenca_sessao (sendo a nova PK da tabela)
+    # e dat_sessao em sessao_plenaria_presenca
+    if not existe_coluna_no_legado('sessao_plenaria_presenca',
+                                   'cod_presenca_sessao'):
+        exec_legado('''
+            ALTER TABLE sessao_plenaria_presenca
+            DROP PRIMARY KEY,
+            ADD cod_presenca_sessao INT auto_increment PRIMARY KEY FIRST;
+        ''')
+        assert existe_coluna_no_legado('sessao_plenaria_presenca',
+                                       'cod_presenca_sessao')
+
+    garante_coluna_no_legado('sessao_plenaria_presenca',
+                             'dat_sessao DATE NULL')
+
+    garante_tabela_no_legado('''
+        CREATE TABLE lexml_registro_publicador (
+            cod_publicador INT auto_increment NOT NULL,
+            id_publicador INT, nom_publicador varchar(255),
+            adm_email varchar(50),
+            sigla varchar(255),
+            nom_responsavel varchar(255),
+            tipo varchar(50),
+            id_responsavel INT, PRIMARY KEY (cod_publicador));
+    ''')
+
+    garante_tabela_no_legado('''
+        CREATE TABLE lexml_registro_provedor (
+            cod_provedor INT auto_increment NOT NULL,
+            id_provedor INT, nom_provedor varchar(255),
+            sgl_provedor varchar(15),
+            adm_email varchar(50),
+            nom_responsavel varchar(255),
+            tipo varchar(50),
+            id_responsavel INT, xml_provedor longtext,
+            PRIMARY KEY (cod_provedor));
+    ''')
+
+    garante_tabela_no_legado('''
+        CREATE TABLE tipo_situacao_militar (
+            tip_situacao_militar INT auto_increment NOT NULL,
+            des_tipo_situacao varchar(50),
+            ind_excluido INT, PRIMARY KEY (tip_situacao_militar));
+    ''')
+
+    update_specs = '''
+vinculo_norma_juridica| ind_excluido = ''           | trim(ind_excluido) = '0'
+unidade_tramitacao    | cod_parlamentar = NULL      | cod_parlamentar = 0
+parlamentar           | cod_nivel_instrucao = NULL  | cod_nivel_instrucao = 0
+parlamentar           | tip_situacao_militar = NULL | tip_situacao_militar = 0
+mandato               | tip_afastamento = NULL      | tip_afastamento = 0
+relatoria             | tip_fim_relatoria = NULL    | tip_fim_relatoria = 0
+    '''.strip().splitlines()
+
+    for spec in update_specs:
+        spec = spec.split('|')
+        exec_legado('UPDATE {} SET {} WHERE {}'.format(*spec))
 
 
 def iter_sql_records(sql, db):
@@ -161,11 +273,6 @@ def iter_sql_records(sql, db):
         record = Record()
         record.__dict__.update(zip(fieldnames, row))
         yield record
-
-
-def get_last_value(model):
-    last_value = model.objects.all().aggregate(Max('pk'))
-    return last_value['pk__max'] or 0
 
 
 def save_relation(obj, nome_campo='', problema='', descricao='',
@@ -276,6 +383,17 @@ def delete_old(legacy_model, cols_values):
     exec_sql(delete_sql, 'legacy')
 
 
+def get_last_pk(model):
+    last_value = model.objects.all().aggregate(Max('pk'))
+    return last_value['pk__max'] or 0
+
+
+def reinicia_sequence(model, id):
+    sequence_name = '%s_id_seq' % model._meta.db_table
+    exec_sql('ALTER SEQUENCE %s RESTART WITH %s MINVALUE -1;' % (
+        sequence_name, id))
+
+
 class DataMigrator:
 
     def __init__(self):
@@ -327,8 +445,8 @@ class DataMigrator:
 
     def migrate(self, obj=appconfs, interativo=True):
         # warning: model/app migration order is of utmost importance
-        exec_sql_file(PROJECT_DIR.child(
-            'sapl', 'legacy', 'scripts', 'fix_tables.sql'), 'legacy')
+
+        uniformiza_banco()
 
         # excluindo database antigo.
         if interativo:
@@ -383,7 +501,9 @@ class DataMigrator:
 
         # setup migration strategy for tables with or without a pk
         if legacy_pk_name == 'id':
+            deve_ajustar_sequence_ao_final = False
             # There is no pk in the legacy table
+
             def save(new, old):
                 with reversion.create_revision():
                     new.save()
@@ -395,6 +515,8 @@ class DataMigrator:
             old_records = iter_sql_records(
                 'select * from ' + legacy_model._meta.db_table, 'legacy')
         else:
+            deve_ajustar_sequence_ao_final = True
+
             def save(new, old):
                 with reversion.create_revision():
                     # salva new com id de old
@@ -437,6 +559,10 @@ class DataMigrator:
                             self.data_mudada.clear()
                             reversion.set_comment(
                                 'Ajuste de data pela migração')
+            # reinicia sequence
+            if deve_ajustar_sequence_ao_final:
+                last_pk = get_last_pk(model)
+                reinicia_sequence(model, last_pk + 1)
 
 
 def migrate(obj=appconfs, interativo=True):
@@ -451,21 +577,21 @@ def adjust_acompanhamentomateria(new, old):
 
 
 def adjust_documentoadministrativo(new, old):
-    if new.numero_protocolo:
+    if old.num_protocolo:
         protocolo = Protocolo.objects.filter(
-            numero=new.numero_protocolo, ano=new.ano)
+            numero=old.num_protocolo, ano=new.ano)
         if not protocolo:
             protocolo = Protocolo.objects.filter(
-                numero=new.numero_protocolo, ano=new.ano + 1)
+                numero=old.num_protocolo, ano=new.ano + 1)
             print('PROTOCOLO ENCONTRADO APENAS PARA O ANO SEGUINTE!!!!! '
                   'DocumentoAdministrativo: {}, numero_protocolo: {}, '
                   'ano doc adm: {}'.format(
-                      old.cod_documento, new.numero_protocolo, new.ano))
+                      old.cod_documento, old.num_protocolo, new.ano))
         if not protocolo:
             raise ForeignKeyFaltando(
                 'Protocolo {} faltando '
                 '(referenciado no documento administrativo {}'.format(
-                    new.numero_protocolo, old.cod_documento))
+                    old.num_protocolo, old.cod_documento))
         assert len(protocolo) == 1
         new.protocolo = protocolo[0]
 
@@ -673,31 +799,36 @@ def adjust_normajuridica_depois_salvar(new, old):
             pass  # ignora assuntos inexistentes
 
 
-def adjust_autor(new, old):
-    if old.cod_parlamentar:
+def vincula_autor(new, old, model_relacionado, campo_relacionado, campo_nome):
+    pk_rel = getattr(old, campo_relacionado)
+    if pk_rel:
         try:
-            new.autor_related = Parlamentar.objects.get(pk=old.cod_parlamentar)
+            new.autor_related = model_relacionado.objects.get(pk=pk_rel)
         except ObjectDoesNotExist:
             # ignoramos o autor órfão
-            raise ForeignKeyFaltando('Parlamentar inexiste para autor')
+            raise ForeignKeyFaltando('{} inexiste para autor'.format(
+                model_relacionado._meta.verbose_name))
         else:
-            new.nome = new.autor_related.nome_parlamentar
+            new.nome = getattr(new.autor_related, campo_nome)
+            return True
 
-    elif old.cod_comissao:
-        try:
-            new.autor_related = Comissao.objects.get(pk=old.cod_comissao)
-        except ObjectDoesNotExist:
-            # ignoramos o autor órfão
-            raise ForeignKeyFaltando('Comissao inexiste para autor')
-        else:
-            new.nome = new.autor_related.nome
+
+def adjust_autor(new, old):
+    for args in [
+            # essa ordem é importante
+            (Parlamentar, 'cod_parlamentar', 'nome_parlamentar'),
+            (Comissao, 'cod_comissao', 'nome'),
+            (Partido, 'cod_partido', 'nome')]:
+        if vincula_autor(new, old, *args):
+            break
 
     if old.col_username:
         user_model = get_user_model()
         if not user_model.objects.filter(username=old.col_username).exists():
             # cria um novo ususaŕio para o autor
             user = user_model(username=old.col_username)
-            user.set_password(12345)
+            # gera uma senha inutilizável, que precisará ser trocada
+            user.set_password(None)
             with reversion.create_revision():
                 user.save()
                 reversion.set_comment(

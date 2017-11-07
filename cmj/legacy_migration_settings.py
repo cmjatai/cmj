@@ -11,7 +11,7 @@ config.config = Config(RepositoryEnv(os.path.abspath('cmj/legacy/.env')))
 
 
 INSTALLED_APPS += (
-    'sapl.legacy',  # legacy reversed model definitions
+    'cmj.legacy',  # legacy reversed model definitions
 )
 
 DATABASES['legacy'] = config('DATABASE_URL', cast=db_url,)

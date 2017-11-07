@@ -11,7 +11,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.urlresolvers import reverse
 from django.db import models
-from django.db.models.fields.related import ForeignKey
+from django.db.models.fields.related import ForeignKey, ManyToManyField
 from django.http.response import Http404
 from django.shortcuts import redirect
 from django.utils.decorators import classonlymethod
@@ -38,6 +38,7 @@ ACTION_LIST, ACTION_CREATE, ACTION_DETAIL, ACTION_UPDATE, ACTION_DELETE = \
 
 def _form_invalid_message(msg):
     return '%s %s' % (_('Formulário inválido.'), msg)
+
 
 FORM_MESSAGES = {ACTION_CREATE: (_('Registro criado com sucesso!'),
                                  _('O registro não foi criado.')),
@@ -78,6 +79,7 @@ def make_pagination(index, num_pages):
                         None, num_pages - 1, num_pages]
             head = from_to(1, PAGINATION_LENGTH - len(tail) - 1)
         return head + [None] + tail
+
 
 """
 variáveis do crud:
@@ -1037,6 +1039,9 @@ class MasterDetailCrud(Crud):
     class ListView(Crud.ListView):
         permission_required = RP_LIST,
 
+        def get(self, request, *args, **kwargs):
+            return Crud.ListView.get(self, request, *args, **kwargs)
+
         @classmethod
         def get_url_regex(cls):
             return r'^(?P<pk>\d+)/%s$' % cls.model._meta.model_name
@@ -1062,7 +1067,8 @@ class MasterDetailCrud(Crud):
             else:
                 parent_model = getattr(
                     self.model, obj.parent_field)
-                if isinstance(parent_model.field, ForeignKey):
+                if isinstance(parent_model.field, (
+                        ForeignKey, ManyToManyField)):
                     parent_model = parent_model.field.related_model
                 else:
                     parent_model = parent_model.rel.related_model
@@ -1326,8 +1332,6 @@ class MasterDetailCrud(Crud):
                         parent_object = self.object
                         for field in fields:
                             parent_object = getattr(parent_object, field)
-                    else:
-                        parent_object = getattr(self.object, obj.parent_field)
 
                     return url + '?pkk=' + str(parent_object.pk)
             else:

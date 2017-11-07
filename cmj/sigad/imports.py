@@ -1,5 +1,6 @@
 from datetime import datetime
 from datetime import timedelta
+import os
 
 from django.conf import settings
 from django.core.files.base import File
@@ -612,36 +613,35 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                 classe_parlamentar.parlamentar = p
                 classe_parlamentar.save()
 
-        """if func == 'avatars':
+        http = urllib3.PoolManager()
 
-            import os
+        for p in Parlamentar.objects.all():
+            p.fotografia.delete()
 
-            http = urllib3.PoolManager()
+            mypath = '%s/sapl/public/parlamentar/%s' % (
+                settings.MEDIA_ROOT, p.pk)
 
-            for p in Parlamentar.objects.all():
-                p.fotografia.delete()
+            print(p.nome_parlamentar)
 
-                mypath = '%s/sapl/public/parlamentar/%s' % (
-                    settings.MEDIA_ROOT, p.pk)
+            if os.path.exists(mypath):
+                onlyfiles = [
+                    f for f in os.listdir(mypath)
+                    if os.path.isfile(os.path.join(mypath, f))]
 
-                print(p.nome_parlamentar)
+                for f in onlyfiles:
+                    os.remove(mypath + '/' + f)
 
-                if os.path.exists(mypath):
-                    onlyfiles = [
-                        f for f in os.listdir(mypath)
-                        if os.path.isfile(os.path.join(mypath, f))]
+            file = http.request(
+                'GET', ('sapl.camarajatai.go.gov.br/sapl/'
+                        'sapl_documentos/parlamentar/fotos/'
+                        '%s_foto_parlamentar') % (p.pk, ))
 
-                    for f in onlyfiles:
-                        os.remove(mypath + '/' + f)
-
-                file = http.request(
-                    'GET', ('sapl.camarajatai.go.gov.br/sapl/'
-                            'sapl_documentos/parlamentar/fotos/'
-                            '%s_foto_parlamentar') % (p.pk, ))
-
+            try:
+                data = file.data.decode('utf-8')
+            except:
                 img_temp = NamedTemporaryFile(delete=True)
                 img_temp.write(file.data)
                 img_temp.flush()
-                p.fotografia.save("image.jpg", File(img_temp), save=True)"""
+                p.fotografia.save("image.jpg", File(img_temp), save=True)
 
         return TemplateView.get(self, request, *args, **kwargs)
