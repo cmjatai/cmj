@@ -1852,11 +1852,14 @@ main {
     color: black;
     line-height: 2em;
     display: inline-block;
-    vertical-align: middle;
+    vertical-align: top;
     border: 1px solid transparent;
     span, small {
-      white-space: nowrap;
+      line-height: 1;
       display: block;
+    }
+    img {
+      vertical-align: top;
     }
   }
   .active {
