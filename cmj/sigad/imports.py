@@ -607,7 +607,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                 visibilidade=CMSMixin.STATUS_PUBLIC,
                 perfil=models.CLASSE_ESTRUTURAL)
 
-            if created:
+            if created or not classe_parlamentar.parlamentar:
                 classe_parlamentar.template_classe = \
                     CLASSE_TEMPLATES_CHOICE.parlamentar
                 classe_parlamentar.parlamentar = p
@@ -632,7 +632,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                     os.remove(mypath + '/' + f)
 
             file = http.request(
-                'GET', ('sapl.camarajatai.go.gov.br/sapl/'
+                'GET', ('http://187.6.249.156:8480/sapl/'
                         'sapl_documentos/parlamentar/fotos/'
                         '%s_foto_parlamentar') % (p.pk, ))
 

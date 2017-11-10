@@ -384,8 +384,9 @@ class ShortUrl(Slugged):
 
         slug = self.absolute_slug + (sufix if sufix else '')
 
-        self.url_short = short_url(slug=slug)
-        self.save()
+        if not settings.DEBUG:
+            self.url_short = short_url(slug=slug)
+            self.save()
 
         print('url_short', self.url_short, slug)
 

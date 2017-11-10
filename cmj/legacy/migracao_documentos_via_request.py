@@ -2,8 +2,8 @@ import mimetypes
 import os
 import re
 
-import magic
-
+from django.core.files.base import File
+from django.core.files.temp import NamedTemporaryFile
 from sapl.base.models import CasaLegislativa
 from sapl.legacy.migration import warn
 from sapl.materia.models import (DocumentoAcessorio, MateriaLegislativa,
@@ -14,6 +14,9 @@ from sapl.protocoloadm.models import (DocumentoAcessorioAdministrativo,
                                       DocumentoAdministrativo)
 from sapl.sessao.models import SessaoPlenaria
 from sapl.settings import MEDIA_ROOT
+import magic
+import urllib3
+
 
 # MIGRAÇÃO DE DOCUMENTOS  ###################################################
 EXTENSOES = {
@@ -141,15 +144,12 @@ def migrar_docs_logo():
     casa.save()
 
 
-def get_extensao(caminho):
-    mime = magic.from_file(caminho, mime=True)
+def get_extensao(mime):
     try:
         return EXTENSOES[mime]
     except KeyError as e:
         raise Exception('\n'.join([
-            'Extensão não conhecida para o arquivo:',
-            caminho,
-            'E mimetype:',
+            'mimetype:',
             mime,
             ' Algumas possibilidades são:', ] +
             ["    '{}': '{}',".format(mime, ext)
@@ -158,73 +158,66 @@ def get_extensao(caminho):
         )) from e
 
 
+http = urllib3.PoolManager()
+
+
+def request_file(base_origem):
+    request = http.request(
+        'GET', ('http://187.6.249.156:8480/sapl/%s') % base_origem)
+
+    try:
+        data = request.data.decode('utf-8')
+        return None, None
+    except:
+        temp = NamedTemporaryFile(delete=True)
+        temp.write(request.data)
+        temp.flush()
+        return request, temp
+
+
 def migrar_docs_por_ids(model):
     for campo, base_origem, base_destino in DOCS[model]:
         print('#### Migrando {} de {} ####'.format(campo, model.__name__))
 
-        dir_origem, nome_origem = os.path.split(em_media(base_origem))
-        pat = re.compile('^{}$'.format(nome_origem.format('(\d+)')))
+        registros = model.objects.all()
 
-        if not os.path.isdir(dir_origem):
-            print('  >>> O diretório {} não existe! Abortado.'.format(
-                dir_origem))
-            continue
+        for item in registros:
 
-        for arq in os.listdir(dir_origem):
-            match = pat.match(arq)
-            if match:
-                # associa documento ao objeto
-                origem = os.path.join(dir_origem, match.group(0))
-                id = match.group(1)
-                try:
-                    obj = model.objects.get(pk=id)
-                except model.DoesNotExist:
-                    msg = '  {} (pk={}) não encontrado para documento em [{}]'
-                    print(msg.format(
-                        model.__name__, id, origem))
-                else:
-                    extensao = get_extensao(origem)
-                    if hasattr(obj, "ano"):
-                        destino = base_destino.format(id, extensao, obj.ano)
-                    elif isinstance(obj, DocumentoAcessorio):
-                        destino = base_destino.format(
-                            id, extensao, obj.materia.ano)
-                    else:
-                        destino = base_destino.format(id, extensao)
-                    mover_documento(origem, destino)
+            campo_file = getattr(item, campo)
+            campo_file.delete()
 
-                    setattr(obj, campo, destino)
-                    obj.save()
+            url = ('http://187.6.249.156:8480/sapl/%s'
+                   ) % base_origem.format(item.pk)
+
+            request = http.request('GET', url)
+
+            try:
+                data = request.data.decode('utf-8')
+            except:
+                temp = NamedTemporaryFile(delete=True)
+                temp.write(request.data)
+                temp.flush()
+
+                ct = request.getheaders()['Content-Type']
+                print (ct, campo, item)
+
+                name_file = '%s%s' % (campo, get_extensao(ct))
+
+                campo_file.save(name_file, File(temp), save=True)
 
 
 def migrar_documentos():
-    # aqui supomos que uma pasta chamada sapl_documentos está em MEDIA_ROOT
-    # com o conteúdo da pasta de mesmo nome do zope
-    # Os arquivos da pasta serão MOVIDOS para a nova estrutura e a pasta será
-    # apagada
-    #
-    # Isto significa que para rodar novamente esta função é preciso
-    # restaurar a pasta sapl_documentos ao estado inicial
-
-    migrar_docs_logo()
     for model in [
         Parlamentar,
         MateriaLegislativa,
         DocumentoAcessorio,
         NormaJuridica,
-        SessaoPlenaria,
-        Proposicao,
         DocumentoAdministrativo,
         DocumentoAcessorioAdministrativo,
     ]:
         migrar_docs_por_ids(model)
 
-    sobrando = [os.path.join(dir, file)
-                for (dir, _, files) in os.walk(em_media('sapl_documentos'))
-                for file in files]
-    if sobrando:
-        print('\n#### Encerrado ####\n\n'
-              '{} documentos sobraram sem ser migrados!!!'.format(
-                  len(sobrando)))
-        for doc in sobrando:
-            print('  {}'. format(doc))
+
+# %run 'cmj/legacy/migracao_documentos.py'
+if __name__ == '__main__':
+    migrar_documentos()

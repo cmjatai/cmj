@@ -7,7 +7,8 @@ from .settings import *  # flake8: noqa
 
 
 config = AutoConfig()
-config.config = Config(RepositoryEnv(os.path.abspath('cmj/legacy_cep/.env')))
+config.config = Config(RepositoryEnv(
+    os.path.abspath('cmj/legacy_cep/.env')))
 
 INSTALLED_APPS += (
     'cmj.legacy_cep',  # legacy reversed model definitions
