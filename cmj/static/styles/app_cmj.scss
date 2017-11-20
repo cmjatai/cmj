@@ -1629,6 +1629,9 @@ main {
     background-repeat: no-repeat;
     background-position: 50% center;
     position: relative;
+    &.path-capa-semfoto {
+      height: 100px;
+    }
     .container-social {
       position: absolute;
       bottom: 0;
