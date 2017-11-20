@@ -1858,6 +1858,9 @@ main {
       line-height: 1;
       display: block;
     }
+    span {
+      padding-top: 0.5em;
+    }
     img {
       vertical-align: top;
     }
@@ -2793,6 +2796,9 @@ main {
   }
   .container-legislaturas {
     padding: 0px;
+    .row {
+      margin: 0 -10px;
+    }
     .inner-mesa {
       border-width: 1px 0 0 0;
     }

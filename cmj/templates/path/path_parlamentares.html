@@ -16,7 +16,7 @@
     <div class="inner-topo">
       <div class="row-fluid">
         <div class="col-md-4 inner-legis">
-          <div class="col-xs-12 tags">
+          <div class="row-fluid tags">
             Legislaturas
           </div>
           <a class="inner-titulo">
@@ -37,9 +37,8 @@
         </div>
         <div class="col-md-8">
           <div class="row inner-sessoes">
-              <div class="col-xs-12 tags">
-                Sessões Legislativas
-              </div>
+            <div class="col-xs-12">
+              <div class="row-fluid tags">Sessões Legislativas</div>
               {% for leg in legislaturas %}
                 {% if leg.legislatura == legislatura_ativa %}
                   {% for sessao in leg.sessoes %}
@@ -47,29 +46,32 @@
                   {% endfor %}
                 {% endif %}
               {% endfor %}
+            </div>
           </div>
           <div class="row container-avatar inner-mesa">
-            <div class="col-xs-12 tags">Mesa Diretora</div>
-            <div class="inner-parla">
-              {% for leg in legislaturas %}
-                {% if leg.legislatura == legislatura_ativa %}
-                  {% for sessao in leg.sessoes %}
-                    {% if sessao.sessao == sessaolegislativa_ativa %}
-                      {% for parlamentar in sessao.mesa %}
-                          <a class="avatar avatar2" href="/{{parlamentar.classe_set.first.absolute_slug}}" class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">
-                          {% if parlamentar.fotografia %}
-                              <img src="{{ parlamentar.fotografia.url }}">
-                          {% else %}
-                              <img src="{% static 'img/perfil.jpg' %}">
-                          {% endif %}
-                            <span>{{parlamentar}}</span>
-                            <small>{{parlamentar.cargo_mesa}}</small>
-                          </a>
-                      {% endfor %}
-                    {% endif %}
-                  {% endfor %}
-                {% endif %}
-              {% endfor %}
+            <div class="col-xs-12">
+              <div class="row-fluid tags">Mesa Diretora</div>
+              <div class="inner-parla">
+                {% for leg in legislaturas %}
+                  {% if leg.legislatura == legislatura_ativa %}
+                    {% for sessao in leg.sessoes %}
+                      {% if sessao.sessao == sessaolegislativa_ativa %}
+                        {% for parlamentar in sessao.mesa %}
+                            <a class="avatar avatar2" href="/{{parlamentar.classe_set.first.absolute_slug}}" class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">
+                            {% if parlamentar.fotografia %}
+                                <img src="{{ parlamentar.fotografia.url }}">
+                            {% else %}
+                                <img src="{% static 'img/perfil.jpg' %}">
+                            {% endif %}
+                              <span>{{parlamentar}}</span>
+                              <small>{{parlamentar.cargo_mesa}}</small>
+                            </a>
+                        {% endfor %}
+                      {% endif %}
+                    {% endfor %}
+                  {% endif %}
+                {% endfor %}
+              </div>
             </div>
           </div>
         </div>
@@ -78,7 +80,7 @@
 
     <div class="row-fluid">
       <div class="col-xs-12 container-avatar inner-ativos">
-        <div class="row tags">Parlamentares</div>
+        <div class="row-fluid tags">Parlamentares</div>
         {% for leg in legislaturas %}
           {% if leg.legislatura == legislatura_ativa %}
             {% for sessao in leg.sessoes %}
