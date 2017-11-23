@@ -254,8 +254,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = PROJECT_DIR.child("collected_static")
 STATICFILES_DIRS = (
     BASE_DIR.child("static"),
-    sapl_settings.STATICFILES_DIRS[0],
-    PROJECT_DIR.child('assets')
+    sapl_settings.STATICFILES_DIRS[0]
 )
 
 STATICFILES_FINDERS = (
@@ -269,7 +268,7 @@ STATICFILES_FINDERS = (
 # Additional search paths for SASS files when using the @import statement
 SASS_PROCESSOR_INCLUDE_DIRS = (
     BOWER_COMPONENTS_ROOT.child(
-        'bower_components', 'bootstrap-sass', 'assets', 'stylesheets'),
+        'bower_components', 'bootstrap-sass', 'stylesheets'),
 )
 
 # FIXME update cripy-forms and remove this
