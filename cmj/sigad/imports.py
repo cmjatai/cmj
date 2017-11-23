@@ -79,7 +79,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
         # print('data: ', data)
         # return TemplateView.get(self, request, *args, **kwargs)
         jdata = json.loads(data)
-        jdata = jdata[0:5]
+        jdata = jdata[0:20]
 
         anos = {}
         print(len(jdata))
@@ -184,142 +184,6 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                 versao.file.save("image.jpg", File(img_temp), save=True)
 
                 print(midia_id_import)
-
-        # FOTOGRAFIA - captura de albuns independentes sem notícias associadas
-
-        r = http.request('GET', ('%s/fotografia/'
-                                 'album.do?action=album_lista_json' %
-                                 self.end_local_fotog))
-
-        data = r.data.decode('utf-8')
-        # print('data: ', data)
-        # return TemplateView.get(self, request, *args, **kwargs)
-        jdata = json.loads(data)
-        #jdata = jdata[0:40]
-
-        print('Albuns independentes:', len(jdata))
-
-        classe_albuns = Classe.objects.get(slug='galerias/imagens')
-
-        for album in jdata:
-
-            evento_path = ('/fotografia/evento.do?action=evento_view&id=%s' %
-                           album['evento_id'])
-
-            if not Documento.objects.filter(old_path=evento_path).exists():
-                print ('não existe evento associado:', album['id'])
-                continue
-
-            capa = ('/fotografia/'
-                    'midia.do?action=midia_view'
-                    '&escala=cmj_import&idImage=%s'
-                    % album['idMCp'])
-
-            noticia = Documento.objects.filter(old_path=capa,
-                                               citado_em__isnull=False)
-            if noticia.exists():
-                print ('Já existe album associado a notícia:', album['tit'])
-
-                img = noticia.first()
-
-                if img:
-                    d = img.citado_em.all().first().referente
-                    d.titulo = album['tit']
-                    d.descricao = album['dscr']
-                    d.save()
-                    Revisao.gerar_revisao(d, request.user)
-
-                continue
-
-            album_path = ("/fotografia/album.do?action=album_json&id=%s"
-                          % album['id'])
-
-            if Documento.objects.filter(old_path=album_path).exists():
-                print ('Já existe album:', album['tit'])
-                continue
-
-            print ('Criando album:', album['tit'])
-
-            jmidias = []
-            try:
-                r = http.request('GET', '%s%s%s' % (
-                    self.end_local_fotog,
-                    '/fotografia/album.do?action=album_json&id=', album['id']))
-                jmidias = json.loads(r.data.decode('utf-8'))
-            except:
-                pass
-
-            if not jmidias:
-                continue
-
-            if len(jmidias) == 1 and jmidias[0]['id'] == "0":
-                continue
-
-            evento = Documento.objects.filter(old_path=evento_path).first()
-
-            with transaction.atomic():
-                documento = Documento()
-                documento.old_path = album_path
-                documento.old_json = json.dumps(album)
-                documento.titulo = album['tit']
-                documento.descricao = album['dscr']
-                documento.public_date = evento.public_date
-                documento.classe = classe_albuns
-                documento.tipo = Documento.TD_GALERIA_PUBLICA
-                documento.template_doc = DOC_TEMPLATES_CHOICE.noticia
-                documento.owner = request.user
-                documento.visibilidade = Documento.STATUS_PUBLIC
-                documento.save()
-                Revisao.gerar_revisao(documento, request.user)
-
-                cont_gallery = Documento()
-                cont_gallery.titulo = ''
-                cont_gallery.descricao = ''
-                cont_gallery.classe = classe_albuns
-                cont_gallery.tipo = Documento.TPD_CONTAINER_EXTENDIDO
-                cont_gallery.owner = request.user
-                cont_gallery.parent = documento
-                cont_gallery.ordem = 1
-                cont_gallery.visibilidade = documento.visibilidade
-                cont_gallery.save()
-                Revisao.gerar_revisao(cont_gallery, request.user)
-
-                galeria = Documento()
-                galeria.autor = 'Hélio Domingos'
-                galeria.visibilidade = documento.visibilidade
-                galeria.ordem = 1
-                galeria.titulo = ''
-                galeria.owner = request.user
-                galeria.parent = cont_gallery
-                galeria.tipo = Documento.TPD_GALLERY
-                galeria.classe = classe_albuns
-                galeria.save()
-                Revisao.gerar_revisao(galeria, request.user)
-
-                ord_ref = 2
-                for midia in jmidias:
-                    old_path_midia = ('/fotografia/'
-                                      'midia.do?action=midia_view'
-                                      '&escala=cmj_import&idImage=%s'
-                                      % midia['id'])
-
-                    referenciado = Documento.objects.filter(
-                        old_path=old_path_midia).first()
-
-                    if referenciado:
-
-                        ref = ReferenciaEntreDocumentos()
-                        ref.referenciado = referenciado
-                        ref.referente = galeria
-                        ref.titulo = ''
-
-                        ref.ordem = ord_ref if midia[
-                            'id'] != album['idMCp'] else 1
-
-                        ref.ordem = ord_ref
-                        ref.save()
-                        if midia['id'] != album['idMCp']:
-                            ord_ref += 1
 
         # PORTAL MODELO - captura todas as notícias do portal modelo 1.0
         p = 1
@@ -612,6 +476,140 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                     CLASSE_TEMPLATES_CHOICE.parlamentar
                 classe_parlamentar.parlamentar = p
                 classe_parlamentar.save()
+
+        # FOTOGRAFIA - captura de albuns independentes sem notícias associadas
+        r = http.request('GET', ('%s/fotografia/'
+                                 'album.do?action=album_lista_json' %
+                                 self.end_local_fotog))
+
+        data = r.data.decode('utf-8')
+        # print('data: ', data)
+        # return TemplateView.get(self, request, *args, **kwargs)
+        jdata = json.loads(data)
+        jdata = jdata[0:21]
+
+        print('Albuns independentes:', len(jdata))
+
+        classe_albuns = Classe.objects.get(slug='galerias/imagens')
+
+        for album in jdata:
+
+            evento_path = ('/fotografia/evento.do?action=evento_view&id=%s' %
+                           album['evento_id'])
+
+            if not Documento.objects.filter(old_path=evento_path).exists():
+                print ('não existe evento associado:', album['id'])
+                continue
+
+            capa = ('/fotografia/'
+                    'midia.do?action=midia_view'
+                    '&escala=cmj_import&idImage=%s'
+                    % album['idMCp'])
+
+            noticia = Documento.objects.filter(old_path=capa,
+                                               citado_em__isnull=False)
+            if noticia.exists():
+                print ('Já existe album associado a notícia:', album['tit'])
+
+                img = noticia.first()
+
+                """if img:
+                    d = img.citado_em.all().first().referente
+                    d.titulo = album['tit']
+                    d.descricao = album['dscr']
+                    d.save()
+                    Revisao.gerar_revisao(d, request.user)"""
+                continue
+
+            album_path = ("/fotografia/album.do?action=album_json&id=%s"
+                          % album['id'])
+
+            if Documento.objects.filter(old_path=album_path).exists():
+                print ('Já existe album:', album['tit'])
+                continue
+
+            print ('Criando album:', album['tit'])
+
+            jmidias = []
+            try:
+                r = http.request('GET', '%s%s%s' % (
+                    self.end_local_fotog,
+                    '/fotografia/album.do?action=album_json&id=', album['id']))
+                jmidias = json.loads(r.data.decode('utf-8'))
+            except:
+                pass
+
+            if not jmidias:
+                continue
+
+            if len(jmidias) == 1 and jmidias[0]['id'] == "0":
+                continue
+
+            evento = Documento.objects.filter(old_path=evento_path).first()
+
+            with transaction.atomic():
+                documento = Documento()
+                documento.old_path = album_path
+                documento.old_json = json.dumps(album)
+                documento.titulo = album['tit']
+                documento.descricao = album['dscr']
+                documento.public_date = evento.public_date
+                documento.classe = classe_albuns
+                documento.tipo = Documento.TD_GALERIA_PUBLICA
+                documento.template_doc = DOC_TEMPLATES_CHOICE.noticia
+                documento.owner = request.user
+                documento.visibilidade = Documento.STATUS_PUBLIC
+                documento.save()
+                Revisao.gerar_revisao(documento, request.user)
+
+                cont_gallery = Documento()
+                cont_gallery.titulo = ''
+                cont_gallery.descricao = ''
+                cont_gallery.classe = classe_albuns
+                cont_gallery.tipo = Documento.TPD_CONTAINER_EXTENDIDO
+                cont_gallery.owner = request.user
+                cont_gallery.parent = documento
+                cont_gallery.ordem = 1
+                cont_gallery.visibilidade = documento.visibilidade
+                cont_gallery.save()
+                Revisao.gerar_revisao(cont_gallery, request.user)
+
+                galeria = Documento()
+                galeria.autor = 'Hélio Domingos'
+                galeria.visibilidade = documento.visibilidade
+                galeria.ordem = 1
+                galeria.titulo = ''
+                galeria.owner = request.user
+                galeria.parent = cont_gallery
+                galeria.tipo = Documento.TPD_GALLERY
+                galeria.classe = classe_albuns
+                galeria.save()
+                Revisao.gerar_revisao(galeria, request.user)
+
+                ord_ref = 2
+                for midia in jmidias:
+                    old_path_midia = ('/fotografia/'
+                                      'midia.do?action=midia_view'
+                                      '&escala=cmj_import&idImage=%s'
+                                      % midia['id'])
+
+                    referenciado = Documento.objects.filter(
+                        old_path=old_path_midia).first()
+
+                    if referenciado:
+
+                        ref = ReferenciaEntreDocumentos()
+                        ref.referenciado = referenciado
+                        ref.referente = galeria
+                        ref.titulo = ''
+
+                        ref.ordem = ord_ref if midia[
+                            'id'] != album['idMCp'] else 1
+
+                        ref.ordem = ord_ref
+                        ref.save()
+                        if midia['id'] != album['idMCp']:
+                            ord_ref += 1
 
         http = urllib3.PoolManager()
 
