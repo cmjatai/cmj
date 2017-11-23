@@ -1,11 +1,3 @@
-"""
-Django settings for CMJ project.
-"""
-"""@property    gerar nomes para urls
-def pretty_name(self):
-    return "{0}.{1}".format(slugify(self.title),
-            get_extension(self.file.name))"""
-
 import logging
 import sys
 
@@ -26,10 +18,7 @@ PROJECT_DIR = Path(__file__).ancestor(2)
 # print(BASE_DIR)
 # print(PROJECT_DIR)
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY')
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = ['*']
@@ -83,7 +72,7 @@ INSTALLED_APPS = (
 
 
     'taggit',
-    'webpack_loader',
+    #'webpack_loader',
 )
 
 INSTALLED_APPS = INSTALLED_APPS + tuple(
@@ -211,8 +200,6 @@ SOCIAL_BACKEND_INFO = {
         'icon': 'img/icon-google-plus.png',
     },
 }
-# twitter não está funcinando com a customização do auth.User,
-# ao menos localmente... testar em um domínio válido.
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
@@ -225,7 +212,6 @@ TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 USE_L10N = False
 USE_TZ = True
-# DATE_FORMAT = 'N j, Y'
 DATE_FORMAT = 'd/m/Y'
 SHORT_DATE_FORMAT = 'd/m/Y'
 DATE_INPUT_FORMATS = ('%d/%m/%Y', '%m-%d-%Y', '%Y-%m-%d')
@@ -235,16 +221,15 @@ LOCALE_PATHS = (
 )
 
 
-WEBPACK_LOADER = {
+"""WEBPACK_LOADER = {
     'DEFAULT': {
         'BUNDLE_DIR_NAME': 'bundles/',
         'STATS_FILE': PROJECT_DIR.child('webpack-stats.json'),
     }
-}
+}"""
 
-MEDIA_ROOT = PROJECT_DIR.child("media")
 MEDIA_URL = '/media/'
-
+MEDIA_ROOT = PROJECT_DIR.child("media")
 MEDIA_PROTECTED_ROOT = PROJECT_DIR.child("media_protected")
 
 DAB_FIELD_RENDERER = \
@@ -347,5 +332,6 @@ if DEBUG and LOGGING_CONSOLE:
 def excepthook(*args):
     logging.getLogger(BASE_DIR.name).error(
         'Uncaught exception:', exc_info=args)
+
 
 sys.excepthook = excepthook

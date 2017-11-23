@@ -1,21 +1,11 @@
 {% extends "base.html" %}
-{% load i18n %}
-
-{% load render_bundle from webpack_loader %}
-{% block extra_js %}{{block.super}}
-{% render_bundle 'main' %}
-{% endblock %}
-
-
-{% block title%}{{block.super}}
-
-<h1>Bem-vindo a Câmara Municipal de Jataí!</h1>
-{% endblock %}
-
+{% load i18n staticfiles %}
 
 {% block base_content %}
+<div class="exemplo"></div>
 
-<div id="react-app"></div>
-<div id="react-app2"></div>
+{% endblock %}
 
+{% block extra_js %}{{block.super}}
+<script src="{% static 'js/bundle.js' %}"></script>
 {% endblock %}

@@ -76,7 +76,7 @@ urlpatterns = [
     url(r'', include(sapl.api.urls)),
     url(r'^sapl/', include(sapl.base.urls)),
 
-    url(r'^react$', TemplateView.as_view(template_name='index.html')),
+    url(r'^vue$', TemplateView.as_view(template_name='index.html')),
 
 ]
 

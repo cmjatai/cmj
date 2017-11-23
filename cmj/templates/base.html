@@ -22,7 +22,7 @@
       <meta property="og:title" content="{% if object.titulo %}{{object.titulo}}{% elif object.parents_and_me.0.titulo %}{{object.parents_and_me.0.titulo}}{% elif object.referente %}{{object.referente.parents_and_me.0.titulo}}{% else %}Câmara Municipal de Jataí{% endif %}">
       <meta property="og:description" content="{% if object.referente %}{{object.referente.parents_and_me.0.descricao|striptags|safe}}{% else %}{{object.parents_and_me.descricao|striptags|safe}}{%endif%}">
 
-
+      
       {% with object.imagem_representativa_metatags as doc_imagem %}
         {% if doc_imagem and doc_imagem.absolute_slug%}
           <meta property="og:image" content="{{request.scheme}}://{{request.get_host}}/{{doc_imagem.absolute_slug}}.768.jpg">
