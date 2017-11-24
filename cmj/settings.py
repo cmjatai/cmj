@@ -268,7 +268,7 @@ STATICFILES_FINDERS = (
 # Additional search paths for SASS files when using the @import statement
 SASS_PROCESSOR_INCLUDE_DIRS = (
     BOWER_COMPONENTS_ROOT.child(
-        'bower_components', 'bootstrap-sass', 'stylesheets'),
+        'bower_components', 'bootstrap-sass', 'assets', 'stylesheets'),
 )
 
 # FIXME update cripy-forms and remove this

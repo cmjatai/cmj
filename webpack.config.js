@@ -1,11 +1,11 @@
 var path = require('path')
 var webpack = require('webpack')
 module.exports = {
-  entry: './cmj/static/js/vue/VueCmj.js',
+  entry: './cmj-vue/src/main.js',
   output: {
-    path: path.resolve(__dirname, './cmj/static/js'),
-    publicPath: '/cmj/static/js/',
-    filename: 'bundle.js'
+    path: path.resolve(__dirname, './cmj/static'),
+    publicPath: '/static/',
+    filename: 'js/bundle.js'
   },
   module: {
     rules: [
@@ -27,7 +27,7 @@ module.exports = {
         test: /\.(png|jpg|gif|svg)$/,
         loader: 'file-loader',
         options: {
-          name: '[name].[ext]?[hash]'
+          name: 'assets/[name].[ext]?[hash]'
         }
       }
     ]
