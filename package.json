@@ -18,8 +18,9 @@
   },
   "homepage": "https://github.com/cmjatai/cmj#readme",
   "dependencies": {
+    "axios": "^0.17.1",
     "vue": "",
-    "vue-resource": "",
+    "vue-resource": "^1.3.4",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1",
     "vuex-router-sync": "^5.0.0"

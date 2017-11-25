@@ -1,9 +1,9 @@
 
-import Exemplo from './utils-components/Exemplo.vue'
+import Endereco from './cmj-components/Endereco'
 
 export const routes = [
   {
       path: '/vue',
-      component: Exemplo,
+      component: Endereco,
   }
 ];
