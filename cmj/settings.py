@@ -64,6 +64,7 @@ INSTALLED_APPS = (
     'floppyforms',
     'sass_processor',
     'rest_framework',
+    'rest_framework_docs',
     'reversion',
 
     'haystack',

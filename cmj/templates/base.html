@@ -22,7 +22,7 @@
       <meta property="og:title" content="{% if object.titulo %}{{object.titulo}}{% elif object.parents_and_me.0.titulo %}{{object.parents_and_me.0.titulo}}{% elif object.referente %}{{object.referente.parents_and_me.0.titulo}}{% else %}Câmara Municipal de Jataí{% endif %}">
       <meta property="og:description" content="{% if object.referente %}{{object.referente.parents_and_me.0.descricao|striptags|safe}}{% else %}{{object.parents_and_me.descricao|striptags|safe}}{%endif%}">
 
-      
+
       {% with object.imagem_representativa_metatags as doc_imagem %}
         {% if doc_imagem and doc_imagem.absolute_slug%}
           <meta property="og:image" content="{{request.scheme}}://{{request.get_host}}/{{doc_imagem.absolute_slug}}.768.jpg">
@@ -407,24 +407,27 @@
         });
 
     });
-
-      window.fbAsyncInit = function() {
-        FB.init({
-          appId      : '150874375319738',
-          xfbml      : true,
-          version    : 'v2.6'
-        });
-      };
-
-      (function(d, s, id){
-         var js, fjs = d.getElementsByTagName(s)[0];
-         if (d.getElementById(id)) {return;}
-         js = d.createElement(s); js.id = id;
-         js.src = "//connect.facebook.net/pt_BR/sdk.js";
-         fjs.parentNode.insertBefore(js, fjs);
-       }(document, 'script', 'facebook-jssdk'));
     </script>
+
     {% if not DEBUG %}
+      <script>
+        window.fbAsyncInit = function() {
+          FB.init({
+            appId      : '150874375319738',
+            xfbml      : true,
+            version    : 'v2.6'
+          });
+        };
+
+        (function(d, s, id){
+           var js, fjs = d.getElementsByTagName(s)[0];
+           if (d.getElementById(id)) {return;}
+           js = d.createElement(s); js.id = id;
+           js.src = "//connect.facebook.net/pt_BR/sdk.js";
+           fjs.parentNode.insertBefore(js, fjs);
+         }(document, 'script', 'facebook-jssdk'));
+
+      </script>
       <!-- Global site tag (gtag.js) - Google Analytics -->
       <script async src="https://www.googletagmanager.com/gtag/js?id=UA-2431536-7"></script>
       <script>

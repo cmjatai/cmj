@@ -1,6 +1,6 @@
 <template lang="html">
   <div v-show="loading" class="loading">
-    <img class="loading_icon" src="../assets/icons/Loading.svg" alt="" />
+    <img class="loading_icon" src="../../assets/icons/Loading.svg" alt="" />
   </div>
 </template>
 

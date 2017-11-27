@@ -1,9 +1,9 @@
 
-import Endereco from './cmj-components/Endereco'
+import DocumentoEdit from './components/cmj/sigad/DocumentoEdit'
 
 export const routes = [
   {
-      path: '/vue',
-      component: Endereco,
+      path: '/documento/:id/edit',
+      component: DocumentoEdit,
   }
 ];

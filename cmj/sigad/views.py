@@ -1097,7 +1097,7 @@ class DocumentoUpdateView(DocumentoPermissionRequiredMixin, UpdateView):
     permission_required = ('sigad.change_documento')
     model = Documento
     form_class = DocumentoForm
-    template_name = 'crud/form.html'
+    template_name = 'sigad/documento_form.html'
 
     @property
     def cancel_url(self):
