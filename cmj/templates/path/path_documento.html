@@ -1,6 +1,7 @@
 {% extends "base_path.html" %}
 {% load i18n sigad_filters social_utils %}
 
+{% block head_title %}{{block.super}} - {{object}}{% endblock head_title %}
 {% block main_container_class %}container-path{% endblock %}
 
 {% block base_functions %}

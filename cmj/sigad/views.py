@@ -583,7 +583,7 @@ class ClasseCreateView(ClasseParentMixin,
     permission_required = 'sigad.add_classe'
     form_valid_message = _('Classe criada com sucesso!')
     form_invalid_message = _('Existem erros no formulário de cadastro!')
-    template_name = 'sigad/form.html'
+    template_name = 'crud/form.html'
     form_class = forms.ClasseForm
     model = Classe
 
@@ -627,7 +627,7 @@ class ClasseUpdateView(ClasseParentMixin,
     permission_required = 'sigad.change_classe'
     form_valid_message = _('Classe Alterada com sucesso!')
     form_invalid_message = _('Existem erros no formulário!')
-    template_name = 'sigad/form.html'
+    template_name = 'crud/form.html'
     form_class = forms.ClasseForm
     model = Classe
 
