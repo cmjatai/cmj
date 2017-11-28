@@ -4,18 +4,18 @@ import VueResource from 'vue-resource'
 import Router from 'vue-router'
 import { sync } from 'vuex-router-sync'
 
-import VuexStore from './vuex/store'
+import VuexStore from './apps/store'
 import { routes } from './router-config'
 import axios from 'axios'
 import { loadProgressBar } from 'axios-progress-bar'
 
-import Components from './components'
+import Components from './apps'
 
 Vue.use(Vuex)
 Vue.use(Router)
 Vue.use(VueResource)
 
-Vue.http.headers.common['Access-Control-Allow-Origin'] = '*'
+//Vue.http.headers.common['Access-Control-Allow-Origin'] = '*'
 
 loadProgressBar()
 
@@ -31,7 +31,7 @@ sync(store, router)
 const app = new Vue({
   router,
   store,
-  components: Components,
+  components: Components.components,
   el: '#app-vue'
 })
 

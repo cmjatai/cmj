@@ -29,6 +29,11 @@ urlpatterns_sigad = [
     url(r'^classe/(?P<pk>[0-9]+)$',
         views.ClasseListView.as_view(), name='subclasse_list'),
 
+
+    url(r'^classe/(?P<pk>[0-9]+)/documento/create',
+        views.DocumentoCreateView.as_view(), name='documento_create'),
+
+
     url(r'^documento/pm_import$',
         imports.DocumentoPmImportView.as_view(), name='documento_pm_import'),
 

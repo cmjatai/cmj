@@ -814,172 +814,28 @@ class PermissionsUserClasseCrud(MasterDetailCrud):
             return ctxt
 
 
-"""
 class DocumentoCreateView(
         PermissionRequiredMixin,
-        FormMessagesMixin,
         CreateView):
     permission_required = ('sigad.add_documento')
-    form_valid_message = _('Documento criado com sucesso!')
-    template_name = 'sigad/form.html'
-    form_class = forms.DocumentoForm
+    template_name = 'crud/form.html'
+    form_class = DocumentoForm
+    model = Documento
 
     def get_success_url(self):
         return reverse_lazy(
-            'sigad:documento_detail',
+            'cmj.sigad:documento_edit',
             kwargs={'pk': self.object.id})
 
-    def post(self, request, *args, **kwargs):
-        try:
-            form = forms.DocumentoForm(request.POST, request.FILES, **kwargs)
+    def get_form(self, form_class=None):
+        form = super().get_form(self.form_class)
+        form.instance.classe = Classe.objects.get(pk=self.kwargs['pk'])
+        form.instance.owner = self.request.user
+        return form
 
-            if form.is_valid():
-                self.object = form.save(commit=False)
-                self.object.owner = request.user
-                self.object.modifier = request.user
-                self.object.save()
-
-                files = form.files.getlist('medias_file')
-                for f in files:
-                    dm = Documento()
-                    dm.media_of = self.object
-                    dm.owner = self.object.owner
-                    dm.modifier = self.object.modifier
-                    dm.data = self.object.data
-                    dm.save()
-
-                    vm = VersionedMedia(documento=dm)
-                    vm.save()
-
-                    m = Media(file=f)
-                    m.owner = self.object.owner
-                    m.vm = vm
-                    m.content_type = f.content_type
-                    m.save()
-                return self.form_valid(form)
-            else:
-                return self.form_invalid(form)
-        except Exception as e:
-            print(e)
-        return HttpResponse("post")
-"""
-
-"""
-class Pcasp2016ImportView(View):
-
-    def get(self, request, *args, **kwargs):
-        import csv
-        csvfile = open(
-            '/home/leandro/Downloads/sigad/PCASP_Estendido_2016_errata.csv')
-        reader = csv.DictReader(csvfile)
-
-        def nivel(conta):
-            nv = len(conta)
-            if not nv:
-                return 0
-
-            if nv > 0 and conta[-1]:
-                return nv
-            return nivel(conta[:-1])
-
-        classe = None
-        nv_old = 0
-        for row in reader:
-            conta = [int('0' + sv) for sv in row['CONTA'].split('.')]
-            titulo = row['TÍTULO'].replace(
-                '\n', '').replace('  ', '').replace('–', '-')
-
-            funcao = row['FUNÇÃO'].replace(
-                '\n', '').replace('  ', '').replace('–', '-')
-
-            if conta >= [2, 1, 5, 0, 0, 0, 0]:
-                print(conta)
-
-            nv = nivel(conta)
-            if nv == 1:
-                parent = None
-            elif not nv:
-                continue
-
-            if nv_old < nv:
-                parent = classe
-            elif nv_old > nv:
-                parent = classe
-                while nv_old >= nv:
-                    nv_old = parent.nivel
-                    parent = parent.parent
-
-            classe = Classe()
-            classe.owner = request.user
-            classe.modifier = request.user
-            classe.codigo = conta[nv - 1]
-            classe.nome = titulo
-            classe.descricao = funcao
-            classe.visibilidade = models.STATUS_RESTRICT
-            classe.perfil = models.CLASSE_ESTRUTURAL
-            classe.parent = parent
-            classe.clean()
-            classe.save()
-
-            nv_old = nv
-
-        classes = Classe.objects.select_related('parent', 'parent__parent')
-
-        for cls in classes:
-            if cls.subclasses.exists():
-                cls.perfil = models.CLASSE_ESTRUTURAL
-            else:
-                cls.perfil = models.CLASSE_DOCUMENTAL
-            cls.save()
-
-        content = ''
-        for row in reader:
-            conta = [int('0' + sv) for sv in row['CONTA'].split('.')]
-            titulo = row['TÍTULO'].replace(
-                '\n', '').replace('  ', '').replace('–', '-')
-
-            funcao = row['FUNÇÃO'].replace(
-                '\n', '').replace('  ', '').replace('–', '-')
-
-            content += '%s - %s - %s\n' % (
-                nivel(conta),
-                conta,
-                row['TÍTULO'].replace('\n', '').
-                replace('  ', '').replace('–', '-'))
-
-        return HttpResponse(content, content_type='text/plain; charset=utf8')
-
-
-class MediaDetailView(DocumentoPermissionRequiredMixin, DetailView):
-    permission_required = ('sigad.view_documento_media')
-    model = Documento
-
-    def get(self, request, *args, **kwargs):
-        try:
-            doc = Documento.objects.get(pk=kwargs['media_id'])
-            midia = doc.midia.last
-        except Exception as e:
-            raise Http404
-
-        if 'resize' in kwargs and kwargs['resize']:
-            try:
-                file = midia.thumbnail(kwargs['resize'])
-            except Exception as e:
-                file = midia.file
-        else:
-            file = midia.file
-
-        response = HttpResponse(
-            file, content_type=midia.content_type)
-
-        response['Cache-Control'] = 'no-cache'
-        response['Pragma'] = 'no-cache'
-        response['Expires'] = 0
-        response['Content-Disposition'] = 'inline; filename=' + \
-            midia.file.name
-        return response
-
-"""
+    def title(self):
+        classe = Classe.objects.get(pk=self.kwargs['pk'])
+        return classe
 
 
 class DocumentoPermissionRequiredMixin(PermissionRequiredMixin):
@@ -988,6 +844,10 @@ class DocumentoPermissionRequiredMixin(PermissionRequiredMixin):
         self.object = self.get_object()
         has_permission = True
         if self.object:
+
+            if not self.object.tipo in Documento.TDs:
+                raise Http404()
+
             if not self.request.user.is_superuser:
 
                 # se documento é privado e usuário que acessá não é o dono
@@ -1035,35 +895,8 @@ class DocumentoDeleteView(DocumentoPermissionRequiredMixin, DeleteView):
             'cmj.sigad:path_view',
             kwargs={'slug': self.object.classe.slug})
 
-    def documento_permitido(self, request, *args, **kwargs):
-        self.object = self.get_object()
-
-        if self.object.parte_de_documento():
-            parent = self.object.parent
-            while parent.parent and parent.parte_de_documento():
-                parent = parent.parent
-
-            messages.error(
-                self.request,
-                _('Parte de Documentos não são excluidos '
-                  'via Exclusão de Documento'))
-            return False, redirect(reverse_lazy(
-                'cmj.sigad:path_view',
-                kwargs={'slug': parent.absolute_slug}))
-
-        return True, None
-
-    def get(self, request, *args, **kwargs):
-        documento_permitido = self.documento_permitido(
-            request, *args, **kwargs)
-
-        if documento_permitido[0]:
-            return DeleteView.get(self, request, *args, **kwargs)
-        else:
-            return documento_permitido[1]
-
     def delete_doc(self, doc):
-        # trans  midia, caso exista, para ult rev de cada descendente
+        # transfere  midia, caso exista, para ult rev de cada descendente
 
         childs = doc.childs.view_childs()
 
@@ -1082,12 +915,6 @@ class DocumentoDeleteView(DocumentoPermissionRequiredMixin, DeleteView):
             midia.save()
 
     def delete(self, request, *args, **kwargs):
-        documento_permitido = self.documento_permitido(
-            request, *args, **kwargs)
-
-        if not documento_permitido[0]:
-            return documento_permitido[1]
-
         self.delete_doc(self.object)
 
         return DeleteView.delete(self, request, *args, **kwargs)
@@ -1113,6 +940,10 @@ class DocumentoUpdateView(DocumentoPermissionRequiredMixin, UpdateView):
         ctxt = UpdateView.get_context_data(self, **kwargs)
         ctxt['subnav_template_name'] = 'sigad/subnav_documento.yaml'
         return ctxt
+
+    def form_valid(self, form):
+
+        return UpdateView.form_valid(self, form)
 
 
 class PermissionsUserDocumentoCrud(MasterDetailCrud):

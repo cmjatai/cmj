@@ -1,7 +1,7 @@
 
 <template>
   <div id="app">
-    <router-view class="view"></router-view>
+    <router-view></router-view>
   </div>
 </template>
 
@@ -11,6 +11,7 @@
 
   export default {
     name: 'app',
+    props: ['message'],
     data() {
       return {
       }
@@ -22,5 +23,5 @@
 
 
 <style lang="scss">
-  @import "./scss/app.scss"
+  @import "../scss/app.scss"
 </style>

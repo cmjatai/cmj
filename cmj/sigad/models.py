@@ -549,6 +549,15 @@ class Documento(ShortUrl, CMSMixin):
         (TPD_GALLERY, _('Galeria de Imagens')),
     )
 
+    # Documentos completos
+    TDs = (TD_DOC, TD_BI, TD_GALERIA_PUBLICA)
+
+    # Containers
+    TDc = (TPD_CONTAINER_SIMPLES, TPD_CONTAINER_EXTENDIDO)
+
+    # Partes
+    TDp = (TPD_TEXTO, TPD_VIDEO, TPD_IMAGE, TPD_GALLERY)
+
     tipo_parte_doc = {
         TPD_TEXTO: {
             'view': {

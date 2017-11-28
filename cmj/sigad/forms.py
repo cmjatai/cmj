@@ -2,12 +2,13 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Fieldset
 from django import forms
 from django.forms.models import ModelForm, ModelMultipleChoiceField
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from sapl.crispy_layout_mixin import to_row, SaplFormLayout
 from sapl.parlamentares.models import Parlamentar
 
 from cmj.sigad import models
-from cmj.sigad.models import Classe, Documento
+from cmj.sigad.models import Classe, Documento, Revisao
 
 
 class UpLoadImportFileForm(forms.Form):
@@ -93,6 +94,8 @@ class DocumentoForm(ModelForm):
         label=Parlamentar._meta.verbose_name_plural,
         widget=forms.SelectMultiple(attrs={'size': '10'})
     )
+    public_date = forms.DateTimeField(
+        widget=forms.HiddenInput(), required=False,)
 
     class Meta:
         model = Documento
@@ -100,7 +103,8 @@ class DocumentoForm(ModelForm):
                   'template_doc',
                   'descricao',
                   'visibilidade',
-                  'parlamentares'
+                  'parlamentares',
+                  'public_date'
                   ]
 
     def __init__(self, *args, **kwargs):
@@ -121,3 +125,28 @@ class DocumentoForm(ModelForm):
         self.fields['parlamentares'].choices = [
             ('0', '--------------')] + list(
             self.fields['parlamentares'].choices)
+
+    def save(self, commit=True):
+        inst = self.instance
+
+        if inst.visibilidade != Documento.STATUS_PUBLIC:
+            inst.public_date = None
+        else:
+            if not inst.public_date:
+                inst.public_date = timezone.now()
+
+        inst = super().save(commit)
+
+        if not inst.childs.exists():
+            container = Documento()
+            container.titulo = ''
+            container.descricao = ''
+            container.classe = inst.classe
+            container.tipo = Documento.TPD_CONTAINER_SIMPLES
+            container.owner = inst.owner
+            container.parent = inst
+            container.ordem = 1
+            container.visibilidade = inst.visibilidade
+            container.save()
+
+        return inst

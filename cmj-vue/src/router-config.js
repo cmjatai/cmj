@@ -1,5 +1,5 @@
 
-import DocumentoEdit from './components/cmj/sigad/DocumentoEdit'
+import DocumentoEdit from './apps/sigad/components/DocumentoEdit'
 
 export const routes = [
   {
