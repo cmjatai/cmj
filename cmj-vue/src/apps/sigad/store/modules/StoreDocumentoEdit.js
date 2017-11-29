@@ -1,8 +1,17 @@
 
-const mutations = {};
+const mutations = {
+  
+};
 
-const state = {};
-const getters = {};
+const state = {
+  documento: {
+    id: 0,
+    containers: []
+  }
+};
+const getters = {
+
+};
 const actions = {};
 
 export default {

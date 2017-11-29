@@ -33,6 +33,7 @@ CMJ_APPS = (
 
     'cmj.cerimonial',
     'cmj.sigad',
+    'cmj.api',
 
 
     # manter sempre como o último da lista de apps
@@ -64,6 +65,7 @@ INSTALLED_APPS = (
     'floppyforms',
     'sass_processor',
     'rest_framework',
+    'rest_framework_recursive',
     'rest_framework_docs',
     'reversion',
 
@@ -114,7 +116,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.SessionAuthentication",
     ),
-    "DEFAULT_PAGINATION_CLASS": "sapl.api.pagination.StandardPagination",
+    "DEFAULT_PAGINATION_CLASS": "cmj.api.pagination.StandardPagination",
     "DEFAULT_FILTER_BACKENDS": (
         "rest_framework.filters.SearchFilter",
         "rest_framework.filters.DjangoFilterBackend",

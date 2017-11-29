@@ -44,6 +44,7 @@ import sapl.protocoloadm.urls
 import sapl.relatorios.urls
 import sapl.sessao.urls
 
+import cmj.api.urls
 import cmj.cerimonial.urls
 import cmj.core.urls
 import cmj.sigad.urls
@@ -96,5 +97,6 @@ if settings.DEBUG:
 
 
 urlpatterns += [
+    url(r'', include(cmj.api.urls)),
     url(r'', include(cmj.sigad.urls)),
 ]
