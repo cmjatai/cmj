@@ -1,14 +1,11 @@
-import copy
-import inspect
 
-from django.core import serializers as django_serializers
 from django.forms.models import model_to_dict
 from rest_framework import serializers
 from rest_framework.fields import empty
 from rest_framework.relations import RelatedField, ManyRelatedField,\
     MANY_RELATION_KWARGS
 
-from cmj.sigad.models import Documento
+from cmj.sigad.models import Documento, ReferenciaEntreDocumentos
 
 
 class DocumentoParteField(RelatedField):
@@ -16,17 +13,29 @@ class DocumentoParteField(RelatedField):
 
     def to_representation(self, instance):
         cfg = self.configs
-        if not cfg['depths'][cfg['field']]:
+
+        """if not cfg['depths'][cfg['field']]:
             return instance.pk
 
-        inst = model_to_dict(instance, fields=cfg['fields'])
+        depths = copy.deepcopy(cfg['depths'])
+        depth = depths[cfg['field']]
+        depths[cfg['field']] = (depth - 1) if depth else 0"""
+
+        if isinstance(instance, Documento):
+            inst = model_to_dict(instance, fields=cfg['fields'])
+        else:
+            inst = model_to_dict(instance)
 
         inst[cfg['field']] = []
 
-        if cfg['depths'][cfg['field']]:
-            for child in getattr(instance, cfg['field']).order_by('ordem'):
-                inst[cfg['field']].append(
-                    cfg['serializer'](child, depths=cfg['depths']).data)
+        # if depths[cfg['field']]:
+
+        if not hasattr(instance, cfg['field']):
+            return inst
+
+        for child in getattr(instance, cfg['field']).order_by('ordem'):
+            inst[cfg['field']].append(
+                cfg['serializer'](child, depths=cfg['depths']).data)  # depths
 
         return inst
 
@@ -46,10 +55,15 @@ class DocumentoParteField(RelatedField):
         return CustomManyRelatedField(**list_kwargs)
 
 
+class RefereniciaDocumentoField(DocumentoParteField):
+    queryset = ReferenciaEntreDocumentos.objects.order_by('ordem')
+
+
 class DocumentoSerializer(serializers.ModelSerializer):
 
     childs = DocumentoParteField(many=True)
-    documentos_citados = DocumentoParteField(many=True)
+    #documentos_citados = DocumentoParteField(many=True)
+    #cita = RefereniciaDocumentoField(many=True)
 
     def __init__(self, instance=None, data=empty, depths={}, **kwargs):
         super().__init__(instance=instance, data=data, **kwargs)
@@ -60,18 +74,12 @@ class DocumentoSerializer(serializers.ModelSerializer):
         if meta:
             exclude = meta.exclude
 
-        if depths:
-            depths = {
-                'childs': depths['childs'] - 1 if depths['childs'] else 0,
-                'documentos_citados': depths[
-                    'documentos_citados'] - 1
-                if depths['documentos_citados'] else 0,
-            }
-        else:
+        if not depths:
             params = kwargs['context']['request'].query_params
             depths = {
                 'childs': int(params.get('depth_childs', '0')),
-                'documentos_citados': int(params.get('depth_citados', '0'))
+                #'documentos_citados': int(params.get('depth_citados', '0')),
+                #'cita': int(params.get('depth_citados', '0'))
             }
 
         for key, value in depths.items():
@@ -91,7 +99,7 @@ class DocumentoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Documento
-        exclude = ('old_json', 'old_path', )
+        exclude = ('old_json', 'old_path', 'documentos_citados')
 
 
 class DocumentoUserAnonymousSerializer(DocumentoSerializer):

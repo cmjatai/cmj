@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import VueResource from 'vue-resource'
 import Router from 'vue-router'
 import { sync } from 'vuex-router-sync'
+import VueCookie from 'vue-cookie'
 
 import VuexStore from './apps/store'
 import { routes } from './router-config'
@@ -10,6 +11,9 @@ import axios from 'axios'
 import { loadProgressBar } from 'axios-progress-bar'
 
 import Components from './apps'
+
+axios.defaults.xsrfCookieName = 'csrftoken'
+axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 
 Vue.use(Vuex)
 Vue.use(Router)

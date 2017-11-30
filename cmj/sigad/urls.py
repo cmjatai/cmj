@@ -37,7 +37,10 @@ urlpatterns_sigad = [
     url(r'^documento/pm_import$',
         imports.DocumentoPmImportView.as_view(), name='documento_pm_import'),
 
-    url(r'^documento/(?P<pk>[0-9]+)/edit$',
+    url(r'^documento/(?P<pk>[0-9]+)/construct',
+        views.DocumentoConstructView.as_view(), name='documento_construct'),
+
+    url(r'^documento/(?P<pk>[0-9]+)/edit',
         views.DocumentoUpdateView.as_view(), name='documento_edit'),
 
     url(r'^documento/(?P<pk>[0-9]+)/delete$',

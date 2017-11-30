@@ -4,16 +4,3 @@
 {% block base_content %}
   {% crispy form %}
 {% endblock %}
-
-{% block cmj_extra_content %}
-<div class="container-path">
-  <div id="app-vue">
-    <app></app>
-  </div>
-</div>
-{% endblock %}
-
-
-{% block extra_js %}{{block.super}}
-<script src="{% static 'js/bundle.js' %}"></script>
-{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load i18n staticfiles%}
+
+{% block main_header %}{% endblock main_header %}
+
+{% block content_container %}
+<div id="app-vue">
+  <app></app>
+</div>
+{% endblock content_container %}
+
+
+{% block extra_js %}{{block.super}}
+<script src="{% static 'js/bundle.js' %}"></script>
+{% endblock %}

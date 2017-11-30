@@ -920,6 +920,12 @@ class DocumentoDeleteView(DocumentoPermissionRequiredMixin, DeleteView):
         return DeleteView.delete(self, request, *args, **kwargs)
 
 
+class DocumentoConstructView(DocumentoPermissionRequiredMixin, DetailView):
+    permission_required = ('sigad.change_documento')
+    template_name = 'sigad/documento_construct.html'
+    model = Documento
+
+
 class DocumentoUpdateView(DocumentoPermissionRequiredMixin, UpdateView):
     permission_required = ('sigad.change_documento')
     model = Documento
