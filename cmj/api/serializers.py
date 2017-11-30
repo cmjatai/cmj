@@ -15,8 +15,18 @@ class DocumentoParteField(RelatedField):
     queryset = Documento.objects.order_by('ordem')
 
     def to_representation(self, instance):
+        cfg = self.configs
+        if not cfg['depths'][cfg['field']]:
+            return instance.pk
 
-        inst = model_to_dict(instance, fields=self.fields)
+        inst = model_to_dict(instance, fields=cfg['fields'])
+
+        inst[cfg['field']] = []
+
+        if cfg['depths'][cfg['field']]:
+            for child in getattr(instance, cfg['field']).order_by('ordem'):
+                inst[cfg['field']].append(
+                    cfg['serializer'](child, depths=cfg['depths']).data)
 
         return inst
 
@@ -39,8 +49,9 @@ class DocumentoParteField(RelatedField):
 class DocumentoSerializer(serializers.ModelSerializer):
 
     childs = DocumentoParteField(many=True)
+    documentos_citados = DocumentoParteField(many=True)
 
-    def __init__(self, instance=None, data=empty, **kwargs):
+    def __init__(self, instance=None, data=empty, depths={}, **kwargs):
         super().__init__(instance=instance, data=data, **kwargs)
 
         meta = getattr(self, 'Meta', None)
@@ -48,9 +59,35 @@ class DocumentoSerializer(serializers.ModelSerializer):
         exclude = ()
         if meta:
             exclude = meta.exclude
-        self.fields.fields.get('childs').child_relation.fields = [
-            field for field in self.fields.fields
-            if field not in meta.exclude]
+
+        if depths:
+            depths = {
+                'childs': depths['childs'] - 1 if depths['childs'] else 0,
+                'documentos_citados': depths[
+                    'documentos_citados'] - 1
+                if depths['documentos_citados'] else 0,
+            }
+        else:
+            params = kwargs['context']['request'].query_params
+            depths = {
+                'childs': int(params.get('depth_childs', '0')),
+                'documentos_citados': int(params.get('depth_citados', '0'))
+            }
+
+        for key, value in depths.items():
+
+            child_relation = self.fields.fields.get(key).child_relation
+
+            child_relation.configs = {
+                'field': key,
+                'serializer': DocumentoSerializer,
+                'fields': [
+                    field for field in self.fields.fields
+                    if field not in meta.exclude
+
+                ],
+                'depths': depths
+            }
 
     class Meta:
         model = Documento
