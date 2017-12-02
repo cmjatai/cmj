@@ -335,7 +335,7 @@ class RelatorioContatoAgrupadoPorGrupoView(
 
         if len(request.GET) and not len(self.filterset.form.errors)\
                 and not self.object_list.exists():
-            messages.error(request, _('Não existe Conato com as '
+            messages.error(request, _('Não existe Contato com as '
                                       'condições definidas na busca!'))
 
         return self.render_to_response(context)

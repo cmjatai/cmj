@@ -22,8 +22,8 @@ from django.forms.models import ModelForm, ModelMultipleChoiceField
 from django.http.request import QueryDict
 from django.utils.translation import ugettext_lazy as _
 from django_filters.filters import CharFilter, ChoiceFilter, NumberFilter,\
-    MethodFilter, DateFromToRangeFilter, ModelChoiceFilter, RangeFilter,\
-    MultipleChoiceFilter, ModelMultipleChoiceFilter
+    DateFromToRangeFilter, ModelChoiceFilter, RangeFilter,\
+    MultipleChoiceFilter, ModelMultipleChoiceFilter, Filter
 from django_filters.filterset import FilterSet, STRICTNESS
 from sapl.crispy_layout_mixin import to_column, SaplFormLayout, to_fieldsets,\
     form_actions, to_row
@@ -597,7 +597,15 @@ class RangeWidgetNumber(forms.MultiWidget):
             return [value.start, value.stop]
         return [None, None]
 
-    def format_output(self, rendered_widgets):
+    def render(self, name, value, attrs=None, renderer=None):
+        rendered_widgets = []
+        for i, x in enumerate(self.widgets):
+            rendered_widgets.append(
+                x.render(
+                    '%s_%d' % (name, i), value[i] if value else ''
+                )
+            )
+
         html = '<div class="col-sm-6">%s</div><div class="col-sm-6">%s</div>'\
             % tuple(rendered_widgets)
         return '<div class="row">%s</div>' % html
@@ -617,36 +625,20 @@ class RangeWidgetOverride(forms.MultiWidget):
     def decompress(self, value):
         if value:
             return [value.start, value.stop]
-        return [None, None]
+        return []
 
-    def format_output(self, rendered_widgets):
+    def render(self, name, value, attrs=None, renderer=None):
+        rendered_widgets = []
+        for i, x in enumerate(self.widgets):
+            rendered_widgets.append(
+                x.render(
+                    '%s_%d' % (name, i), value[i] if value else ''
+                )
+            )
+
         html = '<div class="col-sm-6">%s</div><div class="col-sm-6">%s</div>'\
             % tuple(rendered_widgets)
         return '<div class="row">%s</div>' % html
-
-
-class MethodRangeFilter(MethodFilter, RangeFilter):
-    pass
-
-
-class MethodChoiceFilter(MethodFilter, ChoiceFilter):
-    pass
-
-
-class MethodMultipleChoiceFilter(MethodFilter, MultipleChoiceFilter):
-    pass
-
-
-class MethodNumberFilter(MethodFilter, NumberFilter):
-    pass
-
-
-class MethodModelChoiceFilter(MethodFilter, ModelChoiceFilter):
-    pass
-
-
-class MethodModelMultipleChoiceFilter(MethodFilter, ModelMultipleChoiceFilter):
-    pass
 
 
 class SubmitFilterPrint(BaseInput):
@@ -658,18 +650,26 @@ class SubmitFilterPrint(BaseInput):
         super(SubmitFilterPrint, self).__init__(*args, **kwargs)
 
 
-def filter_impresso(queryset, value):
-    return queryset
+class DataRangeFilter(Filter):
+    field_class = forms.Field
+
+    def filter(self, queryset, value):
+
+        if not value[0] or not value[1]:
+            return queryset
+
+        inicial = datetime.datetime.strptime(value[0], "%d/%m/%Y").date()
+        final = datetime.datetime.strptime(value[1], "%d/%m/%Y").date()
+        if inicial > final:
+            inicial, final = final, inicial
+
+        range_select = Q(data__range=[inicial, final])
+
+        # Run the query.
+        return queryset.filter(range_select)
 
 
 class ImpressoEnderecamentoContatoFilterSet(FilterSet):
-
-    filter_overrides = {models.DateField: {
-        'filter_class': MethodFilter,
-        'extra': lambda f: {
-            'label': '%s (%s)' % (f.verbose_name, _('Inicial - Final')),
-            'widget': RangeWidgetOverride}
-    }}
 
     FEMININO = 'F'
     MASCULINO = 'M'
@@ -689,62 +689,83 @@ class ImpressoEnderecamentoContatoFilterSet(FilterSet):
 
     FILHOS_CHOICE = [(None, _('Ambos'))] + YES_NO_CHOICES
 
-    search = MethodFilter()
+    search = CharFilter(method='filter_search')
     sexo = ChoiceFilter(choices=SEXO_CHOICE)
-    tem_filhos = ChoiceFilter(choices=FILHOS_CHOICE)
-    idade = MethodRangeFilter(
+    tem_filhos = ChoiceFilter(
+        label=_('Com filhos?'),
+        choices=FILHOS_CHOICE)
+
+    idade = RangeFilter(
         label=_('Idade entre:'),
-        widget=RangeWidgetNumber)
+        widget=RangeWidgetNumber,
+        method='filter_idade')
 
     impresso = ModelChoiceFilter(
-        required=False,
+        label=ImpressoEnderecamento._meta.verbose_name_plural,
+        required=True,
         queryset=ImpressoEnderecamento.objects.all(),
-        action=filter_impresso)
+        method='filter_impresso')
 
-    grupo = MethodChoiceFilter(
-        required=False)
+    grupo = ChoiceFilter(
+        label=_('Contatos Agrupados'),
+        required=False,
+        method='filter_grupo')
 
-    imprimir_pronome = MethodChoiceFilter(
+    imprimir_pronome = ChoiceFilter(
+        label=_('Imprimir Pronome?'),
         choices=YES_NO_CHOICES,
-        initial=False)
-    imprimir_cargo = MethodChoiceFilter(
-        choices=YES_NO_CHOICES, initial=False)
+        required=True,
+        initial=False,
+        method='filter_imprimir_pronome')
+    imprimir_cargo = ChoiceFilter(
+        label=_('Imprimir Cargo?'),
+        required=True,
+        empty_label=None,
+        choices=YES_NO_CHOICES, initial=False,
+        method='filter_imprimir_cargo')
 
-    fontsize = MethodNumberFilter(
+    fontsize = NumberFilter(
         label=_('Tamanho da Fonte'), initial='',
-        max_value=100, min_value=0, max_digits=3, decimal_places=0,)
+        max_value=100, min_value=0, max_digits=3, decimal_places=0,
+        method='filter_fontsize'
+    )
 
-    nome_maiusculo = MethodChoiceFilter(
+    nome_maiusculo = ChoiceFilter(
         label=_('Nome Maiúsculo'),
-        choices=YES_NO_CHOICES, initial=False)
+        choices=YES_NO_CHOICES, initial=False,
+        method='filter_nome_maiusculo')
 
-    local_cargo = MethodChoiceFilter(
+    local_cargo = ChoiceFilter(
         label=_('Local para imprimir o Cargo'),
-        choices=LOCAL_CARGO_CHOICE, initial=False)
+        choices=LOCAL_CARGO_CHOICE, initial=False,
+        method='filter_local_cargo')
 
-    def filter_fontsize(self, queryset, value):
+    def filter_impresso(self, queryset, field_name, value):
         return queryset
 
-    def filter_grupo(self, queryset, value):
+    def filter_fontsize(self, queryset, field_name, value):
+        return queryset
+
+    def filter_grupo(self, queryset, field_name, value):
         if value == '0':
             queryset = queryset.filter(grupodecontatos_set__isnull=True)
         elif value != '':
             queryset = queryset.filter(grupodecontatos_set=value)
         return queryset
 
-    def filter_local_cargo(self, queryset, value):
+    def filter_local_cargo(self, queryset, field_name, value):
         return queryset
 
-    def filter_imprimir_pronome(self, queryset, value):
+    def filter_imprimir_pronome(self, queryset, field_name, value):
         return queryset
 
-    def filter_imprimir_cargo(self, queryset, value):
+    def filter_imprimir_cargo(self, queryset, field_name, value):
         return queryset
 
-    def filter_nome_maiusculo(self, queryset, value):
+    def filter_nome_maiusculo(self, queryset, field_name, value):
         return queryset
 
-    def filter_idade(self, queryset, value):
+    def filter_idade(self, queryset, field_name, value):
         idi = int(value.start) if value.start is not None else 0
         idf = int(
             value.stop) if value.stop is not None else date.today().year - 2
@@ -762,7 +783,7 @@ class ImpressoEnderecamentoContatoFilterSet(FilterSet):
         return queryset.filter(data_nascimento__gt=li,
                                data_nascimento__lte=lf)
 
-    def filter_search(self, queryset, value):
+    def filter_search(self, queryset, field_name, value):
 
         query = normalize(value)
 
@@ -778,7 +799,7 @@ class ImpressoEnderecamentoContatoFilterSet(FilterSet):
                 queryset = queryset.filter(q)
         return queryset
 
-    def filter_data_nascimento(self, queryset, value):
+    def filter_data_nascimento(self, queryset, field_name, value):
         #_where = "date_part('year', age(timestamp '%s', data_nascimento)) != date_part('year', age(timestamp '%s', data_nascimento))"
         # return queryset.extra(where=_where, params=value)
 
@@ -819,6 +840,15 @@ class ImpressoEnderecamentoContatoFilterSet(FilterSet):
                   'tem_filhos',
                   'data_nascimento',
                   'tipo_autoridade']
+        filter_overrides = {
+            models.DateField: {
+                'filter_class': DataRangeFilter,
+                'extra': lambda f: {
+                    'label': '%s (%s)' % (f.verbose_name, _('Inicial - Final')),
+                    'widget': RangeWidgetOverride
+                }
+            }
+        }
 
     def __init__(self, data=None,
                  queryset=None, prefix=None, strict=None, **kwargs):
@@ -876,33 +906,15 @@ class ImpressoEnderecamentoContatoFilterSet(FilterSet):
         self.form.fields['data_nascimento'].label = '%s (%s)' % (
             _('Aniversário'), _('Inicial - Final'))
 
-        self.form.fields['tem_filhos'].label = _('Com filhos?')
-        self.form.fields['tem_filhos'].choices[0] = (None, _('Ambos'))
-
-        self.form.fields['imprimir_pronome'].widget = forms.RadioSelect()
-        self.form.fields['imprimir_pronome'].inline_class = True
-
-        self.form.fields['imprimir_cargo'].widget = forms.RadioSelect()
-        self.form.fields['imprimir_cargo'].inline_class = True
-
-        self.form.fields['nome_maiusculo'].widget = forms.RadioSelect()
-        self.form.fields['nome_maiusculo'].inline_class = True
+        self.form.fields['tem_filhos'].choices.choices[0] = (None, _('Ambos'))
 
         self.form.fields['grupo'].choices = [
-            ('', '-------'),
             ('0', _('Apenas Contatos sem Grupo')),
         ] + [(g.pk, str(g)) for g in GrupoDeContatos.objects.filter(
             workspace=workspace)]
 
 
 class ContatoAgrupadoPorProcessoFilterSet(FilterSet):
-
-    filter_overrides = {models.DateField: {
-        'filter_class': MethodFilter,
-        'extra': lambda f: {
-            'label': '%s (%s)' % (f.verbose_name, _('Inicial - Final')),
-            'widget': RangeWidgetOverride}
-    }}
 
     AGRUPADO_POR_NADA = 'sem_agrupamento'
     AGRUPADO_POR_TITULO = 'titulo'
@@ -927,24 +939,28 @@ class ContatoAgrupadoPorProcessoFilterSet(FilterSet):
          _('Por Classificação')),
     )
 
-    search = MethodFilter()
+    search = CharFilter(method='filter_search')
 
-    agrupamento = MethodChoiceFilter(
+    agrupamento = ChoiceFilter(
         required=False,
-        choices=AGRUPAMENTO_CHOICE)
+        empty_label=None,
+        choices=AGRUPAMENTO_CHOICE,
+        method='filter_agrupamento')
 
-    importancia = MethodMultipleChoiceFilter(
+    importancia = MultipleChoiceFilter(
         required=False,
-        choices=IMPORTANCIA_CHOICE)
+        choices=IMPORTANCIA_CHOICE,
+        method='filter_importancia')
 
-    status = MethodModelMultipleChoiceFilter(
+    status = ModelMultipleChoiceFilter(
         required=False,
-        queryset=StatusProcesso.objects.all())
+        queryset=StatusProcesso.objects.all(),
+        method='filter_status')
 
-    def filter_agrupamento(self, queryset, value):
+    def filter_agrupamento(self, queryset, field_name, value):
         return queryset
 
-    def filter_importancia(self, queryset, value):
+    def filter_importancia(self, queryset, field_name,  value):
         if not value:
             return queryset
 
@@ -953,7 +969,7 @@ class ContatoAgrupadoPorProcessoFilterSet(FilterSet):
             q = q | Q(importancia=i) if q else Q(importancia=i)
         return queryset.filter(q)
 
-    def filter_status(self, queryset, value):
+    def filter_status(self, queryset, field_name,  value):
         if not value:
             return queryset
 
@@ -962,22 +978,7 @@ class ContatoAgrupadoPorProcessoFilterSet(FilterSet):
             q = q | Q(status=sta) if q else Q(status=sta)
         return queryset.filter(q)
 
-    def filter_data(self, queryset, value):
-
-        if not value[0] or not value[1]:
-            return queryset
-
-        inicial = datetime.datetime.strptime(value[0], "%d/%m/%Y").date()
-        final = datetime.datetime.strptime(value[1], "%d/%m/%Y").date()
-        if inicial > final:
-            inicial, final = final, inicial
-
-        range_select = Q(data__range=[inicial, final])
-
-        # Run the query.
-        return queryset.filter(range_select)
-
-    def filter_search(self, queryset, value):
+    def filter_search(self, queryset, field_name,  value):
 
         query = normalize(value)
 
@@ -1002,6 +1003,12 @@ class ContatoAgrupadoPorProcessoFilterSet(FilterSet):
                   'classificacoes',
                   'assuntos',
                   'status', ]
+        filter_overrides = {models.DateField: {
+            'filter_class': DataRangeFilter,
+            'extra': lambda f: {
+                'label': '%s (%s)' % (f.verbose_name, _('Inicial - Final')),
+                'widget': RangeWidgetOverride}
+        }}
 
     def __init__(self, data=None,
                  queryset=None, prefix=None, strict=None, **kwargs):
@@ -1073,10 +1080,10 @@ class ContatoAgrupadoPorProcessoFilterSet(FilterSet):
             'classificacoes'].widget = forms.CheckboxSelectMultiple()
 
         self.form.fields['status'].widget = forms.CheckboxSelectMultiple()
-        #self.form.fields['status'].inline_class = True
+        """#self.form.fields['status'].inline_class = True
         self.form.fields['status'].choices = list(
             self.form.fields['status'].choices)
-        del self.form.fields['status'].choices[0]
+        del self.form.fields['status'].choices[0]"""
 
         self.form.fields['agrupamento'].label = _(
             'Agrupar Contatos')
@@ -1160,27 +1167,31 @@ class GrupoDeContatosForm(ModelForm):
 
 
 class ContatoAgrupadoPorGrupoFilterSet(FilterSet):
-    search = MethodFilter()
 
-    municipio = MethodModelChoiceFilter(
+    municipio = ModelChoiceFilter(
         required=False,
-        queryset=Municipio.objects.all())
+        label=Municipio._meta.verbose_name,
+        queryset=Municipio.objects.all(),
+        method='filter_municipio')
 
-    grupo = MethodModelMultipleChoiceFilter(
+    grupo = ModelMultipleChoiceFilter(
         required=False,
-        queryset=GrupoDeContatos.objects.all())
+        label=GrupoDeContatos._meta.verbose_name_plural,
+        queryset=GrupoDeContatos.objects.all(),
+        method='filter_grupo')
 
-    def filter_municipio(self, queryset, value):
+    def filter_municipio(self, queryset, field_name,  value):
         queryset = queryset.filter(endereco_set__municipio=value)
         return queryset
 
-    def filter_grupo(self, queryset, value):
+    def filter_grupo(self, queryset, field_name, value):
         queryset = queryset.filter(grupodecontatos_set__in=value)
 
         return queryset.order_by('grupodecontatos_set__nome', 'nome')
 
     class Meta:
         model = Contato
+        fields = ('municipio', 'grupo')
 
     def __init__(self, data=None,
                  queryset=None, prefix=None, strict=None, **kwargs):

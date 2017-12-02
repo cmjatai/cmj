@@ -1,52 +1,24 @@
-"""
-class DocumentoMixin(object):
-
-    def get_initial(self):
-
-        if 'documento_id' in self.wargs:
-            parent = get_object_or_404(
-                Documento, pk=self.kwargs.get('documento_id'))
-            initial = {'parent': parent}
-
-        if 'pk' in self.kwargs:
-            initial['pk'] = self.kwargs.get('pk')
-
-        return initial
-
-    @method_decorator(login_required)
-    def dispatch(self, *args, **kwargs):
-        return super(DocumentoMixin, self).dispatch(*args, **kwargs)
-"""
-
-from datetime import datetime, timedelta
 from operator import attrgetter
 import io
 import zipfile
 
 from braces.views import FormMessagesMixin
-from django.conf import settings
-from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.contrib.auth.models import Permission
+
 from django.core.exceptions import PermissionDenied
-from django.core.files import File
-from django.core.files.temp import NamedTemporaryFile
-from django.core.urlresolvers import reverse_lazy, reverse
-from django.core.validators import slug_re
+from django.core.urlresolvers import reverse_lazy
 from django.db.models import F
 from django.db.models.aggregates import Max, Count
 from django.http.response import Http404, HttpResponse, HttpResponseForbidden
-from django.shortcuts import get_object_or_404, redirect
-from django.utils import timezone
-from django.utils.dateparse import parse_date
+from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic.base import View, TemplateView
+from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView, MultipleObjectMixin
-from sapl.crispy_layout_mixin import read_layout_from_yaml
+
 from sapl.parlamentares.models import Parlamentar, Legislatura
-import reversion
+
 
 from cmj.crud.base import MasterDetailCrud
 from cmj.sigad import forms, models

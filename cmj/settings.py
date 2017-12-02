@@ -119,7 +119,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "cmj.api.pagination.StandardPagination",
     "DEFAULT_FILTER_BACKENDS": (
         "rest_framework.filters.SearchFilter",
-        "rest_framework.filters.DjangoFilterBackend",
+        "django_filters.rest_framework.DjangoFilterBackend",
     ),
 }
 
@@ -138,8 +138,11 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
-                "django.core.context_processors.media",
-                "django.core.context_processors.static",
+
+
+                "django.template.context_processors.media",
+                "django.template.context_processors.static",
+
                 'django.contrib.messages.context_processors.messages',
                 'social_django.context_processors.backends',
                 'social_django.context_processors.login_redirect',
@@ -281,10 +284,10 @@ SASS_PROCESSOR_INCLUDE_DIRS = (
 # suprime texto de ajuda default do django-filter
 FILTERS_HELP_TEXT_FILTER = False
 
-
 THUMBNAIL_PROCESSORS = (
     'image_cropping.thumbnail_processors.crop_corners',
 ) + thumbnail_settings.THUMBNAIL_PROCESSORS
+
 
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
 EMAIL_HOST = config('EMAIL_HOST', cast=str)

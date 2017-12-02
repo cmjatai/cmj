@@ -99,7 +99,7 @@
 
             <div class="descricao">
               {{documento.descricao|striptags|safe}}
-              {% if not pagina_inicial and documento.tipo = documento.STATUS_PUBLIC %}
+              {% if not pagina_inicial and documento.tipo == documento.STATUS_PUBLIC %}
                 {% social_link_share documento 'pull-right'%}
               {% endif %}
             </div>

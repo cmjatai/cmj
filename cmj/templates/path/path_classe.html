@@ -8,8 +8,7 @@
 {% block base_content %}
   {% block controls_content %}
     {% if perms.sigad.change_classe %}
-      <a href="{% url 'cmj.sigad:classe_edit' object.id %}">{% trans "[Editar]" %}</a>
-
+      <a href="{% url 'cmj.sigad:subclasse_list' object.id %}">{% trans "[Admin]" %}</a>
       <a href="{% url create_doc_url object.id %}">[{% trans "Adicionar item a" %} {{object }}]</a>
     {% endif %}
   {% endblock %}

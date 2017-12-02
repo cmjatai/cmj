@@ -31,7 +31,9 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic.base import TemplateView
 from django.views.static import serve as view_static_server
-import sapl.api.urls
+
+# import sapl.api.urls
+
 import sapl.base.urls
 import sapl.comissoes.urls
 import sapl.compilacao.urls
@@ -74,7 +76,7 @@ urlpatterns = [
     url(r'', include(sapl.protocoloadm.urls)),
     url(r'', include(sapl.compilacao.urls)),
     url(r'', include(sapl.relatorios.urls)),
-    url(r'', include(sapl.api.urls)),
+    # url(r'', include(sapl.api.urls)),
     url(r'^sapl/', include(sapl.base.urls)),
 
     url(r'^vuetest', TemplateView.as_view(template_name='index.html')),
