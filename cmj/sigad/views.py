@@ -280,6 +280,9 @@ class PathView(MultipleObjectMixin, TemplateView):
                 context['page_range'] = make_pagination(
                     page_obj.number, paginator.num_pages)
             context['object'] = self.classe
+
+            context['create_doc_url'] = models.DOC_TEMPLATES_CHOICE_FILES[
+                self.classe.template_doc_padrao]['create_url']
         else:
             context = TemplateView.get_context_data(self, **kwargs)
         context['path'] = '-path'
@@ -364,10 +367,10 @@ class PathView(MultipleObjectMixin, TemplateView):
         if self.documento:
             if self.documento.template_doc:
                 self.template_name = models.DOC_TEMPLATES_CHOICE_FILES[
-                    self.documento.template_doc]
+                    self.documento.template_doc]['template_name']
             else:
                 self.template_name = models.DOC_TEMPLATES_CHOICE_FILES[
-                    self.documento.classe.template_doc_padrao]
+                    self.documento.classe.template_doc_padrao]['template_name']
         else:
             self.template_name = models.CLASSE_TEMPLATES_CHOICE_FILES[
                 self.classe.template_classe]
@@ -843,7 +846,7 @@ class DocumentoPermissionRequiredMixin(PermissionRequiredMixin):
     def has_permission(self):
         self.object = self.get_object()
         has_permission = True
-        if self.object:
+        if self.object and isinstance(self.object, Documento):
 
             if not self.object.tipo in Documento.TDs:
                 raise Http404()
@@ -876,6 +879,8 @@ class DocumentoPermissionRequiredMixin(PermissionRequiredMixin):
                                 documento=self.object).exists():
                             has_permission = False
                             break
+        else:
+            has_permission = super().has_permission()
 
         return has_permission
 
@@ -920,10 +925,18 @@ class DocumentoDeleteView(DocumentoPermissionRequiredMixin, DeleteView):
         return DeleteView.delete(self, request, *args, **kwargs)
 
 
-class DocumentoConstructView(DocumentoPermissionRequiredMixin, DetailView):
-    permission_required = ('sigad.change_documento')
+class DocumentoConstructView(DocumentoPermissionRequiredMixin, TemplateView):
+    permission_required = ('sigad.change_documento', 'sigad.add_documento')
     template_name = 'sigad/documento_construct.html'
     model = Documento
+
+    def get_object(self):
+        kw = self.kwargs
+        return self.model.objects.get(pk=kw.get('pk'))
+
+
+class DocumentoConstructCreateView(DocumentoConstructView):
+    model = Classe
 
 
 class DocumentoUpdateView(DocumentoPermissionRequiredMixin, UpdateView):

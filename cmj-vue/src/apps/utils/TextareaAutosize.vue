@@ -1,5 +1,5 @@
 <template>
-  <textarea ref="input" v-bind:value="value" placeholder="teste de placeholder" v-on:input="updateValue($event.target.value)"></textarea>
+  <textarea ref="input" v-bind:value="value" placeholder="teste de placeholder" v-on:change="updateValue($event.target.value)"></textarea>
 </template>
 
 <script>
@@ -12,7 +12,7 @@
       setTimeout(function () {
         autosize(text)
         autosize.update(text)
-      }, 500);
+      }, 0);
     },
     methods: {
       updateValue: function (value) {

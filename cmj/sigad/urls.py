@@ -30,17 +30,17 @@ urlpatterns_sigad = [
         views.ClasseListView.as_view(), name='subclasse_list'),
 
 
-    url(r'^classe/(?P<pk>[0-9]+)/documento/create',
+    url(r'^classe/(?P<pk>[0-9]+)/documento/create$',
         views.DocumentoCreateView.as_view(), name='documento_create'),
 
+    url(r'^classe/(?P<pk>[0-9]+)/documento/construct$',
+        views.DocumentoConstructCreateView.as_view(),
+        name='documento_construct_create'),
 
-    url(r'^documento/pm_import$',
-        imports.DocumentoPmImportView.as_view(), name='documento_pm_import'),
-
-    url(r'^documento/(?P<pk>[0-9]+)/construct',
+    url(r'^documento/(?P<pk>[0-9]+)/construct$',
         views.DocumentoConstructView.as_view(), name='documento_construct'),
 
-    url(r'^documento/(?P<pk>[0-9]+)/edit',
+    url(r'^documento/(?P<pk>[0-9]+)/edit$',
         views.DocumentoUpdateView.as_view(), name='documento_edit'),
 
     url(r'^documento/(?P<pk>[0-9]+)/delete$',
@@ -48,6 +48,9 @@ urlpatterns_sigad = [
 
     url(r'^documento/', include(PermissionsUserDocumentoCrud.get_urls())),
 
+
+    url(r'^documento/pm_import$',
+        imports.DocumentoPmImportView.as_view(), name='documento_pm_import'),
 
 
 ]

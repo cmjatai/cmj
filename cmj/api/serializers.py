@@ -61,9 +61,19 @@ class RefereniciaDocumentoField(DocumentoParteField):
 
 class DocumentoSerializer(serializers.ModelSerializer):
 
-    childs = DocumentoParteField(many=True)
-    #documentos_citados = DocumentoParteField(many=True)
-    #cita = RefereniciaDocumentoField(many=True)
+    childs = DocumentoParteField(many=True, required=False)
+    # documentos_citados = DocumentoParteField(many=True)
+    # cita = RefereniciaDocumentoField(many=True)
+
+    class Meta:
+        model = Documento
+        exclude = ('old_json',
+                   'old_path',
+                   'documentos_citados',
+                   'slug',
+                   'owner',
+                   'parlamentares',
+                   'materias')
 
     def __init__(self, instance=None, data=empty, depths={}, **kwargs):
         super().__init__(instance=instance, data=data, **kwargs)
@@ -78,11 +88,14 @@ class DocumentoSerializer(serializers.ModelSerializer):
             params = kwargs['context']['request'].query_params
             depths = {
                 'childs': int(params.get('depth_childs', '0')),
-                #'documentos_citados': int(params.get('depth_citados', '0')),
-                #'cita': int(params.get('depth_citados', '0'))
+                # 'documentos_citados': int(params.get('depth_citados', '0')),
+                # 'cita': int(params.get('depth_citados', '0'))
             }
 
         for key, value in depths.items():
+
+            if key not in self.fields.fields:
+                continue
 
             child_relation = self.fields.fields.get(key).child_relation
 
@@ -97,9 +110,9 @@ class DocumentoSerializer(serializers.ModelSerializer):
                 'depths': depths
             }
 
-    class Meta:
-        model = Documento
-        exclude = ('old_json', 'old_path', 'documentos_citados')
+    def create(self, validated_data):
+        validated_data['owner'] = self.context['request'].user
+        return serializers.ModelSerializer.create(self, validated_data)
 
 
 class DocumentoUserAnonymousSerializer(DocumentoSerializer):

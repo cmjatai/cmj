@@ -36,13 +36,13 @@ const state = {
 }
 
 const getters = {
-  getDocObject: state => state.documento,
+  getDoc: state => state.documento,
   getChilds: state => state.documento.childs
 }
 const actions = {
   setDocObject: ({ commit }, data) => commit(DOC_OBJECT, data),
   setTitulo: ({ commit }, data) => commit(DOC_TITULO, data),
-  setDescricao: ({ commit }, data) => commit(DOC_DESCRICAO, data)
+  setDescricao: ({ commit }, data) => commit(DOC_DESCRICAO, data),
 }
 
 export default {

@@ -40,8 +40,14 @@ PERFIL_CLASSE = ((
 )
 
 DOC_TEMPLATES_CHOICE_FILES = {
-    1: 'path/path_documento.html',
-    2: 'path/path_thumbnails.html'
+    1: {
+        'template_name': 'path/path_documento.html',
+        'create_url': 'cmj.sigad:documento_construct_create'
+    },
+    2:  {
+        'template_name': 'path/path_thumbnails.html',
+        'create_url': 'cmj.sigad:documento_construct_create'
+    },
 }
 
 DOC_TEMPLATES_CHOICE = Choices(

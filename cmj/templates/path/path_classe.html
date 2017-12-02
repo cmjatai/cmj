@@ -1,5 +1,5 @@
 {% extends "base_path.html" %}
-{% load i18n sigad_filters %}
+{% load i18n sigad_filters common_cmj_tags%}
 
 {% block historico_publicacao %}{% endblock %}
 {% block title %}
@@ -9,7 +9,8 @@
   {% block controls_content %}
     {% if perms.sigad.change_classe %}
       <a href="{% url 'cmj.sigad:classe_edit' object.id %}">{% trans "[Editar]" %}</a>
-      <a href="{% url 'cmj.sigad:documento_create' object.id %}">{% trans "[Novo Documento]" %}</a>
+
+      <a href="{% url create_doc_url object.id %}">[{% trans "Adicionar item a" %} {{object }}]</a>
     {% endif %}
   {% endblock %}
 

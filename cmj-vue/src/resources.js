@@ -16,9 +16,19 @@ export const DocumentoResource = {
     url: `${basePath}/documento/${id}/`,
     method: 'GET'
   }),
-  setDocumento: (data, route) => axios({
-    url: `${basePath}/documento/${data.id}/${route}/`,
+  createDocumento: (data) => axios({
+    url: `${basePath}/documento/`,
     data: data,
     method: 'POST'
+  }),
+  putDocumento: (data) => axios({
+    url: `${basePath}/documento/${data.id}/`,
+    data: data,
+    method: 'PUT'
+  }),
+  updateDocumento: (data) => axios({
+    url: `${basePath}/documento/${data.id}/`,
+    data: data,
+    method: 'PATCH'
   })
 }

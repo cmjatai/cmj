@@ -37,7 +37,7 @@ class DocumentoViewSet(viewsets.ModelViewSet):
 
         return viewsets.ModelViewSet.dispatch(self, request, *args, **kwargs)
 
-    @detail_route(methods=['POST'])
+    """@detail_route(methods=['POST'])
     def set_titulo(self, request, pk=None):
         self.object = self.get_object()
         self.object.titulo = request.data.get('titulo', '')
@@ -49,4 +49,4 @@ class DocumentoViewSet(viewsets.ModelViewSet):
         self.object = self.get_object()
         self.object.descricao = request.data.get('descricao', '')
         self.object.save()
-        return Response({'message': 'OK'}, status=status.HTTP_206_PARTIAL_CONTENT)
+        return Response({'message': 'OK'}, status=status.HTTP_206_PARTIAL_CONTENT)"""

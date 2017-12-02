@@ -2,7 +2,7 @@
   <div class="container-path container-documento-edit">
     <div class="container">
         <div class="path-title construct">
-          <input v-model.lazy="titulo" placeholder="Título do Documento"/>
+          <textarea-autosize v-model.lazy="titulo" placeholder="Título do Documento"/>
         </div>
         <div class="path-description construct">
           <textarea-autosize v-model.lazy="descricao" placeholder="Descrição do Documento"/>
@@ -25,36 +25,27 @@ export default {
       descricao: '',
       titulo: '',
       id: 0,
-      message: ''
+      message: '',
+      classe: 0,
+      is_mounted: false,
+      parent: 0
     }
   },
   watch: {
-    titulo: function(val) {
-      let data = {
-        id: this.id,
-        titulo: this.titulo
-      }
+    titulo: function(newValue, oldValue) {
+      let data = {titulo: newValue}
       this.setTitulo(data)
-      this.documentoResource.setDocumento(data, 'set_titulo')
-        .then( (response) => {
-          this.message = response.data.message
-        })
+      this.id === 0 ? this.createDocumento(data) : this.updateDocumento(data)
     },
-    descricao: function(val) {
-      let data = {
-        id: this.id,
-        descricao: this.descricao
-      }
+    descricao: function(newValue, oldValue) {
+      let data = {descricao: newValue}
       this.setDescricao(data)
-      this.documentoResource.setDocumento(data, 'set_descricao')
-        .then( (response) => {
-          this.message = response.data.message
-        })
+      this.id === 0 ? this.createDocumento(data) : this.updateDocumento(data)
     }
   },
   computed: {
     ...mapGetters([
-      'getDocObject', 'getChilds'
+       'getChilds'
     ])
   },
   methods: {
@@ -62,21 +53,55 @@ export default {
       'setDocObject',
       'setTitulo',
       'setDescricao',
+      'getDocObject',
     ]),
+    updateDocumento(data) {
+      if (!this.is_mounted)
+        return
+      data.id = this.id
+      this.documentoResource.updateDocumento(data)
+        .then( (response) => {
+          this.message = ''
+        })
+    },
+    createDocumento(data) {
+      let t = this
+      data.classe = t.classe
+      if (t.parent !== 0)
+        data.parent = t.parent
+      t.documentoResource.createDocumento(data)
+        .then( (response) => {
+          t.setDocObject(response.data)
+          t.id = response.data.id
+        })
+    },
+    getDocumento() {
+      let t = this
+      t.documentoResource.getDocumento(t.id)
+        .then( (req) => {
+          t.setDocObject(req.data)
+          t.id = req.data.id
+          t.classe = req.data.classe
+          t.titulo = req.data.titulo
+          t.descricao = req.data.descricao
+        })
+        .then( () => this.is_mounted = true)
+        .catch( (e) => {
+          t.message = 'erro erro erro'
+          t.setDocObject([])
+        })
+    }
   },
   mounted: function() {
       let id = this.$route.params.id
-      this.documentoResource.getDocumento(id)
-        .then( (req) => {
-          this.setDocObject(req.data)
-          this.id = req.data.id
-          this.titulo = req.data.titulo
-          this.descricao = req.data.descricao
-        })
-        .catch( (e) => {
-          this.message = 'erro erro erro'
-          this.setDocObject([])
-        })
+      if (this.$route.name === 'documento_construct') {
+        this.id = id
+        this.getDocumento(id)
+      }
+      else {
+        this.classe = id
+        this.is_mounted = true
+      }
   }
 }
 </script>
