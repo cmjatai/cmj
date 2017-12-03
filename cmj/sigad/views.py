@@ -41,7 +41,7 @@ class PaginaInicialView(TemplateView):
 
         context['noticias_dos_parlamentares'] = np
 
-        context['noticias_destaque'] = Documento.objects.view_public_docs(
+        context['noticias_destaque'] = Documento.objects.qs_docs(
         ).filter(parlamentares__isnull=True,
                  classe_id=1)[:4]
         return context
@@ -49,7 +49,7 @@ class PaginaInicialView(TemplateView):
     def get_noticias_dos_parlamentares(self):
         legislatura_atual = Legislatura.objects.first()
 
-        docs = Documento.objects.view_public_docs()
+        docs = Documento.objects.qs_docs()
 
         docs = docs.annotate(
             count_parlamentar=Count("parlamentares", distinct=True)
@@ -155,109 +155,121 @@ class PathView(MultipleObjectMixin, TemplateView):
             context['object'] = self.referencia
 
         elif self.documento:
-            context = TemplateView.get_context_data(self, **kwargs)
-
-            if self.documento.tipo == Documento.TPD_GALLERY:
-                self.template_name = 'path/path_gallery.html'
-
-            elif self.documento.tipo == Documento.TPD_IMAGE:
-                self.template_name = 'path/path_imagem.html'
-                context['object'] = self.documento
-                context['referencia'] = None
-            else:
-                parlamentares = self.documento.parlamentares.all()
-
-                if hasattr(self, 'parlamentar') and self.parlamentar:
-                    parlamentares = parlamentares.filter(
-                        pk=self.parlamentar.parlamentar.pk)
-
-                if self.documento.public_date:
-
-                    if parlamentares:
-
-                        next = Documento.objects.view_public_docs().filter(
-                            public_date__gte=self.documento.public_date,
-                            classe=self.documento.classe,
-                            parlamentares__in=parlamentares,
-                        ).exclude(
-                            id=self.documento.id).last()
-
-                        previous = Documento.objects.view_public_docs().filter(
-                            public_date__lte=self.documento.public_date,
-                            classe=self.documento.classe,
-                            parlamentares__in=parlamentares,
-                        ).exclude(
-                            id=self.documento.id).first()
-                    else:
-
-                        next = Documento.objects.view_public_docs().filter(
-                            public_date__gte=self.documento.public_date,
-                            classe=self.documento.classe,
-                            parlamentares__isnull=True,
-                        ).exclude(
-                            id=self.documento.id).last()
-
-                        previous = Documento.objects.view_public_docs().filter(
-                            public_date__lte=self.documento.public_date,
-                            classe=self.documento.classe,
-                            parlamentares__isnull=True,
-                        ).exclude(
-                            id=self.documento.id).first()
-
-                else:
-                    next = None
-                    previous = None
-
-                context['next'] = next
-                context['previous'] = previous
-
-                docs = Documento.objects.view_public_docs(
-                ).exclude(id=self.documento.id)
-
-                if parlamentares.exists():
-                    docs = docs.filter(
-                        parlamentares__in=parlamentares)
-                else:
-                    docs = docs.filter(parlamentares__isnull=True)
-
-                if parlamentares.count() > 4:
-                    docs = docs.distinct(
-                        'parlamentares__id').order_by('parlamentares__id')
-
-                context['object_list'] = docs[:4]
-
-            context['object'] = self.documento
-
+            context = self.get_context_data_documento(**kwargs)
         elif self.classe:
-            template = self.classe.template_classe
-            if template == models.CLASSE_TEMPLATES_CHOICE.lista_em_linha:
-                kwargs['object_list'] = self.classe.documento_set.filter(
-                    public_date__isnull=False).order_by(
-                    '-public_date').all()
-            elif template == models.CLASSE_TEMPLATES_CHOICE.galeria:
-                kwargs['object_list'] = Documento.objects.view_public_gallery()
-
-            elif template == models.CLASSE_TEMPLATES_CHOICE.parlamentar:
-                kwargs['object_list'] = \
-                    self.classe.parlamentar.documento_set.filter(
-                    public_date__isnull=False).order_by(
-                    '-public_date').all()
-
-            self.object_list = kwargs['object_list']
-            context = super().get_context_data(**kwargs)
-
-            if self.paginate_by:
-                page_obj = context['page_obj']
-                paginator = context['paginator']
-                context['page_range'] = make_pagination(
-                    page_obj.number, paginator.num_pages)
-            context['object'] = self.classe
-
-            context['create_doc_url'] = models.DOC_TEMPLATES_CHOICE_FILES[
-                self.classe.template_doc_padrao]['create_url']
+            context = self.get_context_data_classe(**kwargs)
         else:
             context = TemplateView.get_context_data(self, **kwargs)
         context['path'] = '-path'
+
+        return context
+
+    def get_context_data_documento(self, **kwargs):
+        context = TemplateView.get_context_data(self, **kwargs)
+
+        if self.documento.tipo == Documento.TPD_GALLERY:
+            self.template_name = 'path/path_gallery.html'
+
+        elif self.documento.tipo == Documento.TPD_IMAGE:
+            self.template_name = 'path/path_imagem.html'
+            context['object'] = self.documento
+            context['referencia'] = None
+        else:
+            parlamentares = self.documento.parlamentares.all()
+
+            if hasattr(self, 'parlamentar') and self.parlamentar:
+                parlamentares = parlamentares.filter(
+                    pk=self.parlamentar.parlamentar.pk)
+
+            if self.documento.public_date:
+
+                if parlamentares:
+
+                    next = Documento.objects.qs_docs().filter(
+                        public_date__gte=self.documento.public_date,
+                        classe=self.documento.classe,
+                        parlamentares__in=parlamentares,
+                    ).exclude(
+                        id=self.documento.id).last()
+
+                    previous = Documento.objects.qs_docs().filter(
+                        public_date__lte=self.documento.public_date,
+                        classe=self.documento.classe,
+                        parlamentares__in=parlamentares,
+                    ).exclude(
+                        id=self.documento.id).first()
+                else:
+
+                    next = Documento.objects.qs_docs().filter(
+                        public_date__gte=self.documento.public_date,
+                        classe=self.documento.classe,
+                        parlamentares__isnull=True,
+                    ).exclude(
+                        id=self.documento.id).last()
+
+                    previous = Documento.objects.qs_docs().filter(
+                        public_date__lte=self.documento.public_date,
+                        classe=self.documento.classe,
+                        parlamentares__isnull=True,
+                    ).exclude(
+                        id=self.documento.id).first()
+
+            else:
+                next = None
+                previous = None
+
+            context['next'] = next
+            context['previous'] = previous
+
+            docs = Documento.objects.qs_docs(
+            ).exclude(id=self.documento.id)
+
+            if parlamentares.exists():
+                docs = docs.filter(
+                    parlamentares__in=parlamentares)
+            else:
+                docs = docs.filter(parlamentares__isnull=True)
+
+            if parlamentares.count() > 4:
+                docs = docs.distinct(
+                    'parlamentares__id').order_by('parlamentares__id')
+
+            context['object_list'] = docs[:4]
+
+        context['object'] = self.documento
+        return context
+
+    def get_context_data_classe(self, **kwargs):
+        template = self.classe.template_classe
+        if template == models.CLASSE_TEMPLATES_CHOICE.lista_em_linha:
+            kwargs[
+                'object_list'
+            ] = self.classe.documento_set.qs_docs(
+                user=self.request.user)
+
+            #.filter(public_date__isnull=False).order_by('-public_date').all()
+        elif template == models.CLASSE_TEMPLATES_CHOICE.galeria:
+            kwargs['object_list'] = Documento.objects.view_public_gallery()
+
+        elif template == models.CLASSE_TEMPLATES_CHOICE.parlamentar:
+            kwargs['object_list'] = \
+                self.classe.parlamentar.documento_set.filter(
+                public_date__isnull=False).order_by(
+                '-public_date').all()
+
+        self.object_list = kwargs['object_list']
+        context = super().get_context_data(**kwargs)
+
+        if self.paginate_by:
+            page_obj = context['page_obj']
+            paginator = context['paginator']
+            context['page_range'] = make_pagination(
+                page_obj.number, paginator.num_pages)
+
+        context['object'] = self.classe
+
+        context['create_doc_url'] = models.DOC_TEMPLATES_CHOICE_FILES[
+            self.classe.template_doc_padrao]['create_url']
 
         return context
 
@@ -292,12 +304,97 @@ class PathView(MultipleObjectMixin, TemplateView):
     def _pre_dispatch(self, request, *args, **kwargs):
 
         slug = kwargs.get('slug', '')
+        # Localização do Objecto
+        referente = None
+        try:
+            # verifica se o slug é uma classe
+            self.classe = Classe.objects.get(slug=slug)
+        except:
+            try:
+                # Verifica se é um documento
+                self.documento = Documento.objects.get(slug=slug)
+            except:
+                try:
+                    # verifica se é uma referência
+                    ref = ReferenciaEntreDocumentos.objects.get(slug=slug)
+                    self.documento = ref.referenciado
+                    self.referencia = ref
+                except:
+                    raise Http404()
+
+        if self.documento and self.documento.tipo >= 100 and \
+                self.documento.tipo < 900:
+            raise Http404()
+
+        if self.documento:
+            if self.documento.template_doc:
+                self.template_name = models.DOC_TEMPLATES_CHOICE_FILES[
+                    self.documento.template_doc]['template_name']
+            else:
+                self.template_name = models.DOC_TEMPLATES_CHOICE_FILES[
+                    self.documento.classe.template_doc_padrao]['template_name']
+        else:
+            self.template_name = models.CLASSE_TEMPLATES_CHOICE_FILES[
+                self.classe.template_classe]
+
+        obj = [self.documento if self.documento else self.classe,
+               'view_documento' if self.documento else 'view_pathclasse']
+
+        if self.referencia:
+            if obj[0].visibilidade != CMSMixin.STATUS_PRIVATE:
+                obj[0] = self.referencia.referente
+            else:
+                raise Http404()
+
+        # Analise de Permissão
+        if obj[0]:
+            u = request.user
+            if u.is_anonymous() and obj[0].visibilidade != \
+                    CMSMixin.STATUS_PUBLIC:
+                raise Http404()
+
+            elif obj[0].visibilidade == CMSMixin.STATUS_PRIVATE:
+                if obj[0].owner != request.user:
+                    raise Http404()
+                if not request.user.has_perm('sigad.' + obj[1]):
+                    raise PermissionDenied()
+
+            elif obj[0].visibilidade == CMSMixin.STATUS_RESTRICT:
+
+                parent = obj[0]
+
+                while parent and not parent.permissions_user_set.exists():
+                    parent = parent.parent
+
+                if not parent and obj[0].__class__ == Documento:
+                    parent = obj[0].classe
+
+                    while parent and not parent.permissions_user_set.exists():
+                        parent = parent.parent
+
+                if parent:
+                    if parent.permissions_user_set.filter(
+                            user=request.user,
+                            permission__codename=obj[1]).exists():
+                        pass
+                    elif parent.permissions_user_set.filter(
+                        user__isnull=True,
+                        permission__codename=obj[1]).exists() and\
+                            request.user.has_perm('sigad.' + obj[1]):
+                        pass
+                    else:
+                        raise Http404()
+
+    def _pre_dispatch___Old(self, request, *args, **kwargs):
+
+        slug = kwargs.get('slug', '')
 
         if isinstance(slug, str):
             slug = slug.split('/')
             slug = [s for s in slug if s]
         slug = list(filter(lambda x: x, slug))
 
+        # Localização do Objecto
         referente = None
         try:
             # verifica se o slug é uma classe
@@ -356,6 +453,7 @@ class PathView(MultipleObjectMixin, TemplateView):
             else:
                 raise Http404()
 
+        # Analise de Permissão
         if obj[0]:
             u = request.user
             if u.is_anonymous() and obj[0].visibilidade != \
@@ -409,7 +507,12 @@ class PathParlamentarView(PathView):
 
         classe = self.classe
         # recupera classe de parlamentar avaliando permissões
-        kwargs['slug'] = ['parlamentar', kwargs['parlamentar']]
+
+        slug = 'parlamentar'
+        if kwargs['parlamentar']:
+            slug = 'parlamentar/' + kwargs['parlamentar']
+
+        kwargs['slug'] = slug
         self._pre_dispatch(request, *args, **kwargs)
         self.parlamentar = self.classe
 
@@ -942,7 +1045,9 @@ class PermissionsUserDocumentoCrud(MasterDetailCrud):
     parent_field = 'documento'
 
     class BaseMixin(MasterDetailCrud.BaseMixin):
-        list_field_names = ['permission',  'user', ]
+        list_field_names = [
+            ('permission', 'permission__codename'),
+            ('user__id', 'user')]
 
         def get_context_data(self, **kwargs):
 

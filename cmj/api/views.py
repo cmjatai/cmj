@@ -33,7 +33,7 @@ class DocumentoViewSet(viewsets.ModelViewSet):
         if self.request.user.is_anonymous():
             self.serializer_class = DocumentoUserAnonymousSerializer
             self.permission_classes = (IsAuthenticatedOrReadOnly, )
-            self.queryset = Documento.objects.view_public_docs()
+            self.queryset = Documento.objects.qs_docs()
 
         return viewsets.ModelViewSet.dispatch(self, request, *args, **kwargs)
 

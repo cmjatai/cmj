@@ -12,7 +12,7 @@
     {% endif %}
 
   {% endif %}
-    <div class="{{css_class}}">
+    <div class="{{css_class}} status_{{documento.visibilidade}}">
       {% with documento.parlamentares.count as count_parlamentares %}
         <div class="inner">
           {% comment %} primeiro container, o primeiro item {% endcomment %}
@@ -36,7 +36,14 @@
               FIXME tratar histórico de revisão e publicação/privacidade
             {% endcomment %}
             <i class="fa fa-clock-o" aria-hidden="true"></i>
-            {{documento.public_date|date:"d"}} {% trans "de" %} {{documento.public_date|date:"F"}} {% trans "de" %} {{documento.public_date|date:"Y"}}
+            {% if documento.public_date %}
+              {{documento.public_date|date:"d"}} {% trans "de" %} {{documento.public_date|date:"F"}} {% trans "de" %} {{documento.public_date|date:"Y"}}
+            {% else%}
+              {% with documento.revisoes.first as rev %}
+                {{rev.get_visibilidade_display}} - {{rev.data}} - {% trans "por:" %} {{rev.user.first_name|default:rev.user.email}}
+              {% endwith %}
+            {% endif %}
+
           </span>
 
           {% if pagina_inicial %}

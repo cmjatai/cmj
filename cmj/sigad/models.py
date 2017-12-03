@@ -270,7 +270,7 @@ class Slugged(Parent):
     def save(self, *args, **kwargs):
         slug_old = self.slug
 
-        if self.titulo:
+        if self.titulo and not self.parent:
             slug = self.titulo
         else:
             super(Slugged, self).save(*args, **kwargs)
@@ -282,7 +282,6 @@ class Slugged(Parent):
 
         if self.slug == slug_old:
             return
-
         for child in self.childs.all():
             child.save()
 
@@ -314,7 +313,12 @@ class Slugged(Parent):
                 break
             i += 1
 
-        slug = parents_slug + slug
+        custom_slug = ''
+        if not self.parent and hasattr(self, 'classe'):
+            custom_slug = self.classe.slug + '/'
+        elif hasattr(self, 'referente'):
+            custom_slug = self.referente.slug + '/'
+        slug = custom_slug + parents_slug + slug
 
         return slug
 
@@ -393,9 +397,6 @@ class ShortUrl(Slugged):
         if not settings.DEBUG:
             self.url_short = short_url(slug=slug)
             self.save()
-
-        print('url_short', self.url_short, slug)
-
         return self.url_short
 
     class Meta:
@@ -493,7 +494,7 @@ class DocumentoManager(models.Manager):
         qs = self.get_queryset()
         return qs.order_by('ordem')
 
-    def view_public_docs(self):
+    def qs_docs(self, user=None):
         qs = self.get_queryset()
 
         qs = qs.filter(
@@ -503,7 +504,28 @@ class DocumentoManager(models.Manager):
             public_date__lte=timezone.now(),
             visibilidade=Documento.STATUS_PUBLIC,
             tipo=Documento.TD_DOC,
-            parent__isnull=True).order_by('-public_date')
+            parent__isnull=True)
+
+        if user and not user.is_anonymous():
+            # FIXME: Retirar essa permissão da produção
+            if user.is_superuser:
+                qs_user = self.get_queryset()
+                qs_user = qs_user.filter(
+                    Q(visibilidade=Documento.STATUS_PRIVATE) |
+                    Q(visibilidade=Documento.STATUS_RESTRICT)
+                )
+            else:
+                qs_user = self.get_queryset()
+                qs_user = qs_user.filter(
+                    Q(visibilidade=Documento.STATUS_PRIVATE,
+                      owner=user) |
+                    Q(visibilidade=Documento.STATUS_RESTRICT,
+                      permissions_user_set__user=user,
+                      permissions_user_set__permission__isnull=True)
+                )
+            qs = qs.union(qs_user)
+
+        qs = qs.order_by('-public_date', '-created')
         return qs
 
     def view_public_gallery(self):
@@ -609,7 +631,7 @@ class Documento(ShortUrl, CMSMixin):
         choices=DOC_TEMPLATES_CHOICE,
         blank=True, null=True, default=None)
 
-    # Possui ordem de renderização se não é um TD_DOC
+    # Possui ordem de renderização se não é uma parte de documento
     ordem = models.IntegerField(
         _('Ordem de Renderização'), default=0)
 
@@ -632,7 +654,8 @@ class Documento(ShortUrl, CMSMixin):
 
     @property
     def absolute_slug(self):
-        return '%s/%s' % (self.classe.slug, self.slug)
+        return self.slug
+        # return '%s/%s' % (self.classe.slug, self.slug)
 
     def imagem_representativa(self):
 
@@ -732,7 +755,8 @@ class ReferenciaEntreDocumentos(ShortUrl):
 
     @property
     def absolute_slug(self):
-        return '%s/%s' % (self.referente.absolute_slug, self.slug)
+        # return '%s/%s' % (self.referente.absolute_slug, self.slug)
+        return self.slug
 
 
 class PermissionsUserDocumento(CMSMixin):
@@ -742,7 +766,9 @@ class PermissionsUserDocumento(CMSMixin):
     documento = models.ForeignKey(Documento,
                                   related_name='permissions_user_set',
                                   verbose_name=_('Documento'))
-    permission = models.ForeignKey(Permission, verbose_name=_('Permissão'))
+    permission = models.ForeignKey(Permission,
+                                   blank=True, null=True, default=None,
+                                   verbose_name=_('Permissão'))
 
     class Meta:
         unique_together = (

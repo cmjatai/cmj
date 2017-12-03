@@ -1498,6 +1498,12 @@ main {
   padding-top: $grid-gutter-width / 4;
   margin-bottom: $grid-gutter-width / 2;
   position: relative;
+  &.status_99 {
+    border-left: 5px solid #a00040;
+  }
+  &.status_1 {
+    border-left: 5px solid #f0c040;
+  }
   .inner {
     z-index: 2000;
     display: block;
