@@ -5,5 +5,5 @@ import CmjChoices from './CmjChoices'
 Vue.component('TextareaAutosize', TextareaAutosize)
 Vue.component('CmjChoices', CmjChoices)
 export default {
-  TextareaAutosize,CmjChoices
+  TextareaAutosize, CmjChoices
 }

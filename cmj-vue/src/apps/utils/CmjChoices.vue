@@ -24,7 +24,7 @@
         },
         watch: {
           model: function(val){
-            this.$emit('input', val)
+            this.$emit('input', parseInt(val))
           },
           value: function(val) {
             this.model = val
@@ -34,7 +34,8 @@
           let t = this
           t.$nextTick()
             .then(function () {
-              t.model = t.value
+              if (t.value !== undefined)
+                t.model = t.value
             })
 
         }

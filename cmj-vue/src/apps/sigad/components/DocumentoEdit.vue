@@ -1,23 +1,22 @@
 <template lang="html">
   <div class="container-path container-documento-edit">
     <div class="container">
-        <div v-show="id" class="btn-toolbar widgets-function">
+        <div v-show="elemento.id" class="btn-toolbar widgets-function">
           <div class="btn-group btn-group-xs pull-left widget-actions ">
-            <a :href="slug" class="btn btn-primary" target="_blank">Versão Final</a>
+            <a :href="elemento.slug" class="btn btn-primary" target="_blank">Versão Final</a>
           </div>
           <div class="btn-group btn-group-lg pull-right widget-visibilidade">
-            <cmj-choices v-model="visibilidade" :options="visibilidade_choice" name="visibilidade-" :id="id" />
+            <cmj-choices v-model.lazy="elemento.visibilidade" :options="visibilidade_choice" name="visibilidade-" :id="elemento.id" />
           </div>
         </div>
         <div class="path-title construct">
-          <textarea-autosize v-model.lazy="titulo" placeholder="Título do Documento"/>
+          <textarea-autosize v-model.lazy="elemento.titulo" placeholder="Título do Documento"/>
         </div>
         <div class="path-description construct">
-          <textarea-autosize v-model.lazy="descricao" placeholder="Descrição do Documento"/>
+          <textarea-autosize v-model.lazy="elemento.descricao" placeholder="Descrição do Documento"/>
         </div>
     </div>
-    <documento-edit-container v-for="(value, key) in getChilds" :child="value" :key="key"/>
-    <span v-on:click.stop="clickteste">{{message}}</span>
+    <documento-edit-container v-for="(value, key) in childs" :elemento="value" :key="key"/>
   </div>
 </template>
 
@@ -30,26 +29,26 @@ export default {
   data() {
     return {
       documentoResource: DocumentoResource,
-      descricao: '',
-      titulo: '',
-      id: 0,
-      message: 'message teste',
-      classe: 0,
+      elemento: {},
       is_mounted: false,
-      parent: 0,
-      visibilidade: -1
     }
   },
   watch: {
-    titulo: function(newValue, oldValue) {
+    'elemento.titulo': function(newValue, oldValue) {
+      if (oldValue === undefined && this.elemento.id !== undefined)
+        return
       let data = {titulo: newValue}
-      this.id === 0 ? this.createDocumento(data) : this.updateDocumento(data)
+      this.elemento.id === undefined ? this.createDocumento(data) : this.updateDocumento(data)
     },
-    descricao: function(newValue, oldValue) {
+    'elemento.descricao': function(newValue, oldValue) {
+      if (oldValue === undefined && this.elemento.id !== undefined)
+        return
       let data = {descricao: newValue}
-      this.id === 0 ? this.createDocumento(data) : this.updateDocumento(data)
+      this.elemento.id === undefined ? this.createDocumento(data) : this.updateDocumento(data)
     },
-    visibilidade: function(newValue, oldValue) {
+    'elemento.visibilidade': function(newValue, oldValue) {
+      if (oldValue === undefined && this.elemento.id !== undefined)
+        return
       let data = {visibilidade: newValue}
       this.updateDocumento(data)
     },
@@ -65,12 +64,12 @@ export default {
       let slug = this.getSlug
       return '/'+slug
     },
+    childs: function() {
+      return this.elemento.childs
+    },
     visibilidade_choice: function() {
-      if (this.getChoices)
-       return this.getChoices.visibilidade
-      else {
-        return {}
-      }
+      return this.elemento.choices && this.elemento.choices.visibilidade
+        ? this.elemento.choices.visibilidade : {}
     }
   },
   methods: {
@@ -80,57 +79,53 @@ export default {
       'setDescricao',
     ]),
     updateDocumento(data) {
-      if (!this.is_mounted)
+      let t = this
+      if (!t.is_mounted)
         return
-      data.id = this.id
+      data.id = t.elemento.id
       console.log(data)
-      this.documentoResource.updateDocumento(data)
+      t.documentoResource.updateDocumento(data)
         .then( (response) => {
-          this.setDocObject(response.data)
+          t.setDocObject(response.data)
+          t.elemento = response.data
         })
     },
     createDocumento(data) {
       let t = this
-      data.classe = t.classe
-      if (t.parent !== 0)
-        data.parent = t.parent
+      data.classe = t.elemento.classe
+      if (t.elemento.parent !== 0)
+        data.parent = t.elemento.parent
       t.documentoResource.createDocumento(data)
         .then( (response) => {
           t.setDocObject(response.data)
-          t.id = response.data.id
+          t.elemento = response.data
+          t.$router.push({name:'documento_construct', params: {id:response.data.id}})
         })
     },
-    getDocumento() {
+    getDocumento(id) {
       let t = this
-      t.documentoResource.getDocumento(t.id)
+      t.documentoResource.getDocumento(id)
         .then( (req) => {
           t.setDocObject(req.data)
-          t.id = req.data.id
-          t.classe = req.data.classe
-          t.titulo = req.data.titulo
-          t.descricao = req.data.descricao
-          this.$nextTick()
-            .then(function () {
-              t.visibilidade = req.data.visibilidade
-            })
+          t.elemento = req.data
+          t.$nextTick()
             .then(function () {
               t.is_mounted = true
             })
         })
         .catch( (e) => {
-          t.message = 'erro erro erro'
-          t.setDocObject([])
+          t.setDocObject({})
+          t.elemento = {}
         })
     },
   },
   mounted: function() {
       let id = this.$route.params.id
       if (this.$route.name === 'documento_construct') {
-        this.id = id
         this.getDocumento(id)
       }
       else {
-        this.classe = id
+        this.elemento.classe = id
         this.is_mounted = true
       }
   }

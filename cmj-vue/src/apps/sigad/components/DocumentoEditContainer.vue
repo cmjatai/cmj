@@ -1,6 +1,6 @@
 <template lang="html">
   <div v-bind:class="classContainer">
-    
+teste
   </div>
 </template>
 
@@ -9,7 +9,7 @@ import { mapGetters, mapActions } from 'vuex'
 
 export default {
   name:'documento-edit-container',
-  props: ['child'],
+  props: ['elemento'],
   computed: {
     ...mapGetters([
         'getChoices',
@@ -17,8 +17,8 @@ export default {
         'getDocObject'
     ]),
     classContainer: function() {
-      if (this.getChoices !== undefined)
-        return this.getChoices.tipo.containers[this.child.tipo]['triple']
+      if (this.elemnto !== undefined)
+        return this.elemento.tipo.containers[this.elemento.tipo]['triple']
       else {
         return ''
       }
