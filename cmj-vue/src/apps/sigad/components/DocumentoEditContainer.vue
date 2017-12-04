@@ -1,5 +1,5 @@
 <template lang="html">
-  <div v-bind:class="classContainer">
+  <div :class="classContainer">
 teste
   </div>
 </template>
@@ -16,13 +16,6 @@ export default {
         'getChilds',
         'getDocObject'
     ]),
-    classContainer: function() {
-      if (this.elemnto !== undefined)
-        return this.elemento.tipo.containers[this.elemento.tipo]['triple']
-      else {
-        return ''
-      }
-    }
   },
   methods: {
     ...mapActions([

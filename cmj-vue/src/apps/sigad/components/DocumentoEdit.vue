@@ -1,13 +1,13 @@
 <template lang="html">
-  <div class="container-path container-documento-edit">
-    <div class="container">
-        <div v-show="elemento.id" class="btn-toolbar widgets-function">
-          <div class="btn-group btn-group-xs pull-left widget-actions ">
-            <a :href="elemento.slug" class="btn btn-primary" target="_blank">Versão Final</a>
-          </div>
-          <div class="btn-group btn-group-lg pull-right widget-visibilidade">
-            <cmj-choices v-model.lazy="elemento.visibilidade" :options="visibilidade_choice" name="visibilidade-" :id="elemento.id" />
-          </div>
+  <div :class="classContainer">
+
+    <div v-if="notParent" class="container">
+      <div v-show="elemento.id" class="btn-toolbar widgets-function">
+        <div class="btn-group btn-group-xs pull-left widget-actions ">
+          <a :href="slug" class="btn btn-primary" target="_blank">Versão Final</a>
+        </div>
+        <div class="btn-group btn-group-lg pull-right widget-visibilidade">
+          <cmj-choices v-model.lazy="elemento.visibilidade" :options="visibilidade_choice" name="visibilidade-" :id="elemento.id" />
         </div>
         <div class="path-title construct">
           <textarea-autosize v-model.lazy="elemento.titulo" placeholder="Título do Documento"/>
@@ -15,8 +15,20 @@
         <div class="path-description construct">
           <textarea-autosize v-model.lazy="elemento.descricao" placeholder="Descrição do Documento"/>
         </div>
+      </div>
     </div>
-    <documento-edit-container v-for="(value, key) in childs" :elemento="value" :key="key"/>
+
+    <template v-if="parent">
+      <div class="path-title construct">
+        <textarea-autosize v-model.lazy="elemento.titulo" placeholder="Título..."/>
+      </div>
+      <div class="path-description construct">
+        <textarea-autosize v-model.lazy="elemento.descricao" placeholder="Descrição..."/>
+      </div>
+    </template>
+
+    <documento-edit v-for="(value, key) in childs" :child="value" :key="key"/>
+
   </div>
 </template>
 
@@ -26,6 +38,7 @@ import { DocumentoResource } from '../../../resources'
 
 export default {
   name: 'documento-edit',
+  props: ['child'],
   data() {
     return {
       documentoResource: DocumentoResource,
@@ -60,6 +73,20 @@ export default {
        'getDocObject',
        'getSlug',
     ]),
+    parent: function() {
+      return this.elemento && this.elemento.parent > 0
+    },
+    notParent: function() {
+      return !this.elemento || !this.elemento.parent
+    },
+
+    classContainer: function() {
+      if (this.notParent)
+        return 'container-path container-documento-edit'
+      else
+        return this.getDocObject.choices.tipo.containers[this.elemento.tipo]['triple']
+    },
+
     slug: function() {
       let slug = this.getSlug
       return '/'+slug
@@ -120,14 +147,20 @@ export default {
     },
   },
   mounted: function() {
-      let id = this.$route.params.id
-      if (this.$route.name === 'documento_construct') {
-        this.getDocumento(id)
+    let t = this
+    if (t.child) {
+      t.elemento = t.child
+          t.is_mounted = true
+    }
+    else {
+      let id = t.$route.params.id
+      if (t.$route.name === 'documento_construct') {
+        t.getDocumento(id)
       }
       else {
-        this.elemento.classe = id
-        this.is_mounted = true
+        t.elemento.classe = id
       }
+    }
   }
 }
 </script>
