@@ -114,7 +114,7 @@
 {% block base_content %}
   {% block controls_content %}
     {% if perms.sigad.change_documento %}
-      <a href="{% url 'cmj.sigad:documento_edit' object.id %}">{% trans "[Editar]" %}</a>
+      <a href="{% url 'cmj.sigad:documento_construct' object.id %}">{% trans "[Editar]" %}</a>
     {% endif %}
     {% if perms.sigad.delete_documento %}
       <a href="{% url 'cmj.sigad:documento_delete' object.id %}">{% trans "[Excluir]" %}</a>
@@ -162,7 +162,7 @@
           {{child.texto|safe|urlize}}
         {% elif child.tipo == child.TPD_IMAGE %}
 
-          <div class="path-imagem {{child.css_class}}">
+          <div class="path-imagem {{child.alinhamento_css_class}}">
             <a href="/{{child.absolute_slug}}" target="_blank">
               <img src="/{{child.absolute_slug}}.512.jpg" alt="" />
             </a>

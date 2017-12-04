@@ -1,11 +1,11 @@
 import Vue from 'vue'
 import DocumentoEdit from './components/DocumentoEdit'
-import DocumentoEditContainerList from './components/DocumentoEditContainerList'
+import DocumentoEditContainer from './components/DocumentoEditContainer'
 
 Vue.component('DocumentoEdit', DocumentoEdit)
-Vue.component('DocumentoEditContainerList', DocumentoEditContainerList)
+Vue.component('DocumentoEditContainer', DocumentoEditContainer)
 
 export default {
   DocumentoEdit,
-  DocumentoEditContainerList
+  DocumentoEditContainer
 }

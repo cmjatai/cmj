@@ -8,6 +8,7 @@ from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from floppyforms import ClearableFileInput
+from model_utils.choices import Choices
 from reversion.admin import VersionAdmin
 import magic
 
@@ -122,6 +123,7 @@ def listify(function):
         return list(function(*args, **kwargs))
     return f
 
+
 UF = [
     ('AC', 'Acre'),
     ('AL', 'Alagoas'),
@@ -226,6 +228,7 @@ def fabrica_validador_de_tipos_de_arquivo(lista, nome):
     restringe_tipos_de_arquivo.__name__ = nome
     return restringe_tipos_de_arquivo
 
+
 restringe_tipos_de_arquivo_txt = fabrica_validador_de_tipos_de_arquivo(
     TIPOS_TEXTO_PERMITIDOS, 'restringe_tipos_de_arquivo_txt')
 restringe_tipos_de_arquivo_img = fabrica_validador_de_tipos_de_arquivo(
@@ -236,3 +239,23 @@ def intervalos_tem_intersecao(a_inicio, a_fim, b_inicio, b_fim):
     maior_inicio = max(a_inicio, b_inicio)
     menor_fim = min(a_fim, b_fim)
     return maior_inicio <= menor_fim
+
+
+class CmjChoices(Choices):
+    def _process(self, choices, triple_collector=None, double_collector=None):
+        Choices._process(self, choices, triple_collector=triple_collector,
+                         double_collector=double_collector)
+
+        self._triple_map = {
+            value: {
+                'triple': triple.replace('_', '-'),
+                'text': text
+            } for value, triple, text in self._triples
+        }
+
+    def triple(self, value):
+        return self._triple_map[value]['triple']
+
+    @property
+    def triple_map(self):
+        return self._triple_map

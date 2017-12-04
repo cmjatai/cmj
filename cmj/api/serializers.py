@@ -1,11 +1,15 @@
 
 from django.forms.models import model_to_dict
+from django.utils import timezone
+from model_utils.choices import Choices
 from rest_framework import serializers
-from rest_framework.fields import empty
+from rest_framework.fields import empty, JSONField, ChoiceField,\
+    SerializerMethodField
 from rest_framework.relations import RelatedField, ManyRelatedField,\
     MANY_RELATION_KWARGS
 
-from cmj.sigad.models import Documento, ReferenciaEntreDocumentos
+from cmj.sigad.models import Documento, ReferenciaEntreDocumentos,\
+    DOC_TEMPLATES_CHOICE
 
 
 class DocumentoParteField(RelatedField):
@@ -14,28 +18,20 @@ class DocumentoParteField(RelatedField):
     def to_representation(self, instance):
         cfg = self.configs
 
-        """if not cfg['depths'][cfg['field']]:
-            return instance.pk
-
-        depths = copy.deepcopy(cfg['depths'])
-        depth = depths[cfg['field']]
-        depths[cfg['field']] = (depth - 1) if depth else 0"""
-
         if isinstance(instance, Documento):
             inst = model_to_dict(instance, fields=cfg['fields'])
         else:
             inst = model_to_dict(instance)
 
-        inst[cfg['field']] = []
-
-        # if depths[cfg['field']]:
+        inst[cfg['field']] = {}
 
         if not hasattr(instance, cfg['field']):
             return inst
 
-        for child in getattr(instance, cfg['field']).order_by('ordem'):
-            inst[cfg['field']].append(
-                cfg['serializer'](child, depths=cfg['depths']).data)  # depths
+        inst[cfg['field']] = {
+            child.id: cfg['serializer'](child, depths=cfg['depths']).data
+            for child in getattr(instance, cfg['field']).order_by('ordem')
+        }
 
         return inst
 
@@ -52,6 +48,11 @@ class DocumentoParteField(RelatedField):
                 relationship = super().get_attribute(instance)
                 return relationship.order_by('ordem')
 
+            def to_representation(self, iterable):
+                return {
+                    value.id: self.child_relation.to_representation(value)
+                    for value in iterable
+                }
         return CustomManyRelatedField(**list_kwargs)
 
 
@@ -65,6 +66,8 @@ class DocumentoSerializer(serializers.ModelSerializer):
     # documentos_citados = DocumentoParteField(many=True)
     # cita = RefereniciaDocumentoField(many=True)
 
+    choices = SerializerMethodField()
+
     class Meta:
         model = Documento
         exclude = ('old_json',
@@ -74,6 +77,14 @@ class DocumentoSerializer(serializers.ModelSerializer):
                    'owner',
                    'parlamentares',
                    'materias')
+
+    def get_choices(self, obj):
+        return {
+            'tipo': Documento.tipo_parte_doc_choice.triple_map,
+            'visibilidade': Documento.VISIBILIDADE_STATUS.triple_map,
+            'alinhamento': Documento.alinhamento_choice.triple_map,
+            'template_doc': DOC_TEMPLATES_CHOICE.triple_map,
+        }
 
     def __init__(self, instance=None, data=empty, depths={}, **kwargs):
         super().__init__(instance=instance, data=data, **kwargs)
@@ -110,9 +121,29 @@ class DocumentoSerializer(serializers.ModelSerializer):
                 'depths': depths
             }
 
+    def update(self, instance, validated_data):
+        if validated_data['visibilidade'] == Documento.STATUS_PUBLIC:
+            validated_data['public_date'] = timezone.now()
+
+        return serializers.ModelSerializer.update(self, instance, validated_data)
+
     def create(self, validated_data):
         validated_data['owner'] = self.context['request'].user
-        return serializers.ModelSerializer.create(self, validated_data)
+        instance = serializers.ModelSerializer.create(self, validated_data)
+
+        if not instance.parte_de_documento():
+            container = Documento()
+            container.titulo = ''
+            container.descricao = ''
+            container.classe = instance.classe
+            container.tipo = Documento.TPD_CONTAINER_SIMPLES
+            container.owner = instance.owner
+            container.parent = instance
+            container.ordem = 1
+            container.visibilidade = instance.visibilidade
+            container.save()
+
+        return instance
 
 
 class DocumentoUserAnonymousSerializer(DocumentoSerializer):

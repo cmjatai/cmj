@@ -546,6 +546,8 @@ a:hover {
 .container-fluid {
   margin: 0;
 }
+.container {
+}
 
 main {
   .item-action-or-input {
@@ -1491,19 +1493,21 @@ main {
       background: $color_main_bg url(/static/img/bg.png);
     }
   }
-
 }
+
 
 .path-item-list {
   padding-top: $grid-gutter-width / 4;
   margin-bottom: $grid-gutter-width / 2;
   position: relative;
-  &.status_99 {
+
+  &.status-private {
     border-left: 5px solid #a00040;
   }
-  &.status_1 {
+  &.status-restrict {
     border-left: 5px solid #f0c040;
   }
+
   .inner {
     z-index: 2000;
     display: block;
@@ -1588,7 +1592,7 @@ main {
       background-position: 50% center;
     }
     &.alinhamento-left {
-      margin: 0 $grid-gutter-width * 0.5 $grid-gutter-width * 0.4  0;
+      margin: 0 $grid-gutter-width $grid-gutter-width * 0.4  0;
       padding: 0;
     }
     &.alinhamento-right {

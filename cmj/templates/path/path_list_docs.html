@@ -12,13 +12,13 @@
     {% endif %}
 
   {% endif %}
-    <div class="{{css_class}} status_{{documento.visibilidade}}">
+    <div class="{{css_class}} {{ documento.visibilidade_css_class}}">
       {% with documento.parlamentares.count as count_parlamentares %}
         <div class="inner">
           {% comment %} primeiro container, o primeiro item {% endcomment %}
           {% with documento.imagem_representativa as imagem %}
               {% if imagem %}
-                <div class="path-imagem {{imagem.css_class}}">
+                <div class="path-imagem {{imagem.alinhamento_css_class}}">
                   <div class="imagem" style="background-image: url(/{{imagem.absolute_slug}}.512)"></div>
                   <a class="img-contexto" href="{% if prefixo_slug %}/{{prefixo_slug}}{% endif %}/{{documento.absolute_slug }}">
                     <div class="texto">
@@ -32,9 +32,6 @@
           {% endwith %}
 
           <span class="data-pub">
-            {% comment %}
-              FIXME tratar histórico de revisão e publicação/privacidade
-            {% endcomment %}
             <i class="fa fa-clock-o" aria-hidden="true"></i>
             {% if documento.public_date %}
               {{documento.public_date|date:"d"}} {% trans "de" %} {{documento.public_date|date:"F"}} {% trans "de" %} {{documento.public_date|date:"Y"}}
@@ -57,7 +54,7 @@
           {% if not pagina_inicial %}
             <div class="titulo">
               <a href="{% if prefixo_slug %}/{{prefixo_slug}}{% endif %}/{{documento.absolute_slug }}">
-                {{documento.titulo}}
+                {{documento.titulo}}{% if not documento.titulo %}...{% endif %}
               </a>
             </div>
           {% endif %}

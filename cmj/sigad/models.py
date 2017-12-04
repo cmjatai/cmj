@@ -19,12 +19,11 @@ from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields.json import JSONField
 from googleapiclient import sample_tools
 from googleapiclient.discovery import build
-from model_utils.choices import Choices
 from oauth2client import client
 from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
 
-from cmj.utils import get_settings_auth_user_model
+from cmj.utils import get_settings_auth_user_model, CmjChoices
 
 
 CLASSE_ESTRUTURAL = 0
@@ -50,7 +49,7 @@ DOC_TEMPLATES_CHOICE_FILES = {
     },
 }
 
-DOC_TEMPLATES_CHOICE = Choices(
+DOC_TEMPLATES_CHOICE = CmjChoices(
     (1, 'noticia', _('Notícia Pública')),
     (2, 'galeria', _('Galeria de Imagens')),
 )
@@ -63,7 +62,7 @@ CLASSE_TEMPLATES_CHOICE_FILES = {
     4: 'path/path_parlamentar.html',
 }
 
-CLASSE_TEMPLATES_CHOICE = Choices(
+CLASSE_TEMPLATES_CHOICE = CmjChoices(
     (1, 'lista_em_linha', _('Listagem Simples em Linha')),
     (2, 'galeria', _('Galeria Pública de Albuns')),
     (3, 'parlamentares', _('Página dos Parlamentares')),
@@ -175,10 +174,10 @@ class CMSMixin(models.Model):
     STATUS_RESTRICT = 1
     STATUS_PUBLIC = 0
 
-    VISIBILIDADE_STATUS = (
-        (STATUS_RESTRICT, _('Restrito')),
-        (STATUS_PRIVATE, _('Privado')),
-        (STATUS_PUBLIC, _('Público')),
+    VISIBILIDADE_STATUS = CmjChoices(
+        (STATUS_RESTRICT, 'status_restrict', _('Restrito')),
+        (STATUS_PRIVATE, 'status_private', _('Privado')),
+        (STATUS_PUBLIC, 'status_public', _('Público')),
     )
 
     created = models.DateTimeField(
@@ -268,7 +267,7 @@ class Slugged(Parent):
         abstract = True
 
     def save(self, *args, **kwargs):
-        slug_old = self.slug
+        s_old = self.slug
 
         if self.titulo and not self.parent:
             slug = self.titulo
@@ -280,10 +279,10 @@ class Slugged(Parent):
 
         super(Slugged, self).save(*args, **kwargs)
 
-        if self.slug == slug_old:
-            return
         for child in self.childs.all():
-            child.save()
+            if self.slug != s_old or self.visibilidade != child.visibilidade:
+                child.visibilidade = self.visibilidade
+                child.save()
 
     def generate_unique_slug(self, slug):
         concret_model = None
@@ -490,38 +489,50 @@ class PermissionsUserClasse(CMSMixin):
 class DocumentoManager(models.Manager):
     use_for_related_fields = True
 
+    def q_filters(self):
+        if hasattr(self, 'q_doc_public'):
+            return
+
+        self.q_doc = Q(tipo=Documento.TD_DOC, parent__isnull=True)
+        self.q_gallery = Q(tipo=Documento.TPD_GALLERY)
+        self.q_doc_public = (Q(public_end_date__gte=timezone.now()) |
+                             Q(public_end_date__isnull=True) &
+                             Q(public_date__lte=timezone.now(),
+                               visibilidade=Documento.STATUS_PUBLIC))
+
+    def filter_q_private(self, user):
+        return Q(visibilidade=Documento.STATUS_PRIVATE, owner=user)
+
+    def filter_q_restrict(self, user):
+        return ((Q(owner=user) |
+                 Q(permissions_user_set__user=user,
+                   permissions_user_set__permission__isnull=True)) &
+                Q(visibilidade=Documento.STATUS_RESTRICT))
+
     def view_childs(self):
         qs = self.get_queryset()
         return qs.order_by('ordem')
 
     def qs_docs(self, user=None):
+        self.q_filters()
         qs = self.get_queryset()
 
-        qs = qs.filter(
-            Q(public_end_date__gte=timezone.now()) |
-            Q(public_end_date__isnull=True),
-
-            public_date__lte=timezone.now(),
-            visibilidade=Documento.STATUS_PUBLIC,
-            tipo=Documento.TD_DOC,
-            parent__isnull=True)
+        qs = qs.filter(self.q_doc, self.q_doc_public)
 
         if user and not user.is_anonymous():
-            # FIXME: Retirar essa permissão da produção
+            # FIXME: manter condição apenas enquanto estiver desenvolvendo
             if user.is_superuser:
                 qs_user = self.get_queryset()
                 qs_user = qs_user.filter(
                     Q(visibilidade=Documento.STATUS_PRIVATE) |
-                    Q(visibilidade=Documento.STATUS_RESTRICT)
+                    Q(visibilidade=Documento.STATUS_RESTRICT),
+                    self.q_doc
                 )
             else:
                 qs_user = self.get_queryset()
                 qs_user = qs_user.filter(
-                    Q(visibilidade=Documento.STATUS_PRIVATE,
-                      owner=user) |
-                    Q(visibilidade=Documento.STATUS_RESTRICT,
-                      permissions_user_set__user=user,
-                      permissions_user_set__permission__isnull=True)
+                    self.filter_q_private(user) | self.filter_q_restrict(user),
+                    self.q_doc
                 )
             qs = qs.union(qs_user)
 
@@ -549,10 +560,10 @@ class Documento(ShortUrl, CMSMixin):
     ALINHAMENTO_JUSTIFY = 1
     ALINHAMENTO_RIGHT = 2
 
-    alinhamento_choice = (
-        (ALINHAMENTO_LEFT, _('Alinhamento Esquerdo')),
-        (ALINHAMENTO_JUSTIFY, _('Alinhamento Completo')),
-        (ALINHAMENTO_RIGHT, _('Alinhamento Direito')),
+    alinhamento_choice = CmjChoices(
+        (ALINHAMENTO_LEFT, 'alinhamento_left', _('Alinhamento Esquerdo')),
+        (ALINHAMENTO_JUSTIFY, 'alinhamento_justify', _('Alinhamento Completo')),
+        (ALINHAMENTO_RIGHT, 'alinhamento_right', _('Alinhamento Direito')),
     )
 
     TD_DOC = 0
@@ -565,16 +576,16 @@ class Documento(ShortUrl, CMSMixin):
     TPD_IMAGE = 900
     TPD_GALLERY = 901
 
-    tipo_parte_doc_choice = (
-        (TD_DOC, _('Documento')),
-        (TD_BI, _('Banco de Imagem')),
-        (TD_GALERIA_PUBLICA, _('Galeria Pública')),
-        (TPD_TEXTO, _('Texto')),
-        (TPD_VIDEO, _('Vídeo')),
-        (TPD_CONTAINER_SIMPLES, _('Container Simples')),
-        (TPD_CONTAINER_EXTENDIDO, _('Container Extendido')),
-        (TPD_IMAGE, _('Imagem')),
-        (TPD_GALLERY, _('Galeria de Imagens')),
+    tipo_parte_doc_choice = CmjChoices(
+        (TD_DOC, 'td_doc', _('Documento')),
+        (TD_BI, 'td_bi', _('Banco de Imagem')),
+        (TD_GALERIA_PUBLICA, '_td_galeria_publica', _('Galeria Pública')),
+        (TPD_TEXTO, 'tpd_texto', _('Texto')),
+        (TPD_VIDEO, 'tpd_video', _('Vídeo')),
+        (TPD_CONTAINER_SIMPLES, 'container', _('Container Simples')),
+        (TPD_CONTAINER_EXTENDIDO, 'container_fluid', _('Container Extendido')),
+        (TPD_IMAGE, 'tpd_image', _('Imagem')),
+        (TPD_GALLERY, 'tpd_gallery',  _('Galeria de Imagens')),
     )
 
     # Documentos completos
@@ -703,12 +714,15 @@ class Documento(ShortUrl, CMSMixin):
 
         return c.absolute_slug
 
-    @cached_property
-    def css_class(self):
-        classes = {self.ALINHAMENTO_LEFT: 'alinhamento-left',
-                   self.ALINHAMENTO_JUSTIFY: 'alinhamento-justify',
-                   self.ALINHAMENTO_RIGHT: 'alinhamento-right'}
-        return classes[self.alinhamento]
+    property
+
+    def alinhamento_css_class(self):
+        return self.alinhamento_choice.triple(self.alinhamento)
+
+    property
+
+    def visibilidade_css_class(self):
+        return self.VISIBILIDADE_STATUS.triple(self.visibilidade)
 
     class Meta:
         ordering = ('public_date', )

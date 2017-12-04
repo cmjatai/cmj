@@ -24,6 +24,7 @@ def organize_avatars(pos, total):
         '9': 2}
     return pos % map_arranjo[str(total if total <= 9 else 9)] == 0
 
+
 @register.filter
 def organize_direction_avatars(pos, total):
     map_arranjo = {

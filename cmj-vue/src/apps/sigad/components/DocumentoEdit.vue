@@ -1,6 +1,18 @@
 <template lang="html">
   <div class="container-path container-documento-edit">
     <div class="container">
+        <div v-show="id" :class="['widgets-function', visibilidade_class]">
+          <div class="widget-visibilidade">
+            <button v-for="(value, key ) in visibilidade_choice"
+              :class="[value.triple, key, visibilidade_class === value.triple ? 'active': '']"
+                type="button"
+                name="button"
+                v-on:click.stop="updateVisibilidade(key)">
+              {{value.text}}
+            </button>
+
+          </div>
+        </div>
         <div class="path-title construct">
           <textarea-autosize v-model.lazy="titulo" placeholder="Título do Documento"/>
         </div>
@@ -8,7 +20,7 @@
           <textarea-autosize v-model.lazy="descricao" placeholder="Descrição do Documento"/>
         </div>
     </div>
-    <documento-edit-container-list v-for="child in getChilds" :child="child" :key="child.id"/>
+    <documento-edit-container v-for="(value, key) in getChilds" :child="value" :key="key"/>
     <span>{{message}}</span>
   </div>
 </template>
@@ -45,23 +57,48 @@ export default {
   },
   computed: {
     ...mapGetters([
-       'getChilds'
-    ])
+       'getChilds',
+       'getChoices',
+       'getDocObject',
+    ]),
+    visibilidade_class: function() {
+      if (this.getChoices)
+        return this.getChoices['visibilidade'][
+          this.getDocObject.visibilidade]['triple']
+      else {
+        return ''
+      }
+    },
+    visibilidade: function() {
+      return this.getDocObject.visibilidade
+    },
+    visibilidade_choice: function() {
+      if (this.getChoices)
+        return this.getChoices.visibilidade
+      else {
+        return {}
+      }
+    }
   },
   methods: {
     ...mapActions([
       'setDocObject',
       'setTitulo',
       'setDescricao',
-      'getDocObject',
     ]),
+    updateVisibilidade(key) {
+      if (this.getDocObject.visibilidade == key)
+        return
+      let data = {visibilidade: key}
+      this.updateDocumento(data)
+    },
     updateDocumento(data) {
       if (!this.is_mounted)
         return
       data.id = this.id
       this.documentoResource.updateDocumento(data)
         .then( (response) => {
-          this.message = ''
+          this.setDocObject(response.data)
         })
     },
     createDocumento(data) {
@@ -116,6 +153,8 @@ export default {
   }
 }
 .path-title {
+  margin-top: 1em;
+  margin-bottom: 0;
   &.construct {
     input {
       width: 100%;
@@ -131,5 +170,52 @@ export default {
   margin: 0px;
 }
 
+.widgets-function {
+  font-size: 70%;
+  text-align: right;
+  &.status-private {
+    border-top: 5px solid transparentize(#a00040,0.5);
+  }
+  &.status-restrict {
+    border-top: 5px solid transparentize(#f0c040,0.5);
+  }
+  &.status-public {
+    border-top: 5px solid transparentize(#008020,0.5);
+  }
+}
+
+.widget-visibilidade {
+  button {
+    border: none;
+    text-decoration: none;
+    display: inline-block;
+    cursor: pointer;
+    padding: 0 20px;
+    margin: 0px 3px;
+    outline: none;
+    opacity: 0.5;
+    color: black;
+    margin-bottom: 10px;
+    &:hover {
+      opacity: 1;
+      color: white;
+    }
+  }
+  .active {
+    opacity: 1;
+    font-weight: bold;
+    color: white;
+    padding: 5px 20px;
+  }
+  .status-private {
+    background: transparentize(#a00040,0.5);
+  }
+  .status-restrict {
+    background: transparentize(#f0c040,0.5);
+  }
+  .status-public {
+    background: transparentize(#008020,0.5);
+  }
+}
 
 </style>

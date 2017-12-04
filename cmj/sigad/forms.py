@@ -131,6 +131,7 @@ class DocumentoForm(ModelForm):
 
         if inst.visibilidade != Documento.STATUS_PUBLIC:
             inst.public_date = None
+            inst.public_end_date = None
         else:
             if not inst.public_date:
                 inst.public_date = timezone.now()

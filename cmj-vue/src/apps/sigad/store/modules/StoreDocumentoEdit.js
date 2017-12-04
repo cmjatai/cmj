@@ -8,7 +8,26 @@ import {
 const mutations = {
   [DOC_OBJECT](state, data) {
     if (data && typeof data === 'object') {
-      state.documento = data
+      if (data.parent === undefined || data.parent === null) {
+        state.documento = data
+      }
+      else {
+        let childs = state.documento.childs
+        let update_child = nodeList => {
+          let node = nodeList[data.id]
+          if (node === undefined) {
+            for (let child in nodeList) {
+              if (update_child(child.childs))
+                break
+            }
+          }
+          else {
+            nodeList[data.id] = data
+            return true
+          }
+        }
+        update_child(childs)
+      }
     }
   },
   [DOC_TITULO](state, data) {
@@ -36,8 +55,9 @@ const state = {
 }
 
 const getters = {
-  getDoc: state => state.documento,
-  getChilds: state => state.documento.childs
+  getDocObject: state => state.documento,
+  getChilds: state => state.documento.childs,
+  getChoices: state => state.documento.choices
 }
 const actions = {
   setDocObject: ({ commit }, data) => commit(DOC_OBJECT, data),
