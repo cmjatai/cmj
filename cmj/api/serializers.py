@@ -4,7 +4,7 @@ from django.utils import timezone
 from model_utils.choices import Choices
 from rest_framework import serializers
 from rest_framework.fields import empty, JSONField, ChoiceField,\
-    SerializerMethodField
+    SerializerMethodField, SlugField
 from rest_framework.relations import RelatedField, ManyRelatedField,\
     MANY_RELATION_KWARGS
 
@@ -67,20 +67,21 @@ class DocumentoSerializer(serializers.ModelSerializer):
     # cita = RefereniciaDocumentoField(many=True)
 
     choices = SerializerMethodField()
+    slug = SlugField(read_only=True)
 
     class Meta:
         model = Documento
         exclude = ('old_json',
                    'old_path',
                    'documentos_citados',
-                   'slug',
                    'owner',
                    'parlamentares',
                    'materias')
 
     def get_choices(self, obj):
         return {
-            'tipo': Documento.tipo_parte_doc_choice.triple_map,
+            'tipo': {key: value.triple_map
+                     for key, value in Documento.tipo_parte_doc.items()},
             'visibilidade': Documento.VISIBILIDADE_STATUS.triple_map,
             'alinhamento': Documento.alinhamento_choice.triple_map,
             'template_doc': DOC_TEMPLATES_CHOICE.triple_map,
@@ -122,7 +123,9 @@ class DocumentoSerializer(serializers.ModelSerializer):
             }
 
     def update(self, instance, validated_data):
-        if validated_data['visibilidade'] == Documento.STATUS_PUBLIC:
+        if 'visibilidade' in validated_data and \
+                validated_data['visibilidade'] == Documento.STATUS_PUBLIC and\
+                instance.visibilidade != Documento.STATUS_PUBLIC:
             validated_data['public_date'] = timezone.now()
 
         return serializers.ModelSerializer.update(self, instance, validated_data)

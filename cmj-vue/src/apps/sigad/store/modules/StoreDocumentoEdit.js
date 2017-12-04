@@ -57,7 +57,8 @@ const state = {
 const getters = {
   getDocObject: state => state.documento,
   getChilds: state => state.documento.childs,
-  getChoices: state => state.documento.choices
+  getChoices: state => state.documento.choices,
+  getSlug: state => state.documento.slug
 }
 const actions = {
   setDocObject: ({ commit }, data) => commit(DOC_OBJECT, data),

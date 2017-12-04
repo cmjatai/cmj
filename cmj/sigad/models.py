@@ -176,8 +176,8 @@ class CMSMixin(models.Model):
 
     VISIBILIDADE_STATUS = CmjChoices(
         (STATUS_RESTRICT, 'status_restrict', _('Restrito')),
-        (STATUS_PRIVATE, 'status_private', _('Privado')),
         (STATUS_PUBLIC, 'status_public', _('Público')),
+        (STATUS_PRIVATE, 'status_private', _('Privado')),
     )
 
     created = models.DateTimeField(
@@ -576,18 +576,6 @@ class Documento(ShortUrl, CMSMixin):
     TPD_IMAGE = 900
     TPD_GALLERY = 901
 
-    tipo_parte_doc_choice = CmjChoices(
-        (TD_DOC, 'td_doc', _('Documento')),
-        (TD_BI, 'td_bi', _('Banco de Imagem')),
-        (TD_GALERIA_PUBLICA, '_td_galeria_publica', _('Galeria Pública')),
-        (TPD_TEXTO, 'tpd_texto', _('Texto')),
-        (TPD_VIDEO, 'tpd_video', _('Vídeo')),
-        (TPD_CONTAINER_SIMPLES, 'container', _('Container Simples')),
-        (TPD_CONTAINER_EXTENDIDO, 'container_fluid', _('Container Extendido')),
-        (TPD_IMAGE, 'tpd_image', _('Imagem')),
-        (TPD_GALLERY, 'tpd_gallery',  _('Galeria de Imagens')),
-    )
-
     # Documentos completos
     TDs = (TD_DOC, TD_BI, TD_GALERIA_PUBLICA)
 
@@ -598,14 +586,31 @@ class Documento(ShortUrl, CMSMixin):
     TDp = (TPD_TEXTO, TPD_VIDEO, TPD_IMAGE, TPD_GALLERY)
 
     tipo_parte_doc = {
-        TPD_TEXTO: {
-            'view': {
-            },
+        'documentos': CmjChoices(
+            (TD_DOC, 'td_doc', _('Documento')),
+            (TD_BI, 'td_bi', _('Banco de Imagem')),
+            (TD_GALERIA_PUBLICA, '_td_galeria_publica', _('Galeria Pública'))
+        ),
 
-            'edit': {
-            }
-        }
+        'containers': CmjChoices(
+            (TPD_CONTAINER_SIMPLES,
+             'container', _('Container Simples')),
+            (TPD_CONTAINER_EXTENDIDO,
+             'container_fluid', _('Container Extendido')),
+        ),
+
+        'subtipos': CmjChoices(
+            (TPD_TEXTO, 'tpd_texto', _('Texto')),
+            (TPD_VIDEO, 'tpd_video', _('Vídeo')),
+            (TPD_IMAGE, 'tpd_image', _('Imagem')),
+            (TPD_GALLERY, 'tpd_gallery',  _('Galeria de Imagens')),
+
+        )
     }
+
+    tipo_parte_doc_choice = (tipo_parte_doc['documentos'] +
+                             tipo_parte_doc['containers'] +
+                             tipo_parte_doc['subtipos'])
 
     texto = models.TextField(
         verbose_name=_('Texto'),

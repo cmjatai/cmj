@@ -259,3 +259,15 @@ class CmjChoices(Choices):
     @property
     def triple_map(self):
         return self._triple_map
+
+    def __add__(self, other):
+        if isinstance(other, self.__class__):
+            other = other._triples
+        else:
+            other = list(other)
+        return CmjChoices(*(self._triples + other))
+
+    def __radd__(self, other):
+        # radd is never called for matching types, so we don't check here
+        other = list(other)
+        return CmjChoices(*(other + self._triples))
