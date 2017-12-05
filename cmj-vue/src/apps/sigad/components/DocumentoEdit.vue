@@ -1,10 +1,11 @@
 <template lang="html">
-  <div :class="classContainer">
+  <div :class="classParent">
 
-    <div v-if="notHasParent" class="container">a
-      <div v-show="elemento.id" class="btn-toolbar widgets-function">b
+    <div v-if="notHasParent" class="container">
+      <div v-show="elemento.id" class="btn-toolbar widgets-function">
         <div class="btn-group btn-group-xs pull-left widget-actions ">
           <a :href="slug" class="btn btn-primary" target="_blank">Versão Final</a>
+            <a :href="meta_edit" class="btn btn-success" target="_blank">Editar Metadados</a>
         </div>
         <div class="btn-group btn-group-lg pull-right widget-visibilidade">
           <cmj-choices v-model.lazy="elemento.visibilidade" :options="visibilidade_choice" name="visibilidade-" :id="elemento.id" />
@@ -17,18 +18,7 @@
           <textarea-autosize v-model.lazy="elemento.descricao" placeholder="Descrição do Documento"/>
         </div>
     </div>
-
-    <template v-if="hasParent">c
-      <div class="path-title construct">
-        <textarea-autosize v-model.lazy="elemento.titulo" placeholder="Título..."/>
-      </div>
-      <div class="path-description construct">
-        <textarea-autosize v-model.lazy="elemento.descricao" placeholder="Descrição..."/>
-      </div>
-      <textarea-autosize v-model.lazy="elemento.texto" placeholder="Texto..."/>
-    </template>
-
-    <documento-edit v-for="(value, key) in childs" :child="value" :parent="elemento" :key="key"/>
+    <component :is="classChild(key, value.tipo)" v-for="(value, key) in childs" :child="value" :parent="elemento" :key="key"/>
 
   </div>
 </template>
@@ -75,23 +65,13 @@ export default {
       return !this.elemento || !this.elemento.parent
     },
 
-    classContainer: function() {
-      if (this.notHasParent)
-        return 'container-path container-documento-edit'
-      else {
-        try {
-          return this.getDocObject.choices.tipo.containers[this.elemento.tipo]['triple']
-        }
-        catch (Exception) {
-          return ''
-        }
-
-      }
-    },
-
     slug: function() {
       let slug = this.getSlug
       return '/'+slug
+    },
+    meta_edit: function() {
+      let slug = this.getSlug
+      return '/documento/'+this.elemento.id+'/edit'
     },
     childs: function() {
       return this.elemento.childs
@@ -99,7 +79,14 @@ export default {
     visibilidade_choice: function() {
       return this.elemento.choices && this.elemento.choices.visibilidade
         ? this.elemento.choices.visibilidade : {}
-    }
+    },
+    classParent: function() {
+      if (this.notHasParent)
+        return 'container-path container-documento-edit'
+      else {
+        return ''
+      }
+    },
   },
   methods: {
     ...mapActions([
@@ -107,6 +94,19 @@ export default {
       'setTitulo',
       'setDescricao',
     ]),
+
+    classChild(id, tipo) {
+      if (!id && this.notHasParent)
+        return 'container-path container-documento-edit'
+      else {
+        try {
+          return this.getDocObject.choices.all[tipo]['component_tag']
+        }
+        catch (Exception) {
+          return ''
+        }
+      }
+    },
     handlerWatch(newValue, oldValue, attr=null) {
       let data = Object()
       if (attr)
@@ -162,6 +162,10 @@ export default {
     let t = this
     if (t.child) {
       t.elemento = t.child
+      t.$nextTick()
+        .then( function() {
+          t.mode = "UPDATE"
+        })
     }
     else {
       let id = t.$route.params.id
@@ -183,7 +187,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" >
 .container-documento-edit {
   background: #f7f7f7 url(/static/img/bg.png);
   padding: 20px 0px;

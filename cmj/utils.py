@@ -248,13 +248,13 @@ class CmjChoices(Choices):
 
         self._triple_map = {
             value: {
-                'triple': triple.replace('_', '-'),
+                'component_tag': triple.replace('_', '-'),
                 'text': text
             } for value, triple, text in self._triples
         }
 
     def triple(self, value):
-        return self._triple_map[value]['triple']
+        return self._triple_map[value]['component_tag']
 
     @property
     def triple_map(self):

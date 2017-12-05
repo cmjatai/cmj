@@ -81,13 +81,16 @@ class DocumentoSerializer(serializers.ModelSerializer):
                    'materias')
 
     def get_choices(self, obj):
-        return {
+        choices = {
             'tipo': {key: value.triple_map
                      for key, value in Documento.tipo_parte_doc.items()},
             'visibilidade': Documento.VISIBILIDADE_STATUS.triple_map,
             'alinhamento': Documento.alinhamento_choice.triple_map,
             'template_doc': DOC_TEMPLATES_CHOICE.triple_map,
         }
+
+        choices['all'] = Documento.tipo_parte_doc_choice.triple_map
+        return choices
 
     def __init__(self, instance=None, data=empty, depths={}, **kwargs):
         super().__init__(instance=instance, data=data, **kwargs)

@@ -1,8 +1,8 @@
 <template>
   <div class="radio-group" :id="name+id">
     <template v-for="(choice, k) in options">
-        <label :class="['btn', choice.triple, k == value ? 'active': '']" v-bind:for="choice.triple">
-          <input type="radio" v-bind:value="k" v-model="model" :id="choice.triple" :name="name+id">
+        <label :class="['btn', choice.component_tag, k == value ? 'active': '']" v-bind:for="choice.component_tag">
+          <input type="radio" v-bind:value="k" v-model="model" :id="choice.component_tag" :name="name+id">
             {{choice.text}}
         </label>
     </template>
