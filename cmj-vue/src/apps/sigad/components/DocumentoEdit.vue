@@ -1,33 +1,34 @@
 <template lang="html">
   <div :class="classContainer">
 
-    <div v-if="notParent" class="container">
-      <div v-show="elemento.id" class="btn-toolbar widgets-function">
+    <div v-if="notHasParent" class="container">a
+      <div v-show="elemento.id" class="btn-toolbar widgets-function">b
         <div class="btn-group btn-group-xs pull-left widget-actions ">
           <a :href="slug" class="btn btn-primary" target="_blank">Versão Final</a>
         </div>
         <div class="btn-group btn-group-lg pull-right widget-visibilidade">
           <cmj-choices v-model.lazy="elemento.visibilidade" :options="visibilidade_choice" name="visibilidade-" :id="elemento.id" />
         </div>
+      </div>
         <div class="path-title construct">
           <textarea-autosize v-model.lazy="elemento.titulo" placeholder="Título do Documento"/>
         </div>
         <div class="path-description construct">
           <textarea-autosize v-model.lazy="elemento.descricao" placeholder="Descrição do Documento"/>
         </div>
-      </div>
     </div>
 
-    <template v-if="parent">
+    <template v-if="hasParent">c
       <div class="path-title construct">
         <textarea-autosize v-model.lazy="elemento.titulo" placeholder="Título..."/>
       </div>
       <div class="path-description construct">
         <textarea-autosize v-model.lazy="elemento.descricao" placeholder="Descrição..."/>
       </div>
+      <textarea-autosize v-model.lazy="elemento.texto" placeholder="Texto..."/>
     </template>
 
-    <documento-edit v-for="(value, key) in childs" :child="value" :key="key"/>
+    <documento-edit v-for="(value, key) in childs" :child="value" :parent="elemento" :key="key"/>
 
   </div>
 </template>
@@ -38,33 +39,27 @@ import { DocumentoResource } from '../../../resources'
 
 export default {
   name: 'documento-edit',
-  props: ['child'],
+  props: ['child', 'parent'], // props.child == data.elemento
   data() {
     return {
       documentoResource: DocumentoResource,
-      elemento: {},
-      is_mounted: false,
+      elemento: {
+        id: 0,
+        classe: 0,
+        parent: null,
+        titulo: '',
+        descricao: '',
+        visibilidade: 99,
+        texto: '',
+      },
+      mode: "INIT"
     }
   },
   watch: {
-    'elemento.titulo': function(newValue, oldValue) {
-      if (oldValue === undefined && this.elemento.id !== undefined)
-        return
-      let data = {titulo: newValue}
-      this.elemento.id === undefined ? this.createDocumento(data) : this.updateDocumento(data)
-    },
-    'elemento.descricao': function(newValue, oldValue) {
-      if (oldValue === undefined && this.elemento.id !== undefined)
-        return
-      let data = {descricao: newValue}
-      this.elemento.id === undefined ? this.createDocumento(data) : this.updateDocumento(data)
-    },
-    'elemento.visibilidade': function(newValue, oldValue) {
-      if (oldValue === undefined && this.elemento.id !== undefined)
-        return
-      let data = {visibilidade: newValue}
-      this.updateDocumento(data)
-    },
+    'elemento.titulo': function(nv, ov) { this.handlerWatch(nv, ov, 'titulo') },
+    'elemento.descricao': function(nv, ov) { this.handlerWatch(nv, ov, 'descricao') },
+    'elemento.visibilidade': function(nv, ov) { this.handlerWatch(nv, ov, 'visibilidade') },
+    'elemento.texto': function(nv, ov) { this.handlerWatch(nv, ov, 'texto') },
   },
   computed: {
     ...mapGetters([
@@ -73,18 +68,25 @@ export default {
        'getDocObject',
        'getSlug',
     ]),
-    parent: function() {
+    hasParent: function() {
       return this.elemento && this.elemento.parent > 0
     },
-    notParent: function() {
+    notHasParent: function() {
       return !this.elemento || !this.elemento.parent
     },
 
     classContainer: function() {
-      if (this.notParent)
+      if (this.notHasParent)
         return 'container-path container-documento-edit'
-      else
-        return this.getDocObject.choices.tipo.containers[this.elemento.tipo]['triple']
+      else {
+        try {
+          return this.getDocObject.choices.tipo.containers[this.elemento.tipo]['triple']
+        }
+        catch (Exception) {
+          return ''
+        }
+
+      }
     },
 
     slug: function() {
@@ -105,28 +107,42 @@ export default {
       'setTitulo',
       'setDescricao',
     ]),
+    handlerWatch(newValue, oldValue, attr=null) {
+      let data = Object()
+      if (attr)
+          data[attr] = newValue
+
+      if (this.mode === "CREATE") {
+         data.classe = this.elemento.classe
+         data.parent = this.elemento.parent
+         this.createDocumento(data)
+         return
+      }
+      else if (this.mode === "INIT") {
+        return
+      }
+
+      data.id = this.elemento.id
+      this.updateDocumento(data)
+    },
     updateDocumento(data) {
       let t = this
-      if (!t.is_mounted)
-        return
-      data.id = t.elemento.id
-      console.log(data)
       t.documentoResource.updateDocumento(data)
         .then( (response) => {
           t.setDocObject(response.data)
-          t.elemento = response.data
         })
     },
     createDocumento(data) {
       let t = this
-      data.classe = t.elemento.classe
-      if (t.elemento.parent !== 0)
-        data.parent = t.elemento.parent
       t.documentoResource.createDocumento(data)
         .then( (response) => {
+          t.mode = "UPDATE"
           t.setDocObject(response.data)
-          t.elemento = response.data
           t.$router.push({name:'documento_construct', params: {id:response.data.id}})
+          t.$nextTick()
+            .then(function() {
+              t.getDocumento(response.data.id)
+            })
         })
     },
     getDocumento(id) {
@@ -135,10 +151,6 @@ export default {
         .then( (req) => {
           t.setDocObject(req.data)
           t.elemento = req.data
-          t.$nextTick()
-            .then(function () {
-              t.is_mounted = true
-            })
         })
         .catch( (e) => {
           t.setDocObject({})
@@ -150,15 +162,21 @@ export default {
     let t = this
     if (t.child) {
       t.elemento = t.child
-          t.is_mounted = true
     }
     else {
       let id = t.$route.params.id
       if (t.$route.name === 'documento_construct') {
         t.getDocumento(id)
+        t.$nextTick()
+          .then( function() {
+            t.mode = "UPDATE"
+          })
       }
       else {
+        t.mode = "CREATE"
         t.elemento.classe = id
+        if (t.parent)
+          t.elemento.parent = t.parent.id
       }
     }
   }

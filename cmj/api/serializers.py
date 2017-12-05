@@ -13,7 +13,6 @@ from cmj.sigad.models import Documento, ReferenciaEntreDocumentos,\
 
 
 class DocumentoParteField(RelatedField):
-    queryset = Documento.objects.order_by('ordem')
 
     def to_representation(self, instance):
         cfg = self.configs
@@ -34,6 +33,9 @@ class DocumentoParteField(RelatedField):
         }
 
         return inst
+
+    def to_internal_value(self, data):
+        RelatedField.to_internal_value(self, data)
 
     @classmethod
     def many_init(cls, *args, **kwargs):
@@ -62,7 +64,7 @@ class RefereniciaDocumentoField(DocumentoParteField):
 
 class DocumentoSerializer(serializers.ModelSerializer):
 
-    childs = DocumentoParteField(many=True, required=False)
+    childs = DocumentoParteField(many=True, required=False, read_only=True)
     # documentos_citados = DocumentoParteField(many=True)
     # cita = RefereniciaDocumentoField(many=True)
 

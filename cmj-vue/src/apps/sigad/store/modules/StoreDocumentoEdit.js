@@ -17,7 +17,7 @@ const mutations = {
           let node = nodeList[data.id]
           if (node === undefined) {
             for (let child in nodeList) {
-              if (update_child(child.childs))
+              if (update_child(nodeList[child].childs))
                 break
             }
           }
