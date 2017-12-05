@@ -12,12 +12,13 @@
         </div>
       </div>
         <div class="path-title construct">
-          <textarea-autosize v-model.lazy="elemento.titulo" placeholder="Título do Documento"/>
+          <textarea-autosize v-model.lazy="elemento.titulo" placeholder="Título do Documento"  :align="'text-center'"/>
         </div>
         <div class="path-description construct">
-          <textarea-autosize v-model.lazy="elemento.descricao" placeholder="Descrição do Documento"/>
+          <textarea-autosize v-model.lazy="elemento.descricao" placeholder="Descrição do Documento" :align="'text-center'"/>
         </div>
-    </div>
+        <textarea-autosize v-model.lazy="elemento.texto" placeholder="texto..." :align="'text-left'"/>
+      </div>
     <component :is="classChild(key, value.tipo)" v-for="(value, key) in childs" :child="value" :parent="elemento" :key="key"/>
 
   </div>
@@ -188,30 +189,30 @@ export default {
 </script>
 
 <style lang="scss" >
-.container-documento-edit {
+.container-path.container-documento-edit {
   background: #f7f7f7 url(/static/img/bg.png);
   padding: 20px 0px;
   margin: -20px 0px 0;
   input {
     outline: none;
   }
-}
-.path-title {
-  margin-top: 1em;
-  margin-bottom: 0;
-  &.construct {
-    input {
-      width: 100%;
-      background: transparent;
-      border: 0px;
-      line-height: 1;
-      padding: 10px;
-      text-align: center;
+  .path-title {
+    margin-top: 1em;
+    margin-bottom: 0;
+    &.construct {
+      input {
+        width: 100%;
+        background: transparent;
+        border: 0px;
+        line-height: 1;
+        padding: 10px;
+        text-align: center;
+      }
     }
   }
-}
-.path-description {
-  margin: 0px;
+  .path-description {
+    margin: 0px;
+  }
 }
 
 .widgets-function {

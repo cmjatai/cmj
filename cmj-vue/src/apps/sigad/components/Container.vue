@@ -1,6 +1,6 @@
 <template lang="html">
-  <div class="container">
-    <div class="path-title construct">
+  <div :class="classChild(elemento.id, elemento.tipo)">
+    <div class="path-title-container">
       <textarea-autosize v-model.lazy="elemento.titulo" placeholder="Título..."/>
     </div>
     <component :is="classChild(key, value.tipo)" v-for="(value, key) in childs" :child="value" :parent="elemento" :key="key"/>
@@ -18,5 +18,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+.container, .container-fluid {
+  border: 1px solid white;
+  background: white;
+}
 </style>

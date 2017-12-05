@@ -1,12 +1,12 @@
 <template>
-  <textarea ref="input" v-bind:value="value" placeholder="teste de placeholder" v-on:change="updateValue($event.target.value)"></textarea>
+  <textarea :class="align" ref="input" v-bind:value="value" placeholder="teste de placeholder" v-on:change="updateValue($event.target.value)"></textarea>
 </template>
 
 <script>
   import autosize from 'autosize'
 
   export default {
-    props: ['value'],
+    props: ['value', 'align'],
     mounted() {
       let text = this.$el
       setTimeout(function () {
@@ -31,6 +31,5 @@
     border: none;
     outline: none;
     resize: none;
-    text-align: center;
   }
 </style>
