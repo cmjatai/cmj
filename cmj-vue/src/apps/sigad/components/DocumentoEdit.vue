@@ -54,6 +54,10 @@ export default {
     'elemento.descricao': function(nv, ov) { this.handlerWatch(nv, ov, 'descricao') },
     'elemento.visibilidade': function(nv, ov) { this.handlerWatch(nv, ov, 'visibilidade') },
     'elemento.texto': function(nv, ov) { this.handlerWatch(nv, ov, 'texto') },
+    parent:function(nv, ov) {
+      this.elemento = this.child
+    },
+
   },
   computed: {
     ...mapGetters([

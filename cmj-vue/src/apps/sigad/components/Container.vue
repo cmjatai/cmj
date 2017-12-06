@@ -31,12 +31,6 @@ export default {
   extends: {
     ...DocumentoEdit,
   },
-  watch:{
-    parent:function(nv, ov) {
-      this.getDocumento(this.elemento.id)
-    },
-
-  },
   methods: {
     addParte(tipo, event) {
       let data = Object()
