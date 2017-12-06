@@ -5,7 +5,7 @@
       <div v-show="elemento.id" class="btn-toolbar widgets-function">
         <div class="btn-group btn-group-xs pull-left widget-actions ">
           <a :href="slug" class="btn btn-primary" target="_blank">Versão Final</a>
-            <a :href="meta_edit" class="btn btn-success" target="_blank">Editar Metadados</a>
+          <a :href="meta_edit" class="btn btn-success" target="_blank">Editar Metadados</a>
         </div>
         <div class="btn-group btn-group-lg pull-right widget-visibilidade">
           <cmj-choices v-model.lazy="elemento.visibilidade" :options="visibilidade_choice" name="visibilidade-" :id="elemento.id" />
@@ -17,9 +17,11 @@
         <div class="path-description construct">
           <textarea-autosize v-model.lazy="elemento.descricao" placeholder="Descrição do Documento" :align="'text-center'"/>
         </div>
-        <textarea-autosize v-model.lazy="elemento.texto" placeholder="texto..." :align="'text-left'"/>
+        <div class="construct">
+          <textarea-autosize v-model.lazy="elemento.texto" placeholder="texto..." :align="'text-left'"/>
+        </div>
       </div>
-    <component :is="classChild(key, value.tipo)" v-for="(value, key) in childs" :child="value" :parent="elemento" :key="key"/>
+    <component :is="classChild(value)" v-for="(value, key) in childs" :child="value" :parent="elemento" :key="value.id"/>
 
   </div>
 </template>
@@ -27,6 +29,7 @@
 <script>
 import { mapActions, mapGetters } from 'vuex'
 import { DocumentoResource } from '../../../resources'
+import { orderBy, isEmpty } from 'lodash';
 
 export default {
   name: 'documento-edit',
@@ -75,7 +78,7 @@ export default {
       return '/documento/'+this.elemento.id+'/edit'
     },
     childs: function() {
-      return this.elemento.childs
+      return _.orderBy(this.elemento.childs,'ordem')
     },
     visibilidade_choice: function() {
       return this.elemento.choices && this.elemento.choices.visibilidade
@@ -96,12 +99,12 @@ export default {
       'setDescricao',
     ]),
 
-    classChild(id, tipo) {
-      if (!id && this.notHasParent)
+    classChild(value) {
+      if (!value.id && this.notHasParent)
         return 'container-path container-documento-edit'
       else {
         try {
-          return this.getDocObject.choices.all[tipo]['component_tag']
+          return this.getDocObject.choices.all_bycode[value.tipo]['component_tag']
         }
         catch (Exception) {
           return ''
@@ -137,7 +140,6 @@ export default {
       let t = this
       t.documentoResource.createDocumento(data)
         .then( (response) => {
-          t.mode = "UPDATE"
           t.setDocObject(response.data)
           t.$router.push({name:'documento_construct', params: {id:response.data.id}})
           t.$nextTick()
@@ -147,15 +149,25 @@ export default {
         })
     },
     getDocumento(id) {
+      console.log('get:', id)
       let t = this
-      t.documentoResource.getDocumento(id)
-        .then( (req) => {
-          t.setDocObject(req.data)
-          t.elemento = req.data
-        })
-        .catch( (e) => {
-          t.setDocObject({})
-          t.elemento = {}
+      this.mode = "INIT"
+      this.$nextTick()
+        .then(function() {
+          t.documentoResource.getDocumento(id)
+            .then( (req) => {
+              t.setDocObject(req.data)
+              t.elemento = req.data
+              t.$nextTick()
+                .then( function() {
+                  t.mode = "UPDATE"
+                })
+            })
+            .catch( (e) => {
+              t.setDocObject({})
+              t.elemento = {}
+              console.log(e.statusText)
+            })
         })
     },
   },
@@ -172,10 +184,6 @@ export default {
       let id = t.$route.params.id
       if (t.$route.name === 'documento_construct') {
         t.getDocumento(id)
-        t.$nextTick()
-          .then( function() {
-            t.mode = "UPDATE"
-          })
       }
       else {
         t.mode = "CREATE"
@@ -191,24 +199,22 @@ export default {
 <style lang="scss" >
 .container-path.container-documento-edit {
   background: #f7f7f7 url(/static/img/bg.png);
-  padding: 20px 0px;
+  padding: 20px 0px 100px;
   margin: -20px 0px 0;
-  input {
+  input, textarea {
     outline: none;
+    width: 100%;
+    margin: 0;
+    padding: 5px 10px;
+    background: transparent;
+    border: none;
+    &:hover {
+      background: transparentize(#fff, 0.5);
+    }
   }
   .path-title {
     margin-top: 1em;
     margin-bottom: 0;
-    &.construct {
-      input {
-        width: 100%;
-        background: transparent;
-        border: 0px;
-        line-height: 1;
-        padding: 10px;
-        text-align: center;
-      }
-    }
   }
   .path-description {
     margin: 0px;

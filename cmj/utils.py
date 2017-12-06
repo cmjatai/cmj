@@ -253,12 +253,23 @@ class CmjChoices(Choices):
             } for value, triple, text in self._triples
         }
 
+        self._triple_map_component = {
+            triple.replace('_', '-'): {
+                'id': value,
+                'text': text
+            } for value, triple, text in self._triples
+        }
+
     def triple(self, value):
         return self._triple_map[value]['component_tag']
 
     @property
     def triple_map(self):
         return self._triple_map
+
+    @property
+    def triple_map_component(self):
+        return self._triple_map_component
 
     def __add__(self, other):
         if isinstance(other, self.__class__):

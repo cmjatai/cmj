@@ -37,6 +37,17 @@ class DocumentoViewSet(viewsets.ModelViewSet):
 
         return viewsets.ModelViewSet.dispatch(self, request, *args, **kwargs)
 
+    def destroy(self, request, *args, **kwargs):
+        obj = self.get_object()
+        parent, ordem = obj.parent, obj.ordem
+
+        response = viewsets.ModelViewSet.destroy(
+            self, request, *args, **kwargs)
+
+        Documento.objects.remove_space(parent, ordem)
+
+        return response
+
     """@detail_route(methods=['POST'])
     def set_titulo(self, request, pk=None):
         self.object = self.get_object()

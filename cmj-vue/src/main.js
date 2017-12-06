@@ -8,6 +8,7 @@ import VueCookie from 'vue-cookie'
 import VuexStore from './apps/store'
 import { routes } from './router-config'
 import axios from 'axios'
+import lodash from 'lodash'
 import { loadProgressBar } from 'axios-progress-bar'
 
 import Components from './apps'

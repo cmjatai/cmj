@@ -30,5 +30,9 @@ export const DocumentoResource = {
     url: `${basePath}/documento/${data.id}/`,
     data: data,
     method: 'PATCH'
+  }),
+  deleteDocumento: (id) => axios({
+    url: `${basePath}/documento/${id}/`,
+    method: 'DELETE'
   })
 }

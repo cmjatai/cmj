@@ -149,17 +149,25 @@
 
         {% endfor %}
       {% endwith %}
-
       {% block base_header %}
          {{block.super}}
       {% endblock %}
+      {{object.texto}}
     </div>
   {% endwith %}
 
     {% for container in object.childs.view_childs %}
       <div class="container{% if container.tipo == container.TPD_CONTAINER_EXTENDIDO%}-fluid{% endif %} {% if forloop.first%}container-first{% endif %}">
-
-        {{container.titulo}}{{container.descricao}}
+        {% if container.titulo %}
+          <div class="path-subtitle">
+            {{container.titulo}}
+          </div>
+        {% endif %}
+        {% if container.descricao %}
+          <div class="path-subtitle">
+            {{container.descricao}}
+          </div>
+        {% endif %}
 
       {% for child in container.childs.view_childs %}
         {% if child.tipo == child.TPD_TEXTO %}

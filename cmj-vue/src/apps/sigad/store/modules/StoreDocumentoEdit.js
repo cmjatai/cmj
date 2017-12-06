@@ -12,13 +12,17 @@ const mutations = {
         state.documento = data
       }
       else {
-        let childs = state.documento.childs
-        let update_child = nodeList => {
-          let node = nodeList[data.id]
-          if (node === undefined) {
-            for (let child in nodeList) {
-              if (update_child(nodeList[child].childs))
-                break
+        let update_child = parent => {
+          if (data.parent === parent.id) {
+            parent.childs[data.id] = data
+            return true
+          }
+
+          let child = parent.childs[data.id]
+          if (child === undefined) {
+            for (let child in parent.childs) {
+              if (update_child(child))
+                return true
             }
           }
           else {
@@ -26,7 +30,7 @@ const mutations = {
             return true
           }
         }
-        update_child(childs)
+        update_child(state.documento)
       }
     }
   },

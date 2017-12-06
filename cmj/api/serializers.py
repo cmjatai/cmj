@@ -89,7 +89,9 @@ class DocumentoSerializer(serializers.ModelSerializer):
             'template_doc': DOC_TEMPLATES_CHOICE.triple_map,
         }
 
-        choices['all'] = Documento.tipo_parte_doc_choice.triple_map
+        choices['all_bycode'] = Documento.tipo_parte_doc_choice.triple_map
+        choices['all_bycomponent'
+                ] = Documento.tipo_parte_doc_choice.triple_map_component
         return choices
 
     def __init__(self, instance=None, data=empty, depths={}, **kwargs):
@@ -133,13 +135,18 @@ class DocumentoSerializer(serializers.ModelSerializer):
                 instance.visibilidade != Documento.STATUS_PUBLIC:
             validated_data['public_date'] = timezone.now()
 
-        return serializers.ModelSerializer.update(self, instance, validated_data)
+        return serializers.ModelSerializer.update(
+            self, instance, validated_data)
 
     def create(self, validated_data):
         validated_data['owner'] = self.context['request'].user
+
+        if 'ordem' in validated_data:
+            Documento.objects.create_space(validated_data)
+
         instance = serializers.ModelSerializer.create(self, validated_data)
 
-        if not instance.parte_de_documento():
+        if not instance.is_parte_de_documento():
             container = Documento()
             container.titulo = ''
             container.descricao = ''

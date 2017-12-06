@@ -11,7 +11,7 @@ from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.storage import FileSystemStorage
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, F
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.text import slugify
@@ -277,12 +277,18 @@ class Slugged(Parent):
 
         self.slug = self.generate_unique_slug(slug)
 
+        kwargs['force_insert'] = False
+        kwargs['force_update'] = True
+
+        if self.parent:
+            self.visibilidade = self.parent.visibilidade
+            self.public_date = self.parent.public_date
+            self.classe = self.parent.classe
+
         super(Slugged, self).save(*args, **kwargs)
 
         for child in self.childs.all():
-            if self.slug != s_old or self.visibilidade != child.visibilidade:
-                child.visibilidade = self.visibilidade
-                child.save()
+            child.save()
 
     def generate_unique_slug(self, slug):
         concret_model = None
@@ -552,6 +558,22 @@ class DocumentoManager(models.Manager):
         ).order_by('-parent__parent__public_date')
         return qs
 
+    def create_space(self, validated_data):
+        qs = self.get_queryset()
+
+        qs = qs.filter(parent_id=validated_data['parent'],
+                       ordem__gte=validated_data['ordem']
+                       ).update(ordem=F('ordem') + 1)
+        return qs
+
+    def remove_space(self, parent, ordem):
+        qs = self.get_queryset()
+
+        qs = qs.filter(parent=parent,
+                       ordem__gte=ordem
+                       ).update(ordem=F('ordem') - 1)
+        return qs
+
 
 class Documento(ShortUrl, CMSMixin):
     objects = DocumentoManager()
@@ -589,7 +611,7 @@ class Documento(ShortUrl, CMSMixin):
         'documentos': CmjChoices(
             (TD_DOC, 'td_doc', _('Documento')),
             (TD_BI, 'td_bi', _('Banco de Imagem')),
-            (TD_GALERIA_PUBLICA, '_td_galeria_publica', _('Galeria Pública'))
+            (TD_GALERIA_PUBLICA, 'td_galeria_publica', _('Galeria Pública'))
         ),
 
         'containers': CmjChoices(
@@ -665,7 +687,7 @@ class Documento(ShortUrl, CMSMixin):
     def __str__(self):
         return self.titulo or self.get_tipo_display()
 
-    def parte_de_documento(self):
+    def is_parte_de_documento(self):
         return self.tipo >= 100
 
     @property
@@ -719,13 +741,11 @@ class Documento(ShortUrl, CMSMixin):
 
         return c.absolute_slug
 
-    property
-
+    @property
     def alinhamento_css_class(self):
         return self.alinhamento_choice.triple(self.alinhamento)
 
-    property
-
+    @property
     def visibilidade_css_class(self):
         return self.VISIBILIDADE_STATUS.triple(self.visibilidade)
 

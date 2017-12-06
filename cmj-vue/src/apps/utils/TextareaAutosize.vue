@@ -1,10 +1,8 @@
 <template>
   <textarea :class="align" ref="input" v-bind:value="value" placeholder="teste de placeholder" v-on:change="updateValue($event.target.value)"></textarea>
 </template>
-
 <script>
   import autosize from 'autosize'
-
   export default {
     props: ['value', 'align'],
     mounted() {
@@ -21,7 +19,6 @@
     }
   }
 </script>
-
 <style lang="scss" scoped>
   textarea {
     width: 100%;

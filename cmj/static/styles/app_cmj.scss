@@ -1052,6 +1052,13 @@ main {
       float: right;
     }
   }
+  .path-subtitle {
+    display:block;
+    border-left: 5px solid $color_text;
+    padding-left: 10px;
+    font-weight: bold;
+    margin-left: 5%;
+  }
   .pagination {
     a {
       font-size: 0.7em;
