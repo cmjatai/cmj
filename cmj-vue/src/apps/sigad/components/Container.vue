@@ -1,20 +1,25 @@
 <template lang="html">
   <div :class="classChild(elemento)">
+    <div class="btn-toolbar widgets widget-topLeft ">
+      <div class="btn-group btn-group-xs">
+        <button v-on:click="containerTrocarTipo" title="Trocar tipo deste Container" type="button" class="btn btn-default"><span class="glyphicon glyphicon-transfer" aria-hidden="true"></span></button>
+      </div>
+    </div>
     <div class="btn-toolbar widgets widget-topright ">
       <div class="btn-group btn-group-xs">
-        <button v-on:click.self="deleteParte" type="button" class="btn btn-danger">x</button>
+        <button v-on:click.self="deleteParte" title="Remover este Container" type="button" class="btn btn-danger">x</button>
       </div>
     </div>
     <div class="btn-toolbar widgets widget-bottom ">
       <div class="btn-group btn-group-xs">
-        <button v-on:click.self="addParte('container', $event)" type="button" class="btn btn-default">+C</button>
-        <button v-on:click.self="addParte('container-fluid', $event)"  type="button" class="btn btn-default">+CF</button>
+        <button v-on:click.self="addParte('container', $event)" title="Adicionar novo Container Simples abaixo deste" type="button" class="btn btn-default">+C</button>
+        <button v-on:click.self="addParte('container-fluid', $event)" title="Adicionar novo Container Fluido abaixo deste"  type="button" class="btn btn-default">+CF</button>
       </div>
     </div>
     <div class="path-subtitle construct">
-      <input v-model.lazy="elemento.titulo" placeholder="Sub título do container..."/>
+      {{elemento.ordem}}<input v-model.lazy="elemento.titulo" placeholder="Sub título do container..."/>
     </div>
-    <component :is="classChild(value)" v-for="(value, key) in childs" :child="value" :parent="elemento" :key="value.id"/>
+    <component :is="classChild(value)" v-for="(value, key) in childsOrdenados" :child="value" :parent="elemento" :key="value.id"/>
   </div>
 </template>
 
@@ -25,6 +30,12 @@ export default {
   name: 'container',
   extends: {
     ...DocumentoEdit,
+  },
+  watch:{
+    parent:function(nv, ov) {
+      this.getDocumento(this.elemento.id)
+    },
+
   },
   methods: {
     addParte(tipo, event) {
@@ -45,17 +56,15 @@ export default {
           console.log(response.statusText)
         })
     },
-    createChild(data) {
-      let t = this
-      t.documentoResource.createDocumento(data)
-        .then( (response) => {
-          t.$parent.getDocumento(response.data.parent)
-        })
-        .catch( (response) => {
-          console.log(response.statusText)
-        })
-    },
-  }
+    containerTrocarTipo(event) {
+      let data = Object()
+      let keys = _.keys(this.getChoices.tipo.containers)
+      data.tipo = this.elemento.tipo === parseInt(keys[0]) ? keys[1] : keys[0]
+      data.id = this.elemento.id
+      this.updateDocumento(data)
+    }
+  },
+
 
 }
 </script>
@@ -82,7 +91,7 @@ export default {
     right:-10px;
   }
   &:hover {
-    background: transparentize(#fff, 0.5);
+    background: transparentize(#fff, 0.3);
     .widgets {
       display: block;
     }

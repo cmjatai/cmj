@@ -152,7 +152,7 @@
       {% block base_header %}
          {{block.super}}
       {% endblock %}
-      {{object.texto}}
+      {{object.texto|default:''}}
     </div>
   {% endwith %}
 

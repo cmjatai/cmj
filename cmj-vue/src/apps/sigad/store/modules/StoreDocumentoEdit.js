@@ -59,7 +59,9 @@ const state = {
 }
 
 const getters = {
-  getDocObject: state => state.documento,
+  getDocObject: (state, id) => {
+    return state.documento
+  },
   getChilds: state => state.documento.childs,
   getChoices: state => state.documento.choices,
   getSlug: state => state.documento.slug

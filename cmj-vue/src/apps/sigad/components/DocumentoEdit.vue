@@ -21,7 +21,7 @@
           <textarea-autosize v-model.lazy="elemento.texto" placeholder="texto..." :align="'text-left'"/>
         </div>
       </div>
-    <component :is="classChild(value)" v-for="(value, key) in childs" :child="value" :parent="elemento" :key="value.id"/>
+    <component :is="classChild(value)" v-for="(value, key) in childsOrdenados" :child="value" :parent="elemento" :key="value.id"/>
 
   </div>
 </template>
@@ -77,8 +77,9 @@ export default {
       let slug = this.getSlug
       return '/documento/'+this.elemento.id+'/edit'
     },
-    childs: function() {
-      return _.orderBy(this.elemento.childs,'ordem')
+    childsOrdenados: function() {
+      let ordenar = this.elemento.childs
+      return _.orderBy(ordenar,'ordem')
     },
     visibilidade_choice: function() {
       return this.elemento.choices && this.elemento.choices.visibilidade
@@ -91,6 +92,10 @@ export default {
         return ''
       }
     },
+    ordem:function() {
+      return this.elemento.ordem
+    }
+
   },
   methods: {
     ...mapActions([
@@ -170,7 +175,18 @@ export default {
             })
         })
     },
+    createChild(data) {
+      let t = this
+      t.documentoResource.createDocumento(data)
+        .then( (response) => {
+          t.$parent.getDocumento(response.data.parent)
+        })
+        .catch( (response) => {
+          console.log(response.statusText)
+        })
+    },
   },
+
   mounted: function() {
     let t = this
     if (t.child) {

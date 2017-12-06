@@ -277,8 +277,9 @@ class Slugged(Parent):
 
         self.slug = self.generate_unique_slug(slug)
 
-        kwargs['force_insert'] = False
-        kwargs['force_update'] = True
+        if self.id:
+            kwargs['force_insert'] = False
+            kwargs['force_update'] = True
 
         if self.parent:
             self.visibilidade = self.parent.visibilidade
