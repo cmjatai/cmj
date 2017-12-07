@@ -183,11 +183,11 @@ export default {
             .catch( (e) => {
               t.setDocObject({})
               t.elemento = {}
-              t.danger()
+              t.danger(message='erro na atualização')
             })
         })
     },
-    createChild(data) {
+    createBrother(data) {
       let t = this
       t.documentoResource.createDocumento(data)
         .then( (response) => {
@@ -197,6 +197,17 @@ export default {
           t.danger()
         })
     },
+    createChild(data) {
+      let t = this
+      t.documentoResource.createDocumento(data)
+        .then( (response) => {
+          t.getDocumento(this.elemento.id)
+        })
+        .catch( (response) => {
+          t.danger(message='erro na adição')
+        })
+    },
+
   },
 
   mounted: function() {

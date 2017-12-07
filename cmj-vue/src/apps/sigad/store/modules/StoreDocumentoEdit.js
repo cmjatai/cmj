@@ -4,7 +4,6 @@ import {
   DOC_DESCRICAO
 } from '../../mutation-types'
 
-
 const mutations = {
   [DOC_OBJECT](state, data) {
     if (data && typeof data === 'object') {
@@ -17,17 +16,9 @@ const mutations = {
             parent.childs[data.id] = data
             return true
           }
-
-          let child = parent.childs[data.id]
-          if (child === undefined) {
-            for (let child in parent.childs) {
-              if (update_child(child))
-                return true
-            }
-          }
-          else {
-            nodeList[data.id] = data
-            return true
+          for (let child in parent.childs) {
+            if (update_child(parent.childs[child]))
+              return true
           }
         }
         update_child(state.documento)

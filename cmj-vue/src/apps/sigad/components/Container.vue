@@ -1,19 +1,24 @@
 <template lang="html">
-  <div :class="classChild(elemento)">
+  <div :class="['container-documento-edit', classChild(elemento)]">
+
+
     <div class="btn-toolbar widgets widget-top">
       <div class="btn-group btn-group-xs pull-left">
+        <button v-on:click.self="addChild('tpd-texto', $event)" title="Adicionar Fragmento de Texto" type="button" class="btn btn-default">T</button>
       </div>
       <div class="btn-group btn-group-xs pull-right">
         <button v-on:click.self="deleteParte" title="Remover este Container" type="button" class="btn btn-danger">x</button>
       </div>
     </div>
+
+
     <div class="btn-toolbar widgets widget-bottom ">
       <div class="btn-group btn-group-xs pull-right">
         <button v-on:click="containerTrocarTipo" title="Trocar tipo deste Container" type="button" class="btn btn-default"><span class="glyphicon glyphicon-transfer" aria-hidden="true"></span></button>
       </div>
       <div class="btn-group btn-group-xs pull-right">
-        <button v-on:click.self="addParte('container', $event)" title="Adicionar novo Container Simples abaixo deste" type="button" class="btn btn-default">+C</button>
-        <button v-on:click.self="addParte('container-fluid', $event)" title="Adicionar novo Container Fluido abaixo deste"  type="button" class="btn btn-default">+CF</button>
+        <button v-on:click.self="addBrother('container', $event)" title="Adicionar novo Container Simples abaixo deste" type="button" class="btn btn-default">+C</button>
+        <button v-on:click.self="addBrother('container-fluid', $event)" title="Adicionar novo Container Fluido abaixo deste"  type="button" class="btn btn-default">+CF</button>
       </div>
     </div>
     <div class="path-subtitle construct">
@@ -32,11 +37,17 @@ export default {
     ...DocumentoEdit,
   },
   methods: {
-    addParte(tipo, event) {
+    addBrother(tipo, event) {
       let data = Object()
       data.tipo = this.getChoices.all_bycomponent[tipo].id
       data.parent = this.parent.id
       data.ordem = this.elemento.ordem + 1
+      this.createBrother(data)
+    },
+    addChild(tipo, event) {
+      let data = Object()
+      data.tipo = this.getChoices.all_bycomponent[tipo].id
+      data.parent = this.elemento.id
       this.createChild(data)
     },
     deleteParte(event) {
@@ -63,16 +74,16 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-.container-fluid {
+<style lang="scss">
+.container-fluid.container-documento-edit  {
   width: 98%;
   margin: 0 auto;
 }
-.container, .container-fluid {
+.container-documento-edit:not(.container-path){
   position: relative;
   margin-bottom: 10px;
   transition: all 0.5s ease;
-  .widgets {
+  & > .widgets {
     opacity: 0;
     height: 0;
     display: none;
@@ -91,10 +102,10 @@ export default {
     right:-10px;
   }
   &:hover {
-    background: transparentize(#fff, 0.5);
+    background: transparentize(#fff, 0.1);
     transition: all 0.5s ease;
 
-    .widgets {
+    & > .widgets {
       display: block;
       height: auto;
       opacity: 0.3;

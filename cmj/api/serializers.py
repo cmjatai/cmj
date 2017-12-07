@@ -141,7 +141,7 @@ class DocumentoSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data['owner'] = self.context['request'].user
 
-        if 'ordem' in validated_data:
+        if 'ordem' in validated_data and validated_data['ordem']:
             Documento.objects.create_space(validated_data)
 
         instance = serializers.ModelSerializer.create(self, validated_data)
@@ -157,6 +157,12 @@ class DocumentoSerializer(serializers.ModelSerializer):
             container.ordem = 1
             container.visibilidade = instance.visibilidade
             container.save()
+        else:
+            if not instance.ordem:
+                prev = instance.parent.childs.view_childs().last()
+                if prev:
+                    instance.ordem = prev.ordem + 1
+                    instance.save()
 
         return instance
 
