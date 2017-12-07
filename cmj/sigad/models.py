@@ -60,6 +60,7 @@ CLASSE_TEMPLATES_CHOICE_FILES = {
     2: 'path/path_galeria.html',
     3: 'path/path_parlamentares.html',
     4: 'path/path_parlamentar.html',
+    5: 'path/path_classe.html',
 }
 
 CLASSE_TEMPLATES_CHOICE = CmjChoices(
@@ -67,6 +68,7 @@ CLASSE_TEMPLATES_CHOICE = CmjChoices(
     (2, 'galeria', _('Galeria Pública de Albuns')),
     (3, 'parlamentares', _('Página dos Parlamentares')),
     (4, 'parlamentar', _('Página individual de Parlamentar')),
+    (5, 'fotografia', _('Banco de Imagens')),
 )
 
 
@@ -269,7 +271,7 @@ class Slugged(Parent):
     def save(self, *args, **kwargs):
         s_old = self.slug
 
-        if self.titulo and not self.parent:
+        if self.titulo and not self.parent or not hasattr(self, 'classe'):
             slug = self.titulo
         else:
             super(Slugged, self).save(*args, **kwargs)
@@ -284,7 +286,9 @@ class Slugged(Parent):
         if self.parent:
             self.visibilidade = self.parent.visibilidade
             self.public_date = self.parent.public_date
-            self.classe = self.parent.classe
+
+            if hasattr(self, 'classe'):
+                self.classe = self.parent.classe
 
         super(Slugged, self).save(*args, **kwargs)
 
@@ -502,6 +506,7 @@ class DocumentoManager(models.Manager):
 
         self.q_doc = Q(tipo=Documento.TD_DOC, parent__isnull=True)
         self.q_gallery = Q(tipo=Documento.TPD_GALLERY)
+        self.q_bi = Q(tipo=Documento.TD_BI)
         self.q_doc_public = (Q(public_end_date__gte=timezone.now()) |
                              Q(public_end_date__isnull=True) &
                              Q(public_date__lte=timezone.now(),
@@ -520,11 +525,21 @@ class DocumentoManager(models.Manager):
         qs = self.get_queryset()
         return qs.order_by('ordem')
 
-    def qs_docs(self, user=None):
+    def qs_bi(self, user=None):
+
         self.q_filters()
+
+        return self.qs_docs(user, q_filter=self.q_bi)
+
+    def qs_docs(self, user=None, q_filter=None):
+
+        if not q_filter:
+            self.q_filters()
+            q_filter = self.q_doc
+
         qs = self.get_queryset()
 
-        qs = qs.filter(self.q_doc, self.q_doc_public)
+        qs = qs.filter(q_filter, self.q_doc_public)
 
         if user and not user.is_anonymous():
             # FIXME: manter condição apenas enquanto estiver desenvolvendo
@@ -533,13 +548,13 @@ class DocumentoManager(models.Manager):
                 qs_user = qs_user.filter(
                     Q(visibilidade=Documento.STATUS_PRIVATE) |
                     Q(visibilidade=Documento.STATUS_RESTRICT),
-                    self.q_doc
+                    q_filter
                 )
             else:
                 qs_user = self.get_queryset()
                 qs_user = qs_user.filter(
                     self.filter_q_private(user) | self.filter_q_restrict(user),
-                    self.q_doc
+                    q_filter
                 )
             qs = qs.union(qs_user)
 

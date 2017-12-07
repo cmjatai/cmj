@@ -251,6 +251,10 @@ class PathView(MultipleObjectMixin, TemplateView):
         elif template == models.CLASSE_TEMPLATES_CHOICE.galeria:
             kwargs['object_list'] = Documento.objects.view_public_gallery()
 
+        elif template == models.CLASSE_TEMPLATES_CHOICE.fotografia:
+            kwargs['object_list'] = Documento.objects.qs_bi(
+                self.request.user)
+
         elif template == models.CLASSE_TEMPLATES_CHOICE.parlamentar:
             kwargs['object_list'] = \
                 self.classe.parlamentar.documento_set.filter(
