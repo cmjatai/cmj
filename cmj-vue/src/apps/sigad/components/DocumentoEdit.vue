@@ -1,6 +1,5 @@
 <template lang="html">
   <div :class="classParent">
-
     <div v-if="notHasParent" class="container">
       <div v-show="elemento.id" class="btn-toolbar widgets-function">
         <div class="btn-group btn-group-xs pull-left widget-actions ">
@@ -46,7 +45,7 @@ export default {
         visibilidade: 99,
         texto: '',
       },
-      mode: "INIT"
+      mode: "INIT",
     }
   },
   watch: {
@@ -57,7 +56,6 @@ export default {
     parent:function(nv, ov) {
       this.elemento = this.child
     },
-
   },
   computed: {
     ...mapGetters([
@@ -106,8 +104,8 @@ export default {
       'setDocObject',
       'setTitulo',
       'setDescricao',
+      'sendMessage',
     ]),
-
     classChild(value) {
       if (!value.id && this.notHasParent)
         return 'container-path container-documento-edit'
@@ -143,7 +141,15 @@ export default {
       t.documentoResource.updateDocumento(data)
         .then( (response) => {
           t.setDocObject(response.data)
+          t.success()
         })
+        .catch( (response) => this.danger())
+    },
+    success(message='Informação atualizada com sucesso.') {
+      this.sendMessage({alert:'alert-success', message:message})
+    },
+    danger(message='Ocorreu um erro na comunicação com o servidor.') {
+      this.sendMessage({alert:'alert-danger', message: message })
     },
     createDocumento(data) {
       let t = this
@@ -156,6 +162,7 @@ export default {
               t.getDocumento(response.data.id)
             })
         })
+        .catch( (response) => this.danger())
     },
     getDocumento(id) {
       console.log('get:', id)
@@ -170,12 +177,13 @@ export default {
               t.$nextTick()
                 .then( function() {
                   t.mode = "UPDATE"
+                  t.success()
                 })
             })
             .catch( (e) => {
               t.setDocObject({})
               t.elemento = {}
-              console.log(e.statusText)
+              t.danger()
             })
         })
     },
@@ -186,7 +194,7 @@ export default {
           t.$parent.getDocumento(response.data.parent)
         })
         .catch( (response) => {
-          console.log(response.statusText)
+          t.danger()
         })
     },
   },
@@ -229,7 +237,7 @@ export default {
     background: transparent;
     border: none;
     &:hover {
-      background: transparentize(#fff, 0.5);
+      background: transparentize(#fff, 0.7);
     }
   }
   .path-title {

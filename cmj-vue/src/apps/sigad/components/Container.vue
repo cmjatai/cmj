@@ -1,23 +1,23 @@
 <template lang="html">
   <div :class="classChild(elemento)">
-    <div class="btn-toolbar widgets widget-topLeft ">
-      <div class="btn-group btn-group-xs">
-        <button v-on:click="containerTrocarTipo" title="Trocar tipo deste Container" type="button" class="btn btn-default"><span class="glyphicon glyphicon-transfer" aria-hidden="true"></span></button>
+    <div class="btn-toolbar widgets widget-top">
+      <div class="btn-group btn-group-xs pull-left">
       </div>
-    </div>
-    <div class="btn-toolbar widgets widget-topright ">
-      <div class="btn-group btn-group-xs">
+      <div class="btn-group btn-group-xs pull-right">
         <button v-on:click.self="deleteParte" title="Remover este Container" type="button" class="btn btn-danger">x</button>
       </div>
     </div>
     <div class="btn-toolbar widgets widget-bottom ">
-      <div class="btn-group btn-group-xs">
+      <div class="btn-group btn-group-xs pull-right">
+        <button v-on:click="containerTrocarTipo" title="Trocar tipo deste Container" type="button" class="btn btn-default"><span class="glyphicon glyphicon-transfer" aria-hidden="true"></span></button>
+      </div>
+      <div class="btn-group btn-group-xs pull-right">
         <button v-on:click.self="addParte('container', $event)" title="Adicionar novo Container Simples abaixo deste" type="button" class="btn btn-default">+C</button>
         <button v-on:click.self="addParte('container-fluid', $event)" title="Adicionar novo Container Fluido abaixo deste"  type="button" class="btn btn-default">+CF</button>
       </div>
     </div>
     <div class="path-subtitle construct">
-      {{elemento.ordem}}<input v-model.lazy="elemento.titulo" placeholder="Sub título do container..."/>
+      <input v-model.lazy="elemento.titulo" placeholder="Sub título do container..."/>
     </div>
     <component :is="classChild(value)" v-for="(value, key) in childsOrdenados" :child="value" :parent="elemento" :key="value.id"/>
   </div>
@@ -44,10 +44,10 @@ export default {
       t.documentoResource.deleteDocumento(this.elemento.id)
         .then( (response) => {
           t.$parent.getDocumento(this.parent.id)
-          console.log(response.statusText)
+          t.success('Elemento excluído com sucesso.')
         })
         .catch( (response) => {
-          console.log(response.statusText)
+          t.danger(response.response.data.detail)
         })
     },
     containerTrocarTipo(event) {
@@ -71,23 +71,38 @@ export default {
 .container, .container-fluid {
   position: relative;
   margin-bottom: 10px;
+  transition: all 0.5s ease;
   .widgets {
+    opacity: 0;
+    height: 0;
     display: none;
     position: absolute;
     z-index: 1;
     margin-top: -10px;
+    width: 100%;
+    transition: all 0.5s ease;
   }
   .widget-bottom {
     top:100%;
+    right:-10px;
   }
-  .widget-topright {
+  .widget-top {
     top: 0px;
     right:-10px;
   }
   &:hover {
-    background: transparentize(#fff, 0.3);
+    background: transparentize(#fff, 0.5);
+    transition: all 0.5s ease;
+
     .widgets {
       display: block;
+      height: auto;
+      opacity: 0.3;
+      transition: all 0.5s ease;
+      &:hover {
+        opacity: 1;
+        transition: opacity 0.5s ease;
+      }
     }
   }
 }

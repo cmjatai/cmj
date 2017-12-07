@@ -1,24 +1,25 @@
 
 <template>
   <div id="app">
+    <message v-bind:messages="getMessages"></message>
     <router-view></router-view>
   </div>
 </template>
 
 <script>
-
   import { mapGetters } from 'vuex'
-
   export default {
     name: 'app',
-    props: ['message'],
     data() {
       return {
       }
     },
-    computed: {},
-    methods: {}
-  };
+    computed: {
+      ...mapGetters({
+        getMessages: 'getMessages',
+      }),
+    },
+  }
 </script>
 
 

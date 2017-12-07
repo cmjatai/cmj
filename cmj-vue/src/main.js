@@ -33,6 +33,7 @@ const router = new Router({
 
 sync(store, router)
 
+
 const app = new Vue({
   router,
   store,

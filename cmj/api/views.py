@@ -1,7 +1,6 @@
-from httplib2 import BasicAuthentication
-from rest_framework import viewsets, status
-from rest_framework.authentication import SessionAuthentication
-from rest_framework.decorators import detail_route
+from django.utils.translation import ugettext_lazy as _
+from rest_framework import viewsets
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated,\
     IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
@@ -39,6 +38,11 @@ class DocumentoViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         obj = self.get_object()
+
+        if obj.tipo in Documento.TDc:
+            if obj.parent.childs.count() == 1:
+                raise PermissionDenied(
+                    _('Não é permitido remover todos os container'))
         parent, ordem = obj.parent, obj.ordem
 
         response = viewsets.ModelViewSet.destroy(
