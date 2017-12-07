@@ -842,6 +842,9 @@ h6 {
   height: 50px;
 }
 
+.embed-audio {
+  padding-bottom: 18%;
+}
 
 // #### footer ###########################################
 // based on http://getbootstrap.com/examples/sticky-footer
@@ -1052,11 +1055,19 @@ main {
       float: right;
     }
   }
-  .path-subtitle {
+  .path-title-container {
     display:block;
     //border-left: 5px solid transparentize($color_text, 0.7);
-    padding-left: 10px;
+    padding: 15px 0 5px 10px;
     font-weight: bold;
+    font-size: 115%;
+  }
+  .path-title-partes {
+    display:block;
+    //border-left: 5px solid transparentize($color_text, 0.7);
+    padding: 15px 0 5px 10px;
+    font-weight: bold;
+    font-size: 105%;
   }
   .pagination {
     a {
@@ -2191,6 +2202,10 @@ main {
       }
     }
   }
+
+  .embed-audio {
+    padding-bottom: 20%;
+  }
   .canais-absolute {
     .icon {
       position: absolute;
@@ -2267,6 +2282,10 @@ main {
 }
 
 @media screen and (max-width: 991px) {
+
+  .embed-audio {
+    padding-bottom: 23%;
+  }
   .navbar {
     .container-header{
       padding: 0 5px;
@@ -2596,6 +2615,10 @@ main {
   body {
     margin-bottom: $footer-height + 20px;
   }
+
+  .embed-audio {
+    padding-bottom: 26%;
+  }
   .footer {
     font-size: 0.8em;
     height: $footer-height;
@@ -2825,6 +2848,10 @@ main {
 }
 
 @media screen and (max-width: 600px) {
+
+    .embed-audio {
+      padding-bottom: 30%;
+    }
   .container-thumbnails {
     .content-image {
       &.show-image {
@@ -3062,6 +3089,10 @@ main {
 }
 
 @media screen and (max-width: 480px) {
+
+  .embed-audio {
+    padding-bottom: 35%;
+  }
   .navbar {
     a.navbar-brand {
       padding: 0 0 0 5px;

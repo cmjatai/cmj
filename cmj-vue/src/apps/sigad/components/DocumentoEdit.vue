@@ -250,6 +250,7 @@ export default {
     &:hover {
       background: transparentize(#fff, 0.7);
     }
+
   }
   .path-title {
     margin-top: 1em;
@@ -270,7 +271,7 @@ export default {
 
 .widget-visibilidade {
   .btn {
-    opacity: 0.3;
+    opacity: 0.5;
     color: black;
     &:hover {
       opacity: 1;

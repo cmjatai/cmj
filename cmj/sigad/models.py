@@ -596,6 +596,7 @@ class Documento(ShortUrl, CMSMixin):
     TPD_CONTAINER_SIMPLES = 700
     TPD_CONTAINER_EXTENDIDO = 701
     TPD_VIDEO = 800
+    TPD_AUDIO = 850
     TPD_IMAGE = 900
     TPD_GALLERY = 901
 
@@ -606,7 +607,7 @@ class Documento(ShortUrl, CMSMixin):
     TDc = (TPD_CONTAINER_SIMPLES, TPD_CONTAINER_EXTENDIDO)
 
     # Partes
-    TDp = (TPD_TEXTO, TPD_VIDEO, TPD_IMAGE, TPD_GALLERY)
+    TDp = (TPD_TEXTO, TPD_VIDEO, TPD_AUDIO, TPD_IMAGE, TPD_GALLERY)
 
     tipo_parte_doc = {
         'documentos': CmjChoices(
@@ -625,6 +626,7 @@ class Documento(ShortUrl, CMSMixin):
         'subtipos': CmjChoices(
             (TPD_TEXTO, 'tpd_texto', _('Texto')),
             (TPD_VIDEO, 'tpd_video', _('Vídeo')),
+            (TPD_AUDIO, 'tpd_audio', _('Áudio')),
             (TPD_IMAGE, 'tpd_image', _('Imagem')),
             (TPD_GALLERY, 'tpd_gallery',  _('Galeria de Imagens')),
 

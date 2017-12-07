@@ -3,9 +3,11 @@
 
 
     <div class="btn-toolbar widgets widget-top">
-      <div class="btn-group btn-group-xs pull-left">
-        <button v-on:click.self="addChild('tpd-texto', $event)" title="Adicionar Fragmento de Texto" type="button" class="btn btn-default">T</button>
-      </div>
+      <template v-if="childsOrdenados.length === 0">
+        <div class="btn-group btn-group-xs pull-left">
+          <button v-on:click.self="addChild(tipo.component_tag, $event)" v-for="tipo, key in getChoices.tipo.subtipos" type="button" class="btn btn-default" title="Adiciona Elemento no final deste Container...">{{tipo.text}}</button>
+        </div>
+      </template>
       <div class="btn-group btn-group-xs pull-right">
         <button v-on:click.self="deleteParte" title="Remover este Container" type="button" class="btn btn-danger">x</button>
       </div>
@@ -21,7 +23,7 @@
         <button v-on:click.self="addBrother('container-fluid', $event)" title="Adicionar novo Container Fluido abaixo deste"  type="button" class="btn btn-default">+CF</button>
       </div>
     </div>
-    <div class="path-subtitle construct">
+    <div class="path-title-container construct">
       <input v-model.lazy="elemento.titulo" placeholder="Sub título do container..."/>
     </div>
     <component :is="classChild(value)" v-for="(value, key) in childsOrdenados" :child="value" :parent="elemento" :key="value.id"/>
@@ -83,13 +85,25 @@ export default {
   position: relative;
   margin-bottom: 10px;
   transition: all 0.5s ease;
+  &:not(.container), &:not(.container-fluid) {
+    .btn-danger {
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: inline-block;
+      padding: 0;
+      margin: 0;
+      line-height: 20px;
+      text-align: center;
+    }
+  }
   & > .widgets {
     opacity: 0;
     height: 0;
     display: none;
     position: absolute;
     z-index: 1;
-    margin-top: -10px;
+    margin-top: -15px;
     width: 100%;
     transition: all 0.5s ease;
   }
@@ -104,11 +118,10 @@ export default {
   &:hover {
     background: transparentize(#fff, 0.1);
     transition: all 0.5s ease;
-
     & > .widgets {
       display: block;
       height: auto;
-      opacity: 0.3;
+      opacity: 0.6;
       transition: all 0.5s ease;
       &:hover {
         opacity: 1;
