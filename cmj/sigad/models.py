@@ -274,6 +274,9 @@ class Slugged(Parent):
     class Meta:
         abstract = True
 
+    def _local_save(self, *args, **kwargs):
+        super(Slugged, self).save(*args, **kwargs)
+
     def save(self, *args, **kwargs):
         s_old = self.slug
 
