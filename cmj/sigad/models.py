@@ -80,6 +80,12 @@ class Parent(models.Model):
         related_name='childs',
         verbose_name=_('Filhos'))
 
+    raiz = models.ForeignKey(
+        'self',
+        blank=True, null=True, default=None,
+        related_name='containers',
+        verbose_name=_('Containers'))
+
     related_classes = models.ManyToManyField(
         'self', blank=True,
         verbose_name=_('Classes Relacionadas'))
@@ -500,13 +506,17 @@ class PermissionsUserClasse(CMSMixin):
 class DocumentoManager(models.Manager):
     use_for_related_fields = True
 
+    filters_created = False
+
     def q_filters(self):
-        if hasattr(self, 'q_doc_public'):
+        if self.filters_created:
             return
+        self.filters_created = True
 
         self.q_doc = Q(tipo=Documento.TD_DOC, parent__isnull=True)
         self.q_gallery = Q(tipo=Documento.TPD_GALLERY)
-        self.q_bi = Q(tipo=Documento.TD_BI)
+        self.q_image = Q(tipo=Documento.TPD_IMAGE)
+        self.q_bi = Q(tipo=Documento.TD_BI, parent__isnull=True)
         self.q_doc_public = (Q(public_end_date__gte=timezone.now()) |
                              Q(public_end_date__isnull=True) &
                              Q(public_date__lte=timezone.now(),
@@ -526,10 +536,12 @@ class DocumentoManager(models.Manager):
         return qs.order_by('ordem')
 
     def qs_bi(self, user=None):
-
         self.q_filters()
-
         return self.qs_docs(user, q_filter=self.q_bi)
+
+    def qs_images(self, user=None):
+        self.q_filters()
+        return self.qs_docs(user, q_filter=self.q_image)
 
     def qs_docs(self, user=None, q_filter=None):
 

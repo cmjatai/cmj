@@ -41,9 +41,12 @@ class PaginaInicialView(TemplateView):
 
         context['noticias_dos_parlamentares'] = np
 
-        context['noticias_destaque'] = Documento.objects.qs_docs(
-        ).filter(parlamentares__isnull=True,
-                 classe_id=1)[:4]
+        context['noticias_destaque'] = Documento.objects.qs_images().filter(
+            raiz__parlamentares__isnull=True, classe_id=1)[:4]
+
+        context['noticias_destaque'] = list(
+            map(lambda x: (x.raiz, x), context['noticias_destaque']))
+
         return context
 
     def get_noticias_dos_parlamentares(self):
