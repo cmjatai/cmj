@@ -11,18 +11,6 @@ from cmj.sigad.models import Documento
 
 
 class DocumentoViewSet(viewsets.ModelViewSet):
-    """
-    List e Retrieve
-        default = /api/documento/{pk}/?depth_childs=X&depth_citados=Y
-
-            depth_childs = X
-            depth_citados = Y
-                recupera X e/ou Y profundidade
-                em childs e/ou em documentos_citados, respectivamente
-
-                X = 0 e/ou Y = 0 childs e documentos_citados
-                tem suas pks listadas
-    """
     queryset = Documento.objects.all()
     serializer_class = DocumentoSerializer
     permission_classes = (IsAuthenticated,)

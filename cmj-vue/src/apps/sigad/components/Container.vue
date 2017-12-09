@@ -3,18 +3,22 @@
 
 
     <div class="btn-toolbar widgets widget-top">
+      <div  v-if="!elemento.titulo" class="btn-group btn-group-xs pull-left">
+        <button v-on:click.self="toogleTitulo" title="Disponibilizar Título para o Container" type="button" class="btn btn-success">T</button>
+      </div>
       <template v-if="childsOrdenados.length === 0">
         <div class="btn-group btn-group-xs pull-left">
-          <button v-on:click.self="addChild(tipo.component_tag, $event)" v-for="tipo, key in getChoices.tipo.subtipos" type="button" class="btn btn-default" title="Adiciona Elemento no final deste Container...">{{tipo.text}}</button>
+          <button v-on:click.self="addChild(tipo.component_tag, $event)" v-for="tipo, key in getChoices.tipo.subtipos" type="button" class="btn btn-primary" title="Adiciona Elemento no final deste Container...">{{tipo.text}}</button>
         </div>
       </template>
       <div class="btn-group btn-group-xs pull-right">
-        <button v-on:click.self="deleteParte" title="Remover este Container" type="button" class="btn btn-danger">x</button>
       </div>
     </div>
 
-
     <div class="btn-toolbar widgets widget-bottom ">
+      <div class="btn-group btn-group-xs pull-right">
+        <button v-on:click.self="deleteParte" title="Remover este Container" type="button" class="btn btn-danger">x</button>
+      </div>
       <div class="btn-group btn-group-xs pull-right">
         <button v-on:click="containerTrocarTipo" title="Trocar tipo deste Container" type="button" class="btn btn-default"><span class="glyphicon glyphicon-transfer" aria-hidden="true"></span></button>
       </div>
@@ -23,7 +27,7 @@
         <button v-on:click.self="addBrother('container-fluid', $event)" title="Adicionar novo Container Fluido abaixo deste"  type="button" class="btn btn-default">+CF</button>
       </div>
     </div>
-    <div class="path-title-container construct">
+    <div v-if="has_titulo || elemento.titulo" class="path-title-container construct">
       <input v-model.lazy="elemento.titulo" placeholder="Sub título do container..."/>
     </div>
     <component :is="classChild(value)" v-for="(value, key) in childsOrdenados" :child="value" :parent="elemento" :key="value.id"/>
@@ -38,7 +42,23 @@ export default {
   extends: {
     ...DocumentoEdit,
   },
+  data() {
+    return {
+      has_titulo: false,
+      has_descricao:false,
+      has_autor: false,
+    }
+  },
   methods: {
+    toogleTitulo(event) {
+      this.has_titulo = !this.has_titulo
+    },
+    toogleDescricao(event) {
+      this.has_descricao = !this.has_descricao
+    },
+    toogleAutor(event) {
+      this.has_autor = !this.has_autor
+    },
     addBrother(tipo, event) {
       let data = Object()
       data.tipo = this.getChoices.all_bycomponent[tipo].id
@@ -81,22 +101,27 @@ export default {
   width: 98%;
   margin: 0 auto;
 }
+
+.container.container-documento-edit, .container-fluid.container-documento-edit  {
+  padding: 30px 10px;
+  border: 1px solid transparent;
+
+  &:hover {
+    background: transparentize(#fff, 0.7);
+    border: 1px solid #fafafa;
+    border-radius: 5px;
+  }
+  & > .widgets  {
+    .btn {
+      height: 30px;
+    }
+  }
+}
+
 .container-documento-edit:not(.container-path){
   position: relative;
   margin-bottom: 10px;
   transition: all 0.5s ease;
-  &:not(.container), &:not(.container-fluid) {
-    .btn-danger {
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      display: inline-block;
-      padding: 0;
-      margin: 0;
-      line-height: 20px;
-      text-align: center;
-    }
-  }
   & > .widgets {
     opacity: 0;
     height: 0;
@@ -116,12 +141,11 @@ export default {
     right:-10px;
   }
   &:hover {
-    background: transparentize(#fff, 0.1);
     transition: all 0.5s ease;
     & > .widgets {
       display: block;
       height: auto;
-      opacity: 0.6;
+      opacity: 0.4;
       transition: all 0.5s ease;
       &:hover {
         opacity: 1;

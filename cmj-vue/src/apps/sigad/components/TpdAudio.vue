@@ -1,8 +1,12 @@
 <template lang="html">
   <div :class="['container-documento-edit', classChild(elemento)]">
     <div class="btn-toolbar widgets widget-top">
+      <div v-show="elemento.texto" class="btn-group btn-group-xs pull-left">
+        <button  v-if="!elemento.titulo" v-on:click.self="toogleTitulo" title="Disponibilizar Título para o Áudio" type="button" class="btn btn-success">T</button>
+        <button  v-if="!elemento.descricao" v-on:click.self="toogleDescricao" title="Disponibilizar Descrição para o Áudio" type="button" class="btn btn-success">D</button>
+      </div>
       <div class="btn-group btn-group-xs pull-right">
-        <button v-on:click.self="deleteParte" title="Remover este Fragmento de Texto" type="button" class="btn btn-danger">x</button>
+        <button v-on:click.self="deleteParte" title="Remover este Áudio" type="button" class="btn btn-danger">x</button>
       </div>
     </div>
     <div class="btn-toolbar widgets widget-bottom">
@@ -12,11 +16,10 @@
     </div>
 
     <div class="inner">
-
-      <span v-show="elemento.texto" class="path-title-partes"><input v-model.lazy="elemento.titulo" placeholder="Título do Áudio..."/></span>
-      <input v-show="elemento.texto" v-model.lazy="elemento.descricao" placeholder="Descrição do Áudio..."/>
-      <input v-model.lazy="elemento.texto" placeholder="Código de incorporação de Áudio..."/>
-      <div v-if="elemento.texto"  class="embed-responsive embed-responsive-16by9 embed-audio">
+      <span v-if="has_titulo || elemento.titulo" v-show="elemento.texto" class="path-title-partes"><input v-model.lazy="elemento.titulo" placeholder="Título do Áudio..."/></span>
+      <input v-if="has_descricao || elemento.descricao" v-show="elemento.texto" v-model.lazy="elemento.descricao" placeholder="Descrição do Áudio..."/>
+      <input v-model.lazy="elemento.texto"  class="path-code" placeholder="Código de incorporação de Áudio..."/>
+      <div v-if="elemento.texto" class="embed-responsive embed-responsive-16by9 embed-audio">
         <span v-html="srcIframe"></span>
       </div>
     </div>
@@ -41,10 +44,17 @@ export default {
 .container-documento-edit {
   & > .tpd-audio {
     position: relative;
-    .widgets {
-      margin-top: 0px;
+    .btn-danger {
+      border-radius: 50%;
     }
-    input {
+    .widgets {
+      margin-top: -7px;
+    }
+    input.path-code {
+      font-size: 50%;
+      font-family: monospace;
+      background: transparentize(#fff, 0.2);
+      color: #22f;
       &::-webkit-input-placeholder { /* Chrome/Opera/Safari */
         color: #55b;
       }

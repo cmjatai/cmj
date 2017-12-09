@@ -243,11 +243,11 @@ export default {
   input, textarea {
     outline: none;
     width: 100%;
-    margin: 0;
+    margin: 5px 0;
     padding: 5px 10px;
-    background: transparent;
     border: none;
-    &:hover {
+    background: transparent;
+    &:focus {
       background: transparentize(#fff, 0.7);
     }
 

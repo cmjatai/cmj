@@ -1,24 +1,35 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import VueResource from 'vue-resource'
-import Router from 'vue-router'
-import { sync } from 'vuex-router-sync'
 import VueCookie from 'vue-cookie'
+import VueResource from 'vue-resource'
 
-import VuexStore from './apps/store'
-import { routes } from './router-config'
-import axios from 'axios'
+import Router from 'vue-router'
+  import { sync } from 'vuex-router-sync'
+
+import VueFroala from 'vue-froala-wysiwyg'
+  require('froala-editor/js/froala_editor.pkgd.min')
+  require('froala-editor/css/froala_editor.pkgd.min.css')
+  require('font-awesome/css/font-awesome.css')
+  require('froala-editor/css/froala_style.min.css')
+
+import vue2Dropzone from 'vue2-dropzone'
+  import 'vue2-dropzone/dist/vue2Dropzone.css'
+
 import lodash from 'lodash'
-import { loadProgressBar } from 'axios-progress-bar'
 
 import Components from './apps'
+import VuexStore from './apps/store'
+import { routes } from './router-config'
 
-axios.defaults.xsrfCookieName = 'csrftoken'
-axios.defaults.xsrfHeaderName = 'X-CSRFToken'
+import axios from 'axios'
+  import { loadProgressBar } from 'axios-progress-bar'
+  axios.defaults.xsrfCookieName = 'csrftoken'
+  axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 
 Vue.use(Vuex)
 Vue.use(Router)
 Vue.use(VueResource)
+Vue.use(VueFroala)
 
 //Vue.http.headers.common['Access-Control-Allow-Origin'] = '*'
 
@@ -32,7 +43,6 @@ const router = new Router({
 })
 
 sync(store, router)
-
 
 const app = new Vue({
   router,
