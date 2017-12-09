@@ -131,6 +131,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
             Revisao.gerar_revisao(documento, request.user)
 
             container = Documento()
+            container.raiz = documento
             container.titulo = ''
             container.descricao = ''
             container.classe = pasta_ano[ano]
@@ -151,6 +152,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                                   % midia_id_import)
 
                 image = Documento()
+                image.raiz = documento
                 image.autor = 'Hélio Domingos'
                 image.visibilidade = Documento.STATUS_RESTRICT
                 image.ordem = ordem
@@ -261,6 +263,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
             Revisao.gerar_revisao(d, request.user)
 
             container = Documento()
+            container.raiz = d
             container.titulo = ''
             container.descricao = ''
             container.classe_id = 1
@@ -276,6 +279,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
             if n['image']:
                 ordem += 1
                 image = Documento()
+                image.raiz = d
                 image.autor = n['image_caption']
                 image.visibilidade = 0
                 image.ordem = ordem
@@ -309,6 +313,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
             if n['text']:
                 ordem += 1
                 texto = Documento()
+                texto.raiz = d
                 texto.texto = n['text']
                 texto.visibilidade = d.visibilidade
                 texto.ordem = ordem
@@ -343,6 +348,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                 ordem += 1
 
                 cont_gallery = Documento()
+                cont_gallery.raiz = d
                 cont_gallery.titulo = ''
                 cont_gallery.descricao = ''
                 cont_gallery.classe_id = 1
@@ -355,6 +361,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                 Revisao.gerar_revisao(cont_gallery, request.user)
 
                 galeria = Documento()
+                galeria.raiz = d
                 galeria.autor = n['image_caption']
                 galeria.visibilidade = d.visibilidade
                 galeria.ordem = ordem
@@ -563,6 +570,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                 Revisao.gerar_revisao(documento, request.user)
 
                 cont_gallery = Documento()
+                cont_galery.raiz = documento
                 cont_gallery.titulo = ''
                 cont_gallery.descricao = ''
                 cont_gallery.classe = classe_albuns
@@ -575,6 +583,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                 Revisao.gerar_revisao(cont_gallery, request.user)
 
                 galeria = Documento()
+                galeria.raiz = documento
                 galeria.autor = 'Hélio Domingos'
                 galeria.visibilidade = documento.visibilidade
                 galeria.ordem = 1

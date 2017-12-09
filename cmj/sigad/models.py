@@ -299,6 +299,8 @@ class Slugged(Parent):
             if hasattr(self, 'classe'):
                 self.classe = self.parent.classe
 
+            self.raiz = self.parent.raiz if self.parent.raiz else self.parent
+
         super(Slugged, self).save(*args, **kwargs)
 
         for child in self.childs.all():

@@ -108,7 +108,7 @@ export default {
       border-radius: 50%;
     }
     .widgets {
-      margin-top: -7px;
+      margin-top: 0px;
     }
     input.path-code {
       font-size: 50%;
