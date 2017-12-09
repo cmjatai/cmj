@@ -12,9 +12,6 @@ import VueFroala from 'vue-froala-wysiwyg'
   require('font-awesome/css/font-awesome.css')
   require('froala-editor/css/froala_style.min.css')
 
-import vue2Dropzone from 'vue2-dropzone'
-  import 'vue2-dropzone/dist/vue2Dropzone.css'
-
 import lodash from 'lodash'
 
 import Components from './apps'
