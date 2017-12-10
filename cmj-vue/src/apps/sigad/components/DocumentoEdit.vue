@@ -62,7 +62,6 @@ export default {
        'getChilds',
        'getChoices',
        'getDocObject',
-       'getSlug',
     ]),
     hasParent: function() {
       return this.elemento && this.elemento.parent > 0
@@ -72,7 +71,7 @@ export default {
     },
 
     slug: function() {
-      let slug = this.getSlug
+      let slug = this.elemento.slug
       return '/'+slug
     },
     meta_edit: function() {
@@ -238,7 +237,7 @@ export default {
 <style lang="scss" >
 .container-path.container-documento-edit {
   background: #f7f7f7 url(/static/img/bg.png);
-  padding: 20px 0px 100px;
+  padding: 20px 0px 200px;
   margin: -20px 0px 0;
   input, textarea {
     outline: none;
@@ -250,7 +249,6 @@ export default {
     &:focus {
       background: transparentize(#fff, 0.7);
     }
-
   }
   .path-title {
     margin-top: 1em;
@@ -260,15 +258,11 @@ export default {
     margin: 0px;
   }
 }
-
-.widgets-function {
-}
 .widget-actions {
   a {
     color: white;
   }
 }
-
 .widget-visibilidade {
   .btn {
     opacity: 0.5;
@@ -287,11 +281,9 @@ export default {
   }
   .status-restrict {
     background: #ffd050;
-
   }
   .status-public {
     background: transparentize(#008020,0.6);
   }
 }
-
 </style>

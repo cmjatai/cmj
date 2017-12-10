@@ -1,5 +1,5 @@
 <template lang="html">
-  <div :class="['container-documento-edit', classChild(elemento)]">
+  <div :class="['container-documento-edit', classChild(elemento), childsOrdenados.length !== 0 ?  '': 'empty' ]">
 
 
     <div class="btn-toolbar widgets widget-top">
@@ -102,43 +102,45 @@ export default {
   margin: 0 auto;
 }
 
-.container.container-documento-edit, .container-fluid.container-documento-edit  {
-  padding: 30px 10px;
+.container-documento-edit:not(.container-path) {
   border: 1px solid transparent;
-
-  &:hover {
-    background: transparentize(#fff, 0.7);
-    border: 1px solid #fafafa;
-    border-radius: 5px;
-  }
-  & > .widgets  {
-    .btn {
-      height: 30px;
-    }
-  }
-}
-
-.container-documento-edit:not(.container-path){
   position: relative;
   margin-bottom: 10px;
-  transition: all 0.5s ease;
-  & > .widgets {
-    opacity: 0;
-    height: 0;
-    display: none;
+  &.container, &.container-fluid {
+    margin-bottom: 25px;
+    padding: 30px 0px;
+    background: transparentize(#bbb, 0.6);
+    border: 1px solid #fafafa;
+    border-radius: 5px;
+    & > .widgets  {
+      .btn {
+        height: 30px;
+      }
+    }
+  }
+  & > .tpd-texto, & > .tpd-audio, & > .tpd-video, & > .tpd-image {
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    &:hover {
+      background: transparentize(#fff, 0.4);
+      border: 1px solid #fafafa;
+      border-radius: 5px;
+    }
+  }
+  & > .widgets  {
     position: absolute;
     z-index: 1;
-    margin-top: -15px;
     width: 100%;
     transition: all 0.5s ease;
   }
-  .widget-bottom {
-    top:100%;
-    right:-10px;
-  }
-  .widget-top {
-    top: 0px;
-    right:-10px;
+  &:not(.empty) {
+    & > .widgets {
+      opacity: 0;
+      height: 0;
+      display: none;
+    }
   }
   &:hover {
     transition: all 0.5s ease;
@@ -152,6 +154,17 @@ export default {
         transition: opacity 0.5s ease;
       }
     }
+  }
+  .widget-bottom {
+    top:100%;
+    right:-10px;
+    left: -10px;
+    margin-top: -12px;
+  }
+  .widget-top {
+    top: 0px;
+    right:-10px;
+    margin-top: -15px;
   }
 }
 </style>

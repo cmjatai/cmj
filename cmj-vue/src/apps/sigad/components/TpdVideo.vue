@@ -1,7 +1,7 @@
 <template lang="html">
   <div :class="['container-documento-edit', classChild(elemento)]">
     <div class="btn-toolbar widgets widget-top">
-      <div v-show="elemento.texto" class="btn-group btn-group-xs pull-left">
+      <div v-show="elemento.texto" class="btn-group btn-group-xs pull-right">
         <button  v-if="!elemento.titulo" v-on:click.self="toogleTitulo" title="Disponibilizar Subtítulo para este Vídeo" type="button" class="btn btn-success">T</button>
         <button  v-if="!elemento.descricao" v-on:click.self="toogleDescricao" title="Disponibilizar Descrição para o Vídeo" type="button" class="btn btn-success">D</button>
       </div>
@@ -10,8 +10,8 @@
       </div>
     </div>
     <div class="btn-toolbar widgets widget-bottom">
-      <div class="btn-group btn-group-xs pull-left">
-        <button v-on:click.self="addBrother(tipo.component_tag, $event)" v-for="tipo, key in getChoices.tipo.subtipos" type="button" class="btn btn-default" title="Adiciona Elemento aqui...">{{tipo.text}}</button>
+      <div class="btn-group btn-group-xs pull-right">
+        <button v-on:click.self="addBrother(tipo.component_tag, $event)" v-for="tipo, key in getChoices.tipo.subtipos" type="button" class="btn btn-primary" title="Adiciona Elemento aqui...">{{tipo.text}}</button>
       </div>
     </div>
 
@@ -49,15 +49,7 @@ export default {
 
 <style lang="scss">
 .container-documento-edit {
-  & > .tpd-video {
-    position: relative;
-
-    .btn-danger {
-      border-radius: 50%;
-    }
-    .widgets {
-      margin-top: -7px;
-    }
+  & > .tpd-video, & > .tpd-audio {
     input.path-code {
       font-size: 50%;
       font-family: monospace;

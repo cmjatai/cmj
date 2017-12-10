@@ -1,15 +1,15 @@
 <template lang="html">
   <div :class="['container-documento-edit', classChild(elemento)]">
     <div class="btn-toolbar widgets widget-top">
-      <div v-if="!elemento.titulo" class="btn-group btn-group-xs pull-left">
-        <button v-on:click.self="toogleTitulo" title="Disponibilizar Subtítulo para este Fragmento de Texto" type="button" class="btn btn-success">T</button>
-      </div>
       <div class="btn-group btn-group-xs pull-right">
         <button v-on:click.self="deleteParte" title="Remover este Fragmento de Texto" type="button" class="btn btn-danger">x</button>
       </div>
+      <div v-if="!elemento.titulo" class="btn-group btn-group-xs pull-right">
+        <button v-on:click.self="toogleTitulo" title="Disponibilizar Subtítulo para este Fragmento de Texto" type="button" class="btn btn-success">T</button>
+      </div>
     </div>
     <div class="btn-toolbar widgets widget-bottom">
-      <div class="btn-group btn-group-xs pull-left">
+      <div class="btn-group btn-group-xs pull-right">
         <button v-on:click.self="addBrother(tipo.component_tag, $event)" v-for="tipo, key in getChoices.tipo.subtipos" type="button" class="btn btn-primary" title="Adiciona Elemento aqui...">{{tipo.text}}</button>
       </div>
     </div>
@@ -58,27 +58,14 @@ export default {
 <style lang="scss">
 .container-documento-edit {
   & > .tpd-texto {
-    padding: 5px 10px;
-    position: relative;
-    .btn-danger {
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      display: inline-block;
+    padding-top: 15px;
+    .path-title-partes {
       padding: 0;
-      margin: 0;
-      line-height: 20px;
-      text-align: center;
+      width: 45%;
+      display: inline-block;
     }
-    &:hover {
-          background: transparentize(#fff, 0.7);
-    }
-    input {
-      font-weight: bold;
-    }
-    .widgets {
-      margin-top: -10px;
-      z-index: 1999;
+    .fr-counter {
+      display: none;
     }
   }
 }

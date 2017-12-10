@@ -1,5 +1,5 @@
 <template lang="html">
-  <div :class="['container-documento-edit', classChild(elemento)]">
+  <div :class="['container-documento-edit', classChild(elemento), 'path-imagem', alinhamento(elemento)]">
     <div class="btn-toolbar widgets widget-top">
       <div v-show="elemento.texto" class="btn-group btn-group-xs pull-left">
         <button  v-if="!elemento.titulo" v-on:click.self="toogleTitulo" title="Disponibilizar Título para a Imagem" type="button" class="btn btn-success">T</button>
@@ -7,12 +7,14 @@
         <button  v-if="!elemento.autor" v-on:click.self="toogleDescricao" title="Disponibilizar Autor para a Imagem" type="button" class="btn btn-success">A</button>
       </div>
       <div class="btn-group btn-group-xs pull-right">
+        <button v-on:click="alinhar(key, $event)" v-for="alinhamento, key in getChoices.alinhamento" type="button" class="btn btn-primary" :title="alinhamento.text" v-html="icons[key]"></button>
+
         <button v-on:click.self="deleteParte" title="Remover esta Imagem" type="button" class="btn btn-danger">x</button>
       </div>
     </div>
     <div class="btn-toolbar widgets widget-bottom">
-      <div class="btn-group btn-group-xs pull-left">
-        <button v-on:click.self="addBrother(tipo.component_tag, $event)" v-for="tipo, key in getChoices.tipo.subtipos" type="button" class="btn btn-default" title="Adiciona Elemento aqui...">{{tipo.text}}</button>
+      <div class="btn-group btn-group-xs pull-right">
+        <button v-on:click.self="addBrother(tipo.component_tag, $event)" v-for="tipo, key in getChoices.tipo.subtipos" type="button" class="btn btn-primary" title="Adiciona Elemento aqui...">{{tipo.text}}</button>
       </div>
     </div>
 
@@ -20,13 +22,18 @@
       <span v-if="has_titulo || elemento.titulo" class="path-title-partes"><input v-model.lazy="elemento.titulo" placeholder="Título da Imagem..."/></span>
       <input v-if="has_descricao || elemento.descricao" v-model.lazy="elemento.descricao" placeholder="Descrição da Imagem..."/>
 
-      <div id="drop_zone" v-on:drop="drop_handler" v-on:dragover="dragover_handler" v-on:dragend="dragend_handler">
-        <strong>Drag one or more files to this Drop Zone ...</strong>
+      <div class="drop_files" :id="'drop_file'+elemento.id" v-on:drop="drop_handler" v-on:dragover="dragover_handler" v-on:dragend="dragend_handler">
+        <label  class="drop_zone" :for="'input_file'+elemento.id">
+          <span class="inner">
+            Arraste sua imagem e solte aqui.<br>
+            <small>Ou clique aqui para selecionar</small>
+          </span>
+        </label>
+        <input type="file" name="file_image" :id="'input_file'+elemento.id"/>
+        <div class="view">
+          <img :src="slug" alt="">
+        </div>
       </div>
-
-
-
-
     </div>
     <component :is="classChild(value)" v-for="(value, key) in childsOrdenados" :child="value" :parent="elemento" :key="value.id"/>
   </div>
@@ -34,6 +41,7 @@
 
 <script>
 import Container from './Container'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'tpd-image',
@@ -44,10 +52,36 @@ export default {
   },
   data() {
     return {
+      icons: {
+        0: '<i class="fa fa-align-left" aria-hidden="true"></i>',
+        1: '<i class="fa fa-align-justify" aria-hidden="true"></i>',
+        2: '<i class="fa fa-align-right" aria-hidden="true"></i>',
+        3: '<i class="fa fa-align-center" aria-hidden="true"></i>',
+      }
     }
   },
-  computed: {},
+  computed: {
+    ...mapGetters([
+       'getChoices',
+    ]),
+  },
   methods: {
+    alinhamento: function(value)  {
+      let al = value.alinhamento
+      try {
+        return this.getChoices.alinhamento[al]['component_tag']
+      }
+      catch (Exception) {
+        return ''
+      }
+    },
+    alinhar(alinhamento, ev) {
+        let data = Object()
+        data.alinhamento = alinhamento
+        data.id = this.elemento.id
+        this.elemento.alinhamento = alinhamento
+        this.updateDocumento(data)
+    },
     drop_handler(ev) {
       if (ev === undefined)
         return
@@ -98,34 +132,51 @@ export default {
 <style lang="scss">
 .container-documento-edit {
   & > .tpd-image {
-    position: relative;
-    #drop_zone {
-      border: 5px solid blue;
-      width:  200px;
-      height: 100px;
+    z-index: 3;
+    &.alinhamento-justify {
+      padding-top: 10px;
+      padding-bottom: 10px;
     }
-    .btn-danger {
-      border-radius: 50%;
+    &.alinhamento-center:hover {
+      margin: 0 auto !important;
     }
-    .widgets {
-      margin-top: 0px;
+    &:hover {
     }
-    input.path-code {
-      font-size: 50%;
-      font-family: monospace;
-      background: transparentize(#fff, 0.2);
-      color: #22f;
-      &::-webkit-input-placeholder { /* Chrome/Opera/Safari */
-        color: #55b;
+    .drop_files {
+      width:  100%;
+      text-align: center;
+      background: transparentize(#fff, 0.5);
+      position: relative;
+      min-height: 150px;
+      input {
+        visibility: hidden;
+        position: fixed;
+        top: -100px;
+        left: -100px;
+        height: 0px;
+        width: 0px;
       }
-      &::-moz-placeholder { /* Firefox 19+ */
-        color: #55b;
-      }
-      &:-ms-input-placeholder { /* IE 10+ */
-        color: #55b;
-      }
-      &:-moz-placeholder { /* Firefox 18- */
-        color: #55b;
+    }
+    .drop_zone {
+      border: 3px dashed #cccfcc;
+      cursor: pointer;
+      position: absolute;
+      line-height: 1;
+      margin: 0;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      background: transparentize(#fff, 0.5);
+      span {
+        color: black;
+        small {
+          color: #000080;
+        }
       }
     }
   }

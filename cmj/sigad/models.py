@@ -614,11 +614,13 @@ class Documento(ShortUrl, CMSMixin):
     ALINHAMENTO_LEFT = 0
     ALINHAMENTO_JUSTIFY = 1
     ALINHAMENTO_RIGHT = 2
+    ALINHAMENTO_CENTER = 3
 
     alinhamento_choice = CmjChoices(
         (ALINHAMENTO_LEFT, 'alinhamento_left', _('Alinhamento Esquerdo')),
         (ALINHAMENTO_JUSTIFY, 'alinhamento_justify', _('Alinhamento Completo')),
         (ALINHAMENTO_RIGHT, 'alinhamento_right', _('Alinhamento Direito')),
+        (ALINHAMENTO_CENTER, 'alinhamento_center', _('Alinhamento Centralizado')),
     )
 
     TD_DOC = 0

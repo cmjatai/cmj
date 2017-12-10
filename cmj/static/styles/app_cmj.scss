@@ -1013,6 +1013,14 @@ main {
     img {
       width: 100%;
     }
+    &.alinhamento-center {
+      padding: 0.5em 1em 0.4em;
+      margin: 0 auto;
+      width: 60%;
+      &.img128 {
+        width: 128px;
+      }
+    }
     &.alinhamento-left {
       padding: 0.5em 1em 0.4em 0;
       float: left;
@@ -1030,7 +1038,8 @@ main {
     &.alinhamento-justify {
       margin: 0;
       padding: 0;
-      width: 100%;
+      display: block;
+      width: auto;
     }
 
     .img-contexto {
@@ -2826,7 +2835,7 @@ main {
         }
         .path-item-list {
           .path-imagem {
-            &.alinhamento-justify {
+            &.alinhamento-justify, &.alinhamento-center {
               width: 35%;
               float: left;
               margin-right: 7px;
