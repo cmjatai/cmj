@@ -23,6 +23,7 @@ class DocumentoParteField(RelatedField):
             inst = model_to_dict(instance)
 
         inst[cfg['field']] = {}
+        inst['midia'] = hasattr(instance, 'midia')
 
         if not hasattr(instance, cfg['field']):
             return inst
@@ -68,6 +69,8 @@ class DocumentoSerializer(serializers.ModelSerializer):
     # documentos_citados = DocumentoParteField(many=True)
     # cita = RefereniciaDocumentoField(many=True)
 
+    has_midia = serializers.SerializerMethodField()
+
     choices = SerializerMethodField()
     slug = SlugField(read_only=True)
 
@@ -79,6 +82,9 @@ class DocumentoSerializer(serializers.ModelSerializer):
                    'owner',
                    'parlamentares',
                    'materias')
+
+    def get_has_midia(self, obj):
+        return hasattr(obj, 'midia')
 
     def get_choices(self, obj):
         choices = {

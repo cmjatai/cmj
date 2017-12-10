@@ -28,9 +28,9 @@
             Arraste sua imagem e solte aqui.<br>
             <small>Ou clique aqui para selecionar</small>
           </span>
+          <input type="file" name="file_image" :id="'input_file'+elemento.id"/>
         </label>
-        <input type="file" name="file_image" :id="'input_file'+elemento.id"/>
-        <div class="view">
+        <div v-if="elemento.has_midia" class="view">
           <img :src="slug" alt="">
         </div>
       </div>
