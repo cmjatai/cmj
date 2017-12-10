@@ -109,7 +109,7 @@ export default {
   &.container, &.container-fluid {
     margin-bottom: 25px;
     padding: 30px 0px;
-    background: transparentize(#bbb, 0.6);
+    background: transparentize(#bbb, 0.85);
     border: 1px solid #fafafa;
     border-radius: 5px;
     & > .widgets  {
