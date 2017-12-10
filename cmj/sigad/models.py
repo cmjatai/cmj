@@ -874,7 +874,7 @@ class Midia(models.Model):
 
     @cached_property
     def last(self):
-        return self.versions.last()
+        return self.versions.first()
 
 
 def media_path(instance, filename):

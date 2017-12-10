@@ -1,13 +1,16 @@
+from django.core.files.base import File
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import viewsets
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.permissions import IsAuthenticated,\
     IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from cmj.api.serializers import DocumentoSerializer,\
     DocumentoUserAnonymousSerializer
-from cmj.sigad.models import Documento
+from cmj.sigad.models import Documento, VersaoDeMidia, Midia
 
 
 class DocumentoViewSet(viewsets.ModelViewSet):
@@ -40,6 +43,30 @@ class DocumentoViewSet(viewsets.ModelViewSet):
 
         return response
 
+    def perform_update(self, serializer):
+        if len(self.request.FILES):
+            files = self.request.FILES.getlist('files')
 
-class MidiaUpLoadView():
-    pass
+            inst = serializer.instance
+
+            if not hasattr(inst, 'midia'):
+                midia = Midia()
+                midia.documento = serializer.instance
+                midia.save()
+            else:
+                midia = inst.midia
+
+            versao = VersaoDeMidia()
+            versao.midia = midia
+            versao.owner = self.request.user
+            versao.content_type = files[0].content_type
+            versao.alinhamento = serializer.instance.alinhamento
+            versao.save()
+
+            versao.file.save("image.jpg", File(files[0]), save=True)
+        else:
+            viewsets.ModelViewSet.perform_update(self, serializer)
+
+
+class MidiaUpLoadView(APIView):
+    parser_classes = (MultiPartParser,)

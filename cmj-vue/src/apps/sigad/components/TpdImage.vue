@@ -21,9 +21,7 @@
     <div class="inner">
       <span v-if="has_titulo || elemento.titulo" class="path-title-partes"><input v-model.lazy="elemento.titulo" placeholder="Título da Imagem..."/></span>
       <input v-if="has_descricao || elemento.descricao" v-model.lazy="elemento.descricao" placeholder="Descrição da Imagem..."/>
-
-      <drop-zone :elemento="elemento" :src="slug"/>
-
+      <drop-zone v-on:change="changeImage" :elemento="elemento" :src="slug" :multiple="true" :resource="documentoResource"/>
     </div>
     <component :is="classChild(value)" v-for="(value, key) in childsOrdenados" :child="value" :parent="elemento" :key="value.id"/>
   </div>
@@ -56,6 +54,9 @@ export default {
     ]),
   },
   methods: {
+    changeImage: function() {
+      this.getDocumento(this.elemento.id)
+    },
     alinhamento: function(value)  {
       let al = value.alinhamento
       try {

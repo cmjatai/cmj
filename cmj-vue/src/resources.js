@@ -31,6 +31,11 @@ export const DocumentoResource = {
     data: data,
     method: 'PATCH'
   }),
+  uploadFiles: (id, form) => axios({
+    url: `${basePath}/documento/${id}/`,
+    data: form,
+    method: 'PATCH'
+  }),
   deleteDocumento: (id) => axios({
     url: `${basePath}/documento/${id}/`,
     method: 'DELETE'
