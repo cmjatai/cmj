@@ -23,7 +23,7 @@ class DocumentoParteField(RelatedField):
             inst = model_to_dict(instance)
 
         inst[cfg['field']] = {}
-        inst['midia'] = hasattr(instance, 'midia')
+        inst['has_midia'] = hasattr(instance, 'midia')
 
         if not hasattr(instance, cfg['field']):
             return inst

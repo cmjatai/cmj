@@ -1,11 +1,15 @@
 import Vue from 'vue'
 import DocumentoEdit from './components/DocumentoEdit'
+
 import Container from './components/Container'
 import ContainerFluid from './components/ContainerFluid'
+import ContainerTdBi from './components/ContainerTdBi'
+
 import TpdTexto from './components/TpdTexto'
 import TpdVideo from './components/TpdVideo'
 import TpdAudio from './components/TpdAudio'
 import TpdImage from './components/TpdImage'
+import TpdImageTdBi from './components/TpdImageTdBi'
 
 Vue.component('DocumentoEdit', DocumentoEdit)
 Vue.component('Container', Container)
@@ -14,6 +18,8 @@ Vue.component('TpdTexto', TpdTexto)
 Vue.component('TpdVideo', TpdVideo)
 Vue.component('TpdAudio', TpdAudio)
 Vue.component('TpdImage', TpdImage)
+Vue.component('ContainerTdBi', ContainerTdBi)
+Vue.component('TpdImageTdBi', TpdImageTdBi)
 
 export default {
   DocumentoEdit,
@@ -22,5 +28,7 @@ export default {
   TpdTexto,
   TpdVideo,
   TpdAudio,
-  TpdImage
+  TpdImage,
+  ContainerTdBi,
+  TpdImageTdBi
 }

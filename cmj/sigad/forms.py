@@ -97,6 +97,8 @@ class DocumentoForm(ModelForm):
     public_date = forms.DateTimeField(
         widget=forms.HiddenInput(), required=False,)
 
+    tipo = forms.ChoiceField(choices=Documento.tipo_parte_doc['documentos'])
+
     class Meta:
         model = Documento
         fields = ['titulo',
@@ -104,7 +106,8 @@ class DocumentoForm(ModelForm):
                   'descricao',
                   'visibilidade',
                   'parlamentares',
-                  'public_date'
+                  'public_date',
+                  'tipo'
                   ]
 
     def __init__(self, *args, **kwargs):
@@ -112,7 +115,10 @@ class DocumentoForm(ModelForm):
         self.helper = FormHelper()
         self.helper.layout = SaplFormLayout(
             to_row([
-                ('titulo', 6), ('template_doc', 3), ('visibilidade', 3),
+                ('titulo', 8), ('visibilidade', 4)
+            ]),
+            to_row([
+                ('tipo', 6), ('template_doc', 6),
             ]),
             to_row([
                 ('descricao', 8),

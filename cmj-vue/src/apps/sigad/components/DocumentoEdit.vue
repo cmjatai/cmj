@@ -21,7 +21,6 @@
         </div>
       </div>
     <component :is="classChild(value)" v-for="(value, key) in childsOrdenados" :child="value" :parent="elemento" :key="value.id"/>
-
   </div>
 </template>
 
@@ -110,7 +109,10 @@ export default {
         return 'container-path container-documento-edit'
       else {
         try {
-          return this.getDocObject.choices.all_bycode[value.tipo]['component_tag']
+          let classe = this.getDocObject.choices.all_bycode[value.tipo]['component_tag']
+          if (this.getDocObject.tipo !== 0)
+            classe += '-'+this.getDocObject.choices.all_bycode[this.getDocObject.tipo]['component_tag']
+          return classe
         }
         catch (Exception) {
           return ''
