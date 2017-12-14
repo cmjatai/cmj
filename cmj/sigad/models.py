@@ -951,12 +951,6 @@ class VersaoDeMidia(models.Model):
             '768': (768, 768),
             '1024': (1024, 1024),
         }
-        """try:
-            w = int(width)
-            sizes[str(width)] = w, w
-            width = str(width)
-        except:
-            pass"""
 
         if width not in sizes:
             width = '96'
@@ -974,7 +968,14 @@ class VersaoDeMidia(models.Model):
             file = io.open(nf, 'rb')
         else:
             if sizes[width][0] < 512:
-                im.thumbnail(sizes[width])
+                if im.width > im.height:
+                    im.thumbnail(sizes[width])
+                else:
+                    size = (
+                        int(sizes[width][0] * (im.width / im.height)),
+                        int(sizes[width][1] * (im.width / im.height))
+                    )
+                    im.thumbnail(size)
             else:
                 im.thumbnail(sizes[width], resample=NEAREST)
             im.save(nft)

@@ -1,14 +1,16 @@
 <template lang="html">
-  <div :class="['container-documento-edit', classChild(elemento), 'container']">
+  <div :class="[classChild(elemento), 'container']">
 
     <div class="btn-toolbar widgets widget-top">
       <div class="btn-group btn-group-xs pull-right">
       </div>
     </div>
-
-    <drop-zone v-on:change="changeImage" :elemento="elemento" :src="slug" :multiple="true" :resource="documentoResource"/>
-
-    <component :is="classChild(value)" v-for="(value, key) in childsOrdenados" :child="value" :parent="elemento" :key="value.id"/>
+    <div class="drop-area">
+      <drop-zone v-on:change="changeImage" :elemento="elemento" :src="slug" :multiple="true" :resource="documentoResource"/>
+    </div>
+    <div class="inner">
+      <component :is="classChild(value)" v-for="(value, key) in childsOrdenados" :child="value" :parent="elemento" :key="value.id"/>
+    </div>
   </div>
 </template>
 
@@ -22,6 +24,9 @@ export default {
     ...DocumentoEdit,
   },
   methods: {
+    changeImage: function() {
+      this.getDocumento(this.elemento.id)
+    },
     deleteParte(event) {
       let t = this
       t.documentoResource.deleteDocumento(this.elemento.id)
@@ -41,8 +46,16 @@ export default {
 <style lang="scss">
 
 .container-documento-edit {
-  & > .container-td-bi {
-    padding: 0px;
+  .container-td-bi {
+    & > .drop-area {
+      padding: 0 10px;
+    }
+    & > .inner {
+      padding: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
   }
 }
 </style>
