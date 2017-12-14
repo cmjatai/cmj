@@ -1,5 +1,5 @@
 <template lang="html">
-    <div :class="['container-documento-edit', classChild(elemento), 'path-imagem', alinhamento(elemento)]">
+    <div :class="[classChild(elemento), 'path-imagem', alinhamento(elemento)]">
       <div class="btn-toolbar widgets widget-top">
         <div v-show="elemento.texto" class="btn-group btn-group-xs pull-left">
           <button  v-if="!elemento.titulo" v-on:click.self="toogleTitulo" title="Disponibilizar Título para a Imagem" type="button" class="btn btn-success">T</button>
@@ -78,17 +78,18 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .container-documento-edit {
-  & > .tpd-image {
+  .tpd-image {
     z-index: 3;
+    margin-top: 13px ;
     &.alinhamento-justify {
       padding-top: 10px;
       padding-bottom: 10px;
       clear: left;
     }
-    &.alinhamento-center:hover {
-      margin: 0 auto !important;
+    &.alinhamento-center{
+      margin: 0 auto ;
     }
     &:hover {
     }

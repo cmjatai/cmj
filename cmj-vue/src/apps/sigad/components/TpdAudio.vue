@@ -1,12 +1,12 @@
 <template lang="html">
-  <div :class="['container-documento-edit', classChild(elemento)]">
+  <div :class="[ classChild(elemento)]">
     <div class="btn-toolbar widgets widget-top">
+      <div class="btn-group btn-group-xs pull-right">
+        <button v-on:click.self="deleteParte" title="Remover este Áudio" type="button" class="btn btn-danger">x</button>
+      </div>
       <div v-show="elemento.texto" class="btn-group btn-group-xs pull-right">
         <button  v-if="!elemento.titulo" v-on:click.self="toogleTitulo" title="Disponibilizar Título para o Áudio" type="button" class="btn btn-success">T</button>
         <button  v-if="!elemento.descricao" v-on:click.self="toogleDescricao" title="Disponibilizar Descrição para o Áudio" type="button" class="btn btn-success">D</button>
-      </div>
-      <div class="btn-group btn-group-xs pull-right">
-        <button v-on:click.self="deleteParte" title="Remover este Áudio" type="button" class="btn btn-danger">x</button>
       </div>
     </div>
     <div class="btn-toolbar widgets widget-bottom">
@@ -42,7 +42,7 @@ export default {
 
 <style lang="scss">
 .container-documento-edit {
-  & > .tpd-audio {
+  .tpd-audio {
   }
 }
 </style>

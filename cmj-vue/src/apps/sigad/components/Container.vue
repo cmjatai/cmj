@@ -1,5 +1,5 @@
 <template lang="html">
-  <div :class="['container-documento-edit', classChild(elemento), childsOrdenados.length !== 0 ?  '': 'empty' ]">
+  <div :class="[classChild(elemento), childsOrdenados.length !== 0 ?  '': 'empty' ]">
 
 
     <div class="btn-toolbar widgets widget-top">
@@ -97,18 +97,15 @@ export default {
 </script>
 
 <style lang="scss">
-.container-fluid.container-documento-edit  {
-  width: 98%;
-  margin: 0 auto;
-}
-
-.container-documento-edit:not(.container-path) {
-  border: 1px solid transparent;
-  position: relative;
-  margin-bottom: 10px;
-  &.container, &.container-fluid {
-    margin-bottom: 25px;
-    padding: 30px 0px;
+.container-documento-edit {
+  .container-fluid  {
+    width: 98%;
+  }
+  .container, .container-fluid {
+    border: 1px solid transparent;
+    position: relative;
+    margin: 15px auto 30px;
+    padding: 15px 0px 30px;
     background: transparentize(#bbb, 0.85);
     border: 1px solid #fafafa;
     border-radius: 5px;
@@ -117,54 +114,27 @@ export default {
         height: 30px;
       }
     }
-  }
-  & > .tpd-texto, & > .tpd-audio, & > .tpd-video, & > .tpd-image {
-    padding-left: 10px;
-    padding-right: 10px;
-    margin-left: 10px;
-    margin-right: 10px;
-    &:hover {
-      background: transparentize(#fff, 0.4);
-      border: 1px solid #fafafa;
-      border-radius: 5px;
-    }
-  }
-  & > .widgets  {
-    position: absolute;
-    z-index: 1;
-    width: 100%;
-    transition: all 0.5s ease;
-  }
-  &:not(.empty) {
-    & > .widgets {
-      opacity: 0;
-      height: 0;
-      display: none;
-    }
-  }
-  &:hover {
-    transition: all 0.5s ease;
-    & > .widgets {
-      display: block;
-      height: auto;
-      opacity: 0.4;
-      transition: all 0.5s ease;
-      &:hover {
-        opacity: 1;
-        transition: opacity 0.5s ease;
+    &.empty {
+      padding: 30px;
+      & > .widgets {
+        display: block;
+        height: auto;
+        opacity: 0.4;
       }
     }
-  }
-  .widget-bottom {
-    top:100%;
-    right:-10px;
-    left: -10px;
-    margin-top: -12px;
-  }
-  .widget-top {
-    top: 0px;
-    right:-10px;
-    margin-top: -15px;
+    &:hover {
+      transition: all 0.5s ease;
+      & > .widgets {
+        transition: all 0.5s ease;
+        display: block;
+        height: auto;
+        opacity: 0.7;
+        &:hover {
+          opacity: 1;
+          transition: all 0.5s ease;
+        }
+      }
+    }
   }
 }
 </style>

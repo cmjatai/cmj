@@ -86,11 +86,7 @@ export default {
         ? this.elemento.choices.visibilidade : {}
     },
     classParent: function() {
-      if (this.notHasParent)
-        return 'container-path container-documento-edit'
-      else {
-        return ''
-      }
+      return this.notHasParent ? 'container-path container-documento-edit' : ''
     },
     ordem:function() {
       return this.elemento.ordem
@@ -252,6 +248,10 @@ export default {
       background: transparentize(#fff, 0.7);
     }
   }
+  .container:first-child {
+    background-color: transparent;
+    border: 1px solid transparent;
+  }
   .path-title {
     margin-top: 1em;
     margin-bottom: 0;
@@ -259,33 +259,82 @@ export default {
   .path-description {
     margin: 0px;
   }
-}
-.widget-actions {
-  a {
-    color: white;
-  }
-}
-.widget-visibilidade {
-  .btn {
-    opacity: 0.5;
-    color: black;
-    &:hover {
-      opacity: 1;
+  .widget-actions {
+    a {
+      color: white;
     }
   }
-  .active {
-    opacity: 1;
-    font-weight: bold;
-    color: black;
+  .widget-visibilidade {
+    .btn {
+      opacity: 0.5;
+      color: black;
+      &:hover {
+        opacity: 1;
+      }
+    }
+    .active {
+      opacity: 1;
+      font-weight: bold;
+      color: black;
+    }
+    .status-private {
+      background: transparentize(#d90040,0.6);
+    }
+    .status-restrict {
+      background: #ffd050;
+    }
+    .status-public {
+      background: transparentize(#008020,0.6);
+    }
   }
-  .status-private {
-    background: transparentize(#d90040,0.6);
+  .widgets {
+    position: absolute;
+    z-index: 2;
+    width: 100%;
+    transition: all 0.5s ease;
+    opacity: 0;
+    height: 0;
+    display: none;
+    &:hover {
+      opacity: 1;
+      transition: all 0.5s ease;
+    }
   }
-  .status-restrict {
-    background: #ffd050;
+  .widget-bottom {
+    top:100%;
+    right:-10px;
+    left: -10px;
+    margin-top: -15px;
   }
-  .status-public {
-    background: transparentize(#008020,0.6);
+  .widget-top {
+    top: 0px;
+    right:-10px;
+    margin-top: -15px;
+  }
+  .tpd-texto, .tpd-audio, .tpd-video, .tpd-image {
+    position: relative;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    border: 1px solid transparent;
+    &:hover {
+      background: transparentize(#fff, 0.4);
+      border: 1px solid #fafafa;
+      border-radius: 5px;
+      & > .widgets {
+        display: block;
+        height: auto;
+        opacity: 0.4;
+        &:hover {
+          opacity: 1;
+          transition: all 0.5s ease;
+        }
+      }
+    }
+  }
+  .fr-counter {
+    display: none;
   }
 }
 </style>

@@ -1,5 +1,5 @@
 <template lang="html">
-  <div :class="['container-documento-edit', classChild(elemento)]">
+  <div :class="[classChild(elemento)]">
     <div class="btn-toolbar widgets widget-top">
       <div class="btn-group btn-group-xs pull-right">
         <button v-on:click.self="deleteParte" title="Remover este Fragmento de Texto" type="button" class="btn btn-danger">x</button>
@@ -57,15 +57,12 @@ export default {
 
 <style lang="scss">
 .container-documento-edit {
-  & > .tpd-texto {
+  .tpd-texto {
     padding-top: 15px;
     .path-title-partes {
       padding: 0;
       width: 45%;
       display: inline-block;
-    }
-    .fr-counter {
-      display: none;
     }
   }
 }
