@@ -136,19 +136,28 @@ class DocumentoSerializer(serializers.ModelSerializer):
             }
 
     def update(self, instance, validated_data):
-        if 'visibilidade' in validated_data and \
-                validated_data['visibilidade'] == Documento.STATUS_PUBLIC and\
+        vd = validated_data
+        if 'visibilidade' in vd and \
+                vd['visibilidade'] == Documento.STATUS_PUBLIC and\
                 instance.visibilidade != Documento.STATUS_PUBLIC:
-            validated_data['public_date'] = timezone.now()
+            vd['public_date'] = timezone.now()
 
-        return serializers.ModelSerializer.update(
-            self, instance, validated_data)
+        if 'ordem' in vd and vd['ordem']:
+            ordem_atual = instance.ordem
+            ordem_nova = vd['ordem']
+            Documento.objects.remove_space(instance.parent, ordem_atual)
+            Documento.objects.create_space(instance.parent, ordem_nova)
+
+        update = serializers.ModelSerializer.update(self, instance, vd)
+
+        return update
 
     def create(self, validated_data):
-        validated_data['owner'] = self.context['request'].user
+        vd = validated_data
+        vd['owner'] = self.context['request'].user
 
-        if 'ordem' in validated_data and validated_data['ordem']:
-            Documento.objects.create_space(validated_data)
+        if 'ordem' in vd and vd['ordem']:
+            Documento.objects.create_space(vd['parent'], vd['ordem'])
 
         instance = serializers.ModelSerializer.create(self, validated_data)
 

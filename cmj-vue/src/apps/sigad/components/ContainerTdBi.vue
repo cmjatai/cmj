@@ -9,7 +9,7 @@
       <drop-zone v-on:change="changeImage" :elemento="elemento" :src="slug" :multiple="true" :resource="documentoResource"/>
     </div>
     <div class="inner">
-      <component :is="classChild(value)" v-for="(value, key) in childsOrdenados" :child="value" :parent="elemento" :key="value.id"/>
+      <component :is="classChild(value)" v-on:ondragend="ondragend" v-on:ondragleave="ondragleave" v-for="(value, key) in childsOrdenados" :child="value" :parent="elemento" :key="value.id"/>
     </div>
   </div>
 </template>
@@ -23,7 +23,35 @@ export default {
   extends: {
     ...DocumentoEdit,
   },
+  data() {
+    return {
+      dragleave: null,
+      side: 0,
+    }
+  },
   methods: {
+    ondragend: function(el) {
+      console.log(this.side)
+      let data = Object()
+      data.id = el.id
+      data.ordem = this.dragleave.ordem
+
+      if (el.ordem > this.dragleave.ordem && this.side > 0) {
+        data.ordem++
+      }
+      else if (el.ordem < this.dragleave.ordem && this.side < 0) {
+        data.ordem--
+      }
+      el.ordem = data.ordem
+      this.updateDocumento(data)
+        .then( () => {
+          this.getDocumento(this.elemento.id)
+        })
+    },
+    ondragleave: function(el, side) {
+      this.dragleave = el
+      this.side = side
+    },
     changeImage: function() {
       this.getDocumento(this.elemento.id)
     },
@@ -51,10 +79,11 @@ export default {
       padding: 0 10px;
     }
     & > .inner {
-      padding: 10px;
+      padding: 5px;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
+      user-select:none;
     }
   }
 }

@@ -1,5 +1,5 @@
 <template lang="html">
-  <div :class="classParent">
+  <div v-if="mode !== 'INIT'" :class="classParent">
     <div v-if="notHasParent" class="container">
       <div v-show="elemento.id" class="btn-toolbar widgets-function">
         <div class="btn-group btn-group-xs pull-left widget-actions ">
@@ -10,16 +10,16 @@
           <cmj-choices v-model.lazy="elemento.visibilidade" :options="visibilidade_choice" name="visibilidade-" :id="elemento.id" />
         </div>
       </div>
-        <div class="path-title construct">
-          <textarea-autosize v-model.lazy="elemento.titulo" placeholder="Título do Documento"  :align="'text-center'"/>
-        </div>
-        <div class="path-description construct">
-          <textarea-autosize v-model.lazy="elemento.descricao" placeholder="Descrição do Documento" :align="'text-center'"/>
-        </div>
-        <div class="construct">
-          <textarea-autosize v-model.lazy="elemento.texto" placeholder="texto..." :align="'text-left'"/>
-        </div>
+      <div class="path-title construct">
+        <textarea-autosize v-model.lazy="elemento.titulo" placeholder="Título do Documento"  :align="'text-center'"/>
       </div>
+      <div class="path-description construct">
+        <textarea-autosize v-model.lazy="elemento.descricao" placeholder="Descrição do Documento" :align="'text-center'"/>
+      </div>
+      <div class="construct">
+        <textarea-autosize v-model.lazy="elemento.texto" placeholder="texto..." :align="'text-left'"/>
+      </div>
+    </div>
     <component :is="classChild(value)" v-for="(value, key) in childsOrdenados" :child="value" :parent="elemento" :key="value.id"/>
   </div>
 </template>
@@ -135,7 +135,7 @@ export default {
     },
     updateDocumento(data) {
       let t = this
-      t.documentoResource.updateDocumento(data)
+      return t.documentoResource.updateDocumento(data)
         .then( (response) => {
           t.setDocObject(response.data)
           t.success()

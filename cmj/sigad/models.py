@@ -591,20 +591,28 @@ class DocumentoManager(models.Manager):
         ).order_by('-parent__parent__public_date')
         return qs
 
-    def create_space(self, validated_data):
+    def create_space(self, parent, ordem, exclude=None):
         qs = self.get_queryset()
 
-        qs = qs.filter(parent_id=validated_data['parent'],
-                       ordem__gte=validated_data['ordem']
-                       ).update(ordem=F('ordem') + 1)
+        qs = qs.filter(parent_id=parent, ordem__gte=ordem)
+
+        if exclude:
+            qs = qs.exclude(id=exclude.id)
+
+        qs = qs.update(ordem=F('ordem') + 1)
+
         return qs
 
-    def remove_space(self, parent, ordem):
+    def remove_space(self, parent, ordem, exclude=None):
         qs = self.get_queryset()
 
-        qs = qs.filter(parent=parent,
-                       ordem__gte=ordem
-                       ).update(ordem=F('ordem') - 1)
+        qs = qs.filter(parent=parent, ordem__gte=ordem)
+
+        if exclude:
+            qs = qs.exclude(id=exclude.id)
+
+        qs = qs.update(ordem=F('ordem') - 1)
+
         return qs
 
 

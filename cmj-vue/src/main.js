@@ -48,11 +48,4 @@ const app = new Vue({
   el: '#app-vue'
 })
 
-
-//let { x, y, ...z } = { x: 1, y: 2, a: 3, b: 4 }
-//console.log(x)
-//console.log(y)
-//console.log(z)
-
-// editor: npm install vue-froala-wysiwyg --save
-// drag and grop: npm install --save vddl    https://github.com/hejianxian/vddl
+//LEMBRAR:   vue + cordova + quasar
