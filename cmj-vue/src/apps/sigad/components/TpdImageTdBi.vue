@@ -45,11 +45,10 @@ export default {
     },
     dragenter(ev) {
       if (this.dragged)
-        this.draggedleave = false;
+        this.draggedleave = false
     },
     dragleave(ev) {
-      if (!this.dragged)
-        this.$emit('ondragleave', this.elemento, this.draggedover)
+      this.$emit('ondragleave', this.elemento, this.draggedover)
       this.draggedleave = this.dragged
       this.draggedover = 0
     },

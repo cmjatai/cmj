@@ -31,7 +31,10 @@ export default {
   },
   methods: {
     ondragend: function(el) {
-      console.log(this.side)
+      if (el.id === this.dragleave.id) {
+        return
+      }
+
       let data = Object()
       data.id = el.id
       data.ordem = this.dragleave.ordem
@@ -42,6 +45,11 @@ export default {
       else if (el.ordem < this.dragleave.ordem && this.side < 0) {
         data.ordem--
       }
+
+      if (el.ordem === data.ordem){
+        return
+      }
+
       el.ordem = data.ordem
       this.updateDocumento(data)
         .then( () => {
