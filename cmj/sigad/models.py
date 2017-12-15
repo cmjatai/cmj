@@ -9,6 +9,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.files.base import File
 from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.db.models import Q, F
@@ -23,7 +24,8 @@ from oauth2client import client
 from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
 
-from cmj.utils import get_settings_auth_user_model, CmjChoices
+from cmj.utils import get_settings_auth_user_model, CmjChoices,\
+    restringe_tipos_de_arquivo_midias
 
 
 CLASSE_ESTRUTURAL = 0
@@ -909,7 +911,8 @@ class VersaoDeMidia(models.Model):
         null=True,
         storage=media_protected,
         upload_to=media_path,
-        verbose_name=_('Mídia'))
+        verbose_name=_('Mídia'),
+        validators=[restringe_tipos_de_arquivo_midias])
 
     content_type = models.CharField(
         max_length=250,
@@ -925,6 +928,20 @@ class VersaoDeMidia(models.Model):
 
         return models.Model.delete(
             self, using=using, keep_parents=keep_parents)
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None, with_file=None):
+        _ret = models.Model.save(self, force_insert=force_insert,
+                                 force_update=force_update, using=using, update_fields=update_fields)
+
+        if not with_file:
+            return _ret
+
+        mime, ext = restringe_tipos_de_arquivo_midias(with_file)
+
+        name_file = 'midia.%s' % ext
+        self.content_type = mime
+        self.file.save(name_file, File(with_file))
 
     @cached_property
     def simple_name(self):

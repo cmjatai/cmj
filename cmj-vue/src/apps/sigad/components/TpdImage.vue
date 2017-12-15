@@ -21,7 +21,7 @@
       <div class="inner">
         <span v-if="has_titulo || elemento.titulo" class="path-title-partes"><input v-model.lazy="elemento.titulo" placeholder="Título da Imagem..."/></span>
         <input v-if="has_descricao || elemento.descricao" v-model.lazy="elemento.descricao" placeholder="Descrição da Imagem..."/>
-        <drop-zone v-on:change="changeImage" :elemento="elemento" :src="slug" :multiple="true" :resource="documentoResource"/>
+        <drop-zone v-on:change="changeImage" :elemento="elemento" :src="slug" :multiple="false" :resource="documentoResource"/>
       </div>
       <component :is="classChild(value)" v-for="(value, key) in childsOrdenados" :child="value" :parent="elemento" :key="value.id"/>
     </div>

@@ -44,29 +44,56 @@ class DocumentoViewSet(viewsets.ModelViewSet):
         return response
 
     def perform_update(self, serializer):
-        if len(self.request.FILES):
-            files = self.request.FILES.getlist('files')
+        len_files = len(self.request.FILES)
+        if not len(self.request.FILES):
+            viewsets.ModelViewSet.perform_update(self, serializer)
+            return
 
-            inst = serializer.instance
+        instance = serializer.instance
+        files = self.request.FILES.getlist('files')
 
-            if not hasattr(inst, 'midia'):
+        if instance.tipo == Documento.TPD_IMAGE:
+            # TPD_IMAGE deve receber apenas um arquivo
+            # se por acaso receber mais de um, será ignorado
+
+            if not hasattr(instance, 'midia'):
                 midia = Midia()
-                midia.documento = serializer.instance
+                midia.documento = instance
                 midia.save()
             else:
-                midia = inst.midia
+                midia = instance.midia
 
             versao = VersaoDeMidia()
             versao.midia = midia
             versao.owner = self.request.user
-            versao.content_type = files[0].content_type
-            versao.alinhamento = serializer.instance.alinhamento
-            versao.save()
+            versao.alinhamento = instance.alinhamento
+            versao.save(with_file=files[0])
 
-            versao.file.save("image.jpg", File(files[0]), save=True)
-        else:
-            viewsets.ModelViewSet.perform_update(self, serializer)
+        elif instance.tipo in Documento.TDc:
+            ordem = 0
+            last_image = instance.childs.view_childs().last()
+            if last_image:
+                ordem = last_image.ordem
 
+            for file in files:
+                ordem += 1
+                image = Documento()
+                image.raiz = instance.raiz
+                image.parent = instance
+                image.visibilidade = Documento.STATUS_RESTRICT
+                image.ordem = ordem
+                image.titulo = ''
+                image.owner = self.request.user
+                image.tipo = Documento.TPD_IMAGE
+                image.classe = instance.classe
+                image.save()
 
-class MidiaUpLoadView(APIView):
-    parser_classes = (MultiPartParser,)
+                midia = Midia()
+                midia.documento = image
+                midia.save()
+
+                versao = VersaoDeMidia()
+                versao.midia = midia
+                versao.owner = self.request.user
+                versao.alinhamento = Documento.ALINHAMENTO_JUSTIFY
+                versao.save(with_file=file)

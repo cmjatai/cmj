@@ -174,65 +174,43 @@ RANGE_MESES = [
 
 RANGE_DIAS_MES = [(n, n) for n in range(1, 32)]
 
-TIPOS_TEXTO_PERMITIDOS = (
-    'application/vnd.oasis.opendocument.text',
-    'application/x-vnd.oasis.opendocument.text',
-    'application/pdf',
-    'application/x-pdf',
-    'application/acrobat',
-    'applications/vnd.pdf',
-    'text/pdf',
-    'text/x-pdf',
-    'text/plain',
-    'application/txt',
-    'browser/internal',
-    'text/anytext',
-    'widetext/plain',
-    'widetext/paragraph',
-    'application/msword',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    'application/xml',
-    'text/xml',
-    'text/html',
-)
-
-TIPOS_IMG_PERMITIDOS = (
-    'image/jpeg',
-    'image/jpg',
-    'image/jpe_',
-    'image/pjpeg',
-    'image/vnd.swiftview-jpeg',
-    'application/jpg',
-    'application/x-jpg',
-    'image/pjpeg',
-    'image/pipeg',
-    'image/vnd.swiftview-jpeg',
-    'image/x-xbitmap',
-    'image/bmp',
-    'image/x-bmp',
-    'image/x-bitmap',
-    'image/png',
-    'application/png',
-    'application/x-png',
-)
+TIPOS_MIDIAS_PERMITIDOS = {
+    'application/pdf': 'pdf',
+    'application/x-pdf': 'pdf',
+    'application/acrobat': 'pdf',
+    'applications/vnd.pdf': 'pdf',
+    'application/msword': 'doc',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '.docx',
+    'image/jpeg': 'jpg',
+    'image/jpg': 'jpg',
+    'image/jpe_': 'jpg',
+    'image/pjpeg': 'jpg',
+    'image/vnd.swiftview-jpeg': 'jpg',
+    'application/jpg': 'jpg',
+    'application/x-jpg': 'jpg',
+    'image/pjpeg': 'jpg',
+    'image/pipeg': 'jpg',
+    'image/vnd.swiftview-jpeg': 'jpg',
+    'image/png': 'png',
+    'application/png': 'png',
+    'application/x-png': 'png',
+}
 
 
 def fabrica_validador_de_tipos_de_arquivo(lista, nome):
 
     def restringe_tipos_de_arquivo(value):
         mime = magic.from_buffer(value.read(), mime=True)
-        mime = mime.decode()
         if mime not in lista:
             raise ValidationError(_('Tipo de arquivo não suportado'))
+        return mime, lista[mime]
     # o nome é importante para as migrations
     restringe_tipos_de_arquivo.__name__ = nome
     return restringe_tipos_de_arquivo
 
 
-restringe_tipos_de_arquivo_txt = fabrica_validador_de_tipos_de_arquivo(
-    TIPOS_TEXTO_PERMITIDOS, 'restringe_tipos_de_arquivo_txt')
-restringe_tipos_de_arquivo_img = fabrica_validador_de_tipos_de_arquivo(
-    TIPOS_IMG_PERMITIDOS, 'restringe_tipos_de_arquivo_img')
+restringe_tipos_de_arquivo_midias = fabrica_validador_de_tipos_de_arquivo(
+    TIPOS_MIDIAS_PERMITIDOS, 'restringe_tipos_de_arquivo_midias')
 
 
 def intervalos_tem_intersecao(a_inicio, a_fim, b_inicio, b_fim):
