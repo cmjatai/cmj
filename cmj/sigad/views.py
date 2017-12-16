@@ -247,8 +247,7 @@ class PathView(MultipleObjectMixin, TemplateView):
         if template == models.CLASSE_TEMPLATES_CHOICE.lista_em_linha:
             kwargs[
                 'object_list'
-            ] = self.classe.documento_set.qs_docs(
-                user=self.request.user)
+            ] = self.classe.documento_set.qs_docs(user=self.request.user)
 
             #.filter(public_date__isnull=False).order_by('-public_date').all()
         elif template == models.CLASSE_TEMPLATES_CHOICE.galeria:
