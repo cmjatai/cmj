@@ -320,7 +320,7 @@ class PathView(MultipleObjectMixin, TemplateView):
             try:
                 # Verifica se é um documento
                 self.documento = Documento.objects.get(slug=slug)
-            except:
+            except Exception as e:
                 try:
                     # verifica se é uma referência
                     ref = ReferenciaEntreDocumentos.objects.get(slug=slug)

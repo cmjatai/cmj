@@ -36,7 +36,7 @@ CMJ_APPS = (
     'cmj.api',
 
 
-    # manter sempre como o último da lista de apps
+    # manter sempre como o ultimo da lista de apps
     'cmj.globalrules'
 
 )

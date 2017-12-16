@@ -1,18 +1,11 @@
 <template lang="html">
   <div class="drop_files" :id="'drop_file'+elemento.id" v-on:drop="drop_handler" v-on:dragover="dragover_handler" v-on:dragend="dragend_handler">
-    <label v-if="!multiple" class="drop_zone" :for="'input_file'+elemento.id">
-      <span class="inner">
-        Arraste sua imagem e solte aqui.<br>
-        <small>Ou clique aqui para selecionar</small>
-      </span>
-      <input type="file" name="file" :id="'input_file'+elemento.id" @change="selectFiles"/>
-    </label>
-    <label v-if="multiple" class="drop_zone" :for="'input_file'+elemento.id">
+    <label class="drop_zone" :for="'input_file'+elemento.id">
       <span class="inner">
         Arraste suas imagens e solte aqui.<br>
         <small>Ou clique aqui para selecionar</small>
       </span>
-      <input multiple type="file" name="file" :id="'input_file'+elemento.id" @change="selectFiles"/>
+      <input :multiple="multiple ? 'multiple': null" type="file" name="file" :id="'input_file'+elemento.id" @change="selectFiles"/>
     </label>
     <div v-if="elemento.has_midia" class="view">
       <img :src="src_local">
@@ -39,7 +32,9 @@ export default {
       let files = ev.currentTarget.files
       if (files.length === 0)
         return
-
+      this.sendFiles(files)
+    },
+    sendFiles(files) {
       let form = new FormData()
       for (var i = 0; i < files.length; i++) {
         form.append('files', files[i])
@@ -52,26 +47,25 @@ export default {
         })
         .catch( (response) => t.danger())
     },
+
     drop_handler(ev) {
       if (ev === undefined)
         return
       console.log("Drop");
       ev.preventDefault();
-      // If dropped items aren't files, reject them
+
       var dt = ev.dataTransfer;
+
       if (dt.items) {
-        // Use DataTransferItemList interface to access the file(s)
+        let files = Array()
         for (var i=0; i < dt.items.length; i++) {
           if (dt.items[i].kind == "file") {
-            var f = dt.items[i].getAsFile();
-            console.log("... file[" + i + "].name = " + f.name);
+            files.push(dt.items[i].getAsFile())
           }
         }
+        this.sendFiles(dt.files)
       } else {
-        // Use DataTransfer interface to access the file(s)
-        for (var i=0; i < dt.files.length; i++) {
-          console.log("... file[" + i + "].name = " + dt.files[i].name);
-        }
+        this.sendFiles(dt.files)
       }
     },
 

@@ -280,19 +280,19 @@ class Slugged(Parent):
         super(Slugged, self).save(*args, **kwargs)
 
     def save(self, *args, **kwargs):
-        s_old = self.slug
 
-        if self.titulo and not self.parent or not hasattr(self, 'classe'):
+        if not self.id:
+            super(Slugged, self).save(*args, **kwargs)
+
+        kwargs['force_insert'] = False
+        kwargs['force_update'] = True
+
+        if self.titulo and not self.parent:
             slug = self.titulo
         else:
-            super(Slugged, self).save(*args, **kwargs)
             slug = str(self.id)
 
         self.slug = self.generate_unique_slug(slug)
-
-        if self.id:
-            kwargs['force_insert'] = False
-            kwargs['force_update'] = True
 
         if self.parent:
             self.visibilidade = self.parent.visibilidade
@@ -307,6 +307,10 @@ class Slugged(Parent):
 
         for child in self.childs.all():
             child.save()
+
+        if hasattr(self, 'cita'):
+            for citacao in self.cita.all():
+                citacao.save()
 
     def generate_unique_slug(self, slug):
         concret_model = None

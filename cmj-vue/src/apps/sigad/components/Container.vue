@@ -116,7 +116,7 @@ export default {
     }
     &.empty {
       padding: 30px;
-      & > .widgets {
+        & > .widgets {
         display: block;
         height: auto;
         opacity: 0.4;
