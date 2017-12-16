@@ -322,30 +322,30 @@ class Slugged(Parent):
 
         parents_slug = (self.parent.slug + '/') if self.parent else ''
 
+        custom_slug = ''
+        if not self.parent and hasattr(self, 'classe'):
+            custom_slug = self.classe.slug + '/'
+        elif hasattr(self, 'referente'):
+            custom_slug = self.referente.slug + '/'
+
+        slug_base = custom_slug + parents_slug + slug
+        slug = slug_base
+
         i = 0
         while True:
             if i > 0:
-                if i > 1:
-                    slug = slug.rsplit("-", 1)[0]
-                slug = "%s-%s" % (slug, i)
+                slug = "%s-%s" % (slug_base, i)
 
             try:
                 obj = concret_model.objects.get(
                     #    **{'slug': slug, 'parent': self.parent})
-                    **{'slug': parents_slug + slug})
+                    **{'slug': slug})
                 if obj == self:
                     raise ObjectDoesNotExist
 
             except ObjectDoesNotExist:
                 break
             i += 1
-
-        custom_slug = ''
-        if not self.parent and hasattr(self, 'classe'):
-            custom_slug = self.classe.slug + '/'
-        elif hasattr(self, 'referente'):
-            custom_slug = self.referente.slug + '/'
-        slug = custom_slug + parents_slug + slug
 
         return slug
 
