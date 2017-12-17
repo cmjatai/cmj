@@ -10,44 +10,20 @@
 {% endblock %}
 
 {% block base_content %}
-  {% block controls_content %}
-    {% if perms.sigad.change_documento %}
-      <a href="{% url 'cmj.sigad:documento_edit' object.id %}">{% trans "[Editar]" %}</a>
-    {% endif %}
-      {% if perms.sigad.delete_documento %}
-        <a href="{% url 'cmj.sigad:documento_delete' object.id %}">{% trans "[Excluir]" %}</a>
-      {% endif %}
-  {% endblock %}
+  {% block controls_content %}{% endblock %}
   {% block render_content %}
 
       <div style="position:relative;">
-        <small class="pull-right"><a href="/{{object.referente.parents.0.absolute_slug}}">Abrir Notícia da Imagem</a></small>
         <div class="path-title-classe">
-          {{object.referente.parents.0.get_tipo_display}}
+          {% if object.referente %}
+            {{object.referente.raiz.classe}} - <small><a href="/{{object.referente.raiz.absolute_slug}}">Ir para: {{object.referente.raiz}}</a></small>
+
+          {% else %}
+            {{object.raiz.classe}} - <small><a href="/{{object.raiz.absolute_slug}}">Ir para: {{object.raiz}}</a></small>
+          {% endif %}
         </div>
         <div class="path-data-pub">
           {% block historico_publicacao %}
-            <div class="container-versions">
-              <a href="#list-revisoes" role="button" data-toggle="collapse" aria-expanded="false" aria-controls="list-revisoes">
-                {% comment %}
-                  FIXME tratar histórico de revisão e publicação/privacidade
-                {% endcomment %}
-                <i class="fa fa-clock-o" aria-hidden="true"></i>
-                {% if object.public_date %}
-                  {% trans "Publicado em" %} {{object.referenciado.public_date|date:"d"}} {% trans "de" %} {{object.referenciado.public_date|date:"F"|lower}} {% trans "de" %} {{object.referenciado.public_date|date:"Y"}}
-                {% else %}
-                  {% trans "Criado em" %} {{object.referenciado.created|date:"d"}} {% trans "de" %} {{object.referenciado.created|date:"F"|lower}} {% trans "de" %} {{object.referenciado.created|date:"Y"}}
-                {% endif %}
-              </a>
-              <div class="collapse" id="list-revisoes">
-                {% for rev in object.referenciado.revisoes.all %}
-                    <span class="">
-                      {{rev.get_visibilidade_display}} - {{rev.data}} - {% trans "por:" %} {{rev.user.first_name|default:rev.user.email}}
-                    </span>
-                {% endfor %}
-
-              </div>
-            </div>
           {% endblock %}
         </div>
 
