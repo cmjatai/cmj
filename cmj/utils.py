@@ -191,6 +191,7 @@ TIPOS_MIDIAS_PERMITIDOS = {
     'image/pjpeg': 'jpg',
     'image/pipeg': 'jpg',
     'image/vnd.swiftview-jpeg': 'jpg',
+    'image/gif': 'gif',
     'image/png': 'png',
     'application/png': 'png',
     'application/x-png': 'png',

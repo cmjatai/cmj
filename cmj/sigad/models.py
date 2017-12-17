@@ -62,7 +62,7 @@ CLASSE_TEMPLATES_CHOICE_FILES = {
     2: 'path/path_galeria.html',
     3: 'path/path_parlamentares.html',
     4: 'path/path_parlamentar.html',
-    5: 'path/path_classe.html',
+    5: 'path/path_galeria.html',
 }
 
 CLASSE_TEMPLATES_CHOICE = CmjChoices(
@@ -287,7 +287,7 @@ class Slugged(Parent):
         kwargs['force_insert'] = False
         kwargs['force_update'] = True
 
-        if self.titulo and not self.parent:
+        if (self.titulo and not self.parent) or not hasattr(self, 'classe'):
             slug = self.titulo
         else:
             slug = str(self.id)
@@ -496,7 +496,9 @@ class PermissionsUserClasse(CMSMixin):
                              verbose_name=_('Usuário'))
     classe = models.ForeignKey(Classe, verbose_name=_('Classe'),
                                related_name='permissions_user_set')
-    permission = models.ForeignKey(Permission, verbose_name=_('Permissão'))
+    permission = models.ForeignKey(Permission,
+                                   blank=True, null=True, default=None,
+                                   verbose_name=_('Permissão'))
 
     def __str__(self):
         return '%s - %s' % (self.permission, self.user or '')
@@ -596,6 +598,10 @@ class DocumentoManager(models.Manager):
             tipo=Documento.TPD_GALLERY
         ).order_by('-parent__parent__public_date')
         return qs
+
+    def count_images(self):
+        qs = self.get_queryset()
+        return qs.filter(tipo=Documento.TPD_IMAGE).count()
 
     def create_space(self, parent, ordem, exclude=None):
         qs = self.get_queryset()
@@ -755,13 +761,9 @@ class Documento(ShortUrl, CMSMixin):
             citado = self.cita.first()
             return citado
 
-        for item in self.childs.view_childs():
-            img = item.imagem_representativa()
+        img = self.nodes.view_childs().filter(tipo=Documento.TPD_IMAGE).first()
 
-            if img:
-                return img
-
-        return None
+        return img
 
     def imagem_representativa_metatags(self):
         img = self.imagem_representativa()
