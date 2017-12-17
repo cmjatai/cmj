@@ -85,7 +85,7 @@ class Parent(models.Model):
     raiz = models.ForeignKey(
         'self',
         blank=True, null=True, default=None,
-        related_name='containers',
+        related_name='nodes',
         verbose_name=_('Containers'))
 
     related_classes = models.ManyToManyField(
