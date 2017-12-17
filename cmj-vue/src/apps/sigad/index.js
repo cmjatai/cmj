@@ -10,6 +10,7 @@ import TpdVideo from './components/TpdVideo'
 import TpdAudio from './components/TpdAudio'
 import TpdImage from './components/TpdImage'
 import TpdImageTdBi from './components/TpdImageTdBi'
+import ModalImageList from './components/ModalImageList'
 
 Vue.component('DocumentoEdit', DocumentoEdit)
 Vue.component('Container', Container)
@@ -20,6 +21,7 @@ Vue.component('TpdAudio', TpdAudio)
 Vue.component('TpdImage', TpdImage)
 Vue.component('ContainerTdBi', ContainerTdBi)
 Vue.component('TpdImageTdBi', TpdImageTdBi)
+Vue.component('ModalImageList', ModalImageList)
 
 export default {
   DocumentoEdit,
@@ -30,5 +32,6 @@ export default {
   TpdAudio,
   TpdImage,
   ContainerTdBi,
-  TpdImageTdBi
+  TpdImageTdBi,
+  ModalImageList
 }

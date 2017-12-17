@@ -24,7 +24,9 @@ def social_title(backend):
 @register.inclusion_tag('social_link_shares.html', takes_context=True)
 def social_link_share(context, obj=None, css_class=''):
 
-    if obj.visibilidade == CMSMixin.STATUS_PUBLIC:
+    obj_test = obj if hasattr(obj, 'visibilidade') else obj.referente.raiz
+
+    if obj_test.visibilidade == CMSMixin.STATUS_PUBLIC:
         url = obj.short_url()
         if not url:
             url = '%s://%s/%s' % (

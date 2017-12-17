@@ -6,7 +6,7 @@
     v-on:dragover="dragover"
     v-on:dragstart="dragstart">
       <img :src="slug+'.128'">
-      <div class="drag"></div>
+      <div class="drag" @click="$emit('showmodal', elemento, ppos)"></div>
   </div>
 </template>
 
@@ -15,6 +15,7 @@ import Container from './Container'
 
 export default {
   name: 'tpd-image-td-bi',
+  props:['pos'],
   extends: {
     ...Container,
   },
@@ -23,6 +24,7 @@ export default {
       dragged: false,
       draggedover: 0,
       draggedleave: false,
+      ppos: this.pos
     }
   },
   computed: {

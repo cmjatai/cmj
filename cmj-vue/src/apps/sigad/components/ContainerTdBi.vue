@@ -9,7 +9,8 @@
       <drop-zone v-on:change="changeImage" :elemento="elemento" :src="slug" :multiple="true" :resource="documentoResource"/>
     </div>
     <div class="inner">
-      <component :is="classChild(value)" v-on:ondragend="ondragend" v-on:ondragleave="ondragleave" v-for="(value, key) in childsOrdenados" :child="value" :parent="elemento" :key="value.id"/>
+      <modal-image-list v-if="showModal >= 0" @close="showModal = -1" :elementos="childsOrdenados" :child="showElemento" :pos="showModal"/>
+      <component :is="classChild(value)" v-on:ondragend="ondragend" v-on:ondragleave="ondragleave" v-for="(value, key) in childsOrdenados" :child="value" :parent="elemento" :key="value.id" :pos="key" v-on:showmodal="showModalAction"/>
     </div>
   </div>
 </template>
@@ -27,9 +28,15 @@ export default {
     return {
       dragleave: null,
       side: 0,
+      showModal: -1,
+      showElemento: null
     }
   },
   methods: {
+    showModalAction(elemento, pos) {
+      this.showElemento = elemento
+      this.showModal = pos
+    },
     ondragend: function(el) {
       if (el.id === this.dragleave.id) {
         return

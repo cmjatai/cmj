@@ -26,22 +26,25 @@
             <div class="show-texto">
                 {% social_link_share ref_doc 'top-right block'%}
               <div class="show-titulo">
-
                 {% if ref_doc.titulo %}
                   {{ref_doc.titulo}}
+                {% elif ref_doc.referenciado.titulo %}
+                  {{ref_doc.referenciado.titulo}}
                 {% elif object.titulo %}
                   {{object.titulo}}
                 {% else %}
-                  {{object.parents.0.titulo}}
+                  {{object.raiz.titulo}}
                 {% endif %}
               </div>
               <div class="show-descricao">
                 {% if ref_doc.descricao %}
-                  {{ref_doc.descricao}}.
+                  {{ref_doc.descricao}}
+                {% elif ref_doc.referenciado.descricao %}
+                  {{ref_doc.referenciado.descricao}}
                 {% elif object.descricao %}
                   {{object.descricao}}
                 {% else %}
-                  {{object.parents.0.descricao}}
+                  {{object.raiz.descricao}}
                 {% endif %}
 
               </div>
