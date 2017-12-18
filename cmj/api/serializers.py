@@ -9,7 +9,7 @@ from rest_framework.relations import RelatedField, ManyRelatedField,\
     MANY_RELATION_KWARGS
 
 from cmj.sigad.models import Documento, ReferenciaEntreDocumentos,\
-    DOC_TEMPLATES_CHOICE
+    DOC_TEMPLATES_CHOICE, CMSMixin
 
 
 class DocumentoParteField(RelatedField):
@@ -71,6 +71,8 @@ class DocumentoSerializer(serializers.ModelSerializer):
 
     has_midia = serializers.SerializerMethodField()
 
+    refresh = serializers.SerializerMethodField()
+
     choices = SerializerMethodField()
     slug = SlugField(read_only=True)
 
@@ -85,6 +87,9 @@ class DocumentoSerializer(serializers.ModelSerializer):
 
     def get_has_midia(self, obj):
         return hasattr(obj, 'midia')
+
+    def get_refresh(self, obj):
+        return 0
 
     def get_choices(self, obj):
         choices = {
@@ -158,6 +163,12 @@ class DocumentoSerializer(serializers.ModelSerializer):
 
         if 'ordem' in vd and vd['ordem']:
             Documento.objects.create_space(vd['parent'], vd['ordem'])
+
+        vd['template_doc'] = vd['classe'].template_doc_padrao
+        vd['tipo'] = vd['classe'].tipo_doc_padrao
+
+        if vd['classe'].visibilidade != CMSMixin.STATUS_PUBLIC:
+            vd['visibilidade'] = vd['classe'].visibilidade
 
         instance = serializers.ModelSerializer.create(self, validated_data)
 

@@ -43,6 +43,7 @@ export default {
         descricao: '',
         visibilidade: 99,
         texto: '',
+        refresh: 0
       },
       mode: "INIT",
     }
@@ -68,7 +69,12 @@ export default {
     notHasParent: function() {
       return !this.elemento || !this.elemento.parent
     },
-
+    refresh: function() {
+      let refresh = this.elemento
+      refresh = refresh.refresh
+      refresh = refresh === undefined ? 0 : refresh
+      return refresh
+    },
     slug: function() {
       let slug = this.elemento.slug
       return '/'+slug

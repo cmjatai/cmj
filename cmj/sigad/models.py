@@ -190,6 +190,66 @@ class CMSMixin(models.Model):
         (STATUS_PRIVATE, 'status_private', _('Privado')),
     )
 
+    ALINHAMENTO_LEFT = 0
+    ALINHAMENTO_JUSTIFY = 1
+    ALINHAMENTO_RIGHT = 2
+    ALINHAMENTO_CENTER = 3
+
+    alinhamento_choice = CmjChoices(
+        (ALINHAMENTO_LEFT, 'alinhamento_left', _('Alinhamento Esquerdo')),
+        (ALINHAMENTO_JUSTIFY, 'alinhamento_justify', _('Alinhamento Completo')),
+        (ALINHAMENTO_RIGHT, 'alinhamento_right', _('Alinhamento Direito')),
+        (ALINHAMENTO_CENTER, 'alinhamento_center', _('Alinhamento Centralizado')),
+    )
+
+    TD_DOC = 0
+    TD_BI = 10
+    TD_GALERIA_PUBLICA = 20
+    TPD_TEXTO = 100
+    TPD_CONTAINER_SIMPLES = 700
+    TPD_CONTAINER_EXTENDIDO = 701
+    TPD_VIDEO = 800
+    TPD_AUDIO = 850
+    TPD_IMAGE = 900
+    TPD_GALLERY = 901
+
+    # Documentos completos
+    TDs = (TD_DOC, TD_BI, TD_GALERIA_PUBLICA)
+
+    # Containers
+    TDc = (TPD_CONTAINER_SIMPLES, TPD_CONTAINER_EXTENDIDO)
+
+    # Partes
+    TDp = (TPD_TEXTO, TPD_VIDEO, TPD_AUDIO, TPD_IMAGE, TPD_GALLERY)
+
+    tipo_parte_doc = {
+        'documentos': CmjChoices(
+            (TD_DOC, 'td_doc', _('Documento')),
+            (TD_BI, 'td_bi', _('Banco de Imagem')),
+            (TD_GALERIA_PUBLICA, 'td_galeria_publica', _('Galeria Pública'))
+        ),
+
+        'containers': CmjChoices(
+            (TPD_CONTAINER_SIMPLES,
+             'container', _('Container Simples')),
+            (TPD_CONTAINER_EXTENDIDO,
+             'container_fluid', _('Container Extendido')),
+        ),
+
+        'subtipos': CmjChoices(
+            (TPD_TEXTO, 'tpd_texto', _('Texto')),
+            (TPD_VIDEO, 'tpd_video', _('Vídeo')),
+            (TPD_AUDIO, 'tpd_audio', _('Áudio')),
+            (TPD_IMAGE, 'tpd_image', _('Imagem')),
+            (TPD_GALLERY, 'tpd_gallery',  _('Galeria de Imagens')),
+
+        )
+    }
+
+    tipo_parte_doc_choice = (tipo_parte_doc['documentos'] +
+                             tipo_parte_doc['containers'] +
+                             tipo_parte_doc['subtipos'])
+
     created = models.DateTimeField(
         verbose_name=_('created'), editable=False, auto_now_add=True)
 
@@ -444,6 +504,11 @@ class Classe(ShortUrl, CMSMixin):
         choices=DOC_TEMPLATES_CHOICE,
         default=DOC_TEMPLATES_CHOICE.noticia)
 
+    tipo_doc_padrao = models.IntegerField(
+        _('Tipo Padrão para Documentos desta Classe'),
+        choices=CMSMixin.tipo_parte_doc['documentos'],
+        default=CMSMixin.TD_DOC)
+
     template_classe = models.IntegerField(
         _('Template para a Classe'),
         choices=CLASSE_TEMPLATES_CHOICE,
@@ -631,66 +696,6 @@ class DocumentoManager(models.Manager):
 class Documento(ShortUrl, CMSMixin):
     objects = DocumentoManager()
 
-    ALINHAMENTO_LEFT = 0
-    ALINHAMENTO_JUSTIFY = 1
-    ALINHAMENTO_RIGHT = 2
-    ALINHAMENTO_CENTER = 3
-
-    alinhamento_choice = CmjChoices(
-        (ALINHAMENTO_LEFT, 'alinhamento_left', _('Alinhamento Esquerdo')),
-        (ALINHAMENTO_JUSTIFY, 'alinhamento_justify', _('Alinhamento Completo')),
-        (ALINHAMENTO_RIGHT, 'alinhamento_right', _('Alinhamento Direito')),
-        (ALINHAMENTO_CENTER, 'alinhamento_center', _('Alinhamento Centralizado')),
-    )
-
-    TD_DOC = 0
-    TD_BI = 10
-    TD_GALERIA_PUBLICA = 20
-    TPD_TEXTO = 100
-    TPD_CONTAINER_SIMPLES = 700
-    TPD_CONTAINER_EXTENDIDO = 701
-    TPD_VIDEO = 800
-    TPD_AUDIO = 850
-    TPD_IMAGE = 900
-    TPD_GALLERY = 901
-
-    # Documentos completos
-    TDs = (TD_DOC, TD_BI, TD_GALERIA_PUBLICA)
-
-    # Containers
-    TDc = (TPD_CONTAINER_SIMPLES, TPD_CONTAINER_EXTENDIDO)
-
-    # Partes
-    TDp = (TPD_TEXTO, TPD_VIDEO, TPD_AUDIO, TPD_IMAGE, TPD_GALLERY)
-
-    tipo_parte_doc = {
-        'documentos': CmjChoices(
-            (TD_DOC, 'td_doc', _('Documento')),
-            (TD_BI, 'td_bi', _('Banco de Imagem')),
-            (TD_GALERIA_PUBLICA, 'td_galeria_publica', _('Galeria Pública'))
-        ),
-
-        'containers': CmjChoices(
-            (TPD_CONTAINER_SIMPLES,
-             'container', _('Container Simples')),
-            (TPD_CONTAINER_EXTENDIDO,
-             'container_fluid', _('Container Extendido')),
-        ),
-
-        'subtipos': CmjChoices(
-            (TPD_TEXTO, 'tpd_texto', _('Texto')),
-            (TPD_VIDEO, 'tpd_video', _('Vídeo')),
-            (TPD_AUDIO, 'tpd_audio', _('Áudio')),
-            (TPD_IMAGE, 'tpd_image', _('Imagem')),
-            (TPD_GALLERY, 'tpd_gallery',  _('Galeria de Imagens')),
-
-        )
-    }
-
-    tipo_parte_doc_choice = (tipo_parte_doc['documentos'] +
-                             tipo_parte_doc['containers'] +
-                             tipo_parte_doc['subtipos'])
-
     texto = models.TextField(
         verbose_name=_('Texto'),
         blank=True, null=True, default=None)
@@ -718,8 +723,8 @@ class Documento(ShortUrl, CMSMixin):
 
     tipo = models.IntegerField(
         _('Tipo da Parte do Documento'),
-        choices=tipo_parte_doc_choice,
-        default=TD_DOC)
+        choices=CMSMixin.tipo_parte_doc_choice,
+        default=CMSMixin.TD_DOC)
 
     template_doc = models.IntegerField(
         _('Template para o Documento'),
@@ -732,8 +737,8 @@ class Documento(ShortUrl, CMSMixin):
 
     alinhamento = models.IntegerField(
         _('Alinhamento'),
-        choices=alinhamento_choice,
-        default=ALINHAMENTO_LEFT)
+        choices=CMSMixin.alinhamento_choice,
+        default=CMSMixin.ALINHAMENTO_LEFT)
 
     documentos_citados = models.ManyToManyField(
         'self',

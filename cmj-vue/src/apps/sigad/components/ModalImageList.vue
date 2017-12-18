@@ -48,35 +48,34 @@ export default {
   },
   data() {
     return {
-      refresh: ''
     }
   },
   computed: {
     slug_local: function() {
-      let r = this.refresh
-      return ' /'+this.child.slug+'.1024' + (r ? '?'+r : '')
+      let r = this.elemento.refresh
+      return '/'+this.child.slug+'.1024' + (r ? '?'+r : '')
     },
   },
   props: ['elementos', 'pos',],
   methods: {
     rotateLeft: function() {
+      let t = this
       let data = Object()
-      data.id = this.elemento.id
+      data.id = t.elemento.id
       data.rotate = 90
-      this.updateDocumento(data)
+      t.updateDocumento(data)
         .then( () => {
-          this.refresh = _.now()
-          //this.getDocumento(this.elemento.id)
+          t.elemento.refresh = _.now()
         })
     },
     rotateRight: function() {
+      let t = this
       let data = Object()
-      data.id = this.elemento.id
+      data.id = t.elemento.id
       data.rotate = -90
-      this.updateDocumento(data)
+      t.updateDocumento(data)
         .then( () => {
-          this.refresh = _.now()
-          //this.getDocumento(this.elemento.id)
+          t.elemento.refresh = _.now()
         })
     },
     leftParte: function() {

@@ -50,8 +50,8 @@ export default {
   background-color: rgba(0, 0, 0, .95);
   transition: opacity .3s ease;
   display: grid;
-  grid-template-rows: 50px 70% auto;
-  grid-template-columns: 60% 40%;
+  grid-template-rows: 60px 75% auto;
+  grid-template-columns: auto 30%;
   grid-template-areas:
     "header headeractions"
     "body body"

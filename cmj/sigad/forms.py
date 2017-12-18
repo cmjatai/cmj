@@ -56,6 +56,7 @@ class ClasseForm(ModelForm):
             'perfil',
             'descricao',
             'parent',
+            'tipo_doc_padrao',
             'template_doc_padrao',
             'template_classe',
             'parlamentar'
@@ -65,14 +66,15 @@ class ClasseForm(ModelForm):
 
         row1 = to_row([
             ('codigo', 2),
-            ('titulo', 6),
-            ('parlamentar', 4),
+            ('titulo', 4),
+            ('perfil', 3),
+            ('parlamentar', 3),
         ])
 
         row2 = to_row([
-            ('perfil', 3),
-            ('visibilidade', 3),
+            ('visibilidade', 2),
             ('template_classe', 3),
+            ('tipo_doc_padrao', 4),
             ('template_doc_padrao', 3),
         ])
         row3 = to_row([

@@ -46,7 +46,7 @@ const mutations = {
 }
 
 const state = {
-  documento: {}
+  documento: {},
 }
 
 const getters = {
@@ -55,7 +55,7 @@ const getters = {
   },
   getChilds: state => state.documento.childs,
   getChoices: state => state.documento.choices,
-  getSlug: state => state.documento.slug
+  getSlug: state => state.documento.slug,
 }
 const actions = {
   setDocObject: ({ commit }, data) => commit(DOC_OBJECT, data),
