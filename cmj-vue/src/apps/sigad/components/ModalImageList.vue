@@ -54,7 +54,7 @@ export default {
   computed: {
     slug_local: function() {
       let r = this.refresh
-      return '/'+this.child.slug+'.1024' + (r ? '?'+r : '')
+      return ' /'+this.child.slug+'.1024' + (r ? '?'+r : '')
     },
   },
   props: ['elementos', 'pos',],
