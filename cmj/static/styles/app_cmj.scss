@@ -937,6 +937,12 @@ main {
       color: darken(#a97905, 15%);
     }
   }
+  .btn-danger {
+    color: white;
+    &:hover {
+      color:black;
+    }
+  }
   .path-title-classe {
     font-size: 120%;
     line-height: 1;

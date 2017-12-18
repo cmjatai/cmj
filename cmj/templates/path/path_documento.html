@@ -1,8 +1,16 @@
 {% extends "base_path.html" %}
 {% load i18n sigad_filters social_utils %}
-
 {% block head_title %}{{block.super}} - {{object}}{% endblock head_title %}
 {% block main_container_class %}container-path{% endblock %}
+
+{% block controls_content %}
+  {% if perms.sigad.change_documento %}
+    <a class="btn btn-default" href="{% url 'cmj.sigad:documento_construct' object.id %}">{% trans "Editar" %}</a>
+  {% endif %}
+  {% if perms.sigad.delete_documento %}
+    <a class="btn btn-danger" href="{% url 'cmj.sigad:documento_delete' object.id %}">{% trans "Excluir" %}</a>
+  {% endif %}
+{% endblock %}
 
 {% block base_functions %}
   {% if next %}
@@ -106,20 +114,17 @@
       </div>
     </div>
   {% endif %}
+
+  {{block.super}}
+
+
 {% endblock %}
 
 {% block base_container_header %}
 {% endblock %}
 
+
 {% block base_content %}
-  {% block controls_content %}
-    {% if perms.sigad.change_documento %}
-      <a href="{% url 'cmj.sigad:documento_construct' object.id %}">{% trans "[Editar]" %}</a>
-    {% endif %}
-    {% if perms.sigad.delete_documento %}
-      <a href="{% url 'cmj.sigad:documento_delete' object.id %}">{% trans "[Excluir]" %}</a>
-    {% endif %}
-  {% endblock %}
   {% block render_content %}
 
   {% with  object.childs.view_childs.first  as container%}

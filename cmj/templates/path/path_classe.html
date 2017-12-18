@@ -1,31 +1,25 @@
 {% extends "base_path.html" %}
 {% load i18n sigad_filters common_cmj_tags%}
-
 {% block historico_publicacao %}{% endblock %}
-{% block title %}
+{% block title %}{% endblock %}
 
+{% block controls_content %}
+  {% if perms.sigad.change_classe %}
+    <a class="btn btn-default" href="{% url 'cmj.sigad:subclasse_list' object.id %}">{% trans "Admin" %}</a>
+  {% endif %}
+  {% if perms.sigad.add_documento %}
+    <a class="btn btn-default" href="{% url create_doc_url object.id %}">{% trans "Adicionar item a" %} {{object }}</a>
+  {% endif %}
 {% endblock %}
-{% block base_content %}
-  {% block controls_content %}
-    {% if perms.sigad.change_classe %}
-      <a href="{% url 'cmj.sigad:subclasse_list' object.id %}">{% trans "[Admin]" %}</a>
-      <a href="{% url create_doc_url object.id %}">[{% trans "Adicionar item a" %} {{object }}]</a>
-    {% endif %}
-  {% endblock %}
 
+{% block base_content %}
   <div class="row">
     {% with 'path-item-list col-lg-10 col-lg-offset-1' as css_class %}
       {% include "path/path_list_docs.html" %}
     {% endwith %}
   </div>
-
-
   {% include "paginacao.html" %}
-
 {% endblock %}
 
 {% block cmj_extra_content %}
-  <div class="container-fluid container{{fluid}}{{path}}">
-    ...
-  </div>
 {% endblock %}
