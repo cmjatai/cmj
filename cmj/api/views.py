@@ -45,29 +45,36 @@ class DocumentoViewSet(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         len_files = len(self.request.FILES)
+        instance = serializer.instance
         if not len(self.request.FILES):
+
+            rotate = self.request.data.get('rotate', 0)
+            if rotate:
+                instance.midia.last.rotate(rotate)
+                pass
+
             viewsets.ModelViewSet.perform_update(self, serializer)
             return
 
-        instance = serializer.instance
         files = self.request.FILES.getlist('files')
 
         if instance.tipo == Documento.TPD_IMAGE:
             # TPD_IMAGE deve receber apenas um arquivo
             # se por acaso receber mais de um, será ignorado
 
-            if not hasattr(instance, 'midia'):
-                midia = Midia()
-                midia.documento = instance
-                midia.save()
-            else:
-                midia = instance.midia
+            if files:
+                if not hasattr(instance, 'midia'):
+                    midia = Midia()
+                    midia.documento = instance
+                    midia.save()
+                else:
+                    midia = instance.midia
 
-            versao = VersaoDeMidia()
-            versao.midia = midia
-            versao.owner = self.request.user
-            versao.alinhamento = instance.alinhamento
-            versao.save(with_file=files[0])
+                versao = VersaoDeMidia()
+                versao.midia = midia
+                versao.owner = self.request.user
+                versao.alinhamento = instance.alinhamento
+                versao.save(with_file=files[0])
 
         elif instance.tipo in Documento.TDc:
             ordem = 0

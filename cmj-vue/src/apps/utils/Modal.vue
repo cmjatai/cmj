@@ -2,7 +2,7 @@
   <transition name="modal">
     <div class="modal-mask"  @click.self="$emit('close')">
 
-          <div class="modal-header-container">
+          <div class="modal-area modal-header-container">
             <slot name="header">
               default header
             </slot>
@@ -22,7 +22,7 @@
             </slot>
           </div>
 
-          <div class="modal-footer-container">
+          <div class="modal-area modal-footer-container">
             <slot name="footer">
               default footer
             </slot>
@@ -50,7 +50,7 @@ export default {
   background-color: rgba(0, 0, 0, .95);
   transition: opacity .3s ease;
   display: grid;
-  grid-template-rows: 80px 70% auto;
+  grid-template-rows: 50px 70% auto;
   grid-template-columns: 60% 40%;
   grid-template-areas:
     "header headeractions"
@@ -58,17 +58,20 @@ export default {
     "footer footer";
   justify-items: center;
   align-items: center;
-
-  input {
-    color: white;
-  }
+}
+.modal-area {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  color: white;
 }
 .modal-header-container {
   grid-area: header;
-  width: 100%;
 }
 .modal-header-actions {
   grid-area: headeractions;
+  color: white;
+  justify-self: end;
 }
 .modal-body-container {
   grid-area: body;

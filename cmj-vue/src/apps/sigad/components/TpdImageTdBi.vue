@@ -6,7 +6,7 @@
     v-on:dragover="dragover"
     v-on:dragstart="dragstart">
       <img :src="slug+'.128'">
-      <div class="drag" @click="$emit('showmodal', elemento, ppos)"></div>
+      <div class="drag" @click="$emit('showmodal', elemento, pos)"></div>
   </div>
 </template>
 
@@ -24,7 +24,6 @@ export default {
       dragged: false,
       draggedover: 0,
       draggedleave: false,
-      ppos: this.pos
     }
   },
   computed: {
@@ -33,7 +32,6 @@ export default {
       this.dragged ? classes.push('drag-start') : ''
       this.draggedleave ? classes.push('drag-leave') : ''
       this.draggedover !== 0 ? classes.push('drag-over') : ''
-
       return classes
     }
   },

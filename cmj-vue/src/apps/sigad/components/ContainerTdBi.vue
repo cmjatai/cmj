@@ -9,7 +9,7 @@
       <drop-zone v-on:change="changeImage" :elemento="elemento" :src="slug" :multiple="true" :resource="documentoResource"/>
     </div>
     <div class="inner">
-      <modal-image-list v-if="showModal >= 0" @close="showModal = -1" :elementos="childsOrdenados" :child="showElemento" :pos="showModal"/>
+      <modal-image-list v-if="showModal >= 0" @close="showModal = -1" :elementos="childsOrdenados" :child="showElemento" :pos="showModal" :parent="elemento" />
       <component :is="classChild(value)" v-on:ondragend="ondragend" v-on:ondragleave="ondragleave" v-for="(value, key) in childsOrdenados" :child="value" :parent="elemento" :key="value.id" :pos="key" v-on:showmodal="showModalAction"/>
     </div>
   </div>
@@ -17,7 +17,6 @@
 
 <script>
 import DocumentoEdit from './DocumentoEdit'
-import Container from './Container'
 
 export default {
   name: 'container-td-bi',
@@ -74,7 +73,22 @@ export default {
       let t = this
       t.documentoResource.deleteDocumento(this.elemento.id)
         .then( (response) => {
-          t.$parent.getDocumento(this.parent.id)
+          if (t.elementos.length === 1) {
+            t.$parent.showModal = -1
+            t.$parent.showElemento = null
+          }
+          else {
+            if (t.pos === 0) {
+              t.$parent.showElemento = t.elementos[1]
+            }
+            else {
+              t.$parent.showElemento = t.elementos[t.pos-1]
+              t.$parent.showModal = t.pos-1
+            }
+          }
+          t.$parent.getDocumento(t.parent.id)
+            .then(() => {
+            })
           t.success('Elemento excluído com sucesso.')
         })
         .catch( (response) => {

@@ -2,7 +2,7 @@ import io
 import os
 
 from PIL import Image
-from PIL.Image import NEAREST
+from PIL.Image import NEAREST, BICUBIC
 from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -819,10 +819,10 @@ class ReferenciaEntreDocumentos(ShortUrl):
     # TRATAR SEGURANÇA PARA QUEM REALIZAR ESSA MUDANÇA DE VISIBILIDADE
     referente = models.ForeignKey(Documento, related_name='cita',
                                   verbose_name=_('Documento Referente'),
-                                  on_delete=models.CASCADE)
+                                  on_delete=models.PROTECT)
     referenciado = models.ForeignKey(Documento, related_name='citado_em',
                                      verbose_name=_('Documento Referenciado'),
-                                     on_delete=models.PROTECT)
+                                     on_delete=models.CASCADE)
 
     # Possui ordem de renderização
     ordem = models.IntegerField(
@@ -970,6 +970,16 @@ class VersaoDeMidia(models.Model):
             return im.height
         except:
             return 0
+
+    def rotate(self, rotate):
+        try:
+            nf = '%s/%s' % (media_protected.location, self.file.name)
+            im = Image.open(nf)
+            im = im.rotate(rotate, resample=BICUBIC, expand=True)
+            im.save(nf)
+            im.close()
+        except:
+            pass
 
     def thumbnail(self, width='thumb'):
         sizes = {

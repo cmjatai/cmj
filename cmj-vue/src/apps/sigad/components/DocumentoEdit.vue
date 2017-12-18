@@ -165,7 +165,7 @@ export default {
       console.log('get:', id)
       let t = this
       this.mode = "INIT"
-      this.$nextTick()
+      return this.$nextTick()
         .then(function() {
           t.documentoResource.getDocumento(id)
             .then( (req) => {
