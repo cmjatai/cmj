@@ -22,7 +22,7 @@
       </template>
 
       <template slot="body">
-        <img :src="'/'+child.slug+'.1024'">
+        <img :src="slug_local">
         <div v-if="pos !== elementos.length - 1" class="btn btn-direction btn-right" v-on:click="rightParte">
           <i class="fa fa-3x fa-chevron-right" aria-hidden="true"></i>
         </div>
@@ -46,6 +46,17 @@ export default {
   extends: {
     ...ContainerTdBi,
   },
+  data() {
+    return {
+      refresh: ''
+    }
+  },
+  computed: {
+    slug_local: function() {
+      let r = this.refresh
+      return '/'+this.child.slug+'.1024' + (r ? '?'+r : '')
+    },
+  },
   props: ['elementos', 'pos',],
   methods: {
     rotateLeft: function() {
@@ -54,6 +65,7 @@ export default {
       data.rotate = 90
       this.updateDocumento(data)
         .then( () => {
+          this.refresh = _.now()
           //this.getDocumento(this.elemento.id)
         })
     },
@@ -63,6 +75,7 @@ export default {
       data.rotate = -90
       this.updateDocumento(data)
         .then( () => {
+          this.refresh = _.now()
           //this.getDocumento(this.elemento.id)
         })
     },

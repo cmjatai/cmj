@@ -2,7 +2,7 @@ import io
 import os
 
 from PIL import Image
-from PIL.Image import NEAREST, BICUBIC
+from PIL.Image import NEAREST, BICUBIC, LANCZOS
 from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -972,13 +972,20 @@ class VersaoDeMidia(models.Model):
             return 0
 
     def rotate(self, rotate):
+        import os
         try:
             nf = '%s/%s' % (media_protected.location, self.file.name)
             im = Image.open(nf)
-            im = im.rotate(rotate, resample=BICUBIC, expand=True)
-            im.save(nf)
+            im = im.rotate(rotate, resample=LANCZOS, expand=True)
+            im.save(nf, dpi=(300, 300))
             im.close()
-        except:
+            dirname = os.path.dirname(self.file.path)
+            for f in os.listdir(dirname):
+                filename = '%s/%s' % (dirname, f)
+                if filename == nf:
+                    continue
+                os.remove(filename)
+        except Exception as e:
             pass
 
     def thumbnail(self, width='thumb'):
@@ -1018,7 +1025,7 @@ class VersaoDeMidia(models.Model):
                     )
                     im.thumbnail(size)
             else:
-                im.thumbnail(sizes[width], resample=NEAREST)
+                im.thumbnail(sizes[width], resample=LANCZOS)
             im.save(nft)
             im.close()
             file = io.open(nft, 'rb')
