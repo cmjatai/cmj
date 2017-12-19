@@ -347,14 +347,14 @@ class Slugged(Parent):
         kwargs['force_insert'] = False
         kwargs['force_update'] = True
 
-        if (self.titulo and not self.parent) or not hasattr(self, 'classe'):
+        if (self.titulo and not self.parent) or not self._meta.model_name == 'classe':
             slug = self.titulo
         else:
             slug = str(self.id)
 
         self.slug = self.generate_unique_slug(slug)
 
-        if self.parent:
+        if self.parent and hasattr(self, 'classe'):
             self.visibilidade = self.parent.visibilidade
             self.public_date = self.parent.public_date
 
@@ -604,10 +604,21 @@ class DocumentoManager(models.Manager):
         return Q(visibilidade=Documento.STATUS_PRIVATE, owner=user)
 
     def filter_q_restrict(self, user):
-        return ((Q(owner=user) |
-                 Q(permissions_user_set__user=user,
-                   permissions_user_set__permission__isnull=True)) &
-                Q(visibilidade=Documento.STATUS_RESTRICT))
+        q = Q(visibilidade=Documento.STATUS_RESTRICT)
+        q = q & (
+            Q(permissions_user_set__permission__isnull=True,
+              permissions_user_set__user=user) | Q(owner=user)
+        )
+
+        return q
+
+    def filter_q_restrict_permission(self, user):
+        q = Q(visibilidade=Documento.STATUS_RESTRICT)
+
+        q = q & (Q(permissions_user_set__permission__isnull=True,
+                   permissions_user_set__user=user) | Q(owner=user))
+
+        return q
 
     def view_childs(self):
         qs = self.get_queryset()
