@@ -570,7 +570,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                 Revisao.gerar_revisao(documento, request.user)
 
                 cont_gallery = Documento()
-                cont_galery.raiz = documento
+                cont_gallery.raiz = documento
                 cont_gallery.titulo = ''
                 cont_gallery.descricao = ''
                 cont_gallery.classe = classe_albuns
