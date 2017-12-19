@@ -347,7 +347,7 @@ class Slugged(Parent):
         kwargs['force_insert'] = False
         kwargs['force_update'] = True
 
-        if (self.titulo and not self.parent) or not self._meta.model_name == 'classe':
+        if (self.titulo and not self.parent) or self._meta.model_name == 'classe':
             slug = self.titulo
         else:
             slug = str(self.id)
