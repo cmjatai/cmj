@@ -2,7 +2,7 @@ import io
 import os
 
 from PIL import Image
-from PIL.Image import NEAREST, BICUBIC, LANCZOS
+from PIL.Image import LANCZOS
 from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -18,9 +18,6 @@ from django.utils.functional import cached_property
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields.json import JSONField
-from googleapiclient import sample_tools
-from googleapiclient.discovery import build
-from oauth2client import client
 from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
 
@@ -604,19 +601,32 @@ class DocumentoManager(models.Manager):
         return Q(visibilidade=Documento.STATUS_PRIVATE, owner=user)
 
     def filter_q_restrict(self, user):
+        # Itens restritos que possuem usuário catalogados para o acesso
+        # e não dependem de permissões
+
         q = Q(visibilidade=Documento.STATUS_RESTRICT)
         q = q & (
             Q(permissions_user_set__permission__isnull=True,
               permissions_user_set__user=user) | Q(owner=user)
         )
 
+        # TODO: existe a possibilidade de isolar funcionalidades Q(owner=user)
+        # por exemplo um usuário poderia cadastrar um documento como restrito
+        # e, posteriormente um usuário de mais alto nível retirar a
+        # visualização deste que cadastrou adicionando apenas aqueles que podem
+        # ver.
+
+        # FIXME - se o documento é restrito mas não possue regra explicita,
+        # o "q" abaixo não fez consultas nos pais como é feito individalmente
+        # na PathView em _pre_dispatch. Projetar como buscar regras gerais
+        # definidas nos pais, seja para usuários ou para permissões, nesta
+        # última através da função filter_q_restrict_permission
         return q
 
     def filter_q_restrict_permission(self, user):
         q = Q(visibilidade=Documento.STATUS_RESTRICT)
 
-        q = q & (Q(permissions_user_set__permission__isnull=True,
-                   permissions_user_set__user=user) | Q(owner=user))
+        # q = q & (Q(permissions_user_set__permission__in=user.get_per) | Q(owner=user))
 
         return q
 

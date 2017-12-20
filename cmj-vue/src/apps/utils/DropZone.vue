@@ -2,8 +2,8 @@
   <div class="drop_files" :id="'drop_file'+elemento.id" v-on:drop="drop_handler" v-on:dragover="dragover_handler" v-on:dragend="dragend_handler">
     <label class="drop_zone" :for="'input_file'+elemento.id">
       <span class="inner">
-        Arraste suas imagens e solte aqui.<br>
-        <small>Ou clique aqui para selecionar</small>
+        Arraste suas imagens e solte aqui,<br>
+        <small>ou clique para selecionar</small>
       </span>
       <input :multiple="multiple ? 'multiple': null" type="file" name="file" :id="'input_file'+elemento.id" @change="selectFiles"/>
     </label>
@@ -124,11 +124,15 @@ export default {
   justify-content: center;
   flex-direction: column;
   background: transparentize(#fff, 0.5);
+  opacity: 0.5;
   span {
     color: black;
     small {
       color: #000080;
     }
+  }
+  &:hover {
+    opacity: 1;
   }
 }
 </style>

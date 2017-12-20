@@ -47,10 +47,10 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, .95);
+  background-color: rgba(0, 0, 0, .9);
   transition: opacity .3s ease;
   display: grid;
-  grid-template-rows: 60px 75% auto;
+  grid-template-rows: 60px 80% auto;
   grid-template-columns: auto 30%;
   grid-template-areas:
     "header headeractions"
@@ -72,6 +72,7 @@ export default {
   grid-area: headeractions;
   color: white;
   justify-self: end;
+  margin-right: 5px;
 }
 .modal-body-container {
   grid-area: body;

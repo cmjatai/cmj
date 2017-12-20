@@ -374,17 +374,36 @@ class PathView(MultipleObjectMixin, TemplateView):
                     raise Http404()
                 if not request.user.has_perm('sigad.' + obj[1]):
                     raise PermissionDenied()
+                # com este if acima... se um usuário perde a permissão de
+                # manter tal informação, mesmo sendo o dono, não poderá
+                # mais ver essa informação. ou seja, ninguem mais poderá ver
+                # criar mecanismo de auditar e manter a base de dados para
+                # este caso. ou talvez notificar que está revogando de que
+                # existem documentos, x, y, z, etc que vão entrar para o limbo
 
             elif obj[0].visibilidade == CMSMixin.STATUS_RESTRICT:
 
                 parent = obj[0]
 
+                # independente das consultas paternas, em sendo os pais,
+                # seja doc ou classe, independe do seu status,
+                # o algoritmo abaixo não permitirá mostrar algo restrito
+                # só porque seu pai é público por exemplo.
+                # Um pai público pode dar regra de restrição para seus filhos
+                # caso estes sejam restritos e sem regras.
+
+                # permissoes vazias significa q se comporta como regras do pai
                 while parent and not parent.permissions_user_set.exists():
                     parent = parent.parent
 
+                # se é restrito, é um Documento e não tem permissões
+                # customizadas até sua raiz, passa a verificar as regras de
+                # sua classe
                 if not parent and obj[0].__class__ == Documento:
                     parent = obj[0].classe
 
+                    # Se classe imediata não tem configuração de restrição,
+                    # segue o corpotamento acima
                     while parent and not parent.permissions_user_set.exists():
                         parent = parent.parent
 
@@ -397,6 +416,17 @@ class PathView(MultipleObjectMixin, TemplateView):
                         user__isnull=True,
                         permission__codename=obj[1]).exists() and\
                             request.user.has_perm('sigad.' + obj[1]):
+                        pass
+                    else:
+                        raise Http404()
+                    self.parent_classe = parent
+                else:
+                    # Se não configurada nenhuma restrição mas o doc é restrito
+                    # será liberado se o usuário conectado for o dono
+                    # da classe ou documento ou se o user for o admin
+
+                    if request.user == parent.owner or \
+                            request.user.is_superuser:
                         pass
                     else:
                         raise Http404()
