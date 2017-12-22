@@ -294,14 +294,7 @@
         {% block content_container %}
             <div class="{% block main_container_class %}container container{{fluid}}{{path}} container-box{% endblock %}">
 
-              {% block base_functions %}
-                <div class="container">
-                  <div class="btn-toolbar">
-                    {% block controls_content %}{% endblock %}
-                  </div>
-                  <div class="clearfix"></div><br>
-                </div>
-              {% endblock %}
+              {% block base_functions %}{% endblock %}
 
               {# Content header #}
               {% block base_container_header %}

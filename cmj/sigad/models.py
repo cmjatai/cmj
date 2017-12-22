@@ -21,6 +21,7 @@ from django_extensions.db.fields.json import JSONField
 from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
 
+from cmj import globalrules
 from cmj.utils import get_settings_auth_user_model, CmjChoices,\
     restringe_tipos_de_arquivo_midias
 
@@ -604,31 +605,48 @@ class DocumentoManager(models.Manager):
         # Itens restritos que possuem usuário catalogados para o acesso
         # e não dependem de permissões
 
-        q = Q(visibilidade=Documento.STATUS_RESTRICT)
-        q = q & (
-            Q(permissions_user_set__permission__isnull=True,
-              permissions_user_set__user=user) | Q(owner=user)
-        )
+        qstatus = Q(visibilidade=Documento.STATUS_RESTRICT)
+        q0 = Q(permissions_user_set__permission__isnull=True,
+               permissions_user_set__user=user)
 
-        # TODO: existe a possibilidade de isolar funcionalidades Q(owner=user)
-        # por exemplo um usuário poderia cadastrar um documento como restrito
-        # e, posteriormente um usuário de mais alto nível retirar a
-        # visualização deste que cadastrou adicionando apenas aqueles que podem
-        # ver.
+        q1 = Q(
+            permissions_user_set__permission__in=user.user_permissions.all(),
+            permissions_user_set__user__isnull=True)
 
-        # FIXME - se o documento é restrito mas não possue regra explicita,
-        # o "q" abaixo não fez consultas nos pais como é feito individalmente
-        # na PathView em _pre_dispatch. Projetar como buscar regras gerais
-        # definidas nos pais, seja para usuários ou para permissões, nesta
-        # última através da função filter_q_restrict_permission
-        return q
+        if type.mro(type(self))[0] == DocumentoManager:
+            # TODO: existe a possibilidade de isolar funcionalidades
+            # Q(owner=user) por exemplo um usuário poderia cadastrar um
+            # documento como restritoe, posteriormente um usuário de mais alto
+            # nível retirar a visualização deste que cadastrou adicionando
+            # apenas aqueles que podem ver.
 
-    def filter_q_restrict_permission(self, user):
-        q = Q(visibilidade=Documento.STATUS_RESTRICT)
+            # FIXME - se o documento é restrito e a consulta não é através de
+            # um RelatedManager e não possue regra explicita,
+            # o "q" abaixo não fez consultas nos pais como é feito
+            # individalmente na PathView em _pre_dispatch. PROJETAR como buscar
+            # regras gerais definidas nos pais, seja para usuários ou para
+            # permissões.
+            return qstatus & (q0 | q1)
 
-        # q = q & (Q(permissions_user_set__permission__in=user.get_per) | Q(owner=user))
+        if isinstance(self.instance, Classe):
+            parent = self.instance
 
-        return q
+            q2 = Q(classe__permissions_user_set__permission__isnull=True,
+                   classe__permissions_user_set__user=user)
+
+            q3 = Q(
+                classe__permissions_user_set__permission__in=user.user_permissions.all(),
+                classe__permissions_user_set__user__isnull=True)
+
+            return (qstatus & (q0 | q1)) | (qstatus & (q2 | q3))
+
+        elif isinstance(self.instance, Parlamentar):
+            pass
+        elif isinstance(self.instance, Documento):
+            pass
+        else:
+            raise Exception(_('Modelo não tratado na filtragem de um '
+                              'Documento restrito'))
 
     def view_childs(self):
         qs = self.get_queryset()
@@ -663,10 +681,15 @@ class DocumentoManager(models.Manager):
                 )
             else:
                 qs_user = self.get_queryset()
-                qs_user = qs_user.filter(
-                    self.filter_q_private(user) | self.filter_q_restrict(user),
-                    q_filter
-                )
+                q = self.filter_q_private(user)
+
+                if user.groups.filter(
+                    name=globalrules.GROUP_SIGAD_VIEW_STATUS_RESTRITOS
+                ).exists():
+                    q = q | self.filter_q_restrict(user)
+
+                qs_user = qs_user.filter(q, q_filter)
+
             qs = qs.union(qs_user)
 
         qs = qs.order_by('-public_date', '-created')

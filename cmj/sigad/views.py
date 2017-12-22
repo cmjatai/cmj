@@ -100,7 +100,7 @@ class PathView(MultipleObjectMixin, TemplateView):
 
     def get(self, request, *args, **kwargs):
 
-        print(self.kwargs['slug'])
+        # print(self.kwargs['slug'])
 
         if self.documento:
             if self.documento.tipo == Documento.TPD_IMAGE:
@@ -268,10 +268,8 @@ class PathView(MultipleObjectMixin, TemplateView):
                 self.request.user)
 
         elif template == models.CLASSE_TEMPLATES_CHOICE.parlamentar:
-            kwargs['object_list'] = \
-                self.classe.parlamentar.documento_set.filter(
-                public_date__isnull=False).order_by(
-                '-public_date').all()
+            docs = self.classe.parlamentar.documento_set
+            kwargs['object_list'] = docs.qs_docs(self.request.user)
 
         self.object_list = kwargs['object_list']
         context = super().get_context_data(**kwargs)
@@ -385,25 +383,26 @@ class PathView(MultipleObjectMixin, TemplateView):
 
                 parent = obj[0]
 
-                # independente das consultas paternas, em sendo os pais,
-                # seja doc ou classe, independe do seu status,
+                # independente das consultas paternas, em sendo os pais
+                # doc ou classe, independe do seu status,
                 # o algoritmo abaixo não permitirá mostrar algo restrito
                 # só porque seu pai é público por exemplo.
                 # Um pai público pode dar regra de restrição para seus filhos
                 # caso estes sejam restritos e sem regras.
 
-                # permissoes vazias significa q se comporta como regras do pai
+                # permissoes vazias significa q se comporta como regras do
+                # primeiro pai que possua mapeamento
                 while parent and not parent.permissions_user_set.exists():
                     parent = parent.parent
 
                 # se é restrito, é um Documento e não tem permissões
                 # customizadas até sua raiz, passa a verificar as regras de
-                # sua classe
+                # sua estrutura de classe.
                 if not parent and obj[0].__class__ == Documento:
                     parent = obj[0].classe
 
                     # Se classe imediata não tem configuração de restrição,
-                    # segue o corpotamento acima
+                    # segue o corpotamento primeira acima que tenha
                     while parent and not parent.permissions_user_set.exists():
                         parent = parent.parent
 
@@ -411,6 +410,11 @@ class PathView(MultipleObjectMixin, TemplateView):
                     if parent.permissions_user_set.filter(
                             user=request.user,
                             permission__codename=obj[1]).exists():
+                        pass
+                    elif parent.permissions_user_set.filter(
+                            user=request.user,
+                            permission__isnull=True).exists() and\
+                            request.user.has_perm('sigad.' + obj[1]):
                         pass
                     elif parent.permissions_user_set.filter(
                         user__isnull=True,
@@ -425,7 +429,7 @@ class PathView(MultipleObjectMixin, TemplateView):
                     # será liberado se o usuário conectado for o dono
                     # da classe ou documento ou se o user for o admin
 
-                    if request.user == parent.owner or \
+                    if request.user == obj[0].owner or \
                             request.user.is_superuser:
                         pass
                     else:
