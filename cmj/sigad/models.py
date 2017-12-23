@@ -873,6 +873,14 @@ class ReferenciaEntreDocumentos(ShortUrl):
                                      verbose_name=_('Documento Referenciado'),
                                      on_delete=models.CASCADE)
 
+    descricao = models.TextField(
+        verbose_name=_('Descrição'),
+        blank=True, null=True, default=None)
+
+    autor = models.TextField(
+        verbose_name=_('Autor'),
+        blank=True, null=True, default=None)
+
     # Possui ordem de renderização
     ordem = models.IntegerField(
         _('Ordem de Renderização'), default=0)
