@@ -19,17 +19,16 @@ class DocumentoParteField(RelatedField):
 
         if isinstance(instance, Documento):
             inst = model_to_dict(instance, fields=cfg['fields'])
+            inst['has_midia'] = hasattr(instance, 'midia')
+            inst[cfg['field']] = {}
         else:
             inst = model_to_dict(instance)
-
-        inst[cfg['field']] = {}
-        inst['has_midia'] = hasattr(instance, 'midia')
 
         if not hasattr(instance, cfg['field']):
             return inst
 
         inst[cfg['field']] = {
-            child.id: cfg['serializer'](child, configs=cfg['m2ms']).data
+            child.id: cfg['serializer'](child, m2ms=cfg['m2ms']).data
             for child in getattr(instance, cfg['field']).order_by('ordem')
         }
 
@@ -59,19 +58,15 @@ class DocumentoParteField(RelatedField):
         return CustomManyRelatedField(**list_kwargs)
 
 
-class RefereniciaDocumentoField(DocumentoParteField):
-    queryset = ReferenciaEntreDocumentos.objects.order_by('ordem')
-
-
 class DocumentoSerializer(serializers.ModelSerializer):
 
     # documentos_citados = DocumentoParteField(many=True)
     childs = DocumentoParteField(many=True, required=False, read_only=True)
-    cita = RefereniciaDocumentoField(many=True)
+    cita = DocumentoParteField(many=True, required=False, read_only=True)
 
     has_midia = serializers.SerializerMethodField()
     refresh = serializers.SerializerMethodField()
-    #choices = SerializerMethodField()
+    choices = SerializerMethodField()
     slug = SlugField(read_only=True)
 
     class Meta:
