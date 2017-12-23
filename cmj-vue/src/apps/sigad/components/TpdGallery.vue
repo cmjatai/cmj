@@ -1,12 +1,9 @@
 <template lang="html">
-  <div :class="[classChild(elemento), 'container']">
+  <div :class="[classChild(elemento)]">
 
     <div class="btn-toolbar widgets widget-top">
       <div class="btn-group btn-group-xs pull-right">
       </div>
-    </div>
-    <div class="drop-area">
-      <drop-zone v-on:change="changeImage" :elemento="elemento" :src="slug" :multiple="true" :resource="documentoResource"/>
     </div>
     <div class="inner">
       <modal-image-list v-if="showModal >= 0" @close="showModal = -1" :elementos="childsOrdenados" :child="showElemento" :pos="showModal" :parent="elemento" />
@@ -19,7 +16,7 @@
 import DocumentoEdit from './DocumentoEdit'
 
 export default {
-  name: 'container-td-bi',
+  name: 'tpd-gallery',
   extends: {
     ...DocumentoEdit,
   },
@@ -68,6 +65,32 @@ export default {
     },
     changeImage: function() {
       this.getDocumento(this.elemento.id)
+    },
+    deleteParte(event) {
+      let t = this
+      t.documentoResource.deleteDocumento(this.elemento.id)
+        .then( (response) => {
+          if (t.elementos.length === 1) {
+            t.$parent.showModal = -1
+            t.$parent.showElemento = null
+          }
+          else {
+            if (t.pos === 0) {
+              t.$parent.showElemento = t.elementos[1]
+            }
+            else {
+              t.$parent.showElemento = t.elementos[t.pos-1]
+              t.$parent.showModal = t.pos-1
+            }
+          }
+          t.$parent.getDocumento(t.parent.id)
+            .then(() => {
+            })
+          t.success('Elemento excluído com sucesso.')
+        })
+        .catch( (response) => {
+          t.danger(response.response.data.detail)
+        })
     },
   },
 

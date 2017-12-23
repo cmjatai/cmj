@@ -29,7 +29,7 @@ class DocumentoParteField(RelatedField):
             return inst
 
         inst[cfg['field']] = {
-            child.id: cfg['serializer'](child, depths=cfg['depths']).data
+            child.id: cfg['serializer'](child, configs=cfg['m2ms']).data
             for child in getattr(instance, cfg['field']).order_by('ordem')
         }
 
@@ -65,15 +65,13 @@ class RefereniciaDocumentoField(DocumentoParteField):
 
 class DocumentoSerializer(serializers.ModelSerializer):
 
-    childs = DocumentoParteField(many=True, required=False, read_only=True)
     # documentos_citados = DocumentoParteField(many=True)
-    # cita = RefereniciaDocumentoField(many=True)
+    childs = DocumentoParteField(many=True, required=False, read_only=True)
+    cita = RefereniciaDocumentoField(many=True)
 
     has_midia = serializers.SerializerMethodField()
-
     refresh = serializers.SerializerMethodField()
-
-    choices = SerializerMethodField()
+    #choices = SerializerMethodField()
     slug = SlugField(read_only=True)
 
     class Meta:
@@ -105,7 +103,7 @@ class DocumentoSerializer(serializers.ModelSerializer):
                 ] = Documento.tipo_parte_doc_choice.triple_map_component
         return choices
 
-    def __init__(self, instance=None, data=empty, depths={}, **kwargs):
+    def __init__(self, instance=None, data=empty, m2ms=[], **kwargs):
         super().__init__(instance=instance, data=data, **kwargs)
 
         meta = getattr(self, 'Meta', None)
@@ -114,30 +112,25 @@ class DocumentoSerializer(serializers.ModelSerializer):
         if meta:
             exclude = meta.exclude
 
-        if not depths:
-            params = kwargs['context']['request'].query_params
-            depths = {
-                'childs': int(params.get('depth_childs', '0')),
-                # 'documentos_citados': int(params.get('depth_citados', '0')),
-                # 'cita': int(params.get('depth_citados', '0'))
-            }
+        if not m2ms:
+            m2ms = ['childs', 'cita']
 
-        for key, value in depths.items():
+        for m2m in m2ms:
 
-            if key not in self.fields.fields:
+            if m2m not in self.fields.fields:
                 continue
 
-            child_relation = self.fields.fields.get(key).child_relation
+            child_relation = self.fields.fields.get(m2m).child_relation
 
             child_relation.configs = {
-                'field': key,
+                'field': m2m,
                 'serializer': DocumentoSerializer,
                 'fields': [
                     field for field in self.fields.fields
                     if field not in meta.exclude
 
                 ],
-                'depths': depths
+                'm2ms': m2ms
             }
 
     def update(self, instance, validated_data):

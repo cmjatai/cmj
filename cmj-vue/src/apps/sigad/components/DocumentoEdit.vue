@@ -43,6 +43,7 @@ export default {
         descricao: '',
         visibilidade: 99,
         texto: '',
+        autor: '',
         refresh: 0
       },
       mode: "INIT",
@@ -53,6 +54,7 @@ export default {
     'elemento.descricao': function(nv, ov) { this.handlerWatch(nv, ov, 'descricao') },
     'elemento.visibilidade': function(nv, ov) { this.handlerWatch(nv, ov, 'visibilidade') },
     'elemento.texto': function(nv, ov) { this.handlerWatch(nv, ov, 'texto') },
+    'elemento.autor': function(nv, ov) { this.handlerWatch(nv, ov, 'autor') },
     parent:function(nv, ov) {
       this.elemento = this.child
     },
