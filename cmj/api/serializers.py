@@ -153,17 +153,22 @@ class DocumentoSerializer(serializers.ModelSerializer):
         if 'cita' in vd:
             cita = vd.pop('cita')
             if len(cita) == 1:
-                if 'ordem' in cita[0]:
-                    ref = ReferenciaEntreDocumentos.objects.get(
-                        pk=cita[0]['id'])
+                cita = cita[0]
+                ref = ReferenciaEntreDocumentos.objects.get(
+                    pk=cita.pop('id'))
+
+                if 'ordem' in cita:
                     ordem_atual = ref.ordem
-                    ordem_nova = cita[0]['ordem']
+                    ordem_nova = cita.pop('ordem')
                     ReferenciaEntreDocumentos.objects.remove_space(
                         instance, ordem_atual)
                     ReferenciaEntreDocumentos.objects.create_space(
                         instance, ordem_nova)
                     ref.ordem = ordem_nova
-                    ref.save()
+
+                for attr, value in cita.items():
+                    setattr(instance, attr, value)
+                ref.save()
 
             else:
                 raise ValidationError(

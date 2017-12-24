@@ -142,14 +142,19 @@ export default {
       }
 
       data.id = this.elemento.id
-      this.updateDocumento(data)
+
+      let t = this
+      t.updateDocumento(data)
+      .then( () => {
+        t.success()
+      })
     },
     updateDocumento(data) {
       let t = this
       return t.documentoResource.updateDocumento(data)
         .then( (response) => {
           t.setDocObject(response.data)
-          t.success()
+          //t.success()
         })
         .catch( (response) => this.danger())
     },

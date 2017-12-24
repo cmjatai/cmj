@@ -12,6 +12,7 @@ import TpdImage from './components/TpdImage'
 import TpdImageTdBi from './components/TpdImageTdBi'
 import ModalImageList from './components/ModalImageList'
 import TpdGallery from './components/TpdGallery'
+import TpdReferencia from './components/TpdReferencia'
 
 Vue.component('DocumentoEdit', DocumentoEdit)
 Vue.component('Container', Container)
@@ -24,6 +25,7 @@ Vue.component('ContainerTdBi', ContainerTdBi)
 Vue.component('TpdImageTdBi', TpdImageTdBi)
 Vue.component('ModalImageList', ModalImageList)
 Vue.component('TpdGallery', TpdGallery)
+Vue.component('TpdReferencia', TpdReferencia)
 
 export default {
   DocumentoEdit,
@@ -37,4 +39,5 @@ export default {
   TpdImageTdBi,
   ModalImageList,
   TpdGallery,
+  TpdReferencia
 }

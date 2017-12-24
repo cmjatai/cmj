@@ -10,9 +10,9 @@
         <span class="btn btn-lg btn-rotate"  v-on:click="rotateLeft" title="Rotacionar 90 graus a esquerda">
           <i class="fa fa-rotate-left" aria-hidden="true"></i>
         </span>
-          <span class="btn btn-lg btn-rotate"  v-on:click="rotateRight" title="Rotacionar 90 graus a direita">
-            <i class="fa fa-rotate-right" aria-hidden="true"></i>
-          </span>
+        <span class="btn btn-lg btn-rotate"  v-on:click="rotateRight" title="Rotacionar 90 graus a direita">
+          <i class="fa fa-rotate-right" aria-hidden="true"></i>
+        </span>
         <span class="btn btn-lg btn-delete"  v-on:click="deleteParte" >
           <i class="fa fa-trash" aria-hidden="true"></i>
         </span>
