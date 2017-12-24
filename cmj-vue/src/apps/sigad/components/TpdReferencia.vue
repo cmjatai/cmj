@@ -6,7 +6,7 @@
     v-on:dragover="dragover"
     v-on:dragstart="dragstart">
       <img :src="slug+'.128'">
-      <div class="drag" @click="$emit('showmodal', elemento, pos)"></div>
+      <div class="drag" @click="$emit('showmodal', child, pos)"></div>
   </div>
 </template>
 

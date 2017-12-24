@@ -20,6 +20,7 @@ class DocumentoViewSet(viewsets.ModelViewSet):
     # authentication_classes = (SessionAuthentication, BasicAuthentication)
 
     def dispatch(self, request, *args, **kwargs):
+        # FIXME
         if self.request.user.is_anonymous():
             self.serializer_class = DocumentoUserAnonymousSerializer
             self.permission_classes = (IsAuthenticatedOrReadOnly, )
