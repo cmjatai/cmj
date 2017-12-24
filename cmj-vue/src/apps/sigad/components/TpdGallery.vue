@@ -1,6 +1,5 @@
 <template lang="html">
   <div :class="name_component">
-
     <div class="btn-toolbar widgets widget-top">
       <div class="btn-group btn-group-xs pull-right">
       </div>
@@ -37,22 +36,22 @@ export default {
         return
       }
 
-      let data = Object()
-      data.id = el.id
-      data.ordem = this.dragleave.ordem
-
-      if (el.ordem > this.dragleave.ordem && this.side > 0) {
-        data.ordem++
-      }
-      else if (el.ordem < this.dragleave.ordem && this.side < 0) {
-        data.ordem--
-      }
-
-      if (el.ordem === data.ordem){
+      let referencia = Object()
+      referencia.id = el.id
+      referencia.ordem = this.dragleave.ordem
+      if (el.ordem > this.dragleave.ordem && this.side > 0)
+        referencia.ordem++
+      else if (el.ordem < this.dragleave.ordem && this.side < 0)
+        referencia.ordem--
+      if (el.ordem === referencia.ordem)
         return
-      }
+      el.ordem = referencia.ordem
 
-      el.ordem = data.ordem
+      let data = Object()
+      data.cita = Array()
+      data.cita.push(referencia)
+      data.id = this.elemento.id
+
       this.updateDocumento(data)
         .then( () => {
           this.getDocumento(this.elemento.id)

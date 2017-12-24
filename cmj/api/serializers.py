@@ -3,6 +3,7 @@ from django.forms.models import model_to_dict
 from django.utils import timezone
 from model_utils.choices import Choices
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from rest_framework.fields import empty, JSONField, ChoiceField,\
     SerializerMethodField, SlugField
 from rest_framework.relations import RelatedField, ManyRelatedField,\
@@ -23,6 +24,7 @@ class DocumentoParteField(RelatedField):
             inst[cfg['field']] = {}
         else:
             inst = model_to_dict(instance)
+            inst['refresh'] = 0
 
         if not hasattr(instance, cfg['field']):
             return inst
@@ -58,11 +60,18 @@ class DocumentoParteField(RelatedField):
         return CustomManyRelatedField(**list_kwargs)
 
 
+class ReferenciaField(DocumentoParteField):
+    queryset = ReferenciaEntreDocumentos.objects.all()
+
+    def to_internal_value(self, data):
+        return data
+
+
 class DocumentoSerializer(serializers.ModelSerializer):
 
     # documentos_citados = DocumentoParteField(many=True)
     childs = DocumentoParteField(many=True, required=False, read_only=True)
-    cita = DocumentoParteField(many=True, required=False, read_only=True)
+    cita = ReferenciaField(many=True, required=False)
 
     has_midia = serializers.SerializerMethodField()
     refresh = serializers.SerializerMethodField()
@@ -140,6 +149,26 @@ class DocumentoSerializer(serializers.ModelSerializer):
             ordem_nova = vd['ordem']
             Documento.objects.remove_space(instance.parent, ordem_atual)
             Documento.objects.create_space(instance.parent, ordem_nova)
+
+        if 'cita' in vd:
+            cita = vd.pop('cita')
+            if len(cita) == 1:
+                if 'ordem' in cita[0]:
+                    ref = ReferenciaEntreDocumentos.objects.get(
+                        pk=cita[0]['id'])
+                    ordem_atual = ref.ordem
+                    ordem_nova = cita[0]['ordem']
+                    ReferenciaEntreDocumentos.objects.remove_space(
+                        instance, ordem_atual)
+                    ReferenciaEntreDocumentos.objects.create_space(
+                        instance, ordem_nova)
+                    ref.ordem = ordem_nova
+                    ref.save()
+
+            else:
+                raise ValidationError(
+                    _('Não existe implentação para tratar '
+                      'mais de uma citação ao mesmo tempo.'))
 
         update = serializers.ModelSerializer.update(self, instance, vd)
 

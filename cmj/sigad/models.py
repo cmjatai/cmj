@@ -862,7 +862,35 @@ class Documento(ShortUrl, CMSMixin):
         )
 
 
+class ReferenciaEntreDocumentosManager(models.Manager):
+    def create_space(self, referente, ordem, exclude=None):
+        qs = self.get_queryset()
+
+        qs = qs.filter(referente=referente, ordem__gte=ordem)
+
+        if exclude:
+            qs = qs.exclude(id=exclude.id)
+
+        qs = qs.update(ordem=F('ordem') + 1)
+
+        return qs
+
+    def remove_space(self, referente, ordem, exclude=None):
+        qs = self.get_queryset()
+
+        qs = qs.filter(referente=referente, ordem__gte=ordem)
+
+        if exclude:
+            qs = qs.exclude(id=exclude.id)
+
+        qs = qs.update(ordem=F('ordem') - 1)
+
+        return qs
+
+
 class ReferenciaEntreDocumentos(ShortUrl):
+
+    objects = ReferenciaEntreDocumentosManager()
     # TODO - IMPLEMENTAR VISIBILIDADE NA REFERENCIA...
     # SIGNIFICA QUE O DOC PRIVADO PODE SER PÚBLICO POR REFERENCIA
     # TRATAR SEGURANÇA PARA QUEM REALIZAR ESSA MUDANÇA DE VISIBILIDADE
