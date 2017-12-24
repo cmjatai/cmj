@@ -1,6 +1,5 @@
 <template lang="html">
-  <div :class="[classChild(elemento), childsOrdenados.length !== 0 ?  '': 'empty' ]">
-
+  <div :class="[name_component, childsOrdenados.length !== 0 ?  '': 'empty' ]">
 
     <div class="btn-toolbar widgets widget-top">
       <div  v-if="!elemento.titulo" class="btn-group btn-group-xs pull-left">

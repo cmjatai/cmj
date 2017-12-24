@@ -1,5 +1,5 @@
 <template lang="html">
-    <div :class="[classChild(elemento), 'path-imagem', alinhamento(elemento)]">
+    <div :class="[name_component, 'path-imagem', alinhamento(elemento)]">
       <div class="btn-toolbar widgets widget-top">
         <div class="btn-group btn-group-xs pull-left">
           <button v-if="!elemento.titulo" v-on:click.self="toogleTitulo" title="Disponibilizar Título para a Imagem" type="button" class="btn btn-success">T</button>

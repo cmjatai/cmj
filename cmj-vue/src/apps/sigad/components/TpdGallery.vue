@@ -1,32 +1,31 @@
 <template lang="html">
-  <div :class="[classChild(elemento)]">
+  <div :class="name_component">
 
     <div class="btn-toolbar widgets widget-top">
       <div class="btn-group btn-group-xs pull-right">
       </div>
     </div>
     <div class="inner">
-      <modal-image-list v-if="showModal >= 0" @close="showModal = -1" :elementos="childsOrdenados" :child="showElemento" :pos="showModal" :parent="elemento" />
-      <component :is="classChild(value)" v-on:ondragend="ondragend" v-on:ondragleave="ondragleave" v-for="(value, key) in childsOrdenados" :child="value" :parent="elemento" :key="value.id" :pos="key" v-on:showmodal="showModalAction"/>
+      <modal-image-list v-if="showModal >= 0" @close="showModal = -1" :elementos="citaOrdenados" :child="showElemento" :pos="showModal" :parent="elemento" />
+      <component :is="'tpd-image-td-bi'" v-on:ondragend="ondragend" v-on:ondragleave="ondragleave" v-for="(value, key) in citaOrdenados" :child="value" :parent="elemento" :key="value.id" :pos="key" v-on:showmodal="showModalAction"/>
     </div>
   </div>
 </template>
 
 <script>
-import DocumentoEdit from './DocumentoEdit'
+import ContainerTdBi from './ContainerTdBi'
+import { orderBy, isEmpty } from 'lodash';
 
 export default {
   name: 'tpd-gallery',
   extends: {
-    ...DocumentoEdit,
+    ...ContainerTdBi,
   },
-  data() {
-    return {
-      dragleave: null,
-      side: 0,
-      showModal: -1,
-      showElemento: null
-    }
+  computed: {
+    citaOrdenados: function() {
+      let ordenar = this.elemento.cita
+      return _.orderBy(ordenar,'ordem')
+    },
   },
   methods: {
     showModalAction(elemento, pos) {
@@ -93,17 +92,12 @@ export default {
         })
     },
   },
-
 }
 </script>
 
 <style lang="scss">
-
 .container-documento-edit {
-  .container-td-bi {
-    & > .drop-area {
-      padding: 0 10px;
-    }
+  .tpd-gallery {
     & > .inner {
       padding: 5px;
       display: flex;

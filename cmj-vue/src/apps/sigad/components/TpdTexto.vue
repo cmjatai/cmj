@@ -1,5 +1,5 @@
 <template lang="html">
-  <div :class="[classChild(elemento)]">
+  <div :class="name_component">
     <div class="btn-toolbar widgets widget-top">
       <div class="btn-group btn-group-xs pull-right">
         <button v-on:click.self="deleteParte" title="Remover este Fragmento de Texto" type="button" class="btn btn-danger">x</button>

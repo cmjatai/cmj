@@ -1,5 +1,5 @@
 <template lang="html">
-  <div :class="[classChild(elemento), 'container']">
+  <div :class="[name_component, 'container']">
 
     <div class="btn-toolbar widgets widget-top">
       <div class="btn-group btn-group-xs pull-right">

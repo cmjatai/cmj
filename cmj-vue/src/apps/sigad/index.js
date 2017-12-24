@@ -36,5 +36,5 @@ export default {
   ContainerTdBi,
   TpdImageTdBi,
   ModalImageList,
-  TpdGallery
+  TpdGallery,
 }

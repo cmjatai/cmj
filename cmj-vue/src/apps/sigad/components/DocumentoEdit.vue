@@ -65,6 +65,9 @@ export default {
        'getChoices',
        'getDocObject',
     ]),
+    name_component: function() {
+      return this.$options.name
+    },
     hasParent: function() {
       return this.elemento && this.elemento.parent > 0
     },

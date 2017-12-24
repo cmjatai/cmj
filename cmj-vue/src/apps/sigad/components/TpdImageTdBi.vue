@@ -1,5 +1,5 @@
 <template lang="html">
-  <div :class="[classChild(elemento), 'draggable', classDrag]"
+  <div :class="[name_component, 'draggable', classDrag]"
     v-on:dragend="dragend"
     v-on:dragenter="dragenter"
     v-on:dragleave="dragleave"
