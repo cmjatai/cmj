@@ -2,7 +2,7 @@
   <div class="">
     <modal @close="$emit('close')">
       <template slot="header">
-        <span class="path-title-partes">
+        <span class="path-title-partes input-value">
           <input v-model.lazy="elemento.titulo" placeholder="Título da Imagem..."/>
         </span>
       </template>
@@ -23,12 +23,12 @@
         <div v-if="pos !==0" class="btn btn-direction btn-left" v-on:click="leftParte">
           <i class="fa fa-3x fa-chevron-left" aria-hidden="true"></i>
         </div>
-        <div class="autor-imagem">
-          <input v-model.lazy="elemento.autor" placeholder="Autor da Imagem..."/>
-        </div>
       </template>
       <template slot="footer">
-        <div class="path-description construct">
+        <div class="autor-imagem input-value">
+          <input v-model.lazy="elemento.autor" placeholder="Autor da Imagem..."/>
+        </div>
+        <div class="path-description input-value">
           <textarea v-model.lazy="elemento.descricao" placeholder="Descrição da Imagem..." :align="'text-left'"/>
         </div>
       </template>
@@ -143,12 +143,13 @@ export default {
 .modal-mask {
   input, textarea {
     color: white;
-    height: 100%;
+    margin: 0px;
+    padding: 5px;
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    margin: 0px;
-    position: absolute;
+    height: 100%;
     &:focus {
       background: transparentize(#fff, 0.9);
     }
@@ -169,6 +170,23 @@ export default {
   }
   .btn-right {
     right: 7px;
+  }
+  .input-value {
+    height: 100%;
+    padding: 0px;
+    position: relative;
+  }
+  .autor-imagem {
+    font-size: 0.7em;
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 30px;
+    bottom: 100%;
+    input {
+      text-align: center;
+      background: transparentize(#000, 0.1);
+    }
   }
 }
 </style>
