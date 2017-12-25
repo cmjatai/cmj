@@ -7,7 +7,7 @@
         </span>
       </template>
       <template slot="header-actions">
-        <span class="btn btn-lg btn-delete"  v-on:click="deleteParte" >
+        <span class="btn btn-lg btn-delete"  v-on:click="deleteReferencia" >
           <i class="fa fa-trash" aria-hidden="true"></i>
         </span>
         <span class="btn btn-lg btn-close"  @click="$emit('close')">
@@ -110,9 +110,17 @@ export default {
       this.$parent.showElemento = this.elementos[this.$parent.showModal]
       this.elemento = this.$parent.showElemento
     },
-    deleteParte(event) {
+    deleteReferencia(event) {
       let t = this
-      t.documentoResource.deleteDocumento(this.elemento.id)
+
+      let data = Object()
+      let referencia = Object()
+      referencia.id = this.elemento.id
+      data.id = this.elemento.referente
+      data.cita = Array()
+      data.cita.push(referencia)
+
+      t.documentoResource.deleteReferencia(data)
         .then( (response) => {
           if (t.elementos.length === 1) {
             t.$parent.showModal = -1

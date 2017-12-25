@@ -1,6 +1,6 @@
 from django.core.files.base import File
 from django.utils.translation import ugettext_lazy as _
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.permissions import IsAuthenticated,\
@@ -10,7 +10,8 @@ from rest_framework.views import APIView
 
 from cmj.api.serializers import DocumentoSerializer,\
     DocumentoUserAnonymousSerializer
-from cmj.sigad.models import Documento, VersaoDeMidia, Midia
+from cmj.sigad.models import Documento, VersaoDeMidia, Midia,\
+    ReferenciaEntreDocumentos
 
 
 class DocumentoViewSet(viewsets.ModelViewSet):
@@ -31,16 +32,27 @@ class DocumentoViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         obj = self.get_object()
 
-        if obj.tipo in Documento.TDc:
-            if obj.parent.childs.count() == 1:
-                raise PermissionDenied(
-                    _('Não é permitido remover todos os container'))
-        parent, ordem = obj.parent, obj.ordem
+        cita = request.data.get('cita', [])
 
-        response = viewsets.ModelViewSet.destroy(
-            self, request, *args, **kwargs)
+        if cita:
+            # FIXME tratar informação cita
+            cita = cita[0]
+            ref = ReferenciaEntreDocumentos.objects.get(
+                pk=cita.pop('id'))
+            ref.delete()
+            response = Response(status=status.HTTP_204_NO_CONTENT)
 
-        Documento.objects.remove_space(parent, ordem)
+        else:
+            if obj.tipo in Documento.TDc:
+                if obj.parent.childs.count() == 1:
+                    raise PermissionDenied(
+                        _('Não é permitido remover todos os container'))
+            parent, ordem = obj.parent, obj.ordem
+
+            response = viewsets.ModelViewSet.destroy(
+                self, request, *args, **kwargs)
+
+            Documento.objects.remove_space(parent, ordem)
 
         return response
 

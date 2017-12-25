@@ -32,5 +32,10 @@ export const DocumentoResource = {
   deleteDocumento: (id) => axios({
     url: `${basePath}/documento/${id}/`,
     method: 'DELETE'
+  }),
+  deleteReferencia: (data) => axios({
+    url: `${basePath}/documento/${data.id}/`,
+    data: data,
+    method: 'DELETE'
   })
 }
