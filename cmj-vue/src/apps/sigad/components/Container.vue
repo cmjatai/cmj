@@ -83,11 +83,15 @@ export default {
         })
     },
     containerTrocarTipo(event) {
+      let t = this
       let data = Object()
       let keys = _.keys(this.getChoices.tipo.containers)
       data.tipo = this.elemento.tipo === parseInt(keys[0]) ? keys[1] : keys[0]
       data.id = this.elemento.id
-      this.updateDocumento(data)
+      t.updateDocumento(data)
+        .then( (response) => {
+          t.$parent.getDocumento(t.parent.id)
+        })
     }
   },
 

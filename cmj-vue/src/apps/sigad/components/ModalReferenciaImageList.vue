@@ -186,6 +186,9 @@ export default {
     input {
       text-align: center;
       background: transparentize(#000, 0.1);
+      &:focus {
+        background: #000;
+      }
     }
   }
 }
