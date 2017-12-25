@@ -327,7 +327,7 @@ export default {
     right:-10px;
     margin-top: -15px;
   }
-  .tpd-texto, .tpd-audio, .tpd-video, .tpd-image {
+  .tpd-texto, .tpd-audio, .tpd-video, .tpd-image, .tpd-gallery {
     position: relative;
     padding-left: 10px;
     padding-right: 10px;

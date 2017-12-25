@@ -1,10 +1,17 @@
 <template lang="html">
   <div :class="name_component">
     <div class="btn-toolbar widgets widget-top">
-      <div class="btn-group btn-group-xs pull-right">
+      <div class="btn-group btn-group-xs pull-left">
+        <button v-if="!elemento.titulo" v-on:click.self="toogleTitulo" title="Disponibilizar Título para a Galeria" type="button" class="btn btn-success">T</button>
+        <button v-if="!elemento.descricao" v-on:click.self="toogleDescricao" title="Disponibilizar Descrição para a Galeria" type="button" class="btn btn-success">D</button>
+        <button v-if="!elemento.autor" v-on:click.self="toogleAutor" title="Disponibilizar Autor para a Galeria" type="button" class="btn btn-success">A</button>
       </div>
     </div>
     <div class="inner">
+      <input v-if="has_titulo || elemento.titulo"  v-model.lazy="elemento.titulo" placeholder="Título da Galeria..."/>
+      <input v-if="has_descricao || elemento.descricao" v-model.lazy="elemento.descricao" placeholder="Descrição da Galeria..."/>
+      <input v-if="has_autor || elemento.autor" v-model.lazy="elemento.autor" placeholder="Autor da Galeria..."/>
+
       <modal-referencia-image-list v-if="showModal >= 0" @close="showModal = -1" :elementos="citaOrdenados" :child="showElemento" :pos="showModal" :parent="elemento" />
       <tpd-referencia v-on:ondragend="ondragend" v-on:ondragleave="ondragleave" v-for="(value, key) in citaOrdenados" :child="value" :parent="elemento" :key="value.id" :pos="key" v-on:showmodal="showModalAction"/>
     </div>
@@ -20,6 +27,13 @@ export default {
   extends: {
     ...ContainerTdBi,
   },
+  data() {
+    return {
+      has_titulo: false,
+      has_descricao:false,
+      has_autor: false,
+    }
+  },
   computed: {
     citaOrdenados: function() {
       let ordenar = this.elemento.cita
@@ -27,6 +41,15 @@ export default {
     },
   },
   methods: {
+    toogleTitulo(event) {
+      this.has_titulo = !this.has_titulo
+    },
+    toogleDescricao(event) {
+      this.has_descricao = !this.has_descricao
+    },
+    toogleAutor(event) {
+      this.has_autor = !this.has_autor
+    },
     showModalAction(elemento, pos) {
       this.showElemento = elemento
       this.showModal = pos

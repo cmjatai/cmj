@@ -345,10 +345,11 @@ class Slugged(Parent):
         kwargs['force_insert'] = False
         kwargs['force_update'] = True
 
-        if (self.titulo and not self.parent) or self._meta.model_name == 'classe':
-            slug = self.titulo
-        else:
+        if not self.titulo or self.parent or \
+                self._meta.model == ReferenciaEntreDocumentos:
             slug = str(self.id)
+        else:
+            slug = self.titulo
 
         self.slug = self.generate_unique_slug(slug)
 

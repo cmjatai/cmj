@@ -167,17 +167,17 @@ class DocumentoSerializer(serializers.ModelSerializer):
                     ref.ordem = ordem_nova
 
                 for attr, value in cita.items():
-                    setattr(instance, attr, value)
+                    setattr(ref, attr, value)
                 ref.save()
 
             else:
                 raise ValidationError(
                     _('Não existe implentação para tratar '
                       'mais de uma citação ao mesmo tempo.'))
+        else:
+            instance = serializers.ModelSerializer.update(self, instance, vd)
 
-        update = serializers.ModelSerializer.update(self, instance, vd)
-
-        return update
+        return instance
 
     def create(self, validated_data):
         vd = validated_data
