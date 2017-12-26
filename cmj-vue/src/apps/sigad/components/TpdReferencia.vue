@@ -1,5 +1,5 @@
 <template lang="html">
-  <div :class="['tpd-referencia', 'draggable', classDrag]"
+  <div :class="['tpd-referencia', 'draggable', classDrag, 'col-xs-6']"
     v-on:dragend="dragend"
     v-on:dragenter="dragenter"
     v-on:dragleave="dragleave"
