@@ -112,7 +112,6 @@ export default {
     },
     deleteReferencia(event) {
       let t = this
-
       let data = Object()
       let referencia = Object()
       referencia.id = this.elemento.id

@@ -87,32 +87,7 @@ export default {
     changeImage: function() {
       this.getDocumento(this.elemento.id)
     },
-    deleteParte(event) {
-      let t = this
-      t.documentoResource.deleteDocumento(this.elemento.id)
-        .then( (response) => {
-          if (t.elementos.length === 1) {
-            t.$parent.showModal = -1
-            t.$parent.showElemento = null
-          }
-          else {
-            if (t.pos === 0) {
-              t.$parent.showElemento = t.elementos[1]
-            }
-            else {
-              t.$parent.showElemento = t.elementos[t.pos-1]
-              t.$parent.showModal = t.pos-1
-            }
-          }
-          t.$parent.getDocumento(t.parent.id)
-            .then(() => {
-            })
-          t.success('Elemento excluído com sucesso.')
-        })
-        .catch( (response) => {
-          t.danger(response.response.data.detail)
-        })
-    },
+
   },
 }
 </script>
