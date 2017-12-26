@@ -13,12 +13,44 @@ from cmj.sigad.models import Documento, ReferenciaEntreDocumentos,\
     DOC_TEMPLATES_CHOICE, CMSMixin
 
 
+class ChoiceSerializer(serializers.Serializer):
+    value = serializers.SerializerMethodField()
+    text = serializers.SerializerMethodField()
+
+    def get_text(self, obj):
+        return obj[1]
+
+    def get_value(self, obj):
+        return obj[0]
+
+
+class ModelChoiceSerializer(ChoiceSerializer):
+
+    def get_text(self, obj):
+        return str(obj)
+
+    def get_value(self, obj):
+        return obj.id
+
+
+class DocumentoChoiceSerializer(ModelChoiceSerializer):
+
+    def get_text(self, obj):
+        return obj.titulo
+
+    class Meta:
+        model = Documento
+        fields = ['id', 'titulo']
+
+
 class DocumentoParteField(RelatedField):
 
     def to_representation(self, instance):
         cfg = self.configs
 
         if isinstance(instance, Documento):
+            test = cfg['serializer'](instance).data
+
             inst = model_to_dict(instance, fields=cfg['fields'])
             inst['has_midia'] = hasattr(instance, 'midia')
             inst[cfg['field']] = {}
@@ -94,6 +126,8 @@ class DocumentoSerializer(serializers.ModelSerializer):
         return 0
 
     def get_choices(self, obj):
+        if obj.tipo not in CMSMixin.TDs:
+            return {}
         choices = {
             'tipo': {key: value.triple_map
                      for key, value in Documento.tipo_parte_doc.items()},

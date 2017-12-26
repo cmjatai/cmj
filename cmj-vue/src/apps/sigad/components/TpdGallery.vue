@@ -17,8 +17,17 @@
       <modal-referencia-image-list v-if="showModal >= 0" @close="showModal = -1" :elementos="citaOrdenados" :child="showElemento" :pos="showModal" :parent="elemento" />
       <div class="row">
         <div class="col-xs-8">
-            <div class="row-bancos-imagens">
+          <div class="row">
+            <div class="col-xs-5">
+              <div class="row row-bi">
+
+              </div>
             </div>
+            <div class="col-xs-7">
+              <div class="row-bi">
+              </div>
+            </div>
+          </div>
         </div>
         <div class="col-xs-4">
           <div class="row row-referencias">
@@ -62,15 +71,10 @@ export default {
     toogleAutor(event) {
       this.has_autor = !this.has_autor
     },
-    showModalAction(elemento, pos) {
-      this.showElemento = elemento
-      this.showModal = pos
-    },
     ondragend: function(el) {
       if (el.id === this.dragleave.id) {
         return
       }
-
       let referencia = Object()
       referencia.id = el.id
       referencia.ordem = this.dragleave.ordem
@@ -92,14 +96,6 @@ export default {
           this.getDocumento(this.elemento.id)
         })
     },
-    ondragleave: function(el, side) {
-      this.dragleave = el
-      this.side = side
-    },
-    changeImage: function() {
-      this.getDocumento(this.elemento.id)
-    },
-
     deleteParte(event) {
       let t = this
       t.documentoResource.deleteDocumento(this.elemento.id)
@@ -126,9 +122,10 @@ export default {
     & > .inner {
       user-select:none;
     }
-    .row-bancos-imagens {
+    .row-bi {
         background: transparentize(#fff, 0.6);
         border: 1px solid #fafafa;
+        min-height: 100px;
     }
     .row-referencias {
       background: transparentize(#fff, 0.6);

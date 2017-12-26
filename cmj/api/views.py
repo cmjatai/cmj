@@ -1,5 +1,6 @@
 from django.core.files.base import File
 from django.utils.translation import ugettext_lazy as _
+from django_filters import rest_framework as filters
 from rest_framework import viewsets, status
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
@@ -9,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from cmj.api.serializers import DocumentoSerializer,\
-    DocumentoUserAnonymousSerializer
+    DocumentoUserAnonymousSerializer, DocumentoChoiceSerializer
 from cmj.sigad.models import Documento, VersaoDeMidia, Midia,\
     ReferenciaEntreDocumentos
 
@@ -19,6 +20,23 @@ class DocumentoViewSet(viewsets.ModelViewSet):
     serializer_class = DocumentoSerializer
     permission_classes = (IsAuthenticated,)
     # authentication_classes = (SessionAuthentication, BasicAuthentication)
+
+    #filter_backends = (filters.DjangoFilterBackend,)
+    #filter_fields = ('tipo', )
+
+    def list(self, request, *args, **kwargs):
+        # FIXME - o método list não deve devolver apenas documentos do tipo
+        # banco de imagens. Implementar filtros por tipo
+        self.queryset = Documento.objects.qs_bi(user=request.user)
+
+        # DocumentoSerializer é extremamente sobrecarregado, principalmente
+        # na devolução de grandes objetos como banco de imagens. Desta forma,
+        # e até esta implementação listagem de documentos via REST
+        # eram necessários para componentes de seleção como radiobox e checkbox
+        # assim foi implementado este desvio de serialização para listagens
+        # que não escreve um método completo mas sim um par id, titulo
+        self.serializer_class = DocumentoChoiceSerializer
+        return viewsets.ModelViewSet.list(self, request, *args, **kwargs)
 
     def dispatch(self, request, *args, **kwargs):
         # FIXME

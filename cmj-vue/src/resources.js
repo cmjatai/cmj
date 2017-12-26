@@ -5,6 +5,10 @@ axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 
 export const DocumentoResource = {
+  getDocumentoChoiceList: (tipo, page) => axios({
+    url: `${basePath}/documento/?page=${page}&tipo=${tipo}`,
+    method: 'GET'
+  }),
   getDocumento: id => axios({
     url: `${basePath}/documento/${id}/`,
     method: 'GET'
