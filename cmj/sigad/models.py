@@ -327,7 +327,7 @@ class Slugged(Parent):
     titulo = models.CharField(
         verbose_name=_('Título'),
         max_length=250,
-        blank=True, null=True, default=None)
+        blank=True, null=True, default='')
 
     slug = models.SlugField(max_length=2000)
 
@@ -915,7 +915,7 @@ class ReferenciaEntreDocumentos(ShortUrl):
         _('Ordem de Renderização'), default=0)
 
     class Meta:
-        ordering = ('referenciado', 'ordem')
+        ordering = ('referente', 'ordem')
 
     def short_url(self):
         return super().short_url(

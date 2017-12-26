@@ -4,7 +4,9 @@
     v-on:dragenter="dragenter"
     v-on:dragleave="dragleave"
     v-on:dragover="dragover"
-    v-on:dragstart="dragstart">
+    v-on:dragstart="dragstart"
+    v-on:dragexit="dragexit"
+    v-on:drop="drop">
       <img :src="slug+'.128'">
       <div class="drag" @click="$emit('showmodal', child, pos)"></div>
       <span class="btn-delete"  v-on:click="deleteReferencia" title="Excluir esta referência">
@@ -41,6 +43,7 @@ export default {
   },
   methods: {
     dragend(ev) {
+      console.log('dragend: tpdreferencia', ev)
       if (this.dragged)
         this.$emit('ondragend', this.child)
       this.dragged = false
@@ -48,21 +51,31 @@ export default {
       this.draggedover = 0;
     },
     dragenter(ev) {
+      console.log('dragenter: tpdreferencia', ev)
       if (this.dragged)
         this.draggedleave = false
     },
     dragleave(ev) {
+      console.log('dragleave: tpdreferencia', ev)
       this.$emit('ondragleave', this.child, this.draggedover)
       this.draggedleave = this.dragged
       this.draggedover = 0
     },
     dragover(ev) {
+      console.log('dragover: tpdreferencia', ev)
       if (!this.dragged) {
           this.draggedover = ev.offsetX - ev.target.offsetWidth / 2
       }
     },
     dragstart(ev) {
+      console.log('dragstart: tpdreferencia', ev)
       this.dragged = true
+    },
+    dragexit(ev) {
+      console.log('dragexit: tpdreferencia', ev)
+    },
+    drop(ev) {
+      console.log('drop: tpdreferencia', ev)
     },
     deleteReferencia(event) {
       let t = this

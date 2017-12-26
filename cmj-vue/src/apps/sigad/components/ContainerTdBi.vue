@@ -37,6 +37,7 @@ export default {
       this.showModal = pos
     },
     ondragend: function(el) {
+      console.log('ondragend: ContainerTdBi', el)
       if (el.id === this.dragleave.id) {
         return
       }
@@ -59,6 +60,7 @@ export default {
         })
     },
     ondragleave: function(el, side) {
+      console.log('ondragleave: ContainerTdBi', el, side)
       this.dragleave = el
       this.side = side
     },

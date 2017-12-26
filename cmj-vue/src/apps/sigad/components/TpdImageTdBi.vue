@@ -4,7 +4,9 @@
     v-on:dragenter="dragenter"
     v-on:dragleave="dragleave"
     v-on:dragover="dragover"
-    v-on:dragstart="dragstart">
+    v-on:dragstart="dragstart"
+    v-on:dragexit="dragexit"
+    v-on:drop="drop">
       <img :src="slug+'.128?'+refresh">
       <div class="drag" @click="$emit('showmodal', elemento, pos)"></div>
   </div>
@@ -37,6 +39,7 @@ export default {
   },
   methods: {
     dragend(ev) {
+      console.log('dragend: tpdimagetdbi', ev)
       if (this.dragged)
         this.$emit('ondragend', this.elemento)
       this.dragged = false
@@ -44,21 +47,31 @@ export default {
       this.draggedover = 0;
     },
     dragenter(ev) {
+      console.log('dragenter: tpdimagetdbi', ev)
       if (this.dragged)
         this.draggedleave = false
     },
     dragleave(ev) {
+      console.log('dragleave: tpdimagetdbi', ev)
       this.$emit('ondragleave', this.elemento, this.draggedover)
       this.draggedleave = this.dragged
       this.draggedover = 0
     },
     dragover(ev) {
+      console.log('dragover: tpdimagetdbi', ev)
       if (!this.dragged) {
           this.draggedover = ev.offsetX - ev.target.offsetWidth / 2
       }
     },
     dragstart(ev) {
+      console.log('dragstart: tpdimagetdbi', ev)
       this.dragged = true
+    },
+    dragexit(ev) {
+      console.log('dragexit: tpdimagetdbi', ev)
+    },
+    drop(ev) {
+      console.log('drop: tpdimagetdbi', ev)
     },
   }
 }
