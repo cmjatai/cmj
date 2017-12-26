@@ -49,9 +49,9 @@ class DocumentoParteField(RelatedField):
         cfg = self.configs
 
         if isinstance(instance, Documento):
-            test = cfg['serializer'](instance).data
+            inst = cfg['serializer'](instance).data
+            # inst = model_to_dict(instance, fields=cfg['fields'])
 
-            inst = model_to_dict(instance, fields=cfg['fields'])
             inst['has_midia'] = hasattr(instance, 'midia')
             inst[cfg['field']] = {}
         else:
@@ -65,7 +65,6 @@ class DocumentoParteField(RelatedField):
             child.id: cfg['serializer'](child, m2ms=cfg['m2ms']).data
             for child in getattr(instance, cfg['field']).order_by('ordem')
         }
-
         return inst
 
     def to_internal_value(self, data):

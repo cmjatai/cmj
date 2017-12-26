@@ -93,8 +93,8 @@ export default {
       return _.orderBy(ordenar,'ordem')
     },
     visibilidade_choice: function() {
-      return this.elemento.choices && this.elemento.choices.visibilidade
-        ? this.elemento.choices.visibilidade : {}
+      return this.getChoices && this.getChoices.visibilidade
+        ? this.getChoices.visibilidade : {}
     },
     classParent: function() {
       return this.notHasParent ? 'container-path container-documento-edit' : ''
@@ -116,9 +116,9 @@ export default {
         return 'container-path container-documento-edit'
       else {
         try {
-          let classe = this.getDocObject.choices.all_bycode[value.tipo]['component_tag']
+          let classe = this.getChoices.all_bycode[value.tipo]['component_tag']
           if (this.getDocObject.tipo !== 0)
-            classe += '-'+this.getDocObject.choices.all_bycode[this.getDocObject.tipo]['component_tag']
+            classe += '-'+this.getChoices.all_bycode[this.getDocObject.tipo]['component_tag']
           return classe
         }
         catch (Exception) {
