@@ -16,13 +16,12 @@
 {% block base_content %}
   <div class="row">
     <div class="col-md-8">
-
       {% with noticias_destaque as noticias_destaque %}
         {% include "path/path_noticias_destaque.html" %}
       {% endwith %}
-
     </div>
     <div class="col-md-4">
+      a
       {% with noticias_dos_parlamentares as object_list %}
         {% with 'path-item-list container-box-parlamentares' as css_class %}
           {% with True as pagina_inicial %}
