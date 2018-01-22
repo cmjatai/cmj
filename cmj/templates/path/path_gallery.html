@@ -49,13 +49,12 @@
 
               </div>
               <div class="show-autor">
-                Foto:
                 {% if ref_doc.autor %}
-                  {{ref_doc.autor}}.
+                  {{ref_doc.autor}}
                 {% elif object.autor %}
                   {{object.autor}}
                 {% else %}
-                  {{object.parents.0.autor}}
+                  {{object.parents.0.autor|default:''}}
                 {% endif %}
               </div>
             </div>

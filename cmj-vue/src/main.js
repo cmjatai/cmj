@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import VueCookie from 'vue-cookie'
 import VueResource from 'vue-resource'
+import VueResize from 'vue-resize'
 
 import Router from 'vue-router'
   import { sync } from 'vuex-router-sync'
@@ -13,6 +14,8 @@ import VueFroala from 'vue-froala-wysiwyg'
   require('froala-editor/css/froala_style.min.css')
 
 import lodash from 'lodash'
+
+import 'vue-resize/dist/vue-resize.css'
 
 import Components from './apps'
 import VuexStore from './apps/store'
@@ -27,6 +30,7 @@ Vue.use(Vuex)
 Vue.use(Router)
 Vue.use(VueResource)
 Vue.use(VueFroala)
+Vue.use(VueResize)
 
 //Vue.http.headers.common['Access-Control-Allow-Origin'] = '*'
 

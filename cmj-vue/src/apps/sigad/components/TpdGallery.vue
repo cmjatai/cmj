@@ -12,8 +12,8 @@
     </div>
     <div class="inner">
       <modal-referencia-image-list v-if="showModal >= 0" @close="showModal = -1" :elementos="citaOrdenados" :child="showElemento" :pos="showModal" :parent="elemento" />
-      <div class="row">
-        <div class="col-xs-8">
+      <div :class="['row', 'row-gallery', 'row'+elemento.id ]">
+        <div :class="['col-xs-8', 'col-bi-container', 'row'+elemento.id ]">
 
 
           <div class="row">
@@ -29,16 +29,15 @@
                   <option :value="value.value"  v-for="(value, key) in bi_list">{{value.text}}</option>
                 </select>
               </div>
-              <div class="row row-bi">
-                <tpd-image-td-bi  v-on:ondragend="ondragendtransf" v-for="(value, key) in images_from_bi" :child="value" :parent="elemento" :key="value.id"/>
+              <div :class="['row', 'row-bi', 'row'+elemento.id ]">
+                <tpd-image-td-bi v-on:ondragend="ondragendtransf" v-for="(value, key) in images_from_bi" :child="value" :parent="elemento" :key="value.id"/>
+                 <resize-observer @notify="handleResize" />
               </div>
             </div>
           </div>
-
-
         </div>
         <div class="col-xs-4 col-referencias">
-          <div class="row row-referencias">
+          <div :class="['row', 'row-referencias', 'row'+elemento.id ]" v-on:dragend="ondragendtransf">
             <tpd-referencia v-on:ondragend="ondragend" v-on:ondragleave="ondragleave" v-for="(value, key) in citaOrdenados" :child="value" :parent="elemento" :key="value.id" :pos="key" v-on:showmodal="showModalAction"/>
           </div>
         </div>
@@ -64,6 +63,7 @@ export default {
       has_titulo: false,
       has_descricao:false,
       has_autor: false,
+      fullHeight: document.documentElement.clientHeight
     }
   },
   watch: {
@@ -101,6 +101,13 @@ export default {
       })
   },
   methods: {
+    handleResize () {
+      if (this.elemento.id !== 0) {
+        let colbicontainer = document.querySelector('.col-bi-container.row'+this.elemento.id)
+        let rowreferencia = document.querySelector('.row-referencias.row'+this.elemento.id)
+        rowreferencia.style.minHeight = colbicontainer.clientHeight + 'px'
+      }
+    },
     toogleTitulo(event) {
       this.has_titulo = !this.has_titulo
     },
@@ -113,8 +120,9 @@ export default {
     ondragendtransf: function(el) {
       let dragleave = this.dragleave
       this.dragleave = null
-      if (el.tipo >= 0) {
+      if (el.tipo === 900) {
         // o item arrastado é um TpdImageTdBi - Imagem de Banco de Imagem
+
         if (dragleave && dragleave.tipo === undefined) {
           // o item no qual o item arrastado foi solto é um item de referencia
           let referencia = Object()
@@ -123,6 +131,21 @@ export default {
           referencia.ordem = dragleave.ordem
           if (this.side > 0)
             referencia.ordem++
+          let data = Object()
+          data.cita = Array()
+          data.cita.push(referencia)
+          data.id = this.elemento.id
+          this.updateDocumento(data)
+            .then( () => {
+              this.getDocumento(this.elemento.id)
+            })
+        }
+        else {
+          // se foi solto na caixa row-referencias
+          let referencia = Object()
+          referencia.referente = this.elemento.id
+          referencia.referenciado = el.id
+          referencia.ordem = 0
           let data = Object()
           data.cita = Array()
           data.cita.push(referencia)
@@ -215,7 +238,15 @@ export default {
         flex-wrap: wrap;
         justify-content: center;
     }
+    .col-bi-container {
+      display: inline-block;
+      float: none;
+    }
     .col-referencias {
+      display: inline-block;
+      vertical-align: top;
+      float: none;
+      width: 32%;
       /*position: absolute;
       top: 0;
       right: 0;
@@ -230,6 +261,9 @@ export default {
       justify-content: center;
       padding: 10px 0;
       min-height: 100px;
+      height: 100%;
+      align-items: flex-start;
+      align-content: flex-start;
     }
   }
 }

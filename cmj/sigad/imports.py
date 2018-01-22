@@ -79,7 +79,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
         # print('data: ', data)
         # return TemplateView.get(self, request, *args, **kwargs)
         jdata = json.loads(data)
-        jdata = jdata[0:20]
+        jdata = jdata[0:5]
 
         anos = {}
         print(len(jdata))

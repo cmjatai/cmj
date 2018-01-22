@@ -1,4 +1,5 @@
 
+from django.db.models import Max
 from django.forms.models import model_to_dict
 from django.utils import timezone
 from model_utils.choices import Choices
@@ -188,13 +189,21 @@ class DocumentoSerializer(serializers.ModelSerializer):
             if len(cita) == 1:
                 cita = cita[0]
                 if 'id' not in cita:
-                    ReferenciaEntreDocumentos.objects.create_space(
-                        instance, cita['ordem'])
+                    ordem = cita['ordem']
+                    if cita['ordem'] == 0:
+                        max_ordem = ReferenciaEntreDocumentos.objects.filter(
+                            referente=instance).aggregate(Max('ordem'))
+                        ordem = (max_ordem['ordem__max'] + 1
+                                 ) if max_ordem['ordem__max'] else 1
+                    else:
+                        ReferenciaEntreDocumentos.objects.create_space(
+                            instance, cita['ordem'])
                     ref = ReferenciaEntreDocumentos()
-                    ref.ordem = cita['ordem']
+                    ref.ordem = ordem
                     ref.referenciado_id = cita['referenciado']
                     ref.referente_id = cita['referente']
                     ref.save()
+
                 else:
                     ref = ReferenciaEntreDocumentos.objects.get(
                         pk=cita.pop('id'))
