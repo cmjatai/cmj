@@ -643,7 +643,7 @@ class DocumentoManager(models.Manager):
             return (qstatus & (q0 | q1)) | (qstatus & (q2 | q3))
 
         elif isinstance(self.instance, Parlamentar):
-            pass
+            return qstatus & (q0 | q1)
         elif isinstance(self.instance, Documento):
             pass
         else:
