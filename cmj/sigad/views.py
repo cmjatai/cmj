@@ -7,7 +7,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse_lazy
-from django.db.models import F
+from django.db.models import F, Q
 from django.db.models.aggregates import Max, Count
 from django.http.response import Http404, HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404
@@ -978,32 +978,55 @@ class DocumentoPermissionRequiredMixin(PermissionRequiredMixin):
 
             if not self.request.user.is_superuser:
 
-                # se documento é privado e usuário que acessá não é o dono
+                # se documento é privado e usuário que acessa não é o dono
                 # não terá permissão.
                 if self.object.visibilidade == Documento.STATUS_PRIVATE and \
                         self.request.user != self.object.owner:
                     has_permission = False
 
-                # se documento é público, testa se usuário tem permissão.
-                elif self.object.visibilidade == Documento.STATUS_PUBLIC:
+                # independente do status, o usuário deve ter permissão da
+                # classe
+                if has_permission:
                     has_permission = super().has_permission()
 
-                # se documento é restrito, analisa quais usuários possuem
-                # permission_required para o documento
-                elif self.object.visibilidade == Documento.STATUS_RESTRICT:
+                # se documento é restrito, verifica se usuário possue
+                # permissão para o documento
+                if has_permission and \
+                        self.object.visibilidade == Documento.STATUS_RESTRICT:
 
-                    perms = self.get_permission_required()
+                    # Permissão para usuário sem associação com permission
+                    qu = Q(permission__isnull=True,
+                           user=self.request.user,
+                           documento=self.object)
 
-                    for perm in perms:
-                        perm = perm.split('.')
+                    if PermissionsUserDocumento.objects.filter(qu).exists() or\
+                            self.request.user == self.object.owner:
+                        pass
+                    else:
 
-                        if not PermissionsUserDocumento.objects.filter(
+                        perms = self.get_permission_required()
+
+                        for perm in perms:
+                            perm = perm.split('.')
+
+                            # Permissão individual user, object, permission
+                            qup = Q(
                                 permission__content_type__app_label=perm[0],
                                 permission__codename=perm[1],
                                 user=self.request.user,
-                                documento=self.object).exists():
-                            has_permission = False
-                            break
+                                documento=self.object)
+
+                            # Permissão de objeto
+                            qp = Q(
+                                permission__content_type__app_label=perm[0],
+                                permission__codename=perm[1],
+                                user__isnull=True,
+                                documento=self.object)
+
+                            if not PermissionsUserDocumento.objects.filter(
+                                    qp | qup).exists():
+                                has_permission = False
+                                break
         else:
             has_permission = super().has_permission()
 
@@ -1051,7 +1074,7 @@ class DocumentoDeleteView(DocumentoPermissionRequiredMixin, DeleteView):
 
 
 class DocumentoConstructView(DocumentoPermissionRequiredMixin, TemplateView):
-    permission_required = ('sigad.change_documento', 'sigad.add_documento')
+    permission_required = ('sigad.change_documento',)
     template_name = 'sigad/documento_construct.html'
     model = Documento
 
@@ -1061,6 +1084,7 @@ class DocumentoConstructView(DocumentoPermissionRequiredMixin, TemplateView):
 
 
 class DocumentoConstructCreateView(DocumentoConstructView):
+    permission_required = ('sigad.add_documento',)
     model = Classe
 
 
