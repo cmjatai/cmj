@@ -604,15 +604,49 @@ class DocumentoManager(models.Manager):
         return Q(visibilidade=Documento.STATUS_PRIVATE, owner=user)
 
     def filter_q_restrict(self, user):
-        # Itens restritos que possuem usuário catalogados para o acesso
-        # e não dependem de permissões
 
         qstatus = Q(visibilidade=Documento.STATUS_RESTRICT)
+
+        # Itens restritos que possuem usuário catalogados para o acesso
+        # e não dependem de permissões
         q0 = Q(permissions_user_set__permission__isnull=True,
                permissions_user_set__user=user)
 
+        # se não existir restrição, basta pertencer ao grupo de view restrito
+        q1 = Q(permissions_user_set__isnull=True)
+
+        if type.mro(type(self))[0] == DocumentoManager:
+            return qstatus & (q0 | q1)
+
+        if isinstance(self.instance, Classe):
+            q2 = Q(classe__permissions_user_set__permission__isnull=True,
+                   classe__permissions_user_set__user=user)
+
+            q3 = Q(classe__permissions_user_set__isnull=True)
+
+            return qstatus & (q0 | q1 | q2 | q3)
+
+        elif isinstance(self.instance, Parlamentar):
+            return qstatus & q0
+        elif isinstance(self.instance, Documento):
+            return qstatus
+        else:
+            raise Exception(_('Modelo não tratado na filtragem de um '
+                              'Documento restrito'))
+
+    def filter_q_restrict_teste_com_permissoes(self, user):
+
+        qstatus = Q(visibilidade=Documento.STATUS_RESTRICT)
+
+        # Itens restritos que possuem usuário catalogados para o acesso
+        # e não dependem de permissões
+        q0 = Q(permissions_user_set__permission__isnull=True,
+               permissions_user_set__user=user)
+
+        # Itens restritos que não possuem usuário catalogados para o acesso
+        # mas exigem que o usuário possua certas permissões
         q1 = Q(
-            permissions_user_set__permission__in=user.user_permissions.all(),
+            permissions_user_set__permission__group_set__name=globalrules.GROUP_SIGAD_VIEW_STATUS_RESTRITOS,
             permissions_user_set__user__isnull=True)
 
         if type.mro(type(self))[0] == DocumentoManager:
@@ -637,7 +671,7 @@ class DocumentoManager(models.Manager):
                    classe__permissions_user_set__user=user)
 
             q3 = Q(
-                classe__permissions_user_set__permission__in=user.user_permissions.all(),
+                classe__permissions_user_set__permission__group_set__name=globalrules.GROUP_SIGAD_VIEW_STATUS_RESTRITOS,
                 classe__permissions_user_set__user__isnull=True)
 
             return (qstatus & (q0 | q1)) | (qstatus & (q2 | q3))

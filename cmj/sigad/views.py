@@ -930,7 +930,8 @@ class PermissionsUserClasseCrud(MasterDetailCrud):
     parent_field = 'classe'
 
     class BaseMixin(MasterDetailCrud.BaseMixin):
-        list_field_names = ['permission',  'user', ]
+        list_field_names = [
+            ('user__id', 'user', 'user__email')]
 
         def get_context_data(self, **kwargs):
 
@@ -1120,8 +1121,7 @@ class PermissionsUserDocumentoCrud(MasterDetailCrud):
 
     class BaseMixin(MasterDetailCrud.BaseMixin):
         list_field_names = [
-            ('permission', 'permission__codename'),
-            ('user__id', 'user')]
+            ('user__id', 'user', 'user__email')]
 
         def get_context_data(self, **kwargs):
 

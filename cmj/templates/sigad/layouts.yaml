@@ -1,7 +1,7 @@
 {% load i18n %}
 PermissionsUserClasse:
   {% trans 'Usuários com Acesso' %}:
-  - user permission
+  - user
 PermissionsUserDocumento:
   {% trans 'Usuários com Acesso' %}:
-  - user permission
+  - user
