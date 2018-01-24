@@ -615,16 +615,16 @@ class DocumentoManager(models.Manager):
         # se não existir restrição, basta pertencer ao grupo de view restrito
         q1 = Q(permissions_user_set__isnull=True)
 
+        q2 = Q(classe__permissions_user_set__permission__isnull=True,
+               classe__permissions_user_set__user=user)
+
+        q3 = Q(classe__permissions_user_set__isnull=True)
+
         if type.mro(type(self))[0] == DocumentoManager:
             return qstatus & (q0 | q1)
 
         if isinstance(self.instance, Classe):
-            q2 = Q(classe__permissions_user_set__permission__isnull=True,
-                   classe__permissions_user_set__user=user)
-
-            q3 = Q(classe__permissions_user_set__isnull=True)
-
-            return qstatus & (q0 | q1 | q2 | q3)
+            return qstatus & (q0 | (q1 & q3) | q2 | q3)
 
         elif isinstance(self.instance, Parlamentar):
             return qstatus & q0
@@ -725,6 +725,7 @@ class DocumentoManager(models.Manager):
                     q = q | self.filter_q_restrict(user)
 
                 qs_user = qs_user.filter(q, q_filter)
+                # print(str(qs_user.query))
 
             qs = qs.union(qs_user)
 

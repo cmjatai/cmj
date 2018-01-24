@@ -4,7 +4,6 @@ import zipfile
 
 from braces.views import FormMessagesMixin
 from django.contrib.auth.mixins import PermissionRequiredMixin
-
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse_lazy
 from django.db.models import F, Q
@@ -16,10 +15,9 @@ from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView, MultipleObjectMixin
-
 from sapl.parlamentares.models import Parlamentar, Legislatura
 
-
+from cmj import globalrules
 from cmj.crud.base import MasterDetailCrud
 from cmj.sigad import forms, models
 from cmj.sigad.forms import DocumentoForm
@@ -425,12 +423,13 @@ class PathView(MultipleObjectMixin, TemplateView):
                         raise Http404()
                     self.parent_classe = parent
                 else:
-                    # Se não configurada nenhuma restrição mas o doc é restrito
-                    # será liberado se o usuário conectado for o dono
-                    # da classe ou documento ou se o user for o admin
+                    # Se não configurada nenhuma restrição mas o OBJ é restrito
+                    # será liberado se o usuário pertencer ao grupo
+                    # globalrules.GROUP_SIGAD_VIEW_STATUS_RESTRITOS
 
-                    if request.user == obj[0].owner or \
-                            request.user.is_superuser:
+                    if request.user.groups.filter(
+                        name=globalrules.GROUP_SIGAD_VIEW_STATUS_RESTRITOS
+                    ).exists():
                         pass
                     else:
                         raise Http404()
@@ -798,8 +797,7 @@ class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
         context['object'] = self.object
 
         if self.object:
-            if self.object.visibilidade == Classe.STATUS_RESTRICT:
-                context['subnav_template_name'] = 'sigad/subnav_classe.yaml'
+            context['subnav_template_name'] = 'sigad/subnav_classe.yaml'
 
         return ListView.get_context_data(self, **context)
 
