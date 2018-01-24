@@ -390,6 +390,9 @@ class PathView(MultipleObjectMixin, TemplateView):
 
                 # permissoes vazias significa q se comporta como regras do
                 # primeiro pai que possua mapeamento
+                if obj[0].__class__ == Documento and parent.raiz:
+                    parent = parent.raiz
+
                 while parent and not parent.permissions_user_set.exists():
                     parent = parent.parent
 
@@ -418,6 +421,8 @@ class PathView(MultipleObjectMixin, TemplateView):
                         user__isnull=True,
                         permission__codename=obj[1]).exists() and\
                             request.user.has_perm('sigad.' + obj[1]):
+                        pass
+                    elif request.user.is_superuser:
                         pass
                     else:
                         raise Http404()
