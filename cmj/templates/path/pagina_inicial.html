@@ -22,6 +22,11 @@
     </div>
 
     <div class="col-md-4">
+      <div class="alert alert-info alert-novo-site" role="alert">
+        <small><small><small>Este é nosso novo Portal.<br>
+          <a href="http://siteantigo.camarajatai.go.gov.br">O antigo ainda pode ser acessado aqui.</a>
+        </small></small></small>
+      </div>
       {% with noticias_dos_parlamentares as object_list %}
           {% include "path/pagina_inicial_noticia_parlamentares.html" %}
       {% endwith %}

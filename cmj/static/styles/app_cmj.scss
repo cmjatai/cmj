@@ -140,7 +140,12 @@ body, html {
 .text-maroon {
   color: #85144b !important;
 }
-
+.alert.alert-novo-site {
+  line-height: 1em;
+  margin: 5px 10px;
+  padding:5px;
+  text-align: center;
+}
 // drunken-parrot flat ui ########################################
 
 .btn-link:hover, .btn-link:focus {
