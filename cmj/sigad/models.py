@@ -441,7 +441,7 @@ def short_url(**kwargs):
     import urllib3
     import json
 
-    domain = kwargs.get('domain', 'http://www2.camarajatai.go.gov.br')
+    domain = kwargs.get('domain', 'http://www.camarajatai.go.gov.br')
 
     slug = kwargs.get('slug', '')
 
