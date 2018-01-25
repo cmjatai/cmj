@@ -232,6 +232,7 @@ class PathView(MultipleObjectMixin, TemplateView):
             context['next'] = next
             context['previous'] = previous
 
+            # FIXME: RETIRAR RESTRIÇÃO DE CLASSE E UTILIZAR OUTRA ABORDAGEM
             docs = Documento.objects.qs_docs(
             ).exclude(id=self.documento.id)
 
