@@ -9,7 +9,7 @@ from django.core.urlresolvers import reverse_lazy
 from django.db.models import F, Q
 from django.db.models.aggregates import Max, Count
 from django.http.response import Http404, HttpResponse, HttpResponseForbidden
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
@@ -310,7 +310,9 @@ class PathView(MultipleObjectMixin, TemplateView):
         if not slug:
             raise Http404()
 
-        self._pre_dispatch(request, *args, **kwargs)
+        result = self._pre_dispatch(request, *args, **kwargs)
+        if result:
+            return result
 
         return TemplateView.dispatch(self, request, *args, **kwargs)
 
@@ -326,14 +328,22 @@ class PathView(MultipleObjectMixin, TemplateView):
             try:
                 # Verifica se é um documento
                 self.documento = Documento.objects.get(slug=slug)
-            except Exception as e:
+            except:
                 try:
                     # verifica se é uma referência
                     ref = ReferenciaEntreDocumentos.objects.get(slug=slug)
                     self.documento = ref.referenciado
                     self.referencia = ref
                 except:
-                    raise Http404()
+                    try:
+                        # Verifica se é um link do antigo site
+                        self.documento = Documento.objects.get(
+                            old_path='/' + slug)
+
+                        if self.documento:
+                            return redirect('/' + self.documento.slug)
+                    except:
+                        raise Http404()
 
         if self.documento and self.documento.tipo >= 100 and \
                 self.documento.tipo < 900:
