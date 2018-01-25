@@ -3,7 +3,7 @@
 - title: {% trans 'Página Inicial' %}
   url: /
 - title: {% trans 'Parlamentares' %}
-url: /parlamentar
+  url: /parlamentar
 - title: {% trans 'Notícias' %}
   url: /noticias
 - title: {% trans 'TV CMJ' %}
