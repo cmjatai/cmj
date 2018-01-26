@@ -587,6 +587,10 @@ class DocumentoManager(models.Manager):
     filters_created = False
 
     def q_filters(self):
+        self.q_doc_public = (Q(public_end_date__gte=timezone.now()) |
+                             Q(public_end_date__isnull=True) &
+                             Q(public_date__lte=timezone.now(),
+                               visibilidade=Documento.STATUS_PUBLIC))
         if self.filters_created:
             return
         self.filters_created = True
@@ -595,10 +599,6 @@ class DocumentoManager(models.Manager):
         self.q_gallery = Q(tipo=Documento.TPD_GALLERY)
         self.q_image = Q(tipo=Documento.TPD_IMAGE)
         self.q_bi = Q(tipo=Documento.TD_BI, parent__isnull=True)
-        self.q_doc_public = (Q(public_end_date__gte=timezone.now()) |
-                             Q(public_end_date__isnull=True) &
-                             Q(public_date__lte=timezone.now(),
-                               visibilidade=Documento.STATUS_PUBLIC))
 
     def filter_q_private(self, user):
         return Q(visibilidade=Documento.STATUS_PRIVATE, owner=user)
