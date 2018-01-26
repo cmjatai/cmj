@@ -29,7 +29,7 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.views.generic.base import TemplateView
+from django.views.generic.base import TemplateView, RedirectView
 from django.views.static import serve as view_static_server
 
 # import sapl.api.urls
@@ -53,6 +53,8 @@ import cmj.sigad.urls
 
 
 urlpatterns = [
+    # FIXME: eliminar redirecionamento em 2019
+    url(r'^portal/?$', RedirectView.as_view(url='/')),
 
 
     url(r'^admin/', admin.site.urls),
