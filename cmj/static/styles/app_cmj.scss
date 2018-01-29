@@ -218,7 +218,7 @@ body, html {
     line-height: 40px;
     color: white;
     font-family: "Graduate";
-    padding: 0 0 0 20px;
+    padding:0;
     display: block;
     position: relative;
     margin: 0 !important;
@@ -233,9 +233,11 @@ body, html {
       background: transparent url("/static/img/bg_cmj_topo_menu_box_left.png") no-repeat scroll left top;
       background-size: auto $navbar-height;
     }
-
     &:hover {
       color: $color_text_inverse;
+    }
+    .fa-home {
+      padding: 0 0.45em 0 0.48em;
     }
   }
   .navbar-nav {
@@ -3120,7 +3122,6 @@ main {
   }
   .navbar {
     a.navbar-brand {
-      padding: 0 0 0 5px;
       font-size: 16px;
     }
     button.navbar-toggle {
@@ -3285,7 +3286,6 @@ main {
     .navbar-nav {
       li { /* Para todo item e subitem*/
         a { /* Para todo link*/
-          font-size: 1.2em;
           &:hover, &:focus {
             background: $hover_background_10pw;
           }
@@ -3389,6 +3389,13 @@ main {
 @media screen and (max-width: 1199px) {
 }
 
+@media screen and (max-width: 991px) {
+  .navbar.navbar-menu .navbar-nav > li a {
+    padding-left: $grid-gutter-width/3;
+    padding-right: $grid-gutter-width/3;
+    }
+}
+
 
 
 @media screen and (max-width: 800px) {
@@ -3454,7 +3461,6 @@ main {
 @media screen and (min-width: 1200px) {
   .navbar a.navbar-brand {
     font-size: 28px;
-    padding: 0 0 0 30px;
   }
 
   .container-legislaturas {
@@ -3479,7 +3485,6 @@ main {
 
   .navbar a.navbar-brand {
     font-size: 35px;
-    padding: 0 0 0 30px;
   }
 
 }
