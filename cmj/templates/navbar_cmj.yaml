@@ -1,7 +1,5 @@
 {% load i18n common_cmj_tags %}
 
-- title: {% trans 'Página Inicial' %}
-  url: /
 - title: {% trans 'Parlamentares' %}
   url: /parlamentar
 - title: {% trans 'Notícias' %}

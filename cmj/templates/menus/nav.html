@@ -5,7 +5,7 @@
       {% if item.children %}
         <li class="dropdown">
           <a class="dropdown-toggle" href="{{item.url}}" role="button" aria-haspopup="true" aria-expanded="false">
-            {{ item.title }}
+            {{ item.title|safe }}
              <span class="caret"></span>
           </a>
           <ul class="dropdown-menu menu-left" role="menu">
@@ -18,7 +18,7 @@
         </li>
       {% else %}
         {% if item.url %}
-          <li><a href="{{ item.url }}">{% trans item.title %}</a></li>
+          <li><a href="{{ item.url }}">{% trans item.title|safe %}</a></li>
         {% endif %}
       {% endif %}
     {% endfor %}
