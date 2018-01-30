@@ -27,5 +27,5 @@
   children:
   - title: {% trans 'Localização e Horários' %}
     url: /fale-conosco/localizacao-e-horarios
-    - title: {% trans 'Telefones' %}
+  - title: {% trans 'Telefones' %}
     url: /fale-conosco/telefones
