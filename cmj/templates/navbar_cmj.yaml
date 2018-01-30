@@ -3,8 +3,8 @@
 - title: {% trans 'Institucional' %}
   url: /institucional
   children:
-  - title: {% trans 'Imagens' %}
-    url: /galerias/imagens
+  - title: {% trans 'Nossa Jataí' %}
+    url: /institucional/nossa-jatai
 
 - title: {% trans 'Parlamentares' %}
   url: /parlamentar
