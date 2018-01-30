@@ -157,7 +157,7 @@
       {% block base_header %}
          {{block.super}}
       {% endblock %}
-      {{object.texto|safe|urlize}}
+      {{object.texto|default:''|safe|urlize}}
     </div>
   {% endwith %}
 

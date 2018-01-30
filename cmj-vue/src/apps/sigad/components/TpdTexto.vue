@@ -2,6 +2,7 @@
   <div :class="name_component">
     <div class="btn-toolbar widgets widget-top">
       <div class="btn-group btn-group-xs pull-right">
+        <button v-on:click.self="toogleEditor" :title="[usarfroala ? 'Usar Editor Simples' : 'Usar Editor Avançado' ]" type="button" class="btn btn-success">Edição de Texto</button>
         <button v-on:click.self="deleteParte" title="Remover este Fragmento de Texto" type="button" class="btn btn-danger">x</button>
       </div>
       <div v-if="!elemento.titulo" class="btn-group btn-group-xs pull-right">
@@ -16,9 +17,10 @@
     <span v-if="has_titulo || elemento.titulo" class="path-title-partes">
       <input v-model.lazy="elemento.titulo" placeholder="Subtítulo para Fragmento de Texto..."/>
     </span>
-    <div class="construct">
-      <froala :tag="'textarea'" :config="config" v-model.lazy="elemento.texto"></froala>
+    <div class="construct" v-if="usarfroala" >
+      <froala v-if="usarfroala" :tag="'textarea'" :config="config" v-model.lazy="elemento.texto"></froala>
     </div>
+      <textarea-autosize  v-if="!usarfroala" v-model.lazy="elemento.texto" placeholder="Fragmento de Texto" :align="'text-left'"/>
     <component :is="classChild(value)" v-for="(value, key) in childsOrdenados" :child="value" :parent="elemento" :key="value.id"/>
   </div>
 </template>
@@ -47,10 +49,14 @@ export default {
           }
         }
       },
-      model: 'texto do model'
+      model: 'texto do model',
+      usarfroala: true,
     }
   },
   methods: {
+    toogleEditor: function() {
+      this.usarfroala = !this.usarfroala
+    }
   },
 }
 </script>

@@ -4,7 +4,7 @@
     {% for item in menu %}
       {% if item.children %}
         <li class="dropdown">
-          <a class="dropdown-toggle" href="{% if item.url %}{{item.url}}{%else%}#fakeLink{%endif%}" role="button" aria-haspopup="true" aria-expanded="false">
+          <a class="dropdown-toggle" href="{% if item.url %}{{item.url}}{%else%}#fakeLink{%endif%}" role="button" aria-haspopup="true" aria-expanded="false" {% if not item.url %}data-toggle="dropdown"{%endif%} >
             {{ item.title|safe }}
              <span class="caret"></span>
           </a>
