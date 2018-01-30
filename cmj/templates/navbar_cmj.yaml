@@ -1,5 +1,11 @@
 {% load i18n common_cmj_tags %}
 
+- title: {% trans 'Institucional' %}
+  url: /institucional
+  children:
+  - title: {% trans 'Imagens' %}
+    url: /galerias/imagens
+
 - title: {% trans 'Parlamentares' %}
   url: /parlamentar
 - title: {% trans 'Notícias' %}
