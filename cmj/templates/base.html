@@ -110,7 +110,7 @@
                     <span class="caret"></span>
                     {% for us in user.social_auth.all %}
                       {% if us.provider == 'facebook' %}
-                        <img class="avatar" src="http://graph.facebook.com/v2.6/{{us.uid}}/picture?height=46" />
+                        <img class="avatar" src="https://graph.facebook.com/v2.6/{{us.uid}}/picture?height=46" />
                       {% endif %}
                     {% endfor %}
                   </a>
@@ -127,7 +127,7 @@
                 <a class="dropdown-toggle" href="#fakeLink" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Acessar" %}</span></a>
                 <ul class="dropdown-menu me menu-rightnu-right">
                   <li><a href="{% url 'cmj.core:login' %}">{% trans "Portal" %}</a></li>
-                  <li><a href="http://mail.camarajatai.go.gov.br">{% trans "Webmail" %}</a></li>
+                  <li><a href="https://mail.camarajatai.go.gov.br">{% trans "Webmail" %}</a></li>
                 </ul>
               </li>
                {% endif %}
@@ -167,7 +167,7 @@
                         {{ user.get_full_name|default:user.email }}
                         <span class="caret"></span>
                         {% if user.social_auth.all.0.provider == 'facebook' %}
-                          <img class="avatar" src="http://graph.facebook.com/v2.6/{{user.social_auth.all.0.uid}}/picture?height=46" />
+                          <img class="avatar" src="https://graph.facebook.com/v2.6/{{user.social_auth.all.0.uid}}/picture?height=46" />
                         {% endif %}
                       </a>
                       <ul class="dropdown-menu me menu-rightnu-right">
@@ -180,7 +180,7 @@
                     <a class="dropdown-toggle" href="#fakeLink" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Acessar" %}</span></a>
                     <ul class="dropdown-menu me menu-rightnu-right">
                       <li><a href="{% url 'cmj.core:login' %}">{% trans "Portal" %}</a></li>
-                      <li><a href="http://webmail.camarajatai.go.gov.br">{% trans "Webmail" %}</a></li>
+                      <li><a href="https://mail.camarajatai.go.gov.br">{% trans "Webmail" %}</a></li>
                     </ul>
 
                   </li>
