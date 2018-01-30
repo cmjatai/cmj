@@ -1,7 +1,7 @@
 {% load i18n common_cmj_tags %}
 
 - title: {% trans 'Institucional' %}
-  url: /institucional
+  url: 
   children:
   - title: {% trans 'Nossa Jataí' %}
     url: /institucional/nossa-jatai
