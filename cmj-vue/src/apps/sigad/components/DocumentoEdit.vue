@@ -117,7 +117,7 @@ export default {
       else {
         try {
           let classe = this.getChoices.all_bycode[value.tipo]['component_tag']
-          if (this.getDocObject.tipo !== 0)
+          if ([10, ].indexOf(this.getDocObject.tipo) !== -1)
             classe += '-'+this.getChoices.all_bycode[this.getDocObject.tipo]['component_tag']
           return classe
         }

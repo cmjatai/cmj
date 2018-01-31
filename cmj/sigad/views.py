@@ -253,6 +253,7 @@ class PathView(MultipleObjectMixin, TemplateView):
 
     def get_context_data_classe(self, **kwargs):
         template = self.classe.template_classe
+
         if template == models.CLASSE_TEMPLATES_CHOICE.lista_em_linha:
             kwargs[
                 'object_list'
@@ -264,6 +265,13 @@ class PathView(MultipleObjectMixin, TemplateView):
 
         elif template == models.CLASSE_TEMPLATES_CHOICE.fotografia:
             kwargs['object_list'] = self.classe.documento_set.qs_bi(
+                self.request.user)
+        elif template == models.CLASSE_TEMPLATES_CHOICE.galeria_audio:
+            kwargs['object_list'] = self.classe.documento_set.qs_audio_news(
+                self.request.user)
+
+        elif template == models.CLASSE_TEMPLATES_CHOICE.galeria_video:
+            kwargs['object_list'] = self.classe.documento_set.qs_video_news(
                 self.request.user)
 
         elif template == models.CLASSE_TEMPLATES_CHOICE.parlamentar:

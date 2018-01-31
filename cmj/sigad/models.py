@@ -61,14 +61,18 @@ CLASSE_TEMPLATES_CHOICE_FILES = {
     3: 'path/path_parlamentares.html',
     4: 'path/path_parlamentar.html',
     5: 'path/path_galeria.html',
+    6: 'path/path_classe.html',
+    7: 'path/path_classe.html',
 }
 
 CLASSE_TEMPLATES_CHOICE = CmjChoices(
-    (1, 'lista_em_linha', _('Galeria de Notícias')),
-    (2, 'galeria', _('Galeria Pública de Albuns')),
+    (1, 'lista_em_linha', _('Listagem em Linha')),
+    (2, 'galeria', _('Galeria Albuns')),
     (3, 'parlamentares', _('Página dos Parlamentares')),
     (4, 'parlamentar', _('Página individual de Parlamentar')),
     (5, 'fotografia', _('Banco de Imagens')),
+    (6, 'galeria_audio', _('Galeria de Áudios')),
+    (7, 'galeria_video', _('Galeria de Vídeos')),
 )
 
 
@@ -608,6 +612,10 @@ class DocumentoManager(models.Manager):
         self.q_gallery = Q(tipo=Documento.TPD_GALLERY)
         self.q_image = Q(tipo=Documento.TPD_IMAGE)
         self.q_bi = Q(tipo=Documento.TD_BI, parent__isnull=True)
+        self.q_audio_news = Q(
+            tipo=Documento.TD_AUDIO_NEWS, parent__isnull=True)
+        self.q_video_news = Q(
+            tipo=Documento.TD_VIDEO_NEWS, parent__isnull=True)
 
     def filter_q_private(self, user):
         return Q(visibilidade=Documento.STATUS_PRIVATE, owner=user)
@@ -708,6 +716,14 @@ class DocumentoManager(models.Manager):
     def qs_news(self, user=None):
         self.q_filters()
         return self.qs_docs(user, q_filter=self.q_news)
+
+    def qs_audio_news(self, user=None):
+        self.q_filters()
+        return self.qs_docs(user, q_filter=self.q_audio_news)
+
+    def qs_video_news(self, user=None):
+        self.q_filters()
+        return self.qs_docs(user, q_filter=self.q_video_news)
 
     def qs_docs(self, user=None, q_filter=None):
 
