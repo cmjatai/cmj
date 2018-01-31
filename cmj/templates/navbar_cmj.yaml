@@ -1,9 +1,14 @@
 {% load i18n common_cmj_tags %}
 - title: {% trans 'Institucional' %}
-  url:
+  url: ''
   children:
   - title: {% trans 'Nossa Jataí' %}
     url: /institucional/nossa-jatai
+- title: {% trans 'História' %}
+  url: /historia
+  children:
+  - title: {% trans 'Prefeitos de Nossa História' %}
+    url: /historia/prefeitos-de-nossa-historia
 - title: {% trans 'Parlamentares' %}
   url: /parlamentar
 - title: {% trans 'Notícias' %}
@@ -23,7 +28,7 @@
   - title: {% trans 'Imagens' %}
     url: /galerias/imagens
 - title: {% trans 'Fale Conosco' %}
-  url: 
+  url: ''
   children:
   - title: {% trans 'Localização e Horários' %}
     url: /fale-conosco/localizacao-e-horarios

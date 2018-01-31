@@ -62,10 +62,6 @@ export default {
       'sendMessage',
     ]),
     handlerWatch(newValue, oldValue, attr=null) {
-      if (this.ready.indexOf(attr) === -1) {
-        this.ready.push(attr)
-        return
-      }
 
       let data = Object()
       let referencia = Object()
