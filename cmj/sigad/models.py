@@ -64,7 +64,7 @@ CLASSE_TEMPLATES_CHOICE_FILES = {
 }
 
 CLASSE_TEMPLATES_CHOICE = CmjChoices(
-    (1, 'lista_em_linha', _('Listagem Simples em Linha')),
+    (1, 'lista_em_linha', _('Galeria de Notícias')),
     (2, 'galeria', _('Galeria Pública de Albuns')),
     (3, 'parlamentares', _('Página dos Parlamentares')),
     (4, 'parlamentar', _('Página individual de Parlamentar')),
