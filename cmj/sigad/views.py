@@ -196,14 +196,14 @@ class PathView(MultipleObjectMixin, TemplateView):
 
                 if parlamentares:
 
-                    next = Documento.objects.qs_docs().filter(
+                    next = Documento.objects.qs_news().filter(
                         public_date__gte=self.documento.public_date,
                         classe=self.documento.classe,
                         parlamentares__in=parlamentares,
                     ).exclude(
                         id=self.documento.id).last()
 
-                    previous = Documento.objects.qs_docs().filter(
+                    previous = Documento.objects.qs_news().filter(
                         public_date__lte=self.documento.public_date,
                         classe=self.documento.classe,
                         parlamentares__in=parlamentares,
@@ -211,14 +211,14 @@ class PathView(MultipleObjectMixin, TemplateView):
                         id=self.documento.id).first()
                 else:
 
-                    next = Documento.objects.qs_docs().filter(
+                    next = Documento.objects.qs_news().filter(
                         public_date__gte=self.documento.public_date,
                         classe=self.documento.classe,
                         parlamentares__isnull=True,
                     ).exclude(
                         id=self.documento.id).last()
 
-                    previous = Documento.objects.qs_docs().filter(
+                    previous = Documento.objects.qs_news().filter(
                         public_date__lte=self.documento.public_date,
                         classe=self.documento.classe,
                         parlamentares__isnull=True,
@@ -232,8 +232,7 @@ class PathView(MultipleObjectMixin, TemplateView):
             context['next'] = next
             context['previous'] = previous
 
-            # FIXME: RETIRAR RESTRIÇÃO DE CLASSE E UTILIZAR OUTRA ABORDAGEM
-            docs = Documento.objects.qs_docs(
+            docs = Documento.objects.qs_news(
             ).exclude(id=self.documento.id)
 
             if parlamentares.exists():
