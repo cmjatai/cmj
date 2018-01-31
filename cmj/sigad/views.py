@@ -39,7 +39,7 @@ class PaginaInicialView(TemplateView):
 
         context['noticias_dos_parlamentares'] = np
 
-        context['noticias_destaque'] = Documento.objects.qs_docs(
+        context['noticias_destaque'] = Documento.objects.qs_news(
         ).filter(
             parlamentares__isnull=True,
             classe_id=1,
@@ -60,7 +60,7 @@ class PaginaInicialView(TemplateView):
     def get_noticias_dos_parlamentares(self):
         legislatura_atual = Legislatura.objects.first()
 
-        docs = Documento.objects.qs_docs()
+        docs = Documento.objects.qs_news()
 
         docs = docs.annotate(
             count_parlamentar=Count("parlamentares", distinct=True)

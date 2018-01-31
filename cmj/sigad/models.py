@@ -200,9 +200,13 @@ class CMSMixin(models.Model):
         (ALINHAMENTO_CENTER, 'alinhamento_center', _('Alinhamento Centralizado')),
     )
 
-    TD_DOC = 0
+    TD_NEWS = 0
+    TD_DOC = 5
     TD_BI = 10
     TD_GALERIA_PUBLICA = 20
+    TD_AUDIO_NEWS = 30
+    TD_VIDEO_NEWS = 40
+
     TPD_TEXTO = 100
     TPD_CONTAINER_SIMPLES = 700
     TPD_CONTAINER_EXTENDIDO = 701
@@ -212,7 +216,8 @@ class CMSMixin(models.Model):
     TPD_GALLERY = 901
 
     # Documentos completos
-    TDs = (TD_DOC, TD_BI, TD_GALERIA_PUBLICA)
+    TDs = (TD_NEWS, TD_DOC, TD_BI, TD_GALERIA_PUBLICA,
+           TD_AUDIO_NEWS, TD_VIDEO_NEWS)
 
     # Containers
     TDc = (TPD_CONTAINER_SIMPLES, TPD_CONTAINER_EXTENDIDO)
@@ -222,9 +227,12 @@ class CMSMixin(models.Model):
 
     tipo_parte_doc = {
         'documentos': CmjChoices(
+            (TD_NEWS, 'td_news', _('Notícia')),
             (TD_DOC, 'td_doc', _('Documento')),
             (TD_BI, 'td_bi', _('Banco de Imagem')),
-            (TD_GALERIA_PUBLICA, 'td_galeria_publica', _('Galeria Pública'))
+            (TD_GALERIA_PUBLICA, 'td_galeria_publica', _('Galeria Pública')),
+            (TD_AUDIO_NEWS, 'td_audio_news', _('Áudio Notícia')),
+            (TD_VIDEO_NEWS, 'td_video_news', _('Vídeo Notícia')),
         ),
 
         'containers': CmjChoices(
@@ -595,6 +603,7 @@ class DocumentoManager(models.Manager):
             return
         self.filters_created = True
 
+        self.q_news = Q(tipo=Documento.TD_NEWS, parent__isnull=True)
         self.q_doc = Q(tipo=Documento.TD_DOC, parent__isnull=True)
         self.q_gallery = Q(tipo=Documento.TPD_GALLERY)
         self.q_image = Q(tipo=Documento.TPD_IMAGE)
@@ -695,6 +704,10 @@ class DocumentoManager(models.Manager):
     def qs_images(self, user=None):
         self.q_filters()
         return self.qs_docs(user, q_filter=self.q_image)
+
+    def qs_news(self, user=None):
+        self.q_filters()
+        return self.qs_docs(user, q_filter=self.q_news)
 
     def qs_docs(self, user=None, q_filter=None):
 
