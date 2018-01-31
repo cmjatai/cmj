@@ -22,7 +22,7 @@ from django.forms.models import ModelForm, ModelMultipleChoiceField
 from django.http.request import QueryDict
 from django.utils.translation import ugettext_lazy as _
 from django_filters.filters import CharFilter, ChoiceFilter, NumberFilter,\
-    DateFromToRangeFilter, ModelChoiceFilter, RangeFilter,\
+    ModelChoiceFilter, RangeFilter,\
     MultipleChoiceFilter, ModelMultipleChoiceFilter, Filter
 from django_filters.filterset import FilterSet, STRICTNESS
 from sapl.crispy_layout_mixin import to_column, SaplFormLayout, to_fieldsets,\
@@ -663,7 +663,10 @@ class DataRangeFilter(Filter):
         if inicial > final:
             inicial, final = final, inicial
 
-        range_select = Q(data__range=[inicial, final])
+        params = {
+            self.field_name + '__range': [inicial, final]}
+
+        range_select = Q(**params)
 
         # Run the query.
         return queryset.filter(range_select)
@@ -833,6 +836,9 @@ class ImpressoEnderecamentoContatoFilterSet(FilterSet):
             'day': 'extract( day from data_nascimento )', }
         ).order_by('month', 'day', 'nome').filter(query)
 
+    data_nascimento = DataRangeFilter(widget=RangeWidgetOverride,
+                                      method='filter_data_nascimento')
+
     class Meta:
         model = Contato
         fields = ['search',
@@ -840,7 +846,7 @@ class ImpressoEnderecamentoContatoFilterSet(FilterSet):
                   'tem_filhos',
                   'data_nascimento',
                   'tipo_autoridade']
-        filter_overrides = {
+        """filter_overrides = {
             models.DateField: {
                 'filter_class': DataRangeFilter,
                 'extra': lambda f: {
@@ -848,7 +854,7 @@ class ImpressoEnderecamentoContatoFilterSet(FilterSet):
                     'widget': RangeWidgetOverride
                 }
             }
-        }
+        }"""
 
     def __init__(self, data=None,
                  queryset=None, prefix=None, strict=None, **kwargs):

@@ -23,7 +23,7 @@
   - title: {% trans 'Imagens' %}
     url: /galerias/imagens
 - title: {% trans 'Fale Conosco' %}
-  url:
+  url: 
   children:
   - title: {% trans 'Localização e Horários' %}
     url: /fale-conosco/localizacao-e-horarios
