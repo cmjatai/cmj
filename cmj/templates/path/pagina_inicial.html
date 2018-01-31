@@ -22,15 +22,86 @@
     </div>
 
     <div class="col-md-4">
-      <div class="alert alert-info alert-novo-site" role="alert">
-        Este é nosso novo Portal.<br>
-        <a href="http://siteantigo.camarajatai.go.gov.br">O antigo ainda pode ser acessado aqui.</a>
 
+      <div class="panel panel-info panel-nota-site-antigo">
+          <div class="panel-heading">
+            Este é nosso novo Portal.<br>
+            <a data-toggle="collapse" href="http://siteantigo.camarajatai.go.gov.br">O antigo ainda pode ser acessado aqui.</a>
+          </div>
+          <div class="panel-collapse collapse">
+            {% comment %}
+              <div class="panel-body">
+
+                <p>A partir do dia 25 de Janeiro de 2018, este é o novo Portal da Câmara Municipal de Jataí.</p>
+                <p>Esta mudança faz parte de um projeto que visa melhorar a transparência do Poder Legislativo jataiense,
+                  dando, para isso, mecanismos modermos de publicação de dados e de interação com o cidadão.</p>
+                <p>Até o lançamento deste, nosso portal era composto por mais de 10(dez) soluções tecnológicas gratuítas,
+                  porém de plataformas diferentes, antigas e de honerosa manutenção, desenvolvidas ao longo do tempo
+                  pela casa e/ou terceiros através da filosofia opensource.</p>
+                <p>Este novo projeto visa, numa primeira etapa, convergir as soluções existentes para uma mesma plataforma:
+                  robusta, integrada, com foco produtivo na gestão da informação e de fácil manutenção e evolução de novas e futuras necessidades.
+                  Numa segunda etapa, evoluir a qualidade da informação, ofertando-a de forma mais clara e através de melhores
+                  mecanismos de interação com nosso cidadão.
+                </p>
+                <p>No estágio atual, foi construído o alicerce para o novo Portal:
+                  foi implementado a tecnologia gratuíta que permite autenticação segura de usuário na plataforma de forma integrada as redes sociais principais (Google e Facebook);
+                  todas as notícias do portal antigo foram migradas; além do SAAP - Sistema de Apoio a Atividade Parlamentar.
+                </p>
+                <p>Nosso novo Portal utiliza tecnologia totalmente gratuíta e é aberto.
+                  <a href="https://github.com/cmjatai/cmj">Está disponível no GitHub</a>,
+                  onde pode ser conferido diariamente a evolução enquanto um processo de desenvolvimento de sistemas.
+                </p>
+                <p>
+                  As soluções isoladas que inicialmente serão redesenvolvidas e migradas para a nova plataforma, são: (em azul os itens já concretizados)
+                  <ol>
+                    <li class="text-primary" title="Já Migrado">Site de Notícias</li>
+                    <li class="text-primary" title="Já Migrado">Sistema de Fotografia</li>
+                    <li class="text-primary" title="Já Migrado">SAAP - Sistema de Apoio a Atividade Parlamentar</li>
+                    <li>Publicação de Licitações e Contratos</li>
+                    <li>Documentos Administrativos</li>
+                    <li>Integração com Youtube para a TvCmj</li>
+                    <li>Integração com SoundCloud para a RádioCmj</li>
+                    <li>Base da Legislação Jataiense</li>
+                    <li>SAPL - Sistema de Apoio ao Processo Legislativo
+                      <ul>
+                        <li>Matérias Legislativas</li>
+                        <li>Protocolo Geral</li>
+                        <li>Sessões Plenárias</li>
+                        <li class="text-primary" title="Já Migrado">Registro de Legislaturas e Parlamentares</li>
+                      </ul>
+                    </li>
+                    <li>SaplMobile - SAPL no plenário</li>
+                    <li>Republicação do Diário Oficial do Município</li>
+                    <li class="text-primary" title="Já Migrado">Serviço de Email</li>
+                    <li class="text-primary" title="Já Implementado">https - Troca segura de informação com o usuário</li>
+                    <li>Entre outras tecnologias para a gestão interna dos dados e inerentes ao Departamento de Informática</li>
+                  </ol>
+                </p>
+              </div>
+              {% endcomment %}
+          </div>
       </div>
+
       {% with noticias_dos_parlamentares as object_list %}
           {% include "path/pagina_inicial_noticia_parlamentares.html" %}
       {% endwith %}
     </div>
 
   </div>
+{% endblock %}
+
+{% block extra_js  %}
+
+
+<script type="text/javascript">
+  $(document).ready(function(){
+    $(".panel-nota-site-antigo").hover(
+     function() {
+        $('.panel-collapse').collapse('show');
+      }, function() {
+        $('.panel-collapse').collapse('hide');
+      }
+    );
+  });
+</script>
 {% endblock %}

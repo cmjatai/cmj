@@ -140,13 +140,6 @@ body, html {
 .text-maroon {
   color: #85144b !important;
 }
-.alert.alert-novo-site {
-  line-height: 1em;
-  margin: 5px 10px;
-  padding:5px;
-  text-align: center;
-  font-size: 0.65em;
-}
 // drunken-parrot flat ui ########################################
 
 .btn-link:hover, .btn-link:focus {
@@ -826,6 +819,8 @@ fieldset {
     }
   }
 }
+
+
 .h1,
 h1 {
   font-size: 35px;
@@ -858,6 +853,20 @@ h6 {
   padding-bottom: 18%;
 }
 
+
+.panel-nota-site-antigo {
+  margin-left: 20px;
+  font-size: 60%;
+  .panel-heading {
+    border: 0px;
+    text-align: center;
+    padding: 5px;
+    line-height: 1.2em;
+  }
+  .panel-body {
+    padding: 5px;
+  }
+}
 // #### footer ###########################################
 // based on http://getbootstrap.com/examples/sticky-footer
 $footer-height: 30px;
