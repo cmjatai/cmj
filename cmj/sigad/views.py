@@ -275,7 +275,7 @@ class PathView(MultipleObjectMixin, TemplateView):
 
         elif template == models.CLASSE_TEMPLATES_CHOICE.parlamentar:
             docs = self.classe.parlamentar.documento_set
-            kwargs['object_list'] = docs.qs_docs(self.request.user)
+            kwargs['object_list'] = docs.qs_news(self.request.user)
 
         self.object_list = kwargs['object_list']
         context = super().get_context_data(**kwargs)
