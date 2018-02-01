@@ -39,11 +39,11 @@
       - title: '{% trans '2013' %}'
         url: /tv-cmj/sessoes/sessoes-plenarias/2013
   - title: {% trans 'Audiências Públicas' %}
-    url: /tv-cmj/sessoes/audiencias-publicas
+    url: /tv-cmj/audiencias-publicas
   - title: {% trans 'Entrevistas' %}
-    url: /tv-cmj/sessoes/entrevistas
+    url: /tv-cmj/entrevistas
   - title: {% trans 'Memórias de jataí' %}
-    url: /tv-cmj/sessoes/memorias-de-jatai
+    url: /tv-cmj/memorias-de-jatai
 - title: {% trans 'Rádio CMJ' %}
   url: ''
   children:
