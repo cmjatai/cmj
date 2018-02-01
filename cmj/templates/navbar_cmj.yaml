@@ -14,13 +14,17 @@
 - title: {% trans 'Notícias' %}
   url: /noticias
 - title: {% trans 'TV CMJ' %}
-  url: /tv-cmj
+  url: ''
   children:
+  - title: {% trans 'Galeria de Vídeos' %}
+    url: /tv-cmj
   - title: {% trans 'Transmissão ao vivo' %}
     url: /tv-cmj/ao-vivo
 - title: {% trans 'Rádio CMJ' %}
-  url: /radio-cmj
+  url: ''
   children:
+  - title: {% trans 'Galeria de Áudio' %}
+    url: /radio-cmj
   - title: {% trans 'Rádio ao vivo' %}
     url: /radio-cmj/ao-vivo
 - title: {% trans 'Galerias' %}

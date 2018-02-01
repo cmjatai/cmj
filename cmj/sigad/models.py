@@ -351,6 +351,7 @@ class Slugged(Parent):
 
     def save(self, *args, **kwargs):
 
+        slug_old = self.slug
         if not self.id:
             super(Slugged, self).save(*args, **kwargs)
 
@@ -365,6 +366,8 @@ class Slugged(Parent):
             slug = str(self.id)
 
         self.slug = self.generate_unique_slug(slug)
+        if self.slug != slug_old:
+            self.url_short = ''
 
         if self.parent and hasattr(self, 'classe'):
             self.visibilidade = self.parent.visibilidade
@@ -378,8 +381,11 @@ class Slugged(Parent):
         super(Slugged, self).save(*args, **kwargs)
 
         if self._meta.model == Classe:
+            count = self.documento_set.filter(parent__isnull=True).count()
             for documento in self.documento_set.filter(parent__isnull=True):
                 documento.save()
+                print(self.titulo, count, self.slug)
+                count -= 1
 
         for child in self.childs.all():
             child.save()
@@ -728,6 +734,10 @@ class DocumentoManager(models.Manager):
     def qs_video_news(self, user=None):
         self.q_filters()
         return self.qs_docs(user, q_filter=self.q_video_news)
+
+    def all_docs(self):
+        qs = self.get_queryset()
+        return qs.filter(parent__isnull=True)
 
     def qs_docs(self, user=None, q_filter=None):
 
