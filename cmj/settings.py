@@ -172,6 +172,7 @@ DATABASES = {
     )
 }
 GOOGLE_URL_SHORTENER_KEY = config('GOOGLE_URL_SHORTENER_KEY', cast=str)
+GOOGLE_URL_API_KEY = config('GOOGLE_URL_API_KEY', cast=str)
 
 AUTHENTICATION_BACKENDS = (
     'social_core.backends.facebook.FacebookOAuth2',

@@ -749,12 +749,12 @@ class ClasseCreateView(ClasseParentMixin,
         response = super(ClasseCreateView, self).form_valid(form)
 
         # Revisao.gerar_revisao(self.object, self.request.user)
-        if self.object.visibilidade == Classe.STATUS_PUBLIC:
+        """if self.object.visibilidade == Classe.STATUS_PUBLIC:
             parents = self.object.parents
             for p in parents:
                 p.visibilidade = Classe.STATUS_PUBLIC
                 p.save()
-                # Revisao.gerar_revisao(p, self.request.user)
+                # Revisao.gerar_revisao(p, self.request.user)"""
 
         return response
 

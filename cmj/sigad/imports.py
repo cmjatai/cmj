@@ -12,6 +12,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import TemplateView
 from reversion.views import RevisionMixin
 from sapl.parlamentares.models import Parlamentar
+import dateutil.parser
 
 from cmj.sigad import models
 from cmj.sigad.models import Documento, Midia, VersaoDeMidia, Revisao, Classe,\
@@ -58,6 +59,132 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
         return classe, created
 
     def get(self, request, *args, **kwargs):
+
+        self.get_youtube(request, *args, **kwargs)
+        return TemplateView.get(self, request, *args, **kwargs)
+
+    def get_youtube(self, request, *args, **kwargs):
+
+        import urllib3
+        import json
+
+        if not request.user.is_superuser:
+            raise Http404()
+
+        http = urllib3.PoolManager()
+
+        playlists = [
+            (198, 'PLgLO7BeNLo8MHrbBi75K7JVF7aGntEBoA'),  # Plenárias 2018
+            (199, 'PLgLO7BeNLo8PsNewCX7mjzlbS91M5LILv'),  # Plenárias 2017
+            (200, 'PLgLO7BeNLo8PPos7B59cOq1mDCHXuRkc3'),  # Plenárias 2016
+            (201, 'PLgLO7BeNLo8NQfWXfKwj1ZbyA2lM-INNJ'),  # Plenárias 2015
+            #(204, ''),  # Plenárias 2014
+            (205, 'PLgLO7BeNLo8MP54ONb0p6RkadZqXensg-'),  # Plenárias 2013
+            (197, 'PLgLO7BeNLo8MD8LzEb8obLTua4spbL_ui'),  # Sessões Solenes
+            (206, 'PLgLO7BeNLo8PxBA-GjNUFG7dCWUPYwQFl'),  # Audiências Públicas
+            (207, 'PLgLO7BeNLo8OluYcp2_5R61nNJXabb5vB'),  # Entrevistas
+            (208, 'PLgLO7BeNLo8NIOg9IC-Fax8KmXT91eylS'),  # Memórias de Jataí
+        ]
+
+        url = ('https://www.googleapis.com/youtube/v3/playlistItems?'
+               'part=snippet&maxResults=50'
+               '&key=%s'
+               '&playlistId=%s'
+               '&pageToken=%s')
+
+        for p in playlists:
+            classe_id, pl = p
+
+            pageToken = ''
+
+            classe = Classe.objects.get(pk=classe_id)
+
+            while pageToken is not None:
+                r = http.request(
+                    'GET', url %
+                    (settings.GOOGLE_URL_API_KEY, pl, pageToken))
+
+                data = r.data.decode('utf-8')
+                data = json.loads(data)
+
+                pageToken = data['nextPageToken']\
+                    if 'nextPageToken' in data else None
+
+                for item in data['items']:
+                    snippet = item['snippet']
+
+                    video_id = snippet['resourceId']['videoId']
+
+                    if Documento.objects.filter(
+                            texto__contains=video_id).exists():
+                        continue
+
+                    url_vid = ('https://www.googleapis.com/youtube/v3/videos?'
+                               'part=snippet'
+                               '&key=%s'
+                               '&id=%s')
+
+                    r = http.request('GET', url_vid %
+                                     (settings.GOOGLE_URL_API_KEY, video_id))
+
+                    vdata = r.data.decode('utf-8')
+                    vdata = json.loads(vdata)
+                    video_dict = {}
+                    try:
+                        video_dict = vdata['items'][0]['snippet']
+                    except:
+                        continue
+
+                    documento = Documento()
+                    documento.titulo = video_dict['title']
+                    documento.descricao = video_dict['description']
+                    documento.public_date = dateutil.parser.parse(
+                        video_dict['publishedAt'])
+                    documento.classe = classe
+                    documento.tipo = Documento.TD_VIDEO_NEWS
+                    documento.template_doc = 1
+                    documento.owner = request.user
+                    documento.visibilidade = Documento.STATUS_PUBLIC
+
+                    documento.extra_data = video_dict
+                    documento.save()
+
+                    container = Documento()
+                    container.raiz = documento
+                    container.titulo = ''
+                    container.descricao = ''
+                    container.classe = classe
+                    container.tipo = Documento.TPD_CONTAINER_SIMPLES
+                    container.owner = request.user
+                    container.parent = documento
+                    container.ordem = 1
+                    container.visibilidade = documento.visibilidade
+                    container.save()
+
+                    video = Documento()
+                    video.raiz = documento
+                    video.titulo = ''
+                    video.descricao = ''
+                    video.classe = classe
+                    video.tipo = Documento.TPD_VIDEO
+                    video.owner = request.user
+                    video.parent = container
+                    video.ordem = 2
+                    video.extra_data = video_dict
+                    video.visibilidade = documento.visibilidade
+
+                    video.texto = (
+                        '<iframe width="560" height="315"'
+                        'src="https://www.youtube.com/embed/%s" '
+                        'frameborder="0" '
+                        'allow="autoplay; encrypted-media" allowfullscreen>'
+                        '</iframe>' % video_id)
+
+                    video.save()
+                break
+            break
+
+    def get_pm1(self, request, *args, **kwargs):
 
         import urllib3
         import json

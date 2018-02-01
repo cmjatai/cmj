@@ -380,11 +380,11 @@ class Slugged(Parent):
 
         super(Slugged, self).save(*args, **kwargs)
 
-        if self._meta.model == Classe:
+        if self._meta.model == Classe and self.slug != slug_old:
             count = self.documento_set.filter(parent__isnull=True).count()
             for documento in self.documento_set.filter(parent__isnull=True):
                 documento.save()
-                print(self.titulo, count, self.slug)
+                #print(self.titulo, count, self.slug)
                 count -= 1
 
         for child in self.childs.all():
@@ -830,6 +830,9 @@ class Documento(ShortUrl, CMSMixin):
     old_json = models.TextField(
         verbose_name=_('Json no Portal Modelo 1.0'),
         blank=True, null=True, default=None)
+
+    extra_data = JSONField(verbose_name=_('Dados Extras'),
+                           blank=True, null=True, default=None)
 
     parlamentares = models.ManyToManyField(
         Parlamentar, related_name='documento_set',
