@@ -377,6 +377,10 @@ class Slugged(Parent):
 
         super(Slugged, self).save(*args, **kwargs)
 
+        if self._meta.model == Classe:
+            for documento in self.documento_set.filter(parent__isnull=True):
+                documento.save()
+
         for child in self.childs.all():
             child.save()
 

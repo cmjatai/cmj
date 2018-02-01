@@ -38,13 +38,13 @@
               </div>
               <div class="show-descricao">
                 {% if ref_doc.descricao %}
-                  {{ref_doc.descricao}}
+                  {{ref_doc.descricao|safe}}
                 {% elif ref_doc.referenciado.descricao %}
-                  {{ref_doc.referenciado.descricao}}
+                  {{ref_doc.referenciado.descricao|safe}}
                 {% elif object.descricao %}
-                  {{object.descricao}}
+                  {{object.descricao|safe}}
                 {% else %}
-                  {{object.raiz.descricao}}
+                  {{object.raiz.descricao|safe}}
                 {% endif %}
 
               </div>
