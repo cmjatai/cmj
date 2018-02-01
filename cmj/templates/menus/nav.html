@@ -9,11 +9,9 @@
              <span class="caret"></span>
           </a>
           <ul class="dropdown-menu menu-left" role="menu">
-            {% for subitem in item.children %}
-                {% if subitem.url %}
-                  <li><a href="{{ subitem.url }}">{{ subitem.title }}</a></li>
-                {% endif %}
-            {% endfor %}
+            {% with item.children as menu %}
+                {% include "menus/nav.html" %}
+            {% endwith %}
           </ul>
         </li>
       {% else %}

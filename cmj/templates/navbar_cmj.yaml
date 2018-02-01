@@ -8,7 +8,7 @@
     url: ''
     children:
     - title: {% trans 'Prefeitos de Nossa História' %}
-      url: /historia/prefeitos-de-nossa-historia
+      url: /institucional/historia/prefeitos-de-nossa-historia
 - title: {% trans 'Parlamentares' %}
   url: /parlamentar
 - title: {% trans 'Notícias' %}
