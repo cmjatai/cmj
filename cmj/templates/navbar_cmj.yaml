@@ -16,10 +16,34 @@
 - title: {% trans 'TV CMJ' %}
   url: ''
   children:
-  - title: {% trans 'Galeria de Vídeos' %}
-    url: /tv-cmj
   - title: {% trans 'Transmissão ao vivo' %}
     url: /tv-cmj/ao-vivo
+  - title: {% trans 'Sessões Transmitidas' %}
+    url: ''
+    children:
+    - title: {% trans 'Sessões Solenes' %}
+      url: /tv-cmj/sessoes/sessoes-solenes
+    - title: {% trans 'Sessões Plenárias' %}
+      url: ''
+      children:
+      - title: '{% trans '2018' %}'
+        url: /tv-cmj/sessoes/sessoes-plenarias/2018
+      - title: '{% trans '2017' %}'
+        url: /tv-cmj/sessoes/sessoes-plenarias/2017
+      - title: '{% trans '2016' %}'
+        url: /tv-cmj/sessoes/sessoes-plenarias/2016
+      - title: '{% trans '2015' %}'
+        url: /tv-cmj/sessoes/sessoes-plenarias/2015
+      - title: '{% trans '2014' %}'
+        url: /tv-cmj/sessoes/sessoes-plenarias/2014
+      - title: '{% trans '2013' %}'
+        url: /tv-cmj/sessoes/sessoes-plenarias/2013
+  - title: {% trans 'Audiências Públicas' %}
+    url: /tv-cmj/sessoes/audiencias-publicas
+  - title: {% trans 'Entrevistas' %}
+    url: /tv-cmj/sessoes/entrevistas
+  - title: {% trans 'Memórias de jataí' %}
+    url: /tv-cmj/sessoes/memorias-de-jatai
 - title: {% trans 'Rádio CMJ' %}
   url: ''
   children:

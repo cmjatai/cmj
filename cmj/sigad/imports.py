@@ -169,7 +169,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                     video.tipo = Documento.TPD_VIDEO
                     video.owner = request.user
                     video.parent = container
-                    video.ordem = 2
+                    video.ordem = 1
                     video.extra_data = video_dict
                     video.visibilidade = documento.visibilidade
 
@@ -181,8 +181,6 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                         '</iframe>' % video_id)
 
                     video.save()
-                break
-            break
 
     def get_pm1(self, request, *args, **kwargs):
 
