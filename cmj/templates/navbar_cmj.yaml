@@ -4,11 +4,11 @@
   children:
   - title: {% trans 'Nossa Jataí' %}
     url: /institucional/nossa-jatai
-- title: {% trans 'História' %}
-  url: /historia
-  children:
-  - title: {% trans 'Prefeitos de Nossa História' %}
-    url: /historia/prefeitos-de-nossa-historia
+  - title: {% trans 'História' %}
+    url: ''
+    children:
+    - title: {% trans 'Prefeitos de Nossa História' %}
+      url: /historia/prefeitos-de-nossa-historia
 - title: {% trans 'Parlamentares' %}
   url: /parlamentar
 - title: {% trans 'Notícias' %}
