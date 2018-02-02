@@ -5,7 +5,7 @@ from django.db import models
 from django.db.models.deletion import SET_NULL, PROTECT, CASCADE
 from django.utils.translation import ugettext_lazy as _
 from sapl.parlamentares.models import Parlamentar, Partido
-from sapl.utils import UF
+from sapl.utils import LISTA_DE_UFS
 
 from cmj.core.models import CmjModelMixin, Trecho, Distrito, RegiaoMunicipal,\
     CmjAuditoriaModelMixin, CmjSearchMixin, AreaTrabalho, Bairro, Municipio
@@ -515,7 +515,7 @@ class LocalTrabalho(CmjAuditoriaModelMixin):
         related_name='localtrabalho_set',
         blank=True, null=True, on_delete=SET_NULL)
 
-    uf = models.CharField(max_length=2, blank=True, choices=UF,
+    uf = models.CharField(max_length=2, blank=True, choices=LISTA_DE_UFS,
                           verbose_name=_('Estado'))
 
     municipio = models.ForeignKey(
@@ -608,7 +608,7 @@ class Endereco(CmjAuditoriaModelMixin):
         related_name='endereco_set',
         blank=True, null=True, on_delete=SET_NULL)
 
-    uf = models.CharField(max_length=2, blank=True, choices=UF,
+    uf = models.CharField(max_length=2, blank=True, choices=LISTA_DE_UFS,
                           verbose_name=_('Estado'))
 
     municipio = models.ForeignKey(
