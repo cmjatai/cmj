@@ -9,7 +9,7 @@ from django.forms.forms import Form
 from django.forms.models import ModelForm
 from django.utils.translation import ugettext_lazy as _
 from image_cropping.widgets import ImageCropWidget, CropWidget
-from sapl.crispy_layout_mixin import to_row, form_actions
+from sapl.crispy_layout_mixin import to_row, form_actions, SaplFormLayout
 
 
 class LoginForm(AuthenticationForm):
@@ -51,16 +51,19 @@ class CmjUserChangeForm(ModelForm):
         label='Senha atual',
         max_length=50,
         strip=False,
+        required=False,
         widget=forms.PasswordInput())
     new_password1 = forms.CharField(
         label='Nova senha',
         max_length=50,
         strip=False,
+        required=False,
         widget=forms.PasswordInput())
     new_password2 = forms.CharField(
         label='Confirmar senha',
         max_length=50,
         strip=False,
+        required=False,
         widget=forms.PasswordInput())
 
     class Meta:
@@ -76,8 +79,13 @@ class CmjUserChangeForm(ModelForm):
     def __init__(self, *args, **kwargs):
 
         super(CmjUserChangeForm, self).__init__(*args, **kwargs)
-
-        row1 = to_row([('old_password', 12)])
+        row0 = to_row([
+            ('first_name', 6),
+            ('last_name', 6),
+        ])
+        row1 = to_row([
+            ('old_password', 12)
+        ])
         row2 = to_row(
             [('new_password1', 6),
              ('new_password2', 6)])
@@ -85,18 +93,26 @@ class CmjUserChangeForm(ModelForm):
             [('avatar', 6),
              ('cropping', 6)])
 
+        rows = [row0]
+        if self.instance.pwd_created:
+            rows.append(row1)
+
+        rows += [row2, row3]
+
         self.helper = FormHelper()
-        self.helper.layout = Layout(
-            row1,
-            row2,
-            row3,
-            form_actions())
+        self.helper.layout = SaplFormLayout(*rows)
+
+        if not self.instance.pwd_created:
+            self.fields['old_password'].widget = forms.HiddenInput()
 
     def save(self, commit=True):
         new_password = self.cleaned_data['new_password1']
 
         user = self.instance
-        user.set_password(new_password)
+
+        if new_password:
+            user.set_password(new_password)
+            user.pwd_created = True
 
         return super().save(commit)
 
@@ -106,25 +122,27 @@ class CmjUserChangeForm(ModelForm):
         if self.errors:
             return data
 
-        old_password = data.get('old_password')
+        old_password = data.get('old_password', '')
         new_password1 = data.get('new_password1', '')
         new_password2 = data.get('new_password2', '')
 
-        if not self.instance.check_password(old_password):
-            raise ValidationError("Senha atual informada não confere "
-                                  "com a senha armazenada")
+        if old_password and self.instance.pwd_created:
+            if not self.instance.check_password(old_password):
+                raise ValidationError("Senha atual informada não confere "
+                                      "com a senha armazenada")
+            if self.instance.check_password(new_password1):
+                raise ValidationError(
+                    "Nova senha não pode ser igual à senha anterior")
 
-        if self.instance.check_password(new_password1):
-            raise ValidationError(
-                "Nova senha não pode ser igual à senha anterior")
-
-        if new_password1 and new_password2:
-            if new_password1 != new_password2:
-                raise forms.ValidationError(
-                    self.error_messages['password_mismatch'],
-                    code='password_mismatch',
-                )
-        password_validation.validate_password(new_password2, self.instance)
+        if new_password1 != new_password2:
+            raise forms.ValidationError(
+                self.error_messages['password_mismatch'],
+                code='password_mismatch',
+            )
+        else:
+            if new_password1 and new_password2:
+                password_validation.validate_password(
+                    new_password2, self.instance)
 
 
 class UserForm(UserChangeForm):

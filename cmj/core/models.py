@@ -122,13 +122,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
 
     avatar = ImageCropField(
-        _('profile picture'), upload_to="avatars/",
+        upload_to="avatars/", verbose_name=_('Avatar'),
         validators=[avatar_validation], null=True, blank=True)
 
     cropping = ImageRatioField(
-        'avatar', '70x70', help_text=_(
-            'Note that the preview above will only be updated after '
-            'you submit the form.'))
+        'avatar', '128x128', verbose_name=_('Seleção (Enquadramento)'), help_text=_(
+            'A configuração do Avatar '
+            'é possível após a atualização da fotografia.'))
 
     pwd_created = models.BooleanField(
         _('Usuário de Rede Social Customizou Senha?'), default=False)

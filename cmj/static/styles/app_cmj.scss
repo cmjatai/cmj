@@ -191,7 +191,7 @@ body, html {
   min-height: 0;
   .avatar {
     border-radius: 50%;
-    height: $menu-height;
+    height: $menu-height - 5;
     margin-left: 0.5em;
   }
   .navbar-header {
@@ -242,8 +242,9 @@ body, html {
         padding-top: 0;
         padding-bottom: 0;
         font-family: "Lato";
+
+        letter-spacing: 0.3px;
         font-weight: 300;
-        letter-spacing: 0.5px;
         font-size: 1em;
         margin: 0px;
         &:hover, &:focus {
@@ -3381,7 +3382,7 @@ main {
           a {
             line-height: 2em;
             font-size: 1em;
-            padding: 0 10px;
+            padding: 0 5px;
           }
         }
       }
@@ -3396,6 +3397,7 @@ main {
 }
 
 @media screen and (max-width: 1199px) {
+
 }
 
 @media screen and (max-width: 991px) {
@@ -3470,6 +3472,10 @@ main {
 @media screen and (min-width: 1200px) {
   .navbar a.navbar-brand {
     font-size: 28px;
+  }
+
+  .navbar .navbar-nav li a {
+    letter-spacing: 1px;
   }
 
   .container-legislaturas {
