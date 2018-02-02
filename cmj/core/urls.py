@@ -3,11 +3,13 @@ from django.contrib.auth import views as v_auth
 from django.contrib.auth.decorators import permission_required, login_required
 from django.views.generic.base import TemplateView
 
-from cmj.core.forms import LoginForm
+from cmj.core.forms_auth import RecuperarSenhaForm, NovaSenhaForm, LoginForm
 from cmj.core.views import CepCrud, RegiaoMunicipalCrud, DistritoCrud,\
     BairroCrud, TipoLogradouroCrud, LogradouroCrud, TrechoCrud, \
     TrechoJsonSearchView, TrechoJsonView, AreaTrabalhoCrud,\
     OperadorAreaTrabalhoCrud, PartidoCrud, ImpressoEnderecamentoCrud
+from cmj.core.views_auth import CmjUserChangeView
+from cmj.settings import EMAIL_SEND_USER
 
 from .apps import AppConfig
 
@@ -15,14 +17,49 @@ from .apps import AppConfig
 app_name = AppConfig.name
 
 
-urlpatterns = [
-    url(r'^login/$', v_auth.login, {'template_name': 'core/login.html',
+user_urlpatterns = [
+    url(r'^user/edit/$', login_required(CmjUserChangeView.as_view()),
+        name='cmj_user_change'),
+
+
+    url(r'^user/recuperar-senha/email/$',
+        v_auth.password_reset,
+        {'post_reset_redirect': 'cmj.core:recuperar_senha_finalizado',
+         'email_template_name': 'core/user/recuperar_senha_email.html',
+         'html_email_template_name': 'core/user/recuperar_senha_email.html',
+         'template_name': 'core/user/recuperar_senha_email_form.html',
+         'from_email': EMAIL_SEND_USER,
+         'password_reset_form': RecuperarSenhaForm},
+        name='recuperar_senha_email'),
+
+    url(r'^user/recuperar-senha/finalizado/$',
+        v_auth.password_reset_done,
+        {'template_name': 'core/user/recupera_senha_email_enviado.html'},
+        name='recuperar_senha_finalizado'),
+
+    url(r'^user/recuperar-senha/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$',
+        v_auth.password_reset_confirm,
+        {'post_reset_redirect': 'cmj.core:recuperar_senha_completo',
+         'template_name': 'core/user/nova_senha_form.html',
+         'set_password_form': NovaSenhaForm},
+        name='recuperar_senha_confirma'),
+
+    url(r'^user/recuperar-senha/completo/$',
+        v_auth.password_reset_complete,
+        {'template_name': 'core/user/recuperar_senha_completo.html'},
+        name='recuperar_senha_completo'),
+    url(r'^login/$', v_auth.login, {'template_name': 'core/user/login.html',
                                     'authentication_form': LoginForm,
                                     'extra_context': {
                                         'fluid': '-fluid'
                                     }}, name='login'),
     url(r'^logout/$', v_auth.logout,
         {'next_page': '/'}, name='logout', ),
+
+]
+
+
+urlpatterns = user_urlpatterns + [
 
     # url(r'^enderecos/', login_required(
     #    TrechoSearchView.as_view()), name='search_view'),

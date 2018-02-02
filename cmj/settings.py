@@ -60,9 +60,11 @@ INSTALLED_APPS = (
     'djangobower',
     'bootstrap3',  # basically for django_admin_bootstrapped
     'crispy_forms',
-    'easy_thumbnails',
-    'image_cropping',
-    'floppyforms',
+
+    'easy_thumbnails',  # ?
+    'image_cropping',  # ?
+    'floppyforms',  # ?
+
     'sass_processor',
     'rest_framework',
     'rest_framework_recursive',
@@ -82,10 +84,8 @@ INSTALLED_APPS = INSTALLED_APPS + tuple(
     list(
         set(sapl_settings.INSTALLED_APPS) - set(INSTALLED_APPS))) + CMJ_APPS
 
-
 # if DEBUG and 'debug_toolbar' not in INSTALLED_APPS:
 #    INSTALLED_APPS += ('debug_toolbar',)
-
 
 MIDDLEWARE_CLASSES = (
     'reversion.middleware.RevisionMiddleware',
@@ -161,8 +161,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'cmj.wsgi.application'
 
-AUTH_USER_MODEL = 'core.User'
-
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 DATABASES = {
@@ -171,6 +169,21 @@ DATABASES = {
         cast=db_url,
     )
 }
+
+AUTH_USER_MODEL = 'core.User'
+str_pv = 'django.contrib.auth.password_validation'
+AUTH_PASSWORD_VALIDATORS = [
+    {'NAME': str_pv + '.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 9,
+        }
+     },
+    {'NAME': str_pv + '.UserAttributeSimilarityValidator', },
+    {'NAME': str_pv + '.CommonPasswordValidator', },
+    {'NAME': str_pv + '.NumericPasswordValidator', },
+]
+
+
 GOOGLE_URL_SHORTENER_KEY = config('GOOGLE_URL_SHORTENER_KEY', cast=str)
 GOOGLE_URL_API_KEY = config('GOOGLE_URL_API_KEY', cast=str)
 
@@ -292,12 +305,16 @@ THUMBNAIL_PROCESSORS = (
     'image_cropping.thumbnail_processors.crop_corners',
 ) + thumbnail_settings.THUMBNAIL_PROCESSORS
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
 EMAIL_HOST = config('EMAIL_HOST', cast=str)
+EMAIL_PORT = config('EMAIL_PORT', cast=int)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', cast=str)
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', cast=str)
-EMAIL_PORT = config('EMAIL_PORT', cast=int)
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
+EMAIL_USE_SSL = config('EMAIL_USE_SSL', cast=bool)
+EMAIL_SEND_USER = config('EMAIL_SEND_USER', cast=str)
+
 
 MAX_DOC_UPLOAD_SIZE = 5 * 1024 * 1024  # 5MB
 MAX_IMAGE_UPLOAD_SIZE = 2 * 1024 * 1024  # 2MB
