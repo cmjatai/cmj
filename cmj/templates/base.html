@@ -114,7 +114,9 @@
                       {% for us in user.social_auth.all %}
                         {% if us.provider == 'facebook' %}
                           <img class="avatar" src="https://graph.facebook.com/v2.6/{{us.uid}}/picture?height=46" />
-                          {% endif %}
+                        {% elif us.provider == 'google-oauth2' %}
+                          <img class="avatar" src="{% static 'img/perfil.jpg' %}">
+                        {% endif %}
                       {% empty %}
                         <img class="avatar" src="{% static 'img/perfil.jpg' %}">
                       {% endfor %}
@@ -176,6 +178,8 @@
                           {% for us in user.social_auth.all %}
                             {% if us.provider == 'facebook' %}
                               <img class="avatar" src="https://graph.facebook.com/v2.6/{{us.uid}}/picture?height=46" />
+                            {% elif us.provider == 'google-oauth2' %}
+                              <img class="avatar" src="{% static 'img/perfil.jpg' %}">
                             {% endif %}
                           {% endfor %}
                         {% endif %}
