@@ -16,7 +16,7 @@
       <meta property="fb:app_id" content="150874375319738">
       <meta property="fb:admins" content="cmjatai">
       <meta property="og:locale" content="pt_BR">
-      <meta property="og:url" content="{{request.scheme}}://{{request.get_host}}{% if object.tipo == object.TPD_IMAGE %}/{{ object.absolute_slug }}.page{% else %}/{{ object.absolute_slug }}{% endif %}">
+      <meta property="og:url" content="https://{{request.get_host}}{% if object.tipo == object.TPD_IMAGE %}/{{ object.absolute_slug }}.page{% else %}/{{ object.absolute_slug }}{% endif %}">
       <meta property="og:site_name" content="Portal da Câmara Municipal de Jataí - Goiás">
       <meta property="og:type" content="website">
       <meta property="og:title" content="{% if object.titulo %}{{object.titulo}}{% elif object.parents_and_me.0.titulo %}{{object.parents_and_me.0.titulo}}{% elif object.referente %}{{object.referente.parents_and_me.0.titulo}}{% else %}Câmara Municipal de Jataí{% endif %}">
@@ -25,22 +25,22 @@
 
       {% with object.imagem_representativa_metatags as doc_imagem %}
         {% if doc_imagem and doc_imagem.absolute_slug%}
-          <meta property="og:image" content="{{request.scheme}}://{{request.get_host}}/{{doc_imagem.absolute_slug}}.768.jpg">
+          <meta property="og:image" content="https://{{request.get_host}}/{{doc_imagem.absolute_slug}}.768.jpg">
           <meta property="og:image:type" content="{{doc_imagem.midia.last.content_type}}">
-          <meta name="twitter:image" content="{{request.scheme}}://{{request.get_host}}/{{doc_imagem.absolute_slug}}.768.jpg">
+          <meta name="twitter:image" content="https://{{request.get_host}}/{{doc_imagem.absolute_slug}}.768.jpg">
 
           <meta property="og:image:width" content="{{doc_imagem.midia.last.width}}">
           <meta property="og:image:height" content="{{doc_imagem.midia.last.height}}">
 
         {% elif doc_imagem.fotografia %}
-          <meta property="og:image" content="{{request.scheme}}://{{request.get_host}}{{doc_imagem.fotografia.url}}">
+          <meta property="og:image" content="https://{{request.get_host}}{{doc_imagem.fotografia.url}}">
           <meta property="og:image:type" content="image/jpeg">
-          <meta name="twitter:image" content="{{request.scheme}}://{{request.get_host}}{{doc_imagem.fotografia.url}}">
+          <meta name="twitter:image" content="https://{{request.get_host}}{{doc_imagem.fotografia.url}}">
 
         {% elif object.referenciado %}
-          <meta property="og:image" content="{{request.scheme}}://{{request.get_host}}/{{object.absolute_slug}}.768">
+          <meta property="og:image" content="https://{{request.get_host}}/{{object.absolute_slug}}.768">
           <meta property="og:image:type" content="{{object.midia.last.content_type}}">
-          <meta name="twitter:image" content="{{request.scheme}}://{{request.get_host}}/{{object.absolute_slug}}.768">
+          <meta name="twitter:image" content="https://{{request.get_host}}/{{object.absolute_slug}}.768">
 
           <meta property="og:image:width" content="{{object.referenciado.midia.last.width}}">
           <meta property="og:image:height" content="{{object.referenciado.midia.last.height}}">
@@ -48,7 +48,7 @@
         {% endif %}
       {% endwith %}
 
-      <meta name="twitter:url" content="{{request.scheme}}://{{request.get_host}}{% if object.tipo == object.TPD_IMAGE %}/{{ object.absolute_slug }}.page{% else %}/{{ object.absolute_slug }}{% endif %}">
+      <meta name="twitter:url" content="https://{{request.get_host}}{% if object.tipo == object.TPD_IMAGE %}/{{ object.absolute_slug }}.page{% else %}/{{ object.absolute_slug }}{% endif %}">
       <meta name="twitter:description" content="{{object.descricao|striptags|safe}}">
       <meta name="twitter:card" content="summary_large_image">
       <meta name="twitter:site" content="@cmjatai">
@@ -225,21 +225,7 @@
                     {% navbar 'navbar_cmj.yaml' %}
                   {% endif %}
 
-                  {% if perms.sigad.view_documento %}
-                    <li class="nav__sub-item">
-                      <a class="dropdown-toggle" href="#fakeLink" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Banco de Imagens" %}<span class="caret"></span></a>
-                      <ul class="dropdown-menu menu-left" role="menu">
 
-                        <li class="nav__sub-item"><a class="dropdown-toggle" href="/banco-de-imagens/2018">{% trans "2018" %}</a></li>
-                        <li class="nav__sub-item"><a class="dropdown-toggle" href="/banco-de-imagens/2017">{% trans "2017" %}</a></li>
-                        <li class="nav__sub-item"><a class="dropdown-toggle" href="/banco-de-imagens/2016">{% trans "2016" %}</a></li>
-                        <li class="nav__sub-item"><a class="dropdown-toggle" href="/banco-de-imagens/2015">{% trans "2015" %}</a></li>
-                        <li class="nav__sub-item"><a class="dropdown-toggle" href="/banco-de-imagens/2014">{% trans "2014" %}</a></li>
-                        <li class="nav__sub-item"><a class="dropdown-toggle" href="/banco-de-imagens/2013">{% trans "2013" %}</a></li>
-
-                      </ul>
-                    </li>
-                  {% endif %}
                 </ul>
 
                 {% block menu_canais_relative %}
@@ -269,7 +255,21 @@
                     <li class="dropdown">
                       <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Dados Auxiliares" %}<span class="caret"></span></a>
                       <ul class="dropdown-menu menu-right">
+
                         <li class="dropdown-header">{% trans "Consultas" %}</li>
+                        {% if perms.sigad.view_documento %}
+                        <li class="nav__sub-item">
+                          <a class="dropdown-toggle" href="#fakeLink" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Banco de Imagens" %}<span class="caret"></span></a>
+                          <ul class="dropdown-menu menu-right" role="menu">
+                            <li class="nav__sub-item"><a class="dropdown-toggle" href="/banco-de-imagens/2018">{% trans "2018" %}</a></li>
+                            <li class="nav__sub-item"><a class="dropdown-toggle" href="/banco-de-imagens/2017">{% trans "2017" %}</a></li>
+                            <li class="nav__sub-item"><a class="dropdown-toggle" href="/banco-de-imagens/2016">{% trans "2016" %}</a></li>
+                            <li class="nav__sub-item"><a class="dropdown-toggle" href="/banco-de-imagens/2015">{% trans "2015" %}</a></li>
+                            <li class="nav__sub-item"><a class="dropdown-toggle" href="/banco-de-imagens/2014">{% trans "2014" %}</a></li>
+                            <li class="nav__sub-item"><a class="dropdown-toggle" href="/banco-de-imagens/2013">{% trans "2013" %}</a></li>
+                          </ul>
+                        </li>
+                        {% endif %}
                         {% if perms.core.search_trecho %}<li class="nav__sub-item"><a href="{% url 'cmj.core:trecho_list' %}">{% trans "Consultar base de Cep's e Endereços" %}</a></li>{% endif %}
 
                         {% if perms.cerimonial.list_operadoratelefonia %}<li class="nav__sub-item"><a href="{% url 'cmj.cerimonial:operadoratelefonia_list' %}">{% model_verbose_name_plural "cmj.cerimonial.models.OperadoraTelefonia"%}</a></li>{% endif %}
