@@ -1226,8 +1226,12 @@ class CaixaPublicacao(models.Model):
         default='')
 
     documentos = models.ManyToManyField(
-        'sigad.Documento', blank=True, related_name='caixapublicacao_set',
+        'sigad.Documento', blank=True,
+        related_query_name='caixapublicacao_set',
         verbose_name=_('Documentos da Caixa de Públicação'))
+
+    def __str__(self):
+        return self.nome
 
     class Meta:
         verbose_name = _('Caixa de Publicação')

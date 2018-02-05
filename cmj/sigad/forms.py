@@ -1,6 +1,7 @@
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Fieldset
 from django import forms
+from django.db.models import Q
 from django.forms import widgets
 from django.forms.models import ModelForm, ModelMultipleChoiceField
 from django.utils import timezone
@@ -179,5 +180,11 @@ class CaixaPublicacaoForm(forms.ModelForm):
 
         self.fields['documentos'].choices = [
             (d.id, d) for d in Documento.objects.qs_news().filter(
-                childs__childs__midia__isnull=False)[:100]
+                Q(caixapublicacao_set__isnull=True) |
+                Q(caixapublicacao_set__isnull=False,
+                  caixapublicacao_set__id=self.instance.pk),
+                nodes__midia__isnull=False
+            )[:100]
+
+
         ]

@@ -39,22 +39,6 @@ class PaginaInicialView(TemplateView):
 
         context['noticias_dos_parlamentares'] = np
 
-        """context['noticias_destaque'] = Documento.objects.qs_news(
-        ).filter(
-            parlamentares__isnull=True,
-            classe_id=1,
-            nodes__tipo=Documento.TPD_IMAGE,
-        ).order_by(
-            '-public_date', '-created', '-id'
-        ).distinct('public_date', 'created', 'id')[:4]
-
-        context['noticias_destaque'] = list(
-            map(lambda x: (
-                x, x.nodes.filter(
-                    tipo=Documento.TPD_IMAGE).order_by('ordem').first()),
-                context['noticias_destaque']
-                ))"""
-
         return context
 
     def get_noticias_dos_parlamentares(self):
