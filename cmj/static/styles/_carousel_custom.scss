@@ -126,6 +126,7 @@ a.carousel-control:active {
       color: white;
     }
   }
+
 }
 
 .carousel {
@@ -140,7 +141,18 @@ a.carousel-control:active {
   }
 
   .navbar-social-links i {
-     color: rgba(255, 255, 255, 0.6);;
+     color: rgba(255, 255, 255, 0.6);
+  }
+  .autor {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    padding: 0 5px;
+    font-size: 0.6em;
+    color: white;
+    &:hover {
+      background: rgba(black, 0.6);
+    }
   }
 }
 
