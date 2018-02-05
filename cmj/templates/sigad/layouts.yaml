@@ -5,3 +5,9 @@ PermissionsUserClasse:
 PermissionsUserDocumento:
   {% trans 'Usuários com Acesso' %}:
   - user
+CaixaPublicacao:
+  {% trans 'Nome e Chave' %}:
+  - nome key
+  {% trans 'Documentos' %}:
+  - documentos
+  

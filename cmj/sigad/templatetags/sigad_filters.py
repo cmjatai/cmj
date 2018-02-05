@@ -1,4 +1,5 @@
 from django import template
+from cmj.sigad.models import CaixaPublicacao, Documento
 
 
 register = template.Library()
@@ -39,3 +40,19 @@ def organize_direction_avatars(pos, total):
         '8': 4,
         '9': 4}
     return pos % map_arranjo[str(total if total <= 9 else 9)] == 0
+
+
+@register.filter
+def caixa_publicacao(key):
+    cp = CaixaPublicacao.objects.get(key=key)
+    docs = cp.documentos.order_by('-public_date')
+    result = {'cp': cp, 'docs':
+              list(
+                  map(lambda x: (
+                      x, x.nodes.filter(
+                        tipo=Documento.TPD_IMAGE).order_by('ordem').first()),
+                      docs
+                      ))
+              }
+
+    return result

@@ -1,6 +1,7 @@
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Fieldset
 from django import forms
+from django.forms import widgets
 from django.forms.models import ModelForm, ModelMultipleChoiceField
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -8,7 +9,7 @@ from sapl.crispy_layout_mixin import to_row, SaplFormLayout
 from sapl.parlamentares.models import Parlamentar
 
 from cmj.sigad import models
-from cmj.sigad.models import Classe, Documento, Revisao
+from cmj.sigad.models import Classe, Documento, Revisao, CaixaPublicacao
 
 
 class UpLoadImportFileForm(forms.Form):
@@ -160,3 +161,23 @@ class DocumentoForm(ModelForm):
             container.save()
 
         return inst
+
+
+class CaixaPublicacaoForm(forms.ModelForm):
+
+    documentos = forms.ModelMultipleChoiceField(
+        queryset=Documento.objects.all(),
+        widget=widgets.CheckboxSelectMultiple
+    )
+
+    class Meta:
+        model = CaixaPublicacao
+        fields = ['nome', 'key', 'documentos']
+
+    def __init__(self, *args, **kwargs):
+        super(CaixaPublicacaoForm, self).__init__(*args, **kwargs)
+
+        self.fields['documentos'].choices = [
+            (d.id, d) for d in Documento.objects.qs_news().filter(
+                childs__childs__midia__isnull=False)[:100]
+        ]

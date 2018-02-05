@@ -2,14 +2,30 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset
 from django import forms
 from django.contrib.auth import get_user_model, password_validation
-from django.contrib.auth.forms import AuthenticationForm, UserChangeForm,\
+from django.contrib.auth.forms import AuthenticationForm, \
     SetPasswordForm, PasswordResetForm
+from django.contrib.auth.forms import \
+    UserCreationForm as BaseUserCreationForm, \
+    UserChangeForm as BaseUserChangeForm
 from django.core.exceptions import ValidationError
-from django.forms.forms import Form
 from django.forms.models import ModelForm
 from django.utils.translation import ugettext_lazy as _
 from image_cropping.widgets import ImageCropWidget, CropWidget
 from sapl.crispy_layout_mixin import to_row, form_actions, SaplFormLayout
+
+
+# admin forms
+class UserCreationForm(BaseUserCreationForm):
+
+    class Meta(BaseUserCreationForm.Meta):
+        model = get_user_model()
+        fields = ('email',)
+
+
+class UserChangeForm(BaseUserChangeForm):
+
+    class Meta(BaseUserChangeForm.Meta):
+        model = get_user_model()
 
 
 class LoginForm(AuthenticationForm):

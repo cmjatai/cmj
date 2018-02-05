@@ -18,12 +18,12 @@ from django.views.generic.list import ListView, MultipleObjectMixin
 from sapl.parlamentares.models import Parlamentar, Legislatura
 
 from cmj import globalrules
-from cmj.crud.base import MasterDetailCrud
+from cmj.crud.base import MasterDetailCrud, Crud
 from cmj.sigad import forms, models
-from cmj.sigad.forms import DocumentoForm
+from cmj.sigad.forms import DocumentoForm, CaixaPublicacaoForm
 from cmj.sigad.models import Documento, Classe, ReferenciaEntreDocumentos,\
     PermissionsUserClasse, PermissionsUserDocumento, Revisao, CMSMixin,\
-    CLASSE_TEMPLATES_CHOICE
+    CLASSE_TEMPLATES_CHOICE, CaixaPublicacao
 from cmj.utils import make_pagination
 
 
@@ -39,7 +39,7 @@ class PaginaInicialView(TemplateView):
 
         context['noticias_dos_parlamentares'] = np
 
-        context['noticias_destaque'] = Documento.objects.qs_news(
+        """context['noticias_destaque'] = Documento.objects.qs_news(
         ).filter(
             parlamentares__isnull=True,
             classe_id=1,
@@ -53,7 +53,7 @@ class PaginaInicialView(TemplateView):
                 x, x.nodes.filter(
                     tipo=Documento.TPD_IMAGE).order_by('ordem').first()),
                 context['noticias_destaque']
-                ))
+                ))"""
 
         return context
 
@@ -1151,3 +1151,18 @@ class PermissionsUserDocumentoCrud(MasterDetailCrud):
             ctxt['subnav_template_name'] = 'sigad/subnav_documento.yaml'
 
             return ctxt
+
+
+class CaixaPublicacaoCrud(Crud):
+    model = CaixaPublicacao
+    help_text = 'Crud'
+
+    class BaseMixin(Crud.BaseMixin):
+        list_field_names = [
+            'nome', 'key', 'documentos']
+
+    class CreateView(Crud.CreateView):
+        form_class = CaixaPublicacaoForm
+
+    class UpdateView(Crud.UpdateView):
+        form_class = CaixaPublicacaoForm

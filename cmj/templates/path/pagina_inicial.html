@@ -10,17 +10,22 @@
   <div class="container-fluid canais-columns">
     {% include "base_sidebar.html" %}
   </div>
+  {% comment %}
+    <div class="container-fluid container-destaque">
+      <div class="container">
+        {% include "path/pagina_inicial_noticias_destaque.html" %}
+      </div>
+    </div>
+  {% endcomment %}
 {% endblock %}
 {% block base_functions %}{% endblock %}
 {% block main_container_class %}container container{{fluid}}{{path}}{% endblock %}
 {% block base_content %}
-  <div class="row">
-    <div class="col-md-8">
-      {% with noticias_destaque as noticias_destaque %}
-        {% include "path/pagina_inicial_noticias_destaque.html" %}
-      {% endwith %}
-    </div>
 
+  <div class="row">
+      <div class="col-md-8">
+        {% include "path/pagina_inicial_noticias_destaque.html" %}
+      </div>
     <div class="col-md-4">
 
       <div class="panel panel-info panel-nota-site-antigo">

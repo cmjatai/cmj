@@ -1,55 +1,83 @@
 {% load i18n sigad_filters social_utils%}
 
-{% for documento, imagem in noticias_destaque %}
-  {% if forloop.first %}
-    <div class="row container-noticias-destaque">
-      <div class="col-xs-12">
-  {% else %}
-    <div class="col-xs-6 col-sm-4">
-  {% endif %}
-
-  <div class="path-item-list">
-    <div class="inner">
-      <div class="path-imagem alinhamento-justify">
-        <div class="imagem" style="background-image: url(/{{imagem.absolute_slug}}.1024)"></div>
-        <a class="img-contexto" href="{% url 'cmj.sigad:path_view' documento.absolute_slug %}">
+{% with 'noticias_destaque'|caixa_publicacao as noticias_destaque %}
+  <div id="carousel-example-generic" class="carousel slide" data-ride="carousel" data-interval="7000">
+    <ol class="carousel-indicators">
+      {% for d in  noticias_destaque.docs%}
+        <li data-target="#carousel-example-generic" data-slide-to="{{forloop.counter0}}" {% if forloop.first %}class="active"{% endif %}></li>
+      {% endfor %}
+    </ol>
+    {% if perms.sigad.change_documento %}
+      <div class="btn-actions">
+        <a href="{% url 'cmj.sigad:caixapublicacao_update' noticias_destaque.cp.pk %}" title="{% trans "Editar Caixa de Publicação" %}">
+          <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
         </a>
-        <div class="autor">{{imagem.autor|default:''}}</div>
       </div>
-      <div class="texto">
-
-        <div class="titulo">
-          <a href="{% url 'cmj.sigad:path_view' documento.absolute_slug %}">
-            {{documento.titulo}}
-          </a>
+    {% endif %}
+    <div class="carousel-inner" role="listbox">
+      {% for d in  noticias_destaque.docs%}
+        <div class="item {% if forloop.first %}active{% endif %}">
+          <div class="imagem"  style="background-image: url(https://www.camarajatai.go.gov.br/{{d.1.absolute_slug}}.1024)"></div>
+          {% comment %}
+          <img src="https://www.camarajatai.go.gov.br/{{d.1.absolute_slug}}" alt="{% if d.1.titulo %}{{d.0.titulo}}{% else %}{{d.0.titulo}}{% endif %}">
+          {% endcomment %}
+          <div class="carousel-caption">{% social_link_share d.0 %}
+            <p>{{d.0.descricao}}</p>
+            <a class="titulo" href="/{{d.0.slug}}">{{d.0.titulo}}</a>
+          </div>
         </div>
-
-        <div class="descricao">
-          {% if forloop.first %}
-            {% social_link_share documento 'top-right pull-right icon-block'%}
-          {% endif %}
-
-          {{documento.descricao|safe|urlize}}
-
-          {% if not forloop.first %}
-            {% social_link_share documento 'top-right pull-right'%}
-          {% endif %}
-
-          <div class="clearfix"></div>
-
-        </div>
-      </div>
+      {% endfor %}
     </div>
+
+    <!-- Controls -->
+    <a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
+      <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+      <span class="sr-only">Previous</span>
+    </a>
+    <a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
+      <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+      <span class="sr-only">Next</span>
+    </a>
   </div>
+{% endwith %}
 
-  {% if forloop.first %}
+<div class="row container-noticias-secundarias">
+
+{% with 'noticias_secundarias'|caixa_publicacao as noticias_secundarias %}
+
+  {% for d in  noticias_secundarias.docs%}
+    <div class="path-item-list">
+      <div class="inner">
+        <div class="path-imagem alinhamento-justify">
+          <div class="imagem" style="background-image: url(https://www.camarajatai.go.gov.br/{{d.1.absolute_slug}}.1024)"></div>
+          <a class="img-contexto" href="{% url 'cmj.sigad:path_view' d.0.absolute_slug %}">
+          </a>
+          <div class="autor">{{d.1.autor|default:''}}</div>
+        </div>
+        <div class="texto">
+
+          <div class="titulo">
+            <a href="{% url 'cmj.sigad:path_view' d.0.absolute_slug %}">
+              {{d.0.titulo}}
+            </a>
+          </div>
+
+          <div class="descricao">
+            {{d.0.descricao|safe|urlize}}
+            {% social_link_share d.0 'top-right pull-right'%}
+            <div class="clearfix"></div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="row container-noticias-destaque">
-  {% elif forloop.last %}
-    </div>
-      </div>
-  {% else %}
+  {% endfor %}
+  {% if perms.sigad.change_documento %}
+    <div class="btn-actions">
+      <a href="{% url 'cmj.sigad:caixapublicacao_update' noticias_secundarias.cp.pk %}" title="{% trans "Editar Caixa de Publicação" %}">
+        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+      </a>
     </div>
   {% endif %}
-{% endfor %}
+{% endwith %}
+
+</div>

@@ -142,6 +142,7 @@ body, html {
 }
 // drunken-parrot flat ui ########################################
 
+
 .btn-link:hover, .btn-link:focus {
     color: #23527c;
     text-decoration: underline;
@@ -555,6 +556,9 @@ a:hover {
 .container {
 }
 
+
+
+
 main {
   .item-action-or-input {
     border-color: darken($color_main_bg, 10%);
@@ -857,6 +861,7 @@ h6 {
 
 .panel-nota-site-antigo {
   margin-left: 20px;
+  margin-bottom: 5px;
   font-size: 60%;
   .panel-heading {
     border: 0px;
@@ -1412,6 +1417,7 @@ main {
         position: absolute;
         bottom: $grid-gutter-width;
         right: $grid-gutter-width;
+        background: transparent;
         left: 0;
         a {
           display: inline-block;
@@ -2086,11 +2092,21 @@ main {
     }
   }
 
-  .container-noticias-destaque {
-    a {
-      color: black;
+  .container-noticias-secundarias {
+    display: table;
+    position: relative;
+    .btn-actions {
+      top: 0px;
+      left: 0px;
     }
     .path-item-list {
+      margin-top: 0px;
+      display: inline-block;
+      width: calc(33.333%);
+      vertical-align: top;
+      &:not(:first-child) {
+        padding-left: 1px;
+      }
       .inner {
         padding: 0;
       }
@@ -2100,40 +2116,10 @@ main {
         padding: 5px 0 10px 0;
       }
       .imagem {
-        height: 120px;
+        height: 150px;
       }
       .texto {
         padding: 0 5px;
-      }
-    }
-    &:first-child > div {
-      padding: 0;
-    }
-    &:not(:first-child) > div {
-      padding: 0 1px 0 0;
-      .path-item-list {
-        font-size: 90%;
-      }
-    }
-    &:first-child {
-      .path-item-list {
-        //@extend .container-box;
-        border-radius: 0;
-        font-size: 120%;
-      }
-      .texto {
-        margin: 20px 0 20px 20px;
-        padding: 0 10px 0 20px;;
-        border-left: 4px solid #a97905;
-      }
-      .descricao {
-        padding: 0px;
-      }
-      .titulo {
-        padding: 0;
-      }
-      .imagem {
-        height: 360px;
       }
     }
   }
@@ -2205,6 +2191,20 @@ main {
     width: 100%;
   }
 }
+.btn-actions {
+  position: absolute;
+  z-index: 1;
+  padding: 3px 6px 0px 8px;
+  background: rgba(black, 0.6);
+  line-height: 1.1;
+  a {
+    color: rgba(255, 255, 255, 0.6);
+    &:hover {
+      color: white;
+    }
+  }
+}
+@import "carousel_custom";
 
 
 @media screen and (max-width: 1185px + $width-wrapper-lg ) {
@@ -2494,6 +2494,9 @@ main {
       text-align: center;
     }
   }
+  .panel-nota-site-antigo {
+    margin-left: 0;
+  }
 }
 
 @media screen and (max-width: 800px) {
@@ -2693,6 +2696,7 @@ main {
   }
   main {
     .container-path {
+      margin-top: 1px;
       font-size: 1.28em;
       .path-imagem {
         padding: 0.2em;
@@ -2839,34 +2843,7 @@ main {
       }
     }
 
-    .container-noticias-destaque {
-      &:first-child {
-        margin: 0 -10px;
-        .path-item-list {
-          margin-top: 0px;
-        }
-        .texto {
-          padding: 0 5px;
-          margin: 10px 0 10px 10px;
-        }
 
-      }
-      &:not(:first-child) {
-        margin: 0 -10px;
-        & > div {
-          width: 100%;
-        }
-        .path-item-list {
-          .path-imagem {
-            &.alinhamento-justify, &.alinhamento-center {
-              width: 35%;
-              float: left;
-              margin-right: 7px;
-            }
-          }
-        }
-      }
-    }
   }
   .container-legislaturas {
     padding: 0px;
@@ -2881,9 +2858,16 @@ main {
 
 @media screen and (max-width: 600px) {
 
-    .embed-audio {
-      padding-bottom: 30%;
+  .embed-audio {
+    padding-bottom: 30%;
+  }
+
+  .carousel {
+    .imagem {
+      height: 260px;
     }
+  }
+
   .container-thumbnails {
     .content-image {
       &.show-image {
@@ -2912,7 +2896,6 @@ main {
     margin-top: 1px;
   }
   .container-path {
-    margin-top: 0px;
     margin-bottom: 50px;
     .path-title {
       font-size: 115%;
@@ -3086,22 +3069,7 @@ main {
         padding: 5px 10px 20px;
       }
     }
-    .container-noticias-destaque {
-      &:first-child {
-        .imagem {
-          height: 250px;
-        }
-      }
-      &:not(:first-child) {
-        .path-item-list {
-          .path-imagem {
-            &.alinhamento-justify {
-              width: 45%;
-            }
-          }
-        }
-      }
-    }
+
   }
 
   .container-legislaturas {
@@ -3128,6 +3096,9 @@ main {
   .navbar {
     a.navbar-brand {
       font-size: 16px;
+      .fa-home {
+        padding: 0 0.36em 0 0.40em;
+      }
     }
     button.navbar-toggle {
       padding: 4px 10px;
@@ -3157,11 +3128,11 @@ main {
       .navbar-social-links {
         padding-right: 0;
         a {
-          width: 1.6em;
+          width: 1.3em;
           height: 1.6em;
         }
         a i {
-          font-size: 110%;
+          font-size: 100%;
         }
       }
     }

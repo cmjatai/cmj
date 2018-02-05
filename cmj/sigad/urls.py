@@ -2,7 +2,7 @@ from django.conf.urls import include, url
 
 from cmj.sigad import views, imports
 from cmj.sigad.views import PermissionsUserClasseCrud,\
-    PermissionsUserDocumentoCrud
+    PermissionsUserDocumentoCrud, CaixaPublicacaoCrud
 from .apps import AppConfig
 
 
@@ -23,7 +23,6 @@ urlpatterns_sigad = [
     url(r'^classe$',
         views.ClasseListView.as_view(), name='classe_list'),
 
-    url(r'^classe/', include(PermissionsUserClasseCrud.get_urls())),
 
 
     url(r'^classe/(?P<pk>[0-9]+)$',
@@ -46,12 +45,14 @@ urlpatterns_sigad = [
     url(r'^documento/(?P<pk>[0-9]+)/delete$',
         views.DocumentoDeleteView.as_view(), name='documento_delete'),
 
-    url(r'^documento/', include(PermissionsUserDocumentoCrud.get_urls())),
 
 
     url(r'^documento/pm_import$',
         imports.DocumentoPmImportView.as_view(), name='documento_pm_import'),
 
+    url(r'^classe/', include(PermissionsUserClasseCrud.get_urls())),
+    url(r'^documento/', include(PermissionsUserDocumentoCrud.get_urls())),
+    url(r'^caixapublicacao/', include(CaixaPublicacaoCrud.get_urls())),
 
 ]
 

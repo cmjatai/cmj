@@ -1215,3 +1215,20 @@ class VersaoDeMidia(models.Model):
         ordering = ('-created',)
         verbose_name = _('Mídia')
         verbose_name_plural = _('Mídias')
+
+
+class CaixaPublicacao(models.Model):
+    key = models.CharField(
+        max_length=250,
+        default='')
+    nome = models.CharField(
+        max_length=250,
+        default='')
+
+    documentos = models.ManyToManyField(
+        'sigad.Documento', blank=True, related_name='caixapublicacao_set',
+        verbose_name=_('Documentos da Caixa de Públicação'))
+
+    class Meta:
+        verbose_name = _('Caixa de Publicação')
+        verbose_name_plural = _('Caixas de Publicação')
