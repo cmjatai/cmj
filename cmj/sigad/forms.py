@@ -179,12 +179,12 @@ class CaixaPublicacaoForm(forms.ModelForm):
         super(CaixaPublicacaoForm, self).__init__(*args, **kwargs)
 
         self.fields['documentos'].choices = [
-            (d.id, d) for d in Documento.objects.qs_news().filter(
-                Q(caixapublicacao_set__isnull=True) |
-                Q(caixapublicacao_set__isnull=False,
-                  caixapublicacao_set__id=self.instance.pk),
+            (d.id, '%s%s' % (
+                d,
+                (' - (%s)' % ' / '.join(d.caixapublicacao_set.values_list('nome', flat=True))
+                 ) if d.caixapublicacao_set.exclude(
+                    id=self.instance.pk).exists() else '')
+             ) for d in Documento.objects.qs_news().filter(
                 nodes__midia__isnull=False
             )[:100]
-
-
         ]
