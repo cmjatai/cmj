@@ -2497,6 +2497,11 @@ main {
   .panel-nota-site-antigo {
     margin-left: 0;
   }
+  .container-noticias-secundarias {
+    .path-item-list {
+      width: calc(50%);
+    }
+  }
 }
 
 @media screen and (max-width: 800px) {
@@ -2865,6 +2870,11 @@ main {
   .carousel {
     .imagem {
       height: 260px;
+    }
+  }
+  .container-noticias-secundarias {
+    .path-item-list {
+      width: calc(100%);
     }
   }
 
