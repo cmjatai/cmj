@@ -48,7 +48,10 @@
                 <span class="fa fa-key fa-3x "></span>
                 {{ form.password }}
             </div>
+            {% comment %}
             <button class="btn btn-link btn-recovery" type="submit" value="recovery" />{% trans "Esqueci minha Senha" %}</button>
+
+            {% endcomment %}
           </div>
 
           <input  type="hidden" name="next" value="{{ next }}" />
