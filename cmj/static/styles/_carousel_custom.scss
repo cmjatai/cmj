@@ -11,11 +11,11 @@
 }
 .carousel .carousel-indicators li:hover {
     border-color: rgba(255, 255, 255, 0);
-    background: rgba(#004138, 1);
+    background: darken(#a97905, 15%);
 }
 .carousel .carousel-indicators li.active {
     border-color: rgba(255, 255, 255, 0);
-    background: rgba(#006556, 1);
+    background:  rgba(#a97905, 1);
 }
 .carousel-indicators {
     display: table;
