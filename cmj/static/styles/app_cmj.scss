@@ -2439,6 +2439,11 @@ main {
         padding-top: 10px;
       }
     }
+    .container-noticias-secundarias {
+      .path-item-list {
+        width: calc(50%);
+      }
+    }
     .container-box-parlamentares {
         margin-left: 0;
 
@@ -2497,11 +2502,7 @@ main {
   .panel-nota-site-antigo {
     margin-left: 0;
   }
-  .container-noticias-secundarias {
-    .path-item-list {
-      width: calc(50%);
-    }
-  }
+
 }
 
 @media screen and (max-width: 800px) {
@@ -2872,11 +2873,7 @@ main {
       height: 260px;
     }
   }
-  .container-noticias-secundarias {
-    .path-item-list {
-      width: calc(100%);
-    }
-  }
+
 
   .container-thumbnails {
     .content-image {
@@ -3063,6 +3060,11 @@ main {
       }
       .path-parlamentares {
         text-align: center;
+      }
+    }
+    .container-noticias-secundarias {
+      .path-item-list {
+        width: calc(100%);
       }
     }
     .container-box-parlamentares {
