@@ -188,3 +188,7 @@ class CaixaPublicacaoForm(forms.ModelForm):
                 nodes__midia__isnull=False
             )[:100]
         ]
+
+        if self.instance.pk:
+            self.fields['nome'].widget.attrs = {'readonly': True}
+            self.fields['key'].widget.attrs = {'readonly': True}
