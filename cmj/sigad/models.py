@@ -23,7 +23,7 @@ from sapl.parlamentares.models import Parlamentar
 
 from cmj import globalrules
 from cmj.utils import get_settings_auth_user_model, CmjChoices,\
-    restringe_tipos_de_arquivo_midias
+    restringe_tipos_de_arquivo_midias, YES_NO_CHOICES
 
 
 CLASSE_ESTRUTURAL = 0
@@ -288,6 +288,11 @@ class CMSMixin(models.Model):
         choices=VISIBILIDADE_STATUS,
         default=STATUS_PRIVATE)
 
+    listar = models.BooleanField(
+        _('Aparecer nas Listagens'),
+        choices=YES_NO_CHOICES,
+        default=True)
+
     class Meta:
         abstract = True
 
@@ -372,6 +377,7 @@ class Slugged(Parent):
         if self.parent and hasattr(self, 'classe'):
             self.visibilidade = self.parent.visibilidade
             self.public_date = self.parent.public_date
+            self.listar = self.parent.listar
 
             if hasattr(self, 'classe'):
                 self.classe = self.parent.classe
@@ -771,6 +777,8 @@ class DocumentoManager(models.Manager):
                 # print(str(qs_user.query))
 
             qs = qs.union(qs_user)
+        else:
+            qs = qs.filter(listar=True)
 
         qs = qs.order_by('-public_date', '-created')
         return qs
@@ -783,7 +791,7 @@ class DocumentoManager(models.Manager):
             Q(parent__parent__public_end_date__isnull=True),
             parent__parent__public_date__lte=timezone.now(),
             parent__parent__visibilidade=Documento.STATUS_PUBLIC,
-
+            listar=True,
             tipo=Documento.TPD_GALLERY
         ).order_by('-parent__parent__public_date')
         return qs

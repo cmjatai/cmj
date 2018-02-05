@@ -109,7 +109,8 @@ class DocumentoForm(ModelForm):
                   'visibilidade',
                   'parlamentares',
                   'public_date',
-                  'tipo'
+                  'tipo',
+                  'listar'
                   ]
 
     def __init__(self, *args, **kwargs):
@@ -117,7 +118,7 @@ class DocumentoForm(ModelForm):
         self.helper = FormHelper()
         self.helper.layout = SaplFormLayout(
             to_row([
-                ('titulo', 8), ('visibilidade', 4)
+                ('titulo', 7), ('visibilidade', 3), ('listar', 2)
             ]),
             to_row([
                 ('tipo', 6), ('template_doc', 6),
