@@ -1406,13 +1406,13 @@ main {
       transition: top 0.15s ease-in-out;
       .btn-actions {
         height: 0px;
-        width: 100%;
         overflow: hidden;
         transition: height 0.15s ease-in-out;
         text-align: right;
         position: absolute;
         bottom: $grid-gutter-width;
         right: $grid-gutter-width;
+        left: 0;
         a {
           display: inline-block;
           left: auto;
@@ -1423,12 +1423,7 @@ main {
         }
       }
       a {
-        display: block;
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        top: 0;
+        display: inline-block;
       }
       &:hover {
         transition: top 0.15s ease-in-out;
