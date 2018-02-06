@@ -18,9 +18,9 @@
       {% for d in  noticias_destaque.docs%}
         <div class="autor">{{d.1.autor|default:''}}</div>
         <div class="item {% if forloop.first %}active{% endif %}">
-          <div class="imagem"  style="background-image: url(https://www.camarajatai.go.gov.br/{{d.1.absolute_slug}}.1024)"></div>
+          <div class="imagem"  style="background-image: url(/{{d.1.absolute_slug}}.1024)"></div>
           {% comment %}
-          <img src="https://www.camarajatai.go.gov.br/{{d.1.absolute_slug}}" alt="{% if d.1.titulo %}{{d.0.titulo}}{% else %}{{d.0.titulo}}{% endif %}">
+          <img src="/{{d.1.absolute_slug}}" alt="{% if d.1.titulo %}{{d.0.titulo}}{% else %}{{d.0.titulo}}{% endif %}">
           {% endcomment %}
           <div class="carousel-caption">{% social_link_share d.0 %}
             <p>{{d.0.descricao}}</p>
@@ -51,7 +51,7 @@
     <div class="path-item-list">
       <div class="inner">
         <div class="path-imagem alinhamento-justify">
-          <div class="imagem" style="background-image: url(https://www.camarajatai.go.gov.br/{{d.1.absolute_slug}}.256)"></div>
+          <div class="imagem" style="background-image: url(/{{d.1.absolute_slug}}.256)"></div>
           <a class="img-contexto" href="{% url 'cmj.sigad:path_view' d.0.absolute_slug %}">
           </a>
           <div class="autor">{{d.1.autor|default:''}}</div>
