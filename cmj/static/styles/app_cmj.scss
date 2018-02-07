@@ -2175,6 +2175,11 @@ main {
       padding: 1px;
     }
   }
+  &.absolute-center {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, 0);
+  }
   &.top-right {
     position: relative;
     right: 0;
@@ -2205,7 +2210,17 @@ main {
   }
 }
 @import "carousel_custom";
-
+#pagina-inicial {
+  .carousel {
+    margin: 0 -10px 20px;
+  }
+}
+.container-videos {
+  margin-top: -20px;
+  .carousel-caption {
+    font-size: 100%;
+  }
+}
 
 @media screen and (max-width: 1185px + $width-wrapper-lg ) {
   #wrapper.toggled {

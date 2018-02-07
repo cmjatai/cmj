@@ -25,18 +25,12 @@
         {% endif %}
         <div class="carousel-inner" role="listbox">
           {% for d in  video_destaque.docs%}
-            <div class="autor">{{d.1.autor|default:''}}</div>
-            <div class="item {% if forloop.first %}active{% endif %}">
-              <div class="imagem"  style="background-image: url({{d.0.extra_data.thumbnails.high.url}})">
-
-              </div>
-              {% comment %}
-              <img src="/{{d.1.absolute_slug}}" alt="{% if d.1.titulo %}{{d.0.titulo}}{% else %}{{d.0.titulo}}{% endif %}">
-              {% endcomment %}
-              <div class="carousel-caption">{% social_link_share d.0 %}
+            <div class="item {% if forloop.first %}active{% endif %}" >
+              {% social_link_share d.0 'absolute-center'%}
+              <a class="imagem" href="/{{d.0.slug}}" style="background-image: url({{d.0.extra_data.thumbnails.high.url}})"></a>
+              <div class="carousel-caption">
                 <p>{{d.0.descricao}}</p>
-                <a class="titulo" href="/{{d.0.slug}}">{{d.0.titulo}}</a>
-
+                <span class="titulo">{{d.0.titulo}}</span>
               </div>
             </div>
           {% endfor %}
@@ -51,6 +45,7 @@
           <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
           <span class="sr-only">Next</span>
         </a>
+
       </div>
     {% endif %}
   {% endwith %}
