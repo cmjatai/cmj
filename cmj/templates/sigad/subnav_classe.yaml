@@ -3,3 +3,5 @@
   url: subclasse_list
 - title: {% trans 'Usuários com Acesso' %}
   url: permissionsuserclasse_list
+- title: {% trans 'Caixas de Publicação' %}
+  url: caixapublicacaoclasse_list

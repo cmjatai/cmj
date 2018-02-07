@@ -67,7 +67,7 @@
 }
 a.carousel-control {
     opacity: 1;
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(255, 255, 255, 0.3);
 }
 a.carousel-control:hover,
 a.carousel-control:focus,
@@ -76,12 +76,12 @@ a.carousel-control:active {
     color: rgba(255, 255, 255, 0.95);
 }
 .carousel-control.left {
-    background: -webkit-linear-gradient(left, rgba(0, 0, 0, 0.25) 0, rgba(0, 0, 0, 0.0001) 100%);
-    background: linear-gradient(to right, rgba(0, 0, 0, 0.25) 0, rgba(0, 0, 0, 0.0001) 100%);
+    background: -webkit-linear-gradient(left, rgba(0, 0, 0, 0.15) 0, rgba(0, 0, 0, 0.0001) 100%);
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.15) 0, rgba(0, 0, 0, 0.0001) 100%);
 }
 .carousel-control.right {
-    background: -webkit-linear-gradient(left, rgba(0, 0, 0, 0.0001) 0, rgba(0, 0, 0, 0.25) 100%);
-    background: linear-gradient(to right, rgba(0, 0, 0, 0.0001) 0, rgba(0, 0, 0, 0.25) 100%);
+    background: -webkit-linear-gradient(left, rgba(0, 0, 0, 0.0001) 0, rgba(0, 0, 0, 0.15) 100%);
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.0001) 0, rgba(0, 0, 0, 0.15) 100%);
 }
 .carousel-control.left:hover,
 .carousel-control.left:focus,

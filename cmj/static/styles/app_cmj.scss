@@ -861,7 +861,7 @@ h6 {
 
 .panel-nota-site-antigo {
   margin-left: 10px;
-  margin-bottom: 5px;
+  margin-bottom: 15px;
   font-size: 60%;
   .panel-heading {
     border: 0px;
@@ -2031,10 +2031,9 @@ main {
     background-color: $hover_background_20p;
     min-height: 0px;
   }
-
-
-
-
+}
+.container-videos {
+  margin-top: -20px;
 }
 
 // #### pagina inicial ########################################
@@ -2078,6 +2077,8 @@ main {
     }
     .navbar-social-links {
       float: right;
+      position: absolute;
+      margin-left: 10px;
       a {
         i {
           color: rgba(#a97905, 0.6);

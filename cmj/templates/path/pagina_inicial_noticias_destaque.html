@@ -1,6 +1,6 @@
 {% load i18n sigad_filters social_utils%}
 
-{% with 'noticias_destaque'|caixa_publicacao as noticias_destaque %}
+{% with 'noticias_destaque'|caixa_publicacao:None as noticias_destaque %}
   <div id="carousel-example-generic" class="carousel slide" data-ride="carousel" data-interval="7000">
     <ol class="carousel-indicators">
       {% for d in  noticias_destaque.docs%}
@@ -45,7 +45,7 @@
 
 <div class="row container-noticias-secundarias">
 
-{% with 'noticias_secundarias'|caixa_publicacao as noticias_secundarias %}
+{% with 'noticias_secundarias'|caixa_publicacao:None as noticias_secundarias %}
 
   {% for d in  noticias_secundarias.docs%}
     <div class="path-item-list">

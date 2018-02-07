@@ -62,8 +62,20 @@ CLASSE_TEMPLATES_CHOICE_FILES = {
     4: 'path/path_parlamentar.html',
     5: 'path/path_galeria.html',
     6: 'path/path_classe.html',
-    7: 'path/path_classe.html',
+    7: 'path/path_galeria_video.html',
 }
+
+
+CLASSE_DOC_MANAGER_CHOICE = {
+    1: 'qs_news',
+    2: 'view_public_gallery',
+    3: 'qs_news',
+    4: 'qs_news',
+    5: 'qs_bi',
+    6: 'qs_audio_news',
+    7: 'qs_video_news',
+}
+
 
 CLASSE_TEMPLATES_CHOICE = CmjChoices(
     (1, 'lista_em_linha', _('Listagem em Linha')),
@@ -1225,14 +1237,31 @@ class CaixaPublicacao(models.Model):
         max_length=250,
         default='')
 
+    classe = models.ForeignKey(
+        Classe,
+        related_name='caixapublicacao_set',
+        verbose_name=_('Classes'),
+        blank=True, null=True, default=None)
+
     documentos = models.ManyToManyField(
         'sigad.Documento', blank=True,
         related_query_name='caixapublicacao_set',
         verbose_name=_('Documentos da Caixa de Públicação'))
 
     def __str__(self):
-        return self.nome
+        if self.classe:
+            return '%s (%s)' % (self.nome, self.classe)
+        else:
+            return self.nome
 
     class Meta:
+        verbose_name = _('Caixa de Publicação')
+        verbose_name_plural = _('Caixas de Publicação')
+
+
+class CaixaPublicacaoClasse(CaixaPublicacao):
+
+    class Meta:
+        proxy = True
         verbose_name = _('Caixa de Publicação')
         verbose_name_plural = _('Caixas de Publicação')

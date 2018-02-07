@@ -10,7 +10,8 @@ from sapl.crispy_layout_mixin import to_row, SaplFormLayout
 from sapl.parlamentares.models import Parlamentar
 
 from cmj.sigad import models
-from cmj.sigad.models import Classe, Documento, Revisao, CaixaPublicacao
+from cmj.sigad.models import Classe, Documento, Revisao, CaixaPublicacao,\
+    CLASSE_DOC_MANAGER_CHOICE, CaixaPublicacaoClasse
 
 
 class UpLoadImportFileForm(forms.Form):
@@ -172,21 +173,30 @@ class CaixaPublicacaoForm(forms.ModelForm):
     )
 
     class Meta:
-        model = CaixaPublicacao
+        model = CaixaPublicacaoClasse
         fields = ['nome', 'key', 'documentos']
 
     def __init__(self, *args, **kwargs):
+        classe = kwargs['initial'].pop('classe', None)
+
+        if classe:
+            tmpl = classe.template_classe
+            qs = getattr(classe.documento_set, CLASSE_DOC_MANAGER_CHOICE[tmpl])
+            qs = qs()
+        else:
+            qs = Documento.objects.qs_news().filter(
+                nodes__midia__isnull=False
+            )
+
         super(CaixaPublicacaoForm, self).__init__(*args, **kwargs)
 
         self.fields['documentos'].choices = [
             (d.id, '%s%s' % (
                 d,
-                (' - (%s)' % ' / '.join(d.caixapublicacao_set.values_list('nome', flat=True))
+                (' - (%s)' % ', '.join(d.caixapublicacao_set.values_list('nome', flat=True))
                  ) if d.caixapublicacao_set.exclude(
                     id=self.instance.pk).exists() else '')
-             ) for d in Documento.objects.qs_news().filter(
-                nodes__midia__isnull=False
-            )[:100]
+             ) for d in qs[:100]
         ]
 
         if self.instance.pk:

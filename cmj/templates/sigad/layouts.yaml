@@ -10,4 +10,8 @@ CaixaPublicacao:
   - nome key
   {% trans 'Documentos' %}:
   - documentos
-  
+CaixaPublicacaoClasse:
+  {% trans 'Nome e Chave' %}:
+  - nome key
+  {% trans 'Documentos' %}:
+  - documentos

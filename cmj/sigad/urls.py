@@ -2,7 +2,8 @@ from django.conf.urls import include, url
 
 from cmj.sigad import views, imports
 from cmj.sigad.views import PermissionsUserClasseCrud,\
-    PermissionsUserDocumentoCrud, CaixaPublicacaoCrud
+    PermissionsUserDocumentoCrud, CaixaPublicacaoCrud,\
+    CaixaPublicacaoClasseCrud
 from .apps import AppConfig
 
 
@@ -50,9 +51,11 @@ urlpatterns_sigad = [
     url(r'^documento/pm_import$',
         imports.DocumentoPmImportView.as_view(), name='documento_pm_import'),
 
-    url(r'^classe/', include(PermissionsUserClasseCrud.get_urls())),
     url(r'^documento/', include(PermissionsUserDocumentoCrud.get_urls())),
     url(r'^caixapublicacao/', include(CaixaPublicacaoCrud.get_urls())),
+    url(r'^classe/', include(PermissionsUserClasseCrud.get_urls() +
+                             CaixaPublicacaoClasseCrud.get_urls()
+                             )),
 
 ]
 

@@ -23,7 +23,7 @@ from cmj.sigad import forms, models
 from cmj.sigad.forms import DocumentoForm, CaixaPublicacaoForm
 from cmj.sigad.models import Documento, Classe, ReferenciaEntreDocumentos,\
     PermissionsUserClasse, PermissionsUserDocumento, Revisao, CMSMixin,\
-    CLASSE_TEMPLATES_CHOICE, CaixaPublicacao
+    CLASSE_TEMPLATES_CHOICE, CaixaPublicacao, CaixaPublicacaoClasse
 from cmj.utils import make_pagination
 
 
@@ -238,11 +238,9 @@ class PathView(MultipleObjectMixin, TemplateView):
         template = self.classe.template_classe
 
         if template == models.CLASSE_TEMPLATES_CHOICE.lista_em_linha:
-            kwargs[
-                'object_list'
-            ] = self.classe.documento_set.qs_news(user=self.request.user)
+            kwargs['object_list'] = self.classe.documento_set.qs_news(
+                user=self.request.user)
 
-            #.filter(public_date__isnull=False).order_by('-public_date').all()
         elif template == models.CLASSE_TEMPLATES_CHOICE.galeria:
             kwargs['object_list'] = Documento.objects.view_public_gallery()
 
@@ -1139,7 +1137,7 @@ class PermissionsUserDocumentoCrud(MasterDetailCrud):
 
 class CaixaPublicacaoCrud(Crud):
     model = CaixaPublicacao
-    help_text = 'Crud'
+    help_text = 'caixapublicacao'
 
     class BaseMixin(Crud.BaseMixin):
         list_field_names = [
@@ -1149,4 +1147,29 @@ class CaixaPublicacaoCrud(Crud):
         form_class = CaixaPublicacaoForm
 
     class UpdateView(Crud.UpdateView):
+        form_class = CaixaPublicacaoForm
+
+
+class CaixaPublicacaoClasseCrud(MasterDetailCrud):
+    model = CaixaPublicacaoClasse
+    parent_field = 'classe'
+
+    class BaseMixin(MasterDetailCrud.BaseMixin):
+        list_field_names = [
+            'nome', 'key', 'classe', 'documentos']
+
+        def get_initial(self):
+            if self.object:
+                classe = self.object.classe
+            else:
+                classe = Classe.objects.get(pk=self.kwargs.get('pk'))
+
+            initial = MasterDetailCrud.CreateView.get_initial(self)
+            initial.update({'classe': classe})
+            return initial
+
+    class CreateView(MasterDetailCrud.CreateView):
+        form_class = CaixaPublicacaoForm
+
+    class UpdateView(MasterDetailCrud.UpdateView):
         form_class = CaixaPublicacaoForm

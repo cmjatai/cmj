@@ -43,16 +43,19 @@ def organize_direction_avatars(pos, total):
 
 
 @register.filter
-def caixa_publicacao(key):
-    cp = CaixaPublicacao.objects.get(key=key)
-    docs = cp.documentos.order_by('-public_date')
-    result = {'cp': cp, 'docs':
-              list(
-                  map(lambda x: (
-                      x, x.nodes.filter(
-                        tipo=Documento.TPD_IMAGE).order_by('ordem').first()),
-                      docs
-                      ))
-              }
+def caixa_publicacao(key, classe):
+    try:
+        cp = CaixaPublicacao.objects.get(key=key, classe=classe)
+        docs = cp.documentos.order_by('-public_date')
+        result = {'cp': cp, 'docs':
+                  list(
+                      map(lambda x: (
+                          x, x.nodes.filter(
+                            tipo=Documento.TPD_IMAGE).order_by('ordem').first()),
+                          docs
+                          ))
+                  }
 
-    return result
+        return result
+    except:
+        return None
