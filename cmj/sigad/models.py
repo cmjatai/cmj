@@ -62,7 +62,7 @@ CLASSE_TEMPLATES_CHOICE_FILES = {
     4: 'path/path_parlamentar.html',
     5: 'path/path_galeria.html',
     6: 'path/path_classe.html',
-    7: 'path/path_classe.html',
+    7: 'path/path_galeria_video.html',
 }
 
 

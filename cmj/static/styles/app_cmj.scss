@@ -2034,6 +2034,26 @@ main {
 }
 .container-videos {
   margin-top: -20px;
+  .btn-play {
+    text-align: center;
+    height: auto;
+    line-height: 400px;
+    font-size: 1.7em;
+    color: rgba(white,0.3);
+    .fa-play {
+      border: .15em solid rgba(white,0.3);
+      border-radius: 50%;
+      padding: 0.5em 0 0 0.2em;
+      width: 2.3em;
+      height: 2.3em;
+    }
+    &:hover {
+      color: rgba(white,0.9);
+      .fa-play {
+        border-color: rgba(white,0.9);
+      }
+    }
+  }
 }
 
 // #### pagina inicial ########################################
@@ -2219,6 +2239,11 @@ main {
   margin-top: -20px;
   .carousel-caption {
     font-size: 100%;
+  }
+  .carousel {
+    .navbar-social-links {
+      padding-top: 10px;
+    }
   }
 }
 
@@ -2723,6 +2748,10 @@ main {
         padding: 0.2em;
       }
     }
+    .container-videos {
+      margin-top:-20px;
+    }
+
   }
   .canais-columns {
     padding: 0px;
@@ -2875,6 +2904,20 @@ main {
       border-width: 1px 0 0 0;
     }
   }
+
+  .carousel {
+    .imagem {
+      height: 360px;
+    }
+  }
+  .container-videos {
+    .btn-play {
+      height: auto;
+      line-height: 360px;
+    }
+
+  }
+
 }
 
 @media screen and (max-width: 600px) {
@@ -2887,8 +2930,15 @@ main {
     .imagem {
       height: 260px;
     }
-  }
 
+  }
+  .container-videos {
+    .btn-play {
+      height: auto;
+      line-height: 240px;
+      padding-bottom: 20px;
+    }
+  }
 
   .container-thumbnails {
     .content-image {
@@ -3250,6 +3300,28 @@ main {
     .inner-mesa {
       .inner-parla {
         margin: 0px;
+      }
+    }
+  }
+
+  .carousel {
+    .imagem {
+      height: 200px;
+    }
+    .titulo {
+      font-size: 110%;
+    }
+  }
+  .container-videos {
+    .btn-play {
+      height: auto;
+      line-height: 195px;
+      padding-bottom: 5px;
+      .fa-play {
+        border-width: .13em;
+        padding: 0.3em 0 0 0.2em;
+        width: 1.8em;
+        height: 1.8em;
       }
     }
   }

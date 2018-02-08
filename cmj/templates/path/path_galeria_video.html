@@ -27,11 +27,13 @@
           {% for d in  video_destaque.docs%}
             <div class="item {% if forloop.first %}active{% endif %}" >
               {% social_link_share d.0 'absolute-center'%}
-              <a class="imagem" href="/{{d.0.slug}}" style="background-image: url({{d.0.extra_data.thumbnails.high.url}})"></a>
               <div class="carousel-caption">
                 <p>{{d.0.descricao}}</p>
                 <span class="titulo">{{d.0.titulo}}</span>
               </div>
+              <a class="imagem btn-play" href="/{{d.0.slug}}" style="background-image: url({{d.0.extra_data.thumbnails.high.url}})">
+                <i class="fa fa-play" aria-hidden="true"></i>
+              </a>
             </div>
           {% endfor %}
         </div>
@@ -45,8 +47,15 @@
           <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
           <span class="sr-only">Next</span>
         </a>
-
       </div>
     {% endif %}
   {% endwith %}
+
+  <div class="container">
+    {% for doc  in object_list %}
+
+    {% endfor %}
+
+
+  </div>
 {% endblock %}
