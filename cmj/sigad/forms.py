@@ -169,7 +169,9 @@ class CaixaPublicacaoForm(forms.ModelForm):
 
     documentos = forms.ModelMultipleChoiceField(
         queryset=Documento.objects.all(),
-        widget=widgets.CheckboxSelectMultiple
+        widget=widgets.CheckboxSelectMultiple,
+        required=False
+
     )
 
     class Meta:
