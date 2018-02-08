@@ -2035,6 +2035,9 @@ main {
 
 .container-videos {
   margin-top: -20px;
+  .carousel {
+    margin-bottom: 0px;
+  }
   .navbar-social-links {
     padding-top: 10px;
     i {
@@ -2075,7 +2078,7 @@ main {
       display: inline-block;
       width: calc(33.33%);
       vertical-align: top;
-      padding: 0 10px 20px;
+      padding: 20px 10px 0;
     }
     .inner {
       position: relative;
@@ -3018,7 +3021,7 @@ main {
         padding-top: 5px;
       }
       .item {
-        padding: 0 25px 30px;
+        padding: 30px 25px 0;
         &:nth-child(even) {
           padding-left: 15px;
         }
@@ -3064,7 +3067,7 @@ main {
       .item {
         width: calc(100%);
         &:nth-child(even), &:nth-child(odd) {
-          padding: 0 25px 30px;
+          padding: 30px 25px 0;
         }
       }
     }

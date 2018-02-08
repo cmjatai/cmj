@@ -47,7 +47,8 @@ def caixa_publicacao(key, classe):
     try:
         cp = CaixaPublicacao.objects.get(key=key, classe=classe)
         docs = cp.documentos.order_by('-public_date')
-        result = {'cp': cp, 'docs':
+        result = {'url_edit': 'cmj.sigad:caixapublicacao%s_update' % ('classe' if classe else ''),
+                  'cp': cp, 'docs':
                   list(
                       map(lambda x: (
                           x, x.nodes.filter(
