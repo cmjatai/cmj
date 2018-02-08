@@ -1,0 +1,209 @@
+{% load i18n common_cmj_tags %}
+- title: {% trans 'Institucional' %}
+  url: ''
+  css_class: head_title
+  children:
+  - title: Mesa Diretora
+    url: /parlamentar
+  - title: Comissões
+    url: http://sapl.camarajatai.go.gov.br/sapl/consultas/comissao/comissao_index_html
+
+  - title: {% trans 'Legislação' %}
+    url: http://sapl.camarajatai.go.gov.br/sapl/qs?d=tc-tn&tc=tn
+    css_class: head_title
+    children:
+    - title: Regimento Interno
+      url: http://sapl.camarajatai.go.gov.br/sapl/qs?d=tc-tn&tn=21
+    - title: Lei Orgânica do Municipio
+      url: http://sapl.camarajatai.go.gov.br/sapl/qs?d=tc-tn&tn=3
+    - title: Leis Complementares
+      url: http://sapl.camarajatai.go.gov.br/sapl/qs?d=tc-tn&tn=20
+    - title: Leis Ordinárias
+      url: http://sapl.camarajatai.go.gov.br/sapl/qs?d=tc-tn&tn=1
+    - title: Decretos Legislativos
+      url: http://sapl.camarajatai.go.gov.br/sapl/qs?d=tc-tn&tn=2
+    - title: Resoluções
+      url: http://sapl.camarajatai.go.gov.br/sapl/qs?d=tc-tn&tn=19
+    - title: Portarias
+      url: http://sapl.camarajatai.go.gov.br/sapl/qs?d=tc-tn&tn=10
+- title: {% trans 'Parlamentares' %}
+  url: /parlamentar
+  css_class: head_title
+  children:
+  - title: Adilson de Carvalho
+    url: /parlamentar/adilson-de-carvalho
+  - title: Thiago Maggioni
+    url: /parlamentar/thiago-maggioni
+  - title: Major Davi Pires
+    url: /parlamentar/major-davi-pires
+  - title: Carvalinho
+    url: /parlamentar/carvalhinho
+  - title: Gildenicio Santos
+    url: /parlamentar/gildenicio-santos
+  - title: João Rosa
+    url: /parlamentar/joao-rosa
+  - title: José Prado Carapô
+    url: /parlamentar/jose-prado-carapo
+  - title: Kátia Carvalho
+    url: /parlamentar/katia-carvalho
+  - title: Marcos Antônio
+    url: /parlamentar/marcos-antonio
+  - title: Mauro Bento Filho
+    url: /parlamentar/mauro-bento-filho
+- title: {% trans 'Comunicação' %}
+  url: ''
+  css_class: head_title
+  children:
+  - title: TV CMJ
+    url: /tv-cmj/ao-vivo
+  - title: Rádio CMJ
+    url: /radio-cmj/ao-vivo
+  - title: Notícias
+    url: /noticias
+  - title: Multimídia
+    url: /radio-cmj/ao-vivo
+    css_class: head_title
+    children:
+    - title: Galeria de imagens
+      url: /galerias/imagens
+    - title: Galeria de Áudios
+      url: /radio-cmj
+    - title: Vídeos
+      url: ''
+      children:
+      - title: Sessẽs Solenes
+        url: /tv-cmj/sessoes/sessoes-solenes
+      - title: Sessões Plenárias
+        url: ''
+        children:
+        - title: '2018'
+          url: /tv-cmj/sessoes/sessoes-plenarias/2018
+        - title: '2017'
+          url: /tv-cmj/sessoes/sessoes-plenarias/2017
+        - title: '2016'
+          url: /tv-cmj/sessoes/sessoes-plenarias/2016
+        - title: '2015'
+          url: /tv-cmj/sessoes/sessoes-plenarias/2015
+        - title: '2014'
+          url: /tv-cmj/sessoes/sessoes-plenarias/2014
+        - title: '2013'
+          url: /tv-cmj/sessoes/sessoes-plenarias/2013
+
+- title: {% trans 'Processo Legislativo' %}
+  url: ''
+  css_class: head_title
+  children:
+  - title: Sessões Plenárias
+    url: http://sapl.camarajatai.go.gov.br/sapl/consultas/sessao_plenaria/sessao_plenaria_index_html
+  - title: Matérias em tramitação
+    url: http://sapl.camarajatai.go.gov.br/sapl/qs?d=-&tr=1
+  - title: Diário Oficial
+    css_class: head_title
+    children:
+    - title: Republicação do Diário Oficial do Município
+      url: http://sapl.camarajatai.go.gov.br/sapl/qs?tc=td
+      children:
+      - title: Fale Conosco
+        url: ''
+        css_class: head_title
+        children:
+        - title: Localização e Horários
+          url: /fale-conosco/localizacao-e-horarios
+        - title: Telefones
+          url: /fale-conosco/telefones
+
+- title: Documentos Administrativos
+  url: ''
+  css_class: head_title
+  children:
+  - title: Últimas Publicações
+    url: http://sislegis.camarajatai.go.gov.br/publicacoes
+  - title: Licitações e Contratos
+    url: http://sislegis.camarajatai.go.gov.br/publicacoes
+    css_class: head_title
+    children:
+    - title: Licitações em Andamento
+      url: http://sislegis.camarajatai.go.gov.br/publicacoes/seeker?sv=9&tl=5
+    - title: Contratos em Vigência
+      url: http://sislegis.camarajatai.go.gov.br/publicacoes/seeker?sv=11&tl=36&ct=3
+    - title: {% trans 'Transparência' %}
+      url: ''
+      css_class: head_title
+      children:
+      - title: Lei de Acesso à Informação
+        url: http://camaradejatai.sigepnet.com.br/index.php?portal=2
+      - title: Portal da Transparência
+        url: http://camaradejatai.sigepnet.com.br/transparencia/?portal=1
+      - title: Lei de Acesso à Informação
+        url: http://camaradejatai.sigepnet.com.br/index.php?portal=2
+      - title: Servidores
+        url: http://camaradejatai.sigepnet.com.br/index.php?portal=3
+
+
+
+
+{% comment %}
+- title: {% trans 'Institucional' %}
+  url: ''
+  children:
+  - title: {% trans 'Nossa Jataí' %}
+    url: /institucional/nossa-jatai
+  - title: {% trans 'História' %}
+    url: ''
+    children:
+    - title: {% trans 'Prefeitos de Nossa História' %}
+      url: /institucional/historia/prefeitos-de-nossa-historia
+- title: {% trans 'Parlamentares' %}
+  url: /parlamentar
+- title: {% trans 'Notícias' %}
+  url: /noticias
+- title: {% trans 'TV CMJ' %}
+  url: ''
+  children:
+  - title: {% trans 'Transmissão ao vivo' %}
+    url: http://www.jatai.go.leg.br/tv-cmj/ao-vivo
+  - title: {% trans 'Sessões Transmitidas' %}
+    url: ''
+    children:
+    - title: {% trans 'Sessões Solenes' %}
+      url: /tv-cmj/sessoes/sessoes-solenes
+    - title: {% trans 'Sessões Plenárias' %}
+      url: ''
+      children:
+      - title: '{% trans '2018' %}'
+        url: /tv-cmj/sessoes/sessoes-plenarias/2018
+      - title: '{% trans '2017' %}'
+        url: /tv-cmj/sessoes/sessoes-plenarias/2017
+      - title: '{% trans '2016' %}'
+        url: /tv-cmj/sessoes/sessoes-plenarias/2016
+      - title: '{% trans '2015' %}'
+        url: /tv-cmj/sessoes/sessoes-plenarias/2015
+      - title: '{% trans '2014' %}'
+        url: /tv-cmj/sessoes/sessoes-plenarias/2014
+      - title: '{% trans '2013' %}'
+        url: /tv-cmj/sessoes/sessoes-plenarias/2013
+  - title: {% trans 'Audiências Públicas' %}
+    url: /tv-cmj/audiencias-publicas
+  - title: {% trans 'Entrevistas' %}
+    url: /tv-cmj/entrevistas
+  - title: {% trans 'Memórias de jataí' %}
+    url: /tv-cmj/memorias-de-jatai
+- title: {% trans 'Rádio CMJ' %}
+  url: ''
+  children:
+  - title: {% trans 'Rádio ao vivo' %}
+    url: http://www.jatai.go.leg.br/radio-cmj/ao-vivo
+  - title: {% trans 'Galeria de Áudio' %}
+    url: /radio-cmj
+- title: {% trans 'Galerias' %}
+  children:
+  - title: {% trans 'Imagens' %}
+    url: /galerias/imagens
+- title: {% trans 'Fale Conosco' %}
+  url: ''
+  children:
+  - title: {% trans 'Localização e Horários' %}
+    url: /fale-conosco/localizacao-e-horarios
+  - title: {% trans 'Telefones' %}
+    url: /fale-conosco/telefones
+{% endcomment %}

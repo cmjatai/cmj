@@ -875,7 +875,7 @@ h6 {
 }
 // #### footer ###########################################
 // based on http://getbootstrap.com/examples/sticky-footer
-$footer-height: 30px;
+$footer-height: 25px;
 html {
   position: relative;
   min-height: 100%;
@@ -893,6 +893,56 @@ body {
   color: lighten($color_topo_bg, 20%);
   text-align: center;
   font-size: 1em;
+  line-height: $footer-height;
+}
+
+footer.container-footer {
+  position: relative;
+  z-index: 2000;
+  background: $color_topo_bg url(/static/img/bg.png);
+  border-top: 2px solid lighten($color_topo_bg, 20%);
+  color: white;
+  a {
+    color: #ccc;
+
+    padding-right: 10px;
+    display: inline-block;
+    &:hover {
+      color: white;
+    }
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+    width: 100%;
+  }
+  li {
+  }
+  .head_title {
+    display: inline-block;
+    padding: 20px 0 0 0;
+    font-variant: small-caps;
+    font-size: 120%;
+    font-weight: bold;
+    font-family: arial;
+    color: yellow;
+
+  }
+  .container {
+    & > ul {
+      display: table;
+      padding: 0px;
+      & > li {
+        position: relative;
+        display: inline-block;
+        width: calc(20%);
+        vertical-align: top;
+      }
+    }
+    li {
+      font-variant: normal;
+    }
+  }
 }
 
 // #### pagination ########################################
@@ -2793,7 +2843,7 @@ main {
 @media screen and (max-width: 767px) {
   $footer-height: 25px;
   body {
-    margin-bottom: $footer-height + 20px;
+    margin-bottom: $footer-height;
   }
 
   .embed-audio {
@@ -3296,6 +3346,16 @@ main {
       }
     }
   }
+
+  footer.container-footer {
+    .container {
+      & > ul {
+        & > li {
+          width: calc(33.33%);
+        }
+      }
+    }
+  }
 }
 
 @media screen and (max-width: 480px) {
@@ -3455,6 +3515,15 @@ main {
         padding: 0.3em 0 0 0.2em;
         width: 1.8em;
         height: 1.8em;
+      }
+    }
+  }
+  footer.container-footer {
+    .container {
+      & > ul {
+        & > li {
+          width: calc(100%);
+        }
       }
     }
   }
