@@ -2,7 +2,7 @@
 {% load i18n sigad_filters social_utils%}
 {% block main_container_class %}container-path container-videos{% endblock %}
 {% block base_functions %}
-  {% if not user.is_anonymous %}
+  {% if not user.is_anonymous and perms.sigad.change_documento or perms.sigad.change_classe%}
     {{block.super}}
   {% endif %}
 {% endblock %}
@@ -51,11 +51,23 @@
     {% endif %}
   {% endwith %}
 
-  <div class="container">
+  <div class="container video-list">
     {% for doc  in object_list %}
-
+      <div class="item">
+        <div class="inner">
+          {% social_link_share doc 'absolute-center'%}
+          <a class="btn-play" href="/{{doc.slug}}" style="background-image: url({{doc.extra_data.thumbnails.high.url}})">
+            <i class="fa fa-play" aria-hidden="true"></i>
+            <div class="inner-text">
+              <span class="titulo">{{doc.titulo}}</span>
+              <span class="descricao">{{doc.descricao}}</span>
+            </div>
+          </a>
+        </div>
+      </div>
     {% endfor %}
-
-
   </div>
+
+
+  {% include "paginacao.html" %}
 {% endblock %}
