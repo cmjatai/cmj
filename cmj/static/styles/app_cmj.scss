@@ -2055,12 +2055,19 @@ main {
       width: 2.3em;
       height: 2.3em;
     }
+    .titulo {
+      font-size: 90%;
+    }
+    p {
+      font-size: 70%;
+    }
     &:hover {
       color: rgba(white,0.9);
       .fa-play {
         border-color: rgba(white,0.9);
       }
     }
+
   }
   .video-list {
     display: table;
