@@ -9,7 +9,7 @@
 {% block base_header %}{% endblock %}
 {% block base_content %}
   {% with 'video_destaque'|caixa_publicacao:object as video_destaque %}
-    {% if video_destaque and video_destaque.docs.count %}
+    {% if video_destaque and video_destaque.docs|length  %}
       <div id="carousel-example-generic" class="carousel slide" data-ride="carousel" data-interval="7000">
         <ol class="carousel-indicators">
           {% for d in  video_destaque.docs%}
