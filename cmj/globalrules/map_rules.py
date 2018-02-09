@@ -151,6 +151,7 @@ rules_sigad_view_status_restritos = {
         (Classe, [
             'view_pathclasse',
             'view_subclasse',
+            'menu_dados_auxiliares',
         ]),
         (Documento, [
             'view_documento'])]
