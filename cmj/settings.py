@@ -357,6 +357,12 @@ if DEBUG and LOGGING_CONSOLE:
     }
 
 
+if DEBUG:
+    SITE_URL = ''
+else:
+    SITE_URL = 'https://www.jatai.go.leg.br'
+
+
 def excepthook(*args):
     logging.getLogger(BASE_DIR.name).error(
         'Uncaught exception:', exc_info=args)

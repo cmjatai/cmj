@@ -98,7 +98,7 @@
       <nav class="navbar">
         <div class="container{{fluid}} container-header">
           <div class="navbar-header">
-            <a class="navbar-brand" href="https://www.jatai.go.leg.br">
+            <a class="navbar-brand" href="{{site_url}}">
               <i class="fa fa-home" aria-hidden="true"></i>C<small>âmara</small> M<small>unicipal de</small> J<small>ataí</small>
             </a>
           </div>
@@ -132,7 +132,7 @@
               <li>
                 <a class="dropdown-toggle" href="#fakeLink" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Acessar" %}</span></a>
                 <ul class="dropdown-menu me menu-rightnu-right">
-                  <li><a href="https://www.jatai.go.leg.br{% url 'cmj.core:login' %}">{% trans "Portal" %}</a></li>
+                  <li><a href="{{site_url}}{% url 'cmj.core:login' %}">{% trans "Portal" %}</a></li>
                   <li><a href="https://mail.camarajatai.go.gov.br">{% trans "Webmail" %}</a></li>
                 </ul>
               </li>
@@ -194,7 +194,7 @@
                   <li>
                     <a class="dropdown-toggle" href="#fakeLink" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Acessar" %}</span></a>
                     <ul class="dropdown-menu me menu-rightnu-right">
-                      <li><a href="https://www.jatai.go.leg.br{% url 'cmj.core:login' %}">{% trans "Portal" %}</a></li>
+                      <li><a href="{{site_url}}{% url 'cmj.core:login' %}">{% trans "Portal" %}</a></li>
                       <li><a href="https://mail.camarajatai.go.gov.br">{% trans "Webmail" %}</a></li>
                     </ul>
 
