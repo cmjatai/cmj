@@ -372,15 +372,20 @@
       {% endblock global_container %}
     </div>
   {% block login_container %}
+    {% comment %}
+            semanticamente o menu footer não deveria estar neste container
+            porém, o arquivo core/user/login.html
+            muda totalmente o layout da pagina e renderiza aqui, com isso
+            retira o menu footer, que é o objetivo
+    {% endcomment %}
+    <footer class="container-fluid container-footer">
+      <div class="container">
+        <ul>
+          {% menu 'menu_footer.yaml'%}
+        </ul>
+      </div>
+    </footer>
   {% endblock%}
-
-  <footer class="container-fluid container-footer">
-    <div class="container">
-      <ul>
-        {% menu 'menu_footer.yaml'%}
-      </ul>
-    </div>
-  </footer>
 
   <footer id="footer" class="footer page__row screen-lg">
     <div class="container">

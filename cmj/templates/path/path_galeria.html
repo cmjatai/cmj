@@ -64,7 +64,7 @@
                 <div class="btn-actions">
 
                     {% if perms.sigad.change_documento %}
-                      <a href="{% url 'cmj.sigad:documento_construct' galeria.raiz.pk%}" title="{% trans "Editar Galeria" %}">
+                      <a href="{% url 'cmj.sigad:documento_construct' galeria.pk%}" title="{% trans "Editar Galeria" %}">
                         <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
                       </a>
                     {% endif %}
