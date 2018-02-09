@@ -665,11 +665,16 @@ class DocumentoManager(models.Manager):
 
         q3 = Q(classe__permissions_user_set__isnull=True)
 
+        q4 = Q(permissions_user_set__user__isnull=True,
+               permissions_user_set__permission__isnull=False)
+        q5 = Q(classe__permissions_user_set__user__isnull=True,
+               classe__permissions_user_set__permission__isnull=False)
+
         if type.mro(type(self))[0] == DocumentoManager:
             return qstatus & (q0 | q1)
 
         if isinstance(self.instance, Classe):
-            return qstatus & (q0 | (q1 & q3) | q2 | q3)
+            return qstatus & (q0 | (q1 & q3) | q2 | q3 | q4 | q5)
 
         elif isinstance(self.instance, Parlamentar):
             return qstatus & q0

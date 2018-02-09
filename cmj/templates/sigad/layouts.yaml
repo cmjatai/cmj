@@ -1,10 +1,10 @@
 {% load i18n %}
 PermissionsUserClasse:
   {% trans 'Usuários com Acesso' %}:
-  - user
+  - user permission
 PermissionsUserDocumento:
   {% trans 'Usuários com Acesso' %}:
-  - user
+  - user permission
 CaixaPublicacao:
   {% trans 'Nome e Chave' %}:
   - nome key

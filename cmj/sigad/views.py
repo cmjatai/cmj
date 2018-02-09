@@ -934,7 +934,7 @@ class PermissionsUserClasseCrud(MasterDetailCrud):
 
     class BaseMixin(MasterDetailCrud.BaseMixin):
         list_field_names = [
-            ('user__id', 'user', 'user__email')]
+            ('user__id', 'user', 'user__email', 'permission')]
 
         def get_context_data(self, **kwargs):
 
@@ -998,39 +998,56 @@ class DocumentoPermissionRequiredMixin(PermissionRequiredMixin):
                 if has_permission and \
                         self.object.visibilidade == Documento.STATUS_RESTRICT:
 
-                    # Permissão para usuário sem associação com permission
-                    qu = Q(permission__isnull=True,
-                           user=self.request.user,
-                           documento=self.object)
+                    if not PermissionsUserDocumento.objects.filter(
+                            documento=self.object).exists():
 
-                    if PermissionsUserDocumento.objects.filter(qu).exists() or\
-                            self.request.user == self.object.owner:
-                        pass
+                        pus = self.object.classe.permissions_user_set
+                        if pus.filter(
+                            user__isnull=False).exists() and not pus.filter(
+                                user=self.request.user).exists():
+                            has_permission = False
+
                     else:
+                        # Permissão para usuário sem associação com permission
+                        qu = Q(permission__isnull=True,
+                               user=self.request.user,
+                               documento=self.object)
 
-                        perms = self.get_permission_required()
+                        if PermissionsUserDocumento.objects.filter(qu).exists(
+                        ) or self.request.user == self.object.owner:
+                            pass
+                        else:
 
-                        for perm in perms:
-                            perm = perm.split('.')
+                            perms = self.get_permission_required()
 
-                            # Permissão individual user, object, permission
-                            qup = Q(
-                                permission__content_type__app_label=perm[0],
-                                permission__codename=perm[1],
-                                user=self.request.user,
-                                documento=self.object)
+                            for perm in perms:
+                                perm = perm.split('.')
 
-                            # Permissão de objeto
-                            qp = Q(
-                                permission__content_type__app_label=perm[0],
-                                permission__codename=perm[1],
-                                user__isnull=True,
-                                documento=self.object)
+                                # Permissão individual user, object, permission
+                                qup = Q(
+                                    permission__content_type__app_label=perm[0],
+                                    permission__codename=perm[1],
+                                    user=self.request.user,
+                                    documento=self.object)
 
-                            if not PermissionsUserDocumento.objects.filter(
-                                    qp | qup).exists():
-                                has_permission = False
-                                break
+                                # Permissão de objeto
+                                qp = Q(
+                                    permission__content_type__app_label=perm[0],
+                                    permission__codename=perm[1],
+                                    user__isnull=True,
+                                    documento=self.object)
+
+                                # Se o objeto não possui
+                                qp = Q(
+                                    permission__content_type__app_label=perm[0],
+                                    permission__codename=perm[1],
+                                    user__isnull=True,
+                                    documento=self.object)
+
+                                if not PermissionsUserDocumento.objects.filter(
+                                        qp | qup).exists():
+                                    has_permission = False
+                                    break
         else:
             has_permission = super().has_permission()
 
@@ -1124,7 +1141,7 @@ class PermissionsUserDocumentoCrud(MasterDetailCrud):
 
     class BaseMixin(MasterDetailCrud.BaseMixin):
         list_field_names = [
-            ('user__id', 'user', 'user__email')]
+            ('user__id', 'user', 'user__email', 'permission')]
 
         def get_context_data(self, **kwargs):
 
