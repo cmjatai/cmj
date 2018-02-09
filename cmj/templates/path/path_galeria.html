@@ -69,15 +69,15 @@
                       {% else %}
                         <a href="{% url 'cmj.sigad:documento_construct' galeria.pk %}" title="{% trans "Editar Galeria" %}">
                       {% endif %}
-
                         <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
                       </a>
                     {% endif %}
+                  {% if galeria.raiz %}
+                    <a href="/{{galeria.absolute_slug}}?zipfile" title="{% trans "Baixar fotos do Album" %}">
+                      <i class="fa fa-download fa-2" aria-hidden="true"></i>
+                    </a>
+                  {% endif %}
 
-
-                  <a href="/{{galeria.absolute_slug}}?zipfile" title="{% trans "Baixar fotos do Album" %}">
-                    <i class="fa fa-download fa-2" aria-hidden="true"></i>
-                  </a>
                 </div>
 
             </div>
