@@ -422,6 +422,11 @@ class PathView(MultipleObjectMixin, TemplateView):
                         permission__codename=obj[1]).exists() and\
                             request.user.has_perm('sigad.' + obj[1]):
                         pass
+                    elif parent.permissions_user_set.filter(
+                        user__isnull=True,
+                        permission__isnull=True).exists() and\
+                            request.user.has_perm('sigad.' + obj[1]):
+                        pass
                     elif request.user.is_superuser:
                         pass
                     else:
