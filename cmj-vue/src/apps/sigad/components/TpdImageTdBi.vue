@@ -6,9 +6,14 @@
     v-on:dragover="dragover"
     v-on:dragstart="dragstart"
     v-on:dragexit="dragexit"
-    v-on:drop="drop">
-      <img :src="slug+'.128?'+refresh">
+    v-on:drop="drop"
+    v-on:mouseover="mouseOver"
+    v-on:mouseleave="mouseLeave">
+      <img :src="'https://www.jatai.go.leg.br'+slug+'.128?'+refresh">
       <div class="drag" @click="$emit('showmodal', elemento, pos)"></div>
+      <div class="imgmouseover" v-if="mouseover">
+        <img :src="'https://www.jatai.go.leg.br'+slug+'.512?'+refresh">
+      </div>
   </div>
 </template>
 
@@ -26,6 +31,7 @@ export default {
       dragged: false,
       draggedover: 0,
       draggedleave: false,
+      mouseover: false,
     }
   },
   computed: {
@@ -38,6 +44,12 @@ export default {
     }
   },
   methods: {
+    mouseOver(ev) {
+      this.mouseover = true;
+    },
+    mouseLeave(ev) {
+      this.mouseover = false;
+    },
     dragend(ev) {
       console.log('dragend: tpdimagetdbi', ev)
       if (this.dragged)
@@ -121,6 +133,18 @@ export default {
       user-select: none;
       -khtml-user-drag: element;
       -webkit-user-drag: element;
+    }
+
+    .imgmouseover {
+      position: absolute;
+      z-index: 2001;
+      background: white;
+      padding: 10px;
+      box-shadow: 0px 0px 6px white;
+      top:90%;
+      left: 10px;
+      border: 1px solid #fafafa;
+
     }
 
   }
