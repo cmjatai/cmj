@@ -147,12 +147,13 @@ rules_group_anonymous = {
 rules_sigad_view_status_restritos = {
     'group': GROUP_SIGAD_VIEW_STATUS_RESTRITOS,
     'rules': [
+        (get_user_model(), ['menu_dados_auxiliares']),
         (Midia, [RP_DETAIL]),
         (Classe, [
             'view_pathclasse',
             'view_subclasse',
-            'menu_dados_auxiliares',
         ]),
+
         (Documento, [
             'view_documento'])]
 }
