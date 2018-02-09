@@ -357,10 +357,9 @@ if DEBUG and LOGGING_CONSOLE:
     }
 
 
+SITE_URL = 'https://www.jatai.go.leg.br'
 if DEBUG:
     SITE_URL = ''
-else:
-    SITE_URL = 'https://www.jatai.go.leg.br'
 
 
 def excepthook(*args):
