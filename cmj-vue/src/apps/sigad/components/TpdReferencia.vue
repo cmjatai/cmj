@@ -7,7 +7,7 @@
     v-on:dragstart="dragstart"
     v-on:dragexit="dragexit"
     v-on:drop="drop">
-      <img :src="'https://www.jatai.go.leg.br'+slug+'.128'">
+      <img :src="slug+'.128'">
       <div class="drag" @click="$emit('showmodal', child, pos)"></div>
       <span class="btn-delete"  v-on:click="deleteReferencia" title="Excluir esta referência">
         <i class="fa fa-remove" aria-hidden="true"></i>

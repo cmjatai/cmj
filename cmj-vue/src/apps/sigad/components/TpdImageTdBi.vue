@@ -9,10 +9,10 @@
     v-on:drop="drop"
     v-on:mouseover="mouseOver"
     v-on:mouseleave="mouseLeave">
-      <img :src="'https://www.jatai.go.leg.br'+slug+'.128?'+refresh">
+      <img :src="slug+'.128?'+refresh">
       <div class="drag" @click="$emit('showmodal', elemento, pos)"></div>
       <div class="imgmouseover" v-if="mouseover">
-        <img :src="'https://www.jatai.go.leg.br'+slug+'.512?'+refresh">
+        <img :src="slug+'.512?'+refresh">
       </div>
   </div>
 </template>
