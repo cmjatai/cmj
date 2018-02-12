@@ -4,60 +4,23 @@
 <!--[if gt IE 8]><!-->
 <html class="no-js {% block html_class %}{%endblock%}" lang="pt-br">
 <!--<![endif]-->
-
   <head>
     <meta charset="utf-8">
+    <meta http-equiv="content-language" content="pt-br">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="reply-to" content="hostmaster@camarajatai.go.gov.br">
     <meta name="theme-color" content="#006556">
-    <title>{% block head_title %}{% trans 'Câmara Municipal de Jataí - Goiás' %}{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block head_title %}{% trans 'Câmara Municipal de Jataí - Goiás' %}{% endblock %}</title>
+    <meta name="description" content="Portal CMJ - Fonte de informações a respeito dos atos do poder legislativo do município de Jataí, na microrregião Sudoeste do Estado de Goiás.">
+
     {% block meta_tags %}
-      <meta name="description" content="{% if object.referente %}{{object.referente.descricao|striptags|safe}}{% else %}{{object.parents_and_me.descricao|striptags|safe}}{%endif%}">
-
-      <meta property="fb:app_id" content="150874375319738">
-      <meta property="fb:admins" content="cmjatai">
-      <meta property="og:locale" content="pt_BR">
-      <meta property="og:url" content="https://{{request.get_host}}{% if object.tipo == object.TPD_IMAGE %}/{{ object.absolute_slug }}.page{% else %}/{{ object.absolute_slug }}{% endif %}">
-      <meta property="og:site_name" content="Portal da Câmara Municipal de Jataí - Goiás">
-      <meta property="og:type" content="website">
-      <meta property="og:title" content="{% if object.titulo %}{{object.titulo}}{% elif object.parents_and_me.0.titulo %}{{object.parents_and_me.0.titulo}}{% elif object.referente %}{{object.referente.parents_and_me.0.titulo}}{% else %}Câmara Municipal de Jataí{% endif %}">
-      <meta property="og:description" content="{% if object.referente %}{{object.referente.parents_and_me.0.descricao|striptags|safe}}{% else %}{{object.parents_and_me.descricao|striptags|safe}}{%endif%}">
-
-
-      {% with object.imagem_representativa_metatags as doc_imagem %}
-        {% if doc_imagem and doc_imagem.absolute_slug%}
-          <meta property="og:image" content="https://{{request.get_host}}/{{doc_imagem.absolute_slug}}.768.jpg">
-          <meta property="og:image:type" content="{{doc_imagem.midia.last.content_type}}">
-          <meta name="twitter:image" content="https://{{request.get_host}}/{{doc_imagem.absolute_slug}}.768.jpg">
-
-          <meta property="og:image:width" content="{{doc_imagem.midia.last.width}}">
-          <meta property="og:image:height" content="{{doc_imagem.midia.last.height}}">
-
-        {% elif doc_imagem.fotografia %}
-          <meta property="og:image" content="https://{{request.get_host}}{{doc_imagem.fotografia.url}}">
-          <meta property="og:image:type" content="image/jpeg">
-          <meta name="twitter:image" content="https://{{request.get_host}}{{doc_imagem.fotografia.url}}">
-
-        {% elif object.referenciado %}
-          <meta property="og:image" content="https://{{request.get_host}}/{{object.absolute_slug}}.768">
-          <meta property="og:image:type" content="{{object.midia.last.content_type}}">
-          <meta name="twitter:image" content="https://{{request.get_host}}/{{object.absolute_slug}}.768">
-
-          <meta property="og:image:width" content="{{object.referenciado.midia.last.width}}">
-          <meta property="og:image:height" content="{{object.referenciado.midia.last.height}}">
-
-        {% endif %}
-      {% endwith %}
-
-      <meta name="twitter:url" content="https://{{request.get_host}}{% if object.tipo == object.TPD_IMAGE %}/{{ object.absolute_slug }}.page{% else %}/{{ object.absolute_slug }}{% endif %}">
-      <meta name="twitter:description" content="{{object.descricao|striptags|safe}}">
-      <meta name="twitter:card" content="summary_large_image">
-      <meta name="twitter:site" content="@cmjatai">
-      <meta name="twitter:creator" content="@cmjatai">
-      <meta name="twitter:title" content="{% if object.titulo %}{{object.titulo|linebreaksbr|striptags}}{% else %}Câmara Municipal de Jataí{% endif %}">
-
+      {% include "base_meta_tags.html" %}
     {% endblock %}
+
     {% block head_content %}
-      <link rel="icon" href="{% static 'img/logo.png' %}"  type="image/png" >
+      <link rel="icon" href="{% static 'img/logo_128.png' %}"  type="image/png" >
 
       {% comment %} Importa bootstrap customizado {% endcomment %}
       <link rel="stylesheet" href="{% sass_src 'styles/header.scss' %}" type="text/css">
