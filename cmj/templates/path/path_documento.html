@@ -157,12 +157,14 @@
       {% block base_header %}
          {{block.super}}
       {% endblock %}
-      {{object.texto|default:''|safe|urlize}}
+      <div class="container container-simples">
+        {{object.texto|default:''|safe|urlize}}
+      </div>
     </div>
   {% endwith %}
 
     {% for container in object.childs.view_childs %}
-      <div class="container{% if container.tipo == container.TPD_CONTAINER_EXTENDIDO%}-fluid{% endif %} {% if forloop.first%}container-first{% endif %}">
+      <div class="container{% if container.tipo == container.TPD_CONTAINER_EXTENDIDO%}-fluid{% else %} container-simples{% endif %} {% if forloop.first%}container-first{% endif %}">
         {% if container.titulo %}
           <div class="path-title-container">
               <br>{{container.titulo}}

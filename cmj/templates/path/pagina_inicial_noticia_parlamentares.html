@@ -1,103 +1,53 @@
 {% load i18n sigad_filters social_utils %}
 
 {% for documento in object_list %}
-  {% if split_row %}
-    {% if forloop.counter0 > 0 and forloop.counter0|divisibleby:split_row %}
-      </div>
-    {% endif %}
-    {% if forloop.counter0|divisibleby:split_row %}
-      <div class="row">
-    {% endif %}
-  {% endif %}
 
-    <div class="path-item-list container-box-parlamentares {{ documento.visibilidade_css_class}}">
-      {% with documento.parlamentares.count as count_parlamentares %}
-        <div class="inner">
-          {% comment %} primeiro container, o primeiro item {% endcomment %}
-          {% with documento.imagem_representativa as imagem %}
-              {% if imagem %}
-                <div class="path-imagem {{imagem.alinhamento_css_class}}">
-                  <div class="imagem" style="background-image: url(/{{imagem.absolute_slug}}.512)"></div>
-                  <a class="img-contexto" href="{% if prefixo_slug %}/{{prefixo_slug}}{% endif %}/{{documento.absolute_slug }}">
-                    <div class="texto">
-                      <div class="titulo">{{imagem.titulo|default:''}}</div>
-                    </div>
-                  </a>
-                  <div class="autor">{{imagem.autor|default:''}}</div>
-                </div>
-              {% else %}
-              {% endif %}
+  <div class="path-item-list container-box-parlamentares {{ documento.visibilidade_css_class}}">
+    <div class="inner">
+      <span class="data-pub">
+        <i class="fa fa-clock-o" aria-hidden="true"></i>
+        {% if documento.public_date %}
+          {{documento.public_date|date:"d"}} {% trans "de" %} {{documento.public_date|date:"F"}} {% trans "de" %} {{documento.public_date|date:"Y"}}
+        {% else%}
+          {% with documento.revisoes.first as rev %}
+            {{rev.get_visibilidade_display}} - {{rev.data}} - {% trans "por:" %} {{rev.user.first_name|default:rev.user.email}}
           {% endwith %}
+        {% endif %}
+      </span>
 
-          <span class="data-pub">
-            <i class="fa fa-clock-o" aria-hidden="true"></i>
-            {% if documento.public_date %}
-              {{documento.public_date|date:"d"}} {% trans "de" %} {{documento.public_date|date:"F"}} {% trans "de" %} {{documento.public_date|date:"Y"}}
-            {% else%}
-              {% with documento.revisoes.first as rev %}
-                {{rev.get_visibilidade_display}} - {{rev.data}} - {% trans "por:" %} {{rev.user.first_name|default:rev.user.email}}
-              {% endwith %}
+
+
+      {% comment %}
+        {% social_link_share documento %}
+        <div class="clearfix"></div>
+      {% endcomment %}
+
+      {% with documento.parlamentares.first as parlamentar %}
+        <div class="row">
+          <div class="col-xs-3">
+            {% if  documento.parlamentares.first.fotografia %}
+              <a class="avatar" href="/{{ parlamentar.classe_set.first.absolute_slug }}">
+                <img src="{{ parlamentar.fotografia.url }}">
+              </a>
             {% endif %}
-
-          </span>
-
+          </div>
+          <div class="col-xs-8">
             <a class="tags tag-parlamentar" href="/{{ documento.parlamentares.first.classe_set.first.absolute_slug }}">
                 {{ documento.parlamentares.first.nome_parlamentar}}
             </a>
-              {% social_link_share documento %}
-              <div class="clearfix"></div>
-
-
-            <div class="row">
-              <div class="col-xs-3 col-xs-push-9">
-
-          {% for parlamentar in documento.parlamentares.all %}
-            {% if forloop.counter0 > 0 and forloop.counter0|organize_direction_avatars:count_parlamentares  %}
-              </div>
-            {% endif %}
-
-            {% if forloop.counter0|organize_direction_avatars:count_parlamentares %}
-              <div class="path-parlamentares">
-            {% endif %}
-
-              {% if parlamentar.fotografia %}
-                <a class="avatar" href="/{{ parlamentar.classe_set.first.absolute_slug }}">
-                  <img src="{{ parlamentar.fotografia.url }}">
-                </a>
-              {% endif %}
-
-            {% if not forloop.last %}
-              <span class="linebreak"></span>
-            {% else %}
-              </div>
-            {% endif %}
-          {% endfor %}
-
-
-
-            <div class="clearfix"></div>
+            <div class="titulo">
+              <a href="/{{documento.url_prefixo_parlamentar}}/{{documento.absolute_slug}}">
+                {{documento.titulo}}
+              </a>
             </div>
-            <div class="col-xs-9 col-xs-pull-3">
-              <div class="titulo">
-                <a href="/{{documento.url_prefixo_parlamentar}}/{{documento.absolute_slug}}">
-                  {{documento.titulo}}
-                </a>
-              </div>
-
-          {% if documento.descricao %}
-
-          {% endif %}
-
-                <div class="clearfix"></div>
-              </div>
+          </div>
+          <div class="col-xs-12">
+            <div class="descricao">
+              {{ documento.descricao|default:''|safe}}
             </div>
-
-          <div class="clearfix"></div>
+          </div>
         </div>
       {% endwith %}
     </div>
-
-  {% if split_row %}
-    {% if forloop.last %}</div>{% endif %}
-  {% endif %}
+  </div>
 {% endfor %}

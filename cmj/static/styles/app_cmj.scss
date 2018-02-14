@@ -183,6 +183,19 @@ body, html {
   }
 }
 
+.avatar {
+  padding: 0 0 0 0;
+  display: inline-block;
+  opacity: 0.75;
+  img {
+    border: 0px solid transparent;
+    border-radius: 50%;
+    width: 100%;
+  }
+  &:hover {
+    opacity: 1;
+  }
+}
 
 .navbar {
   background: $color_topo_bg url(/static/img/bg.png);
@@ -1658,8 +1671,8 @@ main {
       text-align: center;
       padding-top: 0px;
       position: absolute;
-      top:5px;
-      left:$grid-gutter-width / 1.5;
+      top:0px;
+      left:0;
       border-top: 1px solid #ccc;
     }
     &:hover {
@@ -2216,9 +2229,6 @@ main {
 #pagina-inicial {
   .path-item-list {
     margin-bottom: 0px;
-    &:not(:first-child) {
-      margin-top: 1px;
-    }
     .avatar {
       width: 100%;
       margin-left: 0;
@@ -2227,11 +2237,10 @@ main {
       border: 0px;
     }
     .titulo {
-      padding: 0 0 10px;
+      padding: 0;
     }
     .descricao {
       font-size: 85%;
-      padding-bottom: 20px;
     }
     .path-parlamentares {
       margin: 0px;
@@ -2242,27 +2251,17 @@ main {
     //@extend .container-box;
     border: 0px;
     border-radius: 0;
-    .inner {
-      padding: 20px 10px 0 10px;
-      .row {
-        margin: 0 -2px;
-        & > div {
-          padding: 2px;
-        }
-      }
+    .tags {
+      line-height: 1;
     }
-    .navbar-social-links {
-      float: right;
-      position: absolute;
-      margin-left: 10px;
-      a {
-        i {
-          color: rgba(#a97905, 0.6);
-        }
-        &:hover {
-          i {
-            color: rgba(white, 1);
-          }
+    .inner {
+      .row {
+        display: table;
+
+        & > div {
+          float: none;
+          display: inline-block;
+          vertical-align: middle;
         }
       }
     }
@@ -2648,23 +2647,12 @@ main {
     }
     .container-box-parlamentares {
         margin-left: 0;
-
-      .navbar-social-links {
-        padding: 0px 10px 0;
-
-        a {
-          width: 1.5em;
-          height: 1.5em;
-          line-height: 1.6em;
-
-          i {
-            font-size: 90%;
-          }
-          &.whatsapp {
-            line-height: 1.4em;
+        .row {
+          & > div:first-child {
+            width: auto;
+            padding: 0 5px 0 25px;
           }
         }
-      }
     }
   }
 
@@ -2898,6 +2886,9 @@ main {
 
   .container, .container-fluid {
     padding: 0 $grid-gutter-width * 0.25;
+  }
+  .container-simples {
+      padding: 0 $grid-gutter-width * 0.75;
   }
   .row {
     margin:  0 $grid-gutter-width * -0.25;
@@ -3535,7 +3526,7 @@ main {
     .container {
       & > ul {
         & > li {
-          width: calc(100%);
+          width: calc(50%);
         }
       }
     }
