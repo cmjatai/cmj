@@ -5,7 +5,7 @@
   {% comment %} customizações de layout para tela de login apartir de 2017 {% endcomment %}
   <link rel="stylesheet" href="{% sass_src 'styles/login.scss' %}" type="text/css">
 {% endblock %}
-
+{% block body_class %}login-page{%endblock%}
 {% block button_toogle %}{%endblock%}
 {% block global_container %}{%endblock%}
 {% block login_container %}

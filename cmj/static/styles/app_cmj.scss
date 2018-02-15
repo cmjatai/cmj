@@ -632,6 +632,7 @@ main {
 
 .table {
   border: 1px solid darken($color_main_bg, 5%);
+  margin-top: 20px;
   td {
     ul {
         margin-bottom: 0px;
@@ -645,6 +646,7 @@ main {
   font-weight: normal;
   vertical-align: middle;
 }
+
 .table-link-ordering > thead > tr > th, .table-link-ordering > tbody > tr > th, .table-link-ordering > tfoot > tr > th {
     padding: 0;
     a {
@@ -887,56 +889,46 @@ h6 {
     padding: 5px;
   }
 }
+
 // #### footer ###########################################
-// based on http://getbootstrap.com/examples/sticky-footer
-$footer-height: 25px;
 html {
   position: relative;
   min-height: 100%;
 }
-body {
-  margin-bottom: $footer-height;
-}
-.footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  /* Set the fixed height of the footer here */
-  height: $footer-height;
-  background: $color_topo_bg none repeat scroll 0 0;
-  color: lighten($color_topo_bg, 20%);
-  text-align: center;
-  font-size: 1em;
-  line-height: $footer-height;
-}
 
-footer.container-footer {
+footer {
   position: relative;
-  z-index: 2000;
   background: $color_topo_bg url(/static/img/bg.png);
   border-top: 2px solid lighten($color_topo_bg, 20%);
-  color: white;
-  font-size: 0;
+
+  span {
+    color: lighten(yellow,40%);
+  }
   a {
     color: #ccc;
-
-    padding-right: 10px;
+    padding: 0;
     display: inline-block;
     &:hover {
       color: white;
     }
   }
-  span {
-    color: lighten(yellow,40%);
-  }
+
   ul {
+    font-size: 0px;
     list-style: none;
     padding: 0;
     width: 100%;
-
+    display: table;
+    margin: 0;
   }
   li {
+
+    position: relative;
+    font-size: 1.4rem;
+    display: inline-block;
+    width: calc(100%);
   }
+
   .head_title {
     display: inline-block;
     padding: 20px 0 0 0;
@@ -945,23 +937,26 @@ footer.container-footer {
     font-weight: bold;
     font-family: arial;
     color: yellow;
-
   }
-  .container {
-    & > ul {
-      display: table;
-      padding: 0px;
-      & > li {
-        position: relative;
-        display: inline-block;
-        width: calc(20%);
-        vertical-align: top;
 
-        font-size: 1.4rem;
-      }
+  & > div:nth-child(2) {
+    background: $color_topo_bg none repeat scroll 0 0;
+    color: lighten($color_topo_bg, 20%);
+    text-align: center;
+    a {
+      padding: 5px 0;
     }
-    li {
-      font-variant: normal;
+  }
+
+  & > div:nth-child(1) {
+    padding-bottom: 20px;
+    .container {
+      & > ul {
+        & > li {
+          width: calc(20%);
+          vertical-align: top;
+        }
+      }
     }
   }
 }
@@ -2842,17 +2837,8 @@ main {
 }
 
 @media screen and (max-width: 767px) {
-  $footer-height: 25px;
-  body {
-    margin-bottom: $footer-height;
-  }
-
   .embed-audio {
     padding-bottom: 26%;
-  }
-  .footer {
-    font-size: 0.8em;
-    height: $footer-height;
   }
   .navbar {
     .nav-flex {
@@ -3351,11 +3337,13 @@ main {
     }
   }
 
-  footer.container-footer {
-    .container {
-      & > ul {
-        & > li {
-          width: calc(33.33%);
+  footer {
+    & > div:nth-child(1) {
+      .container {
+        & > ul {
+          & > li {
+            width: calc(33.33%);
+          }
         }
       }
     }
@@ -3522,11 +3510,13 @@ main {
       }
     }
   }
-  footer.container-footer {
-    .container {
-      & > ul {
-        & > li {
-          width: calc(50%);
+  footer {
+    & > div:nth-child(1) {
+      .container {
+        & > ul {
+          & > li {
+            width: calc(50%);
+          }
         }
       }
     }

@@ -82,6 +82,15 @@
                     <li>Republicação do Diário Oficial do Município</li>
                     <li class="text-primary" title="Já Migrado">Serviço de E-mail</li>
                     <li class="text-primary" title="Já Implementado">https - Troca segura de informação com o usuário</li>
+                    <li>Desenvolver:
+                      <ol>
+                        <li>Calend&aacute;rio de Eventos</li>
+                        <li>Ouvidoria</li>
+                        <li>Email News</li>
+                        <li>Coment&aacute;rios em conte&uacute;do</li>
+                        <li>Buscas de Conte&uacute;do</li>
+                        <li>Classifica&ccedil;&atilde;o e Busca de conte&uacute;do por tags</li>
+                      </ol>
                     <li>Entre outras tecnologias para a gestão interna dos dados e inerentes ao Departamento de Informática</li>
                   </ol>
                 </p>
@@ -103,11 +112,12 @@
 <script type="text/javascript">
   $(document).ready(function(){
     $('.panel-collapse').collapse('show');
-    setTimeout(function () {
+    timeoutinit = setTimeout(function () {
       $('.panel-collapse').collapse('hide');
     }, 5000);
     $(".panel-nota-site-antigo").hover(
      function() {
+        clearTimeout(timeoutinit);
         $('.panel-collapse').collapse('show');
       }, function() {
         $('.panel-collapse').collapse('hide');
