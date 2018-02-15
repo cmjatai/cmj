@@ -12,6 +12,7 @@ from sapl.parlamentares.models import Parlamentar
 from cmj.sigad import models
 from cmj.sigad.models import Classe, Documento, Revisao, CaixaPublicacao,\
     CLASSE_DOC_MANAGER_CHOICE, CaixaPublicacaoClasse
+from cmj.utils import YES_NO_CHOICES
 
 
 class UpLoadImportFileForm(forms.Form):
@@ -104,6 +105,10 @@ class DocumentoForm(ModelForm):
 
     tipo = forms.ChoiceField(choices=Documento.tipo_parte_doc['documentos'])
 
+    capa = forms.TypedChoiceField(label=_('Capa de sua Classe'),
+                                  choices=YES_NO_CHOICES,
+                                  coerce=lambda x: x == 'True')
+
     class Meta:
         model = Documento
         fields = ['titulo',
@@ -113,7 +118,8 @@ class DocumentoForm(ModelForm):
                   'parlamentares',
                   'public_date',
                   'tipo',
-                  'listar'
+                  'listar',
+                  'capa'
                   ]
 
     def __init__(self, *args, **kwargs):
@@ -124,7 +130,7 @@ class DocumentoForm(ModelForm):
                 ('titulo', 7), ('visibilidade', 3), ('listar', 2)
             ]),
             to_row([
-                ('tipo', 6), ('template_doc', 6),
+                ('tipo', 4), ('template_doc', 4), ('capa', 4),
             ]),
             to_row([
                 ('descricao', 8),
@@ -137,6 +143,8 @@ class DocumentoForm(ModelForm):
         self.fields['parlamentares'].choices = [
             ('0', '--------------')] + list(
             self.fields['parlamentares'].choices)
+
+        self.fields['capa'].initial = self.instance == self.instance.classe.capa
 
     def save(self, commit=True):
         inst = self.instance
@@ -161,6 +169,11 @@ class DocumentoForm(ModelForm):
             container.ordem = 1
             container.visibilidade = inst.visibilidade
             container.save()
+
+        if self.cleaned_data['capa']:
+            classe = inst.classe
+            classe.capa = inst
+            classe.save()
 
         return inst
 

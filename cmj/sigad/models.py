@@ -47,6 +47,10 @@ DOC_TEMPLATES_CHOICE_FILES = {
         'template_name': 'path/path_thumbnails.html',
         'create_url': 'cmj.sigad:documento_construct_create'
     },
+    99:  {
+        'template_name': 'path/path_documento.html',
+        'create_url': 'cmj.sigad:documento_construct_create'
+    },
 }
 
 DOC_TEMPLATES_CHOICE = CmjChoices(
@@ -63,6 +67,7 @@ CLASSE_TEMPLATES_CHOICE_FILES = {
     5: 'path/path_galeria.html',
     6: 'path/path_classe.html',
     7: 'path/path_galeria_video.html',
+    99: 'path/path_documento.html',
 }
 
 
@@ -74,6 +79,7 @@ CLASSE_DOC_MANAGER_CHOICE = {
     5: 'qs_bi',
     6: 'qs_audio_news',
     7: 'qs_video_news',
+    99: None,
 }
 
 
@@ -85,6 +91,7 @@ CLASSE_TEMPLATES_CHOICE = CmjChoices(
     (5, 'fotografia', _('Banco de Imagens')),
     (6, 'galeria_audio', _('Galeria de Áudios')),
     (7, 'galeria_video', _('Galeria de Vídeos')),
+    (99, 'documento_especifico', _('Documento Específico')),
 )
 
 
@@ -558,6 +565,12 @@ class Classe(ShortUrl, CMSMixin):
         Parlamentar, related_name='classe_set',
         verbose_name=_('Parlamentar'),
         blank=True, null=True, default=None)
+
+    capa = models.OneToOneField(
+        'Documento',
+        blank=True, null=True, default=None,
+        verbose_name=_('Capa da Classe'),
+        related_name='capa')
 
     class Meta:
         ordering = ('codigo', '-public_date',)

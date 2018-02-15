@@ -258,6 +258,9 @@ class PathView(MultipleObjectMixin, TemplateView):
         elif template == models.CLASSE_TEMPLATES_CHOICE.parlamentar:
             docs = self.classe.parlamentar.documento_set
             kwargs['object_list'] = docs.qs_news(self.request.user)
+        elif models.CLASSE_TEMPLATES_CHOICE.documento_especifico:
+            kwargs['object_list'] = Documento.objects.qs_news().filter(
+                parlamentares__isnull=True)[:4]
 
         self.object_list = kwargs['object_list']
         context = super().get_context_data(**kwargs)
@@ -268,7 +271,10 @@ class PathView(MultipleObjectMixin, TemplateView):
             context['page_range'] = make_pagination(
                 page_obj.number, paginator.num_pages)
 
-        context['object'] = self.classe
+        if self.classe.capa:
+            context['object'] = self.classe.capa
+        else:
+            context['object'] = self.classe
 
         context['create_doc_url'] = models.DOC_TEMPLATES_CHOICE_FILES[
             self.classe.template_doc_padrao]['create_url']

@@ -10,8 +10,6 @@
       {% crispy form %}
     {% endif %}
   </div>
-
-
   {% block actions %}
     <div class="actions btn-group pull-right btn-group-lg" role="group">
       {% if view.create_url %}
@@ -25,7 +23,7 @@
 </div>
 
 {% block extra_content %} {% endblock %}
-
+{% block container_table_list %}
 {% if not rows %}
   <p>{{ NO_ENTRIES_MSG }}</p>
 {% else %}
@@ -67,6 +65,7 @@
   </div>
 {% endif %}
 
+{% endblock container_table_list %}
 {% include "paginacao.html" %}
 
 {% endblock %}

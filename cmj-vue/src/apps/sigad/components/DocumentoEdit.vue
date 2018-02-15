@@ -4,7 +4,7 @@
       <div v-show="elemento.id" class="btn-toolbar widgets-function">
         <div class="btn-group btn-group-xs pull-left widget-actions ">
           <a :href="slug" class="btn btn-primary" target="_blank">Versão Final</a>
-          <a :href="meta_edit" class="btn btn-success" target="_blank">Editar Metadados</a>
+          <a :href="meta_edit" class="btn btn-success">Editar Metadados</a>
         </div>
         <div class="btn-group btn-group-lg pull-right widget-visibilidade">
           <cmj-choices v-model.lazy="elemento.visibilidade" :options="visibilidade_choice" name="visibilidade-" :id="elemento.id" />
