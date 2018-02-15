@@ -2233,9 +2233,11 @@ main {
     }
     .titulo {
       padding: 0;
+      line-height: 1.4em;
     }
     .descricao {
       font-size: 85%;
+      line-height: 1.4em;
     }
     .path-parlamentares {
       margin: 0px;
@@ -2246,13 +2248,17 @@ main {
     //@extend .container-box;
     border: 0px;
     border-radius: 0;
-    .tags {
-      line-height: 1;
+    padding: 0;
+    * {
+        line-height: 1;
+    }
+    .data-pub {
+      margin-left: 15px;
     }
     .inner {
+
       .row {
         display: table;
-
         & > div {
           float: none;
           display: inline-block;
@@ -2632,7 +2638,6 @@ main {
         position: absolute;
       }
       .inner {
-        padding-top: 10px;
       }
     }
     .container-noticias-secundarias {
@@ -3174,7 +3179,6 @@ main {
 
   .path-item-list {
     .inner {
-      padding: 0;
       .titulo {
         line-height: 1.2;
         padding: 0 $grid-gutter-width * 0.3 $grid-gutter-width * 0.3 ;
@@ -3311,12 +3315,16 @@ main {
       .inner {
         padding-left: 0;
         padding-right: 0;
+
       }
       .titulo {
         padding: 0px 10px 0;
       }
       .descricao {
         padding: 5px 10px 20px;
+      }
+      .data-pub {
+        position: absolute;
       }
     }
 
