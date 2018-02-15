@@ -43,13 +43,13 @@
 .login-page {
   footer {
     border-width: 1px;
-    position: absolute;
-    width: 100%;
-    bottom: 0;
+    margin-top: 100px;
+    bottom: 0px;
   }
   footer > div:first-child {
     display: none;
   }
+
 }
 
 .container-login {
@@ -288,6 +288,15 @@
       .btn-login {
         line-height: 42px;
       }
+    }
+  }
+}
+
+@media screen and (min-width: 992px) {
+  .login-page {
+    footer {
+      position: absolute;
+      width: 100%;
     }
   }
 }
