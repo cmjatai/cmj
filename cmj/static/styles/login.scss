@@ -40,6 +40,17 @@
     background-image: none;
   }
 }
+.login-page {
+  footer {
+    border-width: 1px;
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+  }
+  footer > div:first-child {
+    display: none;
+  }
+}
 
 .container-login {
   background-color: $color_topo_bg;
