@@ -34,6 +34,7 @@
   background-image: none;
   a.navbar-brand {
     font-size: 50px;
+    margin-left: -10px !important;
   }
   body, .navbar {
     background-color: $color_topo_bg;
@@ -170,6 +171,14 @@
   }
 }
 
+
+@media screen and (max-width: 991px) {
+  .html-login {
+    a.navbar-brand {
+      margin-left: 0px !important;
+    }
+  }
+}
 @media screen and (max-width: 800px) {
   .container-login {
     form .row {
