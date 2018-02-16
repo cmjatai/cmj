@@ -1,3 +1,4 @@
+from crispy_forms.bootstrap import Alert
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset
 from django import forms
@@ -95,25 +96,49 @@ class CmjUserChangeForm(ModelForm):
     def __init__(self, *args, **kwargs):
 
         super(CmjUserChangeForm, self).__init__(*args, **kwargs)
-        row0 = to_row([
-            ('first_name', 6),
-            ('last_name', 6),
-        ])
-        row1 = to_row([
-            ('old_password', 12)
-        ])
-        row2 = to_row(
+
+        row_pwd = [to_row([('old_password', 12)]),
+                   to_row(
             [('new_password1', 6),
-             ('new_password2', 6)])
-        row3 = to_row(
-            [('avatar', 6),
-             ('cropping', 6)])
+             ('new_password2', 6)
+             ])
+        ]
 
-        rows = [row0]
+        row_pwd = []
         if self.instance.pwd_created:
-            rows.append(row1)
+            row_pwd.append(to_row([('old_password', 12)]))
 
-        rows += [row2, row3]
+        row_pwd += [
+            to_row(
+                [('new_password1', 6),
+                 ('new_password2', 6)
+                 ])
+        ]
+
+        rows = to_row(
+            [
+                (Fieldset(
+                    _('Cadastro Básico'),
+                    to_row([
+                        ('first_name', 7),
+                        ('last_name', 5),
+                        ('avatar', 7),
+                        ('cropping', 5)
+                    ])
+                ), 8),
+                (Fieldset(
+                 _('Definição de senha'),
+                 *row_pwd,
+                 Alert(_('Após a definição e/ou alteração de senha, '
+                         'sua tela será redirecionada para a tela de Login '
+                         'para que você faça uma nova autenticação.'),
+                       css_class="alert-info",
+                       dismiss=False)
+
+                 ), 4)
+            ]
+
+        )
 
         self.helper = FormHelper()
         self.helper.layout = SaplFormLayout(*rows)

@@ -1,8 +1,13 @@
-<p>Você está recebendo este e-mail pois solicitou recuperação de senha de sua conta no site <b>SAPL</b>.</p></br></p>
+
+{% load i18n staticfiles %}
+<img class="avatar" src="{% static 'img/topo_email.jpg' %}">
+
+<p>Você está recebendo este e-mail pois solicitou recuperação de senha de sua conta no
+  Portal da Câmara Municipal de Jataí<b>SAPL</b>.</p></br></p>
 
 <p>Por favor clique no link a seguir e redefina sua senha:</p></br>
 
-<p><a href="{{ protocol }}://{{ domain }}{% url 'sapl.base:recuperar_senha_confirma' uidb64=uid token=token %}"> 
+<p><a href="{{ protocol }}://{{ domain }}{% url 'cmj.core:recuperar_senha_confirma' uidb64=uid token=token %}">
 
 Clique aqui</a></p></br>
 
@@ -10,4 +15,6 @@ Clique aqui</a></p></br>
 
 <p>Atenciosamente,</p>
 
-<p>A equipe <b>SAPL</b></p>
+<small>
+  <p>A equipe de T.I. da <b>Câmara Municipal de Jataí</b></p>
+</small>
