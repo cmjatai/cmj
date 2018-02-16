@@ -1,6 +1,6 @@
 from crispy_forms.bootstrap import Alert
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Fieldset
+from crispy_forms.layout import Layout, Fieldset, Div
 from django import forms
 from django.contrib.auth import get_user_model, password_validation
 from django.contrib.auth.forms import AuthenticationForm, \
@@ -203,10 +203,10 @@ class RecuperarSenhaForm(PasswordResetForm):
         row1 = to_row(
             [('email', 12)])
         self.helper = FormHelper()
-        self.helper.layout = Layout(
+        self.helper.layout = SaplFormLayout(
             Fieldset(_('Insira o e-mail cadastrado com a sua conta'),
-                     row1,
-                     form_actions(label='Enviar'))
+                     row1),
+            actions=form_actions(label=_('Enviar'))
         )
 
         super(RecuperarSenhaForm, self).__init__(*args, **kwargs)
