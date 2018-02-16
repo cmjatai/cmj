@@ -49,6 +49,7 @@ import sapl.sessao.urls
 import cmj.api.urls
 import cmj.cerimonial.urls
 import cmj.core.urls
+import cmj.ouvidoria.urls
 import cmj.sigad.urls
 
 
@@ -67,6 +68,7 @@ urlpatterns = [
 
     url(r'', include(cmj.core.urls)),
     url(r'', include(cmj.cerimonial.urls)),
+    url(r'', include(cmj.ouvidoria.urls)),
 
     url(r'', include(sapl.comissoes.urls)),
     url(r'', include(sapl.sessao.urls)),

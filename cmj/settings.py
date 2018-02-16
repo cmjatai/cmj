@@ -32,6 +32,7 @@ CMJ_APPS = (
     'sapl',
 
     'cmj.cerimonial',
+    'cmj.ouvidoria',
     'cmj.sigad',
     'cmj.api',
 
