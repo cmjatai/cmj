@@ -48,7 +48,7 @@
                 <span class="fa fa-key fa-3x "></span>
                 {{ form.password }}
             </div>
-            <a class="btn btn-link btn-recovery" href="{% url 'cmj.core:recuperar_senha_email' %}"" />{% trans "Esqueci minha Senha" %}</a>
+            <a class="btn btn-link btn-recovery" href="{% url 'cmj.core:recuperar_senha_email' %}" />{% trans "Esqueci minha Senha" %}</a>
 
           </div>
 
@@ -65,6 +65,14 @@
                   {% blocktrans with backend_name=backend|social_title %}Acessar com {{ backend_name }}{% endblocktrans %}
                 </a>
               {% endfor %}
+              <div class="text-center">
+                <small>
+                  <br>
+                  Seu primeiro acesso?<br>Você pode iniciar seu registro em nosso Portal através das redes sociais
+                  para que assim possa interagir.
+                  Em breve teremos estes espaços de interação e será necessário estar registrado.
+                </small>
+              </div>
           </div>
         </form>
       </div>
