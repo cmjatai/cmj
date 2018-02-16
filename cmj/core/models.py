@@ -7,14 +7,15 @@ from django.contrib.auth.models import PermissionsMixin, Group
 from django.core.exceptions import PermissionDenied
 from django.db import models
 from django.db.models import permalink
-from django.db.models.deletion import PROTECT, CASCADE
+from django.db.models.deletion import PROTECT, CASCADE, SET_NULL
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from image_cropping import ImageCropField, ImageRatioField
+from sapl.parlamentares.models import Parlamentar
 
 from cmj.globalrules import MENU_PERMS_FOR_USERS, GROUP_SOCIAL_USERS
 from cmj.utils import get_settings_auth_user_model, normalize, YES_NO_CHOICES,\
-    UF
+    UF, CmjChoices
 
 
 def group_social_users_add_user(user):
@@ -313,17 +314,22 @@ class Municipio(models.Model):  # Localidade
 
 class AreaTrabalho(CmjAuditoriaModelMixin):
 
+    TIPO_GABINETE = 10
+    TIPO_ADMINISTRATIVO = 20
+    TIPO_INSTITUCIONAL = 30
+
+    TIPO_AREATRABALHO_CHOICE = CmjChoices(
+        (TIPO_GABINETE, 'tipo_gabinete', _('Gabinete Parlamentar')),
+        (TIPO_ADMINISTRATIVO, 'tipo_administrativo',
+         _('Setor Administrativo')),
+        (TIPO_INSTITUCIONAL, 'tipo_institucional', _('Institucional')),
+    )
+
     nome = models.CharField(max_length=100, blank=True, default='',
                             verbose_name=_('Nome'))
 
     descricao = models.CharField(
         default='', max_length=254, verbose_name=_('Descrição'))
-
-    """parlamentar = models.ForeignKey(
-        Parlamentar,
-        verbose_name=_('Parlamentar'),
-        related_name='areatrabalho_set',
-        blank=True, null=True, on_delete=CASCADE)"""
 
     operadores = models.ManyToManyField(
         get_settings_auth_user_model(),
@@ -331,6 +337,16 @@ class AreaTrabalho(CmjAuditoriaModelMixin):
         through_fields=('areatrabalho', 'user'),
         symmetrical=False,
         related_name='areatrabalho_set')
+
+    parlamentar = models.ForeignKey(
+        Parlamentar,
+        verbose_name=_('Parlamentar'),
+        related_name='areatrabalho_set',
+        blank=True, null=True, on_delete=SET_NULL)
+    tipo = models.IntegerField(
+        _('Tipo da Área de Trabalho'),
+        choices=TIPO_AREATRABALHO_CHOICE,
+        default=TIPO_GABINETE)
 
     class Meta:
         verbose_name = _('Área de Trabalho')

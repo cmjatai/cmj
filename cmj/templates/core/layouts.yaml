@@ -33,7 +33,7 @@ Trecho:
 
 AreaTrabalho:
   {% trans 'Área de Trabalho' %}:
-  - nome:5
+  - nome:5 tipo parlamentar
   - descricao
 OperadorAreaTrabalho:
   {% trans 'Operador de Área de Trabalho' %}:
