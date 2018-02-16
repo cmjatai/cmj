@@ -1,20 +1,54 @@
 
 {% load i18n staticfiles %}
-<img class="avatar" src="{{ protocol }}://{{ domain }}{% static 'img/topo_email.jpg' %}">
+<!DOCTYPE html>
+<!--[if IE 8]> <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html lang="pt-br">
+<!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="content-language" content="pt-br">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="reply-to" content="hostmaster@camarajatai.go.gov.br">
 
-<p>Você está recebendo este e-mail pois solicitou recuperação de senha de sua conta no
-  Portal da Câmara Municipal de Jataí<b>SAPL</b>.</p></br></p>
 
-<p>Por favor clique no link a seguir e redefina sua senha:</p></br>
+  <style media="screen">
+    .topo_email {
+      width: 100%
+    }
+    .container-email {
+      width: 400px;
+      border 1px solid #ccc;
+    }
+    .container-email .inner {
+      padding: 20px;
+    }
+  </style>
 
-<p><a href="{{ protocol }}://{{ domain }}{% url 'cmj.core:recuperar_senha_confirma' uidb64=uid token=token %}">
+</head>
 
-Clique aqui</a></p></br>
+<body>
+  <div class="container-email">
+    <div class="inner">
+      <img class="topo_email" src="https://{{ domain }}{% static 'img/topo_email.jpg' %}">
 
-<p>Caso não tenha solicitado a alteração de sua senha, favor ignorar este e-mail.</p></br>
+      <p>Você está recebendo este e-mail pois solicitou recuperação de senha de sua conta no
+        Portal da Câmara Municipal de Jataí<b>SAPL</b>.</p></br></p>
 
-<p>Atenciosamente,</p>
+      <p>Por favor clique no link a seguir e redefina sua senha:</p></br>
 
-<small>
-  <p>A equipe de T.I. da <b>Câmara Municipal de Jataí</b></p>
-</small>
+      <p>
+        <a href="https://{{ domain }}{% url 'cmj.core:recuperar_senha_confirma' uidb64=uid token=token %}">
+          Clique aqui
+        </a>
+      </p>
+      </br>
+      <small>
+        <p>Caso não tenha solicitado a alteração de sua senha, favor ignorar este e-mail.</p>
+        <p>Atenciosamente,</p>
+        <p>A equipe de T.I. da <b>Câmara Municipal de Jataí</b></p>
+      </small>
+    </div>
+  </div>
+</body>
+</html>
