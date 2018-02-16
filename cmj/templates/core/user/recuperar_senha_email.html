@@ -1,6 +1,6 @@
 
 {% load i18n staticfiles %}
-<img class="avatar" src="{% static 'img/topo_email.jpg' %}">
+<img class="avatar" src="{{ protocol }}://{{ domain }}{% static 'img/topo_email.jpg' %}">
 
 <p>Você está recebendo este e-mail pois solicitou recuperação de senha de sua conta no
   Portal da Câmara Municipal de Jataí<b>SAPL</b>.</p></br></p>
