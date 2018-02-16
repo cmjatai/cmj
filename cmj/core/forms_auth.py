@@ -186,17 +186,6 @@ class CmjUserChangeForm(ModelForm):
                     new_password2, self.instance)
 
 
-class UserForm(UserChangeForm):
-
-    class Meta(UserChangeForm.Meta):
-        model = get_user_model()
-        fields = ('first_name', 'last_name', 'avatar', 'cropping')
-        widgets = {
-            'avatar': CustomImageCropWidget(),
-            'cropping': CropWidget(),
-        }
-
-
 class RecuperarSenhaForm(PasswordResetForm):
 
     def __init__(self, *args, **kwargs):

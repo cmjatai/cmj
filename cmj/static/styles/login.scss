@@ -121,7 +121,7 @@
   }
   .btn-recovery {
     color: #aaa;
-    float: right;
+    float: left;
   }
   .btns-login-3 {
     margin-top: 1em;
@@ -172,6 +172,12 @@
 
 @media screen and (max-width: 800px) {
   .container-login {
+    form .row {
+        margin: 0 -10px;
+    }
+    form {
+        margin: 0 0 0 5px;
+    }
     .logo-cmj {
       opacity: 0.16;
       right: auto;
@@ -252,7 +258,42 @@
     }
   }
 }
+
+@media screen and (max-width: 600px) {
+  .html-login {
+    a.navbar-brand {
+      font-size: 30px;
+    }
+    .navbar-social-links a {
+      width: 1.7em;
+      height: 1.7em;
+      i {
+        font-size: 1.2em;
+      }
+    }
+  }
+}
+@media screen and (max-width: 480px) {
+  .html-login {
+    a.navbar-brand {
+      font-size: 22.5px;
+      padding-left: 10px;
+      .fa-home {
+        padding-left: 0;
+      }
+    }
+    .navbar-social-links a {
+      width: 1.7em;
+      height: 1.7em;
+      i {
+        font-size: 1.2em;
+      }
+    }
+  }
+}
+
 @media screen and (max-width: 480px) and (orientation: portrait) {
+
   .container-login {
     .label0,
     .label1,

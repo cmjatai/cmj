@@ -48,6 +48,7 @@ user_urlpatterns = [
         v_auth.password_reset_complete,
         {'template_name': 'core/user/recuperar_senha_completo.html'},
         name='recuperar_senha_completo'),
+
     url(r'^login/$', v_auth.login, {'template_name': 'core/user/login.html',
                                     'authentication_form': LoginForm,
                                     'extra_context': {
