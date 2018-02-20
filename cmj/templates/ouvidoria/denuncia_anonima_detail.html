@@ -2,6 +2,76 @@
 {% load i18n %}
 {% block title %}
   <h1 class="page-header">
-    {% trans "Denúncia Anônima" %}
+    {% trans "Denúncia Anônima" %}<br><small>{% trans "Encaminhada para:" %} {{object.areatrabalho}}</small>
   </h1>
 {% endblock title %}
+{% block base_content %}
+{% comment %}
+  <div class="context-actions clearfix">
+    {% if view.extras_url %}
+      <div class="actions btn-group-lg pull-right" role="group">
+    {% for url, css_class, text in view.extras_url %}
+      <a href="{{url}}" class="btn {{css_class}}">
+            {{text}}
+          </a>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+{% endcomment %}
+
+<div class="container-detail clearfix">
+  <h2 class="legend">Dados Enviados</h2>
+    <div class="row-fluid">
+      <div class="col-sm-8">
+        <div id="div_id_titulo" class="form-group">
+          <p class="control-label">Título</p>
+          <div class="controls">
+            <div class="form-control-static">{{object.titulo}}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-4">
+        <div id="div_id_created" class="form-group">
+          <p class="control-label">Denúncia ecaminhada em:</p>
+            <div class="form-control-static">{{ object.created|date:"d/M/Y" }} - {{ object.created|time:"H:i" }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row-fluid">
+      <div class="col-sm-12">
+        <div id="div_id_descricao" class="form-group">
+          <p class="control-label">Descrição</p>
+          <div class="controls">
+            <div class="form-control-static">
+              {{object.descricao|linebreaksbr}}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row-fluid">
+      <div class="col-sm-12">
+        <div id="div_id_notificacoes" class="form-group">
+          <p class="control-label">Essa Denúncia foi encaminhada para os seguintes usuários:</p>
+          <div class="controls">
+            <div class="form-control-static">
+              <ul>
+                {% for notify in object.notificacoes.all %}
+                  <li>
+                    {{notify.user}} (<small>{{notify.user.email}}</small>)
+                    {% if notify.read %}
+                        <small>Lida em: {{ notify.modified|date:"d/M/Y" }} - {{ notify.modified|time:"H:i" }} </small>
+                    {% endif %}
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock base_content %}

@@ -136,7 +136,7 @@
                       <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                         {{ user.get_full_name|default:user.email }}
                         <span class="caret"></span>
-                        {% if user.cropping %}
+                        {% if user.avatar %}
                           <img class="avatar" src="{% cropped_thumbnail user "cropping" scale=0.5 %}">
                         {% else %}
                           {% for us in user.social_auth.all %}
@@ -145,6 +145,8 @@
                             {% elif us.provider == 'google-oauth2' %}
                               <img class="avatar" src="{% static 'img/perfil.jpg' %}">
                             {% endif %}
+                          {% empty %}
+                            <img class="avatar" src="{% static 'img/perfil.jpg' %}">
                           {% endfor %}
                         {% endif %}
 

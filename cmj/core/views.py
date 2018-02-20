@@ -229,6 +229,10 @@ class OperadorAreaTrabalhoCrud(MasterDetailCrud):
                 self.object.grupos_associados.values_list('name', flat=True))
             groups_remove_user(self.object.user, groups)
 
+            self.object.user.notificacao_set.filter(
+                areatrabalho=self.object.areatrabalho,
+                read=False).delete()
+
             return MasterDetailCrud.DeleteView.post(
                 self, request, *args, **kwargs)
 
@@ -305,8 +309,8 @@ class NotificacaoRedirectView(RedirectView):
 
         if self.request.user != obj.user:
             raise Http404()
-        # obj.read = True
-        # obj.save()
+        obj.read = True
+        obj.save()
 
         self.pattern_name = '%s:%s_detail' % (
             obj.content_object._meta.app_config.name,

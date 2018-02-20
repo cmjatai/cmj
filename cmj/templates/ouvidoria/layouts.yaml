@@ -4,6 +4,6 @@ DenunciaAnonima:
   - titulo
   - descricao
 DenunciaAnonimaDetailLayout:
-  {% trans 'Denúncia Anônima' %}:
+  {% trans 'Dados Enviados' %}:
   - titulo created:3
   - descricao

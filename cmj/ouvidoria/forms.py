@@ -92,6 +92,7 @@ class DenunciaForm(ModelForm):
                 nt = Notificacao()
                 nt.content_object = denuncia
                 nt.user = operador.user
+                nt.areatrabalho = at
                 nt.save()
 
             # TODO: Enviar por email

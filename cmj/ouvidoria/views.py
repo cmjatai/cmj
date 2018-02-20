@@ -51,6 +51,19 @@ class SolicitacaoDetailView(PermissionRequiredMixin,
     permission_required = 'ouvidoria.detail_solicitacao'
     layout_key = 'DenunciaAnonimaDetailLayout'
 
+    @property
+    def extras_url(self):
+        return [
+            (reverse('cmj.ouvidoria:solicitacao_detail', kwargs=self.kwargs),
+             'btn-success',
+             _('Listar outras Solcitações')
+             )
+        ]
+
+    @property
+    def verbose_name_plural(self):
+        return self.model._meta.verbose_name_plural
+
     def has_permission(self):
         self.object = self.get_object()
 

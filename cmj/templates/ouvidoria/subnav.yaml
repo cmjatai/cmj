@@ -1,0 +1,3 @@
+{% load i18n common_cmj_tags %}
+- title: {% trans 'Detalhe' %}
+  url: cmj.ouvidoria:solicitacao_detail
