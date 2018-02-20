@@ -15,6 +15,7 @@ import django_filters
 
 from cmj.core.models import Trecho, TipoLogradouro, User, OperadorAreaTrabalho,\
     ImpressoEnderecamento
+from cmj.globalrules import WORKSPACE_GROUPS
 
 
 class OperadorAreaTrabalhoForm(ModelForm):
@@ -30,7 +31,8 @@ class OperadorAreaTrabalhoForm(ModelForm):
         self.fields[
             'grupos_associados'].widget = forms.CheckboxSelectMultiple()
         self.fields['grupos_associados'].queryset = self.fields[
-            'grupos_associados'].queryset.order_by('name')
+            'grupos_associados'].queryset.filter(
+                name__in=WORKSPACE_GROUPS).order_by('name')
 
 
 class ImpressoEnderecamentoForm(ModelForm):

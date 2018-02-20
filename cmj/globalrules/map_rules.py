@@ -11,7 +11,7 @@ from cmj.cerimonial.models import Perfil, EnderecoPerfil, EmailPerfil,\
     StatusProcesso, ClassificacaoProcesso, TopicoProcesso
 from cmj.core.models import Trecho, Municipio, AreaTrabalho,\
     OperadorAreaTrabalho, Cep, RegiaoMunicipal, Bairro, TipoLogradouro,\
-    Distrito, Logradouro, ImpressoEnderecamento
+    Distrito, Logradouro, ImpressoEnderecamento, Notificacao
 from cmj.globalrules import (RP_ADD, RP_CHANGE, RP_DELETE, RP_DETAIL, RP_LIST,
                              GROUP_SOCIAL_USERS,
                              GROUP_SAAP_WORKSPACE_OPER_CONTATOS,
@@ -167,6 +167,7 @@ rules_ouvidoria_visualizacao_respostas = {
     'rules': [
 
         (Solicitacao, [RP_LIST, RP_DETAIL]),
+        (Notificacao, ['popup_notificacao']),
     ]
 }
 

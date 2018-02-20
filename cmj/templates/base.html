@@ -98,7 +98,9 @@
                 </ul>
               </li>
                {% endif %}
-               {% notificacoes_unread %}
+                {% if perms.core.popup_notificacao %}
+                  {% notificacoes_unread %}
+                {% endif %}
             </ul>
           </div><!--/.nav-collapse -->
           {% block button_toogle %}

@@ -749,6 +749,10 @@ class Notificacao(CmjModelMixin):
     class Meta:
         verbose_name = _('Notificação')
         verbose_name_plural = _('Notificações')
+        permissions = (
+            ('popup_notificacao',
+             _('Visualização das notificações em Popup no Avatar do Usuário')),
+        )
 
     @property
     def user_name(self):

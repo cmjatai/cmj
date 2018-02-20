@@ -3,6 +3,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.forms.utils import ErrorList
+from django.http.response import Http404
 from django.shortcuts import redirect
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import RedirectView
@@ -17,7 +18,7 @@ from cmj.core.forms import OperadorAreaTrabalhoForm, ImpressoEnderecamentoForm,\
     ListWithSearchForm
 from cmj.core.models import Cep, TipoLogradouro, Logradouro, RegiaoMunicipal,\
     Distrito, Bairro, Trecho, AreaTrabalho, OperadorAreaTrabalho,\
-    ImpressoEnderecamento, groups_remove_user, groups_add_user
+    ImpressoEnderecamento, groups_remove_user, groups_add_user, Notificacao
 from cmj.core.serializers import TrechoSearchSerializer, TrechoSerializer
 from cmj.crud.base import Crud, CrudAux, MasterDetailCrud
 from cmj.utils import normalize
@@ -293,4 +294,26 @@ class ImpressoEnderecamentoCrud(Crud):
 
 
 class NotificacaoRedirectView(RedirectView):
-    pass
+    permanent = False
+
+    def get_redirect_url(self, *args, **kwargs):
+
+        try:
+            obj = Notificacao.objects.get(pk=kwargs['pk'])
+        except:
+            raise Http404()
+
+        if self.request.user != obj.user:
+            raise Http404()
+        # obj.read = True
+        # obj.save()
+
+        self.pattern_name = '%s:%s_detail' % (
+            obj.content_object._meta.app_config.name,
+            obj.content_object._meta.model_name
+        )
+        kwargs['pk'] = obj.content_object.pk
+        url = RedirectView.get_redirect_url(self, *args, **kwargs)
+
+        url += '#notify-%s' % obj.pk
+        return url

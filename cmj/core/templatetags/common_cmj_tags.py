@@ -3,7 +3,10 @@ from datetime import date
 from compressor.utils import get_class
 from dateutil.relativedelta import relativedelta
 from django import template
+from django.contrib.auth.tokens import default_token_generator
 from django.db.models.query import QuerySet
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import ugettext_lazy as _
 from sapl.base.models import AppConfig
 from sapl.parlamentares.models import Filiacao
@@ -161,17 +164,17 @@ def notificacoes_unread(context):
 
     result = {'notificacoes_anonimas':
               request.user.notificacao_set.unread().filter(
-                  user_origin__isnull=True),
+                  user_origin__isnull=True).order_by('-created'),
               'notificacoes_usuarios':
               request.user.notificacao_set.unread().filter(
-                  user_origin__isnull=False)
+                  user_origin__isnull=False).order_by('-created')
               }
 
     result.update(
         {
-            'notificacoes':
-            result['notificacoes_anonimas'].count() +
-            result['notificacoes_usuarios'].count()
+            'notificacoes': (
+                result['notificacoes_anonimas'].count() +
+                result['notificacoes_usuarios'].count()),
         }
     )
 
