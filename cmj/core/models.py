@@ -717,6 +717,11 @@ class NotificacaoManager(models.Manager):
         qs = qs.filter(read=False)
         return qs
 
+    def read(self):
+        qs = self.get_queryset()
+        qs = qs.filter(read=True)
+        return qs
+
 
 class Notificacao(CmjModelMixin):
 

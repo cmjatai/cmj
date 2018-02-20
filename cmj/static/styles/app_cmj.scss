@@ -728,6 +728,7 @@ main {
         margin-bottom: 0px;
     }
   }
+
 }
 
 .table > thead > tr > th, .table > thead > tr > td, .table > tbody > tr > th, .table > tbody > tr > td, .table > tfoot > tr > th, .table > tfoot > tr > td {
@@ -754,6 +755,20 @@ main {
 .table-striped > tbody > tr:hover {
     background-color: darken($color_container_bg, 10);
 }
+
+
+
+.table {
+  .row-unread {
+    td {
+      background-color:#e3d4b5;
+    }
+    td:first-child {
+      font-weight: bold;
+    }
+  }
+}
+
 
 .context-actions{
   margin: 0 0 $grid-gutter-width;

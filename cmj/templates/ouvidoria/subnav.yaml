@@ -1,3 +1,5 @@
 {% load i18n common_cmj_tags %}
+- title: {% trans 'Solicitações' %}
+  url: cmj.ouvidoria:solicitacao_list
 - title: {% trans 'Detalhe' %}
   url: cmj.ouvidoria:solicitacao_detail

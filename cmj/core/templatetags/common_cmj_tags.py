@@ -186,3 +186,7 @@ def notificacoes_unread_count(user):
     if user and user.is_anonymous():
         return 0
     return user.notificacao_set.unread().count()
+
+@register.filter
+def objeto_lido(obj, user):
+    return not obj.notificacoes.unread().filter(user=user).exists()
