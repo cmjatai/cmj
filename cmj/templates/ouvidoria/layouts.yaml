@@ -3,3 +3,7 @@ DenunciaAnonima:
   {% trans 'Denúncia Anônima' %}:
   - titulo
   - descricao
+DenunciaAnonimaDetailLayout:
+  {% trans 'Denúncia Anônima' %}:
+  - titulo created:3
+  - descricao

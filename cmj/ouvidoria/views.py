@@ -1,13 +1,13 @@
 
 from braces.views import FormMessagesMixin
-from django.contrib.auth import get_user_model, logout
+from django.contrib.auth import logout
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView
+from sapl.crispy_layout_mixin import CrispyLayoutFormMixin
 
-from cmj.core.models import Notificacao
 from cmj.ouvidoria.forms import DenunciaForm
 from cmj.ouvidoria.models import Solicitacao
 
@@ -43,10 +43,13 @@ class DenunciaAnonimaFormView(FormMessagesMixin, CreateView):
         return response
 
 
-class SolicitacaoDetailView(PermissionRequiredMixin, DetailView):
+class SolicitacaoDetailView(PermissionRequiredMixin,
+                            CrispyLayoutFormMixin,
+                            DetailView):
     model = Solicitacao
     template_name = 'ouvidoria/solicitacao_detail.html'
     permission_required = 'ouvidoria.detail_solicitacao'
+    layout_key = 'DenunciaAnonimaDetailLayout'
 
     def has_permission(self):
         self.object = self.get_object()

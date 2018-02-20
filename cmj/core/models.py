@@ -741,6 +741,12 @@ class Notificacao(CmjModelMixin):
         blank=True, null=True, default=None)
     content_object = GenericForeignKey('content_type', 'object_id')
 
+    areatrabalho = models.ForeignKey(
+        'AreaTrabalho',
+        blank=True, null=True, default=None,
+        on_delete=PROTECT,
+        verbose_name=_('Área de Trabalho'), related_name='notificacao_set')
+
     read = models.BooleanField(
         _('Lida'),
         choices=YES_NO_CHOICES,

@@ -1,8 +1,7 @@
-{% extends "base.html" %}
+{% extends "crud/detail.html" %}
 {% load i18n %}
-
-{% block base_content %}
-denuncia anonima:
-
-{{object}}
-{% endblock %}
+{% block title %}
+  <h1 class="page-header">
+    {% trans "Denúncia Anônima" %}
+  </h1>
+{% endblock title %}
