@@ -1,0 +1,51 @@
+{% load i18n staticfiles%}
+{% if notificacoes %}
+  <div class="popup-notificacoes">
+    <div class="inner">
+      <div class="popup-titulo">
+        {% trans "Notificações" %}
+      </div>
+      {% if notificacoes_anonimas.count %}
+        <div class="inner-list">
+          <div class="popup-subtitulo">
+            {% trans "Denúncias Anônimas" %}
+          </div>
+          {% for item in notificacoes_anonimas %}
+            <a class="item" href="#">
+              <img class="avatar" src="{% static 'img/perfil.jpg' %}">
+              <div class="texto">
+                <div class="titulo">
+                  {{item.content_object.titulo|truncatechars:110}}
+                </div>
+                <div class="time">
+                há {{item.created|timesince}}
+                </div>
+              </div>
+            </a>
+          {% endfor %}
+        </div>
+      {% endif %}
+      {% if notificacoes_usuarios.count %}
+        <div class="inner-list">
+          <div class="popup-subtitulo">
+            {% trans "Notificações de Usuários" %}
+          </div>
+          {% for item in notificacoes_anonimas %}
+            <a class="item" href="#">
+              <img class="avatar" src="{% static 'img/perfil.jpg' %}">
+              <div class="texto">
+                <div class="titulo">
+                  {{item.content_object.titulo|truncatechars:110}}
+                </div>
+                <div class="time">
+                há {{item.created|timesince}}
+                </div>
+              </div>
+            </a>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+    <a href="#" class="btn-unread">{{notificacoes}}</a>
+  </div>
+{% endif %}

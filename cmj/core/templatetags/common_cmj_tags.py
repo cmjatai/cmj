@@ -3,6 +3,7 @@ from datetime import date
 from compressor.utils import get_class
 from dateutil.relativedelta import relativedelta
 from django import template
+from django.db.models.query import QuerySet
 from django.utils.translation import ugettext_lazy as _
 from sapl.base.models import AppConfig
 from sapl.parlamentares.models import Filiacao
@@ -147,3 +148,38 @@ def url(value):
     if value.startswith('http://') or value.startswith('https://'):
         return True
     return False
+
+
+@register.inclusion_tag('core/notificacoes_unread.html', takes_context=True)
+def notificacoes_unread(context):
+    request = context['request']
+
+    if request.user.is_anonymous():
+        return {'notificacoes_anonimas': [],
+                'notificacoes_usuarios': [],
+                'notificacoes': 0, }
+
+    result = {'notificacoes_anonimas':
+              request.user.notificacao_set.unread().filter(
+                  user_origin__isnull=True),
+              'notificacoes_usuarios':
+              request.user.notificacao_set.unread().filter(
+                  user_origin__isnull=False)
+              }
+
+    result.update(
+        {
+            'notificacoes':
+            result['notificacoes_anonimas'].count() +
+            result['notificacoes_usuarios'].count()
+        }
+    )
+
+    return result
+
+
+@register.filter
+def notificacoes_unread_count(user):
+    if user and user.is_anonymous():
+        return 0
+    return user.notificacao_set.unread().count()

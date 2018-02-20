@@ -24,7 +24,9 @@ from cmj.globalrules import (RP_ADD, RP_CHANGE, RP_DELETE, RP_DETAIL, RP_LIST,
                              menu_impresso_enderecamento,
                              menu_tabelas_auxiliares,
                              menu_administracao,
-                             GROUP_SIGAD_VIEW_STATUS_RESTRITOS)
+                             GROUP_SIGAD_VIEW_STATUS_RESTRITOS,
+                             GROUP_OUVIDORIA_VISUALIZACAO_RESPOSTAS)
+from cmj.ouvidoria.models import Solicitacao
 from cmj.sigad.models import Revisao, Classe, Documento, Midia
 
 
@@ -144,6 +146,7 @@ rules_group_anonymous = {
     'group': GROUP_ANONYMOUS,
     'rules': []
 }
+
 rules_sigad_view_status_restritos = {
     'group': GROUP_SIGAD_VIEW_STATUS_RESTRITOS,
     'rules': [
@@ -159,6 +162,14 @@ rules_sigad_view_status_restritos = {
         ])]
 }
 
+rules_ouvidoria_visualizacao_respostas = {
+    'group': GROUP_OUVIDORIA_VISUALIZACAO_RESPOSTAS,
+    'rules': [
+
+        (Solicitacao, [RP_LIST, RP_DETAIL]),
+    ]
+}
+
 
 rules_patterns = [
     rules_group_admin,
@@ -170,4 +181,5 @@ rules_patterns = [
     rules_saap_group_workspace_oper_processos,
 
     rules_sigad_view_status_restritos,
+    rules_ouvidoria_visualizacao_respostas,
 ]

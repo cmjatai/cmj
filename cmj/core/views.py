@@ -5,6 +5,7 @@ from django.db.models import Q
 from django.forms.utils import ErrorList
 from django.shortcuts import redirect
 from django.utils.translation import ugettext_lazy as _
+from django.views.generic.base import RedirectView
 from django_filters.views import FilterView
 from rest_framework import viewsets, mixins
 from rest_framework.authentication import SessionAuthentication,\
@@ -289,3 +290,7 @@ class ImpressoEnderecamentoCrud(Crud):
 
     class CreateView(Crud.CreateView):
         form_class = ImpressoEnderecamentoForm
+
+
+class NotificacaoRedirectView(RedirectView):
+    pass

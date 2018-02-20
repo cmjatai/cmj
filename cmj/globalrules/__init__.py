@@ -23,6 +23,9 @@ GROUP_ADMIN = _('Administrador do Sistema')
 GROUP_SIGAD_VIEW_STATUS_RESTRITOS = _(
     'Sigad - Visualização de itens com Status de Restrito')
 
+GROUP_OUVIDORIA_VISUALIZACAO_RESPOSTAS = _(
+    'Ouvidoria - Visualização e resposta de Solcitações')
+
 
 GROUP_ANONYMOUS = ''
 
@@ -34,6 +37,7 @@ CMJ_GROUPS = [
     GROUP_SAAP_WORKSPACE_OPER_GRUPO_CONTATOS,
     GROUP_ANONYMOUS,
     GROUP_SIGAD_VIEW_STATUS_RESTRITOS,
+    GROUP_OUVIDORIA_VISUALIZACAO_RESPOSTAS,
 ]
 
 

@@ -1,13 +1,16 @@
 
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import Q, F
+from django.db.models.deletion import PROTECT
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
+from cmj.core.models import AreaTrabalho, Notificacao
 from cmj.utils import CmjChoices, get_settings_auth_user_model
 
 
-class CMSMixin(models.Model):
+class Solicitacao(models.Model):
 
     STATUS_RESTRICT = 1
     STATUS_PUBLIC = 0
@@ -17,59 +20,81 @@ class CMSMixin(models.Model):
         (STATUS_PUBLIC, 'status_public', _('Público')),
     )
 
+    TIPO_ACESSO_INFORMACAO = 10
+    TIPO_ELOGIO = 20
+    TIPO_SUGESTAO = 30
+    TIPO_MANIFESTACAO = 40
+    TIPO_DENUNCIA = 900
+
+    TIPO_SOLICITACAO_CHOICE = CmjChoices(
+        (TIPO_ACESSO_INFORMACAO, 'tipo_acesso', _('Acesso a Informação')),
+        (TIPO_ELOGIO, 'tipo_elogio', _('Elogio')),
+        (TIPO_SUGESTAO, 'tipo_sugestao', _('Sugestão')),
+        (TIPO_MANIFESTACAO, 'tipo_manifestacao', _('Manifestação')),
+        (TIPO_DENUNCIA, 'tipo_denuncia', _('Denuncia')),
+    )
+
     created = models.DateTimeField(
         verbose_name=_('created'), editable=False, auto_now_add=True)
 
-    public_date = models.DateTimeField(
-        null=True, default=None,
-        verbose_name=_('Data de Início de Publicação'))
-
-    public_end_date = models.DateTimeField(
-        null=True, default=None,
-        verbose_name=_('Data de Fim de Publicação'))
-
     owner = models.ForeignKey(
         get_settings_auth_user_model(),
+        blank=True, null=True, default=None,
+        on_delete=PROTECT,
         verbose_name=_('owner'), related_name='+')
 
+    titulo = models.CharField(
+        default='', max_length=254, verbose_name=_('Título'))
+
     descricao = models.TextField(
-        verbose_name=_('Descrição'),
-        blank=True, null=True, default=None)
+        default='', verbose_name=_('Descrição'))
 
     visibilidade = models.IntegerField(
         _('Visibilidade'),
         choices=VISIBILIDADE_STATUS,
         default=STATUS_RESTRICT)
 
+    areatrabalho = models.ForeignKey(
+        AreaTrabalho,
+        verbose_name=_('Área de Trablho'))
+
+    tipo = models.IntegerField(
+        _('Tipo de Solicitação'),
+        choices=TIPO_SOLICITACAO_CHOICE,
+        default=TIPO_ACESSO_INFORMACAO)
+
+    notificacoes = GenericRelation(
+        Notificacao, related_query_name='notificacoes')
+
     class Meta:
-        abstract = True
+        verbose_name = _('Solicitação')
+        verbose_name_plural = _('Solicitações')
 
-    def clean(self):
-        """
-        Check for instances with null values in unique_together fields.
-        """
-        from django.core.exceptions import ValidationError
+    def __str__(self):
+        return self.descricao
 
-        super(CMSMixin, self).clean()
 
-        for field_tuple in self._meta.unique_together[:]:
-            unique_filter = {}
-            unique_fields = []
-            null_found = False
-            for field_name in field_tuple:
-                field_value = getattr(self, field_name)
-                if getattr(self, field_name) is None:
-                    unique_filter['%s__isnull' % field_name] = True
-                    null_found = True
-                else:
-                    unique_filter['%s' % field_name] = field_value
-                    unique_fields.append(field_name)
-            if null_found:
-                unique_queryset = self.__class__.objects.filter(
-                    **unique_filter)
-                if self.pk:
-                    unique_queryset = unique_queryset.exclude(pk=self.pk)
-                if unique_queryset.exists():
-                    msg = self.unique_error_message(
-                        self.__class__, tuple(unique_fields))
-                    raise ValidationError(msg)
+"""class MensagemSolicitacao(models.Model):
+
+    created = models.DateTimeField(
+        verbose_name=_('created'), editable=False, auto_now_add=True)
+
+    owner = models.ForeignKey(
+        get_settings_auth_user_model(),
+        verbose_name=_('owner'), related_name='+')
+
+    descricao = models.TextField(
+        default='',  verbose_name=_('Descrição'))
+
+    solicitacao = models.ForeignKey(
+        Solicitacao,
+        verbose_name=_('Solicitação'))
+
+    notificacoes = GenericRelation(
+        Notificacao, related_query_name='notificacoes')
+
+    class Meta:
+        ordering = ('created', )
+        verbose_name = _('Mensagem')
+        verbose_name_plural = _('Mensagens')
+"""

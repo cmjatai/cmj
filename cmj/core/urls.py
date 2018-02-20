@@ -7,7 +7,8 @@ from cmj.core.forms_auth import RecuperarSenhaForm, NovaSenhaForm, LoginForm
 from cmj.core.views import CepCrud, RegiaoMunicipalCrud, DistritoCrud,\
     BairroCrud, TipoLogradouroCrud, LogradouroCrud, TrechoCrud, \
     TrechoJsonSearchView, TrechoJsonView, AreaTrabalhoCrud,\
-    OperadorAreaTrabalhoCrud, PartidoCrud, ImpressoEnderecamentoCrud
+    OperadorAreaTrabalhoCrud, PartidoCrud, ImpressoEnderecamentoCrud,\
+    NotificacaoRedirectView
 from cmj.core.views_auth import CmjUserChangeView
 from cmj.settings import EMAIL_SEND_USER
 
@@ -67,6 +68,10 @@ urlpatterns = user_urlpatterns + [
 
     url(r'^areatrabalho/', include(AreaTrabalhoCrud.get_urls() +
                                    OperadorAreaTrabalhoCrud.get_urls())),
+
+    url(r'^notificacao/(?P<pk>[0-9]+)$', NotificacaoRedirectView.as_view(),
+        name='notificacao_redirect'),
+
 
     url(r'^api/enderecos.json', TrechoJsonSearchView.as_view(
         {'get': 'list'}), name='trecho_search_rest_json'),

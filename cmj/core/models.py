@@ -4,6 +4,8 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin, Group
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.db import models
 from django.db.models import permalink
@@ -312,83 +314,6 @@ class Municipio(models.Model):  # Localidade
         }
 
 
-class AreaTrabalho(CmjAuditoriaModelMixin):
-
-    TIPO_GABINETE = 10
-    TIPO_ADMINISTRATIVO = 20
-    TIPO_INSTITUCIONAL = 30
-
-    TIPO_AREATRABALHO_CHOICE = CmjChoices(
-        (TIPO_GABINETE, 'tipo_gabinete', _('Gabinete Parlamentar')),
-        (TIPO_ADMINISTRATIVO, 'tipo_administrativo',
-         _('Setor Administrativo')),
-        (TIPO_INSTITUCIONAL, 'tipo_institucional', _('Institucional')),
-    )
-
-    nome = models.CharField(max_length=100, blank=True, default='',
-                            verbose_name=_('Nome'))
-
-    descricao = models.CharField(
-        default='', max_length=254, verbose_name=_('Descrição'))
-
-    operadores = models.ManyToManyField(
-        get_settings_auth_user_model(),
-        through='OperadorAreaTrabalho',
-        through_fields=('areatrabalho', 'user'),
-        symmetrical=False,
-        related_name='areatrabalho_set')
-
-    parlamentar = models.ForeignKey(
-        Parlamentar,
-        verbose_name=_('Parlamentar'),
-        related_name='areatrabalho_set',
-        blank=True, null=True, on_delete=SET_NULL)
-    tipo = models.IntegerField(
-        _('Tipo da Área de Trabalho'),
-        choices=TIPO_AREATRABALHO_CHOICE,
-        default=TIPO_GABINETE)
-
-    class Meta:
-        verbose_name = _('Área de Trabalho')
-        verbose_name_plural = _('Áreas de Trabalho')
-
-    def __str__(self):
-        return self.nome
-
-
-class OperadorAreaTrabalho(CmjAuditoriaModelMixin):
-
-    user = models.ForeignKey(
-        get_settings_auth_user_model(),
-        verbose_name=_('Operador da Área de Trabalho'),
-        related_name='operadorareatrabalho_set',
-        on_delete=CASCADE)
-
-    areatrabalho = models.ForeignKey(
-        AreaTrabalho,
-        related_name='operadorareatrabalho_set',
-        verbose_name=_('Área de Trabalho'),
-        on_delete=CASCADE)
-
-    grupos_associados = models.ManyToManyField(
-        Group,
-        verbose_name=_('Grupos Associados'),
-        related_name='operadorareatrabalho_set')
-
-    @property
-    def user_name(self):
-        return '%s - %s' % (
-            self.user.get_display_name(),
-            self.user.email)
-
-    class Meta:
-        verbose_name = _('Operador')
-        verbose_name_plural = _('Operadores')
-
-    def __str__(self):
-        return self.user_name
-
-
 class Cep(models.Model):
     numero = models.CharField(max_length=9, verbose_name=_('CEP'), unique=True)
 
@@ -683,3 +608,153 @@ class ImpressoEnderecamento(models.Model):
 
     def __str__(self):
         return self.nome
+
+
+class AreaTrabalhoManager(models.Manager):
+
+    use_for_related_fields = True
+
+    def areatrabalho_de_parlamentares(self):
+        qs = self.get_queryset()
+        qs = qs.filter(tipo=10, ativo=True)
+        return qs
+
+    def areatrabalho_da_instituicao(self):
+        qs = self.get_queryset()
+        qs = qs.filter(tipo=30, ativo=True)
+        return qs
+
+
+class AreaTrabalho(CmjAuditoriaModelMixin):
+
+    objects = AreaTrabalhoManager()
+
+    TIPO_GABINETE = 10
+    TIPO_ADMINISTRATIVO = 20
+    TIPO_INSTITUCIONAL = 30
+
+    TIPO_AREATRABALHO_CHOICE = CmjChoices(
+        (TIPO_GABINETE, 'tipo_gabinete', _('Gabinete Parlamentar')),
+        (TIPO_ADMINISTRATIVO, 'tipo_administrativo',
+         _('Setor Administrativo')),
+        (TIPO_INSTITUCIONAL, 'tipo_institucional', _('Institucional')),
+    )
+
+    nome = models.CharField(max_length=100, blank=True, default='',
+                            verbose_name=_('Nome'))
+
+    descricao = models.CharField(
+        default='', max_length=254, verbose_name=_('Descrição'))
+
+    operadores = models.ManyToManyField(
+        get_settings_auth_user_model(),
+        through='OperadorAreaTrabalho',
+        through_fields=('areatrabalho', 'user'),
+        symmetrical=False,
+        related_name='areatrabalho_set')
+
+    parlamentar = models.ForeignKey(
+        Parlamentar,
+        verbose_name=_('Parlamentar'),
+        related_name='areatrabalho_set',
+        blank=True, null=True, on_delete=SET_NULL)
+
+    tipo = models.IntegerField(
+        _('Tipo da Área de Trabalho'),
+        choices=TIPO_AREATRABALHO_CHOICE,
+        default=TIPO_GABINETE)
+
+    ativo = models.BooleanField(
+        _('Área de trabalho Ativa'),
+        choices=YES_NO_CHOICES,
+        default=True)
+
+    class Meta:
+        verbose_name = _('Área de Trabalho')
+        verbose_name_plural = _('Áreas de Trabalho')
+
+    def __str__(self):
+        return self.nome
+
+
+class OperadorAreaTrabalho(CmjAuditoriaModelMixin):
+
+    user = models.ForeignKey(
+        get_settings_auth_user_model(),
+        verbose_name=_('Operador da Área de Trabalho'),
+        related_name='operadorareatrabalho_set',
+        on_delete=CASCADE)
+
+    areatrabalho = models.ForeignKey(
+        AreaTrabalho,
+        related_name='operadorareatrabalho_set',
+        verbose_name=_('Área de Trabalho'),
+        on_delete=CASCADE)
+
+    grupos_associados = models.ManyToManyField(
+        Group,
+        verbose_name=_('Grupos Associados'),
+        related_name='operadorareatrabalho_set')
+
+    @property
+    def user_name(self):
+        return '%s - %s' % (
+            self.user.get_display_name(),
+            self.user.email)
+
+    class Meta:
+        verbose_name = _('Operador')
+        verbose_name_plural = _('Operadores')
+
+    def __str__(self):
+        return self.user_name
+
+
+class NotificacaoManager(models.Manager):
+
+    def unread(self):
+        qs = self.get_queryset()
+        qs = qs.filter(read=False)
+        return qs
+
+
+class Notificacao(CmjModelMixin):
+
+    objects = NotificacaoManager()
+
+    user = models.ForeignKey(
+        get_settings_auth_user_model(),
+        verbose_name=_('Usuário Notificado'),
+        related_name='notificacao_set',
+        on_delete=CASCADE)
+
+    user_origin = models.ForeignKey(
+        get_settings_auth_user_model(),
+        blank=True, null=True, default=None,
+        on_delete=PROTECT,
+        verbose_name=_('owner'), related_name='notificacao_origem_set')
+
+    content_type = models.ForeignKey(
+        ContentType,
+        blank=True, null=True, default=None)
+    object_id = models.PositiveIntegerField(
+        blank=True, null=True, default=None)
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    read = models.BooleanField(
+        _('Lida'),
+        choices=YES_NO_CHOICES,
+        default=False)
+
+    class Meta:
+        verbose_name = _('Notificação')
+        verbose_name_plural = _('Notificações')
+
+    @property
+    def user_name(self):
+        return '%s - %s' % (
+            self.user.get_display_name(),
+            self.user.email)
+
+    def __str__(self):
+        return self.user_name
