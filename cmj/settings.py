@@ -238,6 +238,7 @@ USE_L10N = False
 USE_TZ = True
 DATE_FORMAT = 'd/m/Y'
 SHORT_DATE_FORMAT = 'd/m/Y'
+DATETIME_FORMAT = 'd/m/Y - H:i:s'
 DATE_INPUT_FORMATS = ('%d/%m/%Y', '%m-%d-%Y', '%Y-%m-%d')
 
 LOCALE_PATHS = (

@@ -190,3 +190,11 @@ def notificacoes_unread_count(user):
 @register.filter
 def objeto_lido(obj, user):
     return not obj.notificacoes.unread().filter(user=user).exists()
+
+@register.filter
+def data_de_leitura(obj, user):
+    qs = obj.notificacoes.read().filter(user=user)
+    if not qs.exists():
+        return None
+
+    return qs.first().modified

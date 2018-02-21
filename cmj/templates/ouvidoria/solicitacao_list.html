@@ -3,9 +3,10 @@
 
 {% block title %}
   <h1 class="page-header">
-    {% trans "Solicitações Diversas" %}<br>
-    <small>{% trans "Encaminhadas para: " %}
-    {{areatrabalho.0.nome}}</small>
+    <small>{% trans "Solicitações Diversas" %}</small>
+    <span class="pull-right">
+      {{user.areatrabalho_set.all.first.nome}}
+    </span>
   </h1>
 {% endblock title %}
 
@@ -24,9 +25,9 @@
         <thead>
           <tr>
             <th>Título</th>
-            <th>Encaminhamento</th>
             <th>Usuário</th>
-            <th>Lida Por</th>
+            <th>Encaminhamento</th>
+            <th>Data de Leitura</th>
           </tr>
         </thead>
         <tbody>
@@ -38,17 +39,13 @@
               </a>
             </td>
             <td>
-              {{ solicitacao.created|date:"d/M/Y" }} - {{ solicitacao.created|time:"H:i" }}
-            </td>
-            <td>
               {{solicitacao.owner|default:'Denúncia Anônima'}}
             </td>
             <td>
-              <ul>
-                {% for user_read in solicitacao.notificacoes.read.all %}
-                    <li>{{user_read}}</li>
-                {% endfor %}
-              </ul>
+              {{ solicitacao.created }}
+            </td>
+            <td>
+              {{ solicitacao|data_de_leitura:user|default:''}}
             </td>
           </tr>
         {% endfor %}
