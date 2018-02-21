@@ -1,28 +1,23 @@
 {% extends "crud/detail.html" %}
 {% load i18n %}
 {% block title %}
-<h1 class="page-header">
-  <small>{% trans "Solicitações Diversas" %}</small>
+<h1 class="page-header bg-red ">
+  <small class="text-maroon">{% trans "Denúncia Anônima" %}</small>
   <span class="pull-right">
     {{user.areatrabalho_set.all.first.nome}}
   </span>
 </h1>
 {% endblock title %}
 {% block base_content %}
-{% comment %}
-  <div class="context-actions clearfix">
-    {% if view.extras_url %}
-      <div class="actions btn-group-lg pull-right" role="group">
-    {% for url, css_class, text in view.extras_url %}
-      <a href="{{url}}" class="btn {{css_class}}">
-            {{text}}
-          </a>
-        {% endfor %}
-      </div>
-    {% endif %}
+<div class="context-actions clearfix">
+  <div class="actions pull-right" role="group">
+{% for url, css_class, text in view.extras_url %}
+  <a href="{{url}}" class="btn {{css_class}}">
+        {{text}}
+      </a>
+    {% endfor %}
   </div>
-{% endcomment %}
-
+</div>
 <div class="container-detail clearfix">
   <h2 class="legend">Dados Enviados</h2>
     <div class="row-fluid">
@@ -36,7 +31,7 @@
       </div>
       <div class="col-sm-4">
         <div id="div_id_created" class="form-group">
-          <p class="control-label">Denúncia ecaminhada em:</p>
+          <p class="control-label">Denúncia encaminhada em:</p>
             <div class="form-control-static">{{ object.created }}</div>
         </div>
       </div>

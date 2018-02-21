@@ -3,5 +3,3 @@
   url: cmj.ouvidoria:solicitacao_list
 - title: {% trans 'Solicitações que Administro' %}
   url: cmj.ouvidoria:solicitacao_manage_list
-- title: {% trans 'Detalhe' %}
-  url: cmj.ouvidoria:solicitacao_detail

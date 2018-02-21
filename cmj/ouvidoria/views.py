@@ -4,6 +4,8 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.urlresolvers import reverse
+from django.http.response import Http404
+from django.shortcuts import redirect
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
@@ -52,33 +54,31 @@ class SolicitacaoDetailView(PermissionRequiredMixin,
                             CrispyLayoutFormMixin,
                             DetailView):
     model = Solicitacao
-    template_name = 'ouvidoria/solicitacao_detail.html'
+    template_name = 'ouvidoria/denuncia_anonima_detail.html'
     permission_required = 'ouvidoria.detail_solicitacao'
     layout_key = 'DenunciaAnonimaDetailLayout'
 
     @property
     def extras_url(self):
         return [
-            (reverse('cmj.ouvidoria:solicitacao_detail', kwargs=self.kwargs),
-             'btn-success',
+            (reverse('cmj.ouvidoria:solicitacao_manage_list'),
+             'btn-default',
              _('Listar outras Solcitações')
              )
         ]
-
-    @property
-    def verbose_name_plural(self):
-        return self.model._meta.verbose_name_plural
 
     def has_permission(self):
         self.object = self.get_object()
 
         if self.object.owner == self.request.user:
             return True
-        elif PermissionRequiredMixin.has_permission(self):
-            return self.object.areatrabalho.operadores.filter(
+        elif super().has_permission():
+            is_operador = self.object.areatrabalho.operadores.filter(
                 pk=self.request.user.pk).exists()
-        else:
-            return False
+
+            if is_operador:
+                return True
+        raise Http404()
 
     def get(self, request, *args, **kwargs):
         self.object.notificacoes.unread().filter(
@@ -86,8 +86,8 @@ class SolicitacaoDetailView(PermissionRequiredMixin,
                 read=True,
                 modified=timezone.now())
 
-        if not self.object.owner:
-            self.template_name = 'ouvidoria/denuncia_anonima_detail.html'
+        if self.object.owner:
+            self.template_name = 'ouvidoria/solicitacao_detail.html'
         return DetailView.get(self, request, *args, **kwargs)
 
 
