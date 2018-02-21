@@ -74,7 +74,7 @@ class Solicitacao(models.Model):
         return self.descricao
 
 
-"""class MensagemSolicitacao(models.Model):
+class MensagemSolicitacao(models.Model):
 
     created = models.DateTimeField(
         verbose_name=_('created'), editable=False, auto_now_add=True)
@@ -95,6 +95,5 @@ class Solicitacao(models.Model):
 
     class Meta:
         ordering = ('created', )
-        verbose_name = _('Mensagem')
-        verbose_name_plural = _('Mensagens')
-"""
+        verbose_name = _('Mensagem de Solicitação')
+        verbose_name_plural = _('Mensagens de Solicitação')
