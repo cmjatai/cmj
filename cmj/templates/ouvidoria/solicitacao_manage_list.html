@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load i18n common_cmj_tags%}
+
+{% block title %}
+  <h1 class="page-header">
+    <small>{% trans "Solicitações Diversas" %} - {% trans "Área Administrativa" %}</small>
+    <span class="pull-right">
+      {{user.areatrabalho_set.all.first.nome}}
+    </span>
+  </h1>
+{% endblock title %}
+
+{% block base_content %}
+  {% if not object_list %}
+    <p>{{ NO_ENTRIES_MSG }}</p>
+  {% else %}
+    <div class="container-table">
+      <div class="result-count">
+        {% blocktrans with verbose_name_plural=view.verbose_name_plural %}
+        Total de {{ verbose_name_plural }}:
+        {% endblocktrans %}
+        <strong>{{count}}</strong>
+      </div>
+      <table class="table table-striped table-hover table-link-ordering">
+        <thead>
+          <tr>
+            <th>Título</th>
+            <th>Usuário</th>
+            <th>Encaminhamento</th>
+            <th>Data de Leitura</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for solicitacao in object_list %}
+          <tr class="{% if not solicitacao|objeto_lido:user %}row-unread{%endif%}">
+            <td>
+              <a href="{% url 'cmj.ouvidoria:solicitacao_detail' solicitacao.pk%}">
+                {{solicitacao.titulo}}
+              </a>
+            </td>
+            <td>
+              {{solicitacao.owner|default:'Denúncia Anônima'}}
+            </td>
+            <td>
+              {{ solicitacao.created }}
+            </td>
+            <td>
+              {{ solicitacao|data_de_leitura:user|default:''}}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+      </table>
+    </div>
+  {% endif %}
+  {% include "paginacao.html" %}
+{% endblock %}

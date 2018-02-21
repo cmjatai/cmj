@@ -85,8 +85,15 @@
                     {% endif %}
                   </a>
                   <ul class="dropdown-menu menu-right">
-                    <li><a href="{% url 'cmj.core:cmj_user_change' %}">{% trans "Meu Perfil" %}: {{ user.get_full_name|default:user.email }}</a></li>
-                    <li><a href="{% url 'cmj.core:logout' %}">{% trans "Sair" %}</a></li>
+                    <li class=" text-right"><a href="{% url 'cmj.core:cmj_user_change' %}">{{ user.get_full_name|default:user.email }} <i class="fa fa-hand-o-left" aria-hidden="true"></i> {% trans "Meu Perfil" %}</a></li>
+                    {% if perms.ouvidoria %}
+                      <li class=" text-right"><a href="{% url 'cmj.ouvidoria:solicitacao_manage_list' %}">{{user.areatrabalho_set.all.first.nome}} <i class="fa fa-hand-o-left" aria-hidden="true"></i> {% trans "Ouvidoria" %}</a></li>
+                    {% endif %}
+                      <li class=" text-right"><a href="{% url 'cmj.ouvidoria:solicitacao_manage_list' %}">{% trans "Minhas Solicitações" %}</a></li>
+
+
+
+                    <li class=" text-right"><a href="{% url 'cmj.core:logout' %}">{% trans "Sair" %}</a></li>
                   </ul>
                 </li>
               {% else %}

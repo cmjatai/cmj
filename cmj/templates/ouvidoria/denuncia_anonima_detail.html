@@ -1,9 +1,12 @@
 {% extends "crud/detail.html" %}
 {% load i18n %}
 {% block title %}
-  <h1 class="page-header">
-    {% trans "Denúncia Anônima" %}<br><small>{% trans "Encaminhada para:" %} {{object.areatrabalho}}</small>
-  </h1>
+<h1 class="page-header">
+  <small>{% trans "Solicitações Diversas" %}</small>
+  <span class="pull-right">
+    {{user.areatrabalho_set.all.first.nome}}
+  </span>
+</h1>
 {% endblock title %}
 {% block base_content %}
 {% comment %}

@@ -89,10 +89,14 @@ class SolicitacaoDetailView(PermissionRequiredMixin,
         return DetailView.get(self, request, *args, **kwargs)
 
 
-class SolicitacaoListView(ListView):
+class SolicitacaoManageListView(PermissionRequiredMixin,
+                                ListView):
     model = Solicitacao
     paginate_by = 10
     no_entries_msg = _('Nenhum registro encontrado.')
+    template_name = 'ouvidoria/solicitacao_manage_list.html'
+
+    permission_required = 'ouvidoria.list_solicitacao'
 
     @property
     def verbose_name_plural(self):
@@ -123,5 +127,45 @@ class SolicitacaoListView(ListView):
         # rows
         object_list = context['object_list']
         context['NO_ENTRIES_MSG'] = self.no_entries_msg
+        context['subnav_template_name'] = 'ouvidoria/subnav_list.yaml'
+
+        return context
+
+
+class SolicitacaoListView(ListView):
+    model = Solicitacao
+    paginate_by = 10
+    no_entries_msg = _('Nenhum registro encontrado.')
+    template_name = 'ouvidoria/solicitacao_minhas_list.html'
+
+    @property
+    def verbose_name_plural(self):
+        return self.model._meta.verbose_name_plural
+
+    def get_queryset(self):
+        qs = ListView.get_queryset(self)
+
+        qs = qs.filter(owner=self.request.user).order_by(
+            'notificacoes__read', '-created')
+        return qs
+
+    def get_context_data(self, **kwargs):
+
+        count = self.object_list.count()
+        context = super().get_context_data(**kwargs)
+        context.setdefault('title', self.verbose_name_plural)
+        context['count'] = count
+
+        # pagination
+        if self.paginate_by:
+            page_obj = context['page_obj']
+            paginator = context['paginator']
+            context['page_range'] = make_pagination(
+                page_obj.number, paginator.num_pages)
+
+        # rows
+        object_list = context['object_list']
+        context['NO_ENTRIES_MSG'] = self.no_entries_msg
+        context['subnav_template_name'] = 'ouvidoria/subnav_list.yaml'
 
         return context

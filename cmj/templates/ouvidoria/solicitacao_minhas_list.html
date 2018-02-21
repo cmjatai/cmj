@@ -3,10 +3,7 @@
 
 {% block title %}
   <h1 class="page-header">
-    <small>{% trans "Solicitações Diversas" %}</small>
-    <span class="pull-right">
-      {{user.areatrabalho_set.all.first.nome}}
-    </span>
+    {% trans "Minhas Solicitações" %}
   </h1>
 {% endblock title %}
 
