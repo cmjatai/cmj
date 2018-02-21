@@ -62,7 +62,7 @@ class DenunciaForm(ModelForm):
                       'ao estar logado, é só se conectar novamente.'),
                     css_class="alert-info"))
 
-        super(DenunciaForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.helper = FormHelper()
         self.helper.layout = SaplFormLayout(
@@ -87,7 +87,6 @@ class DenunciaForm(ModelForm):
             denuncia.areatrabalho = at
             denuncia.save()
 
-            # TODO: criar grupo e enviar apenas para usuários no grupo
             for operador in at.operadorareatrabalho_set.all():
                 nt = Notificacao()
                 nt.content_object = denuncia
@@ -95,9 +94,93 @@ class DenunciaForm(ModelForm):
                 nt.areatrabalho = at
                 nt.save()
 
-            # TODO: Enviar por email
+            # TODO: Enviar por email?
 
         return
 
     def clean(self):
         pass
+
+
+class SolicitacaoForm(ModelForm):
+
+    areatrabalho_parlamentar = forms.ModelChoiceField(
+        label=_('Prefere se Comunicar Diretamente com um Parlamentar?'),
+        required=False,
+        queryset=AreaTrabalho.objects.areatrabalho_de_parlamentares(),
+        help_text=_('Você pode preferir encaminhar seu Registro de '
+                    'Solicitação diretamente para um parlamentar. '
+                    'Seu Gabinete será notificado com sua manifestação '
+                    'e poderá te responder diretamente aqui pelo portal.<br>'
+                    'Você receberá um e-mail sempre que a assessoria de seu '
+                    'Parlamentar ou a Ouvidoria '
+                    'te encaminhar uma mensagem.<br>'
+                    '<strong>Caso opte por Registrar uma Solicitação para um '
+                    'Parlamentar, seu registro é privado entre você e '
+                    'o Parlamentar.<br>Portanto, se assim proceder você, '
+                    'a Ouvidoria Institucional da Câmara Municipal de Jataí '
+                    'não tomará conhecimento de sua solcitação.</strong><br>'
+                    'Para Registrar Solicitações Institucionais basta '
+                    'não selecionar Parlamentar na caixa acima.'
+                    ))
+
+    class Meta:
+        model = Solicitacao
+        fields = ('titulo', 'descricao', 'tipo')
+
+    def __init__(self, *args, **kwargs):
+
+        rows = to_row(
+            [
+                (Div(
+                    to_row([('titulo', 7), ('tipo', 5),
+                            ('descricao', 12), ])
+                ), 7),
+                (Div(
+                    to_row([('areatrabalho_parlamentar', 12)])
+                ), 5),
+
+            ]
+        )
+
+        super().__init__(*args, **kwargs)
+
+        self.helper = FormHelper()
+        self.helper.layout = SaplFormLayout(
+            *rows,
+            actions=form_actions(label=_('Enviar'))
+        )
+
+        self.instance.owner = kwargs['initial']['owner']
+
+    def save(self, commit=True):
+
+        cd = self.cleaned_data
+
+        at_list = cd['areatrabalho_parlamentar']
+
+        if not at_list:
+            at_list = AreaTrabalho.objects.areatrabalho_da_instituicao()
+        else:
+            at_list = (at_list, )
+
+        for at in at_list:
+            solicitacao = Solicitacao()
+            solicitacao.owner = self.instance.owner
+            solicitacao.titulo = self.instance.titulo
+            solicitacao.descricao = self.instance.descricao
+            solicitacao.tipo = self.instance.tipo
+            solicitacao.areatrabalho = at
+            solicitacao.save()
+
+            for operador in at.operadorareatrabalho_set.all():
+                nt = Notificacao()
+                nt.content_object = solicitacao
+                nt.user = operador.user
+                nt.user_origin = self.instance.owner
+                nt.areatrabalho = at
+                nt.save()
+
+            # TODO: Enviar por email?
+
+        return

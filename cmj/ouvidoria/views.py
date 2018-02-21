@@ -3,18 +3,19 @@ from braces.views import FormMessagesMixin
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.http.response import Http404
 from django.shortcuts import redirect
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
+from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, FormView
 from django.views.generic.list import ListView
 from sapl.crispy_layout_mixin import CrispyLayoutFormMixin
 
-from cmj.ouvidoria.forms import DenunciaForm
+from cmj.ouvidoria.forms import DenunciaForm, SolicitacaoForm
 from cmj.ouvidoria.models import Solicitacao
 from cmj.utils import make_pagination
 
@@ -30,7 +31,6 @@ class DenunciaAnonimaFormView(FormMessagesMixin, CreateView):
     def get_context_data(self, **kwargs):
 
         context = CreateView.get_context_data(self, **kwargs)
-        context['title'] = _('Denúncia Anônima')
         return context
 
     def get_success_url(self):
@@ -87,7 +87,10 @@ class SolicitacaoDetailView(PermissionRequiredMixin,
                 modified=timezone.now())
 
         if self.object.owner:
-            self.template_name = 'ouvidoria/solicitacao_detail.html'
+            return redirect(
+                reverse_lazy('cmj.ouvidoria:solicitacao_interact',
+                             kwargs=kwargs))
+
         return DetailView.get(self, request, *args, **kwargs)
 
 
@@ -141,11 +144,11 @@ class SolicitacaoListView(SolicitacaoListMixin, ListView):
     @property
     def extras_url(self):
         return [
-            (reverse('cmj.ouvidoria:denuncia_form', kwargs=self.kwargs),
+            (reverse('cmj.ouvidoria:solicitacao_create'),
              'btn-success',
              _('Abrir Nova Solicitação')
              ),
-            (reverse('cmj.ouvidoria:denuncia_form', kwargs=self.kwargs),
+            (reverse('cmj.ouvidoria:denuncia_form'),
              'btn-danger',
              _('Fazer uma Denúncia Anônima')
              )
@@ -157,3 +160,34 @@ class SolicitacaoListView(SolicitacaoListMixin, ListView):
         qs = qs.filter(owner=self.request.user).order_by(
             'notificacoes__read', '-created')
         return qs
+
+
+@method_decorator(login_required, name='dispatch')
+class SolicitacaoFormView(FormMessagesMixin, CreateView):
+    form_valid_message, form_invalid_message = (
+        _('Sua solicitação foi encaminha...'),
+        _('Houve um erro no envio de sua mensagem.'))
+    model = Solicitacao
+    form_class = SolicitacaoForm
+    template_name = 'crud/form.html'
+
+    def get_context_data(self, **kwargs):
+        context = CreateView.get_context_data(self, **kwargs)
+        context['title'] = _('Registar uma Solicitação')
+        return context
+
+    def get_initial(self):
+        initial = CreateView.get_initial(self)
+        initial.update({'owner':
+                        self.request.user})
+        return initial
+
+    def get_success_url(self):
+        return reverse('cmj.ouvidoria:solicitacao_interact')
+
+
+class SolicitacaoInteractionView(TemplateView):
+
+    form_class = SolicitacaoForm
+    success_url = reverse_lazy('cmj.ouvidoria:solicitacao_interact')
+    template_name = 'ouvidoria/solicitacao_interact.html'

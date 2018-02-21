@@ -54,12 +54,12 @@
         {% for solicitacao in object_list %}
           <tr class="{% if not solicitacao|objeto_lido:user %}row-unread{%endif%}">
             <td>
-              <a href="{% url 'cmj.ouvidoria:solicitacao_detail' solicitacao.pk%}">
+              <a href="{% url 'cmj.ouvidoria:solicitacao_interact' solicitacao.pk%}">
                 {{solicitacao.titulo}}
               </a>
             </td>
             <td>
-              {{solicitacao.owner|default:'Denúncia Anônima'}}
+              {{solicitacao.areatrabalho|default:''}}
             </td>
             <td>
               {{ solicitacao.created }}
