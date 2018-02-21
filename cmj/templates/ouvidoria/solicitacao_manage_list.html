@@ -16,10 +16,8 @@
   {% else %}
     <div class="container-table">
       <div class="result-count">
-        {% blocktrans with verbose_name_plural=view.verbose_name_plural %}
-        Total de {{ verbose_name_plural }}:
-        {% endblocktrans %}
-        <strong>{{count}}</strong>
+        <strong>{% trans "Total de" %} {{count}} {% if count > 1%}{% trans "Solicitações" %}{% else %}{% trans "Solicitação" %}{% endif %}
+        </strong>
       </div>
       <table class="table table-striped table-hover table-link-ordering">
         <thead>

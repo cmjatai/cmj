@@ -1,9 +1,11 @@
 
 from braces.views import FormMessagesMixin
 from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.urlresolvers import reverse
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView
@@ -89,18 +91,40 @@ class SolicitacaoDetailView(PermissionRequiredMixin,
         return DetailView.get(self, request, *args, **kwargs)
 
 
-class SolicitacaoManageListView(PermissionRequiredMixin,
-                                ListView):
+class SolicitacaoListMixin:
     model = Solicitacao
     paginate_by = 10
     no_entries_msg = _('Nenhum registro encontrado.')
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        count = self.object_list.count()
+        context = super().get_context_data(**kwargs)
+        context['count'] = count
+
+        # pagination
+        if self.paginate_by:
+            page_obj = context['page_obj']
+            paginator = context['paginator']
+            context['page_range'] = make_pagination(
+                page_obj.number, paginator.num_pages)
+
+        # rows
+        object_list = context['object_list']
+        context['NO_ENTRIES_MSG'] = self.no_entries_msg
+        context['subnav_template_name'] = 'ouvidoria/subnav_list.yaml'
+
+        return context
+
+
+class SolicitacaoManageListView(SolicitacaoListMixin,
+                                PermissionRequiredMixin,
+                                ListView):
     template_name = 'ouvidoria/solicitacao_manage_list.html'
-
     permission_required = 'ouvidoria.list_solicitacao'
-
-    @property
-    def verbose_name_plural(self):
-        return self.model._meta.verbose_name_plural
 
     def get_queryset(self):
         qs = ListView.get_queryset(self)
@@ -110,37 +134,22 @@ class SolicitacaoManageListView(PermissionRequiredMixin,
         ).order_by('notificacoes__read', '-created')
         return qs
 
-    def get_context_data(self, **kwargs):
 
-        count = self.object_list.count()
-        context = super().get_context_data(**kwargs)
-        context.setdefault('title', self.verbose_name_plural)
-        context['count'] = count
-
-        # pagination
-        if self.paginate_by:
-            page_obj = context['page_obj']
-            paginator = context['paginator']
-            context['page_range'] = make_pagination(
-                page_obj.number, paginator.num_pages)
-
-        # rows
-        object_list = context['object_list']
-        context['NO_ENTRIES_MSG'] = self.no_entries_msg
-        context['subnav_template_name'] = 'ouvidoria/subnav_list.yaml'
-
-        return context
-
-
-class SolicitacaoListView(ListView):
-    model = Solicitacao
-    paginate_by = 10
-    no_entries_msg = _('Nenhum registro encontrado.')
+class SolicitacaoListView(SolicitacaoListMixin, ListView):
     template_name = 'ouvidoria/solicitacao_minhas_list.html'
 
     @property
-    def verbose_name_plural(self):
-        return self.model._meta.verbose_name_plural
+    def extras_url(self):
+        return [
+            (reverse('cmj.ouvidoria:denuncia_form', kwargs=self.kwargs),
+             'btn-success',
+             _('Abrir Nova Solicitação')
+             ),
+            (reverse('cmj.ouvidoria:denuncia_form', kwargs=self.kwargs),
+             'btn-danger',
+             _('Fazer uma Denúncia Anônima')
+             )
+        ]
 
     def get_queryset(self):
         qs = ListView.get_queryset(self)
@@ -148,24 +157,3 @@ class SolicitacaoListView(ListView):
         qs = qs.filter(owner=self.request.user).order_by(
             'notificacoes__read', '-created')
         return qs
-
-    def get_context_data(self, **kwargs):
-
-        count = self.object_list.count()
-        context = super().get_context_data(**kwargs)
-        context.setdefault('title', self.verbose_name_plural)
-        context['count'] = count
-
-        # pagination
-        if self.paginate_by:
-            page_obj = context['page_obj']
-            paginator = context['paginator']
-            context['page_range'] = make_pagination(
-                page_obj.number, paginator.num_pages)
-
-        # rows
-        object_list = context['object_list']
-        context['NO_ENTRIES_MSG'] = self.no_entries_msg
-        context['subnav_template_name'] = 'ouvidoria/subnav_list.yaml'
-
-        return context

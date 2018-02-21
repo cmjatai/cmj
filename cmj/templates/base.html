@@ -89,7 +89,7 @@
                     {% if perms.ouvidoria %}
                       <li class=" text-right"><a href="{% url 'cmj.ouvidoria:solicitacao_manage_list' %}">{{user.areatrabalho_set.all.first.nome}} <i class="fa fa-hand-o-left" aria-hidden="true"></i> {% trans "Ouvidoria" %}</a></li>
                     {% endif %}
-                      <li class=" text-right"><a href="{% url 'cmj.ouvidoria:solicitacao_manage_list' %}">{% trans "Minhas Solicitações" %}</a></li>
+                      <li class=" text-right"><a href="{% url 'cmj.ouvidoria:solicitacao_list' %}">{% trans "Minhas Solicitações" %}</a></li>
 
 
 

@@ -8,21 +8,44 @@
 {% endblock title %}
 
 {% block base_content %}
+
+
+    <div class="alert alert-info">
+      <ul>
+        <li>
+          Para fazer uma solicitação e obter resposta, utilize a opção "Abrir Nova Solicitação"
+        </li>
+        <li>
+          Caso opte por "Fazer uma Denúnica Anônima" você será desconectado e sua denúncia será encaminhada sem qualquer vínvulo com seu usuário mas desta forma não será possível obter qualquer resposta."
+        </li>
+      </ul>
+    </div>
+    <div class="context-actions clearfix">
+      <div class="actions btn-group-lg pull-right" role="group">
+    {% for url, css_class, text in view.extras_url %}
+      <a href="{{url}}" class="btn {{css_class}}">
+            {{text}}
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+
+
+
+
   {% if not object_list %}
     <p>{{ NO_ENTRIES_MSG }}</p>
   {% else %}
     <div class="container-table">
       <div class="result-count">
-        {% blocktrans with verbose_name_plural=view.verbose_name_plural %}
-        Total de {{ verbose_name_plural }}:
-        {% endblocktrans %}
-        <strong>{{count}}</strong>
+        <strong>{{count}} {% if count > 1%}{% trans "Solicitações" %}{% else %}{% trans "Solicitação" %}{% endif %}
+        </strong>
       </div>
       <table class="table table-striped table-hover table-link-ordering">
         <thead>
           <tr>
             <th>Título</th>
-            <th>Usuário</th>
+            <th>Encaminhado para:</th>
             <th>Encaminhamento</th>
             <th>Data de Leitura</th>
           </tr>
