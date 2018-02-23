@@ -474,7 +474,7 @@ a:hover {
 .container-mensagens {
   position: relative;
   margin: 20px 10% 60px;
-  .container-owner, .container-member {
+  .container-logged-user, .container-member {
     position: relative;
 
   }
@@ -509,7 +509,7 @@ a:hover {
       }
     }
   }
-  .container-owner {
+  .container-logged-user {
     text-align: right;
     margin-left: 25%;
 
@@ -537,7 +537,6 @@ a:hover {
   }
   .container-member {
     margin-right: 25%;
-
     .mensagem {
       margin-left: 75px;
       background: white;
@@ -545,6 +544,17 @@ a:hover {
         border-top: 10px dashed white;
         border-right: 10px solid transparent;
         border-left: 10px solid transparent;
+      }
+    }
+    &.odd {
+      .mensagem {
+        background-color: #eefff5;
+        &:before {
+          border-top: 10px dashed  #eefff5;
+        }
+      }
+      .time {
+          background-color: #eefff5;
       }
     }
   }

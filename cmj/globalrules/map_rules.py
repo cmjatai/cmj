@@ -26,7 +26,7 @@ from cmj.globalrules import (RP_ADD, RP_CHANGE, RP_DELETE, RP_DETAIL, RP_LIST,
                              menu_administracao,
                              GROUP_SIGAD_VIEW_STATUS_RESTRITOS,
                              GROUP_OUVIDORIA_VISUALIZACAO_RESPOSTAS)
-from cmj.ouvidoria.models import Solicitacao
+from cmj.ouvidoria.models import Solicitacao, MensagemSolicitacao
 from cmj.sigad.models import Revisao, Classe, Documento, Midia
 
 
@@ -168,6 +168,7 @@ rules_ouvidoria_visualizacao_respostas = {
 
         (Solicitacao, [RP_LIST, RP_DETAIL]),
         (Notificacao, ['popup_notificacao']),
+        (MensagemSolicitacao, [RP_DETAIL])
     ]
 }
 

@@ -41,7 +41,7 @@
 
 <div class="container-mensagens">
   {% for msg in solicitacao.mensagemsolicitacao_set.all %}
-    <div class="{% ifequal msg.owner msg.solicitacao.owner  %}container-owner{% else %}container-member{% endifequal %}">
+    <div class="{% if msg.owner == user %}container-logged-user{% else %}container-member {%if not forloop.counter0|divisibleby:2  %}odd{%endif%}{% endif %}">
       <a href="#" name="item-{{msg.pk}}"></a>
       <div class="inner">
         <div class="avatar">

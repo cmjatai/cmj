@@ -202,29 +202,46 @@ class SolicitacaoMensagemRedirect(RedirectView):
         return RedirectView.get_redirect_url(self, *args, **kwargs)
 
 
-class SolicitacaoInteractionView(FormView):
+class SolicitacaoInteractionView(PermissionRequiredMixin, FormView):
 
     form_class = MensagemSolicitacaoForm
     template_name = 'ouvidoria/solicitacao_interact.html'
+    permission_required = ('ouvidoria.detail_mensagemsolicitacao')
 
-    def get_initial(self):
+    def dispatch(self, request, *args, **kwargs):
         try:
-            self.solicitacao = Solicitacao.objects.get(pk=self.kwargs['pk'])
+            self.object = Solicitacao.objects.get(pk=self.kwargs['pk'])
         except:
             raise Http404()
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def has_permission(self):
+
+        if self.object.owner == self.request.user:
+            return True
+        elif super().has_permission():
+            is_operador = self.object.areatrabalho.operadores.filter(
+                pk=self.request.user.pk).exists()
+
+            if is_operador:
+                return True
+        raise Http404()
+
+    def get_initial(self):
 
         initial = FormView.get_initial(self)
         initial.update({'owner':
                         self.request.user})
         initial.update({'solicitacao':
-                        self.solicitacao})
+                        self.object})
 
         return initial
 
     def get_context_data(self, **kwargs):
 
         context = FormView.get_context_data(self, **kwargs)
-        context['solicitacao'] = self.solicitacao
+        context['solicitacao'] = self.object
 
         context['subnav_template_name'] = 'ouvidoria/subnav_list.yaml'
         return context
