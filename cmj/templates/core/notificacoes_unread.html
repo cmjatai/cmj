@@ -33,7 +33,9 @@
           </div>
           {% for item in notificacoes_usuarios %}
             <a class="item" href="{% url 'cmj.core:notificacao_redirect' item.pk %}">
-              <img class="avatar" src="{% static 'img/perfil.jpg' %}">
+              <div class="avatar">
+                <img src="{% static 'img/perfil.jpg' %}">
+              </div>
               <div class="texto">
                 <div class="titulo">
                   {{item.content_object|truncatechars:110}}
