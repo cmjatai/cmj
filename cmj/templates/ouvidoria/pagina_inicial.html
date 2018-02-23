@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load i18n crispy_forms_tags staticfiles sass_tags %}
+
+{% block head_content %}{{block.super}}
+  <link rel="stylesheet" href="{% sass_src 'styles/login.scss' %}" type="text/css">
+{% endblock %}
+
+{% block id_wrapper %}pagina-inicial{% endblock %}
+{% block canais_absolute %}{% endblock %}
+
+{% block menu_canais_relative %}
+  <div class="container-fluid canais-columns">
+    {% include "base_sidebar.html" %}
+  </div>
+{% endblock %}
+{% block main_container_class %}container container-ouvidoria container-box container-login-inner{% endblock %}">
+
+{% block title %}
+<h1 class="page-header bg-blue">
+  {% trans "Ouvidoria da Câmara Municipal de Jataí" %}
+</h1>
+{% endblock title %}
+
+{% block base_content %}
+<div class="inner-ouvidoria">
+
+  <h3 class="text-center">Neste espaço a Câmara Municipal de Jataí disponibiliza a você um ambiente de comunicação<br>
+    com a Ouvidoria Institucional e/ou com os Gabinetes Parlamentares.</h3>
+
+  {% if user.is_anonymous %}
+      {% include "core/user/login_portlet.html" %}
+  {% endif %}
+
+</div>
+{% endblock %}

@@ -201,15 +201,6 @@
 
                 </ul>
 
-                {% block menu_canais_relative %}
-                  {% comment %}
-
-                  <div class="canais-relative">
-                    {% include "base_sidebar.html" %}
-                  </div>
-                  {% endcomment %}
-                {% endblock %}
-
                 <ul class="nav navbar-nav navbar-right">
                         {% if perms.core.menu_relatorios %}
                           <li class="dropdown">
@@ -272,8 +263,17 @@
           </nav>
         {% endblock navigation %}
 
+
         {# Header #}
         {% block main_header %}
+          {% block menu_canais_relative %}
+            {% comment %}
+
+            <div class="canais-relative">
+              {% include "base_sidebar.html" %}
+            </div>
+            {% endcomment %}
+          {% endblock %}
           <header class="masthead">
             <div class="container{{fluid}}">
               <div class="container-left">
@@ -281,6 +281,8 @@
               </div>
             </div>
           </header>
+
+
         {% endblock main_header %}
 
         {# Main content #}

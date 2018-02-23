@@ -559,7 +559,13 @@ a:hover {
     }
   }
 }
-
+.container-ouvidoria {
+  margin-top: 20px;
+  .inner-ouvidoria {
+    padding: 20px 30px;
+    font-size: 100%;
+  }
+}
 // ADJUST lateral esquerda ########################################
 
 .canais-absolute, .canais-relative, .canais-columns {

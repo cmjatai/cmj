@@ -3,6 +3,7 @@ from braces.views import FormMessagesMixin
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.views import LoginView
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.http.response import Http404
 from django.shortcuts import redirect
@@ -15,6 +16,7 @@ from django.views.generic.edit import CreateView, FormView
 from django.views.generic.list import ListView
 from sapl.crispy_layout_mixin import CrispyLayoutFormMixin
 
+from cmj.core.forms_auth import LoginForm
 from cmj.ouvidoria.forms import DenunciaForm, SolicitacaoForm,\
     MensagemSolicitacaoForm
 from cmj.ouvidoria.models import Solicitacao, MensagemSolicitacao
@@ -260,3 +262,8 @@ class SolicitacaoInteractionView(PermissionRequiredMixin, FormView):
     def form_valid(self, form):
         self.object = form.save()
         return super().form_valid(form)
+
+
+class OuvidoriaPaginaInicialView(LoginView):
+    template_name = 'ouvidoria/pagina_inicial.html'
+    authentication_form = LoginForm

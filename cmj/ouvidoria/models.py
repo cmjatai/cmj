@@ -23,14 +23,14 @@ class Solicitacao(models.Model):
     TIPO_ACESSO_INFORMACAO = 10
     TIPO_ELOGIO = 20
     TIPO_SUGESTAO = 30
-    TIPO_MANIFESTACAO = 40
+    TIPO_RECLAMACAO = 40
     TIPO_DENUNCIA = 900
 
     TIPO_SOLICITACAO_CHOICE = CmjChoices(
         (TIPO_ACESSO_INFORMACAO, 'tipo_acesso', _('Acesso a Informação')),
         (TIPO_ELOGIO, 'tipo_elogio', _('Elogio')),
         (TIPO_SUGESTAO, 'tipo_sugestao', _('Sugestão')),
-        (TIPO_MANIFESTACAO, 'tipo_manifestacao', _('Manifestação')),
+        (TIPO_RECLAMACAO, 'tipo_reclamacao', _('Reclamação')),
         (TIPO_DENUNCIA, 'tipo_denuncia', _('Denuncia')),
     )
 

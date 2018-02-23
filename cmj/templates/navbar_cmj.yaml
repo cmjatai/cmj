@@ -62,3 +62,5 @@
     url: /fale-conosco/localizacao-e-horarios
   - title: {% trans 'Telefones' %}
     url: /fale-conosco/telefones
+  - title: {% trans 'Ouvidoria' %}
+    url: /fale-conosco/ouvidoria

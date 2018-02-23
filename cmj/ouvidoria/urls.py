@@ -3,7 +3,7 @@ from django.conf.urls import include, url
 from cmj.ouvidoria.views import DenunciaAnonimaFormView, \
     SolicitacaoDetailView, SolicitacaoManageListView, SolicitacaoListView, \
     SolicitacaoFormView, SolicitacaoInteractionView,\
-    SolicitacaoMensagemRedirect
+    SolicitacaoMensagemRedirect, OuvidoriaPaginaInicialView
 
 from .apps import AppConfig
 
@@ -33,6 +33,9 @@ urlpatterns_ouvidoria = [
 
     url(r'^fale-conosco/ouvidoria/solicitacao/(?P<pk>[0-9]+)/mensagem',
         SolicitacaoMensagemRedirect.as_view(), name='mensagemsolicitacao_detail'),
+
+    url(r'^fale-conosco/ouvidoria',
+        OuvidoriaPaginaInicialView.as_view(), name='ouvidoria_pagina_inicial'),
 
 
 ]

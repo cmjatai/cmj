@@ -118,6 +118,14 @@
         color: #fff;
         background-color: rgba(255, 255, 255, 0.2);
       }
+      &[name="facebook"]:hover {
+        background-color: rgba(#77F, 0.2);
+        border: 1px solid rgba(#77F, 7);
+      }
+      &[name="google-oauth2"]:hover {
+        border: 1px solid rgba(#f77, 0.8);
+        background-color: rgba(#f77, 0.5);
+      }
     }
   }
   .btn-recovery {
@@ -132,6 +140,52 @@
     border-radius: 0;
     margin: 20px;
 
+  }
+}
+
+.container-login-inner {
+  .container-login {
+    background-color: transparentize($color_topo_bg,0.1);
+    margin: 0 10%;
+    padding-bottom: 20px;
+    .logo-cmj {
+      position: absolute;
+      opacity: 0.7;
+      right: 1em;
+      top: 1em;
+      width: 80px;
+    }
+    .label2  {
+      margin: 10px 0 0 20px;
+      font-weight: normal;
+      font-size: 2em;
+    }
+    .input-icon {
+      margin: 20px 10% 0;
+    }
+    .row-recovery {
+      margin: 0 10%;
+      text-align: right;
+    }
+    input {
+      height: 2em;
+      font-size: 1.4em;
+    }
+    .btns-login {
+      max-width: 500px;
+      margin-top: 0.7em;
+      .btn-login {
+        background-color: rgba(255, 255, 255, 0.1);
+        line-height: 36px;
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        img {
+          width: 24px;
+        }
+      }
+    }
   }
 }
 
@@ -199,6 +253,21 @@
       .btn-login {
         letter-spacing: 2px;
       }
+    }
+  }
+  .container-login-inner {
+    .container-login {
+      margin: 0px;
+      .input-icon {
+        margin: 20px 5% 0;
+      }
+    }
+    .logo-cmj {
+      right: 0;
+      left: auto;
+      top: auto;
+
+      transform: translateX(0);
     }
   }
 }
