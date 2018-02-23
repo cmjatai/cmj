@@ -243,6 +243,13 @@ class SolicitacaoInteractionView(PermissionRequiredMixin, FormView):
         context = FormView.get_context_data(self, **kwargs)
         context['solicitacao'] = self.object
 
+        self.object.notificacoes.filter(
+            user=self.request.user).update(read=True)
+
+        for ms in self.object.mensagemsolicitacao_set.all():
+            ms.notificacoes.filter(
+                user=self.request.user).update(read=True)
+
         context['subnav_template_name'] = 'ouvidoria/subnav_list.yaml'
         return context
 
