@@ -16,7 +16,7 @@
               <img class="avatar" src="{% static 'img/perfil.jpg' %}">
               <div class="texto">
                 <div class="titulo">
-                  {{item.content_object.titulo|truncatechars:110}}
+                  {{item.content_object|truncatechars:110}}
                 </div>
                 <div class="time">
                 há {{item.created|timesince}}
@@ -36,7 +36,7 @@
               <img class="avatar" src="{% static 'img/perfil.jpg' %}">
               <div class="texto">
                 <div class="titulo">
-                  {{item.content_object.titulo|truncatechars:110}}
+                  {{item.content_object|truncatechars:110}}
                 </div>
                 <div class="time">
                 há {{item.created|timesince}}

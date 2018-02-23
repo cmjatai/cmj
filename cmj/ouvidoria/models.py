@@ -71,7 +71,7 @@ class Solicitacao(models.Model):
         verbose_name_plural = _('Solicitações')
 
     def __str__(self):
-        return self.descricao
+        return self.titulo
 
 
 class MensagemSolicitacao(models.Model):
@@ -98,3 +98,6 @@ class MensagemSolicitacao(models.Model):
         ordering = ('created', )
         verbose_name = _('Mensagem de Solicitação')
         verbose_name_plural = _('Mensagens de Solicitação')
+
+    def __str__(self):
+        return self.descricao

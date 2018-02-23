@@ -43,7 +43,8 @@
   {% for msg in solicitacao.mensagemsolicitacao_set.all %}
 
       <div class="{% ifequal msg.user msg.user_origin  %}container-owner{% else %}container-member{% endifequal %}">
-        {{msg.descricao}}
+        <a href="#" name="item-{{msg.pk}}"></a>
+        {{msg.pk}} - {{msg.descricao}}
       </div>
 
 

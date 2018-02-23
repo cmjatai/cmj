@@ -9,7 +9,7 @@ from django.shortcuts import redirect
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic.base import TemplateView
+from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, FormView
 from django.views.generic.list import ListView
@@ -17,7 +17,7 @@ from sapl.crispy_layout_mixin import CrispyLayoutFormMixin
 
 from cmj.ouvidoria.forms import DenunciaForm, SolicitacaoForm,\
     MensagemSolicitacaoForm
-from cmj.ouvidoria.models import Solicitacao
+from cmj.ouvidoria.models import Solicitacao, MensagemSolicitacao
 from cmj.utils import make_pagination
 
 
@@ -187,6 +187,19 @@ class SolicitacaoFormView(FormMessagesMixin, CreateView):
         return reverse_lazy(
             'cmj.ouvidoria:solicitacao_interact',
             kwargs={'pk': self.object.id})
+
+
+class SolicitacaoMensagemRedirect(RedirectView):
+    pattern_name = 'cmj.ouvidoria:solicitacao_interact'
+
+    def get_redirect_url(self, *args, **kwargs):
+        try:
+            msg = MensagemSolicitacao.objects.get(pk=kwargs['pk'])
+            kwargs['pk'] = msg.solicitacao.pk
+        except:
+            raise Http404()
+
+        return RedirectView.get_redirect_url(self, *args, **kwargs)
 
 
 class SolicitacaoInteractionView(FormView):
