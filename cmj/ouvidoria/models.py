@@ -88,7 +88,8 @@ class MensagemSolicitacao(models.Model):
 
     solicitacao = models.ForeignKey(
         Solicitacao,
-        verbose_name=_('Solicitação'))
+        verbose_name=_('Solicitação'),
+        related_name='mensagemsolicitacao_set')
 
     notificacoes = GenericRelation(
         Notificacao, related_query_name='notificacoes')

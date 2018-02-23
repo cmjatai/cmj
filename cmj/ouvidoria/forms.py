@@ -8,7 +8,7 @@ from sapl.crispy_layout_mixin import SaplFormLayout, to_row, form_actions
 
 from cmj.context_processors import areatrabalho
 from cmj.core.models import AreaTrabalho, Notificacao
-from cmj.ouvidoria.models import Solicitacao
+from cmj.ouvidoria.models import Solicitacao, MensagemSolicitacao
 
 
 class DenunciaForm(ModelForm):
@@ -183,4 +183,54 @@ class SolicitacaoForm(ModelForm):
 
             # TODO: Enviar por email?
 
-        return
+        return solicitacao
+
+
+class MensagemSolicitacaoForm(ModelForm):
+
+    descricao = forms.CharField(
+        label='',
+        widget=forms.Textarea())
+
+    class Meta:
+        model = MensagemSolicitacao
+        fields = ('descricao', )
+
+    def __init__(self, *args, **kwargs):
+
+        rows = to_row([('descricao', 12)])
+
+        super().__init__(*args, **kwargs)
+
+        self.helper = FormHelper()
+        self.helper.layout = SaplFormLayout(
+            *rows,
+            actions=form_actions(label=_('Enviar'))
+        )
+
+        self.instance.owner = kwargs['initial']['owner']
+        self.instance.solicitacao = kwargs['initial']['solicitacao']
+
+    def save(self, commit=True):
+        inst = super().save(commit)
+
+        # o dono da solicitação é notificado se ele não é o dono da mensagem
+        if inst.owner != inst.solicitacao.owner:
+            nt = Notificacao()
+            nt.content_object = inst
+            nt.user = inst.solicitacao.owner
+            nt.user_origin = inst.owner
+            nt.save()
+
+        # todos os membros da área de trabalho receberam notificação de que
+        # houve interação de um membro da área de trabalho ou dono da solic
+
+        areatrabalho = inst.solicitacao.areatrabalho
+        for operador in areatrabalho.operadorareatrabalho_set.exclude(
+                user=inst.owner):
+            nt = Notificacao()
+            nt.content_object = inst
+            nt.user = operador.user
+            nt.user_origin = inst.owner
+            nt.areatrabalho = areatrabalho
+            nt.save()

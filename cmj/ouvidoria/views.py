@@ -15,7 +15,8 @@ from django.views.generic.edit import CreateView, FormView
 from django.views.generic.list import ListView
 from sapl.crispy_layout_mixin import CrispyLayoutFormMixin
 
-from cmj.ouvidoria.forms import DenunciaForm, SolicitacaoForm
+from cmj.ouvidoria.forms import DenunciaForm, SolicitacaoForm,\
+    MensagemSolicitacaoForm
 from cmj.ouvidoria.models import Solicitacao
 from cmj.utils import make_pagination
 
@@ -183,11 +184,42 @@ class SolicitacaoFormView(FormMessagesMixin, CreateView):
         return initial
 
     def get_success_url(self):
-        return reverse('cmj.ouvidoria:solicitacao_interact')
+        return reverse_lazy(
+            'cmj.ouvidoria:solicitacao_interact',
+            kwargs={'pk': self.object.id})
 
 
-class SolicitacaoInteractionView(TemplateView):
+class SolicitacaoInteractionView(FormView):
 
-    form_class = SolicitacaoForm
-    success_url = reverse_lazy('cmj.ouvidoria:solicitacao_interact')
+    form_class = MensagemSolicitacaoForm
     template_name = 'ouvidoria/solicitacao_interact.html'
+
+    def get_initial(self):
+        try:
+            self.solicitacao = Solicitacao.objects.get(pk=self.kwargs['pk'])
+        except:
+            raise Http404()
+
+        initial = FormView.get_initial(self)
+        initial.update({'owner':
+                        self.request.user})
+        initial.update({'solicitacao':
+                        self.solicitacao})
+
+        return initial
+
+    def get_context_data(self, **kwargs):
+
+        context = FormView.get_context_data(self, **kwargs)
+        context['solicitacao'] = self.solicitacao
+
+        context['subnav_template_name'] = 'ouvidoria/subnav_list.yaml'
+        return context
+
+    def get_success_url(self):
+        return reverse_lazy(
+            'cmj.ouvidoria:solicitacao_interact', kwargs=self.kwargs)
+
+    def form_valid(self, form):
+        self.object = form.save()
+        return super().form_valid(form)

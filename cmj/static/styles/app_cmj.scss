@@ -447,6 +447,7 @@ body, html {
   font-weight: normal;
   font-size: 2em;
 }
+
 a {
   color: $color_topo_bg;
 }
@@ -454,6 +455,22 @@ a:focus,
 a:hover {
   color: darken($color_topo_bg, 20%);
 }
+.page-subheader {
+  padding: $grid-gutter-width /2 ;
+  background: darken($color_main_bg, 3%) url(/static/img/bg.png);
+  border-radius: 5px 5px 0 0;
+  border-bottom: 1px solid $color_container_border;
+  margin: 0px;
+}
+.container-resposta {
+  border: 1px solid transparentize(#3d9970,0.8);
+  margin: $grid-gutter-width / 2 $grid-gutter-width / 2 $grid-gutter-width;
+  border-radius: 7px 7px 5px 5px;
+  .form-resposta {
+    padding: $grid-gutter-width * 2 $grid-gutter-width * 1.2 $grid-gutter-width;
+  }
+}
+
 // ADJUST lateral esquerda ########################################
 
 .canais-absolute, .canais-relative, .canais-columns {
@@ -763,7 +780,7 @@ main {
     td {
       background-color:#e3d4b5;
     }
-    
+
   }
 }
 

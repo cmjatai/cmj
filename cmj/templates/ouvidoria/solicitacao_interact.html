@@ -1,6 +1,63 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load i18n crispy_forms_tags %}
+{% block title %}
+<h1 class="page-header bg-blue ">
+  {% trans "Solicitação da Sociedade" %}
+</h1>
+{% endblock title %}
 
 {% block base_content %}
-{{object}}
+  <div class="container-detail clearfix">
+    <h2 class="legend">Dados Enviados</h2>
+    <div class="row-fluid">
+      <div class="col-sm-8">
+        <div id="div_id_titulo" class="form-group">
+          <p class="control-label">Título</p>
+          <div class="controls">
+            <div class="form-control-static">{{solicitacao.titulo}}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-4">
+        <div id="div_id_created" class="form-group">
+          <p class="control-label">Encaminhada em:</p>
+            <div class="form-control-static">{{ solicitacao.created }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="row-fluid">
+      <div class="col-sm-12">
+        <div id="div_id_descricao" class="form-group">
+          <p class="control-label">Descrição</p>
+          <div class="controls">
+            <div class="form-control-static">
+              {{solicitacao.descricao|linebreaksbr}}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="container-mensagens">
+  {% for msg in solicitacao.mensagemsolicitacao_set.all %}
+
+      <div class="{% ifequal msg.user msg.user_origin  %}container-owner{% else %}container-member{% endifequal %}">
+        {{msg.descricao}}
+      </div>
+
+
+  {% endfor %}
+
+</div>
+
+<div class="container-resposta">
+  <h2 class="page-subheader bg-olive ">
+    {% trans "Postar Mensagem/Resposta" %}
+  </h2>
+
+  <div class="form-resposta">
+    {% crispy form %}
+  </div>
+</div>
 {% endblock %}
