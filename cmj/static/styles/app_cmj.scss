@@ -33,6 +33,7 @@ body, html {
 
 /* Background colors */
 .bg-red,
+.bg-red-danger,
 .bg-yellow,
 .bg-aqua,
 .bg-blue,
@@ -57,6 +58,9 @@ body, html {
 }
 .bg-red {
   background-color: #f56954 !important;
+}
+.bg-red-danger {
+  background-color: #aa3333 !important;
 }
 .bg-yellow {
   background-color: #f39c12 !important;
@@ -565,7 +569,37 @@ a:hover {
     padding: 20px 30px;
     font-size: 100%;
   }
+  .actions {
+      margin: 60px 0;
+    div {
+      padding: 0 1px 0 0;
+    }
+  }
+  .action {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+    background: url(/static/img/bg.png);
+    span {
+      display: inline-block;
+      width: 100%;
+      line-height: 1.4em;
+      font-variant: small-caps;
+      font-size: 150%;
+      background-color: $hover_background_10p;
+    }
+    i {
+        line-height: 160%;
+    }
+
+    &:hover {
+      background-color: $hover_background_10p !important;
+    }
+  }
 }
+
+
 // ADJUST lateral esquerda ########################################
 
 .canais-absolute, .canais-relative, .canais-columns {

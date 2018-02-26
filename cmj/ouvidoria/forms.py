@@ -127,13 +127,16 @@ class SolicitacaoForm(ModelForm):
     class Meta:
         model = Solicitacao
         fields = ('titulo', 'descricao', 'tipo')
+        widgets = {
+            'tipo': forms.HiddenInput()
+        }
 
     def __init__(self, *args, **kwargs):
 
         rows = to_row(
             [
                 (Div(
-                    to_row([('titulo', 7), ('tipo', 5),
+                    to_row([('titulo', 10), ('tipo', 2),
                             ('descricao', 12), ])
                 ), 7),
                 (Div(

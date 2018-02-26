@@ -1,7 +1,7 @@
 {% extends "crud/detail.html" %}
 {% load i18n %}
 {% block title %}
-<h1 class="page-header bg-red ">
+<h1 class="page-header bg-red-danger ">
   <small class="text-maroon">{% trans "Denúncia Anônima" %}</small>
   <span class="pull-right">
     {{user.areatrabalho_set.all.first.nome}}

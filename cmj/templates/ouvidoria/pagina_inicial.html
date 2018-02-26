@@ -29,10 +29,43 @@
 
   {% if user.is_anonymous %}
       {% include "core/user/login_portlet.html" %}
+  {% else %}
+
+    <div class="row actions">
+      <div class="col-md-1">
+      </div>
+      <div class="col-md-2">
+        <a href="{% url 'cmj.ouvidoria:solicitacao_create' %}?tipo=900" class="action bg-red-danger">
+          <i class="fa fa-bullhorn fa-3x" aria-hidden="true"></i>
+          <span>Denúncia</span>
+        </a>
+      </div>
+      <div class="col-md-2">
+        <a href="{% url 'cmj.ouvidoria:solicitacao_create' %}?tipo=40" class="action bg-yellow">
+          <i class="fa fa-thumbs-down fa-3x" aria-hidden="true"></i>
+          <span>Reclamação</span>
+        </a>
+      </div>
+      <div class="col-md-2">
+        <a href="{% url 'cmj.ouvidoria:solicitacao_create' %}?tipo=10" class="action bg-green">
+          <i class="fa fa-user-plus fa-3x" aria-hidden="true"></i>
+          <span>Solicitação</span>
+        </a>
+      </div>
+      <div class="col-md-2">
+        <a href="{% url 'cmj.ouvidoria:solicitacao_create' %}?tipo=30" class="action bg-orange">
+          <i class="fa fa-commenting-o fa-3x" aria-hidden="true"></i>
+          <span>Sugestão</span>
+        </a>
+      </div>
+      <div class="col-md-2">
+        <a href="{% url 'cmj.ouvidoria:solicitacao_create' %}?tipo=20" class="action bg-blue">
+          <i class="fa fa-thumbs-up fa-3x" aria-hidden="true"></i>
+          <span>Elogio</span>
+        </a>
+      </div>
+    </div>
   {% endif %}
-
-
-
-
+Para enviar uma denúncia sem se identificar, <a href="/fale-conosco/ouvidoria/denuncia-anonima">clique aqui.</a>
 </div>
 {% endblock %}

@@ -31,7 +31,7 @@ class Solicitacao(models.Model):
         (TIPO_ELOGIO, 'tipo_elogio', _('Elogio')),
         (TIPO_SUGESTAO, 'tipo_sugestao', _('Sugestão')),
         (TIPO_RECLAMACAO, 'tipo_reclamacao', _('Reclamação')),
-        (TIPO_DENUNCIA, 'tipo_denuncia', _('Denuncia')),
+        (TIPO_DENUNCIA, 'tipo_denuncia', _('Denúncia')),
     )
 
     created = models.DateTimeField(

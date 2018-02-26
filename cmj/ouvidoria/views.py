@@ -176,13 +176,35 @@ class SolicitacaoFormView(FormMessagesMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = CreateView.get_context_data(self, **kwargs)
-        context['title'] = _('Registar uma Solicitação')
+
+        tipo = int(self.request.GET.get('tipo', '10'))
+
+        tipos = Solicitacao.TIPO_SOLICITACAO_CHOICE
+
+        context['title'] = _(
+            'Registar uma Solicitação: (%s)') % tipos.triple_map[tipo]['text']
+
+        opts_bg = {
+            10: 'bg-green',
+            20: 'bg-blue',
+            30: 'bg-orange',
+            40: 'bg-yellow',
+            900: 'bg-red-danger',
+        }
+
+        context['bg_title'] = opts_bg[tipo]
+
         return context
 
     def get_initial(self):
         initial = CreateView.get_initial(self)
         initial.update({'owner':
                         self.request.user})
+
+        tipo = self.request.GET.get('tipo', '10')
+
+        initial.update({'tipo': tipo})
+
         return initial
 
     def get_success_url(self):
