@@ -7,15 +7,22 @@
         <form id="login-form" method="post" action="#">
           {% csrf_token %}
 
-
           <div class="label{{backends.backends|length}}">{% trans "Entrar no Portal" %}</div>
 
+          <div class="text-center">
+            <small>
+              Seu primeiro acesso?<br>
+              Você pode iniciar seu registro em nosso Portal através das redes sociais
+              para que assim possa interagir.<br>
+            </small>
+          </div>
           <div class="row">
             {% if form.errors %}
               <div class="alert alert-danger">Usuário e/ou Senha inválidos.
               </div>
             {% endif %}
           </div>
+
 
           <div class="row">
             <div class="input-icon input_username">
@@ -45,16 +52,7 @@
                 </a>
               {% endfor %}
           </div>
-          <div class="text-center">
-            <small>
-              <br>
-              Seu primeiro acesso?<br>
-              Você pode iniciar seu registro em nosso Portal através das redes sociais
-              para que assim possa interagir.<br>
-              Em breve teremos estes espaços de interação e será necessário estar registrado.
-
-            </small>
-          </div>
+          <br>
         </form>
       </div>
     </div>
