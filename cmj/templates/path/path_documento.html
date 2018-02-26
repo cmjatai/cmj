@@ -252,7 +252,10 @@
 
 {% endblock %}
 
+
+
 {% block cmj_extra_content %}
+{% if object != object.classe.capa %}
   <div class="{% if path %}container{{path}}{% endif %} container-fluid container-footer">
     <div class="container">
       <div class="row">
@@ -263,6 +266,7 @@
       </div>
     </div>
   </div>
+{% endif %}
 {% endblock %}
 
 
