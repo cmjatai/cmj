@@ -81,9 +81,9 @@
     margin: 30px 10% 0;
   }
   #login-form {
-    border: 1px solid transparentize($color_topo_bg,0.1);
     border-radius: 5px;
     background: white url(/static/img/bg.png);
+    overflow: hidden;
   }
   .row-recovery {
     margin: 0 10%;
@@ -185,6 +185,14 @@
       .btn-login {
         letter-spacing: 3px;
       }
+    }
+  }
+  .container-login-inner {
+    .container-login {
+      margin: 10px 1%;
+    }
+    .inner-ouvidoria {
+      padding: 10px;
     }
   }
 }
