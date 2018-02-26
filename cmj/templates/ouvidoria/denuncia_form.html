@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 {% load i18n crispy_forms_tags %}
+
+{% block head_content %}{{block.super}}
+<script src='https://www.google.com/recaptcha/api.js'></script>
+{% endblock %}
+
 {% block title %}
 <h1 class="page-header bg-red-danger ">
 {% trans "Denúncia Anônima" %}
@@ -7,4 +12,6 @@
 {% endblock title %}
 {% block base_content %}
   {% crispy form %}
+
+  
 {% endblock %}

@@ -2,6 +2,8 @@ from crispy_forms.bootstrap import Alert
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Div
 from django import forms
+from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.forms.models import ModelForm
 from django.utils.translation import ugettext_lazy as _
 from sapl.crispy_layout_mixin import SaplFormLayout, to_row, form_actions
@@ -43,6 +45,9 @@ class DenunciaForm(ModelForm):
                 (Div(
                     to_row([('areatrabalho_parlamentar', 12)])
                 ), 5),
+                (Div(css_class="g-recaptcha",
+                     data_sitekey=settings.GOOGLE_RECAPTCHA_SITE_KEY
+                     ), 12)
 
             ]
         )
@@ -99,7 +104,39 @@ class DenunciaForm(ModelForm):
         return
 
     def clean(self):
-        pass
+        recaptcha = self.data.get('g-recaptcha-response', '')
+        cd = self.cleaned_data
+
+        if not recaptcha:
+            raise ValidationError(
+                _('Verificação do reCAPTCHA não efetuada.'))
+
+        import urllib3
+        import json
+
+        #encoded_data = json.dumps(fields).encode('utf-8')
+
+        url = ('https://www.google.com/recaptcha/api/siteverify?'
+               'secret=%s'
+               '&response=%s' % (settings.GOOGLE_RECAPTCHA_SECRET_KEY,
+                                 recaptcha))
+
+        http = urllib3.PoolManager()
+        try:
+            r = http.request('POST', url)
+            data = r.data.decode('utf-8')
+            jdata = json.loads(data)
+        except Exception as e:
+            raise ValidationError(
+                _('Ocorreu um erro na validação do reCAPTCHA.'))
+
+        if jdata['success']:
+            return cd
+        else:
+            raise ValidationError(
+                _('Ocorreu um erro na validação do reCAPTCHA.'))
+
+        return cd
 
 
 class SolicitacaoForm(ModelForm):
