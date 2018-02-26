@@ -2,7 +2,6 @@
 
 <div class="container-login container-fluid">
   <div>
-    <img  class="logo-cmj" src="{% static 'img/logo.png' %}" />
     <div class="row">
       <div class="col-xs-12">
         <form id="login-form" method="post" action="{% url 'cmj.core:login' %}">
@@ -20,11 +19,11 @@
 
           <div class="row">
             <div class="input-icon input_username">
-                <span class="fa fa-user fa-3x "></span>
+                <span class="fa fa-user fa-2x "></span>
                 {{ form.username }}
             </div>
             <div class="input-icon input_password">
-                <span class="fa fa-key fa-3x "></span>
+                <span class="fa fa-key fa-2x "></span>
                 {{ form.password }}
             </div>
           </div>
@@ -51,7 +50,7 @@
               <br>
               Seu primeiro acesso?<br>
               Você pode iniciar seu registro em nosso Portal através das redes sociais
-              para que assim possa interagir.
+              para que assim possa interagir.<br>
               Em breve teremos estes espaços de interação e será necessário estar registrado.
 
             </small>

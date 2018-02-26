@@ -54,43 +54,47 @@
 }
 
 .container-login {
-  background-color: $color_topo_bg;
-  color: $color_text_inverse;
   min-height: 100%;
   position: relative;
-  margin: 0;
+  margin: 7% 15%;
+  background-color: transparent;
+  color: $color_topo_bg;
   .logo-cmj {
     position: absolute;
-    opacity: 0.35;
-    right: 1em;
-    margin-left: 1em;
-    max-width: 100%;
+    opacity: 0.7;
+    right: 15px;
+    top: 2px;
+    width: 60px;
+    z-index: 1;
   }
-  .label0,
-  .label1,
-  .label2,
-  .label3,
-  .label4 {
-    margin: 10% 0 1em 5%;
+  .label2 {
     color: white;
     font-weight: normal;
     font-size: 3em;
+    margin: 0;
+    font-weight: normal;
+    font-size: 2em;
+    background: $color_topo_bg;
+    padding: 0 20px;
   }
-  .label2 {
-    margin-top: 4%;
-    margin-bottom: 0.5em;
+  .input-icon {
+    margin: 30px 10% 0;
   }
-  .label3, .label4 {
-    margin-top: 4%;
-    margin-bottom: 0.5em;
+  #login-form {
+    border: 1px solid transparentize($color_topo_bg,0.1);
+    border-radius: 5px;
+    background: white url(/static/img/bg.png);
+  }
+  .row-recovery {
+    margin: 0 10%;
+    text-align: right;
   }
   input {
-    border-radius: 0;
-    border: 0;
-    border-top: 1px solid transparentize($color_topo_bg, 0.8);
+    height: 2.5em;
+    font-size: 1.4em;
+    border: 1px solid rgba($color_topo_bg, 0.7);
+
     padding: 1em;
-    font-size: 1.7em;
-    height: 3.5em;
     background-color: rgba(255, 255, 255, 0.8);
     &:focus {
       background-color: white;
@@ -98,41 +102,8 @@
     @include placeholder($color_topo_bg, 0.5, 1em, normal);
 
   }
-  .btns-login {
-    margin: 4em auto 0;
-    display: block;
-    max-width: 767px;
-    .btn-login {
-      color: rgba(255, 255, 255, 0.8);
-      display: inline-block;
-      background-color: rgba(255, 255, 255, 0.1);
-      width: 100%;
-      letter-spacing: 4px;
-      border: 1px solid rgba(255, 255, 255, 0.8);
-      margin-top: 1em;
-      line-height: 50px;
-      text-align: center;
-      font-family: "Graduate";
-      &:hover {
-        border: 1px solid #fff;
-        color: #fff;
-        background-color: rgba(255, 255, 255, 0.2);
-      }
-      &[name="facebook"]:hover {
-        background-color: rgba(#77F, 0.2);
-        border: 1px solid rgba(#77F, 7);
-      }
-      &[name="google-oauth2"]:hover {
-        border: 1px solid rgba(#f77, 0.8);
-        background-color: rgba(#f77, 0.5);
-      }
-    }
-  }
   .btn-recovery {
     color: #aaa;
-  }
-  .btns-login-3 {
-    margin-top: 1em;
   }
   .alert-danger {
     color:white;
@@ -141,316 +112,97 @@
     margin: 20px;
 
   }
+
+  .btns-login {
+    margin: 0.7em auto 0;
+    display: block;
+    max-width: 500px;
+
+    .btn-login {
+      display: inline-block;
+      width: 100%;
+      letter-spacing: 4px;
+      margin-top: 1em;
+      text-align: center;
+      font-family: "Graduate";
+
+      border: 1px solid $color_topo_bg;
+      background-color: $color_topo_bg;
+      line-height: 40px;
+      color: white;
+
+      &[name="facebook"]  {
+        border: 1px solid #0073b7;
+        background-color:  #0073b7;
+      }
+      &[name="google-oauth2"] {
+        border: 1px solid #e55;
+        background-color: #e55;
+      }
+      &:hover {
+        border: 1px solid #000;
+        background: black url(/static/img/bg.png);
+      }
+      img {
+        width: 24px;
+      }
+    }
+  }
+
 }
 
 .container-login-inner {
   .container-login {
-    background-color: transparentize($color_topo_bg,0.1);
-    margin: 0 10%;
-    padding-bottom: 20px;
-    .logo-cmj {
-      position: absolute;
-      opacity: 0.7;
-      right: 1em;
-      top: 1em;
-      width: 80px;
-    }
-    .label2  {
-      margin: 10px 0 0 20px;
-      font-weight: normal;
-      font-size: 2em;
-    }
-    .input-icon {
-      margin: 20px 10% 0;
-    }
-    .row-recovery {
-      margin: 0 10%;
-      text-align: right;
-    }
-    input {
-      height: 2em;
-      font-size: 1.4em;
-    }
-    .btns-login {
-      max-width: 500px;
-      margin-top: 0.7em;
-      .btn-login {
-        background-color: rgba(255, 255, 255, 0.1);
-        line-height: 36px;
-        &:hover {
-          background-color: rgba(255, 255, 255, 0.2);
-        }
-
-        img {
-          width: 24px;
-        }
-      }
-    }
-  }
-}
-
-
-@media screen and (max-width: 1280px) {
-  .html-login {
-    a.navbar-brand {
-      font-size: 45px;
-    }
-  }
-  .container-login {
-    .label0 {
-      margin-top: 4%;
-    }
-    ,
-    .label1 {
-      margin-top: 2%;
-      margin-bottom: 0.5em;
-    }
-    ,
-    .label2 {
-      margin-top: 2%;
-      margin-bottom: 0.2em;
-    }
-    ,
-    .label3 {
-      margin-top: 0;
-      margin-bottom: 0;
-    }
-    .btns-login {
-      margin-top: 1em;
-    }
-    .btns-login-3 {
-      margin-top: 0;
-    }
+    margin: 30px 15%;
   }
 }
 
 
 @media screen and (max-width: 991px) {
-  .html-login {
-    a.navbar-brand {
-      margin-left: 0px !important;
-    }
-  }
-}
-@media screen and (max-width: 800px) {
   .container-login {
-    form .row {
-        margin: 0 -10px;
-    }
-    form {
-        margin: 0 0 0 5px;
-    }
-    .logo-cmj {
-      opacity: 0.16;
-      right: auto;
-      max-width: 80%;
-      left: 50%;
-      top: -2em;
-      transform: translateX(-50%);
-    }
+    margin: 1% 10%;
     .btns-login {
-      margin-top: 0.5em;
-      .btn-login {
-        letter-spacing: 2px;
-      }
-    }
-  }
-  .container-login-inner {
-    .container-login {
-      margin: 0px;
-      .input-icon {
-        margin: 20px 5% 0;
-      }
-    }
-    .logo-cmj {
-      right: 0;
-      left: auto;
-      top: auto;
-
-      transform: translateX(0);
+      margin: 0.7em 5% 0;
     }
   }
 }
-@media screen and (max-width: 800px) and (orientation: portrait) {
-  .html-login {
-    a.navbar-brand {
-      font-size: 35px;
-    }
-  }
+@media screen and (max-width: 600px) {
   .container-login {
-
-    .label0 {
-      margin-top: 30%;
+    margin: 10% 5%;
+    .input-icon {
+      margin: 30px 5% 0;
     }
-
-    .label1 {
-      margin-top: 25%;
-    }
-
     .label2 {
-      margin-top: 25%;
-      margin-bottom: 1em;
-    }
-
-    .label3 {
-      margin-top: 20%;
-      margin-bottom: 1em;
-    }
-    input {}
-    .btns-login {
-      max-width: 600px;
-      margin-top: 4em;
-    }
-  }
-}
-@media screen and (max-width: 800px) and (orientation: landscape) {
-  .html-login {
-    a.navbar-brand {
-      font-size: 25px;
-    }
-  }
-  .container-login {
-    .label0,
-    .label1,
-    .label2,
-    .label3,
-    .label4 {
-      margin: 0 0 0.2em 5%;
       font-size: 1.5em;
     }
-    .label1,
-    .label2,
-    .label3,
-    .label4 {
-      margin: 0 0 0 5%;
-      font-size: 1.2em;
-    }
     input {
-      font-size: 1.3em;
-      padding: 0 1em;
-      height: 2em;
+      height:2em;
+      font-size: 1.2em;
+      padding: 0.5em 0.5em;
     }
     .btns-login {
-      margin-top: 0;
-    }
-  }
-}
-
-@media screen and (max-width: 600px) {
-  .html-login {
-    a.navbar-brand {
-      font-size: 30px;
-    }
-    .navbar-social-links a {
-      width: 1.7em;
-      height: 1.7em;
-      i {
-        font-size: 1.2em;
+      margin: 0.7em 5% 0;
+      .btn-login {
+        letter-spacing: 3px;
       }
     }
   }
 }
 @media screen and (max-width: 480px) {
-  .html-login {
-    a.navbar-brand {
-      font-size: 22.5px;
-      padding-left: 10px;
-      .fa-home {
-        padding-left: 0;
-      }
-    }
-    .navbar-social-links a {
-      width: 1.7em;
-      height: 1.7em;
-      i {
-        font-size: 1.2em;
-      }
-    }
-  }
-}
-
-@media screen and (max-width: 480px) and (orientation: portrait) {
-
   .container-login {
-    .label0,
-    .label1,
-    .label2,
-    .label3,
-    .label4 {
-      margin: 20% 0 0.4em 5%;
-      font-size: 1.8em;
+    margin: 10px 0;
+    .input-icon {
+      margin: 15px 15px 0;
     }
-    .label1 {
-      margin-top: 15%;
-    }
-    .label2,
-    .label3,
-    .label4 {
-      margin-top: 5%;
-    }
-
-    input {
-      font-size: 1.2em;
-      padding: 0 1em;
-      height: 3em;
+    .row-recovery {
+      margin: 0 10px;
     }
     .btns-login {
-      margin-top: 2em;
-      max-width: 500px;
-    }
-    .btns-login-2,  {
-      margin-top: 1em;
-    }
-    .btns-login-3, {
-      margin-top: 0em;
+      margin: 0 5px;
       .btn-login {
-        line-height: 42px;
+        margin-top: 10px;
+        letter-spacing: 2px;
       }
-    }
-  }
-}
-
-@media screen and (min-width: 992px) {
-  .login-page {
-    footer {
-      position: absolute;
-      width: 100%;
-    }
-  }
-}
-
-@media screen and (min-width: 1281px) {
-  .html-login {
-    a.navbar-brand {
-      font-size: 50px;
-      line-height: 1em;
-    }
-  }
-  .container-login {
-
-    .label0 {
-      margin-top: 7%;
-    }
-    ,
-    .label1 {
-      margin-top: 5%;
-      margin-bottom: 0.5em;
-    }
-    ,
-    .label2 {
-      margin-top: 7%;
-      margin-bottom: 0.2em;
-    }
-    ,
-    .label3 {
-      margin-top: 0;
-      margin-bottom: 0;
-    }
-    .btns-login {
-      margin-top: 1em;
-    }
-    .btns-login-3 {
-      margin-top: 0;
     }
   }
 }
