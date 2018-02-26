@@ -289,3 +289,8 @@ class SolicitacaoInteractionView(PermissionRequiredMixin, FormView):
 class OuvidoriaPaginaInicialView(LoginView):
     template_name = 'ouvidoria/pagina_inicial.html'
     authentication_form = LoginForm
+
+    def get_success_url(self):
+
+        return reverse_lazy(
+            'cmj.ouvidoria:ouvidoria_pagina_inicial', kwargs=self.kwargs)
