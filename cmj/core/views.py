@@ -309,8 +309,8 @@ class NotificacaoRedirectView(RedirectView):
 
         if self.request.user != obj.user:
             raise Http404()
-        #obj.read = True
-        # obj.save()
+        obj.read = True
+        obj.save()
 
         self.pattern_name = '%s:%s_detail' % (
             obj.content_object._meta.app_config.name,
