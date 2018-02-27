@@ -71,13 +71,15 @@
                 <li class="dropdown">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                     {% if user.avatar %}
-                      <img class="avatar" src="{% cropped_thumbnail user "cropping" %}">
+                      <img class="avatar" src="{% cropped_thumbnail user "cropping" %}">a
                     {% else %}
                       {% for us in user.social_auth.all %}
-                        {% if us.provider == 'facebook' %}
-                          <img class="avatar" src="https://graph.facebook.com/v2.6/{{us.uid}}/picture?height=46" />
-                        {% elif us.provider == 'google-oauth2' %}
-                          <img class="avatar" src="{% static 'img/perfil.jpg' %}">
+                        {% if forloop.first %}
+                          {% if us.provider == 'facebook' %}
+                            <img class="avatar" src="https://graph.facebook.com/v2.6/{{us.uid}}/picture?height=46" />
+                          {% elif us.provider == 'google-oauth2' %}
+                            <img class="avatar" src="{% static 'img/perfil.jpg' %}">
+                          {% endif %}
                         {% endif %}
                       {% empty %}
                         <img class="avatar" src="{% static 'img/perfil.jpg' %}">
@@ -143,14 +145,17 @@
                       <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                         {{ user.get_full_name|default:user.email }}
                         <span class="caret"></span>
+
                         {% if user.avatar %}
                           <img class="avatar" src="{% cropped_thumbnail user "cropping" scale=0.5 %}">
                         {% else %}
                           {% for us in user.social_auth.all %}
-                            {% if us.provider == 'facebook' %}
-                              <img class="avatar" src="https://graph.facebook.com/v2.6/{{us.uid}}/picture?height=46" />
-                            {% elif us.provider == 'google-oauth2' %}
-                              <img class="avatar" src="{% static 'img/perfil.jpg' %}">
+                            {% if forloop.first %}
+                              {% if us.provider == 'facebook' %}
+                                <img class="avatar" src="https://graph.facebook.com/v2.6/{{us.uid}}/picture?height=46" />
+                              {% elif us.provider == 'google-oauth2' %}
+                                <img class="avatar" src="{% static 'img/perfil.jpg' %}">
+                              {% endif %}
                             {% endif %}
                           {% empty %}
                             <img class="avatar" src="{% static 'img/perfil.jpg' %}">

@@ -110,6 +110,9 @@ def avatar_validation(image):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    objects = UserManager()
+    USERNAME_FIELD = 'email'
+
     email = models.EmailField(_('email address'), unique=True)
 
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
@@ -124,21 +127,23 @@ class User(AbstractBaseUser, PermissionsMixin):
                     'active. Unselect this instead of deleting accounts.'))
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
 
+    # -------------------------------------------------
+
     avatar = ImageCropField(
         upload_to="avatars/", verbose_name=_('Avatar'),
         validators=[avatar_validation], null=True, blank=True)
 
     cropping = ImageRatioField(
-        'avatar', '128x128', verbose_name=_('Seleção (Enquadramento)'), help_text=_(
+        'avatar', '128x128',
+        verbose_name=_('Seleção (Enquadramento)'), help_text=_(
             'A configuração do Avatar '
             'é possível após a atualização da fotografia.'))
 
     pwd_created = models.BooleanField(
         _('Usuário de Rede Social Customizou Senha?'), default=False)
 
-    objects = UserManager()
-
-    USERNAME_FIELD = 'email'
+    be_notified_by_email = models.BooleanField(
+        _('Receber Notificações por email?'), default=True)
 
     class Meta(AbstractBaseUser.Meta):
         abstract = False

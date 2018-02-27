@@ -6,3 +6,6 @@ class AppConfig(apps.AppConfig):
     name = 'cmj.core'
     label = 'core'
     verbose_name = _('Ajuste Principais')
+
+    def ready(self):
+        from . import signals

@@ -85,8 +85,14 @@ class CmjUserChangeForm(ModelForm):
 
     class Meta:
         model = get_user_model()
-        fields = ['first_name', 'last_name', 'avatar', 'cropping',
-                  'old_password', 'new_password1', 'new_password2']
+        fields = ['first_name',
+                  'last_name',
+                  'avatar',
+                  'cropping',
+                  'old_password',
+                  'new_password1',
+                  'new_password2',
+                  'be_notified_by_email']
 
         widgets = {
             'avatar': CustomImageCropWidget(),
@@ -120,8 +126,10 @@ class CmjUserChangeForm(ModelForm):
                 (Fieldset(
                     _('Cadastro Básico'),
                     to_row([
-                        ('first_name', 7),
-                        ('last_name', 5),
+                        ('first_name', 5),
+                        ('last_name', 4),
+                        ('be_notified_by_email', 3),
+
                         ('avatar', 7),
                         ('cropping', 5)
                     ])
