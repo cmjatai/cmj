@@ -1,0 +1,21 @@
+{% extends "base_email.html" %}
+{% load i18n staticfiles %}
+
+{% block email_content %}
+  <div style="padding: 30px 20px 40px;">
+    <p>Você está recebendo este e-mail do sistema de notificações<br>do Portal CMJ - Câmara Municipal de Jataí</p>
+    <div style="text-align:left;">
+      <b>Data do Envio:</b> {{notificacao.content_object.created}}<br>
+      <b>Mensagem de:</b> {{notificacao.user_origin}}<br><br>
+      <b>Mensagem:</b> {{notificacao.content_object.descricao|safe}}
+    </div>
+
+    <br><br>
+    <a style="color: #ffffff; background-color: #02baf2; border-radius: 4px; padding: 7px 15px 6px 15px; text-decoration: none; text-transform: uppercase; font-weight: bold;"
+      href="https://{{ domain }}/{% url 'cmj.ouvidoria:solicitacao_interact' notificacao.content_object.pk%}">
+      Acesse por aqui o Portal CMJ para enviar sua resposta
+    </a>
+    <br><br>
+    Não responda este email.<br>Sua resposta deve ser dada no Portal CMJ.
+  </div>
+{% endblock email_content %}

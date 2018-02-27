@@ -23,15 +23,16 @@ def send_mail(subject, email_template_name,
 @receiver(post_save, sender=Notificacao, dispatch_uid='notificacao_post_save')
 def notificacao_post_save(sender, instance, using, **kwargs):
 
-    send_mail(
-        instance.content_object.email_notify['subject'],
-        'email/notificacao_%s_%s.html' % (
-            instance.content_object._meta.app_label,
-            instance.content_object._meta.model_name
-        ),
-        {'notificacao': instance}, EMAIL_SEND_USER, instance.user.email)
+    if instance.user.be_notified_by_email:
+        send_mail(
+            instance.content_object.email_notify['subject'],
+            'email/notificacao_%s_%s.html' % (
+                instance.content_object._meta.app_label,
+                instance.content_object._meta.model_name
+            ),
+            {'notificacao': instance}, EMAIL_SEND_USER, instance.user.email)
 
-    print('Uma Notificação foi enviada %s - user: %s - user_origin: %s' % (
-        instance.pk,
-        instance.user,
-        instance.user_origin))
+        print('Uma Notificação foi enviada %s - user: %s - user_origin: %s' % (
+            instance.pk,
+            instance.user,
+            instance.user_origin))

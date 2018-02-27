@@ -71,8 +71,6 @@
         </div>
         <div class="mensagem">
           {{msg.descricao|safe}}
-            {{msg.descricao|safe}}
-              {{msg.descricao|safe}}
         </div>
         <div class="time" title="{{msg.created|date:"DATETIME_FORMAT"}}">
         há {{msg.created|timesince}}
@@ -92,4 +90,11 @@
     {% crispy form %}
   </div>
 </div>
+{% endblock %}
+
+
+{% block extra_js %}
+		<script language="JavaScript">
+			initTinymce(null);
+		</script>
 {% endblock %}

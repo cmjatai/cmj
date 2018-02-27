@@ -49,6 +49,10 @@ body, html {
 .bg-maroon,
 .bg-black {
   color: #f9f9f9 !important;
+
+  small {
+    color: rgba(white, 0.7);
+  }
 }
 .bg-gray {
   background-color: #eaeaec !important;
@@ -385,7 +389,6 @@ body, html {
       display: table-cell;
       vertical-align: middle;
       margin: 0px 15px 0 0;
-      padding-right: 15px;
       img {
         height: 35px;
         width: auto;
@@ -449,9 +452,6 @@ body, html {
   border-bottom: 1px solid $color_container_border;
   font-weight: normal;
   font-size: 2em;
-  small {
-    color: rgba(white, 0.7);
-  }
 }
 
 a {
