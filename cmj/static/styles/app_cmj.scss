@@ -449,6 +449,9 @@ body, html {
   border-bottom: 1px solid $color_container_border;
   font-weight: normal;
   font-size: 2em;
+  small {
+    color: rgba(white, 0.7);
+  }
 }
 
 a {

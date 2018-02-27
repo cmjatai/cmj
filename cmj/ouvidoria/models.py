@@ -73,6 +73,13 @@ class Solicitacao(models.Model):
     def __str__(self):
         return self.titulo
 
+    @property
+    def email_notify(self):
+        return {
+            'subject': _('Solicitação (%s) de %s') % (
+                self.get_tipo_display(), self.owner),
+        }
+
 
 class MensagemSolicitacao(models.Model):
 
@@ -98,6 +105,16 @@ class MensagemSolicitacao(models.Model):
         ordering = ('created', )
         verbose_name = _('Mensagem de Solicitação')
         verbose_name_plural = _('Mensagens de Solicitação')
+
+    @property
+    def email_notify(self):
+        return {
+            'subject': self.solicitacao.email_notify['subject'],
+        }
+
+        """'body': ('Solicitação: ' + self.solicitacao.titulo, self.descricao),
+        'owner': self.owner,
+        'created': self.created"""
 
     def __str__(self):
         return self.descricao

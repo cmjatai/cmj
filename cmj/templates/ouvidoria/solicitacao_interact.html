@@ -1,8 +1,12 @@
 {% extends "base.html" %}
 {% load i18n crispy_forms_tags staticfiles cropping %}
 {% block title %}
-<h1 class="page-header bg-blue ">
-  {% trans "Solicitação da Sociedade" %}
+<h1 class="page-header {{bg_title}} ">
+  {% if solicitacao.owner == user %}
+    {% trans "Minha Solicitação" %} <small>({{solicitacao.get_tipo_display}})</small>
+  {% else %}
+    {% trans "Solicitação da Sociedade" %} <small>({% trans "Encaminhada por:" %} {{solicitacao.owner}})</small>
+  {% endif %}
 </h1>
 {% endblock title %}
 
@@ -37,7 +41,7 @@
           <p class="control-label">Descrição</p>
           <div class="controls">
             <div class="form-control-static">
-              {{solicitacao.descricao|linebreaksbr}}
+              {{solicitacao.descricao|safe}}
             </div>
           </div>
         </div>

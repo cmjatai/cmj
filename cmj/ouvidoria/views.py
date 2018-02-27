@@ -23,6 +23,15 @@ from cmj.ouvidoria.models import Solicitacao, MensagemSolicitacao
 from cmj.utils import make_pagination
 
 
+opts_bg = {
+    10: 'bg-green',
+    20: 'bg-blue',
+    30: 'bg-orange',
+    40: 'bg-yellow',
+    900: 'bg-red-danger',
+}
+
+
 class DenunciaAnonimaFormView(FormMessagesMixin, CreateView):
     form_valid_message, form_invalid_message = (
         _('Sua denúncia anônima foi encaminha.'),
@@ -172,7 +181,7 @@ class SolicitacaoFormView(FormMessagesMixin, CreateView):
         _('Houve um erro no envio de sua mensagem.'))
     model = Solicitacao
     form_class = SolicitacaoForm
-    template_name = 'crud/form.html'
+    template_name = 'ouvidoria/solicitacao_form.html'
 
     def get_context_data(self, **kwargs):
         context = CreateView.get_context_data(self, **kwargs)
@@ -183,14 +192,6 @@ class SolicitacaoFormView(FormMessagesMixin, CreateView):
 
         context['title'] = _(
             'Registar uma Solicitação: (%s)') % tipos.triple_map[tipo]['text']
-
-        opts_bg = {
-            10: 'bg-green',
-            20: 'bg-blue',
-            30: 'bg-orange',
-            40: 'bg-yellow',
-            900: 'bg-red-danger',
-        }
 
         context['bg_title'] = opts_bg[tipo]
 
@@ -274,6 +275,7 @@ class SolicitacaoInteractionView(PermissionRequiredMixin, FormView):
             ms.notificacoes.filter(
                 user=self.request.user).update(read=True)
 
+        context['bg_title'] = opts_bg[self.object.tipo]
         context['subnav_template_name'] = 'ouvidoria/subnav_list.yaml'
         return context
 
