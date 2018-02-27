@@ -187,9 +187,11 @@ def notificacoes_unread_count(user):
         return 0
     return user.notificacao_set.unread().count()
 
+
 @register.filter
 def objeto_lido(obj, user):
     return not obj.notificacoes.unread().filter(user=user).exists()
+
 
 @register.filter
 def data_de_leitura(obj, user):
@@ -198,3 +200,10 @@ def data_de_leitura(obj, user):
         return None
 
     return qs.first().modified
+
+
+@register.inclusion_tag('core/user/avatar.html')
+def avatar_user(user_render=None):
+    return {
+        'user_render': user_render
+    }

@@ -70,21 +70,9 @@
               {% if user and not user.is_anonymous %}
                 <li class="dropdown">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                    {% if user.avatar %}
-                      <img class="avatar" src="{% cropped_thumbnail user "cropping" %}">a
-                    {% else %}
-                      {% for us in user.social_auth.all %}
-                        {% if forloop.first %}
-                          {% if us.provider == 'facebook' %}
-                            <img class="avatar" src="https://graph.facebook.com/v2.6/{{us.uid}}/picture?height=46" />
-                          {% elif us.provider == 'google-oauth2' %}
-                            <img class="avatar" src="{% static 'img/perfil.jpg' %}">
-                          {% endif %}
-                        {% endif %}
-                      {% empty %}
-                        <img class="avatar" src="{% static 'img/perfil.jpg' %}">
-                      {% endfor %}
-                    {% endif %}
+                    {% avatar_user user%}
+
+
                   </a>
                   <ul class="dropdown-menu menu-right">
                     <li class=" text-right"><a href="{% url 'cmj.core:cmj_user_change' %}">{{ user.get_full_name|default:user.email }} <i class="fa fa-hand-o-left" aria-hidden="true"></i> {% trans "Meu Perfil" %}</a></li>
@@ -107,9 +95,7 @@
                 </ul>
               </li>
                {% endif %}
-                {% if perms.core.popup_notificacao %}
-                  {% notificacoes_unread %}
-                {% endif %}
+                {% notificacoes_unread %}
             </ul>
           </div><!--/.nav-collapse -->
           {% block button_toogle %}
@@ -145,23 +131,7 @@
                       <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                         {{ user.get_full_name|default:user.email }}
                         <span class="caret"></span>
-
-                        {% if user.avatar %}
-                          <img class="avatar" src="{% cropped_thumbnail user "cropping" scale=0.5 %}">
-                        {% else %}
-                          {% for us in user.social_auth.all %}
-                            {% if forloop.first %}
-                              {% if us.provider == 'facebook' %}
-                                <img class="avatar" src="https://graph.facebook.com/v2.6/{{us.uid}}/picture?height=46" />
-                              {% elif us.provider == 'google-oauth2' %}
-                                <img class="avatar" src="{% static 'img/perfil.jpg' %}">
-                              {% endif %}
-                            {% endif %}
-                          {% empty %}
-                            <img class="avatar" src="{% static 'img/perfil.jpg' %}">
-                          {% endfor %}
-                        {% endif %}
-
+                        {% avatar_user user%}
                       </a>
                       <ul class="dropdown-menu me menu-rightnu-right">
                           <li><a href="{% url 'cmj.core:cmj_user_change' %}">{% trans "Meu Perfil" %}</a></li>

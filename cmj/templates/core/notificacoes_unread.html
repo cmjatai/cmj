@@ -1,4 +1,4 @@
-{% load i18n staticfiles cropping%}
+{% load i18n staticfiles cropping common_cmj_tags%}
 {% if notificacoes %}
   <div class="popup-notificacoes">
     <div class="inner">
@@ -13,21 +13,7 @@
           </div>
           {% for item in notificacoes_anonimas %}
             <a class="item" href="{% url 'cmj.core:notificacao_redirect' item.pk %}">
-
-              {% if item.user_origin.avatar %}
-                <img class="avatar" src="{% cropped_thumbnail item.user_origin "cropping" %}">
-              {% else %}
-                {% for us in item.user_origin.social_auth.all %}
-                  {% if us.provider == 'facebook' %}
-                    <img  class="avatar" src="https://graph.facebook.com/v2.6/{{us.uid}}/picture?height=60" />
-                  {% elif us.provider == 'google-oauth2' %}
-                    <img  class="avatar" src="{% static 'img/perfil.jpg' %}">
-                  {% endif %}
-                {% empty %}
-                  <img  class="avatar" src="{% static 'img/perfil.jpg' %}">
-                {% endfor %}
-              {% endif %}
-
+              {% avatar_user item.user_origin %}
               <div class="texto">
                 <div class="titulo">
                   {{item.content_object|truncatechars:110}}
@@ -48,22 +34,7 @@
           {% for item in notificacoes_usuarios %}
             <a class="item" href="{% url 'cmj.core:notificacao_redirect' item.pk %}">
               <div >
-
-                {% if item.user_origin.avatar %}
-                  <img  class="avatar" src="{% cropped_thumbnail item.user_origin "cropping" %}">
-                {% else %}
-                  {% for us in item.user_origin.social_auth.all %}
-                    {% if us.provider == 'facebook' %}
-                      <img  class="avatar" src="https://graph.facebook.com/v2.6/{{us.uid}}/picture?height=60" />
-                    {% elif us.provider == 'google-oauth2' %}
-                      <img  class="avatar" src="{% static 'img/perfil.jpg' %}">
-                    {% endif %}
-                  {% empty %}
-                    <img  class="avatar" src="{% static 'img/perfil.jpg' %}">
-                  {% endfor %}
-                {% endif %}
-
-
+                {% avatar_user item.user_origin %}
               </div>
               <div class="texto">
                 <div class="titulo">

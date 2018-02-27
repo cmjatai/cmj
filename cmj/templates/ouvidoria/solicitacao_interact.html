@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n crispy_forms_tags staticfiles cropping %}
+{% load i18n crispy_forms_tags staticfiles cropping common_cmj_tags%}
 {% block title %}
 <h1 class="page-header {{bg_title}} ">
   {% if solicitacao.owner == user %}
@@ -55,19 +55,7 @@
       <a href="#" name="item-{{msg.pk}}"></a>
       <div class="inner">
         <div class="avatar">
-          {% if msg.owner.avatar %}
-            <img src="{% cropped_thumbnail msg.owner "cropping" %}">
-          {% else %}
-            {% for us in msg.owner.social_auth.all %}
-              {% if us.provider == 'facebook' %}
-                <img src="https://graph.facebook.com/v2.6/{{us.uid}}/picture?height=60" />
-              {% elif us.provider == 'google-oauth2' %}
-                <img src="{% static 'img/perfil.jpg' %}">
-              {% endif %}
-            {% empty %}
-              <img src="{% static 'img/perfil.jpg' %}">
-            {% endfor %}
-          {% endif %}
+          {% avatar_user msg.owner%}
         </div>
         <div class="mensagem">
           {{msg.descricao|safe}}
