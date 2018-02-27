@@ -251,7 +251,8 @@ class SolicitacaoInteractionView(PermissionRequiredMixin, FormView):
 
             if is_operador:
                 return True
-        raise Http404()
+
+        return False
 
     def get_initial(self):
 
