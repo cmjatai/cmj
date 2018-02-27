@@ -75,10 +75,15 @@ class Solicitacao(models.Model):
 
     @property
     def email_notify(self):
-        return {
-            'subject': _('Solicitação (%s) de %s') % (
-                self.get_tipo_display(), self.owner),
-        }
+        if self.owner:
+            return {
+                'subject': _('Solicitação (%s) de %s') % (
+                    self.get_tipo_display(), self.owner),
+            }
+        else:
+            return {
+                'subject': _('Denuncia Anônima'),
+            }
 
 
 class MensagemSolicitacao(models.Model):
