@@ -1,72 +1,19 @@
+{% extends "base_email.html" %}
 {% load i18n staticfiles %}
-<!DOCTYPE html>
-<!--[if IE 8]> <html class="no-js lt-ie9" lang="en"> <![endif]-->
-<!--[if gt IE 8]><!-->
-<html lang="pt-br">
-<!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="content-language" content="pt-br">
-  <meta http-equiv="content-type" content="text/html; charset=utf-8">
-  <meta name="reply-to" content="hostmaster@camarajatai.go.gov.br">
 
+{% block email_content %}
+  <div style="padding: 30px 20px 40px;">
+    <p>Você está recebendo este e-mail pois solicitou<br>
+      recuperação de senha de sua conta no<br>
+      <b>Portal da Câmara Municipal de Jataí</b>.
+    </p>
 
-</head>
+    <p>Por favor clique no link a seguir e redefina sua senha:</p>
+    <br>
 
-<body>
-
-<style>
-  .body-page {
-    background-color: #eee;
-  }
-  .topo_email {
-    width: 100%
-  }
-  .container-email {
-    width: 400px;
-    border: 1px solid #ccc;
-  }
-  .container-email .inner {
-    padding: 20px;
-  }
-</style>
-
-  <div style="background-color: #eee; display: block; width:100%; text-align: center; padding: 20px 0;">
-    <table style="background-color: white; margin: 0 auto; max-width: 480px; border: 1px solid #ccc;">
-      <tr>
-        <td>
-          <img style="width: 100%; text-align: left;" src="https://{{ domain }}{% static 'img/topo_email.jpg' %}">
-        </td>
-      </tr>
-      <tr>
-        <td style="padding: 30px 20px 40px;">
-          <p>Você está recebendo este e-mail pois solicitou<br>
-            recuperação de senha de sua conta no<br>
-            <b>Portal da Câmara Municipal de Jataí</b>.
-          </p>
-
-          <p>Por favor clique no link a seguir e redefina sua senha:</p>
-          <br>
-
-          <a style="color: #ffffff; background-color: #02baf2; border-radius: 4px; padding: 7px 15px 6px 15px; text-decoration: none; text-transform: uppercase; font-weight: bold;"
-            href="https://{{ domain }}{% url 'cmj.core:recuperar_senha_confirma' uidb64=uid token=token %}">
-            Redefinir Senha
-          </a>
-
-      </td>
-    </tr>
-    <tr>
-      <td style="background-color: #f5f5f5; font-size: 85%; padding: 10px 0;">
-            Caso não tenha solicitado a alteração de sua senha, favor ignorar este e-mail.<br>
-            Atenciosamente,<br>
-            a equipe de T.I. da <b>Câmara Municipal de Jataí</b>.<br>
-            (64) 3636-0816
-        </td>
-      </tr>
-    </table>
-
-      </div>
-    </div>
+    <a style="color: #ffffff; background-color: #02baf2; border-radius: 4px; padding: 7px 15px 6px 15px; text-decoration: none; text-transform: uppercase; font-weight: bold;"
+      href="https://{{ domain }}{% url 'cmj.core:recuperar_senha_confirma' uidb64=uid token=token %}">
+      Redefinir Senha
+    </a>
   </div>
-</body>
-</html>
+{% endblock email_content %}
