@@ -2528,7 +2528,7 @@ main {
     border-radius: 0;
     padding: 0;
     .col-xs-9 {
-      width: 70%;
+      width: 68%;
     }
     * {
         line-height: 1;
@@ -2797,7 +2797,9 @@ main {
 }
 
 @media screen and (max-width: 991px) {
-
+  .btn-ouvidoria {
+    margin-left: 0px;
+  }
   .embed-audio {
     padding-bottom: 23%;
   }
@@ -3588,18 +3590,21 @@ main {
     .container-noticias-secundarias {
       .path-item-list {
         width: calc(100%);
+        .inner {
+          padding: 0 20px;
+        }
       }
     }
     .container-box-parlamentares {
-      margin-left: -8px;
-      margin-right: -8px;
+      margin-left: -5px;
+      margin-right: -5px;
       .inner {
         padding-left: 0;
         padding-right: 0;
 
       }
       .titulo {
-        padding: 0px 10px 0;
+        padding: 0px 5px 0;
       }
       .descricao {
         padding: 5px 10px 20px;
@@ -3780,7 +3785,7 @@ main {
 
   .carousel {
     .imagem {
-      height: 200px;
+      height: 220px;
     }
     .titulo {
       font-size: 110%;
