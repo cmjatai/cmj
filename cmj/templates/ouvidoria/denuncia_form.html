@@ -12,6 +12,10 @@
 {% endblock title %}
 {% block base_content %}
   {% crispy form %}
+{% endblock %}
 
-  
+{% block extra_js %}
+		<script language="JavaScript">
+			initTinymce(null);
+		</script>
 {% endblock %}

@@ -32,7 +32,7 @@ class DenunciaForm(ModelForm):
         model = Solicitacao
         fields = ('titulo', 'descricao',)
         widgets = {
-            'descricao': forms.Textarea(attrs={'rows': 16})}
+            'descricao': forms.Textarea()}
 
     def __init__(self, *args, **kwargs):
 
@@ -40,14 +40,16 @@ class DenunciaForm(ModelForm):
             [
                 (Div(
                     to_row([('titulo', 12),
-                            ('descricao', 12), ])
+                            ('descricao', 12),
+                            (Div(
+                                css_class="g-recaptcha",
+                                data_sitekey=settings.GOOGLE_RECAPTCHA_SITE_KEY
+                            ), 12)])
                 ), 7),
                 (Div(
                     to_row([('areatrabalho_parlamentar', 12)])
                 ), 5),
-                (Div(css_class="g-recaptcha",
-                     data_sitekey=settings.GOOGLE_RECAPTCHA_SITE_KEY
-                     ), 12)
+
 
             ]
         )
