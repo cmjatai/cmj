@@ -192,7 +192,7 @@
       margin: 10px 1%;
     }
     .inner-ouvidoria {
-      padding: 10px;
+      padding: 0px;
     }
   }
 }
@@ -211,6 +211,15 @@
         margin-top: 10px;
         letter-spacing: 2px;
       }
+    }
+  }
+  .container-login-inner {
+    .container-login {
+      margin: 10px 0;
+    }
+
+    .inner-ouvidoria {
+      padding: 30px;
     }
   }
 }

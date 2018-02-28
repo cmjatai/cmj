@@ -31,6 +31,10 @@ body, html {
   //background: $color_main_bg url(/static/img/bg.png);
 }
 
+form {
+  margin-top: 1em;
+}
+
 /* Background colors */
 .bg-red,
 .bg-red-danger,
@@ -3127,6 +3131,9 @@ main {
   .embed-audio {
     padding-bottom: 26%;
   }
+  .page-header {
+    margin: 0 -5px;
+  }
   .navbar {
     .nav-flex {
       display: block;
@@ -3162,6 +3169,10 @@ main {
   }
   .container-simples {
       padding: 0 $grid-gutter-width * 0.75;
+  }
+  .container-box {
+    margin-left: 10px;
+    margin-right: 10px;
   }
   .row {
     margin:  0 $grid-gutter-width * -0.25;
@@ -3712,7 +3723,13 @@ main {
 
   .page-header {
       padding: 0.4em 0.3em 0.3em;
-      font-size: 1.5em;
+      font-size: 1.15em;
+  }
+  .inner-ouvidoria {
+      padding: 0;
+    h3 {
+      font-size: 18px;
+    }
   }
 
   .path-parlamentares {

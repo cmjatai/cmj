@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime, timedelta
 from functools import wraps
 from unicodedata import normalize as unicodedata_normalize
 
@@ -7,10 +7,41 @@ from django.conf import settings
 from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
+from easy_thumbnails import source_generators
 from floppyforms import ClearableFileInput
 from model_utils.choices import Choices
 from reversion.admin import VersionAdmin
+from unipath.path import Path
 import magic
+
+
+def pil_image(source, exif_orientation=False, **options):
+    return source_generators.pil_image(source, exif_orientation, **options)
+
+
+def clear_thumbnails_cache(queryset, field, time_create=0):
+
+    now = datetime.now()
+    for r in queryset:
+        assert hasattr(r, field), _(
+            'Objeto da listagem não possui o campo informado')
+
+        if not getattr(r, field):
+            continue
+
+        path = Path(getattr(r, field).path)
+        cache_files = path.parent.walk()
+
+        for cf in cache_files:
+            if cf == path:
+                continue
+
+            if time_create:
+                data_arquivo = datetime.fromtimestamp(cf.mtime())
+
+                if now - data_arquivo < timedelta(time_create):
+                    continue
+            cf.remove()
 
 
 def normalize(txt):
