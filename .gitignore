@@ -81,6 +81,7 @@ client_secrets.json
 .pydevproject
 .settings
 .vagrant
+.vscode
 *.sublime-project
 *.sublime-workspace
 

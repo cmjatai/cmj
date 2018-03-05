@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% load i18n common_cmj_tags%}
-
 {% block title %}
   <h1 class="page-header">
     {% trans "Minhas Solicitações" %}
@@ -8,30 +7,23 @@
 {% endblock title %}
 
 {% block base_content %}
-
-
     <div class="alert alert-info">
       <ul>
         <li>
           Para fazer uma solicitação e obter resposta, utilize a opção "Abrir Nova Solicitação"
         </li>
         <li>
-          Caso opte por "Fazer uma Denúnica Anônima" você será desconectado e sua denúncia será encaminhada sem qualquer vínvulo com seu usuário mas desta forma não será possível obter qualquer resposta."
+          Caso opte por <a href="/fale-conosco/ouvidoria/denuncia-anonima">"Fazer uma Denúnica Anônima"  (clique aqui)</a> você será desconectado e
+          sua denúncia será encaminhada sem qualquer vínvulo com seu usuário
+          mas desta forma não será possível obter qualquer resposta. "
         </li>
       </ul>
     </div>
-    <div class="context-actions clearfix">
-      <div class="actions btn-group-lg pull-right" role="group">
-    {% for url, css_class, text in view.extras_url %}
-      <a href="{{url}}" class="btn {{css_class}}">
-            {{text}}
-          </a>
-        {% endfor %}
+    <div class="container-ouvidoria">
+      <div class="inner-ouvidoria clearfix">
+          {% include "ouvidoria/actions_nova_solicitacao.html" %}
       </div>
     </div>
-
-
-
 
   {% if not object_list %}
     <p>{{ NO_ENTRIES_MSG }}</p>

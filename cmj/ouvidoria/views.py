@@ -153,22 +153,8 @@ class SolicitacaoManageListView(SolicitacaoListMixin,
 class SolicitacaoListView(SolicitacaoListMixin, ListView):
     template_name = 'ouvidoria/solicitacao_minhas_list.html'
 
-    @property
-    def extras_url(self):
-        return [
-            (reverse('cmj.ouvidoria:solicitacao_create'),
-             'btn-success',
-             _('Abrir Nova Solicitação')
-             ),
-            (reverse('cmj.ouvidoria:denuncia_form'),
-             'btn-danger',
-             _('Fazer uma Denúncia Anônima')
-             )
-        ]
-
     def get_queryset(self):
         qs = ListView.get_queryset(self)
-
         qs = qs.filter(owner=self.request.user).order_by(
             'notificacoes__read', '-created')
         return qs
