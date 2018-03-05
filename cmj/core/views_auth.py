@@ -1,11 +1,12 @@
 
 from braces.views import FormMessagesMixin
 from django.contrib.auth import get_user_model
+from django.contrib.auth.views import LoginView
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.edit import FormView, UpdateView
 
-from cmj.core.forms_auth import CmjUserChangeForm
+from cmj.core.forms_auth import CmjUserChangeForm, LoginForm
 from cmj.crud.base import FORM_MESSAGES, ACTION_UPDATE
 
 
@@ -32,11 +33,7 @@ class CmjUserChangeView(FormMessagesMixin, UpdateView):
     def get_object(self, queryset=None):
         return self.request.user
 
-    """def form_valid(self, form):
-        new_password = form.cleaned_data['new_password1']
 
-        user = self.request.user
-        user.set_password(new_password)
-        user.save()
-
-        return super().form_valid(form)"""
+class CmjLoginView(LoginView):
+    template_name = 'core/user/login.html'
+    authentication_form = LoginForm

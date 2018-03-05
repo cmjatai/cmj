@@ -2,15 +2,5 @@
 {% if user_render.avatar %}
   <img  class="avatar" src="{% cropped_thumbnail user_render "cropping" %}">
 {% else %}
-  {% for us in user_render.social_auth.all %}
-    {% if forloop.first %}
-      {% if us.provider == 'facebook' %}
-        <img  class="avatar" src="https://graph.facebook.com/v2.6/{{us.uid}}/picture?height=60" title="{{user_render}}" />
-      {% elif us.provider == 'google-oauth2' %}
-        <img  class="avatar" src="{% static 'img/perfil.jpg' %}" title="{{user_render}}">
-      {% endif %}
-    {% endif %}
-  {% empty %}
-    <img  class="avatar" src="{% static 'img/perfil.jpg' %}"title="{{user_render}}">
-  {% endfor %}
+  <img  class="avatar" src="{% static 'img/perfil.jpg' %}"title="{{user_render}}">
 {% endif %}

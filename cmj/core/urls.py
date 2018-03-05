@@ -10,7 +10,7 @@ from cmj.core.views import CepCrud, RegiaoMunicipalCrud, DistritoCrud,\
     TrechoJsonSearchView, TrechoJsonView, AreaTrabalhoCrud,\
     OperadorAreaTrabalhoCrud, PartidoCrud, ImpressoEnderecamentoCrud,\
     NotificacaoRedirectView
-from cmj.core.views_auth import CmjUserChangeView
+from cmj.core.views_auth import CmjUserChangeView, CmjLoginView
 from cmj.settings import EMAIL_SEND_USER
 
 from .apps import AppConfig
@@ -51,11 +51,8 @@ user_urlpatterns = [
         {'template_name': 'core/user/recuperar_senha_completo.html'},
         name='recuperar_senha_completo'),
 
-    url(r'^login/$', v_auth.login, {'template_name': 'core/user/login.html',
-                                    'authentication_form': LoginForm,
-                                    'extra_context': {
-                                        'fluid': '-fluid'
-                                    }}, name='login'),
+    url(r'^login/$', CmjLoginView.as_view(), name='login'),
+
     url(r'^logout/$', v_auth.logout,
         {'next_page': '/'}, name='logout', ),
 
