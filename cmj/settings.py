@@ -148,6 +148,7 @@ TEMPLATES = [
                 "django.template.context_processors.static",
 
                 'django.contrib.messages.context_processors.messages',
+                
                 'social_django.context_processors.backends',
                 'social_django.context_processors.login_redirect',
                 'cmj.context_processors.areatrabalho',
@@ -176,7 +177,7 @@ str_pv = 'django.contrib.auth.password_validation'
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': str_pv + '.MinimumLengthValidator',
         'OPTIONS': {
-            'min_length': 9,
+            'min_length': 6,
         }
      },
     {'NAME': str_pv + '.UserAttributeSimilarityValidator', },
@@ -190,6 +191,8 @@ GOOGLE_URL_API_KEY = config('GOOGLE_URL_API_KEY', cast=str)
 
 GOOGLE_RECAPTCHA_SITE_KEY = config('GOOGLE_RECAPTCHA_SITE_KEY', cast=str)
 GOOGLE_RECAPTCHA_SECRET_KEY = config('GOOGLE_RECAPTCHA_SECRET_KEY', cast=str)
+
+SOCIAL_AUTH_POSTGRES_JSONFIELD = True
 
 AUTHENTICATION_BACKENDS = (
     'social_core.backends.facebook.FacebookOAuth2',
