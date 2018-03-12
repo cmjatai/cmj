@@ -117,7 +117,10 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
 
                     if Documento.objects.filter(
                             texto__contains=video_id).exists():
-                        continue
+                        documento = Documento.objects.filter(
+                            texto__contains=video_id).first().raiz
+                    else:
+                        documento = Documento()
 
                     url_vid = ('https://www.googleapis.com/youtube/v3/videos?'
                                'part=snippet'
@@ -135,7 +138,6 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
                     except:
                         continue
 
-                    documento = Documento()
                     documento.titulo = video_dict['title']
                     documento.descricao = video_dict['description']
                     documento.public_date = dateutil.parser.parse(
@@ -148,6 +150,7 @@ class DocumentoPmImportView(RevisionMixin, TemplateView):
 
                     documento.extra_data = video_dict
                     documento.save()
+                    documento.childs.all().delete()
 
                     container = Documento()
                     container.raiz = documento
