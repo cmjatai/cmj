@@ -32,8 +32,6 @@ from django.contrib import admin
 from django.views.generic.base import TemplateView, RedirectView
 from django.views.static import serve as view_static_server
 
-# import sapl.api.urls
-
 import sapl.base.urls
 import sapl.comissoes.urls
 import sapl.compilacao.urls
@@ -53,6 +51,7 @@ import cmj.ouvidoria.urls
 import cmj.sigad.urls
 
 
+# import sapl.api.urls
 urlpatterns = [
     # FIXME: eliminar redirecionamento em 2019
     url(r'^portal/?$', RedirectView.as_view(url='/')),
@@ -80,7 +79,6 @@ urlpatterns = [
     url(r'', include(sapl.protocoloadm.urls)),
     url(r'', include(sapl.compilacao.urls)),
     url(r'', include(sapl.relatorios.urls)),
-    # url(r'', include(sapl.api.urls)),
     url(r'^sapl/', include(sapl.base.urls)),
 
     url(r'^vuetest', TemplateView.as_view(template_name='index.html')),
