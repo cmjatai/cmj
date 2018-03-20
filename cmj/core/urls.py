@@ -10,7 +10,8 @@ from cmj.core.views import CepCrud, RegiaoMunicipalCrud, DistritoCrud,\
     TrechoJsonSearchView, TrechoJsonView, AreaTrabalhoCrud,\
     OperadorAreaTrabalhoCrud, PartidoCrud, ImpressoEnderecamentoCrud,\
     NotificacaoRedirectView
-from cmj.core.views_auth import CmjUserChangeView, CmjLoginView
+from cmj.core.views_auth import CmjUserChangeView, CmjLoginView,\
+    CmjPasswordResetView
 from cmj.settings import EMAIL_SEND_USER
 
 from .apps import AppConfig
@@ -18,20 +19,12 @@ from .apps import AppConfig
 
 app_name = AppConfig.name
 
-
 user_urlpatterns = [
     url(r'^user/edit/$', login_required(CmjUserChangeView.as_view()),
         name='cmj_user_change'),
 
-
     url(r'^user/recuperar-senha/email/$',
-        v_auth.password_reset,
-        {'post_reset_redirect': 'cmj.core:recuperar_senha_finalizado',
-         'email_template_name': 'core/user/recuperar_senha_email.html',
-         'html_email_template_name': 'core/user/recuperar_senha_email.html',
-         'template_name': 'core/user/recuperar_senha_email_form.html',
-         'from_email': EMAIL_SEND_USER,
-         'password_reset_form': RecuperarSenhaForm},
+        CmjPasswordResetView.as_view(),
         name='recuperar_senha_email'),
 
     url(r'^user/recuperar-senha/finalizado/$',

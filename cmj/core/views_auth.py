@@ -1,13 +1,15 @@
 
 from braces.views import FormMessagesMixin
 from django.contrib.auth import get_user_model
-from django.contrib.auth.views import LoginView
-from django.core.urlresolvers import reverse
+from django.contrib.auth.views import LoginView, PasswordResetView
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.edit import FormView, UpdateView
 
-from cmj.core.forms_auth import CmjUserChangeForm, LoginForm
+from cmj.core.forms_auth import CmjUserChangeForm, LoginForm,\
+    RecuperarSenhaForm
 from cmj.crud.base import FORM_MESSAGES, ACTION_UPDATE
+from cmj.settings import EMAIL_SEND_USER
 
 
 class CmjUserChangeView(FormMessagesMixin, UpdateView):
@@ -37,3 +39,13 @@ class CmjUserChangeView(FormMessagesMixin, UpdateView):
 class CmjLoginView(LoginView):
     template_name = 'core/user/login.html'
     authentication_form = LoginForm
+
+
+class CmjPasswordResetView(PasswordResetView):
+    email_template_name = 'core/user/recuperar_senha_email.html'
+    success_url = reverse_lazy('cmj.core:recuperar_senha_finalizado')
+
+    html_email_template_name = 'core/user/recuperar_senha_email.html'
+    template_name = 'core/user/recuperar_senha_email_form.html'
+    from_email = EMAIL_SEND_USER
+    form_class = RecuperarSenhaForm

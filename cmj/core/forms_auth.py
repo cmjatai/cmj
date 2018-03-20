@@ -220,6 +220,13 @@ class RecuperarSenhaForm(PasswordResetForm):
 
         return self.cleaned_data
 
+    def get_users(self, email):
+        active_users = get_user_model()._default_manager.filter(**{
+            '%s__iexact' % get_user_model().get_email_field_name(): email,
+            'is_active': True,
+        })
+        return (u for u in active_users)
+
 
 class NovaSenhaForm(SetPasswordForm):
 

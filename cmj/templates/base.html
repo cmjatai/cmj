@@ -368,24 +368,29 @@
     </script>
 
     {% if not DEBUG %}
+
       <script>
         window.fbAsyncInit = function() {
           FB.init({
             appId      : '150874375319738',
+            cookie     : true,
             xfbml      : true,
-            version    : 'v2.12'
-          });sim
+            version    : 'v2.9'
+          });
+
+          FB.AppEvents.logPageView();
+
         };
 
-        (function(d, s, id) {
-          var js, fjs = d.getElementsByTagName(s)[0];
-          if (d.getElementById(id)) {return;}
-          js = d.createElement(s); js.id = id;
-          js.src = "//connect.facebook.net/pt_BR/sdk.js";
-          fjs.parentNode.insertBefore(js, fjs);
+        (function(d, s, id){
+           var js, fjs = d.getElementsByTagName(s)[0];
+           if (d.getElementById(id)) {return;}
+           js = d.createElement(s); js.id = id;
+           js.src = "https://connect.facebook.net/pt_BR/sdk.js";
+           fjs.parentNode.insertBefore(js, fjs);
          }(document, 'script', 'facebook-jssdk'));
-
       </script>
+
       <!-- Global site tag (gtag.js) - Google Analytics -->
       <script async src="https://www.googletagmanager.com/gtag/js?id=UA-2431536-7"></script>
       <script>
