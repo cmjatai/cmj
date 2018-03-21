@@ -11,8 +11,14 @@ from easy_thumbnails import source_generators
 from floppyforms import ClearableFileInput
 from model_utils.choices import Choices
 from reversion.admin import VersionAdmin
+from social_core.backends.facebook import FacebookOAuth2
 from unipath.path import Path
 import magic
+
+
+class FacebookOAuth2(FacebookOAuth2):
+    STATE_PARAMETER = False
+    REDIRECT_STATE = False
 
 
 def pil_image(source, exif_orientation=False, **options):

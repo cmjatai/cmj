@@ -148,7 +148,7 @@ TEMPLATES = [
                 "django.template.context_processors.static",
 
                 'django.contrib.messages.context_processors.messages',
-                
+
                 'social_django.context_processors.backends',
                 'social_django.context_processors.login_redirect',
                 'cmj.context_processors.areatrabalho',
@@ -195,7 +195,8 @@ GOOGLE_RECAPTCHA_SECRET_KEY = config('GOOGLE_RECAPTCHA_SECRET_KEY', cast=str)
 SOCIAL_AUTH_POSTGRES_JSONFIELD = True
 
 AUTHENTICATION_BACKENDS = (
-    'social_core.backends.facebook.FacebookOAuth2',
+    #    'social_core.backends.facebook.FacebookOAuth2',
+    'cmj.utils.FacebookOAuth2',
     'django.contrib.auth.backends.ModelBackend',
     'social_core.backends.google.GoogleOAuth2',
 )
@@ -214,8 +215,9 @@ SOCIAL_AUTH_TWITTER_KEY = config('SOCIAL_AUTH_TWITTER_KEY', cast=str)
 SOCIAL_AUTH_TWITTER_SECRET = config('SOCIAL_AUTH_TWITTER_SECRET', cast=str)
 
 USER_FIELDS = ('email',)
-SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']
 
+SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']
+REDIRECT_IS_HTTPS = True
 SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
     'fields': 'id,name,first_name,last_name,email'
 }

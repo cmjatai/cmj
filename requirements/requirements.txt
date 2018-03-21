@@ -29,7 +29,7 @@ rtyaml==0.0.3
 unipath==1.1
 python-magic==0.4.12
 gunicorn==19.6.0
-social-auth-app-django
+social-auth-app-django==2.0.0
 git+git://github.com/interlegis/trml2pdf.git
 python-dateutil
 django-webpack-loader
