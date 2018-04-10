@@ -202,6 +202,7 @@ class CaixaPublicacaoForm(forms.ModelForm):
             qs = Documento.objects.qs_news().filter(
                 nodes__midia__isnull=False
             )
+        qs = qs.distinct()
 
         super(CaixaPublicacaoForm, self).__init__(*args, **kwargs)
 
