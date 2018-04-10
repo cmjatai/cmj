@@ -23,7 +23,8 @@ from cmj.sigad import forms, models
 from cmj.sigad.forms import DocumentoForm, CaixaPublicacaoForm
 from cmj.sigad.models import Documento, Classe, ReferenciaEntreDocumentos,\
     PermissionsUserClasse, PermissionsUserDocumento, Revisao, CMSMixin,\
-    CLASSE_TEMPLATES_CHOICE, CaixaPublicacao, CaixaPublicacaoClasse
+    CLASSE_TEMPLATES_CHOICE, CaixaPublicacao, CaixaPublicacaoClasse,\
+    CaixaPublicacaoDocumento
 from cmj.utils import make_pagination
 
 
@@ -1176,6 +1177,28 @@ class CaixaPublicacaoCrud(Crud):
 
     class UpdateView(Crud.UpdateView):
         form_class = CaixaPublicacaoForm
+
+    class DetailView(Crud.DetailView):
+        layout_key = 'CaixaPublicacaoDetail'
+        template_name = 'sigad/caixapublicacao_detail.html'
+
+        def get_context_data(self, **kwargs):
+            context = Crud.DetailView.get_context_data(self, **kwargs)
+            return context
+
+        def get(self, request, *args, **kwargs):
+            cpd_pk = request.GET.get('cpd_pk', 0)
+            if cpd_pk:
+                up = -1500 if 'up' in request.GET else 1500
+                try:
+                    cpd = CaixaPublicacaoDocumento.objects.get(pk=cpd_pk)
+                    cpd.ordem += up
+                    cpd.save()
+                    cpd.caixapublicacao.reordene()
+                except:
+                    pass
+
+            return Crud.DetailView.get(self, request, *args, **kwargs)
 
 
 class CaixaPublicacaoClasseCrud(MasterDetailCrud):

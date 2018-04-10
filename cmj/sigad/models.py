@@ -1263,8 +1263,17 @@ class CaixaPublicacao(models.Model):
 
     documentos = models.ManyToManyField(
         'sigad.Documento', blank=True,
+        through='CaixaPublicacaoDocumento',
+        through_fields=('caixapublicacao', 'documento'),
         related_query_name='caixapublicacao_set',
         verbose_name=_('Documentos da Caixa de Públicação'))
+
+    def reordene(self):
+        ordem = 0
+        for cpd in self.caixapublicacaodocumento_set.all():
+            ordem += 1000
+            cpd.ordem = ordem
+            cpd.save()
 
     def __str__(self):
         if self.classe:
@@ -1283,3 +1292,21 @@ class CaixaPublicacaoClasse(CaixaPublicacao):
         proxy = True
         verbose_name = _('Caixa de Publicação')
         verbose_name_plural = _('Caixas de Publicação')
+
+
+class CaixaPublicacaoDocumento(models.Model):
+
+    caixapublicacao = models.ForeignKey(
+        CaixaPublicacao, on_delete=models.CASCADE)
+    documento = models.ForeignKey(Documento, on_delete=models.CASCADE)
+    ordem = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return '{:02d} - {}'.format(self.ordem // 1000, self.documento)
+
+    class Meta:
+        unique_together = ('caixapublicacao', 'documento')
+        auto_created = True
+        ordering = ('ordem', '-documento')
+        verbose_name = _('Documentos da Caixa de Publicação')
+        verbose_name_plural = _('Documentos da Caixa de Publicação')

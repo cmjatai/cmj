@@ -209,7 +209,8 @@ class CaixaPublicacaoForm(forms.ModelForm):
         self.fields['documentos'].choices = [
             (d.id, '%s%s' % (
                 d,
-                (' - (%s)' % ', '.join(d.caixapublicacao_set.values_list('nome', flat=True))
+                (' - (%s)' % ', '.join(d.caixapublicacao_set.values_list(
+                    'nome', flat=True))
                  ) if d.caixapublicacao_set.exclude(
                     id=self.instance.pk).exists() else '')
              ) for d in qs[:100]
@@ -218,3 +219,8 @@ class CaixaPublicacaoForm(forms.ModelForm):
         if self.instance.pk:
             self.fields['nome'].widget.attrs = {'readonly': True}
             self.fields['key'].widget.attrs = {'readonly': True}
+
+    def save(self, commit=True):
+        inst = super().save(commit=commit)
+        inst.reordene()
+        return inst

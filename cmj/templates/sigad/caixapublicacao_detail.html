@@ -1,0 +1,26 @@
+{% extends "crud/detail.html" %}
+{% load i18n common_tags%}
+
+{% block detail_content %}
+  {{block.super}}
+  <h2 class="legend">{% trans "Documentos Selecionados" %}</h2>
+  <div class="row-fluid">
+    <div class="col-sm-12">
+      <div id="div_id_documentos" class="form-group">
+        <div class="controls">
+          <div class="form-control-static">
+              {% for cpd in caixapublicacao.caixapublicacaodocumento_set.all %}
+                <div class="">
+                  <a class="btn btn-link {% if forloop.first %}disabled{% endif %}" href="?cpd_pk={{cpd.pk}}&up"><small><i class="fa fa-chevron-up" aria-hidden="true"></small></i></a>
+                  <a class="btn btn-link {% if forloop.last %}disabled{% endif %}" href="?cpd_pk={{cpd.pk}}&down"><small><i class="fa fa-chevron-down" aria-hidden="true"></small></i></a>
+
+                  <span> {{cpd}} </span>
+
+                </div>
+              {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock detail_content %}
