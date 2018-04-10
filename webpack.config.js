@@ -2,6 +2,7 @@ var path = require('path')
 var webpack = require('webpack')
 module.exports = {
   entry: './cmj-vue/src/main.js',
+  mode: "development",
   output: {
     path: path.resolve(__dirname, './cmj/static'),
     publicPath: '/static/',
@@ -35,44 +36,54 @@ module.exports = {
       },
       {
         test: /\.vue$/,
-        loader: 'vue-loader',
-        options: {
-          loaders: {
-            'scss': [
-              'vue-style-loader',
-              'css-loader',
-              'sass-loader'
-            ],
-            'sass': [
-              'vue-style-loader',
-              'css-loader',
-              'sass-loader?indentedSyntax'
-            ]
+
+        use: [{
+          loader: 'vue-loader',
+
+          options: {
+            loaders: {
+              'scss': [
+                'vue-style-loader',
+                'css-loader',
+                'sass-loader'
+              ],
+              'sass': [
+                'vue-style-loader',
+                'css-loader',
+                'sass-loader?indentedSyntax'
+              ]
+            }
+            // other vue-loader options go here
           }
-          // other vue-loader options go here
-        }
+        }]
       },
 
       {
         test: /\.js$/,
-        loader: 'babel-loader',
+        use: [{
+          loader: 'babel-loader'
+        }],
         exclude: /node_modules/
       },
       {
         test: /\.(png|jpg|gif|svg|eot|woff|woff2|ttf)$/,
-        loader: 'file-loader',
-        options: {
-          name: 'assets/[name].[ext]?[hash]'
-        }
+
+        use: [{
+          loader: 'file-loader',
+
+          options: {
+            name: 'assets/[name].[ext]?[hash]'
+          }
+        }]
       }
     ]
   },
-  plugins: [
-    new webpack.ProvidePlugin({
-      $: "jquery",
-      jQuery: "jquery"
-    })
-  ],
+  plugins: [new webpack.ProvidePlugin({
+    $: "jquery",
+    jQuery: "jquery"
+  }), new webpack.LoaderOptionsPlugin({
+    minimize: true
+  })],
   resolve: {
     extensions: ['*', '.js', '.vue', '.json'],
     alias: {
@@ -95,9 +106,12 @@ if (process.env.NODE_ENV === 'production')
     }),
     new webpack.optimize.UglifyJsPlugin({
       sourceMap: true,
+
       compress: {
         warnings: false
-      }
+      },
+
+      sourceMap: true
     }),
     new webpack.LoaderOptionsPlugin({
       minimize: true
