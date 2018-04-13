@@ -170,10 +170,9 @@ class DocumentoForm(ModelForm):
             container.visibilidade = inst.visibilidade
             container.save()
 
-        if self.cleaned_data['capa']:
-            classe = inst.classe
-            classe.capa = inst
-            classe.save()
+        classe = inst.classe
+        classe.capa = inst if self.cleaned_data['capa'] else None
+        classe.save()
 
         return inst
 
