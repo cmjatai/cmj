@@ -363,7 +363,14 @@
         var body = document.querySelector('body');
         var footer = document.querySelector('footer');
         var main = document.querySelector('main');
-        main.style.minHeight = (body.offsetHeight - footer.offsetHeight) + 'px';
+        var nav = document.querySelectorAll('nav');
+        nav = Array.from(nav)
+        nav = nav.reduce(
+        	function(acc, val) {
+        		return acc.offsetHeight + val.offsetHeight; 
+        		}
+        	);
+        //main.style.minHeight = (body.offsetHeight - footer.offsetHeight - nav*2) + 'px';
     });
     </script>
 
