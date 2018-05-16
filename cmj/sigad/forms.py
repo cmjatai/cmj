@@ -220,6 +220,7 @@ class CaixaPublicacaoForm(forms.ModelForm):
             self.fields['key'].widget.attrs = {'readonly': True}
 
     def save(self, commit=True):
+
         inst = super().save(commit=commit)
         inst.reordene()
         return inst

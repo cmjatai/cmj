@@ -24,7 +24,7 @@ from cmj.sigad.forms import DocumentoForm, CaixaPublicacaoForm
 from cmj.sigad.models import Documento, Classe, ReferenciaEntreDocumentos,\
     PermissionsUserClasse, PermissionsUserDocumento, Revisao, CMSMixin,\
     CLASSE_TEMPLATES_CHOICE, CaixaPublicacao, CaixaPublicacaoClasse,\
-    CaixaPublicacaoDocumento
+    CaixaPublicacaoRelationship
 from cmj.utils import make_pagination
 
 
@@ -1191,7 +1191,7 @@ class CaixaPublicacaoCrud(Crud):
             if cpd_pk:
                 up = -1500 if 'up' in request.GET else 1500
                 try:
-                    cpd = CaixaPublicacaoDocumento.objects.get(pk=cpd_pk)
+                    cpd = CaixaPublicacaoRelationship.objects.get(pk=cpd_pk)
                     cpd.ordem += up
                     cpd.save()
                     cpd.caixapublicacao.reordene()

@@ -16,7 +16,7 @@ django-sass-processor==0.4.6
 django-image-cropping
 django-reversion==2.0.8
 django-taggit
-djangorestframework
+djangorestframework==3.7.3
 drfdocs
 djangorestframework-recursive
 easy-thumbnails

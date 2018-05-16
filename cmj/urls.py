@@ -31,7 +31,6 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic.base import TemplateView, RedirectView
 from django.views.static import serve as view_static_server
-
 import sapl.base.urls
 import sapl.comissoes.urls
 import sapl.compilacao.urls
@@ -44,6 +43,7 @@ import sapl.protocoloadm.urls
 import sapl.relatorios.urls
 import sapl.sessao.urls
 
+import cmj.agenda.urls
 import cmj.api.urls
 import cmj.cerimonial.urls
 import cmj.core.urls
@@ -68,6 +68,7 @@ urlpatterns = [
     url(r'', include(cmj.core.urls)),
     url(r'', include(cmj.cerimonial.urls)),
     url(r'', include(cmj.ouvidoria.urls)),
+    url(r'', include(cmj.agenda.urls)),
 
     url(r'', include(sapl.comissoes.urls)),
     url(r'', include(sapl.sessao.urls)),

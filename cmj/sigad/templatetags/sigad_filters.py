@@ -46,7 +46,7 @@ def organize_direction_avatars(pos, total):
 def caixa_publicacao(key, classe):
     try:
         cp = CaixaPublicacao.objects.get(key=key, classe=classe)
-        docs = cp.caixapublicacaodocumento_set.all()
+        docs = cp.caixapublicacaorelationship_set.all()
         result = {'url_edit': 'cmj.sigad:caixapublicacao%s_update' % ('classe' if classe else ''),
                   'cp': cp, 'docs':
                   list(

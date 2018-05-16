@@ -27,6 +27,10 @@ GROUP_OUVIDORIA_VISUALIZACAO_RESPOSTAS = _(
     'Ouvidoria - Visualização e resposta de Solcitações')
 
 
+GROUP_AGENDA_WORKSPACE = _(
+    'Área de Trabalho - Agenda - Manutenção da Agenda')
+
+
 GROUP_ANONYMOUS = ''
 
 CMJ_GROUPS = [
@@ -46,6 +50,7 @@ WORKSPACE_GROUPS = [
     GROUP_SAAP_WORKSPACE_OPER_GRUPO_CONTATOS,
     GROUP_SAAP_WORKSPACE_MANAGERS,
     GROUP_OUVIDORIA_VISUALIZACAO_RESPOSTAS,
+    GROUP_AGENDA_WORKSPACE,
 ]
 
 
@@ -58,6 +63,7 @@ menu_processos = "menu_processos"
 menu_impresso_enderecamento = "menu_impresso_enderecamento"
 menu_relatorios = "menu_relatorios"
 menu_administracao = "menu_administracao"
+menu_agenda = "menu_agenda"
 
 MENU_PERMS_FOR_USERS = (
     (menu_dados_auxiliares, _('Mostrar Menu Dados Auxiliares')),
@@ -71,4 +77,5 @@ MENU_PERMS_FOR_USERS = (
     (menu_relatorios,
      _('Mostrar Menu de Relatórios')),
     (menu_administracao, _('Mostrar Menu de Administração')),
+    (menu_agenda, _('Mostrar Menu da Agenda de Eventos')),
 )

@@ -14,9 +14,6 @@ from django.template.defaultfilters import lower
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 from django_filters.views import FilterView
-from pip._vendor.requests.certs import where
-from reportlab.graphics.charts.textlabels import Label
-from reportlab.graphics.shapes import Drawing
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_RIGHT
 from reportlab.lib.pagesizes import A4, landscape
