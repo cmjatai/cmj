@@ -1305,7 +1305,6 @@ class CaixaPublicacaoRelationship(models.Model):
         return '{:02d} - {}'.format(self.ordem // 1000, self.documento)
 
     class Meta:
-        auto_created = True
         unique_together = ('caixapublicacao', 'documento')
         ordering = ('ordem', '-documento')
         verbose_name = _('Documentos da Caixa de Publicação')

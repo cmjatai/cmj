@@ -11,7 +11,9 @@ from sapl.parlamentares.models import Parlamentar
 
 from cmj.sigad import models
 from cmj.sigad.models import Classe, Documento, Revisao, CaixaPublicacao,\
-    CLASSE_DOC_MANAGER_CHOICE, CaixaPublicacaoClasse
+    CLASSE_DOC_MANAGER_CHOICE, CaixaPublicacaoClasse,\
+    CaixaPublicacaoRelationship
+from cmj.sigad.templatetags.sigad_filters import caixa_publicacao
 from cmj.utils import YES_NO_CHOICES
 
 
@@ -219,8 +221,15 @@ class CaixaPublicacaoForm(forms.ModelForm):
             self.fields['nome'].widget.attrs = {'readonly': True}
             self.fields['key'].widget.attrs = {'readonly': True}
 
-    def save(self, commit=True):
+    def save(self, commit=False):
 
-        inst = super().save(commit=commit)
+        inst = super().save(commit=False)
+        inst.save()
+        inst.documentos.clear()
+        for doc in self.cleaned_data['documentos']:
+            CaixaPublicacaoRelationship.objects.create(
+                caixapublicacao=inst,
+                documento=doc)
+
         inst.reordene()
         return inst
