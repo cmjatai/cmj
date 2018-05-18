@@ -46,6 +46,9 @@ function refreshMask() {
     $('.dateinput').mask('00/00/0000', {placeholder:"__/__/____"});
     $('.hora').mask("00:00", {placeholder:"hh:mm"});
     $('.hora_hms').mask("00:00:00", {placeholder:"hh:mm:ss"});
+    $('.datetimeinput').mask('00/00/0000 00:00:00', {placeholder:"__/__/____ hh:mm:ss"});
+    $('.timeinput').mask("00:00", {placeholder:"hh:mm"});
+
 }
 
 function autorModal() {

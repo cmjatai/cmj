@@ -1266,7 +1266,8 @@ class CaixaPublicacao(models.Model):
         through='CaixaPublicacaoRelationship',
         through_fields=('caixapublicacao', 'documento'),
         related_query_name='caixapublicacao_set',
-        verbose_name=_('Documentos da Caixa de Públicação'))
+        verbose_name=_('Documentos da Caixa de Públicação'),
+        symmetrical=False)
 
     def reordene(self):
         ordem = 0

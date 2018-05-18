@@ -71,7 +71,7 @@ urlpatterns = [
     url(r'', include(cmj.agenda.urls)),
 
     url(r'', include(sapl.comissoes.urls)),
-    url(r'', include(sapl.sessao.urls)),
+    url(r'^sapl/', include(sapl.sessao.urls)),
     url(r'^sapl/', include(sapl.parlamentares.urls)),
     url(r'', include(sapl.materia.urls)),
     url(r'', include(sapl.norma.urls)),

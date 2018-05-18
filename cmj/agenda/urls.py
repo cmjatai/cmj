@@ -1,5 +1,7 @@
 from django.conf.urls import include, url
 
+from cmj.agenda.views import EventoCrud
+
 from .apps import AppConfig
 
 
@@ -9,6 +11,7 @@ urlpatterns_agenda = [
 
     # url(r'^fale-conosco/ouvidoria',
     # OuvidoriaPaginaInicialView.as_view(), name='ouvidoria_pagina_inicial'),
+    url(r'^evento/', include(EventoCrud.get_urls())),
 
 ]
 

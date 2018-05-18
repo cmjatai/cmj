@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from sapl.parlamentares.models import Partido
 from sapl.rules.map_rules import __base__
 
+from cmj.agenda.models import Evento
 from cmj.cerimonial.models import Perfil, EnderecoPerfil, EmailPerfil,\
     TelefonePerfil, LocalTrabalhoPerfil, DependentePerfil, OperadoraTelefonia,\
     NivelInstrucao, EstadoCivil, Contato, FiliacaoPartidaria, Dependente,\
@@ -25,7 +26,8 @@ from cmj.globalrules import (RP_ADD, RP_CHANGE, RP_DELETE, RP_DETAIL, RP_LIST,
                              menu_tabelas_auxiliares,
                              menu_administracao,
                              GROUP_SIGAD_VIEW_STATUS_RESTRITOS,
-                             GROUP_OUVIDORIA_VISUALIZACAO_RESPOSTAS)
+                             GROUP_OUVIDORIA_VISUALIZACAO_RESPOSTAS,
+                             GROUP_AGENDA_WORKSPACE, menu_agenda)
 from cmj.ouvidoria.models import Solicitacao, MensagemSolicitacao
 from cmj.sigad.models import Revisao, Classe, Documento, Midia
 
@@ -140,6 +142,19 @@ rules_saap_group_workspace_oper_processos = {
         (ProcessoContato, __base__),
     ]
 }
+
+
+rules_agenda_group_workspace = {
+    'group': GROUP_AGENDA_WORKSPACE,
+    'rules': [
+        (get_user_model(), [
+            menu_dados_auxiliares,
+            menu_agenda]),
+        (Evento, __base__)
+    ]
+}
+
+
 # não possui efeito e é usada nos testes que verificam se todos os models estão
 # neste arquivo rules.py
 rules_group_anonymous = {
@@ -184,4 +199,5 @@ rules_patterns = [
 
     rules_sigad_view_status_restritos,
     rules_ouvidoria_visualizacao_respostas,
+    rules_agenda_group_workspace
 ]

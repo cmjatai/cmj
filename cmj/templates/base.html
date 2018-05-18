@@ -155,6 +155,10 @@
                       <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'cmj.cerimonial:processo_list' %}">{% trans "Processos" %}</a></li>
                     {% endif %}
 
+                    {% if perms.core.menu_agenda %}
+                      <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'cmj.agenda:evento_list' %}">{% trans "Agenda de Eventos" %}</a></li>
+                    {% endif %}
+
 
                   {% else %}
                     {% navbar 'navbar_cmj.yaml' %}
@@ -164,24 +168,28 @@
                 </ul>
 
                 <ul class="nav navbar-nav navbar-right">
-                        {% if perms.core.menu_relatorios and not user.is_superuser%}
-                          <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Relatórios" %}<span class="caret"></span></a>
-                            <ul class="dropdown-menu menu-left">
-                              <li class="dropdown-header">{% trans "Contatos" %}</li>
-                              {% if perms.cerimonial.print_impressoenderecamento %}<li class="nav__sub-item"><a href="{% url 'cmj.cerimonial:print_impressoenderecamento' %}">{% trans "Etiquetas e Envelopes" %}</a></li>{% endif %}
-                              <li class="dropdown-header">{% trans "Processos" %}</li>
-                              {% if perms.cerimonial.print_rel_contato_agrupado_por_processo %}<li class="nav__sub-item"><a href="{% url 'cmj.cerimonial:print_rel_contato_agrupado_por_processo' %}">{% trans "Contatos Agrupados Por Processo" %}</a></li>{% endif %}
-                              <li class="dropdown-header">{% trans "Grupos" %}</li>
-                              {% if perms.cerimonial.print_rel_contato_agrupado_por_grupo %}<li class="nav__sub-item"><a href="{% url 'cmj.cerimonial:print_rel_contato_agrupado_por_grupo' %}">{% trans "Contatos Agrupados Por Grupos" %}</a></li>{% endif %}
-                            </ul>
-                          </li>
-                        {% endif %}
+                  {% if perms.core.menu_relatorios and not user.is_superuser%}
+                    <li class="dropdown">
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Relatórios" %}<span class="caret"></span></a>
+                      <ul class="dropdown-menu menu-left">
+                        <li class="dropdown-header">{% trans "Contatos" %}</li>
+                        {% if perms.cerimonial.print_impressoenderecamento %}<li class="nav__sub-item"><a href="{% url 'cmj.cerimonial:print_impressoenderecamento' %}">{% trans "Etiquetas e Envelopes" %}</a></li>{% endif %}
+                        <li class="dropdown-header">{% trans "Processos" %}</li>
+                        {% if perms.cerimonial.print_rel_contato_agrupado_por_processo %}<li class="nav__sub-item"><a href="{% url 'cmj.cerimonial:print_rel_contato_agrupado_por_processo' %}">{% trans "Contatos Agrupados Por Processo" %}</a></li>{% endif %}
+                        <li class="dropdown-header">{% trans "Grupos" %}</li>
+                        {% if perms.cerimonial.print_rel_contato_agrupado_por_grupo %}<li class="nav__sub-item"><a href="{% url 'cmj.cerimonial:print_rel_contato_agrupado_por_grupo' %}">{% trans "Contatos Agrupados Por Grupos" %}</a></li>{% endif %}
+                      </ul>
+                    </li>
+                  {% endif %}
                   {% if perms.core.menu_dados_auxiliares or perms.base.view_tabelas_auxiliares%}
                     <li class="dropdown">
                       <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Dados Auxiliares" %}<span class="caret"></span></a>
                       <ul class="dropdown-menu menu-right">
 
+                        {% if not areatrabalho and perms.core.menu_agenda %}
+                          <li class="dropdown-header">{% trans "Calendário" %}</li>
+                          <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'cmj.agenda:evento_list' %}">{% trans "Agenda de Eventos" %}</a></li>
+                        {% endif %}
                         <li class="dropdown-header">{% trans "Consultas" %}</li>
                         {% if perms.sigad.view_documento %}
                         <li class="nav__sub-item">
@@ -360,16 +368,16 @@
             $("#wrapper").toggleClass("toggled");
             $(".container").toggleClass("toggled ");
         });
-        var body = document.querySelector('body');
+        /*var body = document.querySelector('body');
         var footer = document.querySelector('footer');
         var main = document.querySelector('main');
         var nav = document.querySelectorAll('nav');
         nav = Array.from(nav)
         nav = nav.reduce(
         	function(acc, val) {
-        		return acc.offsetHeight + val.offsetHeight; 
+        		return acc.offsetHeight + val.offsetHeight;
         		}
-        	);
+        	);*/
         //main.style.minHeight = (body.offsetHeight - footer.offsetHeight - nav*2) + 'px';
     });
     </script>

@@ -1,0 +1,7 @@
+{% load i18n %}
+Evento:
+  {% trans 'Data do Evento' %}:
+  - inicio fim solicitante
+  {% trans 'Descrição' %}:
+  - titulo
+  - descricao
