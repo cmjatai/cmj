@@ -25,7 +25,8 @@
       <div class="col-md-8">
         {% include "path/pagina_inicial_noticias_destaque.html" %}
       </div>
-    <div class="col-md-4">
+    <div class="col-md-4 col-right">
+
       <div class="">
         <a href="/fale-conosco/ouvidoria" class="btn-ouvidoria">
           <i class="fa fa-bullhorn fa-2x" aria-hidden="true"></i><br>
@@ -35,6 +36,12 @@
           </a>
       </div>
 
+      {% include "path/pagina_inicial_proximos_eventos.html" %}
+      
+
+      {% with noticias_dos_parlamentares as object_list %}
+        {% include "path/pagina_inicial_noticia_parlamentares.html" %}
+      {% endwith %}
 
                 {% comment %}
 
@@ -113,9 +120,6 @@
       </div>
   {% endcomment %}
 
-      {% with noticias_dos_parlamentares as object_list %}
-          {% include "path/pagina_inicial_noticia_parlamentares.html" %}
-      {% endwith %}
     </div>
 
   </div>

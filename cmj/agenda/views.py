@@ -12,7 +12,8 @@ class EventoCrud(Crud):
     container_field = 'workspace__operadores'
 
     class BaseMixin(Crud.BaseMixin):
-        list_field_names = ('inicio', 'fim', 'titulo', 'solicitante')
+        list_field_names = ('inicio', 'fim', 'titulo',
+                            'solicitante', 'descricao')
 
         def get_initial(self):
             initial = {}
