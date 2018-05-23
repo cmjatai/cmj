@@ -1,15 +1,27 @@
+
+
+from datetime import datetime
+
 from django import template
-from cmj.sigad.models import CaixaPublicacao, Documento
+
+from cmj.agenda.models import Evento
 
 
 register = template.Library()
 
 
-"""@register.simple_tag
-def verbose_name(instance, field_name):
-    return instance._meta.get_field(field_name).verbose_name.title()
+@register.filter
+def proximos_eventos(qtd):
+    today = datetime.today().replace(hour=0,
+                                     minute=0,
+                                     second=0,
+                                     microsecond=0)
+    r = Evento.objects.filter(inicio__gte=today).order_by('inicio')[:qtd]
+
+    return r
 
 
+"""
 @register.filter
 def organize_avatars(pos, total):
     map_arranjo = {

@@ -1,18 +1,19 @@
-{% load i18n sigad_filters social_utils%}
-
-<div class="panel panel-default">
-  <div class="panel-heading">
-    Próximos Eventos
+{% load i18n agenda_filters social_utils%}
+<div class="panel-agenda">
+  <div class="heading">
+    <strong>Agênda Pública</strong>
   </div>
-
-  <div class="panel-body">
-    teste
+  <div class="body">
+      {% for evento in 20|proximos_eventos %}
+        <div class="item-agenda">
+          <span class="data">{{evento.inicio|date:"d/m/Y - H:i"}}</span>
+          <a {% if evento.link_externo %}href="{{evento.link_externo}}"{% endif %} class="titulo">{{evento.titulo}}</a>
+          <span class="descricao">{{evento.descricao}}</span>
+        </div>
+      {% endfor %}
+    </ul>
   </div>
-  <ul class="list-group">
-    <li class="list-group-item">Cras justo odio</li>
-    <li class="list-group-item">Dapibus ac facilisis in</li>
-    <li class="list-group-item">Morbi leo risus</li>
-    <li class="list-group-item">Porta ac consectetur ac</li>
-    <li class="list-group-item">Vestibulum at eros</li>
-  </ul>
+  <div class="footer">
+    <a href="#">Acessar Agenda Completa</a>
+    </div>
 </div>

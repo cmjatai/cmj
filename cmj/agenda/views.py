@@ -1,9 +1,11 @@
 from django.core.exceptions import PermissionDenied
 
 from cmj.agenda.forms import EventoForm
-from cmj.agenda.models import Evento
+from cmj.agenda.models import Evento, TipoEvento
 from cmj.core.models import AreaTrabalho
-from cmj.crud.base import Crud
+from cmj.crud.base import Crud, CrudAux
+
+TipoEventoCrud = CrudAux.build(TipoEvento, None)
 
 
 class EventoCrud(Crud):
