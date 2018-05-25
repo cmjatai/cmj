@@ -1113,6 +1113,7 @@ fieldset {
     font-variant: small-caps;
     background: rgba(#b7aa73, 0.4) url(/static/img/bg.png);
   }
+
   .footer {
     display: none;
     border-radius: 0 0 5px 5px;
@@ -1498,15 +1499,14 @@ main {
     }
 
     .img-contexto {
-      line-height: 1;
+      line-height: 1.2;
       background: white url(/static/img/bg.png);;
       .texto {
-        font-size: 0.7em;
-        font-style: italic;
+        font-size: 0.65em;
       }
       .titulo {
         padding: 5px 5px 0 5px;
-        font-weight: bold;
+        font-weight: 300;
       }
       .descricao {
         padding: 0px;
