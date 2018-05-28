@@ -1,0 +1,41 @@
+{% load i18n sigad_filters social_utils%}
+<div class="row container-noticias-secundarias">
+
+{% with 'noticias_secundarias'|caixa_publicacao:None as noticias_secundarias %}
+
+  {% for d in  noticias_secundarias.docs%}
+    <div class="path-item-list">
+      <div class="inner">
+        <div class="path-imagem alinhamento-justify">
+          <div class="imagem" style="background-image: url(https://www.jatai.go.leg.br/{{d.1.absolute_slug}}.512)"></div>
+          <a class="img-contexto" href="{% url 'cmj.sigad:path_view' d.0.absolute_slug %}">
+          </a>
+          <div class="autor">{{d.1.autor|default:''}}</div>
+        </div>
+        <div class="texto">
+
+          <div class="titulo">
+            <a href="{% url 'cmj.sigad:path_view' d.0.absolute_slug %}">
+              {{d.0.titulo}}
+            </a>
+          </div>
+
+          <div class="descricao">
+            {% social_link_share d.0 'pull-right'%}
+            {{d.0.descricao|safe|urlize}}
+            <div class="clearfix"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+  {% if perms.sigad.change_documento %}
+    <div class="btn-actions">
+      <a href="{% url 'cmj.sigad:caixapublicacao_update' noticias_secundarias.cp.pk %}" title="{% trans "Editar Caixa de Publicação" %}">
+        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+      </a>
+    </div>
+  {% endif %}
+{% endwith %}
+
+</div>

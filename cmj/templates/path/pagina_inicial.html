@@ -22,11 +22,10 @@
 {% block main_container_class %}container container{{fluid}}{{path}}{% endblock %}
 {% block base_content %}
   <div class="row">
-      <div class="col-md-8">
-        {% include "path/pagina_inicial_noticias_destaque.html" %}
-      </div>
+    <div class="col-md-8">
+      {% include "path/pagina_inicial_noticias_principais.html" %}
+    </div>
     <div class="col-md-4 col-right">
-
       <div class="">
         <a href="/fale-conosco/ouvidoria" class="btn-ouvidoria">
           <i class="fa fa-bullhorn fa-2x" aria-hidden="true"></i><br>
@@ -35,13 +34,23 @@
           </span>
           </a>
       </div>
-
       {% include "path/pagina_inicial_proximos_eventos.html" %}
-      
+    </div>
+  </div>
 
+  <div class="row">
+    <div class="col-md-6">
+      {% include "path/pagina_inicial_noticias_secudarias.html" %}
+    </div>
+    <div class="col-md-6">
       {% with noticias_dos_parlamentares as object_list %}
         {% include "path/pagina_inicial_noticia_parlamentares.html" %}
       {% endwith %}
+    </div>
+  </div>
+
+
+
 
                 {% comment %}
 
@@ -120,9 +129,7 @@
       </div>
   {% endcomment %}
 
-    </div>
 
-  </div>
 {% endblock %}
 
 {% comment %}

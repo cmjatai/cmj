@@ -1,53 +1,53 @@
 {% load i18n sigad_filters social_utils %}
 
-{% for documento in object_list %}
+<div class="container-box-parlamentares">
+  {% for documento in object_list %}
+    <div class="path-item-list  {{ documento.visibilidade_css_class}}">
+      <div class="inner">
+        <span class="data-pub">
+          <i class="fa fa-clock-o" aria-hidden="true"></i>
+          {% if documento.public_date %}
+            {{documento.public_date|date:"d"}} {% trans "de" %} {{documento.public_date|date:"F"}} {% trans "de" %} {{documento.public_date|date:"Y"}}
+          {% else%}
+            {% with documento.revisoes.first as rev %}
+              {{rev.get_visibilidade_display}} - {{rev.data}} - {% trans "por:" %} {{rev.user.first_name|default:rev.user.email}}
+            {% endwith %}
+          {% endif %}
+        </span>
 
-  <div class="path-item-list container-box-parlamentares {{ documento.visibilidade_css_class}}">
-    <div class="inner">
-      <span class="data-pub">
-        <i class="fa fa-clock-o" aria-hidden="true"></i>
-        {% if documento.public_date %}
-          {{documento.public_date|date:"d"}} {% trans "de" %} {{documento.public_date|date:"F"}} {% trans "de" %} {{documento.public_date|date:"Y"}}
-        {% else%}
-          {% with documento.revisoes.first as rev %}
-            {{rev.get_visibilidade_display}} - {{rev.data}} - {% trans "por:" %} {{rev.user.first_name|default:rev.user.email}}
-          {% endwith %}
-        {% endif %}
-      </span>
 
+        {% comment %}
+          {% social_link_share documento %}
+          <div class="clearfix"></div>
+        {% endcomment %}
 
-
-      {% comment %}
-        {% social_link_share documento %}
-        <div class="clearfix"></div>
-      {% endcomment %}
-
-      {% with documento.parlamentares.first as parlamentar %}
-        <div class="row">
-          <div class="col-xs-3">
-            {% if  documento.parlamentares.first.fotografia %}
-              <a class="avatar" href="/{{ parlamentar.classe_set.first.absolute_slug }}">
-                <img src="{{ parlamentar.fotografia.url }}">
+        {% with documento.parlamentares.first as parlamentar %}
+          <div class="row">
+            <div class="col-xs-3">
+              {% if  documento.parlamentares.first.fotografia %}
+                <a class="avatar" href="/{{ parlamentar.classe_set.first.absolute_slug }}">
+                  <img src="{{ parlamentar.fotografia.url }}">
+                </a>
+              {% endif %}
+            </div>
+            <div class="col-xs-9">
+              <a class="tags tag-parlamentar" href="/{{ documento.parlamentares.first.classe_set.first.absolute_slug }}">
+                  {{ documento.parlamentares.first.nome_parlamentar}}
               </a>
-            {% endif %}
-          </div>
-          <div class="col-xs-9">
-            <a class="tags tag-parlamentar" href="/{{ documento.parlamentares.first.classe_set.first.absolute_slug }}">
-                {{ documento.parlamentares.first.nome_parlamentar}}
-            </a>
-            <div class="titulo">
-              <a href="/{{documento.url_prefixo_parlamentar}}/{{documento.absolute_slug}}">
-                {{documento.titulo}}
-              </a>
+              <div class="titulo">
+                <a href="/{{documento.url_prefixo_parlamentar}}/{{documento.absolute_slug}}">
+                  {{documento.titulo}}
+                </a>
+              </div>
+            </div>
+            <div class="col-xs-12">
+              <div class="descricao">
+                {{ documento.descricao|default:''|safe}}
+              </div>
             </div>
           </div>
-          <div class="col-xs-12">
-            <div class="descricao">
-              {{ documento.descricao|default:''|safe}}
-            </div>
-          </div>
-        </div>
-      {% endwith %}
+        {% endwith %}
+      </div>
     </div>
-  </div>
-{% endfor %}
+  {% endfor %}
+</div>
