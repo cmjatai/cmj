@@ -1102,8 +1102,7 @@ fieldset {
 .panel-agenda {
   background: white;
   border-radius: 5px;
-  margin-bottom: 20px;
-  height: 341px;
+  height: 342px;
   overflow: hidden;
   .heading {
     border-radius: 5px 5px 0 0;
@@ -1175,6 +1174,7 @@ fieldset {
     overflow: inherit;
     position: absolute;
     z-index: 1;
+    margin-right: 10px;
   }
 }
 
