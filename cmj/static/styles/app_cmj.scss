@@ -152,6 +152,35 @@ form {
 .text-maroon {
   color: #85144b !important;
 }
+
+
+.google-search {
+  background: url(/static/img/search_box_icon36.png) no-repeat -5px 5px;
+  position: absolute;
+  padding: 10px;
+  top: 0px;
+  right: 0px;
+  width: 36px;
+  height: 36px;
+  z-index: 2001;
+  .search, .result {
+    display: none;
+  }
+  &:hover {
+    height: auto;
+    width: 45%;
+    background:  white;
+    bottom: 0px;
+    .search, .result  {
+      display: block;
+    }
+  }
+}
+
+
+
+
+
 // drunken-parrot flat ui ########################################
 
 
@@ -3160,6 +3189,13 @@ main {
       line-height: 1.9em;
     }
   }
+
+  .google-search {
+
+    display: none;
+  }
+
+
 }
 
 @media screen and (max-width: 800px) and (orientation: landscape) {
@@ -4153,6 +4189,12 @@ main {
 }
 
 @media screen and (min-width: 1281px) {
+
+    .google-search {
+      &:hover {
+        width: 40%;
+      }
+    }
   .container-gallery {
     .gallery-thumbnails {
       height: 128px;
@@ -4169,6 +4211,12 @@ main {
 }
 
 @media screen and (min-width: 1400px) {
+
+  .google-search {
+    &:hover {
+      width: 35%;
+    }
+  }
 
   .container-legislaturas {
     .avatar2 {

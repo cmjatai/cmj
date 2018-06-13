@@ -32,6 +32,19 @@
   </head>
 
   <body class="{% block body_class %}{%endblock%}">
+
+    <div class="google-search">
+      <div class="search">
+        <gcse:searchbox></gcse:searchbox>
+      </div>
+
+      <div class="result">
+        <gcse:searchresults></gcse:searchresults>
+      </div>
+
+    </div>
+
+
     <div class="page fadein" id="{% block id_wrapper %}wrapper{% endblock %}">
       {% block canais_absolute %}
         <aside>
@@ -257,6 +270,8 @@
 
         {# Main content #}
           <main id="content" class="content page__row screen-lg">
+
+
         {% block content_container %}
             <div class="{% block main_container_class %}container container{{fluid}}{{path}} container-box{% endblock %}">
 
@@ -414,7 +429,18 @@
         gtag('js', new Date());
         gtag('config', 'UA-2431536-7');
       </script>
-    {% endif %}
 
+    {% endif %}
+    <script>
+      (function() {
+        var cx = '015586130466685663092:bbp57zhgqek';
+        var gcse = document.createElement('script');
+        gcse.type = 'text/javascript';
+        gcse.async = true;
+        gcse.src = 'https://cse.google.com/cse.js?cx=' + cx;
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(gcse, s);
+      })();
+    </script>
   </body>
 </html>
