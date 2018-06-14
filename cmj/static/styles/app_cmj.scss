@@ -155,14 +155,14 @@ form {
 
 
 .google-search {
-  background: url(/static/img/search_box_icon36.png) no-repeat -5px 5px;
-  position: absolute;
+  background: rgba(0,0,0,0.1) url(/static/img/search_box_icon36.png) no-repeat 2px 3px;
+  position: fixed;
   padding: 10px;
   top: 0px;
   right: 0px;
-  width: 36px;
-  height: 36px;
-  z-index: 2001;
+  width: 42px;
+  height: 42px;
+  z-index: 2002;
   .search, .result {
     display: none;
   }
@@ -170,7 +170,11 @@ form {
     height: auto;
     width: 45%;
     background:  white;
+    overflow-y: auto;
+    top: 0px;
+    right: 0px;
     bottom: 0px;
+    border-left: 1px solid green;
     .search, .result  {
       display: block;
     }
