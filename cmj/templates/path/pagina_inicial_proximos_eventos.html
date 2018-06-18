@@ -2,6 +2,8 @@
 <div class="panel-agenda">
   <div class="heading">
     <strong>Agenda Pública</strong>
+    <span class="ag-comp">  <a href="{% url 'cmj.agenda:evento_list'%}" title="Abrir Agenda Completa">+</a>
+    </span>
   </div>
   <div class="body">
       {% for evento in 20|proximos_eventos %}
@@ -13,7 +15,4 @@
       {% endfor %}
     </ul>
   </div>
-  <div class="footer">
-    <a href="#">Acessar Agenda Completa</a>
-    </div>
 </div>

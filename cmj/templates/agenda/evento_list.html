@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}
+  <h1 class="page-header">
+    {{ view.title }} - {{object_list.1.0.0|date:"F \d\e Y"}}
+  </h1>
+{% endblock %}
+
+{% block base_content %}
+  <div class="context-actions clearfix">
+    {% block actions %}
+      <div class="actions btn-group pull-right btn-group-lg" role="group">
+        {% if view.create_url %}
+        <a href="{{ view.create_url }}" class="btn btn-default">
+          {% blocktrans with verbose_name=view.verbose_name %} Adicionar {{ verbose_name }} {% endblocktrans %}
+        </a>
+        {% endif %}
+        {% block more_buttons %}{% endblock more_buttons %}
+      </div>
+    {% endblock actions %}
+  </div>
+
+
+  <div class="container-calendar">
+    <div class="semana nomes">
+      <div class="dia">DOM</div>
+      <div class="dia">SEG</div>
+      <div class="dia">TER</div>
+      <div class="dia">QUA</div>
+      <div class="dia">QUI</div>
+      <div class="dia">SEX</div>
+      <div class="dia">SÁB</div>
+    </div>
+
+    {% for semana in object_list %}
+      <div class="semana">
+        {% for dia in semana %}
+          <div class="dia {% if dia.1 is None %}dia-out{% endif %}">
+            <div class="inner">
+              <div class="numero">
+                  {{dia.0.day}}
+              </div>
+              <div class="eventos">
+                {% for evento in dia.1 %}
+                  <div class="evento">
+                    {{evento.inicio|date:"H:i"}} - {{evento.titulo}}
+                    <div class="hover">
+                      <strong>Solicitação:</strong> {{evento.solicitante}}</br>
+                      <strong>Descrição:</strong> {{evento.descricao}}</br>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endfor %}
+  </div>
+
+
+{% endblock %}

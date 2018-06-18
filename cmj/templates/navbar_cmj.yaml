@@ -2,6 +2,8 @@
 - title: {% trans 'Institucional' %}
   url: ''
   children:
+  - title: {% trans 'Agenda Pública' %}
+    url: /evento/
   - title: {% trans 'Nossa Jataí' %}
     url: /institucional/nossa-jatai
   - title: {% trans 'História' %}

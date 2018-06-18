@@ -154,6 +154,9 @@ class AreaTrabalhoCrud(Crud):
 
     class BaseMixin(Crud.BaseMixin):
 
+        list_field_names = ['nome', 'tipo', 'parlamentar',
+                            'ativo', 'operadores']
+
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
             context['subnav_template_name'] = 'core/subnav_areatrabalho.yaml'

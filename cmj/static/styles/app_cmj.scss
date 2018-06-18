@@ -182,7 +182,92 @@ form {
 }
 
 
+.container-calendar {
+  margin-bottom: 10px;
 
+  .semana {
+    display: table;
+    width: 100%;
+    font-size: 0px;
+    .dia {
+      display: inline-block;
+      width: calc(14.2857%);
+      vertical-align: top;
+      padding: 1px;
+      font-size: 1.5rem;
+    }
+    .numero {
+      font-size: 400%;
+      font-weight: bold;
+      color: rgba($color_topo_bg, 0.1);
+      position: absolute;
+      right: 0px;
+      line-height: 1;
+      padding: 5px;
+    }
+    .dia-out {
+      .numero {
+        font-size:150%;
+        color: #aaa;
+      }
+    }
+    .inner {
+      position: relative;
+      background: $color_main_bg url(/static/img/bg.png);
+      padding: 2px;
+      height: 140px;
+      overflow: hidden;
+      &:hover {
+        height: auto;
+        min-height: 140px;
+        overflow: inherit;
+      }
+    }
+    .evento {
+      font-size: 90%;
+      border-bottom: 1px solid #ccc;
+      line-height: 1.2;
+      color: #343;
+      position: relative;
+      .hover {
+        display: none;
+        position: absolute;
+        background: white;
+        z-index: 1;
+        min-width: 100%;
+        padding: 5px;
+        border: 1px solid #cdc;
+        left: 10%;
+        top: 100%;
+        box-shadow: 0px 0px 3px #bbb;
+      }
+      &:hover {
+        background: url(/static/img/bg.png);
+        .hover {
+          display: inline-block;
+        }
+      }
+    }
+  }
+
+  .nomes {
+    background: $color_topo_bg;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+
+    .dia {
+      font-size: 1.5rem;
+    }
+  }
+  .mes {
+    color: $color_topo_bg;
+    background:white;
+    font-size: 130%;
+    display: inline-block;
+
+  }
+}
 
 
 // drunken-parrot flat ui ########################################
@@ -1137,6 +1222,7 @@ fieldset {
   border-radius: 5px;
   height: 342px;
   overflow: hidden;
+  position: relative;
   .heading {
     border-radius: 5px 5px 0 0;
     padding: 10px 10px 6px 10px;
@@ -1146,15 +1232,11 @@ fieldset {
     background: rgba(#b7aa73, 0.4) url(/static/img/bg.png);
   }
 
-  .footer {
-    display: none;
-    border-radius: 0 0 5px 5px;
-    text-align: right;
-    line-height: 1;
+  .ag-comp {
     font-weight: bold;
-    font-size: 75%;
-    padding: 4px 10px;
-    background: rgba(#b7aa73, 0.7) url(/static/img/bg.png);
+    position: absolute;
+    top: 10px;
+    right: 10px;
   }
   .item-agenda:nth-child(odd)  {
     background: rgba(#b7aa73, 0.15) url(/static/img/bg.png);
