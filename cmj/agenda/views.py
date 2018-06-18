@@ -65,19 +65,32 @@ class EventoCrud(Crud):
             ol = context['object_list']
             calendar.setfirstweekday(calendar.SUNDAY)
 
-            now = datetime.now()
+            try:
+                m = int(self.request.GET.get('m', '0'))
+            except:
+                m = 0
 
-            cal = calendar.monthcalendar(now.year, now.month)
+            context['m_next'] = m + 1
+            context['m_previous'] = m - 1
+
+            now = datetime.now()
+            mes_base = datetime(now.year, now.month, 15)
+            mes_base = mes_base + timedelta(days=int(m) * 30)
+
+            cal = calendar.monthcalendar(mes_base.year, mes_base.month)
 
             for i, semana in enumerate(cal):
                 for j, dia in enumerate(semana):
                     if dia:
                         cal[i][j] = [
-                            datetime(now.year, now.month, dia), []]
+                            datetime(mes_base.year, mes_base.month, dia),
+                            [],
+                            now.day == dia and mes_base.month == now.month
+                        ]
 
             for evento in ol.filter(
-                    inicio__year=now.year,
-                    inicio__month=now.month):
+                    inicio__year=mes_base.year,
+                    inicio__month=mes_base.month):
                 ano = evento.inicio.year
                 mes = evento.inicio.month
                 dia = evento.inicio.day
@@ -92,7 +105,7 @@ class EventoCrud(Crud):
                     dia_pos = dia[0]
                 else:
                     dia_pos = dia_pos - timedelta(days=1)
-                    linha_inicial[i] = [dia_pos, None]
+                    linha_inicial[i] = [dia_pos, None, False]
 
             cal[0] = linha_inicial[::-1]
 
@@ -102,7 +115,9 @@ class EventoCrud(Crud):
                     dia_pos = dia[0]
                 else:
                     dia_pos = dia_pos + timedelta(days=1)
-                    linha_final[i] = [dia_pos, None]
+                    linha_final[i] = [
+                        dia_pos, None,
+                        now.day == dia and mes_base.month == now.month]
 
             cal[-1] = linha_final
 

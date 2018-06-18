@@ -184,7 +184,25 @@ form {
 
 .container-calendar {
   margin-bottom: 10px;
-
+  position: relative;
+  .btn-calendar {
+    position: absolute;
+    top: 20px;
+    z-index: 1;
+    font-size: 400%;
+    a {
+      color: rgba($color_topo_bg, 0.3);
+      &:hover {
+          color: rgba($color_topo_bg, 0.9);
+      }
+    }
+  }
+  .btn-next {
+    right: 0px;
+  }
+  .btn-previous {
+    left: 0px;
+  }
   .semana {
     display: table;
     width: 100%;
@@ -195,20 +213,32 @@ form {
       vertical-align: top;
       padding: 1px;
       font-size: 1.5rem;
+      &:last-child {
+        padding-right: 0;
+      }
+      &:first-child {
+        padding-left: 0;
+      }
     }
     .numero {
       font-size: 400%;
       font-weight: bold;
       color: rgba($color_topo_bg, 0.1);
       position: absolute;
-      right: 0px;
+      right: 10px;
       line-height: 1;
       padding: 5px;
+      bottom: 0px;
     }
     .dia-out {
       .numero {
-        font-size:150%;
-        color: #aaa;
+        font-size:200%;
+        color: #ccc;
+      }
+    }
+    .dia-now {
+      .numero {
+        color: darken(yellow,5);
       }
     }
     .inner {
@@ -234,7 +264,7 @@ form {
         position: absolute;
         background: white;
         z-index: 1;
-        min-width: 100%;
+        min-width: 110%;
         padding: 5px;
         border: 1px solid #cdc;
         left: 10%;
@@ -248,6 +278,7 @@ form {
         }
       }
     }
+
   }
 
   .nomes {
