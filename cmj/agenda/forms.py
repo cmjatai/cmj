@@ -24,7 +24,7 @@ class CustomSplitDateTimeWidget(SplitDateTimeWidget):
 
 class EventoForm(ModelForm):
     inicio = SplitDateTimeField(widget=CustomSplitDateTimeWidget)
-    fim = SplitDateTimeField(widget=CustomSplitDateTimeWidget)
+    fim = SplitDateTimeField(widget=CustomSplitDateTimeWidget, required=False)
 
     class Meta:
         model = Evento

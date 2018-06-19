@@ -3,7 +3,7 @@
 
 {% block title %}
   <h1 class="page-header">
-    {{ view.title }} - {{object_list.1.0.0|date:"F \d\e Y"}}
+    {{ view.title }} - {{object_list.1.0.data|date:"F \d\e Y"}}
   </h1>
 {% endblock %}
 
@@ -47,17 +47,29 @@
     {% for semana in object_list %}
       <div class="semana">
         {% for dia in semana %}
-          <div class="dia {% if dia.1 is None %}dia-out{% endif %} {% if dia.2 %}dia-now{% endif %}">
+          <div class="dia {% if dia.eventos is None %}dia-out{% endif %} {% if dia.now %}dia-now{% endif %}{% if dia.destaque %}dia-destaque{% endif %}">
             <div class="inner">
               <div class="numero">
-                  {{dia.0.day}}
+                  {{dia.data.day}}
               </div>
               <div class="eventos">
-                {% for evento in dia.1 %}
-                  <div class="evento">
-                    {{evento.inicio|date:"H:i"}} - {{evento.titulo}}
+                {% for evento in dia.eventos %}
+                  <div class="evento {% if evento.caracteristica == evento.FERIADO %}evento-feriado{% endif %}">
+                    {% if perms.agenda.change_evento %}
+                      <a href="{% url 'cmj.agenda:evento_update' evento.pk %}">
+                        {% if evento.caracteristica != evento.FERIADO %}
+                            {{evento.inicio|date:"H:i"}} -
+                        {% endif %}
+                        {{evento.titulo}}
+                      </a>
+                    {% else %}
+                      {% if evento.caracteristica != evento.FERIADO %}
+                          {{evento.inicio|date:"H:i"}} -
+                      {% endif %}
+                      {{evento.titulo}}
+                    {% endif %}
                     <div class="hover">
-                      <strong>Solicitação:</strong> {{evento.solicitante}}</br>
+                      {% if evento.caracteristica != evento.FERIADO %}<strong>Solicitação:</strong> {{evento.solicitante}}</br>{% endif %}
                       <strong>Descrição:</strong> {{evento.descricao}}</br>
                     </div>
                   </div>

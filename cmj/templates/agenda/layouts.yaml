@@ -3,7 +3,7 @@ Evento:
   {% trans 'Data do Evento' %}:
   - inicio fim solicitante
   {% trans 'Descrição' %}:
-  - titulo tipo:5
+  - titulo:6 tipo caracteristica
   - descricao
   - link_externo
 TipoEvento:

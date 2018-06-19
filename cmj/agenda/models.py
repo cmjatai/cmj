@@ -23,8 +23,13 @@ class TipoEvento(models.Model):
 
 class Evento(models.Model):
 
+    EVENTO = 0
+    FERIADO = 1
+    CARACTERISTICA_CHOICE = ((EVENTO, _('Eventos Diversos')),
+                             (FERIADO, _('Feriado')))
+
     inicio = models.DateTimeField(_("Início"))
-    fim = models.DateTimeField(_("Fim"))
+    fim = models.DateTimeField(_("Fim"), blank=True, null=True)
     titulo = models.CharField(_("Título"), max_length=255)
     descricao = models.TextField(_("Descrição"))
 
@@ -32,6 +37,10 @@ class Evento(models.Model):
         TipoEvento,
         verbose_name=_('Tipo de Evento'),
         related_name='+', on_delete=PROTECT)
+
+    caracteristica = models.PositiveSmallIntegerField(
+        choices=CARACTERISTICA_CHOICE,
+        default=0, verbose_name=_('Caracteristica?'))
 
     link_externo = models.URLField(_('Url Externa'), default='', blank=True)
 

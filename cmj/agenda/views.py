@@ -82,11 +82,12 @@ class EventoCrud(Crud):
             for i, semana in enumerate(cal):
                 for j, dia in enumerate(semana):
                     if dia:
-                        cal[i][j] = [
-                            datetime(mes_base.year, mes_base.month, dia),
-                            [],
-                            now.day == dia and mes_base.month == now.month
-                        ]
+                        cal[i][j] = {
+                            'data': datetime(mes_base.year, mes_base.month, dia),
+                            'eventos': [],
+                            'now': now.day == dia and mes_base.month == now.month,
+                            'destaque': False
+                        }
 
             for evento in ol.filter(
                     inicio__year=mes_base.year,
@@ -97,27 +98,39 @@ class EventoCrud(Crud):
 
                 primeiro_dia = datetime(ano, mes, 1)
                 dia_pos = dia + primeiro_dia.weekday()
-                cal[(dia_pos) // 7][(dia_pos) % 7][1].insert(0, evento)
+
+                if evento.caracteristica == Evento.FERIADO:
+                    cal[(dia_pos) // 7][(dia_pos) % 7]['destaque'] = True
+
+                cal[(dia_pos) // 7][(dia_pos) % 7]['eventos'].insert(0, evento)
 
             linha_inicial = cal[0][::-1]
             for i, dia in enumerate(linha_inicial):
                 if dia:
-                    dia_pos = dia[0]
+                    dia_pos = dia['data']
                 else:
                     dia_pos = dia_pos - timedelta(days=1)
-                    linha_inicial[i] = [dia_pos, None, False]
+                    linha_inicial[i] = {
+                        'data': dia_pos,
+                        'eventos': None,
+                        'now': False,
+                        'destaque': False
+                    }
 
             cal[0] = linha_inicial[::-1]
 
             linha_final = cal[-1]
             for i, dia in enumerate(linha_final):
                 if dia:
-                    dia_pos = dia[0]
+                    dia_pos = dia['data']
                 else:
                     dia_pos = dia_pos + timedelta(days=1)
-                    linha_final[i] = [
-                        dia_pos, None,
-                        now.day == dia and mes_base.month == now.month]
+                    linha_final[i] = {
+                        'data': dia_pos,
+                        'eventos': None,
+                        'now': now.day == dia and mes_base.month == now.month,
+                        'destaque': False
+                    }
 
             cal[-1] = linha_final
 

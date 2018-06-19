@@ -241,6 +241,12 @@ form {
         color: darken(yellow,5);
       }
     }
+    .dia-destaque {
+      background-color: rgba($color_topo_bg, 0.2);
+      .numero {
+        color: rgba(red,0.5);
+      }
+    }
     .inner {
       position: relative;
       background: $color_main_bg url(/static/img/bg.png);
@@ -254,6 +260,7 @@ form {
       }
     }
     .evento {
+
       font-size: 90%;
       border-bottom: 1px solid #ccc;
       line-height: 1.2;
@@ -278,11 +285,17 @@ form {
         }
       }
     }
-
+    .evento-feriado {
+      color: rgba(red,0.5);
+      border-bottom: 1px solid rgba(red,0.2);
+      a {
+        color: rgba(red,0.5);
+      }
+    }
   }
 
   .nomes {
-    background: $color_topo_bg;
+    background: rgba($color_topo_bg,0.5);
     color: white;
     font-weight: bold;
     text-align: center;
