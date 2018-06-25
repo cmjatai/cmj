@@ -55,19 +55,12 @@
               <div class="eventos">
                 {% for evento in dia.eventos %}
                   <div class="evento {% if evento.caracteristica == evento.FERIADO %}evento-feriado{% endif %}">
-                    {% if perms.agenda.change_evento %}
-                      <a href="{% url 'cmj.agenda:evento_update' evento.pk %}">
-                        {% if evento.caracteristica != evento.FERIADO %}
-                            {{evento.inicio|date:"H:i"}} -
-                        {% endif %}
-                        {{evento.titulo}}
-                      </a>
-                    {% else %}
+                    <a href="{% if perms.agenda.change_evento %}{% url 'cmj.agenda:evento_update' evento.pk %}{% elif evento.link_externo %}{{evento.link_externo}}{% else %}#{% endif %}">
                       {% if evento.caracteristica != evento.FERIADO %}
                           {{evento.inicio|date:"H:i"}} -
                       {% endif %}
                       {{evento.titulo}}
-                    {% endif %}
+                    </a>
                     <div class="hover">
                       {% if evento.caracteristica != evento.FERIADO %}<strong>Solicitação:</strong> {{evento.solicitante}}</br>{% endif %}
                       <strong>Descrição:</strong> {{evento.descricao}}</br>
