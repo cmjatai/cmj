@@ -14,7 +14,7 @@ if __name__ == "__main__":
     from cmj.cerimonial.models import Processo, Contato, Telefone, Endereco
     from cmj.core.models import AreaTrabalho
 
-    at = AreaTrabalho.objects.get(pk=6)
+    at = AreaTrabalho.objects.get(pk=9)
     print(at.nome)
 
     """processos = Processo.objects.filter(
@@ -75,9 +75,9 @@ if __name__ == "__main__":
                 continue
             row_title.append(field.verbose_name)
 
-        row_title.append('Data')
-        row_title.append('Processos')
-        row_title.append('Observações')
+        # row_title.append('Data')
+        # row_title.append('Processos')
+        # row_title.append('Observações')
 
         writer.writerow(row_title)
 
@@ -107,6 +107,8 @@ if __name__ == "__main__":
             row.append(telefones)
 
             for endereco in c.endereco_set.all():
+                if not endereco.endereco:
+                    continue
                 for field in get_model_fields(Endereco):
                     if campo_excluido(field, (excludes_fields, endereco_excludes_fields)):
                         continue
@@ -115,7 +117,7 @@ if __name__ == "__main__":
                     else:
                         row.append('')
 
-            titulo_processos = ''
+            """titulo_processos = ''
             if c.processo_set.exists():
                 pf = c.processo_set.order_by('data').first()
                 row.append(formats.date_format(
@@ -136,9 +138,9 @@ if __name__ == "__main__":
                 row.append(formats.date_format(
                     c.created, "DATE_FORMAT"))
 
-            row.append(titulo_processos)
+            row.append(titulo_processos)"""
 
-            row.append(c.observacoes)
+            # row.append(c.observacoes)
 
             writer.writerow(row)
 
