@@ -3,7 +3,6 @@ django-haystack==2.6.0
 django>=1.11,<2.0
 git+git://github.com/django-admin-bootstrapped/django-admin-bootstrapped.git
 django-bootstrap3==9.1.0
-django-bower==5.1.0
 django-braces==1.9.0
 django-compressor==2.0
 django-crispy-forms==1.6.0
@@ -23,7 +22,7 @@ easy-thumbnails
 libsass==0.11.1
 psycopg2-binary==2.7.4
 python-decouple==3.0
-pytz==2016.4
+pytz==2018.5
 pyyaml==3.11
 rtyaml==0.0.3
 unipath==1.1
@@ -39,3 +38,4 @@ whoosh==2.7.4
 pysolr==3.6.0
 django-reversion-compare==0.8.4
 django-speedinfo==1.3.5
+django-webpack-loader

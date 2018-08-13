@@ -1,4 +1,5 @@
-{% load i18n staticfiles sass_tags menus common_cmj_tags cropping%}
+{% load i18n staticfiles menus common_cmj_tags cropping%}
+{% load render_bundle from webpack_loader %}
 <!DOCTYPE html>
 <!--[if IE 8]> <html class="no-js lt-ie9" lang="en"> <![endif]-->
 <!--[if gt IE 8]><!-->
@@ -21,18 +22,22 @@
 
     {% block head_content %}
       <link rel="icon" href="{% static 'img/logo_128.png' %}"  type="image/png" >
-      <link rel="stylesheet" href="{% sass_src 'styles/header.scss' %}" type="text/css">
-      <link rel="stylesheet" href="{% static 'drunken-parrot-flat-ui/css/drunken-parrot.css' %}">
-      <link rel="stylesheet" href="{% static 'components-font-awesome/css/font-awesome.css' %}">
-      <link rel="stylesheet" href="{% static 'jquery-ui/themes/cupertino/jquery-ui.min.css' %}">
-      <link rel="stylesheet" href="{% sass_src 'styles/app_cmj.scss' %}{% if DEBUG %}?time={% now "jS F Y H:i:s" %}{% endif %}" type="text/css">
+      {% render_bundle  'hellow' 'css' %}
+                              {% comment "" %}
+
+                                <link rel="stylesheet" href="{% sass_src 'styles/header.scss' %}" type="text/css">
+                                <link rel="stylesheet" href="{% static 'drunken-parrot-flat-ui/css/drunken-parrot.css' %}">
+                                <link rel="stylesheet" href="{% static 'components-font-awesome/css/font-awesome.css' %}">
+                                <link rel="stylesheet" href="{% static 'jquery-ui/themes/cupertino/jquery-ui.min.css' %}">
+                                <link rel="stylesheet" href="{% sass_src 'styles/app_cmj.scss' %}{% if DEBUG %}?time={% now "jS F Y H:i:s" %}{% endif %}" type="text/css">
+                              {% endcomment %}
     {% endblock %}
 
-    <script type="text/javascript" src="{% static 'jquery/dist/jquery.min.js' %}"></script>
   </head>
 
   <body class="{% block body_class %}{%endblock%}">
 
+    <div id=app></div>
     <div class="google-search">
       <div class="search">
         <strong>
@@ -359,25 +364,28 @@
   </footer>
 
     {% block foot_js %}
-      <!-- Bootstrap core JavaScript ================================================== -->
-      <!-- Placed at the end of the document so the pages load faster -->
-      <script type="text/javascript" src="{% static 'bootstrap-sass/assets/javascripts/bootstrap.min.js' %}"></script>
+      {% render_bundle  'hellow' 'js' %}
+                                                          {% comment  %}
+                                                            <!-- Bootstrap core JavaScript ================================================== -->
+                                                            <!-- Placed at the end of the document so the pages load faster -->
+                                                            <script type="text/javascript" src="{% static 'bootstrap-sass/assets/javascripts/bootstrap.min.js' %}"></script>
 
-      <script type="text/javascript" src="{% static 'jquery-ui/jquery-ui.min.js' %}"></script>
-      <script type="text/javascript" src="{% static 'jquery-ui/ui/i18n/datepicker-pt-BR.js' %}"></script>
+                                                            <script type="text/javascript" src="{% static 'jquery-ui/jquery-ui.min.js' %}"></script>
+                                                            <script type="text/javascript" src="{% static 'jquery-ui/ui/i18n/datepicker-pt-BR.js' %}"></script>
 
-      <script type="text/javascript" src="{% static 'js/jquery.runner.js' %}"></script>
+                                                            <script type="text/javascript" src="{% static 'js/jquery.runner.js' %}"></script>
 
-      <script type="text/javascript" src="{% static 'jquery-mask-plugin/dist/jquery.mask.js' %}"></script>
-      <script type="text/javascript" src="{% static 'drunken-parrot-flat-ui/js/checkbox.js' %}"></script>
-      <script type="text/javascript" src="{% static 'drunken-parrot-flat-ui/js/radio.js' %}"></script>
+                                                            <script type="text/javascript" src="{% static 'jquery-mask-plugin/dist/jquery.mask.js' %}"></script>
+                                                            <script type="text/javascript" src="{% static 'drunken-parrot-flat-ui/js/checkbox.js' %}"></script>
+                                                            <script type="text/javascript" src="{% static 'drunken-parrot-flat-ui/js/radio.js' %}"></script>
 
-      <script src="{% static 'tinymce/tinymce.min.js' %}"></script>
-      <script type="text/javascript" src="{% static 'jsdiff/diff.min.js' %}"></script>
+                                                            <script src="{% static 'tinymce/tinymce.min.js' %}"></script>
+                                                            <script type="text/javascript" src="{% static 'jsdiff/diff.min.js' %}"></script>
 
-      <script type="text/javascript" src="{% static 'js/app.js' %}"></script>
+                                                            <script type="text/javascript" src="{% static 'js/app.js' %}"></script>
 
-      <script type="text/javascript" src="{% static 'js/app_cmj.js' %}{% if DEBUG %}?time={% now "jS F Y H:i:s" %}{% endif %}"></script>
+                                                            <script type="text/javascript" src="{% static 'js/app_cmj.js' %}{% if DEBUG %}?time={% now "jS F Y H:i:s" %}{% endif %}"></script>
+                                                          {% endcomment %}
       {% block extra_js %}{% endblock %}
 
     {% endblock foot_js %}

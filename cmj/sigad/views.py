@@ -40,7 +40,9 @@ class PaginaInicialView(TemplateView):
 
         context['noticias_dos_parlamentares'] = np
 
+        
         return context
+
 
     def get_noticias_dos_parlamentares(self):
         legislatura_atual = Legislatura.objects.first()
@@ -51,9 +53,11 @@ class PaginaInicialView(TemplateView):
             count_parlamentar=Count("parlamentares", distinct=True)
         ).filter(
             parlamentares__mandato__legislatura_id=legislatura_atual.id,
-            count_parlamentar=1
+            count_parlamentar=1,
+            parlamentares__ativo=True
         ).values_list('id', flat=True)
 
+        
         docs = Documento.objects.filter(
             id__in=docs
         ).distinct(
