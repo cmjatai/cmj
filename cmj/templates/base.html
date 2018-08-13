@@ -37,8 +37,6 @@
   </head>
 
   <body class="{% block body_class %}{%endblock%}">
-
-    <div class='teste'>teste</div>
     <div id=app></div>
     <div class="google-search">
       <div class="search">
@@ -370,9 +368,9 @@
       {% render_bundle  'manifest' %}
       {% render_bundle  'vendor' %}
     {% endif %}
-    {% render_bundle  'hellow' 'js' %}
     {% render_bundle  'globals' 'js' %}
-                                                          {% comment %}
+    {% comment %}
+    {% render_bundle  'hellow' 'js' %}
                                                             <script type="text/javascript" src="{% static 'bootstrap-sass/assets/javascripts/bootstrap.min.js' %}"></script>
                                                             <script type="text/javascript" src="{% static 'jquery-ui/jquery-ui.min.js' %}"></script>
                                                             <script type="text/javascript" src="{% static 'jquery-ui/ui/i18n/datepicker-pt-BR.js' %}"></script>
