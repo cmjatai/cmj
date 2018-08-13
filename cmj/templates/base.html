@@ -370,6 +370,7 @@
       {% render_bundle  'manifest' %}
       {% render_bundle  'vendor' %}
     {% endif %}
+    {% render_bundle  'hellow' 'js' %}
     {% render_bundle  'globals' 'js' %}
                                                           {% comment %}
                                                             <script type="text/javascript" src="{% static 'bootstrap-sass/assets/javascripts/bootstrap.min.js' %}"></script>
@@ -386,27 +387,27 @@
                                                           {% endcomment %}
     {% block extra_js %}{% endblock %}
   {% endblock foot_js %}
+  <script>
+    $(document).ready(function() {
+      $("#menu-toggle").click(function(e) {
+        e.preventDefault();
+        $("#wrapper").toggleClass("toggled");
+        $(".container").toggleClass("toggled ");
+      });
+      /*var body = document.querySelector('body');
+      var footer = document.querySelector('footer');
+      var main = document.querySelector('main');
+      var nav = document.querySelectorAll('nav');
+      nav = Array.from(nav)
+      nav = nav.reduce(
+        function(acc, val) {
+          return acc.offsetHeight + val.offsetHeight;
+        }
+        );*/
+        //main.style.minHeight = (body.offsetHeight - footer.offsetHeight - nav*2) + 'px';
+      });
+  </script>
                                                           {% comment %}
-                                                            <script>
-                                                              $(document).ready(function() {
-                                                                $("#menu-toggle").click(function(e) {
-                                                                  e.preventDefault();
-                                                                  $("#wrapper").toggleClass("toggled");
-                                                                  $(".container").toggleClass("toggled ");
-                                                                });
-                                                                /*var body = document.querySelector('body');
-                                                                var footer = document.querySelector('footer');
-                                                                var main = document.querySelector('main');
-                                                                var nav = document.querySelectorAll('nav');
-                                                                nav = Array.from(nav)
-                                                                nav = nav.reduce(
-                                                                  function(acc, val) {
-                                                                    return acc.offsetHeight + val.offsetHeight;
-                                                                  }
-                                                                  );*/
-                                                                  //main.style.minHeight = (body.offsetHeight - footer.offsetHeight - nav*2) + 'px';
-                                                                });
-                                                              </script>
     
                                                               {% if not DEBUG %}
                                                               <script>

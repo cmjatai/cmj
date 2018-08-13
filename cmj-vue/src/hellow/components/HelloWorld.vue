@@ -1,6 +1,7 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
+    <h1>{{ msg2 }}</h1>
     <h2>Essential Links</h2>
     <ul>
       <li>
@@ -84,11 +85,13 @@
 </template>
 
 <script>
+import $ from 'jquery'
 export default {
   name: 'HelloWorld',
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App'
+      msg: 'Welcome to Your Vue.js App',
+      msg2: $('.navbar-brand').text()
     }
   }
 }
