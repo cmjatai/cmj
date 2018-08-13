@@ -1,2 +1,2 @@
-import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap/scss/bootstrap.scss'
 import './scss/app.scss'
