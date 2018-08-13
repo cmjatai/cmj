@@ -1,6 +1,6 @@
-.bg-black {
-  color: #f9f9f9 !important;
-
+@import 'header';
+.teste {
+  font-size: $h1-font-size;
   small {
     color: rgba(white, 0.7);
   }

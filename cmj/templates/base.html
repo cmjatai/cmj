@@ -39,6 +39,7 @@
 
   <body class="{% block body_class %}{%endblock%}">
 
+    <div class='teste'>teste</div>
     <div id=app></div>
     <div class="google-search">
       <div class="search">
@@ -365,7 +366,7 @@
     </div>
   </footer>
   {% block foot_js %}
-  
+
     {% if not DEBUG %}
       {% render_bundle  'manifest' %}
       {% render_bundle  'vendor' %}

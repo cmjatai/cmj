@@ -1,0 +1,225 @@
+
+@import "variables";
+
+@mixin placeholder($color, $opacity, $fontsize, $fontweight) {
+  &::-webkit-input-placeholder {
+    color: $color !important;
+    opacity: $opacity;
+    font-size: $fontsize;
+    font-weight: $fontweight;
+  }
+  &::-moz-placeholder {
+    color: $color !important;
+    opacity: $opacity;
+    font-size: $fontsize;
+    font-weight: $fontweight;
+  }
+  &::-moz-placeholder {
+    color: $color !important;
+    opacity: $opacity;
+    font-size: $fontsize;
+    font-weight: $fontweight;
+  }
+  &:-ms-input-placeholder {
+    color: $color !important;
+    opacity: $opacity;
+    font-size: $fontsize;
+    font-weight: $fontweight;
+  }
+}
+
+// ADJUST tela de login ########################################
+.html-login, {
+  background-color: $color_topo_bg;
+  background-image: none;
+  a.navbar-brand {
+    font-size: 50px;
+    margin-left: -10px !important;
+  }
+  body, .navbar {
+    background-color: $color_topo_bg;
+    background-image: none;
+  }
+}
+.login-page {
+  footer {
+    border-width: 1px;
+    margin-top: 100px;
+    bottom: 0px;
+  }
+  footer > div:first-child {
+    display: none;
+  }
+
+}
+
+.container-login {
+  min-height: 100%;
+  position: relative;
+  margin: 7% 15%;
+  background-color: transparent;
+  color: $color_topo_bg;
+  .logo-cmj {
+    position: absolute;
+    opacity: 0.7;
+    right: 15px;
+    top: 2px;
+    width: 60px;
+    z-index: 1;
+  }
+  .label2 {
+    color: white;
+    font-weight: normal;
+    font-size: 3em;
+    margin: 0;
+    font-weight: normal;
+    font-size: 2em;
+    background: $color_topo_bg;
+    padding: 0 20px;
+  }
+  .input-icon {
+    margin: 30px 10% 0;
+  }
+  #login-form {
+    border-radius: 5px;
+    background: white url(/static/img/bg.png);
+    overflow: hidden;
+  }
+  .row-recovery {
+    margin: 0 10%;
+    text-align: right;
+  }
+  input {
+    height: 2.5em;
+    font-size: 1.4em;
+    border: 1px solid rgba($color_topo_bg, 0.7);
+
+    padding: 1em;
+    background-color: rgba(255, 255, 255, 0.8);
+    &:focus {
+      background-color: white;
+    }
+    @include placeholder($color_topo_bg, 0.5, 1em, normal);
+
+  }
+  .btn-recovery {
+    color: #aaa;
+  }
+  .alert-danger {
+    color:white;
+    background-color: #aa0000;
+    border-radius: 0;
+    margin: 20px;
+
+  }
+
+  .btns-login {
+    margin: 0.7em auto 0;
+    display: block;
+    max-width: 500px;
+
+    .btn-login {
+      display: inline-block;
+      width: 100%;
+      letter-spacing: 4px;
+      margin-top: 1em;
+      text-align: center;
+      font-family: "Graduate";
+
+      border: 1px solid $color_topo_bg;
+      background-color: $color_topo_bg;
+      line-height: 40px;
+      color: white;
+
+      &[name="facebook"]  {
+        border: 1px solid #0073b7;
+        background-color:  #0073b7;
+      }
+      &[name="google-oauth2"] {
+        border: 1px solid #e55;
+        background-color: #e55;
+      }
+      &:hover {
+        border: 1px solid #000;
+        background: black url(/static/img/bg.png);
+      }
+      img {
+        width: 24px;
+      }
+    }
+  }
+
+}
+
+.container-login-inner {
+  .container-login {
+    margin: 30px 15%;
+  }
+}
+
+
+@media screen and (max-width: 991px) {
+  .container-login {
+    margin: 1% 10%;
+    .btns-login {
+      margin: 0.7em 5% 0;
+    }
+  }
+}
+@media screen and (max-width: 600px) {
+  .container-login {
+    margin: 10% 5%;
+    .input-icon {
+      margin: 30px 5% 0;
+    }
+    .label2 {
+      font-size: 1.5em;
+    }
+    input {
+      height:2em;
+      font-size: 1.2em;
+      padding: 0.5em 0.5em;
+    }
+    .btns-login {
+      margin: 0.7em 5% 0;
+      .btn-login {
+        letter-spacing: 3px;
+      }
+    }
+  }
+  .container-login-inner {
+    .container-login {
+      margin: 10px 1%;
+    }
+    .inner-ouvidoria {
+      padding: 0px;
+    }
+  }
+}
+@media screen and (max-width: 480px) {
+  .container-login {
+    margin: 10px 0;
+    .input-icon {
+      margin: 15px 15px 0;
+    }
+    .row-recovery {
+      margin: 0 10px;
+    }
+    .btns-login {
+      margin: 0 5px;
+      .btn-login {
+        margin-top: 10px;
+        letter-spacing: 2px;
+      }
+    }
+  }
+  .container-login-inner {
+    .container-login {
+      margin: 10px 0;
+    }
+
+    .inner-ouvidoria {
+      padding: 30px;
+    }
+  }
+}
