@@ -1,12 +1,46 @@
-@import "variables";
+@import 'header';
+
+.teste {
+  font-size: $h1-font-size;
+  small {
+    color: rgba(white, 0.7);
+  }
+}
+
+body, html {
+  background: $color_main_bg;
+}
+
+.google-search {
+  background: rgba(0,0,0,0.1) url(../img/search_box_icon36.png) no-repeat 2px 3px;
+  position: fixed;
+  padding: 10px;
+  top: 0px;
+  right: 0px;
+  width: 42px;
+  height: 42px;
+  z-index: 2002;
+  .search, .result {
+    display: none;
+  }
+  &:hover {
+    height: auto;
+    width: 45%;
+    background:  white;
+    overflow-y: auto;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    border-left: 1px solid green;
+    .search, .result  {
+      display: block;
+    }
+  }
+}
 
 form {
   margin-top: 1em;
 }
-
-
-
-
 
 .container-calendar {
   margin-bottom: 10px;
@@ -75,7 +109,7 @@ form {
     }
     .inner {
       position: relative;
-      background: $color_main_bg url(/static/img/bg.png);
+      background: $color_main_bg url(../img/bg.png);
       padding: 2px;
       height: 140px;
       overflow: hidden;
@@ -105,7 +139,7 @@ form {
         box-shadow: 0px 0px 3px #bbb;
       }
       &:hover {
-        background: url(/static/img/bg.png);
+        background: url(../img/bg.png);
         .hover {
           display: inline-block;
         }
@@ -198,7 +232,7 @@ form {
 }
 
 .navbar {
-  background: $color_topo_bg url(/static/img/bg.png);
+  background: $color_topo_bg url(../img/bg.png);
   border-radius: 0;
   border-width: 0;
   margin: 0;
@@ -237,8 +271,8 @@ form {
       width: 100%;
       height: $menu-height + 2 * $padding-menu-top;
       opacity: 0.35;
-      background: transparent url("/static/img/bg_cmj_topo_menu_box_left.png") no-repeat scroll left top;
-      background-size: auto $navbar-height;
+      background: transparent url(../img/bg_cmj_topo_menu_box_left.png) no-repeat scroll left top;
+      background-size: auto $navbar-brand-height;
     }
     &:hover {
       color: $color_text_inverse;
@@ -277,7 +311,7 @@ form {
       position: relative;
       float: right;
       margin: $grid-gutter-width * -0.6 $grid-gutter-width / 2 0 0;
-      background: darken($color_main_bg, 15%) url(/static/img/bg.png);
+      background: darken($color_main_bg, 15%) url(../img/bg.png);
       border-radius: 0;
       border: 1px solid white;
 
@@ -421,12 +455,12 @@ form {
         padding: 7px 10px 4px;
         &:hover {
           border-bottom: 0px;
-          background: darken($color_main_bg, 4%) url(/static/img/bg.png);
+          background: darken($color_main_bg, 4%) url(../img/bg.png);
         }
       }
       &.active {
         a {
-          background: darken($color_main_bg, 4%) url(/static/img/bg.png);
+          background: darken($color_main_bg, 4%) url(../img/bg.png);
           border-color: $color_container_border;
           border-bottom: 1px;
         }
@@ -439,7 +473,7 @@ form {
   padding: $grid-gutter-width $grid-gutter-width $grid-gutter-width * 0.75 $grid-gutter-width * 1.5;
   margin: 0em $grid-gutter-width * -0.5 0 $grid-gutter-width * -0.5 ;
   color: transparentize($color_topo_bg, 0.3);
-  background: darken($color_main_bg, 3%) url(/static/img/bg.png);
+  background: darken($color_main_bg, 3%) url(../img/bg.png);
   border-radius: 5px 5px 0 0;
   border-bottom: 1px solid $color_container_border;
   font-weight: normal;
@@ -455,7 +489,7 @@ a:hover {
 }
 .page-subheader {
   padding: $grid-gutter-width /2 ;
-  background: darken($color_main_bg, 3%) url(/static/img/bg.png);
+  background: darken($color_main_bg, 3%) url(../img/bg.png);
   border-radius: 5px 5px 0 0;
   border-bottom: 1px solid $color_container_border;
   margin: 0px;
@@ -575,7 +609,7 @@ a:hover {
     display: inline-block;
     width: 100%;
     text-align: center;
-    background: url(/static/img/bg.png);
+    background: url(../img/bg.png);
     span {
       display: inline-block;
       width: 100%;
@@ -604,7 +638,7 @@ a:hover {
   text-align: center;
   border-radius: 5px;
   color: white !important;
-  background: rgba(#0073b7, 0.8) url(/static/img/bg.png);
+  background: rgba(#0073b7, 0.8) url(../img/bg.png);
 
   &:hover {
     background-color: rgba(#0073b7, 0.9);
@@ -646,22 +680,22 @@ a:hover {
     background-repeat: no-repeat;
     opacity: 0.15;
     &.icon-atividade-legislativa {
-      background-image: url(/static/img/icon_materia_legislativa.png);
+      background-image: url(../img/icon_materia_legislativa.png);
     }
     &.icon-diario-oficial {
-      background-image: url(/static/img/icon_diario_oficial.png);
+      background-image: url(../img/icon_diario_oficial.png);
     }
     &.icon-sessao-plenaria {
-      background-image: url(/static/img/icon_plenarias.png);
+      background-image: url(../img/icon_plenarias.png);
     }
     &.icon-norma-juridica {
-      background-image: url(/static/img/icon_normas_juridicas.png);
+      background-image: url(../img/icon_normas_juridicas.png);
     }
     &.icon-licitacao {
-      background-image: url(/static/img/icon_licitacao.png);
+      background-image: url(../img/icon_licitacao.png);
     }
     &.icon-transparencia {
-      background-image: url(/static/img/icon_transparencia.png);
+      background-image: url(../img/icon_transparencia.png);
     }
   }
   .box {
@@ -741,7 +775,7 @@ a:hover {
     top: 0;
     left: 0;
     bottom: 0;
-    background: $color_main_bg url(/static/img/bg.png);
+    background: $color_main_bg url(../img/bg.png);
     z-index: 2001;
   }
   #menu-toggle {
@@ -812,7 +846,7 @@ a:hover {
 
 }
 .bg-back-image {
-  background: $color_main_bg url(/static/img/bg.png);
+  background: $color_main_bg url(../img/bg.png);
 
 }
 
@@ -855,11 +889,11 @@ main {
       background-color: $color_main_bg;
     }
     &.btn-excluir {
-      color: $btn-danger-bg;
+      color: $danger;
       &:hover {
-        color: $btn-danger-color;
-        border-color: lighten($btn-danger-bg, 5%);
-        background-color: lighten($btn-danger-bg, 5%);
+        color: $danger;
+        border-color: lighten($danger, 5%);
+        background-color: lighten($danger, 5%);
       }
     }
   }
@@ -982,9 +1016,9 @@ fieldset {
   padding: 0;
   font-size: ($font-size-base * 1.5);
   line-height: inherit;
-  color: $legend-color;
+  color: #333;
   border: 0;
-  border-bottom: 1px solid $legend-border-color;
+  border-bottom: 1px solid #e5e5e5;
   font-weight: normal;
   font-family: "SourceSansProSemiBold", Helvetica, Arial, sans-serif;
 
@@ -1099,7 +1133,7 @@ fieldset {
     line-height: 1;
     font-weight: bold;
     font-variant: small-caps;
-    background: rgba(#b7aa73, 0.4) url(/static/img/bg.png);
+    background: rgba(#b7aa73, 0.4) url(../img/bg.png);
   }
 
   .ag-comp {
@@ -1109,10 +1143,10 @@ fieldset {
     right: 10px;
   }
   .item-agenda:nth-child(odd)  {
-    background: rgba(#b7aa73, 0.15) url(/static/img/bg.png);
+    background: rgba(#b7aa73, 0.15) url(../img/bg.png);
   }
   .item-agenda:nth-child(even)  {
-    background: rgba(#b7aa73, 0.25) url(/static/img/bg.png);
+    background: rgba(#b7aa73, 0.25) url(../img/bg.png);
   }
   .item-agenda {
     position: relative;
@@ -1148,7 +1182,7 @@ fieldset {
           box-shadow: 2px 2px 6px #99a;
     }
     &:hover {
-      background: rgba(#b7aa73, 0.7) url(/static/img/bg.png);
+      background: rgba(#b7aa73, 0.7) url(../img/bg.png);
       .descricao {
         display: block;
       }
@@ -1246,7 +1280,7 @@ html {
 
 footer {
   position: relative;
-  background: $color_topo_bg url(/static/img/bg.png);
+  background: $color_topo_bg url(../img/bg.png);
   border-top: 2px solid lighten($color_topo_bg, 20%);
 
   span {
@@ -1317,7 +1351,7 @@ footer {
 // #### ImpressoEnderecamentoRenderer #####################
 
 .ier {
-  background: darken($color_main_bg, 10%) url(/static/img/bg.png);
+  background: darken($color_main_bg, 10%) url(../img/bg.png);
   height: 100px;
   margin: 0 $grid-gutter-width / 2 $grid-gutter-width $grid-gutter-width / 2;
   overflow: hidden;
@@ -1340,7 +1374,7 @@ main {
     position: static;
   }
   .container-footer {
-    background: white url(/static/img/bg.png);
+    background: white url(../img/bg.png);
     margin: $grid-gutter-width 0 0 0;
     border: 0px;
     border-radius: 0;
@@ -1491,7 +1525,7 @@ main {
 
     .img-contexto {
       line-height: 1.2;
-      background: white url(/static/img/bg.png);;
+      background: white url(../img/bg.png);;
       .texto {
         font-size: 0.65em;
       }
@@ -1903,7 +1937,7 @@ main {
     margin-left: 10px;
     /*border: 2px solid white;
     padding: 5px;
-    background: $color_main_bg url(/static/img/bg.png);*/
+    background: $color_main_bg url(../img/bg.png);*/
     img {
       border: 0px solid transparent;
       border-radius: 50%;
@@ -1958,7 +1992,7 @@ main {
     //margin-top: $grid-gutter-width;
     position: relative;
     &:hover {
-      background: $color_main_bg url(/static/img/bg.png);
+      background: $color_main_bg url(../img/bg.png);
     }
   }
 }
@@ -1979,14 +2013,14 @@ main {
     z-index: 2000;
     display: block;
     margin: 0;
-    // background: lighten($color_main_bg, 15%) url(/static/img/bg.png);
+    // background: lighten($color_main_bg, 15%) url(../img/bg.png);
     font-size: 80%;
     /*border-radius: 2px;*/
     //border-top: 1px solid white;
     padding: 10px 0 0px 0;
 
     .titulo {
-      /*background: lighten($color_main_bg, 1%) url(/static/img/bg.png);*/
+      /*background: lighten($color_main_bg, 1%) url(../img/bg.png);*/
       padding: 0 0 $grid-gutter-width/4 0;
       font-weight: 600;
       a {
@@ -2142,7 +2176,7 @@ main {
     //border-bottom: 1px solid $color_topo_bg;;
     position: relative;
     box-shadow: -3px 1px 3px 0 rgba(0,0,0,0.25), 5px 1px 100px 0 rgba(#fff, 0.5);
-    background: darken($color_main_bg,5) url(/static/img/bg.png);
+    background: darken($color_main_bg,5) url(../img/bg.png);
   }
   .path-title {
     padding-top: 4px;
@@ -2216,7 +2250,7 @@ main {
   }
   & > a {
     position: relative;
-    background: rgba(#0689c2,.35) url(/static/img/bg.png);
+    background: rgba(#0689c2,.35) url(../img/bg.png);
     color: white;
     display: inline-block;
     border-radius: 50%;
@@ -2232,14 +2266,14 @@ main {
       display: block;
       position: absolute;
       margin: 0 10px;
-      background: darken($color_main_bg, 4%) url(/static/img/bg.png);
+      background: darken($color_main_bg, 4%) url(../img/bg.png);
       font-size: 80%;
       border-radius: 2px;
       border: 1px solid white;
       box-shadow: 3px 3px 10px  lighten($hover_background_50p, 3%);
       .titulo {
         white-space: nowrap;
-        background: darken($color_main_bg, 8%) url(/static/img/bg.png);
+        background: darken($color_main_bg, 8%) url(../img/bg.png);
         padding: 5px 10px;
         font-weight: 600;
         margin-bottom: 6px;
@@ -2552,7 +2586,7 @@ main {
           top: 100%;
           margin-top: -5px;
           z-index: 2000;
-          background: darken($color_topo_bg, 5%) url(/static/img/bg.png);
+          background: darken($color_topo_bg, 5%) url(../img/bg.png);
           box-shadow: 2px 2px 6px #444;
           padding: 10px;
           border: 1px solid rgba(white, 0.2);
