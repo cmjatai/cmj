@@ -365,15 +365,13 @@
     </div>
   </footer>
   {% block foot_js %}
+  
     {% if not DEBUG %}
       {% render_bundle  'manifest' %}
       {% render_bundle  'vendor' %}
     {% endif %}
     {% render_bundle  'globals' 'js' %}
-    {% render_bundle  'hellow' 'js' %}
                                                           {% comment %}
-                                                            <!-- Bootstrap core JavaScript ================================================== -->
-                                                            <!-- Placed at the end of the document so the pages load faster -->
                                                             <script type="text/javascript" src="{% static 'bootstrap-sass/assets/javascripts/bootstrap.min.js' %}"></script>
                                                             <script type="text/javascript" src="{% static 'jquery-ui/jquery-ui.min.js' %}"></script>
                                                             <script type="text/javascript" src="{% static 'jquery-ui/ui/i18n/datepicker-pt-BR.js' %}"></script>
