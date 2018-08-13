@@ -2,6 +2,7 @@
 const path = require('path')
 const utils = require('./utils')
 const config = require('../config')
+const webpack = require('webpack')
 const vueLoaderConfig = require('./vue-loader.conf')
 var BundleTracker = require('webpack-bundle-tracker')
 
@@ -83,6 +84,11 @@ module.exports = {
   },
   plugins: [
     new BundleTracker({filename: './webpack-stats.json'}),
+    new webpack.ProvidePlugin({
+      $: "jquery",
+      jQuery: "jquery",
+      "window.jQuery": "jquery",
+    })
   ],
   node: {
     // prevent webpack from injecting useless setImmediate polyfill because Vue
