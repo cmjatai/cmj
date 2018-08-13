@@ -370,7 +370,8 @@
       {% render_bundle  'vendor' %}
     {% endif %}
     {% render_bundle  'globals' 'js' %}
-                                                          {% comment  %}
+    {% render_bundle  'hellow' 'js' %}
+                                                          {% comment %}
                                                             <!-- Bootstrap core JavaScript ================================================== -->
                                                             <!-- Placed at the end of the document so the pages load faster -->
                                                             <script type="text/javascript" src="{% static 'bootstrap-sass/assets/javascripts/bootstrap.min.js' %}"></script>
@@ -387,72 +388,72 @@
                                                           {% endcomment %}
     {% block extra_js %}{% endblock %}
   {% endblock foot_js %}
+                                                          {% comment %}
+                                                            <script>
+                                                              $(document).ready(function() {
+                                                                $("#menu-toggle").click(function(e) {
+                                                                  e.preventDefault();
+                                                                  $("#wrapper").toggleClass("toggled");
+                                                                  $(".container").toggleClass("toggled ");
+                                                                });
+                                                                /*var body = document.querySelector('body');
+                                                                var footer = document.querySelector('footer');
+                                                                var main = document.querySelector('main');
+                                                                var nav = document.querySelectorAll('nav');
+                                                                nav = Array.from(nav)
+                                                                nav = nav.reduce(
+                                                                  function(acc, val) {
+                                                                    return acc.offsetHeight + val.offsetHeight;
+                                                                  }
+                                                                  );*/
+                                                                  //main.style.minHeight = (body.offsetHeight - footer.offsetHeight - nav*2) + 'px';
+                                                                });
+                                                              </script>
+    
+                                                              {% if not DEBUG %}
+                                                              <script>
+                                                                window.fbAsyncInit = function() {
+                                                                  FB.init({
+                                                                    appId      : '150874375319738',
+                                                                    cookie     : true,
+                                                                    xfbml      : true,
+                                                                    version    : 'v2.9'
+                                                                  });
 
-  <script>
-  $(document).ready(function() {
-      $("#menu-toggle").click(function(e) {
-          e.preventDefault();
-          $("#wrapper").toggleClass("toggled");
-          $(".container").toggleClass("toggled ");
-      });
-      /*var body = document.querySelector('body');
-      var footer = document.querySelector('footer');
-      var main = document.querySelector('main');
-      var nav = document.querySelectorAll('nav');
-      nav = Array.from(nav)
-      nav = nav.reduce(
-        function(acc, val) {
-          return acc.offsetHeight + val.offsetHeight;
-          }
-        );*/
-      //main.style.minHeight = (body.offsetHeight - footer.offsetHeight - nav*2) + 'px';
-  });
-  </script>
+                                                                  FB.AppEvents.logPageView();
 
-  {% if not DEBUG %}
+                                                                };
 
-    <script>
-      window.fbAsyncInit = function() {
-        FB.init({
-          appId      : '150874375319738',
-          cookie     : true,
-          xfbml      : true,
-          version    : 'v2.9'
-        });
+                                                                (function(d, s, id){
+                                                                    var js, fjs = d.getElementsByTagName(s)[0];
+                                                                    if (d.getElementById(id)) {return;}
+                                                                    js = d.createElement(s); js.id = id;
+                                                                    js.src = "https://connect.facebook.net/pt_BR/sdk.js";
+                                                                    fjs.parentNode.insertBefore(js, fjs);
+                                                                  }(document, 'script', 'facebook-jssdk'));
+                                                              </script>
 
-        FB.AppEvents.logPageView();
+                                                              <!-- Global site tag (gtag.js) - Google Analytics -->
+                                                              <script async src="https://www.googletagmanager.com/gtag/js?id=UA-2431536-7"></script>
+                                                              <script>
+                                                                window.dataLayer = window.dataLayer || [];
+                                                                function gtag(){dataLayer.push(arguments);}
+                                                                gtag('js', new Date());
+                                                                gtag('config', 'UA-2431536-7');
+                                                              </script>
 
-      };
-
-      (function(d, s, id){
-          var js, fjs = d.getElementsByTagName(s)[0];
-          if (d.getElementById(id)) {return;}
-          js = d.createElement(s); js.id = id;
-          js.src = "https://connect.facebook.net/pt_BR/sdk.js";
-          fjs.parentNode.insertBefore(js, fjs);
-        }(document, 'script', 'facebook-jssdk'));
-    </script>
-
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-2431536-7"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'UA-2431536-7');
-    </script>
-
-  {% endif %}
-  <script>
-    (function() {
-      var cx = '015586130466685663092:bbp57zhgqek';
-      var gcse = document.createElement('script');
-      gcse.type = 'text/javascript';
-      gcse.async = true;
-      gcse.src = 'https://cse.google.com/cse.js?cx=' + cx;
-      var s = document.getElementsByTagName('script')[0];
-      s.parentNode.insertBefore(gcse, s);
-    })();
-  </script>
+                                                            {% endif %}
+                                                            <script>
+                                                              (function() {
+                                                                var cx = '015586130466685663092:bbp57zhgqek';
+                                                                var gcse = document.createElement('script');
+                                                                gcse.type = 'text/javascript';
+                                                                gcse.async = true;
+                                                                gcse.src = 'https://cse.google.com/cse.js?cx=' + cx;
+                                                                var s = document.getElementsByTagName('script')[0];
+                                                                s.parentNode.insertBefore(gcse, s);
+                                                              })();
+                                                            </script>
+                                                          {% endcomment %}
   </body>
 </html>

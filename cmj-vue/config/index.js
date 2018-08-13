@@ -10,7 +10,7 @@ module.exports = {
     // Paths
     assetsRoot: path.resolve(__dirname, '../bundle/dev'),
     assetsSubDirectory: 'static',
-    assetsPublicPath: '/static/',
+    assetsPublicPath: 'http://localhost:8080/static/',
     proxyTable: {},
 
     // Various Dev Server settings
