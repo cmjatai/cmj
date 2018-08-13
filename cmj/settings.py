@@ -37,10 +37,8 @@ CMJ_APPS = (
     'cmj.sigad',
     'cmj.api',
 
-
     # manter sempre como o ultimo da lista de apps
     'cmj.globalrules'
-
 )
 
 INITIAL_VALUE_FORMS_UF = config('INITIAL_VALUE_FORMS_UF')
@@ -59,7 +57,6 @@ INSTALLED_APPS = (
 
     # more
     'django_extensions',
-    'djangobower',
     'bootstrap3',  # basically for django_admin_bootstrapped
     'crispy_forms',
 
@@ -67,24 +64,23 @@ INSTALLED_APPS = (
     'image_cropping',  # ?
     'floppyforms',  # ?
 
-    'sass_processor',
     'rest_framework',
     'rest_framework_recursive',
     'rest_framework_docs',
-    'reversion',
 
     'haystack',
     'whoosh',
-
-
+    'reversion',
+    'reversion_compare',
+    'speedinfo',
 
     'taggit',
-    #'webpack_loader',
+    'webpack_loader',
 )
 
 INSTALLED_APPS = INSTALLED_APPS + tuple(
     list(
-        set(sapl_settings.INSTALLED_APPS) - set(INSTALLED_APPS))) + CMJ_APPS
+        set(sapl_settings.SAPL_APPS) - set(INSTALLED_APPS))) + CMJ_APPS
 
 # if DEBUG and 'debug_toolbar' not in INSTALLED_APPS:
 #    INSTALLED_APPS += ('debug_toolbar',)
@@ -255,12 +251,12 @@ LOCALE_PATHS = (
 )
 
 
-"""WEBPACK_LOADER = {
+WEBPACK_LOADER = {
     'DEFAULT': {
-        'BUNDLE_DIR_NAME': 'bundles/',
-        'STATS_FILE': PROJECT_DIR.child('webpack-stats.json'),
+        'BUNDLE_DIR_NAME': 'bundle/dist/',
+        'STATS_FILE': PROJECT_DIR.child('cmj-vue').child('webpack-stats.json'),
     }
-}"""
+}
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = PROJECT_DIR.child("media")
@@ -272,7 +268,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap3'
 CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap3'
 CRISPY_FAIL_SILENTLY = not DEBUG
 
-BOWER_COMPONENTS_ROOT = PROJECT_DIR.child("bower")
+"""BOWER_COMPONENTS_ROOT = PROJECT_DIR.child("bower")
 BOWER_INSTALLED_APPS = (
     'jquery#3.1.1',
     'bootstrap-sass',
@@ -282,28 +278,29 @@ BOWER_INSTALLED_APPS = (
     'jQuery-Mask-Plugin#1.14.0',
     'jsdiff#2.2.2',
     'https://github.com/cmjatai/drunken-parrot-flat-ui.git',
-)
+)"""
 
 STATIC_URL = '/static/'
 STATIC_ROOT = PROJECT_DIR.child("collected_static")
+
 STATICFILES_DIRS = (
     BASE_DIR.child("static"),
-    sapl_settings.STATICFILES_DIRS[0]
+    PROJECT_DIR.child(
+        "cmj-vue").child('bundle').child('dev' if DEBUG else 'dist'),
+    # sapl_settings.STATICFILES_DIRS[0]
 )
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'djangobower.finders.BowerFinder',
-    'sass_processor.finders.CssFinder',
+    #'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
 
 
 # Additional search paths for SASS files when using the @import statement
-SASS_PROCESSOR_INCLUDE_DIRS = (
+"""SASS_PROCESSOR_INCLUDE_DIRS = (
     BOWER_COMPONENTS_ROOT.child(
         'bower_components', 'bootstrap-sass', 'assets', 'stylesheets'),
-)
+)"""
 
 # FIXME update cripy-forms and remove this
 # hack to suppress many annoying warnings from crispy_forms
