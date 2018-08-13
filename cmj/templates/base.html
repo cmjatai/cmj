@@ -382,9 +382,13 @@
                                                             <script type="text/javascript" src="{% static 'drunken-parrot-flat-ui/js/radio.js' %}"></script>
                                                             <script src="{% static 'tinymce/tinymce.min.js' %}"></script>
                                                             <script type="text/javascript" src="{% static 'jsdiff/diff.min.js' %}"></script>
-                                                            <script type="text/javascript" src="{% static 'js/app.js' %}"></script>
-                                                            <script type="text/javascript" src="{% static 'js/app_cmj.js' %}{% if DEBUG %}?time={% now "jS F Y H:i:s" %}{% endif %}"></script>
-                                                          {% endcomment %}
+                                                            {% endcomment %}
+    
+    {% comment %}
+      FIXME: migrar app.js e app_cmj.js para "CMJ Vue project"
+    {% endcomment %}
+    <script type="text/javascript" src="{% static 'js/app.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/app_cmj.js' %}{% if DEBUG %}?time={% now "jS F Y H:i:s" %}{% endif %}"></script>
     {% block extra_js %}{% endblock %}
   {% endblock foot_js %}
   <script>
