@@ -1,3 +1,4 @@
+import 'font-awesome/css/font-awesome.css'
 import './2018/scss/app.scss'
 import jQuery from 'jquery'
 import 'bootstrap'

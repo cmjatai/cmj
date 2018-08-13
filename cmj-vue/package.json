@@ -12,6 +12,7 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.2.0",
     "autosize": "^4.0.0",
     "axios": "^0.18.0",
     "axios-progress-bar": "^1.2.0",
