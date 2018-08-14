@@ -1,10 +1,10 @@
 {% load i18n sigad_filters social_utils%}
 
 {% with 'noticias_destaque'|caixa_publicacao:None as noticias_destaque %}
-  <div id="carousel-example-generic" class="carousel slide" data-ride="carousel" data-interval="7000">
+  <div id="carousel-custom" class="carousel carousel-custom slide" data-ride="carousel" data-interval="180000">
     <ol class="carousel-indicators">
       {% for d in  noticias_destaque.docs%}
-        <li data-target="#carousel-example-generic" data-slide-to="{{forloop.counter0}}" {% if forloop.first %}class="active"{% endif %}></li>
+        <li data-target="#carousel-custom" data-slide-to="{{forloop.counter0}}" {% if forloop.first %}class="active"{% endif %}></li>
       {% endfor %}
     </ol>
     {% if perms.sigad.change_documento %}
@@ -19,12 +19,12 @@
         <div class="carousel-item {% if forloop.first %}active{% endif %}">
           <div class="autor">{{d.1.autor|default:''}}</div>
           {% social_link_share d.0 'absolute-center' %}
-          <a class="imagem" href="/{{d.0.slug}}"  style="background-image: url(https://www.jatai.go.leg.br/{{d.1.absolute_slug}}.1024)">
+          <a class="d-block w-100 imagem" href="/{{d.0.slug}}"  style="background-image: url(/{{d.1.absolute_slug}}.1024);">
             {% comment %}
             <img src="/{{d.1.absolute_slug}}" alt="{% if d.1.titulo %}{{d.0.titulo}}{% else %}{{d.0.titulo}}{% endif %}">
             {% endcomment %}
             <div class="carousel-caption">
-              <p>{{d.0.descricao}}</p>
+              <p class="d-none d-sm-block">{{d.0.descricao}}</p>
               <span class="titulo">{{d.0.titulo}}</span>
             </div>
           </a>
@@ -33,11 +33,11 @@
     </div>
 
     <!-- Controls -->
-    <a class="carousel-control-prev" href="#carousel-example-generic" role="button" data-slide="prev">
+    <a class="carousel-control-prev" href="#carousel-custom" role="button" data-slide="prev">
       <span class="carousel-control-prev-icon" aria-hidden="true"></span>
       <span class="sr-only">Previous</span>
     </a>
-    <a class=" carousel-control-next" href="#carousel-example-generic" role="button" data-slide="next">
+    <a class=" carousel-control-next" href="#carousel-custom" role="button" data-slide="next">
       <span class="carousel-control-next-icon" aria-hidden="true"></span>
       <span class="sr-only">Next</span>
     </a>
