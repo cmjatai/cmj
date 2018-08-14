@@ -5,7 +5,6 @@ import 'bootstrap'
 
 window.$ = window.jQuery = jQuery
 
-// eslint-disable-next-line
 function Gallery () {
   let instance
   // eslint-disable-next-line
