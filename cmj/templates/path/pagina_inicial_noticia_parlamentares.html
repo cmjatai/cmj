@@ -1,5 +1,4 @@
 {% load i18n sigad_filters social_utils %}
-
 <div class="container-box-parlamentares">
   {% for documento in object_list %}
     <div class="path-item-list  {{ documento.visibilidade_css_class}}">
@@ -22,7 +21,6 @@
         {% endcomment %}
 
         {% with documento.parlamentares.first as parlamentar %}
-          <div class="row">
             <div class="col-xs-3">
               {% if  documento.parlamentares.first.fotografia %}
                 <a class="avatar" href="/{{ parlamentar.classe_set.first.absolute_slug }}">
@@ -45,7 +43,6 @@
                 {{ documento.descricao|default:''|safe}}
               </div>
             </div>
-          </div>
         {% endwith %}
       </div>
     </div>
