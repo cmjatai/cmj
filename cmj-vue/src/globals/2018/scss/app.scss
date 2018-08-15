@@ -5,6 +5,7 @@
 @import '_app_agenda';
 @import '_app_ouvidoria';
 @import '_carousel_custom';
+@import '_layout_footer';
 @import '_layout_navbar';
 @import '_layout_noticias_secundarias';
 @import '_layout_noticias_parlamentares';
@@ -24,7 +25,6 @@ body, html {
   background: $color_main_bg $url_bg_png;
 }
 
-
 .caret {
   display: inline-block;
   width: 0;
@@ -36,3 +36,4 @@ body, html {
   border-right: 4px solid transparent;
   border-left: 4px solid transparent;
 }
+
