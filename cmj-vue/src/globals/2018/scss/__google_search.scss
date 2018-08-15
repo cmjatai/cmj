@@ -1,0 +1,37 @@
+.google-search {
+  background:  url(../img/search_box_icon36.png) no-repeat 2px 3px;
+  position: fixed;
+  padding: 10px;
+  top: 0px;
+  right: 0px;
+  width: 42px;
+  height: 42px;
+  z-index: 2002;
+  .search, .result {
+    display: none;
+  }
+  &:hover {
+    height: auto;
+    width: 45%;
+    background:  white;
+    overflow-y: auto;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    border-left: 1px solid green;
+    .search, .result  {
+      display: block;
+    }
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .google-search {
+    background-size: 70%;
+    background-position-y:8px;
+    width: 36px;
+    &:hover {
+      width: 75%;
+    }
+  }
+}

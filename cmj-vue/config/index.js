@@ -10,11 +10,11 @@ module.exports = {
     // Paths
     assetsRoot: path.resolve(__dirname, '../bundle/dev'),
     assetsSubDirectory: 'static',
-    assetsPublicPath: 'http://localhost:8080/static/',
+    assetsPublicPath: 'http://10.42.0.1:8080/static/',
     proxyTable: {},
 
     // Various Dev Server settings
-    host: 'localhost', // can be overwritten by process.env.HOST
+    host: '10.42.0.1', // can be overwritten by process.env.HOST
     port: 8080, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
     autoOpenBrowser: false,
     errorOverlay: true,

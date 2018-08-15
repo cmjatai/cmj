@@ -1,0 +1,57 @@
+@import 'variables';
+
+.navbar-social-links {
+  display: inline-block;
+  padding: 0;
+  line-height: 1;
+  z-index: 1;
+  a {
+    font-size: 1rem;
+    display: inline-block;
+    border-radius: 50%;
+    width: 2em;
+    height: 2em;
+    line-height: 2em;
+    text-align: center;
+    i {
+      color: rgba(green, 0.3);
+    }
+    &:hover {
+      i {
+        color: rgba(white, 1);
+      }
+      &.facebook {
+        background-color: #3a579d;
+      }
+      &.twitter {
+        background-color: #5ba9e1;
+      }
+      &.whatsapp {
+        background-color: #65bc54;
+      }
+    }
+    &.whatsapp {
+      padding: 1px;
+    }
+  }
+  &.absolute-center {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, 0);
+  }
+  &.top-right {
+    position: relative;
+    right: 0;
+    text-align: right;
+    padding-left: 5px;
+  }
+  &.icon-block {
+    a {
+      display: block;
+    }
+  }
+  &.block {
+    display: block;
+    width: 100%;
+  }
+}

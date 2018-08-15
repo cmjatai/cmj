@@ -26,7 +26,7 @@ $width-wrapper-sm: 135px !default;
 $width-wrapper-xs: 80px !default;
 
 // variaveis bootstrap ########################################
-$grid-gutter-width: 20px !default;
+//$grid-gutter-width: 20px !default;
 
 $menu-height: 40px !default;
 $padding-menu-top: 5px !default;
@@ -37,3 +37,5 @@ $icon-font-path: "../bootstrap/fonts/" !default;
 // variaveis bootstrap ########################################
 $font-size-base: 1rem !default;
 
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';

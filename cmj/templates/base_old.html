@@ -47,6 +47,7 @@
           Utilize a busca do Google para pesquisar em nosso conteúdo.
         </small>
       </div>
+
       <div class="result">
         <gcse:searchresults></gcse:searchresults>
       </div>
@@ -60,80 +61,107 @@
               <i class="fa fa-2x fa-chevron-circle-left" aria-hidden="true"></i>
               <i class="fa fa-2x fa-chevron-circle-right" aria-hidden="true"></i>
             </a>
+
             {% include "base_sidebar.html" %}
           </div>
         </aside>
-      {% endblock canais_absolute%}
+        {% endblock canais_absolute%}
+      <nav class="navbar">
+        <div class="container{{fluid}} container-header">
+          <div class="navbar-header">
+            <a class="navbar-brand" href="{{site_url}}/">
+              <i class="fa fa-home" aria-hidden="true"></i>C<small>âmara</small> M<small>unicipal de</small> J<small>ataí</small>
+            </a>
+          </div>
+          <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right" id="autenticacao">
+              {% if user and not user.is_anonymous %}
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                    {% avatar_user user%}
 
-      <nav class="navbar navbar-topo navbar-expand-lg navbar-dark">
-          <div class="container{{fluid}}">
-            <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+
+                  </a>
+                  <ul class="dropdown-menu menu-right">
+                    <li class=" text-right"><a href="{% url 'cmj.core:cmj_user_change' %}">{{ user.get_full_name|default:user.email }} <i class="fa fa-hand-o-left" aria-hidden="true"></i> {% trans "Meu Perfil" %}</a></li>
+                    {% if perms.ouvidoria %}
+                      <li class=" text-right"><a href="{% url 'cmj.ouvidoria:solicitacao_manage_list' %}">{{user.areatrabalho_set.all.first.nome}} <i class="fa fa-hand-o-left" aria-hidden="true"></i> {% trans "Ouvidoria" %}</a></li>
+                    {% endif %}
+                      <li class=" text-right"><a href="{% url 'cmj.ouvidoria:solicitacao_list' %}">{% trans "Minhas Solicitações" %}</a></li>
+
+
+
+                    <li class=" text-right"><a href="{% url 'cmj.core:logout' %}">{% trans "Sair" %}</a></li>
+                  </ul>
+                </li>
+              {% else %}
+              <li>
+                <a class="dropdown-toggle" href="#fakeLink" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Acessar" %}</span></a>
+                <ul class="dropdown-menu me menu-rightnu-right">
+                  <li><a href="https://www.jatai.go.leg.br{% url 'cmj.core:login' %}">{% trans "Portal" %}</a></li>
+                  <li><a href="https://mail.camarajatai.go.gov.br">{% trans "Webmail" %}</a></li>
+                </ul>
+              </li>
+               {% endif %}
+                {% notificacoes_unread %}
+            </ul>
+          </div><!--/.nav-collapse -->
+          {% block button_toogle %}
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+              <span class="sr-only">Toggle navigation</span>
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button>
+          {% endblock %}
 
-            <a class="navbar-brand" href="{{site_url}}/">
-              <i class="fa fa-home" aria-hidden="true"></i>C<small>âmara</small> M<small>unicipal de</small> J<small>ataí</small>
-            </a>
+          {% block social_links %}
+            <div class="navbar-social-links">
+              <a href="https://www.facebook.com/cmjatai"><i class="fa fa-facebook" aria-hidden="true"></i></a>
+              <a href="https://www.youtube.com/C%C3%A2maraMunicipalJata%C3%AD?sub_confirmation=1"><i class="fa fa-youtube-play" aria-hidden="true"></i></a>
+              <a href="https://twitter.com/cmjatai"><i class="fa fa-twitter" aria-hidden="true"></i></a>
+            </div>
+          {% endblock %}
 
-            {% block button_toogle %}
-              <button type="button" class="navbar-toggler toggle-access" data-toggle="collapse" data-target="#navbar-access" aria-controls="navbar-access" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
-            {% endblock %}
 
-            <div class="navbar-collapse collapse" id="navbar-access">
-
-            {% block social_links %}
-              <div class="navbar-social-links  justify-content-center">
-                <a href="https://www.facebook.com/cmjatai"><i class="fa fa-facebook" aria-hidden="true"></i></a>
-                <a href="https://www.youtube.com/C%C3%A2maraMunicipalJata%C3%AD?sub_confirmation=1"><i class="fa fa-youtube-play" aria-hidden="true"></i></a>
-                <a href="https://twitter.com/cmjatai"><i class="fa fa-twitter" aria-hidden="true"></i></a>
-              </div>
-            {% endblock %}
-              <ul class="navbar-nav justify-content-end">
-                {% if user and not user.is_anonymous %}
-                  <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                      {% avatar_user user%}
-                    </a>
-                    <ul class="dropdown-menu menu-right">
-                      <li class=" text-right"><a href="{% url 'cmj.core:cmj_user_change' %}">{{ user.get_full_name|default:user.email }} <i class="fa fa-hand-o-left" aria-hidden="true"></i> {% trans "Meu Perfil" %}</a></li>
-                      {% if perms.ouvidoria %}
-                        <li class=" text-right"><a href="{% url 'cmj.ouvidoria:solicitacao_manage_list' %}">{{user.areatrabalho_set.all.first.nome}} <i class="fa fa-hand-o-left" aria-hidden="true"></i> {% trans "Ouvidoria" %}</a></li>
-                      {% endif %}
-                        <li class=" text-right"><a href="{% url 'cmj.ouvidoria:solicitacao_list' %}">{% trans "Minhas Solicitações" %}</a></li>
-                      <li class=" text-right"><a href="{% url 'cmj.core:logout' %}">{% trans "Sair" %}</a></li>
-                    </ul>
-                  </li>
-                {% else %}
-                  <li>
-                    <a href="#fakeLink" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Acessar" %}<span class="caret"></span></a>
-                    <ul class="dropdown-menu">
-                      <li><a href="https://www.jatai.go.leg.br{% url 'cmj.core:login' %}">{% trans "Portal" %}</a></li>
-                      <li><a href="https://mail.camarajatai.go.gov.br">{% trans "Webmail" %}</a></li>
-                    </ul>
-                  </li>
-                {% endif %}
-                  {% notificacoes_unread %}
-              </ul>
-            </div><!--/.nav-collapse -->
-          </div>
+        </div>
       </nav>
 
       {% block global_container %}
         {% block navigation %}
-          <nav class="navbar navbar-menu navbar-expand-lg navbar-dark">
+          <nav class="navbar navbar-menu">
             <div class="container{{fluid}}">
-              <div class="navbar-collapse collapse" id="navbar-menu">
-                <ul class="navbar-nav">
+
+              <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-right nav-acessar" id="autenticacao">
+                  {% if user and not user.is_anonymous %}
+                    <li class="dropdown">
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                        {{ user.get_full_name|default:user.email }}
+                        <span class="caret"></span>
+                        {% avatar_user user%}
+                      </a>
+                      <ul class="dropdown-menu me menu-rightnu-right">
+                          <li><a href="{% url 'cmj.core:cmj_user_change' %}">{% trans "Meu Perfil" %}</a></li>
+                          <li><a href="{% url 'cmj.core:logout' %}">{% trans "Sair" %}</a></li>
+                      </ul>
+                    </li>
+                  {% else %}
+                  <li>
+                    <a class="dropdown-toggle" href="#fakeLink" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Acessar" %}</span></a>
+                    <ul class="dropdown-menu me menu-rightnu-right">
+                      <li><a href="https://www.jatai.go.leg.br{% url 'cmj.core:login' %}">{% trans "Portal" %}</a></li>
+                      <li><a href="https://mail.camarajatai.go.gov.br">{% trans "Webmail" %}</a></li>
+                    </ul>
+
+                  </li>
+                   {% endif %}
+                </ul>
+
+                <ul class="nav navbar-nav">
                   {% if areatrabalho %}
                     <li class="dropdown">
-                      <a class="dropdown-toggle" href="#fakeLink" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Portal" %}</a>
-                      
+                      <a class="dropdown-toggle" href="#fakeLink" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Portal" %}<span class="caret"></span></a>
                       <ul class="dropdown-menu menu-left" role="menu">
                         {% navbar 'navbar_cmj.yaml' %}
                       </ul>
@@ -156,19 +184,14 @@
                   {% else %}
                     {% navbar 'navbar_cmj.yaml' %}
                   {% endif %}
+
+
                 </ul>
 
-                <ul class="navbar-nav navbar-right justify-content-end">
-                  <li>
-                    <a href="#fakeLink" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Acessar" %}<span class="caret"></span></a>
-                    <ul class="dropdown-menu">
-                      <li><a href="https://www.jatai.go.leg.br{% url 'cmj.core:login' %}">{% trans "Portal" %}</a></li>
-                      <li><a href="https://mail.camarajatai.go.gov.br">{% trans "Webmail" %}</a></li>
-                    </ul>
-                  </li>
+                <ul class="nav navbar-nav navbar-right">
                   {% if perms.core.menu_relatorios and not user.is_superuser%}
                     <li class="dropdown">
-                      <a href="#"data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Relatórios" %}<span class="caret"></span></a>
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Relatórios" %}<span class="caret"></span></a>
                       <ul class="dropdown-menu menu-left">
                         <li class="dropdown-header">{% trans "Contatos" %}</li>
                         {% if perms.cerimonial.print_impressoenderecamento %}<li class="nav__sub-item"><a href="{% url 'cmj.cerimonial:print_impressoenderecamento' %}">{% trans "Etiquetas e Envelopes" %}</a></li>{% endif %}
@@ -181,24 +204,24 @@
                   {% endif %}
                   {% if perms.core.menu_dados_auxiliares or perms.base.view_tabelas_auxiliares%}
                     <li class="dropdown">
-                      <a href="#" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Dados Auxiliares" %}<span class="caret"></span></a>
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Dados Auxiliares" %}<span class="caret"></span></a>
                       <ul class="dropdown-menu menu-right">
 
                         {% if not areatrabalho and perms.core.menu_agenda %}
                           <li class="dropdown-header">{% trans "Calendário" %}</li>
-                          <li class="nav__sub-item"><a href="{% url 'cmj.agenda:evento_list' %}">{% trans "Agenda de Eventos" %}</a></li>
+                          <li class="nav__sub-item"><a class="dropdown-toggle" href="{% url 'cmj.agenda:evento_list' %}">{% trans "Agenda de Eventos" %}</a></li>
                         {% endif %}
                         <li class="dropdown-header">{% trans "Consultas" %}</li>
                         {% if perms.sigad.view_documento %}
                         <li class="nav__sub-item">
-                          <a href="#fakeLink" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Banco de Imagens" %}<span class="caret"></span></a>
+                          <a class="dropdown-toggle" href="#fakeLink" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Banco de Imagens" %}<span class="caret"></span></a>
                           <ul class="dropdown-menu menu-right" role="menu">
-                            <li class="nav__sub-item"><a href="/banco-de-imagens/2018">{% trans "2018" %}</a></li>
-                            <li class="nav__sub-item"><a href="/banco-de-imagens/2017">{% trans "2017" %}</a></li>
-                            <li class="nav__sub-item"><a href="/banco-de-imagens/2016">{% trans "2016" %}</a></li>
-                            <li class="nav__sub-item"><a href="/banco-de-imagens/2015">{% trans "2015" %}</a></li>
-                            <li class="nav__sub-item"><a href="/banco-de-imagens/2014">{% trans "2014" %}</a></li>
-                            <li class="nav__sub-item"><a href="/banco-de-imagens/2013">{% trans "2013" %}</a></li>
+                            <li class="nav__sub-item"><a class="dropdown-toggle" href="/banco-de-imagens/2018">{% trans "2018" %}</a></li>
+                            <li class="nav__sub-item"><a class="dropdown-toggle" href="/banco-de-imagens/2017">{% trans "2017" %}</a></li>
+                            <li class="nav__sub-item"><a class="dropdown-toggle" href="/banco-de-imagens/2016">{% trans "2016" %}</a></li>
+                            <li class="nav__sub-item"><a class="dropdown-toggle" href="/banco-de-imagens/2015">{% trans "2015" %}</a></li>
+                            <li class="nav__sub-item"><a class="dropdown-toggle" href="/banco-de-imagens/2014">{% trans "2014" %}</a></li>
+                            <li class="nav__sub-item"><a class="dropdown-toggle" href="/banco-de-imagens/2013">{% trans "2013" %}</a></li>
                           </ul>
                         </li>
                         {% endif %}
@@ -226,7 +249,7 @@
                     </li>
                   {% endif %}
                 </ul>
-              </div>
+              </div><!--/.nav-collapse -->
             </div>
           </nav>
         {% endblock navigation %}
