@@ -1,0 +1,78 @@
+@import "variables";
+
+.panel-agenda {
+  background: white;
+  border-radius: 5px;
+  height: 321px;
+  overflow: hidden;
+  position: relative;
+  .heading {
+    border-radius: 5px 5px 0 0;
+    padding: 10px 10px 6px 10px;
+    line-height: 1;
+    font-weight: bold;
+    font-variant: small-caps;
+    background: rgba(#b7aa73, 0.4) $url_bg_png;
+  }
+
+  .ag-comp {
+    font-weight: bold;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+  .item-agenda:nth-child(odd)  {
+    background: rgba(#b7aa73, 0.15) $url_bg_png;
+  }
+  .item-agenda:nth-child(even)  {
+    background: rgba(#b7aa73, 0.25) $url_bg_png;
+  }
+  .item-agenda {
+    position: relative;
+    padding: 7px;
+    line-height: 1.4;
+
+    font-size: 80%;
+    .data, .titulo {
+      display: block;
+    }
+    .data {
+
+    }
+    .titulo {
+      font-weight: bold;
+      color: #675a43;
+      &:hover {
+        color: #444;
+      }
+    }
+    .descricao {
+      display: none;
+      position: absolute;
+      background: #b79a73;
+      border: #e7cab3 1px solid;
+      right: 10px;
+      left: 10%;
+      padding: 10px;
+      color: white;
+      line-height: 1.2;
+      z-index: 1;
+      text-align: right;
+          box-shadow: 2px 2px 6px #99a;
+    }
+    &:hover {
+      background: rgba(#b7aa73, 0.7) $url_bg_png;
+      .descricao {
+        display: block;
+      }
+    }
+  }
+  &:hover {
+    height: auto;
+    overflow: inherit;
+    position: absolute;
+    z-index: 1;
+    right: 15px;
+    left: 15px;
+  }
+}

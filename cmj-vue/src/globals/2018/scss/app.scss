@@ -1,12 +1,14 @@
 @import 'header';
 
+@import '_social_links';
 @import '_app_sigad';
 @import '_app_agenda';
 @import '_app_ouvidoria';
 @import '_carousel_custom';
+@import '_layout_navbar';
 @import '_layout_noticias_secundarias';
 @import '_layout_noticias_parlamentares';
-@import '_social_links';
+@import '_layout_sidebar';
 @import '_google_search';
 
 
@@ -19,5 +21,18 @@
 }
 
 body, html {
-  background: $color_main_bg;
+  background: $color_main_bg $url_bg_png;
+}
+
+
+.caret {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-left: 2px;
+  vertical-align: middle;
+  border-top: 4px dashed;
+  border-top: 4px solid \9;
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
 }

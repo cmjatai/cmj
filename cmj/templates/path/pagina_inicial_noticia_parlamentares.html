@@ -2,7 +2,7 @@
 <div class="container-box-parlamentares">
   {% for documento in object_list %}
     <div class="path-item-list  {{ documento.visibilidade_css_class}}">
-      <div class="inner">
+      <div class="row inner">
         <span class="data-pub">
           <i class="fa fa-clock-o" aria-hidden="true"></i>
           {% if documento.public_date %}
@@ -13,6 +13,7 @@
             {% endwith %}
           {% endif %}
         </span>
+        <div class="w-100"></div>
 
 
         {% comment %}
@@ -21,14 +22,14 @@
         {% endcomment %}
 
         {% with documento.parlamentares.first as parlamentar %}
-            <div class="col-xs-3">
+            <div class="col-3">
               {% if  documento.parlamentares.first.fotografia %}
                 <a class="avatar" href="/{{ parlamentar.classe_set.first.absolute_slug }}">
                   <img src="{{ parlamentar.fotografia.url }}">
                 </a>
               {% endif %}
             </div>
-            <div class="col-xs-9">
+            <div class="col">
               <a class="tags tag-parlamentar" href="/{{ documento.parlamentares.first.classe_set.first.absolute_slug }}">
                   {{ documento.parlamentares.first.nome_parlamentar}}
               </a>
