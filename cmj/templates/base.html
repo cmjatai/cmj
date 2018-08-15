@@ -66,7 +66,7 @@
       {% endblock canais_absolute%}
 
       <nav class="navbar navbar-topo navbar-expand-lg navbar-dark">
-          <div class="container{{fluid}}">
+          <div class="container{{fluid}} justify-content-start">
             <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
@@ -159,13 +159,7 @@
                 </ul>
 
                 <ul class="navbar-nav navbar-right justify-content-end">
-                  <li>
-                    <a href="#fakeLink" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Acessar" %}<span class="caret"></span></a>
-                    <ul class="dropdown-menu">
-                      <li><a href="https://www.jatai.go.leg.br{% url 'cmj.core:login' %}">{% trans "Portal" %}</a></li>
-                      <li><a href="https://mail.camarajatai.go.gov.br">{% trans "Webmail" %}</a></li>
-                    </ul>
-                  </li>
+                  
                   {% if perms.core.menu_relatorios and not user.is_superuser%}
                     <li class="dropdown">
                       <a href="#"data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Relatórios" %}<span class="caret"></span></a>
