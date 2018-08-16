@@ -144,7 +144,15 @@
       font-weight: bold;
     }
     i {
-        line-height: 120%;
+      line-height: 120%;
     }
+  }
+}
+.container-resposta {
+  border: 1px solid transparentize(#3d9970,0.8);
+  margin: $grid-gutter-width / 2 $grid-gutter-width / 2 $grid-gutter-width;
+  border-radius: 7px 7px 5px 5px;
+  .form-resposta {
+    padding: $grid-gutter-width * 2 $grid-gutter-width * 1.2 $grid-gutter-width;
   }
 }
