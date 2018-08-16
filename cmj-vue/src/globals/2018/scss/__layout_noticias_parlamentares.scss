@@ -9,4 +9,18 @@
     align-self: center;
     padding: 0px;
   }
+  .col { 
+    padding: 0 5px;
+  }
+  .tags {
+    line-height: 1em;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .container-box-parlamentares {
+    .path-item-list {
+      width: 100%;
+    }
+  }
 }
