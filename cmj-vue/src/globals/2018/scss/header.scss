@@ -13,22 +13,3 @@
 @import 'mixins';
 
 @import '_colors';
-
-.container-path {
-  font-family: "Lato";
-  font-size: 1.6em;
-  font-weight: 300;
-  position: static;
-}
-
-.tags {
-  display: inline-block;
-  position: relative;
-  color: $color_text_title;
-  font-weight: bold;
-  font-size: 0.8em;
-  &:hover {
-    text-decoration: underline;
-    color: darken(#a97905, 5);
-  }
-}
