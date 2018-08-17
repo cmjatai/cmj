@@ -2,7 +2,6 @@
 
 {% for documento in object_list %}
   {% if split_row %}
-
     {% if forloop.counter0 > 0 and forloop.counter0|divisibleby:split_row %}
       </div>
     {% endif %}
