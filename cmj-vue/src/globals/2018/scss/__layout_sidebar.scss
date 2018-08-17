@@ -59,7 +59,7 @@
   .inner {
     position: relative;
     z-index: 1;
-    font-size: 1.8em;
+    font-size: 1.9em;
     font-variant: small-caps;
     line-height: 0.9em;
     height: 100%;
@@ -67,7 +67,7 @@
       position: relative;
       display: block;
       color: inherit;
-      padding: 5px 5px 5px 40px;
+      padding: 8px 5px 5px 50px;
       text-indent: -30px;
       height: 100%;
       text-decoration: none;
@@ -181,6 +181,19 @@
 }
 
 
+@media screen and (max-width: 1199px) {
+  .canais-columns {
+    height: 65px;
+    .inner {
+      font-size: 1.6em;
+      a {
+        padding: 8px 5px 5px 27px;
+        text-indent: -18px;
+      }
+    }
+  }
+}
+
 
 @media screen and (max-width: 991px) {
   #wrapper {
@@ -227,12 +240,12 @@
     }
   }
   .canais-columns {
-    height: 60px;
+    height: 58px;
     .inner {
-      font-size: 1.6em;
+      font-size: 1.3em;
       a {
-        padding: 5px 5px 5px 35px;
-        text-indent: -25px;
+        padding: 9px 5px 5px 20px;
+        text-indent: -10px;
       }
     }
   }
@@ -240,19 +253,6 @@
 
 
 @media screen and (max-width: 767px) {
-  .canais-columns {
-    height: 50px;
-    .inner {
-      font-size: 1.2em;
-      a {
-        padding: 7px 5px 5px 30px;
-        text-indent: -20px;
-      }
-    }
-  }
-}
-
-@media screen and (max-width: 575px) {
   
   .canais-columns {
     height: 60px;
