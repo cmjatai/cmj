@@ -25,6 +25,14 @@
   }
 }
 
+@media screen and (max-width: 991px) {
+  .google-search {
+    position: relative;
+    &:hover {
+      position: fixed;
+    }
+  }
+}
 @media screen and (max-width: 480px) {
   .google-search {
     background-size: 70%;
