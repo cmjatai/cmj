@@ -13,8 +13,8 @@
 {% endblock %}
 
 {% block base_content %}
-  <div class="row">
-    {% with 'path-item-list col-lg-10 col-lg-offset-1' as css_class %}
+  <div class="row  justify-content-lg-center">
+    {% with 'path-item-list col-lg-10' as css_class %}
       {% include "path/path_list_docs.html" %}
     {% endwith %}
   </div>
