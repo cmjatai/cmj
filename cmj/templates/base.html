@@ -37,21 +37,7 @@
 
   <body class="{% block body_class %}{%endblock%}">
     <div id=app></div>
-    <div class="google-search">
-      <div class="search">
-        <strong>
-            Busca Google no Portal CMJ
-        </strong>
-        <gcse:searchbox></gcse:searchbox>
-        <small>
-          Utilize a busca do Google para pesquisar em nosso conteúdo.
-        </small>
-      </div>
-      <div class="result">
-        <gcse:searchresults></gcse:searchresults>
-      </div>
-    </div>
-
+    
     <div class="page fadein" id="{% block id_wrapper %}wrapper{% endblock %}">
       {% block canais_absolute %}
         <aside>
@@ -121,6 +107,21 @@
                   {% notificacoes_unread %}
               </ul>
             </div><!--/.nav-collapse -->
+            <div class="google-search">
+                <div class="search">
+                  <strong>
+                      Busca Google no Portal CMJ
+                  </strong>
+                  <gcse:searchbox></gcse:searchbox>
+                  <small>
+                    Utilize a busca do Google para pesquisar em nosso conteúdo.
+                  </small>
+                </div>
+                <div class="result">
+                  <gcse:searchresults></gcse:searchresults>
+                </div>
+              </div>
+          
           </div>
       </nav>
 
@@ -350,11 +351,11 @@
                                                             
     {% comment %}
     FIXME: migrar scripts abaixo "CMJ Vue project"
-    {% endcomment %}
     <script type="text/javascript" src="{% static 'jquery-ui/jquery-ui.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'jquery-ui/ui/i18n/datepicker-pt-BR.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/app.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/app_cmj.js' %}{% if DEBUG %}?time={% now "jS F Y H:i:s" %}{% endif %}"></script>
+    {% endcomment %}
     {% block extra_js %}{% endblock %}
   {% endblock foot_js %}
   <script>
