@@ -600,13 +600,13 @@ class PathParlamentarView(PathView):
 
             legislatura_ativa = int(self.request.GET.get('l', '0'))
             sl_ativa = int(self.request.GET.get('sl', '0'))
-            parlamentar_ativo = int(self.request.GET.get('p', '0'))
+            #parlamentar_ativo = int(self.request.GET.get('p', '0'))
 
             legs = Legislatura.objects
             pms = Parlamentar.objects
 
-            if parlamentar_ativo:
-                context['parlamentar_ativo'] = pms.get(pk=parlamentar_ativo)
+            #if parlamentar_ativo:
+            #    context['parlamentar_ativo'] = pms.get(pk=parlamentar_ativo)
 
             legislaturas = []
             context['legislatura_ativa'] = 0

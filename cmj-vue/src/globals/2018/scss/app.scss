@@ -610,154 +610,6 @@ h6 {
   }
 }
 
-.container-legislaturas {
-  padding: 0px;
-  margin-top: -$grid-gutter-width;
-  position: relative;
-  font-family: "Lato";
-  text-align: center;
-  a {
-    color: black;
-    line-height: 2em;
-    display: inline-block;
-    vertical-align: top;
-    border: 1px solid transparent;
-    span, small {
-      line-height: 1;
-      display: block;
-    }
-    span {
-      padding-top: 0.5em;
-    }
-    img {
-      vertical-align: top;
-    }
-  }
-  .active {
-    @extend .bg-back-image;
-    font-weight: bold;
-    font-size: 140%;
-    background-color: $hover_background_10p;
-  }
-  .selected {
-    color:gray;
-    border: 1px solid #bbb;
-    border-radius: 3px;
-  }
-  .tags {
-    display: block;
-    text-align: left;
-    font-size: 130%;
-    font-variant: small-caps;
-    &:hover {
-      text-decoration: none;
-    }
-  }
-  .inner-topo {
-    @extend .bg-back-image;
-    padding: $grid-gutter-width 0;
-  }
-
-  .inner-titulo {
-    font-size: 130%;
-    padding: 0 $grid-gutter-width $grid-gutter-width;
-    width: 100%;
-    span {
-      border-radius: 10px;
-      padding: $grid-gutter-width / 2;
-    }
-  }
-
-  .inner-legis {
-    font-size: 120%;
-    border: solid #bbb;
-    border-width: 0px 1px 0 0
-  }
-
-  .inner-sessoes {
-    padding-bottom: $grid-gutter-width;
-    a {
-      padding: 0px 15px;
-      margin: $grid-gutter-width / 2 $grid-gutter-width / 3 0;
-      border: 1px solid #bbb;
-    }
-  }
-
-  .inner-sessoes, .inner-legis {
-    a {
-      border-radius: 3px;
-      &:hover:not(.active):not(.inner-titulo):not(.selected) {
-        border-color: $color_topo_bg;
-        background: $color_topo_bg;
-        color: white;
-      }
-    }
-  }
-
-  .avatar {
-    margin: 1em;
-  }
-  .inner-mesa {
-    text-align: left;
-    border: solid #bbb;
-    border-width: 1px 0 0 1px;
-    margin-left: -$grid-gutter-width / 2 - 1px;
-    a {
-      line-height: 1.2;
-      text-align: center;
-    }
-    .inner-parla {
-      margin: 0 $grid-gutter-width;
-    }
-  }
-  .inner-ativos {
-    @extend .bg-back-image;
-    background-color: $hover_background_05p;
-    padding-bottom: $grid-gutter-width * 2;
-    .avatar {
-      margin: 0.5em;
-    }
-  }
-  .inner-inativos {
-    @extend .bg-back-image;
-    background-color: $hover_background_10p;
-    min-height: 0px;
-    .avatar {
-      opacity: 0.5;
-    }
-  }
-  .inner-suplentes {
-    @extend .bg-back-image;
-    background-color: $hover_background_20p;
-    min-height: 0px;
-  }
-}
-
-.container-videos {
-  margin-top: -20px;
-  .carousel-caption {
-    font-size: 100%;
-  }
-}
-
-
-@import '_social_links';
-@import '_app_sigad';
-@import '_app_agenda';
-@import '_app_ouvidoria';
-@import '_carousel_custom';
-@import '_layout_footer';
-@import '_layout_galeria';
-@import '_layout_navbar';
-@import '_layout_noticias_secundarias';
-@import '_layout_noticias_parlamentares';
-@import '_layout_sidebar';
-@import '_layout_videos';
-@import '_google_search';
-
-
-// #### tags ########################################
-
 .tags {
   display: inline-block;
   position: relative;
@@ -770,6 +622,24 @@ h6 {
     color: darken(#a97905, 5);
   }
 }
+
+@import '_social_links';
+@import '_app_sigad';
+@import '_app_agenda';
+@import '_app_ouvidoria';
+@import '_app_parlamentares';
+@import '_carousel_custom';
+@import '_layout_footer';
+@import '_layout_galeria';
+@import '_layout_navbar';
+@import '_layout_noticias_secundarias';
+@import '_layout_noticias_parlamentares';
+@import '_layout_sidebar';
+@import '_layout_videos';
+@import '_google_search';
+
+
+// #### tags ########################################
 
 /* 
 

@@ -13,153 +13,142 @@
 {% endblock %}
 
 {% block base_content %}
-  <div class="inner">
-    <div class="inner-topo">
-      <div class="row-fluid">
-        <div class="col-md-4 inner-legis">
-          <div class="row-fluid tags">
-            Legislaturas
-          </div>
-          <a class="inner-titulo">
-            <span class="active">
-              {{legislatura_ativa.numero}}º<br>
-              ({{legislatura_ativa.data_inicio.year}} - {{legislatura_ativa.data_fim.year}})
-            </span>
-          </a>
+  <div class="row inner-topo">
+    <div class="col-md-4 inner-legis">
+      <div class="tags">
+        Legislaturas
+      </div>
+      <a class="inner-titulo">
+        <span class="active">
+          {{legislatura_ativa.numero}}º<br>
+          ({{legislatura_ativa.data_inicio.year}} - {{legislatura_ativa.data_fim.year}})
+        </span>
+      </a>
 
+      {% for leg in legislaturas %}
+        <a href="?l={{leg.legislatura.pk}}" title="{{leg.legislatura}}" class="col-xs-2 col-md-3 {% if leg.legislatura == legislatura_ativa%}selected{% endif %}">
+          {{leg.legislatura.numero}}º
+        </a>
+      {% endfor %}
+      <div class="clearfix">
+
+      </div>
+    </div>
+    <div class="col-md-8">
+      <div class="row inner-sessoes">
+        <div class="col-xs-12">
+          <div class="tags">Sessões Legislativas</div>
           {% for leg in legislaturas %}
-            <a href="?l={{leg.legislatura.pk}}" title="{{leg.legislatura}}" class="col-xs-2 col-md-3 {% if leg.legislatura == legislatura_ativa%}selected{% endif %}">
-              {{leg.legislatura.numero}}º
-            </a>
+            {% if leg.legislatura == legislatura_ativa %}
+              {% for sessao in leg.sessoes %}
+                  <a href="?sl={{sessao.sessao.pk}}" class="{% if sessao.sessao == sessaolegislativa_ativa %}active{% endif %}">{{sessao.sessao}}</a>
+              {% endfor %}
+            {% endif %}
           {% endfor %}
-          <div class="clearfix">
-
-          </div>
         </div>
-        <div class="col-md-8">
-          <div class="row inner-sessoes">
-            <div class="col-xs-12">
-              <div class="row-fluid tags">Sessões Legislativas</div>
-              {% for leg in legislaturas %}
-                {% if leg.legislatura == legislatura_ativa %}
-                  {% for sessao in leg.sessoes %}
-                      <a href="?sl={{sessao.sessao.pk}}" class="{% if sessao.sessao == sessaolegislativa_ativa %}active{% endif %}">{{sessao.sessao}}</a>
+      </div>
+      <div class="row container-avatar inner-mesa">
+        <div class="tags w-100">Mesa Diretora</div>
+        <div class="inner-parla w-100">
+          {% for leg in legislaturas %}
+            {% if leg.legislatura == legislatura_ativa %}
+              {% for sessao in leg.sessoes %}
+                {% if sessao.sessao == sessaolegislativa_ativa %}
+                  {% for parlamentar in sessao.mesa %}
+                      <a class="avatar avatar2" href="/{{parlamentar.classe_set.first.absolute_slug}}" class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">
+                      {% if parlamentar.fotografia %}
+                          <img src="{{ parlamentar.fotografia.url }}">
+                      {% else %}
+                          <img src="{% static 'img/perfil.jpg' %}">
+                      {% endif %}
+                        <span>{{parlamentar}}</span>
+                        <small>{{parlamentar.cargo_mesa}}</small>
+                      </a>
                   {% endfor %}
                 {% endif %}
               {% endfor %}
-            </div>
-          </div>
-          <div class="row container-avatar inner-mesa">
-            <div class="col-xs-12">
-              <div class="row-fluid tags">Mesa Diretora</div>
-              <div class="inner-parla">
-                {% for leg in legislaturas %}
-                  {% if leg.legislatura == legislatura_ativa %}
-                    {% for sessao in leg.sessoes %}
-                      {% if sessao.sessao == sessaolegislativa_ativa %}
-                        {% for parlamentar in sessao.mesa %}
-                            <a class="avatar avatar2" href="/{{parlamentar.classe_set.first.absolute_slug}}" class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">
-                            {% if parlamentar.fotografia %}
-                                <img src="{{ parlamentar.fotografia.url }}">
-                            {% else %}
-                                <img src="{% static 'img/perfil.jpg' %}">
-                            {% endif %}
-                              <span>{{parlamentar}}</span>
-                              <small>{{parlamentar.cargo_mesa}}</small>
-                            </a>
-                        {% endfor %}
-                      {% endif %}
-                    {% endfor %}
-                  {% endif %}
-                {% endfor %}
-              </div>
-            </div>
-          </div>
+            {% endif %}
+          {% endfor %}
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="row-fluid">
-      <div class="col-xs-12 container-avatar inner-ativos">
-        <div class="row-fluid tags">Parlamentares</div>
-        {% for leg in legislaturas %}
-          {% if leg.legislatura == legislatura_ativa %}
-            {% for sessao in leg.sessoes %}
-              {% if sessao.sessao == sessaolegislativa_ativa %}
-                {% for parlamentar in sessao.parlamentares %}
-                  {% if parlamentar.titular and not parlamentar.afastado%}
-                    <a class="avatar avatar3" href="/{{parlamentar.classe_set.first.absolute_slug}}" class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">
-                    {% if parlamentar.fotografia %}
-                        <img src="{{ parlamentar.fotografia.url }}">
-                    {% else %}
-                        <img src="{% static 'img/perfil.jpg' %}">
-                    {% endif %}
-                      <span>{{parlamentar}}</span>
-                    </a>
+  <div class="row inner-parlamentares">
+    <div class="col-xs-12 container-avatar inner-ativos w-100">
+      <div class="tags">Parlamentares</div>
+      {% for leg in legislaturas %}
+        {% if leg.legislatura == legislatura_ativa %}
+          {% for sessao in leg.sessoes %}
+            {% if sessao.sessao == sessaolegislativa_ativa %}
+              {% for parlamentar in sessao.parlamentares %}
+                {% if parlamentar.titular and not parlamentar.afastado%}
+                  <a class="avatar avatar3" href="/{{parlamentar.classe_set.first.absolute_slug}}" class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">
+                  {% if parlamentar.fotografia %}
+                      <img src="{{ parlamentar.fotografia.url }}">
+                  {% else %}
+                      <img src="{% static 'img/perfil.jpg' %}">
                   {% endif %}
-                {% endfor %}
-              {% endif %}
-            {% endfor %}
-          {% endif %}
-        {% endfor %}
-      </div>
-      <div class="col-xs-6 container-avatar inner-suplentes">
-
-        {% for leg in legislaturas %}
-          {% if leg.legislatura == legislatura_ativa %}
-            {% for sessao in leg.sessoes %}
-              {% if sessao.sessao == sessaolegislativa_ativa %}
-                {% for parlamentar in sessao.parlamentares %}
-                  {% if not parlamentar.titular and not parlamentar.afastado %}
-                    <div class="tags">Suplentes</div>
-                    <a class="avatar avatar3" href="/{{parlamentar.classe_set.first.absolute_slug}}" class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">
-                    {% if parlamentar.fotografia %}
-                        <img src="{{ parlamentar.fotografia.url }}">
-                    {% else %}
-                        <img src="{% static 'img/perfil.jpg' %}">
-                    {% endif %}
-                      <span>{{parlamentar}}</span>
-                    </a>
-                  {% endif %}
-                {% endfor %}
-              {% endif %}
-            {% endfor %}
-          {% endif %}
-        {% endfor %}
-      </div>
-      <div class="col-xs-6 container-avatar inner-inativos ">
-        {% for leg in legislaturas %}
-          {% if leg.legislatura == legislatura_ativa %}
-            {% for sessao in leg.sessoes %}
-              {% if sessao.sessao == sessaolegislativa_ativa %}
-                {% for parlamentar in sessao.parlamentares %}
-
-                  {% if parlamentar.afastado %}
-                    <div class="tags">Inativos</div>
-                    <a class="avatar avatar3" href="/{{parlamentar.classe_set.first.absolute_slug}}" class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">
-                    {% if parlamentar.fotografia %}
-                        <img src="{{ parlamentar.fotografia.url }}">
-                    {% else %}
-                        <img src="{% static 'img/perfil.jpg' %}">
-                    {% endif %}
-                      <span>{{parlamentar}}</span>
-                    </a>
-                  {% endif %}
-                {% endfor %}
-              {% endif %}
-            {% endfor %}
-          {% endif %}
-        {% endfor %}
-      </div>
-    </div>
-    <div class="row-fluid inner-parlamentar">
-      {% if parlamentar_ativo %}
-        {{parlamentar_ativo}}
-      {% endif %}
+                    <span>{{parlamentar}}</span>
+                  </a>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
     </div>
   </div>
 
+  <div class="row inner-extra">
+    <div class="col-6 container-avatar inner-suplentes">
+      {% for leg in legislaturas %}
+        {% if leg.legislatura == legislatura_ativa %}
+          {% for sessao in leg.sessoes %}
+            {% if sessao.sessao == sessaolegislativa_ativa %}
+              {% for parlamentar in sessao.parlamentares %}
+                {% if not parlamentar.titular and not parlamentar.afastado %}
+                  <div class="tags">Suplentes</div>
+                  <a class="avatar avatar3" href="/{{parlamentar.classe_set.first.absolute_slug}}" class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">
+                  {% if parlamentar.fotografia %}
+                      <img src="{{ parlamentar.fotografia.url }}">
+                  {% else %}
+                      <img src="{% static 'img/perfil.jpg' %}">
+                  {% endif %}
+                    <span>{{parlamentar}}</span>
+                  </a>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+    </div>
+    <div class="col-6 container-avatar inner-inativos ">
+      {% for leg in legislaturas %}
+        {% if leg.legislatura == legislatura_ativa %}
+          {% for sessao in leg.sessoes %}
+            {% if sessao.sessao == sessaolegislativa_ativa %}
+              {% for parlamentar in sessao.parlamentares %}
 
+                {% if parlamentar.afastado %}
+                  <div class="tags">Inativos</div>
+                  <a class="avatar avatar3" href="/{{parlamentar.classe_set.first.absolute_slug}}" class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">
+                  {% if parlamentar.fotografia %}
+                      <img src="{{ parlamentar.fotografia.url }}">
+                  {% else %}
+                      <img src="{% static 'img/perfil.jpg' %}">
+                  {% endif %}
+                    <span>{{parlamentar}}</span>
+                  </a>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
 {% endblock %}
 
 {% block cmj_extra_content %}
