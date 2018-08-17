@@ -19,41 +19,6 @@
   }
 }
 
-.container-avatar {
-  .avatar {
-    padding: 0 0 0 0;
-    display: inline-block;
-    opacity: 0.75;
-    margin-left: 10px;
-    /*border: 2px solid white;
-    padding: 5px;
-    background: $color_main_bg url(/static/img/bg.png);*/
-    img {
-      border: 0px solid transparent;
-      border-radius: 50%;
-      width: 100%;
-    }
-    &:hover {
-      opacity: 1;
-    }
-  }
-  .avatar1 {
-    width: 250px;
-  }
-  .avatar2 {
-    width: 170px;
-  }
-  .avatar3 {
-    width: 130px;
-  }
-  .avatar4 {
-    width: 90px;
-  }
-  .avatar5 {
-    width: 70px;
-  }
-}
-
 .path-parlamentares {
   @extend .container-avatar;
   float: right;

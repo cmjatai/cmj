@@ -26,7 +26,7 @@
       </a>
 
       {% for leg in legislaturas %}
-        <a href="?l={{leg.legislatura.pk}}" title="{{leg.legislatura}}" class="col-xs-2 col-md-3 {% if leg.legislatura == legislatura_ativa%}selected{% endif %}">
+        <a href="?l={{leg.legislatura.pk}}" title="{{leg.legislatura}}" class="col-2 col-md-3 {% if leg.legislatura == legislatura_ativa%}selected{% endif %}">
           {{leg.legislatura.numero}}º
         </a>
       {% endfor %}
@@ -75,8 +75,8 @@
   </div>
 
   <div class="row inner-parlamentares">
+    <div class="tags w-100 pl-3">Parlamentares</div>
     <div class="col-xs-12 container-avatar inner-ativos w-100">
-      <div class="tags">Parlamentares</div>
       {% for leg in legislaturas %}
         {% if leg.legislatura == legislatura_ativa %}
           {% for sessao in leg.sessoes %}
