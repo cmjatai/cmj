@@ -48,9 +48,10 @@
 
 {% block base_content %}
 
-  <div class="container">
+<div class="container">
+  <div class="container-list">
     {% with slug as prefixo_slug %}
-      {% with 3 as split_row %}
+      {% with 0 as split_row %}
         {% with 'path-item-list col-md-4' as css_class %}
           {% include "path/path_list_docs.html" %}
         {% endwith %}
@@ -58,6 +59,7 @@
     {% endwith %}
     {% include "paginacao.html" %}
   </div>
+</div>
 
 
 {% endblock %}
