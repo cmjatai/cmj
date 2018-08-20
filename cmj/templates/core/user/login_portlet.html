@@ -1,60 +1,48 @@
-{% load i18n social_utils staticfiles sass_tags %}
+{% load i18n social_utils staticfiles %}
 
-<div class="container-login container-fluid">
-  <div>
-    <div class="row">
-      <div class="col-xs-12">
-        <form id="login-form" method="post" action="#">
-          {% csrf_token %}
+<div class="container-login">
+  <form id="login-form" method="post" action="#">
+    <div class="label{{backends.backends|length}}">{% trans "Entrar no Portal" %}</div>
+    <div class="inner">
+      {% csrf_token %}
+      <div class="text-center">
+        <small>
+          Seu primeiro acesso?<br>
+          Você pode iniciar seu registro em nosso Portal através das redes sociais
+          para que assim possa interagir.<br>
+        </small>
+      </div>
+      {% if form.errors %}
+        <div class="alert alert-danger">Usuário e/ou Senha inválidos.
+        </div>
+      {% endif %}
+      <div class="input-icon input_username">
+          <span class="fa fa-user fa-2x "></span>
+          {{ form.username }}
+      </div>
+      <div class="input-icon input_password">
+          <span class="fa fa-key fa-2x "></span>
+          {{ form.password }}
+      </div>
+      <div class="row-recovery">
+        <a class="btn btn-link btn-recovery" href="{% url 'cmj.core:recuperar_senha_email' %}" />{% trans "Esqueci minha Senha" %}</a>
+      </div>
 
-          <div class="label{{backends.backends|length}}">{% trans "Entrar no Portal" %}</div>
+      <input  type="hidden" name="next" value="{{ next }}" />
 
-          <div class="text-center">
-            <small>
-              Seu primeiro acesso?<br>
-              Você pode iniciar seu registro em nosso Portal através das redes sociais
-              para que assim possa interagir.<br>
-            </small>
-          </div>
-          <div class="row">
-            {% if form.errors %}
-              <div class="alert alert-danger">Usuário e/ou Senha inválidos.
-              </div>
-            {% endif %}
-          </div>
+      <div class="btns-login container-fluid btns-login-{{backends.backends|length}}">
+        <button class="btn-login" type="submit" value="login" />{% trans "Iniciar Sessão" %}</button>
 
-
-          <div class="row">
-            <div class="input-icon input_username">
-                <span class="fa fa-user fa-2x "></span>
-                {{ form.username }}
-            </div>
-            <div class="input-icon input_password">
-                <span class="fa fa-key fa-2x "></span>
-                {{ form.password }}
-            </div>
-          </div>
-          <div class="row row-recovery">
-            <a class="btn btn-link btn-recovery" href="{% url 'cmj.core:recuperar_senha_email' %}" />{% trans "Esqueci minha Senha" %}</a>
-          </div>
-
-          <input  type="hidden" name="next" value="{{ next }}" />
-
-          <div class="btns-login container-fluid btns-login-{{backends.backends|length}}">
-            <button class="btn-login" type="submit" value="login" />{% trans "Iniciar Sessão" %}</button>
-
-              {% for backend in backends.backends %}
-                <a class="btn-login" id="{{ backend }}-button" name="{{ backend }}"
-                  title = "{% blocktrans with backend_name=backend|social_title %}Acessar com {{ backend_name }}{% endblocktrans %}"
-                  href="{% url 'social:begin' backend=backend %}?next={{view.get_success_url}}">
-                  <img src="{% static backend|social_icon %}" />
-                  {% blocktrans with backend_name=backend|social_title %}Acessar com {{ backend_name }}{% endblocktrans %}
-                </a>
-              {% endfor %}
-          </div>
-          <br>
-        </form>
+          {% for backend in backends.backends %}
+            <a class="btn-login" id="{{ backend }}-button" name="{{ backend }}"
+              title = "{% blocktrans with backend_name=backend|social_title %}Acessar com {{ backend_name }}{% endblocktrans %}"
+              href="{% url 'social:begin' backend=backend %}?next={{view.get_success_url}}">
+              
+              <i class="fa {{ backend|social_icon }}"></i>
+              {% blocktrans with backend_name=backend|social_title %}Acessar com {{ backend_name }}{% endblocktrans %}
+            </a>
+          {% endfor %}
       </div>
     </div>
-  </div>
+  </form>
 </div>
