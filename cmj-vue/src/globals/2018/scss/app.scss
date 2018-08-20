@@ -106,30 +106,12 @@ form {
   }
 }
 
-.page-header {
-  padding: $grid-gutter-width $grid-gutter-width $grid-gutter-width * 0.75 $grid-gutter-width * 1.5;
-  margin: 0em $grid-gutter-width * -0.5 0 $grid-gutter-width * -0.5 ;
-  color: transparentize($color_topo_bg, 0.3);
-  background: darken($color_main_bg, 3%) url(/static/img/bg.png);
-  border-radius: 5px 5px 0 0;
-  border-bottom: 1px solid $color_container_border;
-  font-weight: normal;
-  font-size: 2em;
-}
-
 a {
   color: $color_topo_bg;
 }
 a:focus,
 a:hover {
   color: darken($color_topo_bg, 20%);
-}
-.page-subheader {
-  padding: $grid-gutter-width /2 ;
-  background: darken($color_main_bg, 3%) url(/static/img/bg.png);
-  border-radius: 5px 5px 0 0;
-  border-bottom: 1px solid $color_container_border;
-  margin: 0px;
 }
 
 
@@ -173,13 +155,6 @@ a:hover {
 }
 // colore de forma diferente
 // os containers que não são da app sigad
-.container-box, .container-box-fluid {
-  background-color: $color_container_bg;
-  border-radius: 5px;
-  transition: all 1s ease;
-  margin-bottom: 20px;
-}
-
 
 main {
   .item-action-or-input {
@@ -650,6 +625,7 @@ h6 {
   }
 }
 
+@import '_layout_2018';
 @import '_social_links';
 @import '_app_agenda';
 @import '_app_core';
