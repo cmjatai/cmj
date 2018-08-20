@@ -3,7 +3,6 @@ import './app_sapl'
 
 window.$ = window.jQuery = jQuery
 
-
 window.Gallery = function () {
   let instance
   // eslint-disable-next-line
@@ -265,14 +264,14 @@ window.Gallery = function () {
             progress.css('width', img.style.width)
             progress.css('left', img.offsetLeft + 'px')
             progress.css('top', img.offsetTop + img.offsetHeight - 2 + 'px')
-            progress.removeClass('hidden')
+            progress.removeClass('invisible')
           }, 100)
         }
 
         if ($(preloads[i].data).find('img').length === 1) {
           $(preloads[i]).find('img').one('load', function () {
             instance.ajustaShowImage(this)
-            progress.addClass('hidden')
+            progress.addClass('invisible')
             if (i < preloads.length - 1) {
               preloadImgs(i + 1)
             }
@@ -325,18 +324,18 @@ window.Gallery = function () {
             progress.css('width', img.style.width)
             progress.css('left', img.offsetLeft + 'px')
             progress.css('top', img.offsetTop + img.offsetHeight - 2 + 'px')
-            progress.removeClass('hidden')
+            progress.removeClass('invisible')
           }, 100)
 
           setTimeout(function () {
             $(img).one('load', function () {
-              progress.addClass('hidden')
+              progress.addClass('invisible')
               instance.ajustaShowImage(img)
               instance.recreateNextPrevious(_this)
             }).attr('src', thumb.getAttribute('data-src'))
           }, 200)
         } else {
-          progress.addClass('hidden')
+          progress.addClass('invisible')
           instance.ajustaShowImage(img)
           instance.recreateNextPrevious(_this)
         }

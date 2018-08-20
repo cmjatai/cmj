@@ -18,8 +18,8 @@
 {% block base_content %}
   {% for galeria in object_list %}
     {% if forloop.first and galeria.tipo != galeria.TD_BI %}
-      <div class="albuns-show-gallery hidden"></div>
-      <form class="hidden" method="post">{% csrf_token %}</form>
+      <div class="albuns-show-gallery invisible"></div>
+      <form class="invisible" method="post">{% csrf_token %}</form>
       <div class="row">
     {% endif %}
     <div class="col-md-4 col-xs-6">
@@ -104,9 +104,9 @@
 
           $.post(this.href, form_data)
             .done(function(data) {
-            $('.albuns-show-gallery').removeClass('hidden').html(data);
-            $('.albuns-show-gallery .btn-close').removeClass('hidden').click(function() {
-              $('.albuns-show-gallery').html('').addClass('hidden');
+            $('.albuns-show-gallery').removeClass('invisible').html(data);
+            $('.albuns-show-gallery .btn-close').removeClass('invisible').click(function() {
+              $('.albuns-show-gallery').html('').addClass('invisible');
             });
             Gallery().init();
           });
