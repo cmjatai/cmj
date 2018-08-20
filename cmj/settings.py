@@ -222,11 +222,11 @@ SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
 SOCIAL_BACKEND_INFO = {
     'facebook': {
         'title': 'Facebook',
-        'icon': 'img/icon-facebook.png',
+        'icon': 'fa-facebook-f',
     },
     'google-oauth2': {
         'title': 'Google',
-        'icon': 'img/icon-google-plus.png',
+        'icon': 'fa-google-plus',
     },
 }
 

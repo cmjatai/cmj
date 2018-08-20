@@ -1,12 +1,7 @@
 {% extends "base.html" %}
-{% load i18n social_utils staticfiles sass_tags %}
+{% load i18n social_utils %}
 
-{% block head_content %}{{block.super}}
-  {% comment %} customizações de layout para tela de login apartir de 2017 {% endcomment %}
-  <link rel="stylesheet" href="{% sass_src 'styles/login.scss' %}" type="text/css">
-{% endblock %}
 {% block main_container_class %}container{% endblock %}
-
 
 {% block title %}{% endblock title %}
 {% block base_content %}

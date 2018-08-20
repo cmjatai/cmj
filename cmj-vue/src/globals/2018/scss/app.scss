@@ -18,7 +18,7 @@ body, html {
 
 
 form {
-  margin-top: 1em;
+  margin: 1em 0;
 }
 
 
@@ -37,16 +37,6 @@ form {
       font-weight: normal;
     }
 }
-.input-icon {
-  [class*="fa-"] {
-      transform: translateY(-50%);
-      margin-top: 0px;
-  }
-  .form-control {
-    text-indent: 40px;
-  }
-}
-
 
 
 // ajuste bootstrap ########################################
@@ -662,6 +652,7 @@ h6 {
 
 @import '_social_links';
 @import '_app_agenda';
+@import '_app_core';
 @import '_app_ouvidoria';
 @import '_app_parlamentares';
 @import '_app_sigad';
