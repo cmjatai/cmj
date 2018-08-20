@@ -278,17 +278,11 @@
 
               {% block base_workspace %}
                 {% if view.is_contained %}
-                  <nav class="navbar navbar-area-trabalho">
+                  <div class="box-area-trabalho">
                     {% for at in areatrabalho %}
-                      {% if forloop.first %}
-                        <ul class="nav navbar-nav" >
-                      {% endif %}
-                        <li><a>{{at.nome}}</a></li>
-                      {% if forloop.last %}
-                        </ul>
-                      {% endif %}
+                        <a>{{at.nome}}</a>
                     {% endfor %}
-                  </nav>
+                  </div>
                 {% endif %}
               {% endblock base_workspace %}
 

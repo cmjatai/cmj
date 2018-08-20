@@ -1,0 +1,42 @@
+.container-box {
+  margin: $grid-gutter-width auto;
+  background: darken($color_main_bg, 3%) url(../img/bg.png);
+  padding-bottom: $grid-gutter-width / 2;
+  position: relative;
+  .box-area-trabalho {
+    display: inline-block;
+    position: absolute;
+    right: $grid-gutter-width / 2;
+    margin-top: $grid-gutter-width / -3;
+    
+    a {
+      border: 1px solid darken($color_main_bg, 1%);
+      font-family: Lato;
+      font-size: 1em;
+      line-height: 1;
+      background: darken($color_main_bg, 40%) url(../img/bg.png);
+      color: #666;
+      padding: 0 $grid-gutter-width / 2;
+    }
+  }
+}
+
+.page-header {
+  padding: $grid-gutter-width $grid-gutter-width $grid-gutter-width * 0.75 $grid-gutter-width * 1.5;
+  margin: 0em $grid-gutter-width * -0.5 0 $grid-gutter-width * -0.5 ;
+  color: transparentize($color_topo_bg, 0.3);
+  background: darken($color_main_bg, 10%) url(../img/bg.png);
+  border-radius: 5px 5px 0 0;
+  border-bottom: 1px solid $color_container_border;
+  font-weight: normal;
+  font-size: 2em;
+}
+
+.page-subheader {
+  padding: $grid-gutter-width /2 ;
+  background: darken($color_main_bg, 3%) url(../img/bg.png);
+  border-radius: 5px 5px 0 0;
+  border-bottom: 1px solid $color_container_border;
+  margin: 0px;
+}
+

@@ -57,7 +57,7 @@ INSTALLED_APPS = (
 
     # more
     'django_extensions',
-    'bootstrap3',  # basically for django_admin_bootstrapped
+    'bootstrap4',
     'crispy_forms',
 
     'easy_thumbnails',  # ?
@@ -264,8 +264,8 @@ MEDIA_PROTECTED_ROOT = PROJECT_DIR.child("media_protected")
 
 DAB_FIELD_RENDERER = \
     'django_admin_bootstrapped.renderers.BootstrapFieldRenderer'
-CRISPY_TEMPLATE_PACK = 'bootstrap3'
-CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap3'
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap4'
 CRISPY_FAIL_SILENTLY = not DEBUG
 
 """BOWER_COMPONENTS_ROOT = PROJECT_DIR.child("bower")

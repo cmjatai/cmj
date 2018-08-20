@@ -1,9 +1,5 @@
 {% extends "base.html" %}
-{% load i18n crispy_forms_tags staticfiles sass_tags %}
-
-{% block head_content %}{{block.super}}
-  <link rel="stylesheet" href="{% sass_src 'styles/login.scss' %}{% if DEBUG %}?time={% now "jS F Y H:i:s" %}{% endif %}" type="text/css">
-{% endblock %}
+{% load i18n crispy_forms_tags staticfiles %}
 
 {% block id_wrapper %}pagina-inicial{% endblock %}
 {% block canais_absolute %}{% endblock %}
