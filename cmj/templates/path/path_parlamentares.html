@@ -1,5 +1,6 @@
 {% extends "base_path.html" %}
-{% load i18n sigad_filters staticfiles social_utils%}
+{% load i18n sigad_filters  social_utils%}
+{% load webpack_static from webpack_loader %}
 
 {% block main_container_class %}container-fluid container-legislaturas{% endblock %}
 {% block base_functions %}{% endblock %}
@@ -59,7 +60,7 @@
                       {% if parlamentar.fotografia %}
                           <img src="{{ parlamentar.fotografia.url }}">
                       {% else %}
-                          <img src="{% static 'img/perfil.jpg' %}">
+                          <img src="{% webpack_static 'img/perfil.jpg' %}">
                       {% endif %}
                         <span>{{parlamentar}}</span>
                         <small>{{parlamentar.cargo_mesa}}</small>
@@ -87,7 +88,7 @@
                   {% if parlamentar.fotografia %}
                       <img src="{{ parlamentar.fotografia.url }}">
                   {% else %}
-                      <img src="{% static 'img/perfil.jpg' %}">
+                      <img src="{% webpack_static 'img/perfil.jpg' %}">
                   {% endif %}
                     <span>{{parlamentar}}</span>
                   </a>
@@ -113,7 +114,7 @@
                   {% if parlamentar.fotografia %}
                       <img src="{{ parlamentar.fotografia.url }}">
                   {% else %}
-                      <img src="{% static 'img/perfil.jpg' %}">
+                      <img src="{% webpack_static 'img/perfil.jpg' %}">
                   {% endif %}
                     <span>{{parlamentar}}</span>
                   </a>
@@ -137,7 +138,7 @@
                   {% if parlamentar.fotografia %}
                       <img src="{{ parlamentar.fotografia.url }}">
                   {% else %}
-                      <img src="{% static 'img/perfil.jpg' %}">
+                      <img src="{% webpack_static 'img/perfil.jpg' %}">
                   {% endif %}
                     <span>{{parlamentar}}</span>
                   </a>
