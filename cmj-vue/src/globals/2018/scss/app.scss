@@ -75,36 +75,8 @@ form {
 .nav-acessar {
   display: none;
 }
-// ADJUST topo ########################################
-.masthead {
-  z-index: 10;
-  .slogan {
-    color: $color_topo_bg;
-    float: right;
-  }
-  .nav-tabs {
-    margin-top: 10px;
-    border-bottom: 0px;
-    margin-right: $grid-gutter-width;
-    li {
-      a {
-        border-bottom: 0px;
-        padding: 7px 10px 4px;
-        &:hover {
-          border-bottom: 0px;
-          background: darken($color_main_bg, 4%) url(/static/img/bg.png);
-        }
-      }
-      &.active {
-        a {
-          background: darken($color_main_bg, 4%) url(/static/img/bg.png);
-          border-color: $color_container_border;
-          border-bottom: 1px;
-        }
-      }
-    }
-  }
-}
+
+
 
 a {
   color: $color_topo_bg;
@@ -155,40 +127,6 @@ a:hover {
 }
 // colore de forma diferente
 // os containers que não são da app sigad
-
-main {
-  .item-action-or-input {
-    border-color: darken($color_main_bg, 10%);
-    &:hover {
-      border-color: darken($color_main_bg, 20%);
-      box-shadow: 0 0 30px  lighten($color_main_bg, 3%);
-    }
-    &:focus, &:active {
-      border-color: darken($color_main_bg, 40%);
-      box-shadow: 0 0 30px  lighten($color_main_bg, 3%);
-        background-color:  darken($color_container_bg, 10%);
-    }
-  }
-  .form-control, .btn-default {
-    @extend .item-action-or-input;
-  }
-  .btn-default {
-    color: darken($color_main_bg, 60%);
-    &:hover {
-      color: darken($color_main_bg, 70%);
-      background-color: $color_main_bg;
-    }
-    &.btn-excluir {
-      color: $danger;
-      &:hover {
-        color: $danger;
-        border-color: lighten($danger, 5%);
-        background-color: lighten($danger, 5%);
-      }
-    }
-  }
-
-}
 
 .control-label {
   color: $color_text;
@@ -281,32 +219,6 @@ p.control-label {
   margin-bottom: 0;
 }
 
-.form-control-static {
-  font-size: 1.2em;
-  border-bottom: 1px solid darken($color_main_bg, 5%);
-  line-height: 1.5em;
-  padding-bottom: 3px;
-  min-height: 2em;
-  background: transparentize($color_main_bg, 0.4);
-  ul {
-    padding-left: $grid-gutter-width * 1.2;
-  }
-}
-
-.legend, legend { // tag legend para crud updates
-  clear:both;
-  display: block;
-  width: 100%;
-  padding: 0;
-  font-size: ($font-size-base * 1.5);
-  line-height: inherit;
-  //color: $legend-color;
-  border: 0;
-  //border-bottom: 1px solid $legend-border-color;
-  font-weight: normal;
-  font-family: "SourceSansProSemiBold", Helvetica, Arial, sans-serif;
-
-}
 
 // #### CRUD UPDATE ########################################
 

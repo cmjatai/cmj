@@ -80,6 +80,10 @@
       & > li {
         position: relative;
         &:hover {
+          ul {
+            left: auto;
+            right: 100%;
+          }
           & > ul {
             left: auto;
             right: 5px;
