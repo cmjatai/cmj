@@ -1,6 +1,7 @@
-{% load i18n staticfiles cropping%}
+{% load i18n cropping%}
+{% load webpack_static from webpack_loader %}
 {% if user_render.avatar %}
-  <img  class="avatar" src="{% cropped_thumbnail user_render "cropping" %}">
+  <img class="avatar" src="{% cropped_thumbnail user_render 'cropping' %}">
 {% else %}
-  <img  class="avatar" src="{% static 'img/perfil.jpg' %}"title="{{user_render}}">
+  <img class="avatar" src="{% webpack_static 'img/perfil.jpg' %}" title="{{user_render}}">
 {% endif %}
