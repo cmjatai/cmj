@@ -1,5 +1,6 @@
 {% extends "base_path.html" %}
-{% load i18n sigad_filters staticfiles social_utils cropping thumbnail %}
+{% load i18n sigad_filters social_utils cropping thumbnail %}
+{% load webpack_static from webpack_loader %}
 
 {% block main_container_class %}container-path container-path-parlamentar{% endblock %}
 {% block base_functions %}{% endblock %}
@@ -27,7 +28,7 @@
               {% if object.parlamentar.fotografia %}
                   <img src="{{ object.parlamentar.fotografia.url }}">
               {% else %}
-                  <img src="{% static 'img/perfil.jpg' %}">
+                  <img src="{% webpack_static 'img/perfil.jpg' %}">
               {% endif %}
             </a>
           </div>
