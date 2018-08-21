@@ -9,7 +9,7 @@ module.exports = {
 
     // Paths
     assetsRoot: path.resolve(__dirname, '../bundle/dev'),
-    assetsSubDirectory: 'static',
+    assetsSubDirectory: '',
     assetsPublicPath: 'http://localhost:8080/static/',
     proxyTable: {},
 

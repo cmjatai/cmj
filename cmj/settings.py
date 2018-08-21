@@ -251,12 +251,6 @@ LOCALE_PATHS = (
 )
 
 
-WEBPACK_LOADER = {
-    'DEFAULT': {
-        'BUNDLE_DIR_NAME': 'bundle/dist/',
-        'STATS_FILE': PROJECT_DIR.child('cmj-vue').child('webpack-stats.json'),
-    }
-}
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = PROJECT_DIR.child("media")
@@ -280,6 +274,14 @@ BOWER_INSTALLED_APPS = (
 
 STATIC_URL = '/static/'
 STATIC_ROOT = PROJECT_DIR.child("collected_static")
+
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'CACHE': not DEBUG,
+        'BUNDLE_DIR_NAME': 'bundle/dist/',
+        'STATS_FILE': PROJECT_DIR.child('cmj-vue').child('webpack-stats.json'),
+    }
+}
 
 STATICFILES_DIRS = (
     BASE_DIR.child("static"),
