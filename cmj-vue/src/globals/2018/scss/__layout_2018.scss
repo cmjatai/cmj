@@ -1,5 +1,5 @@
 .container-box {
-  margin: $grid-gutter-width auto;
+  margin: 0 auto $grid-gutter-width;
   background: darken($color_main_bg, 3%) url(../img/bg.png);
   padding-bottom: $grid-gutter-width / 2;
   position: relative;
@@ -19,17 +19,44 @@
       padding: 0 $grid-gutter-width / 2;
     }
   }
+
+  .legend, legend { // tag legend para crud updates
+    clear:both;
+    display: block;
+    width: 100%;
+    padding: 0;
+    font-size: ($font-size-base * 1.5);
+    line-height: 1;
+    color: #444;
+    border: 0;
+    border-bottom: 1px solid #ddd;
+    font-weight: normal;
+    font-family: "SourceSansProSemiBold", Helvetica, Arial, sans-serif;
+
+  }
+
+  .form-control-static {
+    font-size: 1.2em;
+    border-bottom: 1px solid darken($color_main_bg, 5%);
+    line-height: 2em;
+    padding: 0px $grid-gutter-width / 2;
+    min-height: 2em;
+    background: transparentize($color_main_bg, 0.4);
+    ul {
+      padding-left: $grid-gutter-width * 1.2;
+    }
+  }
 }
 
 .page-header {
-  padding: $grid-gutter-width $grid-gutter-width $grid-gutter-width * 0.75 $grid-gutter-width * 1.5;
+  padding: $grid-gutter-width / 1.5;
   margin: 0em $grid-gutter-width * -0.5 0 $grid-gutter-width * -0.5 ;
   color: transparentize($color_topo_bg, 0.3);
   background: darken($color_main_bg, 10%) url(../img/bg.png);
   border-radius: 5px 5px 0 0;
   border-bottom: 1px solid $color_container_border;
   font-weight: normal;
-  font-size: 2em;
+  font-size: 1.7em;
 }
 
 .page-subheader {
@@ -38,5 +65,69 @@
   border-radius: 5px 5px 0 0;
   border-bottom: 1px solid $color_container_border;
   margin: 0px;
+}
+
+.btn-excluir {
+  &:hover {
+    color: white;
+
+  }
+}
+
+.masthead {
+  .nav-tabs {
+    margin-top: $grid-gutter-width;
+    border-bottom: 0px;
+    li {
+      margin-left: 1px;
+      line-height: 2em;
+      border-radius: 5px 5px 0 0;
+      a {
+        text-decoration: none;
+        line-height: 2em;
+        padding: 0 $grid-gutter-width / 4;
+      }
+      &:hover {
+        background: darken($color_main_bg, 10%) url(../img/bg.png);
+      }
+      &.active {
+        background: darken($color_main_bg, 10%) url(../img/bg.png);
+      }
+    }
+  }
+}
+
+
+main {
+  .item-action-or-input {
+    border-color: darken($color_main_bg, 10%);
+    &:hover {
+      border-color: darken($color_main_bg, 20%);
+      box-shadow: 0 0 30px  lighten($color_main_bg, 3%);
+    }
+    &:focus, &:active {
+      border-color: darken($color_main_bg, 40%);
+      box-shadow: 0 0 30px  lighten($color_main_bg, 3%);
+        background-color:  darken($color_container_bg, 10%);
+    }
+  }
+  .form-control, .btn-default {
+    @extend .item-action-or-input;
+  }
+  .btn-default {
+    color: darken($color_main_bg, 60%);
+    &:hover {
+      color: darken($color_main_bg, 70%);
+      background-color: $color_main_bg;
+    }
+    &.btn-excluir {
+      color: $danger;
+      &:hover {
+        color: white;
+        border-color: lighten($danger, 5%);
+        background-color: lighten($danger, 5%);
+      }
+    }
+  }
 }
 
