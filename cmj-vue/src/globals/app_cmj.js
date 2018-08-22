@@ -750,5 +750,5 @@ window.$(document).ready(function () {
   window.refreshMask()
   window.autorModal()
   // initTinymce()
-  window.OptionalCustomFrontEnd()
+  // window.OptionalCustomFrontEnd()
 })
