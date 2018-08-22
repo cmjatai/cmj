@@ -1,5 +1,5 @@
 import jQuery from 'jquery'
-import './app_sapl'
+import './functions'
 
 window.$ = window.jQuery = jQuery
 
@@ -413,22 +413,342 @@ window.Gallery = function () {
   // instance.init()
 }
 
-window.ContainerFirst = function () {
-  let first = $('.container-first')
-
-  if (first.height() > window.innerHeight) {
-    first.css('height', window.innerHeight)
-    let btn = first.find('.btn').click(function () {
-      this.parentElement.remove()
-      first.css('height', '')
-      first.removeClass('container-first')
+window.autorModal = function () {
+  $(function () {
+    let dialog = $('#modal_autor').dialog({
+      autoOpen: false,
+      modal: true,
+      width: 500,
+      height: 300,
+      show: {
+        effect: 'blind',
+        duration: 500
+      },
+      hide: {
+        effect: 'explode',
+        duration: 500
+      }
     })
-    if (btn.length === 0) {
-      first.css('height', '')
-    }
-  } else {
-    first.removeClass('.container-first')
-    first.css('height', '')
-    first.find('.painel-corte').remove()
-  }
+
+    $('#button-id-limpar').click(function () {
+      $('#nome_autor').text('')
+
+      function cleanIfExists (fieldname) {
+        if ($(fieldname).length > 0) {
+          $(fieldname).val('')
+        }
+      }
+      cleanIfExists('#id_autor')
+      cleanIfExists('#id_autoria__autor')
+    })
+
+    $('#button-id-pesquisar').click(function () {
+      $('#q').val('')
+      $('#div-resultado').children().remove()
+      $('#modal_autor').dialog('open')
+      $('#selecionar').attr('hidden', 'hidden')
+    })
+
+    $('#pesquisar').click(function () {
+      let query = $('#q').val()
+
+      $.get('/api/autor?q=' + query, function (data, status) {
+        $('#div-resultado').children().remove()
+        if (data.pagination.total_entries === 0) {
+          $('#selecionar').attr('hidden', 'hidden')
+          $('#div-resultado').html('<span class="alert"><strong>Nenhum resultado</strong></span>')
+          return
+        }
+
+        let select = $('<select id="resultados" style="min-width: 90%; max-width:90%;" size="5"/>')
+
+        data.results.forEach(function (item, index) {
+          select.append($('<option>').attr('value', item.value).text(item.text))
+        })
+
+        $('#div-resultado').append('<br/>').append(select)
+        $('#selecionar').removeAttr('hidden', 'hidden')
+
+        $('#selecionar').click(function () {
+          let res = $('#resultados option:selected')
+          let id = res.val()
+          let nome = res.text()
+
+          $('#nome_autor').text(nome)
+
+          // MateriaLegislativa pesquisa Autor via a tabela Autoria
+          if ($('#id_autoria__autor').length) {
+            $('#id_autoria__autor').val(id)
+          }
+          // Protocolo pesquisa a própria tabela de Autor
+          if ($('#id_autor').length) {
+            $('#id_autor').val(id)
+          }
+          dialog.dialog('close')
+        })
+      })
+    })
+  })
 }
+
+window.OptionalCustomFrontEnd = function () {
+  // Adaptações opcionais de layout com a presença de JS.
+  // Não implementar customizações que a funcionalidade que fique dependente.
+  let instance
+  if (!(this instanceof window.OptionalCustomFrontEnd)) {
+    if (!instance) {
+      instance = new window.OptionalCustomFrontEnd()
+    }
+    return instance
+  }
+  instance = this
+  window.OptionalCustomFrontEnd = function () {
+    return instance
+  }
+  instance.customCheckBoxAndRadio = function () {
+    $('[type=radio], [type=checkbox]').each(function () {
+      let _this = $(this)
+      let _controls = _this.closest('.controls')
+      _controls && _controls.find(':file').length === 0 && !_controls.hasClass('controls-radio-checkbox') && _controls.addClass('controls-radio-checkbox')
+      _controls.find(':file').length > 0 && _controls.addClass('controls-file')
+    })
+  }
+  instance.customCheckBoxAndRadioWithoutLabel = function () {
+    $('[type=radio], [type=checkbox]').each(function () {
+      let _this = $(this)
+      let _label = _this.closest('label')
+
+      if (_label.length) {
+        return
+      }
+
+      if (this.id) {
+        _label = $('label[for=' + this.id + ']')
+      } else {
+        _label = $('<label/>').insertBefore(this)
+      }
+
+      if (_label.length) {
+        _label.addClass('checkbox-inline')
+        _label.prepend(_this)
+        _this.checkbox()
+      }
+    })
+  }
+  instance.init = function () {
+    this.customCheckBoxAndRadio()
+    this.customCheckBoxAndRadioWithoutLabel()
+  }
+  instance.init()
+}
+
+window.ImpressoEnderecamentoRenderer = function (opts) {
+  $(function () {
+    let ier = $('body').children('.ier')
+    if (ier.length > 0) {
+      $(ier).remove()
+    }
+    ier = $('<div class="ier"/>')
+    let eb = $('<div class="etiqueta"/>')
+
+    let form = $('form')
+    form.after(ier)
+
+    let resize = function (event) {
+      let larguraPagina = parseFloat(form[0].elements['largura_pagina'].value)
+      let alturaPagina = parseFloat(form[0].elements['altura_pagina'].value)
+      let rotate = form[0].elements['rotate'].value === 'True'
+
+      let razao = alturaPagina / larguraPagina
+      let conversao = ier.width() / larguraPagina
+      ier.height(ier.width() * razao)
+
+      let margemEsquerda = parseFloat(form[0].elements[rotate ? 'margem_superior' : 'margem_esquerda'].value) * conversao
+      let margemSuperior = parseFloat(form[0].elements[rotate ? 'margem_esquerda' : 'margem_superior'].value) * conversao
+
+      let colunasfolha = parseInt(form[0].elements['colunasfolha'].value)
+      let linhasfolha = parseInt(form[0].elements['linhasfolha'].value)
+
+      let entreColunas = parseFloat(form[0].elements[rotate ? 'entre_linhas' : 'entre_colunas'].value) * conversao
+      let entreLinhas = parseFloat(form[0].elements[rotate ? 'entre_colunas' : 'entre_linhas'].value) * conversao
+
+      let larguraetiqueta = parseFloat(form[0].elements[rotate ? 'alturaetiqueta' : 'larguraetiqueta'].value) * conversao
+      let alturaetiqueta = parseFloat(form[0].elements[rotate ? 'larguraetiqueta' : 'alturaetiqueta'].value) * conversao
+
+      let totalEtiquetas = colunasfolha * linhasfolha
+
+      let etiquetas = $('.ier .etiqueta')
+      while (etiquetas.length < totalEtiquetas) {
+        etiquetas.push(eb.clone())
+        ier.append(etiquetas[etiquetas.length - 1])
+      }
+      while ($('.ier .etiqueta').length > totalEtiquetas) {
+        $('.ier .etiqueta').last().remove()
+      }
+      etiquetas = $('.ier .etiqueta')
+      etiquetas.width(larguraetiqueta)
+      etiquetas.height(alturaetiqueta)
+
+      for (let i = 0; i < etiquetas.length; i++) {
+        let left = margemEsquerda
+        let top = margemSuperior
+
+        let quociente = i / colunasfolha | 0
+        let resto = i % colunasfolha
+
+        console.log(quociente + ' = ' + resto)
+
+        if (resto > 0) {
+          left += (resto) * entreColunas + (resto) * larguraetiqueta
+        }
+        if (quociente > 0) {
+          top += (quociente) * entreLinhas + (quociente) * alturaetiqueta
+        }
+
+        etiquetas[i].style.left = left + 'px'
+        if (rotate) {
+          etiquetas[i].style.bottom = top + 'px'
+        } else {
+          etiquetas[i].style.top = top + 'px'
+        }
+      }
+    }
+    $(window).resize(resize)
+    form.change(resize)
+    $(window).trigger('resize')
+  })
+}
+window.TrechoSearch = function (opts) {
+  $(function () {
+    let ctsClear = $('body').children('.cts') // Container Trecho Search
+    if (ctsClear.length > 0) {
+      $(ctsClear).remove()
+    }
+
+    $("input[name='endereco']").each(function () {
+      let input = $(this)
+      let inputRow = $(input.closest('.row'))
+      let cts = $('<div class="cts"/>')
+      let qOld = input.val()
+      let qNew = input.val()
+      let intervalKeyPress = null
+      input.after(cts)
+
+      let ctsShow = function () {
+        let rowPosition = inputRow[0].getBoundingClientRect()
+        let inputPosition = input[0].getBoundingClientRect()
+        cts.animate({
+          'top': inputPosition.bottom,
+          'left': inputPosition.left + 7,
+          'right': rowPosition.right - rowPosition.width
+        }, 400)
+      }
+      let ctsHidden = function () {
+        cts.css('visibility', 'hidden')
+      }
+
+      $(window).resize(ctsHidden)
+      $(window).scroll(ctsHidden)
+
+      let zoomListeners = [ctsHidden]
+      let lastWidth = 0
+      let pollZoomFireEvent = function () {
+        let widthNow = $(window).width()
+        if (lastWidth === widthNow) return
+        lastWidth = widthNow
+        // Length changed, user must have zoomed, invoke listeners.
+        for (let i = zoomListeners.length - 1; i >= 0; --i) {
+          zoomListeners[i]()
+        }
+      }
+      setInterval(pollZoomFireEvent, 300)
+
+      let flagNewkeypress = false
+      let flagGetRunAjax = false
+      let keyUpEndereco = function () {
+        if (qOld !== qNew) {
+          qOld = qNew
+          return
+        }
+        if (!flagNewkeypress) {
+          return
+        }
+        flagNewkeypress = false
+
+        if (flagGetRunAjax) {
+          return
+        }
+        flagGetRunAjax = true
+
+        let formData = {
+          'q': qNew,
+          'format': 'json'
+        }
+        $.get(opts.api_rest_list, formData).done(function (data) {
+          cts.html('')
+          ctsShow()
+          cts.css('visibility', (data.results.length === 0 ? 'hidden' : 'visible'))
+
+          $.each(data.results, function (index, itemData) {
+            let its = $('<div class="its"/>') // Item de Trecho Search
+            its.append(itemData.display)
+            cts.append(its)
+
+            its.on('click', function (event, setDataEndereco) {
+              let pk = this.data
+              let formData = {
+                'format': 'json'
+              }
+              let url = opts.api_rest_retrieve
+              url = url.replace('0', pk)
+              $.get(url, formData, function (retrivieData) {
+                $("input[name='trecho']").val(pk)
+                if (setDataEndereco !== undefined && setDataEndereco) {
+                  $("input[name='endereco']").attr('data', retrivieData.tipo_descricao + ' ' + retrivieData.logradouro_descricao)
+                } else {
+                  $("input[name='endereco']").val(retrivieData.tipo_descricao + ' ' + retrivieData.logradouro_descricao)
+                }
+                $("select[name='bairro']").val(retrivieData.bairro_id)
+                $("input[name='cep']").val(retrivieData.cep[0])
+                $("select[name='distrito']").val(retrivieData.distrito_id)
+                $("select[name='regiao_municipal']").val(retrivieData.regiao_municipal_id)
+                $("select[name='municipio']").val(retrivieData.municipio_id)
+                $("select[name='uf']").val(retrivieData.uf)
+              })
+            })
+            its[0].data = itemData.pk
+          })
+        }).always(function () {
+          flagGetRunAjax = false
+        })
+      }
+      input.on('keyup', function () {
+        if (intervalKeyPress === null) {
+          intervalKeyPress = setInterval(keyUpEndereco, 700)
+        }
+        flagNewkeypress = true
+        qNew = input.val()
+        if (qNew === qOld || qNew.length < 3) {
+          cts.css('visibility', 'hidden')
+        }
+      }).on('blur', function () {
+        let inputData = $(this).attr('data')
+        if (inputData !== undefined && inputData !== '') {
+          $(this).val(inputData)
+        }
+
+        setTimeout(function () {
+          cts.css('visibility', 'hidden')
+        }, 300)
+      })
+    })
+  })
+}
+
+window.$(document).ready(function () {
+  window.refreshDatePicker()
+  window.refreshMask()
+  window.autorModal()
+  // initTinymce()
+  window.OptionalCustomFrontEnd()
+})
