@@ -438,6 +438,8 @@ class ProcessoForm(ModelForm):
                         linha[idx] = (InlineRadios('importancia'), field[1])
 
         self.helper = FormHelper()
+
+        self.helper.field_class = 'controls'
         self.helper.layout = SaplFormLayout(*yaml_layout)
 
         super(ProcessoForm, self).__init__(*args, **kwargs)
@@ -547,7 +549,8 @@ class ContatoFragmentSearchForm(forms.Form):
                 _('Filtrar'), css_class='btn-default',
                 type='button', onclick='atualizaContatos(event)'))"""
 
-        self.fields['contatos_search'].widget = forms.CheckboxSelectMultiple()
+        self.fields['contatos_search'].widget = forms.CheckboxSelectMultiple(
+        )
 
         queryset = Contato.objects.filter(
             workspace=self.initial['workspace']).exclude(
@@ -572,6 +575,7 @@ class ContatoFragmentSearchForm(forms.Form):
         self.fields['contatos_search'].choices = [(c.pk, c) for c in queryset]
 
         self.helper = FormHelper()
+        self.helper.field_class = 'controls'
         self.helper.layout = Layout(
             Div(
                 Field('contatos_search'),

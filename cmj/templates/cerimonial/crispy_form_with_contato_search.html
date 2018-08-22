@@ -4,12 +4,14 @@
 {% block extra_js %}
 
   <script type="text/javascript">
+
+    OptionalCustomFrontEnd();
     function changeHideShow() {
-      var help = $('.form-group-contatos .help-block');
-      if (help.parent().children().length > 1)
-        help.css('display', 'none');
-      else {
-        help.css('display', 'block');
+      let help_text = $('#hint_id_contatos')
+      if (help_text.parent().children().length > 1) {
+        help_text.css('display', 'none')
+      } else {
+        help_text.css('display', 'block')
       }
     }
     function updateBindChange() {
@@ -27,17 +29,16 @@
       var pks_exclude = $(".form-group-contatos input:checkbox[name=contatos]:checked").map(function(){return $(this).val()}).get()
 
       var _this = $("#id_q");
-      var url_get_contatos = '{% url 'cmj.cerimonial:ajax_search_contatos' %}';
+      var url_get_contatos = '{% url "cmj.cerimonial:ajax_search_contatos" %}';
       var q = _this.val()
       updateBindChange();
       $.get(url_get_contatos, {'q':q, 'pks_exclude':pks_exclude}, function(data) {
         var parent = _this.closest('.form-group').siblings();
         parent.replaceWith(data);
-        OptionalCustomFrontEnd();
 
-        $( ".form-group-contatos-search div, .form-group-contatos div" ).sortable({
+        $( ".form-group-contatos-search .controls, .form-group-contatos .controls" ).sortable({
           connectWith: ".controls",
-          items: "div.checkbox",
+          items: ".form-check",
           stop: function( event, ui ) {
             var value = ui.item.find('input').val();
             var text =  ui.item.text()
@@ -50,7 +51,7 @@
               var i = ui.item.find('input')
               i.prop( "checked", true );
               i.prop( 'name', 'contatos');
-              i.trigger('click');
+              //i.trigger('click');
               updateBindChange()
             }
           }
