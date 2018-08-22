@@ -1,10 +1,11 @@
-import 'font-awesome/css/font-awesome.css'
 import './2018/scss/app.scss'
-import jQuery from 'jquery'
+import 'font-awesome/css/font-awesome.css'
+import 'jquery-ui-themes/themes/pepper-grinder/jquery-ui.min.css'
+
 import 'bootstrap'
 import 'jquery-mask-plugin'
-import 'webpack-jquery-ui/datepicker'
 import 'webpack-jquery-ui/dialog'
-import './app_cmj'
+import 'webpack-jquery-ui/datepicker'
+import 'jquery-ui/ui/i18n/datepicker-pt-BR'
 
-window.$ = window.jQuery = jQuery
+import './app_cmj'

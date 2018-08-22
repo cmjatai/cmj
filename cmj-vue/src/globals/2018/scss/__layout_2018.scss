@@ -20,7 +20,7 @@
     }
   }
 
-  .legend, legend { // tag legend para crud updates
+  .legend, legend { 
     clear:both;
     display: block;
     width: 100%;
@@ -32,7 +32,6 @@
     border-bottom: 1px solid #ddd;
     font-weight: normal;
     font-family: "SourceSansProSemiBold", Helvetica, Arial, sans-serif;
-
   }
 
   .form-control-static {
@@ -75,8 +74,8 @@
 }
 
 .masthead {
+  margin-top: $grid-gutter-width;
   .nav-tabs {
-    margin-top: $grid-gutter-width;
     border-bottom: 0px;
     li {
       margin-left: 1px;
@@ -130,4 +129,5 @@ main {
     }
   }
 }
+
 
