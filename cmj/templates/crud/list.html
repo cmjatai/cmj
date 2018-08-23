@@ -5,13 +5,13 @@
 
 <div class="context-actions clearfix">
 
-  <div class="actions search pull-left">
+  <div class="actions search">
     {% if form %}
       {% crispy form %}
     {% endif %}
   </div>
   {% block actions %}
-    <div class="actions btn-group pull-right btn-group-lg" role="group">
+    <div class="actions btn-group btn-group-lg" role="group">
       {% if view.create_url %}
       <a href="{{ view.create_url }}" class="btn btn-default">
         {% blocktrans with verbose_name=view.verbose_name %} Adicionar {{ verbose_name }} {% endblocktrans %}

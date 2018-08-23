@@ -1,0 +1,40 @@
+.btn {
+  &:hover {
+    box-shadow: 0 0 30px #fff;
+  }
+}
+
+.btn-default {
+  @include btn(#333, rgba(white, 0.7), #555, rgba(#ccc, 0.7));
+  border-color: #ced4da;
+  &:hover {
+    border-color: #ced4da;
+  }
+}
+
+.btn-excluir {
+  @include btn($danger, null, #fff, $danger);
+}
+
+.btn-danger{
+  @include btn(#fff, $danger, #fff, $danger);
+}
+
+.btn-inverse {
+  @include btn(#ffffff, #364347);
+}
+
+.btn-primary {
+  @include btn(#ffffff, #02baf2);
+}
+
+
+.btn-link:hover, .btn-link:focus {
+  color: #23527c;
+  text-decoration: underline;
+  background-color: transparent;
+}
+
+.btn-recovery {
+  color: #aaa;
+}

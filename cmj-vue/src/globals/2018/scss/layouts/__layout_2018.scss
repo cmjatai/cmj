@@ -1,0 +1,134 @@
+.container-box {
+  margin: 0 auto $grid-gutter-width;
+  background: darken($color_main_bg, 3%) url(../img/bg.png);
+  padding-bottom: $grid-gutter-width / 2;
+  position: relative;
+  .box-area-trabalho {
+    display: inline-block;
+    position: absolute;
+    right: $grid-gutter-width / 2;
+    margin-top: $grid-gutter-width / -3;
+    
+    a {
+      border: 1px solid darken($color_main_bg, 1%);
+      font-family: Lato;
+      font-size: 1em;
+      line-height: 1;
+      background: darken($color_main_bg, 40%) url(../img/bg.png);
+      color: #fff;
+      padding: 3px $grid-gutter-width / 2;
+    }
+  }
+
+  .legend, legend { 
+    clear:both;
+    display: block;
+    width: 100%;
+    padding: 0;
+    font-size: ($font-size-base * 1.5);
+    line-height: 1;
+    color: #444;
+    border: 0;
+    border-bottom: 1px solid #ddd;
+    font-weight: normal;
+    font-family: "SourceSansProSemiBold", Helvetica, Arial, sans-serif;
+  }
+
+
+}
+
+.page-header {
+  padding: $grid-gutter-width * 0.5 $grid-gutter-width * 0.5 $grid-gutter-width * 0.3;
+  margin: 0em $grid-gutter-width * -0.5;
+  color: transparentize($color_topo_bg, 0.3);
+  background: darken($color_main_bg, 10%) url(../img/bg.png);
+  border-radius: 5px 5px 0 0;
+  border-bottom: 1px solid $color_container_border;
+  font-weight: normal;
+  font-size: 1.7em;
+  small {
+    color: #777;
+  }
+}
+
+.page-subheader {
+  padding: $grid-gutter-width /2 ;
+  background: darken($color_main_bg, 3%) url(../img/bg.png);
+  border-radius: 5px 5px 0 0;
+  border-bottom: 1px solid $color_container_border;
+  margin: 0px;
+}
+
+.masthead {
+  margin-top: $grid-gutter-width;
+  .nav-tabs {
+    border-bottom: 0px;
+    li {
+      margin-left: 1px;
+      line-height: 2em;
+      border-radius: 5px 5px 0 0;
+      a {
+        text-decoration: none;
+        line-height: 2em;
+        padding: 0 $grid-gutter-width / 4;
+      }
+      &:hover {
+        background: darken($color_main_bg, 10%) url(../img/bg.png);
+      }
+      &.active {
+        background: darken($color_main_bg, 10%) url(../img/bg.png);
+      }
+    }
+  }
+}
+
+
+
+.context-actions{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: $grid-gutter-width 0;
+  .search {
+    flex: 0 1 100%;
+    margin-right: $grid-gutter-width;
+  }
+}
+
+
+
+/* 
+main {
+  .item-action-or-input {
+    border-color: darken($color_main_bg, 10%);
+    &:hover {
+      border-color: darken($color_main_bg, 20%);
+      box-shadow: 0 0 30px  lighten($color_main_bg, 3%);
+    }
+    &:focus, &:active {
+      border-color: darken($color_main_bg, 40%);
+      box-shadow: 0 0 30px  lighten($color_main_bg, 3%);
+        background-color:  darken($color_container_bg, 10%);
+    }
+  }
+  .form-control, .btn-default {
+    @extend .item-action-or-input;
+  }
+  .btn-default {
+    color: darken($color_main_bg, 60%);
+    &:hover {
+      color: darken($color_main_bg, 70%);
+      background-color: $color_main_bg;
+    }
+    &.btn-excluir {
+      color: $danger;
+      &:hover {
+        color: white;
+        border-color: lighten($danger, 5%);
+        background-color: lighten($danger, 5%);
+      }
+    }
+  }
+}
+
+ */
