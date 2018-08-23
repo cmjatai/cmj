@@ -1,3 +1,4 @@
+import skinTinymce from 'tinymce-light-skin'
 
 window.getCookie = function (name) {
   var cookieValue = null
@@ -79,37 +80,37 @@ window.isElementInViewport = function (el) {
   )
 }
 
-/*
-window.initTinymce = function (elements, readonly=false) {
-  removeTinymce();
-  var config_tinymce = {
-      force_br_newlines : false,
-      force_p_newlines : false,
-      forced_root_block : '',
-      plugins: ["table save code"],
-      menubar: "edit format table tools",
-      toolbar: "undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent",
-      tools: "inserttable",
+window.removeTinymce = function () {
+  while (window.tinymce.editors.length > 0) {
+    window.tinymce.remove(window.tinymce.editors[0])
+  }
+}
+
+window.initTinymce = function (elements, readonly = false) {
+  window.removeTinymce()
+  let configTinymce = {
+    'force_br_newlines': false,
+    'force_p_newlines': false,
+    'forced_root_block': '',
+    'content_style': skinTinymce.contentStyle,
+    'skin': false,
+    'plugins': ['table'],
+    'toolbar': 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent',
+    'tools': 'inserttable'
   }
 
   if (readonly) {
-    config_tinymce.readonly = 1,
-    config_tinymce.menubar = false,
-    config_tinymce.toolbar = false
+    configTinymce.readonly = 1
+    configTinymce.menubar = false
+    configTinymce.toolbar = false
   }
 
   if (elements != null) {
-      config_tinymce['elements'] = elements;
-      config_tinymce['mode'] = "exact";
-      }
-  else
-      config_tinymce['mode'] = "textareas";
-
-  tinymce.init(config_tinymce);
-}
-
-window.removeTinymce = function () {
-  while (tinymce.editors.length > 0) {
-      tinymce.remove(tinymce.editors[0])
+    configTinymce['elements'] = elements
+    configTinymce['mode'] = 'exact'
+  } else {
+    configTinymce['mode'] = 'textareas'
   }
-} */
+  skinTinymce.use()
+  window.tinymce.init(configTinymce)
+}
