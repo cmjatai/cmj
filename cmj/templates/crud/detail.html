@@ -3,11 +3,9 @@
 
 {% block base_content %}
 
-  <div class="context-actions clearfix">
+  <div class="context-actions">
     {% block actions %}
-
       {% block sub_actions %}
-
         <div class="actions btn-group btn-group-sm" role="group">
           {% if view.list_url %}
             <a href="{{ view.list_url }}" class="btn btn-default">{% trans 'Listar' %} {{view.verbose_name_plural}}</a>
@@ -23,8 +21,8 @@
         </div>
           {% if view.extras_url %}
             <div class="actions btn-group btn-group-sm" role="group">
-          {% for href, css_class, text in view.extras_url %}
-            <a href="{{href}}" class="btn btn-default {{css_class}}">
+              {% for href, css_class, text in view.extras_url %}
+                <a href="{{href}}" class="btn btn-default {{css_class}}">
                   {{text}}
                 </a>
               {% endfor %}
@@ -35,10 +33,10 @@
       {% block extra_actions %}
       {% endblock extra_actions %}
 
-      <div class="editons pull-right">
+      <div class="editons">
         {% block editions %}
           {% if view.update_url or view.delete_url %}
-            <div class="actions btn-group" role="group">
+            <div class="btn-group" role="group">
               {% if view.update_url %}
                 <a href="{{ view.update_url }}" class="btn btn-default">{% trans 'Editar' %}</a>
               {% endif %}

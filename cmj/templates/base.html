@@ -39,6 +39,7 @@
   <body class="{% block body_class %}{%endblock%}">
     <div id="app"></div>
     
+
     <div class="page fadein" id="{% block id_wrapper %}wrapper{% endblock %}">
       {% block canais_absolute %}
         <aside>
@@ -292,9 +293,9 @@
 
               {# Feedback messages #}
               {% for message in messages %}
-                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade in" role="alert">
+                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible" role="alert">
                   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                    <span aria-hidden="true">&times;</span>
                   </button>
                   {{ message|safe }}
                 </div>
@@ -329,6 +330,7 @@
       </div>
     </div>
   </footer>
+
   {% block foot_js %}
 
     {% if not DEBUG %}

@@ -25,3 +25,34 @@
       font-weight: $fontweight;
     }
   }
+
+
+@mixin btn($btn_color, $background_color, $btn_color__hover:null, $background_color__hover:null) {
+  color: $btn_color;
+
+  @if $background_color != null {
+    background-color: $background_color;
+    border-color: $background_color;
+  }
+  &:hover,
+  &:focus,
+  &:active,
+  &.active,
+  &.hover {
+    @if $btn_color__hover == null {
+      color: $btn_color;
+    } @else {
+      color: $btn_color__hover;
+    }
+    @if $background_color__hover == null {
+      @if $background_color != null { 
+        background-color: lighten($background_color, 10);
+        border-color: lighten($background_color, 10);
+      }
+    } @else {
+      background-color: lighten($background_color__hover, 10);
+      border-color: lighten($background_color__hover, 10);
+    }
+
+  }
+}

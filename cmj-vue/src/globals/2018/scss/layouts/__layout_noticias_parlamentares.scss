@@ -1,0 +1,26 @@
+.container-box-parlamentares {
+  margin-top: $grid-gutter-width;
+  display: table;
+  font-size: 0px;
+  .path-item-list {
+    width: calc(50%);
+  }
+  .col-3 {
+    align-self: center;
+    padding: 0px;
+  }
+  .col { 
+    padding: 0 5px;
+  }
+  .tags {
+    line-height: 1em;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .container-box-parlamentares {
+    .path-item-list {
+      width: 100%;
+    }
+  }
+}
