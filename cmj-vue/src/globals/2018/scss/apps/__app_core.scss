@@ -112,7 +112,7 @@
       }
       &:hover {
         border: 1px solid #000;
-        background: black url(../img/bg.png);
+        background: black $url_bg_png;
       }
       img {
         width: 24px;

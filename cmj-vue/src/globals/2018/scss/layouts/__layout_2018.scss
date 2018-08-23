@@ -1,6 +1,6 @@
 .container-box {
   margin: 0 auto $grid-gutter-width;
-  background: darken($color_main_bg, 3%) url(../img/bg.png);
+  background: darken($color_main_bg, 3%) $url_bg_png;
   padding-bottom: $grid-gutter-width / 2;
   position: relative;
   .box-area-trabalho {
@@ -14,7 +14,7 @@
       font-family: Lato;
       font-size: 1em;
       line-height: 1;
-      background: darken($color_main_bg, 40%) url(../img/bg.png);
+      background: darken($color_main_bg, 40%) $url_bg_png;
       color: #fff;
       padding: 3px $grid-gutter-width / 2;
     }
@@ -41,7 +41,7 @@
   padding: $grid-gutter-width * 0.5 $grid-gutter-width * 0.5 $grid-gutter-width * 0.3;
   margin: 0em $grid-gutter-width * -0.5;
   color: transparentize($color_topo_bg, 0.3);
-  background: darken($color_main_bg, 10%) url(../img/bg.png);
+  background: darken($color_main_bg, 10%) $url_bg_png;
   border-radius: 5px 5px 0 0;
   border-bottom: 1px solid $color_container_border;
   font-weight: normal;
@@ -53,7 +53,7 @@
 
 .page-subheader {
   padding: $grid-gutter-width /2 ;
-  background: darken($color_main_bg, 3%) url(../img/bg.png);
+  background: darken($color_main_bg, 3%) $url_bg_png;
   border-radius: 5px 5px 0 0;
   border-bottom: 1px solid $color_container_border;
   margin: 0px;
@@ -73,15 +73,14 @@
         padding: 0 $grid-gutter-width / 4;
       }
       &:hover {
-        background: darken($color_main_bg, 10%) url(../img/bg.png);
+        background: darken($color_main_bg, 10%) $url_bg_png;
       }
       &.active {
-        background: darken($color_main_bg, 10%) url(../img/bg.png);
+        background: darken($color_main_bg, 10%) $url_bg_png;
       }
     }
   }
 }
-
 
 
 .context-actions{

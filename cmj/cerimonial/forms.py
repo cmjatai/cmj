@@ -1156,6 +1156,7 @@ class GrupoDeContatosForm(ModelForm):
         yaml_layout.append(q)
 
         self.helper = FormHelper()
+        self.helper.field_class = 'controls'
         self.helper.layout = SaplFormLayout(*yaml_layout)
 
         super(GrupoDeContatosForm, self).__init__(*args, **kwargs)

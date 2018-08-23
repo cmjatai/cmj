@@ -70,7 +70,7 @@
     }
     .inner {
       position: relative;
-      background: $color_main_bg url(../img/bg.png);
+      background: $color_main_bg $url_bg_png;
       padding: 2px;
       height: 140px;
       overflow: hidden;
@@ -100,7 +100,7 @@
         box-shadow: 0px 0px 3px #bbb;
       }
       &:hover {
-        background: url(../img/bg.png);
+        background: $url_bg_png;
         .hover {
           display: inline-block;
         }
