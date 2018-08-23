@@ -264,7 +264,6 @@ CRISPY_FAIL_SILENTLY = not DEBUG
 
 """BOWER_COMPONENTS_ROOT = PROJECT_DIR.child("bower")
 BOWER_INSTALLED_APPS = (
-    'tinymce#4.4.3',
     'jsdiff#2.2.2',
 )"""
 
