@@ -1,6 +1,12 @@
 {% extends "base.html" %}
+{% load render_bundle from webpack_loader %}
 {% load i18n staticfiles%}
 {% block main_header %}{% endblock main_header %}
+
+{% block head_content %}{{block.super}}
+  {% render_bundle 'construct' 'css' %}
+{% endblock %}
+
 
 {% block content_container %}
 <div id="app-vue">
@@ -9,5 +15,5 @@
 {% endblock content_container %}
 
 {% block extra_js %}{{block.super}}
-<script src="{% static 'js/bundle.js' %}"></script>
+{% render_bundle 'construct' 'js' %}
 {% endblock %}
