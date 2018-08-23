@@ -25,7 +25,8 @@ module.exports = {
   context: path.resolve(__dirname, '../'),
   entry: {
     hellow: './src/hellow/main.js',
-    globals: './src/globals/main.js'
+    globals: './src/globals/main.js',
+    construct: './src/construct/main.js'
   },
   output: {
     path: process.env.NODE_ENV === 'production'
