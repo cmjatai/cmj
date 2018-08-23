@@ -266,7 +266,6 @@ CRISPY_FAIL_SILENTLY = not DEBUG
 BOWER_INSTALLED_APPS = (
     'tinymce#4.4.3',
     'jsdiff#2.2.2',
-    'https://github.com/cmjatai/drunken-parrot-flat-ui.git',
 )"""
 
 STATIC_URL = '/static/'
