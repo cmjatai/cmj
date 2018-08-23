@@ -25,9 +25,6 @@
     display: inline-block;
     opacity: 0.75;
     margin-left: 10px;
-    /*border: 2px solid white;
-    padding: 5px;
-    background: $color_main_bg url(/static/img/bg.png);*/
     img {
       border: 0px solid transparent;
       border-radius: 50%;
@@ -84,12 +81,14 @@
   font-size: 1.6em;
   font-weight: 300;
   position: static;
+
   a:not(.btn) {
     color: #a97905;
     &:hover {
       color: darken(#a97905, 15%);
     }
   }
+
   .path-title-classe {
     font-size: 120%;
     line-height: 1;
@@ -488,110 +487,115 @@
   }
 }
 
+.container-path {
 
-// #### actions path next previous ########################################
-.path-direction {
-  position: fixed;
-  bottom: 50%;
-  z-index: 2000;
-  &.scroll_down {
-    & > a {
-      background-color: rgba(#0689c2,.3);
+
+  .path-direction {
+    position: fixed;
+    bottom: 50%;
+    z-index: 2000;
+    a, a:hover {
+      color: white;
     }
-  }
-  &.scroll_up {
-    & > a {
-      background-color: rgba(#0689c2,.4);
+    &.scroll_down {
+      & > a {
+        background-color: rgba(#0689c2,.3);
+      }
     }
-  }
-  & > a {
-    position: relative;
-    background: rgba(#0689c2,.35) url(/static/img/bg.png);
-    color: white;
-    display: inline-block;
-    border-radius: 50%;
+    &.scroll_up {
+      & > a {
+        background-color: rgba(#0689c2,.4);
+      }
+    }
+    & > a {
+      position: relative;
+      background: rgba(#0689c2,.35) $url_bg_png;
+      color: white;
+      display: inline-block;
+      border-radius: 50%;
+      &:hover {
+        background-color: #0689c2;
+      }
+    }
     &:hover {
-      background-color: #0689c2;
-    }
-  }
-  &:hover {
-    min-width: 40%;
-    .inner {
-      z-index: 2000;
-      bottom: 3.1em;
-      display: block;
-      position: absolute;
-      margin: 0 10px;
-      background: darken($color_main_bg, 4%) url(/static/img/bg.png);
-      font-size: 80%;
-      border-radius: 2px;
-      border: 1px solid white;
-      box-shadow: 3px 3px 10px  lighten($hover_background_50p, 3%);
-      .titulo {
-        white-space: nowrap;
-        background: darken($color_main_bg, 8%) url(/static/img/bg.png);
-        padding: 5px 10px;
-        font-weight: 600;
-        margin-bottom: 6px;
+      min-width: 40%;
+      .inner {
+        z-index: 2000;
+        bottom: 3.1em;
+        display: block;
+        position: absolute;
+        margin: 0 10px;
+        background: darken($color_main_bg, 4%) $url_bg_png;
+        font-size: 80%;
+        border-radius: 2px;
+        border: 1px solid white;
+        box-shadow: 3px 3px 10px  lighten($hover_background_50p, 3%);
+        .titulo {
+          white-space: nowrap;
+          background: darken($color_main_bg, 8%) $url_bg_png;
+          padding: 5px 10px;
+          font-weight: 600;
+          margin-bottom: 6px;
 
-        a {
-          color: #443;
-          &:hover {
-            color: black;
+          a {
+            color: #443;
+            &:hover {
+              color: black;
+            }
           }
         }
+        .descricao {
+          color: #006556;
+          font-size: 90%;
+          font-style: italic;
+          padding: 10px;
+        }
       }
-      .descricao {
-        color: #006556;
-        font-size: 90%;
-        font-style: italic;
-        padding: 10px;
+    }
+    .path-parlamentares {
+      margin: 0px 5px 5px 5px;
+      .avatar {
+        display: inline-block;
+        margin: 0 0 0 5px;;
+        float:right;
+        width: 60px;
+      }
+    }
+    .path-imagem {
+      padding-left: 0.5em;
+    }
+  }
+
+  .path-next {
+    right: -1.6em;
+    text-align: right;
+    a {
+      padding: 1.2em 1.7em 1.0em 0.5em;
+    }
+    .inner {
+      display: none;
+    }
+    &:hover {
+      .inner {
+        right: 2.2em;
       }
     }
   }
-  .path-parlamentares {
-    margin: 0px 5px 5px 5px;
-    .avatar {
-      display: inline-block;
-      margin: 0 0 0 5px;;
-      float:right;
-      width: 60px;
-    }
-  }
-  .path-imagem {
-    padding-left: 0.5em;
-  }
-}
 
-.path-next {
-  right: -1.6em;
-  text-align: right;
-  a {
-    padding: 1.2em 1.7em 1.0em 0.5em;
-  }
-  .inner {
-    display: none;
-  }
-  &:hover {
-    .inner {
-      right: 2.2em;
+  .path-previous {
+    left: -32px;
+    text-align: left;
+    transition: left 0.5s ease;
+    a {
+      padding: 1.2em 0.5em 1.0em 1.7em;
     }
-  }
-}
-
-.path-previous {
-  left: -38px;
-  text-align: left;
-  transition: left 0.5s ease;
-  a {
-    padding: 1.2em 0.5em 1.0em 1.7em;
-  }
-  .inner {
-    display: none;
-  }
-  &:hover {
     .inner {
-      left: 2.2em;
+      display: none;
+    }
+    &:hover {
+      .inner {
+        left: 2.2em;
+      }
     }
   }
 }
