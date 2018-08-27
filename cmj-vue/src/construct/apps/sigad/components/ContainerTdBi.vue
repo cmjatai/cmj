@@ -21,9 +21,9 @@ import DocumentoEdit from './DocumentoEdit'
 export default {
   name: 'container-td-bi',
   extends: {
-    ...DocumentoEdit,
+    ...DocumentoEdit
   },
-  data() {
+  data () {
     return {
       dragleave: null,
       side: 0,
@@ -32,11 +32,11 @@ export default {
     }
   },
   methods: {
-    showModalAction(elemento, pos) {
+    showModalAction (elemento, pos) {
       this.showElemento = elemento
       this.showModal = pos
     },
-    ondragend: function(el) {
+    ondragend: function (el) {
       console.log('ondragend: ContainerTdBi', el)
       if (el.id === this.dragleave.id) {
         return
@@ -46,29 +46,27 @@ export default {
       data.ordem = this.dragleave.ordem
       if (el.ordem > this.dragleave.ordem && this.side > 0) {
         data.ordem++
-      }
-      else if (el.ordem < this.dragleave.ordem && this.side < 0) {
+      } else if (el.ordem < this.dragleave.ordem && this.side < 0) {
         data.ordem--
       }
-      if (el.ordem === data.ordem){
+      if (el.ordem === data.ordem) {
         return
       }
       el.ordem = data.ordem
       this.updateDocumento(data)
-        .then( () => {
+        .then(() => {
           this.getDocumento(this.elemento.id)
         })
     },
-    ondragleave: function(el, side) {
+    ondragleave: function (el, side) {
       console.log('ondragleave: ContainerTdBi', el, side)
       this.dragleave = el
       this.side = side
     },
-    changeImage: function() {
+    changeImage: function () {
       this.getDocumento(this.elemento.id)
-    },
-  },
-
+    }
+  }
 }
 </script>
 

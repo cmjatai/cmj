@@ -16,7 +16,7 @@
     // In a perfect world, this would be its own library file that got included
     // on the page and only the ``$(document).ready(...)`` below would be present.
     // But this is an example.
-    var Autocomplete = function(options) {
+    var Autocomplete = function (options) {
       this.form_selector = options.form_selector
       this.url = options.url || '/search/autocomplete/'
       this.delay = parseInt(options.delay || 300)
@@ -25,14 +25,14 @@
       this.query_box = null
     }
 
-    Autocomplete.prototype.setup = function() {
+    Autocomplete.prototype.setup = function () {
       var self = this
 
       this.form_elem = $(this.form_selector)
       this.query_box = this.form_elem.find('input[name=q]')
 
       // Watch the input box.
-      this.query_box.on('keyup', function() {
+      this.query_box.on('keyup', function () {
         var query = self.query_box.val()
 
         if(query.length < self.minimum_length) {
@@ -43,14 +43,14 @@
       })
 
       // On selecting a result, populate the search field.
-      this.form_elem.on('click', '.ac-result', function(ev) {
+      this.form_elem.on('click', '.ac-result', function (ev) {
         self.query_box.val($(this).text())
         $('.ac-results').remove()
         return false
       })
     }
 
-    Autocomplete.prototype.fetch = function(query) {
+    Autocomplete.prototype.fetch = function (query) {
       var self = this
 
       $.ajax({
@@ -58,13 +58,13 @@
       , data: {
           'q': query
         }
-      , success: function(data) {
+      , success: function (data) {
           self.show_results(data)
         }
       })
     }
 
-    Autocomplete.prototype.show_results = function(data) {
+    Autocomplete.prototype.show_results = function (data) {
       // Remove any existing results.
       $('.ac-results').remove()
 
@@ -90,7 +90,7 @@
       this.query_box.after(results_wrapper)
     }
 
-    $(document).ready(function() {
+    $(document).ready(function () {
       window.autocomplete = new Autocomplete({
         form_selector: '.autocomplete-me'
       })

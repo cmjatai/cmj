@@ -1,5 +1,5 @@
-const basePath = '/api'
 import axios from 'axios'
+const basePath = '/api'
 
 axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'

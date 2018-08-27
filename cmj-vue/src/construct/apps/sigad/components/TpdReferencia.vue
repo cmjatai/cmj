@@ -19,84 +19,87 @@
 import { DocumentoResource } from '../../../resources'
 export default {
   name: 'tpd-referencia',
-  props:['pos', 'child', 'parent'],
-  data() {
+  props: ['pos', 'child', 'parent'],
+  data () {
     return {
       documentoResource: DocumentoResource,
       dragged: false,
       draggedover: 0,
-      draggedleave: false,
+      draggedleave: false
     }
   },
   computed: {
-    classDrag: function() {
-      let classes = Array()
-      this.dragged ? classes.push('drag-start') : ''
-      this.draggedleave ? classes.push('drag-leave') : ''
-      this.draggedover !== 0 ? classes.push('drag-over') : ''
+    classDrag: function () {
+      let classes = Array() // eslint-disable-line
+      this.dragged ? classes.push('drag-start') : '' // eslint-disable-line
+      this.draggedleave ? classes.push('drag-leave') : '' // eslint-disable-line
+      this.draggedover !== 0 ? classes.push('drag-over') : '' // eslint-disable-line
       return classes
     },
-    slug: function() {
+    slug: function () {
       let slug = this.child.slug
-      return '/'+slug
-    },
+      return '/' + slug
+    }
   },
   methods: {
-    dragend(ev) {
+    dragend (ev) {
       console.log('dragend: tpdreferencia', ev)
-      if (this.dragged)
+      if (this.dragged) {
         this.$emit('ondragend', this.child)
+      }
       this.dragged = false
-      this.draggedleave = false;
-      this.draggedover = 0;
+      this.draggedleave = false
+      this.draggedover = 0
     },
-    dragenter(ev) {
+    dragenter (ev) {
       console.log('dragenter: tpdreferencia', ev)
-      if (this.dragged)
+      if (this.dragged) {
         this.draggedleave = false
+      }
     },
-    dragleave(ev) {
+    dragleave (ev) {
       console.log('dragleave: tpdreferencia', ev)
       this.$emit('ondragleave', this.child, this.draggedover)
       this.draggedleave = this.dragged
       this.draggedover = 0
     },
-    dragover(ev) {
+    dragover (ev) {
       console.log('dragover: tpdreferencia', ev)
       if (!this.dragged) {
-          this.draggedover = ev.offsetX - ev.target.offsetWidth / 2
+        this.draggedover = ev.offsetX - ev.target.offsetWidth / 2
       }
     },
-    dragstart(ev) {
+    dragstart (ev) {
       console.log('dragstart: tpdreferencia', ev)
       this.dragged = true
     },
-    dragexit(ev) {
+    dragexit (ev) {
       console.log('dragexit: tpdreferencia', ev)
     },
-    drop(ev) {
+    drop (ev) {
       console.log('drop: tpdreferencia', ev)
     },
-    deleteReferencia(event) {
+    deleteReferencia (event) {
       let t = this
       let data = Object()
       let referencia = Object()
       referencia.id = this.child.id
       data.id = this.child.referente
-      data.cita = Array()
+      data.cita = Array() //eslint-disable-line
       data.cita.push(referencia)
       t.documentoResource.deleteReferencia(data)
-        .then( (response) => {
+        .then((response) => {
           t.$parent.success('Elemento excluído com sucesso.')
           t.$parent.getDocumento(t.parent.id)
         })
-        .catch( (response) => {
-          if (response.response)
+        .catch((response) => {
+          if (response.response) {
             t.$parent.danger(response.response.data.detail)
-          else
+          } else {
             t.$parent.danger(response.message)
+          }
         })
-    },
+    }
   }
 }
 </script>

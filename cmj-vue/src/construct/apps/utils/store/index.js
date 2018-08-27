@@ -1,5 +1,5 @@
-import StoreMessage from './modules/StoreMessage';
+import StoreMessage from './modules/StoreMessage'
 
 export default {
   StoreMessage
-};
+}

@@ -16,7 +16,7 @@
     }
     function updateBindChange() {
       changeHideShow();
-      $('.form-group-contatos input').on('change', function(event) {
+      $('.form-group-contatos input').on('change', function (event) {
         if (!event.currentTarget.checked)
           event.currentTarget.parentElement.parentElement.remove();
         changeHideShow();
@@ -26,20 +26,20 @@
       if (event.type == 'keypress' && event.keyCode != 13)
         return;
 
-      var pks_exclude = $(".form-group-contatos input:checkbox[name=contatos]:checked").map(function(){return $(this).val()}).get()
+      var pks_exclude = $(".form-group-contatos input:checkbox[name=contatos]:checked").map(function (){return $(this).val()}).get()
 
       var _this = $("#id_q");
       var url_get_contatos = '{% url "cmj.cerimonial:ajax_search_contatos" %}';
       var q = _this.val()
       updateBindChange();
-      $.get(url_get_contatos, {'q':q, 'pks_exclude':pks_exclude}, function(data) {
+      $.get(url_get_contatos, {'q':q, 'pks_exclude':pks_exclude}, function (data) {
         var parent = _this.closest('.form-group').siblings();
         parent.replaceWith(data);
 
         $( ".form-group-contatos-search .controls, .form-group-contatos .controls" ).sortable({
           connectWith: ".controls",
           items: ".form-check",
-          stop: function( event, ui ) {
+          stop: function ( event, ui ) {
             var value = ui.item.find('input').val();
             var text =  ui.item.text()
             var items = ui.item.parent().find('input[value="'+value+'"]');
@@ -59,7 +59,7 @@
       });
     }
     updateBindChange();
-    $(document).on("keypress", "form", function(event) {
+    $(document).on("keypress", "form", function (event) {
         return event.keyCode != 13;
     });
   </script>

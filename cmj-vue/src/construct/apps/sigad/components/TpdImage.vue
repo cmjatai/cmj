@@ -7,14 +7,14 @@
           <button v-if="!elemento.autor" v-on:click.self="toogleAutor" title="Disponibilizar Autor para a Imagem" type="button" class="btn btn-success">A</button>
         </div>
         <div class="btn-group btn-group-xs pull-right">
-          <button v-on:click="alinhar(key, $event)" v-for="alinhamento, key in getChoices.alinhamento" type="button" class="btn btn-primary" :title="alinhamento.text" v-html="icons[key]"></button>
+          <button v-on:click="alinhar(key, $event)" v-for="(alinhamento, key) in getChoices.alinhamento" type="button" class="btn btn-primary" :title="alinhamento.text" v-html="icons[key]" :key="key"></button>
           <button v-on:click.self="deleteParte" title="Remover esta Imagem" type="button" class="btn btn-danger">x</button>
         </div>
       </div>
 
       <div class="btn-toolbar widgets widget-bottom">
         <div class="btn-group btn-group-xs pull-right">
-          <button v-on:click.self="addBrother(tipo.component_tag, $event)" v-for="tipo, key in getChoices.tipo.subtipos" type="button" class="btn btn-primary" title="Adiciona Elemento aqui...">{{tipo.text}}</button>
+          <button v-on:click.self="addBrother(tipo.component_tag, $event)" v-for="(tipo, key) in getChoices.tipo.subtipos" :key="key" type="button" class="btn btn-primary" title="Adiciona Elemento aqui...">{{tipo.text}}</button>
         </div>
       </div>
 
@@ -26,7 +26,7 @@
         <input v-if="has_descricao || elemento.descricao" v-model.lazy="elemento.descricao" placeholder="Descrição da Imagem..."/>
         <input v-if="has_autor || elemento.autor" v-model.lazy="elemento.autor" placeholder="Autor da Imagem..."/>
       </div>
-      <component :is="classChild(value)" v-for="(value, key) in childsOrdenados" :child="value" :parent="elemento" :key="value.id"/>
+      <component :is="classChild(value)" v-for="value in childsOrdenados" :child="value" :parent="elemento" :key="value.id"/>
     </div>
 </template>
 
@@ -37,47 +37,46 @@ import { mapGetters } from 'vuex'
 export default {
   name: 'tpd-image',
   extends: {
-    ...Container,
+    ...Container
   },
   components: {
   },
-  data() {
+  data () {
     return {
       icons: {
         0: '<i class="fa fa-align-left" aria-hidden="true"></i>',
         1: '<i class="fa fa-align-justify" aria-hidden="true"></i>',
         2: '<i class="fa fa-align-right" aria-hidden="true"></i>',
-        3: '<i class="fa fa-align-center" aria-hidden="true"></i>',
+        3: '<i class="fa fa-align-center" aria-hidden="true"></i>'
       }
     }
   },
   computed: {
     ...mapGetters([
       'getChoices',
-      'getDocObject',
-    ]),
+      'getDocObject'
+    ])
   },
   methods: {
-    changeImage: function() {
+    changeImage: function () {
       this.getDocumento(this.elemento.id)
     },
-    alinhamento: function(value)  {
+    alinhamento: function (value) {
       let al = value.alinhamento
       try {
         return this.getChoices.alinhamento[al]['component_tag']
-      }
-      catch (Exception) {
+      } catch (Exception) {
         return ''
       }
     },
-    alinhar(alinhamento, ev) {
-        let data = Object()
-        data.alinhamento = alinhamento
-        data.id = this.elemento.id
-        this.elemento.alinhamento = alinhamento
-        this.updateDocumento(data)
-    },
-  },
+    alinhar (alinhamento, ev) {
+      let data = Object()
+      data.alinhamento = alinhamento
+      data.id = this.elemento.id
+      this.elemento.alinhamento = alinhamento
+      this.updateDocumento(data)
+    }
+  }
 }
 </script>
 

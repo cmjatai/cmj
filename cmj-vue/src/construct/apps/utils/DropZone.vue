@@ -16,50 +16,51 @@
 <script>
 export default {
   name: 'drop-zone',
-  props: ['elemento', 'src','multiple', 'resource'],
-  data() {
+  props: ['elemento', 'src', 'multiple', 'resource'],
+  data () {
     return {
       src_local: this.src
     }
   },
   watch: {
-    src: function(nv, ov) {
+    src: function (nv, ov) {
       this.src_local = this.src
-    },
+    }
   },
   methods: {
-    selectFiles(ev) {
+    selectFiles (ev) {
       let files = ev.currentTarget.files
-      if (files.length === 0)
+      if (files.length === 0) {
         return
+      }
       this.sendFiles(files)
     },
-    sendFiles(files) {
+    sendFiles (files) {
       let form = new FormData()
       for (var i = 0; i < files.length; i++) {
         form.append('files', files[i])
       }
       let t = this
       t.resource.uploadFiles(t.elemento.id, form)
-        .then( (response) => {
-          t.src_local = t.src + '?'+ _.now()
+        .then((response) => {
+          t.src_local = t.src + '?'+ _.now() // eslint-disable-line
           t.$emit('change')
         })
-        .catch( (response) => t.danger())
+        .catch((response) => t.danger())
     },
-
-    drop_handler(ev) {
-      if (ev === undefined)
+    drop_handler (ev) {
+      if (ev === undefined) {
         return
-      console.log("Drop");
-      ev.preventDefault();
+      }
+      console.log('Drop')
+      ev.preventDefault()
 
-      var dt = ev.dataTransfer;
+      var dt = ev.dataTransfer
 
       if (dt.items) {
-        let files = Array()
-        for (var i=0; i < dt.items.length; i++) {
-          if (dt.items[i].kind == "file") {
+        let files = Array() // eslint-disable-line
+        for (let i = 0; i < dt.items.length; i++) {
+          if (dt.items[i].kind === 'file') {
             files.push(dt.items[i].getAsFile())
           }
         }
@@ -68,31 +69,28 @@ export default {
         this.sendFiles(dt.files)
       }
     },
-
-    dragover_handler(ev) {
-      console.log("dragOver");
+    dragover_handler (ev) {
+      console.log('dragOver')
       // Prevent default select and drag behavior
-      ev.preventDefault();
+      ev.preventDefault()
     },
-
-    dragend_handler(ev) {
-      console.log("dragEnd");
+    dragend_handler (ev) {
+      console.log('dragEnd')
       // Remove all of the drag data
-      var dt = ev.dataTransfer;
+      let dt = ev.dataTransfer
       if (dt.items) {
         // Use DataTransferItemList interface to remove the drag data
         for (var i = 0; i < dt.items.length; i++) {
-          dt.items.remove(i);
+          dt.items.remove(i)
         }
       } else {
         // Use DataTransfer interface to remove the drag data
-        ev.dataTransfer.clearData();
+        ev.dataTransfer.clearData()
       }
     }
-  },
+  }
 }
 </script>
-
 <style lang="scss">
 .drop_files {
   width:  100%;

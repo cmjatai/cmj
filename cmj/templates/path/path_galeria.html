@@ -94,18 +94,18 @@
 
 {% block extra_js  %}
   <script type="text/javascript">
-    $(document).ready(function(){
+    $(document).ready(function (){
       var csrfmiddlewaretoken = $('input[name="csrfmiddlewaretoken"]')
       if (csrfmiddlewaretoken.length > 0) {
         var form_data = {
           'csrfmiddlewaretoken': csrfmiddlewaretoken[0].value
         }
-        $('.container-albuns .show-contexto > a').click(function() {
+        $('.container-albuns .show-contexto > a').click(function () {
 
           $.post(this.href, form_data)
-            .done(function(data) {
+            .done(function (data) {
             $('.albuns-show-gallery').removeClass('invisible').html(data);
-            $('.albuns-show-gallery .btn-close').removeClass('invisible').click(function() {
+            $('.albuns-show-gallery .btn-close').removeClass('invisible').click(function () {
               $('.albuns-show-gallery').html('').addClass('invisible');
             });
             Gallery().init();

@@ -1,7 +1,7 @@
 <template>
   <div class="radio-group" :id="name+id">
     <template v-for="(choice, k) in options">
-        <label :class="['btn', choice.component_tag, k == value ? 'active': '']" v-bind:for="choice.component_tag">
+        <label :class="['btn', choice.component_tag, k == value ? 'active': '']" v-bind:for="choice.component_tag" v-bind:key="k">
           <input type="radio" v-bind:value="k" v-model="model" :id="choice.component_tag" :name="name+id">
             {{choice.text}}
         </label>
@@ -10,36 +10,36 @@
 </template>
 
 <script>
-    export default {
-        props: [
-          'options',
-          'value',
-          'name',
-          'id'
-        ],
-        data() {
-          return {
-              model: -1,
-          };
-        },
-        watch: {
-          model: function(val){
-            this.$emit('input', parseInt(val))
-          },
-          value: function(val) {
-            this.model = val
-          }
-        },
-        mounted() {
-          let t = this
-          t.$nextTick()
-            .then(function () {
-              if (t.value !== undefined)
-                t.model = t.value
-            })
-
-        }
+export default {
+  props: [
+    'options',
+    'value',
+    'name',
+    'id'
+  ],
+  data () {
+    return {
+      model: -1
     }
+  },
+  watch: {
+    model: function (val) {
+      this.$emit('input', parseInt(val))
+    },
+    value: function (val) {
+      this.model = val
+    }
+  },
+  mounted () {
+    let t = this
+    t.$nextTick()
+      .then(function () {
+        if (t.value !== undefined) {
+          t.model = t.value
+        }
+      })
+  }
+}
 </script>
 
 <style>

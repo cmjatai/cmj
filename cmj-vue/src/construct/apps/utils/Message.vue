@@ -1,6 +1,6 @@
 <template lang="html">
   <div class="container-messages">
-    <div :class="['alert', msg.alert]" v-for="msg in messages">
+    <div :class="['alert', msg.alert]" v-for="(msg, key) in messages" :key="key">
       {{msg.message}}
     </div>
   </div>
@@ -12,24 +12,24 @@ export default {
   props: {
     messages: {
       type: Array,
-      default() {
-        return Array();
-      },
-    },
+      default () {
+        return []
+      }
+    }
   },
-  data() {
+  data () {
     return {
-    };
+    }
   },
   computed: {},
-  mounted() {},
+  mounted () {},
   methods: {
     ...mapActions([
-      'popMessage',
-    ]),
+      'popMessage'
+    ])
   },
-  components: {},
-};
+  components: {}
+}
 </script>
 
 <style lang="scss" scoped>

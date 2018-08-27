@@ -7,7 +7,7 @@
       </div>
       <template v-if="childsOrdenados.length === 0">
         <div class="btn-group btn-group-xs pull-left">
-          <button v-on:click.self="addChild(tipo.component_tag, $event)" v-for="tipo, key in getChoices.tipo.subtipos" type="button" class="btn btn-primary" title="Adiciona Elemento no final deste Container...">{{tipo.text}}</button>
+          <button v-on:click.self="addChild(tipo.component_tag, $event)" v-for="(tipo, key) in getChoices.tipo.subtipos" :key="key" type="button" class="btn btn-primary" title="Adiciona Elemento no final deste Container...">{{tipo.text}}</button>
         </div>
       </template>
       <div class="btn-group btn-group-xs pull-right">
@@ -29,7 +29,8 @@
     <div v-if="has_titulo || elemento.titulo" class="path-title-container construct">
       <input v-model.lazy="elemento.titulo" placeholder="Sub título do container..."/>
     </div>
-    <component :is="classChild(value)" v-for="(value, key) in childsOrdenados" :child="value" :parent="elemento" :key="value.id"/>
+
+    <component :is="classChild(value)" v-for="value in childsOrdenados" :child="value" :parent="elemento" :key="value.id"/>
   </div>
 </template>
 
@@ -39,63 +40,61 @@ import DocumentoEdit from './DocumentoEdit'
 export default {
   name: 'container',
   extends: {
-    ...DocumentoEdit,
+    ...DocumentoEdit
   },
-  data() {
+  data () {
     return {
       has_titulo: false,
-      has_descricao:false,
-      has_autor: false,
+      has_descricao: false,
+      has_autor: false
     }
   },
   methods: {
-    toogleTitulo(event) {
+    toogleTitulo (event) {
       this.has_titulo = !this.has_titulo
     },
-    toogleDescricao(event) {
+    toogleDescricao (event) {
       this.has_descricao = !this.has_descricao
     },
-    toogleAutor(event) {
+    toogleAutor (event) {
       this.has_autor = !this.has_autor
     },
-    addBrother(tipo, event) {
+    addBrother (tipo, event) {
       let data = Object()
       data.tipo = this.getChoices.all_bycomponent[tipo].id
       data.parent = this.parent.id
       data.ordem = this.elemento.ordem + 1
       this.createBrother(data)
     },
-    addChild(tipo, event) {
+    addChild (tipo, event) {
       let data = Object()
       data.tipo = this.getChoices.all_bycomponent[tipo].id
       data.parent = this.elemento.id
       this.createChild(data)
     },
-    deleteParte(event) {
+    deleteParte (event) {
       let t = this
       t.documentoResource.deleteDocumento(this.elemento.id)
-        .then( (response) => {
+        .then((response) => {
           t.$parent.getDocumento(this.parent.id)
           t.success('Elemento excluído com sucesso.')
         })
-        .catch( (response) => {
+        .catch((response) => {
           t.danger(response.response.data.detail)
         })
     },
-    containerTrocarTipo(event) {
+    containerTrocarTipo (event) {
       let t = this
       let data = Object()
-      let keys = _.keys(this.getChoices.tipo.containers)
+      let keys = _.keys(this.getChoices.tipo.containers) // eslint-disable-line
       data.tipo = this.elemento.tipo === parseInt(keys[0]) ? keys[1] : keys[0]
       data.id = this.elemento.id
       t.updateDocumento(data)
-        .then( (response) => {
+        .then((response) => {
           t.$parent.getDocumento(t.parent.id)
         })
     }
-  },
-
-
+  }
 }
 </script>
 

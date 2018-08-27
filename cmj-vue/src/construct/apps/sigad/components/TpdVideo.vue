@@ -11,7 +11,7 @@
     </div>
     <div class="btn-toolbar widgets widget-bottom">
       <div class="btn-group btn-group-xs pull-right">
-        <button v-on:click.self="addBrother(tipo.component_tag, $event)" v-for="tipo, key in getChoices.tipo.subtipos" type="button" class="btn btn-primary" title="Adiciona Elemento aqui...">{{tipo.text}}</button>
+        <button v-on:click.self="addBrother(tipo.component_tag, $event)" v-for="(tipo, key) in getChoices.tipo.subtipos" :key="key" type="button" class="btn btn-primary" title="Adiciona Elemento aqui...">{{tipo.text}}</button>
       </div>
     </div>
 
@@ -24,7 +24,7 @@
         <span v-html="srcIframe"></span>
       </div>
     </div>
-    <component :is="classChild(value)" v-for="(value, key) in childsOrdenados" :child="value" :parent="elemento" :key="value.id"/>
+    <component :is="classChild(value)" v-for="value in childsOrdenados" :child="value" :parent="elemento" :key="value.id"/>
   </div>
 </template>
 
@@ -34,16 +34,16 @@ import Container from './Container'
 export default {
   name: 'tpd-video',
   extends: {
-    ...Container,
+    ...Container
   },
   computed: {
-    srcIframe: function() {
-        let iframe = this.elemento.texto
-        iframe = iframe.replace('<iframe ', '<iframe class="embed-responsive-item" ' )
-        return iframe
-      }
+    srcIframe: function () {
+      let iframe = this.elemento.texto
+      iframe = iframe.replace('<iframe ', '<iframe class="embed-responsive-item" ')
+      return iframe
+    }
   },
-  methods: {},
+  methods: {}
 }
 </script>
 

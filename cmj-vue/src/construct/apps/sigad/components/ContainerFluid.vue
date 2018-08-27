@@ -5,7 +5,7 @@ export default {
   template: Container.template,
   style: Container.style,
   extends: {
-    ...Container,
+    ...Container
   }
 }
 </script>

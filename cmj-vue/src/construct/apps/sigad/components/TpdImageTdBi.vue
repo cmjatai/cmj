@@ -22,69 +22,71 @@ import Container from './Container'
 
 export default {
   name: 'tpd-image-td-bi',
-  props:['pos'],
+  props: ['pos'],
   extends: {
-    ...Container,
+    ...Container
   },
-  data() {
+  data () {
     return {
       dragged: false,
       draggedover: 0,
       draggedleave: false,
-      mouseover: false,
+      mouseover: false
     }
   },
   computed: {
-    classDrag: function() {
-      let classes = Array()
-      this.dragged ? classes.push('drag-start') : ''
-      this.draggedleave ? classes.push('drag-leave') : ''
-      this.draggedover !== 0 ? classes.push('drag-over') : ''
+    classDrag: function () {
+      let classes = Array() //eslint-disable-line
+      this.dragged ? classes.push('drag-start') : '' //eslint-disable-line
+      this.draggedleave ? classes.push('drag-leave') : '' //eslint-disable-line
+      this.draggedover !== 0 ? classes.push('drag-over') : '' //eslint-disable-line
       return classes
     }
   },
   methods: {
-    mouseOver(ev) {
-      this.mouseover = true;
+    mouseOver (ev) {
+      this.mouseover = true
     },
-    mouseLeave(ev) {
-      this.mouseover = false;
+    mouseLeave (ev) {
+      this.mouseover = false
     },
-    dragend(ev) {
+    dragend (ev) {
       console.log('dragend: tpdimagetdbi', ev)
-      if (this.dragged)
+      if (this.dragged) {
         this.$emit('ondragend', this.elemento)
+      }
       this.dragged = false
-      this.draggedleave = false;
-      this.draggedover = 0;
+      this.draggedleave = false
+      this.draggedover = 0
     },
-    dragenter(ev) {
+    dragenter (ev) {
       console.log('dragenter: tpdimagetdbi', ev)
-      if (this.dragged)
-        this.draggedleave = false
+      if (this.dragged) {
+        this.draggedleave = false // não deve ser atribuido true em caso contrário
+      }
     },
-    dragleave(ev) {
+    dragleave (ev) {
       console.log('dragleave: tpdimagetdbi', ev)
       this.$emit('ondragleave', this.elemento, this.draggedover)
       this.draggedleave = this.dragged
       this.draggedover = 0
     },
-    dragover(ev) {
+    dragover (ev) {
       console.log('dragover: tpdimagetdbi', ev)
       if (!this.dragged) {
-          this.draggedover = ev.offsetX - ev.target.offsetWidth / 2
+        this.draggedover = ev.offsetX - ev.target.offsetWidth / 2
       }
     },
-    dragstart(ev) {
+    dragstart (ev) {
       console.log('dragstart: tpdimagetdbi', ev)
       this.dragged = true
     },
-    dragexit(ev) {
+    dragexit (ev) {
       console.log('dragexit: tpdimagetdbi', ev)
     },
-    drop(ev) {
+    drop (ev) {
       console.log('drop: tpdimagetdbi', ev)
-    },
+    }
   }
 }
 </script>

@@ -1,33 +1,30 @@
 <template lang="html">
   <transition name="modal">
     <div class="modal-mask"  @click.self="$emit('close')">
+      <div class="modal-area modal-header-container">
+        <slot name="header">
+          default header
+        </slot>
+      </div>
+      <div class="modal-header-actions">
+        <slot name="header-actions">
+          default header actions
+          <button class="modal-default-button" @click="$emit('close')">
+            OK
+          </button>
+        </slot>
+      </div>
 
-          <div class="modal-area modal-header-container">
-            <slot name="header">
-              default header
-            </slot>
-          </div>
-          <div class="modal-header-actions">
-            <slot name="header-actions">
-              default header actions
-              <button class="modal-default-button" @click="$emit('close')">
-                OK
-              </button>
-            </slot>
-          </div>
+      <div class="modal-body-container">
+        <slot name="body">
+          default body
+        </slot>
+      </div>
 
-          <div class="modal-body-container">
-            <slot name="body">
-              default body
-            </slot>
-          </div>
-
-          <div class="modal-area modal-footer-container">
-            <slot name="footer">
-              default footer
-            </slot>
-          </div>
-        </div>
+      <div class="modal-area modal-footer-container">
+        <slot name="footer">
+          default footer
+        </slot>
       </div>
     </div>
   </transition>
@@ -35,7 +32,7 @@
 
 <script>
 export default {
-  name: 'modal',
+  name: 'modal'
 }
 </script>
 
