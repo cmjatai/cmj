@@ -37,97 +37,95 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions } from 'vuex'
 import { DocumentoResource } from '../../../resources'
 export default {
   name: 'modal-referencia-image-list',
   props: ['elementos', 'pos', 'child', 'parent'],
-  data() {
+  data () {
     return {
       documentoResource: DocumentoResource,
-      elemento:this.child,
-      ready: Array()
+      elemento: this.child,
+      ready: Array() // eslint-disable-line
     }
   },
   watch: {
-    'elemento.titulo': function(nv, ov) { this.handlerWatch(nv, ov, 'titulo') },
-    'elemento.descricao': function(nv, ov) { this.handlerWatch(nv, ov, 'descricao') },
-    'elemento.autor': function(nv, ov) { this.handlerWatch(nv, ov, 'autor') },
-    parent:function(nv, ov) {this.elemento = this.child},
+    'elemento.titulo': function (nv, ov) { this.handlerWatch(nv, ov, 'titulo') },
+    'elemento.descricao': function (nv, ov) { this.handlerWatch(nv, ov, 'descricao') },
+    'elemento.autor': function (nv, ov) { this.handlerWatch(nv, ov, 'autor') },
+    parent: function (nv, ov) { this.elemento = this.child }
   },
   computed: {
   },
   methods: {
     ...mapActions([
-      'sendMessage',
+      'sendMessage'
     ]),
-    handlerWatch(newValue, oldValue, attr=null) {
-
+    handlerWatch (newValue, oldValue, attr = null) {
       let data = Object()
       let referencia = Object()
       referencia.id = this.elemento.id
-      if (attr)
-          referencia[attr] = newValue
+      if (attr) {
+        referencia[attr] = newValue
+      }
 
       data.id = this.elemento.referente
-      data.cita = Array()
+      data.cita = Array() // eslint-disable-line
       data.cita.push(referencia)
 
       let t = this
       t.updateDocumento(data)
-      .then( () => {
-        t.success()
-      })
+        .then(() => {
+          t.success()
+        })
     },
-    updateDocumento(data) {
+    updateDocumento (data) {
       let t = this
       return t.documentoResource.updateDocumento(data)
-        .then( (response) => {
+        .then((response) => {
 
         })
-        .catch( (response) => this.danger())
+        .catch((response) => this.danger())
     },
-    success(message='Informação atualizada com sucesso.') {
-      this.sendMessage({alert:'alert-success', message:message})
+    success (message = 'Informação atualizada com sucesso.') {
+      this.sendMessage({alert: 'alert-success', message: message})
     },
-    danger(message='Ocorreu um erro na comunicação com o servidor.') {
-      this.sendMessage({alert:'alert-danger', message: message })
+    danger (message = 'Ocorreu um erro na comunicação com o servidor.') {
+      this.sendMessage({alert: 'alert-danger', message: message})
     },
 
-    leftParte: function() {
-      this.ready = Array()
+    leftParte: function () {
+      this.ready = Array() // eslint-disable-line
       this.$parent.showModal -= 1
       this.$parent.showElemento = this.elementos[this.$parent.showModal]
       this.elemento = this.$parent.showElemento
     },
-    rightParte: function() {
-      this.ready = Array()
+    rightParte: function () {
+      this.ready = Array() // eslint-disable-line
       this.$parent.showModal += 1
       this.$parent.showElemento = this.elementos[this.$parent.showModal]
       this.elemento = this.$parent.showElemento
     },
-    deleteReferencia(event) {
+    deleteReferencia (event) {
       let t = this
       let data = Object()
       let referencia = Object()
       referencia.id = this.elemento.id
       data.id = this.elemento.referente
-      data.cita = Array()
+      data.cita = Array() // eslint-disable-line
       data.cita.push(referencia)
 
       t.documentoResource.deleteReferencia(data)
-        .then( (response) => {
+        .then((response) => {
           if (t.elementos.length === 1) {
             t.$parent.showModal = -1
             t.$parent.showElemento = null
-          }
-          else {
+          } else {
             if (t.pos === 0) {
               t.$parent.showElemento = t.elementos[1]
-            }
-            else {
-              t.$parent.showElemento = t.elementos[t.pos-1]
-              t.$parent.showModal = t.pos-1
+            } else {
+              t.$parent.showElemento = t.elementos[t.pos - 1]
+              t.$parent.showModal = t.pos - 1
             }
           }
           t.$parent.getDocumento(t.parent.id)
@@ -135,11 +133,11 @@ export default {
             })
           t.success('Elemento excluído com sucesso.')
         })
-        .catch( (response) => {
+        .catch((response) => {
           t.danger(response.response.data.detail)
         })
-    },
-  },
+    }
+  }
 }
 </script>
 <style lang="scss" scoped>

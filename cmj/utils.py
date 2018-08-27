@@ -157,7 +157,7 @@ NONE_YES_NO_CHOICES = [(None, _('---------')),
 def listify(function):
     @wraps(function)
     def f(*args, **kwargs):
-        return list(function(*args, **kwargs))
+        return list(function (*args, **kwargs))
     return f
 
 

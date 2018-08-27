@@ -351,8 +351,8 @@
     {% block extra_js %}{% endblock %}
   {% endblock foot_js %}
   <script>
-    $(document).ready(function() {
-      $("#menu-toggle").click(function(e) {
+    $(document).ready(function () {
+      $("#menu-toggle").click(function (e) {
         e.preventDefault();
         $("#wrapper").toggleClass("toggled");
         $(".container").toggleClass("toggled ");
@@ -362,7 +362,7 @@
 
   {% if not DEBUG %}
     <script>
-      window.fbAsyncInit = function() {
+      window.fbAsyncInit = function () {
         FB.init({
           appId      : '150874375319738',
           cookie     : true,
@@ -374,7 +374,7 @@
 
       };
 
-      (function(d, s, id){
+      (function (d, s, id){
           var js, fjs = d.getElementsByTagName(s)[0];
           if (d.getElementById(id)) {return;}
           js = d.createElement(s); js.id = id;
@@ -394,7 +394,7 @@
 
   {% endif %}
   <script>
-    (function() {
+    (function () {
       var cx = '015586130466685663092:bbp57zhgqek';
       var gcse = document.createElement('script');
       gcse.type = 'text/javascript';

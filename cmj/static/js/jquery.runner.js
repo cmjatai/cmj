@@ -3,7 +3,7 @@
  * https://github.com/jylauril/jquery-runner/
  * Copyright (c) 2014 Jyrki Laurila <https://github.com/jylauril>
  */
-(function() {
+(function () {
   var Runner, formatTime, meta, pad, runners, uid, _$, _requestAnimationFrame, _uid;
 
   meta = {
@@ -19,23 +19,23 @@
 
   runners = {};
 
-  pad = function(num) {
+  pad = function (num) {
     return (num < 10 ? '0' : '') + num;
   };
 
   _uid = 1;
 
-  uid = function() {
+  uid = function () {
     return 'runner' + _uid++;
   };
 
-  _requestAnimationFrame = (function(win, raf) {
-    return win['r' + raf] || win['webkitR' + raf] || win['mozR' + raf] || win['msR' + raf] || function(fn) {
+  _requestAnimationFrame = (function (win, raf) {
+    return win['r' + raf] || win['webkitR' + raf] || win['mozR' + raf] || win['msR' + raf] || function (fn) {
       return setTimeout(fn, 30);
     };
   })(this, 'equestAnimationFrame');
 
-  formatTime = function(time, settings) {
+  formatTime = function (time, settings) {
     var i, len, ms, output, prefix, separator, step, steps, value, _i, _len;
     settings = settings || {};
     steps = [3600000, 60000, 1000, 10];
@@ -63,7 +63,7 @@
     return prefix + output;
   };
 
-  Runner = (function() {
+  Runner = (function () {
     function Runner(items, options, start) {
       var id;
       if (!(this instanceof Runner)) {
@@ -73,7 +73,7 @@
       id = this.id = uid();
       this.settings = _$.extend({}, this.settings, options);
       runners[id] = this;
-      items.each(function(index, element) {
+      items.each(function (index, element) {
         _$(element).data('runner', id);
       });
       this.value(this.settings.startAt);
@@ -109,9 +109,9 @@
       format: null
     };
 
-    Runner.prototype.value = function(value) {
-      this.items.each((function(_this) {
-        return function(item, element) {
+    Runner.prototype.value = function (value) {
+      this.items.each((function (_this) {
+        return function (item, element) {
           var action;
           item = _$(element);
           action = item.is('input') ? 'val' : 'text';
@@ -120,14 +120,14 @@
       })(this));
     };
 
-    Runner.prototype.format = function(value) {
+    Runner.prototype.format = function (value) {
       var format;
       format = this.settings.format;
-      format = _$.isFunction(format) ? format : formatTime;
+      format = _$.isfunction (format) ? format : formatTime;
       return format(value, this.settings);
     };
 
-    Runner.prototype.update = function() {
+    Runner.prototype.update = function () {
       var countdown, delta, settings, stopAt, time;
       if (!this.updating) {
         this.updating = true;
@@ -153,11 +153,11 @@
       }
     };
 
-    Runner.prototype.fire = function(event) {
+    Runner.prototype.fire = function (event) {
       this.items.trigger(event, this.info());
     };
 
-    Runner.prototype.start = function() {
+    Runner.prototype.start = function () {
       var step;
       if (!this.running) {
         this.running = true;
@@ -165,8 +165,8 @@
           this.reset();
         }
         this.lastTime = _$.now();
-        step = (function(_this) {
-          return function() {
+        step = (function (_this) {
+          return function () {
             if (_this.running) {
               _this.update();
               _requestAnimationFrame(step);
@@ -178,7 +178,7 @@
       }
     };
 
-    Runner.prototype.stop = function() {
+    Runner.prototype.stop = function () {
       if (this.running) {
         this.running = false;
         this.update();
@@ -186,7 +186,7 @@
       }
     };
 
-    Runner.prototype.toggle = function() {
+    Runner.prototype.toggle = function () {
       if (this.running) {
         this.stop();
       } else {
@@ -194,7 +194,7 @@
       }
     };
 
-    Runner.prototype.lap = function() {
+    Runner.prototype.lap = function () {
       var lap, last;
       last = this.lastTime;
       lap = last - this.lapTime;
@@ -210,7 +210,7 @@
       return last;
     };
 
-    Runner.prototype.reset = function(stop) {
+    Runner.prototype.reset = function (stop) {
       var nowTime;
       if (stop) {
         this.stop();
@@ -226,7 +226,7 @@
       this.fire('runnerReset');
     };
 
-    Runner.prototype.info = function() {
+    Runner.prototype.info = function () {
       var lap;
       lap = this.lastLap || 0;
       return {
@@ -245,7 +245,7 @@
 
   })();
 
-  _$.fn.runner = function(method, options, start) {
+  _$.fn.runner = function (method, options, start) {
     var id, runner;
     if (!method) {
       method = 'init';

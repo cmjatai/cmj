@@ -13,8 +13,7 @@
     <div class="inner">
       <modal-referencia-image-list v-if="showModal >= 0" @close="showModal = -1" :elementos="citaOrdenados" :child="showElemento" :pos="showModal" :parent="elemento" />
       <div :class="['row', 'row-gallery', 'row'+elemento.id ]">
-        <div :class="['col-xs-8', 'col-bi-container', 'row'+elemento.id ]">
-
+        <div :class="['col-xs-8', 'col-bi-container', 'row' + elemento.id ]">
 
           <div class="row">
             <div class="col-xs-12">
@@ -26,11 +25,11 @@
               <div class="row row-bi-select">
                 <select v-model="bi_selected">
                   <option disabled value="">Escolha um Banco de Imagem</option>
-                  <option :value="value.value"  v-for="(value, key) in bi_list">{{value.text}}</option>
+                  <option :value="value.value"  v-for="value in bi_list" :key="value.value">{{value.text}}</option>
                 </select>
               </div>
               <div :class="['row', 'row-bi', 'row'+elemento.id ]">
-                <tpd-image-td-bi v-on:ondragend="ondragendtransf" v-for="(value, key) in images_from_bi" :child="value" :parent="elemento" :key="value.id"/>
+                <tpd-image-td-bi v-on:ondragend="ondragendtransf" v-for="value in images_from_bi" :child="value" :parent="elemento" :key="value.id"/>
                  <resize-observer @notify="handleResize" />
               </div>
             </div>
@@ -48,76 +47,77 @@
 
 <script>
 import ContainerTdBi from './ContainerTdBi'
-import { orderBy, isEmpty } from 'lodash';
+import { orderBy, isEmpty } from 'lodash' // eslint-disable-line
 
 export default {
   name: 'tpd-gallery',
   extends: {
-    ...ContainerTdBi,
+    ...ContainerTdBi
   },
-  data() {
+  data () {
     return {
-      bi_selected: "",
+      bi_selected: '',
       bi_object: Object(),
-      bi_list: Array(),
+      bi_list: Array(), // eslint-disable-line
       has_titulo: false,
-      has_descricao:false,
+      has_descricao: false,
       has_autor: false,
       fullHeight: document.documentElement.clientHeight
     }
   },
   watch: {
-    "bi_selected": function(nv, ov) {
+    'bi_selected': function (nv, ov) {
       let t = this
       this.documentoResource.getDocumento(nv)
-        .then( (req) => {
+        .then((req) => {
           t.bi_object = req.data
           t.success()
         })
     }
   },
   computed: {
-    images_from_bi: function() {
+    images_from_bi: function () {
       let images = this.bi_object
-      if (images.ordem === undefined)
+      if (images.ordem === undefined) {
         return
-      images = _.orderBy(images.childs,'ordem')
-      images = _.orderBy(images[0].childs,'ordem')
+      }
+      images = _.orderBy(images.childs, 'ordem') // eslint-disable-line
+      images = _.orderBy(images[0].childs, 'ordem') // eslint-disable-line
       return images
     },
-    citaOrdenados: function() {
+    citaOrdenados: function () {
       let ordenar = this.elemento.cita
-      return _.orderBy(ordenar,'ordem')
-    },
+      return _.orderBy(ordenar, 'ordem') // eslint-disable-line
+    }
   },
-  mounted() {
+  mounted () {
     let t = this
     t.documentoResource.getDocumentoChoiceList(10, 1)
-      .then( (response) => {
+      .then((response) => {
         t.bi_list = response.data.results
       })
-      .catch( (response) => {
+      .catch((response) => {
         t.danger()
       })
   },
   methods: {
     handleResize () {
       if (this.elemento.id !== 0) {
-        let colbicontainer = document.querySelector('.col-bi-container.row'+this.elemento.id)
-        let rowreferencia = document.querySelector('.row-referencias.row'+this.elemento.id)
+        let colbicontainer = document.querySelector('.col-bi-container.row' + this.elemento.id)
+        let rowreferencia = document.querySelector('.row-referencias.row' + this.elemento.id)
         rowreferencia.style.minHeight = colbicontainer.clientHeight + 'px'
       }
     },
-    toogleTitulo(event) {
+    toogleTitulo (event) {
       this.has_titulo = !this.has_titulo
     },
-    toogleDescricao(event) {
+    toogleDescricao (event) {
       this.has_descricao = !this.has_descricao
     },
-    toogleAutor(event) {
+    toogleAutor (event) {
       this.has_autor = !this.has_autor
     },
-    ondragendtransf: function(el) {
+    ondragendtransf: function (el) {
       let dragleave = this.dragleave
       this.dragleave = null
       if (el.tipo === 900) {
@@ -129,35 +129,35 @@ export default {
           referencia.referente = this.elemento.id
           referencia.referenciado = el.id
           referencia.ordem = dragleave.ordem
-          if (this.side > 0)
+          if (this.side > 0) {
             referencia.ordem++
+          }
           let data = Object()
-          data.cita = Array()
+          data.cita = Array() // eslint-disable-line
           data.cita.push(referencia)
           data.id = this.elemento.id
           this.updateDocumento(data)
-            .then( () => {
+            .then(() => {
               this.getDocumento(this.elemento.id)
             })
-        }
-        else {
+        } else {
           // se foi solto na caixa row-referencias
           let referencia = Object()
           referencia.referente = this.elemento.id
           referencia.referenciado = el.id
           referencia.ordem = 0
           let data = Object()
-          data.cita = Array()
+          data.cita = Array() // eslint-disable-line
           data.cita.push(referencia)
           data.id = this.elemento.id
           this.updateDocumento(data)
-            .then( () => {
+            .then(() => {
               this.getDocumento(this.elemento.id)
             })
         }
       }
     },
-    ondragend: function(el) {
+    ondragend: function (el) {
       let dragleave = this.dragleave
       this.dragleave = null
       if (!dragleave || el.id === dragleave.id || dragleave.tipo >= 0) {
@@ -166,46 +166,47 @@ export default {
       let referencia = Object()
       referencia.id = el.id
       referencia.ordem = dragleave.ordem
-      if (el.ordem > dragleave.ordem && this.side > 0)
+      if (el.ordem > dragleave.ordem && this.side > 0) {
         referencia.ordem++
-      else if (el.ordem < dragleave.ordem && this.side < 0)
+      } else if (el.ordem < dragleave.ordem && this.side < 0) {
         referencia.ordem--
-      if (el.ordem === referencia.ordem)
+      }
+      if (el.ordem === referencia.ordem) {
         return
+      }
       el.ordem = referencia.ordem
       let data = Object()
-      data.cita = Array()
+      data.cita = Array() // eslint-disable-line
       data.cita.push(referencia)
       data.id = this.elemento.id
 
       this.updateDocumento(data)
-        .then( () => {
+        .then(() => {
           this.getDocumento(this.elemento.id)
         })
     },
-    ondragleave: function(el, side) {
+    ondragleave: function (el, side) {
       if (el.tipo >= 0) {
         this.dragleave = null
         this.side = 0
-      }
-      else {
+      } else {
         console.log('ondragleave: tpdgallery', el, side)
         this.dragleave = el
         this.side = side
       }
     },
-    deleteParte(event) {
+    deleteParte (event) {
       let t = this
       t.documentoResource.deleteDocumento(this.elemento.id)
-        .then( (response) => {
+        .then((response) => {
           t.$parent.getDocumento(this.parent.id)
           t.success('Elemento excluído com sucesso.')
         })
-        .catch( (response) => {
+        .catch((response) => {
           t.danger(response.response.data.detail)
         })
-    },
-  },
+    }
+  }
 }
 </script>
 

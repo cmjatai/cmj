@@ -10,5 +10,5 @@ const components = Object.assign(
 )
 
 export default {
-  components,
+  components
 }

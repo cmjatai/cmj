@@ -135,16 +135,16 @@
 {% comment %}
 {% block extra_js  %}
   <script type="text/javascript">
-    $(document).ready(function(){
+    $(document).ready(function (){
       $('.panel-collapse').collapse('show');
       timeoutinit = setTimeout(function () {
         $('.panel-collapse').collapse('hide');
       }, 5000);
       $(".panel-nota-site-antigo").hover(
-       function() {
+       function () {
           clearTimeout(timeoutinit);
           $('.panel-collapse').collapse('show');
-        }, function() {
+        }, function () {
           $('.panel-collapse').collapse('hide');
         }
       );

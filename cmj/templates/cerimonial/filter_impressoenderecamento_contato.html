@@ -44,11 +44,11 @@
 
 {% block extra_js %}
   <script type="text/javascript">
-    $(document).on("keypress", "form", function(event) {
+    $(document).on("keypress", "form", function (event) {
         return event.keyCode != 13;
     });
 
-    var change_imprimir_cargo = function() {
+    var change_imprimir_cargo = function () {
       var local_cargo = $('[name="local_cargo"]');
       var _this = this;
       if ($('[name="imprimir_cargo"]:checked').val() == "True") {

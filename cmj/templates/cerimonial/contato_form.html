@@ -12,7 +12,7 @@
       if (pk != '')
         url_get_pronomes = url_get_pronomes.replace('0', pk);
 
-      $.get(url_get_pronomes, function(data) {
+      $.get(url_get_pronomes, function (data) {
         var new_obj = $(data);
         var old_obj = $('#'+new_obj[0].id).replaceWith(new_obj);
       });

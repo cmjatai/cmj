@@ -20,19 +20,19 @@
         <textarea-autosize v-model.lazy="elemento.texto" placeholder="texto..." :align="'text-left'"/>
       </div>
     </div>
-    <component :is="classChild(value)" v-for="(value, key) in childsOrdenados" :child="value" :parent="elemento" :key="value.id"/>
+    <component :is="classChild(value)" v-for="value in childsOrdenados" :child="value" :parent="elemento" :key="value.id"/>
   </div>
 </template>
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
 import { DocumentoResource } from '../../../resources'
-import { orderBy, isEmpty } from 'lodash';
+// import { orderBy, isEmpty } from 'lodash'
 
 export default {
   name: 'documento-edit',
   props: ['child', 'parent'], // props.child == data.elemento
-  data() {
+  data () {
     return {
       documentoResource: DocumentoResource,
       elemento: {
@@ -46,98 +46,97 @@ export default {
         autor: '',
         refresh: 0
       },
-      mode: "INIT",
+      mode: 'INIT'
     }
   },
   watch: {
-    'elemento.titulo': function(nv, ov) { this.handlerWatch(nv, ov, 'titulo') },
-    'elemento.descricao': function(nv, ov) { this.handlerWatch(nv, ov, 'descricao') },
-    'elemento.visibilidade': function(nv, ov) { this.handlerWatch(nv, ov, 'visibilidade') },
-    'elemento.texto': function(nv, ov) { this.handlerWatch(nv, ov, 'texto') },
-    'elemento.autor': function(nv, ov) { this.handlerWatch(nv, ov, 'autor') },
-    parent:function(nv, ov) {
+    'elemento.titulo': function (nv, ov) { this.handlerWatch(nv, ov, 'titulo') },
+    'elemento.descricao': function (nv, ov) { this.handlerWatch(nv, ov, 'descricao') },
+    'elemento.visibilidade': function (nv, ov) { this.handlerWatch(nv, ov, 'visibilidade') },
+    'elemento.texto': function (nv, ov) { this.handlerWatch(nv, ov, 'texto') },
+    'elemento.autor': function (nv, ov) { this.handlerWatch(nv, ov, 'autor') },
+    parent: function (nv, ov) {
       this.elemento = this.child
-    },
+    }
   },
   computed: {
     ...mapGetters([
-       'getChilds',
-       'getChoices',
-       'getDocObject',
+      'getChilds',
+      'getChoices',
+      'getDocObject'
     ]),
-    name_component: function() {
+    name_component: function () {
       return this.$options.name
     },
-    hasParent: function() {
+    hasParent: function () {
       return this.elemento && this.elemento.parent > 0
     },
-    notHasParent: function() {
+    notHasParent: function () {
       return !this.elemento || !this.elemento.parent
     },
-    refresh: function() {
+    refresh: function () {
       let refresh = this.elemento
       refresh = refresh.refresh
       refresh = refresh === undefined ? 0 : refresh
       return refresh
     },
-    slug: function() {
+    slug: function () {
       let slug = this.elemento.slug
-      return '/'+slug
+      return '/' + slug
     },
-    meta_edit: function() {
-      let slug = this.getSlug
-      return '/documento/'+this.elemento.id+'/edit'
+    meta_edit: function () {
+      // let slug = this.getSlug
+      return '/documento/' + this.elemento.id + '/edit'
     },
-    childsOrdenados: function() {
+    childsOrdenados: function () {
       let ordenar = this.elemento.childs
-      return _.orderBy(ordenar,'ordem')
+      return _.orderBy(ordenar,'ordem') // eslint-disable-line
     },
-    visibilidade_choice: function() {
+    visibilidade_choice: function () {
       return this.getChoices && this.getChoices.visibilidade
         ? this.getChoices.visibilidade : {}
     },
-    classParent: function() {
+    classParent: function () {
       return this.notHasParent ? 'container-path container-documento-edit' : ''
     },
-    ordem:function() {
+    ordem: function () {
       return this.elemento.ordem
     }
-
   },
   methods: {
     ...mapActions([
       'setDocObject',
       'setTitulo',
       'setDescricao',
-      'sendMessage',
+      'sendMessage'
     ]),
-    classChild(value) {
-      if (!value.id && this.notHasParent)
+    classChild (value) {
+      if (!value.id && this.notHasParent) {
         return 'container-path container-documento-edit'
-      else {
+      } else {
         try {
           let classe = this.getChoices.all_bycode[value.tipo]['component_tag']
-          if ([10, ].indexOf(this.getDocObject.tipo) !== -1)
-            classe += '-'+this.getChoices.all_bycode[this.getDocObject.tipo]['component_tag']
+          if ([10].indexOf(this.getDocObject.tipo) !== -1) {
+            classe += '-' + this.getChoices.all_bycode[this.getDocObject.tipo]['component_tag']
+          }
           return classe
-        }
-        catch (Exception) {
+        } catch (Exception) {
           return ''
         }
       }
     },
-    handlerWatch(newValue, oldValue, attr=null) {
+    handlerWatch (newValue, oldValue, attr = null) {
       let data = Object()
-      if (attr)
-          data[attr] = newValue
-
-      if (this.mode === "CREATE") {
-         data.classe = this.elemento.classe
-         data.parent = this.elemento.parent
-         this.createDocumento(data)
-         return
+      if (attr) {
+        data[attr] = newValue
       }
-      else if (this.mode === "INIT") {
+
+      if (this.mode === 'CREATE') {
+        data.classe = this.elemento.classe
+        data.parent = this.elemento.parent
+        this.createDocumento(data)
+        return
+      } else if (this.mode === 'INIT') {
         return
       }
 
@@ -145,103 +144,100 @@ export default {
 
       let t = this
       t.updateDocumento(data)
-      .then( () => {
-        t.success()
-      })
+        .then(() => {
+          t.success()
+        })
     },
-    updateDocumento(data) {
+    updateDocumento (data) {
       let t = this
       return t.documentoResource.updateDocumento(data)
-        .then( (response) => {
+        .then((response) => {
           t.setDocObject(response.data)
-          //t.success()
+          // t.success()
         })
-        .catch( (response) => this.danger())
+        .catch((response) => this.danger())
     },
-    success(message='Informação atualizada com sucesso.') {
-      this.sendMessage({alert:'alert-success', message:message})
+    success (message = 'Informação atualizada com sucesso.') {
+      this.sendMessage({alert: 'alert-success', message: message})
     },
-    danger(message='Ocorreu um erro na comunicação com o servidor.') {
-      this.sendMessage({alert:'alert-danger', message: message })
+    danger (message = 'Ocorreu um erro na comunicação com o servidor.') {
+      this.sendMessage({alert: 'alert-danger', message: message})
     },
-    createDocumento(data) {
+    createDocumento (data) {
       let t = this
       t.documentoResource.createDocumento(data)
-        .then( (response) => {
+        .then((response) => {
           t.setDocObject(response.data)
-          t.$router.push({name:'documento_construct', params: {id:response.data.id}})
+          t.$router.push({name: 'documento_construct', params: {id: response.data.id}})
           t.$nextTick()
-            .then(function() {
+            .then(function () {
               t.getDocumento(response.data.id)
             })
         })
-        .catch( (response) => this.danger())
+        .catch((response) => this.danger())
     },
-    getDocumento(id) {
-      console.log('get:', id)
+    getDocumento (id) {
+      // console.log('get:', id)
       let t = this
-      this.mode = "INIT"
+      this.mode = 'INIT'
       return this.$nextTick()
-        .then(function() {
+        .then(function () {
           t.documentoResource.getDocumento(id)
-            .then( (req) => {
+            .then((req) => {
               t.setDocObject(req.data)
               t.elemento = req.data
               t.$nextTick()
-                .then( function() {
-                  t.mode = "UPDATE"
+                .then(function () {
+                  t.mode = 'UPDATE'
                   t.success()
                 })
             })
-            .catch( (e) => {
+            .catch((e) => {
               t.setDocObject({})
               t.elemento = {}
-              t.danger(message='erro na atualização')
+              t.danger('erro na atualização')
             })
         })
     },
-    createBrother(data) {
+    createBrother (data) {
       let t = this
       t.documentoResource.createDocumento(data)
-        .then( (response) => {
+        .then((response) => {
           t.$parent.getDocumento(response.data.parent)
         })
-        .catch( (response) => {
+        .catch((response) => {
           t.danger()
         })
     },
-    createChild(data) {
+    createChild (data) {
       let t = this
       t.documentoResource.createDocumento(data)
-        .then( (response) => {
+        .then((response) => {
           t.getDocumento(this.elemento.id)
         })
-        .catch( (response) => {
-          t.danger(message='erro na adição')
+        .catch((response) => {
+          t.danger('erro na adição')
         })
-    },
-
+    }
   },
-
-  mounted: function() {
+  mounted: function () {
     let t = this
     if (t.child) {
       t.elemento = t.child
       t.$nextTick()
-        .then( function() {
-          t.mode = "UPDATE"
+        .then(function () {
+          t.mode = 'UPDATE'
         })
-    }
-    else {
+    } else {
       let id = t.$route.params.id
       if (t.$route.name === 'documento_construct') {
         t.getDocumento(id)
-      }
-      else {
-        t.mode = "CREATE"
+      } else {
+        t.mode = 'CREATE'
         t.elemento.classe = id
-        if (t.parent)
+        if (t.parent) {
           t.elemento.parent = t.parent.id
+        }
       }
     }
   }

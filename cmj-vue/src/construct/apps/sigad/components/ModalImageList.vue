@@ -52,65 +52,63 @@ export default {
       // cancela os watch de DocumentoEdit e manipula apenas o this.elemento
       // ao fazer isso this.elemento de tpd-image-tdbi também será alterado e o
       // assim, o watch de lá fará a atualização
-    },
+    }
   },
-  data() {
+  data () {
     return {
     }
   },
   computed: {
-    slug_local: function() {
+    slug_local: function () {
       let r = this.elemento.refresh
-      return '/'+this.child.slug+'.1024' + (r ? '?'+r : '')
-    },
+      return '/' + this.child.slug + '.1024' + (r ? '?' + r : '')
+    }
   },
-  props: ['elementos', 'pos',],
+  props: ['elementos', 'pos'],
   methods: {
-    rotateLeft: function() {
+    rotateLeft: function () {
       let t = this
       let data = Object()
       data.id = t.elemento.id
       data.rotate = 90
       t.updateDocumento(data)
-        .then( () => {
-          t.elemento.refresh = _.now()
+        .then(() => {
+          t.elemento.refresh = _.now() // eslint-disable-line
         })
     },
-    rotateRight: function() {
+    rotateRight: function () {
       let t = this
       let data = Object()
       data.id = t.elemento.id
       data.rotate = -90
       t.updateDocumento(data)
-        .then( () => {
-          t.elemento.refresh = _.now()
+        .then(() => {
+          t.elemento.refresh = _.now() // eslint-disable-line
         })
     },
-    leftParte: function() {
+    leftParte: function () {
       this.$parent.showModal -= 1
       this.$parent.showElemento = this.elementos[this.$parent.showModal]
       this.elemento = this.$parent.showElemento
     },
-    rightParte: function() {
+    rightParte: function () {
       this.$parent.showModal += 1
       this.$parent.showElemento = this.elementos[this.$parent.showModal]
       this.elemento = this.$parent.showElemento
     },
-    deleteParte(event) {
+    deleteParte (event) {
       let t = this
       t.documentoResource.deleteDocumento(this.elemento.id)
-        .then( (response) => {
+        .then((response) => {
           if (t.elementos.length === 1) {
             t.$parent.showModal = -1
             t.$parent.showElemento = null
-          }
-          else {
+          } else {
             if (t.pos === 0) {
               t.$parent.showElemento = t.elementos[1]
-            }
-            else {
-              t.$parent.showElemento = t.elementos[t.pos-1]
-              t.$parent.showModal = t.pos-1
+            } else {
+              t.$parent.showElemento = t.elementos[t.pos - 1]
+              t.$parent.showModal = t.pos - 1
             }
           }
           t.$parent.getDocumento(t.parent.id)
@@ -118,11 +116,11 @@ export default {
             })
           t.success('Elemento excluído com sucesso.')
         })
-        .catch( (response) => {
+        .catch((response) => {
           t.danger(response.response.data.detail)
         })
-    },
-  },
+    }
+  }
 }
 </script>
 <style lang="scss" scoped>
