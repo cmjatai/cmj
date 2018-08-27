@@ -22,6 +22,13 @@
     </div>
     <component :is="classChild(value)" v-for="value in childsOrdenados" :child="value" :parent="elemento" :key="value.id"/>
   </div>
+  <div v-else>
+    <div class="container">
+      <div class="loading">
+        Carregando Editor...
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -245,10 +252,16 @@ export default {
 </script>
 
 <style lang="scss" >
+.loading {
+  font-size: 200%;
+  text-align: center;
+  margin: 15% 0;
+}
 .container-path.container-documento-edit {
   background: #f7f7f7 url(/static/img/bg.png);
   padding: 20px 0px 200px;
   margin: -20px 0px 0;
+
   input, textarea {
     outline: none;
     width: 100%;
