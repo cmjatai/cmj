@@ -33,13 +33,9 @@
                                 <link rel="stylesheet" href="{% sass_src 'styles/app_cmj.scss' %}{% if DEBUG %}?time={% now "jS F Y H:i:s" %}{% endif %}" type="text/css">
                               {% endcomment %}
     {% endblock %}
-
   </head>
 
   <body class="{% block body_class %}{%endblock%}">
-    <div id="app"></div>
-    
-
     <div class="page fadein" id="{% block id_wrapper %}wrapper{% endblock %}">
       {% block canais_absolute %}
         <aside>
