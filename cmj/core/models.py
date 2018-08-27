@@ -264,8 +264,14 @@ class CmjModelMixin(CmjCleanMixin, models.Model):
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None, clean=True):
-        if clean:
+
+        import inspect
+        funcs = list(filter(lambda x: x == 'revision_pre_delete_signal',
+                            map(lambda x: x[3], inspect.stack())))
+
+        if clean and not funcs:
             self.clean()
+
         return models.Model.save(
             self,
             force_insert=force_insert,
