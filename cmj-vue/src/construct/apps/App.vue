@@ -1,7 +1,9 @@
 <template>
   <div id="app">
     <message v-bind:messages="getMessages"></message>
-    <router-view></router-view>
+    <router-view>
+
+    </router-view>
   </div>
 </template>
 

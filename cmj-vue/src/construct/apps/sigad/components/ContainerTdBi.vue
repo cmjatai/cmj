@@ -2,7 +2,7 @@
   <div :class="[name_component, 'container']">
 
     <div class="btn-toolbar widgets widget-top">
-      <div class="btn-group btn-group-xs pull-right">
+      <div class="btn-group btn-group-sm">
       </div>
     </div>
     <div class="drop-area">

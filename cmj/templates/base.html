@@ -84,6 +84,8 @@
                     <a href="#">
                       {% avatar_user user%}
                     </a>
+  
+
                     <ul class="dropdown-menu">
                       <li class=" text-right"><a href="{% url 'cmj.core:cmj_user_change' %}">{{ user.get_full_name|default:user.email }} <i class="fa fa-hand-o-left" aria-hidden="true"></i> {% trans "Meu Perfil" %}</a></li>
                       {% if perms.ouvidoria %}

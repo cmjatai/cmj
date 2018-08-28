@@ -20,13 +20,13 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-  textarea {
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    background: transparent;
-    border: none;
-    outline: none;
-    resize: none;
-  }
+textarea {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+}
 </style>

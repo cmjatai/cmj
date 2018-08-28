@@ -71,41 +71,10 @@ a:hover {
 
 
 
-/* 
-                                                          .btn-ouvidoria {
-                                                            margin-bottom: 20px;
-                                                            display: inline-block;
-                                                            width: 100%;
-                                                            text-align: center;
-                                                            border-radius: 5px;
-                                                            color: white !important;
-                                                            background: rgba(#0073b7, 0.8) url(/static/img/bg.png);
-
-                                                            &:hover {
-                                                              background-color: rgba(#0073b7, 0.9);
-                                                            }
-                                                            span {
-                                                              display: inline-block;
-                                                              width: 100%;
-                                                              line-height: 1.4em;
-                                                              font-variant: small-caps;
-                                                              font-size: 100%;
-                                                              background-color: $hover_background_10p;
-                                                              font-weight: bold;
-                                                            }
-                                                            i {
-                                                                line-height: 120%;
-                                                            }
-                                                          } */
-
-
-
 .bg-back-image {
   background: $color_main_bg $url_bg_png;
 
 }
-
-
 .container-fluid {
   margin: 0;
 }

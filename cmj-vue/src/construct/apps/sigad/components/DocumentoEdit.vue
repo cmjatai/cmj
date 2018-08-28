@@ -1,12 +1,12 @@
 <template lang="html">
   <div v-if="mode !== 'INIT'" :class="classParent">
     <div v-if="notHasParent" class="container">
-      <div v-show="elemento.id" class="btn-toolbar widgets-function">
-        <div class="btn-group btn-group-xs pull-left widget-actions ">
-          <a :href="slug" class="btn btn-primary" target="_blank">Versão Final</a>
-          <a :href="meta_edit" class="btn btn-success">Editar Metadados</a>
-        </div>
-        <div class="btn-group btn-group-lg pull-right widget-visibilidade">
+      <div v-show="elemento.id" class="btn-toolbar widgets-function justify-content-between">
+        <b-button-group>
+          <b-button v-on:click.self="clickVersaFinal" variant="primary">Versão Final</b-button>
+          <b-button v-on:click.self="clickEditMetadados" variant="success">Editar Metadados</b-button>
+        </b-button-group>
+        <div class="btn-group widget-visibilidade">
           <cmj-choices v-model.lazy="elemento.visibilidade" :options="visibilidade_choice" name="visibilidade-" :id="elemento.id" />
         </div>
       </div>
@@ -117,6 +117,12 @@ export default {
       'setDescricao',
       'sendMessage'
     ]),
+    clickVersaoFinal () {
+      window.open(this.slug, '_blank')
+    },
+    clickEditMetadados () {
+      window.open(this.meta_edit, '_self')
+    },
     classChild (value) {
       if (!value.id && this.notHasParent) {
         return 'container-path container-documento-edit'
@@ -257,50 +263,15 @@ export default {
   text-align: center;
   margin: 15% 0;
 }
-.container-path.container-documento-edit {
-  background: #f7f7f7 url(/static/img/bg.png);
-  padding: 20px 0px 200px;
-  margin: -20px 0px 0;
 
-  input, textarea {
-    outline: none;
-    width: 100%;
-    margin: 5px 0;
-    padding: 5px 10px;
-    border: none;
-    background: transparent;
-    &:focus {
-      background: transparentize(#fff, 0.7);
-    }
-  }
-  .container:first-child {
-    background-color: transparent;
-    border: 1px solid transparent;
-  }
-  .path-title {
-    margin-top: 1em;
-    margin-bottom: 0;
-  }
-  .path-description {
-    margin: 0px;
-  }
-  .widget-actions {
-    a {
-      color: white;
-    }
-  }
+.container-path.container-documento-edit {
+  padding: 20px 0px 200px;
   .widget-visibilidade {
-    .btn {
+    label {
       opacity: 0.5;
-      color: black;
       &:hover {
         opacity: 1;
       }
-    }
-    .active {
-      opacity: 1;
-      font-weight: bold;
-      color: black;
     }
     .status-private {
       background: transparentize(#d90040,0.6);
@@ -311,15 +282,31 @@ export default {
     .status-public {
       background: transparentize(#008020,0.6);
     }
+    .active {
+      opacity: 1;
+      font-weight: bold;
+      color: black;
+    }
+  }
+  .tpd-texto, .tpd-audio, .tpd-video, .tpd-image, .tpd-gallery {
+    position: relative;
   }
   .widgets {
     position: absolute;
     z-index: 2;
     width: 100%;
     transition: all 0.5s ease;
-    opacity: 0;
     height: 0;
     display: none;
+    opacity: 0.7;
+    .btn {
+      box-shadow: 0 0 0;
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.2;
+    }
+    .btn-group {
+      padding: 0 4px;
+    }
     &:hover {
       opacity: 1;
       transition: all 0.5s ease;
@@ -327,14 +314,24 @@ export default {
   }
   .widget-bottom {
     top:100%;
-    right:-10px;
-    left: -10px;
     margin-top: -15px;
+    right: 10px;
   }
+
   .widget-top {
     top: 0px;
-    right:-10px;
     margin-top: -15px;
+  }
+  input, textarea {
+    outline: none;
+    width: 100%;
+    margin: 5px 0;
+    padding: 5px 10px;
+    border: none;
+    background: transparent;
+    &:focus {
+      background: transparentize(#fff, 0.7);
+    }
   }
   .tpd-texto, .tpd-audio, .tpd-video, .tpd-image, .tpd-gallery {
     position: relative;
@@ -348,9 +345,9 @@ export default {
       border: 1px solid #fafafa;
       border-radius: 5px;
       & > .widgets {
-        display: block;
+        display: flex;
         height: auto;
-        opacity: 0.4;
+        opacity: 0.7;
         &:hover {
           opacity: 1;
           transition: all 0.5s ease;
@@ -358,8 +355,29 @@ export default {
       }
     }
   }
-  .fr-counter {
-    display: none;
+}
+
+.container-path.container-documento-edit__old {
+  //background: #f7f7f7 url("../../../../../static/img/bg.png");
+  margin: -20px 0px 0;
+
+  .path-title {
+    margin-top: 1em;
+    margin-bottom: 0;
   }
+  .path-description {
+    margin: 0px;
+  }
+  .widget-actions {
+    .btn {
+      font-size: 1rem;
+    }
+    a {
+      color: white;
+    }
+  }
+}
+.fr-counter {
+  display: none;
 }
 </style>

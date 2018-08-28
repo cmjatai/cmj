@@ -196,7 +196,7 @@
 
     .img-contexto {
       line-height: 1.2;
-      background: white url(/static/img/bg.png);;
+      background: white $url_bg_png;
       .texto {
         font-size: 0.65em;
       }
@@ -429,7 +429,7 @@
     //border-bottom: 1px solid $color_topo_bg;;
     position: relative;
     box-shadow: -3px 1px 3px 0 rgba(0,0,0,0.25), 5px 1px 100px 0 rgba(#fff, 0.5);
-    background: darken($color_main_bg,5) url(/static/img/bg.png);
+    background: darken($color_main_bg,5) $url_bg_png;
   }
   .path-title {
     padding-top: 4px;

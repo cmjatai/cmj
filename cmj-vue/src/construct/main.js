@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import VueResource from 'vue-resource'
 import VueResize from 'vue-resize'
+import BootstrapVue from 'bootstrap-vue'
 // import VueCookie from 'vue-cookie'
 // import lodash from 'lodash'
 
@@ -33,6 +34,7 @@ Vue.use(Router)
 Vue.use(VueResource)
 Vue.use(VueFroala)
 Vue.use(VueResize)
+Vue.use(BootstrapVue)
 Vue.config.productionTip = false
 
 // Vue.http.headers.common['Access-Control-Allow-Origin'] = '*'
