@@ -82,7 +82,7 @@
   }
   #login-form {
     border-radius: 5px;
-    background: white url(/static/img/bg.png);
+    background: white $url_bg_png;
     overflow: hidden;
   }
   .row-recovery {
@@ -135,7 +135,7 @@
       }
       &:hover {
         border: 1px solid #000;
-        background: black url(/static/img/bg.png);
+        background: black $url_bg_png;
       }
       img {
         width: 24px;

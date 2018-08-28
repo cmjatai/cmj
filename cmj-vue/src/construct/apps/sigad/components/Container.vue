@@ -2,35 +2,35 @@
   <div :class="[name_component, childsOrdenados.length !== 0 ?  '': 'empty' ]">
 
     <div class="btn-toolbar widgets widget-top">
-      <div  v-if="!elemento.titulo" class="btn-group btn-group-xs pull-left">
+      <div  v-if="!elemento.titulo" class="btn-group btn-group-sm">
         <button v-on:click.self="toogleTitulo" title="Disponibilizar Título para o Container" type="button" class="btn btn-success">T</button>
       </div>
       <template v-if="childsOrdenados.length === 0">
-        <div class="btn-group btn-group-xs pull-left">
+        <div class="btn-group btn-group-sm">
           <button v-on:click.self="addChild(tipo.component_tag, $event)" v-for="(tipo, key) in getChoices.tipo.subtipos" :key="key" type="button" class="btn btn-primary" title="Adiciona Elemento no final deste Container...">{{tipo.text}}</button>
         </div>
       </template>
-      <div class="btn-group btn-group-xs pull-right">
+      <div class="btn-group btn-group-sm">
       </div>
     </div>
 
-    <div class="btn-toolbar widgets widget-bottom ">
-      <div class="btn-group btn-group-xs pull-right">
-        <button v-on:click.self="deleteParte" title="Remover este Container" type="button" class="btn btn-danger">x</button>
-      </div>
-      <div class="btn-group btn-group-xs pull-right">
-        <button v-on:click="containerTrocarTipo" title="Trocar tipo deste Container" type="button" class="btn btn-default"><span class="glyphicon glyphicon-transfer" aria-hidden="true"></span></button>
-      </div>
-      <div class="btn-group btn-group-xs pull-right">
-        <button v-on:click.self="addBrother('container', $event)" title="Adicionar novo Container Simples abaixo deste" type="button" class="btn btn-default">+C</button>
-        <button v-on:click.self="addBrother('container-fluid', $event)" title="Adicionar novo Container Fluido abaixo deste"  type="button" class="btn btn-default">+CF</button>
-      </div>
-    </div>
     <div v-if="has_titulo || elemento.titulo" class="path-title-container construct">
       <input v-model.lazy="elemento.titulo" placeholder="Sub título do container..."/>
     </div>
 
     <component :is="classChild(value)" v-for="value in childsOrdenados" :child="value" :parent="elemento" :key="value.id"/>
+    <div class="btn-toolbar widgets widget-bottom justify-content-end">
+      <div class="btn-group btn-group-sm">
+        <button v-on:click.self="addBrother('container', $event)" title="Adicionar novo Container Simples abaixo deste" type="button" class="btn btn-default">+C</button>
+        <button v-on:click.self="addBrother('container-fluid', $event)" title="Adicionar novo Container Fluido abaixo deste"  type="button" class="btn btn-default">+CF</button>
+      </div>
+      <div class="btn-group btn-group-sm">
+        <button v-on:click="containerTrocarTipo" title="Trocar tipo deste Container" type="button" class="btn btn-default"><i class="fa fa-exchange"></i></button>
+      </div>
+      <div class="btn-group btn-group-sm">
+        <button v-on:click.self="deleteParte" title="Remover este Container" type="button" class="btn btn-danger">x</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -99,42 +99,57 @@ export default {
 </script>
 
 <style lang="scss">
+
 .container-documento-edit {
   .container-fluid  {
     width: 98%;
   }
-  .container, .container-fluid {
+  .container:first-child {
+    background-color: transparent;
     border: 1px solid transparent;
+  }
+  .container, .container-fluid {
     position: relative;
+    background-color: white;
+    border: 1px solid #fafafa;
+    background: transparentize(#bbb, 0.85);
     margin: 15px auto 30px;
     padding: 15px 0px 30px;
-    background: transparentize(#bbb, 0.85);
-    border: 1px solid #fafafa;
-    border-radius: 5px;
-    & > .widgets  {
-      .btn {
-        height: 30px;
-      }
-    }
     &.empty {
       padding: 30px;
         & > .widgets {
-        display: block;
+        display: flex;
         height: auto;
         opacity: 0.4;
       }
+    }
+    & > .widget-bottom {
+      margin-top: -15px;
+      right: 10px;
     }
     &:hover {
       transition: all 0.5s ease;
       & > .widgets {
         transition: all 0.5s ease;
-        display: block;
+        display: flex;
         height: auto;
         opacity: 0.7;
         &:hover {
           opacity: 1;
           transition: all 0.5s ease;
         }
+      }
+    }
+  }
+}
+
+.container-documento-edit__old {
+  .container, .container-fluid {
+    border: 1px solid transparent;
+    border-radius: 5px;
+    &:hover {
+      transition: all 0.5s ease;
+      & > .widgets {
       }
     }
   }

@@ -1,17 +1,13 @@
 <template lang="html">
   <div :class="name_component">
-    <div class="btn-toolbar widgets widget-top">
-      <div class="btn-group btn-group-xs pull-right">
-        <button v-on:click.self="deleteParte" title="Remover este Vídeo" type="button" class="btn btn-danger">x</button>
-      </div>
-      <div v-show="elemento.texto" class="btn-group btn-group-xs pull-right">
+    <div class="clearfix"></div>
+    <div class="btn-toolbar widgets widget-top justify-content-between">
+      <div v-show="elemento.texto" class="btn-group btn-group-sm">
         <button  v-if="!elemento.titulo" v-on:click.self="toogleTitulo" title="Disponibilizar Subtítulo para este Vídeo" type="button" class="btn btn-success">T</button>
         <button  v-if="!elemento.descricao" v-on:click.self="toogleDescricao" title="Disponibilizar Descrição para o Vídeo" type="button" class="btn btn-success">D</button>
       </div>
-    </div>
-    <div class="btn-toolbar widgets widget-bottom">
-      <div class="btn-group btn-group-xs pull-right">
-        <button v-on:click.self="addBrother(tipo.component_tag, $event)" v-for="(tipo, key) in getChoices.tipo.subtipos" :key="key" type="button" class="btn btn-primary" title="Adiciona Elemento aqui...">{{tipo.text}}</button>
+      <div class="btn-group btn-group-sm">
+        <button v-on:click.self="deleteParte" title="Remover este Vídeo" type="button" class="btn btn-danger">x</button>
       </div>
     </div>
 
@@ -25,6 +21,11 @@
       </div>
     </div>
     <component :is="classChild(value)" v-for="value in childsOrdenados" :child="value" :parent="elemento" :key="value.id"/>
+    <div class="btn-toolbar widgets widget-bottom justify-content-end">
+      <div class="btn-group btn-group-sm">
+        <button v-on:click.self="addBrother(tipo.component_tag, $event)" v-for="(tipo, key) in getChoices.tipo.subtipos" :key="key" type="button" class="btn btn-primary" title="Adiciona Elemento aqui...">{{tipo.text}}</button>
+      </div>
+    </div>
   </div>
 </template>
 

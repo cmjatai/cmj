@@ -1,7 +1,7 @@
 <template>
   <div class="radio-group" :id="name+id">
     <template v-for="(choice, k) in options">
-        <label :class="['btn', choice.component_tag, k == value ? 'active': '']" v-bind:for="choice.component_tag" v-bind:key="k">
+        <label :class="[choice.component_tag, k == value ? 'active': '']" v-bind:for="choice.component_tag" v-bind:key="k">
           <input type="radio" v-bind:value="k" v-model="model" :id="choice.component_tag" :name="name+id">
             {{choice.text}}
         </label>
@@ -42,16 +42,22 @@ export default {
 }
 </script>
 
-<style>
-  .radio-group {
-    display: inline-block;
-    border-radius: 30px;
-    overflow: hidden;
+<style lang="scss">
+.radio-group {
+  display: inline-block;
+  border-radius: 30px;
+  overflow: hidden;
+  border: 1px solid transparent;
+  input[type="radio"] {
+    display: none;
   }
-  .radio-group input[type="radio"] {
-      display: none;
+  label {
+    margin: 0;
+    background: rgba(#ccc, 0.3);
+    padding: 0 15px;
+    &.active {
+      background: rgba(#ccc, 0.7);
+    }
   }
-  .radio-group .btn {
-    border-radius: 0px;
-  }
+}
 </style>

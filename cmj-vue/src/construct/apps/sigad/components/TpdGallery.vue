@@ -1,27 +1,27 @@
 <template lang="html">
   <div :class="name_component">
-    <div class="btn-toolbar widgets widget-top">
-      <div class="btn-group btn-group-xs pull-left">
+    <div class="btn-toolbar widgets widget-top justify-content-end">
+      <div class="btn-group btn-group-sm">
         <button v-if="!elemento.titulo" v-on:click.self="toogleTitulo" title="Disponibilizar Título para a Galeria" type="button" class="btn btn-success">T</button>
         <button v-if="!elemento.descricao" v-on:click.self="toogleDescricao" title="Disponibilizar Descrição para a Galeria" type="button" class="btn btn-success">D</button>
         <button v-if="!elemento.autor" v-on:click.self="toogleAutor" title="Disponibilizar Autor para a Galeria" type="button" class="btn btn-success">A</button>
       </div>
-      <div class="btn-group btn-group-xs pull-right">
+      <div class="btn-group btn-group-sm">
         <button v-on:click.self="deleteParte" title="Remover esta Galeria" type="button" class="btn btn-danger">x</button>
       </div>
     </div>
     <div class="inner">
       <modal-referencia-image-list v-if="showModal >= 0" @close="showModal = -1" :elementos="citaOrdenados" :child="showElemento" :pos="showModal" :parent="elemento" />
       <div :class="['row', 'row-gallery', 'row'+elemento.id ]">
-        <div :class="['col-xs-8', 'col-bi-container', 'row' + elemento.id ]">
+        <div :class="['col-8', 'col-bi-container', 'row' + elemento.id ]">
 
           <div class="row">
-            <div class="col-xs-12">
+            <div class="col-12">
               <input v-if="has_titulo || elemento.titulo"  v-model.lazy="elemento.titulo" placeholder="Título da Galeria..."/>
               <input v-if="has_descricao || elemento.descricao" v-model.lazy="elemento.descricao" placeholder="Descrição da Galeria..."/>
               <input v-if="has_autor || elemento.autor" v-model.lazy="elemento.autor" placeholder="Autor da Galeria..."/>
             </div>
-            <div class="col-xs-12">
+            <div class="col-12">
               <div class="row row-bi-select">
                 <select v-model="bi_selected">
                   <option disabled value="">Escolha um Banco de Imagem</option>
@@ -35,7 +35,7 @@
             </div>
           </div>
         </div>
-        <div class="col-xs-4 col-referencias">
+        <div class="col-4 col-referencias">
           <div :class="['row', 'row-referencias', 'row'+elemento.id ]" v-on:dragend="ondragendtransf">
             <tpd-referencia v-on:ondragend="ondragend" v-on:ondragleave="ondragleave" v-for="(value, key) in citaOrdenados" :child="value" :parent="elemento" :key="value.id" :pos="key" v-on:showmodal="showModalAction"/>
           </div>
@@ -105,7 +105,11 @@ export default {
       if (this.elemento.id !== 0) {
         let colbicontainer = document.querySelector('.col-bi-container.row' + this.elemento.id)
         let rowreferencia = document.querySelector('.row-referencias.row' + this.elemento.id)
-        rowreferencia.style.minHeight = colbicontainer.clientHeight + 'px'
+        try {
+          rowreferencia.style.minHeight = colbicontainer.clientHeight + 'px'
+        } catch (Exception) {
+          return ''
+        }
       }
     },
     toogleTitulo (event) {

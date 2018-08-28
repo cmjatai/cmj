@@ -1,20 +1,14 @@
 <template lang="html">
     <div :class="[name_component, 'path-imagem', alinhamento(elemento)]">
-      <div class="btn-toolbar widgets widget-top">
-        <div class="btn-group btn-group-xs pull-left">
+      <div class="btn-toolbar widgets widget-top justify-content-between">
+        <div class="btn-group btn-group-sm">
           <button v-if="!elemento.titulo" v-on:click.self="toogleTitulo" title="Disponibilizar Título para a Imagem" type="button" class="btn btn-success">T</button>
           <button v-if="!elemento.descricao" v-on:click.self="toogleDescricao" title="Disponibilizar Descrição para a Imagem" type="button" class="btn btn-success">D</button>
           <button v-if="!elemento.autor" v-on:click.self="toogleAutor" title="Disponibilizar Autor para a Imagem" type="button" class="btn btn-success">A</button>
         </div>
-        <div class="btn-group btn-group-xs pull-right">
+        <div class="btn-group btn-group-sm">
           <button v-on:click="alinhar(key, $event)" v-for="(alinhamento, key) in getChoices.alinhamento" type="button" class="btn btn-primary" :title="alinhamento.text" v-html="icons[key]" :key="key"></button>
           <button v-on:click.self="deleteParte" title="Remover esta Imagem" type="button" class="btn btn-danger">x</button>
-        </div>
-      </div>
-
-      <div class="btn-toolbar widgets widget-bottom">
-        <div class="btn-group btn-group-xs pull-right">
-          <button v-on:click.self="addBrother(tipo.component_tag, $event)" v-for="(tipo, key) in getChoices.tipo.subtipos" :key="key" type="button" class="btn btn-primary" title="Adiciona Elemento aqui...">{{tipo.text}}</button>
         </div>
       </div>
 
@@ -27,6 +21,11 @@
         <input v-if="has_autor || elemento.autor" v-model.lazy="elemento.autor" placeholder="Autor da Imagem..."/>
       </div>
       <component :is="classChild(value)" v-for="value in childsOrdenados" :child="value" :parent="elemento" :key="value.id"/>
+      <div class="btn-toolbar widgets widget-bottom justify-content-end">
+        <div class="btn-group btn-group-sm">
+          <button v-on:click.self="addBrother(tipo.component_tag, $event)" v-for="(tipo, key) in getChoices.tipo.subtipos" :key="key" type="button" class="btn btn-primary" title="Adiciona Elemento aqui...">{{tipo.text}}</button>
+        </div>
+      </div>
     </div>
 </template>
 
@@ -92,8 +91,6 @@ export default {
     }
     &.alinhamento-center{
       margin: 0 auto ;
-    }
-    &:hover {
     }
   }
 }

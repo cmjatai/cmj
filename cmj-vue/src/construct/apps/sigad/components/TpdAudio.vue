@@ -41,7 +41,7 @@ export default {
 </script>
 
 <style lang="scss">
-.container-documento-edit {
+.container-documento-edit__old {
   .tpd-audio {
   }
 }
