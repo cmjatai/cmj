@@ -24,14 +24,6 @@
     {% block head_content %}
       <link rel="icon" href="{% webpack_static 'img/logo_128.png' %}"  type="image/png" >
       {% render_bundle  'globals' 'css' %}
-      
-      {% comment %}
-      <link rel="stylesheet" href="{% static 'jquery-ui/themes/cupertino/jquery-ui.min.css' %}">
-                                <link rel="stylesheet" href="{% sass_src 'styles/header.scss' %}" type="text/css">
-                                <link rel="stylesheet" href="{% static 'drunken-parrot-flat-ui/css/drunken-parrot.css' %}">
-                                <link rel="stylesheet" href="{% static 'components-font-awesome/css/font-awesome.css' %}">
-                                <link rel="stylesheet" href="{% sass_src 'styles/app_cmj.scss' %}{% if DEBUG %}?time={% now "jS F Y H:i:s" %}{% endif %}" type="text/css">
-                              {% endcomment %}
     {% endblock %}
   </head>
 
@@ -331,17 +323,9 @@
       {% render_bundle  'vendor' %}
     {% endif %}
     {% render_bundle  'globals' 'js' %}
-    {% comment %}
-      {% render_bundle  'hellow' 'js' %}
-      <script type="text/javascript" src="{% static 'bootstrap-sass/assets/javascripts/bootstrap.min.js' %}"></script>
-      <script type="text/javascript" src="{% static 'js/jquery.runner.js' %}"></script>
-      <script type="text/javascript" src="{% static 'jquery-mask-plugin/dist/jquery.mask.js' %}"></script>
-      <script type="text/javascript" src="{% static 'drunken-parrot-flat-ui/js/checkbox.js' %}"></script>
-      <script type="text/javascript" src="{% static 'drunken-parrot-flat-ui/js/radio.js' %}"></script>
-      <script src="{% static 'tinymce/tinymce.min.js' %}"></script>
-      <script type="text/javascript" src="{% static 'jsdiff/diff.min.js' %}"></script>
-      {% endcomment %}
+    
     {% block extra_js %}{% endblock %}
+    
   {% endblock foot_js %}
   <script>
     $(document).ready(function () {

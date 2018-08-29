@@ -98,7 +98,6 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
 )
 
-
 REST_FRAMEWORK = {
 
     'DEFAULT_PARSER_CLASSES': (
@@ -124,11 +123,9 @@ REST_FRAMEWORK = {
     ),
 }
 
-
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
 ROOT_URLCONF = 'cmj.urls'
-
 
 TEMPLATES = [
     {
@@ -250,8 +247,6 @@ LOCALE_PATHS = (
     BASE_DIR.child('locale'),
 )
 
-
-
 MEDIA_URL = '/media/'
 MEDIA_ROOT = PROJECT_DIR.child("media")
 MEDIA_PROTECTED_ROOT = PROJECT_DIR.child("media_protected")
@@ -261,11 +256,6 @@ DAB_FIELD_RENDERER = \
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap4'
 CRISPY_FAIL_SILENTLY = not DEBUG
-
-"""BOWER_COMPONENTS_ROOT = PROJECT_DIR.child("bower")
-BOWER_INSTALLED_APPS = (
-    'jsdiff#2.2.2',
-)"""
 
 STATIC_URL = '/static/'
 STATIC_ROOT = PROJECT_DIR.child("collected_static")
@@ -282,12 +272,11 @@ STATICFILES_DIRS = (
     BASE_DIR.child("static"),
     PROJECT_DIR.child(
         "cmj-vue").child('bundle').child('dev' if DEBUG else 'dist'),
-    # sapl_settings.STATICFILES_DIRS[0]
 )
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
-    #'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
 
 
