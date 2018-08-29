@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
-
+{% block main_container_class %}container container-box container-agenda {% endblock %}
 {% block title %}
   <h1 class="page-header">
     {{ view.title }} - {{object_list.1.0.data|date:"F \d\e Y"}}
