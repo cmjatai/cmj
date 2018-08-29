@@ -10,14 +10,17 @@
         {% block controls_content %}{% endblock %}
       </div>
     </div>
-    <div class="clearfix"></div><br>
   </div>
 {% endblock %}
 
 {% block base_header %}
     <div style="position:relative;">
       <div class="path-title-classe">
-        {{object.classe}}
+        {% if object.classe %}
+          <a href="/{{object.classe.slug}}">{{object.classe}}</a>
+        {% else %}
+        <a href="#">{{object}}</a>
+        {% endif %}
       </div>
       <div class="path-data-pub">
         {% block historico_publicacao %}

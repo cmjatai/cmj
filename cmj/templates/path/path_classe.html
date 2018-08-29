@@ -1,8 +1,10 @@
 {% extends "base_path.html" %}
 {% load i18n sigad_filters common_cmj_tags%}
 {% block historico_publicacao %}{% endblock %}
-{% block main_container_class %}container-path{% endblock %}
+{% block main_container_class %}container container-path container-list{% endblock %}
+{% block title %}
 
+{% endblock title %}
 {% block controls_content %}
   {% if perms.sigad.change_classe %}
     <a class="btn btn-default" href="{% url 'cmj.sigad:subclasse_list' object.id %}">{% trans "Admin" %}</a>
@@ -14,7 +16,7 @@
 
 {% block base_content %}
   <div class="row  justify-content-lg-center">
-    {% with 'path-item-list col-lg-7 col-sm-12' as css_class %}
+    {% with 'path-item-list col-lg-8' as css_class %}
       {% include "path/path_list_docs.html" %}
     {% endwith %}
   </div>
