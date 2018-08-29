@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n staticfiles %}
+{% load i18n %}
 
 {% block base_content %}
 
@@ -10,5 +10,4 @@
 {% endblock %}
 
 {% block extra_js %}{{block.super}}
-<script src="{% static 'js/bundle.js' %}"></script>
 {% endblock %}
