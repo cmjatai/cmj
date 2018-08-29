@@ -88,11 +88,21 @@
       color: darken(#a97905, 15%);
     }
   }
+  &.container-list {
+    .path-data-pub {
+      border-top-width: 3px;
+    }
+  }
 
   .path-title-classe {
-    font-size: 120%;
+    font-size: 170%;
     line-height: 1;
     padding-left: 10px;
+    font-weight: 800;
+    margin-top: $grid-gutter-width;
+    a {
+      text-decoration: none;
+    }
   }
   .path-title {
     text-align: center;
@@ -159,14 +169,13 @@
   }
 
   .path-imagem {
-    padding: 0 0 0.4em 0;
     width: 49.9%;
     position: relative;
+    margin-bottom: $grid-gutter-width / 4;
     img {
       width: 100%;
     }
     &.alinhamento-center {
-      padding: 0.5em 1em 0.4em;
       margin: 0 auto;
       width: 60%;
       &.img128 {
@@ -174,22 +183,20 @@
       }
     }
     &.alinhamento-left {
-      padding: 0.5em 1em 0.4em 0;
+      margin-right: $grid-gutter-width;
       float: left;
       &.img128 {
         width: 128px;
       }
     }
     &.alinhamento-right {
-      padding: 0.5em 0 0.4em 1em;
+      margin-left: $grid-gutter-width;
       float: right;
       &.img128 {
         width: 128px;
       }
     }
     &.alinhamento-justify {
-      margin: 0;
-      padding: 0;
       display: block;
       width: auto;
     }
@@ -306,15 +313,6 @@
       background-size: cover;
       background-repeat: no-repeat;
       background-position: 50% center;
-    }
-    &.alinhamento-left {
-      margin: 0 $grid-gutter-width $grid-gutter-width * 0.4  0;
-      padding: 0;
-    }
-    &.alinhamento-right {
-      margin: 0 0 $grid-gutter-width * 0.4 $grid-gutter-width * 0.5;
-      padding: 0;
-      float: right;
     }
     .img-contexto {
       position: absolute;
@@ -488,8 +486,6 @@
 }
 
 .container-path {
-
-
   .path-direction {
     position: fixed;
     bottom: 50%;
@@ -556,8 +552,8 @@
       margin: 0px 5px 5px 5px;
       .avatar {
         display: inline-block;
-        margin: 0 0 0 5px;;
-        float:right;
+        margin: 0 0 0 5px;
+        float: right;
         width: 60px;
       }
     }
@@ -583,7 +579,7 @@
   }
 
   .path-previous {
-    left: -32px;
+    left: -1.2em;
     text-align: left;
     transition: left 0.5s ease;
     a {
@@ -602,16 +598,19 @@
 
 @media screen and (max-width:767px) {
   .container-path {
+
+    font-size: 1.3em;
+
     .path-imagem {
       .imagem {
         width: 100%;
         height: 150px;
       }
       &.alinhamento-left {
-        margin: 0 $grid-gutter-width / 2 $grid-gutter-width * 0.2  0;
+        margin-right: $grid-gutter-width / 2;
       }
       &.alinhamento-right {
-        margin: 0 0 $grid-gutter-width * 0.2 $grid-gutter-width * 0.5;
+        margin-left: $grid-gutter-width / 2;
       }
     }
   }

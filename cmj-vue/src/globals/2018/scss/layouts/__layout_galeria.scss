@@ -234,22 +234,26 @@
     padding: 0 10px 20px 10px;
 
     &:nth-child(1) {
-      width: 66.666%;
       .album-item-list {
         .show-image {
           height: 520px;
         }
       }
     }
-    &:nth-child(4) {
+    &:nth-child(2) {
       .album-item-list {
         .show-image {
           height: 520px;
         }
       }
     }
-    &:nth-child(5) {
-      width: 66.666%;
+    &:nth-child(10n - 9) {
+      flex: 0 0 66.666%;
+      max-width: 66.666%;
+      .album-item-list {
+        .show-image {
+        }
+      }
     }
   }
   .album-item-list {
