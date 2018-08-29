@@ -20,9 +20,11 @@
     {% if forloop.first and galeria.tipo != galeria.TD_BI %}
       <div class="albuns-show-gallery invisible"></div>
       <form class="invisible" method="post">{% csrf_token %}</form>
+    {% endif %}
+    {% if forloop.first %}
       <div class="row">
     {% endif %}
-    <div class="col-4">
+    <div class="col-6 col-lg-4">
       <div class="album-item-list">
         <div class="album-inner">
           <div class="album-show">
