@@ -6,10 +6,10 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.forms.models import ModelForm
 from django.utils.translation import ugettext_lazy as _
-from sapl.crispy_layout_mixin import SaplFormLayout, to_row, form_actions
 
 from cmj.context_processors import areatrabalho
 from cmj.core.models import AreaTrabalho, Notificacao
+from cmj.crispy_layout_mixin import SaplFormLayout, to_row, form_actions
 from cmj.ouvidoria.models import Solicitacao, MensagemSolicitacao
 
 

@@ -14,7 +14,7 @@ from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, FormView
 from django.views.generic.list import ListView
-from sapl.crispy_layout_mixin import CrispyLayoutFormMixin
+from cmj.crispy_layout_mixin import CrispyLayoutFormMixin
 
 from cmj.core.forms_auth import LoginForm
 from cmj.ouvidoria.forms import DenunciaForm, SolicitacaoForm,\

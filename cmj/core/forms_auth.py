@@ -12,7 +12,7 @@ from django.core.exceptions import ValidationError
 from django.forms.models import ModelForm
 from django.utils.translation import ugettext_lazy as _
 from image_cropping.widgets import ImageCropWidget, CropWidget
-from sapl.crispy_layout_mixin import to_row, form_actions, SaplFormLayout
+from cmj.crispy_layout_mixin import to_row, form_actions, SaplFormLayout
 
 
 # admin forms
