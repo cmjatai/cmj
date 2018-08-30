@@ -159,7 +159,7 @@
 
                 <ul class="navbar-nav justify-content-end">
                   
-                  {% if perms.core.menu_relatorios and user.is_superuser%}
+                  {% if perms.core.menu_relatorios%}
                     <li class="dropdown">
                       <a href="#"data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Relatórios" %}<span class="caret"></span></a>
                       <ul class="dropdown-menu">
