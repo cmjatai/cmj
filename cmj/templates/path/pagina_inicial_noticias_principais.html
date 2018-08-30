@@ -19,7 +19,7 @@
         <div class="carousel-item {% if forloop.first %}active{% endif %}">
           <div class="autor">{{d.1.autor|default:''}}</div>
           {% social_link_share d.0 'absolute-center' %}
-          <a class="d-block w-100 imagem" href="/{{d.0.slug}}"  style="background-image: url(/{{d.1.absolute_slug}}.1024);">
+          <a class="d-block w-100 imagem" href="/{{d.0.slug}}"  style="background-image: url(/{{d.1.absolute_slug}}.768);">
             {% comment %}
             <img src="/{{d.1.absolute_slug}}" alt="{% if d.1.titulo %}{{d.0.titulo}}{% else %}{{d.0.titulo}}{% endif %}">
             {% endcomment %}
