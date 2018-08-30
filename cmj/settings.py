@@ -96,6 +96,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    #'django.middleware.gzip.GZipMiddleware'
 )
 
 REST_FRAMEWORK = {
@@ -134,10 +135,9 @@ TEMPLATES = [
         'OPTIONS': {
             'context_processors': [
                 'django.contrib.auth.context_processors.auth',
+
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
-
-
                 "django.template.context_processors.media",
                 "django.template.context_processors.static",
 
@@ -145,6 +145,7 @@ TEMPLATES = [
 
                 'social_django.context_processors.backends',
                 'social_django.context_processors.login_redirect',
+
                 'cmj.context_processors.areatrabalho',
                 'cmj.context_processors.debug',
             ],
@@ -351,7 +352,6 @@ if DEBUG and LOGGING_CONSOLE:
         'handlers': ['console'],
         'level': 'DEBUG',
     }
-
 
 SITE_URL = 'https://www.jatai.go.leg.br'
 if DEBUG:
