@@ -6,7 +6,7 @@ from django.forms import widgets
 from django.forms.models import ModelForm, ModelMultipleChoiceField
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from sapl.crispy_layout_mixin import to_row, SaplFormLayout
+from cmj.crispy_layout_mixin import to_row, SaplFormLayout
 from sapl.parlamentares.models import Parlamentar
 
 from cmj.sigad import models

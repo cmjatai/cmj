@@ -4,7 +4,6 @@ from django.db.models.aggregates import Max
 from django.http.response import HttpResponse
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.edit import FormView
-from sapl.crispy_layout_mixin import CrispyLayoutFormMixin
 
 from cmj.cerimonial.forms import LocalTrabalhoForm, EnderecoForm,\
     TipoAutoridadeForm, LocalTrabalhoPerfilForm,\
@@ -21,6 +20,7 @@ from cmj.cerimonial.models import TipoTelefone, TipoEndereco,\
     AssuntoProcesso, ProcessoContato, GrupoDeContatos
 from cmj.core.forms import ListWithSearchForm
 from cmj.core.models import AreaTrabalho
+from cmj.crispy_layout_mixin import CrispyLayoutFormMixin
 from cmj.crud.base import CrudAux, Crud, MasterDetailCrud
 from cmj.globalrules.crud_custom import PerfilAbstractCrud,\
     PerfilDetailCrudPermission

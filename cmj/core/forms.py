@@ -7,14 +7,13 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.forms import UserCreationForm as BaseUserCreationForm, UserChangeForm as BaseUserChangeForm
 from django.forms.models import ModelForm
 from django.utils.translation import ugettext_lazy as _
-from django_filters.filterset import FilterSet
-
-from image_cropping.widgets import ImageCropWidget, CropWidget
-from sapl.crispy_layout_mixin import to_row
 import django_filters
+from django_filters.filterset import FilterSet
+from image_cropping.widgets import ImageCropWidget, CropWidget
 
 from cmj.core.models import Trecho, TipoLogradouro, User, OperadorAreaTrabalho,\
     ImpressoEnderecamento
+from cmj.crispy_layout_mixin import to_row
 from cmj.globalrules import WORKSPACE_GROUPS
 
 
