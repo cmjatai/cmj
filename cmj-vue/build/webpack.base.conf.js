@@ -5,6 +5,7 @@ const config = require('../config')
 const webpack = require('webpack')
 const vueLoaderConfig = require('./vue-loader.conf')
 var BundleTracker = require('webpack-bundle-tracker')
+const PreloadWebpackPlugin = require('preload-webpack-plugin');
 
 function resolve (dir) {
   return path.join(__dirname, '..', dir)
@@ -89,7 +90,8 @@ module.exports = {
       $: 'jquery',
       jQuery: 'jquery',
       'window.jQuery': 'jquery'
-    })
+    }),
+    new PreloadWebpackPlugin()
   ],
   node: {
     // prevent webpack from injecting useless setImmediate polyfill because Vue
