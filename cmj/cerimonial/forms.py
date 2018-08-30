@@ -589,10 +589,10 @@ class RangeWidgetNumber(forms.MultiWidget):
 
     def __init__(self, attrs=None):
         widgets = (forms.NumberInput(
-            attrs={'class': 'numberinput',
+            attrs={'class': 'numberinput form-control',
                    'placeholder': 'Inicial'}),
                    forms.NumberInput(
-            attrs={'class': 'numberinput',
+            attrs={'class': 'numberinput form-control',
                    'placeholder': 'Final'}))
         super(RangeWidgetNumber, self).__init__(widgets, attrs)
 
@@ -619,10 +619,10 @@ class RangeWidgetOverride(forms.MultiWidget):
 
     def __init__(self, attrs=None):
         widgets = (forms.DateInput(format='%d/%m/%Y',
-                                   attrs={'class': 'dateinput',
+                                   attrs={'class': 'dateinput form-control',
                                           'placeholder': 'Inicial'}),
                    forms.DateInput(format='%d/%m/%Y',
-                                   attrs={'class': 'dateinput',
+                                   attrs={'class': 'dateinput form-control',
                                           'placeholder': 'Final'}))
         super(RangeWidgetOverride, self).__init__(widgets, attrs)
 
