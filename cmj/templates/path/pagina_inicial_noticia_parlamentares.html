@@ -1,4 +1,4 @@
-{% load i18n sigad_filters social_utils %}
+{% load i18n sigad_filters social_utils cropping%}
 <div class="container-box-parlamentares">
   {% for documento in object_list %}
     <div class="path-item-list  {{ documento.visibilidade_css_class}}">
@@ -25,7 +25,7 @@
             <div class="col-3">
               {% if  documento.parlamentares.first.fotografia %}
                 <a class="avatar" href="/{{ parlamentar.classe_set.first.absolute_slug }}">
-                  <img src="{{ parlamentar.fotografia.url }}">
+                  <img src="{% cropped_thumbnail parlamentar "cropping" %}"> 
                 </a>
               {% endif %}
             </div>
