@@ -3,7 +3,7 @@
     <div v-if="notHasParent" class="container">
       <div v-show="elemento.id" class="btn-toolbar widgets-function justify-content-between">
         <b-button-group>
-          <b-button v-on:click.self="clickVersaFinal" variant="primary">Versão Final</b-button>
+          <b-button v-on:click.self="clickVersaoFinal" variant="primary">Versão Final</b-button>
           <b-button v-on:click.self="clickEditMetadados" variant="success">Editar Metadados</b-button>
         </b-button-group>
         <div class="btn-group widget-visibilidade">
