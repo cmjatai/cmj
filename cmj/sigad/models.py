@@ -933,7 +933,14 @@ class Documento(ShortUrl, CMSMixin):
 
         img = self.nodes.view_childs().filter(tipo=Documento.TPD_IMAGE).first()
 
-        return img
+        if img:
+            return img
+
+        galeria = self.nodes.view_childs().filter(tipo=Documento.TPD_GALLERY).first()
+        if galeria:
+            return galeria.cita.first()
+
+        return None
 
     def imagem_representativa_metatags(self):
         img = self.imagem_representativa()
