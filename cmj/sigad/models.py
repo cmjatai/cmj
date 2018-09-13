@@ -938,7 +938,8 @@ class Documento(ShortUrl, CMSMixin):
 
         galeria = self.nodes.view_childs().filter(tipo=Documento.TPD_GALLERY).first()
         if galeria:
-            return galeria.cita.first()
+            img = galeria.cita.first()
+            return img
 
         return None
 

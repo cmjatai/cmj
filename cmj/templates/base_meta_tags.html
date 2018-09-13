@@ -38,7 +38,14 @@
   <meta name="twitter:title" content="{% if object.titulo %}{{object.titulo}}{% elif object.parents_and_me.0.titulo %}{{object.parents_and_me.0.titulo}}{% elif object.referente %}{{object.referente.parents_and_me.0.titulo}}{% else %}Câmara Municipal de Jataí{% endif %}">
 
   {% with object.imagem_representativa_metatags as doc_imagem %}
-    {% if doc_imagem and doc_imagem.absolute_slug%}
+    {% if doc_imagem and doc_imagem.referenciado %}
+      <meta property="og:image" content="https://{{request.get_host}}/{{object.absolute_slug}}.768">
+      <meta property="og:image:type" content="{{doc_imagem.referenciado.midia.last.content_type}}">
+      <meta name="twitter:image" content="https://{{request.get_host}}/{{object.absolute_slug}}.768">
+
+      <meta property="og:image:width" content="{{doc_imagem.referenciado.midia.last.width}}">
+      <meta property="og:image:height" content="{{doc_imagem.referenciado.midia.last.height}}">
+    {% elif doc_imagem and doc_imagem.absolute_slug%}
       <meta property="og:image" content="https://{{request.get_host}}/{{doc_imagem.absolute_slug}}.768.jpg">
       <meta property="og:image:type" content="{{doc_imagem.midia.last.content_type}}">
       <meta name="twitter:image" content="https://{{request.get_host}}/{{doc_imagem.absolute_slug}}.768.jpg">
