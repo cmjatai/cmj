@@ -1,5 +1,5 @@
 {% extends "base_path.html" %}
-{% load i18n sigad_filters %}
+{% load i18n sigad_filters social_utils %}
 {% block main_container_class %}container container-path container-albuns {% endblock %}
 {% block historico_publicacao %}{% endblock %}
 {% block title %}
@@ -29,6 +29,7 @@
         <div class="album-inner">
           <div class="album-show">
             <div class="show-image">
+              {% social_link_share galeria.raiz 'absolute-right' %}
               {% if galeria.cita.first %}
                 <div class="image" style="background-image: url('/{{galeria.cita.first.slug}}.512')">
                 </div>
@@ -38,7 +39,7 @@
               {% endif %}
             </div>
             <div class="show-contexto">
-              <a href="/{{galeria.absolute_slug}}" >
+              <a href="/{{galeria.absolute_slug}}">
                 <div class="show-texto">
                   <div class="show-titulo">
                     {% if galeria.raiz %}
@@ -79,9 +80,7 @@
                       <i class="fa fa-download fa-2" aria-hidden="true"></i>
                     </a>
                   {% endif %}
-
                 </div>
-
             </div>
           </div>
         </div>
@@ -103,7 +102,6 @@
           'csrfmiddlewaretoken': csrfmiddlewaretoken[0].value
         }
         $('.container-albuns .show-contexto > a').click(function () {
-
           $.post(this.href, form_data)
             .done(function (data) {
             $('.albuns-show-gallery').removeClass('invisible').html(data);

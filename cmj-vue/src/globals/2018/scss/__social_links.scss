@@ -39,6 +39,11 @@
     left: 50%;
     transform: translate(-50%, 0);
   }
+  &.absolute-right {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+  }
   &.top-right {
     position: relative;
     right: 0;

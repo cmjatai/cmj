@@ -287,9 +287,9 @@ h6 {
 }
 
 @import 'apps/app';
+@import '_social_links';
 @import 'layouts/layout';
 
-@import '_social_links';
 @import '_google_search';
 
 @media print {

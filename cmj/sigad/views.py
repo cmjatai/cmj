@@ -1,5 +1,5 @@
-from operator import attrgetter
 import io
+from operator import attrgetter
 import zipfile
 
 from braces.views import FormMessagesMixin
@@ -40,9 +40,7 @@ class PaginaInicialView(TemplateView):
 
         context['noticias_dos_parlamentares'] = np
 
-        
         return context
-
 
     def get_noticias_dos_parlamentares(self):
         legislatura_atual = Legislatura.objects.first()
@@ -57,7 +55,6 @@ class PaginaInicialView(TemplateView):
             parlamentares__ativo=True
         ).values_list('id', flat=True)
 
-        
         docs = Documento.objects.filter(
             id__in=docs
         ).distinct(
@@ -605,7 +602,7 @@ class PathParlamentarView(PathView):
             legs = Legislatura.objects
             pms = Parlamentar.objects
 
-            #if parlamentar_ativo:
+            # if parlamentar_ativo:
             #    context['parlamentar_ativo'] = pms.get(pk=parlamentar_ativo)
 
             legislaturas = []

@@ -348,13 +348,17 @@
       &:hover {
         color: #fff;
       }
-
+    }
+  }
+  .show-image {
+    .navbar-social-links a i {
+      color:white;
+      text-shadow: 0 0 15px rgba(#000, 0.5);
     }
   }
 }
 
 @media screen and (max-width: 1199px) {
-
   .container-gallery {
     .show-image {
       width: 59%;
