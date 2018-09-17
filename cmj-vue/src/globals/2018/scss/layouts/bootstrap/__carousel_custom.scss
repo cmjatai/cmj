@@ -7,19 +7,7 @@
 
 .carousel-custom {
   position: relative;
-  .btn-actions {
-    position: absolute;
-    z-index: 1;
-    padding: 3px 6px 3px 8px;
-    background: rgba(black, 0.6);
-    line-height: 1.1;
-    a {
-      color: rgba(255, 255, 255, 0.6);
-      &:hover {
-        color: white;
-      }
-    }
-  }
+  
   .imagem {
     background-size: cover;
     background-repeat: no-repeat;

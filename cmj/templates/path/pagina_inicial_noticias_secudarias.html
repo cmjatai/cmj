@@ -2,7 +2,6 @@
 <div class="container-noticias-secundarias">
 
 {% with 'noticias_secundarias'|caixa_publicacao:None as noticias_secundarias %}
-
   {% for d in  noticias_secundarias.docs%}
     <div class="path-item-list">
       <div class="inner">
@@ -30,7 +29,7 @@
     </div>
   {% endfor %}
   {% if perms.sigad.change_documento %}
-    <div class="btn-actions">
+    <div class="btn-edit-destaques">
       <a href="{% url 'cmj.sigad:caixapublicacao_update' noticias_secundarias.cp.pk %}" title="{% trans "Editar Caixa de Publicação" %}">
         <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
       </a>
