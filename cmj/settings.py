@@ -1,13 +1,12 @@
-import logging
+
 import sys
 
 from decouple import AutoConfig
 from dj_database_url import parse as db_url
+from django.utils.log import DEFAULT_LOGGING
 from django.utils.translation import ugettext_lazy as _
 from easy_thumbnails.conf import Settings as thumbnail_settings
 from sapl import settings as sapl_settings
-from sapl.temp_suppress_crispy_form_warnings import \
-    SUPRESS_CRISPY_FORM_WARNINGS_LOGGING
 from unipath import Path
 
 
@@ -329,7 +328,7 @@ HAYSTACK_CONNECTIONS = {
 # FIXME update cripy-forms and remove this
 # hack to suppress many annoying warnings from crispy_forms
 # see sapl.temp_suppress_crispy_form_warnings
-LOGGING = SUPRESS_CRISPY_FORM_WARNINGS_LOGGING
+LOGGING = DEFAULT_LOGGING
 
 LOGGING_CONSOLE = config('LOGGING_CONSOLE', default=False, cast=bool)
 if DEBUG and LOGGING_CONSOLE:
