@@ -77,7 +77,7 @@ class PathView(MultipleObjectMixin, TemplateView):
     documento = None
     classe = None
     referencia = None
-    paginate_by = 31
+    paginate_by = 30
 
     def post(self, request, *args, **kwargs):
         return self.get(request, *args, **kwargs)

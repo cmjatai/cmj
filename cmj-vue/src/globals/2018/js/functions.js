@@ -46,6 +46,7 @@ window.ContainerFirst = function () {
     })
     if (btn.length === 0) {
       first.css('height', '')
+      first.removeClass('container-first')
     }
   } else {
     first.removeClass('.container-first')
@@ -53,6 +54,7 @@ window.ContainerFirst = function () {
     first.find('.painel-corte').remove()
   }
 }
+
 window.styleWithEndNameClass = function (endNameClass, attr, value = undefined) {
   for (var s = 0; s < document.styleSheets.length; s++) {
     var rules = document.styleSheets[s].rules || document.styleSheets[s].cssRules
