@@ -4,7 +4,7 @@
     {% for item in menu %}
       {% if item.children %}
         <li class="dropdown">
-          <a href="{% if item.url %}{{item.url}}{%else%}#fakeLink{%endif%}" role="button" aria-haspopup="true" aria-expanded="false" {% if not item.url %}data-toggle="dropdown"{%endif%}>
+          <a href="{% if item.url %}{{item.url}}{%else%}#fakeLink{%endif%}"  title="item.title|striptags" role="button" aria-haspopup="true" aria-expanded="false" {% if not item.url %}data-toggle="dropdown"{%endif%}>
             {{ item.title|safe }}
           <span class="caret"></span>
           </a>
@@ -16,7 +16,7 @@
         </li>
       {% else %}
         {% if item.url %}
-          <li><a href="{{ item.url }}">{% trans item.title|safe %}</a></li>
+          <li><a href="{{ item.url }}" title="item.title|striptags">{% trans item.title|safe %}</a></li>
         {% endif %}
       {% endif %}
     {% endfor %}
