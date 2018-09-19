@@ -6,21 +6,21 @@
   {% for item in menu %}
     {% if item.children %}
       <li class="dropdown {{item.active}}">
-        <a data-toggle="dropdown" href="#fakeLink" title="item.title|striptags">
+        <a data-toggle="dropdown" href="#fakeLink" title="{{item.title|striptags}}">
           {% trans item.title %}
           <span class="caret"></span>
         </a>
         <ul class="dropdown-menu" role="menu">
           {% for subitem in item.children %}
               {% if subitem.url %}
-                <li class="{{subitem.active}}"><a href="{{ subitem.url }}">{% trans subitem.title %}</a></li>
+                <li class="{{subitem.active}}"><a href="{{ subitem.url }}" title="{{subitem.title|striptags}}">{% trans subitem.title %}</a></li>
               {% endif %}
           {% endfor %}
         </ul>
       </li>
     {% else %}
       {% if item.url %}
-        <li class="{{item.active}}"><a href="{{ item.url }}"  title="item.title|striptags">{% trans item.title %}</a></li>
+        <li class="{{item.active}}"><a href="{{ item.url }}"  title="{{item.title|striptags}}">{% trans item.title %}</a></li>
       {% endif %}
     {% endif %}
   {% endfor %}
