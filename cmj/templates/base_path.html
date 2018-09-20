@@ -50,7 +50,7 @@
 
     </div>
   {% block title %}
-    <h1 class="path-title" tabindex="{{view.tabindex}}">
+    <h1  id="main_content" class="path-title" tabindex="{{view.tabindex}}">
         {% if object.titulo %}
           {{ object.titulo|safe|linebreaksbr }}
         {% else %}
