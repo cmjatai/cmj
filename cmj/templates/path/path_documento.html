@@ -28,7 +28,7 @@
   {% if next %}
     <div class="path-direction path-next">
       <a href="{% if view.parlamentar %}/{{view.parlamentar.absolute_slug}}{% endif %}{% url 'cmj.sigad:path_view' next.absolute_slug %}">
-        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+        <i class="fa fa-chevron-right" aria-hidden="true"><span>Próximo</span></i>
       </a>
       <div class="inner">
         <div class="titulo">
@@ -79,7 +79,7 @@
     <div class="path-direction path-previous">
 
       <a href="{% if view.parlamentar %}/{{view.parlamentar.absolute_slug}}{% endif %}{% url 'cmj.sigad:path_view' previous.absolute_slug %}">
-        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        <i class="fa fa-chevron-left" aria-hidden="true"><span>Anterior</span></i>
       </a>
       <div class="inner">
         <div class="titulo">
