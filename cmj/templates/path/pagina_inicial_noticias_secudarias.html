@@ -7,8 +7,10 @@
       <div class="inner">
         <div class="path-imagem alinhamento-justify">
           <div class="imagem" style="background-image: url(/{{d.1.absolute_slug}}.256)"></div>
-          <a class="img-contexto" href="{% url 'cmj.sigad:path_view' d.0.absolute_slug %}">
-          </a>
+          {% comment %}
+            <a class="img-contexto" href="{% url 'cmj.sigad:path_view' d.0.absolute_slug %}">
+            </a>
+          {% endcomment %}
           <div class="autor">{{d.1.autor|default:''}}</div>
         </div>
         <div class="texto">

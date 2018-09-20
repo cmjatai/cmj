@@ -26,13 +26,11 @@
 
   <body class="{% block body_class %}{%endblock%}">
     <div class="header-accessibility">
-      <div class="container">
         <div class="links-to-content">
           <a class="btn btn-link" href="#main_content" accesskey="1">Ir para Conteúdo<span class="badge badge-dark">1</span></a>
           <a class="btn btn-link" href="#menu_content" accesskey="2">Ir para Menu<span class="badge badge-dark">2</span></a>
           <a class="btn btn-link" href="#rodape_access" accesskey="3">Ir para Rodapé<span class="badge badge-dark">3</span></a>
         </div>
-      </div>
     </div>
     <div class="page fadein" id="{% block id_wrapper %}wrapper{% endblock %}">
       {% block canais_absolute %}
@@ -73,9 +71,9 @@
 
             {% block social_links %}
               <div class="navbar-social-links justify-content-center">
-                <a href="https://www.facebook.com/cmjatai"><i class="fa fa-facebook" aria-hidden="true"></i></a>
-                <a href="https://www.youtube.com/C%C3%A2maraMunicipalJata%C3%AD?sub_confirmation=1"><i class="fa fa-youtube-play" aria-hidden="true"></i></a>
-                <a href="https://twitter.com/cmjatai"><i class="fa fa-twitter" aria-hidden="true"></i></a>
+                <a href="https://www.facebook.com/cmjatai"><i class="fa fa-facebook" aria-hidden="true"><span>Facebook</span></i></a>
+                <a href="https://www.youtube.com/C%C3%A2maraMunicipalJata%C3%AD?sub_confirmation=1"><i class="fa fa-youtube-play" aria-hidden="true"><span>YouTube</span></i></a>
+                <a href="https://twitter.com/cmjatai"><i class="fa fa-twitter" aria-hidden="true"><span>Twitter</span></i></a>
               </div>
             {% endblock %}
               <ul class="navbar-nav justify-content-end">

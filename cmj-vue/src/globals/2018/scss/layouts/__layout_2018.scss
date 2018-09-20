@@ -97,10 +97,14 @@
 .header-accessibility {
   background: $color_topo_bg $url_bg_png;
   .links-to-content {
+    position: absolute;
     line-height: 1;
+    z-index: 1;
+    top:41px;
+    left: 60px;
     .btn {
-      color: #9c9;
-      font-size: 80%;
+      color: rgb(153, 165, 153);
+      font-size: 75%;
       padding: 0;
       line-height: 1;
       .badge {
