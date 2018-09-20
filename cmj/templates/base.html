@@ -25,13 +25,16 @@
   </head>
 
   <body class="{% block body_class %}{%endblock%}">
-    <div class="container">
-      <ul class="accessibilidade">
-        <li><a href="#main_content" accesskey="1">Ir para Conteúdo</a></li>
-      </ul>
+    <div class="header-accessibility">
+      <div class="container">
+        <div class="links-to-content">
+          <a class="btn btn-link" href="#main_content" accesskey="1">Ir para Conteúdo<span class="badge badge-dark">1</span></a>
+          <a class="btn btn-link" href="#menu_content" accesskey="2">Ir para Menu<span class="badge badge-dark">2</span></a>
+          <a class="btn btn-link" href="#rodape_access" accesskey="3">Ir para Rodapé<span class="badge badge-dark">3</span></a>
+        </div>
+      </div>
     </div>
     <div class="page fadein" id="{% block id_wrapper %}wrapper{% endblock %}">
-
       {% block canais_absolute %}
         <aside>
           <div class="canais-absolute">
@@ -130,7 +133,7 @@
           <nav class="navbar navbar-menu navbar-expand-lg navbar-dark">
             <div class="container{{fluid}}">
               <div class="navbar-collapse collapse" id="navbar-menu">
-                <ul class="navbar-nav">
+                <ul class="navbar-nav" id="menu_content">
                   {% if areatrabalho %}
                     <li class="dropdown">
                       <a href="#fakeLink" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
@@ -299,7 +302,7 @@
   {% block login_container %}
   {% endblock%}
 
-  <footer>
+  <footer id="rodape_access">
     <div class="container-fluid">
       <div class="container">
         <ul>

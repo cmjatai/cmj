@@ -1,5 +1,5 @@
 {% load i18n sigad_filters social_utils cropping%}
-<div class="container-box-parlamentares">
+<div class="container-box-parlamentares" id="parl_content">
   {% for documento in object_list %}
     <div class="path-item-list  {{ documento.visibilidade_css_class}}">
       <div class="row inner">
@@ -39,7 +39,7 @@
               </h2>
             </div>
             <div class="col-xs-12">
-              <div class="descricao">
+              <div tabindex="{{view.tabindex}}" class="descricao">
                 {{ documento.descricao|default:''|safe}}
               </div>
             </div>
