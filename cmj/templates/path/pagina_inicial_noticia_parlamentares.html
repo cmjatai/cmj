@@ -28,12 +28,12 @@
             </div>
             <div class="col">
               <h3>
-                <a class="tags tag-parlamentar" href="/{{ documento.parlamentares.first.classe_set.first.absolute_slug }}">
+                <a tabindex="{{view.tabindex}}" class="tags tag-parlamentar" href="/{{ documento.parlamentares.first.classe_set.first.absolute_slug }}">
                     {{ documento.parlamentares.first.nome_parlamentar}}
                 </a>
               </h3>
               <h2 class="titulo">
-                <a href="/{{documento.url_prefixo_parlamentar}}/{{documento.absolute_slug}}">
+                <a tabindex="{{view.tabindex}}" href="/{{documento.url_prefixo_parlamentar}}/{{documento.absolute_slug}}">
                   {{documento.titulo}}
                 </a>
               </h2>

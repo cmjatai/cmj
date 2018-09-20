@@ -28,7 +28,16 @@ from cmj.sigad.models import Documento, Classe, ReferenciaEntreDocumentos,\
 from cmj.utils import make_pagination
 
 
-class PaginaInicialView(TemplateView):
+class TabIndexMixin:
+    _tabindex = 0
+
+    @property
+    def tabindex(self):
+        self._tabindex += 1
+        return self._tabindex
+
+
+class PaginaInicialView(TabIndexMixin, TemplateView):
 
     template_name = 'path/pagina_inicial.html'
 
@@ -72,7 +81,7 @@ class PaginaInicialView(TemplateView):
         return docs
 
 
-class PathView(MultipleObjectMixin, TemplateView):
+class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
     template_name = 'base_path.html'
     documento = None
     classe = None

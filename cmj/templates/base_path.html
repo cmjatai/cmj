@@ -17,9 +17,9 @@
     <div style="position:relative;">
       <div class="path-title-classe">
         {% if object.classe %}
-          <a href="/{{object.classe.slug}}">{{object.classe}}</a>
+          <a tabindex="{{view.tabindex}}" href="/{{object.classe.slug}}">{{object.classe}}</a>
         {% else %}
-        <a href="#">{{object}}</a>
+        <a tabindex="{{view.tabindex}}" href="#">{{object}}</a>
         {% endif %}
       </div>
       <div class="path-data-pub">
@@ -51,7 +51,7 @@
 
     </div>
   {% block title %}
-    <span class="path-title">
+    <span class="path-title" tabindex="{{view.tabindex}}">
         {% if object.titulo %}
           {{ object.titulo|safe|linebreaksbr }}
         {% else %}

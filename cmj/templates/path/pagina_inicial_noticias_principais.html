@@ -19,15 +19,19 @@
         <div class="carousel-item {% if forloop.first %}active{% endif %}">
           <div class="autor">{{d.1.autor|default:''}}</div>
           {% social_link_share d.0 'absolute-center' %}
-          <a class="d-block w-100 imagem" href="/{{d.0.slug}}"  style="background-image: url(/{{d.1.absolute_slug}}.768);">
+          <div class="d-block w-100 imagem" style="background-image: url(/{{d.1.absolute_slug}}.768);">
             {% comment %}
             <img src="/{{d.1.absolute_slug}}" alt="{% if d.1.titulo %}{{d.0.titulo}}{% else %}{{d.0.titulo}}{% endif %}">
             {% endcomment %}
             <div class="carousel-caption">
               <p class="d-none d-sm-block">{{d.0.descricao}}</p>
-              <h1 class="titulo">{{d.0.titulo}}</h1>
+              <a tabindex="{{view.tabindex}}" href="/{{d.0.slug}}" alt="{{d.0.titulo}}">
+              <h1 class="titulo">
+                  {{d.0.titulo}}
+                </h1>
+              </a>
             </div>
-          </a>
+          </div>
         </div>
       {% endfor %}
     </div>

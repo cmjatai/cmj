@@ -14,14 +14,17 @@
         <div class="texto">
 
           <h2 class="titulo">
-            <a href="{% url 'cmj.sigad:path_view' d.0.absolute_slug %}">
+            <a tabindex="{{view.tabindex}}" href="{% url 'cmj.sigad:path_view' d.0.absolute_slug %}">
               {{d.0.titulo}}
             </a>
           </h2>
 
           <div class="descricao">
             {% social_link_share d.0 'pull-right'%}
-            {{d.0.descricao|safe|urlize}}
+            <p tabindex="{{view.tabindex}}" >
+              {{d.0.descricao|safe|urlize}}
+
+            </p>
             <div class="clearfix"></div>
           </div>
         </div>
