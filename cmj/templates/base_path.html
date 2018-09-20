@@ -59,7 +59,7 @@
     </h1>
   {% endblock %}
 
-  <span class="path-description">
+  <div class="path-description">
     {% block descricao %}
       {% if object.descricao %}
         {{object.descricao|striptags|safe}}
@@ -68,5 +68,5 @@
       {% endif %}
     {% endblock %}
     {% social_link_share object 'top-right block'%}
-  </span>
+  </div>
 {% endblock %}
