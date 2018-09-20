@@ -16,7 +16,7 @@
     {% endif %}
     <div class="carousel-inner" role="listbox">
       {% for d in  noticias_destaque.docs%}
-        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+        <div class="carousel-item {% if forloop.first %}active{% endif %}"  {%if forloop.first%}id="main_content"{%endif%} >
           <div class="autor">{{d.1.autor|default:''}}</div>
           {% social_link_share d.0 'absolute-center' %}
           <div class="d-block w-100 imagem" style="background-image: url(/{{d.1.absolute_slug}}.768);">
@@ -25,7 +25,7 @@
             {% endcomment %}
             <div class="carousel-caption">
               <p class="d-none d-sm-block">{{d.0.descricao}}</p>
-              <a {%if forloop.first%}name="main_content" id="main_content"{%endif%} tabindex="{{view.tabindex}}" href="/{{d.0.slug}}" alt="{{d.0.titulo}}">
+              <a tabindex="{{view.tabindex}}" href="/{{d.0.slug}}" title="{{d.0.titulo}}">
               <h1 class="titulo">
                   {{d.0.titulo}}
                 </h1>

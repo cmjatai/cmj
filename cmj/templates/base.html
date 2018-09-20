@@ -7,8 +7,6 @@
 <html class="no-js {% block html_class %}{%endblock%}" lang="pt-br">
 <!--<![endif]-->
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="content-language" content="pt-br">
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <meta name="reply-to" content="hostmaster@camarajatai.go.gov.br">
     <meta name="theme-color" content="#006556">
@@ -28,7 +26,13 @@
   </head>
 
   <body class="{% block body_class %}{%endblock%}">
+    <div class="container">
+      <ul class="accessibilidade">
+        <li><a href="#main_content" accesskey="1">Ir para Conteúdo</a></li>
+      </ul>
+    </div>
     <div class="page fadein" id="{% block id_wrapper %}wrapper{% endblock %}">
+
       {% block canais_absolute %}
         <aside>
           <div class="canais-absolute">
@@ -51,7 +55,7 @@
               <span class="icon-bar"></span>
             </button>
 
-            <a class="navbar-brand" href="{{site_url}}/#main_content">
+            <a class="navbar-brand" href="{{site_url}}">
                 <i class="fa fa-home" aria-hidden="true"></i>C<small>âmara</small> M<small>unicipal de</small> J<small>ataí</small>
             </a>
 
@@ -109,13 +113,13 @@
                   <strong>
                       Busca Google no Portal CMJ
                   </strong>
-                  <gcse:searchbox></gcse:searchbox>
+                  <div class="gcse-searchbox"></div>
                   <small>
                     Utilize a busca do Google para pesquisar em nosso conteúdo.
                   </small>
                 </div>
                 <div class="result">
-                  <gcse:searchresults></gcse:searchresults>
+                  <div class="gcse-searchresults"></div>
                 </div>
               </div>
           
