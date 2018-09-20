@@ -14,13 +14,10 @@
           {% endif %}
         </span>
         <div class="w-100"></div>
-
-
         {% comment %}
           {% social_link_share documento %}
           <div class="clearfix"></div>
         {% endcomment %}
-
         {% with documento.parlamentares.first as parlamentar %}
             <div class="col-3">
               {% if  documento.parlamentares.first.fotografia %}
@@ -30,14 +27,16 @@
               {% endif %}
             </div>
             <div class="col">
-              <a class="tags tag-parlamentar" href="/{{ documento.parlamentares.first.classe_set.first.absolute_slug }}">
-                  {{ documento.parlamentares.first.nome_parlamentar}}
-              </a>
-              <div class="titulo">
+              <h3>
+                <a class="tags tag-parlamentar" href="/{{ documento.parlamentares.first.classe_set.first.absolute_slug }}">
+                    {{ documento.parlamentares.first.nome_parlamentar}}
+                </a>
+              </h3>
+              <h2 class="titulo">
                 <a href="/{{documento.url_prefixo_parlamentar}}/{{documento.absolute_slug}}">
                   {{documento.titulo}}
                 </a>
-              </div>
+              </h2>
             </div>
             <div class="col-xs-12">
               <div class="descricao">
