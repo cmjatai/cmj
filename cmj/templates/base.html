@@ -2,7 +2,7 @@
 {% load render_bundle from webpack_loader %}
 {% load webpack_static from webpack_loader %}
 <!DOCTYPE html>
-<!--[if IE 8]> <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if IE 8]> <html class="no-js lt-ie9" lang="pt-br"> <![endif]-->
 <!--[if gt IE 8]><!-->
 <html class="no-js {% block html_class %}{%endblock%}" lang="pt-br">
 <!--<![endif]-->
@@ -14,7 +14,7 @@
     <meta name="theme-color" content="#006556">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{% if user|notificacoes_unread_count %}({{user|notificacoes_unread_count}}) {% endif %}{% block head_title %}{% trans 'Câmara Municipal de Jataí - Goiás' %}{% endblock %}</title>
+    <title>{% if user|notificacoes_unread_count %}({{user|notificacoes_unread_count}}) {% endif %}{% block head_title %}{% trans 'Portal da Câmara Municipal de Jataí - Goiás' %}{% endblock %}</title>
     <meta name="description" content="Portal CMJ - Fonte de informações a respeito dos atos do poder legislativo do município de Jataí, na microrregião Sudoeste do Estado de Goiás.">
 
     {% block meta_tags %}
