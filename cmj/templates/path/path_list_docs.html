@@ -14,16 +14,17 @@
     <div class="{{css_class}} {{ documento.visibilidade_css_class}}">
       {% with documento.parlamentares.count as count_parlamentares %}
         <div class="inner">
-          {% comment %} primeiro container, o primeiro item {% endcomment %}
           {% with documento.imagem_representativa as imagem %}
               {% if imagem %}
                 <div class="path-imagem {{imagem.alinhamento_css_class}}">
                   <div class="imagem" style="background-image: url(/{{imagem.absolute_slug}}.512)"></div>
+                  {% comment %}
                   <a class="img-contexto" href="{% if prefixo_slug %}/{{prefixo_slug}}{% endif %}/{{documento.absolute_slug }}">
                     <div class="texto">
                       <div class="titulo">{{imagem.titulo|default:''}}</div>
                     </div>
                   </a>
+                  {% endcomment %}
                   <div class="autor">{{imagem.autor|default:''}}</div>
                 </div>
               {% else %}
