@@ -15,13 +15,13 @@
 
 {% block base_header %}
     <div style="position:relative;">
-      <h2 class="path-title-classe">
+      <h1 class="path-title-classe">
         {% if object.classe %}
           <a tabindex="{{view.tabindex}}" href="/{{object.classe.slug}}" title="Listar {{object.classe}}">{{object.classe}}</a>
         {% else %}
         <a tabindex="{{view.tabindex}}" href="#">{{object}}</a>
         {% endif %}
-      </h2>
+      </h1>
       <div class="path-data-pub">
         {% block historico_publicacao %}
           <div class="container-versions">

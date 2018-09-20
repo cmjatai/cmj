@@ -52,11 +52,11 @@
           {% endif %}
 
           {% if not pagina_inicial %}
-            <div class="titulo">
+            <h2 class="titulo">
               <a tabindex="{{view.tabindex}}" href="{% if prefixo_slug %}/{{prefixo_slug}}{% endif %}/{{documento.absolute_slug }}">
                 {{documento.titulo}}{% if not documento.titulo %}...{% endif %}
               </a>
-            </div>
+            </h2>
           {% endif %}
 
           {% if pagina_inicial %}
@@ -75,7 +75,7 @@
 
               {% if parlamentar.fotografia %}
                 <a class="avatar" href="/{{ parlamentar.classe_set.first.absolute_slug }}">
-                  <img src="{{ parlamentar.fotografia.url }}">
+                  <img src="{{ parlamentar.fotografia.url }}" alt="{{parlamentar}}">
                 </a>
               {% endif %}
 
