@@ -26,13 +26,18 @@
 
   <body class="{% block body_class %}{%endblock%}">
     <div class="header-accessibility">
-        <div class="links-to-content">
-          <a class="btn btn-link" href="#main_content" accesskey="1">Ir para Conteúdo<span class="badge badge-dark">1</span></a>
-          <a class="btn btn-link" href="#menu_content" accesskey="2">Ir para Menu<span class="badge badge-dark">2</span></a>
-          <a class="btn btn-link" href="#rodape_access" accesskey="3">Ir para Rodapé<span class="badge badge-dark">3</span></a>
+        <div class="container links-to-content justify-content-between">
+          <div class="btn-group" role="group">
+            <a class="btn btn-link " href="#main_content" accesskey="1">Ir para Conteúdo<span class="badge badge-dark">1</span></a>
+            <a class="btn btn-link" href="#menu_content" accesskey="2">Ir para Menu<span class="badge badge-dark">2</span></a>
+            <a class="btn btn-link" href="#rodape_access" accesskey="3">Ir para Rodapé<span class="badge badge-dark">3</span></a>
+          </div>
+          <div class="btn-group" role="group">
+              <a class="btn btn-link" href="#" id="altocontraste" accesskey="4" onclick="window.toggleContrast()" onkeydown="window.toggleContrast()"><i class="fa fa-adjust" aria-hidden="true"> Alto Contraste</i></a>
+          </div>
         </div>
-    </div>
-    <div class="page fadein" id="{% block id_wrapper %}wrapper{% endblock %}">
+      </div>
+      <div class="page fadein" id="{% block id_wrapper %}wrapper{% endblock %}">
       {% block canais_absolute %}
         <aside>
           <div class="canais-absolute">

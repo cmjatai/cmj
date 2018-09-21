@@ -1,0 +1,135 @@
+.contrast {
+  background-image: none !important;
+  background-color: black !important;
+  color: white !important;
+  opacity: 1;
+
+  nav, div,  ol, header, footer, section, main, aside, article, span {
+    background-color: black !important;
+    color: white !important;
+  }
+  h1, h2, h3, h4,h5,h6,p,label,strong,em,cite,q,i,b,u,span {
+    color: white !important;
+    opacity: 1;
+  }
+
+  button, input[type=button], input[type=reset], input[type=submit] {
+    background: black !important;
+    color: yellow !important;
+    border: none !important;
+  }
+
+  a {
+    color: yellow !important;
+  }
+
+  .navbar-social-links, div.path-parlamentares {
+    background-color: transparent !important;
+    i {
+      text-shadow: 0 0 0;
+    }
+  }
+
+  .navbar, .navbar-nav, ul, .item-agenda, .heading, .btn-ouvidoria, .path-header, .page-link  {
+    background-image: none !important;
+    background-color: #000 !important;
+    border-color: white !important;
+    ::before {
+      filter: grayscale(100%) contrast(110%);
+    }
+  }
+  
+  img, 
+  div.imagem,
+  div.path-capa,
+  .icon {
+    filter: grayscale(100%) contrast(110%);
+  }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.contrast1 {
+  background-image: none !important;
+
+  * {
+    //filter: grayscale(100%);
+  }
+  .color_black {
+    color: black !important;
+    opacity: 1 !important;
+  }
+
+  a {
+    @extend .color_black;
+    text-decoration: underline !important;
+  }
+  .descricao, i {
+    @extend .color_black;
+  }
+  .navbar-social-links {
+    a:hover {
+      background-color: black !important;
+      i {
+        color: white !important;
+      }
+    }
+  }
+
+  .box {
+    opacity: 1;
+    background-color: black !important;
+    border-bottom: 1px solid white;
+  }
+
+  .navbar, .header-accessibility, .box {
+    a {
+      color: white !important;
+      opacity: 1;
+      text-decoration: none !important;
+    }
+  }
+
+  .navbar, .navbar-nav, ul {
+    background-image: none !important;
+    background-color: #000 !important;
+    border-color: white !important;
+    ::before {
+      filter: grayscale(100%) contrast(110%);
+    }
+    li {
+      a {
+        color: white !important;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+      &:hover {
+        border-color: white !important;
+      }
+    }
+  }
+  
+  .navbar-topo, .navbar-menu {
+    background-color: #000 !important;
+  }
+
+  img, 
+  div.imagem,
+  .icon {
+    filter: grayscale(100%) contrast(110%);
+  }
+  
+}
