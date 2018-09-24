@@ -29,14 +29,32 @@
       text-shadow: 0 0 0;
     }
   }
+  .container-calendar {
+    .dia {
+      .numero {
+        font-size: 120%;
+      }
+    }
+    .dia-out {
+      .numero  {
+        font-size: 100%;
+      }
+    }
+  }
 
-  .navbar, .navbar-nav, ul, .item-agenda, .heading, .btn-ouvidoria, .path-header, .page-link  {
+  .navbar, .navbar-nav, ul, .item-agenda, .heading,
+  .btn-ouvidoria, .path-header, .page-link, .page-header,
+  .container-box, .inner {
     background-image: none !important;
     background-color: #000 !important;
     border-color: white !important;
     ::before {
       filter: grayscale(100%) contrast(110%);
     }
+  }
+
+  .canais-columns, .navbar {
+    border-bottom: 1px solid white;
   }
   
   img, 

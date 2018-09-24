@@ -3,7 +3,7 @@
   margin-top: $grid-gutter-width;
   display: table;
   font-size: 0px;
-
+  
   .path-item-list {
     width: calc(50%);
     &:nth-child(2n) {
@@ -15,6 +15,9 @@
       .inner {
         padding: 0 2px 0 0;
       }
+    }
+    h2 {
+      margin: 0;
     }
   }
   .path-imagem {
@@ -49,6 +52,16 @@
   .container-noticias-secundarias {
     .path-item-list {
       width: 100%;
+    }
+    .path-item-list:nth-child(2n) {
+      .inner {
+        padding: 0;
+      }
+    }    
+    .path-item-list:nth-child(2n + 1) {
+      .inner {
+        padding: 0;
+      }
     }
   }
 }
