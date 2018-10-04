@@ -18,3 +18,5 @@ import 'tinymce/plugins/code'
 import 'tinymce/plugins/save'
 
 import './2018/js/app_cmj'
+
+// import './2018/themes/outubrorosa/app.scss'

@@ -33,7 +33,7 @@
       text-decoration: none;
       display: flex;
       align-items: center;
-      color: #9c9;
+      color: $color_text_menu;
       font-family: Lato, Helvetica, sans-serif;
       padding: 0 6px;
       &:hover {
@@ -57,11 +57,10 @@
         }
       }
       ul {
-        border-color: rgba(#9c9, 0.3);
+        border-color: $color_border_menu_hover;
         margin: -1px 0 0 0;
         padding: 0;
-        background:$color_topo_bg$url_bg_png;
-
+        background: $color_topo_bg $url_bg_png;
         a {
           line-height: 2em;
         }
@@ -101,7 +100,7 @@
       border: 1px solid transparent;
       border-width: 1px 1px 0 1px;
       &:hover {
-        border-color:  rgba(#9c9, 0.3);
+        border-color: $color_border_menu_hover;
       }
     }
     a {
@@ -153,13 +152,13 @@
   a.navbar-brand {
     font-size: 24px;
     line-height: 40px;
-    color: white;
+    color: $color_text_brand; 
     font-family: "Graduate";
     padding:0;
     display: inline-block;
     flex-basis: 100%;
     &:hover {
-      color: $color_text_inverse;
+      color: $color_text_brand_hover;
     }
     .fa-home {
       padding: 0 0.45em 0 0.48em;
@@ -171,7 +170,7 @@
       border: 1px solid transparent;
       border-bottom-width: 0px;
       &:hover {
-        border-color: rgba(240,239,231,0.3);
+        border-color: $color_border_menu_hover;
       }
       .fa {
         margin-left: 10px;
