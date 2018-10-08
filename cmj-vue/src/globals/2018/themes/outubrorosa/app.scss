@@ -26,6 +26,11 @@
   .navbar-menu {
     z-index: 1;
   }
+  .navbar-topo {
+    .container::before {
+      top: 45px;
+    }
+  }
   #pagina-inicial {
     .navbar-topo {
       .container::before {
