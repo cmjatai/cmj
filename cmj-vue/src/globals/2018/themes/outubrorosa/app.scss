@@ -16,6 +16,9 @@
     z-index: 1;
   }
 }
+.navbar-menu {
+  z-index: 1;
+}
 .header-accessibility {
   .container {
     padding-left: 44px;
@@ -29,8 +32,5 @@
         top: 104px;
       }
     }
-  }
-  .navbar-collapse.show {
-    z-index: 1;
   }
 }
