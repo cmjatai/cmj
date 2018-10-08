@@ -104,7 +104,7 @@
                   </li>
                 {% else %}
                   <li>
-                    <a href="#fakeLink" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Acessar" %}<span class="caret"></span></a>
+                    <a href="#linkMenu" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Acessar" %}<span class="caret"></span></a>
                     <ul class="dropdown-menu">
                       <li><a href="https://www.jatai.go.leg.br{% url 'cmj.core:login' %}">{% trans "Portal" %}</a></li>
                       <li><a href="https://mail.camarajatai.go.gov.br">{% trans "Webmail" %}</a></li>
@@ -139,7 +139,7 @@
                 <ul class="navbar-nav" id="menu_content">
                   {% if areatrabalho %}
                     <li class="dropdown">
-                      <a href="#fakeLink" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                      <a href="#linkMenu" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                         {% trans "Portal" %}<span class="caret"></span>
                       </a>
                       <ul class="dropdown-menu menu-left" role="menu">
@@ -190,7 +190,7 @@
                         <li class="dropdown-header">{% trans "Consultas" %}</li>
                         {% if perms.sigad.view_documento %}
                         <li>
-                          <a href="#fakeLink" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Banco de Imagens" %}<span class="caret"></span></a>
+                          <a href="#linkMenu" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Banco de Imagens" %}<span class="caret"></span></a>
                           <ul class="dropdown-menu menu-right" role="menu">
                             <li><a href="/banco-de-imagens/2018">{% trans "2018" %}</a></li>
                             <li><a href="/banco-de-imagens/2017">{% trans "2017" %}</a></li>

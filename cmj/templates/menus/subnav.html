@@ -6,7 +6,7 @@
   {% for item in menu %}
     {% if item.children %}
       <li class="dropdown {{item.active}}">
-        <a data-toggle="dropdown" href="#fakeLink" title="{{item.title|striptags}}">
+        <a data-toggle="dropdown" href="#linkMenu" title="{{item.title|striptags}}">
           {% trans item.title %}
           <span class="caret"></span>
         </a>
