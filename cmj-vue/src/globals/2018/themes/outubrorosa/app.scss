@@ -16,9 +16,6 @@
     z-index: 1;
   }
 }
-.navbar-menu {
-  z-index: 1;
-}
 .header-accessibility {
   .container {
     padding-left: 44px;
@@ -26,6 +23,9 @@
 }
 @media screen and (max-width: 992px) {
   
+  .navbar-menu {
+    z-index: 1;
+  }
   #pagina-inicial {
     .navbar-topo {
       .container::before {
