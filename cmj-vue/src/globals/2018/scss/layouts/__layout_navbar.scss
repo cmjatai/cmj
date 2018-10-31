@@ -355,4 +355,10 @@
 }
 
 @media screen and (max-width: 480px) {
+
+  #wrapper {
+    &.toggled {
+      
+    }
+  }
 }
