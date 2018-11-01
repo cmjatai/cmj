@@ -1,4 +1,5 @@
-
+import logging
+import socket
 import sys
 
 from decouple import AutoConfig
@@ -9,6 +10,8 @@ from easy_thumbnails.conf import Settings as thumbnail_settings
 from sapl import settings as sapl_settings
 from unipath import Path
 
+
+host = socket.gethostbyname_ex(socket.gethostname())[0]
 
 config = AutoConfig()
 
@@ -325,41 +328,51 @@ HAYSTACK_CONNECTIONS = {
 }
 
 
-# FIXME update cripy-forms and remove this
-# hack to suppress many annoying warnings from crispy_forms
-# see sapl.temp_suppress_crispy_form_warnings
-LOGGING = DEFAULT_LOGGING
-
-LOGGING_CONSOLE = config('LOGGING_CONSOLE', default=False, cast=bool)
-if DEBUG and LOGGING_CONSOLE:
-    # Descomentar linha abaixo fará com que logs aparecam, inclusive SQL
-    #LOGGING['handlers']['console']['level'] = 'DEBUG'
-    LOGGING['loggers']['django']['level'] = 'DEBUG'
-    LOGGING.update({
-        'formatters': {
-            'verbose': {
-                'format': '%(levelname)s %(asctime)s %(pathname)s '
-                '%(funcName)s %(message)s'
-            },
-            'simple': {
-                'format': '%(levelname)s %(message)s'
-            },
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s ' + host + ' %(pathname)s %(name)s:%(funcName)s:%(lineno)d %(message)s'
         },
-    })
-    LOGGING['handlers']['console']['formatter'] = 'verbose'
-    LOGGING['loggers'][BASE_DIR.name] = {
-        'handlers': ['console'],
-        'level': 'DEBUG',
+        'simple': {
+            'format': '%(levelname)s %(asctime)s - %(message)s'
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+        'applogfile': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': 'sapl.log',
+            'maxBytes': 1024 * 1024 * 15,  # 15MB
+            'backupCount': 10,
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'sapl': {
+            'handlers': ['applogfile'],
+            'level': 'INFO',
+            'propagate': True,
+        },
     }
+}
+
 
 SITE_URL = 'https://www.jatai.go.leg.br'
 if DEBUG:
     SITE_URL = ''
 
-
+"""
 def excepthook(*args):
     logging.getLogger(BASE_DIR.name).error(
         'Uncaught exception:', exc_info=args)
 
 
 sys.excepthook = excepthook
+"""
