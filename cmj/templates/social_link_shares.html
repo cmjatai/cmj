@@ -1,8 +1,8 @@
 {% load i18n%}
 {% if url %}
   <div class="navbar-social-links {{css_class}}">
-    <a class="facebook" target="_blank" title="{% trans "Compartilhar no Facebook" %} [{{titulo}}]" href="https://www.facebook.com/sharer/sharer.php?u={{url}}"><i class="fa fa-facebook" aria-hidden="true"></i></a>
-    <a class="twitter" target="_blank" title="{% trans "Compartilhar no Twitter" %} [{{titulo}}]" href="https://twitter.com/intent/tweet?text={{titulo|urlencode}}&url={{url}}"><i class="fa fa-twitter" aria-hidden="true"></i></a>
-    <a class="whatsapp" title="{% trans "Compartilhar no WhatsApp" %} [{{titulo}}]" href="whatsapp://send?text={{whatsapp_text|urlencode|striptags|safe}}.%20{{url}}"><i class="fa fa-whatsapp" aria-hidden="true"></i></a>
+    <a class="facebook" target="_blank" title="{% trans "Compartilhar no Facebook" %} [{{titulo}}]" href="https://www.facebook.com/sharer/sharer.php?u={{url}}"><i class="fa fa-facebook" aria-hidden="true"></i><span>Facebook</span></a>
+    <a class="twitter" target="_blank" title="{% trans "Compartilhar no Twitter" %} [{{titulo}}]" href="https://twitter.com/intent/tweet?text={{titulo|urlencode}}&url={{url}}"><i class="fa fa-twitter" aria-hidden="true"></i><span>Twitter</span></a>
+    <a class="whatsapp" title="{% trans "Compartilhar no WhatsApp" %} [{{titulo}}]" href="whatsapp://send?text={{whatsapp_text|urlencode|striptags|safe}}.%20{{url}}"><i class="fa fa-whatsapp" aria-hidden="true"></i><span>WhatsApp</span></a>
   </div>
 {% endif %}
