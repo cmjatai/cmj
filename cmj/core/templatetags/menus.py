@@ -2,7 +2,6 @@ from django import template
 from django.core.urlresolvers import reverse
 from django.shortcuts import render
 from django.utils.translation import ugettext_lazy as _
-from sapl.utils import sapl_logger
 import yaml
 
 
@@ -86,11 +85,12 @@ def nav_run(context, path=None):
             menu = yaml.load(rendered)
             resolve_urls_inplace(menu, root_pk, rm, context)
         except Exception as e:
-            sapl_logger.error(_("""Erro na conversão do yaml %s. App: %s.
+            """sapl_logger.error(_('Erro na conversão do yaml %s. App: %s.
                                     Erro:
                                       %s
-                                """) % (
-                yaml_path, rm.app_name, str(e)))
+                                ') % (
+                yaml_path, rm.app_name, str(e)))"""
+            pass
 
     return {'menu': menu}
 
