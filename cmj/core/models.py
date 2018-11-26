@@ -153,6 +153,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.get_display_name()
 
+    @property
+    def username(self):
+        return self.get_username()
+
     def get_full_name(self):
         """
         Returns the first_name plus the last_name, with a space in between.
