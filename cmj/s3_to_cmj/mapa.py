@@ -915,7 +915,14 @@ mapa = [
             'ind_excluido': 'ind_excluido'
         },
         'adjust': adjust_normarelacionada
-    }
+    },
+
+    {
+        'name': '_ocorrenciasessao',
+        's30_model': None,
+        's31_model': OcorrenciaSessao,  # para clear
+        'fields': {}
+    },
 ]
 
 mapa_a_processar = [
