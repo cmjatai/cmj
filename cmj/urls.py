@@ -31,6 +31,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic.base import TemplateView, RedirectView
 from django.views.static import serve as view_static_server
+#import sapl.api.urls
 import sapl.base.urls
 import sapl.comissoes.urls
 import sapl.compilacao.urls
@@ -70,17 +71,18 @@ urlpatterns = [
     url(r'', include(cmj.ouvidoria.urls)),
     url(r'', include(cmj.agenda.urls)),
 
-    url(r'', include(sapl.comissoes.urls)),
+    url(r'^sapl/', include(sapl.comissoes.urls)),
     url(r'^sapl/', include(sapl.sessao.urls)),
     url(r'^sapl/', include(sapl.parlamentares.urls)),
-    url(r'', include(sapl.materia.urls)),
-    url(r'', include(sapl.norma.urls)),
-    url(r'', include(sapl.lexml.urls)),
-    url(r'', include(sapl.painel.urls)),
-    url(r'', include(sapl.protocoloadm.urls)),
-    url(r'', include(sapl.compilacao.urls)),
-    url(r'', include(sapl.relatorios.urls)),
-    url(r'^sapl/', include(sapl.base.urls)),
+    url(r'^sapl/', include(sapl.materia.urls)),
+    url(r'^sapl/', include(sapl.norma.urls)),
+    url(r'^sapl/', include(sapl.lexml.urls)),
+    url(r'^sapl/', include(sapl.painel.urls)),
+    url(r'^sapl/', include(sapl.protocoloadm.urls)),
+    url(r'^sapl/', include(sapl.compilacao.urls)),
+    url(r'^sapl/', include(sapl.relatorios.urls)),
+    url(r'', include(sapl.base.urls)),
+    #url(r'', include(sapl.api.urls)),
 
     url(r'^vuetest', TemplateView.as_view(template_name='index.html')),
 

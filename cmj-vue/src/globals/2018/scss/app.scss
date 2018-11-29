@@ -23,9 +23,6 @@ body, html {
   }
 }
 
-
-
-
 // ajuste bootstrap ########################################
 
 .row-fluid:before, .row-fluid:after {
@@ -34,6 +31,9 @@ body, html {
 }
 .row-fluid:after {
     clear: both;
+}
+.row-fluid {
+  @extend .row;
 }
 
 .caret {

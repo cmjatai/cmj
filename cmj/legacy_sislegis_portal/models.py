@@ -56,7 +56,6 @@ class Documento(models.Model):
     texto_final = models.TextField(blank=True, null=True)
     assinatura = models.TextField(blank=True, null=True)
     cargo_assinante = models.TextField(blank=True, null=True)
-    arqdigital = models.BinaryField(blank=True, null=True)
     possuiarqdigital = models.NullBooleanField()
     id_revogador = models.IntegerField(blank=True, null=True)
     link_revogador = models.TextField(blank=True, null=True)
@@ -134,3 +133,18 @@ class Itemlei(models.Model):
         db_table = 'itemlei'
         unique_together = (('numero', 'anexo', 'parte', 'livro', 'titulo', 'capitulo', 'capitulovar', 'secao', 'secaovar', 'subsecao', 'itemsecao',
                             'artigo', 'artigovar', 'paragrafo', 'inciso', 'incisovar', 'incisovarvar', 'alinea', 'item', 'subitem', 'subsubitem', 'id_alterador', 'nivel'),)
+
+
+class Assuntos(models.Model):
+    documento = models.ForeignKey(
+        Documento, models.DO_NOTHING, db_column='documento', blank=True, null=True)
+    tipo = models.ForeignKey(
+        Tipolei, models.DO_NOTHING, db_column='tipo', blank=True, null=True)
+
+    oficial = models.NullBooleanField(blank=True, null=True)
+    excluir = models.NullBooleanField(blank=True, null=True)
+    sugestoes = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'assuntos'

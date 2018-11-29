@@ -40,7 +40,9 @@ CMJ_APPS = (
     'cmj.api',
 
     # manter sempre como o ultimo da lista de apps
-    'cmj.globalrules'
+    'cmj.globalrules',
+
+
 )
 
 INITIAL_VALUE_FORMS_UF = config('INITIAL_VALUE_FORMS_UF')
@@ -78,6 +80,9 @@ INSTALLED_APPS = (
 
     'taggit',
     'webpack_loader',
+
+
+    'sass_processor',  # retirar apos testes de migração
 )
 
 INSTALLED_APPS = INSTALLED_APPS + tuple(
@@ -133,8 +138,9 @@ ROOT_URLCONF = 'cmj.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['cmj/templates'],
+        'DIRS': ['cmj/templates', 'sapl/templates'],
         'OPTIONS': {
+            'debug': DEBUG,
             'context_processors': [
                 'django.contrib.auth.context_processors.auth',
 
@@ -151,9 +157,10 @@ TEMPLATES = [
                 'cmj.context_processors.areatrabalho',
                 'cmj.context_processors.debug',
             ],
-            'debug': DEBUG,
-            'loaders': ['django.template.loaders.filesystem.Loader',
-                        'django.template.loaders.app_directories.Loader']
+            'loaders': [
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader'
+            ]
         },
     },
 ]
