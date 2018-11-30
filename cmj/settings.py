@@ -81,7 +81,6 @@ INSTALLED_APPS = (
     'taggit',
     'webpack_loader',
 
-
     'sass_processor',  # retirar apos testes de migração
 )
 
