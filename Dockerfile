@@ -59,6 +59,7 @@ COPY config/nginx/sapl.conf /etc/nginx/conf.d
 COPY config/nginx/nginx.conf /etc/nginx/nginx.conf
 
 WORKDIR /var/cmjatai/cmj/cmj-vue
+RUN npm install
 RUN npm run build
 
 WORKDIR /var/cmjatai/cmj/
