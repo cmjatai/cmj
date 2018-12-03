@@ -7,6 +7,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.management.base import BaseCommand
 from django.db import connection
 from django.db.models import Q
+from django.utils import timezone
 from sapl.compilacao.models import Dispositivo, TextoArticulado,\
     STATUS_TA_PUBLIC, TipoTextoArticulado, TipoDispositivo, STATUS_TA_EDITION
 from sapl.norma.models import NormaJuridica
@@ -22,6 +23,7 @@ class Command(BaseCommand):
 
     _ordem = 0
     graph = OrderedDict()
+    index = OrderedDict()
     fields = [
         'anexo',
         'parte',
@@ -111,6 +113,10 @@ class Command(BaseCommand):
         t = None
 
         for item in items:
+            self.index[item['id']] = {
+                'item': item,
+                'bloco_alteracao': [],
+            }
             if t is None:
                 t = g[item['id_lei']]
 
@@ -119,9 +125,12 @@ class Command(BaseCommand):
             while fields and not item[fields[0]]:
                 del fields[0]
 
-            self.put_node(
-                t, item, fields[::-1]
-            )
+            try:
+                self.put_node(
+                    t, item, fields[::-1]
+                )
+            except:
+                print(item)
 
     def put_node(self, subtree, item, _fields):
         f = _fields[0]
@@ -135,7 +144,7 @@ class Command(BaseCommand):
             st = subtree[item[f]]
 
         if len(_fields) == 1:
-            st['item'].append(item['id'])
+            st['item'].append(item)
         else:
             self.put_node(st['subtree'], item, _fields[1:])
 
@@ -148,14 +157,13 @@ class Command(BaseCommand):
 
         docs = Documento.objects.filter(
             assuntos__tipo__in=tipos,
-            id=3777,
             publicado=True).order_by('data_lei')
 
         related_object_type = ContentType.objects.get_for_model(NormaJuridica)
 
         user = get_user_model().objects.get(pk=1)
 
-        for doc in docs:
+        """for doc in docs:
             if not NormaJuridica.objects.filter(id=doc.id).exists():
                 continue
 
@@ -177,71 +185,119 @@ class Command(BaseCommand):
                 ta.privacidade = STATUS_TA_EDITION
                 ta.editable_only_by_owners = False
                 ta.editing_locked = False
+                ta.created = timezone.now()
                 ta.save()
             else:
                 ta = norma.texto_articulado.first()
             ta.owners.clear()
-            ta.owners.add(user)
+            ta.owners.add(user)"""
 
         self.create_graph(docs.values_list('id', flat=True))
-        """
 
-            if not ta.dispositivos_set.exists():
-                # articulação base.
-                td = TipoDispositivo.objects.filter(class_css='articulacao')[0]
-                a = Dispositivo()
-                a.nivel = 0
-                a.ordem = self.new_ordem
-                a.ordem_bloco_atualizador = 0
-                a.set_numero_completo([1, 0, 0, 0, 0, 0, ])
-                a.ta = ta
-                a.tipo_dispositivo = td
-                a.inicio_vigencia = ta.data
-                a.inicio_eficacia = ta.data
-                a.save()
+        for key, value in self.index.items():
+            if value['item']['id_dono']:
+                self.index[value['item']['id_dono']
+                           ]['bloco_alteracao'].append(key)
 
-                td = TipoDispositivo.objects.filter(class_css='ementa')[0]
-                e = Dispositivo()
-                e.nivel = 1
-                e.ordem = self.new_ordem
-                e.ordem_bloco_atualizador = 0
-                e.set_numero_completo([1, 0, 0, 0, 0, 0, ])
-                e.ta = ta
-                e.tipo_dispositivo = td
-                e.inicio_vigencia = ta.data
-                e.inicio_eficacia = ta.data
-                e.texto = ta.ementa
-                e.dispositivo_pai = a
-                e.save()
+        self.import_graph()
 
-                a.pk = None  # articulação do corpo do texto
-                a.nivel = 0
-                a.ordem = self.new_ordem
-                a.set_numero_completo([2, 0, 0, 0, 0, 0, ])
-                a.save()
+    def import_graph(self):
 
-                a.pk = None  # articulação assinatura
-                a.nivel = 0
-                a.ordem = self.new_ordem
-                a.set_numero_completo([3, 0, 0, 0, 0, 0, ])
-                a.save()
+        for id, dsps in self.graph.items():
+            self._ordem = 0
+            roots = self.load_roots(id)
+            self.import_subtree(roots, dsps)
 
-                a.pk = None  # articulação para anexos - excluir no final se vazio
-                a.nivel = 0
-                a.ordem = e.ordem + Dispositivo.INTERVALO_ORDEM
-                a.set_numero_completo([4, 0, 0, 0, 0, 0, ])
-                a.save()
+        for id, dsps in self.graph.items():
+            self._ordem = 0
+            roots = self.load_roots(id)
+            self.import_subtree(roots, dsps, only_originals=False)
 
-            roots = Dispositivo.objects.order_by(
-                'ordem').filter(nivel=0, ta_id=ta.id)
+    def import_subtree(self, node, subtree, only_originals=True):
 
-            root_inicio = roots[0]
-            root_corpo = roots[1]
-            root_assinatura = roots[2]
-            root_anexos = roots[3]
+        for n, sub in subtree.items():
+            sub_node = node
+            if isinstance(node, dict):
+                sub_node = sub_node[
+                    'anexos' if sub['type'] == 'anexo' and n else 'corpo'
+                ]
 
-            anexo = 0
+            if sub['item']:
+                _method = 'import_{}'.format(sub['type'])
+                _method = _method if hasattr(
+                    self, _method) else 'import_basico'
 
-            for item in items[:1]:
-                if item.anexo != 0:
-                    print(item.__dict__)"""
+                sub_node = getattr(self, _method)(
+                    sub_node,
+                    sub['item'],
+                    only_originals=only_originals)
+
+            self.import_subtree(sub_node, sub['subtree'])
+
+    def import_basico(self, node, items, only_originals):
+        item_original = items[0]
+        items_alterados = items[1:]
+
+    def import_capitulo(self, node, items, only_originals):
+        item_original = items[0]
+        items_alterados = items[1:]
+
+    def load_roots(self, id):
+        ta = TextoArticulado.objects.get(id=id)
+        if not ta.dispositivos_set.exists():
+            # articulação base.
+            td = TipoDispositivo.objects.filter(class_css='articulacao')[0]
+            a = Dispositivo()
+            a.nivel = 0
+            a.ordem = self.new_ordem
+            a.ordem_bloco_atualizador = 0
+            a.set_numero_completo([1, 0, 0, 0, 0, 0, ])
+            a.ta = ta
+            a.tipo_dispositivo = td
+            a.inicio_vigencia = ta.data
+            a.inicio_eficacia = ta.data
+            a.save()
+
+            td = TipoDispositivo.objects.filter(class_css='ementa')[0]
+            e = Dispositivo()
+            e.nivel = 1
+            e.ordem = self.new_ordem
+            e.ordem_bloco_atualizador = 0
+            e.set_numero_completo([1, 0, 0, 0, 0, 0, ])
+            e.ta = ta
+            e.tipo_dispositivo = td
+            e.inicio_vigencia = ta.data
+            e.inicio_eficacia = ta.data
+            e.texto = ta.ementa
+            e.dispositivo_pai = a
+            e.save()
+
+            a.pk = None  # articulação do corpo do texto
+            a.nivel = 0
+            a.ordem = self.new_ordem
+            a.set_numero_completo([2, 0, 0, 0, 0, 0, ])
+            a.save()
+
+            a.pk = None  # articulação assinatura
+            a.nivel = 0
+            a.ordem = self.new_ordem
+            a.set_numero_completo([3, 0, 0, 0, 0, 0, ])
+            a.save()
+
+            a.pk = None  # articulação para anexos - excluir no final se vazio
+            a.nivel = 0
+            a.ordem = self.new_ordem
+            a.set_numero_completo([4, 0, 0, 0, 0, 0, ])
+            a.save()
+
+        roots = Dispositivo.objects.order_by(
+            'ordem').filter(nivel=0, ta_id=ta.id)
+
+        roots = {
+            'inicio':  roots[0],
+            'corpo': roots[1],
+            'assinatura': roots[2],
+            'anexos': roots[3]
+        }
+
+        return roots
