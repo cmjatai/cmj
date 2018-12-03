@@ -19,4 +19,4 @@ import 'tinymce/plugins/save'
 
 import './2018/js/app_cmj'
 
-import './2018/themes/novembroazul/app.scss'
+import './2018/themes/dezembrolaranja/app.scss'
