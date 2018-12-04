@@ -316,6 +316,25 @@
   }
 }
 
+@media screen and (max-width: 1199px) {
+  .navbar-menu {
+    .container {
+      width: auto;
+      max-width: 100%;
+      padding: 0 5px;
+    }
+    .navbar-nav {
+      & > li {
+        a {
+          line-height: 2.2em;
+          font-size: 1.1em;
+          padding: 0 2px;
+        }
+      }
+    }
+  }
+}
+
 @media screen and (max-width: 991px) {
   .navbar {
     .navbar-toggler {

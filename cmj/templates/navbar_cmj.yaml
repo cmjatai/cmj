@@ -66,3 +66,43 @@
     url: /fale-conosco/telefones
   - title: {% trans 'Ouvidoria' %}
     url: /fale-conosco/ouvidoria
+- title: {% trans 'Transparência' %}
+  url: ''
+  children:
+  - title: {% trans 'Prestação de Contas' %}
+    url: http://camaradejatai.sigepnet.com.br
+  - title:  {% trans 'Relatórios de Gestão Fiscal'%}
+    url: http://sislegis.camarajatai.go.gov.br/publicacoes/seeker?sv=10&tl=8
+  - title:  {% trans 'Balancetes'%}
+    url: http://sislegis.camarajatai.go.gov.br/publicacoes/seeker?sv=10&tl=7
+  - title: {% trans 'Licitações' %}
+    url: ''
+    children:
+    - title: {% trans 'Em Andamento' %}
+      url: http://sislegis.camarajatai.go.gov.br/publicacoes/seeker?sv=9&tl=5
+    - title: {% trans 'Com Contratos Assinados' %}
+      url: http://sislegis.camarajatai.go.gov.br/publicacoes/seeker?sv=9&tl=31
+    - title: {% trans 'Encerradas' %}
+      url: http://sislegis.camarajatai.go.gov.br/publicacoes/seeker?sv=9&tl=32
+    - title: {% trans 'Canceladas' %}
+      url: http://sislegis.camarajatai.go.gov.br/publicacoes/seeker?sv=9&tl=33
+    - title: {% trans 'Outras Publicações' %}
+      url: http://sislegis.camarajatai.go.gov.br/publicacoes/seeker?sv=9&tl=33
+  - title: {% trans 'Contratos'%}
+    url: ''
+    children:
+      - title:  {% trans 'Contratos em vigência'%}
+        url: http://sislegis.camarajatai.go.gov.br/publicacoes/seeker?sv=11&tl=36&ct=3
+      - title:  {% trans 'Contratos prestes a vencer'%}
+        url: http://sislegis.camarajatai.go.gov.br/publicacoes/seeker?sv=11&tl=36&ct=2
+      - title:  {% trans 'Contratos encerrados'%}
+        url: http://sislegis.camarajatai.go.gov.br/publicacoes/seeker?sv=11&tl=36&ct=1
+  - title: {% trans 'Outras Publicações'%}
+    url: ''
+    children:
+      - title:  {% trans 'Últimas Publicações'%}
+        url: http://sislegis.camarajatai.go.gov.br/publicacoes/seeker
+      - title:  {% trans 'Editais diversos'%}
+        url: http://sislegis.camarajatai.go.gov.br/publicacoes/seeker?sv=5&tl=29
+      - title:  {% trans 'Outras Publicações'%}
+        url: http://sislegis.camarajatai.go.gov.br/publicacoes/seeker?sv=5&tl=25
