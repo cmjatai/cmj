@@ -32,8 +32,8 @@
   children:
   - title: Adilson de Carvalho
     url: /parlamentar/adilson-de-carvalho
-  - title: Pastor Luiz Carlos
-    url: /parlamentar/pastor-luiz-carlos
+  - title: Thiago Maggioni
+    url: /parlamentar/thiago-maggioni
   - title: Major Davi Pires
     url: /parlamentar/major-davi-pires
   - title: Carvalinho
@@ -50,6 +50,8 @@
     url: /parlamentar/marcos-antonio
   - title: Mauro Bento Filho
     url: /parlamentar/mauro-bento-filho
+  - title: Pastor Luiz Carlos
+    url: /parlamentar/pastor-luiz-carlos
 - title: {% trans 'Comunicação' %}
   url: ''
   css_class: head_title
