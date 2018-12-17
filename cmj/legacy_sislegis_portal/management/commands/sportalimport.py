@@ -231,7 +231,7 @@ class Command(BaseCommand):
                         return value['item']['id_alterador']
             return 0
 
-        _ID = 1135
+        _ID = 0
 
         run_doc(_ID=_ID)
 
@@ -241,8 +241,8 @@ class Command(BaseCommand):
         else:
             create_arestas(_ID)
 
-        self.grafh_to_image()
-        # self.import_graph()
+        # self.grafh_to_image()
+        self.import_graph()
 
     def import_graph(self):
         for id, dsps in self.graph.items():
@@ -574,8 +574,11 @@ class Command(BaseCommand):
 
             if io['id'] in (54010, 57991):
                 numero[0] = 3
-            elif io['id'] == 57838:
+            elif io['id'] in (57838, 56855, 9746):
                 numero[0] = 4
+
+            elif io['id'] in (5243, ):
+                numero[0] = 5
 
             try:
                 d = self.create_dispositivo(
@@ -587,8 +590,7 @@ class Command(BaseCommand):
                     rotulo,
                     numero=numero)
             except Exception as e:
-                print(io['id'])
-                raise Exception(e)
+                print('erro de parágrafo:', io['id'])
 
             if only_originals:
                 break
@@ -722,7 +724,7 @@ class Command(BaseCommand):
             'abcdefghijklmnopqrstuvwxyz' + \
             'ABCDEFGHIJKLMNOPQRSTUVWXYZ' + \
             '0123456789' + \
-            'ºª§/-_,.;:!@#$%*()?[]~"<>=\r\n\t²°&+' + "'"
+            'ºª§/-_,.;:!@#$%*()?[]~"<>=\r\n\t²³°&+' + "'"
 
         black_char = {
             '´': "'",
@@ -854,7 +856,7 @@ class Command(BaseCommand):
         x = mx
         y = my
         r = 5
-        dx = 30
+        dx = 50
         dy = 10
         img = Image.new('RGB', (x_max * dx * 2 + mx, len(self.graph) * 50),
                         color=(255, 255, 255))
@@ -878,7 +880,7 @@ class Command(BaseCommand):
                 p[0] * dx + mx + dx,
                 p[1] * y + y + 2 * r,
                 p[2] * dx + mx + dx,
-                p[3] * y + y + 2 * r
+                p[3] * y + y + 2 * r  # - p[0] * r * 4
             )
             ph1 = (
                 mx,
@@ -891,7 +893,7 @@ class Command(BaseCommand):
                 mx,
                 p[3] * y + y + 2 * r,
                 p[2] * dx + mx + dx,
-                p[3] * y + y + 2 * r,
+                p[3] * y + y + 2 * r  # - p[0] * r * 4,
             )
 
             d.line(ph1, fill=128, width=1)
