@@ -245,17 +245,20 @@ class Command(BaseCommand):
         self.import_graph()
 
     def import_graph(self):
+        print('---- Normas Originais ----')
         for id, dsps in self.graph.items():
+            print(id)
             self.ta = TextoArticulado.objects.get(pk=id)
             self._ordem = 0
-            print(self.ta)
             roots = self.load_roots(id)
             self.import_subtree(roots, dsps)
 
+        print('---- Blocos de alteração ----')
         for key, value in self.arestas_internas.items():
             if value['bloco_alteracao']:
                 self.create_bloco_alteracao(key)
 
+        print('---- Compilação ----')
         for id, dsps in self.graph.items():
             self.ta = TextoArticulado.objects.get(pk=id)
             self._ordem = 0
@@ -459,93 +462,98 @@ class Command(BaseCommand):
         a = None
         caput_old = None
         for io in items:
+            try:
+                caput = Dispositivo.objects.filter(id=io['id']).first()
+                if not a:
+                    if not caput:
+                        a = Dispositivo()
+                        a.ordem = node_pai.criar_espaco(
+                            1, local='json_add_next')
 
-            caput = Dispositivo.objects.filter(id=io['id']).first()
-            if not a:
+                        a.contagem_continua = True
+                        a.nivel = node_pai.nivel + 1
+                        a.tipo_dispositivo = td
+                        a.dispositivo_pai = node_pai
+                        a.dispositivo_raiz = node_pai.dispositivo_raiz \
+                            if node_pai.dispositivo_raiz else node_pai
+
+                        a.dispositivo0 = io['artigo']
+                        a.dispositivo1 = io['artigovar']
+                        a.dispositivo2 = io['artigovarvar']
+
+                        a.ta = self.ta
+                        a.inicio_vigencia = self.ta.data
+                        a.inicio_eficacia = self.ta.data
+                        a.rotulo = a.rotulo_padrao()
+
+                        # associação para inclusões por norma alteradora
+
+                        if io['id_alterador'] != io['id_lei']:
+                            a.ta_publicado_id = io['id_alterador']
+
+                        if io['id_dono']:
+                            da = self.get_bloco_alteracao(io['id_dono'])
+                            a.dispositivo_atualizador = da
+                            a.inicio_vigencia = da.inicio_vigencia
+                            a.inicio_eficacia = da.inicio_eficacia
+
+                        a.visibilidade = False
+                        a.save()
+
                 if not caput:
-                    a = Dispositivo()
-                    a.ordem = node_pai.criar_espaco(1, local='json_add_next')
-
-                    a.contagem_continua = True
-                    a.nivel = node_pai.nivel + 1
-                    a.tipo_dispositivo = td
-                    a.dispositivo_pai = node_pai
-                    a.dispositivo_raiz = node_pai.dispositivo_raiz \
-                        if node_pai.dispositivo_raiz else node_pai
-
-                    a.dispositivo0 = io['artigo']
-                    a.dispositivo1 = io['artigovar']
-                    a.dispositivo2 = io['artigovarvar']
-
-                    a.ta = self.ta
-                    a.inicio_vigencia = self.ta.data
-                    a.inicio_eficacia = self.ta.data
-                    a.rotulo = a.rotulo_padrao()
-
-                    # associação para inclusões por norma alteradora
-
-                    if io['id_alterador'] != io['id_lei']:
-                        a.ta_publicado_id = io['id_alterador']
-
-                    if io['id_dono']:
-                        da = self.get_bloco_alteracao(io['id_dono'])
-                        a.dispositivo_atualizador = da
-                        a.inicio_vigencia = da.inicio_vigencia
-                        a.inicio_eficacia = da.inicio_eficacia
-
-                    a.visibilidade = False
-                    a.save()
-
-            if not caput:
-                caput = Dispositivo()
-                caput.id = io['id']
-                if not caput_old:
-                    caput.ordem = a.criar_espaco(1, local='json_add_in')
+                    caput = Dispositivo()
+                    caput.id = io['id']
+                    if not caput_old:
+                        caput.ordem = a.criar_espaco(1, local='json_add_in')
+                    else:
+                        caput.ordem = caput_old.criar_espaco(
+                            1, local='json_add_next')
+                    caput.auto_inserido = True
                 else:
-                    caput.ordem = caput_old.criar_espaco(
-                        1, local='json_add_next')
-                caput.auto_inserido = True
-            else:
-                a = caput.dispositivo_pai
+                    a = caput.dispositivo_pai
 
-            td_caput = TipoDispositivo.objects.filter(class_css='caput')[0]
-            caput.tipo_dispositivo = td_caput
-            caput.nivel = a.nivel + 1
-            caput.dispositivo_pai = a
-            caput.dispositivo_raiz = a.dispositivo_raiz
+                td_caput = TipoDispositivo.objects.filter(class_css='caput')[0]
+                caput.tipo_dispositivo = td_caput
+                caput.nivel = a.nivel + 1
+                caput.dispositivo_pai = a
+                caput.dispositivo_raiz = a.dispositivo_raiz
 
-            caput.ta = self.ta
-            caput.inicio_vigencia = self.ta.data
-            caput.inicio_eficacia = self.ta.data
-            caput.rotulo = caput.rotulo_padrao()
-            caput.texto = self.normalize(io['texto'])
+                caput.ta = self.ta
+                caput.inicio_vigencia = self.ta.data
+                caput.inicio_eficacia = self.ta.data
+                caput.rotulo = caput.rotulo_padrao()
+                caput.texto = self.normalize(io['texto'])
 
-            if io['id_alterador'] != io['id_lei']:
-                caput.ta_publicado_id = io['id_alterador']
-            caput.dispositivo_substituido = caput_old
-            if io['id_dono']:
-                da = self.get_bloco_alteracao(io['id_dono'])
-                caput.dispositivo_atualizador = da
-                caput.inicio_vigencia = da.inicio_vigencia
-                caput.inicio_eficacia = da.inicio_eficacia
+                if io['id_alterador'] != io['id_lei']:
+                    caput.ta_publicado_id = io['id_alterador']
+                caput.dispositivo_substituido = caput_old
+                if io['id_dono']:
+                    da = self.get_bloco_alteracao(io['id_dono'])
+                    caput.dispositivo_atualizador = da
+                    caput.inicio_vigencia = da.inicio_vigencia
+                    caput.inicio_eficacia = da.inicio_eficacia
 
-            caput.visibilidade = True
-            caput.save()
+                caput.visibilidade = True
+                caput.save()
 
-            if only_originals:
-                break
+                if only_originals:
+                    break
 
-            if caput_old:
-                caput_old.dispositivo_subsequente = caput
-                caput_old.fim_vigencia = caput.inicio_vigencia - \
-                    timedelta(days=1)
-                caput_old.fim_eficacia = caput.inicio_eficacia - \
-                    timedelta(days=1)
-                caput_old.save()
-                caput.dispositivos_filhos_set.add(
-                    *list(caput_old.dispositivos_filhos_set.all()))
+                if caput_old:
+                    caput_old.dispositivo_subsequente = caput
+                    caput_old.fim_vigencia = caput.inicio_vigencia - \
+                        timedelta(days=1)
+                    caput_old.fim_eficacia = caput.inicio_eficacia - \
+                        timedelta(days=1)
+                    caput_old.save()
+                    caput.dispositivos_filhos_set.add(
+                        *list(caput_old.dispositivos_filhos_set.all()))
 
-            caput_old = caput
+                caput_old = caput
+            except Exception as e:
+                print(io)
+                print(e)
+                raise Exception(e)
 
         return a
 
@@ -574,11 +582,13 @@ class Command(BaseCommand):
 
             if io['id'] in (54010, 57991):
                 numero[0] = 3
-            elif io['id'] in (57838, 56855, 9746):
+            elif io['id'] in (57838, 56855, 9746, 73697):
                 numero[0] = 4
 
             elif io['id'] in (5243, ):
                 numero[0] = 5
+            elif io['id'] in (84312, ):
+                print(io)
 
             try:
                 d = self.create_dispositivo(

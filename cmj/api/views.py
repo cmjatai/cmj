@@ -1,4 +1,5 @@
 from django.core.files.base import File
+from django.db import transaction
 from django.utils.translation import ugettext_lazy as _
 from django_filters import rest_framework as filters
 from rest_framework import viewsets, status
@@ -74,6 +75,9 @@ class DocumentoViewSet(viewsets.ModelViewSet):
 
         return response
 
+    def perform_destroy(self, instance):
+        instance.delete(user=self.request.user)
+
     def perform_update(self, serializer):
         len_files = len(self.request.FILES)
         instance = serializer.instance
@@ -82,7 +86,6 @@ class DocumentoViewSet(viewsets.ModelViewSet):
             rotate = self.request.data.get('rotate', 0)
             if rotate:
                 instance.midia.last.rotate(rotate)
-                pass
 
             viewsets.ModelViewSet.perform_update(self, serializer)
             return
@@ -107,6 +110,22 @@ class DocumentoViewSet(viewsets.ModelViewSet):
                 versao.alinhamento = instance.alinhamento
                 versao.save(with_file=files[0])
 
+        elif instance.tipo == Documento.TPD_FILE:
+
+            if files:
+                if not hasattr(instance, 'midia'):
+                    midia = Midia()
+                    midia.documento = instance
+                    midia.save()
+                else:
+                    midia = instance.midia
+
+                versao = VersaoDeMidia()
+                versao.midia = midia
+                versao.owner = self.request.user
+                versao.alinhamento = instance.alinhamento
+                versao.save(with_file=files[0])
+
         elif instance.tipo in Documento.TDc:
             ordem = 0
             last_image = instance.childs.view_childs().last()
@@ -114,24 +133,30 @@ class DocumentoViewSet(viewsets.ModelViewSet):
                 ordem = last_image.ordem
 
             for file in files:
-                ordem += 1
-                image = Documento()
-                image.raiz = instance.raiz
-                image.parent = instance
-                image.visibilidade = Documento.STATUS_RESTRICT
-                image.ordem = ordem
-                image.titulo = ''
-                image.owner = self.request.user
-                image.tipo = Documento.TPD_IMAGE
-                image.classe = instance.classe
-                image.save()
+                try:
+                    with transaction.atomic():
+                        ordem += 1
 
-                midia = Midia()
-                midia.documento = image
-                midia.save()
+                        image = Documento()
+                        image.raiz = instance.raiz
+                        image.parent = instance
+                        image.visibilidade = Documento.STATUS_RESTRICT
+                        image.ordem = ordem
+                        image.titulo = ''
+                        image.owner = self.request.user
+                        image.tipo = Documento.TPD_IMAGE if instance.tipo != \
+                            Documento.TPD_CONTAINER_FILE else Documento.TPD_FILE
+                        image.classe = instance.classe
+                        image.save()
 
-                versao = VersaoDeMidia()
-                versao.midia = midia
-                versao.owner = self.request.user
-                versao.alinhamento = Documento.ALINHAMENTO_JUSTIFY
-                versao.save(with_file=file)
+                        midia = Midia()
+                        midia.documento = image
+                        midia.save()
+
+                        versao = VersaoDeMidia()
+                        versao.midia = midia
+                        versao.owner = self.request.user
+                        versao.alinhamento = Documento.ALINHAMENTO_JUSTIFY
+                        versao.save(with_file=file)
+                except:
+                    ordem -= 1

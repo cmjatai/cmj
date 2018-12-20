@@ -1,32 +1,22 @@
 <template lang="html">
-  <div :class="[name_component, childsOrdenados.length !== 0 ?  '': 'empty' ]">
-
-    <div class="btn-toolbar widgets widget-top">
-      <div  v-if="!elemento.titulo" class="btn-group btn-group-sm">
-        <button v-on:click.self="toogleTitulo" title="Disponibilizar Título para o Container" type="button" class="btn btn-success">T</button>
-      </div>
-      <template v-if="childsOrdenados.length === 0">
-        <div class="btn-group btn-group-sm">
-          <button v-on:click.self="addChild(tipo.component_tag, $event)" v-for="(tipo, key) in getChoices.tipo.subtipos" :key="key" type="button" class="btn btn-primary" title="Adiciona Elemento no final deste Container...">{{tipo.text}}</button>
-        </div>
-      </template>
-      <div class="btn-group btn-group-sm">
-      </div>
+  <div :class="[name_component, 'container']">
+    <div class="path-title-file construct">
+      <input v-model.lazy="elemento.titulo" placeholder="Título do Arquivo..."/>
     </div>
+    <input v-model.lazy="elemento.descrição" placeholder="Descrição do Arquivo..."/>
 
-    <div v-if="has_titulo || elemento.titulo" class="path-title-container construct">
-      <input v-model.lazy="elemento.titulo" placeholder="Sub título do container..."/>
+    <div class="drop-area">
+      <drop-zone v-on:change="changeImage" :elemento="elemento" :src="slug" :multiple="true" :resource="documentoResource"/>
     </div>
-
-    <component :is="classChild(value)" v-for="value in childsOrdenados" :child="value" :parent="elemento" :key="value.id"/>
+    <div class="inner">
+      <modal-image-list v-if="showModal >= 0" @close="showModal = -1" :elementos="childsOrdenados" :child="showElemento" :pos="showModal" :parent="elemento" />
+      <component :is="classChild(value)" v-on:ondragend="ondragend" v-on:ondragleave="ondragleave" v-for="(value, key) in childsOrdenados" :child="value" :parent="elemento" :key="value.id" :pos="key" v-on:showmodal="showModalAction"/>
+    </div>
     <div class="btn-toolbar widgets widget-bottom justify-content-end">
       <div class="btn-group btn-group-sm">
         <button v-on:click.self="addBrother('container', $event)" title="Adicionar novo Container Simples abaixo deste" type="button" class="btn btn-default">+C</button>
         <button v-on:click.self="addBrother('container-fluid', $event)" title="Adicionar novo Container Extendido abaixo deste"  type="button" class="btn btn-default">+CE</button>
         <button v-on:click.self="addBrother('container-file', $event)" title="Adicionar novo Container Para PDF"  type="button" class="btn btn-default">+CF</button>
-      </div>
-      <div class="btn-group btn-group-sm">
-        <button v-on:click="containerTrocarTipo" title="Trocar tipo deste Container" type="button" class="btn btn-default"><i class="fa fa-exchange"></i></button>
       </div>
       <div class="btn-group btn-group-sm">
         <button v-on:click.self="deleteParte" title="Remover este Container" type="button" class="btn btn-danger">x</button>
@@ -36,18 +26,21 @@
 </template>
 
 <script>
-import DocumentoEdit from './DocumentoEdit'
-
+import Container from './Container.vue'
 export default {
-  name: 'container',
+  name: 'container-file',
   extends: {
-    ...DocumentoEdit
+    ...Container
   },
   data () {
     return {
       has_titulo: false,
       has_descricao: false,
-      has_autor: false
+      has_autor: false,
+      dragleave: null,
+      side: 0,
+      showModal: -1,
+      showElemento: null
     }
   },
   methods: {
@@ -84,16 +77,39 @@ export default {
           t.danger(response.response.data.detail)
         })
     },
-    containerTrocarTipo (event) {
-      let t = this
+    showModalAction (elemento, pos) {
+      this.showElemento = elemento
+      this.showModal = pos
+    },
+    ondragend: function (el) {
+      console.log('ondragend: ContainerTdBi', el)
+      if (el.id === this.dragleave.id) {
+        return
+      }
       let data = Object()
-      let keys = _.keys(this.getChoices.tipo.containers) // eslint-disable-line
-      data.tipo = this.elemento.tipo === parseInt(keys[0]) ? keys[1] : keys[0]
-      data.id = this.elemento.id
-      t.updateDocumento(data)
-        .then((response) => {
-          t.$parent.getDocumento(t.parent.id)
+      data.id = el.id
+      data.ordem = this.dragleave.ordem
+      if (el.ordem > this.dragleave.ordem && this.side > 0) {
+        data.ordem++
+      } else if (el.ordem < this.dragleave.ordem && this.side < 0) {
+        data.ordem--
+      }
+      if (el.ordem === data.ordem) {
+        return
+      }
+      el.ordem = data.ordem
+      this.updateDocumento(data)
+        .then(() => {
+          this.getDocumento(this.elemento.id)
         })
+    },
+    ondragleave: function (el, side) {
+      console.log('ondragleave: ContainerTdBi', el, side)
+      this.dragleave = el
+      this.side = side
+    },
+    changeImage: function (response) {
+      this.getDocumento(this.elemento.id)
     }
   }
 }
@@ -142,17 +158,20 @@ export default {
       }
     }
   }
-}
-
-.container-documento-edit__old {
-  .container, .container-fluid {
-    border: 1px solid transparent;
-    border-radius: 5px;
-    &:hover {
-      transition: all 0.5s ease;
-      & > .widgets {
-      }
+  .container-file {
+    & > .drop-area {
+      padding: 0 10px;
     }
+    & > .inner {
+      padding: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      user-select:none;
+    }
+  }
+  .path-title-file {
+    font-size: 130%;
   }
 }
 </style>

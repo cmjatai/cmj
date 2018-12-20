@@ -106,6 +106,7 @@ class DocumentoSerializer(serializers.ModelSerializer):
     cita = ReferenciaField(many=True, required=False)
 
     has_midia = serializers.SerializerMethodField()
+    mime_type = serializers.SerializerMethodField()
     refresh = serializers.SerializerMethodField()
     choices = SerializerMethodField()
     slug = SlugField(read_only=True)
@@ -121,6 +122,9 @@ class DocumentoSerializer(serializers.ModelSerializer):
 
     def get_has_midia(self, obj):
         return hasattr(obj, 'midia')
+
+    def get_mime_type(self, obj):
+        return obj.midia.last.content_type if hasattr(obj, 'midia') else ''
 
     def get_refresh(self, obj):
         return 0

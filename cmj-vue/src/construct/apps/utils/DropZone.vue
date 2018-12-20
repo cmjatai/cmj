@@ -2,7 +2,7 @@
   <div class="drop_files" :id="'drop_file'+elemento.id" v-on:drop="drop_handler" v-on:dragover="dragover_handler" v-on:dragend="dragend_handler">
     <label class="drop_zone" :for="'input_file'+elemento.id">
       <span class="inner">
-        Arraste suas imagens e solte aqui,<br>
+        Arraste seus arquivos e solte aqui,<br>
         <small>ou clique para selecionar</small>
       </span>
       <input :multiple="multiple ? 'multiple': null" type="file" name="file" :id="'input_file'+elemento.id" @change="selectFiles"/>
@@ -44,9 +44,11 @@ export default {
       t.resource.uploadFiles(t.elemento.id, form)
         .then((response) => {
           t.src_local = t.src + '?'+ _.now() // eslint-disable-line
-          t.$emit('change')
+          t.$emit('change', response)
         })
-        .catch((response) => t.danger())
+        .catch((response) => {
+          t.$emit('change', response)
+        })
     },
     drop_handler (ev) {
       if (ev === undefined) {

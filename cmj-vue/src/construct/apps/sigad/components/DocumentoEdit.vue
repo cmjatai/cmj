@@ -237,6 +237,7 @@ export default {
     let t = this
     if (t.child) {
       t.elemento = t.child
+      // console.log(t.elemento.tipo)
       t.$nextTick()
         .then(function () {
           t.mode = 'UPDATE'
@@ -288,7 +289,7 @@ export default {
       color: black;
     }
   }
-  .tpd-texto, .tpd-audio, .tpd-video, .tpd-image, .tpd-gallery {
+  .tpd-texto, .tpd-audio, .tpd-video, .tpd-image, .tpd-gallery, .tpd-file {
     position: relative;
   }
   .widgets {
@@ -333,7 +334,7 @@ export default {
       background: transparentize(#fff, 0.7);
     }
   }
-  .tpd-texto, .tpd-audio, .tpd-video, .tpd-image, .tpd-gallery {
+  .tpd-texto, .tpd-audio, .tpd-video, .tpd-image, .tpd-gallery, .tpd-file {
     position: relative;
     padding-left: 10px;
     padding-right: 10px;

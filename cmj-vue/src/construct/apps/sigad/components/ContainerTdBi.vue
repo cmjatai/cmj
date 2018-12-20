@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import DocumentoEdit from './DocumentoEdit'
+import DocumentoEdit from './DocumentoEdit.vue'
 
 export default {
   name: 'container-td-bi',
@@ -63,7 +63,7 @@ export default {
       this.dragleave = el
       this.side = side
     },
-    changeImage: function () {
+    changeImage: function (response) {
       this.getDocumento(this.elemento.id)
     }
   }

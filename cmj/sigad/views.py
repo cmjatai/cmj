@@ -8,7 +8,8 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse_lazy
 from django.db.models import F, Q
 from django.db.models.aggregates import Max, Count
-from django.http.response import Http404, HttpResponse, HttpResponseForbidden
+from django.http.response import Http404, HttpResponse, HttpResponseForbidden,\
+    HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import TemplateView
@@ -96,7 +97,7 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
         # print(self.kwargs['slug'])
 
         if self.documento:
-            if self.documento.tipo == Documento.TPD_IMAGE:
+            if self.documento.tipo in (Documento.TPD_IMAGE, Documento.TPD_FILE):
                 try:
                     midia = self.documento.midia.last
                 except Exception as e:
@@ -351,8 +352,7 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
                     except:
                         raise Http404()
 
-        if self.documento and self.documento.tipo >= 100 and \
-                self.documento.tipo < 900:
+        if self.documento and self.documento.tipo in Documento.TDp_exclude_render:
             raise Http404()
 
         if self.documento:
@@ -502,8 +502,7 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
                         except:
                             pass
 
-        if self.documento and self.documento.tipo >= 100 and \
-                self.documento.tipo < 900:
+        if self.documento and self.documento.tipo in Documento.TDp_exclude_render:
             raise Http404()
 
         if not self.documento and not self.classe:
@@ -1091,7 +1090,8 @@ class DocumentoDeleteView(DocumentoPermissionRequiredMixin, DeleteView):
             'cmj.sigad:path_view',
             kwargs={'slug': self.object.classe.slug})
 
-    def delete_doc(self, doc):
+    # movido para o model documento
+    """def delete_doc(self, doc):
         # transfere  midia, caso exista, para ult rev de cada descendente
 
         childs = doc.childs.view_childs()
@@ -1108,12 +1108,13 @@ class DocumentoDeleteView(DocumentoPermissionRequiredMixin, DeleteView):
 
             midia.documento = None
             midia.revisao = ultima_revisao
-            midia.save()
+            midia.save()"""
 
     def delete(self, request, *args, **kwargs):
-        self.delete_doc(self.object)
-
-        return DeleteView.delete(self, request, *args, **kwargs)
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        self.object.delete(user=request.user)
+        return HttpResponseRedirect(success_url)
 
 
 class DocumentoConstructView(DocumentoPermissionRequiredMixin, TemplateView):

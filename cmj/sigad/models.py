@@ -231,8 +231,10 @@ class CMSMixin(models.Model):
     TD_VIDEO_NEWS = 40
 
     TPD_TEXTO = 100
+    TPD_FILE = 200
     TPD_CONTAINER_SIMPLES = 700
     TPD_CONTAINER_EXTENDIDO = 701
+    TPD_CONTAINER_FILE = 750
     TPD_VIDEO = 800
     TPD_AUDIO = 850
     TPD_IMAGE = 900
@@ -243,10 +245,17 @@ class CMSMixin(models.Model):
            TD_AUDIO_NEWS, TD_VIDEO_NEWS)
 
     # Containers
-    TDc = (TPD_CONTAINER_SIMPLES, TPD_CONTAINER_EXTENDIDO)
+    TDc = (TPD_CONTAINER_SIMPLES, TPD_CONTAINER_EXTENDIDO, TPD_CONTAINER_FILE)
 
     # Partes
-    TDp = (TPD_TEXTO, TPD_VIDEO, TPD_AUDIO, TPD_IMAGE, TPD_GALLERY)
+    TDp = (TPD_TEXTO, TPD_FILE, TPD_VIDEO, TPD_AUDIO, TPD_IMAGE, TPD_GALLERY)
+
+    # Tipos não acessiveis diretamente via URL
+    TDp_exclude_render = (TPD_TEXTO,
+                          TPD_CONTAINER_SIMPLES,
+                          TPD_CONTAINER_EXTENDIDO,
+                          TPD_VIDEO,
+                          TPD_AUDIO)
 
     tipo_parte_doc = {
         'documentos': CmjChoices(
@@ -263,10 +272,13 @@ class CMSMixin(models.Model):
              'container', _('Container Simples')),
             (TPD_CONTAINER_EXTENDIDO,
              'container_fluid', _('Container Extendido')),
+            (TPD_CONTAINER_FILE,
+             'container_file', _('Container de Imagens para Arquivo PDF')),
         ),
 
         'subtipos': CmjChoices(
             (TPD_TEXTO, 'tpd_texto', _('Texto')),
+            (TPD_FILE, 'tpd_file', _('Arquivo')),
             (TPD_VIDEO, 'tpd_video', _('Vídeo')),
             (TPD_AUDIO, 'tpd_audio', _('Áudio')),
             (TPD_IMAGE, 'tpd_image', _('Imagem')),
@@ -971,6 +983,26 @@ class Documento(ShortUrl, CMSMixin):
             return ''
 
         return c.absolute_slug
+
+    def delete(self, using=None, keep_parents=False, user=None):
+        # transfere  midia, caso exista, para ult rev de cada descendente
+
+        childs = self.childs.view_childs()
+
+        for child in childs:
+            child.delete()
+
+        ultima_revisao = self.revisoes.first()
+        if not ultima_revisao:
+            ultima_revisao = Revisao.gerar_revisao(self, user)
+
+        if hasattr(self, 'midia'):
+            midia = self.midia
+
+            midia.documento = None
+            midia.revisao = ultima_revisao
+            midia.save()
+        return super().delete(using=using, keep_parents=keep_parents)
 
     @property
     def alinhamento_css_class(self):

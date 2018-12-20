@@ -16,7 +16,7 @@
               {% avatar_user item.user_origin %}
               <div class="texto">
                 <div class="titulo">
-                  {{item.content_object|truncatechars:110}}
+                  {{item.content_object|safe|truncatechars:110}}
                 </div>
                 <div class="time">
                 há {{item.created|timesince}}
@@ -38,7 +38,7 @@
               </div>
               <div class="texto">
                 <div class="titulo">
-                  {{item.content_object|truncatechars:110}}
+                  {{item.content_object|safe|truncatechars:110}}
                 </div>
                 <div class="time">
                 há {{item.created|timesince}}
