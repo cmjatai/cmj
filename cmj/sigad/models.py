@@ -18,6 +18,11 @@ from django.utils.functional import cached_property
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields.json import JSONField
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.lib.units import cm
+from reportlab.pdfgen import canvas
+from reportlab.pdfgen.pdfimages import PDFImage
+from reportlab.platypus.doctemplate import SimpleDocTemplate
 from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
 
@@ -923,6 +928,16 @@ class Documento(ShortUrl, CMSMixin):
         through_fields=('referente', 'referenciado'),
         symmetrical=False,)
 
+    class Meta:
+        ordering = ('public_date', )
+        verbose_name = _('Documento')
+        verbose_name_plural = _('Documentos')
+        permissions = (
+            ('view_documento', _('Visualização dos Metadados do Documento.')),
+            ('view_documento_media',
+             _('Visualização das mídias do Documento')),
+        )
+
     def __str__(self):
         return self.titulo or self.get_tipo_display()
 
@@ -1012,15 +1027,34 @@ class Documento(ShortUrl, CMSMixin):
     def visibilidade_css_class(self):
         return self.VISIBILIDADE_STATUS.triple(self.visibilidade)
 
-    class Meta:
-        ordering = ('public_date', )
-        verbose_name = _('Documento')
-        verbose_name_plural = _('Documentos')
-        permissions = (
-            ('view_documento', _('Visualização dos Metadados do Documento.')),
-            ('view_documento_media',
-             _('Visualização das mídias do Documento')),
-        )
+    def build_container_file_to_pdf(self, response):
+
+        def page(canvas, doc, path):
+            pass
+
+        doc = SimpleDocTemplate(
+            response,
+            rightMargin=0,
+            leftMargin=0,
+            topMargin=0,
+            bottomMargin=0)
+
+        c = canvas.Canvas(response)
+        A4_landscape = landscape(A4)
+        for img in self.childs.order_by('ordem'):
+            path = img.midia.last.file.path
+
+            if img.midia.last.is_paisagem:
+                c.setPageSize(A4_landscape)
+            else:
+                c.setPageSize(A4)
+
+            dim = A4_landscape if img.midia.last.is_paisagem else A4
+            c.drawImage(path, 0, 0,
+                        width=dim[0],
+                        height=dim[1])
+            c.showPage()
+        c.save()
 
 
 class ReferenciaEntreDocumentosManager(models.Manager):
@@ -1216,6 +1250,10 @@ class VersaoDeMidia(models.Model):
             return im.height
         except:
             return 0
+
+    @cached_property
+    def is_paisagem(self):
+        return self.height < self.width
 
     def rotate(self, rotate):
         import os

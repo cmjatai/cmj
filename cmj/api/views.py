@@ -158,5 +158,6 @@ class DocumentoViewSet(viewsets.ModelViewSet):
                         versao.owner = self.request.user
                         versao.alinhamento = Documento.ALINHAMENTO_JUSTIFY
                         versao.save(with_file=file)
+
                 except:
                     ordem -= 1

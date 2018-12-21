@@ -9,10 +9,23 @@
     v-on:drop="drop"
     v-on:mouseover="mouseOver"
     v-on:mouseleave="mouseLeave">
-      <img :src="slug+'.128?'+refresh">
-      <div class="drag" @click="$emit('showmodal', elemento, pos)"></div>
+      <img :src="slug+'.256?'+refresh">
       <div class="imgmouseover" v-if="false">
         <img :src="slug+'.512?'+refresh">
+      </div>
+      <div class="drag">
+        <div class="btn-controls">
+          <span class="btn btn-rotate"  v-on:click="rotateLeft" title="Rotacionar 90 graus a esquerda">
+            <i class="fa fa-rotate-left" aria-hidden="true"></i>
+          </span>
+          <span class="btn btn-rotate"  v-on:click="rotateRight" title="Rotacionar 90 graus a direita">
+            <i class="fa fa-rotate-right" aria-hidden="true"></i>
+          </span>
+          <span class="btn btn-delete"  v-on:click="deleteParte" >
+            <i class="fa fa-trash" aria-hidden="true"></i>
+          </span>
+        </div>
+
       </div>
   </div>
 </template>
@@ -80,7 +93,7 @@ export default {
       this.mouseover = false
     },
     dragend (ev) {
-      console.log('dragend: tpdimagetdbi', ev)
+      console.log('dragend: TpdFile', ev)
       if (this.dragged) {
         this.$emit('ondragend', this.elemento)
       }
@@ -89,32 +102,63 @@ export default {
       this.draggedover = 0
     },
     dragenter (ev) {
-      console.log('dragenter: tpdimagetdbi', ev)
+      console.log('dragenter: TpdFile', ev)
       if (this.dragged) {
         this.draggedleave = false // não deve ser atribuido true em caso contrário
       }
     },
     dragleave (ev) {
-      console.log('dragleave: tpdimagetdbi', ev)
+      console.log('dragleave: TpdFile', ev)
       this.$emit('ondragleave', this.elemento, this.draggedover)
       this.draggedleave = this.dragged
       this.draggedover = 0
     },
     dragover (ev) {
-      console.log('dragover: tpdimagetdbi', ev)
+      console.log('dragover: TpdFile', ev)
       if (!this.dragged) {
         this.draggedover = ev.offsetX - ev.target.offsetWidth / 2
       }
     },
     dragstart (ev) {
-      console.log('dragstart: tpdimagetdbi', ev)
+      console.log('dragstart: TpdFile', ev)
       this.dragged = true
     },
     dragexit (ev) {
-      console.log('dragexit: tpdimagetdbi', ev)
+      console.log('dragexit: TpdFile', ev)
     },
     drop (ev) {
-      console.log('drop: tpdimagetdbi', ev)
+      console.log('drop: TpdFile', ev)
+    },
+    rotateLeft: function () {
+      let t = this
+      let data = Object()
+      data.id = t.elemento.id
+      data.rotate = 90
+      t.updateDocumento(data)
+        .then(() => {
+          t.elemento.refresh = _.now() // eslint-disable-line
+        })
+    },
+    rotateRight: function () {
+      let t = this
+      let data = Object()
+      data.id = t.elemento.id
+      data.rotate = -90
+      t.updateDocumento(data)
+        .then(() => {
+          t.elemento.refresh = _.now() // eslint-disable-line
+        })
+    },
+    deleteParte (event) {
+      let t = this
+      t.documentoResource.deleteDocumento(this.elemento.id)
+        .then((response) => {
+          t.$parent.getDocumento(t.parent.id)
+          t.success('Elemento excluído com sucesso.')
+        })
+        .catch((response) => {
+          t.danger(response.response.data.detail)
+        })
     }
   }
 }
@@ -158,6 +202,7 @@ export default {
       right: 0;
       bottom: 0;
       display: block;
+      z-index: 1;
 
       -moz-user-select: none;
       -khtml-user-select: none;
@@ -165,6 +210,11 @@ export default {
       user-select: none;
       -khtml-user-drag: element;
       -webkit-user-drag: element;
+    }
+    .btn-controls {
+      flex: 0 1 auto;
+      z-index: 2;
+      position: relative;
     }
   }
 }

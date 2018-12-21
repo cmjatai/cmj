@@ -176,68 +176,91 @@
   {% endwith %}
 
     {% for container in object.childs.view_childs %}
-      <div class="container{% if container.tipo == container.TPD_CONTAINER_EXTENDIDO%}-fluid{% else %} container-simples{% endif %} {% if forloop.first%}container-first{% endif %}">
-        {% if container.titulo %}
-          <div class="path-title-container">
-              <br>{{container.titulo}}
-          </div>
-        {% endif %}
-        {% if container.descricao %}
-          <div class="path-description">
-            {{container.descricao}}
-          </div>
-        {% endif %}
-
-      {% for child in container.childs.view_childs %}
-        {% if child.tipo == child.TPD_TEXTO %}
-          {% if child.titulo %}
-            <span class="path-title-partes">{{child.titulo|safe|urlize}}</span>
-          {% endif %}
-          {% if child.texto %}
-            {{child.texto|safe|urlize}}
-          {% endif %}
-
-          {% elif child.tipo == child.TPD_VIDEO %}
-            {% if child.titulo %}    <span class="path-title-partes">{{child.titulo|safe|urlize}}</span> {% endif %}
-            {% if child.descricao %} <small>{{child.descricao|safe|urlize}}</small>{% endif %}
-
-            {% if child.texto %}
-              <div class="embed-responsive embed-responsive-16by9">
-                {{child.texto|safe}}
-              </div>
-            {% endif %}
-
-          {% elif child.tipo == child.TPD_AUDIO %}
-            {% if child.titulo %}    <span class="path-title-partes">{{child.titulo|safe|urlize}}</span>{% endif %}
-            {% if child.descricao %} <small>{{child.descricao|safe|urlize}}</small>{% endif %}
-            {% if child.texto %}
-              <div class="embed-responsive embed-responsive-16by9 embed-audio">
-                {{child.texto|safe}}
-              </div>
-            {% endif %}
-
-          {% elif child.tipo == child.TPD_IMAGE %}
-            <div class="path-imagem {{child.alinhamento_css_class}}">
-              <a href="/{{child.absolute_slug}}" target="_blank">
-                <img src="/{{child.absolute_slug}}.{%if child.alinhamento == 1%}1024{%else%}512{%endif%}.jpg" alt="{% if child.titulo and not child.descricao %}{{child.titulo|default:child.parents.0.titulo}}{% endif %}{% if not child.titulo and child.descricao %}{{child.descricao|default:child.parents.0.descricao}}{% endif %}{% if not child.titulo and not child.descricao %}{{child.parents.0.descricao}}{% endif %}" />
-              </a>
-              <div  class="img-contexto">
-                <div class="autor">{{child.autor|default:''}}</div>
-                {% if child.titulo or child.descricao %}
-                <div class="texto">
-                  <div class="titulo">{{child.titulo|default:child.parents.0.titulo}}</div>
-                  <div class="descricao">{{child.descricao|default:''}}</div>
-                </div>
-                {% endif %}
-              </div>
+      {% if container.tipo == container.TPD_CONTAINER_FILE and container.childs.exists %}
+        <div class="container container-file">
+          <div class="path-title-container" >
+            <a tabindex="{{view.tabindex}}" href="/{{container.slug}}" target="_blank">
+              <i class="fa fa-2x fa-file-pdf-o" aria-hidden="true"></i>
+              <span >
+                {{container.titulo|default:''|safe|urlize}}
+              </span>
+            </a>
+            <div class="path-description">
+              {{container.descricao|default:''|safe|urlize}}
             </div>
+          </div>
+          {% with rev=container.revisoes.first %}
+              <span class="">
+                {{rev.data}} - {% trans "por:" %} {{rev.user.first_name|default:rev.user.email}}
+              </span>
+          
+          {% endwith %}
 
-          {% elif child.tipo == child.TPD_GALLERY %}
-              {% with child as object %}
-                {% include "path/path_gallery.html" %}
-              {% endwith %}
-        {% endif %}
-      {% endfor %}
+        </div>
+      {% else %}
+        <div class="container{% if container.tipo == container.TPD_CONTAINER_EXTENDIDO%}-fluid{% else %} container-simples{% endif %} {% if forloop.first%}container-first{% endif %}">
+          {% if container.titulo %}
+            <div class="path-title-container">
+                <br>{{container.titulo}}
+            </div>
+          {% endif %}
+          {% if container.descricao %}
+            <div class="path-description">
+              {{container.descricao}}
+            </div>
+          {% endif %}
+
+        {% for child in container.childs.view_childs %}
+          {% if child.tipo == child.TPD_TEXTO %}
+            {% if child.titulo %}
+              <span class="path-title-partes">{{child.titulo|safe|urlize}}</span>
+            {% endif %}
+            {% if child.texto %}
+              {{child.texto|safe|urlize}}
+            {% endif %}
+
+            {% elif child.tipo == child.TPD_VIDEO %}
+              {% if child.titulo %}    <span class="path-title-partes">{{child.titulo|safe|urlize}}</span> {% endif %}
+              {% if child.descricao %} <small>{{child.descricao|safe|urlize}}</small>{% endif %}
+
+              {% if child.texto %}
+                <div class="embed-responsive embed-responsive-16by9">
+                  {{child.texto|safe}}
+                </div>
+              {% endif %}
+
+            {% elif child.tipo == child.TPD_AUDIO %}
+              {% if child.titulo %}    <span class="path-title-partes">{{child.titulo|safe|urlize}}</span>{% endif %}
+              {% if child.descricao %} <small>{{child.descricao|safe|urlize}}</small>{% endif %}
+              {% if child.texto %}
+                <div class="embed-responsive embed-responsive-16by9 embed-audio">
+                  {{child.texto|safe}}
+                </div>
+              {% endif %}
+
+            {% elif child.tipo == child.TPD_IMAGE %}
+              <div class="path-imagem {{child.alinhamento_css_class}}">
+                <a href="/{{child.absolute_slug}}" target="_blank">
+                  <img src="/{{child.absolute_slug}}.{%if child.alinhamento == 1%}1024{%else%}512{%endif%}.jpg" alt="{% if child.titulo and not child.descricao %}{{child.titulo|default:child.parents.0.titulo}}{% endif %}{% if not child.titulo and child.descricao %}{{child.descricao|default:child.parents.0.descricao}}{% endif %}{% if not child.titulo and not child.descricao %}{{child.parents.0.descricao}}{% endif %}" />
+                </a>
+                <div  class="img-contexto">
+                  <div class="autor">{{child.autor|default:''}}</div>
+                  {% if child.titulo or child.descricao %}
+                  <div class="texto">
+                    <div class="titulo">{{child.titulo|default:child.parents.0.titulo}}</div>
+                    <div class="descricao">{{child.descricao|default:''}}</div>
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+
+            {% elif child.tipo == child.TPD_GALLERY %}
+                {% with child as object %}
+                  {% include "path/path_gallery.html" %}
+                {% endwith %}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
       {% if forloop.first and not forloop.last %}
         <div class="painel-corte">
           <div class="btn btn-success">

@@ -621,6 +621,22 @@
   }
 }
 
+.container-file {
+
+  i {
+    display: inline-block;
+  }
+  span {
+    line-height: 2em;
+    vertical-align: top;
+    display: inline-block;
+  }
+  .path-description {
+    margin: 0;
+    text-align: left;
+  }
+}
+
 @media screen and (max-width:767px) {
   .container-path {
 

@@ -247,7 +247,6 @@ class Command(BaseCommand):
     def import_graph(self):
         print('---- Normas Originais ----')
         for id, dsps in self.graph.items():
-            print(id)
             self.ta = TextoArticulado.objects.get(pk=id)
             self._ordem = 0
             roots = self.load_roots(id)
@@ -580,6 +579,8 @@ class Command(BaseCommand):
 
             numero = [io['paragrafo'], 0, 0, 0, 0, 0]
 
+            if io['id'] in (46773, ):
+                numero[0] = 2
             if io['id'] in (54010, 57991):
                 numero[0] = 3
             elif io['id'] in (57838, 56855, 9746, 73697):
@@ -600,7 +601,7 @@ class Command(BaseCommand):
                     rotulo,
                     numero=numero)
             except Exception as e:
-                print('erro de parágrafo:', io['id'])
+                print('erro de parágrafo:', io['id'], io['id_lei'])
 
             if only_originals:
                 break

@@ -1,15 +1,23 @@
 <template lang="html">
   <div :class="[name_component, 'container']">
+    <span class="btn-pdf" >
+      <b-button-group >
+        <b-button v-if="childsOrdenados.length!=0" variant="primary">
+          <i class="fa fa-2x fa-file-pdf-o" aria-hidden="true"  v-on:click.self="clickVersaoFinal"></i>
+        </b-button>
+      </b-button-group>
+    </span>
     <div class="path-title-file construct">
       <input v-model.lazy="elemento.titulo" placeholder="Título do Arquivo..."/>
     </div>
-    <input v-model.lazy="elemento.descrição" placeholder="Descrição do Arquivo..."/>
-
+    <div class="path-description-file construct">
+      <input v-model.lazy="elemento.descricao" placeholder="Descrição do Arquivo..."/>
+    </div>
     <div class="drop-area">
       <drop-zone v-on:change="changeImage" :elemento="elemento" :src="slug" :multiple="true" :resource="documentoResource"/>
     </div>
     <div class="inner">
-      <modal-image-list v-if="showModal >= 0" @close="showModal = -1" :elementos="childsOrdenados" :child="showElemento" :pos="showModal" :parent="elemento" />
+      <!--modal-image-list v-if="showModal >= 0" @close="showModal = -1" :elementos="childsOrdenados" :child="showElemento" :pos="showModal" :parent="elemento" /-->
       <component :is="classChild(value)" v-on:ondragend="ondragend" v-on:ondragleave="ondragleave" v-for="(value, key) in childsOrdenados" :child="value" :parent="elemento" :key="value.id" :pos="key" v-on:showmodal="showModalAction"/>
     </div>
     <div class="btn-toolbar widgets widget-bottom justify-content-end">
@@ -44,6 +52,9 @@ export default {
     }
   },
   methods: {
+    clickVersaoFinal () {
+      window.open(this.slug, '_blank')
+    },
     toogleTitulo (event) {
       this.has_titulo = !this.has_titulo
     },
@@ -172,6 +183,14 @@ export default {
   }
   .path-title-file {
     font-size: 130%;
+  }
+  .path-description-file {
+    margin-bottom: 5px;
+  }
+  .btn-pdf {
+    position: absolute;
+    right: 0;
+    top: 0;
   }
 }
 </style>
