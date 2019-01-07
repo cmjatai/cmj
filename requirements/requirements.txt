@@ -7,7 +7,7 @@ djangorestframework-recursive
 dj-database-url==0.5.0
 django-braces==1.9.0
 django-crispy-forms==1.7.2
-django-floppyforms==1.9.0
+django-floppyforms==1.7.0
 django-extra-views==0.12.0
 django-model-utils==3.1.2
 django-sass-processor==0.7.2
@@ -37,7 +37,7 @@ social-auth-app-django==2.0.0
 python-dateutil
 django-webpack-loader
 
-git+git://github.com/django-admin-bootstrapped/django-admin-bootstrapped.git
+git+git://github.com/rubgombar1/django-admin-bootstrapped.git
 git+git://github.com/jasperlittle/django-rest-framework-docs
 git+git://github.com/interlegis/trml2pdf.git
 git+git://github.com/cmjatai/sapl.git@3.1.x.cmj.cmj-portal
