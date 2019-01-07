@@ -324,11 +324,7 @@
 
 @media screen and (max-width: 1199px) {
   .navbar-menu {
-    .container {
-      width: auto;
-      max-width: 100%;
-      padding: 0 5px;
-    }
+    
     .navbar-nav {
       & > li {
         a {
@@ -363,6 +359,11 @@
     }
   }
   .navbar-menu {
+    .container {
+      width: auto;
+      max-width: 100%;
+      padding: 0 5px;
+    }
     .navbar-nav {
       & > li {
         margin: 0px;
