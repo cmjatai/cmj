@@ -741,7 +741,7 @@ class Command(BaseCommand):
             'abcdefghijklmnopqrstuvwxyz' + \
             'ABCDEFGHIJKLMNOPQRSTUVWXYZ' + \
             '0123456789' + \
-            'ºª§/-_,.;:!@#$%*()?[]~"<>=\r\n\t²³°&+' + "'"
+            'ºª§/-_,.;:!@#$%*()?[]~"<>=\r\n\t²³°&+|' + "'"
 
         black_char = {
             '´': "'",
@@ -755,7 +755,8 @@ class Command(BaseCommand):
             '“': '"',
             '½': '1/2',
             '’': '"',
-            '‘': '"'
+            '‘': '"',
+            '¼': '1/4'
         }
 
         for c in texto:
