@@ -2,6 +2,8 @@
 - title: {% trans 'Institucional' %}
   url: ''
   children:
+  - title: {% trans 'Comissões' %}
+    url: sapl.comissoes:comissao_list
   - title: {% trans 'Agenda Pública' %}
     url: /evento/
   - title: {% trans 'Nossa Jataí' %}
@@ -11,52 +13,55 @@
     children:
     - title: {% trans 'Prefeitos de Nossa História' %}
       url: /institucional/historia/prefeitos-de-nossa-historia
-- title: {% trans 'Parlamentares' %}
+- title: {% trans 'Vereadores' %}
   url: /parlamentar
 - title: {% trans 'Notícias' %}
   url: /noticias
-- title: {% trans 'TV CMJ' %}
+- title: {% trans 'Mídias' %}
   url: ''
   children:
-  - title: {% trans 'Transmissão ao vivo' %}
-    url: http://www.jatai.go.leg.br/tv-cmj/ao-vivo
-  - title: {% trans 'Sessões Transmitidas' %}
+  - title: {% trans 'TV CMJ' %}
     url: ''
     children:
-    - title: {% trans 'Sessões Solenes' %}
-      url: /tv-cmj/sessoes/sessoes-solenes
-    - title: {% trans 'Sessões Plenárias' %}
+    - title: {% trans 'Transmissão ao vivo' %}
+      url: http://www.jatai.go.leg.br/tv-cmj/ao-vivo
+    - title: {% trans 'Sessões Transmitidas' %}
       url: ''
       children:
-      - title: '{% trans '2018' %}'
-        url: /tv-cmj/sessoes/sessoes-plenarias/2018
-      - title: '{% trans '2017' %}'
-        url: /tv-cmj/sessoes/sessoes-plenarias/2017
-      - title: '{% trans '2016' %}'
-        url: /tv-cmj/sessoes/sessoes-plenarias/2016
-      - title: '{% trans '2015' %}'
-        url: /tv-cmj/sessoes/sessoes-plenarias/2015
-      - title: '{% trans '2014' %}'
-        url: /tv-cmj/sessoes/sessoes-plenarias/2014
-      - title: '{% trans '2013' %}'
-        url: /tv-cmj/sessoes/sessoes-plenarias/2013
-  - title: {% trans 'Audiências Públicas' %}
-    url: /tv-cmj/audiencias-publicas
-  - title: {% trans 'Entrevistas' %}
-    url: /tv-cmj/entrevistas
-  - title: {% trans 'Memórias de jataí' %}
-    url: /tv-cmj/memorias-de-jatai
-- title: {% trans 'Rádio CMJ' %}
-  url: ''
-  children:
-  - title: {% trans 'Rádio ao vivo' %}
-    url: http://www.jatai.go.leg.br/radio-cmj/ao-vivo
-  - title: {% trans 'Galeria de Áudio' %}
-    url: /radio-cmj
-- title: {% trans 'Galerias' %}
-  children:
-  - title: {% trans 'Imagens' %}
-    url: /galerias/imagens
+      - title: {% trans 'Sessões Solenes' %}
+        url: /tv-cmj/sessoes/sessoes-solenes
+      - title: {% trans 'Sessões Plenárias' %}
+        url: ''
+        children:
+        - title: '{% trans '2018' %}'
+          url: /tv-cmj/sessoes/sessoes-plenarias/2018
+        - title: '{% trans '2017' %}'
+          url: /tv-cmj/sessoes/sessoes-plenarias/2017
+        - title: '{% trans '2016' %}'
+          url: /tv-cmj/sessoes/sessoes-plenarias/2016
+        - title: '{% trans '2015' %}'
+          url: /tv-cmj/sessoes/sessoes-plenarias/2015
+        - title: '{% trans '2014' %}'
+          url: /tv-cmj/sessoes/sessoes-plenarias/2014
+        - title: '{% trans '2013' %}'
+          url: /tv-cmj/sessoes/sessoes-plenarias/2013
+    - title: {% trans 'Audiências Públicas' %}
+      url: /tv-cmj/audiencias-publicas
+    - title: {% trans 'Entrevistas' %}
+      url: /tv-cmj/entrevistas
+    - title: {% trans 'Memórias de jataí' %}
+      url: /tv-cmj/memorias-de-jatai
+  - title: {% trans 'Rádio CMJ' %}
+    url: ''
+    children:
+    - title: {% trans 'Rádio ao vivo' %}
+      url: http://www.jatai.go.leg.br/radio-cmj/ao-vivo
+    - title: {% trans 'Galeria de Áudio' %}
+      url: /radio-cmj
+  - title: {% trans 'Galerias' %}
+    children:
+    - title: {% trans 'Imagens' %}
+      url: /galerias/imagens
 - title: {% trans 'Fale Conosco' %}
   url: ''
   children:

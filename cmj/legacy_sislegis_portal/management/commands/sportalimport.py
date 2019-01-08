@@ -65,7 +65,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.reset_sequences()
         self.run()
-        print(self.caracter_desconhecido)
+        for cd in self.caracter_desconhecido:
+            print(cd)
         # self.reset_sequences()
 
     def reset_sequences(self):
@@ -247,10 +248,15 @@ class Command(BaseCommand):
     def import_graph(self):
         print('---- Normas Originais ----')
         for id, dsps in self.graph.items():
-            self.ta = TextoArticulado.objects.get(pk=id)
-            self._ordem = 0
-            roots = self.load_roots(id)
-            self.import_subtree(roots, dsps)
+            try:
+                self.ta = TextoArticulado.objects.get(pk=id)
+                print(self.ta)
+                self._ordem = 0
+                roots = self.load_roots(id)
+                self.import_subtree(roots, dsps)
+            except:
+                print(id, dsps)
+                return
 
         print('---- Blocos de alteração ----')
         for key, value in self.arestas_internas.items():
@@ -581,9 +587,9 @@ class Command(BaseCommand):
 
             if io['id'] in (46773, ):
                 numero[0] = 2
-            if io['id'] in (54010, 57991):
+            if io['id'] in (54010, 57991, 62879, 68520):
                 numero[0] = 3
-            elif io['id'] in (57838, 56855, 9746, 73697):
+            elif io['id'] in (57838, 56855, 9746, 73697, 64452):
                 numero[0] = 4
 
             elif io['id'] in (5243, ):
@@ -747,12 +753,15 @@ class Command(BaseCommand):
             '·': " ",
             '”': '"',
             '“': '"',
+            '½': '1/2',
+            '’': '"',
+            '‘': '"'
         }
 
         for c in texto:
             if c in black_char:
                 texto.replace(c, black_char[c])
-            elif ord(c) in (160, 173):
+            elif ord(c) in (160, 173, 172, 145, 151, 92, 8211):
                 texto.replace(c, '-')
             elif c not in white_char:
                 self.caracter_desconhecido.append((ord(c), c, texto))
