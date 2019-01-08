@@ -110,6 +110,7 @@ jspm_packages
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+yarn.lock
 
 # Optional npm cache directory
 .npm
