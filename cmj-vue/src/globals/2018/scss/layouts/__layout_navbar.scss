@@ -1,7 +1,7 @@
-
 .navbar {
   background: darken($color_topo_bg, 5%) $url_bg_png;
   padding: 0px;
+  z-index: 2;
   .navbar-nav {
     flex-basis: 100%;
   }
@@ -34,6 +34,7 @@
       align-items: center;
       color: $color_text_menu;
       font-family: Lato, Helvetica, sans-serif;
+      font-weight: 400;
       padding: 0 6px;
       &:hover {
         color: white;

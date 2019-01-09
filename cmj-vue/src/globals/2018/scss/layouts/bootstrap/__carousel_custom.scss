@@ -36,9 +36,11 @@
     margin: 0px;
     width: 100%;
     li {
+      height: 4px;
       flex: 1 1 auto;
       margin: 0px;
       width: auto;
+      border-width: 0;
       &.active {
         background-color: $color_text_title;
       }
