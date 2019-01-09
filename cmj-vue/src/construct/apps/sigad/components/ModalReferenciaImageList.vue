@@ -88,10 +88,10 @@ export default {
         .catch((response) => this.danger())
     },
     success (message = 'Informação atualizada com sucesso.') {
-      this.sendMessage({alert: 'alert-success', message: message})
+      this.sendMessage({ alert: 'alert-success', message: message })
     },
     danger (message = 'Ocorreu um erro na comunicação com o servidor.') {
-      this.sendMessage({alert: 'alert-danger', message: message})
+      this.sendMessage({ alert: 'alert-danger', message: message })
     },
 
     leftParte: function () {

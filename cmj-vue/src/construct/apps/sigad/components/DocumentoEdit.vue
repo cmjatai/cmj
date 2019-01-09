@@ -171,17 +171,21 @@ export default {
         .catch((response) => this.danger())
     },
     success (message = 'Informação atualizada com sucesso.') {
-      this.sendMessage({alert: 'alert-success', message: message})
+      this.sendMessage({ alert: 'alert-success', message: message })
     },
     danger (message = 'Ocorreu um erro na comunicação com o servidor.') {
-      this.sendMessage({alert: 'alert-danger', message: message})
+      this.sendMessage({
+        alert: 'alert-danger',
+        message: message
+      })
     },
     createDocumento (data) {
       let t = this
       t.documentoResource.createDocumento(data)
         .then((response) => {
           t.setDocObject(response.data)
-          t.$router.push({name: 'documento_construct', params: {id: response.data.id}})
+          t.$router.push({
+            name: 'documento_construct', params: { id: response.data.id } })
           t.$nextTick()
             .then(function () {
               t.getDocumento(response.data.id)
