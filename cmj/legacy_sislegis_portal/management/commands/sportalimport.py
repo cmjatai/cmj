@@ -232,7 +232,7 @@ class Command(BaseCommand):
                         return value['item']['id_alterador']
             return 0
 
-        _ID = 0
+        _ID = 1117
 
         run_doc(_ID=_ID)
 
@@ -585,9 +585,10 @@ class Command(BaseCommand):
 
             numero = [io['paragrafo'], 0, 0, 0, 0, 0]
 
-            if io['id'] in (46773, ):
+            if io['id'] in (46773, 63405):
                 numero[0] = 2
-            if io['id'] in (54010, 57991, 62879, 68520):
+            if io['id'] in (54010, 57991, 62879, 68520, 84312,
+                            20842, 18853, 18823, 15815):
                 numero[0] = 3
             elif io['id'] in (57838, 56855, 9746, 73697, 64452):
                 numero[0] = 4
