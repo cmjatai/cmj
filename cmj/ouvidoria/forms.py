@@ -9,7 +9,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from cmj.context_processors import areatrabalho
 from cmj.core.models import AreaTrabalho, Notificacao
-from cmj.crispy_layout_mixin import SaplFormLayout, to_row, form_actions
+from cmj.crispy_layout_mixin import SaplFormLayout, to_row, form_actions,\
+    to_column
 from cmj.ouvidoria.models import Solicitacao, MensagemSolicitacao
 
 
@@ -172,24 +173,21 @@ class SolicitacaoForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
 
-        rows = to_row(
-            [
-                (Div(
-                    to_row([('titulo', 10), ('tipo', 2),
-                            ('descricao', 12), ])
-                ), 7),
-                (Div(
-                    to_row([('areatrabalho_parlamentar', 12)])
-                ), 5),
-
-            ]
-        )
+        row = Div(
+            to_column((
+                to_row([('titulo', 10), ('tipo', 2),
+                        ('descricao', 12), ]),
+                8)),
+            to_column((
+                to_row([('areatrabalho_parlamentar', 12)]),
+                4)),
+            css_class="row")
 
         super().__init__(*args, **kwargs)
 
         self.helper = FormHelper()
         self.helper.layout = SaplFormLayout(
-            *rows,
+            row,
             actions=form_actions(label=_('Enviar'))
         )
 
