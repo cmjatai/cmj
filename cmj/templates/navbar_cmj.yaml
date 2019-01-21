@@ -33,6 +33,8 @@
       - title: {% trans 'Sessões Plenárias' %}
         url: ''
         children:
+        - title: '{% trans '2019' %}'
+          url: /tv-cmj/sessoes/sessoes-plenarias/2019
         - title: '{% trans '2018' %}'
           url: /tv-cmj/sessoes/sessoes-plenarias/2018
         - title: '{% trans '2017' %}'

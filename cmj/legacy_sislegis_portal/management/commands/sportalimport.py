@@ -232,9 +232,10 @@ class Command(BaseCommand):
                         return value['item']['id_alterador']
             return 0
 
-        _ID = 1117
+        _ID = 2222
 
-        run_doc(_ID=_ID)
+        if _ID == 0:
+            run_doc(_ID=_ID)
 
         while _ID:
             run_doc(_ID=_ID)
