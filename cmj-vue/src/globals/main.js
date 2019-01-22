@@ -1,5 +1,5 @@
 import './2018/scss/app.scss'
-import 'font-awesome/css/font-awesome.css'
+import '@fortawesome/fontawesome-free/css/all.css'
 import 'jquery-ui-themes/themes/pepper-grinder/jquery-ui.min.css'
 
 import 'bootstrap'

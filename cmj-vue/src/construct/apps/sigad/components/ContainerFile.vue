@@ -3,7 +3,7 @@
     <span class="btn-pdf" >
       <b-button-group >
         <b-button v-if="childsOrdenados.length!=0" variant="primary">
-          <i class="fa fa-2x fa-file-pdf-o" aria-hidden="true"  v-on:click.self="clickVersaoFinal"></i>
+          <i class="far fa-file-pdf" aria-hidden="true"  v-on:click.self="clickVersaoFinal"></i>
         </b-button>
       </b-button-group>
     </span>

@@ -8,26 +8,26 @@
       </template>
       <template slot="header-actions">
         <span class="btn btn-lg btn-rotate"  v-on:click="rotateLeft" title="Rotacionar 90 graus a esquerda">
-          <i class="fa fa-rotate-left" aria-hidden="true"></i>
+          <i class="fas fa-undo" aria-hidden="true"></i>
         </span>
         <span class="btn btn-lg btn-rotate"  v-on:click="rotateRight" title="Rotacionar 90 graus a direita">
-          <i class="fa fa-rotate-right" aria-hidden="true"></i>
+          <i class="fas fa-redo" aria-hidden="true"></i>
         </span>
         <span class="btn btn-lg btn-delete"  v-on:click="deleteParte" >
-          <i class="fa fa-trash" aria-hidden="true"></i>
+          <i class="fas fa-trash" aria-hidden="true"></i>
         </span>
         <span class="btn btn-lg btn-close"  @click="$emit('close')">
-          <i class="fa fa-times" aria-hidden="true"></i>
+          <i class="fas fa-times" aria-hidden="true"></i>
         </span>
       </template>
 
       <template slot="body">
         <img :src="slug_local">
         <div v-if="pos !== elementos.length - 1" class="btn btn-direction btn-right" v-on:click="rightParte">
-          <i class="fa fa-3x fa-chevron-right" aria-hidden="true"></i>
+          <i class="fas fa-3x fa-chevron-right" aria-hidden="true"></i>
         </div>
         <div v-if="pos !==0" class="btn btn-direction btn-left" v-on:click="leftParte">
-          <i class="fa fa-3x fa-chevron-left" aria-hidden="true"></i>
+          <i class="fas fa-3x fa-chevron-left" aria-hidden="true"></i>
         </div>
       </template>
       <template slot="footer">

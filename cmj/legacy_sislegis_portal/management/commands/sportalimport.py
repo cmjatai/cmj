@@ -251,22 +251,23 @@ class Command(BaseCommand):
         for id, dsps in self.graph.items():
             try:
                 self.ta = TextoArticulado.objects.get(pk=id)
-                print(self.ta)
+                print('N.O.', self.ta)
                 self._ordem = 0
                 roots = self.load_roots(id)
                 self.import_subtree(roots, dsps)
             except:
-                print(id, dsps)
-                return
+                print('N.O. erro:', id, dsps)
 
         print('---- Blocos de alteração ----')
         for key, value in self.arestas_internas.items():
             if value['bloco_alteracao']:
                 self.create_bloco_alteracao(key)
+                print('B.A.', key)
 
         print('---- Compilação ----')
         for id, dsps in self.graph.items():
             self.ta = TextoArticulado.objects.get(pk=id)
+            print('Comp:', self.ta)
             self._ordem = 0
             roots = self.load_roots(id)
             self.import_subtree(roots, dsps, only_originals=False)
@@ -295,17 +296,20 @@ class Command(BaseCommand):
                 if not hasattr(self, _method):
                     _method = 'import_basico'
 
-                # try:
-                last = getattr(self, _method)(
-                    last,
-                    sub_node,
-                    sub['item'],
-                    only_originals=only_originals,
-                    type=(sub['type'], )
-                )
-                """except Exception as e:
+                try:
+                    # if sub['item'][0]['id'] == 84667:
+                    #    print(sub['item'][0]['id'])
+
+                    last = getattr(self, _method)(
+                        last,
+                        sub_node,
+                        sub['item'],
+                        only_originals=only_originals,
+                        type=(sub['type'], )
+                    )
+                except Exception as e:
                     print(sub['item'][0]['id'])
-                    raise Exception(e)"""
+                    raise Exception(e)
 
             last = self.import_subtree(
                 last, sub['subtree'], only_originals=only_originals)
@@ -589,15 +593,27 @@ class Command(BaseCommand):
             if io['id'] in (46773, 63405):
                 numero[0] = 2
             if io['id'] in (54010, 57991, 62879, 68520, 84312,
-                            20842, 18853, 18823, 15815):
+                            20842, 18853, 18823, 15815, 24952,
+                            37877, 84386, 36497, 36511, 25254,
+                            36561, 36598, 16167, 18864, 36852,
+                            17111, 79237, 2780, 47023, 8600, 35828,
+                            8685, 36359
+                            ):
                 numero[0] = 3
-            elif io['id'] in (57838, 56855, 9746, 73697, 64452):
+            elif io['id'] in (57838, 56855, 9746, 73697, 64452,
+                              25821, 36872):
                 numero[0] = 4
-
-            elif io['id'] in (5243, ):
+            elif io['id'] in (5243, 18902, 21912, 24456, 35958,
+                              36224, 36259, 24815, 26090, 84429):
                 numero[0] = 5
-            elif io['id'] in (84312, ):
-                print(io)
+            elif io['id'] in ():
+                numero[0] = 6
+            elif io['id'] in (36333, 37867):
+                numero[0] = 7
+            elif io['id'] in (36539, ):
+                numero[0] = 9
+            elif io['id'] in (84420, ):
+                numero[0] = 13
 
             try:
                 d = self.create_dispositivo(

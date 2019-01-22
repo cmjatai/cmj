@@ -88,8 +88,10 @@ module.exports = {
     new BundleTracker({filename: './webpack-stats.json'}),
     new webpack.ProvidePlugin({
       $: 'jquery',
+      jquery: 'jquery',
+      'window.jQuery': 'jquery',
       jQuery: 'jquery',
-      'window.jQuery': 'jquery'
+      _: 'lodash'
     }),
     new PreloadWebpackPlugin()
   ],

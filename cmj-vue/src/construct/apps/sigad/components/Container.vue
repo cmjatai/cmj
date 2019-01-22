@@ -26,7 +26,7 @@
         <button v-on:click.self="addBrother('container-file', $event)" title="Adicionar novo Container Para PDF"  type="button" class="btn btn-default">+CF</button>
       </div>
       <div class="btn-group btn-group-sm">
-        <button v-on:click="containerTrocarTipo" title="Trocar tipo deste Container" type="button" class="btn btn-default"><i class="fa fa-exchange"></i></button>
+        <button v-on:click="containerTrocarTipo" title="Trocar tipo deste Container" type="button" class="btn btn-default"><i class="fas fa-exchange-alt"></i></button>
       </div>
       <div class="btn-group btn-group-sm">
         <button v-on:click.self="deleteParte" title="Remover este Container" type="button" class="btn btn-danger">x</button>
