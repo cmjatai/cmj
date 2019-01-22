@@ -149,7 +149,8 @@ class CmjUserChangeForm(ModelForm):
         )
 
         self.helper = FormHelper()
-        self.helper.layout = SaplFormLayout(*rows)
+        self.helper.layout = SaplFormLayout(rows)
+        self.helper.include_media = False
 
         if not self.instance.pwd_created:
             self.fields['old_password'].widget = forms.HiddenInput()

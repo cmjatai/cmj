@@ -22,6 +22,8 @@
       <link rel="icon" href="{% webpack_static 'img/logo_128.png' %}"  type="image/png" >
       {% render_bundle  'globals' 'css' %}
     {% endblock %}
+
+    {% block widgets_form_css %}{% endblock widgets_form_css %}
   </head>
 
   <body class="{% block body_class %}{%endblock%}">
@@ -334,6 +336,9 @@
     {% block extra_js %}{% endblock %}
     
   {% endblock foot_js %}
+
+  {% block widgets_form_js %}{% endblock widgets_form_js %}
+  
   <script>
     $(document).ready(function () {
       $("#menu-toggle").click(function (e) {
