@@ -339,8 +339,9 @@
 
   {% block widgets_form_js %}{% endblock widgets_form_js %}
   
-  <script>
-    $(document).ready(function () {
+  <script language="JavaScript" type="text/javascript" >
+  
+    $(function () {
       $("#menu-toggle").click(function (e) {
         e.preventDefault();
         $("#wrapper").toggleClass("toggled");

@@ -103,7 +103,7 @@
     position: relative;
     display: flex;
     line-height: 1;
-    z-index: 3;
+    z-index: 5;
     top: 43px;
     .btn {
       color: rgb(202, 125, 24);
@@ -122,6 +122,38 @@
   }
 }
 
+.btn-segmentos {
+  background: darken($color_main_bg, 10%) $url_bg_png;
+  flex: 1 1 25%;
+  font-size: 1.2rem;
+  align-items: center;
+  display: flex;
+  
+  span {
+    font-variant: small-caps;
+    font-weight: bold;
+    color: $color_text;
+  }
+  &:hover {
+    text-decoration: none;
+    background: darken($color_main_bg, 30%) $url_bg_png;
+  }
+    
+  &:not(:last-child) {
+    margin-bottom: 0.25rem;
+  }
+  i {
+    color: $color_text;
+    width: 4rem;
+    height: 4rem;
+    text-align: center;
+    border: 3px solid #fff;
+    border-radius: 50%;
+    line-height: 4rem;
+    margin: 5px 10px;
+  }
+}
+
 @media screen and (max-width: 991px) {
   .header-accessibility {
     .links-to-content {
@@ -131,6 +163,9 @@
     }
   }
 }
+
+
+
 
 /* 
 main {

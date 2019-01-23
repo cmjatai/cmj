@@ -38,7 +38,7 @@
               title = "{% blocktrans with backend_name=backend|social_title %}Acessar com {{ backend_name }}{% endblocktrans %}"
               href="{% url 'social:begin' backend=backend %}?next={{view.get_success_url}}">
               
-              <i class="fa {{ backend|social_icon }}"></i>
+              <i class="fab {{ backend|social_icon }}"></i>
               {% blocktrans with backend_name=backend|social_title %}Acessar com {{ backend_name }}{% endblocktrans %}
             </a>
           {% endfor %}

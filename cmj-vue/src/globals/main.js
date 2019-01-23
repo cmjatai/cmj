@@ -22,3 +22,6 @@ import './2018/js/app_cmj'
 import './2018/image_cropping'
 
 // import './2018/themes/dezembrolaranja/app.scss'
+
+window.jQuery = jQuery
+window.$ = jQuery

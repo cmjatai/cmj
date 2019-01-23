@@ -1,7 +1,4 @@
-import jQuery from 'jquery'
 import './functions'
-
-window.$ = window.jQuery = jQuery
 
 window.Gallery = function () {
   let instance
@@ -745,10 +742,10 @@ window.TrechoSearch = function (opts) {
   })
 }
 
-window.$(document).ready(function () {
+$(function () {
   window.refreshDatePicker()
   window.refreshMask()
   window.autorModal()
   // initTinymce()
-  window.OptionalCustomFrontEnd()
+  // window.OptionalCustomFrontEnd()
 })

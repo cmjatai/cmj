@@ -1,7 +1,7 @@
 @import "variables";
 #pagina-inicial {
   .carousel-custom {
-    margin-top: $grid-gutter-width;
+    margin-top: $spacer * 2;
   }
 }
 
@@ -11,8 +11,8 @@
   .imagem {
     background-size: cover;
     background-repeat: no-repeat;
-    background-position: 50% center;
-    height: 450px;
+    background-position: center 25%;
+    height: 350px;
   }
   .navbar-social-links {
     padding-top: 5px;
