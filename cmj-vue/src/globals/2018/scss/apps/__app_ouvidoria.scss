@@ -117,10 +117,19 @@
     }
     i {
         line-height: 160%;
+        opacity: 0.9;
     }
 
+
     &:hover {
-      background-color: $hover_background_10p !important;
+
+      i {
+        opacity: 1;
+      }
+      .fa-lightbulb {
+        text-shadow: 1px 1px 20px #fff;
+      }
+      //  background-color: $hover_background_10p !important;
     }
   }
   .btn-ouvidoria {
