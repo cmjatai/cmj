@@ -25,14 +25,16 @@
 }
 
 .container-login {
+  box-shadow: 0px 1px 1px #ddd;
   min-height: 100%;
   position: relative;
-  margin: 7% 15%;
+  margin: 3% 22%;
   background-color: transparent;
   color: $color_topo_bg;
+  border: 0;
   .inner {
-
     padding: $grid-gutter-width;
+    line-height: 1;
   }
   .logo-cmj {
     position: absolute;
@@ -56,11 +58,11 @@
     margin: 30px 10% 0;
     span.fa {
       position: absolute;
-      padding: 0.4em;
+      padding: 0.2em;
+      opacity: 0.6;
     }
   }
   #login-form {
-    border-radius: 5px;
     background: white;
     overflow: hidden;
   }
@@ -69,8 +71,8 @@
     text-align: right;
   }
   input {
-    height: 2.5em;
-    font-size: 1.4em;
+    height: 2em;
+    font-size: 1.3em;
     border: 1px solid rgba($color_topo_bg, 0.7);
 
     padding: 1em 1em 1em 2.2em;
@@ -84,40 +86,56 @@
   }
   
   .btns-login {
-    margin: 0.7em auto 0;
-    display: block;
-    max-width: 500px;
-
+    margin: 1em 0;
     .btn-login {
+      position: relative;
       display: inline-block;
       width: 100%;
-      letter-spacing: 4px;
-      margin-top: 1em;
+      letter-spacing: 0px;
       text-align: center;
-      font-family: "Graduate";
+      font-size: 1.1rem;
+      cursor: pointer;
 
-      border: 1px solid $color_topo_bg;
+      border: 0px solid $color_topo_bg;
       background-color: $color_topo_bg;
-      line-height: 40px;
+      line-height: 43px;
       color: white;
       text-decoration: none;
 
+      i {
+        background-color: white;
+        margin-right: 15px;
+        line-height: 1.8rem;
+        width: 1.8rem;
+        border-radius: 5px;
+      }
+
+
       &[name="facebook"]  {
-        border: 1px solid #0073b7;
-        background-color:  #0073b7;
+        background-color:  #4267B2;
+        i { 
+          color:  #4267B2;
+        }
       }
       &[name="google-oauth2"] {
-        border: 1px solid #e55;
         background-color: #e55;
+        i { 
+          color:  #e55;
+        }
       }
       &:hover {
-        border: 1px solid #000;
         background: black $url_bg_png;
       }
       img {
         width: 24px;
       }
     }
+    &.box-entry {
+      margin: $grid-gutter-width 0 0 0;
+      padding: 1em 2em;
+      border: 1px solid #ccc;
+    }
+    
   }
 
 }
@@ -144,23 +162,38 @@
 
 
 
+@media screen and (max-width: 1199px) {
+  .container-login {
+    margin: 0 15% $grid-gutter-width/2;
+  }
+}
 @media screen and (max-width: 991px) {
   .container-login {
-    margin: 1% 5%;
+    margin: 0 10% $grid-gutter-width/2;
     .inner {
       padding: $grid-gutter-width/2;
+    }
+  }
+  .container-login-inner {
+    .container-login {
+      margin: 10px 1%;
     }
   }
 }
 
 @media screen and (max-width: 767px) {
   .container-login {
-    margin: $grid-gutter-width / 2;
+    margin: $grid-gutter-width / 2 0;
     .inner {
       padding: $grid-gutter-width / 2;
     }
     .input-icon {
       margin: $grid-gutter-width / 2;
+    }
+    .btns-login {
+      .btn-login {
+        margin-top: 10px;
+      }
     }
   }
 }
@@ -204,12 +237,7 @@
     .row-recovery {
       margin: 0 10px;
     }
-    .btns-login {
-      .btn-login {
-        margin-top: 10px;
-        letter-spacing: 2px;
-      }
-    }
+    
   }
   .container-login-inner {
     .container-login {

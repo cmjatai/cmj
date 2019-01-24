@@ -7,42 +7,49 @@
       {% csrf_token %}
       <div class="text-center">
         <small>
-          Seu primeiro acesso?<br>
-          Você pode iniciar seu registro em nosso Portal através das redes sociais
-          para que assim possa interagir.<br>
+          <strong>Seu primeiro acesso?</strong><br>
+          Conecte com uma das redes sociais abaixo.<br>
+          Depois você pode entrar em seu perfil aqui no Portal CMJ e definir uma senha.<br>
+          Assim, em seus acessos futuros, 
+          você poderá acessar com seu email e senha caso não queria mais usar as redes sociais!
         </small>
       </div>
       {% if form.errors %}
         <div class="alert alert-danger">Usuário e/ou Senha inválidos.
         </div>
       {% endif %}
-      <div class="input-icon input_username">
-          <span class="fa fa-user fa-2x "></span>
-          {{ form.username }}
-      </div>
-      <div class="input-icon input_password">
-          <span class="fa fa-key fa-2x "></span>
-          {{ form.password }}
-      </div>
-      <div class="row-recovery">
-        <a class="btn btn-link btn-recovery" href="{% url 'cmj.core:recuperar_senha_email' %}" />{% trans "Esqueci minha Senha" %}</a>
-      </div>
-
-      <input  type="hidden" name="next" value="{{ next }}" />
-
-      <div class="btns-login container-fluid btns-login-{{backends.backends|length}}">
-        <button class="btn-login" type="submit" value="login" />{% trans "Iniciar Sessão" %}</button>
-
+      <div class="row btns-login">
           {% for backend in backends.backends %}
+            <div class="col-md-6">
             <a class="btn-login" id="{{ backend }}-button" name="{{ backend }}"
               title = "{% blocktrans with backend_name=backend|social_title %}Acessar com {{ backend_name }}{% endblocktrans %}"
               href="{% url 'social:begin' backend=backend %}?next={{view.get_success_url}}">
               
               <i class="fab {{ backend|social_icon }}"></i>
-              {% blocktrans with backend_name=backend|social_title %}Acessar com {{ backend_name }}{% endblocktrans %}
-            </a>
+              {% blocktrans with backend_name=backend|social_title %}Entrar com {{ backend_name }}{% endblocktrans %}
+            </a>    
+          </div>
           {% endfor %}
       </div>
+
+      <div class="btns-login box-entry">
+        <h4>Entre com seu usuário e senha</h4>
+        <div class="input-icon input_username">
+            <span class="fa fa-user fa-2x "></span>
+            {{ form.username }}
+        </div>
+        <div class="input-icon input_password">
+            <span class="fa fa-key fa-2x "></span>
+            {{ form.password }}
+        </div>
+        <div class="row-recovery">
+          <a class="btn btn-link btn-recovery" href="{% url 'cmj.core:recuperar_senha_email' %}" />{% trans "Esqueci minha Senha" %}</a>
+        </div>
+        <button class="btn-login" type="submit" value="login" />{% trans "ENTRAR" %}</button>
+      </div>
+
+      <input  type="hidden" name="next" value="{{ next }}" />
+
     </div>
   </form>
 </div>

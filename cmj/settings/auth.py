@@ -59,6 +59,6 @@ SOCIAL_BACKEND_INFO = {
     },
     'google-oauth2': {
         'title': 'Google',
-        'icon': 'fa-google-plus',
+        'icon': 'fa-google',
     },
 }
