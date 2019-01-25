@@ -159,12 +159,21 @@
     padding:0;
     display: inline-block;
     flex-basis: 100%;
+    .brand-estado {
+      color: rgba(white, 0.5);
+      font-size: 75%;
+      line-height: 1;
+    }
     &:hover {
       color: $color_text_brand_hover;
+      .brand-estado {
+        color: rgba(white, 0.8);
+      }
     }
     .fa-home {
       padding: 0 0.45em 0 0.48em;
     }
+
   }
   .navbar-nav {
     flex-basis: 100%;
@@ -411,6 +420,17 @@
   #wrapper {
     &.toggled {
       
+    }
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .navbar-topo {
+    a.navbar-brand {
+      font-size: 100%;
+    }
+    .brand-estado {
+      display: none;
     }
   }
 }

@@ -371,6 +371,10 @@
 
   .inner {
     padding: $grid-gutter-width / 2 0;
+    margin-bottom: 1rem;
+    p {
+      margin: 0;
+    }
     &:hover {
       .path-imagem {
         box-shadow: 2px 2px 6px #bba;
@@ -673,6 +677,14 @@
 @media screen and (max-width: 480px) {
   .path-item-list {
     font-size: 1rem;
+    .titulo {
+      font-size: 1.2rem;
+    }
+
+    .inner {
+      border-bottom: 1px solid #ccc;
+    }
+
   }
   
 }

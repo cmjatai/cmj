@@ -11,7 +11,7 @@
     <meta name="theme-color" content="#006556">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{% if user|notificacoes_unread_count %}({{user|notificacoes_unread_count}}) {% endif %}{% block head_title %}{% trans 'Portal da Câmara Municipal de Jataí - Goiás' %}{% endblock %}</title>
+    <title>{% if user|notificacoes_unread_count %}({{user|notificacoes_unread_count}}) {% endif %}{% block head_title %}{% trans 'Câmara Jataí' %}{% endblock %} - Portal da Câmara Municipal de Jataí - Estado de Goiás</title>
     <meta name="description" content="Portal CMJ - Fonte de informações a respeito dos atos do poder legislativo do município de Jataí, na microrregião Sudoeste do Estado de Goiás.">
 
     {% block meta_tags %}
@@ -63,7 +63,7 @@
             </button>
 
             <a class="navbar-brand" href="{{site_url}}/">
-                <i class="fa fa-home" aria-hidden="true"></i>C<small>âmara</small> M<small>unicipal de</small> J<small>ataí</small>
+                <i class="fa fa-home" aria-hidden="true"></i>C<small>âmara</small> M<small>unicipal de</small> J<small>ataí</small><span class="brand-estado"> - E<small>stado</small> <small>de</small> G<small>oiás</small></span>
             </a>
 
             {% block button_toogle %}
@@ -181,6 +181,7 @@
                         <li>
                           <a href="#linkMenu" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Banco de Imagens" %}<span class="caret"></span></a>
                           <ul class="dropdown-menu menu-right" role="menu">
+                            <li><a href="/banco-de-imagens/2019">{% trans "2019" %}</a></li>
                             <li><a href="/banco-de-imagens/2018">{% trans "2018" %}</a></li>
                             <li><a href="/banco-de-imagens/2017">{% trans "2017" %}</a></li>
                             <li><a href="/banco-de-imagens/2016">{% trans "2016" %}</a></li>

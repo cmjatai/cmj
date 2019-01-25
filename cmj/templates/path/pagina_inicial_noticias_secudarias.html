@@ -22,9 +22,9 @@
           </h2>
 
           <div class="descricao">
-            {% social_link_share d.0 'pull-right'%}
             <p tabindex="{{view.tabindex}}" >
               {{d.0.descricao|safe|urlize}}
+              {% social_link_share d.0 'pull-right'%}
 
             </p>
             <div class="clearfix"></div>
