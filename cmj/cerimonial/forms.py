@@ -861,13 +861,13 @@ class ImpressoEnderecamentoContatoFilterSet(FilterSet):
         }"""
 
     def __init__(self, data=None,
-                 queryset=None, prefix=None, strict=None, **kwargs):
+                 queryset=None, prefix=None, **kwargs):
 
         workspace = kwargs.pop('workspace')
 
         super(ImpressoEnderecamentoContatoFilterSet, self).__init__(
             data=data,
-            queryset=queryset, prefix=prefix, strict=strict, **kwargs)
+            queryset=queryset, prefix=prefix, **kwargs)
 
         col1 = to_row([
             ('search', 6),
@@ -1021,13 +1021,13 @@ class ContatoAgrupadoPorProcessoFilterSet(FilterSet):
         }}
 
     def __init__(self, data=None,
-                 queryset=None, prefix=None, strict=None, **kwargs):
+                 queryset=None, prefix=None, **kwargs):
 
         workspace = kwargs.pop('workspace')
 
         super(ContatoAgrupadoPorProcessoFilterSet, self).__init__(
             data=data,
-            queryset=queryset, prefix=prefix, strict=strict, **kwargs)
+            queryset=queryset, prefix=prefix,  **kwargs)
 
         c1_row1 = to_row([
             ('search', 7),

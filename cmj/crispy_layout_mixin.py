@@ -35,7 +35,7 @@ def to_fieldsets(fields):
 
 
 def form_actions(more=[Div(css_class='clearfix')],
-                 label=_('Salvar'), name='salvar', css_class='pull-right', disabled=True):
+                 label=_('Salvar'), name='salvar', css_class='float-right', disabled=True):
 
     if disabled:
         doubleclick = 'this.form.submit();this.disabled=true;'
@@ -43,10 +43,12 @@ def form_actions(more=[Div(css_class='clearfix')],
         doubleclick = 'return true;'
 
     return FormActions(
+        *more,
         Submit(name, label, css_class=css_class,
                # para impedir resubmissão do form
                onclick=doubleclick),
-        *more)
+        css_class='form-group row justify-content-between'
+    )
 
 
 class SaplFormLayout(Layout):
