@@ -76,7 +76,7 @@
   </div>
 
   <div class="row inner-parlamentares">
-    <div class="tags w-100 pl-3">Parlamentares</div>
+    <div class="tags w-100 pl-3">Parlamentares Titulares</div>
     <div class="col-xs-12 container-avatar inner-ativos w-100">
       {% for leg in legislaturas %}
         {% if leg.legislatura == legislatura_ativa %}
@@ -103,13 +103,13 @@
 
   <div class="row inner-extra">
     <div class="col-6 container-avatar inner-suplentes">
+      <div class="tags">Parlamentares Suplentes</div>
       {% for leg in legislaturas %}
         {% if leg.legislatura == legislatura_ativa %}
           {% for sessao in leg.sessoes %}
             {% if sessao.sessao == sessaolegislativa_ativa %}
               {% for parlamentar in sessao.parlamentares %}
                 {% if not parlamentar.titular and not parlamentar.afastado %}
-                  <div class="tags">Suplentes</div>
                   <a class="avatar avatar3" href="/{{parlamentar.classe_set.first.absolute_slug}}" class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">
                   {% if parlamentar.fotografia %}
                       <img src="{{ parlamentar.fotografia.url }}">
@@ -126,6 +126,7 @@
       {% endfor %}
     </div>
     <div class="col-6 container-avatar inner-inativos ">
+      <div class="tags">Parlamentares Inativos</div>
       {% for leg in legislaturas %}
         {% if leg.legislatura == legislatura_ativa %}
           {% for sessao in leg.sessoes %}
@@ -133,7 +134,6 @@
               {% for parlamentar in sessao.parlamentares %}
 
                 {% if parlamentar.afastado %}
-                  <div class="tags">Inativos</div>
                   <a class="avatar avatar3" href="/{{parlamentar.classe_set.first.absolute_slug}}" class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">
                   {% if parlamentar.fotografia %}
                       <img src="{{ parlamentar.fotografia.url }}">
