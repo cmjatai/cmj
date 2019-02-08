@@ -266,11 +266,14 @@ class Command(BaseCommand):
 
         print('---- Compilação ----')
         for id, dsps in self.graph.items():
-            self.ta = TextoArticulado.objects.get(pk=id)
-            print('Comp:', self.ta)
-            self._ordem = 0
-            roots = self.load_roots(id)
-            self.import_subtree(roots, dsps, only_originals=False)
+            try:
+                self.ta = TextoArticulado.objects.get(pk=id)
+                print('Comp:', self.ta)
+                self._ordem = 0
+                roots = self.load_roots(id)
+                self.import_subtree(roots, dsps, only_originals=False)
+            except:
+                print('Comp erro:', id, dsps)
 
     def import_subtree(self, node, subtree, only_originals=True):
 
@@ -297,7 +300,7 @@ class Command(BaseCommand):
                     _method = 'import_basico'
 
                 try:
-                    # if sub['item'][0]['id'] == 84667:
+                    # if sub['item'][0]['id'] == 44705:
                     #    print(sub['item'][0]['id'])
 
                     last = getattr(self, _method)(
@@ -598,13 +601,16 @@ class Command(BaseCommand):
                             36561, 36598, 16167, 18864, 36852,
                             17111, 79237, 2780, 47023, 8600, 35828,
                             8685, 36359, 11383, 51848, 9799, 58320,
-                            6007, 63829):
+                            6007, 63829, 17553, 41584, 78929, 55000,
+                            60420, 64982, 86262, 83234,
+                            ):
                 numero[0] = 3
             elif io['id'] in (57838, 56855, 9746, 73697, 64452,
-                              25821, 36872):
+                              25821, 36872, 81696, 83237):
                 numero[0] = 4
             elif io['id'] in (5243, 18902, 21912, 24456, 35958,
-                              36224, 36259, 24815, 26090, 84429):
+                              36224, 36259, 24815, 26090, 84429,
+                              24505):
                 numero[0] = 5
             elif io['id'] in ():
                 numero[0] = 6
