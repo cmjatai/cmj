@@ -36,6 +36,11 @@ LOGGING = {
             'level': 'INFO',
             'propagate': True,
         },
+        'cmj': {
+            'handlers': ['applogfile'],
+            'level': 'INFO',
+            'propagate': True,
+        },
     }
 }
 

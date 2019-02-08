@@ -4,7 +4,6 @@ from datetime import date, datetime
 from math import ceil, floor
 
 from braces.views import PermissionRequiredMixin
-from compressor.utils.decorators import cached_property
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
@@ -44,7 +43,7 @@ class ImpressoEnderecamentoContatoView(PermissionRequiredMixin, FilterView):
 
     paginate_by = 30
 
-    @cached_property
+    @property
     def is_contained(self):
         return True
 
@@ -303,7 +302,7 @@ class RelatorioContatoAgrupadoPorGrupoView(
 
     paginate_by = 30
 
-    @cached_property
+    @property
     def is_contained(self):
         return True
 
@@ -391,7 +390,7 @@ class RelatorioContatoAgrupadoPorProcessoView(
 
     paginate_by = 30
 
-    @cached_property
+    @property
     def is_contained(self):
         return True
 

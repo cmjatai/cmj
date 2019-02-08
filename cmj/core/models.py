@@ -1,23 +1,22 @@
 
-from compressor.utils.decorators import cached_property
 from django import forms
-from django.contrib.auth import get_user_model
-from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
-from django.contrib.auth.models import PermissionsMixin, Group
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.db import models
 from django.db.models import permalink
-from django.db.models.deletion import PROTECT, CASCADE, SET_NULL
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from image_cropping import ImageCropField, ImageRatioField
 from sapl.parlamentares.models import Parlamentar
 
 from cmj.globalrules import MENU_PERMS_FOR_USERS, GROUP_SOCIAL_USERS
 from cmj.utils import get_settings_auth_user_model, normalize, YES_NO_CHOICES,\
     UF, CmjChoices
+from django.contrib.auth import get_user_model
+from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
+from django.contrib.auth.models import PermissionsMixin, Group
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+from django.db.models.deletion import PROTECT, CASCADE, SET_NULL
+from image_cropping import ImageCropField, ImageRatioField
 
 
 def group_social_users_add_user(user):
@@ -496,7 +495,7 @@ class Trecho(CmjSearchMixin, CmjModelMixin):
         related_name='trechos_set',
         verbose_name=_('Cep'))
 
-    @cached_property
+    @property
     def fields_search(self):
         return [
             'tipo__nome',

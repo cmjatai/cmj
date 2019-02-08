@@ -1,6 +1,5 @@
 from datetime import date
 
-from compressor.utils import get_class
 from dateutil.relativedelta import relativedelta
 from django import template
 from django.contrib.auth.tokens import default_token_generator
@@ -16,6 +15,15 @@ from webpack_loader.utils import _get_bundle
 
 
 register = template.Library()
+
+
+def get_class(class_string):
+    if not hasattr(class_string, '__bases__'):
+        class_string = str(class_string)
+        dot = class_string.rindex('.')
+        mod_name, class_name = class_string[:dot], class_string[dot + 1:]
+        if class_name:
+            return getattr(__import__(mod_name, {}, {}, [str('')]), class_name)
 
 
 @register.simple_tag

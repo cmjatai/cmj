@@ -1,7 +1,6 @@
 import logging
 
 from braces.views import FormMessagesMixin
-from compressor.utils.decorators import cached_property
 from crispy_forms.bootstrap import FieldWithButtons, StrictButton
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Field, Layout
@@ -22,12 +21,12 @@ from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
                                   UpdateView)
 from django.views.generic.base import ContextMixin
 from django.views.generic.list import MultipleObjectMixin
-from sapl.settings import BASE_DIR
-from sapl.utils import normalize
 
 from cmj.crispy_layout_mixin import CrispyLayoutFormMixin, get_field_display
 from cmj.globalrules import (RP_ADD, RP_CHANGE, RP_DELETE, RP_DETAIL,
                              RP_LIST)
+from sapl.settings import BASE_DIR
+from sapl.utils import normalize
 
 
 logger = logging.getLogger(BASE_DIR.name)
@@ -228,14 +227,14 @@ class PermissionRequiredContainerCrudMixin(PermissionRequiredMixin):
         return super(PermissionRequiredMixin, self).dispatch(
             request, *args, **kwargs)
 
-    @cached_property
+    @property
     def container_field(self):
         if hasattr(self, 'crud') and not hasattr(self.crud, 'container_field'):
             self.crud.container_field = ''
         if hasattr(self, 'crud'):
             return self.crud.container_field
 
-    @cached_property
+    @property
     def container_field_set(self):
         if hasattr(self, 'crud') and\
                 not hasattr(self.crud, 'container_field_set'):
@@ -243,7 +242,7 @@ class PermissionRequiredContainerCrudMixin(PermissionRequiredMixin):
         if hasattr(self, 'crud'):
             return self.crud.container_field_set
 
-    @cached_property
+    @property
     def is_contained(self):
         return self.container_field_set or self.container_field
 

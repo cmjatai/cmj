@@ -1,16 +1,15 @@
 
-from compressor.utils.decorators import cached_property
-from django.contrib.auth.models import Group
 from django.db import models
-from django.db.models.deletion import SET_NULL, PROTECT, CASCADE
 from django.utils.translation import ugettext_lazy as _
 from sapl.parlamentares.models import Parlamentar, Partido
-from sapl.utils import LISTA_DE_UFS
 
 from cmj.core.models import CmjModelMixin, Trecho, Distrito, RegiaoMunicipal,\
     CmjAuditoriaModelMixin, CmjSearchMixin, AreaTrabalho, Bairro, Municipio
 from cmj.utils import YES_NO_CHOICES, NONE_YES_NO_CHOICES,\
     get_settings_auth_user_model
+from django.contrib.auth.models import Group
+from django.db.models.deletion import SET_NULL, PROTECT, CASCADE
+from sapl.utils import LISTA_DE_UFS
 
 
 FEMININO = 'F'
@@ -303,7 +302,7 @@ class Contato(CmjSearchMixin, CmjAuditoriaModelMixin):
         blank=True, default='',
         verbose_name=_('Outros observações sobre o Contato'))
 
-    @cached_property
+    @property
     def fields_search(self):
         return ['nome',
                 'nome_social',
@@ -806,7 +805,7 @@ class Processo(CmjSearchMixin, CmjAuditoriaModelMixin):
     def __str__(self):
         return str(self.titulo)
 
-    @cached_property
+    @property
     def fields_search(self):
         return ['titulo',
                 'observacoes',

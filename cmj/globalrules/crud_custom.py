@@ -1,4 +1,3 @@
-from compressor.utils.decorators import cached_property
 from crispy_forms.bootstrap import FieldWithButtons, StrictButton
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field
