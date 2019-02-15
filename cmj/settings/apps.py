@@ -15,6 +15,25 @@ CMJ_APPS = (
     'cmj.globalrules',
 )
 
+SAPL_APPS = (
+    'sapl.audiencia',
+    'sapl.base',
+    'sapl.crud',
+    'sapl.parlamentares',
+    'sapl.comissoes',
+    'sapl.materia',
+    'sapl.norma',
+    'sapl.sessao',
+    'sapl.lexml',
+    'sapl.painel',
+    'sapl.protocoloadm',
+    'sapl.redireciona_urls',
+    'sapl.compilacao',
+    'sapl.api',
+
+    'sapl.rules'
+)
+
 INSTALLED_APPS = (
     'django_admin_bootstrapped',  # must come before django.contrib.admin
     'django.contrib.admin',
@@ -27,7 +46,6 @@ INSTALLED_APPS = (
 
     # more
     'django_extensions',
-    'bootstrap4',
     'crispy_forms',
 
     'easy_thumbnails',  # ?
@@ -36,7 +54,6 @@ INSTALLED_APPS = (
 
     'rest_framework',
     'rest_framework_recursive',
-    'rest_framework_docs',
 
     'haystack',
     'whoosh',
@@ -47,7 +64,6 @@ INSTALLED_APPS = (
     'taggit',
     'webpack_loader',
 
-    'sass_processor',  # retirar apos testes de migração
 )
 
 INSTALLED_APPS = INSTALLED_APPS + tuple(

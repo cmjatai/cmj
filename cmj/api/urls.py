@@ -20,10 +20,6 @@ urlpatterns_api = [
 
 ]
 
-if settings.DEBUG:
-    urlpatterns_api += [
-        url(r'^docs', include('rest_framework_docs.urls')), ]
-
 urlpatterns = [
     url(r'^api/', include(urlpatterns_api)),
     url(r'^api/', include(urlpatterns_router))
