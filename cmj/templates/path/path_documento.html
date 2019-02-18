@@ -279,7 +279,7 @@
 
 {% block cmj_extra_content %}
 {% if object != object.classe.capa %}
-  <div class="{% if path %}container{{path}}{% endif %} container-fluid container-footer">
+  <div class="{% if path %}container{{path}}{% endif %} container-fluid container-footer d-print-none">
     <div class="container">
       <div class="row">
         {% with 'path-item-list col-md-3' as css_class %}
