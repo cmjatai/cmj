@@ -351,11 +351,10 @@
     });
   </script>
 
-  {% if not DEBUG %}
     <script>
       window.fbAsyncInit = function () {
         FB.init({
-          appId      : '150874375319738',
+          appId      : '{% settings_key 'SOCIAL_AUTH_FACEBOOK_KEY' %}', 
           cookie     : true,
           xfbml      : true,
           version    : 'v3.2'
@@ -363,6 +362,9 @@
 
         FB.AppEvents.logPageView();
 
+        FB.getLoginStatus(function(response) {
+            console.log(response);
+        });
       };
 
       (function (d, s, id){
@@ -372,7 +374,11 @@
           js.src = "https://connect.facebook.net/pt_BR/sdk.js";
           fjs.parentNode.insertBefore(js, fjs);
         }(document, 'script', 'facebook-jssdk'));
-    </script>
+
+
+
+  </script>
+  {% if not DEBUG %}
 
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-2431536-7"></script>

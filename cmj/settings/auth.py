@@ -1,8 +1,10 @@
 from decouple import AutoConfig
 
 config = AutoConfig()
+DEBUG = config('DEBUG', default=False, cast=bool)
 
 AUTH_USER_MODEL = 'core.User'
+SOCIAL_AUTH_POSTGRES_JSONFIELD = True
 
 str_pv = 'django.contrib.auth.password_validation'
 AUTH_PASSWORD_VALIDATORS = [
@@ -32,9 +34,20 @@ AUTHENTICATION_BACKENDS = (
 
 """ 'social.backends.twitter.TwitterOAuth' """
 
-SOCIAL_AUTH_FACEBOOK_KEY = config('SOCIAL_AUTH_FACEBOOK_KEY', cast=str)
-SOCIAL_AUTH_FACEBOOK_SECRET = config('SOCIAL_AUTH_FACEBOOK_SECRET', cast=str)
+if DEBUG:
+    SOCIAL_AUTH_FACEBOOK_KEY = config(
+        'SOCIAL_AUTH_FACEBOOK_KEY_TEST', cast=str)
+    SOCIAL_AUTH_FACEBOOK_SECRET = config(
+        'SOCIAL_AUTH_FACEBOOK_SECRET_TEST', cast=str)
+else:
+    SOCIAL_AUTH_FACEBOOK_KEY = config(
+        'SOCIAL_AUTH_FACEBOOK_KEY', cast=str)
+    SOCIAL_AUTH_FACEBOOK_SECRET = config(
+        'SOCIAL_AUTH_FACEBOOK_SECRET', cast=str)
+
+
 SOCIAL_AUTH_FACEBOOK_API_VERSION = '3.2'
+
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = config(
     'SOCIAL_AUTH_GOOGLE_OAUTH2_KEY', cast=str)
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = config(

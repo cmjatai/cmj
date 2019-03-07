@@ -28,7 +28,7 @@
   box-shadow: 0px 1px 1px #ddd;
   min-height: 100%;
   position: relative;
-  margin: 3% 22%;
+  margin: 3% 15%;
   background-color: transparent;
   color: $color_topo_bg;
   border: 0;
@@ -88,26 +88,29 @@
   .btns-login {
     margin: 1em 0;
     .btn-login {
+      padding: 0 3px;
       position: relative;
       display: inline-block;
       width: 100%;
       letter-spacing: 0px;
       text-align: center;
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       cursor: pointer;
 
       border: 0px solid $color_topo_bg;
       background-color: $color_topo_bg;
-      line-height: 43px;
+      line-height: 1.9rem;
+
       color: white;
       text-decoration: none;
 
       i {
+        font-size: 1.9rem;
         background-color: white;
-        margin-right: 15px;
+        margin: 7px 10px;
         line-height: 1.8rem;
-        width: 1.8rem;
-        border-radius: 5px;
+        border-radius: 2px;
+        vertical-align: middle;
       }
 
 
@@ -115,12 +118,14 @@
         background-color:  #4267B2;
         i { 
           color:  #4267B2;
+          padding: 12px 7px 0 18px;
         }
       }
       &[name="google-oauth2"] {
         background-color: #e55;
         i { 
           color:  #e55;
+          padding: 6px 7px;
         }
       }
       &:hover {
@@ -164,7 +169,12 @@
 
 @media screen and (max-width: 1199px) {
   .container-login {
-    margin: 0 15% $grid-gutter-width/2;
+    margin: 0 10% $grid-gutter-width/2;
+    .btns-login {
+      .btn-login {
+        margin-top: 10px;
+      }
+    }
   }
 }
 @media screen and (max-width: 991px) {

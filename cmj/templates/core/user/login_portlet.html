@@ -20,13 +20,13 @@
       {% endif %}
       <div class="row btns-login">
           {% for backend in backends.backends %}
-            <div class="col-md-6">
+            <div class="col-lg-6">
             <a class="btn-login" id="{{ backend }}-button" name="{{ backend }}"
               title = "{% blocktrans with backend_name=backend|social_title %}Acessar com {{ backend_name }}{% endblocktrans %}"
               href="{% url 'social:begin' backend=backend %}?next={{view.get_success_url}}">
               
               <i class="fab {{ backend|social_icon }}"></i>
-              {% blocktrans with backend_name=backend|social_title %}Entrar com {{ backend_name }}{% endblocktrans %}
+              {% blocktrans with backend_name=backend|social_title %}Continuar com {{ backend_name }}{% endblocktrans %}
             </a>    
           </div>
           {% endfor %}

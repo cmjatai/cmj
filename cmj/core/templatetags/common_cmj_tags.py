@@ -2,6 +2,7 @@ from datetime import date
 
 from dateutil.relativedelta import relativedelta
 from django import template
+from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.db.models.query import QuerySet
 from django.utils.encoding import force_bytes
@@ -250,3 +251,8 @@ def render_bundle(bundle_name, extension=None, config='DEFAULT', attrs=''):
     tags = get_as_tags(bundle_name, extension=extension,
                        config=config, attrs=attrs)
     return mark_safe('\n'.join(tags))
+
+
+@register.simple_tag
+def settings_key(var_name):
+    return getattr(settings, var_name)
