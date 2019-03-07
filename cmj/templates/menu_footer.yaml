@@ -113,8 +113,8 @@
         children:
         - title: Localização e Horários
           url: /fale-conosco/localizacao-e-horarios
-        - title: Telefones
-          url: /fale-conosco/telefones
+        - title: Telefones e Emails
+          url: /fale-conosco/telefones-e-emails
 
 - title: Documentos Administrativos
   url: ''
