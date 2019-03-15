@@ -41,6 +41,7 @@ SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 ROOT_URLCONF = 'cmj.urls'
 
 WSGI_APPLICATION = 'cmj.wsgi.application'
+ASGI_APPLICATION = "cmj.routing.application"
 
 DATABASES = {
     'default': config(
