@@ -9,7 +9,7 @@ from cmj.core.views import CepCrud, RegiaoMunicipalCrud, DistritoCrud,\
     BairroCrud, TipoLogradouroCrud, LogradouroCrud, TrechoCrud, \
     TrechoJsonSearchView, TrechoJsonView, AreaTrabalhoCrud,\
     OperadorAreaTrabalhoCrud, PartidoCrud, ImpressoEnderecamentoCrud,\
-    NotificacaoRedirectView
+    NotificacaoRedirectView, chanel_index, chanel_room, time_refresh_log_test
 from cmj.core.views_auth import CmjUserChangeView, CmjLoginView,\
     CmjPasswordResetView
 from cmj.settings import EMAIL_SEND_USER
@@ -48,6 +48,14 @@ user_urlpatterns = [
 
     url(r'^logout/$', v_auth.logout,
         {'next_page': '/'}, name='logout', ),
+
+
+    url(r'^channel$', chanel_index, name='channel_index'),
+    url(r'^channel/(?P<room_name>[^/]+)/$',
+        chanel_room, name='channel_room'),
+    url(r'^time-refresh/$',
+        time_refresh_log_test, name='time_refresh_log_test_index'),
+
 
 ]
 

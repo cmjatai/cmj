@@ -1,10 +1,13 @@
 
+import json
+
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.forms.utils import ErrorList
 from django.http.response import Http404
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
+from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import RedirectView
 from django_filters.views import FilterView
@@ -32,6 +35,25 @@ BairroCrud = CrudAux.build(Bairro, None, 'bairro')
 TipoLogradouroCrud = CrudAux.build(
     TipoLogradouro, None, 'tipo_logradouro')
 LogradouroCrud = CrudAux.build(Logradouro, None, 'logradouro')
+
+
+def chanel_index(request):
+    return render(request, 'core/channel_index.html', {})
+
+
+def chanel_room(request, room_name):
+    return render(request, 'core/channel_room.html', {
+        'room_name_json': mark_safe(json.dumps(room_name))
+    })
+
+
+def time_refresh_log_test(request):
+    return render(request, 'core/time_refresh_log_test.html', {})
+
+
+def online_app_view(request):
+
+    return render(request, 'online_app.html')
 
 
 class TrechoCrud(CrudAux):

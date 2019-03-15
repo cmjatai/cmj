@@ -1,5 +1,7 @@
 from decouple import AutoConfig
+from sapl.settings import WEBPACK_LOADER as SAPL_WEBPACK_LOADER
 from unipath import Path
+
 
 config = AutoConfig()
 DEBUG = config('DEBUG', default=False, cast=bool)
@@ -49,15 +51,32 @@ STATIC_ROOT = PROJECT_DIR.child("collected_static")
 WEBPACK_LOADER = {
     'DEFAULT': {
         'CACHE': not DEBUG,
-        'BUNDLE_DIR_NAME': 'bundle/dist/',
-        'STATS_FILE': PROJECT_DIR.child('cmj-vue').child('webpack-stats.json'),
-    }
+        'BUNDLE_DIR_NAME': 'dist/',
+        'STATS_FILE': PROJECT_DIR.child('frontend').child('webpack-stats.json'),
+    },
+    'SAPL_DEFAULT':  SAPL_WEBPACK_LOADER['DEFAULT']
+}
+
+
+USE_CHANNEL_LAYERS = config(
+    'USE_CHANNEL_LAYERS', cast=bool, default=False)
+HOST_CHANNEL_LAYERS = config(
+    'HOST_CHANNEL_LAYERS', cast=str, default='localhost')
+PORT_CHANNEL_LAYERS = config(
+    'PORT_CHANNEL_LAYERS', cast=int, default=6379)
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [(HOST_CHANNEL_LAYERS, PORT_CHANNEL_LAYERS)],
+        },
+    },
 }
 
 STATICFILES_DIRS = (
-    BASE_DIR.child("static"),
-    PROJECT_DIR.child(
-        "cmj-vue").child('bundle').child('dev' if DEBUG else 'dist'),
+    BASE_DIR.child('static'),
+    PROJECT_DIR.child('frontend').child('dist'),
 )
 
 STATICFILES_FINDERS = (

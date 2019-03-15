@@ -38,6 +38,11 @@ social-auth-app-django==3.1.0
 python-dateutil
 django-webpack-loader
 
+
+daphne==2.2.5
+channels_redis==2.3.2
+channels==2.1.7
+
 git+git://github.com/interlegis/django-admin-bootstrapped
 git+git://github.com/interlegis/trml2pdf.git
-git+git://github.com/cmjatai/sapl.git@3.1.x.cmj.cmj-portal
+git+git://github.com/cmjatai/sapl.git@master.para.portal.cmj
