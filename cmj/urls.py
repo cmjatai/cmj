@@ -67,6 +67,14 @@ urlpatterns = [
     #url('', include('social.apps.django_app.urls', namespace='social')),
     url('', include('social_django.urls', namespace='social')),
 
+    # Todo o conjunto de urls que passaram por adaptação do sapl
+    # devem ficar antes do sapl. para isso criar a app cmj.sapl_adapter
+    url(r'', include(cmj.core.urls)),
+    url(r'', include(cmj.cerimonial.urls)),
+    url(r'', include(cmj.ouvidoria.urls)),
+    url(r'', include(cmj.agenda.urls)),
+
+
     url(r'^sapl/', include(sapl.comissoes.urls)),
     url(r'^sapl/', include(sapl.sessao.urls)),
     url(r'^sapl/', include(sapl.parlamentares.urls)),
@@ -80,14 +88,6 @@ urlpatterns = [
     url(r'', include(sapl.base.urls)),
     url(r'', include(sapl.api.urls)),
 
-
-    url(r'', include(cmj.core.urls)),
-    url(r'', include(cmj.cerimonial.urls)),
-    url(r'', include(cmj.ouvidoria.urls)),
-    url(r'', include(cmj.agenda.urls)),
-
-
-    url(r'^vuetest', TemplateView.as_view(template_name='index.html')),
 
 ]
 
@@ -108,5 +108,7 @@ if settings.DEBUG:
 
 urlpatterns += [
     url(r'', include(cmj.api.urls)),
+
+    # urls não tratadas até aqui será capturada por PathView de cmj.sigad
     url(r'', include(cmj.sigad.urls)),
 ]

@@ -31,6 +31,7 @@ INSTALLED_APPS = (
     'webpack_loader',
 
     'channels',
+    'sapl',  # não retire, é necessário para os templates centralizados do sapl
 )
 
 SAPL_APPS = (
