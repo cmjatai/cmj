@@ -9,7 +9,8 @@ from cmj.core.views import CepCrud, RegiaoMunicipalCrud, DistritoCrud,\
     BairroCrud, TipoLogradouroCrud, LogradouroCrud, TrechoCrud, \
     TrechoJsonSearchView, TrechoJsonView, AreaTrabalhoCrud,\
     OperadorAreaTrabalhoCrud, PartidoCrud, ImpressoEnderecamentoCrud,\
-    NotificacaoRedirectView, chanel_index, chanel_room, time_refresh_log_test
+    NotificacaoRedirectView, chanel_index, chanel_room, time_refresh_log_test,\
+    online_app_view
 from cmj.core.views_auth import CmjUserChangeView, CmjLoginView,\
     CmjPasswordResetView
 from cmj.settings import EMAIL_SEND_USER
@@ -55,6 +56,9 @@ user_urlpatterns = [
         chanel_room, name='channel_room'),
     url(r'^time-refresh/$',
         time_refresh_log_test, name='time_refresh_log_test_index'),
+
+    url(r'^online/',
+        online_app_view, name='online_app_url'),
 
 
 ]

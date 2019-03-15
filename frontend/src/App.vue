@@ -1,28 +1,38 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link>
-    </div>
-    <router-view/>
+  <div id="app-frontend-base-content">
+    <message></message>
+    <router-view></router-view>
   </div>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-#nav {
-  padding: 30px;
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-    &.router-link-exact-active {
-      color: #42b983;
+<script>
+import Message from '@/components/utils/message/Message'
+import { EventBus } from '@/event-bus'
+export default {
+  name: 'app',
+  components: {
+    Message
+  },
+  mounted: function () {
+    this.$options.sockets.onmessage = (event) => {
+      /**
+       * Define um ouvinte para o socket implementado por VueNativeSock
+       */
+      let data = JSON.parse(event.data)
+      this.sendMessage({ alert: 'info', message: 'Base Atualizada', time: 3 })
+
+      // Remove do Vuex/cache o elemento que o Servidor informou ter sofrido alteracão
+      this.removeFromState(data)
+
+      // Emite um evento pelo barramento parelelo global.
+      // O componente que estiver ouvindo esse barramento será informado que um
+      // evento ws-message ocorreu. Será chamada o method on_ws_message
+      EventBus.$emit('ws-message', data)
     }
   }
 }
+</script>
+
+<style lang="scss">
+
 </style>

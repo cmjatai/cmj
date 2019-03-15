@@ -67,11 +67,6 @@ urlpatterns = [
     #url('', include('social.apps.django_app.urls', namespace='social')),
     url('', include('social_django.urls', namespace='social')),
 
-    url(r'', include(cmj.core.urls)),
-    url(r'', include(cmj.cerimonial.urls)),
-    url(r'', include(cmj.ouvidoria.urls)),
-    url(r'', include(cmj.agenda.urls)),
-
     url(r'^sapl/', include(sapl.comissoes.urls)),
     url(r'^sapl/', include(sapl.sessao.urls)),
     url(r'^sapl/', include(sapl.parlamentares.urls)),
@@ -84,6 +79,13 @@ urlpatterns = [
     url(r'^sapl/', include(sapl.relatorios.urls)),
     url(r'', include(sapl.base.urls)),
     url(r'', include(sapl.api.urls)),
+
+
+    url(r'', include(cmj.core.urls)),
+    url(r'', include(cmj.cerimonial.urls)),
+    url(r'', include(cmj.ouvidoria.urls)),
+    url(r'', include(cmj.agenda.urls)),
+
 
     url(r'^vuetest', TemplateView.as_view(template_name='index.html')),
 
