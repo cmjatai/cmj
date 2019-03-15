@@ -33,7 +33,7 @@ TEMPLATES = [
             ],
             'loaders': [
                 # Não troque a ordem, trocar a ordem faz, por exemplo,
-                # base.html do sapl ser lido para primeiro que o base.html
+                # base.html do sapl ser lido primeiro que o base.html
                 # deste projeto
                 'django.template.loaders.filesystem.Loader',
                 'django.template.loaders.app_directories.Loader'
