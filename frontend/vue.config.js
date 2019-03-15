@@ -1,8 +1,6 @@
 const path = require('path')
 const each = require('lodash/fp/each')
 
-console.log(`${process.env.BASE_URL}`)
-
 const BundleTrackerPlugin = require('webpack-bundle-tracker')
 const CompressionPlugin = require('compression-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
@@ -36,7 +34,7 @@ module.exports = {
   chainWebpack: config => {
     //config.plugins.delete('html')
     //config.plugins.delete('preload')
-    config.plugins.delete('prefetch')
+    //config.plugins.delete('prefetch')
 
     config
       .plugin('RelativeBundleTrackerPlugin')
@@ -109,18 +107,13 @@ module.exports = {
 
     //config.entryPoints.delete('app')
 
-    config
-      .entry('globals')
-      .add('./src/__globals/main.js')
-      .end()
-
     config.entry('construct')
       .add('./src/__construct/main.js')
       .end()
 
-      /* config.entry('frontend')
+    /* config.entry('globals')
       .add('./src/main.js')
-      .end()
- */
+      .end() */
+ 
   },
 }

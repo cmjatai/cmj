@@ -9,7 +9,7 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
-  "dependencies": { 
+  "dependencies": {
     "@fortawesome/fontawesome-free": "^5.7.2",
     "autosize": "^4.0.2",
     "axios": "^0.18.0",
@@ -18,6 +18,7 @@
     "bootstrap-vue": "^2.0.0-rc.14",
     "diff": "^4.0.1",
     "dotenv": "^6.2.0",
+    "imports-loader": "^0.8.0",
     "jquery": "^3.3.1",
     "jquery-mask-plugin": "^1.14.15",
     "jquery-ui-themes": "^1.12.0",
@@ -27,12 +28,12 @@
     "tinymce": "^4.9.2",
     "tinymce-light-skin": "^1.3.1",
     "vue": "^2.6.8",
-    "vue-native-websocket": "^2.0.12",
-    "vue-router": "^3.0.2",
     "vue-cookie": "^1.1.4",
     "vue-froala-wysiwyg": "^2.9.3",
+    "vue-native-websocket": "^2.0.12",
     "vue-resize": "^0.4.5",
     "vue-resource": "^1.5.1",
+    "vue-router": "^3.0.2",
     "vuex": "^3.1.0",
     "vuex-router-sync": "^5.0.0",
     "webpack": "^4.29.6",

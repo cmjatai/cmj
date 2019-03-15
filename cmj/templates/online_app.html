@@ -3,10 +3,12 @@
 
 {% block webpack_loader_css %}
     {{ block.super }}
-    {% render_bundle 'online' 'css' %}
+    {% render_bundle 'pwa' 'css' %}
 {% endblock %}
-
+{% block base_content %}
+<div id="app"></div>
+{% endblock base_content %}
 {% block webpack_loader_js %}    
     {{ block.super }}
-    {% render_bundle 'online' 'js' %}
+    {% render_bundle 'pwa' 'js' %}
 {% endblock %}
