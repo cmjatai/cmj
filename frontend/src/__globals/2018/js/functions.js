@@ -196,10 +196,7 @@ window.refreshMask = function () {
   $('.timeinput').mask('00:00:00', { placeholder: 'hh:mm:ss' })
   $('.cronometro').mask('00:00:00', { placeholder: 'hh:mm:ss' })
   $('.datetimeinput').mask('00/00/0000 00:00:00', { placeholder: '__/__/____ hh:mm:ss' })
-
 }
-
-
 
 window.AltoContraste = function () {
   let Contrast = {
