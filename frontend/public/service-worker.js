@@ -1,16 +1,13 @@
 if (workbox) {
-  workbox.core.setCacheNameDetails({prefix: "frontend"});
+  workbox.core.setCacheNameDetails({prefix: "frontend"})
   self.__precacheManifest = [{
     url: '/offline/',
     revision: '000001'
-  }].concat(self.__precacheManifest || []);
+  }].concat(self.__precacheManifest || [])
   
-  workbox.precaching.suppressWarnings();
+  workbox.precaching.suppressWarnings()
   
-  workbox.precaching.precacheAndRoute(
-    self.__precacheManifest, 
-    {}
-  );
+  workbox.precaching.precacheAndRoute(self.__precacheManifest, {})
 
   workbox.routing.registerRoute(
     ({ event }) => event.request.mode === 'navigate', //if the requests is to go to a new url
@@ -22,6 +19,6 @@ if (workbox) {
 
 } 
 else {
-  console.log(`Workbox didn't load`);
+  console.log(`Workbox didn't load`)
 }
 
