@@ -14,7 +14,8 @@
       <input v-model.lazy="elemento.titulo" placeholder="Subtítulo para Fragmento de Texto..."/>
     </span>
     <div class="construct" v-if="usarfroala" >
-      <froala v-if="usarfroala" :tag="'textarea'" :config="config" v-model.lazy="elemento.texto"></froala>
+      <editor inline  v-model.lazy="elemento.texto"></editor>
+      <!--froala v-if="usarfroala" :tag="'textarea'" :config="config"></froala-->
     </div>
 
     <textarea-autosize  v-if="!usarfroala" v-model.lazy="elemento.texto" placeholder="Fragmento de Texto" :align="'text-left'"/>
@@ -29,11 +30,15 @@
 
 <script>
 import Container from './Container'
+import Editor from '@tinymce/tinymce-vue'
 
 export default {
   name: 'tpd-texto',
   extends: {
     ...Container
+  },
+  components: {
+    Editor
   },
   data () {
     return {
