@@ -36,7 +36,7 @@ pyoai==2.5.0
 django-taggit
 social-auth-app-django==3.1.0
 python-dateutil
-django-webpack-loader
+django-webpack4-loader
 
 
 daphne==2.2.5

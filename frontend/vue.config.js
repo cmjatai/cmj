@@ -17,7 +17,7 @@ class RelativeBundleTrackerPlugin extends BundleTrackerPlugin {
     }
     super.writeOutput(compiler, contents)
   }
-}
+} 
 
 const dotenv = require('dotenv')
 dotenv.config({
@@ -28,7 +28,7 @@ var HOST_NAME = 'localhost'
 
 module.exports = {
   runtimeCompiler: true,
-  publicPath: process.env.NODE_ENV === 'production' ? '/static/' : `http://${HOST_NAME}:8080/`,
+  publicPath: process.env.NODE_ENV === 'production' ? '/static' : `http://${HOST_NAME}:8080/`,
   outputDir: 'dist',
 
   chainWebpack: config => {
@@ -44,7 +44,6 @@ module.exports = {
       }])
 
     if (process.env.NODE_ENV === 'production') {
-
       config
         .optimization
         .minimizer([new TerserPlugin()])
@@ -57,8 +56,8 @@ module.exports = {
         .devtool('source-map')
     }
 
-    config.resolve.alias
-      .set('__STATIC__', 'static')
+    //config.resolve.alias
+    //  .set('__STATIC__', 'static')
 
     config.module
       .rule('vue')
@@ -105,15 +104,29 @@ module.exports = {
         _: 'lodash'
       }])
 
-    //config.entryPoints.delete('app')
+    /* config
+      .plugin('html')
+      .tap(args => {
+        args[0]['filename'] = '../../cmj/templates/index.test.html'
+        console.log(args)
+
+        return args
+      }) */
+
 
     config.entry('construct')
       .add('./src/__construct/main.js')
       .end()
 
-    /* config.entry('globals')
+/* 
+    config.entryPoints.delete('app')
+     config.entry('app')
       .add('./src/main.js')
-      .end() */
+      .end()  */
  
   },
+
+  pwa: {
+    name: 'Portal CMJ'
+  }
 }

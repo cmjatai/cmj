@@ -61,6 +61,7 @@
     "sass-loader": "^7.1.0",
     "terser-webpack-plugin": "^1.2.3",
     "vue-template-compiler": "^2.6.8",
-    "webpack-bundle-tracker": "^0.4.2-beta"
+    "webpack-bundle-tracker": "^0.4.2-beta",
+    "webpack-cli": "^3.3.0"
   }
 }
