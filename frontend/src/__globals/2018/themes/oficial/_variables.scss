@@ -43,5 +43,24 @@ $icon-font-path: "../bootstrap/fonts/" !default;
 // variaveis bootstrap ########################################
 $font-size-base: 1rem !default;
 
+
+$zindex-dropdown:                   1000 !default;
+$zindex-sticky:                     1020 !default;
+$zindex-fixed:                      1030 !default;
+$zindex-modal-backdrop:             1040 !default;
+$zindex-modal:                      1050 !default;
+$zindex-popover:                    1060 !default;
+$zindex-tooltip:                    1070 !default;
+
+$zindex-notify:                     1500 !default;
+$zindex-path-direction:             2000 !default;
+$zindex-footer:                     2100 !default;
+$zindex-sidebar:                    2500 !default;
+$zindex-google-search:              3000 !default;
+$zindex-galeria:                    5000 !default;
+$zindex-galeria-fixed:              9000 !default;
+$zindex-message:                    10000 !default;
+
+
 @import '~bootstrap/scss/functions';
 @import '~bootstrap/scss/variables';

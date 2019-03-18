@@ -139,7 +139,7 @@ export default {
 
     .imgmouseover {
       position: absolute;
-      z-index: 2001;
+      z-index: 5000;
       background: white;
       padding: 10px;
       box-shadow: 0px 0px 6px white;

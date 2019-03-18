@@ -2,7 +2,7 @@ footer {
   position: relative;
   background: $color_topo_bg $url_bg_png;
   border-top: 2px solid lighten($color_topo_bg, 20%);
-  z-index: 2000;
+  z-index: 2100;
   span {
     color: lighten(yellow,40%);
   }
@@ -66,6 +66,7 @@ footer {
 .container-footer {
   background: $hover_background_05p;
   margin: $grid-gutter-width 0 0 0;
+  z-index: 2100;
   .path-parlamentares {
     display: none;
   }

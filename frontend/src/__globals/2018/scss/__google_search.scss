@@ -6,7 +6,7 @@
   right: 0px;
   width: 42px;
   height: 42px;
-  z-index: 9999;
+  z-index: 3000;
   .search, .result {
     display: none;
   }
@@ -21,7 +21,7 @@
     border-left: 1px solid green;
 
     .search, .result  {
-      z-index: 9999;
+      z-index: 3000;
       display: block;
     }
   }
