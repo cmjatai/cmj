@@ -107,7 +107,7 @@
 
 #wrapper {
   transition: all 0.5s ease;
-  z-index: 2001;
+  z-index: 2500;
   padding-left: 10px;
   aside {
     width: 10px;
@@ -117,7 +117,7 @@
     left: 0;
     bottom: 0;
     background: $color_main_bg $url_bg_png;
-    z-index: 2001;
+    z-index: 2500;
   }
   #menu-toggle {
     text-decoration: none;
