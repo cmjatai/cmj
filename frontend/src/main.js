@@ -68,6 +68,7 @@ const app = new Vue({ // eslint-disable-line
   components: { App },
   template: '<App/>'
 })
+
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/service-worker.js').then(registration => {
