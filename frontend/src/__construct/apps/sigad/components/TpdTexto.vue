@@ -13,12 +13,12 @@
     <span v-if="has_titulo || elemento.titulo" class="path-title-partes">
       <input v-model.lazy="elemento.titulo" placeholder="Subtítulo para Fragmento de Texto..."/>
     </span>
-    <div class="construct" v-if="usarfroala" >
-      <editor inline  v-model.lazy="elemento.texto"></editor>
-      <!--froala v-if="usarfroala" :tag="'textarea'" :config="config"></froala-->
+    <div class="construct" v-if="usartinymce" >
+      <editor v-if="usartinymce" inline  v-model.lazy="elemento.texto"></editor>
+      <!--froala :tag="'textarea'" :config="config"></froala-->
     </div>
 
-    <textarea-autosize  v-if="!usarfroala" v-model.lazy="elemento.texto" placeholder="Fragmento de Texto" :align="'text-left'"/>
+    <textarea-autosize  v-if="!usartinymce" v-model.lazy="elemento.texto" placeholder="Fragmento de Texto" :align="'text-left'"/>
     <component :is="classChild(value)" v-for="value in childsOrdenados" :child="value" :parent="elemento" :key="value.id"/>
     <div class="btn-toolbar widgets widget-bottom justify-content-end">
       <div class="btn-group btn-group-sm">
@@ -55,12 +55,12 @@ export default {
         }
       },
       model: 'texto do model',
-      usarfroala: true
+      usartinymce: true
     }
   },
   methods: {
     toogleEditor: function () {
-      this.usarfroala = !this.usarfroala
+      this.usartinymce = !this.usartinymce
     }
   }
 }
