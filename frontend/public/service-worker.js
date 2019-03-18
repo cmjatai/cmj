@@ -9,13 +9,16 @@ if (workbox) {
   
   workbox.precaching.precacheAndRoute(
     self.__precacheManifest, 
-    {
-      offlinePage: '/offline/', //<- in case of getting offline and not have cache content , redirect here
-    }
+    {}
   );
-  
-  console.log('self.__precacheManifest:')
-  console.log(self.__precacheManifest)
+
+  workbox.routing.registerRoute(
+    ({ event }) => event.request.mode === 'navigate', //if the requests is to go to a new url
+    ({ url }) => fetch(url.href,{credentials: 'same-origin'}).catch(() => caches.match('/offline/')) //in case of not match send my to the offline page
+  );
+
+  // console.log('self.__precacheManifest:')
+  // console.log(self.__precacheManifest)
 
 } 
 else {
