@@ -1,5 +1,10 @@
 {% load i18n staticfiles%}
 {% load webpack_static from webpack_loader %}
+
+<link rel="manifest" href="/manifest.json">
+<link rel=icon type=image/png sizes=32x32  href="{% webpack_static 'img/icons/favicon-32x32.png' %}" >
+<link rel=icon type=image/png sizes=16x16  href="{% webpack_static 'img/icons/favicon-16x16.png' %}" >
+	
 <meta property="fb:app_id" content="150874375319738">
 <meta property="fb:admins" content="cmjatai">
 <meta property="og:locale" content="pt_BR">

@@ -11,6 +11,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from sapl.base.models import AppConfig
 from sapl.parlamentares.models import Filiacao
+from webpack_loader import utils
 from webpack_loader.templatetags.webpack_loader import render_bundle
 from webpack_loader.utils import _get_bundle
 
@@ -256,3 +257,13 @@ def render_bundle(bundle_name, extension=None, config='DEFAULT', attrs=''):
 @register.simple_tag
 def settings_key(var_name):
     return getattr(settings, var_name)
+
+
+@register.simple_tag
+def render_chunk_vendors(extension=None):
+    try:
+        tags = utils.get_as_tags(
+            'chunk-vendors', extension=extension, config='DEFAULT', attrs='')
+        return mark_safe('\n'.join(tags))
+    except:
+        return ''

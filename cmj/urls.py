@@ -48,6 +48,7 @@ import cmj.agenda.urls
 import cmj.api.urls
 import cmj.cerimonial.urls
 import cmj.core.urls
+import cmj.globalrules.urls
 import cmj.ouvidoria.urls
 import cmj.sigad.urls
 
@@ -57,18 +58,17 @@ import cmj.sigad.urls
 urlpatterns = [
     # FIXME: eliminar redirecionamento em 2019
     url(r'^portal/?$', RedirectView.as_view(url='/')),
-
-
     url(r'^admin/', admin.site.urls),
 
-    #url(r'^$', TemplateView.as_view(template_name='index.html')),
     url(r'^message$', TemplateView.as_view(template_name='base.html')),
-
-    #url('', include('social.apps.django_app.urls', namespace='social')),
     url('', include('social_django.urls', namespace='social')),
 
-    # Todo o conjunto de urls que passaram por adaptação do sapl
+
+    url(r'', include(cmj.globalrules.urls)),
+
+    # Todo o conjunto de urls que passarão por adaptação do sapl
     # devem ficar antes do sapl. para isso criar a app cmj.sapl_adapter
+
     url(r'', include(cmj.core.urls)),
     url(r'', include(cmj.cerimonial.urls)),
     url(r'', include(cmj.ouvidoria.urls)),

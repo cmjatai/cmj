@@ -78,9 +78,15 @@ CHANNEL_LAYERS = {
 }
 
 STATICFILES_DIRS = (
-    BASE_DIR.child('static'),
+    # BASE_DIR.child('static'),
     PROJECT_DIR.child('frontend').child('dist'),
 )
+
+# apenas para debug - na produção nginx deve entregar sw
+PWA_SERVICE_WORKER_PATH = PROJECT_DIR.child(
+    'frontend').child('dist').child('service-worker.js')
+PWA_MANIFEST_PATH = PROJECT_DIR.child(
+    'frontend').child('dist').child('manifest.json')
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',

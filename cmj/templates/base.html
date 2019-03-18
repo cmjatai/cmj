@@ -19,7 +19,7 @@
     {% endblock %}
 
     {% block head_content %}
-      <link rel="icon" href="{% webpack_static 'img/logo_128.png' %}"  type="image/png" >
+      {% render_chunk_vendors 'css' %}
       {% render_bundle  'app' 'css' %}
     {% endblock %}
 
@@ -328,10 +328,8 @@
   </div>
   
   {% block foot_js %}
-    {% if not DEBUG %}
-      {% render_bundle  'manifest' %}
-      {% render_bundle  'vendor' %}
-    {% endif %}
+
+    {% render_chunk_vendors 'js' %}
     {% render_bundle  'app' 'js' %}
     
     {% block extra_js %}{% endblock %}
