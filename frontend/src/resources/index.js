@@ -7,7 +7,7 @@ axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 export default {
   Utils: {
     getYearsChoiceList: (app, model) => axios({
-      url: `${basePath}/${app}/${model}/years`,
+      url: `${basePath}/${app}/${model}/years/`,
       method: 'GET'
     }),
     getModelOrderedList: (app, model, ordering = '', page = 1, query_string = '') => axios({
@@ -19,7 +19,7 @@ export default {
       method: 'GET'
     }),
     getModel: (app, model, id) => axios({
-      url: `${basePath}/${app}/${model}/${id}`,
+      url: `${basePath}/${app}/${model}/${id}/`,
       method: 'GET'
     })
   }

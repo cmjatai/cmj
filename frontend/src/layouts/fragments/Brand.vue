@@ -1,6 +1,6 @@
 <template>
   <div class="w-100 d-flex inner-brand">
-    <img :src="casa.logotipo !== undefined ? casa.logotipo : '@/assets/img/brasao_transp.gif'"/>
+    <img :src="casa.logotipo !== undefined ? casa.logotipo : require('@/assets/img/brasao_transp.gif')"/>
     <h6 class="title-brand">
       {{casa.nome}}<br>
       <small>SAPL - Sistema de Apoio ao Processo Legislativo</small>
@@ -26,7 +26,9 @@ export default {
       let _this = this
       return _this.utils.getModelOrderedList(_this.app, _this.model, 'id')
         .then((response) => {
-          _this.casa = response.data.results[0]
+          if (response.data.results.length > 0) {
+            _this.casa = response.data.results[0]
+          }
         })
     }
   },
