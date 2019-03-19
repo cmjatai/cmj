@@ -68,7 +68,7 @@ SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
 SOCIAL_BACKEND_INFO = {
     'facebook': {
         'title': 'Facebook',
-        'icon': 'fa-facebook-f',
+        'icon': 'fa-facebook',
     },
     'google-oauth2': {
         'title': 'Google',
