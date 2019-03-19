@@ -370,10 +370,13 @@
     }
   }
   .navbar-menu {
+    .navbar-collapse.show {
+      padding:  5px;
+    }
     .container {
       width: 100%;
       max-width: 100%;
-      padding: 5px;
+      padding: 0;
     }
     .navbar-nav {
       li ul li {
