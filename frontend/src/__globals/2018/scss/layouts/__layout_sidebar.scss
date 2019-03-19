@@ -84,6 +84,8 @@
   left: 0;
   bottom: 0;
   right: 0;
+  .inner {
+  }
 }
 
 .canais-relative {
@@ -172,6 +174,10 @@
     .canais-absolute {
       .inner {
         font-size: 0;
+        margin-right: 10px;
+        a {
+          padding: 0;
+        }
       }
       .icon {
         width: 0;

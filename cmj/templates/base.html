@@ -341,10 +341,20 @@
   <script language="JavaScript" type="text/javascript" >
   
     $(function () {
-      $("#menu-toggle").click(function (e) {
-        e.preventDefault();
+      let toogleWrapper = function (event) {
+          if (!$("#wrapper").hasClass('toogled')) {
+            $(".canais-absolute .box").off('click')
+          }
+          else {
+            $(".canais-absolute .box").click(toogleWrapper)
+          }
         $("#wrapper").toggleClass("toggled");
         $(".container").toggleClass("toggled ");
+        event.preventDefault();
+      }
+
+      $("#menu-toggle, .canais-absolute .box").click(function (event) {
+        toogleWrapper(event)
       });
     });
   </script>
