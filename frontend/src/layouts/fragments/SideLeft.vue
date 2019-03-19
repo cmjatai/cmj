@@ -1,6 +1,6 @@
 <template>
   <div class="w-100 h-100 d-flex flex-column align-items-start inner inner-sideleft">
-    <router-link :to="{ name: item.route }" v-for="(item, key) in links" :key="key" @click.native="selectRoute(item)" :class="isSelected(item)">
+    <router-link :to="{ name: item.route }" v-for="(item, key) in links_filter" :key="key+1" @click.native="selectRoute(item)" :class="[isSelected(item), isClicked(item)]" @mouseover.native="mouseover(item)" @mouseleave.native="mouseleave(item)">
       <span class="hover-circle icon">
         <b-img :src="item.image" fluid rounded="0" />
       </span>
@@ -15,10 +15,11 @@
 
 <script>
 export default {
-  name: 'side-right',
+  name: 'side-left',
   data () {
     return {
       selected: '',
+      clicked: '',
       links: [
         {
           image: require('@/assets/img/icon_mesa_diretora.png'),
@@ -64,15 +65,38 @@ export default {
     }
   },
   computed: {
+    links_filter: function () {
+      return this.links.filter(i => i.route !== '')
+    }
   },
   methods: {
     isSelected (item) {
-      return item.texto === this.selected ? 'selected' : ''
+      return item.route === this.selected ? 'selected' : ''
+    },
+    isClicked (item) {
+      return item.texto === this.clicked ? 'clicked' : ''
+    },
+    mouseover (item) {
+      let t = this
+      t.clicked = item.texto
+    },
+    mouseleave (item) {
+      let t = this
+      t.clicked = ''
     },
     selectRoute (item) {
-      this.selected = item.texto
+      let t = this
+      t.selected = item.route
+      t.clicked = item.texto
+      setTimeout(() => {
+        t.clicked = ''
+      }, 500)
     }
+  },
+  mounted () {
+    this.selected = this.$route.name
   }
+
 }
 </script>
 
@@ -103,8 +127,9 @@ export default {
       position: absolute;
       left: 100%;
       margin-left: -5px;
+      line-height: 40px;
     }
-    &:hover, &.selected .icon {
+    &.clicked{
       text-decoration: none;
       position: relative;
       background-color: #dddddd;
@@ -112,15 +137,16 @@ export default {
         background-color: #dddddd;
         display: block;
         border-radius: 0 24px 24px 0;
-        padding: 8px 24px 8px 0;
+        padding: 0px 12px 0px 0;
       }
     }
+
     &.selected .icon  {
       border-radius: 50%;
+      background-color: #dddddd;
     }
   }
 }
-
 .base-layout.left-expand {
   .sideleft {
     background-color: rgba($color: #f5f5f5, $alpha: 1);
