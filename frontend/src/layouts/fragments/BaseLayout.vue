@@ -51,7 +51,6 @@ export default {
 </script>
 
 <style lang="scss">
-@import '~bootstrap/scss/bootstrap';
 
 .body-base-layout {
   overflow: hidden;
@@ -78,7 +77,7 @@ export default {
   bottom: 0;
   left: 0;
   background-color: transparent;
-  z-index: $zindex-fixed;
+  z-index: 4000;
   display: grid;
 
   @extend .grid-template-columns;
