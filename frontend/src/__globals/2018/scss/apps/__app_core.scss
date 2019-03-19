@@ -1,6 +1,6 @@
 
 // ADJUST tela de login ########################################
-.html-login, {
+.html-login {
   background-color: $color_topo_bg;
   background-image: none;
   a.navbar-brand {
@@ -25,7 +25,7 @@
 }
 
 .container-login {
-  box-shadow: 0px 1px 1px #ddd;
+  box-shadow: 0px 1px 5px #ccc;
   min-height: 100%;
   position: relative;
   margin: 3% 15%;
@@ -58,7 +58,7 @@
     margin: 30px 10% 0;
     span.fa {
       position: absolute;
-      padding: 0.2em;
+      padding: 0.45em 0.2em;
       opacity: 0.6;
     }
   }
@@ -71,7 +71,7 @@
     text-align: right;
   }
   input {
-    height: 2em;
+    height: 3em;
     font-size: 1.3em;
     border: 1px solid rgba($color_topo_bg, 0.7);
 
@@ -88,57 +88,49 @@
   .btns-login {
     margin: 1em 0;
     .btn-login {
-      padding: 0 3px;
-      position: relative;
-      display: inline-block;
-      width: 100%;
-      letter-spacing: 0px;
-      text-align: center;
-      font-size: 1.2rem;
-      cursor: pointer;
-
       border: 0px solid $color_topo_bg;
       background-color: $color_topo_bg;
-      line-height: 1.9rem;
+      cursor: pointer;
+      display: inline-block;
+      line-height: 3rem;
+      padding: 0 10px;
+      font-size: 1.2rem;
+      //position: relative;
+      width: 100%;
+      //letter-spacing: 0px;
+      text-align: center;
+
+      //line-height: 1.9rem;
 
       color: white;
       text-decoration: none;
 
       i {
-        font-size: 1.9rem;
-        background-color: white;
-        margin: 7px 10px;
-        line-height: 1.8rem;
-        border-radius: 2px;
+        margin-right: 10px;
+        //line-height: 1.8rem;
+        //border-radius: 2px;
         vertical-align: middle;
+        font-size: 2.4rem;
       }
-
-
+      
+      
       &[name="facebook"]  {
         background-color:  #4267B2;
-        i { 
-          color:  #4267B2;
-          padding: 12px 7px 0 18px;
-        }
       }
       &[name="google-oauth2"] {
         background-color: #e55;
         i { 
-          color:  #e55;
-          padding: 6px 7px;
+          font-size: 2rem;
         }
       }
       &:hover {
         background: black $url_bg_png;
       }
-      img {
-        width: 24px;
-      }
     }
     &.box-entry {
       margin: $grid-gutter-width 0 0 0;
       padding: 1em 2em;
-      border: 1px solid #ccc;
+      border: 1px solid #ddd;
     }
     
   }
@@ -147,7 +139,7 @@
 
 .container-login-inner {
   .container-login {
-    margin: 30px 15%;
+    //margin: 30px 15%;
   }
 }
 
@@ -171,6 +163,9 @@
   .container-login {
     margin: 0 10% $grid-gutter-width/2;
     .btns-login {
+      .col-lg-6 {
+        padding: 0;
+      }
       .btn-login {
         margin-top: 10px;
       }
@@ -179,14 +174,14 @@
 }
 @media screen and (max-width: 991px) {
   .container-login {
-    margin: 0 10% $grid-gutter-width/2;
+    //margin: 0 10% $grid-gutter-width/2;
     .inner {
-      padding: $grid-gutter-width/2;
+      //padding: $grid-gutter-width/2;
     }
   }
   .container-login-inner {
     .container-login {
-      margin: 10px 1%;
+      margin: 0;
     }
   }
 }
@@ -202,7 +197,7 @@
     }
     .btns-login {
       .btn-login {
-        margin-top: 10px;
+        //margin-top: 10px;
       }
     }
   }
@@ -210,52 +205,56 @@
 
 @media screen and (max-width: 600px) {
   .container-login {
-    .label2 {
-      font-size: 1.5em;
-    }
     input {
-      height:2em;
+      height: 2.5em;
       font-size: 1.2em;
       padding: 0.5em 0.7em 0.5em 2.2em;
     }
     .btns-login {
       .btn-login {
-        letter-spacing: 3px;
+        letter-spacing: 1px;
       }
     }
     .input-icon {
       span.fa {
-        padding: 0.1em 0.2em;
+        padding: 0.15em 0.2em;
       }
     }
   }
   .container-login-inner {
     .container-login {
-      margin: 10px 1%;
+      //margin: 10px 1%;
     }
     .inner-ouvidoria {
-      padding: 0px;
+      //padding: 0px;
     }
   }
 }
 @media screen and (max-width: 480px) {
   .container-login {
-    margin: 10px 0;
+    //margin: 10px 0;
     .input-icon {
-      margin: 15px 15px 0;
+      margin: 15px 0 0;
     }
     .row-recovery {
       margin: 0 10px;
+    }
+
+    .btns-login {
+      &.box-entry {
+        margin: 0;
+        padding: 15px;
+      }
     }
     
   }
   .container-login-inner {
     .container-login {
-      margin: 10px 0;
+      //margin: 10px 0;
     }
 
     .inner-ouvidoria {
-      padding: 30px;
+      //padding: 30px;
     }
   }
 }

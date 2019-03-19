@@ -371,11 +371,14 @@
   }
   .navbar-menu {
     .container {
-      width: auto;
+      width: 100%;
       max-width: 100%;
-      padding: 0 5px;
+      padding: 5px;
     }
     .navbar-nav {
+      li ul li {
+        padding: 0 15px;
+      }
       & > li {
         margin: 0px;
         a {
