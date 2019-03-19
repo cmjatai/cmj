@@ -53,7 +53,7 @@ def time_refresh_log_test(request):
 
 def online_app_view(request):
 
-    return render(request, 'online_app.html')
+    return render(request, 'base.html')
 
 
 class TrechoCrud(CrudAux):
