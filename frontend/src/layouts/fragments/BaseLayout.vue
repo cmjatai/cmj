@@ -80,6 +80,9 @@ export default {
   z-index: 4000;
   display: grid;
 
+  font-size: 1rem;
+  line-height: 1rem;
+
   @extend .grid-template-columns;
   grid-template-rows: 60px auto;
 
@@ -87,7 +90,7 @@ export default {
     display: grid;
     @extend .row-top;
 
-    grid-template-columns: 64px 2fr 1fr 64px;
+    grid-template-columns: 64px auto 1px 64px;
     grid-column-start: 1;
     grid-column-end: 5;
 

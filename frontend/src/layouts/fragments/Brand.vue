@@ -48,9 +48,15 @@ export default {
   }
   .title-brand {
     display: inline-block;
-    padding-left: 1rem;
-    line-height: 1;
+    padding-left: 0.5rem;
     margin: 0;
+  }
+}
+@media screen and (max-width: 480px) {
+  .inner-brand {
+    .title-brand {
+      font-size: 0.7rem;
+    }
   }
 }
 </style>

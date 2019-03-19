@@ -52,7 +52,6 @@ def time_refresh_log_test(request):
 
 
 def online_app_view(request):
-
     return render(request, 'base.html')
 
 
