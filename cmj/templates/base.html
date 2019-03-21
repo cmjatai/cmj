@@ -27,6 +27,9 @@
   </head>
 
   <body class="{% block body_class %}{%endblock%}">
+
+  {% block root_body %}
+  
     <div class="page fadein" id="{% block id_wrapper %}wrapper{% endblock %}">
       <div class="header-accessibility">
           <div class="container links-to-content justify-content-between">
@@ -295,6 +298,7 @@
   {% block login_container %}
   {% endblock%}
 
+
   <footer id="rodape_access">
     <div class="container-fluid">
       <div class="container">
@@ -326,6 +330,9 @@
       <div class="gcse-searchresults"></div>
     </div>
   </div>
+
+
+  {% endblock root_body %}
   
   {% block foot_js %}
 

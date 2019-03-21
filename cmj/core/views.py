@@ -51,8 +51,8 @@ def time_refresh_log_test(request):
     return render(request, 'core/time_refresh_log_test.html', {})
 
 
-def online_app_view(request):
-    return render(request, 'base.html')
+def app_vue_view(request):
+    return render(request, 'app_vue.html')
 
 
 class TrechoCrud(CrudAux):

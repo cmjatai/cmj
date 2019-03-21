@@ -122,4 +122,9 @@ export default {
   }
 }
 
+@media screen and (max-width: 480px) {
+  .sessaoplenaria-list {
+    grid-row-gap: 5px;
+  }
+}
 </style>

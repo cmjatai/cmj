@@ -101,16 +101,19 @@ export default {
 </script>
 
 <style lang="scss">
+
+@import "~@/scss/variables";
+
 .inner-sideleft {
   padding-top: 8px;
-  //background: linear-gradient(to right, rgba(9, 20, 38, 0.95) 0%, #000000 100%);
+  // background: linear-gradient(to right, rgba(9, 20, 38, 0.95) 0%, #000000 100%);
   a {
     text-decoration: none;
     cursor: pointer;
-    height: 40px;
+    height: $width-sideleft * 0.6;
     width: 100%;
     display: grid;
-    grid-template-columns: 64px minmax(0px,186px);
+    grid-template-columns: $width-sideleft minmax(0px, $width-sideleft * 3);
     align-items: center;
     .icon {
       text-align: center;
@@ -118,7 +121,7 @@ export default {
       padding: 6px 0;
     }
     img {
-      height: 28px;
+      height: $width-sideleft * 0.4;
     }
     .text-link {
       color: #555;
@@ -127,7 +130,8 @@ export default {
       position: absolute;
       left: 100%;
       margin-left: -5px;
-      line-height: 40px;
+      line-height: $width-sideleft * 0.6;
+      z-index: 1;
     }
     &.clicked{
       text-decoration: none;
@@ -161,6 +165,20 @@ export default {
     a:hover, a.selected  {
        background-color: #dddddd;
        border-radius: 0 24px 24px 0;
+    }
+  }
+}
+
+@media screen and (max-width: 480px) {
+  $width-sideleft: 48px;
+  .inner-sideleft {
+    a {
+      //height: $width-sideleft * 0.7;
+      grid-template-columns: 48px minmax(0px, 186px);
+      .icon {
+        margin: 0 6px;
+        padding: 5px 0;
+      }
     }
   }
 }

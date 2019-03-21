@@ -4,16 +4,15 @@ from django.contrib.auth.decorators import permission_required, login_required
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import TemplateView
 
-from cmj.core.forms_auth import RecuperarSenhaForm, NovaSenhaForm, LoginForm
+from cmj.core.forms_auth import NovaSenhaForm
 from cmj.core.views import CepCrud, RegiaoMunicipalCrud, DistritoCrud,\
     BairroCrud, TipoLogradouroCrud, LogradouroCrud, TrechoCrud, \
     TrechoJsonSearchView, TrechoJsonView, AreaTrabalhoCrud,\
     OperadorAreaTrabalhoCrud, PartidoCrud, ImpressoEnderecamentoCrud,\
     NotificacaoRedirectView, chanel_index, chanel_room, time_refresh_log_test,\
-    online_app_view
+    app_vue_view
 from cmj.core.views_auth import CmjUserChangeView, CmjLoginView,\
     CmjPasswordResetView
-from cmj.settings import EMAIL_SEND_USER
 
 from .apps import AppConfig
 
@@ -58,7 +57,7 @@ user_urlpatterns = [
         time_refresh_log_test, name='time_refresh_log_test_index'),
 
     url(r'^online/',
-        online_app_view, name='online_app_url'),
+        app_vue_view, name='app_vue_view_url'),
 
 
 ]

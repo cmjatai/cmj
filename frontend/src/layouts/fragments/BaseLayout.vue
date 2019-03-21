@@ -51,13 +51,14 @@ export default {
 </script>
 
 <style lang="scss">
+@import "~@/scss/variables";
 
 .body-base-layout {
   overflow: hidden;
 }
 
 .grid-template-columns {
-  grid-template-columns: 64px 186px auto 0px;
+  grid-template-columns: $width-sideleft $width-sideleft * 3 auto 0px;
 }
 
 .row-top {
@@ -90,7 +91,7 @@ export default {
     display: grid;
     @extend .row-top;
 
-    grid-template-columns: 64px auto 1px 64px;
+    grid-template-columns: $width-sideleft auto 1px $width-sideleft;
     grid-column-start: 1;
     grid-column-end: 5;
 
@@ -130,8 +131,6 @@ export default {
     }
   }
 }
-
-$padding-space: 1rem;
 
 .base-layout {
   .hover-circle:hover {
@@ -199,6 +198,26 @@ $padding-space: 1rem;
     padding: 3rem;
     text-align: center;
     font-size: 120%;
+  }
+}
+
+@media screen and (max-width: 480px){
+  $width-sideleft: 48px;
+
+  .base-layout {
+    grid-template-columns: $width-sideleft 0 auto 0px;
+    .main {
+      padding: 0.5rem;
+    }
+  }
+
+  .base-layout {
+    header {
+      grid-template-columns: auto 1px $width-sideleft;
+      .navigation {
+        display: none;
+      }
+    }
   }
 
 }

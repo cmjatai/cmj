@@ -50,13 +50,8 @@ export default {
     display: inline-block;
     padding-left: 0.5rem;
     margin: 0;
+    font-size: 1rem;
   }
 }
-@media screen and (max-width: 480px) {
-  .inner-brand {
-    .title-brand {
-      font-size: 0.7rem;
-    }
-  }
-}
+
 </style>

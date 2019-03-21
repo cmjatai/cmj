@@ -91,4 +91,10 @@ export default {
     }
   }
 }
+@media screen and (max-width: 480px) {
+  .form-sessao-list {
+    grid-row-gap: 5px;
+    grid-column-gap: 5px;
+  }
+}
 </style>
