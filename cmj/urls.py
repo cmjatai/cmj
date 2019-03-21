@@ -32,6 +32,7 @@ from django.contrib import admin
 from django.views.generic.base import TemplateView, RedirectView
 from django.views.static import serve as view_static_server
 import sapl.api.urls
+import sapl.audiencia.urls
 import sapl.base.urls
 import sapl.comissoes.urls
 import sapl.compilacao.urls
@@ -75,6 +76,7 @@ urlpatterns = [
     url(r'', include(cmj.agenda.urls)),
 
 
+    url(r'^sapl/', include(sapl.audiencia.urls)),
     url(r'^sapl/', include(sapl.comissoes.urls)),
     url(r'^sapl/', include(sapl.sessao.urls)),
     url(r'^sapl/', include(sapl.parlamentares.urls)),
