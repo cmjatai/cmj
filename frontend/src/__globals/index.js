@@ -37,5 +37,5 @@ window.autorModal()
 window.refreshMask()
 window.refreshDatePicker()
 window.initTextRichEditor('texto-rico')
-
+//initTinymce
 // import './2018/themes/dezembrolaranja/app.scss'
