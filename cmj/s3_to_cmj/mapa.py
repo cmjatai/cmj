@@ -277,7 +277,7 @@ mapa = [
         's31_model': TipoExpediente,
         'fields': {
             'id': 'cod_expediente',
-            'descricao': 'nom_expediente',
+            'nome': 'nom_expediente',
             'ind_excluido': 'ind_excluido'
         }
     },
