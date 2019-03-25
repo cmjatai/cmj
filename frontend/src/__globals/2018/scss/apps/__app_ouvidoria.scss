@@ -91,6 +91,10 @@
 
 .container-ouvidoria {
   margin-top: $grid-gutter-width;
+  &.container-login-inner {
+    width: auto;
+    margin: 0 15px 30px;
+  }
   .inner-ouvidoria {
     padding: 20px 30px;
     font-size: 100%;
@@ -165,5 +169,21 @@
   border-radius: 7px 7px 5px 5px;
   .form-resposta {
     padding: $grid-gutter-width * 2 $grid-gutter-width * 1.2 $grid-gutter-width;
+  }
+}
+@media screen and (max-width: 480px) {
+  .container-ouvidoria {
+    .page-header {
+      font-size: 120%;
+    }
+    .text-center {
+      font-size: 100%;
+    }
+    .label2 {
+      font-size: 120%;
+    }
+    .inner-ouvidoria {
+      padding: 10px 0px;
+    }
   }
 }
