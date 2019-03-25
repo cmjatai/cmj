@@ -26,7 +26,8 @@ const mutations = {
     if (!state.cache[data.app].hasOwnProperty(data.model)) {
       state.cache[data.app][data.model] = {}
     }
-    state.cache[data.app][data.model][data.id] = data.value
+    state.cache[data.app][data.model][
+      data.value !== undefined ? data.value.id : data.id] = data.value
   }
 }
 
