@@ -78,14 +78,15 @@
             {% endblock %}
 
             <div class="navbar-collapse collapse" id="navbar-access">
-
-            {% block social_links %}
-              <div class="navbar-social-links justify-content-center">
-                <a href="https://www.facebook.com/cmjatai"><i class="fab fa-facebook-f" aria-hidden="true"><span>Facebook</span></i></a>
-                <a href="https://www.youtube.com/C%C3%A2maraMunicipalJata%C3%AD?sub_confirmation=1"><i class="fab fa-youtube" aria-hidden="true"><span>YouTube</span></i></a>
-                <a href="https://twitter.com/cmjatai"><i class="fab fa-twitter" aria-hidden="true"><span>Twitter</span></i></a>
-              </div>
-            {% endblock %}
+              
+              {% block social_links %}
+                <div class="navbar-social-links justify-content-center">
+                  <a href="https://www.facebook.com/cmjatai"><i class="fab fa-facebook-f" aria-hidden="true"><span>Facebook</span></i></a>
+                  <a href="https://www.youtube.com/C%C3%A2maraMunicipalJata%C3%AD?sub_confirmation=1"><i class="fab fa-youtube" aria-hidden="true"><span>YouTube</span></i></a>
+                  <a href="https://twitter.com/cmjatai"><i class="fab fa-twitter" aria-hidden="true"><span>Twitter</span></i></a>
+                </div>
+              {% endblock %}
+                
               <ul class="navbar-nav justify-content-end">
                 {% if user and not user.is_anonymous %}
                   <li class="dropdown nav-user">
@@ -120,19 +121,19 @@
                 {% endif %}
               </ul>
                 <div class="google-search">
-                  <div class="search">
-                    <strong>
-                      Busca Google no Portal CMJ
-                    </strong>
-                    <div class="gcse-searchbox"></div>
-                    <small>
-                      Utilize a busca do Google para pesquisar em nosso conteúdo.
-                    </small>
-                  </div>
-                  <div class="result">
-                    <div class="gcse-searchresults"></div>
-                  </div>
+                <div class="search">
+                  <strong>
+                    Busca Google no Portal CMJ
+                  </strong>
+                  <div class="gcse-searchbox"></div>
+                  <small>
+                    Utilize a busca do Google para pesquisar em nosso conteúdo.
+                  </small>
                 </div>
+                <div class="result">
+                  <div class="gcse-searchresults"></div>
+                </div>
+              </div>
             </div>
           </div>
       </nav>
