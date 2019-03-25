@@ -419,7 +419,7 @@ class ProcessoForm(ModelForm):
                       type='search',
                       onkeypress='atualizaContatos(event)'),
                 StrictButton(
-                    _('Filtrar'), css_class='btn-default',
+                    _('Filtrar'), css_class='btn-outline-primary',
                     type='button', onclick='atualizaContatos(event)')),
             Div(css_class='form-group-contato-search '
                 'controls-radio-checkbox')
@@ -546,7 +546,7 @@ class ContatoFragmentSearchForm(forms.Form):
                   placeholder=_('Filtrar Lista'),
                   autocomplete='off'),
             StrictButton(
-                _('Filtrar'), css_class='btn-default',
+                _('Filtrar'), css_class='btn-outline-primary',
                 type='button', onclick='atualizaContatos(event)'))"""
 
         self.fields['contatos_search'].widget = forms.CheckboxSelectMultiple(
@@ -895,7 +895,7 @@ class ImpressoEnderecamentoContatoFilterSet(FilterSet):
                 col1,
                 to_row([(SubmitFilterPrint(
                     'filter',
-                    value=_('Filtrar'), css_class='btn-default pull-right',
+                    value=_('Filtrar'), css_class='btn-outline-primary pull-right',
                     type='submit'), 12)])), 6),
              (Fieldset(
                  _('Informações para Impressão'),
@@ -1046,7 +1046,7 @@ class ContatoAgrupadoPorProcessoFilterSet(FilterSet):
                 (SubmitFilterPrint(
                     'filter',
                     value=_('Filtrar'),
-                    css_class='btn-default pull-right',
+                    css_class='btn-outline-primary pull-right',
                     type='submit'), 12)
             ]))
 
@@ -1144,7 +1144,7 @@ class GrupoDeContatosForm(ModelForm):
                       type='search',
                       onkeypress='atualizaContatos(event)'),
                 StrictButton(
-                    _('Filtrar'), css_class='btn-default',
+                    _('Filtrar'), css_class='btn-outline-primary',
                     type='button', onclick='atualizaContatos(event)')),
             Div(css_class='form-group-contato-search')
         )
@@ -1225,7 +1225,7 @@ class ContatoAgrupadoPorGrupoFilterSet(FilterSet):
                 (SubmitFilterPrint(
                     'filter',
                     value=_('Filtrar'),
-                    css_class='btn-default pull-right',
+                    css_class='btn-outline-primary pull-right',
                     type='submit'), 12)
             ]))
 

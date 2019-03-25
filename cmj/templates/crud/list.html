@@ -13,7 +13,7 @@
   {% block actions %}
     <div class="actions btn-group btn-group-lg" role="group">
       {% if view.create_url %}
-      <a href="{{ view.create_url }}" class="btn btn-default">
+      <a href="{{ view.create_url }}" class="btn btn-outline-primary">
         {% blocktrans with verbose_name=view.verbose_name %} Adicionar {{ verbose_name }} {% endblocktrans %}
       </a>
       {% endif %}

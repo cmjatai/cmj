@@ -7,10 +7,10 @@
 {% endblock title %}
 {% block controls_content %}
   {% if perms.sigad.change_classe %}
-    <a class="btn btn-default" href="{% url 'cmj.sigad:subclasse_list' object.id %}">{% trans "Admin" %}</a>
+    <a class="btn btn-outline-primary" href="{% url 'cmj.sigad:subclasse_list' object.id %}">{% trans "Admin" %}</a>
   {% endif %}
   {% if perms.sigad.add_documento %}
-    <a class="btn btn-default" href="{% url create_doc_url object.id %}">{% trans "Adicionar item a" %} {{object }}</a>
+    <a class="btn btn-outline-primary" href="{% url create_doc_url object.id %}">{% trans "Adicionar item a" %} {{object }}</a>
   {% endif %}
 {% endblock %}
 

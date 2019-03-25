@@ -4,9 +4,9 @@
   }
 }
 
-.btn-default {
+.btn-outline-primary {
   @include btn(#333, rgba(white, 0.7), #555, rgba(#ccc, 0.7));
-  white-space: nowrap;
+  //white-space: nowrap;
   border-color: #ced4da;
   &:hover {
     border-color: #ced4da;

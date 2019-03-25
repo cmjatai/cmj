@@ -85,6 +85,6 @@ class ListWithSearchForm(forms.Form):
                       placeholder=_('Filtrar Lista'),
                       css_class='input-lg'),
                 StrictButton(
-                    _('Filtrar'), css_class='btn-default btn-lg',
+                    _('Filtrar'), css_class='btn-outline-primary btn-lg',
                     type='submit'))
         )

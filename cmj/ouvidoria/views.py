@@ -74,7 +74,7 @@ class SolicitacaoDetailView(PermissionRequiredMixin,
     def extras_url(self):
         return [
             (reverse('cmj.ouvidoria:solicitacao_manage_list'),
-             'btn-default',
+             'btn-outline-primary',
              _('Listar outras Solcitações')
              )
         ]

@@ -87,7 +87,7 @@
   justify-content: space-between;
   margin: $grid-gutter-width 0;
   .search {
-    flex: 0 1 100%;
+    flex: 1 1 auto;
     margin-right: $grid-gutter-width;
   }
 }
@@ -181,10 +181,10 @@ main {
         background-color:  darken($color_container_bg, 10%);
     }
   }
-  .form-control, .btn-default {
+  .form-control, .btn-outline-primary {
     @extend .item-action-or-input;
   }
-  .btn-default {
+  .btn-outline-primary {
     color: darken($color_main_bg, 60%);
     &:hover {
       color: darken($color_main_bg, 70%);

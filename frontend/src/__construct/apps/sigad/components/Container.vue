@@ -21,12 +21,12 @@
     <component :is="classChild(value)" v-for="value in childsOrdenados" :child="value" :parent="elemento" :key="value.id"/>
     <div class="btn-toolbar widgets widget-bottom justify-content-end">
       <div class="btn-group btn-group-sm">
-        <button v-on:click.self="addBrother('container', $event)" title="Adicionar novo Container Simples abaixo deste" type="button" class="btn btn-default">+C</button>
-        <button v-on:click.self="addBrother('container-fluid', $event)" title="Adicionar novo Container Extendido abaixo deste"  type="button" class="btn btn-default">+CE</button>
-        <button v-on:click.self="addBrother('container-file', $event)" title="Adicionar novo Container Para PDF"  type="button" class="btn btn-default">+CF</button>
+        <button v-on:click.self="addBrother('container', $event)" title="Adicionar novo Container Simples abaixo deste" type="button" class="btn btn-outline-primary">+C</button>
+        <button v-on:click.self="addBrother('container-fluid', $event)" title="Adicionar novo Container Extendido abaixo deste"  type="button" class="btn btn-outline-primary">+CE</button>
+        <button v-on:click.self="addBrother('container-file', $event)" title="Adicionar novo Container Para PDF"  type="button" class="btn btn-outline-primary">+CF</button>
       </div>
       <div class="btn-group btn-group-sm">
-        <button v-on:click="containerTrocarTipo" title="Trocar tipo deste Container" type="button" class="btn btn-default"><i class="fas fa-exchange-alt"></i></button>
+        <button v-on:click="containerTrocarTipo" title="Trocar tipo deste Container" type="button" class="btn btn-outline-primary"><i class="fas fa-exchange-alt"></i></button>
       </div>
       <div class="btn-group btn-group-sm">
         <button v-on:click.self="deleteParte" title="Remover este Container" type="button" class="btn btn-danger">x</button>
