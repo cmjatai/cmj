@@ -93,8 +93,8 @@
       url: http://sislegis.camarajatai.go.gov.br/publicacoes/seeker?sv=9&tl=32
     - title: {% trans 'Canceladas' %}
       url: http://sislegis.camarajatai.go.gov.br/publicacoes/seeker?sv=9&tl=33
-    - title: {% trans 'Outras Publicações' %}
-      url: http://sislegis.camarajatai.go.gov.br/publicacoes/seeker?sv=9&tl=33
+    - title: {% trans 'Outros Status' %}
+      url: http://sislegis.camarajatai.go.gov.br/publicacoes/seeker?sv=9&tl=35
   - title: {% trans 'Contratos'%}
     url: ''
     children:
