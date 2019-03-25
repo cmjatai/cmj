@@ -6,14 +6,11 @@
 
 <script>
 
-import Resources from '@/resources'
-
 export default {
   name: 'model-select',
   props: ['app', 'model', 'label', 'limit', 'ordering', 'choice'],
   data () {
     return {
-      utils: Resources.Utils,
 
       selected: null,
       options: [

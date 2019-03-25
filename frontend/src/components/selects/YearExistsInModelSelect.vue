@@ -6,8 +6,6 @@
 
 <script>
 
-import Resources from '@/resources'
-
 export default {
   /**
    * Componente que cria select para qualquer model do Sapl que
@@ -17,7 +15,6 @@ export default {
   props: ['app', 'model', 'label'],
   data () {
     return {
-      utils: Resources.Utils,
 
       selected: null,
       options: [

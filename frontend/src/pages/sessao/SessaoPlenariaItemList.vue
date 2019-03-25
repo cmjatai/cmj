@@ -9,13 +9,11 @@
   </router-link>
 </template>
 <script>
-import Resources from '@/resources'
 export default {
   name: 'sessao-plenaria-item-list',
   props: ['sessao'],
   data () {
     return {
-      utils: Resources.Utils,
 
       app: ['sessao', 'parlamentares'],
       model: ['sessaoplenaria', 'sessaolegislativa', 'tiposessaoplenaria', 'legislatura'],

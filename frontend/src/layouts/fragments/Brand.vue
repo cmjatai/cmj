@@ -9,12 +9,10 @@
 </template>
 
 <script>
-import Resources from '@/resources'
 export default {
   name: 'brand',
   data () {
     return {
-      utils: Resources.Utils,
       app: 'base',
       model: 'casalegislativa',
 

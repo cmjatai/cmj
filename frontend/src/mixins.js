@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
+import Resources from '@/resources'
 import { EventBus } from '@/event-bus'
 
 Vue.use(Vuex)
@@ -11,6 +12,11 @@ Vue.mixin({
     ...Vuex.mapGetters([
       'getModel'
     ])
+  },
+  data () {
+    return {
+      utils: Resources.Utils,
+    }
   },
   methods: {
     ...Vuex.mapActions([

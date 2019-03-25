@@ -22,7 +22,6 @@
 </template>
 
 <script>
-import Resources from '@/resources'
 import FormSessaoList from './FormSessaoList'
 import SessaoPlenariaItemList from './SessaoPlenariaItemList'
 export default {
@@ -33,7 +32,6 @@ export default {
   },
   data () {
     return {
-      utils: Resources.Utils,
       init: false,
 
       /**

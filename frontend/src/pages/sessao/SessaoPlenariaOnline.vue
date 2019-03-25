@@ -8,7 +8,6 @@
 </template>
 <script>
 import SessaoPlenariaItemList from './SessaoPlenariaItemList'
-import Resources from '@/resources'
 export default {
   name: 'sessao-plenaria-online',
   components: {
@@ -16,9 +15,7 @@ export default {
   },
   data () {
     return {
-      utils: Resources.Utils,
       sessao: null,
-
       app: ['sessao'],
       model: ['sessaoplenaria']
     }
