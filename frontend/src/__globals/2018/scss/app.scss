@@ -73,87 +73,73 @@ a:hover {
   color: darken($color_topo_bg, 20%);
 }
 
-
-
 .bg-back-image {
   background: $color_main_bg $url_bg_png;
-
 }
-.container-fluid {
-  margin: 0;
-}
-// colore de forma diferente
-// os containers que não são da app sigad
 
 .control-label {
   color: $color_text;
   font-weight: normal;
 }
 
+.container-fluid {
+  margin: 0;
+}
+
 
 .container-table {
-  padding-left: $grid-gutter-width / 2;
-  padding-right: $grid-gutter-width / 2;
   overflow: hidden;
-}
-.result-count {
-  position: absolute;
-  color: darken($color_main_bg, 40%);
-  margin-left: 0.5 * $grid-gutter-width;
-  margin-top: -0.55 * $grid-gutter-width;
-  line-height: $grid-gutter-width * 0.75;
-  padding: 4px 0.5 * $grid-gutter-width 2px;
-  border: 1px solid  darken($color_main_bg, 5%);
-  background-color: white;
+  margin: -15px;
 
+  .result-count {
+    display: inline-block;
+    background-color: darken($color_container_bg, 5);
+    padding: 0px 10px;
+    margin-left: 10px;
+    border: 1px solid white;
+    border-bottom: 0px;
+  }
 }
 
 .table {
-  border: 1px solid darken($color_main_bg, 5%);
-  td {
-    ul {
-        margin-bottom: 0px;
+  margin-bottom: 0;
+  th, td {
+    vertical-align: middle;
+    border: 1px solid #fff;
+  }
+  thead {
+    th {
+      border: 1px solid #fff;
+    }
+  }
+  th {
+    padding: 15px 10px;
+    background-color: darken($color_container_bg, 5);
+    a {
+      display: inline-block;
+      width: 100%;
+    }
+    &:hover {
+      background-color: darken($color_container_bg, 10);
+    }
+  }
+  tbody {
+    tr:nth-child(odd) {
+      background-color: lighten($hover_background_05p, 40);
+    }
+    tr:hover {
+      background-color: darken($color_container_bg, 10);
     }
   }
 
-}
-
-.table > thead > tr > th, .table > thead > tr > td, .table > tbody > tr > th, .table > tbody > tr > td, .table > tfoot > tr > th, .table > tfoot > tr > td {
-  border-top-color: darken($color_main_bg, 5%);
-  border-bottom-width: 0;
-  font-weight: normal;
-  vertical-align: middle;
-}
-
-.table-link-ordering > thead > tr > th, .table-link-ordering > tbody > tr > th, .table-link-ordering > tfoot > tr > th {
-    padding: 0;
-    a {
-      display: block;
-      padding: $grid-gutter-width 0.35 * $grid-gutter-width;
-      &:hover {
-        background-color: $hover_background_05p;
-      }
-    }
-}
-
-.table-striped > tbody > tr:nth-of-type(odd) {
-    background-color: lighten($color_container_bg, 3);
-}
-.table-striped > tbody > tr:hover {
-    background-color: darken($color_container_bg, 10);
-}
-
-
-
-.table {
   .row-unread {
     td {
       background-color:#e3d4b5;
     }
-
+    
   }
 }
-
+  
 .alert {
   margin: $grid-gutter-width $grid-gutter-width/2 $grid-gutter-width;
 }
