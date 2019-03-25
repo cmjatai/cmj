@@ -32,7 +32,7 @@
       text-decoration: none;
       display: flex;
       align-items: center;
-      color: $color_text_menu;
+      color: lighten($color_text_menu,15);
       font-family: Lato, Helvetica, sans-serif;
       font-weight: 400;
       padding: 0 6px;
@@ -113,7 +113,7 @@
         min-width: auto;
         background: darken($color_topo_bg, 5%) $url_bg_png;
         li {
-          padding: 0 30px;
+          padding: 0 20px;
 
           &.dropdown-header {
             color: #b2c6cd;
