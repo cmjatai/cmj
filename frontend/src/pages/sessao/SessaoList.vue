@@ -10,7 +10,7 @@
     </form-sessao-list>
 
     <div class="inner-list">
-      <sessao-plenaria-item-list :sessao="item" v-for="(item, key) in sessoes" :key="key"></sessao-plenaria-item-list>
+      <sessao-plenaria-item-list :sessao="item" v-for="(item, key) in sessoes" :key="key+1"></sessao-plenaria-item-list>
       <div class="empty-list" v-if="sessoes.length === 0 && init">
           Não foram encontradas Sessões Plenárias com seus critérios de busca!
       </div>

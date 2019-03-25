@@ -1,12 +1,12 @@
 <template>
-  <div class="online-sessaolenaria">
+  <div class="sessaoplenaria-module">
       <router-view></router-view>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'sessao-plenaria-module'
+  name: 'sessaoplenaria-module'
 }
 </script>
 

@@ -1,8 +1,8 @@
 <template>
   <router-link :class="'sessao-plenaria-item-list'" :to="{ name: 'sessao_plenaria_online_link', params: {id: sessao.id} }" @click.native="sendStore">
-    <h5 class="tit">
+    <h3 class="tit">
       {{titulo}}
-    </h5>
+    </h3>
     <div class="subtitulo">
       <span>{{subtitulo}}</span><span class="separator"> – </span><span>{{date_text}}</span>
     </div>

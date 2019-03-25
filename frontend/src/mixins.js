@@ -33,11 +33,22 @@ Vue.mixin({
     on_ws_message (data) {
       let _this = this
 
-      if (!_this.hasOwnProperty('app') || !_this.hasOwnProperty('model')) {
+      if (_this.app === undefined) {
         return
       }
-
-      if (Array.isArray(_this.app) && Array.isArray(_this.model)) {
+      // se coincidir com app e não tiver model faz o fetch do que vier de notificação
+      if (_this.model === undefined) {
+        if (Array.isArray(_this.app)) {
+          if (_.indexOf(_this.app, data.message.app) !== -1) {
+            _this.fetch()
+          }
+        }
+        else {
+          if (data.message.app === _this.app) {
+            _this.fetch()
+          }
+        }
+      } else if (Array.isArray(_this.app) && Array.isArray(_this.model)) {
         if (_.indexOf(_this.app, data.message.app) !== -1 &&
             _.indexOf(_this.model, data.message.model) !== -1) {
           _this.fetch()
