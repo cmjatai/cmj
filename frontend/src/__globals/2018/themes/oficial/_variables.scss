@@ -43,6 +43,12 @@ $icon-font-path: "../bootstrap/fonts/" !default;
 // variaveis bootstrap ########################################
 $font-size-base: 1rem !default;
 
+// variaveis grid bootstrap ########################################
+
+$container-max-widths: (
+  xl: 1140px
+) !default;
+
 
 $zindex-dropdown:                   1000 !default;
 $zindex-sticky:                     1020 !default;

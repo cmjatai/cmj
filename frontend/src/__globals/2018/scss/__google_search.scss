@@ -27,21 +27,23 @@
   }
 }
 
-@media screen and (max-width: 991px) {
+@media screen and (max-width: 1199px) {
   .google-search {
     position: relative;
+    padding: 10px 20px;
     &:hover {
       position: fixed;
     }
   }
 }
-@media screen and (max-width: 480px) {
+@media screen and (max-width: 991px) {
   .google-search {
     background-size: 70%;
     background-position-y:8px;
     width: 36px;
     &:hover {
-      width: 75%;
+      width: 100%;
+      position: relative;
     }
   }
 }
