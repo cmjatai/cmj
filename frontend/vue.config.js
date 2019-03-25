@@ -24,7 +24,7 @@ dotenv.config({
   path: '../cmj/.env'
 })
 
-var HOST_NAME = '192.168.15.7'
+var HOST_NAME = '10.42.0.1'
 
 module.exports = {
   runtimeCompiler: true,

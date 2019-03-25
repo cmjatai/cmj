@@ -61,20 +61,37 @@
   margin-top: $grid-gutter-width;
   .nav-tabs {
     border-bottom: 0px;
+    padding: 0;
+    ul {
+      padding: 0;
+    }
     li {
-      margin-left: 1px;
-      line-height: 1.5em;
-      border-radius: 5px 5px 0 0;
+      line-height: 1;
+      display: block;
       a {
         text-decoration: none;
         line-height: 1.5em;
-        padding: 0 5px;
+        padding: 4px 10px;
+        white-space: nowrap;
+        display: inline-block;
+        width: 100%;
       }
       &:hover {
         background: darken($color_main_bg, 10%) $url_bg_png;
       }
       &.active {
         background: darken($color_main_bg, 10%) $url_bg_png;
+      }
+    }
+    & > li {
+      border-radius: 5px 5px 0 0;
+      margin-left: 1px;
+      & > a {
+        padding: 1px 5px;
+      }
+      &:last-child {
+        left: auto;
+        right: 0;
       }
     }
   }
