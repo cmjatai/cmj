@@ -10,7 +10,7 @@ Vue.mixin({
 
   computed: {
     ...Vuex.mapGetters([
-      'getModel'
+      'getCache'
     ])
   },
   data () {
@@ -21,8 +21,8 @@ Vue.mixin({
   methods: {
     ...Vuex.mapActions([
       'sendMessage',
-      'removeFromState',
-      'insertInState'
+      'refreshState',
+      'getObject'
     ]),
     stringToDate: function (_date, _format, _delimiter) {
       var formatLowerCase = _format.toLowerCase()
@@ -39,6 +39,9 @@ Vue.mixin({
     on_ws_message (data) {
       let _this = this
 
+      return
+
+
       if (_this.app === undefined) {
         return
       }
@@ -46,22 +49,22 @@ Vue.mixin({
       if (_this.model === undefined) {
         if (Array.isArray(_this.app)) {
           if (_.indexOf(_this.app, data.message.app) !== -1) {
-            _this.fetch()
+            _this.fetch(data.message)
           }
         }
         else {
           if (data.message.app === _this.app) {
-            _this.fetch()
+            _this.fetch(data.message)
           }
         }
       } else if (Array.isArray(_this.app) && Array.isArray(_this.model)) {
         if (_.indexOf(_this.app, data.message.app) !== -1 &&
             _.indexOf(_this.model, data.message.model) !== -1) {
-          _this.fetch()
+          _this.fetch(data.message)
         }
       } else {
         if (data.message.app === _this.app && data.message.model === _this.model) {
-          _this.fetch()
+          _this.fetch(data.message)
         }
       }
     }

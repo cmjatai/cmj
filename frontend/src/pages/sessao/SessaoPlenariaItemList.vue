@@ -1,5 +1,5 @@
 <template>
-  <router-link :class="'sessao-plenaria-item-list'" :to="{ name: 'sessao_plenaria_online_link', params: {id: sessao.id} }" @click.native="sendStore">
+  <router-link :class="'sessao-plenaria-item-list'" :to="{ name: 'sessao_plenaria_online_link', params: {id: sessao.id} }">
     <h3 class="tit">
       {{titulo}}
     </h3>
@@ -58,14 +58,14 @@ export default {
     }
   },
   methods: {
-    sendStore () {
+    /* sendStore () {
       this.insertInState({
         app: 'sessao',
         model: 'sessaoplenaria',
         id: this.sessao.id,
         value: this.sessao
       })
-    },
+    }, */
     month_text (month_num) {
       let month = [
         'Janeiro',
@@ -87,27 +87,11 @@ export default {
       let _this = this
       _.mapKeys(_this.metadata, function (value, key) {
         let meta = _this.metadata[key]
-        meta.component = _this
-        let sl = _this.getModel(meta)
-        if (sl === null) {
-          _this
-            .insertInState(meta)
-            .then((response) => {
-              _this[key] = _this.getModel(meta)[meta.id]
-            })
-        } else {
-          if (sl[meta.id] === undefined) {
-            _this
-              .$nextTick()
-              .then(() => {
-                setTimeout(function () {
-                  _this.fetch()
-                }, 100)
-              })
-          } else {
-            _this[key] = sl[meta.id]
-          }
-        }
+        _this
+          .getObject(meta)
+          .then(obj => {
+            _this[key] = obj
+          })
       })
     },
     updateSessao () {

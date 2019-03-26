@@ -52,19 +52,22 @@ export default {
   },
   methods: {
     currentPage (value) {
-      this.fetch(value)
+      this.fetchSessaoList(value)
     },
     nextPage () {
-      return this.pagination.next_page !== null ? this.fetch(this.pagination.next_page) : null
+      return this.pagination.next_page !== null ? this.fetchSessaoList(this.pagination.next_page) : null
     },
     previousPage () {
-      return this.pagination.previous_page !== null ? this.fetch(this.pagination.previous_page) : null
+      return this.pagination.previous_page !== null ? this.fetchSessaoList(this.pagination.previous_page) : null
     },
     changeFilter (form_filter) {
       this.form_filter = form_filter
-      this.fetch(1)
+      this.fetchSessaoList(1)
     },
-    fetch (page = null) {
+    fetch (data) {
+      this.fetchSessaoList(1)
+    },
+    fetchSessaoList (page = null) {
       let _this = this
 
       if (page === null) {
@@ -89,12 +92,12 @@ export default {
         })
         .catch((response) => {
           if (page !== 1) {
-            _this
-              .fetch(_this.pagination.previous_page)
+            return _this
+              .fetchSessaoList(1)
               .catch(() => {
                 _this.init = true
                 _this.sendMessage(
-                  { alert: 'danger', message: 'Não foi possível recuperar a lista...', time: 5 })
+                  { alert: 'danger', message: 'Não foi possível recuperar a lista de Sessões.', time: 5 })
               })
           }
         })
@@ -102,7 +105,7 @@ export default {
   },
   created: function () {
     let _this = this
-    _this.fetch(1)
+    _this.fetchSessaoList(1)
   }
 }
 </script>

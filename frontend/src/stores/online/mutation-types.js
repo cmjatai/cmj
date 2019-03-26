@@ -1,2 +1,2 @@
-export const REMOVE_FROM_STATE = 'REMOVE_FROM_STATE'
-export const INSERT_IN_STATE = 'INSERT_IN_STATE'
+export const STATE_UPDATE = 'STATE_UPDATE'
+export const STATE_DELETE = 'STATE_DELETE'

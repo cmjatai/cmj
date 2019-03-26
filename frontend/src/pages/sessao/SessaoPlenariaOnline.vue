@@ -1,17 +1,19 @@
 <template>
   <div class="sessao-plenaria-online">
-    <div  v-if="sessao" >
-    <sessao-plenaria-item-list :sessao="sessao"></sessao-plenaria-item-list>
-  teste
+    <div v-if="sessao" >
+      <sessao-plenaria-item-list :sessao="sessao"></sessao-plenaria-item-list>
+      <ordem-dia-list :sessao="sessao"></ordem-dia-list>
     </div>
   </div>
 </template>
 <script>
 import SessaoPlenariaItemList from './SessaoPlenariaItemList'
+import OrdemDiaList from './OrdemDiaList'
 export default {
   name: 'sessao-plenaria-online',
   components: {
-    SessaoPlenariaItemList
+    SessaoPlenariaItemList,
+    OrdemDiaList
   },
   data () {
     return {
@@ -27,33 +29,30 @@ export default {
     fetchSessao () {
       let _this = this
       let id = _this.$route.params.id
+
       let meta = {
         app: _this.app[0],
         model: _this.model[0],
         id: id
       }
 
-      let sessao = _this.getModel(meta)
-      if (sessao === null || !sessao.hasOwnProperty(id)) {
-        _this.$nextTick()
-          .then(() => {
-            _this
-              .insertInState(meta)
-              .then(() => {
-                sessao = _this.getModel(meta)
-                _this.sessao = sessao[id]
-              })
-          })
-      } else {
-        _this.sessao = sessao[id]
-      }
+      _this.getObject(meta)
+        .then(obj => {
+          _this.sessao = obj
+        })
     },
-    fetch () {
+    fetch (data) {
       /**
        * O Mixin global que escuta o websocket é que decide em chamar o fetch
        * baseado em [this.app] e [this.model]
        */
+
       this.fetchSessao()
+      if (data.app === this.app[0] &&
+          data.model === this.model[0] &&
+          data.id === this.sessao.id) {
+        this.fetchSessao()
+      }
     }
   }
 

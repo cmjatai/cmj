@@ -1,13 +1,13 @@
 import {
-  REMOVE_FROM_STATE,
-  INSERT_IN_STATE
+  STATE_UPDATE,
+  STATE_DELETE
 } from './mutation-types'
 
 import Resources from '@/resources'
 
 const mutations = {
-  [REMOVE_FROM_STATE] (state, wsdata) {
-    let data = wsdata.message
+  [STATE_DELETE] (state, wsdata) {
+    let data = wsdata
     if (!state.cache.hasOwnProperty(data.app)) {
       return
     }
@@ -18,16 +18,17 @@ const mutations = {
       return
     }
     delete state.cache[data.app][data.model][data.id]
+    return 
   },
-  [INSERT_IN_STATE] (state, data) {
-    if (!state.cache.hasOwnProperty(data.app)) {
+  [STATE_UPDATE] (state, data) {
+     if (!state.cache.hasOwnProperty(data.app)) {
       state.cache[data.app] = {}
     }
     if (!state.cache[data.app].hasOwnProperty(data.model)) {
       state.cache[data.app][data.model] = {}
     }
     state.cache[data.app][data.model][
-      data.value !== undefined ? data.value.id : data.id] = data.value
+      data.value !== undefined ? data.value.id : data.id] = data.value 
   }
 }
 
@@ -36,7 +37,7 @@ const state = {
 }
 
 const getters = {
-  getModel: (state) => (metadata) => {
+  getCache: (state) => (metadata) => {
     if (!state.cache.hasOwnProperty(metadata.app)) {
       return null
     }
@@ -51,30 +52,77 @@ const getters = {
 }
 
 const actions = {
-  removeFromState: ({ commit }, data) => commit(REMOVE_FROM_STATE, data),
-  insertInState: ({ commit, getters }, metadata) => {
+  getObject: ({ commit, getters, dispatch }, metadata) => {
+    let model = getters.getCache(metadata)
+
+    if (model !== null && model[metadata.id])
+      return model[metadata.id]
+    
+    return dispatch('refreshState', metadata)
+      .then(value => {
+        return value
+      })
+
+
+  },
+  refreshState: ({ commit, getters }, metadata) => {
+
     if (metadata.hasOwnProperty('value')) {
-      commit(INSERT_IN_STATE, metadata)
-      return
+      return new Promise((resolve, reject) => {
+        commit(STATE_UPDATE, metadata)
+        resolve()
+      })
     }
+
+    if (metadata.action === 'post_delete') {
+      return new Promise((resolve, reject) => {
+        commit(STATE_DELETE, metadata)
+        resolve()
+      })
+    }
+    
 
     let fetch = function () {
       let utils = Resources.Utils
       return utils
         .getModel(metadata.app, metadata.model, metadata.id)
         .then(response => {
-          commit(INSERT_IN_STATE, {
+          let meta = {
             app: metadata.app,
             model: metadata.model,
             value: response.data,
             id: response.data.id
-          })
+          }
+          commit(STATE_UPDATE, meta)
+          return response.data
         })
-        .catch((response) => metadata.component.sendMessage(
-          { alert: 'danger', message: 'Não foi possível fetch...', time: 5 }))
     }
 
-    let model = getters.getModel(metadata)
+    return fetch()
+    
+    /* let model = getters.getCache(metadata)
+
+    if (model === null) {
+    }
+    if (!model.hasOwnProperty(metadata.id)) {
+      return fetch()
+    } */
+
+  },
+
+
+
+
+
+
+  removeFromStateOld: ({ commit }, data) => commit(REMOVE_FROM_STATE, data),
+  insertInStateOld: ({ commit, getters }, metadata) => {
+    if (metadata.hasOwnProperty('value')) {
+      commit(INSERT_IN_STATE, metadata)
+      return
+    }
+
+    
     if (model === null) {
       commit(INSERT_IN_STATE, metadata)
       return fetch()

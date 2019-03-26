@@ -24,7 +24,15 @@ export default {
     }
   },
   methods: {
-    fetch (next_page = 1) {
+    fetch (data) {
+      this.fetchModel()
+    },
+    fetchModel (next_page = 1) {
+      /**
+       * Busca lista completa do model
+       *   /api/[app]/[model]/
+       *
+       */
       let _this = this
       _this.options = [
         { value: null, text: this.label }
@@ -33,14 +41,15 @@ export default {
         .then((response) => {
           _.each(response.data.results, function (item, idx) {
             _this.options.push({ value: item.id, text: item[_this.choice] })
-            _this.insertInState({
+            _this.refreshState({
               app: _this.app,
               model: _this.model,
-              value: item
+              value: item,
+              id: item.id
             })
           })
           if (response.data.pagination.next_page !== null) {
-            _this.fetch(response.data.pagination.next_page)
+            _this.fetchModel(response.data.pagination.next_page)
           }
         })
         .catch((response) => _this.sendMessage(
@@ -48,7 +57,7 @@ export default {
     }
   },
   created: function () {
-    this.fetch()
+    this.fetchModel()
   }
 }
 </script>

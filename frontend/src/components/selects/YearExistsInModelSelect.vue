@@ -15,7 +15,6 @@ export default {
   props: ['app', 'model', 'label'],
   data () {
     return {
-
       selected: null,
       options: [
         { value: null, text: this.label }
