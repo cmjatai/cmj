@@ -1,8 +1,8 @@
 <template>
   <router-link :class="'sessao-plenaria-item-list'" :to="{ name: 'sessao_plenaria_online_link', params: {id: sessao.id} }">
-    <h3 class="tit">
+    <h4 class="tit">
       {{titulo}}
-    </h3>
+    </h4>
     <div class="subtitulo">
       <span>{{subtitulo}}</span><span class="separator"> – </span><span>{{date_text}}</span>
     </div>
@@ -112,12 +112,13 @@ export default {
 .sessao-plenaria-item-list {
   display: grid;
   grid-template-columns: auto auto;
-
+  align-items: center;
   background-image: url("~@/assets/img/bg.png");
   border-bottom: 1px solid #d5d5d5;
   padding: 15px;
   line-height: 1;
   cursor: pointer;
+  grid-column-gap: 10px;
 
   &:hover {
     background-color: rgba($color: #f5f5f5, $alpha: 0.9);
@@ -134,7 +135,7 @@ export default {
       overflow: hidden;
     }
   }
-  h5 {
+  h4 {
     line-height: 1;
     color: #007;
     margin-bottom: 0px;
@@ -144,7 +145,7 @@ export default {
   .sessao-plenaria-item-list {
     grid-template-columns: auto;
     line-height: 1.3;
-    h5 {
+    h4 {
       font-size: 110%;
     }
     .subtitulo {

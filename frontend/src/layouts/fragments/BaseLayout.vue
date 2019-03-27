@@ -36,7 +36,7 @@ export default {
   name: 'base-layout',
   data () {
     return {
-      sideleft_expand: false
+      sideleft_expand: true
     }
   },
   methods: {
@@ -219,7 +219,16 @@ export default {
       }
     }
   }
-
 }
 
+@media screen and (min-width: 481px) {
+  .base-layout:not(.left-expand) {
+    grid-template-columns: 0 0 auto 0px;
+    .inner-sideleft {
+      a {
+        grid-template-columns: 0px 0px;
+      }
+    }
+  }
+}
 </style>

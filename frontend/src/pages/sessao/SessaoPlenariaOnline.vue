@@ -60,15 +60,14 @@ export default {
 </script>
 
 <style lang="scss">
-.sessao-plenaria-online {
-  .sessao-plenaria-item-list {
-    padding: 5px;
-    .subtitulo {
-      .separator {
-        display: inline;
+  .sessao-plenaria-online {
+    .sessao-plenaria-item-list {
+      padding: 5px;
+      .subtitulo {
+        .separator {
+          display: inline;
+        }
       }
     }
   }
-
-}
 </style>

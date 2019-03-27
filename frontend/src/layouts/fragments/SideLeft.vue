@@ -144,13 +144,13 @@ export default {
         padding: 0px 12px 0px 0;
       }
     }
-
     &.selected .icon  {
       border-radius: 50%;
       background-color: #dddddd;
     }
   }
 }
+
 .base-layout.left-expand {
   .sideleft {
     background-color: rgba($color: #f5f5f5, $alpha: 1);
@@ -174,7 +174,7 @@ export default {
   .inner-sideleft {
     a {
       //height: $width-sideleft * 0.7;
-      grid-template-columns: 48px minmax(0px, 186px);
+      grid-template-columns: 48px 0;
       .icon {
         margin: 0 6px;
         padding: 5px 0;
