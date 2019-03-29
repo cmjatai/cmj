@@ -7,6 +7,9 @@
       <div class="empty-list" v-if="!init">
           Carregando listagem...
       </div>
+
+      <div v-for="(item, key) in itensOrdenados" :key="key+1">{{item.numero_ordem}}</div>
+
     </div>
   </div>
 </template>
@@ -18,57 +21,58 @@ export default {
   data () {
     return {
       itens: {
-        ordemdia_list: []
+        ordemdia_list: {}
       },
+
       init: false,
 
       app: ['sessao'],
       model: ['ordemdia']
-
     }
   },
-  actions: {
+  computed: {
+    itensOrdenados: {
+      get () {
+        let itens = this.itens.ordemdia_list
+        return _.orderBy(itens,'numero_ordem') // eslint-disable-line
+      }
+    }
+  },
+  mounted () {
+    this.fetchOrdemDiaList(1)
+  },
+  methods: {
     fetch (data) {
+      // this.itens.ordemdia_list = {}
+      this.$set(this.itens, 'ordemdia_list', {})
       this.fetchOrdemDiaList(1)
     },
-    fetchSessaoList (page = null) {
+    fetchOrdemDiaList (page = null) {
       let _this = this
 
-      if (page === null) {
-        page = _this.pagination.page
-      }
+      let query_string = `&sessao_plenaria=${this.sessao.id}`
 
-      let query_string = ''
-      let ff = this.form_filter
-      if (ff.year !== null) query_string += `&year=${ff.year}`
-      if (ff.month !== null) query_string += `&month=${ff.month}`
-      if (ff.tipo !== null) query_string += `&tipo=${ff.tipo}`
-
-      return _this.utils.getModelOrderedList(_this.app[0], _this.model[0], _this.ordering, page === null ? 1 : page, query_string)
+      _this.utils.getModelOrderedList('sessao', 'ordemdia', 'numero_ordem', page === null ? 1 : page, query_string)
         .then((response) => {
           _this.init = true
-          _this.sessoes = []
+          _.each(response.data.results, (value, idx) => {
+            _this.$set(_this.itens.ordemdia_list, value.id, value)
+          })
           _this.$nextTick()
             .then(function () {
-              _this.sessoes = response.data.results
-              _this.pagination = response.data.pagination
+              // _this.itens.ordemdia_list = [..._this.itens.ordemdia_list, ...response.data.results]
+              if (response.data.pagination.next_page !== null) {
+                _this.fetchOrdemDiaList(response.data.pagination.next_page)
+              }
             })
         })
         .catch((response) => {
-          if (page !== 1) {
-            return _this
-              .fetchSessaoList(1)
-              .catch(() => {
-                _this.init = true
-                _this.sendMessage(
-                  { alert: 'danger', message: 'Não foi possível recuperar a lista de Sessões.', time: 5 })
-              })
-          }
+          _this.init = true
+          _this.sendMessage(
+            { alert: 'danger', message: 'Não foi possível recuperar a Ordem do Dia.', time: 5 })
         })
     }
-
   }
-
 }
 </script>
 

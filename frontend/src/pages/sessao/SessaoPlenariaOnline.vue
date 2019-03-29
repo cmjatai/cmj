@@ -51,6 +51,9 @@ export default {
           data.model === this.model[0]) {
         if (data.action === 'post_delete') {
           setTimeout(() => {
+            t.sendMessage(
+              { alert: 'danger', message: 'Sessão Plenária foi excluída', time: 5 })
+
             t.$router.push({ name: 'sessao_list_link' })
           }, 500)
         } else {

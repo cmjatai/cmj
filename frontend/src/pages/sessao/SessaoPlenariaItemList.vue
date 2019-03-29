@@ -63,31 +63,6 @@ export default {
     }
   },
   methods: {
-    /* sendStore () {
-      this.insertInState({
-        app: 'sessao',
-        model: 'sessaoplenaria',
-        id: this.sessao.id,
-        value: this.sessao
-      })
-    }, */
-    month_text (month_num) {
-      let month = [
-        'Janeiro',
-        'Fevereiro',
-        'Março',
-        'Abril',
-        'Maio',
-        'Junho',
-        'Julho',
-        'Agosto',
-        'Setembro',
-        'Outubro',
-        'Novembro',
-        'Dezembro'
-      ]
-      return month[month_num]
-    },
     fetch (metadata) {
       let t = this
       let meta_list = _.clone(t.metadata)
