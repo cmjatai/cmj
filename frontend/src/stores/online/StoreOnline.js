@@ -37,6 +37,9 @@ const state = {
 }
 
 const getters = {
+  cache: (state) => {
+    return state.cache
+  },
   getCache: (state) => (metadata) => {
     if (!state.cache.hasOwnProperty(metadata.app)) {
       return null
@@ -62,10 +65,8 @@ const actions = {
       .then(value => {
         return value
       })
-
-
   },
-  refreshState: ({ commit, getters }, metadata) => {
+  refreshState: ({ commit }, metadata) => {
 
     if (metadata.hasOwnProperty('value')) {
       return new Promise((resolve, reject) => {
@@ -80,10 +81,10 @@ const actions = {
         resolve()
       })
     }
-    
 
     let fetch = function () {
       let utils = Resources.Utils
+      //console.log('fetch refresh', metadata)
       return utils
         .getModel(metadata.app, metadata.model, metadata.id)
         .then(response => {
@@ -97,40 +98,8 @@ const actions = {
           return response.data
         })
     }
-
     return fetch()
-    
-    /* let model = getters.getCache(metadata)
-
-    if (model === null) {
-    }
-    if (!model.hasOwnProperty(metadata.id)) {
-      return fetch()
-    } */
-
   },
-
-
-
-
-
-
-  removeFromStateOld: ({ commit }, data) => commit(REMOVE_FROM_STATE, data),
-  insertInStateOld: ({ commit, getters }, metadata) => {
-    if (metadata.hasOwnProperty('value')) {
-      commit(INSERT_IN_STATE, metadata)
-      return
-    }
-
-    
-    if (model === null) {
-      commit(INSERT_IN_STATE, metadata)
-      return fetch()
-    }
-    if (!model.hasOwnProperty(metadata.id)) {
-      return fetch()
-    }
-  }
 }
 export default {
   state,

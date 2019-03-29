@@ -10,7 +10,8 @@ Vue.mixin({
 
   computed: {
     ...Vuex.mapGetters([
-      'getCache'
+      'getCache',
+      'cache'
     ])
   },
   data () {
@@ -24,6 +25,23 @@ Vue.mixin({
       'refreshState',
       'getObject'
     ]),
+    month_text (month_num) {
+      let month = [
+        'Janeiro',
+        'Fevereiro',
+        'Março',
+        'Abril',
+        'Maio',
+        'Junho',
+        'Julho',
+        'Agosto',
+        'Setembro',
+        'Outubro',
+        'Novembro',
+        'Dezembro'
+      ]
+      return month[month_num]
+    },
     stringToDate: function (_date, _format, _delimiter) {
       var formatLowerCase = _format.toLowerCase()
       var formatItems = formatLowerCase.split(_delimiter)
@@ -39,32 +57,29 @@ Vue.mixin({
     on_ws_message (data) {
       let _this = this
 
-      return
-
-
       if (_this.app === undefined) {
         return
       }
-      // se coincidir com app e não tiver model faz o fetch do que vier de notificação
+      
       if (_this.model === undefined) {
         if (Array.isArray(_this.app)) {
-          if (_.indexOf(_this.app, data.message.app) !== -1) {
-            _this.fetch(data.message)
+          if (_.indexOf(_this.app, data.app) !== -1) {
+            _this.fetch(data)
           }
         }
         else {
-          if (data.message.app === _this.app) {
-            _this.fetch(data.message)
+          if (data.app === _this.app) {
+            _this.fetch(data)
           }
         }
       } else if (Array.isArray(_this.app) && Array.isArray(_this.model)) {
-        if (_.indexOf(_this.app, data.message.app) !== -1 &&
-            _.indexOf(_this.model, data.message.model) !== -1) {
-          _this.fetch(data.message)
+        if (_.indexOf(_this.app, data.app) !== -1 &&
+            _.indexOf(_this.model, data.model) !== -1) {
+          _this.fetch(data)
         }
       } else {
-        if (data.message.app === _this.app && data.message.model === _this.model) {
-          _this.fetch(data.message)
+        if (data.app === _this.app && data.model === _this.model) {
+          _this.fetch(data)
         }
       }
     }

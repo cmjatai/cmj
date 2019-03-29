@@ -7,9 +7,7 @@
       <span class="text-link">
         {{item.texto}}
       </span>
-
     </router-link>
-
   </div>
 </template>
 
@@ -96,7 +94,6 @@ export default {
   mounted () {
     this.selected = this.$route.name
   }
-
 }
 </script>
 
@@ -151,36 +148,44 @@ export default {
   }
 }
 
-.base-layout.left-expand {
-  .sideleft {
-    background-color: rgba($color: #f5f5f5, $alpha: 1);
-    padding-right: 8px;
-  }
-  .inner-sideleft {
-    .text-link {
-      display: inline-block;
-      position: relative;
-      left: auto;
-    }
-    a:hover, a.selected  {
-       background-color: #dddddd;
-       border-radius: 0 24px 24px 0;
-    }
-  }
-}
-
 @media screen and (max-width: 480px) {
   $width-sideleft: 48px;
   .inner-sideleft {
     a {
       //height: $width-sideleft * 0.7;
-      grid-template-columns: 48px 0;
+      grid-template-columns: 48px 0px;
       .icon {
         margin: 0 6px;
         padding: 5px 0;
       }
     }
   }
+}
+
+@media screen and (min-width: 481px) {
+
+  .sideleft  {
+    //grid-template-columns: 1px 1px;
+  }
+
+  .base-layout.left-expand {
+    .sideleft {
+      background-color: rgba($color: #f5f5f5, $alpha: 1);
+      padding-right: 8px;
+    }
+    .inner-sideleft {
+      .text-link {
+        display: inline-block;
+        position: relative;
+        left: auto;
+      }
+      a:hover, a.selected  {
+        background-color: #dddddd;
+        border-radius: 0 24px 24px 0;
+      }
+    }
+  }
+
 }
 
 </style>

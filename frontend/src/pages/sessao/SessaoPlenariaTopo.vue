@@ -1,5 +1,5 @@
 <template>
-  <router-link :class="'sessao-plenaria-item-list'" :to="{ name: 'sessao_plenaria_online_link', params: {id: sessao.id} }">
+  <router-link :class="'sessao-plenaria-topo'" :to="{ name: 'sessao_plenaria_online_link', params: {id: sessao.id} }">
     <h4 class="tit">
       {{titulo}}
     </h4>
@@ -10,13 +10,11 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 export default {
-  name: 'sessao-plenaria-item-list',
+  name: 'sessao-plenaria-topo',
   props: ['sessao'],
   data () {
     return {
-
       app: ['sessao', 'parlamentares'],
       model: ['sessaoplenaria', 'sessaolegislativa', 'tiposessaoplenaria', 'legislatura'],
 
@@ -39,9 +37,6 @@ export default {
     }
   },
   computed: {
-    ...mapState({
-      cache: state => state.cache
-    }),
     titulo: function () {
       let sessao = this.sessao
       let tipo = this.tipo
@@ -63,37 +58,10 @@ export default {
     }
   },
   methods: {
-    /* sendStore () {
-      this.insertInState({
-        app: 'sessao',
-        model: 'sessaoplenaria',
-        id: this.sessao.id,
-        value: this.sessao
-      })
-    }, */
-    month_text (month_num) {
-      let month = [
-        'Janeiro',
-        'Fevereiro',
-        'Março',
-        'Abril',
-        'Maio',
-        'Junho',
-        'Julho',
-        'Agosto',
-        'Setembro',
-        'Outubro',
-        'Novembro',
-        'Dezembro'
-      ]
-      return month[month_num]
-    },
     fetch (metadata) {
       let t = this
-      let meta_list = _.clone(t.metadata)
-
-      _.mapKeys(meta_list, function (value, key) {
-        let meta = meta_list[key]
+      _.mapKeys(t.metadata, function (value, key) {
+        let meta = t.metadata[key]
         t.getObject(meta)
           .then(obj => {
             t[key] = obj
@@ -115,7 +83,7 @@ export default {
 }
 </script>
 <style lang="scss">
-.sessao-plenaria-item-list {
+.sessao-plenaria-topo {
   display: grid;
   grid-template-columns: auto auto;
   align-items: center;
@@ -148,7 +116,7 @@ export default {
   }
 }
 @media screen and (max-width: 1199px) {
-  .sessao-plenaria-item-list {
+  .sessao-plenaria-topo {
     grid-template-columns: auto;
     line-height: 1.3;
     h4 {
