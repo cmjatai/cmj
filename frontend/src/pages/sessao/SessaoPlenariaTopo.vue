@@ -4,7 +4,7 @@
       {{titulo}}
     </h4>
     <div class="subtitulo">
-      <span>{{subtitulo}}</span><span class="separator"> – </span><span>{{date_text}}</span>
+      <span>{{subtitulo}}</span> – <span>{{date_text}}</span>
     </div>
   </router-link>
 </template>
@@ -102,7 +102,6 @@ export default {
     color: #777;
     display: inline-block;
     text-align: right;
-    line-height: 1.2;
     .separator {
       display: block;
       height: 0px;
@@ -115,16 +114,17 @@ export default {
     margin-bottom: 0px;
   }
 }
-@media screen and (max-width: 1199px) {
+@media screen and (max-width: 991px) {
   .sessao-plenaria-topo {
     grid-template-columns: auto;
     line-height: 1.3;
+    justify-content: center;
     h4 {
       font-size: 110%;
     }
     .subtitulo {
       line-height: 1;
-      text-align: left;
+      text-align: center;
     }
   }
 }

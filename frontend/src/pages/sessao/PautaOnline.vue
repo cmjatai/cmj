@@ -27,7 +27,7 @@ export default {
       init: false,
 
       app: ['sessao'],
-      model: ['ordemdia']
+      model: ['expedientemateria', 'ordemdia']
     }
   },
   computed: {
