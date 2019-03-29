@@ -8,7 +8,9 @@
           Carregando listagem...
       </div>
 
-      <div v-for="(item, key) in itensOrdenados" :key="key+1">{{item.numero_ordem}}</div>
+      <div v-for="item in itensDoExpediente" :key="item.id">{{item.numero_ordem}}</div>
+
+      <div v-for="item in itensDaOrdemDia" :key="item.id">{{item.numero_ordem}}</div>
 
     </div>
   </div>
@@ -21,7 +23,8 @@ export default {
   data () {
     return {
       itens: {
-        ordemdia_list: {}
+        ordemdia_list: {},
+        expedientemateria_list: {}
       },
 
       init: false,
@@ -31,38 +34,54 @@ export default {
     }
   },
   computed: {
-    itensOrdenados: {
+
+    itensDaOrdemDia: {
       get () {
-        let itens = this.itens.ordemdia_list
-        return _.orderBy(itens,'numero_ordem') // eslint-disable-line
+        return _.orderBy(this.itens.ordemdia_list, 'numero_ordem')
+      }
+    },
+    itensDoExpediente: {
+      get () {
+        return _.orderBy(this.itens.expedientemateria_list, 'numero_ordem')
       }
     }
   },
   mounted () {
-    this.fetchOrdemDiaList(1)
+    this.fetchItens()
   },
   methods: {
     fetch (data) {
       // this.itens.ordemdia_list = {}
       this.$set(this.itens, 'ordemdia_list', {})
-      this.fetchOrdemDiaList(1)
+      this.$set(this.itens, 'expedientemateria_list', {})
+      this.fetchItens()
     },
-    fetchOrdemDiaList (page = null) {
+    fetchItens () {
+      let _this = this
+      _.mapKeys(this.model, function (value, key) {
+        _this.fetchList(1, value)
+      })
+    },
+    fetchList (page = null, model = null) {
       let _this = this
 
       let query_string = `&sessao_plenaria=${this.sessao.id}`
 
-      _this.utils.getModelOrderedList('sessao', 'ordemdia', 'numero_ordem', page === null ? 1 : page, query_string)
+      _this.utils.getModelOrderedList('sessao', model, 'numero_ordem', page === null ? 1 : page, query_string)
         .then((response) => {
           _this.init = true
           _.each(response.data.results, (value, idx) => {
-            _this.$set(_this.itens.ordemdia_list, value.id, value)
+            if (value.id in _this.itens[`${model}_list`]) {
+              _this.itens[`${model}_list`][value.id] = value
+            } else {
+              _this.$set(_this.itens[`${model}_list`], value.id, value)
+            }
           })
           _this.$nextTick()
             .then(function () {
               // _this.itens.ordemdia_list = [..._this.itens.ordemdia_list, ...response.data.results]
               if (response.data.pagination.next_page !== null) {
-                _this.fetchOrdemDiaList(response.data.pagination.next_page)
+                _this.fetchList(response.data.pagination.next_page, model)
               }
             })
         })
