@@ -47,6 +47,7 @@
     }
     li {
       &:hover {
+        position: relative;
         background: $hover_background_10pw;
         & > ul {
           display: block;
@@ -86,6 +87,15 @@
           & > ul {
             left: auto;
             right: 5px;
+          }
+        }
+      }      
+      li.text-right {
+        &:hover {
+          ul {
+            left: auto;
+            right: 1em;
+            top: 35px;
           }
         }
       }
@@ -152,6 +162,9 @@
   padding: 0 0px 0 0;
 
   z-index: $zindex-navbar-topo;
+  li {
+    
+  }
   a.navbar-brand {
     font-size: 24px;
     line-height: 40px;
