@@ -51,14 +51,20 @@ export default {
   },
   methods: {
     fetch (data) {
-      // this.itens.ordemdia_list = {}
-      // this.$set(this.itens, 'ordemdia_list', {})
-      // this.$set(this.itens, 'expedientemateria_list', {})
-      this.fetchItens()
+      if (data.action === 'post_delete') {
+        this.$delete(this.itens[`${data.model}_list`], data.id)
+        return
+      }
+
+      const _this = this
+      _this.utils.getModel(data.app, data.model, data.id)
+        .then(response => {
+          _this.$set(_this.itens[`${data.model}_list`], data.id, response.data)
+        })
     },
-    fetchItens () {
-      let _this = this
-      _.mapKeys(this.model, function (value, key) {
+    fetchItens (model_list = this.model) {
+      const _this = this
+      _.mapKeys(model_list, function (value, key) {
         _.mapKeys(_this.itens[`${value}_list`], function (obj, k) {
           obj.vue_validate = false
         })
@@ -69,7 +75,7 @@ export default {
       })
     },
     fetchList (page = null, model = null) {
-      let _this = this
+      const _this = this
 
       let query_string = `&sessao_plenaria=${this.sessao.id}`
 
@@ -86,14 +92,12 @@ export default {
           })
           _this.$nextTick()
             .then(function () {
-              // _this.itens.ordemdia_list = [..._this.itens.ordemdia_list, ...response.data.results]
               if (response.data.pagination.next_page !== null) {
                 _this.fetchList(response.data.pagination.next_page, model)
               } else {
                 _.mapKeys(_this.itens[`${model}_list`], function (obj, k) {
                   if (!obj.vue_validate) {
                     _this.$delete(_this.itens[`${model}_list`], obj.id)
-                    delete _this.itens[`${model}_list`][obj.id]
                   }
                 })
               }
