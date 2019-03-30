@@ -8,9 +8,9 @@
           Carregando listagem...
       </div>
 
-      <div v-for="item in itensDoExpediente" :key="item.id">{{item.numero_ordem}}</div>
+      <div v-for="item in itensDoExpediente" :key="item.id">{{item.numero_ordem}} – {{item.materia}}</div>
 
-      <div v-for="item in itensDaOrdemDia" :key="item.id">{{item.numero_ordem}}</div>
+      <div v-for="item in itensDaOrdemDia" :key="item.id">{{item.numero_ordem}} – {{item.materia}}</div>
 
     </div>
   </div>
@@ -52,14 +52,20 @@ export default {
   methods: {
     fetch (data) {
       // this.itens.ordemdia_list = {}
-      this.$set(this.itens, 'ordemdia_list', {})
-      this.$set(this.itens, 'expedientemateria_list', {})
+      // this.$set(this.itens, 'ordemdia_list', {})
+      // this.$set(this.itens, 'expedientemateria_list', {})
       this.fetchItens()
     },
     fetchItens () {
       let _this = this
       _.mapKeys(this.model, function (value, key) {
-        _this.fetchList(1, value)
+        _.mapKeys(_this.itens[`${value}_list`], function (obj, k) {
+          obj.vue_validate = false
+        })
+        _this.$nextTick()
+          .then(function () {
+            _this.fetchList(1, value)
+          })
       })
     },
     fetchList (page = null, model = null) {
@@ -71,6 +77,7 @@ export default {
         .then((response) => {
           _this.init = true
           _.each(response.data.results, (value, idx) => {
+            value.vue_validate = true
             if (value.id in _this.itens[`${model}_list`]) {
               _this.itens[`${model}_list`][value.id] = value
             } else {
@@ -82,6 +89,13 @@ export default {
               // _this.itens.ordemdia_list = [..._this.itens.ordemdia_list, ...response.data.results]
               if (response.data.pagination.next_page !== null) {
                 _this.fetchList(response.data.pagination.next_page, model)
+              } else {
+                _.mapKeys(_this.itens[`${model}_list`], function (obj, k) {
+                  if (!obj.vue_validate) {
+                    _this.$delete(_this.itens[`${model}_list`], obj.id)
+                    delete _this.itens[`${model}_list`][obj.id]
+                  }
+                })
               }
             })
         })
