@@ -54,6 +54,9 @@ Vue.mixin({
       var formatedDate = new Date(dateItems[yearIndex], month, dateItems[dayIndex])
       return formatedDate
     },
+    isString: function (value) {
+      return typeof value === 'string' || value instanceof String;
+    },
     on_ws_message (data) {
       let _this = this
 

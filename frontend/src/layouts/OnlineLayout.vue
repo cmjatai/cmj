@@ -39,11 +39,62 @@ export default {
   },
   data () {
     return {
+      models_init_cache: {
+        sessao: ['tiposessaoplenaria'],
+        materia: ['tipomaterialegislativa'],
+        parlamentares: [
+          'legislatura',
+          {
+            model: 'sessaolegislativa',
+            full_pages: false,
+            ordering: '-data_inicio'
+          }
+        ]
+      }
     }
+  },
+  mounted: function () {
+    this.initCache()
   },
   methods: {
     close () {
       window.location.href = '/'
+    },
+    fetchList (page = null, _app = null, _model = null) {
+      const t = this
+
+      t.utils
+        .getModelOrderedList(_app,
+          t.isString(_model) ? _model : _model.model,
+          t.isString(_model) ? '' : _model.ordering,
+          page === null ? 1 : page
+        )
+        .then((response) => {
+          _.each(response.data.results, (_value, idx) => {
+            t.refreshState({
+              app: _app,
+              model: t.isString(_model) ? _model : _model.model,
+              id: _value.id,
+              value: _value
+            })
+          })
+          t.$nextTick()
+            .then(function () {
+              if (response.data.pagination.next_page !== null) {
+                if (t.isString(_model) || _model.full_pages) {
+                  t.fetchList(response.data.pagination.next_page, _app, _model)
+                }
+              }
+            })
+        })
+    },
+    initCache () {
+      const t = this
+      _.mapKeys(t.models_init_cache, function (model_list, app) {
+        _.each(model_list, function (model) {
+          t.fetchList(1, app, model)
+        })
+      })
     }
   }
 }
