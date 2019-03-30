@@ -50,17 +50,22 @@ export default {
     this.fetchItens()
   },
   methods: {
-    fetch (data) {
-      if (data.action === 'post_delete') {
-        this.$delete(this.itens[`${data.model}_list`], data.id)
+    fetch (metadata) {
+      if (metadata.action === 'post_delete') {
+        this.$delete(this.itens[`${metadata.model}_list`], metadata.id)
         return
       }
 
       const _this = this
-      _this.utils.getModel(data.app, data.model, data.id)
+      _this.getObject(metadata)
+        .then(obj => {
+          _this.$set(_this.itens[`${metadata.model}_list`], metadata.id, obj)
+        })
+
+      /* _this.utils.getModel(data.app, data.model, data.id)
         .then(response => {
           _this.$set(_this.itens[`${data.model}_list`], data.id, response.data)
-        })
+        }) */
     },
     fetchItens (model_list = this.model) {
       const _this = this
