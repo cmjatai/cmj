@@ -1,6 +1,7 @@
 from django.apps import apps
 from django.core.management.base import BaseCommand
 from django.db import connection
+from django.db.models.signals import post_save, post_delete
 from sapl.materia.models import MateriaLegislativa, DocumentoAcessorio
 from sapl.norma.models import NormaJuridica
 from sapl.parlamentares.models import Parlamentar
@@ -19,6 +20,9 @@ class Command(s3import.Command):
         parser.add_argument('sync', nargs='?', type=float, default=None)
 
     def handle(self, *args, **options):
+        post_delete.disconnect('sapl_post_delete_signal')
+        post_save.disconnect('sapl_post_save_signal')
+
         self.sync = options['sync']
         self.run()
         self.reset_sequences()
