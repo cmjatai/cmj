@@ -1,14 +1,21 @@
 <template>
   <div :class="['item-de-pauta', type]">
+
     <div class="item-header" v-if="tipo_string">
-      <div class="titulo">
+      <div class="epigrafe">
         {{tipo_string}} n&#186; {{materia.numero}}/{{materia.ano}}
       </div>
-      <span>Protocolo: {{materia.numero_protocolo}}</span>
+      <div class="protocolo-data-autoria">
+        <span>Protocolo: {{materia.numero_protocolo}}</span>
+        <span>{{data_apresentacao}}</span>
+        <span>Autores</span>
+      </div>
     </div>
+
     <div class="item-body">
     {{materia.ementa}}
     </div>
+
   </div>
 </template>
 <script>
@@ -37,6 +44,12 @@ export default {
         })
     }
   },
+  computed: {
+    data_apresentacao () {
+      const data = this.stringToDate(this.materia.data_apresentacao, 'yyyy-mm-dd', '-')
+      return `${data.getDate()}/${data.getMonth()}/${data.getFullYear()}`
+    }
+  },
   mounted () {
     const t = this
     t
@@ -55,62 +68,73 @@ export default {
 
     }
   }
-
 }
 </script>
+
 <style lang="scss">
 .item-de-pauta {
   position: relative;
-  background-image: url("~@/assets/img/bg.png");
   background-color: white;
-  padding: 10px 15px;
+  padding: 10px 15px 10px 10px;
   margin-bottom: 15px;
-  border-top: 4px solid transparent;
-  border-bottom: 4px solid transparent;
-  font-size: 1.5rem;
-  line-height: 2rem;
-  &:hover {
-    background-color: #dbdbdb;
-    border-top: 4px solid #d0d0d0;
-    border-bottom: 4px solid #d0d0d0;
-    border-radius: 4px;
-  }
+  font-size: 100%;
+  line-height: 1;
 
   &::before {
     content: 'Ordem do Dia';
     position: absolute;
     bottom: 5px;
     right: 5px;
-    color: rgba(#000, 0.03);
+    color: rgba(#000, 0.05);
     font-size: 200%;
-    line-height: 1rem;
   }
 
   &.expedientemateria {
-    background-color: #e2dcca;
-    background-image: none;
+    background-color: #e6e6a8;
     &:hover {
       background-color: #ffbf00;
-      border-top: 4px solid #beb9a9;
-      border-bottom: 4px solid #beb9a9;
+      //border-top: 4px solid #beb9a9;
+      //border-bottom: 4px solid #beb9a9;
     }
     &::before {
       content: 'Grande Expediente';
     }
+
   }
+
   .item-header {
-    padding-bottom: 10px;
-    .titulo {
+    .epigrafe {
+      color: #044079;
+      font-size: 125%;
       font-weight: bold;
-      color: #01776d;
+      letter-spacing: 0.5px;
+    }
+    .protocolo-data-autoria {
+      line-height: 2rem;
+      span {
+        padding: 0 10px;
+        border-right: 1px solid #00000055;
+      }
+      span:first-child {
+        color: #800;
+        padding-left: 0;
+      }
+      span:last-child {
+        padding-right: 0;
+        border-right: 0px solid black;
+        font-weight: bold;
+      }
     }
   }
 
-  .item-body {
-    color: #2e4c74;
-  }
 }
 
-@media screen and (max-width: 991px) {
+@media screen and (max-width: 480px) {
+  .item-de-pauta {
+    //margin-bottom: 5px;
+    padding: 5px 5px 5px 5px;
+    border-left-width: 1px;
+    border-radius: 0px;
+  }
 }
 </style>

@@ -40,6 +40,7 @@ export default {
   data () {
     return {
       models_init_cache: {
+        base: ['autor'],
         sessao: ['tiposessaoplenaria'],
         materia: ['tipomaterialegislativa'],
         parlamentares: [

@@ -140,6 +140,16 @@ export default {
     font-size: 200%;
     padding: 30px 10px 20px 15px;
   }
+  .container-expedientemateria {
+    .titulo-container {
+      color: #4e3c15;
+    }
+  }
+  .container-ordemdia {
+    .titulo-container {
+      color: #0055ff;
+    }
+  }
 }
 
 @media screen and (max-width: 991px) {
@@ -152,9 +162,17 @@ export default {
 
 @media screen and (max-width: 767px) {
   .pauta-online {
-    padding: 0;
     .titulo-container {
       font-size: 130%;
+    }
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .pauta-online {
+    padding: 0;
+    .titulo-container {
+      padding: 10px 5px 5px 5px;
     }
   }
 }
