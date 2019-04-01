@@ -8,12 +8,15 @@
       <div class="protocolo-data-autoria">
         <span>Protocolo: {{materia.numero_protocolo}}</span>
         <span>{{data_apresentacao}}</span>
-        <span>Autores</span>
+        <span>{{autores_string.join(', ')}}</span>
       </div>
     </div>
 
     <div class="item-body">
-    {{materia.ementa}}
+      <div class="ementa">
+        {{materia.ementa}}
+
+      </div>
     </div>
 
   </div>
@@ -27,7 +30,8 @@ export default {
       app: ['materia'],
       model: ['materialegislativa'],
       materia: {},
-      tipo_string: ''
+      tipo_string: '',
+      autores_string: []
     }
   },
   watch: {
@@ -42,6 +46,20 @@ export default {
         .then(obj => {
           t.tipo_string = obj.descricao
         })
+
+      t.autores_string = []
+      t.$nextTick()
+        .then(() => {
+          _.each(nv.autores, (value) => {
+            t.getObject({
+              app: 'base',
+              model: 'autor',
+              id: value
+            }).then(obj => {
+              t.autores_string.push(obj.nome)
+            })
+          })
+        })
     }
   },
   computed: {
@@ -51,21 +69,21 @@ export default {
     }
   },
   mounted () {
-    const t = this
-    t
-      .getObject({
-        action: '',
-        app: t.app[0],
-        model: t.model[0],
-        id: t.item.materia
-      })
-      .then(obj => {
-        t.materia = obj
-      })
+    this.fetch()
   },
   methods: {
-    fetch (metadata) {
-
+    fetch (metadata = null) {
+      const t = this
+      t
+        .getObject({
+          action: '',
+          app: t.app[0],
+          model: t.model[0],
+          id: t.item.materia
+        })
+        .then(obj => {
+          t.materia = obj
+        })
     }
   }
 }
@@ -123,7 +141,16 @@ export default {
         padding-right: 0;
         border-right: 0px solid black;
         font-weight: bold;
+        font-size: 95%;
       }
+    }
+  }
+  .item-body {
+    .ementa {
+      margin: 10px 0;
+      font-size: 150%;
+      line-height: 1.4;
+      color: rgb(37, 116, 100);
     }
   }
 
