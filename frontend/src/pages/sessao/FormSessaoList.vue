@@ -68,6 +68,7 @@ export default {
   grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-template-rows: auto auto;
   grid-column-gap: 15px;
+  padding: 15px 15px 0 15px;
   .form-opacity {
     opacity: 0.4;
   }

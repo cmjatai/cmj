@@ -78,5 +78,33 @@ if ('serviceWorker' in navigator) {
       .catch(registrationError => {
         console.log('SW registration failed: ', registrationError)
       })
+
+    /* if (navigator.storage && navigator.storage.persist) {
+      //First, see if we already have it
+      navigator.storage.persisted().then(persistent => {
+        if(persistent) {
+          console.log('already granted');
+        } else {
+          console.log('not already granted, lets ask for it');
+          navigator.storage.persist().then(granted => {
+            if (granted) {
+              console.log("persisted storage granted ftw");
+            } else {
+              console.log("sad face");
+            }
+          });
+        }
+      });
+    }
+
+    //what the heck
+    if(navigator.storage && navigator.storage.estimate) {
+      navigator.storage.estimate().then(result => {
+        console.log(result);
+        console.log('Percent used '+(result.usage/result.quota).toFixed(2));
+      });
+    } */
   })
 }
+
+// #f26a3d

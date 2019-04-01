@@ -155,8 +155,8 @@ export default {
 .base-layout {
   .main {
     text-align: justify;
-    padding: $padding-space;
-    padding-bottom: 0;
+    //padding: $padding-space;
+    //padding-bottom: 0;
   }
 
   header {
@@ -207,7 +207,7 @@ export default {
   .base-layout {
     grid-template-columns: $width-sideleft 0 auto 0px;
     .main {
-      padding: 0.5rem;
+      //padding: 0.5rem;
     }
   }
 

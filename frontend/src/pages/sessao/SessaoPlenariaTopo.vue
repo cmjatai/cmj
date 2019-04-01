@@ -1,12 +1,12 @@
 <template>
-  <router-link :class="'sessao-plenaria-topo'" :to="{ name: 'sessao_plenaria_online_link', params: {id: sessao.id} }">
-    <h4 class="tit">
-      {{titulo}}
-    </h4>
-    <div class="subtitulo">
-      <span>{{subtitulo}}</span> – <span>{{date_text}}</span>
-    </div>
-  </router-link>
+  <div :class="'sessao-plenaria-topo'" >
+      <div class="tit">
+        {{titulo}}
+      </div>
+      <div class="subtitulo">
+        <span>{{subtitulo}}</span> – <span>{{date_text}}</span>
+      </div>
+  </div>
 </template>
 
 <script>
@@ -83,49 +83,49 @@ export default {
 }
 </script>
 <style lang="scss">
+
 .sessao-plenaria-topo {
   display: grid;
   grid-template-columns: auto auto;
-  align-items: center;
-  background-image: url("~@/assets/img/bg.png");
-  border-bottom: 1px solid #d5d5d5;
-  padding: 15px;
+  align-items: start;
+  padding: 0 2px 10px 2px;
   line-height: 1;
-  cursor: pointer;
+  cursor: default;
   grid-column-gap: 10px;
+  text-align: left;
+  font-size: 95%;
 
-  &:hover {
-    background-color: rgba($color: #f5f5f5, $alpha: 0.9);
-    text-decoration: none;
+  .tit {
+    color: #493b23;
+    margin-bottom: 0px;
   }
   .subtitulo {
     color: #777;
-    display: inline-block;
     text-align: right;
-    .separator {
-      display: block;
-      height: 0px;
-      overflow: hidden;
-    }
-  }
-  h4 {
-    line-height: 1;
-    color: #007;
-    margin-bottom: 0px;
+    font-size: 90%;
   }
 }
+
 @media screen and (max-width: 991px) {
   .sessao-plenaria-topo {
     grid-template-columns: auto;
-    line-height: 1.3;
     justify-content: center;
-    h4 {
-      font-size: 110%;
-    }
+    text-align: center;
     .subtitulo {
-      line-height: 1;
       text-align: center;
     }
+  }
+}
+
+@media screen and (max-width: 767px) {
+.sessao-plenaria-topo {
+    font-size: 92%;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .sessao-plenaria-topo {
+    font-size: 70%;
   }
 }
 </style>

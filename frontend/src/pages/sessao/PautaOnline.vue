@@ -1,25 +1,37 @@
 <template>
   <div class="pauta-online">
-    <div class="inner-list">
-      <div class="empty-list" v-if="itens.ordemdia_list.length === 0 && init">
-          Não existem Itens na Ordem do Dia com seus critérios de busca!
-      </div>
-      <div class="empty-list" v-if="!init">
-          Carregando listagem...
-      </div>
-
-      <div v-for="item in itensDoExpediente" :key="item.id">{{item.numero_ordem}} – {{item.materia}}</div>
-
-      <div v-for="item in itensDaOrdemDia" :key="item.id">{{item.numero_ordem}} – {{item.materia}}</div>
-
+    <div class="empty-list" v-if="itens.ordemdia_list.length === 0 && init">
+        Não existem Itens na Ordem do Dia com seus critérios de busca!
     </div>
+    <div class="empty-list" v-if="!init">
+        Carregando listagem...
+    </div>
+
+    <div class="container-expedientemateria">
+      <div v-if="itensDoExpediente.length" class="titulo-container">Matérias do Grande Expediente</div>
+      <div class="inner">
+        <item-de-pauta v-for="item in itensDoExpediente" :key="item.id" :item="item" type="expedientemateria"></item-de-pauta>
+      </div>
+    </div>
+
+    <div class="container-ordemdia">
+      <div v-if="itensDaOrdemDia.length" class="titulo-container">Matérias da Ordem do Dia</div>
+      <div class="inner">
+        <item-de-pauta v-for="item in itensDaOrdemDia" :key="item.id * (-1)" :item="item" type="ordemdia"></item-de-pauta>
+      </div>
+    </div>
+
   </div>
 </template>
 
 <script>
+import ItemDePauta from './ItemDePauta'
 export default {
   name: 'pauta-online',
   props: ['sessao'],
+  components: {
+    ItemDePauta
+  },
   data () {
     return {
       itens: {
@@ -119,5 +131,32 @@ export default {
 </script>
 
 <style lang="scss">
+@import "~@/scss/variables";
+
+.pauta-online {
+  padding: 0 $padding-space $padding-space;
+  .titulo-container {
+    color: #4e3c15;
+    font-size: 200%;
+    padding: 30px 10px 20px 15px;
+  }
+}
+
+@media screen and (max-width: 991px) {
+  .pauta-online {
+    .titulo-container {
+      padding: 20px 10px 15px 15px;
+    }
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .pauta-online {
+    padding: 0;
+    .titulo-container {
+      font-size: 130%;
+    }
+  }
+}
 
 </style>
