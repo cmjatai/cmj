@@ -11,7 +11,7 @@
             <span>Protocolo: <strong>{{materia.numero_protocolo}}</strong></span>
             <span>{{data_apresentacao}}</span>
           </div>
-          <div class="autoria">
+          <div class="autoria" >
             <div v-for="(autores_line, key) in autores_string" :key="`al${key}`">
               <span v-for="(autores, k) in autores_line" :key="`a${k}`">{{autores}}</span>
             </div>
@@ -19,7 +19,12 @@
         </div>
       </div>
       <div class="func-header">
-teste
+        <div class="btn-toolbar" role="toolbar">
+          <div class="btn-group ml-2 btn-group-sm" role="group" aria-label="First group">
+            <a class="btn btn-outline-dark" @click="diminuirFonte">a</a>
+            <a class="btn btn-outline-dark" @click="aumentarFonte">A</a>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -27,8 +32,7 @@ teste
       <div class="ementa">
         {{materia.ementa}}
       </div>
-      <div class="observacao" v-html="observacao">
-      </div>
+      <div class="observacao" v-html="observacao" v-if="observacao.length > 0"></div>
     </div>
 
   </div>
@@ -97,6 +101,12 @@ export default {
     this.fetchMateria()
   },
   methods: {
+    diminuirFonte () {
+      $('.base-layout').css('font-size', '-=1')
+    },
+    aumentarFonte () {
+      $('.base-layout').css('font-size', '+=1')
+    },
     fetch (metadata = null) {
       if (metadata === null || metadata === undefined) {
         return
@@ -129,13 +139,14 @@ export default {
 
 <style lang="scss">
 .item-de-pauta {
+  user-select: none;
   position: relative;
   background-color: #ffffff55;
   padding: 10px;
   padding-bottom: 60px;
   margin-bottom: 15px;
 
-  border-top: 1px solid #bbb;
+  border-top: 1px solid #aaa;
 
   &:hover {
     background-color: #d6e6fd;
@@ -148,9 +159,12 @@ export default {
     right: 5px;
     color: rgba(#000, 0.1);
     font-size: 200%;
+    display: inline-block;
+    line-height: 1;
   }
 
   &.expedientemateria {
+    //border-top: 1px solid #ffbf00;
     //background-color: #e6e6a8;
     &:hover {
       background-color: #ffbf00;
@@ -215,19 +229,30 @@ export default {
       }
     }
   }
+  .func-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: start;
+    a {
+      padding: 10px 15px 7px;
+      background-image: linear-gradient(to bottom, #fff, #e0e0e0);
+      line-height: 1;
+    }
+  }
   .item-body {
+    padding-right: 10px;
     .ementa {
       margin: 5px 0 15px 0;
       font-size: 135%;
       line-height: 1.4;
-      color: rgb(37, 116, 100);
+      color: #257464;
       text-align: left;
     }
     .observacao {
       display: inline-block;
-      border-top: 2px solid #999;
-      padding: 10px 10px 0 0;
-
+      border-top: 1px solid rgb(86, 150, 202);
+      padding: 5px 10px 0 0;
+      line-height: 1.3;
     }
   }
 

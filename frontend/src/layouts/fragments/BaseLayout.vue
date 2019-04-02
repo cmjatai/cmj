@@ -82,7 +82,7 @@ export default {
   display: grid;
 
   font-size: 1rem;
-  line-height: 1rem;
+  line-height: 1;
 
   @extend .grid-template-columns;
   grid-template-rows: 60px auto;
