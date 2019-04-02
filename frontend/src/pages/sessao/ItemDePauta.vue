@@ -19,12 +19,7 @@
         </div>
       </div>
       <div class="func-header">
-        <div class="btn-toolbar" role="toolbar">
-          <div class="btn-group ml-2 btn-group-sm" role="group" aria-label="First group">
-            <a class="btn btn-outline-dark" @click="diminuirFonte">a</a>
-            <a class="btn btn-outline-dark" @click="aumentarFonte">A</a>
-          </div>
-        </div>
+
       </div>
     </div>
 
@@ -101,12 +96,6 @@ export default {
     this.fetchMateria()
   },
   methods: {
-    diminuirFonte () {
-      $('.base-layout').css('font-size', '-=1')
-    },
-    aumentarFonte () {
-      $('.base-layout').css('font-size', '+=1')
-    },
     fetch (metadata = null) {
       if (metadata === null || metadata === undefined) {
         return
@@ -174,9 +163,7 @@ export default {
     &::before {
       content: 'Grande Expediente';
     }
-
   }
-
   .item-header {
     display: grid;
     grid-template-columns: auto auto;
@@ -233,11 +220,6 @@ export default {
     display: flex;
     justify-content: flex-end;
     align-items: start;
-    a {
-      padding: 10px 15px 7px;
-      background-image: linear-gradient(to bottom, #fff, #e0e0e0);
-      line-height: 1;
-    }
   }
   .item-body {
     padding-right: 10px;

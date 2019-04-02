@@ -8,6 +8,7 @@
         {{item.texto}}
       </span>
     </router-link>
+
   </div>
 </template>
 
@@ -104,6 +105,7 @@ export default {
 .inner-sideleft {
   padding-top: 8px;
   // background: linear-gradient(to right, rgba(9, 20, 38, 0.95) 0%, #000000 100%);
+
   a {
     text-decoration: none;
     cursor: pointer;

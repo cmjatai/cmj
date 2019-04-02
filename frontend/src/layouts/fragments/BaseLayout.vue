@@ -14,6 +14,11 @@
       </div>
       <div class="header-main">
         <slot name="header-main"></slot>
+
+        <div class="btn-group ml-2 btn-group-sm" role="group" aria-label="First group">
+          <a class="btn btn-outline-dark" @click="diminuirFonte">a</a>
+          <a class="btn btn-outline-dark" @click="aumentarFonte">A</a>
+        </div>
       </div>
       <div class="header-right">
         <slot name="header-right"></slot>
@@ -21,6 +26,7 @@
     </header>
     <div class="sideleft">
       <slot name="sideleft"></slot>
+
     </div>
     <div class="main">
       <slot name="main"></slot>
@@ -40,6 +46,12 @@ export default {
     }
   },
   methods: {
+    diminuirFonte () {
+      $('.base-layout .main').css('font-size', '-=1')
+    },
+    aumentarFonte () {
+      $('.base-layout .main').css('font-size', '+=1')
+    },
     toogle_sideleft: function () {
       this.sideleft_expand = !this.sideleft_expand
     }
@@ -91,7 +103,7 @@ export default {
     display: grid;
     @extend .row-top;
 
-    grid-template-columns: $width-sideleft auto 1px $width-sideleft;
+    grid-template-columns: $width-sideleft auto auto $width-sideleft;
     grid-column-start: 1;
     grid-column-end: 5;
 
@@ -166,6 +178,17 @@ export default {
     }
     .navigation {
       padding: 6px 4px 6px 12px;
+    }
+    .header-main {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+
+      .btn-outline-dark {
+        border: 1px solid #bbb;
+        padding: 5px 15px 1px;
+        background-image: linear-gradient(to bottom, #fff, #e0e0e0);
+      }
     }
   }
 
