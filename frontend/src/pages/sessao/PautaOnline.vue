@@ -8,6 +8,7 @@
     </div>
 
     <div class="container-expedientemateria">
+
       <div v-if="itensDoExpediente.length" class="titulo-container">Matérias do Grande Expediente</div>
       <div class="inner">
         <item-de-pauta v-for="item in itensDoExpediente" :key="item.id" :item="item" type="expedientemateria"></item-de-pauta>

@@ -48,7 +48,7 @@ export default {
     display: inline-block;
     padding-left: 0.5rem;
     margin: 0;
-    font-size: 1rem;
+    font-size: 110%;
   }
 }
 

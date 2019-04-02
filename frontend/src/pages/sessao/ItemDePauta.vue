@@ -6,14 +6,20 @@
         <div class="epigrafe">
           {{tipo_string}} n&#186; {{materia.numero}}/{{materia.ano}}
         </div>
-        <div class="protocolo-data-autoria">
-          <span>Protocolo: {{materia.numero_protocolo}}</span>
-          <span>{{data_apresentacao}}</span>
-          <span>{{autores_string.join('; ')}}</span>
+        <div class="detail-header">
+          <div class="protocolo-data" >
+            <span>Protocolo: <strong>{{materia.numero_protocolo}}</strong></span>
+            <span>{{data_apresentacao}}</span>
+          </div>
+          <div class="autoria">
+            <div v-for="(autores_line, key) in autores_string" :key="`al${key}`">
+              <span v-for="(autores, k) in autores_line" :key="`a${k}`">{{autores}}</span>
+            </div>
+          </div>
         </div>
       </div>
       <div class="func-header">
-
+teste
       </div>
     </div>
 
@@ -37,7 +43,7 @@ export default {
       model: ['materialegislativa', 'tramitacao'],
       materia: {},
       tipo_string: '',
-      autores_string: []
+      autores_string: [[]]
     }
   },
   watch: {
@@ -53,7 +59,7 @@ export default {
           t.tipo_string = obj.descricao
         })
 
-      t.autores_string = []
+      t.autores_string = [[]]
       t.$nextTick()
         .then(() => {
           _.each(nv.autores, (value) => {
@@ -62,7 +68,12 @@ export default {
               model: 'autor',
               id: value
             }).then(obj => {
-              t.autores_string.push(obj.nome)
+              if (t.autores_string[t.autores_string.length - 1].length < 5) {
+                t.autores_string[t.autores_string.length - 1].push(obj.nome)
+              } else {
+                t.autores_string.push([])
+                t.autores_string[t.autores_string.length - 1].push(obj.nome)
+              }
             })
           })
         })
@@ -75,9 +86,10 @@ export default {
     },
     observacao () {
       let o = this.item.observacao
+      o = o.replace(/^\r\n/g, '')
       o = o.replace(/\r\n/g, '<br />')
-      o = o.replace(/\r\n/g, '<br />')
-      o = o.replace(/\r\n/g, '<br />')
+      o = o.replace(/\r/g, ' ')
+      o = o.replace(/\n/g, '<br />')
       return o
     }
   },
@@ -123,8 +135,6 @@ export default {
   padding-bottom: 60px;
   margin-bottom: 15px;
 
-  font-size: 100%;
-  line-height: 1;
   border-top: 1px solid #bbb;
 
   &:hover {
@@ -163,30 +173,61 @@ export default {
       font-weight: bold;
       letter-spacing: 0.5px;
     }
-    .protocolo-data-autoria {
-      line-height: 2rem;
+  }
+  .detail-header {
+    display: flex;
+    font-size: 95%;
+    align-items: center;
+    flex-flow: row nowrap;
+
+    .protocolo-data {
+      flex: 0 0 auto;
+      padding: 5px 10px 5px 0;
       span {
-        padding: 0 10px;
+        display: inline-block;
+        line-height: 2.3;
         border-right: 1px solid #00000055;
+        padding-right: 10px;
+        padding-left: 10px;
       }
       span:first-child {
         color: #800;
-        padding-left: 0;
       }
-      span:last-child {
-        padding-right: 0;
-        border-right: 0px solid black;
-        font-weight: bold;
-        font-size: 95%;
+    }
+    .autoria {
+      font-weight: bold;
+      letter-spacing: 0.1px;
+      line-height: 1.5;
+      font-size: 95%;
+      padding: 5px 0;
+      span {
+        display: inline-block;
+        white-space: nowrap;
+        &:after{
+          content:";";
+          padding-right: 10px;
+        }
+      }
+      div:last-child {
+        span:last-child:after {
+          content:"";
+        }
       }
     }
   }
   .item-body {
     .ementa {
-      margin: 0;
-      font-size: 1.5rem;
+      margin: 5px 0 15px 0;
+      font-size: 135%;
       line-height: 1.4;
       color: rgb(37, 116, 100);
+      text-align: left;
+    }
+    .observacao {
+      display: inline-block;
+      border-top: 2px solid #999;
+      padding: 10px 10px 0 0;
+
     }
   }
 
