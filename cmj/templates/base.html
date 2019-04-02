@@ -189,12 +189,14 @@
                     {% navbar 'navbar_cmj.yaml' %}
                   {% endif %}
                   {% if user.is_superuser %}
+                  
                     <li class="dropdown">
                       <a href="#linkMenu" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                         {% trans "SAPL" %}<span class="caret"></span>
                       </a>
                       <ul class="dropdown-menu menu-left" role="menu">
                         {% navbar 'navbar.yaml' %}
+                        <li><a href="/online/">{% trans "OnLine" %}</a></li>
                       </ul>
                     </li>
                   {% endif %}
