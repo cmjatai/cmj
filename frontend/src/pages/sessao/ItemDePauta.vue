@@ -2,20 +2,26 @@
   <div :class="['item-de-pauta', type]">
 
     <div class="item-header" v-if="tipo_string">
-      <div class="epigrafe">
-        {{tipo_string}} n&#186; {{materia.numero}}/{{materia.ano}}
+      <div class="data-header">
+        <div class="epigrafe">
+          {{tipo_string}} n&#186; {{materia.numero}}/{{materia.ano}}
+        </div>
+        <div class="protocolo-data-autoria">
+          <span>Protocolo: {{materia.numero_protocolo}}</span>
+          <span>{{data_apresentacao}}</span>
+          <span>{{autores_string.join('; ')}}</span>
+        </div>
       </div>
-      <div class="protocolo-data-autoria">
-        <span>Protocolo: {{materia.numero_protocolo}}</span>
-        <span>{{data_apresentacao}}</span>
-        <span>{{autores_string.join(', ')}}</span>
+      <div class="func-header">
+
       </div>
     </div>
 
     <div class="item-body">
       <div class="ementa">
         {{materia.ementa}}
-
+      </div>
+      <div class="observacao" v-html="observacao">
       </div>
     </div>
 
@@ -28,7 +34,7 @@ export default {
   data () {
     return {
       app: ['materia'],
-      model: ['materialegislativa'],
+      model: ['materialegislativa', 'tramitacao'],
       materia: {},
       tipo_string: '',
       autores_string: []
@@ -66,13 +72,30 @@ export default {
     data_apresentacao () {
       const data = this.stringToDate(this.materia.data_apresentacao, 'yyyy-mm-dd', '-')
       return `${data.getDate()}/${data.getMonth()}/${data.getFullYear()}`
+    },
+    observacao () {
+      let o = this.item.observacao
+      o = o.replace(/\r\n/g, '<br />')
+      o = o.replace(/\r\n/g, '<br />')
+      o = o.replace(/\r\n/g, '<br />')
+      return o
     }
   },
   mounted () {
-    this.fetch()
+    this.fetchMateria()
   },
   methods: {
     fetch (metadata = null) {
+      if (metadata === null || metadata === undefined) {
+        return
+      }
+      if (metadata.app === 'materia' && metadata.model === 'materialegislativa') {
+        this.fetchMateria(metadata)
+      } else if (metadata.app === 'materia' && metadata.model === 'tramitacao') {
+        this.fetchUltimaTramitacao(metadata)
+      }
+    },
+    fetchMateria (metadata) {
       const t = this
       t
         .getObject({
@@ -84,6 +107,9 @@ export default {
         .then(obj => {
           t.materia = obj
         })
+    },
+    fetchUltimaTramitacao (metadata) {
+
     }
   }
 }
@@ -92,23 +118,30 @@ export default {
 <style lang="scss">
 .item-de-pauta {
   position: relative;
-  background-color: white;
-  padding: 10px 15px 10px 10px;
+  background-color: #ffffff55;
+  padding: 10px;
+  padding-bottom: 60px;
   margin-bottom: 15px;
+
   font-size: 100%;
   line-height: 1;
+  border-top: 1px solid #bbb;
+
+  &:hover {
+    background-color: #d6e6fd;
+  }
 
   &::before {
     content: 'Ordem do Dia';
     position: absolute;
     bottom: 5px;
     right: 5px;
-    color: rgba(#000, 0.05);
+    color: rgba(#000, 0.1);
     font-size: 200%;
   }
 
   &.expedientemateria {
-    background-color: #e6e6a8;
+    //background-color: #e6e6a8;
     &:hover {
       background-color: #ffbf00;
       //border-top: 4px solid #beb9a9;
@@ -121,6 +154,9 @@ export default {
   }
 
   .item-header {
+    display: grid;
+    grid-template-columns: auto auto;
+
     .epigrafe {
       color: #044079;
       font-size: 125%;
@@ -147,8 +183,8 @@ export default {
   }
   .item-body {
     .ementa {
-      margin: 10px 0;
-      font-size: 150%;
+      margin: 0;
+      font-size: 1.5rem;
       line-height: 1.4;
       color: rgb(37, 116, 100);
     }
