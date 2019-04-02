@@ -1,6 +1,7 @@
 import {
   STATE_UPDATE,
-  STATE_DELETE
+  STATE_DELETE,
+  SET_NIVEL_DETALHE
 } from './mutation-types'
 
 import Resources from '@/resources'
@@ -29,16 +30,24 @@ const mutations = {
     }
     state.cache[data.app][data.model][
       data.value !== undefined ? data.value.id : data.id] = data.value 
+  },
+
+  [SET_NIVEL_DETALHE] (state, nivel) {
+    state.nivel_detalhe = nivel
   }
 }
 
 const state = {
-  cache: {}
+  cache: {},
+  nivel_detalhe: 1
 }
 
 const getters = {
   cache: (state) => {
     return state.cache
+  },
+  nivel_detalhe: (state) => {
+    return state.nivel_detalhe
   },
   getCache: (state) => (metadata) => {
     if (!state.cache.hasOwnProperty(metadata.app)) {
@@ -55,6 +64,9 @@ const getters = {
 }
 
 const actions = {
+  setNivelDetalhe: ({commit}, nivel) => {
+    commit(SET_NIVEL_DETALHE, nivel)
+  },
   getObject: ({ commit, getters, dispatch }, metadata) => {
     let model = getters.getCache(metadata)
 

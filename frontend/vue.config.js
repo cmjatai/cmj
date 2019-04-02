@@ -2,8 +2,8 @@ const path = require('path')
 const each = require('lodash/fp/each')
 
 const BundleTrackerPlugin = require('webpack-bundle-tracker')
-const CompressionPlugin = require('compression-webpack-plugin');
-const TerserPlugin = require('terser-webpack-plugin');
+const CompressionPlugin = require('compression-webpack-plugin')
+const TerserPlugin = require('terser-webpack-plugin')
 
 class RelativeBundleTrackerPlugin extends BundleTrackerPlugin {
   convertPathChunks(chunks) {
@@ -26,7 +26,7 @@ dotenv.config({
 
 var HOST_NAME = 'localhost'
 // HOST_NAME = '192.168.15.7'
-// HOST_NAME = '10.42.0.1'
+HOST_NAME = '10.42.0.1'
 // HOST_NAME = '10.3.163.200'
 
 module.exports = {

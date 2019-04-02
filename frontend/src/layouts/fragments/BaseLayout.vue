@@ -15,10 +15,13 @@
       <div class="header-main">
         <slot name="header-main"></slot>
 
-        <div class="btn-group ml-2 btn-group-sm" role="group" aria-label="First group">
+        <nivel-detalhe></nivel-detalhe>
+
+        <div class="btn-group ml-2 btn-group-sm accessibility" role="group" aria-label="First group">
           <a class="btn btn-outline-dark" @click="diminuirFonte">a</a>
           <a class="btn btn-outline-dark" @click="aumentarFonte">A</a>
         </div>
+
       </div>
       <div class="header-right">
         <slot name="header-right"></slot>
@@ -38,6 +41,7 @@
 </template>
 
 <script>
+import NivelDetalhe from './NivelDetalhe'
 export default {
   name: 'base-layout',
   data () {
@@ -45,12 +49,15 @@ export default {
       sideleft_expand: true
     }
   },
+  components: {
+    NivelDetalhe
+  },
   methods: {
     diminuirFonte () {
-      $('.base-layout .main').css('font-size', '-=1')
+      $('.base-layout .main').css('font-size', '-=2')
     },
     aumentarFonte () {
-      $('.base-layout .main').css('font-size', '+=1')
+      $('.base-layout .main').css('font-size', '+=2')
     },
     toogle_sideleft: function () {
       this.sideleft_expand = !this.sideleft_expand
@@ -84,6 +91,8 @@ export default {
 }
 
 .base-layout {
+
+  user-select: none;
   position: fixed;
   top: 0;
   right: 0;
@@ -171,6 +180,20 @@ export default {
     //padding-bottom: 0;
   }
 
+  .btn-outline-dark {
+    border: 1px solid #bbb;
+    background-image: linear-gradient(to bottom, #fff, #e0e0e0);
+    //height: 25px;
+    font-size: 140%;
+    line-height: 1.7;
+    padding: 0 20px;
+    &:hover, &:not(.disabled).active {
+      border: 1px solid #888;
+      background-image: linear-gradient(to bottom, #ddd, #fff);
+      color: black;
+    }
+  }
+
   header {
     .navigation, .brand, .header-main, .header-right {
       padding: 8px;
@@ -184,11 +207,6 @@ export default {
       justify-content: flex-end;
       align-items: center;
 
-      .btn-outline-dark {
-        border: 1px solid #bbb;
-        padding: 5px 15px 1px;
-        background-image: linear-gradient(to bottom, #fff, #e0e0e0);
-      }
     }
   }
 

@@ -1,2 +1,3 @@
 export const STATE_UPDATE = 'STATE_UPDATE'
 export const STATE_DELETE = 'STATE_DELETE'
+export const SET_NIVEL_DETALHE = 'SET_NIVEL_DETALHE'

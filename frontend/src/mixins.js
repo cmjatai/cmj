@@ -11,7 +11,8 @@ Vue.mixin({
   computed: {
     ...Vuex.mapGetters([
       'getCache',
-      'cache'
+      'cache',
+      'nivel_detalhe'
     ])
   },
   data () {
@@ -23,7 +24,7 @@ Vue.mixin({
     ...Vuex.mapActions([
       'sendMessage',
       'refreshState',
-      'getObject'
+      'getObject',
     ]),
     month_text (month_num) {
       let month = [

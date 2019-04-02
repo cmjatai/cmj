@@ -27,7 +27,7 @@
       <div class="ementa">
         {{materia.ementa}}
       </div>
-      <div class="observacao" v-html="observacao" v-if="observacao.length > 0"></div>
+      <div v-if="nivel_detalhe > 1 && observacao.length > 0" class="observacao" v-html="observacao"></div>
     </div>
 
   </div>
@@ -128,7 +128,6 @@ export default {
 
 <style lang="scss">
 .item-de-pauta {
-  user-select: none;
   position: relative;
   background-color: #ffffff55;
   padding: 10px;
@@ -219,7 +218,7 @@ export default {
   .func-header {
     display: flex;
     justify-content: flex-end;
-    align-items: start;
+    align-items: flex-start;
   }
   .item-body {
     padding-right: 10px;
