@@ -21,6 +21,14 @@ export default {
     getModel: (app, model, id) => axios({
       url: `${basePath}/${app}/${model}/${id}/`,
       method: 'GET'
+    }),
+    getModelAction: (app, model, id, action) => axios({
+      url: `${basePath}/${app}/${model}/${id}/${action}/`,
+      method: 'GET'
+    }),
+    getModelListAction: (app, model, id, action) => axios({
+      url: `${basePath}/${app}/${model}/${action}/`,
+      method: 'GET'
     })
   }
 }
