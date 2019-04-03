@@ -260,8 +260,20 @@ export default {
         line-height: 1.2;
         padding: 0 18px;
       }
-
     }
+  }
+}
+
+@media screen and (max-width: 360px) {
+  .base-layout {
+    font-size: 0.82rem;
+  }
+}
+
+@media screen and (max-width: 320px) {
+
+  .base-layout {
+    font-size: 0.7rem;
   }
 }
 

@@ -67,8 +67,8 @@ export default {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-template-rows: auto auto;
-  grid-column-gap: 15px;
-  padding: 15px 15px 0 15px;
+  grid-column-gap: 1em;
+  padding: 1em 1em 0 1em;
   .form-opacity {
     opacity: 0.4;
   }
@@ -85,7 +85,7 @@ export default {
 @media screen and (max-width: 991px) {
   .form-sessao-list {
     grid-template-columns: 1fr 1fr 1fr;
-    grid-row-gap: 15px;
+    grid-row-gap: 1em;
     .widget-pagination {
       grid-column-start: 1;
       grid-column-end: 4;
@@ -94,8 +94,13 @@ export default {
 }
 @media screen and (max-width: 480px) {
   .form-sessao-list {
-    grid-row-gap: 5px;
-    grid-column-gap: 5px;
+    padding: 0.5em 0.5em 0.25em 0.5em;
+    grid-row-gap: 0.5em;
+    grid-column-gap: 0.5em;
+    select {
+      font-size: 80%;
+    }
+
   }
 }
 </style>

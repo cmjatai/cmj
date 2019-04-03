@@ -36,7 +36,7 @@ export default {
   },
   computed: {
     niveis_filter: function () {
-      return this.niveis.filter(i => i.nivel === 4 || i.nivel === 1)
+      return this.niveis // .filter(i => i.nivel === 4 || i.nivel === 1)
     }
   },
   methods: {

@@ -96,9 +96,9 @@ export default {
   align-items: center;
   background-image: url("~@/assets/img/bg.png");
   border-bottom: 1px solid #ccc;
-  padding: 15px;
+  padding: 1em;
   line-height: 1;
-  grid-column-gap: 10px;
+  grid-column-gap: 0.5em;
   cursor: pointer;
 
   &:first-child {
@@ -136,6 +136,26 @@ export default {
     .subtitulo {
       line-height: 1;
       text-align: left;
+    }
+  }
+}
+@media screen and (max-width: 600px) {
+  .sessao-plenaria-item-list {
+    h3 {
+      font-size: 100%;
+    }
+    .subtitulo {
+    }
+  }
+}
+@media screen and (max-width: 480px) {
+  .sessao-plenaria-item-list {
+    padding: 0.5em;
+    h3 {
+      font-size: 85%;
+    }
+    .subtitulo {
+      font-size: 75%;
     }
   }
 }

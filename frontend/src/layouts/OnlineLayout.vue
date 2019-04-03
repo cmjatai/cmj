@@ -35,7 +35,7 @@ import SideRight from './fragments/SideRight'
 import SideLeft from './fragments/SideLeft'
 import Brand from './fragments/Brand'
 import BaseLayout from './fragments/BaseLayout'
-import NivelDetalhe from './fragments/NivelDetalhe'
+import NivelDetalhe from './NivelDetalhe'
 
 export default {
   name: 'online',
