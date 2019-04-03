@@ -132,14 +132,12 @@ export default {
 </script>
 
 <style lang="scss">
-@import "~@/scss/variables";
-
 .pauta-online {
-  padding: 0 $padding-space $padding-space;
+  padding: 0 1em 1em;
   .titulo-container {
     color: #4e3c15;
     font-size: 200%;
-    padding: 30px 10px 20px 15px;
+    padding: 0.5em 0.5em 0.3em;
   }
   .container-expedientemateria {
     .titulo-container {
@@ -153,18 +151,10 @@ export default {
   }
 }
 
-@media screen and (max-width: 991px) {
-  .pauta-online {
-    .titulo-container {
-      padding: 20px 10px 15px 15px;
-    }
-  }
-}
-
 @media screen and (max-width: 767px) {
   .pauta-online {
     .titulo-container {
-      font-size: 130%;
+      font-size: 170%;
     }
   }
 }
@@ -173,7 +163,7 @@ export default {
   .pauta-online {
     padding: 0;
     .titulo-container {
-      padding: 10px 5px 5px 5px;
+      font-size: 160%;
     }
   }
 }

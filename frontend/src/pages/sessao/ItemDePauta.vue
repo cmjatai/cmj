@@ -27,7 +27,7 @@
       <div class="ementa">
         {{materia.ementa}}
       </div>
-      <div v-if="nivel_detalhe > 1 && observacao.length > 0" class="observacao" v-html="observacao"></div>
+      <div v-if="nivel_detalhe >= NIVEL4 && observacao.length > 0" class="observacao" v-html="observacao"></div>
     </div>
 
   </div>
@@ -130,9 +130,9 @@ export default {
 .item-de-pauta {
   position: relative;
   background-color: #ffffff55;
-  padding: 10px;
-  padding-bottom: 60px;
-  margin-bottom: 15px;
+  padding: 1em;
+  //padding-bottom: 60px;
+  margin-bottom: 1em;
 
   border-top: 1px solid #aaa;
 
@@ -152,12 +152,8 @@ export default {
   }
 
   &.expedientemateria {
-    //border-top: 1px solid #ffbf00;
-    //background-color: #e6e6a8;
     &:hover {
       background-color: #ffbf00;
-      //border-top: 4px solid #beb9a9;
-      //border-bottom: 4px solid #beb9a9;
     }
     &::before {
       content: 'Grande Expediente';
@@ -182,13 +178,13 @@ export default {
 
     .protocolo-data {
       flex: 0 0 auto;
-      padding: 5px 10px 5px 0;
+      padding: 0.3em 0.5em 0.3em 0;
       span {
         display: inline-block;
-        line-height: 2.3;
+        line-height: 2;
         border-right: 1px solid #00000055;
-        padding-right: 10px;
-        padding-left: 10px;
+        padding-right: 0.5em;
+        padding-left: 0.5em;
       }
       span:first-child {
         color: #800;
@@ -199,13 +195,13 @@ export default {
       letter-spacing: 0.1px;
       line-height: 1.5;
       font-size: 95%;
-      padding: 5px 0;
+      padding: 0.4em 0;
       span {
         display: inline-block;
         white-space: nowrap;
         &:after{
           content:";";
-          padding-right: 10px;
+          padding-right: 0.5em;
         }
       }
       div:last-child {
@@ -221,9 +217,8 @@ export default {
     align-items: flex-start;
   }
   .item-body {
-    padding-right: 10px;
     .ementa {
-      margin: 5px 0 15px 0;
+      margin: 0.3em 0 0.5em 0;
       font-size: 135%;
       line-height: 1.4;
       color: #257464;
@@ -231,8 +226,8 @@ export default {
     }
     .observacao {
       display: inline-block;
-      border-top: 1px solid rgb(86, 150, 202);
-      padding: 5px 10px 0 0;
+      border-top: 1px solid #5696ca;
+      margin: 0.5em 1em 0 0;
       line-height: 1.3;
     }
   }
@@ -241,10 +236,12 @@ export default {
 
 @media screen and (max-width: 480px) {
   .item-de-pauta {
-    //margin-bottom: 5px;
-    padding: 5px 5px 5px 5px;
-    border-left-width: 1px;
-    border-radius: 0px;
+    font-size: 85%;
+    .item-header {
+      .epigrafe {
+        letter-spacing: 0px;
+      }
+    }
   }
 }
 </style>

@@ -151,13 +151,13 @@ export default {
 }
 
 @media screen and (max-width: 480px) {
-  $width-sideleft: 48px;
+  $width-sideleft: 40px;
   .inner-sideleft {
     a {
       //height: $width-sideleft * 0.7;
-      grid-template-columns: 48px 0px;
+      grid-template-columns: 40px 0px;
       .icon {
-        margin: 0 6px;
+        margin: 0 2px;
         padding: 5px 0;
       }
     }

@@ -88,7 +88,7 @@ export default {
   display: grid;
   grid-template-columns: auto auto;
   align-items: start;
-  padding: 0 2px 10px 2px;
+  padding: 0 0.3em 1em 0.3em;
   line-height: 1;
   cursor: default;
   grid-column-gap: 10px;
@@ -106,7 +106,7 @@ export default {
   }
 }
 
-@media screen and (max-width: 991px) {
+@media screen and (max-width: 767px) {
   .sessao-plenaria-topo {
     grid-template-columns: auto;
     justify-content: center;
@@ -117,15 +117,10 @@ export default {
   }
 }
 
-@media screen and (max-width: 767px) {
-.sessao-plenaria-topo {
-    font-size: 92%;
+@media screen and (max-width:480px) {
+  .sessao-plenaria-topo {
+    font-size: 82%;
   }
 }
 
-@media screen and (max-width: 480px) {
-  .sessao-plenaria-topo {
-    font-size: 70%;
-  }
-}
 </style>

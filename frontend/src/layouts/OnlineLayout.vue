@@ -4,6 +4,16 @@
     <template slot="brand">
       <brand></brand>
     </template>
+    <template slot="header-detail">
+        <nivel-detalhe></nivel-detalhe>
+        <div class="btn-group ml-2 btn-group-sm accessibility" role="group" aria-label="First group">
+          <a class="btn btn-outline-dark" @click="diminuirFonte">a</a>
+          <a class="btn btn-outline-dark" @click="aumentarFonte">A</a>
+        </div>
+    </template>
+    <template slot="header-right">
+      <i class="fas fa-sign-out-alt hover-circle" @click="close" title="Sair da Interface Sapl Online"></i>
+    </template>
 
     <template slot="sideleft">
       <side-left></side-left>
@@ -17,10 +27,6 @@
       <router-view></router-view>
     </template>
 
-    <template slot="header-right">
-      <i class="fas fa-sign-out-alt hover-circle" @click="close" title="Sair da Interface Sapl Online"></i>
-    </template>
-
   </base-layout>
 </template>
 
@@ -29,13 +35,16 @@ import SideRight from './fragments/SideRight'
 import SideLeft from './fragments/SideLeft'
 import Brand from './fragments/Brand'
 import BaseLayout from './fragments/BaseLayout'
+import NivelDetalhe from './fragments/NivelDetalhe'
+
 export default {
   name: 'online',
   components: {
     BaseLayout,
     SideRight,
     SideLeft,
-    Brand
+    Brand,
+    NivelDetalhe
   },
   data () {
     return {
@@ -58,6 +67,12 @@ export default {
     this.initCache()
   },
   methods: {
+    diminuirFonte () {
+      $('.base-layout .main').css('font-size', '-=1')
+    },
+    aumentarFonte () {
+      $('.base-layout .main').css('font-size', '+=1')
+    },
     close () {
       window.location.href = '/'
     },

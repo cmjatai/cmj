@@ -18,6 +18,10 @@ Vue.mixin({
   data () {
     return {
       utils: Resources.Utils,
+      NIVEL1: 1,
+      NIVEL2: 2,
+      NIVEL3: 3,
+      NIVEL4: 4
     }
   },
   methods: {

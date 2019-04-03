@@ -37,18 +37,56 @@ export default {
 </script>
 
 <style lang="scss">
+
 .inner-brand {
   height: 100%;
   align-items: center;
+
   img {
     width: auto;
-    height: 100%;
+    height: 48px;
   }
   .title-brand {
     display: inline-block;
-    padding-left: 0.5rem;
+    padding-left: 1rem;
     margin: 0;
     font-size: 110%;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .inner-brand {
+    img {
+      height: 40px;
+    }
+    .title-brand {
+      //font-size: 100%;
+      padding-left: 0.5rem;
+    }
+  }
+}
+
+@media screen and (max-width: 600px) {
+
+  .inner-brand {
+    img {
+      height: 36px;
+    }
+    .title-brand {
+      //font-size: 90%;
+      padding-left: 0.25rem;
+    }
+  }
+
+}
+@media screen and (max-width: 480px){
+  .inner-brand {
+    img {
+      height: 32px;
+    }
+    .title-brand {
+      line-height: 1;
+    }
   }
 }
 
