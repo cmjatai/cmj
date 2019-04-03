@@ -1,6 +1,8 @@
 <template>
   <div :class="['item-de-pauta', type]">
-
+    <div class="empty-list" v-if="materia.id === undefined">
+        Carregando Matéria...
+    </div>
     <div class="item-header" v-if="tipo_string">
       <div class="data-header">
         <div class="epigrafe">

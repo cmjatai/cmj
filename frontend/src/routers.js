@@ -6,7 +6,9 @@ export const routes = [
     children: [
       { path: '',
         name: 'index_link',
-        component: () => import('@/pages/Index.vue')
+
+        component: () => import('@/pages/sessao/SessaoList.vue')
+        //component: () => import('@/pages/Index.vue')
       },
        {
         path: 'sessao/',

@@ -22,7 +22,7 @@ export default {
       links: [
         {
           image: require('@/assets/img/icon_mesa_diretora.png'),
-          route: 'index_link',
+          route: '',
           texto: 'Mesa Diretora'
         },
         {

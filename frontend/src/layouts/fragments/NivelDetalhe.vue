@@ -2,7 +2,7 @@
   <div class="btn-group ml-2 btn-group-sm nivel-detalhe" role="group" aria-label="First group">
     <a
       @click="changeNivel(nivel.nivel)"
-      v-for="(nivel, key) in niveis"
+      v-for="(nivel, key) in niveis_filter"
       :class="['btn btn-outline-dark', nivel_detalhe === nivel.nivel ? 'active' : '']"
       :key="'nv'+key">{{nivel.text}}</a>
   </div>
@@ -32,6 +32,11 @@ export default {
           nivel: 4
         }
       ]
+    }
+  },
+  computed: {
+    niveis_filter: function () {
+      return this.niveis.filter(i => i.nivel === 4 || i.nivel === 1)
     }
   },
   methods: {
