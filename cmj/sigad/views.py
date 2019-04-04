@@ -56,7 +56,7 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
 
     def get_noticias_da_procuradoria(self):
 
-        docs = Documento.objects.qs_news()
+        docs = Documento.objects.qs_docs()
         # FIXME: IMPLEMENTAR ESTRATÉGIA CORRETA PARA SELECIONAR NOTÍCIAS DA
         # PROCURADORIA
         docs = docs.filter(classe=215)
