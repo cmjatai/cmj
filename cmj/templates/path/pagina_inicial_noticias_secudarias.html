@@ -1,6 +1,7 @@
 {% load i18n sigad_filters social_utils%}
 <div class="container-noticias-secundarias">
-
+<h2 class="title-container-noticias">Notícias Institucionais</h2>
+<div class="inner-noticias">
 {% with 'noticias_secundarias'|caixa_publicacao:None as noticias_secundarias %}
   {% for d in  noticias_secundarias.docs%}
     <div class="path-item-list">
@@ -42,4 +43,5 @@
   {% endif %}
 {% endwith %}
 
+</div>
 </div>

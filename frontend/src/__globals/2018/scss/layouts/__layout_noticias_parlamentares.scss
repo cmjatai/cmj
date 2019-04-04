@@ -1,9 +1,12 @@
 .container-box-parlamentares {
-  margin-top: $spacer;
+  margin-top: $grid-gutter-width;
   display: table;
   font-size: 0px;
   .path-item-list {
     width: calc(50%);
+    .inner {
+      padding-top: 0;
+    }
   }
   .col-3 {
     align-self: center;

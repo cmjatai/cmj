@@ -1,15 +1,12 @@
-.container-noticias-secundarias {
+.container-noticias-procuradoria {
   position: relative;
   margin-top: $grid-gutter-width;
   display: table;
   font-size: 0px;
   width: 100%;
-
-  .inner-noticias {
-    position: relative;
-  }
+  
   .path-item-list {
-    width: calc(50%);
+    width: calc(100%);
     &:nth-child(2n) {
       .inner {
         padding: 0 0 0 2px;

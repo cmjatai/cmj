@@ -1017,6 +1017,10 @@ class Documento(ShortUrl, CMSMixin):
             midia.documento = None
             midia.revisao = ultima_revisao
             midia.save()
+
+        for cita in self.cita.all():
+            cita.delete()
+
         return super().delete(using=using, keep_parents=keep_parents)
 
     @property

@@ -50,7 +50,18 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
 
         context['noticias_dos_parlamentares'] = np
 
+        context['noticias_da_procuradoria'] = self.get_noticias_da_procuradoria()
+
         return context
+
+    def get_noticias_da_procuradoria(self):
+
+        docs = Documento.objects.qs_news()
+        # FIXME: IMPLEMENTAR ESTRATÉGIA CORRETA PARA SELECIONAR NOTÍCIAS DA
+        # PROCURADORIA
+        docs = docs.filter(classe=215)
+
+        return docs
 
     def get_noticias_dos_parlamentares(self):
         legislatura_atual = Legislatura.objects.first()

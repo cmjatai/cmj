@@ -1,0 +1,31 @@
+{% load i18n sigad_filters social_utils%}
+<div class="container-noticias-procuradoria">
+  <h2 class="title-container-noticias">Notícias da Procuradoria Geral</h2>
+  {% for d in noticias_da_procuradoria.all%}
+    <div class="path-item-list">
+      <div class="inner">
+        <!--div class="path-imagem alinhamento-justify">
+          <div class="imagem" style="background-image: url(/{{d.absolute_slug}}.256)"></div>
+          <div class="autor">{{d.autor|default:''}}</div>
+        </div-->
+
+        <div class="texto">
+          <h2 class="titulo">
+            <a tabindex="{{view.tabindex}}" href="{% url 'cmj.sigad:path_view' d.absolute_slug %}">
+              {{d.titulo}}
+            </a>
+          </h2>
+
+          <div class="descricao">
+              {% comment "" %}
+            {{d.childs.all.0.childs.all.0.texto|safe|urlize}}
+              {% endcomment %}
+            <p tabindex="{{view.tabindex}}" >
+                {{d.descricao|safe|urlize}}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>

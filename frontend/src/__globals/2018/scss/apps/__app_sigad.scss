@@ -81,6 +81,7 @@
   font-size: 1.6em;
   font-weight: 300;
   position: static;
+  margin-bottom: 2em;
 
   a:not(.btn) {
     color: #a97905;
@@ -387,6 +388,17 @@
       }
     }
   }
+}
+
+.title-container-noticias {
+  font-variant: small-caps;
+  font-weight: bold;
+  color: #006556;
+  border-bottom: 1px solid #006556;
+  display: inline-block;
+  min-width: 55%;
+  margin-bottom: 1rem;
+  padding-left: 0.3rem;
 }
 
 .page:not(#pagina-inicial) {
