@@ -4,6 +4,8 @@
   children:
   - title: {% trans 'Comissões' %}
     url: sapl.comissoes:comissao_list
+  - title: {% trans 'Procuradoria Geral' %}
+    url: /institucional/procuradoria-geral
   - title: {% trans 'Agenda Pública' %}
     url: /evento/
   - title: {% trans 'Nossa Jataí' %}

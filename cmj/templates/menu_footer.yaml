@@ -7,6 +7,12 @@
     url: /parlamentar
   - title: Comissões
     url: /sapl/comissao/
+  - title: {% trans 'Procuradoria Geral' %}
+    url: /institucional/procuradoria-geral
+  - title: {% trans 'Agenda Pública' %}
+    url: /evento/
+  - title: {% trans 'Nossa Jataí' %}
+    url: /institucional/nossa-jatai
 
   - title: {% trans 'Legislação' %}
     url: http://sapl.camarajatai.go.gov.br/sapl/qs?d=tc-tn&tc=tn
