@@ -29,7 +29,18 @@
       <div class="ementa">
         {{materia.ementa}}
       </div>
-      <div v-if="nivel_detalhe >= NIVEL4 && observacao.length > 0" class="observacao" v-html="observacao"></div>
+    </div>
+    <div :class="['item-body', tipo_string && materia.anexadas.length > 0 ? 'col-anexadas':'']">
+      <div class="col-1-body">
+
+        <div class="ultima_tramitacao" v-if="nivel_detalhe >= NIVEL2 && tramitacao.ultima !== {}" >
+          <strong>Situação:</strong> {{tramitacao.status.descricao}}<br>
+          <strong>Ultima Ação:</strong> {{tramitacao.ultima.texto}}
+        </div>
+        <div v-if="nivel_detalhe >= NIVEL4 && observacao.length > 0" class="observacao" v-html="observacao"></div>
+      </div>
+      <div class="col-2-body">
+      </div>
     </div>
 
   </div>
@@ -43,6 +54,10 @@ export default {
       app: ['materia'],
       model: ['materialegislativa', 'tramitacao'],
       materia: {},
+      tramitacao: {
+        ultima: {},
+        status: {}
+      },
       tipo_string: '',
       autores_string: [[]]
     }
@@ -95,7 +110,12 @@ export default {
     }
   },
   mounted () {
-    this.fetchMateria()
+    const t = this
+    this
+      .fetchMateria()
+      .then((obj) => {
+        t.fetchUltimaTramitacao()
+      })
   },
   methods: {
     fetch (metadata = null) {
@@ -110,7 +130,7 @@ export default {
     },
     fetchMateria (metadata) {
       const t = this
-      t
+      return t
         .getObject({
           action: '',
           app: t.app[0],
@@ -119,10 +139,30 @@ export default {
         })
         .then(obj => {
           t.materia = obj
+          return obj
         })
     },
-    fetchUltimaTramitacao (metadata) {
-
+    fetchUltimaTramitacao () {
+      const t = this
+      return t.utils
+        .getByMetadata({
+          action: 'ultima_tramitacao',
+          app: 'materia',
+          model: 'materialegislativa',
+          id: t.materia.id
+        })
+        .then((response) => {
+          t.tramitacao.ultima = response.data
+          t.getObject({
+            action: '',
+            app: 'materia',
+            model: 'statustramitacao',
+            id: t.tramitacao.ultima.status
+          })
+            .then(obj => {
+              t.tramitacao.status = obj
+            })
+        })
     }
   }
 }
@@ -219,6 +259,13 @@ export default {
     align-items: flex-start;
   }
   .item-body {
+    display: grid;
+
+    &.col-anexadas {
+      grid-template-columns: 2fr 1fr;
+    }
+    //
+
     .ementa {
       margin: 0.3em 0 0.5em 0;
       font-size: 135%;
@@ -230,6 +277,12 @@ export default {
       display: inline-block;
       border-top: 1px solid #5696ca;
       margin: 0.5em 1em 0 0;
+      padding-top: 0.5em;
+      line-height: 1.3;
+    }
+    .ultima_tramitacao {
+      border-top: 1px solid #5696ca;
+      padding-top: 0.5em;
       line-height: 1.3;
     }
   }

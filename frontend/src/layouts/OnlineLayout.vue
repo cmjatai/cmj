@@ -51,7 +51,7 @@ export default {
       models_init_cache: {
         base: ['autor'],
         sessao: ['tiposessaoplenaria'],
-        materia: ['tipomaterialegislativa'],
+        materia: ['tipomaterialegislativa', 'statustramitacao'],
         parlamentares: [
           'legislatura',
           {

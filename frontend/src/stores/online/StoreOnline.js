@@ -94,11 +94,16 @@ const actions = {
       })
     }
 
+    const utils = Resources.Utils
+    const resource = metadata.func === undefined ? utils.getModel : metadata.func
+
     let fetch = function () {
-      let utils = Resources.Utils
-      //console.log('fetch refresh', metadata)
-      return utils
-        .getModel(metadata.app, metadata.model, metadata.id)
+
+      let exec = resource === utils.getModel ?
+        resource(metadata.app, metadata.model, metadata.id) :
+        resource(metadata)
+        
+      return exec
         .then(response => {
           let meta = {
             app: metadata.app,
