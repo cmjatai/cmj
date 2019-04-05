@@ -37,14 +37,16 @@ class LoginForm(AuthenticationForm):
             attrs={
                 'class': 'form-control',
                 'name': 'username',
-                'placeholder': _('Digite seu Endereço de email')}))
+                'placeholder': _('Digite seu Endereço de email'),
+                'autocomplete': "username"}))
     password = forms.CharField(
         label="Password", max_length=30,
         widget=forms.PasswordInput(
             attrs={
                 'class': 'form-control',
                 'name': 'password',
-                'placeholder': _('Digite sua Senha')}))
+                'placeholder': _('Digite sua Senha'),
+                'autocomplete': "current-password"}))
 
 
 class CustomImageCropWidget(ImageCropWidget):
