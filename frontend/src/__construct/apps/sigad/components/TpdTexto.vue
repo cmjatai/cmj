@@ -5,7 +5,7 @@
         <button v-on:click.self="toogleTitulo" title="Disponibilizar Subtítulo para este Fragmento de Texto" type="button" class="btn btn-success">T</button>
       </div>
       <div class="btn-group btn-group-sm">
-        <button v-on:click.self="toogleEditor" :title="[usarfroala ? 'Usar Editor Simples' : 'Usar Editor Avançado' ]" type="button" class="btn btn-success">Edição de Texto</button>
+        <button v-on:click.self="toogleEditor" :title="[usartinymce ? 'Usar Editor Simples' : 'Usar Editor Avançado' ]" type="button" class="btn btn-success">Edição de Texto</button>
         <button v-on:click.self="deleteParte" title="Remover este Fragmento de Texto" type="button" class="btn btn-danger">x</button>
       </div>
     </div>
@@ -30,7 +30,9 @@
 
 <script>
 import Container from './Container'
+
 import Editor from '@tinymce/tinymce-vue'
+import 'tinymce/themes/modern/theme'
 
 export default {
   name: 'tpd-texto',

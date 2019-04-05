@@ -6,6 +6,10 @@ body, html {
   background: $color_main_bg $url_bg_png;
 }
 
+strong {
+  font-weight: bold;
+}
+
 .caret {
   display: inline-block;
   width: 0;

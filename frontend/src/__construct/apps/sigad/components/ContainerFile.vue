@@ -189,7 +189,7 @@ export default {
   }
   .btn-pdf {
     position: absolute;
-    right: 0;
+    right: 10px;
     top: 0;
   }
 }

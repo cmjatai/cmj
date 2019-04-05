@@ -9,12 +9,16 @@
     v-on:drop="drop"
     v-on:mouseover="mouseOver"
     v-on:mouseleave="mouseLeave">
-      <img :src="slug+'.256?'+refresh">
+
+      <img :src="slug+'.256?'+refresh" v-if="is_imagem">
+      <a :href="slug" v-if="!is_imagem">
+        <i class="fas fa-file"></i>
+      </a>
       <div class="imgmouseover" v-if="false">
         <img :src="slug+'.512?'+refresh">
       </div>
       <div class="drag">
-        <div class="btn-controls">
+        <div class="btn-controls" v-if="is_imagem">
           <span class="btn btn-rotate"  v-on:click="rotateLeft" title="Rotacionar 90 graus a esquerda">
             <i class="fas fa-undo" aria-hidden="true"></i>
           </span>
@@ -74,6 +78,9 @@ export default {
       'getChoices',
       'getDocObject'
     ]),
+    is_imagem: function () {
+      return this.TIPOS_IMG_PERMITIDOS.indexOf(this.elemento.mime_type) != -1
+    },
     classDrag: function () {
       let classes = Array() //eslint-disable-line
       this.dragged ? classes.push('drag-start') : '' //eslint-disable-line

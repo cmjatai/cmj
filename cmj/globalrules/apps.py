@@ -210,9 +210,11 @@ models.signals.post_migrate.connect(
 
 @receiver(post_save, dispatch_uid='cmj_post_save_signal')
 def cmj_post_save_signal(sender, instance, using, **kwargs):
-    send_signal_for_websocket_time_refresh('cmj.', 'post_save', instance)
+    #send_signal_for_websocket_time_refresh('cmj.', 'post_save', instance)
+    pass
 
 
 @receiver(post_delete, dispatch_uid='cmj_post_delete_signal')
 def cmj_post_delete_signal(sender, instance, using, **kwargs):
-    send_signal_for_websocket_time_refresh('cmj.', 'post_delete', instance)
+    #send_signal_for_websocket_time_refresh('cmj.', 'post_delete', instance)
+    pass
