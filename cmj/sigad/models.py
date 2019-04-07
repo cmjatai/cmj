@@ -1044,6 +1044,7 @@ class Documento(ShortUrl, CMSMixin):
             bottomMargin=0)
 
         c = canvas.Canvas(response)
+        c.setTitle(self.titulo)
         A4_landscape = landscape(A4)
         for img in self.childs.order_by('ordem'):
             path = img.midia.last.file.path

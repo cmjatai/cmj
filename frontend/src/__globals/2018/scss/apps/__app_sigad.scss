@@ -638,13 +638,17 @@
 }
 
 .container-file {
-
-  i {
-    display: inline-block;
+  padding: 1em;
+  background-color: #ffffff77;
+  line-height: 1.2;
+  &:not(:last-child) {
+    border-bottom: 1px solid #ddd;
   }
-  span {
-    line-height: 2em;
-    vertical-align: top;
+  .path-title-container {
+    padding: 0;
+  }
+  span.data-pub {
+    font-size: 60%;
     display: inline-block;
   }
   .path-description {

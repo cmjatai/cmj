@@ -10,10 +10,6 @@
     v-on:mouseover="mouseOver"
     v-on:mouseleave="mouseLeave">
 
-      <div class="drag">
-        <i class="fas fa-grip-vertical"></i>
-      </div>
-
       <div :class="[is_imagem ? 'image-render': 'file-render']">
         <a :href="slug" target="_blank" v-if="!is_imagem" class="btn btn-link" >
           <i class="fas fa-file fa-2x"></i>{{elemento.id}}
@@ -175,54 +171,12 @@ export default {
 <style lang="scss" scoped>
 
 .container-documento-edit {
-  .tpd-file {
-    position: relative;
-    z-index: 1;
-    padding: 5px;
-    opacity: 0.8;
-    transition: all 1s ease;
-    margin:3px;
-    position: relative;
-    &:hover {
-      transition: all 0.3s ease;
-      opacity: 1;
-    }
+  .container-file {
+    .tpd-file {
 
-    &.drag-start {
-      opacity: 0.5;
-      transition: all 1s ease;
-    }
-    &.drag-leave {
-      opacity: 0.1;
-      transition: all 1s ease;
-    }
-    &.drag-over {
-      opacity: 0.2;
-      transition: all 1s ease;
-    }
-
-    &.files-list {
-
-      width: 10em;
-      height: 10em;
-
-    }
-    &.images-list {
-      width: auto;
-      min-width: 6em;
-      //min-height: 15em;
-      //flex: 1 1 25%;
-      transition: all 1s ease;
-      .drag {
-        border: 1px solid #aaa;
-        position: absolute;
-        top: 0;
-        left:0;
-        right: 0;
-        bottom: 0;
-        display: block;
+      &.draggable {
         z-index: 1;
-        user-select:none;
+        cursor: default;
 
         -moz-user-select: none;
         -khtml-user-select: none;
@@ -230,42 +184,79 @@ export default {
         user-select: none;
         -khtml-user-drag: element;
         -webkit-user-drag: element;
-        i {
-          display: none;
-        }
-
-      }
-      .btn-controls {
-        position: absolute;
-        right: 0;
-        top: 0;
-        z-index: 2;
-        background-color: #ffffff33;
-        margin: 5px;
-        transition: all 1s ease;
-        white-space: nowrap;
-        &:hover {
-          transition: all 1s ease;
-          background-color: #ffffffbb;
-        }
-      }
-      &:hover {
-        transition: all 1s ease;
-        .btn-controls {
-          background-color: #ffffff99;
-          transition: all 1s ease;
-        }
-      }
-
-      .image-render {
-        width: 100%;
-        img {
-          width: 100%;
-          object-fit: cover;
-        }
       }
     }
   }
-}
+  .tpd-file {
+    border: 1px solid #aaa;
+    position: relative;
+    z-index: 1;
+    padding: 5px;
+    opacity: 0.8;
+    transition: all 1s ease;
+    margin:3px;
+    position: relative;
 
+    width: auto;
+    min-width: 6em;
+    &:hover {
+      transition: all 0.3s ease;
+      opacity: 1;
+    }
+    &.drag-start {
+      opacity: 0.5;
+      transition: all 1s ease;
+      //transform: rotate(0.3);
+    }
+    &.drag-leave {
+      opacity: 0.1;
+      transition: all 1s ease;
+    }
+    &.drag-over {
+      opacity: 0.3;
+      transition: all 1s ease;
+    }
+
+    .btn-controls {
+      position: absolute;
+      right: 0;
+      top: 0;
+      z-index: 2;
+      background-color: #ffffff33;
+      margin: 5px;
+      transition: all 1s ease;
+      white-space: nowrap;
+      cursor: pointer;
+      &:hover {
+        transition: all 1s ease;
+        background-color: #ffffffbb;
+      }
+    }
+    &:hover {
+      transition: all 1s ease;
+      .btn-controls {
+        background-color: #ffffff99;
+        transition: all 1s ease;
+      }
+    }
+
+    .image-render {
+      width: 100%;
+      img {
+        width: 100%;
+        object-fit: cover;
+      }
+    }
+
+    &.images-list {
+    }
+    &.files-list {
+      flex: 1 1 45%;
+      height: 10em;
+      border: 1px solid #aaa;
+      display: grid;
+      grid-template-columns: 1em auto 2em;
+    }
+  }
+}
 </style>
