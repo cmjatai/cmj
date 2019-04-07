@@ -63,6 +63,10 @@ export default {
   methods: {
     toogleEditor: function () {
       this.usartinymce = !this.usartinymce
+    },
+
+    success (message = 'Informação atualizada com sucesso.') {
+      // this.sendMessage({ alert: 'alert-success', message: message })
     }
   }
 }
