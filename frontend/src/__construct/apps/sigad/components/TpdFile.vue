@@ -42,6 +42,11 @@
           <i class="fas fa-trash" aria-hidden="true"></i>
         </span>
       </div>
+      <div class="btn-toolbar widgets widget-bottom justify-content-end">
+        <div class="btn-group btn-group-sm">
+          <button v-on:click.self="addBrother(tipo.component_tag, $event)" v-for="(tipo, key) in getChoices.tipo.subtipos" :key="key" type="button" class="btn btn-primary" title="Adiciona Elemento aqui...">{{tipo.text}}</button>
+        </div>
+      </div>
   </div>
 </template>
 

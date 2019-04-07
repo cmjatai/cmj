@@ -1034,6 +1034,11 @@ class Documento(ShortUrl, CMSMixin):
         return self.VISIBILIDADE_STATUS.triple(self.visibilidade)
 
     @property
+    def is_pdf(self):
+
+        return self.midia.last.content_type == 'application/pdf'
+
+    @property
     def is_pdf_container(self):
 
         s = set(self.childs.all().order_by(

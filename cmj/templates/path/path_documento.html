@@ -291,6 +291,34 @@
               </div>
             </div>
 
+          {% elif child.tipo == child.TPD_FILE %}
+
+              <div class="container-file">
+                <a class="icon-container" tabindex="{{view.tabindex}}" href="/{{child.slug}}" target="_blank">
+                  <i class="far fa-file-{% if child.is_pdf %}pdf{% else %}archive{% endif %}"></i>
+                </a>
+                <div class="path-title-container" >
+                  <a tabindex="{{view.tabindex}}" href="/{{child.slug}}" target="_blank">
+                    <span >
+                      {{child.titulo|default:'Arquivo'|safe|urlize}}
+                    </span>
+                  </a>
+                </div>
+                <div class="path-description">
+                  {{child.descricao|default:''|safe|urlize}}
+                </div>
+                <span class="path-autor">
+                  {{child.autor|default:''|safe|urlize}}
+                </span>
+                
+                {% with rev=child.revisoes.first %}
+                  <span class="data-pub">
+                    {{rev.data}} - {% trans "por:" %} {{rev.user.first_name|default:rev.user.email}}
+                  </span>
+                {% endwith %}
+              </div>
+
+
           {% elif child.tipo == child.TPD_GALLERY %}
               {% with child as object %}
                 {% include "path/path_gallery.html" %}
