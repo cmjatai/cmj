@@ -190,22 +190,7 @@ export default {
 <style lang="scss" scoped>
 
 .container-documento-edit {
-  .container-file {
-    .tpd-file {
 
-      &.draggable {
-        z-index: 1;
-        cursor: default;
-
-        -moz-user-select: none;
-        -khtml-user-select: none;
-        -webkit-user-select: none;
-        user-select: none;
-        -khtml-user-drag: element;
-        -webkit-user-drag: element;
-      }
-    }
-  }
   .tpd-file {
     border: 1px solid #aaa;
     position: relative;
@@ -270,8 +255,24 @@ export default {
     &.images-list {
     }
     &.files-list {
-      flex: 1 1 100%;
+      margin-bottom: 10px;
+      flex: 1 1 45%;
       border: 1px solid #aaa;
+    }
+  }
+  .container-file {
+    .tpd-file {
+      &.draggable {
+        z-index: 1;
+        cursor: default;
+
+        -moz-user-select: none;
+        -khtml-user-select: none;
+        -webkit-user-select: none;
+        user-select: none;
+        -khtml-user-drag: element;
+        -webkit-user-drag: element;
+      }
     }
   }
 }

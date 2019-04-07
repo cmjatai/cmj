@@ -73,6 +73,7 @@ export default {
 .container-documento-edit {
   .tpd-texto {
     padding-top: 15px;
+    z-index: 3;
     .path-title-partes {
       padding: 0;
       width: 45%;

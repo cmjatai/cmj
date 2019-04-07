@@ -182,6 +182,15 @@ export default {
       justify-content: center;
       user-select:none;
     }
+    .tpd-file {
+      &:hover {
+        .widgets {
+          display: none;
+        }
+
+      }
+
+    }
   }
   .path-title-file {
     font-size: 130%;

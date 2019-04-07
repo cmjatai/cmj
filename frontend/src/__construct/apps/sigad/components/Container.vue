@@ -19,6 +19,9 @@
     </div>
 
     <component :is="classChild(value)" v-for="value in childsOrdenados" :child="value" :parent="elemento" :key="value.id"/>
+
+    <div class="clearfix"></div>
+
     <div class="btn-toolbar widgets widget-bottom justify-content-end">
       <div class="btn-group btn-group-sm">
         <button v-on:click.self="addBrother('container', $event)" title="Adicionar novo Container Simples abaixo deste" type="button" class="btn btn-outline-primary">+C</button>
