@@ -1,5 +1,5 @@
 <template lang="html">
-  <div :class="[name_component, 'draggable', classDrag]"
+  <div :class="[name_component, 'draggable', classDrag, is_imagem ? 'images-list': 'files-list']"
     v-on:dragend="dragend"
     v-on:dragenter="dragenter"
     v-on:dragleave="dragleave"
@@ -10,26 +10,27 @@
     v-on:mouseover="mouseOver"
     v-on:mouseleave="mouseLeave">
 
-      <img :src="slug+'.256?'+refresh" v-if="is_imagem">
-      <a :href="slug" v-if="!is_imagem">
-        <i class="fas fa-file"></i>
-      </a>
-      <div class="imgmouseover" v-if="false">
-        <img :src="slug+'.512?'+refresh">
-      </div>
       <div class="drag">
-        <div class="btn-controls" v-if="is_imagem">
-          <span class="btn btn-rotate"  v-on:click="rotateLeft" title="Rotacionar 90 graus a esquerda">
-            <i class="fas fa-undo" aria-hidden="true"></i>
-          </span>
-          <span class="btn btn-rotate"  v-on:click="rotateRight" title="Rotacionar 90 graus a direita">
-            <i class="fas fa-redo" aria-hidden="true"></i>
-          </span>
-          <span class="btn btn-delete"  v-on:click="deleteParte" >
-            <i class="fas fa-trash" aria-hidden="true"></i>
-          </span>
-        </div>
+        <i class="fas fa-grip-vertical"></i>
+      </div>
 
+      <div :class="[is_imagem ? 'image-render': 'file-render']">
+        <a :href="slug" target="_blank" v-if="!is_imagem" class="btn btn-link" >
+          <i class="fas fa-file fa-2x"></i>{{elemento.id}}
+        </a>
+        <img :src="slug+'.256?'+refresh" v-if="is_imagem">
+      </div>
+
+      <div class="btn-controls">
+        <span v-if="is_imagem" class="btn btn-rotate"  v-on:click="rotateLeft" title="Rotacionar 90 graus a esquerda">
+          <i class="fas fa-undo" aria-hidden="true"></i>
+        </span>
+        <span v-if="is_imagem" class="btn btn-rotate"  v-on:click="rotateRight" title="Rotacionar 90 graus a direita">
+          <i class="fas fa-redo" aria-hidden="true"></i>
+        </span>
+        <span class="btn btn-delete"  v-on:click="deleteParte" >
+          <i class="fas fa-trash" aria-hidden="true"></i>
+        </span>
       </div>
   </div>
 </template>
@@ -79,7 +80,7 @@ export default {
       'getDocObject'
     ]),
     is_imagem: function () {
-      return this.TIPOS_IMG_PERMITIDOS.indexOf(this.elemento.mime_type) != -1
+      return this.TIPOS_IMG_PERMITIDOS.indexOf(this.elemento.mime_type) !== -1
     },
     classDrag: function () {
       let classes = Array() //eslint-disable-line
@@ -172,18 +173,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
 .container-documento-edit {
   .tpd-file {
+    position: relative;
     z-index: 1;
-    flex: 0 1 auto;
-    flex-direction: row;
     padding: 5px;
     opacity: 0.8;
     transition: all 1s ease;
-    margin:2px;
+    margin:3px;
     position: relative;
-    user-select:none;
-    width: auto;
     &:hover {
       transition: all 0.3s ease;
       opacity: 1;
@@ -201,28 +200,72 @@ export default {
       opacity: 0.2;
       transition: all 1s ease;
     }
-    .drag {
-      border: 1px solid #aaa;
-      position: absolute;
-      top: 0;
-      left:0;
-      right: 0;
-      bottom: 0;
-      display: block;
-      z-index: 1;
 
-      -moz-user-select: none;
-      -khtml-user-select: none;
-      -webkit-user-select: none;
-      user-select: none;
-      -khtml-user-drag: element;
-      -webkit-user-drag: element;
+    &.files-list {
+
+      width: 10em;
+      height: 10em;
+
     }
-    .btn-controls {
-      flex: 0 1 auto;
-      z-index: 2;
-      position: relative;
+    &.images-list {
+      width: auto;
+      min-width: 6em;
+      //min-height: 15em;
+      //flex: 1 1 25%;
+      transition: all 1s ease;
+      .drag {
+        border: 1px solid #aaa;
+        position: absolute;
+        top: 0;
+        left:0;
+        right: 0;
+        bottom: 0;
+        display: block;
+        z-index: 1;
+        user-select:none;
+
+        -moz-user-select: none;
+        -khtml-user-select: none;
+        -webkit-user-select: none;
+        user-select: none;
+        -khtml-user-drag: element;
+        -webkit-user-drag: element;
+        i {
+          display: none;
+        }
+
+      }
+      .btn-controls {
+        position: absolute;
+        right: 0;
+        top: 0;
+        z-index: 2;
+        background-color: #ffffff33;
+        margin: 5px;
+        transition: all 1s ease;
+        white-space: nowrap;
+        &:hover {
+          transition: all 1s ease;
+          background-color: #ffffffbb;
+        }
+      }
+      &:hover {
+        transition: all 1s ease;
+        .btn-controls {
+          background-color: #ffffff99;
+          transition: all 1s ease;
+        }
+      }
+
+      .image-render {
+        width: 100%;
+        img {
+          width: 100%;
+          object-fit: cover;
+        }
+      }
     }
   }
 }
+
 </style>
