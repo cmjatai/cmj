@@ -15,7 +15,6 @@
     </span>
     <div class="construct" v-if="usartinymce" >
       <editor v-if="usartinymce" inline  v-model.lazy="elemento.texto"></editor>
-      <!--froala :tag="'textarea'" :config="config"></froala-->
     </div>
 
     <textarea-autosize  v-if="!usartinymce" v-model.lazy="elemento.texto" placeholder="Fragmento de Texto" :align="'text-left'"/>
@@ -44,19 +43,6 @@ export default {
   },
   data () {
     return {
-      config: {
-        toolbarInline: true,
-        toolbarButtons: ['bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript', 'align', 'formatOL', 'formatUL', 'indent', 'outdent', 'undo', 'redo'],
-        quickInsertButtons: [],
-        quickInsertTags: [],
-        typingTimer: 1000,
-        placeholderText: 'Fragmento de Texto... ',
-        events: {
-          'froalaEditor.initialized': function () {
-          }
-        }
-      },
-      model: 'texto do model',
       usartinymce: true
     }
   },
