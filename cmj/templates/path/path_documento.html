@@ -177,23 +177,53 @@
 
   {% for container in object.childs.view_childs %}
     {% if container.tipo == container.TPD_CONTAINER_FILE and container.childs.exists %}
+    
       <div class="container container-file">
+        <a class="icon-container" tabindex="{{view.tabindex}}" href="/{{container.slug}}" target="_blank">
+          <i class="far fa-2x fa-file-{% if container.is_pdf_container %}pdf{% else %}archive{% endif %}"></i>
+        </a>
         <div class="path-title-container" >
           <a tabindex="{{view.tabindex}}" href="/{{container.slug}}" target="_blank">
-            <i class="far fa-file-pdf"></i>
             <span >
               {{container.titulo|default:''|safe|urlize}}
             </span>
           </a>
         </div>
-          <div class="path-description">
-            {{container.descricao|default:''|safe|urlize}}
+        <div class="path-description">
+          {{container.descricao|default:''|safe|urlize}}
+        </div>
+        {% with rev=container.revisoes.first %}
+          <span class="data-pub">
+            {{rev.data}} - {% trans "por:" %} {{rev.user.first_name|default:rev.user.email}}
+          </span>
+        {% endwith %}
+        {% if not container.is_pdf_container %}
+          <div class="inner-container">
+            {% for item in container.childs.view_childs %}
+              <div class="inner-item">
+                <a class="icon-container" tabindex="{{view.tabindex}}" href="/{{item.slug}}" target="_blank">
+                  <i class="far fa-file-{% if item.is_pdf_container %}pdf{% else %}archive{% endif %}"></i>
+                </a>
+                <div class="path-title-container" >
+                  <a tabindex="{{view.tabindex}}" href="/{{item.slug}}" target="_blank">
+                    <span >
+                      {{item.titulo|default:'teste'|safe|urlize}}
+                    </span>
+                  </a>
+                </div>
+                <div class="path-description">
+                  {{item.descricao|default:'descrição'|safe|urlize}}
+                </div>
+                {% with rev=item.revisoes.first %}
+                  <span class="data-pub">
+                    {{rev.data}} - {% trans "por:" %} {{rev.user.first_name|default:rev.user.email}}
+                  </span>
+                {% endwith %}
+              </div>
+            {% endfor %}
           </div>
-          {% with rev=container.revisoes.first %}
-            <span class="data-pub">
-              {{rev.data}} - {% trans "por:" %} {{rev.user.first_name|default:rev.user.email}}
-            </span>
-          {% endwith %}
+        {% endif %}
+
       </div>
     {% else %}
       <div class="container{% if container.tipo == container.TPD_CONTAINER_EXTENDIDO%}-fluid{% else %} container-simples{% endif %} {% if forloop.first%}container-first{% endif %}">

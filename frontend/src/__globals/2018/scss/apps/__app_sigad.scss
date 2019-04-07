@@ -3,15 +3,17 @@
   overflow: hidden;
   margin-bottom: $grid-gutter-width;
   margin-top: $grid-gutter-width;
+
   .painel-corte {
     position: absolute;
     left: 0px;
     right: 0px;
     bottom: 0px;
     padding-top: 30%;
-    background: linear-gradient(to top,  rgba(darken($color_main_bg, 5),1) 0, rgba(255,255,255,0) 70%);
+    background: linear-gradient(to top, rgba(darken($color_main_bg, 5), 1) 0, rgba(255, 255, 255, 0) 70%);
 
     text-align: center;
+
     .btn {
       margin-bottom: -5px;
     }
@@ -25,27 +27,34 @@
     display: inline-block;
     opacity: 0.75;
     margin-left: 10px;
+
     img {
       border: 0px solid transparent;
       border-radius: 50%;
       width: 100%;
     }
+
     &:hover {
       opacity: 1;
     }
   }
+
   .avatar1 {
     width: 250px;
   }
+
   .avatar2 {
     width: 170px;
   }
+
   .avatar3 {
     width: 130px;
   }
+
   .avatar4 {
     width: 90px;
   }
+
   .avatar5 {
     width: 70px;
   }
@@ -68,6 +77,7 @@
 
   .linebreak {
     display: none;
+
     &:nth-child(5n) {
       display: block;
     }
@@ -85,10 +95,12 @@
 
   a:not(.btn) {
     color: #a97905;
+
     &:hover {
       color: darken(#a97905, 15%);
     }
   }
+
   &.container-list {
     .path-data-pub {
       border-top-width: 3px;
@@ -101,10 +113,12 @@
     padding-left: 10px;
     font-weight: 800;
     margin-top: $grid-gutter-width;
+
     a {
       text-decoration: none;
     }
   }
+
   .path-title {
     text-align: center;
     margin-top: 1.8em;
@@ -114,6 +128,7 @@
     font-weight: 800;
     line-height: 1.4em;
   }
+
   .path-description {
     display: block;
     font-weight: normal;
@@ -124,6 +139,7 @@
     text-align: center;
     font-style: italic;
   }
+
   .path-data-pub {
     border-top: 1px solid transparentize(#a97905, 0.6);
     text-align: center;
@@ -136,11 +152,12 @@
     left: 0;
     right: 0;
 
-    .container-versions  {
+    .container-versions {
       display: inline-block;
-      position:static;
+      position: static;
       margin: 0px;
       line-height: 2;
+
       &:before {
         margin: 0 -5px;
         content: '';
@@ -148,12 +165,15 @@
         height: 3px;
         background-color: transparentize(#a97905, 0.6);
       }
-      a{
+
+      a {
         display: block;
       }
+
       a[aria-expanded="true"] {
         background-color: white;
       }
+
       span {
         display: block;
         background-color: white;
@@ -161,6 +181,7 @@
         line-height: 1;
         padding: 5px;
       }
+
       /*.collapse, .collapsing {
         right: 0px;
         top: 0;
@@ -173,30 +194,38 @@
     width: 49.9%;
     position: relative;
     margin-bottom: $grid-gutter-width / 4;
+
     img {
       width: 100%;
     }
+
     &.alinhamento-center {
       margin: 0 auto;
       width: 60%;
+
       &.img128 {
         width: 128px;
       }
     }
+
     &.alinhamento-left {
       margin-right: $grid-gutter-width;
       float: left;
+
       &.img128 {
         width: 128px;
       }
     }
+
     &.alinhamento-right {
       margin-left: $grid-gutter-width;
       float: right;
+
       &.img128 {
         width: 128px;
       }
     }
+
     &.alinhamento-justify {
       display: block;
       width: auto;
@@ -205,13 +234,16 @@
     .img-contexto {
       line-height: 1.2;
       background: white $url_bg_png;
+
       .texto {
         font-size: 0.65em;
       }
+
       .titulo {
         padding: 5px 5px 0 5px;
         font-weight: 300;
       }
+
       .descricao {
         padding: 0px;
       }
@@ -223,20 +255,23 @@
       float: right;
     }
   }
+
   .path-title-container {
-    display:block;
+    display: block;
     //border-left: 5px solid transparentize($color_text, 0.7);
     padding: 15px 0 5px 10px;
     font-weight: bold;
     font-size: 115%;
   }
+
   .path-title-partes {
-    display:block;
+    display: block;
     //border-left: 5px solid transparentize($color_text, 0.7);
     padding: 15px 0 5px 10px;
     font-weight: bold;
     font-size: 105%;
   }
+
   .pagination {
     a {
       font-size: 0.7em;
@@ -252,8 +287,10 @@
     line-height: 1.1;
     top: 0px;
     font-size: 1.4rem;
+
     a {
       color: rgba(255, 255, 255, 0.6);
+
       &:hover {
         color: white;
       }
@@ -270,10 +307,13 @@
   .row {
     margin: 0;
   }
+
   position: relative;
+
   &.status-private {
     border-left: 5px solid #d90040;
   }
+
   &.status-restrict {
     border-left: 5px solid #f0c040;
   }
@@ -283,6 +323,7 @@
     overflow: hidden;
     display: inline-block;
     width: 100%;
+
     img {
       width: 100%;
     }
@@ -295,22 +336,27 @@
     text-align: center;
     padding-top: 0px;
     border-top: 1px solid #ccc;
+
     &::after {
       width: 100%;
       display: block;
     }
   }
+
   .titulo {
     padding: 0 0 $grid-gutter-width/4 0;
     font-weight: 600;
+
     a {
       color: #443;
+
       &:hover {
         color: black;
         text-decoration: underline;
       }
     }
   }
+
   .descricao {
     color: #006556;
     font-size: 90%;
@@ -323,6 +369,7 @@
     line-height: 0;
     position: relative;
     overflow: hidden;
+
     .imagem {
       width: 100%;
       height: 200px;
@@ -331,6 +378,7 @@
       background-repeat: no-repeat;
       background-position: 50% center;
     }
+
     .img-contexto {
       position: absolute;
       top: 0;
@@ -339,6 +387,7 @@
       bottom: 0;
       transition: all 0.4s ease;
       background: linear-gradient(0deg, rgba(0, 0, 0, 0.6) 0px, transparent 100%, transparent);
+
       .texto {
         transition: all 0.4s ease;
         position: absolute;
@@ -346,6 +395,7 @@
         color: white;
       }
     }
+
     .autor {
       font-size: 60%;
       color: white;
@@ -359,13 +409,15 @@
   .path-parlamentares {
     margin: 0px 15px 5px 0px;
     float: left;
+
     &:first-child {
-      margin-top:$grid-gutter-width / 1.5;
+      margin-top: $grid-gutter-width / 1.5;
     }
+
     .avatar {
       display: inline-block;
       margin: 0 0 0 5px;
-      float:right;
+      float: right;
       width: 60px;
     }
   }
@@ -373,14 +425,18 @@
   .inner {
     padding: $grid-gutter-width / 2 0;
     margin-bottom: 1rem;
+
     p {
       margin: 0;
     }
+
     &:hover {
       .path-imagem {
         box-shadow: 2px 2px 6px #bba;
+
         .img-contexto {
           transition: all 0.4s ease;
+
           .texto {
             transition: all 0.4s ease;
           }
@@ -404,6 +460,7 @@
 .page:not(#pagina-inicial) {
   .path-item-list {
     position: relative;
+
     &:hover {
       background: $hover_background_05p;
     }
@@ -413,24 +470,29 @@
 
 .container-path-parlamentar {
   margin-top: -$grid-gutter-width;
+
   .container-topo-parlamentar {
     margin-bottom: $grid-gutter-width * 2;
     padding: 0px;
   }
+
   .path-capa {
     height: 400px;
     background-size: cover;
     background-repeat: no-repeat;
     background-position: 50% center;
     position: relative;
+
     &.path-capa-semfoto {
       height: 100px;
     }
+
     .container-social {
       position: absolute;
       bottom: 0;
       right: 0;
       left: 0;
+
       .container {
         position: relative;
       }
@@ -440,11 +502,13 @@
       position: absolute;
       bottom: 10px;
       right: 10px;
+
       a {
         i {
-          text-shadow: 0px 0px 10px rgba(0,0,0,0.4);
+          text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.4);
           color: #fafafa;
         }
+
         &:hover {
           i {
 
@@ -455,36 +519,43 @@
       }
     }
   }
+
   .path-header {
     //border-bottom: 1px solid $color_topo_bg;;
     position: relative;
-    box-shadow: -3px 1px 3px 0 rgba(0,0,0,0.25), 5px 1px 100px 0 rgba(#fff, 0.5);
-    background: darken($color_main_bg,5) $url_bg_png;
+    box-shadow: -3px 1px 3px 0 rgba(0, 0, 0, 0.25), 5px 1px 100px 0 rgba(#fff, 0.5);
+    background: darken($color_main_bg, 5) $url_bg_png;
   }
+
   .path-title {
     padding-top: 4px;
     margin: 0;
     line-height: 2em;
     text-align: right;
   }
+
   .path-parlamentares {
     margin: 0 0 0 20px;
     position: absolute;
     bottom: -70%;
+
     &:first-child {
       margin-top: 0px;
     }
+
     .avatar {
       margin: 0;
       opacity: 1;
       border-radius: 50%;
       background-color: white;
+
       img {
         opacity: 0.75;
         transition: opacity 0.3s ease;
         padding: 6px;
         box-shadow: 5px 1px 30px 0 rgba(#fff, 0.6);
       }
+
       &:hover {
         img {
           transition: opacity 0.3s ease;
@@ -493,24 +564,31 @@
       }
     }
   }
+
   .container-list {
     display: grid;
     grid-template-columns: 33.333% 33.333% 33.333%;
   }
+
   .path-item-list {
     max-width: none;
+
     .path-parlamentares {
       display: none;
     }
   }
+
   .path-item-list:first-child {
     grid-area: 1 / 1 / 3 / 3;
+
     .titulo {
       font-size: 200%;
     }
+
     .descricao {
       font-size: 200%;
     }
+
     .data-pub {
       display: none;
     }
@@ -522,31 +600,39 @@
     position: fixed;
     bottom: 50%;
     z-index: 2000;
-    a, a:hover {
+
+    a,
+    a:hover {
       color: white;
     }
+
     &.scroll_down {
-      & > a {
-        background-color: rgba(#0689c2,.3);
+      &>a {
+        background-color: rgba(#0689c2, .3);
       }
     }
+
     &.scroll_up {
-      & > a {
-        background-color: rgba(#0689c2,.4);
+      &>a {
+        background-color: rgba(#0689c2, .4);
       }
     }
-    & > a {
+
+    &>a {
       position: relative;
-      background: rgba(#0689c2,.35) $url_bg_png;
+      background: rgba(#0689c2, .35) $url_bg_png;
       color: white;
       display: inline-block;
       border-radius: 50%;
+
       &:hover {
         background-color: #0689c2;
       }
     }
+
     &:hover {
       min-width: 40%;
+
       .inner {
         z-index: 2000;
         bottom: 3.1em;
@@ -557,7 +643,8 @@
         font-size: 80%;
         border-radius: 2px;
         border: 1px solid white;
-        box-shadow: 3px 3px 10px  lighten($hover_background_50p, 3%);
+        box-shadow: 3px 3px 10px lighten($hover_background_50p, 3%);
+
         .titulo {
           white-space: nowrap;
           background: darken($color_main_bg, 8%) $url_bg_png;
@@ -567,11 +654,13 @@
 
           a {
             color: #443;
+
             &:hover {
               color: black;
             }
           }
         }
+
         .descricao {
           color: #006556;
           font-size: 90%;
@@ -580,14 +669,17 @@
         }
       }
     }
+
     .path-parlamentares {
       margin: 0px 5px 5px 5px;
+
       .avatar {
         display: inline-block;
         margin: 0 0 0 5px;
         width: 60px;
       }
     }
+
     .path-imagem {
       padding-left: 0.5em;
     }
@@ -596,17 +688,21 @@
   .path-next {
     right: -1.6em;
     text-align: right;
+
     a {
       padding: 1.2em 1.7em 1.0em 0.5em;
     }
+
     .inner {
       display: none;
     }
+
     &:hover {
       .inner {
         right: 2.2em;
       }
     }
+
     .path-parlamentares {
       a {
         padding: 0;
@@ -618,17 +714,21 @@
     left: -1.2em;
     text-align: left;
     transition: left 0.5s ease;
+
     a {
       padding: 1.2em 0.5em 1.0em 1.7em;
     }
+
     .inner {
       display: none;
     }
+
     &:hover {
       .inner {
         left: 2.2em;
       }
     }
+
     .path-parlamentares {
       a {
         padding: 0;
@@ -641,20 +741,54 @@
   padding: 1em;
   background-color: #ffffff77;
   line-height: 1.2;
+
   &:not(:last-child) {
     border-bottom: 1px solid #ddd;
   }
+
   .path-title-container {
     padding: 0;
   }
+
   span.data-pub {
     font-size: 60%;
     display: inline-block;
+    padding-bottom: 1em;
   }
+
   .path-description {
     margin: 0;
     text-align: left;
   }
+
+  .icon-container {
+    float: left;
+    display: inline-block;
+    padding-right: 0.5em;
+  }
+
+  .inner-container {
+    background-color: #fafafa;
+
+    .icon-container {
+      padding-top: 1em;
+      padding-left: 1em;
+    }
+
+    a {
+      font-size: 80%;
+    }
+
+    .inner-item {
+      border-top: 1px solid #eee;
+    }
+
+    span.data-pub {
+      padding-left: 1em;
+
+    }
+  }
+
 }
 
 @media screen and (max-width:767px) {
@@ -667,13 +801,16 @@
         width: 100%;
         height: 150px;
       }
+
       &.alinhamento-left {
         margin-right: $grid-gutter-width / 2;
       }
+
       &.alinhamento-right {
         margin-left: $grid-gutter-width / 2;
       }
     }
+
     .path-previous {
       left: -1.1em;
     }
@@ -693,6 +830,7 @@
 @media screen and (max-width: 480px) {
   .path-item-list {
     font-size: 1rem;
+
     .titulo {
       font-size: 1.2rem;
     }
@@ -702,5 +840,5 @@
     }
 
   }
-  
+
 }

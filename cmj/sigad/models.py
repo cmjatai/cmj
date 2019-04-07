@@ -1033,9 +1033,17 @@ class Documento(ShortUrl, CMSMixin):
     def visibilidade_css_class(self):
         return self.VISIBILIDADE_STATUS.triple(self.visibilidade)
 
+    @property
+    def is_pdf_container(self):
+
+        s = set(self.childs.all().order_by(
+            '-midia__versions__created').values_list(
+                'midia__versions__content_type', flat=True))
+
+        return not bool(s - TIPOS_IMG_PERMITIDOS)
+
     def build_container_file(self):
 
-        validated_for_pdf = True
         s = set(self.childs.all().order_by(
             '-midia__versions__created').values_list(
                 'midia__versions__content_type', flat=True))
