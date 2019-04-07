@@ -138,11 +138,7 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
                 return response
 
             elif self.documento.tipo == Documento.TPD_CONTAINER_FILE:
-                response = HttpResponse(content_type='application/pdf')
-                response['Content-Disposition'] = \
-                    'inline; filename="documento.pdf"'
-                self.documento.build_container_file_to_pdf(response)
-                return response
+                return self.documento.build_container_file()
 
             elif self.documento.tipo == Documento.TPD_GALLERY and \
                     'zipfile' in request.GET:

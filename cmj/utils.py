@@ -9,11 +9,11 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from easy_thumbnails import source_generators
 from floppyforms import ClearableFileInput
+import magic
 from model_utils.choices import Choices
 from reversion.admin import VersionAdmin
 from social_core.backends.facebook import FacebookOAuth2
 from unipath.path import Path
-import magic
 
 
 class FacebookOAuth2(FacebookOAuth2):
@@ -157,7 +157,7 @@ NONE_YES_NO_CHOICES = [(None, _('---------')),
 def listify(function):
     @wraps(function)
     def f(*args, **kwargs):
-        return list(function (*args, **kwargs))
+        return list(function(*args, **kwargs))
     return f
 
 
@@ -232,6 +232,26 @@ TIPOS_MIDIAS_PERMITIDOS = {
     'image/png': 'png',
     'application/png': 'png',
     'application/x-png': 'png',
+}
+
+TIPOS_IMG_PERMITIDOS = {
+    'image/jpeg',
+    'image/jpg',
+    'image/jpe_',
+    'image/pjpeg',
+    'image/vnd.swiftview-jpeg',
+    'application/jpg',
+    'application/x-jpg',
+    'image/pjpeg',
+    'image/pipeg',
+    'image/vnd.swiftview-jpeg',
+    'image/x-xbitmap',
+    'image/bmp',
+    'image/x-bmp',
+    'image/x-bitmap',
+    'image/png',
+    'application/png',
+    'application/x-png'
 }
 
 

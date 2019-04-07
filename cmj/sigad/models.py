@@ -1,5 +1,6 @@
 import io
 import os
+import zipfile
 
 from PIL import Image
 from PIL.Image import LANCZOS
@@ -13,6 +14,7 @@ from django.core.files.base import File
 from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.db.models import Q, F
+from django.http.response import HttpResponse
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.text import slugify
@@ -27,8 +29,8 @@ from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
 
 from cmj import globalrules
-from cmj.utils import get_settings_auth_user_model, CmjChoices,\
-    restringe_tipos_de_arquivo_midias, YES_NO_CHOICES
+from cmj.utils import get_settings_auth_user_model, YES_NO_CHOICES, CmjChoices,\
+    restringe_tipos_de_arquivo_midias, TIPOS_IMG_PERMITIDOS
 
 
 CLASSE_ESTRUTURAL = 0
@@ -1031,35 +1033,65 @@ class Documento(ShortUrl, CMSMixin):
     def visibilidade_css_class(self):
         return self.VISIBILIDADE_STATUS.triple(self.visibilidade)
 
-    def build_container_file_to_pdf(self, response):
+    def build_container_file(self):
 
-        def page(canvas, doc, path):
-            pass
+        validated_for_pdf = True
+        s = set(self.childs.all().order_by(
+            '-midia__versions__created').values_list(
+                'midia__versions__content_type', flat=True))
 
-        doc = SimpleDocTemplate(
-            response,
-            rightMargin=0,
-            leftMargin=0,
-            topMargin=0,
-            bottomMargin=0)
+        if not (s - TIPOS_IMG_PERMITIDOS):
+            response = HttpResponse(content_type='application/pdf')
+            response['Content-Disposition'] = \
+                'inline; filename="documento.pdf"'
 
-        c = canvas.Canvas(response)
-        c.setTitle(self.titulo)
-        A4_landscape = landscape(A4)
-        for img in self.childs.order_by('ordem'):
-            path = img.midia.last.file.path
+            doc = SimpleDocTemplate(
+                response,
+                rightMargin=0,
+                leftMargin=0,
+                topMargin=0,
+                bottomMargin=0)
 
-            if img.midia.last.is_paisagem:
-                c.setPageSize(A4_landscape)
-            else:
-                c.setPageSize(A4)
+            c = canvas.Canvas(response)
+            c.setTitle(self.titulo)
+            A4_landscape = landscape(A4)
+            for img in self.childs.order_by('ordem'):
+                path = img.midia.last.file.path
 
-            dim = A4_landscape if img.midia.last.is_paisagem else A4
-            c.drawImage(path, 0, 0,
-                        width=dim[0],
-                        height=dim[1])
-            c.showPage()
-        c.save()
+                if img.midia.last.is_paisagem:
+                    c.setPageSize(A4_landscape)
+                else:
+                    c.setPageSize(A4)
+
+                dim = A4_landscape if img.midia.last.is_paisagem else A4
+                c.drawImage(path, 0, 0,
+                            width=dim[0],
+                            height=dim[1])
+                c.showPage()
+            c.save()
+            return response
+
+        else:
+            file_buffer = io.BytesIO()
+
+            with zipfile.ZipFile(file_buffer, 'w') as file:
+                for f in self.childs.order_by('ordem'):
+                    fn = '%s-%s' % (
+                        f.id,
+                        f.midia.last.file.path.split(
+                            '/')[-1])
+                    file.write(f.midia.last.file.path,
+                               arcname=fn)
+
+            response = HttpResponse(file_buffer.getvalue(),
+                                    content_type='application/zip')
+
+            response['Cache-Control'] = 'no-cache'
+            response['Pragma'] = 'no-cache'
+            response['Expires'] = 0
+            response['Content-Disposition'] = \
+                'inline; filename=%s.zip' % self.raiz.slug
+            return response
 
 
 class ReferenciaEntreDocumentosManager(models.Manager):
