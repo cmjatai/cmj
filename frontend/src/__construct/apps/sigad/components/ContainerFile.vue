@@ -10,8 +10,10 @@
     <div class="path-title-file construct">
       <input v-model.lazy="elemento.titulo" placeholder="Título do Arquivo..."/>
     </div>
+    <input v-model.lazy="elemento.autor" placeholder="Autor..."/>
+
     <div class="path-description-file construct">
-      <input v-model.lazy="elemento.descricao" placeholder="Descrição do Arquivo..."/>
+      <textarea-autosize v-model.lazy="elemento.descricao" placeholder="Descrição do Documento"/>
     </div>
     <div class="drop-area">
       <drop-zone v-on:change="changeImage" :elemento="elemento" :src="slug" :multiple="true" :resource="documentoResource"/>
@@ -190,7 +192,7 @@ export default {
   .btn-pdf {
     position: absolute;
     right: 10px;
-    top: 0;
+    top: 10px;
   }
 }
 </style>

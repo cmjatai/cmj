@@ -1,14 +1,18 @@
 <template lang="html">
   <div class="drop_files" :id="'drop_file'+elemento.id" v-on:drop="drop_handler" v-on:dragover="dragover_handler" v-on:dragend="dragend_handler">
     <label class="drop_zone" :for="'input_file'+elemento.id">
-      <span class="inner">
+      <span class="inner" v-if="multiple">
         Arraste seus arquivos e solte aqui,<br>
+        <small>ou clique para selecionar</small>
+      </span>
+      <span class="inner" v-if="!multiple">
+        Arraste seu arquivo e solte aqui,<br>
         <small>ou clique para selecionar</small>
       </span>
       <input :multiple="multiple ? 'multiple': null" type="file" name="file" :id="'input_file'+elemento.id" @change="selectFiles"/>
     </label>
     <div v-if="elemento.has_midia" class="view">
-      <img :src="src_local">
+      <img :src="src_local" v-if="src">
     </div>
   </div>
 </template>
@@ -99,7 +103,7 @@ export default {
   text-align: center;
   background: transparentize(#fff, 0.5);
   position: relative;
-  min-height: 150px;
+  min-height: 120px;
   input {
     visibility: hidden;
     position: fixed;

@@ -11,13 +11,27 @@
     v-on:mouseleave="mouseLeave">
 
       <div :class="[is_imagem ? 'image-render': 'file-render']">
-        <a :href="slug" target="_blank" v-if="!is_imagem" class="btn btn-link" >
-          <i class="fas fa-file fa-2x"></i>{{elemento.id}}
-        </a>
         <img :src="slug+'.256?'+refresh" v-if="is_imagem">
       </div>
 
+      <div v-if="!is_imagem" >
+        <div class="path-title-file construct">
+          <input v-model.lazy="elemento.titulo" placeholder="Título do Arquivo..."/>
+        </div>
+        <input v-model.lazy="elemento.autor" placeholder="Autor..."/>
+        <div class="path-description-file construct">
+          <textarea-autosize v-model.lazy="elemento.descricao" placeholder="Descrição do Documento"/>
+        </div>
+      </div>
+
+      <div class="drop-area" v-if="!is_imagem">
+        <drop-zone v-on:change="changeImage" :elemento="elemento" :src="''" :multiple="false" :resource="documentoResource"/>
+      </div>
       <div class="btn-controls">
+
+        <a :href="slug" target="_blank" v-if="!is_imagem" class="btn btn-link" >
+          <i class="fas fa-file"></i>
+        </a>
         <span v-if="is_imagem" class="btn btn-rotate"  v-on:click="rotateLeft" title="Rotacionar 90 graus a esquerda">
           <i class="fas fa-undo" aria-hidden="true"></i>
         </span>
@@ -251,11 +265,8 @@ export default {
     &.images-list {
     }
     &.files-list {
-      flex: 1 1 45%;
-      height: 10em;
+      flex: 1 1 100%;
       border: 1px solid #aaa;
-      display: grid;
-      grid-template-columns: 1em auto 2em;
     }
   }
 }

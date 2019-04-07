@@ -192,6 +192,10 @@
         <div class="path-description">
           {{container.descricao|default:''|safe|urlize}}
         </div>
+
+        <span class="path-autor">
+          {{container.autor|default:''|safe|urlize}}
+        </span>
         {% with rev=container.revisoes.first %}
           <span class="data-pub">
             {{rev.data}} - {% trans "por:" %} {{rev.user.first_name|default:rev.user.email}}
@@ -207,13 +211,17 @@
                 <div class="path-title-container" >
                   <a tabindex="{{view.tabindex}}" href="/{{item.slug}}" target="_blank">
                     <span >
-                      {{item.titulo|default:'teste'|safe|urlize}}
+                      {{item.titulo|default:'Arquivo'|safe|urlize}}
                     </span>
                   </a>
                 </div>
                 <div class="path-description">
-                  {{item.descricao|default:'descrição'|safe|urlize}}
+                  {{item.descricao|default:''|safe|urlize}}
                 </div>
+                <span class="path-autor">
+                  {{item.autor|default:''|safe|urlize}}
+                </span>
+                
                 {% with rev=item.revisoes.first %}
                   <span class="data-pub">
                     {{rev.data}} - {% trans "por:" %} {{rev.user.first_name|default:rev.user.email}}
