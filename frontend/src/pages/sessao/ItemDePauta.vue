@@ -21,7 +21,9 @@
         </div>
       </div>
       <div class="func-header">
-
+        <a :href="materia.texto_original" class="btn btn-link">
+          <i class="far fa-file-pdf"></i>
+        </a>
       </div>
     </div>
 
