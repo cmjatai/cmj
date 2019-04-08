@@ -1035,7 +1035,6 @@ class Documento(ShortUrl, CMSMixin):
 
     @property
     def is_pdf(self):
-
         return self.midia.last.content_type == 'application/pdf'
 
     @property
