@@ -7,6 +7,11 @@
         Carregando listagem...
     </div>
 
+    <div class="item-expediente" v-if="itens.expedientesessao_list.length > 0">
+      <div v-html="expediente(1)" class="inner">
+      </div>
+    </div>
+
     <div class="container-expedientemateria">
 
       <div v-if="itensDoExpediente.length" class="titulo-container">Matérias do Grande Expediente</div>
@@ -15,10 +20,19 @@
       </div>
     </div>
 
+    <div class="item-expediente" v-if="itens.expedientesessao_list.length > 0">
+      <div v-html="expediente(3)" class="inner">
+      </div>
+    </div>
+
     <div class="container-ordemdia">
       <div v-if="itensDaOrdemDia.length" class="titulo-container">Matérias da Ordem do Dia</div>
       <div class="inner">
         <item-de-pauta v-for="item in itensDaOrdemDia" :key="item.id * (-1)" :item="item" type="ordemdia"></item-de-pauta>
+      </div>
+    </div>
+    <div class="item-expediente" v-if="itens.expedientesessao_list.length > 0">
+      <div v-html="expediente(4)" class="inner">
       </div>
     </div>
 
@@ -36,6 +50,7 @@ export default {
   data () {
     return {
       itens: {
+        expedientesessao_list: [],
         ordemdia_list: {},
         expedientemateria_list: {}
       },
@@ -60,70 +75,94 @@ export default {
     }
   },
   mounted () {
-    this.fetchItens()
+    setTimeout(() => {
+      this.fetchItens()
+      this.fetchExpedienteSessao()
+    }, 1000)
   },
   methods: {
+    expediente (tipo) {
+      const esl = this.itens.expedientesessao_list
+      let filtro = _.filter(esl, ['tipo', tipo])
+      return filtro.length > 0 ? filtro[0].conteudo : ''
+    },
     fetch (metadata) {
       if (metadata.action === 'post_delete') {
         this.$delete(this.itens[`${metadata.model}_list`], metadata.id)
         return
       }
 
-      const _this = this
-      _this.getObject(metadata)
+      const t = this
+      t.getObject(metadata)
         .then(obj => {
-          _this.$set(_this.itens[`${metadata.model}_list`], metadata.id, obj)
+          t.$set(t.itens[`${metadata.model}_list`], metadata.id, obj)
         })
 
-      /* _this.utils.getModel(data.app, data.model, data.id)
+      /* t.utils.getModel(data.app, data.model, data.id)
         .then(response => {
-          _this.$set(_this.itens[`${data.model}_list`], data.id, response.data)
+          t.$set(t.itens[`${data.model}_list`], data.id, response.data)
         }) */
     },
     fetchItens (model_list = this.model) {
-      const _this = this
+      const t = this
       _.mapKeys(model_list, function (value, key) {
-        _.mapKeys(_this.itens[`${value}_list`], function (obj, k) {
+        _.mapKeys(t.itens[`${value}_list`], function (obj, k) {
           obj.vue_validate = false
         })
-        _this.$nextTick()
+        t.$nextTick()
           .then(function () {
-            _this.fetchList(1, value)
+            t.fetchList(1, value)
           })
       })
     },
+    fetchExpedienteSessao () {
+      const t = this
+      return t.utils
+        .getByMetadata({
+          action: 'expedientes',
+          app: 'sessao',
+          model: 'sessaoplenaria',
+          id: t.sessao.id
+        })
+        .then(response => {
+          t.$set(t.itens, 'expedientesessao_list', response.data.results)
+        })
+        .then(obj => {
+          // t.tramitacao.status = obj
+        })
+    },
     fetchList (page = null, model = null) {
-      const _this = this
+      const t = this
 
       let query_string = `&sessao_plenaria=${this.sessao.id}`
 
-      _this.utils.getModelOrderedList('sessao', model, 'numero_ordem', page === null ? 1 : page, query_string)
+      t.utils.getModelOrderedList('sessao', model, 'numero_ordem', page === null ? 1 : page, query_string)
         .then((response) => {
-          _this.init = true
+          t.init = true
           _.each(response.data.results, (value, idx) => {
             value.vue_validate = true
-            if (value.id in _this.itens[`${model}_list`]) {
-              _this.itens[`${model}_list`][value.id] = value
+            if (value.id in t.itens[`${model}_list`]) {
+              t.itens[`${model}_list`][value.id] = value
             } else {
-              _this.$set(_this.itens[`${model}_list`], value.id, value)
+              t.$set(t.itens[`${model}_list`], value.id, value)
             }
           })
-          _this.$nextTick()
+          t.$nextTick()
             .then(function () {
               if (response.data.pagination.next_page !== null) {
-                _this.fetchList(response.data.pagination.next_page, model)
+                t.fetchList(response.data.pagination.next_page, model)
               } else {
-                _.mapKeys(_this.itens[`${model}_list`], function (obj, k) {
+                _.mapKeys(t.itens[`${model}_list`], function (obj, k) {
                   if (!obj.vue_validate) {
-                    _this.$delete(_this.itens[`${model}_list`], obj.id)
+                    t.$delete(t.itens[`${model}_list`], obj.id)
                   }
                 })
               }
             })
         })
         .catch((response) => {
-          _this.init = true
-          _this.sendMessage(
+          t.init = true
+          t.sendMessage(
             { alert: 'danger', message: 'Não foi possível recuperar a Ordem do Dia.', time: 5 })
         })
     }
@@ -147,6 +186,13 @@ export default {
   .container-ordemdia {
     .titulo-container {
       color: #0055ff;
+    }
+  }
+  .item-expediente {
+    .inner {
+      background-color: white;
+      padding: 1em;
+      line-height: 1.2;
     }
   }
 }

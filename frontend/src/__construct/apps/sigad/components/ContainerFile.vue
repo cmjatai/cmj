@@ -172,6 +172,7 @@ export default {
     }
   }
   .container-file {
+    margin-bottom: 1em;
     & > .drop-area {
       padding: 0 10px;
     }

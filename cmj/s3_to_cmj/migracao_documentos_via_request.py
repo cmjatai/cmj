@@ -173,7 +173,7 @@ def migrar_docs_por_ids(model, sync=None, check=False):
                 print(item.pk, ct, campo, item)
 
                 try:
-                    name_file = '%s%s' % (campo, get_extensao(ct))
+                    name_file = '%s_%s%s' % (campo, item.id, get_extensao(ct))
                     campo_file.save(name_file, File(temp), save=True)
                 except Exception as e:
                     erros.append(e)

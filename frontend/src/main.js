@@ -69,6 +69,7 @@ const app = new Vue({ // eslint-disable-line
   template: '<App/>'
 })
 
+
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/service-worker.js')
@@ -78,6 +79,13 @@ if ('serviceWorker' in navigator) {
       .catch(registrationError => {
         console.log('SW registration failed: ', registrationError)
       })
+
+    // From a page:
+    navigator.storage.requestPersistent().then((granted) => {
+      if (granted) {
+        console.log('Hurrah, your data is here to stay!')
+      }
+    });
 
     /* if (navigator.storage && navigator.storage.persist) {
       //First, see if we already have it
