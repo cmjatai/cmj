@@ -187,3 +187,12 @@
     }
   }
 }
+
+@media screen and (min-width: 1200px) {
+  
+  .container-ouvidoria {
+    &.container-login-inner {
+      margin: 0 auto 30px;
+    }
+  }
+}
