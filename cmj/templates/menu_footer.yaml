@@ -36,30 +36,34 @@
   url: /parlamentar
   css_class: head_title
   children:
-  - title: Mauro Bento Filho
-    url: /parlamentar/mauro-bento-filho
   - title: Kátia Carvalho
     url: /parlamentar/katia-carvalho
   - title: Carvalinho
     url: /parlamentar/carvalhinho
+  - title: -----------------
+    url: 
   - title: Adilson de Carvalho
     url: /parlamentar/adilson-de-carvalho
   - title: Gildenicio Santos
     url: /parlamentar/gildenicio-santos
-  - title: João Rosa
-    url: /parlamentar/joao-rosa
-  - title: Marcos Antônio
-    url: /parlamentar/marcos-antonio
   - title: Major Davi Pires
     url: /parlamentar/major-davi-pires
+  - title: Marcos Antônio
+    url: /parlamentar/marcos-antonio
   - title: Maria Aparecida (CIDA)
     url: /parlamentar/maria-aparecida-cida
-  - title: Thiago Maggioni
-    url: /parlamentar/thiago-maggioni
-  - title: José Carapô
-    url: /parlamentar/jose-carapo
   - title: Pastor Luiz Carlos
     url: /parlamentar/pastor-luiz-carlos
+  - title: Thiago Maggioni
+    url: /parlamentar/thiago-maggioni
+  - title: -----------------
+    url: 
+  - title: João Rosa
+    url: /parlamentar/joao-rosa
+  - title: José Carapô
+    url: /parlamentar/jose-carapo
+  - title: Mauro Bento Filho
+    url: /parlamentar/mauro-bento-filho
 - title: {% trans 'Comunicação' %}
   url: ''
   css_class: head_title
