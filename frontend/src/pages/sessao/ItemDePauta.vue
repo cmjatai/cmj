@@ -83,9 +83,6 @@ export default {
     this.refresh()
   },
   methods: {
-    nivel (value, teste_local) {
-      return this.nivel_detalhe >= value > 0 && teste_local ? '' : 'd-none'
-    },
     refresh () {
       const t = this
       t.fetchMateria()

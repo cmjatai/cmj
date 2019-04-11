@@ -3,24 +3,24 @@
     <div class="empty-list" v-if="itens.ordemdia_list.length === 0 && init">
         Não existem Itens na Ordem do Dia com seus critérios de busca!
     </div>
+
     <div class="empty-list" v-if="!init">
         Carregando listagem...
     </div>
 
-    <div class="item-expediente" v-if="itens.expedientesessao_list.length > 0">
+    <div :class="['item-expediente', nivel(NIVEL4, itens.expedientesessao_list.length > 0)]">
       <div v-html="expediente(1)" class="inner">
       </div>
     </div>
 
     <div class="container-expedientemateria">
-
       <div v-if="itensDoExpediente.length" class="titulo-container">Matérias do Grande Expediente</div>
       <div class="inner">
         <item-de-pauta v-for="item in itensDoExpediente" :key="item.id" :item="item" type="expedientemateria"></item-de-pauta>
       </div>
     </div>
 
-    <div class="item-expediente" v-if="itens.expedientesessao_list.length > 0">
+    <div :class="['item-expediente', nivel(NIVEL4, itens.expedientesessao_list.length > 0)]">
       <div v-html="expediente(3)" class="inner">
       </div>
     </div>
@@ -31,7 +31,8 @@
         <item-de-pauta v-for="item in itensDaOrdemDia" :key="item.id * (-1)" :item="item" type="ordemdia"></item-de-pauta>
       </div>
     </div>
-    <div class="item-expediente" v-if="itens.expedientesessao_list.length > 0">
+
+    <div :class="['item-expediente', nivel(NIVEL4, itens.expedientesessao_list.length > 0)]">
       <div v-html="expediente(4)" class="inner">
       </div>
     </div>

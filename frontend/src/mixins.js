@@ -30,6 +30,9 @@ Vue.mixin({
       'refreshState',
       'getObject',
     ]),
+    nivel (value, teste_local) {
+      return this.nivel_detalhe >= value && teste_local ? '' : 'd-none'
+    },
     month_text (month_num) {
       let month = [
         'Janeiro',

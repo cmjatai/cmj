@@ -7,7 +7,7 @@
     <div :class="['item-header', tipo_string ? '': 'd-none']">
 
       <div class="link-file">
-        <a :href="materia.texto_original" class="btn btn-link">
+        <a class="btn btn-link" @click="clickFile">
           <i class="far fa-2x fa-file-pdf"></i>
         </a>
       </div>
@@ -72,6 +72,9 @@ export default {
     }, 2000)
   },
   methods: {
+    clickFile (event) {
+      window.open(`https://docs.google.com/gview?url=${this.materia.texto_original}`)
+    },
     fetch () {
     },
     refresh () {
