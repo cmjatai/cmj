@@ -7,7 +7,7 @@
     <div :class="['item-header', tipo_string ? '': 'd-none']">
 
       <div class="link-file">
-        <a class="btn btn-link" @click="clickFile">
+        <a :class="['btn btn-link', `link-file-${materia.id}`]">
           <i class="far fa-2x fa-file-pdf"></i>
         </a>
       </div>
@@ -33,6 +33,7 @@
   </div>
 </template>
 <script>
+import axios from 'axios'
 export default {
   name: 'materia-pauta',
   props: ['materia'],
@@ -69,11 +70,31 @@ export default {
     const t = this
     setTimeout(() => {
       t.refresh()
+
+      axios({
+        url: t.materia.texto_original,
+        method: 'GET',
+        responseType: 'blob' // important
+      }).then((response) => {
+        const url = window.URL.createObjectURL(new Blob([response.data]))
+        const link = document.getElementsByClassName(`link-file-${t.materia.id}`)[0]
+        link.href = url
+        link.setAttribute('download', 'file.pdf')
+        // document.body.appendChild(link)
+        // link.click()
+      })
     }, 2000)
   },
   methods: {
     clickFile (event) {
-      window.open(`https://docs.google.com/gview?url=${this.materia.texto_original}`)
+      navigator.share({
+        title: document.title,
+        text: 'Hello World',
+        url: window.location.href
+      }).then(() => console.log('Successful share'))
+        .catch(error => console.log('Error sharing:', error))
+
+      // window.open(`https://docs.google.com/gview?url=${this.materia.texto_original}`)
     },
     fetch () {
     },

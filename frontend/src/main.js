@@ -81,11 +81,11 @@ if ('serviceWorker' in navigator) {
       })
 
     // From a page:
-    navigator.storage.requestPersistent().then((granted) => {
+    /* navigator.storage.requestPersistent().then((granted) => {
       if (granted) {
         console.log('Hurrah, your data is here to stay!')
       }
-    });
+    }); */
 
     /* if (navigator.storage && navigator.storage.persist) {
       //First, see if we already have it
