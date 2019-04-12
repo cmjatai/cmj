@@ -42,7 +42,8 @@ export default {
       app: ['materia'],
       model: ['materialegislativa', 'tramitacao', 'anexada', 'autoria'],
       autores: {},
-      tipo_string: ''
+      tipo_string: '',
+      url: Object()
     }
   },
   watch: {
@@ -70,27 +71,29 @@ export default {
     const t = this
     setTimeout(() => {
       t.refresh()
-
-      axios({
-        url: t.materia.texto_original,
-        method: 'GET',
-        responseType: 'blob' // important
-      }).then((response) => {
-        const url = window.URL.createObjectURL(
-          new Blob(
-            [response.data],
-            { type: 'application/pdf' }))
-        const link = document.getElementsByClassName(`link-file-${t.materia.id}`)[0]
-        link.hhref = url
-        link.setAttribute('download', `file-${t.materia.id}.pdf`)
-        // document.body.appendChild(link)
-        // link.click()
-      })
+      if (t.materia.texto_original !== null) {
+        axios({
+          url: t.materia.texto_original,
+          method: 'GET',
+          responseType: 'blob' // important
+        }).then((response) => {
+          let url = window.URL.createObjectURL(
+            new Blob(
+              [response.data],
+              { type: 'application/pdf' }))
+          t.url = url
+          // const link = document.getElementsByClassName(`link-file-${t.materia.id}`)[0]
+          // link.hhref = url
+          // link.setAttribute('download', `file-${t.materia.id}.pdf`)
+          // document.body.appendChild(link)
+          // link.click()
+        })
+      }
     }, 2000)
   },
   methods: {
     clickFile (event) {
-      window.open(event.currentTarget.hhref)
+      window.open(this.url)
     },
     fetch () {
     },
@@ -150,6 +153,9 @@ export default {
     grid-template-columns: minmax(0, 50px) auto;
     align-items: center;
     grid-column-gap: 1em;
+  }
+  .btn-link {
+    cursor:pointer;
   }
 
   .detail-header {
