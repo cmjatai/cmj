@@ -19,6 +19,11 @@ def _get_registration_key(model):
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
+
+        post_delete.disconnect(dispatch_uid='sapl_post_delete_signal')
+        post_save.disconnect(dispatch_uid='sapl_post_save_signal')
+        post_delete.disconnect(dispatch_uid='cmj_post_delete_signal')
+        post_save.disconnect(dispatch_uid='cmj_post_save_signal')
         # self.clear()
         # self.run()
         # self.reset_sequences()
