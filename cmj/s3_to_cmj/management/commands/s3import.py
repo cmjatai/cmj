@@ -3,11 +3,13 @@ from copy import deepcopy
 from django.apps import apps
 from django.core.management.base import BaseCommand
 from django.db import connection
+from django.db.models.signals import post_delete, post_save
 from sapl.materia.models import MateriaLegislativa, DocumentoAcessorio
 from sapl.norma.models import NormaJuridica
 from sapl.parlamentares.models import Parlamentar
 from sapl.protocoloadm.models import DocumentoAdministrativo,\
     DocumentoAcessorioAdministrativo
+
 from cmj.s3_to_cmj import mapa
 from cmj.s3_to_cmj.migracao_documentos_via_request import migrar_docs_por_ids
 
