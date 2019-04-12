@@ -1,33 +1,29 @@
 <template>
   <div :class="['materia-pauta']">
-    <div class="epigrafe">
-      {{tipo_string}} n&#186; {{materia.numero}}/{{materia.ano}}
-    </div>
+    <div class="epigrafe">{{tipo_string}} n&#186; {{materia.numero}}/{{materia.ano}}</div>
 
     <div :class="['item-header', tipo_string ? '': 'd-none']">
-
-      <div class="link-file">
-        <a :class="['btn btn-link', `link-file-${materia.id}`]" @click="clickFile" >
+      <div class="link-file" :id="`${type}-${materia.id}`">
+        <a :class="['btn btn-link', `link-file-${materia.id}`]" @click="clickFile">
           <i class="far fa-2x fa-file-pdf"></i>
         </a>
       </div>
 
       <div class="data-header">
-
         <div class="detail-header">
-          <div class="protocolo-data" >
-            <span>Protocolo: <strong>{{materia.numero_protocolo}}</strong></span>
+          <div class="protocolo-data">
+            <span>
+              Protocolo:
+              <strong>{{materia.numero_protocolo}}</strong>
+            </span>
             <span>{{data_apresentacao}}</span>
           </div>
-          <div class="autoria" >
-            <span v-for="(autores, key) in autores_list" :key="`al${key}`">{{autores.nome}}</span>
+          <div class="autoria">
+            <span v-for="(autores, key) in autores_list" :key="`au${key}`">{{autores.nome}}</span>
           </div>
         </div>
 
-        <div class="ementa">
-          {{materia.ementa}}
-        </div>
-
+        <div class="ementa">{{materia.ementa}}</div>
       </div>
     </div>
   </div>
@@ -36,14 +32,14 @@
 import axios from 'axios'
 export default {
   name: 'materia-pauta',
-  props: ['materia'],
+  props: ['materia', 'type'],
   data () {
     return {
       app: ['materia'],
       model: ['materialegislativa', 'tramitacao', 'anexada', 'autoria'],
       autores: {},
       tipo_string: '',
-      url: Object()
+      blob: Object()
     }
   },
   watch: {
@@ -55,7 +51,11 @@ export default {
   computed: {
     data_apresentacao () {
       try {
-        const data = this.stringToDate(this.materia.data_apresentacao, 'yyyy-mm-dd', '-')
+        const data = this.stringToDate(
+          this.materia.data_apresentacao,
+          'yyyy-mm-dd',
+          '-'
+        )
         return `${data.getDate()}/${data.getMonth() + 1}/${data.getFullYear()}`
       } catch (Exception) {
         return ''
@@ -69,6 +69,7 @@ export default {
   },
   mounted () {
     const t = this
+    console.log(t.key)
     setTimeout(() => {
       t.refresh()
       if (t.materia.texto_original !== null) {
@@ -76,14 +77,10 @@ export default {
           url: t.materia.texto_original,
           method: 'GET',
           responseType: 'blob' // important
-        }).then((response) => {
-          let url = window.URL.createObjectURL(
-            new Blob(
-              [response.data],
-              { type: 'application/pdf' }))
-          t.url = url
-          // const link = document.getElementsByClassName(`link-file-${t.materia.id}`)[0]
-          // link.hhref = url
+        }).then(response => {
+          t.blob = new Blob([response.data], { type: 'application/pdf' })
+          // const link = document.getElementById(`${t.type}-${t.materia.id}`)
+          // link.href = '##'
           // link.setAttribute('download', `file-${t.materia.id}.pdf`)
           // document.body.appendChild(link)
           // link.click()
@@ -93,10 +90,12 @@ export default {
   },
   methods: {
     clickFile (event) {
-      window.open(this.url)
+      const url = window.URL.createObjectURL(
+        this.blob
+      )
+      window.location = url
     },
-    fetch () {
-    },
+    fetch () {},
     refresh () {
       const t = this
 
@@ -108,27 +107,24 @@ export default {
         app: 'materia',
         model: 'tipomaterialegislativa',
         id: t.materia.tipo
+      }).then(obj => {
+        t.tipo_string = obj.descricao
       })
-        .then(obj => {
-          t.tipo_string = obj.descricao
-        })
 
       t.$set(t, 'autores', {})
 
-      t.$nextTick()
-        .then(() => {
-          _.each(t.materia.autores, (value) => {
-            t.getObject({
-              app: 'base',
-              model: 'autor',
-              id: value
-            }).then(obj => {
-              t.$set(t.autores, obj.id, obj)
-            })
+      t.$nextTick().then(() => {
+        _.each(t.materia.autores, value => {
+          t.getObject({
+            app: 'base',
+            model: 'autor',
+            id: value
+          }).then(obj => {
+            t.$set(t.autores, obj.id, obj)
           })
         })
+      })
     }
-
   }
 }
 </script>
@@ -155,7 +151,7 @@ export default {
     grid-column-gap: 1em;
   }
   .btn-link {
-    cursor:pointer;
+    cursor: pointer;
   }
 
   .detail-header {
@@ -188,19 +184,18 @@ export default {
       span {
         display: inline-block;
         white-space: nowrap;
-        &:after{
-          content:";";
+        &:after {
+          content: ";";
           padding-right: 0.5em;
         }
       }
       span:last-child:after {
-        content:"";
+        content: "";
       }
     }
   }
 }
 
 @media screen and (max-width: 480px) {
-
 }
 </style>

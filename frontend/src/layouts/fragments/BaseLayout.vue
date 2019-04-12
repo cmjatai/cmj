@@ -45,7 +45,7 @@ export default {
   name: 'base-layout',
   data () {
     return {
-      sideleft_expand: true
+      sideleft_expand: false
     }
   },
   methods: {

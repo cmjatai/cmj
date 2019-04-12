@@ -5,7 +5,7 @@
         Carregando Matéria...
     </div>
 
-    <materia-pauta :materia="materia"></materia-pauta>
+    <materia-pauta :materia="materia" :type="type"></materia-pauta>
 
     <div :class="['item-body', materia.id !== undefined && materia.anexadas.length > 0 ? 'col-anexadas':'']">
       <div class="col-1-body">
@@ -24,9 +24,9 @@
             </span>
             </div>
           <div class="inner">
-            <div v-for="anexada in itensAnexados" :key="anexada.id">
+            <div v-for="anexada in itensAnexados" :key="`${type}${anexada.id}`">
 
-              <materia-pauta :materia="anexada"></materia-pauta>
+              <materia-pauta :materia="anexada" :type="type"></materia-pauta>
 
             </div>
           </div>

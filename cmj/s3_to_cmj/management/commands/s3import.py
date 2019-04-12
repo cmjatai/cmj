@@ -20,14 +20,14 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # self.clear()
-        self.run()
-        self.reset_sequences()
+        # self.run()
+        # self.reset_sequences()
         self.migrar_documentos()
         # self.list_models_with_relation()
 
     def migrar_documentos(self):
         for model in [
-            Parlamentar,
+            # Parlamentar,
             MateriaLegislativa,
             DocumentoAcessorio,
             NormaJuridica,

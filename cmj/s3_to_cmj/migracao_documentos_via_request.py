@@ -1,5 +1,6 @@
 import mimetypes
 import os
+from time import sleep
 
 from django.core.files.base import File
 from django.core.files.temp import NamedTemporaryFile
@@ -144,11 +145,11 @@ def migrar_docs_por_ids(model, sync=None, check=False):
         for item in registros:
 
             campo_file = getattr(item, campo)
-            if campo_file:
-                print('PULANDO', item.id,  model._meta.object_name)
-                continue
-            # campo_file.delete()
-            # sleep(3)
+            # if campo_file:
+            #    print('PULANDO', item.id,  model._meta.object_name)
+            #    continue
+            campo_file.delete()
+            sleep(5)
 
             """if check:
                 for mime, ext in EXTENSOES.items():
