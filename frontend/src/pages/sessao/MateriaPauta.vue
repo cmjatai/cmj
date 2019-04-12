@@ -7,7 +7,7 @@
     <div :class="['item-header', tipo_string ? '': 'd-none']">
 
       <div class="link-file">
-        <a :class="['btn btn-link', `link-file-${materia.id}`]">
+        <a :class="['btn btn-link', `link-file-${materia.id}`]" @click="clickFile" >
           <i class="far fa-2x fa-file-pdf"></i>
         </a>
       </div>
@@ -76,10 +76,13 @@ export default {
         method: 'GET',
         responseType: 'blob' // important
       }).then((response) => {
-        const url = window.URL.createObjectURL(new Blob([response.data]))
+        const url = window.URL.createObjectURL(
+          new Blob(
+            [response.data],
+            { type: 'application/pdf' }))
         const link = document.getElementsByClassName(`link-file-${t.materia.id}`)[0]
-        link.href = url
-        link.setAttribute('download', 'file.pdf')
+        link.hhref = url
+        link.setAttribute('download', `file-${t.materia.id}.pdf`)
         // document.body.appendChild(link)
         // link.click()
       })
@@ -87,14 +90,7 @@ export default {
   },
   methods: {
     clickFile (event) {
-      navigator.share({
-        title: document.title,
-        text: 'Hello World',
-        url: window.location.href
-      }).then(() => console.log('Successful share'))
-        .catch(error => console.log('Error sharing:', error))
-
-      // window.open(`https://docs.google.com/gview?url=${this.materia.texto_original}`)
+      window.open(event.currentTarget.hhref)
     },
     fetch () {
     },
