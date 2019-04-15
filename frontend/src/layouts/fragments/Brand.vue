@@ -54,7 +54,7 @@ export default {
   }
 }
 
-@media screen and (max-width: 767px) {
+@media screen and (max-width: 800px) {
   .inner-brand {
     img {
       height: 40px;

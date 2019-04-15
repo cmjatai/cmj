@@ -196,7 +196,7 @@ export default {
 
 }
 
-@media screen and (max-width: 767px){
+@media screen and (max-width: 800px){
 
   $width-sideleft: 48px;
 

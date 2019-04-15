@@ -106,7 +106,7 @@ export default {
   }
 }
 
-@media screen and (max-width: 767px) {
+@media screen and (max-width: 800px) {
   .sessao-plenaria-topo {
     grid-template-columns: auto;
     justify-content: center;

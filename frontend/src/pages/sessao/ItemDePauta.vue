@@ -188,7 +188,7 @@ export default {
   background-color: #ffffff55;
   padding: 1em;
   margin-bottom: 1em;
-  border-top: 1px solid #aaa;
+  border-top: 1px solid #ccc;
 
   &:hover {
     background-color: #d6e6fd;

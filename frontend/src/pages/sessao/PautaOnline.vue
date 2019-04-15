@@ -198,7 +198,7 @@ export default {
   }
 }
 
-@media screen and (max-width: 767px) {
+@media screen and (max-width: 800px) {
   .pauta-online {
     .titulo-container {
       font-size: 170%;

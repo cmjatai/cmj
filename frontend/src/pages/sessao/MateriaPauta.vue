@@ -3,10 +3,11 @@
     <div class="epigrafe">{{tipo_string}} n&#186; {{materia.numero}}/{{materia.ano}}</div>
 
     <div :class="['item-header', tipo_string ? '': 'd-none']">
-      <div class="link-file" :id="`${type}-${materia.id}`">
-        <a :class="['btn btn-link', `link-file-${materia.id}`]" @click="clickFile">
+      <div class="link-file" :id="`${type}-${materia.id}`" >
+        <a :class="['btn btn-link', `link-file-${materia.id}`, !blob ? 'd-none' : '' ]" @click="clickFile">
           <i class="far fa-2x fa-file-pdf"></i>
         </a>
+        <small :class="!baixando?'d-none': ''">Baixando<br>Arquivo</small>
       </div>
 
       <div class="data-header">
@@ -22,7 +23,6 @@
             <span v-for="(autores, key) in autores_list" :key="`au${key}`">{{autores.nome}}</span>
           </div>
         </div>
-
         <div class="ementa">{{materia.ementa}}</div>
       </div>
     </div>
@@ -39,7 +39,8 @@ export default {
       model: ['materialegislativa', 'tramitacao', 'anexada', 'autoria'],
       autores: {},
       tipo_string: '',
-      blob: Object()
+      blob: null,
+      baixando: false
     }
   },
   watch: {
@@ -73,20 +74,24 @@ export default {
     setTimeout(() => {
       t.refresh()
       if (t.materia.texto_original !== null) {
+        t.baixando = true
         axios({
           url: t.materia.texto_original,
           method: 'GET',
           responseType: 'blob' // important
         }).then(response => {
+          t.baixando = false
           t.blob = new Blob([response.data], { type: 'application/pdf' })
           // const link = document.getElementById(`${t.type}-${t.materia.id}`)
           // link.href = '##'
           // link.setAttribute('download', `file-${t.materia.id}.pdf`)
           // document.body.appendChild(link)
           // link.click()
+        }).catch(() => {
+          t.baixando = false
         })
       }
-    }, 2000)
+    }, 1000)
   },
   methods: {
     clickFile (event) {
@@ -149,11 +154,14 @@ export default {
     grid-template-columns: minmax(0, 50px) auto;
     align-items: center;
     grid-column-gap: 1em;
+    small {
+      text-align: center;
+      display: inline-block;
+    }
   }
   .btn-link {
     cursor: pointer;
   }
-
   .detail-header {
     display: flex;
     font-size: 95%;
