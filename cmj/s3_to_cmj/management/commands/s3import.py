@@ -27,8 +27,8 @@ class Command(BaseCommand):
         post_delete.disconnect(dispatch_uid='cmj_post_delete_signal')
         post_save.disconnect(dispatch_uid='cmj_post_save_signal')
         # self.clear()
-        # self.run()
-        # self.reset_sequences()
+        self.run()
+        self.reset_sequences()
         self.migrar_documentos()
         # self.list_models_with_relation()
 

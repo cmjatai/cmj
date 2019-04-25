@@ -30,8 +30,8 @@ export default {
       url: `${basePath}/${app}/${model}/${action}/`,
       method: 'GET'
     }),
-    getByMetadata: (m) => axios({
-      url: `${basePath}/${m.app}/${m.model}/${m.id}${m.id!==''?'/':''}${m.action}${m.action!==''?'/':''}`,
+    getByMetadata: (m, query_string = '') => axios({
+      url: `${basePath}/${m.app}/${m.model}/${m.id}${m.id!==''?'/':''}${m.action}${m.action!==''?'/':''}${query_string!==''?'?':''}${query_string}`,
       method: 'GET'
     })
   }

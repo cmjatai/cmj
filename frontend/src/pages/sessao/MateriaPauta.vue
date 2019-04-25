@@ -70,26 +70,9 @@ export default {
   },
   mounted () {
     const t = this
-    console.log(t.key)
     setTimeout(() => {
-      t.refresh()
-      if (t.materia.texto_original !== null) {
-        t.baixando = true
-        axios({
-          url: t.materia.texto_original,
-          method: 'GET',
-          responseType: 'blob' // important
-        }).then(response => {
-          t.baixando = false
-          t.blob = new Blob([response.data], { type: 'application/pdf' })
-          // const link = document.getElementById(`${t.type}-${t.materia.id}`)
-          // link.href = '##'
-          // link.setAttribute('download', `file-${t.materia.id}.pdf`)
-          // document.body.appendChild(link)
-          // link.click()
-        }).catch(() => {
-          t.baixando = false
-        })
+      if (!t.blob) {
+        t.refresh()
       }
     }, 1000)
   },
@@ -100,7 +83,12 @@ export default {
       )
       window.location = url
     },
-    fetch () {},
+    fetch (metadata) {
+      const t = this
+      if (t.materia !== undefined && t.materia.id === metadata.id && metadata.model === t.model[0]) {
+        this.refresh()
+      }
+    },
     refresh () {
       const t = this
 
@@ -128,6 +116,20 @@ export default {
             t.$set(t.autores, obj.id, obj)
           })
         })
+
+        if (t.materia.texto_original !== null) {
+          t.baixando = true
+          axios({
+            url: t.materia.texto_original,
+            method: 'GET',
+            responseType: 'blob' // important
+          }).then(response => {
+            t.baixando = false
+            t.blob = new Blob([response.data], { type: 'application/pdf' })
+          }).catch(() => {
+            t.baixando = false
+          })
+        }
       })
     }
   }
