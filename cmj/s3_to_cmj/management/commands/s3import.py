@@ -101,11 +101,16 @@ class Command(BaseCommand):
             count = 0
 
             if hasattr(self, 'sync') and self.sync and count_old_list > 100:
-                old_list = old_list.order_by('-{}'.format(
+                old_list = old_list.order_by('{}'.format(
                     item['fields']['id'])
-                )[:int(count_old_list * self.sync) + 1]
+                )[int(count_old_list * (1 - self.sync)) + 1:]
 
             for old in old_list:
+
+                """if hasattr(old, item['fields']['id']) and \
+                        getattr(old, item['fields']['id']) == 32239:
+                    print(old)"""
+
                 count += 1
 
                 if count % 100 == 0:

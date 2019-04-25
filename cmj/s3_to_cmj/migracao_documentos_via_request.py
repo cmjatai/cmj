@@ -137,10 +137,10 @@ def migrar_docs_por_ids(model, sync=None, check=False):
     for campo, base_origem, base_destino in DOCS[model]:
         print('#### Migrando {} de {} ####'.format(campo, model.__name__))
 
-        registros = model.objects.all().order_by('-id')
+        registros = model.objects.all().order_by('id')
 
         if sync:
-            registros = registros[:int(registros.count() * sync) + 1]
+            registros = registros[int(registros.count() * (1 - sync)) + 1:]
 
         for item in registros:
 

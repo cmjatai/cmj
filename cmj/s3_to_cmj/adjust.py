@@ -1,9 +1,9 @@
 
-from datetime import date
+from datetime import date, datetime
 from operator import xor
 
 from django.contrib.contenttypes.models import ContentType
-
+from django.utils import timezone
 from sapl.comissoes.models import Participacao, Comissao, Composicao
 from sapl.norma.models import AssuntoNorma, TipoVinculoNormaJuridica
 from sapl.parlamentares.models import Legislatura, Parlamentar, Partido
@@ -214,6 +214,7 @@ def adjust_documentoacessorio(new, old):
 
 
 def adjust_tramitacao(new, old):
+    new.timestamp = timezone.now()
     if not new.turno:
         new.turno = 'U'
 
