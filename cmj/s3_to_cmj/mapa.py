@@ -9,7 +9,7 @@ from sapl.norma.models import AnexoNormaJuridica, AssuntoNorma, AutoriaNorma, Le
 from sapl.painel.models import Cronometro, Painel
 from sapl.parlamentares.models import CargoMesa, Coligacao, ComposicaoColigacao, ComposicaoMesa, Dependente, Filiacao, Frente, Legislatura, Mandato, NivelInstrucao, Parlamentar, Partido, SessaoLegislativa, SituacaoMilitar, TipoAfastamento, TipoDependente, Votante
 from sapl.protocoloadm.models import AcompanhamentoDocumento, DocumentoAcessorioAdministrativo, DocumentoAdministrativo, Protocolo, StatusTramitacaoAdministrativo, TipoDocumentoAdministrativo, TramitacaoAdministrativo
-from sapl.sessao.models import Bancada, Bloco, CargoBancada, ExpedienteMateria, ExpedienteSessao, IntegranteMesa, OcorrenciaSessao, Orador, OradorExpediente, OrdemDia, PresencaOrdemDia, RegistroVotacao, ResumoOrdenacao, SessaoPlenaria, SessaoPlenariaPresenca, TipoExpediente, TipoResultadoVotacao, TipoSessaoPlenaria, VotoParlamentar
+from sapl.sessao.models import Bancada, CargoBancada, ExpedienteMateria, ExpedienteSessao, IntegranteMesa, OcorrenciaSessao, Orador, OradorExpediente, OrdemDia, PresencaOrdemDia, RegistroVotacao, ResumoOrdenacao, SessaoPlenaria, SessaoPlenariaPresenca, TipoExpediente, TipoResultadoVotacao, TipoSessaoPlenaria, VotoParlamentar
 
 from cmj.s3_to_cmj.adjust import adjust_tipoafastamento, adjust_tipo_comissao,\
     adjust_statustramitacao, adjust_tipo_autor, adjust_tiporesultadovotacao,\
@@ -57,7 +57,6 @@ mapa = [
             MateriaAssunto,
             TipoVinculoNormaJuridica,
             CargoBancada,
-            Bloco,
             ResumoOrdenacao,
             LexmlProvedor,
             LexmlPublicador,
