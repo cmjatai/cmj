@@ -37,7 +37,9 @@
               </a>
             </td>
             <td>
-              {{solicitacao.owner|default:'Denúncia Anônima'}}
+              {{solicitacao.owner|default:'Denúncia Anônima'}}<br>
+              <small>{{solicitacao.owner.email|default:'Denúncia Anônima'}}
+              </small>
             </td>
             <td>
               {{ solicitacao.created }}
