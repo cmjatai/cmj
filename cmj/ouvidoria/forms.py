@@ -234,11 +234,11 @@ class MensagemSolicitacaoForm(ModelForm):
 
     class Meta:
         model = MensagemSolicitacao
-        fields = ('descricao', )
+        fields = ('descricao', 'anexo')
 
     def __init__(self, *args, **kwargs):
 
-        rows = to_row([('descricao', 12)])
+        rows = to_row([('descricao', 12), ('anexo', 12)])
 
         super().__init__(*args, **kwargs)
 
@@ -262,8 +262,8 @@ class MensagemSolicitacaoForm(ModelForm):
             nt.user_origin = inst.owner
             nt.save()
 
-        # todos os membros da área de trabalho receberam notificação de que
-        # houve interação de um membro da área de trabalho ou dono da solic
+        # todos os membros da área de trabalho receberão notificação de que
+        # houve interação de um membro da área de trabalho ou do dono da solic
 
         areatrabalho = inst.solicitacao.areatrabalho
         for operador in areatrabalho.operadorareatrabalho_set.exclude(

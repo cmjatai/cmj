@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from cmj.core.models import AreaTrabalho, Notificacao
 from cmj.sigad.models import media_protected
 from cmj.utils import CmjChoices, get_settings_auth_user_model,\
-    restringe_tipos_de_arquivo_midias
+    restringe_tipos_de_arquivo_midias, TIPOS_MIDIAS_PERMITIDOS
 
 
 class Solicitacao(models.Model):
@@ -120,8 +120,9 @@ class MensagemSolicitacao(models.Model):
         null=True,
         storage=media_protected,
         upload_to=anexo_ouvidoria_path,
-        verbose_name=_('Mídia'),
-        validators=[restringe_tipos_de_arquivo_midias])
+        verbose_name=_('Anexo'),
+        validators=[restringe_tipos_de_arquivo_midias],
+        help_text=_('Envie um arquivo em anexo a sua mensagem.'))
 
     content_type = models.CharField(
         max_length=250,
@@ -140,18 +141,24 @@ class MensagemSolicitacao(models.Model):
             self, using=using, keep_parents=keep_parents)
 
     def save(self, force_insert=False, force_update=False, using=None,
-             update_fields=None, with_file=None):
-        _ret = models.Model.save(self, force_insert=force_insert,
-                                 force_update=force_update, using=using, update_fields=update_fields)
+             update_fields=None):
 
-        if not with_file:
-            return _ret
+        if not self.pk and self.anexo:
+            anexo = self.anexo
+            self.anexo = None
+            models.Model.save(self, force_insert=force_insert,
+                              force_update=force_update,
+                              using=using,
+                              update_fields=update_fields)
+            self.anexo = anexo
+            self.content_type = self.anexo.file.content_type
 
-        mime, ext = restringe_tipos_de_arquivo_midias(with_file)
+            if self.anexo.file.content_type in TIPOS_MIDIAS_PERMITIDOS:
+                name_file = 'anexo.%s' % TIPOS_MIDIAS_PERMITIDOS[self.content_type]
+                self.anexo.save(name_file, self.anexo.file)
 
-        name_file = 'midia.%s' % ext
-        self.content_type = mime
-        self.anexo.save(name_file, File(with_file))
+        models.Model.save(self, force_insert=force_insert,
+                          force_update=force_update, using=using, update_fields=update_fields)
 
     @property
     def email_notify(self):
