@@ -5,7 +5,7 @@
   {% if solicitacao.owner == user %}
     {% trans "Minha Solicitação" %} <small>({{solicitacao.get_tipo_display}})</small>
   {% else %}
-    {% trans "Solicitação da Sociedade" %} <small>({% trans "Encaminhada por:" %} {{solicitacao.owner}})</small>
+    {% trans "Solicitação da Sociedade" %}<br><small>({% trans "Encaminhada por:" %} {{solicitacao.owner}} - {{solicitacao.owner.email}})</small>
   {% endif %}
 </h1>
 {% endblock title %}

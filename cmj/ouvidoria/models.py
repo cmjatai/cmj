@@ -1,5 +1,6 @@
 
 from django.contrib.contenttypes.fields import GenericRelation
+from django.core.files.base import File
 from django.db import models
 from django.db.models import Q, F
 from django.db.models.deletion import PROTECT
@@ -7,7 +8,9 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from cmj.core.models import AreaTrabalho, Notificacao
-from cmj.utils import CmjChoices, get_settings_auth_user_model
+from cmj.sigad.models import media_protected
+from cmj.utils import CmjChoices, get_settings_auth_user_model,\
+    restringe_tipos_de_arquivo_midias
 
 
 class Solicitacao(models.Model):
@@ -86,6 +89,12 @@ class Solicitacao(models.Model):
             }
 
 
+def anexo_ouvidoria_path(instance, filename):
+    return './ouvidoria/mensagem/%s/%s' % (
+        instance.id,
+        filename)
+
+
 class MensagemSolicitacao(models.Model):
 
     created = models.DateTimeField(
@@ -106,10 +115,43 @@ class MensagemSolicitacao(models.Model):
     notificacoes = GenericRelation(
         Notificacao, related_query_name='notificacoes')
 
+    anexo = models.FileField(
+        blank=True,
+        null=True,
+        storage=media_protected,
+        upload_to=anexo_ouvidoria_path,
+        verbose_name=_('Mídia'),
+        validators=[restringe_tipos_de_arquivo_midias])
+
+    content_type = models.CharField(
+        max_length=250,
+        default='')
+
     class Meta:
         ordering = ('created', )
         verbose_name = _('Mensagem de Solicitação')
         verbose_name_plural = _('Mensagens de Solicitação')
+
+    def delete(self, using=None, keep_parents=False):
+        if self.anexo:
+            self.anexo.delete()
+
+        return models.Model.delete(
+            self, using=using, keep_parents=keep_parents)
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None, with_file=None):
+        _ret = models.Model.save(self, force_insert=force_insert,
+                                 force_update=force_update, using=using, update_fields=update_fields)
+
+        if not with_file:
+            return _ret
+
+        mime, ext = restringe_tipos_de_arquivo_midias(with_file)
+
+        name_file = 'midia.%s' % ext
+        self.content_type = mime
+        self.anexo.save(name_file, File(with_file))
 
     @property
     def email_notify(self):
