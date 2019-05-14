@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.core.urlresolvers import reverse, reverse_lazy
-from django.http.response import Http404
+from django.http.response import Http404, HttpResponse
 from django.shortcuts import redirect
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -14,9 +14,9 @@ from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, FormView
 from django.views.generic.list import ListView
-from cmj.crispy_layout_mixin import CrispyLayoutFormMixin
 
 from cmj.core.forms_auth import LoginForm
+from cmj.crispy_layout_mixin import CrispyLayoutFormMixin
 from cmj.ouvidoria.forms import DenunciaForm, SolicitacaoForm,\
     MensagemSolicitacaoForm
 from cmj.ouvidoria.models import Solicitacao, MensagemSolicitacao
@@ -211,6 +211,46 @@ class SolicitacaoMensagemRedirect(RedirectView):
             raise Http404()
 
         return RedirectView.get_redirect_url(self, *args, **kwargs)
+
+
+class SolicitacaoMensagemAnexoView(PermissionRequiredMixin, DetailView):
+    model = MensagemSolicitacao
+    permission_required = ('ouvidoria.detail_mensagemsolicitacao')
+
+    def get(self, request, *args, **kwargs):
+
+        obj = self.get_object()
+
+        response = HttpResponse(obj.anexo.file, content_type=obj.content_type)
+
+        response['Cache-Control'] = 'no-cache'
+        response['Pragma'] = 'no-cache'
+        response['Expires'] = 0
+        response['Content-Disposition'] = 'inline; filename=' + \
+            obj.anexo.name
+        return response
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            self.object = MensagemSolicitacao.objects.get(pk=self.kwargs['pk'])
+        except:
+            raise Http404()
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def has_permission(self):
+
+        if self.object.solicitacao.owner == self.request.user:
+            return True
+        elif super().has_permission():
+
+            is_operador = self.object.solicitacao.areatrabalho.operadores.filter(
+                pk=self.request.user.pk).exists()
+
+            if is_operador:
+                return True
+
+        return False
 
 
 class SolicitacaoInteractionView(PermissionRequiredMixin, FormView):

@@ -18,6 +18,7 @@
   .inner {
     margin: 15px 0;
     display: inline-block;
+    min-width: 50%;
     .mensagem {
       text-align: left;
       padding: 10px;
@@ -29,6 +30,21 @@
         width: 0;
         height: 0;
       }
+    }
+    .msg-anexo {
+      display: block;
+      margin-top: 20px;
+      .link {
+        border-top: 1px solid white;
+      }
+      img {
+        max-width: 100%;
+      }
+    }
+    .msg-anexo a{
+      padding: 0px;
+      color: #eee;
+      display: inline-block;
     }
     .avatar {
       float:left;

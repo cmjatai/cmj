@@ -59,6 +59,22 @@
         </div>
         <div class="mensagem">
           {{msg.descricao|safe}}
+
+          {% if msg.anexo %}
+            <div class="msg-anexo">
+              {% if msg.content_type|startswith:'image' %}
+                <img src="{% url 'cmj.ouvidoria:anexo_mensagem_view' msg.id %}">
+              {% else %}
+                <div class="link">
+                  <a target="_blank" href="{% url 'cmj.ouvidoria:anexo_mensagem_view' msg.id %}" title="Download Anexo">
+                    <i class="fas fa-archive"></i> Anexo a mensagem.
+                  </a>
+                  
+                </div>
+              {% endif %}
+            </div>
+          {% endif %}
+
         </div>
         <div class="time" title="{{msg.created|date:"DATETIME_FORMAT"}}">
         há {{msg.created|timesince}}

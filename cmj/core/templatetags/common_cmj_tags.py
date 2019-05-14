@@ -19,6 +19,13 @@ from webpack_loader.utils import _get_bundle
 register = template.Library()
 
 
+@register.filter('startswith')
+def startswith(text, starts):
+    if isinstance(text, str):
+        return text.startswith(starts)
+    return False
+
+
 def get_class(class_string):
     if not hasattr(class_string, '__bases__'):
         class_string = str(class_string)
