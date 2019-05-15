@@ -5,7 +5,6 @@
   margin: 20px 10% 60px;
   .container-logged-user, .container-member {
     position: relative;
-
   }
   .time {
     position: absolute;
@@ -80,6 +79,7 @@
       float: right;
     }
   }
+
   .container-member {
     margin-right: 25%;
     .mensagem {
@@ -89,6 +89,16 @@
         border-top: 10px dashed white;
         border-right: 10px solid transparent;
         border-left: 10px solid transparent;
+      }
+    }
+    .inner {
+      .msg-anexo {
+        .link {
+          border-top: 1px solid #444;
+        }
+      }
+      .msg-anexo a{
+        color: #444;
       }
     }
     &.odd {
