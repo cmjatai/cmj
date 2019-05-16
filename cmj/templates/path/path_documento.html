@@ -289,7 +289,7 @@
             {% endif %}
 
 
-          {% elif child.tipo == child.TPD_IMAGE %}
+          {% elif child.tipo == child.TPD_IMAGE and child.raiz.tipo != child.TD_VIDEO_NEWS %}
             <div class="path-imagem {{child.alinhamento_css_class}}">
 
               <a href="/{{child.absolute_slug}}" target="_blank">

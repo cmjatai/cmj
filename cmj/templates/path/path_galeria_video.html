@@ -27,15 +27,19 @@
           {% for d in  video_destaque.docs%}
             <div class="item {% if forloop.first %}active{% endif %}" >
               {% social_link_share d.0 'absolute-center'%}
-              <a class="imagem btn-play container" href="/{{d.0.slug}}" style="background-image: url({{d.0.extra_data.thumbnails.high.url}})">
-                <div class="carousel-caption">
-                  <div class="container">
-                    <p>{{d.0.descricao}}</p>
-                    <span class="titulo">{{d.0.titulo}}</span>
+
+              {% with d.0.imagem_representativa as imagem %}
+                <a class="imagem btn-play container" href="/{{d.0.slug}}" style="background-image: url({% if imagem %}/{{imagem.absolute_slug}}.512{% else %}{{d.0.extra_data.thumbnails.high.url}}{% endif %})">
+                  <div class="carousel-caption">
+                    <div class="container">
+                      <p>{{d.0.descricao}}</p>
+                      <span class="titulo">{{d.0.titulo}}</span>
+                    </div>
                   </div>
-                </div>
-                <i class="fa fa-play" aria-hidden="true"></i>
-              </a>
+                  <i class="fa fa-play" aria-hidden="true"></i>
+                </a>
+              {% endwith %}
+
             </div>
           {% endfor %}
         </div>
@@ -58,14 +62,16 @@
       <div class="item">
         <div class="inner">
           {% social_link_share doc 'absolute-center'%}
-          <a class="btn-play" href="/{{doc.slug}}" style="background-image: url({{doc.extra_data.thumbnails.high.url}})">
-            <i class="fa fa-play" aria-hidden="true"></i>
-            <div class="inner-text">
-              <span class="titulo">{{doc.titulo}}</span>
-              <span class="descricao">{{doc.descricao}}</span>
-            </div>
-          </a>
-        </div>
+            {% with doc.imagem_representativa as imagem %}
+              <a class="btn-play" href="/{{doc.slug}}" style="background-image: url({% if imagem %}/{{imagem.absolute_slug}}.512{% else %}{{doc.extra_data.thumbnails.high.url}}{% endif %})">
+                <i class="fa fa-play" aria-hidden="true"></i>
+                <div class="inner-text">
+                  <span class="titulo">{{doc.titulo}}</span>
+                  <span class="descricao">{{doc.descricao}}</span>
+                </div>
+              </a>
+            {% endwith %}
+          </div>
       </div>
     {% endfor %}
   </div>
