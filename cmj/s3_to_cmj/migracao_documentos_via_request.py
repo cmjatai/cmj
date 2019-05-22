@@ -160,24 +160,30 @@ def migrar_docs_por_ids(model, sync=None, check=False):
             url = ('http://187.6.249.156:8480/sapl/%s'
                    ) % base_origem.format(item.pk)
 
-            request = http.request('GET', url)
-
+            request = None
             try:
-                data = request.data.decode('utf-8')
-                print(item.pk, "Sem arquivo ou outro erro...")
+                request = http.request('GET', url)
             except:
-                temp = NamedTemporaryFile(delete=True)
-                temp.write(request.data)
-                temp.flush()
+                pass
 
-                ct = request.getheaders()['Content-Type']
-                print(item.pk, ct, campo, item)
-
+            if request is not None:
                 try:
-                    name_file = '%s_%s%s' % (campo, item.id, get_extensao(ct))
-                    campo_file.save(name_file, File(temp), save=True)
-                except Exception as e:
-                    erros.append(e)
+                    data = request.data.decode('utf-8')
+                    print(item.pk, "Sem arquivo ou outro erro...")
+                except:
+                    temp = NamedTemporaryFile(delete=True)
+                    temp.write(request.data)
+                    temp.flush()
+
+                    ct = request.getheaders()['Content-Type']
+                    print(item.pk, ct, campo, item)
+
+                    try:
+                        name_file = '%s_%s%s' % (
+                            campo, item.id, get_extensao(ct))
+                        campo_file.save(name_file, File(temp), save=True)
+                    except Exception as e:
+                        erros.append(e)
     return erros
 
 
