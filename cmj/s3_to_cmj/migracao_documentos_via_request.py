@@ -162,28 +162,34 @@ def migrar_docs_por_ids(model, sync=None, check=False):
 
             request = None
             try:
-                request = http.request('GET', url)
-            except:
-                pass
+                request = http.request('GET', url, timeout=10.0, retries=False)
 
-            if request is not None:
+                if not request:
+                    continue
+
+                if request.status == 404:
+                    continue
+
+                if not request.data or len(request.data) == 0:
+                    continue
+
+                temp = NamedTemporaryFile(delete=True)
+                temp.write(request.data)
+                temp.flush()
+
+                ct = request.getheaders()['Content-Type']
+                print(item.pk, ct, campo, item)
+
                 try:
-                    data = request.data.decode('utf-8')
-                    print(item.pk, "Sem arquivo ou outro erro...")
-                except:
-                    temp = NamedTemporaryFile(delete=True)
-                    temp.write(request.data)
-                    temp.flush()
+                    name_file = '%s_%s%s' % (
+                        campo, item.id, get_extensao(ct))
+                    campo_file.save(name_file, File(temp), save=True)
+                except Exception as e:
+                    erros.append(e)
 
-                    ct = request.getheaders()['Content-Type']
-                    print(item.pk, ct, campo, item)
+            except:
+                print(item.pk, "erro...")
 
-                    try:
-                        name_file = '%s_%s%s' % (
-                            campo, item.id, get_extensao(ct))
-                        campo_file.save(name_file, File(temp), save=True)
-                    except Exception as e:
-                        erros.append(e)
     return erros
 
 
