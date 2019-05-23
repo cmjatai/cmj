@@ -157,7 +157,7 @@ def migrar_docs_por_ids(model, sync=None, check=False):
                 
                 continue"""
 
-            url = ('http://187.6.249.156:8480/sapl/%s'
+            url = ('http://168.228.184.68:8480/sapl/%s'
                    ) % base_origem.format(item.pk)
 
             request = None
@@ -168,6 +168,7 @@ def migrar_docs_por_ids(model, sync=None, check=False):
                     continue
 
                 if request.status == 404:
+                    print(item.pk, "não possui arquivo...")
                     continue
 
                 if not request.data or len(request.data) == 0:
