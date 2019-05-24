@@ -546,6 +546,7 @@ class ShortUrl(Slugged):
             return self.url_short
 
         slug = self.absolute_slug + (sufix if sufix else '')
+        return slug
 
         if not settings.DEBUG:
             self.url_short = short_url(slug=slug)
