@@ -16,15 +16,15 @@ import axios from 'axios'
 import { loadProgressBar } from 'axios-progress-bar'
 import 'axios-progress-bar/dist/nprogress.css'
 
-//import VueFroala from 'vue-froala-wysiwyg'
+// import VueFroala from 'vue-froala-wysiwyg'
 import 'vue-resize/dist/vue-resize.css'
 
 import Components from './apps'
 
-//require('froala-editor/js/froala_editor.pkgd.min')
-//require('froala-editor/css/froala_editor.pkgd.min.css')
+// require('froala-editor/js/froala_editor.pkgd.min')
+// require('froala-editor/css/froala_editor.pkgd.min.css')
 require('font-awesome/css/font-awesome.css')
-//require('froala-editor/css/froala_style.min.css')
+// require('froala-editor/css/froala_style.min.css')
 
 axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
@@ -32,7 +32,7 @@ axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 Vue.use(Vuex)
 Vue.use(Router)
 Vue.use(VueResource)
-//Vue.use(VueFroala)
+// Vue.use(VueFroala)
 Vue.use(VueResize)
 Vue.use(BootstrapVue)
 Vue.config.productionTip = false

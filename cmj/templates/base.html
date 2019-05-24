@@ -18,10 +18,10 @@
       {% include "base_meta_tags.html" %}
     {% endblock %}
 
-    {% block head_content %}
+    {% block webpack_loader_css %}
       {% render_chunk_vendors 'css' %}
       {% render_bundle  'app' 'css' %}
-    {% endblock %}
+    {% endblock webpack_loader_css %}
 
     {% block widgets_form_css %}{% endblock widgets_form_css %}
   </head>
@@ -369,8 +369,10 @@
   
   {% block foot_js %}
 
-    {% render_chunk_vendors 'js' %}
-    {% render_bundle  'app' 'js' %}
+      {% block webpack_loader_js %}    
+        {% render_chunk_vendors 'js' %}
+        {% render_bundle  'app' 'js' %}
+      {% endblock webpack_loader_js %}
     
     {% block extra_js %}{% endblock %}
     

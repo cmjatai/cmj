@@ -1,5 +1,5 @@
 import '@fortawesome/fontawesome-free/css/all.css'
-//import '@fortawesome/fontawesome-free/js/all.js'
+// import '@fortawesome/fontawesome-free/js/all.js'
 
 import 'bootstrap'
 
@@ -37,5 +37,5 @@ window.autorModal()
 window.refreshMask()
 window.refreshDatePicker()
 window.initTextRichEditor('texto-rico')
-//initTinymce
+// initTinymce
 // import './2018/themes/dezembrolaranja/app.scss'

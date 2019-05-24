@@ -28,7 +28,7 @@ Vue.mixin({
     ...Vuex.mapActions([
       'sendMessage',
       'refreshState',
-      'getObject',
+      'getObject'
     ]),
     nivel (value, teste_local) {
       return this.nivel_detalhe >= value && teste_local ? '' : 'd-none'
@@ -63,7 +63,7 @@ Vue.mixin({
       return formatedDate
     },
     isString: function (value) {
-      return typeof value === 'string' || value instanceof String;
+      return typeof value === 'string' || value instanceof String
     },
     on_ws_message (data) {
       let _this = this
@@ -71,14 +71,13 @@ Vue.mixin({
       if (_this.app === undefined) {
         return
       }
-      
+
       if (_this.model === undefined) {
         if (Array.isArray(_this.app)) {
           if (_.indexOf(_this.app, data.app) !== -1) {
             _this.fetch(data)
           }
-        }
-        else {
+        } else {
           if (data.app === _this.app) {
             _this.fetch(data)
           }

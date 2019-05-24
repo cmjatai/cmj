@@ -19,17 +19,15 @@ const mutations = {
       return
     }
     delete state.cache[data.app][data.model][data.id]
-    return 
   },
   [STATE_UPDATE] (state, data) {
-     if (!state.cache.hasOwnProperty(data.app)) {
+    if (!state.cache.hasOwnProperty(data.app)) {
       state.cache[data.app] = {}
     }
     if (!state.cache[data.app].hasOwnProperty(data.model)) {
       state.cache[data.app][data.model] = {}
     }
-    state.cache[data.app][data.model][
-      data.value !== undefined ? data.value.id : data.id] = data.value 
+    state.cache[data.app][data.model][data.value !== undefined ? data.value.id : data.id] = data.value
   },
 
   [SET_NIVEL_DETALHE] (state, nivel) {
@@ -64,22 +62,22 @@ const getters = {
 }
 
 const actions = {
-  setNivelDetalhe: ({commit}, nivel) => {
+  setNivelDetalhe: ({ commit }, nivel) => {
     commit(SET_NIVEL_DETALHE, nivel)
   },
   getObject: ({ commit, getters, dispatch }, metadata) => {
     let model = getters.getCache(metadata)
 
-    if (model !== null && model[metadata.id])
+    if (model !== null && model[metadata.id]) {
       return model[metadata.id]
-    
+    }
+
     return dispatch('refreshState', metadata)
       .then(value => {
         return value
       })
   },
   refreshState: ({ commit }, metadata) => {
-
     if (metadata.hasOwnProperty('value')) {
       return new Promise((resolve, reject) => {
         commit(STATE_UPDATE, metadata)
@@ -98,11 +96,8 @@ const actions = {
     const resource = metadata.func === undefined ? utils.getModel : metadata.func
 
     let fetch = function () {
+      let exec = resource === utils.getModel ? resource(metadata.app, metadata.model, metadata.id) : resource(metadata)
 
-      let exec = resource === utils.getModel ?
-        resource(metadata.app, metadata.model, metadata.id) :
-        resource(metadata)
-        
       return exec
         .then(response => {
           let meta = {
@@ -116,7 +111,7 @@ const actions = {
         })
     }
     return fetch()
-  },
+  }
 }
 export default {
   state,
