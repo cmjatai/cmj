@@ -1,5 +1,5 @@
 {% extends "base_path.html" %}
-{% load i18n sigad_filters  social_utils%}
+{% load i18n sigad_filters  social_utils cropping%}
 {% load webpack_static from webpack_loader %}
 
 {% block main_container_class %}container-fluid container-legislaturas{% endblock %}
@@ -58,7 +58,7 @@
                   {% for parlamentar in sessao.mesa %}
                       <a class="avatar avatar2" href="/{{parlamentar.classe_set.first.absolute_slug}}" class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">
                       {% if parlamentar.fotografia %}
-                          <img src="{{ parlamentar.fotografia.url }}">
+                          <img src="{% cropped_thumbnail parlamentar "cropping" %}">
                       {% else %}
                           <img src="{% webpack_static 'img/perfil.jpg' %}">
                       {% endif %}
@@ -86,7 +86,7 @@
                 {% if parlamentar.titular and not parlamentar.afastado%}
                   <a class="avatar avatar3" href="/{{parlamentar.classe_set.first.absolute_slug}}" class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">
                   {% if parlamentar.fotografia %}
-                      <img src="{{ parlamentar.fotografia.url }}">
+                      <img src="{% cropped_thumbnail parlamentar "cropping" %}">
                   {% else %}
                       <img src="{% webpack_static 'img/perfil.jpg' %}">
                   {% endif %}
@@ -112,7 +112,7 @@
                 {% if not parlamentar.titular and not parlamentar.afastado %}
                   <a class="avatar avatar3" href="/{{parlamentar.classe_set.first.absolute_slug}}" class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">
                   {% if parlamentar.fotografia %}
-                      <img src="{{ parlamentar.fotografia.url }}">
+                      <img src="{% cropped_thumbnail parlamentar "cropping" %}">
                   {% else %}
                       <img src="{% webpack_static 'img/perfil.jpg' %}">
                   {% endif %}
@@ -130,13 +130,13 @@
       {% for leg in legislaturas %}
         {% if leg.legislatura == legislatura_ativa %}
           {% for sessao in leg.sessoes %}
-            {% if sessao.sessao == sessaolegislativa_ativa %}
+            {% if sessao.sessao == sessaolegislativa_ativa %} 
               {% for parlamentar in sessao.parlamentares %}
 
                 {% if parlamentar.afastado %}
                   <a class="avatar avatar3" href="/{{parlamentar.classe_set.first.absolute_slug}}" class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">
                   {% if parlamentar.fotografia %}
-                      <img src="{{ parlamentar.fotografia.url }}">
+                      <img src="{% cropped_thumbnail parlamentar "cropping" %}">
                   {% else %}
                       <img src="{% webpack_static 'img/perfil.jpg' %}">
                   {% endif %}

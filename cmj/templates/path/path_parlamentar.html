@@ -26,7 +26,7 @@
           <div class="path-parlamentares">
             <a class="avatar avatar1" href="/{{ object.absolute_slug }}">
               {% if object.parlamentar.fotografia %}
-                  <img src="{{ object.parlamentar.fotografia.url }}">
+                  <img src="{% cropped_thumbnail object.parlamentar "cropping" %}">
               {% else %}
                   <img src="{% webpack_static 'img/perfil.jpg' %}">
               {% endif %}
