@@ -546,7 +546,7 @@ class ShortUrl(Slugged):
 
     def short_url(self, sufix=None):
         if self.url_short:
-            return 'https://jatai.go.leg.br/j' + self.url_short
+            return 'https://www.jatai.go.leg.br/j' + self.url_short
 
         slug = self.absolute_slug + (sufix if sufix else '')
 
@@ -561,7 +561,7 @@ class ShortUrl(Slugged):
         # if not settings.DEBUG:
         self.url_short = b62encode(self.id)
         self.save()
-        return 'https://jatai.go.leg.br/j' + self.url_short
+        return 'https://www.jatai.go.leg.br/j' + self.url_short
 
     class Meta:
         abstract = True
