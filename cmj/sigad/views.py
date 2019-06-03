@@ -1,3 +1,4 @@
+import base64
 import io
 from operator import attrgetter
 import zipfile
@@ -331,11 +332,29 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
         if not slug:
             raise Http404()
 
+        if slug[0] == 'j':
+            return self._dispath_url_short(slug[1:])
+
         result = self._pre_dispatch(request, *args, **kwargs)
         if result:
             return result
 
         return TemplateView.dispatch(self, request, *args, **kwargs)
+
+    def _dispath_url_short(self, slug):
+        try:
+            d = Documento.objects.get(url_short=slug)
+            return redirect('/' + d.slug)
+        except:
+            try:
+                r = ReferenciaEntreDocumentos.objects.get(url_short=slug)
+                return redirect('/' + r.slug)
+            except:
+                try:
+                    c = Classe.objects.get(url_short=slug)
+                    return redirect('/' + c.slug)
+                except:
+                    raise Http404()
 
     def _pre_dispatch(self, request, *args, **kwargs):
 

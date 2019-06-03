@@ -504,6 +504,9 @@ class Slugged(Parent):
 
 def short_url(**kwargs):
 
+    return ''
+
+    # GOOGLE FOI DESATIVADO EM 30/05/2019
     import urllib3
     import json
 
@@ -543,15 +546,22 @@ class ShortUrl(Slugged):
 
     def short_url(self, sufix=None):
         if self.url_short:
-            return self.url_short
+            return 'https://jatai.go.leg.br/j' + self.url_short
 
         slug = self.absolute_slug + (sufix if sufix else '')
-        return 'https://www.jatai.go.leg.br/'+slug
 
-        if not settings.DEBUG:
-            self.url_short = short_url(slug=slug)
-            self.save()
-        return self.url_short
+        bts = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+        def b62encode(id):
+            if id < 62:
+                return bts[id]
+            r = id % 62
+            return bts[r] + b62encode(id // 62)
+
+        # if not settings.DEBUG:
+        self.url_short = b62encode(self.id)
+        self.save()
+        return 'https://jatai.go.leg.br/j' + self.url_short
 
     class Meta:
         abstract = True
