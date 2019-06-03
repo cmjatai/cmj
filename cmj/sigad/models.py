@@ -556,7 +556,8 @@ class ShortUrl(Slugged):
             if id < 62:
                 return bts[id]
             r = id % 62
-            return bts[r] + b62encode(id // 62)
+            return b62encode(id // 62) + bts[r]
+            # rn*62^n + ... + r2*62^2 + r1*62^1 + q*62^0
 
         # if not settings.DEBUG:
         self.url_short = b62encode(self.id)
