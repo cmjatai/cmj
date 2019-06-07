@@ -6,7 +6,7 @@ if __name__ == '__main__':
 
     import django
 
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sapl.settings")
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "cmj.settings")
     django.setup()
 
 if True:
@@ -15,7 +15,7 @@ if True:
 
 if __name__ == '__main__':
 
-    p = 'joão rosa'
+    p = 'nome do parlamentar'
 
     materias = MateriaLegislativa.objects.filter(
         autores__nome__icontains=p
