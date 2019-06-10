@@ -121,8 +121,8 @@
         url: ''
         css_class: head_title
         children:
-        - title: Localização e Horários
-          url: /fale-conosco/localizacao-e-horarios
+        - title: {% trans 'SIC Físico - Localização e Horários' %}
+          url: /fale-conosco/servico-de-informacoes-ao-cidadao-sic
         - title: Telefones e Emails
           url: /fale-conosco/telefones-e-emails
 
