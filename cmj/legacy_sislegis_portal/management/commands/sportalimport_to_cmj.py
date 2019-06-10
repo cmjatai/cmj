@@ -10,9 +10,10 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.management.base import BaseCommand
 from django.db import connection
 from django.db.models import Q
+from django.db.models.signals import post_delete, post_save
 from django.utils import timezone
 from sapl.compilacao.models import Dispositivo, TextoArticulado,\
-    STATUS_TA_PUBLIC, TipoTextoArticulado, TipoDispositivo, STATUS_TA_EDITION
+    TipoTextoArticulado, TipoDispositivo, STATUS_TA_EDITION
 from sapl.norma.models import NormaJuridica
 
 from cmj.legacy_sislegis_portal.models import Documento, Tipolei, Itemlei
@@ -63,11 +64,17 @@ class Command(BaseCommand):
         return self._ordem
 
     def handle(self, *args, **options):
+
+        post_delete.disconnect(dispatch_uid='sapl_post_delete_signal')
+        post_save.disconnect(dispatch_uid='sapl_post_save_signal')
+        post_delete.disconnect(dispatch_uid='cmj_post_delete_signal')
+        post_save.disconnect(dispatch_uid='cmj_post_save_signal')
+
         self.reset_sequences()
         self.run()
         for cd in self.caracter_desconhecido:
             print(cd)
-        # self.reset_sequences()
+        self.reset_sequences()
 
     def reset_sequences(self):
 
@@ -255,8 +262,9 @@ class Command(BaseCommand):
                 self._ordem = 0
                 roots = self.load_roots(id)
                 self.import_subtree(roots, dsps)
-            except:
-                print('N.O. erro:', id, dsps)
+            except Exception as e:
+                print('N.O. erro:', id, dsps, e)
+                print('N.O. erro:', id, e)
 
         print('---- Blocos de alteração ----')
         for key, value in self.arestas_internas.items():

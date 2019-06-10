@@ -23,7 +23,7 @@ class Command(s3import.Command):
         self.sync = options['sync']
         self.run()
         self.reset_sequences()
-        self.migrar_documentos()
+        # self.migrar_documentos()
         # self.list_models_with_relation()
 
     def migrar_docs_por_ids(self, model):
