@@ -18,6 +18,9 @@
       {% include "base_meta_tags.html" %}
     {% endblock %}
 
+    {% block head_content %}
+    {% endblock %}
+
     {% block webpack_loader_css %}
       {% render_chunk_vendors 'css' %}
       {% render_bundle  'app' 'css' %}

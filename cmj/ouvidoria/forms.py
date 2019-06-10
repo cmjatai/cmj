@@ -37,23 +37,22 @@ class DenunciaForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
 
-        rows = to_row(
-            [
-                (Div(
-                    to_row([('titulo', 12),
-                            ('descricao', 12),
-                            (Div(
-                                css_class="g-recaptcha",
-                                data_sitekey=settings.GOOGLE_RECAPTCHA_SITE_KEY
-                            ), 12)])
-                ), 7),
-                (Div(
-                    to_row([('areatrabalho_parlamentar', 12)])
-                ), 5),
+        rows = [Div(
+            to_column((
+                to_row([('titulo', 12),
+                        ('descricao', 12),
+                        (Div(
+                            css_class="g-recaptcha",
+                            data_sitekey=settings.GOOGLE_RECAPTCHA_SITE_KEY
+                        ), 12)]),
+                8)),
 
+            to_column((
+                to_row([('areatrabalho_parlamentar', 12)]),
+                4)),
 
-            ]
-        )
+            css_class="row"
+        )]
 
         if 'logged_user' in kwargs['initial'] and \
                 kwargs['initial']['logged_user']:
