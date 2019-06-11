@@ -39,12 +39,25 @@ class DenunciaForm(ModelForm):
 
         rows = [Div(
             to_column((
-                to_row([('titulo', 12),
-                        ('descricao', 12),
-                        (Div(
-                            css_class="g-recaptcha",
-                            data_sitekey=settings.GOOGLE_RECAPTCHA_SITE_KEY
-                        ), 12)]),
+                to_row([
+                    ('titulo', 8),
+                    (Div(
+                        css_class="g-recaptcha",
+                        data_sitekey=settings.GOOGLE_RECAPTCHA_SITE_KEY
+                    ), 4),
+                    ('descricao', 12),
+                    (Alert(_(
+                        """<strong>Aviso</strong><br>
+                            As manifestações registradas de maneira anônima são 
+                            consideradas "Comunicações" e 
+                            <strong class="text-red">não é possível o seu acompanhamento.</strong>
+                            Caso deseje acompanhar o andamento 
+                            da sua manifestação e receber uma resposta do órgão 
+                            ou entidade, por favor identifique-se.
+                            """),
+                        css_class="alert-warning",
+                        dismiss=False), 12)
+                ]),
                 12)),
 
             # to_column((
