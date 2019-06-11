@@ -16,18 +16,18 @@ from cmj.ouvidoria.models import Solicitacao, MensagemSolicitacao
 
 class DenunciaForm(ModelForm):
 
-    areatrabalho_parlamentar = forms.ModelMultipleChoiceField(
-        label=_('Encaminhar Denúncia para parlamentar'),
-        required=False,
-        queryset=AreaTrabalho.objects.areatrabalho_de_parlamentares(),
-        widget=forms.CheckboxSelectMultiple,
-        help_text=_('Você pode preferir encaminhar sua denúncia para um '
-                    'ou mais parlamentares. '
-                    'Eles serão isoladamente notificados com sua manifestação.'
-                    '<br>Caso não selecione nenhum parlamentar, sua denúncia '
-                    'será encaminhada para o setor responsável pela Ouvidoria '
-                    'Institucional.'
-                    ))
+    # areatrabalho_parlamentar = forms.ModelMultipleChoiceField(
+    #    label=_('Encaminhar Denúncia para parlamentar'),
+    #    required=False,
+    #    queryset=AreaTrabalho.objects.areatrabalho_de_parlamentares(),
+    #    widget=forms.CheckboxSelectMultiple,
+    #    help_text=_('Você pode preferir encaminhar sua denúncia para um '
+    #                'ou mais parlamentares. '
+    #                'Eles serão isoladamente notificados com sua manifestação.'
+    #                '<br>Caso não selecione nenhum parlamentar, sua denúncia '
+    #                'será encaminhada para o setor responsável pela Ouvidoria '
+    #                'Institucional.'
+    #                ))
 
     class Meta:
         model = Solicitacao
@@ -45,11 +45,11 @@ class DenunciaForm(ModelForm):
                             css_class="g-recaptcha",
                             data_sitekey=settings.GOOGLE_RECAPTCHA_SITE_KEY
                         ), 12)]),
-                8)),
+                12)),
 
-            to_column((
-                to_row([('areatrabalho_parlamentar', 12)]),
-                4)),
+            # to_column((
+            #    to_row([('areatrabalho_parlamentar', 12)]),
+            #    4)),
 
             css_class="row"
         )]
@@ -81,10 +81,10 @@ class DenunciaForm(ModelForm):
 
         cd = self.cleaned_data
 
-        at_list = cd['areatrabalho_parlamentar']
+        #at_list = cd['areatrabalho_parlamentar']
 
-        if not at_list.exists():
-            at_list = AreaTrabalho.objects.areatrabalho_da_instituicao()
+        # if not at_list.exists():
+        at_list = AreaTrabalho.objects.areatrabalho_da_instituicao()
 
         for at in at_list:
             denuncia = Solicitacao()
@@ -100,8 +100,6 @@ class DenunciaForm(ModelForm):
                 nt.user = operador.user
                 nt.areatrabalho = at
                 nt.save()
-
-            # TODO: Enviar por email?
 
         return
 
@@ -143,25 +141,25 @@ class DenunciaForm(ModelForm):
 
 class SolicitacaoForm(ModelForm):
 
-    areatrabalho_parlamentar = forms.ModelChoiceField(
-        label=_('Prefere se Comunicar Diretamente com um Parlamentar?'),
-        required=False,
-        queryset=AreaTrabalho.objects.areatrabalho_de_parlamentares(),
-        help_text=_('Você pode preferir encaminhar seu Registro de '
-                    'Solicitação diretamente para um parlamentar. '
-                    'Seu Gabinete será notificado com sua manifestação '
-                    'e poderá te responder diretamente aqui pelo portal.<br>'
-                    'Você receberá um e-mail sempre que a assessoria de seu '
-                    'Parlamentar ou a Ouvidoria '
-                    'te encaminhar uma mensagem.<br>'
-                    '<strong>Caso opte por Registrar uma Solicitação para um '
-                    'Parlamentar, seu registro é privado entre você e '
-                    'o Parlamentar.<br>Portanto, se assim proceder você, '
-                    'a Ouvidoria Institucional da Câmara Municipal de Jataí '
-                    'não tomará conhecimento de sua solcitação.</strong><br>'
-                    'Para Registrar Solicitações Institucionais basta '
-                    'não selecionar Parlamentar na caixa acima.'
-                    ))
+    # areatrabalho_parlamentar = forms.ModelChoiceField(
+    #    label=_('Prefere se Comunicar Diretamente com um Parlamentar?'),
+    #    required=False,
+    #    queryset=AreaTrabalho.objects.areatrabalho_de_parlamentares(),
+    #    help_text=_('Você pode preferir encaminhar seu Registro de '
+    #                'Solicitação diretamente para um parlamentar. '
+    #                'Seu Gabinete será notificado com sua manifestação '
+    #                'e poderá te responder diretamente aqui pelo portal.<br>'
+    #                'Você receberá um e-mail sempre que a assessoria de seu '
+    #                'Parlamentar ou a Ouvidoria '
+    #                'te encaminhar uma mensagem.<br>'
+    #                '<strong>Caso opte por Registrar uma Solicitação para um '
+    #                'Parlamentar, seu registro é privado entre você e '
+    #                'o Parlamentar.<br>Portanto, se assim proceder você, '
+    #                'a Ouvidoria Institucional da Câmara Municipal de Jataí '
+    #                'não tomará conhecimento de sua solcitação.</strong><br>'
+    #                'Para Registrar Solicitações Institucionais basta '
+    #                'não selecionar Parlamentar na caixa acima.'
+    #                ))
 
     class Meta:
         model = Solicitacao
@@ -176,10 +174,10 @@ class SolicitacaoForm(ModelForm):
             to_column((
                 to_row([('titulo', 10), ('tipo', 2),
                         ('descricao', 12), ]),
-                8)),
-            to_column((
-                to_row([('areatrabalho_parlamentar', 12)]),
-                4)),
+                12)),
+            # to_column((
+            #    to_row([('areatrabalho_parlamentar', 12)]),
+            #    4)),
             css_class="row")
 
         super().__init__(*args, **kwargs)
@@ -196,12 +194,12 @@ class SolicitacaoForm(ModelForm):
 
         cd = self.cleaned_data
 
-        at_list = cd['areatrabalho_parlamentar']
+        # at_list = cd['areatrabalho_parlamentar']
 
-        if not at_list:
-            at_list = AreaTrabalho.objects.areatrabalho_da_instituicao()
-        else:
-            at_list = (at_list, )
+        # if not at_list:
+        at_list = AreaTrabalho.objects.areatrabalho_da_instituicao()
+        # else:
+        #    at_list = (at_list, )
 
         for at in at_list:
             solicitacao = Solicitacao()
@@ -219,8 +217,6 @@ class SolicitacaoForm(ModelForm):
                 nt.user_origin = self.instance.owner
                 nt.areatrabalho = at
                 nt.save()
-
-            # TODO: Enviar por email?
 
         return solicitacao
 
