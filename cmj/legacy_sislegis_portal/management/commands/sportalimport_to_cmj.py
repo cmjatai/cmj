@@ -258,7 +258,7 @@ class Command(BaseCommand):
         for id, dsps in self.graph.items():
             try:
                 self.ta = TextoArticulado.objects.get(pk=id)
-                print('N.O.', self.ta)
+                #print('N.O.', self.ta)
                 self._ordem = 0
                 roots = self.load_roots(id)
                 self.import_subtree(roots, dsps)
@@ -269,14 +269,16 @@ class Command(BaseCommand):
         print('---- Blocos de alteração ----')
         for key, value in self.arestas_internas.items():
             if value['bloco_alteracao']:
-                self.create_bloco_alteracao(key)
-                print('B.A.', key)
+                try:
+                    self.create_bloco_alteracao(key)
+                except:
+                    print('B.A.', key)
 
         print('---- Compilação ----')
         for id, dsps in self.graph.items():
             try:
                 self.ta = TextoArticulado.objects.get(pk=id)
-                print('Comp:', self.ta)
+                #print('Comp:', self.ta)
                 self._ordem = 0
                 roots = self.load_roots(id)
                 self.import_subtree(roots, dsps, only_originals=False)

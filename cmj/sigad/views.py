@@ -290,6 +290,7 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
                 parlamentares__isnull=True)[:4]
 
         self.object_list = kwargs['object_list']
+
         context = super().get_context_data(**kwargs)
 
         if self.paginate_by:
@@ -300,6 +301,8 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
 
         if self.classe.capa:
             context['object'] = self.classe.capa
+            self.template_name = models.DOC_TEMPLATES_CHOICE_FILES[
+                self.classe.capa.template_doc]['template_name']
         else:
             context['object'] = self.classe
 
