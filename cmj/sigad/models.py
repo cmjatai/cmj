@@ -577,7 +577,7 @@ class ShortUrl(Slugged):
                 return b62encode(id // 62) + bts[r]
                 # rn*62^n + ... + r2*62^2 + r1*62^1 + q*62^0
 
-            url_short = b62encode(self.id)
+            url_short = b62encode(url.id)
             url.url_short = url_short
             url.save()
 
