@@ -26,7 +26,7 @@ from cmj.sigad.forms import DocumentoForm, CaixaPublicacaoForm
 from cmj.sigad.models import Documento, Classe, ReferenciaEntreDocumentos,\
     PermissionsUserClasse, PermissionsUserDocumento, Revisao, CMSMixin,\
     CLASSE_TEMPLATES_CHOICE, CaixaPublicacao, CaixaPublicacaoClasse,\
-    CaixaPublicacaoRelationship
+    CaixaPublicacaoRelationship, UrlShortener
 from cmj.utils import make_pagination
 
 
@@ -346,18 +346,11 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
 
     def _dispath_url_short(self, slug):
         try:
-            d = Documento.objects.get(url_short=slug)
-            return redirect('/' + d.slug)
+            url = UrlShortener.objects.get(
+                url_short=slug)
+            return redirect('/' + url.url_long, permanent=True)
         except:
-            try:
-                r = ReferenciaEntreDocumentos.objects.get(url_short=slug)
-                return redirect('/' + r.slug)
-            except:
-                try:
-                    c = Classe.objects.get(url_short=slug)
-                    return redirect('/' + c.slug)
-                except:
-                    raise Http404()
+            raise Http404()
 
     def _pre_dispatch(self, request, *args, **kwargs):
 

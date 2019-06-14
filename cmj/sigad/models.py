@@ -409,8 +409,6 @@ class Slugged(Parent):
             slug = str(self.id)
 
         self.slug = self.generate_unique_slug(slug)
-        if self.slug != slug_old:
-            self.url_short = ''
 
         if self.parent and hasattr(self, 'classe'):
             self.visibilidade = self.parent.visibilidade
@@ -538,31 +536,52 @@ def short_url(**kwargs):
         return ''
 
 
-class ShortUrl(Slugged):
-
+class UrlShortener(models.Model):
     url_short = models.TextField(
         verbose_name=_('Link Curto'),
+        db_index=True,
         blank=True, null=True, default=None)
 
+    url_long = models.TextField(
+        verbose_name=_('Link Longo'),
+        db_index=True)
+
+    class Meta:
+        ordering = ('url_short',)
+
+        unique_together = (
+            ('url_short', 'url_long', ),
+        )
+        verbose_name = _('UrlShortener')
+        verbose_name_plural = _('UrlShortener')
+
+
+class ShortUrl(Slugged):
+
     def short_url(self, sufix=None):
-        if self.url_short:
-            return 'https://www.jatai.go.leg.br/j' + self.url_short
-
         slug = self.absolute_slug + (sufix if sufix else '')
+        url_short = ''
+        try:
+            url = UrlShortener.objects.get(url_long=slug)
+        except:
+            bts = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-        bts = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+            url = UrlShortener()
+            url.url_long = slug
+            url.save()
 
-        def b62encode(id):
-            if id < 62:
-                return bts[id]
-            r = id % 62
-            return b62encode(id // 62) + bts[r]
-            # rn*62^n + ... + r2*62^2 + r1*62^1 + q*62^0
+            def b62encode(id):
+                if id < 62:
+                    return bts[id]
+                r = id % 62
+                return b62encode(id // 62) + bts[r]
+                # rn*62^n + ... + r2*62^2 + r1*62^1 + q*62^0
 
-        # if not settings.DEBUG:
-        self.url_short = b62encode(self.id)
-        self.save()
-        return 'https://www.jatai.go.leg.br/j' + self.url_short
+            url_short = b62encode(self.id)
+            url.url_short = url_short
+            url.save()
+
+        return 'https://www.jatai.go.leg.br/j' + url.url_short
 
     class Meta:
         abstract = True
