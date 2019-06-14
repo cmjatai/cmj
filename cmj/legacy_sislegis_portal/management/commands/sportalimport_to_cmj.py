@@ -55,7 +55,8 @@ class Command(BaseCommand):
         'alinea',
         'item',
         'subitem',
-        'subsubitem'
+        'subsubitem',
+        'subsubsubitem'
     ]
 
     @property
@@ -150,7 +151,7 @@ class Command(BaseCommand):
                     t, item, fields[::-1]
                 )
             except:
-                print(item)
+                print('create_tree erro:', item)
 
     def put_node(self, subtree, item, _fields):
         f = _fields[0]
@@ -258,32 +259,32 @@ class Command(BaseCommand):
         for id, dsps in self.graph.items():
             try:
                 self.ta = TextoArticulado.objects.get(pk=id)
-                #print('N.O.', self.ta)
+                print('N.O.', self.ta)
                 self._ordem = 0
                 roots = self.load_roots(id)
                 self.import_subtree(roots, dsps)
             except Exception as e:
-                print('N.O. erro:', id, dsps, e)
                 print('N.O. erro:', id, e)
 
         print('---- Blocos de alteração ----')
         for key, value in self.arestas_internas.items():
             if value['bloco_alteracao']:
                 try:
-                    self.create_bloco_alteracao(key)
-                except:
                     print('B.A.', key)
+                    self.create_bloco_alteracao(key)
+                except Exception as e:
+                    print('B.A. erro:', key, e)
 
         print('---- Compilação ----')
         for id, dsps in self.graph.items():
             try:
                 self.ta = TextoArticulado.objects.get(pk=id)
-                #print('Comp:', self.ta)
+                print('Comp:', self.ta)
                 self._ordem = 0
                 roots = self.load_roots(id)
                 self.import_subtree(roots, dsps, only_originals=False)
-            except:
-                print('Comp erro:', id, dsps)
+            except Exception as e:
+                print('Comp erro:', id, e)
 
     def import_subtree(self, node, subtree, only_originals=True):
 
@@ -310,18 +311,19 @@ class Command(BaseCommand):
                     _method = 'import_basico'
 
                 try:
-                    # if sub['item'][0]['id'] == 44705:
-                    #    print(sub['item'][0]['id'])
+
+                    if sub['item'][0]['id'] == 86519:
+                        print(sub['item'][0]['id'])
 
                     last = getattr(self, _method)(
                         last,
                         sub_node,
                         sub['item'],
                         only_originals=only_originals,
-                        type=(sub['type'], )
+                        ttype=(sub['type'], )
                     )
                 except Exception as e:
-                    print(sub['item'][0]['id'])
+                    print('import_subtree erro:', sub['item'][0]['id'])
                     raise Exception(e)
 
             last = self.import_subtree(
@@ -376,7 +378,7 @@ class Command(BaseCommand):
 
         return bloco
 
-    def create_dispositivo(self, node_pai, type, td, d_old, io, rotulo=None, numero=[]):
+    def create_dispositivo(self, node_pai, ttype, td, d_old, io, rotulo=None, numero=[]):
 
         d = Dispositivo.objects.filter(id=io['id']).first()
         if not d:
@@ -394,7 +396,7 @@ class Command(BaseCommand):
         d.dispositivo_raiz = node_pai.dispositivo_raiz if node_pai.dispositivo_raiz else node_pai
 
         if not numero:
-            for t in type:
+            for t in ttype:
                 numero.append(io[t.split()[0]])
 
             while len(numero) < 6:
@@ -433,49 +435,49 @@ class Command(BaseCommand):
 
         return d
 
-    def import_basico(self, last, node_pai, items, only_originals, type=[]):
+    def import_basico(self, last, node_pai, items, only_originals, ttype=[]):
 
-        td = TipoDispositivo.objects.filter(class_css=type[0])[0]
+        td = TipoDispositivo.objects.filter(class_css=ttype[0])[0]
 
         d = None
 
         for io in items:
 
             d = self.create_dispositivo(
-                node_pai, type, td, d, io, rotulo=None, numero=[])
+                node_pai, ttype, td, d, io, rotulo=None, numero=[])
 
             if only_originals:
                 break
 
         return d
 
-    def import_capitulo(self, last, node_pai, items, only_originals, type=''):
+    def import_capitulo(self, last, node_pai, items, only_originals, ttype=''):
 
         while node_pai.tipo_dispositivo.class_css.startswith('capitulo'):
             node_pai = node_pai.dispositivo_pai
 
-        d = self.import_basico(last, node_pai, items, only_originals, type=[
+        d = self.import_basico(last, node_pai, items, only_originals, ttype=[
                                'capitulo', 'capitulovar'])
 
         return d
 
-    def import_capitulovar(self, last, node_pai, items, only_originals, type=''):
-        return self.import_capitulo(last, node_pai, items, only_originals, type=type)
+    def import_capitulovar(self, last, node_pai, items, only_originals, ttype=''):
+        return self.import_capitulo(last, node_pai, items, only_originals, ttype=ttype)
 
-    def import_secao(self, last, node_pai, items, only_originals, type=''):
+    def import_secao(self, last, node_pai, items, only_originals, ttype=''):
 
         while node_pai.tipo_dispositivo.class_css.startswith('secao'):
             node_pai = node_pai.dispositivo_pai
 
         d = self.import_basico(last, node_pai, items,
-                               only_originals, type=['secao', 'secaovar'])
+                               only_originals, ttype=['secao', 'secaovar'])
 
         return d
 
-    def import_secaovar(self, last, node_pai, items, only_originals, type=''):
-        return self.import_secao(last, node_pai, items, only_originals, type=type)
+    def import_secaovar(self, last, node_pai, items, only_originals, ttype=''):
+        return self.import_secao(last, node_pai, items, only_originals, ttype=ttype)
 
-    def import_artigo(self, last, node_pai, items, only_originals, type=''):
+    def import_artigo(self, last, node_pai, items, only_originals, ttype=''):
 
         td = TipoDispositivo.objects.filter(class_css='artigo')[0]
 
@@ -574,19 +576,18 @@ class Command(BaseCommand):
 
                 caput_old = caput
             except Exception as e:
-                print(io)
-                print(e)
-                raise Exception(e)
+                print('import_artigo erro:', io)
+                print('import_artigo erro:', e)
 
         return a
 
-    def import_artigovar(self, last, node_pai, items, only_originals, type=''):
-        return self.import_artigo(last, node_pai, items, only_originals, type=type)
+    def import_artigovar(self, last, node_pai, items, only_originals, ttype=''):
+        return self.import_artigo(last, node_pai, items, only_originals, ttype=ttype)
 
-    def import_artigovarvar(self, last, node_pai, items, only_originals, type=''):
-        return self.import_artigo(last, node_pai, items, only_originals, type=type)
+    def import_artigovarvar(self, last, node_pai, items, only_originals, ttype=''):
+        return self.import_artigo(last, node_pai, items, only_originals, ttype=ttype)
 
-    def import_paragrafo(self, last, node_pai, items, only_originals, type=''):
+    def import_paragrafo(self, last, node_pai, items, only_originals, ttype=''):
 
         td = TipoDispositivo.objects.filter(
             class_css__icontains='paragrafo')[0]
@@ -612,7 +613,7 @@ class Command(BaseCommand):
                             17111, 79237, 2780, 47023, 8600, 35828,
                             8685, 36359, 11383, 51848, 9799, 58320,
                             6007, 63829, 17553, 41584, 78929, 55000,
-                            60420, 64982, 86262, 83234,
+                            60420, 64982, 86262, 83234, 88413
                             ):
                 numero[0] = 3
             elif io['id'] in (57838, 56855, 9746, 73697, 64452,
@@ -636,7 +637,7 @@ class Command(BaseCommand):
             try:
                 d = self.create_dispositivo(
                     node_pai,
-                    type,
+                    ttype,
                     td,
                     d,
                     io,
@@ -650,7 +651,7 @@ class Command(BaseCommand):
 
         return d
 
-    def import_inciso(self, last, node_pai, items, only_originals, type=''):
+    def import_inciso(self, last, node_pai, items, only_originals, ttype=''):
 
         if node_pai.tipo_dispositivo.class_css == 'artigo':
             node_pai = node_pai.dispositivos_filhos_set.filter(
@@ -661,17 +662,17 @@ class Command(BaseCommand):
 
         d = self.import_basico(last, node_pai, items,
                                only_originals,
-                               type=['inciso indent', 'incisovar', 'incisovarvar'])
+                               ttype=['inciso indent', 'incisovar', 'incisovarvar'])
 
         return d
 
-    def import_incisovar(self, last, node_pai, items, only_originals, type=''):
-        return self.import_inciso(last, node_pai, items, only_originals, type=type)
+    def import_incisovar(self, last, node_pai, items, only_originals, ttype=''):
+        return self.import_inciso(last, node_pai, items, only_originals, ttype=ttype)
 
-    def import_incisovarvar(self, last, node_pai, items, only_originals, type=''):
-        return self.import_inciso(last, node_pai, items, only_originals, type=type)
+    def import_incisovarvar(self, last, node_pai, items, only_originals, ttype=''):
+        return self.import_inciso(last, node_pai, items, only_originals, ttype=ttype)
 
-    def import_alinea(self, last, node_pai, items, only_originals, type=''):
+    def import_alinea(self, last, node_pai, items, only_originals, ttype=''):
 
         if node_pai.tipo_dispositivo.class_css == 'artigo':
             node_pai = node_pai.dispositivos_filhos_set.filter(
@@ -679,11 +680,11 @@ class Command(BaseCommand):
 
         d = self.import_basico(last, node_pai, items,
                                only_originals,
-                               type=['alinea indent'])
+                               ttype=['alinea indent'])
 
         return d
 
-    def import_item(self, last, node_pai, items, only_originals, type=''):
+    def import_item(self, last, node_pai, items, only_originals, ttype=''):
 
         if node_pai.tipo_dispositivo.class_css == 'artigo':
             node_pai = node_pai.dispositivos_filhos_set.filter(
@@ -694,15 +695,21 @@ class Command(BaseCommand):
 
         d = self.import_basico(last, node_pai, items,
                                only_originals,
-                               type=['item indent', 'subitem', 'subsubitem'])
+                               ttype=['item indent',
+                                      'subitem',
+                                      'subsubitem',
+                                      'subsubsubitem'])
 
         return d
 
-    def import_subitem(self, last, node_pai, items, only_originals, type=''):
-        return self.import_item(last, node_pai, items, only_originals, type=type)
+    def import_subitem(self, last, node_pai, items, only_originals, ttype=''):
+        return self.import_item(last, node_pai, items, only_originals, ttype=ttype)
 
-    def import_subsubitem(self, last, node_pai, items, only_originals, type=''):
-        return self.import_item(last, node_pai, items, only_originals, type=type)
+    def import_subsubitem(self, last, node_pai, items, only_originals, ttype=''):
+        return self.import_item(last, node_pai, items, only_originals, ttype=ttype)
+
+    def import_subsubsubitem(self, last, node_pai, items, only_originals, ttype=''):
+        return self.import_item(last, node_pai, items, only_originals, ttype=ttype)
 
     def load_roots(self, id):
         ta = TextoArticulado.objects.get(id=id)

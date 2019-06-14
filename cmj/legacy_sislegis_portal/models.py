@@ -123,6 +123,7 @@ class Itemlei(models.Model):
     secaovar = models.IntegerField()
     subitem = models.IntegerField()
     subsubitem = models.IntegerField()
+    subsubsubitem = models.IntegerField()
     itemsecao = models.IntegerField()
     incisovar = models.IntegerField()
     incisovarvar = models.IntegerField()
@@ -132,7 +133,7 @@ class Itemlei(models.Model):
         managed = False
         db_table = 'itemlei'
         unique_together = (('numero', 'anexo', 'parte', 'livro', 'titulo', 'capitulo', 'capitulovar', 'secao', 'secaovar', 'subsecao', 'itemsecao',
-                            'artigo', 'artigovar', 'paragrafo', 'inciso', 'incisovar', 'incisovarvar', 'alinea', 'item', 'subitem', 'subsubitem', 'id_alterador', 'nivel'),)
+                            'artigo', 'artigovar', 'paragrafo', 'inciso', 'incisovar', 'incisovarvar', 'alinea', 'item', 'subitem', 'subsubitem', 'subsubsubitem', 'id_alterador', 'nivel'),)
 
 
 class Assuntos(models.Model):
