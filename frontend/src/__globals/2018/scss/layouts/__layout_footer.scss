@@ -2,7 +2,7 @@ footer {
   position: relative;
   background: $color_topo_bg $url_bg_png;
   border-top: 2px solid lighten($color_topo_bg, 20%);
-  z-index: 2100;
+  //z-index: 2100;
   span {
     color: lighten(yellow,40%);
   }

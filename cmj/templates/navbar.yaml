@@ -1,18 +1,10 @@
 {% load i18n common_cmj_tags %}
-
+{% comment %}
 - title: {% trans 'Institucional' %}
   children:
-    - title: {% trans 'Mesa Diretora' %}
-      url: sapl.parlamentares:mesa_diretora
-    - title: {% trans 'Comissões' %}
-      url: sapl.comissoes:comissao_list
-    - title: {% trans 'Frentes' %}
-      url: sapl.parlamentares:frente_list
-    - title: {% trans 'Parlamentares' %}
-      url: sapl.parlamentares:parlamentar_list
     - title: {% trans 'Audiências Públicas' %}
       url: sapl.audiencia:audienciapublica_list
-
+{% endcomment %}
 - title: {% trans 'Atividade Legislativa' %}
   children:
     - title: {% trans 'Acessório em Lote' %}
