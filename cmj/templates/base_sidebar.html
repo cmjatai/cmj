@@ -9,21 +9,21 @@
   <div class="icon icon-norma-juridica">
   </div>
   <div class="inner">
-    <a href="http://sapl.camarajatai.go.gov.br/sapl/qs?d=-&tc=tn" class="">Legislação<br>Municipal</a>
+    <a href="{% url 'sapl.norma:norma_pesquisa' %}" class="">Legislação<br>Municipal</a>
   </div>
 </div>
 <div class="box bg-yellow">
   <div class="icon icon-sessao-plenaria">
   </div>
   <div class="inner">
-    <a href="http://sapl.camarajatai.go.gov.br/sapl/consultas/sessao_plenaria" class="">Sessões<br>Plenárias</a>
+    <a href="{%url 'sapl.sessao:pesquisar_sessao' %}" class="">Sessões<br>Plenárias</a>
   </div>
 </div>
 <div class="box bg-red">
   <div class="icon icon-atividade-legislativa">
   </div>
   <div class="inner">
-    <a href="http://sapl.camarajatai.go.gov.br/sapl/qs?d=-&tc=tm" class="">Atividade<br>Legislativa</a>
+    <a href="{% url 'sapl.materia:pesquisar_materia' %}" class="">Atividade<br>Legislativa</a>
   </div>
 </div>
 <div class="box bg-maroon">

@@ -198,7 +198,7 @@
                       </a>
                       <ul class="dropdown-menu menu-left" role="menu">
                         {% navbar 'navbar.yaml' %}
-                        <li><a href="/online/">{% trans "OnLine" %}</a></li>
+                        <li><a href="/online/">{% trans "App em Tempo Real" %}</a></li>
                       </ul>
                     </li>
                   {% endif %}
@@ -216,6 +216,8 @@
                         {% if perms.cerimonial.print_rel_contato_agrupado_por_processo %}<li><a href="{% url 'cmj.cerimonial:print_rel_contato_agrupado_por_processo' %}">{% trans "Contatos Agrupados Por Processo" %}</a></li>{% endif %}
                         <li class="dropdown-header">{% trans "Grupos" %}</li>
                         {% if perms.cerimonial.print_rel_contato_agrupado_por_grupo %}<li><a href="{% url 'cmj.cerimonial:print_rel_contato_agrupado_por_grupo' %}">{% trans "Contatos Agrupados Por Grupos" %}</a></li>{% endif %}
+                        <li class="dropdown-header">{% trans "SAPL" %}</li>
+                        <li><a href="{% url 'sapl.base:relatorios_list' %}">{% trans "Relatórios Administrativos" %}</a></li>
                       </ul>
                     </li>
                   {% endif %}
