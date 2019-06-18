@@ -96,6 +96,8 @@
 - title: {% trans 'Transparência' %}
   url: ''
   children:
+  - title: {% trans 'Diários Oficiais' %}
+    url: cmj.diarios:diariooficial_list
   - title: {% trans 'Prestação de Contas' %}
     url: http://camaradejatai.sigepnet.com.br
   - title:  {% trans 'Relatórios de Gestão Fiscal'%}

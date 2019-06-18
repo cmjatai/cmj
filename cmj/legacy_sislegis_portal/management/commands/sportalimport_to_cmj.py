@@ -2,17 +2,23 @@ from collections import OrderedDict
 from copy import deepcopy
 from datetime import timedelta
 
+from time import sleep
+
 from PIL import Image, ImageDraw
 from PIL.ImageFont import truetype
 from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
+from django.core.files.base import File
+from django.core.files.temp import NamedTemporaryFile
 from django.core.management.base import BaseCommand
 from django.db import connection
 from django.db.models import Q
 from django.db.models.signals import post_delete, post_save
 from django.utils import timezone
+import urllib3
 
+from cmj.diarios.models import TipoDeDiario, DiarioOficial
 from cmj.legacy_sislegis_portal.models import Documento, Tipolei, Itemlei
 from sapl.compilacao.models import Dispositivo, TextoArticulado,\
     TipoTextoArticulado, TipoDispositivo, STATUS_TA_EDITION
@@ -104,21 +110,95 @@ class Command(BaseCommand):
                 print(rows)
 
     def run_diarios(self):
-        tipo_diario = Tipolei.objects.get(id=5)
+
+        http = urllib3.PoolManager()
+
+        def reset_id_model(model):
+
+            query = """SELECT setval(pg_get_serial_sequence('"%(app_model_name)s"','id'),
+                        coalesce(max("id"), 1), max("id") IS NOT null) 
+                        FROM "%(app_model_name)s";
+                    """ % {
+                'app_model_name': _get_registration_key(model)
+            }
+
+            with connection.cursor() as cursor:
+                cursor.execute(query)
+                # get all the rows as a list
+                rows = cursor.fetchall()
+                print(rows)
+
+        tipo = Tipolei.objects.get(id=5)
 
         docs = Documento.objects.filter(
-            assuntos__tipo=tipo_diario,
+            assuntos__tipo=tipo,
             publicado=True)
 
         docs = docs.order_by('data_lei')
 
-        related_object_type = ContentType.objects.get_for_model(
-            NormaJuridica)
-
-        user = get_user_model().objects.get(pk=1)
+        tipo_de_diario = TipoDeDiario.objects.get(pk=1)
+        # DiarioOficial.objects.all().delete()
 
         for doc in docs:
-            print(doc.id, doc.numero)
+
+            try:
+                diario = DiarioOficial.objects.get(id=doc.id)
+            except:
+                diario = DiarioOficial()
+                diario.id = doc.id
+
+            diario.tipo = tipo_de_diario
+            diario.descricao = doc.epigrafe
+            diario.edicao = doc.numero
+            diario.data = doc.data_lei
+            diario.save()
+
+            normas = NormaJuridica.objects.filter(
+                veiculo_publicacao=diario.edicao)
+
+            if normas.exists():
+                diario.normas.add(*list(normas))
+
+            if diario.arquivo:
+                print('PULANDO', diario.id,  DiarioOficial._meta.object_name)
+                continue
+            sleep(1)
+            print('Fazendo', diario.id,  DiarioOficial._meta.object_name)
+
+            url = ('http://168.228.184.68:8580/portal/'
+                   'downloadFile.pdf?sv=2&id=%s') % diario.id
+
+            request = None
+            try:
+                request = http.request('GET', url, timeout=10.0, retries=False)
+
+                if not request:
+                    continue
+
+                if request.status == 404:
+                    print(diario.pk, "não possui arquivo...")
+                    continue
+
+                if not request.data or len(request.data) == 0:
+                    continue
+
+                temp = NamedTemporaryFile(delete=True)
+                temp.write(request.data)
+                temp.flush()
+
+                try:
+                    name_file = '%s_diario_oficial_%s.pdf' % (
+                        diario.id, diario.edicao)
+                    diario.arquivo.save(name_file, File(temp), save=True)
+                except Exception as e:
+                    print(e)
+
+            except:
+                print(diario.pk, "erro...")
+
+        reset_id_model(DiarioOficial)
+
+        print(doc.id, doc.numero)
 
     def create_graph(self, docs):
         g = self.graph
