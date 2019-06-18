@@ -4,14 +4,14 @@ from django.apps import apps
 from django.core.management.base import BaseCommand
 from django.db import connection
 from django.db.models.signals import post_delete, post_save
+
+from cmj.s3_to_cmj import mapa
+from cmj.s3_to_cmj.migracao_documentos_via_request import migrar_docs_por_ids
 from sapl.materia.models import MateriaLegislativa, DocumentoAcessorio
 from sapl.norma.models import NormaJuridica
 from sapl.parlamentares.models import Parlamentar
 from sapl.protocoloadm.models import DocumentoAdministrativo,\
     DocumentoAcessorioAdministrativo
-
-from cmj.s3_to_cmj import mapa
-from cmj.s3_to_cmj.migracao_documentos_via_request import migrar_docs_por_ids
 
 
 def _get_registration_key(model):
@@ -78,6 +78,9 @@ class Command(BaseCommand):
     def run(self):
         for item in mapa.mapa[1:]:
 
+            # if item['name'] != '_vinculonormajuridica':
+            #    continue
+
             if item['s30_model'] is None:
                 continue
 
@@ -95,7 +98,7 @@ class Command(BaseCommand):
                 item['s31_model'].objects.filter(
                     id__in=old_list_excluidos).delete()
 
-                old_list = old_list.filter(ind_excluido=0)
+                old_list = old_list.exclude(ind_excluido=1)
 
             count_old_list = old_list.count()
             count = 0

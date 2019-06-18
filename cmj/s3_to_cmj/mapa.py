@@ -1,16 +1,3 @@
-from sapl.audiencia.models import AnexoAudienciaPublica, AudienciaPublica, TipoAudienciaPublica
-from sapl.base.models import AppConfig, Autor, CasaLegislativa, TipoAutor
-from sapl.comissoes.models import CargoComissao, Comissao, Composicao, Participacao, Periodo, Reuniao, TipoComissao
-from sapl.comissoes.models import DocumentoAcessorio as ComissoesDocumentoAcessorio
-from sapl.compilacao.models import Dispositivo, Nota, PerfilEstruturalTextoArticulado, Publicacao, TextoArticulado, TipoDispositivo, TipoDispositivoRelationship, TipoNota, TipoPublicacao, TipoTextoArticulado, TipoVide, VeiculoPublicacao, Vide
-from sapl.lexml.models import LexmlProvedor, LexmlPublicador
-from sapl.materia.models import AcompanhamentoMateria, Anexada, AssuntoMateria, Autoria, DespachoInicial, DocumentoAcessorio, MateriaAssunto, MateriaLegislativa, Numeracao, Orgao, Origem, Parecer, Proposicao, RegimeTramitacao, Relatoria, StatusTramitacao, TipoDocumento, TipoFimRelatoria, TipoMateriaLegislativa, TipoProposicao, Tramitacao, UnidadeTramitacao
-from sapl.norma.models import AnexoNormaJuridica, AssuntoNorma, AutoriaNorma, LegislacaoCitada, NormaJuridica, NormaRelacionada, TipoNormaJuridica, TipoVinculoNormaJuridica
-from sapl.painel.models import Cronometro, Painel
-from sapl.parlamentares.models import CargoMesa, Coligacao, ComposicaoColigacao, ComposicaoMesa, Dependente, Filiacao, Frente, Legislatura, Mandato, NivelInstrucao, Parlamentar, Partido, SessaoLegislativa, SituacaoMilitar, TipoAfastamento, TipoDependente, Votante
-from sapl.protocoloadm.models import AcompanhamentoDocumento, DocumentoAcessorioAdministrativo, DocumentoAdministrativo, Protocolo, StatusTramitacaoAdministrativo, TipoDocumentoAdministrativo, TramitacaoAdministrativo
-from sapl.sessao.models import Bancada, CargoBancada, ExpedienteMateria, ExpedienteSessao, IntegranteMesa, OcorrenciaSessao, Orador, OradorExpediente, OrdemDia, PresencaOrdemDia, RegistroVotacao, ResumoOrdenacao, SessaoPlenaria, SessaoPlenariaPresenca, TipoExpediente, TipoResultadoVotacao, TipoSessaoPlenaria, VotoParlamentar
-
 from cmj.s3_to_cmj.adjust import adjust_tipoafastamento, adjust_tipo_comissao,\
     adjust_statustramitacao, adjust_tipo_autor, adjust_tiporesultadovotacao,\
     adjust_orgao, adjust_assunto_norma, adjust_comissao, adjust_parlamentar,\
@@ -41,6 +28,18 @@ from cmj.s3_to_cmj.models import (
     S3TipoSessaoPlenaria, S3TipoSituacaoMateria, S3TipoSituacaoMilitar,
     S3TipoSituacaoNorma, S3Tramitacao, S3TramitacaoAdministrativo,
     S3TramitacaoParecer, S3UnidadeTramitacao, S3VinculoNormaJuridica)
+from sapl.audiencia.models import AnexoAudienciaPublica, AudienciaPublica, TipoAudienciaPublica
+from sapl.base.models import AppConfig, Autor, CasaLegislativa, TipoAutor
+from sapl.comissoes.models import CargoComissao, Comissao, Composicao, Participacao, Periodo, Reuniao, TipoComissao
+from sapl.comissoes.models import DocumentoAcessorio as ComissoesDocumentoAcessorio
+from sapl.compilacao.models import Dispositivo, Nota, PerfilEstruturalTextoArticulado, Publicacao, TextoArticulado, TipoDispositivo, TipoDispositivoRelationship, TipoNota, TipoPublicacao, TipoTextoArticulado, TipoVide, VeiculoPublicacao, Vide
+from sapl.lexml.models import LexmlProvedor, LexmlPublicador
+from sapl.materia.models import AcompanhamentoMateria, Anexada, AssuntoMateria, Autoria, DespachoInicial, DocumentoAcessorio, MateriaAssunto, MateriaLegislativa, Numeracao, Orgao, Origem, Parecer, Proposicao, RegimeTramitacao, Relatoria, StatusTramitacao, TipoDocumento, TipoFimRelatoria, TipoMateriaLegislativa, TipoProposicao, Tramitacao, UnidadeTramitacao
+from sapl.norma.models import AnexoNormaJuridica, AssuntoNorma, AutoriaNorma, LegislacaoCitada, NormaJuridica, NormaRelacionada, TipoNormaJuridica, TipoVinculoNormaJuridica
+from sapl.painel.models import Cronometro, Painel
+from sapl.parlamentares.models import CargoMesa, Coligacao, ComposicaoColigacao, ComposicaoMesa, Dependente, Filiacao, Frente, Legislatura, Mandato, NivelInstrucao, Parlamentar, Partido, SessaoLegislativa, SituacaoMilitar, TipoAfastamento, TipoDependente, Votante
+from sapl.protocoloadm.models import AcompanhamentoDocumento, DocumentoAcessorioAdministrativo, DocumentoAdministrativo, Protocolo, StatusTramitacaoAdministrativo, TipoDocumentoAdministrativo, TramitacaoAdministrativo
+from sapl.sessao.models import Bancada, CargoBancada, ExpedienteMateria, ExpedienteSessao, IntegranteMesa, OcorrenciaSessao, Orador, OradorExpediente, OrdemDia, PresencaOrdemDia, RegistroVotacao, ResumoOrdenacao, SessaoPlenaria, SessaoPlenariaPresenca, TipoExpediente, TipoResultadoVotacao, TipoSessaoPlenaria, VotoParlamentar
 
 
 mapa = [
@@ -55,7 +54,6 @@ mapa = [
             Frente,
             AssuntoMateria,
             MateriaAssunto,
-            TipoVinculoNormaJuridica,
             CargoBancada,
             ResumoOrdenacao,
             LexmlProvedor,
