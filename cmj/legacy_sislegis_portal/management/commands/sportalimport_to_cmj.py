@@ -12,11 +12,11 @@ from django.db import connection
 from django.db.models import Q
 from django.db.models.signals import post_delete, post_save
 from django.utils import timezone
+
+from cmj.legacy_sislegis_portal.models import Documento, Tipolei, Itemlei
 from sapl.compilacao.models import Dispositivo, TextoArticulado,\
     TipoTextoArticulado, TipoDispositivo, STATUS_TA_EDITION
 from sapl.norma.models import NormaJuridica
-
-from cmj.legacy_sislegis_portal.models import Documento, Tipolei, Itemlei
 
 
 def _get_registration_key(model):
@@ -72,7 +72,8 @@ class Command(BaseCommand):
         post_save.disconnect(dispatch_uid='cmj_post_save_signal')
 
         self.reset_sequences()
-        self.run()
+        # self.run()
+        self.run_diarios()
         for cd in self.caracter_desconhecido:
             print(cd)
         self.reset_sequences()
@@ -101,6 +102,23 @@ class Command(BaseCommand):
                 # get all the rows as a list
                 rows = cursor.fetchall()
                 print(rows)
+
+    def run_diarios(self):
+        tipo_diario = Tipolei.objects.get(id=5)
+
+        docs = Documento.objects.filter(
+            assuntos__tipo=tipo_diario,
+            publicado=True)
+
+        docs = docs.order_by('data_lei')
+
+        related_object_type = ContentType.objects.get_for_model(
+            NormaJuridica)
+
+        user = get_user_model().objects.get(pk=1)
+
+        for doc in docs:
+            print(doc.id, doc.numero)
 
     def create_graph(self, docs):
         g = self.graph

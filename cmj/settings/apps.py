@@ -57,7 +57,8 @@ SAPL_APPS = (
 # CMJ_APPS business apps in dependency order
 CMJ_APPS = (
     'cmj.core',
-
+    
+    'cmj.diarios',
     'cmj.cerimonial',
     'cmj.ouvidoria',
     'cmj.agenda',
