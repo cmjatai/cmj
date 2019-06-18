@@ -1,5 +1,6 @@
 from datetime import date, datetime, timedelta
 from functools import wraps
+import re
 from unicodedata import normalize as unicodedata_normalize
 
 from django.apps import apps
@@ -318,3 +319,31 @@ class CmjChoices(Choices):
         # radd is never called for matching types, so we don't check here
         other = list(other)
         return CmjChoices(*(other + self._triples))
+
+
+def texto_upload_path(instance, filename, subpath='', pk_first=False):
+
+    filename = re.sub('\s', '_', normalize(filename.strip()).lower())
+
+    prefix = 'public'
+
+    str_path = ('./cmj/%(prefix)s/%(model_name)s/'
+                '%(subpath)s/%(pk)s/%(filename)s')
+
+    if pk_first:
+        str_path = ('./cmj/%(prefix)s/%(model_name)s/'
+                    '%(pk)s/%(subpath)s/%(filename)s')
+
+    if subpath is None:
+        subpath = '_'
+
+    path = str_path % \
+        {
+            'prefix': prefix,
+            'model_name': instance._meta.model_name,
+            'pk': instance.pk,
+            'subpath': subpath,
+            'filename': filename
+        }
+
+    return path

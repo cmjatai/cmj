@@ -1,8 +1,10 @@
 from django.db import models
-
 from django.utils.translation import ugettext_lazy as _
 import reversion
-from sapl.utils import texto_upload_path, restringe_tipos_de_arquivo_txt
+
+from cmj.utils import texto_upload_path
+from sapl.norma.models import NormaJuridica
+from sapl.utils import restringe_tipos_de_arquivo_txt
 
 
 @reversion.register()
@@ -12,6 +14,9 @@ class TipoDeDiario(models.Model):
     class Meta:
         verbose_name = _('Tipo de Diário')
         verbose_name_plural = _('Tipos de Diário')
+
+    def __str__(self):
+        return self.descricao
 
 
 def diario_upload_path(instance, filename):
@@ -42,6 +47,18 @@ class DiarioOficial(models.Model):
         verbose_name=_('Arquivo Digital do Diário'),
         validators=[restringe_tipos_de_arquivo_txt])
 
+    normas = models.ManyToManyField(
+        NormaJuridica,
+        verbose_name=_('Normas Publicadas no Diário'))
+
     class Meta:
         verbose_name = _('Diário Oficial')
         verbose_name_plural = _('Diários Oficiais')
+        ordering = ('-data', )
+
+    def __str__(self):
+        return self.descricao
+
+    @property
+    def ano(self):
+        return self.data.year
