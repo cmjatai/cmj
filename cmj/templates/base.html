@@ -194,7 +194,7 @@
                   {% if user.is_superuser or True%}
                     <li class="dropdown">
                       <a href="#linkMenu" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                        {% trans "SAPL" %}<span class="caret"></span>
+                        {% trans "Atividade Legislativa" %}<span class="caret"></span>
                       </a>
                       <ul class="dropdown-menu menu-left" role="menu">
                         {% navbar 'navbar.yaml' %}
@@ -216,7 +216,7 @@
                         {% if perms.cerimonial.print_rel_contato_agrupado_por_processo %}<li><a href="{% url 'cmj.cerimonial:print_rel_contato_agrupado_por_processo' %}">{% trans "Contatos Agrupados Por Processo" %}</a></li>{% endif %}
                         <li class="dropdown-header">{% trans "Grupos" %}</li>
                         {% if perms.cerimonial.print_rel_contato_agrupado_por_grupo %}<li><a href="{% url 'cmj.cerimonial:print_rel_contato_agrupado_por_grupo' %}">{% trans "Contatos Agrupados Por Grupos" %}</a></li>{% endif %}
-                        <li class="dropdown-header">{% trans "SAPL" %}</li>
+                        <li class="dropdown-header">{% trans "Atividade Legislativa" %}</li>
                         <li><a href="{% url 'sapl.base:relatorios_list' %}">{% trans "Relatórios Administrativos" %}</a></li>
                       </ul>
                     </li>

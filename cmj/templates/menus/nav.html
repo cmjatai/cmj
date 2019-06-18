@@ -5,7 +5,7 @@
       {% if item.children %}
         <li class="dropdown">
           <a href="{% if item.url %}{{item.url}}{%else%}#linkMenu{%endif%}" title="{%trans 'Categoria' %}: {{item.title|striptags}}" role="button" aria-haspopup="true" aria-expanded="false" {% if not item.url %}data-toggle="dropdown"{%endif%}>
-            {{ item.title|safe }}
+            <span  title="">{{ item.title|safe }}</span>
           <span class="caret"></span>
           </a>
           <ul class="dropdown-menu menu-left" role="menu">
@@ -16,7 +16,8 @@
         </li>
       {% else %}
         {% if item.url %}
-          <li><a href="{{ item.url }}" title="{%trans 'Conteúdo' %}: {{item.title|striptags}}">{% trans item.title|safe %}</a></li>
+          <li><a href="{{ item.url }}" title="{%trans 'Conteúdo' %}: {{item.title|striptags}}">
+           <span title="">{% trans item.title|safe %}</span></a></li>
         {% endif %}
       {% endif %}
     {% endfor %}
