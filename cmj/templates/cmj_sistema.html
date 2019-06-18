@@ -33,7 +33,11 @@
       <div class="col-md-6"><a href="{% url 'cmj.cerimonial:statusprocesso_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.cerimonial.models.StatusProcesso"%}</a></div>
       <div class="col-md-6"><a href="{% url 'cmj.cerimonial:classificacaoprocesso_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.cerimonial.models.ClassificacaoProcesso"%}</a></div>
       <div class="col-md-6"><a href="{% url 'cmj.cerimonial:topicoprocesso_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.cerimonial.models.TopicoProcesso"%}</a></div>
+    </div>
 
+    <h2>Módulo Diários Oficiais</h2>
+    <div class="row">
+      <div class="col-md-6"><a href="{% url 'cmj.diarios:tipodediario_list' %}" class="btn btn-link">{% model_verbose_name_plural "cmj.diarios.models.TipoDeDiario"%}</a></div>
     </div>
 
   </fieldset>
