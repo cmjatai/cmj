@@ -5,8 +5,8 @@
       {% if item.children %}
         <li class="dropdown">
           <a href="{% if item.url %}{{item.url}}{%else%}#linkMenu{%endif%}" title="{%trans 'Categoria' %}: {{item.title|striptags}}" role="button" aria-haspopup="true" aria-expanded="false" {% if not item.url %}data-toggle="dropdown"{%endif%}>
-            <span  title="">{{ item.title|safe }}</span>
-          <span class="caret"></span>
+            <span title="">{{ item.title|safe }}</span>
+          <span class="caret" title=""></span>
           </a>
           <ul class="dropdown-menu menu-left" role="menu">
             {% with item.children as menu %}
