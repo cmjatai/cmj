@@ -53,13 +53,49 @@ DATABASES = {
 FILE_UPLOAD_MAX_MEMORY_SIZE = 104857600
 DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600
 
-HAYSTACK_CONNECTIONS = {
-    'default': {
-        'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
-        'PATH': PROJECT_DIR.child('whoosh'),
-    },
-}
 
 SITE_URL = 'https://www.jatai.go.leg.br'
 if DEBUG:
     SITE_URL = ''
+
+
+# FTS = Full Text Search
+# Desabilita a indexação textual até encontramos uma solução para a issue
+# https://github.com/interlegis/sapl/issues/2055
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.BaseSignalProcessor'  # Disable auto index
+SEARCH_BACKEND = ''
+SEARCH_URL = ['', '']
+
+
+# SOLR
+USE_SOLR = config('USE_SOLR', cast=bool, default=False)
+SOLR_URL = config('SOLR_URL', cast=str, default='http://localhost:8983')
+SOLR_COLLECTION = config('SOLR_COLLECTION', cast=str, default='cmj_portal')
+
+if USE_SOLR:
+    # enable auto-index
+    HAYSTACK_SIGNAL_PROCESSOR = 'celery_haystack.signals.CelerySignalProcessor'
+    SEARCH_BACKEND = 'haystack.backends.solr_backend.SolrEngine'
+    SEARCH_URL = ('URL', '{}/solr/{}'.format(SOLR_URL, SOLR_COLLECTION))
+
+#  BATCH_SIZE: default is 1000 if omitted, avoid Too Large Entity Body errors
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': SEARCH_BACKEND,
+        SEARCH_URL[0]: SEARCH_URL[1],
+        'BATCH_SIZE': 1000,
+        'TIMEOUT': 20,
+    },
+}
+
+CELERY_BROKER_URL = 'redis://localhost:6379'
+
+CELERY_RESULT_BACKEND = 'django-db'
+
+CACHES = {
+    'default': {
+        'BACKEND': 'speedinfo.backends.proxy_cache',
+        'CACHE_BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': '/var/tmp/django_cache',
+    }
+}

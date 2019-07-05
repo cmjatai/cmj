@@ -10,29 +10,35 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',
     'social_django',
 
-    # more
-    'django_extensions',
     'crispy_forms',
+    'floppyforms',
 
-    'easy_thumbnails',  # ?
-    'image_cropping',  # ?
-    'floppyforms',  # ?
+    'easy_thumbnails', 
+    'image_cropping',  
 
     'rest_framework',
     'rest_framework_recursive',
 
-    'haystack',
-    'whoosh',
+    'django_filters',
     'reversion',
     'reversion_compare',
+
+    'django_celery_results',
+    'haystack',
+    'celery_haystack',
+    'whoosh',
     'speedinfo',
+
 
     'taggit',
     'webpack_loader',
 
     'channels',
+
+
     'sapl',  # não retire, é necessário para os templates centralizados do sapl
 )
 
