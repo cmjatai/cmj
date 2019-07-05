@@ -31,16 +31,16 @@ LOGGING = {
         },
     },
     'loggers': {
-        'sapl': {
-            'handlers': ['applogfile'],
-            'level': 'INFO',
-            'propagate': True,
-        },
-        'cmj': {
-            'handlers': ['applogfile'],
-            'level': 'INFO',
-            'propagate': True,
-        },
+        #'sapl': {
+        #    'handlers': ['applogfile'],
+        #    'level': 'INFO',
+        #    'propagate': True,
+        #},
+        #'cmj': {
+        #    'handlers': ['applogfile'],
+        #    'level': 'INFO',
+        #    'propagate': True,
+        #},
     }
 }
 
