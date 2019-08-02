@@ -4,6 +4,9 @@ from time import sleep
 
 from django.core.files.base import File
 from django.core.files.temp import NamedTemporaryFile
+import urllib3
+
+from cmj.settings import MEDIA_ROOT
 from sapl.base.models import CasaLegislativa
 from sapl.materia.models import (DocumentoAcessorio, MateriaLegislativa,
                                  Proposicao)
@@ -12,9 +15,6 @@ from sapl.parlamentares.models import Parlamentar
 from sapl.protocoloadm.models import (DocumentoAcessorioAdministrativo,
                                       DocumentoAdministrativo)
 from sapl.sessao.models import SessaoPlenaria
-import urllib3
-
-from cmj.settings import MEDIA_ROOT
 
 
 # MIGRAÇÃO DE DOCUMENTOS  ###################################################
@@ -149,7 +149,7 @@ def migrar_docs_por_ids(model, sync=None, check=False):
                 print('PULANDO', item.id,  model._meta.object_name)
                 continue
             # campo_file.delete()
-            # sleep(5)
+            sleep(1)
 
             """if check:
                 for mime, ext in EXTENSOES.items():

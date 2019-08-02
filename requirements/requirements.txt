@@ -15,7 +15,7 @@ django-speedinfo==1.4.0
 django-extensions==2.1.4
 django-image-cropping==1.2
 django-webpack4-loader
-drf_yasg
+drf_yasg==1.13.0
 easy-thumbnails==2.5
 python-decouple==3.1
 psycopg2-binary==2.7.6.1
@@ -50,6 +50,7 @@ django-taggit
 social-auth-app-django==3.1.0
 python-dateutil
 
+cryptography==2.7
 
 
 git+git://github.com/interlegis/django-admin-bootstrapped

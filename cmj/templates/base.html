@@ -260,7 +260,7 @@
                           <li role="separator" class="divider"></li>
                           <li class="dropdown-header">{% trans "Tabelas do Sistema" %}</li>
                         {% endif %}
-                        {% if perms.core.menu_tabelas_auxiliares  or perms.base.view_tabelas_auxiliares%}<li><a href="{% url 'cmj.core:tabelas_auxiliares' %}">{% trans "Tabelas Auxiliares" %}</a></li>{% endif %}
+                        {% if perms.core.menu_tabelas_auxiliares or perms.base.view_tabelas_auxiliares%}<li><a href="{% url 'cmj.core:tabelas_auxiliares' %}">{% trans "Tabelas Auxiliares" %}</a></li>{% endif %}
                         {% if perms.core.menu_area_trabalho %}<li><a href="{% url 'cmj.core:areatrabalho_list' %}">{% trans "Áreas de Trabalho" %}</a></li>{% endif %}
                         {% if perms.core.menu_impresso_enderecamento %}<li><a href="{% url 'cmj.core:impressoenderecamento_list' %}">{% trans "Impressos de Endereçamento" %}</a></li>{% endif %}
 
@@ -271,6 +271,7 @@
               </div>
             </div>
           </nav>
+
         {% endblock navigation %}
 
 

@@ -6,6 +6,7 @@ from decouple import AutoConfig
 from dj_database_url import parse as db_url
 from unipath import Path
 
+
 from .apps import *
 from .auth import *
 from .drf import *
@@ -74,6 +75,8 @@ SOLR_COLLECTION = config('SOLR_COLLECTION', cast=str, default='cmj_portal')
 
 if USE_SOLR:
     # enable auto-index
+
+    HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
     HAYSTACK_SIGNAL_PROCESSOR = 'celery_haystack.signals.CelerySignalProcessor'
     SEARCH_BACKEND = 'haystack.backends.solr_backend.SolrEngine'
     SEARCH_URL = ('URL', '{}/solr/{}'.format(SOLR_URL, SOLR_COLLECTION))
@@ -91,6 +94,11 @@ HAYSTACK_CONNECTIONS = {
 CELERY_BROKER_URL = 'redis://localhost:6379'
 
 CELERY_RESULT_BACKEND = 'django-db'
+CELERY_CACHE_BACKEND = 'django-cache'
+
+#CELERY_ACCEPT_CONTENT = ['application/json']
+#CELERY_RESULT_SERIALIZER = 'json'
+#CELERY_TASK_SERIALIZER = 'json'
 
 CACHES = {
     'default': {
