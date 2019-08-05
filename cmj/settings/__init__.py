@@ -55,7 +55,7 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 104857600
 DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600
 
 
-SITE_URL = 'https://www.jatai.go.leg.br'
+SITE_URL = 'http://www2.jatai.go.leg.br'
 if DEBUG:
     SITE_URL = ''
 

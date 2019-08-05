@@ -35,7 +35,7 @@
        that you fully re-index after changing this setting as it can
        affect both how text is indexed and queried.
   -->
-  <luceneMatchVersion>7.4.0</luceneMatchVersion>
+  <luceneMatchVersion>8.2.0</luceneMatchVersion>
 
   <!-- <lib/> directives can be used to instruct Solr to load any Jars
        identified and use them to resolve any "plugins" specified in
@@ -802,8 +802,13 @@
       <str name="fmap.meta">ignored_</str>
       <str name="fmap.content">_text_</str>
     </lst>
-    <str name="tika.config">/home/leandro/desenvolvimento/envs/cmj/solr/cmj_configset/conf/tika-config.xml</str>
-    <!--str name="tika.config">./tika-config.xml</str-->
+    <str name="tika.config">/storage1/django-apps/cmj_www2/solr/cmj_configset/conf/tika-config.xml</str>
+
+    <!--
+      <str name="tika.config">/home/leandro/desenvolvimento/envs/cmj/solr/cmj_configset/conf/tika-config.xml</str>
+
+      <str name="tika.config">./tika-config.xml</str>
+    -->
   </requestHandler>
 
   <!-- Search Components
