@@ -76,7 +76,7 @@ SOLR_COLLECTION = config('SOLR_COLLECTION', cast=str, default='cmj_portal')
 if USE_SOLR:
     # enable auto-index
 
-    HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+    #HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
     HAYSTACK_SIGNAL_PROCESSOR = 'celery_haystack.signals.CelerySignalProcessor'
     SEARCH_BACKEND = 'haystack.backends.solr_backend.SolrEngine'
     SEARCH_URL = ('URL', '{}/solr/{}'.format(SOLR_URL, SOLR_COLLECTION))
@@ -87,7 +87,7 @@ HAYSTACK_CONNECTIONS = {
         'ENGINE': SEARCH_BACKEND,
         SEARCH_URL[0]: SEARCH_URL[1],
         'BATCH_SIZE': 1000,
-        'TIMEOUT': 20,
+        'TIMEOUT': 600,
     },
 }
 

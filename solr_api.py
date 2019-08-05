@@ -1,8 +1,9 @@
 
-import requests
+import argparse
 import subprocess
 import sys
-import argparse
+
+import requests
 
 
 class SolrClient:
@@ -54,15 +55,17 @@ class SolrClient:
                               'application/octet-stream',
                               {'Expires': '0'})}
 
-            req_url = self.UPLOAD_CONFIGSET.format(self.url, self.CONFIGSET_NAME)
+            req_url = self.UPLOAD_CONFIGSET.format(
+                self.url, self.CONFIGSET_NAME)
 
             resp = requests.post(req_url, files=files)
             print(resp.content)
         else:
-            print('O %s já presente no servidor, NÃO enviando.' % self.CONFIGSET_NAME)
+            print('O %s já presente no servidor, NÃO enviando.' %
+                  self.CONFIGSET_NAME)
 
     def create_collection(self, collection_name, shards=1, replication_factor=1, max_shards_per_node=1):
-        self.maybe_upload_configset()
+        self.maybe_upload_configset(force=True)
         req_url = self.CREATE_COLLECTION.format(self.url,
                                                 collection_name,
                                                 self.CONFIGSET_NAME,
@@ -78,7 +81,7 @@ class SolrClient:
             print("Error %s: %s" % (res.status_code, as_json['error']['msg']))
             return False
         return True
-    
+
     def delete_collection(self, collection_name):
         if collection_name == '*':
             collections = self.list_collections()
@@ -103,7 +106,8 @@ class SolrClient:
             print("Error deleting index for collection '%s'", collection_name)
             print("Code {}: {}".format(res.status_code, res.text))
         else:
-            print("Collection '%s' data deleted successfully!" % collection_name)
+            print("Collection '%s' data deleted successfully!" %
+                  collection_name)
 
             num_docs = self.get_num_docs(collection_name)
             print("Num docs: %s" % num_docs)
