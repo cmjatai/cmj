@@ -803,8 +803,9 @@
       <str name="fmap.content">_text_</str>
     </lst>
     <str name="tika.config">/storage1/django-apps/cmj_www2/solr/cmj_configset/conf/tika-config.xml</str>
-
+    
     <!--
+      <str name="tika.config">/storage1/django-apps/cmj_www2/solr/cmj_configset/conf/tika-config.xml</str>
       <str name="tika.config">/home/leandro/desenvolvimento/envs/cmj/solr/cmj_configset/conf/tika-config.xml</str>
 
       <str name="tika.config">./tika-config.xml</str>
