@@ -78,8 +78,8 @@ class Command(BaseCommand):
         post_save.disconnect(dispatch_uid='cmj_post_save_signal')
 
         self.reset_sequences()
-        # self.run()
-        self.run_diarios()
+        self.run()
+        # self.run_diarios()
         for cd in self.caracter_desconhecido:
             print(cd)
         self.reset_sequences()
@@ -338,7 +338,7 @@ class Command(BaseCommand):
                         return value['item']['id_alterador']
             return 0
 
-        _ID = 0
+        _ID = 2222
 
         if _ID == 0:
             run_doc(_ID=_ID)
