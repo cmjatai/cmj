@@ -12,11 +12,11 @@ from django.db import connection
 from django.db.models import Q
 from django.db.models.signals import post_delete, post_save
 from django.utils import timezone
-from sapl.compilacao.models import Dispositivo, TextoArticulado,\
-    TipoTextoArticulado, TipoDispositivo, STATUS_TA_EDITION
-from sapl.norma.models import NormaJuridica
 
 from cmj.legacy_sislegis_portal.models import Documento, Tipolei, Itemlei
+from sapl.compilacao.models import TextoArticulado,\
+    TipoTextoArticulado, TipoDispositivo, STATUS_TA_EDITION, Dispositivo
+from sapl.norma.models import NormaJuridica
 
 
 def _get_registration_key(model):
