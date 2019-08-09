@@ -1,0 +1,9 @@
+{% load i18n %}
+TipoDeDiario:
+  {% trans 'Tipo de Diário' %}:
+  - descricao
+DiarioOficial:
+  {% trans 'Diário Oficial' %}:
+  - edicao:3 data:3 tipo
+  - descricao
+  - arquivo
