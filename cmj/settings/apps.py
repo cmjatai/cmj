@@ -16,8 +16,8 @@ INSTALLED_APPS = (
     'crispy_forms',
     'floppyforms',
 
-    'easy_thumbnails', 
-    'image_cropping',  
+    'easy_thumbnails',
+    'image_cropping',
 
     'rest_framework',
     'rest_framework_recursive',
@@ -63,13 +63,14 @@ SAPL_APPS = (
 # CMJ_APPS business apps in dependency order
 CMJ_APPS = (
     'cmj.core',
-    
+
     'cmj.diarios',
     'cmj.cerimonial',
     'cmj.ouvidoria',
     'cmj.agenda',
     'cmj.sigad',
     'cmj.api',
+    'cmj.procuradoria'
 )
 
 RULES_APPS = (
