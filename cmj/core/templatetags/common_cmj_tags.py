@@ -9,11 +9,15 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
-from sapl.base.models import AppConfig
-from sapl.parlamentares.models import Filiacao
 from webpack_loader import utils
 from webpack_loader.templatetags.webpack_loader import render_bundle
 from webpack_loader.utils import _get_bundle
+
+from cmj.diarios.models import DiarioOficial
+from sapl.base.models import AppConfig
+from sapl.materia.models import DocumentoAcessorio, MateriaLegislativa
+from sapl.norma.models import NormaJuridica
+from sapl.parlamentares.models import Filiacao
 
 
 register = template.Library()
@@ -274,3 +278,17 @@ def render_chunk_vendors(extension=None):
         return mark_safe('\n'.join(tags))
     except:
         return ''
+
+
+@register.filter
+def search_get_model(object):
+    if type(object) == MateriaLegislativa:
+        return 'm'
+    elif type(object) == DocumentoAcessorio:
+        return 'd'
+    elif type(object) == NormaJuridica:
+        return 'n'
+    elif type(object) == DiarioOficial:
+        return 'o'
+
+    return None
