@@ -51,6 +51,11 @@ class DiarioOficial(models.Model):
         NormaJuridica,
         verbose_name=_('Normas Publicadas no Diário'))
 
+    data_ultima_atualizacao = models.DateTimeField(
+        blank=True, null=True,
+        auto_now=True,
+        verbose_name=_('Data'))
+
     class Meta:
         verbose_name = _('Diário Oficial')
         verbose_name_plural = _('Diários Oficiais')
