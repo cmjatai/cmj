@@ -1,5 +1,17 @@
 {% load i18n %}
 <div class="col-lg-4 d-flex flex-column mt-4 pt-2 pl-lg-1">
+
+  <div class="btn-search btn-segmentos">
+    <form method="get" action="{% url 'cmj.core:haystack_search'%}">
+          <input type="search" name="q" placeholder="Busca Textual" class="textinput textInput form-control" id="id_q" />
+          
+          <button  class="button" type="submit"value="">
+            <i class="fas fa-search"></i>
+          </button>
+    </form>
+  </div>
+     
+
   <a href="/fale-conosco/ouvidoria" class="btn-segmentos">
     <i class="fas fa-bullhorn" aria-hidden="true"></i>
     <span>
