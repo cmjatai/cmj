@@ -60,7 +60,6 @@ user_urlpatterns = [
     url(r'^online/',
         app_vue_view, name='app_vue_view_url'),
 
-
     url(r'^sistema/search/', CmjSearchView(), name='haystack_search'),
 
 ]
