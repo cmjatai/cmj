@@ -13,6 +13,7 @@ from cmj.core.views import CepCrud, RegiaoMunicipalCrud, DistritoCrud,\
     app_vue_view
 from cmj.core.views_auth import CmjUserChangeView, CmjLoginView,\
     CmjPasswordResetView
+from cmj.core.views_search import CmjSearchView
 
 from .apps import AppConfig
 
@@ -59,6 +60,8 @@ user_urlpatterns = [
     url(r'^online/',
         app_vue_view, name='app_vue_view_url'),
 
+
+    url(r'^sistema/search/', CmjSearchView(), name='haystack_search'),
 
 ]
 

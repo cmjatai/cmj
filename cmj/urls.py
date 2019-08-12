@@ -29,6 +29,7 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.urls.resolvers import RegexURLPattern, RegexURLResolver
 from django.views.generic.base import TemplateView, RedirectView
 from django.views.static import serve as view_static_server
 
@@ -58,7 +59,7 @@ import sapl.sessao.urls
 
 #import sapl.api.urls
 # import sapl.api.urls
-urlpatterns = [
+urlpatterns_all = [
     # FIXME: eliminar redirecionamento em 2019
     url(r'^portal/?$', RedirectView.as_view(url='/')),
     url(r'^admin/', admin.site.urls),
@@ -102,19 +103,48 @@ admin.site.site_header = 'Cmj'
 if settings.DEBUG:
     # urlpatterns += static(settings.MEDIA_URL,
     #                      document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(settings.STATIC_URL,
-                          document_root=settings.STATIC_ROOT)
+    urlpatterns_all += static(settings.STATIC_URL,
+                              document_root=settings.STATIC_ROOT)
 
-    urlpatterns += [
+    urlpatterns_all += [
         url(r'^media/(?P<path>.*)$', view_static_server, {
             'document_root': settings.MEDIA_ROOT,
         }),
     ]
 
 
-urlpatterns += [
+urlpatterns_all += [
     url(r'', include(cmj.api.urls)),
 
     # urls não tratadas até aqui será capturada por PathView de cmj.sigad
     url(r'', include(cmj.sigad.urls)),
 ]
+
+"""urlpatterns_remove = [
+    'sistema/search/',
+    'sistema/ajuda/'
+]"""
+
+urlpatterns = urlpatterns_all
+
+"""
+def urlpatterns_filter(ponto, urls):
+    remove_url = []
+    for url in urls:
+        if isinstance(url, RegexURLResolver):
+            print('.' * ponto, url)
+            urlpatterns_filter(ponto + 4, url.url_patterns)
+        else:
+            print('.' * ponto, url)
+            if url.name == 'haystack_search':
+                print('parar')
+            if list(filter(url.regex.match, urlpatterns_remove)) and url.name:
+
+                remove_url.append(url)
+
+    for r_url in remove_url:
+        urls.remove(r_url)
+
+
+urlpatterns_filter(1, urlpatterns_all)
+"""
