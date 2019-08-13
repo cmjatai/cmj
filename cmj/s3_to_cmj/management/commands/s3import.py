@@ -19,6 +19,10 @@ def _get_registration_key(model):
 
 
 class Command(BaseCommand):
+    migrate_files = False
+
+    def add_arguments(self, parser):
+        parser.add_argument('f', nargs='?', type=bool, default=False)
 
     def handle(self, *args, **options):
 
@@ -27,9 +31,14 @@ class Command(BaseCommand):
         post_delete.disconnect(dispatch_uid='cmj_post_delete_signal')
         post_save.disconnect(dispatch_uid='cmj_post_save_signal')
         # self.clear()
-        # self.run()
-        # self.reset_sequences()
-        self.migrar_documentos()
+
+        self.migrate_files = options['f']
+
+        self.run()
+        self.reset_sequences()
+
+        if self.migrate_files:
+            self.migrar_documentos()
         # self.list_models_with_relation()
 
     def migrar_documentos(self):
@@ -76,10 +85,12 @@ class Command(BaseCommand):
         return migrar_docs_por_ids(model)
 
     def run(self):
+        nao_migrar = True
         for item in mapa.mapa[1:]:
 
-            # if item['name'] != '_vinculonormajuridica':
+            # if nao_migrar and item['name'] != '_normajuridica':
             #    continue
+            # nao_migrar = False
 
             if item['s30_model'] is None:
                 continue
