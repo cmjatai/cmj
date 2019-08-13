@@ -84,6 +84,7 @@
               
               {% block social_links %}
                 <div class="navbar-social-links justify-content-center">
+                  <a href="https://soundcloud.com/camara-de-jatai"><i class="fab fa-soundcloud" aria-hidden="true"></i><span>SoundCloud</span></i></a>
                   <a href="https://www.facebook.com/cmjatai"><i class="fab fa-facebook-f" aria-hidden="true"><span>Facebook</span></i></a>
                   <a href="https://www.youtube.com/C%C3%A2maraMunicipalJata%C3%AD?sub_confirmation=1"><i class="fab fa-youtube" aria-hidden="true"><span>YouTube</span></i></a>
                   <a href="https://twitter.com/cmjatai"><i class="fab fa-twitter" aria-hidden="true"><span>Twitter</span></i></a>
@@ -403,7 +404,25 @@
       $("#menu-toggle, .canais-absolute .box").click(function (event) {
         toogleWrapper(event)
       });
+
+      $('a[data-social-sharing]').click(function(event){
+        event.preventDefault();var socialNetwork=$(this).data('social-sharing');
+        switch(socialNetwork){
+            case'facebook':_height=436;_width=626;break;
+            case'whatsapp':_height=591;_width=617;break;
+            case'twitter':_height=300;_width=600;}
+
+        var leftPosition=(window.screen.width/2)-((_width/2)+10);
+        var topPosition=(window.screen.height/2)-((_height/2)+50);
+        var stringSpecs='left='+leftPosition+',top='+topPosition+',toolbar=0,status=0,width='+_width+',height='+_height;
+        window.open($(this).attr('href'),'sharer',stringSpecs);});
+
+
+
     });
+
+
+    
   </script>
 
   {% if not DEBUG %}
