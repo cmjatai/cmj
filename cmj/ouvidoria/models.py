@@ -8,9 +8,9 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from cmj.core.models import AreaTrabalho, Notificacao
-from cmj.sigad.models import media_protected
 from cmj.utils import CmjChoices, get_settings_auth_user_model,\
-    restringe_tipos_de_arquivo_midias, TIPOS_MIDIAS_PERMITIDOS
+    restringe_tipos_de_arquivo_midias, TIPOS_MIDIAS_PERMITIDOS,\
+    media_protected_storage
 
 
 class Solicitacao(models.Model):
@@ -118,7 +118,7 @@ class MensagemSolicitacao(models.Model):
     anexo = models.FileField(
         blank=True,
         null=True,
-        storage=media_protected,
+        storage=media_protected_storage,
         upload_to=anexo_ouvidoria_path,
         verbose_name=_('Anexo'),
         validators=[restringe_tipos_de_arquivo_midias],
