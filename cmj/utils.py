@@ -7,6 +7,7 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
 from django.core.exceptions import ValidationError
+from django.core.files.storage import FileSystemStorage
 from django.utils.translation import ugettext_lazy as _
 from easy_thumbnails import source_generators
 from floppyforms import ClearableFileInput
@@ -15,6 +16,7 @@ from model_utils.choices import Choices
 from reversion.admin import VersionAdmin
 from social_core.backends.facebook import FacebookOAuth2
 from unipath.path import Path
+
 from sapl.utils import choice_anos
 
 
@@ -326,6 +328,10 @@ class CmjChoices(Choices):
         # radd is never called for matching types, so we don't check here
         other = list(other)
         return CmjChoices(*(other + self._triples))
+
+
+media_protected_storage = FileSystemStorage(
+    location=settings.MEDIA_PROTECTED_ROOT, base_url='DO_NOT_USE')
 
 
 def texto_upload_path(instance, filename, subpath='', pk_first=False):

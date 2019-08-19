@@ -14,6 +14,7 @@ from webpack_loader.templatetags.webpack_loader import render_bundle
 from webpack_loader.utils import _get_bundle
 
 from cmj.diarios.models import DiarioOficial
+from cmj.sigad.models import Documento
 from sapl.base.models import AppConfig
 from sapl.materia.models import DocumentoAcessorio, MateriaLegislativa
 from sapl.norma.models import NormaJuridica
@@ -290,5 +291,7 @@ def search_get_model(object):
         return 'n'
     elif type(object) == DiarioOficial:
         return 'o'
+    elif type(object) == Documento:
+        return 'sd'
 
     return None

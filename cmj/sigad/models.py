@@ -25,12 +25,13 @@ from reportlab.lib.units import cm
 from reportlab.pdfgen import canvas
 from reportlab.pdfgen.pdfimages import PDFImage
 from reportlab.platypus.doctemplate import SimpleDocTemplate
-from sapl.materia.models import MateriaLegislativa
-from sapl.parlamentares.models import Parlamentar
 
 from cmj import globalrules
 from cmj.utils import get_settings_auth_user_model, YES_NO_CHOICES, CmjChoices,\
-    restringe_tipos_de_arquivo_midias, TIPOS_IMG_PERMITIDOS
+    restringe_tipos_de_arquivo_midias, TIPOS_IMG_PERMITIDOS,\
+    media_protected_storage
+from sapl.materia.models import MateriaLegislativa
+from sapl.parlamentares.models import Parlamentar
 
 
 CLASSE_ESTRUTURAL = 0
@@ -346,6 +347,11 @@ class CMSMixin(models.Model):
             content_type=ContentType.objects.get_for_model(concret_model),
             object_id=self.pk)
         return qs
+
+    @property
+    def modified(self):
+        rev = self.revisoes
+        return rev.first.data
 
     def clean(self):
         """
@@ -825,6 +831,16 @@ class DocumentoManager(models.Manager):
         qs = self.get_queryset()
         return qs.filter(parent__isnull=True)
 
+    def public_all_docs(self):
+        qs = self.get_queryset()
+
+        if not self.filters_created:
+            self.q_filters()
+
+        return qs.filter(
+            self.q_doc_public,
+            parent__isnull=True).order_by('-public_date', '-created')
+
     def qs_docs(self, user=None, q_filter=None):
 
         if not q_filter:
@@ -1260,10 +1276,6 @@ def media_path(instance, filename):
         filename)
 
 
-media_protected = FileSystemStorage(
-    location=settings.MEDIA_PROTECTED_ROOT, base_url='DO_NOT_USE')
-
-
 class VersaoDeMidia(models.Model):
     created = models.DateTimeField(
         verbose_name=_('created'),
@@ -1275,7 +1287,7 @@ class VersaoDeMidia(models.Model):
     file = models.FileField(
         blank=True,
         null=True,
-        storage=media_protected,
+        storage=media_protected_storage,
         upload_to=media_path,
         verbose_name=_('Mídia'),
         validators=[restringe_tipos_de_arquivo_midias])
@@ -1316,7 +1328,7 @@ class VersaoDeMidia(models.Model):
     @cached_property
     def width(self):
         try:
-            nf = '%s/%s' % (media_protected.location, self.file.name)
+            nf = '%s/%s' % (media_protected_storage.location, self.file.name)
             im = Image.open(nf)
             return im.width
         except:
@@ -1325,7 +1337,7 @@ class VersaoDeMidia(models.Model):
     @cached_property
     def height(self):
         try:
-            nf = '%s/%s' % (media_protected.location, self.file.name)
+            nf = '%s/%s' % (media_protected_storage.location, self.file.name)
             im = Image.open(nf)
             return im.height
         except:
@@ -1338,7 +1350,7 @@ class VersaoDeMidia(models.Model):
     def rotate(self, rotate):
         import os
         try:
-            nf = '%s/%s' % (media_protected.location, self.file.name)
+            nf = '%s/%s' % (media_protected_storage.location, self.file.name)
             im = Image.open(nf)
             im = im.rotate(rotate, resample=LANCZOS, expand=True)
             im.save(nf, dpi=(300, 300))
@@ -1367,7 +1379,7 @@ class VersaoDeMidia(models.Model):
         if width not in sizes:
             width = '96'
 
-        nf = '%s/%s' % (media_protected.location, self.file.name)
+        nf = '%s/%s' % (media_protected_storage.location, self.file.name)
         nft = nf.split('/')
         nft = '%s/%s.%s' % ('/'.join(nft[:-1]), width, nft[-1])
 
