@@ -17,7 +17,6 @@ from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView, MultipleObjectMixin
-from sapl.parlamentares.models import Parlamentar, Legislatura
 
 from cmj import globalrules
 from cmj.crud.base import MasterDetailCrud, Crud
@@ -28,6 +27,7 @@ from cmj.sigad.models import Documento, Classe, ReferenciaEntreDocumentos,\
     CLASSE_TEMPLATES_CHOICE, CaixaPublicacao, CaixaPublicacaoClasse,\
     CaixaPublicacaoRelationship, UrlShortener
 from cmj.utils import make_pagination
+from sapl.parlamentares.models import Parlamentar, Legislatura
 
 
 class TabIndexMixin:
@@ -621,6 +621,14 @@ class PathParlamentarView(PathView):
         self.parlamentar = self.classe
 
         return TemplateView.dispatch(self, request, *args, **kwargs)
+
+    @property
+    def ultimas_autorias(self):
+        if self.parlamentar.parlamentar:
+            return self.parlamentar.parlamentar.autor.first().autoria_set.order_by(
+                '-materia__data_apresentacao')[:5]
+        else:
+            return []
 
     def get_context_data(self, **kwargs):
 

@@ -126,4 +126,17 @@
   {% if split_row %}
     {% if forloop.last %}</div>{% endif %}
   {% endif %}
+
+  {% if False or fooloop.first %}
+    <div class="path-item-list col-md-4">
+      {% for a in view.ultimas_autorias %}
+        <strong><a href="{% url 'sapl.materia:materialegislativa_detail' a.materia.id %}">{{a.materia.tipo.sigla}} {{a.materia.numero}}/{{a.materia.ano}} - {{a.materia.tipo}}</strong></a>
+        </br>
+        <strong>Ementa:</strong>&nbsp;{{ a.materia.ementa }}
+        </br>
+      {%endfor%}
+    </div>
+  {% endif %}
+
+  
 {% endfor %}
