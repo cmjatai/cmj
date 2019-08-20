@@ -6,15 +6,15 @@ from django.forms import widgets
 from django.forms.models import ModelForm, ModelMultipleChoiceField
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from cmj.crispy_layout_mixin import to_row, SaplFormLayout
-from sapl.parlamentares.models import Parlamentar
 
+from cmj.crispy_layout_mixin import to_row, SaplFormLayout
 from cmj.sigad import models
 from cmj.sigad.models import Classe, Documento, Revisao, CaixaPublicacao,\
     CLASSE_DOC_MANAGER_CHOICE, CaixaPublicacaoClasse,\
     CaixaPublicacaoRelationship
 from cmj.sigad.templatetags.sigad_filters import caixa_publicacao
 from cmj.utils import YES_NO_CHOICES
+from sapl.parlamentares.models import Parlamentar
 
 
 class UpLoadImportFileForm(forms.Form):
@@ -98,7 +98,7 @@ class ClasseForm(ModelForm):
 class DocumentoForm(ModelForm):
 
     parlamentares = ModelMultipleChoiceField(
-        queryset=Parlamentar.objects.all(), required=False,
+        queryset=Parlamentar.objects.filter(ativo=True), required=False,
         label=Parlamentar._meta.verbose_name_plural,
         widget=forms.SelectMultiple(attrs={'size': '10'})
     )
