@@ -49,8 +49,8 @@ class SolrClient:
         configsets = dic['configSets']
         # UPLOAD configset
         if not self.CONFIGSET_NAME in configsets or force:
-            files = {'file': ('cmj_www2.zip',
-                              open('./solr/cmj_configset/conf/cmj_www2.zip',
+            files = {'file': ('cmjdev.zip',
+                              open('./solr/cmj_configset/conf/cmjdev.zip',
                                    'rb'),
                               'application/octet-stream',
                               {'Expires': '0'})}
