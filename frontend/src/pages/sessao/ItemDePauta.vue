@@ -14,7 +14,7 @@
           <strong>Situação:</strong> {{tramitacao.status.descricao}}<br>
           <strong>Ultima Ação:</strong> {{tramitacao.ultima.texto}}
         </div>
-        <div :class="['observacao', nivel(NIVEL4, observacao.length > 0)]" v-html="observacao"></div>
+        <div :class="['observacao', nivel(NIVEL3, observacao.length > 0)]" v-html="observacao"></div>
       </div>
       <div class="col-2-body">
         <div :class="['container-anexadas', nivel(NIVEL2, itensAnexados.length > 0)]">

@@ -26,11 +26,11 @@ export default {
         {
           text: '|||',
           nivel: 3
-        },
-        {
-          text: '||||',
-          nivel: 4
         }
+        // {
+        //  text: '||||',
+        //  nivel: 4
+        // }
       ]
     }
   },
