@@ -87,13 +87,16 @@
   }
   .inner-parla {
     display: flex;
+    justify-content: center;
     a {
       display: inline-block;
-      justify-content: space-between;
-      flex: 1 1 70%;
+      flex: 0 0 25%;
       margin: 5px;
+      img {
+        border: 1px solid #ddd;
+      }
       &:nth-child(2) {
-        flex-basis: 90%;
+        flex-basis: 30%;
       }
     }
   }
@@ -116,6 +119,7 @@
     .avatar3 {
       width: 100px;
     }
+    
   }
 
 }
@@ -123,6 +127,14 @@
   .container-legislaturas {
     .avatar3 {
       width: 80px;
+    }
+    .inner-parla {
+      a {
+        flex: 0 0 40%;
+        &:nth-child(2) {
+          flex-basis: 50%;
+        }
+      }
     }
   }
 }
@@ -137,6 +149,8 @@
         font-size: 80%;
       }
     }
+
+
   }
 }
 @media screen and (max-width: 480px) {
