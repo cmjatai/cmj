@@ -49,7 +49,7 @@ export default {
 
       let base = `${sessao.numero}ª ${tipo.nome}`
 
-      if (tipo.tipo_numeracao === 1) { base += ` da ${data_inicio.getDate() > 15 ? 2 : 1}ª Quizena` }
+      if (tipo.tipo_numeracao === 1) { base += ` da ${data_inicio.getDate() > 15 ? 2 : 1}ª Quizena do mês de ${this.month_text(data_inicio.getMonth())}` }
 
       if (tipo.tipo_numeracao === 2) { base += ` do mês de ${this.month_text(data_inicio.getMonth())}` }
 

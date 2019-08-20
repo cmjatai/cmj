@@ -1,20 +1,20 @@
+// { path: '',
+//   name: 'index_link',
+//   component: () => import('@/pages/Index.vue')
+// },
 
 export const routes = [
   {
     path: '/online',
     component: () => import('@/layouts/OnlineLayout'),
     children: [
-      { path: '',
-        name: 'index_link',
-        component: () => import('@/pages/Index.vue')
-      },
       {
-        path: 'sessao/',
+        path: '/', // list
         name: 'sessao_link',
         component: () => import('@/pages/sessao/SessaoPlenariaModule.vue'),
         children: [
           {
-            path: 'list/',
+            path: '/',
             name: 'sessao_list_link',
             component: () => import('@/pages/sessao/SessaoList.vue')
           },
