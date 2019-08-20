@@ -14,6 +14,7 @@ from cmj.sigad.models import Classe, Documento, Revisao, CaixaPublicacao,\
     CaixaPublicacaoRelationship
 from cmj.sigad.templatetags.sigad_filters import caixa_publicacao
 from cmj.utils import YES_NO_CHOICES
+from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
 
 
@@ -111,6 +112,14 @@ class DocumentoForm(ModelForm):
                                   choices=YES_NO_CHOICES,
                                   coerce=lambda x: x == 'True')
 
+    materias = ModelMultipleChoiceField(
+        queryset=MateriaLegislativa.objects.order_by(
+            '-data_apresentacao'),
+        required=False,
+        label=MateriaLegislativa._meta.verbose_name_plural,
+        widget=forms.SelectMultiple(attrs={'size': '10'})
+    )
+
     class Meta:
         model = Documento
         fields = ['titulo',
@@ -121,7 +130,8 @@ class DocumentoForm(ModelForm):
                   'public_date',
                   'tipo',
                   'listar',
-                  'capa'
+                  'capa',
+                  'materias'
                   ]
 
     def __init__(self, *args, **kwargs):
@@ -138,6 +148,9 @@ class DocumentoForm(ModelForm):
                 ('descricao', 8),
                 ('parlamentares', 4)
             ]),
+            to_row([
+                ('materias', 12),
+            ]),
         )
 
         super(DocumentoForm, self).__init__(*args, **kwargs)
@@ -145,6 +158,9 @@ class DocumentoForm(ModelForm):
         self.fields['parlamentares'].choices = [
             ('0', '--------------')] + list(
             self.fields['parlamentares'].choices)
+
+        self.fields['materias'].choices = [
+            ('0', '--------------')] + [(m.id, str(m) + ' - ' + m.ementa) for m in self.fields['materias'].queryset[:200]]
 
         self.fields['capa'].initial = self.instance == self.instance.classe.capa
 
