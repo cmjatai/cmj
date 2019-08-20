@@ -89,7 +89,7 @@ class CmjSearchForm(ModelSearchForm):
         if self.load_all:
             sqs = sqs.load_all()
 
-        return sqs.filter().order_by('-data')
+        return sqs.models(*self.get_models()).filter().order_by('-data')
 
 
 class CmjSearchView(SearchView):
