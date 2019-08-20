@@ -82,6 +82,7 @@ export default {
 </script>
 
 <style lang="scss">
+<<<<<<< HEAD
 .inner-sideright .menu {
   //display: none;
   a {
@@ -113,6 +114,32 @@ export default {
     }
   }
 
+=======
+.inner-sideright {
+  //display: none;
+  & > ul {
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+    & >li {
+      position: relative;
+    }
+  }
+  ul {
+    &.isr-hover {
+      position: absolute;
+      right: 90%;
+      top: 50%;
+      display: none;
+      &.show {
+        display: flex;
+      }
+      a {
+        white-space: nowrap;
+      }
+    }
+  }
+>>>>>>> 15a0e01... altera sideright para inserção de itens e subitens
   img {
     padding: 15px;
     cursor: pointer;
