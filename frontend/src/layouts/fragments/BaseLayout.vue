@@ -79,7 +79,7 @@ export default {
   line-height: 1;
 
   display: grid;
-  grid-template-columns: $width-sideleft $width-sideleft * 3 auto 0px;
+  grid-template-columns: $width-sideleft $width-sideleft * 3 auto $width-sideright;
   grid-template-rows: 60px auto;
   z-index: 4000;
 
@@ -137,7 +137,6 @@ export default {
       }
       &:hover {
         background-color: #ddd;
-
       }
     }
     .btn-outline-dark {
@@ -157,6 +156,7 @@ export default {
   .sideleft {
     grid-column-start: 1;
     grid-column-end: 2;
+    border-right: 1px #ddd solid;
   }
 
   .main {
@@ -168,6 +168,7 @@ export default {
   .sideright {
     grid-column-start: 4;
     grid-column-end: 5;
+    border-left: 1px #ddd solid;
   }
 
   &.left-expand {
@@ -279,7 +280,7 @@ export default {
 
 @media screen and (min-width: 481px) {
   .base-layout:not(.left-expand) {
-    grid-template-columns: 0 0 auto 0px;
+    //grid-template-columns: 0 0 auto 0px;
   }
 }
 
