@@ -40,6 +40,9 @@ def social_link_share(context, obj=None, css_class=''):
         descricao = getattr(obj, 'descricao')\
             if hasattr(obj, 'descricao') else obj.parents[0].descricao
 
+        if not descricao:
+            descricao = ''
+
         return {'url': url,
                 'titulo': obj.titulo,
                 'descricao': descricao,
