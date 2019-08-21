@@ -557,8 +557,6 @@ mapa = [
             'hora_fim': 'hr_fim_sessao',
             'numero': 'num_sessao_plen',
             'data_fim': 'dat_fim_sessao',
-            'url_audio': 'url_audio',
-            'url_video': 'url_video',
             'ind_excluido': 'ind_excluido'
         },
         'adjust': adjust_sessaoplenaria,
