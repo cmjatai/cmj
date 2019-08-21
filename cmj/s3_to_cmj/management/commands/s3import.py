@@ -100,6 +100,9 @@ class Command(BaseCommand):
                 # Já migrado - não migra novamente a app na lista do iff
                 continue
 
+            if item['name'] in ('_tiposessaoplenaria', ):
+                continue
+
             print('Migrando...', item['s31_model']._meta.object_name)
             old_list = item['s30_model'].objects.all()
             if 'ind_excluido' in item['fields']:
