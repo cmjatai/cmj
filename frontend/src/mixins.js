@@ -92,7 +92,46 @@ Vue.mixin({
           _this.fetch(data)
         }
       }
+    },
+
+    fetchModelListAction (app = null, model = null, action = null, page = 1) {
+      if (page === null || model === null || action === null) {
+        return
+      }
+
+      const t = this
+      t.utils.getModelListAction(app, model, action, page)
+        .then((response) => {
+          t.init = true
+          _.each(response.data.results, (value, idx) => {
+            value.vue_validate = true
+            if (value.id in t.itens[`${model}_list`]) {
+              t.itens[`${model}_list`][value.id] = value
+            } else {
+              t.$set(t.itens[`${model}_list`], value.id, value)
+            }
+          })
+          t.$nextTick()
+            .then(function () {
+              if (response.data.pagination.next_page !== null) {
+                t.fetchModelListAction(app, model, action, response.data.pagination.next_page)
+              } else {
+                _.mapKeys(t.itens[`${model}_list`], function (obj, k) {
+                  if (!obj.vue_validate) {
+                    t.$delete(t.itens[`${model}_list`], obj.id)
+                  }
+                })
+              }
+            })
+        })
+        .catch((response) => {
+          t.init = true
+          t.sendMessage(
+            { alert: 'danger', message: 'Não foi possível recuperar a Listagem.', time: 5 })
+        })
     }
+
+
   },
   created: function () {
     /*
