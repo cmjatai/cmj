@@ -5,19 +5,36 @@
         <li>
           <b-img @click="toogleNormaDestaque" src="@/assets/img/icon_normas_juridicas_destaque.png" fluid rounded="0" />
           <ul class="list-group">
-            <li class="list-group-item"  v-for="item in itensNormasDeDestaque" :key="`srmd${item.id}`"><a href="#">{{item.apelido}}</a></li>
+            <li class="list-group-item" v-for="item in itensNormasDeDestaque" :key="`srmd${item.id}`">
+              <button
+                type="button"
+                class="btn btn-primary"
+                data-toggle="modal"
+                data-target="#modal-norma"
+                @click="modal_norma=item">
+                  {{item.apelido}}
+              </button>
+            </li>
           </ul>
         </li>
       </ul>
-
-      <!--b-img src="@/assets/img/icon_mesa_diretora.png" fluid rounded="0" />
-      <b-img src="@/assets/img/icon_comissoes.png" fluid rounded="0" />
-      <b-img src="@/assets/img/icon_parlamentares.png" fluid rounded="0" />
-      <b-img src="@/assets/img/icon_pautas.png" fluid rounded="0" />
-      <b-img src="@/assets/img/icon_plenarias.png" fluid rounded="0" />
-      <b-img src="@/assets/img/icon_materia_legislativa.png" fluid rounded="0" />
-      <b-img src="@/assets/img/icon_normas_juridicas.png" fluid rounded="0" />
-      <b-img src="@/assets/img/icon_relatorios.png" fluid rounded="0" /-->
+    </div>
+    <div v-if="modal_norma" class="modal fade modal-cmj" id="modal-norma" tabindex="-1" role="dialog" aria-labelledby="ModalNorma" aria-hidden="true">
+      <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="#titulo">{{modal_norma.apelido}}</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body" v-html="modal_norma.html">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -30,9 +47,23 @@ export default {
       app: ['norma'],
       model: ['normajuridica'],
       menu_norma_destaque: false,
+      modal_norma: null,
       itens: {
         normajuridica_list: {}
       }
+    }
+  },
+  watch: {
+    'modal_norma': function (nv, ov) {
+      const t = this
+      $.ajax({
+        url: `http://10.42.0.1:9000/sapl/ta/${nv.id}/text?embedded`,
+        type: 'GET',
+        success: function (res) {
+          var text = res
+          t.$set(nv, 'html', text)
+        }
+      })
     }
   },
   computed: {
@@ -82,13 +113,19 @@ export default {
 </script>
 
 <style lang="scss">
+.modal-cmj {
+  background-color: #000b;
+}
 .inner-sideright .menu {
-  //display: none;
-  a {
+  // display: none;
+  button {
     padding: 0.5rem 1rem;
     white-space: nowrap;
     display: block;
     text-decoration: none;
+    width: 100%;
+    border-radius: 0px;
+    text-align: center;
   }
   ul {
     padding: 0;
@@ -107,7 +144,6 @@ export default {
           position: absolute;
           right: 80%;
           top: 50%;
-
         }
       }
     }
@@ -116,7 +152,6 @@ export default {
   img {
     padding: 15px;
     cursor: pointer;
-
   }
 }
 </style>

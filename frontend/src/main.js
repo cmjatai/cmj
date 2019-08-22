@@ -25,6 +25,7 @@ import { routes } from './routers'
 import App from './App'
 
 import './mixins'
+import './__apps/compilacao/main'
 
 axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
