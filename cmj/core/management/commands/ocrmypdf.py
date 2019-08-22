@@ -89,11 +89,11 @@ class Command(BaseCommand):
 
             ct = ContentType.objects.get_for_model(model['model'])
             performed_at_least_one = False
-            count = 0
+            #count = 0
             for item in model['model'].objects.order_by('id'):
-                if count >= 5:
-                    performed_at_least_one = False
-                    break
+                # if count >= 5:
+                #    performed_at_least_one = False
+                #    break
                 for ff in model['file_field']:
                     ocr = OcrMyPDF.objects.filter(
                         content_type=ct,
@@ -127,7 +127,7 @@ class Command(BaseCommand):
 
                         #print(item.id, model['model'], )
                         performed_at_least_one = True
-                        count += 1
+                        #count += 1
                         o = OcrMyPDF()
                         o.content_object = item
                         o.field = ff
