@@ -1,22 +1,26 @@
 
 from django import forms
-from django.core.exceptions import PermissionDenied
-from django.db import models
-from django.db.models import permalink
-from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
-from sapl.parlamentares.models import Parlamentar
-
-from cmj.globalrules import MENU_PERMS_FOR_USERS, GROUP_SOCIAL_USERS
-from cmj.utils import get_settings_auth_user_model, normalize, YES_NO_CHOICES,\
-    UF, CmjChoices
 from django.contrib.auth import get_user_model
 from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin, Group
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import PermissionDenied
+from django.db import models
+from django.db.models import permalink
 from django.db.models.deletion import PROTECT, CASCADE, SET_NULL
+from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
 from image_cropping import ImageCropField, ImageRatioField
+
+from cmj.diarios.models import DiarioOficial
+from cmj.globalrules import MENU_PERMS_FOR_USERS, GROUP_SOCIAL_USERS
+from cmj.utils import get_settings_auth_user_model, normalize, YES_NO_CHOICES,\
+    UF, CmjChoices
+from sapl.materia.models import MateriaLegislativa, DocumentoAcessorio
+from sapl.norma.models import NormaJuridica
+from sapl.parlamentares.models import Parlamentar
+from sapl.sessao.models import SessaoPlenaria
 
 
 def group_social_users_add_user(user):
@@ -787,3 +791,29 @@ class Notificacao(CmjModelMixin):
 
     def __str__(self):
         return self.user_name
+
+
+class OcrMyPDF(models.Model):
+
+    content_type = models.ForeignKey(
+        ContentType,
+        blank=True, null=True, default=None)
+    object_id = models.PositiveIntegerField(
+        blank=True, null=True, default=None)
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    field = models.CharField(
+        default='', max_length=254, verbose_name=_('Field'))
+
+    created = models.DateTimeField(
+        verbose_name=_('created'),
+        editable=False, auto_now_add=True)
+
+    concluido = models.DateTimeField(
+        verbose_name=_('created'),
+        editable=False, auto_now=True)
+
+    sucesso = models.BooleanField(
+        _('Sucesso'),
+        choices=YES_NO_CHOICES,
+        default=True)
