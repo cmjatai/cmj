@@ -1,5 +1,6 @@
 
 from datetime import datetime, timedelta
+import logging
 import os
 import random
 import subprocess
@@ -22,26 +23,28 @@ def _get_registration_key(model):
 
 
 class ProcessOCR(object):
-    def __init__(self, cmd):
+    def __init__(self, cmd, logger):
         self.cmd = cmd
         self.process = None
+        self.logger = logger
 
     def run(self, timeout):
         def target():
-            print('Thread started')
-            self.process = subprocess.Popen(self.cmd, shell=True)
+            self.logger.info('Thread started')
+            self.process = subprocess.Popen(
+                self.cmd, shell=True, stdout=subprocess.PIPE)
             self.process.communicate()
-            print('Thread finished')
+            self.logger.info('Thread finished:')
 
         thread = threading.Thread(target=target)
         thread.start()
 
         thread.join(timeout)
         if thread.is_alive():
-            print('Terminating process')
+            self.logger.info('Terminating process')
             self.process.terminate()
             thread.join()
-        print(self.process.returncode)
+        self.logger.info(self.process.returncode)
         return self.process.returncode
 
 
@@ -76,7 +79,7 @@ class Command(BaseCommand):
     ]
 
     def handle(self, *args, **options):
-
+        self.logger = logging.getLogger(__name__)
         init = datetime.now()
 
         # Refaz tudo que foi feito a mais de um ano
@@ -130,7 +133,8 @@ class Command(BaseCommand):
                             # se existe arquivo mas não existe meta ocr por nunca
                             # ter feito ou por alguma regra de remoção acima
 
-                            print(item.id, model['model'], )
+                            self.logger.info(
+                                str(item.id) + ' ' + str(model['model']))
                             model['count'] += 1
                             o = OcrMyPDF()
                             o.content_object = item
@@ -140,13 +144,17 @@ class Command(BaseCommand):
                             o.sucesso = result
                             o.save()
                             now = datetime.now()
-                            print(now - init, item.id, model['model'], )
+
+                            self.logger.info(
+                                str(now - init) + ' ' +
+                                str(item.id) + ' ' +
+                                str(model['model']))
 
                             if now - init > timedelta(minutes=9):
                                 return
-                            print('Aguardando...')
+                            self.logger.info('Aguardando...')
                             sleep(5)
-                            print('Seguindo...')
+                            self.logger.info('Seguindo...')
 
             self.models = list(filter(lambda x: x['count'] != 0, self.models))
 
@@ -157,7 +165,7 @@ class Command(BaseCommand):
         cmd = ["ocrmypdf",  "--deskew", file.path, file.path]
 
         try:
-            p = ProcessOCR(' '.join(cmd))
+            p = ProcessOCR(' '.join(cmd), self.logger)
             r = p.run(timeout=300)
 
             if not r:

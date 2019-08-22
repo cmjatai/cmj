@@ -29,6 +29,14 @@ LOGGING = {
             'backupCount': 10,
             'formatter': 'verbose',
         },
+        'cmjlogfile': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': 'ocrmypdf.log',
+            'maxBytes': 1024 * 1024 * 15,  # 15MB
+            'backupCount': 10,
+            'formatter': 'verbose',
+        },
     },
     'loggers': {
         #'sapl': {
@@ -36,11 +44,11 @@ LOGGING = {
         #    'level': 'INFO',
         #    'propagate': True,
         #},
-        #'cmj': {
-        #    'handlers': ['applogfile'],
-        #    'level': 'INFO',
-        #    'propagate': True,
-        #},
+        'cmj': {
+            'handlers': ['cmjlogfile'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
     }
 }
 
