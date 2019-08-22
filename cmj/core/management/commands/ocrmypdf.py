@@ -28,10 +28,10 @@ class ProcessOCR(object):
 
     def run(self, timeout):
         def target():
-            #print('Thread started')
+            print('Thread started')
             self.process = subprocess.Popen(self.cmd, shell=True)
             self.process.communicate()
-            #print('Thread finished')
+            print('Thread finished')
 
         thread = threading.Thread(target=target)
         thread.start()
@@ -41,7 +41,7 @@ class ProcessOCR(object):
             print('Terminating process')
             self.process.terminate()
             thread.join()
-        # print(self.process.returncode)
+        print(self.process.returncode)
         return self.process.returncode
 
 
@@ -51,22 +51,27 @@ class Command(BaseCommand):
         {
             'model': MateriaLegislativa,
             'file_field': ('texto_original',),
+            'count': 0
         },
         {
             'model': NormaJuridica,
             'file_field': ('texto_integral',),
+            'count': 0
         },
         {
             'model': DocumentoAcessorio,
             'file_field': ('arquivo',),
+            'count': 0
         },
         {
             'model': DiarioOficial,
             'file_field': ('arquivo', ),
+            'count': 0
         },
         {
             'model': SessaoPlenaria,
             'file_field': ('upload_pauta', 'upload_ata', 'upload_anexo'),
+            'count': 0
         },
     ]
 
@@ -85,67 +90,65 @@ class Command(BaseCommand):
 
         while self.models:
 
-            model = random.choice(self.models)
+            for model in self.models:
+                model['count'] = 0
 
-            ct = ContentType.objects.get_for_model(model['model'])
-            performed_at_least_one = False
-            #count = 0
-            for item in model['model'].objects.order_by('id'):
-                # if count >= 5:
-                #    performed_at_least_one = False
-                #    break
-                for ff in model['file_field']:
-                    ocr = OcrMyPDF.objects.filter(
-                        content_type=ct,
-                        object_id=item.id,
-                        field=ff).first()
+            for model in self.models:
+                ct = ContentType.objects.get_for_model(model['model'])
+                count = 0
+                for item in model['model'].objects.order_by('id'):
+                    if count >= 5:
+                        break
+                    for ff in model['file_field']:
+                        ocr = OcrMyPDF.objects.filter(
+                            content_type=ct,
+                            object_id=item.id,
+                            field=ff).first()
 
-                    file = getattr(item, ff)
-                    if ocr and file:
-                        # possui meta ocr anterior,
-                        # testa se o arq é mais recente que último ocr
-                        # feito
-                        t = os.path.getmtime(file.path)
-                        date_file = datetime.fromtimestamp(t, timezone.utc)
+                        file = getattr(item, ff)
+                        if ocr and file:
+                            # possui meta ocr anterior,
+                            # testa se o arq é mais recente que último ocr
+                            # feito
+                            t = os.path.getmtime(file.path)
+                            date_file = datetime.fromtimestamp(t, timezone.utc)
 
-                        if date_file <= ocr.created:
+                            if date_file <= ocr.created:
+                                continue
+                            # se arq é mais novo, apaga o meta ocr p fazer
+                            # novamente
+                            ocr.delete()
+                            ocr = None
+
+                        elif ocr and not file:
+                            # se existe um meta ocr mas não existe mais o
+                            # arquivo
+                            ocr.delete()
                             continue
-                        # se arq é mais novo, apaga o meta ocr p fazer
-                        # novamente
-                        ocr.delete()
-                        ocr = None
 
-                    elif ocr and not file:
-                        # se existe um meta ocr mas não existe mais o
-                        # arquivo
-                        ocr.delete()
-                        continue
+                        if not ocr and file:
+                            # se existe arquivo mas não existe meta ocr por nunca
+                            # ter feito ou por alguma regra de remoção acima
 
-                    if not ocr and file:
-                        # se existe arquivo mas não existe meta ocr por nunca
-                        # ter feito ou por alguma regra de remoção acima
+                            print(item.id, model['model'], )
+                            model['count'] += 1
+                            o = OcrMyPDF()
+                            o.content_object = item
+                            o.field = ff
+                            o.save()
+                            result = self.run(item, ff)
+                            o.sucesso = result
+                            o.save()
+                            now = datetime.now()
+                            print(now - init, item.id, model['model'], )
 
-                        #print(item.id, model['model'], )
-                        performed_at_least_one = True
-                        #count += 1
-                        o = OcrMyPDF()
-                        o.content_object = item
-                        o.field = ff
-                        o.save()
-                        result = self.run(item, ff)
-                        o.sucesso = result
-                        o.save()
-                        now = datetime.now()
-                        #print(now - init, item.id, model['model'], )
+                            if now - init > timedelta(minutes=9):
+                                return
+                            print('Aguardando...')
+                            sleep(5)
+                            print('Seguindo...')
 
-                        if now - init > timedelta(minutes=9):
-                            return
-                        # print('Aguardando...')
-                        sleep(5)
-                        # print('Seguindo...')
-
-            if not performed_at_least_one:
-                self.models.remove(model)
+            self.models = list(filter(lambda x: x['count'] != 0, self.models))
 
     def run(self, item, fstr):
 
