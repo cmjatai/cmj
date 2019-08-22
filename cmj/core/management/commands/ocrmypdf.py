@@ -145,6 +145,9 @@ class Command(BaseCommand):
                             o.save()
                             now = datetime.now()
 
+                            if result:
+                                item.save()
+
                             self.logger.info(
                                 str(now - init) + ' ' +
                                 str(item.id) + ' ' +
