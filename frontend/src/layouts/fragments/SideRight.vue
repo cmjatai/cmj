@@ -6,14 +6,9 @@
           <b-img @click="toogleNormaDestaque" src="@/assets/img/icon_normas_juridicas_destaque.png" fluid rounded="0" />
           <ul class="list-group">
             <li class="list-group-item" v-for="item in itensNormasDeDestaque" :key="`srmd${item.id}`">
-              <button
-                type="button"
-                class="btn btn-primary"
-                data-toggle="modal"
-                data-target="#modal-norma"
-                @click="modal_norma=item">
+              <a :href="`/sapl/ta/${item.id}/text`" target="_blank">
                   {{item.apelido}}
-              </button>
+              </a>
             </li>
           </ul>
         </li>
@@ -118,7 +113,7 @@ export default {
 }
 .inner-sideright .menu {
   // display: none;
-  button {
+  a {
     padding: 0.5rem 1rem;
     white-space: nowrap;
     display: block;
