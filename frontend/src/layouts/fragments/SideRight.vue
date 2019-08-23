@@ -59,8 +59,12 @@ export default {
 
     } */
     'itens.normajuridica_list': function (nv, ov) {
-      this.getText(nv)
-      console.log(nv)
+      let t = this
+      setTimeout(() => {
+        _.mapKeys(nv, function (value, key) {
+          t.getText(value)
+        })
+      }, 5000)
     }
   },
   computed: {
@@ -72,8 +76,8 @@ export default {
   },
   mounted () {
     setTimeout(() => {
-      this.fetchModelListAction('norma', 'normajuridica', 'destaques', 1, this.getText)
-    }, 1000)
+      this.fetchModelListAction('norma', 'normajuridica', 'destaques', 1, null)
+    }, 2000)
   },
   methods: {
     getText (nv) {
@@ -117,6 +121,7 @@ export default {
         .then(obj => {
           if (obj.norma_de_destaque) {
             t.$set(t.itens[`${metadata.model}_list`], metadata.id, obj)
+            // t.getText(obj)
           }
         })
     }
