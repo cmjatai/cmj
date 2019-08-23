@@ -101,7 +101,7 @@ class Command(BaseCommand):
             for model in self.models:
                 ct = ContentType.objects.get_for_model(model['model'])
                 count = 0
-                for item in model['model'].objects.filter(id=438).order_by('id'):
+                for item in model['model'].objects.order_by('id'):
                     if count >= 5:
                         break
                     for ff in model['file_field']:
