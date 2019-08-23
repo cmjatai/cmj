@@ -43,8 +43,8 @@ class ProcessOCR(object):
         if thread.is_alive():
             self.logger.info('Terminating process')
             self.process.terminate()
-            thread.join()
-            subprocess.run(['pkill', '-9 -f', "'ocrmypdf'"])
+            return None
+            # thread.join()
 
         self.logger.info(self.process.returncode)
         return self.process.returncode
@@ -101,7 +101,7 @@ class Command(BaseCommand):
             for model in self.models:
                 ct = ContentType.objects.get_for_model(model['model'])
                 count = 0
-                for item in model['model'].objects.order_by('id'):
+                for item in model['model'].objects.filter(id=438).order_by('id'):
                     if count >= 5:
                         break
                     for ff in model['file_field']:
@@ -146,6 +146,9 @@ class Command(BaseCommand):
                             o.sucesso = False
                             o.save()
                             result = self.run(item, ff)
+                            if result is None:
+                                return
+
                             o.sucesso = result
                             o.save()
                             now = datetime.now()
@@ -175,6 +178,9 @@ class Command(BaseCommand):
         try:
             p = ProcessOCR(' '.join(cmd), self.logger)
             r = p.run(timeout=300)
+
+            if r is None:
+                return None
 
             if not r or r == 6:  # 6 = resposta para pdf que já possui texto
                 return True

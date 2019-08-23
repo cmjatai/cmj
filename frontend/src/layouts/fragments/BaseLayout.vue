@@ -200,9 +200,10 @@ export default {
 @media screen and (max-width: 800px){
 
   $width-sideleft: 48px;
+  $width-sideright: 48px;
 
   .base-layout {
-    grid-template-columns: $width-sideleft $width-sideleft * 3 auto 0px;
+    grid-template-columns: $width-sideleft $width-sideleft * 3 auto $width-sideright;
 
     font-size: 0.9rem;
     header {
@@ -240,8 +241,10 @@ export default {
 @media screen and (max-width: 480px){
 
   $width-sideleft: 40px;
+  $width-sideright: 36px;
+
   .base-layout {
-    grid-template-columns: $width-sideleft 0 auto 0px;
+    grid-template-columns: $width-sideleft $width-sideleft * 3 auto $width-sideright;
 
     header {
       grid-template-columns: auto 1px $width-sideleft;

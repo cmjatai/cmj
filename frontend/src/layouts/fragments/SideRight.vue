@@ -8,7 +8,7 @@
             <li class="list-group-item" v-for="item in itensNormasDeDestaque" :key="`srmd${item.id}`">
               <button
                 type="button"
-                class="btn btn-primary"
+                class="btn btn-secondary"
                 data-toggle="modal"
                 data-target="#modal-norma"
                 @click="modal_norma=item">
@@ -54,16 +54,13 @@ export default {
     }
   },
   watch: {
-    'modal_norma': function (nv, ov) {
+    /* 'modal_norma': function (nv, ov) {
       const t = this
-      $.ajax({
-        url: `http://10.42.0.1:9000/sapl/ta/${nv.id}/text?embedded`,
-        type: 'GET',
-        success: function (res) {
-          var text = res
-          t.$set(nv, 'html', text)
-        }
-      })
+
+    } */
+    'itens.normajuridica_list': function (nv, ov) {
+      this.getText(nv)
+      console.log(nv)
     }
   },
   computed: {
@@ -75,10 +72,23 @@ export default {
   },
   mounted () {
     setTimeout(() => {
-      this.fetchModelListAction('norma', 'normajuridica', 'destaques', 1)
+      this.fetchModelListAction('norma', 'normajuridica', 'destaques', 1, this.getText)
     }, 1000)
   },
   methods: {
+    getText (nv) {
+      let t = this
+      if (nv.id !== undefined && nv.id > 0) {
+        $.ajax({
+          url: `/sapl/ta/${nv.id}/text?embedded`,
+          type: 'GET',
+          success: function (res) {
+            var text = res
+            t.$set(nv, 'html', text)
+          }
+        })
+      }
+    },
     toogleNormaDestaque (event) {
       this.menu_norma_destaque = !this.menu_norma_destaque
     },
@@ -105,7 +115,9 @@ export default {
       const t = this
       t.getObject(metadata)
         .then(obj => {
-          t.$set(t.itens[`${metadata.model}_list`], metadata.id, obj)
+          if (obj.norma_de_destaque) {
+            t.$set(t.itens[`${metadata.model}_list`], metadata.id, obj)
+          }
         })
     }
   }
@@ -115,6 +127,19 @@ export default {
 <style lang="scss">
 .modal-cmj {
   background-color: #000b;
+  .cp {
+     font-size: 1.2em;
+     line-height: 1.5em;
+     .cp-linha-vigencias,
+     .vigencia-active,
+     .dptt .dne,
+     .btns-action,
+     .btn-group,
+     .nota-alteracao,
+     .tipo-vigencias{
+       display: none !important;
+     }
+  }
 }
 .inner-sideright .menu {
   // display: none;
@@ -125,7 +150,7 @@ export default {
     text-decoration: none;
     width: 100%;
     border-radius: 0px;
-    text-align: center;
+    text-align: left;
   }
   ul {
     padding: 0;
@@ -154,4 +179,13 @@ export default {
     cursor: pointer;
   }
 }
+
+@media screen and (max-width: 800px){
+  .inner-sideright .menu {
+    img {
+      padding: 5px;
+    }
+  }
+}
+
 </style>
