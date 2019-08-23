@@ -143,6 +143,7 @@ class Command(BaseCommand):
                             o = OcrMyPDF()
                             o.content_object = item
                             o.field = ff
+                            o.sucesso = False
                             o.save()
                             result = self.run(item, ff)
                             o.sucesso = result
