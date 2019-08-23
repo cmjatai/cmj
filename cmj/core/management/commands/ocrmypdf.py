@@ -44,6 +44,8 @@ class ProcessOCR(object):
             self.logger.info('Terminating process')
             self.process.terminate()
             thread.join()
+            subprocess.run(['pkill', '-9 -f', "'ocrmypdf'"])
+
         self.logger.info(self.process.returncode)
         return self.process.returncode
 
@@ -136,6 +138,8 @@ class Command(BaseCommand):
                             self.logger.info(
                                 str(item.id) + ' ' + str(model['model']))
                             model['count'] += 1
+                            print(item.id, model['model'])
+                            count += 1
                             o = OcrMyPDF()
                             o.content_object = item
                             o.field = ff
@@ -171,7 +175,7 @@ class Command(BaseCommand):
             p = ProcessOCR(' '.join(cmd), self.logger)
             r = p.run(timeout=300)
 
-            if not r:
+            if not r or r == 6:  # 6 = resposta para pdf que já possui texto
                 return True
         except:
             return False
