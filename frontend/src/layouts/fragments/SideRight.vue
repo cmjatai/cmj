@@ -29,6 +29,7 @@
             </button>
           </div>
           <div class="modal-body" v-html="modal_norma.html">
+            Carregando...
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
@@ -40,6 +41,8 @@
 </template>
 
 <script>
+
+import '@/__apps/compilacao/main'
 export default {
   name: 'side-right',
   data () {
@@ -64,7 +67,7 @@ export default {
         _.mapKeys(nv, function (value, key) {
           t.getText(value)
         })
-      }, 5000)
+      }, 10000)
     }
   },
   computed: {
