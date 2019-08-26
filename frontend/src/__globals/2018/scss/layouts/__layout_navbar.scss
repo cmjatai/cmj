@@ -353,7 +353,7 @@
         a {
           line-height: 2.2em;
           font-size: 1.1em;
-          padding: 0 2px;
+          padding: 0 4px;
         }
       }
     }
@@ -460,9 +460,9 @@
         content: " ";
         background: transparent;
         position: absolute;
-        top: -50px;
-        bottom: -50px;
-        left: -70px;
+        top: -20px;
+        bottom: -70px;
+        left: -20px;
         right: -70px;
         z-index: -1;
       }
@@ -472,7 +472,7 @@
         & > ul {
           &::before {
             top: -5px;
-            bottom: -10px;
+            //bottom: -10px;
           }
         }
       }

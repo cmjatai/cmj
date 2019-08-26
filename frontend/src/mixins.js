@@ -94,13 +94,13 @@ Vue.mixin({
       }
     },
 
-    fetchModelListAction (app = null, model = null, action = null, page = 1) {
+    fetchModelListAction (app = null, model = null, action = null, page = 1, func = null) {
       if (page === null || model === null || action === null) {
         return
       }
 
       const t = this
-      t.utils.getModelListAction(app, model, action, page)
+      return t.utils.getModelListAction(app, model, action, page)
         .then((response) => {
           t.init = true
           _.each(response.data.results, (value, idx) => {
@@ -109,6 +109,9 @@ Vue.mixin({
               t.itens[`${model}_list`][value.id] = value
             } else {
               t.$set(t.itens[`${model}_list`], value.id, value)
+            }
+            if (func !== null) {
+              func(value)
             }
           })
           t.$nextTick()

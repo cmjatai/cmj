@@ -137,7 +137,7 @@ a:link:after, a:visited:after {
   text-align: center;
 }
 .cp-notify {
-  z-index: 9999;
+  z-index: 10000;
   position:fixed;
   top: 2em;
   left: 50%;
@@ -636,6 +636,17 @@ a:link:after, a:visited:after {
   .tipo-vigencias {
     margin-bottom: -6px;
     opacity: 0.8;
+
+    list-style: none;
+    position: fixed;
+    bottom: 0px;
+    left: 50%;
+    transform: translate(-50%, 0);
+    margin: 0;
+    padding: 0;
+    z-index: 1000;
+
+    transition: all 0.3s ease-in-out;
     div {
       a {
         color: white;

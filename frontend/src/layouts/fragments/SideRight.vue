@@ -6,9 +6,14 @@
           <b-img @click="toogleNormaDestaque" src="@/assets/img/icon_normas_juridicas_destaque.png" fluid rounded="0" />
           <ul class="list-group">
             <li class="list-group-item" v-for="item in itensNormasDeDestaque" :key="`srmd${item.id}`">
-              <a :href="`/sapl/ta/${item.id}/text`" target="_blank">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-toggle="modal"
+                data-target="#modal-norma"
+                @click="modal_norma=item">
                   {{item.apelido}}
-              </a>
+              </button>
             </li>
           </ul>
         </li>
@@ -24,6 +29,7 @@
             </button>
           </div>
           <div class="modal-body" v-html="modal_norma.html">
+            Carregando...
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
@@ -35,6 +41,8 @@
 </template>
 
 <script>
+
+import '@/__apps/compilacao/main'
 export default {
   name: 'side-right',
   data () {
@@ -49,16 +57,17 @@ export default {
     }
   },
   watch: {
-    'modal_norma': function (nv, ov) {
+    /* 'modal_norma': function (nv, ov) {
       const t = this
-      $.ajax({
-        url: `http://10.42.0.1:9000/sapl/ta/${nv.id}/text?embedded`,
-        type: 'GET',
-        success: function (res) {
-          var text = res
-          t.$set(nv, 'html', text)
-        }
-      })
+
+    } */
+    'itens.normajuridica_list': function (nv, ov) {
+      let t = this
+      setTimeout(() => {
+        _.mapKeys(nv, function (value, key) {
+          t.getText(value)
+        })
+      }, 10000)
     }
   },
   computed: {
@@ -70,10 +79,23 @@ export default {
   },
   mounted () {
     setTimeout(() => {
-      this.fetchModelListAction('norma', 'normajuridica', 'destaques', 1)
-    }, 1000)
+      this.fetchModelListAction('norma', 'normajuridica', 'destaques', 1, null)
+    }, 2000)
   },
   methods: {
+    getText (nv) {
+      let t = this
+      if (nv.id !== undefined && nv.id > 0) {
+        $.ajax({
+          url: `/sapl/ta/${nv.id}/text?embedded`,
+          type: 'GET',
+          success: function (res) {
+            var text = res
+            t.$set(nv, 'html', text)
+          }
+        })
+      }
+    },
     toogleNormaDestaque (event) {
       this.menu_norma_destaque = !this.menu_norma_destaque
     },
@@ -100,7 +122,10 @@ export default {
       const t = this
       t.getObject(metadata)
         .then(obj => {
-          t.$set(t.itens[`${metadata.model}_list`], metadata.id, obj)
+          if (obj.norma_de_destaque) {
+            t.$set(t.itens[`${metadata.model}_list`], metadata.id, obj)
+            // t.getText(obj)
+          }
         })
     }
   }
@@ -110,17 +135,30 @@ export default {
 <style lang="scss">
 .modal-cmj {
   background-color: #000b;
+  .cp {
+     font-size: 1.2em;
+     line-height: 1.5em;
+     .cp-linha-vigencias,
+     .vigencia-active,
+     .dptt .dne,
+     .btns-action,
+     .btn-group,
+     .nota-alteracao,
+     .tipo-vigencias{
+       display: none !important;
+     }
+  }
 }
 .inner-sideright .menu {
   // display: none;
-  a {
+  button {
     padding: 0.5rem 1rem;
     white-space: nowrap;
     display: block;
     text-decoration: none;
     width: 100%;
     border-radius: 0px;
-    text-align: center;
+    text-align: left;
   }
   ul {
     padding: 0;
@@ -149,4 +187,13 @@ export default {
     cursor: pointer;
   }
 }
+
+@media screen and (max-width: 800px){
+  .inner-sideright .menu {
+    img {
+      padding: 5px;
+    }
+  }
+}
+
 </style>
