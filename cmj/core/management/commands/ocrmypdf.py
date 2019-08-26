@@ -102,7 +102,7 @@ class Command(BaseCommand):
                 ct = ContentType.objects.get_for_model(model['model'])
                 count = 0
                 for item in model['model'].objects.order_by('id'):
-                    if count >= 5:
+                    if count >= 10:
                         break
                     for ff in model['file_field']:
                         ocr = OcrMyPDF.objects.filter(

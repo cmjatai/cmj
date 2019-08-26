@@ -145,20 +145,22 @@
                   </li>
                 {% endif %}
               </ul>
+              {% comment "DEPRECATED: retirar Pesquisa Google" %}
                 <div class="google-search">
-                <div class="search">
-                  <strong>
-                    Busca Google no Portal CMJ
-                  </strong>
-                  <div class="gcse-searchbox"></div>
-                  <small>
-                    Utilize a busca do Google para pesquisar em nosso conteúdo.
-                  </small>
+                  <div class="search">
+                    <strong>
+                      Busca Google no Portal CMJ
+                    </strong>
+                    <div class="gcse-searchbox"></div>
+                    <small>
+                      Utilize a busca do Google para pesquisar em nosso conteúdo.
+                    </small>
+                  </div>
+                  <div class="result">
+                    <div class="gcse-searchresults"></div>
+                  </div>
                 </div>
-                <div class="result">
-                  <div class="gcse-searchresults"></div>
-                </div>
-              </div>
+              {% endcomment %}
             </div>
           </div>
       </nav>
@@ -452,10 +454,7 @@
           js.src = "https://connect.facebook.net/pt_BR/sdk.js";
           fjs.parentNode.insertBefore(js, fjs);
         }(document, 'script', 'facebook-jssdk'));
-
-
-
-  </script>
+    </script>
 
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-2431536-7"></script>
@@ -465,19 +464,22 @@
       gtag('js', new Date());
       gtag('config', 'UA-2431536-7');
     </script>
-
   {% endif %}
-  <script>
-    (function () {
-      var cx = '015586130466685663092:bbp57zhgqek';
-      var gcse = document.createElement('script');
-      gcse.type = 'text/javascript';
-      gcse.async = true;
-      gcse.src = 'https://cse.google.com/cse.js?cx=' + cx;
-      var s = document.getElementsByTagName('script')[0];
-      s.parentNode.insertBefore(gcse, s);
-    })();
-  </script>
+
+  {% comment "DEPRECATED: Retirar Pesquisa Google" %}
+    <script>
+      (function () {
+        var cx = '015586130466685663092:bbp57zhgqek';
+        var gcse = document.createElement('script');
+        gcse.type = 'text/javascript';
+        gcse.async = true;
+        gcse.src = 'https://cse.google.com/cse.js?cx=' + cx;
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(gcse, s);
+      })();
+    </script>
+  {% endcomment %}
+
   </body>
 </html>
 
