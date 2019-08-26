@@ -32,7 +32,7 @@ class TextExtractField(SaplTextExtractField):
 
 class SessaoPlenariaIndex(CelerySearchIndex, Indexable):
     model = SessaoPlenaria
-    data = DateTimeField(model_attr='data_inicio', null=True)
+    data = DateTimeField(model_attr='data', null=True)
     text = TextExtractField(
         document=True, use_template=True,
         model_attr=(
