@@ -19,6 +19,7 @@ from sapl.base.models import AppConfig
 from sapl.materia.models import DocumentoAcessorio, MateriaLegislativa
 from sapl.norma.models import NormaJuridica
 from sapl.parlamentares.models import Filiacao
+from sapl.sessao.models import SessaoPlenaria
 
 
 register = template.Library()
@@ -293,5 +294,7 @@ def search_get_model(object):
         return 'o'
     elif type(object) == Documento:
         return 'sd'
+    elif type(object) == SessaoPlenaria:
+        return 'sp'
 
     return None

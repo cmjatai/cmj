@@ -92,6 +92,12 @@
                   <strong>Texto Articulado:</strong> <a href="{% url 'sapl.norma:norma_ta' result.object.pk %}"> Clique aqui </a>
                 {% endif %}
               </p>
+            {% elif result.object|search_get_model == 'sp' %}
+              <p>
+                <strong>Sessão Planária: </strong><a href="{% url 'sapl.sessao:sessaoplenaria_detail' result.object.pk %}">{{ result.object }}</a></br>
+                Data: {{result.object.data_inicio}}
+
+              </p>
             {% endif %}
           </td>
         </tr>
