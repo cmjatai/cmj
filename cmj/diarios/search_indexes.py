@@ -1,11 +1,14 @@
 from celery_haystack.indexes import CelerySearchIndex
 from haystack.constants import Indexable
+from haystack.fields import DateTimeField
+
 from cmj.diarios.models import DiarioOficial
 from sapl.base.search_indexes import TextExtractField
 
 
 class DiarioOficialIndex(CelerySearchIndex, Indexable):
     model = DiarioOficial
+    data = DateTimeField(model_attr='data', null=True)
     text = TextExtractField(
         document=True, use_template=True,
         model_attr=(
