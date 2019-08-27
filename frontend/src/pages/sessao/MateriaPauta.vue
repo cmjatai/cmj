@@ -118,9 +118,15 @@ export default {
         })
 
         if (t.materia.texto_original !== null) {
+          let url = t.materia.texto_original
           t.baixando = true
+
+          if (url.includes('www2')) {
+            url = url.replace('https', 'http')
+          }
+
           axios({
-            url: t.materia.texto_original,
+            url: url,
             method: 'GET',
             responseType: 'blob' // important
           }).then(response => {
