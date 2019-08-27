@@ -7,6 +7,15 @@ from haystack.views import SearchView
 
 class CmjSearchForm(ModelSearchForm):
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        choices = self.fields['models'].choices
+        for i, v in enumerate(choices):
+            if v[0] == 'sigad.documento':
+                choices[i] = (v[0], _('Notícias'))
+        self.fields['models'].choices = sorted(choices, key=lambda x: x[1])
+
     def search(self):
         sqs = super().search()
         return sqs.order_by('-data')
