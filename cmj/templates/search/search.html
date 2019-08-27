@@ -1,34 +1,28 @@
 {% extends 'crud/form.html' %}
 {% load crispy_forms_tags %}
 {% load common_cmj_tags %}
+
 {% block base_content %}
+<div class="container-search">
+
+
+
   <form method="get" action=".">
-    <div class="row">
-      <div class="col-md-12">
-        {{ form.q|as_crispy_field }}
-      </div>
-    </div>
 
     <div class="row">
-      <div class="col-md-8">
-        <h3> Em quais tipos de documento deseja pesquisar?</h3>
-        <br/>
+      {% crispy form %}
+    </div>
+    <div class="row">
+      <div class="col-md-5 ">
         <div class="checkbox" id="check_all">
+          <input type="checkbox" id="id_check_all" onchange="checkAll(this)" />
           <label for="id_check_all">
-            <input type="checkbox" id="id_check_all" onchange="checkAll(this)" /> Marcar/Desmarcar Todos
+            Marcar/Desmarcar Todos
           </label>
         </div>
-        <br/>
-        {{ form.models }}
       </div>
     </div>
 
-    <div  class="row">
-      <div class="col-md-12">
-        <input class="btn btn-primary float-right" type="submit" value="Pesquisar">
-      </div>
-    </div>
-    </br>
     {% if query %}
       <table class="table table-striped table-bordered">
         <thead class="thead-default">
@@ -44,6 +38,7 @@
           <td>
             {% if result.object|search_get_model == 'm' %}
               <p>
+                <i class="far fa-2x fa-file-pdf"></i>
                 <strong>Matéria Legislativa: </strong> <a href="{% url 'sapl.materia:materialegislativa_detail' result.object.pk %}">{{ result.object }}</a>
                 <br>{{result.object.ementa}}
 
@@ -132,6 +127,7 @@
     {% endif %}
 
   </form>
+</div>
 {% endblock %}
 
 {% block extra_js %}

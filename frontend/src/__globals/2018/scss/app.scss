@@ -279,6 +279,11 @@ h6 {
   }
 }
 
+.hidden {
+  display: none;
+}
+
+
 @import 'apps/app';
 @import '_social_links';
 @import 'layouts/layout';
