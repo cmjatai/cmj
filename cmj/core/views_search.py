@@ -8,10 +8,12 @@ from haystack.forms import ModelSearchForm
 from haystack.views import SearchView
 
 from cmj.crispy_layout_mixin import to_row
-from sapl.crispy_layout_mixin import SaplFormLayout
 
 
 class CmjSearchForm(ModelSearchForm):
+
+    def no_query_found(self):
+        return self.searchqueryset.all()
 
     def __init__(self, *args, **kwargs):
 
@@ -19,18 +21,18 @@ class CmjSearchForm(ModelSearchForm):
             FieldWithButtons(
                 Field('q',
                       placeholder=_('Busca Textual'),
-                      autocomplete='off',
                       type='search',),
                 StrictButton(
-                    _('Pesquisar'), css_class='btn-outline-primary',
+                    _('<i class="fas fa-2x fa-search"></i>'), css_class='btn-outline-primary',
                     type='submit')
             )
         )
 
-        row = to_row([(q_field, 8), (Div(Field('models')), 5)])
+        row = to_row([(Div(), 2), (q_field, 8), (Div(Field('models')), 12)])
 
         self.helper = FormHelper()
         self.helper.form_tag = False
+        self.helper.disable_csrf = True
         self.helper.layout = Layout(*row)
 
         super().__init__(*args, **kwargs)
@@ -40,7 +42,8 @@ class CmjSearchForm(ModelSearchForm):
             if v[0] == 'sigad.documento':
                 choices[i] = (v[0], _('Notícias'))
         self.fields['models'].choices = sorted(choices, key=lambda x: x[1])
-        self.fields['models'].label = _('Buscar em conteúdos específicos')
+        self.fields['models'].label = _('Buscar em conteúdos específicos:')
+        self.fields['q'].label = ''
 
     def search(self):
         sqs = super().search()

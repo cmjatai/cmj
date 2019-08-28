@@ -2,6 +2,19 @@
   ul {
     list-style: none;
   }
+  input {
+    font-size: 2em;
+    line-height: 1em;
+  }
+  label {
+    font-size: 1.3em;
+    line-height: 1.5em;
+  }
+  button {
+    padding-left: 2em;
+    padding-right: 2em;
+    color: rgba(0, 101, 86, 0.7);
+  }
 }
 
 
