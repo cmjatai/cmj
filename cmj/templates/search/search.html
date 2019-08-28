@@ -40,12 +40,13 @@
         {% for result in page.object_list %}
           <tr>
             <td>
+
               {% if result.object|search_get_model == 'm' %}
+
                 <p>
-                  <i class="far fa-2x fa-file-pdf"></i>
                   <strong>Matéria Legislativa: </strong> <a href="{% url 'sapl.materia:materialegislativa_detail' result.object.pk %}">{{ result.object }}</a>
                   <br>{{result.object.ementa}}
-
+                  <br><strong>Data de Apresentação:</strong> {{result.object.data_apresentacao}}
                   {% if result.object.texto_original %}
                     <br><strong>Texto Original:</strong> <a href="{{result.object.texto_original.url}}"> Clique aqui </a>
                   {% endif %}
@@ -57,8 +58,8 @@
               {% elif result.object|search_get_model == 'd' %}
                 <p>
                   <strong>Documento Acessório: </strong><a href="{% url 'sapl.materia:documentoacessorio_detail' result.object.pk %}">{{ result.object }}</a>
-                  <br><strong>Data:</strong> {{result.object.data}}
                   <br>{{result.object.ementa}}
+                  <br><strong>Data:</strong> {{result.object.data}}
                   {% if result.object.arquivo %}
                     <br><strong>Texto Original:</strong> <a href="{{result.object.arquivo.url}}"> Clique aqui </a>
                   {% endif %}
@@ -68,7 +69,9 @@
                 <p>
                   <strong>Diário Oficial: </strong><a href="{% url 'cmj.diarios:diariooficial_detail' result.object.pk %}">{{ result.object }}</a>
                   <br>Data: {{result.object.data}}
-                  <br>{{result.object.descricao}}
+                  {% comment "" %}
+                    <br>{{result.object.descricao}}
+                  {% endcomment %}
                   {% if result.object.arquivo %}
                     <br><strong>Arquivo:</strong> <a href="{{result.object.arquivo.url}}"> Clique aqui </a>
                   {% endif %}
