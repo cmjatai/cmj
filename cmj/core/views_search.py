@@ -13,7 +13,7 @@ from cmj.crispy_layout_mixin import to_row
 class CmjSearchForm(ModelSearchForm):
 
     def no_query_found(self):
-        return self.searchqueryset.all()
+        return self.searchqueryset.all().order_by('-data')
 
     def __init__(self, *args, **kwargs):
 

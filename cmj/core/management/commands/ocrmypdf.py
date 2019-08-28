@@ -169,7 +169,7 @@ class Command(BaseCommand):
                             if now - init > timedelta(minutes=9):
                                 return
                             self.logger.info('Aguardando...')
-                            sleep(5)
+                            sleep(10)
                             self.logger.info('Seguindo...')
 
             self.models = list(filter(lambda x: x['count'] != 0, self.models))
