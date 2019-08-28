@@ -28,7 +28,8 @@ class DocumentoViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         # FIXME - o método list não deve devolver apenas documentos do tipo
         # banco de imagens. Implementar filtros por tipo
-        self.queryset = Documento.objects.qs_bi(user=request.user)
+        self.queryset = Documento.objects.qs_bi(
+            user=request.user).order_by('-created')
 
         # DocumentoSerializer é extremamente sobrecarregado, principalmente
         # na devolução de grandes objetos como banco de imagens. Desta forma,
