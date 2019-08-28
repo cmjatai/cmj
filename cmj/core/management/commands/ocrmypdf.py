@@ -56,27 +56,32 @@ class Command(BaseCommand):
         {
             'model': MateriaLegislativa,
             'file_field': ('texto_original',),
-            'count': 0
+            'count': 0,
+            'order_by': '-data_apresentacao'
         },
         {
             'model': NormaJuridica,
             'file_field': ('texto_integral',),
-            'count': 0
+            'count': 0,
+            'order_by': '-data'
         },
         {
             'model': DocumentoAcessorio,
             'file_field': ('arquivo',),
-            'count': 0
+            'count': 0,
+            'order_by': '-data'
         },
         {
             'model': DiarioOficial,
             'file_field': ('arquivo', ),
-            'count': 0
+            'count': 0,
+            'order_by': '-data'
         },
         {
             'model': SessaoPlenaria,
             'file_field': ('upload_pauta', 'upload_ata', 'upload_anexo'),
-            'count': 0
+            'count': 0,
+            'order_by': '-data_inicio'
         },
     ]
 
@@ -101,7 +106,7 @@ class Command(BaseCommand):
             for model in self.models:
                 ct = ContentType.objects.get_for_model(model['model'])
                 count = 0
-                for item in model['model'].objects.order_by('id'):
+                for item in model['model'].objects.order_by(model['order_by']):
                     if count >= 10:
                         break
                     for ff in model['file_field']:
