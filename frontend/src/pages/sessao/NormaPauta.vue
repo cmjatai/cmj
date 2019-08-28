@@ -1,5 +1,5 @@
 <template>
-  <div :class="['materia-pauta']">
+  <div :class="['norma-pauta']">
     <div class="epigrafe">{{tipo_string}} n&#186; {{materia.numero}}/{{materia.ano}}</div>
 
     <div :class="['item-header', tipo_string ? '': 'd-none']">
@@ -32,11 +32,11 @@
 import axios from 'axios'
 export default {
   name: 'norma-pauta',
-  props: ['id' ],
+  props: ['idd'],
   data () {
     return {
       app: ['norma'],
-      model: ['normajuridica' ]
+      model: ['normajuridica']
     }
   },
   watch: {
@@ -45,6 +45,7 @@ export default {
       t.refresh()
     }
   },
+
   computed: {
     data_apresentacao () {
       try {

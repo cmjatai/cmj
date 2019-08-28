@@ -20,7 +20,7 @@
             </div>
           <div class="inner">
             <div v-for="legis in itensLegislacaoCitada" :key="`legiscit${legis.id}`">
-              <norma-pauta :id="legis.id"></norma-pauta>
+              {{legis.__str__}}
             </div>
           </div>
         </div>
