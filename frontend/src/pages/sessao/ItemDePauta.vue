@@ -7,9 +7,23 @@
 
     <materia-pauta :materia="materia" :type="type"></materia-pauta>
 
+    <div :class="['item-body']">
+    </div>
+
     <div :class="['item-body', materia.id !== undefined && materia.anexadas.length > 0 ? 'col-anexadas':'']">
       <div class="col-1-body">
-
+        <div :class="['sub-containers', itensLegislacaoCitada.length === 0 ? 'displaynone':'']">
+          <div class="title">
+            <span>
+              Legislação Citada
+            </span>
+            </div>
+          <div class="inner">
+            <div v-for="legis in itensLegislacaoCitada" :key="`legiscit${legis.id}`">
+              <norma-pauta :id="legis.id"></norma-pauta>
+            </div>
+          </div>
+        </div>
         <div :class="['ultima_tramitacao', nivel(NIVEL2, tramitacao.ultima !== {})]">
           <strong>Situação:</strong> {{tramitacao.status.descricao}}<br>
           <strong>Ultima Ação:</strong> {{tramitacao.ultima.texto}}
@@ -17,7 +31,7 @@
         <div :class="['observacao', nivel(NIVEL3, observacao.length > 0)]" v-html="observacao"></div>
       </div>
       <div class="col-2-body">
-        <div :class="['container-anexadas', nivel(NIVEL2, itensAnexados.length > 0)]">
+        <div :class="['sub-containers', nivel(NIVEL2, itensAnexados.length > 0)]">
           <div class="title">
             <span>
               MATÉRIAS ANEXADAS
@@ -25,9 +39,7 @@
             </div>
           <div class="inner">
             <div v-for="anexada in itensAnexados" :key="`${type}${anexada.id}`">
-
               <materia-pauta :materia="anexada" :type="type"></materia-pauta>
-
             </div>
           </div>
         </div>
@@ -38,11 +50,13 @@
 </template>
 <script>
 import MateriaPauta from './MateriaPauta'
+import NormaPauta from './NormaPauta'
 export default {
   name: 'item-de-pauta',
   props: ['item', 'type'],
   components: {
-    MateriaPauta
+    MateriaPauta,
+    NormaPauta
   },
   data () {
     return {
@@ -77,6 +91,11 @@ export default {
     itensAnexados: {
       get () {
         return _.orderBy(this.anexadas, 'data_apresentacao')
+      }
+    },
+    itensLegislacaoCitada: {
+      get () {
+        return _.orderBy(this.legislacaocitada, 'norma')
       }
     }
   },
@@ -245,7 +264,7 @@ export default {
       content: 'Grande Expediente';
     }
   }
-  .container-anexadas {
+  .sub-containers {
     font-size: 85%;
     margin: 1em;
 
@@ -271,6 +290,10 @@ export default {
         padding-top: 5px;
       }
     }
+  }
+  .container-legis-citada {
+      border-top: 1px solid #5696ca;
+
   }
 
   .item-body {
