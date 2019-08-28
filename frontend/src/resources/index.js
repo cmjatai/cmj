@@ -14,8 +14,8 @@ export default {
       url: `${basePath}/${app}/${model}/?o=${ordering}&page=${page}${query_string}`,
       method: 'GET'
     }),
-    getModelList: (app, model, page = 1) => axios({
-      url: `${basePath}/${app}/${model}/?page=${page}`,
+    getModelList: (app, model, page = 1, query_string = '') => axios({
+      url: `${basePath}/${app}/${model}/?page=${page}${query_string}`,
       method: 'GET'
     }),
     getModel: (app, model, id) => axios({

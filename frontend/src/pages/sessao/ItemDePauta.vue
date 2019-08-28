@@ -46,14 +46,15 @@ export default {
   },
   data () {
     return {
-      app: ['materia'],
-      model: ['materialegislativa', 'tramitacao', 'anexada', 'autoria'],
+      app: ['materia', 'norma'],
+      model: ['materialegislativa', 'tramitacao', 'anexada', 'autoria', 'legislacaocitada'],
       materia: {},
       tramitacao: {
         ultima: {},
         status: {}
       },
-      anexadas: {}
+      anexadas: {},
+      legislacaocitada: {}
     }
   },
   computed: {
@@ -100,6 +101,9 @@ export default {
         .then(() => {
           t.fetchUltimaTramitacao()
         })
+        .then(() => {
+          t.fetchLegislacaoCitada()
+        })
     },
     fetch (metadata) {
       const t = this
@@ -135,7 +139,30 @@ export default {
           })
       } else if (metadata.app === 'materia' && metadata.model === 'tramitacao') {
         t.fetchUltimaTramitacao(metadata)
+      } else if (metadata.app === 'norma' && metadata.model === 'legislacaocitada') {
+        t.fetchLegislacaoCitada()
       }
+    },
+    fetchLegislacaoCitada (page = 1) {
+      const t = this
+      const query_string = `&materia=${t.item.materia}`
+      t.utils
+        .getModelList('norma', 'legislacaocitada', page, query_string)
+        .then((response) => {
+          _.each(response.data.results, value => {
+            t.$set(t.legislacaocitada, value.id, value)
+          })
+          if (response.data.pagination.next_page !== null) {
+            t.$nextTick()
+              .then(function () {
+                t.fetchLegislacaoCitada(response.data.pagination.next_page)
+              })
+          }
+        })
+        .catch((response) => {
+          t.sendMessage(
+            { alert: 'danger', message: 'Não foi possível recuperar a lista de Legislação Citada.', time: 5 })
+        })
     },
     fetchMateria (metadata) {
       const t = this
@@ -166,6 +193,10 @@ export default {
         })
         .then((response) => {
           t.tramitacao.ultima = response.data
+          if (t.tramitacao.ultima.id === undefined) {
+            return
+          }
+
           t.getObject({
             action: '',
             app: 'materia',
