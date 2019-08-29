@@ -191,7 +191,7 @@
                   {% else %}
                     {% navbar 'navbar_cmj.yaml' %}
                   {% endif %}
-                  {% if user.is_superuser %}
+                  {% if user.is_superuser or perms.sessao %}
                   
                     <li class="dropdown">
                       <a href="#linkMenu" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
