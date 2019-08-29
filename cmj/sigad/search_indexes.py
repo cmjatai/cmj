@@ -39,7 +39,8 @@ class DocumentoIndex(CelerySearchIndex, Indexable):
         return self.model
 
     def index_queryset(self, using=None):
-        return self.get_model().objects.public_all_docs()
+        qs = self.get_model().objects.public_all_docs()
+        return qs
 
     def get_updated_field(self):
         return 'modified'

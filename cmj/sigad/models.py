@@ -1,3 +1,4 @@
+from datetime import datetime
 import io
 import os
 import zipfile
@@ -695,11 +696,14 @@ class DocumentoManager(models.Manager):
 
     filters_created = False
 
+    @property
+    def q_doc_public(self):
+        return (Q(public_end_date__gte=datetime.now()) |
+                Q(public_end_date__isnull=True) &
+                Q(public_date__lte=datetime.now(),
+                  visibilidade=Documento.STATUS_PUBLIC))
+
     def q_filters(self):
-        self.q_doc_public = (Q(public_end_date__gte=timezone.now()) |
-                             Q(public_end_date__isnull=True) &
-                             Q(public_date__lte=timezone.now(),
-                               visibilidade=Documento.STATUS_PUBLIC))
         if self.filters_created:
             return
         self.filters_created = True
