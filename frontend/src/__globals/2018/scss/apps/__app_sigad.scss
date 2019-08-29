@@ -796,6 +796,25 @@
 }
 
 @media screen and (max-width:767px) {
+
+  .container-path-parlamentar {
+    .container-list {
+      grid-template-columns: 100%;
+    }
+    .path-item-list:first-child {
+      grid-area: 1;
+
+      .titulo {
+        font-size: 120%;
+      }
+
+      .descricao {
+        font-size: 120%;
+      }
+
+    }
+  }
+
   .container-path {
 
     font-size: 1.3em;
@@ -822,6 +841,27 @@
 }
 
 @media screen and (max-width: 575px) {
+  .container-avatar {
+    .avatar1 {
+      width: 150px;
+    }
+
+    .avatar2 {
+      width: 110px;
+    }
+
+    .avatar3 {
+      width: 90px;
+    }
+
+    .avatar4 {
+      width: 70px;
+    }
+
+    .avatar5 {
+      width: 55px;
+    }
+  }
   .container-path {
     .pagination {
       a {
@@ -833,7 +873,7 @@
 
 @media screen and (max-width: 480px) {
   .path-item-list {
-    font-size: 1rem;
+    //font-size: 1rem;
 
     .titulo {
       font-size: 1.2rem;
@@ -845,4 +885,39 @@
 
   }
 
+}
+
+@media screen and (max-width: 425px) {
+
+  .container-path {
+
+  }
+  .path-parlamentares {
+    margin-top: 10px;
+  }
+
+  .container-avatar {
+    .avatar {
+      margin-left: 5px;
+    }
+    .avatar1 {
+      width: 100px;
+    }
+
+    .avatar2 {
+      width: 90px;
+    }
+
+    .avatar3 {
+      width: 55px;
+    }
+
+    .avatar4 {
+      width: 55px;
+    }
+
+    .avatar5 {
+      width: 40px;
+    }
+  }
 }
