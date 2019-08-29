@@ -121,10 +121,6 @@ export default {
           let url = t.materia.texto_original
           t.baixando = true
 
-          if (url !== undefined && url.includes('www2')) {
-            url = url.replace('https', 'http')
-          }
-
           axios({
             url: url,
             method: 'GET',
