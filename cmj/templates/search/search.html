@@ -79,7 +79,7 @@
 
               {% elif result.object|search_get_model == 'sd' %}
                 <p>
-                  <strong>Documentos e Notícias: </strong><a href="/{{result.object.absolute_slug}}">{{ result.object }}</a>
+                  <strong>Notícia: </strong><a href="/{{result.object.absolute_slug}}">{{ result.object }}</a>
                   <br>{{result.object.descricao}}
                   <br><small>Publicado em {{result.object.public_date}}</small>
                 </p>
@@ -116,19 +116,9 @@
           {% endfor %}
         </table>
       </div>
-
-      {% if page.has_previous or page.has_next %}
-        <div>
-          {% if page.has_previous %}
-            <a href="?q={{ query }}&amp;page={{ page.previous_page_number }}{{ models }}">
-          {% endif %}&laquo; Anterior{% if page.has_previous %}</a>{% endif %}
-          |
-          {% if page.has_next %}
-            <a href="?q={{ query }}&amp;page={{ page.next_page_number }}{{ models }}">
-          {% endif %}Próxima &raquo;{% if page.has_next %}</a>{% endif %}
-        </div>
+      {% if page.object_list  %}
+        {% include "paginacao.html" %}
       {% endif %}
-
 
   </form>
 </div>

@@ -8,6 +8,7 @@ from haystack.forms import ModelSearchForm
 from haystack.views import SearchView
 
 from cmj.crispy_layout_mixin import to_row
+from cmj.utils import make_pagination
 
 
 class CmjSearchForm(ModelSearchForm):
@@ -71,6 +72,19 @@ class CmjSearchView(SearchView):
             models = []
 
         context['models'] = ''
+        context['is_paginated'] = True
+
+        page_obj = context['page']
+        context['page_obj'] = page_obj
+        paginator = context['paginator']
+        context['page_range'] = make_pagination(
+            page_obj.number, paginator.num_pages)
+
+        qr = self.request.GET.copy()
+        if 'page' in qr:
+            del qr['page']
+        context['filter_url'] = (
+            '&' + qr.urlencode()) if len(qr) > 0 else ''
 
         for m in models:
             context['models'] = context['models'] + '&models=' + m
