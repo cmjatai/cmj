@@ -84,3 +84,27 @@
     }
   }
 }
+@media screen and (max-width: 480px) {
+  .container-search {
+    font-size: 0.8em;
+    label{
+      font-size: 1.3em;
+    }
+    input{
+      font-size: 1.5em;
+    }
+  }
+}
+
+@media screen and (max-width: 359px) {
+  .container-search {
+
+    button {
+      padding-left: 1em;
+      padding-right: 1em;
+      .fa-2x {
+        font-size: 100%;
+      }
+    }
+  }
+}
