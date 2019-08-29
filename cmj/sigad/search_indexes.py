@@ -43,3 +43,6 @@ class DocumentoIndex(CelerySearchIndex, Indexable):
 
     def get_updated_field(self):
         return 'modified'
+
+    def should_update(self, instance):
+        return instance.raiz is None
