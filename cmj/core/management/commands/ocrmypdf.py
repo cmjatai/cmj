@@ -15,6 +15,8 @@ from cmj.core.models import OcrMyPDF
 from cmj.diarios.models import DiarioOficial
 from sapl.materia.models import MateriaLegislativa, DocumentoAcessorio
 from sapl.norma.models import NormaJuridica
+from sapl.protocoloadm.models import DocumentoAdministrativo,\
+    DocumentoAcessorioAdministrativo
 from sapl.sessao.models import SessaoPlenaria
 
 
@@ -83,6 +85,18 @@ class Command(BaseCommand):
             'count': 0,
             'order_by': '-data_inicio'
         },
+        {
+            'model': DocumentoAdministrativo,
+            'file_field': ('texto_integral', ),
+            'count': 0,
+            'order_by': '-data'
+        },
+        {
+            'model': DocumentoAcessorioAdministrativo,
+            'file_field': ('arquivo', ),
+            'count': 0,
+            'order_by': '-data'
+        },
     ]
 
     def handle(self, *args, **options):
@@ -107,7 +121,7 @@ class Command(BaseCommand):
                 ct = ContentType.objects.get_for_model(model['model'])
                 count = 0
                 for item in model['model'].objects.order_by(model['order_by']):
-                    if count >= 10:
+                    if count >= 3:
                         break
                     for ff in model['file_field']:
                         ocr = OcrMyPDF.objects.filter(
