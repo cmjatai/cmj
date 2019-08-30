@@ -12,16 +12,21 @@
 
     <div :class="['item-body', materia.id !== undefined && materia.anexadas.length > 0 ? 'col-anexadas':'']">
       <div class="col-1-body">
-        <div :class="['sub-containers', itensLegislacaoCitada.length === 0 ? 'displaynone':'']">
+        <div :class="['sub-containers', itensLegislacaoCitada.length === 0 ? 'd-none':'container-legis-citada']">
           <div class="title">
             <span>
               Legislação Citada
             </span>
             </div>
-          <div class="inner">
-            <div v-for="legis in itensLegislacaoCitada" :key="`legiscit${legis.id}`">
-              {{legis.__str__}}
-            </div>
+          <div class="inner btn-group btn-group-sm btn-group-vertical">
+              <button v-for="legis in itensLegislacaoCitada" :key="`legiscit${legis.id}`"
+                type="button"
+                class="btn btn-link"
+                data-toggle="modal"
+                :data-target="`modal-legis-citada-${legis.id}`"
+                @click="modal_legis_citada=legis">
+                  {{legis.__str__}}
+              </button>
           </div>
         </div>
         <div :class="['ultima_tramitacao', nivel(NIVEL2, tramitacao.ultima !== {})]">
@@ -45,18 +50,19 @@
         </div>
       </div>
     </div>
-
+    <norma-simple-modal-view v-if="modal_legis_citada" :html_id="`modal-legis-citada-${modal_legis_citada.id}`" :modal_norma="null" :idd="modal_legis_citada.norma"></norma-simple-modal-view>
   </div>
 </template>
 <script>
 import MateriaPauta from './MateriaPauta'
-import NormaPauta from './NormaPauta'
+import NormaSimpleModalView from '@/components/norma/NormaSimpleModalView'
+
 export default {
   name: 'item-de-pauta',
   props: ['item', 'type'],
   components: {
     MateriaPauta,
-    NormaPauta
+    NormaSimpleModalView
   },
   data () {
     return {
@@ -68,7 +74,22 @@ export default {
         status: {}
       },
       anexadas: {},
-      legislacaocitada: {}
+      legislacaocitada: {},
+      modal_legis_citada: null
+    }
+  },
+  watch: {
+    'modal_legis_citada': function (nv, ov) {
+      const t = this
+      if (nv !== null) {
+        this.$nextTick()
+          .then(() => {
+            $(`#modal-legis-citada-${nv.id}`).modal('show')
+            $(`#modal-legis-citada-${nv.id}`).on('hidden.bs.modal', function (e) {
+              t.modal_legis_citada = null
+            })
+          })
+      }
     }
   },
   computed: {
@@ -292,8 +313,10 @@ export default {
     }
   }
   .container-legis-citada {
-      border-top: 1px solid #5696ca;
-
+      //border-top: 1px solid #5696ca;
+    button {
+      text-align: left;
+    }
   }
 
   .item-body {

@@ -19,32 +19,18 @@
         </li>
       </ul>
     </div>
-    <div v-if="modal_norma" class="modal fade modal-cmj" id="modal-norma" tabindex="-1" role="dialog" aria-labelledby="ModalNorma" aria-hidden="true">
-      <div class="modal-dialog modal-xl" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="#titulo">{{modal_norma.apelido}}</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body" v-html="modal_norma.html">
-            Carregando...
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <norma-simple-modal-view :html_id="'modal-norma'" :modal_norma="modal_norma" :idd="modal_norma"></norma-simple-modal-view>
   </div>
 </template>
 
 <script>
+import NormaSimpleModalView from '@/components/norma/NormaSimpleModalView'
 
-import '@/__apps/compilacao/main'
 export default {
   name: 'side-right',
+  components: {
+    NormaSimpleModalView
+  },
   data () {
     return {
       app: ['norma'],
@@ -54,20 +40,6 @@ export default {
       itens: {
         normajuridica_list: {}
       }
-    }
-  },
-  watch: {
-    /* 'modal_norma': function (nv, ov) {
-      const t = this
-
-    } */
-    'itens.normajuridica_list': function (nv, ov) {
-      let t = this
-      setTimeout(() => {
-        _.mapKeys(nv, function (value, key) {
-          t.getText(value)
-        })
-      }, 10000)
     }
   },
   computed: {
@@ -83,19 +55,6 @@ export default {
     }, 2000)
   },
   methods: {
-    getText (nv) {
-      let t = this
-      if (nv.id !== undefined && nv.id > 0) {
-        $.ajax({
-          url: `/sapl/ta/${nv.id}/text?embedded`,
-          type: 'GET',
-          success: function (res) {
-            var text = res
-            t.$set(nv, 'html', text)
-          }
-        })
-      }
-    },
     toogleNormaDestaque (event) {
       this.menu_norma_destaque = !this.menu_norma_destaque
     },
@@ -133,22 +92,6 @@ export default {
 </script>
 
 <style lang="scss">
-.modal-cmj {
-  background-color: #000b;
-  .cp {
-     font-size: 1.2em;
-     line-height: 1.5em;
-     .cp-linha-vigencias,
-     .vigencia-active,
-     .dptt .dne,
-     .btns-action,
-     .btn-group,
-     .nota-alteracao,
-     .tipo-vigencias{
-       display: none !important;
-     }
-  }
-}
 .inner-sideright .menu {
   // display: none;
   button {
