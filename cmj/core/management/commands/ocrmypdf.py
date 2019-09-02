@@ -9,6 +9,7 @@ from time import sleep
 
 from django.contrib.contenttypes.models import ContentType
 from django.core.management.base import BaseCommand
+from django.db.models.signals import post_delete, post_save
 from django.utils import timezone
 
 from cmj.core.models import OcrMyPDF
@@ -100,6 +101,11 @@ class Command(BaseCommand):
     ]
 
     def handle(self, *args, **options):
+        post_delete.disconnect(dispatch_uid='sapl_post_delete_signal')
+        post_save.disconnect(dispatch_uid='sapl_post_save_signal')
+        post_delete.disconnect(dispatch_uid='cmj_post_delete_signal')
+        post_save.disconnect(dispatch_uid='cmj_post_save_signal')
+
         self.logger = logging.getLogger(__name__)
         init = datetime.now()
 
