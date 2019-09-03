@@ -40,7 +40,6 @@ import cmj.core.urls
 import cmj.diarios.urls
 import cmj.globalrules.urls
 import cmj.ouvidoria.urls
-import cmj.procuradoria.urls
 import cmj.sigad.urls
 import sapl.api.urls
 import sapl.audiencia.urls
@@ -79,7 +78,6 @@ urlpatterns_all = [
     url(r'', include(cmj.diarios.urls)),
     url(r'', include(cmj.ouvidoria.urls)),
     url(r'', include(cmj.agenda.urls)),
-    url(r'', include(cmj.procuradoria.urls)),
 
 
     url(r'^sapl/', include(sapl.audiencia.urls)),

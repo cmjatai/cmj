@@ -67,7 +67,6 @@ CMJ_APPS = (
     'cmj.agenda',
     'cmj.sigad',
     'cmj.api',
-    'cmj.procuradoria'
 )
 
 RULES_APPS = (
