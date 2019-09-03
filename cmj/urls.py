@@ -53,6 +53,7 @@ import sapl.norma.urls
 import sapl.painel.urls
 import sapl.parlamentares.urls
 import sapl.protocoloadm.urls
+import sapl.redireciona_urls.urls
 import sapl.relatorios.urls
 import sapl.sessao.urls
 
@@ -94,6 +95,9 @@ urlpatterns_all = [
     url(r'^sapl/', include(sapl.relatorios.urls)),
     url(r'', include(sapl.base.urls)),
     url(r'', include(sapl.api.urls)),
+
+
+    url(r'^sapl/', include(sapl.redireciona_urls.urls)),
 
 
 ]

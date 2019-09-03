@@ -1,5 +1,4 @@
 from decouple import AutoConfig
-from sapl.settings import WEBPACK_LOADER as SAPL_WEBPACK_LOADER
 from unipath import Path
 
 
@@ -56,8 +55,7 @@ WEBPACK_LOADER = {
         'CACHE': not DEBUG,
         'BUNDLE_DIR_NAME': 'dist/',
         'STATS_FILE': PROJECT_DIR.child('frontend').child('webpack-stats.json'),
-    },
-    'SAPL_DEFAULT':  SAPL_WEBPACK_LOADER['DEFAULT']
+    }
 }
 
 

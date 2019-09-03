@@ -1,6 +1,3 @@
-from sapl import settings as sapl_settings
-from sapl.settings import SAPL_VERSION
-
 
 INSTALLED_APPS = (
     'django_admin_bootstrapped',  # must come before django.contrib.admin

@@ -5,6 +5,7 @@ from crispy_forms.bootstrap import FieldWithButtons, StrictButton
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Field, Layout
 from django import forms
+from django.conf import settings
 from django.conf.urls import url
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -25,11 +26,10 @@ from django.views.generic.list import MultipleObjectMixin
 from cmj.crispy_layout_mixin import CrispyLayoutFormMixin, get_field_display
 from cmj.globalrules import (RP_ADD, RP_CHANGE, RP_DELETE, RP_DETAIL,
                              RP_LIST)
-from sapl.settings import BASE_DIR
 from sapl.utils import normalize
 
 
-logger = logging.getLogger(BASE_DIR.name)
+logger = logging.getLogger(settings.BASE_DIR.name)
 
 ACTION_LIST, ACTION_CREATE, ACTION_DETAIL, ACTION_UPDATE, ACTION_DELETE = \
     'list', 'create', 'detail', 'update', 'delete'
