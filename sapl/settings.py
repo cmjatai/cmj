@@ -1,0 +1,1 @@
+from cmj.settings import *
