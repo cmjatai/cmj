@@ -1,0 +1,61 @@
+{% extends "crud/detail.html" %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+	<h1 class="page-header">
+		Resumo <small>({{sessaoplenaria}})</small>
+		<br/>
+	</h1>
+{% endblock %}
+
+{% block detail_content %}
+<div>
+	<p align="right">
+		<strong>
+			<a href="{% url 'sapl.relatorios:relatorio_sessao_plenaria' sessaoplenaria.pk %}">
+				Impressão PDF
+			</a>
+		</strong>
+	</p>
+</div>
+
+<div>
+	<p align="right">
+		<strong>
+			<a href="{% url 'sapl.relatorios:relatorio_sessao_plenaria_pdf' sessaoplenaria.pk %}">
+				Impressão PDF (Novo)
+			</a>
+		</strong>
+	</p>
+</div>
+
+	{% include 'sessao/blocos_resumo/'|add:primeiro_ordenacao %}
+
+    {% include 'sessao/blocos_resumo/'|add:segundo_ordenacao %}
+
+    {% include 'sessao/blocos_resumo/'|add:terceiro_ordenacao %}
+
+    {% include 'sessao/blocos_resumo/'|add:quarto_ordenacao %}
+
+    {% include 'sessao/blocos_resumo/'|add:quinto_ordenacao %}
+
+    {% include 'sessao/blocos_resumo/'|add:sexto_ordenacao %}
+
+    {% include 'sessao/blocos_resumo/'|add:setimo_ordenacao %}
+
+    {% include 'sessao/blocos_resumo/'|add:oitavo_ordenacao %}
+
+    {% include 'sessao/blocos_resumo/'|add:nono_ordenacao %}
+
+    {% include 'sessao/blocos_resumo/'|add:decimo_ordenacao %}
+
+    {% include 'sessao/blocos_resumo/'|add:decimo_primeiro_ordenacao %}
+
+    {% include 'sessao/blocos_resumo/'|add:decimo_segundo_ordenacao %}
+
+    {% include 'sessao/blocos_resumo/'|add:decimo_terceiro_ordenacao %}
+
+    {% include 'sessao/blocos_resumo/'|add:decimo_quarto_ordenacao %}
+    
+{% endblock detail_content %}

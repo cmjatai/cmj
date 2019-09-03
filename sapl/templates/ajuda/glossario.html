@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading">Gloss&aacute;rio</h1><br />
+<b><br />
+SESS&Atilde;O LEGISLATIVA</b>&nbsp; &eacute; um tempo
+de trabalhos legislativos. <br />
+<br />
+A <b>sess&atilde;o legislativa ordin&aacute;ria</b>&nbsp;
+come&ccedil;a no dia 15 de fevereiro e vai at&eacute; o dia 30
+de junho; retoma em 1&ordm; de agosto e vai at&eacute; 15 de
+dezembro. Esses s&atilde;o os dois per&iacute;odos da
+sess&atilde;o legislativa ( de 15/02&nbsp; a 30/06 e de
+1&ordm;/08 a 15/12). Nos intervalos desses per&iacute;odos
+acontecem os recessos parlamentares. As sess&otilde;es marcadas
+para as datas acima citadas ser&atilde;o automaticamente
+transferidas para o primeiro dia &uacute;til subseq&uuml;ente,
+caso esses dias recaiam em s&aacute;bados, domingos ou feriados. <br />
+<br />
+<b>SESS&Atilde;O PLEN&Aacute;RIA</b> &eacute;
+cada unidade de trabalho, a cada dia. <br />
+<br />
+As sess&otilde;es plen&aacute;rias podem ser:<br />
+<ul>
+  <li>deliberativas (ordin&aacute;rias ou
+extraordin&aacute;rias);</li>
+  <li>n&atilde;o-deliberativas;</li>
+  <li>especiais.</li>
+</ul>
+<br />
+<b>LEGISLATURA</b> &eacute; um tempo de 4 anos (art.
+44).&nbsp; Um deputado estadual e/ou vereador &eacute; eleito
+para uma legislatura, ou seja, o mandato do deputado estadual e/ou
+vereador dura 4 anos. <br />
+<b><br />
+INDEXA&Ccedil;&Atilde;O</b> &eacute; um processo de
+arquivar informa&ccedil;&otilde;es e caracter&iacute;sticas
+de um determinado assunto para que pessoas que desejem
+informa&ccedil;&otilde;es sobre este determinado assunto possam
+encontrar de forma f&aacute;cil o que procuram.<br />
+Ato ou efeito de fazer &iacute;ndices para livros ou de
+p&ocirc;r em ordem alfab&eacute;tica, ou outra, qualquer
+s&eacute;rie de palavras ou frases destinada a auxiliar a
+localiza&ccedil;&atilde;o de informa&ccedil;&otilde;es
+espec&iacute;ficas. (Dicion&aacute;rio Aur&eacute;lio).<br />
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'envio_proposicao' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'anexos' %}">Pr&oacute;xima</a>
+
+<br />
+
+</div>
+
+{% endblock base_content %}

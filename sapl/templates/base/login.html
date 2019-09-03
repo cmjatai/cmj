@@ -1,0 +1,66 @@
+{% extends "crud/detail.html" %}
+{% load i18n %}
+{% block base_content %}
+  
+  <!-- O bloco comentado é para ser implementado após as autorizacoes -->
+  <!-- {% if next %}
+    {% if user.is_authenticated %}
+      <p>Você não tem acesso a esta página. Se quiser continuar, faça o Login.</p>
+      
+      {% else %}
+        <p>Por favor, faça o Login para acessar esta página.</p>
+      {% endif %}
+
+  {% endif %} -->
+
+  <div class="container mb-3">
+      <div class="row">
+          <div class="col-lg-4 offset-lg-4 col-8 offset-2">
+              <div class="card">
+                  <div class="card-header text-center bg-info">
+                     <h3 class=" font-weight-bolder ">Entrar</h3>
+                  </div>
+                  <div class="card-body">
+                    <form id="login-form" method="post" action="{% url 'sapl.base:login' %}">
+                        {% csrf_token %}
+
+                          <p class="bs-component">
+                              <table>
+                                {% if form.errors %}
+                                  <div class="alert alert-danger">Usuário e/ou Senha inválidos.
+                                  </div>
+
+                                {% endif %}
+                                  <tr>
+                                      <p><b><center>Usuário</center></b></p>
+                                      {{ form.username }}
+                                  </tr>
+                                  <tr>
+                                      <p><b><center>Senha</center></b></p>
+                                      {{ form.password }}
+                                  </tr>
+                              </table>
+                          </p>
+                          <h5><a href="{% url 'sapl.base:recuperar_senha_email' %}"><center>Esqueceu sua senha?</center></a></h6>
+                          <p class="bs-component">
+                              <center>
+                                  <input class="btn btn-lg btn-success btn-block" type="submit" value="login" />
+                              </center>
+                          </p>
+                          <input type="hidden" name="next" value="{{ next }}" />
+                    </form>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+
+{% endblock base_content %}
+
+{% block extra_js %}
+  <script>
+    {% if not user.is_authenticated %}
+        $("#autenticacao") .css("display","none");
+    {% endif %}
+  </script>
+{% endblock %}

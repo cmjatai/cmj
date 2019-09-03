@@ -1,0 +1,67 @@
+{% load i18n %}
+{% load compilacao_filters %}
+{% load common_tags %}
+
+{% dispositivotree dispositivos_list %}
+    <div class="dpt" id="id{{node.dpt.id}}" pk="{{node.dpt.pk}}" ordem="{{node.dpt.ordem}}" name="{{node.dpt.pk}}" formtype="get_form_base">
+      <div class="dpt-actions">
+      </div>
+      <div class="dpt-actions-fixed">
+        <a class="btn-dpt-edit btn btn-outline-primary btn-sm" pk="{{node.dpt.pk}}" title=""><span class="deactivate">{% trans 'Editar'%} </span><span class="activate">{% trans 'Em Edição'%}: </span>{% if not node.td.rotulo_prefixo_texto %}{{ node.td.nome }} {% endif %}{{ node.dpt.rotulo }}</a>
+        <div class="btn-group">
+          <a class="btn-dpt-edit btn btn-warning btn-sm activate" pk="{{node.dpt.pk}}" action="editor-help" data-toggle="modal" data-target="#modal-help"><span class="deactivate"></span><span class="activate"><i class="fa fa-question" aria-hidden="true"></i></span></a>
+        </div>
+        <div class="btn-group">
+          <a class="btn-dpt-edit btn btn-info btn-sm activate" pk="{{node.dpt.pk}}" action="editor-close" title="{% trans 'Fechar Edição' %}"><span class="deactivate"></span><span class="activate"><i class="fa fa-times" aria-hidden="true"></i></span></a>
+        </div>
+        {% if not node.dpt.rotulo and not node.dpt.texto and node.td.dispositivo_de_articulacao%}
+        {% endif %}
+      </div>
+      <div class="dpt-text {{node.td.class_css}} {%if node.dpt.fim_vigencia %}desativado{%endif%} {%if not node.filhos and node.td.dispositivo_de_alteracao or node.td.dispositivo_de_articulacao and node.dpt.nivel == 0 %}hover-fixed{%endif%}">
+          {% if node.dpt.auto_inserido and node.da%}
+            {{ node.dpt.dispositivo_pai.tipo_dispositivo.rotulo_prefixo_html|safe }}
+            {% if node.da and node in node.da.alts %}
+              <a class="dpt-link link-rotulo" name="{{node.dpt.pk}}" href="{% url 'sapl.compilacao:ta_text_edit' node.dpt.dispositivo_pai.ta_id %}#{{node.dpt.pk}}" title="{% trans 'Abrir editor deste dispositivo em seu Texto Articulado Original'%}">{{ node.dpt.dispositivo_pai.rotulo }}</a>
+              {{ node.dpt.dispositivo_pai.tipo_dispositivo.rotulo_sufixo_html|safe }}
+            {% else %}
+              <a class="dpt-link link-rotulo" name="{{node.dpt.pk}}">{% comment %}{{ node.dpt.dispositivo_pai.rotulo }}{% endcomment %}</a>
+            {% endif %}
+          {% else %}
+            {{ node.td.rotulo_prefixo_html|safe }}
+            {% if node.da and node in node.da.alts %}
+              <a class="dpt-link link-rotulo" name="{{node.dpt.pk}}" href="{% url 'sapl.compilacao:ta_text_edit' node.dpt.ta_id %}#{{node.dpt.pk}}" title="{% trans 'Abrir editor deste dispositivo em seu Texto Articulado Original'%}">{{ node.dpt.rotulo }}</a>
+            {% else %}
+              <a class="dpt-link link-rotulo" name="{{node.dpt.pk}}">{{ node.dpt.rotulo }}</a>
+            {% endif %}
+            {{ node.td.rotulo_sufixo_html|safe }}
+          {% endif %}
+
+          {{ node.td.texto_prefixo_html|safe }}
+
+          {% if node.da and node in node.da.alts and not node.dpt.visibilidade %}<small>({% trans 'Dispositivo visível apenas no Texto Articulado Original'%})</small>{% endif %}
+
+          {% if not node.dpt.texto and not node.td.dispositivo_de_articulacao %}
+            <span class="semtexto">({{node.td}} sem texto)</span>
+          {%else%}
+            {% if node.da and node.dpt.texto_atualizador and node in node.da.alts%}{{ node.dpt.texto_atualizador|safe }}{% else %}{{ node.dpt.texto|safe }}{% endif %}
+          {%endif%}
+          {% if node.na %}
+            <a class="dpt-link nota-alteracao" href="{% url 'sapl.compilacao:ta_text_edit' node.da.dpt.ta_id %}#{{node.da.dpt.pk}}" title="{% trans 'Abrir Edição do Dispositivo Alterador'%}">
+                {{ node.td.nota_automatica_prefixo_html|safe }}
+                {{ node.na }}
+                {{ node.td.nota_automatica_sufixo_html|safe }}
+            </a>
+          {% endif %}
+      </div>
+      <div class="dpt-form clearfix"></div>
+      <div class="dpt-actions-bottom btn-group"></div>
+      {% if node.alts or node.td.dispositivo_de_alteracao and node.td.dispositivo_de_articulacao %}
+        <div class="dpt-alts">{{ alts }}</div>
+      {% endif %}
+      {% if node.filhos %}
+        <div class="dpt-block">
+          {{ filhos }}
+        </div>
+      {% endif %}
+    </div>
+{% enddispositivotree %}

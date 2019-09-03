@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading">Dependentes</h1>
+<br />
+Para incluir os Dependentes do Parlamentar, selecione o Parlamentar, e
+acione a fun&ccedil;&atilde;o Dependentes que est&aacute;
+na barra superior da tela.<br />
+Acione o bot&atilde;o [Adicionar Dependentes].<br />
+<br />
+<center>
+<table width="85%">
+  <col width="55*" /> <col width="39*" /> <col
+ width="162*" /> <thead> <tr valign="top">
+    <td bgcolor="#c7d8eb" width="21%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Nome do Campo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="15%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Tipo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="63%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Instru&ccedil;&otilde;es para
+Preenchimento</b></font></p>
+    </td>
+  </tr>
+  </thead> <tbody>
+    <tr valign="top">
+      <td width="21%">
+      <p><font style="font-size: 11pt;" size="3">Nome</font></p>
+      </td>
+      <td width="15%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="63%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o nome do dependente do Parlamentar.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="21%">
+      <p><font style="font-size: 11pt;" size="3">Tipo</font></p>
+      </td>
+      <td width="15%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="63%">
+      <p><font style="font-size: 11pt;" size="3">Escolha
+na caixa de tipos o tipo de parentesco do parlamentar com o dependente.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="21%">
+      <p><font style="font-size: 11pt;" size="3">Sexo</font></p>
+      </td>
+      <td width="15%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="63%">
+      <p><font style="font-size: 11pt;" size="3">Selecione
+o sexo do dependente, masculino ou feminino.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="21%">
+      <p><font style="font-size: 11pt;" size="3">Data
+Nascimento</font></p>
+      </td>
+      <td width="15%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="63%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a data de nascimento do dependente do parlamentar no formato dia,
+m&ecirc;s e ano ( ano com quatro posi&ccedil;&otilde;es).</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="21%">
+      <p><font style="font-size: 11pt;" size="3">CPF</font></p>
+      </td>
+      <td width="15%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="63%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o n&uacute;mero do CPF do dependente se houver.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="21%">
+      <p><font style="font-size: 11pt;" size="3">RG</font></p>
+      </td>
+      <td width="15%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="63%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o n&uacute;mero do Registro Geral do dependente se houver.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="21%">
+      <p><font style="font-size: 11pt;" size="3">N&deg;.
+T&iacute;tulo Eleitor</font></p>
+      </td>
+      <td width="15%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="63%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o n&uacute;mero do t&iacute;tulo de eleitor do dependente se
+houver.</font></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</center>
+<br />
+<br />
+Acione a fun&ccedil;&atilde;o&nbsp;
+&ldquo;Salvar&rdquo; para que as
+informa&ccedil;&otilde;es sejam salvas no arquivo.<br />
+Ser&aacute; enviada a mensagem: <i>Dependente salvo com sucesso!</i><br />
+<br />
+Para <b>alterar</b> as informa&ccedil;&otilde;es de um dependente,
+selecione o dependente desejado, altere as
+informa&ccedil;&otilde;es e acione a
+fun&ccedil;&atilde;o &ldquo;Salvar&rdquo;.<br />
+<br />
+Para <b>excluir</b> um dependente, selecione o dependente desejado e acione a
+fun&ccedil;&atilde;o &ldquo;Excluir&rdquo;.<br />
+Ser&aacute; enviada a pergunta &ldquo;Deseja realmente
+excluir?&rdquo;<br />
+Acione Confirmar em caso positivo ou Cancelar para o caso de
+desist&ecirc;ncia da exclus&atilde;o.<br />
+Quando for informado Confirmar ser&aacute; enviada a mensagem: <i>Dependente
+exclu&iacute;do com sucesso!</i><br />
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'filiacoes_partidarias' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'modulo_mesa_diretora' %}">Pr&oacute;xima</a>
+
+<br />
+
+
+</div>
+
+{% endblock base_content %}

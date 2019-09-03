@@ -1,0 +1,17 @@
+{% extends "protocoloadm/protocoloadm_detail.html" %}
+{% load i18n %}
+
+{% block extra_js %}
+   <script language="Javascript">
+      $(document).ready(function() {
+
+        $("input[name=data_hora_manual]").change(function(event) {
+          if (this.value === 'True' && this.checked)
+            $("#protocolo_data_hora_manual").show();
+          else if (this.value === 'False' && this.checked)
+            $("#protocolo_data_hora_manual").hide();
+        });
+        $("input[name=data_hora_manual]").trigger('change')
+      });
+   </script>
+{% endblock %}

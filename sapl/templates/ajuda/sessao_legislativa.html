@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading">Sess&atilde;o Legislativa</h1>
+<br />
+Sessão Legislativa é o período anual de reunião do parlamento. Cada legislatura é composta de quatro
+Sessões Legislativas Ordinárias - SLO. As SLOs dividem-se em períodos legislativos, cujas datas de
+início e de término são normatizadas.<br/>
+
+<br />
+Esta tabela&nbsp; tem por objetivo cadastrar as Sess&otilde;es
+Legislativas da Casa.<br />
+Ao ter acesso a esta tabela ser&aacute; exibido um campo para
+escolha de uma legislatura. E a baixo a rela&ccedil;&atilde;o
+de Sess&atilde;o j&aacute; cadastrada na Legislatura escolhida.<br />
+Escolha a legislatura que deseja e acione a barra &ldquo;Incluir
+Sess&atilde;o Legislativa&rdquo;<br />
+<br />
+Campos a serem preenchidos:<br />
+<br />
+<center>
+<table width="85%">
+  <col width="51*" /> <col width="41*" /> <col
+ width="164*" /> <thead> <tr valign="top">
+    <td bgcolor="#c7d8eb" width="20%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Nome do Campo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="16%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Tipo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="64%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Instru&ccedil;&otilde;es para
+Preenchimento</b></font></p>
+    </td>
+  </tr>
+  </thead> <tbody>
+    <tr valign="top">
+      <td width="20%">
+      <p><font style="font-size: 11pt;" size="3">N&uacute;mero</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="64%">
+      <p><font style="font-size: 11pt;" size="3">N&uacute;mero
+da sess&atilde;o legislativa</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="20%">
+      <p><font style="font-size: 11pt;" size="3">Tipo</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="64%">
+      <p style="margin-bottom: 0cm;"><font
+ style="font-size: 11pt;" size="3">Escolha na caixa de
+op&ccedil;&otilde;es o tipo de sess&atilde;o legislativa
+(Ordin&aacute;ria ou Extraordin&aacute;ria)</font></p>
+      <p><font style="font-size: 11pt;" size="3">Obs:
+Esta informa&ccedil;&otilde;es s&atilde;o internas do
+arquivo, n&atilde;o tem tabela para atualizar</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="20%">
+      <p><font style="font-size: 11pt;" size="3">Legislatura</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="64%">
+      <p><font style="font-size: 11pt;" size="3">N&uacute;mero
+da legislatura</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="20%">
+      <p><font style="font-size: 11pt;" size="3">Data
+In&iacute;cio</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="64%">
+      <p><font style="font-size: 11pt;" size="3">Data
+de in&iacute;cio da sess&atilde;o legislativa no formato dia,
+m&ecirc;s e ano (ano com quatro posi&ccedil;&otilde;es)</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="20%">
+      <p><font style="font-size: 11pt;" size="3">Data
+Fim</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="64%">
+      <p><font style="font-size: 11pt;" size="3">Data
+de fim da sess&atilde;o legislativa no formato dia, m&ecirc;s e
+ano (ano com quatro posi&ccedil;&otilde;es)</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="20%">
+      <p><font style="font-size: 11pt;" size="3">In&iacute;cio
+Intervalo</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="64%">
+      <p><font style="font-size: 11pt;" size="3">Data
+de in&iacute;cio do intervalo da sess&atilde;o legislativa
+(recesso da Assembl&eacute;ia ou C&acirc;mara Municipal) no
+formato dia, m&ecirc;s e ano (ano com quatro
+posi&ccedil;&otilde;es)</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="20%">
+      <p><font style="font-size: 11pt;" size="3">Fim
+Intervalo</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="64%">
+      <p><font style="font-size: 11pt;" size="3">Data
+de Fim do intervalo da sess&atilde;o legislativa (recesso da
+Assembl&eacute;ia ou C&acirc;mara Municipal) no formato dia,
+m&ecirc;s e ano (ano com quatro posi&ccedil;&otilde;es)</font></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</center>
+<br />
+<br />
+Acione a tecla&nbsp; &ldquo;Salvar&rdquo; para que as
+informa&ccedil;&otilde;es sejam salvas no
+arquivo.Ser&aacute; enviada a mensagem: <i>Sess&atilde;o
+Legislatura salva com sucesso!</i><br />
+
+<b><br />
+Altera&ccedil;&atilde;o ou Exclus&atilde;o de uma
+sess&atilde;o legislativa:</b><br />
+<br />
+Para <b>alterar</b> as informa&ccedil;&otilde;es de uma
+sess&atilde;o legislativa j&aacute; cadastrada, selecione o
+n&uacute;mero da sess&atilde;o, modifique as
+informa&ccedil;&otilde;es que desejar e acione a
+fun&ccedil;&atilde;o Salvar.<br />
+Para <b>excluir</b> uma sess&atilde;o legislativa j&aacute;
+cadastrada, selecione o n&uacute;mero da sess&atilde;o, e
+acione a fun&ccedil;&atilde;o Excluir.<br />
+Ser&aacute; enviada a pergunta &ldquo;Deseja realmente
+excluir?&rdquo;<br />
+Acione Confirmar em caso positivo ou Cancelar para o caso de
+desist&ecirc;ncia da exclus&atilde;o.<br />
+Quando for informado Confirmar ser&aacute; enviada a mensagem: <i>Sess&atilde;o
+Legislatura exclu&iacute;da com sucesso!</i><br />
+
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'modulo_mesa_diretora' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'cargo_mesa' %}">Pr&oacute;xima</a>
+
+<br />
+
+</div>
+
+{% endblock base_content %}

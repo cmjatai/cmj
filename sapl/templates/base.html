@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+{% load i18n staticfiles menus %}
+{% load common_tags %}
+{% load render_bundle from webpack_loader %}
+{% load webpack_static from webpack_loader %}
+
+<!--[if IE 8]> <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="pt-br">
+<!--<![endif]-->
+
+  <head>
+    <meta charset="utf-8">
+    <title>{% block head_title %}{% trans 'SAPL - Sistema de Apoio ao Processo Legislativo' %}{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#343a40">
+
+
+
+
+    {% block head_content %}
+      <link rel="icon" href="{% webpack_static 'img/favicon.ico' %}"  type="image/png">
+      {% block webpack_loader_css %}
+        {% render_chunk_vendors 'css' %}
+        {% render_bundle  'global' 'css' %}
+      {% endblock webpack_loader_css %}
+
+      {% block webpack_loader_chunks_css %}
+      {% endblock webpack_loader_chunks_css %}
+
+    {% endblock %}
+  </head>
+
+  <body>
+    <div id="app-frontend-body" class="page fadein">
+
+      {% if not request|has_iframe %}
+      {% block navigation %}
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+          <div class="container">
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+              {% block sections_navbar %} {% navbar 'navbar.yaml' %}{% endblock sections_navbar %}
+
+              <ul class="nav navbar-nav justify-content-end" id="autenticacao">
+                <li class="nav-item dropdown pesquisa">
+                  <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><img src="{% webpack_static 'img/search.png' %}"><span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                      <li class="dropdown-item">
+                        <form id="formulario-lexml" class="navbar-form search-form" method="get" action="">
+                          <input id="input-lexml" type="text" class="form-control" placeholder="Pesquisar no LexML" />
+                        </form>
+                      </li>
+                    </ul>
+                </li>
+                <li class="nav-item"><a class="nav-link"href="/sistema/ajuda"><img src="{% webpack_static 'img/manual.png' %}"></a></li>
+                {% if not user.is_authenticated %}
+                  <li class="nav-item"><a class="nav-link" href="{% url 'sapl.base:login' %}"><img src="{% webpack_static 'img/user.png' %}"></a></li>
+                {% else %}
+                  <li class="nav-item dropdown">
+                      <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><img height="30" width="30" src="{% webpack_static 'img/authenticated.png' %}"><span class="caret"></span></a>
+                    </a>
+                    <ul class="dropdown-menu">
+                      <li class="dropdown-item"><a>{{user.username}}</a></li>
+                      {% if 'parlamentares.can_vote' in request.user.get_all_permissions %}
+                        <li class="dropdown-item"><a href="" onclick="window.open('{% url 'sapl.painel:voto_individual' %}','Voto Individual','width=1000, height=800, scrollbars=yes')";>
+                          Votar Matéria
+                        </a></li>
+                      {% endif %}
+                      <li class="dropdown-item"><a href="{% url 'sapl.base:alterar_senha' %}">Alterar senha</a></li>
+                      <li class="dropdown-item"><a href="{% url 'sapl.base:logout' %}">Sair</a></li>
+                    </ul>
+                  </li>
+                {% endif %}
+              </ul>
+
+            </div><!--/.nav-collapse -->
+          </div>
+        </nav>
+      {% endblock navigation %}
+
+      {# Header #}
+      {% block main_header %}
+      <header class="masthead">
+        <div class="container">
+          <div class="navbar-header">
+            <a class="navbar-brand" href="/">
+              <img src="{% if logotipo %}{{ MEDIA_URL }}{{ logotipo }}{% else %}{% webpack_static 'img/logo.png' %}{% endif %}"
+              alt="Logo" class="img-responsive" >
+              <span class="vcenter">{% if nome %}{{ nome }}{% else %}{% trans 'Câmara/Assembléia não configurada'%}{% endif %}
+                <br/><small>{% trans 'Sistema de Apoio ao Processo Legislativo' %}</small>
+              </span>
+            </a>
+          </div>
+          <div class="hidden-print">
+            {% block sections_nav %} {% subnav %} {% endblock sections_nav %}
+          </div>
+        </div>
+      </header>
+      {% endblock main_header %}
+      {% else %}
+              <div class="btn-cancel-iframe">
+                <a href="?iframe=0" target="_blank"><i class="fa fa-2x fa-arrows-alt"></i></a>
+              </div>
+              <header class="masthead">
+                <div class="container">
+                  <div class="hidden-print">
+                    {% subnav %}
+                  </div>
+                </div>
+              </header>
+      {% endif %}
+
+      {# Main content #}
+      {% block content_container %}
+        <main id="content" class="content page__row">
+          <div class="container">
+
+            {# Feedback messages #}
+            {% for message in messages %}
+              <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+                {{ message|safe }}
+              </div>
+            {% endfor %}
+
+            {# Content header #}
+            {% block base_header %}
+              <div class="clearfix">
+
+                {% block help %}
+{#                    {% if view.help_topic %}#}
+{#                        <a class="contextual-help right" href="{% url 'sapl.base:help'  %}{{ view.help_topic  }}">{% trans 'Ajuda' %}</a>#}
+{#                    {% endif %}#}
+                {% endblock %}
+
+                {% block title %}
+                  <h1 class="page-header">
+                    {% if title %}
+                      {{ title|safe|linebreaksbr }}
+                    {% elif object %}
+                      {{ object|safe|linebreaksbr }}
+                    {% endif %}
+                  </h1>
+                {% endblock %}
+
+              </div>
+            {% endblock base_header %}
+
+            {% block vue_content %}<div id="app-frontend-base-content"></div>{% endblock %}
+
+            {% block base_content %}{% endblock %}
+
+          </div>
+        </main>
+
+      {% endblock content_container %}
+
+      {% if not request|has_iframe %}
+      {% block footer_container %}
+      <footer id="footer" class="footer page__row hidden-print">
+        <div class="container">
+
+          <div class="row">
+            <div class="col-md-4">
+
+              <a class="footer__logo" href="#">
+                <a href="http://www.interlegis.leg.br/">
+                  <img src="{% webpack_static 'img/logo_interlegis.png' %}" alt="{% trans 'Logo do Interlegis' %} ">
+                </a>
+              </a>
+              <p>
+                <small>
+                  Desenvolvido pelo <a href="http://www.interlegis.leg.br/">Interlegis</a> em software livre e aberto.
+                </small>
+		<span>Release: master</span>
+              </p>
+            </div>
+            <div class="col-md-4">
+              <a class="footer__logo" href="#">
+                <img src="{% webpack_static 'img/logo_cc.png' %}" alt="{% trans 'Logo do Creative Commons BY SA' %}">
+              </a>
+              <p>
+                <small>
+                  Conteúdo e dados sob licença <a href="https://creativecommons.org">Creative Commons</a> 4.0<br><a href="https://creativecommons.org/licenses/by/4.0/">Atribuir Fonte - Compartilhar Igual</a>
+                </small>
+              </p>
+            </div>
+            <div class="col-md-4">
+              {% if nome %}
+              <address>
+                <small>
+                  <strong>
+                    <span class="org">{{ nome }}</span>
+                  </strong>
+                  <br>
+                  <span class="street-address">{{ endereco }}</span>
+                  <br> CEP: <span class="postal-code">{{ cep }}</span> | Telefone: <span>{{ telefone }}</span>
+                  <br>
+                  <a href="{{endereco_web}}" class="url">{% trans 'Site' %}</a> |
+                  <a href="mailto:{{email}}" class="email">{% trans 'Fale Conosco' %}</a>
+                </small>
+              </address>
+              {% else %}
+                 Casa Legislativa não configurada.
+                 <br>
+                {% if user.is_authenticated %}
+                  <a href="{% url 'sapl.base:casalegislativa_list' %}">Favor configurar clicando aqui</a>
+                {% endif %}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+    {% endblock footer_container %}
+    {% endif %}
+
+    {% block foot_js %}
+
+      {% block webpack_loader_js %}
+        {% render_chunk_vendors 'js' %}
+        {% render_bundle  'global' 'js' %}      
+      {% endblock webpack_loader_js %}
+
+      {% block webpack_loader_chunks_js %}
+      {% endblock webpack_loader_chunks_js %}
+
+      {% block extra_js %}{% endblock extra_js %}
+
+      <script type="text/javascript" >
+        function inIframe () {
+          try {
+              return window.self !== window.top;
+          } catch (e) {
+              return true;
+          }
+        }
+        $(document).ready(function(){
+          let iframe_set_backend = {{ request|has_iframe|lower }}
+          if (iframe_set_backend && !inIframe() ) {
+            location.href = location.origin + '?iframe=0'
+          }
+
+          var form = document.getElementById("formulario-lexml");
+          $("#input-lexml").change(function(){
+            let value = $("#input-lexml").val();
+            let url = "{% url 'sapl.lexml:lexml_search' 'xxx'%}"
+            url = url.replace('xxx', value)
+            form.action = url;
+          });
+
+        });
+      </script>
+
+    {% endblock foot_js %}
+
+  </body>
+</html>

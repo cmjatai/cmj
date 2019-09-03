@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading">Tipo de Afastamento</h1>
+<br />
+Esta tabela tem por objetivo cadastrar os tipos de afastamentos que um
+parlamentar pode ter.<br />
+<br />
+Ao ter acesso a esta tabela ser&aacute; exibida uma tela com a
+rela&ccedil;&atilde;o de tipos de afastamentos j&aacute;
+cadastrados e o bot&atilde;o [Adicionar Tipo de
+Afastamento]. Ao ser acionado este bot&atilde;o
+ser&aacute; exibida a tela com os seguintes campos:<br />
+<br />
+<center>
+<table width="85%">
+  <col width="53*" /> <col width="41*" /> <col
+ width="162*" /> <thead> <tr valign="top">
+    <td bgcolor="#c7d8eb" width="21%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Nome do Campo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="16%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Tipo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="63%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Instru&ccedil;&otilde;es para
+Preenchimento</b></font></p>
+    </td>
+  </tr>
+  </thead> <tbody>
+    <tr valign="top">
+      <td width="21%">
+      <p><font style="font-size: 11pt;" size="3">Descri&ccedil;&atilde;o</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="63%">
+      <p><font style="font-size: 11pt;" size="3">Preencher
+este campo com a descri&ccedil;&atilde;o do afastamento
+&ndash; ex. Licen&ccedil;a sa&uacute;de,
+Exerc&iacute;cio de fun&ccedil;&atilde;o de secretariado,
+etc.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="21%">
+      <p><font style="font-size: 11pt;" size="3">Dispositivo</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="63%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+neste campo o dispositivo legal que gerou o afastamento.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="21%">
+      <p><font style="font-size: 11pt;" size="3">Indicador</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="63%">
+      <p style="margin-bottom: 0cm;"><font
+ style="font-size: 11pt;" size="3">Afastamento ou Fim
+de Mandato.</font></p>
+      <p><font style="font-size: 11pt;" size="3">Assinale
+neste campo se o afastamento do parlamentar implica em fim de mandato,
+ou se &eacute; um afastamento tempor&aacute;rio</font></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</center>
+
+<br />
+<br />
+<br />
+Acione a tecla&nbsp; &ldquo;Salvar&rdquo; para que as
+informa&ccedil;&otilde;es sejam salvas no arquivo.<br />
+Ser&aacute; enviada a mensagem: <i>Tipo de Afastamento salvo
+com sucesso!</i><br />
+<br />
+Para <b>alterar</b> um Tipo de Afastamento, selecione o Tipo de Afastamento
+desejado, altere as informa&ccedil;&otilde;es e acione a
+fun&ccedil;&atilde;o &ldquo;Salvar&rdquo;.Para excluir
+um Tipo de Afastamento, selecione o Tipo de Afastamento desejado e
+acione a fun&ccedil;&atilde;o <b>Excluir</b>.<br />
+Ser&aacute; enviada a pergunta &ldquo;Deseja realmente
+excluir?&rdquo;<br />
+Acione Confirmar em caso positivo ou Cancelar para o caso de
+desist&ecirc;ncia da exclus&atilde;o.<br />
+Quando for informado Confirmar ser&aacute; enviada a mensagem: <i>Tipo
+de Afastamento exclu&iacute;do com sucesso!</i><br />
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'legislatura' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'tipo_dependente' %}">Pr&oacute;xima</a>
+
+<br />
+
+</div>
+
+{% endblock base_content %}

@@ -1,0 +1,17 @@
+{% load i18n %}
+LexmlProvedor:
+  {% trans 'Provedor Lexml' %}:
+  - id_provedor:2  nome
+  - id_responsavel:2  nome_responsavel  email_responsavel
+  - xml
+
+LexmlProvedorDetail:
+  {% trans 'Provedor Lexml' %}:
+  - id_provedor:2  nome
+  - id_responsavel:2  nome_responsavel  email_responsavel
+  - pretty_xml
+
+LexmlPublicador:
+  {% trans 'Publicador Lexml' %}:
+  - id_publicador:2  nome  sigla
+  - id_responsavel:2  nome_responsavel  email_responsavel

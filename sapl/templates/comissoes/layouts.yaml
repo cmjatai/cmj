@@ -1,0 +1,69 @@
+ {% load i18n %}
+CargoComissao:
+  {% trans 'Cargo de Comissão' %}:
+  - nome:10  unico
+
+Periodo:
+  {% trans 'Período de composição de Comissão' %}:
+  - data_inicio  data_fim
+
+TipoComissao:
+  {% trans 'Tipo Comissão' %}:
+  - nome:9  sigla
+  - dispositivo_regimental:9  natureza
+
+Comissao:
+  {% trans 'Dados Básicos' %}:
+  - nome:7  sigla ativa
+  - tipo    data_criacao  unidade_deliberativa  data_extincao
+  {% trans 'Dados Complementares' %}:
+  - local_reuniao  agenda_reuniao  telefone_reuniao
+  - endereco_secretaria  telefone_secretaria  fax_secretaria
+  - secretario  email
+  - finalidade
+  {% trans 'Temporária' %}:
+  - apelido_temp:8  data_instalacao_temp
+  - data_final_prevista_temp  data_prorrogada_temp  data_fim_comissao
+
+Composicao:
+  {% trans 'Composição' %}:
+  - comissao
+  - periodo
+
+Participacao:
+  {% trans 'Participação' %}:
+  - parlamentar cargo titular
+  - data_designacao data_desligamento
+  - motivo_desligamento
+  - observacao
+
+ParticipacaoEdit:
+  {% trans 'Participação' %}:
+  - nome_parlamentar cargo titular
+  - data_designacao data_desligamento
+  - motivo_desligamento
+  - observacao
+
+Reuniao:
+  {% trans 'Reunião' %}:
+  - periodo numero
+  - nome tema local_reuniao
+  - data hora_inicio hora_fim
+  - url_video url_audio
+  - observacao
+  - upload_pauta upload_ata upload_anexo
+  - comissao
+
+DocumentoAcessorio:
+  {% trans 'Documento Acessório' %}:
+  - nome data
+  - autor arquivo
+  - indexacao
+  - ementa
+
+DocumentoAcessorioEdit:
+  {% trans 'Documento Acessório' %}:
+  - nome data
+  - autor arquivo
+  - indexacao
+  - ementa

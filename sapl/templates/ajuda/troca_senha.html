@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading">Troca de Senha</h1>
+<br />
+Este M&oacute;dulo tem por objetivo possibilitar a troca de senha
+de acesso a parte de alimenta&ccedil;&atilde;o do sistema.<br />
+Ao ter acesso a este m&oacute;dulo ser&aacute; exibida uma tela
+com os seguintes campos a serem preenchidos.<br />
+
+<br />
+
+<center>
+<table width="85%">
+  <col width="60*" /> <col width="40*" /> <col
+ width="156*" /> <thead> <tr valign="top">
+    <td bgcolor="#c7d8eb" width="24%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Nome do Campo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="15%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Tipo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="61%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Instru&ccedil;&otilde;es para
+Preenchimento</b></font></p>
+    </td>
+  </tr>
+  </thead> <tbody>
+    <tr valign="top">
+      <td width="24%">
+      <p><font style="font-size: 11pt;" size="3">Nova
+Senha</font></p>
+      </td>
+      <td width="15%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="61%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a nova senha.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="24%">
+      <p><font style="font-size: 11pt;" size="3">Confirma&ccedil;&atilde;o</font></p>
+      </td>
+      <td width="15%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="61%">
+      <p><font style="font-size: 11pt;" size="3">Digite
+novamente a senha informada no campo acima.</font></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</center>
+<br />
+Acione a fun&ccedil;&atilde;o&nbsp;
+&ldquo;Trocar&rdquo; para que as
+informa&ccedil;&otilde;es sejam salvas no arquivo.<br />
+Ser&aacute; enviada a mensagem<i> !Senha salva com sucesso!</i><br />
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'ordem_dia' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'gerenciamento_usuarios' %}">Pr&oacute;xima</a>
+
+<br />
+
+
+</div>
+
+{% endblock base_content %}

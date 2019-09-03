@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading">Sess&atilde;o Plen&aacute;ria - Vota&ccedil;&atilde;o</h1><br />
+<br>A finalidade desta fun&ccedil&atilde;o &eacute; a de registrar o resultado das vota&ccedil;&otilde;es das mat&eacute;rias inscritas na Ordem do Dia da Sess&atilde;o Plen&aacute;ria.<br />
+<br>O sistema apresenta uma lista das mat&eacute;rias, que foram inscritas para serem votadas na Ordem do Dia, contendo: N&uacute;mero / Origem / Autor, Ementa, Resultado da Vota&ccedil;&atilde;o e a Observa&ccedil;&atilde;o registrada sobre o resultado da vota&ccedil;&atilde;o.<br />
+<br>Para aquelas mat&eacute;rias ainda n&atilde;o votadas, o sistema exibe a mensagem <i>mat&eacute;ria n&atilde;o votada</i>.<br />
+<br>Para efetivar o registro de uma vota&ccedil;&atilde;o, clique sobre a mat&eacute;ria que o sistema ir&aacute; apresentar uma tela para que sejam informados os seguintes dados: votos SIM, votos N&Atilde;O, Absten&ccedil;&otilde;es; ou, assinalar no quadro indicado como <i>Sem Vota&ccedil;&atilde;o</i>.<br />
+<br>Em seguida, selecionar no combo box a mensagem que reflete o resultado da vota&ccedil;&atilde;o, lembrando que estes textos dever&atilde;o ter sido cadastrados previamente na <b>tabela auxiliar <i>Tipo de Resultado da Vota&ccedil;&atilde;o</i></b>.<br />
+<br>O campo observa&ccedil;&otilde;es deve ser preenchido, quando for o caso, com as informa&ccedil;&otilde;es que forem julgadas oportunas e de esclarecimentos adicionais. <br />
+<br>Ap&oacute;s preenchidas todas as informa&ccedil;&otilde;es, clicar no bot&atilde;o 'Salvar'. O sistema dever&aacute; emitir a mensagem: <i>!Vota&ccedil;&atilde;o salva com sucesso!</i> caso todos os dados estejam corretos, devendo clicar em <i>continuar</i> para retomar o registro da vota&ccedil;&atilde;o de outras mat&eacute;rias.<br />
+<br>Entretanto, emitir&aacute; a mensagem: <i>!Quantidade de Votos &eacute; diferente do n&uacute;mero de parlamentares presentes na Ordem do Dia!</i> caso o total de votantes esteja diferente da lista de presen&ccedil;a indicada na Ordem do Dia. Neste caso, clique em <i>voltar</i> para retornar a tela anterior e efetuar as corre&ccedil;&otilde;es.<br />
+<br>  <a href="{% url 'sapl.base:help_topic' 'sessao_plenaria' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'sessao_plenaria' %}">Pr&oacute;xima</a>
+<br />
+<br />
+</div>
+
+{% endblock base_content %}

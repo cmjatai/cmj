@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading"> Tramita&ccedil;&atilde;o em Lote</h1>
+<br/>
+<p>A tramitação em lote tem a finalidade de simplificar essa atividade permitindo, de uma só vez, o encaminhamento de vários processos legislativos. É realizada em dois passos. No primeiro, deve ser feita a pesquisa dos processos que se deseja tramitar; e, para isso, devem ser informados alguns parâmetros, conforme a tabela abaixo, que permitirão selecionar a lista de processos. E, no segundo, é realizada a tramitação propriamente dos que constarem da lista obtida e que tiverem sido assinalados. <p>
+<b>Primeira tramitação</b> - essa opção permite a seleção para encaminhamento dos processos que ainda não tiveram nenhuma tramitação.
+<br />
+<br />
+<center>
+<table width="653">
+  <col width="173" /> <col width="84" /> <col
+ width="363" /> <thead> <tr valign="top">
+    <td bgcolor="#c7d8eb" width="173">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Nome do Campo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="84">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Tipo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="363">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Instru&ccedil;&otilde;es para
+Preenchimento</b></font></p>
+    </td>
+  </tr>
+  </thead>
+   <tbody>
+    <tr valign="top">
+      <td width="173">
+      <p><font style="font-size: 11pt;" size="3">Data Ação</font></p>
+      </td>
+      <td width="84">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="363">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a data da ação no formato dd/mm/aaaa.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="173">
+      <p><font style="font-size: 11pt;" size="3">Tipo da Matéria</font></p>
+      </td>
+      <td width="84">
+      <p><font style="font-size: 11pt;" size="3">Obrigatório</font></p>
+      </td>
+      <td width="363">
+      <p><font style="font-size: 11pt;" size="3">Selecione
+na Caixa o Tipo de Matéria</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="173">
+      <p><font style="font-size: 11pt;" size="3">Unidade Local</font></p>
+      </td>
+      <td width="84">
+      <p><font style="font-size: 11pt;" size="3">Obrigatório</font></p>
+      </td>
+      <td width="363">
+      <p><font style="font-size: 11pt;" size="3">Selecione na Caixa a Unidade Local onde se encontram os processos para tramitação.</font></p>
+      </td>
+    </tr>
+   <tr valign="top">
+    <td width="173">
+    <p><font style="fonte-size: 11pt;" size="3">Data Inicial</font></p>
+    </td>
+    <td width="84">
+    <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+    </td>
+    <td width="363">
+    <p><font style="font-size: 11pt;" size="3">Informe a data início (dd/mm/aaaa) do período no qual se insere a data da apresentação dos processos.</font></p>
+    </td>
+    </tr>
+   <tr valign="top">
+    <td width="173">
+    <p><font style="fonte-size: 11pt;" size="3">Data Final</font></p>
+    </td>
+    <td width="84">
+    <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+    </td>
+    <td width="363">
+    <p><font style="font-size: 11pt;" size="3">Informe a data fim (dd/mm/aaaa) do período no qual se insere a data da apresentação  dos processos.</font></p>
+    </td>
+    </tr>
+   <tr valign="top">
+    <td width="173">
+    <p><font style="fonte-size: 11pt;" size="3">Status Tramitação</font></p>
+    </td>
+    <td width="84">
+    <p><font style="font-size: 11pt;" size="3">Obrigatório</font></p>
+    </td>
+    <td width="363">
+    <p><font style="font-size: 11pt;" size="3">Informe o Status da Tramitação dos processos a serem selecionados.</font></p>
+    </td>
+    </tr>
+    </tbody>
+</table>
+</center>
+<br />
+<br />
+Acione a função <b>Pesquisar</b> para obter a lista de processos, a partir dos parâmetros informados.<br />
+<br />
+Uma vez obtida a lista de processos para tramitação complemente as informações, conforme abaixo, assinalando aqueles que efetivamente serão encaminhados.<br />
+<br />
+<center>
+<table width="653">
+  <col width="173" /> <col width="84" /> <col
+ width="363" /> <thead> <tr valign="top">
+    <td bgcolor="#c7d8eb" width="173">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Nome do Campo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="84">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Tipo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="363">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Instru&ccedil;&otilde;es para
+Preenchimento</b></font></p>
+    </td>
+  </tr>
+  </thead>
+   <tbody>
+    <tr valign="top">
+      <td width="173">
+      <p><font style="font-size: 11pt;" size="3">Data Ação</font></p>
+      </td>
+      <td width="84">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="363">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a data da ação no formato dd/mm/aaaa.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="173">
+      <p><font style="font-size: 11pt;" size="3">Tipo da Matéria</font></p>
+      </td>
+      <td width="84">
+      <p><font style="font-size: 11pt;" size="3">Obrigatório</font></p>
+      </td>
+      <td width="363">
+      <p><font style="font-size: 11pt;" size="3">Selecione na Caixa o Tipo de Matéria.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="173">
+      <p><font style="font-size: 11pt;" size="3">Unidade Local</font></p>
+      </td>
+      <td width="84">
+      <p><font style="font-size: 11pt;" size="3">Obrigatório</font></p>
+      </td>
+      <td width="363">
+      <p><font style="font-size: 11pt;" size="3">Selecione na Caixa a Unidade Local onde se encontram os processos a serem selecionados para tramitação.</font></p>
+      </td>
+    </tr>
+   <tr valign="top">
+    <td width="173">
+    <p><font style="fonte-size: 11pt;" size="3">Data Inicial</font></p>
+    </td>
+    <td width="84">
+    <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+    </td>
+    <td width="363">
+    <p><font style="font-size: 11pt;" size="3">Informe a data início (dd/mm/aaaa) do período no qual se insere a data de apresentação dos processos.</font></p>
+    </td>
+    </tr>
+   <tr valign="top">
+    <td width="173">
+    <p><font style="fonte-size: 11pt;" size="3">Data Final</font></p>
+    </td>
+    <td width="84">
+    <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+    </td>
+    <td width="363">
+    <p><font style="font-size: 11pt;" size="3">Informe a data fim (dd/mm/aaaa) do período no qual se insere a data de apresentação dos processos.</font></p>
+    </td>
+    </tr>
+   <tr valign="top">
+   <td width="173">
+   <p><font style="font-size: 11pt;" size="3">Unidade de Destino</font></p>
+   </td>
+   <td width="84">
+   <p><font style="fonte-size: 11pt;" size="3">Obrigatório</font></p>
+   </td>
+   <td width="363">
+    <p><font style="font-size: 11pt;" size="3">Selecione na Caixa a Unidade de Destino dos processos a serem selecionados para tramitação.</font></p>
+   </td>
+   </tr>
+   <tr valign="top">
+   <td width="173">
+   <p><font style="font-size: 11pt;" size="3">Texto da Ação</font></p>
+   </td>
+   <td width="84">
+   <p><font style="fonte-size: 11pt;" size="3">Obrigatório</font></p>
+   </td>
+   <td width="363">
+    <p><font style="font-size: 11pt;" size="3">Descreva a ação que explique a tramitação dos processos a serem selecionados.</font></p>
+   </td>
+   </tr>
+   <tr valign="top">
+    <td width="173">
+    <p><font style="fonte-size: 11pt;" size="3">Status Tramitação</font></p>
+    </td>
+    <td width="84">
+    <p><font style="font-size: 11pt;" size="3">Obrigatório</font></p>
+    </td>
+    <td width="363">
+    <p><font style="font-size: 11pt;" size="3">Informe o Status da Tramitação dos processos a serem selecionados.</font></p>
+    </td>
+    </tr>
+   <tr valign="top">
+   <td width="173">
+   <p><font style="font-size: 11pt;" size="3">Urgente</font></p>
+   </td>
+   <td width="84">
+   <p><font style="fonte-size: 11pt;" size="3">Obrigatório</font></p>
+   </td>
+   <td width="363">
+    <p><font style="font-size: 11pt;" size="3">Assinale se há ou não urgência na solução dos processos que estão sendo encaminhados.</font></p>
+   </td>
+   </tr>
+   <tr valign="top">
+   <td width="173">
+   <p><font style="font-size: 11pt;" size="3">Turno</font></p>
+   </td>
+   <td width="84">
+   <p><font style="fonte-size: 11pt;" size="3">Opcional</font></p>
+   </td>
+   <td width="363">
+    <p><font style="font-size: 11pt;" size="3">Selecione o Turno definido para apreciação dos processos que estão sendo encaminhados.</font></p>
+   </td>
+   </tr>
+   <tr valign="top">
+   <td width="173">
+   <p><font style="font-size: 11pt;" size="3">Data de Encaminhamento</font></p>
+   </td>
+   <td width="84">
+   <p><font style="fonte-size: 11pt;" size="3">Opcional</font></p>
+   </td>
+   <td width="363">
+    <p><font style="font-size: 11pt;" size="3">Informe a Data de Encaminhamento dos processos a serem selecionados para tramitação.</font></p>
+   </td>
+   </tr>
+   <tr valign="top">
+   <td width="173">
+   <p><font style="font-size: 11pt;" size="3">Data Fim do Prazo</font></p>
+   </td>
+   <td width="84">
+   <p><font style="fonte-size: 11pt;" size="3">Opcional</font></p>
+   </td>
+   <td width="363">
+    <p><font style="font-size: 11pt;" size="3">Informe, se houver, a data fim do prazo esperado para a solução dos processos selecionados para tramitação.</font></p>
+   </td>
+   </tr>
+    </tbody>
+</table>
+</center>
+<br />
+<br />
+A partir da lista de processos apresentada, assinale aqueles que deverão tramitar e acione a função <b>Tramitar</b> para a efetivação do encaminhamento.<br />
+<br />
+
+Ser&aacute; enviada a mensagem: <i>Tramitação efetivada com sucesso!</i><br />
+<br />
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'fim_relatoria' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'tipo_documento' %}">Pr&oacute;xima</a>
+
+<br />
+
+</div>
+
+{% endblock base_content %}

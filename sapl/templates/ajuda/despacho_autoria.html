@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading"><a NAME="despacho">Para inclus&atilde;o do Despacho Inicial, acione a
+fun&ccedil;&atilde;o &ldquo;Despacho Inicial&rdquo;</a></h1>
+<br />
+Selecione na Caixa Comiss&atilde;o a comiss&atilde;o que a
+mat&eacute;ria ser&aacute; encaminhada.<br />
+Campo de preenchimento obrigat&oacute;rio.<br />
+<br />
+Acione a fun&ccedil;&atilde;o&nbsp;
+&ldquo;Salvar&rdquo; para que as
+informa&ccedil;&otilde;es sejam salvas no arquivo.<br />
+Ser&aacute; enviada a mensagem: <i>Despacho inicial salvo
+com sucesso!</i><br />
+<br />
+Para <b>alterar</b> um Despacho Inicial, selecione o Despacho Inicial
+desejado, altere as informa&ccedil;&otilde;es e acione a
+fun&ccedil;&atilde;o &ldquo;Salvar&rdquo;.<br />
+Para <b>excluir</b> um Despacho Inicial, selecione o Despacho Inicial desejado
+e acione a fun&ccedil;&atilde;o &ldquo;Excluir&rdquo;.<br />
+Ser&aacute; enviada a pergunta &ldquo;Deseja realmente
+excluir?&rdquo;<br />
+Acione Confirmar em caso positivo ou Cancelar para o caso de
+desist&ecirc;ncia da exclus&atilde;o.<br />
+Quando for informado Confirmar ser&aacute; enviada a mensagem: <i>Despacho
+Inicial exclu&iacute;do com sucesso!</i><br />
+<br />
+<h1 class="firstHeading"><a NAME="autoria">Para inclus&atilde;o de Autoria, acione a
+fun&ccedil;&atilde;o &ldquo;Autoria&rdquo;</a></h1>
+<br/>
+Ser&aacute; exibida a tela com as informa&ccedil;&otilde;es
+da mat&eacute;ria (tipo, n&uacute;mero e ano), e a
+rela&ccedil;&atilde;o de autores j&aacute; designados
+&agrave; materia.<br />
+Acione o bot&atilde;o [Adicionar Autoria]<br />
+Preencha os seguintes campos:<br />
+<br />
+<center>
+<table width="653">
+  <col width="145" /> <col width="75" /> <col
+ width="401" /> <thead> <tr valign="top">
+    <td bgcolor="#c7d8eb" width="145">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Nome do Campo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="75">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Tipo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="401">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Instru&ccedil;&otilde;es para
+Preenchimento</b></font></p>
+    </td>
+  </tr>
+  </thead> <tbody>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Tipo
+de Autor</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Selecione
+na Caixa Tipo de Autor, o tipo de autoria da mat&eacute;ria</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Autor</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o Autor da Mat&eacute;ria.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Primeiro
+Autor</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Sim
+/ N&atilde;o &ndash; Informe se o autor &eacute; ou n&atilde;o o primeiro
+autor da mat&eacute;ria. Caso deseja alterar a indica&ccedil;&atilde;o de primeiro autor deve, inicialmente, alterar a indica&ccedil;&atilde;o do primeiro autor para n&atilde;o e, posteriormente, assinalar o outro autor para primeiro autor alterando a sua op&ccedil;&atilde;o para sim.</font></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</center>
+<br />
+<br />
+
+<i>Quando a autoria for parlamentar, estar&atilde;o dispon&iacute;veis para sele&ccedil;&atilde;o somente os parlamentares com mandato cuja data de apresenta&ccedil;&atilde;o da mat&eacute;ria em quest&atilde;o esteja dentro do per&iacute;odo do seu mandato.</i><br /><br />
+
+
+Acione a fun&ccedil;&atilde;o &ldquo;Salvar&rdquo; para
+que as informa&ccedil;&otilde;es sejam salvas no arquivo.<br />
+Ser&aacute; enviada a mensagem: <i>Autoria salva com sucesso!</i><br />
+Acione a fun&ccedil;&atilde;o Continuar para&nbsp; repetir
+a opera&ccedil;&atilde;o para outras Autorias, ou acione a
+fun&ccedil;&atilde;o Sair para sair do cadastramento de Autoria
+e voltar a tela inicial do sistema.<br />
+<br />
+Para <b>alterar</b> uma Autoria, selecione a Autoria desejada, altere as
+informa&ccedil;&otilde;es e acione a
+fun&ccedil;&atilde;o&nbsp; &ldquo;Salvar&rdquo;.<br />
+Para <b>excluir</b> uma Autoria, selecione a Autoria desejada e acione a
+fun&ccedil;&atilde;o &ldquo;Excluir&rdquo;.<br />
+Ser&aacute; enviada a pergunta &ldquo;Deseja realmente
+excluir?&rdquo;<br />
+Acione Confirmar em caso positivo ou Cancelar para o caso de
+desist&ecirc;ncia da exclus&atilde;o.<br />
+Quando for informado Confirmar ser&aacute; enviada a mensagem: <i>Autoria
+exclu&iacute;da com sucesso!</i><br />
+
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'cadastro_materia' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}?">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'legislacao_cita_matanexada' %}">Pr&oacute;xima</a>
+
+<br />
+
+
+</div>
+
+{% endblock base_content %}

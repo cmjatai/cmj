@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading">Norma Jur&iacute;dica</h1>
+<br />
+Antes de entrar na parte de alimenta&ccedil;&atilde;o dos dados
+de Norma Jur&iacute;dica &eacute; necess&aacute;rio que
+alimente as tabelas auxiliares que d&atilde;o suporte a esta
+transa&ccedil;&atilde;o, que s&atilde;o:<br />
+<b><br />
+- Tabela Auxiliar</b>
+<ul>
+  <li><a href="{% url 'sapl.base:help_topic' 'tipo_norma_juridica' %}">Tipo de Norma Jur&iacute;dica</a></li>
+</ul>
+<br />
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'numeracao_docsacess' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'tipo_norma_juridica' %}">Pr&oacute;xima</a>
+
+<br />
+
+</div>
+
+{% endblock base_content %}

@@ -1,0 +1,26 @@
+{% load i18n common_tags %}
+- title: {% trans 'Início' %}
+  url: materialegislativa_detail
+- title: {% trans 'Anexada' %}
+  url: anexada_list
+- title: {% trans 'Assunto' %}
+  url: materiaassunto_list
+- title: {% trans 'Autoria' %}
+  url: autoria_list
+- title: {% trans 'Despacho Inicial' %}
+  url: despachoinicial_list
+- title: {% trans 'Documento Acessório' %}
+  url: documentoacessorio_list
+- title: {% trans 'Legislação Citada' %}
+  url: legislacaocitada_list
+  app_name: 'materia'
+- title: {% trans 'Numeração' %}
+  url: numeracao_list
+- title: {% trans 'Tramitação' %}
+  url: tramitacao_list
+- title: {% trans 'Relatoria' %}
+  url: relatoria_list
+{% if 'texto_articulado_materia'|get_config_attr %}
+- title: {% trans 'Texto' %}
+  url: materia_ta
+{% endif %}

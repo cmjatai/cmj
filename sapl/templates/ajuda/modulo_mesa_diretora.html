@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading">Mesa Diretora</h1>
+Antes de entrar na parte de alimenta&ccedil;&atilde;o dos dados
+da mesa diretora &eacute; necess&aacute;rio que alimente as
+tabelas auxiliares que d&atilde;o suporte &agrave; esta
+transa&ccedil;&atilde;o, que s&atilde;o:<br />
+<br />
+<b>- Tabelas Auxiliares</b><br />
+<br />
+<ul>
+  <li><a href="{% url 'sapl.base:help_topic' 'legislatura' %}">Legislatura</a></li>
+  <li><a href="{% url 'sapl.base:help_topic' 'sessao_legislativa' %}">Sess&atilde;o Legislativa</a></li>
+  <li><a href="{% url 'sapl.base:help_topic' 'modulo_parlamentares' %}">M&oacute;dulo Parlamentares</a></li>
+  <li><a href="{% url 'sapl.base:help_topic' 'partidos' %}">Partidos</a></li>
+  <li><a href="{% url 'sapl.base:help_topic' 'cargo_mesa' %}">Cargo mesa</a></li>
+</ul>
+<br />
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'dependentes' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'sessao_legislativa' %}">Pr&oacute;xima</a>
+
+<br />
+
+
+</div>
+
+{% endblock base_content %}

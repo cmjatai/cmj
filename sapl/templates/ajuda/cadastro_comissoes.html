@@ -1,0 +1,588 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading"><a NAME="comis_topo">Cadastro de Comiss&otilde;es</a></h1>
+<br />
+Este M&oacute;dulo tem por objetivo
+cadastrar as Comiss&otilde;es da Casa Legislativa.<br />
+<br />
+Ao ter acesso a este&nbsp; m&oacute;dulo ser&aacute;
+exibida uma tela com a rela&ccedil;&atilde;o de
+Comiss&otilde;es j&aacute; cadastradas.<br />
+<br />
+Ao ser acionado o bot&atilde;o [Adicionar Comiss&atilde;o]
+ser&aacute; exibida a tela como os seguintes campos a serem
+preenchidos:<br />
+<br />
+<center>
+<p style="text-indent: 0.75cm; margin-bottom: 0cm;"
+ align="justify"><font style="font-size: 11pt;"
+ size="3"><i><u>Dados Básicos:</u></i></font></p>
+<table width="653">
+  <col width="145"> <col width="75"> <col
+ width="401"> <thead> <tr valign="top">
+    <td bgcolor="#c7d8eb" width="145">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Nome do Campo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="75">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Tipo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="401">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Instru&ccedil;&otilde;es para
+Preenchimento</b></font></p>
+    </td>
+  </tr>
+  </thead> <tbody>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Nome
+da Comiss&atilde;o</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o nome da Comiss&atilde;o</font></p>
+      </td>
+    </tr>/
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Sigla</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a sigla da Comiss&atilde;o</font></p>
+      </td>
+    </tr>
+     <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Comissão Ativa</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional.</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe se a comissão é ativa ou não.</font></p>
+      </td>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Tipo</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Escolha
+na caixa de tipo o tipo da comiss&atilde;o que est&aacute;
+sendo cadastrada.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Data
+Cria&ccedil;&atilde;o</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a data de cria&ccedil;&atilde;o da comiss&atilde;o no
+formato dia, m&ecirc;s e ano (ano com quatro
+posi&ccedil;&otilde;es)</font></p>
+      </td>
+    </tr>
+     <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Data de Extinção.</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a data de extinsão da comiss&atilde;o no
+formato dia, m&ecirc;s e ano (ano com quatro
+posi&ccedil;&otilde;es)</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Unidade
+Deliberativa</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Sim
+/ N&atilde;o &ndash; Informe se a unidade &eacute;
+deliberativa ou n&atilde;o.</font></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</center>
+<p style="text-indent: 0.75cm; margin-bottom: 0cm;"
+ align="justify"><br />
+</p>
+<p style="text-indent: 0.75cm; margin-bottom: 0cm;"
+ align="justify"><font style="font-size: 11pt;"
+ size="3"><i><u>Complementares;</u></i></font></p><br />
+<center>
+<table width="653">
+  <col width="145" /> <col width="75" /> <col
+ width="401" /> <thead> <tr valign="top">
+    <td bgcolor="#c7d8eb" width="145">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Nome do Campo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="75">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Tipo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="401">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Instru&ccedil;&otilde;es para
+Preenchimento</b></font></p>
+    </td>
+  </tr>
+  </thead> <tbody>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Local
+Reuni&atilde;o</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+neste campo o local em que a comiss&atilde;o se reuni.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Data/Hora
+Reuni&atilde;o</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a data e a hora em que a comiss&atilde;o se reuni.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Tel.
+Sala Reuni&atilde;o</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o n&uacute;mero do telefone da sala de reuni&atilde;o da
+comiss&atilde;o.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Endere&ccedil;o
+Secretaria</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o endere&ccedil;o da secretaria da comiss&atilde;o.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Tel.
+Secretaria</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o n&uacute;mero do telefone da secretaria da comiss&atilde;o.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Fax
+Secretaria</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o n&uacute;mero do fax da secretaria da comiss&atilde;o.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Secret&aacute;rio</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o nome do secret&aacute;rio da comiss&atilde;o.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">E-mail</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o endere&ccedil;o do correio eletr&ocirc;nico da
+comiss&atilde;o no formato </font><font color="#0000ff"><u><a
+ href="mailto:nome@provedor"><font style="font-size: 11pt;"
+ size="3">nome@provedor</font></a></u></font><font
+ style="font-size: 11pt;" size="3"> se houver.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Finalidade</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Descreva
+a finalidade pela qual a comiss&atilde;o foi criada.</font></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</center>
+<p style="text-indent: 0.75cm; margin-bottom: 0cm;"
+ align="justify"><br />
+</p>
+<p style="text-indent: 0.75cm; margin-bottom: 0cm;"
+ align="justify"><font style="font-size: 11pt;"
+ size="3"><i><u>Para
+Comiss&atilde;o Tempor&aacute;ria informe:</u></i></font></p><br />
+<center>
+<table width="653">
+  <col width="145" /> <col width="75" /> <col
+ width="401" /> <thead> <tr valign="top">
+    <td bgcolor="#c7d8eb" width="145">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Nome do Campo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="75">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Tipo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="401">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Instru&ccedil;&otilde;es para
+Preenchimento</b></font></p>
+    </td>
+  </tr>
+  </thead> <tbody>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Apelido</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o apelido da comiss&atilde;o (nome popular pelo qual a
+comiss&atilde;o ficou conhecida) se houver.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Data
+Instala&ccedil;&atilde;o</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a data da instala&ccedil;&atilde;o da comiss&atilde;o no
+formato dia, m&ecirc;s e ano (ano com quatro
+posi&ccedil;&otilde;es)</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Data
+Prevista T&eacute;rmino</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a data de termino que foi prevista na cria&ccedil;&atilde;o da
+comiss&atilde;o no formato dia, m&ecirc;s e ano (ano com quatro
+posi&ccedil;&otilde;es).</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Novo
+Prazo</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a data de in&iacute;cio do novo prazo da comiss&atilde;o em
+caso de prorroga&ccedil;&atilde;o dos trabalhos da mesma, no
+formato dia, m&ecirc;s e ano (ano com quatro
+posi&ccedil;&otilde;es).</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Data
+T&eacute;rmino</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a data em que a comiss&atilde;o encerrou seus trabalhos no formato
+dia, m&ecirc;s e ano (ano com quatro posi&ccedil;&otilde;es)</font></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</center>
+<p style="text-indent: 0.75cm; margin-bottom: 0cm;"
+ align="justify"><br />
+</p>
+<br />
+Acione a fun&ccedil;&atilde;o
+&ldquo;Salvar&rdquo; para gravar as
+informa&ccedil;&otilde;es no arquivo.<br />
+
+<br />
+Caso seja acionada a fun&ccedil;&atilde;o &ldquo;Incluir
+como unidade de Tramita&ccedil;&atilde;o&rdquo;,
+ser&aacute; enviada a mensagem:<sbr />
+<i>Unidade de tramita&ccedil;&atilde;o salva com sucesso!</i><br />
+<br />
+Para <b>alterar</b> os dados de uma Comiss&atilde;o j&aacute;
+cadastrada, selecione a comiss&atilde;o na lista de
+comiss&otilde;es altere as informa&ccedil;&otilde;es e
+acione a fun&ccedil;&atilde;o &ldquo;Salvar&rdquo;.<br />
+<br />
+Para <b>excluir</b> uma comiss&atilde;o, selecione a comiss&atilde;o e
+acione a fun&ccedil;&atilde;o &ldquo;Excluir&rdquo;.<br />
+Ser&aacute; enviada a pergunta &ldquo;Deseja realmente
+excluir?&rdquo;<br />
+<br />
+Acione Confirmar em caso positivo ou Cancelar para o caso
+de desist&ecirc;ncia da exclus&atilde;o.<br />
+Quando for informado Confirmar ser&aacute; enviada a mensagem
+: <i>Comiss&atilde;o exclu&iacute;da com sucesso!.</i><br />
+<br />
+<br />
+<h1 class="firstHeading"><a NAME="comis_compo">Composi&ccedil;&atilde;o</a></h1>
+<br />
+Para incluir a composi&ccedil;&atilde;o de uma
+comiss&atilde;o, selecione a comiss&atilde;o, e acione a
+fun&ccedil;&atilde;o Composi&ccedil;&atilde;o que
+est&aacute; na barra superior da tela.<br />
+<br />
+Escolha o per&iacute;odo da composi&ccedil;&atilde;o na
+caixa de per&iacute;odos j&aacute; cadastrados e acione o
+bot&atilde;o [Adicionar Parlamentar na
+Composi&ccedil;&atilde;o]. Ser&atilde;o visualizados para sele&ccedil;&atilde;o aqueles parlamentares cujos mandatos coincidam com o per&iacute;odo da composi&ccedil;&atilde;o. <br />
+<br />
+<center>
+<table style="" border="1" cellpadding="5"
+ cellspacing="0" width="85%">
+  <col width="59*" /> <col width="40*" /> <col
+ width="157*" /> <thead> <tr valign="top">
+    <td bgcolor="#c7d8eb" width="23%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Nome do Campo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="16%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Tipo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="61%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Instru&ccedil;&otilde;es para
+Preenchimento</b></font></p>
+    </td>
+  </tr>
+  </thead> <tbody>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">Nome</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="61%">
+      <p><font style="font-size: 11pt;" size="3">Escolha
+na caixa de nomes o Parlamentar que compor&aacute; a
+composi&ccedil;&atilde;o.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">Cargo</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="61%">
+      <p><font style="font-size: 11pt;" size="3">Escolha
+na caixa de cargos o cargo que o Parlamentar escolhido ter&aacute;
+na composi&ccedil;&atilde;o da comiss&atilde;o.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">Titular</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="61%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+se o Parlamentar &eacute; titular da comiss&atilde;o ou
+suplente, (caso o parlamentar seja titular selecione a
+op&ccedil;&atilde;o SIM, caso seja suplente, selecione a
+op&ccedil;&atilde;o N&Atilde;O)</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">Data
+Designa&ccedil;&atilde;o</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="61%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a data em que o parlamentar foi designado para compor a
+comiss&atilde;o, no formato dia, m&ecirc;s e ano (ano com
+quatro posi&ccedil;&otilde;es)</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">Data
+Desligamento</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="61%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a data em que o parlamentar se desligou da comiss&atilde;o (se for
+o caso), no formato dia, m&ecirc;s e ano (ano com quatro
+posi&ccedil;&otilde;es)</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">Motivo
+Desligamento</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="61%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o motivo pelo qual o parlamentar se desligou da comiss&atilde;o,
+ex. Licen&ccedil;a sa&uacute;de, Perda do mandato etc.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">Observa&ccedil;&atilde;o</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="61%">
+      <p><font style="font-size: 11pt;" size="3">Preencha
+este campo com outras informa&ccedil;&otilde;es sobre o
+Parlamentar ao a comiss&atilde;o, que se fizer
+necess&aacute;rio.</font></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</center>
+<br />
+Acione a fun&ccedil;&atilde;o&nbsp;
+&ldquo;Salvar&rdquo; para que as
+informa&ccedil;&otilde;es sejam salvas no arquivo.<br />
+Ser&aacute; enviada a mensagem: <i>Composi&ccedil;&atilde;o
+salva com sucesso!</i><br />
+<br />
+Para <b>alterar</b> uma Composi&ccedil;&atilde;o, selecione o
+parlamentar que comp&otilde;e a comiss&atilde;o, altere as
+informa&ccedil;&otilde;es e acione a
+fun&ccedil;&atilde;o &ldquo;Salvar&rdquo;.<br />
+<br />
+Para <b>excluir</b> um parlamentar que comp&otilde;e a
+comiss&atilde;o, selecione o parlamentar na lista de parlamentares
+da comiss&atilde;o e acione a fun&ccedil;&atilde;o
+&ldquo;Excluir&rdquo;.<br />
+Ser&aacute; enviada a pergunta &ldquo;Deseja realmente
+excluir?&rdquo;<br />
+Acione Confirmar em caso positivo ou Cancelar para o caso de
+desist&ecirc;ncia da exclus&atilde;o.<br />
+Quando for informado Confirmar ser&aacute; enviada a mensagem:
+<i>Composi&ccedil;&atilde;o exclu&iacute;da com
+sucesso!</i><br />
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'periodo_composicao_comissao' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'modulo_tramitacao_materias' %}">Pr&oacute;xima</a>
+
+<br />
+
+
+</div>
+
+{% endblock base_content %}

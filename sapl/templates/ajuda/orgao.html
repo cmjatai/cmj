@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading">&Oacute;rg&atilde;o</h1>
+<br />
+Esta tabela tem por objetivo cadastrar os &Oacute;rg&atilde;os
+das unidades administrativas das casas legislativas.<br />
+Ao ter acesso a esta tabela ser&aacute; exibida uma tela com a
+rela&ccedil;&atilde;o de &Oacute;rg&atilde;os
+j&aacute; cadastrados e um bot&atilde;o &ldquo;Incluir
+&Oacute;rg&atilde;o&rdquo;.<br />
+<br />
+Ao ser&nbsp; acionado o bot&atilde;o [Adicionar
+&Oacute;rg&atilde;o] ser&aacute; exibida a tela com os
+seguintes campos a serem preenchidos:<br />
+<br />
+<center>
+<table width="653">
+  <col width="145" /> <col width="75" /> <col
+ width="401" /> <thead> <tr valign="top">
+    <td bgcolor="#c7d8eb" width="145">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Nome do Campo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="75">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Tipo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="401">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Instru&ccedil;&otilde;es para
+Preenchimento</b></font></p>
+    </td>
+  </tr>
+  </thead> <tbody>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Nome</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o nome da unidade administrativa.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Sigla</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a sigla da unidade administrativa.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Unidade
+Deliberativa</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Sim
+/ N&atilde;o &ndash; Informe se a unidade &eacute;
+deliberativa ou n&atilde;o.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Endere&ccedil;o</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o endere&ccedil;o da unidade administrativa.</font></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</center>
+<br />
+<br />
+Acione a fun&ccedil;&atilde;o&nbsp;
+&ldquo;Salvar&rdquo; para que as
+informa&ccedil;&otilde;es sejam salvas no arquivo.<br />
+Ser&aacute; enviada a mensagem: <i>
+&Oacute;rg&atilde;o salvo com sucesso!</i><br />
+<i>&ldquo;Se deseja cadastrar esse
+&Oacute;rg&atilde;o como uma unidade de
+tramita&ccedil;&atilde;o, clique abaixo em <b>&ldquo;Incluir
+como unidade de tramita&ccedil;&atilde;o&rdquo;</b></i>".<br />
+
+<br />
+Caso seja acionado a op&ccedil;&atilde;o: Incluir como unidade
+de tramita&ccedil;&atilde;o, ser&aacute; enviado a mensagem:<br />
+<i>Unidade de tramita&ccedil;&atilde;o salva com
+sucesso!.</i><br />
+<br />
+Para <b>alterar</b> os dados de um &Oacute;rg&atilde;o j&aacute;
+cadastrado, selecione o &Oacute;rg&atilde;o na lista de
+&Oacute;rg&atilde;os, altere as
+informa&ccedil;&otilde;es e acione a
+fun&ccedil;&atilde;o&nbsp; &ldquo;Salvar&rdquo;.<br />
+<br />
+Para <b>excluir</b> um &Oacute;rg&atilde;o, selecione o
+&Oacute;rg&atilde;o e acione a fun&ccedil;&atilde;o
+&ldquo;Excluir&rdquo;.<br />
+Ser&aacute; enviada a pergunta &ldquo;Deseja realmente
+excluir?&rdquo;<br />
+Acione Confirmar em caso positivo ou Cancelar para o caso de
+desist&ecirc;ncia da exclus&atilde;o.<br />
+Quando for informado Confirmar ser&aacute; enviada a mensagem <i>!&Oacute;rg&atilde;o&nbsp;
+exclu&iacute;do com sucesso!</i><br />
+
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'unidade_tramitacao' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'fim_relatoria' %}">Pr&oacute;xima</a>
+
+<br />
+
+</div>
+
+{% endblock base_content %}

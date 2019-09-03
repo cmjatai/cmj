@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading">Regime de Tramita&ccedil;&atilde;o</h1>
+<br/>
+Esta tabela tem por objetivo cadastrar os tipos de regime de
+tramita&ccedil;&atilde;o das mat&eacute;rias legislativas
+que ocorre na casa.<br />
+Ao ter acesso a esta tabela ser&aacute; exibida uma tela com a
+rela&ccedil;&atilde;o de tipos de regime de
+tramita&ccedil;&atilde;o das mat&eacute;rias, j&aacute;
+cadastradas.<br />
+Informe o tipo de regime de tramita&ccedil;&atilde;o no campo e
+acione o bot&atilde;o &ldquo;Incluir Regime de
+Tramita&ccedil;&atilde;o&rdquo;. Campo de preenchimento
+obrigat&oacute;rio. <br />
+Ser&aacute; enviada a mensagem: <i>Regime de
+Tramita&ccedil;&atilde;o salvo com sucesso!</i><br />
+
+<br />
+Para <b>alterar</b> um tipo de regime de
+tramita&ccedil;&atilde;o,&nbsp; efetue a
+altera&ccedil;&atilde;o desejada e acione a
+a&ccedil;&atilde;o &ldquo;Atualizar&rdquo;.<br />
+Para <b>excluir</b> um tipo de regime de
+tramita&ccedil;&atilde;o, acione a a&ccedil;&atilde;o
+excluir.<br />
+Ser&aacute; enviada a pergunta &ldquo;Deseja realmente
+excluir?&rdquo;<br />
+Acione Confirmar em caso positivo ou Cancelar para o caso de
+desist&ecirc;ncia da exclus&atilde;o.<br />
+Quando for informado Confirmar ser&aacute; enviada a mensagem: <i>Regime de
+Tramita&ccedil;&atilde;o exclu&iacute;do com sucesso!</i><br />
+
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'tipo_materia_legislativa' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'origem' %}">Pr&oacute;xima</a>
+
+<br />
+
+</div>
+
+{% endblock base_content %}

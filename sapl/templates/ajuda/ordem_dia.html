@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading">Ordem do Dia</h1>
+<br />
+Este M&oacute;dulo tem por objetivo cadastrar a ordem do dia que
+ser&aacute; apreciada na&nbsp; Sess&atilde;o
+Plen&aacute;ria1 da Casa.<br />
+Ao ter acesso a este&nbsp; m&oacute;dulo ser&aacute;
+exibida uma tela com a rela&ccedil;&atilde;o das ordens do dia
+j&aacute; cadastradas e um bot&atilde;o&nbsp;
+&ldquo;Incluir Ordem do Dia&rdquo;<br />
+Ao ser acionado o bot&atilde;o Incluir Ordem do Dia ser&aacute;
+exibida a tela como os seguintes campos a serem preenchidos:<br />
+<br />
+<u><b>Mat&eacute;ria da Ordem do Dia:</b></u><br />
+<br />
+<center>
+<table width="85%">
+  <col width="60*" /> <col width="40*" /> <col
+ width="156*" /> <thead> <tr valign="top">
+    <td bgcolor="#c7d8eb" width="24%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Nome do Campo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="16%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Tipo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="61%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Instru&ccedil;&otilde;es para
+Preenchimento</b></font></p>
+    </td>
+  </tr>
+  </thead> <tbody>
+    <tr valign="top">
+      <td width="24%">
+      <p><font style="font-size: 11pt;" size="3">Data</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="61%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a data da ordem do dia no formato dia, m&ecirc;s e ano (ano com
+quatro posi&ccedil;&otilde;es).</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="24%">
+      <p><font style="font-size: 11pt;" size="3">N&deg;.
+Ordem</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="61%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o n&uacute;mero da ordem do dia.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="24%">
+      <p><font style="font-size: 11pt;" size="3">Tipo
+Mat&eacute;ria</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="61%">
+      <p><font style="font-size: 11pt;" size="3">Selecione
+na caixa Tipo Mat&eacute;ria o tipo da mat&eacute;ria.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="24%">
+      <p><font style="font-size: 11pt;" size="3">N&uacute;mero</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="61%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o n&uacute;mero da mat&eacute;ria.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="24%">
+      <p><font style="font-size: 11pt;" size="3">Ano</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="61%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o ano da mat&eacute;ria.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="24%">
+      <p><font style="font-size: 11pt;" size="3">Observa&ccedil;&atilde;o</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="61%">
+      <p><font style="font-size: 11pt;" size="3">Digite
+as ementa da mat&eacute;ria.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="24%">
+      <p><font style="font-size: 11pt;" size="3">Tipo Vota&ccedil;&atilde;o</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="61%">
+      <p><font style="font-size: 11pt;" size="3">Assinale uma das op&ccedil;&otilde;es de vota&ccedil;&atilde;
+o da mat&eacute;ria.</font></p>
+  </tbody>
+</table>
+</center>
+<br />
+<br />
+Acione a fun&ccedil;&atilde;o&nbsp;
+&ldquo;Salvar&rdquo; para que as
+informa&ccedil;&otilde;es sejam salvas no arquivo.<br />
+Ser&aacute; enviada a mensagem: <i>Mat&eacute;ria salva
+com sucesso na Ordem do Dia!</i><br />
+<br />
+Para <b>alterar</b> uma Ordem do Dia, selecione a Ordem do dia desejada,
+altere as informa&ccedil;&otilde;es e acione a
+fun&ccedil;&atilde;o &ldquo;Salvar&rdquo;.<br />
+Para <b>excluir</b> uma Ordem do Dia&nbsp; selecione a Ordem do dia
+desejada e acione a fun&ccedil;&atilde;o
+&ldquo;Excluir&rdquo;.<br />
+Ser&aacute; enviada a pergunta &ldquo;Deseja realmente
+excluir?&rdquo;<br />
+Acione Confirmar em caso positivo ou Cancelar para o caso de
+desist&ecirc;ncia da exclus&atilde;o.<br />
+Quando for informado Confirmar ser&aacute; enviada a mensagem: <i>Mat&eacute;ria
+exclu&iacute;da com sucesso da ordem do dia!</i><br />
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'norma_juridica' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'sessao_plenaria' %}">Pr&oacute;xima</a>
+
+<br />
+
+
+
+</div>
+
+{% endblock base_content %}

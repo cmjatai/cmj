@@ -1,0 +1,20 @@
+{% load i18n common_tags%}
+
+- title: {% trans 'Início' %}
+  url: normajuridica_detail
+- title: {% trans 'Alterações em Outras Normas' %}
+  url: normarelacionada_list
+  check_permission: norma.list_normarelacionada
+- title: {% trans 'Anexos da Norma' %}
+  url: anexonormajuridica_list
+- title: {% trans 'Autoria' %}
+  url: autorianorma_list
+#  Opção adicionada para chamar o TextoArticulado da norma.
+#   para integração foram necessárias apenas criar a url norma_ta em urls.py
+#   e a view NormaTaView(IntegracaoTaView) em views.py
+#  Em nada mais a integração interfere em NormaJuridica
+
+{% if 'texto_articulado_norma'|get_config_attr %}
+- title: {% trans 'Texto Compilado' %}
+  url: norma_ta
+{% endif %}

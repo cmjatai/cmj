@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading">Tipo de Autor</h1>
+Esta tabela tem por objetivo cadastrar os Tipos de Autores que
+apresentam mat&eacute;rias legislativas.<br />
+Ao ter acesso a esta tabela ser&aacute; exibida uma tela com a
+rela&ccedil;&atilde;o de Tipo de Autores j&aacute;
+cadastrados e um bot&atilde;o &ldquo;Incluir Tipo de
+Autor&rdquo;.<br />
+<br />
+Ao ser&nbsp; acionado o bot&atilde;o Incluir Tipo de Autor
+ser&aacute; exibida a tela com os seguintes campos a serem
+preenchidos:<br />
+<br />
+<center>
+<table width="85%">
+  <col width="57*" /> <col width="40*" /> <col
+ width="159*" /> <thead> <tr valign="top">
+    <td bgcolor="#c7d8eb" width="22%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Nome do Campo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="15%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Tipo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="62%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Instru&ccedil;&otilde;es para
+Preenchimento</b></font></p>
+    </td>
+  </tr>
+  </thead> <tbody>
+    <tr valign="top">
+      <td width="22%">
+      <p><font style="font-size: 11pt;" size="3">Tipo</font></p>
+      </td>
+      <td width="15%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="62%">
+      <p><font style="font-size: 11pt;" size="3">Escolha
+o tipo do autor se &eacute; Parlamentar, uma Comiss&atilde;o ou
+Outro.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="22%">
+      <p><font style="font-size: 11pt;" size="3">Descri&ccedil;&atilde;o</font></p>
+      </td>
+      <td width="15%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="62%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o nome do Autor.</font></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</center>
+<br />
+<br />
+Acione a fun&ccedil;&atilde;o&nbsp;
+&ldquo;Salvar&rdquo; para que as
+informa&ccedil;&otilde;es sejam salvas no arquivo.<br />
+Ser&aacute; enviada a mensagem: <i>Tipo Autor salvo com
+sucesso!</i><br />
+<br />
+Para <b>alterar</b> um Tipo Autor, selecione o Tipo Autor
+desejado, altere as informa&ccedil;&otilde;es e acione a
+fun&ccedil;&atilde;o &ldquo;Salvar&rdquo;.<br />
+Para <b>excluir</b> um Tipo de Autor, selecione o Tipo de
+Autor e acione a fun&ccedil;&atilde;o
+&ldquo;Excluir&rdquo;.<br />
+Ser&aacute; enviada a pergunta &ldquo;Deseja realmente
+excluir?&rdquo;<br />
+Acione Confirmar em caso positivo ou Cancelar para o caso de
+desist&ecirc;ncia da exclus&atilde;o.<br />
+Quando for informado Confirmar ser&aacute; enviada a mensagem: <i>Tipo
+Autor exclu&iacute;do com sucesso!</i><br />
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'autor' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'unidade_tramitacao' %}">Pr&oacute;xima</a>
+
+<br />
+
+</div>
+
+{% endblock base_content %}

@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading">Tipo de Proposi&ccedil;&atilde;o</h1>
+Esta tabela tem por objetivo cadastrar os Tipos de Proposi&ccedil;&otilde;es
+Legislativas.<br />
+Ao ter acesso a esta tabela ser&aacute; exibida uma tela com a
+rela&ccedil;&atilde;o de Tipo de Proposi&ccedil;&otilde;es j&aacute;
+cadastradas.<br />
+<br />
+Ao ser&nbsp; acionado o bot&atilde;o [Adicionar Tipo Proposi&ccedil;&atilde;o]
+ser&aacute; exibida a tela com os seguintes campos a serem
+preenchidos:<br />
+<br />
+<center>
+<table width="85%">
+  <col width="57*" /> <col width="40*" /> <col
+ width="159*" /> <thead> <tr valign="top">
+    <td bgcolor="#c7d8eb" width="22%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Nome do Campo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="15%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Descri&ccedil;&atilde;o</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="62%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Instru&ccedil;&otilde;es para
+Preenchimento</b></font></p>
+    </td>
+  </tr>
+  </thead> <tbody>
+    <tr valign="top">
+      <td width="22%">
+      <p><font style="font-size: 11pt;" size="3">Descri&ccedil;&atilde;o</font></p>
+      </td>
+      <td width="15%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="62%">
+      <p><font style="font-size: 11pt;" size="3">Fa&ccedil;a breve descri&ccedil;&atilde;o sobre o tipo de proposi&ccedil;&atilde;o em quest&atilde;o.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="22%">
+      <p><font style="font-size: 11pt;" size="3">Definição de Tipo</font></p>
+      </td>
+      <td width="15%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="62%">
+      <p><font style="font-size: 11pt;" size="3">Informe a definição deo tipo de proposição</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="22%">
+      <p><font style="font-size: 11pt;" size="3">Seleção de Tipo</font></p>
+      </td>
+      <td width="15%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="62%">
+      <p><font style="font-size: 11pt;" size="3">Informe a seleção do tipo de proposição.</font></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</center>
+<br />
+<br />
+Acione a fun&ccedil;&atilde;o&nbsp;
+&ldquo;Salvar&rdquo; para que as
+informa&ccedil;&otilde;es sejam salvas no arquivo.<br />
+Ser&aacute; enviada a mensagem: <i>Tipo Proposi&ccedil;&atilde;o salvo com
+sucesso!</i><br /><br /> 
+<br />
+Para <b>alterar</b> um Tipo Proposi&ccedil;&atilde;o, selecione clicando sobre o Tipo de Proposi&ccedil;&atilde;o desejado, altere as informa&ccedil;&otilde;es e acione a fun&ccedil;&atilde;o &ldquo;Salvar&rdquo;.<br /> <br />
+Para <b>excluir</b> um Tipo de Proposi&ccedil;&atilde;o, selecione clicando sobre o Tipo
+ e acione a fun&ccedil;&atilde;o &ldquo;Excluir&rdquo;. Ser&aacute; enviada a pergunta &ldquo;Deseja realmente excluir?&rdquo;<br />
+Acione Confirmar em caso positivo ou Cancelar para o caso de desist&ecirc;ncia da exclus&atilde;o.<br />
+Quando for informado Confirmar ser&aacute; enviada a mensagem: <i>Tipo Proposi&ccedil;&atilde;o exclu&iacute;do com sucesso!</i><br />
+
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'proposicao_editor' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'recebimento_proposicao' %}">Pr&oacute;xima</a>
+
+<br />
+
+</div>
+
+{% endblock base_content %}

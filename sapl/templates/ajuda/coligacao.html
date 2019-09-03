@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+
+<h1 class="firstHeading"><a NAME="colig_topo">Coliga&ccedil;&atilde;o</a></h1>
+<br />
+Esta tabela tem por objetivo cadastrar as
+Coliga&ccedil;&otilde;es Partid&aacute;rias existentes na
+Casa Legislativa<br />
+<br />
+Ao ter acesso a esta tabela ser&aacute; exibida uma tela com as
+coliga&ccedil;&otilde;es j&aacute; cadastradas e o
+bot&atilde;o [Adicionar
+Coliga&ccedil;&atilde;o]. Ao ser acionado este
+bot&atilde;o ser&aacute; exibida a tela com os seguintes campos
+para serem preenchidos:<br />
+<br />
+<center>
+<table width="653">
+  <col width="154" /> <col width="94" /> <col
+ width="372" /> <thead> <tr valign="top">
+    <td bgcolor="#c7d8eb" width="154">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Nome do Campo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="94">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Tipo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="372">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Instru&ccedil;&otilde;es para
+Preenchimento</b></font></p>
+    </td>
+  </tr>
+  </thead> <tbody>
+    <tr valign="top">
+      <td width="154">
+      <p><font style="font-size: 11pt;" size="3">Nome</font></p>
+      </td>
+      <td width="94">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="372">
+      <p><font style="font-size: 11pt;" size="3">Preencher
+este campo com o nome da coliga&ccedil;&atilde;o
+partid&aacute;ria</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td height="28" width="154">
+      <p><font style="font-size: 11pt;" size="3">N.&ordm;
+Legislatura</font></p>
+      </td>
+      <td width="94">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="372">
+      <p><font style="font-size: 11pt;" size="3">Selecione
+na caixa N.&deg; Legislatura o n&uacute;mero da legislatura na
+qual a coliga&ccedil;&atilde;o foi realizada.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="154">
+      <p><font style="font-size: 11pt;" size="3">N.&ordm;
+de Votos Recebidos</font></p>
+      </td>
+      <td width="94">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="372">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o n&uacute;mero de votos que a coliga&ccedil;&atilde;o
+recebeu</font></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</center>
+<br />
+Acione a tecla&nbsp; &ldquo;Salvar&rdquo; para que as
+informa&ccedil;&otilde;es sejam salvas no arquivo.<br />
+Ser&aacute; enviada a mensagem: <i>Coliga&ccedil;&atilde;o
+salva com sucesso!</i><br />
+<br />
+Para <b>alterar</b> uma Coliga&ccedil;&atilde;o, selecione a
+Coliga&ccedil;&atilde;o&nbsp; desejada, altere as
+informa&ccedil;&otilde;es e acione a
+fun&ccedil;&atilde;o &ldquo;Salvar&rdquo;.<br />
+Para <b>excluir</b> uma Coliga&ccedil;&atilde;o, selecione a
+Coliga&ccedil;&atilde;o desejada e acione a
+fun&ccedil;&atilde;o &ldquo;Excluir&rdquo;.<br />
+Ser&aacute; enviada a pergunta &ldquo;Deseja realmente
+excluir?&rdquo;<br />
+Acione Confirmar em caso positivo ou Cancelar para o caso de
+desist&ecirc;ncia da exclus&atilde;o.<br />
+Quando for informado Confirmar ser&aacute; enviada a mensagem: <i>Coliga&ccedil;&atilde;o exclu&iacute;da com sucesso!</i><br />
+
+<br />
+<h1 class="firstHeading"><a NAME="colig_compo">Composi&ccedil;&atilde;o</a></h1>
+<br />
+Ao ter acesso a esta tabela ser&aacute; exibida uma tela com as
+coliga&ccedil;&otilde;es j&aacute; cadastradas e o
+bot&atilde;o [Adicionar
+Composição]. Ao ser acionado este
+bot&atilde;o ser&aacute; exibida a tela com os seguintes campos
+para serem preenchidos:<br />
+Preencha os campos:<br />
+<br />
+Selecione na Caixa de Partidos, os partidos que comp&otilde;em a
+Coliga&ccedil;&atilde;o.<br />
+Campo de preenchimento obrigat&oacute;rio.<br />
+Acione o Bot&atilde;o Adicionar.<br />
+Ser&aacute; enviada a mensagem: <i>Composi&ccedil;&atilde;o
+salva com sucesso!</i><br />
+<br />
+Para <b>alterar</b> um partido da composi&ccedil;&atilde;o, selecione
+o partido na rela&ccedil;&atilde;o de partidos
+inclu&iacute;dos, e acione a a&ccedil;&atilde;o
+&ldquo;Atualizar&rdquo;.<br />
+Ser&aacute; enviada a mensagem !Composi&ccedil;&atilde;o
+salva com sucesso.<br />
+Acione a fun&ccedil;&atilde;o Continuar para voltar a tela de
+cadastramento de Composi&ccedil;&atilde;o.<br />
+<br />
+Para <b>excluir</b> uma Composi&ccedil;&atilde;o, e acione a
+a&ccedil;&atilde;o &ldquo;Excluir&rdquo;.<br />
+Ser&aacute; enviada a pergunta &ldquo;Confirma a
+exclus&atilde;o?&rdquo;<br />
+Acione Confirmar em caso positivo ou Cancelar para o caso de
+desist&ecirc;ncia da exclus&atilde;o.<br />
+Quando for informado Confirmar ser&aacute; enviada a mensagem: <i>
+Composi&ccedil;&atilde;o exclu&iacute;da com sucesso!</i><br />
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'partidos' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'cadastro_parlamentares' %}">Pr&oacute;xima</a>
+
+<br />
+
+</div>
+
+{% endblock base_content %}

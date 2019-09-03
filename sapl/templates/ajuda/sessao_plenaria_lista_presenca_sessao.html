@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading">Sess&atilde;o Plen&aacute;ria - lista de presen&ccedil;a na sess&atilde;o</h1><br />
+<br>Esta fun&ccedil;&atilde;o permite cadastrar a lista de presen&ccedil;as dos parlamentares na Sess&atilde;o Plen&aacute;ria.<br />
+<br>Para isso, basta assinalar - com um clique do mouse - no quadro, que se encontra a esquerda do nome de cada parlamentar, a presen&ccedil;a na Sess&atilde;o e acionar o bot&atilde;o 'Salvar'. <br />
+<br>Para excluir o parlamentar da lista de presen&ccedil;as basta desmarcar - com um clique do mouse - o quadro correspondente ao nome do parlamentar e acionar o bot&atilde;o 'Salvar'.<br />
+<br>O sistema ir&aacute; exibir a mensagem <i>!Lista de presen&ccedil;a de parlamentares da Sess&atilde;o Plen&aacute;ria foi cadastrada com sucesso</i>.<br />
+<br>Tamb&eacute;m, o sistema ir&aacute; exibir a mensagem: <i>Qu&oacute;rum n&atilde;o atingido para a Sess&atilde;o Plen&aacute;ria</i>, caso o n&uacute;mero de parlamentares presentes seja inferior ao <b>qu&oacute;rum m&iacute;nimo</b> exigido para esse tipo de Sess&atilde;o Plen&aacute;ria.<br />
+<br>Por outro lado, tendo sido assinalada a quantidade de parlamentares presentes a sess&atilde;o, ap&oacute;s clicar no bot&atilde;o 'Salvar', o sistema emitir&aacute; a mensagem: <i>!Qu&oacute;rum atingido para a Sess&atilde;o Plen&aacute;ria!</i>.<br />
+<br>A informa&ccedil;&atilde;o, sobre o qu&oacute;rum, foi previamente cadastrada quando do cadastro do tipo de sess&atilde;o no sistema.<br />
+<br>Para a execu&ccedil;&atilde;o desta fun&ccedil;&atilde;o ser&atilde;o necess&aacute;rios que os <a href="modulo_parlamentares">Parlamentares</a> bem como os <a href="tipo_sessao_plenaria">Tipos de Sess&atilde;o Plen&aacute;ria</a> - em <b>tabelas auxiliares</b>, estejam previamente cadastrados. <br />
+<br />
+<br>  <a href="{% url 'sapl.base:help_topic' 'sessao_plenaria' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'sessao_plenaria_lista_presenca_ordem_dia' %}">Pr&oacute;xima</a>
+<br />
+<br />
+</div>
+
+{% endblock base_content %}

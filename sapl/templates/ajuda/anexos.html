@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% load i18n crispy_forms_tags %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading">Anexos</h1>
+
+<h1 class="firstHeading"><a NAME="acesso_banco">Acesso a Banco de Dados</a></h1>
+1)&nbsp; Execute o arquivo .zip&nbsp; para instalar o driver
+ODBC p/ mysql, numa m&aacute;quina que utilize WINDOWS, sem ser o
+servidor.<br />
+<br />
+2)&nbsp; Configure o driver instalado da seguinte maneira:<br />
+<br />
+&nbsp;&nbsp;&nbsp; Windows DSN name: sapl<br />
+&nbsp;&nbsp;&nbsp; MySQL host: coloque o
+endere&ccedil;o IP da m&aacute;quina onde est&aacute; o
+banco de dados<br />
+&nbsp;&nbsp;&nbsp; MySQL database name: interlegis<br />
+&nbsp;&nbsp;&nbsp; User: sapl<br />
+&nbsp;&nbsp;&nbsp; Password: (colocar a senha do user sapl)<br />
+<br />
+&nbsp;&nbsp;&nbsp; OBS. Deixe os outros campos com os
+valores default.<br />
+<br />
+3)&nbsp; Inicie o StarOffice<br />
+<br />
+4)&nbsp; Clique na op&ccedil;&atilde;o do menu Ficheiro
+-&gt; Novo -&gt; Base de dados<br />
+<br />
+5)&nbsp; Na tela propriedades de &lt;Base de Dados&gt;,
+preencha os seguintes campos:<br />
+<br />
+&nbsp;&nbsp;&nbsp; Na guia Geral:<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+- No lugar de &lt;Base de dados&gt; coloque sapl<br />
+<br />
+&nbsp;&nbsp;&nbsp; Na guia Tipo:<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+- Tipo de base de dados: escolha a op&ccedil;&atilde;o ODBC<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+- Clique a seguir no bot&atilde;o PESQUISAR:<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Aparecer&aacute; uma tela com o fonte de dados: escolha a
+op&ccedil;&atilde;o sapl<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(MySQL) e clique OK.<br />
+<br />
+&nbsp;&nbsp;&nbsp; Na guia ODBC:<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+- Nome do utilizador: sapl<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+- Senha: (colocar a senha do user sapl)<br />
+<br />
+Ap&oacute;s isto, aparecer&aacute; uma tela com
+&iacute;cones de Formul&aacute;rios, Relat&oacute;rios,
+Consultas e Tabelas.<br />
+<br />
+Daqui em diante voc&ecirc; vai poder montar os seus
+relat&oacute;rios conforme a sua defini&ccedil;&atilde;o.<br />
+<br />
+Qualquer d&uacute;vida, entre em contato conosco.<br />
+<br />
+<br />
+
+<h1 class="firstHeading"><a NAME="bk_tabela">Procedimentos de Backup das Tabelas MySQL</a></h1>
+Seguem os comandos para fazer o backup das tabelas do MySQL:<br />
+<br />
+&nbsp;Op&ccedil;&atilde;o 1) para fazer o backup de todo o
+banco de dados interlegis: dados +
+cria&ccedil;&atilde;o&nbsp; das tabelas&nbsp; <br />
+mysqldump -uroot -p interlegis&nbsp;&gt; NOME_ARQUIVO<br />
+&nbsp;<br />
+Op&ccedil;&atilde;o 2) para fazer o backup somente dos
+dados&nbsp; mysqldump -t -uroot -p interlegis &gt; NOME_ARQUIVO<br />
+<i>&nbsp;<br />
+Obs: NOME_ARQUIVO deve ser substitu&iacute;do pelo caminho+nome do
+arquivo a ser&nbsp; gerado.</i><br />
+&nbsp;&Eacute; sempre&nbsp; bom fazer o backup de todo o
+banco de dados.<br />
+Qualquer d&uacute;vida, entre em contato conosco.<br />
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'glossario' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+
+<br />
+
+</div>
+
+{% endblock base_content %}

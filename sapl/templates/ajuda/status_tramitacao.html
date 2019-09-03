@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading">Status da Tramita&ccedil;&atilde;o</h1>
+<br />
+Esta tabela tem por objetivo cadastrar as
+situa&ccedil;&otilde;es que podem ocorrer em uma
+tramita&ccedil;&atilde;o de mat&eacute;ria legislativa.<br />
+Ao ter acesso a esta tabela ser&aacute; exibida uma tela com a
+rela&ccedil;&atilde;o de Status de
+Tramita&ccedil;&atilde;o j&aacute; cadastradas e um
+bot&atilde;o &ldquo;Adicionar Status
+Tramita&ccedil;&atilde;o&rdquo;.<br />
+<br />
+Ao ser&nbsp; acionado o bot&atilde;o [Adicionar Status
+Tramita&ccedil;&atilde;o] ser&aacute; exibida a tela com os
+seguintes campos a serem preenchidos:<br />
+<br />
+<center>
+<table width="653">
+  <col width="173" /> <col width="84" /> <col
+ width="363" /> <thead> <tr valign="top">
+    <td bgcolor="#c7d8eb" width="173">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Nome do Campo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="84">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Tipo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="363">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Instru&ccedil;&otilde;es para
+Preenchimento</b></font></p>
+    </td>
+  </tr>
+  </thead> <tbody>
+    <tr valign="top">
+      <td width="173">
+      <p><font style="font-size: 11pt;" size="3">Sigla</font></p>
+      </td>
+      <td width="84">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="363">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a sigla do status.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="173">
+      <p><font style="font-size: 11pt;" size="3">Indicador
+da Tramita&ccedil;&atilde;o</font></p>
+      </td>
+      <td width="84">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="363">
+      <p><font style="font-size: 11pt;" size="3">Selecione
+na Caixa o indicador da tramita&ccedil;&atilde;o.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="173">
+      <p><font style="font-size: 11pt;" size="3">Descri&ccedil;&atilde;o</font></p>
+      </td>
+      <td width="84">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="363">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a descri&ccedil;&atilde;o do status da
+tramita&ccedil;&atilde;o.</font></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</center>
+<br />
+<br />
+<br />
+Acione a fun&ccedil;&atilde;o&nbsp;
+&ldquo;Salvar&rdquo; para que as
+informa&ccedil;&otilde;es sejam salvas no arquivo.<br />
+Ser&aacute; enviada a mensagem: <i>Status de
+Tramita&ccedil;&atilde;o salvo com sucesso!</i><br />
+<br />
+Para<b> alterar</b> os dados de um status da
+tramita&ccedil;&atilde;o j&aacute; cadastrada, selecione
+status de tramita&ccedil;&atilde;o na lista de status de
+tramita&ccedil;&atilde;o, altere as
+informa&ccedil;&otilde;es e acione a
+fun&ccedil;&atilde;o&nbsp; &ldquo;Salvar&rdquo;.<br />
+<br />
+Para <b>excluir</b> um status de
+tramita&ccedil;&atilde;o, selecione o status e acione a
+fun&ccedil;&atilde;o &ldquo;Excluir&rdquo;.<br />
+Ser&aacute; enviada a pergunta &ldquo;Deseja realmente
+excluir?&rdquo;<br />
+Acione Confirmar em caso positivo ou Cancelar para o caso de
+desist&ecirc;ncia da exclus&atilde;o.<br />
+Quando for informado Confirmar ser&aacute; enviada a mensagem: <i>Status de
+Tramita&ccedil;&atilde;o exclu&iacute;do com sucesso!</i><br />
+
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'fim_relatoria' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'tipo_documento' %}">Pr&oacute;xima</a>
+
+<br />
+
+</div>
+
+{% endblock base_content %}

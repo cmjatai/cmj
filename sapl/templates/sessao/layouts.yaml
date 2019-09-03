@@ -1,0 +1,108 @@
+{% load i18n %}
+TipoSessaoPlenaria:
+  {% trans 'Tipo de Sessão Plenária' %}:
+  - nome  quorum_minimo tipo_numeracao
+
+SessaoPlenaria:
+  {% trans 'Dados Básicos' %}:
+  - legislatura  sessao_legislativa tipo numero:2
+  - data_inicio:5  hora_inicio:5  iniciada
+  - data_fim:5  hora_fim:5  finalizada
+  - upload_pauta  upload_ata  upload_anexo
+  - url_audio  url_video
+
+SessaoSolene:
+  {% trans 'Dados Básicos' %}:
+  - legislatura  sessao_legislativa tipo:3  numero:1
+  - data_inicio:5  hora_inicio:5  iniciada
+  - data_fim:5  hora_fim:5  finalizada
+  - tema_solene
+  - upload_pauta  upload_ata  upload_anexo
+  - url_audio  url_video
+
+TipoResultadoVotacao:
+  {% trans 'Tipo de Resultado da Votação' %}:
+  - nome
+  - natureza
+
+TipoExpediente:
+  {% trans 'Tipo de Expediente' %}:
+  - nome ordenacao
+
+RegistroVotacao:
+  {% trans 'Votação Simbólica' %}:
+  - numero_votos_sim  numero_votos_nao  numero_abstencoes  nao_votou_FIXME
+  - votacao_branco_FIXME  ind_votacao_presidente_FIXME
+  - tipo_resultado_votacao
+  - observacao
+
+Orador:
+  {% trans 'Orador das Explicações Pessoais' %}:
+  - numero_ordem parlamentar
+  - url_discurso observacao
+  - upload_anexo
+
+OradorExpediente:
+  {% trans 'Orador do Expediente' %}:
+  - numero_ordem parlamentar
+  - url_discurso observacao
+  - upload_anexo
+
+OradorOrdemDia:
+  {% trans 'Orador da Ordem do Dia' %}:
+  - numero_ordem parlamentar
+  - url_discurso observacao
+  - upload_anexo
+  
+ExpedienteMateria:
+  {% trans 'Matéria do Expediente' %}:
+  - data_ordem numero_ordem
+  - tipo_materia numero_materia ano_materia
+  - tipo_votacao
+  - observacao
+
+OrdemDia:
+  {% trans 'Matéria da Ordem do Dia' %}:
+  - data_ordem numero_ordem
+  - tipo_materia numero_materia ano_materia
+  - tipo_votacao
+  - observacao
+
+ExpedienteMateriaDetail:
+  {% trans 'Matérias do Expediente' %}:
+  - materia
+  - ementa
+  - tipo_votacao
+  - observacao
+
+OrdemDiaDetail:
+  {% trans 'Matérias da Ordem do Dia' %}:
+  - materia
+  - ementa
+  - tipo_votacao
+  - observacao
+
+TipoJustificativa:
+  {% trans 'Tipo de Justificativa' %}:
+  - descricao
+
+JustificativaAusencia:
+  {% trans 'Justificativa de Ausência' %}:
+  - parlamentar
+  - data hora
+  - upload_anexo
+  - tipo_ausencia
+  - ausencia
+  - materias_do_expediente
+  - materias_da_ordem_do_dia
+  - observacao
+
+TipoRetiradaPauta:
+  {% trans 'Tipo Retirada Pauta'%}:
+  - descricao
+
+RetiradaPauta:
+  {% trans 'Retirada de Pauta' %}:
+  - tipo_de_retirada materia
+  - data parlamentar
+  - observacao

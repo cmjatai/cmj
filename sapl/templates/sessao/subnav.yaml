@@ -1,0 +1,55 @@
+{% load i18n common_tags %}
+
+- title: {% trans 'Abertura' %}
+  children:
+    - title: {% trans 'Dados Básicos' %}
+      url: sessaoplenaria_detail
+    - title: {% trans 'Mesa' %}
+      url: mesa
+    - title: {% trans 'Presença' %}
+      url: presenca
+    - title: {% trans 'Ausência' %}
+      url: justificativaausencia_list
+    - title: {% trans 'Explicações Pessoais' %}
+      url: orador_list
+    - title: {% trans 'Ocorrências da Sessão' %}
+      url: ocorrencia_sessao
+    - title: {% trans 'Retirada de Pauta'%}
+      url: retiradapauta_list
+
+- title: {% trans 'Expedientes' %}
+  children:
+    - title: {% trans 'Expediente Diversos' %}
+      url: expediente
+    - title: {% trans 'Matérias Expediente' %}
+      url: expedientemateria_list
+    - title: {% trans 'Oradores do Expediente' %}
+      url: oradorexpediente_list
+    - title: {% trans 'Votação em Bloco' %}
+      url: votacao_bloco_expediente
+      check_permission: sessao.add_sessaoplenaria
+
+- title: {% trans 'Ordem do Dia' %}
+  children:
+    - title: {% trans 'Matérias Ordem do Dia' %}
+      url: ordemdia_list
+    - title: {% trans 'Presença Ordem do Dia' %}
+      url: presencaordemdia
+    - title: {% trans 'Oradores da Ordem do Dia' %}
+      url: oradorordemdia_list
+    - title: {% trans 'Votação em Bloco' %}
+      url: votacao_bloco_ordemdia
+      check_permission: sessao.add_sessaoplenaria
+
+- title: {% trans 'Painel Eletrônico' %}
+  url: painel
+  {% if not 'painel_aberto'|get_config_attr %}check_permission: painel.list_painel{%endif%}
+  check_permission: painel.list_painel
+
+- title: {% trans 'Resumo' %}
+  children:
+    - title: {% trans 'Resumo' %}
+      url: resumo
+    - title: {% trans 'Extrato' %}
+      url: resumo_ata
+      check_permission: sessao.add_sessaoplenaria

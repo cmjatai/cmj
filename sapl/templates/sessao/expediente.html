@@ -1,0 +1,60 @@
+{% extends "crud/detail.html" %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% load common_tags %}
+
+{% block actions %}{% endblock %}
+
+{% block detail_content %}
+
+{% if perms|get_add_perm:view %}
+	{% if expedientes|length == 0 %}
+		<div class="alert alert-danger alert-dismissible " role="alert">
+			Não há nenhum expediente cadastrado. <br />
+			Cique <a href="{% url 'sapl.sessao:tipoexpediente_create'%}">aqui</a> para cadastrar um novo.
+		</div>
+	{% else %}
+		<form method="post">
+			{% csrf_token %}
+
+			{% for e in expedientes %}
+				<fieldset class="form-group">
+					<legend>{{e.tipo}}</legend>
+					<input type="hidden" name="tipo" id="tipo" value="{{e.tipo.id}}" class="form-control"/>
+					<textarea rows="5" cols="50" name="conteudo" id="conteudo" class="form-control">{{e.conteudo}}</textarea>
+					<br />
+				</fieldset>
+			{% endfor %}
+
+			<br />
+			<input type="submit" value="Salvar" class="btn btn-primary"/>
+            <input type="submit" id="apagar-expediente" name="apagar-expediente" value="Apagar" class="btn btn-danger" />
+		</form>
+	{% endif %}
+
+{% else %}
+
+	{% for e in expedientes %}
+			<fieldset class="form-group">
+				<legend>{{e.tipo}}</legend>
+				<textarea rows="5" cols="50" name="conteudo" id="conteudo" class="form-control">{{e.conteudo}}</textarea>
+				<br />
+			</fieldset>
+	{% endfor %}
+
+{% endif %}
+
+{% endblock detail_content %}
+<!-- Texto RICO -->
+{% block extra_js %}
+	{% if perms|get_add_perm:view %}
+		<script language="JavaScript">
+			initTextRichEditor(null);
+		</script>
+	<!-- Se nao tiver permissao, o texto rico fica readonly -->
+	{% else %}
+		<script language="JavaScript">
+			initTextRichEditor(null, true);
+		</script>
+	{% endif %}
+{% endblock %}

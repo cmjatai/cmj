@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading">Sess&atilde;o Plen&aacute;ria - Mat&eacute;rias no Expediente</h1><br />
+<br>Esta fun&ccedil;&atilde;o apresenta a lista de mat&eacute;rias legislativas que foram inseridas no Expediente da Sess&atilde;o Plen&aacute;ria. <br />
+<br>Cada mat&eacute;ria na lista cont&eacute;m: o n&uacute;mero de ordem, a identifica&ccedil;&atilde;o da mat&eacute;ria ( n&uacute;mero e origem), autor, ementa e observa&ccedil;&atilde;o. <br />
+<br>Esta fun&ccedil;&atilde;o permite o acesso as fun&ccedil;&otilde;es <b>inclus&atilde;o individual</b> ou de <b>v&aacute;rias mat&eacute;rias </b> na mesma transa&ccedil;&atilde;o, segundo o bot&atilde;o que for acionado, via clique do mouse. <br />
+<br>Tamb&eacute;m, nos casos de exclus&otilde;es e/ou novas inclus&otilde;es de mat&eacute;rias com a consequente perda da numera&ccedil;&atilde;o sequencial, permite a reordena&ccedil;&atilde;o das mat&eacute;rias por tipo, ano e n&uacute;mero de identifica&ccedil;&atilde;o. Portanto, n&atilde;o h&aacute; necessidade de inclus&atilde;o na ordem, pois pode ser ordenado posteriormente. <br />
+<br>Na identifica&ccedil;&atilde;o da mat&eacute;ria h&aacute; um link que, quando acionado, permite o acesso aos meta dados da mat&eacute;ria propriamente.<br />
+<br>As mat&eacute;rias legislativas s&atilde;o inseridas no Expediente, por meio da fun&ccedil;&atilde;o <i>Mat&eacute;rias no Expediente</i>, da <i>Sess&atilde;o Plen&aacute;ria</i>.<br />
+<br>O retorno a tela anterior &eacute; feito ao acionar o bot&atilde;o 'Retornar', que se encontra na parte inferior da tela.<br />
+<br>  <a href="{% url 'sapl.base:help_topic' 'sessao_plenaria' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'sessao_plenaria_expedientes' %}">Pr&oacute;xima</a>
+<br />
+<br />
+</div>
+
+{% endblock base_content %}

@@ -1,0 +1,122 @@
+{% extends "crud/detail.html" %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% load common_tags %}
+
+{% block sections_nav %} {% endblock %}
+
+{% block actions %}
+  <div class="actions btn-group float-right" role="group">
+    {% if perms.protocoloadm.add_documentoadministrativo %}
+      <a href="{% url 'sapl.protocoloadm:documentoadministrativo_create' %}" class="btn btn-outline-primary">
+        {% blocktrans with verbose_name=view.verbose_name %} Adicionar Documento Administrativo {% endblocktrans %}
+      </a>
+    {% endif %}
+  </div>
+  {% if show_results %}
+    <div class="actions btn-group float-right" role="group">
+      <a href="{% url 'sapl.protocoloadm:pesq_doc_adm' %}" class="btn btn-outline-primary">{% trans 'Fazer Nova Pesquisa' %}</a>
+    </div>
+  {% endif %}
+{% endblock actions %}
+
+{% block detail_content %}
+  {% if not show_results %} {% crispy filter.form %} {% endif %}
+
+  {% if show_results %}
+    <table class="table table-striped table-bordered">
+      <thead class="thead-default"><tr><td><h3>Resultados</h3></td></tr></thead>
+      {% if page_obj|length %}
+        {% if numero_res > 1 %}
+          <h3>Pesquisa concluída com sucesso! Foram encontrados {{numero_res}} documentos.</h3>
+        {% elif numero_res == 1 %}
+          <h3>Pesquisa concluída com sucesso! Foi encontrado {{numero_res}} documento.</h3>
+        {% endif %}
+
+        {% for d in page_obj %}
+          {% if request.user.is_anonymous and not d.restrito or not request.user.is_anonymous%}
+          <tr>
+            <td>
+              <strong><a href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' d.id %}">{{d.tipo.sigla}} {{d.numero}}/{{d.ano}} - {{d.tipo}}</strong></a></br>
+                <strong>Interessado:</strong>&nbsp;{{ d.interessado|default_if_none:"Não informado"}}
+                </br>
+              <strong>Assunto:</strong>&nbsp;{{ d.assunto|safe }}
+                </br>
+              {% if d.protocolo %}
+                <strong>Protocolo:</strong>&nbsp;<a href="{% url 'sapl.protocoloadm:protocolo_mostrar' d.protocolo.id %}">{{ d.protocolo}}</a></br>
+              {% endif %}
+                {% define d.tramitacaoadministrativo_set.last as tram %}
+                {% if tram.unidade_tramitacao_destino %}
+                <strong>Localização Atual:</strong> &nbsp;{{tram.unidade_tramitacao_destino}}
+                    </br>
+                   <strong>Status:</strong> {{tram.status}}
+                    </br>
+                {% endif %}
+                {% define d.documentoacessorioadministrativo_set.all as acess %}
+                {% if d.documentoacessorioadministrativo_set.all.exists %}
+                        <strong>Documentos Acessórios:</strong>
+                        <a href="{% url 'sapl.protocoloadm:documentoacessorioadministrativo_list' d.id %}">
+                            {{ d.documentoacessorioadministrativo_set.all.count }}
+                        </a>
+                        </br>
+                    {% endif %}
+              {% if d.texto_integral %}
+                <strong><a href="{{ d.texto_integral.url }}">Texto Integral</a></strong></br>
+              {% endif %}
+              {% if d.tramitacao and mail_service_configured %}
+                <a href="{% url 'sapl.protocoloadm:acompanhar_documento' d.id %}">Acompanhar Documento</a>
+              {% endif %}
+            </td>
+
+          </tr>
+        {% endif %}
+        {% endfor %}
+      {% else  %}
+        <tr><td><h3>Nenhum documento encontrado com essas especificações</h3></tr>
+      {% endif %}
+    </table>
+    {% include "paginacao.html" %}
+  {% endif %}
+{% endblock detail_content %}
+
+{% block table_content %}
+{% endblock table_content %}
+
+
+{% block extra_js %}
+
+<style>
+  .select-error {
+    border-color: red;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+  }
+</style>
+
+<script type="text/javascript">
+
+  validation = () => {
+    if (document.getElementById("relatorio").checked && !$("#id_ano").val()){
+      $("#submit-id-pesquisar").attr("disabled", true);
+      $("#id_ano").addClass("select-error");
+      $("#div_id_ano").append('<spam id="error-ano" style="font-size:8pt;color:red">Selecione uma data.</spam>');
+    }
+    else{
+      error = document.getElementById("error-ano")
+      if (error){
+        $("#submit-id-pesquisar").attr("disabled", false);
+        $("#id_ano").removeClass("select-error");
+        document.getElementById("error-ano").remove();
+      }
+      
+    }
+  }
+
+  document.getElementById("relatorio").onchange = validation;
+  document.getElementById("id_ano").onchange = validation;
+  validation();
+
+
+</script>
+
+{% endblock %}

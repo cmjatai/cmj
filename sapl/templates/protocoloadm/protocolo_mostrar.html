@@ -1,0 +1,52 @@
+{% extends "protocoloadm/protocoloadm_detail.html" %}
+{% load i18n %}
+{% load tz %}
+{% load static %}
+{% load webpack_static from webpack_loader %}
+
+{% block detail_content %}
+        <strong>Protocolo: </strong>{{ protocolo.numero|stringformat:'06d' }}/{{ protocolo.ano }} - 
+        <a href="{% url 'sapl.relatorios:relatorio_etiqueta_protocolo' protocolo.numero protocolo.ano %}"><img src="{% webpack_static 'img/etiqueta.png' %}" alt="Etiqueta Individual"></a></br>
+
+	<strong>Assunto: </strong> {{ protocolo.assunto_ementa|default:"Não informado" }}</br>
+	{% if protocolo.timestamp %}
+      <strong>Data Protocolo:</strong> {{ protocolo.timestamp|localtime|date:"d/m/Y"|default_if_none:"Não informado" }} - Horário: {{ protocolo.timestamp|localtime|date:"G:i:s" }}</br>
+    {% else %}
+      <strong>Data Protocolo:</strong> {{ protocolo.data|date:"d/m/Y"|default_if_none:"Não informado" }} - Horário: {{ protocolo.hora|date:"G:i:s" }} - {% if not protocolo.timestamp %}  Informado Manualmente por: {{protocolo.user_data_hora_manual}}{% endif %}</br>
+    {% endif %}
+
+	{% if protocolo.tipo_processo == 0 %}
+		<strong>Interessado:</strong> {{ protocolo.interessado|default_if_none:"Não informado" }}</br>
+	{% elif protocolo.tipo_processo == 1 %}
+		<strong>Autor:</strong>{{ protocolo.autor.nome|default_if_none:"Não informado" }}</br>
+	{% endif %}	<!-- TODO: convert if-else to custom tag -->
+
+	<strong>Natureza do Processo: </strong>{% if protocolo.tipo_processo == 0 %} Administrativo {% elif protocolo.tipo_processo == 1 %} Legislativo {% endif %}</br>
+	<strong>Número de Páginas: </strong> {{ protocolo.numero_paginas|default_if_none:"Não informado" }}</br>
+	<strong>Observação: </strong>{{ protocolo.observacao|default:"Não informado" }}</br>
+	<strong>Anulado: {% if protocolo.anulado %} <font color="red"> Sim {% else %} <font color="green"> Não {% endif %} </font></strong>
+	<br /><br />
+
+	<strong>Documentos Vinculados:</strong>
+	<br/>
+	{% if protocolo.tipo_documento %}
+		  {% for documento in documentos %}
+			  &nbsp;&nbsp;&nbsp;&nbsp;
+				<a href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' documento.pk %}">{{documento.tipo}} - {{documento.numero}}/{{documento.ano}}</a>
+				</br>
+			{% endfor %}
+			<br />
+			{% if not protocolo.anulado %} <a href="{% url 'sapl.protocoloadm:criar_documento' protocolo.pk %}" class="btn btn-primary">Criar Documento</a>{% endif %}
+	{% elif protocolo.tipo_materia %}
+		{% for m in materia%}
+            &nbsp;&nbsp;&nbsp;&nbsp;
+			<a href="{% url 'sapl.materia:materialegislativa_detail' m.pk %}"> {{m}} </a></br>
+		{% endfor %}
+			</br>
+			{% if not protocolo.anulado%}{% if not materia %}<a href="{% url 'sapl.materia:materia_create_simplificado' protocolo.pk %}" class="btn btn-primary">Criar Matéria</a>&nbsp;&nbsp;&nbsp;&nbsp;{% endif %}{% endif %}
+	{% endif %}
+
+
+	<a target="popup" class="btn btn-primary" onclick="window.open('{% url 'sapl.protocoloadm:comprovante_protocolo' protocolo.pk%}','Comprovante','width=800, height=800')">Comprovante
+	</a>
+{% endblock detail_content %}

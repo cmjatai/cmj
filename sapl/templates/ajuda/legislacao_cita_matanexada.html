@@ -1,0 +1,284 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading"><a NAME="legislacao_citada">Para inclus&atilde;o de Legisla&ccedil;&atilde;o Citada,
+acione a fun&ccedil;&atilde;o
+&ldquo;Legisla&ccedil;&atilde;o Citada&rdquo;</a></h1>
+<br/>
+As Legisla&ccedil;&otilde;es que ser&atilde;o
+inclu&iacute;das neste m&oacute;dulo, tem que estarem
+cadastradas na tabela de Normas Jur&iacute;dicas.<br />
+<br />
+Ser&aacute; exibida a tela com as informa&ccedil;&otilde;es
+da mat&eacute;ria (tipo, n&uacute;mero e ano), e a
+rela&ccedil;&atilde;o de legisla&ccedil;&atilde;o
+j&aacute; cadastrada para a mat&eacute;ria.<br />
+Acione o bot&atilde;o &ldquo;Incluir
+Legisla&ccedil;&atilde;o Citada&rdquo;<br />
+Preencha os campos:<br />
+<br />
+<center>
+<table width="653">
+  <col width="145" /> <col width="75" /> <col
+ width="401" /> <thead> <tr valign="top">
+    <td bgcolor="#c7d8eb" width="145">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Nome do Campo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="75">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Tipo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="401">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Instru&ccedil;&otilde;es para
+Preenchimento</b></font></p>
+    </td>
+  </tr>
+  </thead> <tbody>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Tipo
+Norma</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Selecione
+na Caixa Tipo Norma, o tipo de norma que cita a mat&eacute;ria.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">N&uacute;mero</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="401">
+      <p style="margin-bottom: 0cm;"><font
+ style="font-size: 11pt;" size="3">Informe o
+n&uacute;mero da norma que cita a mat&eacute;ria.</font></p>
+      <p><font style="font-size: 11pt;" size="3">O
+n&uacute;mero tem que existir na tabela de normas
+jur&iacute;dicas</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Ano</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p style="margin-bottom: 0cm;"><font
+ style="font-size: 11pt;" size="3">Informe o ano da
+norma que cita a mat&eacute;ria.</font></p>
+      <p><font style="font-size: 11pt;" size="3">O
+ano tem que existir na tabela de normas jur&iacute;dicas.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Disposi&ccedil;&atilde;o</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Selecione
+na Caixa Disposi&ccedil;&atilde;o o tipo de
+disposi&ccedil;&atilde;o da legisla&ccedil;&atilde;o
+citada.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Parte</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a Parte da legisla&ccedil;&atilde;o que cita a
+mat&eacute;ria.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Livro</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o Livro da legisla&ccedil;&atilde;o que cita a
+mat&eacute;ria.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">T&iacute;tulo</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o T&iacute;tulo da legisla&ccedil;&atilde;o que cita a
+mat&eacute;ria.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Cap&iacute;tulo</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o Cap&iacute;tulo da legisla&ccedil;&atilde;o que cita a
+mat&eacute;ria.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Se&ccedil;&atilde;o</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a Se&ccedil;&atilde;o da legisla&ccedil;&atilde;o que
+cita a mat&eacute;ria.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Subse&ccedil;&atilde;o</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a Subse&ccedil;&atilde;o da legisla&ccedil;&atilde;o
+que cita a mat&eacute;ria.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Artigo</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o Artigo da legisla&ccedil;&atilde;o que cita a
+mat&eacute;ria.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Par&aacute;grafo</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o Par&aacute;grafo da legisla&ccedil;&atilde;o que cita a
+mat&eacute;ria.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Inciso</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o Inciso da legisla&ccedil;&atilde;o que cita a
+mat&eacute;ria.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Al&iacute;nea</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a Al&iacute;nea da legisla&ccedil;&atilde;o que cita a
+mat&eacute;ria.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Item</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o Item da legisla&ccedil;&atilde;o que cita a
+mat&eacute;ria.</font></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</center>
+<br />
+<br />
+Acione a fun&ccedil;&atilde;o&nbsp;
+&ldquo;Salvar&rdquo; para que as
+informa&ccedil;&otilde;es sejam salvas no arquivo.<br />
+Ser&aacute; enviada a mensagem: <i>Legisla&ccedil;&atilde;o
+Citada salva com sucesso!</i><br />
+<br />
+Para <b>alterar</b> uma Legisla&ccedil;&atilde;o Citada, selecione a
+Legisla&ccedil;&atilde;o Citada desejada, altere as
+informa&ccedil;&otilde;es e acione a
+fun&ccedil;&atilde;o &ldquo;Salvar&rdquo;.<br />
+Para <b>excluir</b> uma Legisla&ccedil;&atilde;o Citada, selecione a
+Legisla&ccedil;&atilde;o Citada desejada e acione a
+fun&ccedil;&atilde;o &ldquo;Excluir&rdquo;.<br />
+Ser&aacute; enviada a pergunta &ldquo;Deseja realmente
+excluir?&rdquo;<br />
+Acione Confirmar em caso positivo ou Cancelar para o caso de
+desist&ecirc;ncia da exclus&atilde;o.<br />
+Quando for informado Confirmar ser&aacute; enviada a mensagem: 
+<i>Legisla&ccedil;&atilde;o Citada&nbsp; exclu&iacute;da
+com sucesso!</i><br />
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'despacho_autoria' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'materia_anexada' %}">Pr&oacute;xima</a>
+
+<br />
+
+
+</div>
+
+{% endblock base_content %}

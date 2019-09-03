@@ -1,0 +1,494 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading"><a NAME="numeracao">Para inclus&atilde;o de Numera&ccedil;&atilde;o,
+acione a fun&ccedil;&atilde;o
+&ldquo;Numera&ccedil;&atilde;o&rdquo;</a></h1>
+<br />
+Ser&aacute; exibida a tela com as informa&ccedil;&otilde;es
+da mat&eacute;ria (tipo, n&uacute;mero e ano), e a
+rela&ccedil;&atilde;o de numera&ccedil;&atilde;o
+j&aacute; cadastrada.<br />
+Acione o bot&atilde;o &ldquo;Incluir
+Numera&ccedil;&atilde;o&rdquo;<br />
+Preencha os campos:<br />
+<br />
+<center>
+<table width="653">
+  <col width="145" /> <col width="75" /> <col
+ width="401" /> <thead> <tr valign="top">
+    <td bgcolor="#c7d8eb" width="145">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Nome do Campo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="75">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Tipo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="401">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Instru&ccedil;&otilde;es para
+Preenchimento</b></font></p>
+    </td>
+  </tr>
+  </thead> <tbody>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Tipo
+Mat&eacute;ria</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Selecione
+na Caixa Tipo Mat&eacute;ria, o tipo da mat&eacute;ria.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">N&uacute;mero</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o n&uacute;mero da mat&eacute;ria.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Ano</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o ano da mat&eacute;ria.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Data</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a data da mat&eacute;ria no formato dia, m&ecirc;s e ano (ano
+com quatro posi&ccedil;&otilde;es).</font></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</center>
+<br />
+<br />
+Acione a fun&ccedil;&atilde;o&nbsp;
+&ldquo;Salvar&rdquo; para que as
+informa&ccedil;&otilde;es sejam salvas no arquivo.<br />
+Ser&aacute; enviada a mensagem: <i>
+Numera&ccedil;&atilde;o salva com sucesso!</i><br />
+<br />
+Para <b>alterar</b> uma Numera&ccedil;&atilde;o, selecione a
+Numera&ccedil;&atilde;o desejada, altere as
+informa&ccedil;&otilde;es e acione a
+fun&ccedil;&atilde;o &ldquo;Salvar&rdquo;.<br />
+Para <b>excluir</b> uma Numera&ccedil;&atilde;o, selecione a
+Numera&ccedil;&atilde;o desejada e acione a
+fun&ccedil;&atilde;o &ldquo;Excluir&rdquo;.<br />
+Ser&aacute; enviada a pergunta &ldquo;Deseja realmente
+excluir?&rdquo;<br />
+Acione Confirmar em caso positivo ou Cancelar para o caso de
+desist&ecirc;ncia da exclus&atilde;o.<br />
+Quando for informado Confirmar ser&aacute; enviada a mensagem: <i>Numera&ccedil;&atilde;o
+exclu&iacute;da com sucesso!</i><br />
+<br />
+
+<h1 class="firstHeading"><a NAME="docsacess">Para inclus&atilde;o de Documentos Acess&oacute;rios,
+acione a fun&ccedil;&atilde;o &ldquo;Documentos
+Acess&oacute;rios&rdquo;</a></h1>
+<br />
+Ser&aacute; exibida a tela com as informa&ccedil;&otilde;es
+da mat&eacute;ria (tipo, n&uacute;mero e ano), e a
+rela&ccedil;&atilde;o de documentos acess&oacute;rios
+j&aacute; cadastrados.<br />
+Acione o bot&atilde;o &ldquo;Incluir Documento
+Acess&oacute;rio&rdquo;<br />
+Preencha os campos:<br />
+<br />
+<br />
+<center>
+<table width="85%">
+  <col width="59*" /> <col width="40*" /> <col
+ width="157*" /> <thead> <tr valign="top">
+    <td bgcolor="#c7d8eb" width="23%">
+    <p class="western" align="justify"><font
+ style="font-size: 11pt;" size="3"><b>Nome do
+Campo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="15%">
+    <p class="western" align="justify"><font
+ style="font-size: 11pt;" size="3"><b>Tipo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="61%">
+    <p class="western" align="justify"><font
+ style="font-size: 11pt;" size="3"><b>Instru&ccedil;&otilde;es
+para Preenchimento</b></font></p>
+    </td>
+  </tr>
+  </thead> <tbody>
+    <tr valign="top">
+      <td width="23%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Tipo</font></p>
+      </td>
+      <td width="15%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="61%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Selecione na Caixa Tipo, o tipo de documento que
+est&aacute; sendo anexado.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Nome</font></p>
+      </td>
+      <td width="15%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Opcional</font></p>
+      </td>
+      <td width="61%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Informe o nome do documento.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Data</font></p>
+      </td>
+      <td width="15%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Opcional</font></p>
+      </td>
+      <td width="61%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Informe a data em que o documento est&aacute;
+sendo anexado, no formato dia, m&ecirc;s e ano (ano com quatro
+posi&ccedil;&otilde;es)</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Nome Autor</font></p>
+      </td>
+      <td width="15%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="61%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Informe o nome do autor do documento anexado.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Texto</font></p>
+      </td>
+      <td width="15%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="61%">
+      <p class="western" style="margin-bottom: 0cm;"><font
+ style="font-size: 11pt;" size="3">Caso o texto
+integral do documento seja proveniente de um arquivo em disco, marque a
+op&ccedil;&atilde;o &ldquo;Arquivo&rdquo;, e informe o
+local e nome do arquivo que est&aacute; sendo anexado. Para
+procurar o local e nome do arquivo acione o bot&atilde;o
+&ldquo;Procurar...&rdquo;, para procurar nos
+diret&oacute;rios do micro o arquivo em quest&atilde;o. (A
+fun&ccedil;&atilde;o &ldquo;Procurar...&rdquo; abre a
+janela de busca de arquivos no padr&atilde;o Windows).</font></p>
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Ao inv&eacute;s de um arquivo, uma
+proposi&ccedil;&atilde;o pode ser indicada como origem do texto
+integral do documento. Nesse caso, marque a op&ccedil;&atilde;o
+&ldquo;Proposi&ccedil;&atilde;o&rdquo; e selecione na
+caixa de sele&ccedil;&atilde;o a
+proposi&ccedil;&atilde;o desejada. Note que s&atilde;o
+mostradas apenas as proposi&ccedil;&otilde;es j&aacute;
+recebidas, mas ainda n&atilde;o vinculadas a outra
+mat&eacute;ria ou documento acess&oacute;rio.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Texto Ementa</font></p>
+      </td>
+      <td width="15%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Opcional</font></p>
+      </td>
+      <td width="61%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Informe a ementa do documento.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Texto indexa&ccedil;&atilde;o</font></p>
+      </td>
+      <td width="15%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Opcional</font></p>
+      </td>
+      <td width="61%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Informe as palavras para indexar o assunto do
+documento.</font></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</center>
+<br />
+<br />
+Acione a fun&ccedil;&atilde;o&nbsp;
+&ldquo;Salvar&rdquo; para que as
+informa&ccedil;&otilde;es sejam salvas no arquivo.<br />
+Ser&aacute; enviada a mensagem: <i>Documento Acess&oacute;rio
+salvo com sucesso!</i><br />
+<br />
+Para <b>alterar</b> um Documento Acess&oacute;rio, selecione o Documento
+Acess&oacute;rio desejado, altere as
+informa&ccedil;&otilde;es e acione a
+fun&ccedil;&atilde;o&nbsp; &ldquo;Salvar&rdquo;.<br />
+<br />
+Para <b>excluir</b> um Documento Acess&oacute;rio, selecione o Documento
+Acess&oacute;rio desejado e acione a fun&ccedil;&atilde;o
+&ldquo;Excluir&rdquo;.<br />
+Ser&aacute; enviada a pergunta &ldquo;Deseja realmente
+excluir?&rdquo;<br />
+Acione Confirmar em caso positivo ou Cancelar para o caso de
+desist&ecirc;ncia da exclus&atilde;o.<br />
+Quando for informado Confirmar ser&aacute; enviada a mensagem: <i>Documento
+Acess&oacute;rio exclu&iacute;do com sucesso!</i><br />
+<br />
+A fun&ccedil;&atilde;o &ldquo;In&iacute;cio&rdquo;
+retorna &agrave; tela com os dados da mat&eacute;ria
+legislativa selecionada.Para inclus&atilde;o de Documentos
+Acess&oacute;rios, acione a fun&ccedil;&atilde;o
+&ldquo;Documentos Acess&oacute;rios&rdquo;.<br />
+<br />
+Ser&aacute; exibida a tela com as informa&ccedil;&otilde;es
+da mat&eacute;ria (tipo, n&uacute;mero e ano), e a
+rela&ccedil;&atilde;o de documentos acess&oacute;rios
+j&aacute; cadastrados.<br />
+Acione o bot&atilde;o &ldquo;Incluir Documento
+Acess&oacute;rio&rdquo;<br />
+Preencha os campos:<br />
+<br />
+<center>
+<table width="85%">
+  <col width="59*" /> <col width="40*" /> <col
+ width="157*" /> <thead> <tr valign="top">
+    <td bgcolor="#c7d8eb" width="23%">
+    <p class="western" align="justify"><font
+ style="font-size: 11pt;" size="3"><b>Nome do
+Campo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="15%">
+    <p class="western" align="justify"><font
+ style="font-size: 11pt;" size="3"><b>Tipo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="61%">
+    <p class="western" align="justify"><font
+ style="font-size: 11pt;" size="3"><b>Instru&ccedil;&otilde;es
+para Preenchimento</b></font></p>
+    </td>
+  </tr>
+  </thead> <tbody>
+    <tr valign="top">
+      <td width="23%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Tipo</font></p>
+      </td>
+      <td width="15%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="61%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Selecione na Caixa Tipo, o tipo de documento que
+est&aacute; sendo anexado.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Nome</font></p>
+      </td>
+      <td width="15%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Opcional</font></p>
+      </td>
+      <td width="61%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Informe o nome do documento.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Data</font></p>
+      </td>
+      <td width="15%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Opcional</font></p>
+      </td>
+      <td width="61%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Informe a data em que o documento est&aacute;
+sendo anexado, no formato dia, m&ecirc;s e ano (ano com quatro
+posi&ccedil;&otilde;es)</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Nome Autor</font></p>
+      </td>
+      <td width="15%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="61%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Informe o nome do autor do documento anexado.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Texto</font></p>
+      </td>
+      <td width="15%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="61%">
+      <p class="western" style="margin-bottom: 0cm;"><font
+ style="font-size: 11pt;" size="3">Caso o texto
+integral do documento seja proveniente de um arquivo em disco, marque a
+op&ccedil;&atilde;o &ldquo;Arquivo&rdquo;, e informe o
+local e nome do arquivo que est&aacute; sendo anexado. Para
+procurar o local e nome do arquivo acione o bot&atilde;o
+&ldquo;Procurar...&rdquo;, para procurar nos
+diret&oacute;rios do micro o arquivo em quest&atilde;o. (A
+fun&ccedil;&atilde;o &ldquo;Procurar...&rdquo; abre a
+janela de busca de arquivos no padr&atilde;o Windows).</font></p>
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Ao inv&eacute;s de um arquivo, uma
+proposi&ccedil;&atilde;o pode ser indicada como origem do texto
+integral do documento. Nesse caso, marque a op&ccedil;&atilde;o
+&ldquo;Proposi&ccedil;&atilde;o&rdquo; e selecione na
+caixa de sele&ccedil;&atilde;o a
+proposi&ccedil;&atilde;o desejada. Note que s&atilde;o
+mostradas apenas as proposi&ccedil;&otilde;es j&aacute;
+recebidas, mas ainda n&atilde;o vinculadas a outra
+mat&eacute;ria ou documento acess&oacute;rio.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Texto Ementa</font></p>
+      </td>
+      <td width="15%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Opcional</font></p>
+      </td>
+      <td width="61%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Informe a ementa do documento.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Texto indexa&ccedil;&atilde;o</font></p>
+      </td>
+      <td width="15%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Opcional</font></p>
+      </td>
+      <td width="61%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Informe as palavras para indexar o assunto do
+documento.</font></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</center>
+<br />
+<br />
+Acione a fun&ccedil;&atilde;o&nbsp;
+&ldquo;Salvar&rdquo; para que as
+informa&ccedil;&otilde;es sejam salvas no arquivo.<br />
+Ser&aacute; enviada a mensagem !Documento Acess&oacute;rio
+salvo com sucesso!<br />
+<br />
+Acione a fun&ccedil;&atilde;o Continuar para&nbsp; repetir
+a opera&ccedil;&atilde;o para outros Documentos, ou acione a
+fun&ccedil;&atilde;o Sair para sair do cadastramento de
+Documentos Acess&oacute;rios e voltar a tela inicial do sistema.<br />
+<br />
+Para <b>alterar</b> um Documento Acess&oacute;rio, selecione o Documento
+Acess&oacute;rio desejado, altere as
+informa&ccedil;&otilde;es e acione a
+fun&ccedil;&atilde;o&nbsp; &ldquo;Salvar&rdquo;.<br />
+<br />
+Para <b>excluir</b> um Documento Acess&oacute;rio, selecione o Documento
+Acess&oacute;rio desejado e acione a fun&ccedil;&atilde;o
+&ldquo;Excluir&rdquo;.<br />
+Ser&aacute; enviada a pergunta &ldquo;Deseja realmente
+excluir?&rdquo;<br />
+Acione Confirmar em caso positivo ou Cancelar para o caso de
+desist&ecirc;ncia da exclus&atilde;o.<br />
+Quando for informado Confirmar ser&aacute; enviada a mensagem: <i>Documento
+Acess&oacute;rio exclu&iacute;do com sucesso!</i><br />
+<br />
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'tramitacao_relatoria' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'modulo_norma_juridica' %}">Pr&oacute;xima</a>
+
+<br />
+
+
+</div>
+
+{% endblock base_content %}

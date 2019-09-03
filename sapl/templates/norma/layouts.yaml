@@ -1,0 +1,78 @@
+{% load i18n %}
+
+AssuntoNormaRelationship:
+  {% trans 'Assunto Norma Jurídica' %}:
+    - assunto
+
+AssuntoNorma:
+  {% trans 'Assunto Norma Jurídica' %}:
+  - assunto  descricao
+
+TipoNormaJuridica:
+  {% trans 'Tipo Norma Jurídica' %}:
+  - descricao  sigla  equivalente_lexml
+
+NormaJuridica:
+  {% trans 'Identificação Básica' %}:
+  - tipo  numero  ano
+  - data  esfera_federacao  complemento
+  - materia
+  - data_publicacao  veiculo_publicacao data_vigencia pagina_inicio_publicacao  pagina_fim_publicacao
+  - texto_integral
+  - ementa
+  - apelido
+  - indexacao
+  - observacao
+  - assuntos
+
+AnexoNormaJuridica:
+  {% trans 'Adicionar Anexos à Norma Jurídica' %}:
+  - anexo_arquivo
+  - assunto_anexo
+  - norma
+
+NormaJuridicaCreate:
+  {% trans 'Identificação Básica' %}:
+  - tipo  ano numero
+  - data  esfera_federacao  complemento norma_de_destaque
+  - tipo_materia  numero_materia  ano_materia
+  - data_publicacao  veiculo_publicacao data_vigencia pagina_inicio_publicacao  pagina_fim_publicacao
+  - texto_integral
+  - ementa
+  - apelido
+  - indexacao
+  - observacao
+  - assuntos
+
+LegislacaoCitada:
+  {% trans 'Legislação Citada' %}:
+  - tipo  numero  ano
+  - disposicoes  parte  livro  titulo
+  - capitulo  secao  subsecao  artigo
+  - paragrafo  inciso  alinea  item
+
+LegislacaoCitadaDetail:
+  {% trans 'Legislação Citada' %}:
+  - norma|fk_urlize_for_detail
+  - disposicoes  parte  livro  titulo
+  - capitulo  secao  subsecao  artigo
+  - paragrafo  inciso  alinea  item
+
+TipoVinculoNormaJuridica:
+  {% trans 'Tipo de Vínculo entre Normas Jurídicas' %}:
+  - sigla:2 descricao_ativa descricao_passiva revoga_integralmente
+
+NormaRelacionada:
+  {% trans 'Norma Relacionada' %}:
+  - tipo numero ano
+  - tipo_vinculo
+  - ementa
+
+NormaRelacionadaDetail:
+  {% trans 'Norma Relacionada' %}:
+  - norma_relacionada
+  - tipo_vinculo
+
+AutoriaNorma:
+  {% trans 'Autoria' %}:
+  - autor primeiro_autor

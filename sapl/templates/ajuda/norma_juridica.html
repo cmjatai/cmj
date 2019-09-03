@@ -1,0 +1,345 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading">Cadastro de Normas Jur&iacute;dicas</h1>
+<br />
+Este m&oacute;dulo tem por objetivo cadastrar as normas
+jur&iacute;dicas que s&atilde;o citadas nas mat&eacute;rias
+legislativas, e tamb&eacute;m montar a base de dados de
+Legisla&ccedil;&atilde;o da casa Legislativa.<br />
+Ao ter acesso a este m&oacute;dulo ser&aacute; exibido uma tela
+com campos para pesquisa de normas j&aacute; cadastradas com
+os&nbsp; bot&otilde;es Pesquisar e Limpar.<br />
+No resultado da pesquisa voc&ecirc; poder&aacute; acessar a
+norma para altera&ccedil;&atilde;o que se fizer
+necess&aacute;ria.<br />
+Para incluir uma norma acione a
+fun&ccedil;&atilde;o&nbsp;&nbsp; &ldquo;Incluir
+Norma Jur&iacute;dica&rdquo;.<br />
+<br />
+Ao ser acionado a fun&ccedil;&atilde;o Incluir Norma
+Jur&iacute;dica ser&aacute; exibida a tela com os seguintes
+campos a serem preenchidos:<br />
+<br />
+<center>
+<table width="85%">
+  <col width="58*" /> <col width="43*" /> <col
+ width="156*" /> <thead> <tr valign="top">
+    <td bgcolor="#c7d8eb" width="23%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Nome do Campo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="17%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Tipo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="61%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Instru&ccedil;&otilde;es para
+Preenchimento</b></font></p>
+    </td>
+  </tr>
+  </thead> <tbody>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">Tipo</font></p>
+      </td>
+      <td width="17%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="61%">
+      <p><font style="font-size: 11pt;" size="3">Selecione
+na caixa Tipo o tipo de norma jur&iacute;dica que ser&aacute;
+cadastrado</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">N&uacute;mero</font></p>
+      </td>
+      <td width="17%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="61%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o n&uacute;mero da Norma Jur&iacute;dica.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">Ano</font></p>
+      </td>
+      <td width="17%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="61%">
+      <p><font style="font-size: 11pt;" size="3">J&aacute;
+vem preenchido com o ano corrente, informe o ano da norma
+jur&iacute;dica.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">Data</font></p>
+      </td>
+      <td width="17%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="61%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a data da norma jur&iacute;dica, no formato dia, m&ecirc;s e
+ano (ano com quatro posi&ccedil;&otilde;es)</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">Esfera
+Federa&ccedil;&atilde;o</font></p>
+      </td>
+      <td width="17%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="61%">
+      <p><font style="font-size: 11pt;" size="3">Selecione
+na caixa Esfera Federa&ccedil;&atilde;o a esfera que a norma
+jur&iacute;dica pertence.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">&Eacute;
+Complementar</font></p>
+      </td>
+      <td width="17%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="61%">
+      <p><font style="font-size: 11pt;" size="3">Sim/N&atilde;o
+&ndash; Informe se a mat&eacute;ria &eacute; uma
+mat&eacute;ria complementar ou n&atilde;o.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">Mat&eacute;ria
+Legislativa</font></p>
+      </td>
+      <td width="17%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="61%">
+      <p><font style="font-size: 11pt;" size="3">Selecione
+na caixa Mat&eacute;ria Legislativa, o tipo de mat&eacute;ria
+que deu origem a norma jur&iacute;dica acima citada.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">N&uacute;mero</font></p>
+      </td>
+      <td width="17%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="61%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o n&uacute;mero da mat&eacute;ria legislativa.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">Ano</font></p>
+      </td>
+      <td width="17%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="61%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o ano da mat&eacute;ria legislativa.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">Data
+Publica&ccedil;&atilde;o</font></p>
+      </td>
+      <td width="17%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="61%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a data em que a norma jur&iacute;dica foi publicada, no formato
+dia, m&ecirc;s e ano (ano com quatro
+posi&ccedil;&otilde;es).</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">Ve&iacute;culo
+Publica&ccedil;&atilde;o</font></p>
+      </td>
+      <td width="17%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="61%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a fonte onde a norma jur&iacute;dica foi publicada.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">N&deg;.
+P&aacute;g. In&iacute;cio Public.</font></p>
+      </td>
+      <td width="17%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="61%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o n&uacute;mero da primeira p&aacute;gina da fonte de
+publica&ccedil;&atilde;o da norma jur&iacute;dica.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">N&deg;.
+P&aacute;g. Fim Public.</font></p>
+      </td>
+      <td width="17%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="61%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o n&uacute;mero da &uacute;ltima p&aacute;gina da fonte de
+publica&ccedil;&atilde;o da norma jur&iacute;dica.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">Texto
+Integral</font></p>
+      </td>
+      <td width="17%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="61%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o caminho onde est&aacute; gravado o documento com o texto integral
+da norma, ou acione o bot&atilde;o Procurar..., para encontra-lo no
+micro. (A fun&ccedil;&atilde;o
+&ldquo;Procurar...&rdquo; abre a janela de procura de arquivos
+no padr&atilde;o Windows).</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">Ementa</font></p>
+      </td>
+      <td width="17%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="61%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a ementa da norma Legislativa.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">Indexa&ccedil;&atilde;o</font></p>
+      </td>
+      <td width="17%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="61%">
+      <p style="margin-bottom: 0cm;"><font
+ style="font-size: 11pt;" size="3">Informe as palavras
+para indexa&ccedil;&atilde;o da norma jur&iacute;dica.</font></p>
+      <p style="margin-bottom: 0cm;"><br />
+      </p>
+      <p style="margin-bottom: 0cm;"> <font
+ style="font-size: 11pt;" size="3">A
+indexa&ccedil;&atilde;o deve conter palavras que informe o
+conte&uacute;do da mat&eacute;ria de forma que a pesquisa da
+mesma fique mais r&aacute;pida e objetiva.</font></p>
+      <p style="margin-bottom: 0cm;"><font
+ style="font-size: 11pt;" size="3">Exemplo: Uma
+mat&eacute;ria que trata da prote&ccedil;&atilde;o
+&agrave; crian&ccedil;a, mas que no seu texto n&atilde;o
+esteja escrito termos como, Agress&atilde;o f&iacute;sica,
+Abuso sexual, estes termos, devem aparecer na
+indexa&ccedil;&atilde;o para que a mat&eacute;ria ao ser
+pesquisada por este assunto possa ser encontrada. </font> </p>
+      <p><font style="font-size: 11pt;" size="3">Caso
+tenha interesse em consultar uma base de dados de palavras controladas
+(THESAURUS) para alimenta&ccedil;&atilde;o da
+indexa&ccedil;&atilde;o de Mat&eacute;rias Legislativas,
+acesse o site: </font><font color="#0000ff"><u><a
+ href="http://webthes.senado.gov.br/thes/"><font
+ style="font-size: 11pt;" size="3">http://webthes.senado.gov.br/thes/</font></a></u></font><font
+ style="font-size: 11pt;" size="3"> na
+p&aacute;gina do Senado Federal.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">Observa&ccedil;&atilde;o</font></p>
+      </td>
+      <td width="17%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="61%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+as observa&ccedil;&otilde;es adicionais sobre a norma
+jur&iacute;dica.</font></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</center>
+
+<br />
+<br />
+Acione a fun&ccedil;&atilde;o&nbsp;
+&ldquo;Salvar&rdquo; para que as
+informa&ccedil;&otilde;es sejam salvas no arquivo.<br />
+Ser&aacute; enviada a mensagem: <i>Norma Jur&iacute;dica salva com
+sucesso!</i><br />
+Acione a fun&ccedil;&atilde;o Continuar para&nbsp; repetir
+a opera&ccedil;&atilde;o para outras Normas
+Jur&iacute;dicas, ou acione a fun&ccedil;&atilde;o Sair
+para sair do cadastramento Normas Jur&iacute;dicas e voltar a tela
+inicial do sistema.<br />
+<br />
+Para <b>alterar</b> os dados de uma Norma Jur&iacute;dica j&aacute;
+cadastrada, selecione a norma jur&iacute;dica na lista de normas
+jur&iacute;dicas, altere as informa&ccedil;&otilde;es que
+se deseja alterar e acione a fun&ccedil;&atilde;o
+&ldquo;Salvar&rdquo;.<br />
+Para <b>excluir</b> uma Norma Jur&iacute;dica, selecione a Norma
+Jur&iacute;dica e acione a fun&ccedil;&atilde;o&nbsp;
+&ldquo;Excluir&rdquo;.<br />
+Ser&aacute; enviada a pergunta &ldquo;Deseja realmente
+excluir?&rdquo;<br />
+Acione Confirmar em caso positivo ou Cancelar para o caso de
+desist&ecirc;ncia da exclus&atilde;o.<br />
+Quando for informado Confirmar ser&aacute; enviada a mensagem: <i>Norma
+Jur&iacute;dica exclu&iacute;da com sucesso!</i><br />
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'tipo_norma_juridica' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'ordem_dia' %}">Pr&oacute;xima</a>
+
+<br />
+
+
+</div>
+
+{% endblock base_content %}

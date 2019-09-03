@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading">Casa Legislativa</h1><br />
+Ao ter acesso a esta tabela ser&aacute; exibida uma tela com os
+seguintes campos para serem preenchidos:<br />
+<br />
+<center>
+<table width="85%">
+  <col width="53*" /> <col width="41*" /> <col  width="162*" /> <thead> <tr valign="top">
+    <td bgcolor="#c7d8eb" width="21%">
+    <p align="justify"><font style="font-size: 11pt;"  size="3"><b>Nome do Campo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="16%">
+    <p align="justify"><font style="font-size: 11pt;"  size="3"><b>Tipo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="63%">
+    <p align="justify"><font style="font-size: 11pt;"  size="3"><b>Instru&ccedil;&otilde;es para Preenchimento</b></font></p>
+    </td>
+  </tr>
+  </thead> <tbody>
+    <tr valign="top">
+      <td width="21%">
+      <p><font style="font-size: 11pt;" size="3">C&oacute;digo</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="63%">
+      <p style="margin-bottom: 0in;"><font  style="font-size: 11pt;" size="3">Para obter o c&oacute;digo da casa legislativa, v&aacute; &aacute; p&aacute;gina da Interlegis no endere&ccedil;o </font><font  color="#0000ff"><u><a
+ href="http://www.interlegis.gov.br/"><font  style="font-size: 11pt;" size="3">www.interlegis.gov.br</font></a></u></font><font  style="font-size: 11pt;" size="3"> , navegue at&eacute; a sua C&acirc;mara Municipal e na barra de
+endere&ccedil;o no browser obtenha o c&oacute;digo de sua casa, exemplo:<br />
+      </font><font color="#0000ff"><u><a  href="http://www.interlegis.gov.br/comunidade/casas_legislativas/municipal/cxxxx/view"><font  style="font-size: 8pt;" size="1">http://www.interlegis.gov.br/comunidade/casas_legislativas/municipal/c</font><b><font  size="3">xxxx</font></b><font  style="font-size: 8pt;" size="1">/view</font></a></u></font><font  style="font-size: 11pt;" size="3">.</font></p>
+      <p style="margin-bottom: 0in;"><font  style="font-size: 11pt;" size="3">Copie o n&uacute;mero mostrado em cxxxx e informe-o neste campo.</font></p>
+      <p><font style="font-size: 11pt;" size="3">Caso n&atilde;o disponha de conex&atilde;o &agrave; Internet, informe &ldquo;0&rdquo; (zero) como c&oacute;digo.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="21%">
+      <p><font style="font-size: 11pt;" size="3">Nome</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="63%">
+      <p><font style="font-size: 11pt;" size="3">Informe o Nome da casa Legislativa. Ex.: C&acirc;mara Municipal de xxxxxxx</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="21%">
+      <p><font style="font-size: 11pt;" size="3">Sigla</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="63%">
+      <p><font style="font-size: 11pt;" size="3">Informe a Sigla da casa legislativa. Ex.: CMX</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="21%">
+      <p><font style="font-size: 11pt;" size="3">Endere&ccedil;o</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="63%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o endere&ccedil;o da casa legislativa</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="21%">
+      <p><font style="font-size: 11pt;" size="3">CEP</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="63%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o CEP da casa legislativa</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="21%">
+      <p><font style="font-size: 11pt;" size="3">Munic&iacute;pio</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="63%">
+      <p style="margin-bottom: 0in;"><font  style="font-size: 11pt;" size="3">Informe o nome do munic&iacute;pio da casa legislativa.</font></p>
+      <p style="margin-bottom: 0in;"><font  style="font-size: 11pt;" size="3">Caso queira saber os nomes dos munic&iacute;pios cadastrados no estado de representa&ccedil;&atilde;o &eacute; s&oacute; informar a parte inicial do nome do munic&iacute;pio, a UF e acionar a &ldquo;?&rdquo; interroga&ccedil;&atilde;o que se encontra &agrave; direita do campo. Ao encontrar a Cidade desejada, selecione-a e tecla o bot&atilde;o OK. </font> </p>       <p><font style="font-size: 11pt;" size="3"><i>O cadastro de munic&iacute;pio &eacute; obtido de um arquivo interno do sistema. N&atilde;o h&aacute; tabela de
+munic&iacute;pios para alimentar</i></font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="21%">
+      <p><font style="font-size: 11pt;" size="3">UF</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="63%">
+      <p><font style="font-size: 11pt;" size="3">Selecione a UF da casa Legislativa.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="21%">
+      <p><font style="font-size: 11pt;" size="3">Telefone</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="63%">
+      <p><font style="font-size: 11pt;" size="3">Informe o n&uacute;mero do telefone da casa legislativa</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="21%">
+      <p><font style="font-size: 11pt;" size="3">Fax</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="63%">
+      <p><font style="font-size: 11pt;" size="3">Informe o n&uacute;mero do fax da casa legislativa.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="21%">
+      <p><font style="font-size: 11pt;" size="3">Logotipo</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="63%">
+      <p style="margin-bottom: 0in;"><font  style="font-size: 11pt;" size="3">Informe o caminho, onde se encontra o logotipo da casa legislativa, ou acione a fun&ccedil;&atilde;o procurar.</font></p>       <p style="margin-bottom: 0in;"><font  style="font-size: 11pt;" size="3"><i>Sempre que for necess&aacute;rio fazer qualquer altera&ccedil;&atilde;o nos dados da casa legislativa, tem que informar novamente o arquivo do logotipo. Caso seja acionada a fun&ccedil;&atilde;o &ldquo;Salvar&rdquo; com este campo em branco, as informa&ccedil;&otilde;es ser&atilde;o salvas, mas o logotipo ser&aacute; alterado para o Bras&atilde;o da Rep&uacute;blica que &eacute; a imagem
+&ldquo;default&rdquo; do sistema.</i></font></p>
+      <p style="margin-bottom: 0in;"><font  style="font-size: 11pt;" size="3"><i>O logotipo
+ser&aacute; exibido em todas as telas do Sistema.</i></font></p>
+      <p><font style="font-size: 11pt;" size="3"><i>A fun&ccedil;&atilde;o &ldquo;Procurar&rdquo; abre a
+janela padr&atilde;o de procura de arquivos usada pelo windows.</i></font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="21%">
+      <p><font style="font-size: 11pt;" size="3">HomePage</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="63%">
+      <p><font style="font-size: 11pt;" size="3">Informe o endere&ccedil;o da HomePage da casa legislativa.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="21%">
+      <p><font style="font-size: 11pt;" size="3">E-mail</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="63%">
+      <p><font style="font-size: 11pt;" size="3">Informe o e-mail (endere&ccedil;o eletr&ocirc;nico) da casa legislativa.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="21%">
+      <p><font style="font-size: 11pt;" size="3">Informa&ccedil;&atilde;o Geral</font></p>
+      </td>
+      <td width="16%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="63%">
+      <p><font style="font-size: 11pt;" size="3">Informa&ccedil;&otilde;es gerais sobre a casa legislativa</font></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</center>
+<br />
+Acione a fun&ccedil;&atilde;o &ldquo;Salvar&rdquo; para que as informa&ccedil;&otilde;es sejam salvas no arquivo.<br />
+Ser&aacute; enviada a mensagem: <i>Casa Legislativa salva com sucesso!</i><br />
+Acione a fun&ccedil;&atilde;o Continuar caso queira fazer alguma altera&ccedil;&atilde;o nos dados da casa legislativa.<br />
+Os campos Endere&ccedil;o, CEP, Munic&iacute;pio, UF, Telefone, Fax, HomePage, E-mail e Informa&ccedil;&atilde;o Geral, se
+preenchidos, ter&atilde;o seu conte&uacute;do exibido na tela inicial do sistema.<br />
+No m&oacute;dulo de alimenta&ccedil;&atilde;o das informa&ccedil;&otilde;es, voc&ecirc; tem tamb&eacute;m, a possibilidade de fazer pesquisa por &ldquo;busca por palavra-chave&rdquo;.<br />
+A pesquisa por busca de palavras-chave recupera as informa&ccedil;&otilde;es que foram digitadas nos campos &ldquo;Ementa&rdquo; e &ldquo;Indexa&ccedil;&atilde;o&rdquo;, do cadastro de mat&eacute;rias legislativas.<br />
+A Busca por palavra chave s&oacute; pesquisa o cadastro de mat&eacute;rias legislativas. N&atilde;o sendo poss&iacute;vel recuperar informa&ccedil;&otilde;es de outros cadastros como por exemplo Parlamentares.<br />
+Quando a pesquisa &eacute; realizada dentro do m&oacute;dulo de atualiza&ccedil;&atilde;o das informa&ccedil;&otilde;es, o operador tem a possibilidade de fazer altera&ccedil;&otilde;es nas informa&ccedil;&otilde;es das mat&eacute;rias que resultou da pesquisa.<br />
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'acessando_alimenta' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'modulo_parlamentares' %}">Pr&oacute;xima</a>
+
+<br />
+
+</div>
+
+{% endblock base_content %}

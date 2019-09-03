@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading">N&iacute;vel de Instru&ccedil;&atilde;o</h1>
+<br />
+Esta tabela tem por objetivo cadastrar os tipos de N&iacute;vel de
+Instru&ccedil;&atilde;o.<br />
+<br />
+Ao ter acesso a esta tabela ser&aacute; exibido a
+rela&ccedil;&atilde;o de n&iacute;vel de
+instru&ccedil;&atilde;o j&aacute; cadastrado se houve, e um
+campo em branco, onde deve&nbsp; ser digitado o tipo do
+n&iacute;vel de instru&ccedil;&atilde;o, ex.: Superior
+Incompleto, Superior, Prim&aacute;rio, etc.<br />
+Campo de preenchimento obrigat&oacute;rio.<br />
+Acione o bot&atilde;o [Adicionar N&iacute;vel de
+Instru&ccedil;&atilde;o] para efetivar a
+inclus&atilde;o. <br />
+Ser&aacute; enviada a mensagem: <i>N&iacute;vel de
+Instru&ccedil;&atilde;o salvo com sucesso!</i><br />
+<br />
+Para <b>alterar</b> o n&iacute;vel de instru&ccedil;&atilde;o,
+&eacute; s&oacute; escrever a altera&ccedil;&atilde;o
+no n&iacute;vel j&aacute; existente acionar a
+a&ccedil;&atilde;o &ldquo;Atualizar&rdquo;.<br />
+Para <b>excluir</b> o n&iacute;vel, acione a a&ccedil;&atilde;o
+&ldquo;Excluir&rdquo;.<br />
+Ser&aacute; enviada a pergunta &ldquo;Deseja realmente
+excluir?&rdquo;<br />
+Acione Confirmar em caso positivo ou Cancelar para o caso de
+desist&ecirc;ncia da exclus&atilde;o.<br />
+Quando for informado Confirmar ser&aacute; enviada a mensagem:
+<i>Nível de Instrução exclu&iacute;do com
+sucesso!</i><br/>
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'tipo_situa_militar' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'partidos' %}">Pr&oacute;xima</a>
+
+<br />
+
+
+</div>
+
+{% endblock base_content %}

@@ -1,0 +1,13 @@
+{% load common_tags %}
+
+{% if presenca_ordem %}
+<fieldset>
+	<legend>Lista de Presença na Ordem do Dia</legend>
+		<div class="row">
+		  {% for p in presenca_ordem %}
+		  <div class="col-md-12">{{p.nome_parlamentar}} / {% if p|filiacao_data_filter:object.data_inicio %} {{ p|filiacao_data_filter:object.data_inicio }} {% else %} Sem partido {% endif %} </div>
+		  {% endfor %}
+		</div>
+</fieldset>
+<br /><br /><br />
+{% endif %}

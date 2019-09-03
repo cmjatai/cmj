@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading"><a NAME="cons_topo">Acompanhamento de Mat&eacute;ria Legislativa</a> </h1>
+<br />
+Esta fun&ccedil;&atilde;o tem por objetivo cadastrar o e-mail de usu&aacute;rio
+interessado em receber informa&ccedil;&atilde;o sobre cada movimenta&ccedil;&atilde;o
+da mat&eacute;ria legislativa em quest&atilde;o durante a sua tramita&ccedil;&atilde;o
+na Casa Legislativa.<br />
+<br />
+A tela para cadastro do e-mail &eacute; apresentada ao usu&aacute;rio ao clicar em <b><i>Acompanhar Mat&eacute;ria</i></b>.
+<br />
+Nela, o usu&aacute;rio dever&aacute; informar o e-mail no qual deseja receber
+informa&ccedil;&atilde;o sobre a movimenta&ccedil;&atilde;o da referida mat&eacute;ria. <br  >
+<br />
+O descadastramento do e-mail, objetivando interromper o recebimento de avisos,
+poder&aacute; ser feito clicando-se no link apropriado, que consta no e-mail recebido
+informando sobre a movimenta&ccedil;&atilde;o da mat&eacute;ria.<br />
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'consultas' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'consultas' %}">Pr&oacute;xima</a>
+
+<br />
+
+</div>
+
+{% endblock base_content %}

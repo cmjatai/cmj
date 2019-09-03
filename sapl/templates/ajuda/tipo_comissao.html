@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading">Tipo de Comiss&atilde;o</h1>
+<br />
+Esta tabela tem por objetivo cadastrar os tipos de Comiss&otilde;es
+que a casa Legislativa possui.<br />
+<br />
+Ao ter acesso a esta tabela ser&aacute; exibida uma tela com os
+tipos de comiss&otilde;es j&aacute; cadastradas e o
+bot&atilde;o [Adicionar Tipo de
+Comiss&atilde;o]. Ao ser acionado este bot&atilde;o
+ser&aacute; exibida a tela com os seguintes campos a serem
+preenchidos:<br />
+<br />
+<center>
+<table width="653">
+  <col width="145" /> <col width="75" /> <col
+ width="401" /> <thead> <tr valign="top">
+    <td bgcolor="#c7d8eb" width="145">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Nome do Campo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="75">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Tipo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="401">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Instru&ccedil;&otilde;es para
+Preenchimento</b></font></p>
+    </td>
+  </tr>
+  </thead> <tbody>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Nome</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o nome da comiss&atilde;o &ndash; ex. Comiss&atilde;o de
+Sa&uacute;de, Comiss&atilde;o de
+Educa&ccedil;&atilde;o, etc.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Sigla</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a sigla da comiss&atilde;o.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Dispositivo
+Regimental</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+neste campo qual o dispositivo legal que criou a comiss&atilde;o.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Natureza</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="401">
+      <p style="margin-bottom: 0cm;"><font
+ style="font-size: 11pt;" size="3">Escolha na caixa
+Natureza, a natureza da comiss&atilde;o, ex. Permanente,
+tempor&aacute;ria etc.</font></p>
+      <ul>
+        <li value="1">
+          <p><font style="font-size: 11pt;" size="3"><i>Obs.
+Esta informa&ccedil;&atilde;o &eacute; interna do cadastro,
+n&atilde;o havendo tabela para atualizar.</i></font></p>
+        </li>
+      </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</center>
+<br />
+<br />
+Acione a fun&ccedil;&atilde;o Salvar para que as
+informa&ccedil;&otilde;es sejam salvas no arquivo.<br />
+Ser&aacute; enviada a mensagem: <i>Tipo Comiss&atilde;o
+salva com sucesso!</i><br />
+<br />
+Para<b> alterar </b>as informa&ccedil;&otilde;es
+de uma comiss&atilde;o, selecione a comiss&atilde;o desejada,
+altere as informa&ccedil;&otilde;es e acione a
+fun&ccedil;&atilde;o &ldquo;Salvar&rdquo;.<br />
+<br />
+Para <b>excluir</b> uma comiss&atilde;o, selecione a
+comiss&atilde;o desejada e acione a fun&ccedil;&atilde;o
+&ldquo;Excluir&rdquo;.<br />
+Ser&aacute; enviada a pergunta &ldquo;Deseja realmente
+excluir?&rdquo;<br />
+Acione Confirmar em caso positivo ou Cancelar para o caso de
+desist&ecirc;ncia da exclus&atilde;o.<br />
+Quando for informado Confirmar ser&aacute; enviada a mensagem: <i>Tipo
+Comiss&atilde;o exclu&iacute;do com sucesso!</i><br />
+
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'cargo_comissao' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'periodo_composicao_comissao' %}">Pr&oacute;xima</a>
+
+<br />
+
+</div>
+
+{% endblock base_content %}

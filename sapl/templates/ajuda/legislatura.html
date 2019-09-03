@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading">Legislatura</h1>
+<br />
+Esta tabela tem por objetivo cadastrar as Legislaturas da Casa
+Legislativa.<br />
+<br />
+Ao ter acesso a esta tabela ser&aacute; exibida uma tela com a
+rela&ccedil;&atilde;o das legislaturas j&aacute;
+cadastradas e o bot&atilde;o &ldquo;Adicionar
+Legislatura&rdquo;.<br />
+&nbsp;Ao ser acionado este bot&atilde;o ser&aacute; exibida
+a tela com os seguintes campos para serem preenchidos:<br />
+<br />
+<center>
+<table width="85%">
+  <col width="57*" /> <col width="40*" /> <col
+ width="159*" /> <thead> <tr valign="top">
+    <td bgcolor="#c7d8eb" width="22%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Nome do Campo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="15%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Tipo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="62%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Instru&ccedil;&otilde;es para
+Preenchimento</b></font></p>
+    </td>
+  </tr>
+  </thead> <tbody>
+    <tr valign="top">
+      <td width="22%">
+      <p><font style="font-size: 11pt;" size="3">N.&ordm;
+Legislatura</font></p>
+      </td>
+      <td width="15%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="62%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o n&uacute;mero da legislatura, (n&uacute;mero
+seq&uuml;encial &ndash; ex. 1,2,3, etc). <font
+ color="#ff6600">N&atilde;o pode ser literal (ex. um,
+dois, tr&ecirc;s) </font> </font> </p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="22%">
+      <p><font style="font-size: 11pt;" size="3">Data
+In&iacute;cio</font></p>
+      </td>
+      <td width="15%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="62%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a data de inicio da legislatura no formato dia, m&ecirc;s e ano
+(ano com quatro posi&ccedil;&otilde;es)</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="22%">
+      <p><font style="font-size: 11pt;" size="3">Data
+Fim</font></p>
+      </td>
+      <td width="15%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="62%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a data final da legislatura no formato dia, m&ecirc;s e ano (ano
+com quatro posi&ccedil;&otilde;es)</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="22%">
+      <p><font style="font-size: 11pt;" size="3">Data
+Elei&ccedil;&atilde;o</font></p>
+      </td>
+      <td width="15%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="62%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a data da elei&ccedil;&atilde;o dos parlamentares desta
+legislatura no formato dia, m&ecirc;s e ano (ano com quatro
+posi&ccedil;&otilde;es)</font></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</center>
+
+<br />
+Acione a fun&ccedil;&atilde;o&nbsp;
+&ldquo;Salvar&rdquo; para que as
+informa&ccedil;&otilde;es sejam salvas no arquivo.<br />
+Ser&aacute; enviada a mensagem: <i>Registro criado com sucesso!</i><br />
+
+
+<br />
+Para <b>alterar</b> as informa&ccedil;&otilde;es de uma Legislatura, vá em Listar
+Legislaturas e selecione a Legislatura desejada, acione Editar, altere as
+informa&ccedil;&otilde;es e acione a
+fun&ccedil;&atilde;o &ldquo;Salvar&rdquo;.<br />
+<br />
+Para <b>excluir</b> uma Legislatura, vá em Listar Legislatura e selecione a Legislatura
+desejada, acione
+a fun&ccedil;&atilde;o &ldquo;Excluir&rdquo;.<br />
+Ser&aacute; enviada a pergunta &ldquo;Confirmar exclusão da Legislatura?&rdquo;<br />
+Acione CONFIRMAR em caso positivo ou CANCELAR para o caso de
+desist&ecirc;ncia da exclus&atilde;o.<br />
+Quando for informado Confirmar ser&aacute; enviada a mensagem: <i>Legislatura
+exclu&iacute;da com sucesso!</i><br />
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'modulo_parlamentares' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'tipo_afastamento' %}">Pr&oacute;xima</a>
+
+<br />
+
+</div>
+
+{% endblock base_content %}

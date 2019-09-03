@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading">Cadastro da Mesa Diretora</h1>
+<br />
+<div align="left">Esta tabela tem por objetivo cadastrar a
+Composi&ccedil;&atilde;o da Mesa da Casa
+Legislativa.&nbsp;&nbsp; &nbsp;<br />
+Ao ter acesso a esta tabela ser&aacute; exibida uma tela onde deve
+ser preenchido os seguintes campos:<br />
+</div>
+<br />
+Escolha uma Legislatura:
+<blockquote>Escolha na caixa de Legislatura, a legislatura em que
+ser&aacute; cadastrada a composi&ccedil;&atilde;o da mesa.<br />
+Caso n&atilde;o exista nenhuma Legislatura inclu&iacute;da, o
+sistema enviar&aacute; a seguinte mensagem: &ldquo;Legislatura
+deve ser cadastrada antes de efetuar a inclus&atilde;o&rdquo;<br />
+</blockquote>
+<br />
+<p>Escolha uma Sess&atilde;o Legislativa:</p>
+<blockquote>Escolha na caixa de Sess&atilde;o Legislativa, a
+sess&atilde;o em que ser&aacute; cadastrada a
+composi&ccedil;&atilde;o da mesa.<br />
+Caso n&atilde;o exista nenhuma Sess&atilde;o Legislativa
+inclu&iacute;da, o sistema enviar&aacute; a seguinte mensagem:
+&ldquo;Sess&atilde;o Legislativa deve ser cadastrada na
+legislatura selecionada antes de efetuar a
+inclus&atilde;o&rdquo;<br />
+</blockquote>
+<br />
+<p>Parlamentares:</p>
+<blockquote>Escolha na caixa de Parlamentares os parlamentares
+que comp&otilde;em a mesa.<br />
+Caso n&atilde;o exista nenhum Parlamentar inclu&iacute;do, o
+sistema enviar&aacute; a seguinte mensagem: &ldquo;Parlamentar
+deve ser cadastrado com mandato na legislatura selecionada antes de
+efetuar a inclus&atilde;o&rdquo;.<br />
+</blockquote>
+<br />
+<p>Cargo na Mesa:</p>
+<blockquote>Escolha na caixa Cargo, o cargo que o parlamentar
+ir&aacute; ocupar na mesa diretora. Caso n&atilde;o exista
+nenhum cargo inclu&iacute;do, o sistema enviar&aacute; a
+seguinte mensagem: &ldquo;Cargo do parlamentar na mesa deve ser
+cadastrado antes de efetuar a inclus&atilde;o&rdquo;<br />
+</blockquote>
+Acione o bot&atilde;o Incluir, para incluir o parlamentar
+juntamente com seu cargo.<br />
+Ser&aacute; enviada a mensagem: <i>Parlamentar
+inclu&iacute;do com sucesso na Composi&ccedil;&atilde;o da
+Mesa.</i><br />
+
+<br />
+Para excluir um parlamentar de um cargo na mesa:<br />
+Selecione o parlamentar e acione o
+bot&atilde;o Excluir<br />
+Ser&aacute; enviada a pergunta &ldquo;Deseja realmente
+excluir?&rdquo;<br />
+Acione Confirmar em caso positivo ou Cancelar para o caso de
+desist&ecirc;ncia da exclus&atilde;o. Quando for informado Confirmar
+ser&aacute; enviada a mensagem: <i>Parlamentar exclu&iacute;do com
+sucesso da composi&ccedil;&atilde;o da mesa!</i><br />
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'cargo_mesa' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}?">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'modulo_comissoes' %}">Pr&oacute;xima</a>
+
+<br />
+
+</div>
+
+{% endblock base_content %}

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading">Acessando o modulo de
+alimenta&ccedil;&atilde;o das informa&ccedil;&otilde;es</h1><br />
+Informe seu Login e senha e acione a fun&ccedil;&atilde;o
+&ldquo;Entrar&rdquo;.<br />
+Caso esteja com problemas de acesso, por favor entre em contato com a
+administra&ccedil;&atilde;o do sistema.<br />
+Caso queira, que seu Login fique digitado sempre que voc&ecirc;
+desejar entrar no sistema, marque a op&ccedil;&atilde;o
+&ldquo;Lembrar meu nome.&rdquo;<br />
+No m&oacute;dulo de alimenta&ccedil;&atilde;o das
+informa&ccedil;&otilde;es voc&ecirc; tem acesso
+&agrave; alimenta&ccedil;&atilde;o dos seguintes
+m&oacute;dulos:<br />
+<br />
+<ul>
+  <li><a href="{% url 'sapl.base:help_topic' 'gerenciamento_usuarios' %}">Gerenciamento de Usu&aacute;rio</a></li>
+  <li><a href="{% url 'sapl.base:help_topic' 'troca_senha' %}">Troca de Senha</a></li>
+  <li><a href="{% url 'sapl.base:help_topic' 'modulo_mesa_diretora' %}">Mesa Diretora</a></li>
+  <li><a href="{% url 'sapl.base:help_topic' 'modulo_comissoes' %}">Comiss&otilde;es</a></li>
+  <li><a href="{% url 'sapl.base:help_topic' 'mandatos_parlamentar' %}">Parlamentares</a></li>
+  <li><a href="{% url 'sapl.base:help_topic' 'protocolo_geral' %}">Protocolo Geral</a></li>
+  <li><a href="modulo_documentos_administrativos">Documentos Administrativos</a>
+  <li><a href="{% url 'sapl.base:help_topic' 'recebimento_proposicao' %}">Recebimento de Proposi&ccedil;&otilde;es</a></li>
+  <li><a href="modulo_pauta_sessao">Pauta da Sess&atilde;o</a></li></ul><br />
+<ul>
+  <li><a href="{% url 'sapl.base:help_topic' 'modulo_tramitacao_materias' %}">Mat&eacute;rias Legislativas</a></li>
+  <li><a href="{% url 'sapl.base:help_topic' 'modulo_tratamicao_lote' %}">Tramita&ccedil;&atilde;o em Lote</a></li>
+  <li><a href="{% url 'sapl.base:help_topic' 'sessao_plenaria' %}">Sess&atilde;o Plen&aacute;ria</a></li>
+  <li><a href="{% url 'sapl.base:help_topic' 'envio_proposicao' %}">Proposi&ccedil;&otilde;es</a></li>
+  <li><a href="{% url 'sapl.base:help_topic' 'modulo_norma_juridica' %}">Normas Jur&iacute;dicas</a></li>
+  <li><a href="{% url 'sapl.base:help_topic' 'modulo_impressos' %}">Impressos</a></li>
+  <li><a href="{% url 'sapl.base:help_topic' 'modulo_relatorios' %}">Relat&oacute;rios</a></li>
+  <li>Tabelas Auxiliares &nbsp;</li>
+</ul>
+<br />
+Ao acessar o sistema, a primeira tabela a ser preenchida &eacute; a
+tabela de Casa Legislativa, que se encontra no m&oacute;dulo
+Tabelas Auxiliares.<br />
+Esta tabela tem por objetivo cadastrar as
+informa&ccedil;&otilde;es relativas a casa legislativa, para
+personalizar as telas do sistema de Apoio ao Processo Legislativo.<br />
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'consultas' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{{casa_legislativa}}">Pr&oacute;xima</a>
+
+<br />
+
+
+</div>
+
+{% endblock base_content %}

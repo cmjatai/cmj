@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading">Per&iacute;odo da Composi&ccedil;&atilde;o da
+Comiss&atilde;o</h1>
+<br />
+Esta tabela tem por objetivo cadastrar os per&iacute;odos de
+funcionamento das Comiss&otilde;es que a casa Legislativa possui.<br />
+<br />
+Ao ter acesso a esta tabela ser&aacute; exibida uma tela com a
+rela&ccedil;&atilde;o de per&iacute;odos j&aacute;
+cadastrados e o bot&atilde;o [Adicionar 
+Per&iacute;odo de composição de comissão]. Ao ser acionado este bot&atilde;o
+ser&aacute; exibida a tela com os seguintes campos a serem
+preenchidos:<br />
+<br />
+<center>
+<table width="653">
+  <col width="145" /> <col width="75" /> <col
+ width="401" /> <thead> <tr valign="top">
+    <td bgcolor="#c7d8eb" width="145">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Nome do Campo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="75">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Tipo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="401">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Instru&ccedil;&otilde;es para
+Preenchimento</b></font></p>
+    </td>
+  </tr>
+  </thead> <tbody>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Data
+In&iacute;cio</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Data
+de cria&ccedil;&atilde;o da Comiss&atilde;o no formato dia,
+m&ecirc;s e ano (ano com quatro posi&ccedil;&otilde;es)</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Data
+Fim</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Data
+de encerramento da Comiss&atilde;o no formato dia, m&ecirc;s e
+ano (ano com quatro posi&ccedil;&otilde;es).</font></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</center>
+<br />
+<br />
+Acione a fun&ccedil;&atilde;o&nbsp;
+&ldquo;Salvar&rdquo; para que as
+informa&ccedil;&otilde;es sejam salvas no arquivo.<br />
+Ser&aacute; enviada a mensagem: <i>Per&iacute;odo salvo
+com sucesso!</i><br />
+
+<br />
+Para <b>alterar</b> as informa&ccedil;&otilde;es de um
+per&iacute;odo de Composi&ccedil;&atilde;o de
+comiss&atilde;o, selecione o per&iacute;odo desejado, altere as
+informa&ccedil;&otilde;es e acione a
+fun&ccedil;&atilde;o &ldquo;Salvar&rdquo;.<br />
+<br />
+Para <b>excluir</b> um per&iacute;odo de uma comiss&atilde;o,
+selecione o per&iacute;odo desejado e acione a
+fun&ccedil;&atilde;o &ldquo;Excluir&rdquo;.<br />
+Ser&aacute; enviada a pergunta &ldquo;Deseja realmente
+excluir?&rdquo;<br />
+Acione Confirmar em caso positivo ou Cancelar para o caso de
+desist&ecirc;ncia da exclus&atilde;o.<br />
+Quando for informado Confirmar ser&aacute; enviada a mensagem: <i>Per&iacute;odo
+exclu&iacute;do com sucesso!</i><br/>
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'tipo_comissao' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'cadastro_comissoes' %}">Pr&oacute;xima</a>
+
+<br />
+
+
+</div>
+
+{% endblock base_content %}

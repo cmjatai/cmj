@@ -1,0 +1,27 @@
+{% extends "crud/detail.html" %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% block actions %} {% endblock %}
+
+{% block title %}
+	<h1 class="page-header">
+		Matérias em Tramitação <small>({{object}})</small>
+	</h1>
+{% endblock %}
+
+{% block detail_content %}
+	<fieldset>
+		<legend>{{comissao}}</legend>
+		<b>Há {{qtde}} matéria(s) em tramitação nesta unidade.</b> <br><br>
+		{% for materia in page_obj %}
+			<b><a href="{% url 'sapl.materia:materialegislativa_detail' materia.id %}">
+				{{materia.tipo.sigla}} {{materia.numero}} {{materia.ano}} - {{materia.tipo}}
+			</b></a><br>
+			{{materia}}<br>
+			<b>Autor: </b>{{materia.autoria_set.first.autor.nome}}<br>
+			<b>Situação: </b>{{materia.tramitacao_set.last.status.descricao}}<br>
+			<b>Data Fim Prazo da Última Tramitação: </b>{% if materia.tramitacao_set.last.data_fim_prazo %} {{materia.tramitacao_set.last.data_fim_prazo}} {% else %} Não definida. {% endif %}<br>
+			<br>
+		{% endfor %}
+	</fieldset>
+{% endblock detail_content %}

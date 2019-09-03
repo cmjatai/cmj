@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading">Tipo de Fim de Relatoria</h1>
+<br />
+Esta tabela tem por objetivo cadastrar as causas de fim de relatoria
+das mat&eacute;rias legislativas.<br />
+Ao ter acesso a esta tabela ser&aacute; exibida uma tela com os
+tipos de Fim de Relatorias j&aacute; cadastrados, e um campo em
+branco.<br />
+<br />
+Preencha o Tipo Fim Relatoria no campo tipo fim relatoria e acione o
+bot&atilde;o &ldquo;Incluir Tipo Fim Relatoria&rdquo;.
+Campo de preenchimento obrigat&oacute;rio. <br />
+Ser&aacute; enviada a mensagem:	<i>Tipo Fim Relatoria salvo
+com sucesso!</i><br />
+<br />
+Para alterar os dados de um tipo fim de relatoria j&aacute;
+cadastrada, altere as informa&ccedil;&otilde;es e acione a
+a&ccedil;&atilde;o &ldquo;Atualizar&rdquo;. Para excluir
+um tipo fim relatoria , acione a a&ccedil;&atilde;o
+&ldquo;Excluir&rdquo;.<br />
+Ser&aacute; enviada a pergunta &ldquo;Deseja realmente
+excluir?&rdquo;<br />
+Acione Confirmar em caso positivo ou Cancelar para o caso de
+desist&ecirc;ncia da exclus&atilde;o.<br />
+Quando for informado Confirmar ser&aacute; enviada a mensagem: <i>Tipo Fim de relatoria exclu&iacute;do com sucesso!</i><br />
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'orgao' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'status_tramitacao' %}">Pr&oacute;xima</a>
+
+<br />
+
+</div>
+
+{% endblock base_content %}

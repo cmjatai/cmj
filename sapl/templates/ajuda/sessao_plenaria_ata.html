@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading">Sess&atilde;o Plen&aacute;ria - Ata</h1><br />
+<br>Na <b>Ata</b> consta o sum&aacute;rio das a&ccedil;&otilde;es realizadas na Sess&atilde;o Plen&aacute;ria, de acordo com os t&oacute;picos:<br />
+<br>1. Identifica&ccedil;&atilde;o da Sess&atilde;o Plen&aacute;ria e da Legislatura, contendo: tipo da sess&atilde;o, data e hora de in&iacute;cio e de t&eacute;rmino.<br />
+<br>2. Mesa - Apresenta a composi&ccedil;&atilde;o da Mesa que presidiu e/ou presidir&aacute; a Sess&atilde;o.<br />
+<br>3. Parlamentares presentes - Lista dos Parlamentares com os respectivos partidos presentes a Sess&atilde;o.<br />
+<br>4. Oradores inscritos - Lista dos Parlamentares que se inscreveram para proferir discurso.<br />
+<br>5. Mat&eacute;rias da Ordem do Dia - Rela&ccedil;&atilde;o das Mat&eacute;rias Legislativas inscritas na Ordem do Dia constando de: n&uacute;mero, autor, ementa, observa&ccedil;&atilde;o, resultado da vota&ccedil;&atilde;o e observa&ccedil;&otilde;es, caso a mat&eacute;ria j&aacute; tenha sido votada.<br/>
+<br>6. Expedientes - Constam os registros dos fatos ocorridos em cada parte/expediente da Sess&atilde;o.<br />
+<br>Clique no bot&atilde;o <i>retornar</i> para retornar a tela de cadastro da Sess&atilde;o Plen&aacute;ria.<br />
+
+<br>  <a href="{% url 'sapl.base:help_topic' 'sessao_plenaria' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'sessao_plenaria_materias' %}">Pr&oacute;xima</a>
+<br />
+<br />
+</div>
+
+{% endblock base_content %}

@@ -1,0 +1,490 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading">Cadastro de Parlamentares</h1>
+<br />
+Este M&oacute;dulo tem por objetivo cadastrar os Parlamentares da
+Casa Legislativa.<br />
+Ao ter acesso a este m&oacute;dulo ser&aacute; exibido uma tela
+com um campo para selecionar a legislatura.<br />
+Ao selecionar a legislatura ser&aacute; exibida a
+rela&ccedil;&atilde;o de Parlamentares j&aacute;
+cadastrados na legislatura escolhida<br />
+Nota: Ao entrar no sistema, este sempre vir&aacute; com a
+legislatura atual posicionada.<br />
+
+<br />
+Para incluir um parlamentar acione a fun&ccedil;&atilde;o
+[Adicionar Parlamentar].<br />
+
+Ser&aacute; exibida a tela como os seguintes campos a serem
+preenchidos:<br />
+<br />
+<center>
+<table width="653">
+  <col width="145" /> <col width="75" /> <col
+ width="401" /> <thead> <tr valign="top">
+    <td bgcolor="#c7d8eb" width="145">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Nome do Campo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="75">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Tipo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="401">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Instru&ccedil;&otilde;es para
+Preenchimento</b></font></p>
+    </td>
+  </tr>
+  </thead> <tbody>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Legislatura</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a legislatura do mandato.</font></p>
+      </td>
+    </tr>
+      <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Expedição do Diploma</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a data da expedição do diploma do mandato.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Nome
+do Parlamentar</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o nome Parlamentar do Vereador ou Deputado</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Ativo
+na casa </font> </p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="401">
+      <p style="margin-bottom: 0cm;"><font
+ style="font-size: 11pt;" size="3">Escolha a
+op&ccedil;&atilde;o Sim ou N&atilde;o para informar se o
+Parlamentar est&aacute; ativo na casa ou n&atilde;o.</font></p>
+      <p><font style="font-size: 11pt;" size="3">Caso
+seja informada a op&ccedil;&atilde;o &ldquo;SIM&rdquo;
+o sistema ir&aacute; inclui-lo automaticamente no Mandato Atual, e
+perguntar&aacute; ao Operador se deseja cadastrar o Parlamentar
+como &ldquo;Autor&rdquo;.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Nome
+Completo</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o nome completo do Vereador ou Deputado</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Partido</font></p>
+      </td>
+      <td width="75">
+      <p><br />
+      </p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Este
+campo n&atilde;o pode ser preenchido. Este campo mostra o partido
+ao qual o parlamentar est&aacute; filiado. A
+informa&ccedil;&atilde;o de filia&ccedil;&atilde;o
+partid&aacute;ria dever ser cadastrada atrav&eacute;s da
+fun&ccedil;&atilde;o &ldquo;Filia&ccedil;&atilde;o
+Partid&aacute;ria&rdquo; que se encontra no fim da
+p&aacute;gina .</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Sexo</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Assinale
+Masculino ou Feminino. Campo de preenchimento obrigat&oacute;rio</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td height="23" width="145">
+      <p><font style="font-size: 11pt;" size="3">Data
+Nascimento</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a data de Nascimento do Parlamentar no formato dia, m&ecirc;s e ano
+(ano com quatro posi&ccedil;&otilde;es).</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">CPF</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p style="margin-bottom: 0cm;"><font
+ style="font-size: 11pt;" size="3">Informe o CPF do
+Parlamentar</font></p>
+      <p><font style="font-size: 11pt;" size="3">O
+n&uacute;mero do CPF ser&aacute; validado com o digito
+verificador, caso o CPF n&atilde;o seja um CPF v&aacute;lido,
+ser&aacute; enviada a mensagem. &ldquo;<i>Digite um CPF
+v&aacute;lido&rdquo;</i>.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">RG</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o n&uacute;mero do Registro Geral do Parlamentar. </font> </p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">N&ordm;.
+T&iacute;tulo Eleitor</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o n&uacute;mero do T&iacute;tulo de Eleitor do Parlamentar.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Situa&ccedil;&atilde;o
+Militar</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Escolha
+na caixa de Situa&ccedil;&atilde;o Militar, a
+situa&ccedil;&atilde;o militar do Parlamentar.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">N&iacute;vel
+Instru&ccedil;&atilde;o</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Escolha
+na caixa de N&iacute;vel de Instru&ccedil;&atilde;o, o
+n&iacute;vel de instru&ccedil;&atilde;o do Parlamentar.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Profiss&atilde;o</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a profiss&atilde;o exercida pelo Parlamentar.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">HomePage</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o endere&ccedil;o da HomePage do Parlamentar no formato </font><font
+ color="#0000ff"><u><a href="http://www.eeeee./"><font
+ style="font-size: 11pt;" size="3">http://www.eeeee.</font></a></u></font><font
+ style="font-size: 11pt;" size="3">. se houver.:</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Correio
+Eletr&ocirc;nico</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o endere&ccedil;o do correio eletr&ocirc;nico do Parlamentar no
+formato </font><font color="#0000ff"><u><a
+ href="mailto:nome@provedor"><font style="font-size: 11pt;"
+ size="3">nome@provedor</font></a></u></font><font
+ style="font-size: 11pt;" size="3"> se houver</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">N.&ordm;
+Gabinete</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o n&uacute;mero do gabinete do Parlamentar</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Telefone</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o n&uacute;mero do telefone da casa legislativa para contato com o
+Parlamentar.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Fax</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o n&uacute;mero do fax para contato com o Parlamentar.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Endere&ccedil;o
+Residencial</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o endere&ccedil;o residencial do Parlamentar &ndash; nome rua,
+n.&ordm; da casa, bairro etc.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">CEP</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o CEP da resid&ecirc;ncia do Parlamentar.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Munic&iacute;pio</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p style="margin-bottom: 0cm;"><font
+ style="font-size: 11pt;" size="3">Informe o nome do
+munic&iacute;pio em que o Parlamentar reside.</font></p>
+      <ul>
+        <li>
+          <p style="margin-bottom: 0cm;"><font
+ style="font-size: 11pt;" size="3">Caso queira saber
+os nomes dos munic&iacute;pios cadastrados no estado de
+representa&ccedil;&atilde;o &eacute; s&oacute; informar
+a parte inicial do nome do munic&iacute;pio, a UF e acionar a
+&ldquo;?&rdquo; interroga&ccedil;&atilde;o que se
+encontra a direita do campo. Ao encontrar a Cidade desejada,
+selecione-a e tecla o bot&atilde;o OK. </font> </p>
+        </li>
+        <li>
+          <p><font style="font-size: 11pt;" size="3"><i>O
+cadastro de munic&iacute;pio &eacute; obtido de um arquivo
+interno do sistema. N&atilde;o h&aacute; tabela de
+munic&iacute;pios para alimentar.</i></font></p>
+        </li>
+      </ul>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">UF</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p style="margin-bottom: 0cm;"><font
+ style="font-size: 11pt;" size="3">Selecione a sigla
+da UF do Parlamentar.</font></p>
+      <ul>
+        <li value="1">
+          <p><i><font style="font-size: 11pt;"
+ size="3">O cadastro de UF, &eacute; um cadastro interno
+do sistema, n&atilde;o h&aacute; tabela para alimentar</font></i><font
+ style="font-size: 9pt;" size="2">.</font></p>
+        </li>
+      </ul>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Telefone</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o telefone residencial do Parlamentar.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Locais
+de Atua&ccedil;&atilde;o</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+os locais de maior atua&ccedil;&atilde;o do Parlamentar.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Fotografia</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o caminho, onde se encontra o arquivo com a foto, ou acione a
+fun&ccedil;&atilde;o procurar.
+Recomenda-se o tamanho de aproximadamente 225 x 300 pixels para uma boa visualização.</font></p>
+      </td>
+    </tr>
+     <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Biografia</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe a biografia do parlamentar. Nela deverá constar um breve resumo curricular</font></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</center>
+<br />
+<br />
+Acione a fun&ccedil;&atilde;o&nbsp;
+&ldquo;Salvar&rdquo; para que as
+informa&ccedil;&otilde;es sejam salvas no arquivo.<br />
+Ser&aacute; enviada a mensagem:&nbsp; Registro criado com sucesso!<br />
+
+Para <b>alterar</b> os dados de um Parlamentar j&aacute; cadastrados,
+selecione o Parlamentar&nbsp; desejado, altere as
+informa&ccedil;&otilde;es e acione a
+fun&ccedil;&atilde;o &ldquo;Salvar&rdquo;.<br />
+<br />
+Para acessar um Parlamentar, selecione o período de Legistatura e acione o Parlamentar desejado.
+<br />
+Caso deseje <b>excluir</b> esse parlamentar, acione o botão Excluir.
+Ser&aacute; enviada a pergunta &ldquo;Deseja realmente
+excluir?&rdquo;<br />
+Acione Confirmar em caso positivo ou Cancelar para o caso de
+desist&ecirc;ncia da exclus&atilde;o.<br />
+Quando for informado Confirmar ser&aacute; enviada a mensagem !Parlamentar
+exclu&iacute;do com sucesso!<br />
+
+<br />
+Caso deseje editar um Parlamentar, acione o botão <b>Editar</b> e altere os campos desejados.
+Após alterados, acione o botão Salvar.
+
+Selecione um Parlamentar j&aacute; cadastrado para continuar
+alimentando outras informa&ccedil;&otilde;es tais como:
+<a href="{% url 'sapl.base:help_topic' 'mandatos_parlamentar' %}"><b>Mandato</b></a>,
+<a href="{% url 'sapl.base:help_topic' 'filiacoes_partidarias' %}"><b>Filiação Partidária</b></a> e
+<a href="{% url 'sapl.base:help_topic' 'dependentes' %}"><b>Dependente</b></a>. <br />
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'coligacao' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}?">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'mandatos_parlamentar' %}">Pr&oacute;xima</a>
+
+<br />
+
+</div>
+
+{% endblock base_content %}

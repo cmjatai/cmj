@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading">Mandatos do Parlamentar</h1>
+<br />
+Ao incluir o parlamentar é fundamental informar a data do Início do Mandato. Nem sempre
+esta data coincidirá com a data de início da legislatura. Veja o caso de um suplente, ele poderá
+iniciar o seu mandato a qualquer tempo dentro da legislatura.
+<b>Importante: Caso não seja inserida essa data, não será possível dar autoria de matéria
+legislativa para esse parlamentar.</b><br />
+
+Para inserir a data de Início de Mandato, na tela do parlamentar, no menu horizontal clique
+em Mandatos. Em seguida, clique na legislatura em que o parlamentar está cadastrado. Ao selecionar a legislatura, clique em [Editar] e insira a data de início de mandato.<br />
+
+<br />
+Caso o parlamentar tenha sido criado com os mandatos, 
+ser&aacute; exibido uma tela com os mandatos j&aacute;
+cadastrados e o bot&atilde;o [Adionar Mandato].<br />
+
+Campos a serem preenchidos:<br />
+&nbsp;<br />
+<center>
+<table width="649">
+  <col width="143" /> <col width="73" /> <col
+ width="401" /> <thead> <tr valign="top">
+    <td bgcolor="#c7d8eb" width="143">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Nome do Campo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="73">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Tipo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="401">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Instru&ccedil;&otilde;es para
+Preenchimento</b></font></p>
+    </td>
+  </tr>
+  </thead> <tbody>
+    <tr valign="top">
+      <td width="143">
+      <p><font style="font-size: 11pt;" size="3">Legislatura</font></p>
+      </td>
+      <td width="73">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Escolha
+na caixa de legislatura a legislatura correspondente ao
+per&iacute;odo do mandato do parlamentar.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="143">
+      <p><font style="font-size: 11pt;" size="3">Coliga&ccedil;&atilde;o</font></p>
+      </td>
+      <td width="73">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Escolha
+na caixa de Coliga&ccedil;&atilde;o a
+coliga&ccedil;&atilde;o que o parlamentar est&aacute;
+filiado.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="143">
+      <p><font style="font-size: 11pt;" size="3">N&deg;.
+Votos Recebidos</font></p>
+      </td>
+      <td width="73">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o n&uacute;mero de votos que o parlamentar obteve nas
+elei&ccedil;&otilde;es.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="143">
+      <p><font style="font-size: 11pt;" size="3">Data
+Inicio Mandato</font></p>
+      </td>
+      <td width="73">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a data de fim do mandato do parlamentar no formato dia m&ecirc;s e
+ano (ano com quatro posi&ccedil;&otilde;es), se for o caso.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="143">
+      <p><font style="font-size: 11pt;" size="3">Data
+Fim Mandato</font></p>
+      </td>
+      <td width="73">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a data de fim do mandato do parlamentar no formato dia m&ecirc;s e
+ano (ano com quatro posi&ccedil;&otilde;es), se for o caso.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="143">
+      <p><font style="font-size: 11pt;" size="3">Data
+Expedi&ccedil;&atilde;o Diploma</font></p>
+      </td>
+      <td width="73">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a data que o diploma de posse do parlamentar foi expedido no formato
+dia, m&ecirc;s e ano (ano com quatro
+posi&ccedil;&otilde;es).</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="143">
+      <p><font style="font-size: 11pt;" size="3">Vereador Titular</font></p>
+      </td>
+      <td width="73">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe se o parlamentar é Vereador Titular, acione entre sim ou não.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="143">
+      <p><font style="font-size: 11pt;" size="3">Tipo
+de Afastamento</font></p>
+      </td>
+      <td width="73">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Escolha
+na caixa de tipo de afastamento, o motivo que fez com que o parlamentar
+se afastasse das suas atividades legislativas.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="143">
+      <p><font style="font-size: 11pt;" size="3">Observa&ccedil;&atilde;o</font></p>
+      </td>
+      <td width="73">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+neste campo observa&ccedil;&otilde;es complementares referentes
+ao mandato do parlamentar.</font></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</center>
+<br />
+<br />
+Acione a fun&ccedil;&atilde;o&nbsp; [Salvar] para que as
+informa&ccedil;&otilde;es sejam salvas no arquivo.<br />
+Ser&aacute; enviada a mensagem: <i>Mandato Parlamentar salvo com
+sucesso!</i><br />
+<br />
+Para <b>alterar</b> um mandato parlamentar, selecione o mandato desejado,
+altere as informa&ccedil;&otilde;es e acione a
+fun&ccedil;&atilde;o &ldquo;Salvar&rdquo;.<br />
+<br />
+Para <b>excluir</b> um Mandato, selecione o mandato desejado e acione a
+fun&ccedil;&atilde;o &ldquo;Excluir&rdquo;.<br />
+Ser&aacute; enviada a pergunta &ldquo;Deseja realmente
+excluir?&rdquo;<br />
+Acione Confirmar em caso positivo ou Cancelar para o caso de
+desist&ecirc;ncia da exclus&atilde;o.<br />
+Quando for informado Confirmar ser&aacute; enviada a mensagem: <i>Mandato
+exclu&iacute;do com sucesso!</i><br />
+
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'cadastro_parlamentares' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'filiacoes_partidarias' %}">Pr&oacute;xima</a>
+
+<br />
+
+</div>
+
+{% endblock base_content %}

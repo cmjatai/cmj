@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading">Cargo Mesa</h1>
+<br />
+Esta tabela tem por objetivo cadastrar
+os tipos de cargos para composi&ccedil;&atilde;o da mesa.<br />
+Ao ter acesso a esta tabela ser&aacute; exibido a
+rela&ccedil;&atilde;o de cargos j&aacute; cadastrados e um
+campo em branco, onde deve&nbsp; ser digitado o tipo do cargo, ex.:
+Presidente, vice-presidente, etc.<br />
+Campo de preenchimento obrigat&oacute;rio.<br />
+<br />
+Informe se o tipo de cargo que esta sendo inclu&iacute;do
+&eacute; &uacute;nico. (ex. Presidente &eacute; um cargo
+&uacute;nico, porque na composi&ccedil;&atilde;o da mesa
+s&oacute; pode ter um presidente, j&aacute;
+secret&aacute;rio pode haver 1&ordm; secret&aacute;rio,
+2&ordm; secret&aacute;rio etc.)&nbsp; Campo de
+preenchimento obrigat&oacute;rio.<br />
+<br />
+Acione o bot&atilde;o [Adicionar Cargo de Mesa] para
+efetivar a inclus&atilde;o.<br />
+Ser&aacute; enviada a mensagem: <i>Cargo salvo com sucesso!</i><br />
+
+<br />
+Para <b>alterar</b> o cargo, &eacute; s&oacute;
+escrever a altera&ccedil;&atilde;o no cargo j&aacute;
+existente e acionar a a&ccedil;&atilde;o
+&ldquo;Atualizar&rdquo;.<br />
+Para <b>mudar</b> a situa&ccedil;&atilde;o de
+cargo &uacute;nico de um cargo j&aacute; existente acione a
+a&ccedil;&atilde;o de cargo &uacute;nico e acione a
+a&ccedil;&atilde;o &ldquo;Atualizar&rdquo;.<br />
+Para <b>exclui</b>r o cargo, &eacute; s&oacute;
+acionar a a&ccedil;&atilde;o excluir.<br />
+Ser&aacute; enviada a pergunta &ldquo;Deseja realmente
+excluir?&rdquo;<br />
+Acione Confirmar em caso positivo ou Cancelar para o caso de
+desist&ecirc;ncia da exclus&atilde;o.<br />
+Quando for informado Confirmar ser&aacute; enviada a mensagem: <i>Cargo
+exclu&iacute;do com sucesso!</i><br />
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'sessao_legislativa' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'cadastro_mesa_diretora' %}">Pr&oacute;xima</a>
+
+<br />
+
+</div>
+
+{% endblock base_content %}

@@ -1,0 +1,87 @@
+{% extends "protocoloadm/protocoloadm_detail.html" %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block detail_content %}
+	{% crispy form %}
+{% endblock detail_content %}
+
+{% block extra_js %}
+   <script language="Javascript">
+     function compare(a, b) {
+       if (a.text < b.text)
+         return -1;
+       if (a.text > b.text)
+         return 1;
+       return 0;
+     }
+
+      $(document).ready(function() {
+
+        $("input[name=data_hora_manual]").change(function(event) {
+          if (this.value === 'True' && this.checked)
+            $("#protocolo_data_hora_manual").show();
+          else if (this.value === 'False' && this.checked)
+            $("#protocolo_data_hora_manual").hide();
+        });
+        $("input[name=data_hora_manual]").trigger('change')
+        
+        function busca_ementa() {
+          var vincular_materia = $("#id_vincular_materia_1").prop("checked");
+          var ano_materia = $("#id_ano_materia").val();
+          var numero_materia = $("#id_numero_materia").val();
+          var tipo_materia = $("#id_tipo_materia").val();
+          var json_data = {
+            ano : ano_materia,
+            numero : numero_materia,
+            tipo : tipo_materia
+          }
+          if (vincular_materia === true && ano_materia !== undefined &&
+            numero_materia !== undefined && numero_materia !== "") {
+            $.getJSON("/protocoloadm/recuperar-materia", json_data, function(data){
+              if (data) {
+                if (data['error'] === undefined){
+                  $('#id_assunto_ementa').val(data['ementa']);
+                  if (data['autor'] !== undefined) {
+                    $('#id_autor').val(data['autor']);
+                    $('#id_tipo_autor').val(data['tipo_autor']);
+
+                  }
+                }
+              }
+            })
+          }
+        };
+        $("#id_ano_materia").blur(busca_ementa);
+        $("#id_numero_materia").blur(busca_ementa);
+        $("#id_tipo_materia").change(busca_ementa);
+
+          $("#id_tipo_autor").change(function() {
+              var tipo_selecionado = $("#id_tipo_autor").val();
+              var autor_selecionado = $("#id_autor").val();
+              $("#id_autor option").remove()
+              if (tipo_selecionado !== undefined && tipo_selecionado !== null) {
+                var json_data = {
+                   tipo : tipo_selecionado
+                }
+                $.getJSON("/api/autor/possiveis", json_data, function(data){
+                    if (data) {
+                      var results = data.sort(compare);
+                      if (results.length > 1) {
+                        $("#id_autor").append("<option>-----</option>");
+                      }
+                      $.each(results, function(idx, obj) {
+                          $("#id_autor")
+                            .append($("<option></option>")
+                            .attr("value", obj.value)
+                            .text(obj.text));
+                      });
+                      $("#id_autor").prop("selectedIndex", 0);
+                    }
+                });
+            }
+          });
+
+      });
+   </script>
+{% endblock %}

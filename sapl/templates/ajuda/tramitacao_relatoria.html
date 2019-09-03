@@ -1,0 +1,332 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading"><a NAME="tramitacao">Para inclus&atilde;o de Tramita&ccedil;&atilde;o,
+acione a fun&ccedil;&atilde;o
+&ldquo;Tramita&ccedil;&atilde;o&rdquo;</a></h1>
+<br />
+Ser&aacute; exibida a tela com as informa&ccedil;&otilde;es
+da mat&eacute;ria (tipo, n&uacute;mero e ano), e a
+rela&ccedil;&atilde;o de tramita&ccedil;&atilde;o
+j&aacute; cadastrada.<br />
+A rela&ccedil;&atilde;o das tramita&ccedil;&otilde;es
+j&aacute; cadastradas &eacute; classificada na seguinte ordem:<br />
+&nbsp;&nbsp; &nbsp;Data de tramita&ccedil;&atilde;o
+em ordem decrescente. Se houver mais de uma
+tramita&ccedil;&atilde;o na mesma data, ser&aacute; exibido
+tamb&eacute;m na ordem decrescente, ou seja, a &uacute;ltima
+tramita&ccedil;&atilde;o cadastrada &eacute; a que aparece
+no topo da lista.<br />
+Acione o bot&atilde;o &ldquo;Incluir
+Tramita&ccedil;&atilde;o&rdquo;<br />
+<br />
+Preencha os campos:<br />
+<br /><center>
+<table width="85%">
+  <col width="58*" /> <col width="39*" /> <col
+ width="159*" /> <thead> <tr valign="top">
+    <td bgcolor="#c7d8eb" width="23%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Nome do Campo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="15%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Tipo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="62%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Instru&ccedil;&otilde;es para
+Preenchimento</b></font></p>
+    </td>
+  </tr>
+  </thead> <tbody>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">Data
+A&ccedil;&atilde;o</font></p>
+      </td>
+      <td width="15%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="62%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a data em que a mat&eacute;ria sofreu a
+tramita&ccedil;&atilde;o no formato dia, m&ecirc;s e ano
+(ano com quatro posi&ccedil;&otilde;es)</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">Unidade
+Local</font></p>
+      </td>
+    <td width="15%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="62%">
+      <p><font style="font-size: 11pt;" size="3">Selecione
+na caixa Unidade Local, a unidade de onde a mat&eacute;ria esta
+sendo encaminhada.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">Data
+Encaminhamento</font></p>
+      </td>
+      <td width="15%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="62%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a data do encaminhamento da mat&eacute;ria no formato dia,
+m&ecirc;s e ano (ano com quatro posi&ccedil;&otilde;es).</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">Urgente</font></p>
+      </td>
+      <td width="15%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="62%">
+      <p><font style="font-size: 11pt;" size="3">Sim
+/ N&atilde;o &ndash; Informe o tipo de
+tramita&ccedil;&atilde;o da mat&eacute;ria, se em regime de
+urg&ecirc;ncia ou n&atilde;o</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">Status</font></p>
+      </td>
+      <td width="15%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="62%">
+      <p><font style="font-size: 11pt;" size="3">Selecione
+na Caixa Status, a situa&ccedil;&atilde;o da mat&eacute;ria
+(arquivada, em tramita&ccedil;&atilde;o, etc)</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">Unidade
+Destino</font></p>
+      </td>
+      <td width="15%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="62%">
+      <p><font style="font-size: 11pt;" size="3">Selecione
+na Caixa Unidade Destino, a unidade para a qual a mat&eacute;ria
+esta sendo encaminhada.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">Data
+Fim do Prazo</font></p>
+      </td>
+      <td width="15%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="62%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a data fim do prazo da tramita&ccedil;&atilde;o no formato dia,
+m&ecirc;s e ano (ano com quatro posi&ccedil;&otilde;es)</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">Turno</font></p>
+      </td>
+      <td width="15%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="62%">
+      <p style="margin-bottom: 0in;"><font
+ style="font-size: 11pt;" size="3">Selecione na Caixa
+Turno, qual o turno de vota&ccedil;&atilde;o em que a
+mat&eacute;ria se encontra.</font></p>
+      <p><font style="font-size: 11pt;" size="3"><i>Obs.
+Estas informa&ccedil;&otilde;es s&atilde;o internas do
+arquivo, n&atilde;o havendo tabela para alimentar</i></font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">Texto
+da A&ccedil;&atilde;o</font></p>
+      </td>
+      <td width="15%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="62%">
+      <p><font style="font-size: 11pt;" size="3">Descreva
+a a&ccedil;&atilde;o ocorrida com a mat&eacute;ria.</font></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</center>
+<br />
+Acione a fun&ccedil;&atilde;o&nbsp;
+&ldquo;Salvar&rdquo; para que as
+informa&ccedil;&otilde;es sejam salvas no arquivo.<br />
+Ser&aacute; enviada a mensagem: <i>Tramita&ccedil;&atilde;o
+salva com sucesso!</i><br />
+<br />
+Para <b>alterar</b> uma Tramita&ccedil;&atilde;o, selecione a
+Tramita&ccedil;&atilde;o desejada, altere as
+informa&ccedil;&otilde;es e acione a
+fun&ccedil;&atilde;o &ldquo;Salvar&rdquo;.<br /><br />
+<br />
+Para <b>excluir</b> uma Tramita&ccedil;&atilde;o, selecione a
+Tramita&ccedil;&atilde;o desejada e acione a
+fun&ccedil;&atilde;o &ldquo;Excluir&rdquo;.<br />
+Ser&aacute; enviada a pergunta &ldquo;Deseja realmente
+excluir?&rdquo;<br />
+Acione Confirmar em caso positivo ou Cancelar para o caso de
+desist&ecirc;ncia da exclus&atilde;o.<br />
+Quando for informado Confirmar ser&aacute; enviada a mensagem:
+<i>Tramita&ccedil;&atilde;o exclu&iacute;da com sucesso!</i><br />
+<br />
+<h1 class="firstHeading"><a NAME="relatoria">Para inclus&atilde;o da Relatoria, acione a
+fun&ccedil;&atilde;o &ldquo;Relatoria&rdquo;.</a></h1>
+<br/>
+Ser&aacute; exibida a tela com as informa&ccedil;&otilde;es
+da mat&eacute;ria (tipo, n&uacute;mero e ano), e a
+rela&ccedil;&atilde;o de relatoria j&aacute; cadastrada.<br />
+Acione o bot&atilde;o &ldquo;Incluir Relatoria&rdquo;<br />
+<br/>
+Preencha os campos:<br />
+<center>
+<table width="85%">
+  <col width="59*" /> <col width="39*" /> <col
+ width="157*" /> <thead> <tr valign="top">
+    <td bgcolor="#c7d8eb" width="23%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Nome do Campo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="15%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Tipo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="62%">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Instru&ccedil;&otilde;es para
+Preenchimento</b></font></p>
+    </td>
+  </tr>
+  </thead> <tbody>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">Data
+Designa&ccedil;&atilde;o</font></p>
+      </td>
+      <td width="15%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="62%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a data em que o relator foi designado para relatar a mat&eacute;ria
+no formato dia, m&ecirc;s e ano (ano com quatro
+posi&ccedil;&otilde;es).</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">Comiss&atilde;o</font></p>
+      </td>
+      <td width="15%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="62%">
+      <p><font style="font-size: 11pt;" size="3">Selecione
+na Caixa Comiss&atilde;o, a comiss&atilde;o que a
+mat&eacute;ria est&aacute; tramitando.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">Parlamentar</font></p>
+      </td>
+      <td width="15%">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="62%">
+      <p><font style="font-size: 11pt;" size="3">Selecione
+na Caixa Parlamentar, o nome do parlamentar que foi designado para
+relatar a mat&eacute;ria.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">Data
+Destitui&ccedil;&atilde;o</font></p>
+      </td>
+      <td width="15%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="62%">
+      <p><font style="font-size: 11pt;" size="3">Informe
+a data de destitui&ccedil;&atilde;o do relator da
+mat&eacute;ria, se for o caso.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="23%">
+      <p><font style="font-size: 11pt;" size="3">Motivo
+Fim Relatoria:</font></p>
+      </td>
+      <td width="15%">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="62%">
+      <p><font style="font-size: 11pt;" size="3">Escolha
+no Caixa Motivo Fim Relatoria, o motivo pelo qual o relator deixou de
+relatar a mat&eacute;ria.</font></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</center>
+<br />
+Acione a fun&ccedil;&atilde;o&nbsp;
+&ldquo;Salvar&rdquo; para que as
+informa&ccedil;&otilde;es sejam salvas no arquivo.<br />
+Ser&aacute; enviada a mensagem: <i>Relatoria salva com
+sucesso!</i><br />
+<br/>
+Para <b>alterar</b> uma Relatoria, selecione a Relatoria desejada, altere as
+informa&ccedil;&otilde;es e acione a
+fun&ccedil;&atilde;o &ldquo;Salvar&rdquo;.<br />
+Para <b>excluir</b> uma Relatoria, selecione a Relatoria desejada e acione a
+fun&ccedil;&atilde;o &ldquo;Excluir&rdquo;.<br />
+Ser&aacute; enviada a pergunta &ldquo;Deseja realmente
+excluir?&rdquo;<br />
+Acione Confirmar  em caso positivo ou Cancelar para o caso de
+desist&ecirc;ncia da exclus&atilde;o.<br />
+Quando for informado Confirmar ser&aacute; enviada a mensagem: <i>Relatoria
+exclu&iacute;da com sucesso!</i><br />
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'legislacao_cita_matanexada' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'numeracao_docsacess' %}">Pr&oacute;xima</a>
+
+<br />
+
+</div>
+
+{% endblock base_content %}

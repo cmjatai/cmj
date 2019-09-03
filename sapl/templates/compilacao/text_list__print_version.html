@@ -1,0 +1,20 @@
+{% extends "compilacao/text_list.html" %}
+{% load i18n %}
+{% load compilacao_filters %}
+{% load common_tags %}
+
+{% block navigation %}{% endblock %}
+{% block sections_nav %}{% endblock %}
+{% block extra_sections_nav %}{% endblock %}
+{% block actions %}{% endblock %}
+{% block dsp_actions %}{% endblock %}
+
+{% block detail_content %}{% endblock %}
+{% block footer_container %}{% endblock %}
+
+
+{% block base_content %}
+<div class="cp-print">
+  {{ block.super }}
+</div>
+{% endblock %}

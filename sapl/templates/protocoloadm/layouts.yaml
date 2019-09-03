@@ -1,0 +1,63 @@
+{% load i18n %}
+TipoDocumentoAdministrativo:
+  {% trans 'Tipo Documento Administrativo' %}:
+  - sigla:4  descricao
+
+DocumentoAdministrativo:
+  {% trans 'Identificação Básica' %}:
+  - tipo  numero  ano
+  - data  protocolo 
+  - assunto
+  - interessado  tramitacao
+  - texto_integral|urlize
+  - documento_anexado_set__documento_principal|m2m_urlize_for_detail
+  - documento_principal_set__documento_anexado|m2m_urlize_for_detail
+  {% trans 'Outras Informações' %}:
+  - numero_externo
+  - dias_prazo  data_fim_prazo
+  - observacao
+
+DocumentoAcessorioAdministrativo:
+  {% trans 'Documento Acessório' %}:
+  - tipo  autor
+  - nome  data
+  - arquivo
+  - assunto
+
+StatusTramitacaoAdministrativo:
+  {% trans 'Status Tramitação Administrativo' %}:
+  - indicador:3  sigla:2  descricao
+
+TramitacaoAdministrativo:
+  {% trans 'Tramitação' %}:
+  - data_tramitacao  unidade_tramitacao_local
+  - unidade_tramitacao_destino data_encaminhamento  data_fim_prazo
+  - status urgente 
+  - texto
+
+Anexado:
+  {% trans 'Documento Anexado' %}:
+  - tipo numero ano
+  - data_anexacao  data_desanexacao
+
+AnexadoDetail:
+  {% trans 'Documento Anexado' %}:
+  - documento_principal|fk_urlize_for_detail
+  - documento_anexado|fk_urlize_for_detail
+  - data_anexacao  data_desanexacao
+
+Protocolo:
+  {% trans 'Indentificação Documento' %}:
+  - tipo_protocolo
+  - tipo_documento  numero_paginas
+  - assunto_ementa
+  - interessado
+  - observacao
+
+Protocolo:
+  {% trans 'Indentificação da Matéria' %}:
+  - tipo_materia  numero_paginas
+  - numero_materia ano_materia vincular_materia
+  - assunto_ementa
+  - autor
+  - observacao

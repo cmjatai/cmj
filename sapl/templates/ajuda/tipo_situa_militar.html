@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading">Tipo de Situa&ccedil;&atilde;o Militar</h1>
+<br />
+Ao ter acesso a esta tabela ser&aacute; exibido a lista de
+situa&ccedil;&atilde;o militar j&aacute; cadastrada se
+houver, e um campo em branco, onde deve&nbsp; ser digitado o tipo
+da situa&ccedil;&atilde;o Militar, ex.: Dispensado, Servidor
+etc. <br />
+Campo de preenchimento obrigat&oacute;rio.<br />
+Logo abaixo o bot&atilde;o [Adicionar Tipo de
+Situa&ccedil;&atilde;o Militar]. <br />
+Ser&aacute; enviada a mensagem <i>:Tipo de
+Situa&ccedil;&atilde;o Militar salvo com sucesso!</i><br />
+<br />
+Para <b>alterar</b> o tipo de situa&ccedil;&atilde;o militar,
+&eacute; s&oacute; escrever a altera&ccedil;&atilde;o
+no tipo j&aacute; existente e acionar a a&ccedil;&atilde;o
+&ldquo;Atualizar&rdquo;.<br />
+Para <b>excluir</b> o tipo de situa&ccedil;&atilde;o militar,
+&eacute; s&oacute; acionar a a&ccedil;&atilde;o
+&ldquo;Excluir&rdquo;.<br />
+Ser&aacute; enviada a pergunta &ldquo;Deseja realmente
+excluir?&rdquo;<br />
+Acione Confirmar em caso positivo ou Cancelar para o caso de
+desist&ecirc;ncia da exclus&atilde;o.<br />
+Quando for informado Confirmar ser&aacute; enviada a mensagem:
+<i>Situação Militar exclu&iacute;do com
+sucesso!</i><br/>
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'tipo_dependente' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'nivel_instrucao' %}">Pr&oacute;xima</a>
+
+<br />
+
+</div>
+
+{% endblock base_content %}

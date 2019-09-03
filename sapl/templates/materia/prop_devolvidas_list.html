@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load tz %}
+{% block base_content %}
+  <fieldset>
+  <legend>Proposições Não Incorporadas</legend>
+    {% if not object_list %}
+      <p>{{ NO_ENTRIES_MSG }}</p>
+    {% else %}
+      <table class="table table-striped table-hover">
+        <thead>
+          <tr>
+            <th>Data do Devolução</th>
+            <th>Tipo</th>
+            <th>Descrição</th>
+            <th>Autor</th>
+            <th>Motivo da Devolução</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for prop in object_list %}
+            <tr>
+              <td><a href="{% url 'sapl.materia:proposicao_detail' prop.pk %}">{{ prop.data_devolucao|localtime|date:"d/m/Y H:i:s" }}</a></td>
+              <td>{{ prop.tipo.descricao }}</td>
+              <td>{{ prop.descricao }}</td>
+              <td>{{ prop.autor }}</td>
+              <td>{{ prop.justificativa_devolucao}}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+  </fieldset>
+  {% include 'paginacao.html'%}
+{% endblock %}

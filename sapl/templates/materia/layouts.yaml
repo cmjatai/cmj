@@ -1,0 +1,159 @@
+{% load i18n %}
+Origem:
+  {% trans 'Origem' %}:
+  - nome:8  sigla
+
+TipoMateriaLegislativaDetail:
+  {% trans 'Tipo Matéria Legislativa' %}:
+  - sigla:2 descricao sequencia_numeracao:2 sequencia_regimental:2
+
+TipoMateriaLegislativa:
+  {% trans 'Tipo Matéria Legislativa' %}:
+  - sigla:2 descricao sequencia_numeracao:3
+
+RegimeTramitacao:
+  {% trans 'Tipo de Documento' %}:
+  - descricao
+
+TipoDocumento:
+  {% trans 'Regime Tramitação' %}:
+  - descricao
+
+TipoFimRelatoria:
+  {% trans 'Tipo Fim de Relatoria' %}:
+  - descricao
+
+MateriaLegislativa:
+  {% trans 'Identificação Básica' %}:
+  - tipo ano numero
+  - data_apresentacao  numero_protocolo  tipo_apresentacao
+  - tipo_autor autor
+  - texto_original
+  {% trans 'Outras Informações' %}:
+  - apelido  dias_prazo  polemica
+  - objeto  regime_tramitacao  em_tramitacao
+  - data_fim_prazo  data_publicacao  complementar
+  {% trans 'Origem Externa' %}:
+  - tipo_origem_externa  numero_origem_externa  ano_origem_externa
+  - local_origem_externa  data_origem_externa
+  {% trans 'Dados Textuais' %}:
+  - ementa
+  - indexacao
+  - observacao
+
+AssuntoMateria:
+  {% trans 'Assunto de Matéria Legislativa' %}:
+  - assunto
+  - dispositivo
+
+MateriaAssunto:
+  {% trans 'Assuntos da Matéria' %}:
+  - assunto
+  - materia
+
+Anexada:
+  {% trans 'Matéria Anexada' %}:
+  - tipo numero ano
+  - data_anexacao  data_desanexacao
+
+AnexadaDetail:
+  {% trans 'Matéria Anexada' %}:
+  - materia_principal|fk_urlize_for_detail
+  - materia_anexada|fk_urlize_for_detail
+  - data_anexacao  data_desanexacao
+
+Autoria:
+  {% trans 'Autoria' %}:
+  - autor primeiro_autor
+
+
+DocumentoAcessorio:
+  {% trans 'Documento Acessório' %}:
+  - tipo nome data
+  - autor
+  - ementa
+  - indexacao
+  - arquivo
+
+Numeracao:
+  {% trans 'Numeração' %}:
+  - tipo_materia numero_materia ano_materia data_materia
+
+Orgao:
+  {% trans 'Órgão' %}:
+  - nome:4  sigla  telefone  endereco  unidade_deliberativa
+
+Relatoria:
+  {% trans 'Relatoria' %}:
+  - comissao
+  - data_designacao_relator data_destituicao_relator
+  - parlamentar tipo_fim_relatoria
+
+TipoProposicao:
+  {% trans 'Tipo Proposição' %}:
+  - descricao content_type
+  - tipo_conteudo_related perfis
+
+Proposicao:
+  {% trans 'Proposição' %}:
+  - tipo  data_envio
+  - descricao
+  - observacao
+  {% trans 'Materia' %}:
+  - materia_de_vinculo
+  {% trans 'Complemento' %}:
+  - texto_original
+
+StatusTramitacao:
+  {% trans 'Status Tramitação' %}:
+  - sigla:2  descricao:6  indicador:4
+
+UnidadeTramitacao:
+  {% trans 'Unidade Tramitação' %}:
+  - orgao
+  - comissao
+  - parlamentar
+
+Tramitacao:
+  {% trans 'Tramitação' %}:
+  - data_tramitacao unidade_tramitacao_local
+  - unidade_tramitacao_destino data_encaminhamento data_fim_prazo
+  - status  turno  urgente
+  - texto
+
+TramitacaoUpdate:
+  {% trans 'Tramitação' %}:
+  - unidade_tramitacao_destino data_encaminhamento data_fim_prazo
+  - status  turno  urgente
+  - texto
+
+DespachoInicial:
+  {% trans 'Despacho Inicial' %}:
+  - comissao
+
+LegislacaoCitadaDetail:
+  {% trans 'Legislação Citada' %}:
+  - norma
+  - disposicoes  parte  livro  titulo
+  - capitulo  secao  subsecao  artigo
+  - paragrafo  inciso  alinea  item
+
+MateriaLegislativaDetail:
+  {% trans 'Identificação Básica' %}:
+  - tipo ano numero
+  - data_apresentacao  numero_protocolo  tipo_apresentacao
+  - texto_original
+  - numeracao_set
+  - materia_anexada_set__materia_principal|m2m_urlize_for_detail
+  - materia_principal_set__materia_anexada|m2m_urlize_for_detail
+  {% trans 'Outras Informações' %}:
+  - apelido  dias_prazo  polemica
+  - objeto  regime_tramitacao  em_tramitacao
+  - data_fim_prazo  data_publicacao  complementar
+  {% trans 'Origem Externa' %}:
+  - tipo_origem_externa  numero_origem_externa  ano_origem_externa
+  - local_origem_externa  data_origem_externa
+  {% trans 'Dados Textuais' %}:
+  - ementa
+  - indexacao
+  - observacao

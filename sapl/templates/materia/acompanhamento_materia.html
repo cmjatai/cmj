@@ -1,0 +1,20 @@
+{% extends "crud/detail.html" %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% block actions %} {% endblock %}
+{% block detail_content %}
+
+<h1>Acompanhamento de Matéria</h1>
+<hr>
+<div class="row">
+  <div class="col-md-4"><b>Tipo:</b> {{materia.tipo.sigla}} - {{materia.tipo.descricao}}</div>
+  <div class="col-md-4"><b>Número:</b> {{materia.numero}}</div>
+  <div class="col-md-4"><b>Ano:</b> {{materia.ano}}</div>
+
+</div>
+<div class="row">
+  <div class="col-md-12"><b>Ementa:</b> {{materia.ementa|safe}}</div>
+</div>
+
+{% crispy form %}
+{% endblock %}

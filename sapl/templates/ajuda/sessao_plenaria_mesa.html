@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading">Sess&atilde;o Plen&aacute;ria - Mesa</h1><br />
+<br>A Mesa da Sess&atilde;o &eacute; a respons&aacute;vel pela condu&ccedil;&atilde;o dos trabalhos na Sess&atilde;o Plen&aacute;ria. De um modo geral, o Presidente da Casa Legislativa &eacute;, tamb&eacute;m, quem preside os trabalhos das Sess&otilde;es Plen&aacute;rias. Entretanto, outro parlamentar poder&aacute; ser indicado para faze-lo, em seu lugar, de acordo com o que estiver estabelecido no Regimento Interno da Casa.<br />
+<br>Ao selecionar esta fun&ccedil;&atilde;o, o sistema ir&aacute; apresentar ao lado direito da tela, dois combos, um contendo a lista de parlamentares e o outro a lista de cargos, sendo que a inclus&atilde;o do parlamentar, que ir&aacute; compor a Mesa, bem como o cargo que ir&aacute; ocupar, devem ser previamente selecionados para, em seguida, acionar o bot&atilde;o 'Incluir'.<br />
+<br>A indica&ccedil;&atilde;o de inclus&atilde;o do parlamentar com o respectivo cargo na composi&ccedil;&atilde;o da Mesa dar-se-&aacute; pelo sistema ao passa-los para o lado esquerdo da tela, sob o t&iacute;tulo 'Composi&ccedil;&atilde;o'. O sistema ir&aacute; emitir a mensagem: <i>!Parlamentar inclu&iacute;do com sucesso na composi&ccedil;&atilde;o da mesa</i>.<br />
+<br>Para excluir o parlamentar da Mesa da Sess&atilde;o, basta seleciona-lo e acionar o bot&atilde;o 'Excluir'. O sistema, antes de efetivar, ir&aacute; perguntar se deseja realmente excluir e, caso afirmativo, efetivar&aacute; a exclus&atilde;o e emitir&aacute; a mensagem: <i>!Parlamentar exclu&iacute;do com sucesso da composi&ccedil;&atilde;o da mesa</i>.<br />
+<br>Para a execu&ccedil;&atilde;o desta fun&ccedil;&atilde;o ser&atilde;o necess&aacute;rios que os <a href="modulo_parlamentares">Parlamentares</a> bem como os <a href="cargo_mesa">Cargos</a> - em tabelas auxiliares, estejam previamente cadastrados. <br />
+<br />
+<br>  <a href="{% url 'sapl.base:help_topic' 'sessao_plenaria' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'sessao_plenaria_oradores' %}">Pr&oacute;xima</a>
+<br />
+<br />
+</div>
+
+{% endblock base_content %}

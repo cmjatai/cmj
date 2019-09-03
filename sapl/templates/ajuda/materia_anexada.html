@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+<h1 class="firstHeading"><a NAME="materia_anexada">Para inclus&atilde;o de Mat&eacute;ria Anexada,
+acione a fun&ccedil;&atilde;o &ldquo;Mat&eacute;ria
+Anexada&rdquo;</a></h1>
+<br />
+Ser&aacute; exibida a tela com as informa&ccedil;&otilde;es
+da mat&eacute;ria (tipo,n&uacute;mero e ano), e a
+rela&ccedil;&atilde;o de mat&eacute;rias anexada
+j&aacute; cadastradas<br />
+<br />
+Acione o bot&atilde;o [Adicionar Mat&eacute;ria
+Anexada]<br />
+Preencha os campos:<br />
+<br />
+<center>
+
+<table width="85%">
+  <col width="50*" /> <col width="39*" /> <col
+ width="167*" /> <thead> <tr valign="top">
+    <td bgcolor="#c7d8eb" width="20%">
+    <p class="western" align="justify"><font
+ style="font-size: 11pt;" size="3"><b>Nome do
+Campo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="15%">
+    <p class="western" align="justify"><font
+ style="font-size: 11pt;" size="3"><b>Tipo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="65%">
+    <p class="western" align="justify"><font
+ style="font-size: 11pt;" size="3"><b>Instru&ccedil;&otilde;es
+para Preenchimento</b></font></p>
+    </td>
+  </tr>
+  </thead> <tbody>
+    <tr valign="top">
+      <td width="20%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Tipo</font></p>
+      </td>
+      <td width="15%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="65%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Selecione na Caixa Tipo, o tipo de norma que
+est&aacute; sendo anexada. O tipo informado tem que constar no
+cadastro de mat&eacute;rias legislativas.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="20%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">N&uacute;mero</font></p>
+      </td>
+      <td width="15%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="65%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Informe o n&uacute;mero da norma que
+est&aacute; sendo anexada. O n&uacute;mero informado tem que
+constar no cadastro de mat&eacute;rias legislativas.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="20%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Ano</font></p>
+      </td>
+      <td width="15%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="65%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Informe o ano da norma que est&aacute; sendo
+anexada. O ano informado tem que constar no cadastro de
+mat&eacute;rias legislativas.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="20%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Data Anexa&ccedil;&atilde;o</font></p>
+      </td>
+      <td width="15%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="65%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Informe a data da anexa&ccedil;&atilde;o no
+formato dia, m&ecirc;s e ano (ano com quatro
+posi&ccedil;&otilde;es).</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="20%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Data Desanexa&ccedil;&atilde;o</font></p>
+      </td>
+      <td width="15%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Opcional</font></p>
+      </td>
+      <td width="65%">
+      <p class="western"><font style="font-size: 11pt;"
+ size="3">Informe a data da desanexa&ccedil;&atilde;o
+quando ocorrer no formato dia, m&ecirc;s e ano (ano com quatro
+posi&ccedil;&otilde;es)</font></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</center>
+
+<br />
+<br />
+Acione a fun&ccedil;&atilde;o&nbsp;
+&ldquo;Salvar&rdquo; para que as
+informa&ccedil;&otilde;es sejam salvas no arquivo.<br />
+Ser&aacute; enviada a mensagem: <i>Mat&eacute;ria
+Anexada salva com sucesso!</i><br />
+<br />
+Para <b>excluir</b> uma Mat&eacute;ria Anexada, selecione a
+Mat&eacute;ria Anexada desejada e acione a
+fun&ccedil;&atilde;o &ldquo;Excluir&rdquo;.<br />
+<br />
+Ser&aacute; enviada a pergunta &ldquo;Deseja realmente
+excluir?&rdquo;<br />
+Acione Confirmar em caso positivo ou Cancelar para o caso de
+desist&ecirc;ncia da exclus&atilde;o.<br />
+<br />
+Quando for informado Confirmar ser&aacute; enviada a mensagem: <i>Mat&eacute;ria
+Anexada exclu&iacute;da com sucesso!</i><br />
+<br />
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'despacho_autoria' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'tramitacao_relatoria' %}">Pr&oacute;xima</a>
+
+<br />
+
+
+</div>
+
+{% endblock base_content %}

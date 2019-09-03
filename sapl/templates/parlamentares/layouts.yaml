@@ -1,0 +1,159 @@
+{% load i18n %}
+CargoMesa:
+  {% trans 'Cargo na Mesa'%}:
+  - descricao:10  unico
+
+Legislatura:
+  {% trans 'Legislatura' %}:
+  - numero data_eleicao  data_inicio  data_fim
+
+Coligacao:
+  {% trans 'Coligação' %}:
+  - nome:5  legislatura:5  numero_votos
+
+Partido:
+  {% trans 'Partido Político' %}:
+  - sigla:2 nome:4 data_criacao data_extincao
+  - observacao
+  - logo_partido
+
+Dependente:
+  {% trans 'Dependentes' %}:
+  - nome
+  - tipo  sexo  data_nascimento
+  - cpf  rg  titulo_eleitor
+
+SessaoLegislativa:
+  {% trans 'Sessão Legislativa' %}:
+  - numero  tipo  legislatura
+  - data_inicio  data_fim
+  - data_inicio_intervalo  data_fim_intervalo
+
+Parlamentar:
+  {% trans 'Dados do Parlamentar' %}:
+  - nome_parlamentar:8  ativo
+  - nome_completo
+  - nivel_instrucao  sexo  data_nascimento
+  - cpf  rg  titulo_eleitor
+  - situacao_militar  profissao
+  - endereco_web
+  - email
+  - numero_gab_parlamentar  telefone
+  - endereco_residencia  cep_residencia
+  - municipio_residencia  uf_residencia
+  - telefone_residencia
+  - locais_atuacao
+  - fotografia:5
+  - biografia
+
+ParlamentarUpdate:
+  {% trans 'Dados do Parlamentar' %}:
+  - nome_parlamentar:8  ativo
+  - nome_completo
+  - nivel_instrucao  sexo  data_nascimento
+  - cpf  rg  titulo_eleitor
+  - situacao_militar  profissao
+  - endereco_web
+  - email
+  - numero_gab_parlamentar  telefone
+  - endereco_residencia  cep_residencia
+  - municipio_residencia  uf_residencia
+  - telefone_residencia
+  - locais_atuacao
+  - fotografia cropping
+  - biografia
+
+ParlamentarCreate:
+  {% trans 'Dados do Parlamentar' %}:
+  - nome_parlamentar:8  ativo
+  - nome_completo
+  - nivel_instrucao  sexo  data_nascimento
+  - cpf  rg  titulo_eleitor
+  - situacao_militar  profissao
+  - endereco_web
+  - email
+  - numero_gab_parlamentar  telefone
+  - endereco_residencia  cep_residencia
+  - municipio_residencia
+  - telefone_residencia
+  - locais_atuacao
+  - fotografia
+  - biografia
+
+Filiacao:
+  {% trans 'Filiações Partidárias' %}:
+  - partido  data  data_desfiliacao
+
+Mandato:
+  {% trans 'Mandato' %}:
+  - legislatura  coligacao  votos_recebidos
+  - data_inicio_mandato data_fim_mandato
+  - data_expedicao_diploma titular
+  - tipo_afastamento
+  - observacao
+
+TipoDependente:
+  {% trans 'Tipo de Dependente' %}:
+  - descricao
+
+NivelInstrucao:
+  {% trans 'Nível Instrução' %}:
+  - descricao
+
+TipoAfastamento:
+  {% trans 'Tipo de Afastamento' %}:
+  - descricao  dispositivo  indicador
+
+SituacaoMilitar:
+  {% trans 'Tipo Situação Militar' %}:
+  - descricao
+
+Municipio:
+  {% trans 'Município' %}:
+  - nome  uf regiao
+
+ComposicaoColigacao:
+  {% trans 'Nome do Partido' %}:
+  - partido
+
+Bancada:
+  {% trans 'Bancada' %}:
+  - legislatura
+  - nome partido
+  - data_criacao data_extincao
+  - descricao
+
+CargoBancada:
+  {% trans 'Cargo de Bancada' %}:
+  - nome_cargo:8 cargo_unico
+
+Frente:
+  {% trans 'Frente' %}:
+  - nome
+  - data_criacao data_extincao
+  - parlamentares
+  - descricao
+
+Votante:
+  {% trans 'Votante' %}:
+  - parlamentar user
+  - data
+
+Bloco:
+  {% trans 'Bloco' %}:
+  - nome
+  - data_criacao data_extincao
+  - partidos
+  - descricao
+
+CargoBloco:
+  {% trans 'Cargo' %}:
+  - nome
+  - unico
+  - descricao
+
+AfastamentoParlamentar:
+  {% trans 'Afastamento' %}:
+  - data_inicio data_fim
+  - mandato tipo_afastamento
+  - observacao

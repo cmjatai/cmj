@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading">Recebimento de Proposi&ccedil;&otilde;es</h1>
+<br />
+Este M&oacute;dulo tem por objetivo possibilitar ao operador do
+sistema ou a um operador de mat&eacute;rias legislativas registrar
+o recebimento de uma proposi&ccedil;&atilde;o enviada por um
+autor.<br />
+Ao ter acesso a este m&oacute;dulo ser&aacute; exibida uma tela
+aguardando a digita&ccedil;&atilde;o do c&oacute;digo de
+uma proposi&ccedil;&atilde;o. Esse c&oacute;digo
+est&aacute; dispon&iacute;vel no recibo de entrega da
+proposi&ccedil;&atilde;o, que deve ter sido impresso e enviado/assinado
+pelo autor. <br />
+Digite o c&oacute;digo constante do recibo no campo
+&ldquo;C&oacute;digo do Documento&rdquo;, e clique no
+bot&atilde;o &ldquo;Buscar Dados...&rdquo;.<br />
+Ser&atilde;o exibidos os dados b&aacute;sicos da
+proposi&ccedil;&atilde;o, e o seu texto integral
+estar&aacute; dispon&iacute;vel ao clicar-se no link com o
+c&oacute;digo do documento. Nos casos de erro, o sistema emite a mensagem 'Documento Inv&aacute;lido!" devendo, o mesmo, ser devolvido ao autor.<br />
+Existem dois tipos de proposi&ccedil;&otilde;es: geradoras de
+mat&eacute;rias (que s&atilde;o propostas de
+mat&eacute;rias legislativas) e geradoras de documentos
+acess&oacute;rios (que d&atilde;o origem a um novo documento
+acess&oacute;rio dentro de uma mat&eacute;ria j&aacute;
+existente). Dependendo desse tipo, ser&aacute; exibido o
+bot&atilde;o &ldquo;Criar Mat&eacute;ria&rdquo; ou
+&ldquo;Criar Documento Acess&oacute;rio&rdquo; conforme o caso.<br />
+Clique num deles para continuar, e prossiga o cadastramento de uma
+mat&eacute;ria ou de um documento acess&oacute;rio da forma
+convencional.<br />
+Ao finalizar esse cadastramento, e clicar no bot&atilde;o salvar, a
+proposi&ccedil;&atilde;o ser&aacute; dada como recebida, e
+ficar&aacute; vinculada &agrave; mat&eacute;ria ou ao
+documento acess&oacute;rio criado. <br />
+<br />
+Ainda na tela inicial de recebimento de
+proposi&ccedil;&otilde;es, est&atilde;o
+dispon&iacute;veis tr&ecirc;s links para telas de consulta do
+estado de proposi&ccedil;&otilde;es:<br />
+<br />
+<ul>
+  <li><b>Proposi&ccedil;&otilde;es N&atilde;o
+Recebidas:</b> Proposi&ccedil;&otilde;es que
+j&aacute; foram enviadas pelo autor via SAPL, &agrave;s quais
+ainda n&atilde;o foi dado o recebimento. Aguardam a informa&ccedil;&atilde;o do c&oacute;digo de seguran&ccedil;a</li>
+  <li><b>Proposi&ccedil;&otilde;es&nbsp;
+N&atilde;o Incorporadas</b>:
+Proposi&ccedil;&otilde;es que j&aacute; foram recebidas
+pelo operador,&nbsp; mas que, por algum motivo, foram desvinculadas
+de sua mat&eacute;ria legislativa ou de seu documento
+acess&oacute;rio correspondente. Essa <b>n&atilde;o</b> &eacute;
+uma situa&ccedil;&atilde;o normal, pois uma
+proposi&ccedil;&atilde;o n&atilde;o deve permanecer nesse
+estado. Assim, vincule-a novamente a uma mat&eacute;ria legislativa
+ou documento acess&oacute;rio (entrando no cadastro correspondente
+e marcando como texto integral a referida
+proposi&ccedil;&atilde;o), ou devolva-a ao autor (entrando na
+tela de detalhes da proposi&ccedil;&atilde;o, clique no
+bot&atilde;o &ldquo;Devolver proposi&ccedil;&atilde;o
+ao autor&rdquo;.</li>
+  <li><b>Proposi&ccedil;&otilde;es Incorporadas:</b>
+Proposi&ccedil;&otilde;es corretamente recebidas e vinculadas a
+uma mat&eacute;ria legislativa ou a um documento
+acess&oacute;rio.</li>
+</ul>
+<br />
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'sessao_plenaria' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'envio_proposicao' %}">Pr&oacute;xima</a>
+
+<br />
+
+
+</div>
+
+{% endblock base_content %}

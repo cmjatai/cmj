@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content %}
+
+            <div id="conteudo">
+
+
+
+<h1 class="firstHeading">Autor</h1>
+Esta tabela tem por objetivo cadastrar os Autores de
+Mat&eacute;rias Legislativas e de Proposi&ccedil;&otilde;es.<br />
+Nota: Antes por&eacute;m deve ser cadastrado os tipos de autores na tabela
+Tipo de Autor e tamb&eacute;m j&aacute; tem que ter sido
+atualizado o m&oacute;dulo Parlamentar.<br />
+Ao autor parlamentar ou comissÃ£o deve ser concedido um nome de usu&aacute;rio (login) e
+senha para acesso ao SAPL, para que ele possa elaborar e fazer o envio de
+proposi&ccedil;&otilde;es por meio eletr&ocirc;nico.<br />
+
+Para atribuir a autoria da mat&eacute;ria legislativa ao parlamentar &eacute;
+necess&aacute;rio que a data da apresenta&ccedil;&atilde;o esteja dentro do per&iacute;odo
+de um mandato do referido parlamentar.
+
+Para atribuir a autoria da mat&eacute;ria legislativa a comiss&atilde;o &eacute;
+necess&aacute;rio que a data da apresenta&ccedil;&atilde;o esteja dentro do o per&iacute;odo
+de composi&ccedil;&atilde;o da comiss&atilde;o.
+
+Ao ter acesso a esta tabela ser&aacute; exibida uma tela com a
+rela&ccedil;&atilde;o de autores j&aacute; cadastrados e um
+bot&atilde;o &ldquo;Incluir Autor&rdquo;.<br />
+Ao ser&nbsp; acionado o bot&atilde;o Incluir Autor
+ser&aacute; exibida a tela com os seguintes campos a serem
+preenchidos:<br />
+<br />
+<center>
+<table width="653">
+  <col width="145" /> <col width="75" /> <col
+ width="401" /> <thead> <tr valign="top">
+    <td bgcolor="#c7d8eb" width="145">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Nome do Campo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="75">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Tipo</b></font></p>
+    </td>
+    <td bgcolor="#c7d8eb" width="401">
+    <p align="justify"><font style="font-size: 11pt;"
+ size="3"><b>Instru&ccedil;&otilde;es para
+Preenchimento</b></font></p>
+    </td>
+  </tr>
+  </thead> <tbody>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Tipo</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Selecione
+na Caixa Tipo o tipo de Autor que apresentou a mat&eacute;ria.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Autor</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Selecione
+na caixa autor, o autor que apresentou a mat&eacute;ria.</font></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</center>
+<br />
+<br />
+Caso o tipo de autor selecionado seja diferente de PARLAMENTAR E
+COMISS&Atilde;O, ser&atilde;o enviados mais dois
+comp&ocirc;s a serem preenchidos que s&atilde;o:<br />
+<br />
+<center>
+<table width="653">
+  <col width="145" /> <col width="75" /> <col
+ width="401" /> <tbody>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Cargo</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Obrigat&oacute;rio</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Informe
+o cargo do autor.</font></p>
+      </td>
+    </tr>
+    <tr valign="top">
+      <td width="145">
+      <p><font style="font-size: 11pt;" size="3">Partido</font></p>
+      </td>
+      <td width="75">
+      <p><font style="font-size: 11pt;" size="3">Opcional</font></p>
+      </td>
+      <td width="401">
+      <p><font style="font-size: 11pt;" size="3">Selecione
+na caixa Partido o partido do autor.</font></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</center>
+<br />
+Logo abaixo, no grupo de campos rotulado &ldquo;Cadastro para
+Acesso ao SAPL&rdquo;, marque &ldquo;Sim&rdquo; para
+conceder ao autor acesso ao sistema para fins de
+apresenta&ccedil;&atilde;o de proposi&ccedil;&atilde;o.
+Nesse caso, crie e informe no campo &ldquo;Login&rdquo; um nome
+de usu&aacute;rio para que o autor utilize no acesso ao SAPL. Se a
+Casa Legislativa n&atilde;o fizer uso do m&oacute;dulo de envio
+de proposi&ccedil;&otilde;es, marque
+&ldquo;N&atilde;o&rdquo;. Tamb&eacute;m, elimine o login caso n&atilde;o tenha
+mais cadastro de mat&eacute;rias para esse Autor. <br />
+<br />
+Acione a fun&ccedil;&atilde;o&nbsp;
+&ldquo;Salvar&rdquo; para que as
+informa&ccedil;&otilde;es sejam salvas no arquivo.<br />
+<br />
+Ser&aacute; enviada a mensagem: <i>Autor salvo com sucesso!</i><br />
+<br />
+Para alterar os dados de um Autor j&aacute; cadastrado, selecione o
+Autor na lista de Autores, altere as informa&ccedil;&otilde;es
+que se deseja alterar e acione a fun&ccedil;&atilde;o
+&ldquo;Salvar&rdquo;.<br />
+<br />
+Para RETIRAR a op&ccedil;&atilde;o de sele&ccedil;&atilde;o como
+Autor de materia, fa&ccedil;a altera&ccedil;&atilde;o retirando o login de Autor. <br />
+<br />
+Para excluir um Autor, selecione o Autor e acione a
+fun&ccedil;&atilde;o &ldquo;Excluir&rdquo;.<br />
+<br />
+Ser&aacute; enviada a pergunta &ldquo;Deseja realmente
+excluir?&rdquo;<br />
+<br />
+Acione Confirmar em caso positivo ou Cancelar para o caso de
+desist&ecirc;ncia da exclus&atilde;o.<br />
+<br />
+Quando for informado Confirmar ser&aacute; enviada a mensagem: <i>Autor
+exclu&iacute;do com sucesso!</i><br />
+<br />
+
+<br />
+  <a href="{% url 'sapl.base:help_topic' 'envio_proposicao' %}">Anterior</a> |
+
+  <a href="{% url 'sapl.base:help'%}">&Iacute;ndice</a>
+
+  | <a href="{% url 'sapl.base:help_topic' 'tipo_autor' %}">Pr&oacute;xima</a>
+
+<br />
+
+</div>
+
+{% endblock base_content %}
