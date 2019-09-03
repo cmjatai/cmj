@@ -156,7 +156,7 @@ class SolicitacaoListView(SolicitacaoListMixin, ListView):
     def get_queryset(self):
         qs = ListView.get_queryset(self)
         qs = qs.filter(owner=self.request.user).order_by(
-            'notificacoes__read', '-created')
+            'notificacoes__read', '-created').distinct()
         return qs
 
 
