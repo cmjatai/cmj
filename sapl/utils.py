@@ -1,11 +1,12 @@
 from functools import wraps
 import hashlib
+import logging
 from operator import itemgetter
 import os
 import re
 from unicodedata import normalize as unicodedata_normalize
 import unicodedata
-import logging
+
 from crispy_forms.layout import HTML, Button
 from django import forms
 from django.apps import apps
@@ -14,6 +15,7 @@ from django.contrib import admin
 from django.contrib.contenttypes.fields import (GenericForeignKey, GenericRel,
                                                 GenericRelation)
 from django.core.exceptions import ValidationError
+from django.core.files.storage import FileSystemStorage
 from django.core.files.uploadedfile import UploadedFile
 from django.core.mail import get_connection
 from django.db import models
@@ -23,7 +25,6 @@ from django.forms.widgets import SplitDateTimeWidget
 from django.utils import six, timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
-from django.core.files.storage import FileSystemStorage
 import django_filters
 from easy_thumbnails import source_generators
 from floppyforms import ClearableFileInput
@@ -33,6 +34,7 @@ from unipath.path import Path
 
 from sapl.crispy_layout_mixin import SaplFormHelper
 from sapl.crispy_layout_mixin import SaplFormLayout, form_actions, to_row
+
 
 # (26/10/2018): O separador foi mudador de '/' para 'K'
 # por conta dos leitores de códigos de barra, que trocavam
@@ -46,18 +48,18 @@ def pil_image(source, exif_orientation=False, **options):
 
 def dont_break_out(value, max_part=50):
     _safe = value.split()
-    
+
     def chunkstring(string):
         return re.findall('.{%d}' % max_part, string)
-    
+
     def __map(a):
         if len(a) <= max_part:
             return a
         return '<br>' + '<br>'.join(chunkstring(a))
-            
+
     _safe = map(__map, _safe)
     _safe = ' '.join(_safe)
-    
+
     _safe = mark_safe(_safe)
     return value
 
@@ -128,7 +130,9 @@ def montar_row_autor(name):
 
     return autor_row
 
-#TODO: Esta função é utilizada?
+# TODO: Esta função é utilizada?
+
+
 def montar_helper_autor(self):
     autor_row = montar_row_autor('nome')
     self.helper = SaplFormHelper()
@@ -734,8 +738,12 @@ def texto_upload_path(instance, filename, subpath='', pk_first=False):
     filename = re.sub('\s', '_', normalize(filename.strip()).lower())
 
     from sapl.materia.models import Proposicao
-    from sapl.protocoloadm.models import DocumentoAdministrativo
-    if isinstance(instance, (DocumentoAdministrativo, Proposicao)):
+    from sapl.protocoloadm.models import DocumentoAdministrativo, \
+        DocumentoAcessorioAdministrativo
+
+    if isinstance(instance, (DocumentoAdministrativo,
+                             Proposicao,
+                             DocumentoAcessorioAdministrativo)):
         prefix = 'private'
     else:
         prefix = 'public'
@@ -961,12 +969,13 @@ def mail_service_configured(request=None):
 
 def lista_anexados(principal, isMateriaLegislativa=True):
     anexados_total = []
-    if isMateriaLegislativa: #MateriaLegislativa
+    if isMateriaLegislativa:  # MateriaLegislativa
         from sapl.materia.models import Anexada
         anexados_iterator = Anexada.objects.filter(materia_principal=principal)
-    else: #DocAdm
+    else:  # DocAdm
         from sapl.protocoloadm.models import Anexado
-        anexados_iterator = Anexado.objects.filter(documento_principal=principal)
+        anexados_iterator = Anexado.objects.filter(
+            documento_principal=principal)
 
     anexadas_temp = list(anexados_iterator)
 
@@ -975,12 +984,14 @@ def lista_anexados(principal, isMateriaLegislativa=True):
         if isMateriaLegislativa:
             if anx.materia_anexada not in anexados_total:
                 anexados_total.append(anx.materia_anexada)
-                anexados_anexado = Anexada.objects.filter(materia_principal=anx.materia_anexada)
+                anexados_anexado = Anexada.objects.filter(
+                    materia_principal=anx.materia_anexada)
                 anexadas_temp.extend(anexados_anexado)
         else:
             if anx.documento_anexado not in anexados_total:
                 anexados_total.append(anx.documento_anexado)
-                anexados_anexado = Anexado.objects.filter(documento_principal=anx.documento_anexado)
+                anexados_anexado = Anexado.objects.filter(
+                    documento_principal=anx.documento_anexado)
                 anexadas_temp.extend(anexados_anexado)
     if principal in anexados_total:
         anexados_total.remove(principal)
@@ -994,24 +1005,25 @@ class OverwriteStorage(FileSystemStorage):
     Muda o comportamento padrão do Django e o faz sobrescrever arquivos de
     mesmo nome que foram carregados pelo usuário ao invés de renomeá-los.
     '''
+
     def get_available_name(self, name, max_length=None):
         if self.exists(name):
             os.remove(os.path.join(settings.MEDIA_ROOT, name))
         return name
 
-        
+
 def verifica_afastamento_parlamentar(parlamentar, data_inicio, data_fim=None):
     from sapl.parlamentares.models import AfastamentoParlamentar
     if data_fim:
         existe_afastamento = AfastamentoParlamentar.objects.filter(Q(parlamentar=parlamentar) &
-                                                            ( (Q(data_inicio__lte=data_inicio) &
-                                                               Q(data_fim__gte=data_fim)) | 
-                                                               ( Q(data_inicio__lte=data_inicio) &
-                                                                 Q(data_fim__isnull=True)) 
-                                                            ) ).exists()
+                                                                   ((Q(data_inicio__lte=data_inicio) &
+                                                                     Q(data_fim__gte=data_fim)) |
+                                                                    (Q(data_inicio__lte=data_inicio) &
+                                                                       Q(data_fim__isnull=True))
+                                                                    )).exists()
     else:
-        existe_afastamento = AfastamentoParlamentar.objects.filter(parlamentar=parlamentar, 
-                                                            data_inicio__lte=data_inicio,
-                                                            data_fim__gte=data_inicio).exists()
+        existe_afastamento = AfastamentoParlamentar.objects.filter(parlamentar=parlamentar,
+                                                                   data_inicio__lte=data_inicio,
+                                                                   data_fim__gte=data_inicio).exists()
 
     return existe_afastamento
