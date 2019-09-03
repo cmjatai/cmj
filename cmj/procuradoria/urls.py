@@ -1,8 +1,5 @@
 from django.conf.urls import include, url
 
-from cmj.procuradoria.views import DocumentoProcuradoriaCrud,\
-    TipoDocumentoProcuradoriaCrud
-
 from .apps import AppConfig
 
 
@@ -101,8 +98,4 @@ urlpatterns_sistema = [
 ]"""
 
 urlpatterns = [
-    url(r'^procuradoria/',
-        include(DocumentoProcuradoriaCrud.get_urls())),
-    url(r'^sistema/tipo-documento-procuradoria/',
-        include(TipoDocumentoProcuradoriaCrud.get_urls())),
 ]
