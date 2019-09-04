@@ -110,7 +110,7 @@ def doc_adm_texto_integral(request, pk):
             response['Content-Disposition'] = (
                 'inline; filename="%s"' % arquivo.name.split('/')[-1])
             response['X-Accel-Redirect'] = "/media/{0}".format(
-                arquivo.file.name)
+                arquivo.name)
             return response
     raise Http404
 
@@ -134,7 +134,7 @@ def doc_acess_adm_arquivo(request, pk):
             response['Content-Disposition'] = (
                 'inline; filename="%s"' % arquivo.name.split('/')[-1])
             response['X-Accel-Redirect'] = "/media/{0}".format(
-                arquivo.file.name)
+                arquivo.name)
             return response
     raise Http404
 
