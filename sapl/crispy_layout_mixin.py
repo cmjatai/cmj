@@ -100,6 +100,7 @@ class SaplFormLayout(Layout):
 
 
 def get_field_display(obj, fieldname):
+
     field = ''
     try:
         field = obj._meta.get_field(fieldname)
@@ -258,7 +259,12 @@ class CrispyLayoutFormMixin:
         if func:
             verbose_name, text = getattr(self, func)(obj, fieldname)
         else:
-            verbose_name, text = get_field_display(obj, fieldname)
+            hook_fieldname = 'hook_%s' % fieldname
+            if hasattr(self, hook_fieldname):
+                verbose_name, text = getattr(
+                    self, hook_fieldname)(obj, fieldname)
+            else:
+                verbose_name, text = get_field_display(obj, fieldname)
 
         return {
             'id': fieldname,

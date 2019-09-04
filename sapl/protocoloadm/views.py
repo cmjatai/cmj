@@ -396,7 +396,7 @@ class DocumentoAdministrativoCrud(Crud):
                 return redirect('/')
             return super(Crud.DetailView, self).get(args, kwargs)
 
-        def urlize(self, obj, fieldname):
+        def hook_texto_integral(self, obj, fieldname):
             a = '<a href="%s">%s</a>' % (
                 reverse(
                     'sapl.protocoloadm:docadm_texto_integral',
@@ -1330,7 +1330,7 @@ class DocumentoAcessorioAdministrativoCrud(MasterDetailCrud):
     class DetailView(DocumentoAdministrativoMixin,
                      MasterDetailCrud.DetailView):
 
-        def urlize(self, obj, fieldname):
+        def hook_arquivo(self, obj, fieldname):
             a = '<a href="%s">%s</a>' % (
                 reverse(
                     'sapl.protocoloadm:doc_acess_adm_arquivo',

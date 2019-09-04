@@ -9,7 +9,7 @@ DocumentoAdministrativo:
   - data  protocolo 
   - assunto
   - interessado  tramitacao
-  - texto_integral|urlize
+  - texto_integral
   - documento_anexado_set__documento_principal|m2m_urlize_for_detail
   - documento_principal_set__documento_anexado|m2m_urlize_for_detail
   {% trans 'Outras Informações' %}:
@@ -21,7 +21,7 @@ DocumentoAcessorioAdministrativo:
   {% trans 'Documento Acessório' %}:
   - tipo  autor
   - nome  data
-  - arquivo|urlize
+  - arquivo
   - assunto
 
 StatusTramitacaoAdministrativo:
