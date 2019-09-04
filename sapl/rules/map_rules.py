@@ -43,7 +43,7 @@ from sapl.rules import (RP_ADD, RP_CHANGE, RP_DELETE, RP_DETAIL, RP_LIST,
                         SAPL_GROUP_MATERIA, SAPL_GROUP_NORMA,
                         SAPL_GROUP_PAINEL, SAPL_GROUP_PARLAMENTAR,
                         SAPL_GROUP_PROTOCOLO, SAPL_GROUP_SESSAO,
-                        SAPL_GROUP_VOTANTE)
+                        SAPL_GROUP_VOTANTE, SAPL_GROUP_AUDIENCIA)
 from sapl.sessao import models as sessao
 
 
@@ -67,7 +67,7 @@ rules_group_administrativo = {
 }
 
 rules_group_audiencia = {
-    'group': SAPL_GROUP_GERAL,
+    'group': SAPL_GROUP_AUDIENCIA,
     'rules': [
         (audiencia.AudienciaPublica, __base__, __perms_publicas__),
         (audiencia.TipoAudienciaPublica, __base__, __perms_publicas__),
@@ -257,7 +257,7 @@ rules_group_geral = {
         (materia.Parecer, __base__, __perms_publicas__),
         (materia.StatusTramitacao, __base__, __perms_publicas__),
         (materia.UnidadeTramitacao, __base__, __perms_publicas__),
-        
+
 
         (norma.AssuntoNorma, __base__, __perms_publicas__),
         (norma.TipoNormaJuridica, __base__, __perms_publicas__),
@@ -319,10 +319,6 @@ rules_group_geral = {
 
         (audiencia.AudienciaPublica, __base__, __perms_publicas__),
         (audiencia.TipoAudienciaPublica, __base__, __perms_publicas__),
-
-
-
-
     ]
 }
 

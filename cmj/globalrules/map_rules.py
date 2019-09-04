@@ -1,6 +1,4 @@
 from django.contrib.auth import get_user_model
-from sapl.parlamentares.models import Partido
-from sapl.rules.map_rules import __base__
 
 from cmj.agenda.models import Evento
 from cmj.cerimonial.models import Perfil, EnderecoPerfil, EmailPerfil,\
@@ -30,6 +28,8 @@ from cmj.globalrules import (RP_ADD, RP_CHANGE, RP_DELETE, RP_DETAIL, RP_LIST,
                              GROUP_AGENDA_WORKSPACE, menu_agenda)
 from cmj.ouvidoria.models import Solicitacao, MensagemSolicitacao
 from cmj.sigad.models import Revisao, Classe, Documento, Midia
+from sapl.parlamentares.models import Partido
+from sapl.rules.map_rules import __base__
 
 
 __base__ = [RP_LIST, RP_DETAIL, RP_ADD, RP_CHANGE, RP_DELETE]
@@ -196,8 +196,8 @@ rules_patterns = [
     rules_saap_group_workspace_oper_contatos,
     rules_saap_group_workspace_oper_grupo_contatos,
     rules_saap_group_workspace_oper_processos,
+    rules_agenda_group_workspace,
 
     rules_sigad_view_status_restritos,
     rules_ouvidoria_visualizacao_respostas,
-    rules_agenda_group_workspace
 ]

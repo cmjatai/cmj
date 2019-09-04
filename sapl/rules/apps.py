@@ -8,18 +8,13 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.management import _get_all_permissions
 from django.core import exceptions
-from django.db import models, router
-from django.db.models.signals import post_save, post_delete
+from django.db import router
+from django.db.models.signals import post_save, post_delete, post_migrate
 from django.db.utils import DEFAULT_DB_ALIAS
 from django.dispatch.dispatcher import receiver
 from django.utils.translation import string_concat
 from django.utils.translation import ugettext_lazy as _
 import reversion
-
-from sapl.rules import (SAPL_GROUP_ADMINISTRATIVO, SAPL_GROUP_COMISSOES,
-                        SAPL_GROUP_GERAL, SAPL_GROUP_MATERIA, SAPL_GROUP_NORMA,
-                        SAPL_GROUP_PAINEL, SAPL_GROUP_PROTOCOLO,
-                        SAPL_GROUP_SESSAO)
 
 
 class AppConfig(django.apps.AppConfig):
@@ -28,6 +23,7 @@ class AppConfig(django.apps.AppConfig):
     verbose_name = _('Regras de Acesso')
 
 
+@receiver(post_migrate, dispatch_uid='django.contrib.auth.management.create_permissions')
 def create_proxy_permissions(
         app_config, verbosity=2, interactive=True,
         using=DEFAULT_DB_ALIAS, **kwargs):
@@ -134,7 +130,6 @@ def create_proxy_permissions(
 
 
 def get_rules():
-
     from sapl.rules.map_rules import rules_patterns
     from django.contrib.auth.models import Group, Permission
     from django.contrib.contenttypes.models import ContentType
@@ -205,19 +200,6 @@ def get_rules():
             g = Group.objects.get_or_create(name=grupo)[0]
             g.user_set.add(usuario)
 
-        def cria_usuarios_padrao(self):
-            for group, user in (
-                (SAPL_GROUP_ADMINISTRATIVO, 'operador_administrativo'),
-                (SAPL_GROUP_PROTOCOLO, 'operador_protocoloadm'),
-                (SAPL_GROUP_COMISSOES, 'operador_comissoes'),
-                (SAPL_GROUP_MATERIA, 'operador_materia'),
-                (SAPL_GROUP_NORMA, 'operador_norma'),
-                (SAPL_GROUP_SESSAO, 'operador_sessao'),
-                (SAPL_GROUP_PAINEL, 'operador_painel'),
-                (SAPL_GROUP_GERAL, 'operador_geral'),
-            ):
-                self.cria_usuario(user, group)
-
         def update_groups(self):
             print('')
             print(string_concat('\033[93m\033[1m',
@@ -231,23 +213,7 @@ def get_rules():
     return Rules(rules_patterns)
 
 
-def update_groups(app_config, verbosity=2, interactive=True,
-                  using=DEFAULT_DB_ALIAS, **kwargs):
-
-    if app_config != AppConfig and not isinstance(app_config, AppConfig):
-        return
-
-    rules = get_rules()
-    rules.update_groups()
-
-
-def cria_usuarios_padrao():
-    rules = get_rules()
-    rules.cria_usuarios_padrao()
-
-
 def send_signal_for_websocket_time_refresh(project, action, inst):
-
     if not settings.USE_CHANNEL_LAYERS:
         return
 
@@ -287,6 +253,16 @@ def send_signal_for_websocket_time_refresh(project, action, inst):
                               "CHANNEL_LAYERS"))
 
 
+@receiver(post_migrate, dispatch_uid='update_groups')
+def update_groups(app_config, verbosity=2, interactive=True,
+                  using=DEFAULT_DB_ALIAS, **kwargs):
+    if app_config != AppConfig and not isinstance(app_config, AppConfig):
+        return
+    rules = get_rules()
+    rules.update_groups()
+
+
+@receiver(post_delete, dispatch_uid='pre_delete_signal')
 def revision_pre_delete_signal(sender, **kwargs):
     #send_signal_for_websocket_time_refresh(kwargs['instance'], 'pre_delete')
     with reversion.create_revision():
@@ -302,15 +278,3 @@ def sapl_post_save_signal(sender, instance, using, **kwargs):
 @receiver(post_delete, dispatch_uid='sapl_post_delete_signal')
 def sapl_post_delete_signal(sender, instance, using, **kwargs):
     send_signal_for_websocket_time_refresh('sapl', 'post_delete', instance)
-
-
-models.signals.post_migrate.connect(
-    receiver=update_groups)
-
-models.signals.post_migrate.connect(
-    receiver=create_proxy_permissions,
-    dispatch_uid="django.contrib.auth.management.create_permissions")
-
-models.signals.pre_delete.connect(
-    receiver=revision_pre_delete_signal,
-    dispatch_uid="pre_delete_signal")

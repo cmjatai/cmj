@@ -25,6 +25,7 @@ SAPL_GROUP_MATERIA = _("Operador de Matéria")
 SAPL_GROUP_NORMA = _("Operador de Norma Jurídica")
 SAPL_GROUP_SESSAO = _("Operador de Sessão Plenária")
 SAPL_GROUP_PAINEL = _("Operador de Painel Eletrônico")
+SAPL_GROUP_AUDIENCIA = _("Operador de Audiências")
 SAPL_GROUP_GERAL = _("Operador Geral")
 SAPL_GROUP_AUTOR = _("Autor")
 SAPL_GROUP_PARLAMENTAR = _("Parlamentar")
@@ -46,6 +47,7 @@ SAPL_GROUPS = [
     SAPL_GROUP_NORMA,
     SAPL_GROUP_SESSAO,
     SAPL_GROUP_PAINEL,
+    SAPL_GROUP_AUDIENCIA,
     SAPL_GROUP_GERAL,
     SAPL_GROUP_AUTOR,
     SAPL_GROUP_PARLAMENTAR,
