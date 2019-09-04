@@ -91,7 +91,7 @@ def recuperar_materia_protocolo(request):
     return response
 
 
-def doc_texto_integral(request, pk):
+def doc_adm_texto_integral(request, pk):
     can_see = True
 
     if not request.user.is_authenticated():
@@ -103,6 +103,30 @@ def doc_texto_integral(request, pk):
         documento = DocumentoAdministrativo.objects.get(pk=pk)
         if documento.texto_integral:
             arquivo = documento.texto_integral
+
+            mime = get_mime_type_from_file_extension(arquivo.name)
+
+            response = HttpResponse(content_type='%s' % mime)
+            response['Content-Disposition'] = (
+                'inline; filename="%s"' % arquivo.name.split('/')[-1])
+            response['X-Accel-Redirect'] = "/media/{0}".format(
+                arquivo.file.name)
+            return response
+    raise Http404
+
+
+def doc_acess_adm_arquivo(request, pk):
+    can_see = True
+
+    if not request.user.is_authenticated():
+        app_config = AppConfig.objects.last()
+        if app_config and app_config.documentos_administrativos == 'R':
+            can_see = False
+
+    if can_see:
+        documento = DocumentoAcessorioAdministrativo.objects.get(pk=pk)
+        if documento.arquivo:
+            arquivo = documento.arquivo
 
             mime = get_mime_type_from_file_extension(arquivo.name)
 
@@ -375,7 +399,7 @@ class DocumentoAdministrativoCrud(Crud):
         def urlize(self, obj, fieldname):
             a = '<a href="%s">%s</a>' % (
                 reverse(
-                    'sapl.protocoloadm:doc_texto_integral',
+                    'sapl.protocoloadm:docadm_texto_integral',
                     kwargs={'pk': obj.pk}),
                 obj.texto_integral.name.split('/')[-1])
             return obj.texto_integral.field.verbose_name, a
@@ -1305,7 +1329,14 @@ class DocumentoAcessorioAdministrativoCrud(MasterDetailCrud):
 
     class DetailView(DocumentoAdministrativoMixin,
                      MasterDetailCrud.DetailView):
-        pass
+
+        def urlize(self, obj, fieldname):
+            a = '<a href="%s">%s</a>' % (
+                reverse(
+                    'sapl.protocoloadm:doc_acess_adm_arquivo',
+                    kwargs={'pk': obj.pk}),
+                obj.arquivo.name.split('/')[-1])
+            return obj.arquivo.field.verbose_name, a
 
 
 def atualizar_numero_documento(request):

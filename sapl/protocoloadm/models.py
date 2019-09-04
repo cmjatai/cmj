@@ -1,9 +1,11 @@
 from django.db import models
+from django.db.models.deletion import PROTECT
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices
 import reversion
 
+from cmj.core.models import AreaTrabalho
 from sapl.base.models import Autor
 from sapl.materia.models import TipoMateriaLegislativa, UnidadeTramitacao
 from sapl.utils import (RANGE_ANOS, YES_NO_CHOICES, texto_upload_path,
@@ -184,6 +186,12 @@ class DocumentoAdministrativo(models.Model):
         )
     )
 
+    """workspace = models.ForeignKey(
+        AreaTrabalho,
+        verbose_name=_('Área de Trabalho'),
+        related_name='documentoadministrativo_set',
+        blank=True, null=True, on_delete=PROTECT)
+    """
     class Meta:
         verbose_name = _('Documento Administrativo')
         verbose_name_plural = _('Documentos Administrativos')

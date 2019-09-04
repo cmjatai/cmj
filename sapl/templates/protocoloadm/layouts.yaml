@@ -21,7 +21,7 @@ DocumentoAcessorioAdministrativo:
   {% trans 'Documento Acessório' %}:
   - tipo  autor
   - nome  data
-  - arquivo
+  - arquivo|urlize
   - assunto
 
 StatusTramitacaoAdministrativo:

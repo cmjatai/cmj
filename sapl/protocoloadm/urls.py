@@ -19,12 +19,13 @@ from sapl.protocoloadm.views import (AcompanhamentoDocumentoView,
                                      TipoDocumentoAdministrativoCrud,
                                      TramitacaoAdmCrud,
                                      atualizar_numero_documento,
-                                     doc_texto_integral,
                                      DesvincularDocumentoView,
                                      DesvincularMateriaView,
                                      AnexadoCrud, DocumentoAnexadoEmLoteView,
                                      PrimeiraTramitacaoEmLoteAdmView,
-                                     TramitacaoEmLoteAdmView)
+                                     TramitacaoEmLoteAdmView,
+                                     doc_adm_texto_integral,
+                                     doc_acess_adm_arquivo)
 
 from .apps import AppConfig
 
@@ -33,16 +34,20 @@ app_name = AppConfig.name
 urlpatterns_documento_administrativo = [
     url(r'^docadm/',
         include(DocumentoAdministrativoCrud.get_urls() +
-                AnexadoCrud.get_urls() + 
+                AnexadoCrud.get_urls() +
                 TramitacaoAdmCrud.get_urls() +
                 DocumentoAcessorioAdministrativoCrud.get_urls())),
 
     url(r'^docadm/pesq-doc-adm',
         PesquisarDocumentoAdministrativoView.as_view(), name='pesq_doc_adm'),
 
-    url(r'^docadm/texto_integral/(?P<pk>\d+)$', doc_texto_integral,
-        name='doc_texto_integral'),
-    
+    url(r'^docadm/(?P<pk>\d+)/texto_integral$', doc_adm_texto_integral,
+        name='docadm_texto_integral'),
+
+    url(r'^docadm/documentoacessorioadministrativo/(?P<pk>\d+)/arquivo$',
+        doc_acess_adm_arquivo,
+        name='doc_acess_adm_arquivo'),
+
     url(r'^docadm/(?P<pk>\d+)/anexado_em_lote', DocumentoAnexadoEmLoteView.as_view(),
         name='anexado_em_lote'),
 ]
