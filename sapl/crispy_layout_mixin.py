@@ -90,7 +90,7 @@ class SaplFormLayout(Layout):
         if not buttons:
             buttons = form_actions(label=save_label, more=[
                 HTML('<a href="{{ view.cancel_url }}"'
-                     ' class="btn btn-dark">%s</a>' % cancel_label)
+                     ' class="btn btn-inverse">%s</a>' % cancel_label)
                 if cancel_label else None])
 
         _fields = list(to_fieldsets(fields))

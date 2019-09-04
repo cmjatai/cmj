@@ -18,17 +18,17 @@ from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import ContextMixin
 from django.views.generic.list import MultipleObjectMixin
+
+from cmj.cerimonial.forms import PerfilForm
+from cmj.cerimonial.models import Perfil
+from cmj.globalrules import (RP_ADD, RP_CHANGE, RP_DELETE, RP_DETAIL, RP_LIST)
+from cmj.globalrules import GROUP_SOCIAL_USERS
+from cmj.utils import normalize
+from sapl.crispy_layout_mixin import get_field_display
 from sapl.crud import base
 from sapl.crud.base import Crud, CrudListView, CrudCreateView, CrudDetailView,\
     CrudUpdateView, CrudDeleteView, MasterDetailCrud
 from sapl.rules import map_rules
-
-from cmj.cerimonial.forms import PerfilForm
-from cmj.cerimonial.models import Perfil
-from cmj.crispy_layout_mixin import get_field_display
-from cmj.globalrules import (RP_ADD, RP_CHANGE, RP_DELETE, RP_DETAIL, RP_LIST)
-from cmj.globalrules import GROUP_SOCIAL_USERS
-from cmj.utils import normalize
 
 
 class PerfilAbstractCrud(Crud):

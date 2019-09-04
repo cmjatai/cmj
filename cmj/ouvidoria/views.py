@@ -16,11 +16,11 @@ from django.views.generic.edit import CreateView, FormView
 from django.views.generic.list import ListView
 
 from cmj.core.forms_auth import LoginForm
-from cmj.crispy_layout_mixin import CrispyLayoutFormMixin
 from cmj.ouvidoria.forms import DenunciaForm, SolicitacaoForm,\
     MensagemSolicitacaoForm
 from cmj.ouvidoria.models import Solicitacao, MensagemSolicitacao
 from cmj.utils import make_pagination
+from sapl.crispy_layout_mixin import CrispyLayoutFormMixin
 
 
 opts_bg = {

@@ -33,9 +33,9 @@ from cmj.cerimonial.models import LocalTrabalho, Endereco,\
     GrupoDeContatos, TopicoProcesso
 from cmj.core.forms import ListWithSearchForm
 from cmj.core.models import Municipio, Trecho, ImpressoEnderecamento
-from cmj.crispy_layout_mixin import to_column, SaplFormLayout, to_fieldsets,\
-    form_actions, to_row
 from cmj.utils import normalize, YES_NO_CHOICES
+from sapl.crispy_layout_mixin import to_column, SaplFormLayout, to_fieldsets,\
+    form_actions, to_row
 
 
 class ListTextWidget(forms.TextInput):

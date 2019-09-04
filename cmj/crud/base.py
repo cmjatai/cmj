@@ -23,9 +23,9 @@ from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
 from django.views.generic.base import ContextMixin
 from django.views.generic.list import MultipleObjectMixin
 
-from cmj.crispy_layout_mixin import CrispyLayoutFormMixin, get_field_display
 from cmj.globalrules import (RP_ADD, RP_CHANGE, RP_DELETE, RP_DETAIL,
                              RP_LIST)
+from sapl.crispy_layout_mixin import CrispyLayoutFormMixin, get_field_display
 from sapl.utils import normalize
 
 

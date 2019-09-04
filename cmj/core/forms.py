@@ -13,8 +13,8 @@ from image_cropping.widgets import ImageCropWidget, CropWidget
 
 from cmj.core.models import Trecho, TipoLogradouro, User, OperadorAreaTrabalho,\
     ImpressoEnderecamento
-from cmj.crispy_layout_mixin import to_row
 from cmj.globalrules import WORKSPACE_GROUPS
+from sapl.crispy_layout_mixin import to_row
 
 
 class OperadorAreaTrabalhoForm(ModelForm):

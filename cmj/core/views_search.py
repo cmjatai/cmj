@@ -7,8 +7,8 @@ from django.utils.translation import ugettext_lazy as _
 from haystack.forms import ModelSearchForm
 from haystack.views import SearchView
 
-from cmj.crispy_layout_mixin import to_row
 from cmj.utils import make_pagination
+from sapl.crispy_layout_mixin import to_row
 
 
 class CmjSearchForm(ModelSearchForm):

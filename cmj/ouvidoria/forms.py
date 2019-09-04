@@ -9,9 +9,9 @@ from django.utils.translation import ugettext_lazy as _
 
 from cmj.context_processors import areatrabalho
 from cmj.core.models import AreaTrabalho, Notificacao
-from cmj.crispy_layout_mixin import SaplFormLayout, to_row, form_actions,\
-    to_column
 from cmj.ouvidoria.models import Solicitacao, MensagemSolicitacao
+from sapl.crispy_layout_mixin import SaplFormLayout, to_row, form_actions,\
+    to_column
 
 
 class DenunciaForm(ModelForm):

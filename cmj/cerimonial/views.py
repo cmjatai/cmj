@@ -20,10 +20,10 @@ from cmj.cerimonial.models import TipoTelefone, TipoEndereco,\
     AssuntoProcesso, ProcessoContato, GrupoDeContatos
 from cmj.core.forms import ListWithSearchForm
 from cmj.core.models import AreaTrabalho
-from cmj.crispy_layout_mixin import CrispyLayoutFormMixin
 from cmj.crud.base import CrudAux, Crud, MasterDetailCrud
 from cmj.globalrules.crud_custom import PerfilAbstractCrud,\
     PerfilDetailCrudPermission
+from sapl.crispy_layout_mixin import CrispyLayoutFormMixin
 
 
 # ---- Details Master Crud build ---------------------------
