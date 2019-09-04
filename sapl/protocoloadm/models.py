@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models.deletion import PROTECT
+from django.urls.base import reverse
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices
@@ -201,6 +202,12 @@ class DocumentoAdministrativo(models.Model):
             'tipo': self.tipo, 'assunto': self.assunto
         }
 
+    @property
+    def url_texto_integral(self):
+        return '%s' % reverse(
+            'sapl.protocoloadm:docadm_texto_integral',
+            kwargs={'pk': self.pk})
+
     def delete(self, using=None, keep_parents=False):
         if self.texto_integral:
             self.texto_integral.delete()
@@ -254,6 +261,12 @@ class DocumentoAcessorioAdministrativo(models.Model):
 
     def __str__(self):
         return self.nome
+
+    @property
+    def url_arquivo(self):
+        return '%s' % reverse(
+            'sapl.protocoloadm:doc_acess_adm_arquivo',
+            kwargs={'pk': self.pk})
 
     def delete(self, using=None, keep_parents=False):
         if self.arquivo:
