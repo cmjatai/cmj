@@ -106,12 +106,11 @@ def doc_texto_integral(request, pk):
 
             mime = get_mime_type_from_file_extension(arquivo.name)
 
-            with open(arquivo.path, 'rb') as f:
-                data = f.read()
-
-            response = HttpResponse(data, content_type='%s' % mime)
+            response = HttpResponse(content_type='%s' % mime)
             response['Content-Disposition'] = (
                 'inline; filename="%s"' % arquivo.name.split('/')[-1])
+            response['X-Accel-Redirect'] = "/media/{0}".format(
+                arquivo.file.name)
             return response
     raise Http404
 
