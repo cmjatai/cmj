@@ -29,7 +29,8 @@ from sapl.materia.models import Proposicao, TipoMateriaLegislativa,\
 from sapl.norma.models import NormaJuridica
 from sapl.parlamentares.models import Parlamentar
 from sapl.protocoloadm.models import DocumentoAdministrativo,\
-    DocumentoAcessorioAdministrativo, TramitacaoAdministrativo, Anexado
+    DocumentoAcessorioAdministrativo, TramitacaoAdministrativo, Anexado,\
+    TipoDocumentoAdministrativo
 from sapl.sessao.models import SessaoPlenaria, ExpedienteSessao
 from sapl.utils import models_with_gr_for_model, choice_anos_com_sessaoplenaria
 
@@ -456,6 +457,11 @@ class DocAdmMixin:
         qs = qs.filter(**params)
 
         return qs
+
+
+@customize(TipoDocumentoAdministrativo)
+class _TipoDocumentoAdministrativoViewSet(DocAdmMixin):
+    container_field = 'workspace__operadores'
 
 
 @customize(DocumentoAdministrativo)
