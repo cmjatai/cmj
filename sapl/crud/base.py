@@ -1154,7 +1154,9 @@ class MasterDetailCrud(Crud):
 
             try:
                 parent_object = parent_model.objects.get(**params)
-            except:
+            except Exception as e:
+                username = self.request.user.username
+                self.logger.error("user=" + username + ". " + str(e))
                 raise Http404()
 
             context[
