@@ -188,12 +188,12 @@ class DocumentoAdministrativo(models.Model):
         )
     )
 
-    """workspace = models.ForeignKey(
+    workspace = models.ForeignKey(
         AreaTrabalho,
         verbose_name=_('Área de Trabalho'),
         related_name='documentoadministrativo_set',
         blank=True, null=True, on_delete=PROTECT)
-    """
+
     class Meta:
         verbose_name = _('Documento Administrativo')
         verbose_name_plural = _('Documentos Administrativos')
