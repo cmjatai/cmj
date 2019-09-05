@@ -29,7 +29,8 @@ from sapl.base.models import Autor, CasaLegislativa, AppConfig
 from sapl.base.signals import tramitacao_signal
 from sapl.comissoes.models import Comissao
 from sapl.crud.base import (Crud, CrudAux, MasterDetailCrud, make_pagination,
-                            RP_LIST, RP_DETAIL)
+                            RP_LIST, RP_DETAIL,
+                            PermissionRequiredContainerCrudMixin)
 from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa, UnidadeTramitacao
 from sapl.materia.views import gerar_pdf_impressos
 from sapl.parlamentares.models import Legislatura, Parlamentar
@@ -350,6 +351,7 @@ class DocumentoAdministrativoMixin:
 class DocumentoAdministrativoCrud(Crud):
     model = DocumentoAdministrativo
     help_topic = 'numeracao_docsacess'
+    container_field = 'workspace__operadores'
 
     class BaseMixin(Crud.BaseMixin):
         list_field_names = ['tipo', 'numero', 'ano', 'data',
@@ -876,12 +878,18 @@ class ProtocoloMateriaTemplateView(PermissionRequiredMixin, TemplateView):
 
 
 class PesquisarDocumentoAdministrativoView(DocumentoAdministrativoMixin,
-                                           PermissionRequiredMixin,
+                                           PermissionRequiredContainerCrudMixin,
                                            FilterView):
     model = DocumentoAdministrativo
     filterset_class = DocumentoAdministrativoFilterSet
     paginate_by = 10
     permission_required = ('protocoloadm.list_documentoadministrativo', )
+    container_field = 'workspace__operadores'
+
+    def get_queryset(self):
+        qs = FilterView.get_queryset(self)
+        qs = qs.filter(workspace__operadores=self.request.user)
+        return qs
 
     def get_filterset_kwargs(self, filterset_class):
         super(PesquisarDocumentoAdministrativoView,
@@ -979,6 +987,7 @@ class AnexadoCrud(MasterDetailCrud):
     parent_field = 'documento_principal'
     help_topic = 'documento_anexado'
     public = [RP_LIST, RP_DETAIL]
+    container_field = 'documento_principal__workspace__operadores'
 
     class BaseMixin(MasterDetailCrud.BaseMixin):
         list_field_names = ['documento_anexado', 'data_anexacao']
@@ -1129,6 +1138,7 @@ class TramitacaoAdmCrud(MasterDetailCrud):
     model = TramitacaoAdministrativo
     parent_field = 'documento'
     help_topic = 'unidade_tramitacao'
+    container_field = 'documento__workspace__operadores'
 
     class BaseMixin(MasterDetailCrud.BaseMixin):
         list_field_names = ['data_tramitacao', 'unidade_tramitacao_local',
@@ -1308,6 +1318,7 @@ class DocumentoAcessorioAdministrativoCrud(MasterDetailCrud):
     model = DocumentoAcessorioAdministrativo
     parent_field = 'documento'
     help_topic = 'numeracao_docsacess'
+    container_field = 'documento__workspace__operadores'
 
     class BaseMixin(MasterDetailCrud.BaseMixin):
         list_field_names = ['nome', 'tipo',

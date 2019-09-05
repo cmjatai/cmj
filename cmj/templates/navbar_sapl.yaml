@@ -31,9 +31,9 @@
 - title: {% trans 'Documentos Administrativos (SUPERUSER)' %}
   {% if 'documentos_administrativos'|get_config_attr == 'R' %}check_permission: protocoloadm.list_documentoadministrativo {% endif %}
   children:
-    - title: {% trans 'Pesquisar Documentos Administrativos' %}
+    - title: {% trans 'Pesquisar Documentos Administrativos (SUPERUSER)' %}
       url: sapl.protocoloadm:pesq_doc_adm
-    - title: {% trans 'Tramitação em Lote' %}
+    - title: {% trans 'Tramitação em Lote (SUPERUSER)' %}
       url: sapl.protocoloadm:primeira_tramitacao_em_lote_docadm
       check_permission: sapl.documento:add_tramitacao
 - title: {% trans 'Impressos (SUPERUSER)' %}
