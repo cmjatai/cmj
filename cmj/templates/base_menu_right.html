@@ -1,0 +1,65 @@
+{% load i18n staticfiles menus common_cmj_tags cropping %}
+{% load webpack_static from webpack_loader %}
+<ul class="navbar-nav justify-content-end">
+  {% if perms.core.menu_relatorios%}
+    <li class="dropdown">
+      <a href="#"data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Relatórios" %}<span class="caret"></span></a>
+      <ul class="dropdown-menu">
+        <li class="dropdown-header">{% trans "Contatos" %}</li>
+        {% if perms.cerimonial.print_impressoenderecamento %}<li><a href="{% url 'cmj.cerimonial:print_impressoenderecamento' %}">{% trans "Etiquetas e Envelopes" %}</a></li>{% endif %}
+        <li class="dropdown-header">{% trans "Processos" %}</li>
+        {% if perms.cerimonial.print_rel_contato_agrupado_por_processo %}<li><a href="{% url 'cmj.cerimonial:print_rel_contato_agrupado_por_processo' %}">{% trans "Contatos Agrupados Por Processo" %}</a></li>{% endif %}
+        <li class="dropdown-header">{% trans "Grupos" %}</li>
+        {% if perms.cerimonial.print_rel_contato_agrupado_por_grupo %}<li><a href="{% url 'cmj.cerimonial:print_rel_contato_agrupado_por_grupo' %}">{% trans "Contatos Agrupados Por Grupos" %}</a></li>{% endif %}
+        <li class="dropdown-header">{% trans "Atividade Legislativa" %}</li>
+        <li><a href="{% url 'sapl.base:relatorios_list' %}">{% trans "Relatórios Administrativos" %}</a></li>
+      </ul>
+    </li>
+  {% endif %}
+  {% if perms.core.menu_dados_auxiliares or perms.base.view_tabelas_auxiliares%}
+    <li class="dropdown">
+      <a href="#" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Dados Auxiliares" %}<span class="caret"></span></a>
+      <ul class="dropdown-menu">
+        {% if not areatrabalho and perms.core.menu_agenda %}
+          <li class="dropdown-header">{% trans "Calendário" %}</li>
+          <li><a href="{% url 'cmj.agenda:evento_list' %}">{% trans "Agenda de Eventos" %}</a></li>
+        {% endif %}
+        <li class="dropdown-header">{% trans "Consultas" %}</li>
+        {% if perms.sigad.view_documento %}
+        <li>
+          <a href="#linkMenu" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Banco de Imagens" %}<span class="caret"></span></a>
+          <ul class="dropdown-menu menu-right" role="menu">
+            <li><a href="/banco-de-imagens/2019">{% trans "2019" %}</a></li>
+            <li><a href="/banco-de-imagens/2018">{% trans "2018" %}</a></li>
+            <li><a href="/banco-de-imagens/2017">{% trans "2017" %}</a></li>
+            <li><a href="/banco-de-imagens/2016">{% trans "2016" %}</a></li>
+            <li><a href="/banco-de-imagens/2015">{% trans "2015" %}</a></li>
+            <li><a href="/banco-de-imagens/2014">{% trans "2014" %}</a></li>
+            <li><a href="/banco-de-imagens/2013">{% trans "2013" %}</a></li>
+          </ul>
+        </li>
+        {% endif %}
+        {% if perms.core.search_trecho %}<li><a href="{% url 'cmj.core:trecho_list' %}">{% trans "Consultar base de Cep's e Endereços" %}</a></li>{% endif %}
+
+        {% if perms.cerimonial.list_operadoratelefonia %}<li><a href="{% url 'cmj.cerimonial:operadoratelefonia_list' %}">{% model_verbose_name_plural "cmj.cerimonial.models.OperadoraTelefonia"%}</a></li>{% endif %}
+        {% if perms.cerimonial.list_nivelinstrucao %}<li><a href="{% url 'cmj.cerimonial:nivelinstrucao_list' %}">{% model_verbose_name_plural "cmj.cerimonial.models.NivelInstrucao"%}</a></li>{% endif %}
+        {% if perms.cerimonial.list_estadocivil %}<li><a href="{% url 'cmj.cerimonial:estadocivil_list' %}">{% model_verbose_name_plural "cmj.cerimonial.models.EstadoCivil"%}</a></li>{% endif %}
+        {% if perms.parlamentares.detail_partido %}<li><a href="{% url 'cmj.core:partido_list' %}">{% model_verbose_name_plural "sapl.parlamentares.models.Partido"%}</a></li>{% endif %}
+        {% if areatrabalho %}
+          <li role="separator" class="divider"></li>
+          <li class="dropdown-header">{% trans "Tabelas da Área de Trabalho" %}</li>
+          {% if perms.cerimonial.list_assuntoprocesso %}<li><a href="{% url 'cmj.cerimonial:assuntoprocesso_list' %}">{% model_verbose_name_plural "cmj.cerimonial.models.AssuntoProcesso"%}</a></li>{% endif %}
+        {% endif %}
+
+        {% if perms.core.menu_tabelas_auxiliares or perms.core.menu_area_trabalho or perms.core.menu_impresso_enderecamento or perms.base.view_tabelas_auxiliares%}
+          <li role="separator" class="divider"></li>
+          <li class="dropdown-header">{% trans "Tabelas do Sistema" %}</li>
+        {% endif %}
+        {% if perms.core.menu_tabelas_auxiliares or perms.base.view_tabelas_auxiliares%}<li><a href="{% url 'cmj.core:tabelas_auxiliares' %}">{% trans "Tabelas Auxiliares" %}</a></li>{% endif %}
+        {% if perms.core.menu_area_trabalho %}<li><a href="{% url 'cmj.core:areatrabalho_list' %}">{% trans "Áreas de Trabalho" %}</a></li>{% endif %}
+        {% if perms.core.menu_impresso_enderecamento %}<li><a href="{% url 'cmj.core:impressoenderecamento_list' %}">{% trans "Impressos de Endereçamento" %}</a></li>{% endif %}
+
+      </ul>
+    </li>
+  {% endif %}
+</ul>

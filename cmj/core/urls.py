@@ -10,7 +10,7 @@ from cmj.core.views import CepCrud, RegiaoMunicipalCrud, DistritoCrud,\
     TrechoJsonSearchView, TrechoJsonView, AreaTrabalhoCrud,\
     OperadorAreaTrabalhoCrud, PartidoCrud, ImpressoEnderecamentoCrud,\
     NotificacaoRedirectView, chanel_index, chanel_room, time_refresh_log_test,\
-    app_vue_view
+    app_vue_view, template_render
 from cmj.core.views_auth import CmjUserChangeView, CmjLoginView,\
     CmjPasswordResetView
 from cmj.core.views_search import CmjSearchView
@@ -59,6 +59,11 @@ user_urlpatterns = [
 
     url(r'^online/',
         app_vue_view, name='app_vue_view_url'),
+
+    url(r'^template/(?P<template_name>[^/]+)$',
+        template_render, name='template_render'),
+
+
 
     url(r'^sistema/search/', CmjSearchView(), name='haystack_search'),
 

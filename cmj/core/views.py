@@ -15,7 +15,6 @@ from rest_framework import viewsets, mixins
 from rest_framework.authentication import SessionAuthentication,\
     BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
-from sapl.parlamentares.models import Partido, Filiacao
 
 from cmj.core.forms import OperadorAreaTrabalhoForm, ImpressoEnderecamentoForm,\
     ListWithSearchForm
@@ -25,6 +24,7 @@ from cmj.core.models import Cep, TipoLogradouro, Logradouro, RegiaoMunicipal,\
 from cmj.core.serializers import TrechoSearchSerializer, TrechoSerializer
 from cmj.crud.base import Crud, CrudAux, MasterDetailCrud
 from cmj.utils import normalize
+from sapl.parlamentares.models import Partido, Filiacao
 
 
 CepCrud = CrudAux.build(Cep, None, 'cep')
@@ -35,6 +35,10 @@ BairroCrud = CrudAux.build(Bairro, None, 'bairro')
 TipoLogradouroCrud = CrudAux.build(
     TipoLogradouro, None, 'tipo_logradouro')
 LogradouroCrud = CrudAux.build(Logradouro, None, 'logradouro')
+
+
+def template_render(request, template_name):
+    return render(request, template_name, {})
 
 
 def chanel_index(request):

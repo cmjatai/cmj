@@ -298,3 +298,15 @@ def search_get_model(object):
         return 'sp'
 
     return None
+
+
+@register.filter
+def yaml_render(template_name, increment_space=0):
+    t = template.loader.get_template(template_name)
+    r = t.render()
+    if not increment_space:
+        return r
+
+    r = r.split('\n')
+    r = ['%s%s' % (' ' * increment_space, line) for line in r]
+    return '\n'.join(r)
