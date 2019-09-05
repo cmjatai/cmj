@@ -6,6 +6,7 @@ from django.core.files.base import File
 from django.core.files.temp import NamedTemporaryFile
 import urllib3
 
+from cmj.s3_to_cmj.mapa import mapa
 from cmj.settings import MEDIA_ROOT
 from sapl.base.models import CasaLegislativa
 from sapl.materia.models import (DocumentoAcessorio, MateriaLegislativa,
@@ -88,6 +89,11 @@ DOCS = {
         'administrativo/{}_texto_integral',
         'private/documentoadministrativo/{0}/{0}_texto_integral{1}')
     ],
+    '_parecerprocuradoria': [(
+        'texto_integral',
+        'parecer_procuradoria/{}_texto_integral',
+        'private/documentoadministrativo/{0}/{0}_texto_integral{1}')
+    ],
     DocumentoAcessorioAdministrativo: [(
         'arquivo',
         'administrativo/{}',
@@ -135,15 +141,24 @@ def migrar_docs_por_ids(model, sync=None, check=False):
 
     erros = []
     for campo, base_origem, base_destino in DOCS[model]:
+
+        if isinstance(model, str):
+            model = list(filter(lambda x, m=model: x['name'] == m, mapa))[
+                0]['s31_model']
+
         print('#### Migrando {} de {} ####'.format(campo, model.__name__))
 
         registros = model.objects.all().order_by('id')
+
+        if 'parecer_procuradoria' in base_origem:
+            registros = registros.filter(workspace_id=21)
+        elif model == DocumentoAdministrativo:
+            registros = registros.filter(workspace_id=20)
 
         if sync:
             registros = registros[int(registros.count() * (1 - sync)) + 1:]
 
         for item in registros:
-
             campo_file = getattr(item, campo)
             if campo_file:
                 print('PULANDO', item.id,  model._meta.object_name)
@@ -157,8 +172,12 @@ def migrar_docs_por_ids(model, sync=None, check=False):
                 
                 continue"""
 
-            url = ('http://168.228.184.68:8480/sapl/%s'
-                   ) % base_origem.format(item.pk)
+            if 'parecer_procuradoria' in base_origem:
+                url = ('http://168.228.184.68:8480/sapl/%s'
+                       ) % base_origem.format(item.pk // 10)
+            else:
+                url = ('http://168.228.184.68:8480/sapl/%s'
+                       ) % base_origem.format(item.pk)
 
             request = None
             try:

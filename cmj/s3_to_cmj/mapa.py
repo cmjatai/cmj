@@ -6,7 +6,9 @@ from cmj.s3_to_cmj.adjust import adjust_tipoafastamento, adjust_tipo_comissao,\
     adjust_documentoacessorioadministrativo, adjust_materialegislativa,\
     adjust_documentoacessorio, adjust_tramitacao, adjust_registrovotacao, \
     adjust_expediente_ordem, adjust_registrovotacao_parlamentar,\
-    adjust_normajuridica, adjust_normarelacionada, adjust_participacao
+    adjust_normajuridica, adjust_normarelacionada, adjust_participacao,\
+    adjust_tipo_documento_administrativo, adjust_tipo_parecer,\
+    adjust_parecerprocuradoria
 from cmj.s3_to_cmj.models import (
     S3AcompMateria, S3Afastamento, S3Anexada, S3AssuntoNorma, S3Autor, S3Autoria,
     S3CargoComissao, S3CargoMesa, S3Comissao, S3ComposicaoComissao, S3ComposicaoMesa,
@@ -27,7 +29,8 @@ from cmj.s3_to_cmj.models import (
     S3TipoNormaJuridica, S3TipoParecer, S3TipoProposicao, S3TipoResultadoVotacao,
     S3TipoSessaoPlenaria, S3TipoSituacaoMateria, S3TipoSituacaoMilitar,
     S3TipoSituacaoNorma, S3Tramitacao, S3TramitacaoAdministrativo,
-    S3TramitacaoParecer, S3UnidadeTramitacao, S3VinculoNormaJuridica)
+    S3TramitacaoParecer, S3UnidadeTramitacao, S3VinculoNormaJuridica,
+    S3ParecerProcuradoria)
 from sapl.audiencia.models import AnexoAudienciaPublica, AudienciaPublica, TipoAudienciaPublica
 from sapl.base.models import AppConfig, Autor, CasaLegislativa, TipoAutor
 from sapl.comissoes.models import CargoComissao, Comissao, Composicao, Participacao, Periodo, Reuniao, TipoComissao
@@ -269,6 +272,18 @@ mapa = [
             'ind_excluido': 'ind_excluido'
         },
         'adjust': adjust_tipo_documento_administrativo
+    },
+    {
+        'name': '_tipoparecer',
+        's30_model': S3TipoParecer,
+        's31_model': TipoDocumentoAdministrativo,
+        'fields': {
+            'id': 'tip_documento',
+            'sigla': 'sgl_tipo_documento',
+            'descricao': 'des_tipo_documento',
+            'ind_excluido': 'ind_excluido'
+        },
+        'adjust': adjust_tipo_parecer
     },
     {
         'name': '_tipoexpediente',
@@ -657,6 +672,27 @@ mapa = [
             'ind_excluido': 'ind_excluido'
         },
         'adjust': adjust_documentoadministrativo
+    },
+    {
+        'name': '_parecerprocuradoria',
+        's30_model': S3ParecerProcuradoria,
+        's31_model': DocumentoAdministrativo,
+        'fields': {
+            'id': 'cod_documento',
+            'tipo_id': 'tip_documento',
+            'numero': 'num_documento',
+            'ano': 'ano_documento',
+            'data': 'dat_documento',
+            'interessado': 'txt_interessado',
+            'autor_id': 'cod_autor',
+            'dias_prazo': 'num_dias_prazo',
+            'data_fim_prazo': 'dat_fim_prazo',
+            'tramitacao': 'ind_tramitacao',
+            'assunto': 'txt_assunto',
+            'observacao': 'txt_observacao',
+            'ind_excluido': 'ind_excluido'
+        },
+        'adjust': adjust_parecerprocuradoria
     },
     {
         'name': '_documentoacessorioadministrativo',

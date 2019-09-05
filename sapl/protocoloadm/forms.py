@@ -1084,11 +1084,6 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
                                           label=Protocolo._meta.
                                           get_field('numero').verbose_name)
 
-    restrito = forms.ChoiceField(label=_('Acesso Restrito'),
-                                 widget=forms.RadioSelect(),
-                                 choices=YES_NO_CHOICES,
-                                 initial=False)
-
     class Meta:
         model = DocumentoAdministrativo
         fields = ['tipo',
@@ -1106,7 +1101,6 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
                   'observacao',
                   'texto_integral',
                   'protocolo',
-                  'restrito'
                   ]
 
         widgets = {'protocolo': forms.HiddenInput(),
@@ -1211,7 +1205,7 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
             [('assunto', 12)])
 
         row4 = to_row(
-            [('interessado', 7), ('tramitacao', 2), (InlineRadios('restrito'), 3)])
+            [('interessado', 7), ('tramitacao', 2), ])
 
         row5 = to_row(
             [('texto_integral', 12)])
@@ -1230,6 +1224,9 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
                      row6, row7))
         super(DocumentoAdministrativoForm, self).__init__(
             *args, **kwargs)
+
+        self.fields['tipo'].queryset = TipoDocumentoAdministrativo.objects.filter(
+            workspace=self.initial['workspace'])
 
 
 class DesvincularDocumentoForm(ModelForm):

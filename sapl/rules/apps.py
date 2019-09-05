@@ -9,7 +9,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.management import _get_all_permissions
 from django.core import exceptions
 from django.db import router
-from django.db.models.signals import post_save, post_delete, post_migrate
+from django.db.models.signals import post_save, post_delete, post_migrate,\
+    pre_delete
 from django.db.utils import DEFAULT_DB_ALIAS
 from django.dispatch.dispatcher import receiver
 from django.utils.translation import string_concat
@@ -262,7 +263,7 @@ def update_groups(app_config, verbosity=2, interactive=True,
     rules.update_groups()
 
 
-@receiver(post_delete, dispatch_uid='pre_delete_signal')
+@receiver(pre_delete, dispatch_uid='pre_delete_signal')
 def revision_pre_delete_signal(sender, **kwargs):
     #send_signal_for_websocket_time_refresh(kwargs['instance'], 'pre_delete')
     with reversion.create_revision():

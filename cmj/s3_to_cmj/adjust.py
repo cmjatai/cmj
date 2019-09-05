@@ -190,11 +190,29 @@ def adjust_documentoadministrativo(new, old):
         else:
             # Se não achamos o protocolo registramos no número externo
             new.numero_externo = numero
-    new.workspace = 20
+    new.workspace_id = 20
+
+
+def adjust_parecerprocuradoria(new, old):
+    if old.num_protocolo:
+        numero, ano = old.num_protocolo, new.ano
+        # False < True => o primeiro será o protocolo não anulado
+        protocolos = Protocolo.objects.filter(
+            numero=numero, ano=ano).order_by('anulado')
+        if protocolos:
+            new.protocolo = protocolos[0]
+        else:
+            # Se não achamos o protocolo registramos no número externo
+            new.numero_externo = numero
+    new.workspace_id = 21
 
 
 def adjust_tipo_documento_administrativo(new, old):
-    new.workspace = 20
+    new.workspace_id = 20
+
+
+def adjust_tipo_parecer(new, old):
+    new.workspace_id = 21
 
 
 def adjust_documentoacessorioadministrativo(new, old):

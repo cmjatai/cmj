@@ -47,7 +47,6 @@
               <h3>Número de documentos: {{numero_res}}</h3>
               {% for d in documentoadministrativo_list %}
                 <div style="border-top: 1px solid black;margin-bottom:0.3cm">
-                {% if request.user.is_anonymous and not d.restrito or not request.user.is_anonymous%}
                     <strong><a href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' d.id %}">{{d.tipo.sigla}} {{d.numero}}/{{d.ano}} - {{d.tipo}}</strong></a></br>
                       <strong>Interessado:</strong>&nbsp;{{ d.interessado|default_if_none:"Não informado"}}
                       </br>
@@ -74,7 +73,6 @@
                     {% if d.tramitacao and mail_service_configured %}
                       <a href="{% url 'sapl.protocoloadm:acompanhar_documento' d.id %}">Acompanhar Documento</a>
                     {% endif %}
-              {% endif %}
               </div>
 
               {% endfor %}

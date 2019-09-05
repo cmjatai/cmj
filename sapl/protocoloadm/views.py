@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.db.models import Max, Q
@@ -23,6 +23,7 @@ from django.views.generic.base import RedirectView, TemplateView
 from django.views.generic.edit import FormView
 from django_filters.views import FilterView
 
+from cmj.core.models import AreaTrabalho
 import sapl
 from sapl.base.email_utils import do_envia_email_confirmacao
 from sapl.base.models import Autor, CasaLegislativa, AppConfig
@@ -59,14 +60,9 @@ from .models import (AcompanhamentoDocumento, DocumentoAcessorioAdministrativo,
                      TipoDocumentoAdministrativo, TramitacaoAdministrativo, Anexado)
 
 
-TipoDocumentoAdministrativoCrud = CrudAux.build(
-    TipoDocumentoAdministrativo, '')
-
-
 # ProtocoloDocumentoCrud = Crud.build(Protocolo, '')
 # FIXME precisa de uma chave diferente para o layout
 # ProtocoloMateriaCrud = Crud.build(Protocolo, '')
-
 @permission_required('protocoloadm.add_protocolo')
 def recuperar_materia_protocolo(request):
     tipo = request.GET.get('tipo')
@@ -333,6 +329,12 @@ class DocumentoAdministrativoMixin:
         return super().has_permission()
 
 
+class TipoDocumentoAdministrativoCrud(Crud):
+    model = TipoDocumentoAdministrativo
+    help_topic = 'numeracao_docsacess'
+    container_field = 'workspace__operadores'
+
+
 class DocumentoAdministrativoCrud(Crud):
     model = DocumentoAdministrativo
     help_topic = 'numeracao_docsacess'
@@ -350,7 +352,18 @@ class DocumentoAdministrativoCrud(Crud):
 
         list_url = ''
 
-    class ListView(RedirectView, DocumentoAdministrativoMixin, Crud.ListView):
+        def get_initial(self):
+            initial = {}
+
+            try:
+                initial['workspace'] = AreaTrabalho.objects.filter(
+                    operadores=self.request.user.pk)[0]
+            except:
+                raise PermissionDenied(_('Sem permissão de Acesso!'))
+
+            return initial
+
+    class ListView(RedirectView, Crud.ListView):
 
         def get_redirect_url(self, *args, **kwargs):
             namespace = self.model._meta.app_config.name
@@ -374,13 +387,11 @@ class DocumentoAdministrativoCrud(Crud):
                 return {'ano_protocolo': p.ano,
                         'numero_protocolo': p.numero}
 
-    class DetailView(DocumentoAdministrativoMixin, Crud.DetailView):
+    class DetailView(Crud.DetailView):
 
         def get(self, *args, **kwargs):
             pk = self.kwargs['pk']
             documento = DocumentoAdministrativo.objects.get(id=pk)
-            if documento.restrito and self.request.user.is_anonymous():
-                return redirect('/')
             return super(Crud.DetailView, self).get(args, kwargs)
 
         def hook_texto_integral(self, obj, fieldname):
@@ -944,13 +955,8 @@ class PesquisarDocumentoAdministrativoView(DocumentoAdministrativoMixin,
         else:
             url = ''
         self.filterset.form.fields['o'].label = _('Ordenação')
-        # é usada essa verificação anônima para quando os documentos administrativos
-        # estão no modo ostensivo, mas podem existir documentos administrativos
-        # restritos
-        if request.user.is_anonymous():
-            length = self.object_list.filter(restrito=False).count()
-        else:
-            length = self.object_list.count()
+
+        length = self.object_list.count()
 
         is_relatorio = url != '' and request.GET.get('relatorio', None)
         self.paginate_by = None if is_relatorio else self.paginate_by

@@ -44,6 +44,7 @@ class Command(BaseCommand):
     def migrar_documentos(self):
         for model in [
             # Parlamentar,
+            '_parecerprocuradoria',
             MateriaLegislativa,
             DocumentoAcessorio,
             NormaJuridica,
@@ -88,9 +89,14 @@ class Command(BaseCommand):
         nao_migrar = True
         for item in mapa.mapa[1:]:
 
-            # if nao_migrar and item['name'] != '_normajuridica':
+            # nao migra nada antes do model abaixo
+            # if nao_migrar and item['name'] != '_parecerprocuradoria':
             #    continue
-            # nao_migrar = False
+            #nao_migrar = False
+
+            # uso específico - nao migra nada fora daqui
+            # if item['name'] not in ('_parecerprocuradoria', '_tipoparecer'):
+            #    continue
 
             if item['s30_model'] is None:
                 continue
@@ -100,11 +106,13 @@ class Command(BaseCommand):
                 # Já migrado - não migra novamente a app na lista do iff
                 continue
 
+            # Não migra mais
             if item['name'] in ('_tiposessaoplenaria', ):
                 continue
 
             print('Migrando...', item['s31_model']._meta.object_name)
             old_list = item['s30_model'].objects.all()
+
             if 'ind_excluido' in item['fields']:
                 old_list_excluidos = list(old_list.filter(
                     ind_excluido=1).values_list(
