@@ -209,8 +209,9 @@ def notificacoes_unread(context):
 
 @register.filter
 def notificacoes_unread_count(user):
-    if user and user.is_anonymous():
+    if not user or user and user.is_anonymous():
         return 0
+
     return user.notificacao_set.unread().count()
 
 
