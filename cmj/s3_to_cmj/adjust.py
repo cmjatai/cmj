@@ -190,6 +190,7 @@ def adjust_documentoadministrativo(new, old):
         else:
             # Se não achamos o protocolo registramos no número externo
             new.numero_externo = numero
+    new.workspace = 20
 
 
 def adjust_documentoacessorioadministrativo(new, old):
