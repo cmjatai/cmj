@@ -18,3 +18,12 @@
 - title: {% trans 'Documentos' %}
   url: sapl.protocoloadm:pesq_doc_adm
   check_permission: protocoloadm.list_documentoadministrativo 
+
+- title: {% trans "Atividade Legislativa" %}
+  url: ''
+  children:
+    - title: {% trans 'Diários Oficiais' %}
+      url: cmj.diarios:diariooficial_list
+    - title: {% trans 'Legislação Municipal' %}
+      url: sapl.norma:norma_pesquisa
+    {{ "navbar_sapl.yaml"|yaml_render:4|safe }}
