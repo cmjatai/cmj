@@ -688,6 +688,7 @@ class AreaTrabalho(CmjAuditoriaModelMixin):
         default=True)
 
     class Meta:
+        ordering = ('-ativo', '-tipo', 'parlamentar')
         verbose_name = _('Área de Trabalho')
         verbose_name_plural = _('Áreas de Trabalho')
 
