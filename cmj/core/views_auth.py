@@ -8,8 +8,8 @@ from django.views.generic.edit import FormView, UpdateView
 
 from cmj.core.forms_auth import CmjUserChangeForm, LoginForm,\
     RecuperarSenhaForm
-from cmj.crud.base import FORM_MESSAGES, ACTION_UPDATE
 from cmj.settings import EMAIL_SEND_USER
+from sapl.crud.base import FORM_MESSAGES, ACTION_UPDATE
 
 
 class CmjUserChangeView(FormMessagesMixin, UpdateView):

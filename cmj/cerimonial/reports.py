@@ -29,7 +29,7 @@ from cmj.cerimonial.forms import ImpressoEnderecamentoContatoFilterSet,\
     ContatoAgrupadoPorProcessoFilterSet, ContatoAgrupadoPorGrupoFilterSet
 from cmj.cerimonial.models import Contato, Processo
 from cmj.core.models import AreaTrabalho
-from cmj.crud.base import make_pagination
+from sapl.crud.base import make_pagination
 
 
 class ImpressoEnderecamentoContatoView(PermissionRequiredMixin, FilterView):

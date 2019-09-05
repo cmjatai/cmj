@@ -19,7 +19,6 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView, MultipleObjectMixin
 
 from cmj import globalrules
-from cmj.crud.base import MasterDetailCrud, Crud
 from cmj.sigad import forms, models
 from cmj.sigad.forms import DocumentoForm, CaixaPublicacaoForm
 from cmj.sigad.models import Documento, Classe, ReferenciaEntreDocumentos,\
@@ -27,6 +26,7 @@ from cmj.sigad.models import Documento, Classe, ReferenciaEntreDocumentos,\
     CLASSE_TEMPLATES_CHOICE, CaixaPublicacao, CaixaPublicacaoClasse,\
     CaixaPublicacaoRelationship, UrlShortener
 from cmj.utils import make_pagination
+from sapl.crud.base import MasterDetailCrud, Crud
 from sapl.parlamentares.models import Parlamentar, Legislatura
 
 

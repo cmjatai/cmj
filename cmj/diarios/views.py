@@ -1,7 +1,7 @@
 from builtins import property
 
-from cmj.crud.base import CrudAux, Crud, RP_DETAIL, RP_LIST
 from cmj.diarios.models import TipoDeDiario, DiarioOficial
+from sapl.crud.base import CrudAux, Crud, RP_DETAIL, RP_LIST
 
 
 TipoDeDiarioCrud = CrudAux.build(TipoDeDiario, None)

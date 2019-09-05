@@ -22,8 +22,8 @@ from cmj.core.models import Cep, TipoLogradouro, Logradouro, RegiaoMunicipal,\
     Distrito, Bairro, Trecho, AreaTrabalho, OperadorAreaTrabalho,\
     ImpressoEnderecamento, groups_remove_user, groups_add_user, Notificacao
 from cmj.core.serializers import TrechoSearchSerializer, TrechoSerializer
-from cmj.crud.base import Crud, CrudAux, MasterDetailCrud
 from cmj.utils import normalize
+from sapl.crud.base import Crud, CrudAux, MasterDetailCrud
 from sapl.parlamentares.models import Partido, Filiacao
 
 

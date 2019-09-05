@@ -1,5 +1,5 @@
-from datetime import datetime, timedelta
 import calendar
+from datetime import datetime, timedelta
 
 from django.core.exceptions import PermissionDenied
 from django.views.generic.list import ListView
@@ -7,7 +7,7 @@ from django.views.generic.list import ListView
 from cmj.agenda.forms import EventoForm
 from cmj.agenda.models import Evento, TipoEvento
 from cmj.core.models import AreaTrabalho
-from cmj.crud.base import Crud, CrudAux
+from sapl.crud.base import Crud, CrudAux
 
 
 TipoEventoCrud = CrudAux.build(TipoEvento, None)
