@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from django.db.models.deletion import PROTECT
 from django.urls.base import reverse
@@ -204,6 +205,8 @@ class DocumentoAdministrativo(models.Model):
 
     @property
     def url_texto_integral(self):
+        if settings.DEBUG:
+            return self.texto_integral.url
         return '%s' % reverse(
             'sapl.protocoloadm:docadm_texto_integral',
             kwargs={'pk': self.pk})
@@ -264,6 +267,8 @@ class DocumentoAcessorioAdministrativo(models.Model):
 
     @property
     def url_arquivo(self):
+        if settings.DEBUG:
+            return self.arquivo.url
         return '%s' % reverse(
             'sapl.protocoloadm:doc_acess_adm_arquivo',
             kwargs={'pk': self.pk})
