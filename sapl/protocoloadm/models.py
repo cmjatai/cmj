@@ -172,9 +172,6 @@ class DocumentoAdministrativo(models.Model):
         storage=OverwriteStorage(),
         upload_to=texto_upload_path,
         verbose_name=_('Texto Integral'))
-    restrito = models.BooleanField(default=False,
-                                   verbose_name=_('Acesso Restrito'),
-                                   blank=True)
 
     anexados = models.ManyToManyField(
         'self',

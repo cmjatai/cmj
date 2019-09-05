@@ -95,11 +95,6 @@ def recuperar_materia_protocolo(request):
 def doc_adm_texto_integral(request, pk):
     can_see = True
 
-    if not request.user.is_authenticated():
-        app_config = AppConfig.objects.last()
-        if app_config and app_config.documentos_administrativos == 'R':
-            can_see = False
-
     if can_see:
         documento = DocumentoAdministrativo.objects.get(pk=pk)
         if documento.texto_integral:
@@ -118,12 +113,6 @@ def doc_adm_texto_integral(request, pk):
 
 def doc_acess_adm_arquivo(request, pk):
     can_see = True
-
-    if not request.user.is_authenticated():
-        app_config = AppConfig.objects.last()
-        if app_config and app_config.documentos_administrativos == 'R':
-            can_see = False
-
     if can_see:
         documento = DocumentoAcessorioAdministrativo.objects.get(pk=pk)
         if documento.arquivo:
@@ -341,10 +330,6 @@ class AcompanhamentoDocumentoView(CreateView):
 class DocumentoAdministrativoMixin:
 
     def has_permission(self):
-        app_config = AppConfig.objects.last()
-        if app_config and app_config.documentos_administrativos == 'O':
-            return True
-
         return super().has_permission()
 
 

@@ -7,22 +7,15 @@ import reversion
 from sapl.utils import (LISTA_DE_UFS, YES_NO_CHOICES,
                         get_settings_auth_user_model)
 
-
-DOC_ADM_OSTENSIVO = 'O'
-DOC_ADM_RESTRITIVO = 'R'
-
-TIPO_DOCUMENTO_ADMINISTRATIVO = ((DOC_ADM_OSTENSIVO, _('Ostensiva')),
-                                 (DOC_ADM_RESTRITIVO, _('Restritiva')))
-
 RELATORIO_ATOS_ACESSADOS = (('S', _('Sim')),
                             ('N', _('Não')))
 
 SEQUENCIA_NUMERACAO_PROTOCOLO = (('A', _('Sequencial por ano')),
-                       ('L', _('Sequencial por legislatura')),
-                       ('U', _('Sequencial único')))
+                                 ('L', _('Sequencial por legislatura')),
+                                 ('U', _('Sequencial único')))
 
 SEQUENCIA_NUMERACAO_PROPOSICAO = (('A', _('Sequencial por ano para cada autor')),
-                       ('B', _('Sequencial por ano indepententemente do autor')))
+                                  ('B', _('Sequencial por ano indepententemente do autor')))
 
 ESFERA_FEDERACAO_CHOICES = (('M', _('Municipal')),
                             ('E', _('Estadual')),
@@ -86,12 +79,6 @@ class AppConfig(models.Model):
         ('C', _('Perguntar se é pra gerar protocolo ao incorporar')),
         ('N', _('Nunca Protocolar ao incorporar uma proposição')),
     )
-
-    documentos_administrativos = models.CharField(
-        max_length=1,
-        verbose_name=_('Visibilidade dos Documentos Administrativos'),
-        choices=TIPO_DOCUMENTO_ADMINISTRATIVO, default='O')
-
     estatisticas_acesso_normas = models.CharField(
         max_length=1,
         verbose_name=_('Estatísticas de acesso a normas'),
@@ -157,11 +144,13 @@ class AppConfig(models.Model):
         choices=YES_NO_CHOICES, default=False)
 
     tramitacao_materia = models.BooleanField(
-        verbose_name=_('Tramitar matérias anexadas junto com as matérias principais?'),
+        verbose_name=_(
+            'Tramitar matérias anexadas junto com as matérias principais?'),
         choices=YES_NO_CHOICES, default=True)
-    
+
     tramitacao_documento = models.BooleanField(
-        verbose_name=_('Tramitar documentos anexados junto com os documentos principais?'),
+        verbose_name=_(
+            'Tramitar documentos anexados junto com os documentos principais?'),
         choices=YES_NO_CHOICES, default=True)
 
     class Meta:

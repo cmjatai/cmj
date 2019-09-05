@@ -1,9 +1,9 @@
-import sapl
-
-from django.http import HttpResponse
 from django.core.urlresolvers import reverse
+from django.http import HttpResponse
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.generic import UpdateView
+
+import sapl
 from sapl.crud.base import RP_DETAIL, RP_LIST, Crud, MasterDetailCrud
 
 from .forms import AudienciaForm, AnexoAudienciaPublicaForm
@@ -20,7 +20,7 @@ class AudienciaCrud(Crud):
 
     class BaseMixin(Crud.BaseMixin):
         list_field_names = ['numero', 'nome', 'tipo', 'materia',
-                            'data'] 
+                            'data']
         ordering = '-data', 'nome', 'numero', 'tipo'
 
     class ListView(Crud.ListView):
@@ -35,7 +35,8 @@ class AudienciaCrud(Crud):
                 audiencia_materia[str(o.numero)] = o.materia
 
             for row in context['rows']:
-                coluna_materia = row[3] # se mudar a ordem de listagem mudar aqui
+                # se mudar a ordem de listagem mudar aqui
+                coluna_materia = row[3]
                 if coluna_materia[0]:
                     materia = audiencia_materia[row[0][0]]
                     url_materia = reverse('sapl.materia:materialegislativa_detail',
@@ -59,7 +60,7 @@ class AudienciaCrud(Crud):
                 initial['numero_materia'] = self.object.materia.numero
                 initial['ano_materia'] = self.object.materia.ano
             return initial
-     
+
     class DeleteView(Crud.DeleteView):
         pass
 
@@ -75,10 +76,6 @@ class AudienciaCrud(Crud):
 class AudienciaPublicaMixin:
 
     def has_permission(self):
-        app_config = sapl.base.models.AppConfig.objects.last()
-        if app_config and app_config.documentos_administrativos == 'O':
-            return True
-
         return super().has_permission()
 
 

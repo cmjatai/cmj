@@ -11,9 +11,6 @@ CasaLegislativa:
   - informacao_geral
 
 AppConfig:
-  {% trans 'Configurações da Aplicação' %}:
-  - documentos_administrativos
-
   {% trans 'Norma Jurídica' %}:
   - esfera_federacao
 

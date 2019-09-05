@@ -15,6 +15,7 @@ from django_filters.rest_framework.filterset import FilterSet
 from django_filters.utils import resolve_field
 from rest_framework import serializers as rest_serializers
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.fields import SerializerMethodField
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
@@ -22,7 +23,7 @@ from rest_framework.viewsets import ModelViewSet
 from sapl.api.forms import SaplFilterSetMixin
 from sapl.api.permissions import SaplModelPermissions
 from sapl.api.serializers import ChoiceSerializer
-from sapl.base.models import Autor, AppConfig, DOC_ADM_OSTENSIVO
+from sapl.base.models import Autor
 from sapl.materia.models import Proposicao, TipoMateriaLegislativa,\
     MateriaLegislativa, Tramitacao
 from sapl.norma.models import NormaJuridica
@@ -430,82 +431,51 @@ class _TipoMateriaLegislativaViewSet:
         return Response(result)
 
 
-@customize(DocumentoAdministrativo)
-class _DocumentoAdministrativoViewSet:
+class DocAdmMixin:
 
     class DocumentoAdministrativoPermission(SaplModelPermissions):
         def has_permission(self, request, view):
-            if request.method == 'GET':
-                comportamento = AppConfig.attr('documentos_administrativos')
-                if comportamento == DOC_ADM_OSTENSIVO:
-                    return True
-                    """
-                    Diante da lógica implementada na manutenção de documentos
-                    administrativos:
-                    - Se o comportamento é doc adm ostensivo, deve passar pelo 
-                      teste de permissões sem avaliá-las
-                    - se o comportamento é doc adm restritivo, deve passar pelo
-                      teste de permissões avaliando-as
-                    """
+            if request.user.is_anonymous():
+                raise PermissionDenied()
+
+            if not request.user.areatrabalho_set.filter(ativo=True).exists():
+                raise PermissionDenied(
+                    detail=_(
+                        '%s, você pertence a nenhuma '
+                        'Área de Trabalho ativa' % request.user))
             return super().has_permission(request, view)
 
     permission_classes = (DocumentoAdministrativoPermission, )
 
     def get_queryset(self):
-        """
-        mesmo tendo passado pelo teste de permissões, deve ser filtrado,
-        pelo campo restrito. Sendo este igual a True, disponibilizar apenas
-        a um usuário conectado. Apenas isso, sem critérios outros de permissão, 
-        conforme implementado em DocumentoAdministrativoCrud
-        """
         qs = super().get_queryset()
 
-        if self.request.user.is_anonymous():
-            qs = qs.exclude(restrito=True)
+        params = {
+            self.container_field: self.request.user
+        }
+        qs = qs.filter(**params)
+
         return qs
+
+
+@customize(DocumentoAdministrativo)
+class _DocumentoAdministrativoViewSet(DocAdmMixin):
+    container_field = 'workspace__operadores'
 
 
 @customize(DocumentoAcessorioAdministrativo)
-class _DocumentoAcessorioAdministrativoViewSet:
-
-    permission_classes = (
-        _DocumentoAdministrativoViewSet.DocumentoAdministrativoPermission, )
-
-    def get_queryset(self):
-        qs = super().get_queryset()
-
-        if self.request.user.is_anonymous():
-            qs = qs.exclude(documento__restrito=True)
-        return qs
+class _DocumentoAcessorioAdministrativoViewSet(DocAdmMixin):
+    container_field = 'documento__workspace__operadores'
 
 
 @customize(TramitacaoAdministrativo)
-class _TramitacaoAdministrativoViewSet(BusinessRulesNotImplementedMixin):
-    # TODO: Implementar regras de manutenção das tramitações de docs adms
-
-    permission_classes = (
-        _DocumentoAdministrativoViewSet.DocumentoAdministrativoPermission, )
-
-    def get_queryset(self):
-        qs = super().get_queryset()
-
-        if self.request.user.is_anonymous():
-            qs = qs.exclude(documento__restrito=True)
-        return qs
+class _TramitacaoAdministrativoViewSet(DocAdmMixin):
+    container_field = 'documento__workspace__operadores'
 
 
 @customize(Anexado)
-class _AnexadoViewSet(BusinessRulesNotImplementedMixin):
-
-    permission_classes = (
-        _DocumentoAdministrativoViewSet.DocumentoAdministrativoPermission, )
-
-    def get_queryset(self):
-        qs = super().get_queryset()
-
-        if self.request.user.is_anonymous():
-            qs = qs.exclude(documento__restrito=True)
-        return qs
+class _AnexadoViewSet(DocAdmMixin):
+    container_field = 'documento__workspace__operadores'
 
 
 @customize(SessaoPlenaria)

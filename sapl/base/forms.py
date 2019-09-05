@@ -1,4 +1,5 @@
 import logging
+from operator import xor
 import os
 
 from crispy_forms.bootstrap import FieldWithButtons, InlineRadios, StrictButton
@@ -29,8 +30,8 @@ from sapl.crispy_layout_mixin import SaplFormHelper
 from sapl.materia.models import (MateriaLegislativa, UnidadeTramitacao, StatusTramitacao,
                                  DocumentoAcessorio, TipoMateriaLegislativa)
 from sapl.norma.models import (NormaJuridica, NormaEstatisticas)
-from sapl.protocoloadm.models import DocumentoAdministrativo
 from sapl.parlamentares.models import SessaoLegislativa, Partido, HistoricoPartido
+from sapl.protocoloadm.models import DocumentoAdministrativo
 from sapl.sessao.models import SessaoPlenaria
 from sapl.settings import MAX_IMAGE_UPLOAD_SIZE
 from sapl.utils import (RANGE_ANOS, YES_NO_CHOICES,
@@ -40,8 +41,8 @@ from sapl.utils import (RANGE_ANOS, YES_NO_CHOICES,
                         choice_anos_com_normas, choice_anos_com_materias,
                         FilterOverridesMetaMixin, FileFieldCheckMixin,
                         intervalos_tem_intersecao)
+
 from .models import AppConfig, CasaLegislativa
-from operator import xor
 
 
 ACTION_CREATE_USERS_AUTOR_CHOICE = [
@@ -744,7 +745,7 @@ class RelatorioDocumentosAcessoriosFilterSet(django_filters.FilterSet):
         fields = ['tipo', 'materia__tipo', 'data']
 
     def __init__(self, *args, **kwargs):
-        
+
         super(
             RelatorioDocumentosAcessoriosFilterSet, self
         ).__init__(*args, **kwargs)
@@ -752,20 +753,20 @@ class RelatorioDocumentosAcessoriosFilterSet(django_filters.FilterSet):
         self.filters['tipo'].label = 'Tipo de Documento'
         self.filters['materia__tipo'].label = 'Tipo de Matéria do Documento'
         self.filters['data'].label = 'Período (Data Inicial - Data Final)'
-        
+
         self.form.fields['tipo'].required = True
 
         row0 = to_row([('tipo', 6),
                        ('materia__tipo', 6)])
-    
+
         row1 = to_row([('data', 12)])
 
         self.form.helper = SaplFormHelper()
         self.form.helper.form_method = 'GET'
         self.form.helper.layout = Layout(
             Fieldset(_('Pesquisa'),
-            row0, row1,
-            form_actions(label='Pesquisar'))
+                     row0, row1,
+                     form_actions(label='Pesquisar'))
         )
 
 
@@ -919,13 +920,14 @@ class RelatorioPresencaSessaoFilterSet(django_filters.FilterSet):
         super(RelatorioPresencaSessaoFilterSet, self).__init__(
             *args, **kwargs)
 
-        self.form.fields['exibir_ordem_dia'] = forms.BooleanField(required=False, 
+        self.form.fields['exibir_ordem_dia'] = forms.BooleanField(required=False,
                                                                   label='Exibir presença das Ordens do Dia')
-        self.form.initial['exibir_ordem_dia']  = True
+        self.form.initial['exibir_ordem_dia'] = True
 
         self.filters['data_inicio'].label = 'Período (Inicial - Final)'
-        
-        tipo_sessao_ordinaria = self.filters['tipo'].queryset.filter(nome='Ordinária')
+
+        tipo_sessao_ordinaria = self.filters['tipo'].queryset.filter(
+            nome='Ordinária')
         if tipo_sessao_ordinaria:
             self.form.initial['tipo'] = tipo_sessao_ordinaria.first()
 
@@ -1265,8 +1267,7 @@ class ConfiguracoesAppForm(ModelForm):
 
     class Meta:
         model = AppConfig
-        fields = ['documentos_administrativos',
-                  'sequencia_numeracao_protocolo',
+        fields = ['sequencia_numeracao_protocolo',
                   'sequencia_numeracao_proposicao',
                   'esfera_federacao',
                   # 'painel_aberto', # TODO: a ser implementado na versão 3.2
@@ -1467,7 +1468,7 @@ class PartidoForm(FileFieldCheckMixin, ModelForm):
         )
 
     def clean(self):
-        super(PartidoForm,self).clean()
+        super(PartidoForm, self).clean()
         cleaned_data = self.cleaned_data
 
         if not self.is_valid():
@@ -1475,17 +1476,20 @@ class PartidoForm(FileFieldCheckMixin, ModelForm):
 
         if cleaned_data['data_criacao'] and cleaned_data['data_extincao'] and cleaned_data['data_criacao'] > \
                 cleaned_data['data_extincao']:
-            raise ValidationError("Certifique-se de que a data de criação seja anterior à data de extinção.")
+            raise ValidationError(
+                "Certifique-se de que a data de criação seja anterior à data de extinção.")
 
         if self.instance.pk:
             partido = Partido.objects.get(pk=self.instance.pk)
 
             if xor(cleaned_data['sigla'] == partido.sigla, cleaned_data['nome'] == partido.nome):
-                raise ValidationError(_('O Partido deve ter um novo nome e uma nova sigla.'))
+                raise ValidationError(
+                    _('O Partido deve ter um novo nome e uma nova sigla.'))
 
             cleaned_data.update({'partido': partido})
 
         return cleaned_data
+
 
 class PartidoUpdateForm(PartidoForm):
 
@@ -1493,11 +1497,9 @@ class PartidoUpdateForm(PartidoForm):
 
     historico = forms.ChoiceField(initial=False, choices=opcoes)
 
-
     class Meta:
         model = Partido
         exclude = []
-
 
     def __init__(self, pk=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -1505,23 +1507,24 @@ class PartidoUpdateForm(PartidoForm):
         row1 = to_row([
             ('sigla', 6),
             ('nome', 6),
-            ]
+        ]
         )
         row2 = to_row([
             ('historico', 2),
             ('data_criacao', 5),
             ('data_extincao', 5),
-            ]
+        ]
         )
         row3 = to_row([('observacao', 12)])
         row4 = to_row([('logo_partido', 12)])
 
         buttons = FormActions(
-           *[
-               HTML('''<a href="/sistema/parlamentar/partido/{{object.id}}" class="btn btn-dark btn-close-container">%s</a>''' % _('Cancelar'))
-           ],
+            *[
+                HTML(
+                    '''<a href="/sistema/parlamentar/partido/{{object.id}}" class="btn btn-dark btn-close-container">%s</a>''' % _('Cancelar'))
+            ],
             Submit('salvar', _('Salvar'), css_class='float-right',
-               onclick='return true;'),
+                   onclick='return true;'),
             css_class='form-group row justify-content-between'
         )
 
@@ -1530,12 +1533,9 @@ class PartidoUpdateForm(PartidoForm):
             row1, row2, row3, row4, to_row([(buttons, 12)]),
         )
 
-
-
-
     def clean(self):
-        cleaned_data = super(PartidoUpdateForm,self).clean()
-        
+        cleaned_data = super(PartidoUpdateForm, self).clean()
+
         if not self.is_valid():
             return cleaned_data
 
@@ -1546,12 +1546,12 @@ class PartidoUpdateForm(PartidoForm):
 
         return cleaned_data
 
-    def save(self,commit=False):
+    def save(self, commit=False):
         partido = self.instance
-    
+
         cleaned_data = self.cleaned_data
         is_historico = cleaned_data['historico'] == 'True'
-            
+
         if not is_historico:
             partido.save(commit)
         else:
@@ -1561,14 +1561,15 @@ class PartidoUpdateForm(PartidoForm):
             fim_historico = self.cleaned_data['data_extincao']
             logo_partido = self.cleaned_data['logo_partido']
             historico_partido = HistoricoPartido(sigla=sigla,
-                                                nome=nome,
-                                                inicio_historico=inicio_historico,
-                                                fim_historico=fim_historico,
-                                                logo_partido=logo_partido,
-                                                partido=partido,
-                                                )
+                                                 nome=nome,
+                                                 inicio_historico=inicio_historico,
+                                                 fim_historico=fim_historico,
+                                                 logo_partido=logo_partido,
+                                                 partido=partido,
+                                                 )
             historico_partido.save()
         return partido
+
 
 class RelatorioHistoricoTramitacaoAdmFilterSet(django_filters.FilterSet):
 
