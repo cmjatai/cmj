@@ -88,43 +88,6 @@ def recuperar_materia_protocolo(request):
     return response
 
 
-def doc_adm_texto_integral(request, pk):
-    can_see = True
-
-    if can_see:
-        documento = DocumentoAdministrativo.objects.get(pk=pk)
-        if documento.texto_integral:
-            arquivo = documento.texto_integral
-
-            mime = get_mime_type_from_file_extension(arquivo.name)
-
-            response = HttpResponse(content_type='%s' % mime)
-            response['Content-Disposition'] = (
-                'inline; filename="%s"' % arquivo.name.split('/')[-1])
-            response['X-Accel-Redirect'] = "/media/{0}".format(
-                arquivo.name)
-            return response
-    raise Http404
-
-
-def doc_acess_adm_arquivo(request, pk):
-    can_see = True
-    if can_see:
-        documento = DocumentoAcessorioAdministrativo.objects.get(pk=pk)
-        if documento.arquivo:
-            arquivo = documento.arquivo
-
-            mime = get_mime_type_from_file_extension(arquivo.name)
-
-            response = HttpResponse(content_type='%s' % mime)
-            response['Content-Disposition'] = (
-                'inline; filename="%s"' % arquivo.name.split('/')[-1])
-            response['X-Accel-Redirect'] = "/media/{0}".format(
-                arquivo.name)
-            return response
-    raise Http404
-
-
 class AcompanhamentoConfirmarView(TemplateView):
 
     logger = logging.getLogger(__name__)
@@ -395,10 +358,9 @@ class DocumentoAdministrativoCrud(Crud):
             return super(Crud.DetailView, self).get(args, kwargs)
 
         def hook_texto_integral(self, obj, fieldname):
+            url = obj.url_texto_integral
             a = '<a href="%s">%s</a>' % (
-                reverse(
-                    'sapl.protocoloadm:docadm_texto_integral',
-                    kwargs={'pk': obj.pk}),
+                url,
                 obj.texto_integral.name.split('/')[-1])
             return obj.texto_integral.field.verbose_name, a
 
@@ -1322,22 +1284,14 @@ class DocumentoAcessorioAdministrativoCrud(MasterDetailCrud):
     class UpdateView(MasterDetailCrud.UpdateView):
         form_class = DocumentoAcessorioAdministrativoForm
 
-    class ListView(DocumentoAdministrativoMixin, MasterDetailCrud.ListView):
-
-        def get_queryset(self):
-            qs = super(MasterDetailCrud.ListView, self).get_queryset()
-            kwargs = {self.crud.parent_field: self.kwargs['pk']}
-            return qs.filter(**kwargs).order_by('-data', '-id')
-
-    class DetailView(DocumentoAdministrativoMixin,
-                     MasterDetailCrud.DetailView):
+    class DetailView(MasterDetailCrud.DetailView):
 
         def hook_arquivo(self, obj, fieldname):
+            url = obj.arquivo
             a = '<a href="%s">%s</a>' % (
-                reverse(
-                    'sapl.protocoloadm:doc_acess_adm_arquivo',
-                    kwargs={'pk': obj.pk}),
-                obj.arquivo.name.split('/')[-1])
+                url,
+                obj.arquivo.name.split('/')[-1]
+            )
             return obj.arquivo.field.verbose_name, a
 
 

@@ -211,7 +211,7 @@ class DocumentoAdministrativo(models.Model):
         if settings.DEBUG:
             return self.texto_integral.url
         return '%s' % reverse(
-            'sapl.protocoloadm:docadm_texto_integral',
+            'sapl.api:%s-%s' % (self._meta.model_name, 'texto-integral'),
             kwargs={'pk': self.pk})
 
     def delete(self, using=None, keep_parents=False):
@@ -273,7 +273,7 @@ class DocumentoAcessorioAdministrativo(models.Model):
         if settings.DEBUG:
             return self.arquivo.url
         return '%s' % reverse(
-            'sapl.protocoloadm:doc_acess_adm_arquivo',
+            'sapl.api:%s-%s' % (self._meta.model_name, 'arquivo'),
             kwargs={'pk': self.pk})
 
     def delete(self, using=None, keep_parents=False):

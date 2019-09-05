@@ -23,9 +23,7 @@ from sapl.protocoloadm.views import (AcompanhamentoDocumentoView,
                                      DesvincularMateriaView,
                                      AnexadoCrud, DocumentoAnexadoEmLoteView,
                                      PrimeiraTramitacaoEmLoteAdmView,
-                                     TramitacaoEmLoteAdmView,
-                                     doc_adm_texto_integral,
-                                     doc_acess_adm_arquivo)
+                                     TramitacaoEmLoteAdmView)
 
 from .apps import AppConfig
 
@@ -40,13 +38,6 @@ urlpatterns_documento_administrativo = [
 
     url(r'^docadm/pesq-doc-adm',
         PesquisarDocumentoAdministrativoView.as_view(), name='pesq_doc_adm'),
-
-    url(r'^docadm/(?P<pk>\d+)/texto_integral$', doc_adm_texto_integral,
-        name='docadm_texto_integral'),
-
-    url(r'^docadm/documentoacessorioadministrativo/(?P<pk>\d+)/arquivo$',
-        doc_acess_adm_arquivo,
-        name='doc_acess_adm_arquivo'),
 
     url(r'^docadm/(?P<pk>\d+)/anexado_em_lote', DocumentoAnexadoEmLoteView.as_view(),
         name='anexado_em_lote'),

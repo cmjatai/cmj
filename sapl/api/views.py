@@ -5,6 +5,7 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 from django.db.models.fields.files import FileField
+from django.http.response import Http404, HttpResponse
 from django.utils.decorators import classonlymethod
 from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy as _
@@ -15,7 +16,7 @@ from django_filters.rest_framework.filterset import FilterSet
 from django_filters.utils import resolve_field
 from rest_framework import serializers as rest_serializers
 from rest_framework.decorators import action
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, NotFound
 from rest_framework.fields import SerializerMethodField
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
@@ -32,7 +33,8 @@ from sapl.protocoloadm.models import DocumentoAdministrativo,\
     DocumentoAcessorioAdministrativo, TramitacaoAdministrativo, Anexado,\
     TipoDocumentoAdministrativo
 from sapl.sessao.models import SessaoPlenaria, ExpedienteSessao
-from sapl.utils import models_with_gr_for_model, choice_anos_com_sessaoplenaria
+from sapl.utils import models_with_gr_for_model, choice_anos_com_sessaoplenaria,\
+    get_mime_type_from_file_extension
 
 
 class BusinessRulesNotImplementedMixin:
@@ -458,6 +460,28 @@ class DocAdmMixin:
 
         return qs
 
+    def response_file(self, request, *args, **kwargs):
+        item = self.get_queryset().filter(pk=kwargs['pk']).first()
+
+        if not item:
+            raise NotFound
+
+        if not hasattr(item, self.action):
+            raise NotFound
+
+        arquivo = getattr(item, self.action)
+        if not arquivo:
+            raise NotFound
+
+        mime = get_mime_type_from_file_extension(arquivo.name)
+
+        response = HttpResponse(content_type='%s' % mime)
+        response['Content-Disposition'] = (
+            'inline; filename="%s"' % arquivo.name.split('/')[-1])
+        response['X-Accel-Redirect'] = "/media/{0}".format(
+            arquivo.name)
+        return response
+
 
 @customize(TipoDocumentoAdministrativo)
 class _TipoDocumentoAdministrativoViewSet(DocAdmMixin):
@@ -468,10 +492,18 @@ class _TipoDocumentoAdministrativoViewSet(DocAdmMixin):
 class _DocumentoAdministrativoViewSet(DocAdmMixin):
     container_field = 'workspace__operadores'
 
+    @action(detail=True)
+    def texto_integral(self, request, *args, **kwargs):
+        return self.response_file(request, *args, **kwargs)
+
 
 @customize(DocumentoAcessorioAdministrativo)
 class _DocumentoAcessorioAdministrativoViewSet(DocAdmMixin):
     container_field = 'documento__workspace__operadores'
+
+    @action(detail=True)
+    def arquivo(self, request, *args, **kwargs):
+        return self.response_file(request, *args, **kwargs)
 
 
 @customize(TramitacaoAdministrativo)
