@@ -20,6 +20,12 @@ class TipoDocumentoAdministrativo(models.Model):
     sigla = models.CharField(max_length=5, verbose_name=_('Sigla'))
     descricao = models.CharField(max_length=50, verbose_name=_('Descrição'))
 
+    workspace = models.ForeignKey(
+        AreaTrabalho,
+        verbose_name=_('Área de Trabalho'),
+        related_name='tipodocumentoadministrativo_set',
+        blank=True, null=True, on_delete=PROTECT)
+
     class Meta:
         verbose_name = _('Tipo de Documento Administrativo')
         verbose_name_plural = _('Tipos de Documento Administrativo')

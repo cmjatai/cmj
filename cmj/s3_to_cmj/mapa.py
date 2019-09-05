@@ -267,7 +267,8 @@ mapa = [
             'sigla': 'sgl_tipo_documento',
             'descricao': 'des_tipo_documento',
             'ind_excluido': 'ind_excluido'
-        }
+        },
+        'adjust': adjust_tipo_documento_administrativo
     },
     {
         'name': '_tipoexpediente',

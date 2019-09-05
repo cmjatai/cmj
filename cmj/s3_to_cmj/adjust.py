@@ -193,6 +193,10 @@ def adjust_documentoadministrativo(new, old):
     new.workspace = 20
 
 
+def adjust_tipo_documento_administrativo(new, old):
+    new.workspace = 20
+
+
 def adjust_documentoacessorioadministrativo(new, old):
     if not new.assunto:
         new.assunto = ''
