@@ -3,14 +3,9 @@ from datetime import date
 from dateutil.relativedelta import relativedelta
 from django import template
 from django.conf import settings
-from django.contrib.auth.tokens import default_token_generator
-from django.db.models.query import QuerySet
-from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from webpack_loader import utils
-from webpack_loader.templatetags.webpack_loader import render_bundle
 from webpack_loader.utils import _get_bundle
 
 from cmj.diarios.models import DiarioOficial
@@ -19,6 +14,7 @@ from sapl.base.models import AppConfig
 from sapl.materia.models import DocumentoAcessorio, MateriaLegislativa
 from sapl.norma.models import NormaJuridica
 from sapl.parlamentares.models import Filiacao
+from sapl.protocoloadm.models import DocumentoAdministrativo
 from sapl.sessao.models import SessaoPlenaria
 
 
@@ -289,6 +285,8 @@ def search_get_model(object):
         return 'm'
     elif type(object) == DocumentoAcessorio:
         return 'd'
+    elif type(object) == DocumentoAdministrativo:
+        return 'da'
     elif type(object) == NormaJuridica:
         return 'n'
     elif type(object) == DiarioOficial:

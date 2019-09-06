@@ -900,6 +900,8 @@ class PesquisarDocumentoAdministrativoView(DocumentoAdministrativoMixin,
             context['page_range'] = make_pagination(
                 page_obj.number, paginator.num_pages)
 
+        context['title'] = _('Documentos Administrativos')
+
         return context
 
     def get(self, request, *args, **kwargs):

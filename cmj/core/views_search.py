@@ -3,6 +3,7 @@ import re
 from crispy_forms.bootstrap import FieldWithButtons, StrictButton
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Div, Field, Layout
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from haystack.forms import ModelSearchForm
 from haystack.views import SearchView
@@ -17,6 +18,8 @@ class CmjSearchForm(ModelSearchForm):
         return self.searchqueryset.all().order_by('-data')
 
     def __init__(self, *args, **kwargs):
+
+        self.workspace = kwargs.pop('workspace')
 
         q_field = Div(
             FieldWithButtons(
@@ -42,13 +45,34 @@ class CmjSearchForm(ModelSearchForm):
         for i, v in enumerate(choices):
             if v[0] == 'sigad.documento':
                 choices[i] = (v[0], _('Notícias'))
-        self.fields['models'].choices = sorted(choices, key=lambda x: x[1])
+            elif v[0] == 'protocoloadm.documentoadministrativo':
+                if not self.workspace:
+                    choices[i] = (None, None)
+                else:
+                    choices[i] = (v[0], '%s (%s)' % (
+                        v[1], self.workspace
+                    ))
+
+        self.fields['models'].choices = sorted(
+            filter(lambda x: x[0], choices),
+
+            key=lambda x: x[1])
+
         self.fields['models'].label = _('Buscar em conteúdos específicos:')
         self.fields['q'].label = ''
 
     def search(self):
         sqs = super().search()
+
+        if self.workspace:
+            sqs = sqs.filter(Q(at=self.workspace.pk) | Q(at=0))
+        else:
+            sqs = sqs.filter(at=0)
+
         return sqs.order_by('-data')
+
+    def get_models(self):
+        return ModelSearchForm.get_models(self)
 
 
 class CmjSearchView(SearchView):
@@ -61,6 +85,20 @@ class CmjSearchView(SearchView):
             form_class=CmjSearchForm,
             searchqueryset=None,
             results_per_page=results_per_page)
+
+    def build_form(self, form_kwargs=None):
+
+        kwargs = {'workspace': None}
+
+        user = self.request.user
+        if not user.is_anonymous() and user.areatrabalho_set.exists():
+            at = user.areatrabalho_set.first()
+            kwargs['workspace'] = at
+
+        if form_kwargs:
+            kwargs.update(form_kwargs)
+
+        return SearchView.build_form(self, form_kwargs=kwargs)
 
     def get_context(self):
         context = super().get_context()
