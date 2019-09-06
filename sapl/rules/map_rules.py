@@ -26,6 +26,9 @@ negócio trabalham com os cinco radiais de permissão
 e com qualquer outro tipo de permissão customizada, nesta ordem de precedência.
 
 """
+from django.contrib.auth import get_user_model
+
+from cmj.globalrules import menu_dados_auxiliares
 from sapl.audiencia import models as audiencia
 from sapl.base import models as base
 from sapl.comissoes import models as comissoes
@@ -56,6 +59,9 @@ __perms_publicas__ = {RP_LIST, RP_DETAIL}
 rules_group_administrativo = {
     'group': SAPL_GROUP_ADMINISTRATIVO,
     'rules': [
+        (get_user_model(), [
+            menu_dados_auxiliares,
+        ], set()),
         (materia.MateriaLegislativa, [
          'can_access_impressos'], __perms_publicas__),
         # TODO: tratar em sapl.api a questão de ostencivo e restritivo
