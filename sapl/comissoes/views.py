@@ -1,16 +1,16 @@
 import logging
 
-from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.core.urlresolvers import reverse
 from django.db.models import F
 from django.http.response import HttpResponseRedirect, JsonResponse
+from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.generic import ListView, CreateView, DeleteView
 from django.views.generic.base import RedirectView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormMixin, UpdateView
-from django.utils.translation import ugettext_lazy as _
 
 from sapl.base.models import AppConfig as AppsAppConfig
 from sapl.comissoes.apps import AppConfig
@@ -40,6 +40,7 @@ def pegar_url_reuniao(pk):
     r_pk = documentoacessorio.reuniao.pk
     url = reverse('sapl.comissoes:reuniao_detail', kwargs={'pk': r_pk})
     return url
+
 
 CargoCrud = CrudAux.build(CargoComissao, 'cargo_comissao')
 
@@ -114,10 +115,12 @@ class ComposicaoCrud(MasterDetailCrud):
 
             username = self.request.user.username
             try:
-                self.logger.debug('user=' + username + '. Tentando obter pk da composição.')
+                self.logger.debug('user=' + username +
+                                  '. Tentando obter pk da composição.')
                 return int(self.request.GET['pk'])
             except Exception as e:
-                self.logger.error('user=' + username + '. Erro ao obter pk da composição. Retornado 0. ' + str(e))
+                self.logger.error(
+                    'user=' + username + '. Erro ao obter pk da composição. Retornado 0. ' + str(e))
                 return 0
 
         def get_context_data(self, **kwargs):
@@ -167,11 +170,11 @@ class ComissaoCrud(Crud):
 
 def lista_materias_comissao(comissao_pk):
     ts = Tramitacao.objects.order_by(
-        'materia', '-data_tramitacao', '-id').annotate(
+        'materia_id', '-data_tramitacao', '-id').annotate(
         comissao=F('unidade_tramitacao_destino__comissao')).distinct(
             'materia').values_list('materia', 'comissao')
 
-    ts = [m for (m,c) in ts if c == int(comissao_pk)]
+    ts = [m for (m, c) in ts if c == int(comissao_pk)]
 
     materias = MateriaLegislativa.objects.filter(
         pk__in=ts).order_by('tipo', '-ano', '-numero')
@@ -210,23 +213,26 @@ class ReuniaoCrud(MasterDetailCrud):
             context = super().get_context_data(**kwargs)
 
             docs = []
-            documentos = DocumentoAcessorio.objects.filter(reuniao=self.kwargs['pk']).order_by('nome')
+            documentos = DocumentoAcessorio.objects.filter(
+                reuniao=self.kwargs['pk']).order_by('nome')
             docs.extend(documentos)
 
             context['docs'] = docs
             context['num_docs'] = len(docs)
 
             mats = []
-            materias_pauta = PautaReuniao.objects.filter(reuniao=self.kwargs['pk'])
-            materias_pk = [materia_pauta.materia.pk for materia_pauta in materias_pauta]
-            
+            materias_pauta = PautaReuniao.objects.filter(
+                reuniao=self.kwargs['pk'])
+            materias_pk = [
+                materia_pauta.materia.pk for materia_pauta in materias_pauta]
+
             context['mats'] = MateriaLegislativa.objects.filter(
                 pk__in=materias_pk
             ).order_by('tipo', '-ano', '-numero')
             context['num_mats'] = len(context['mats'])
 
             context['reuniao_pk'] = self.kwargs['pk']
-            
+
             return context
 
     class ListView(MasterDetailCrud.ListView):
@@ -237,10 +243,12 @@ class ReuniaoCrud(MasterDetailCrud):
 
             username = self.request.user.username
             try:
-                self.logger.debug('user=' + username + '. Tentando obter pk da reunião.')
+                self.logger.debug('user=' + username +
+                                  '. Tentando obter pk da reunião.')
                 return int(self.request.GET['pk'])
             except Exception as e:
-                self.logger.error('user=' + username + '. Erro ao obter pk da reunião. Retornado 0. ' + str(e))
+                self.logger.error(
+                    'user=' + username + '. Erro ao obter pk da reunião. Retornado 0. ' + str(e))
                 return 0
 
         def get_context_data(self, **kwargs):
@@ -296,29 +304,32 @@ class RemovePautaView(PermissionRequiredMixin, CreateView):
         context['root_pk'] = context['object'].comissao.pk
 
         materias_pauta = PautaReuniao.objects.filter(reuniao=context['object'])
-        materias_pk = [materia_pauta.materia.pk for materia_pauta in materias_pauta]
-        
+        materias_pk = [
+            materia_pauta.materia.pk for materia_pauta in materias_pauta]
+
         context['materias'] = MateriaLegislativa.objects.filter(
             pk__in=materias_pk
-        ).order_by('tipo', '-ano', '-numero') 
+        ).order_by('tipo', '-ano', '-numero')
         context['num_materias'] = len(context['materias'])
 
         return context
 
     def post(self, request, *args, **kwargs):
-        success_url = reverse('sapl.comissoes:reuniao_detail', kwargs={'pk':kwargs['pk']})
+        success_url = reverse('sapl.comissoes:reuniao_detail', kwargs={
+                              'pk': kwargs['pk']})
         marcadas = request.POST.getlist('materia_id')
 
         if not marcadas:
-            msg=_('Nenhuma matéria foi selecionada.')
+            msg = _('Nenhuma matéria foi selecionada.')
             messages.add_message(request, messages.WARNING, msg)
             return HttpResponseRedirect(success_url)
 
         reuniao = Reuniao.objects.get(pk=kwargs['pk'])
         for materia in MateriaLegislativa.objects.filter(id__in=marcadas):
-            PautaReuniao.objects.filter(reuniao=reuniao,materia=materia).delete()
+            PautaReuniao.objects.filter(
+                reuniao=reuniao, materia=materia).delete()
 
-        msg=_('Matéria(s) removida(s) com sucesso!')
+        msg = _('Matéria(s) removida(s) com sucesso!')
         messages.add_message(request, messages.SUCCESS, msg)
         return HttpResponseRedirect(success_url)
 
@@ -340,7 +351,8 @@ class AdicionaPautaView(PermissionRequiredMixin, CreateView):
         context['object'] = Reuniao.objects.get(pk=self.kwargs['pk'])
         context['root_pk'] = context['object'].comissao.pk
 
-        materias_comissao = lista_materias_comissao(context['object'].comissao.pk)
+        materias_comissao = lista_materias_comissao(
+            context['object'].comissao.pk)
         materias_pauta = PautaReuniao.objects.filter(reuniao=context['object'])
 
         nao_listar = [mp.materia.pk for mp in materias_pauta]
@@ -348,25 +360,26 @@ class AdicionaPautaView(PermissionRequiredMixin, CreateView):
         context['num_materias'] = len(context['materias'])
 
         return context
-    
+
     def post(self, request, *args, **kwargs):
-        success_url = reverse('sapl.comissoes:reuniao_detail', kwargs={'pk':kwargs['pk']}) 
+        success_url = reverse('sapl.comissoes:reuniao_detail', kwargs={
+                              'pk': kwargs['pk']})
         marcadas = request.POST.getlist('materia_id')
 
         if not marcadas:
             msg = _('Nenhuma máteria foi selecionada.')
             messages.add_message(request, messages.WARNING, msg)
             return HttpResponseRedirect(success_url)
-            
+
         reuniao = Reuniao.objects.get(pk=kwargs['pk'])
         pautas = []
         for materia in MateriaLegislativa.objects.filter(id__in=marcadas):
-                 pauta = PautaReuniao()
-                 pauta.reuniao = reuniao
-                 pauta.materia = materia
-                 pautas.append(pauta)
+            pauta = PautaReuniao()
+            pauta.reuniao = reuniao
+            pauta.materia = materia
+            pautas.append(pauta)
         PautaReuniao.objects.bulk_create(pautas)
-        
+
         msg = _('Matéria(s) adicionada(s) com sucesso!')
         messages.add_message(request, messages.SUCCESS, msg)
         return HttpResponseRedirect(success_url)
