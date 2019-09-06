@@ -96,15 +96,15 @@ class EventoCrud(Crud):
                 mes = evento.inicio.month
                 dia = evento.inicio.day
 
-                primeiro_dia = datetime(ano, mes, 1)
-                dia_pos = dia + primeiro_dia.weekday()
+                prim_dia = datetime(ano, mes, 1)
+                dia_pos = dia + prim_dia.weekday()
+
+                coluna = (dia_pos) % 7
+                linha = (dia_pos - (7 if prim_dia.weekday() == 6 else 0)) // 7
 
                 if evento.caracteristica == Evento.FERIADO:
-                    cal[(dia_pos) // 7][(dia_pos) % 7]['destaque'] = True
+                    cal[linha][coluna]['destaque'] = True
 
-                linha = (dia_pos - (7 if primeiro_dia.weekday()
-                                    == 6 else 0)) // 7  # - (1 primeiro_dia)
-                coluna = (dia_pos) % 7
                 cal[linha][coluna]['eventos'].insert(0, evento)
 
             linha_inicial = cal[0][::-1]
