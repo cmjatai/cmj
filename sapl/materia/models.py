@@ -552,6 +552,10 @@ class DocumentoAcessorio(models.Model):
         auto_now=True,
         verbose_name=_('Data'))
 
+    @property
+    def ano(self):
+        return self.data.year
+
     class Meta:
         verbose_name = _('Documento Acessório')
         verbose_name_plural = _('Documentos Acessórios')

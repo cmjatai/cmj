@@ -197,6 +197,11 @@ class DocumentoAdministrativo(models.Model):
         related_name='documentoadministrativo_set',
         blank=True, null=True, on_delete=PROTECT)
 
+    data_ultima_atualizacao = models.DateTimeField(
+        blank=True, null=True,
+        auto_now=True,
+        verbose_name=_('Data'))
+
     class Meta:
         verbose_name = _('Documento Administrativo')
         verbose_name_plural = _('Documentos Administrativos')

@@ -991,6 +991,10 @@ class Documento(ShortUrl, CMSMixin):
              _('Visualização das mídias do Documento')),
         )
 
+    @property
+    def ano(self):
+        return self.public_date.year if self.public_date else self.created.year
+
     def __str__(self):
         return self.titulo or self.get_tipo_display()
 

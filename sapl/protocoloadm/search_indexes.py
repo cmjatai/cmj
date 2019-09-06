@@ -2,20 +2,21 @@ from celery_haystack.indexes import CelerySearchIndex
 from haystack.constants import Indexable
 from haystack.fields import DateTimeField, IntegerField
 
-from cmj.diarios.models import DiarioOficial
 from sapl.base.search_indexes import TextExtractField
+from sapl.protocoloadm.models import DocumentoAdministrativo
 
 
-class DiarioOficialIndex(CelerySearchIndex, Indexable):
-    model = DiarioOficial
+class DocumentoAdministrativoIndex(CelerySearchIndex, Indexable):
+    model = DocumentoAdministrativo
     data = DateTimeField(model_attr='data', null=True)
-    ano = IntegerField(model_attr='ano')
-
+    at = IntegerField(model_attr='workspace_id', null=True)
+    ano = IntegerField(model_attr='ano', null=True)
     text = TextExtractField(
         document=True, use_template=True,
         model_attr=(
-            ('descricao', 'string_extractor'),
-            ('arquivo', 'file_extractor'),
+            ('texto_integral', 'file_extractor'),
+            ('assunto', 'string_extractor'),
+            ('observacao', 'string_extractor'),
         )
     )
 

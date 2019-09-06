@@ -99,7 +99,11 @@ class TextExtractField(CharField):
             value = getattr(obj, attr)
             if not value:
                 continue
-            data += getattr(self, func)(value) + '  '
+
+            if callable(value):
+                data += getattr(self, func)(value()) + '  '
+            else:
+                data += getattr(self, func)(value) + '  '
 
         data = data.replace('\n', ' ')
 
@@ -119,6 +123,8 @@ class TextExtractField(CharField):
 class DocumentoAcessorioIndex(CelerySearchIndex, Indexable):
     model = DocumentoAcessorio
     data = DateTimeField(model_attr='data', null=True)
+    ano = IntegerField(model_attr='ano')
+
     text = TextExtractField(
         document=True, use_template=True,
         model_attr=(

@@ -160,6 +160,11 @@ class SessaoPlenaria(models.Model):
     tema_solene = models.TextField(
         blank=True, max_length=500, verbose_name=_('Tema da Sessão Solene'))
 
+    data_ultima_atualizacao = models.DateTimeField(
+        blank=True, null=True,
+        auto_now=True,
+        verbose_name=_('Data'))
+
     class Meta:
         verbose_name = _('Sessão Plenária')
         verbose_name_plural = _('Sessões Plenárias')
@@ -240,6 +245,10 @@ class SessaoPlenaria(models.Model):
                                  force_update=force_update,
                                  using=using,
                                  update_fields=update_fields)
+
+    @property
+    def ano(self):
+        return self.data_inicio.year
 
 
 @reversion.register()

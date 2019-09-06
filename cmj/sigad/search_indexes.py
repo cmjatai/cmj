@@ -1,6 +1,6 @@
 from celery_haystack.indexes import CelerySearchIndex
 from haystack.constants import Indexable
-from haystack.fields import CharField, DateField, DateTimeField
+from haystack.fields import CharField, DateTimeField, IntegerField
 
 from cmj.sigad.models import Documento
 from sapl.base.search_indexes import TextExtractField
@@ -27,6 +27,8 @@ class SigadTextExtractField(TextExtractField):
 class DocumentoIndex(CelerySearchIndex, Indexable):
     model = Documento
     data = DateTimeField(model_attr='public_date')
+    ano = IntegerField(model_attr='ano')
+
     text = SigadTextExtractField(
         document=True, use_template=True
     )
