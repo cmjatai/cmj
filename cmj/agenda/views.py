@@ -102,7 +102,10 @@ class EventoCrud(Crud):
                 if evento.caracteristica == Evento.FERIADO:
                     cal[(dia_pos) // 7][(dia_pos) % 7]['destaque'] = True
 
-                cal[(dia_pos) // 7][(dia_pos) % 7]['eventos'].insert(0, evento)
+                linha = (dia_pos - (7 if primeiro_dia.weekday()
+                                    == 6 else 0)) // 7  # - (1 primeiro_dia)
+                coluna = (dia_pos) % 7
+                cal[linha][coluna]['eventos'].insert(0, evento)
 
             linha_inicial = cal[0][::-1]
             for i, dia in enumerate(linha_inicial):
