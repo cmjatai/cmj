@@ -3,24 +3,21 @@
 {% load crispy_forms_tags %}
 
 {% block actions %}
-  <div class="actions btn-group float-right" role="group">
-    {% if USE_SOLR %}
-        <a href="{% url 'sapl.base:haystack_search' %}" class="btn btn-outline-primary">
-          Pesquisa Textual
-        </a>
+  <div class="actions btn-group" role="group">
+    <a href="{% url 'sapl.base:haystack_search' %}?q=&models=norma.normajuridica" class="btn btn-outline-primary">
+      Pesquisa Textual
+    </a>
+    {% if show_results %}
+        <a href="{% url 'sapl.norma:norma_pesquisa' %}" class="btn btn-outline-primary">{% trans 'Fazer nova pesquisa' %}</a>
     {% endif %}
-
-
+  </div>
+  <div class="actions btn-group-lg" role="group">
     {% if perms.norma.add_normajuridica %}
       <a href="{% url 'sapl.norma:normajuridica_create' %}" class="btn btn-outline-primary">
         {% blocktrans with verbose_name=view.verbose_name %} Adicionar Norma Jurídica {% endblocktrans %}
       </a>
     {% endif %}
-  {% if show_results %}
-      <a href="{% url 'sapl.norma:norma_pesquisa' %}" class="btn btn-outline-primary">{% trans 'Fazer nova pesquisa' %}</a>
-  {% endif %}
   </div>
-  <br /><br />
 {% endblock %}
 
 {% block detail_content %}
@@ -30,14 +27,9 @@
 
   {% if show_results %}
     {% if page_obj|length %}
-      <br />
-      {% if page_obj|length > 1 %}
-        <h3 style="text-align:right;">Pesquisa concluída com sucesso! Foram encontradas {{paginator.count}} normas.</h3>
-      {% elif page_obj|length == 1 %}
-        <h3 style="text-align:right;">{% trans 'Pesquisa concluída com sucesso! Foi encontrada 1 norma.'%}</h3>
-      {% endif %}
-      <br />
-      <table class="table table-striped">
+      <div class="container-table">
+      <div class="result-count">Total de Normas: <strong>{{paginator.count}}</strong></div>
+      <table class="table table-striped table-hover table-link-ordering">
     		<thead class="thead-default">
           <tr>
             <th>Tipo</th>
@@ -84,6 +76,7 @@
     			</tr>
     		{% endfor %}
     	</table>
+      </div>
       {% include "paginacao.html" %}
     {% else  %}
       <br /><br />

@@ -3,21 +3,23 @@
 
 {% block base_content %}
 
-<div class="context-actions clearfix">
-
-  <div class="actions search">
-    {% if form %}
+<div class="context-actions justify-content-between">
+  {% if form %}
+    <div class="actions search">
       {% crispy form %}
-    {% endif %}
-  </div>
+    </div>
+  {% endif %}
   {% block actions %}
+    <div class="actions btn-group btn-group" role="group">
+      {% block more_buttons_left %}{% endblock more_buttons_left %}
+    </div>
     <div class="actions btn-group btn-group-lg" role="group">
-      {% if view.create_url %}
-      <a href="{{ view.create_url }}" class="btn btn-outline-primary">
-        {% blocktrans with verbose_name=view.verbose_name %} Adicionar {{ verbose_name }} {% endblocktrans %}
-      </a>
-      {% endif %}
       {% block more_buttons %}{% endblock more_buttons %}
+      {% if view.create_url %}
+        <a href="{{ view.create_url }}" class="btn btn-outline-primary">
+          {% blocktrans with verbose_name=view.verbose_name %} Adicionar {{ verbose_name }} {% endblocktrans %}
+        </a>
+      {% endif %}
     </div>
   {% endblock actions %}
 </div>

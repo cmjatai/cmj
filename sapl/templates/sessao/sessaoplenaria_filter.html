@@ -10,6 +10,9 @@
     {% endif %}
     </a>
   </div>
+  {% block more_buttons %}
+    <a href="{% url 'sapl.base:haystack_search' %}?q=&models=sessao.sessaoplenaria" class="btn btn-outline-primary">{% trans 'Pesquisa Textual' %}</a>
+  {% endblock more_buttons %}
 {% endblock %}
 
 {% block detail_content %}
