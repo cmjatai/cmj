@@ -44,12 +44,12 @@
     .numero {
       font-size: 300%;
       font-weight: bold;
-      color: rgba($color_topo_bg, 0.1);
+      color: rgba($color_topo_bg, 0.09);
       position: absolute;
       right: 10px;
       line-height: 1;
       padding: 5px;
-      bottom: 0px;
+      top: 0px;
     }
     .dia-out {
       .numero {
