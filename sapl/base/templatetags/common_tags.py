@@ -238,7 +238,16 @@ def youtube_url(value):
     value = value.lower()
     youtube_pattern = "^((https?://)?(www\.)?youtube\.com\/watch\?v=)"
     r = re.findall(youtube_pattern, value)
-    return True if r else False
+
+    if r:
+        return True
+
+    youtube_p2 = "^((https?://)?(www\.)?youtu\.be\/)"
+    r = re.findall(youtube_p2, value)
+    if r:
+        return True
+
+    return False
 
 
 @register.filter
@@ -256,6 +265,7 @@ def youtube_id(value):
     quer_v = parse_qs(u_pars.query).get('v')
     if quer_v:
         return quer_v[0]
+    return u_pars.path[1:]
     return ''
 
 
