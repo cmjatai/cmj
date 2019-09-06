@@ -6,16 +6,31 @@
 {% block sections_nav %} {% endblock %}
 
 {% block actions %}
-  <div class="actions">
-    <div class="btn-search btn-segmentos">
-      <form method="get" action="{% url 'cmj.core:haystack_search'%}?q=&models=protocoloadm.documentoadministrativo">
-            <input type="search" name="q" placeholder="Busca Textual" class="textinput textInput form-control" id="id_q" />
-            <button  class="button" type="submit"value="">
-              <i class="fas fa-search"></i>
-            </button>
-      </form>
-    </div>
+  <div class="actions btn-group" role="group">
+    {% comment "" %}
+      <div class="container-search">
+        <form method="get" action="{% url 'cmj.core:haystack_search'%}?q=&models=protocoloadm.documentoadministrativo">
+          <div class="row">
+            <div class="col-md-12"> 
+              <div class="form-group">
+                <div class="input-group">
+                  <input type="search" name="q" placeholder="Busca Textual" type="search" class="textinput textInput form-control" id="id_q" />
+                  <span class="input-group-append">
+                    <button  class="btn btn-outline-primary" type="submit">
+                      <i class="fas fa-2x fa-search"></i>
+                    </button>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
 
+    {% endcomment %}
+    <a href="{% url 'sapl.base:haystack_search' %}?q=&models=protocoloadm.documentoadministrativo" class="btn btn-outline-primary">
+      Pesquisa Textual
+    </a>
     {% if show_results %}
       <a href="{% url 'sapl.protocoloadm:pesq_doc_adm' %}" class="btn btn-outline-primary">{% trans 'Pesquisa Parametrizada' %}</a>
     {% endif %}
@@ -36,7 +51,7 @@
       {% if page_obj|length %}
 
       <div class="container-table">
-        <div class="result-count">Total de Normas: <strong>{{paginator.count}}</strong></div>
+        <div class="result-count">Total de Documentos: <strong>{{paginator.count}}</strong></div>
         <table class="table table-striped table-hover table-link-ordering">
     	
         {% for d in page_obj %}

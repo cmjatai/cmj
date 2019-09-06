@@ -11,7 +11,6 @@ from django.forms.widgets import CheckboxSelectMultiple
 from django.utils.translation import ugettext_lazy as _
 import django_filters
 
-from sapl.settings import MAX_DOC_UPLOAD_SIZE
 from sapl.base.models import Autor, TipoAutor
 from sapl.crispy_layout_mixin import SaplFormHelper
 from sapl.crispy_layout_mixin import form_actions, to_row, SaplFormLayout
@@ -19,6 +18,7 @@ from sapl.materia.forms import MateriaLegislativaFilterSet
 from sapl.materia.models import (MateriaLegislativa, StatusTramitacao,
                                  TipoMateriaLegislativa)
 from sapl.parlamentares.models import Parlamentar, Mandato
+from sapl.settings import MAX_DOC_UPLOAD_SIZE
 from sapl.utils import (RANGE_DIAS_MES, RANGE_MESES,
                         MateriaPesquisaOrderingFilter, autor_label,
                         autor_modal, timezone, choice_anos_com_sessaoplenaria,
@@ -150,23 +150,21 @@ class SessaoPlenariaForm(FileFieldCheckMixin, ModelForm):
                                           "entre a data de início e fim tanto da "
                                           "Legislatura quanto da Sessão Legislativa.")
 
-
         upload_pauta = self.cleaned_data.get('upload_pauta', False)
         upload_ata = self.cleaned_data.get('upload_ata', False)
         upload_anexo = self.cleaned_data.get('upload_anexo', False)
 
         if upload_pauta and upload_pauta.size > MAX_DOC_UPLOAD_SIZE:
-            raise ValidationError("O arquivo Pauta da Sessão deve ser menor que {0:.1f} mb, o tamanho atual desse arquivo é {1:.1f} mb" \
-                .format((MAX_DOC_UPLOAD_SIZE/1024)/1024, (upload_pauta.size/1024)/1024))
-        
+            raise ValidationError("O arquivo Pauta da Sessão deve ser menor que {0:.1f} mb, o tamanho atual desse arquivo é {1:.1f} mb"
+                                  .format((MAX_DOC_UPLOAD_SIZE / 1024) / 1024, (upload_pauta.size / 1024) / 1024))
+
         if upload_ata and upload_ata.size > MAX_DOC_UPLOAD_SIZE:
-            raise ValidationError("O arquivo Ata da Sessão deve ser menor que {0:.1f} mb, o tamanho atual desse arquivo é {1:.1f} mb" \
-                .format((MAX_DOC_UPLOAD_SIZE/1024)/1024, (upload_ata.size/1024)/1024))
-        
+            raise ValidationError("O arquivo Ata da Sessão deve ser menor que {0:.1f} mb, o tamanho atual desse arquivo é {1:.1f} mb"
+                                  .format((MAX_DOC_UPLOAD_SIZE / 1024) / 1024, (upload_ata.size / 1024) / 1024))
+
         if upload_anexo and upload_anexo.size > MAX_DOC_UPLOAD_SIZE:
-            raise ValidationError("O arquivo Anexo da Sessão deve ser menor que {0:.1f} mb, o tamanho atual desse arquivo é {1:.1f} mb" \
-                .format((MAX_DOC_UPLOAD_SIZE/1024)/1024, (upload_anexo.size/1024)/1024))
-        
+            raise ValidationError("O arquivo Anexo da Sessão deve ser menor que {0:.1f} mb, o tamanho atual desse arquivo é {1:.1f} mb"
+                                  .format((MAX_DOC_UPLOAD_SIZE / 1024) / 1024, (upload_anexo.size / 1024) / 1024))
 
         return self.cleaned_data
 
@@ -600,13 +598,13 @@ class OradorForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         sessao = SessaoPlenaria.objects.get(id=kwargs['initial']['id_sessao'])
-        parlamentares_ativos = Parlamentar.objects.filter(ativo=True).order_by('nome_parlamentar')
+        parlamentares_ativos = Parlamentar.objects.filter(
+            ativo=True).order_by('nome_parlamentar')
         for p in parlamentares_ativos:
             if verifica_afastamento_parlamentar(p, sessao.data_inicio, sessao.data_fim):
                 parlamentares_ativos = parlamentares_ativos.exclude(id=p.id)
-        
+
         self.fields['parlamentar'].queryset = parlamentares_ativos
-             
 
     def clean(self):
         super(OradorForm, self).clean()
@@ -631,8 +629,8 @@ class OradorForm(ModelForm):
         upload_anexo = self.cleaned_data.get('upload_anexo', False)
 
         if upload_anexo and upload_anexo.size > MAX_DOC_UPLOAD_SIZE:
-            raise ValidationError("O arquivo Anexo do Orador deve ser menor que {0:.1f} mb, o tamanho atual desse arquivo é {1:.1f} mb" \
-                .format((MAX_DOC_UPLOAD_SIZE/1024)/1024, (upload_anexo.size/1024)/1024))
+            raise ValidationError("O arquivo Anexo do Orador deve ser menor que {0:.1f} mb, o tamanho atual desse arquivo é {1:.1f} mb"
+                                  .format((MAX_DOC_UPLOAD_SIZE / 1024) / 1024, (upload_anexo.size / 1024) / 1024))
 
         return self.cleaned_data
 
@@ -647,12 +645,13 @@ class OradorExpedienteForm(ModelForm):
         id_sessao = int(self.initial['id_sessao'])
         sessao = SessaoPlenaria.objects.get(id=id_sessao)
         legislatura_vigente = sessao.legislatura
-        
-        parlamentares_ativos = Parlamentar.objects.filter(ativo=True).order_by('nome_parlamentar')
+
+        parlamentares_ativos = Parlamentar.objects.filter(
+            ativo=True).order_by('nome_parlamentar')
         for p in parlamentares_ativos:
             if verifica_afastamento_parlamentar(p, sessao.data_inicio, sessao.data_fim):
                 parlamentares_ativos = parlamentares_ativos.exclude(id=p.id)
-        
+
         self.fields['parlamentar'].queryset = parlamentares_ativos
 
     def clean(self):
@@ -676,8 +675,8 @@ class OradorExpedienteForm(ModelForm):
         upload_anexo = self.cleaned_data.get('upload_anexo', False)
 
         if upload_anexo and upload_anexo.size > MAX_DOC_UPLOAD_SIZE:
-            raise ValidationError("O arquivo Anexo do Orador deve ser menor que {0:.1f} mb, o tamanho atual desse arquivo é {1:.1f} mb" \
-                .format((MAX_DOC_UPLOAD_SIZE/1024)/1024, (upload_anexo.size/1024)/1024))
+            raise ValidationError("O arquivo Anexo do Orador deve ser menor que {0:.1f} mb, o tamanho atual desse arquivo é {1:.1f} mb"
+                                  .format((MAX_DOC_UPLOAD_SIZE / 1024) / 1024, (upload_anexo.size / 1024) / 1024))
 
         return self.cleaned_data
 
@@ -719,8 +718,8 @@ class OradorOrdemDiaForm(ModelForm):
         upload_anexo = self.cleaned_data.get('upload_anexo', False)
 
         if upload_anexo and upload_anexo.size > MAX_DOC_UPLOAD_SIZE:
-            raise ValidationError("O arquivo Anexo do Orador deve ser menor que {0:.1f} mb, o tamanho atual desse arquivo é {1:.1f} mb" \
-                .format((MAX_DOC_UPLOAD_SIZE/1024)/1024, (upload_anexo.size/1024)/1024))
+            raise ValidationError("O arquivo Anexo do Orador deve ser menor que {0:.1f} mb, o tamanho atual desse arquivo é {1:.1f} mb"
+                                  .format((MAX_DOC_UPLOAD_SIZE / 1024) / 1024, (upload_anexo.size / 1024) / 1024))
 
         return self.cleaned_data
 
@@ -823,8 +822,8 @@ class JustificativaAusenciaForm(ModelForm):
         upload_anexo = self.cleaned_data.get('upload_anexo', False)
 
         if upload_anexo and upload_anexo.size > MAX_DOC_UPLOAD_SIZE:
-            raise ValidationError("O arquivo Anexo de Justificativa deve ser menor que {0:.1f} mb, o tamanho atual desse arquivo é {1:.1f} mb" \
-                .format((MAX_DOC_UPLOAD_SIZE/1024)/1024, (upload_anexo.size/1024)/1024))
+            raise ValidationError("O arquivo Anexo de Justificativa deve ser menor que {0:.1f} mb, o tamanho atual desse arquivo é {1:.1f} mb"
+                                  .format((MAX_DOC_UPLOAD_SIZE / 1024) / 1024, (upload_anexo.size / 1024) / 1024))
 
         if not sessao_plenaria.finalizada or sessao_plenaria.finalizada is None:
             raise ValidationError(

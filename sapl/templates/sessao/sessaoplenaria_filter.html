@@ -3,16 +3,18 @@
 {% load crispy_forms_tags %}
 
 {% block actions %}
-  <div class="actions btn-group float-right" role="group">
+  <div class="actions btn-group" role="group">
+  {% block more_buttons %}
+    <a href="{% url 'sapl.base:haystack_search' %}?q=&models=sessao.sessaoplenaria" class="btn btn-outline-primary">{% trans 'Pesquisa Textual' %}</a>
+  {% endblock more_buttons %}
+  </div>
+  <div class="actions btn-group btn-group-lg" role="group">
     {% if perms.sessao %}
       <a href="{% url 'sapl.sessao:sessaoplenaria_create' %}" class="btn btn-outline-primary">
         {% blocktrans with verbose_name=view.verbose_name %} Adicionar Sessão Plenária {% endblocktrans %}
     {% endif %}
     </a>
   </div>
-  {% block more_buttons %}
-    <a href="{% url 'sapl.base:haystack_search' %}?q=&models=sessao.sessaoplenaria" class="btn btn-outline-primary">{% trans 'Pesquisa Textual' %}</a>
-  {% endblock more_buttons %}
 {% endblock %}
 
 {% block detail_content %}
