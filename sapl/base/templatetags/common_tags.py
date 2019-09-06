@@ -3,8 +3,8 @@ import re
 
 from django import template
 from django.template.defaultfilters import stringfilter
-from django.utils.safestring import mark_safe
 from django.utils import timezone
+from django.utils.safestring import mark_safe
 from webpack_loader import utils
 
 from sapl.base.models import AppConfig
@@ -12,6 +12,7 @@ from sapl.materia.models import DocumentoAcessorio, MateriaLegislativa, Proposic
 from sapl.norma.models import NormaJuridica
 from sapl.parlamentares.models import Filiacao
 from sapl.utils import filiacao_data, SEPARADOR_HASH_PROPOSICAO
+
 
 register = template.Library()
 
@@ -239,6 +240,7 @@ def youtube_url(value):
     r = re.findall(youtube_pattern, value)
     return True if r else False
 
+
 @register.filter
 def facebook_url(value):
     value = value.lower()
@@ -246,12 +248,15 @@ def facebook_url(value):
     r = re.findall(facebook_pattern, value)
     return True if r else False
 
+
 @register.filter
 def youtube_id(value):
     from urllib.parse import urlparse, parse_qs
     u_pars = urlparse(value)
-    quer_v = parse_qs(u_pars.query).get('v')[0]
-    return quer_v
+    quer_v = parse_qs(u_pars.query).get('v')
+    if quer_v:
+        return quer_v[0]
+    return ''
 
 
 @register.filter
@@ -272,12 +277,14 @@ def cronometro_to_seconds(value):
 def duration_to_seconds(cronometro_duration):
     return cronometro_duration.seconds
 
+
 @register.filter
 def duration_difference(cronometro_duration, last_time):
-    difference_to_now = timezone.now()-last_time
+    difference_to_now = timezone.now() - last_time
     if difference_to_now < cronometro_duration:
-        return (cronometro_duration-difference_to_now).seconds
+        return (cronometro_duration - difference_to_now).seconds
     return cronometro_duration.seconds
+
 
 @register.filter
 def to_list_pk(object_list):
@@ -334,12 +341,11 @@ def render_chunk_vendors(extension=None):
         return mark_safe('\n'.join(tags))
     except:
         return ''
-    
-   
+
+
 @register.filter(is_safe=True)
-@stringfilter 
+@stringfilter
 def dont_break_out(value):
     _safe = '<div class="dont-break-out">{}</div>'.format(value)
     _safe = mark_safe(_safe)
-    return _safe    
-
+    return _safe

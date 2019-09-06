@@ -1,7 +1,6 @@
 
 import logging
 
-from sapl.crispy_layout_mixin import SaplFormHelper
 from crispy_forms.layout import Fieldset, Layout
 from django import forms
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
@@ -13,6 +12,7 @@ from django.utils.translation import ugettext_lazy as _
 import django_filters
 
 from sapl.base.models import Autor, TipoAutor
+from sapl.crispy_layout_mixin import SaplFormHelper
 from sapl.crispy_layout_mixin import form_actions, to_row
 from sapl.materia.forms import choice_anos_com_materias
 from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa
@@ -50,13 +50,16 @@ class NormaFilterSet(django_filters.FilterSet):
         label=_('Pesquisar expressões na ementa da norma'))
 
     apelido = django_filters.CharFilter(lookup_expr='icontains',
-                                          label=_('Apelido'))
+                                        label=_('Apelido'))
 
     indexacao = django_filters.CharFilter(lookup_expr='icontains',
                                           label=_('Indexação'))
 
     assuntos = django_filters.ModelChoiceFilter(
         queryset=AssuntoNorma.objects.all())
+
+    vigencia = django_filters.BooleanFilter(
+        label='Vigência', method='filter_vigencia')
 
     o = NormaPesquisaOrderingFilter(help_text='')
 
@@ -71,7 +74,7 @@ class NormaFilterSet(django_filters.FilterSet):
         row1 = to_row([('tipo', 4), ('numero', 4), ('ano', 4)])
         row2 = to_row([('ementa', 6), ('assuntos', 6)])
         row3 = to_row([('data', 6), ('data_publicacao', 6)])
-        row4 = to_row([('data_vigencia', 12)])
+        row4 = to_row([('data_vigencia', 10), ('vigencia', 2)])
         row5 = to_row([('o', 4), ('indexacao', 4), ('apelido', 4)])
 
         self.form.helper = SaplFormHelper()
@@ -89,6 +92,16 @@ class NormaFilterSet(django_filters.FilterSet):
             q &= Q(ementa__icontains=t)
 
         return queryset.filter(q)
+
+    def filter_vigencia(self, queryset, name, value):
+        data_atual = timezone.now()
+        if value:
+            queryset = queryset.filter(
+                Q(data_vigencia__lt=data_atual) | Q(data_vigencia__isnull=True))
+        else:
+            queryset = queryset.filter(data_vigencia__gt=data_atual)
+
+        return queryset
 
 
 class NormaJuridicaForm(FileFieldCheckMixin, ModelForm):
@@ -138,12 +151,12 @@ class NormaJuridicaForm(FileFieldCheckMixin, ModelForm):
                   'assuntos',
                   'norma_de_destaque',
                   'apelido',
-                  'user', 
+                  'user',
                   'ip']
-                  
+
         widgets = {'assuntos': widgets.CheckboxSelectMultiple,
-                    'user': forms.HiddenInput(),
-                    'ip': forms.HiddenInput()}
+                   'user': forms.HiddenInput(),
+                   'ip': forms.HiddenInput()}
 
     def clean(self):
 
@@ -207,8 +220,8 @@ class NormaJuridicaForm(FileFieldCheckMixin, ModelForm):
         texto_integral = self.cleaned_data.get('texto_integral', False)
 
         if texto_integral and texto_integral.size > MAX_DOC_UPLOAD_SIZE:
-            raise ValidationError("O arquivo Texto Integral deve ser menor que {0:.1f} mb, o tamanho atual desse arquivo é {1:.1f} mb" \
-                .format((MAX_DOC_UPLOAD_SIZE/1024)/1024, (texto_integral.size/1024)/1024))
+            raise ValidationError("O arquivo Texto Integral deve ser menor que {0:.1f} mb, o tamanho atual desse arquivo é {1:.1f} mb"
+                                  .format((MAX_DOC_UPLOAD_SIZE / 1024) / 1024, (texto_integral.size / 1024) / 1024))
 
         return texto_integral
 
@@ -283,15 +296,15 @@ class AnexoNormaJuridicaForm(FileFieldCheckMixin, ModelForm):
 
     def clean(self):
         cleaned_data = super(AnexoNormaJuridicaForm, self).clean()
-        
+
         if not self.is_valid():
             return cleaned_data
-        
+
         anexo_arquivo = self.cleaned_data.get('anexo_arquivo', False)
 
         if anexo_arquivo and anexo_arquivo.size > MAX_DOC_UPLOAD_SIZE:
-            raise ValidationError("O Arquivo Anexo deve ser menor que {0:.1f} mb, o tamanho atual desse arquivo é {1:.1f} mb" \
-                .format((MAX_DOC_UPLOAD_SIZE/1024)/1024, (anexo_arquivo.size/1024)/1024))
+            raise ValidationError("O Arquivo Anexo deve ser menor que {0:.1f} mb, o tamanho atual desse arquivo é {1:.1f} mb"
+                                  .format((MAX_DOC_UPLOAD_SIZE / 1024) / 1024, (anexo_arquivo.size / 1024) / 1024))
 
         return cleaned_data
 
@@ -427,7 +440,9 @@ class NormaPesquisaSimplesForm(forms.Form):
                 raise ValidationError(_('Caso pesquise por data, os campos de Data Inicial e '
                                         'Data Final devem ser preenchidos obrigatoriamente'))
             elif data_inicial > data_final:
-                self.logger.error("Data Final ({}) menor que a Data Inicial ({}).".format(data_final, data_inicial))
-                raise ValidationError(_('A Data Final não pode ser menor que a Data Inicial'))
+                self.logger.error("Data Final ({}) menor que a Data Inicial ({}).".format(
+                    data_final, data_inicial))
+                raise ValidationError(
+                    _('A Data Final não pode ser menor que a Data Inicial'))
 
         return cleaned_data
