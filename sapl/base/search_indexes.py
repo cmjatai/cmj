@@ -100,7 +100,8 @@ class TextExtractField(CharField):
             if not value:
                 continue
 
-            if callable(value):
+            # if callable(value):
+            if type(value) is type(self.extract_data):
                 data += getattr(self, func)(value()) + '  '
             else:
                 data += getattr(self, func)(value) + '  '
