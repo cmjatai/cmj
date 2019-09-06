@@ -1,13 +1,18 @@
 {% load i18n %}
 <div class="col-lg-4 d-flex flex-column mt-4 pt-2 pl-lg-1">
 
-  <div class="btn-search btn-segmentos">
+  <div class="btn-segmentos btn-search">
     <form method="get" action="{% url 'cmj.core:haystack_search'%}">
+      <div class="inner">
+        <div class="item-form">
           <input type="search" name="q" placeholder="Busca Textual" class="textinput textInput form-control" id="id_q" />
-          
+        </div>
+        <div class="item-form">
           <button  class="button" type="submit"value="">
             <i class="fas fa-search"></i>
           </button>
+        </div>
+      </div>
     </form>
   </div>
      
