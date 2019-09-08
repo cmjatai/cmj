@@ -189,7 +189,7 @@ class Command(BaseCommand):
                             if now - init > timedelta(minutes=9):
                                 return
                             self.logger.info('Aguardando...')
-                            sleep(10)
+                            sleep(2)
                             self.logger.info('Seguindo...')
 
             self.models = list(filter(lambda x: x['count'] != 0, self.models))
@@ -209,7 +209,7 @@ class Command(BaseCommand):
 
             if r is None:
                 return None
-            if not r:
+            if not r or r == 6:
                 return True
         except:
             return False
