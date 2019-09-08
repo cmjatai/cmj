@@ -642,6 +642,11 @@ class AreaTrabalhoManager(models.Manager):
         qs = qs.filter(tipo=30, ativo=True)
         return qs
 
+    def areatrabalho_publica(self):
+        qs = self.get_queryset()
+        qs = qs.filter(tipo=99, ativo=True)
+        return qs
+
 
 class AreaTrabalho(CmjAuditoriaModelMixin):
 
@@ -650,12 +655,14 @@ class AreaTrabalho(CmjAuditoriaModelMixin):
     TIPO_GABINETE = 10
     TIPO_ADMINISTRATIVO = 20
     TIPO_INSTITUCIONAL = 30
+    TIPO_PUBLICO = 99
 
     TIPO_AREATRABALHO_CHOICE = CmjChoices(
         (TIPO_GABINETE, 'tipo_gabinete', _('Gabinete Parlamentar')),
         (TIPO_ADMINISTRATIVO, 'tipo_administrativo',
          _('Setor Administrativo')),
         (TIPO_INSTITUCIONAL, 'tipo_institucional', _('Institucional')),
+        (TIPO_PUBLICO, 'tipo_publico', _('Documentos Públicos')),
     )
 
     nome = models.CharField(max_length=100, blank=True, default='',
