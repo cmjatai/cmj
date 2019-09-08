@@ -7,6 +7,7 @@ import subprocess
 import threading
 from time import sleep
 
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.management.base import BaseCommand
 from django.db.models.signals import post_delete, post_save
@@ -110,6 +111,7 @@ class Command(BaseCommand):
         init = datetime.now()
 
         # Refaz tudo que foi feito a mais de um ano
+
         OcrMyPDF.objects.filter(
             created__lt=init - timedelta(days=365)).delete()
 
@@ -117,6 +119,9 @@ class Command(BaseCommand):
         OcrMyPDF.objects.filter(
             created__lt=init - timedelta(days=30),
             sucesso=False).delete()
+
+        if settings.DEBUG:
+            OcrMyPDF.objects.all().delete()
 
         while self.models:
 
@@ -209,7 +214,7 @@ class Command(BaseCommand):
 
             if r is None:
                 return None
-            if not r or r == 6:
+            if not r or r in (2, 6):
                 return True
         except:
             return False
