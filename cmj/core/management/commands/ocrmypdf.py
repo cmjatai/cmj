@@ -206,7 +206,15 @@ class Command(BaseCommand):
         # arquivos digitais
         # force-ocr só pode ser usado se outro teste verificar antes que um
         # documento não possui assinatura digital
-        cmd = ["ocrmypdf",  "--deskew",  "-l por", file.path, file.path]
+
+        # temporario
+        cmd = ["ocrmypdf",  "--deskew",  "-l por",
+               "--force-ocr", file.path, file.path]
+
+        if isinstance(item, DocumentoAcessorio):
+            if item.tipo_id == 1:
+                cmd = ["ocrmypdf",  "--deskew",
+                       "-l por", file.path, file.path]
 
         try:
             p = ProcessOCR(' '.join(cmd), self.logger)
