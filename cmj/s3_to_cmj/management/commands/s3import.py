@@ -20,8 +20,10 @@ def _get_registration_key(model):
 
 class Command(BaseCommand):
     migrate_files = False
+    model_unico = ''
 
     def add_arguments(self, parser):
+        parser.add_argument('model_unico', nargs='?', type=str, default='')
         parser.add_argument('f', nargs='?', type=bool, default=False)
 
     def handle(self, *args, **options):
@@ -32,6 +34,7 @@ class Command(BaseCommand):
         post_save.disconnect(dispatch_uid='cmj_post_save_signal')
         # self.clear()
 
+        self.model_unico = options['model_unico']
         self.migrate_files = options['f']
 
         self.run()
@@ -51,6 +54,9 @@ class Command(BaseCommand):
             DocumentoAdministrativo,
             DocumentoAcessorioAdministrativo,
         ]:
+            if self.model_unico and not isinstance(model, str) and model._meta.model_name != self.model_unico:
+                continue
+
             erros = self.migrar_docs_por_ids(model)
 
         for e in erros:
@@ -97,6 +103,10 @@ class Command(BaseCommand):
             # uso específico - nao migra nada fora daqui
             # if item['name'] not in ('_parecerprocuradoria', '_tipoparecer'):
             #    continue
+
+            # se model_unico colocado na linha de comando migra apenas ele
+            if self.model_unico and item['s31_model']._meta.model_name != self.model_unico:
+                continue
 
             if item['s30_model'] is None:
                 continue

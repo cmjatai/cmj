@@ -10,6 +10,7 @@ class Command(s3import.Command):
 
     def add_arguments(self, parser):
         parser.add_argument('sync', nargs='?', type=float, default=None)
+        parser.add_argument('model_unico', nargs='?', type=str, default='')
         parser.add_argument('f', nargs='?', type=bool, default=False)
 
     def handle(self, *args, **options):
@@ -23,6 +24,7 @@ class Command(s3import.Command):
         # post_save.disconnect(cmj_post_save_signal)
 
         self.sync = options['sync']
+        self.model_unico = options['model_unico']
         self.migrate_files = options['f']
 
         self.run()
