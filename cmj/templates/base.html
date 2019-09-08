@@ -132,7 +132,7 @@
                     <a href="#linkMenu" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Acessar" %}<span class="caret"></span></a>
                     <ul class="dropdown-menu">
                     
-                      <li><a href="https://www.jatai.go.leg.br{% url 'cmj.core:login' %}">{% trans "Portal" %}</a></li>
+                      <li><a href="{% url 'cmj.core:login' %}">{% trans "Portal" %}</a></li>
                       
                       <li class=" text-right">
                         <a href="#linkMenu"  role="button" aria-haspopup="true" aria-expanded="false">{% trans "Intranet" %}<span class="caret"></span></a>
@@ -331,7 +331,7 @@
     
   </script>
 
-  {% if not DEBUG %}
+  {% if not DEBUG and 'www.' in site_url %}
     <script>
       window.fbAsyncInit = function () {
         FB.init({

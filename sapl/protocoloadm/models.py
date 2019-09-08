@@ -207,8 +207,12 @@ class DocumentoAdministrativo(models.Model):
         verbose_name_plural = _('Documentos Administrativos')
 
     def __str__(self):
-        return _('%(tipo)s - %(assunto)s') % {
-            'tipo': self.tipo, 'assunto': self.assunto
+        return _('%(sigla)s - %(tipo)s %(numero)s/%(ano)s (%(interessado)s) ') % {
+            'sigla': self.tipo.sigla,
+            'tipo': self.tipo,
+            'numero': self.numero,
+            'ano': self.ano,
+            'interessado': self.interessado
         }
 
     @property

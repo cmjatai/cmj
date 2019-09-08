@@ -265,7 +265,12 @@ def render_bundle(bundle_name, extension=None, config='DEFAULT', attrs=''):
 
 
 @register.simple_tag
-def settings_key(var_name):
+def settings_key_tag(var_name):
+    return getattr(settings, var_name)
+
+
+@register.filter
+def settings_key_filter(var_name):
     return getattr(settings, var_name)
 
 

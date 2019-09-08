@@ -45,6 +45,9 @@ class CmjSearchForm(ModelSearchForm):
         for i, v in enumerate(choices):
             if v[0] == 'sigad.documento':
                 choices[i] = (v[0], _('Notícias'))
+            elif v[0] == 'materia.documentoacessorio':
+                choices[i] = (
+                    v[0], _('Documentos Acessórios vinculados a Matérias Legislativas'))
             elif v[0] == 'protocoloadm.documentoadministrativo':
                 if not self.workspace:
                     choices[i] = (None, None)

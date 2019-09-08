@@ -19,17 +19,19 @@
         </div>
       {% endif %}
       <div class="row btns-login">
-          {% for backend in backends.backends %}
-            <div class="col-lg-6">
-            <a class="btn-login" id="{{ backend }}-button" name="{{ backend }}"
-              title = "{% blocktrans with backend_name=backend|social_title %}Acessar com {{ backend_name }}{% endblocktrans %}"
-              href="{% url 'social:begin' backend=backend %}?next={{view.get_success_url}}">
-              
-              <i class="fab {{ backend|social_icon }}"></i>
-              {% blocktrans with backend_name=backend|social_title %}Continuar com {{ backend_name }}{% endblocktrans %}
-            </a>    
-          </div>
-          {% endfor %}
+          {% if 'www.' in site_url%}
+            {% for backend in backends.backends %}
+              <div class="col-lg-6">
+              <a class="btn-login" id="{{ backend }}-button" name="{{ backend }}"
+                title = "{% blocktrans with backend_name=backend|social_title %}Acessar com {{ backend_name }}{% endblocktrans %}"
+                href="{% url 'social:begin' backend=backend %}?next={{view.get_success_url}}">
+                
+                <i class="fab {{ backend|social_icon }}"></i>
+                {% blocktrans with backend_name=backend|social_title %}Continuar com {{ backend_name }}{% endblocktrans %}
+              </a>    
+            </div>
+            {% endfor %}
+          {% endif %}
       </div>
 
       <div class="btns-login box-entry">
@@ -42,9 +44,11 @@
             <span class="fa fa-key fa-2x "></span>
             {{ form.password }}
         </div>
-        <div class="row-recovery">
-          <a class="btn btn-link btn-recovery" href="{% url 'cmj.core:recuperar_senha_email' %}" />{% trans "Esqueci minha Senha" %}</a>
-        </div>
+        {% if 'www.' in site_url%}
+          <div class="row-recovery">
+            <a class="btn btn-link btn-recovery" href="{% url 'cmj.core:recuperar_senha_email' %}" />{% trans "Esqueci minha Senha" %}</a>
+          </div>
+        {% endif %}
         <button class="btn-login" type="submit" value="login" />{% trans "ENTRAR" %}</button>
       </div>
 
