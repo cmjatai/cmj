@@ -197,9 +197,11 @@ class Command(BaseCommand):
     def run(self, item, fstr):
 
         file = getattr(item, fstr)
-
-        cmd = ["ocrmypdf",  "--deskew",  "--redo-ocr",
-               "-l por", file.path, file.path]
+        # não usar --force-ocr pois invalida as assinaturas digitais em
+        # arquivos digitais
+        # force-ocr só pode ser usado se outro teste verificar antes que um
+        # documento não possui assinatura digital
+        cmd = ["ocrmypdf",  "--deskew",  "-l por", file.path, file.path]
 
         try:
             p = ProcessOCR(' '.join(cmd), self.logger)
@@ -207,31 +209,22 @@ class Command(BaseCommand):
 
             if r is None:
                 return None
-
-            if not r or r == 6:  # 6 = resposta para pdf que já possui texto
+            if not r:
                 return True
         except:
             return False
-        return False
 
-    def run_old(self, item, fstr):
-
-        file = getattr(item, fstr)
-
-        cmd = ["ocrmypdf",  "--deskew", file.path, file.path]
+        # redo-ocr é excelente para execuções no futuro
+        # mas não funciona no servidores atuais de 32 bits
+        """cmd = ["ocrmypdf", "--redo-ocr", "-l por", file.path, file.path]
         try:
-            proc = subprocess.run(
-                cmd,
-                timeout=60,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT)
-            result = proc.stdout
-            if proc.returncode == 6:
-                #print("Skipped document because it already contained text")
-                pass
-            elif proc.returncode == 0:
-                #print("OCR complete")
+            p = ProcessOCR(' '.join(cmd), self.logger)
+            r = p.run(timeout=300)
+
+            if r is None:
+                return None
+            if not r or r == 6:
                 return True
         except:
-            pass
-        return False
+            return False
+        return False"""
