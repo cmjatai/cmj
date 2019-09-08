@@ -198,7 +198,8 @@ class Command(BaseCommand):
 
         file = getattr(item, fstr)
 
-        cmd = ["ocrmypdf",  "--deskew", file.path, file.path]
+        cmd = ["ocrmypdf",  "--deskew",  "--redo-ocr",
+               "-l por", file.path, file.path]
 
         try:
             p = ProcessOCR(' '.join(cmd), self.logger)
