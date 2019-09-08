@@ -199,7 +199,11 @@ def migrar_docs_por_ids(model, sync=None, check=False):
                 temp.write(request.data)
                 temp.flush()
 
-                ct = request.getheaders()['Content-Type']
+                headers = request.getheaders()
+                if 'contentType' in headers:
+                    ct = headers['contentType']
+                else:
+                    ct = headers['Content-Type']
                 print(item.pk, ct, campo, item)
 
                 try:
