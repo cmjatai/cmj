@@ -215,6 +215,7 @@ class Command(BaseCommand):
             if item.tipo_id == 1:
                 cmd = ["ocrmypdf",  "--deskew",
                        "-l por", file.path, file.path]
+                # remove --force-ocr se for do tipo "Parecer Técnico"
 
         try:
             p = ProcessOCR(' '.join(cmd), self.logger)

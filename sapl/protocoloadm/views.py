@@ -857,17 +857,15 @@ class PesquisarDocumentoAdministrativoView(DocumentoAdministrativoMixin,
         return qs
 
     def get_filterset_kwargs(self, filterset_class):
-        super(PesquisarDocumentoAdministrativoView,
-              self).get_filterset_kwargs(filterset_class)
+        kwargs = super(PesquisarDocumentoAdministrativoView,
+                       self).get_filterset_kwargs(filterset_class)
 
-        kwargs = {'data': self.request.GET or None}
-
-        status_tramitacao = self.request.GET.get(
+        status_tramitacao = kwargs['request'].GET.get(
             'tramitacaoadministrativo__status')
-        unidade_destino = self.request.GET.get(
+        unidade_destino = kwargs['request'].GET.get(
             'tramitacaoadministrativo__unidade_tramitacao_destino')
 
-        qs = self.get_queryset()
+        qs = kwargs['queryset']
 
         qs = qs.prefetch_related("documentoacessorioadministrativo_set",
                                  "tramitacaoadministrativo_set",
@@ -894,6 +892,7 @@ class PesquisarDocumentoAdministrativoView(DocumentoAdministrativoMixin,
 
         kwargs.update({
             'queryset': qs,
+            'workspace': self.request.user.areatrabalho_set.first()
         })
         return kwargs
 

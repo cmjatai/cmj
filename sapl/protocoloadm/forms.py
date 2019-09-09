@@ -201,7 +201,12 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
                   'tramitacaoadministrativo__status']
 
     def __init__(self, *args, **kwargs):
+        workspace = kwargs.pop('workspace')
+
         super(DocumentoAdministrativoFilterSet, self).__init__(*args, **kwargs)
+
+        self.form.fields['tipo'].queryset = TipoDocumentoAdministrativo.objects.filter(
+            workspace=workspace)
 
         local_atual = 'tramitacaoadministrativo__unidade_tramitacao_destino'
         self.filters['tipo'].label = 'Tipo de Documento'
