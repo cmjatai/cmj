@@ -205,7 +205,7 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
 
         super(DocumentoAdministrativoFilterSet, self).__init__(*args, **kwargs)
 
-        self.form.fields['tipo'].queryset = TipoDocumentoAdministrativo.objects.filter(
+        self.filters['tipo'].queryset = TipoDocumentoAdministrativo.objects.filter(
             workspace=workspace)
 
         local_atual = 'tramitacaoadministrativo__unidade_tramitacao_destino'
