@@ -1017,8 +1017,9 @@ class OverwriteStorage(FileSystemStorage):
     def save(self, name, content, max_length=None):
         prod_name = FileSystemStorage.save(
             self, name, content, max_length=max_length)
-        return FileSystemStorage.save(
+        FileSystemStorage.save(
             self, 'original__%s' % prod_name, content, max_length=max_length)
+        return prod_name
 
 
 def verifica_afastamento_parlamentar(parlamentar, data_inicio, data_fim=None):
