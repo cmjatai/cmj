@@ -54,14 +54,15 @@
                                 <tr>
                                     <td>
                                         <input type="checkbox" name="documento_id" value="{{documento.id}}" {% if check %} checked {% endif %}/>
-                                        <a href="{% url 'sapl_index' %}docadm/{{documento.pk}}">{{documento.tipo.sigla}} {{documento.numero}}/{{documento.ano}} - {{documento.tipo.descricao}}</a>                                        
+                                        <a href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' documento.id %}">{{documento.tipo.sigla}} {{documento.numero}}/{{documento.ano}} - {{documento.tipo.descricao}}</a>                                        
                                     </td>
                                 </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </fieldset>
-                <input type="submit" value="Salvar" class="btn btn-primary"S>
+                <a href="{% url 'sapl.protocoloadm:anexado_list' object.id %}" class="btn btn-inverse">Cancelar</a>
+                
             </form>
             <br/>
         {% else %}

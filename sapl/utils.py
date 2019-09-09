@@ -1006,10 +1006,19 @@ class OverwriteStorage(FileSystemStorage):
     mesmo nome que foram carregados pelo usuário ao invés de renomeá-los.
     '''
 
-    def get_available_name(self, name, max_length=None):
+    """def get_available_name(self, name, max_length=None):
         if self.exists(name):
             os.remove(os.path.join(settings.MEDIA_ROOT, name))
-        return name
+        return name"""
+
+    """def delete(self, name):
+        FileSystemStorage.delete(self, name)"""
+
+    def save(self, name, content, max_length=None):
+        prod_name = FileSystemStorage.save(
+            self, name, content, max_length=max_length)
+        return FileSystemStorage.save(
+            self, 'original__%s' % prod_name, content, max_length=max_length)
 
 
 def verifica_afastamento_parlamentar(parlamentar, data_inicio, data_fim=None):

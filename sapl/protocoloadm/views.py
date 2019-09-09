@@ -956,14 +956,23 @@ class AnexadoCrud(MasterDetailCrud):
     class CreateView(MasterDetailCrud.CreateView):
         form_class = AnexadoForm
 
+        def get_initial(self):
+            initial = super().get_initial()
+
+            initial['workspace'] = self.request.user.areatrabalho_set.first()
+            return initial
+
     class UpdateView(MasterDetailCrud.UpdateView):
         form_class = AnexadoForm
 
         def get_initial(self):
-            initial = super(UpdateView, self).get_initial()
+            initial = super().get_initial()
             initial['tipo'] = self.object.documento_anexado.tipo.id
             initial['numero'] = self.object.documento_anexado.numero
             initial['ano'] = self.object.documento_anexado.ano
+
+            initial['workspace'] = self.request.user.areatrabalho_set.first()
+
             return initial
 
     class DetailView(MasterDetailCrud.DetailView):
@@ -977,6 +986,23 @@ class DocumentoAnexadoEmLoteView(PermissionRequiredMixin, FilterView):
     filterset_class = AnexadoEmLoteFilterSet
     template_name = 'protocoloadm/em_lote/anexado.html'
     permission_required = ('protocoloadm.add_anexado', )
+
+    @property
+    def cancel_url(self):
+        return reverse('sapl.protocoloadm:anexado_list', kwargs={
+            'pk': self.kwargs['pk']})
+
+    @property
+    def is_contained(self):
+        return True
+
+    def get_filterset_kwargs(self, filterset_class):
+        kwargs = FilterView.get_filterset_kwargs(self, filterset_class)
+
+        kwargs.update({
+            'workspace': self.request.user.areatrabalho_set.first()
+        })
+        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super(

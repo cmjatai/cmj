@@ -236,8 +236,7 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
                 ('tramitacaoadministrativo__unidade_tramitacao_destino', 6),
             ])
 
-        buttons = FormActions(
-            *[
+        """            *[
                 HTML('''
                     <div class="form-check">
                         <input name="relatorio" type="checkbox" class="form-check-input" id="relatorio">
@@ -245,6 +244,8 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
                     </div>
                 ''')
             ],
+            """
+        buttons = FormActions(
             Submit('pesquisar', _('Pesquisar'), css_class='float-right',
                    onclick='return true;'),
             css_class='form-group row justify-content-between',
@@ -961,7 +962,13 @@ class AnexadoForm(ModelForm):
     ano = forms.CharField(label='Ano', required=True)
 
     def __init__(self, *args, **kwargs):
-        return super(AnexadoForm, self).__init__(*args, **kwargs)
+
+        workspace = kwargs['initial'].pop('workspace')
+
+        super().__init__(*args, **kwargs)
+
+        self.fields['tipo'].queryset = TipoDocumentoAdministrativo.objects.filter(
+            workspace=workspace)
 
     def clean(self):
         super(AnexadoForm, self).clean()
@@ -984,10 +991,12 @@ class AnexadoForm(ModelForm):
                 "Tentando obter objeto DocumentoAdministrativo (numero={}, ano={}, tipo={})."
                 .format(cleaned_data['numero'], cleaned_data['ano'], cleaned_data['tipo'])
             )
-            documento_anexado = DocumentoAdministrativo.objects.get(
+            documento_anexado = DocumentoAdministrativo.objects.filter(
                 numero=cleaned_data['numero'],
                 ano=cleaned_data['ano'],
-                tipo=cleaned_data['tipo']
+
+                tipo=cleaned_data['tipo'],
+                workspace=self.instance.documento_principal.workspace
             )
         except ObjectDoesNotExist:
             msg = _('O {} {}/{} não existe no cadastro de documentos administrativos.'
@@ -1055,7 +1064,13 @@ class AnexadoEmLoteFilterSet(django_filters.FilterSet):
         fields = ['tipo', 'data']
 
     def __init__(self, *args, **kwargs):
+
+        workspace = kwargs.pop('workspace')
+
         super(AnexadoEmLoteFilterSet, self).__init__(*args, **kwargs)
+
+        self.filters['tipo'].queryset = TipoDocumentoAdministrativo.objects.filter(
+            workspace=workspace)
 
         self.filters['tipo'].label = 'Tipo de Documento*'
         self.filters['data'].label = 'Data (Inicial - Final)*'
@@ -1065,9 +1080,11 @@ class AnexadoEmLoteFilterSet(django_filters.FilterSet):
 
         self.form.helper = SaplFormHelper()
         self.form.helper.form_method = 'GET'
-        self.form.helper.layout = Layout(
+        self.form.helper.layout = SaplFormLayout(
             Fieldset(_('Pesquisa de Documentos'),
-                     row1, row2, form_actions(label='Pesquisar'))
+                     row1, row2, ),
+
+            save_label=_('Pesquisar')
         )
 
 

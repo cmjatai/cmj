@@ -4,7 +4,7 @@ import reversion
 
 from cmj.utils import texto_upload_path
 from sapl.norma.models import NormaJuridica
-from sapl.utils import restringe_tipos_de_arquivo_txt
+from sapl.utils import restringe_tipos_de_arquivo_txt, OverwriteStorage
 
 
 @reversion.register()
@@ -44,6 +44,7 @@ class DiarioOficial(models.Model):
         blank=True,
         null=True,
         upload_to=diario_upload_path,
+        storage=OverwriteStorage(),
         verbose_name=_('Arquivo Digital do Diário'),
         validators=[restringe_tipos_de_arquivo_txt])
 
