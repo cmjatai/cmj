@@ -120,8 +120,8 @@ class Command(BaseCommand):
             created__lt=init - timedelta(days=30),
             sucesso=False).delete()
 
-        if settings.DEBUG:
-            OcrMyPDF.objects.all().delete()
+        """if settings.DEBUG:
+            OcrMyPDF.objects.all().delete()"""
 
         while self.models:
 
