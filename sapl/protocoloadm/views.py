@@ -1323,7 +1323,7 @@ class DocumentoAcessorioAdministrativoCrud(MasterDetailCrud):
     class DetailView(MasterDetailCrud.DetailView):
 
         def hook_arquivo(self, obj, fieldname):
-            url = obj.arquivo
+            url = obj.url_arquivo
             a = '<a href="%s">%s</a>' % (
                 url,
                 obj.arquivo.name.split('/')[-1]

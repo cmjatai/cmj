@@ -715,6 +715,8 @@ def generic_relations_for_model(model):
 
 def texto_upload_path(instance, filename, subpath='', pk_first=False):
     """
+    update materia_materialegislativa set texto_original = regexp_replace(texto_original, '^sapl/public/', '', 'ig');
+
     O path gerado por essa função leva em conta a pk de instance.
     isso não é possível naturalmente em uma inclusão pois a implementação
     do django framework chama essa função antes do metodo save
