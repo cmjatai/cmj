@@ -26,7 +26,7 @@ from sapl.api.permissions import SaplModelPermissions
 from sapl.api.serializers import ChoiceSerializer
 from sapl.base.models import Autor
 from sapl.materia.models import Proposicao, TipoMateriaLegislativa,\
-    MateriaLegislativa, Tramitacao
+    MateriaLegislativa, Tramitacao, DocumentoAcessorio
 from sapl.norma.models import NormaJuridica
 from sapl.parlamentares.models import Parlamentar
 from sapl.protocoloadm.models import DocumentoAdministrativo,\
@@ -393,6 +393,106 @@ class _ProposicaoViewSet():
         return qs
 
 
+class ResponseFileMixin:
+
+    def response_file(self, request, *args, **kwargs):
+        item = self.get_queryset().filter(pk=kwargs['pk']).first()
+
+        if not item:
+            raise NotFound
+
+        if not hasattr(item, self.action):
+            raise NotFound
+
+        arquivo = getattr(item, self.action)
+        if not arquivo:
+            raise NotFound
+
+        mime = get_mime_type_from_file_extension(arquivo.name)
+
+        response = HttpResponse(content_type='%s' % mime)
+        response['Content-Disposition'] = (
+            'inline; filename="%s"' % arquivo.name.split('/')[-1])
+
+        original = 'original__' if 'original' in request.GET else ''
+        response['X-Accel-Redirect'] = "/media/{0}{1}".format(
+            original,
+            arquivo.name
+        )
+
+        return response
+
+
+class DocumentoAdministrativoPermission(SaplModelPermissions):
+    def has_permission(self, request, view):
+        if request.user.is_anonymous():
+            raise PermissionDenied()
+
+        if not request.user.areatrabalho_set.filter(ativo=True).exists():
+            raise PermissionDenied(
+                detail=_(
+                    '%s, você pertence a nenhuma '
+                    'Área de Trabalho ativa' % request.user))
+        return super().has_permission(request, view)
+
+
+class ControlAccessFileForContainerMixin(ResponseFileMixin):
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        params = {
+            self.container_field: self.request.user
+        }
+        qs = qs.filter(**params)
+        return qs
+
+
+@customize(TipoDocumentoAdministrativo)
+class _TipoDocumentoAdministrativoViewSet(ControlAccessFileForContainerMixin):
+    container_field = 'workspace__operadores'
+    permission_classes = (DocumentoAdministrativoPermission, )
+
+
+@customize(DocumentoAdministrativo)
+class _DocumentoAdministrativoViewSet(ControlAccessFileForContainerMixin):
+    container_field = 'workspace__operadores'
+    permission_classes = (DocumentoAdministrativoPermission, )
+
+    @action(detail=True)
+    def texto_integral(self, request, *args, **kwargs):
+        return self.response_file(request, *args, **kwargs)
+
+
+@customize(DocumentoAcessorioAdministrativo)
+class _DocumentoAcessorioAdministrativoViewSet(ControlAccessFileForContainerMixin):
+    container_field = 'documento__workspace__operadores'
+    permission_classes = (DocumentoAdministrativoPermission, )
+
+    @action(detail=True)
+    def arquivo(self, request, *args, **kwargs):
+        return self.response_file(request, *args, **kwargs)
+
+
+@customize(TramitacaoAdministrativo)
+class _TramitacaoAdministrativoViewSet(ControlAccessFileForContainerMixin):
+    container_field = 'documento__workspace__operadores'
+    permission_classes = (DocumentoAdministrativoPermission, )
+
+
+@customize(Anexado)
+class _AnexadoViewSet(ControlAccessFileForContainerMixin):
+    container_field = 'documento__workspace__operadores'
+    permission_classes = (DocumentoAdministrativoPermission, )
+
+
+@customize(DocumentoAcessorio)
+class _DocumentoAcessorioViewSet(ResponseFileMixin):
+
+    @action(detail=True)
+    def arquivo(self, request, *args, **kwargs):
+        return self.response_file(request, *args, **kwargs)
+
+
 @customize(MateriaLegislativa)
 class _MateriaLegislativaViewSet:
 
@@ -432,93 +532,6 @@ class _TipoMateriaLegislativaViewSet:
                 TipoMateriaLegislativa.objects.reposicione(pk, d['pos_fim'])
 
         return Response(result)
-
-
-class DocAdmMixin:
-
-    class DocumentoAdministrativoPermission(SaplModelPermissions):
-        def has_permission(self, request, view):
-            if request.user.is_anonymous():
-                raise PermissionDenied()
-
-            if not request.user.areatrabalho_set.filter(ativo=True).exists():
-                raise PermissionDenied(
-                    detail=_(
-                        '%s, você pertence a nenhuma '
-                        'Área de Trabalho ativa' % request.user))
-            return super().has_permission(request, view)
-
-    permission_classes = (DocumentoAdministrativoPermission, )
-
-    def get_queryset(self):
-        qs = super().get_queryset()
-
-        params = {
-            self.container_field: self.request.user
-        }
-        qs = qs.filter(**params)
-
-        return qs
-
-    def response_file(self, request, *args, **kwargs):
-        item = self.get_queryset().filter(pk=kwargs['pk']).first()
-
-        if not item:
-            raise NotFound
-
-        if not hasattr(item, self.action):
-            raise NotFound
-
-        arquivo = getattr(item, self.action)
-        if not arquivo:
-            raise NotFound
-
-        mime = get_mime_type_from_file_extension(arquivo.name)
-
-        response = HttpResponse(content_type='%s' % mime)
-        response['Content-Disposition'] = (
-            'inline; filename="%s"' % arquivo.name.split('/')[-1])
-
-        original = 'original__' if 'original' in request.GET else ''
-        response['X-Accel-Redirect'] = "/media/{0}{1}".format(
-            original,
-            arquivo.name
-        )
-
-        return response
-
-
-@customize(TipoDocumentoAdministrativo)
-class _TipoDocumentoAdministrativoViewSet(DocAdmMixin):
-    container_field = 'workspace__operadores'
-
-
-@customize(DocumentoAdministrativo)
-class _DocumentoAdministrativoViewSet(DocAdmMixin):
-    container_field = 'workspace__operadores'
-
-    @action(detail=True)
-    def texto_integral(self, request, *args, **kwargs):
-        return self.response_file(request, *args, **kwargs)
-
-
-@customize(DocumentoAcessorioAdministrativo)
-class _DocumentoAcessorioAdministrativoViewSet(DocAdmMixin):
-    container_field = 'documento__workspace__operadores'
-
-    @action(detail=True)
-    def arquivo(self, request, *args, **kwargs):
-        return self.response_file(request, *args, **kwargs)
-
-
-@customize(TramitacaoAdministrativo)
-class _TramitacaoAdministrativoViewSet(DocAdmMixin):
-    container_field = 'documento__workspace__operadores'
-
-
-@customize(Anexado)
-class _AnexadoViewSet(DocAdmMixin):
-    container_field = 'documento__workspace__operadores'
 
 
 @customize(SessaoPlenaria)

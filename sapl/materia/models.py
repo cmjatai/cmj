@@ -1,10 +1,12 @@
 
+from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models.functions import Concat
 from django.template import defaultfilters
+from django.urls.base import reverse
 from django.utils import formats, timezone
 from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices
@@ -15,13 +17,13 @@ from sapl.comissoes.models import Comissao, Reuniao
 from sapl.compilacao.models import (PerfilEstruturalTextoArticulado,
                                     TextoArticulado)
 from sapl.parlamentares.models import Parlamentar
-#from sapl.protocoloadm.models import Protocolo
 from sapl.utils import (RANGE_ANOS, YES_NO_CHOICES, SaplGenericForeignKey,
                         SaplGenericRelation, restringe_tipos_de_arquivo_txt,
                         texto_upload_path, get_settings_auth_user_model,
                         OverwriteStorage)
 
 
+#from sapl.protocoloadm.models import Protocolo
 EM_TRAMITACAO = [(1, 'Sim'),
                  (0, 'Não')]
 
@@ -551,6 +553,14 @@ class DocumentoAcessorio(models.Model):
         blank=True, null=True,
         auto_now=True,
         verbose_name=_('Data'))
+
+    @property
+    def url_arquivo(self):
+        if settings.DEBUG:
+            return self.arquivo.url
+        return '%s' % reverse(
+            'sapl.api:%s-%s' % (self._meta.model_name, 'arquivo'),
+            kwargs={'pk': self.pk})
 
     @property
     def ano(self):
