@@ -120,8 +120,8 @@ class Command(BaseCommand):
             created__lt=init - timedelta(days=30),
             sucesso=False).delete()
 
-        """if settings.DEBUG:
-            OcrMyPDF.objects.all().delete()"""
+        if settings.DEBUG:
+            OcrMyPDF.objects.all().delete()
 
         while self.models:
 
@@ -145,7 +145,7 @@ class Command(BaseCommand):
                             # possui meta ocr anterior,
                             # testa se o arq é mais recente que último ocr
                             # feito
-                            t = os.path.getmtime(file.path)
+                            t = os.path.getmtime(file.path) - 86400
                             date_file = datetime.fromtimestamp(t, timezone.utc)
 
                             if date_file <= ocr.created:
@@ -194,7 +194,9 @@ class Command(BaseCommand):
                             if now - init > timedelta(minutes=9):
                                 return
                             self.logger.info('Aguardando...')
+                            print('Aguardando...')
                             sleep(2)
+                            print('Seguindo...')
                             self.logger.info('Seguindo...')
 
             self.models = list(filter(lambda x: x['count'] != 0, self.models))
@@ -207,7 +209,13 @@ class Command(BaseCommand):
         # force-ocr só pode ser usado se outro teste verificar antes que um
         # documento não possui assinatura digital
 
-        cmd = ["ocrmypdf",  "--deskew",  "-l por", file.path, file.path]
+        #cmd = ["ocrmypdf",  "--deskew",  "-l por", file.path, file.path]
+
+        o_path = file.path.replace('media/sapl/', 'media/original__sapl/')
+        print(o_path)
+        print(file.path)
+
+        cmd = ["ocrmypdf", "--deskew", "-l por", o_path, file.path]
 
         try:
             p = ProcessOCR(' '.join(cmd), self.logger)

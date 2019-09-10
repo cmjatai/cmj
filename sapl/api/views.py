@@ -478,8 +478,13 @@ class DocAdmMixin:
         response = HttpResponse(content_type='%s' % mime)
         response['Content-Disposition'] = (
             'inline; filename="%s"' % arquivo.name.split('/')[-1])
-        response['X-Accel-Redirect'] = "/media/{0}".format(
-            arquivo.name)
+
+        original = 'original__' if 'original' in request.GET else ''
+        response['X-Accel-Redirect'] = "/media/{0}{1}".format(
+            original,
+            arquivo.name
+        )
+
         return response
 
 
