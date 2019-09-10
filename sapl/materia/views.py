@@ -1786,7 +1786,7 @@ class MateriaLegislativaCrud(Crud):
         template_name = "materia/materialegislativa_detail.html"
 
         def hook_texto_original(self, obj, fieldname):
-            url = obj.texto_original
+            url = obj.url_texto_original
             a = '<a href="%s">%s</a>' % (
                 url,
                 obj.texto_original.name.split('/')[-1])
