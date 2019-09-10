@@ -423,7 +423,7 @@ class ResponseFileMixin:
         return response
 
 
-class DocumentoAdministrativoPermission(SaplModelPermissions):
+class ContainerPermission(SaplModelPermissions):
     def has_permission(self, request, view):
         if request.user.is_anonymous():
             raise PermissionDenied()
@@ -450,13 +450,13 @@ class ControlAccessFileForContainerMixin(ResponseFileMixin):
 @customize(TipoDocumentoAdministrativo)
 class _TipoDocumentoAdministrativoViewSet(ControlAccessFileForContainerMixin):
     container_field = 'workspace__operadores'
-    permission_classes = (DocumentoAdministrativoPermission, )
+    permission_classes = (ContainerPermission, )
 
 
 @customize(DocumentoAdministrativo)
 class _DocumentoAdministrativoViewSet(ControlAccessFileForContainerMixin):
     container_field = 'workspace__operadores'
-    permission_classes = (DocumentoAdministrativoPermission, )
+    permission_classes = (ContainerPermission, )
 
     @action(detail=True)
     def texto_integral(self, request, *args, **kwargs):
@@ -466,7 +466,7 @@ class _DocumentoAdministrativoViewSet(ControlAccessFileForContainerMixin):
 @customize(DocumentoAcessorioAdministrativo)
 class _DocumentoAcessorioAdministrativoViewSet(ControlAccessFileForContainerMixin):
     container_field = 'documento__workspace__operadores'
-    permission_classes = (DocumentoAdministrativoPermission, )
+    permission_classes = (ContainerPermission, )
 
     @action(detail=True)
     def arquivo(self, request, *args, **kwargs):
@@ -476,13 +476,13 @@ class _DocumentoAcessorioAdministrativoViewSet(ControlAccessFileForContainerMixi
 @customize(TramitacaoAdministrativo)
 class _TramitacaoAdministrativoViewSet(ControlAccessFileForContainerMixin):
     container_field = 'documento__workspace__operadores'
-    permission_classes = (DocumentoAdministrativoPermission, )
+    permission_classes = (ContainerPermission, )
 
 
 @customize(Anexado)
 class _AnexadoViewSet(ControlAccessFileForContainerMixin):
     container_field = 'documento__workspace__operadores'
-    permission_classes = (DocumentoAdministrativoPermission, )
+    permission_classes = (ContainerPermission, )
 
 
 @customize(DocumentoAcessorio)
@@ -494,7 +494,11 @@ class _DocumentoAcessorioViewSet(ResponseFileMixin):
 
 
 @customize(MateriaLegislativa)
-class _MateriaLegislativaViewSet:
+class _MateriaLegislativaViewSet(ResponseFileMixin):
+
+    @action(detail=True)
+    def texto_original(self, request, *args, **kwargs):
+        return self.response_file(request, *args, **kwargs)
 
     @action(detail=True, methods=['GET'])
     def ultima_tramitacao(self, request, *args, **kwargs):
