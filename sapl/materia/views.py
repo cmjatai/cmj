@@ -956,7 +956,7 @@ class ProposicaoCrud(Crud):
             dict_objeto_antigo = objeto_antigo.__dict__
 
             tipo_texto = self.request.POST.get('tipo_texto', '')
-            if tipo_texto=='D' and objeto_antigo.texto_articulado.exists() or tipo_texto=='T' and not objeto_antigo.texto_articulado.exists():
+            if tipo_texto == 'D' and objeto_antigo.texto_articulado.exists() or tipo_texto == 'T' and not objeto_antigo.texto_articulado.exists():
                 self.object.user = self.request.user
                 self.object.ip = get_client_ip(self.request)
                 self.object.ultima_edicao = tz.localize(datetime.now())
@@ -977,7 +977,7 @@ class ProposicaoCrud(Crud):
                     self.object.ultima_edicao = tz.localize(datetime.now())
                     self.object.save()
                     break
-            
+
             return super().form_valid(form)
 
         def _action_is_valid(self, request, *args, **kwargs):
@@ -1038,7 +1038,7 @@ class ProposicaoCrud(Crud):
 
             initial['user'] = self.request.user
             initial['ip'] = get_client_ip(self.request)
-            
+
             tz = timezone.get_current_timezone()
             initial['ultima_edicao'] = tz.localize(datetime.now())
 
@@ -1465,6 +1465,15 @@ class DocumentoAcessorioCrud(MasterDetailCrud):
             context = super(UpdateView, self).get_context_data(**kwargs)
             return context
 
+    class DetailView(MasterDetailCrud.DetailView):
+
+        def hook_arquivo(self, obj, fieldname):
+            url = obj.url_arquivo
+            a = '<a href="%s">%s</a>' % (
+                url,
+                obj.arquivo.name.split('/')[-1])
+            return obj.arquivo.field.verbose_name, a
+
 
 class AutoriaCrud(MasterDetailCrud):
     model = Autoria
@@ -1775,6 +1784,13 @@ class MateriaLegislativaCrud(Crud):
 
         layout_key = 'MateriaLegislativaDetail'
         template_name = "materia/materialegislativa_detail.html"
+
+        def hook_texto_original(self, obj, fieldname):
+            url = obj.url_arquivo
+            a = '<a href="%s">%s</a>' % (
+                url,
+                obj.arquivo.name.split('/')[-1])
+            return obj.arquivo.field.verbose_name, a
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
@@ -2168,8 +2184,8 @@ class DocumentoAcessorioEmLoteView(PermissionRequiredMixin, FilterView):
 
         if request.FILES['arquivo'].size > MAX_DOC_UPLOAD_SIZE:
             msg = _("O arquivo Anexo de Texto Integral deve ser menor que {0:.1f} MB, \
-                o tamanho atual desse arquivo é {1:.1f} MB" \
-                .format((MAX_DOC_UPLOAD_SIZE/1024)/1024, (request.FILES['arquivo'].size/1024)/1024))
+                o tamanho atual desse arquivo é {1:.1f} MB"
+                    .format((MAX_DOC_UPLOAD_SIZE / 1024) / 1024, (request.FILES['arquivo'].size / 1024) / 1024))
             messages.add_message(request, messages.ERROR, msg)
             return self.get(request, self.kwargs)
 
@@ -2360,7 +2376,6 @@ class PrimeiraTramitacaoEmLoteView(PermissionRequiredMixin, FilterView):
 
     logger = logging.getLogger(__name__)
 
-
     def get_context_data(self, **kwargs):
         context = super(PrimeiraTramitacaoEmLoteView,
                         self).get_context_data(**kwargs)
@@ -2382,8 +2397,8 @@ class PrimeiraTramitacaoEmLoteView(PermissionRequiredMixin, FilterView):
         if self.primeira_tramitacao:
             context['title'] = _('Primeira Tramitação em Lote')
             # Pega somente documentos que não possuem tramitação
-            context['object_list'] = [obj for obj in context['object_list'] 
-                                          if obj.tramitacao_set.all().count() == 0]
+            context['object_list'] = [obj for obj in context['object_list']
+                                      if obj.tramitacao_set.all().count() == 0]
         else:
             context['title'] = _('Tramitação em Lote')
             context['form'].fields['unidade_tramitacao_local'].initial = UnidadeTramitacao.objects.get(
@@ -2405,33 +2420,33 @@ class PrimeiraTramitacaoEmLoteView(PermissionRequiredMixin, FilterView):
             messages.add_message(request, messages.ERROR, msg)
             return self.get(request, self.kwargs)
 
-        form = TramitacaoEmLoteForm(request.POST, 
-                                       initial= {'materias': materias_ids,
-                                                'user': user, 'ip':ip})
+        form = TramitacaoEmLoteForm(request.POST,
+                                    initial={'materias': materias_ids,
+                                             'user': user, 'ip': ip})
 
         if form.is_valid():
             form.save()
 
             msg = _('Tramitação completa.')
-            self.logger.info('user=' + user.username + '. Tramitação completa.')
+            self.logger.info('user=' + user.username +
+                             '. Tramitação completa.')
             messages.add_message(request, messages.SUCCESS, msg)
             return self.get_success_url()
 
         return self.form_invalid(form)
 
-    
     def get_success_url(self):
         return HttpResponseRedirect(reverse('sapl.materia:primeira_tramitacao_em_lote'))
 
-
     def form_invalid(self, form, *args, **kwargs):
         for key, erros in form.errors.items():
-            if not key=='__all__':
-                [messages.add_message(self.request, messages.ERROR, form.fields[key].label + ": " + e) for e in erros]
+            if not key == '__all__':
+                [messages.add_message(
+                    self.request, messages.ERROR, form.fields[key].label + ": " + e) for e in erros]
             else:
-                [messages.add_message(self.request, messages.ERROR, e) for e in erros]
-        return self.get(self.request, kwargs, {'form':form})
-
+                [messages.add_message(self.request, messages.ERROR, e)
+                 for e in erros]
+        return self.get(self.request, kwargs, {'form': form})
 
 
 class TramitacaoEmLoteView(PrimeiraTramitacaoEmLoteView):
