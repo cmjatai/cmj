@@ -225,6 +225,24 @@ class SaplGenericRelation(GenericRelation):
         super().__init__(to, **kwargs)
 
 
+class DocPrivateClearableFileInput(ClearableFileInput):
+    class str_file:
+        def __init__(self, file, name):
+            self.file = file
+            self.url = getattr(file.instance, 'url_%s' % name)
+
+        def __str__(self):
+            return self.file.name.split('/')[-1]
+
+    def get_context(self, name, value, attrs):
+        context = ClearableFileInput.get_context(self, name, value, attrs)
+        file = context['value']
+        if file:
+            context['value'] = DocPrivateClearableFileInput.str_file(
+                file, name)
+        return context
+
+
 class ImageThumbnailFileInput(ClearableFileInput):
     template_name = 'floppyforms/image_thumbnail.html'
 

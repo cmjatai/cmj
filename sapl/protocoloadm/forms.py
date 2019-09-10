@@ -26,7 +26,8 @@ from sapl.utils import (RANGE_ANOS, YES_NO_CHOICES, AnoNumeroOrderingFilter,
                         choice_anos_com_protocolo, choice_force_optional,
                         choice_anos_com_documentoadministrativo,
                         FilterOverridesMetaMixin, choice_anos_com_materias,
-                        FileFieldCheckMixin, lista_anexados)
+                        FileFieldCheckMixin, lista_anexados,
+                        DocPrivateClearableFileInput)
 
 from .models import (AcompanhamentoDocumento, DocumentoAcessorioAdministrativo,
                      DocumentoAdministrativo,
@@ -44,24 +45,6 @@ NATUREZA_PROCESSO = [('0', 'Administrativo'),
 
 
 EM_TRAMITACAO = [(0, 'Sim'), (1, 'Não')]
-
-
-class DocPrivateClearableFileInput(ClearableFileInput):
-    class str_file:
-        def __init__(self, file, name):
-            self.file = file
-            self.url = getattr(file.instance, 'url_%s' % name)
-
-        def __str__(self):
-            return self.file.name.split('/')[-1]
-
-    def get_context(self, name, value, attrs):
-        context = ClearableFileInput.get_context(self, name, value, attrs)
-        file = context['widget']['value']
-        if file:
-            context['widget']['value'] = DocPrivateClearableFileInput.str_file(
-                file, name)
-        return context
 
 
 class AcompanhamentoDocumentoForm(ModelForm):
