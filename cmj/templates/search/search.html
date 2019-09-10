@@ -49,7 +49,7 @@
                     <br>{{result.object.ementa}}
                     <br><strong>Data de Apresentação:</strong> {{result.object.data_apresentacao}}
                     {% if result.object.texto_original %}
-                      <br><strong>Texto Original:</strong> <a href="{{result.object.texto_original.url}}"> Clique aqui </a>
+                      <br><strong>Texto Original:</strong> <a href="{{result.object.url_texto_original}}"> Clique aqui </a>
                     {% endif %}
                     {% if result.object.texto_articulado.exists %}
                       <br><strong>Texto Articulado:</strong> <a href="{% url 'sapl.materia:materia_ta' result.object.pk %}"> Clique aqui </a>

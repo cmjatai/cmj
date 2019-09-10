@@ -309,6 +309,14 @@ class MateriaLegislativa(models.Model):
             'tipo': self.tipo, 'numero': self.numero, 'ano': self.ano}
 
     @property
+    def url_texto_original(self):
+        if settings.DEBUG:
+            return self.texto_original.url
+        return '%s' % reverse(
+            'sapl.api:%s-%s' % (self._meta.model_name, 'texto_original'),
+            kwargs={'pk': self.pk})
+
+    @property
     def epigrafe(self):
         return _('%(tipo)s nº %(numero)s de %(data)s') % {
             'tipo': self.tipo,
