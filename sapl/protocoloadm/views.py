@@ -286,12 +286,6 @@ class AcompanhamentoDocumentoView(CreateView):
                        kwargs={'pk': self.kwargs['pk']})
 
 
-class DocumentoAdministrativoMixin:
-
-    def has_permission(self):
-        return super().has_permission()
-
-
 class TipoDocumentoAdministrativoCrud(Crud):
     model = TipoDocumentoAdministrativo
     help_topic = 'numeracao_docsacess'
@@ -842,8 +836,7 @@ class ProtocoloMateriaTemplateView(PermissionRequiredMixin, TemplateView):
         return context
 
 
-class PesquisarDocumentoAdministrativoView(DocumentoAdministrativoMixin,
-                                           PermissionRequiredContainerCrudMixin,
+class PesquisarDocumentoAdministrativoView(PermissionRequiredContainerCrudMixin,
                                            FilterView):
     model = DocumentoAdministrativo
     filterset_class = DocumentoAdministrativoFilterSet
@@ -1237,7 +1230,7 @@ class TramitacaoAdmCrud(MasterDetailCrud):
                 return HttpResponseRedirect(self.get_success_url())
             return super().form_valid(form)
 
-    class ListView(DocumentoAdministrativoMixin, MasterDetailCrud.ListView):
+    class ListView(MasterDetailCrud.ListView):
 
         def get_queryset(self):
             qs = super(MasterDetailCrud.ListView, self).get_queryset()
@@ -1245,8 +1238,7 @@ class TramitacaoAdmCrud(MasterDetailCrud):
             return qs.filter(**kwargs).order_by('-data_tramitacao',
                                                 '-id')
 
-    class DetailView(DocumentoAdministrativoMixin,
-                     MasterDetailCrud.DetailView):
+    class DetailView(MasterDetailCrud.DetailView):
 
         template_name = 'protocoloadm/tramitacaoadministrativo_detail.html'
 
@@ -1315,8 +1307,18 @@ class DocumentoAcessorioAdministrativoCrud(MasterDetailCrud):
     class CreateView(MasterDetailCrud.CreateView):
         form_class = DocumentoAcessorioAdministrativoForm
 
+        def get_initial(self):
+            initial = super().get_initial()
+            initial['workspace'] = self.request.user.areatrabalho_set.first()
+            return initial
+
     class UpdateView(MasterDetailCrud.UpdateView):
         form_class = DocumentoAcessorioAdministrativoForm
+
+        def get_initial(self):
+            initial = super().get_initial()
+            initial['workspace'] = self.request.user.areatrabalho_set.first()
+            return initial
 
     class DetailView(MasterDetailCrud.DetailView):
 

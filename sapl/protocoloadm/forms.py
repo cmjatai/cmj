@@ -680,6 +680,15 @@ class DocumentoAcessorioAdministrativoForm(FileFieldCheckMixin, ModelForm):
             'arquivo': DocPrivateClearableFileInput()
         }
 
+    def __init__(self, *args, **kwargs):
+
+        workspace = kwargs['initial'].pop('workspace')
+
+        super().__init__(*args, **kwargs)
+
+        self.fields['tipo'].queryset = TipoDocumentoAdministrativo.objects.filter(
+            workspace=workspace)
+
     def clean(self):
         super(DocumentoAcessorioAdministrativoForm, self).clean()
 
@@ -991,7 +1000,7 @@ class AnexadoForm(ModelForm):
                 "Tentando obter objeto DocumentoAdministrativo (numero={}, ano={}, tipo={})."
                 .format(cleaned_data['numero'], cleaned_data['ano'], cleaned_data['tipo'])
             )
-            documento_anexado = DocumentoAdministrativo.objects.filter(
+            documento_anexado = DocumentoAdministrativo.objects.get(
                 numero=cleaned_data['numero'],
                 ano=cleaned_data['ano'],
 
