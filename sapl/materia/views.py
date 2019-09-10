@@ -1786,11 +1786,11 @@ class MateriaLegislativaCrud(Crud):
         template_name = "materia/materialegislativa_detail.html"
 
         def hook_texto_original(self, obj, fieldname):
-            url = obj.url_arquivo
+            url = obj.texto_original
             a = '<a href="%s">%s</a>' % (
                 url,
-                obj.arquivo.name.split('/')[-1])
-            return obj.arquivo.field.verbose_name, a
+                obj.texto_original.name.split('/')[-1])
+            return obj.texto_original.field.verbose_name, a
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
