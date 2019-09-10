@@ -313,7 +313,7 @@ class MateriaLegislativa(models.Model):
         if settings.DEBUG:
             return self.texto_original.url
         return '%s' % reverse(
-            'sapl.api:%s-%s' % (self._meta.model_name, 'texto_original'),
+            'sapl.api:%s-%s' % (self._meta.model_name, 'texto-original'),
             kwargs={'pk': self.pk})
 
     @property
