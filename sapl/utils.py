@@ -778,13 +778,16 @@ def texto_upload_path(instance, filename, subpath='', pk_first=False):
 
     filename = re.sub('\s', '_', normalize(filename.strip()).lower())
 
-    from sapl.materia.models import Proposicao
+    from sapl.materia.models import Proposicao, MateriaLegislativa, \
+        DocumentoAcessorio
     from sapl.protocoloadm.models import DocumentoAdministrativo, \
         DocumentoAcessorioAdministrativo
 
     if isinstance(instance, (DocumentoAdministrativo,
                              Proposicao,
-                             DocumentoAcessorioAdministrativo)):
+                             DocumentoAcessorioAdministrativo,
+                             DocumentoAcessorio,
+                             MateriaLegislativa)):
         prefix = 'private'
     else:
         prefix = 'public'
