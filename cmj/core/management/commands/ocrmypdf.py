@@ -61,42 +61,49 @@ class Command(BaseCommand):
             'model': MateriaLegislativa,
             'file_field': ('texto_original',),
             'count': 0,
+            'count_base': 2,
             'order_by': '-data_apresentacao'
         },
         {
             'model': NormaJuridica,
             'file_field': ('texto_integral',),
             'count': 0,
+            'count_base': 2,
             'order_by': '-data'
         },
         {
             'model': DocumentoAcessorio,
             'file_field': ('arquivo',),
             'count': 0,
+            'count_base': 2,
             'order_by': '-data'
         },
         {
             'model': DiarioOficial,
             'file_field': ('arquivo', ),
             'count': 0,
+            'count_base': 2,
             'order_by': '-data'
         },
         {
             'model': SessaoPlenaria,
             'file_field': ('upload_pauta', 'upload_ata', 'upload_anexo'),
             'count': 0,
+            'count_base': 2,
             'order_by': '-data_inicio'
         },
         {
             'model': DocumentoAdministrativo,
             'file_field': ('texto_integral', ),
             'count': 0,
+            'count_base': 9,
             'order_by': '-data'
         },
         {
             'model': DocumentoAcessorioAdministrativo,
             'file_field': ('arquivo', ),
             'count': 0,
+            'count_base': 2,
             'order_by': '-data'
         },
     ]
@@ -132,7 +139,7 @@ class Command(BaseCommand):
                 ct = ContentType.objects.get_for_model(model['model'])
                 count = 0
                 for item in model['model'].objects.order_by(model['order_by']):
-                    if count >= 3:
+                    if count >= model['count_base']:
                         break
                     for ff in model['file_field']:
                         ocr = OcrMyPDF.objects.filter(
