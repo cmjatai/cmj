@@ -12,13 +12,22 @@
 
     <div :class="['item-body', materia.id !== undefined && materia.anexadas.length > 0 ? 'col-anexadas':'']">
       <div class="col-1-body">
+
+        <div class="status-tramitacao">
+          <div :class="['ultima_tramitacao', nivel(NIVEL2, tramitacao.ultima !== {})]">
+            <strong>Situação:</strong> {{tramitacao.status.descricao}}<br>
+            <strong>Ultima Ação:</strong> {{tramitacao.ultima.texto}}
+          </div>
+          <div :class="['observacao', nivel(NIVEL3, observacao.length > 0)]" v-html="observacao"></div>
+        </div>
+
         <div :class="['sub-containers', itensLegislacaoCitada.length === 0 ? 'd-none':'container-legis-citada']">
           <div class="title">
             <span>
               Legislação Citada
             </span>
             </div>
-          <div class="inner btn-group btn-group-sm btn-group-vertical">
+          <div class="inner">
               <button v-for="legis in itensLegislacaoCitada" :key="`legiscit${legis.id}`"
                 type="button"
                 class="btn btn-link"
@@ -29,17 +38,26 @@
               </button>
           </div>
         </div>
-        <div :class="['ultima_tramitacao', nivel(NIVEL2, tramitacao.ultima !== {})]">
-          <strong>Situação:</strong> {{tramitacao.status.descricao}}<br>
-          <strong>Ultima Ação:</strong> {{tramitacao.ultima.texto}}
+
+        <div :class="['sub-containers', nivel(NIVEL2, itensDocumentosAcessorios.length > 0), itensDocumentosAcessorios.length === 0 ? 'd-none':'container-docs-acessorios']">
+          <div class="title">
+            <span>
+              Documentos Acessórios
+            </span>
+            </div>
+          <div class="inner">
+              <a :href="docs.arquivo"  class="btn btn-link" v-for="docs in itensDocumentosAcessorios" :key="`docsacc${docs.id}`">
+                {{docs.__str__}}
+              </a>
+          </div>
         </div>
-        <div :class="['observacao', nivel(NIVEL3, observacao.length > 0)]" v-html="observacao"></div>
+
       </div>
       <div class="col-2-body">
         <div :class="['sub-containers', nivel(NIVEL2, itensAnexados.length > 0)]">
           <div class="title">
             <span>
-              MATÉRIAS ANEXADAS
+              Matérias Anexadas
             </span>
             </div>
           <div class="inner">
@@ -67,7 +85,7 @@ export default {
   data () {
     return {
       app: ['materia', 'norma'],
-      model: ['materialegislativa', 'tramitacao', 'anexada', 'autoria', 'legislacaocitada'],
+      model: ['materialegislativa', 'tramitacao', 'anexada', 'autoria', 'legislacaocitada', 'documentoacessorio'],
       materia: {},
       tramitacao: {
         ultima: {},
@@ -75,6 +93,7 @@ export default {
       },
       anexadas: {},
       legislacaocitada: {},
+      documentoacessorio: {},
       modal_legis_citada: null
     }
   },
@@ -118,6 +137,11 @@ export default {
       get () {
         return _.orderBy(this.legislacaocitada, 'norma')
       }
+    },
+    itensDocumentosAcessorios: {
+      get () {
+        return _.orderBy(this.documentoacessorio, 'data')
+      }
     }
   },
   mounted () {
@@ -143,6 +167,9 @@ export default {
         })
         .then(() => {
           t.fetchLegislacaoCitada()
+        })
+        .then(() => {
+          t.fetchDocumentoAcessorio()
         })
     },
     fetch (metadata) {
@@ -181,7 +208,30 @@ export default {
         t.fetchUltimaTramitacao(metadata)
       } else if (metadata.app === 'norma' && metadata.model === 'legislacaocitada') {
         t.fetchLegislacaoCitada()
+      } else if (metadata.app === 'materia' && metadata.model === 'documentoacessorio') {
+        t.fetchDocumentoAcessorio()
       }
+    },
+    fetchDocumentoAcessorio (page = 1) {
+      const t = this
+      const query_string = `&materia=${t.item.materia}`
+      t.utils
+        .getModelList('materia', 'documentoacessorio', page, query_string)
+        .then((response) => {
+          _.each(response.data.results, value => {
+            t.$set(t.documentoacessorio, value.id, value)
+          })
+          if (response.data.pagination.next_page !== null) {
+            t.$nextTick()
+              .then(function () {
+                t.fetchDocumentoAcessorio(response.data.pagination.next_page)
+              })
+          }
+        })
+        .catch((response) => {
+          t.sendMessage(
+            { alert: 'danger', message: 'Não foi possível recuperar a lista de Documentos Acessórios.', time: 5 })
+        })
     },
     fetchLegislacaoCitada (page = 1) {
       const t = this
@@ -257,7 +307,7 @@ export default {
 .item-de-pauta {
   position: relative;
   background-color: #ffffff55;
-  padding: 1em;
+  padding: 15px;
   margin-bottom: 1em;
   border-top: 1px solid #ccc;
 
@@ -285,49 +335,47 @@ export default {
       content: 'Grande Expediente';
     }
   }
+
   .sub-containers {
     font-size: 85%;
-    margin: 1em;
+    margin: 0 -15px 15px -15px;
 
     .title {
       border-bottom: 1px solid #5696ca;
       font-size: 130%;
-      font-weight: bold;
-      color: white;
-      display: block;
-      line-height: 1;
-      margin: 0 -1em 0.4em -1em;
+      //display: block;
+      //line-height: 1;
+      //margin: 0 -1em 0.4em -1em;
       span {
         padding: 0.35em 1em 0.15em;
-        line-height: 1;
+        //line-height: 1;
+        font-weight: bold;
+        color: white;
         background-color: #5696ca;
         display: inline-block
-
+      }
+    }
+    .inner {
+      & > .btn-link {
+        text-align: left;
+        display: inline-block;
+        width: 100%;
+        border-bottom: 1px solid #ddd;
+        color: #444;
+      }
+      & > .btn-link:not(:last-child) {
+        //border-bottom: 1px solid #ddd;
       }
     }
     .materia-pauta {
       border-bottom: 1px solid #aaa;
-      .epigrafe {
-        padding-top: 5px;
-      }
+      padding: 10px 15px 0 ;
     }
+
   }
-  .container-legis-citada {
-      //border-top: 1px solid #5696ca;
-    button {
-      text-align: left;
-    }
-  }
-
-  .item-body {
-    display: grid;
-    grid-column-gap: 1em;
-
-    &.col-anexadas {
-      grid-template-columns: auto;
-    }
-    //
-
+  .status-tramitacao {
+    font-size: 1em;
+    padding-bottom: 15px;
     .observacao {
       display: inline-block;
       border-top: 1px solid #5696ca;
@@ -340,8 +388,29 @@ export default {
       padding-top: 0.5em;
       line-height: 1.3;
     }
+
   }
 
+  .sub-containers__old {
+
+    .container-legis-citada {
+        //border-top: 1px solid #5696ca;
+      button {
+        text-align: left;
+      }
+    }
+
+    .item-body {
+      display: grid;
+      grid-column-gap: 1em;
+
+      &.col-anexadas {
+        grid-template-columns: auto;
+      }
+
+    }
+
+  }
 }
 
 @media screen and (max-width: 480px) {
