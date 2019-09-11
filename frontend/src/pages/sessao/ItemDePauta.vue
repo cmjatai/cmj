@@ -341,7 +341,7 @@ export default {
     margin: 0 -15px 15px -15px;
 
     .title {
-      border-bottom: 1px solid #5696ca;
+      border-bottom: 1px solid #9ccef7;
       font-size: 130%;
       //display: block;
       //line-height: 1;
@@ -362,9 +362,6 @@ export default {
         width: 100%;
         border-bottom: 1px solid #ddd;
         color: #444;
-      }
-      & > .btn-link:not(:last-child) {
-        //border-bottom: 1px solid #ddd;
       }
     }
     .materia-pauta {
