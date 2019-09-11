@@ -81,7 +81,7 @@
                         </br>
                     {% endif %}
               {% if d.texto_integral %}
-                <strong><a href="{{ d.url_texto_integral}}">Texto Integral</a></strong></br>
+                <strong><a href="{{ d.url}}">Texto Integral</a></strong></br>
               {% endif %}
               {% if user.is_superuser and d.tramitacao and mail_service_configured %}
                 <a href="{% url 'sapl.protocoloadm:acompanhar_documento' d.id %}">Acompanhar Documento (SUPERUPSER)</a>

@@ -12,7 +12,7 @@ from sapl.base.models import Autor
 from sapl.materia.models import TipoMateriaLegislativa, UnidadeTramitacao
 from sapl.utils import (RANGE_ANOS, YES_NO_CHOICES, texto_upload_path,
                         get_settings_auth_user_model,
-                        OverwriteStorage)
+                        OverwriteStorage, PortalFileField)
 
 
 @reversion.register()
@@ -172,7 +172,7 @@ class DocumentoAdministrativo(models.Model):
         verbose_name=_('Número Externo'))
     observacao = models.TextField(
         blank=True, verbose_name=_('Observação'))
-    texto_integral = models.FileField(
+    texto_integral = PortalFileField(
         blank=True,
         null=True,
         storage=OverwriteStorage(),
@@ -215,14 +215,6 @@ class DocumentoAdministrativo(models.Model):
             'interessado': self.interessado
         }
 
-    @property
-    def url_texto_integral(self):
-        if settings.DEBUG:
-            return self.texto_integral.url
-        return '%s' % reverse(
-            'sapl.api:%s-%s' % (self._meta.model_name, 'texto-integral'),
-            kwargs={'pk': self.pk})
-
     def delete(self, using=None, keep_parents=False):
         if self.texto_integral:
             self.texto_integral.delete()
@@ -257,7 +249,7 @@ class DocumentoAcessorioAdministrativo(models.Model):
         on_delete=models.PROTECT,
         verbose_name=_('Tipo'))
     nome = models.CharField(max_length=30, verbose_name=_('Nome'))
-    arquivo = models.FileField(
+    arquivo = PortalFileField(
         blank=True,
         null=True,
         upload_to=texto_upload_path,
@@ -276,14 +268,6 @@ class DocumentoAcessorioAdministrativo(models.Model):
 
     def __str__(self):
         return self.nome
-
-    @property
-    def url_arquivo(self):
-        if settings.DEBUG:
-            return self.arquivo.url
-        return '%s' % reverse(
-            'sapl.api:%s-%s' % (self._meta.model_name, 'arquivo'),
-            kwargs={'pk': self.pk})
 
     def delete(self, using=None, keep_parents=False):
         if self.arquivo:

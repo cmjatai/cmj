@@ -351,13 +351,6 @@ class DocumentoAdministrativoCrud(Crud):
             documento = DocumentoAdministrativo.objects.get(id=pk)
             return super(Crud.DetailView, self).get(args, kwargs)
 
-        def hook_texto_integral(self, obj, fieldname):
-            url = obj.url_texto_integral
-            a = '<a href="%s">%s</a>' % (
-                url,
-                obj.texto_integral.name.split('/')[-1])
-            return obj.texto_integral.field.verbose_name, a
-
     class DeleteView(Crud.DeleteView):
 
         def get_success_url(self):
@@ -1319,16 +1312,6 @@ class DocumentoAcessorioAdministrativoCrud(MasterDetailCrud):
             initial = super().get_initial()
             initial['workspace'] = self.request.user.areatrabalho_set.first()
             return initial
-
-    class DetailView(MasterDetailCrud.DetailView):
-
-        def hook_arquivo(self, obj, fieldname):
-            url = obj.url_arquivo
-            a = '<a href="%s">%s</a>' % (
-                url,
-                obj.arquivo.name.split('/')[-1]
-            )
-            return obj.arquivo.field.verbose_name, a
 
 
 def atualizar_numero_documento(request):

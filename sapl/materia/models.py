@@ -20,7 +20,7 @@ from sapl.parlamentares.models import Parlamentar
 from sapl.utils import (RANGE_ANOS, YES_NO_CHOICES, SaplGenericForeignKey,
                         SaplGenericRelation, restringe_tipos_de_arquivo_txt,
                         texto_upload_path, get_settings_auth_user_model,
-                        OverwriteStorage)
+                        OverwriteStorage, PortalFileField)
 
 
 #from sapl.protocoloadm.models import Protocolo
@@ -258,7 +258,7 @@ class MateriaLegislativa(models.Model):
         through_fields=(
             'materia_principal',
             'materia_anexada'))
-    texto_original = models.FileField(
+    texto_original = PortalFileField(
         blank=True,
         null=True,
         upload_to=materia_upload_path,
@@ -307,14 +307,6 @@ class MateriaLegislativa(models.Model):
     def __str__(self):
         return _('%(tipo)s nº %(numero)s de %(ano)s') % {
             'tipo': self.tipo, 'numero': self.numero, 'ano': self.ano}
-
-    @property
-    def url_texto_original(self):
-        if settings.DEBUG:
-            return self.texto_original.url
-        return '%s' % reverse(
-            'sapl.api:%s-%s' % (self._meta.model_name, 'texto-original'),
-            kwargs={'pk': self.pk})
 
     @property
     def epigrafe(self):
@@ -545,7 +537,7 @@ class DocumentoAcessorio(models.Model):
         max_length=50, blank=True, verbose_name=_('Autor'))
     ementa = models.TextField(blank=True, verbose_name=_('Ementa'))
     indexacao = models.TextField(blank=True)
-    arquivo = models.FileField(
+    arquivo = PortalFileField(
         blank=True,
         null=True,
         max_length=255,
@@ -561,14 +553,6 @@ class DocumentoAcessorio(models.Model):
         blank=True, null=True,
         auto_now=True,
         verbose_name=_('Data'))
-
-    @property
-    def url_arquivo(self):
-        if settings.DEBUG:
-            return self.arquivo.url
-        return '%s' % reverse(
-            'sapl.api:%s-%s' % (self._meta.model_name, 'arquivo'),
-            kwargs={'pk': self.pk})
 
     @property
     def ano(self):
@@ -823,7 +807,7 @@ class Proposicao(models.Model):
                                        ('R', 'Recebida'),
                                        ('I', 'Incorporada')),
                               verbose_name=_('Status Proposição'))
-    texto_original = models.FileField(
+    texto_original = PortalFileField(
         upload_to=materia_upload_path,
         blank=True,
         null=True,

@@ -1441,38 +1441,13 @@ class DocumentoAcessorioCrud(MasterDetailCrud):
     class CreateView(MasterDetailCrud.CreateView):
         form_class = DocumentoAcessorioForm
 
-        def __init__(self, **kwargs):
-            super(MasterDetailCrud.CreateView, self).__init__(**kwargs)
-
         def get_initial(self):
             initial = super(CreateView, self).get_initial()
             initial['data'] = timezone.now().date()
-
             return initial
-
-        def get_context_data(self, **kwargs):
-            context = super(
-                MasterDetailCrud.CreateView, self).get_context_data(**kwargs)
-            return context
 
     class UpdateView(MasterDetailCrud.UpdateView):
         form_class = DocumentoAcessorioForm
-
-        def __init__(self, **kwargs):
-            super(MasterDetailCrud.UpdateView, self).__init__(**kwargs)
-
-        def get_context_data(self, **kwargs):
-            context = super(UpdateView, self).get_context_data(**kwargs)
-            return context
-
-    class DetailView(MasterDetailCrud.DetailView):
-
-        def hook_arquivo(self, obj, fieldname):
-            url = obj.url_arquivo
-            a = '<a href="%s">%s</a>' % (
-                url,
-                obj.arquivo.name.split('/')[-1])
-            return obj.arquivo.field.verbose_name, a
 
 
 class AutoriaCrud(MasterDetailCrud):
@@ -1784,13 +1759,6 @@ class MateriaLegislativaCrud(Crud):
 
         layout_key = 'MateriaLegislativaDetail'
         template_name = "materia/materialegislativa_detail.html"
-
-        def hook_texto_original(self, obj, fieldname):
-            url = obj.url_texto_original
-            a = '<a href="%s">%s</a>' % (
-                url,
-                obj.texto_original.name.split('/')[-1])
-            return obj.texto_original.field.verbose_name, a
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)

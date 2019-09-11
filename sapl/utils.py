@@ -20,8 +20,10 @@ from django.core.files.uploadedfile import UploadedFile
 from django.core.mail import get_connection
 from django.db import models
 from django.db.models import Q
+from django.db.models.fields.files import FieldFile
 from django.forms import BaseForm
 from django.forms.widgets import SplitDateTimeWidget
+from django.urls.base import reverse
 from django.utils import six, timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
@@ -223,6 +225,25 @@ class SaplGenericRelation(GenericRelation):
 
         self.fields_search = fields_search
         super().__init__(to, **kwargs)
+
+
+class PortalFieldFile(FieldFile):
+
+    @property
+    def url(self):
+        self._require_file()
+        # if settings.DEBUG:
+        #    return self.storage.url(self.name)
+
+        field_name_action = self.field.name.replace('_', '-')
+        return '%s' % reverse(
+            'sapl.api:%s-%s' % (self.instance._meta.model_name,
+                                field_name_action),
+            kwargs={'pk': self.instance.pk})
+
+
+class PortalFileField(models.FileField):
+    attr_class = PortalFieldFile
 
 
 class DocPrivateClearableFileInput(ClearableFileInput):
