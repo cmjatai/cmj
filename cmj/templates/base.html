@@ -111,12 +111,14 @@
                       <li  class="divider"></li>
                       <li class=" text-right"><a href="{% url 'cmj.core:cmj_user_change' %}">{{ user.get_full_name|default:user.email }} <i class="fa fa-hand-o-left" aria-hidden="true"></i> {% trans "Meu Perfil" %}</a></li>
                       <li  class="divider"></li>
-                      {% if perms.ouvidoria %}
+                      {% if perms.ouvidoria and not user.is_superuser %}
                         <li class=" text-right"><a href="{% url 'cmj.ouvidoria:solicitacao_manage_list' %}">{{user.areatrabalho_set.all.first.nome}} <i class="fa fa-hand-o-left" aria-hidden="true"></i> {% trans "Ouvidoria" %}</a></li>
                       {% endif %}
+                      {% if not user.is_superuser %}
                         <li class=" text-right"><a href="{% url 'cmj.ouvidoria:solicitacao_list' %}">{% trans "Minhas Solicitações" %}</a></li>
-
                         <li class="divider"></li>
+                      {% endif %}
+
 
                         <li class=" text-right">
                           <a href="#linkMenu">{% trans "Intranet" %}<span class="caret"></span></a>

@@ -1315,11 +1315,16 @@ class DocumentoAcessorioAdministrativoCrud(MasterDetailCrud):
 
 
 def atualizar_numero_documento(request):
+    if request.user.is_anonymous():
+        raise Http404()
     tipo = TipoDocumentoAdministrativo.objects.get(pk=request.GET['tipo'])
     ano = request.GET['ano']
 
-    param = {'tipo': tipo}
-    param['ano'] = ano if ano else timezone.now().year
+    param = {
+        'tipo': tipo,
+        'workspace__operadores': request.user,
+        'ano': ano if ano else timezone.now().year
+    }
 
     doc = DocumentoAdministrativo.objects.filter(**param).order_by(
         'tipo', 'ano', 'numero').values_list('numero', 'ano').last()

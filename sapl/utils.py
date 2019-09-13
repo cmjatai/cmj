@@ -241,6 +241,26 @@ class PortalFieldFile(FieldFile):
                                 field_name_action),
             kwargs={'pk': self.instance.pk})
 
+    def delete(self, save=True):
+        if not self:
+            return
+        # Only close the file if it's already open, which we know by the
+        # presence of self._file
+        if hasattr(self, '_file'):
+            self.close()
+            del self.file
+
+        original_name = self.name.replace('sapl/', 'original__sapl/')
+        self.storage.delete(self.name)
+        self.storage.delete(original_name)
+
+        self.name = None
+        setattr(self.instance, self.field.name, self.name)
+        self._committed = False
+
+        if save:
+            self.instance.save()
+
 
 class PortalFileField(models.FileField):
     attr_class = PortalFieldFile
@@ -257,7 +277,8 @@ class DocPrivateClearableFileInput(ClearableFileInput):
 
     def get_context(self, name, value, attrs):
         context = ClearableFileInput.get_context(self, name, value, attrs)
-        file = context['value']
+
+        file = context['value'] if 'value' in context else None
         if file:
             context['value'] = DocPrivateClearableFileInput.str_file(
                 file, name)
