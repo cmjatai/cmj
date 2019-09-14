@@ -29,6 +29,9 @@ TEMPLATES = [
 
                 'cmj.context_processors.areatrabalho',
                 'cmj.context_processors.debug',
+
+                'sapl.context_processors.mail_service_configured',
+
             ],
             'loaders': [
                 # Não troque a ordem, trocar a ordem faz, por exemplo,

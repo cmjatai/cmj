@@ -29,13 +29,13 @@ from .apps import AppConfig
 app_name = AppConfig.name
 
 urlpatterns_documento_administrativo = [
-    url(r'^docadm/',
+    url(r'^doc/',
         include(DocumentoAdministrativoCrud.get_urls() +
                 AnexadoCrud.get_urls() +
                 TramitacaoAdmCrud.get_urls() +
                 DocumentoAcessorioAdministrativoCrud.get_urls())),
 
-    url(r'^docadm/(?P<pk>\d+)/anexado_em_lote', DocumentoAnexadoEmLoteView.as_view(),
+    url(r'^doc/(?P<pk>\d+)/anexado_em_lote', DocumentoAnexadoEmLoteView.as_view(),
         name='anexado_em_lote'),
 ]
 
@@ -58,12 +58,12 @@ urlpatterns_protocolo = [
     url(r'^protocoloadm/(?P<pk>\d+)/protocolo-mostrar$',
         ProtocoloMostrarView.as_view(), name='protocolo_mostrar'),
 
-    url(r'^docadm/(?P<pk>\d+)/acompanhar-documento/$',
+    url(r'^doc/(?P<pk>\d+)/acompanhar-documento/$',
         AcompanhamentoDocumentoView.as_view(), name='acompanhar_documento'),
-    url(r'^docadm/(?P<pk>\d+)/acompanhar-confirmar$',
+    url(r'^doc/(?P<pk>\d+)/acompanhar-confirmar$',
         AcompanhamentoConfirmarView.as_view(),
         name='acompanhar_confirmar'),
-    url(r'^docadm/(?P<pk>\d+)/acompanhar-excluir$',
+    url(r'^doc/(?P<pk>\d+)/acompanhar-excluir$',
         AcompanhamentoExcluirView.as_view(),
         name='acompanhar_excluir'),
 
