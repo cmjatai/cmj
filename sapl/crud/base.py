@@ -388,12 +388,12 @@ class CrudBaseMixin(CrispyLayoutFormMixin):
 class CrudListView(PermissionRequiredContainerCrudMixin, ListView):
     permission_required = (RP_LIST, )
     logger = logging.getLogger(__name__)
+    paginate_by = 10
+    no_entries_msg = _('Nenhum registro encontrado.')
 
     @classmethod
     def get_url_regex(cls):
         return r'^$'
-    paginate_by = 10
-    no_entries_msg = _('Nenhum registro encontrado.')
 
     def get_rows(self, object_list):
         return [self._as_row(obj) for obj in object_list]

@@ -8,7 +8,6 @@ from sapl.protocoloadm.views import (AcompanhamentoDocumentoView,
                                      CriarDocumentoProtocolo,
                                      DocumentoAcessorioAdministrativoCrud,
                                      DocumentoAdministrativoCrud,
-                                     PesquisarDocumentoAdministrativoView,
                                      ProtocoloDocumentoView,
                                      ProtocoloMateriaTemplateView,
                                      ProtocoloMateriaView,
@@ -35,9 +34,6 @@ urlpatterns_documento_administrativo = [
                 AnexadoCrud.get_urls() +
                 TramitacaoAdmCrud.get_urls() +
                 DocumentoAcessorioAdministrativoCrud.get_urls())),
-
-    url(r'^docadm/pesq-doc-adm',
-        PesquisarDocumentoAdministrativoView.as_view(), name='pesq_doc_adm'),
 
     url(r'^docadm/(?P<pk>\d+)/anexado_em_lote', DocumentoAnexadoEmLoteView.as_view(),
         name='anexado_em_lote'),

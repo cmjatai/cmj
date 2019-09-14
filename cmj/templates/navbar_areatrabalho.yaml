@@ -16,7 +16,7 @@
   url: cmj.agenda:evento_list
   check_permission: core.menu_agenda
 - title: {% trans 'Documentos' %}
-  url: sapl.protocoloadm:pesq_doc_adm
+  url: sapl.protocoloadm:documentoadministrativo_list
   check_permission: protocoloadm.list_documentoadministrativo 
 
 - title: {% trans "Atividade Legislativa" %}

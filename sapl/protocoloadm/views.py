@@ -305,7 +305,7 @@ class DocumentoAdministrativoCrud(Crud):
         @property
         def search_url(self):
             namespace = self.model._meta.app_config.name
-            return reverse('%s:%s' % (namespace, 'pesq_doc_adm'))
+            return reverse('%s:%s' % (namespace, 'documentoadministrativo_list'))
 
         list_url = ''
 
@@ -319,12 +319,6 @@ class DocumentoAdministrativoCrud(Crud):
                 raise PermissionDenied(_('Sem permissão de Acesso!'))
 
             return initial
-
-    class ListView(RedirectView, Crud.ListView):
-
-        def get_redirect_url(self, *args, **kwargs):
-            namespace = self.model._meta.app_config.name
-            return reverse('%s:%s' % (namespace, 'pesq_doc_adm'))
 
     class CreateView(Crud.CreateView):
         form_class = DocumentoAdministrativoForm
@@ -355,6 +349,118 @@ class DocumentoAdministrativoCrud(Crud):
 
         def get_success_url(self):
             return self.search_url
+
+    class ListView(FilterView):
+        filterset_class = DocumentoAdministrativoFilterSet
+        paginate_by = 10
+        container_field = 'workspace__operadores'
+        permission_required = ('protocoloadm.list_documentoadministrativo', )
+
+        @classmethod
+        def get_url_regex(cls):
+            return r'^$'
+
+        def get_queryset(self):
+            qs = super().get_queryset()
+
+            u = self.request.user
+            if u.is_anonymous() or not u.has_perms(self.permission_required):
+                qs = qs.filter(workspace__tipo=AreaTrabalho.TIPO_PUBLICO)
+            elif u.has_perms(self.permission_required):
+                if u.areatrabalho_set.exists():
+                    qs = qs.filter(workspace__operadores=self.request.user)
+                else:
+                    qs = qs.filter(workspace__tipo=AreaTrabalho.TIPO_PUBLICO)
+            else:
+                raise Http404
+
+            return qs
+
+        def get_filterset_kwargs(self, filterset_class):
+            kwargs = super().get_filterset_kwargs(filterset_class)
+
+            status_tramitacao = kwargs['request'].GET.get(
+                'tramitacaoadministrativo__status')
+            unidade_destino = kwargs['request'].GET.get(
+                'tramitacaoadministrativo__unidade_tramitacao_destino')
+
+            qs = kwargs['queryset']
+
+            qs = qs.prefetch_related("documentoacessorioadministrativo_set",
+                                     "tramitacaoadministrativo_set",
+                                     "tipo",
+                                     "tramitacaoadministrativo_set__status",
+                                     "tramitacaoadministrativo_set__unidade_tramitacao_local",
+                                     "tramitacaoadministrativo_set__unidade_tramitacao_destino")
+
+            if status_tramitacao and unidade_destino:
+                lista = filtra_tramitacao_adm_destino_and_status(status_tramitacao,
+                                                                 unidade_destino)
+                qs = qs.filter(id__in=lista).distinct()
+
+            elif status_tramitacao:
+                lista = filtra_tramitacao_adm_status(status_tramitacao)
+                qs = qs.filter(id__in=lista).distinct()
+
+            elif unidade_destino:
+                lista = filtra_tramitacao_adm_destino(unidade_destino)
+                qs = qs.filter(id__in=lista).distinct()
+
+            if 'o' in self.request.GET and not self.request.GET['o']:
+                qs = qs.order_by('-ano', '-numero')
+
+            kwargs.update({
+                'queryset': qs,
+                'workspace': AreaTrabalho.objects.areatrabalho_publica(
+                ).first() if self.request.user.is_anonymous()
+                else self.request.user.areatrabalho_set.first()
+            })
+            return kwargs
+
+        def get_context_data(self, *args, **kwargs):
+            context = super().get_context_data(*args, **kwargs)
+
+            if self.paginate_by:
+                paginator = context['paginator']
+                page_obj = context['page_obj']
+                context['page_range'] = make_pagination(
+                    page_obj.number, paginator.num_pages)
+
+            context['title'] = _('Documentos Administrativos')
+
+            return context
+
+        def get(self, request, *args, **kwargs):
+            r = super().get(request, *args, **kwargs)
+            # Se a pesquisa estiver quebrando com a paginação
+            # Olhe esta função abaixo
+            # Provavelmente você criou um novo campo no Form/FilterSet
+            # Então a ordem da URL está diferente
+            data = self.filterset.data
+            if data and data.get('tipo') is not None:
+                url = "&" + str(self.request.META['QUERY_STRING'])
+                if url.startswith("&page"):
+                    ponto_comeco = url.find('tipo=') - 1
+                    url = url[ponto_comeco:]
+            else:
+                url = ''
+            self.filterset.form.fields['o'].label = _('Ordenação')
+
+            length = self.object_list.count()
+
+            is_relatorio = url != '' and request.GET.get('relatorio', None)
+            self.paginate_by = None if is_relatorio else self.paginate_by
+            context = self.get_context_data(filter=self.filterset,
+                                            filter_url=url,
+                                            numero_res=length
+                                            )
+            context['show_results'] = show_results_filter_set(
+                self.request.GET.copy())
+
+            if is_relatorio:
+                return relatorio_doc_administrativos(request, context)
+            else:
+                return self.render_to_response(context)
 
 
 class StatusTramitacaoAdministrativoCrud(CrudAux):
@@ -827,106 +933,6 @@ class ProtocoloMateriaTemplateView(PermissionRequiredMixin, TemplateView):
         protocolo = Protocolo.objects.get(pk=self.kwargs['pk'])
         context.update({'protocolo': protocolo})
         return context
-
-
-class PesquisarDocumentoAdministrativoView(PermissionRequiredContainerCrudMixin,
-                                           FilterView):
-    model = DocumentoAdministrativo
-    filterset_class = DocumentoAdministrativoFilterSet
-    paginate_by = 10
-    permission_required = ('protocoloadm.list_documentoadministrativo', )
-    container_field = 'workspace__operadores'
-
-    def get_queryset(self):
-        qs = FilterView.get_queryset(self)
-        qs = qs.filter(workspace__operadores=self.request.user)
-        return qs
-
-    def get_filterset_kwargs(self, filterset_class):
-        kwargs = super(PesquisarDocumentoAdministrativoView,
-                       self).get_filterset_kwargs(filterset_class)
-
-        status_tramitacao = kwargs['request'].GET.get(
-            'tramitacaoadministrativo__status')
-        unidade_destino = kwargs['request'].GET.get(
-            'tramitacaoadministrativo__unidade_tramitacao_destino')
-
-        qs = kwargs['queryset']
-
-        qs = qs.prefetch_related("documentoacessorioadministrativo_set",
-                                 "tramitacaoadministrativo_set",
-                                 "tipo",
-                                 "tramitacaoadministrativo_set__status",
-                                 "tramitacaoadministrativo_set__unidade_tramitacao_local",
-                                 "tramitacaoadministrativo_set__unidade_tramitacao_destino")
-
-        if status_tramitacao and unidade_destino:
-            lista = filtra_tramitacao_adm_destino_and_status(status_tramitacao,
-                                                             unidade_destino)
-            qs = qs.filter(id__in=lista).distinct()
-
-        elif status_tramitacao:
-            lista = filtra_tramitacao_adm_status(status_tramitacao)
-            qs = qs.filter(id__in=lista).distinct()
-
-        elif unidade_destino:
-            lista = filtra_tramitacao_adm_destino(unidade_destino)
-            qs = qs.filter(id__in=lista).distinct()
-
-        if 'o' in self.request.GET and not self.request.GET['o']:
-            qs = qs.order_by('-ano', '-numero')
-
-        kwargs.update({
-            'queryset': qs,
-            'workspace': self.request.user.areatrabalho_set.first()
-        })
-        return kwargs
-
-    def get_context_data(self, **kwargs):
-        context = super(PesquisarDocumentoAdministrativoView,
-                        self).get_context_data(**kwargs)
-
-        if self.paginate_by:
-            paginator = context['paginator']
-            page_obj = context['page_obj']
-            context['page_range'] = make_pagination(
-                page_obj.number, paginator.num_pages)
-
-        context['title'] = _('Documentos Administrativos')
-
-        return context
-
-    def get(self, request, *args, **kwargs):
-        super(PesquisarDocumentoAdministrativoView, self).get(request)
-        # Se a pesquisa estiver quebrando com a paginação
-        # Olhe esta função abaixo
-        # Provavelmente você criou um novo campo no Form/FilterSet
-        # Então a ordem da URL está diferente
-        data = self.filterset.data
-        if data and data.get('tipo') is not None:
-            url = "&" + str(self.request.META['QUERY_STRING'])
-            if url.startswith("&page"):
-                ponto_comeco = url.find('tipo=') - 1
-                url = url[ponto_comeco:]
-        else:
-            url = ''
-        self.filterset.form.fields['o'].label = _('Ordenação')
-
-        length = self.object_list.count()
-
-        is_relatorio = url != '' and request.GET.get('relatorio', None)
-        self.paginate_by = None if is_relatorio else self.paginate_by
-        context = self.get_context_data(filter=self.filterset,
-                                        filter_url=url,
-                                        numero_res=length
-                                        )
-        context['show_results'] = show_results_filter_set(
-            self.request.GET.copy())
-
-        if is_relatorio:
-            return relatorio_doc_administrativos(request, context)
-        else:
-            return self.render_to_response(context)
 
 
 class AnexadoCrud(MasterDetailCrud):
