@@ -144,7 +144,7 @@
                     {% endif %}
                     <p></p>
                     {% if m.em_tramitacao and mail_service_configured %}
-                      <a href="{% url 'sapl.materia:acompanhar_materia' m.id %}">Acompanhar Matéria</a>
+                      <a class="btn btn-sm btn-outline-primary" href="{% url 'sapl.materia:acompanhar_materia' m.id %}" data-toggle="tooltip" data-placement="top" title="Registre seu email para acompanhamento desta matéria. Você receberá um email sempre que está materia tramitar.">Acompanhar Matéria</a>
                     {% endif %}
                   {% endif %}
                   </td>
