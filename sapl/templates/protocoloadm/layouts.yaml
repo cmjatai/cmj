@@ -42,14 +42,13 @@ Anexado:
 
 AnexadoDetail:
   {% trans 'Documento Anexado' %}:
-  - documento_principal|fk_urlize_for_detail
   - documento_anexado|fk_urlize_for_detail
-  - data_anexacao  data_desanexacao
+  - data_anexacao data_desanexacao
 
 Protocolo:
   {% trans 'Indentificação Documento' %}:
   - tipo_protocolo
-  - tipo_documento  numero_paginas
+  - tipo_documento numero_paginas
   - assunto_ementa
   - interessado
   - observacao

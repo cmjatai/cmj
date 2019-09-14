@@ -968,10 +968,12 @@ class AnexadoCrud(MasterDetailCrud):
             return 'AnexadoDetail'
 
 
-class DocumentoAnexadoEmLoteView(PermissionRequiredMixin, FilterView):
+class DocumentoAnexadoEmLoteView(PermissionRequiredContainerCrudMixin, FilterView):
     filterset_class = AnexadoEmLoteFilterSet
     template_name = 'protocoloadm/em_lote/anexado.html'
     permission_required = ('protocoloadm.add_anexado', )
+    container_field = 'workspace__operadores'
+    model = DocumentoAdministrativo
 
     @property
     def cancel_url(self):
@@ -1226,14 +1228,10 @@ class TramitacaoAdmCrud(MasterDetailCrud):
     class ListView(MasterDetailCrud.ListView):
 
         def get_queryset(self):
-            qs = super(MasterDetailCrud.ListView, self).get_queryset()
-            kwargs = {self.crud.parent_field: self.kwargs['pk']}
-            return qs.filter(**kwargs).order_by('-data_tramitacao',
-                                                '-id')
+            qs = super().get_queryset()
+            return qs.order_by('-data_tramitacao', '-id')
 
     class DetailView(MasterDetailCrud.DetailView):
-
-        template_name = 'protocoloadm/tramitacaoadministrativo_detail.html'
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
