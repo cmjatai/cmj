@@ -132,76 +132,47 @@ class StatusTramitacaoAdministrativoCrud(CrudAux):
         ordering = 'sigla'
 
 
-class DocumentoAcessorioAdministrativoCrud(MasterDetailCrud):
-    model = DocumentoAcessorioAdministrativo
-    parent_field = 'documento'
-    help_topic = 'numeracao_docsacess'
-    container_field = 'documento__workspace__operadores'
-
-    class BaseMixin(MasterDetailCrud.BaseMixin):
-        list_field_names = ['nome', 'tipo',
-                            'data', 'autor',
-                            'assunto']
-
-    class CreateView(MasterDetailCrud.CreateView):
-        form_class = DocumentoAcessorioAdministrativoForm
-
-        def get_initial(self):
-            initial = super().get_initial()
-            initial['workspace'] = self.request.user.areatrabalho_set.first()
-            return initial
-
-    class UpdateView(MasterDetailCrud.UpdateView):
-        form_class = DocumentoAcessorioAdministrativoForm
-
-        def get_initial(self):
-            initial = super().get_initial()
-            initial['workspace'] = self.request.user.areatrabalho_set.first()
-            return initial
-
-
-class AnexadoCrud(MasterDetailCrud):
-    model = Anexado
-    parent_field = 'documento_principal'
-    help_topic = 'documento_anexado'
-    container_field = 'documento_principal__workspace__operadores'
-
-    class BaseMixin(MasterDetailCrud.BaseMixin):
-        list_field_names = ['documento_anexado', 'data_anexacao']
-
-    class CreateView(MasterDetailCrud.CreateView):
-        form_class = AnexadoForm
-
-        def get_initial(self):
-            initial = super().get_initial()
-
-            initial['workspace'] = self.request.user.areatrabalho_set.first()
-            return initial
-
-    class UpdateView(MasterDetailCrud.UpdateView):
-        form_class = AnexadoForm
-
-        def get_initial(self):
-            initial = super().get_initial()
-            initial['tipo'] = self.object.documento_anexado.tipo.id
-            initial['numero'] = self.object.documento_anexado.numero
-            initial['ano'] = self.object.documento_anexado.ano
-
-            initial['workspace'] = self.request.user.areatrabalho_set.first()
-
-            return initial
-
-    class DetailView(MasterDetailCrud.DetailView):
-
-        @property
-        def layout_key(self):
-            return 'AnexadoDetail'
-
-
 class DocumentoAdministrativoCrud(Crud):
     model = DocumentoAdministrativo
     help_topic = 'numeracao_docsacess'
     container_field = 'workspace__operadores'
+
+    class QuerySetContainerPrivPubMixin:
+        def has_permission(self):
+            """
+            get_queryset faz os testes de permissão
+            """
+            return True
+
+        def get_queryset(self):
+
+            qs = super().get_queryset()
+            u = self.request.user
+
+            crud = self.crud
+
+            param_tip_pub = {
+                '__'.join(crud.container_field.split('__')[:-1]):
+                AreaTrabalho.TIPO_PUBLICO
+            }
+
+            param_user = {
+                crud.container_field: self.request.user
+            }
+
+            if u.is_anonymous() or not u.has_perms(self.permission_required):
+                qs = qs.filter(**param_tip_pub)
+            elif u.has_perms(self.permission_required):
+                if u.areatrabalho_set.exists():
+                    qs = qs.filter(**param_user)
+                else:
+                    qs = qs.filter(**param_tip_pub)
+            else:
+                # não havendo permissão a resposta 404 explicita inexistência
+                # ao inves de permissão negada por ser um container
+                raise Http404
+
+            return qs
 
     class BaseMixin(Crud.BaseMixin):
         list_field_names = ['tipo', 'numero', 'ano', 'data',
@@ -249,24 +220,6 @@ class DocumentoAdministrativoCrud(Crud):
         def get_success_url(self):
             return self.search_url
 
-    class QuerySetContainerPrivPubMixin:
-
-        def get_queryset(self):
-
-            qs = super().get_queryset()
-            u = self.request.user
-            if u.is_anonymous() or not u.has_perms(self.permission_required):
-                qs = qs.filter(workspace__tipo=AreaTrabalho.TIPO_PUBLICO)
-            elif u.has_perms(self.permission_required):
-                if u.areatrabalho_set.exists():
-                    qs = qs.filter(workspace__operadores=self.request.user)
-                else:
-                    qs = qs.filter(workspace__tipo=AreaTrabalho.TIPO_PUBLICO)
-            else:
-                raise Http404
-
-            return qs
-
     class DetailView(QuerySetContainerPrivPubMixin, DetailView):
         permission_required = ('protocoloadm.detail_documentoadministrativo', )
 
@@ -277,7 +230,6 @@ class DocumentoAdministrativoCrud(Crud):
     class ListView(QuerySetContainerPrivPubMixin, FilterView):
         filterset_class = DocumentoAdministrativoFilterSet
         paginate_by = 10
-        container_field = 'workspace__operadores'
         permission_required = ('protocoloadm.list_documentoadministrativo', )
 
         @classmethod
@@ -369,6 +321,77 @@ class DocumentoAdministrativoCrud(Crud):
                 return relatorio_doc_administrativos(request, context)
             else:
                 return self.render_to_response(context)
+
+
+class DocumentoAcessorioAdministrativoCrud(MasterDetailCrud):
+    model = DocumentoAcessorioAdministrativo
+    parent_field = 'documento'
+    help_topic = 'numeracao_docsacess'
+    container_field = 'documento__workspace__operadores'
+
+    class BaseMixin(MasterDetailCrud.BaseMixin):
+        list_field_names = ['nome', 'tipo',
+                            'data', 'autor',
+                            'assunto']
+
+    class CreateView(MasterDetailCrud.CreateView):
+        form_class = DocumentoAcessorioAdministrativoForm
+
+        def get_initial(self):
+            initial = super().get_initial()
+            initial['workspace'] = self.request.user.areatrabalho_set.first()
+            return initial
+
+    class UpdateView(MasterDetailCrud.UpdateView):
+        form_class = DocumentoAcessorioAdministrativoForm
+
+        def get_initial(self):
+            initial = super().get_initial()
+            initial['workspace'] = self.request.user.areatrabalho_set.first()
+            return initial
+
+
+class AnexadoCrud(MasterDetailCrud):
+    model = Anexado
+    parent_field = 'documento_principal'
+    help_topic = 'documento_anexado'
+    container_field = 'documento_principal__workspace__operadores'
+
+    class BaseMixin(MasterDetailCrud.BaseMixin):
+        list_field_names = ['documento_anexado', 'data_anexacao']
+
+    class CreateView(MasterDetailCrud.CreateView):
+        form_class = AnexadoForm
+
+        def get_initial(self):
+            initial = super().get_initial()
+
+            initial['workspace'] = self.request.user.areatrabalho_set.first()
+            return initial
+
+    class UpdateView(MasterDetailCrud.UpdateView):
+        form_class = AnexadoForm
+
+        def get_initial(self):
+            initial = super().get_initial()
+            initial['tipo'] = self.object.documento_anexado.tipo.id
+            initial['numero'] = self.object.documento_anexado.numero
+            initial['ano'] = self.object.documento_anexado.ano
+
+            initial['workspace'] = self.request.user.areatrabalho_set.first()
+
+            return initial
+
+    class DetailView(MasterDetailCrud.DetailView):
+
+        @property
+        def layout_key(self):
+            return 'AnexadoDetail'
+
+    class ListView(
+            DocumentoAdministrativoCrud.QuerySetContainerPrivPubMixin,
+            MasterDetailCrud.ListView):
+        pass
 
 
 class DocumentoAnexadoEmLoteView(PermissionRequiredContainerCrudMixin, FilterView):
