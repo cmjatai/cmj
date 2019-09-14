@@ -58,14 +58,16 @@ urlpatterns_protocolo = [
     url(r'^protocoloadm/(?P<pk>\d+)/protocolo-mostrar$',
         ProtocoloMostrarView.as_view(), name='protocolo_mostrar'),
 
-    url(r'^doc/(?P<pk>\d+)/acompanhar-documento/$',
-        AcompanhamentoDocumentoView.as_view(), name='acompanhar_documento'),
-    url(r'^doc/(?P<pk>\d+)/acompanhar-confirmar$',
-        AcompanhamentoConfirmarView.as_view(),
-        name='acompanhar_confirmar'),
-    url(r'^doc/(?P<pk>\d+)/acompanhar-excluir$',
-        AcompanhamentoExcluirView.as_view(),
-        name='acompanhar_excluir'),
+
+    # TODO:
+    # url(r'^doc/(?P<pk>\d+)/acompanhar-documento/$',
+    #    AcompanhamentoDocumentoView.as_view(), name='acompanhar_documento'),
+    # url(r'^doc/(?P<pk>\d+)/acompanhar-confirmar$',
+    #    AcompanhamentoConfirmarView.as_view(),
+    #    name='acompanhar_confirmar'),
+    # url(r'^doc/(?P<pk>\d+)/acompanhar-excluir$',
+    #    AcompanhamentoExcluirView.as_view(),
+    #    name='acompanhar_excluir'),
 
 
 
