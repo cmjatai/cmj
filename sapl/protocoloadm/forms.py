@@ -26,8 +26,7 @@ from sapl.utils import (RANGE_ANOS, YES_NO_CHOICES, AnoNumeroOrderingFilter,
                         choice_anos_com_protocolo, choice_force_optional,
                         choice_anos_com_documentoadministrativo,
                         FilterOverridesMetaMixin, choice_anos_com_materias,
-                        FileFieldCheckMixin, lista_anexados,
-                        DocPrivateClearableFileInput)
+                        FileFieldCheckMixin, lista_anexados)
 
 from .models import (AcompanhamentoDocumento, DocumentoAcessorioAdministrativo,
                      DocumentoAdministrativo,
@@ -659,8 +658,7 @@ class DocumentoAcessorioAdministrativoForm(FileFieldCheckMixin, ModelForm):
                   'assunto']
 
         widgets = {
-            'data': forms.DateInput(format='%d/%m/%Y'),
-            'arquivo': DocPrivateClearableFileInput()
+            'data': forms.DateInput(format='%d/%m/%Y')
         }
 
     def __init__(self, *args, **kwargs):
@@ -1117,8 +1115,7 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
                   'protocolo',
                   ]
 
-        widgets = {'protocolo': forms.HiddenInput(),
-                   'texto_integral': DocPrivateClearableFileInput()}
+        widgets = {'protocolo': forms.HiddenInput()}
 
     def clean(self):
         super(DocumentoAdministrativoForm, self).clean()

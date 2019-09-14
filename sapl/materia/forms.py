@@ -46,7 +46,7 @@ from sapl.utils import (YES_NO_CHOICES, SEPARADOR_HASH_PROPOSICAO,
                         autor_label, autor_modal, gerar_hash_arquivo,
                         models_with_gr_for_model, qs_override_django_filter,
                         choice_anos_com_materias, FilterOverridesMetaMixin, FileFieldCheckMixin,
-                        lista_anexados, DocPrivateClearableFileInput)
+                        lista_anexados)
 
 from .models import (AcompanhamentoMateria, Anexada, Autoria, DespachoInicial,
                      DocumentoAcessorio, Numeracao, Proposicao, Relatoria,
@@ -178,7 +178,6 @@ class MateriaLegislativaForm(FileFieldCheckMixin, ModelForm):
         widgets = {
             'user': forms.HiddenInput(),
             'ip': forms.HiddenInput(),
-            'texto_original': DocPrivateClearableFileInput()
         }
 
     def __init__(self, *args, **kwargs):
@@ -346,10 +345,6 @@ class DocumentoAcessorioForm(FileFieldCheckMixin, ModelForm):
         model = DocumentoAcessorio
         fields = ['tipo', 'nome', 'data', 'autor',
                   'ementa', 'indexacao', 'arquivo']
-
-        widgets = {
-            'arquivo': DocPrivateClearableFileInput()
-        }
 
     def clean(self):
         super(DocumentoAcessorioForm, self).clean()

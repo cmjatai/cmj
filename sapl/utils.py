@@ -232,8 +232,8 @@ class PortalFieldFile(FieldFile):
     @property
     def url(self):
         self._require_file()
-        # if settings.DEBUG:
-        #    return self.storage.url(self.name)
+        if settings.DEBUG:
+            return self.storage.url(self.name)
 
         field_name_action = self.field.name.replace('_', '-')
         return '%s' % reverse(
@@ -264,25 +264,6 @@ class PortalFieldFile(FieldFile):
 
 class PortalFileField(models.FileField):
     attr_class = PortalFieldFile
-
-
-class DocPrivateClearableFileInput(ClearableFileInput):
-    class str_file:
-        def __init__(self, file, name):
-            self.file = file
-            self.url = getattr(file.instance, 'url_%s' % name)
-
-        def __str__(self):
-            return self.file.name.split('/')[-1]
-
-    def get_context(self, name, value, attrs):
-        context = ClearableFileInput.get_context(self, name, value, attrs)
-
-        file = context['value'] if 'value' in context else None
-        if file:
-            context['value'] = DocPrivateClearableFileInput.str_file(
-                file, name)
-        return context
 
 
 class ImageThumbnailFileInput(ClearableFileInput):
@@ -1017,6 +998,8 @@ def mail_service_configured(request=None):
 
     logger = logging.getLogger(__name__)
 
+    if settings.DEBUG:
+        return True
     if settings.EMAIL_RUNNING is None:
         result = True
         try:
