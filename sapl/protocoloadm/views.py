@@ -20,6 +20,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import ListView, CreateView, UpdateView
 from django.views.generic.base import RedirectView, TemplateView
+from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from django_filters.views import FilterView
 
@@ -58,14 +59,12 @@ from .forms import (AcompanhamentoDocumentoForm, AnularProtocoloAdmForm,
 from .models import (AcompanhamentoDocumento, DocumentoAcessorioAdministrativo,
                      DocumentoAdministrativo, StatusTramitacaoAdministrativo,
                      TipoDocumentoAdministrativo, TramitacaoAdministrativo, Anexado)
-
-
 from .views_disabled import *
+
+
 # ProtocoloDocumentoCrud = Crud.build(Protocolo, '')
 # FIXME precisa de uma chave diferente para o layout
 # ProtocoloMateriaCrud = Crud.build(Protocolo, '')
-
-
 @permission_required('protocoloadm.add_protocolo')
 def recuperar_materia_protocolo(request):
     tipo = request.GET.get('tipo')
@@ -165,7 +164,6 @@ class AnexadoCrud(MasterDetailCrud):
     model = Anexado
     parent_field = 'documento_principal'
     help_topic = 'documento_anexado'
-    public = [RP_LIST, RP_DETAIL]
     container_field = 'documento_principal__workspace__operadores'
 
     class BaseMixin(MasterDetailCrud.BaseMixin):
@@ -246,31 +244,16 @@ class DocumentoAdministrativoCrud(Crud):
                 return {'ano_protocolo': p.ano,
                         'numero_protocolo': p.numero}
 
-    class DetailView(Crud.DetailView):
-
-        def get(self, *args, **kwargs):
-            pk = self.kwargs['pk']
-            documento = DocumentoAdministrativo.objects.get(id=pk)
-            return super(Crud.DetailView, self).get(args, kwargs)
-
     class DeleteView(Crud.DeleteView):
 
         def get_success_url(self):
             return self.search_url
 
-    class ListView(FilterView):
-        filterset_class = DocumentoAdministrativoFilterSet
-        paginate_by = 10
-        container_field = 'workspace__operadores'
-        permission_required = ('protocoloadm.list_documentoadministrativo', )
-
-        @classmethod
-        def get_url_regex(cls):
-            return r'^$'
+    class QuerySetContainerPrivPubMixin:
 
         def get_queryset(self):
-            qs = super().get_queryset()
 
+            qs = super().get_queryset()
             u = self.request.user
             if u.is_anonymous() or not u.has_perms(self.permission_required):
                 qs = qs.filter(workspace__tipo=AreaTrabalho.TIPO_PUBLICO)
@@ -283,6 +266,23 @@ class DocumentoAdministrativoCrud(Crud):
                 raise Http404
 
             return qs
+
+    class DetailView(QuerySetContainerPrivPubMixin, DetailView):
+        permission_required = ('protocoloadm.detail_documentoadministrativo', )
+
+        @classmethod
+        def get_url_regex(cls):
+            return r'^(?P<pk>\d+)$'
+
+    class ListView(QuerySetContainerPrivPubMixin, FilterView):
+        filterset_class = DocumentoAdministrativoFilterSet
+        paginate_by = 10
+        container_field = 'workspace__operadores'
+        permission_required = ('protocoloadm.list_documentoadministrativo', )
+
+        @classmethod
+        def get_url_regex(cls):
+            return r'^$'
 
         def get_filterset_kwargs(self, filterset_class):
             kwargs = super().get_filterset_kwargs(filterset_class)
