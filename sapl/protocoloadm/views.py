@@ -15,12 +15,12 @@ from django.db import transaction
 from django.db.models import Max, Q
 from django.db.models.fields.related import ForeignKey, ManyToManyField
 from django.http import Http404, HttpResponse, JsonResponse
-from django.http.response import HttpResponseRedirect
+from django.http.response import HttpResponseRedirect, Http404
 from django.shortcuts import redirect
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import ListView, CreateView, UpdateView
-from django.views.generic.base import RedirectView, TemplateView
+from django.views.generic.base import RedirectView, TemplateView, ContextMixin
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from django_filters.views import FilterView
@@ -33,11 +33,12 @@ from sapl.base.signals import tramitacao_signal
 from sapl.comissoes.models import Comissao
 from sapl.crud.base import (Crud, CrudAux, MasterDetailCrud, make_pagination,
                             RP_LIST, RP_DETAIL,
-                            PermissionRequiredContainerCrudMixin, CrudListView)
+                            PermissionRequiredContainerCrudMixin, CrudListView,
+                            CrudDetailView)
 from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa, UnidadeTramitacao
 from sapl.materia.views import gerar_pdf_impressos
 from sapl.parlamentares.models import Legislatura, Parlamentar
-from sapl.protocoloadm.models import Protocolo
+from sapl.protocoloadm.models import Protocolo, DocumentoAdministrativo
 from sapl.relatorios.views import relatorio_doc_administrativos
 from sapl.utils import (create_barcode, get_base_url, get_client_ip,
                         get_mime_type_from_file_extension, lista_anexados,
@@ -138,7 +139,7 @@ class DocumentoAdministrativoCrud(Crud):
     help_topic = 'numeracao_docsacess'
     container_field = 'workspace__operadores'
 
-    class QuerySetContainerPrivPubMixin:
+    class QuerySetContainerPrivPubMixin(ContextMixin):
         is_contained = False
 
         def has_permission(self):
@@ -146,55 +147,6 @@ class DocumentoAdministrativoCrud(Crud):
             get_queryset faz os testes de permissão
             """
             return True
-
-        def get_context_data(self, **kwargs):
-            crud = self.crud if hasattr(self, 'crud') else self
-
-            if not hasattr(crud, 'parent_field'):
-                context = super().get_context_data(**kwargs)
-                return context
-
-            parent_model = None
-            if '__' in crud.parent_field:
-                fields = crud.parent_field.split('__')
-                parent_model = pm = self.model
-                for field in fields:
-                    pm = getattr(pm, field)
-                    if isinstance(pm.field, ForeignKey):
-                        parent_model = getattr(
-                            parent_model, field).field.related_model
-                    else:
-                        parent_model = getattr(
-                            parent_model, field).rel.related_model
-                    pm = parent_model
-
-            else:
-                parent_model = getattr(
-                    self.model, crud.parent_field)
-                if isinstance(parent_model.field, (
-                        ForeignKey, ManyToManyField)):
-                    parent_model = parent_model.field.related_model
-                else:
-                    parent_model = parent_model.rel.related_model
-
-            params = {'pk': kwargs['root_pk']}
-
-            if self.container_field:
-                container = self.container_field.split('__')
-                if len(container) > 1:
-                    params['__'.join(container[1:])] = self.request.user.pk
-
-            try:
-                parent_object = parent_model.objects.get(**params)
-            except Exception as e:
-                username = self.request.user.username
-                self.logger.error("user=" + username + ". " + str(e))
-                raise Http404()
-
-            context[
-                'title'] = '%s <small>(%s)</small>' % (
-                context['title'], parent_object)
-            return context
 
         def get_queryset(self):
 
@@ -432,19 +384,110 @@ class AnexadoCrud(MasterDetailCrud):
             return initial
 
     class DetailView(MasterDetailCrud.DetailView):
+        is_contained = True
 
         @property
         def layout_key(self):
             return 'AnexadoDetail'
 
+        def has_permission(self):
+            return True
+
         def dispatch(self, request, *args, **kwargs):
-            return MasterDetailCrud.DetailView.dispatch(self, request, *args, **kwargs)
+            return DetailView.dispatch(self, request, *args, **kwargs)
+
+        def get(self, request, *args, **kwargs):
+            try:
+                self.object = self.model.objects.get(pk=kwargs.get('pk'))
+            except Exception as e:
+                username = request.user.username
+                self.logger.error("user=" + username + ". " + str(e))
+                raise Http404
+
+            context = AnexadoCrud.DetailView.get_context_data(
+                self, object=self.object)
+            return self.render_to_response(context)
+
+        def get_context_data(self, **kwargs):
+
+            try:
+                dp = kwargs['object'].documento_principal
+                kwargs['root_pk'] = dp.id
+
+            except Exception as e:
+                username = self.request.user.username
+                self.logger.error("user=" + username + ". " + str(e))
+                raise Http404()
+
+            u = self.request.user
+            if u.is_anonymous():
+                if dp.workspace.tipo != AreaTrabalho.TIPO_PUBLICO:
+                    raise Http404
+            else:
+                if dp.workspace.tipo != AreaTrabalho.TIPO_PUBLICO:
+                    if not u.has_perms(self.permission_required) and dp.workspace == u.areatrabalho_set.first():
+                        raise Http404
+                    elif u.has_perms(self.permission_required) and dp.workspace != u.areatrabalho_set.first():
+                        raise Http404
+                else:
+                    if not u.has_perms(self.permission_required) or dp.workspace != u.areatrabalho_set.first():
+                        self.is_contained = False
+
+            context = super(MasterDetailCrud.DetailView,
+                            self).get_context_data(**kwargs)
+
+            context[
+                'title'] = 'Documento Principal: <small>(%s)</small>' % (
+                    dp)
+            return context
 
     class ListView(
             DocumentoAdministrativoCrud.QuerySetContainerPrivPubMixin,
             MasterDetailCrud.ListView):
+
         def dispatch(self, request, *args, **kwargs):
-            return ListView.dispatch(self, request, *args, **kwargs)
+            return MasterDetailCrud.ListView.dispatch(self, request, *args, **kwargs)
+
+        def get_queryset(self):
+            qs = DocumentoAdministrativoCrud.QuerySetContainerPrivPubMixin.get_queryset(
+                self)
+            return qs.filter(documento_principal_id=self.kwargs['pk'])
+
+        def get_context_data(self, **kwargs):
+
+            try:
+                params = {'pk': kwargs['root_pk']}
+                dp = DocumentoAdministrativo.objects.get(**params)
+                if dp.workspace.tipo == AreaTrabalho.TIPO_PUBLICO:
+                    self.is_contained = False
+
+            except Exception as e:
+                username = self.request.user.username
+                self.logger.error("user=" + username + ". " + str(e))
+                raise Http404()
+
+            u = self.request.user
+            if u.is_anonymous():
+                if dp.workspace.tipo != AreaTrabalho.TIPO_PUBLICO:
+                    raise Http404
+            else:
+                if dp.workspace.tipo != AreaTrabalho.TIPO_PUBLICO:
+                    if not u.has_perms(self.permission_required) and dp.workspace == u.areatrabalho_set.first():
+                        raise Http404
+                    elif u.has_perms(self.permission_required) and dp.workspace != u.areatrabalho_set.first():
+                        raise Http404
+                else:
+                    if not u.has_perms(self.permission_required) or dp.workspace == u.areatrabalho_set.first():
+                        self.is_contained = False
+
+            context = super(MasterDetailCrud.ListView,
+                            self).get_context_data(**kwargs)
+
+            context[
+                'title'] = '%s a: <small>(%s)</small>' % (
+                    context['title'],
+                    dp)
+            return context
 
 
 class DocumentoAnexadoEmLoteView(PermissionRequiredContainerCrudMixin, FilterView):

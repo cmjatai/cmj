@@ -64,15 +64,17 @@
                       {% endif %}
                       {% define d.documentoacessorioadministrativo_set.all as acess %}
                       {% if d.documentoacessorioadministrativo_set.all.exists %}
-                              <strong>Documentos Acessórios:</strong>
-                              <a href="{% url 'sapl.protocoloadm:documentoacessorioadministrativo_list' d.id %}">
-                                  {{ d.documentoacessorioadministrativo_set.all.count }}
-                              </a>
-                              </br>
-                          {% endif %}
-                    {% if d.tramitacao and mail_service_configured %}
-                      <a href="{% url 'sapl.protocoloadm:acompanhar_documento' d.id %}">Acompanhar Documento</a>
-                    {% endif %}
+                        <strong>Documentos Acessórios:</strong>
+                        <a href="{% url 'sapl.protocoloadm:documentoacessorioadministrativo_list' d.id %}">
+                            {{ d.documentoacessorioadministrativo_set.all.count }}
+                        </a>
+                        </br>
+                      {% endif %}
+                    {% comment "" %}
+                      {% if d.tramitacao and mail_service_configured %}
+                        <a href="{% url 'sapl.protocoloadm:acompanhar_documento' d.id %}">Acompanhar Documento</a>
+                      {% endif %}
+                    {% endcomment %}
               </div>
 
               {% endfor %}
