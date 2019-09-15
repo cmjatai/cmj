@@ -152,7 +152,7 @@ class DocumentoAdministrativoCrud(Crud):
             crud = self.crud
 
             param_tip_pub = {
-                '__'.join(crud.container_field.split('__')[:-1]):
+                '%s__tipo' % '__'.join(crud.container_field.split('__')[:-1]):
                 AreaTrabalho.TIPO_PUBLICO
             }
 
