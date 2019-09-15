@@ -13,6 +13,7 @@ from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.db.models import Max, Q
+from django.db.models.fields.related import ForeignKey, ManyToManyField
 from django.http import Http404, HttpResponse, JsonResponse
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import redirect
@@ -32,7 +33,7 @@ from sapl.base.signals import tramitacao_signal
 from sapl.comissoes.models import Comissao
 from sapl.crud.base import (Crud, CrudAux, MasterDetailCrud, make_pagination,
                             RP_LIST, RP_DETAIL,
-                            PermissionRequiredContainerCrudMixin)
+                            PermissionRequiredContainerCrudMixin, CrudListView)
 from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa, UnidadeTramitacao
 from sapl.materia.views import gerar_pdf_impressos
 from sapl.parlamentares.models import Legislatura, Parlamentar
@@ -138,18 +139,68 @@ class DocumentoAdministrativoCrud(Crud):
     container_field = 'workspace__operadores'
 
     class QuerySetContainerPrivPubMixin:
+        is_contained = False
+
         def has_permission(self):
             """
             get_queryset faz os testes de permissão
             """
             return True
 
+        def get_context_data(self, **kwargs):
+            crud = self.crud if hasattr(self, 'crud') else self
+
+            if not hasattr(crud, 'parent_field'):
+                context = super().get_context_data(**kwargs)
+                return context
+
+            parent_model = None
+            if '__' in crud.parent_field:
+                fields = crud.parent_field.split('__')
+                parent_model = pm = self.model
+                for field in fields:
+                    pm = getattr(pm, field)
+                    if isinstance(pm.field, ForeignKey):
+                        parent_model = getattr(
+                            parent_model, field).field.related_model
+                    else:
+                        parent_model = getattr(
+                            parent_model, field).rel.related_model
+                    pm = parent_model
+
+            else:
+                parent_model = getattr(
+                    self.model, crud.parent_field)
+                if isinstance(parent_model.field, (
+                        ForeignKey, ManyToManyField)):
+                    parent_model = parent_model.field.related_model
+                else:
+                    parent_model = parent_model.rel.related_model
+
+            params = {'pk': kwargs['root_pk']}
+
+            if self.container_field:
+                container = self.container_field.split('__')
+                if len(container) > 1:
+                    params['__'.join(container[1:])] = self.request.user.pk
+
+            try:
+                parent_object = parent_model.objects.get(**params)
+            except Exception as e:
+                username = self.request.user.username
+                self.logger.error("user=" + username + ". " + str(e))
+                raise Http404()
+
+            context[
+                'title'] = '%s <small>(%s)</small>' % (
+                context['title'], parent_object)
+            return context
+
         def get_queryset(self):
 
-            qs = super().get_queryset()
             u = self.request.user
-
             crud = self.crud
+            qs = crud.model.objects.all()
 
             param_tip_pub = {
                 '%s__tipo' % '__'.join(crud.container_field.split('__')[:-1]):
@@ -160,17 +211,14 @@ class DocumentoAdministrativoCrud(Crud):
                 crud.container_field: self.request.user
             }
 
-            if u.is_anonymous() or not u.has_perms(self.permission_required):
+            if u.is_anonymous() or not u.areatrabalho_set.exists():
                 qs = qs.filter(**param_tip_pub)
-            elif u.has_perms(self.permission_required):
-                if u.areatrabalho_set.exists():
+            else:
+                if u.has_perms(self.permission_required):
                     qs = qs.filter(**param_user)
+                    self.is_contained = True
                 else:
                     qs = qs.filter(**param_tip_pub)
-            else:
-                # não havendo permissão a resposta 404 explicita inexistência
-                # ao inves de permissão negada por ser um container
-                raise Http404
 
             return qs
 
@@ -272,7 +320,8 @@ class DocumentoAdministrativoCrud(Crud):
             kwargs.update({
                 'queryset': qs,
                 'workspace': AreaTrabalho.objects.areatrabalho_publica(
-                ).first() if self.request.user.is_anonymous()
+                ).first() if self.request.user.is_anonymous() or
+                not self.request.user.has_perm(self.permission_required)
                 else self.request.user.areatrabalho_set.first()
             })
             return kwargs
@@ -388,10 +437,14 @@ class AnexadoCrud(MasterDetailCrud):
         def layout_key(self):
             return 'AnexadoDetail'
 
+        def dispatch(self, request, *args, **kwargs):
+            return MasterDetailCrud.DetailView.dispatch(self, request, *args, **kwargs)
+
     class ListView(
             DocumentoAdministrativoCrud.QuerySetContainerPrivPubMixin,
             MasterDetailCrud.ListView):
-        pass
+        def dispatch(self, request, *args, **kwargs):
+            return ListView.dispatch(self, request, *args, **kwargs)
 
 
 class DocumentoAnexadoEmLoteView(PermissionRequiredContainerCrudMixin, FilterView):
