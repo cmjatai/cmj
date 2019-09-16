@@ -1,3 +1,5 @@
+import re
+
 from django.core.management.base import BaseCommand
 from django.db.models import Q
 from django.db.models.signals import post_delete, post_save
@@ -23,12 +25,34 @@ class Command(BaseCommand):
             tipo_id=1,
         )
 
-        # for p in pareceres:
-        #    print(p)
         print(pareceres.count())
 
-        #docs = DocumentoAdministrativo.objects.exclude(numero_externo=None)
-        # print(docs.count())
+        count = 0
+        for p in pareceres:
+            m = re.match('([^0-9]+)([0-9]+)/ ?([0-9]+)', p.nome)
+            if m:
+                if 'projeto' not in p.nome and 'Proj.' not in p.nome:
+                    pass
+                else:
+                    continue
 
-        # for d in docs:
-        #    print(d.id, d.assunto, d.numero_externo)
+            else:
+                continue
+
+            count += 1
+            #print(p.id, p.nome)
+
+            continue
+
+            d = DocumentoAdministrativo.objects.filter(
+                temp_migracao_doc_acessorio=p.id).first()
+
+            if not d:
+                d = DocumentoAdministrativo()
+                d.temp_migracao_doc_acessorio = p.id
+                d.materia = p.materia
+                d.tipo_id = 150
+                d.ano = p.data.year
+                d.numero
+
+        print(count)
