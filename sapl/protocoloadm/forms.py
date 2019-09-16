@@ -103,19 +103,19 @@ class ProtocoloFilterSet(django_filters.FilterSet):
         model = Protocolo
         fields = ['numero',
                   'tipo_documento',
-                  'timestamp',
+                  'data',
                   'tipo_materia',
                   ]
 
     def __init__(self, *args, **kwargs):
         super(ProtocoloFilterSet, self).__init__(*args, **kwargs)
 
-        self.filters['timestamp'].label = 'Data (Inicial - Final)'
+        self.filters['data'].label = 'Data (Inicial - Final)'
 
         row1 = to_row(
             [('numero', 4),
              ('ano', 4),
-             ('timestamp', 4)])
+             ('data', 4)])
 
         row2 = to_row(
             [('tipo_documento', 4),
@@ -1113,9 +1113,11 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
                   'observacao',
                   'texto_integral',
                   'protocolo',
+                  'workspace'
                   ]
 
-        widgets = {'protocolo': forms.HiddenInput()}
+        widgets = {'protocolo': forms.HiddenInput(),
+                   'workspace': forms.HiddenInput()}
 
     def clean(self):
         super(DocumentoAdministrativoForm, self).clean()
@@ -1199,6 +1201,9 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
         if self.fields['protocolo'].initial:
             documento.protocolo = Protocolo.objects.get(
                 id=int(self.fields['protocolo'].initial))
+
+        # FIXME - DAR ESCOLHA AO PROTOCOLO DE ENCAMINHAMENTO
+        #documento.workspace_id = 20
 
         documento.save()
 

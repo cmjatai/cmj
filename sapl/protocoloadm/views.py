@@ -205,6 +205,17 @@ class DocumentoAdministrativoCrud(Crud):
         def cancel_url(self):
             return self.search_url
 
+        def get_initial(self):
+            initial = Crud.CreateView.get_initial(self)
+
+            initial.update({
+                'workspace': AreaTrabalho.objects.areatrabalho_publica(
+                ).first() if self.request.user.is_anonymous() or
+                not self.request.user.has_perms(self.permission_required)
+                else self.request.user.areatrabalho_set.first()
+            })
+            return initial
+
     class UpdateView(Crud.UpdateView):
         form_class = DocumentoAdministrativoForm
         layout_key = None
@@ -213,7 +224,7 @@ class DocumentoAdministrativoCrud(Crud):
             if self.object.protocolo:
                 p = self.object.protocolo
                 return {'ano_protocolo': p.ano,
-                        'numero_protocolo': p.numero}
+                        'numero_protocolo': p.numero, }
 
     class DeleteView(Crud.DeleteView):
 
@@ -267,13 +278,13 @@ class DocumentoAdministrativoCrud(Crud):
                 qs = qs.filter(id__in=lista).distinct()
 
             if 'o' in self.request.GET and not self.request.GET['o']:
-                qs = qs.order_by('-ano', '-numero')
+                qs = qs.order_by('-ano', '-data')
 
             kwargs.update({
                 'queryset': qs,
                 'workspace': AreaTrabalho.objects.areatrabalho_publica(
                 ).first() if self.request.user.is_anonymous() or
-                not self.request.user.has_perm(self.permission_required)
+                not self.request.user.has_perms(self.permission_required)
                 else self.request.user.areatrabalho_set.first()
             })
             return kwargs
@@ -1405,6 +1416,12 @@ class CriarDocumentoProtocolo(PermissionRequiredMixin, CreateView):
         doc['assunto'] = protocolo.assunto_ementa
         doc['interessado'] = protocolo.interessado
         doc['numero'] = numero_max + 1 if numero_max else 1
+
+        doc['workspace'] = AreaTrabalho.objects.areatrabalho_publica().first() \
+            if self.request.user.is_anonymous() or \
+            not self.request.user.has_perms(self.permission_required) \
+            else self.request.user.areatrabalho_set.first()
+
         return doc
 
 

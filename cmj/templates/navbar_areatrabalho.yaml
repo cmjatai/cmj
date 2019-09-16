@@ -15,9 +15,15 @@
 - title: {% trans "Agenda" %}
   url: cmj.agenda:evento_list
   check_permission: core.menu_agenda
+- title: {% trans 'Protocolo' %}
+  url: sapl.protocoloadm:protocolo
+  check_permission: protocoloadm.list_protocolo 
 - title: {% trans 'Documentos' %}
   url: sapl.protocoloadm:documentoadministrativo_list
   check_permission: protocoloadm.list_documentoadministrativo 
+- title: {% trans 'Matérias Legislativas' %}
+  url: sapl.materia:pesquisar_materia
+  check_permission: protocoloadm.list_protocolo 
 
 - title: {% trans "Atividade Legislativa" %}
   url: ''

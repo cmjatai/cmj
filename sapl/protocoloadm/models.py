@@ -136,6 +136,18 @@ class Protocolo(models.Model):
             'numero': self.numero, 'ano': self.ano
         }
 
+    def materia_vinculada(self):
+        from sapl.materia.models import MateriaLegislativa
+        try:
+            materia = MateriaLegislativa.objects.get(
+                tipo=self.tipo_materia,
+                ano=self.ano,
+                numero_protocolo=self.numero
+            )
+        except:
+            return None
+        return materia
+
 
 @reversion.register()
 class DocumentoAdministrativo(models.Model):

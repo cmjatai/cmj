@@ -680,9 +680,10 @@ class AnoNumeroOrderingFilter(django_filters.OrderingFilter):
 
     choices = (('DEC', 'Ordem Decrescente'),
                ('CRE', 'Ordem Crescente'),)
+
     order_by_mapping = {
-        'DEC': ['-ano', '-numero'],
-        'CRE': ['ano', 'numero'],
+        'DEC': ['-ano', '-data'],
+        'CRE': ['ano', 'data'],
     }
 
     def __init__(self, *args, **kwargs):
