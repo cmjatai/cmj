@@ -1,5 +1,7 @@
 from django.core.management.base import BaseCommand
+from django.db.models import Q
 from django.db.models.signals import post_delete, post_save
+
 from sapl.materia.models import DocumentoAcessorio, TipoDocumento
 from sapl.protocoloadm.models import DocumentoAdministrativo
 
@@ -15,13 +17,18 @@ class Command(BaseCommand):
 
     def run(self):
 
-        pareceres = DocumentoAcessorio.objects.filter(tipo_id=1)
+        pareceres = DocumentoAcessorio.objects.filter(
+            Q(autor__icontains='leonardo') | Q(
+                autor__icontains='renata') | Q(autor__icontains='silmar'),
+            tipo_id=1,
+        )
 
         # for p in pareceres:
         #    print(p)
+        print(pareceres.count())
 
-        docs = DocumentoAdministrativo.objects.exclude(numero_externo=None)
-        print(docs.count())
+        #docs = DocumentoAdministrativo.objects.exclude(numero_externo=None)
+        # print(docs.count())
 
-        for d in docs:
-            print(d.id, d.assunto, d.numero_externo)
+        # for d in docs:
+        #    print(d.id, d.assunto, d.numero_externo)

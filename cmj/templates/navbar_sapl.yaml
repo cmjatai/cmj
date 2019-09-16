@@ -25,7 +25,7 @@
   url: sapl.base:relatorios_list
 
 - title: {% trans 'Sessão OnLine' %}
-  url: /online
+  url: /online/
                   
 {% if user.is_superuser %}
 - title: {% trans 'Documentos Administrativos (SUPERUSER)' %}

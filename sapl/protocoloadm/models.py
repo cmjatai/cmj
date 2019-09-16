@@ -9,7 +9,8 @@ import reversion
 
 from cmj.core.models import AreaTrabalho
 from sapl.base.models import Autor
-from sapl.materia.models import TipoMateriaLegislativa, UnidadeTramitacao
+from sapl.materia.models import TipoMateriaLegislativa, UnidadeTramitacao,\
+    MateriaLegislativa
 from sapl.utils import (RANGE_ANOS, YES_NO_CHOICES, texto_upload_path,
                         get_settings_auth_user_model,
                         OverwriteStorage, PortalFileField)
@@ -137,7 +138,6 @@ class Protocolo(models.Model):
         }
 
     def materia_vinculada(self):
-        from sapl.materia.models import MateriaLegislativa
         try:
             materia = MateriaLegislativa.objects.get(
                 tipo=self.tipo_materia,
@@ -163,6 +163,14 @@ class DocumentoAdministrativo(models.Model):
         null=True,
         on_delete=models.PROTECT,
         verbose_name=_('Protocolo'))
+
+    materia = models.ForeignKey(
+        MateriaLegislativa,
+        blank=True,
+        null=True,
+        on_delete=models.PROTECT
+    )
+
     data = models.DateField(verbose_name=_('Data'))
 
     interessado = models.CharField(
