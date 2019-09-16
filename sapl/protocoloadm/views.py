@@ -351,6 +351,115 @@ class DocumentoAcessorioAdministrativoCrud(MasterDetailCrud):
             initial['workspace'] = self.request.user.areatrabalho_set.first()
             return initial
 
+    class DetailView(MasterDetailCrud.DetailView):
+        is_contained = True
+
+        def has_permission(self):
+            return True
+
+        def dispatch(self, request, *args, **kwargs):
+            return DetailView.dispatch(self, request, *args, **kwargs)
+
+        def get(self, request, *args, **kwargs):
+            try:
+                self.object = self.model.objects.get(pk=kwargs.get('pk'))
+            except Exception as e:
+                username = request.user.username
+                self.logger.error("user=" + username + ". " + str(e))
+                raise Http404
+
+            context = DocumentoAcessorioAdministrativoCrud.DetailView.get_context_data(
+                self, object=self.object)
+            return self.render_to_response(context)
+
+        def get_context_data(self, **kwargs):
+
+            try:
+                dp = kwargs['object'].documento
+                kwargs['root_pk'] = dp.id
+
+            except Exception as e:
+                username = self.request.user.username
+                self.logger.error("user=" + username + ". " + str(e))
+                raise Http404()
+
+            u = self.request.user
+
+            if u.is_anonymous():
+                if dp.workspace.tipo != AreaTrabalho.TIPO_PUBLICO:
+                    raise Http404
+            else:
+                if dp.workspace.tipo == AreaTrabalho.TIPO_PUBLICO:
+                    self.is_contained = dp.workspace == u.areatrabalho_set.first(
+                    ) and u.has_perms(self.permission_required)
+                    if not self.is_contained and dp.workspace != u.areatrabalho_set.first():
+                        raise Http404
+                else:
+                    # se não é público, se user faz parte do container e tem
+                    # permissão visualização dos anexados
+                    if dp.workspace == u.areatrabalho_set.first() and u.has_perms(self.permission_required):
+                        self.is_contained = True
+                    else:
+                        raise Http404
+
+            context = super(MasterDetailCrud.DetailView,
+                            self).get_context_data(**kwargs)
+
+            context[
+                'title'] = 'Documento Principal: <small>(%s)</small>' % (
+                    dp)
+            return context
+
+    class ListView(
+            DocumentoAdministrativoCrud.QuerySetContainerPrivPubMixin,
+            MasterDetailCrud.ListView):
+
+        def dispatch(self, request, *args, **kwargs):
+            return MasterDetailCrud.ListView.dispatch(self, request, *args, **kwargs)
+
+        def get_queryset(self):
+            qs = super().get_queryset()
+            return qs.filter(documento_id=self.kwargs['pk'])
+
+        def get_context_data(self, **kwargs):
+
+            try:
+                params = {'pk': kwargs['root_pk']}
+                dp = DocumentoAdministrativo.objects.get(**params)
+
+            except Exception as e:
+                username = self.request.user.username
+                self.logger.error("user=" + username + ". " + str(e))
+                raise Http404()
+
+            u = self.request.user
+
+            if u.is_anonymous():
+                if dp.workspace.tipo != AreaTrabalho.TIPO_PUBLICO:
+                    raise Http404
+            else:
+                if dp.workspace.tipo == AreaTrabalho.TIPO_PUBLICO:
+                    self.is_contained = dp.workspace == u.areatrabalho_set.first(
+                    ) and u.has_perms(self.permission_required)
+                    if not self.is_contained and dp.workspace != u.areatrabalho_set.first():
+                        raise Http404
+                else:
+                    # se não é público, se user faz parte do container e tem
+                    # permissão visualização dos anexados
+                    if dp.workspace == u.areatrabalho_set.first() and u.has_perms(self.permission_required):
+                        self.is_contained = True
+                    else:
+                        raise Http404
+
+            context = super(MasterDetailCrud.ListView,
+                            self).get_context_data(**kwargs)
+
+            context[
+                'title'] = '%s a: <small>(%s)</small>' % (
+                    context['title'],
+                    dp)
+            return context
+
 
 class AnexadoCrud(MasterDetailCrud):
     model = Anexado
@@ -420,18 +529,23 @@ class AnexadoCrud(MasterDetailCrud):
                 raise Http404()
 
             u = self.request.user
+
             if u.is_anonymous():
                 if dp.workspace.tipo != AreaTrabalho.TIPO_PUBLICO:
                     raise Http404
             else:
-                if dp.workspace.tipo != AreaTrabalho.TIPO_PUBLICO:
-                    if not u.has_perms(self.permission_required) and dp.workspace == u.areatrabalho_set.first():
-                        raise Http404
-                    elif u.has_perms(self.permission_required) and dp.workspace != u.areatrabalho_set.first():
+                if dp.workspace.tipo == AreaTrabalho.TIPO_PUBLICO:
+                    self.is_contained = dp.workspace == u.areatrabalho_set.first(
+                    ) and u.has_perms(self.permission_required)
+                    if not self.is_contained and dp.workspace != u.areatrabalho_set.first():
                         raise Http404
                 else:
-                    if not u.has_perms(self.permission_required) or dp.workspace != u.areatrabalho_set.first():
-                        self.is_contained = False
+                    # se não é público, se user faz parte do container e tem
+                    # permissão visualização dos anexados
+                    if dp.workspace == u.areatrabalho_set.first() and u.has_perms(self.permission_required):
+                        self.is_contained = True
+                    else:
+                        raise Http404
 
             context = super(MasterDetailCrud.DetailView,
                             self).get_context_data(**kwargs)
@@ -449,8 +563,7 @@ class AnexadoCrud(MasterDetailCrud):
             return MasterDetailCrud.ListView.dispatch(self, request, *args, **kwargs)
 
         def get_queryset(self):
-            qs = DocumentoAdministrativoCrud.QuerySetContainerPrivPubMixin.get_queryset(
-                self)
+            qs = super().get_queryset()
             return qs.filter(documento_principal_id=self.kwargs['pk'])
 
         def get_context_data(self, **kwargs):
@@ -458,8 +571,6 @@ class AnexadoCrud(MasterDetailCrud):
             try:
                 params = {'pk': kwargs['root_pk']}
                 dp = DocumentoAdministrativo.objects.get(**params)
-                if dp.workspace.tipo == AreaTrabalho.TIPO_PUBLICO:
-                    self.is_contained = False
 
             except Exception as e:
                 username = self.request.user.username
@@ -467,18 +578,23 @@ class AnexadoCrud(MasterDetailCrud):
                 raise Http404()
 
             u = self.request.user
+
             if u.is_anonymous():
                 if dp.workspace.tipo != AreaTrabalho.TIPO_PUBLICO:
                     raise Http404
             else:
-                if dp.workspace.tipo != AreaTrabalho.TIPO_PUBLICO:
-                    if not u.has_perms(self.permission_required) and dp.workspace == u.areatrabalho_set.first():
-                        raise Http404
-                    elif u.has_perms(self.permission_required) and dp.workspace != u.areatrabalho_set.first():
+                if dp.workspace.tipo == AreaTrabalho.TIPO_PUBLICO:
+                    self.is_contained = dp.workspace == u.areatrabalho_set.first(
+                    ) and u.has_perms(self.permission_required)
+                    if not self.is_contained and dp.workspace != u.areatrabalho_set.first():
                         raise Http404
                 else:
-                    if not u.has_perms(self.permission_required) or dp.workspace == u.areatrabalho_set.first():
-                        self.is_contained = False
+                    # se não é público, se user faz parte do container e tem
+                    # permissão visualização dos anexados
+                    if dp.workspace == u.areatrabalho_set.first() and u.has_perms(self.permission_required):
+                        self.is_contained = True
+                    else:
+                        raise Http404
 
             context = super(MasterDetailCrud.ListView,
                             self).get_context_data(**kwargs)
@@ -747,17 +863,112 @@ class TramitacaoAdmCrud(MasterDetailCrud):
                 return HttpResponseRedirect(self.get_success_url())
             return super().form_valid(form)
 
-    class ListView(MasterDetailCrud.ListView):
+    class DetailView(MasterDetailCrud.DetailView):
+        is_contained = True
+
+        def has_permission(self):
+            return True
+
+        def dispatch(self, request, *args, **kwargs):
+            return DetailView.dispatch(self, request, *args, **kwargs)
+
+        def get(self, request, *args, **kwargs):
+            try:
+                self.object = self.model.objects.get(pk=kwargs.get('pk'))
+            except Exception as e:
+                username = request.user.username
+                self.logger.error("user=" + username + ". " + str(e))
+                raise Http404
+
+            context = TramitacaoAdmCrud.DetailView.get_context_data(
+                self, object=self.object)
+            return self.render_to_response(context)
+
+        def get_context_data(self, **kwargs):
+
+            try:
+                dp = kwargs['object'].documento
+                kwargs['root_pk'] = dp.id
+
+            except Exception as e:
+                username = self.request.user.username
+                self.logger.error("user=" + username + ". " + str(e))
+                raise Http404()
+
+            u = self.request.user
+
+            if u.is_anonymous():
+                if dp.workspace.tipo != AreaTrabalho.TIPO_PUBLICO:
+                    raise Http404
+            else:
+                if dp.workspace.tipo == AreaTrabalho.TIPO_PUBLICO:
+                    self.is_contained = dp.workspace == u.areatrabalho_set.first(
+                    ) and u.has_perms(self.permission_required)
+                    if not self.is_contained and dp.workspace != u.areatrabalho_set.first():
+                        raise Http404
+                else:
+                    # se não é público, se user faz parte do container e tem
+                    # permissão visualização dos anexados
+                    if dp.workspace == u.areatrabalho_set.first() and u.has_perms(self.permission_required):
+                        self.is_contained = True
+                    else:
+                        raise Http404
+
+            context = super(MasterDetailCrud.DetailView,
+                            self).get_context_data(**kwargs)
+
+            context[
+                'title'] = 'Tramitação... <small>(%s)</small>' % (
+                    dp)
+            return context
+
+    class ListView(
+            DocumentoAdministrativoCrud.QuerySetContainerPrivPubMixin,
+            MasterDetailCrud.ListView):
+
+        def dispatch(self, request, *args, **kwargs):
+            return MasterDetailCrud.ListView.dispatch(self, request, *args, **kwargs)
 
         def get_queryset(self):
             qs = super().get_queryset()
-            return qs.order_by('-data_tramitacao', '-id')
-
-    class DetailView(MasterDetailCrud.DetailView):
+            return qs.filter(documento_id=self.kwargs['pk'])
 
         def get_context_data(self, **kwargs):
-            context = super().get_context_data(**kwargs)
-            context['user'] = self.request.user
+
+            try:
+                params = {'pk': kwargs['root_pk']}
+                dp = DocumentoAdministrativo.objects.get(**params)
+
+            except Exception as e:
+                username = self.request.user.username
+                self.logger.error("user=" + username + ". " + str(e))
+                raise Http404()
+
+            u = self.request.user
+
+            if u.is_anonymous():
+                if dp.workspace.tipo != AreaTrabalho.TIPO_PUBLICO:
+                    raise Http404
+            else:
+                if dp.workspace.tipo == AreaTrabalho.TIPO_PUBLICO:
+                    self.is_contained = dp.workspace == u.areatrabalho_set.first(
+                    ) and u.has_perms(self.permission_required)
+                    if not self.is_contained and dp.workspace != u.areatrabalho_set.first():
+                        raise Http404
+                else:
+                    # se não é público, se user faz parte do container e tem
+                    # permissão visualização dos anexados
+                    if dp.workspace == u.areatrabalho_set.first() and u.has_perms(self.permission_required):
+                        self.is_contained = True
+                    else:
+                        raise Http404
+
+            context = super(MasterDetailCrud.ListView,
+                            self).get_context_data(**kwargs)
+
+            context[
+                'title'] = 'Tramitações de: <small>(%s)</small>' % (
+                    dp)
             return context
 
     class DeleteView(MasterDetailCrud.DeleteView):

@@ -19,8 +19,8 @@ DocumentoAdministrativo:
 
 DocumentoAcessorioAdministrativo:
   {% trans 'Documento Acessório' %}:
-  - tipo  autor
-  - nome  data
+  - tipo autor
+  - nome data
   - arquivo
   - assunto
 
@@ -30,8 +30,8 @@ StatusTramitacaoAdministrativo:
 
 TramitacaoAdministrativo:
   {% trans 'Tramitação' %}:
-  - data_tramitacao  unidade_tramitacao_local
-  - unidade_tramitacao_destino data_encaminhamento  data_fim_prazo
+  - unidade_tramitacao_local unidade_tramitacao_destino
+  - data_tramitacao  data_encaminhamento  data_fim_prazo
   - status urgente 
   - texto
 

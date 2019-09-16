@@ -2,12 +2,20 @@
 {% load i18n %}
 {% load common_tags %}
 
-{% block more_buttons %}
-    
-    {% if perms|get_add_perm:view %}
-        <a href="{% url 'sapl.protocoloadm:anexado_em_lote' root_pk %}" class="btn btn-outline-primary">
-            {% trans "Adicionar Anexado em Lote" %}
-        </a>
+{% block actions %}
+  <div class="actions btn-group btn-group" role="group">
+    {% block more_buttons_left %}{% endblock more_buttons_left %}
+  </div>
+  <div class="actions btn-group btn-group-lg" role="group">
+    {% if view.is_contained and perms|get_add_perm:view %}
+      <a href="{% url 'sapl.protocoloadm:anexado_em_lote' root_pk %}" class="btn btn-outline-primary">
+        {% trans "Adicionar Anexado em Lote" %}
+      </a>
     {% endif %}
-
-{% endblock more_buttons %}
+    {% if view.create_url and view.is_contained %}
+      <a href="{{ view.create_url }}" class="btn btn-outline-primary">
+        {% blocktrans with verbose_name=view.verbose_name %} Adicionar {{ verbose_name }} {% endblocktrans %}
+      </a>
+    {% endif %}
+  </div>
+{% endblock actions %}
