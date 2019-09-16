@@ -232,8 +232,8 @@ class PortalFieldFile(FieldFile):
     @property
     def url(self):
         self._require_file()
-        if settings.DEBUG:
-            return self.storage.url(self.name)
+        # if settings.DEBUG:
+        #    return self.storage.url(self.name)
 
         field_name_action = self.field.name.replace('_', '-')
         return '%s' % reverse(

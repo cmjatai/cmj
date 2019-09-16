@@ -21,6 +21,7 @@ from rest_framework.fields import SerializerMethodField
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
+from cmj.core.models import AreaTrabalho
 from sapl.api.forms import SaplFilterSetMixin
 from sapl.api.permissions import SaplModelPermissions
 from sapl.api.serializers import ChoiceSerializer
@@ -424,26 +425,36 @@ class ResponseFileMixin:
 
 
 class ContainerPermission(SaplModelPermissions):
-    def has_permission(self, request, view):
-        if request.user.is_anonymous():
-            raise PermissionDenied()
 
-        if not request.user.areatrabalho_set.filter(ativo=True).exists():
-            raise PermissionDenied(
-                detail=_(
-                    '%s, você pertence a nenhuma '
-                    'Área de Trabalho ativa' % request.user))
-        return super().has_permission(request, view)
+    def has_permission(self, request, view):
+        view.permission_required = self.get_required_permissions(
+            request.method, view.queryset.model)
+        return True
 
 
 class ControlAccessFileForContainerMixin(ResponseFileMixin):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        params = {
-            self.container_field: self.request.user
+
+        u = self.request.user
+
+        param_tip_pub = {
+            '%s__tipo' % '__'.join(self.container_field.split('__')[:-1]):
+            AreaTrabalho.TIPO_PUBLICO
         }
-        qs = qs.filter(**params)
+
+        param_user = {
+            self.container_field: u
+        }
+
+        if u.is_anonymous() or not u.areatrabalho_set.exists():
+            qs = qs.filter(**param_tip_pub)
+        else:
+            if u.has_perms(self.permission_required):
+                qs = qs.filter(**param_user)
+            else:
+                qs = qs.filter(**param_tip_pub)
         return qs
 
 
@@ -481,7 +492,7 @@ class _TramitacaoAdministrativoViewSet(ControlAccessFileForContainerMixin):
 
 @customize(Anexado)
 class _AnexadoViewSet(ControlAccessFileForContainerMixin):
-    container_field = 'documento__workspace__operadores'
+    container_field = 'documento_principal__workspace__operadores'
     permission_classes = (ContainerPermission, )
 
 
