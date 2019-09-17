@@ -46,8 +46,12 @@ class NormaFilterSet(django_filters.FilterSet):
                                       choices=choice_anos_com_normas)
 
     ementa = django_filters.CharFilter(
-        method='filter_ementa',
-        label=_('Pesquisar expressões na ementa da norma'))
+        label=_(
+            'Pesquisar expressões na ementa'),
+        help_text=_(
+            '"Para busca no conteúdo das normas, use a Pesquisa Textual"'),
+        method='filter_ementa'
+    )
 
     apelido = django_filters.CharFilter(lookup_expr='icontains',
                                         label=_('Apelido'))
@@ -80,9 +84,9 @@ class NormaFilterSet(django_filters.FilterSet):
         self.form.helper = SaplFormHelper()
         self.form.helper.form_method = 'GET'
         self.form.helper.layout = Layout(
-            Fieldset(_('Pesquisa de Norma'),
+            Fieldset(_('Pesquisa de Norma<br><small>Refine sua busca informando quaisquer dos campos desta página de busca e clique em "Processar Pesquisa"</small>'),
                      row1, row2, row3, row4, row5,
-                     form_actions(label='Pesquisar'))
+                     form_actions(label='Processar pesquisa'))
         )
 
     def filter_ementa(self, queryset, name, value):

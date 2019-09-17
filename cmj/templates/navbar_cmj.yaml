@@ -100,6 +100,8 @@
     url: cmj.diarios:diariooficial_list
   - title: {% trans 'Legislação Municipal' %}
     url: sapl.norma:norma_pesquisa
+  - title: {% trans 'Normas e Códigos de Destaque' %}
+    url: sapl.norma:norma_de_destaque
   - title: {% trans 'Licitações' %}
     url: ''
     children:

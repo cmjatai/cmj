@@ -958,7 +958,10 @@ class MateriaLegislativaFilterSet(django_filters.FilterSet):
         label=_('Matérias por Partido'))
 
     ementa = django_filters.CharFilter(
-        label=_('Pesquisar expressões na ementa'),
+        label=_(
+            'Pesquisar expressões na ementa'),
+        help_text=_(
+            '"Para busca no conteúdo das matérias, use a Pesquisa Textual"'),
         method='filter_ementa'
     )
     indexacao = django_filters.CharFilter(lookup_expr='icontains',
@@ -981,7 +984,7 @@ class MateriaLegislativaFilterSet(django_filters.FilterSet):
     tipo_listagem = forms.ChoiceField(
         required=False,
         choices=CHOICE_TIPO_LISTAGEM,
-        label=_('Tipo da Listagem do Resultado da Pesquisa'))
+        label=_('Tipo da Pesquisa'))
 
     class Meta(FilterOverridesMetaMixin):
         model = MateriaLegislativa
@@ -1049,10 +1052,10 @@ class MateriaLegislativaFilterSet(django_filters.FilterSet):
             ('autoria__autor', 0),
             (Button('pesquisar',
                     'Pesquisar Autor',
-                    css_class='btn btn-primary btn-sm'), 2),
+                    css_class='btn btn-secondary btn-sm'), 2),
             (Button('limpar',
                     'limpar Autor',
-                    css_class='btn btn-primary btn-sm'), 2),
+                    css_class='btn btn-secondary btn-sm'), 2),
             ('autoria__primeiro_autor', 2),
             ('autoria__autor__tipo', 3),
             ('autoria__autor__parlamentar_set__filiacao__partido', 3)
@@ -1086,11 +1089,16 @@ class MateriaLegislativaFilterSet(django_filters.FilterSet):
         self.form.helper = SaplFormHelper()
         self.form.helper.form_method = 'GET'
         self.form.helper.layout = Layout(
-            Fieldset(_('Pesquisa Básica'),
-                     row1, row2),
+            Fieldset(_('Pesquisa Básica<br><small>Refine sua busca informando quaisquer dos campos desta página de busca e clique em "Processar Pesquisa"</small>'),
+                     row1, row2
+                     ),
 
             Fieldset(_('Como listar os resultados da pesquisa'),
-                     row8
+
+                     to_row([
+                         (row8, 'col'),
+                         (form_actions(label=_('Processar Pesquisa')), 'col-md-auto')
+                     ])
                      ),
             Fieldset(_('Origem externa'),
                      row10, row11
@@ -1100,7 +1108,7 @@ class MateriaLegislativaFilterSet(django_filters.FilterSet):
                      HTML(autor_label),
                      HTML(autor_modal),
                      row4, row6, row7, row9,
-                     form_actions(label=_('Pesquisar')))
+                     )
         )
 
     @property

@@ -125,10 +125,10 @@ def montar_row_autor(name):
         [(name, 0),
          (Button('pesquisar',
                  'Pesquisar Autor',
-                 css_class='btn btn-primary btn-sm'), 2),
+                 css_class='btn btn-secondary btn-sm'), 2),
          (Button('limpar',
                  'Limpar Autor',
-                 css_class='btn btn-primary btn-sm'), 10)])
+                 css_class='btn btn-secondary btn-sm'), 10)])
 
     return autor_row
 

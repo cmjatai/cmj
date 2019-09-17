@@ -7,9 +7,14 @@
     <a href="{% url 'sapl.base:haystack_search' %}?q=&models=norma.normajuridica" class="btn btn-outline-primary">
       Pesquisa Textual
     </a>
-    {% if show_results %}
+    {% if show_results or page_obj %}
         <a href="{% url 'sapl.norma:norma_pesquisa' %}" class="btn btn-outline-primary">{% trans 'Pesquisa Parametrizada' %}</a>
     {% endif %}
+  </div>
+  <div class="actions btn-group-sm" role="group">
+    <a href="{% url 'sapl.norma:norma_de_destaque' %}" class="btn btn-outline-primary">
+      Normas e Códigos de Destaque
+    </a>
   </div>
   <div class="actions btn-group-lg" role="group">
     {% if perms.norma.add_normajuridica %}
@@ -34,25 +39,23 @@
       <table class="table table-striped table-hover table-link-ordering">
     		<thead class="thead-default">
           <tr>
-            <th>Tipo</th>
-            <th>Número</th>
-            <th>Ano</th>
-            <th>Data</th>
-            <th>Ementa</th>
-            <th>Relacionamentos</th>
+            <th>Normas Pesquisadas</th>
           </tr>
     		</thead>
         {% for n in page_obj %}
           <tr>
-            <td><a href="{% url 'sapl.norma:normajuridica_detail' n.id %}">{{n.tipo}}</a></td>
-            {% if n.texto_integral %}
-                <td><a href="{{n.texto_integral.url}}">{{n.numero}}</a></td>
-            {% else %}
-                <td>{{n.numero}}</td>
-            {% endif %}
-            <td>{{n.ano}}</td>
-            <td>{{n.data}}</td>
-            <td>{{n.ementa|safe}}</td>
+            <td>
+              <a href="{% url 'sapl.norma:normajuridica_detail' n.id %}"><strong>{{n}}</strong></a><br>
+              {{n.ementa|safe}}
+              {% if n.texto_integral %}
+                <br><strong>Texto Original:</strong> <a href="{{result.object.texto_integral.url}}">Clique aqui</a>
+              {% endif %}
+              {% if n.texto_articulado.exists %}
+                <br><strong>Texto Articulado:</strong> <a href="{% url 'sapl.norma:norma_ta' n.pk %}">Clique aqui</a>
+              {% endif %}
+            </td>
+            {% comment "" %}
+            
             <td>
                 {% if n.get_normas_relacionadas.0|length == 0 and n.get_normas_relacionadas.1|length == 0%}
                    Norma sem alterações posteriores.
@@ -75,6 +78,7 @@
                   {% endfor %}
               {% endif %}
             </td>
+            {% endcomment %}
     			</tr>
     		{% endfor %}
     	</table>

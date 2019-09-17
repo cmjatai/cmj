@@ -32,6 +32,11 @@
     border-bottom: 1px solid #ddd;
     font-weight: normal;
     font-family: "SourceSansProSemiBold", Helvetica, Arial, sans-serif;
+    small {
+      color: #777;
+      margin-left: 1em;
+      font-size: 0.55em;
+    }
   }
 
   .container-detail {

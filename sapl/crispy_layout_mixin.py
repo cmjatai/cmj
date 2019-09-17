@@ -17,7 +17,10 @@ def heads_and_tails(list_of_lists):
 
 def to_column(name_span):
     fieldname, span = name_span
-    return Div(fieldname, css_class='col-md-%d' % span)
+    if isinstance(span, int):
+        return Div(fieldname, css_class='col-md-%s' % span)
+    else:
+        return Div(fieldname, css_class=span)
 
 
 def to_row(names_spans):
