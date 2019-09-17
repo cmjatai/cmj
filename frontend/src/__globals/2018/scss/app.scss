@@ -145,6 +145,9 @@ a:hover {
   
 .alert {
   margin: $grid-gutter-width $grid-gutter-width/2 $grid-gutter-width;
+  &.ementa_materia {
+    margin: 0 0 $grid-gutter-width ;
+  }
 }
 
 // #### CRUD DETAIL ########################################

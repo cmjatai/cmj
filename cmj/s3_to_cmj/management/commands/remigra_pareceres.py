@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand
 from django.db.models import Q
 from django.db.models.signals import post_delete, post_save
 
-from sapl.materia.models import DocumentoAcessorio, TipoDocumento
+from sapl.materia.models import DocumentoAcessorio
 from sapl.protocoloadm.models import DocumentoAdministrativo
 
 
@@ -74,7 +74,7 @@ class Command(BaseCommand):
             d.numero = int(nome_split[-2])
             d.data = p.data
             d.assunto = p.ementa
-            d.obervacao = p.indexacao
+            d.observacao = p.indexacao
             d.workspace_id = 21
             d.save()
 

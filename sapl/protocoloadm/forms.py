@@ -14,8 +14,9 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 import django_filters
 
+from cmj.core.models import AreaTrabalho
 from sapl.base.models import Autor, TipoAutor, AppConfig
-from sapl.crispy_layout_mixin import SaplFormHelper
+from sapl.crispy_layout_mixin import SaplFormHelper, to_column
 from sapl.crispy_layout_mixin import SaplFormLayout, form_actions, to_row
 from sapl.materia.models import (MateriaLegislativa, TipoMateriaLegislativa,
                                  UnidadeTramitacao)
@@ -1096,6 +1097,18 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
                                           label=Protocolo._meta.
                                           get_field('numero').verbose_name)
 
+    tipo_materia = forms.ModelChoiceField(
+        label=TipoMateriaLegislativa._meta.verbose_name,
+        required=False,
+        queryset=TipoMateriaLegislativa.objects.all(),
+        empty_label='Selecione')
+
+    numero_materia = forms.CharField(
+        label='Número', required=False)
+
+    ano_materia = forms.CharField(
+        label='Ano', required=False)
+
     class Meta:
         model = DocumentoAdministrativo
         fields = ['tipo',
@@ -1113,6 +1126,10 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
                   'observacao',
                   'texto_integral',
                   'protocolo',
+                  'materia',
+                  'tipo_materia',
+                  'numero_materia',
+                  'ano_materia',
                   'workspace'
                   ]
 
@@ -1194,6 +1211,28 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
             raise ValidationError("O arquivo Texto Integral deve ser menor que {0:.1f} mb, o tamanho atual desse arquivo é {1:.1f} mb"
                                   .format((MAX_DOC_UPLOAD_SIZE / 1024) / 1024, (texto_integral.size / 1024) / 1024))
 
+        tm, am, nm = (cleaned_data.get('tipo_materia', ''),
+                      cleaned_data.get('ano_materia', ''),
+                      cleaned_data.get('numero_materia', ''))
+
+        if tm and am and nm:
+            try:
+                self.logger.debug("Tentando obter objeto MateriaLegislativa (tipo_id={}, ano={}, numero={})."
+                                  .format(tm, am, nm))
+                materia_de_vinculo = MateriaLegislativa.objects.get(
+                    tipo_id=tm,
+                    ano=am,
+                    numero=nm
+                )
+            except ObjectDoesNotExist:
+                self.logger.error("Objeto MateriaLegislativa vinculada (tipo_id={}, ano={}, numero={}) não existe!"
+                                  .format(tm, am, nm))
+                raise ValidationError(_('Matéria Vinculada não existe!'))
+            else:
+                self.logger.info("MateriaLegislativa vinculada (tipo_id={}, ano={}, numero={}) com sucesso."
+                                 .format(tm, am, nm))
+                cleaned_data['materia'] = materia_de_vinculo
+
         return self.cleaned_data
 
     def save(self, commit=True):
@@ -1201,9 +1240,6 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
         if self.fields['protocolo'].initial:
             documento.protocolo = Protocolo.objects.get(
                 id=int(self.fields['protocolo'].initial))
-
-        # FIXME - DAR ESCOLHA AO PROTOCOLO DE ENCAMINHAMENTO
-        #documento.workspace_id = 20
 
         documento.save()
 
@@ -1226,23 +1262,43 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
         row5 = to_row(
             [('texto_integral', 12)])
 
+        row5_5 = to_row(
+            [('tipo_materia', 6), ('numero_materia', 3), ('ano_materia', 3)])
+
         row6 = to_row(
             [('numero_externo', 4), ('dias_prazo', 6), ('data_fim_prazo', 2)])
 
         row7 = to_row(
             [('observacao', 12)])
 
+        fieldset = [
+            Fieldset(_('Identificação Básica'), row1, row2, row3, row4, row5),
+        ]
+
+        if kwargs['initial']['workspace'].tipo == AreaTrabalho.TIPO_PROCURADORIA:
+            fieldset.append(
+                Fieldset(_('Vincular a Matéria Legislativa'), row5_5,
+                         to_column(
+                    (Alert('<strong></strong><br><span></span>',
+                           css_class="ementa_materia hidden alert-info",
+
+                           dismiss=False), 12)))
+            )
+
+        fieldset.append(Fieldset(_('Outras Informações'), row6, row7))
+
         self.helper = SaplFormHelper()
-        self.helper.layout = SaplFormLayout(
-            Fieldset(_('Identificação Básica'),
-                     row1, row2, row3, row4, row5),
-            Fieldset(_('Outras Informações'),
-                     row6, row7))
-        super(DocumentoAdministrativoForm, self).__init__(
-            *args, **kwargs)
+        self.helper.layout = SaplFormLayout(*fieldset)
+        super(DocumentoAdministrativoForm, self).__init__(*args, **kwargs)
 
         self.fields['tipo'].queryset = TipoDocumentoAdministrativo.objects.filter(
-            workspace=self.initial['workspace'])
+            workspace=kwargs['initial']['workspace'])
+
+        inst = self.instance
+        if inst and inst.materia:
+            self.fields['tipo_materia'].initial = inst.materia.tipo
+            self.fields['numero_materia'].initial = inst.materia.numero
+            self.fields['ano_materia'].initial = inst.materia.ano
 
 
 class DesvincularDocumentoForm(ModelForm):

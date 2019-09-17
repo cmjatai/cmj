@@ -1770,10 +1770,10 @@ class MateriaLegislativaCrud(Crud):
         def hook_documentoadministrativo_set(self, obj):
 
             d = obj.documentoadministrativo_set.first()
-            if not d:
+            if not d or not d.texto_integral:
                 return '', ''
 
-            return _('Documento Administrativo'), '<a href="{}">{}</a>'.format(d.texto_integral.url, d)
+            return _('Parecer da Procuradoria Jurídica'), '<a href="{}">{}</a>'.format(d.texto_integral.url, d)
 
     class ListView(Crud.ListView, RedirectView):
 
