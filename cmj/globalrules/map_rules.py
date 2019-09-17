@@ -25,7 +25,8 @@ from cmj.globalrules import (RP_ADD, RP_CHANGE, RP_DELETE, RP_DETAIL, RP_LIST,
                              menu_administracao,
                              GROUP_SIGAD_VIEW_STATUS_RESTRITOS,
                              GROUP_OUVIDORIA_VISUALIZACAO_RESPOSTAS,
-                             GROUP_AGENDA_WORKSPACE, menu_agenda)
+                             GROUP_AGENDA_WORKSPACE, menu_agenda,
+                             GROUP_MATERIA_WORKSPACE_VIEWER)
 from cmj.ouvidoria.models import Solicitacao, MensagemSolicitacao
 from cmj.sigad.models import Revisao, Classe, Documento, Midia
 from sapl.parlamentares.models import Partido
@@ -143,6 +144,11 @@ rules_saap_group_workspace_oper_processos = {
     ]
 }
 
+rules_materia_group_workspace = {
+    'group': GROUP_MATERIA_WORKSPACE_VIEWER,
+    'rules': []
+}
+
 
 rules_agenda_group_workspace = {
     'group': GROUP_AGENDA_WORKSPACE,
@@ -197,6 +203,8 @@ rules_patterns = [
     rules_saap_group_workspace_oper_grupo_contatos,
     rules_saap_group_workspace_oper_processos,
     rules_agenda_group_workspace,
+    rules_materia_group_workspace,
+
 
     rules_sigad_view_status_restritos,
     rules_ouvidoria_visualizacao_respostas,

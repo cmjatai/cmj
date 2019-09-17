@@ -139,6 +139,8 @@ LegislacaoCitadaDetail:
   - paragrafo  inciso  alinea  item
 
 MateriaLegislativaDetail:
+  ' ':
+  - ementa
   {% trans 'Identificação Básica' %}:
   - tipo:6 ano numero
   - data_apresentacao  numero_protocolo  tipo_apresentacao
@@ -157,6 +159,5 @@ MateriaLegislativaDetail:
   - tipo_origem_externa  numero_origem_externa  ano_origem_externa
   - local_origem_externa  data_origem_externa
   {% trans 'Dados Textuais' %}:
-  - ementa
   - indexacao
   - observacao

@@ -10,7 +10,7 @@ import tempfile
 from crispy_forms.layout import HTML
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.decorators import permission_required, login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, ValidationError
 from django.core.urlresolvers import reverse
@@ -1760,13 +1760,6 @@ class MateriaLegislativaCrud(Crud):
         layout_key = 'MateriaLegislativaDetail'
         template_name = "materia/materialegislativa_detail.html"
 
-        def get_context_data(self, **kwargs):
-            context = super().get_context_data(**kwargs)
-            context['user'] = self.request.user
-            context['materia'] = MateriaLegislativa.objects.get(
-                pk=self.kwargs['pk'])
-            return context
-
         def hook_documentoadministrativo_set(self, obj):
 
             d = obj.documentoadministrativo_set.first()
@@ -1792,6 +1785,9 @@ class MateriaLegislativaCrud(Crud):
 
             return _('Autógrafo'), '<a href="{}">{}</a>'.format(
                 reverse('sapl.norma:normajuridica_detail', kwargs={'pk': d.id}), d)
+
+        def get_queryset(self):
+            return Crud.DetailView.get_queryset(self)
 
     class ListView(Crud.ListView, RedirectView):
 
