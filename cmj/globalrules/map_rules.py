@@ -11,6 +11,7 @@ from cmj.cerimonial.models import Perfil, EnderecoPerfil, EmailPerfil,\
 from cmj.core.models import Trecho, Municipio, AreaTrabalho,\
     OperadorAreaTrabalho, Cep, RegiaoMunicipal, Bairro, TipoLogradouro,\
     Distrito, Logradouro, ImpressoEnderecamento, Notificacao
+from cmj.diarios.models import DiarioOficial, TipoDeDiario
 from cmj.globalrules import (RP_ADD, RP_CHANGE, RP_DELETE, RP_DETAIL, RP_LIST,
                              GROUP_SOCIAL_USERS,
                              GROUP_SAAP_WORKSPACE_OPER_CONTATOS,
@@ -26,10 +27,12 @@ from cmj.globalrules import (RP_ADD, RP_CHANGE, RP_DELETE, RP_DETAIL, RP_LIST,
                              GROUP_SIGAD_VIEW_STATUS_RESTRITOS,
                              GROUP_OUVIDORIA_VISUALIZACAO_RESPOSTAS,
                              GROUP_AGENDA_WORKSPACE, menu_agenda,
-                             GROUP_MATERIA_WORKSPACE_VIEWER)
+                             GROUP_MATERIA_WORKSPACE_VIEWER,
+                             GROUP_DIARIOS_OPERADOR)
 from cmj.ouvidoria.models import Solicitacao, MensagemSolicitacao
 from cmj.sigad.models import Revisao, Classe, Documento, Midia
 from sapl.parlamentares.models import Partido
+from sapl.rules import SAPL_GROUP_GERAL
 from sapl.rules.map_rules import __base__
 
 
@@ -161,6 +164,21 @@ rules_agenda_group_workspace = {
 }
 
 
+rules_diarios_group_operador = {
+    'group': GROUP_DIARIOS_OPERADOR,
+    'rules': [
+        (DiarioOficial, __base__)
+    ]
+}
+
+
+rules_group_geral = {
+    'group': SAPL_GROUP_GERAL,
+    'rules': [
+        (TipoDeDiario, __base__)
+    ]
+}
+
 # não possui efeito e é usada nos testes que verificam se todos os models estão
 # neste arquivo rules.py
 rules_group_anonymous = {
@@ -205,7 +223,10 @@ rules_patterns = [
     rules_agenda_group_workspace,
     rules_materia_group_workspace,
 
+    rules_diarios_group_operador,
 
     rules_sigad_view_status_restritos,
     rules_ouvidoria_visualizacao_respostas,
+
+    rules_group_geral
 ]
