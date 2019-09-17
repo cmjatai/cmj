@@ -277,6 +277,8 @@ class CrispyLayoutFormMixin:
 
         field = obj._meta.get_field(fieldname)
         value = getattr(obj, fieldname)
+        if not value:
+            return '', ''
 
         display = '<a href="{}">{}</a>'.format(
             reverse(

@@ -571,15 +571,27 @@ class DocumentoAcessorio(models.Model):
             'autor': self.autor}
 
     def delete(self, using=None, keep_parents=False):
-        if self.arquivo:
-            self.arquivo.delete()
 
         for p in self.proposicao.all():
             p.conteudo_gerado_related = None
             p.save()
 
-        return models.Model.delete(
-            self, using=using, keep_parents=keep_parents)
+        arquivo = self.arquivo
+
+        try:
+            r = models.Model.delete(
+                self, using=using, keep_parents=keep_parents)
+        except Exception as e:
+
+            for p in self.proposicao.all():
+                p.conteudo_gerado_related = self
+                p.save()
+            raise Exception(e)
+
+        if arquivo:
+            arquivo.delete(save=False)
+
+        return r
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):

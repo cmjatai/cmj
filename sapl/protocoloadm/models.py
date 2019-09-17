@@ -168,7 +168,8 @@ class DocumentoAdministrativo(models.Model):
         MateriaLegislativa,
         blank=True,
         null=True,
-        on_delete=models.PROTECT
+        on_delete=models.PROTECT,
+        verbose_name=_('Matéria Vinculada')
     )
 
     data = models.DateField(verbose_name=_('Data'))
@@ -177,7 +178,7 @@ class DocumentoAdministrativo(models.Model):
         blank=True, null=True, verbose_name=_('Field temporário para migração dos docs acessórios da procuradoria'))
 
     interessado = models.CharField(
-        max_length=50, blank=True, verbose_name=_('Interessado'))
+        max_length=1000, blank=True, verbose_name=_('Interessado'))
     autor = models.ForeignKey(Autor, blank=True, null=True,
                               on_delete=models.PROTECT)
     dias_prazo = models.PositiveIntegerField(

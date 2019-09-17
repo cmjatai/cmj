@@ -25,7 +25,7 @@ TipoFimRelatoria:
 
 MateriaLegislativa:
   {% trans 'Identificação Básica' %}:
-  - tipo ano numero
+  - tipo:6 ano numero
   - data_apresentacao  numero_protocolo  tipo_apresentacao
   - tipo_autor autor
   - texto_original
@@ -140,7 +140,7 @@ LegislacaoCitadaDetail:
 
 MateriaLegislativaDetail:
   {% trans 'Identificação Básica' %}:
-  - tipo ano numero
+  - tipo:6 ano numero
   - data_apresentacao  numero_protocolo  tipo_apresentacao
   - texto_original
   - numeracao_set

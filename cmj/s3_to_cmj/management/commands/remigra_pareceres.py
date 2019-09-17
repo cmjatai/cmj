@@ -1,5 +1,8 @@
+import os
 import re
 
+from cairosvg.path import path
+from django.core.files.base import File
 from django.core.management.base import BaseCommand
 from django.db.models import Q
 from django.db.models.signals import post_delete, post_save
@@ -26,8 +29,8 @@ class Command(BaseCommand):
         )
 
         print(pareceres.count())
-
         count = 0
+
         for p in pareceres:
             m = re.match('([^0-9]+)([0-9]+)/ ?([0-9]+)', p.nome)
             if m:
@@ -40,19 +43,57 @@ class Command(BaseCommand):
                 continue
 
             count += 1
-            #print(p.id, p.nome)
+            print('migrando... ', p.id, p.nome)
 
-            continue
+            nome_split = m.groups()
 
             d = DocumentoAdministrativo.objects.filter(
                 temp_migracao_doc_acessorio=p.id).first()
+
+            d_outro = DocumentoAdministrativo.objects.filter(
+                temp_migracao_doc_acessorio__isnull=True,
+                ano=int(nome_split[-1]),
+                numero=int(nome_split[-2]),
+                tipo_id=150).first()
+            if d_outro:
+                d_outro.delete()
 
             if not d:
                 d = DocumentoAdministrativo()
                 d.temp_migracao_doc_acessorio = p.id
                 d.materia = p.materia
-                d.tipo_id = 150
-                d.ano = p.data.year
-                d.numero
+
+            if d.materia.autores.exists():
+                d.interessado = ', '.join(map(str, d.materia.autores.all()))
+
+            d.tipo_id = 150
+            d.ano = int(nome_split[-1])
+            d.numero = int(nome_split[-2])
+            d.data = p.data
+            d.assunto = p.ementa
+            d.obervacao = p.indexacao
+            d.workspace_id = 21
+            d.save()
+
+            if d.texto_integral:
+                d.texto_integral.delete()
+
+            if p.arquivo:
+                path = p.arquivo.path.replace('sapl', 'original__sapl')
+                ext = os.path.basename(path).rsplit('.')[-1]
+
+                with open(path, 'rb') as f:
+                    d.texto_integral = File(
+                        f,
+                        'docadm_%s.%s' % (d.id, ext))
+
+                    print(path)
+                    print(d.texto_integral.path)
+                    d.save()
+
+                    print(p.arquivo.path)
+                    print(d.texto_integral.path)
+
+            p.delete()
 
         print(count)
