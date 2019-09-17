@@ -79,7 +79,7 @@
                 {% elif result.object|search_get_model == 'o' %}
                   <p>
                     <strong>Diário Oficial: </strong><a href="{% url 'cmj.diarios:diariooficial_detail' result.object.pk %}">{{ result.object }}</a>
-                    <br>Data: {{result.object.data}}
+                    <br><strong>Data:</strong> {{result.object.data}}
                     {% comment "" %}
                       <br>{{result.object.descricao}}
                     {% endcomment %}
@@ -98,18 +98,21 @@
                 {% elif result.object|search_get_model == 'n' %}
                   <p>
                     <strong>Norma Jurídica: </strong><a href="{% url 'sapl.norma:normajuridica_detail' result.object.pk %}">{{ result.object }}</a>
+                    {% if result.object.materia %}
+                      <br><small><strong>Matéria Legislativa Vinculada:</strong> <a href="{% url 'sapl.materia:materialegislativa_detail' result.object.pk %}">{{result.object.materia}}</a></small>
+                    {% endif %}
                     <br>{{result.object.ementa}}
                     {% if result.object.texto_integral %}
                     <br><strong>Texto Original:</strong> <a href="{{result.object.texto_integral.url}}">Clique aqui</a>
                     {% endif %}
-                    {% if result.object.texto_articulado %}
+                    {% if result.object.texto_articulado.exists %}
                       <br><strong>Texto Articulado:</strong> <a href="{% url 'sapl.norma:norma_ta' result.object.pk %}">Clique aqui</a>
                     {% endif %}
                   </p>
                 {% elif result.object|search_get_model == 'sp' %}
                   <p>
                     <strong>Sessão Planária: </strong><a href="{% url 'sapl.sessao:sessaoplenaria_detail' result.object.pk %}">{{ result.object }}</a>
-                    <br>Data: {{result.object.data_inicio}}
+                    <br><strong>Data:</strong> {{result.object.data_inicio}}
                     {% if result.object.upload_ata %}
                       <br><strong>Ata da Sessão:</strong><a href="{{result.object.upload_ata.url}}">Clique aqui</a>
                     {% endif %}

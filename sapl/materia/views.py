@@ -1775,6 +1775,24 @@ class MateriaLegislativaCrud(Crud):
 
             return _('Parecer da Procuradoria Jurídica'), '<a href="{}">{}</a>'.format(d.texto_integral.url, d)
 
+        def hook_normajuridica_set(self, obj):
+
+            d = obj.normajuridica_set.exclude(tipo_id=27).first()
+            if not d:
+                return '', ''
+
+            return _('Norma Juridica Vinculada'), '<a href="{}">{}</a>'.format(
+                reverse('sapl.norma:normajuridica_detail', kwargs={'pk': d.id}), d)
+
+        def hook_autografo_set(self, obj):
+
+            d = obj.normajuridica_set.filter(tipo_id=27).first()
+            if not d:
+                return '', ''
+
+            return _('Autógrafo'), '<a href="{}">{}</a>'.format(
+                reverse('sapl.norma:normajuridica_detail', kwargs={'pk': d.id}), d)
+
     class ListView(Crud.ListView, RedirectView):
 
         def get_redirect_url(self, *args, **kwargs):

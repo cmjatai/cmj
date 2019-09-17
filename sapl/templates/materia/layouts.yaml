@@ -146,8 +146,10 @@ MateriaLegislativaDetail:
   - numeracao_set
   - materia_anexada_set__materia_principal|m2m_urlize_for_detail
   - materia_principal_set__materia_anexada|m2m_urlize_for_detail
-  - documentoadministrativo_set  
   {% trans 'Outras Informações' %}:
+  - documentoadministrativo_set  
+  - normajuridica_set  
+  - autografo_set  
   - apelido  dias_prazo  polemica
   - objeto  regime_tramitacao  em_tramitacao
   - data_fim_prazo  data_publicacao  complementar
