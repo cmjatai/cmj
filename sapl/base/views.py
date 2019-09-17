@@ -15,8 +15,8 @@ from django.core.mail import send_mail
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.db import connection
 from django.db.models import Count, Q, ProtectedError
-from django.shortcuts import render
 from django.http import Http404, HttpResponseRedirect, JsonResponse
+from django.shortcuts import render
 from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
 from django.utils import timezone
@@ -29,8 +29,8 @@ from django.views.generic import (CreateView, DeleteView, FormView, ListView,
                                   UpdateView)
 from django.views.generic.base import RedirectView, TemplateView
 from django_filters.views import FilterView
-from haystack.views import SearchView
 from haystack.query import SearchQuerySet
+from haystack.views import SearchView
 
 from sapl import settings
 from sapl.audiencia.models import AudienciaPublica, TipoAudienciaPublica
@@ -41,17 +41,19 @@ from sapl.crud.base import CrudAux, make_pagination
 from sapl.materia.models import (Autoria, MateriaLegislativa, Proposicao, Anexada,
                                  TipoMateriaLegislativa, StatusTramitacao, UnidadeTramitacao,
                                  DocumentoAcessorio, TipoDocumento)
-from sapl.norma.models import (NormaJuridica, TipoNormaJuridica, NormaEstatisticas)
-from sapl.parlamentares.models import (Parlamentar, Legislatura, Mandato, Filiacao, 
+from sapl.norma.models import (
+    NormaJuridica, TipoNormaJuridica, NormaEstatisticas)
+from sapl.parlamentares.models import (Parlamentar, Legislatura, Mandato, Filiacao,
                                        SessaoLegislativa, Bancada, AfastamentoParlamentar)
-from sapl.protocoloadm.models import (Protocolo, TipoDocumentoAdministrativo, 
-                                      StatusTramitacaoAdministrativo, 
+from sapl.protocoloadm.models import (Protocolo, TipoDocumentoAdministrativo,
+                                      StatusTramitacaoAdministrativo,
                                       DocumentoAdministrativo, Anexado)
 from sapl.sessao.models import (PresencaOrdemDia, SessaoPlenaria, OrdemDia,
                                 SessaoPlenariaPresenca, TipoSessaoPlenaria)
 from sapl.utils import (parlamentares_ativos, gerar_hash_arquivo, SEPARADOR_HASH_PROPOSICAO,
                         show_results_filter_set, mail_service_configured,
                         intervalos_tem_intersecao, remover_acentos)
+
 from .forms import (AlterarSenhaForm, CasaLegislativaForm,
                     ConfiguracoesAppForm, RelatorioAtasFilterSet,
                     RelatorioAudienciaFilterSet,
@@ -342,10 +344,10 @@ class RelatorioDocumentosAcessoriosView(FilterView):
 
         if not self.filterset.form.is_valid():
             return context
-        
+
         query_dict = self.request.GET.copy()
         context['show_results'] = show_results_filter_set(query_dict)
-        
+
         context['tipo_documento'] = str(
             TipoDocumento.objects.get(pk=self.request.GET['tipo'])
         )
@@ -414,12 +416,14 @@ class RelatorioPresencaSessaoView(FilterView):
 
         cd = self.filterset.form.cleaned_data
         if not cd['data_inicio'] and not cd['sessao_legislativa'] \
-            and not cd['legislatura']:
-            msg = _("Formulário inválido! Preencha pelo menos algum dos campos Período, Legislatura ou Sessão Legislativa.")
+                and not cd['legislatura']:
+            msg = _(
+                "Formulário inválido! Preencha pelo menos algum dos campos Período, Legislatura ou Sessão Legislativa.")
             messages.error(self.request, msg)
             return context
 
-        # Caso a data tenha sido preenchida, verifica se foi preenchida corretamente
+        # Caso a data tenha sido preenchida, verifica se foi preenchida
+        # corretamente
         if self.request.GET.get('data_inicio_0') and not self.request.GET.get('data_inicio_1'):
             msg = _("Formulário inválido! Preencha a data do Período Final.")
             messages.error(self.request, msg)
@@ -441,19 +445,21 @@ class RelatorioPresencaSessaoView(FilterView):
         sessao_legislativa_pk = self.request.GET.get('sessao_legislativa')
         if sessao_legislativa_pk:
             param0['sessao_plenaria__sessao_legislativa_id'] = sessao_legislativa_pk
-            sessao_legislativa = SessaoLegislativa.objects.get(id=sessao_legislativa_pk)
+            sessao_legislativa = SessaoLegislativa.objects.get(
+                id=sessao_legislativa_pk)
             context['sessao_legislativa'] = sessao_legislativa
 
         tipo_sessao_plenaria_pk = self.request.GET.get('tipo')
         context['tipo'] = ''
         if tipo_sessao_plenaria_pk:
             param0['sessao_plenaria__tipo_id'] = tipo_sessao_plenaria_pk
-            context['tipo'] = TipoSessaoPlenaria.objects.get(id=tipo_sessao_plenaria_pk)
+            context['tipo'] = TipoSessaoPlenaria.objects.get(
+                id=tipo_sessao_plenaria_pk)
 
         _range = []
 
         if ('data_inicio_0' in self.request.GET) and self.request.GET['data_inicio_0'] and \
-            ('data_inicio_1' in self.request.GET) and self.request.GET['data_inicio_1']:
+                ('data_inicio_1' in self.request.GET) and self.request.GET['data_inicio_1']:
             where = context['object_list'].query.where
             _range = where.children[0].rhs
 
@@ -461,10 +467,10 @@ class RelatorioPresencaSessaoView(FilterView):
             _range = [legislatura.data_inicio, legislatura.data_fim]
 
         elif sessao_legislativa_pk:
-            _range = [sessao_legislativa.data_inicio, sessao_legislativa.data_fim]
+            _range = [sessao_legislativa.data_inicio,
+                      sessao_legislativa.data_fim]
 
         param0.update({'sessao_plenaria__data_inicio__range': _range})
-
 
         # Parlamentares com Mandato no intervalo de tempo (Ativos)
         parlamentares_qs = parlamentares_ativos(
@@ -498,24 +504,24 @@ class RelatorioPresencaSessaoView(FilterView):
                                      Q(data_inicio_mandato__gte=_range[0], data_fim_mandato__lte=_range[1]))
 
             afastamentos = AfastamentoParlamentar.objects.filter(Q(parlamentar=p) & (Q(data_inicio__range=_range) |
-                                     Q(data_inicio__gte=_range[0], data_fim__isnull=True)))
-            
+                                                                                     Q(data_inicio__gte=_range[0], data_fim__isnull=True)))
+
             afast_parl_sessao = 0
             afast_parl_ordem = 0
             for afastamento in afastamentos:
                 if afastamento.data_fim:
-                    afast_parl_sessao += SessaoPlenaria.objects.filter(data_inicio__range=[afastamento.data_inicio, 
-                                                                    afastamento.data_fim]).count()
-                    afast_parl_ordem += OrdemDia.objects.filter(sessao_plenaria__data_inicio__range=[afastamento.data_inicio, 
-                                                                afastamento.data_fim]).order_by('sessao_plenaria__id').\
-                                                                distinct('sessao_plenaria__id').count()
+                    afast_parl_sessao += SessaoPlenaria.objects.filter(data_inicio__range=[afastamento.data_inicio,
+                                                                                           afastamento.data_fim]).count()
+                    afast_parl_ordem += OrdemDia.objects.filter(sessao_plenaria__data_inicio__range=[afastamento.data_inicio,
+                                                                                                     afastamento.data_fim]).order_by('sessao_plenaria__id').\
+                        distinct('sessao_plenaria__id').count()
                 else:
-                    afast_parl_sessao += SessaoPlenaria.objects.filter(data_inicio__gte=afastamento.data_inicio).count()
+                    afast_parl_sessao += SessaoPlenaria.objects.filter(
+                        data_inicio__gte=afastamento.data_inicio).count()
                     afast_parl_ordem += OrdemDia.objects.filter(sessao_plenaria__data_inicio__gte=afastamento.data_inicio).\
-                                                                order_by('sessao_plenaria__id').\
-                                                                distinct('sessao_plenaria__id').count()
+                        order_by('sessao_plenaria__id').\
+                        distinct('sessao_plenaria__id').count()
 
-            
             m = m.last()
             parlamentares_presencas.append({
                 'parlamentar': p,
@@ -550,14 +556,14 @@ class RelatorioPresencaSessaoView(FilterView):
 
             if total_sessao != 0:
                 porc = round(
-                        sessao_count * 100 / (total_sessao-afast_parl_sessao), 2)
+                    sessao_count * 100 / (total_sessao - afast_parl_sessao), 2)
                 parlamentares_presencas[i].update(
-                    {'sessao_porc': porc if porc <=100 else 100})
+                    {'sessao_porc': porc if porc <= 100 else 100})
             if total_ordemdia != 0:
                 porc = round(
-                        ordemdia_count * 100 / (total_ordemdia-afast_parl_ordem), 2)
+                    ordemdia_count * 100 / (total_ordemdia - afast_parl_ordem), 2)
                 parlamentares_presencas[i].update(
-                    {'ordemdia_porc': porc if porc <=100.0 else 100.0})
+                    {'ordemdia_porc': porc if porc <= 100.0 else 100.0})
 
         context['date_range'] = _range
         context['total_ordemdia'] = total_ordemdia
@@ -568,10 +574,12 @@ class RelatorioPresencaSessaoView(FilterView):
             ' - ' + self.request.GET['data_inicio_1'])
         context['sessao_legislativa'] = ''
         context['legislatura'] = ''
-        context['exibir_ordem'] = self.request.GET.get('exibir_ordem_dia') == 'on'
+        context['exibir_ordem'] = self.request.GET.get(
+            'exibir_ordem_dia') == 'on'
 
         if sessao_legislativa_pk:
-            context['sessao_legislativa'] = SessaoLegislativa.objects.get(id=sessao_legislativa_pk)
+            context['sessao_legislativa'] = SessaoLegislativa.objects.get(
+                id=sessao_legislativa_pk)
         if legislatura_pk:
             context['legislatura'] = Legislatura.objects.get(id=legislatura_pk)
         # =====================================================================
@@ -591,7 +599,8 @@ class RelatorioHistoricoTramitacaoView(FilterView):
     def get_context_data(self, **kwargs):
         context = super(RelatorioHistoricoTramitacaoView,
                         self).get_context_data(**kwargs)
-        context['title'] = _('Histórico de Tramitações de Matérias Legislativas')
+        context['title'] = _(
+            'Histórico de Tramitações de Matérias Legislativas')
         if not self.filterset.form.is_valid():
             return context
         qr = self.request.GET.copy()
@@ -770,13 +779,14 @@ class RelatorioMateriasTramitacaoView(FilterView):
             qs = filtra_url_materias_em_tramitacao(
                 qr, qs, 'tramitacao__status', 'status')
 
-        li = [li1 for li1 in qs if li1.tramitacao_set.last() and li1.tramitacao_set.last().status.indicador != 'F']
+        li = [li1 for li1 in qs if li1.tramitacao_set.last(
+        ) and li1.tramitacao_set.last().status.indicador != 'F']
         context['object_list'] = li
 
         qtdes = {}
         for tipo in TipoMateriaLegislativa.objects.all():
             li = context['object_list']
-            qtde = sum(1 for i in li if i.tipo_id==tipo.id)
+            qtde = sum(1 for i in li if i.tipo_id == tipo.id)
             if qtde > 0:
                 qtdes[tipo] = qtde
         context['qtdes'] = qtdes
@@ -1115,7 +1125,7 @@ class ListarInconsistenciasView(PermissionRequiredMixin, ListView):
             ('filiacoes_sem_data_filiacao',
              'Filiações sem data filiação',
              len(filiacoes_sem_data_filiacao())
-            )
+             )
         )
         tabela.append(
             ('mandato_sem_data_inicio',
@@ -1127,7 +1137,7 @@ class ListarInconsistenciasView(PermissionRequiredMixin, ListView):
             ('parlamentares_duplicados',
              'Parlamentares duplicados',
              len(parlamentares_duplicados())
-            )
+             )
         )
         tabela.append(
             ('parlamentares_mandatos_intersecao',
@@ -1138,8 +1148,8 @@ class ListarInconsistenciasView(PermissionRequiredMixin, ListView):
         tabela.append(
             ('parlamentares_filiacoes_intersecao',
              'Parlamentares com filiações em interseção',
-             len(parlamentares_filiacoes_intersecao())    
-            )
+             len(parlamentares_filiacoes_intersecao())
+             )
         )
         tabela.append(
             ('autores_duplicados',
@@ -1214,7 +1224,8 @@ def anexados_ciclicos(ofMateriaLegislativa):
                         )
                         anexados_temp.extend(anexados_anexado)
                     else:
-                        ciclicos.append((anexado.data_anexacao, anexado.materia_principal, anexado.materia_anexada))
+                        ciclicos.append(
+                            (anexado.data_anexacao, anexado.materia_principal, anexado.materia_anexada))
             else:
                 if anexado.documento_anexado not in anexados_total:
                     if not principal['documento_principal'] == anexado.documento_anexado.pk:
@@ -1224,7 +1235,8 @@ def anexados_ciclicos(ofMateriaLegislativa):
                         )
                         anexados_temp.extend(anexados_anexado)
                     else:
-                        ciclicos.append((anexado.data_anexacao, anexado.documento_principal, anexado.documento_anexado))
+                        ciclicos.append(
+                            (anexado.data_anexacao, anexado.documento_principal, anexado.documento_anexado))
 
     return ciclicos
 
@@ -1394,10 +1406,12 @@ def parlamentares_filiacoes_intersecao():
 
         for c in combinacoes:
             data_filiacao1 = c[0].data
-            data_desfiliacao1 = c[0].data_desfiliacao if c[0].data_desfiliacao else timezone.now().date()
+            data_desfiliacao1 = c[0].data_desfiliacao if c[0].data_desfiliacao else timezone.now(
+            ).date()
 
             data_filiacao2 = c[1].data
-            data_desfiliacao2 = c[1].data_desfiliacao if c[1].data_desfiliacao else timezone.now().date()
+            data_desfiliacao2 = c[1].data_desfiliacao if c[1].data_desfiliacao else timezone.now(
+            ).date()
 
             if data_filiacao1 and data_filiacao2:
                 exists = intervalos_tem_intersecao(
@@ -1427,7 +1441,7 @@ class ListarParlFiliacoesIntersecaoView(PermissionRequiredMixin, ListView):
             page_obj.number, paginator.num_pages)
         context[
             'NO_ENTRIES_MSG'
-            ] = 'Nenhum encontrado.'
+        ] = 'Nenhum encontrado.'
         return context
 
 
@@ -1495,7 +1509,7 @@ class ListarParlamentaresDuplicadosView(PermissionRequiredMixin, ListView):
 
     def get_queryset(self):
         return parlamentares_duplicados()
-    
+
     def get_context_data(self, **kwargs):
         context = super(
             ListarParlamentaresDuplicadosView, self).get_context_data(**kwargs)
@@ -1505,9 +1519,9 @@ class ListarParlamentaresDuplicadosView(PermissionRequiredMixin, ListView):
             page_obj.number, paginator.num_pages)
         context[
             'NO_ENTRIES_MSG'
-            ] = 'Nenhum encontrado.'
+        ] = 'Nenhum encontrado.'
         return context
- 
+
 
 def mandato_sem_data_inicio():
     return Mandato.objects.filter(data_inicio_mandato__isnull=True).order_by('parlamentar')
@@ -1518,13 +1532,13 @@ def get_estatistica(request):
     json_dict = {}
 
     datas = [MateriaLegislativa.objects.all().
-                 order_by('-data_ultima_atualizacao').
-                 values_list('data_ultima_atualizacao', flat=True).
-                 first(),
+             order_by('-data_ultima_atualizacao').
+             values_list('data_ultima_atualizacao', flat=True).
+             first(),
              NormaJuridica.objects.all().
-                 order_by('-data_ultima_atualizacao').
-                 values_list('data_ultima_atualizacao', flat=True).
-                 first()] # Retorna [None, None] se inexistem registros
+             order_by('-data_ultima_atualizacao').
+             values_list('data_ultima_atualizacao', flat=True).
+             first()]  # Retorna [None, None] se inexistem registros
 
     max_data = ''
 
@@ -1583,7 +1597,7 @@ class ListarFiliacoesSemDataFiliacaoView(PermissionRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super(
             ListarFiliacoesSemDataFiliacaoView, self
-            ).get_context_data(**kwargs)
+        ).get_context_data(**kwargs)
         paginator = context['paginator']
         page_obj = context['page_obj']
         context['page_range'] = make_pagination(
@@ -1942,7 +1956,8 @@ class AppConfigCrud(CrudAux):
                     inst.hash_code = gerar_hash_arquivo(
                         inst.texto_original.path, str(inst.pk))
                 except IOError:
-                    raise ValidationError("Existem proposicoes com arquivos inexistentes.")
+                    raise ValidationError(
+                        "Existem proposicoes com arquivos inexistentes.")
             elif inst.texto_articulado.exists():
                 ta = inst.texto_articulado.first()
                 inst.hash_code = 'P' + ta.hash() + SEPARADOR_HASH_PROPOSICAO + str(inst.pk)
@@ -2031,6 +2046,7 @@ class LogotipoView(RedirectView):
         logo = casa and casa.logotipo and casa.logotipo.name
         return os.path.join(settings.MEDIA_URL, logo) if logo else STATIC_LOGO
 
+
 def filtro_campos(dicionario):
 
     chaves_desejadas = ['ementa',
@@ -2053,6 +2069,7 @@ def filtro_campos(dicionario):
 
     return dicionario
 
+
 def pesquisa_textual(request):
 
     if 'q' not in request.GET:
@@ -2072,7 +2089,8 @@ def pesquisa_textual(request):
         try:
             sec_dict['pk'] = e.object.pk
         except:
-            # Index and db are out of sync. Object has been deleted from database
+            # Index and db are out of sync. Object has been deleted from
+            # database
             continue
         dici = filtro_campos(e.object.__dict__)
         sec_dict['objeto'] = str(dici)
@@ -2082,7 +2100,6 @@ def pesquisa_textual(request):
 
         json_dict['resultados'].append(sec_dict)
 
-
     return JsonResponse(json_dict)
 
 
@@ -2091,10 +2108,16 @@ class RelatorioHistoricoTramitacaoAdmView(FilterView):
     filterset_class = RelatorioHistoricoTramitacaoAdmFilterSet
     template_name = 'base/RelatorioHistoricoTramitacaoAdm_filter.html'
 
+    def get(self, request, *args, **kwargs):
+        if not request.user.is_superuser:
+            raise Http404
+        return FilterView.get(self, request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super(RelatorioHistoricoTramitacaoAdmView,
                         self).get_context_data(**kwargs)
-        context['title'] = _('Histórico de Tramitações de Documento Administrativo')
+        context['title'] = _(
+            'Histórico de Tramitações de Documento Administrativo')
         if not self.filterset.form.is_valid():
             return context
         qr = self.request.GET.copy()
@@ -2169,7 +2192,7 @@ class RelatorioNormasPorAutorView(FilterView):
                 str(TipoNormaJuridica.objects.get(id=tipo)))
         else:
             context['tipo'] = ''
-        
+
         if self.request.GET['autorianorma__autor']:
             autor = int(self.request.GET['autorianorma__autor'])
             context['autor'] = (str(Autor.objects.get(id=autor)))
