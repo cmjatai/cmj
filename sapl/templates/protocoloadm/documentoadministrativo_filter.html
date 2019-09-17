@@ -81,7 +81,7 @@
                         </br>
                     {% endif %}
               {% if d.texto_integral %}
-                <strong><a href="{{ d.url}}">Texto Integral</a></strong></br>
+                <strong><a href="{{ d.texto_integral.url}}">Texto Integral</a></strong></br>
               {% endif %}
               {% comment "" %}
                 {% if user.is_superuser and d.tramitacao and mail_service_configured or  user.is_superuser %}

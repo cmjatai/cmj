@@ -1767,6 +1767,14 @@ class MateriaLegislativaCrud(Crud):
                 pk=self.kwargs['pk'])
             return context
 
+        def hook_documentoadministrativo_set(self, obj):
+
+            d = obj.documentoadministrativo_set.first()
+            if not d:
+                return '', ''
+
+            return _('Documento Administrativo'), '<a href="{}">{}</a>'.format(d.texto_integral.url, d)
+
     class ListView(Crud.ListView, RedirectView):
 
         def get_redirect_url(self, *args, **kwargs):

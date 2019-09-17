@@ -262,7 +262,7 @@ class CrispyLayoutFormMixin:
             hook_fieldname = 'hook_%s' % fieldname
             if hasattr(self, hook_fieldname):
                 verbose_name, text = getattr(
-                    self, hook_fieldname)(obj, fieldname)
+                    self, hook_fieldname)(obj)
             else:
                 verbose_name, text = get_field_display(obj, fieldname)
 

@@ -55,13 +55,16 @@ class Command(BaseCommand):
                 ano=int(nome_split[-1]),
                 numero=int(nome_split[-2]),
                 tipo_id=150).first()
-            if d_outro:
-                d_outro.delete()
 
             if not d:
                 d = DocumentoAdministrativo()
                 d.temp_migracao_doc_acessorio = p.id
                 d.materia = p.materia
+
+            if d_outro:
+                if d_outro.protocolo:
+                    d.protocolo = d_outro.protocolo
+                d_outro.delete()
 
             if d.materia.autores.exists():
                 d.interessado = ', '.join(map(str, d.materia.autores.all()))
@@ -75,10 +78,11 @@ class Command(BaseCommand):
             d.workspace_id = 21
             d.save()
 
-            if d.texto_integral:
-                d.texto_integral.delete()
-
             if p.arquivo:
+
+                if d.texto_integral:
+                    d.texto_integral.delete()
+
                 path = p.arquivo.path.replace('sapl', 'original__sapl')
                 ext = os.path.basename(path).rsplit('.')[-1]
 

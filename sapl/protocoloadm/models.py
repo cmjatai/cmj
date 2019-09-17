@@ -169,6 +169,7 @@ class DocumentoAdministrativo(models.Model):
         blank=True,
         null=True,
         on_delete=models.PROTECT,
+        related_name='documentoadministrativo_set',
         verbose_name=_('Matéria Vinculada')
     )
 
