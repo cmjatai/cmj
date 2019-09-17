@@ -7,9 +7,9 @@ DocumentoAdministrativo:
   {% trans 'Identificação Básica' %}:
   - tipo  numero  ano
   - data  protocolo 
+  - materia|fk_urlize_for_detail
   - assunto
   - interessado  tramitacao
-  - materia|fk_urlize_for_detail
   - texto_integral
   - documento_anexado_set__documento_principal|m2m_urlize_for_detail
   - documento_principal_set__documento_anexado|m2m_urlize_for_detail
