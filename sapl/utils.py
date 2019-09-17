@@ -596,14 +596,12 @@ def intervalos_tem_intersecao(a_inicio, a_fim, b_inicio, b_fim):
 class MateriaPesquisaOrderingFilter(django_filters.OrderingFilter):
 
     choices = (
-        ('', 'Selecione'),
         ('dataC', 'Data, Tipo, Ano, Numero - Ordem Crescente'),
-        ('dataD', 'Data, Tipo, Ano, Numero - Ordem Decrescente'),
+        ('dataD', 'Data, Tipo, Ano, Numero - Ordem Decrescente (padrão)'),
         ('tipoC', 'Tipo, Ano, Numero, Data - Ordem Crescente'),
         ('tipoD', 'Tipo, Ano, Numero, Data - Ordem Decrescente')
     )
     order_by_mapping = {
-        '': [],
         'dataC': ['data_apresentacao', 'tipo__sigla', 'ano', 'numero'],
         'dataD': ['-data_apresentacao', '-tipo__sigla', '-ano', '-numero'],
         'tipoC': ['tipo__sigla', 'ano', 'numero', 'data_apresentacao'],
@@ -615,21 +613,23 @@ class MateriaPesquisaOrderingFilter(django_filters.OrderingFilter):
         super(MateriaPesquisaOrderingFilter, self).__init__(*args, **kwargs)
 
     def filter(self, qs, value):
-        _value = self.order_by_mapping[value[0]] if value else value
+        if value:
+            _value = self.order_by_mapping[value[0]] if value else value
+        else:
+            _value = self.order_by_mapping['dataD']
+
         return super().filter(qs, _value)
 
 
 class NormaPesquisaOrderingFilter(django_filters.OrderingFilter):
 
     choices = (
-        ('', 'Selecione'),
         ('dataC', 'Data, Tipo, Ano, Numero - Ordem Crescente'),
         ('dataD', 'Data, Tipo, Ano, Numero - Ordem Decrescente'),
         ('tipoC', 'Tipo, Ano, Numero, Data - Ordem Crescente'),
         ('tipoD', 'Tipo, Ano, Numero, Data - Ordem Decrescente')
     )
     order_by_mapping = {
-        '': [],
         'dataC': ['data', 'tipo', 'ano', 'numero'],
         'dataD': ['-data', '-tipo', '-ano', '-numero'],
         'tipoC': ['tipo', 'ano', 'numero', 'data'],
@@ -641,7 +641,10 @@ class NormaPesquisaOrderingFilter(django_filters.OrderingFilter):
         super(NormaPesquisaOrderingFilter, self).__init__(*args, **kwargs)
 
     def filter(self, qs, value):
-        _value = self.order_by_mapping[value[0]] if value else value
+        if value:
+            _value = self.order_by_mapping[value[0]] if value else value
+        else:
+            _value = self.order_by_mapping['dataD']
         return super().filter(qs, _value)
 
 

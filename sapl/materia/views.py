@@ -28,6 +28,7 @@ from django_filters.views import FilterView
 import weasyprint
 import weasyprint
 
+from cmj.globalrules import GROUP_MATERIA_WORKSPACE_VIEWER
 import sapl
 from sapl.base.email_utils import do_envia_email_confirmacao
 from sapl.base.models import Autor, CasaLegislativa, AppConfig as BaseAppConfig
@@ -1763,10 +1764,16 @@ class MateriaLegislativaCrud(Crud):
         def hook_documentoadministrativo_set(self, obj):
 
             d = obj.documentoadministrativo_set.first()
-            if not d or not d.texto_integral:
+            if not d or not d.texto_integral or not self.request.user.groups.filter(
+                    name=GROUP_MATERIA_WORKSPACE_VIEWER).exists():
                 return '', ''
 
-            return _('Parecer da Procuradoria Jurídica'), '<a href="{}">{}</a>'.format(d.texto_integral.url, d)
+            return (
+                _('Parecer da Procuradoria Jurídica'),
+                '<a href="{}">{}</a><br><small>{}</small>'.format(
+                    d.texto_integral.url, d, d.observacao
+                )
+            )
 
         def hook_normajuridica_set(self, obj):
 
@@ -1786,8 +1793,14 @@ class MateriaLegislativaCrud(Crud):
             return _('Autógrafo'), '<a href="{}">{}</a>'.format(
                 reverse('sapl.norma:normajuridica_detail', kwargs={'pk': d.id}), d)
 
-        def get_queryset(self):
-            return Crud.DetailView.get_queryset(self)
+        """def get_queryset(self):
+            qs = Crud.DetailView.get_queryset(self)
+
+            if not self.request.user.groups.filter(
+                    name=GROUP_MATERIA_WORKSPACE_VIEWER).exists():
+                qs = qs.exclude(despachoinicial_set__isnull=True)
+
+            return qs"""
 
     class ListView(Crud.ListView, RedirectView):
 

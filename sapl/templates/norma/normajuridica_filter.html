@@ -20,10 +20,12 @@
   </div>
 {% endblock %}
 
+
 {% block detail_content %}
-  {% if not show_results %}
-    {% crispy filter.form %}
-  {% endif %}
+  {% if not show_results %} {% crispy filter.form %} {% endif %}
+{% endblock detail_content %}
+
+{% block table_content %}
 
   {% if show_results %}
     {% if page_obj|length %}
@@ -84,9 +86,6 @@
     {% endif %}
   {% endif %}
 
-{% endblock detail_content %}
-
-{% block table_content %}
 {% endblock table_content %}
 
 {% block extra_js %}

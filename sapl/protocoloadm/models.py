@@ -196,7 +196,7 @@ class DocumentoAdministrativo(models.Model):
         null=True,
         verbose_name=_('Número Externo'))
     observacao = models.TextField(
-        blank=True, verbose_name=_('Observação'))
+        blank=True, verbose_name=_('Resumo'))
     texto_integral = PortalFileField(
         blank=True,
         null=True,

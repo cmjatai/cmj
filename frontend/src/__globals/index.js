@@ -17,6 +17,8 @@ import 'tinymce/themes/modern'
 import 'tinymce/plugins/table'
 import 'tinymce/plugins/lists'
 import 'tinymce/plugins/code'
+import 'tinymce/plugins/colorpicker'
+            
 
 import 'jquery-mask-plugin'
 

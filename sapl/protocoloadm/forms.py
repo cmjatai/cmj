@@ -1109,6 +1109,13 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
     ano_materia = forms.CharField(
         label='Ano', required=False)
 
+    observacao = forms.CharField(
+        label=DocumentoAdministrativo._meta.get_field(
+            'observacao').verbose_name,
+        widget=forms.Textarea(attrs={'id': 'texto-rico'}),
+        required=False
+    )
+
     class Meta:
         model = DocumentoAdministrativo
         fields = ['tipo',

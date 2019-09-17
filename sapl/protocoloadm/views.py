@@ -209,10 +209,7 @@ class DocumentoAdministrativoCrud(Crud):
             initial = Crud.CreateView.get_initial(self)
 
             initial.update({
-                'workspace': AreaTrabalho.objects.areatrabalho_publica(
-                ).first() if self.request.user.is_anonymous() or
-                not self.request.user.has_perms(self.permission_required)
-                else self.request.user.areatrabalho_set.first()
+                'workspace': self.request.user.areatrabalho_set.first()
             })
             return initial
 
@@ -1417,10 +1414,7 @@ class CriarDocumentoProtocolo(PermissionRequiredMixin, CreateView):
         doc['interessado'] = protocolo.interessado
         doc['numero'] = numero_max + 1 if numero_max else 1
 
-        doc['workspace'] = AreaTrabalho.objects.areatrabalho_publica().first() \
-            if self.request.user.is_anonymous() or \
-            not self.request.user.has_perms(self.permission_required) \
-            else self.request.user.areatrabalho_set.first()
+        doc['workspace'] = self.request.user.areatrabalho_set.first()
 
         return doc
 

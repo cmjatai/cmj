@@ -1,5 +1,5 @@
 from django.utils.translation import ugettext_lazy as _
-from sapl.rules import SAPL_GROUP_ADMINISTRATIVO
+from sapl.rules import SAPL_GROUP_ADMINISTRATIVO, SAPL_GROUP_PROTOCOLO
 
 default_app_config = 'cmj.globalrules.apps.AppConfig'
 
@@ -56,7 +56,8 @@ WORKSPACE_GROUPS = [
     GROUP_MATERIA_WORKSPACE_VIEWER,
     GROUP_AGENDA_WORKSPACE,
     GROUP_OUVIDORIA_VISUALIZACAO_RESPOSTAS,
-    SAPL_GROUP_ADMINISTRATIVO
+    SAPL_GROUP_ADMINISTRATIVO,
+    SAPL_GROUP_PROTOCOLO,
 ]
 
 

@@ -763,7 +763,7 @@ class CrudDetailView(PermissionRequiredContainerCrudMixin,
 
     def get(self, request, *args, **kwargs):
         try:
-            self.object = self.model.objects.get(pk=kwargs.get('pk'))
+            self.object = self.model.objects.get(pk=kwargs['pk'])
         except Exception as e:
             username = request.user.username
             self.logger.error("user=" + username + ". " + str(e))

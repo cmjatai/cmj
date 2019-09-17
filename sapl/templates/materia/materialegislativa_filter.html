@@ -22,10 +22,11 @@
     </div>
   {% endblock %}
 
-  {% block detail_content %}
-    {% if not show_results %}
-      {% crispy filter.form %}
-    {% endif %}
+{% block detail_content %}
+  {% if not show_results %} {% crispy filter.form %} {% endif %}
+{% endblock detail_content %}
+
+{% block table_content %}
 
     {% if show_results %}
         <div class="container-table">
@@ -157,8 +158,4 @@
         </div>
       {% include "paginacao.html" %}
     {% endif %}
-    {% endblock detail_content %}
-
-
-  {% block table_content %}
-  {% endblock table_content %}
+    {% endblock table_content %}

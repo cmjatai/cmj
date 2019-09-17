@@ -22,6 +22,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from cmj.core.models import AreaTrabalho
+from cmj.globalrules import GROUP_MATERIA_WORKSPACE_VIEWER
 from sapl.api.forms import SaplFilterSetMixin
 from sapl.api.permissions import SaplModelPermissions
 from sapl.api.serializers import ChoiceSerializer
@@ -455,6 +456,7 @@ class ControlAccessFileForContainerMixin(ResponseFileMixin):
                 qs = qs.filter(**param_user)
             else:
                 qs = qs.filter(**param_tip_pub)
+
         return qs
 
 
@@ -468,6 +470,21 @@ class _TipoDocumentoAdministrativoViewSet(ControlAccessFileForContainerMixin):
 class _DocumentoAdministrativoViewSet(ControlAccessFileForContainerMixin):
     container_field = 'workspace__operadores'
     permission_classes = (ContainerPermission, )
+
+    def get_queryset(self):
+        qs = ControlAccessFileForContainerMixin.get_queryset(self)
+        if self.action == 'texto_integral':
+            pk = self.kwargs['pk']
+            item = qs.filter(pk=pk).first()
+
+            if not item and self.request.user.groups.filter(
+                    name=GROUP_MATERIA_WORKSPACE_VIEWER).exists():
+
+                qs_new = DocumentoAdministrativo.objects.filter(pk=pk)
+                d = qs_new.first()
+                if d and d.materia and d.workspace and d.workspace.tipo == AreaTrabalho.TIPO_PROCURADORIA:
+                    return qs_new
+        return qs
 
     @action(detail=True)
     def texto_integral(self, request, *args, **kwargs):
