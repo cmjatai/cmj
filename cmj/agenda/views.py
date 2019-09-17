@@ -52,7 +52,7 @@ class EventoCrud(Crud):
 
             if not self.request.user.pk or not AreaTrabalho.objects.filter(
                     operadores=self.request.user.pk).exists():
-                qs = qs.filter(workspace__tipo=AreaTrabalho.TIPO_INSTITUCIONAL)
+                qs = qs.filter(workspace__tipo=AreaTrabalho.TIPO_PUBLICO)
             else:
                 qs = qs.filter(workspace__operadores=self.request.user.pk)
             return qs
