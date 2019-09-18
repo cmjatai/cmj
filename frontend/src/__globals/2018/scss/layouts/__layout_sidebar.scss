@@ -51,24 +51,25 @@
       opacity: 1;
       transition: opacity 0.4s ease-in-out;
       .icon {
-        transform: scale(1.15);
-        right: 10px;
+        transform: scale(1.35);
+        margin-right: 40px;
+
       }
     }
   }
   .inner {
     position: relative;
     z-index: 1;
-    font-size: 1.9em;
+    font-size: 1.7em;
     font-variant: small-caps;
-    line-height: 0.9em;
+    line-height: 1em;
     height: 100%;
     a {
       position: relative;
       display: block;
       color: inherit;
-      padding: 8px 5px 5px 45px;
-      text-indent: -30px;
+      padding: 5px 25px 5px 30px;
+      text-indent: -17px;
       height: 100%;
       text-decoration: none;
       &:hover {
@@ -95,13 +96,23 @@
 .canais-columns {
   padding: 0;
   height: 70px;
+  display: flex;     
+  transition: height 0.4s ease-in-out;
   .box {
-    width: 16.6666%;
-    float: left;
+    flex: 1 1 auto;
+    width: auto;
     height: 100%;
     &:hover {
+      flex: 1 0 25%;
       .icon {
         right: 0px;
+      }
+      .inner {
+        font-size: 2em;
+        a {
+          padding: 3px 5px 5px 40px;
+          text-indent: -30px;
+        }
       }
     }
   }

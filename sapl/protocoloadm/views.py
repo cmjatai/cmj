@@ -400,8 +400,8 @@ class DocumentoAcessorioAdministrativoCrud(MasterDetailCrud):
                 if dp.workspace.tipo == AreaTrabalho.TIPO_PUBLICO:
                     self.is_contained = dp.workspace == u.areatrabalho_set.first(
                     ) and u.has_perms(self.permission_required)
-                    if not self.is_contained and dp.workspace != u.areatrabalho_set.first():
-                        raise Http404
+                    # if not self.is_contained and dp.workspace != u.areatrabalho_set.first():
+                    #    raise Http404
                 else:
                     # se não é público, se user faz parte do container e tem
                     # permissão visualização dos anexados
@@ -449,8 +449,8 @@ class DocumentoAcessorioAdministrativoCrud(MasterDetailCrud):
                 if dp.workspace.tipo == AreaTrabalho.TIPO_PUBLICO:
                     self.is_contained = dp.workspace == u.areatrabalho_set.first(
                     ) and u.has_perms(self.permission_required)
-                    if not self.is_contained and dp.workspace != u.areatrabalho_set.first():
-                        raise Http404
+                    # if not self.is_contained and dp.workspace != u.areatrabalho_set.first():
+                    #    raise Http404
                 else:
                     # se não é público, se user faz parte do container e tem
                     # permissão visualização dos anexados
@@ -545,8 +545,8 @@ class AnexadoCrud(MasterDetailCrud):
                 if dp.workspace.tipo == AreaTrabalho.TIPO_PUBLICO:
                     self.is_contained = dp.workspace == u.areatrabalho_set.first(
                     ) and u.has_perms(self.permission_required)
-                    if not self.is_contained and dp.workspace != u.areatrabalho_set.first():
-                        raise Http404
+                    # if not self.is_contained and dp.workspace != u.areatrabalho_set.first():
+                    #    raise Http404
                 else:
                     # se não é público, se user faz parte do container e tem
                     # permissão visualização dos anexados
@@ -594,8 +594,8 @@ class AnexadoCrud(MasterDetailCrud):
                 if dp.workspace.tipo == AreaTrabalho.TIPO_PUBLICO:
                     self.is_contained = dp.workspace == u.areatrabalho_set.first(
                     ) and u.has_perms(self.permission_required)
-                    if not self.is_contained and dp.workspace != u.areatrabalho_set.first():
-                        raise Http404
+                    # if not self.is_contained and dp.workspace != u.areatrabalho_set.first():
+                    #    raise Http404
                 else:
                     # se não é público, se user faz parte do container e tem
                     # permissão visualização dos anexados
@@ -912,8 +912,8 @@ class TramitacaoAdmCrud(MasterDetailCrud):
                 if dp.workspace.tipo == AreaTrabalho.TIPO_PUBLICO:
                     self.is_contained = dp.workspace == u.areatrabalho_set.first(
                     ) and u.has_perms(self.permission_required)
-                    if not self.is_contained and dp.workspace != u.areatrabalho_set.first():
-                        raise Http404
+                    # if not self.is_contained and dp.workspace != u.areatrabalho_set.first():
+                    #    raise Http404
                 else:
                     # se não é público, se user faz parte do container e tem
                     # permissão visualização dos anexados
@@ -961,8 +961,8 @@ class TramitacaoAdmCrud(MasterDetailCrud):
                 if dp.workspace.tipo == AreaTrabalho.TIPO_PUBLICO:
                     self.is_contained = dp.workspace == u.areatrabalho_set.first(
                     ) and u.has_perms(self.permission_required)
-                    if not self.is_contained and dp.workspace != u.areatrabalho_set.first():
-                        raise Http404
+                    # if not self.is_contained and dp.workspace != u.areatrabalho_set.first():
+                    #    raise Http404
                 else:
                     # se não é público, se user faz parte do container e tem
                     # permissão visualização dos anexados

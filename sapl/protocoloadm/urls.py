@@ -27,13 +27,13 @@ from .apps import AppConfig
 app_name = AppConfig.name
 
 urlpatterns_documento_administrativo = [
-    url(r'^doc/',
+    url(r'^documentos/',
         include(DocumentoAdministrativoCrud.get_urls() +
                 AnexadoCrud.get_urls() +
                 TramitacaoAdmCrud.get_urls() +
                 DocumentoAcessorioAdministrativoCrud.get_urls())),
 
-    url(r'^doc/(?P<pk>\d+)/anexado_em_lote', DocumentoAnexadoEmLoteView.as_view(),
+    url(r'^documentos/(?P<pk>\d+)/anexado_em_lote', DocumentoAnexadoEmLoteView.as_view(),
         name='anexado_em_lote'),
 ]
 
