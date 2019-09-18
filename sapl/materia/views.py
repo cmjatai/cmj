@@ -28,6 +28,7 @@ from django_filters.views import FilterView
 import weasyprint
 import weasyprint
 
+from cmj.core.models import AreaTrabalho
 from cmj.globalrules import GROUP_MATERIA_WORKSPACE_VIEWER
 import sapl
 from sapl.base.email_utils import do_envia_email_confirmacao
@@ -1763,17 +1764,41 @@ class MateriaLegislativaCrud(Crud):
 
         def hook_documentoadministrativo_set(self, obj):
 
-            d = obj.documentoadministrativo_set.first()
-            if not d or not d.texto_integral or not self.request.user.groups.filter(
-                    name=GROUP_MATERIA_WORKSPACE_VIEWER).exists():
+            docs = obj.documentoadministrativo_set.all()
+            if not docs.exists():
                 return '', ''
 
-            return (
-                _('Parecer da Procuradoria Jurídica'),
-                '<a href="{}">{}</a><br><small>{}</small>'.format(
-                    d.texto_integral.url, d, d.observacao
+            result = ['', []]
+
+            for d in docs:
+                if not d.texto_integral:
+                    continue
+
+                if d.workspace.tipo == AreaTrabalho.TIPO_PROCURADORIA and \
+                    not self.request.user.groups.filter(
+                        name=GROUP_MATERIA_WORKSPACE_VIEWER).exists():
+                    continue
+
+                if not result[0]:
+                    result[0] = _('Documentos Administrativos Vinculados')
+
+                result[1].append(d)
+
+            if not result[0]:
+                return '', ''
+
+            result[1] = '<br>'.join(
+                map(
+                    lambda d:
+                    '<a class="w-100" href="{}">{}</a><br><small>{}</small>'.format(
+                        d.texto_integral.url, d,
+                        d.observacao if d.workspace.tipo == AreaTrabalho.TIPO_PROCURADORIA else d.assunto
+                    ),
+                    result[1]
                 )
             )
+
+            return result
 
         def hook_normajuridica_set(self, obj):
 

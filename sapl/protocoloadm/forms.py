@@ -1282,7 +1282,10 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
             Fieldset(_('Identificação Básica'), row1, row2, row3, row4, row5),
         ]
 
-        if kwargs['initial']['workspace'].tipo == AreaTrabalho.TIPO_PROCURADORIA:
+        if kwargs['initial']['workspace'].tipo in (
+            AreaTrabalho.TIPO_PROCURADORIA,
+            AreaTrabalho.TIPO_PUBLICO
+        ):
             fieldset.append(
                 Fieldset(_('Vincular a Matéria Legislativa'), row5_5,
                          to_column(

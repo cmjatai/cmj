@@ -477,13 +477,17 @@ class _DocumentoAdministrativoViewSet(ControlAccessFileForContainerMixin):
             pk = self.kwargs['pk']
             item = qs.filter(pk=pk).first()
 
-            if not item and self.request.user.groups.filter(
-                    name=GROUP_MATERIA_WORKSPACE_VIEWER).exists():
-
+            if not item:
                 qs_new = DocumentoAdministrativo.objects.filter(pk=pk)
                 d = qs_new.first()
-                if d and d.materia and d.workspace and d.workspace.tipo == AreaTrabalho.TIPO_PROCURADORIA:
-                    return qs_new
+
+                if d and d.materia:
+                    if d.workspace.tipo == AreaTrabalho.TIPO_PUBLICO:
+                        return qs_new
+                    elif d.workspace.tipo == AreaTrabalho.TIPO_PROCURADORIA and \
+                        self.request.user.groups.filter(
+                            name=GROUP_MATERIA_WORKSPACE_VIEWER).exists():
+                        return qs_new
         return qs
 
     @action(detail=True)
