@@ -20,7 +20,7 @@ from sapl.crispy_layout_mixin import SaplFormHelper, to_column
 from sapl.crispy_layout_mixin import SaplFormLayout, form_actions, to_row
 from sapl.materia.models import (MateriaLegislativa, TipoMateriaLegislativa,
                                  UnidadeTramitacao)
-from sapl.protocoloadm.models import Protocolo
+from sapl.protocoloadm.models import Protocolo, StatusTramitacaoAdministrativo
 from sapl.settings import MAX_DOC_UPLOAD_SIZE
 from sapl.utils import (RANGE_ANOS, YES_NO_CHOICES, AnoNumeroOrderingFilter,
                         RangeWidgetOverride, autor_label, autor_modal,
@@ -189,6 +189,9 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
         super(DocumentoAdministrativoFilterSet, self).__init__(*args, **kwargs)
 
         self.filters['tipo'].queryset = TipoDocumentoAdministrativo.objects.filter(
+            workspace=workspace)
+
+        self.filters['tramitacaoadministrativo__status'].queryset = StatusTramitacaoAdministrativo.objects.filter(
             workspace=workspace)
 
         local_atual = 'tramitacaoadministrativo__unidade_tramitacao_destino'
@@ -706,6 +709,8 @@ class TramitacaoAdmForm(ModelForm):
                    'ip': forms.HiddenInput()}
 
     def __init__(self, *args, **kwargs):
+        workspace = kwargs['initial'].pop('workspace')
+
         super(TramitacaoAdmForm, self).__init__(*args, **kwargs)
         self.fields['data_tramitacao'].initial = timezone.now().date()
         ust = UnidadeTramitacao.objects.select_related().all()
@@ -717,6 +722,9 @@ class TramitacaoAdmForm(ModelForm):
             [(ut.pk, ut) for ut in ust if ut.parlamentar])
         self.fields['unidade_tramitacao_destino'].choices = unidade_tramitacao_destino
         self.fields['urgente'].label = "Urgente? *"
+
+        self.fields['status'].queryset = StatusTramitacaoAdministrativo.objects.filter(
+            workspace=workspace)
 
     def clean(self):
         cleaned_data = super(TramitacaoAdmForm, self).clean()

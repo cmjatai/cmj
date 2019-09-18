@@ -789,6 +789,7 @@ class TramitacaoAdmCrud(MasterDetailCrud):
             initial['data_tramitacao'] = timezone.now().date()
             initial['ip'] = get_client_ip(self.request)
             initial['user'] = self.request.user
+            initial['workspace'] = self.request.user.areatrabalho_set.first()
             return initial
 
         def get_context_data(self, **kwargs):
@@ -852,6 +853,8 @@ class TramitacaoAdmCrud(MasterDetailCrud):
             initial = super(UpdateView, self).get_initial()
             initial['ip'] = get_client_ip(self.request)
             initial['user'] = self.request.user
+            initial['workspace'] = self.request.user.areatrabalho_set.first()
+
             return initial
 
         def form_valid(self, form):
