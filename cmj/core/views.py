@@ -184,11 +184,19 @@ class AreaTrabalhoCrud(Crud):
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
-            context['subnav_template_name'] = 'core/subnav_areatrabalho.yaml'
+            if 'subnav_template_name' not in context:
+                context['subnav_template_name'] = 'core/subnav_areatrabalho.yaml'
             return context
 
     class DetailView(Crud.DetailView):
         list_field_names_set = ['user_name', ]
+
+    class ListView(Crud.ListView):
+
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            context['subnav_template_name'] = ''
+            return context
 
 
 class OperadorAreaTrabalhoCrud(MasterDetailCrud):

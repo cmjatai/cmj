@@ -178,6 +178,9 @@ class DocumentoAdministrativo(models.Model):
     temp_migracao_doc_acessorio = models.PositiveIntegerField(
         blank=True, null=True, verbose_name=_('Field temporário para migração dos docs acessórios da procuradoria'))
 
+    temp_migracao_sislegis = models.PositiveIntegerField(
+        blank=True, null=True, verbose_name=_('Field temporário para migração dos docs adms do sislegis'))
+
     interessado = models.CharField(
         max_length=1000, blank=True, verbose_name=_('Interessado'))
     autor = models.ForeignKey(Autor, blank=True, null=True,
