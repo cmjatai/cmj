@@ -7,6 +7,7 @@ from django.core.management.base import BaseCommand
 from django.db.models import Q
 from django.db.models.signals import post_delete, post_save
 
+from cmj.core.models import OcrMyPDF
 from sapl.materia.models import DocumentoAcessorio
 from sapl.protocoloadm.models import DocumentoAdministrativo
 
@@ -60,6 +61,8 @@ class Command(BaseCommand):
                 d = DocumentoAdministrativo()
                 d.temp_migracao_doc_acessorio = p.id
                 d.materia = p.materia
+            else:
+                OcrMyPDF.objects.filter(object_id=d.id)
 
             if d_outro:
                 if d_outro.protocolo:
