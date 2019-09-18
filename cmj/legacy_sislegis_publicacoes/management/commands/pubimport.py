@@ -1,22 +1,11 @@
-from collections import OrderedDict
-from copy import deepcopy
-from datetime import timedelta
-from time import sleep
 
-from PIL import Image, ImageDraw
-from PIL.ImageFont import truetype
-from django.apps import apps
-from django.contrib.auth import get_user_model
-from django.contrib.contenttypes.models import ContentType
-from django.core.files.base import File
-from django.core.files.temp import NamedTemporaryFile
 from django.core.management.base import BaseCommand
 from django.db import connection
 from django.db.models import Q
 from django.db.models.signals import post_delete, post_save
 from django.utils import timezone
 import urllib3
-from cmj.legacy_sislegis_publicacoes.models import Tipodoc
+from cmj.legacy_sislegis_publicacoes.models import Tipodoc, Tipolei, Documento
 
 
 def _get_registration_key(model):
@@ -55,3 +44,13 @@ class Command(BaseCommand):
         tds = Tipodoc.objects.filter(ordem__gt=0).order_by('ordem')
         for td in tds:
             print(td.id, td.ordem, td.descr)
+
+            tls = Tipolei.objects.filter(idtipodoc=td).order_by('ordem')
+
+            for tl in tls:
+                print('---- tl:', tl.id, tl.ordem, tl.descr)
+
+        d_25 = Documento.objects.filter(id_tipolei_id=25)
+
+        print('--------------------')
+        print(d_25.count())

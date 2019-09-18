@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.postgres.fields.jsonb import JSONField
 from django.db import models
 from django.db.models.deletion import PROTECT
 from django.urls.base import reverse
@@ -180,6 +181,13 @@ class DocumentoAdministrativo(models.Model):
 
     temp_migracao_sislegis = models.PositiveIntegerField(
         blank=True, null=True, verbose_name=_('Field temporário para migração dos docs adms do sislegis'))
+
+    old_path = models.TextField(
+        verbose_name=_('Path para Sislegis - Publicações'),
+        blank=True, null=True, default=None)
+    old_json = JSONField(
+        verbose_name=_('Json pra Sislegis - Publicações'),
+        blank=True, null=True, default=None)
 
     interessado = models.CharField(
         max_length=1000, blank=True, verbose_name=_('Interessado'))
