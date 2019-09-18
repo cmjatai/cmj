@@ -123,14 +123,15 @@ class TipoDocumentoAdministrativoCrud(Crud):
     container_field = 'workspace__operadores'
 
 
-class StatusTramitacaoAdministrativoCrud(CrudAux):
+class StatusTramitacaoAdministrativoCrud(Crud):
     model = StatusTramitacaoAdministrativo
     help_topic = 'status_tramitacao'
+    container_field = 'workspace__operadores'
 
-    class BaseMixin(CrudAux.BaseMixin):
+    class BaseMixin(Crud.BaseMixin):
         list_field_names = ['sigla', 'indicador', 'descricao']
 
-    class ListView(CrudAux.ListView):
+    class ListView(Crud.ListView):
         ordering = 'sigla'
 
 

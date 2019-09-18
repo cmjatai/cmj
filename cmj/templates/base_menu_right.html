@@ -50,6 +50,7 @@
           <li class="dropdown-header">{% trans "Tabelas da Área de Trabalho" %}</li>
           {% if perms.cerimonial.list_assuntoprocesso %}<li><a href="{% url 'cmj.cerimonial:assuntoprocesso_list' %}">{% model_verbose_name_plural "cmj.cerimonial.models.AssuntoProcesso"%}</a></li>{% endif %}
           {% if perms.protocoloadm.list_tipodocumentoadministrativo %}<li><a href="{% url 'sapl.protocoloadm:tipodocumentoadministrativo_list' %}">{% model_verbose_name_plural "sapl.protocoloadm.models.TipoDocumentoAdministrativo"%}</a></li>{% endif %}
+          {% if perms.protocoloadm.list_statustramitacaoadministrativo %}<li><a href="{% url 'sapl.protocoloadm:statustramitacaoadministrativo_list' %}">{% model_verbose_name_plural "sapl.protocoloadm.models.StatusTramitacaoAdministrativo"%}</a></li>{% endif %}
         {% endif %}
 
         {% if perms.core.menu_tabelas_auxiliares or perms.core.menu_area_trabalho or perms.core.menu_impresso_enderecamento or perms.base.view_tabelas_auxiliares%}

@@ -341,6 +341,12 @@ class StatusTramitacaoAdministrativo(models.Model):
         ('R', 'retorno', _('Retorno')),
     )
 
+    workspace = models.ForeignKey(
+        AreaTrabalho,
+        verbose_name=_('Área de Trabalho'),
+        related_name='statustramitacaoadministrativo_set',
+        blank=True, null=True, on_delete=PROTECT)
+
     sigla = models.CharField(max_length=10, verbose_name=_('Sigla'))
     descricao = models.CharField(max_length=60, verbose_name=_('Descrição'))
     # TODO make specific migration considering both ind_fim_tramitacao,
@@ -350,8 +356,9 @@ class StatusTramitacaoAdministrativo(models.Model):
         choices=INDICADOR_CHOICES)
 
     class Meta:
-        verbose_name = _('Status de Tramitação')
-        verbose_name_plural = _('Status de Tramitação')
+        verbose_name = _('Status de Tramitação de Documentos Administrativos')
+        verbose_name_plural = _(
+            'Status de Tramitação de Documentos Administrativos')
 
     def __str__(self):
         return self.descricao

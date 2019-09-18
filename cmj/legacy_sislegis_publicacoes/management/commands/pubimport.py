@@ -5,7 +5,10 @@ from django.db.models import Q
 from django.db.models.signals import post_delete, post_save
 from django.utils import timezone
 import urllib3
+
+from cmj.core.models import AreaTrabalho
 from cmj.legacy_sislegis_publicacoes.models import Tipodoc, Tipolei, Documento
+from sapl.protocoloadm.models import TipoDocumentoAdministrativo
 
 
 def _get_registration_key(model):
@@ -40,6 +43,11 @@ class Command(BaseCommand):
             print(rows)
 
     def run(self):
+        at = AreaTrabalho.objects.get(pk=22)
+
+        tl_tda = {
+            '25': ('PD', 'Publicações Diversas'),
+        }
 
         tds = Tipodoc.objects.filter(ordem__gt=0).order_by('ordem')
         for td in tds:
@@ -49,7 +57,14 @@ class Command(BaseCommand):
 
             for tl in tls:
                 print('---- tl:', tl.id, tl.ordem, tl.descr)
-
+                id_str = str(tl.id)
+                if id_str in tl_tda:
+                    tl_tda[id_str] = TipoDocumentoAdministrativo.objects.get_or_create(
+                        sigla=tl_tda[id_str][0], descricao=tl_tda[id_str][1]
+                    )
+                    
+                    
+        for id_tipolei_id in tl_tda
         d_25 = Documento.objects.filter(id_tipolei_id=25)
 
         print('--------------------')
