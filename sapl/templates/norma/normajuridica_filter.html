@@ -7,15 +7,18 @@
     <a href="{% url 'sapl.base:haystack_search' %}?q=&models=norma.normajuridica" class="btn btn-outline-primary">
       Pesquisa Textual
     </a>
-    {% if show_results or page_obj %}
+    {% if show_results %}
         <a href="{% url 'sapl.norma:norma_pesquisa' %}" class="btn btn-outline-primary">{% trans 'Pesquisa Parametrizada' %}</a>
     {% endif %}
   </div>
-  <div class="actions btn-group-sm" role="group">
-    <a href="{% url 'sapl.norma:norma_de_destaque' %}" class="btn btn-outline-primary">
-      Normas e Códigos de Destaque
-    </a>
-  </div>
+    {% if not show_results %}
+    <div class="actions btn-group-sm" role="group">
+      <a href="{% url 'sapl.norma:norma_de_destaque' %}" class="btn btn-outline-primary">
+        Normas e Códigos de Destaque
+      </a>
+    </div>
+  {% endif %}
+
   <div class="actions btn-group-lg" role="group">
     {% if perms.norma.add_normajuridica %}
       <a href="{% url 'sapl.norma:normajuridica_create' %}" class="btn btn-outline-primary">

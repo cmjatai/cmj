@@ -64,7 +64,6 @@ class NormaRelacionadaCrud(MasterDetailCrud):
             return initial
 
     class DetailView(MasterDetailCrud.DetailView):
-
         layout_key = 'NormaRelacionadaDetail'
 
 
@@ -74,7 +73,7 @@ class NormaDestaquesView(ListView):
     paginate_by = 1000
 
     def get_queryset(self):
-        return NormaJuridica.objects.filter(norma_de_destaque=True)
+        return NormaJuridica.objects.filter(norma_de_destaque=True).order_by('data')
 
     @property
     def title(self):

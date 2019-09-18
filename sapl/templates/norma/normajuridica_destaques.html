@@ -1,6 +1,9 @@
 {% extends "norma/normajuridica_filter.html" %}
 {% load i18n %}
 
+{% block container_actions %}
+{% endblock container_actions %}
+
 {% block detail_content %}
 {% endblock detail_content %}
 
@@ -11,8 +14,10 @@
         {% for n in page_obj %}
           <tr>
             <td>
-              <a href="{% url 'sapl.norma:normajuridica_detail' n.id %}"><strong>{{n.apelido}}</strong></a><br>
-              {{n.ementa|safe}}
+              <a href="{% url 'sapl.norma:normajuridica_detail' n.id %}"><strong>{{n.apelido}}</strong></a><br><small>{{n}}</small><br>
+              {% if n.ementa %}
+                {{n.ementa|safe}}
+              {% endif %}
               {% if n.texto_integral %}
                 <br><strong>Texto Original:</strong> <a href="{{result.object.texto_integral.url}}">Clique aqui</a>
               {% endif %}
