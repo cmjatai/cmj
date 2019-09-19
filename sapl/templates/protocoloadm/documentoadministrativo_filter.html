@@ -45,9 +45,13 @@
 {% endblock actions %}
 
 {% block detail_content %}
-  {% if user.is_anonymous %}
+  {% if user.is_anonymous or not user.areatrabalho_set.exists %}
     <div class="alert alert-danger">
-      <strong></strong>
+      <strong>ATENÇÃO!!!</strong><br>
+      O Sistema de Publicação de Documentos Administrativos da Câmara Municipal passou por migração.<br>
+      Todos os documentos estão aqui mas sem classificação apropriada.<br>
+      Nas dificuldades encontradas para localização de documentos e processos diversos, 
+      o Setor de Tecnologia e Desenvolvimento da Câmara Municipal pede a compreensão momentânea pelo transtornos.
     </div>
   {% endif %}
   {% if not show_results %} {% crispy filter.form %} {% endif %}

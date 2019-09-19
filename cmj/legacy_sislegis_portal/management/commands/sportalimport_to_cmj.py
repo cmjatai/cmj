@@ -338,7 +338,7 @@ class Command(BaseCommand):
                         return value['item']['id_alterador']
             return 0
 
-        _ID = 0
+        _ID = 2222
 
         if _ID == 0:
             run_doc(_ID=_ID)
