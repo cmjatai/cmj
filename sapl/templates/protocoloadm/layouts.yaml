@@ -8,6 +8,7 @@ DocumentoAdministrativo:
   - tipo  numero  ano
   - data  protocolo 
   - materia|fk_urlize_for_detail
+  - epigrafe
   - assunto
   - interessado  tramitacao
   - texto_integral

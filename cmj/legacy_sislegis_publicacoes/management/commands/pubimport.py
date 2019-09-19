@@ -1,4 +1,6 @@
 
+from datetime import timedelta
+import datetime
 import mimetypes
 
 from django.core.files.base import File
@@ -15,7 +17,8 @@ from cmj.core.models import AreaTrabalho
 from cmj.legacy_sislegis_publicacoes.models import Tipodoc, Tipolei, Documento,\
     Assuntos
 from sapl.protocoloadm.models import TipoDocumentoAdministrativo,\
-    DocumentoAdministrativo
+    DocumentoAdministrativo, Anexado
+from sapl.utils import RANGE_MESES
 
 
 # MIGRAÇÃO DE DOCUMENTOS  ###################################################
@@ -82,7 +85,7 @@ class Command(BaseCommand):
         post_save.disconnect(dispatch_uid='cmj_post_save_signal')
 
         self.run()
-        self.reset_id_model(DocumentoAdministrativo)
+        # self.reset_id_model(DocumentoAdministrativo)
 
     def reset_id_model(self, model):
 
@@ -100,6 +103,70 @@ class Command(BaseCommand):
             print(rows)
 
     def run(self):
+        at = AreaTrabalho.objects.get(pk=22)
+
+        clear = False
+
+        if clear:
+            a = Anexado.objects.all()
+            a.filter(documento_principal__workspace=at)
+            a.delete()
+
+        docs = DocumentoAdministrativo.objects.filter(
+            workspace=at).order_by('-id')
+
+        print(docs.count())
+
+        em_checar = 0
+        for d in docs:
+            j = d.old_json
+
+            if clear and j['id_doc_principal']:
+                a = Anexado()
+                a.documento_principal_id = j['id_doc_principal']
+                a.documento_anexado_id = d.id
+                try:
+                    a.data_anexacao = datetime.datetime.strptime(
+                        j['data_inclusao'], "%Y-%m-%dT%H:%M:%S")
+                except:
+                    a.data_anexacao = d.data
+
+                try:
+                    a.save()
+                except Exception as e:
+                    print(e)
+                    return
+
+            if 7 in j['tipos'] and len(j['tipos']) == 1:  # Balancetes Contábeis
+                d.tipo_id = 182
+                dbb = (d.data - timedelta(days=20)
+                       ) if d.data.day < 15 else d.data
+                d.numero = dbb.month
+                d.year = dbb.year
+                d.assunto = j['epigrafe']
+                if not d.assunto:
+                    print(dbb.month)
+                    d.assunto = 'Balancete de %s de %s' % (
+                        RANGE_MESES[d.numero - 1][1], dbb.year)
+                d.save()
+
+            # Balancetes Contábeis
+            elif 25 in j['tipos'] and len(j['tipos']) == 1:
+                d.tipo = TipoDocumentoAdministrativo.objects.get(pk=183)
+                d.save()
+
+            elif 29 in j['tipos'] and len(j['tipos']) == 1:
+                d.tipo = None
+                d.tipo_id = 184
+                d.save()
+
+            else:
+                em_checar += 1
+                print(j)
+
+        print(em_checar)
+
+    def run__base(self):
         at = AreaTrabalho.objects.get(pk=22)
         tipo = TipoDocumentoAdministrativo.objects.get(pk=181)
 

@@ -1127,6 +1127,7 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
     class Meta:
         model = DocumentoAdministrativo
         fields = ['tipo',
+                  'epigrafe',
                   'numero',
                   'ano',
                   'data',
@@ -1268,6 +1269,9 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
         row2 = to_row(
             [('data', 4), ('numero_protocolo', 4), ('ano_protocolo', 4)])
 
+        row2_5 = to_row(
+            [('epigrafe', 12)])
+
         row3 = to_row(
             [('assunto', 12)])
 
@@ -1287,7 +1291,8 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
             [('observacao', 12)])
 
         fieldset = [
-            Fieldset(_('Identificação Básica'), row1, row2, row3, row4, row5),
+            Fieldset(_('Identificação Básica'), row1,
+                     row2, row2_5, row3, row4, row5),
         ]
 
         if kwargs['initial']['workspace'].tipo in (

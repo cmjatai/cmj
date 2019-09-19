@@ -191,6 +191,8 @@ class DocumentoAdministrativo(models.Model):
         verbose_name=_('Json from origin import'),
         blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
 
+    epigrafe = models.CharField(
+        max_length=1000, blank=True, verbose_name=_('Epigrafe / Título'))
     interessado = models.CharField(
         max_length=1000, blank=True, verbose_name=_('Interessado'))
     autor = models.ForeignKey(Autor, blank=True, null=True,
@@ -245,6 +247,11 @@ class DocumentoAdministrativo(models.Model):
         verbose_name_plural = _('Documentos Administrativos')
 
     def __str__(self):
+        if self.epigrafe:
+            return _('%s') % {
+                'epigrafe': self.epigrafe,
+            }
+
         return _('%(sigla)s - %(tipo)s %(numero)s/%(ano)s (%(interessado)s) ') % {
             'sigla': self.tipo.sigla,
             'tipo': self.tipo,
