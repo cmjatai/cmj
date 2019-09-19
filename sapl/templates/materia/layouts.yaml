@@ -116,8 +116,8 @@ UnidadeTramitacao:
 
 Tramitacao:
   {% trans 'Tramitação' %}:
-  - data_tramitacao unidade_tramitacao_local
-  - unidade_tramitacao_destino data_encaminhamento data_fim_prazo
+  - unidade_tramitacao_local unidade_tramitacao_destino
+  - data_tramitacao data_encaminhamento data_fim_prazo
   - status  turno  urgente
   - texto
 

@@ -1351,6 +1351,7 @@ class TramitacaoCrud(MasterDetailCrud):
             return super().form_valid(form)
 
     class ListView(MasterDetailCrud.ListView):
+        paginate_by = None
 
         def get_queryset(self):
             qs = super(MasterDetailCrud.ListView, self).get_queryset()
