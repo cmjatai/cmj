@@ -19,7 +19,6 @@
         </div>
       {% endif %}
       <div class="row btns-login">
-          {% if 'www.' in site_url%}
             {% for backend in backends.backends %}
               <div class="col-lg-6">
               <a class="btn-login" id="{{ backend }}-button" name="{{ backend }}"
@@ -31,7 +30,6 @@
               </a>    
             </div>
             {% endfor %}
-          {% endif %}
       </div>
 
       <div class="btns-login box-entry">
@@ -44,13 +42,11 @@
             <span class="fa fa-key fa-2x "></span>
             {{ form.password }}
         </div>
-        {% if 'www.' in site_url%}
           <div class="row-recovery">
             <a class="btn btn-link btn-recovery" href="{% url 'cmj.core:recuperar_senha_email' %}" />{% trans "Esqueci minha Senha" %}</a>
           </div>
         {% else %}
           <br>
-        {% endif %}
         <button class="btn-login" type="submit" value="login" />{% trans "ENTRAR" %}</button>
       </div>
 
