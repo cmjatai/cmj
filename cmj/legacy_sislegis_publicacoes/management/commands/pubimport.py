@@ -174,11 +174,20 @@ class Command(BaseCommand):
             elif 35 in j['tipos'] and len(j['tipos']) == 1:
                 d.tipo = tipos['186']
                 d.save()
+            elif 38 in j['tipos'] and len(j['tipos']) == 1 and not j['id_doc_principal']:
+                d.tipo = tipos['187']
+                d.save()
+            elif 38 in j['tipos'] and len(j['tipos']) == 1 and not j['id_doc_principal']:
+                d.tipo = tipos['187']
+                d.save()
+
             else:
                 em_checar += 1
-                print(j)
+                if j['tipos']:
+                    print(j)
 
-        print(em_checar)
+        print("sem classificação não impressos")
+        print('total a checar', em_checar)
 
     def run__base(self):
         at = AreaTrabalho.objects.get(pk=22)

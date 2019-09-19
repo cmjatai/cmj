@@ -413,6 +413,7 @@ class TramitacaoAdministrativo(models.Model):
     class Meta:
         verbose_name = _('Tramitação de Documento Administrativo')
         verbose_name_plural = _('Tramitações de Documento Administrativo')
+        ordering = ('-data_tramitacao', '-id')
 
     def __str__(self):
         return _('%(documento)s - %(status)s') % {

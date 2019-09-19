@@ -946,14 +946,13 @@ class TramitacaoAdmCrud(MasterDetailCrud):
             context = super(MasterDetailCrud.DetailView,
                             self).get_context_data(**kwargs)
 
-            context[
-                'title'] = 'Tramitação... <small>(%s)</small>' % (
-                    dp)
+            context['title'] = 'Tramitação de : <small>(%s)</small>' % (dp)
             return context
 
     class ListView(
             DocumentoAdministrativoCrud.QuerySetContainerPrivPubMixin,
             MasterDetailCrud.ListView):
+        paginate_by = None
 
         def dispatch(self, request, *args, **kwargs):
             return MasterDetailCrud.ListView.dispatch(self, request, *args, **kwargs)
