@@ -107,15 +107,11 @@
     width: auto;
     height: 100%;
     &:hover {
-      flex: 1 0 25%;
       .icon {
         right: 0px;
       }
       .inner {
-        font-size: 2em;
         a {
-          padding: 3px 5px 5px 40px;
-          text-indent: -30px;
         }
       }
     }
