@@ -14,6 +14,7 @@ class DocumentoAdministrativoIndex(CelerySearchIndex, Indexable):
     text = TextExtractField(
         document=True, use_template=True,
         model_attr=(
+            ('__str__', 'string_extractor'),
             ('texto_integral', 'file_extractor'),
             ('assunto', 'string_extractor'),
             ('observacao', 'string_extractor'),
