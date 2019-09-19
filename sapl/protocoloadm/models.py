@@ -121,7 +121,7 @@ class Protocolo(models.Model):
     observacao = models.TextField(
         blank=True, verbose_name=_('Observação'))
     anulado = models.BooleanField(default=False)
-    user_anulacao = models.CharField(max_length=20, blank=True)
+    user_anulacao = models.CharField(max_length=1000, blank=True)
     ip_anulacao = models.CharField(max_length=15, blank=True)
     justificativa_anulacao = models.CharField(
         max_length=260, blank=True, verbose_name=_('Motivo'))

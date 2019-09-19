@@ -45,6 +45,11 @@
 {% endblock actions %}
 
 {% block detail_content %}
+  {% if user.is_anonymous %}
+    <div class="alert alert-danger">
+      <strong></strong>
+    </div>
+  {% endif %}
   {% if not show_results %} {% crispy filter.form %} {% endif %}
 {% endblock detail_content %}
 
