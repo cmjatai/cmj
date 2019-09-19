@@ -164,7 +164,6 @@ def migrar_docs_por_ids(model, sync=None, check=False):
                 print('PULANDO', item.id,  model._meta.object_name)
                 continue
             # campo_file.delete()
-            sleep(1)
 
             """if check:
                 for mime, ext in EXTENSOES.items():
@@ -176,7 +175,7 @@ def migrar_docs_por_ids(model, sync=None, check=False):
                 url = ('http://168.228.184.68:8480/sapl/%s'
                        ) % base_origem.format(item.pk // 10)
             elif model == NormaJuridica:
-                url = 'http://sislegis.camarajatai.go.gov.br/portal/downloadFile.pdf?sv=2&id=%s' % item.pk
+                url = 'http://168.228.184.68:8580/portal/downloadFile.pdf?sv=2&id=%s' % item.pk
             else:
                 url = ('http://168.228.184.68:8480/sapl/%s'
                        ) % base_origem.format(item.pk)
@@ -215,6 +214,7 @@ def migrar_docs_por_ids(model, sync=None, check=False):
 
             except:
                 print(item.pk, "erro...")
+            sleep(3)
 
     return erros
 
