@@ -56,7 +56,7 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600
 
 SAPL_VERSION = 'master'
 
-SITE_URL = 'https://www2.jatai.go.leg.br'
+SITE_URL = 'https://www.jatai.go.leg.br'
 if DEBUG:
     SITE_URL = ''
 
