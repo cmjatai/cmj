@@ -45,6 +45,7 @@ EXTENSOES = {
     'text/plain': '.brf',
     'text/plain': '.srt',
     'image/tiff': '.tiff',
+    'application/vnd.ms-excel': '.xlsx',
 
     # sem extensao
     'application/octet-stream': '',  # binário
