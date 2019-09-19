@@ -117,13 +117,30 @@ def atualizar_numero_documento(request):
     return response
 
 
-class TipoDocumentoAdministrativoCrud(Crud):
+class CrudSemSubNavMixin(Crud):
+    class SemSubNavMixin:
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            context['subnav_template_name'] = None
+            return context
+
+    class DetailView(SemSubNavMixin, Crud.DetailView):
+        pass
+
+    class UpdateView(SemSubNavMixin, Crud.UpdateView):
+        pass
+
+    class DeleteView(SemSubNavMixin, Crud.DeleteView):
+        pass
+
+
+class TipoDocumentoAdministrativoCrud(CrudSemSubNavMixin):
     model = TipoDocumentoAdministrativo
     help_topic = 'numeracao_docsacess'
     container_field = 'workspace__operadores'
 
 
-class StatusTramitacaoAdministrativoCrud(Crud):
+class StatusTramitacaoAdministrativoCrud(CrudSemSubNavMixin):
     model = StatusTramitacaoAdministrativo
     help_topic = 'status_tramitacao'
     container_field = 'workspace__operadores'

@@ -8,7 +8,7 @@
         Carregando listagem...
     </div>
 
-    <div :class="['item-expediente', nivel(NIVEL4, itens.expedientesessao_list.length > 0)]">
+    <div :class="['item-expediente', nivel(NIVEL3, itens.expedientesessao_list.length > 0)]">
       <div v-html="expediente(1)" class="inner">
       </div>
     </div>
@@ -20,7 +20,7 @@
       </div>
     </div>
 
-    <div :class="['item-expediente', nivel(NIVEL4, itens.expedientesessao_list.length > 0)]">
+    <div :class="['item-expediente', nivel(NIVEL3, itens.expedientesessao_list.length > 0)]">
       <div v-html="expediente(3)" class="inner">
       </div>
     </div>
@@ -32,7 +32,7 @@
       </div>
     </div>
 
-    <div :class="['item-expediente', nivel(NIVEL4, itens.expedientesessao_list.length > 0)]">
+    <div :class="['item-expediente', nivel(NIVEL3, itens.expedientesessao_list.length > 0)]">
       <div v-html="expediente(4)" class="inner">
       </div>
     </div>

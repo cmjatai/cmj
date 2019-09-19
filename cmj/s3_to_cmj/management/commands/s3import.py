@@ -37,6 +37,7 @@ class Command(BaseCommand):
         self.model_unico = options['model_unico']
         self.migrate_files = options['f']
 
+        self.reset_sequences()
         self.run()
         self.reset_sequences()
 

@@ -2,10 +2,12 @@ import os
 import re
 
 from cairosvg.path import path
+from django.contrib.contenttypes.models import ContentType
 from django.core.files.base import File
 from django.core.management.base import BaseCommand
 from django.db.models import Q
 from django.db.models.signals import post_delete, post_save
+from django.forms.models import model_to_dict
 
 from cmj.core.models import OcrMyPDF
 from sapl.materia.models import DocumentoAcessorio
@@ -62,7 +64,9 @@ class Command(BaseCommand):
                 d.temp_migracao_doc_acessorio = p.id
                 d.materia = p.materia
             else:
-                OcrMyPDF.objects.filter(object_id=d.id)
+                OcrMyPDF.objects.filter(
+                    object_id=d.id,
+                    content_type=ContentType.objects.get_for_model(DocumentoAdministrativo))
 
             if d_outro:
                 if d_outro.protocolo:
@@ -79,6 +83,9 @@ class Command(BaseCommand):
             d.assunto = p.ementa
             d.observacao = p.indexacao
             d.workspace_id = 21
+
+            d.old_json = model_to_dict(p, exclude='arquivo')
+
             d.save()
 
             if p.arquivo:

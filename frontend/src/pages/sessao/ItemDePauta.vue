@@ -329,7 +329,7 @@ export default {
   &.expedientemateria {
       background-color: #ffffe3;
     &:hover {
-      background-color: #ffbf00;
+      background-color: #f5d576;
     }
     &::before {
       content: 'Grande Expediente';
@@ -360,7 +360,7 @@ export default {
         text-align: left;
         display: inline-block;
         width: 100%;
-        border-bottom: 1px solid #ddd;
+        //border-bottom: 1px solid #ddd;
         color: #444;
       }
     }
@@ -381,9 +381,12 @@ export default {
       line-height: 1.3;
     }
     .ultima_tramitacao {
-      border-top: 1px solid #5696ca;
-      padding-top: 0.5em;
       line-height: 1.3;
+      strong:first-child {
+      padding-top: 0.5em;
+        border-top: 1px solid #5696ca;
+
+      }
     }
 
   }
