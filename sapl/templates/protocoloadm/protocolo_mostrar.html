@@ -25,6 +25,8 @@
 	<strong>Número de Páginas: </strong> {{ protocolo.numero_paginas|default_if_none:"Não informado" }}</br>
 	<strong>Observação: </strong>{{ protocolo.observacao|default:"Não informado" }}</br>
 	<strong>Anulado: {% if protocolo.anulado %} <font color="red"> Sim {% else %} <font color="green"> Não {% endif %} </font></strong>
+	{% if protocolo.anulado%}<br><strong>Motivo da Anulação:</strong> {{protocolo.justificativa_anulacao}}{%endif%}
+
 	<br /><br />
 
 	<strong>Documentos Vinculados:</strong>
