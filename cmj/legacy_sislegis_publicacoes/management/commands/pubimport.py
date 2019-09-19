@@ -46,6 +46,7 @@ EXTENSOES = {
     'text/plain': '.srt',
     'image/tiff': '.tiff',
     'application/vnd.ms-excel': '.xlsx',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': '.xlsx',
 
     # sem extensao
     'application/octet-stream': '',  # binário
