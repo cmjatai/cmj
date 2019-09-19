@@ -118,8 +118,17 @@ class Command(BaseCommand):
         print(docs.count())
 
         em_checar = 0
+
+        qs_tipos = TipoDocumentoAdministrativo.objects.all()
+        tipos = {}
+
+        for tipo in qs_tipos:
+            tipos[str(tipo.id)] = tipo
+
         for d in docs:
             j = d.old_json
+
+            d.epigrafe = j['epigrafe']
 
             if clear and j['id_doc_principal']:
                 a = Anexado()
@@ -138,7 +147,7 @@ class Command(BaseCommand):
                     return
 
             if 7 in j['tipos'] and len(j['tipos']) == 1:  # Balancetes Contábeis
-                d.tipo_id = 182
+                d.tipo = tipos['182']
                 dbb = (d.data - timedelta(days=20)
                        ) if d.data.day < 15 else d.data
                 d.numero = dbb.month
@@ -146,20 +155,25 @@ class Command(BaseCommand):
                 d.assunto = j['epigrafe']
                 if not d.assunto:
                     print(dbb.month)
+                    d.epigrafe = 'Balancete de %s de %s' % (
+                        RANGE_MESES[d.numero - 1][1], dbb.year)
                     d.assunto = 'Balancete de %s de %s' % (
                         RANGE_MESES[d.numero - 1][1], dbb.year)
                 d.save()
 
             # Balancetes Contábeis
             elif 25 in j['tipos'] and len(j['tipos']) == 1:
-                d.tipo = TipoDocumentoAdministrativo.objects.get(pk=183)
+                d.tipo = tipos['183']
                 d.save()
-
             elif 29 in j['tipos'] and len(j['tipos']) == 1:
-                d.tipo = None
-                d.tipo_id = 184
+                d.tipo = tipos['184']
                 d.save()
-
+            elif 8 in j['tipos'] and len(j['tipos']) == 1:
+                d.tipo = tipos['185']
+                d.save()
+            elif 35 in j['tipos'] and len(j['tipos']) == 1:
+                d.tipo = tipos['186']
+                d.save()
             else:
                 em_checar += 1
                 print(j)

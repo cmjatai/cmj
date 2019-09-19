@@ -248,9 +248,7 @@ class DocumentoAdministrativo(models.Model):
 
     def __str__(self):
         if self.epigrafe:
-            return _('%s') % {
-                'epigrafe': self.epigrafe,
-            }
+            return '%s' % self.epigrafe
 
         return _('%(sigla)s - %(tipo)s %(numero)s/%(ano)s (%(interessado)s) ') % {
             'sigla': self.tipo.sigla,

@@ -69,6 +69,7 @@
                 {% elif result.object|search_get_model == 'da' %}
                   <p>
                     <strong>Documento Administrativo: </strong><a href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' result.object.pk %}">{{ result.object }}</a>
+                    
                     <br>{{result.object.assunto}}
                     <br><strong>Data:</strong> {{result.object.data}}
                     {% if result.object.texto_integral %}
