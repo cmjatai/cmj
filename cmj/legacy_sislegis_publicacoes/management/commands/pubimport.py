@@ -3,6 +3,7 @@ from datetime import timedelta
 import datetime
 import mimetypes
 
+from django.contrib.auth import get_user_model
 from django.core.files.base import File
 from django.core.files.temp import NamedTemporaryFile
 from django.core.management.base import BaseCommand
@@ -13,7 +14,7 @@ from django.forms.models import model_to_dict
 from django.utils import timezone
 import urllib3
 
-from cmj.core.models import AreaTrabalho
+from cmj.core.models import AreaTrabalho, CertidaoPublicacao
 from cmj.legacy_sislegis_publicacoes.models import Tipodoc, Tipolei, Documento,\
     Assuntos
 from sapl.protocoloadm.models import TipoDocumentoAdministrativo,\
@@ -85,7 +86,7 @@ class Command(BaseCommand):
         post_save.disconnect(dispatch_uid='cmj_post_save_signal')
 
         self.run()
-        # self.reset_id_model(DocumentoAdministrativo)
+        self.reset_id_model(CertidaoPublicacao)
 
     def reset_id_model(self, model):
 
@@ -125,8 +126,13 @@ class Command(BaseCommand):
         for tipo in qs_tipos:
             tipos[str(tipo.id)] = tipo
 
+        user_adm = get_user_model().objects.get(id=1)
+
         for d in docs:
             j = d.old_json
+
+            if not j:
+                continue
 
             d.epigrafe = j['epigrafe']
 
@@ -139,12 +145,22 @@ class Command(BaseCommand):
                         j['data_inclusao'], "%Y-%m-%dT%H:%M:%S")
                 except:
                     a.data_anexacao = d.data
-
                 try:
                     a.save()
                 except Exception as e:
                     print(e)
                     return
+
+            if j['cod_certidao'] and not d.certidao:
+                cp = CertidaoPublicacao.gerar_certidao(
+                    user_adm, d, 'texto_integral', d.id)
+
+                if cp:
+                    cp.created = datetime.datetime.strptime(
+                        j['data_inclusao'], "%Y-%m-%dT%H:%M:%S")
+                    cp.modified = datetime.datetime.strptime(
+                        j['data_inclusao'], "%Y-%m-%dT%H:%M:%S")
+                    cp.save()
 
             if 7 in j['tipos'] and len(j['tipos']) == 1:  # Balancetes Contábeis
                 d.tipo = tipos['182']
@@ -183,8 +199,8 @@ class Command(BaseCommand):
 
             else:
                 em_checar += 1
-                if j['tipos']:
-                    print(j)
+                # if j['tipos']:
+                #    print(j)
 
         print("sem classificação não impressos")
         print('total a checar', em_checar)

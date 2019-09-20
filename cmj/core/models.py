@@ -10,6 +10,7 @@ from django.db import models
 from django.db.models import permalink
 from django.db.models.deletion import PROTECT, CASCADE, SET_NULL
 from django.utils import timezone
+from django.utils.decorators import classonlymethod
 from django.utils.translation import ugettext_lazy as _
 from image_cropping import ImageCropField, ImageRatioField
 
@@ -21,6 +22,7 @@ from sapl.materia.models import MateriaLegislativa, DocumentoAcessorio
 from sapl.norma.models import NormaJuridica
 from sapl.parlamentares.models import Parlamentar
 from sapl.sessao.models import SessaoPlenaria
+from sapl.utils import hash_sha512
 
 
 def group_social_users_add_user(user):
@@ -254,17 +256,17 @@ class CmjCleanMixin:
 
 class CmjModelMixin(CmjCleanMixin, models.Model):
     # para migração
-    """created = models.DateTimeField(
+    created = models.DateTimeField(
         verbose_name=_('created'),
         editable=True, auto_now_add=False)
     modified = models.DateTimeField(
-        verbose_name=_('modified'), editable=True, auto_now=False)"""
+        verbose_name=_('modified'), editable=True, auto_now=False)
     # para produção
-    created = models.DateTimeField(
+    """created = models.DateTimeField(
         verbose_name=_('created'),
         editable=False, auto_now_add=True)
     modified = models.DateTimeField(
-        verbose_name=_('modified'), editable=False, auto_now=True)
+        verbose_name=_('modified'), editable=False, auto_now=True)"""
 
     class Meta:
         abstract = True
@@ -827,3 +829,45 @@ class OcrMyPDF(models.Model):
         _('Sucesso'),
         choices=YES_NO_CHOICES,
         default=True)
+
+
+class CertidaoPublicacao(CmjAuditoriaModelMixin):
+
+    content_type = models.ForeignKey(
+        ContentType,
+        blank=True, null=True, default=None)
+    object_id = models.PositiveIntegerField(
+        blank=True, null=True, default=None)
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    hash_code = models.TextField(verbose_name=_('Hash de Publicação'),
+                                 max_length=200,
+                                 blank=True)
+
+    cancelado = models.BooleanField(
+        _('Cancelado '),
+        choices=YES_NO_CHOICES,
+        default=False)
+
+    @classonlymethod
+    def gerar_certidao(cls, user, obj, file_field_name, pk=None):
+
+        path = getattr(obj, file_field_name).path
+        original__path = path.replace(
+            'media/sapl', 'media/original__sapl')
+
+        if not path:
+            return
+
+        hash_code = hash_sha512(original__path)
+
+        cp = CertidaoPublicacao()
+        cp.id = pk
+        cp.content_object = obj
+        cp.hash_code = hash_code
+        cp.owner = user
+        cp.modifier = user
+
+        if not pk:
+            cp.save()
+        return cp

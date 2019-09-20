@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.postgres.fields.jsonb import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
@@ -9,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices
 import reversion
 
-from cmj.core.models import AreaTrabalho
+from cmj.core.models import AreaTrabalho, CertidaoPublicacao
 from sapl.base.models import Autor
 from sapl.materia.models import TipoMateriaLegislativa, UnidadeTramitacao,\
     MateriaLegislativa
@@ -242,9 +243,16 @@ class DocumentoAdministrativo(models.Model):
         auto_now=True,
         verbose_name=_('Data'))
 
+    _certidao = GenericRelation(
+        CertidaoPublicacao, related_query_name='documentoadministrativo_cert')
+
     class Meta:
         verbose_name = _('Documento Administrativo')
         verbose_name_plural = _('Documentos Administrativos')
+
+    @property
+    def certidao(self):
+        return self._certidao.all().first()
 
     def __str__(self):
         if self.epigrafe:

@@ -25,7 +25,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from django_filters.views import FilterView
 
-from cmj.core.models import AreaTrabalho
+from cmj.core.models import AreaTrabalho, CertidaoPublicacao
 import sapl
 from sapl.base.email_utils import do_envia_email_confirmacao
 from sapl.base.models import Autor, CasaLegislativa, AppConfig
@@ -42,7 +42,8 @@ from sapl.protocoloadm.models import Protocolo, DocumentoAdministrativo
 from sapl.relatorios.views import relatorio_doc_administrativos
 from sapl.utils import (create_barcode, get_base_url, get_client_ip,
                         get_mime_type_from_file_extension, lista_anexados,
-                        show_results_filter_set, mail_service_configured)
+                        show_results_filter_set, mail_service_configured,
+                        gerar_hash_arquivo, hash_sha512)
 
 from .forms import (AcompanhamentoDocumentoForm, AnularProtocoloAdmForm,
                     DocumentoAcessorioAdministrativoForm,
@@ -252,6 +253,78 @@ class DocumentoAdministrativoCrud(Crud):
         @classmethod
         def get_url_regex(cls):
             return r'^(?P<pk>\d+)$'
+
+        @property
+        def extras_url(self):
+
+            r = []
+            r.append(self.btn_certidao())
+
+            r = filter(None, r)
+            return r
+
+        def btn_certidao(self):
+
+            btn = (
+                '%s?certidao' % reverse('sapl.protocoloadm:documentoadministrativo_detail',
+                                        kwargs={'pk': self.kwargs['pk']}),
+                'btn-primary',
+                _('Certidão de Publicação')
+            )
+
+            if self.object.certidao:
+                return btn
+
+            if not self.object.texto_integral:
+                return
+
+            if not self.request.user.is_anonymous() and\
+                    not self.request.user.areatrabalho_publica():
+                return btn
+
+            return
+
+        def get(self, request, *args, **kwargs):
+            self.object = self.get_object()
+
+            if 'certidao' in request.GET:
+                self.certidao_generate()
+
+            context = self.get_context_data(object=self.object)
+            context['bg_title'] = 'd-print-none'
+            return self.render_to_response(context)
+
+        @property
+        def title(self):
+
+            if 'certidao' in self.request.GET:
+                return 'Certidão de Públicação: <small>%s</small>' % self.object
+            else:
+                return
+
+        def certidao_generate(self):
+
+            if self.object.certidao:
+                self.template_name = 'core/certidao_publicacao.html'
+                return
+
+            if not self.object.texto_integral:
+                messages.add_message(
+                    self.request,
+                    messages.ERROR,
+                    _('Documento sem Arquivo.'))
+                return
+
+            if self.request.user.is_anonymous() or \
+                    not self.request.user.areatrabalho_set.filter(
+                        tipo=AreaTrabalho.TIPO_PUBLICO).exists():
+                return
+
+            obj = self.object
+            u = self.request.user
+            CertidaoPublicacao.gerar_certidao(u, obj, 'texto_integral')
+
+            self.template_name = 'core/certidao_publicacao.html'
 
     class ListView(QuerySetContainerPrivPubMixin, FilterView):
         filterset_class = DocumentoAdministrativoFilterSet
