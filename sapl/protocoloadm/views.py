@@ -942,6 +942,8 @@ class TramitacaoAdmCrud(MasterDetailCrud):
         form_class = TramitacaoAdmEditForm
         logger = logging.getLogger(__name__)
 
+        layout_key = 'TramitacaoAdministrativoUpdate'
+
         def get_initial(self):
             initial = super(UpdateView, self).get_initial()
             initial['ip'] = get_client_ip(self.request)

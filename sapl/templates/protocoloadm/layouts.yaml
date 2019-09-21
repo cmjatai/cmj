@@ -34,9 +34,16 @@ StatusTramitacaoAdministrativo:
 TramitacaoAdministrativo:
   {% trans 'Tramitação' %}:
   - unidade_tramitacao_local unidade_tramitacao_destino
-  - data_tramitacao  data_encaminhamento  data_fim_prazo
-  - status urgente 
+  - data_tramitacao data_encaminhamento data_fim_prazo
+  - status urgente:3
   - texto
+
+TramitacaoAdministrativoUpdate:
+  {% trans 'Tramitação' %}:
+  - unidade_tramitacao_destino data_encaminhamento data_fim_prazo
+  - status urgente:3
+  - texto
+
 
 Anexado:
   {% trans 'Documento Anexado' %}:
