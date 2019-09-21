@@ -1871,6 +1871,11 @@ class AcompanhamentoConfirmarView(TemplateView):
         hash_txt = request.GET.get('hash_txt', '')
         username = request.user.username
 
+        documento = DocumentoAdministrativo.objects.get(id=documento_id)
+
+        if documento.workspace.tipo != AreaTrabalho.TIPO_PUBLICO:
+            raise Http404
+
         try:
             self.logger.debug("user=" + username + ". Tentando obter objeto AcompanhamentoDocumento com documento_id={} e hash={}"
                               .format(documento_id, hash_txt))
@@ -1908,6 +1913,12 @@ class AcompanhamentoExcluirView(TemplateView):
         documento_id = kwargs['pk']
         hash_txt = request.GET.get('hash_txt', '')
         username = request.user.username
+
+        documento = DocumentoAdministrativo.objects.get(id=documento_id)
+
+        if documento.workspace.tipo != AreaTrabalho.TIPO_PUBLICO:
+            raise Http404
+
         try:
             self.logger.debug("user=" + username + ". Tentando obter AcompanhamentoDocumento com documento_id={} e hash={}."
                               .format(documento_id, hash_txt))
@@ -1939,6 +1950,9 @@ class AcompanhamentoDocumentoView(CreateView):
         pk = self.kwargs['pk']
         documento = DocumentoAdministrativo.objects.get(id=pk)
 
+        if documento.workspace.tipo != AreaTrabalho.TIPO_PUBLICO:
+            raise Http404
+
         return self.render_to_response(
             {'form': AcompanhamentoDocumentoForm(),
              'documento': documento})
@@ -1953,6 +1967,9 @@ class AcompanhamentoDocumentoView(CreateView):
         form = AcompanhamentoDocumentoForm(request.POST)
         pk = self.kwargs['pk']
         documento = DocumentoAdministrativo.objects.get(id=pk)
+
+        if documento.workspace.tipo != AreaTrabalho.TIPO_PUBLICO:
+            raise Http404
 
         if form.is_valid():
             email = form.cleaned_data['email']
