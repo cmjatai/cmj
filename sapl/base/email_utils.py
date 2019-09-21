@@ -5,6 +5,7 @@ from django.core.mail import EmailMultiAlternatives, get_connection, send_mail
 from django.core.urlresolvers import reverse
 from django.template import Context, loader
 from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
 
 from sapl.base.models import CasaLegislativa
 from sapl.materia.models import AcompanhamentoMateria
@@ -12,7 +13,6 @@ from sapl.protocoloadm.models import AcompanhamentoDocumento
 from sapl.settings import EMAIL_SEND_USER
 from sapl.utils import mail_service_configured
 
-from django.utils.translation import ugettext_lazy as _
 
 def load_email_templates(templates, context={}):
 
@@ -106,6 +106,7 @@ def criar_email_confirmacao(base_url, casa_legislativa, doc_mat, tipo, hash_txt=
                                       "base_url": base_url,
                                       "materia": str(doc_mat),
                                       "materia_url": doc_mat_url,
+                                      "tipo": tipo,
                                       "confirmacao_url": confirmacao_url, })
     return templates
 
@@ -223,7 +224,8 @@ def do_envia_email_tramitacao(base_url, tipo, doc_mat, status, unidade_destino):
                                                                confirmado=True)
 
     if not destinatarios:
-        logger.debug(_('Não existem destinatários cadastrados para essa matéria.'))
+        logger.debug(
+            _('Não existem destinatários cadastrados para essa matéria.'))
         return
 
     casa = CasaLegislativa.objects.first()
@@ -264,6 +266,5 @@ def do_envia_email_tramitacao(base_url, tipo, doc_mat, status, unidade_destino):
             connection.close()
             raise Exception(
                 'Erro ao enviar e-mail de acompanhamento de matéria.')
-
 
     connection.close()

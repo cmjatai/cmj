@@ -148,8 +148,8 @@
 
 
 
-                {% if d.tramitacao and mail_service_configured %}
-                  <a class="btn btn-sm btn-outline-primary" href="{% url 'sapl.protocoloadm:acompanhar_documento' d.id %}">Acompanhar Documento (SUPERUPSER)</a>
+                {% if and mail_service_configured %}
+                  <a class="btn btn-sm btn-outline-primary" href="{% url 'sapl.protocoloadm:acompanhar_documento' d.id %}">Acompanhar Documento</a>
                 {% endif %}
             </td>
 

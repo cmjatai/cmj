@@ -1,19 +1,25 @@
-{% load i18n %}
-{% load static %}
+{% extends "base_email.html" %}
+{% load i18n staticfiles %}
 {% load webpack_static from webpack_loader %}
-<html><head></head><body bgcolor='#ffffff'>
 
-<h2 align='center'><b>{{casa_legislativa}}</b>
-  <br/>
-  Sistema de Apoio ao Processo Legislativo
-</h2>
-
-<p>Registramos seu pedido para acompanhamento por e-mail da matéria legislativa identificada a seguir:</p>
-<a href="{{base_url}}{{materia_url}}">{{materia}}<b> - {{descricao_materia}}</b></a><br/>
-{{ementa}}<br/>
-</h4>
-<p></p>
-<p>Para garantia de sua privacidade, solicitamos que ative o recebimento das futuras mensagens clicando no link:</p>
+{% block email_content %}
+  <div style="padding: 30px 20px 40px;">
+    <p>Registramos seu pedido para acompanhamento por e-mail 
+    {% if tipo == 'materia' %}
+      da matéria legislativa identificada a seguir:</p>
+    {% else %}
+      do documento administrativo identificado a seguir:</p>
+    {% endif %}
+    
+    <a href="{{base_url}}{{materia_url}}">
+      {{materia}}<br>
+      <b>{{descricao_materia}}</b>
+    </a>
+    <br/>
+    {{ementa}}
+    <br/>
+    
+    <p>Para garantia de sua privacidade, solicitamos que ative o recebimento das futuras mensagens clicando no link:</p>
 
 <h4>
   <a href="{{base_url}}{{confirmacao_url}}?hash_txt={{hash_txt}}">{{base_url}}{{confirmacao_url}}?hash_txt={{hash_txt}}</a>
@@ -22,5 +28,5 @@
 <hr>
 <p>Caso não tenha realizado o cadastramento em nosso sistema, favor desconsiderar a presente mensagem<br/>
 Esta é uma mensagem automática. Por favor, não responda.</p>
-</body>
-</html>
+
+{% endblock email_content %}
