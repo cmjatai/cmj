@@ -30,7 +30,8 @@ class CmjSearchForm(ModelSearchForm):
                       placeholder=_('Busca Textual'),
                       type='search',),
                 StrictButton(
-                    _('<i class="fas fa-2x fa-search"></i>'), css_class='btn-outline-primary',
+                    '<i class="fas fa-2x fa-search"></i>',
+                    css_class='btn-outline-primary',
                     type='submit')
             )
         )
@@ -85,7 +86,7 @@ class CmjSearchForm(ModelSearchForm):
         else:
             sqs = sqs.filter(at=0)
 
-        return sqs.order_by('-data')
+        return sqs.order_by('-data', '-id')
 
     def get_models(self):
         """Return a list of the selected models."""

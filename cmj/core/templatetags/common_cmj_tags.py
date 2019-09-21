@@ -3,6 +3,7 @@ from datetime import date
 from dateutil.relativedelta import relativedelta
 from django import template
 from django.conf import settings
+from django.template.defaultfilters import stringfilter
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from webpack_loader import utils
@@ -285,26 +286,6 @@ def render_chunk_vendors(extension=None):
 
 
 @register.filter
-def search_get_model(object):
-    if type(object) == MateriaLegislativa:
-        return 'm'
-    elif type(object) == DocumentoAcessorio:
-        return 'd'
-    elif type(object) == DocumentoAdministrativo:
-        return 'da'
-    elif type(object) == NormaJuridica:
-        return 'n'
-    elif type(object) == DiarioOficial:
-        return 'o'
-    elif type(object) == Documento:
-        return 'sd'
-    elif type(object) == SessaoPlenaria:
-        return 'sp'
-
-    return None
-
-
-@register.filter
 def yaml_render(template_name, increment_space=0):
     t = template.loader.get_template(template_name)
     r = t.render()
@@ -314,3 +295,11 @@ def yaml_render(template_name, increment_space=0):
     r = r.split('\n')
     r = ['%s%s' % (' ' * increment_space, line) for line in r]
     return '\n'.join(r)
+
+
+@register.filter(is_safe=True)
+@stringfilter
+def dont_break_out(value):
+    _safe = '<div class="dont-break-out">{}</div>'.format(value)
+    _safe = mark_safe(_safe)
+    return _safe

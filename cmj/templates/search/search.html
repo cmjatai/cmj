@@ -40,84 +40,196 @@
         {% for result in page.object_list %}
           {% if result.object %}
             <tr>
-              <td>
+              <td class="item-listas">  
 
-                {% if result.object|search_get_model == 'm' %}
+                <div class="verbose_name">
+                  {% if not result.model_name == 'documento' %}{{result.verbose_name}}{%else%}Notícias{% endif %}                  
+                </div>
 
-                  <p>
-                    <strong>Matéria Legislativa: </strong> <a href="{% url 'sapl.materia:materialegislativa_detail' result.object.pk %}">{{ result.object }}</a>
-                    <br>{{result.object.ementa}}
-                    <br><strong>Data de Apresentação:</strong> {{result.object.data_apresentacao}}
-                    {% if result.object.texto_original %}
-                      <br><strong>Texto Original:</strong> <a href="{{result.object.texto_original.url}}">Clique aqui</a>
-                    {% endif %}
-                    {% if result.object.texto_articulado.exists %}
-                      <br><strong>Texto Articulado:</strong> <a href="{% url 'sapl.materia:materia_ta' result.object.pk %}">Clique aqui</a>
-                    {% endif %}
-                  </p>
-
-                {% elif result.object|search_get_model == 'd' %}
-                  <p>
-                    <strong>Documento Acessório: </strong><a href="{% url 'sapl.materia:documentoacessorio_detail' result.object.pk %}">{{ result.object }}</a>
-                    <br>{{result.object.ementa}}
-                    <br><strong>Data:</strong> {{result.object.data}}
-                    {% if result.object.arquivo %}
-                      <br><strong>Texto Original:</strong> <a href="{{result.object.arquivo.url}}">Clique aqui</a>
-                    {% endif %}
-                  </p>
-
-                {% elif result.object|search_get_model == 'da' %}
-                  <p>
-                    <strong>Documento Administrativo: </strong><a href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' result.object.pk %}">{{ result.object }}</a>
+                {% if result.model_name == 'materialegislativa' %}
+                  {% with result.object as m %}
+                    <div class="links-texto">
+                      {% if m.texto_original %}
+                        <a class="link-texto" href="{{m.texto_original.url}}" title="Texto Original">
+                          <i class="far fa-2x fa-file-{% if '.pdf' in m.texto_original.path %}pdf{% else %}archive{% endif %}"></i>
+                        </a>
+                      {% endif %}
+                      {% if m.texto_articulado.exists %}
+                        <a class="link-texto" href="{% url 'sapl.materia:materia_ta' m.id%}">
+                          Texto Articulado
+                        </a>
+                      {% endif %}
+                    </div>
                     
-                    <br>{{result.object.assunto}}
-                    <br><strong>Data:</strong> {{result.object.data}}
-                    {% if result.object.texto_integral %}
-                      <br><strong>Texto Integral:</strong> <a href="{{result.object.texto_integral.url}}">Clique aqui</a>
+                    <strong>
+                      <a href="{% url 'sapl.materia:materialegislativa_detail' m.id %}">{{m.tipo.sigla}} {{m.numero}}/{{m.ano}} - {{m.tipo}}</a>
+                    </strong><br>
+                    {% if m.numero_protocolo %}
+                        <strong>Protocolo: </strong>{{m.numero_protocolo}}/{{m.ano}} | 
                     {% endif %}
-                  </p>
+                    <strong>Data de Apresentação:</strong> {{m.data_apresentacao}}
+                    <br><strong>Autoria:</strong> {{ m.autores.all|join:", "}}
+                    <div class="text-ementa">{{ m.ementa }}</div>
+                  {% endwith %}
 
-                {% elif result.object|search_get_model == 'o' %}
-                  <p>
-                    <strong>Diário Oficial: </strong><a href="{% url 'cmj.diarios:diariooficial_detail' result.object.pk %}">{{ result.object }}</a>
-                    <br><strong>Data:</strong> {{result.object.data}}
-                    {% comment "" %}
-                      <br>{{result.object.descricao}}
-                    {% endcomment %}
+
+
+
+
+                {% elif result.model_name == 'documentoacessorio' %}
+                  <div class="links-texto">
                     {% if result.object.arquivo %}
-                      <br><strong>Arquivo:</strong> <a href="{{result.object.arquivo.url}}">Clique aqui</a>
+                      <a class="link-texto" href="{{result.object.arquivo.url}}" title="Documento Acessório">
+                        <i class="far fa-2x fa-file-{% if '.pdf' in result.object.arquivo.path %}pdf{% else %}archive{% endif %}"></i>
+                      </a>
                     {% endif %}
-                  </p>
+                  </div>
+                  <a href="{% url 'sapl.materia:documentoacessorio_detail' result.object.pk %}">{{ result.object }}</a>
+                  <br><small>Matéria legislativa vinculada: <strong>{{result.object.materia}} </strong></small>
+                  <br><strong>Data:</strong> {{result.object.data}}
+                  <div class="text-ementa">{{ result.object.ementa }}</div>
 
-                {% elif result.object|search_get_model == 'sd' %}
-                  <p>
-                    <strong>Notícia: </strong><a href="/{{result.object.absolute_slug}}">{{ result.object }}</a>
-                    <br>{{result.object.descricao}}
-                    <br><small>Publicado em {{result.object.public_date}}</small>
-                  </p>
 
-                {% elif result.object|search_get_model == 'n' %}
-                  <p>
-                    <strong>Norma Jurídica: </strong><a href="{% url 'sapl.norma:normajuridica_detail' result.object.pk %}">{{ result.object }}</a>
-                    {% if result.object.materia %}
-                      <br><small><strong>Matéria Legislativa Vinculada:</strong> <a href="{% url 'sapl.materia:materialegislativa_detail' result.object.pk %}">{{result.object.materia}}</a></small>
-                    {% endif %}
-                    <br>{{result.object.ementa}}
+
+
+
+                {% elif result.model_name == 'documentoadministrativo' %}
+                  <div class="links-texto">
                     {% if result.object.texto_integral %}
-                    <br><strong>Texto Original:</strong> <a href="{{result.object.texto_integral.url}}">Clique aqui</a>
+                      <a class="link-texto" href="{{result.object.texto_integral.url}}" title="Documento Administrativo">
+                        <i class="far fa-2x fa-file-{% if '.pdf' in result.object.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
+                      </a>
                     {% endif %}
+                  </div>
+
+                  <strong>
+                    <a href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' result.object.pk %}">{{ result.object }}</a>
+                  </strong>
+
+                  <br><strong>Data:</strong> {{result.object.data}}
+
+                  {% if result.object.assunto %}
+                    <div class="text-ementa">{{ result.object.assunto }}</div>
+                  {% else %}
+                    {% if result.object.documento_principal_set.exists %}
+                      {{result.object.documento_principal_set.last.assunto}}
+                    {% endif %}
+                  {% endif %}
+
+                  <small>
+                    {% for anexado in result.object.documento_principal_set.all %}
+                      {% if forloop.first %}
+                        <strong>Documentos Associados:</strong>
+                        <ul>
+                      {% endif %}
+                      <li><a href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' anexado.documento_anexado.pk %}">{{ anexado.documento_anexado }}</a></li>
+                      {% if forloop.last %}
+                        </ul>
+                        {% endif %}
+                    {% endfor %}
+                    {% for principal in result.object.documento_anexado_set.all %}
+                      {% if forloop.first %}
+                        <strong>Associado a:</strong>
+                        <ul>
+                      {% endif %}
+                        <li><a href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' principal.documento_principal.pk %}">{{ principal.documento_principal }}</a></li>
+                      {% if forloop.last %}
+                        </ul>
+                      {% endif %}
+                    {% endfor %}
+                  </small>
+
+
+
+
+
+                {% elif result.model_name == 'diariooficial' %}
+                    <div class="links-texto">
+                      {% if result.object.arquivo %}
+                        <a class="link-texto" href="{{result.object.arquivo.url}}" title="Arquivo do Diários Oficial">
+                          <i class="far fa-2x fa-file-{% if '.pdf' in result.object.arquivo.path %}pdf{% else %}archive{% endif %}"></i>
+                        </a>
+                      {% endif %}
+                    </div>
+
+                    <a href="{% url 'cmj.diarios:diariooficial_detail' result.object.pk %}">{{ result.object }}</a>
+                    <br><strong>Data:</strong> {{result.object.data}}
+
+
+
+
+                    
+
+                {% elif result.model_name == 'normajuridica' %}
+                  <div class="links-texto">
+                    {% if result.object.texto_integral %}
+                      <a class="link-texto" href="{{result.object.texto_integral.url}}" title="Arquivo Digitalizado da Norma ">
+                        <i class="far fa-2x fa-file-{% if '.pdf' in result.object.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
+                      </a>
+                    {% endif %}
+
                     {% if result.object.texto_articulado.exists %}
-                      <br><strong>Texto Articulado:</strong> <a href="{% url 'sapl.norma:norma_ta' result.object.pk %}">Clique aqui</a>
+                      <a class="link-texto" href="{% url 'sapl.norma:norma_ta' result.object.pk%}">
+                        Texto Articulado
+                      </a>
                     {% endif %}
-                  </p>
-                {% elif result.object|search_get_model == 'sp' %}
-                  <p>
-                    <strong>Sessão Planária: </strong><a href="{% url 'sapl.sessao:sessaoplenaria_detail' result.object.pk %}">{{ result.object }}</a>
+                  </div>
+                  
+                  <strong>
+                    <a href="{% url 'sapl.norma:normajuridica_detail' result.object.pk %}">{{ result.object }}</a>
+                  </strong>
+
+                  <div class="text-ementa">
+                    {{result.object.ementa}}
+                  </div>
+
+
+
+
+                  
+                {% elif result.model_name == 'sessaoplenaria' %}
+                    <strong>
+                    <a href="{% url 'sapl.sessao:sessaoplenaria_detail' result.object.pk %}">{{ result.object }}</a>
+                    </strong>
+                    
                     <br><strong>Data:</strong> {{result.object.data_inicio}}
                     {% if result.object.upload_ata %}
                       <br><strong>Ata da Sessão:</strong><a href="{{result.object.upload_ata.url}}">Clique aqui</a>
                     {% endif %}
-                  </p>
+
+
+
+
+
+                {% elif result.model_name == 'documento' %}
+                      <div class="data-pub">
+                        <i class="far fa-clock" aria-hidden="true"></i>
+                        {{result.object.public_date}}
+                      </div>
+                      <div class="row">
+                        {% for p in result.object.parlamentares.all %}
+                          {% if forloop.first %}
+                            <div class="col-3 col-sm-2 col-md-1 ml-3 mt-3">
+                          {% endif %}
+
+                          <div class="avatar">
+                            <img src="{{p.fotografia.url}}" alt="{{p.nome_parlamentar}}">
+                          </div>
+
+                          {% if forloop.last %}
+                            </div>
+                          {% endif %}
+
+                          {% endfor %}
+                        <div class="col">
+                          <strong>
+                            <a href="/{{result.object.absolute_slug}}">{{ result.object }}</a>
+                          </strong>
+                          <div class="text-ementa p-0">
+                            {{result.object.descricao}}
+                          </div>
+                        </div>
+                      </div>
                 {% endif %}
               </td>
             </tr>

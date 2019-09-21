@@ -139,6 +139,7 @@ export default {
 </script>
 
 <style lang="scss">
+
 .materia-pauta {
   .epigrafe {
     color: #044079;

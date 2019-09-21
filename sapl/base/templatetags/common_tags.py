@@ -301,17 +301,6 @@ def to_list_pk(object_list):
     return [o.pk for o in object_list]
 
 
-@register.filter
-def search_get_model(object):
-    if type(object) == MateriaLegislativa:
-        return 'm'
-    elif type(object) == DocumentoAcessorio:
-        return 'd'
-    elif type(object) == NormaJuridica:
-        return 'n'
-
-    return None
-
 
 @register.filter
 def urldetail_content_type(obj, value):

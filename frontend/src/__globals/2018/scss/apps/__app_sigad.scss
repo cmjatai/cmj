@@ -415,7 +415,6 @@
     }
 
     .avatar {
-      display: inline-block;
       margin: 0 0 0 5px;
       float: right;
       width: 60px;
@@ -767,7 +766,6 @@
 
   .icon-container {
     float: left;
-    display: inline-block;
     padding-right: 0.5em;
   }
 
@@ -889,9 +887,6 @@
 
 @media screen and (max-width: 425px) {
 
-  .container-path {
-
-  }
   .path-parlamentares {
     margin-top: 10px;
   }

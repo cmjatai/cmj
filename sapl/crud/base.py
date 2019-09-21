@@ -959,10 +959,8 @@ class Crud:
             if crud[0]:
                 cruds.append(crud)
 
-        r = [url(regex, view.as_view(), name=view.url_name(suffix))
-             for regex, view, suffix in cruds]
-
-        return r
+        return [url(regex, view.as_view(), name=view.url_name(suffix))
+                for regex, view, suffix in cruds]
 
     @classonlymethod
     def build(cls, _model, _help_topic, _model_set=None, list_field_names=[]):

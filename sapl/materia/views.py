@@ -2012,7 +2012,7 @@ class MateriaLegislativaPesquisaView(FilterView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context['title'] = _('Pesquisar Matéria Legislativa')
+        context['title'] = _('Matérias Legislativas')
 
         tipo_listagem = self.request.GET.get('tipo_listagem', '1')
         tipo_listagem = '1' if not tipo_listagem else tipo_listagem

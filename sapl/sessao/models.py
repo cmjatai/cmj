@@ -476,6 +476,7 @@ class RegistroVotacao(models.Model):
     ordem = models.ForeignKey(OrdemDia,
                               blank=True,
                               null=True,
+                              related_name="registrovotacao_set",
                               on_delete=models.CASCADE)
     expediente = models.ForeignKey(ExpedienteMateria,
                                    blank=True,
