@@ -151,7 +151,7 @@ class Command(BaseCommand):
                     print(e)
                     return
 
-            if j['cod_certidao'] > 0 and not d.certidao:
+            """if j['cod_certidao'] > 0 and not d.certidao:
                 cp = CertidaoPublicacao.gerar_certidao(
                     user_adm, d, 'texto_integral', d.id)
 
@@ -160,7 +160,7 @@ class Command(BaseCommand):
                         j['data_inclusao'], "%Y-%m-%dT%H:%M:%S")
                     cp.modified = datetime.datetime.strptime(
                         j['data_inclusao'], "%Y-%m-%dT%H:%M:%S")
-                    cp.save()
+                    cp.save()"""
 
             if 7 in j['tipos'] and len(j['tipos']) == 1:  # Balancetes Contábeis
                 d.tipo = tipos['182']

@@ -1076,15 +1076,15 @@ class MateriaLegislativaFilterSet(django_filters.FilterSet):
                 ('tipo_listagem', 4)
             ])
 
-        row10 = to_row([
-            ('tipo_origem_externa', 4),
-            ('numero_origem_externa', 4),
-            ('ano_origem_externa', 4),
-        ])
-        row11 = to_row([
-            ('data_origem_externa', 8),
-            ('local_origem_externa', 4)
-        ])
+        # row10 = to_row([
+        #    ('tipo_origem_externa', 4),
+        #    ('numero_origem_externa', 4),
+        #    ('ano_origem_externa', 4),
+        #])
+        # row11 = to_row([
+        #    ('data_origem_externa', 8),
+        #    ('local_origem_externa', 4)
+        #])
 
         self.form.helper = SaplFormHelper()
         self.form.helper.form_method = 'GET'
@@ -1100,9 +1100,9 @@ class MateriaLegislativaFilterSet(django_filters.FilterSet):
                          (form_actions(label=_('Processar Pesquisa')), 'col-md-auto')
                      ])
                      ),
-            Fieldset(_('Origem externa'),
-                     row10, row11
-                     ),
+            # Fieldset(_('Origem externa'),
+            #         row10, row11
+            #         ),
             Fieldset(_('Pesquisa Avançada'),
                      row3,
                      HTML(autor_label),

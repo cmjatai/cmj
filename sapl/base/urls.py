@@ -92,10 +92,10 @@ recuperar_senha = [
 
 channels_url = [
 
-    url(r'^sapl/channel$', base.views.chanel_index, name='channel_index'),
-    url(r'^sapl/channel/(?P<room_name>[^/]+)/$',
+    url(r'^channel$', base.views.chanel_index, name='channel_index'),
+    url(r'^channel/(?P<room_name>[^/]+)/$',
         base.views.chanel_room, name='channel_room'),
-    url(r'^sapl/time-refresh/$',
+    url(r'^time-refresh/$',
         base.views.time_refresh_log_test, name='time_refresh_log_test_index'),
 
     url(r'^online/',

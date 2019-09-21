@@ -47,11 +47,16 @@ export default {
     'idd': function (nv, ov) {
       const t = this
       if (nv !== null) {
-        t.utils
-          .getModel('norma', 'normajuridica', t.idd)
-          .then(response => {
-            t.norma_render = response.data
-          })
+        let idd = 0
+        if (nv != null && typeof nv === 'number') {
+          idd = nv
+
+          t.utils
+            .getModel('norma', 'normajuridica', idd)
+            .then(response => {
+              t.norma_render = response.data
+            })
+        }
       }
     }
 
@@ -78,7 +83,7 @@ export default {
       let t = this
       if (nv.id !== undefined && nv.id > 0) {
         $.ajax({
-          url: `/sapl/norma/${nv.id}/ta?embedded`,
+          url: `/norma/${nv.id}/ta?embedded`,
           type: 'GET',
           success: function (res) {
             var text = res

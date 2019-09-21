@@ -80,22 +80,22 @@ urlpatterns_all = [
     url(r'', include(cmj.agenda.urls)),
 
 
-    url(r'^sapl/', include(sapl.audiencia.urls)),
-    url(r'^sapl/', include(sapl.comissoes.urls)),
-    url(r'^sapl/', include(sapl.sessao.urls)),
-    url(r'^sapl/', include(sapl.parlamentares.urls)),
-    url(r'^sapl/', include(sapl.materia.urls)),
-    url(r'^sapl/', include(sapl.norma.urls)),
-    url(r'^sapl/', include(sapl.lexml.urls)),
-    url(r'^sapl/', include(sapl.painel.urls)),
-    url(r'^sapl/', include(sapl.protocoloadm.urls)),
-    url(r'^sapl/', include(sapl.compilacao.urls)),
-    url(r'^sapl/', include(sapl.relatorios.urls)),
+    url(r'', include(sapl.audiencia.urls)),
+    url(r'', include(sapl.comissoes.urls)),
+    url(r'', include(sapl.sessao.urls)),
+    url(r'', include(sapl.parlamentares.urls)),
+    url(r'', include(sapl.materia.urls)),
+    url(r'', include(sapl.norma.urls)),
+    url(r'', include(sapl.lexml.urls)),
+    url(r'', include(sapl.painel.urls)),
+    url(r'', include(sapl.protocoloadm.urls)),
+    url(r'', include(sapl.compilacao.urls)),
+    url(r'', include(sapl.relatorios.urls)),
     url(r'', include(sapl.base.urls)),
     url(r'', include(sapl.api.urls)),
 
 
-    url(r'^sapl/', include(sapl.redireciona_urls.urls)),
+    url(r'', include(sapl.redireciona_urls.urls)),
 
 
 ]
