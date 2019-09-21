@@ -151,7 +151,7 @@ class Command(BaseCommand):
                     print(e)
                     return
 
-            if j['cod_certidao'] and not d.certidao:
+            if j['cod_certidao'] > 0 and not d.certidao:
                 cp = CertidaoPublicacao.gerar_certidao(
                     user_adm, d, 'texto_integral', d.id)
 
@@ -199,8 +199,8 @@ class Command(BaseCommand):
 
             else:
                 em_checar += 1
-                # if j['tipos']:
-                #    print(j)
+                if j['tipos']:
+                    print(j)
 
         print("sem classificação não impressos")
         print('total a checar', em_checar)

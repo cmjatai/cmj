@@ -256,17 +256,17 @@ class CmjCleanMixin:
 
 class CmjModelMixin(CmjCleanMixin, models.Model):
     # para migração
-    created = models.DateTimeField(
+    """created = models.DateTimeField(
         verbose_name=_('created'),
         editable=True, auto_now_add=False)
     modified = models.DateTimeField(
-        verbose_name=_('modified'), editable=True, auto_now=False)
+        verbose_name=_('modified'), editable=True, auto_now=False)"""
     # para produção
-    """created = models.DateTimeField(
+    created = models.DateTimeField(
         verbose_name=_('created'),
         editable=False, auto_now_add=True)
     modified = models.DateTimeField(
-        verbose_name=_('modified'), editable=False, auto_now=True)"""
+        verbose_name=_('modified'), editable=False, auto_now=True)
 
     class Meta:
         abstract = True
@@ -853,11 +853,11 @@ class CertidaoPublicacao(CmjAuditoriaModelMixin):
     def gerar_certidao(cls, user, obj, file_field_name, pk=None):
 
         path = getattr(obj, file_field_name).path
-        original__path = path.replace(
-            'media/sapl', 'media/original__sapl')
-
         if not path:
             return
+
+        original__path = path.replace(
+            'media/sapl', 'media/original__sapl')
 
         hash_code = hash_sha512(original__path)
 

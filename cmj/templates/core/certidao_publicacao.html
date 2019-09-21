@@ -1,11 +1,23 @@
 {% extends "base.html" %}
-
-
-
+{% load webpack_static from webpack_loader %}
 
 {% block base_content %}
+  <div class="container container-cert-pub">
+    <div class="inner">
+      <div class="title">
+        <span>Certidão de Publicação</span>
+        <span>nº {{object.certidao.id|stringformat:"06d" }}</span>
+        <span>{{object.certidao.created|date:"d/m/Y H:i:s"}}</span>
+      </div>
+        Certifico para os devidos fins, nos termos do §1º art. 81
+        da Lei Orgânica do Município de Jataí, que o presente
+        documento foi publicado eletronicamente no Portal
+        Transparência Pública do Legislativo Municipal de Jataí.
 
-<div class="container-cert-pub">
-</div>
-
+      {% comment %}
+        <img style="width: 100%; text-align: left;" src="{% webpack_static 'img/logo_128.png' %}">
+      {% endcomment %}
+      </div>
+    </div>
+  </div>
 {% endblock %}

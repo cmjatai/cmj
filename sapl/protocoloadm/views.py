@@ -258,19 +258,19 @@ class DocumentoAdministrativoCrud(Crud):
         def extras_url(self):
 
             r = []
-            r.append(self.btn_certidao())
+            # r.append(self.btn_certidao())
 
-            r = filter(None, r)
+            #r = filter(None, r)
             return r
 
         def btn_certidao(self):
 
-            btn = (
+            btn = [
                 '%s?certidao' % reverse('sapl.protocoloadm:documentoadministrativo_detail',
                                         kwargs={'pk': self.kwargs['pk']}),
-                'btn-primary',
+                'btn-success',
                 _('Certidão de Publicação')
-            )
+            ]
 
             if self.object.certidao:
                 return btn
@@ -279,7 +279,10 @@ class DocumentoAdministrativoCrud(Crud):
                 return
 
             if not self.request.user.is_anonymous() and\
-                    not self.request.user.areatrabalho_publica():
+                    self.request.user.areatrabalho_set.filter(
+                        tipo=AreaTrabalho.TIPO_PUBLICO).exists():
+                btn[1] = 'btn-primary'
+                btn[2] = _('Gerar Certidão de Publicação')
                 return btn
 
             return
@@ -287,11 +290,11 @@ class DocumentoAdministrativoCrud(Crud):
         def get(self, request, *args, **kwargs):
             self.object = self.get_object()
 
+            context = self.get_context_data(object=self.object)
+
             if 'certidao' in request.GET:
                 self.certidao_generate()
-
-            context = self.get_context_data(object=self.object)
-            context['bg_title'] = 'd-print-none'
+                context['bg_title'] = 'd-print-none'
             return self.render_to_response(context)
 
         @property
