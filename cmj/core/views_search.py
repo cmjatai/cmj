@@ -86,7 +86,7 @@ class CmjSearchForm(ModelSearchForm):
         else:
             sqs = sqs.filter(at=0)
 
-        return sqs.order_by('-data', '-id')
+        return sqs.order_by('-data', '-last_update')
 
     def get_models(self):
         """Return a list of the selected models."""

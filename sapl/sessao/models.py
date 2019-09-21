@@ -451,7 +451,8 @@ class PresencaOrdemDia(models.Model):  # OrdemDiaPresenca
 class TipoResultadoVotacao(models.Model):
     NATUREZA_CHOICES = Choices(
         ('A', 'aprovado', 'Aprovado'),
-        ('R', 'rejeitado', 'Rejeitado'))
+        ('R', 'rejeitado', 'Rejeitado'),
+        ('P', 'prazo', 'Pedidos de Prazo'))
     nome = models.CharField(max_length=100, verbose_name=_('Nome do Tipo'))
     natureza = models.CharField(max_length=1,
                                 blank=True,

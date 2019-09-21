@@ -80,11 +80,15 @@
                     {% if m.tramitacao_set.last.status %}
                       <strong>Status:</strong> &nbsp;{{m.tramitacao_set.last.status}}</br>
                     {% endif %}
+                    {% if m.tramitacao_set.last.data_tramitacao %}
+                    <strong>Ultima Ação:</strong> &nbsp; {{m.tramitacao_set.last.texto}}</br>
+                    <strong>Data da última Tramitação:</strong> &nbsp;{{m.tramitacao_set.last.data_tramitacao}}</br>
+                    {% endif %}
                     {% if m.tramitacao_set.last.data_fim_prazo %}
                       <strong>Data Fim Prazo (Tramitação):</strong>&nbsp;{{m.tramitacao_set.last.data_fim_prazo|default_if_none:""}}</br>
                     {% endif %}
                     {% if m.registrovotacao_set.exists %}
-                        <strong>Foi a plenário:</strong>
+                        <strong>Foi a plenário em:</strong><br>
                         {% for rv in m.registrovotacao_set.all %}
                             {% if rv.ordem %}
                               <a href="{% url 'sapl.sessao:ordemdia_list' rv.ordem.sessao_plenaria_id %}#id{{m.id}}">
@@ -98,10 +102,7 @@
                             </br>
                         {% endfor %}
                     {% endif %}
-                    {% if m.tramitacao_set.last.data_tramitacao %}
-                    <strong>Data da última Tramitação:</strong> &nbsp;{{m.tramitacao_set.last.data_tramitacao}}</br>
-                    <strong>Ultima Ação:</strong> &nbsp; {{m.tramitacao_set.last.texto}}</br>
-                    {% endif %}
+                    
                     {% if m.anexo_de.exists %}
                       {% for a in m.materia_anexada_set.all %}
                       <strong>Matéria Anexadora: </strong>&nbsp;
@@ -131,7 +132,11 @@
                     {% endif %}
                     {% if m.normajuridica_set.exists %}
                         {% for nr in m.normajuridica_set.all %}
-                          <strong>Norma Jurídica Vinculada: </strong>
+                          {% if nr.tipo_id == 27 %}
+                            <strong>Autrografo: </strong>
+                          {% else %}
+                            <strong>Norma Jurídica Vinculada: </strong>
+                          {% endif %}
                           <a href="{% url 'sapl.norma:normajuridica_detail' nr.id %}">
                             {{ nr }}
                           </a>
