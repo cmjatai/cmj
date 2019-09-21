@@ -20,7 +20,8 @@ from sapl.protocoloadm.views import (
     DesvincularMateriaView,
     AnexadoCrud, DocumentoAnexadoEmLoteView,
     PrimeiraTramitacaoEmLoteAdmView,
-    TramitacaoEmLoteAdmView)
+    TramitacaoEmLoteAdmView, AcompanhamentoExcluirView,
+    AcompanhamentoConfirmarView, AcompanhamentoDocumentoView)
 
 from .apps import AppConfig
 
@@ -57,15 +58,14 @@ urlpatterns_protocolo = [
         ProtocoloMostrarView.as_view(), name='protocolo_mostrar'),
 
 
-    # TODO:
-    # url(r'^doc/(?P<pk>\d+)/acompanhar-documento/$',
-    #    AcompanhamentoDocumentoView.as_view(), name='acompanhar_documento'),
-    # url(r'^doc/(?P<pk>\d+)/acompanhar-confirmar$',
-    #    AcompanhamentoConfirmarView.as_view(),
-    #    name='acompanhar_confirmar'),
-    # url(r'^doc/(?P<pk>\d+)/acompanhar-excluir$',
-    #    AcompanhamentoExcluirView.as_view(),
-    #    name='acompanhar_excluir'),
+    url(r'^doc/(?P<pk>\d+)/acompanhar-documento/$',
+        AcompanhamentoDocumentoView.as_view(), name='acompanhar_documento'),
+    url(r'^doc/(?P<pk>\d+)/acompanhar-confirmar$',
+        AcompanhamentoConfirmarView.as_view(),
+        name='acompanhar_confirmar'),
+    url(r'^doc/(?P<pk>\d+)/acompanhar-excluir$',
+        AcompanhamentoExcluirView.as_view(),
+        name='acompanhar_excluir'),
 
 
 
