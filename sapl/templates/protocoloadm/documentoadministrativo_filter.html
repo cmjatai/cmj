@@ -105,7 +105,7 @@
                       <strong>Interessado:</strong>&nbsp;{{ d.interessado|default_if_none:"Não informado"}}
                     {% endif %}
 
-                    {% define d.tramitacaoadministrativo_set.last as tram %}
+                    {% define d.tramitacaoadministrativo_set.first as tram %}
                     {% if tram.unidade_tramitacao_destino %}
                         </br>
                       <strong>Localização Atual:</strong> &nbsp;{{tram.unidade_tramitacao_destino}}
