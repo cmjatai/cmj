@@ -1,17 +1,8 @@
-{% load i18n %}
-{% load static %}
+{% extends "base_email.html" %}
+{% load i18n staticfiles %}
 {% load webpack_static from webpack_loader %}
-<html>
-<head></head>
-<body bgcolor='#ffffff'>
-	<h2 align='center'><b>{{casa_legislativa}}</b>
-		<br/>
-		Sistema de Apoio ao Processo Legislativo
-	</h2>
-	<p>A seguinte mat&eacute;ria, de seu interesse, sofreu
-		Tramita&ccedil;&atilde;o registrada em <b>{{data_registro}}</b>.
-	</p>
-<h4>
+
+{% block email_content %}
 	<a href="{{base_url}}{{materia_url}}"><b>{{materia}} - {{descricao_materia}}</b></a>
 	<br/><br/>
 {% if autoria %}
@@ -34,5 +25,4 @@
 	<p>
 	<p>Esta &eacute; uma mensagem autom&aacute;tica.
 	 Por favor, n&atilde;o a responda.</p>
-</body>
-</html>
+{% endblock email_content %}

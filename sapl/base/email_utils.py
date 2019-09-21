@@ -201,6 +201,7 @@ def criar_email_tramitacao(base_url, casa_legislativa, tipo, doc_mat, status,
                                       "hash_txt": hash_txt,
                                       "materia": str(doc_mat),
                                       "base_url": base_url,
+                                      "tipo": tipo,
                                       "materia_url": doc_mat_url,
                                       "excluir_url": url_excluir})
     return templates
