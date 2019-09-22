@@ -246,6 +246,16 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
                      buttons,)
         )
 
+    def filter_queryset(self, queryset):
+        qs = django_filters.FilterSet.filter_queryset(self, queryset)
+
+        cd = self.form.cleaned_data
+        print(qs.count())
+        if 'tipo' in cd and not cd['tipo']:
+            qs = qs.filter(documento_anexado_set__isnull=True)
+        print(qs.count())
+        return qs
+
 
 class AnularProtocoloAdmForm(ModelForm):
 

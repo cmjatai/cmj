@@ -136,6 +136,9 @@ class Command(BaseCommand):
 
             d.epigrafe = j['epigrafe']
 
+            if not j['possuiarqdigital'] and d.texto_integral:
+                d.texto_integral.delete()
+
             if clear and j['id_doc_principal']:
                 a = Anexado()
                 a.documento_principal_id = j['id_doc_principal']
