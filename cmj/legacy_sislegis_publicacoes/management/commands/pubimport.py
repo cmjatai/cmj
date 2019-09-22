@@ -200,7 +200,7 @@ class Command(BaseCommand):
                 d.save()
 
                 d.tramitacaoadministrativo_set.all().delete()
-                for anexo in d.documento_principal_set.all():
+                for anexo in d.documento_principal_set.all().order_by('-id'):
                     t = TramitacaoAdministrativo()
                     t.status_id = 4
                     t.documento = d

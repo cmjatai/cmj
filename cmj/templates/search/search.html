@@ -41,7 +41,7 @@
           {% if result.object %}
             <tr>
               <td class="item-listas">  
-
+                <div class="item-raiz">
                 <div class="verbose_name">
                   {% if not result.model_name == 'documento' %}{{result.verbose_name}}{%else%}Notícias{% endif %}                  
                 </div>
@@ -131,7 +131,11 @@
                   </strong>
 
                   <br><strong>Data:</strong> {{result.object.data}}
-
+                  {% if result.object.certidao %}
+                    <br><small>
+                    <span class="text-danger">Certidão de Publicação nº {{result.object.certidao.id|stringformat:"06d" }} de {{result.object.certidao.created}}</span>
+                    </small>
+                  {% endif %}
                   {% if result.object.assunto %}
                     <div class="text-ementa">{{ result.object.assunto }}</div>
                   {% else %}
@@ -257,6 +261,7 @@
                         </div>
                       </div>
                 {% endif %}
+                </div>
               </td>
             </tr>
           {% endif %}

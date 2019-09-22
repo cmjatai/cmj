@@ -20,12 +20,21 @@ import { sync } from 'vuex-router-sync'
 import { loadProgressBar } from 'axios-progress-bar'
 import 'axios-progress-bar/dist/nprogress.css'
 
+
+import 'popper.js'
+
+
 import { routes } from './routers'
 
 import App from './App'
 
 import './mixins'
 
+$(function () {
+  $('[data-toggle="popover"]').popover({
+  trigger: 'focus'
+  })
+})
 
 axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
