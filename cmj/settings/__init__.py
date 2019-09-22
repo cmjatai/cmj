@@ -57,8 +57,8 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600
 SAPL_VERSION = 'master'
 
 SITE_URL = 'https://www.jatai.go.leg.br'
-if DEBUG:
-    SITE_URL = ''
+#if DEBUG:
+#    SITE_URL = ''
 
 HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.BaseSignalProcessor'  # Disable auto index
 SEARCH_BACKEND = ''

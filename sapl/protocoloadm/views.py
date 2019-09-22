@@ -17,6 +17,7 @@ from django.db.models.fields.related import ForeignKey, ManyToManyField
 from django.http import Http404, HttpResponse, JsonResponse
 from django.http.response import HttpResponseRedirect, Http404
 from django.shortcuts import redirect
+from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import ListView, CreateView, UpdateView
@@ -24,8 +25,10 @@ from django.views.generic.base import RedirectView, TemplateView, ContextMixin
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from django_filters.views import FilterView
+from weasyprint import HTML
 
 from cmj.core.models import AreaTrabalho, CertidaoPublicacao
+from cmj.settings.medias import MEDIA_URL
 import sapl
 from sapl.base.email_utils import do_envia_email_confirmacao
 from sapl.base.models import Autor, CasaLegislativa, AppConfig
@@ -39,7 +42,8 @@ from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa, Unid
 from sapl.materia.views import gerar_pdf_impressos
 from sapl.parlamentares.models import Legislatura, Parlamentar
 from sapl.protocoloadm.models import Protocolo, DocumentoAdministrativo
-from sapl.relatorios.views import relatorio_doc_administrativos
+from sapl.relatorios.views import relatorio_doc_administrativos, get_rodape,\
+    make_pdf
 from sapl.utils import (create_barcode, get_base_url, get_client_ip,
                         get_mime_type_from_file_extension, lista_anexados,
                         show_results_filter_set, mail_service_configured,
@@ -258,9 +262,9 @@ class DocumentoAdministrativoCrud(Crud):
         def extras_url(self):
 
             r = []
-            # r.append(self.btn_certidao())
+            r.append(self.btn_certidao())
 
-            #r = filter(None, r)
+            r = filter(None, r)
             return r
 
         def btn_certidao(self):
@@ -273,6 +277,9 @@ class DocumentoAdministrativoCrud(Crud):
             ]
 
             if self.object.certidao:
+                if not self.request.user.is_anonymous() and\
+                        self.request.user.areatrabalho_set.first() == self.object.workspace:
+                    btn[0] = btn[0].replace('certidao', 'certidao&print')
                 return btn
 
             if not self.object.texto_integral:
@@ -291,11 +298,29 @@ class DocumentoAdministrativoCrud(Crud):
             self.object = self.get_object()
 
             context = self.get_context_data(object=self.object)
+            context['print'] = 'print' in request.GET
 
-            if 'certidao' in request.GET:
-                self.certidao_generate()
-                context['bg_title'] = 'd-print-none'
-            return self.render_to_response(context)
+            if 'certidao' not in request.GET or not self.certidao_generate():
+                return self.render_to_response(context)
+
+            return self.certidao_publicacao(request, context)
+
+        def certidao_publicacao(self, request, context):
+            base_url = request.build_absolute_uri()
+
+            html_template = render_to_string(
+                'core/certidao_publicacao.html', context)
+
+            html = HTML(base_url=base_url, string=html_template)
+            main_doc = html.render(stylesheets=[])
+            pdf_file = main_doc.write_pdf()
+
+            response = HttpResponse(content_type='application/pdf;')
+            response['Content-Disposition'] = 'inline; filename=relatorio.pdf'
+            response['Content-Transfer-Encoding'] = 'binary'
+            response.write(pdf_file)
+
+            return response
 
         @property
         def title(self):
@@ -308,26 +333,29 @@ class DocumentoAdministrativoCrud(Crud):
         def certidao_generate(self):
 
             if self.object.certidao:
-                self.template_name = 'core/certidao_publicacao.html'
-                return
+                return True
 
             if not self.object.texto_integral:
                 messages.add_message(
                     self.request,
                     messages.ERROR,
                     _('Documento sem Arquivo.'))
-                return
+                return False
 
             if self.request.user.is_anonymous() or \
                     not self.request.user.areatrabalho_set.filter(
                         tipo=AreaTrabalho.TIPO_PUBLICO).exists():
-                return
+                messages.add_message(
+                    self.request,
+                    messages.ERROR,
+                    _('Seu usuário não possui permissão para emitir certidões.'))
+                return False
 
             obj = self.object
             u = self.request.user
             CertidaoPublicacao.gerar_certidao(u, obj, 'texto_integral')
 
-            self.template_name = 'core/certidao_publicacao.html'
+            return True
 
     class ListView(QuerySetContainerPrivPubMixin, FilterView):
         filterset_class = DocumentoAdministrativoFilterSet
