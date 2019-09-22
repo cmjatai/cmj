@@ -452,6 +452,8 @@ class Anexado(models.Model):
     class Meta:
         verbose_name = _('Anexado')
         verbose_name_plural = _('Anexados')
+        ordering = ('-data_anexacao',
+                    '-documento_anexado___certidao__created')
 
     def __str__(self):
         return _('Anexado: %(documento_anexado_tipo)s %(documento_anexado_numero)s'
