@@ -18,7 +18,7 @@ from cmj.core.models import AreaTrabalho, CertidaoPublicacao
 from cmj.legacy_sislegis_publicacoes.models import Tipodoc, Tipolei, Documento,\
     Assuntos
 from sapl.protocoloadm.models import TipoDocumentoAdministrativo,\
-    DocumentoAdministrativo, Anexado
+    DocumentoAdministrativo, Anexado, TramitacaoAdministrativo
 from sapl.utils import RANGE_MESES
 
 
@@ -195,10 +195,23 @@ class Command(BaseCommand):
                 d.save()
             elif 38 in j['tipos'] and len(j['tipos']) == 1 and not j['id_doc_principal']:
                 d.tipo = tipos['187']
+                d.tipo_id = 187
                 d.save()
-            elif 38 in j['tipos'] and len(j['tipos']) == 1 and not j['id_doc_principal']:
-                d.tipo = tipos['187']
-                d.save()
+
+                d.tramitacaoadministrativo_set.all().delete()
+                for anexo in d.documento_principal_set.all().order_by('id'):
+                    t = TramitacaoAdministrativo()
+                    t.status_id = 4
+                    t.documento = d
+                    if anexo.documento_anexado.certidao:
+                        t.data_tramitacao = anexo.documento_anexado.certidao.created.date()
+                    else:
+                        t.data_tramitacao = anexo.documento_anexado.data
+                    t.unidade_tramitacao_local_id = 3
+                    t.unidade_tramitacao_destino_id = 3
+                    t.texto = 'Publicação de: %s' % anexo.documento_anexado
+                    t.save()
+                    print(anexo)
 
             else:
                 em_checar += 1

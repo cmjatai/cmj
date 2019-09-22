@@ -206,7 +206,10 @@ class DocumentoAdministrativo(models.Model):
         verbose_name=_('Em Tramitação?'),
         choices=YES_NO_CHOICES,
         default=False)
-    assunto = models.TextField(verbose_name=_('Assunto'))
+    assunto = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name=_('Assunto'))
     numero_externo = models.PositiveIntegerField(
         blank=True,
         null=True,

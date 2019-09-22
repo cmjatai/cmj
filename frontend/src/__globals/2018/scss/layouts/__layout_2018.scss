@@ -67,7 +67,9 @@
     margin-top: -5px;
     font-size: 1em;
     color: #0006;
-    
+  }
+  .item-titulo {
+    font-size: 120%;
   }
   .text-ementa {
     color: #36031c !important;
@@ -97,7 +99,8 @@
   }
 
   .item-node {
-    padding: 11px 0 11px 11px;
+    position: relative;
+    padding: 15px 0 11px 15px;
     margin: 11px 0 11px 18px;
     
     border:1px solid #fffa;
@@ -106,6 +109,22 @@
 
     &:hover {
       background-color: rgba(#fff, 0.3);
+    }
+    .item-titulo {
+      color:#004499;
+    }
+
+    .parent {
+      position: absolute;
+      font-size: 0.7em;
+      color: #0003;
+      top: 0px;
+      left: 2px;
+      line-height: 1;
+      cursor:help;
+      &:hover {
+        color: #05f;
+      }
     }
 
   }
