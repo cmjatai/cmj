@@ -196,6 +196,7 @@ class Command(BaseCommand):
             elif 38 in j['tipos'] and len(j['tipos']) == 1 and not j['id_doc_principal']:
                 d.tipo = tipos['187']
                 d.tipo_id = 187
+                d.tramitacao = True
                 d.save()
 
                 d.tramitacaoadministrativo_set.all().delete()
