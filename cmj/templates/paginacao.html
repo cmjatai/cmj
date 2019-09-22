@@ -1,14 +1,21 @@
 {% if is_paginated %}
-  <nav>
+  <nav class="nav-pagination">
     <ul class="pagination justify-content-center">
       {% if page_obj.has_previous %}
         <li class="page-item">
-          <a class="page-link" href="?page={{ page_obj.previous_page_number }}{{filter_url}}">
-            Anterior
+          <a class="page-link" aria-label="Anterior" href="?page={{ page_obj.previous_page_number }}{{filter_url}}">
+
+            <span aria-hidden="true">&laquo;</span>
+            <span class="sr-only">Anterior</span>
           </a>
         </li>
       {% else %}
-        <li class="page-item disabled"><a class="page-link" href="">Anterior</a></li>
+        <li class="page-item disabled">        
+          <a class="page-link" href="#" aria-label="Anterior">
+            <span aria-hidden="true">&laquo;</span>
+            <span class="sr-only">Anterior</span>
+          </a>       
+        </li>
       {% endif %}
 
       {% for page in page_range %}
@@ -25,12 +32,18 @@
 
       {% if page_obj.has_next %}
         <li class="page-item">
-          <a class="page-link" href="?page={{ page_obj.next_page_number }}{{filter_url}}">
-            Próxima
+          <a class="page-link" aria-label="Próxima" href="?page={{ page_obj.next_page_number }}{{filter_url}}">
+            <span aria-hidden="true">&raquo;</span>
+            <span class="sr-only">Próxima</span>
           </a>
         </li>
       {% else %}
-        <li class="page-item disabled"><a class="page-link" href="">Próxima</a></li>
+        <li class="page-item disabled">
+          <a class="page-link" href="#" aria-label="Próxima">
+            <span aria-hidden="true">&raquo;</span>
+            <span class="sr-only">Próxima</span>
+          </a>
+        </li>
       {% endif %}
     </ul>
   </nav>
