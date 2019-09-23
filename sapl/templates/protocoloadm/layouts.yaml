@@ -5,7 +5,7 @@ TipoDocumentoAdministrativo:
 
 DocumentoAdministrativo:
   {% trans 'Identificação Básica' %}:
-  - tipo  numero  ano
+  - tipo:6  numero  ano
   - data  protocolo 
   - materia|fk_urlize_for_detail
   - epigrafe
@@ -16,8 +16,8 @@ DocumentoAdministrativo:
   - documento_principal_set__documento_anexado|m2m_urlize_for_detail
   
   {% trans 'Outras Informações' %}:
+  - data_vencimento dias_prazo data_fim_prazo
   - numero_externo
-  - dias_prazo  data_fim_prazo
   - observacao
 
 DocumentoAcessorioAdministrativo:

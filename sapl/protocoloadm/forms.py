@@ -27,7 +27,8 @@ from sapl.utils import (RANGE_ANOS, YES_NO_CHOICES, AnoNumeroOrderingFilter,
                         choice_anos_com_protocolo, choice_force_optional,
                         choice_anos_com_documentoadministrativo,
                         FilterOverridesMetaMixin, choice_anos_com_materias,
-                        FileFieldCheckMixin, lista_anexados)
+                        FileFieldCheckMixin, lista_anexados,
+                        DocumentoAdministrativoOrderingFilter)
 
 from .models import (AcompanhamentoDocumento, DocumentoAcessorioAdministrativo,
                      DocumentoAdministrativo,
@@ -171,7 +172,7 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
         label=_('Interessado'),
         lookup_expr='icontains')
 
-    o = AnoNumeroOrderingFilter(help_text='')
+    o = DocumentoAdministrativoOrderingFilter(help_text='')
 
     class Meta(FilterOverridesMetaMixin):
         model = DocumentoAdministrativo
@@ -180,6 +181,7 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
                   'protocolo__numero',
                   'numero_externo',
                   'data',
+                  'data_vencimento',
                   'tramitacaoadministrativo__unidade_tramitacao_destino',
                   'tramitacaoadministrativo__status']
 

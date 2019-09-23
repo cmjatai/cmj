@@ -71,6 +71,7 @@
   }
   .item-titulo {
     font-size: 120%;
+    padding-right: 0.5em;
   }
   .text-ementa {
     color: #a26c06 !important;
@@ -119,20 +120,24 @@
     .item-titulo {
       color:#004499;
     }
+    
+  }
 
-    .parent {
-      position: absolute;
-      font-size: 0.7em;
-      color: #0003;
-      top: 0px;
-      left: 2px;
-      line-height: 1;
-      cursor:help;
-      &:hover {
-        color: #05f;
-      }
+  .parent, .parent-right {
+    position: absolute;
+    font-size: 0.7em;
+    color: #0003;
+    top: 1px;
+    left: 2px;
+    line-height: 1;
+    cursor:help;
+    &:hover {
+      color: #05f;
     }
-
+  }
+  .parent-right {
+    left: auto;
+    right: 2px;
   }
 
   &:hover {

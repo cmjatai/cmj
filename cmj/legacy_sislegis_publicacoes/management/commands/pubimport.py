@@ -3,6 +3,7 @@ from datetime import timedelta
 import datetime
 import mimetypes
 
+import dateutil
 from django.contrib.auth import get_user_model
 from django.core.files.base import File
 from django.core.files.temp import NamedTemporaryFile
@@ -18,7 +19,8 @@ from cmj.core.models import AreaTrabalho, CertidaoPublicacao
 from cmj.legacy_sislegis_publicacoes.models import Tipodoc, Tipolei, Documento,\
     Assuntos
 from sapl.protocoloadm.models import TipoDocumentoAdministrativo,\
-    DocumentoAdministrativo, Anexado, TramitacaoAdministrativo
+    DocumentoAdministrativo, Anexado, TramitacaoAdministrativo,\
+    StatusTramitacaoAdministrativo
 from sapl.utils import RANGE_MESES
 
 
@@ -87,6 +89,8 @@ class Command(BaseCommand):
 
         self.run()
         self.reset_id_model(CertidaoPublicacao)
+        self.reset_id_model(TipoDocumentoAdministrativo)
+        self.reset_id_model(StatusTramitacaoAdministrativo)
 
     def reset_id_model(self, model):
 
@@ -114,11 +118,121 @@ class Command(BaseCommand):
             a.delete()
 
         docs = DocumentoAdministrativo.objects.filter(
-            workspace=at).order_by('-id')
+            workspace=at).order_by('id')
 
         print(docs.count())
 
         em_checar = 0
+
+        StatusTramitacaoAdministrativo.objects.get_or_create(
+            id=12, sigla='LICAND', indicador='R', workspace=at,
+            descricao='Licitação em Andamento')
+
+        StatusTramitacaoAdministrativo.objects.get_or_create(
+            id=13, sigla='LICCASS', indicador='F', workspace=at,
+            descricao='Licitação com Contrato Assinado')
+
+        StatusTramitacaoAdministrativo.objects.get_or_create(
+            id=14, sigla='LICENC', indicador='F', workspace=at,
+            descricao='Licitação Encerrada')
+
+        StatusTramitacaoAdministrativo.objects.get_or_create(
+            id=15, sigla='LICCANC', indicador='F', workspace=at,
+            descricao='Licitação Cancelada')
+
+        StatusTramitacaoAdministrativo.objects.get_or_create(
+            id=16, sigla='JUSTINEG', indicador='F', workspace=at,
+            descricao='Justificativa de Inexigibilidade de Licitação')
+
+        TipoDocumentoAdministrativo.objects.get_or_create(
+            id=189, sigla='TC', workspace=at,
+            descricao='Termo de Credenciamento'
+        )
+
+        TipoDocumentoAdministrativo.objects.get_or_create(
+            id=190, sigla='CNTRT', workspace=at,
+            descricao='Contrato'
+        )
+        TipoDocumentoAdministrativo.objects.get_or_create(
+            id=191, sigla='EDCC', workspace=at,
+            descricao='Edital Carta Convite'
+        )
+
+        TipoDocumentoAdministrativo.objects.get_or_create(
+            id=192, sigla='EDTP', workspace=at,
+            descricao='Edital Tomada de Preços'
+        )
+
+        TipoDocumentoAdministrativo.objects.get_or_create(
+            id=193, sigla='EDPP', workspace=at,
+            descricao='Edital Pregão Presencial'
+        )
+
+        TipoDocumentoAdministrativo.objects.get_or_create(
+            id=194, sigla='ATAP', workspace=at,
+            descricao='Ato de Apostilamento'
+        )
+
+        TipoDocumentoAdministrativo.objects.get_or_create(
+            id=195, sigla='ADTCT', workspace=at,
+            descricao='Aditivo de Contrato'
+        )
+
+        TipoDocumentoAdministrativo.objects.get_or_create(
+            id=196, sigla='EDCRD', workspace=at,
+            descricao='Edital de Credenciamento'
+        )
+
+        TipoDocumentoAdministrativo.objects.get_or_create(
+            id=197, sigla='DPLIC', workspace=at,
+            descricao='Dispensa de Licitação'
+        )
+
+        TipoDocumentoAdministrativo.objects.get_or_create(
+            id=198, sigla='PRTR', workspace=at,
+            descricao='Portaria'
+        )
+
+        TipoDocumentoAdministrativo.objects.get_or_create(
+            id=200, sigla='ARPP', workspace=at,
+            descricao='Ata de Realização de Pregão'
+        )
+
+        TipoDocumentoAdministrativo.objects.get_or_create(
+            id=201, sigla='CRDPR', workspace=at,
+            descricao='Credenciamento de Pregão'
+        )
+
+        TipoDocumentoAdministrativo.objects.get_or_create(
+            id=202, sigla='ARP', workspace=at,
+            descricao='Ata de Registro de Preços'
+        )
+        TipoDocumentoAdministrativo.objects.get_or_create(
+            id=203, sigla='EDINT', workspace=at,
+            descricao='Edital de Intimação'
+        )
+        TipoDocumentoAdministrativo.objects.get_or_create(
+            id=204, sigla='IPIP', workspace=at,
+            descricao='Instauração de Procedimento Investigatório Preliminar'
+        )
+
+        TipoDocumentoAdministrativo.objects.get_or_create(
+            id=205, sigla='PRPRG', workspace=at,
+            descricao='Proposta de Pregão'
+        )
+        TipoDocumentoAdministrativo.objects.get_or_create(
+            id=206, sigla='ATRN', workspace=at,
+            descricao='Ata de Reunião'
+        )
+        TipoDocumentoAdministrativo.objects.get_or_create(
+            id=207, sigla='TMHM', workspace=at,
+            descricao='Termo de Homologação'
+        )
+
+        TipoDocumentoAdministrativo.objects.get_or_create(
+            id=208, sigla='RGCP', workspace=at,
+            descricao='Registro de Chapa'
+        )
 
         qs_tipos = TipoDocumentoAdministrativo.objects.all()
         tipos = {}
@@ -178,31 +292,33 @@ class Command(BaseCommand):
                         RANGE_MESES[d.numero - 1][1], dbb.year)
                     d.assunto = 'Balancete de %s de %s' % (
                         RANGE_MESES[d.numero - 1][1], dbb.year)
-                d.save()
 
             # Balancetes Contábeis
             elif 25 in j['tipos'] and len(j['tipos']) == 1:
                 d.tipo = tipos['183']
-                d.save()
             elif 29 in j['tipos'] and len(j['tipos']) == 1:
                 d.tipo = tipos['184']
-                d.save()
             elif 8 in j['tipos'] and len(j['tipos']) == 1:
                 d.tipo = tipos['185']
-                d.save()
             elif 35 in j['tipos'] and len(j['tipos']) == 1:
                 d.tipo = tipos['186']
-                d.save()
-            elif 38 in j['tipos'] and len(j['tipos']) == 1 and not j['id_doc_principal']:
+
+            elif len(j['tipos']) == 1 and j['tipos'][0] in (38, 39, 40, 41) and not j['id_doc_principal']:
                 d.tipo = tipos['187']
                 d.tipo_id = 187
                 d.tramitacao = True
-                d.save()
+
+                status = {
+                    '38': 4,
+                    '39': 5,
+                    '40': 6,
+                    '41': 7,
+                }
 
                 d.tramitacaoadministrativo_set.all().delete()
                 for anexo in d.documento_principal_set.all().order_by('-id'):
                     t = TramitacaoAdministrativo()
-                    t.status_id = 4
+                    t.status_id = status[str(j['tipos'][0])]
                     t.documento = d
                     if anexo.documento_anexado.certidao:
                         t.data_tramitacao = anexo.documento_anexado.certidao.created.date()
@@ -212,14 +328,211 @@ class Command(BaseCommand):
                     t.unidade_tramitacao_destino_id = 3
                     t.texto = 'Publicação de: %s' % anexo.documento_anexado
                     t.save()
-                    print(anexo)
+
+            elif len(j['tipos']) == 1 and j['tipos'][0] in (5, 31, 32, 33, 35) and not j['id_doc_principal']:
+                d.tipo = tipos['187']
+                d.tipo_id = 187
+                d.tramitacao = True
+
+                status = {
+                    '5': 12,
+                    '31': 13,
+                    '32': 14,
+                    '33': 15,
+                    '35': 16,
+                }
+
+                d.tramitacaoadministrativo_set.all().delete()
+                for anexo in d.documento_principal_set.all().order_by('-id'):
+                    t = TramitacaoAdministrativo()
+                    t.status_id = status[str(j['tipos'][0])]
+                    t.documento = d
+                    if anexo.documento_anexado.certidao:
+                        t.data_tramitacao = anexo.documento_anexado.certidao.created.date()
+                    else:
+                        t.data_tramitacao = anexo.documento_anexado.data
+                    t.unidade_tramitacao_local_id = 3
+                    t.unidade_tramitacao_destino_id = 3
+                    t.texto = 'Publicação de: %s' % anexo.documento_anexado
+                    t.save()
+
+            elif j['epigrafe'].startswith('Termo de Credenciamento'):
+                d.tipo = tipos['189']
+                d.tipo_id = 189
+
+            elif j['epigrafe'].startswith('Contrato') or \
+                    j['epigrafe'].startswith('Instrumento contratual'):
+                d.tipo = tipos['190']
+                d.tipo_id = 190
+
+            elif j['id_doc_principal'] and (
+                j['epigrafe'].startswith(' Carta Convite') or
+                j['epigrafe'].startswith('Carta Convite') or
+                j['epigrafe'].startswith('Carta  Convite') or
+                j['epigrafe'].startswith('Edital Convite') or
+                j['epigrafe'].startswith('Edital Carta') or
+                j['epigrafe'].startswith('Edital  Carta') or
+                j['epigrafe'].startswith('Edital  Convite') or
+                j['epigrafe'].startswith(' Edital - Convite') or
+                j['epigrafe'].startswith('Edital - Carta') or
+                j['epigrafe'].startswith('Edital Carta Convite')
+            ):
+                d.tipo = tipos['191']
+                d.tipo_id = 191
+
+            elif j['id_doc_principal'] and (
+                'Tomada de Preço'.lower() in j['epigrafe'].lower()
+            ):
+                d.tipo = tipos['192']
+                d.tipo_id = 192
+
+            elif j['id_doc_principal'] and (
+                'edital de pregão' in j['epigrafe'].lower() or
+                'edital pregão' in j['epigrafe'].lower() or
+                'edital  pregão' in j['epigrafe'].lower()
+
+            ):
+                d.tipo = tipos['193']
+                d.tipo_id = 193
+
+            elif j['id_doc_principal'] and (
+                'ato de apostilamento' in j['epigrafe'].lower()
+            ):
+                d.tipo = tipos['194']
+                d.tipo_id = 194
+
+            elif j['id_doc_principal'] and (
+                'aditivo do contrato' in j['epigrafe'].lower() or
+                'aditivo de prorrogação do contrato' in j['epigrafe'].lower()
+            ):
+                d.tipo = tipos['195']
+                d.tipo_id = 195
+
+            elif j['id_doc_principal'] and (
+                'edital de credenciamento' in j['epigrafe'].lower()
+            ):
+                d.tipo = tipos['196']
+                d.tipo_id = 196
+
+            elif j['id_doc_principal'] and (
+                'dispensa de licitação' in j['epigrafe'].lower()
+            ):
+                d.tipo = tipos['197']
+                d.tipo_id = 197
+
+            elif j['id_doc_principal'] and (
+                j['epigrafe'].lower().startswith('portaria')
+            ):
+                d.tipo = tipos['198']
+                d.tipo_id = 198
+
+            elif j['id_doc_principal'] and (
+                'Demostrativo'.lower() in j['epigrafe'].lower() or
+                'DEMONSTRATIVO DOS RESTOS'.lower() in j['epigrafe'].lower() or
+                'Demonstrativo da Despesa com Pessoal'.lower() in j['epigrafe'].lower() or
+                'Demonstrativos de Despesa com Pessoal'.lower() in j['epigrafe'].lower() or
+                'Demonstrativo de Despesa'.lower() in j['epigrafe'].lower() or
+                'Demonstrativo da Dívida Consolidada'.lower() in j['epigrafe'].lower() or
+                'Demonstrativo da Divida Consolidada'.lower() in j['epigrafe'].lower() or
+                'Demonstrativo das Garantias'.lower() in j['epigrafe'].lower() or
+                'Demonstrativo das Operações'.lower() in j['epigrafe'].lower() or
+                'Demonstrativo Simplificado do Relatório'.lower() in j['epigrafe'].lower() or
+                'Demonstrativo da Disponibilidade de Caixa'.lower(
+                ) in j['epigrafe'].lower()
+
+            ):
+                d.epigrafe = d.epigrafe.replace(
+                    'DEMOSTRATIVO', 'DEMONSTRATIVO')
+                d.epigrafe = d.epigrafe.replace(
+                    'Demostrativo', 'Demonstrativo')
+                d.old_json['epigrafe'] = d.epigrafe
+                d.tipo = tipos['185']
+                d.tipo_id = 185
+
+            elif j['id_doc_principal'] and (
+                'Ata de Realização do Pregão'.lower() in j['epigrafe'].lower() or
+                'Ata de Realização de Pregão'.lower() in j['epigrafe'].lower() or
+                'Ata de Realização Pregão'.lower() in j['epigrafe'].lower()
+            ):
+                d.tipo = tipos['200']
+                d.tipo_id = 200
+            elif j['id_doc_principal'] and (
+                'Credenciamento do Pregão'.lower() in j['epigrafe'].lower() or
+                'Credenciamento de Pregão'.lower() in j['epigrafe'].lower() or
+                'Credenciamento Pregão'.lower() in j['epigrafe'].lower()
+            ):
+                d.tipo = tipos['201']
+                d.tipo_id = 201
+
+            elif j['id_doc_principal'] and (
+                'Ata de Registro de Preço'.lower() in j['epigrafe'].lower() or
+                'Ata de Registro de Preços'.lower() in j['epigrafe'].lower()
+            ):
+                d.tipo = tipos['202']
+                d.tipo_id = 202
+
+            elif j['id_doc_principal'] and (
+                'Edital de Intimação'.lower() in j['epigrafe'].lower()
+            ):
+                d.tipo = tipos['203']
+                d.tipo_id = 203
+
+            elif j['id_doc_principal'] and (
+                'Instauração de Procedimento Investigatório'.lower(
+                ) in j['epigrafe'].lower()
+            ):
+                d.tipo = tipos['204']
+                d.tipo_id = 204
+
+            elif j['id_doc_principal'] and (
+                'Proposta Pregão'.lower() in j['epigrafe'].lower() or
+                'Proposta do Pregão'.lower() in j['epigrafe'].lower()
+            ):
+                d.tipo = tipos['205']
+                d.tipo_id = 205
+
+            elif j['id_doc_principal'] and (
+                'Ata de Reunião'.lower() in j['epigrafe'].lower()
+            ):
+                d.tipo = tipos['206']
+                d.tipo_id = 206
+
+            elif j['id_doc_principal'] and (
+                'Termo de Adjudicação e Homologação'.lower() in j['epigrafe'].lower() or
+                'Homologação e Adjudicação'.lower() in j['epigrafe'].lower() or
+                'Homologação do Processo'.lower() in j['epigrafe'].lower() or
+                'Termo de Homologação'.lower() in j['epigrafe'].lower()
+            ):
+                d.tipo = tipos['207']
+                d.tipo_id = 207
+
+            elif j['id_doc_principal'] and (
+                'Registro de Chapa'.lower() in j['epigrafe'].lower()
+            ):
+                d.tipo = tipos['208']
+                d.tipo_id = 208
 
             else:
-                em_checar += 1
-                if j['tipos']:
-                    print(j)
+                #em_checar += 1
+                d.tipo = tipos['183']
+                d.tipo_id = 183
+                # if 'Adjudicação'.lower() in j['epigrafe'].lower():
+                # if not j['id_doc_principal']:
+                #    print(j['epigrafe'], j)
 
-        print("sem classificação não impressos")
+            if not d.assunto:
+                d.assunto = d.epigrafe
+
+            if not d.data_vencimento and j['data_vencimento']:
+                d.data_vencimento = datetime.datetime.strptime(
+                    j['data_vencimento'], "%Y-%m-%dT%H:%M:%S").astimezone()
+
+            if j['data_alteracao']:
+                d.data_ultima_atualizacao = datetime.datetime.strptime(
+                    j['data_alteracao'], "%Y-%m-%dT%H:%M:%S").astimezone()
+
+            d.save()
+
         print('total a checar', em_checar)
 
     def run__base(self):

@@ -6,7 +6,10 @@
  <div class="parent">
   Vinculado a: {{d.anexo_de.first}}
  </div>
- <div class="clearfix"></div>
+{% else %}
+ <div class="parent-right">
+  Última Atualização: {{d.data_ultima_atualizacao}}
+ </div>
  {% endif %}
   
 
@@ -24,7 +27,7 @@
       <span class="text-danger">Certidão de Publicação nº {{d.certidao.id|stringformat:"06d" }} de {{d.certidao.created}}</span>
       </small>
     {% endif %}
-    
+     
   <br><strong>Data do documento:</strong> {{d.data}} | {{d.tipo}} | {{d.tipo.sigla}} {{d.numero}}/{{d.ano}}
 
   {% if d.protocolo %}
@@ -38,20 +41,18 @@
 
 
   {% if d.assunto %}
-    <div class="text-ementa">{{ d.assunto }}</div>
+    <div class="text-ementa">{{ d.assunto|safe }}</div>
   {% endif %}
 
 
   <small>
     {% if d.interessado %}
-      <strong>Interessado:</strong>&nbsp;{{ d.interessado|default_if_none:"Não informado"}}
+      <strong>Interessado:</strong>&nbsp;{{ d.interessado|default_if_none:"Não informado"}}</br>
     {% endif %}
 
     {% define d.tramitacaoadministrativo_set.first as tram %}
-    {% if tram.unidade_tramitacao_destino %}
-        </br>
-      <strong>Localização Atual:</strong> &nbsp;{{tram.unidade_tramitacao_destino}}
-        </br>
+    {% if tram.unidade_tramitacao_destino %}        
+      <strong>Localização Atual:</strong> &nbsp;{{tram.unidade_tramitacao_destino}}</br>        
       <strong>Status:</strong> {{tram.status}}
     {% endif %}
     {% if not d.anexo_de.first %}

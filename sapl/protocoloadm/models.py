@@ -22,7 +22,7 @@ from sapl.utils import (RANGE_ANOS, YES_NO_CHOICES, texto_upload_path,
 @reversion.register()
 class TipoDocumentoAdministrativo(models.Model):
     sigla = models.CharField(max_length=5, verbose_name=_('Sigla'))
-    descricao = models.CharField(max_length=50, verbose_name=_('Descrição'))
+    descricao = models.CharField(max_length=100, verbose_name=_('Descrição'))
 
     workspace = models.ForeignKey(
         AreaTrabalho,
@@ -198,10 +198,15 @@ class DocumentoAdministrativo(models.Model):
         max_length=1000, blank=True, verbose_name=_('Interessado'))
     autor = models.ForeignKey(Autor, blank=True, null=True,
                               on_delete=models.PROTECT)
+
     dias_prazo = models.PositiveIntegerField(
         blank=True, null=True, verbose_name=_('Dias Prazo'))
     data_fim_prazo = models.DateField(
         blank=True, null=True, verbose_name=_('Data Fim Prazo'))
+
+    data_vencimento = models.DateField(
+        blank=True, null=True, verbose_name=_('Data Fim Prazo'))
+
     tramitacao = models.BooleanField(
         verbose_name=_('Em Tramitação?'),
         choices=YES_NO_CHOICES,
@@ -243,7 +248,7 @@ class DocumentoAdministrativo(models.Model):
 
     data_ultima_atualizacao = models.DateTimeField(
         blank=True, null=True,
-        auto_now=True,
+        auto_now=not settings.DEBUG,
         verbose_name=_('Data'))
 
     _certidao = GenericRelation(

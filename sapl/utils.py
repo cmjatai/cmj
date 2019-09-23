@@ -596,16 +596,16 @@ def intervalos_tem_intersecao(a_inicio, a_fim, b_inicio, b_fim):
 class MateriaPesquisaOrderingFilter(django_filters.OrderingFilter):
 
     choices = (
-        ('dataC', 'Data, Tipo, Ano, Numero - Ordem Crescente'),
-        ('dataD', 'Data, Tipo, Ano, Numero - Ordem Decrescente (padrão)'),
-        ('tipoC', 'Tipo, Ano, Numero, Data - Ordem Crescente'),
-        ('tipoD', 'Tipo, Ano, Numero, Data - Ordem Decrescente')
+        ('dataD', 'Ordem Decrescente - Data, Tipo, Ano, Numero '),
+        ('tipoD', 'Ordem Decrescente - Tipo, Ano, Numero, Data'),
+        ('dataC', 'Ordem Crescente - Data, Tipo, Ano, Numero'),
+        ('tipoC', 'Ordem Crescente - Tipo, Ano, Numero, Data'),
     )
     order_by_mapping = {
-        'dataC': ['data_apresentacao', 'tipo__sigla', 'ano', 'numero'],
         'dataD': ['-data_apresentacao', '-tipo__sigla', '-ano', '-numero'],
-        'tipoC': ['tipo__sigla', 'ano', 'numero', 'data_apresentacao'],
         'tipoD': ['-tipo__sigla', '-ano', '-numero', '-data_apresentacao'],
+        'dataC': ['data_apresentacao', 'tipo__sigla', 'ano', 'numero'],
+        'tipoC': ['tipo__sigla', 'ano', 'numero', 'data_apresentacao'],
     }
 
     def __init__(self, *args, **kwargs):
@@ -624,16 +624,16 @@ class MateriaPesquisaOrderingFilter(django_filters.OrderingFilter):
 class NormaPesquisaOrderingFilter(django_filters.OrderingFilter):
 
     choices = (
-        ('dataC', 'Data, Tipo, Ano, Numero - Ordem Crescente'),
-        ('dataD', 'Data, Tipo, Ano, Numero - Ordem Decrescente'),
-        ('tipoC', 'Tipo, Ano, Numero, Data - Ordem Crescente'),
-        ('tipoD', 'Tipo, Ano, Numero, Data - Ordem Decrescente')
+        ('dataD', 'Ordem Decrescente - Data, Tipo, Ano, Numero '),
+        ('tipoD', 'Ordem Decrescente - Tipo, Ano, Numero, Data'),
+        ('dataC', 'Ordem Crescente - Data, Tipo, Ano, Numero'),
+        ('tipoC', 'Ordem Crescente - Tipo, Ano, Numero, Data'),
     )
     order_by_mapping = {
-        'dataC': ['data', 'tipo', 'ano', 'numero'],
         'dataD': ['-data', '-tipo', '-ano', '-numero'],
-        'tipoC': ['tipo', 'ano', 'numero', 'data'],
         'tipoD': ['-tipo', '-ano', '-numero', '-data'],
+        'dataC': ['data', 'tipo', 'ano', 'numero'],
+        'tipoC': ['tipo', 'ano', 'numero', 'data'],
     }
 
     def __init__(self, *args, **kwargs):
@@ -695,6 +695,35 @@ class AnoNumeroOrderingFilter(django_filters.OrderingFilter):
 
     def filter(self, qs, value):
         _value = self.order_by_mapping[value[0]] if value else value
+        return super().filter(qs, _value)
+
+
+class DocumentoAdministrativoOrderingFilter(django_filters.OrderingFilter):
+
+    choices = (('dataPUBd', 'Ordem Decrescente - Data de última atulização'),
+               ('dataDOCd', 'Ordem Decrescente - Data, Tipo, Número'),
+               ('dataDOCc', 'Ordem Crescente - Data, Tipo, Número'),
+               ('dataVENd', 'Ordem Decrescente - Data de Vencimento, Tipo, Número'),
+               ('dataVENc', 'Ordem Crescente - Data de Vencimento, Tipo, Número'),)
+
+    order_by_mapping = {
+        'dataPUBd': ['-data_ultima_atualizacao'],
+        'dataDOCd': ['-data', '-tipo', '-numero'],
+        'dataDOCc': ['data', 'tipo', 'numero'],
+        'dataVENd': ['-data_vencimento', '-tipo', '-numero'],
+        'dataVENc': ['data_vencimento', 'tipo', 'numero'],
+    }
+
+    def __init__(self, *args, **kwargs):
+        kwargs['choices'] = self.choices
+        super(DocumentoAdministrativoOrderingFilter,
+              self).__init__(*args, **kwargs)
+
+    def filter(self, qs, value):
+        if value:
+            _value = self.order_by_mapping[value[0]] if value else value
+        else:
+            _value = self.order_by_mapping['dataPUBd']
         return super().filter(qs, _value)
 
 
