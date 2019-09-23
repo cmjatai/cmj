@@ -700,7 +700,7 @@ class AnoNumeroOrderingFilter(django_filters.OrderingFilter):
 
 class DocumentoAdministrativoOrderingFilter(django_filters.OrderingFilter):
 
-    choices = (('dataPUBd', 'Ordem Decrescente - Data de última atulização'),
+    choices = (('dataPUBd', 'Ordem Decrescente - Data de última atualização'),
                ('dataDOCd', 'Ordem Decrescente - Data, Tipo, Número'),
                ('dataDOCc', 'Ordem Crescente - Data, Tipo, Número'),
                ('dataVENd', 'Ordem Decrescente - Data de Vencimento, Tipo, Número'),

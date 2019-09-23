@@ -254,9 +254,15 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
         qs = django_filters.FilterSet.filter_queryset(self, queryset)
 
         cd = self.form.cleaned_data
-        if 'data_vencimento' in cd and not cd['data_vencimento']:
-            if 'tipo' in cd and not cd['tipo']:
-                qs = qs.filter(documento_anexado_set__isnull=True)
+
+        raiz = True
+        for k, v in cd.items():
+            if v:
+                raiz = False
+                break
+
+        if raiz:
+            qs = qs.filter(documento_anexado_set__isnull=True)
 
         if 'data_vencimento' in cd and cd['data_vencimento']:
             if cd['data_vencimento'].start and cd['data_vencimento'].stop:

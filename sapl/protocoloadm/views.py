@@ -288,6 +288,7 @@ class DocumentoAdministrativoCrud(Crud):
             if not self.request.user.is_anonymous() and\
                     self.request.user.areatrabalho_set.filter(
                         tipo=AreaTrabalho.TIPO_PUBLICO).exists():
+                btn[0] = btn[0].replace('certidao', 'certidao&print')
                 btn[1] = 'btn-primary'
                 btn[2] = _('Gerar Certidão de Publicação')
                 return btn
