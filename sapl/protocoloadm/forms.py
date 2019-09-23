@@ -255,23 +255,28 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
 
         cd = self.form.cleaned_data
 
-        raiz = True
-        for k, v in cd.items():
-            if v:
-                raiz = False
-                break
+        first = qs.first()
 
-        if raiz:
-            qs = qs.filter(documento_anexado_set__isnull=True)
+        if first and first.workspace.tipo == AreaTrabalho.TIPO_PUBLICO:
+            raiz = True
+            for k, v in cd.items():
+                if v:
+                    raiz = False
+                    break
 
-        if 'data_vencimento' in cd and cd['data_vencimento']:
-            if cd['data_vencimento'].start and cd['data_vencimento'].stop:
-                qs = qs.order_by('data_vencimento', '-data_ultima_atualizacao')
-            elif cd['data_vencimento'].start and not cd['data_vencimento'].stop:
-                qs = qs.order_by('data_vencimento', '-data_ultima_atualizacao')
-            elif not cd['data_vencimento'].start and cd['data_vencimento'].stop:
-                qs = qs.order_by('-data_vencimento',
-                                 '-data_ultima_atualizacao')
+            if raiz:
+                qs = qs.filter(documento_anexado_set__isnull=True)
+
+            if 'data_vencimento' in cd and cd['data_vencimento']:
+                if cd['data_vencimento'].start and cd['data_vencimento'].stop:
+                    qs = qs.order_by('data_vencimento',
+                                     '-data_ultima_atualizacao')
+                elif cd['data_vencimento'].start and not cd['data_vencimento'].stop:
+                    qs = qs.order_by('data_vencimento',
+                                     '-data_ultima_atualizacao')
+                elif not cd['data_vencimento'].start and cd['data_vencimento'].stop:
+                    qs = qs.order_by('-data_vencimento',
+                                     '-data_ultima_atualizacao')
 
         return qs
 
