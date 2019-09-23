@@ -10,7 +10,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, PermissionDenied
 from django.core.signing import Signer
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.db import transaction
@@ -565,13 +565,29 @@ class TaDeleteView(CompMixin, DeleteView):
     template_name = "crud/confirm_delete.html"
     permission_required = 'compilacao.delete_textoarticulado'
 
+    def post(self, request, *args, **kwargs):
+        if not request.user.is_superuser:
+            raise PermissionDenied
+        return DeleteView.post(self, request, *args, **kwargs)
+
     @property
     def detail_url(self):
         return reverse_lazy('sapl.compilacao:ta_detail',
                             kwargs={'pk': self.kwargs['pk']})
 
     def get_success_url(self):
-        return reverse_lazy('sapl.compilacao:ta_list')
+        messages.info(self.request, 'Texto Articulado excluido com sucesso!')
+
+        reverse_url = '%s:%s_detail' % (
+            self.object.content_object._meta.app_config.name,
+            self.object.content_object._meta.model_name)
+
+        return reverse_lazy(reverse_url,
+                            kwargs={'pk': self.object.content_object.pk})
+
+    @property
+    def title(self):
+        return '<b>Texto Articulado:</b> %s' % self.object
 
 
 class DispositivoSuccessUrlMixin(CompMixin):

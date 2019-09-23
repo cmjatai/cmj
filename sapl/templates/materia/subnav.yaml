@@ -20,7 +20,7 @@
   url: tramitacao_list
 - title: {% trans 'Relatoria' %}
   url: relatoria_list
-{% if 'texto_articulado_materia'|get_config_attr %}
+{% if 'texto_articulado_materia'|get_config_attr and object.texto_articulado.exists %}
 - title: {% trans 'Texto' %}
   url: materia_ta
 {% endif %}

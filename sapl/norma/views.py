@@ -205,6 +205,30 @@ class NormaCrud(Crud):
             return reverse('%s:%s' % (namespace, 'norma_pesquisa'))
 
     class DetailView(Crud.DetailView):
+
+        @property
+        def extras_url(self):
+
+            if self.request.user.has_perm('compilacao.add_textoarticulado'):
+                if not self.object.texto_articulado.exists():
+                    btns = [(
+                        reverse('sapl.norma:norma_ta',
+                                kwargs={'pk': self.kwargs['pk']}),
+                        'btn-primary',
+                        _('Criar Texto Articulado')
+                    )
+                    ]
+                    return btns
+                elif self.request.user.is_superuser:
+                    btns = [(
+                        reverse('sapl.compilacao:ta_delete',
+                                kwargs={'pk': self.object.texto_articulado.first().pk}),
+                        'btn-danger',
+                        _('Excluir Texto Articulado')
+                    )
+                    ]
+                    return btns
+
         def get(self, request, *args, **kwargs):
             estatisticas_acesso_normas = AppConfig.objects.first().estatisticas_acesso_normas
             if estatisticas_acesso_normas == 'S':

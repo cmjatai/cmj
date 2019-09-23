@@ -1763,6 +1763,28 @@ class MateriaLegislativaCrud(Crud):
         layout_key = 'MateriaLegislativaDetail'
         template_name = "materia/materialegislativa_detail.html"
 
+        @property
+        def extras_url(self):
+            if self.request.user.has_perm('compilacao.add_textoarticulado'):
+                if not self.object.texto_articulado.exists():
+                    btns = [(
+                        reverse('sapl.materia:materia_ta',
+                                kwargs={'pk': self.kwargs['pk']}),
+                        'btn-primary',
+                        _('Criar Texto Articulado')
+                    )
+                    ]
+                    return btns
+                elif self.request.user.is_superuser:
+                    btns = [(
+                        reverse('sapl.compilacao:ta_delete',
+                                kwargs={'pk': self.object.texto_articulado.first().pk}),
+                        'btn-danger',
+                        _('Excluir Texto Articulado')
+                    )
+                    ]
+                    return btns
+
         def hook_documentoadministrativo_set(self, obj):
 
             docs = obj.documentoadministrativo_set.all()
