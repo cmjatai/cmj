@@ -57,7 +57,7 @@
       <strong>Status:</strong> {{tram.status}}
     {% endif %}
     {% if not d.anexo_de.first %}
-      {% if d.tramitacao and mail_service_configured %}
+      {% if d.tramitacao and not perms.protocoloadm.detail_documentoadministrativo and d.workspace.tipo == d.workspace.TIPO_PUBLICO and mail_service_configured %}
         <br><a class="btn btn-sm btn-outline-primary" href="{% url 'sapl.protocoloadm:acompanhar_documento' d.id %}">Acompanhar Tramitação</a>
       {% endif %}
     {% endif %}

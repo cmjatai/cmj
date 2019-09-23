@@ -19,7 +19,7 @@
 - title: {% trans 'Matérias Legislativas' %}
   url: {% url 'sapl.materia:pesquisar_materia' %}?o=
 - title: {% trans 'Sessões Plenárias' %}
-  url: {% url 'sapl.sessao:pesquisar_sessao' %}?data_inicio__year=2019
+  url: {% url 'sapl.sessao:pesquisar_sessao' %}?data_inicio__year={% now 'Y' %}
 
 - title: {% trans 'Relatórios' %}
   url: sapl.base:relatorios_list

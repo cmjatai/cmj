@@ -94,7 +94,7 @@
   css_class: head_title
   children:
   - title: Sessões Plenárias
-    url: /sessao/pesquisar-sessao?data_inicio__year=2019
+    url: /sessao/pesquisar-sessao?data_inicio__year={% now 'Y' %}
   - title: Matérias em tramitação
     url: /materia/pesquisar-materia?em_tramitacao=1
   - title: Diário Oficial
