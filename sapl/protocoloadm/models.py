@@ -248,7 +248,7 @@ class DocumentoAdministrativo(models.Model):
 
     data_ultima_atualizacao = models.DateTimeField(
         blank=True, null=True,
-        auto_now=not settings.DEBUG,
+        auto_now=True,
         verbose_name=_('Data'))
 
     _certidao = GenericRelation(
