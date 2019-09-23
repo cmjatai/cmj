@@ -58,15 +58,44 @@
     		</thead>
         {% for n in page_obj %}
           <tr>
-            <td>
-              <a href="{% url 'sapl.norma:normajuridica_detail' n.id %}"><strong>{{n}}</strong></a><br>
-              {{n.ementa|safe}}
-              {% if n.texto_integral %}
-                <br><strong>Texto Original:</strong> <a href="{{result.object.texto_integral.url}}">Clique aqui</a>
-              {% endif %}
-              {% if n.texto_articulado.exists %}
-                <br><strong>Texto Articulado:</strong> <a href="{% url 'sapl.norma:norma_ta' n.pk %}">Clique aqui</a>
-              {% endif %}
+            <td class="item-listas">
+              <div class="item-raiz">
+                <div class="links-texto">
+                  {% if n.texto_integral %}
+                    <a class="link-texto" href="{{n.texto_integral.url}}" title="Arquivo Digitalizado da Norma ">
+                      <i class="far fa-2x fa-file-{% if '.pdf' in n.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
+                    </a>
+                  {% endif %}
+
+                  {% if n.texto_articulado.exists %}
+                    <a class="link-texto" href="{% url 'sapl.norma:norma_ta' n.pk%}">
+                      Texto Articulado
+                    </a>
+                  {% endif %}
+                </div>
+                
+                <strong>
+                  <a href="{% url 'sapl.norma:normajuridica_detail' n.pk %}">{{ n }}</a>
+                </strong>
+
+                <div class="text-ementa">
+                  {{n.ementa}}
+                </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            </div>
             </td>
             {% comment "" %}
             

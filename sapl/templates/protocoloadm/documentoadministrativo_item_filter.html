@@ -29,7 +29,6 @@
     {% endif %}
      
   <br><strong>Data do documento:</strong> {{d.data}} | {{d.tipo}} | {{d.tipo.sigla}} {{d.numero}}/{{d.ano}}
-
   {% if d.protocolo %}
     | 
     {% if perms.detail_protocolo %}
@@ -38,7 +37,9 @@
       <strong>Protocolo:</strong> {{ d.protocolo}}
     {% endif %}
   {% endif %}
-
+  {% if d.data_vencimento %}
+    <br><small>Data de Vencimento: {{d.data_vencimento}}</small>
+  {% endif %}
 
   {% if d.assunto %}
     <div class="text-ementa">{{ d.assunto|safe }}</div>

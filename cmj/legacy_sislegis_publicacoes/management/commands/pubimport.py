@@ -87,7 +87,7 @@ class Command(BaseCommand):
         post_delete.disconnect(dispatch_uid='cmj_post_delete_signal')
         post_save.disconnect(dispatch_uid='cmj_post_save_signal')
 
-        self.run()
+        # self.run()
         self.reset_id_model(CertidaoPublicacao)
         self.reset_id_model(TipoDocumentoAdministrativo)
         self.reset_id_model(StatusTramitacaoAdministrativo)

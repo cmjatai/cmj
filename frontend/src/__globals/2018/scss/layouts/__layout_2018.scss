@@ -97,6 +97,9 @@
   .item-raiz {
     padding: 10px 0 0 10px;
     margin-bottom: 10px;
+    &.anexador {
+      font-size: 75%;
+    }
   }
 
   .item-node {

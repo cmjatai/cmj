@@ -201,10 +201,12 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
         self.filters['protocolo__numero'].label = 'Núm. Protocolo'
         self.filters['tramitacaoadministrativo__status'].label = 'Situação'
         self.filters[local_atual].label = 'Localização Atual'
+        self.form.fields['data_vencimento'].help_text = 'Ao Informar um periodo de vencimento, o campo ordenação se torna irrelevante.'
 
         row1 = to_row(
-            [('tipo', 8),
-             ('o', 4), ])
+            [('tipo', 5),
+             ('o', 3),
+             ('data_vencimento', 4), ])
 
         row2 = to_row(
             [('numero', 2),
@@ -252,10 +254,19 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
         qs = django_filters.FilterSet.filter_queryset(self, queryset)
 
         cd = self.form.cleaned_data
-        print(qs.count())
-        if 'tipo' in cd and not cd['tipo']:
-            qs = qs.filter(documento_anexado_set__isnull=True)
-        print(qs.count())
+        if 'data_vencimento' in cd and not cd['data_vencimento']:
+            if 'tipo' in cd and not cd['tipo']:
+                qs = qs.filter(documento_anexado_set__isnull=True)
+
+        if 'data_vencimento' in cd and cd['data_vencimento']:
+            if cd['data_vencimento'].start and cd['data_vencimento'].stop:
+                qs = qs.order_by('data_vencimento', '-data_ultima_atualizacao')
+            elif cd['data_vencimento'].start and not cd['data_vencimento'].stop:
+                qs = qs.order_by('data_vencimento', '-data_ultima_atualizacao')
+            elif not cd['data_vencimento'].start and cd['data_vencimento'].stop:
+                qs = qs.order_by('-data_vencimento',
+                                 '-data_ultima_atualizacao')
+
         return qs
 
 

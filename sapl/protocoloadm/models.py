@@ -205,7 +205,7 @@ class DocumentoAdministrativo(models.Model):
         blank=True, null=True, verbose_name=_('Data Fim Prazo'))
 
     data_vencimento = models.DateField(
-        blank=True, null=True, verbose_name=_('Data Fim Prazo'))
+        blank=True, null=True, verbose_name=_('Data de Vencimento'))
 
     tramitacao = models.BooleanField(
         verbose_name=_('Em Tramitação?'),

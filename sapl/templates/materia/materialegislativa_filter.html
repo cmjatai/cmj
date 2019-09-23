@@ -46,6 +46,7 @@
             {% for m in page_obj %}
               <tr>
                 <td class="item-listas">  
+                  <div class="item-raiz">
 
                     <div class="links-texto">
                       {% if m.texto_original %}
@@ -167,6 +168,7 @@
                       <a class="btn btn-sm btn-outline-primary" href="{% url 'sapl.materia:acompanhar_materia' m.id %}" data-toggle="tooltip" data-placement="top" title="Registre seu email para acompanhamento desta matéria. Você receberá um email sempre que está materia tramitar.">Acompanhar Matéria</a>
                     {% endif %}
                   {% endif %}
+                  </div>
                   </td>
               </tr>
             {% endfor %}

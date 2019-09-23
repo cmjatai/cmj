@@ -6,7 +6,7 @@
   - title: Mesa Diretora
     url: /parlamentar
   - title: Comissões
-    url: http://sapl.camarajatai.go.gov.br/sapl/cadastros/comissao/comissao_index_html
+    url: sapl.comissoes:comissao_list
   - title: {% trans 'Procuradoria Geral' %}
     url: /institucional/procuradoria-geral
   - title: {% trans 'Agenda Pública' %}
@@ -15,24 +15,10 @@
     url: /institucional/nossa-jatai
 
   - title: {% trans 'Legislação' %}
-    url: http://sapl.camarajatai.go.gov.br/sapl/qs?d=tc-tn&tc=tn
-    css_class: head_title
-    children:
-    - title: Regimento Interno
-      url: http://sapl.camarajatai.go.gov.br/sapl/qs?d=tc-tn&tn=21
-    - title: Lei Orgânica do Municipio
-      url: http://sapl.camarajatai.go.gov.br/sapl/qs?d=tc-tn&tn=3
-    - title: Leis Complementares
-      url: http://sapl.camarajatai.go.gov.br/sapl/qs?d=tc-tn&tn=20
-    - title: Leis Ordinárias
-      url: http://sapl.camarajatai.go.gov.br/sapl/qs?d=tc-tn&tn=1
-    - title: Decretos Legislativos
-      url: http://sapl.camarajatai.go.gov.br/sapl/qs?d=tc-tn&tn=2
-    - title: Resoluções
-      url: http://sapl.camarajatai.go.gov.br/sapl/qs?d=tc-tn&tn=19
-    - title: Portarias
-      url: http://sapl.camarajatai.go.gov.br/sapl/qs?d=tc-tn&tn=10
-- title: {% trans 'Parlamentares' %}
+    url: sapl.norma:norma_pesquisa
+  - title: {% trans 'Normas e Códigos de Destaque' %}
+    url: sapl.norma:norma_de_destaque
+  - title: {% trans 'Parlamentares' %}
   url: /parlamentar
   css_class: head_title
   children:
@@ -108,14 +94,14 @@
   css_class: head_title
   children:
   - title: Sessões Plenárias
-    url: http://sapl.camarajatai.go.gov.br/sapl/consultas/sessao_plenaria/sessao_plenaria_index_html
+    url: /sessao/pesquisar-sessao?data_inicio__year=2019
   - title: Matérias em tramitação
-    url: http://sapl.camarajatai.go.gov.br/sapl/qs?d=-&tr=1
+    url: /materia/pesquisar-materia?em_tramitacao=1
   - title: Diário Oficial
     css_class: head_title
     children:
     - title: Republicação do Diário Oficial do Município
-      url: http://sapl.camarajatai.go.gov.br/sapl/qs?tc=td
+      url: cmj.diarios:diariooficial_list
       children:
       - title: Fale Conosco
         url: ''
@@ -131,15 +117,17 @@
   css_class: head_title
   children:
   - title: Últimas Publicações
-    url: http://sislegis.camarajatai.go.gov.br/publicacoes
+    url: /doc?o=
   - title: Licitações e Contratos
-    url: http://sislegis.camarajatai.go.gov.br/publicacoes
+    url: ''
     css_class: head_title
     children:
     - title: Licitações em Andamento
-      url: http://sislegis.camarajatai.go.gov.br/publicacoes/seeker?sv=9&tl=5
+      url: /doc/?tipo=187&o=&tramitacaoadministrativo__status=12
     - title: Contratos em Vigência
-      url: http://sislegis.camarajatai.go.gov.br/publicacoes/seeker?sv=11&tl=36&ct=3
+      url: /doc/?data_vencimento_0={% now "d/m/Y" %}
+    - title: Contratos Encerrados
+      url: /doc/?data_vencimento_1={% now "d/m/Y" %}
     - title: {% trans 'Transparência' %}
       url: ''
       css_class: head_title
