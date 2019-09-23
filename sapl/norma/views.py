@@ -5,6 +5,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, JsonResponse
+from django.shortcuts import redirect
 from django.template import RequestContext, loader
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -206,6 +207,8 @@ class NormaCrud(Crud):
 
     class DetailView(Crud.DetailView):
 
+        layout_key = 'NormaJuridicaDetail'
+
         @property
         def extras_url(self):
 
@@ -230,6 +233,11 @@ class NormaCrud(Crud):
                     return btns
 
         def get(self, request, *args, **kwargs):
+            """if not request.user.has_perm('norma.change_normajuridica') and \
+                    self.get_object().texto_articulado.exists():
+                return redirect(reverse('sapl.norma:norma_ta',
+                                        kwargs={'pk': self.kwargs['pk']}))"""
+
             estatisticas_acesso_normas = AppConfig.objects.first().estatisticas_acesso_normas
             if estatisticas_acesso_normas == 'S':
                 NormaEstatisticas.objects.create(usuario=str(self.request.user),

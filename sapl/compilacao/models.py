@@ -416,8 +416,8 @@ class TextoArticulado(TimestampedMixin):
 
     def clone_for(self, obj):
         # O clone gera um texto válido original dada a base self,
-        # mesmo sendo esta base um texto compilado.
-        # Os dispositivos a clonar será com base no texto compilado
+        # mesmo sendo esta base um Texto Articulado.
+        # Os dispositivos a clonar será com base no Texto Articulado
 
         assert self.tipo_ta and self.tipo_ta.content_type, _(
             'Não é permitido chamar o método clone_for '

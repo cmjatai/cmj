@@ -17,18 +17,7 @@
   } 
 }
 
-@page {
-  size: A4;
-  margin: 4cm;
-}
 @media print {
-
-  .container-cert-pub {
-    width: 300pt;
-    .inner {
-    }
-  }
-
 
 
 }

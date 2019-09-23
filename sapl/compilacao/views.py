@@ -865,6 +865,10 @@ class TextView(CompMixin, ListView):
     fim_vigencia = None
     ta_vigencia = None
 
+    @property
+    def title(self):
+        return '<b>Texto Articulado:</b> %s' % self.object
+
     def has_permission(self):
         self.object = self.ta
         return self.object.has_view_permission(self.request)

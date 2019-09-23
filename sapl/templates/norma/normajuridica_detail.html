@@ -1,95 +1,90 @@
 {% extends "crud/detail.html" %}
 {% load i18n common_tags %}
 {% load render_bundle from webpack_loader %}
-
+{% comment %}
 {% block webpack_loader_css %}
   {{ block.super }}
   {% if object.texto_articulado.exists and object.texto_articulado.first.has_view_permission  %}
     {% render_bundle 'compilacao' 'css' %}
   {% endif %}
 {% endblock %}
-
-
+{% endcomment %}
 
 {% block detail_content %}
-      {% for fieldset in view.layout_display %}
-        <h2 class="legend">{{ fieldset.legend }}</h2>
-        {% for row in fieldset.rows %}
-          <div class="row">
-            {% for column in row %}
-              <div class="col-sm-{{ column.span }}">
-                <div id="div_id_{{ column.id }}" class="form-group">
-                  <p class="control-label">{{ column.verbose_name }}</p>
-                  <div class="controls">
-                    {% comment %}TODO Transformar os links em URLs diretamente no CRUD{% endcomment %}
+<div class="item-listas">
+  <div class="links-texto">
+    {% if object.texto_integral %}
+      <a class="link-texto" href="{{object.texto_integral.url}}" title="Arquivo Digitalizado da Norma ">
+        <i class="far fa-3x fa-file-{% if '.pdf' in object.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
+      </a>
+    {% endif %}
 
-                    {% if column.text|url %}
-                      <div class="form-control-static"><a href="{{ column.text|safe }}"> {{ column.text|safe|default:"" }} </a></div>
-                    {% elif column.verbose_name == 'Matéria' %}
-                      {% if object.materia.id %}
-                        <div class="form-control-static"><a href="{% url 'sapl.materia:materialegislativa_detail' object.materia.id  %}"> {{ column.text|safe|default:"" }} </a></div>
-                      {% else %}
-                        <div class="form-control-static">{{ column.text|safe|default:"" }}</div>
-                      {% endif %}
-                    {% else %}
-                      <div class="form-control-static">{{ column.text|safe|default:"" }}</div>
-                    {% endif %}
-                  </div>
-                </div>
-              </div>
-            {% endfor %}
-          </div>
-        {% endfor %}
-      {% endfor %}
+    {% if object.texto_articulado.exists %}
+      <a class="link-texto" href="{% url 'sapl.norma:norma_ta' object.pk%}">
+        Texto Articulado
+      </a>
+    {% endif %}
+  </div>
 
-      <hr />
-      <div class="row">
-        <div class="col-sm-12">
-          <p class="control-label">Normas Relacionadas</p>
+  <div class="text-ementa">
+    {{object.ementa}}
+  </div>
+</div>
 
-            {% if object.get_normas_relacionadas.0|length > 0 %}
-              {% for p in object.get_normas_relacionadas.0 %}
-                <div class="form-control-static">
-                 <b>{{ p.tipo_vinculo.descricao_ativa }}</b>&nbsp;
-                  <a href="{% url 'sapl.norma:normajuridica_detail' p.norma_relacionada.pk %}">
-                   {{ p.norma_relacionada.epigrafe }}
-                 </a>
-                </div>
-              {% endfor %}
-            {% endif %}
+{{ block.super }}
 
-            {% if object.get_normas_relacionadas.1|length > 0 %}
-              {% for r in object.get_normas_relacionadas.1 %}
-                <div class="form-control-static">
-                  <b>{{ r.tipo_vinculo.descricao_passiva }}</b>&nbsp;
-                  <a href="{% url 'sapl.norma:normajuridica_detail' r.norma_principal.pk %}">
-                  {{ r.norma_principal.epigrafe }}
-                  </a>
-                </div>
-              {% endfor %}
-            {% endif %}
 
-        </div>
-      </div>
-      <hr />
-      <div class="row">
-        <div class="col-sm-12">
-          &nbsp;<p class="control-label">Anexos Norma Jurídica</p>
-      {% if object.get_anexos_norma_juridica|length > 0 %}
-        {% for p in object.get_anexos_norma_juridica %}
+
+<div class="row">
+  <div class="col-sm-12">
+
+
+      {% if object.get_normas_relacionadas.0|length > 0 %}
+        <hr />
+        <p class="control-label">Normas Relacionadas</p>
+        {% for p in object.get_normas_relacionadas.0 %}
           <div class="form-control-static">
-           <a href="/media/{{p.anexo_arquivo}}">
-            {{ p.anexo_arquivo | to_str | split:"/" | get_last_item_from_list:-1 }}
-           </a>
+            <b>{{ p.tipo_vinculo.descricao_ativa }}</b>&nbsp;
+            <a href="{% url 'sapl.norma:normajuridica_detail' p.norma_relacionada.pk %}">
+              {{ p.norma_relacionada.epigrafe }}
+            </a>
           </div>
         {% endfor %}
       {% endif %}
-    </div>
-  </div>
 
-  <br><br>
+      {% if object.get_normas_relacionadas.1|length > 0 %}
+        {% for r in object.get_normas_relacionadas.1 %}
+          <div class="form-control-static">
+            <b>{{ r.tipo_vinculo.descricao_passiva }}</b>&nbsp;
+            <a href="{% url 'sapl.norma:normajuridica_detail' r.norma_principal.pk %}">
+            {{ r.norma_principal.epigrafe }}
+            </a>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    {% if object.get_anexos_norma_juridica|length > 0 %}
+      <hr />
+      <p class="control-label">Anexos Norma Jurídica</p>
+      {% for p in object.get_anexos_norma_juridica %}
+        <div class="form-control-static">
+          <a href="/media/{{p.anexo_arquivo}}">
+          {{ p.anexo_arquivo | to_str | split:"/" | get_last_item_from_list:-1 }}
+          </a>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+</div>
+
 
   {% if user.is_superuser %}
+    <br><br>
     <div class="row">
       {% if object.user %}
         <div class="col-sm-6">
@@ -119,6 +114,9 @@
       {% endif %}
       </div>
     {% endif %}
+
+
+  {% comment %}
   {% if object.texto_articulado.exists and object.texto_articulado.first.has_view_permission %}
     <hr />
     <div class="row">
@@ -129,9 +127,10 @@
       </div>
     </div>
   {% endif %}
+  {% endcomment %}
 {% endblock detail_content %}
 
-
+{% comment %}
 {% block webpack_loader_js %}
     {{ block.super }}
     {% if object.texto_articulado.exists and object.texto_articulado.first.has_view_permission  %}
@@ -155,3 +154,5 @@
   </script>
 {% endif %}
 {% endblock extra_js %}
+
+{% endcomment %}
