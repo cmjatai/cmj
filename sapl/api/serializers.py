@@ -3,6 +3,7 @@ from rest_framework import serializers
 from rest_framework.relations import StringRelatedField
 
 from sapl.base.models import Autor, CasaLegislativa
+from sapl.protocoloadm.models import DocumentoAdministrativo
 
 
 class IntRelatedField(StringRelatedField):

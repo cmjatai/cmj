@@ -1,9 +1,11 @@
+from django.contrib.postgres.fields.jsonb import JSONField
 from django.db.models.fields.files import FileField
 from django.template.defaultfilters import capfirst
 import django_filters
 from django_filters.filters import CharFilter, NumberFilter
 from django_filters.rest_framework.filterset import FilterSet
 from django_filters.utils import resolve_field
+
 from sapl.sessao.models import SessaoPlenaria
 
 
@@ -20,6 +22,13 @@ class SaplFilterSetMixin(FilterSet):
                     'lookup_expr': 'exact',
                 },
             },
+            JSONField: {
+                'filter_class': django_filters.CharFilter,
+                'extra': lambda f: {
+                    'lookup_expr': 'exact',
+                },
+            },
+
         }
 
     def filter_o(self, queryset, name, value):
