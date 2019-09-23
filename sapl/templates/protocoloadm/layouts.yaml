@@ -20,6 +20,13 @@ DocumentoAdministrativo:
   - numero_externo
   - observacao
 
+DocumentoAdministrativoDetail:
+  {% trans 'Outras Informações' %}:
+  - materia|fk_urlize_for_detail
+  - data_vencimento dias_prazo data_fim_prazo
+  - numero_externo
+  - observacao
+
 DocumentoAcessorioAdministrativo:
   {% trans 'Documento Acessório' %}:
   - tipo autor

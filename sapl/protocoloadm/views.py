@@ -254,6 +254,8 @@ class DocumentoAdministrativoCrud(Crud):
     class DetailView(QuerySetContainerPrivPubMixin, DetailView):
         permission_required = ('protocoloadm.detail_documentoadministrativo', )
 
+        layout_key = 'DocumentoAdministrativoDetail'
+
         @classmethod
         def get_url_regex(cls):
             return r'^(?P<pk>\d+)$'
