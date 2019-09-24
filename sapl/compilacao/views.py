@@ -2146,7 +2146,7 @@ class ActionDispositivoCreateMixin(ActionsCommonsMixin):
             Dispositivo.objects.filter(ta_publicado=dvt.ta
                                        ).update(
                 dispositivo_vigencia=dvt,
-                inicio_vigencia=dvt.inicio_eficacia,
+                inicio_vigencia=dvt.inicio_vigencia,
                 inicio_eficacia=dvt.inicio_eficacia)
 
             dps = Dispositivo.objects.filter(dispositivo_vigencia=dvt)
