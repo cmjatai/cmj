@@ -1645,6 +1645,12 @@ class Dispositivo(BaseModel, TimestampedMixin):
         dp.dispositivo_pai = dispositivo_base.dispositivo_pai
         dp.publicacao = dispositivo_base.publicacao
 
+        # teste de criação inversa de itens alterados por mesmo bloco
+        dp.ta_publicado = dispositivo_base.ta_publicado
+        dp.dispositivo_atualizador = dispositivo_base.dispositivo_atualizador
+        dp.ordem_bloco_atualizador = dispositivo_base.ordem_bloco_atualizador + \
+            Dispositivo.INTERVALO_ORDEM
+
         dp.dispositivo_vigencia = dispositivo_base.dispositivo_vigencia
         if dp.dispositivo_vigencia:
             dp.inicio_eficacia = dp.dispositivo_vigencia.inicio_eficacia
