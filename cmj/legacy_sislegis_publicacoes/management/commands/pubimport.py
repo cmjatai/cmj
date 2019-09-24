@@ -105,10 +105,28 @@ class Command(BaseCommand):
         post_delete.disconnect(dispatch_uid='cmj_post_delete_signal')
         post_save.disconnect(dispatch_uid='cmj_post_save_signal')
 
-        self.run__click_dispositivo_vigencia()
+        self.run__remove_alteracoes_codigo_tributario()
+
         # self.reset_id_model(CertidaoPublicacao)
         # self.reset_id_model(TipoDocumentoAdministrativo)
         # self.reset_id_model(StatusTramitacaoAdministrativo)
+
+    def run__remove_alteracoes_codigo_tributario(self):
+
+        normas = NormaRelacionada.objects.filter(
+            norma_relacionada_id=1117).order_by('-norma_principal__data')
+
+        for n in normas:
+            ta = n.norma_principal.texto_articulado.first()
+
+            if ta:
+                blocos = ta.dispositivos_set.filter(
+                    tipo_dispositivo_id=3).order_by('-ordem')
+                blocos.delete()
+                print(ta)
+                ta.editing_locked = False
+                ta.privacidade = 89
+                ta.save()
 
     def run__click_dispositivo_vigencia(self):
         # Dispositivo.objects.all().update(dispositivo_vigencia=None)

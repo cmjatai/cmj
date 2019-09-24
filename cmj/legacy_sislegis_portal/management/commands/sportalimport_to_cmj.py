@@ -338,7 +338,7 @@ class Command(BaseCommand):
                         return value['item']['id_alterador']
             return 0
 
-        _ID = 2222
+        _ID = 1117
 
         if _ID == 0:
             run_doc(_ID=_ID)
@@ -361,6 +361,7 @@ class Command(BaseCommand):
                 self._ordem = 0
                 roots = self.load_roots(id)
                 self.import_subtree(roots, dsps)
+                return
             except Exception as e:
                 print('N.O. erro:', id, e)
 
