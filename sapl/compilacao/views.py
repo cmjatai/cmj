@@ -495,7 +495,9 @@ class TaListView(CompMixin, ListView):
             privacidade=STATUS_TA_PRIVATE)
 
         if 'check' in self.request.GET:
-            qs = qs.filter(temp_check_migrations=False)
+            qs = qs.filter(
+                temp_check_migrations=False
+            ).exclude(dispositivos_set__tipo_dispositivo_id=3)
 
         return qs
 
