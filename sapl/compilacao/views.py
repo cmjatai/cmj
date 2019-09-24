@@ -494,6 +494,9 @@ class TaListView(CompMixin, ListView):
             ~Q(owners=self.request.user.id),
             privacidade=STATUS_TA_PRIVATE)
 
+        if 'check' in self.request.GET:
+            qs = qs.filter(temp_check_migrations=False)
+
         return qs
 
 
@@ -1098,7 +1101,7 @@ class TextEditView(CompMixin, TemplateView):
                     self.object.content_object.save()
 
         else:
-            if 'lock' in request.GET:
+            if 'lock' in request.GET or 'check' in request.GET:
 
                 # TODO - implementar logging de ação de usuário
                 notificacoes = self.get_notificacoes(
@@ -1117,11 +1120,17 @@ class TextEditView(CompMixin, TemplateView):
                         'sapl.compilacao:ta_text_notificacoes', kwargs={
                             'ta_id': self.object.id}))
 
-                self.object.editing_locked = True
-                self.object.privacidade = STATUS_TA_PUBLIC
-                self.object.save()
-                messages.success(request, _(
-                    'Texto Articulado bloqueado com sucesso.'))
+                if 'lock' in request.GET:
+                    self.object.editing_locked = True
+                    self.object.privacidade = STATUS_TA_PUBLIC
+                    self.object.save()
+                    messages.success(request, _(
+                        'Texto Articulado publicado com sucesso.'))
+                else:
+                    self.object.temp_check_migrations = True
+                    self.object.save()
+                    messages.success(request, _(
+                        'Texto Articulado Checado...'))
 
                 if self.object.content_object:
                     self.object.content_object.save()

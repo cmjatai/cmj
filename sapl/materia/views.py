@@ -1452,6 +1452,9 @@ class DocumentoAcessorioCrud(MasterDetailCrud):
     class UpdateView(MasterDetailCrud.UpdateView):
         form_class = DocumentoAcessorioForm
 
+    class ListView(MasterDetailCrud.ListView):
+        paginate_by = None
+
 
 class AutoriaCrud(MasterDetailCrud):
     model = Autoria

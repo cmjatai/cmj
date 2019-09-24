@@ -2,6 +2,7 @@
 from datetime import timedelta
 import datetime
 import mimetypes
+from time import sleep
 
 import dateutil
 from django.contrib.auth import get_user_model
@@ -18,6 +19,8 @@ import urllib3
 from cmj.core.models import AreaTrabalho, CertidaoPublicacao
 from cmj.legacy_sislegis_publicacoes.models import Tipodoc, Tipolei, Documento,\
     Assuntos
+from sapl.compilacao.models import TextoArticulado
+from sapl.norma.models import NormaRelacionada
 from sapl.protocoloadm.models import TipoDocumentoAdministrativo,\
     DocumentoAdministrativo, Anexado, TramitacaoAdministrativo,\
     StatusTramitacaoAdministrativo
@@ -80,18 +83,6 @@ def _get_registration_key(model):
 
 class Command(BaseCommand):
 
-    def handle(self, *args, **options):
-
-        post_delete.disconnect(dispatch_uid='sapl_post_delete_signal')
-        post_save.disconnect(dispatch_uid='sapl_post_save_signal')
-        post_delete.disconnect(dispatch_uid='cmj_post_delete_signal')
-        post_save.disconnect(dispatch_uid='cmj_post_save_signal')
-
-        # self.run()
-        self.reset_id_model(CertidaoPublicacao)
-        self.reset_id_model(TipoDocumentoAdministrativo)
-        self.reset_id_model(StatusTramitacaoAdministrativo)
-
     def reset_id_model(self, model):
 
         query = """SELECT setval(pg_get_serial_sequence('"%(app_model_name)s"','id'),
@@ -107,7 +98,69 @@ class Command(BaseCommand):
             rows = cursor.fetchall()
             print(rows)
 
-    def run(self):
+    def handle(self, *args, **options):
+
+        post_delete.disconnect(dispatch_uid='sapl_post_delete_signal')
+        post_save.disconnect(dispatch_uid='sapl_post_save_signal')
+        post_delete.disconnect(dispatch_uid='cmj_post_delete_signal')
+        post_save.disconnect(dispatch_uid='cmj_post_save_signal')
+
+        # self.run()
+        # self.reset_id_model(CertidaoPublicacao)
+        # self.reset_id_model(TipoDocumentoAdministrativo)
+        # self.reset_id_model(StatusTramitacaoAdministrativo)
+
+    def run__check_automatico_normas_sem_bloco_e_sem_alteracao(self):
+        tas = TextoArticulado.objects.all()
+
+        for ta in tas:
+
+            ds = ta.dispositivos_set.all()
+
+            if not ds.filter(tipo_dispositivo_id=3).exists() and \
+                    not ds.filter(ta_publicado_id__isnull=False).exists():
+                ta.temp_check_migrations = True
+                ta.save()
+                print(ta.id, ta)
+
+    def run__coloca_em_edicao_determinada_norma_e_suas_alteracoes(self):
+        normas = NormaRelacionada.objects.filter(norma_relacionada_id=1117)
+
+        for n in normas:
+            ta = n.norma_principal.texto_articulado.first()
+
+            if ta:
+                print(ta)
+                ta.editing_locked = False
+                ta.privacidade = 89
+                ta.save()
+
+    def run__old4(self):
+        tas = TextoArticulado.objects.all()
+
+        for ta in tas:
+            print(ta)
+            ta.editable_only_by_owners = False
+            ta.editing_locked = True
+            ta.privacidade = 0
+            ta.save()
+
+    def run__old3(self):
+
+        at = AreaTrabalho.objects.get(pk=22)
+
+        docs = DocumentoAdministrativo.objects.filter(
+            workspace=at).order_by('id')
+
+        for d in docs:
+            j = d.old_json
+
+            if j and 'data_alteracao' in j and j['data_alteracao']:
+                d.data_ultima_atualizacao = datetime.datetime.strptime(
+                    j['data_alteracao'], "%Y-%m-%dT%H:%M:%S").astimezone()
+            d.save()
+
+    def run__old2(self):
         at = AreaTrabalho.objects.get(pk=22)
 
         clear = False
@@ -535,7 +588,7 @@ class Command(BaseCommand):
 
         print('total a checar', em_checar)
 
-    def run__base(self):
+    def run__old(self):
         at = AreaTrabalho.objects.get(pk=22)
         tipo = TipoDocumentoAdministrativo.objects.get(pk=181)
 

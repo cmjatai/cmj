@@ -221,17 +221,22 @@ class TextoArticulado(TimestampedMixin):
     editable_only_by_owners = models.BooleanField(
         choices=YES_NO_CHOICES,
         default=True,
-        verbose_name=_('Editável apenas pelos donos do Texto Articulado'))
+        verbose_name=_('Editável apenas pelos donos do Texto Articulado?'))
 
     editing_locked = models.BooleanField(
         choices=YES_NO_CHOICES,
         default=True,
-        verbose_name=_('Texto Articulado em Edição'))
+        verbose_name=_('Texto Articulado em Edição?'))
 
     privacidade = models.IntegerField(
         _('Privacidade'),
         choices=PRIVACIDADE_STATUS,
         default=STATUS_TA_PRIVATE)
+
+    temp_check_migrations = models.BooleanField(
+        choices=YES_NO_CHOICES,
+        default=False,
+        verbose_name=_('Check de Migração?'))
 
     class Meta:
         verbose_name = _('Texto Articulado')
