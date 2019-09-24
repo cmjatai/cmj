@@ -496,8 +496,10 @@ class TaListView(CompMixin, ListView):
 
         if 'check' in self.request.GET:
             qs = qs.filter(
-                temp_check_migrations=False
+                temp_check_migrations=False,
+                privacidade=0,
             ).exclude(dispositivos_set__tipo_dispositivo_id=3)
+
         if 'check_dvt' in self.request.GET:
             qs = qs.filter(
             ).filter(

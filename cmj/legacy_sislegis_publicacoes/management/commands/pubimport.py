@@ -137,12 +137,20 @@ class Command(BaseCommand):
                 'Esta resolução entra em vigor na data de sua publicação',
                 'Esta portaria entra em vigor na data de sua publicação',
                 'A presente Lei entra em vigor na data de sua publicação',
+                'A Presente Lei entrará em vigor na data de sua publicação'
                 'Esta Lei entrará em vigor, na data de sua publicação',
                 'Esta Lei entra em vigor a partir de sua publicação',
-                'Esta Resolução entrará em vigor na data de sua publicação'
+                'Esta Resolução entrará em vigor na data de sua publicação',
                 'Este Decreto Legislativo entra em vigor a partir da data de sua publicação',
                 'Este decreto legislativo entra em vigor na da data de sua publicação',
-                'Este decreto legislativo entra em vigor na da data da sua publicação'
+                'Este decreto legislativo entra em vigor na da data da sua publicação',
+                'Esta Resolução entra avigor na data de sua publicação',
+                'Este DECRETO - LEGISLATIVO entra em vigor na data de sua publicação',
+                'Esta Lei n° 4.016/2018 entrará em vigor na data de sua publicação',
+                'Esta Portaria entras em vigor na data de sua publicação',
+                'Esta Lei entrará em na data de sua publicação',
+                'Esta lei entra em vigor na data da sua publicação',
+                'Esta emenda entra em vigor após a sua publicação',
 
             ):
 
