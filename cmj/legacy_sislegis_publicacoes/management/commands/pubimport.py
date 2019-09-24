@@ -19,7 +19,7 @@ import urllib3
 from cmj.core.models import AreaTrabalho, CertidaoPublicacao
 from cmj.legacy_sislegis_publicacoes.models import Tipodoc, Tipolei, Documento,\
     Assuntos
-from sapl.compilacao.models import TextoArticulado
+from sapl.compilacao.models import TextoArticulado, Dispositivo
 from sapl.norma.models import NormaRelacionada
 from sapl.protocoloadm.models import TipoDocumentoAdministrativo,\
     DocumentoAdministrativo, Anexado, TramitacaoAdministrativo,\
@@ -105,10 +105,98 @@ class Command(BaseCommand):
         post_delete.disconnect(dispatch_uid='cmj_post_delete_signal')
         post_save.disconnect(dispatch_uid='cmj_post_save_signal')
 
-        # self.run()
+        self.run__click_dispositivo_vigencia()
         # self.reset_id_model(CertidaoPublicacao)
         # self.reset_id_model(TipoDocumentoAdministrativo)
         # self.reset_id_model(StatusTramitacaoAdministrativo)
+
+    def run__click_dispositivo_vigencia(self):
+        # Dispositivo.objects.all().update(dispositivo_vigencia=None)
+        tas = TextoArticulado.objects.all().order_by('data')
+
+        count_sem_dvt = 0
+        for ta in tas:
+            dsss = ta.dispositivos_set.all()
+
+            if not dsss:
+                continue
+
+            has_dvt = dsss.first().dispositivo_vigencia
+
+            if has_dvt:
+                continue
+
+            dvt_encontrado = False
+            for dvt_str in (
+                'Esta Lei entrará em vigor na data da sua publicação',
+                'Esta Lei entrará em vigor na data de sua publicação',
+                'Esta Lei Ordinária entra em vigor na data de sua publicação',
+                'Esta lei entra em vigor na data de sua publicação',
+                'Este Decreto Legislativo entra em vigor na data de sua publicação',
+                'Está Lei entrará em vigor na data de sua publicação',
+                'Esta resolução entra em vigor na data de sua publicação',
+                'Esta portaria entra em vigor na data de sua publicação',
+                'A presente Lei entra em vigor na data de sua publicação',
+                'Esta Lei entrará em vigor, na data de sua publicação',
+                'Esta Lei entra em vigor a partir de sua publicação',
+                'Esta Resolução entrará em vigor na data de sua publicação'
+                'Este Decreto Legislativo entra em vigor a partir da data de sua publicação',
+                'Este decreto legislativo entra em vigor na da data de sua publicação',
+                'Este decreto legislativo entra em vigor na da data da sua publicação'
+
+            ):
+
+                dvt = dsss.filter(texto__icontains=dvt_str).last()
+
+                if dvt:
+                    if dvt.dispositivo_vigencia:
+                        dvt_encontrado = True
+                        break
+
+                    if dvt.auto_inserido:
+                        dvt = dvt.dispositivo_pai
+                    try:
+                        Dispositivo.objects.filter(
+                            ta=dvt.ta, ta_publicado__isnull=True
+                        ).update(
+                            dispositivo_vigencia=dvt,
+                            inicio_vigencia=dvt.inicio_vigencia,
+                            inicio_eficacia=dvt.inicio_eficacia)
+
+                        Dispositivo.objects.filter(ta_publicado=dvt.ta
+                                                   ).update(
+                            dispositivo_vigencia=dvt,
+                            inicio_vigencia=dvt.inicio_eficacia,
+                            inicio_eficacia=dvt.inicio_eficacia)
+
+                        dps = Dispositivo.objects.filter(
+                            dispositivo_vigencia=dvt)
+                        for d in dps:
+                            if d.dispositivo_substituido:
+                                ds = d.dispositivo_substituido
+                                ds.fim_vigencia = d.inicio_vigencia - \
+                                    timedelta(days=1)
+                                ds.fim_eficacia = d.inicio_eficacia - \
+                                    timedelta(days=1)
+                                ds.save()
+
+                            if d.dispositivo_subsequente:
+                                ds = d.dispositivo_subsequente
+                                d.fim_vigencia = ds.inicio_vigencia - \
+                                    timedelta(days=1)
+                                d.fim_eficacia = ds.inicio_eficacia - \
+                                    timedelta(days=1)
+                                d.save()
+                    except Exception as e:
+                        print("Ocorreu um erro ({}) na atualização do "
+                              "Dispositivo de Vigência".format(str(e)))
+                    dvt_encontrado = True
+                    break
+
+            if not dvt_encontrado:
+                count_sem_dvt += 1
+                print('dvt nao encontrado', ta.id, ta)
+        print('T.A. sem dvt', count_sem_dvt)
 
     def run__check_automatico_normas_sem_bloco_e_sem_alteracao(self):
         tas = TextoArticulado.objects.all()

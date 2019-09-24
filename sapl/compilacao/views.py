@@ -498,6 +498,11 @@ class TaListView(CompMixin, ListView):
             qs = qs.filter(
                 temp_check_migrations=False
             ).exclude(dispositivos_set__tipo_dispositivo_id=3)
+        if 'check_dvt' in self.request.GET:
+            qs = qs.filter(
+            ).filter(
+                dispositivos_set__isnull=False,
+                dispositivos_set__dispositivo_vigencia__isnull=True).distinct()
 
         return qs
 
@@ -2128,7 +2133,6 @@ class ActionDispositivoCreateMixin(ActionsCommonsMixin):
         dvt = Dispositivo.objects.get(pk=self.kwargs['dispositivo_id'])
         if dvt.auto_inserido:
             dvt = dvt.dispositivo_pai
-
         try:
             Dispositivo.objects.filter(
                 ta=dvt.ta, ta_publicado__isnull=True
