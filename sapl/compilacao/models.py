@@ -1118,14 +1118,15 @@ class Dispositivo(BaseModel, TimestampedMixin):
 
         self.contagem_continua = self.tipo_dispositivo.contagem_continua
 
-        try:
+        """try:
             if self.texto:
+                self.texto = self.texto.replace('\xa0', '')
                 self.texto = str(BeautifulSoup(self.texto, "html.parser"))
             if self.texto_atualizador:
                 self.texto_atualizador = str(BeautifulSoup(
                     self.texto_atualizador,  "html.parser"))
         except:
-            pass
+            pass"""
 
         return super().save(
             force_insert=force_insert, force_update=force_update, using=using,
