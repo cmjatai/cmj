@@ -107,7 +107,7 @@ class Command(BaseCommand):
         post_delete.disconnect(dispatch_uid='cmj_post_delete_signal')
         post_save.disconnect(dispatch_uid='cmj_post_save_signal')
 
-        # self.run__add_operadores_no_grupo_para_ver_pareceres()
+        self.run__add_operadores_no_grupo_para_ver_pareceres()
 
         # self.reset_id_model(CertidaoPublicacao)
         # self.reset_id_model(TipoDocumentoAdministrativo)
@@ -119,9 +119,11 @@ class Command(BaseCommand):
         g = Group.objects.get(name=GROUP_MATERIA_WORKSPACE_VIEWER)
         for at in ats:
             for o in at.operadorareatrabalho_set.all():
+                o.user.groups.add(g)
                 if not o.grupos_associados.filter(id=g.id).exists():
                     try:
                         o.grupos_associados.add(g)
+                        o.user.groups.add(g)
                     except Exception as e:
                         print(e)
                     print(o.user, at)
