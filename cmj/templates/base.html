@@ -297,21 +297,7 @@
   <script language="JavaScript" type="text/javascript" >
   
     $(function () {
-      let toogleWrapper = function (event) {
-          if (!$("#wrapper").hasClass('toogled')) {
-            $(".canais-absolute .box").off('click')
-          }
-          else {
-            $(".canais-absolute .box").click(toogleWrapper)
-          }
-        $("#wrapper").toggleClass("toggled");
-        $(".container").toggleClass("toggled ");
-        event.preventDefault();
-      }
-
-      $("#menu-toggle, .canais-absolute .box").click(function (event) {
-        toogleWrapper(event)
-      });
+      
 
       $('a[data-social-sharing]').click(function(event){
         event.preventDefault();var socialNetwork=$(this).data('social-sharing');
@@ -324,16 +310,10 @@
         var topPosition=(window.screen.height/2)-((_height/2)+50);
         var stringSpecs='left='+leftPosition+',top='+topPosition+',toolbar=0,status=0,width='+_width+',height='+_height;
         window.open($(this).attr('href'),'sharer',stringSpecs);});
-
-
-
     });
-
-
-    
   </script>
 
-  {% if not DEBUG and 'www.' in site_url %}
+  {% if not DEBUG %}
     <script>
       window.fbAsyncInit = function () {
         FB.init({

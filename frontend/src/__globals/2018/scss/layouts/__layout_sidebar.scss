@@ -118,6 +118,34 @@
   }
 }
 
+@mixin toggled_mixin() {
+  transition: all 0.5s ease;
+  padding-left: $width-wrapper-lg;
+  aside {
+    transition: all 0.5s ease;
+    width: $width-wrapper-lg;
+  }
+  .path-previous {
+    left: $width-wrapper-lg - 43px;
+  }
+  
+  #menu-toggle {
+    color: rgba(white, 0.4);
+    top: 0px;
+    &:hover  {
+      color: white;
+    }
+    &:active  {
+      color: rgba(white, 0.4);
+    }
+    .fa-chevron-circle-right {
+      display: none;
+    }
+    .fa-chevron-circle-left {
+      display: inline;
+    }
+  }
+}
 #wrapper {
   transition: all 0.5s ease;
   z-index: 2500;
@@ -152,34 +180,9 @@
       display: inline;
     }
   }
-
+  
   &.toggled {
-    transition: all 0.5s ease;
-    padding-left: $width-wrapper-lg;
-    aside {
-        transition: all 0.5s ease;
-        width: $width-wrapper-lg;
-    }
-    .path-previous {
-        left: $width-wrapper-lg - 43px;
-    }
-
-    #menu-toggle {
-      color: rgba(white, 0.4);
-      top: 0px;
-      &:hover  {
-        color: white;
-      }
-      &:active  {
-        color: rgba(white, 0.4);
-      }
-      .fa-chevron-circle-right {
-        display: none;
-      }
-      .fa-chevron-circle-left {
-        display: inline;
-      }
-    }
+    @include toggled_mixin();
   }
   &:not(.toggled) {
     .canais-absolute {
@@ -196,7 +199,6 @@
     }
   }
 }
-
 
 @media screen and (max-width: 1199px) {
   .canais-columns {
@@ -313,4 +315,14 @@
       }
     }
   }
+}
+
+@media screen and (min-width: 992px) {
+  #wrapper {
+    &.toggled-lg {
+      @include toggled_mixin();
+
+    }
+  }
+
 }
