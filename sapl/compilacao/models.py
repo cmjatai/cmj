@@ -1630,7 +1630,7 @@ class Dispositivo(BaseModel, TimestampedMixin):
             yield ultimo
 
     @staticmethod
-    def new_instance_based_on(dispositivo_base, tipo_base):
+    def new_instance_based_on(dispositivo_base, tipo_base, base_alteracao=None):
         dp = Dispositivo()
 
         dp.tipo_dispositivo = tipo_base
@@ -1645,12 +1645,14 @@ class Dispositivo(BaseModel, TimestampedMixin):
         dp.dispositivo_pai = dispositivo_base.dispositivo_pai
         dp.publicacao = dispositivo_base.publicacao
 
+        b = base_alteracao if base_alteracao else dispositivo_base
+
         # teste de criação inversa de itens alterados por mesmo bloco
-        dp.ta_publicado = dispositivo_base.ta_publicado
-        dp.dispositivo_atualizador = dispositivo_base.dispositivo_atualizador
+        dp.ta_publicado = b.ta_publicado
+        dp.dispositivo_atualizador = b.dispositivo_atualizador
 
         if dp.ta_publicado:
-            dp.ordem_bloco_atualizador = dispositivo_base.ordem_bloco_atualizador + \
+            dp.ordem_bloco_atualizador = b.ordem_bloco_atualizador + \
                 Dispositivo.INTERVALO_ORDEM
 
         dp.dispositivo_vigencia = dispositivo_base.dispositivo_vigencia
