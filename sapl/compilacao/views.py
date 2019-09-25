@@ -2234,11 +2234,13 @@ class ActionDispositivoCreateMixin(ActionsCommonsMixin):
                 dp_pai = dp
 
             if dp_irmao is not None:
-                dp = Dispositivo.new_instance_based_on(dp_irmao, tipo)
+                dp = Dispositivo.new_instance_based_on(
+                    dp_irmao, tipo, base_alteracao=base)
                 dp.transform_in_next(variacao)
             else:
                 # Inserção sem precedente
-                dp = Dispositivo.new_instance_based_on(dp_pai, tipo)
+                dp = Dispositivo.new_instance_based_on(
+                    dp_pai, tipo, base_alteracao=base)
                 dp.dispositivo_pai = dp_pai
                 dp.nivel += 1
 
@@ -2351,6 +2353,10 @@ class ActionDispositivoCreateMixin(ActionsCommonsMixin):
 
                     ordem += Dispositivo.INTERVALO_ORDEM
                 dp = Dispositivo.objects.get(pk=dp_pk)
+                dp.ta_publicado = None
+                dp.dispositivo_atualizador = None
+                dp.ordem_bloco_atualizador = 0
+                dp.save()
 
             ''' Reenquadrar todos os dispositivos que possuem pai
             antes da inserção atual e que são inferiores a dp,
