@@ -1800,10 +1800,10 @@ class MateriaLegislativaCrud(Crud):
                 if not d.texto_integral:
                     continue
 
-                if d.workspace.tipo == AreaTrabalho.TIPO_PROCURADORIA and \
-                    not self.request.user.groups.filter(
-                        name=GROUP_MATERIA_WORKSPACE_VIEWER).exists():
-                    continue
+                if d.workspace.tipo != AreaTrabalho.TIPO_PUBLICO:
+                    if not self.request.user.groups.filter(
+                            name=GROUP_MATERIA_WORKSPACE_VIEWER).exists():
+                        continue
 
                 if not result[0]:
                     result[0] = _('Documentos Administrativos Vinculados')
