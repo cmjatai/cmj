@@ -47,8 +47,16 @@ window.refreshDatePicker = function () {
     input.setAttribute('autocomplete', 'off')
   })
 }
+window.setCookie = function (cookieName, cookieValue, nDays) {
+  let today = new Date()
+  let expire = new Date()
+  if (nDays === null || nDays === 0) nDays = 1
+  expire.setTime(today.getTime() + 3600000 * 24 * nDays)
+  document.cookie = cookieName + '=' + escape(cookieValue) +
+    ';expires=' + expire.toGMTString()
+} 
 
-window.getCookie = function (name) {
+window.getCookie = function (name) { 
   var cookieValue = null
   if (document.cookie && document.cookie !== '') {
     var cookies = document.cookie.split(';')

@@ -434,12 +434,6 @@
 }
 
 @media screen and (max-width: 480px) {
-
-  #wrapper {
-    &.toggled {
-      
-    }
-  }
   .navbar {
     .navbar-toggler {
       padding: 2px 15px;
@@ -453,8 +447,6 @@
       }
     }
   }
-
-
 }
 
 

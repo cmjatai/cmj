@@ -6,6 +6,7 @@ from time import sleep
 
 import dateutil
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.core.files.base import File
 from django.core.files.temp import NamedTemporaryFile
 from django.core.management.base import BaseCommand
@@ -17,6 +18,7 @@ from django.utils import timezone
 import urllib3
 
 from cmj.core.models import AreaTrabalho, CertidaoPublicacao
+from cmj.globalrules import GROUP_MATERIA_WORKSPACE_VIEWER
 from cmj.legacy_sislegis_publicacoes.models import Tipodoc, Tipolei, Documento,\
     Assuntos
 from sapl.compilacao.models import TextoArticulado, Dispositivo
@@ -105,11 +107,24 @@ class Command(BaseCommand):
         post_delete.disconnect(dispatch_uid='cmj_post_delete_signal')
         post_save.disconnect(dispatch_uid='cmj_post_save_signal')
 
-        self.run__remove_alteracoes_codigo_tributario()
+        # self.run__add_operadores_no_grupo_para_ver_pareceres()
 
         # self.reset_id_model(CertidaoPublicacao)
         # self.reset_id_model(TipoDocumentoAdministrativo)
         # self.reset_id_model(StatusTramitacaoAdministrativo)
+
+    def run__add_operadores_no_grupo_para_ver_pareceres(self):
+        ats = AreaTrabalho.objects.filter(ativo=True)
+
+        g = Group.objects.get(name=GROUP_MATERIA_WORKSPACE_VIEWER)
+        for at in ats:
+            for o in at.operadorareatrabalho_set.all():
+                if not o.grupos_associados.filter(id=g.id).exists():
+                    try:
+                        o.grupos_associados.add(g)
+                    except Exception as e:
+                        print(e)
+                    print(o.user, at)
 
     def run__remove_alteracoes_codigo_tributario(self):
 
@@ -259,7 +274,7 @@ class Command(BaseCommand):
             ta.privacidade = 0
             ta.save()
 
-    def run__old3(self):
+    def run__corrige_datas_ultima_atualizacao_com_sislegis(self):
 
         at = AreaTrabalho.objects.get(pk=22)
 
@@ -272,6 +287,17 @@ class Command(BaseCommand):
             if j and 'data_alteracao' in j and j['data_alteracao']:
                 d.data_ultima_atualizacao = datetime.datetime.strptime(
                     j['data_alteracao'], "%Y-%m-%dT%H:%M:%S").astimezone()
+            d.save()
+
+    def run__corrige_datas_ultima_atualizacao_na_propria_base(self):
+
+        at = AreaTrabalho.objects.get(pk=21)
+
+        docs = DocumentoAdministrativo.objects.filter(
+            workspace=at).order_by('id')
+
+        for d in docs:
+            d.data_ultima_atualizacao = d.data
             d.save()
 
     def run__old2(self):

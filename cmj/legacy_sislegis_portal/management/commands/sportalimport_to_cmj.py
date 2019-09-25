@@ -77,12 +77,12 @@ class Command(BaseCommand):
         post_delete.disconnect(dispatch_uid='cmj_post_delete_signal')
         post_save.disconnect(dispatch_uid='cmj_post_save_signal')
 
-        self.reset_sequences()
-        self.run()
-        self.run_diarios()
-        for cd in self.caracter_desconhecido:
-            print(cd)
-        self.reset_sequences()
+        # self.reset_sequences()
+        # self.run()
+        # self.run_diarios()
+        # for cd in self.caracter_desconhecido:
+        #    print(cd)
+        # self.reset_sequences()
 
     def reset_sequences(self):
 

@@ -41,3 +41,36 @@ window.refreshDatePicker()
 window.initTextRichEditor('texto-rico')
 // initTinymce
 // import './2018/themes/dezembrolaranja/app.scss'
+
+
+
+
+
+$(function () {
+  
+  let sidebarCmjCookie = getCookie('sidebarCmjCookie')
+  $("#wrapper").addClass(sidebarCmjCookie);
+  $(".container").addClass(sidebarCmjCookie);
+  let toggleWrapper = function (event) {
+      if (!$("#wrapper").hasClass('toggled')) {
+        setCookie('sidebarCmjCookie', 'toggled', 30)
+        $(".canais-absolute .box").off('click')
+      }
+      else {
+        setCookie('sidebarCmjCookie', '', 30)
+        $(".canais-absolute .box").click(toggleWrapper)
+      }
+
+      $("#wrapper").toggleClass("toggled");
+      $(".container").toggleClass("toggled");
+  
+    event.preventDefault();
+  }
+  $("#menu-toggle, .canais-absolute .box").click(function (event) {
+    toggleWrapper(event)
+  });
+  $('[data-toggle="popover"]').popover({
+  trigger: 'focus'
+  })
+})
+

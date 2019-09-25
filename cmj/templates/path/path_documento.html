@@ -367,6 +367,7 @@
           {% for m in object.materias.all %}
             <tr>
               <td class="item-listas">  
+                <div class="p-3">
                 <div class="verbose_name">
                   Matéria Legislativa
                 </div>
@@ -478,6 +479,7 @@
                       <a class="btn btn-sm btn-outline-primary" href="{% url 'sapl.materia:acompanhar_materia' m.id %}" data-toggle="tooltip" data-placement="top" title="Registre seu email para acompanhamento desta matéria. Você receberá um email sempre que está materia tramitar.">Acompanhar Matéria</a>
                     {% endif %}
                 </small>
+                </div>
               </td>
             </tr>
           {% endfor %}
