@@ -269,6 +269,12 @@ a:link:after, a:visited:after {
             margin-bottom: 15px;
           }
         }
+        &:first-child {
+          & > a {
+            transform: rotate(0deg);
+            margin-bottom: 5px;
+          }
+        }
         & > a  {
           margin-bottom: 5px;
 
