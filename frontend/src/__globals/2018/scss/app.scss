@@ -119,7 +119,6 @@ a:hover {
     }
   }
   th {
-    white-space: nowrap;
     text-align: center;
     padding: 15px 10px;
     background-color: darken($color_container_bg, 5);
@@ -291,6 +290,9 @@ h6 {
   display: none;
 }
 
+.hash_code {
+  font-family: 'Courier New', Courier, monospace;
+}
 
 @import 'apps/app';
 @import '_social_links';

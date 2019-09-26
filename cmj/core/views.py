@@ -382,11 +382,28 @@ class CertidaoPublicacaoCrud(Crud):
             return ''
 
     class ListView(Crud.ListView):
+        def split_bylen(self, item, maxlen):
+            return [item[ind:ind + maxlen] for ind in range(0, len(item), maxlen)]
 
         def hook_content_object(self, *args, **kwargs):
-            return '%s<br><small>%s</small>' % (
+            hash = args[0].hash_code  # self.split_bylen(args[0].hash_code, 64)
+
+            return """%s<br><small>%s</small>""" % (
                 args[1],
                 args[0].content_object.__descr__), ''
+            return """
+            %s<br><small>%s</small><br>
+            <button 
+            class="hash_code btn btn-info"
+            data-trigger="focus" 
+            data-container="body"
+            data-toggle="popover"
+            data-placement="top" 
+            title="Hash 512" 
+            data-content="%s">Hash 512</button>""" % (
+                args[1],
+                args[0].content_object.__descr__,
+                ''.join(hash)), ''
 
         def hook_header_content_object(self, **kwargs):
             return 'Documentos Certificados'
@@ -404,7 +421,7 @@ class CertidaoPublicacaoCrud(Crud):
             return 'Data/Hora'
 
         def hook_created(self, *args, **kwargs):
-            return '<span style="white-space: nowrap;">{}</span>'.format(
+            return '{}'.format(
                 formats.date_format(args[0].created, 'd/m/Y \à\s H:i')
             ), args[2]
 
