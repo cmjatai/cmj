@@ -119,10 +119,10 @@
 }
 
 @mixin toggled_mixin() {
-  transition: all 0.5s ease;
+  //transition: all 0.5s ease;
   padding-left: $width-wrapper-lg;
   aside {
-    transition: all 0.5s ease;
+    //transition: all 0.5s ease;
     width: $width-wrapper-lg;
   }
   .path-previous {
@@ -147,12 +147,12 @@
   }
 }
 #wrapper {
-  transition: all 0.5s ease;
+  //transition: all 0.5s ease;
   z-index: 2500;
   padding-left: 10px;
   aside {
     width: 10px;
-    transition: all 0.5s ease;
+    //transition: all 0.5s ease;
     position: fixed;
     top: 0;
     left: 0;
