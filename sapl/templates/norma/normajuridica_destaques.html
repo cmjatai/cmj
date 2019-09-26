@@ -17,7 +17,7 @@
               <div class="item-raiz">
                 <div class="links-texto">
                   {% if n.texto_integral %}
-                    <a class="link-texto" href="{{n.texto_integral.url}}" title="Arquivo Digitalizado da Norma ">
+                    <a class="link-texto"  target="_blank" href="{{n.texto_integral.url}}" title="Arquivo Digitalizado da Norma ">
                       <i class="far fa-2x fa-file-{% if '.pdf' in n.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
                     </a>
                   {% endif %}

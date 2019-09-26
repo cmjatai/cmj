@@ -308,6 +308,7 @@ class DocumentoAdministrativoCrud(Crud):
                 'workspace': AreaTrabalho.objects.areatrabalho_publica(
                 ).first() if self.request.user.is_anonymous() or
                 not self.request.user.has_perms(self.permission_required)
+                or not self.request.user.areatrabalho_set.exists()
                 else self.request.user.areatrabalho_set.first()
             })
             return kwargs

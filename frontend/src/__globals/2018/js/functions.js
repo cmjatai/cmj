@@ -71,6 +71,8 @@ window.getCookie = function (name) {
   return cookieValue
 }
 
+
+
 window.autorModal = function () {
   $(function () {
     var dialog = $('#modal_autor').dialog({

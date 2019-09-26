@@ -48,16 +48,18 @@ window.initTextRichEditor('texto-rico')
 
 $(function () {
   
-  let sidebarCmjCookie = getCookie('sidebarCmjCookie')
-  $("#wrapper").addClass(sidebarCmjCookie);
-  $(".container").addClass(sidebarCmjCookie);
+  let sidebarCmjCookie = window.localStorage.getItem('sidebarCmjCookie')
+  if (sidebarCmjCookie !== undefined) {
+    $("#wrapper").toggleClass(sidebarCmjCookie);
+    $(".container").toggleClass(sidebarCmjCookie);
+  }
   let toggleWrapper = function (event) {
       if (!$("#wrapper").hasClass('toggled')) {
-        setCookie('sidebarCmjCookie', 'toggled', 30)
+        window.localStorage.setItem('sidebarCmjCookie', 'toggled')
         $(".canais-absolute .box").off('click')
       }
       else {
-        setCookie('sidebarCmjCookie', '', 30)
+        window.localStorage.setItem('sidebarCmjCookie', '')
         $(".canais-absolute .box").click(toggleWrapper)
       }
 

@@ -14,7 +14,7 @@
 <div class="item-listas">
   <div class="links-texto">
     {% if object.texto_integral %}
-      <a class="link-texto" href="{{object.texto_integral.url}}" title="Arquivo Digitalizado da Norma ">
+      <a class="link-texto"  target="_blank" href="{{object.texto_integral.url}}" title="Arquivo Digitalizado da Norma ">
         <i class="far fa-3x fa-file-{% if '.pdf' in object.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
       </a>
     {% endif %}
