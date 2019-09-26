@@ -1,29 +1,38 @@
 
+from builtins import property
 import json
 
+from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.contenttypes.models import ContentType
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.forms.utils import ErrorList
-from django.http.response import Http404
+from django.http.response import Http404, HttpResponse
 from django.shortcuts import redirect, render
+from django.template.loader import render_to_string
+from django.utils import formats
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import RedirectView
+from django.views.generic.detail import DetailView
 from django_filters.views import FilterView
 from rest_framework import viewsets, mixins
 from rest_framework.authentication import SessionAuthentication,\
     BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
+from weasyprint import HTML
 
 from cmj.core.forms import OperadorAreaTrabalhoForm, ImpressoEnderecamentoForm,\
     ListWithSearchForm
 from cmj.core.models import Cep, TipoLogradouro, Logradouro, RegiaoMunicipal,\
     Distrito, Bairro, Trecho, AreaTrabalho, OperadorAreaTrabalho,\
-    ImpressoEnderecamento, groups_remove_user, groups_add_user, Notificacao
+    ImpressoEnderecamento, groups_remove_user, groups_add_user, Notificacao,\
+    CertidaoPublicacao
 from cmj.core.serializers import TrechoSearchSerializer, TrechoSerializer
 from cmj.utils import normalize
-from sapl.crud.base import Crud, CrudAux, MasterDetailCrud
+from sapl.crud.base import Crud, CrudAux, MasterDetailCrud, RP_DETAIL, RP_LIST
 from sapl.parlamentares.models import Partido, Filiacao
 
 
@@ -357,3 +366,155 @@ class NotificacaoRedirectView(RedirectView):
 
         url += '#item-%s' % obj.content_object.pk
         return url
+
+
+class CertidaoPublicacaoCrud(Crud):
+    model = CertidaoPublicacao
+    public = [RP_DETAIL, RP_LIST]
+
+    DeleteView = None
+
+    class BaseMixin(Crud.BaseMixin):
+        list_field_names = ['id', 'created', 'content_type', 'content_object']
+
+        @property
+        def create_url(self):
+            return ''
+
+    class ListView(Crud.ListView):
+
+        def hook_content_object(self, *args, **kwargs):
+            return '%s<br><small>%s</small>' % (
+                args[1],
+                args[0].content_object.__descr__), ''
+
+        def hook_header_content_object(self, **kwargs):
+            return 'Documentos Certificados'
+
+        def hook_header_content_type(self, **kwargs):
+            return 'Tipo do Documento'
+
+        def hook_header_id(self, **kwargs):
+            return 'Certidão'
+
+        def hook_id(self, *args, **kwargs):
+            return '%06d' % int(args[1]), args[2]
+
+        def hook_header_created(self, **kwargs):
+            return 'Data/Hora'
+
+        def hook_created(self, *args, **kwargs):
+            return '<span style="white-space: nowrap;">{}</span>'.format(
+                formats.date_format(args[0].created, 'd/m/Y \à\s H:i')
+            ), args[2]
+
+    class DetailView(DetailView):
+        slug_field = 'hash_code'
+
+        @classmethod
+        def get_url_regex(cls):
+            return r'^(?P<pk>\d+)$'
+
+        def get(self, request, *args, **kwargs):
+            self.object = self.get_object()
+
+            context = self.get_context_data(object=self.object)
+
+            return self.certidao_publicacao(request, context)
+
+        def get_context_data(self, **kwargs):
+            context = DetailView.get_context_data(self, **kwargs)
+            context['print'] = 'print' in self.request.GET
+            context['content_object_url'] = self.content_object_url()
+            return context
+
+        def certidao_publicacao(self, request, context):
+            base_url = request.build_absolute_uri()
+
+            html_template = render_to_string(
+                'core/certidao_publicacao.html', context)
+
+            html = HTML(base_url=base_url, string=html_template)
+            main_doc = html.render(stylesheets=[])
+            pdf_file = main_doc.write_pdf()
+
+            response = HttpResponse(content_type='application/pdf;')
+            response['Content-Disposition'] = 'inline; filename=relatorio.pdf'
+            response['Content-Transfer-Encoding'] = 'binary'
+            response.write(pdf_file)
+
+            return response
+
+        def content_object_url(self):
+            cert = self.object
+            co = cert.content_object
+
+            link = reverse(
+                'sapl.api:%s-%s' % (
+                    co._meta.model_name,
+                    cert.field_name.replace('_', '-')
+                ),
+                kwargs={'pk': co.id}
+            )
+
+            urls = {
+                'original': '%s%s?original' % (settings.SITE_URL, link),
+                'ocr': '%s%s?ocr' % (settings.SITE_URL, link),
+            }
+
+            return urls
+
+    class CreateView(Crud.CreateView):
+
+        @classmethod
+        def get_url_regex(cls):
+            return r'^(?P<content_type>\d+)/create/(?P<pk>\d+)/(?P<field_name>\w+)$'
+
+        def get(self, request, *args, **kwargs):
+
+            if self.certidao_generate():
+                return redirect(
+                    reverse('cmj.core:certidaopublicacao_detail',
+                            kwargs={'pk': self.content_object.certidao.pk})
+                )
+
+            else:
+                messages.add_message(
+                    self.request,
+                    messages.ERROR,
+                    _('Não foi possível gerar certidão!'))
+
+                return redirect(
+                    reverse('%s:%s_detail' % (
+                        self.content_object._meta.app_config.name,
+                        self.content_object._meta.model_name),
+                        kwargs={'pk': self.content_object.pk})
+                )
+
+        def certidao_generate(self):
+
+            model = ContentType.objects.get_for_id(
+                self.kwargs['content_type']).model_class()
+
+            object = self.content_object = model.objects.get(
+                pk=self.kwargs['pk'])
+
+            if object.certidao:
+                return True
+
+            if not getattr(object, self.kwargs['field_name']):
+                messages.add_message(
+                    self.request,
+                    messages.ERROR,
+                    _('Documento sem Arquivo.'))
+                return False
+
+            u = self.request.user
+
+            try:
+                CertidaoPublicacao.gerar_certidao(
+                    u, object, self.kwargs['field_name'])
+            except Exception as e:
+                return False
+
+            return True

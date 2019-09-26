@@ -6,6 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices
 import reversion
 
+from cmj.core.models import CertidaoPublicacao
 from sapl.base.models import Autor
 from sapl.compilacao.models import TextoArticulado
 from sapl.materia.models import MateriaLegislativa
@@ -163,6 +164,9 @@ class NormaJuridica(models.Model):
         default=''
     )
 
+    _certidao = GenericRelation(
+        CertidaoPublicacao, related_query_name='normajuridica_cert')
+
     class Meta:
         verbose_name = _('Norma Jurídica')
         verbose_name_plural = _('Normas Jurídicas')
@@ -181,6 +185,14 @@ class NormaJuridica(models.Model):
         anexos = AnexoNormaJuridica.objects.filter(
             norma=self.id)
         return anexos
+
+    @property
+    def certidao(self):
+        return self._certidao.all().first()
+
+    @property
+    def __descr__(self):
+        return self.ementa
 
     def __str__(self):
         return _('%(tipo)s nº %(numero)s de %(data)s') % {

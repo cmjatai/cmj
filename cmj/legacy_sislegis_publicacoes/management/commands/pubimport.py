@@ -107,7 +107,7 @@ class Command(BaseCommand):
         post_delete.disconnect(dispatch_uid='cmj_post_delete_signal')
         post_save.disconnect(dispatch_uid='cmj_post_save_signal')
 
-        self.run__add_operadores_no_grupo_para_ver_pareceres()
+        # self.run__add_operadores_no_grupo_para_ver_pareceres()
 
         # self.reset_id_model(CertidaoPublicacao)
         # self.reset_id_model(TipoDocumentoAdministrativo)

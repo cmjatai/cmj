@@ -68,8 +68,8 @@
     <div class="inner">
       <div class="title">
         <span>CERTIDÃO DE PUBLICAÇÃO</span>
-        <span>nº {{object.certidao.id|stringformat:"06d" }}</span>
-        <span>{{object.certidao.created|date:"d/m/Y H:i:s"}}</span>
+        <span>nº {{object.id|stringformat:"06d" }}</span>
+        <span>{{object.created|date:"d/m/Y H:i:s"}}</span>
       </div>
         Certifico para os devidos fins, nos termos do §1º art. 81
         da Lei Orgânica do Município de Jataí, que o presente
@@ -79,10 +79,10 @@
           1) Original tal como digitalizado e com o hash abaixo, e 2) em OCR para sistemas de indexação e busca.
         </div></div>
         <div class="url">
-          <strong>1)https://www.jatai.go.leg.br{% url 'sapl.api:documentoadministrativo-texto-integral' object.id %}?original</strong>
-          2)https://www.jatai.go.leg.br{% url 'sapl.api:documentoadministrativo-texto-integral' object.id %}?ocr <br>
+          <strong>1){{ content_object_url.original }}</strong>
+          2){{ content_object_url.ocr }}
           <div class="hash">
-            <strong>Original com hash512:</strong><br>{{object.certidao.hash_code}}
+            <strong>Original com hash512:</strong><br>{{object.hash_code}}
           </div> 
         </div>
     </div>

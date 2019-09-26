@@ -14,14 +14,9 @@ from django.utils.decorators import classonlymethod
 from django.utils.translation import ugettext_lazy as _
 from image_cropping import ImageCropField, ImageRatioField
 
-from cmj.diarios.models import DiarioOficial
 from cmj.globalrules import MENU_PERMS_FOR_USERS, GROUP_SOCIAL_USERS
 from cmj.utils import get_settings_auth_user_model, normalize, YES_NO_CHOICES,\
     UF, CmjChoices
-from sapl.materia.models import MateriaLegislativa, DocumentoAcessorio
-from sapl.norma.models import NormaJuridica
-from sapl.parlamentares.models import Parlamentar
-from sapl.sessao.models import SessaoPlenaria
 from sapl.utils import hash_sha512
 
 
@@ -652,6 +647,7 @@ class AreaTrabalhoManager(models.Manager):
 
 class AreaTrabalho(CmjAuditoriaModelMixin):
 
+    from sapl.parlamentares.models import Parlamentar
     objects = AreaTrabalhoManager()
 
     TIPO_GABINETE = 10
@@ -844,10 +840,19 @@ class CertidaoPublicacao(CmjAuditoriaModelMixin):
                                  max_length=200,
                                  blank=True)
 
+    field_name = models.CharField(verbose_name=_('Field Name'),
+                                  max_length=200,
+                                  blank=True)
+
     cancelado = models.BooleanField(
         _('Cancelado '),
         choices=YES_NO_CHOICES,
         default=False)
+
+    class Meta:
+        verbose_name = _('Certidão de Publicação')
+        verbose_name_plural = _('Certidões de Publicação')
+        ordering = ('-id', )
 
     @classonlymethod
     def gerar_certidao(cls, user, obj, file_field_name, pk=None):
@@ -867,6 +872,7 @@ class CertidaoPublicacao(CmjAuditoriaModelMixin):
         cp.hash_code = hash_code
         cp.owner = user
         cp.modifier = user
+        cp.field_name = file_field_name
 
         if not pk:
             cp.save()

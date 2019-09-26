@@ -17,7 +17,7 @@
     - title: {% trans 'Receber Proposições' %}
       url: sapl.materia:receber-proposicao
 - title: {% trans 'Matérias Legislativas' %}
-  url: {% url 'sapl.materia:pesquisar_materia' %}?o=
+  url: {% url 'sapl.materia:pesquisar_materia' %}
 - title: {% trans 'Sessões Plenárias' %}
   url: {% url 'sapl.sessao:pesquisar_sessao' %}?data_inicio__year={% now 'Y' %}
 

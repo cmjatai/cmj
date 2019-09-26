@@ -119,6 +119,8 @@ a:hover {
     }
   }
   th {
+    white-space: nowrap;
+    text-align: center;
     padding: 15px 10px;
     background-color: darken($color_container_bg, 5);
     a {

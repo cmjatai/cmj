@@ -423,7 +423,13 @@ class CrudListView(PermissionRequiredContainerCrudMixin, ListView):
                     if hasattr(f, 'related_model') and f.related_model:
                         m = f.related_model
                 if f:
-                    s.append(force_text(f.verbose_name))
+                    hook = 'hook_header_{}'.format(''.join(fn))
+                    if hasattr(self, hook):
+                        header = getattr(self, hook)()
+                        s.append(header)
+                    else:
+                        s.append(force_text(f.verbose_name))
+
             s = ' / '.join(s)
             r.append(s)
         return r

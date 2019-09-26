@@ -262,6 +262,10 @@ class DocumentoAdministrativo(models.Model):
     def certidao(self):
         return self._certidao.all().first()
 
+    @property
+    def __descr__(self):
+        return self.assunto
+
     def __str__(self):
         if self.epigrafe:
             return '%s' % self.epigrafe

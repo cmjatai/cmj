@@ -10,7 +10,7 @@ from cmj.core.views import CepCrud, RegiaoMunicipalCrud, DistritoCrud,\
     TrechoJsonSearchView, TrechoJsonView, AreaTrabalhoCrud,\
     OperadorAreaTrabalhoCrud, PartidoCrud, ImpressoEnderecamentoCrud,\
     NotificacaoRedirectView, chanel_index, chanel_room, time_refresh_log_test,\
-    app_vue_view, template_render
+    app_vue_view, template_render, CertidaoPublicacaoCrud
 from cmj.core.views_auth import CmjUserChangeView, CmjLoginView,\
     CmjPasswordResetView
 from cmj.core.views_search import CmjSearchView
@@ -77,6 +77,8 @@ urlpatterns = user_urlpatterns + [
 
     url(r'^areatrabalho/', include(AreaTrabalhoCrud.get_urls() +
                                    OperadorAreaTrabalhoCrud.get_urls())),
+
+    url(r'^cert/', include(CertidaoPublicacaoCrud.get_urls())),
 
     url(r'^notificacao/(?P<pk>[0-9]+)$', NotificacaoRedirectView.as_view(),
         name='notificacao_redirect'),

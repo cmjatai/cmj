@@ -6,8 +6,10 @@ from unicodedata import normalize as unicodedata_normalize
 from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
+from django.urls.base import reverse
 from django.utils.translation import ugettext_lazy as _
 from easy_thumbnails import source_generators
 from floppyforms import ClearableFileInput
@@ -360,3 +362,38 @@ def texto_upload_path(instance, filename, subpath='', pk_first=False):
         }
 
     return path
+
+
+class BtnCertMixin:
+
+    @property
+    def extras_url(self):
+        return [self.btn_certidao('texto_integral')]
+
+    def btn_certidao(self, field_name):
+
+        if self.object.certidao:
+
+            btn = [
+                reverse('cmj.core:certidaopublicacao_detail',
+                        kwargs={'pk': self.object.certidao.pk}),
+                'btn-success',
+                _('Certidão de Publicação')
+            ]
+
+        else:
+
+            btn = [
+                reverse(
+                    'cmj.core:certidaopublicacao_create',
+                    kwargs={
+                        'pk': self.kwargs['pk'],
+                        'content_type': ContentType.objects.get_for_model(
+                            self.object._meta.model).id,
+                        'field_name': field_name
+                    }),
+                'btn-primary',
+                _('Gerar Certidão de Publicação')
+            ]
+
+        return btn

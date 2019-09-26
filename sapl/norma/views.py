@@ -15,6 +15,7 @@ from django.views.generic.edit import FormView
 from django_filters.views import FilterView
 import weasyprint
 
+from cmj.utils import BtnCertMixin
 from sapl import settings
 import sapl
 from sapl.base.models import AppConfig
@@ -99,7 +100,7 @@ class NormaPesquisaView(FilterView):
     def get_context_data(self, **kwargs):
         context = super(NormaPesquisaView, self).get_context_data(**kwargs)
 
-        context['title'] = _('Pesquisar Norma Jurídica')
+        context['title'] = _('Pesquisa Parametrizada de Normas Jurídicas')
 
         self.filterset.form.fields['o'].label = _('Ordenação')
 
@@ -205,16 +206,17 @@ class NormaCrud(Crud):
             namespace = self.model._meta.app_config.name
             return reverse('%s:%s' % (namespace, 'norma_pesquisa'))
 
-    class DetailView(Crud.DetailView):
+    class DetailView(BtnCertMixin, Crud.DetailView):
 
         layout_key = 'NormaJuridicaDetail'
 
         @property
         def extras_url(self):
+            btns = [self.btn_certidao('texto_integral')]
 
             if self.request.user.has_perm('compilacao.add_textoarticulado'):
                 if not self.object.texto_articulado.exists():
-                    btns = [(
+                    btns = btns + [(
                         reverse('sapl.norma:norma_ta',
                                 kwargs={'pk': self.kwargs['pk']}),
                         'btn-primary',
@@ -223,7 +225,7 @@ class NormaCrud(Crud):
                     ]
                     return btns
                 elif self.request.user.is_superuser:
-                    btns = [(
+                    btns = btns + [(
                         reverse('sapl.compilacao:ta_delete',
                                 kwargs={'pk': self.object.texto_articulado.first().pk}),
                         'btn-danger',
