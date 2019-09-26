@@ -73,27 +73,27 @@ function DispositivoSearch (opts) {
         let tipoModel = _$('select[name="tipo_model"]').val()
         let numTa = _$('input[name="num_ta"]').val()
         let anoTa = _$('input[name="ano_ta"]').val()
-        let dispositivosInternos = _$('input[name="dispositivos_internos"]:checked').val()
+        let tipoResultado = _$('input[name="tipo_resultado"]:checked').val()
         let rotuloDispositivo = _$('input[name="rotulo_dispositivo"]').val()
         let textoDispositivo = _$('input[name="texto_dispositivo"]').val()
         let maxResults = _$('select[name="max_results"]').val()
         let url = ''
 
         if (rotuloDispositivo.length > 0 || textoDispositivo.length > 0) {
-          _$('input[name="dispositivos_internos"]').prop('disabled', false)
-          _$('input[name="dispositivos_internos"]').each((idx, element) => {
+          _$('input[name="tipo_resultado"]').prop('disabled', false)
+          _$('input[name="tipo_resultado"]').each((idx, element) => {
             element.parentElement.classList.remove('disabled')
           })
-          _$('input[name="dispositivos_internos"]').closest('#div_id_dispositivos_internos').css('opacity', '1')
+          _$('input[name="tipo_resultado"]').closest('#div_id_tipo_resultado').css('opacity', '1')
         } else {
-          _$('input[name="dispositivos_internos"]').filter('[value="False"]').prop('checked', true)
-          _$('input[name="dispositivos_internos"]').prop('disabled', true)
+          _$('input[name="tipo_resultado"]').filter('[value="False"]').prop('checked', true)
+          _$('input[name="tipo_resultado"]').prop('disabled', true)
 
-          _$('input[name="dispositivos_internos"]').each((idx, element) => {
+          _$('input[name="tipo_resultado"]').each((idx, element) => {
             element.parentElement.classList.add('disabled')
           })
-          _$('input[name="dispositivos_internos"]').closest('#div_id_dispositivos_internos').css('opacity', '0.3')
-          dispositivosInternos = 'False'
+          _$('input[name="tipo_resultado"]').closest('#div_id_tipo_resultado').css('opacity', '0.3')
+          tipoResultado = 'False'
         }
         formData = {
           'tipo_ta': tipoTa,
@@ -102,7 +102,7 @@ function DispositivoSearch (opts) {
           'ano_ta': anoTa,
           'texto': textoDispositivo,
           'rotulo': rotuloDispositivo,
-          'dispositivos_internos': dispositivosInternos,
+          'tipo_resultado': tipoResultado,
           'max_results': maxResults,
           'data_type_selection': dataTypeSelection,
           'data_field': dataField,
@@ -130,22 +130,22 @@ function DispositivoSearch (opts) {
       let onKeyPressRotuloBuscaTextual = function (event) {
         let rotuloDispositivo = _$('input[name="rotulo_dispositivo"]').val()
         let textoDispositivo = _$('input[name="texto_dispositivo"]').val()
-        // let dispositivosInternos = _$('input[name="dispositivos_internos"]:checked').val()
+        // let tipoResultado = _$('input[name="tipo_resultado"]:checked').val()
 
         if (rotuloDispositivo.length > 0 || textoDispositivo.length > 0) {
-          _$('input[name="dispositivos_internos"]').prop('disabled', false)
-          _$('input[name="dispositivos_internos"]').each((idx, element) => {
+          _$('input[name="tipo_resultado"]').prop('disabled', false)
+          _$('input[name="tipo_resultado"]').each((idx, element) => {
             element.parentElement.classList.remove('disabled')
           })
-          _$('input[name="dispositivos_internos"]').closest('#div_id_dispositivos_internos').css('opacity', '1')
+          _$('input[name="tipo_resultado"]').closest('#div_id_tipo_resultado').css('opacity', '1')
         } else {
-          _$('input[name="dispositivos_internos"]').filter('[value="False"]').prop('checked', true)
-          _$('input[name="dispositivos_internos"]').prop('disabled', true)
-          _$('input[name="dispositivos_internos"]').each((idx, element) => {
+          _$('input[name="tipo_resultado"]').filter('[value="False"]').prop('checked', true)
+          _$('input[name="tipo_resultado"]').prop('disabled', true)
+          _$('input[name="tipo_resultado"]').each((idx, element) => {
             element.parentElement.classList.add('disabled')
           })
-          _$('input[name="dispositivos_internos"]').closest('#div_id_dispositivos_internos').css('opacity', '0.3')
-          // dispositivosInternos = 'False'
+          _$('input[name="tipo_resultado"]').closest('#div_id_tipo_resultado').css('opacity', '0.3')
+          // tipoResultado = 'False'
         }
       }
 
@@ -194,7 +194,7 @@ function DispositivoSearch (opts) {
             +'input[name="ano_ta"], '
             +'select[name="tipo_model"], '
             +'input[name="texto_dispositivo"], '
-            +'input[name="dispositivos_internos"], '
+            +'input[name="tipo_resultado"], '
             +'input[name="rotulo_dispositivo"]'
           ).change(onChangeParamTA); */
           modalDs.find('input[name="texto_dispositivo"], ' +
@@ -250,6 +250,7 @@ function DispositivoSearch (opts) {
             _$('input[name="rotulo_dispositivo"]').val(formData.rotulo)
             _$('input[name="texto_dispositivo"]').val(formData.texto)
             _$('select[name="max_results"]').val(formData.max_results)
+            _$('input[name="tipo_resultado"]').val(formData.tipo_resultado)
           } catch (e) {
             // console.log(e)
           }

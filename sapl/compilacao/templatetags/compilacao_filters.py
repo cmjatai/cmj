@@ -294,6 +294,20 @@ def nomenclatura_heranca(d, ignore_ultimo=0, ignore_primeiro=0):
 
 
 @register.filter
+def next_results(obj, max_results):
+    i_max = int(max_results)
+    if not i_max:
+        i_max = 100
+
+    object_list = Dispositivo.objects.filter(
+        ordem__gt=obj.ordem,
+        ta=obj.ta
+    )[:i_max]
+
+    return object_list
+
+
+@register.filter
 def list(obj):
     return [obj, ]
 

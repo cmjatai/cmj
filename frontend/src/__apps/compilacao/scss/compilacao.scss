@@ -1525,6 +1525,7 @@ a:link:after, a:visited:after {
       }
 
       .itemlabel {
+        margin: 0;
         background-color: rgba(0, 0, 0, 0.1);
         display: table-cell;
         padding: 0.5em;

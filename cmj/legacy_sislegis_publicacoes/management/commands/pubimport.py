@@ -21,7 +21,9 @@ from cmj.core.models import AreaTrabalho, CertidaoPublicacao
 from cmj.globalrules import GROUP_MATERIA_WORKSPACE_VIEWER
 from cmj.legacy_sislegis_publicacoes.models import Tipodoc, Tipolei, Documento,\
     Assuntos
-from sapl.compilacao.models import TextoArticulado, Dispositivo
+from sapl.compilacao.models import TextoArticulado, Dispositivo,\
+    TipoDispositivoRelationship, TipoDispositivo,\
+    PerfilEstruturalTextoArticulado
 from sapl.norma.models import NormaRelacionada
 from sapl.protocoloadm.models import TipoDocumentoAdministrativo,\
     DocumentoAdministrativo, Anexado, TramitacaoAdministrativo,\
@@ -109,7 +111,9 @@ class Command(BaseCommand):
 
         # self.run__add_operadores_no_grupo_para_ver_pareceres()
 
-        # self.reset_id_model(CertidaoPublicacao)
+        self.reset_id_model(TipoDispositivoRelationship)
+        self.reset_id_model(TipoDispositivo)
+        self.reset_id_model(PerfilEstruturalTextoArticulado)
         # self.reset_id_model(TipoDocumentoAdministrativo)
         # self.reset_id_model(StatusTramitacaoAdministrativo)
 
