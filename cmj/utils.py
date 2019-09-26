@@ -368,10 +368,13 @@ class BtnCertMixin:
 
     @property
     def extras_url(self):
-        return [self.btn_certidao('texto_integral')]
+        r = [self.btn_certidao('texto_integral')]
+        r = list(filter(None, r))
+        return r
 
     def btn_certidao(self, field_name):
 
+        btn = []
         if self.object.certidao:
 
             btn = [
@@ -381,7 +384,7 @@ class BtnCertMixin:
                 _('Certidão de Publicação')
             ]
 
-        else:
+        elif self.request.user.has_perm('cmj.core:create_certidaopublicacao'):
 
             btn = [
                 reverse(
