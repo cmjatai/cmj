@@ -596,9 +596,13 @@ class _SessaoPlenariaViewSet:
 
 
 @customize(NormaJuridica)
-class _NormaJuridicaViewset:
+class _NormaJuridicaViewset(ResponseFileMixin):
 
     @action(detail=False, methods=['GET'])
     def destaques(self, request, *args, **kwargs):
         self.queryset = self.get_queryset().filter(norma_de_destaque=True)
         return self.list(request, *args, **kwargs)
+
+    @action(detail=True)
+    def texto_integral(self, request, *args, **kwargs):
+        return self.response_file(request, *args, **kwargs)
