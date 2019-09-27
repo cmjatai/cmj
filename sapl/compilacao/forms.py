@@ -116,7 +116,7 @@ class TaForm(ModelForm):
         queryset=TipoTextoArticulado.objects.all(),
         required=True,
         empty_label=None)
-    numero = forms.IntegerField(
+    numero = forms.CharField(
         label=TextoArticulado._meta.get_field(
             'numero').verbose_name,
         required=True)

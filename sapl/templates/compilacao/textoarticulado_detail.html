@@ -52,14 +52,14 @@
             </div>
           </div>
 
-          {% if object.content_object and object.content_object.tipo%}
+          {% if object.content_object and object.content_object.tipo %}
             <div class="col-md-3">
               <div id="div_id_tipo" class="holder">
                 <label>{% field_verbose_name object.content_object 'tipo' %}</label>
                 <p>{{ object.content_object.tipo}}</p>
               </div>
             </div>
-          {%endif%}
+          {% endif %}
 
           <div class="col-md-2">
             <div id="div_id_numero" class="holder">

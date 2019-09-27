@@ -250,7 +250,11 @@ function DispositivoSearch (opts) {
             _$('input[name="rotulo_dispositivo"]').val(formData.rotulo)
             _$('input[name="texto_dispositivo"]').val(formData.texto)
             _$('select[name="max_results"]').val(formData.max_results)
-            _$('input[name="tipo_resultado"]').val(formData.tipo_resultado)
+
+            _$('input[name="tipo_resultado"]')
+              .filter(`[value="${formData.tipo_resultado}"]`)
+              .attr('checked', true)
+
           } catch (e) {
             // console.log(e)
           }
