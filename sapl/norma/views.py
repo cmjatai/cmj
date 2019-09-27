@@ -223,7 +223,6 @@ class NormaCrud(Crud):
                         _('Criar Texto Articulado')
                     )
                     ]
-                    return btns
                 elif self.request.user.is_superuser:
                     btns = btns + [(
                         reverse('sapl.compilacao:ta_delete',
@@ -232,7 +231,9 @@ class NormaCrud(Crud):
                         _('Excluir Texto Articulado')
                     )
                     ]
-                    return btns
+
+            btns = list(filter(None, btns))
+            return btns
 
         def get(self, request, *args, **kwargs):
             """if not request.user.has_perm('norma.change_normajuridica') and \

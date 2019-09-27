@@ -384,7 +384,7 @@ class BtnCertMixin:
                 _('Certidão de Publicação')
             ]
 
-        elif self.request.user.has_perm('cmj.core:create_certidaopublicacao'):
+        elif self.request.user.has_perm('core.add_certidaopublicacao'):
 
             btn = [
                 reverse(
