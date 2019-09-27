@@ -273,6 +273,9 @@ function DispositivoSearch (opts) {
           modalDs.modal('show')
         })
       })
+      if ('autostart' in opts && opts['autostart']) {
+        btnOpenSearch.trigger('click');
+      }
     })
   })
 }

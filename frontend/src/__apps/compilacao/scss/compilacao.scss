@@ -705,6 +705,12 @@ a:link:after, a:visited:after {
       z-index: 3;
       opacity: 0;
 
+      &.bottom {
+        top: auto;
+        bottom: 3px;
+        right: 2px;
+      }
+
       .activate {
         display:none;
       }
