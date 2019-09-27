@@ -92,6 +92,7 @@ class Command(BaseCommand):
             'count_base': 2,
             'order_by': '-data_inicio'
         },
+
         {
             'model': DocumentoAdministrativo,
             'file_field': ('texto_integral', ),
@@ -152,11 +153,16 @@ class Command(BaseCommand):
                             # possui meta ocr anterior,
                             # testa se o arq é mais recente que último ocr
                             # feito
-                            t = os.path.getmtime(file.path) - 86400
-                            date_file = datetime.fromtimestamp(t, timezone.utc)
+                            try:
+                                t = os.path.getmtime(file.path) - 86400
+                                date_file = datetime.fromtimestamp(
+                                    t, timezone.utc)
 
-                            if date_file <= ocr.created:
-                                continue
+                                if date_file <= ocr.created:
+                                    continue
+                            except Exception as e:
+                                print(e)
+
                             # se arq é mais novo, apaga o meta ocr p fazer
                             # novamente
                             ocr.delete()
@@ -182,24 +188,27 @@ class Command(BaseCommand):
                             o.field = ff
                             o.sucesso = False
                             o.save()
-                            result = self.run(item, ff)
-                            if result is None:
-                                return
+                            try:
+                                result = self.run(item, ff)
+                                if result is None:
+                                    return
 
-                            o.sucesso = result
-                            o.save()
-                            now = datetime.now()
+                                o.sucesso = result
+                                o.save()
+                                now = datetime.now()
 
-                            if result:
-                                item.save()
+                                if result:
+                                    item.save()
 
-                            self.logger.info(
-                                str(now - init) + ' ' +
-                                str(item.id) + ' ' +
-                                str(model['model']))
+                                self.logger.info(
+                                    str(now - init) + ' ' +
+                                    str(item.id) + ' ' +
+                                    str(model['model']))
 
                             if now - init > timedelta(minutes=9):
                                 return
+                            except Exception as e:
+                                print(e)
                             self.logger.info('Aguardando...')
                             print('Aguardando...')
                             sleep(2)
