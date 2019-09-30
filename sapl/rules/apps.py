@@ -233,6 +233,9 @@ def send_signal_for_websocket_time_refresh(project, action, inst):
 
         if not funcs:
             try:
+                if hasattr(inst, 'ws_sync') and not inst.ws_sync():
+                    return
+
                 channel_layer = get_channel_layer()
 
                 async_to_sync(channel_layer.group_send)(

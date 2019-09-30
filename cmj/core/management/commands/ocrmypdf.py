@@ -205,8 +205,8 @@ class Command(BaseCommand):
                                     str(item.id) + ' ' +
                                     str(model['model']))
 
-                            if now - init > timedelta(minutes=9):
-                                return
+                                if now - init > timedelta(minutes=9):
+                                    return
                             except Exception as e:
                                 print(e)
                             self.logger.info('Aguardando...')

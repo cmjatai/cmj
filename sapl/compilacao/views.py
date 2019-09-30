@@ -2263,6 +2263,9 @@ class ActionDispositivoCreateMixin(ActionsCommonsMixin):
                     else:
                         dp.set_numero_completo([1, 0, 0, 0, 0, 0, ])
 
+            if dp.dispositivo_atualizador:
+                registro_inclusao = True
+
             # verificar se existe restrição de quantidade de itens
             if dp.dispositivo_pai:
                 for perfil in perfil_parents:

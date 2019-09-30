@@ -1077,6 +1077,10 @@ class Dispositivo(BaseModel, TimestampedMixin):
                 'Permissão alteração global do dispositivo de vigência')),
         )
 
+    def ws_sync(self):
+        return self.ta and self.ta.privacidade in (
+            STATUS_TA_IMMUTABLE_PUBLIC, STATUS_TA_PUBLIC)
+
     def clean(self):
         """
         Check for instances with null values in unique_together fields.
