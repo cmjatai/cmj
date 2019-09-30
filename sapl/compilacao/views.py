@@ -2304,7 +2304,8 @@ class ActionDispositivoCreateMixin(ActionsCommonsMixin):
                 dp.incrementar_irmaos(variacao, [local_add, ], force=False)
 
             dp.publicacao = pub_last
-            dp.save()
+
+            dp.save(clean=not registro_inclusao)
 
             count_auto_insert = 0
             if create_auto_inserts:
@@ -2359,7 +2360,7 @@ class ActionDispositivoCreateMixin(ActionsCommonsMixin):
                 dp.ta_publicado = None
                 dp.dispositivo_atualizador = None
                 dp.ordem_bloco_atualizador = 0
-                dp.save()
+                dp.save(clean=False)
 
             ''' Reenquadrar todos os dispositivos que possuem pai
             antes da inserção atual e que são inferiores a dp,
@@ -2702,8 +2703,8 @@ class ActionsEditMixin(ActionDragAndMoveDispositivoAlteradoMixin,
             dsps_ids = Dispositivo.objects.filter(
                 id__in=dsps_ids
             ).values_list('id', flat="True")
-            for dsp in dsps_ids:
-                with transaction.atomic():
+            with transaction.atomic():
+                for dsp in dsps_ids:
                     data.update(
                         self.registra_alteracao(
                             bloco_alteracao,
@@ -2759,10 +2760,10 @@ class ActionsEditMixin(ActionDragAndMoveDispositivoAlteradoMixin,
 
         if ndp.dispositivo_vigencia:
             ndp.inicio_eficacia = ndp.dispositivo_vigencia.inicio_eficacia
-            ndp.inicio_vigencia = ndp.dispositivo_vigencia.inicio_eficacia
+            ndp.inicio_vigencia = ndp.dispositivo_vigencia.inicio_vigencia
         else:
             ndp.inicio_eficacia = bloco_alteracao.inicio_eficacia
-            ndp.inicio_vigencia = bloco_alteracao.inicio_eficacia
+            ndp.inicio_vigencia = bloco_alteracao.inicio_vigencia
 
         try:
             ordem = dsp_a_alterar.criar_espaco(
@@ -2811,7 +2812,7 @@ class ActionsEditMixin(ActionDragAndMoveDispositivoAlteradoMixin,
             filhos_diretos = dsp_a_alterar.dispositivos_filhos_set
             for d in filhos_diretos.all():
                 d.dispositivo_pai = ndp
-                d.save()
+                d.save(clean=False)
 
             ndp.ta.reordenar_dispositivos()
             bloco_alteracao.ordenar_bloco_alteracao()
