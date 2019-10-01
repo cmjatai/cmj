@@ -2121,6 +2121,10 @@ class ActionDispositivoCreateMixin(ActionsCommonsMixin):
             if len(result) > 2:
                 result.pop()
 
+            result[0]['itens'] = result[1]['itens'] + result[0]['itens']
+            result[0]['tipo_insert'] = 'Inserção'
+            result[1]['itens'] = []
+
             return result
 
         except Exception as e:
