@@ -2676,10 +2676,10 @@ class ActionsEditMixin(ActionDragAndMoveDispositivoAlteradoMixin,
                 while ds.dispositivo_subsequente:
                     ds = ds.dispositivo_subsequente
 
-                if revogacao and ds.dispositivo_de_revogacao:
-                    continue
-
                 dsps_ids.add(ds.pk)
+
+                if revogacao and ds.dispositivo_de_revogacao:
+                    dsps_ids.remove(ds.pk)
 
                 if em_bloco:
                     proximo_bloco = Dispositivo.objects.filter(
