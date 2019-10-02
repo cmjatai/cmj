@@ -2675,6 +2675,10 @@ class ActionsEditMixin(ActionDragAndMoveDispositivoAlteradoMixin,
                 ds = d
                 while ds.dispositivo_subsequente:
                     ds = ds.dispositivo_subsequente
+
+                if revogacao and ds.dispositivo_de_revogacao:
+                    continue
+
                 dsps_ids.add(ds.pk)
 
                 if em_bloco:
@@ -2687,8 +2691,17 @@ class ActionsEditMixin(ActionDragAndMoveDispositivoAlteradoMixin,
                         'ta_id': ds.ta_id,
                         'nivel__gte': ds.nivel,
                         'ordem__gte': ds.ordem,
-                        'dispositivo_subsequente__isnull': True
+                        'dispositivo_subsequente__isnull': True,
                     }
+
+                    if revogacao:
+                        params.update(
+                            {
+                                'dispositivo_de_revogacao': False,
+                                'tipo_dispositivo__dispositivo_de_articulacao': False
+                            }
+
+                        )
 
                     if proximo_bloco:
                         params['ordem__lt'] = proximo_bloco.ordem
@@ -2706,7 +2719,7 @@ class ActionsEditMixin(ActionDragAndMoveDispositivoAlteradoMixin,
 
             dsps_ids = Dispositivo.objects.filter(
                 id__in=dsps_ids
-            ).values_list('id', flat="True")
+            ).values_list('id', flat="True").order_by('ordem')
             with transaction.atomic():
                 for dsp in dsps_ids:
                     data.update(
@@ -2799,6 +2812,7 @@ class ActionsEditMixin(ActionDragAndMoveDispositivoAlteradoMixin,
                 ).ordem_bloco_atualizador + Dispositivo.INTERVALO_ORDEM
             else:
                 ndp.ordem_bloco_atualizador = Dispositivo.INTERVALO_ORDEM
+
             ndp.save()
 
             p.dispositivo_subsequente = ndp
@@ -2818,8 +2832,8 @@ class ActionsEditMixin(ActionDragAndMoveDispositivoAlteradoMixin,
                 d.dispositivo_pai = ndp
                 d.save(clean=False)
 
-            ndp.ta.reordenar_dispositivos()
-            bloco_alteracao.ordenar_bloco_alteracao()
+            # ndp.ta.reordenar_dispositivos()
+            # bloco_alteracao.ordenar_bloco_alteracao()
 
             if not revogacao:
                 if 'message' not in data:
