@@ -109,13 +109,39 @@ class Command(BaseCommand):
         post_delete.disconnect(dispatch_uid='cmj_post_delete_signal')
         post_save.disconnect(dispatch_uid='cmj_post_save_signal')
 
-        # self.run__add_operadores_no_grupo_para_ver_pareceres()
+        # self.run__corrige_caputs()
 
-        self.reset_id_model(TipoDispositivoRelationship)
-        self.reset_id_model(TipoDispositivo)
-        self.reset_id_model(PerfilEstruturalTextoArticulado)
+        # self.reset_id_model(TipoDispositivoRelationship)
+        # self.reset_id_model(TipoDispositivo)
+        # self.reset_id_model(PerfilEstruturalTextoArticulado)
         # self.reset_id_model(TipoDocumentoAdministrativo)
         # self.reset_id_model(StatusTramitacaoAdministrativo)
+
+    def run__corrige_caputs(self):
+        ds = Dispositivo.objects.filter(
+            dispositivo_subsequente__isnull=False,
+            dispositivos_filhos_set__isnull=False,
+            tipo_dispositivo_id=120
+        ).distinct()
+
+        for d in ds:
+            print(d.ta_id, d.id)
+            if not d.dispositivos_filhos_set.exists():
+                continue
+
+            dn = d
+            o = dn.ordem
+            while dn.dispositivo_subsequente:
+                o += 1
+                dn = dn.dispositivo_subsequente
+                dn.ordem = o
+                dn.save()
+
+            for filho in d.dispositivos_filhos_set.all():
+                filho.dispositivo_pai = dn
+                filho.save()
+            dn.save()
+            dn.ta.reagrupar_ordem_de_dispositivos()
 
     def run__add_operadores_no_grupo_para_ver_pareceres(self):
         ats = AreaTrabalho.objects.filter(ativo=True)
