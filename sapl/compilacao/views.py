@@ -2203,6 +2203,10 @@ class ActionDispositivoCreateMixin(ActionsCommonsMixin):
 
             dp_auto_insert = None
             base = Dispositivo.objects.get(pk=self.kwargs['dispositivo_id'])
+
+            if base.dispositivo_atualizador:
+                registro_inclusao = True
+
             tipo = TipoDispositivo.objects.get(pk=context['tipo_pk'])
             pub_last = Publicacao.objects.order_by(
                 'data', 'hora').filter(ta=base.ta).last()
