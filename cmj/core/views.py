@@ -12,7 +12,7 @@ from django.forms.utils import ErrorList
 from django.http.response import Http404, HttpResponse
 from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
-from django.utils import formats
+from django.utils import formats, timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import RedirectView
@@ -422,7 +422,8 @@ class CertidaoPublicacaoCrud(Crud):
 
         def hook_created(self, *args, **kwargs):
             return '{}'.format(
-                formats.date_format(args[0].created, 'd/m/Y \à\s H:i')
+                formats.date_format(
+                    timezone.template_localtime(args[0].created), 'd/m/Y \à\s H:i')
             ), args[2]
 
     class DetailView(DetailView):
