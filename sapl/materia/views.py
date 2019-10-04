@@ -2038,6 +2038,7 @@ class MateriaLegislativaPesquisaView(FilterView):
         context = super().get_context_data(**kwargs)
 
         context['title'] = _('Pesquisa Parametrizada de Matérias Legislativas')
+        context['bg_title'] = 'bg-red text-white'
 
         tipo_listagem = self.request.GET.get('tipo_listagem', '1')
         tipo_listagem = '1' if not tipo_listagem else tipo_listagem

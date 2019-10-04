@@ -11,3 +11,15 @@ class DiarioOficialCrud(Crud):
     model = DiarioOficial
     help_topic = 'diariooficial'
     public = [RP_LIST, RP_DETAIL]
+
+    class ListView(Crud.ListView):
+        def get_context_data(self, **kwargs):
+            c = super().get_context_data(**kwargs)
+            c['bg_title'] = 'bg-maroon text-white'
+            return c
+
+    class DetailView(Crud.DetailView):
+        def get_context_data(self, **kwargs):
+            c = super().get_context_data(**kwargs)
+            c['bg_title'] = 'bg-maroon text-white'
+            return c

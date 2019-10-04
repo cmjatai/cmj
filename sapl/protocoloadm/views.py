@@ -323,6 +323,7 @@ class DocumentoAdministrativoCrud(Crud):
                     page_obj.number, paginator.num_pages)
             context['title'] = _(
                 'Pesquisa Parametrizada de Documentos Administrativos')
+            context['bg_title'] = 'bg-aqua text-white'
 
             return context
 
