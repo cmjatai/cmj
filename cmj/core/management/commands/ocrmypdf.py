@@ -58,6 +58,20 @@ class Command(BaseCommand):
 
     models = [
         {
+            'model': DocumentoAdministrativo,
+            'file_field': ('texto_integral', ),
+            'count': 0,
+            'count_base': 9,
+            'order_by': '-data'
+        },
+        {
+            'model': DocumentoAcessorioAdministrativo,
+            'file_field': ('arquivo', ),
+            'count': 0,
+            'count_base': 2,
+            'order_by': '-data'
+        },
+        {
             'model': MateriaLegislativa,
             'file_field': ('texto_original',),
             'count': 0,
@@ -93,20 +107,7 @@ class Command(BaseCommand):
             'order_by': '-data_inicio'
         },
 
-        {
-            'model': DocumentoAdministrativo,
-            'file_field': ('texto_integral', ),
-            'count': 0,
-            'count_base': 9,
-            'order_by': '-data'
-        },
-        {
-            'model': DocumentoAcessorioAdministrativo,
-            'file_field': ('arquivo', ),
-            'count': 0,
-            'count_base': 2,
-            'order_by': '-data'
-        },
+
     ]
 
     def handle(self, *args, **options):
