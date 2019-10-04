@@ -53,6 +53,11 @@ class NormaFilterSet(django_filters.FilterSet):
         method='filter_ementa'
     )
 
+    numero = django_filters.CharFilter(
+        label=_('Número'),
+        method='filter_numero'
+    )
+
     apelido = django_filters.CharFilter(lookup_expr='icontains',
                                         label=_('Apelido'))
 
@@ -84,9 +89,15 @@ class NormaFilterSet(django_filters.FilterSet):
         self.form.helper = SaplFormHelper()
         self.form.helper.form_method = 'GET'
         self.form.helper.layout = Layout(
-            Fieldset(_('Pesquisa de Norma<br><small>Refine sua busca informando quaisquer dos campos desta página de busca e clique em "Processar Pesquisa"</small>'),
-                     row1, row2, row3, row4, row5,
-                     form_actions(label='Processar pesquisa'))
+            Fieldset(_(
+                '''
+                Pesquisa de Norma<br>
+                <small>
+                <strong class="text-red">TODOS OS CAMPOS SÃO OPCIONAIS!</strong>
+                </small>
+                '''),
+                row1, row2, row3, row4, row5,
+                form_actions(label='Pesquisar'))
         )
 
     def filter_ementa(self, queryset, name, value):
@@ -106,6 +117,17 @@ class NormaFilterSet(django_filters.FilterSet):
             queryset = queryset.filter(data_vigencia__gt=data_atual)
 
         return queryset
+
+    def filter_numero(self, qs, name, value):
+
+        value = value.replace('.', '')
+        value = value.replace(',', '')
+        if len(value) > 2:
+            qs = qs.filter(numero__icontains=value)
+        else:
+            qs = qs.filter(numero=value)
+
+        return qs
 
 
 class NormaJuridicaForm(FileFieldCheckMixin, ModelForm):

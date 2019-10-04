@@ -174,6 +174,11 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
 
     o = DocumentoAdministrativoOrderingFilter(help_text='')
 
+    numero = django_filters.NumberFilter(
+        label=_('Número'),
+        method='filter_numero'
+    )
+
     class Meta(FilterOverridesMetaMixin):
         model = DocumentoAdministrativo
         fields = ['tipo',
@@ -244,11 +249,26 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
         self.form.helper = SaplFormHelper()
         self.form.helper.form_method = 'GET'
         self.form.helper.layout = Layout(
-            Fieldset(_('Pesquisar Documento'),
-                     row1, row2,
-                     row3, row4,
-                     buttons,)
+            Fieldset(_(
+                '''Pesquisar Documentos<br>
+                <small>
+                <strong class="text-red">TODOS OS CAMPOS SÃO OPCIONAIS!</strong>'''),
+                row1, row2,
+                row3, row4,
+                buttons,)
         )
+
+    def filter_numero(self, qs, name, value):
+        value = str(value)
+
+        value = value.replace('.', '')
+        value = value.replace(',', '')
+        if len(value) > 2:
+            qs = qs.filter(numero__icontains=value)
+        else:
+            qs = qs.filter(numero=value)
+
+        return qs
 
     def filter_queryset(self, queryset):
         qs = django_filters.FilterSet.filter_queryset(self, queryset)

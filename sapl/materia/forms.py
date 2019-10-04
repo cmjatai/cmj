@@ -947,6 +947,11 @@ class MateriaLegislativaFilterSet(django_filters.FilterSet):
                                       label='Ano da Matéria',
                                       choices=choice_anos_com_materias)
 
+    numero = django_filters.CharFilter(
+        label=_('Número'),
+        method='filter_numero'
+    )
+
     autoria__autor = django_filters.CharFilter(widget=forms.HiddenInput())
 
     autoria__primeiro_autor = django_filters.BooleanFilter(
@@ -1009,6 +1014,17 @@ class MateriaLegislativaFilterSet(django_filters.FilterSet):
                   'data_origem_externa',
                   'local_origem_externa',
                   ]
+
+    def filter_numero(self, qs, name, value):
+
+        value = value.replace('.', '')
+        value = value.replace(',', '')
+        if len(value) > 2:
+            qs = qs.filter(numero__icontains=value)
+        else:
+            qs = qs.filter(numero=value)
+
+        return qs
 
     def filter_ementa(self, queryset, name, value):
         texto = value.split()
@@ -1089,9 +1105,16 @@ class MateriaLegislativaFilterSet(django_filters.FilterSet):
         self.form.helper = SaplFormHelper()
         self.form.helper.form_method = 'GET'
         self.form.helper.layout = Layout(
-            Fieldset(_('Pesquisa Básica<br><small>Refine sua busca informando quaisquer dos campos desta página de busca e clique em "Processar Pesquisa"</small>'),
-                     row1, row2
-                     ),
+            Fieldset(_(
+                '''
+                Pesquisa Básica<br>
+                <small>
+                <strong class="text-red">TODOS OS CAMPOS SÃO OPCIONAIS!</strong>
+                </small>
+                '''
+            ),
+                row1, row2
+            ),
 
             Fieldset(_('Como listar os resultados da pesquisa'),
 
