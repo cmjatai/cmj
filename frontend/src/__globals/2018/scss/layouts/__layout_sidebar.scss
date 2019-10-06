@@ -37,6 +37,50 @@
       right: 0;
     }
     
+    ul {
+      display: none;
+      position: absolute;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      z-index: 1;
+      left: 90%;
+      top: 10px;
+      border-radius: 4px;
+      box-shadow: 0 5px 15px #2d3f2f;
+      background-color: transparent;
+      &::before {
+        background-color: #00a65a;
+        content: '';
+        position: absolute;
+        visibility: inherit;
+        top: 10px;
+        left: -5px;
+        width: 10px;
+        height: 10px;
+        transform: rotate(45deg);
+        z-index: -1;
+      }
+
+      li {
+        line-height: 1;
+        &:not(:last-child) {
+          border-bottom: 1px solid #0001;
+        }
+      }
+      a {
+        display: block;
+        text-decoration: none;
+        font-size: 1em;
+        line-height: 1.5;
+        white-space: nowrap;
+        padding: 0 10px;
+        &:hover {
+          background-color: #0003;
+        }
+      }
+    }
+
     .box {
       position: relative;
       display: flex;
@@ -53,9 +97,20 @@
       }
       &.box-norma:hover{
         background: #00a65aaa  !important;
+        ul {
+          background: #00a65a;
+        }
       }
       &.box-norma-destaque:hover{
         background: #3d9970aa !important;
+        ul {
+          background: #3d9970;
+          top: -140px;
+          &::before {
+            background-color: #3d9970;
+            top: 150px;
+          }
+        }
       }
       &.box-sessao:hover{
         background: #f39c12aa !important;
@@ -132,26 +187,20 @@
         background-image: url(~@/assets/img/icon_comissoes.png);
       }
     }
-    
-    
-    /*.box-search {
-      margin: 0px;
-      .icon {
-        opacity: 1;
+
+    .box {
+      &:hover {
+        ul {
+          display: block;
+        }
       }
-      .inner {
-        padding: 0 12px;
-      }
-      input {
-        background-color: #eee;
-      }
-    }*/
+    }
 
     &:hover {
       
       width: $width-wrapper-lg;
       box-shadow: 0 20px 20px #2d3f2f;
-      overflow: none;
+      overflow: unset;
 
       .container-aside {
         opacity: 1;
@@ -167,11 +216,6 @@
 
       }
       
-      /*.box-search {
-        .icon {
-          display: none;
-        }
-      }*/
 
       .inner {
         display: flex;

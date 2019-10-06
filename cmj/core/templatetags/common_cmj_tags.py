@@ -12,8 +12,9 @@ from webpack_loader.utils import _get_bundle
 from cmj.diarios.models import DiarioOficial
 from cmj.sigad.models import Documento
 from sapl.base.models import AppConfig
-from sapl.materia.models import DocumentoAcessorio, MateriaLegislativa
-from sapl.norma.models import NormaJuridica
+from sapl.materia.models import DocumentoAcessorio, MateriaLegislativa,\
+    TipoMateriaLegislativa
+from sapl.norma.models import NormaJuridica, TipoNormaJuridica
 from sapl.parlamentares.models import Filiacao
 from sapl.protocoloadm.models import DocumentoAdministrativo
 from sapl.sessao.models import SessaoPlenaria
@@ -303,3 +304,18 @@ def dont_break_out(value):
     _safe = '<div class="dont-break-out">{}</div>'.format(value)
     _safe = mark_safe(_safe)
     return _safe
+
+
+@register.filter
+def sidebar_tipos_de_normas(obj):
+    return TipoNormaJuridica.objects.all()
+
+
+@register.filter
+def sidebar_tipos_de_materias(obj):
+    return TipoMateriaLegislativa.objects.all().order_by('sequencia_regimental')
+
+
+@register.filter
+def normas_de_destaque(obj):
+    return NormaJuridica.objects.filter(norma_de_destaque=True).order_by('id')

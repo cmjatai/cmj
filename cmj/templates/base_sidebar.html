@@ -1,3 +1,6 @@
+{% load common_cmj_tags %}
+
+
 <aside>
   <div class="container-aside">
 
@@ -41,6 +44,17 @@
       </a>
       <div class="inner">
         <a href="{% url 'sapl.materia:pesquisar_materia' %}" class="">Matérias Legislativas</a>
+
+        {% comment %}
+          <ul>
+            {% for tipo in ""|sidebar_tipos_de_materias %}
+              <li>
+                <a href="{% url 'sapl.materia:pesquisar_materia' %}?tipo={{tipo.pk}}">{{tipo}}</a>
+              </li>
+            {% endfor %}
+          </ul>
+        {% endcomment %}
+
       </div>
     </div>
     <div class="box box-norma">
@@ -48,6 +62,18 @@
       </a>
       <div class="inner">
         <a href="{% url 'sapl.norma:norma_pesquisa' %}" class="">Legislação Municipal</a>
+
+        {% comment %}
+        <ul>
+          {% for tipo in ""|sidebar_tipos_de_normas %}
+            <li>
+              <a href="{% url 'sapl.norma:norma_pesquisa' %}?tipo={{tipo.pk}}">{{tipo}}</a>
+            </li>
+          {% endfor %}
+        </ul>
+        {% endcomment %}
+
+
       </div>
     </div>
     <div class="box box-norma-destaque">
@@ -55,6 +81,18 @@
       </a>
       <div class="inner">
         <a href="{% url 'sapl.norma:norma_de_destaque' %}" class="">Normas de Destaque</a>
+
+        {% comment %}
+        <ul>
+          {% for norma in ""|normas_de_destaque %}
+            <li>
+              <a href="{% url 'sapl.norma:normajuridica_detail' norma.id %}">{{norma.apelido}}</a>
+            </li>
+          {% endfor %}
+        </ul>
+        {% endcomment %}
+
+
       </div>
     </div>
     <div class="box box-sessao">
