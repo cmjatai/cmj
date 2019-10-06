@@ -316,7 +316,6 @@ a:link:after, a:visited:after {
     }
   }
 
-
   .desativado {
 
     .dtxt, .dtxt *, .dpt-link, .dpt-link * {
@@ -665,6 +664,19 @@ a:link:after, a:visited:after {
   &:hover {
     opacity: 1;
   }
+
+  .revogado {
+    color: #800;
+    .dpt-link {
+      color:#999 !important;
+    }
+  }
+  .omissis {
+    a {
+      text-decoration: none !important;
+    }
+  }
+
 } /* end cp */
 
 .cp-print {

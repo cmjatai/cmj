@@ -3230,6 +3230,7 @@ class SessaoListView(ListView):
 
         context['page_range'] = make_pagination(
             page_obj.number, paginator.num_pages)
+
         return context
 
 
@@ -3411,6 +3412,7 @@ class PesquisarSessaoPlenariaView(FilterView):
         context['page_range'] = make_pagination(
             page_obj.number, paginator.num_pages)
 
+        context['bg_title'] = 'bg-yellow text-white'
         return context
 
     def get(self, request, *args, **kwargs):

@@ -65,6 +65,8 @@ def get_bloco_atualizador(pk_atualizador):
 
 @register.simple_tag
 def dispositivo_desativado(dispositivo, inicio_vigencia, fim_vigencia):
+    if dispositivo.dispositivo_de_revogacao:
+        return 'revogado'
     if inicio_vigencia and fim_vigencia:
         if dispositivo.fim_vigencia is None:
             return ''

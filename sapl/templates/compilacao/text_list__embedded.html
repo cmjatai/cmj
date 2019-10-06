@@ -39,6 +39,9 @@
               {% blocktrans with inicio_vigencia=dispositivo.inicio_vigencia%}
                 Vigência a partir de <b>{{inicio_vigencia}}</b>.
               {% endblocktrans%}
+              {% if dispositivo.inicio_vigencia != dispositivo.inicio_eficacia %}
+                Efeitos a partir de  <b>{{dispositivo.inicio_eficacia}}</b>.
+              {% endif %}
             {% endif %}
             <br>
             {% if view.ta_vigencia %}

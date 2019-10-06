@@ -48,31 +48,36 @@ window.initTextRichEditor('texto-rico')
 
 $(function () {
   
+  let toggleWrapper = function (event) {
+    if (!$("#wrapper").hasClass('toggled')) {
+      window.localStorage.setItem('sidebarCmjCookie', 'toggled')
+      $(".canais-absolute .box").off('click')
+    }
+    else {
+      window.localStorage.setItem('sidebarCmjCookie', '')
+      $(".canais-absolute .box").click(toggleWrapper)
+    }
+    
+    $("#wrapper").toggleClass("toggled");
+    $(".container").toggleClass("toggled");
+    
+    event.preventDefault();
+  }
+  
+  $("#menu-toggle, .canais-absolute .box").click(function (event) {
+    toggleWrapper(event)
+  });
+  
   let sidebarCmjCookie = window.localStorage.getItem('sidebarCmjCookie')
   if (sidebarCmjCookie !== undefined) {
     $("#wrapper").toggleClass(sidebarCmjCookie);
     $(".container").toggleClass(sidebarCmjCookie);
+    $(".canais-absolute .box").off('click')
   }
-  let toggleWrapper = function (event) {
-      if (!$("#wrapper").hasClass('toggled')) {
-        window.localStorage.setItem('sidebarCmjCookie', 'toggled')
-        $(".canais-absolute .box").off('click')
-      }
-      else {
-        window.localStorage.setItem('sidebarCmjCookie', '')
-        $(".canais-absolute .box").click(toggleWrapper)
-      }
-
-      $("#wrapper").toggleClass("toggled");
-      $(".container").toggleClass("toggled");
   
-    event.preventDefault();
-  }
-  $("#menu-toggle, .canais-absolute .box").click(function (event) {
-    toggleWrapper(event)
-  });
   $('[data-toggle="popover"]').popover({
   trigger: 'focus'
   })
+
 })
 
