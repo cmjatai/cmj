@@ -240,25 +240,72 @@
         position: relative;
         display: flex;
         flex-direction: row;
+        opacity: 0.8;
       }
 
       .box {
         flex-direction: column;
+
+        & > .inner {
+          text-align: center;
+          display: inline-flex;
+          padding-bottom: 5px;
+          & > a {
+            font-size: 0.8em;
+            white-space: unset;
+            line-height: 1.2;
+            font-variant: normal;
+          }
+        }
       }
       .icon {
-
-        background-size: auto 65%;
-      }
-      .inner {
-        text-align: center;
-        & > a {
-          font-size: 1em;
-        }
+        background-size: auto 70%;
       }
 
       &:hover {
         width: 100%;
         box-shadow: 0 0 0 #031d06;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 767.98px) {
+
+  #wrapper {
+    aside {
+      .container-aside {
+        opacity: 0.8;
+      }
+      .box {
+        & > .inner {
+          & > a {
+            font-size: 0.6em;
+          }
+        }
+      }
+      .icon {
+        background-size: auto 60%;
+      }
+
+    }
+  }
+}
+
+@media screen and (max-width: 575.98px) {
+
+  #wrapper {
+    aside {
+      .container-aside {
+        opacity: 0.8;
+      }
+      .box {
+        & > .inner {
+          padding: 0;
+          & > a {
+            display: none;
+          }
+        }
       }
     }
   }
