@@ -1,42 +1,89 @@
-<div class="box bg-aqua">
-  <div class="icon icon-licitacao">
+<aside>
+  <div class="container-aside">
+
+
+    <div class="box box-search">
+      <a class="icon icon-busca-textual" href="{% url 'cmj.core:haystack_search'%}" >
+      </a>
+      <div class="inner">
+        <a href="{% url 'cmj.core:haystack_search'%}" class="">Busca Textual</a>
+      </div>
+    </div>
+
+    <div class="box box-parlamentares">
+      <a class="icon icon-parlamentares" href="/parlamentar" >
+      </a>
+      <div class="inner">
+        <a href="/parlamentar" class="">Parlamentares</a>
+      </div>
+    </div>
+
+    {% comment %}
+      <form class="box box-search" method="get" action="{% url 'cmj.core:haystack_search'%}">
+        
+        <a class="icon icon-busca-textual">
+        </a>
+
+        <div class="inner">
+          <input type="search" name="q" placeholder="Busca Textual" class="textinput textInput form-control" id="id_q" autocomplete="off" />
+        </div>
+      </form>
+    {% endcomment %}
+    <div class="box box-documento-administrativo">
+      <a class="icon icon-licitacao" href="{% url 'sapl.protocoloadm:documentoadministrativo_list' %}?o" >
+      </a>
+      <div class="inner">
+        <a href="{% url 'sapl.protocoloadm:documentoadministrativo_list' %}?o" class="">Documentos Administrativos</a>
+      </div>
+    </div>
+    <div class="box box-materia">
+      <a class="icon icon-atividade-legislativa" href="{% url 'sapl.materia:pesquisar_materia' %}" >
+      </a>
+      <div class="inner">
+        <a href="{% url 'sapl.materia:pesquisar_materia' %}" class="">Matérias Legislativas</a>
+      </div>
+    </div>
+    <div class="box box-norma">
+      <a class="icon icon-norma-juridica" href="{% url 'sapl.norma:norma_pesquisa' %}" >
+      </a>
+      <div class="inner">
+        <a href="{% url 'sapl.norma:norma_pesquisa' %}" class="">Legislação Municipal</a>
+      </div>
+    </div>
+    <div class="box box-norma-destaque">
+      <a class="icon icon-norma-juridica-destaque" href="{% url 'sapl.norma:norma_de_destaque' %}" >
+      </a>
+      <div class="inner">
+        <a href="{% url 'sapl.norma:norma_de_destaque' %}" class="">Normas de Destaque</a>
+      </div>
+    </div>
+    <div class="box box-sessao">
+      <a class="icon icon-sessao-plenaria" href="{%url 'sapl.sessao:pesquisar_sessao' %}?data_inicio__year=2019" >
+      </a>
+      <div class="inner">
+        <a href="{%url 'sapl.sessao:pesquisar_sessao' %}?data_inicio__year=2019" class="">Sessões Plenárias</a>
+      </div>
+    </div>
+    <div class="box box-diario-oficial">
+      <a class="icon icon-diario-oficial" href="{% url 'cmj.diarios:diariooficial_list' %}" >
+      </a>
+      <div class="inner">
+        <a href="{% url 'cmj.diarios:diariooficial_list' %}" class="">Diário Oficial</a>
+      </div>
+    </div>
+    <div class="box box-comissao">
+      <a class="icon icon-comissoes" href="{% url 'sapl.comissoes:comissao_list' %}">
+      </a>
+      <div class="inner">
+        <a href="{% url 'sapl.comissoes:comissao_list' %}" class="">Comissões</a>
+      </div>
+    </div>
+    <div class="box box-transparencia">
+      <a class="icon icon-transparencia" href="http://camaradejatai.sigepnet.com.br/?portal=1" >
+      </a>
+      <div class="inner">
+        <a href="http://camaradejatai.sigepnet.com.br/?portal=1" class="">Prestação de Contas</a>
+      </div>
+    </div>
   </div>
-  <div class="inner">
-    <a href="{% url 'sapl.protocoloadm:documentoadministrativo_list' %}?o" class="">Documentos<br>Administrativos</a>
-  </div>
-</div>
-<div class="box bg-green">
-  <div class="icon icon-norma-juridica">
-  </div>
-  <div class="inner">
-    <a href="{% url 'sapl.norma:norma_pesquisa' %}" class="">Legislação<br>Municipal</a>
-  </div>
-</div>
-<div class="box bg-yellow">
-  <div class="icon icon-sessao-plenaria">
-  </div>
-  <div class="inner">
-    <a href="{%url 'sapl.sessao:pesquisar_sessao' %}?data_inicio__year=2019" class="">Sessões<br>Plenárias</a>
-  </div>
-</div>
-<div class="box bg-red">
-  <div class="icon icon-atividade-legislativa">
-  </div>
-  <div class="inner">
-    <a href="{% url 'sapl.materia:pesquisar_materia' %}" class="">Matérias<br>Legislativas</a>
-  </div>
-</div>
-<div class="box bg-maroon">
-  <div class="icon icon-diario-oficial">
-  </div>
-  <div class="inner">
-    <a href="{% url 'cmj.diarios:diariooficial_list' %}" class="">Diário<br>Oficial</a>
-  </div>
-</div>
-<div class="box bg-purple">
-  <div class="icon icon-transparencia">
-  </div>
-  <div class="inner">
-    <a href="http://camaradejatai.sigepnet.com.br/?portal=1" class="">Prestação<br>de Contas</a>
-  </div>
-</div>
+</aside>

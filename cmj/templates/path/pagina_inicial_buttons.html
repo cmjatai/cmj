@@ -1,11 +1,10 @@
 {% load i18n %}
-<div class="col-lg-4 d-flex flex-column mt-4 pt-2 pl-lg-1">
 
   <div class="btn-segmentos btn-search">
     <form method="get" action="{% url 'cmj.core:haystack_search'%}">
       <div class="inner">
         <div class="item-form">
-          <input type="search" name="q" placeholder="Busca Textual" class="textinput textInput form-control" id="id_q" />
+          <input type="search" name="q" placeholder="Busca Textual" class="textinput textInput form-control" id="id_q"  autocomplete="off" />
         </div>
         <div class="item-form">
           <button  class="button" type="submit"value="">
@@ -34,7 +33,7 @@
   </a>
 
   <a href="/radio-cmj/ao-vivo" class="btn-segmentos">
-<i class="fas fa-broadcast-tower"></i>
+    <i class="fas fa-broadcast-tower"></i>
     <span>
       Rádio Câmara - Ao Vivo
     </span>
@@ -46,4 +45,3 @@
       Agenda Legislativa
     </span>
   </a>
-</div>

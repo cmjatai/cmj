@@ -48,18 +48,6 @@
         </div>
       </div>
 
-      {% block canais_absolute %}
-        <aside>
-          <div class="canais-absolute">
-            <a href="#menu-toggle" id="menu-toggle">
-              <i class="fa fa-2x fa-chevron-circle-left" aria-hidden="true"></i>
-              <i class="fa fa-2x fa-chevron-circle-right" aria-hidden="true"></i>
-            </a>
-            {% include "base_sidebar.html" %}
-          </div>
-        </aside>
-      {% endblock canais_absolute%}
-
       <nav class="navbar navbar-topo navbar-expand-lg navbar-dark">
           <div class="container{{fluid}} justify-content-between container-notificacoes">
 
@@ -183,19 +171,21 @@
 
         {% endblock navigation %}
 
+        {% block canais_diretos %}
+          {% include "base_sidebar.html" %}
+        {% endblock canais_diretos%}
 
         {# Header #}
         {% block main_header %}
-          {% block menu_canais_relative %}
-          {% endblock %}
           <header class="masthead">
             <div class="container{{fluid}}">
                 {% block sections_nav %}{% subnav %}{% endblock sections_nav %}
             </div>
           </header>
-
-
         {% endblock main_header %}
+
+
+
 
         <main id="content" class="content page__row screen-lg">
         {% block content_container %}
