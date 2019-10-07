@@ -1,3 +1,33 @@
+@keyframes toggledin {
+  from {
+    width: $width-wrapper-closed;
+    overflow: hidden;
+  }
+  99% {
+    width: $width-wrapper-lg - 1;
+    overflow: hidden;
+  }
+  100% {
+    width: $width-wrapper-lg;
+    overflow: unset;
+  }
+}
+
+@keyframes toggledin_lg {
+  from {
+    width: $width-wrapper-closed * 1.5;
+    overflow: hidden;
+  }
+  99% {
+    width: $width-wrapper-lg * 1.5 - 1;
+    overflow: hidden;
+  }
+  100% {
+    width: $width-wrapper-lg * 1.5;
+    overflow: unset;
+  }
+}
+
 #wrapper {
   padding-left: $width-wrapper-closed;
   
@@ -6,8 +36,6 @@
   }
   
   aside {
-    width: $width-wrapper-lg;
-
     width: $width-wrapper-closed;
     position: fixed;
     top: 0;
@@ -15,9 +43,8 @@
     bottom: 0;
     background: #212a2d $url_bg_png;
     z-index: 2500;
-    transition: width 0.5s ease;
 
-    overflow: hidden;
+    font-size: 1rem;
 
     background: -moz-linear-gradient(left, rgba(9, 20, 38, 0.99) 0%, #000000 100%);
     background: -webkit-linear-gradient(left, rgba(9, 20, 38, 0.99) 0%, #000000 100%);
@@ -71,7 +98,7 @@
       a {
         display: block;
         text-decoration: none;
-        font-size: 1em;
+        font-size: 1rem;
         line-height: 1.5;
         white-space: nowrap;
         padding: 0 10px;
@@ -138,8 +165,8 @@
   
         & > a {
           color: #aaa;
-          font-size: 0em;
-          font-variant: small-caps;
+          font-size: 1.2em;
+          //font-variant: small-caps;
           text-decoration: none;
           white-space: nowrap;
         }
@@ -200,10 +227,7 @@
     }
 
     &:hover {
-      
-      width: $width-wrapper-lg;
       box-shadow: 0 20px 20px #2d3f2f;
-      overflow: unset;
 
       .container-aside {
         opacity: 1;
@@ -217,8 +241,6 @@
           color: white;
         }
       }
-      
-
       .inner {
         display: flex;
       }
@@ -247,6 +269,10 @@
 
       .box {
         flex-direction: column;
+
+        &:not(:last-child)  {
+          border-bottom-width: 0;
+        }
 
         & > .inner {
           text-align: center;
@@ -315,6 +341,20 @@
   }
 }
 
+@media screen and (min-width: 992px) {
+  #wrapper {
+    aside {
+      &:hover {
+        width: $width-wrapper-lg;
+        animation-delay: 0s;
+        animation-duration: 0.7s;
+        animation-name: toggledin; 
+      
+      }
+    }
+  }
+}
+
 @media screen and (min-width: 1200px) {
   #wrapper {
     padding-left: $width-wrapper-closed * 1.5;
@@ -327,16 +367,19 @@
       .icon {
         flex: 0 0 $width-wrapper-closed * 1.5;
       }
-      .box {
-        & > .inner {
-          & > a {
-            font-size: 1.5em;
+      &:hover {
+        width: $width-wrapper-lg * 1.5;
+        animation-delay: 0s;
+        animation-duration: 0.7s;
+        animation-name: toggledin_lg; 
+        
+        .box {
+          & > .inner {
+            & > a {
+              font-size: 1.5em;
+            }
           }
         }
-
-      }
-      &:hover {
-        width:  $width-wrapper-lg * 1.5;
       }
     }
   }
