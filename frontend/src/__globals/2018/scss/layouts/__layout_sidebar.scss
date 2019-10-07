@@ -92,6 +92,9 @@
       &.box-search:hover {
         background: #fff3 !important;
       }
+      &.box-parlamentares:hover {
+        background: #004c40 !important;
+      }
       &.box-documento-administrativo:hover {
         background: #00c0eeaa !important;
       }
@@ -102,7 +105,7 @@
         }
       }
       &.box-norma-destaque:hover{
-        background: #3d9970aa !important;
+        background: #b0b300 !important;
         ul {
           background: #3d9970;
           top: -140px;
@@ -135,7 +138,7 @@
   
         & > a {
           color: #aaa;
-          font-size: 1.1em;
+          font-size: 0em;
           font-variant: small-caps;
           text-decoration: none;
           white-space: nowrap;
@@ -213,7 +216,6 @@
         a {
           color: white;
         }
-
       }
       
 
@@ -287,7 +289,6 @@
       .icon {
         background-size: auto 60%;
       }
-
     }
   }
 }
@@ -301,11 +302,14 @@
       }
       .box {
         & > .inner {
-          padding: 0;
           & > a {
-            display: none;
+            //display: none;
+            padding: 0 3px;
           }
         }
+      }
+      .box-comissao, .box-search, .box-diario-oficial, .box-parlamentares {
+        display:none;
       }
     }
   }
