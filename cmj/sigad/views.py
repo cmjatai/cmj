@@ -12,6 +12,7 @@ from django.db.models.aggregates import Max, Count
 from django.http.response import Http404, HttpResponse, HttpResponseForbidden,\
     HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
@@ -27,7 +28,8 @@ from cmj.sigad.models import Documento, Classe, ReferenciaEntreDocumentos,\
     CaixaPublicacaoRelationship, UrlShortener
 from cmj.utils import make_pagination
 from sapl.crud.base import MasterDetailCrud, Crud
-from sapl.parlamentares.models import Parlamentar, Legislatura
+from sapl.parlamentares.models import Parlamentar, Legislatura,\
+    AfastamentoParlamentar
 
 
 class TabIndexMixin:
@@ -661,6 +663,7 @@ class PathParlamentarView(PathView):
 
                 # if l.numero < 17:
                 #    continue
+                l_atual = l.atual()
 
                 if not legislatura_ativa and l.atual() or \
                         l.pk == legislatura_ativa:
@@ -703,13 +706,45 @@ class PathParlamentarView(PathView):
                                     mandato__legislatura=l
                                 ).exclude(
                                     composicaomesa__sessao_legislativa=s
-                                ).annotate(
-                                    afastado=F('mandato__tipo_afastamento'),
+                                ).order_by(
+                                    '-ativo',
+                                    '-mandato__data_fim_mandato',
+                                    '-mandato__titular',
+                                    'nome_parlamentar')
+                                .annotate(
+                                    data_inicio_mandato=F(
+                                        'mandato__data_inicio_mandato'),
+                                    data_fim_mandato=F(
+                                        'mandato__data_fim_mandato'),
+                                    afastado=F('afastamentoparlamentar'),
                                     titular=F('mandato__titular')
-                                ).order_by('-ativo',
-                                           '-mandato__titular',
-                                           'nome_parlamentar')]
+                                ).distinct()]
                         })
+
+                    if 'parlamentares' in sessao:
+                        n = timezone.now()
+                        sessao['parlamentares'] = sorted(
+                            list(set(sessao['parlamentares'])),
+                            key=lambda x: x.nome_parlamentar)
+
+                        for p in sessao['parlamentares']:
+                            if not l_atual:
+                                p.afastado = False
+                                continue
+
+                            if not p.data_inicio_mandato <= n.date() <= p.data_fim_mandato:
+                                p.afastado = True
+                                continue
+
+                            if not p.afastado:
+                                continue
+
+                            af = p.afastamentoparlamentar_set.filter(
+                                data_inicio__lte=n,
+                                data_fim__gte=n).exists()
+
+                            if not af:
+                                p.afastado = None
 
                     leg['sessoes'].append(sessao)
 
