@@ -11,9 +11,11 @@
   
   {% block actions %}
     <div class="context-actions justify-content-between mb-4">
-      <div class="actions btn-group" role="group">
-        <a href="{{base_url}}?print" class="btn btn-outline-primary">{% trans 'Preparar para impressão' %}</a>
-      </div>
+      {% comment %}
+        <div class="actions btn-group d-none" role="group">
+          <a href="{{base_url}}?print" class="btn btn-outline-primary">{% trans 'Preparar para impressão' %}</a>
+        </div>
+      {% endcomment %}
       {% if not object.temp_check_migrations %}
         <div class="actions btn-group" role="group"> 
           <a href="{% url 'sapl.compilacao:ta_text_edit' object.pk %}?check" class="btn btn-primary">
