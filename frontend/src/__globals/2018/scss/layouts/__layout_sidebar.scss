@@ -1,3 +1,5 @@
+$fator-xl: 1.3;
+
 @keyframes toggledin {
   from {
     width: $width-wrapper-closed;
@@ -15,15 +17,15 @@
 
 @keyframes toggledin_lg {
   from {
-    width: $width-wrapper-closed * 1.5;
+    width: $width-wrapper-closed * $fator-xl * 1.1;
     overflow: hidden;
   }
   99% {
-    width: $width-wrapper-lg * 1.5 - 1;
+    width: $width-wrapper-lg * $fator-xl - 1;
     overflow: hidden;
   }
   100% {
-    width: $width-wrapper-lg * 1.5;
+    width: $width-wrapper-lg * $fator-xl;
     overflow: unset;
   }
 }
@@ -51,19 +53,30 @@
     background: linear-gradient(to right, rgba(9, 20, 38, 0.99) 0%, #000000 100%);
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#091426', endColorstr='#000000',GradientType=1 );
     
+    .aside-hover {
+      color: white;        
+      border-bottom: 1px solid #555;
+      text-align: center;
+      line-height: 2;
+      background-color: #334;
+      display: block;
+      height: 32px;
+
+
+    }
     .container-aside {
       position: absolute;
       display: flex;
       flex-direction: column;
       
-      opacity: 0.6;
+      opacity: 0.7;
 
-      top: 0;
+      top: 32px;
       left: 0;
       bottom: 0;
       right: 0;
     }
-    
+    /*
     ul {
       display: none;
       position: absolute;
@@ -106,7 +119,7 @@
           background-color: #0003;
         }
       }
-    }
+    }*/
 
     .box {
       position: relative;
@@ -165,7 +178,7 @@
   
         & > a {
           color: #aaa;
-          font-size: 1.2em;
+          font-size: 1.1em;
           //font-variant: small-caps;
           text-decoration: none;
           white-space: nowrap;
@@ -233,16 +246,21 @@
         opacity: 1;
       }
 
-      .box:hover {
-        .icon {
-          opacity: 1;
-        }
+      .box {
         a {
           color: white;
         }
-      }
-      .inner {
-        display: flex;
+        &:hover {
+          .icon {
+            opacity: 1;
+          }
+          a {
+            text-shadow: 0 0 20px white;
+          }
+        }
+        .inner {
+          display: flex;
+        }
       }
     }
   }
@@ -258,13 +276,22 @@
     aside {
       width: 100%;
       position: relative;
-      //height: 64px;
+      // height: 64px;
 
+      .aside-hover {
+        display: none;
+      }
+      
       .container-aside {
+        top: 0;
         position: relative;
         display: flex;
         flex-direction: row;
         opacity: 0.8;
+      }
+
+      .aside-hover {
+        display: none;
       }
 
       .box {
@@ -357,18 +384,27 @@
 
 @media screen and (min-width: 1200px) {
   #wrapper {
-    padding-left: $width-wrapper-closed * 1.5;
+    padding-left: $width-wrapper-closed * $fator-xl * 1.1;
     .path-previous {
-      left: $width-wrapper-closed * 1.5 - 41px;
+      left: $width-wrapper-closed * $fator-xl * 1.1 - 41px;
     }
     aside {
-      width:  $width-wrapper-closed * 1.5;
+      width:  $width-wrapper-closed * $fator-xl * 1.1;
+
+
+      .aside-hover {
+        display: none;
+      }
+      .container-aside {
+        top: 0;
+      }
+      
 
       .icon {
-        flex: 0 0 $width-wrapper-closed * 1.5;
+        flex: 0 0 $width-wrapper-closed * $fator-xl * 1.1;
       }
       &:hover {
-        width: $width-wrapper-lg * 1.5;
+        width: $width-wrapper-lg * $fator-xl;
         animation-delay: 0s;
         animation-duration: 0.7s;
         animation-name: toggledin_lg; 
@@ -376,7 +412,7 @@
         .box {
           & > .inner {
             & > a {
-              font-size: 1.5em;
+              font-size: 1.4em;
             }
           }
         }
