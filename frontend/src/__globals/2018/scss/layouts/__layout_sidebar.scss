@@ -52,18 +52,7 @@ $fator-xl: 1.3;
     background: -webkit-linear-gradient(left, rgba(9, 20, 38, 0.99) 0%, #000000 100%);
     background: linear-gradient(to right, rgba(9, 20, 38, 0.99) 0%, #000000 100%);
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#091426', endColorstr='#000000',GradientType=1 );
-    
-    .aside-hover {
-      color: white;        
-      border-bottom: 1px solid #555;
-      text-align: center;
-      line-height: 2;
-      background-color: #334;
-      display: block;
-      height: 32px;
-
-
-    }
+     
     .container-aside {
       position: absolute;
       display: flex;
@@ -71,11 +60,12 @@ $fator-xl: 1.3;
       
       opacity: 0.7;
 
-      top: 32px;
+      top: 0;
       left: 0;
       bottom: 0;
       right: 0;
     }
+
     /*
     ul {
       display: none;
@@ -278,12 +268,7 @@ $fator-xl: 1.3;
       position: relative;
       // height: 64px;
 
-      .aside-hover {
-        display: none;
-      }
-      
       .container-aside {
-        top: 0;
         position: relative;
         display: flex;
         flex-direction: row;
@@ -390,15 +375,6 @@ $fator-xl: 1.3;
     }
     aside {
       width:  $width-wrapper-closed * $fator-xl * 1.1;
-
-
-      .aside-hover {
-        display: none;
-      }
-      .container-aside {
-        top: 0;
-      }
-      
 
       .icon {
         flex: 0 0 $width-wrapper-closed * $fator-xl * 1.1;
