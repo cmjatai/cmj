@@ -302,6 +302,18 @@ h6 {
 
 @import '_alto_contraste';
 
+
+@media only screen and (max-width: 991.98px) {
+  .table{
+    width: auto;
+    white-space: normal;
+    display:block;
+    overflow-x: auto;
+  }
+}
+
+
+
 @media print {
   .screen-lg {
     padding-left: 0;

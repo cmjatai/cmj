@@ -204,17 +204,19 @@ a:link:after, a:visited:after {
       & > a {
         position: absolute;
         white-space: nowrap;
-        line-height: 1.8rem;
+        line-height: 1rem;
         text-align: center;
       }
       &:nth-child(even) {
         & > a {
           top: 100%;
+          margin-top: 5px;
         }
       }
       &:nth-child(odd) {
         & > a {
           bottom: 100%;
+          margin-bottom: 5px;
         }
       }
       
@@ -266,18 +268,19 @@ a:link:after, a:visited:after {
         &:not(:last-child) {
           & > a {
             transform: rotate(-90deg);
-            margin-bottom: 15px;
+            margin-bottom: 25px;
+            font-weight: bold;
           }
         }
-        &:first-child {
+        &:first-child, &:last-child {
           & > a {
             transform: rotate(0deg);
-            margin-bottom: 5px;
+            margin-bottom: 15px;
+            font-weight: bold;
           }
         }
         & > a  {
           margin-bottom: 5px;
-
         }
         &:nth-child(even) {
           & > a {
@@ -1659,6 +1662,18 @@ a:link:after, a:visited:after {
   display: none !important;
 }
 
+@media only screen and (max-width: 991.98px) {
+  .cp {
+    table, .table {
+      width: auto !important;
+      white-space: normal;
+      display:block;
+      overflow-x: auto !important;
+    }
+
+  }
+}
+
 @media only screen and (max-width: 800px) {
 
   .cp .fixed{
@@ -1736,6 +1751,62 @@ a:link:after, a:visited:after {
                 right: 0;
                 left: auto;
               }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media only screen and (max-width: 575.98px) {
+  .cp {
+    .cp-linha-vigencias {
+      & > li {
+        height: 1px;
+        .circle {
+          width:  8px;
+          height: 8px;
+          margin: -4px auto 0;
+        }
+        
+        & > a {
+          font-size: 0.75rem;
+        }
+        &:nth-child(even) {
+          & > a {
+            margin-top: 4px;
+          }
+        }
+        &:nth-child(odd) {
+          & > a {
+            margin-bottom: 4px;
+          }
+        }
+        
+        ul {
+          a {
+            line-height: 1.3rem;
+            font-size: 0.7rem;
+            background: #fff;
+          }     
+        }
+        
+        &.active {
+          .circle {
+            width:  14px;
+            height: 14px;
+            margin: -7px auto 0;
+          }
+          
+          &:not(:last-child) {
+            & > a {
+              margin-bottom: 15px;
+            }
+          }
+          &:first-child, &:last-child {
+            & > a {
+              margin-bottom: 10px;
             }
           }
         }

@@ -17,14 +17,14 @@
       <ul class="cp-linha-vigencias">
         {% for dispositivo in values %}
           <li class="{% if view.inicio_vigencia == dispositivo.inicio_vigencia %}active{%endif%}">
-            <a class="" href="{% url 'sapl.compilacao:ta_vigencia' dispositivo.ta_id dispositivo|get_sign_vigencia %}" title="{% trans 'Vigência entre'%} {{dispositivo.inicio_vigencia}} {% trans 'e'%} {{dispositivo.fim_vigencia}}">{% trans 'Texto Original'%}</a>
+            <a class="" href="{% url 'sapl.compilacao:ta_vigencia' dispositivo.ta_id dispositivo|get_sign_vigencia %}" title="{% trans 'Vigência entre'%} {{dispositivo.inicio_vigencia}} {% trans 'e'%} {{dispositivo.fim_vigencia}}">{% trans 'Texto<br>Original'%}</a>
             <span class="circle"> </span>
           </li>
         {% endfor %}
     {% elif forloop.last %}
       {% for dispositivo in values %}
         <li class="{% if not view.inicio_vigencia%}active{% endif %}">
-          <a class="" href="{% url 'sapl.compilacao:ta_text' dispositivo.ta_id %}" title="{% trans 'Compilação atual'%}.&#013;{% trans 'Vigência a partir de'%} {{dispositivo.inicio_vigencia}}&#013;{% if dispositivo.ta_publicado_id in ta_pub_list %}{{ ta_pub_list|lookup:dispositivo.ta_publicado_id }}{%else%}{%if dispositivo.ta_publicado %}{{dispositivo.ta_publicado}}{%else%}{{dispositivo.ta}}{%endif%}{%endif%}">{% trans 'Texto Atual'%}</a>
+          <a class="" href="{% url 'sapl.compilacao:ta_text' dispositivo.ta_id %}" title="{% trans 'Compilação atual'%}.&#013;{% trans 'Vigência a partir de'%} {{dispositivo.inicio_vigencia}}&#013;{% if dispositivo.ta_publicado_id in ta_pub_list %}{{ ta_pub_list|lookup:dispositivo.ta_publicado_id }}{%else%}{%if dispositivo.ta_publicado %}{{dispositivo.ta_publicado}}{%else%}{{dispositivo.ta}}{%endif%}{%endif%}">{% trans 'Texto<br>Atual'%}</a>
           <span class="circle"> </span>
         </li>
         {% if forloop.parentloop.last %}
