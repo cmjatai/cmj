@@ -16,7 +16,7 @@
           <a href="{{base_url}}?print" class="btn btn-outline-primary">{% trans 'Preparar para impressão' %}</a>
         </div>
       {% endcomment %}
-      {% if perms.compilacao.change_textoarticulado %}
+      {% if perms.compilacao.add_textoarticulado %}
         {% if not object.temp_check_migrations %}
           <div class="actions btn-group" role="group"> 
             <a href="{% url 'sapl.compilacao:ta_text_edit' object.pk %}?check" class="btn btn-primary">
