@@ -7,6 +7,7 @@ from model_utils import Choices
 import reversion
 
 from cmj.core.models import CertidaoPublicacao
+from cmj.utils import restringe_tipos_de_arquivo_midias
 from sapl.base.models import Autor
 from sapl.compilacao.models import TextoArticulado
 from sapl.materia.models import MateriaLegislativa
@@ -378,7 +379,7 @@ class AnexoNormaJuridica(models.Model):
         upload_to=norma_upload_path,
         verbose_name=_('Arquivo Anexo'),
         storage=OverwriteStorage(),
-        validators=[restringe_tipos_de_arquivo_txt])
+        validators=[restringe_tipos_de_arquivo_midias])
     ano = models.PositiveSmallIntegerField(verbose_name=_('Ano'),
                                            choices=RANGE_ANOS)
 
