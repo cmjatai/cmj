@@ -14,7 +14,7 @@
   <div class="item-raiz">
     <div class="links-texto">
       {% if object.texto_original %}
-        <a class="link-texto" target="_blank"  href="{{object.texto_original.url}}" title="Texto Original">
+        <a class="link-texto" target="_blank"  href="{{object.texto_original.url}}?u={% now "u"%}" title="Texto Original">
           <i class="far fa-2x fa-file-{% if '.pdf' in object.texto_original.path %}pdf{% else %}archive{% endif %}"></i>
           <br>
           Texto Original

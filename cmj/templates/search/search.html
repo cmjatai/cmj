@@ -50,7 +50,7 @@
                   {% with result.object as m %}
                     <div class="links-texto">
                       {% if m.texto_original %}
-                        <a class="link-texto" href="{{m.texto_original.url}}" title="Texto Original">
+                        <a class="link-texto" href="{{m.texto_original.url}}?u={% now "u"%}" title="Texto Original">
                           <i class="far fa-2x fa-file-{% if '.pdf' in m.texto_original.path %}pdf{% else %}archive{% endif %}"></i>
                         </a>
                       {% endif %}
@@ -103,7 +103,7 @@
                 {% elif result.model_name == 'documentoacessorio' %}
                   <div class="links-texto">
                     {% if result.object.arquivo %}
-                      <a class="link-texto" href="{{result.object.arquivo.url}}" title="Documento Acessório">
+                      <a class="link-texto" href="{{result.object.arquivo.url}}?u={% now "u"%}" title="Documento Acessório">
                         <i class="far fa-2x fa-file-{% if '.pdf' in result.object.arquivo.path %}pdf{% else %}archive{% endif %}"></i>
                       </a>
                     {% endif %}
@@ -120,7 +120,7 @@
                 {% elif result.model_name == 'documentoadministrativo' %}
                   <div class="links-texto">
                     {% if result.object.texto_integral %}
-                      <a class="link-texto" href="{{result.object.texto_integral.url}}" title="Documento Administrativo">
+                      <a class="link-texto" href="{{result.object.texto_integral.url}}?u={% now "u"%}" title="Documento Administrativo">
                         <i class="far fa-2x fa-file-{% if '.pdf' in result.object.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
                       </a>
                     {% endif %}
@@ -176,7 +176,7 @@
                 {% elif result.model_name == 'diariooficial' %}
                     <div class="links-texto">
                       {% if result.object.arquivo %}
-                        <a class="link-texto" href="{{result.object.arquivo.url}}" title="Arquivo do Diários Oficial">
+                        <a class="link-texto" href="{{result.object.arquivo.url}}?u={% now "u"%}" title="Arquivo do Diários Oficial">
                           <i class="far fa-2x fa-file-{% if '.pdf' in result.object.arquivo.path %}pdf{% else %}archive{% endif %}"></i>
                         </a>
                       {% endif %}
@@ -193,7 +193,7 @@
                 {% elif result.model_name == 'normajuridica' %}
                   <div class="links-texto">
                     {% if result.object.texto_integral %}
-                      <a class="link-texto" href="{{result.object.texto_integral.url}}" title="Arquivo Digitalizado da Norma ">
+                      <a class="link-texto" href="{{result.object.texto_integral.url}}?u={% now "u"%}" title="Arquivo Digitalizado da Norma ">
                         <i class="far fa-2x fa-file-{% if '.pdf' in result.object.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
                       </a>
                     {% endif %}
@@ -224,7 +224,7 @@
                     
                     <br><strong>Data:</strong> {{result.object.data_inicio}}
                     {% if result.object.upload_ata %}
-                      <br><strong>Ata da Sessão:</strong><a href="{{result.object.upload_ata.url}}">Clique aqui</a>
+                      <br><strong>Ata da Sessão:</strong><a href="{{result.object.upload_ata.url}}?u={% now "u"%}">Clique aqui</a>
                     {% endif %}
 
 
@@ -244,7 +244,7 @@
                           {% endif %}
 
                           <div class="avatar">
-                            <img src="{{p.fotografia.url}}" alt="{{p.nome_parlamentar}}">
+                            <img src="{{p.fotografia.url}}?u={% now "u"%}" alt="{{p.nome_parlamentar}}">
                           </div>
 
                           {% if forloop.last %}
