@@ -416,6 +416,10 @@ class ResponseFileMixin:
         response['Content-Disposition'] = (
             'inline; filename="%s"' % arquivo.name.split('/')[-1])
 
+        response['Cache-Control'] = 'no-cache'
+        response['Pragma'] = 'no-cache'
+        response['Expires'] = 0
+
         original = 'original__' if 'original' in request.GET else ''
         response['X-Accel-Redirect'] = "/media/{0}{1}".format(
             original,
