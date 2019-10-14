@@ -289,19 +289,60 @@
 .nav-pagination {
   margin-top: 15px;
 }
+
+.container-leis-capa {
+  line-height: 1;
+  .row {
+    margin: 0;
+    padding: 0;
+  }
+  div {
+    padding: 0;
+  }
+  .title {
+    border-radius: 0;
+    padding: 0 10px;
+    line-height: 1.1;
+    margin-left: 10px;
+    color: white;
+    font-variant: small-caps;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  a {
+    display: block;
+    border-radius: 0;
+    color: white;
+    font-weight: bold;
+    font-size: 0.9rem;
+  }
+}
+
+
 @media screen and (max-width: 991px) {
   // TODO: resolver essa parte de acessibilidade em telas menores
   .header-accessibility {
     .links-to-content {
       overflow: hidden;
       height: 0px;
-
     }
   }
+
+.container-leis-capa {
+  a {
+    font-size: 0.9rem;
+  }
+}
+
 }
 
 
 @media screen and (max-width: 767px) {
+
+  .container-leis-capa {
+    a {
+      padding: 4px 2px;
+    }
+  }
 
   .item-listas {
     font-size: 80%;
@@ -341,6 +382,12 @@
 
 
 @media screen and (max-width: 575.98px) {
+
+  .container-leis-capa {
+    a {
+      font-size: 0.7rem;
+    }
+  }
 
   .nav-pagination {
     .pagination {
