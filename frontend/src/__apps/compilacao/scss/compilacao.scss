@@ -461,6 +461,14 @@ a:link:after, a:visited:after {
       a, table, table td {
         color: #018 !important;
       }
+      .desativado {
+        text-decoration: line-through;
+        color: #999 !important;
+        a, table, table td  {
+          text-decoration: line-through;
+          color: #999 !important;
+        }
+      }
     }
 
     .card-header {
