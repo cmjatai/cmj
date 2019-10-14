@@ -361,8 +361,10 @@ a:link:after, a:visited:after {
     .titulo_generico {
       text-align: center;
       margin-bottom: 1em;
-      font-size: 1.15em;
+      font-size: 1.5em;
       margin-top: 3em;
+      font-weight: bold;
+      font-variant: small-caps;
     }
 
     .anexo,
@@ -528,6 +530,7 @@ a:link:after, a:visited:after {
           }
 
           .ntitulo {
+            font-size: 0.8rem;
             font-weight: bold;
             color: #03A203;
             text-decoration: none;
@@ -536,6 +539,8 @@ a:link:after, a:visited:after {
             }
           }
           .ntexto {
+            font-variant: normal;
+            font-size: 0.8rem;
 
             color: rgb(1, 136, 1);
             a{
