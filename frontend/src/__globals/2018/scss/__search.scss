@@ -15,6 +15,9 @@
     padding-right: 2em;
     color: rgba(0, 101, 86, 0.7);
   }
+  .form-group {
+    padding-top: 1em;
+  }
 
   .collapse {
     margin: 10px 0;
@@ -22,7 +25,8 @@
   .btn-ajuda {
     position: absolute;
     right: 1em;
-    z-index: 1;
+    line-height: 1;
+    padding: 5px 15px 3px;
   }
 }
 
@@ -152,6 +156,36 @@
     }
   }
 }
+
+@media screen and (max-width: 767.98px) {
+  .container-search__ {
+    ul {
+      list-style: none;
+    }
+    input {
+      font-size: 2em;
+      line-height: 1em;
+    }
+    label {
+      font-size: 1.3em;
+      line-height: 1.5em;
+    }
+    button {
+      padding-left: 2em;
+      padding-right: 2em;
+      color: rgba(0, 101, 86, 0.7);
+    }
+  
+    .collapse {
+      margin: 10px 0;
+    }
+    .btn-ajuda {
+      position: relative;
+    }
+  }
+  
+}
+
 @media screen and (max-width: 480px) {
   .container-search {
     font-size: 0.8em;

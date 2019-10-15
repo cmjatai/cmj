@@ -2,64 +2,69 @@
 {% load crispy_forms_tags  cropping thumbnail  %}
 {% load common_cmj_tags %}
 
+{% block title %}
+  <h1 class="page-header container-search" >
+    Pesquisa Textual
+      <a class="btn btn-warning btn-ajuda" data-toggle="collapse" href="#collapseAjudaBuscaTextual" role="button" aria-expanded="false" aria-controls="collapseAjudaBuscaTextual">
+        ?
+      </a>
+  </h1>
+{% endblock title %}
+
+
 {% block base_content %}
 <div class="container-search">
 
   <form method="get" action=".">
-
-      <a class="btn btn-warning btn-ajuda" data-toggle="collapse" href="#collapseAjudaBuscaTextual" role="button" aria-expanded="false" aria-controls="collapseAjudaBuscaTextual">
-        ?
-      </a>
-
-<div class="collapse" id="collapseAjudaBuscaTextual">
+    <div class="collapse" id="collapseAjudaBuscaTextual">
       <div class="clearfix"></div>
-  <div class="card card-body">
-    <h2 class="card-title">Pesquisar uma correspondência exata</h2>
-    <p class="card-text">
-      Coloque o conteúdo entre aspas. Por exemplo: 
-       <span class="text-green">"Inclusão Social das Pessoas com Deficiência"</span>
-    </p>
-  </div> 
-   <div class="card card-body">
-    <h2 class="card-title">Excluir palavras da pesquisa</h2>
-    <p class="card-text">
-      Coloque o sinal de "-" antes da palavra que não deve aparecer na pesquisa. Por exemplo: 
-       <span class="text-green">servidor -executivo</span>
-    </p>
-  </div>
-   <div class="card card-body">
-    <h2 class="card-title">Combinar pesquisas</h2>
-    <p class="card-text">
-      Coloque "OR" na consulta. Por exemplo: 
-       <span class="text-green">servidor OR executivo</span>
-    </p>
-  </div>
-   <div class="card card-body">
-    <h2 class="card-title">Restringir pesquisas</h2>
-    <p class="card-text">Coloque "AND" na consulta. Por exemplo: 
-       <span class="text-green">servidor AND executivo</span>
-       <br><small>palavras soltas já são pesquisadas como se você colocasse "AND", ou seja,
-       pesquisar <span class="text-green">servidor AND executivo</span> é o mesmo que <span class="text-green">servidor executivo</span></small>. 
-    </p>
-  </div>
-   <div class="card card-body">
-    <h2 class="card-title">Combinar as opções de pesquisa</h2>
-    <p class="card-text">
-       Uma pesquisa exata com uma exclusão. Por exemplo:
-       <span class="text-green">"servidor efetivo" -câmara</span>
-       <br>
-       Duas pesquisas exatas. Por exemplo:
-       <span class="text-green">"audiência pública" AND "diretrizes orçamentárias"</span>
-       <br>
-       Duas pesquisas exatas e que o resultado tenha ao menos uma delas. Por exemplo:
-       <span class="text-green">"audiência pública" OR "diretrizes orçamentárias"</span>
-       <br>
-       Duas pesquisas exatas, que o resultado tenha ao menos uma delas e que não tenha a palavra "diário". Por exemplo:
-       <span class="text-green">"audiência pública" OR "diretrizes orçamentárias" -diário</span>
-       <br>
-    </p>
-  </div>
-</div>
+      <div class="card card-body">
+        <h2 class="card-title">Pesquisar uma correspondência exata</h2>
+        <p class="card-text">
+          Coloque o conteúdo entre aspas. Por exemplo: 
+          <span class="text-green">"Inclusão Social das Pessoas com Deficiência"</span>
+        </p>
+      </div> 
+      <div class="card card-body">
+        <h2 class="card-title">Excluir palavras da pesquisa</h2>
+        <p class="card-text">
+          Coloque o sinal de "-" antes da palavra que não deve aparecer na pesquisa. Por exemplo: 
+          <span class="text-green">servidor -executivo</span>
+        </p>
+      </div>
+      <div class="card card-body">
+        <h2 class="card-title">Combinar pesquisas</h2>
+        <p class="card-text">
+          Coloque "OR" na consulta. Por exemplo: 
+          <span class="text-green">servidor OR executivo</span>
+        </p>
+      </div>
+      <div class="card card-body">
+        <h2 class="card-title">Restringir pesquisas</h2>
+        <p class="card-text">Coloque "AND" na consulta. Por exemplo: 
+          <span class="text-green">servidor AND executivo</span>
+          <br><small>palavras soltas já são pesquisadas como se você colocasse "AND", ou seja,
+          pesquisar <span class="text-green">servidor AND executivo</span> é o mesmo que <span class="text-green">servidor executivo</span></small>. 
+        </p>
+      </div>
+      <div class="card card-body">
+        <h2 class="card-title">Combinar as opções de pesquisa</h2>
+        <p class="card-text">
+          Uma pesquisa exata com uma exclusão. Por exemplo:
+          <span class="text-green">"servidor efetivo" -câmara</span>
+          <br>
+          Duas pesquisas exatas. Por exemplo:
+          <span class="text-green">"audiência pública" AND "diretrizes orçamentárias"</span>
+          <br>
+          Duas pesquisas exatas e que o resultado tenha ao menos uma delas. Por exemplo:
+          <span class="text-green">"audiência pública" OR "diretrizes orçamentárias"</span>
+          <br>
+          Duas pesquisas exatas, que o resultado tenha ao menos uma delas e que não tenha a palavra "diário". Por exemplo:
+          <span class="text-green">"audiência pública" OR "diretrizes orçamentárias" -diário</span>
+          <br>
+        </p>
+      </div>
+    </div>
 
     <div class="row">
       {% crispy form %}
