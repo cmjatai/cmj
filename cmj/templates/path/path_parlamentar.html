@@ -7,7 +7,6 @@
 {% block base_header %}
   <div class="container-fluid container-topo-parlamentar">
     <div class="inner">
-
       <div class="path-capa {% if not object.parlamentar.fotografia  %}path-capa-semfoto{% endif %}" {% if object.parlamentar.fotografia  %}style="background-image: url({% thumbnail object.parlamentar.fotografia 1000x1000 box=object.parlamentar.cropping crop detail %});"{% endif %}>
           <div class="container-social">
             <div class="container">

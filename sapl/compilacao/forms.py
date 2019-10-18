@@ -776,7 +776,7 @@ class DispositivoSearchModalForm(Form):
         choices=[(10, _('Dez Dispositivos')),
                  (30, _('Trinta Dispositivos')),
                  (50, _('Cinquenta Dispositivos')),
-                 (0, _('Tudo que atender aos Critérios da Busca'))],
+                 (100, _('Cem Dispositivos'))],
         widget=forms.Select(),
         required=False)
 

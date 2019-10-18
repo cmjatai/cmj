@@ -136,7 +136,7 @@ class CmjSearchView(SearchView):
 
     def get_context(self):
         context = super().get_context()
-        context['title'] = _('Pesquisa Textual')
+        #context['title'] = _('Pesquisa Textual')
 
         if 'models' in self.request.GET:
             models = self.request.GET.getlist('models')

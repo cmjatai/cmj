@@ -3049,201 +3049,164 @@ class DispositivoSearchFragmentFormView(ListView):
                 itens.append(item)
             return JsonResponse(itens, safe=False)
 
-        response = ListView.get(self, request, *args, **kwargs)
-
-        if not self.object_list or \
-                not isinstance(self.object_list, list) and \
-                not self.object_list.exists():
-            messages.info(
-                request, _('Não foram encontrados resultados '
-                           'com seus critérios de busca!'))
-            username = self.request.user.username
-            self.logger.error("user=" + username + ". Não foram encontrados "
-                              "resultados com esses critérios de busca. "
-                              "id_tipo_ta=".format(request.GET['tipo_ta']))
-
-        try:
-            r = response.render()
-            return response
-        except Exception as e:
-            messages.error(request, "Erro - %s" % str(e))
-            context = {}
-            self.template_name = 'compilacao/messages.html'
-            username = self.request.user.username
-            self.logger.error("user=" + username + ". " + str(e))
-            return self.render_to_response(context)
+        return ListView.get(self, request, *args, **kwargs)
 
     def get_queryset(self):
+        result = []
+
         try:
-            n = 10
-            if 'max_results' in self.request.GET:
-                n = int(self.request.GET['max_results'])
-
-            q = Q()
-            if 'initial_ref' in self.request.GET:
-                initial_ref = self.request.GET['initial_ref']
-                if initial_ref:
-                    q = q & Q(pk=initial_ref)
-
-                result = Dispositivo.objects.filter(q).select_related(
-                    'ta').exclude(
-                    tipo_dispositivo__dispositivo_de_alteracao=True)
-
-                return result[:n]
-
-            str_texto = ''
-            texto = ''
-            rotulo = ''
-            num_ta = ''
-            ano_ta = ''
-
-            if 'texto' in self.request.GET:
-                str_texto = self.request.GET['texto']
-
+            tipo_model = self.request.GET.get('tipo_model', '')
+            limit = int(self.request.GET.get('max_results', 100))
+            tipo_ta = self.request.GET.get('tipo_ta', '')
+            num_ta = self.request.GET.get('num_ta', '')
+            ano_ta = self.request.GET.get('ano_ta', '')
+            rotulo = self.request.GET.get('rotulo', '')
+            str_texto = self.request.GET.get('texto', '')
             texto = str_texto.split(' ')
 
-            if 'rotulo' in self.request.GET:
-                rotulo = self.request.GET['rotulo']
-                if rotulo:
-                    q = q & Q(rotulo__icontains=rotulo)
-
-            for item in texto:
-                if not item:
-                    continue
-                if q:
-                    q = q & (Q(texto__icontains=item) |
-                             Q(texto_atualizador__icontains=item))
-                else:
-                    q = (Q(texto__icontains=item) |
-                         Q(texto_atualizador__icontains=item))
-
-            if 'tipo_ta' in self.request.GET:
-                tipo_ta = self.request.GET['tipo_ta']
-                if tipo_ta:
-                    q = q & Q(ta__tipo_ta_id=tipo_ta)
-
-            if 'num_ta' in self.request.GET:
-                num_ta = self.request.GET['num_ta']
-                if num_ta:
-                    q = q & Q(ta__numero=num_ta)
-
-            if 'ano_ta' in self.request.GET:
-                ano_ta = self.request.GET['ano_ta']
-                if ano_ta:
-                    q = q & Q(ta__ano=ano_ta)
-
-            if not q.children and not n:
-                n = 10
-            q = q & Q(nivel__gt=0)
-
-            result = Dispositivo.objects.order_by(
-                '-ta__data',
-                '-ta__ano',
-                '-ta__numero',
-                'ta',
-                'ordem').filter(q).select_related('ta')
-
-            if 'data_type_selection' in self.request.GET and\
-                    self.request.GET['data_type_selection'] == 'checkbox':
-                result = result.exclude(
-                    tipo_dispositivo__dispositivo_de_alteracao=True)
-            else:
-                if 'data_function' in self.request.GET and\
-                        self.request.GET['data_function'] == 'alterador':
-                    result = result.exclude(
-                        tipo_dispositivo__dispositivo_de_alteracao=False,
-                    )
-                    result = result.exclude(
-                        tipo_dispositivo__dispositivo_de_articulacao=False,
-                    )
-                    print(str(result.query))
-
-            def resultados(r):
-                if n:
-                    return r[:n]
-                else:
-                    return r
-
-                """if num_ta and ano_ta and not rotulo and not str_texto and\
-                        'data_type_selection' in self.request.GET and\
-                        self.request.GET['data_type_selection'] == 'checkbox':
-                    return r
-                else:
-                    return r[:n]"""
-
-            if 'tipo_model' not in self.request.GET:
-                return resultados(result)
-
-            tipo_model = self.request.GET['tipo_model']
-            if not tipo_model:
-                return resultados(result)
-
-            integrations_view_names = get_integrations_view_names()
-
-            tipo_ta = TipoTextoArticulado.objects.get(pk=tipo_ta)
+            tipo_resultado = self.request.GET.get('tipo_resultado', '')
+            tipo_resultado = '' if tipo_resultado == 'False' else tipo_resultado
 
             model_class = None
-            for item in integrations_view_names:
-                if hasattr(item, 'model_type_foreignkey') and\
-                        hasattr(item, 'model'):
-                    if (tipo_ta.content_type.model ==
-                        item.model.__name__.lower() and
-                            tipo_ta.content_type.app_label ==
-                            item.model._meta.app_label):
 
-                        model_class = item.model
-                        model_type_class = item.model_type_foreignkey
-                        tipo_model = item.model_type_foreignkey.objects.get(
-                            pk=tipo_model)
-                        break
+            if tipo_ta:
+                tipo_ta = TipoTextoArticulado.objects.get(pk=tipo_ta)
 
-            if not model_class:
-                return resultados(result)
+            if tipo_ta and tipo_model:
+                integrations_view_names = get_integrations_view_names()
+                for item in integrations_view_names:
+                    if hasattr(item, 'model_type_foreignkey') and\
+                            hasattr(item, 'model'):
+                        if (tipo_ta.content_type.model ==
+                            item.model.__name__.lower() and
+                                tipo_ta.content_type.app_label ==
+                                item.model._meta.app_label):
+
+                            model_class = item.model
+                            model_type_class = item.model_type_foreignkey
+                            tipo_model = item.model_type_foreignkey.objects.get(
+                                pk=tipo_model)
+                            break
 
             column_field = ''
-            for field in model_class._meta.fields:
-                if field.related_model == model_type_class:
-                    column_field = field.column
-                    break
+            if model_class:
+                for field in model_class._meta.fields:
+                    if field.related_model == model_type_class:
+                        column_field = field.column
+                        break
 
-            if not column_field:
-                return resultados(result)
+            dts = self.request.GET.get('data_type_selection', '')
+            df = self.request.GET.get('data_function', '')
+
+            AND_CONTROLS = ''
+            if dts == 'checkbox':
+                AND_CONTROLS = 'AND td.dispositivo_de_alteracao = false'
+            else:
+                if df == 'alterador':
+                    AND_CONTROLS = '''AND td.dispositivo_de_alteracao = true 
+                                    AND td.dispositivo_de_articulacao = true'''
+
+            texto = list(map("d.texto ~* '{}'".format, texto))
+            if str_texto and rotulo:
+                AND_TEXTO_ROTULO = '''AND (  ({BUSCA_TEXTO} AND d.rotulo ~* '{BUSCA_ROTULO}')  OR
+                                         ({BUSCA_TEXTO} AND d.rotulo = '' AND dp.rotulo ~* '{BUSCA_ROTULO}')  
+                                      )'''.format(
+                    BUSCA_TEXTO=' AND '.join(texto),
+                    BUSCA_ROTULO=rotulo
+                )
+            elif str_texto:
+                AND_TEXTO_ROTULO = ' AND '.join(texto)
+            elif rotulo:
+                AND_TEXTO_ROTULO = "AND d.rotulo ~* '{BUSCA_ROTULO}'".format(
+                    BUSCA_ROTULO=rotulo)
+
+            jtms = ''  # JOIN_TYPE_MODEL_SELECTED
+            atms = ''  # AND_TYPE_MODEL_SELECTED
+            if tipo_model:
+                jtms = 'JOIN {gfk_table} gfkt on (gfkt.id = ta.object_id)'.format(
+                    gfk_table=model_class._meta.db_table)
+                atms = 'AND gfkt.{gfk_field_type} = {gfk_field_type_id}'.format(
+                    gfk_field_type=column_field,
+                    gfk_field_type_id=tipo_model.id,
+                )
+
+            sql = ''' 
+                SELECT d.* FROM compilacao_dispositivo d 
+                    JOIN compilacao_dispositivo dp on (d.dispositivo_pai_id = dp.id)
+                    JOIN compilacao_tipodispositivo td on (d.tipo_dispositivo_id = td.id)
+                    JOIN compilacao_textoarticulado ta on (d.ta_id = ta.id) 
+                    
+                    {JOIN_TYPE_MODEL_SELECTED}
+                    
+                    where d.nivel > 0
+                    
+                    {AND_TYPE_MODEL_SELECTED}
+                    
+                    {AND_TEXTO_ROTULO}
+                    {AND1_NUMERO}
+                    {AND2_ANO}
+                    {AND3_TIPO_TA}
+                    {AND_CONTROLS}
+                   
+                    order by ta.data desc, 
+                            ta.numero desc, 
+                            ta.id desc, 
+                            d.ordem 
+                    {limit}; 
+                '''.format(
+
+                limit='limit {}'.format(limit) if limit else '',
+
+                JOIN_TYPE_MODEL_SELECTED=jtms,
+                AND_TYPE_MODEL_SELECTED=atms,
+
+                AND3_TIPO_TA="AND ta.tipo_ta_id = {}".format(
+                    tipo_ta.id) if tipo_ta else '',
+
+                AND2_ANO="AND ta.ano = {}".format(
+                    ano_ta) if ano_ta else '',
+
+                AND1_NUMERO="AND ta.numero ~* '{}'".format(
+                    num_ta) if num_ta else '',
+
+                AND_TEXTO_ROTULO=AND_TEXTO_ROTULO if AND_TEXTO_ROTULO else '',
+                AND_CONTROLS=AND_CONTROLS if AND_CONTROLS else ''
+            )
+
+            result = Dispositivo.objects.raw(sql)
 
             r = []
+            ids = set()
 
-            """
-            ao integrar um model ao app de compilação, se este model possuir
+            def proc_dispositivos(ds):
 
-                texto_articulado = GenericRelation(
-                    TextoArticulado, related_query_name='texto_articulado')
+                for d in ds:
+                    if d.id not in ids:
+                        r.append(d)
+                        ids.add(d.id)
 
-            será uma integração mais eficiente para as buscas de Dispositivos
-            """
-            if hasattr(model_class, 'texto_articulado'):
-                q = q & Q(**{
-                    'ta__texto_articulado__' + column_field: tipo_model.pk
-                })
-                if n:
-                    result = result.filter(q)[:n]
-                else:
-                    result = result.filter(q)
+                    if tipo_resultado == 'I':
+                        proc_dispositivos(d.dispositivos_filhos_set.filter(
+                            tipo_dispositivo__dispositivo_de_alteracao=False
+                        ))
+                    elif tipo_resultado == 'S' and ds == result:
+                        seq = Dispositivo.objects.filter(
+                            ta=d.ta,
+                            ordem__gt=d.ordem,
+                            nivel__gt=0,
+                            tipo_dispositivo__dispositivo_de_alteracao=False
+                        )
+                        proc_dispositivos(seq[:limit])
 
-            for d in result:
-                if not d.ta.content_object or\
-                        not hasattr(d.ta.content_object, column_field):
-                    continue
+            proc_dispositivos(result)
 
-                if tipo_model.pk == getattr(d.ta.content_object, column_field):
-                    r.append(d)
-
-                if (len(r) == n and (not num_ta or
-                                     not ano_ta or rotulo or str_texto)):
-                    break
             return r
 
         except Exception as e:
             username = self.request.user.username
             self.logger.error("user=" + username + ". " + str(e))
+            return []
+        pass
 
 
 class DispositivoSearchModalView(FormView):
