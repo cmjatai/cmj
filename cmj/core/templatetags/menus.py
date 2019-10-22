@@ -9,21 +9,21 @@ register = template.Library()
 
 
 @register.inclusion_tag('menus/menu.html', takes_context=True)
-def menu(context, path=None):
-    return nav_run(context, path)
+def menu(context, path=None, pk=None):
+    return nav_run(context, path, pk)
 
 
 @register.inclusion_tag('menus/subnav.html', takes_context=True)
-def subnav(context, path=None):
-    return nav_run(context, path)
+def subnav(context, path=None, pk=None):
+    return nav_run(context, path, pk)
 
 
 @register.inclusion_tag('menus/nav.html', takes_context=True)
-def navbar(context, path=None):
-    return nav_run(context, path)
+def navbar(context, path=None, pk=None):
+    return nav_run(context, path, pk)
 
 
-def nav_run(context, path=None):
+def nav_run(context, path=None, pk=None):
     """Renderiza sub navegação para objetos no padrão Mestre Detalhe
 
     Existem três possíveis fontes de busca do yaml
@@ -39,11 +39,17 @@ def nav_run(context, path=None):
             será realizado o teste de permissão para renderizá-lo.
     """
     menu = None
-    root_pk = context.get('root_pk', None)
-    if not root_pk:
-        obj = context.get('object', None)
-        if obj:
-            root_pk = obj.pk
+    
+    if not pk:
+        root_pk = context.get('root_pk', None)
+        if not root_pk:
+            obj = context.get('object', None)
+            if obj:
+                root_pk = obj.pk
+    else:
+        root_pk = pk
+            
+            
 
     if root_pk or 'subnav_template_name' in context or path:
         request = context['request']

@@ -468,6 +468,24 @@
 
 
 .container-path-parlamentar {
+  .avatar {
+    img {
+      border: 1px solid #ddd;
+    }
+  }
+  .path-title {
+    text-align: left;
+    margin: 0;
+  }
+  .path-topo {
+    padding-bottom: 1em;
+    border-bottom: 1px solid red;
+  }
+
+}
+
+
+.container-path-parlamentar__old {
   margin-top: -$grid-gutter-width;
 
   .container-topo-parlamentar {
@@ -795,7 +813,7 @@
 
 @media screen and (max-width:767px) {
 
-  .container-path-parlamentar {
+  .container-path-parlamentar__old {
     .container-list {
       grid-template-columns: 100%;
     }
