@@ -1439,7 +1439,7 @@ class DocumentoAcessorioCrud(MasterDetailCrud):
     public = [RP_LIST, RP_DETAIL]
 
     class BaseMixin(MasterDetailCrud.BaseMixin):
-        list_field_names = ['nome', 'tipo', 'data', 'autor', 'arquivo']
+        list_field_names = ['nome', 'tipo', 'data', 'autor']
 
     class CreateView(MasterDetailCrud.CreateView):
         form_class = DocumentoAcessorioForm
@@ -1455,6 +1455,12 @@ class DocumentoAcessorioCrud(MasterDetailCrud):
     class ListView(MasterDetailCrud.ListView):
         paginate_by = None
 
+        def hook_nome(self, obj, default, url):
+            return """
+            <a href="{}" pk="{}" class="d-block text-center">{}</a><br>
+            <a href="{}" pk="{}" class="d-block text-center">Arquivo<br>Digitalizado</a>
+            """.format(
+                url, obj.id, obj.nome, obj.arquivo.url, obj.id), ''
 
 class AutoriaCrud(MasterDetailCrud):
     model = Autoria

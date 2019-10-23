@@ -562,6 +562,7 @@ class DocumentoAcessorio(models.Model):
     class Meta:
         verbose_name = _('Documento Acessório')
         verbose_name_plural = _('Documentos Acessórios')
+        ordering = 'data', 'id'
 
     def __str__(self):
         return _('%(tipo)s - %(nome)s de %(data)s por %(autor)s') % {
