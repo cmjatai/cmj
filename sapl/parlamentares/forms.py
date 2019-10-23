@@ -213,7 +213,9 @@ class ParlamentarForm(FileFieldCheckMixin, ModelForm):
 
         widgets = {
             'fotografia': CustomImageCropWidget(),
-            'cropping': CropWidget(),
+            'fotografia_cropping': CropWidget(),
+            'capa': CustomImageCropWidget(),
+            'capa_cropping': CropWidget(),
             'biografia': forms.Textarea(
                 attrs={'id': 'texto-rico'})}
 
@@ -248,6 +250,7 @@ class ParlamentarCreateForm(ParlamentarForm):
     class Meta(ParlamentarForm.Meta):
         widgets = {
             'fotografia': forms.ClearableFileInput(),
+            'capa': forms.ClearableFileInput(),
             'biografia': forms.Textarea(
                 attrs={'id': 'texto-rico'})
         }

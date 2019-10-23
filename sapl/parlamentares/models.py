@@ -227,6 +227,11 @@ def foto_upload_path(instance, filename):
     return texto_upload_path(instance, filename, subpath='')
 
 
+
+def capa_upload_path(instance, filename):
+    return texto_upload_path(instance, filename, subpath='capa', pk_first=True)
+
+
 def true_false_none(x):
     if x == 'True':
         return True
@@ -318,10 +323,21 @@ class Parlamentar(models.Model):
     fotografia = ImageCropField(
         verbose_name=_('Fotografia'), upload_to=foto_upload_path,
         validators=[restringe_tipos_de_arquivo_img], null=True, blank=True)
-    cropping = ImageRatioField(
+    fotografia_cropping = ImageRatioField(
         'fotografia', '128x128', verbose_name=_('Avatar'), size_warning=True,
         help_text=_('A configuração do Avatar '
                     'é possível após a atualização da fotografia.'))
+    
+    
+    capa = ImageCropField(
+        verbose_name=_('Imagem de Capa'), upload_to=capa_upload_path,
+        validators=[restringe_tipos_de_arquivo_img], null=True, blank=True)
+
+    capa_cropping = ImageRatioField(
+        'capa', '280x105', verbose_name=_('Capa'), size_warning=True,
+        help_text=_('A configuração da capa '
+                    'é possível após a atualização.'))
+    
 
     # campo conceitual de reversão genérica para o model Autor que dá a
     # o meio possível de localização de tipos de autores.
@@ -357,23 +373,39 @@ class Parlamentar(models.Model):
             + self.fotografia.url + '>'if self.fotografia else ''
 
     def delete(self, using=None, keep_parents=False):
+
+        r = models.Model.delete(
+            self, using=using, keep_parents=keep_parents)
+        
         if self.fotografia:
             self.fotografia.delete()
 
-        return models.Model.delete(
-            self, using=using, keep_parents=keep_parents)
+        if self.capa:
+            self.capa.delete()
+            
+        return r
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
-
-        if not self.pk and self.fotografia:
-            fotografia = self.fotografia
-            self.fotografia = None
+        
+        if not self.pk:
+            fotografia = None
+            capa = None
+            if self.fotografia:
+                fotografia = self.fotografia
+                self.fotografia = None
+            
+            if self.capa:
+                capa = self.capa
+                self.capa = None
+                
             models.Model.save(self, force_insert=force_insert,
                               force_update=force_update,
                               using=using,
                               update_fields=update_fields)
+                
             self.fotografia = fotografia
+            self.capa = capa
 
         return models.Model.save(self, force_insert=force_insert,
                                  force_update=force_update,

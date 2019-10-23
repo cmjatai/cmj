@@ -43,7 +43,7 @@ Parlamentar:
   - municipio_residencia  uf_residencia
   - telefone_residencia
   - locais_atuacao
-  - fotografia:5
+  - fotografia:5 capa
   - biografia
 
 ParlamentarUpdate:
@@ -60,7 +60,8 @@ ParlamentarUpdate:
   - municipio_residencia  uf_residencia
   - telefone_residencia
   - locais_atuacao
-  - fotografia cropping
+  - fotografia fotografia_cropping
+  - capa capa_cropping
   - biografia
 
 ParlamentarCreate:
@@ -78,6 +79,7 @@ ParlamentarCreate:
   - telefone_residencia
   - locais_atuacao
   - fotografia
+  - capa
   - biografia
 
 Filiacao:

@@ -9,25 +9,26 @@
   <div class="container-fluid container-topo-parlamentar">
     <div class="inner">
 
-      <div class="path-capa {% if not object.parlamentar.fotografia  %}path-capa-semfoto{% endif %}" {% if object.parlamentar.fotografia  %}style="background-image: url({% thumbnail object.parlamentar.fotografia 1000x1000 box=object.parlamentar.cropping crop detail %});"{% endif %}>
-          <div class="container-social">
-            <div class="container">
-              {% social_link_share object %}
+      <div class="path-capa {% if not object.parlamentar.capa  %}path-capa-semfoto{% endif %}">
+        <div class="container">
+          <img src="{% thumbnail object.parlamentar.capa 1000x1000 box=object.parlamentar.capa_cropping crop detail %}">
 
-            </div>
-          </div>
+        </div>
       </div>
 
 
       <div class="path-header">
         <div class="container">
           {% block title %}
+          {% social_link_share object 'absolute-top-center' %}
+
+
             {{block.super}}
           {% endblock %}
           <div class="path-parlamentares">
             <a class="avatar avatar1" href="/{{ object.absolute_slug }}">
               {% if object.parlamentar.fotografia %}
-                  <img src="{% cropped_thumbnail object.parlamentar "cropping" %}">
+                  <img src="{% thumbnail object.parlamentar.fotografia 1000x1000 box=object.parlamentar.fotografia_cropping crop detail %}">
               {% else %}
                   <img src="{% webpack_static 'img/perfil.jpg' %}">
               {% endif %}

@@ -494,11 +494,14 @@
   }
 
   .path-capa {
-    height: 300px;
-    background-size: cover;
+    //background-size: cover;
     background-repeat: no-repeat;
-    background-position: 50% 30%;
+    background-position: center top;
     position: relative;
+
+    img {
+      width: 100%;
+    }
 
     &.path-capa-semfoto {
       height: 100px;
@@ -813,7 +816,7 @@
 
 @media screen and (max-width:767px) {
 
-  .container-path-parlamentar__old {
+  .container-path-parlamentar {
     .container-list {
       grid-template-columns: 100%;
     }

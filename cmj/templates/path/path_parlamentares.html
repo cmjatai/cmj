@@ -112,7 +112,7 @@
                 {% if not parlamentar.titular and not parlamentar.afastado %}
                   <a class="avatar avatar3" href="/{{parlamentar.classe_set.first.absolute_slug}}" class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">
                   {% if parlamentar.fotografia %}
-                      <img src="{% cropped_thumbnail parlamentar "cropping" %}">
+                      <img src="{% cropped_thumbnail parlamentar "fotografia_cropping" %}">
                   {% else %}
                       <img src="{% webpack_static 'img/perfil.jpg' %}">
                   {% endif %}
@@ -136,7 +136,7 @@
                 {% if parlamentar.afastado %}
                   <a class="avatar avatar3" href="/{{parlamentar.classe_set.first.absolute_slug}}" class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">
                   {% if parlamentar.fotografia %}
-                      <img src="{% cropped_thumbnail parlamentar "cropping" %}">
+                      <img src="{% cropped_thumbnail parlamentar "fotografia_cropping" %}">
                   {% else %}
                       <img src="{% webpack_static 'img/perfil.jpg' %}">
                   {% endif %}

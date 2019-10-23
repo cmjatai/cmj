@@ -24,7 +24,7 @@
             <div class="col-3">
               {% if  documento.parlamentares.first.fotografia %}
                 <a class="avatar" href="/{{ parlamentar.classe_set.first.absolute_slug }}">
-                  <img src="{% cropped_thumbnail parlamentar "cropping" %}" alt="{{ documento.parlamentares.first.nome_parlamentar}}"> 
+                  <img src="{% cropped_thumbnail parlamentar "fotografia_cropping" %}" alt="{{ documento.parlamentares.first.nome_parlamentar}}"> 
                 </a>
               {% endif %}
             </div>

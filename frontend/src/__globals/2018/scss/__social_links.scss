@@ -50,6 +50,11 @@
     left: 50%;
     transform: translate(-50%, 0);
   }
+  &.absolute-top-center {
+    position: absolute;
+    top: 5px;
+    left: 50%;
+  }
   &.absolute-right {
     position: absolute;
     right: 5px;

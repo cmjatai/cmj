@@ -188,6 +188,7 @@ def abrir_votacao(request, pk, spk):
             model = ExpedienteMateria
             presenca_model = SessaoPlenariaPresenca
             redirect_url = 'expedientemateria_list'
+            
     if not model:
         raise Http404()
 
@@ -201,8 +202,8 @@ def abrir_votacao(request, pk, spk):
         sessao.save()
         materia_votacao.save()
 
-    return HttpResponseRedirect(
-        reverse('sapl.sessao:' + redirect_url, kwargs={'pk': spk}))
+    url = reverse('sapl.sessao:' + redirect_url, kwargs={'pk': spk})
+    return HttpResponseRedirect('{}#id{}'.format(url, materia_votacao.materia.pk))
 
 
 def customize_link_materia(context, pk, has_permission, is_expediente):

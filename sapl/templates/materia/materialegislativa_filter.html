@@ -61,7 +61,7 @@
                             <a class="avatar avatar5" 
                               href="{% url 'sapl.materia:pesquisar_materia'%}?autoria__autor={{autor.id}}" 
                               title="{{autor.autor_related}}">
-                              <img src="{% cropped_thumbnail autor.autor_related "cropping" %}" alt="{{autor.autor_related}}">
+                              <img src="{% cropped_thumbnail autor.autor_related "fotografia_cropping" %}" alt="{{autor.autor_related}}">
                             </a>
                           {% endif %}
                         {% if not forloop.last %}

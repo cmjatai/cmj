@@ -1154,7 +1154,7 @@ def altera_field_mesa_public_view(request):
                     parlamentar.fotografia,
                     {
                         'size': (128, 128),
-                        'box': parlamentar.cropping,
+                        'box': parlamentar.fotografia_cropping,
                         'crop': True,
                         'detail': True,
                     }
