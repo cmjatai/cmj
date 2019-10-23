@@ -1,59 +1,18 @@
+
 {% extends "base_path.html" %}
-{% load i18n sigad_filters social_utils cropping thumbnail menus%}
+{% load i18n sigad_filters social_utils cropping thumbnail %}
 {% load webpack_static from webpack_loader %}
 
 {% block main_container_class %}container-path container-path-parlamentar{% endblock %}
 {% block base_functions %}{% endblock %}
-{% comment %}
-{% block main_header %}{% endblock main_header %}
-{% endcomment %}
 {% block base_header %}
-
-  <div class="container">
-    <div class="row path-topo">
-      <div class="col-lg-2 col-3">
-        <a class="avatar avatar1" href="/{{ object.absolute_slug }}">
-          {% if object.parlamentar.fotografia %}
-            <img src="{% thumbnail object.parlamentar.fotografia 1000x1000 box=object.parlamentar.cropping crop detail %}">
-          {% else %}
-            <img src="{% webpack_static 'img/perfil.jpg' %}">
-          {% endif %}
-        </a>
-      </div>
-      <div class="col">
-          {% block title %}
-            {{block.super}}
-          {% endblock %}
-          {% social_link_share object %}
-      </div>
-      {{object.pk}}
-      {% subnav 'parlamentares/subnav.yaml' object.pk %}
-
-
-
-    </div>
-  </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
   <div class="container-fluid container-topo-parlamentar">
     <div class="inner">
-    
-      <div class="path-capa {% if not object.parlamentar.fotografia %}path-capa-semfoto{% endif %}" {% if object.parlamentar.fotografia  %}style="background-image: url({% thumbnail object.parlamentar.fotografia 1000x1000 box=object.parlamentar.cropping crop detail %});"{% endif %}>
+
+      <div class="path-capa {% if not object.parlamentar.fotografia  %}path-capa-semfoto{% endif %}" {% if object.parlamentar.fotografia  %}style="background-image: url({% thumbnail object.parlamentar.fotografia 1000x1000 box=object.parlamentar.cropping crop detail %});"{% endif %}>
           <div class="container-social">
             <div class="container">
+              {% social_link_share object %}
 
             </div>
           </div>
@@ -62,7 +21,18 @@
 
       <div class="path-header">
         <div class="container">
-          
+          {% block title %}
+            {{block.super}}
+          {% endblock %}
+          <div class="path-parlamentares">
+            <a class="avatar avatar1" href="/{{ object.absolute_slug }}">
+              {% if object.parlamentar.fotografia %}
+                  <img src="{% cropped_thumbnail object.parlamentar "cropping" %}">
+              {% else %}
+                  <img src="{% webpack_static 'img/perfil.jpg' %}">
+              {% endif %}
+            </a>
+          </div>
         </div>
       </div>
 
