@@ -80,7 +80,6 @@ from .models import (AcompanhamentoMateria, Anexada, AssuntoMateria, Autoria,
                      TipoDocumento, TipoFimRelatoria, TipoMateriaLegislativa,
                      TipoProposicao, Tramitacao, UnidadeTramitacao)
 
-
 AssuntoMateriaCrud = CrudAux.build(AssuntoMateria, 'assunto_materia')
 
 OrigemCrud = CrudAux.build(Origem, '')
@@ -442,7 +441,7 @@ class ProposicaoDevolvida(PermissionRequiredMixin, ListView):
     model = Proposicao
     ordering = ['data_envio']
     paginate_by = 10
-    permission_required = ('materia.detail_proposicao_devolvida', )
+    permission_required = ('materia.detail_proposicao_devolvida',)
 
     def get_queryset(self):
         return Proposicao.objects.filter(
@@ -466,7 +465,7 @@ class ProposicaoPendente(PermissionRequiredMixin, ListView):
     model = Proposicao
     ordering = ['data_envio', 'autor', 'tipo', 'descricao']
     paginate_by = 10
-    permission_required = ('materia.detail_proposicao_enviada', )
+    permission_required = ('materia.detail_proposicao_enviada',)
 
     def get_queryset(self):
         return Proposicao.objects.filter(
@@ -574,7 +573,7 @@ class RetornarProposicao(UpdateView):
     template_name = "materia/proposicao_confirm_return.html"
     model = Proposicao
     fields = ['data_envio', 'descricao']
-    permission_required = ('materia.detail_proposicao_enviada', )
+    permission_required = ('materia.detail_proposicao_enviada',)
     logger = logging.getLogger(__name__)
 
     def dispatch(self, request, *args, **kwargs):
@@ -1101,7 +1100,7 @@ class ProposicaoCrud(Crud):
 class ReciboProposicaoView(TemplateView):
     logger = logging.getLogger(__name__)
     template_name = "materia/recibo_proposicao.html"
-    permission_required = ('materia.detail_proposicao', )
+    permission_required = ('materia.detail_proposicao',)
 
     def has_permission(self):
         perms = self.get_permission_required()
@@ -1439,7 +1438,7 @@ class DocumentoAcessorioCrud(MasterDetailCrud):
     public = [RP_LIST, RP_DETAIL]
 
     class BaseMixin(MasterDetailCrud.BaseMixin):
-        list_field_names = ['nome', 'tipo', 'data', 'autor']
+        list_field_names = ['nome', 'tipo', 'data', ('ementa', 'autor')]
 
     class CreateView(MasterDetailCrud.CreateView):
         form_class = DocumentoAcessorioForm
@@ -1455,12 +1454,16 @@ class DocumentoAcessorioCrud(MasterDetailCrud):
     class ListView(MasterDetailCrud.ListView):
         paginate_by = None
 
+        def hook_ementa(self, obj, default, url):
+            return '<strong>{}</strong>'.format(default), ''
+        
         def hook_nome(self, obj, default, url):
             return """
             <a href="{}" pk="{}" class="d-block text-center">{}</a><br>
             <a href="{}" pk="{}" class="d-block text-center">Arquivo<br>Digitalizado</a>
             """.format(
                 url, obj.id, obj.nome, obj.arquivo.url, obj.id), ''
+
 
 class AutoriaCrud(MasterDetailCrud):
     model = Autoria
@@ -1873,7 +1876,7 @@ class MateriaLegislativaCrud(Crud):
 class DocumentoAcessorioView(PermissionRequiredMixin, CreateView):
     template_name = "materia/documento_acessorio.html"
     form_class = DocumentoAcessorioForm
-    permission_required = ('materia.add_documentoacessorio', )
+    permission_required = ('materia.add_documentoacessorio',)
 
     def get(self, request, *args, **kwargs):
         materia = MateriaLegislativa.objects.get(id=kwargs['pk'])
@@ -2431,7 +2434,7 @@ class MateriaAnexadaEmLoteView(PermissionRequiredMixin, FilterView):
 class PrimeiraTramitacaoEmLoteView(PermissionRequiredMixin, FilterView):
     filterset_class = PrimeiraTramitacaoEmLoteFilterSet
     template_name = 'materia/em_lote/tramitacao.html'
-    permission_required = ('materia.add_tramitacao', )
+    permission_required = ('materia.add_tramitacao',)
 
     primeira_tramitacao = True
 
@@ -2538,7 +2541,7 @@ class TramitacaoEmLoteView(PrimeiraTramitacaoEmLoteView):
 
 class ImpressosView(PermissionRequiredMixin, TemplateView):
     template_name = 'materia/impressos/impressos.html'
-    permission_required = ('materia.can_access_impressos', )
+    permission_required = ('materia.can_access_impressos',)
 
 
 def gerar_pdf_impressos(request, context, template_name):
@@ -2557,7 +2560,7 @@ def gerar_pdf_impressos(request, context, template_name):
 class EtiquetaPesquisaView(PermissionRequiredMixin, FormView):
     form_class = EtiquetaPesquisaForm
     template_name = 'materia/impressos/impressos_form.html'
-    permission_required = ('materia.can_access_impressos', )
+    permission_required = ('materia.can_access_impressos',)
 
     def form_valid(self, form):
         context = {}
@@ -2598,7 +2601,7 @@ class EtiquetaPesquisaView(PermissionRequiredMixin, FormView):
 class FichaPesquisaView(PermissionRequiredMixin, FormView):
     form_class = FichaPesquisaForm
     template_name = 'materia/impressos/impressos_form.html'
-    permission_required = ('materia.can_access_impressos', )
+    permission_required = ('materia.can_access_impressos',)
 
     def form_valid(self, form):
         tipo_materia = form.data['tipo_materia']
@@ -2616,7 +2619,7 @@ class FichaSelecionaView(PermissionRequiredMixin, FormView):
     logger = logging.getLogger(__name__)
     form_class = FichaSelecionaForm
     template_name = 'materia/impressos/impressos_form.html'
-    permission_required = ('materia.can_access_impressos', )
+    permission_required = ('materia.can_access_impressos',)
 
     def get_context_data(self, **kwargs):
         if ('tipo' not in self.request.GET or
@@ -2717,7 +2720,7 @@ class ExcluirTramitacaoEmLoteView(PermissionRequiredMixin, FormView):
 class MateriaPesquisaSimplesView(PermissionRequiredMixin, FormView):
     form_class = MateriaPesquisaSimplesForm
     template_name = 'materia/impressos/impressos_form.html'
-    permission_required = ('materia.can_access_impressos', )
+    permission_required = ('materia.can_access_impressos',)
 
     def form_valid(self, form):
         template_materia = 'materia/impressos/materias_pdf.html'
@@ -2750,6 +2753,7 @@ class TipoMateriaCrud(CrudAux):
         layout_key = 'TipoMateriaLegislativaDetail'
 
     class DeleteView(CrudAux.DeleteView):
+
         def delete(self, request, *args, **kwargs):
             d = CrudAux.DeleteView.delete(self, request, *args, **kwargs)
             TipoMateriaLegislativa.objects.reordene()
