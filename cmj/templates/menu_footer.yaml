@@ -117,7 +117,7 @@
   css_class: head_title
   children:
   - title: Últimas Publicações
-    url: /doc?o=
+    url: /doc/?o=
   - title: Licitações e Contratos
     url: ''
     css_class: head_title
