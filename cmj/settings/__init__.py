@@ -51,9 +51,6 @@ DATABASES = {
     )
 }
 
-FILE_UPLOAD_MAX_MEMORY_SIZE = 104857600
-DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600
-
 SAPL_VERSION = 'master'
 
 SITE_URL = 'https://www.jatai.go.leg.br'
