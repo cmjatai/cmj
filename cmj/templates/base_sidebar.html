@@ -22,18 +22,6 @@
         <a href="/parlamentar" class="">Parlamentares</a>
       </div>
     </div>
-
-    {% comment %}
-      <form class="box box-search" method="get" action="{% url 'cmj.core:haystack_search'%}">
-        
-        <a class="icon icon-busca-textual">
-        </a>
-
-        <div class="inner">
-          <input type="search" name="q" placeholder="Busca Textual" class="textinput textInput form-control" id="id_q" autocomplete="off" />
-        </div>
-      </form>
-    {% endcomment %}
     <div class="box box-documento-administrativo">
       <a onclick="return false;" class="d-none d-lg-block icon icon-licitacao" href="{% url 'sapl.protocoloadm:documentoadministrativo_list' %}?o" >
       </a>
@@ -41,6 +29,38 @@
       </a>
       <div class="inner">
         <a href="{% url 'sapl.protocoloadm:documentoadministrativo_list' %}?o" class="">Documentos Administrativos</a>
+
+        <ul class="submenu submenu-docadm">
+          <li><a>Licitações</a>
+            <ul>
+              <li><a href="/doc/?tipo=187&o=&tramitacaoadministrativo__status=12">Em Andamento</a></li>
+              <li><a href="/doc/?tipo=187&o=&tramitacaoadministrativo__status=13">Com Contratos Assinados</a></li>
+              <li><a href="/doc/?tipo=187&o=&tramitacaoadministrativo__status=14">Encerradas</a></li>
+              <li><a href="/doc/?tipo=187&o=&tramitacaoadministrativo__status=15">Canceladas</a></li>
+            </ul>
+          </li>
+
+          <li><a>Contratos</a>
+            <ul>
+              <li><a href="/doc/?tipo=189">Credenciamentos da Imprensa</a></li>
+              <li><a href="/doc/?data_vencimento_0={% now "d/m/Y" %}">Contratos Em Vigência</a></li>
+              <li><a href="/doc/?data_vencimento_1={% now "d/m/Y" %}">Contratos Encerrados</a></li>
+            </ul>
+          </li>
+
+          <li><a>Acesso Rápido</a>
+            <ul>
+              <li><a href="/doc/?o=">Últimas Publicações</a>
+              <li><a href="/doc/?tipo=197&o=">Dispensa de Licitação</a></li>
+              <li><a href="/doc/?tipo=193&o=">Edital de Pregão Presencial</a></li>
+              <li><a href="/doc/?tipo=182&o=">Balancetes Contábeis</a></li>
+              <li><a href="/doc/?tipo=185&o=">Relatórios de Gestão Fiscal</a></li>
+            </ul>
+          </li>
+
+        </ul>
+
+
       </div>
     </div>
     <div class="box box-materia">
@@ -50,17 +70,24 @@
       </a>
       <div class="inner">
         <a href="{% url 'sapl.materia:pesquisar_materia' %}" class="">Matérias Legislativas</a>
-
-        {% comment %}
-          <ul>
-            {% for tipo in ""|sidebar_tipos_de_materias %}
-              <li>
-                <a href="{% url 'sapl.materia:pesquisar_materia' %}?tipo={{tipo.pk}}">{{tipo}}</a>
-              </li>
-            {% endfor %}
+          {% comment %}
+          <ul class="submenu submenu-materia">
+            <li>
+              <a>Todas as Matérias</a>
+              <ul>
+                {% for tipo in ""|sidebar_tipos_de_materias %}
+                  <li>
+                    <a href="{% url 'sapl.materia:pesquisar_materia' %}?tipo={{tipo.pk}}">{{tipo}}</a>
+                  </li>
+                {% endfor %}
+              
+              </ul>
+            </li>
+            <li>
+              <a href="{% url 'sapl.materia:pesquisar_materia' %}?em_tramitacao=1">Matérias em tramitação</a>
+            </li>
           </ul>
-        {% endcomment %}
-
+          {% endcomment %}
       </div>
     </div>
     <div class="box box-norma">

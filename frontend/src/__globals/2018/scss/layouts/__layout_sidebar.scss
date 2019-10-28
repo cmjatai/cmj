@@ -4,10 +4,12 @@ $fator-xl: 1.3;
   from {
     width: $width-wrapper-closed;
     overflow: hidden;
+    opacity: 0;
   }
   99% {
     width: $width-wrapper-lg - 1;
     overflow: hidden;
+    opacity: 1;
   }
   100% {
     width: $width-wrapper-lg;
@@ -19,10 +21,12 @@ $fator-xl: 1.3;
   from {
     width: $width-wrapper-closed * $fator-xl * 1.1;
     overflow: hidden;
+    opacity: 0;
   }
   99% {
     width: $width-wrapper-lg * $fator-xl - 1;
     overflow: hidden;
+    opacity: 1;
   }
   100% {
     width: $width-wrapper-lg * $fator-xl;
@@ -66,53 +70,49 @@ $fator-xl: 1.3;
       right: 0;
     }
 
-    /*
     ul {
       display: none;
-      position: absolute;
+      position: fixed;
       list-style: none;
       padding: 0;
       margin: 0;
       z-index: 1;
-      left: 90%;
-      top: 10px;
+      left: $width-wrapper-lg - 10px;
+      right: 30px;
+      top: 30px;
+      bottom: 30px;
       border-radius: 4px;
-      box-shadow: 0 5px 15px #2d3f2f;
-      background-color: transparent;
-      &::before {
-        background-color: #00a65a;
-        content: '';
-        position: absolute;
-        visibility: inherit;
-        top: 10px;
-        left: -5px;
-        width: 10px;
-        height: 10px;
-        transform: rotate(45deg);
-        z-index: -1;
-      }
 
-      li {
-        line-height: 1;
-        &:not(:last-child) {
-          border-bottom: 1px solid #0001;
+      &.submenu {
+        display: none;
+        padding: 20px 30px;
+        a {
+          font-size: 1.4em;
+        }        
+        & > li {
+          //padding: 20px;
+          & > a {
+            font-size: 2em;
+          }
+        }             
+        ul {
+          display: block;
+          position: static;
+          padding-left: 20px;
+          padding-bottom: 20px;
         }
       }
-      a {
-        display: block;
-        text-decoration: none;
-        font-size: 1rem;
-        line-height: 1.5;
-        white-space: nowrap;
-        padding: 0 10px;
-        &:hover {
-          background-color: #0003;
-        }
+      &.submenu-materia {
+        background: #f56954f5 !important;    
       }
-    }*/
+      &.submenu-docadm {
+        background: #00c0eef5 !important;    
+      }
+    }
+
 
     .box {
-      position: relative;
+      //position: relative;
       display: flex;
       flex: 1 1 100%;
       &:not(:last-child) {
@@ -223,8 +223,14 @@ $fator-xl: 1.3;
 
     .box {
       &:hover {
-        ul {
+        .inner > ul {
           display: block;
+          li:hover {
+            ul {
+              display: block;
+            }
+              
+          }
         }
       }
     }
@@ -246,6 +252,12 @@ $fator-xl: 1.3;
           }
           a {
             text-shadow: 0 0 20px white;
+          }
+          .submenu {
+            a {
+              text-shadow: 0 0 0 white;
+
+            }
           }
         }
         .inner {
@@ -273,6 +285,26 @@ $fator-xl: 1.3;
         display: flex;
         flex-direction: row;
         opacity: 0.8;
+      }
+
+      ul {
+        left: 10px;
+        right: 10px;
+        top: 120px;
+        bottom: 0px;
+        text-align: left;
+        &::before {
+          content: '';
+          display: block;
+          background-color: transparent;
+          position: absolute;
+          top: -1em;
+          bottom: 0px;
+          left: -10px;
+          right: -10px;
+          z-index: -1;
+        }
+
       }
 
       .aside-hover {
@@ -380,6 +412,10 @@ $fator-xl: 1.3;
       .icon {
         flex: 0 0 $width-wrapper-closed * $fator-xl * 1.1;
       }
+      ul {
+        left: $width-wrapper-lg * $fator-xl - 10px;
+      }
+
       &:hover {
         width: $width-wrapper-lg * $fator-xl;
         animation-delay: 0s;

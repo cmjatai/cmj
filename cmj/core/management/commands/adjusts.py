@@ -17,11 +17,11 @@ class Command(BaseCommand):
         post_save.disconnect(dispatch_uid='cmj_post_save_signal')
 
         self.logger = logging.getLogger(__name__)
-        init = datetime.now()
 
-        self.run_ordene_dispositivos_pelos_numeros()
+        #self.run_ordene_dispositivos_pelos_numeros()
 
     def run_ordene_dispositivos_pelos_numeros(self):
+        init = datetime.now()
 
         ta = TextoArticulado.objects.get(pk=1121)
 
