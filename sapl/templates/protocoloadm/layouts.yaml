@@ -6,7 +6,7 @@ TipoDocumentoAdministrativo:
 DocumentoAdministrativo:
   {% trans 'Identificação Básica' %}:
   - tipo:6  numero  ano
-  - data  protocolo 
+  - data data_vencimento protocolo 
   - materia|fk_urlize_for_detail
   - epigrafe
   - assunto

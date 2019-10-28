@@ -1192,6 +1192,7 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
                   'tramitacao',
                   'dias_prazo',
                   'data_fim_prazo',
+                  'data_vencimento',
                   'numero_externo',
                   'observacao',
                   'texto_integral',
@@ -1321,7 +1322,7 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
             [('tipo', 6), ('numero', 3), ('ano', 3)])
 
         row2 = to_row(
-            [('data', 4), ('numero_protocolo', 4), ('ano_protocolo', 4)])
+            [('data', 3), ('data_vencimento', 3), ('numero_protocolo', 3), ('ano_protocolo', 3)])
 
         row2_5 = to_row(
             [('epigrafe', 12)])
