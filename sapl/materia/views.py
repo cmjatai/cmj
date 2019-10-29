@@ -1460,9 +1460,17 @@ class DocumentoAcessorioCrud(MasterDetailCrud):
         def hook_nome(self, obj, default, url):
             return """
             <a href="{}" pk="{}" class="d-block text-center">{}</a><br>
-            <a href="{}" pk="{}" class="d-block text-center">Arquivo<br>Digitalizado</a>
+            {}
             """.format(
-                url, obj.id, obj.nome, obj.arquivo.url, obj.id), ''
+                url, obj.id, obj.nome,
+               """
+                   <small>
+                     <a href="{}" pk="{}" class="d-block text-center">
+                       Arquivo<br>Digitalizado
+                     </a>
+                   </small>
+               """.format(obj.arquivo.url, obj.id) if obj.arquivo else ''
+            ), ''
 
 
 class AutoriaCrud(MasterDetailCrud):
