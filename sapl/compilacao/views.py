@@ -2739,6 +2739,14 @@ class ActionsEditMixin(ActionDragAndMoveDispositivoAlteradoMixin,
 
         dsp_a_alterar = Dispositivo.objects.get(
             pk=dsp_a_alterar)
+        
+        """print(', '.join(
+            
+            list(
+                map(str, dsp_a_alterar.get_parents_asc())
+                )+ [dsp_a_alterar.rotulo, ]
+            )
+        )"""
 
         history = dsp_a_alterar.history()
 
@@ -3119,6 +3127,8 @@ class DispositivoSearchFragmentFormView(ListView):
             elif rotulo:
                 AND_TEXTO_ROTULO = "AND d.rotulo ~* '{BUSCA_ROTULO}'".format(
                     BUSCA_ROTULO=rotulo)
+            else: 
+                AND_TEXTO_ROTULO = ''
 
             jtms = ''  # JOIN_TYPE_MODEL_SELECTED
             atms = ''  # AND_TYPE_MODEL_SELECTED
