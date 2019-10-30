@@ -48,7 +48,7 @@
 
 .item-listas {
   position: relative;
-  padding: 0 !important;
+  padding: 2px 0 0 0 !important;
   .links-texto {
     float:left;
   }
@@ -76,10 +76,10 @@
   .text-ementa {
     color: #a26c06 !important;
     font-size: 150%;
-    padding: 0.3em 0.5em 0.5em 0;
+    padding: 0 0.5em 0 0;
     line-height: 1.3;
   }
-
+  
   .childs {
     .text-ementa {
       font-size: 110%;
@@ -96,12 +96,13 @@
   }
   .item-raiz {
     padding: 10px 0 0 10px;
-    margin-bottom: 10px;
+    //margin-bottom: 10px;
     &.anexador {
       font-size: 75%;
     }
+    
   }
-
+  
   .item-node {
     position: relative;
     padding: 15px 0px 11px 15px;
@@ -110,22 +111,21 @@
     border:1px solid #fffa;
     border-right-width: 0;
     border-bottom-width: 0;
-
+    
     &:hover {
       background-color: rgba(#fff, 0.5);
     }
     .item-node {
-
-    &:hover {
-      background-color: rgba(#fff, 0.8);
-    }
+      &:hover {
+        background-color: rgba(#fff, 0.8);
+      }
     }
     .item-titulo {
       color:#004499;
     }
     
   }
-
+  
   .parent, .parent-right {
     position: absolute;
     font-size: 0.7em;
@@ -142,9 +142,12 @@
     left: auto;
     right: 2px;
   }
-
+  
   &:hover {
-    background-color: transparent;
+    background-color: rgba(#000, 0.1);
+  }
+  button {
+    margin: 0 0 10px 10px;
   }
 }
 

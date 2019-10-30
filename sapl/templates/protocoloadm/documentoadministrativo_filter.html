@@ -73,141 +73,190 @@
 
 {% block table_content %}
   {% if show_results %}
-      {% if page_obj|length %}
+    {% if page_obj|length %}
 
       <div class="container-table">
-        <div class="result-count">Total de Processos e/ou Documentos individuais: <strong>{{paginator.count}}</strong></div>
-        <table class="table table-striped table-hover table-link-ordering">
-    	
-        {% for d in page_obj %}
-          <tr>
-              <td class="item-listas">  
+        <div class="result-count">
+          Total de Processos e/ou Documentos individuais: <strong>{{paginator.count}}</strong>
+        </div>
+          {% for d in page_obj %}
+            <div class="item-listas">
+              <div  id="btn-view-{{d.id}}">
+                <div {% if not d.anexo_de.first %}class="item-raiz"{% else %}class="item-node"{% endif %}>
+                  {% if d.anexo_de.first %}
+                    <div class="parent">
+                      Vinculado a: {{d.anexo_de.first}}
+                    </div>
+                  {% else %}
+                    <div class="parent-right">
+                      Última Atualização: {{d.data_ultima_atualizacao}}
+                    </div>
+                  {% endif %}
+                  
 
-                  {% with d as d %}
-                    {% include "protocoloadm/documentoadministrativo_item_filter.html" %}
-                  {% endwith %}
+                  <div class="links-texto">
+                    {% if d.texto_integral %}
+                      <a class="link-texto"  target="_blank" href="{{d.texto_integral.url}}" title="Documento Administrativo">
+                        <i class="far fa-2x fa-file-{% if '.pdf' in d.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
+                      </a>
+                    {% endif %}
+                  </div>
+
+                  <a class="item-titulo" href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' d.pk %}">{{ d }}</a>
+                  {% if d.certidao %}
+                    <br><small>
+                    <span class="text-danger">Certidão de Publicação nº {{d.certidao.id|stringformat:"06d" }} de {{d.certidao.created}}</span>
+                    </small>
+                  {% endif %}
+                      
+                  <br><strong>Data do documento:</strong> {{d.data}} | {{d.tipo}} | {{d.tipo.sigla}} {{d.numero}}/{{d.ano}}
+                  {% if d.protocolo %}
+                    | 
+                    {% if perms.detail_protocolo %}
+                      <strong>Protocolo:</strong>&nbsp;<a href="{% url 'sapl.protocoloadm:protocolo_mostrar' d.protocolo.id %}">{{ d.protocolo}}</a></br>
+                    {% else %}
+                      <strong>Protocolo:</strong> {{ d.protocolo}}
+                    {% endif %}
+                  {% endif %}
+                  {% if d.data_vencimento %}
+                    <br><small>Data de Vencimento: {{d.data_vencimento}}</small>
+                  {% endif %}
+
+                  {% if d.assunto %}
+                    <div class="text-ementa">{{ d.assunto|safe }}</div>
+                  {% endif %}
 
 
+                  <small>
+                    {% if d.interessado %}
+                      <strong>Interessado:</strong>&nbsp;{{ d.interessado|default_if_none:"Não informado"}}</br>
+                    {% endif %}
 
+                    {% define d.tramitacaoadministrativo_set.first as tram %}
+                    {% if tram.unidade_tramitacao_destino %}        
+                      <strong>Localização Atual:</strong> &nbsp;{{tram.unidade_tramitacao_destino}}</br>        
+                      <strong>Status:</strong> {{tram.status}}
+                    {% endif %}
+                    {% if not d.anexo_de.first %}
+                      {% if d.tramitacao and not perms.protocoloadm.detail_documentoadministrativo and d.workspace.tipo == d.workspace.TIPO_PUBLICO and mail_service_configured %}
+                        <br><a class="btn btn-sm btn-outline-primary" href="{% url 'sapl.protocoloadm:acompanhar_documento' d.id %}">Acompanhar Tramitação</a>
+                      {% endif %}
+                    {% endif %}
+
+
+                    {% define d.documentoacessorioadministrativo_set.all as acess %}
+                    {% if d.documentoacessorioadministrativo_set.all.exists %}
+                        <strong>Documentos Acessórios:</strong>
+                        <a href="{% url 'sapl.protocoloadm:documentoacessorioadministrativo_list' d.id %}">
+                            {{ d.documentoacessorioadministrativo_set.all.count }}
+                        </a>
+                        </br>
+                    {% endif %}
+                  </small>
+                </div>
+
+                {% if d.documento_principal_set.exists %}
+                  <button class="btn btn-link"
+                    type="button"
+                    data-toggle="collapse"
+                    data-target="#collapse-{{d.id}}"
+                    aria-expanded="false"
+                    aria-controls="collapse-{{d.id}}">
+                    Ver Documentos Anexados
+                  </button>
+                {% endif %}
+
+              </div>
+
+              <div class="collapse"
+                  id="collapse-{{d.id}}">
+
+
+                  {% for anexado in d.documento_principal_set.all %}
+                    {% if forloop.first %}
+                      <div class="childs">
+                    {% endif %}
+                      {% with anexado.documento_anexado as d %}
+                        {% include "protocoloadm/documentoadministrativo_item_filter.html" %}
+                      {% endwith %}
+                    {% if forloop.last %}
+                      </div>
+                    {% endif %}
+                  {% endfor %}
+
+
+              </div>
                   {% for principal in d.documento_anexado_set.all %}
                     {% if forloop.first %}
                       <div class="item-raiz anexador">
                       <strong>Anexado a:</strong>
                       <ul>
                     {% endif %}
-                      <li>
-                        {% with principal.documento_principal as d %}
+                    <li>
+                      {% with principal.documento_principal as d %}
 
+                        <div class="links-texto">
+                            {% if d.texto_integral %}
+                              <a class="link-texto" href="{{d.texto_integral.url}}" title="Documento Administrativo">
+                                <i class="far fa-2x fa-file-{% if '.pdf' in d.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
+                              </a>
+                            {% endif %}
+                        </div>
 
+                        <a class="item-titulo" href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' d.pk %}">{{ d }}</a>
+                        {% if d.certidao %}
+                          <br><small>
+                          <span class="text-danger">Certidão de Publicação nº {{d.certidao.id|stringformat:"06d" }} de {{d.certidao.created}}</span>
+                          </small>
+                        {% endif %}
+                        <br><strong>Data do documento:</strong> {{d.data}} | {{d.tipo}} | {{d.tipo.sigla}} {{d.numero}}/{{d.ano}}
 
+                        {% if d.protocolo %}
+                          | 
+                          {% if perms.detail_protocolo %}
+                            <strong>Protocolo:</strong>&nbsp;<a href="{% url 'sapl.protocoloadm:protocolo_mostrar' d.protocolo.id %}">{{ d.protocolo}}</a></br>
+                          {% else %}
+                            <strong>Protocolo:</strong> {{ d.protocolo}}
+                          {% endif %}
+                        {% endif %}
 
+                        {% if d.assunto %}
+                          <div class="text-ementa">{{ d.assunto|safe }}</div>
+                        {% endif %}
 
+                        <small>
+                          {% if d.interessado %}
+                            <strong>Interessado:</strong>&nbsp;{{ d.interessado|default_if_none:"Não informado"}}</br>
+                          {% endif %}
 
-                                                  <div class="links-texto">
-                                                      {% if d.texto_integral %}
-                                                        <a class="link-texto" href="{{d.texto_integral.url}}" title="Documento Administrativo">
-                                                          <i class="far fa-2x fa-file-{% if '.pdf' in d.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
-                                                        </a>
-                                                      {% endif %}
-                                                  </div>
-
-                                                    <a class="item-titulo" href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' d.pk %}">{{ d }}</a>
-                                                    {% if d.certidao %}
-                                                      <br><small>
-                                                      <span class="text-danger">Certidão de Publicação nº {{d.certidao.id|stringformat:"06d" }} de {{d.certidao.created}}</span>
-                                                      </small>
-                                                    {% endif %}
-                                                  <br><strong>Data do documento:</strong> {{d.data}} | {{d.tipo}} | {{d.tipo.sigla}} {{d.numero}}/{{d.ano}}
-
-                                                  {% if d.protocolo %}
-                                                    | 
-                                                    {% if perms.detail_protocolo %}
-                                                      <strong>Protocolo:</strong>&nbsp;<a href="{% url 'sapl.protocoloadm:protocolo_mostrar' d.protocolo.id %}">{{ d.protocolo}}</a></br>
-                                                    {% else %}
-                                                      <strong>Protocolo:</strong> {{ d.protocolo}}
-                                                    {% endif %}
-                                                  {% endif %}
-
-
-                                                  {% if d.assunto %}
-                                                    <div class="text-ementa">{{ d.assunto|safe }}</div>
-                                                  {% endif %}
-
-
-                                                  <small>
-                                                    {% if d.interessado %}
-                                                      <strong>Interessado:</strong>&nbsp;{{ d.interessado|default_if_none:"Não informado"}}</br>
-                                                    {% endif %}
-
-                                                    {% define d.tramitacaoadministrativo_set.first as tram %}
-                                                    {% if tram.unidade_tramitacao_destino %}        
-                                                      <strong>Localização Atual:</strong> &nbsp;{{tram.unidade_tramitacao_destino}}</br>        
-                                                      <strong>Status:</strong> {{tram.status}}
-                                                    {% endif %}
-                                                    {% if not d.anexo_de.first %}
-                                                      {% if d.tramitacao and not perms.protocoloadm.detail_documentoadministrativo and d.workspace.tipo == d.workspace.TIPO_PUBLICO and mail_service_configured %}
-                                                        <br><a class="btn btn-sm btn-outline-primary" href="{% url 'sapl.protocoloadm:acompanhar_documento' d.id %}">Acompanhar Tramitação</a>
-                                                      {% endif %}
-                                                    {% endif %}
-                                                    </small>
-                        {% endwith %}
-                      </li>
+                          {% define d.tramitacaoadministrativo_set.first as tram %}
+                          {% if tram.unidade_tramitacao_destino %}        
+                            <strong>Localização Atual:</strong> &nbsp;{{tram.unidade_tramitacao_destino}}</br>        
+                            <strong>Status:</strong> {{tram.status}}
+                          {% endif %}
+                          {% if not d.anexo_de.first %}
+                            {% if d.tramitacao and not perms.protocoloadm.detail_documentoadministrativo and d.workspace.tipo == d.workspace.TIPO_PUBLICO and mail_service_configured %}
+                              <br><a class="btn btn-sm btn-outline-primary" href="{% url 'sapl.protocoloadm:acompanhar_documento' d.id %}">Acompanhar Tramitação</a>
+                            {% endif %}
+                          {% endif %}
+                        </small>
+                      {% endwith %}
+                    </li>
                     {% if forloop.last %}
-                      </ul>
-                    </div>
+                        </ul>
+                      </div>
                     {% endif %}
                   {% endfor %}
+            </div>
+          {% endfor %}
+     
+      </div>
 
+    {% else  %}
+      <h3>Nenhum documento encontrado com essas especificações</h3>
+    {% endif %}
 
-            </td>
-
-          </tr>
-        {% endfor %}
-      {% else  %}
-        <tr><td><h3>Nenhum documento encontrado com essas especificações</h3></tr>
-      {% endif %}
-    </table>
     {% include "paginacao.html" %}
+
   {% endif %}
 {% endblock table_content %}
-
-
-{% block extra_js %}
-
-{% comment "" %}
-<style>
-  .select-error {
-    border-color: red;
-    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-  }
-</style>
-
-<script type="text/javascript">
-
-  validation = () => {
-    if (document.getElementById("relatorio").checked && !$("#id_ano").val()){
-      $("#submit-id-pesquisar").attr("disabled", true);
-      $("#id_ano").addClass("select-error");
-      $("#div_id_ano").append('<spam id="error-ano" style="font-size:8pt;color:red">Selecione uma data.</spam>');
-    }
-    else{
-      error = document.getElementById("error-ano")
-      if (error){
-        $("#submit-id-pesquisar").attr("disabled", false);
-        $("#id_ano").removeClass("select-error");
-        document.getElementById("error-ano").remove();
-      }
-      
-    }
-  }
-
-  document.getElementById("relatorio").onchange = validation;
-  document.getElementById("id_ano").onchange = validation;
-  validation();
-
-
-</script>
-{% endcomment %}
-
-{% endblock %}
