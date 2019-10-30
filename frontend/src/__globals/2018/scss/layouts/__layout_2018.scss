@@ -48,7 +48,9 @@
 
 .item-listas {
   position: relative;
-  padding: 2px 0 0 0 !important;
+  padding: 2px 0 10px 0 !important;
+  border-bottom: 1px solid white;
+
   .links-texto {
     float:left;
   }
@@ -129,7 +131,7 @@
   .parent, .parent-right {
     position: absolute;
     font-size: 0.7em;
-    color: #0003;
+    color: #0005;
     top: 1px;
     left: 2px;
     line-height: 1;

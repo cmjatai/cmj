@@ -19,23 +19,31 @@ class Command(BaseCommand):
 
         self.logger = logging.getLogger(__name__)
 
-        self.run_ajusta_datas_de_edicao_com_certidoes()
+        # pós migração sislegis
+        # self.run_ajusta_datas_de_edicao_com_certidoes()
         
     def run_ajusta_datas_de_edicao_com_certidoes(self):
         
         # Área de trabalho pública
-        docs = DocumentoAdministrativo.objects.filter(workspace_id=22).order_by('-data')
+        docs = DocumentoAdministrativo.objects.filter(workspace_id=22).order_by('-id')
         
         for d in docs:
             c = d.certidao
             
-            if not c:
+            if c:
                 continue
             
+            print(d.epigrafe)
             
+            if not d.documento_principal_set.exists():
+                continue
             
-            print(c.created, d.epigrafe)
-        
+            da = d.documento_principal_set.first()
+            
+            if da and da.documento_anexado.certidao: 
+                d.data_ultima_atualizacao = da.documento_anexado.certidao.created
+                d.save()
+                
         
 
     def run_ordene_dispositivos_pelos_numeros(self):
