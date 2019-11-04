@@ -1,5 +1,6 @@
 from datetime import datetime
 import logging
+from platform import node
 
 from django.core.management.base import BaseCommand
 from django.db.models import F, Q
@@ -20,46 +21,54 @@ class Command(BaseCommand):
         self.logger = logging.getLogger(__name__)
 
         # pós migração sislegis
-        # self.run_ajusta_datas_de_edicao_com_certidoes()
-        
+        self.run_busca_desordem_de_dispositivos()
+
     def run_ajusta_datas_de_edicao_com_certidoes(self):
-        
+
         # Área de trabalho pública
         docs = DocumentoAdministrativo.objects.filter(workspace_id=22).order_by('-id')
-        
+
         for d in docs:
             c = d.certidao
-            
+
             if c:
                 continue
-            
+
             print(d.epigrafe)
-            
+
             if not d.documento_principal_set.exists():
                 continue
-            
+
             da = d.documento_principal_set.first()
-            
-            if da and da.documento_anexado.certidao: 
+
+            if da and da.documento_anexado.certidao:
                 d.data_ultima_atualizacao = da.documento_anexado.certidao.created
                 d.save()
-                
-        
 
-    def run_ordene_dispositivos_pelos_numeros(self):
+    def run_busca_desordem_de_dispositivos(self):
         init = datetime.now()
 
-        ta = TextoArticulado.objects.get(pk=1121)
+        nodelist = Dispositivo.objects.filter(
+            dispositivo_pai__isnull=True).order_by('ta', 'ordem')
 
-        dpts = Dispositivo.objects.filter(ta=self)
+        def busca(nl):
+            numero = []
 
-        if not dpts.exists():
-            return
+            for nd in nl:
 
-        ordem_max = dpts.last().ordem
-        dpts.update(ordem=F('ordem') + ordem_max)
+                busca(nd.dispositivos_filhos_set.all())
 
-        raizes = Dispositivo.objects.filter(
-            ta=self,
-            dispositivo_pai__isnull=True).values_list(
-                'pk', flat=True).order_by('ordem')
+                if nd.contagem_continua:
+                    continue
+
+                if not numero:
+                    numero = nd.get_numero_completo()
+                    continue
+
+                if nd.get_numero_completo() < numero:
+                    print(nd.ta_id, nd.ordem, nd.id, ', '.join(map(str, nd.get_parents_asc())))
+
+                numero = nd.get_numero_completo()
+
+        busca(nodelist)
+

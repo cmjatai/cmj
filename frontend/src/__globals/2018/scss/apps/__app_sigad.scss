@@ -495,8 +495,8 @@
 
   .path-capa {
     //background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center top;
+    //background-repeat: no-repeat;
+    //background-position: center top;
     position: relative;
 
     img {
@@ -555,9 +555,9 @@
   }
 
   .path-parlamentares {
-    margin: 0 0 0 20px;
+    margin: 0 0 0 30px;
     position: absolute;
-    bottom: -70%;
+    bottom: -120%;
 
     &:first-child {
       margin-top: 0px;

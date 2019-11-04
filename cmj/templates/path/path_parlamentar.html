@@ -11,7 +11,7 @@
 
       <div class="path-capa {% if not object.parlamentar.capa  %}path-capa-semfoto{% endif %}">
         <div class="container">
-          <img src="{% thumbnail object.parlamentar.capa 1000x1000 box=object.parlamentar.capa_cropping crop detail %}">
+          <img src="{% thumbnail object.parlamentar.capa 9000x9000 box=object.parlamentar.capa_cropping crop detail %}">
 
         </div>
       </div>
@@ -28,7 +28,7 @@
           <div class="path-parlamentares">
             <a class="avatar avatar1" href="/{{ object.absolute_slug }}">
               {% if object.parlamentar.fotografia %}
-                  <img src="{% thumbnail object.parlamentar.fotografia 1000x1000 box=object.parlamentar.fotografia_cropping crop detail %}">
+                  <img src="{% thumbnail object.parlamentar.fotografia 9000x9000 box=object.parlamentar.fotografia_cropping crop detail %}">
               {% else %}
                   <img src="{% webpack_static 'img/perfil.jpg' %}">
               {% endif %}
