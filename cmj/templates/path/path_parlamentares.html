@@ -47,7 +47,7 @@
             {% endif %}
           {% endfor %}
         </div>
-      </div>
+      </div> 
       <div class="row container-avatar inner-mesa">
         <div class="tags w-100">Mesa Diretora</div>
         <div class="inner-parla w-100">
@@ -56,7 +56,11 @@
               {% for sessao in leg.sessoes %}
                 {% if sessao.sessao == sessaolegislativa_ativa %}
                   {% for parlamentar in sessao.mesa %}
+                    {% comment %}
                       <a class="avatar avatar2" href="/{{parlamentar.classe_set.first.absolute_slug}}" class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">
+                    {% endcomment %}
+                      <a class="avatar avatar2" href="{% url 'sapl.parlamentares:parlamentar_detail' parlamentar.id %}" class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">
+
                       {% if parlamentar.fotografia %}
                         <img src="{% thumbnail parlamentar.fotografia 1000x1000 box=parlamentar.cropping crop detail %}">
                       {% else %}

@@ -467,150 +467,73 @@
 }
 
 
-.container-path-parlamentar__new {
-  .avatar {
-    img {
-      border: 1px solid #ddd;
-    }
-  }
-  .path-title {
-    text-align: left;
-    margin: 0;
-  }
-  .path-topo {
-    padding-bottom: 1em;
-    border-bottom: 1px solid red;
-  }
-
-}
-
-
 .container-path-parlamentar {
-  margin-top: -$grid-gutter-width;
 
   .container-topo-parlamentar {
-    margin-bottom: $grid-gutter-width * 2;
-    padding: 0px;
+    margin: 0 -15px;
+
   }
 
   .path-capa {
-    //background-size: cover;
-    //background-repeat: no-repeat;
-    //background-position: center top;
     position: relative;
-
     img {
       width: 100%;
     }
-
     &.path-capa-semfoto {
       height: 100px;
     }
-
-    .container-social {
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      left: 0;
-
-      .container {
-        position: relative;
-      }
-    }
-
-    .navbar-social-links {
-      position: absolute;
-      bottom: 10px;
-      right: 10px;
-
-      a {
-        i {
-          text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.4);
-          color: #fafafa;
-        }
-
-        &:hover {
-          i {
-
-            text-shadow: none;
-            color: white;
-          }
-        }
-      }
-    }
   }
-
-  .path-header {
-    //border-bottom: 1px solid $color_topo_bg;;
+  .path-header {    
     position: relative;
-    box-shadow: -3px 1px 3px 0 rgba(0, 0, 0, 0.25), 5px 1px 100px 0 rgba(#fff, 0.5);
-    background: darken($color_main_bg, 5) $url_bg_png;
-  }
 
-  .path-title {
-    padding-top: 4px;
-    margin: 0;
-    line-height: 2em;
+    margin-bottom: 50px;
+    color: transparentize($color_topo_bg, 0.3);
+    box-shadow:  0px -30px 100px #fff;
+    background: darken($color_main_bg, 15%) $url_bg_png;
     text-align: right;
+    .title {
+      font-size: 1.7em;
+      line-height: 2em;    
+    }
   }
 
-  .path-parlamentares {
-    margin: 0 0 0 30px;
+  .masthead {
+    margin-top: 0;
     position: absolute;
-    bottom: -120%;
-
-    &:first-child {
-      margin-top: 0px;
+    bottom: 100%;
+    right: 1em;
+    //margin-bottom: 1px;
+    background-color: darken($color_main_bg, 10%);
+    border: 0px solid white;
+    border-radius: 7px 7px 0 0;
+    border-bottom-width: 0;
+    .active {
+      margin: 0;
+      background-color: darken($color_main_bg, 15%) !important;
     }
 
+  }
+
+  .inner {
+    position: relative;
     .avatar {
-      margin: 0;
+      width: 200px;
+      bottom: -120%;
+      left: 1em;
+      position: absolute;
       opacity: 1;
-      border-radius: 50%;
       background-color: white;
-
+      border-radius: 50%;
       img {
-        opacity: 0.75;
-        transition: opacity 0.3s ease;
-        padding: 6px;
-        box-shadow: 5px 1px 30px 0 rgba(#fff, 0.6);
-      }
-
-      &:hover {
-        img {
-          transition: opacity 0.3s ease;
+        border: 3px solid white;
+        opacity: 0.8;
+        box-shadow: 5px 1px 30px 0 hsla(0,0%,100%,.6);
+        transition: all 0.3s ease-in-out;
+        &:hover {
           opacity: 1;
+          transition: all 0.3s ease-in-out;
         }
       }
-    }
-  }
-
-  .container-list {
-    display: grid;
-    grid-template-columns: 33.333% 33.333% 33.333%;
-  }
-
-  .path-item-list {
-    max-width: none;
-
-    .path-parlamentares {
-      display: none;
-    }
-  }
-
-  .path-item-list:first-child {
-    grid-area: 1 / 1 / 3 / 3;
-
-    .titulo {
-      font-size: 200%;
-    }
-
-    .descricao {
-      font-size: 200%;
-    }
-
-    .data-pub {
-      display: none;
     }
   }
 }
@@ -815,24 +738,6 @@
 }
 
 @media screen and (max-width:767px) {
-
-  .container-path-parlamentar {
-    .container-list {
-      grid-template-columns: 100%;
-    }
-    .path-item-list:first-child {
-      grid-area: 1;
-
-      .titulo {
-        font-size: 120%;
-      }
-
-      .descricao {
-        font-size: 120%;
-      }
-
-    }
-  }
 
   .container-path {
 

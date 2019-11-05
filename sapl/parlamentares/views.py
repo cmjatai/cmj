@@ -22,7 +22,6 @@ from django.views.generic.edit import UpdateView
 from django_filters.views import FilterView
 from image_cropping.utils import get_backend
 
-
 from sapl.base.forms import SessaoLegislativaForm, PartidoForm, PartidoUpdateForm
 from sapl.base.models import Autor
 from sapl.comissoes.models import Participacao
@@ -33,19 +32,17 @@ from sapl.materia.models import Autoria, Proposicao, Relatoria
 from sapl.parlamentares.apps import AppConfig
 from sapl.utils import (parlamentares_ativos, show_results_filter_set)
 
-
 from .forms import (FiliacaoForm, FrenteForm, LegislaturaForm, MandatoForm,
-                    ParlamentarCreateForm, ParlamentarForm, VotanteForm, 
+                    ParlamentarCreateForm, ParlamentarForm, VotanteForm,
                     ParlamentarFilterSet, VincularParlamentarForm,
                     BlocoForm, CargoBlocoForm, CargoBlocoPartidoForm,
                     BancadaForm, AfastamentoParlamentarForm)
-                    
+
 from .models import (Bancada, CargoBancada, CargoMesa, Coligacao, ComposicaoColigacao, ComposicaoMesa,
                      Dependente, Filiacao, Frente, Legislatura, Mandato,
                      NivelInstrucao, Parlamentar, Partido, SessaoLegislativa,
                      SituacaoMilitar, TipoAfastamento, TipoDependente, Votante,
                      Bloco, CargoBlocoPartido, HistoricoPartido, CargoBloco, AfastamentoParlamentar)
-
 
 CargoBancadaCrud = CrudAux.build(CargoBancada, '')
 CargoMesaCrud = CrudAux.build(CargoMesa, 'cargo_mesa')
@@ -80,10 +77,12 @@ class PartidoCrud(CrudAux):
         form_class = PartidoUpdateForm
 
     class DetailView(CrudAux.DetailView):
+
         def get_context_data(self, **kwargs):
             context = super().get_context_data(kwargs=kwargs)
             context.update({'historico': HistoricoPartido.objects.filter(partido=self.object).order_by('-inicio_historico')})
             return context
+
 
 class VotanteView(MasterDetailCrud):
     model = Votante
@@ -397,6 +396,7 @@ class FrenteCrud(Crud):
                         'data_extincao', 'parlamentares']
 
     class BaseMixin(Crud.BaseMixin):
+
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
             context['subnav_template_name'] = ''
@@ -540,18 +540,7 @@ class ParlamentarCrud(Crud):
     class DetailView(Crud.DetailView):
 
         def get_template_names(self):
-            if self.request.user.has_perm(self.permission(RP_CHANGE)):
-                if 'iframe' not in self.request.GET:
-                    if not self.request.session.get('iframe'):
-                        return ['crud/detail.html']
-                elif self.request.GET['iframe'] == '0':
-                    return ['crud/detail.html']
-
-            return ['parlamentares/parlamentar_perfil_publico.html']
-
-        @xframe_options_exempt
-        def get(self, request, *args, **kwargs):
-            return super().get(request, *args, **kwargs)
+            return ['parlamentares/base_parlamentares.html']
 
     class UpdateView(Crud.UpdateView):
         form_class = ParlamentarForm
@@ -695,10 +684,10 @@ class ParlamentarCrud(Crud):
                                       ". Filiação encontrada com sucesso.")
 
                     partido_aux = filiacao.partido
-                    historico = HistoricoPartido.objects.filter(partido=partido_aux).order_by('-fim_historico')  
+                    historico = HistoricoPartido.objects.filter(partido=partido_aux).order_by('-fim_historico')
                     if historico:
                         partido_aux = next(iter([p for p in historico if p.inicio_historico < legislatura.data_fim <= p.fim_historico]), filiacao.partido)
-                    
+
                     row[1] = (partido_aux.sigla, None, None)
 
             return context
@@ -1068,8 +1057,6 @@ def partido_parlamentar_sessao_legislativa(sessao, parlamentar):
             data_desfiliacao__gte=sessao.data_fim) | Q(
             data__lte=sessao.data_fim,
             data_desfiliacao__isnull=True))
-        
-
 
     # Caso não exista filiação com essas condições
     except ObjectDoesNotExist:
@@ -1180,7 +1167,7 @@ def deleta_historico_partido(request, pk):
     historico = HistoricoPartido.objects.get(pk=pk)
     pk_partido = historico.partido.pk
     historico.delete()
-    
+
     return HttpResponseRedirect(
                 reverse(
                     'sapl.parlamentares:partido_detail',
@@ -1191,7 +1178,7 @@ class VincularParlamentarView(PermissionRequiredMixin, FormView):
     logger = logging.getLogger(__name__)
     form_class = VincularParlamentarForm
     template_name = 'parlamentares/vincular_parlamentar.html'
-    permission_required = ('parlamentares.add_parlamentar', )
+    permission_required = ('parlamentares.add_parlamentar',)
 
     def get_success_url(self):
         return reverse('sapl.parlamentares:parlamentar_list')
@@ -1223,8 +1210,8 @@ class BlocoCrud(CrudAux):
         def get_success_url(self):
             return reverse('sapl.parlamentares:bloco_list')
 
-
     class DetailView(CrudAux.DetailView):
+
         def get_template_names(self):
             return ['parlamentares/detail_bloco.html']
 
@@ -1235,18 +1222,19 @@ class BlocoCrud(CrudAux):
             context['vinculados'] = CargoBlocoPartido.objects.filter(bloco=self.object)
 
             return context
-        
-        
+
+
 class CargoBlocoCrud(CrudAux):
     model = CargoBloco
-   
+
     class CreateView(CrudAux.CreateView):
         form_class = CargoBlocoForm
 
-def vincula_parlamentar_ao_bloco(request,pk):
+
+def vincula_parlamentar_ao_bloco(request, pk):
     template_name = "parlamentares/vincula_parlamentar_ao_bloco.html"
     if request.method == 'POST':
-        form = CargoBlocoPartidoForm(request.POST,initial={'bloco_pk': pk})
+        form = CargoBlocoPartidoForm(request.POST, initial={'bloco_pk': pk})
         if form.is_valid():
             vinculo = form.save(commit=False)
             vinculo.bloco = Bloco.objects.get(pk=pk)
@@ -1258,7 +1246,7 @@ def vincula_parlamentar_ao_bloco(request,pk):
     else:
         form = CargoBlocoPartidoForm(initial={'bloco_pk': pk})
 
-    return render(request, template_name, {'form': form,'pk':pk})
+    return render(request, template_name, {'form': form, 'pk':pk})
 
 
 def get_sessoes_legislatura(request):
@@ -1267,16 +1255,16 @@ def get_sessoes_legislatura(request):
 
     json_response = {'sessoes_legislativas': []}
     for s in SessaoLegislativa.objects.filter(legislatura_id=legislatura_id):
-        json_response['sessoes_legislativas'].append( (s.id, str(s)) )
+        json_response['sessoes_legislativas'].append((s.id, str(s)))
 
     return JsonResponse(json_response)
 
 
-def edita_vinculo_parlamentar_bloco(request,pk):
+def edita_vinculo_parlamentar_bloco(request, pk):
     template_name = "parlamentares/vincula_parlamentar_ao_bloco.html"
     vinculo = get_object_or_404(CargoBlocoPartido, pk=pk)
     if request.method == 'POST':
-        form = CargoBlocoPartidoForm(request.POST,instance=vinculo, initial={'bloco_pk':vinculo.bloco.pk})
+        form = CargoBlocoPartidoForm(request.POST, instance=vinculo, initial={'bloco_pk':vinculo.bloco.pk})
         if form.is_valid():
             vinculo = form.save(commit=True)
             return HttpResponseRedirect(
@@ -1286,10 +1274,10 @@ def edita_vinculo_parlamentar_bloco(request,pk):
     else:
         form = CargoBlocoPartidoForm(instance=vinculo, initial={'bloco_pk':vinculo.bloco.pk})
 
-    return render(request, template_name, {'form': form,'pk':vinculo.bloco.pk})
+    return render(request, template_name, {'form': form, 'pk':vinculo.bloco.pk})
 
 
-def deleta_vinculo_parlamentar_bloco(request,pk):
+def deleta_vinculo_parlamentar_bloco(request, pk):
     vinculo = get_object_or_404(CargoBlocoPartido, pk=pk)
     pk_bloco = vinculo.bloco.pk
     vinculo.delete()
@@ -1298,6 +1286,7 @@ def deleta_vinculo_parlamentar_bloco(request,pk):
             'sapl.parlamentares:bloco_detail',
             kwargs={'pk': pk_bloco})
         )
+
 
 class AfastamentoParlamentarCrud(PermissionRequiredMixin, MasterDetailCrud):
     model = AfastamentoParlamentar

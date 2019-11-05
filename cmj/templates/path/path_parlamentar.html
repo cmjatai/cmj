@@ -8,14 +8,11 @@
 {% block base_header %}
   <div class="container-fluid container-topo-parlamentar">
     <div class="inner">
-
       <div class="path-capa {% if not object.parlamentar.capa  %}path-capa-semfoto{% endif %}">
         <div class="container">
           <img src="{% thumbnail object.parlamentar.capa 9000x9000 box=object.parlamentar.capa_cropping crop detail %}">
-
         </div>
       </div>
-
 
       <div class="path-header">
         <div class="container">
