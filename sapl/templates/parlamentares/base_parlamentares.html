@@ -9,38 +9,48 @@
 {% block base_container_header %}
 
 <div class="container-topo-parlamentar">
-  <div class="container">
-    <div class="row">
-      <div class="path-capa {% if not parlamentar.capa  %}path-capa-semfoto{% endif %}">
-        <img src="{% thumbnail parlamentar.capa 9000x9000 box=parlamentar.capa_cropping crop detail %}">
-      </div>
-    </div>  
+  <div class="path-capa {% if not parlamentar.capa  %}path-capa-semfoto{% endif %}">
+    <img src="{% thumbnail parlamentar.capa 9000x9000 box=parlamentar.capa_cropping crop detail %}">
   </div> 
 
   
   <div class="container-fluid path-header">
-    <div class="row">
-      <div class="container inner">
+    <div class="">
+      <div class="inner">
         <header class="masthead">
-              {% block sections_nav %}{% subnav %}{% endblock sections_nav %}
+          {% block sections_nav %}{% subnav %}{% endblock sections_nav %}
         </header>
-        <span class="title">
-          {% if title %}
-            {{ title|safe|linebreaksbr }}
-          {% elif view.title %}
-            {{ view.title|safe|linebreaksbr }}
-          {% elif object %}
-            {{ object|safe|linebreaksbr }}
-          {% endif %}
-        </span>
 
-        <a class="avatar" href="/{{ object.absolute_slug }}">
-          {% if parlamentar.fotografia %}
-              <img src="{% thumbnail parlamentar.fotografia 9000x9000 box=parlamentar.fotografia_cropping crop detail %}">
-          {% else %}
-              <img src="{% webpack_static 'img/perfil.jpg' %}">
-          {% endif %}
-        </a>
+        <div class="row d-flex w-100">
+          <div class="col-2 d-flex align-items-center">
+            <a class="avatar" href="/{{ object.classe_set.first.absolute_slug }}">
+              {% if parlamentar.fotografia %}
+                  <img src="{% thumbnail parlamentar.fotografia 9000x9000 box=parlamentar.fotografia_cropping crop detail %}">
+              {% else %}
+                  <img src="{% webpack_static 'img/perfil.jpg' %}">
+              {% endif %}
+            </a>
+          </div>
+          <div class="col-10 w-100 d-flex justify-content-between align-items-center">
+            <a class="btn btn-noticias" href="/{{ object.classe_set.first.absolute_slug }}" title="Acessar página de notícias do parlamentar">
+              Notícias
+            </a>
+
+            {% social_link_share parlamentar.classe_set.first %}
+      
+            <span class="title">
+              {% if title %}
+                {{ title|safe|linebreaksbr }}
+              {% elif view.title %}
+                {{ view.title|safe|linebreaksbr }}
+              {% elif object %}
+                {{ object|safe|linebreaksbr }}
+              {% endif %}
+            </span>
+          </div>
+        
+        </div>
+
 
       </div>
     </div>

@@ -31,6 +31,8 @@
     text-align: left;
     font-size: 130%;
     font-variant: small-caps;
+    line-height: 1;
+    padding: 5px 0;
     &:hover {
       text-decoration: none;
     } 
@@ -76,6 +78,7 @@
     border-width: 1px 0 0 1px;
     margin-left: -$grid-gutter-width / 2 - 1px;
   }
+
   .inner-parlamentares {
     background: $hover_background_05p;
     .inner-ativos {
@@ -85,18 +88,19 @@
       margin: 0.6em;
     }
   }
+
   .inner-parla {
     display: flex;
     justify-content: center;
     a {
       display: inline-block;
-      flex: 0 1 45%;
+      flex: 1 1 30%;
       margin: 5px;
       img {
         border: 1px solid #ddd;
       }
       &:nth-child(2) {
-        flex-basis: 30%;
+        flex-basis: 40%;
       }
     }
   }
@@ -113,13 +117,11 @@
   }
 }
 
-
 @media screen and (max-width: 991px) {
   .container-legislaturas {
     .avatar3 {
       width: 100px;
     }
-    
   }
 }
 

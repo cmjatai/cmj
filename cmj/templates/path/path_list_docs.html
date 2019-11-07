@@ -1,4 +1,4 @@
-{% load i18n sigad_filters social_utils %}
+{% load i18n sigad_filters social_utils  cropping thumbnail %}
 
 {% for documento in object_list %}
   {% if split_row %}
@@ -74,8 +74,9 @@
             {% endif %}
 
               {% if parlamentar.fotografia %}
+
                 <a class="avatar" href="/{{ parlamentar.classe_set.first.absolute_slug }}">
-                  <img src="{{ parlamentar.fotografia.url }}" alt="{{parlamentar}}">
+                  <img src="{% thumbnail parlamentar.fotografia 9000x9000 box=parlamentar.fotografia_cropping crop detail %}">
                 </a>
               {% endif %}
 

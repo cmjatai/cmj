@@ -468,70 +468,75 @@
 
 
 .container-path-parlamentar {
+  .path-parlamentares {
+    display: none;;
+  }
 
   .container-topo-parlamentar {
     margin: 0 -15px;
 
-  }
-
-  .path-capa {
-    position: relative;
-    img {
-      width: 100%;
-    }
-    &.path-capa-semfoto {
-      height: 100px;
-    }
-  }
-  .path-header {    
-    position: relative;
-
-    margin-bottom: 50px;
-    color: transparentize($color_topo_bg, 0.3);
-    box-shadow:  0px -30px 100px #fff;
-    background: darken($color_main_bg, 15%) $url_bg_png;
-    text-align: right;
-    .title {
-      font-size: 1.7em;
-      line-height: 2em;    
-    }
-  }
-
-  .masthead {
-    margin-top: 0;
-    position: absolute;
-    bottom: 100%;
-    right: 1em;
-    //margin-bottom: 1px;
-    background-color: darken($color_main_bg, 10%);
-    border: 0px solid white;
-    border-radius: 7px 7px 0 0;
-    border-bottom-width: 0;
-    .active {
-      margin: 0;
-      background-color: darken($color_main_bg, 15%) !important;
-    }
-
-  }
-
-  .inner {
-    position: relative;
-    .avatar {
-      width: 200px;
-      bottom: -120%;
-      left: 1em;
-      position: absolute;
-      opacity: 1;
-      background-color: white;
-      border-radius: 50%;
+    
+    .path-capa {
+      position: relative;
       img {
-        border: 3px solid white;
-        opacity: 0.8;
-        box-shadow: 5px 1px 30px 0 hsla(0,0%,100%,.6);
-        transition: all 0.3s ease-in-out;
-        &:hover {
-          opacity: 1;
+        width: 100%;
+      }
+      &.path-capa-semfoto {
+        height: 100px;
+      }
+    }
+    .path-header {    
+      position: relative;
+      
+      margin-bottom: 50px;
+      color: transparentize($color_topo_bg, 0.3);
+      box-shadow:  0px -30px 100px #fff;
+      background: darken($color_main_bg, 15%) $url_bg_png;
+      text-align: right;
+      .title {
+        font-size: 1.8rem;
+        line-height: 2em;    
+        font-family: "Lato";
+      }
+      
+      .masthead {
+        right: 0;
+        margin-top: 0;
+        position: absolute;
+        bottom: 100%;
+        background-color: darken($color_main_bg, 10%);
+        .active {
+          background-color: darken($color_main_bg, 15%) !important;
+        }
+      }
+    }
+
+    .inner {
+      position: relative;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      .btn-noticias {
+        font-size: 1.5em;
+        font-family: "Lato";
+      }
+      .avatar {
+        position: absolute;
+        opacity: 1;
+        background-color: white;
+        border-radius: 50%;
+        width: 100%;
+        left: 0;
+        img {
+          border: 3px solid white;
+          opacity: 0.8;
+          box-shadow: 5px 1px 30px 0 hsla(0,0%,100%,.6);
           transition: all 0.3s ease-in-out;
+          &:hover {
+            opacity: 1;
+            transition: all 0.3s ease-in-out;
+          }
         }
       }
     }
@@ -543,7 +548,7 @@
     position: fixed;
     bottom: 50%;
     z-index: 2000;
-
+    
     a,
     a:hover {
       color: white;
@@ -734,13 +739,13 @@
 
     }
   }
-
 }
 
+
+
+
 @media screen and (max-width:767px) {
-
   .container-path {
-
     font-size: 1.3em;
 
     .path-imagem {
@@ -764,7 +769,51 @@
   }
 }
 
-@media screen and (max-width: 575px) {
+@media screen and (max-width: 599.98px) {
+  .container-path-parlamentar {
+    .container-topo-parlamentar {
+      .container-fluid {
+        padding: 0;
+      }
+      .inner {
+        .btn-noticias {
+          padding: 5px;
+          font-size: 1rem;
+        }
+        .col-10 {
+          padding-right: 10px;
+        }
+        .title {
+          font-size: 1.4em;
+        }
+        .navbar-social-links a {
+          font-size: 0.8em;
+        }
+        .avatar {
+          margin-left: 10px;
+        }
+      }
+    }
+
+    .path-header {
+      .masthead {
+        .nav {
+          flex-direction: column;
+          li {
+            border-radius: 0;
+          }
+          a {
+            font-size: 0.8em;
+            line-height: 1em;
+          }
+        }
+      }
+    }
+  }
+
+
+  
+
   .container-avatar {
     .avatar1 {
       width: 150px;
@@ -797,8 +846,6 @@
 
 @media screen and (max-width: 480px) {
   .path-item-list {
-    //font-size: 1rem;
-
     .titulo {
       font-size: 1.2rem;
     }
@@ -806,9 +853,7 @@
     .inner {
       border-bottom: 1px solid #ccc;
     }
-
   }
-
 }
 
 @media screen and (max-width: 425px) {
@@ -821,6 +866,7 @@
     .avatar {
       margin-left: 5px;
     }
+
     .avatar1 {
       width: 100px;
     }

@@ -1,29 +1,29 @@
-
 {% extends "base_path.html" %}
-{% load i18n sigad_filters social_utils cropping thumbnail %}
+{% load i18n sigad_filters social_utils cropping thumbnail menus %}
 {% load webpack_static from webpack_loader %}
 
-{% block main_container_class %}container-path container-path-parlamentar{% endblock %}
+{% block main_container_class %}container container-path-parlamentar{% endblock main_container_class %}
 {% block base_functions %}{% endblock %}
-{% block base_header %}
-  <div class="container-fluid container-topo-parlamentar">
-    <div class="inner">
-      <div class="path-capa {% if not object.parlamentar.capa  %}path-capa-semfoto{% endif %}">
-        <div class="container">
-          <img src="{% thumbnail object.parlamentar.capa 9000x9000 box=object.parlamentar.capa_cropping crop detail %}">
-        </div>
-      </div>
+{% block main_header %}{% endblock %}
 
-      <div class="path-header">
-        <div class="container">
-          {% block title %}
-          {% social_link_share object 'absolute-top-center' %}
+{% block base_container_header %}
 
+<div class="container-topo-parlamentar">
+  <div class="path-capa {% if not object.parlamentar.capa  %}path-capa-semfoto{% endif %}">
+    <img src="{% thumbnail object.parlamentar.capa 9000x9000 box=object.parlamentar.capa_cropping crop detail %}">
+  </div> 
 
-            {{block.super}}
-          {% endblock %}
-          <div class="path-parlamentares">
-            <a class="avatar avatar1" href="/{{ object.absolute_slug }}">
+  
+  <div class="container-fluid path-header">
+    <div class="">
+      <div class="inner">
+        <header class="masthead">
+          {% block sections_nav %}{% subnav 'parlamentares/subnav.yaml' object.parlamentar.id%}{% endblock sections_nav %}
+        </header>
+
+        <div class="row d-flex w-100">
+          <div class="col-2 d-flex align-items-center">
+            <a class="avatar" href="/{{ object.classe_set.first.absolute_slug }}">
               {% if object.parlamentar.fotografia %}
                   <img src="{% thumbnail object.parlamentar.fotografia 9000x9000 box=object.parlamentar.fotografia_cropping crop detail %}">
               {% else %}
@@ -31,13 +31,32 @@
               {% endif %}
             </a>
           </div>
+          <div class="col-10 w-100 d-flex justify-content-between align-items-center">
+              {% social_link_share object %}
+      
+            <span class="title">
+              {{ object.parlamentar }}
+            </span>
+          </div>
+        
         </div>
+
+
       </div>
-
-
-
     </div>
   </div>
+</div>
+{% endblock base_container_header %}
+
+
+
+
+
+
+
+
+
+{% block base_header %}
 
   {% block controls_content %}
     {% if perms.sigad.change_classe %}
@@ -47,25 +66,18 @@
 {% endblock %}
 
 {% block base_content %}
-
-<div class="container">
-  <div class="container-list">
-    {% with slug as prefixo_slug %}
-      {% with 0 as split_row %}
-        {% with 'path-item-list col-md-4' as css_class %}
-          {% include "path/path_list_docs.html" %}
+<div class="container container-path">
+  <div class="row">
+      {% with slug as prefixo_slug %}
+        {% with 0 as split_row %}
+          {% with 'path-item-list col-md-4' as css_class %}
+            {% include "path/path_list_docs.html" %}
+          {% endwith %}
         {% endwith %}
       {% endwith %}
-    {% endwith %}
-  </div>
-  {% include "paginacao.html" %}
+    </div>
+
+    {% include "paginacao.html" %}
 </div>
 
-
-{% endblock %}
-
-{% block cmj_extra_content %}
-  <div class="container-fluid container{{fluid}}{{path}}">
-    ...
-  </div>
 {% endblock %}
