@@ -17,7 +17,7 @@ from cmj.core.models import OcrMyPDF
 from cmj.diarios.models import DiarioOficial
 from sapl.materia.models import MateriaLegislativa, DocumentoAcessorio
 from sapl.norma.models import NormaJuridica
-from sapl.protocoloadm.models import DocumentoAdministrativo,\
+from sapl.protocoloadm.models import DocumentoAdministrativo, \
     DocumentoAcessorioAdministrativo
 from sapl.sessao.models import SessaoPlenaria
 
@@ -27,12 +27,14 @@ def _get_registration_key(model):
 
 
 class ProcessOCR(object):
+
     def __init__(self, cmd, logger):
         self.cmd = cmd
         self.process = None
         self.logger = logger
 
     def run(self, timeout):
+
         def target():
             self.logger.info('Thread started')
             self.process = subprocess.Popen(
@@ -59,24 +61,17 @@ class Command(BaseCommand):
     models = [
         {
             'model': DocumentoAdministrativo,
-            'file_field': ('texto_integral', ),
+            'file_field': ('texto_integral',),
             'count': 0,
             'count_base': 9,
             'order_by': '-data'
         },
         {
             'model': DocumentoAcessorioAdministrativo,
-            'file_field': ('arquivo', ),
+            'file_field': ('arquivo',),
             'count': 0,
             'count_base': 2,
             'order_by': '-data'
-        },
-        {
-            'model': MateriaLegislativa,
-            'file_field': ('texto_original',),
-            'count': 0,
-            'count_base': 2,
-            'order_by': '-data_apresentacao'
         },
         {
             'model': NormaJuridica,
@@ -94,7 +89,7 @@ class Command(BaseCommand):
         },
         {
             'model': DiarioOficial,
-            'file_field': ('arquivo', ),
+            'file_field': ('arquivo',),
             'count': 0,
             'count_base': 2,
             'order_by': '-data'
@@ -106,7 +101,13 @@ class Command(BaseCommand):
             'count_base': 2,
             'order_by': '-data_inicio'
         },
-
+        {
+            'model': MateriaLegislativa,
+            'file_field': ('texto_original',),
+            'count': 0,
+            'count_base': 2,
+            'order_by': '-data_apresentacao'
+        },
 
     ]
 
@@ -226,7 +227,7 @@ class Command(BaseCommand):
         # force-ocr só pode ser usado se outro teste verificar antes que um
         # documento não possui assinatura digital
 
-        #cmd = ["ocrmypdf",  "--deskew",  "-l por", file.path, file.path]
+        # cmd = ["ocrmypdf",  "--deskew",  "-l por", file.path, file.path]
 
         o_path = file.path.replace('media/sapl/', 'media/original__sapl/')
         print(o_path)
