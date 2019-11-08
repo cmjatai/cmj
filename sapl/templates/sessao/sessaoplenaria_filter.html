@@ -38,27 +38,29 @@
       <table class="table table-striped table-hover">
         {% for s in page_obj %}
           <tr>
-            <td class="row  align-items-center">
-              <div class="col-12 pb-3">
-                <strong><a href="{% url 'sapl.sessao:sessaoplenaria_detail' s.id %}">{{s}}</strong></a></br>
-              </div>
-              {% if s.url_video %}
-              <div class="col-md-5">
-                <div class="embed-responsive embed-responsive-16by9">
-                  <iframe id="ytplayer" type="text/html" allowfullscreen
-                  src="https://www.youtube.com/embed/{{ s.url_video|youtube_id }}"
-                  frameborder="0"></iframe>
+            <td>
+              <div class="row align-items-center">
+                <div class="col-12 pb-{% if s.url_video %}2{% else %}1{% endif %}">
+                  <strong><a href="{% url 'sapl.sessao:sessaoplenaria_detail' s.id %}">{{s}}</strong></a></br>
                 </div>
-              </div>
-              {% endif %}
-              <div class="col ">
-                <strong>Abertura:</strong> {{s.data_inicio}}</br>
-                <strong>Legislatura:</strong> {{s.legislatura}}</br>
-                <strong>Sessão Legislativa:</strong> {{s.sessao_legislativa}}</br>
-                <strong>Tipo:</strong> {{s.tipo}}</br>
-                {% if s.upload_ata %}
-                <strong><a href="{{s.upload_ata.url}}">Ata da Sessão</strong></a></br>
+                {% if s.url_video %}
+                <div class="col-md-5">
+                  <div class="embed-responsive embed-responsive-16by9">
+                    <iframe id="ytplayer" type="text/html" allowfullscreen
+                    src="https://www.youtube.com/embed/{{ s.url_video|youtube_id }}"
+                    frameborder="0"></iframe>
+                  </div>
+                </div>
                 {% endif %}
+                <div class="col ">
+                  <strong>Abertura:</strong> {{s.data_inicio}}</br>
+                  <strong>Legislatura:</strong> {{s.legislatura}}</br>
+                  <strong>Sessão Legislativa:</strong> {{s.sessao_legislativa}}</br>
+                  <strong>Tipo:</strong> {{s.tipo}}</br>
+                  {% if s.upload_ata %}
+                  <strong><a href="{{s.upload_ata.url}}">Ata da Sessão</strong></a></br>
+                  {% endif %}
+                </div>
               </div>
             </td>
           </tr>
