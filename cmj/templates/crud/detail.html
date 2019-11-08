@@ -78,7 +78,7 @@
                         </div>
                       {% elif column.text|youtube_url %}
                         <div class="embed-responsive embed-responsive-16by9">
-                          <iframe id="ytplayer" type="text/html"
+                          <iframe id="ytplayer" type="text/html" allowfullscreen
                           src="https://www.youtube.com/embed/{{ column.text|youtube_id }}"
                           frameborder="0"></iframe>
                         </div>

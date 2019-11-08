@@ -1,12 +1,11 @@
 {% extends "crud/detail.html" %}
 {% load i18n %}
-{% load crispy_forms_tags %}
+{% load crispy_forms_tags common_tags %}
 
 {% block actions %}
   <div class="actions btn-group" role="group">
   {% block more_buttons %}
     <a href="{% url 'sapl.base:haystack_search' %}?q=&models=sessao.sessaoplenaria" class="btn btn-outline-primary">
-    
        Mudar para Pesquisa Textual
     </a>
     <button type="button"
@@ -30,42 +29,46 @@
   </div>
 {% endblock %}
 
-{% block detail_content %}
+{% block table_content %}
   {% crispy filter.form %}
 
   {% if show_results %}
-    <p></p>
-    <table class="table table-striped table-hover">
-      <thead class="thead-default"><tr><td><h3>Resultados</h3></td></tr></thead>
-      {% if page_obj|length %}
-        {% if numero_res > 1 %}
-          <h3>Foram encontradas {{numero_res}} sessões.</h3></br>
-        {% elif numero_res == 1 %}
-          <h3>Foi encontrada {{numero_res}} sessão.</h3></br>
-        {% endif %}
-
+    <div class="container-table">
+      <div class="result-count">Total de Sessões: <strong>{{paginator.count}}</strong></div>
+      <table class="table table-striped table-hover">
         {% for s in page_obj %}
           <tr>
-            <td>
-              <strong><a href="{% url 'sapl.sessao:sessaoplenaria_detail' s.id %}">{{s}}</strong></a></br>
-              <strong>Abertura:</strong> {{s.data_inicio}}</br>
-              <strong>Legislatura:</strong> {{s.legislatura}}</br>
-              <strong>Sessão Legislativa:</strong> {{s.sessao_legislativa}}</br>
-              <strong>Tipo:</strong> {{s.tipo}}</br>
-              {% if s.upload_ata %}
-              <strong><a href="{{s.upload_ata.url}}">Ata da Sessão</strong></a></br>
+            <td class="row  align-items-center">
+              <div class="col-12 pb-3">
+                <strong><a href="{% url 'sapl.sessao:sessaoplenaria_detail' s.id %}">{{s}}</strong></a></br>
+              </div>
+              {% if s.url_video and not perms.sessao.change_sessaoplenaria %}
+              <div class="col-md-5">
+                <div class="embed-responsive embed-responsive-16by9">
+                  <iframe id="ytplayer" type="text/html" allowfullscreen
+                  src="https://www.youtube.com/embed/{{ s.url_video|youtube_id }}"
+                  frameborder="0"></iframe>
+                </div>
+              </div>
               {% endif %}
+              <div class="col ">
+                <strong>Abertura:</strong> {{s.data_inicio}}</br>
+                <strong>Legislatura:</strong> {{s.legislatura}}</br>
+                <strong>Sessão Legislativa:</strong> {{s.sessao_legislativa}}</br>
+                <strong>Tipo:</strong> {{s.tipo}}</br>
+                {% if s.upload_ata %}
+                <strong><a href="{{s.upload_ata.url}}">Ata da Sessão</strong></a></br>
+                {% endif %}
+              </div>
             </td>
           </tr>
-        {% endfor %}
-      {% else  %}
+        {% empty  %}
         <tr><td><h3>Nenhuma Sessão Plenária encontrada com essas especificações</h3></tr>
-      {% endif %}
-    </table>
-    {% include "paginacao.html" %}
+        {% endfor %}
+      </table>
+      {% include "paginacao.html" %}
+    </div>
   {% endif %}
-{% endblock detail_content %}
-{% block table_content %}
 {% endblock table_content %}
 
 
