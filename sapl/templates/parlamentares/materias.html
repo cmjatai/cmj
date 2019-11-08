@@ -14,15 +14,13 @@
 
 {% block detail_content %}
 
-<h2 style="text-align: center">Primeiro Autor</h2>
-<br/>
 <table class="table table-striped table-bordered">
   {% for autoria in autoria.0 %}
     <thead class="thead-default">
       <tr>
         <td colspan=3>
-          <strong>
-            Ano: {{ autoria.0 }}
+          <strong class="h1">
+            Em: {{ autoria.0 }}
           </strong>
         </td>
       </tr>
