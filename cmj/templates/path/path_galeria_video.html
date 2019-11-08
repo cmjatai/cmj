@@ -67,7 +67,9 @@
                 <i class="fa fa-play" aria-hidden="true"></i>
                 <div class="inner-text">
                   <span class="titulo">{{doc.titulo}}</span>
-                  <span class="descricao">{{doc.descricao}}</span>
+                  {% if doc.descricao %}
+                    <span class="descricao">{{doc.descricao|default:''}}</span>
+                  {% endif %}
                 </div>
               </a>
             {% endwith %}
