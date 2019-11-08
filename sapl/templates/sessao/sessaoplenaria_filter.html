@@ -42,7 +42,7 @@
               <div class="col-12 pb-3">
                 <strong><a href="{% url 'sapl.sessao:sessaoplenaria_detail' s.id %}">{{s}}</strong></a></br>
               </div>
-              {% if s.url_video and not perms.sessao.change_sessaoplenaria %}
+              {% if s.url_video %}
               <div class="col-md-5">
                 <div class="embed-responsive embed-responsive-16by9">
                   <iframe id="ytplayer" type="text/html" allowfullscreen
