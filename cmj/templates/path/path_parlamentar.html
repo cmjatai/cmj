@@ -23,7 +23,7 @@
 
         <div class="row d-flex w-100">
           <div class="col-2 d-flex align-items-center">
-            <a class="avatar" href="/{{ object.classe_set.first.absolute_slug }}">
+            <a class="avatar" href="/{{ object.absolute_slug }}">
               {% if object.parlamentar.fotografia %}
                   <img src="{% thumbnail object.parlamentar.fotografia 9000x9000 box=object.parlamentar.fotografia_cropping crop detail %}">
               {% else %}

@@ -1,7 +1,6 @@
 from datetime import timedelta
 import logging
 
-from sapl.crispy_layout_mixin import SaplFormHelper
 from crispy_forms.layout import Fieldset, Layout
 from django import forms
 from django.contrib.auth import get_user_model
@@ -13,14 +12,15 @@ from django.db.models import Q
 from django.forms import ModelForm
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+import django_filters
 from floppyforms.widgets import ClearableFileInput
 from image_cropping.widgets import CropWidget, ImageCropWidget
-from sapl.utils import FileFieldCheckMixin, filiacao_data, intervalos_tem_intersecao
 
 from sapl.base.models import Autor, TipoAutor
+from sapl.crispy_layout_mixin import SaplFormHelper
 from sapl.crispy_layout_mixin import form_actions, to_row
 from sapl.rules import SAPL_GROUP_VOTANTE
-import django_filters
+from sapl.utils import FileFieldCheckMixin, filiacao_data, intervalos_tem_intersecao
 
 from .models import (ComposicaoColigacao, Filiacao, Frente, Legislatura,
                      Mandato, Parlamentar, Votante, Bloco, Bancada, CargoBloco,
@@ -92,7 +92,6 @@ class MandatoForm(ModelForm):
 
         self.fields['tipo_afastamento'].queryset = TipoAfastamento.objects.filter(indicador='F')
 
-
     def clean(self):
         super(MandatoForm, self).clean()
 
@@ -145,8 +144,12 @@ class MandatoForm(ModelForm):
 
         existe_mandato = Mandato.objects.filter(
             parlamentar=data['parlamentar'],
-            legislatura=data['legislatura']).exists()
-        if existe_mandato and data['titular']:
+            legislatura=data['legislatura'])
+
+        if self.instance.pk:
+            existe_mandato = existe_mandato.exclude(id=self.instance.pk)
+
+        if existe_mandato.exists() and data['titular']:
             self.logger.error("Mandato nesta legislatura (parlamentar={}, legislatura={}) já existe."
                               .format(data['parlamentar'], data['legislatura']))
             raise ValidationError(_('Mandato nesta legislatura já existe.'))
@@ -343,7 +346,7 @@ def validar_datas(data_filiacao, data_desfiliacao, parlamentar, filiacao):
                          " no intervalo de outro período de filiação.")
             error_msg = _("A data de filiação e desfiliação (intervalo de {} a {}) "
                           "não podem estar no intervalo de outro período de filiação."
-                          .format(data_filiacao, df_desfiliacao, ))
+                          .format(data_filiacao, df_desfiliacao,))
 
     if not error_msg:
         # passou pelo teste de intervalo mas a data de filiação é maior que
@@ -598,6 +601,7 @@ class VincularParlamentarForm(forms.Form):
 
 
 class BlocoForm(ModelForm):
+
     class Meta:
         model = Bloco
         fields = ['nome', 'partidos', 'data_criacao',
@@ -685,16 +689,17 @@ class BancadaForm(ModelForm):
 
 
 class CargoBlocoForm(ModelForm):
+
     class Meta:
         model = CargoBloco
         fields = '__all__'
+
 
 class CargoBlocoPartidoForm(ModelForm):
 
     class Meta:
         model = CargoBlocoPartido
-        fields = ['cargo','parlamentar','data_inicio','data_fim']
-    
+        fields = ['cargo', 'parlamentar', 'data_inicio', 'data_fim']
 
     def __init__(self, *args, **kwargs):
         super(CargoBlocoPartidoForm, self).__init__(*args, **kwargs)
@@ -704,11 +709,10 @@ class CargoBlocoPartidoForm(ModelForm):
             partidos = self.bloco.partidos.all().values_list('id', flat=True)
             parlamentares_filiacao = Filiacao.objects.select_related('partido').filter(partido__in=partidos).values_list('parlamentar', flat=True)
             self.fields['parlamentar'].queryset = Parlamentar.objects.filter(id__in=parlamentares_filiacao)
-        
+
         if self.instance and self.instance.pk:
             self.fields['parlamentar'].widget.attrs['disabled'] = 'disabled'
             self.fields['parlamentar'].required = False
-
 
     def clean(self):
         super(CargoBlocoPartidoForm, self).clean()
@@ -726,10 +730,10 @@ class CargoBlocoPartidoForm(ModelForm):
                     vinculo.data_fim) and vinculo.cargo.unico and \
                     not(self.instance and self.instance.id == vinculo.id):
                         raise ValidationError("Cargo unico já é utilizado nesse período.")
-        
+
         if aux_data_fim <= cleaned_data['data_inicio']:
             raise ValidationError("Data Inicial deve ser anterior a data final.")
-        
+
         if self.instance and self.instance.pk:
             self.cleaned_data['parlamentar'] = self.instance.parlamentar
         else:
@@ -741,7 +745,7 @@ class CargoBlocoPartidoForm(ModelForm):
                     cleaned_data['data_inicio'],
                     aux_data_fim,
                     mandato.legislatura.data_fim):
-                fora_de_mandato = False              
+                fora_de_mandato = False
         if fora_de_mandato:
             raise ValidationError("Data de inicio e fim fora de periodo do mandato do parlamentar.")
 
@@ -760,7 +764,7 @@ class AfastamentoParlamentarForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
+
         if not (self.instance and self.instance.pk):
             parlamentar = kwargs['initial']['parlamentar']
             self.fields['mandato'].queryset = Mandato.objects.filter(parlamentar=parlamentar)
@@ -795,7 +799,7 @@ class AfastamentoParlamentarForm(ModelForm):
                                 .format(data_inicio_afastamento, data_fim_mandato))
             raise ValidationError(_("Data início do afastamento posterior ao fim"
                                     " do mandato informado."))
-                                    
+
         if data_fim_afastamento:
             if data_fim_afastamento < data_inicio_afastamento:
                 self.logger.error("Data fim de afastamento ({}) anterior à data início"
@@ -822,6 +826,6 @@ class AfastamentoParlamentarForm(ModelForm):
         if ultimo_afastamento and not ultimo_afastamento.data_fim \
            and ultimo_afastamento != self.instance:
             self.logger.error("Existe Afastamento sem Data Fim.")
-            raise ValidationError(_("Existe Afastamento sem Data Fim.")) 
+            raise ValidationError(_("Existe Afastamento sem Data Fim."))
 
         return self.cleaned_data
