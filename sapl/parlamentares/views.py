@@ -80,7 +80,8 @@ class PartidoCrud(CrudAux):
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(kwargs=kwargs)
-            context.update({'historico': HistoricoPartido.objects.filter(partido=self.object).order_by('-inicio_historico')})
+            context.update({'historico': HistoricoPartido.objects.filter(
+                partido=self.object).order_by('-inicio_historico')})
             return context
 
 
@@ -272,17 +273,17 @@ class ParticipacaoParlamentarCrud(CrudBaseForListAndDetailExternalAppView):
 
             comissoes = []
             for p in object_list:
-                    comissao = [
-                        (p.composicao.comissao.nome, reverse(
-                            'sapl.comissoes:comissao_detail', kwargs={
-                                'pk': p.composicao.comissao.pk})),
-                        (p.cargo.nome, None),
-                        (p.composicao.periodo.data_inicio.strftime(
-                         "%d/%m/%Y") + ' a ' +
-                         p.composicao.periodo.data_fim.strftime("%d/%m/%Y"),
-                         None)
-                    ]
-                    comissoes.append(comissao)
+                comissao = [
+                    (p.composicao.comissao.nome, reverse(
+                        'sapl.comissoes:comissao_detail', kwargs={
+                            'pk': p.composicao.comissao.pk})),
+                    (p.cargo.nome, None),
+                    (p.composicao.periodo.data_inicio.strftime(
+                     "%d/%m/%Y") + ' a ' +
+                     p.composicao.periodo.data_fim.strftime("%d/%m/%Y"),
+                     None)
+                ]
+                comissoes.append(comissao)
             return comissoes
 
         def get_headers(self):
@@ -537,8 +538,7 @@ class ParlamentarCrud(Crud):
         list_field_names = [
             'nome_parlamentar',
             'filiacao_atual',
-            'ativo',
-            'mandato_titular']
+            'ativo']
 
     class DetailView(Crud.DetailView):
 
@@ -603,8 +603,8 @@ class ParlamentarCrud(Crud):
             username = self.request.user.username
             if legislatura_id >= 0:
                 return queryset.filter(
-                    mandato__legislatura_id=legislatura_id).annotate(
-                        mandato_titular=F('mandato__titular')).distinct()
+                    mandato__legislatura_id=legislatura_id
+                ).distinct()
             else:
                 try:
                     self.logger.debug(
@@ -620,8 +620,7 @@ class ParlamentarCrud(Crud):
                                      ". Objeto encontrado com sucesso.")
                     if l is None:
                         return Legislatura.objects.all()
-                    return queryset.filter(mandato__legislatura_id=l).annotate(
-                        mandato_titular=F('mandato__titular'))
+                    return queryset.filter(mandato__legislatura_id=l)
 
         def get_headers(self):
             return [_('Parlamentar'), _('Partido'),
@@ -636,18 +635,30 @@ class ParlamentarCrud(Crud):
             context['legislaturas'] = legislaturas
             context['legislatura_id'] = self.take_legislatura_id()
 
+            # Pega a Legislatura
+            legislatura = Legislatura.objects.get(
+                id=context['legislatura_id'])
+
             for row in context['rows']:
 
                 # Pega o Parlamentar por meio da pk
                 parlamentar = Parlamentar.objects.get(
                     id=(row[0][1].split('/')[-1]))
 
+                mandato = Mandato.objects.filter(
+                    parlamentar=parlamentar,
+                    data_inicio_mandato__gte=legislatura.data_inicio,
+                    data_fim_mandato__lte=legislatura.data_fim
+                ).order_by('-data_inicio_mandato').first()
+
+                if mandato:
+                    titular = 'Sim' if mandato.titular else 'Não'
+                    row.append((titular, None))
+                else:
+                    row.append(('-', None))
+
                 for index, value in enumerate(row):
                     row[index] += (None if index else parlamentar,)
-
-                # Pega a Legislatura
-                legislatura = Legislatura.objects.get(
-                    id=context['legislatura_id'])
 
                 # Coloca a filiação atual ao invés da última
                 # As condições para mostrar a filiação são:
@@ -687,9 +698,11 @@ class ParlamentarCrud(Crud):
                                       ". Filiação encontrada com sucesso.")
 
                     partido_aux = filiacao.partido
-                    historico = HistoricoPartido.objects.filter(partido=partido_aux).order_by('-fim_historico')
+                    historico = HistoricoPartido.objects.filter(
+                        partido=partido_aux).order_by('-fim_historico')
                     if historico:
-                        partido_aux = next(iter([p for p in historico if p.inicio_historico < legislatura.data_fim <= p.fim_historico]), filiacao.partido)
+                        partido_aux = next(iter(
+                            [p for p in historico if p.inicio_historico < legislatura.data_fim <= p.fim_historico]), filiacao.partido)
 
                     row[1] = (partido_aux.sigla, None, None)
 
@@ -1152,7 +1165,8 @@ def altera_field_mesa_public_view(request):
                 lista_fotos.append(thumbnail_url)
             except Exception as e:
                 logger.error(e)
-                logger.error('erro processando arquivo: %s' % parlamentar.fotografia.path)
+                logger.error('erro processando arquivo: %s' %
+                             parlamentar.fotografia.path)
         else:
             lista_fotos.append(None)
 
@@ -1172,9 +1186,9 @@ def deleta_historico_partido(request, pk):
     historico.delete()
 
     return HttpResponseRedirect(
-                reverse(
-                    'sapl.parlamentares:partido_detail',
-                    kwargs={'pk': pk_partido}))
+        reverse(
+            'sapl.parlamentares:partido_detail',
+            kwargs={'pk': pk_partido}))
 
 
 class VincularParlamentarView(PermissionRequiredMixin, FormView):
@@ -1194,7 +1208,8 @@ class VincularParlamentarView(PermissionRequiredMixin, FormView):
             'data_fim_mandato': form.cleaned_data['legislatura'].data_fim
         }
 
-        data_expedicao_diploma = form.cleaned_data.get('data_expedicao_diploma')
+        data_expedicao_diploma = form.cleaned_data.get(
+            'data_expedicao_diploma')
         if data_expedicao_diploma:
             kwargs.update({'data_expedicao_diploma': data_expedicao_diploma})
 
@@ -1222,7 +1237,8 @@ class BlocoCrud(CrudAux):
             context = super(BlocoCrud.DetailView,
                             self).get_context_data(**kwargs)
 
-            context['vinculados'] = CargoBlocoPartido.objects.filter(bloco=self.object)
+            context['vinculados'] = CargoBlocoPartido.objects.filter(
+                bloco=self.object)
 
             return context
 
@@ -1249,7 +1265,7 @@ def vincula_parlamentar_ao_bloco(request, pk):
     else:
         form = CargoBlocoPartidoForm(initial={'bloco_pk': pk})
 
-    return render(request, template_name, {'form': form, 'pk':pk})
+    return render(request, template_name, {'form': form, 'pk': pk})
 
 
 def get_sessoes_legislatura(request):
@@ -1267,7 +1283,8 @@ def edita_vinculo_parlamentar_bloco(request, pk):
     template_name = "parlamentares/vincula_parlamentar_ao_bloco.html"
     vinculo = get_object_or_404(CargoBlocoPartido, pk=pk)
     if request.method == 'POST':
-        form = CargoBlocoPartidoForm(request.POST, instance=vinculo, initial={'bloco_pk':vinculo.bloco.pk})
+        form = CargoBlocoPartidoForm(request.POST, instance=vinculo, initial={
+                                     'bloco_pk': vinculo.bloco.pk})
         if form.is_valid():
             vinculo = form.save(commit=True)
             return HttpResponseRedirect(
@@ -1275,9 +1292,10 @@ def edita_vinculo_parlamentar_bloco(request, pk):
                     'sapl.parlamentares:bloco_detail',
                     kwargs={'pk': vinculo.bloco.pk}))
     else:
-        form = CargoBlocoPartidoForm(instance=vinculo, initial={'bloco_pk':vinculo.bloco.pk})
+        form = CargoBlocoPartidoForm(instance=vinculo, initial={
+                                     'bloco_pk': vinculo.bloco.pk})
 
-    return render(request, template_name, {'form': form, 'pk':vinculo.bloco.pk})
+    return render(request, template_name, {'form': form, 'pk': vinculo.bloco.pk})
 
 
 def deleta_vinculo_parlamentar_bloco(request, pk):
@@ -1288,7 +1306,7 @@ def deleta_vinculo_parlamentar_bloco(request, pk):
         reverse(
             'sapl.parlamentares:bloco_detail',
             kwargs={'pk': pk_bloco})
-        )
+    )
 
 
 class AfastamentoParlamentarCrud(PermissionRequiredMixin, MasterDetailCrud):

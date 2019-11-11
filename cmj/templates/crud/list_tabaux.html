@@ -2,11 +2,11 @@
 {% load i18n menus%}
 {% block base_content %}
   <div class="row container-tabaux">
-    <div class="{% if perms.base.view_tabelas_auxiliares %}col-sm-9{% endif %}">
+    <div class="{% if perms.base.view_tabelas_auxiliares %}col{% endif %}">
       {{block.super}}
     </div>
     {% if perms.base.view_tabelas_auxiliares %}
-      <div class="col-sm-3 sidebar-tabaux">
+      <div class="sidebar-tabaux">
           <h3>{% trans "Tabelas Auxiliares" %}</h3>
           {% subnav 'menu_tabelas_auxiliares.yaml'%}
       </div>

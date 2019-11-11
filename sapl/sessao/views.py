@@ -188,7 +188,7 @@ def abrir_votacao(request, pk, spk):
             model = ExpedienteMateria
             presenca_model = SessaoPlenariaPresenca
             redirect_url = 'expedientemateria_list'
-            
+
     if not model:
         raise Http404()
 
@@ -452,6 +452,24 @@ def customize_link_materia(context, pk, has_permission, is_expediente):
 
 
 def get_presencas_generic(model, sessao, legislatura):
+    presentes = [p.parlamentar for p in model.objects.filter(
+        sessao_plenaria=sessao)]
+
+    parlamentares_mandato = Mandato.objects.filter(
+        legislatura=legislatura,
+        data_inicio_mandato__lte=sessao.data_inicio,
+        data_fim_mandato__gte=sessao.data_inicio
+    ).distinct().order_by(
+        'parlamentar__nome_parlamentar')
+
+    for m in parlamentares_mandato:
+        if m.parlamentar in presentes:
+            yield (m.parlamentar, True)
+        else:
+            yield (m.parlamentar, False)
+
+
+def get_presencas_generic__old(model, sessao, legislatura):
     presencas = model.objects.filter(
         sessao_plenaria=sessao)
 
@@ -1595,11 +1613,11 @@ def get_presenca_sessao(sessao_plenaria):
 
     parlamentares_sessao = [p.parlamentar for p in SessaoPlenariaPresenca.objects.filter(
         sessao_plenaria_id=sessao_plenaria.id
-    ).order_by('parlamentar__nome_parlamentar')]
+    ).order_by('parlamentar__nome_parlamentar').distinct()]
 
     ausentes_sessao = JustificativaAusencia.objects.filter(
         sessao_plenaria_id=sessao_plenaria.id
-    ).order_by('parlamentar__nome_parlamentar')
+    ).distinct().order_by('parlamentar__nome_parlamentar')
 
     return ({'presenca_sessao': parlamentares_sessao,
              'justificativa_ausencia': ausentes_sessao})
@@ -1693,7 +1711,7 @@ def get_oradores_expediente(sessao_plenaria):
 def get_presenca_ordem_do_dia(sessao_plenaria):
     parlamentares_ordem = [p.parlamentar for p in PresencaOrdemDia.objects.filter(
         sessao_plenaria_id=sessao_plenaria.id
-    ).order_by('parlamentar__nome_parlamentar')]
+    ).distinct().order_by('parlamentar__nome_parlamentar')]
 
     return {'presenca_ordem': parlamentares_ordem}
 
