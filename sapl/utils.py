@@ -37,7 +37,6 @@ from unipath.path import Path
 from sapl.crispy_layout_mixin import SaplFormHelper
 from sapl.crispy_layout_mixin import SaplFormLayout, form_actions, to_row
 
-
 # (26/10/2018): O separador foi mudador de '/' para 'K'
 # por conta dos leitores de códigos de barra, que trocavam
 # a '/' por '&' ou ';'
@@ -649,6 +648,7 @@ class NormaPesquisaOrderingFilter(django_filters.OrderingFilter):
 
 
 class FileFieldCheckMixin(BaseForm):
+
     def _check(self):
         cleaned_data = super(FileFieldCheckMixin, self).clean()
         errors = []
@@ -1127,3 +1127,18 @@ def verifica_afastamento_parlamentar(parlamentar, data_inicio, data_fim=None):
                                                                    data_fim__gte=data_inicio).exists()
 
     return existe_afastamento
+
+
+def from_date_to_datetime_utc(data):
+    """
+
+    :param data: datetime.date
+    :return: datetime.timestamp com UTC
+    """
+    import pytz
+    from datetime import datetime
+
+    # from date to datetime
+    dt_unware = datetime.combine(data, datetime.min.time())
+    dt_utc = pytz.utc.localize(dt_unware)
+    return dt_utc

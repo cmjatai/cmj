@@ -43,12 +43,13 @@ from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa, Unid
 from sapl.materia.views import gerar_pdf_impressos
 from sapl.parlamentares.models import Legislatura, Parlamentar
 from sapl.protocoloadm.models import Protocolo, DocumentoAdministrativo
-from sapl.relatorios.views import relatorio_doc_administrativos, get_rodape,\
+from sapl.relatorios.views import relatorio_doc_administrativos, get_rodape, \
     make_pdf
 from sapl.utils import (create_barcode, get_base_url, get_client_ip,
                         get_mime_type_from_file_extension, lista_anexados,
                         show_results_filter_set, mail_service_configured,
-                        gerar_hash_arquivo, hash_sha512)
+                        gerar_hash_arquivo, hash_sha512,
+                        from_date_to_datetime_utc)
 
 from .forms import (AcompanhamentoDocumentoForm, AnularProtocoloAdmForm,
                     DocumentoAcessorioAdministrativoForm,
@@ -124,7 +125,9 @@ def atualizar_numero_documento(request):
 
 
 class CrudSemSubNavMixin(Crud):
+
     class SemSubNavMixin:
+
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
             context['subnav_template_name'] = None
@@ -253,7 +256,7 @@ class DocumentoAdministrativoCrud(Crud):
             return self.search_url
 
     class DetailView(BtnCertMixin, QuerySetContainerPrivPubMixin, DetailView):
-        permission_required = ('protocoloadm.detail_documentoadministrativo', )
+        permission_required = ('protocoloadm.detail_documentoadministrativo',)
 
         layout_key = 'DocumentoAdministrativoDetail'
 
@@ -264,7 +267,7 @@ class DocumentoAdministrativoCrud(Crud):
     class ListView(QuerySetContainerPrivPubMixin, FilterView):
         filterset_class = DocumentoAdministrativoFilterSet
         paginate_by = 10
-        permission_required = ('protocoloadm.list_documentoadministrativo', )
+        permission_required = ('protocoloadm.list_documentoadministrativo',)
 
         @classmethod
         def get_url_regex(cls):
@@ -645,7 +648,7 @@ class AnexadoCrud(MasterDetailCrud):
 class DocumentoAnexadoEmLoteView(PermissionRequiredContainerCrudMixin, FilterView):
     filterset_class = AnexadoEmLoteFilterSet
     template_name = 'protocoloadm/em_lote/anexado.html'
-    permission_required = ('protocoloadm.add_anexado', )
+    permission_required = ('protocoloadm.add_anexado',)
     container_field = 'workspace__operadores'
     model = DocumentoAdministrativo
 
@@ -1060,7 +1063,7 @@ class TramitacaoAdmCrud(MasterDetailCrud):
 class PrimeiraTramitacaoEmLoteAdmView(PermissionRequiredMixin, FilterView):
     filterset_class = PrimeiraTramitacaoEmLoteAdmFilterSet
     template_name = 'protocoloadm/em_lote/tramitacaoadm.html'
-    permission_required = ('protocoloadm.add_tramitacaoadministrativo', )
+    permission_required = ('protocoloadm.add_tramitacaoadministrativo',)
 
     primeira_tramitacao = True
 
@@ -1196,7 +1199,7 @@ class DesvincularDocumentoView(PermissionRequiredMixin, CreateView):
     template_name = 'protocoloadm/anular_protocoloadm.html'
     form_class = DesvincularDocumentoForm
     form_valid_message = _('Documento desvinculado com sucesso!')
-    permission_required = ('protocoloadm.action_anular_protocolo', )
+    permission_required = ('protocoloadm.action_anular_protocolo',)
 
     def get_success_url(self):
         return reverse('sapl.protocoloadm:protocolo')
@@ -1304,7 +1307,7 @@ class AnularProtocoloAdmView(PermissionRequiredMixin, CreateView):
     template_name = 'protocoloadm/anular_protocoloadm.html'
     form_class = AnularProtocoloAdmForm
     form_valid_message = _('Protocolo anulado com sucesso!')
-    permission_required = ('protocoloadm.action_anular_protocolo', )
+    permission_required = ('protocoloadm.action_anular_protocolo',)
 
     def get_success_url(self):
         return reverse('sapl.protocoloadm:protocolo')
@@ -1337,7 +1340,7 @@ class ProtocoloDocumentoView(PermissionRequiredMixin,
     template_name = "protocoloadm/protocolar_documento.html"
     form_class = ProtocoloDocumentForm
     form_valid_message = _('Protocolo cadastrado com sucesso!')
-    permission_required = ('protocoloadm.add_protocolo', )
+    permission_required = ('protocoloadm.add_protocolo',)
 
     def get_success_url(self):
         return reverse('sapl.protocoloadm:protocolo_mostrar',
@@ -1455,7 +1458,7 @@ class ProtocoloMostrarView(PermissionRequiredMixin, TemplateView):
     logger = logging.getLogger(__name__)
 
     template_name = "protocoloadm/protocolo_mostrar.html"
-    permission_required = ('protocoloadm.detail_protocolo', )
+    permission_required = ('protocoloadm.detail_protocolo',)
 
     def get_context_data(self, **kwargs):
 
@@ -1493,7 +1496,7 @@ class ProtocoloMostrarView(PermissionRequiredMixin, TemplateView):
 class ComprovanteProtocoloView(PermissionRequiredMixin, TemplateView):
 
     template_name = "protocoloadm/comprovante.html"
-    permission_required = ('protocoloadm.detail_protocolo', )
+    permission_required = ('protocoloadm.detail_protocolo',)
 
     def get_context_data(self, **kwargs):
         context = super(ComprovanteProtocoloView, self).get_context_data(
@@ -1575,10 +1578,22 @@ class ProtocoloMateriaView(PermissionRequiredMixin, CreateView):
                 data_fim__year__gte=timezone.now().year).first()
             data_inicio = legislatura.data_inicio
             data_fim = legislatura.data_fim
+
+            data_inicio_utc = from_date_to_datetime_utc(data_inicio)
+            data_fim_utc = from_date_to_datetime_utc(data_fim)
+
             numero = Protocolo.objects.filter(
-                data__gte=data_inicio,
-                data__lte=data_fim).aggregate(
-                Max('numero'))
+                Q(data__isnull=False,
+                  data__gte=data_inicio,
+                  data__lte=data_fim) |
+                Q(timestamp__isnull=False,
+                  timestamp__gte=data_inicio_utc,
+                  timestamp__lte=data_fim_utc) |
+                Q(timestamp_data_hora_manual__isnull=False,
+                  timestamp_data_hora_manual__gte=data_inicio_utc,
+                  timestamp_data_hora_manual__lte=data_fim_utc,)
+            ).aggregate(Max('numero'))
+
         elif numeracao == 'U':
             numero = Protocolo.objects.all().aggregate(Max('numero'))
 
@@ -1664,7 +1679,7 @@ class ProtocoloMateriaView(PermissionRequiredMixin, CreateView):
 class ProtocoloMateriaTemplateView(PermissionRequiredMixin, TemplateView):
 
     template_name = "protocoloadm/MateriaTemplate.html"
-    permission_required = ('protocoloadm.detail_protocolo', )
+    permission_required = ('protocoloadm.detail_protocolo',)
 
     def get_context_data(self, **kwargs):
         context = super(ProtocoloMateriaTemplateView, self).get_context_data(
@@ -1678,7 +1693,7 @@ class DesvincularMateriaView(PermissionRequiredMixin, FormView):
     template_name = 'protocoloadm/anular_protocoloadm.html'
     form_class = DesvincularMateriaForm
     form_valid_message = _('Matéria desvinculado com sucesso!')
-    permission_required = ('protocoloadm.action_anular_protocolo', )
+    permission_required = ('protocoloadm.action_anular_protocolo',)
 
     def get_success_url(self):
         return reverse('sapl.protocoloadm:protocolo')
@@ -1694,13 +1709,13 @@ class DesvincularMateriaView(PermissionRequiredMixin, FormView):
 
 class ImpressosView(PermissionRequiredMixin, TemplateView):
     template_name = 'materia/impressos/impressos.html'
-    permission_required = ('materia.can_access_impressos', )
+    permission_required = ('materia.can_access_impressos',)
 
 
 class FichaPesquisaAdmView(PermissionRequiredMixin, FormView):
     form_class = FichaPesquisaAdmForm
     template_name = 'materia/impressos/impressos_form.html'
-    permission_required = ('materia.can_access_impressos', )
+    permission_required = ('materia.can_access_impressos',)
 
     def form_valid(self, form):
         tipo_documento = form.data['tipo_documento']
@@ -1718,7 +1733,7 @@ class FichaSelecionaAdmView(PermissionRequiredMixin, FormView):
     logger = logging.getLogger(__name__)
     form_class = FichaSelecionaAdmForm
     template_name = 'materia/impressos/impressos_form.html'
-    permission_required = ('materia.can_access_impressos', )
+    permission_required = ('materia.can_access_impressos',)
 
     def get_context_data(self, **kwargs):
         if ('tipo' not in self.request.GET or
