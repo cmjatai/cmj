@@ -24,10 +24,10 @@
   children:
   - title: Kátia Carvalho
     url: /parlamentar/katia-carvalho
-  - title: -----------------
-    url: 
   - title: Adilson de Carvalho
     url: /parlamentar/adilson-de-carvalho
+  - title: -----------------
+    url: 
   - title: Carlos Miranda
     url: /parlamentar/carlos-miranda
   - title: Carvalinho
@@ -36,6 +36,8 @@
     url: /parlamentar/major-davi-pires
   - title: Maria Aparecida (CIDA)
     url: /parlamentar/maria-aparecida-cida
+  - title: Mauro Bento Filho
+    url: /parlamentar/mauro-bento-filho
   - title: Pastor Luiz Carlos
     url: /parlamentar/pastor-luiz-carlos
   - title: Thiago Maggioni
@@ -50,8 +52,6 @@
     url: /parlamentar/jose-carapo
   - title: Marcos Antônio
     url: /parlamentar/marcos-antonio
-  - title: Mauro Bento Filho
-    url: /parlamentar/mauro-bento-filho
 - title: {% trans 'Comunicação' %}
   url: ''
   css_class: head_title

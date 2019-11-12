@@ -382,6 +382,9 @@ class CertidaoPublicacaoCrud(Crud):
             return ''
 
     class ListView(Crud.ListView):
+
+        paginate_by = 50
+
         def split_bylen(self, item, maxlen):
             return [item[ind:ind + maxlen] for ind in range(0, len(item), maxlen)]
 
