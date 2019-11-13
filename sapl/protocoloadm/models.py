@@ -270,12 +270,12 @@ class DocumentoAdministrativo(models.Model):
         if self.epigrafe:
             return '%s' % self.epigrafe
 
-        return _('%(sigla)s - %(tipo)s %(numero)s/%(ano)s (%(interessado)s) ') % {
+        return _('%(sigla)s - %(tipo)s nº %(numero)s/%(ano)s %(interessado)s') % {
             'sigla': self.tipo.sigla,
             'tipo': self.tipo,
             'numero': self.numero,
             'ano': self.ano,
-            'interessado': self.interessado
+            'interessado': ('(%s)' % self.interessado) if self.interessado else ''
         }
 
     def delete(self, using=None, keep_parents=False):
