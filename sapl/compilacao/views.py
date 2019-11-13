@@ -2739,7 +2739,7 @@ class ActionsEditMixin(ActionDragAndMoveDispositivoAlteradoMixin,
 
         dsp_a_alterar = Dispositivo.objects.get(
             pk=dsp_a_alterar)
-        
+
         """print(', '.join(
             
             list(
@@ -3123,11 +3123,11 @@ class DispositivoSearchFragmentFormView(ListView):
                     BUSCA_ROTULO=rotulo
                 )
             elif str_texto:
-                AND_TEXTO_ROTULO = ' AND '.join(texto)
+                AND_TEXTO_ROTULO = ' AND %s' % ' AND '.join(texto)
             elif rotulo:
                 AND_TEXTO_ROTULO = "AND d.rotulo ~* '{BUSCA_ROTULO}'".format(
                     BUSCA_ROTULO=rotulo)
-            else: 
+            else:
                 AND_TEXTO_ROTULO = ''
 
             jtms = ''  # JOIN_TYPE_MODEL_SELECTED
