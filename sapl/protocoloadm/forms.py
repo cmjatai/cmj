@@ -1171,6 +1171,18 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
     ano_materia = forms.CharField(
         label='Ano', required=False)
 
+    tipo_anexador = forms.ModelChoiceField(
+        label=TipoDocumentoAdministrativo._meta.verbose_name,
+        required=False,
+        queryset=TipoDocumentoAdministrativo.objects.all(),
+        empty_label='Selecione')
+
+    numero_anexador = forms.CharField(
+        label='Número', required=False)
+
+    ano_anexador = forms.CharField(
+        label='Ano', required=False)
+
     observacao = forms.CharField(
         label=DocumentoAdministrativo._meta.get_field(
             'observacao').verbose_name,
@@ -1180,29 +1192,33 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
 
     class Meta:
         model = DocumentoAdministrativo
-        fields = ['tipo',
-                  'epigrafe',
-                  'numero',
-                  'ano',
-                  'data',
-                  'numero_protocolo',
-                  'ano_protocolo',
-                  'assunto',
-                  'interessado',
-                  'tramitacao',
-                  'dias_prazo',
-                  'data_fim_prazo',
-                  'data_vencimento',
-                  'numero_externo',
-                  'observacao',
-                  'texto_integral',
-                  'protocolo',
-                  'materia',
-                  'tipo_materia',
-                  'numero_materia',
-                  'ano_materia',
-                  'workspace'
-                  ]
+        fields = [
+            'tipo_anexador',
+            'numero_anexador',
+            'ano_anexador',
+            'tipo',
+            'epigrafe',
+            'numero',
+            'ano',
+            'data',
+            'numero_protocolo',
+            'ano_protocolo',
+            'assunto',
+            'interessado',
+            'tramitacao',
+            'dias_prazo',
+            'data_fim_prazo',
+            'data_vencimento',
+            'numero_externo',
+            'observacao',
+            'texto_integral',
+            'protocolo',
+            'materia',
+            'tipo_materia',
+            'numero_materia',
+            'ano_materia',
+            'workspace'
+        ]
 
         widgets = {'protocolo': forms.HiddenInput(),
                    'workspace': forms.HiddenInput()}
@@ -1304,6 +1320,26 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
                                  .format(tm, am, nm))
                 cleaned_data['materia'] = materia_de_vinculo
 
+        tx, ax, nx = (cleaned_data.get('tipo_anexador', ''),
+                      cleaned_data.get('ano_anexador', ''),
+                      cleaned_data.get('numero_anexador', ''))
+
+        if tx and ax and nx:
+            try:
+                doc_anexador = DocumentoAdministrativo.objects.get(
+                    tipo_id=tx,
+                    ano=ax,
+                    numero=nx
+                )
+            except ObjectDoesNotExist:
+                self.logger.error("Objeto MateriaLegislativa vinculada (tipo_id={}, ano={}, numero={}) não existe!"
+                                  .format(tm, am, nm))
+                raise ValidationError(_('Documento Anexador  não existe!'))
+            else:
+                if self.instance.pk and self.instance.pk == doc_anexador.pk:
+                    raise ValidationError(
+                        _('Não é possível anexar um documento a ele mesmo!'))
+
         return self.cleaned_data
 
     def save(self, commit=True):
@@ -1312,11 +1348,33 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
             documento.protocolo = Protocolo.objects.get(
                 id=int(self.fields['protocolo'].initial))
 
+        cleaned_data = self.cleaned_data
+
         documento.save()
+
+        tx, ax, nx = (cleaned_data.get('tipo_anexador', ''),
+                      cleaned_data.get('ano_anexador', ''),
+                      cleaned_data.get('numero_anexador', ''))
+
+        if tx and ax and nx:
+            doc_anexador = DocumentoAdministrativo.objects.get(
+                tipo_id=tx,
+                ano=ax,
+                numero=nx)
+            documento.documento_anexado_set.all().delete()
+
+            anexacao = Anexado()
+            anexacao.documento_principal = doc_anexador
+            anexacao.documento_anexado = documento
+            anexacao.data_anexacao = timezone.localdate()
+            anexacao.save()
 
         return documento
 
     def __init__(self, *args, **kwargs):
+
+        row0 = to_row(
+            [('tipo_anexador', 6), ('numero_anexador', 3), ('ano_anexador', 3)])
 
         row1 = to_row(
             [('tipo', 6), ('numero', 3), ('ano', 3)])
@@ -1345,10 +1403,12 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
         row7 = to_row(
             [('observacao', 12)])
 
-        fieldset = [
+        fieldset = []
+
+        fieldset.append(
             Fieldset(_('Identificação Básica'), row1,
                      row2, row2_5, row3, row4, row5),
-        ]
+        )
 
         if kwargs['initial']['workspace'].tipo in (
             AreaTrabalho.TIPO_PROCURADORIA,
@@ -1363,6 +1423,14 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
                            dismiss=False), 12)))
             )
 
+        fieldset.append(
+            Fieldset(_('Anexar a outro Documento'), row0,
+                     to_column(
+                (Alert('<strong></strong><br><span></span>',
+                       css_class="assunto_anexador hidden alert-info",
+                       dismiss=False), 12)))
+        )
+
         fieldset.append(Fieldset(_('Outras Informações'), row6, row7))
 
         self.helper = SaplFormHelper()
@@ -1372,11 +1440,22 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
         self.fields['tipo'].queryset = TipoDocumentoAdministrativo.objects.filter(
             workspace=kwargs['initial']['workspace'])
 
+        self.fields['tipo_anexador'].queryset = TipoDocumentoAdministrativo.objects.filter(
+            workspace=kwargs['initial']['workspace'])
+
         inst = self.instance
         if inst and inst.materia:
             self.fields['tipo_materia'].initial = inst.materia.tipo
             self.fields['numero_materia'].initial = inst.materia.numero
             self.fields['ano_materia'].initial = inst.materia.ano
+
+        if inst:
+            anexador = inst.documento_anexado_set.first()
+            if anexador:
+                anexador = anexador.documento_principal
+                self.fields['tipo_anexador'].initial = anexador.tipo
+                self.fields['numero_anexador'].initial = anexador.numero
+                self.fields['ano_anexador'].initial = anexador.ano
 
 
 class DesvincularDocumentoForm(ModelForm):

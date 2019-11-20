@@ -68,7 +68,6 @@ from .forms import (AcompanhamentoDocumentoForm, AnularProtocoloAdmForm,
 from .models import (AcompanhamentoDocumento, DocumentoAcessorioAdministrativo,
                      DocumentoAdministrativo, StatusTramitacaoAdministrativo,
                      TipoDocumentoAdministrativo, TramitacaoAdministrativo, Anexado)
-from .views_disabled import *
 
 
 # ProtocoloDocumentoCrud = Crud.build(Protocolo, '')
@@ -223,6 +222,18 @@ class DocumentoAdministrativoCrud(Crud):
                 raise PermissionDenied(_('Sem permissão de Acesso!'))
 
             return initial
+
+        @property
+        def title(self):
+
+            return _('%(sigla)s - %(tipo)s nº %(numero)s/%(ano)s %(interessado)s') % {
+                'sigla': self.object.tipo.sigla,
+                'tipo': self.object.tipo,
+                'numero': self.object.numero,
+                'ano': self.object.ano,
+                'interessado': ('(%s)' % self.object.interessado)
+                if self.object.interessado else ''
+            }
 
     class CreateView(Crud.CreateView):
         form_class = DocumentoAdministrativoForm

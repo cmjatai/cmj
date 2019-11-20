@@ -51,6 +51,32 @@
   $("select[name=tipo_materia]").trigger('change');
 
 
+  $("select[name=tipo_anexador], input[name=numero_anexador], input[name=ano_anexador]").change(function(event) {
+    var url = '{% url 'sapl.api:documentoadministrativo-list'%}'
+
+    var formData = {
+          'tipo'   : $("select[name=tipo_anexador]").val(),
+          'ano'    : $("input[name=ano_anexador]").val(),
+          'numero' : $("input[name=numero_anexador]").val(),
+    }
+    if (formData.tipo == '' || formData.ano == '' || formData.numero == '')
+      return;
+    $.get(url, formData).done(function(data) {
+      if (data.pagination.total_entries == 1) {
+        $(".assunto_anexador strong").html(data.results[0].__str__);
+        $(".assunto_anexador span").html(data.results[0].assunto);
+        $(".assunto_anexador").removeClass('hidden').removeClass('alert-danger').addClass('alert-info');
+      }
+      else {
+        $(".assunto_anexador strong").html('Atenção!');
+        $(".assunto_anexador span").html('Documento não localizado...');
+        $(".assunto_anexador").removeClass('hidden').removeClass('alert-info').addClass('alert-danger');
+      }
+    });
+  });
+  $("select[name=tipo_anexador]").trigger('change');
+
+
   
 </script>
 {% endblock %}
