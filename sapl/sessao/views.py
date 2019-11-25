@@ -192,9 +192,9 @@ def abrir_votacao(request, pk, spk):
     if not model:
         raise Http404()
 
-    if (verifica_presenca(request, presenca_model, spk) and
-        verifica_votacoes_abertas(request) and
-            verifica_sessao_iniciada(request, spk)):
+    if (verifica_sessao_iniciada(request, spk) and
+        verifica_presenca(request, presenca_model, spk) and
+            verifica_votacoes_abertas(request)):
         materia_votacao = model.objects.get(id=pk)
         materia_votacao.votacao_aberta = True
         sessao = SessaoPlenaria.objects.get(id=spk)
