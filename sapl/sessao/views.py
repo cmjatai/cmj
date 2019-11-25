@@ -2396,7 +2396,12 @@ class VotacaoView(SessaoPermissionMixin):
                 messages.add_message(request, messages.ERROR, msg)
                 return self.render_to_response(context)
             else:
+
                 try:
+
+                    resultado = TipoResultadoVotacao.objects.get(
+                        id=request.POST['resultado_votacao'])
+
                     votacao = RegistroVotacao()
                     votacao.numero_votos_sim = int(request.POST['votos_sim'])
                     votacao.numero_votos_nao = int(request.POST['votos_nao'])
@@ -2404,8 +2409,7 @@ class VotacaoView(SessaoPermissionMixin):
                     votacao.observacao = request.POST['observacao']
                     votacao.materia_id = materia_id
                     votacao.ordem_id = ordem_id
-                    votacao.tipo_resultado_votacao_id = int(
-                        request.POST['resultado_votacao'])
+                    votacao.tipo_resultado_votacao = resultado
                     votacao.user = request.user
                     votacao.ip = get_client_ip(request)
                     votacao.save()
@@ -2418,8 +2422,6 @@ class VotacaoView(SessaoPermissionMixin):
                     ordem = OrdemDia.objects.get(
                         sessao_plenaria_id=self.object.id,
                         materia_id=materia_id)
-                    resultado = TipoResultadoVotacao.objects.get(
-                        id=request.POST['resultado_votacao'])
                     ordem.resultado = resultado.nome
                     ordem.votacao_aberta = False
                     ordem.save()
@@ -2434,8 +2436,10 @@ class VotacaoView(SessaoPermissionMixin):
 
     def get_success_url(self):
         pk = self.kwargs['pk']
-        return reverse('sapl.sessao:ordemdia_list',
-                       kwargs={'pk': pk})
+        url = reverse('sapl.sessao:ordemdia_list',
+                      kwargs={'pk': pk})
+
+        return '{}#id{}'.format(url, self.kwargs['mid'])
 
 
 def fechar_votacao_materia(materia):

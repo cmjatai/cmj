@@ -39,9 +39,9 @@
 		<br />
 
 		<div class="row">
-			<div class="col-md-4">Sim*: <input type="text" id="votos_sim" name="votos_sim" value="" class="form-control"/></div>
-			<div class="col-md-4">Não*: <input type="text" id="votos_nao" name="votos_nao" value="" class="form-control"/></div>
-			<div class="col-md-4">Abstenções*: <input type="text" id="abstencoes" name="abstencoes" value="" class="form-control"/></div>
+			<div class="col-md-4">Sim*: <input type="text" id="votos_sim" name="votos_sim" value="{{ total_presentes|add:"-1" }}" class="form-control"/></div>
+			<div class="col-md-4">Não*: <input type="text" id="votos_nao" name="votos_nao" value="0" class="form-control"/></div>
+			<div class="col-md-4">Abstenções*: <input type="text" id="abstencoes" name="abstencoes" value="0" class="form-control"/></div>
 		</div>
 
    		<div class="row">
@@ -70,10 +70,9 @@
 			</div>
 		</div>
 
-		<br /><br />
 		<div class="row">
 			<div class="col-md-12">
-				<div class="form-group row justify-content-between">
+				<div class="d-flex justify-content-between pt-3">
 					<input type="submit" id="cancelar-votacao" name="cancelar-votacao" value="Cancelar Votação" class="btn btn-warning" />
 					<input type="submit" id="salvar-votacao" name="salvar-votacao" value="Salvar" class="btn btn-primary" />
 				</div>
