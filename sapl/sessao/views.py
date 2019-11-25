@@ -122,8 +122,8 @@ def verifica_presenca(request, model, spk):
     if not model.objects.filter(sessao_plenaria_id=spk).exists():
         username = request.user.username
         logger.error("user=" + username +
-                     ". Votação não pode ser aberta sem presenças (sessao_plenaria_id={}).".format(spk))
-        msg = _('Votação não pode ser aberta sem presenças')
+                     ". Votação não pode ser aberta sem registro de presenças (sessao_plenaria_id={}).".format(spk))
+        msg = _('Votação não pode ser aberta sem registro de presenças.')
         messages.add_message(request, messages.ERROR, msg)
         return False
     return True
@@ -201,6 +201,9 @@ def abrir_votacao(request, pk, spk):
         sessao.painel_aberto = True
         sessao.save()
         materia_votacao.save()
+    else:
+        url = reverse('sapl.sessao:' + redirect_url, kwargs={'pk': spk})
+        return HttpResponseRedirect(url)
 
     url = reverse('sapl.sessao:' + redirect_url, kwargs={'pk': spk})
     return HttpResponseRedirect('{}#id{}'.format(url, materia_votacao.materia.pk))
