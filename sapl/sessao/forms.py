@@ -521,10 +521,15 @@ class SessaoPlenariaFilterSet(django_filters.FilterSet):
 class AdicionarVariasMateriasFilterSet(MateriaLegislativaFilterSet):
 
     o = MateriaPesquisaOrderingFilter()
+
     tramitacao__status = django_filters.ModelChoiceFilter(
-        required=True,
+        required=False,
         queryset=StatusTramitacao.objects.all(),
         label=_('Status da Matéria'))
+
+    em_tramitacao = django_filters.BooleanFilter(
+        initial=True
+    )
 
     class Meta:
         model = MateriaLegislativa
@@ -551,9 +556,9 @@ class AdicionarVariasMateriasFilterSet(MateriaLegislativaFilterSet):
         self.filters['relatoria__parlamentar_id'].label = 'Relatoria'
 
         row1 = to_row(
-            [('tramitacao__status', 12)])
+            [('em_tramitacao', 4), ('tramitacao__status', 8)])
         row2 = to_row(
-            [('tipo', 12)])
+            [('tipo', 6), ('ementa', 6)])
         row3 = to_row(
             [('numero', 4),
              ('ano', 4),
@@ -570,18 +575,12 @@ class AdicionarVariasMateriasFilterSet(MateriaLegislativaFilterSet):
                      'limpar Autor',
                      css_class='btn btn-primary btn-sm'), 10)])
         row6 = to_row(
-            [('autoria__autor__tipo', 6),
+            [('autoria__autor__tipo', 6), ('o', 6)
              # ('autoria__autor__partido', 6)
              ])
         row7 = to_row(
             [('relatoria__parlamentar_id', 6),
              ('local_origem_externa', 6)])
-        row8 = to_row(
-            [('em_tramitacao', 6),
-             ('o', 6)])
-        row9 = to_row(
-            [('ementa', 12)])
-
         self.form.helper = SaplFormHelper()
         self.form.helper.form_method = 'GET'
         self.form.helper.layout = Layout(
@@ -589,7 +588,7 @@ class AdicionarVariasMateriasFilterSet(MateriaLegislativaFilterSet):
                      row1, row2, row3,
                      HTML(autor_label),
                      HTML(autor_modal),
-                     row4, row5, row6, row7, row8, row9,
+                     row4, row5, row6, row7,
                      form_actions(label='Pesquisar'))
         )
 

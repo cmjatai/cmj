@@ -3493,6 +3493,8 @@ class AdicionarVariasMateriasExpediente(PermissionRequiredForAppCrudMixin,
 
     logger = logging.getLogger(__name__)
 
+    paginate_by = 1000
+
     def get_filterset_kwargs(self, filterset_class):
         super().get_filterset_kwargs(filterset_class)
 
