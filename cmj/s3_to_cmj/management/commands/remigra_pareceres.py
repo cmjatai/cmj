@@ -1,7 +1,6 @@
 import os
 import re
 
-from cairosvg.path import path
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.base import File
 from django.core.management.base import BaseCommand

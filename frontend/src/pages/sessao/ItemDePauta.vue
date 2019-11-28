@@ -5,9 +5,15 @@
         Carregando Matéria...
     </div>
 
+    <div :class="[resultadoVotacao]">
+      <span v-if="item.resultado">{{ item.resultado }}</span>
+      <span v-else>Tramitando</span>
+    </div>
+
     <materia-pauta :materia="materia" :type="type"></materia-pauta>
 
     <div :class="['item-body']">
+
     </div>
 
     <div :class="['item-body', materia.id !== undefined && materia.anexadas.length > 0 ? 'col-anexadas':'']">
@@ -141,6 +147,23 @@ export default {
     itensDocumentosAcessorios: {
       get () {
         return _.orderBy(this.documentoacessorio, 'data')
+      }
+    },
+    resultadoVotacao: {
+      get () {
+        let tipo = ''
+        let r = this.item.resultado
+        if (r === 'Aprovado') {
+          tipo = 'status-votacao result-aprovado'
+        } else if (r === 'Rejeitado') {
+          tipo = 'status-votacao result-rejeitado'
+        } else if (r === 'Pedido de Vista') {
+          tipo = 'status-votacao result-vista'
+        } else if (r === 'Prazo Regimental') {
+          tipo = 'status-votacao result-prazo'
+        }
+
+        return tipo !== '' ? tipo : 'status-votacao'
       }
     }
   },
@@ -308,6 +331,7 @@ export default {
   position: relative;
   background-color: #ffffff55;
   padding: 15px;
+  //padding-top: 0;
   margin-bottom: 1em;
   border-top: 1px solid #ccc;
 
@@ -333,6 +357,31 @@ export default {
     }
     &::before {
       content: 'Grande Expediente';
+    }
+  }
+  .status-votacao {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: inline-block;
+    min-height: 15px;
+    margin-left: -15px;
+    padding: 5px;
+    font-weight: bold;
+    color: #fff;
+    background-color: #e6bc02;
+
+    &.result-aprovado {
+      background-color: green;
+    }
+    &.result-prazo {
+      background-color: #2580f7;
+    }
+    &.result-vista {
+      background-color: #2580f7;
+    }
+    &.result-rejeitado {
+      background-color: red;
     }
   }
 
