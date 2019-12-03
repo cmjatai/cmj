@@ -4,9 +4,10 @@
    Atualizado por Luciano De Fázio - 22/03/2012
    versão: 1.0
 """
+import logging
 import os
 import time
-import logging
+
 from django.template.defaultfilters import safe
 from django.utils.html import strip_tags
 from trml2pdf import parseString
@@ -18,7 +19,7 @@ def cabecalho(inf_basicas_dic, imagem):
     """
     """
     tmp = ''
-    
+
     if os.path.isfile(imagem):
         tmp += '\t\t\t\t<image x="2.1cm" y="25.7cm" width="59" height="62" file="' + \
             imagem + '"/>\n'
@@ -114,7 +115,7 @@ def inf_basicas(inf_basicas_dic):
         hr_fim_sessao = ''
 
     if nom_sessao or dat_inicio_sessao or hr_inicio_sessao \
-        or dat_fim_sessao or hr_fim_sessao:
+            or dat_fim_sessao or hr_fim_sessao:
         tmp += '\t\t<para style="P1">Informações Básicas</para>\n'
         tmp += '\t\t<para style="P2">\n'
         tmp += '\t\t\t<font color="white"> <br/></font>\n'
@@ -130,7 +131,7 @@ def inf_basicas(inf_basicas_dic):
                 dat_fim_sessao + ' <b>- </b> ' + hr_fim_sessao + '</para>\n'
     if inf_basicas_dic.get('tema_solene'):
         tmp += '\t\t<para style="P2" spaceAfter="5"><b>Tema da Sessão Solene: </b> ' + \
-                inf_basicas_dic['tema_solene'] + '</para>\n'
+            inf_basicas_dic['tema_solene'] + '</para>\n'
 
     return tmp
 
@@ -139,7 +140,7 @@ def multimidia(cont_mult_dic):
     """
     """
     tmp = ""
-    
+
     mul_audio = cont_mult_dic['multimidia_audio']
     mul_video = cont_mult_dic['multimidia_video']
 
@@ -228,15 +229,17 @@ def expediente_materia(lst_expediente_materia):
         tmp += '<tr><td >Matéria</td><td>Ementa</td><td>Resultado da Votação</td></tr>\n'
         for expediente_materia in lst_expediente_materia:
             tmp += '<tr><td><para style="P3"><b>' + str(expediente_materia['num_ordem']) + '</b> - ' + expediente_materia['id_materia'] + '</para>\n' + '<para style="P3"><b>Turno: </b>' + expediente_materia[
-            'des_turno'] + '</para>\n' + '<para style="P3"><b>' + expediente_materia['num_autores'] + ': </b>' + str(expediente_materia['nom_autor']) + '</para></td>\n'
-            
+                'des_turno'] + '</para>\n' + '<para style="P3"><b>' + expediente_materia['num_autores'] + ': </b>' + str(expediente_materia['nom_autor']) + '</para></td>\n'
+
             txt_ementa = expediente_materia['txt_ementa'].replace('&', '&amp;')
-            
+
             # txt_ementa = dont_break_out(expediente_materia['txt_ementa'])
-                    
+
             # if len(txt_ementa) > 800:
             #    txt_ementa = txt_ementa[:800] + "..."
-            tmp += '<td><para style="P4">' + txt_ementa + '</para>' + '<para style="P4">' + expediente_materia['ordem_observacao'] + '</para></td>\n'
+            tmp += '<td><para style="P4">' + txt_ementa + '</para>' + \
+                '<para style="P4">' + \
+                expediente_materia['ordem_observacao'] + '</para></td>\n'
             tmp += '<td><para style="P3"><b>' + \
                 str(expediente_materia['nom_resultado']) + \
                 '</b></para>\n' + '<para style="P3">'
@@ -260,13 +263,15 @@ def expediente_materia_vot_nom(lst_expediente_materia_vot_nom):
         tmp += '<blockTable style="repeater" repeatRows="1">\n'
         tmp += '<tr><td >Matéria</td><td>Votos</td></tr>\n'
         for expediente_materia_vot_nom in lst_expediente_materia_vot_nom:
-            tmp += '<tr><td><para style="P3">' + str(expediente_materia_vot_nom['titulo']) + '</para></td>'
+            tmp += '<tr><td><para style="P3">' + \
+                str(expediente_materia_vot_nom['titulo']) + '</para></td>'
             if expediente_materia_vot_nom['votos']:
                 tmp += '<td>'
                 for v in expediente_materia_vot_nom['votos']:
-                    tmp += '<para style="P3"><b>' + str(v.parlamentar) + '</b> - ' + v.voto + '</para>'
+                    tmp += '<para style="P3"><b>' + \
+                        str(v.parlamentar) + '</b> - ' + v.voto + '</para>'
                 tmp += '</td>'
-            else: 
+            else:
                 tmp += '<td><para style="P3"><b>Matéria não votada</b></para></td>'
             tmp += '</tr>\n'
         tmp += '\t\t</blockTable>\n'
@@ -282,10 +287,10 @@ def oradores_expediente(lst_oradores_expediente):
         tmp += '\t\t</para>\n'
         for orador_expediente in lst_oradores_expediente:
             tmp += '\t\t<para style="P2" spaceAfter="5"><b>' + str(orador_expediente[
-            'num_ordem']) + '</b> - ' + orador_expediente[
-            'nom_parlamentar'] + '/' + str(orador_expediente[
-            'sgl_partido']) + ' - ' + str(orador_expediente[
-            'observacao']) + '</para>\n'
+                'num_ordem']) + '</b> - ' + orador_expediente[
+                'nom_parlamentar'] + '/' + str(orador_expediente[
+                    'sgl_partido']) + ' - ' + str(orador_expediente[
+                        'observacao']) + '</para>\n'
     return tmp
 
 
@@ -318,7 +323,9 @@ def votacao(lst_votacao):
             txt_ementa = votacao['txt_ementa'].replace('&', '&amp;')
             if len(txt_ementa) > 1000:
                 txt_ementa = txt_ementa[:1000] + "..."
-            tmp += '<td><para style="P4">' + txt_ementa + '</para>' + '<para style="P4">' + votacao['ordem_observacao'] + '</para></td>\n'
+            tmp += '<td><para style="P4">' + txt_ementa + '</para>' + \
+                '<para style="P4">' + \
+                votacao['ordem_observacao'] + '</para></td>\n'
             tmp += '<td><para style="P3"><b>' + \
                 str(votacao['nom_resultado']) + \
                 '</b></para>\n' + '<para style="P3">'
@@ -341,13 +348,15 @@ def votacao_vot_nom(lst_votacao_vot_nom):
         tmp += '<blockTable style="repeater" repeatRows="1">\n'
         tmp += '<tr><td >Matéria</td><td>Votos</td></tr>\n'
         for votacao_vot_nom in lst_votacao_vot_nom:
-            tmp += '<tr><td><para style="P3">' + str(votacao_vot_nom['titulo']) + '</para></td>'
+            tmp += '<tr><td><para style="P3">' + \
+                str(votacao_vot_nom['titulo']) + '</para></td>'
             if votacao_vot_nom['votos']:
                 tmp += '<td>'
                 for v in votacao_vot_nom['votos']:
-                    tmp += '<para style="P3"><b>' + str(v.parlamentar) + '</b> - ' + v.voto + '</para>'
+                    tmp += '<para style="P3"><b>' + \
+                        str(v.parlamentar) + '</b> - ' + v.voto + '</para>'
                 tmp += '</td>'
-            else: 
+            else:
                 tmp += '<td><para style="P3"><b>Matéria não votada</b></para></td>'
             tmp += '</tr>\n'
         tmp += '\t\t</blockTable>\n'
@@ -363,10 +372,10 @@ def oradores_ordemdia(lst_oradores_ordemdia):
         tmp += '\t\t</para>\n'
         for orador_ordemdia in lst_oradores_ordemdia:
             tmp += '\t\t<para style="P2" spaceAfter="5"><b>' + \
-            str(orador_ordemdia['num_ordem']) + '</b> - ' + \
-            orador_ordemdia['nome_parlamentar'] + '/' + \
-            str(orador_ordemdia['sigla']) + ' - ' + \
-            str(orador_ordemdia['observacao']) + '</para>\n'
+                str(orador_ordemdia['num_ordem']) + '</b> - ' + \
+                orador_ordemdia['nome_parlamentar'] + '/' + \
+                str(orador_ordemdia['sigla']) + ' - ' + \
+                str(orador_ordemdia['observacao']) + '</para>\n'
     return tmp
 
 
@@ -439,7 +448,7 @@ def principal(rodape_dic, imagem, inf_basicas_dic, cont_mult_dic, lst_mesa, lst_
         'oradores_expli': oradores(lst_oradores),
         'ocorr_sessao': ocorrencias(lst_ocorrencias)
     }
-    
+
     if ordenacao:
         try:
             tmp += dict_ord_template[ordenacao.primeiro]
@@ -458,7 +467,7 @@ def principal(rodape_dic, imagem, inf_basicas_dic, cont_mult_dic, lst_mesa, lst_
             tmp += dict_ord_template[ordenacao.decimo_quarto]
         except KeyError as e:
             logger.error("KeyError: " + str(e) + ". Erro ao tentar utilizar "
-                              "configuração de ordenação. Utilizando ordenação padrão.")
+                         "configuração de ordenação. Utilizando ordenação padrão.")
             tmp += inf_basicas(inf_basicas_dic)
             tmp += multimidia(cont_mult_dic)
             tmp += mesa(lst_mesa)

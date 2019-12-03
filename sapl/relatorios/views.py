@@ -1420,7 +1420,7 @@ def relatorio_sessao_plenaria_pdf(request, pk):
                                          "lst_mesa": lst_mesa,
                                          "lst_presenca_sessao": lst_presenca_sessao,
                                          "lst_ausencia_sessao": lst_ausencia_sessao,
-                                         "lst_expedientes": lst_expedientes,
+                                         #"lst_expedientes": lst_expedientes,
                                          "lst_expediente_materia": lst_expediente_materia,
                                          "lst_oradores_expediente": lst_oradores_expediente,
                                          "lst_presenca_ordem_dia": lst_presenca_ordem_dia,
