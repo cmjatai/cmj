@@ -18,8 +18,13 @@ from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView, MultipleObjectMixin
+from haystack.forms import model_choices
+from haystack.query import SearchQuerySet
+from haystack.utils.app_loading import haystack_get_model,\
+    haystack_get_models
 
 from cmj import globalrules
+from cmj.core.models import AreaTrabalho
 from cmj.sigad import forms, models
 from cmj.sigad.forms import DocumentoForm, CaixaPublicacaoForm
 from cmj.sigad.models import Documento, Classe, ReferenciaEntreDocumentos,\
@@ -55,6 +60,8 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
 
         context['noticias_da_procuradoria'] = self.get_noticias_da_procuradoria()
 
+        context['ultimas_publicacoes'] = self.get_ultimas_publicacoes()
+
         return context
 
     def get_noticias_da_procuradoria(self):
@@ -65,6 +72,40 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
         docs = docs.filter(classe=215)
 
         return docs
+
+    def get_ultimas_publicacoes_uma_por_tipo__nao_usada(self):
+        search_models = model_choices()
+
+        results = []
+
+        for m in search_models:
+            sqs = SearchQuerySet().all()
+            sqs = sqs.filter(at=0)
+            sqs = sqs.models(*haystack_get_models(m[0]))
+            sqs = sqs.order_by('-data', '-last_update')[:5]
+            if len(sqs):
+                results.append(sqs[0])
+
+        return results
+
+    def get_ultimas_publicacoes(self):
+        sqs = SearchQuerySet().all()
+        sqs = sqs.filter(
+            Q(at=0) |
+            Q(at__in=AreaTrabalho.objects.areatrabalho_publica().values_list('id', flat=True)))
+        sqs = sqs.models(
+            *haystack_get_models('protocoloadm.documentoadministrativo'))
+        sqs = sqs.order_by('-data', '-last_update')[:100]
+
+        r = []
+        for sr in sqs:
+            if sr.object._certidao.exists():
+                r.append(sr)
+
+                if len(r) == 20:
+                    break
+
+        return r
 
     def get_noticias_dos_parlamentares(self):
         legislatura_atual = Legislatura.objects.first()
