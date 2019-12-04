@@ -13,36 +13,33 @@
           <a href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' result.object.pk %}">{{ result.object }}</a>
         </strong>
         <small>
-        <br><strong>Data:</strong> {{result.object.data}}
-        <div class="text-ementa">{{ result.object.assunto }}</div>
+          <br><strong>Data:</strong> {{result.object.data}}
+          <div class="text-ementa">{{ result.object.assunto }}</div>
 
-
-                  <small>
-                    {% for anexado in result.object.documento_principal_set.all %}
-                      {% if forloop.first %}
-                        <div class="clearfix"></div>
-                        <strong>Documentos Vinculados:</strong>
-                        <ul>
-                      {% endif %}
-                      <li><a href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' anexado.documento_anexado.pk %}">{{ anexado.documento_anexado }}</a></li>
-                      {% if forloop.last %}
-                        </ul>
-                        {% endif %}
-                    {% endfor %}
-                    {% for principal in result.object.documento_anexado_set.all %}
-                      {% if forloop.first %}
-                        <div class="clearfix"></div>
-                        <strong>Vinculado a:</strong>
-                        <ul>
-                      {% endif %}
-                        <li><a href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' principal.documento_principal.pk %}">{{ principal.documento_principal }}</a></li>
-                      {% if forloop.last %}
-                        </ul>
-                      {% endif %}
-                    {% endfor %}
-                  </small>
-
-
+          <small>
+            {% for anexado in result.object.documento_principal_set.all %}
+              {% if forloop.first %}
+                <div class="clearfix"></div>
+                <strong>Documentos Vinculados:</strong>
+                <ul>
+              {% endif %}
+              <li><a href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' anexado.documento_anexado.pk %}">{{ anexado.documento_anexado }}</a></li>
+              {% if forloop.last %}
+                </ul>
+                {% endif %}
+            {% endfor %}
+            {% for principal in result.object.documento_anexado_set.all %}
+              {% if forloop.first %}
+                <div class="clearfix"></div>
+                <strong>Vinculado a:</strong>
+                <ul>
+              {% endif %}
+                <li><a href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' principal.documento_principal.pk %}">{{ principal.documento_principal }}</a></li>
+              {% if forloop.last %}
+                </ul>
+              {% endif %}
+            {% endfor %}
+          </small>
         </small>
       </div>
     </div>
