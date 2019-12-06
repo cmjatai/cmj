@@ -145,11 +145,16 @@
     right: 2px;
   }
   
-  &:hover {
-    background-color: rgba(#000, 0.1);
-  }
   button {
     margin: 0 0 10px 10px;
+  }
+}
+
+.container-table {
+  .item-listas {
+    &:hover {
+      background-color: rgba(#000, 0.1);
+    }
   }
 }
 

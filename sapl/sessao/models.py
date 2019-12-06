@@ -208,6 +208,26 @@ class SessaoPlenaria(models.Model):
             'legislatura_id': self.legislatura.numero}
         """
 
+    def str_short(self):
+
+        tnc = self.tipo.TIPO_NUMERACAO_CHOICES
+
+        base = '{}ª {}'.format(self.numero, self.tipo.nome)
+
+        if self.tipo.tipo_numeracao == tnc.quizenal:
+            base += ' da {}ª Quinzena'.format(
+                1 if self.data_inicio.day <= 15 else 2)
+
+        if self.tipo.tipo_numeracao <= tnc.mensal:
+            base += ' do mês de {}'.format(
+                formats.date_format(self.data_inicio, 'F')
+            )
+
+        if self.tipo.tipo_numeracao <= tnc.anual:
+            base += ' de {}'.format(self.data_inicio.year)
+
+        return base
+
     def delete(self, using=None, keep_parents=False):
         if self.upload_pauta:
             self.upload_pauta.delete()
