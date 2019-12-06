@@ -99,11 +99,12 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
 
         r = []
         for sr in sqs:
-            if sr.object._certidao.exists():
-                r.append(sr)
+            if sr.object._certidao:
+                if sr.object._certidao.exists():
+                    r.append(sr)
 
-                if len(r) == 20:
-                    break
+                    if len(r) == 20:
+                        break
 
         return r
 

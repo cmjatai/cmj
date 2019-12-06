@@ -26,6 +26,46 @@ def _get_registration_key(model):
     return '%s_%s' % (model._meta.app_label, model._meta.model_name)
 
 
+class CompressPDF:
+
+    quality = {
+        0: '/default',
+        1: '/prepress',
+        2: '/printer',
+        3: '/ebook',
+        4: '/screen'
+    }
+
+    def compress(self, compress_level, file=None, new_file=None):
+
+        try:
+            initial_size = os.path.getsize(file)
+
+            subprocess.call([
+                'gs', '-sDEVICE=pdfwrite', '-dCompatibilityLevel=1.4',
+                '-dPDFSETTINGS={}'.format(
+                    self.quality[compress_level]),
+                '-dNOPAUSE',
+                '-dQUIET',
+                '-dBATCH',
+                '-sOutputFile={}'.format(new_file),
+                file]
+            )
+
+            final_size = os.path.getsize(new_file)
+            ratio = 1 - (final_size / initial_size)
+            print("Compression by {0:.0%}.".format(ratio))
+            print("Final file size is {0:.1f}MB".format(
+                final_size / 1000000))
+            return True
+
+        except Exception as error:
+            print('Caught this error: ' + repr(error))
+        except subprocess.CalledProcessError as e:
+            print("Unexpected error:".format(e.output))
+            return False
+
+
 class ProcessOCR(object):
 
     def __init__(self, cmd, logger):

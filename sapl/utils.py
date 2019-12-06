@@ -226,6 +226,15 @@ class SaplGenericRelation(GenericRelation):
         super().__init__(to, **kwargs)
 
 
+class OverwriteStorage(FileSystemStorage):
+    def save(self, name, content, max_length=None):
+        prod_name = FileSystemStorage.save(
+            self, name, content, max_length=max_length)
+        FileSystemStorage.save(
+            self, 'original__%s' % prod_name, content, max_length=max_length)
+        return prod_name
+
+
 class PortalFieldFile(FieldFile):
 
     @property
@@ -1086,30 +1095,6 @@ def lista_anexados(principal, isMateriaLegislativa=True):
     if principal in anexados_total:
         anexados_total.remove(principal)
     return anexados_total
-
-
-class OverwriteStorage(FileSystemStorage):
-    '''
-    Solução derivada do gist: https://gist.github.com/fabiomontefuscolo/1584462
-
-    Muda o comportamento padrão do Django e o faz sobrescrever arquivos de
-    mesmo nome que foram carregados pelo usuário ao invés de renomeá-los.
-    '''
-
-    """def get_available_name(self, name, max_length=None):
-        if self.exists(name):
-            os.remove(os.path.join(settings.MEDIA_ROOT, name))
-        return name"""
-
-    """def delete(self, name):
-        FileSystemStorage.delete(self, name)"""
-
-    def save(self, name, content, max_length=None):
-        prod_name = FileSystemStorage.save(
-            self, name, content, max_length=max_length)
-        FileSystemStorage.save(
-            self, 'original__%s' % prod_name, content, max_length=max_length)
-        return prod_name
 
 
 def verifica_afastamento_parlamentar(parlamentar, data_inicio, data_fim=None):

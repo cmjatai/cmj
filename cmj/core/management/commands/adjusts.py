@@ -1,13 +1,62 @@
 from datetime import datetime
 import logging
+import os
 from platform import node
+import subprocess
 
 from django.core.management.base import BaseCommand
 from django.db.models import F, Q
 from django.db.models.signals import post_delete, post_save
+import ghostscript
 
 from sapl.compilacao.models import TextoArticulado, Dispositivo
+from sapl.materia.models import MateriaLegislativa
 from sapl.protocoloadm.models import DocumentoAdministrativo
+
+
+class CompressPDF:
+
+    quality = {
+        0: '/default',
+        1: '/prepress',
+        2: '/printer',
+        3: '/ebook',
+        4: '/screen'
+    }
+
+    def compress(self, compress_level, file=None, new_file=None):
+
+        try:
+            initial_size = os.path.getsize(file)
+
+            r = subprocess.call([
+                'gs',
+                '-sDEVICE=pdfwrite',
+                '-dCompatibilityLevel=1.4',
+                '-dPDFSETTINGS=/prepress',
+                '-dNOPAUSE',
+                '-dQUIET',
+                '-dBATCH',
+                '-dAutoRotatePages=/None',
+                '-dCompressPages=true',
+                '-dColorImageResolution=96',
+                #'-dColorImageDownsampleType=/Bicubic',
+                '-sOutputFile={}'.format(new_file),
+                file]
+            )
+
+            final_size = os.path.getsize(new_file)
+            ratio = 1 - (final_size / initial_size)
+            print("Compression by {0:.0%}.".format(ratio))
+            print("Final file size is {0:.1f}MB".format(
+                final_size / 1000000))
+            return True
+
+        except Exception as error:
+            print('Caught this error: ' + repr(error))
+        except subprocess.CalledProcessError as e:
+            print("Unexpected error:".format(e.output))
+            return False
 
 
 class Command(BaseCommand):
@@ -19,14 +68,27 @@ class Command(BaseCommand):
         post_save.disconnect(dispatch_uid='cmj_post_save_signal')
 
         self.logger = logging.getLogger(__name__)
+        # self.run_busca_desordem_de_dispositivos()
 
-        # pós migração sislegis
-        self.run_busca_desordem_de_dispositivos()
+        self.run_testa_ghostscript()
+
+    def run_testa_ghostscript(self):
+        m = MateriaLegislativa.objects.get(pk=13576)
+
+        file_path = m.texto_original.file.name
+
+        p = CompressPDF()
+        p.compress(0, file_path, file_path + '__0__new.pdf')
+        #p.compress(1, file_path, file_path + '__1__new.pdf')
+        #p.compress(2, file_path, file_path + '__2__new.pdf')
+        #p.compress(3, file_path, file_path + '__3__new.pdf')
+        #p.compress(4, file_path, file_path + '__4__new.pdf')
 
     def run_ajusta_datas_de_edicao_com_certidoes(self):
 
         # Área de trabalho pública
-        docs = DocumentoAdministrativo.objects.filter(workspace_id=22).order_by('-id')
+        docs = DocumentoAdministrativo.objects.filter(
+            workspace_id=22).order_by('-id')
 
         for d in docs:
             c = d.certidao
@@ -66,9 +128,9 @@ class Command(BaseCommand):
                     continue
 
                 if nd.get_numero_completo() < numero:
-                    print(nd.ta_id, nd.ordem, nd.id, ', '.join(map(str, nd.get_parents_asc())))
+                    print(nd.ta_id, nd.ordem, nd.id, ', '.join(
+                        map(str, nd.get_parents_asc())))
 
                 numero = nd.get_numero_completo()
 
         busca(nodelist)
-
