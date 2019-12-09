@@ -1208,7 +1208,8 @@ class ListMateriaOrdemDiaView(FormMixin, DetailView):
                    'resultado': o.resultado,
                    'autor': autor,
                    'votacao_aberta': o.votacao_aberta,
-                   'tipo_votacao': o.tipo_votacao
+                   'tipo_votacao': o.tipo_votacao,
+                   'materia': o.materia
                    }
             materias_ordem.append(mat)
 
@@ -1268,7 +1269,8 @@ class ListMateriaOrdemDiaView(FormMixin, DetailView):
                            'resultado': o.resultado,
                            'autor': autor,
                            'votacao_aberta': o.votacao_aberta,
-                           'tipo_votacao': o.tipo_votacao
+                           'tipo_votacao': o.tipo_votacao,
+                           'materia': o.materia
                            }
                     materias_ordem.append(mat)
 
@@ -1831,6 +1833,7 @@ def get_materias_ordem_do_dia(sessao_plenaria):
                'voto_nao': voto_nao,
                'voto_abstencoes': voto_abstencoes,
                'voto_nominal': voto_nominal,
+               'materia': o.materia
                }
         materias_ordem.append(mat)
 
@@ -3395,7 +3398,8 @@ class PautaSessaoDetailView(DetailView):
                    'resultado': resultado,
                    'resultado_observacao': resultado_observacao,
                    'situacao': situacao,
-                   'autor': autor
+                   'autor': autor,
+                   'materia': o.materia
                    }
             materias_ordem.append(mat)
 

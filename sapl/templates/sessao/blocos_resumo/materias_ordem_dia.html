@@ -4,8 +4,8 @@
 <fieldset>
   <legend>Matérias da Ordem do Dia</legend>
   
-      {% for m in materias_ordem %}
       <table class="table">
+      {% for m in materias_ordem %}
         <tr>
           <td class="item-listas">  
             <div class="item-raiz">
@@ -18,15 +18,28 @@
               <b>Turno:</b> {{m.turno|default:''}} |
               <b>Autor{{ m.autor|length|pluralize:"es" }}</b>: {{ m.autor|join:', ' }}
               <div class="text-ementa">{{ m.ementa }}</div>
-              <hr>
-              <b>{{m.resultado}}</b><br/>{{m.resultado_observacao}}
+
+              <small>
+                {% with m.materia.tramitacao_set.last as tram %}
+                  {% if tram.unidade_tramitacao_destino %}        
+                    <strong>Localização Atual:</strong> &nbsp;{{tram.unidade_tramitacao_destino}}</br>        
+                    <strong>Status:</strong> {{tram.status}}<br>
+                    <strong>Ultima Ação:</strong> {{tram.texto}}<br>
+                    <strong>Data da última Tramitação:</strong> {{tram.data_tramitacao}}<br>       
+                  {% endif %}
+                {% endwith %}
+                <br>      
+              </small>
               {% comment %}
               {% endcomment %}
             </div>
           </td>
+          <td>
+              <b>{{m.resultado}}</b><br/>{{m.resultado_observacao}}
+          </td>
         </tr>
-      </table>
       {% endfor %}
+      </table>
 </fieldset>
 <br>
 <br>
