@@ -71,7 +71,11 @@ export default {
     }
   },
   mounted: function () {
+    this.$connect()
     this.initCache()
+  },
+  beforeDestroy: function () {
+    this.$disconnect()
   },
   methods: {
     diminuirFonte () {
