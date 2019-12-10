@@ -2,7 +2,7 @@ if (workbox) {
   workbox.core.setCacheNameDetails({prefix: "frontend"})
   self.__precacheManifest = [{
     url: '/offline/',
-    revision: '000001'
+    revision: '000002'
   }].concat(self.__precacheManifest || [])
   
   workbox.precaching.suppressWarnings()
