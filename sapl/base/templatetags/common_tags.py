@@ -263,10 +263,10 @@ def youtube_id(value):
     from urllib.parse import urlparse, parse_qs
     u_pars = urlparse(value)
     quer_v = parse_qs(u_pars.query).get('v')
+    quer_t = parse_qs(u_pars.query).get('t') or ('0', )
     if quer_v:
-        return quer_v[0]
-    return u_pars.path[1:]
-    return ''
+        return '{}?start={}'.format(quer_v[0], quer_t[0])
+    return '{}?start={}'.format(u_pars.path[1:], quer_t[0])
 
 
 @register.filter
@@ -299,7 +299,6 @@ def duration_difference(cronometro_duration, last_time):
 @register.filter
 def to_list_pk(object_list):
     return [o.pk for o in object_list]
-
 
 
 @register.filter
