@@ -1,5 +1,5 @@
 <template>
-  <div class="sessao-plenaria-online">
+  <div class="sessao-plenaria-online" >
     <template v-if="sessao" >
       <sessao-plenaria-topo :sessao="sessao"></sessao-plenaria-topo>
       <pauta-online :sessao="sessao"></pauta-online>

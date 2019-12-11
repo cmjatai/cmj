@@ -30,7 +30,7 @@
       <slot name="sideleft"></slot>
     </div>
 
-    <div class="main">
+    <div class="main" v-on:scroll.passive="handleScroll">
       <slot name="main"></slot>
     </div>
 
@@ -45,12 +45,34 @@ export default {
   name: 'base-layout',
   data () {
     return {
-      sideleft_expand: false
+      sideleft_expand: false,
+      count_time: 0,
+      id_interval: 0
     }
   },
   methods: {
     toogle_sideleft: function () {
       this.sideleft_expand = !this.sideleft_expand
+    },
+    handleScroll () {
+      // console.log('scroll')
+      let t = this
+      if (t.count_time === 0) {
+        t.count_time += 1
+        if (t.id_interval !== 0) {
+          clearInterval(t.id_interval)
+        }
+        t.id_interval = setInterval(() => {
+          // console.log(t.count_time)
+          t.count_time += 1
+        }, 5000)
+      } else if (t.count_time > 12) {
+        t.count_time = 0
+        t.$disconnect()
+        t.$connect()
+      } else {
+        t.count_time = 0
+      }
     }
   },
   mounted: function () {
