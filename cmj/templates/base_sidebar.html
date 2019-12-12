@@ -44,6 +44,7 @@
             <ul>
               <li><a href="/doc/?tipo=189">Credenciamentos da Imprensa</a></li>
               <li><a href="/doc/?data_vencimento_0={% now "d/m/Y" %}">Contratos Em Vigência</a></li>
+              <li><a href="/doc/?data_vencimento_0={% now "d/m/Y" %}&data_vencimento_1={{""|timedelta_filter:90|date:"d/m/Y"}}" title="Contratos a vencer nos próximos 90 dias.">Contratos a Vencer</a></li>
               <li><a href="/doc/?data_vencimento_1={% now "d/m/Y" %}">Contratos Encerrados</a></li>
             </ul>
           </li>

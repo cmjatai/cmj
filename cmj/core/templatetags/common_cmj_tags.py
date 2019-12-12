@@ -1,9 +1,10 @@
-from datetime import date
+from datetime import date, timedelta
 
 from dateutil.relativedelta import relativedelta
 from django import template
 from django.conf import settings
 from django.template.defaultfilters import stringfilter
+from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from webpack_loader import utils
@@ -319,3 +320,11 @@ def sidebar_tipos_de_materias(obj):
 @register.filter
 def normas_de_destaque(obj):
     return NormaJuridica.objects.filter(norma_de_destaque=True).order_by('id')
+
+
+@register.filter
+def timedelta_filter(data, td):
+    if not data:
+        data = timezone.now()
+    data += timedelta(days=int(td))
+    return data
