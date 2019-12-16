@@ -101,9 +101,9 @@ def get_rodape(casa):
             linha2 = linha2 + " - "
         linha2 = linha2 + str(_("E-mail: ")) + casa.email
 
-    data_emissao = dt.strftime(timezone.now(), "%d/%m/%Y")
+    #data_emissao = dt.strftime(timezone.now(), "%d/%m/%Y")
 
-    return [linha1, linha2, data_emissao]
+    return [linha1, linha2]
 
 
 def get_materias(mats):
@@ -622,7 +622,8 @@ def get_sessao_plenaria(sessao, casa):
         dic_expediente_materia = {}
         dic_expediente_materia["num_ordem"] = expediente_materia.numero_ordem
         dic_expediente_materia["id_materia"] = (materia.tipo.sigla + ' ' +
-                                                materia.tipo.descricao + ' ' +
+                                                # materia.tipo.descricao + ' '
+                                                # +
                                                 str(materia.numero) + '/' +
                                                 str(materia.ano))
         dic_expediente_materia["des_numeracao"] = ' '
@@ -734,7 +735,7 @@ def get_sessao_plenaria(sessao, casa):
         dic_votacao["num_ordem"] = votacao.numero_ordem
         dic_votacao["id_materia"] = (
             materia.tipo.sigla + ' ' +
-            materia.tipo.descricao + ' ' +
+            # materia.tipo.descricao + ' ' +
             str(materia.numero) + '/' +
             str(materia.ano))
         dic_votacao["des_numeracao"] = ' '
@@ -1419,14 +1420,14 @@ def relatorio_sessao_plenaria_pdf(request, pk):
                                          "inf_basicas_dic": inf_basicas_dic,
                                          "lst_mesa": lst_mesa,
                                          "lst_presenca_sessao": lst_presenca_sessao,
-                                         "lst_ausencia_sessao": lst_ausencia_sessao,
+                                         #"lst_ausencia_sessao": lst_ausencia_sessao,
                                          #"lst_expedientes": lst_expedientes,
                                          "lst_expediente_materia": lst_expediente_materia,
-                                         "lst_oradores_expediente": lst_oradores_expediente,
+                                         #"lst_oradores_expediente": lst_oradores_expediente,
                                          "lst_presenca_ordem_dia": lst_presenca_ordem_dia,
                                          "lst_votacao": lst_votacao,
-                                         "lst_oradores": lst_oradores,
-                                         "lst_ocorrencias": lst_ocorrencias,
+                                         #"lst_oradores": lst_oradores,
+                                         #"lst_ocorrencias": lst_ocorrencias,
                                          "rodape": rodape,
                                          "data": dt.today().strftime('%d/%m/%Y')
                                      })

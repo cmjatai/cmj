@@ -25,8 +25,6 @@ from django.views.generic import ListView, TemplateView, CreateView, UpdateView
 from django.views.generic.base import RedirectView
 from django.views.generic.edit import FormView
 from django_filters.views import FilterView
-import weasyprint
-import weasyprint
 
 from cmj.core.models import AreaTrabalho
 from cmj.globalrules import GROUP_MATERIA_WORKSPACE_VIEWER
@@ -1456,14 +1454,14 @@ class DocumentoAcessorioCrud(MasterDetailCrud):
 
         def hook_ementa(self, obj, default, url):
             return '<strong>{}</strong>'.format(default), ''
-        
+
         def hook_nome(self, obj, default, url):
             return """
             <a href="{}" pk="{}" class="d-block text-center">{}</a><br>
             {}
             """.format(
                 url, obj.id, obj.nome,
-               """
+                """
                    <small>
                      <a href="{}" pk="{}" class="d-block text-center">
                        Arquivo<br>Digitalizado
