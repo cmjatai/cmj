@@ -758,6 +758,7 @@ mapa = [
             'observacao': 'txt_observacao',
             'resultado': 'txt_resultado',
             'ind_excluido': 'ind_excluido',
+            'checkcheck': 'checkcheck',
         },
         'adjust': adjust_materialegislativa
     },

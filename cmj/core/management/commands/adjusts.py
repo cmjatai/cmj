@@ -9,6 +9,7 @@ from django.db.models import F, Q
 from django.db.models.signals import post_delete, post_save
 import ghostscript
 
+from cmj.s3_to_cmj.models import S3MateriaLegislativa
 from sapl.compilacao.models import TextoArticulado, Dispositivo
 from sapl.materia.models import MateriaLegislativa
 from sapl.protocoloadm.models import DocumentoAdministrativo
@@ -71,6 +72,11 @@ class Command(BaseCommand):
         # self.run_busca_desordem_de_dispositivos()
 
         self.run_testa_ghostscript()
+
+    def run_import_check_check(self):
+        materias_antigas = S3MateriaLegislativa.objects.all()
+
+        pass
 
     def run_testa_ghostscript(self):
         m = MateriaLegislativa.objects.get(pk=13576)

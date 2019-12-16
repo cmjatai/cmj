@@ -296,9 +296,14 @@ class MateriaLegislativa(models.Model):
         blank=True,
         default=''
     )
-    
+
     arquivado = models.BooleanField(
         verbose_name=_('Arquivamento completo?'),
+        default=False,
+        choices=YES_NO_CHOICES)
+
+    checkcheck = models.BooleanField(
+        verbose_name=_('Processo Legislativo Auditado?'),
         default=False,
         choices=YES_NO_CHOICES)
 
