@@ -1,9 +1,11 @@
+
 from datetime import datetime
 import logging
 import os
 from platform import node
 import subprocess
 
+from celery.worker.control import ok
 from django.core.management.base import BaseCommand
 from django.db.models import F, Q
 from django.db.models.signals import post_delete, post_save
@@ -71,12 +73,22 @@ class Command(BaseCommand):
         self.logger = logging.getLogger(__name__)
         # self.run_busca_desordem_de_dispositivos()
 
-        self.run_testa_ghostscript()
+        # self.run_import_check_check()
 
     def run_import_check_check(self):
-        materias_antigas = S3MateriaLegislativa.objects.all()
+        materias_antigas = S3MateriaLegislativa.objects.filter(
+            checkcheck=1,
+            ind_excluido=0)
 
-        pass
+        for m_old in materias_antigas:
+            try:
+                m_new = MateriaLegislativa.objects.get(pk=m_old.cod_materia)
+            except:
+                pass
+            else:
+                m_new.checkcheck = True
+                m_new.save()
+                print(m_new)
 
     def run_testa_ghostscript(self):
         m = MateriaLegislativa.objects.get(pk=13576)

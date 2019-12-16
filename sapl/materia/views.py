@@ -1,3 +1,4 @@
+
 from datetime import datetime
 import itertools
 import logging
@@ -77,6 +78,7 @@ from .models import (AcompanhamentoMateria, Anexada, AssuntoMateria, Autoria,
                      RegimeTramitacao, Relatoria, StatusTramitacao,
                      TipoDocumento, TipoFimRelatoria, TipoMateriaLegislativa,
                      TipoProposicao, Tramitacao, UnidadeTramitacao)
+
 
 AssuntoMateriaCrud = CrudAux.build(AssuntoMateria, 'assunto_materia')
 
@@ -2795,3 +2797,36 @@ class TipoMateriaCrud(CrudAux):
                 self.object.save()
 
             return fv
+
+
+class MateriaLegislativaCheckView(ListView):
+    model = MateriaLegislativa
+    template_name = "materia/materialegislativa_check.html"
+
+    @property
+    def title(self):
+        return 'Checagem de Registro do Processo Legislativo'
+
+    def get(self, request, *args, **kwargs):
+
+        check = request.GET.get('check', '')
+        if check and request.user.is_superuser:
+            try:
+                m = MateriaLegislativa.objects.get(pk=check)
+            except:
+                raise Http404
+            else:
+                m.checkcheck = True
+                m.save()
+                return redirect('/materia/check')
+
+        return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        qs = qs.filter(checkcheck=False)
+
+        qs = qs.order_by('-data_apresentacao')
+
+        return qs

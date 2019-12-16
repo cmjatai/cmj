@@ -168,6 +168,9 @@ class NormaJuridica(models.Model):
     _certidao = GenericRelation(
         CertidaoPublicacao, related_query_name='normajuridica_cert')
 
+    def diariooficial(self):
+        return self.diariooficial_set.all()
+
     class Meta:
         verbose_name = _('Norma Jurídica')
         verbose_name_plural = _('Normas Jurídicas')

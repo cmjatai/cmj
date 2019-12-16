@@ -27,7 +27,8 @@ from sapl.materia.views import (AcompanhamentoConfirmarView,
                                 proposicao_texto, recuperar_materia,
                                 ExcluirTramitacaoEmLoteView, RetornarProposicao,
                                 MateriaPesquisaSimplesView,
-                                DespachoInicialMultiCreateView)
+                                DespachoInicialMultiCreateView,
+                                MateriaLegislativaCheckView)
 from sapl.norma.views import NormaPesquisaSimplesView
 from sapl.protocoloadm.views import (
     FichaPesquisaAdmView, FichaSelecionaAdmView)
@@ -89,6 +90,9 @@ urlpatterns_materia = [
         recuperar_materia, name='recuperar_materia'),
     url(r'^materia/(?P<pk>[0-9]+)/ta$',
         MateriaTaView.as_view(), name='materia_ta'),
+
+    url(r'^materia/check$',
+        MateriaLegislativaCheckView.as_view(), name='materia_check'),
 
 
     url(r'^materia/pesquisar-materia$',

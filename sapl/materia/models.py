@@ -377,6 +377,12 @@ class MateriaLegislativa(models.Model):
                                  using=using,
                                  update_fields=update_fields)
 
+    def autografo(self):
+        return self.normajuridica_set.filter(tipo_id=27).first()
+
+    def normajuridica(self):
+        return self.normajuridica_set.exclude(tipo_id=27).first()
+
 
 @reversion.register()
 class Autoria(models.Model):
