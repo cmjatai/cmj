@@ -48,11 +48,18 @@
             <td>
               {% if m.normajuridica %}
                 <a href="{% url 'sapl.norma:normajuridica_detail' m.normajuridica.id %}">{{m.normajuridica}}</a>
-                 <br>{{m.normajuridica.ementa}}
+                <br>{{m.normajuridica.ementa}}
                 
-                 {% if not m.normajuridica.veiculo_publicacao %}
-                   <br><strong>Diário Oficial não informado.</strong>
-                 {% endif %}
+                {% if not m.normajuridica.veiculo_publicacao %}
+                  <br><strong>Diário Oficial não informado.</strong>
+                {% else %}
+                  <br><br>
+                  <a href="{% url 'cmj.diarios:diariooficial_detail' m.normajuridica.diariooficial.first.id%}">
+                    <small class="text-info">
+                      {{m.normajuridica.diariooficial.first}}
+                    </small>
+                  </a>
+                {% endif %}
               {% endif %}
             </td>
           </tr>

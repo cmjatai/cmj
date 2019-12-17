@@ -169,6 +169,15 @@ class NormaJuridica(models.Model):
         CertidaoPublicacao, related_query_name='normajuridica_cert')
 
     def diariooficial(self):
+        if self.veiculo_publicacao:
+            if not self.diariooficial_set.filter(edicao=self.veiculo_publicacao).exists():
+                from cmj.diarios.models import DiarioOficial
+
+                d = DiarioOficial.objects.filter(
+                    edicao=self.veiculo_publicacao).last()
+
+                d.normas.add(self)
+
         return self.diariooficial_set.all()
 
     class Meta:
