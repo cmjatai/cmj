@@ -22,6 +22,9 @@
             {% endif %}
             <td width="35%">
               <a href="{% url 'sapl.materia:materialegislativa_detail' m.id %}">{{m}}</a>
+              {% if m.em_tramitacao %}
+                <br><strong class="text-red">Em Tramitação</strong>
+              {% endif %}
               <br>{{m.ementa}}
               <br>
               <small>
@@ -46,8 +49,8 @@
               {% if m.normajuridica %}
                 <a href="{% url 'sapl.norma:normajuridica_detail' m.normajuridica.id %}">{{m.normajuridica}}</a>
                  <br>{{m.normajuridica.ementa}}
-
-                 {% if not n.normajuridica.veiculo_publicacao %}
+                
+                 {% if not m.normajuridica.veiculo_publicacao %}
                    <br><strong>Diário Oficial não informado.</strong>
                  {% endif %}
               {% endif %}
