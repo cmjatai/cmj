@@ -176,7 +176,8 @@ class NormaJuridica(models.Model):
                 d = DiarioOficial.objects.filter(
                     edicao=self.veiculo_publicacao).last()
 
-                d.normas.add(self)
+                if d:
+                    d.normas.add(self)
 
         return self.diariooficial_set.all()
 
