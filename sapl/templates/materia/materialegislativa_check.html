@@ -22,6 +22,9 @@
             {% endif %}
             <td width="35%">
               <a href="{% url 'sapl.materia:materialegislativa_detail' m.id %}">{{m}}</a>
+              <small>
+                <br><strong>Data de Apresentação:</strong> {{m.data_apresentacao}}
+              </small>
               {% if m.em_tramitacao %}
                 <br><strong class="text-red">Em Tramitação</strong>
               {% endif %}

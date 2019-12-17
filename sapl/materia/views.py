@@ -2810,13 +2810,14 @@ class MateriaLegislativaCheckView(ListView):
     def get(self, request, *args, **kwargs):
 
         check = request.GET.get('check', '')
-        if check and request.user.is_superuser:
+        uncheck = request.GET.get('uncheck', '')
+        if request.user.is_superuser and (check or uncheck):
             try:
-                m = MateriaLegislativa.objects.get(pk=check)
+                m = MateriaLegislativa.objects.get(pk=check or uncheck)
             except:
                 raise Http404
             else:
-                m.checkcheck = True
+                m.checkcheck = True if check else False
                 m.save()
                 return redirect('/materia/check')
 

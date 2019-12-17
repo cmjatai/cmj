@@ -22,7 +22,7 @@
       <link rel="icon" href="{% webpack_static 'img/favicon.ico' %}"  type="image/png">
       {% block webpack_loader_css %}
         {% render_chunk_vendors 'css' %}
-        {% render_bundle  'global' 'css' %}
+        {% render_bundle 'global' 'css' %}
       {% endblock webpack_loader_css %}
 
       {% block webpack_loader_chunks_css %}
