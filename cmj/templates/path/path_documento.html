@@ -108,7 +108,7 @@
 
                   {% if parlamentar.fotografia %}
                     <a class="avatar" href="/{{ parlamentar.classe_set.first.absolute_slug }}" title="{{parlamentar}}">
-                      <img src="{{ parlamentar.fotografia.url }}" alt="{{parlamentar}}">
+                      <img src="{% thumbnail parlamentar.fotografia 9000x9000 box=parlamentar.fotografia_cropping crop detail %}">
                     </a>
                   {% endif %}
 
@@ -154,7 +154,7 @@
 
               {% if parlamentar.fotografia %}
                 <a class="avatar avatar{% if count_parlamentares >= 5 %}5{%else%}{{count_parlamentares}}{% endif %}" href="/{{ parlamentar.classe_set.first.absolute_slug }}" title="{{parlamentar}}">
-                  <img src="{{ parlamentar.fotografia.url }}" alt="{{parlamentar}}">
+                  <img src="{% thumbnail parlamentar.fotografia 9000x9000 box=parlamentar.fotografia_cropping crop detail %}">
                 </a>
               {% endif %}
 
