@@ -1,5 +1,5 @@
 {% extends "base_path.html" %}
-{% load i18n sigad_filters social_utils %}
+{% load i18n sigad_filters social_utils cropping thumbnail %}
 {% block head_title %}{{block.super}} - {{object}}{% endblock head_title %}
 {% block main_container_class %}container-path{% endblock %}
 
@@ -56,7 +56,7 @@
 
                   {% if parlamentar.fotografia %}
                     <a class="avatar" href="/{{ parlamentar.classe_set.first.absolute_slug }}" title="{{parlamentar}}">
-                      <img src="{{ parlamentar.fotografia.url }}" alt="{{parlamentar}}">
+                      <img src="{% thumbnail parlamentar.fotografia 9000x9000 box=parlamentar.fotografia_cropping crop detail %}">
                     </a>
                   {% endif %}
 
