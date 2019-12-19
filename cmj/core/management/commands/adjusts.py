@@ -142,12 +142,17 @@ class Command(BaseCommand):
                 path = ''
                 count_reg += 1
                 try:
-                    if getattr(i, file):
-                        path = getattr(i, file).file.name
-                        pdf = PdfReader(open(path, "rb"))
+                    ff = getattr(i, file)
+                    if ff:
+                        path = ff.file.name
+                        pdf = PdfReader(path)
                         count_pages += len(pdf.pages)
+                        ff.file.close()
                 except Exception as e:
                     print(e)
+
+                if count_reg % 100 == 0:
+                    print(count_reg, model._meta.verbose_name_plural, count_pages)
 
             print(model._meta.verbose_name_plural, count_pages)
 
