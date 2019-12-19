@@ -11,6 +11,7 @@ from django.core.management.base import BaseCommand
 from django.db.models import F, Q
 from django.db.models.signals import post_delete, post_save
 import ghostscript
+from pdfrw.pdfreader import PdfReader
 from prompt_toolkit.key_binding.bindings.named_commands import self_insert
 
 from cmj.diarios.models import DiarioOficial
@@ -138,14 +139,15 @@ class Command(BaseCommand):
             count_pages = 0
             count_reg = 0
             for i in itens:
+                path = ''
                 count_reg += 1
                 try:
-                    path = getattr(i, file).file.name
-                    pdf = PdfFileReader(open(path, "rb"))
+                    if getattr(i, file):
+                        path = getattr(i, file).file.name
+                        pdf = PdfReader(open(path, "rb"))
+                        count_pages += len(pdf.pages)
                 except Exception as e:
-                    pass
-                else:
-                    count_pages += pdf.getNumPages()
+                    print(e)
 
             print(model._meta.verbose_name_plural, count_pages)
 
