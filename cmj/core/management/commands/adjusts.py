@@ -5,16 +5,22 @@ import os
 from platform import node
 import subprocess
 
+from PyPDF4.pdf import PdfFileReader
 from celery.worker.control import ok
 from django.core.management.base import BaseCommand
 from django.db.models import F, Q
 from django.db.models.signals import post_delete, post_save
 import ghostscript
+from prompt_toolkit.key_binding.bindings.named_commands import self_insert
 
+from cmj.diarios.models import DiarioOficial
 from cmj.s3_to_cmj.models import S3MateriaLegislativa
+from cmj.sigad.models import Documento, VersaoDeMidia
 from sapl.compilacao.models import TextoArticulado, Dispositivo
-from sapl.materia.models import MateriaLegislativa
-from sapl.protocoloadm.models import DocumentoAdministrativo
+from sapl.materia.models import MateriaLegislativa, DocumentoAcessorio
+from sapl.norma.models import NormaJuridica, AnexoNormaJuridica
+from sapl.protocoloadm.models import DocumentoAdministrativo,\
+    DocumentoAcessorioAdministrativo
 
 
 class CompressPDF:
@@ -73,7 +79,81 @@ class Command(BaseCommand):
         self.logger = logging.getLogger(__name__)
         # self.run_busca_desordem_de_dispositivos()
 
-        # self.run_import_check_check()
+        self.run_bi()
+
+    def run_bi(self):
+        self.run_bi_files()
+
+    def run_bi_files(self):
+        models = [
+            {
+                'model': MateriaLegislativa,
+                'file_field': 'texto_original',
+                'hook': '',  # 'run_bi_files_materias_legislativas'
+            },
+            {
+                'model': DocumentoAcessorio,
+                'file_field': 'arquivo',
+                'hook': ''
+            },
+            {
+                'model': NormaJuridica,
+                'file_field': 'texto_integral',
+                'hook': ''
+            },
+            {
+                'model': AnexoNormaJuridica,
+                'file_field': 'anexo_arquivo',
+                'hook': ''
+            },
+            {
+                'model': DocumentoAdministrativo,
+                'file_field': 'texto_integral',
+                'hook': ''
+            },
+            {
+                'model': DocumentoAcessorioAdministrativo,
+                'file_field': 'arquivo',
+                'hook': ''
+            },
+            {
+                'model': DiarioOficial,
+                'file_field': 'arquivo',
+                'hook': ''
+            },
+            {
+                'model': VersaoDeMidia,
+                'file_field': 'file',
+                'hook': 'run_bi_files_midias'
+            },
+        ]
+
+        for mt in models:  # mt = metadata
+            if mt['hook']:
+                getattr(self, mt['hook'])
+                continue
+            model = mt['model']
+            file = mt['file_field']
+            itens = model.objects.all()
+            count_pages = 0
+            count_reg = 0
+            for i in itens:
+                count_reg += 1
+                try:
+                    path = getattr(i, file).file.name
+                    pdf = PdfFileReader(open(path, "rb"))
+                except Exception as e:
+                    pass
+                else:
+                    count_pages += pdf.getNumPages()
+
+            print(model._meta.verbose_name_plural, count_pages)
+
+    def run_bi_files_materias_legislativas(self):
+        pass
+
+    def run_bi_files_midias(self):
+        pass
 
     def run_import_check_check(self):
         materias_antigas = S3MateriaLegislativa.objects.filter(
