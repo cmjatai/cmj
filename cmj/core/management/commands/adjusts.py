@@ -1,5 +1,5 @@
 
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 import os
 from platform import node
@@ -8,12 +8,15 @@ import subprocess
 from PyPDF4.pdf import PdfFileReader
 from celery.worker.control import ok
 from django.core.management.base import BaseCommand
+from django.db import connection
 from django.db.models import F, Q
 from django.db.models.signals import post_delete, post_save
+from django.utils import timezone
 import ghostscript
 from pdfrw.pdfreader import PdfReader
 from prompt_toolkit.key_binding.bindings.named_commands import self_insert
 
+from cmj.core.models import OcrMyPDF
 from cmj.diarios.models import DiarioOficial
 from cmj.s3_to_cmj.models import S3MateriaLegislativa
 from cmj.sigad.models import Documento, VersaoDeMidia
@@ -80,7 +83,30 @@ class Command(BaseCommand):
         self.logger = logging.getLogger(__name__)
         # self.run_busca_desordem_de_dispositivos()
 
-        self.run_bi()
+        # self.run_bi()
+        self.run_distibui_ocr_ao_longo_do_ano()
+
+    def run_sql(self, sql):
+
+        with connection.cursor() as cursor:
+            cursor.execute(sql)
+            # get all the rows as a list
+            rows = cursor.fetchall()
+            print(rows)
+
+    def run_distibui_ocr_ao_longo_do_ano(self):
+        ocrs = OcrMyPDF.objects.all().order_by('id')
+
+        c = ocrs.count()
+        d = timezone.now() - timedelta(days=365, seconds=120)
+        i = 31536000 // c
+        for o in ocrs:
+            concluido_interval = o.concluido - o.created
+            o.created = d
+            o.concluido = d + concluido_interval
+            o.save()
+
+            d = d + timedelta(seconds=i)
 
     def run_bi(self):
         self.run_bi_files()
