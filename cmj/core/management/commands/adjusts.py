@@ -84,7 +84,7 @@ class Command(BaseCommand):
         # self.run_busca_desordem_de_dispositivos()
 
         # self.run_bi()
-        self.run_distibui_ocr_ao_longo_do_ano()
+        # self.run_ajusta_datas_de_edicao_com_certidoes()
 
     def run_sql(self, sql):
 
@@ -225,6 +225,8 @@ class Command(BaseCommand):
             c = d.certidao
 
             if c:
+                d.data_ultima_atualizacao = c.created
+                d.save()
                 continue
 
             print(d.epigrafe)
