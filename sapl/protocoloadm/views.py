@@ -339,6 +339,10 @@ class DocumentoAdministrativoCrud(Crud):
                 'Pesquisa Parametrizada de Documentos Administrativos')
             context['bg_title'] = 'bg-aqua text-white'
 
+            qr = self.request.GET.copy()
+            context['filter_url'] = (
+                '&' + qr.urlencode()) if len(qr) > 0 else ''
+
             return context
 
         def get(self, request, *args, **kwargs):
