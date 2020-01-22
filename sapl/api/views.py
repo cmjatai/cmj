@@ -412,6 +412,10 @@ class ResponseFileMixin:
 
         mime = get_mime_type_from_file_extension(arquivo.name)
 
+        if settings.DEBUG:
+            response = HttpResponse(arquivo, content_type=mime)
+            return response
+
         response = HttpResponse(content_type='%s' % mime)
         response['Content-Disposition'] = (
             'inline; filename="%s"' % arquivo.name.split('/')[-1])
@@ -421,6 +425,7 @@ class ResponseFileMixin:
         response['Expires'] = 0
 
         original = 'original__' if 'original' in request.GET else ''
+
         response['X-Accel-Redirect'] = "/media/{0}{1}".format(
             original,
             arquivo.name
