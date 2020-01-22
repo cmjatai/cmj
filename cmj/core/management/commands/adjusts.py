@@ -15,6 +15,7 @@ from django.utils import timezone
 import ghostscript
 from pdfrw.pdfreader import PdfReader
 from prompt_toolkit.key_binding.bindings.named_commands import self_insert
+from reversion.models import Version
 
 from cmj.core.models import OcrMyPDF
 from cmj.diarios.models import DiarioOficial
@@ -85,6 +86,7 @@ class Command(BaseCommand):
 
         # self.run_bi()
         # self.run_ajusta_datas_de_edicao_com_certidoes()
+        # self.run_ajusta_datas_de_edicao_com_data_doc()
 
     def run_sql(self, sql):
 
@@ -239,6 +241,31 @@ class Command(BaseCommand):
             if da and da.documento_anexado.certidao:
                 d.data_ultima_atualizacao = da.documento_anexado.certidao.created
                 d.save()
+
+    def run_ajusta_datas_de_edicao_com_data_doc(self):
+
+        # Áreas de trabalho específicas
+        docs = DocumentoAdministrativo.objects.filter(
+            workspace_id=21).order_by('-id')
+
+        for d in docs:
+
+            #v = Version.objects.get_for_object(d)
+
+            # if v.exists():
+            #    d.data_ultima_atualizacao = v[0].revision.date_created
+            # else:
+            d.data_ultima_atualizacao = d.data
+            d.save()
+
+            """if not d.documento_principal_set.exists():
+                continue
+
+            da = d.documento_principal_set.first()
+
+            if da and da.documento_anexado.certidao:
+                d.data_ultima_atualizacao = da.documento_anexado.certidao.created
+                d.save()"""
 
     def run_busca_desordem_de_dispositivos(self):
         init = datetime.now()
