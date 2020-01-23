@@ -340,6 +340,10 @@ class DocumentoAdministrativoCrud(Crud):
             context['bg_title'] = 'bg-aqua text-white'
 
             qr = self.request.GET.copy()
+
+            if 'page' in qr:
+                del qr['page']
+
             context['filter_url'] = (
                 '&' + qr.urlencode()) if len(qr) > 0 else ''
 
