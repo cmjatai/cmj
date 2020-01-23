@@ -40,7 +40,7 @@ CepCrud = CrudAux.build(Cep, None, 'cep')
 RegiaoMunicipalCrud = CrudAux.build(
     RegiaoMunicipal, None,  'regiao_municipal')
 DistritoCrud = CrudAux.build(Distrito, None, 'distrito')
-BairroCrud = CrudAux.build(Bairro, None, 'bairro')
+BairroCrud = CrudAux.build(Bairro, None)
 TipoLogradouroCrud = CrudAux.build(
     TipoLogradouro, None, 'tipo_logradouro')
 LogradouroCrud = CrudAux.build(Logradouro, None, 'logradouro')

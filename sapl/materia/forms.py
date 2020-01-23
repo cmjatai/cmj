@@ -1120,7 +1120,7 @@ class MateriaLegislativaFilterSet(django_filters.FilterSet):
 
                      to_row([
                          (row8, 'col'),
-                         (form_actions(label=_('Processar Pesquisa')), 'col-md-auto')
+                         (form_actions(label=_('Processar Pesquisa')), 'col-md-auto mt-4 pt-3')
                      ])
                      ),
             # Fieldset(_('Origem externa'),
