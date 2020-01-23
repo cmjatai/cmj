@@ -716,11 +716,11 @@ class DocumentoAdministrativoOrderingFilter(django_filters.OrderingFilter):
                ('dataVENc', 'Ordem Crescente - Data de Vencimento, Tipo, Número'),)
 
     order_by_mapping = {
-        'dataPUBd': ['-data_ultima_atualizacao'],
-        'dataDOCd': ['-data', '-tipo', '-numero'],
-        'dataDOCc': ['data', 'tipo', 'numero'],
-        'dataVENd': ['-data_vencimento', '-tipo', '-numero'],
-        'dataVENc': ['data_vencimento', 'tipo', 'numero'],
+        'dataPUBd': ['-data_ultima_atualizacao', '-id'],
+        'dataDOCd': ['-data', '-tipo', '-numero', '-id'],
+        'dataDOCc': ['data', 'tipo', 'numero', '-id'],
+        'dataVENd': ['-data_vencimento', '-tipo', '-numero', '-id'],
+        'dataVENc': ['data_vencimento', 'tipo', 'numero', '-id'],
     }
 
     def __init__(self, *args, **kwargs):
