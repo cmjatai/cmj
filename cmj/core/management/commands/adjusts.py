@@ -84,7 +84,7 @@ class Command(BaseCommand):
         self.logger = logging.getLogger(__name__)
         # self.run_busca_desordem_de_dispositivos()
 
-        # self.run_bi()
+        self.run_bi()
         # self.run_ajusta_datas_de_edicao_com_certidoes()
         # self.run_ajusta_datas_de_edicao_com_data_doc()
 
@@ -118,12 +118,8 @@ class Command(BaseCommand):
             {
                 'model': MateriaLegislativa,
                 'file_field': 'texto_original',
-                'hook': '',  # 'run_bi_files_materias_legislativas'
-            },
-            {
-                'model': DocumentoAcessorio,
-                'file_field': 'arquivo',
-                'hook': ''
+                'hook': 'run_bi_materias_legislativas',
+                'results': {}
             },
             {
                 'model': NormaJuridica,
@@ -158,35 +154,29 @@ class Command(BaseCommand):
         ]
 
         for mt in models:  # mt = metadata
-            if mt['hook']:
-                getattr(self, mt['hook'])
+            if not mt['hook']:
                 continue
-            model = mt['model']
-            file = mt['file_field']
-            itens = model.objects.all()
-            count_pages = 0
-            count_reg = 0
-            for i in itens:
-                path = ''
-                count_reg += 1
-                try:
-                    ff = getattr(i, file)
-                    if ff:
-                        path = ff.file.name
-                        pdf = PdfReader(path)
-                        count_pages += len(pdf.pages)
-                        ff.file.close()
-                except Exception as e:
-                    print(e)
+            getattr(self, mt['hook'])(mt)
 
-                if count_reg % 100 == 0:
-                    print(count_reg, model._meta.verbose_name_plural, count_pages)
+    def run_count_pages_from_file(self, filefield):
+        count_pages = 0
+        try:
+            path = filefield.file.name
+            pdf = PdfReader(path)
+            count_pages += len(pdf.pages)
+            filefield.file.close()
+        except Exception as e:
+            print(e)
+        else:
+            return count_pages
 
-            print(model._meta.verbose_name_plural, count_pages)
-
-    def run_bi_files_materias_legislativas(self):
-        pass
-
+    def run_bi_materias_legislativas(self, mt):
+        materias = MateriaLegislativa.objects.all()
+        
+        for m in materias:
+            
+        
+        
     def run_bi_files_midias(self):
         pass
 
