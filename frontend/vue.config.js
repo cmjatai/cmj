@@ -6,18 +6,18 @@ const CompressionPlugin = require('compression-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
 
 class RelativeBundleTrackerPlugin extends BundleTrackerPlugin {
-  convertPathChunks(chunks) {
+  convertPathChunks (chunks) {
     each(each(chunk => {
       chunk.path = path.relative(this.options.path, chunk.path)
     }))(chunks)
   }
-  writeOutput(compiler, contents) {
+  writeOutput (compiler, contents) {
     if (contents.status === 'done') {
       this.convertPathChunks(contents.chunks)
     }
     super.writeOutput(compiler, contents)
   }
-} 
+}
 
 const dotenv = require('dotenv')
 dotenv.config({
@@ -25,9 +25,9 @@ dotenv.config({
 })
 
 var HOST_NAME = 'localhost'
-//HOST_NAME = '192.168.15.7'
-HOST_NAME = '10.42.0.1'
-//HOST_NAME = '10.3.163.200'
+// HOST_NAME = '192.168.15.7'
+// HOST_NAME = '10.42.0.1'
+HOST_NAME = '10.3.163.200'
 
 module.exports = {
   runtimeCompiler: true,
@@ -35,9 +35,9 @@ module.exports = {
   outputDir: 'dist',
 
   chainWebpack: config => {
-    //config.plugins.delete('html')
-    //config.plugins.delete('preload')
-    //config.plugins.delete('prefetch')
+    // config.plugins.delete('html')
+    // config.plugins.delete('preload')
+    // config.plugins.delete('prefetch')
 
     config
       .plugin('RelativeBundleTrackerPlugin')
@@ -59,7 +59,7 @@ module.exports = {
         .devtool('source-map')
     }
 
-    //config.resolve.alias
+    // config.resolve.alias
     //  .set('__STATIC__', 'static')
 
     config.module
@@ -116,7 +116,6 @@ module.exports = {
         return args
       }) */
 
-
     config.entry('construct')
       .add('./src/__construct/main.js')
       .end()
@@ -125,21 +124,20 @@ module.exports = {
       .add('./src/__apps/compilacao/main.js')
       .end()
 
-/* 
+    /*
     config.entryPoints.delete('app')
      config.entry('app')
       .add('./src/main.js')
       .end()  */
- 
   },
 
   pwa: {
     name: 'Portal CMJ',
     workboxPluginMode: 'InjectManifest',
     workboxOptions: {
-        // swSrc is required in InjectManifest mode.
-        swSrc: 'public/service-worker.js',
-        // ...other Workbox options...
+      // swSrc is required in InjectManifest mode.
+      swSrc: 'public/service-worker.js'
+      // ...other Workbox options...
     }
   }
 }

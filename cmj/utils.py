@@ -9,6 +9,7 @@ from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
+from django.db import connection
 from django.urls.base import reverse
 from django.utils.translation import ugettext_lazy as _
 from easy_thumbnails import source_generators
@@ -400,3 +401,15 @@ class BtnCertMixin:
             ]
 
         return btn
+
+
+def run_sql(sql):
+    with connection.cursor() as cursor:
+
+        cursor.execute(sql)
+
+        if sql.startswith('select'):
+            rows = cursor.fetchall()
+
+        if settings.DEBUG:
+            print(rows)
