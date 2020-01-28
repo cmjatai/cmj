@@ -174,7 +174,7 @@ class MateriaLegislativaForm(FileFieldCheckMixin, ModelForm):
     class Meta:
         model = MateriaLegislativa
         exclude = ['texto_articulado', 'autores', 'proposicao',
-                   'anexadas', 'data_ultima_atualizacao']
+                   'anexadas', 'data_ultima_atualizacao', '_paginas']
         widgets = {
             'user': forms.HiddenInput(),
             'ip': forms.HiddenInput(),
@@ -1120,7 +1120,8 @@ class MateriaLegislativaFilterSet(django_filters.FilterSet):
 
                      to_row([
                          (row8, 'col'),
-                         (form_actions(label=_('Processar Pesquisa')), 'col-md-auto mt-4 pt-3')
+                         (form_actions(label=_('Processar Pesquisa')),
+                          'col-md-auto mt-4 pt-3')
                      ])
                      ),
             # Fieldset(_('Origem externa'),
