@@ -109,7 +109,7 @@ class Command(BaseCommand):
                 'model': MateriaLegislativa,
                 'file_field': 'texto_original',
                 'hook': 'run_bi_materias_legislativas',
-                'results': {}
+                'results': {},
             },
             {
                 'model': NormaJuridica,
@@ -177,15 +177,17 @@ class Command(BaseCommand):
         results = mt['results']
         for k, v in r.items():
             if k not in results:
-                results[k] = {}
+                results[k] = {
+                    'ml': {}
+                }
 
             for materia in v:
                 if materia.user_id not in results[k]:
-                    results[k][materia.user_id] = {}
-                    results[k][materia.user_id]['total_ml'] = 0
-                    results[k][materia.user_id]['total_da'] = 0
-                    results[k][materia.user_id]['total_tr'] = 0
-                    results[k][materia.user_id]['paginas'] = 0
+                    results[k]['ml'][materia.user_id] = {}
+                    results[k]['ml'][materia.user_id]['total_ml'] = 0
+                    results[k]['ml'][materia.user_id]['total_da'] = 0
+                    results[k]['ml'][materia.user_id]['total_tr'] = 0
+                    results[k]['ml'][materia.user_id]['paginas'] = 0
 
                 ru = results[k][materia.user_id]
                 ru['total_ml'] += 1
@@ -204,7 +206,7 @@ class Command(BaseCommand):
                 except:
                     pass
 
-            print(results)
+        print(results)
 
     def run_import_check_check(self):
         from cmj.s3_to_cmj.models import S3MateriaLegislativa
