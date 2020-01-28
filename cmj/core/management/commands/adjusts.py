@@ -12,14 +12,12 @@ from django.db import connection
 from django.db.models import F, Q
 from django.db.models.signals import post_delete, post_save
 from django.utils import timezone
-import ghostscript
 from pdfrw.pdfreader import PdfReader
 from prompt_toolkit.key_binding.bindings.named_commands import self_insert
 from reversion.models import Version
 
 from cmj.core.models import OcrMyPDF
 from cmj.diarios.models import DiarioOficial
-from cmj.s3_to_cmj.models import S3MateriaLegislativa
 from cmj.sigad.models import Documento, VersaoDeMidia
 from sapl.compilacao.models import TextoArticulado, Dispositivo
 from sapl.materia.models import MateriaLegislativa, DocumentoAcessorio
@@ -88,14 +86,6 @@ class Command(BaseCommand):
         # self.run_ajusta_datas_de_edicao_com_certidoes()
         # self.run_ajusta_datas_de_edicao_com_data_doc()
 
-    def run_sql(self, sql):
-
-        with connection.cursor() as cursor:
-            cursor.execute(sql)
-            # get all the rows as a list
-            rows = cursor.fetchall()
-            print(rows)
-
     def run_distibui_ocr_ao_longo_do_ano(self):
         ocrs = OcrMyPDF.objects.all().order_by('id')
 
@@ -149,7 +139,7 @@ class Command(BaseCommand):
             {
                 'model': VersaoDeMidia,
                 'file_field': 'file',
-                'hook': 'run_bi_files_midias'
+                'hook': ''
             },
         ]
 
@@ -166,21 +156,61 @@ class Command(BaseCommand):
             count_pages += len(pdf.pages)
             filefield.file.close()
         except Exception as e:
-            print(e)
+            pass
+            # print(e)
         else:
             return count_pages
 
     def run_bi_materias_legislativas(self, mt):
-        materias = MateriaLegislativa.objects.all()
-        
+        materias = MateriaLegislativa.objects.order_by('id')
+
+        ano_cadastro = 2008
+        r = {}
         for m in materias:
-            
-        
-        
-    def run_bi_files_midias(self):
-        pass
+            if m.ano <= ano_cadastro:
+                r[ano_cadastro].append(m)
+                continue
+            ano_cadastro = m.ano
+            r[ano_cadastro] = [m, ]
+
+        total = 0
+        results = mt['results']
+        for k, v in r.items():
+            if k not in results:
+                results[k] = {}
+
+            for materia in v:
+                if materia.user_id not in results[k]:
+                    results[k][materia.user_id] = {}
+                    results[k][materia.user_id]['total_ml'] = 0
+                    results[k][materia.user_id]['total_da'] = 0
+                    results[k][materia.user_id]['total_tr'] = 0
+                    results[k][materia.user_id]['paginas'] = 0
+
+                ru = results[k][materia.user_id]
+                ru['total_ml'] += 1
+
+                if materia.documentoacessorio_set.exists():
+                    ru['total_da'] += materia.documentoacessorio_set.count()
+
+                if materia.tramitacao_set.exists():
+                    ru['total_tr'] += materia.tramitacao_set.count()
+
+                try:
+                    ru['paginas'] += self.run_count_pages_from_file(
+                        materia.texto_original)
+
+                    for da in materia.documentoacessorio_set.all():
+                        ru['paginas'] += self.run_count_pages_from_file(
+                            da.arquivo)
+                except:
+                    pass
+
+            print(results)
 
     def run_import_check_check(self):
+        from cmj.s3_to_cmj.models import S3MateriaLegislativa
+
         materias_antigas = S3MateriaLegislativa.objects.filter(
             checkcheck=1,
             ind_excluido=0)
