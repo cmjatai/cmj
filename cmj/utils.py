@@ -9,13 +9,15 @@ from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
-from django.db import connection
+from django.db import connection, models
 from django.urls.base import reverse
 from django.utils.translation import ugettext_lazy as _
 from easy_thumbnails import source_generators
 from floppyforms import ClearableFileInput
 import magic
 from model_utils.choices import Choices
+from pdfrw.pdfreader import PdfReader
+from prompt_toolkit.key_binding.bindings.named_commands import self_insert
 from reversion.admin import VersionAdmin
 from social_core.backends.facebook import FacebookOAuth2
 from unipath.path import Path
@@ -411,5 +413,49 @@ def run_sql(sql):
         if sql.startswith('select'):
             rows = cursor.fetchall()
 
-        if settings.DEBUG:
-            print(rows)
+            if settings.DEBUG:
+                print(rows)
+
+
+class CountPageMixin(models.Model):
+
+    _paginas = models.PositiveIntegerField(
+        default=0, verbose_name=_('Número de Páginas'))
+
+    FIELDFILE_NAME = ''
+
+    class Meta:
+        abstract = True
+
+    @property
+    def paginas(self):
+        if not self.FIELDFILE_NAME:
+            return 0
+
+        if not self.id:
+            return 0
+
+        if self._paginas:
+            return self._paginas
+
+        count_pages = 0
+        for field in self.FIELDFILE_NAME:
+            try:
+                path = getattr(self, field).file.name
+                pdf = PdfReader(path)
+                count_pages += len(pdf.pages)
+                getattr(self, field).file.close()
+            except Exception as e:
+                return 0
+            else:
+                self._paginas = count_pages
+                run_sql(
+                    """update {}
+                            set _paginas = {}
+                            where id = {};""".format(
+                        '%s_%s' % (self._meta.app_label,
+                                   self._meta.model_name),
+                        count_pages,
+                        self.id
+                    ))
+                return count_pages

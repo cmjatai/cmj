@@ -6,14 +6,12 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models.functions import Concat
 from django.template import defaultfilters
-from django.urls.base import reverse
 from django.utils import formats, timezone
 from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices
-from pdfrw.pdfreader import PdfReader
 import reversion
 
-from cmj.utils import run_sql
+from cmj.utils import CountPageMixin
 from sapl.base.models import SEQUENCIA_NUMERACAO_PROTOCOLO, Autor
 from sapl.comissoes.models import Comissao, Reuniao
 from sapl.compilacao.models import (PerfilEstruturalTextoArticulado,
@@ -189,7 +187,8 @@ def anexo_upload_path(instance, filename):
 
 
 @reversion.register()
-class MateriaLegislativa(models.Model):
+class MateriaLegislativa(CountPageMixin):
+    FIELDFILE_NAME = ('texto_original', )
 
     tipo = models.ForeignKey(
         TipoMateriaLegislativa,
@@ -268,9 +267,6 @@ class MateriaLegislativa(models.Model):
         storage=OverwriteStorage(),
         validators=[restringe_tipos_de_arquivo_txt])
 
-    _paginas = models.PositiveIntegerField(
-        default=0, verbose_name=_('Número de Páginas'))
-
     texto_articulado = GenericRelation(
         TextoArticulado, related_query_name='texto_articulado')
 
@@ -322,32 +318,6 @@ class MateriaLegislativa(models.Model):
     def __str__(self):
         return _('%(tipo)s nº %(numero)s de %(ano)s') % {
             'tipo': self.tipo, 'numero': self.numero, 'ano': self.ano}
-
-    @property
-    def paginas(self):
-        if not self.id:
-            return 0
-        if not self.texto_original:
-            return 0
-
-        if self._paginas:
-            print('aqui')
-            return self._paginas
-
-        count_pages = 0
-        try:
-            path = self.texto_original.file.name
-            pdf = PdfReader(path)
-            count_pages += len(pdf.pages)
-            self.texto_original.file.close()
-        except Exception as e:
-            pass
-        else:
-            self._paginas = count_pages
-            run_sql("""update materia_materialegislativa
-                        set _paginas = {}
-                        where id = {};""".format(count_pages, self.id))
-            return count_pages
 
     @property
     def epigrafe(self):
@@ -572,7 +542,9 @@ class TipoDocumento(models.Model):
 
 
 @reversion.register()
-class DocumentoAcessorio(models.Model):
+class DocumentoAcessorio(CountPageMixin):
+    FIELDFILE_NAME = ('arquivo', )
+
     materia = models.ForeignKey(MateriaLegislativa, on_delete=models.CASCADE)
     tipo = models.ForeignKey(TipoDocumento,
                              on_delete=models.PROTECT,

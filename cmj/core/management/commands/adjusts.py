@@ -197,12 +197,10 @@ class Command(BaseCommand):
                     ru['total_tr'] += materia.tramitacao_set.count()
 
                 try:
-                    ru['paginas'] += self.run_count_pages_from_file(
-                        materia.texto_original)
+                    ru['paginas'] += materia.paginas
 
                     for da in materia.documentoacessorio_set.all():
-                        ru['paginas'] += self.run_count_pages_from_file(
-                            da.arquivo)
+                        ru['paginas'] += da.paginas
                 except:
                     pass
 
