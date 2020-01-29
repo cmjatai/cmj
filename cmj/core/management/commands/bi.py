@@ -5,16 +5,25 @@ import os
 from platform import node
 import subprocess
 
+from PyPDF4.pdf import PdfFileReader
 from celery.worker.control import ok
 from django.core.management.base import BaseCommand
+from django.db import connection
 from django.db.models import F, Q
 from django.db.models.signals import post_delete, post_save
 from django.utils import timezone
+from pdfrw.pdfreader import PdfReader
+from prompt_toolkit.key_binding.bindings.named_commands import self_insert
+from reversion.models import Version
 
 from cmj.core.models import OcrMyPDF
-from sapl.compilacao.models import Dispositivo
-from sapl.materia.models import MateriaLegislativa
-from sapl.protocoloadm.models import DocumentoAdministrativo
+from cmj.diarios.models import DiarioOficial
+from cmj.sigad.models import Documento, VersaoDeMidia
+from sapl.compilacao.models import TextoArticulado, Dispositivo
+from sapl.materia.models import MateriaLegislativa, DocumentoAcessorio
+from sapl.norma.models import NormaJuridica, AnexoNormaJuridica
+from sapl.protocoloadm.models import DocumentoAdministrativo,\
+    DocumentoAcessorioAdministrativo
 
 
 class CompressPDF:
@@ -73,6 +82,7 @@ class Command(BaseCommand):
         self.logger = logging.getLogger(__name__)
         # self.run_busca_desordem_de_dispositivos()
 
+        self.run_bi()
         # self.run_ajusta_datas_de_edicao_com_certidoes()
         # self.run_ajusta_datas_de_edicao_com_data_doc()
 
@@ -89,6 +99,123 @@ class Command(BaseCommand):
             o.save()
 
             d = d + timedelta(seconds=i)
+
+    def run_bi(self):
+        self.run_bi_files()
+
+    def run_bi_files(self):
+        models = [
+            {
+                'model': MateriaLegislativa,
+                'file_field': 'texto_original',
+                'hook': 'run_bi_materias_legislativas',
+                'results': {},
+            },
+            {
+                'model': NormaJuridica,
+                'file_field': 'texto_integral',
+                'hook': ''
+            },
+            {
+                'model': AnexoNormaJuridica,
+                'file_field': 'anexo_arquivo',
+                'hook': ''
+            },
+            {
+                'model': DocumentoAdministrativo,
+                'file_field': 'texto_integral',
+                'hook': ''
+            },
+            {
+                'model': DocumentoAcessorioAdministrativo,
+                'file_field': 'arquivo',
+                'hook': ''
+            },
+            {
+                'model': DiarioOficial,
+                'file_field': 'arquivo',
+                'hook': ''
+            },
+            {
+                'model': VersaoDeMidia,
+                'file_field': 'file',
+                'hook': ''
+            },
+        ]
+
+        for mt in models:  # mt = metadata
+            if not mt['hook']:
+                continue
+            getattr(self, mt['hook'])(mt)
+
+            for ano, value in mt['results'].items():
+                print(ano, value)
+
+    def run_count_pages_from_file(self, filefield):
+        count_pages = 0
+        try:
+            path = filefield.file.name
+            pdf = PdfReader(path)
+            count_pages += len(pdf.pages)
+            filefield.file.close()
+        except Exception as e:
+            pass
+            # print(e)
+        else:
+            return count_pages
+
+    def run_bi_materias_legislativas(self, mt):
+        materias = MateriaLegislativa.objects.order_by('id')
+
+        ano_cadastro = 2008
+        r = {}
+        for m in materias:
+            if m.ano <= ano_cadastro:
+                r[ano_cadastro].append(m)
+                continue
+            ano_cadastro = m.ano
+            r[ano_cadastro] = [m, ]
+
+        total = 0
+        results = mt['results']
+        for k, v in r.items():  # ano, lista de materias cadastradas no ano
+            if k not in results:
+                results[k] = {}
+                results[k]['tramitacao'] = 0
+
+            for materia in v:
+
+                if materia.tramitacao_set.exists():
+                    results[k]['tramitacao'] += materia.tramitacao_set.count()
+
+                u = materia.user_id if materia.ano == 2020 else (
+                    materia.user_id if materia.user_id else 0)
+                if u not in results[k]:
+                    results[k][u] = {}
+                    results[k][u]['materialegislativa'] = {}
+                    results[k][u]['documentoacessorio'] = {}
+
+                ru = results[k][u]
+
+                if materia.ano not in ru['materialegislativa']:
+                    ru['materialegislativa'][materia.ano] = {
+                        'total': 0, 'paginas': 0}
+                ru['materialegislativa'][materia.ano]['total'] += 1
+
+                if materia.ano not in ru['documentoacessorio']:
+                    ru['documentoacessorio'][materia.ano] = {
+                        'total': 0, 'paginas': 0}
+
+                if materia.documentoacessorio_set.exists():
+                    ru['documentoacessorio'][materia.ano]['total'] += materia.documentoacessorio_set.count()
+
+                try:
+                    ru['materialegislativa'][materia.ano]['paginas'] += materia.paginas
+
+                    for da in materia.documentoacessorio_set.all():
+                        ru['documentoacessorio'][materia.ano]['paginas'] += da.paginas
+                except:
+                    pass
 
     def run_import_check_check(self):
         from cmj.s3_to_cmj.models import S3MateriaLegislativa
