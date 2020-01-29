@@ -265,7 +265,8 @@ class MateriaLegislativa(CountPageMixin):
         upload_to=materia_upload_path,
         verbose_name=_('Texto Original'),
         storage=OverwriteStorage(),
-        validators=[restringe_tipos_de_arquivo_txt])
+        validators=[restringe_tipos_de_arquivo_txt],
+        max_length=512)
 
     texto_articulado = GenericRelation(
         TextoArticulado, related_query_name='texto_articulado')
@@ -560,11 +561,11 @@ class DocumentoAcessorio(CountPageMixin):
     arquivo = PortalFileField(
         blank=True,
         null=True,
-        max_length=255,
         upload_to=anexo_upload_path,
         verbose_name=_('Texto Integral'),
         storage=OverwriteStorage(),
-        validators=[restringe_tipos_de_arquivo_txt])
+        validators=[restringe_tipos_de_arquivo_txt],
+        max_length=512)
 
     proposicao = GenericRelation(
         'Proposicao', related_query_name='proposicao')
@@ -846,7 +847,8 @@ class Proposicao(models.Model):
         null=True,
         verbose_name=_('Texto Original'),
         storage=OverwriteStorage(),
-        validators=[restringe_tipos_de_arquivo_txt])
+        validators=[restringe_tipos_de_arquivo_txt],
+        max_length=512)
 
     texto_articulado = GenericRelation(
         TextoArticulado, related_query_name='texto_articulado')

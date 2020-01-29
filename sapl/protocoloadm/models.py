@@ -226,7 +226,8 @@ class DocumentoAdministrativo(models.Model):
         null=True,
         storage=OverwriteStorage(),
         upload_to=texto_upload_path,
-        verbose_name=_('Texto Integral'))
+        verbose_name=_('Texto Integral'),
+        max_length=512)
 
     anexados = models.ManyToManyField(
         'self',
@@ -321,7 +322,8 @@ class DocumentoAcessorioAdministrativo(models.Model):
         null=True,
         upload_to=texto_upload_path,
         storage=OverwriteStorage(),
-        verbose_name=_('Arquivo'))
+        verbose_name=_('Arquivo'),
+        max_length=512)
     data = models.DateField(blank=True, null=True, verbose_name=_('Data'))
     autor = models.CharField(
         max_length=50, blank=True, verbose_name=_('Autor'))
