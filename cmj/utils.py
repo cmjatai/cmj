@@ -419,7 +419,7 @@ def run_sql(sql):
 
 class CountPageMixin(models.Model):
 
-    _paginas = models.PositiveIntegerField(
+    _paginas = models.IntegerField(
         default=0, verbose_name=_('Número de Páginas'))
 
     FIELDFILE_NAME = ''
@@ -430,32 +430,38 @@ class CountPageMixin(models.Model):
     @property
     def paginas(self):
         if not self.FIELDFILE_NAME:
-            return 0
+            raise Exception
 
         if not self.id:
-            return 0
+            raise Exception
 
-        if self._paginas:
+        if self._paginas > 0:
             return self._paginas
+        elif self._paginas == -1:
+            raise Exception
 
         count_pages = 0
-        for field in self.FIELDFILE_NAME:
-            try:
+        try:
+            for field in self.FIELDFILE_NAME:
+                if not getattr(self, field):
+                    return 0
                 path = getattr(self, field).file.name
                 pdf = PdfReader(path)
                 count_pages += len(pdf.pages)
                 getattr(self, field).file.close()
-            except Exception as e:
-                return 0
-            else:
-                self._paginas = count_pages
-                run_sql(
-                    """update {}
-                            set _paginas = {}
-                            where id = {};""".format(
-                        '%s_%s' % (self._meta.app_label,
-                                   self._meta.model_name),
-                        count_pages,
-                        self.id
-                    ))
-                return count_pages
+        except Exception as e:
+            count_pages = -1
+        finally:
+            self._paginas = count_pages
+            run_sql(
+                """update {}
+                        set _paginas = {}
+                        where id = {};""".format(
+                    '%s_%s' % (self._meta.app_label,
+                               self._meta.model_name),
+                    count_pages,
+                    self.id
+                ))
+            if count_pages == -1:
+                raise Exception
+            return count_pages
