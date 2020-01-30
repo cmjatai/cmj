@@ -124,8 +124,7 @@ class Command(BaseCommand):
                 if doc.tramitacaoadministrativo_set.exists():
                     results[k]['tramitacao'] += doc.tramitacaoadministrativo_set.count()
 
-                u = doc.user_id if doc.ano == 2020 else (
-                    doc.user_id if doc.user_id else 0)
+                u = 0
                 if u not in results[k]:
                     results[k][u] = {}
                     results[k][u]['documentoadministrativo'] = {}
