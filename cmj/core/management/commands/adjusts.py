@@ -7,14 +7,19 @@ import subprocess
 
 from celery.worker.control import ok
 from django.core.management.base import BaseCommand
+from django.db import connection
 from django.db.models import F, Q
 from django.db.models.signals import post_delete, post_save
 from django.utils import timezone
 
-from cmj.core.models import OcrMyPDF
+from cmj.core.models import OcrMyPDF, CertidaoPublicacao
 from sapl.compilacao.models import Dispositivo
 from sapl.materia.models import MateriaLegislativa
 from sapl.protocoloadm.models import DocumentoAdministrativo
+
+
+def _get_registration_key(model):
+    return '%s_%s' % (model._meta.app_label, model._meta.model_name)
 
 
 class CompressPDF:
@@ -75,6 +80,22 @@ class Command(BaseCommand):
 
         # self.run_ajusta_datas_de_edicao_com_certidoes()
         # self.run_ajusta_datas_de_edicao_com_data_doc()
+        # self.reset_id_model(CertidaoPublicacao)
+
+    def reset_id_model(self, model):
+
+        query = """SELECT setval(pg_get_serial_sequence('"%(app_model_name)s"','id'),
+                    coalesce(max("id"), 1), max("id") IS NOT null) 
+                    FROM "%(app_model_name)s";
+                """ % {
+            'app_model_name': _get_registration_key(model)
+        }
+
+        with connection.cursor() as cursor:
+            cursor.execute(query)
+            # get all the rows as a list
+            rows = cursor.fetchall()
+            print(rows)
 
     def run_distibui_ocr_ao_longo_do_ano(self):
         ocrs = OcrMyPDF.objects.all().order_by('id')
