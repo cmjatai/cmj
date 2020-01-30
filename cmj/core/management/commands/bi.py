@@ -199,23 +199,26 @@ class Command(BaseCommand):
 
                 if materia.ano not in ru['materialegislativa']:
                     ru['materialegislativa'][materia.ano] = {
-                        'total': 0, 'paginas': 0}
+                        'total': 0, 'paginas': 0, 'ep': 0}
                 ru['materialegislativa'][materia.ano]['total'] += 1
 
                 if materia.ano not in ru['documentoacessorio']:
                     ru['documentoacessorio'][materia.ano] = {
-                        'total': 0, 'paginas': 0}
+                        'total': 0, 'paginas': 0, 'ep': 0}
 
                 if materia.documentoacessorio_set.exists():
                     ru['documentoacessorio'][materia.ano]['total'] += materia.documentoacessorio_set.count()
 
                 try:
                     ru['materialegislativa'][materia.ano]['paginas'] += materia.paginas
-
-                    for da in materia.documentoacessorio_set.all():
-                        ru['documentoacessorio'][materia.ano]['paginas'] += da.paginas
                 except:
-                    pass
+                    ru['materialegislativa'][materia.ano]['ep'] += 1
+
+                for da in materia.documentoacessorio_set.all():
+                    try:
+                        ru['documentoacessorio'][materia.ano]['paginas'] += da.paginas
+                    except:
+                        ru['documentoacessorio'][materia.ano]['ep'] += 1
 
     def run_import_check_check(self):
         from cmj.s3_to_cmj.models import S3MateriaLegislativa
