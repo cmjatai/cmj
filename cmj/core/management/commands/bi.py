@@ -51,12 +51,7 @@ class Command(BaseCommand):
             {
                 'model': DocumentoAdministrativo,
                 'file_field': 'texto_integral',
-                'hook': ''
-            },
-            {
-                'model': DocumentoAcessorioAdministrativo,
-                'file_field': 'arquivo',
-                'hook': ''
+                'hook': 'run_bi_documentoadministrativo'
             },
             {
                 'model': DiarioOficial,
@@ -101,6 +96,66 @@ class Command(BaseCommand):
             # print(e)
         else:
             return count_pages
+
+    def run_bi_documentoadministrativo(self, mt):
+        docs = DocumentoAdministrativo.objects.filter(
+            workspace_id=22  # área pública
+        ).order_by('id')
+
+        ano_cadastro = 2008
+        r = {}
+        for d in docs:
+            if d.ano <= ano_cadastro:
+                r[ano_cadastro].append(d)
+                continue
+            ano_cadastro = d.ano
+            r[ano_cadastro] = [d, ]
+
+        total = 0
+        results = mt['results']
+        for k, v in r.items():  # ano, lista de materias cadastradas no ano
+            if k not in results:
+                results[k] = {}
+                results[k]['tramitacao'] = 0
+
+            for doc in v:
+
+                if doc.tramitacaoadministrativo_set.exists():
+                    results[k]['tramitacao'] += doc.tramitacaoadministrativo_set.count()
+
+                u = doc.user_id if doc.ano == 2020 else (
+                    doc.user_id if doc.user_id else 0)
+                if u not in results[k]:
+                    results[k][u] = {}
+                    results[k][u]['documentoadministrativo'] = {}
+                    results[k][u]['documentoacessorioadministrativo'] = {}
+
+                ru = results[k][u]
+
+                if doc.ano not in ru['documentoadministrativo']:
+                    ru['documentoadministrativo'][doc.ano] = {
+                        'total': 0, 'paginas': 0, 'ep': []}
+                ru['documentoadministrativo'][doc.ano]['total'] += 1
+
+                if doc.ano not in ru['documentoacessorioadministrativo']:
+                    ru['documentoacessorioadministrativo'][doc.ano] = {
+                        'total': 0, 'paginas': 0, 'ep': []}
+
+                if doc.documentoacessorio_set.exists():
+                    ru['documentoacessorioadministrativo'][doc.ano]['total'] += doc.documentoacessorioadministrativo_set.count()
+
+                try:
+                    ru['documentoadministrativo'][doc.ano]['paginas'] += doc.paginas
+                except:
+                    ru['documentoadministrativo'][doc.ano]['ep'].append(
+                        doc.id)
+
+                for da in doc.documentoacessorioadministrativo_set.all():
+                    try:
+                        ru['documentoacessorioadministrativo'][doc.ano]['paginas'] += da.paginas
+                    except:
+                        ru['documentoacessorioadministrativo'][doc.ano]['ep'].append(
+                            da.id)
 
     def run_bi_materias_legislativas(self, mt):
         materias = MateriaLegislativa.objects.order_by('id')

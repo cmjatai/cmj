@@ -11,6 +11,7 @@ from model_utils import Choices
 import reversion
 
 from cmj.core.models import AreaTrabalho, CertidaoPublicacao
+from cmj.utils import CountPageMixin
 from sapl.base.models import Autor
 from sapl.materia.models import TipoMateriaLegislativa, UnidadeTramitacao,\
     MateriaLegislativa
@@ -153,7 +154,9 @@ class Protocolo(models.Model):
 
 
 @reversion.register()
-class DocumentoAdministrativo(models.Model):
+class DocumentoAdministrativo(CountPageMixin):
+    FIELDFILE_NAME = ('texto_integral', )
+
     tipo = models.ForeignKey(
         TipoDocumentoAdministrativo, on_delete=models.PROTECT,
         verbose_name=_('Tipo Documento'))
@@ -309,7 +312,9 @@ class DocumentoAdministrativo(models.Model):
 
 
 @reversion.register()
-class DocumentoAcessorioAdministrativo(models.Model):
+class DocumentoAcessorioAdministrativo(CountPageMixin):
+    FIELDFILE_NAME = ('arquivo', )
+
     documento = models.ForeignKey(DocumentoAdministrativo,
                                   on_delete=models.PROTECT)
     tipo = models.ForeignKey(
