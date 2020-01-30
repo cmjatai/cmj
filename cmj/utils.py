@@ -221,11 +221,6 @@ RANGE_MESES = [
 RANGE_DIAS_MES = [(n, n) for n in range(1, 32)]
 
 
-def choice_anos_com_documentoprocuradoria():
-    from cmj.procuradoria.models import DocumentoProcuradoria
-    return choice_anos(DocumentoProcuradoria)
-
-
 TIPOS_MIDIAS_PERMITIDOS = {
     'application/pdf': 'pdf',
     'application/x-pdf': 'pdf',

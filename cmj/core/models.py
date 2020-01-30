@@ -5,7 +5,9 @@ from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin, Group
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.postgres.fields.jsonb import JSONField
 from django.core.exceptions import PermissionDenied
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models import permalink
 from django.db.models.deletion import PROTECT, CASCADE, SET_NULL
@@ -825,6 +827,25 @@ class OcrMyPDF(models.Model):
         _('Sucesso'),
         choices=YES_NO_CHOICES,
         default=True)
+
+
+class Bi(models.Model):
+
+    content_type = models.ForeignKey(ContentType)
+
+    ano = models.PositiveSmallIntegerField(
+        verbose_name=_('Ano'),
+        default=0)
+
+    results = JSONField(
+        verbose_name=_('Json results'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+
+    class Meta:
+        verbose_name = _('Bi')
+        verbose_name_plural = _('Bi')
+        ordering = ('-ano', 'content_type', )
+        unique_together = (("ano", "content_type"),)
 
 
 class CertidaoPublicacao(CmjAuditoriaModelMixin):
