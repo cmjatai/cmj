@@ -11,8 +11,7 @@ from cmj.diarios.models import DiarioOficial
 from cmj.sigad.models import VersaoDeMidia
 from sapl.materia.models import MateriaLegislativa
 from sapl.norma.models import NormaJuridica, AnexoNormaJuridica
-from sapl.protocoloadm.models import DocumentoAdministrativo,\
-    DocumentoAcessorioAdministrativo
+from sapl.protocoloadm.models import DocumentoAdministrativo
 
 
 class Command(BaseCommand):
@@ -32,28 +31,29 @@ class Command(BaseCommand):
 
     def run_bi_files(self):
         models = [
-            {
-                'model': MateriaLegislativa,
-                'file_field': 'texto_original',
-                'hook': 'run_bi_materias_legislativas',
-                'results': {},
-            },
+            #{
+            #    'model': MateriaLegislativa,
+            #    'file_field': 'texto_original',
+            #    'hook': 'run_bi_materias_legislativas',
+            #    'results': {},
+            #},
             {
                 'model': NormaJuridica,
                 'file_field': 'texto_integral',
-                'hook': ''
+                'hook': 'run_bi_normajuridica',
+                'results': {},
             },
             {
                 'model': AnexoNormaJuridica,
                 'file_field': 'anexo_arquivo',
                 'hook': ''
             },
-            {
-                'model': DocumentoAdministrativo,
-                'file_field': 'texto_integral',
-                'hook': 'run_bi_documentoadministrativo',
-                'results': {},
-            },
+            #{
+            #    'model': DocumentoAdministrativo,
+            #    'file_field': 'texto_integral',
+            #    'hook': 'run_bi_documentoadministrativo',
+            #    'results': {},
+            #},
             {
                 'model': DiarioOficial,
                 'file_field': 'arquivo',
@@ -141,7 +141,7 @@ class Command(BaseCommand):
                     ru['documentoacessorioadministrativo'][doc.ano] = {
                         'total': 0, 'paginas': 0, 'ep': []}
 
-                if doc.documentoacessorio_set.exists():
+                if doc.documentoacessorioadministrativo_set.exists():
                     ru['documentoacessorioadministrativo'][doc.ano]['total'] += doc.documentoacessorioadministrativo_set.count()
 
                 try:
@@ -214,3 +214,62 @@ class Command(BaseCommand):
                     except:
                         ru['documentoacessorio'][materia.ano]['ep'].append(
                             da.id)
+
+    def run_bi_normajuridica(self, mt):
+        nj = NormaJuridica.objects.order_by('id')
+
+        ano_cadastro = 2009
+        r = {ano_cadastro: []}
+        for n in nj:
+            if n.ano <= ano_cadastro:
+                r[ano_cadastro].append(n)
+                continue
+            ano_cadastro = n.ano
+            r[ano_cadastro] = [n, ]
+
+        total = 0
+        results = mt['results']
+        for k, v in r.items():  # ano, lista de normas cadastradas no ano
+            if k not in results:
+                results[k] = {}
+
+            for n in v:
+                print(n)
+                u = 0
+                if u not in results[k]:
+                    results[k][u] = {}
+                    results[k][u]['normajuridica'] = {}
+                    results[k][u]['anexo'] = {}
+
+                ru = results[k][u]
+
+                if n.ano not in ru['normajuridica']:
+                    ru['normajuridica'][n.ano] = {
+                        'total': 0, 'dispositivos': 0, 'paginas': 0, 'ep': []}
+
+                ru['normajuridica'][n.ano]['total'] += 1
+
+                if n.ano not in ru['anexo']:
+                    ru['anexo'][n.ano] = {
+                        'total': 0, 'paginas': 0, 'ep': []}
+
+                if n.texto_articulado.exists():
+                    ru['normajuridica'][n.ano][
+                        'dispositivos'
+                    ] += n.texto_articulado.first().dispositivos_set.count()
+
+                if n.anexos_set.exists():
+                    ru['anexo'][n.ano]['total'] += n.anexos_set.count()
+
+                try:
+                    ru['normajuridica'][n.ano]['paginas'] += n.paginas
+                except:
+                    ru['normajuridica'][n.ano]['ep'].append(
+                        n.id)
+
+                for anx in n.anexos_set.all():
+                    try:
+                        ru['anexo'][n.ano]['paginas'] += anx.paginas
+                    except:
+                        ru['anexo'][n.ano]['ep'].append(
+                            anx.id)

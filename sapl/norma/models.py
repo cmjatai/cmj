@@ -7,7 +7,7 @@ from model_utils import Choices
 import reversion
 
 from cmj.core.models import CertidaoPublicacao
-from cmj.utils import restringe_tipos_de_arquivo_midias
+from cmj.utils import restringe_tipos_de_arquivo_midias, CountPageMixin
 from sapl.base.models import Autor
 from sapl.compilacao.models import TextoArticulado
 from sapl.materia.models import MateriaLegislativa
@@ -73,7 +73,9 @@ def norma_upload_path(instance, filename):
 
 
 @reversion.register()
-class NormaJuridica(models.Model):
+class NormaJuridica(CountPageMixin):
+    FIELDFILE_NAME = ('texto_integral', )
+
     ESFERA_FEDERACAO_CHOICES = Choices(
         ('M', 'municipal', _('Municipal')),
         ('E', 'estadual', _('Estadual')),
@@ -374,10 +376,12 @@ class NormaRelacionada(models.Model):
 
 
 @reversion.register()
-class AnexoNormaJuridica(models.Model):
+class AnexoNormaJuridica(CountPageMixin):
+    FIELDFILE_NAME = ('anexo_arquivo', )
+
     norma = models.ForeignKey(
         NormaJuridica,
-        related_name='norma',
+        related_name='anexos_set',
         on_delete=models.PROTECT,
         verbose_name=_('Norma Juridica'))
     assunto_anexo = models.TextField(
