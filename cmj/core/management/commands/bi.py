@@ -51,7 +51,8 @@ class Command(BaseCommand):
             {
                 'model': DocumentoAdministrativo,
                 'file_field': 'texto_integral',
-                'hook': 'run_bi_documentoadministrativo'
+                'hook': 'run_bi_documentoadministrativo',
+                'results': {},
             },
             {
                 'model': DiarioOficial,
