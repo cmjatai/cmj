@@ -1,10 +1,12 @@
 import logging
 
+from django.contrib.contenttypes.models import ContentType
 from django.core.management.base import BaseCommand
 from django.db.models import F, Q
 from django.db.models.signals import post_delete, post_save
 from pdfrw.pdfreader import PdfReader
 
+from cmj.core.models import Bi
 from cmj.diarios.models import DiarioOficial
 from cmj.sigad.models import VersaoDeMidia
 from sapl.materia.models import MateriaLegislativa
@@ -74,7 +76,18 @@ class Command(BaseCommand):
             getattr(self, mt['hook'])(mt)
 
             for ano, value in mt['results'].items():
-                print(ano, value)
+
+                bi, created = Bi.objects.get_or_create(
+                    ano=ano,
+                    content_type=ContentType.objects.get_for_model(
+                        mt['models']
+                    )
+                )
+
+                bi.results = value
+                bi.save()
+
+        print('Concluído')
 
     def run_count_pages_from_file(self, filefield):
         count_pages = 0
