@@ -2,18 +2,26 @@ from django.core.files.base import File
 from django.db import transaction
 from django.utils.translation import ugettext_lazy as _
 from django_filters import rest_framework as filters
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, mixins
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.permissions import IsAuthenticated,\
     IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.viewsets import GenericViewSet
 
 from cmj.api.serializers import DocumentoSerializer,\
-    DocumentoUserAnonymousSerializer, DocumentoChoiceSerializer
+    DocumentoUserAnonymousSerializer, DocumentoChoiceSerializer,\
+    BiSerializer
+from cmj.core.models import Bi
 from cmj.sigad.models import Documento, VersaoDeMidia, Midia,\
     ReferenciaEntreDocumentos
+
+
+class BiViewSet(viewsets.ModelViewSet):
+    queryset = Bi.objects.all()
+    serializer_class = BiSerializer
 
 
 class DocumentoViewSet(viewsets.ModelViewSet):

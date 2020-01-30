@@ -80,7 +80,7 @@ class Command(BaseCommand):
                 bi, created = Bi.objects.get_or_create(
                     ano=ano,
                     content_type=ContentType.objects.get_for_model(
-                        mt['models']
+                        mt['model']
                     )
                 )
 
@@ -137,12 +137,12 @@ class Command(BaseCommand):
 
                 if materia.ano not in ru['materialegislativa']:
                     ru['materialegislativa'][materia.ano] = {
-                        'total': 0, 'paginas': 0, 'ep': 0}
+                        'total': 0, 'paginas': 0, 'ep': []}
                 ru['materialegislativa'][materia.ano]['total'] += 1
 
                 if materia.ano not in ru['documentoacessorio']:
                     ru['documentoacessorio'][materia.ano] = {
-                        'total': 0, 'paginas': 0, 'ep': 0}
+                        'total': 0, 'paginas': 0, 'ep': []}
 
                 if materia.documentoacessorio_set.exists():
                     ru['documentoacessorio'][materia.ano]['total'] += materia.documentoacessorio_set.count()
@@ -150,10 +150,12 @@ class Command(BaseCommand):
                 try:
                     ru['materialegislativa'][materia.ano]['paginas'] += materia.paginas
                 except:
-                    ru['materialegislativa'][materia.ano]['ep'] += 1
+                    ru['materialegislativa'][materia.ano]['ep'].append(
+                        materia.id)
 
                 for da in materia.documentoacessorio_set.all():
                     try:
                         ru['documentoacessorio'][materia.ano]['paginas'] += da.paginas
                     except:
-                        ru['documentoacessorio'][materia.ano]['ep'] += 1
+                        ru['documentoacessorio'][materia.ano]['ep'].append(
+                            da.id)

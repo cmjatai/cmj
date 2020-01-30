@@ -841,6 +841,9 @@ class Bi(models.Model):
         verbose_name=_('Json results'),
         blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
 
+    modified = models.DateTimeField(
+        verbose_name=_('modified'), editable=False, auto_now=True)
+
     class Meta:
         verbose_name = _('Bi')
         verbose_name_plural = _('Bi')

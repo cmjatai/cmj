@@ -10,6 +10,7 @@ from rest_framework.fields import empty, JSONField, ChoiceField,\
 from rest_framework.relations import RelatedField, ManyRelatedField,\
     MANY_RELATION_KWARGS
 
+from cmj.core.models import Bi
 from cmj.sigad.models import Documento, ReferenciaEntreDocumentos,\
     DOC_TEMPLATES_CHOICE, CMSMixin
 
@@ -97,6 +98,13 @@ class ReferenciaField(DocumentoParteField):
 
     def to_internal_value(self, data):
         return data
+
+
+class BiSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Bi
+        fields = '__all__'
 
 
 class DocumentoSerializer(serializers.ModelSerializer):
