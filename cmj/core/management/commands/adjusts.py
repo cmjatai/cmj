@@ -13,7 +13,8 @@ from django.db.models.signals import post_delete, post_save
 from django.utils import timezone
 
 from cmj.core.models import OcrMyPDF, CertidaoPublicacao
-from sapl.compilacao.models import Dispositivo
+from sapl.compilacao.models import Dispositivo,\
+    TipoDispositivoRelationship
 from sapl.materia.models import MateriaLegislativa
 from sapl.protocoloadm.models import DocumentoAdministrativo
 
@@ -80,7 +81,7 @@ class Command(BaseCommand):
 
         # self.run_ajusta_datas_de_edicao_com_certidoes()
         # self.run_ajusta_datas_de_edicao_com_data_doc()
-        # self.reset_id_model(CertidaoPublicacao)
+        self.reset_id_model(TipoDispositivoRelationship)
 
     def reset_id_model(self, model):
 

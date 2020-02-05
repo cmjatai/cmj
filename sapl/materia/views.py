@@ -1820,7 +1820,11 @@ class MateriaLegislativaCrud(Crud):
                 if d.workspace.tipo != AreaTrabalho.TIPO_PUBLICO:
                     if not self.request.user.groups.filter(
                             name=GROUP_MATERIA_WORKSPACE_VIEWER).exists():
-                        continue
+
+                        rede = self.request.META.get(
+                            'HTTP_X_FORWARDED_FOR', '')
+                        if not rede.startswith('168.228.184'):
+                            continue
 
                 if not result[0]:
                     result[0] = _('Documentos Administrativos Vinculados')
