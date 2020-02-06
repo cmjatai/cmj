@@ -1823,7 +1823,9 @@ class MateriaLegislativaCrud(Crud):
 
                         rede = self.request.META.get(
                             'HTTP_X_FORWARDED_FOR', '')
-                        if not rede.startswith('168.228.184'):
+                        if not rede.startswith('168.228.184') and \
+                                self.request.META.get(
+                                'REMOTE_ADDR', '') != '127.0.0.1':
                             continue
 
                 if not result[0]:
