@@ -3,9 +3,12 @@ from datetime import datetime, timedelta
 import logging
 import os
 import random
+import shutil
+import stat
 import subprocess
 import threading
 from time import sleep
+import time
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -151,6 +154,18 @@ class Command(BaseCommand):
 
     ]
 
+    def delete_itens_tmp_folder(self):
+        list = os.scandir('/tmp/')
+
+        now = time.time()
+        for i in list:
+            age = now - os.stat(i.path)[stat.ST_MTIME]
+
+            if age > 86400:
+                if i.name.startswith('pymp') or\
+                        i.name.startswith('com.github.ocrmypdf'):
+                    shutil.rmtree(i.path, ignore_errors=True)
+
     def handle(self, *args, **options):
         post_delete.disconnect(dispatch_uid='sapl_post_delete_signal')
         post_save.disconnect(dispatch_uid='sapl_post_save_signal')
@@ -158,6 +173,9 @@ class Command(BaseCommand):
         post_save.disconnect(dispatch_uid='cmj_post_save_signal')
 
         self.logger = logging.getLogger(__name__)
+
+        self.delete_itens_tmp_folder()
+
         init = datetime.now()
 
         # Refaz tudo que foi feito a mais de um ano

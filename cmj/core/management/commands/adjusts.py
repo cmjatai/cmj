@@ -3,7 +3,10 @@ from datetime import datetime, timedelta
 import logging
 import os
 from platform import node
+import shutil
+import stat
 import subprocess
+import time
 
 from celery.worker.control import ok
 from django.core.management.base import BaseCommand
@@ -81,7 +84,20 @@ class Command(BaseCommand):
 
         # self.run_ajusta_datas_de_edicao_com_certidoes()
         # self.run_ajusta_datas_de_edicao_com_data_doc()
-        self.reset_id_model(TipoDispositivoRelationship)
+        # self.reset_id_model(TipoDispositivoRelationship)
+        self.delete_itens_tmp_folder()
+
+    def delete_itens_tmp_folder(self):
+        list = os.scandir('/home/leandro/desenvolvimento/envs/cmj/tmp/')
+
+        now = time.time()
+        for i in list:
+            age = now - os.stat(i.path)[stat.ST_MTIME]
+
+            if age > 86400:
+                if i.name.startswith('pymp') or\
+                        i.name.startswith('com.github.ocrmypdf'):
+                    shutil.rmtree(i.path, ignore_errors=True)
 
     def reset_id_model(self, model):
 
