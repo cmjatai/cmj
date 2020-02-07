@@ -4,15 +4,22 @@
 
 
 <div {% if not d.anexo_de.first %}class="item-raiz"{% else %}class="item-node"{% endif %}>
- {% if d.anexo_de.first %}
- <div class="parent">
-  Vinculado a: {{d.anexo_de.first}}
- </div>
-{% else %}
- <div class="parent-right">
-  Última Atualização: {{d.data_ultima_atualizacao}}
- </div>
- {% endif %}
+  {% if d.anexo_de.first %}
+    <div class="parent">
+      Vinculado a: {{d.anexo_de.first}}
+    </div>
+    {% if not user.is_superuser %}
+      <div class="parent-right">
+        <small>
+          Última Atualização: {{d.data_ultima_atualizacao}}
+        </small>
+      </div>
+    {% endif %}
+  {% else %}
+    <div class="parent-right">
+      Última Atualização: {{d.data_ultima_atualizacao}}
+    </div>
+{% endif %}
   
 
   <div class="links-texto">
@@ -75,7 +82,7 @@
     {% endif %}
   </small>
 
-    {% for anexado in d.documento_principal_set.all %}
+    {% for anexado in d.documento_principal_set.childs_anexados %}
       {% if forloop.first %}
         <div class="childs">
       {% endif %}

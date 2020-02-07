@@ -448,8 +448,17 @@ class TramitacaoAdministrativo(models.Model):
         }
 
 
+class AnexadoManager(models.Manager):
+
+    def childs_anexados(self):
+        return self.all().order_by('-documento_anexado__data_ultima_atualizacao')
+
+
 @reversion.register()
 class Anexado(models.Model):
+
+    objects = AnexadoManager()
+
     documento_principal = models.ForeignKey(
         DocumentoAdministrativo, related_name='documento_principal_set',
         on_delete=models.CASCADE,
