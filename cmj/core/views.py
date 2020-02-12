@@ -15,8 +15,9 @@ from django.template.loader import render_to_string
 from django.utils import formats, timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic.base import RedirectView
+from django.views.generic.base import RedirectView, TemplateView
 from django.views.generic.detail import DetailView
+from django.views.generic.list import ListView
 from django_filters.views import FilterView
 from rest_framework import viewsets, mixins
 from rest_framework.authentication import SessionAuthentication,\
@@ -29,7 +30,7 @@ from cmj.core.forms import OperadorAreaTrabalhoForm, ImpressoEnderecamentoForm,\
 from cmj.core.models import Cep, TipoLogradouro, Logradouro, RegiaoMunicipal,\
     Distrito, Bairro, Trecho, AreaTrabalho, OperadorAreaTrabalho,\
     ImpressoEnderecamento, groups_remove_user, groups_add_user, Notificacao,\
-    CertidaoPublicacao
+    CertidaoPublicacao, Bi
 from cmj.core.serializers import TrechoSearchSerializer, TrechoSerializer
 from cmj.utils import normalize
 from sapl.crud.base import Crud, CrudAux, MasterDetailCrud, RP_DETAIL, RP_LIST
@@ -539,3 +540,7 @@ class CertidaoPublicacaoCrud(Crud):
                 return False
 
             return True
+
+
+class BiView(ListView):
+    model = Bi

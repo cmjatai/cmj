@@ -12,6 +12,7 @@ from django.core.files.storage import FileSystemStorage
 from django.db import connection, models
 from django.urls.base import reverse
 from django.utils.translation import ugettext_lazy as _
+from docx import Document
 from easy_thumbnails import source_generators
 from floppyforms import ClearableFileInput
 import magic
@@ -433,17 +434,24 @@ class CountPageMixin(models.Model):
         if self._paginas > 0:
             return self._paginas
         elif self._paginas == -1:
-            raise Exception
+            # raise Exception
+            pass
 
         count_pages = 0
         try:
             for field in self.FIELDFILE_NAME:
                 if not getattr(self, field):
                     return 0
+
                 path = getattr(self, field).file.name
-                pdf = PdfReader(path)
-                count_pages += len(pdf.pages)
-                getattr(self, field).file.close()
+
+                if path.endswith('.pdf'):
+                    pdf = PdfReader(path)
+                    count_pages += len(pdf.pages)
+                    getattr(self, field).file.close()
+                elif '.doc' in path:
+                    return 0
+
         except Exception as e:
             count_pages = -1
         finally:

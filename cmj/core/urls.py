@@ -10,7 +10,7 @@ from cmj.core.views import CepCrud, RegiaoMunicipalCrud, DistritoCrud,\
     TrechoJsonSearchView, TrechoJsonView, AreaTrabalhoCrud,\
     OperadorAreaTrabalhoCrud, PartidoCrud, ImpressoEnderecamentoCrud,\
     NotificacaoRedirectView, chanel_index, chanel_room, time_refresh_log_test,\
-    app_vue_view, template_render, CertidaoPublicacaoCrud
+    app_vue_view, template_render, CertidaoPublicacaoCrud, BiView
 from cmj.core.views_auth import CmjUserChangeView, CmjLoginView,\
     CmjPasswordResetView
 from cmj.core.views_search import CmjSearchView
@@ -82,6 +82,10 @@ urlpatterns = user_urlpatterns + [
 
     url(r'^notificacao/(?P<pk>[0-9]+)$', NotificacaoRedirectView.as_view(),
         name='notificacao_redirect'),
+
+
+    url(r'^bi/$', BiView.as_view(),
+        name='bi_render'),
 
 
     url(r'^api/enderecos.json', TrechoJsonSearchView.as_view(
