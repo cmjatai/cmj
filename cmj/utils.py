@@ -12,18 +12,14 @@ from django.core.files.storage import FileSystemStorage
 from django.db import connection, models
 from django.urls.base import reverse
 from django.utils.translation import ugettext_lazy as _
-from docx import Document
 from easy_thumbnails import source_generators
 from floppyforms import ClearableFileInput
 import magic
 from model_utils.choices import Choices
 from pdfrw.pdfreader import PdfReader
-from prompt_toolkit.key_binding.bindings.named_commands import self_insert
 from reversion.admin import VersionAdmin
 from social_core.backends.facebook import FacebookOAuth2
 from unipath.path import Path
-
-from sapl.utils import choice_anos
 
 
 class FacebookOAuth2(FacebookOAuth2):
