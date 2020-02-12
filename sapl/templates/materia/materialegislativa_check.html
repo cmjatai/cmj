@@ -31,6 +31,12 @@
               <br>{{m.ementa}}
               <br>
               <small>
+
+                <strong>Autoria:</strong> 
+                {% for autor in m.autores.all %}
+                  {{autor}}{% if not forloop.last %},{% else %}<br>{% endif %}
+                {% endfor %}
+
                 {% with m.tramitacao_set.last as tram %}
                   {% if tram.unidade_tramitacao_destino %}        
                     <strong>Localização Atual:</strong> &nbsp;{{tram.unidade_tramitacao_destino}}</br>        

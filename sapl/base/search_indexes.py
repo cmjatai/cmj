@@ -2,6 +2,7 @@ import logging
 import os.path
 
 from celery_haystack.indexes import CelerySearchIndex
+from django.conf import settings
 from django.db.models import F, Q, Value
 from django.db.models.fields import TextField
 from django.db.models.functions import Concat
@@ -53,7 +54,7 @@ class TextExtractField(CharField):
         self.logger.error(msg, error)
 
     def file_extractor(self, arquivo):
-        if not os.path.exists(arquivo.path) or \
+        if settings.DEBUG or not os.path.exists(arquivo.path) or \
                 not os.path.splitext(arquivo.path)[1][:1]:
             return ''
 
@@ -67,6 +68,10 @@ class TextExtractField(CharField):
         return ''
 
     def ta_extractor(self, value):
+
+        if settings.DEBUG:
+            return ''
+
         r = []
         for ta in value.filter(privacidade__in=[
                 STATUS_TA_PUBLIC,
