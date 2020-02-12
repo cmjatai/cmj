@@ -31,12 +31,12 @@ class Command(BaseCommand):
 
     def run_bi_files(self):
         models = [
-            #{
-            #    'model': MateriaLegislativa,
-            #    'file_field': 'texto_original',
-            #    'hook': 'run_bi_materias_legislativas',
-            #    'results': {},
-            #},
+            {
+                'model': MateriaLegislativa,
+                'file_field': 'texto_original',
+                'hook': 'run_bi_materias_legislativas',
+                'results': {},
+            },
             {
                 'model': NormaJuridica,
                 'file_field': 'texto_integral',
@@ -48,12 +48,12 @@ class Command(BaseCommand):
                 'file_field': 'anexo_arquivo',
                 'hook': ''
             },
-            #{
-            #    'model': DocumentoAdministrativo,
-            #    'file_field': 'texto_integral',
-            #    'hook': 'run_bi_documentoadministrativo',
-            #    'results': {},
-            #},
+            {
+                'model': DocumentoAdministrativo,
+                'file_field': 'texto_integral',
+                'hook': 'run_bi_documentoadministrativo',
+                'results': {},
+            },
             {
                 'model': DiarioOficial,
                 'file_field': 'arquivo',

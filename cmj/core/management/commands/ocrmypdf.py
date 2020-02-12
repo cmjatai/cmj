@@ -178,10 +178,10 @@ class Command(BaseCommand):
 
         init = datetime.now()
 
-        # Refaz tudo que foi feito a mais de um ano
+        # Refaz tudo que foi feito a mais de dois anos
 
         OcrMyPDF.objects.filter(
-            created__lt=init - timedelta(days=365)).delete()
+            created__lt=init - timedelta(days=730)).delete()
 
         # Refaz tudo que foi feito a mais de um mês e nao teve sucesso
         OcrMyPDF.objects.filter(
