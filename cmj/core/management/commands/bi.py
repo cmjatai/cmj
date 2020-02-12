@@ -9,6 +9,7 @@ from pdfrw.pdfreader import PdfReader
 from cmj.core.models import Bi
 from cmj.diarios.models import DiarioOficial
 from cmj.sigad.models import VersaoDeMidia
+from cmj.utils import run_sql
 from sapl.materia.models import MateriaLegislativa
 from sapl.norma.models import NormaJuridica, AnexoNormaJuridica
 from sapl.protocoloadm.models import DocumentoAdministrativo
@@ -30,45 +31,63 @@ class Command(BaseCommand):
         self.run_bi_files()
 
     def run_bi_files(self):
+        reset_errors = False
         models = [
             {
                 'model': MateriaLegislativa,
                 'file_field': 'texto_original',
                 'hook': 'run_bi_materias_legislativas',
                 'results': {},
+                'reset_errors': reset_errors
             },
             {
                 'model': NormaJuridica,
                 'file_field': 'texto_integral',
                 'hook': 'run_bi_normajuridica',
                 'results': {},
+                'reset_errors': reset_errors
             },
             {
                 'model': AnexoNormaJuridica,
                 'file_field': 'anexo_arquivo',
-                'hook': ''
+                'hook': '',
+                'reset_errors': reset_errors
             },
             {
                 'model': DocumentoAdministrativo,
                 'file_field': 'texto_integral',
                 'hook': 'run_bi_documentoadministrativo',
                 'results': {},
+                'reset_errors': reset_errors
             },
             {
                 'model': DiarioOficial,
                 'file_field': 'arquivo',
-                'hook': ''
+                'hook': '',
+                'reset_errors': reset_errors
             },
             {
                 'model': VersaoDeMidia,
                 'file_field': 'file',
-                'hook': ''
+                'hook': '',
+                'reset_errors': reset_errors
             },
         ]
 
         for mt in models:  # mt = metadata
             if not mt['hook']:
                 continue
+
+            if mt['reset_errors']:
+                run_sql(
+                    '''update {} 
+                            set _paginas = 0 
+                            where _paginas = -1;'''.format(
+                        '%s_%s' % (mt['model']._meta.app_label,
+                                   mt['model']._meta.model_name)
+                    )
+                )
+
             getattr(self, mt['hook'])(mt)
 
             for ano, value in mt['results'].items():
