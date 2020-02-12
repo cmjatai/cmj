@@ -1,0 +1,63 @@
+{% load i18n %}
+{% load crispy_forms_tags common_tags%}
+
+<table class="table table-striped table-hover table-link-ordering">
+  {% for t in object_list %}
+    {% if forloop.first %}
+      <tr>
+        <th>Tramitações</th>
+      </tr>
+    {% endif %}
+
+
+
+    <tr>
+      <td>
+        <div class="row mb-2">
+          <div class="col-md-3 d-block d-md-none font-weight-bold">
+            {% if user.is_anonymous %}
+              {{t.data_tramitacao}}
+            {% else %}
+              <a href="{% url 'sapl.materia:tramitacao_detail' t.pk %}">{{t.data_tramitacao}}</a>
+            {% endif %}
+          </div>
+          <div class="col-md-3 d-md-block d-none text-right font-weight-bold">
+              {% if user.is_anonymous %}
+              {{t.data_tramitacao}}
+            {% else %}
+              <a href="{% url 'sapl.materia:tramitacao_detail' t.pk %}">{{t.data_tramitacao}}</a>
+            {% endif %}
+          </div>
+          <div class="col">
+            {{t.unidade_tramitacao_destino}}
+          </div>
+        </div>
+        <div class="row mb-2">
+          <div class="col-md-3 d-block d-md-none font-weight-bold">
+              Situação{% if forloop.first %} Atual{% endif %}:
+          </div>
+          <div class="col-md-3 d-md-block d-none text-right font-weight-bold">
+              Situação{% if forloop.first %} Atual{% endif %}:
+          </div>
+          <div class="col">
+            {{t.status}}
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-3 d-block d-md-none font-weight-bold">
+              Ação:
+          </div>
+          <div class="col-md-3 d-md-block d-none text-right font-weight-bold">
+              Ação:
+          </div>
+          <div class="col">
+            {{t.texto}}
+          </div>
+        </div>
+
+      </td>
+    </tr>
+  {% empty  %}
+    <tr><td><h3>Nenhuma Tramitação registrada neste Documento.</h3></tr>
+  {% endfor %}
+</table>

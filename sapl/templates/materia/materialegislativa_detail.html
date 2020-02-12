@@ -69,97 +69,103 @@
   </div>
 
 
-    {% if object.audienciapublica_set.exists %}
-      <p class="control-label">&emsp; Audiência(s) Pública(s)</p>
-      <div class="actions btn-group btn-group-sm" role="group">
-        {% for ap in object.audienciapublica_set.all %}
-          &emsp;&emsp;<a href="{% url 'sapl.audiencia:audienciapublica_detail' ap.id %}">
-              {{ ap.nome }}
-          </a>
-            {% if not forloop.last %} </br> {% endif %}
-        {% endfor %}
-      </div>
-    {% endif %}
+  {% if object.audienciapublica_set.exists %}
+    <p class="control-label">&emsp; Audiência(s) Pública(s)</p>
+    <div class="actions btn-group btn-group-sm" role="group">
+      {% for ap in object.audienciapublica_set.all %}
+        &emsp;&emsp;<a href="{% url 'sapl.audiencia:audienciapublica_detail' ap.id %}">
+            {{ ap.nome }}
+        </a>
+          {% if not forloop.last %} </br> {% endif %}
+      {% endfor %}
+    </div>
+  {% endif %}
 
-    {% if user.is_superuser %}
-      <div class="row">
-        {% if materialegislativa.user %}
-          <div class="col-sm-6">
-            <div id="div_id_user" class="form-group">
-              <p class="control-label">Usuário</p>
-              <div class="controls">
-                <div class="form-control-static">
-                  <div class="dont-break-out">
-                    <a href="{% url 'sapl.base:user_edit' materialegislativa.user.pk %}">{{materialegislativa.user}}</a>
-                  </div>
+  {% if user.is_superuser %}
+    <div class="row">
+      {% if materialegislativa.user %}
+        <div class="col-sm-6">
+          <div id="div_id_user" class="form-group">
+            <p class="control-label">Usuário</p>
+            <div class="controls">
+              <div class="form-control-static">
+                <div class="dont-break-out">
+                  <a href="{% url 'sapl.base:user_edit' materialegislativa.user.pk %}">{{materialegislativa.user}}</a>
                 </div>
               </div>
             </div>
           </div>
-        {% endif %}
-        {% if materialegislativa.ip %}
-          <div class="col-sm-6">
-            <div id="div_ip_user" class="form-group">
-              <p class="control-label">IP</p>
-              <div class="controls">
-                <div class="form-control-static">
-                  <div class="dont-break-out">{{materialegislativa.ip}}</div>
-                </div>
+        </div>
+      {% endif %}
+      {% if materialegislativa.ip %}
+        <div class="col-sm-6">
+          <div id="div_ip_user" class="form-group">
+            <p class="control-label">IP</p>
+            <div class="controls">
+              <div class="form-control-static">
+                <div class="dont-break-out">{{materialegislativa.ip}}</div>
               </div>
             </div>
           </div>
-        {% endif %}
-      </div>
-    {% endif %}
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
 
 
-    {% if object.registrovotacao_set.exists %}
-      <div class="pt-4">
-        <table class="table">
-          {% for rv in object.registrovotacao_set.all %}
-            {% if forloop.first %}
-              <tr>
-              <th>Deliberações em Plenário</th>
-              <th>Votação</th>
-              </tr>
-            {% endif %}
+  {% if object.registrovotacao_set.exists %}
+    <div class="pt-4">
+      <table class="table">
+        {% for rv in object.registrovotacao_set.all %}
+          {% if forloop.first %}
             <tr>
-              <td>
-                {% if rv.ordem %}
-                  <a href="{% url 'sapl.sessao:ordemdia_list' rv.ordem.sessao_plenaria_id %}#id{{object.id}}">
-                    {{rv.ordem.sessao_plenaria.str_short}}
-                  </a>
-                <br><strong>Data:</strong> {{ rv.ordem.sessao_plenaria.data_inicio}}
-                {% elif rv.expediente %}
-                  <a href="{% url 'sapl.sessao:expedientemateria_list' rv.expediente.sessao_plenaria_id %}#id{{object.id}}">
-                    {{rv.expediente.sessao_plenaria.str_short}}
-                  </a>
-                <br><strong>Data:</strong> {{ rv.expediente.sessao_plenaria.data_inicio}}
-                {% endif %}
-                <br><strong>{{rv.tipo_resultado_votacao}}</strong>
-                {% if rv.observacao %}
-                 - {{rv.observacao}}
-                {% endif %}
-              </td>
-              <td>
-                {{ rv.tipo_votacao }}
-                <strong>Sim: </strong>{{ rv.numero_votos_sim }}
-                <br><strong>Não: </strong>{{ rv.numero_votos_nao }}
-                {% if rv.numero_abstencoes %}
-                  <br><strong>Abstenções: </strong>{{ rv.numero_abstencoes }}
-                {% endif %}
-
-                {% if rv.ordem.tipo_votacao == 2 %}
-                  <br>-------------
-                  {% for vp in rv.votoparlamentar_set.all %}
-                    <br><strong>{{vp.voto}}</strong> - {{vp.parlamentar}}
-                  {% endfor %}
-                {% endif %}
-              </td>
+            <th>Deliberações em Plenário</th>
+            <th>Votação</th>
             </tr>
-          {% endfor %}
-        </table>
-      </div>
+          {% endif %}
+          <tr>
+            <td>
+              {% if rv.ordem %}
+                <a href="{% url 'sapl.sessao:ordemdia_list' rv.ordem.sessao_plenaria_id %}#id{{object.id}}">
+                  {{rv.ordem.sessao_plenaria.str_short}}
+                </a>
+              <br><strong>Data:</strong> {{ rv.ordem.sessao_plenaria.data_inicio}}
+              {% elif rv.expediente %}
+                <a href="{% url 'sapl.sessao:expedientemateria_list' rv.expediente.sessao_plenaria_id %}#id{{object.id}}">
+                  {{rv.expediente.sessao_plenaria.str_short}}
+                </a>
+              <br><strong>Data:</strong> {{ rv.expediente.sessao_plenaria.data_inicio}}
+              {% endif %}
+              <br><strong>{{rv.tipo_resultado_votacao}}</strong>
+              {% if rv.observacao %}
+                - {{rv.observacao}}
+              {% endif %}
+            </td>
+            <td>
+              {{ rv.tipo_votacao }}
+              <strong>Sim: </strong>{{ rv.numero_votos_sim }}
+              <br><strong>Não: </strong>{{ rv.numero_votos_nao }}
+              {% if rv.numero_abstencoes %}
+                <br><strong>Abstenções: </strong>{{ rv.numero_abstencoes }}
+              {% endif %}
 
-    {% endif %}
+              {% if rv.ordem.tipo_votacao == 2 %}
+                <br>-------------
+                {% for vp in rv.votoparlamentar_set.all %}
+                  <br><strong>{{vp.voto}}</strong> - {{vp.parlamentar}}
+                {% endfor %}
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </table>
+    </div>
+  {% endif %}
+
+  {% with object.tramitacao_set.all as object_list %}
+    <br><br>
+    {% include "materia/tramitacao_list_container.html" %}
+  {% endwith %}
+
+
 {% endblock detail_content %}
