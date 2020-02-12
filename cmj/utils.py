@@ -434,8 +434,7 @@ class CountPageMixin(models.Model):
         if self._paginas > 0:
             return self._paginas
         elif self._paginas == -1:
-            # raise Exception
-            pass
+            raise Exception
 
         count_pages = 0
         try:
