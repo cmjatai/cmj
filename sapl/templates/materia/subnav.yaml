@@ -1,5 +1,5 @@
 {% load i18n common_tags %}
-- title: {% trans 'Início' %}
+- title: {% if not perms.materia.change_materialegislativa %}{% trans 'Resumo' %}{%else%}{% trans 'Início' %}{%endif%}
   url: materialegislativa_detail
 - title: {% trans 'Anexada' %}
   url: anexada_list
