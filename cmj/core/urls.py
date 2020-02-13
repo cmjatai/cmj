@@ -84,7 +84,7 @@ urlpatterns = user_urlpatterns + [
         name='notificacao_redirect'),
 
 
-    url(r'^bi/$', BiView.as_view(),
+    url(r'^estatisticas/$', BiView.as_view(),
         name='bi_render'),
 
 

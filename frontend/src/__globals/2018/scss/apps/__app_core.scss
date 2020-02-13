@@ -157,6 +157,118 @@
   }
 }
 
+.bi-app {
+  background: $hover_background_10p $url_bg_png;
+  h2 {
+    line-height: 2;
+    margin: 0;
+  }
+
+  .container-bi {
+    padding: 1em;
+    margin-bottom: 3em;
+    background-color: white;
+    //border-bottom: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0px 6px 5px rgba(0, 0, 0, 0.06), 0px 2px 6px rgba(0, 0, 0, 0.23);
+  }
+
+  .bi-footer {
+    padding-top: 1em;
+  }
+
+  .bi-graph {
+
+    .inner {      
+      display: grid;
+      grid-template-areas: 
+        "unset lx lx2 lx3"
+        "ly graph graph2 graph3"; 
+      grid-template-columns: auto 1fr 1fr 1fr;
+      line-height: 1.2;
+    }
+    .ly, .ly2, .ly3 {
+      grid-area: ly;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      color: #777;       
+      .ly-item {
+        border-bottom: 1px dashed #ddd;
+        display: inline-block;
+        border-right: 1px dashed #ddd;
+        padding: 5px 5px 6px;
+        margin-right: 2px;
+      }
+    }
+    .ly2 {
+      grid-area: ly2;
+      display: none;
+    }
+    .ly3 {
+      grid-area: ly3;
+      display: none;
+    }
+    .legend {
+      border-bottom: 1px solid green;
+    }
+    .graph {
+      grid-area: graph;
+    }
+    .graph2 {
+      grid-area: graph2;
+    }
+    .graph3 {
+      grid-area: graph3;
+    }
+    .lx {
+      grid-area: lx;
+    }
+    .lx2 {
+      grid-area: lx2;
+    }
+    .lx3 {
+      grid-area: lx3;
+    }
+    .lx-titulo {
+      color: #777;
+      margin-left: -0.5em;
+    }
+
+    
+  }
+  .bi-graph-barra-horizontal {
+    .graph, .graph2, .graph3 {
+      display: flex;
+      flex-direction: column;
+      .group-row {
+        display: flex;
+        flex-direction: column;     
+        padding: 5px 0;
+        border-bottom: 1px dashed #ddd;
+        padding-right: 1em;
+      }
+      .g-row {
+        display: inline-block;
+        font-size: 11pt;
+        color: #555;
+        span {
+          display: inline-block;
+          text-align: right;
+          padding: 2px 0px 1px;
+          span {
+            padding: 0 5px;
+          }
+        }
+      }
+    }
+    .graph2, .graph3 {
+      border-left: 1px dashed #ddd;
+      padding-left: 2px;
+    }
+  }
+}
+
 
 
 @media screen and (max-width: 1199px) {
@@ -184,6 +296,37 @@
       margin: 0;
     }
   }
+
+  .bi-app {
+    .bi-graph {
+      .inner {      
+        grid-template-areas: 
+          "lx lx"
+          "ly graph"
+          "lx2 lx2"
+          "ly2 graph2"
+          "lx3 lx3"
+          "ly3 graph3";
+        grid-template-columns: auto 1fr;
+
+        .graph {
+          padding-right: 0;
+        }
+        .graph2, .graph3 {
+          border-left: 0px dashed #ddd;
+        }
+        .ly2, .ly3 {
+          display: flex;
+        }
+        .lx2, .lx3 {
+          padding-top: 1em;
+        }
+      }
+    }
+  }
+
+
+
 }
 
 @media screen and (max-width: 767px) {
@@ -227,6 +370,24 @@
     }
     .inner-ouvidoria {
       //padding: 0px;
+    }
+  }
+
+  .bi-app {
+    .container-bi {
+      padding: 0.5em;
+    }
+    .bi-graph {
+      .lx-titulo {
+        margin-left: 0;
+      }
+    }
+    .bi-graph-barra-horizontal {
+      .graph, .graph2, .graph3 {
+        .group-row {
+          padding-right: 0.5em;
+        }
+      }
     }
   }
 }

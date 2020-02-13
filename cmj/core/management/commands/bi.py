@@ -253,7 +253,7 @@ class Command(BaseCommand):
                 results[k] = {}
 
             for n in v:
-                print(n)
+                # print(n)
                 u = 0
                 if u not in results[k]:
                     results[k][u] = {}

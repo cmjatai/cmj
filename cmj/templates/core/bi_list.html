@@ -1,5 +1,120 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block base_content %}
-bi
+{% block main_header %}{% endblock main_header %}
+
+{% block content_container %}
+  <div class="container-fluid bi-app">
+    <div class="container">
+    <div class="row">
+      <div class="col">
+        <h2>Atividades no Portal CMJ</h2>
+
+        <div class="container-bi bi-graph bi-graph-barra-horizontal">
+          <h3 class="legend">           
+                Atividades Anuais
+          </h3>
+          <div class="inner">
+            <div class="ly">
+              {% for ano, value in global.items %}
+                <span class="ly-item p-row">
+                {{ano}}
+                </span>
+              {% endfor %}
+            </div>            
+            
+            <div class="ly2">
+              {% for ano, value in global.items %}
+                <span class="ly-item p-row">
+                {{ano}}
+                </span>
+              {% endfor %}
+            </div>
+
+            <div class="ly3">
+              {% for ano, value in global.items %}
+                <span class="ly-item p-row">
+                {{ano}}
+                </span>
+              {% endfor %}
+            </div>
+
+            <div class="graph">
+              {% for ano, value in global.items %}
+                <div class="group-row">
+                  <div class="g-row">
+                    <span class="d-inline-block bg-green" style="width: {{value.largura.documentos|stringformat:'f'}}%;">
+                      {% if value.largura.documentos >= 18 %}
+                        <span>{{value.documentos}}
+                        </span>
+                      {% else %}
+                        &nbsp;
+                      {% endif %}
+                    </span>
+                    {% if value.largura.documentos < 18 %}
+                      {{value.documentos}}
+                    {% endif %}
+                  </div>
+                </div>
+              {% endfor %}
+            </div>   
+            <div class="graph2">
+              {% for ano, value in global.items %}
+                <div class="group-row">
+                  <div class="g-row">
+                    <span class="d-inline-block bg-yellow" style="width: {{value.largura.paginas|stringformat:'f'}}%;">
+                      {% if value.largura.paginas >= 18 %}
+                        <span>{{value.paginas}}
+                        </span>
+                      {% else %}
+                        &nbsp;
+                      {% endif %}
+                    </span>
+                    {% if value.largura.paginas < 18 %}
+                      {{value.paginas}}
+                    {% endif %}
+                  </div>
+                </div>
+              {% endfor %}
+            </div>  
+            <div class="graph3">
+              {% for ano, value in global.items %}
+                <div class="group-row">
+                  <div class="g-row">
+                    <span class="d-inline-block bg-fuchsia" style="width: {{value.largura.tramitacao|stringformat:'f'}}%;">
+                      {% if value.largura.tramitacao >= 18 %}
+                        <span>{{value.tramitacao}}
+                        </span>
+                      {% else %}
+                        &nbsp;
+                      {% endif %}
+                    </span>
+                    {% if value.largura.tramitacao < 18 %}
+                      {{value.tramitacao}}
+                    {% endif %}
+                  </div>
+                </div>
+              {% endfor %}
+            </div>      
+            <div class="lx">
+                <span class="lx-titulo">Documentos Cadastrados</span>
+                <span class="lx-item"></span>
+            </div>
+            <div class="lx2">
+                <span class="lx-titulo">Páginas Digitalizadas</span>
+                <span class="lx-item"></span>
+            </div>
+            <div class="lx3">
+                <span class="lx-titulo">Tramitações</span>
+                <span class="lx-item"></span>
+            </div>
+          </div>
+        <div class="bi-footer">
+          BI: v0.1
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

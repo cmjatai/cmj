@@ -3,6 +3,7 @@ from builtins import property
 import json
 
 from django.conf import settings
+from django.conf.locale import ru
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.contenttypes.models import ContentType
@@ -544,3 +545,77 @@ class CertidaoPublicacaoCrud(Crud):
 
 class BiView(ListView):
     model = Bi
+    paginate_by = None
+
+    @property
+    def title(self):
+        return 'B'
+
+    def get_context_data(self, **kwargs):
+        context = ListView.get_context_data(self, **kwargs)
+
+        context['global'] = self.get_global()
+
+        return context
+
+    def get_global(self):
+        qs = self.get_queryset()
+
+        g = {}
+
+        for i in qs:
+            if i.ano not in g:
+                g[i.ano] = {
+                    'documentos': 0,
+                    'paginas': 0,
+                    'tramitacao': 0
+                }
+
+            results = i.results
+
+            for user, ru in results.items():  # ru -> result user
+
+                if not isinstance(ru, dict):
+                    if user == 'tramitacao':
+                        g[i.ano]['tramitacao'] += ru
+                    continue
+
+                for model, rm in ru.items():  # rm -> result model
+                    for ano, ra in rm.items():  # rm -> result anos
+                        g[i.ano]['documentos'] += ra['total']
+                        g[i.ano]['paginas'] += ra['paginas']
+
+        sum_documentos = 0
+        sum_paginas = 0
+        sum_tramitacao = 0
+        for k, v in g.items():
+            sum_documentos += v['documentos']
+            sum_paginas += v['paginas']
+            sum_tramitacao += v['tramitacao']
+
+        per_d_max = 0
+        per_p_max = 0
+        per_t_max = 0
+        for k, v in g.items():
+            v['largura'] = {
+                'documentos': v['documentos'] / sum_documentos * 100,
+                'paginas': v['paginas'] / sum_paginas * 100,
+                'tramitacao': v['tramitacao'] / sum_paginas * 100
+            }
+
+            if v['documentos'] > per_d_max:
+                per_d_max = v['documentos']
+
+            if v['paginas'] > per_p_max:
+                per_p_max = v['paginas']
+
+            if v['tramitacao'] > per_t_max:
+                per_t_max = v['tramitacao']
+
+        for k, v in g.items():
+            v['largura'] = {
+                'documentos': (v['documentos'] * (100 / per_d_max)) if per_d_max else 0,
+                'paginas': (v['paginas'] * (100 / per_p_max)) if per_p_max else 0,
+                'tramitacao': (v['tramitacao'] * (100 / per_t_max)) if per_t_max else 0
+            }
+        return g
