@@ -95,7 +95,7 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
             Q(at__in=AreaTrabalho.objects.areatrabalho_publica().values_list('id', flat=True)))
         sqs = sqs.models(
             *haystack_get_models('protocoloadm.documentoadministrativo'))
-        sqs = sqs.order_by('-data', '-last_update')[:100]
+        sqs = sqs.order_by('-id')[:100]
 
         r = []
         for sr in sqs:
@@ -103,7 +103,7 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
                 if sr.object._certidao.exists():
                     r.append(sr)
 
-                    if len(r) == 20:
+                    if len(r) == 10:
                         break
 
         return r

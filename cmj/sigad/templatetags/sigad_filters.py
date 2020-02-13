@@ -59,6 +59,12 @@ def organize_direction_horizontal_avatars(pos, total):
 
 
 @register.filter
+def inspect(obj):
+
+    return obj.__dict__
+
+
+@register.filter
 def caixa_publicacao(key, classe):
     try:
         cp = CaixaPublicacao.objects.get(key=key, classe=classe)
