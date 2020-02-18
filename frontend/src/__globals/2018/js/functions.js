@@ -54,9 +54,9 @@ window.setCookie = function (cookieName, cookieValue, nDays) {
   expire.setTime(today.getTime() + 3600000 * 24 * nDays)
   document.cookie = cookieName + '=' + escape(cookieValue) +
     ';expires=' + expire.toGMTString()
-} 
+}
 
-window.getCookie = function (name) { 
+window.getCookie = function (name) {
   var cookieValue = null
   if (document.cookie && document.cookie !== '') {
     var cookies = document.cookie.split(';')
@@ -70,8 +70,6 @@ window.getCookie = function (name) {
   }
   return cookieValue
 }
-
-
 
 window.autorModal = function () {
   $(function () {

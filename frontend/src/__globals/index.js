@@ -18,7 +18,6 @@ import 'tinymce/plugins/table'
 import 'tinymce/plugins/lists'
 import 'tinymce/plugins/code'
 import 'tinymce/plugins/colorpicker'
-            
 
 import 'jquery-mask-plugin'
 
@@ -42,13 +41,8 @@ window.initTextRichEditor('texto-rico')
 // initTinymce
 // import './2018/themes/dezembrolaranja/app.scss'
 
-
-
-
-
 $(function () {
-  
-  /*let toggleWrapper = function (event) {
+  /* let toggleWrapper = function (event) {
     if (!$("#wrapper").hasClass('toggled')) {
       window.localStorage.setItem('sidebarCmjCookie', 'toggled')
       //$(".canais-absolute .box").off('click')
@@ -57,27 +51,25 @@ $(function () {
       window.localStorage.setItem('sidebarCmjCookie', '')
       //$(".canais-absolute .box").click(toggleWrapper)
     }
-    
+
     $("#wrapper").toggleClass("toggled");
     //$(".container").toggleClass("toggled");
-    
+
     event.preventDefault();
   }
-  
+
   $("#menu-toggle").click(function (event) {
     toggleWrapper(event)
   });
-  
+
   let sidebarCmjCookie = window.localStorage.getItem('sidebarCmjCookie')
   if (sidebarCmjCookie !== undefined) {
     $("#wrapper").toggleClass(sidebarCmjCookie);
     //$(".container").toggleClass(sidebarCmjCookie);
     //$(".canais-absolute .box").off('click')
-  }*/
+  } */
 
   $('[data-toggle="popover"]').popover({
-  trigger: 'focus'
+    trigger: 'focus'
   })
-
 })
-

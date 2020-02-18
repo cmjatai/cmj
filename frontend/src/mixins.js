@@ -134,7 +134,6 @@ Vue.mixin({
         })
     }
 
-
   },
   created: function () {
     /*

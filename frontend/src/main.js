@@ -47,8 +47,8 @@ ws/time-refresh recebe uma notificacão sempre que um model do Sapl
 */
 
 Vue.use(VueNativeSock, (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host + '/ws/time-refresh/', {
-  //reconnection: true // (Boolean) whether to reconnect automatically (false)
-  connectManually: true,
+  // reconnection: true // (Boolean) whether to reconnect automatically (false)
+  connectManually: true
 
   // reconnectionAttempts: 5, // (Number) number of reconnection attempts before giving up (Infinity),
   // reconnectionDelay: 3000, // (Number) how long to initially wait before attempting a new (1000)
@@ -117,6 +117,3 @@ if ('serviceWorker' in navigator) {
     } */
   })
 }
-
-
-// #f26a3d

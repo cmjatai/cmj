@@ -302,7 +302,6 @@ h6 {
 
 @import '_alto_contraste';
 
-
 @media only screen and (max-width: 991.98px) {
   .table{
     width: auto;
@@ -311,8 +310,6 @@ h6 {
     overflow-x: auto;
   }
 }
-
-
 
 @media print {
   .screen-lg {
@@ -336,14 +333,11 @@ h6 {
   }
 }
 
-
 @media (min-width: 992px) and (max-width: 1199px) {
 
   .container {
     width: 100%;
   }
-
-
 
   main .container, header .container {
     width: auto;

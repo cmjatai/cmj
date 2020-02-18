@@ -59,6 +59,14 @@ module.exports = {
         .devtool('source-map')
     }
 
+    config.module
+      .rule('images')
+      .use('url-loader')
+      .loader('url-loader')
+      .tap(options => {
+        options['limit'] = 8192
+      })
+
     // config.resolve.alias
     //  .set('__STATIC__', 'static')
 

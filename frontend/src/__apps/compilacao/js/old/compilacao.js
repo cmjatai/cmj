@@ -254,7 +254,6 @@ function DispositivoSearch (opts) {
             _$('input[name="tipo_resultado"]')
               .filter(`[value="${formData.tipo_resultado}"]`)
               .attr('checked', true)
-
           } catch (e) {
             // console.log(e)
           }
@@ -274,7 +273,7 @@ function DispositivoSearch (opts) {
         })
       })
       if ('autostart' in opts && opts['autostart']) {
-        btnOpenSearch.trigger('click');
+        btnOpenSearch.trigger('click')
       }
     })
   })
