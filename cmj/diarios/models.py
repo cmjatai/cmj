@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 import reversion
 
-from cmj.utils import texto_upload_path
+from cmj.utils import texto_upload_path, CountPageMixin
 from sapl.norma.models import NormaJuridica
 from sapl.utils import restringe_tipos_de_arquivo_txt, OverwriteStorage
 
@@ -24,7 +24,8 @@ def diario_upload_path(instance, filename):
 
 
 @reversion.register()
-class DiarioOficial(models.Model):
+class DiarioOficial(CountPageMixin):
+    FIELDFILE_NAME = ('arquivo', )
 
     edicao = models.PositiveIntegerField(
         default=0,

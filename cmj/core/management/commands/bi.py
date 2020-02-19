@@ -63,7 +63,8 @@ class Command(BaseCommand):
             {
                 'model': DiarioOficial,
                 'file_field': 'arquivo',
-                'hook': '',
+                'hook': 'run_bi_diariooficial',
+                'results': {},
                 'reset_errors': reset_errors
             },
             {
@@ -233,6 +234,46 @@ class Command(BaseCommand):
                     except:
                         ru['documentoacessorio'][materia.ano]['ep'].append(
                             da.id)
+
+    def run_bi_diariooficial(self, mt):
+        diarios = DiarioOficial.objects.order_by('id')
+
+        ano_cadastro = 2016
+        r = {ano_cadastro: []}
+
+        for d in diarios:
+            if d.ano <= ano_cadastro:
+                r[ano_cadastro].append(d)
+                continue
+            ano_cadastro = d.ano
+            r[ano_cadastro] = [d, ]
+
+        total = 0
+        results = mt['results']
+        for k, v in r.items():  # ano, lista de diarios cadastrados no ano
+            if k not in results:
+                results[k] = {}
+
+            for d in v:
+                # print(n)
+                u = 0
+                if u not in results[k]:
+                    results[k][u] = {}
+                    results[k][u]['diariooficial'] = {}
+
+                ru = results[k][u]
+
+                if d.ano not in ru['diariooficial']:
+                    ru['diariooficial'][d.ano] = {
+                        'total': 0, 'paginas': 0, 'ep': []}
+
+                ru['diariooficial'][d.ano]['total'] += 1
+
+                try:
+                    ru['diariooficial'][d.ano]['paginas'] += d.paginas
+                except:
+                    ru['diariooficial'][d.ano]['ep'].append(
+                        d.id)
 
     def run_bi_normajuridica(self, mt):
         nj = NormaJuridica.objects.order_by('id')
