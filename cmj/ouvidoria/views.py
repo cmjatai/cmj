@@ -75,7 +75,7 @@ class SolicitacaoDetailView(PermissionRequiredMixin,
         return [
             (reverse('cmj.ouvidoria:solicitacao_manage_list'),
              'btn-outline-primary',
-             _('Listar outras Solcitações')
+             _('Listar outras Solicitações')
              )
         ]
 

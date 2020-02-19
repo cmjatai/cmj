@@ -25,7 +25,7 @@ GROUP_SIGAD_VIEW_STATUS_RESTRITOS = _(
     'Sigad - Visualização de itens com Status de Restrito')
 
 GROUP_OUVIDORIA_VISUALIZACAO_RESPOSTAS = _(
-    'Ouvidoria - Visualização e resposta de Solcitações')
+    'Ouvidoria - Visualização e resposta de Solicitações')
 
 
 GROUP_AGENDA_WORKSPACE = _(
