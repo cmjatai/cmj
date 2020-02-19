@@ -1,12 +1,9 @@
-
 <script>
 import { mapActions } from 'vuex'
-import BAlert from 'bootstrap-vue/es/components/alert/alert'
+import { BAlert } from 'bootstrap-vue/esm/components/alert/alert'
 export default {
   name: 'alert',
-  extends: {
-    ...BAlert
-  },
+  extends: BAlert,
   props: [
     'message_id', 'show'
   ],
