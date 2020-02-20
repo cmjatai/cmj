@@ -10,9 +10,9 @@
   <div class="row inner-topo">
     <div class="col-md-4 inner-legis">
       
-      {% if perms.sigad.change_classe %}
+      {% if perms.parlamentares.change_parlamentar %}
         <div class="btn-group">
-          <a class="btn btn-outline-primary" href="{% url 'cmj.sigad:classe_edit' object.id %}">[ Editar ]
+          <a class="btn btn-outline-primary" href="{% url 'sapl.parlamentares:parlamentar_list' %}">[ Editar ]
           </a>
         </div>
       {% endif %}
