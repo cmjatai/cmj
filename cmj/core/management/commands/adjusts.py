@@ -2,13 +2,12 @@
 from datetime import datetime, timedelta
 import logging
 import os
-from platform import node
 import shutil
 import stat
 import subprocess
 import time
 
-from celery.worker.control import ok
+from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 from django.db import connection
 from django.db.models import F, Q
@@ -85,7 +84,13 @@ class Command(BaseCommand):
         # self.run_ajusta_datas_de_edicao_com_certidoes()
         # self.run_ajusta_datas_de_edicao_com_data_doc()
         # self.reset_id_model(TipoDispositivoRelationship)
-        self.delete_itens_tmp_folder()
+        # self.delete_itens_tmp_folder()
+        self.run_test_users_permissions()
+
+    def run_test_users_permissions(self):
+        u = get_user_model().objects.filter(email__icontains='livioac').first()
+
+        print(u)
 
     def delete_itens_tmp_folder(self):
         list = os.scandir('/home/leandro/desenvolvimento/envs/cmj/tmp/')

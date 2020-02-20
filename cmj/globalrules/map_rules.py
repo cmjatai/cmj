@@ -171,14 +171,14 @@ rules_diarios_group_operador = {
     ]
 }
 
-
+"""
 rules_group_geral = {
     'group': SAPL_GROUP_GERAL,
     'rules': [
         (TipoDeDiario, __base__)
     ]
 }
-
+"""
 # não possui efeito e é usada nos testes que verificam se todos os models estão
 # neste arquivo rules.py
 rules_group_anonymous = {
@@ -228,5 +228,5 @@ rules_patterns = [
     rules_sigad_view_status_restritos,
     rules_ouvidoria_visualizacao_respostas,
 
-    rules_group_geral
+    # rules_group_geral
 ]
