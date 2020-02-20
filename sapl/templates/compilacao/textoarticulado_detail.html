@@ -12,25 +12,27 @@
   {% block actions %}
     <div class="context-actions justify-content-between mb-4">
       {% comment %}
+
         <div class="actions btn-group d-none" role="group">
           <a href="{{base_url}}?print" class="btn btn-outline-primary">{% trans 'Preparar para impressão' %}</a>
         </div>
-      {% endcomment %}
-      {% if perms.compilacao.add_textoarticulado %}
-        {% if not object.temp_check_migrations %}
-          <div class="actions btn-group" role="group"> 
-            <a href="{% url 'sapl.compilacao:ta_text_edit' object.pk %}?check" class="btn btn-primary">
-              Confirmar Migração
-            </a>
-          </div>
-        {% else %}
-          <div class="actions btn-group" role="group"> 
-            <div class="btn btn-success">
-              Migração Confirmada
+        {% if perms.compilacao.add_textoarticulado %}
+          {% if not object.temp_check_migrations %}
+            <div class="actions btn-group" role="group"> 
+              <a href="{% url 'sapl.compilacao:ta_text_edit' object.pk %}?check" class="btn btn-primary">
+                Confirmar Migração
+              </a>
             </div>
-          </div>      
+          {% else %}
+            <div class="actions btn-group" role="group"> 
+              <div class="btn btn-success">
+                Migração Confirmada
+              </div>
+            </div>      
+          {% endif %}
         {% endif %}
-      {% endif %}
+        
+      {% endcomment %}
       <div class="actions btn-group" role="group">
         {% if perms.compilacao.change_textoarticulado and object|can_use_dynamic_editing:user %}
           <a href="{% url 'sapl.compilacao:ta_edit' object.pk %}" class="btn btn-outline-primary">{% trans 'Editar Metadados do Texto Articulado' %}</a>

@@ -6,9 +6,17 @@
 {% block base_functions %}{% endblock %}
 {% block main_header %}{% endblock %}
 
-{% block base_container_header %}
 
+{% block base_container_header %}
 <div class="container-topo-parlamentar">
+  {% if perms.sigad.change_classe %}
+      <div class="btn-edit-destaques">
+        <a href="{% url 'cmj.sigad:classe_edit' object.id %}">
+          <i class="fas fa-edit" aria-hidden="true"></i>
+        </a>
+      </div>
+  {% endif %}
+
   <div class="path-capa {% if not object.parlamentar.capa  %}path-capa-semfoto{% endif %}">
     <img src="{% thumbnail object.parlamentar.capa 9000x9000 box=object.parlamentar.capa_cropping crop detail %}">
   </div> 

@@ -11,19 +11,21 @@
   {% if perms.compilacao.change_textoarticulado %}
     <div class="container-actions mt-4 mb-4 justify-content-between d-flex">
 
-      {% if not object.temp_check_migrations %}
-        <div class="actions btn-group" role="group"> 
-          <a href="{% url 'sapl.compilacao:ta_text_edit' object.pk %}?check" class="btn btn-primary">
-            Confirmar Migração
-          </a>
-        </div>
-      {% else %}
-        <div class="actions btn-group" role="group"> 
-          <div class="btn btn-success">
-            Migração Confirmada
+      {% comment %}
+        {% if not object.temp_check_migrations %}
+          <div class="actions btn-group" role="group"> 
+            <a href="{% url 'sapl.compilacao:ta_text_edit' object.pk %}?check" class="btn btn-primary">
+              Confirmar Migração
+            </a>
           </div>
-        </div>      
-      {% endif %}
+        {% else %}
+          <div class="actions btn-group" role="group"> 
+            <div class="btn btn-success">
+              Migração Confirmada
+            </div>
+          </div>      
+        {% endif %}
+      {% endcomment %}
 
 
       <div class="actions btn-group" role="group">
