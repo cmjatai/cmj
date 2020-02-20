@@ -357,6 +357,7 @@ class NotificacaoRedirectView(RedirectView):
         if self.request.user != obj.user:
             raise Http404()
         obj.read = True
+        obj.not_send_mail = True  # Não envia email no post_save
         obj.save()
 
         self.pattern_name = '%s:%s_detail' % (

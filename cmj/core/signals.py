@@ -30,6 +30,9 @@ def notificacao_post_save(sender, instance, using, **kwargs):
     if funcs:
         return
 
+    if hasattr(instance, 'not_send_mail') and instance.not_send_mail:
+        return
+
     if instance.user.be_notified_by_email:
         send_mail(
             instance.content_object.email_notify['subject'],
