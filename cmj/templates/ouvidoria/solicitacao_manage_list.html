@@ -32,7 +32,7 @@
         {% for solicitacao in object_list %}
           <tr class="{% if not solicitacao|objeto_lido:user %}row-unread{%endif%}">
             <td>
-              <a href="{% if solicitacao.owner %}{% url 'cmj.ouvidoria:solicitacao_interact' solicitacao.pk%}{% else %}{% url 'cmj.ouvidoria:solicitacao_detail' solicitacao.pk%}{% endif %}">
+              <a href="{% url 'cmj.ouvidoria:solicitacao_interact' solicitacao.pk%}">
                 {{solicitacao.titulo}}
               </a>
             </td>

@@ -1,4 +1,6 @@
 
+import hashlib
+
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.files.base import File
 from django.db import models
@@ -11,6 +13,7 @@ from cmj.core.models import AreaTrabalho, Notificacao
 from cmj.utils import CmjChoices, get_settings_auth_user_model,\
     restringe_tipos_de_arquivo_midias, TIPOS_MIDIAS_PERMITIDOS,\
     media_protected_storage
+from sapl.utils import SEPARADOR_HASH_PROPOSICAO
 
 
 class Solicitacao(models.Model):
@@ -66,6 +69,11 @@ class Solicitacao(models.Model):
         choices=TIPO_SOLICITACAO_CHOICE,
         default=TIPO_ACESSO_INFORMACAO)
 
+    hash_code = models.TextField(
+        verbose_name=_('Hash de Acesso Anônimo'),
+        max_length=200,
+        blank=True)
+
     notificacoes = GenericRelation(
         Notificacao, related_query_name='notificacoes')
 
@@ -88,6 +96,21 @@ class Solicitacao(models.Model):
                 'subject': _('Denuncia Anônima'),
             }
 
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+
+        if not self.hash_code:
+            md5 = hashlib.md5()
+            data = '{}{}{}'.format(
+                timezone.now(),
+                self.titulo,
+                self.descricao)
+
+            md5.update(data.encode())
+            self.hash_code = md5.hexdigest()
+
+        return models.Model.save(self, force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+
 
 def anexo_ouvidoria_path(instance, filename):
     return './ouvidoria/mensagem/%s/%s' % (
@@ -102,6 +125,7 @@ class MensagemSolicitacao(models.Model):
 
     owner = models.ForeignKey(
         get_settings_auth_user_model(),
+        blank=True, null=True, default=None,
         verbose_name=_('owner'), related_name='+')
 
     descricao = models.TextField(

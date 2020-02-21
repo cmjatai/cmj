@@ -757,6 +757,7 @@ class Notificacao(CmjModelMixin):
 
     user = models.ForeignKey(
         get_settings_auth_user_model(),
+        blank=True, null=True, default=None,
         verbose_name=_('Usuário Notificado'),
         related_name='notificacao_set',
         on_delete=CASCADE)

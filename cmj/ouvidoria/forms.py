@@ -118,12 +118,15 @@ class DenunciaForm(ModelForm):
                 nt.areatrabalho = at
                 nt.save()
 
-        return
+        return denuncia  # TODO: retorno incorreto, corrigir se existir mais de uma area de trabalho de instituição
 
     def clean(self):
-        recaptcha = self.data.get('g-recaptcha-response', '')
-        cd = self.cleaned_data
 
+        cd = self.cleaned_data
+        if settings.DEBUG:
+            return cd
+
+        recaptcha = self.data.get('g-recaptcha-response', '')
         if not recaptcha:
             raise ValidationError(
                 _('Verificação do reCAPTCHA não efetuada.'))
@@ -250,7 +253,12 @@ class MensagemSolicitacaoForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
 
-        rows = to_row([('descricao', 12), ('anexo', 12)])
+        rows = [('descricao', 12), ]
+
+        if kwargs['initial']['owner']:
+            rows.append(('anexo', 12))
+
+        rows = to_row(rows)
 
         super().__init__(*args, **kwargs)
 
@@ -267,7 +275,8 @@ class MensagemSolicitacaoForm(ModelForm):
         inst = super().save(commit)
 
         # o dono da solicitação é notificado se ele não é o dono da mensagem
-        if inst.owner != inst.solicitacao.owner:
+        if inst.owner != inst.solicitacao.owner and \
+                not inst.solicitacao.owner is None:
             nt = Notificacao()
             nt.content_object = inst
             nt.user = inst.solicitacao.owner

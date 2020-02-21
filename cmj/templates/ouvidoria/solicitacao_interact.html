@@ -3,15 +3,37 @@
 {% block title %}
 <h1 class="page-header {{bg_title}} ">
   {% if solicitacao.owner == user %}
-    {% trans "Minha Solicitação" %} <small>({{solicitacao.get_tipo_display}})</small>
+    {% trans "Minha Solicitação" %} <small class="text-white">({{solicitacao.get_tipo_display}})</small>
+  {% elif user.is_anonymous or solicitacao.owner is None %}
+    {% trans "Denúncia Anônima" %}
   {% else %}
-    {% trans "Solicitação da Sociedade" %}<br><small>({% trans "Encaminhada por:" %} {{solicitacao.owner}} - {{solicitacao.owner.email}})</small>
+    {% trans "Solicitação da Sociedade" %}<br>
+    <small class="text-white">
+      ({% trans "Encaminhada por:" %} {{solicitacao.owner}} - {{solicitacao.owner.email}})
+    </small>
   {% endif %}
 </h1>
 {% endblock title %}
 
 {% block base_content %}
   <div class="container-detail clearfix">
+    {% if user.is_anonymous and not msg.owner %}
+      <div class="alert alert-secondary">
+        <strong>ATENÇÃO...</strong> Guarde o link abaixo!!!<br>
+        Com ele você poderá voltar a sua <strong>denúncia anônima</strong> e acompanhar as ações e interagir com a ouvidoria.
+        <div class="form-clickboard input-group input-group-lg">
+          <input class="form-control" readonly="readonly" type="text" value="https://www.jatai.go.leg.br{% url 'cmj.ouvidoria:solicitacao_interact_hash' solicitacao.hash_code solicitacao.pk %}" id="input-copy-clipboard">
+          <div class="input-group-append">
+            <button onclick="copyInputClipboard()" class="btn btn-outline-primary" type="button">
+              <i class="far fa-clipboard"></i> Copiar Link
+            </button>
+          </div>
+        </div>
+      </div>
+    {% else %}
+    <br>
+    <br>
+    {% endif %}
     <h2 class="legend">Dados Enviados</h2>
     <div class="row">
       <div class="col-sm-6">
@@ -22,13 +44,13 @@
           </div>
         </div>
       </div>
-      <div class="col-sm-3">
+      <div class="col-sm-2">
         <div id="div_id_created" class="form-group">
           <p class="control-label">Tipo:</p>
             <div class="form-control-static">{{ solicitacao.get_tipo_display }}</div>
         </div>
       </div>
-      <div class="col-sm-3">
+      <div class="col-sm-4">
         <div id="div_id_created" class="form-group">
           <p class="control-label">Encaminhada em:</p>
             <div class="form-control-static">{{ solicitacao.created }}</div>
@@ -50,8 +72,8 @@
   </div>
 
 <div class="container-mensagens">
-  {% for msg in solicitacao.mensagemsolicitacao_set.all %}
-    <div class="{% if msg.owner == user %}container-logged-user{% else %}container-member {%if not forloop.counter0|divisibleby:2  %}odd{%endif%}{% endif %}">
+  {% for msg in solicitacao.mensagemsolicitacao_set.all %} 
+    <div class="{% if msg.owner == user or user.is_anonymous and not msg.owner %}container-logged-user{% else %}container-member {%if not forloop.counter0|divisibleby:2  %}odd{%endif%}{% endif %}">
       <a href="#" name="item-{{msg.pk}}"></a>
       <div class="inner">
         <div class="avatar">
@@ -63,18 +85,26 @@
           {% if msg.anexo %}
             <div class="msg-anexo">
               {% if msg.content_type|startswith:'image' %}
-                <img src="{% url 'cmj.ouvidoria:anexo_mensagem_view' msg.id %}">
+                {% if user.is_anonymous and solicitacao.owner is None %}
+                  <img src="{% url 'cmj.ouvidoria:anexo_mensagem_view_hash' solicitacao.hash_code msg.id %}">
+                {% else %}
+                  <img src="{% url 'cmj.ouvidoria:anexo_mensagem_view' msg.id %}">
+                {% endif %}
               {% else %}
                 <div class="link">
-                  <a target="_blank" href="{% url 'cmj.ouvidoria:anexo_mensagem_view' msg.id %}" title="Download Anexo">
-                    <i class="fas fa-archive"></i> Anexo a mensagem.
-                  </a>
-                  
+                  {% if user.is_anonymous and solicitacao.owner is None %}
+                    <a target="_blank" href="{% url 'cmj.ouvidoria:anexo_mensagem_view_hash' solicitacao.hash_code msg.id %}" title="Download Anexo">
+                      <i class="fas fa-archive"></i> Anexo a mensagem.
+                    </a>
+                  {% else %}
+                    <a target="_blank" href="{% url 'cmj.ouvidoria:anexo_mensagem_view' msg.id %}" title="Download Anexo">
+                      <i class="fas fa-archive"></i> Anexo a mensagem.
+                    </a>
+                  {% endif %}
                 </div>
               {% endif %}
             </div>
           {% endif %}
-
         </div>
         <div class="time" title="{{msg.created|date:"DATETIME_FORMAT"}}">
         há {{msg.created|timesince}}

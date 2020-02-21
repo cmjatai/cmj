@@ -302,3 +302,10 @@ window.ContainerFirst = function () {
     first.find('.painel-corte').remove()
   }
 }
+
+window.copyInputClipboard = function () {
+  var copyText = document.getElementById('input-copy-clipboard')
+  copyText.select()
+  copyText.setSelectionRange(0, 99999)
+  document.execCommand('copy')
+}

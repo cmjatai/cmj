@@ -46,7 +46,11 @@ class DenunciaAnonimaFormView(FormMessagesMixin, CreateView):
         return context
 
     def get_success_url(self):
-        return reverse('cmj.ouvidoria:denuncia_form')
+        self.kwargs['hash'] = self.object.hash_code
+        self.kwargs['pk'] = self.object.pk
+
+        return reverse_lazy(
+            'cmj.ouvidoria:solicitacao_interact_hash', kwargs=self.kwargs)
 
     def get_initial(self):
         initial = CreateView.get_initial(self)
@@ -60,6 +64,9 @@ class DenunciaAnonimaFormView(FormMessagesMixin, CreateView):
             logout(request)
 
         return response
+
+    def form_valid(self, form):
+        return FormMessagesMixin.form_valid(self, form)
 
 
 class SolicitacaoDetailView(PermissionRequiredMixin,
@@ -240,6 +247,11 @@ class SolicitacaoMensagemAnexoView(PermissionRequiredMixin, DetailView):
 
     def has_permission(self):
 
+        if self.request.user.is_anonymous() and \
+                self.object.solicitacao.hash_code and\
+                self.kwargs.get('hash', '') == self.object.solicitacao.hash_code:
+            return True
+
         if self.object.solicitacao.owner == self.request.user:
             return True
         elif super().has_permission():
@@ -269,6 +281,11 @@ class SolicitacaoInteractionView(PermissionRequiredMixin, FormView):
 
     def has_permission(self):
 
+        if self.request.user.is_anonymous() and \
+                self.object.hash_code and\
+                self.kwargs.get('hash', '') == self.object.hash_code:
+            return True
+
         if self.object.owner == self.request.user:
             return True
         elif super().has_permission():
@@ -281,12 +298,10 @@ class SolicitacaoInteractionView(PermissionRequiredMixin, FormView):
         return False
 
     def get_initial(self):
-
+        u = self.request.user
         initial = FormView.get_initial(self)
-        initial.update({'owner':
-                        self.request.user})
-        initial.update({'solicitacao':
-                        self.object})
+        initial.update({'owner': None if u.is_anonymous() else u})
+        initial.update({'solicitacao': self.object})
 
         return initial
 
@@ -295,20 +310,24 @@ class SolicitacaoInteractionView(PermissionRequiredMixin, FormView):
         context = FormView.get_context_data(self, **kwargs)
         context['solicitacao'] = self.object
 
-        self.object.notificacoes.filter(
-            user=self.request.user).update(read=True)
-
-        for ms in self.object.mensagemsolicitacao_set.all():
-            ms.notificacoes.filter(
+        if not self.request.user.is_anonymous():
+            self.object.notificacoes.filter(
                 user=self.request.user).update(read=True)
 
+            for ms in self.object.mensagemsolicitacao_set.all():
+                ms.notificacoes.filter(
+                    user=self.request.user).update(read=True)
+
+            context['subnav_template_name'] = 'ouvidoria/subnav_list.yaml'
         context['bg_title'] = opts_bg[self.object.tipo]
-        context['subnav_template_name'] = 'ouvidoria/subnav_list.yaml'
+
         return context
 
     def get_success_url(self):
         return reverse_lazy(
-            'cmj.ouvidoria:solicitacao_interact', kwargs=self.kwargs)
+            'cmj.ouvidoria:solicitacao_interact{}'.format(
+                '_hash' if self.request.user.is_anonymous() else ''
+            ), kwargs=self.kwargs)
 
     def form_valid(self, form):
         self.object = form.save()

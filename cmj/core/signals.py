@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.mail.message import EmailMultiAlternatives
 from django.db.models.signals import post_save
 from django.dispatch.dispatcher import receiver
@@ -10,6 +11,10 @@ from cmj.settings import EMAIL_SEND_USER
 
 def send_mail(subject, email_template_name,
               context, from_email, to_email):
+
+    if settings.DEBUG:
+        print('DEBUG: Envio de notificação', subject, from_email, to_email)
+        return
 
     subject = ''.join(subject.splitlines())
 
