@@ -57,6 +57,7 @@
         </div>
       </div>
     </div>
+
     <div class="row">
       <div class="col-sm-12">
         <div id="div_id_descricao" class="form-group">
@@ -69,6 +70,32 @@
         </div>
       </div>
     </div>
+
+    {% if not solicitacao.onwer %}
+      <div class="row">
+        <div class="col-sm-12">
+          <div id="div_id_notificacoes" class="form-group">
+            <p class="control-label">Essa Denúncia foi encaminhada para os seguintes usuários:</p>
+            <div class="controls">
+              <div class="form-control-static">
+                <ul>
+                  {% for notify in solicitacao.notificacoes.all %}
+                    <li>
+                      {{notify.user}} (<small>{{notify.user.email}}</small>)
+                      {% if notify.read %}
+                          <small>Lida em: {{ notify.modified }}</small>
+                      {% endif %}
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+
   </div>
 
 <div class="container-mensagens">
