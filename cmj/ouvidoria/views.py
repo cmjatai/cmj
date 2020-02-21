@@ -105,7 +105,7 @@ class SolicitacaoDetailView(PermissionRequiredMixin,
                 read=True,
                 modified=timezone.now())
 
-        if self.object.owner:
+        if self.hash_code or self.object.owner:
             return redirect(
                 reverse_lazy('cmj.ouvidoria:solicitacao_interact',
                              kwargs=kwargs))
