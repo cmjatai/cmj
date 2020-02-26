@@ -250,6 +250,15 @@ class NormaCrud(Crud):
                                                  horario_acesso=timezone.now())
             return super().get(request, *args, **kwargs)
 
+        def hook_materia(self, obj):
+
+            return _('Matéria'), '<a href="{}">{}</a>'.format(
+                reverse(
+                    'sapl.materia:materialegislativa_detail',
+                    kwargs={'pk': obj.materia.id}
+                ),
+                obj.materia)
+
     class DeleteView(Crud.DeleteView):
 
         def get_success_url(self):

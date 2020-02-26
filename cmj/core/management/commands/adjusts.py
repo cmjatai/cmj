@@ -1,4 +1,3 @@
-
 from datetime import datetime, timedelta
 import logging
 import os
@@ -85,12 +84,24 @@ class Command(BaseCommand):
         # self.run_ajusta_datas_de_edicao_com_data_doc()
         # self.reset_id_model(TipoDispositivoRelationship)
         # self.delete_itens_tmp_folder()
-        self.run_test_users_permissions()
 
-    def run_test_users_permissions(self):
-        u = get_user_model().objects.filter(email__icontains='livioac').first()
+        self.run_invalida_checkcheck_projeto_com_norma_nao_viculada_a_autografo()
 
-        print(u)
+    def run_invalida_checkcheck_projeto_com_norma_nao_viculada_a_autografo(self):
+        materias = MateriaLegislativa.objects.filter(
+            normajuridica__tipo_id=1,
+            normajuridica__ano__gte=2014
+        ).exclude(
+            normajuridica__norma_relacionada__norma_relacionada__tipo_id=27)
+
+        # print(materias.count())
+        for m in materias:
+            try:
+                m.checkcheck = False
+                m.save()
+            except Exception as e:
+                print(e)
+            # print(m.normajuridica())
 
     def delete_itens_tmp_folder(self):
         list = os.scandir('/home/leandro/desenvolvimento/envs/cmj/tmp/')

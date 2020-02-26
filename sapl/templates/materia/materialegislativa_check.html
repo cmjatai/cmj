@@ -62,13 +62,25 @@
                 {% if not m.normajuridica.veiculo_publicacao %}
                   <br><strong>Diário Oficial não informado.</strong>
                 {% else %}
-                  <br><br>
+                  <br> <strong>Diário Oficial Relacionado: </strong><br>
                   <a href="{% url 'cmj.diarios:diariooficial_detail' m.normajuridica.diariooficial.first.id%}">
                     <small class="text-info">
                       {{m.normajuridica.diariooficial.first}}
                     </small>
                   </a>
                 {% endif %}
+
+                {% if m.autografovinculado_a_normajuridica %}
+                  <br> <strong>Autógrafo Relacionado: </strong><br>
+                  <small class="text-info">
+                    {{m.autografovinculado_a_normajuridica}}
+                  </small
+                {% else %}
+                  <br> <strong>Norma não vinculáda ao Autógrafo</strong>
+
+                {% endif %}
+
+
               {% endif %}
             </td>
           </tr>

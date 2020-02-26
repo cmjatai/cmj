@@ -385,6 +385,15 @@ class MateriaLegislativa(CountPageMixin):
     def normajuridica(self):
         return self.normajuridica_set.exclude(tipo_id=27).first()
 
+    def autografovinculado_a_normajuridica(self):
+        nr = self.normajuridica_set.exclude(
+            tipo_id=27).first().norma_principal.filter(
+                norma_relacionada__tipo_id=27).first()
+
+        if nr:
+            return nr.norma_relacionada
+        return ''
+
 
 @reversion.register()
 class Autoria(models.Model):
