@@ -4,10 +4,12 @@ import re
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.template import RequestContext, loader
 from django.utils import timezone
+from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import TemplateView, UpdateView, ListView
 from django.views.generic.base import RedirectView
@@ -195,17 +197,7 @@ class NormaTaView(IntegracaoTaView):
 class NormaCrud(Crud):
     model = NormaJuridica
     help_topic = 'norma_juridica'
-    public = [RP_LIST, RP_DETAIL]
-
-    class BaseMixin(Crud.BaseMixin):
-        list_field_names = ['tipo', 'numero', 'ano', 'ementa']
-
-        list_url = ''
-
-        @property
-        def search_url(self):
-            namespace = self.model._meta.app_config.name
-            return reverse('%s:%s' % (namespace, 'norma_pesquisa'))
+    public = [RP_DETAIL]
 
     class DetailView(BtnCertMixin, Crud.DetailView):
 
@@ -297,14 +289,57 @@ class NormaCrud(Crud):
 
         layout_key = 'NormaJuridicaCreate'
 
-    class ListView(Crud.ListView, RedirectView):
+    class BaseMixin(Crud.BaseMixin):
+        # 'has_texto_articulado')
+        list_field_names = ('epigrafe', 'ementa')
+        list_url = ''
 
-        def get_redirect_url(self, *args, **kwargs):
+        @property
+        def search_url(self):
+            namespace = self.model._meta.app_config.name
+            return reverse('%s:%s' % (namespace, 'norma_pesquisa'))
+
+    class ListView(Crud.ListView):  # , RedirectView):
+
+        def get_queryset(self):
+            qs = Crud.ListView.get_queryset(self)
+            q = Q(
+                texto_articulado__privacidade=0
+            ) | Q(
+                texto_articulado__isnull=True)
+            qs = qs.exclude(q)
+            return qs.order_by('-texto_articulado__privacidade', '-ano')
+
+        def hook_header_epigrafe(self):
+            return force_text(_('Epigrafe'))
+
+        """def hook_header_has_texto_articulado(self):
+            return force_text(_('Texto Articulado'))
+
+        def hook_has_texto_articulado(self, obj, ss, url):
+
+            return (
+                ('Sim - {}'.format(
+                    obj.texto_articulado.first().privacidade)
+
+                 ) if obj.texto_articulado.exists() else 'Não', url)"""
+
+        def get_context_data(self, **kwargs):
+            context = Crud.ListView.get_context_data(self, **kwargs)
+
+            context['title'] = 'Checagem de Registro das Normas Jurídicas'
+            return context
+
+        @classmethod
+        def get_url_regex(cls):
+            return r'^check$'
+
+        """def get_redirect_url(self, *args, **kwargs):
             namespace = self.model._meta.app_config.name
             return reverse('%s:%s' % (namespace, 'norma_pesquisa'))
 
         def get(self, request, *args, **kwargs):
-            return RedirectView.get(self, request, *args, **kwargs)
+            return RedirectView.get(self, request, *args, **kwargs)"""
 
     class UpdateView(Crud.UpdateView):
         form_class = NormaJuridicaForm

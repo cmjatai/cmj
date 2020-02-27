@@ -419,9 +419,12 @@ class CrudListView(PermissionRequiredContainerCrudMixin, ListView):
                 for f in fn:
                     if not f:
                         continue
-                    f = m._meta.get_field(f)
-                    if hasattr(f, 'related_model') and f.related_model:
-                        m = f.related_model
+                    try:
+                        f = m._meta.get_field(f)
+                        if hasattr(f, 'related_model') and f.related_model:
+                            m = f.related_model
+                    except:
+                        pass
                 if f:
                     hook = 'hook_header_{}'.format(''.join(fn))
                     if hasattr(self, hook):
@@ -429,6 +432,11 @@ class CrudListView(PermissionRequiredContainerCrudMixin, ListView):
                         s.append(header)
                     else:
                         s.append(force_text(f.verbose_name))
+                else:
+                    hook = 'hook_header_{}'.format(''.join(fn))
+                    if hasattr(self, hook):
+                        header = getattr(self, hook)()
+                        s.append(header)
 
             s = ' / '.join(s)
             r.append(s)
@@ -467,18 +475,21 @@ class CrudListView(PermissionRequiredContainerCrudMixin, ListView):
                             break
 
                     ss = ''
-                    if m:
-                        ss = get_field_display(m, n[-1])[1]
-                        ss = (
-                            ('<br>' if '<ul>' in ss else ' - ') + ss)\
-                            if ss and j != 0 and s else ss
-
-                    hook = 'hook_{}'.format(''.join(n))
-                    if hasattr(self, hook):
-                        hs, url = getattr(self, hook)(obj, ss, url)
-                        s += str(hs)
-                    else:
-                        s += ss
+                    try:
+                        if m:
+                            ss = get_field_display(m, n[-1])[1]
+                            ss = (
+                                ('<br>' if '<ul>' in ss else ' - ') + ss)\
+                                if ss and j != 0 and s else ss
+                    except:
+                        pass
+                    finally:
+                        hook = 'hook_{}'.format(''.join(n))
+                        if hasattr(self, hook):
+                            hs, url = getattr(self, hook)(obj, ss, url)
+                            s += str(hs)
+                        else:
+                            s += ss
 
                 r.append((s, url))
         return r

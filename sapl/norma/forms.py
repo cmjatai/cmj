@@ -83,7 +83,7 @@ class NormaFilterSet(django_filters.FilterSet):
         row1 = to_row([('tipo', 4), ('numero', 4), ('ano', 4)])
         row2 = to_row([('ementa', 6), ('assuntos', 6)])
         row3 = to_row([('data', 6), ('data_publicacao', 6)])
-        row4 = to_row([('data_vigencia', 10), ('vigencia', 2)])
+        #row4 = to_row([('data_vigencia', 10), ('vigencia', 2)])
         row5 = to_row([('o', 4), ('indexacao', 4), ('apelido', 4)])
 
         self.form.helper = SaplFormHelper()
@@ -96,7 +96,7 @@ class NormaFilterSet(django_filters.FilterSet):
                 <strong class="text-red">TODOS OS CAMPOS SÃO OPCIONAIS!</strong>
                 </small>
                 '''),
-                row1, row2, row3, row4, row5,
+                row1, row2, row3, row5,  # row4,
                 form_actions(label='Pesquisar'))
         )
 
