@@ -811,7 +811,7 @@ class DocumentoManager(models.Manager):
         qs = self.get_queryset()
         return qs.order_by('ordem')
 
-    def qs_bi(self, user=None):
+    def qs_bi(self, user=None):  # banco de imagens
         self.q_filters()
         return self.qs_docs(user, q_filter=self.q_bi)
 

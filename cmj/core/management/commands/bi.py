@@ -8,7 +8,7 @@ from pdfrw.pdfreader import PdfReader
 
 from cmj.core.models import Bi
 from cmj.diarios.models import DiarioOficial
-from cmj.sigad.models import VersaoDeMidia
+from cmj.sigad.models import VersaoDeMidia, Documento
 from cmj.utils import run_sql
 from sapl.materia.models import MateriaLegislativa
 from sapl.norma.models import NormaJuridica, AnexoNormaJuridica
@@ -31,47 +31,53 @@ class Command(BaseCommand):
         self.run_bi_files()
 
     def run_bi_files(self):
-        reset_errors = False
+        reset_errors_count_page = False
         models = [
             {
                 'model': MateriaLegislativa,
                 'file_field': 'texto_original',
                 'hook': 'run_bi_materias_legislativas',
                 'results': {},
-                'reset_errors': reset_errors
+                'reset_errors_count_page': reset_errors_count_page
             },
             {
                 'model': NormaJuridica,
                 'file_field': 'texto_integral',
                 'hook': 'run_bi_normajuridica',
                 'results': {},
-                'reset_errors': reset_errors
+                'reset_errors_count_page': reset_errors_count_page
             },
             {
                 'model': AnexoNormaJuridica,
                 'file_field': 'anexo_arquivo',
                 'hook': '',
-                'reset_errors': reset_errors
+                'reset_errors_count_page': reset_errors_count_page
             },
             {
                 'model': DocumentoAdministrativo,
                 'file_field': 'texto_integral',
                 'hook': 'run_bi_documentoadministrativo',
                 'results': {},
-                'reset_errors': reset_errors
+                'reset_errors_count_page': reset_errors_count_page
             },
             {
                 'model': DiarioOficial,
                 'file_field': 'arquivo',
                 'hook': 'run_bi_diariooficial',
                 'results': {},
-                'reset_errors': reset_errors
+                'reset_errors_count_page': reset_errors_count_page
             },
             {
                 'model': VersaoDeMidia,
                 'file_field': 'file',
                 'hook': '',
-                'reset_errors': reset_errors
+                'reset_errors_count_page': reset_errors_count_page
+            },
+            {
+                'model': Documento,
+                'hook': 'run_bi_sigad_documento',
+                'reset_errors_count_page': reset_errors_count_page,
+                'results': {},
             },
         ]
 
@@ -79,7 +85,10 @@ class Command(BaseCommand):
             if not mt['hook']:
                 continue
 
-            if mt['reset_errors']:
+            # if mt['hook'] != 'run_bi_sigad_documento':
+            #    continue
+
+            if mt['reset_errors_count_page']:
                 run_sql(
                     '''update {} 
                             set _paginas = 0 
@@ -117,6 +126,43 @@ class Command(BaseCommand):
             # print(e)
         else:
             return count_pages
+
+    def run_bi_sigad_documento(self, mt):
+        docs = Documento.objects.filter(
+            tipo__in=Documento.TDs).order_by('id')
+
+        r = {}
+        for d in docs:
+            if not d.public_date:
+                continue
+            if d.public_date.year in r:
+                r[d.public_date.year].append(d)
+                continue
+            r[d.public_date.year] = [d, ]
+
+        total = 0
+        results = mt['results']
+        for k, v in r.items():
+            if k not in results:
+                results[k] = {}
+
+            for doc in v:
+
+                u = 0
+                if u not in results[k]:
+                    results[k][u] = {}
+
+                ru = results[k][u]
+
+                y = doc.public_date.year
+
+                if doc.tipo not in ru:
+                    ru[doc.tipo] = {}
+
+                if y not in ru[doc.tipo]:
+                    ru[doc.tipo][y] = {'total': 0}
+
+                ru[doc.tipo][y]['total'] += 1
 
     def run_bi_documentoadministrativo(self, mt):
         docs = DocumentoAdministrativo.objects.filter(

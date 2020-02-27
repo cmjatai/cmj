@@ -584,7 +584,8 @@ class BiView(ListView):
                 for model, rm in ru.items():  # rm -> result model
                     for ano, ra in rm.items():  # rm -> result anos
                         g[i.ano]['documentos'] += ra['total']
-                        g[i.ano]['paginas'] += ra['paginas']
+
+                        g[i.ano]['paginas'] += ra.get('paginas', 0)
 
         sum_documentos = 0
         sum_paginas = 0
