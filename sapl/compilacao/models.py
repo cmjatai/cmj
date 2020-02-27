@@ -280,7 +280,7 @@ class TextoArticulado(TimestampedMixin):
              user.has_perm(
                  'compilacao.change_your_dispositivo_edicao_dinamica'))
 
-    def has_view_permission(self, request=None):
+    def has_view_permission(self, request=None, message=True):
         if self.privacidade in (STATUS_TA_IMMUTABLE_PUBLIC, STATUS_TA_PUBLIC):
             return True
 
@@ -300,8 +300,12 @@ class TextoArticulado(TimestampedMixin):
                     'compilacao.change_dispositivo_edicao_dinamica'):
                 return True
             else:
-                messages.error(request, _(
-                    'Este Texto Articulado está em edição.'))
+                if message:
+                    messages.error(
+                        request, _(
+                            'Este Texto Articulado está em edição.'))
+                else:
+                    return None
 
         elif self.privacidade == STATUS_TA_PRIVATE:
             if request.user in self.owners.all():

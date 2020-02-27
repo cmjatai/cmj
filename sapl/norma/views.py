@@ -1,6 +1,7 @@
 import logging
 import re
 
+from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
@@ -188,8 +189,38 @@ class NormaTaView(IntegracaoTaView):
         este get foi implementado para tratar uma prerrogativa externa
         de usuário.
         """
+        from sapl.compilacao.models import STATUS_TA_PUBLIC,\
+            STATUS_TA_IMMUTABLE_PUBLIC
+
         if AppConfig.attr('texto_articulado_norma'):
-            return IntegracaoTaView.get(self, request, *args, **kwargs)
+
+            response = super().get(request, *args, **kwargs)
+
+            perm = self.object.has_view_permission(
+                self.request, message=False)
+
+            if perm is None:
+                messages.error(self.request, _(
+                    '''<strong>O Texto Articulado desta {} está em edição
+                            ou ainda não foi cadastrado.</strong><br>{}
+                        '''.format(
+                        self.object.content_object._meta.verbose_name,
+                        '''
+                            No entanto, sua consulta é possível da forma trivial através
+                            do Arquivo Digitalizado abaixo. 
+                            ''' if self.object.content_object.texto_integral else ''
+                    )))
+
+                co = self.object.content_object
+                return redirect(
+                    reverse('{}:{}_detail'.format(
+                        co._meta.app_config.name,
+                        co._meta.model_name
+                    ),
+                        kwargs={'pk': self.object.object_id})
+                )
+
+            return response
         else:
             return self.get_redirect_deactivated()
 

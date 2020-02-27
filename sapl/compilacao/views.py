@@ -183,7 +183,7 @@ class IntegracaoTaView(TemplateView):
                 item, TextoArticulado._meta.verbose_name))
             return redirect('/message')
 
-        ta = TextoArticulado.update_or_create(self, item)
+        self.object = ta = TextoArticulado.update_or_create(self, item)
 
         if not ta_exists:
             if ta.editable_only_by_owners and\
@@ -884,6 +884,34 @@ class TextView(CompMixin, ListView):
     def has_permission(self):
         self.object = self.ta
         return self.object.has_view_permission(self.request)
+
+    def dispatch(self, request, *args, **kwargs):
+
+        self.object = self.ta
+        perm = self.object.has_view_permission(self.request, message=False)
+
+        if perm is None:
+            messages.error(self.request, _(
+                '''<strong>O Texto Articulado desta {} está em edição
+                        ou ainda não foi cadastrado.</strong><br>{}
+                    '''.format(
+                    self.object.content_object._meta.verbose_name,
+                    '''
+                        No entanto, sua consulta é possível da forma trivial através
+                        do Arquivo Digitalizado abaixo. 
+                        ''' if self.object.content_object.texto_integral else ''
+                )))
+
+            co = self.object.content_object
+            return redirect(
+                reverse('{}:{}_detail'.format(
+                    co._meta.app_config.name,
+                    co._meta.model_name
+                ),
+                    kwargs={'pk': self.object.object_id})
+            )
+
+        return CompMixin.dispatch(self, request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
         if 'print' in request.GET:

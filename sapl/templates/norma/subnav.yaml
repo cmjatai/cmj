@@ -14,7 +14,7 @@
 #   e a view NormaTaView(IntegracaoTaView) em views.py
 #  Em nada mais a integração interfere em NormaJuridica
 
-{% if 'texto_articulado_norma'|get_config_attr and object.texto_articulado.exists %}
+{% if 'texto_articulado_norma'|get_config_attr and object.texto_articulado.exists and object.texto_articulado.first.privacidade == 0 or perms.compilacao.change_dispositivo_edicao_dinamica%}
 - title: {% trans 'Texto Articulado' %}
   url: norma_ta
 {% endif %}
