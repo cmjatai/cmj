@@ -21,7 +21,7 @@
               <td><a href="?check={{m.id}}">Check</a></td>
             {% endif %}
             <td width="35%">
-              <a href="{% url 'sapl.materia:materialegislativa_detail' m.id %}">{{m}}</a>
+              <a id="{{m.id}}" href="{% url 'sapl.materia:materialegislativa_detail' m.id %}">{{m}}</a>
               <small>
                 <br><strong>Data de Apresentação:</strong> {{m.data_apresentacao}}
               </small>
