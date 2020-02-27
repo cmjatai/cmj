@@ -308,7 +308,7 @@ class NormaCrud(Crud):
             ) | Q(
                 texto_articulado__isnull=True)
             qs = qs.exclude(q)
-            return qs.order_by('-texto_articulado__privacidade', '-ano')
+            return qs.order_by('-texto_articulado__privacidade', '-ano', '-numero')
 
         def hook_header_epigrafe(self):
             return force_text(_('Epigrafe'))
