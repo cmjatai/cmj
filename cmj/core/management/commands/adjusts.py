@@ -85,7 +85,11 @@ class Command(BaseCommand):
         # self.reset_id_model(TipoDispositivoRelationship)
         # self.delete_itens_tmp_folder()
 
-        self.run_invalida_checkcheck_projeto_com_norma_nao_viculada_a_autografo()
+        self.run_checkcheck_olds()
+
+    def run_checkcheck_olds(self):
+        MateriaLegislativa.objects.filter(
+            ano__lte=2012).update(checkcheck=True)
 
     def run_invalida_checkcheck_projeto_com_norma_nao_viculada_a_autografo(self):
         materias = MateriaLegislativa.objects.filter(
