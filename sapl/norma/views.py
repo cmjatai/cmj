@@ -251,13 +251,15 @@ class NormaCrud(Crud):
             return super().get(request, *args, **kwargs)
 
         def hook_materia(self, obj):
-
-            return _('Matéria'), '<a href="{}">{}</a>'.format(
-                reverse(
-                    'sapl.materia:materialegislativa_detail',
-                    kwargs={'pk': obj.materia.id}
-                ),
-                obj.materia)
+            if obj.materia:
+                return _('Matéria'), '<a href="{}">{}</a>'.format(
+                    reverse(
+                        'sapl.materia:materialegislativa_detail',
+                        kwargs={'pk': obj.materia.id}
+                    ),
+                    obj.materia)
+            else:
+                return _('Matéria'), ''
 
     class DeleteView(Crud.DeleteView):
 
