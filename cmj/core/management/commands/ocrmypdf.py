@@ -178,11 +178,11 @@ class Command(BaseCommand):
 
         init = datetime.now()
 
-        # primeira execução depende do crontab executado em:
+        # execução depende do crontab executado em:
         # 1,9,18,27,36,45,54 0-22 * * * djangoapps
         # /storage1/django-apps/cmj/run__commands__9min.sh
 
-        primeira_exec_da_hora_atual = init.minute < 9
+        exec_docs_antigos = init.hour < 8
 
         # Refaz tudo que foi feito a mais de dois anos
 
@@ -216,9 +216,9 @@ class Command(BaseCommand):
                     **params).order_by(model['order_by'])
 
                 # se não existir nenhum registro pra processar do último ano
-                # ou ano atual para processar, e a execução é a primeira
-                # da hora atual então faz do passado.
-                if primeira_exec_da_hora_atual and not items.exists():
+                # ou ano atual, e a execução é de madrugada,
+                # então faz do passado.
+                if exec_docs_antigos and not items.exists():
                     items = model['model'].objects.order_by(model['order_by'])
 
                 for item in items:
