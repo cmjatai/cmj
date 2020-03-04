@@ -178,6 +178,12 @@ class Command(BaseCommand):
 
         init = datetime.now()
 
+        # primeira execução depende do crontab executado em:
+        # 1,9,18,27,36,45,54 0-22 * * * djangoapps
+        # /storage1/django-apps/cmj/run__commands__9min.sh
+
+        primeira_exec_da_hora_atual = init.minute < 9
+
         # Refaz tudo que foi feito a mais de dois anos
 
         OcrMyPDF.objects.filter(
@@ -199,9 +205,27 @@ class Command(BaseCommand):
             for model in self.models:
                 ct = ContentType.objects.get_for_model(model['model'])
                 count = 0
-                for item in model['model'].objects.order_by(model['order_by']):
+
+                data_field = model['order_by'][
+                    1 if model['order_by'].startswith('-') else 0:]
+
+                params = {
+                    '{}__year__gte'.format(data_field): init.year - 1
+                }
+                items = model['model'].objects.filter(
+                    **params).order_by(model['order_by'])
+
+                # se não existir nenhum registro pra processar do último ano
+                # ou ano atual para processar, e a execução é a primeira
+                # da hora atual então faz do passado.
+                if primeira_exec_da_hora_atual and not items.exists():
+                    items = model['model'].objects.order_by(model['order_by'])
+
+                for item in items:
+
                     if count >= model['count_base']:
                         break
+
                     for ff in model['file_field']:
                         ocr = OcrMyPDF.objects.filter(
                             content_type=ct,
