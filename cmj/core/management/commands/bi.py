@@ -83,7 +83,7 @@ class Command(BaseCommand):
             },
         ]
 
-        Bi.objects.all().delete()
+        # Bi.objects.all().delete()
 
         for mt in models:  # mt = metadata
             if not mt['hook']:
