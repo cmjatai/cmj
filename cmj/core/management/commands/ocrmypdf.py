@@ -194,6 +194,9 @@ class Command(BaseCommand):
             created__lt=init - timedelta(days=30),
             sucesso=False).delete()
 
+        # OcrMyPDF.objects.filter(
+        #    object_id=xxxx).delete()
+
         """if settings.DEBUG:
             OcrMyPDF.objects.all().delete()"""
 
@@ -281,8 +284,10 @@ class Command(BaseCommand):
                                 o.save()
                                 now = datetime.now()
 
-                                # if result:
-                                #    item.save()
+                                if result:
+                                    post_save.send(
+                                        model['model'],
+                                        instance=item, using='default')
 
                                 self.logger.info(
                                     str(now - init) + ' ' +

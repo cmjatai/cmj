@@ -100,10 +100,18 @@
           {% if result.object %}
             <tr>
               <td class="item-listas">  
+              
                 <div class="item-raiz">
+
                 <div class="verbose_name">
                   {% if not result.model_name == 'documento' %}{{result.verbose_name}}{%else%}Notícias{% endif %}                  
                 </div>
+
+                {% if user.is_superuser %}
+                  <div class="parent-right">
+                    {{ result.text|length }} 
+                  </div>
+                {% endif %}
 
                 {% if result.model_name == 'materialegislativa' %}
                   {% with result.object as m %}
