@@ -16,7 +16,7 @@
           </h3>
           <div class="inner">
             <div class="ly">
-              {% for ano, value in global.items %}
+              {% for ano, value in global %}
                 <span class="ly-item p-row">
                 {{ano}}
                 </span>
@@ -24,7 +24,7 @@
             </div>            
             
             <div class="ly2">
-              {% for ano, value in global.items %}
+              {% for ano, value in global %}
                 <span class="ly-item p-row">
                 {{ano}}
                 </span>
@@ -32,7 +32,7 @@
             </div>
 
             <div class="ly3">
-              {% for ano, value in global.items %}
+              {% for ano, value in global %}
                 <span class="ly-item p-row">
                 {{ano}}
                 </span>
@@ -40,7 +40,7 @@
             </div>
 
             <div class="graph">
-              {% for ano, value in global.items %}
+              {% for ano, value in global %}
                 <div class="group-row">
                   <div class="g-row">
                     <span class="d-inline-block bg-green" style="width: {{value.largura.documentos|stringformat:'f'}}%;">
@@ -59,7 +59,7 @@
               {% endfor %}
             </div>   
             <div class="graph2">
-              {% for ano, value in global.items %}
+              {% for ano, value in global %}
                 <div class="group-row">
                   <div class="g-row">
                     <span class="d-inline-block bg-yellow" style="width: {{value.largura.paginas|stringformat:'f'}}%;">
@@ -78,7 +78,7 @@
               {% endfor %}
             </div>  
             <div class="graph3">
-              {% for ano, value in global.items %}
+              {% for ano, value in global %}
                 <div class="group-row">
                   <div class="g-row">
                     <span class="d-inline-block bg-fuchsia" style="width: {{value.largura.tramitacao|stringformat:'f'}}%;">

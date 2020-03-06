@@ -1,5 +1,6 @@
 
 from builtins import property
+import collections
 import json
 
 from django.conf import settings
@@ -576,16 +577,11 @@ class BiView(ListView):
 
             for user, ru in results.items():  # ru -> result user
 
-                if not isinstance(ru, dict):
-                    if user == 'tramitacao':
-                        g[i.ano]['tramitacao'] += ru
-                    continue
-
                 for model, rm in ru.items():  # rm -> result model
                     for ano, ra in rm.items():  # rm -> result anos
-                        g[i.ano]['documentos'] += ra['total']
-
+                        g[i.ano]['documentos'] += ra.get('total', 0)
                         g[i.ano]['paginas'] += ra.get('paginas', 0)
+                        g[i.ano]['tramitacao'] += ra.get('tramitacao', 0)
 
         sum_documentos = 0
         sum_paginas = 0
@@ -620,4 +616,8 @@ class BiView(ListView):
                 'paginas': (v['paginas'] * (100 / per_p_max)) if per_p_max else 0,
                 'tramitacao': (v['tramitacao'] * (100 / per_t_max)) if per_t_max else 0
             }
+
+        g = list(g.items())
+        g.sort(key=lambda row: row[0])
+        g.reverse()
         return g

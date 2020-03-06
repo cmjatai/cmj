@@ -8,7 +8,7 @@ from pdfrw.pdfreader import PdfReader
 
 from cmj.core.models import Bi
 from cmj.diarios.models import DiarioOficial
-from cmj.sigad.models import VersaoDeMidia, Documento
+from cmj.sigad.models import VersaoDeMidia, Documento, Midia
 from cmj.utils import run_sql
 from sapl.materia.models import MateriaLegislativa
 from sapl.norma.models import NormaJuridica, AnexoNormaJuridica
@@ -70,8 +70,10 @@ class Command(BaseCommand):
             {
                 'model': VersaoDeMidia,
                 'file_field': 'file',
-                'hook': '',
-                'reset_errors_count_page': reset_errors_count_page
+                'hook': 'run_bi_midias_imagens',
+                'results': {},
+                'reset_errors_count_page': reset_errors_count_page,
+                'sum_globals': False
             },
             {
                 'model': Documento,
@@ -81,11 +83,13 @@ class Command(BaseCommand):
             },
         ]
 
+        Bi.objects.all().delete()
+
         for mt in models:  # mt = metadata
             if not mt['hook']:
                 continue
 
-            # if mt['hook'] != 'run_bi_sigad_documento':
+            # if mt['hook'] != 'run_bi_midias_imagens':
             #    continue
 
             if mt['reset_errors_count_page']:
@@ -126,6 +130,43 @@ class Command(BaseCommand):
             # print(e)
         else:
             return count_pages
+
+    def run_bi_midias_imagens(self, mt):
+        midias = Midia.objects.filter(
+            documento__tipo=Documento.TPD_IMAGE).order_by('id')
+
+        r = {}
+        for m in midias:
+            if not m.documento.created:
+                continue
+            if m.documento.created.year in r:
+                r[m.documento.created.year].append(m)
+                continue
+            r[m.documento.created.year] = [m, ]
+
+        total = 0
+        results = mt['results']
+        for k, v in r.items():
+            if k not in results:
+                results[k] = {}
+
+            for m in v:
+
+                u = 0
+                if u not in results[k]:
+                    results[k][u] = {}
+
+                ru = results[k][u]
+
+                y = m.documento.created.year
+
+                if m.documento.tipo not in ru:
+                    ru[m.documento.tipo] = {}
+
+                if y not in ru[m.documento.tipo]:
+                    ru[m.documento.tipo][y] = {'count': 0}
+
+                ru[m.documento.tipo][y]['count'] += 1
 
     def run_bi_sigad_documento(self, mt):
         docs = Documento.objects.filter(
@@ -183,12 +224,9 @@ class Command(BaseCommand):
         for k, v in r.items():  # ano, lista de materias cadastradas no ano
             if k not in results:
                 results[k] = {}
-                results[k]['tramitacao'] = 0
+                #results[k]['tramitacao'] = 0
 
             for doc in v:
-
-                if doc.tramitacaoadministrativo_set.exists():
-                    results[k]['tramitacao'] += doc.tramitacaoadministrativo_set.count()
 
                 u = 0
                 if u not in results[k]:
@@ -200,12 +238,19 @@ class Command(BaseCommand):
 
                 if doc.ano not in ru['documentoadministrativo']:
                     ru['documentoadministrativo'][doc.ano] = {
-                        'total': 0, 'paginas': 0, 'ep': []}
+                        'total': 0,
+                        'tramitacao': 0,
+                        'paginas': 0,
+                        'ep': []
+                    }
+
                 ru['documentoadministrativo'][doc.ano]['total'] += 1
+                ru['documentoadministrativo'][doc.ano]['tramitacao'] += doc.tramitacaoadministrativo_set.count()
 
                 if doc.ano not in ru['documentoacessorioadministrativo']:
                     ru['documentoacessorioadministrativo'][doc.ano] = {
-                        'total': 0, 'paginas': 0, 'ep': []}
+                        'total': 0, 'paginas': 0, 'ep': []
+                    }
 
                 if doc.documentoacessorioadministrativo_set.exists():
                     ru['documentoacessorioadministrativo'][doc.ano]['total'] += doc.documentoacessorioadministrativo_set.count()
@@ -240,12 +285,8 @@ class Command(BaseCommand):
         for k, v in r.items():  # ano, lista de materias cadastradas no ano
             if k not in results:
                 results[k] = {}
-                results[k]['tramitacao'] = 0
 
             for materia in v:
-
-                if materia.tramitacao_set.exists():
-                    results[k]['tramitacao'] += materia.tramitacao_set.count()
 
                 u = materia.user_id if materia.ano == 2020 else (
                     materia.user_id if materia.user_id else 0)
@@ -258,8 +299,14 @@ class Command(BaseCommand):
 
                 if materia.ano not in ru['materialegislativa']:
                     ru['materialegislativa'][materia.ano] = {
-                        'total': 0, 'paginas': 0, 'ep': []}
+                        'total': 0,
+                        'paginas': 0,
+                        'tramitacao': 0,
+                        'ep': []
+                    }
+
                 ru['materialegislativa'][materia.ano]['total'] += 1
+                ru['materialegislativa'][materia.ano]['tramitacao'] += materia.tramitacao_set.count()
 
                 if materia.ano not in ru['documentoacessorio']:
                     ru['documentoacessorio'][materia.ano] = {

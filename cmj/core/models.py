@@ -848,7 +848,7 @@ class Bi(models.Model):
     class Meta:
         verbose_name = _('Bi')
         verbose_name_plural = _('Bi')
-        ordering = ('-ano', 'content_type', )
+        ordering = ('-id', '-ano', 'content_type', )
         unique_together = (("ano", "content_type"),)
 
 
