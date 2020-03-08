@@ -158,25 +158,55 @@
 }
 
 .bi-app {
+  padding-top: 1em;
   background: $hover_background_10p $url_bg_png;
-  h2 {
-    line-height: 2;
-    margin: 0;
-  }
-
   .container-bi {
     padding: 1em;
-    margin-bottom: 3em;
+    margin-bottom: 1em;
     background-color: white;
     //border-bottom: 1px solid #ccc;
-    border-radius: 5px;
-    box-shadow: 0px 6px 5px rgba(0, 0, 0, 0.06), 0px 2px 6px rgba(0, 0, 0, 0.23);
+    //border-radius: 5px;
+    //box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.06), 0px 2px 6px rgba(0, 0, 0, 0.23);
   }
 
   .bi-footer {
     padding-top: 1em;
+    display: none;
   }
 
+  .container-bi-global {
+    .inner { 
+      background-color: white;
+      padding: 5px;
+      text-align: center;
+      height: 100%;
+      .key {
+        //white-space: nowrap;
+        font-size: 0.9em;
+        color: #777;
+      }
+      .value {
+        font-size: 1.5em;
+        font-family: Lato, Helvetica, sans-serif;
+        color: #004c40;
+        font-weight: bold;
+        padding: 0.5em 0;
+      }
+    }
+    .col {
+      padding-right: 5px;
+      padding-left: 5px;
+      margin-bottom: 10px; 
+    }
+    .row {
+      padding: 0 10px;
+      align-items: stretch;
+    }
+  }
+
+  .legend {
+    border-bottom: 1px solid green;
+  }
   .bi-graph {
 
     .inner {      
@@ -208,9 +238,6 @@
     .ly3 {
       grid-area: ly3;
       display: none;
-    }
-    .legend {
-      border-bottom: 1px solid green;
     }
     .graph {
       grid-area: graph;

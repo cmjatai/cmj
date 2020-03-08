@@ -5,18 +5,36 @@
 
 {% block content_container %}
   <div class="container-fluid bi-app">
-    <div class="container">
+    
+    <div class="container-bi-global">
+      <h2 class="legend">           
+            Portal CMJ em números
+      </h2>
+      <div class="row justify-content-between">
+        {% for key, value in global %}
+          <div class="col">
+            <div class="inner">
+              <div class="value text-{{value.color}}">
+              {{value.count}}
+              </div>
+              <div class="key">
+                {{key}}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
     <div class="row">
       <div class="col">
-        <h2>Atividades no Portal CMJ</h2>
-
         <div class="container-bi bi-graph bi-graph-barra-horizontal">
           <h3 class="legend">           
                 Atividades Anuais
           </h3>
           <div class="inner">
             <div class="ly">
-              {% for ano, value in global %}
+              {% for ano, value in producao_anual %}
                 <span class="ly-item p-row">
                 {{ano}}
                 </span>
@@ -24,7 +42,7 @@
             </div>            
             
             <div class="ly2">
-              {% for ano, value in global %}
+              {% for ano, value in producao_anual %}
                 <span class="ly-item p-row">
                 {{ano}}
                 </span>
@@ -32,7 +50,7 @@
             </div>
 
             <div class="ly3">
-              {% for ano, value in global %}
+              {% for ano, value in producao_anual %}
                 <span class="ly-item p-row">
                 {{ano}}
                 </span>
@@ -40,7 +58,7 @@
             </div>
 
             <div class="graph">
-              {% for ano, value in global %}
+              {% for ano, value in producao_anual %}
                 <div class="group-row">
                   <div class="g-row">
                     <span class="d-inline-block bg-green" style="width: {{value.largura.documentos|stringformat:'f'}}%;">
@@ -59,7 +77,7 @@
               {% endfor %}
             </div>   
             <div class="graph2">
-              {% for ano, value in global %}
+              {% for ano, value in producao_anual %}
                 <div class="group-row">
                   <div class="g-row">
                     <span class="d-inline-block bg-yellow" style="width: {{value.largura.paginas|stringformat:'f'}}%;">
@@ -78,7 +96,7 @@
               {% endfor %}
             </div>  
             <div class="graph3">
-              {% for ano, value in global %}
+              {% for ano, value in producao_anual %}
                 <div class="group-row">
                   <div class="g-row">
                     <span class="d-inline-block bg-fuchsia" style="width: {{value.largura.tramitacao|stringformat:'f'}}%;">
@@ -127,5 +145,4 @@
       </div>
     </div>
   </div>
-</div>
 {% endblock %}

@@ -2,6 +2,7 @@
 from builtins import property
 import collections
 import json
+import re
 
 from django.conf import settings
 from django.conf.locale import ru
@@ -557,17 +558,50 @@ class BiView(ListView):
         context = ListView.get_context_data(self, **kwargs)
 
         context['global'] = self.get_global()
+        context['producao_anual'] = self.get_producao_anual()
 
         return context
 
     def get_global(self):
         qs = self.get_queryset()
 
-        g = {}
+        g = {'Páginas Digitalizadas': {
+            'count': 0,
+            'color': ''
+        }}
 
         for i in qs:
-            if i.ano not in g:
-                g[i.ano] = {
+
+            results = i.results
+
+            for user, ru in results.items():  # ru -> result user
+
+                for model, rm in ru.items():  # rm -> result model
+                    if model not in g:
+                        g[model] = {
+                            'count': 0,
+                            'color': re.sub('\s', '', normalize(model.lower()))
+                        }
+                    for ano, ra in rm.items():  # rm -> result anos
+                        try:
+                            g[model]['count'] += ra.get('total',
+                                                        ra.get('count', 0))
+                            g['Páginas Digitalizadas']['count'] += ra.get(
+                                'paginas', 0)
+                        except Exception as e:
+                            print(ra)
+
+        g = filter(lambda x: x[1]['count'] > 500, g.items())
+        return g
+
+    def get_producao_anual(self):
+        qs = self.get_queryset()
+
+        pa = {}
+
+        for i in qs:
+            if i.ano not in pa:
+                pa[i.ano] = {
                     'documentos': 0,
                     'paginas': 0,
                     'tramitacao': 0
@@ -579,14 +613,14 @@ class BiView(ListView):
 
                 for model, rm in ru.items():  # rm -> result model
                     for ano, ra in rm.items():  # rm -> result anos
-                        g[i.ano]['documentos'] += ra.get('total', 0)
-                        g[i.ano]['paginas'] += ra.get('paginas', 0)
-                        g[i.ano]['tramitacao'] += ra.get('tramitacao', 0)
+                        pa[i.ano]['documentos'] += ra.get('total', 0)
+                        pa[i.ano]['paginas'] += ra.get('paginas', 0)
+                        pa[i.ano]['tramitacao'] += ra.get('tramitacao', 0)
 
         sum_documentos = 0
         sum_paginas = 0
         sum_tramitacao = 0
-        for k, v in g.items():
+        for k, v in pa.items():
             sum_documentos += v['documentos']
             sum_paginas += v['paginas']
             sum_tramitacao += v['tramitacao']
@@ -594,7 +628,7 @@ class BiView(ListView):
         per_d_max = 0
         per_p_max = 0
         per_t_max = 0
-        for k, v in g.items():
+        for k, v in pa.items():
             v['largura'] = {
                 'documentos': v['documentos'] / sum_documentos * 100,
                 'paginas': v['paginas'] / sum_paginas * 100,
@@ -610,14 +644,14 @@ class BiView(ListView):
             if v['tramitacao'] > per_t_max:
                 per_t_max = v['tramitacao']
 
-        for k, v in g.items():
+        for k, v in pa.items():
             v['largura'] = {
                 'documentos': (v['documentos'] * (100 / per_d_max)) if per_d_max else 0,
                 'paginas': (v['paginas'] * (100 / per_p_max)) if per_p_max else 0,
                 'tramitacao': (v['tramitacao'] * (100 / per_t_max)) if per_t_max else 0
             }
 
-        g = list(g.items())
-        g.sort(key=lambda row: row[0])
-        g.reverse()
-        return g
+        pa = list(pa.items())
+        pa.sort(key=lambda row: row[0])
+        pa.reverse()
+        return pa

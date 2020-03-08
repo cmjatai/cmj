@@ -268,7 +268,7 @@ class CMSMixin(models.Model):
 
     tipo_parte_doc = {
         'documentos': CmjChoices(
-            (TD_NEWS, 'td_news', _('Notícia')),
+            (TD_NEWS, 'td_news', _('Notícias')),
             (TD_DOC, 'td_doc', _('Documento')),
             (TD_BI, 'td_bi', _('Banco de Imagem')),
             (TD_GALERIA_PUBLICA, 'td_galeria_publica', _('Galeria Pública')),

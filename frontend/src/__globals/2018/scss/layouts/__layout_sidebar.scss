@@ -120,16 +120,16 @@ $fator-xl: 1.06;
 
       }
       &.box-search:hover {
-        background: #fff3 !important;
+        background: #fff3 !important; 
       }
       &.box-parlamentares:hover {
-        background: #004c40 !important;
+        background: $color_parlamentar !important;
       }
       &.box-documento-administrativo:hover {
-        background: #00c0eeaa !important;
+        background: $color_documentoadministrativo !important;
       }
       &.box-norma:hover{
-        background: #00a65aaa  !important;
+        background: $color_normajuridica !important;
         ul {
           background: #00a65a;
         }
@@ -146,19 +146,19 @@ $fator-xl: 1.06;
         }
       }
       &.box-sessao:hover{
-        background: #f39c12aa !important;
+        background: $color_sessaoplenaria !important;
       }
       &.box-materia:hover{
-        background: #f56954aa !important;
+        background: $color_materialegislativa !important;
       }
       &.box-diario-oficial:hover {
-        background: #85144baa !important;
+        background: $color_diariooficial !important;
       }
       &.box-comissao:hover {
-        background: #f012beaa !important;
+        background: $color_comissao !important;
       }
       &.box-transparencia:hover {
-        background: #932ab6aa !important;
+        background: $color_transparencia !important;
       }
 
       & > .inner {
