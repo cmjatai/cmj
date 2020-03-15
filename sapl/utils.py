@@ -259,6 +259,7 @@ class PortalFieldFile(FieldFile):
             del self.file
 
         original_name = self.name.replace('sapl/', 'original__sapl/')
+        original_name = original_name.replace('cmj/', 'original__cmj/')
         self.storage.delete(self.name)
         self.storage.delete(original_name)
 

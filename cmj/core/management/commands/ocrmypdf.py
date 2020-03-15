@@ -107,49 +107,56 @@ class Command(BaseCommand):
             'file_field': ('texto_integral',),
             'count': 0,
             'count_base': 9,
-            'order_by': '-data'
+            'order_by': '-data',
+            'years_priority': 20
         },
         {
             'model': DocumentoAcessorioAdministrativo,
             'file_field': ('arquivo',),
             'count': 0,
             'count_base': 2,
-            'order_by': '-data'
+            'order_by': '-data',
+            'years_priority': 20
         },
         {
             'model': NormaJuridica,
             'file_field': ('texto_integral',),
             'count': 0,
             'count_base': 2,
-            'order_by': '-data'
+            'order_by': '-data',
+            'years_priority': 20
         },
         {
             'model': DocumentoAcessorio,
             'file_field': ('arquivo',),
             'count': 0,
             'count_base': 2,
-            'order_by': '-data'
+            'order_by': '-data',
+            'years_priority': 20
         },
         {
             'model': DiarioOficial,
             'file_field': ('arquivo',),
             'count': 0,
             'count_base': 2,
-            'order_by': '-data'
+            'order_by': '-data',
+            'years_priority': 20
         },
         {
             'model': SessaoPlenaria,
             'file_field': ('upload_pauta', 'upload_ata', 'upload_anexo'),
             'count': 0,
             'count_base': 2,
-            'order_by': '-data_inicio'
+            'order_by': '-data_inicio',
+            'years_priority': 20
         },
         {
             'model': MateriaLegislativa,
             'file_field': ('texto_original',),
             'count': 0,
             'count_base': 2,
-            'order_by': '-data_apresentacao'
+            'order_by': '-data_apresentacao',
+            'years_priority': 20
         },
 
     ]
@@ -213,7 +220,7 @@ class Command(BaseCommand):
                     1 if model['order_by'].startswith('-') else 0:]
 
                 params = {
-                    '{}__year__gte'.format(data_field): init.year - 1
+                    '{}__year__gte'.format(data_field): init.year - model['years_priority']
                 }
                 items = model['model'].objects.filter(
                     **params).order_by(model['order_by'])
@@ -317,10 +324,15 @@ class Command(BaseCommand):
         # cmd = ["ocrmypdf",  "--deskew",  "-l por", file.path, file.path]
 
         o_path = file.path.replace('media/sapl/', 'media/original__sapl/')
+        o_path = o_path.replace('media/cmj/', 'media/original__cmj/')
         print(o_path)
         print(file.path)
 
-        cmd = ["ocrmypdf", "--deskew", "-l por", o_path, file.path]
+        cmd = ["ocrmypdf",
+               "--deskew",
+               "-l por",
+               "--output-type pdfa-1",
+               o_path, file.path]
 
         try:
             p = ProcessOCR(' '.join(cmd), self.logger)

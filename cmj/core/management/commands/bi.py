@@ -74,8 +74,7 @@ class Command(BaseCommand):
                 'file_field': 'file',
                 'hook': 'run_bi_midias_imagens',
                 'results': {},
-                'reset_errors_count_page': reset_errors_count_page,
-                'sum_globals': False
+                'reset_errors_count_page': reset_errors_count_page
             },
             {
                 'model': Documento,
