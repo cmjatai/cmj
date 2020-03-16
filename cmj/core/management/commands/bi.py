@@ -96,8 +96,8 @@ class Command(BaseCommand):
             if not mt['hook']:
                 continue
 
-            if mt['hook'] != 'run_bi_tramitacao':
-                continue
+            # if mt['hook'] != 'run_bi_tramitacao':
+            #    continue
 
             if mt['reset_errors_count_page']:
                 run_sql(
