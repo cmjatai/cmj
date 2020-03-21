@@ -17,7 +17,7 @@
     
       {% block webpack_loader_css %}
         {% render_chunk_vendors 'css' %}
-        {% render_bundle  'global' 'css' %}
+        {% render_bundle  'app' 'css' %}
         {% render_bundle  'painel' 'css' %}
       {% endblock webpack_loader_css %}
 
@@ -127,7 +127,7 @@
 
   {% block webpack_loader_js %}
     {% render_chunk_vendors 'js' %}
-    {% render_bundle  'global' 'js' %}  
+    {% render_bundle  'app' 'js' %}  
     {% render_bundle  'painel' 'js' %}      
   {% endblock webpack_loader_js %}
 
