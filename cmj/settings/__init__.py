@@ -24,6 +24,7 @@ config = AutoConfig()
 
 BASE_DIR = Path(__file__).ancestor(2)
 PROJECT_DIR = Path(__file__).ancestor(3)
+FONTS_DIR = Path(__file__).ancestor(3).child('fonts')
 
 SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
@@ -54,7 +55,7 @@ DATABASES = {
 SAPL_VERSION = 'master'
 
 SITE_URL = 'https://www.jatai.go.leg.br'
-#if DEBUG:
+# if DEBUG:
 #    SITE_URL = ''
 
 HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.BaseSignalProcessor'  # Disable auto index

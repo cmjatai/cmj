@@ -6,12 +6,22 @@ import stat
 import subprocess
 import time
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 from django.db import connection
 from django.db.models import F, Q
 from django.db.models.signals import post_delete, post_save
 from django.utils import timezone
+import fitz
+from fpdf.fpdf import FPDF
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import mm
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfgen import canvas
+from reportlab.platypus.paragraph import Paragraph
 
 from cmj.core.models import OcrMyPDF, CertidaoPublicacao
 from sapl.compilacao.models import Dispositivo,\
@@ -85,7 +95,49 @@ class Command(BaseCommand):
         # self.reset_id_model(TipoDispositivoRelationship)
         # self.delete_itens_tmp_folder()
 
-        self.run_checkcheck_olds()
+        # self.run_checkcheck_olds()
+
+        self.run_insert_font_pdf_file__test3()
+
+    def run_insert_font_pdf_file__test3(self):
+        ifile = '/home/leandro/TEMP/4084__com_fonte__.pdf'
+        pdf = fitz.open(ifile)
+
+        for p in pdf:
+            fl = p.getFontList()
+            for f in fl:
+                print(f)
+
+    def run_insert_font_pdf_file__test2(self):
+        helvetica_font = settings.FONTS_DIR.child('Helvetica.ttf')
+
+        ifile = '/home/leandro/TEMP/4084.pdf'
+
+        style = getSampleStyleSheet()
+        width, height = A4
+        c = canvas.Canvas(ofile, pagesize=A4)
+        pdfmetrics.registerFont(TTFont("Helvetica", helvetica_font))
+
+        cmj_string = '<font name="Helvetica" size="16">%s</font>'
+        cmj_string = cmj_string % "CMJ DOC"
+
+        p = Paragraph(cmj_string, style=style["Normal"])
+        p.wrapOn(c, width, height)
+        p.drawOn(c, 20, 750, mm)
+
+        c.save()
+
+    def run_insert_font_pdf_file__test1(self):
+        helvetica_font = settings.FONTS_DIR.child('Helvetica.ttf')
+
+        ifile = '/home/leandro/TEMP/4084.pdf'
+        ofile = '/home/leandro/TEMP/4084__com_fonte.pdf'
+
+        ppdf = FPDF()
+        ppdf.add_font('helvetica', style='', fname=helvetica_font, uni=True)
+
+        ppdf.set_font('helvetica')
+        ppdf.output(ofile, 'F')
 
     def run_checkcheck_olds(self):
         MateriaLegislativa.objects.filter(

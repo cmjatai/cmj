@@ -584,6 +584,8 @@ class CrudListView(PermissionRequiredContainerCrudMixin, ListView):
                     ordering = ()
                     model = self.model
                     for fo in fields_for_ordering:
+                        if not fo:
+                            continue
 
                         fm = None
                         try:
@@ -616,10 +618,12 @@ class CrudListView(PermissionRequiredContainerCrudMixin, ListView):
                         for mo in model_ordering:
                             if mo not in ordering:
                                 ordering = ordering + (mo, )
+
                     queryset = queryset.order_by(*ordering)
 
                     # print(ordering)
                 except Exception as e:
+                    logger.error(self.request)
                     logger.error(string_concat(_(
                         'ERRO: construção da tupla de ordenação.'), str(e)))
 
