@@ -12,9 +12,7 @@
 
     <materia-pauta :materia="materia" :type="type"></materia-pauta>
 
-    <div :class="['item-body']">
-
-    </div>
+    <div :class="['item-body']"></div>
 
     <div :class="['item-body', materia.id !== undefined && materia.anexadas.length > 0 ? 'col-anexadas':'']">
       <div class="col-1-body">
@@ -364,7 +362,6 @@ export default {
     top: 0;
     right: 0;
     display: inline-block;
-    min-height: 15px;
     margin-left: -15px;
     padding: 5px;
     font-weight: bold;
@@ -462,9 +459,19 @@ export default {
   }
 }
 
+@media screen and (max-width: 600px) {
+  .item-de-pauta {
+    .status-votacao {
+      padding: 2px 5px;
+      line-height: 1;
+    }
+  }
+}
+
 @media screen and (max-width: 480px) {
   .item-de-pauta {
     font-size: 85%;
+    padding: 15px 5px 0;
     .item-header {
       .epigrafe {
         letter-spacing: 0px;
