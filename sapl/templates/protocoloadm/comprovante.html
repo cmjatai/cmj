@@ -14,18 +14,29 @@
 		th, td {
 			padding: 5px;
 		}
+		.row {
+			display:flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+		.col-2 {
+			flex-grow: 2;
+		}
 		@media print {
-    		.hide-print {
-        		display :  none;
-    		}
+			table {
+				width: 100%;
+			}
+			.hide-print {
+					display :  none;
+			}
 			.downsize {
 				font-size: 12px;
 			}
 		}
-    	@page {
-        	size:  auto;   /* auto is the initial value */
-        	margin: 0mm;  /* this affects the margin in the printer settings */
-    	}
+		@page {
+				size:  auto;   /* auto is the initial value */
+				margin: 0.7cm;  /* this affects the margin in the printer settings */
+		}
 	</style>
 
 	<div align="center">
@@ -33,33 +44,39 @@
 		<input type="submit" value="Fechar" onclick="window.close();" class="btn btn-success hide-print"/>
 	</div>
 	<table>
-		<tr><td colspan="2" align="center">
-				<img height="90" width="90"
-				     src="{% if logotipo %}{{ MEDIA_URL }}{{ logotipo }}{% else %}{% webpack_static 'img/logo.png' %}{% endif %}"
-						 alt="Logotipo"
-						 class="img-responsive visible-lg-inline-block vcenter">
-				<div>
-					{% if nome %}
-						<b>{{ nome }} - {{ municipio }} - {{ uf }}</b>
-					{% else %}
-						<b>{% trans 'Sem Nome Cadastrado' %}</b>
-					{% endif %}
-					<br />
-					{% trans 'Sistema de Apoio ao Processo Legislativo' %}
+		<tr>
+			<td colspan="2" align="center">
+				<div class="row">
+					<div class="col-1">
+						<img height="90"
+								src="{% if logotipo %}{{ MEDIA_URL }}{{ logotipo }}{% else %}{% webpack_static 'img/logo.png' %}{% endif %}"
+								alt="Logotipo"
+								class="img-responsive visible-lg-inline-block vcenter">
+					</div>
+					<div class="col-2">
+						{% if nome %}
+							<b>{{ nome }} - {{ municipio }} - {{ uf }}</b>
+						{% else %}
+							<b>{% trans 'Sem Nome Cadastrado' %}</b>
+						{% endif %}
+						<br />
+						{% trans 'Sistema de Apoio ao Processo Legislativo' %}
+					</div>
+					<div class="col-3">
+						<center>
+							<img src="{{barcode}}" height="50px" width="170px">
+							<br>
+							{{ protocolo.numero|stringformat:'06d' }}
+						</center>
+					</div>
 				</div>
+
 			</td>
 		</tr>
-		<tr> <td colspan="2" align="center"><b>COMPROVANTE DE PROTOCOLO</b></td> </tr>
+		<tr> <td colspan="2" align="center"><b>COMPROVANTE DE PROTOCOLO</b> - Autenticação: {{ autenticacao }}</td></tr>
 
 		<tr>
-			<td>
-				<center>
-					<img src="{{barcode}}" height="50px" width="170px">
-					<br>
-					{{ protocolo.numero|stringformat:'06d' }}
-				</center>
-			</td>
-			<td align="center">Autenticação: {{ autenticacao }}</td>
+			
 		</tr>
 
 		<tr>
@@ -77,7 +94,8 @@
 		{% if protocolo.tipo_processo == 1 %}
 			<tr>
 				<th>Ementa</th>
-				<td class="downsize">{{ protocolo.assunto_ementa }}</td>			</tr>
+				<td class="downsize">{{ protocolo.assunto_ementa }}</td>
+			</tr>
 			<tr>
 				<th>Autor</th>
 				<td>{{ protocolo.autor }}</td>
@@ -101,6 +119,10 @@
 		<tr>
 			<th>{% if protocolo.tipo_documento %} Tipo Documento {% else %} Tipo Matéria {% endif %}</th>
 			<td>{% if protocolo.tipo_documento %} {{protocolo.tipo_documento}} {% else %} {{protocolo.tipo_materia}} {% endif %}</td>
+		</tr>
+		<tr>
+			<th>Número Páginas</th>
+			<td>{{ protocolo.numero_paginas|default_if_none:"0" }}</td>
 		</tr>
 		{% if materia %}
 		<tr>

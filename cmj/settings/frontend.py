@@ -30,6 +30,7 @@ TEMPLATES = [
                 'cmj.context_processors.areatrabalho',
                 'cmj.context_processors.debug',
 
+                'sapl.context_processors.parliament_info',
                 'sapl.context_processors.mail_service_configured',
 
             ],
