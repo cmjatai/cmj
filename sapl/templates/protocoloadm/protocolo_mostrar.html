@@ -56,7 +56,7 @@
 			{% if not protocolo.anulado%}{% if not materia %}<a href="{% url 'sapl.materia:materia_create_simplificado' protocolo.pk %}" class="btn btn-primary">Criar Matéria</a>&nbsp;&nbsp;&nbsp;&nbsp;{% endif %}{% endif %}
 	{% endif %}
 
-	<a target="popup" class="btn btn-primary" href="javascript::window.open('{% url 'sapl.protocoloadm:comprovante_protocolo' protocolo.pk%}','Comprovante','width=800, height=800')">Comprovante
+	<a target="popup" class="btn btn-primary" onclick="window.open('{% url 'sapl.protocoloadm:comprovante_protocolo' protocolo.pk%}','Comprovante','width=800, height=800')">Comprovante
 	</a>
 	{% if protocolo.email %}
 		<a class="btn btn-primary d-none" href="{% url 'sapl.protocoloadm:comprovante_protocolo' protocolo.pk%}?send_mail">
