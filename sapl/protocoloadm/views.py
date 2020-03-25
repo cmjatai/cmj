@@ -1541,8 +1541,7 @@ class ComprovanteProtocoloView(PermissionRequiredMixin, TemplateView):
             materia = MateriaLegislativa.objects.filter(
                 numero_protocolo=protocolo.numero,
                 ano=protocolo.ano).first()
-            if materia:
-                context['materia'] = materia.numero
+            context['materia'] = materia
 
         context.update({"protocolo": protocolo,
                         "barcode": barcode,

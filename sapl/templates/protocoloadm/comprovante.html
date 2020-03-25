@@ -126,13 +126,20 @@
 		</tr>
 		{% if materia %}
 		<tr>
-			<th>Número da Matéria</th>
+			<th>Matéria Legislativa</th>
 			<td>{{ materia }}</td>
 		</tr>
 		{% endif %}
 		<tr>
 			<th>Emitido por</th>
-			<td>{{ request.user.username }}</td>
+			<td>{{ request.user }}</td>
 		</tr>
+		{% if protocolo.observacao %}
+			<tr>
+				<th>Outros dados</th>
+				<td>{{ protocolo.observacao }}</td>
+			</tr>
+		{% endif %}
+
 	</table>
 {% endblock detail_content %}
