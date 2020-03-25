@@ -4,9 +4,13 @@
 {% load static %}
 {% load webpack_static from webpack_loader %}
 
-{% block detail_content %}
-        <strong>Protocolo: </strong>{{ protocolo.numero|stringformat:'06d' }}/{{ protocolo.ano }} - 
-        <a href="{% url 'sapl.relatorios:relatorio_etiqueta_protocolo' protocolo.numero protocolo.ano %}"><img src="{% webpack_static 'img/etiqueta.png' %}" alt="Etiqueta Individual"></a></br>
+{% block base_content %}
+
+	{% block container_actions %}{{ block.super }}
+	{% endblock container_actions %}
+
+	<strong>Protocolo: </strong>{{ protocolo.numero|stringformat:'06d' }}/{{ protocolo.ano }} - 
+	<a href="{% url 'sapl.relatorios:relatorio_etiqueta_protocolo' protocolo.numero protocolo.ano %}"><img src="{% webpack_static 'img/etiqueta.png' %}" alt="Etiqueta Individual"></a></br>
 
 	<strong>Assunto: </strong> {{ protocolo.assunto_ementa|default:"Não informado" }}</br>
 	{% if protocolo.timestamp %}
@@ -16,7 +20,11 @@
     {% endif %}
 
 	{% if protocolo.tipo_processo == 0 %}
-		<strong>Interessado:</strong> {{ protocolo.interessado|default_if_none:"Não informado" }}</br>
+		<strong>Interessado:</strong> {{ protocolo.interessado|default_if_none:"Não informado" }} 
+		<small>
+		{% if protocolo.email %}<strong>Email:</strong> {{ protocolo.email }}</br>{% endif %}
+		</small>
+		
 	{% elif protocolo.tipo_processo == 1 %}
 		<strong>Autor:</strong>{{ protocolo.autor.nome|default_if_none:"Não informado" }}</br>
 	{% endif %}	<!-- TODO: convert if-else to custom tag -->
@@ -48,7 +56,11 @@
 			{% if not protocolo.anulado%}{% if not materia %}<a href="{% url 'sapl.materia:materia_create_simplificado' protocolo.pk %}" class="btn btn-primary">Criar Matéria</a>&nbsp;&nbsp;&nbsp;&nbsp;{% endif %}{% endif %}
 	{% endif %}
 
-
-	<a target="popup" class="btn btn-primary" onclick="window.open('{% url 'sapl.protocoloadm:comprovante_protocolo' protocolo.pk%}','Comprovante','width=800, height=800')">Comprovante
+	<a target="popup" class="btn btn-primary" href="javascript::window.open('{% url 'sapl.protocoloadm:comprovante_protocolo' protocolo.pk%}','Comprovante','width=800, height=800')">Comprovante
 	</a>
-{% endblock detail_content %}
+	{% if protocolo.email %}
+		<a class="btn btn-primary d-none" href="{% url 'sapl.protocoloadm:comprovante_protocolo' protocolo.pk%}?send_mail">
+			Enviar Comprovante por Email
+		</a>
+	{% endif %}
+{% endblock base_content %}

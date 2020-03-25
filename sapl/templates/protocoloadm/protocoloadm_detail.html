@@ -1,6 +1,14 @@
 {% extends "crud/detail.html" %}
 {% load i18n %}
 
+{% block base_workspace %}
+  <div class="box-area-trabalho">
+    {% for at in areatrabalho %}
+        <a>{{at.nome}}</a>
+    {% endfor %}
+  </div>
+{% endblock base_workspace %}
+
 {% load crispy_forms_tags %}  
 {% block actions %}
 <div class="btn-toolbar w-100 justify-content-between align-items-start" role="toolbar">

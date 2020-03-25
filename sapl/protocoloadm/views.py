@@ -1368,7 +1368,7 @@ class ProtocoloDocumentoView(PermissionRequiredMixin,
     def get_initial(self):
         initial = super().get_initial()
 
-        initial['user_data_hora_manual'] = self.request.user.username
+        initial['user_data_hora_manual'] = self.request.user
         initial['ip_data_hora_manual'] = get_client_ip(self.request)
         initial['data'] = timezone.localdate(timezone.now())
         initial['hora'] = timezone.localtime(timezone.now())

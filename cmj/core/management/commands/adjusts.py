@@ -6,6 +6,7 @@ import stat
 import subprocess
 import time
 
+from PyPDF4.pdf import PdfFileReader
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
@@ -96,12 +97,21 @@ class Command(BaseCommand):
         # self.delete_itens_tmp_folder()
 
         # self.run_checkcheck_olds()
+        # self.run_insert_font_pdf_file__test3()
 
-        self.run_insert_font_pdf_file__test3()
+        self.run_veririca_pdf_tem_assinatura()
+
+    def run_veririca_pdf_tem_assinatura(self):
+        ifile = '/home/leandro/Downloads/portaria_23_assinada.pdf'
+
+        f = PdfFileReader(ifile)
+        print(f.getFields())
+
+        pass
 
     def run_insert_font_pdf_file__test3(self):
         ifile = '/home/leandro/TEMP/4084__com_fonte__.pdf'
-        pdf = fitz.open(ifile)
+        pdf = open(ifile)
 
         for p in pdf:
             fl = p.getFontList()

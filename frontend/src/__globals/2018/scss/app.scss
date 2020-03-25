@@ -189,7 +189,15 @@ p.control-label {
     }
   }
 }
+.small {
+  .form-check {
+    padding-left: 0.5em;
 
+  }
+  .form-check-inline {
+    margin-right: 0.5em;
+  }
+}
 
 // ADJUST DRUNKEN PARROT STYLES ########################################
 .panel-primary {

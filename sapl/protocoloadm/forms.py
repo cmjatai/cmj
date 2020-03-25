@@ -412,11 +412,15 @@ class ProtocoloDocumentForm(ModelForm):
     )
 
     numero_paginas = forms.CharField(label=_('Núm. Páginas'), required=True)
+
     assunto = forms.CharField(
         widget=forms.Textarea, label=_('Assunto'), required=True)
 
     interessado = forms.CharField(required=True,
                                   label=_('Interessado'))
+
+    email = forms.EmailField(required=False,
+                             label=_('Email do Interessado'))
 
     observacao = forms.CharField(required=False,
                                  widget=forms.Textarea, label=_('Observação'))
@@ -425,7 +429,7 @@ class ProtocoloDocumentForm(ModelForm):
         required=False, label=_('Número de Protocolo (opcional)'))
 
     data_hora_manual = forms.ChoiceField(
-        label=_('Informar data e hora manualmente?'),
+        label=_('Data e hora manual?'),
         widget=forms.RadioSelect(),
         choices=YES_NO_CHOICES,
         initial=False)
@@ -441,20 +445,19 @@ class ProtocoloDocumentForm(ModelForm):
                   'numero',
                   'data',
                   'hora',
+                  'email'
                   ]
 
     def __init__(self, *args, **kwargs):
 
         row1 = to_row(
-            [(InlineRadios('tipo_protocolo'), 12)])
-        row2 = to_row(
-            [('tipo_documento', 5),
+            [(InlineRadios('tipo_protocolo'), 3),
+             ('tipo_documento', 4),
              ('numero_paginas', 2),
-             (Div(), 1),
-             (InlineRadios('data_hora_manual'), 4),
+             (InlineRadios('data_hora_manual'), 3),
              ])
         row3 = to_row([
-            (Div(), 2),
+            (Div(), 1),
             (Alert(
                 """
                 Usuário: <strong>{}</strong> - {}<br> 
@@ -470,14 +473,14 @@ class ProtocoloDocumentForm(ModelForm):
 
                 ),
                 dismiss=False,
-                css_class='alert-info'), 6),
+                css_class='alert-info'), 7),
             ('data', 2),
             ('hora', 2),
         ])
         row4 = to_row(
             [('assunto', 12)])
         row5 = to_row(
-            [('interessado', 12)])
+            [('email', 5), ('interessado', 7)])
         row6 = to_row(
             [('observacao', 12)])
         row7 = to_row(
@@ -495,11 +498,9 @@ class ProtocoloDocumentForm(ModelForm):
         self.helper = SaplFormHelper()
         self.helper.layout = Layout(
             Fieldset(_('Identificação de Documento'),
-                     row1,
-                     row2),
-            fieldset,
-            row4,
-            row5,
+                     Div(row1, css_class='small')),
+            fieldset, row5,
+            row4, row6,
             HTML("&nbsp;"),
             Fieldset(_('Número do Protocolo (Apenas se quiser que a numeração comece '
                        'a partir do número a ser informado)'),
@@ -513,6 +514,10 @@ class ProtocoloDocumentForm(ModelForm):
 
         if not config.protocolo_manual:
             self.fields['data_hora_manual'].widget = forms.HiddenInput()
+
+        self.fields['tipo_documento'
+                    ].choices = [(t.id, t) for t in TipoDocumentoAdministrativo.objects.filter(
+                        workspace__operadores=kwargs['initial']['user_data_hora_manual'])]
 
 
 class ProtocoloMateriaForm(ModelForm):

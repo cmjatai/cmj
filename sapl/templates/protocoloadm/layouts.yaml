@@ -68,7 +68,6 @@ Protocolo:
   - tipo_protocolo
   - tipo_documento numero_paginas
   - assunto_ementa
-  - interessado
   - observacao
 
 Protocolo:
