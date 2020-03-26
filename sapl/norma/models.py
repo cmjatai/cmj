@@ -1,4 +1,6 @@
 from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.postgres.fields.jsonb import JSONField
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.template import defaultfilters
 from django.utils import timezone
@@ -82,6 +84,10 @@ class NormaJuridica(CountPageMixin):
         ('E', 'estadual', _('Estadual')),
         ('F', 'federal', _('Federal')),
     )
+
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
 
     texto_integral = PortalFileField(
         blank=True,

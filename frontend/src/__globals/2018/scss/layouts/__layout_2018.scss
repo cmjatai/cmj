@@ -297,7 +297,21 @@
 }
 
 .nav-pagination {
-  margin-top: 15px;
+  position: sticky;
+  z-index: $zindex-message;
+  margin: -15px;
+  margin-top: 0;
+  padding: 15px;
+
+
+  bottom: 0;
+  background: linear-gradient(to bottom, #fff0, #ffff);
+  left: 0;
+  right: 0;
+
+  .pagination {
+    margin-bottom: 0;
+  }
 }
 
 .container-leis-capa {
@@ -409,6 +423,16 @@
         padding: 0.5em 5px;
         text-align: center;
       }
+    }
+  }
+}
+
+@media screen and (min-width: 576px) {
+
+  .nav-pagination {
+    left: auto;
+    top: 90px;
+    .pagination {
     }
   }
 }
