@@ -15,7 +15,8 @@ from sapl.utils import (RANGE_ANOS, YES_NO_CHOICES,
                         restringe_tipos_de_arquivo_txt,
                         texto_upload_path,
                         get_settings_auth_user_model,
-                        OverwriteStorage)
+                        OverwriteStorage,
+                        PortalFileField)
 
 
 @reversion.register()
@@ -82,13 +83,15 @@ class NormaJuridica(CountPageMixin):
         ('F', 'federal', _('Federal')),
     )
 
-    texto_integral = models.FileField(
+    texto_integral = PortalFileField(
         blank=True,
         null=True,
         upload_to=norma_upload_path,
         verbose_name=_('Texto Integral'),
         storage=OverwriteStorage(),
-        validators=[restringe_tipos_de_arquivo_txt])
+        validators=[restringe_tipos_de_arquivo_txt],
+        max_length=512)
+
     tipo = models.ForeignKey(
         TipoNormaJuridica,
         on_delete=models.PROTECT,

@@ -99,13 +99,37 @@ class Command(BaseCommand):
         # self.run_checkcheck_olds()
         # self.run_insert_font_pdf_file__test3()
 
-        self.run_veririca_pdf_tem_assinatura()
+        # self.run_veririca_pdf_tem_assinatura()
 
     def run_veririca_pdf_tem_assinatura(self):
-        ifile = '/home/leandro/Downloads/portaria_23_assinada.pdf'
+        global sss
+        sss = 1
 
-        f = PdfFileReader(ifile)
-        print(f.getFields())
+        def tree_print(field_name, fields):
+            global sss
+            ss = " "
+            print(ss * sss, field_name, '.............')
+            if not isinstance(fields, dict):
+                """if '/Contents':
+                    with open('/home/leandro/Downloads/content.ext', 'wb') as f:
+                        f.write(bytearray(fields))
+                        f.close()
+                else:"""
+
+                print(' ' * sss, fields)
+                return
+            for field_name, value in fields.items():
+                sss += 2
+                tree_print(field_name, value)
+                sss -= 2
+
+        ifile = '/home/leandro/Downloads/portaria_23_duas_assinaturas.pdf'
+
+        pf = PdfFileReader(ifile)
+
+        fields = pf.getFields()
+
+        tree_print('file', fields)
 
         pass
 
