@@ -11,7 +11,7 @@ from model_utils import Choices
 import reversion
 
 from cmj.core.models import AreaTrabalho, CertidaoPublicacao
-from cmj.utils import CountPageMixin
+from cmj.mixins import CountPageMixin
 from sapl.base.models import Autor
 from sapl.materia.models import TipoMateriaLegislativa, UnidadeTramitacao,\
     MateriaLegislativa

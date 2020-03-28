@@ -17,8 +17,9 @@ from django.utils.translation import ugettext_lazy as _
 from image_cropping import ImageCropField, ImageRatioField
 
 from cmj.globalrules import MENU_PERMS_FOR_USERS, GROUP_SOCIAL_USERS
+from cmj.mixins import CmjChoices
 from cmj.utils import get_settings_auth_user_model, normalize, YES_NO_CHOICES,\
-    UF, CmjChoices
+    UF
 from sapl.utils import hash_sha512
 
 

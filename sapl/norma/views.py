@@ -18,7 +18,7 @@ from django.views.generic.edit import FormView
 from django_filters.views import FilterView
 import weasyprint
 
-from cmj.utils import BtnCertMixin
+from cmj.mixins import BtnCertMixin
 from sapl import settings
 import sapl
 from sapl.base.models import AppConfig

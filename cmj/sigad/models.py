@@ -28,7 +28,8 @@ from reportlab.pdfgen.pdfimages import PDFImage
 from reportlab.platypus.doctemplate import SimpleDocTemplate
 
 from cmj import globalrules
-from cmj.utils import get_settings_auth_user_model, YES_NO_CHOICES, CmjChoices,\
+from cmj.mixins import CmjChoices
+from cmj.utils import get_settings_auth_user_model, YES_NO_CHOICES,\
     restringe_tipos_de_arquivo_midias, TIPOS_IMG_PERMITIDOS,\
     media_protected_storage
 from sapl.materia.models import MateriaLegislativa

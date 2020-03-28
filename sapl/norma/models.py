@@ -9,7 +9,8 @@ from model_utils import Choices
 import reversion
 
 from cmj.core.models import CertidaoPublicacao
-from cmj.utils import restringe_tipos_de_arquivo_midias, CountPageMixin
+from cmj.mixins import CountPageMixin
+from cmj.utils import restringe_tipos_de_arquivo_midias
 from sapl.base.models import Autor
 from sapl.compilacao.models import TextoArticulado
 from sapl.materia.models import MateriaLegislativa
@@ -146,7 +147,7 @@ class NormaJuridica(CountPageMixin):
 
     data_ultima_atualizacao = models.DateTimeField(
         blank=True, null=True,
-        auto_now=True,
+        auto_now=False,
         verbose_name=_('Data'))
 
     autores = models.ManyToManyField(

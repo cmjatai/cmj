@@ -1,10 +1,12 @@
 from datetime import date, timedelta
+import datetime
 
 from dateutil.relativedelta import relativedelta
 from django import template
 from django.conf import settings
 from django.template.defaultfilters import stringfilter
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime as django_parse_datetime
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from webpack_loader import utils
@@ -328,3 +330,8 @@ def timedelta_filter(data, td):
         data = timezone.now()
     data += timedelta(days=int(td))
     return data
+
+
+@register.filter(expects_localtime=True)
+def parse_datetime(value):
+    return django_parse_datetime(value)

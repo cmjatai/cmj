@@ -2,7 +2,8 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 import reversion
 
-from cmj.utils import texto_upload_path, CountPageMixin
+from cmj.mixins import CountPageMixin
+from cmj.utils import texto_upload_path
 from sapl.norma.models import NormaJuridica
 from sapl.utils import restringe_tipos_de_arquivo_txt, OverwriteStorage
 

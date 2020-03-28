@@ -27,9 +27,8 @@ from django.views.generic.edit import FormView
 from django_filters.views import FilterView
 from weasyprint import HTML
 
-from cmj.core.models import AreaTrabalho, CertidaoPublicacao
-from cmj.settings.medias import MEDIA_URL
-from cmj.utils import BtnCertMixin
+from cmj.core.models import AreaTrabalho
+from cmj.mixins import BtnCertMixin
 import sapl
 from sapl.base.email_utils import do_envia_email_confirmacao
 from sapl.base.models import Autor, CasaLegislativa, AppConfig

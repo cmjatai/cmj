@@ -10,10 +10,10 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from cmj.core.models import AreaTrabalho, Notificacao
-from cmj.utils import CmjChoices, get_settings_auth_user_model,\
+from cmj.mixins import CmjChoices
+from cmj.utils import get_settings_auth_user_model,\
     restringe_tipos_de_arquivo_midias, TIPOS_MIDIAS_PERMITIDOS,\
     media_protected_storage
-from sapl.utils import SEPARADOR_HASH_PROPOSICAO
 
 
 class Solicitacao(models.Model):

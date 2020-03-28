@@ -1,3 +1,4 @@
+from _ast import Pass
 from datetime import datetime, timedelta
 import logging
 import os
@@ -6,6 +7,8 @@ import stat
 import subprocess
 import time
 
+from PIL import Image
+from PyPDF4.generic import IndirectObject
 from PyPDF4.pdf import PdfFileReader
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -28,6 +31,7 @@ from cmj.core.models import OcrMyPDF, CertidaoPublicacao
 from sapl.compilacao.models import Dispositivo,\
     TipoDispositivoRelationship
 from sapl.materia.models import MateriaLegislativa
+from sapl.norma.models import NormaJuridica
 from sapl.protocoloadm.models import DocumentoAdministrativo
 
 
@@ -101,6 +105,34 @@ class Command(BaseCommand):
 
         # self.run_veririca_pdf_tem_assinatura()
 
+        self.run_capture_fields_from_pdf()
+
+    def run_capture_fields_from_pdf(self):
+        models = (NormaJuridica, )
+
+        for m in models:
+            qs = m.objects.order_by('-ano', '-id')[:5]  # qs -> queryset
+            for item in qs:
+                for fn in m.FIELDFILE_NAME:  # fn -> field_name
+                    ff = getattr(item, fn)  # ff -> file_field
+
+                    if not ff.storage.exists(ff.name):
+                        continue
+
+                    original_absolute_path = '{}/original__{}'.format(
+                        ff.storage.location,
+                        ff.name)
+
+                    signs = signed_extract(original_absolute_path)
+
+                    metadata = item.metadata if item.metadata else {}
+
+                    metadata.update(signs)
+                    item.metadata = metadata
+                    item.save()
+
+                    print(signs)
+
     def run_veririca_pdf_tem_assinatura(self):
         global sss
         sss = 1
@@ -110,26 +142,147 @@ class Command(BaseCommand):
             ss = " "
             print(ss * sss, field_name, '.............')
             if not isinstance(fields, dict):
-                """if '/Contents':
-                    with open('/home/leandro/Downloads/content.ext', 'wb') as f:
-                        f.write(bytearray(fields))
+                if field_name == '/Contents':
+                    with open('/home/leandro/Downloads/content{}.ext'.format(sss), 'wb') as f:
+                        f.write(fields)
                         f.close()
-                else:"""
-
-                print(' ' * sss, fields)
-                return
+                    return
+                else:
+                    print(' ' * sss, fields)
+                    return
             for field_name, value in fields.items():
                 sss += 2
                 tree_print(field_name, value)
                 sss -= 2
 
         ifile = '/home/leandro/Downloads/portaria_23_duas_assinaturas.pdf'
+        ifile = '/home/leandro/Downloads/Ofício Major sobre PLOE 13-2020.pdf'
+        o_path = '/home/leandro/Downloads/'
 
-        pf = PdfFileReader(ifile)
+        r = PdfFileReader(open(ifile, "rb"))
 
-        fields = pf.getFields()
+        fields = r.getFields()
 
         tree_print('file', fields)
+
+        #self.get_all_images_sign(r, o_path)
+
+    def get_all_images_sign(self, r, o_path):
+        global img_count
+
+        img_count = 0
+        o_path = o_path + 'img{}{}'
+
+        def busca_imagem(node):
+            global img_count
+
+            if isinstance(node, IndirectObject):
+                node = node.getObject()
+
+            if not isinstance(node, dict):
+                return
+
+            if '/Type' in node and node['/Type'] == '/XObject' and\
+                    '/Subtype' in node and node['/Subtype'] == '/Image':
+                size = (node['/Width'], node['/Height'])
+                data = node.getData()
+
+                if node['/ColorSpace'] == '/DeviceRGB':
+                    mode = "RGB"
+                elif node['/ColorSpace'] == '/DeviceGray':
+                    return
+                else:
+                    mode = "P"
+
+                try:
+                    if '/Filter' in node:
+                        if node['/Filter'] == '/FlateDecode':
+                            img = Image.frombytes(mode, size, data)
+                            img.save(o_path.format(img_count, ".png"))
+                        elif node['/Filter'] == '/DCTDecode':
+                            img = open(o_path .format(img_count, ".jpg"), "wb")
+                            img.write(data)
+                            img.close()
+                        elif node['/Filter'] == '/JPXDecode':
+                            img = open(o_path.format(img_count, ".jp2"), "wb")
+                            img.write(data)
+                            img.close()
+                        elif node['/Filter'] == '/CCITTFaxDecode':
+                            img = open(o_path.format(img_count, ".tiff"), "wb")
+                            img.write(data)
+                            img.close()
+                    else:
+                        img = Image.frombytes(mode, size, data)
+                        img.save(o_path.format(img_count, ".png"))
+                    img_count += 1
+                except Exception as e:
+                    print(e)
+
+            for key, value in node.items():
+                busca_imagem(value)
+
+        pageNo = 0
+        while (pageNo < r.numPages):
+            page = r.getPage(pageNo)
+
+            if '/Annots' not in page:
+                pageNo += 1
+                continue
+
+            for annot in page['/Annots']:
+
+                obj_annot = annot.getObject()
+                if '/AP' not in obj_annot or '/N' not in obj_annot['/AP']:
+                    continue
+
+                node = obj_annot['/AP']['/N'].getObject()
+
+                busca_imagem(node)
+
+            pageNo += 1
+
+    def get_all_images(self, r, o_path):
+        pageNo = 0
+        while (pageNo < r.numPages):
+            page = r.getPage(pageNo)
+
+            if '/XObject' in page['/Resources']:
+                xObject = page['/Resources']['/XObject'].getObject()
+
+                for obj in xObject:
+                    if xObject[obj]['/Subtype'] == '/Image':
+                        size = (xObject[obj]['/Width'],
+                                xObject[obj]['/Height'])
+                        data = xObject[obj].getData()
+
+                        if xObject[obj]['/ColorSpace'] == '/DeviceRGB':
+                            mode = "RGB"
+                        else:
+                            mode = "P"
+
+                        if '/Filter' in xObject[obj]:
+                            if xObject[obj]['/Filter'] == '/FlateDecode':
+                                img = Image.frombytes(mode, size, data)
+                                img.save(o_path + obj[1:] + ".png")
+                            elif xObject[obj]['/Filter'] == '/DCTDecode':
+                                img = open(o_path + obj[1:] + ".jpg", "wb")
+                                img.write(data)
+                                img.close()
+                            elif xObject[obj]['/Filter'] == '/JPXDecode':
+                                img = open(o_path + obj[1:] + ".jp2", "wb")
+                                img.write(data)
+                                img.close()
+                            elif xObject[obj]['/Filter'] == '/CCITTFaxDecode':
+                                img = open(o_path + obj[1:] + ".tiff", "wb")
+                                img.write(data)
+                                img.close()
+                        else:
+                            img = Image.frombytes(mode, size, data)
+                            img.save(o_path + obj[1:] + ".png")
+            else:
+                print("No image found.")
+
+            pageNo += 1
 
         pass
 
