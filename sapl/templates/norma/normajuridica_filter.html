@@ -1,6 +1,6 @@
 {% extends "crud/detail.html" %}
 {% load i18n %}
-{% load crispy_forms_tags %}
+{% load crispy_forms_tags common_cmj_tags %}
 
 {% block actions %}
   <div class="actions btn-group" role="group">
@@ -66,6 +66,12 @@
                       <i class="far fa-2x fa-file-{% if '.pdf' in n.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
                       <br><small>Arquivo<br>Digitalizado da Norma</small>
                     </a>
+                    {% if n.metadata.signs and n.metadata.signs.texto_integral %}
+
+                      {% for nome, data in n.metadata.signs.texto_integral %}
+                        <br>{{nome}}<br>{{data|parse_datetime|date:"DATETIME_FORMAT" }}
+                      {% endfor %}
+                    {% endif %}
                   {% endif %}
 
                   {% if n.texto_articulado.exists and n.texto_articulado.first.privacidade == 0 or perms.compilacao.change_dispositivo_edicao_dinamica%}

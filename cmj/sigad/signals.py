@@ -1,7 +1,7 @@
-from django.db.models.signals import post_save, pre_delete
+from django.db.models.signals import pre_delete
 from django.dispatch.dispatcher import receiver
 from reversion.revisions import create_revision
-from reversion.signals import post_revision_commit, pre_revision_commit
+from reversion.signals import post_revision_commit
 
 from cmj.sigad.models import Documento, Revisao, CMSMixin
 
@@ -18,6 +18,7 @@ def save_revision_documents(sender, **kwargs):
             with create_revision(False):
                 Revisao.gerar_revisao(
                     version.object, version.revision.user)
+
 
 post_revision_commit.connect(save_revision_documents, sender=create_revision)
 

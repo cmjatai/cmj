@@ -268,7 +268,6 @@ def update_groups(app_config, verbosity=2, interactive=True,
 
 @receiver(pre_delete, dispatch_uid='pre_delete_signal')
 def revision_pre_delete_signal(sender, **kwargs):
-    #send_signal_for_websocket_time_refresh(kwargs['instance'], 'pre_delete')
     with reversion.create_revision():
         kwargs['instance'].save()
         reversion.set_comment("Deletado pelo sinal.")

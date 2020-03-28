@@ -93,6 +93,7 @@ def anexo_upload_path(instance, filename):
 
 @reversion.register()
 class SessaoPlenaria(models.Model):
+    FIELDFILE_NAME = ('upload_pauta', 'upload_ata', 'upload_anexo')
     # TODO trash??? Seems to have been a FK in the past. Would be:
     # andamento_sessao = models.ForeignKey(
     #    AndamentoSessao, blank=True, null=True)

@@ -3,6 +3,7 @@ from functools import wraps
 import re
 from unicodedata import normalize as unicodedata_normalize
 
+from PyPDF4.pdf import PdfFileReader
 from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
@@ -16,7 +17,6 @@ from easy_thumbnails import source_generators
 from floppyforms import ClearableFileInput
 import magic
 from model_utils.choices import Choices
-from pdfrw.pdfreader import PdfReader
 from reversion.admin import VersionAdmin
 from social_core.backends.facebook import FacebookOAuth2
 from unipath.path import Path
@@ -319,10 +319,10 @@ def run_sql(sql):
                 print(rows)
 
 
-def signed_extract(original_absolute_path):
-    signs = {'signs': []}
+def signed_name_and_date_extract(file):
+    signs = []
     try:
-        pdf = PdfFileReader(open(original_absolute_path, "rb"))
+        pdf = PdfFileReader(file)
     except:
         return signs
 
@@ -349,5 +349,5 @@ def signed_extract(original_absolute_path):
                 fd = datetime.strptime(data[2:], '%Y%m%d%H%M%S%z')
         except:
             pass
-        signs['signs'].append((nome, fd))
+        signs.append((nome, fd))
     return signs

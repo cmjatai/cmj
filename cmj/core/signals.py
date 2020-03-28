@@ -1,12 +1,22 @@
+from datetime import datetime
+import os
+
+from PyPDF4.pdf import PdfFileReader
+from django import apps
 from django.conf import settings
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.mail.message import EmailMultiAlternatives
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch.dispatcher import receiver
 from django.template import loader
 from django.utils.encoding import force_text
+from django.utils.six import BytesIO
 
 from cmj.core.models import Notificacao
 from cmj.settings import EMAIL_SEND_USER
+from cmj.utils import signed_name_and_date_extract
+from sapl.materia.models import MateriaLegislativa
+from sapl.norma.models import NormaJuridica
 
 
 def send_mail(subject, email_template_name,
@@ -51,3 +61,44 @@ def notificacao_post_save(sender, instance, using, **kwargs):
             instance.pk,
             instance.user,
             instance.user_origin))
+
+
+def signed_name_and_date_extract_pre_save(sender, instance, using, **kwargs):
+
+    if not hasattr(instance, 'FIELDFILE_NAME') or not hasattr(instance, 'metadata'):
+        return
+
+    metadata = instance.metadata
+    for fn in instance.FIELDFILE_NAME:  # fn -> field_name
+        ff = getattr(instance, fn)  # ff -> file_field
+
+        if not ff:
+            continue
+
+        file = ff.file.file
+        if not isinstance(ff.file, InMemoryUploadedFile):
+            original_absolute_path = '{}/original__{}'.format(
+                ff.storage.location,
+                ff.name)
+            file = open(original_absolute_path, "rb")
+            signs = signed_name_and_date_extract(file)
+            file.close()
+        else:
+            signs = signed_name_and_date_extract(file)
+
+        if not signs:
+            continue
+
+        if not metadata:
+            metadata = {}
+
+        metadata.update({'signs': {fn: signs}})
+    instance.metadata = metadata
+
+
+for app in apps.apps.get_app_configs():
+    for model in app.get_models():
+        if hasattr(model, 'FIELDFILE_NAME'):
+            pre_save.connect(
+                signed_name_and_date_extract_pre_save,
+                sender=model)

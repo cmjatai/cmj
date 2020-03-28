@@ -1,4 +1,4 @@
-from _ast import Pass
+
 from datetime import datetime, timedelta
 import logging
 import os
@@ -17,7 +17,6 @@ from django.db import connection
 from django.db.models import F, Q
 from django.db.models.signals import post_delete, post_save
 from django.utils import timezone
-import fitz
 from fpdf.fpdf import FPDF
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet
@@ -27,9 +26,9 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
 from reportlab.platypus.paragraph import Paragraph
 
-from cmj.core.models import OcrMyPDF, CertidaoPublicacao
-from sapl.compilacao.models import Dispositivo,\
-    TipoDispositivoRelationship
+from cmj.core.models import OcrMyPDF
+from cmj.utils import signed_name_and_date_extract
+from sapl.compilacao.models import Dispositivo
 from sapl.materia.models import MateriaLegislativa
 from sapl.norma.models import NormaJuridica
 from sapl.protocoloadm.models import DocumentoAdministrativo
@@ -123,15 +122,16 @@ class Command(BaseCommand):
                         ff.storage.location,
                         ff.name)
 
-                    signs = signed_extract(original_absolute_path)
+                    signs = signed_name_and_date_extract(
+                        original_absolute_path)
 
                     metadata = item.metadata if item.metadata else {}
 
-                    metadata.update(signs)
+                    fn_signs = {'signs': {fn: signs}}
+
+                    metadata.update(fn_signs)
                     item.metadata = metadata
                     item.save()
-
-                    print(signs)
 
     def run_veririca_pdf_tem_assinatura(self):
         global sss
