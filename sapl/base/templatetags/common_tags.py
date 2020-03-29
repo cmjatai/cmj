@@ -55,6 +55,11 @@ def model_verbose_name_plural(class_name):
 
 
 @register.filter
+def model_name(instance):
+    return instance._meta.label
+
+
+@register.filter
 def split(value, arg):
     return value.split(arg)
 
@@ -162,6 +167,15 @@ def get_delete_perm(value, arg):
     can_delete = '.delete_' + nome_model
 
     return perm.__contains__(nome_app + can_delete)
+
+
+@register.filter
+def has_perm_change_instance(instance, perms):
+
+    nome_app = instance._meta.app_label
+    can_change = '.change_' + instance._meta.model_name
+
+    return perms.__contains__(nome_app + can_change)
 
 
 @register.filter

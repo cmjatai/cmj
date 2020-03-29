@@ -902,14 +902,14 @@ class TextView(CompMixin, ListView):
                         ''' if self.object.content_object.texto_integral else ''
                 )))
 
-            co = self.object.content_object
+            """co = self.object.content_object
             return redirect(
                 reverse('{}:{}_detail'.format(
                     co._meta.app_config.name,
                     co._meta.model_name
                 ),
                     kwargs={'pk': self.object.object_id})
-            )
+            )"""
 
         return CompMixin.dispatch(self, request, *args, **kwargs)
 

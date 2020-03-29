@@ -260,10 +260,10 @@ class NormaCrud(Crud):
             return btns
 
         def get(self, request, *args, **kwargs):
-            """if not request.user.has_perm('norma.change_normajuridica') and \
+            if not request.user.has_perm('norma.change_normajuridica') and \
                     self.get_object().texto_articulado.exists():
                 return redirect(reverse('sapl.norma:norma_ta',
-                                        kwargs={'pk': self.kwargs['pk']}))"""
+                                        kwargs={'pk': self.kwargs['pk']}))
 
             estatisticas_acesso_normas = AppConfig.objects.first().estatisticas_acesso_normas
             if estatisticas_acesso_normas == 'S':

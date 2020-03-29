@@ -28,7 +28,8 @@ from reportlab.platypus.paragraph import Paragraph
 
 from cmj.core.models import OcrMyPDF
 from cmj.utils import signed_name_and_date_extract
-from sapl.compilacao.models import Dispositivo
+from sapl.compilacao.models import Dispositivo, TextoArticulado,\
+    TipoDispositivo
 from sapl.materia.models import MateriaLegislativa, DocumentoAcessorio
 from sapl.norma.models import NormaJuridica
 from sapl.protocoloadm.models import DocumentoAdministrativo,\
@@ -107,6 +108,20 @@ class Command(BaseCommand):
         # self.run_veririca_pdf_tem_assinatura()
 
         self.run_capture_fields_from_pdf()
+
+    def run_insere_ementa_em_textos_articulados_que_o_cadastro_esqueceu(self):
+        for t in TextoArticulado.objects.exclude(dispositivos_set__tipo_dispositivo=2):
+            dsps = t.dispositivos_set.order_by('ordem')
+            if not dsps.exists():
+                continue
+            tipo_ementa = TipoDispositivo.objects.get(pk=2)
+            articulacao = dsps[0]
+            ordem = articulacao.criar_espaco(1)
+            ementa = Dispositivo.new_instance_based_on(
+                articulacao, tipo_ementa)
+            ementa.ordem = ordem
+            ementa.texto = t.ementa
+            ementa.save()
 
     def run_capture_fields_from_pdf(self):
         models = (

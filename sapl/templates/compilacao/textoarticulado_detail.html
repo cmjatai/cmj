@@ -2,6 +2,43 @@
 {% load i18n %}
 {% load compilacao_filters %}
 {% load common_tags %}
+{% load static %}
+{% load webpack_static from webpack_loader %}
+
+{% if object.content_object and object.content_object|model_name == 'norma.NormaJuridica' and not object.content_object|has_perm_change_instance:perms  %}
+ 
+  {% block base_container_header %}
+    <div class="pt-3 d-flex justify-content-around align-items-center">
+      <div>
+        <img height="100"
+            src="{% if logotipo %}{{ MEDIA_URL }}{{ logotipo }}{% else %}{% webpack_static 'img/logo.png' %}{% endif %}"
+            alt="Logotipo"
+            class="img-responsive visible-lg-inline-block vcenter">
+      </div>
+      <div class="control-label">
+        <h1 class="">
+          {% if nome %}
+            <b>{{ nome }}</b>
+          {% else %}
+            <b>{% trans 'Sem Nome Cadastrado' %}</b>
+          {% endif %}
+        </h1>
+        <h2 class="text-center">
+          Poder Legislativo
+        </h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col pt-3">
+        <h2 class="text-center">
+          <strong>
+            {{object.content_object}}
+          </strong>
+        </h2>
+      </div>
+    </div>
+  {% endblock base_container_header %}
+{% endif %}
 
 {% block sections_nav %}
   {% include 'compilacao/subnav.html'%}
@@ -11,28 +48,6 @@
   
   {% block actions %}
     <div class="context-actions justify-content-between mb-4">
-      {% comment %}
-
-        <div class="actions btn-group d-none" role="group">
-          <a href="{{base_url}}?print" class="btn btn-outline-primary">{% trans 'Preparar para impressão' %}</a>
-        </div>
-        {% if perms.compilacao.add_textoarticulado %}
-          {% if not object.temp_check_migrations %}
-            <div class="actions btn-group" role="group"> 
-              <a href="{% url 'sapl.compilacao:ta_text_edit' object.pk %}?check" class="btn btn-primary">
-                Confirmar Migração
-              </a>
-            </div>
-          {% else %}
-            <div class="actions btn-group" role="group"> 
-              <div class="btn btn-success">
-                Migração Confirmada
-              </div>
-            </div>      
-          {% endif %}
-        {% endif %}
-        
-      {% endcomment %}
       <div class="actions btn-group" role="group">
         {% if perms.compilacao.change_textoarticulado and object|can_use_dynamic_editing:user %}
           <a href="{% url 'sapl.compilacao:ta_edit' object.pk %}" class="btn btn-outline-primary">{% trans 'Editar Metadados do Texto Articulado' %}</a>
@@ -47,55 +62,61 @@
     </div>
   {% endblock actions %}
 
-  {% block detail_content %} {# TODO replace fieldset for something semantically correct, but with similar visual grouping style #}
-    <fieldset class="hidden-print">
-        <legend>{%trans 'Identificação Básica'%}</legend>
-        <div class="row">
-          <div class="col-md-3">
-            <div id="div_id_tipo" class="holder">
-              <label>{% field_verbose_name object 'tipo_ta' %}</label>
-              <p>{{ object.tipo_ta}}</p>
-            </div>
-          </div>
+  {% block detail_content %}
 
-          {% if object.content_object and object.content_object.tipo %}
+    {% if object.content_object and object.content_object|model_name == 'norma.NormaJuridica'  and not object.content_object|has_perm_change_instance:perms  %}
+    
+    {% else %}
+      <fieldset class="hidden-print">
+          <legend>{%trans 'Identificação Básica'%}</legend>
+          <div class="row">
             <div class="col-md-3">
               <div id="div_id_tipo" class="holder">
-                <label>{% field_verbose_name object.content_object 'tipo' %}</label>
-                <p>{{ object.content_object.tipo}}</p>
+                <label>{% field_verbose_name object 'tipo_ta' %}</label>
+                <p>{{ object.tipo_ta}}</p>
               </div>
             </div>
-          {% endif %}
 
-          <div class="col-md-2">
-            <div id="div_id_numero" class="holder">
-              <label>{% field_verbose_name object 'numero' %}</label>
-              <p>{{ object.numero}}</p>
-            </div>
-          </div>
+            {% if object.content_object and object.content_object.tipo %}
+              <div class="col-md-3">
+                <div id="div_id_tipo" class="holder">
+                  <label>{% field_verbose_name object.content_object 'tipo' %}</label>
+                  <p>{{ object.content_object.tipo}}</p>
+                </div>
+              </div>
+            {% endif %}
 
-          <div class="col-md-2">
-            <div id="div_id_ano" class="holder">
-              <label>{% field_verbose_name object 'ano' %}</label>
-              <p>{{ object.ano}}</p>
+            <div class="col-md-2">
+              <div id="div_id_numero" class="holder">
+                <label>{% field_verbose_name object 'numero' %}</label>
+                <p>{{ object.numero}}</p>
+              </div>
             </div>
-          </div>
 
-          <div class="col-md-2">
-            <div id="div_id_data" class="holder">
-              <label>{% field_verbose_name object 'data' %}</label>
-              <p>{{ object.data}}</p>
+            <div class="col-md-2">
+              <div id="div_id_ano" class="holder">
+                <label>{% field_verbose_name object 'ano' %}</label>
+                <p>{{ object.ano}}</p>
+              </div>
+            </div>
+
+            <div class="col-md-2">
+              <div id="div_id_data" class="holder">
+                <label>{% field_verbose_name object 'data' %}</label>
+                <p>{{ object.data}}</p>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="row">
-          <div class="col-md-12">
-            <div id="div_id_ementa" class="holder">
-              <label>{% field_verbose_name object 'ementa' %}</label>
-              <p>{{ object.ementa|safe}}</p>
+          <div class="row">
+            <div class="col-md-12">
+              <div id="div_id_ementa" class="holder">
+                <label>{% field_verbose_name object 'ementa' %}</label>
+                <p>{{ object.ementa|safe}}</p>
+              </div>
             </div>
           </div>
-        </div>
-    </fieldset>
+      </fieldset>
+    {% endif %}
+
   {% endblock detail_content %}
 {% endblock base_content %}
