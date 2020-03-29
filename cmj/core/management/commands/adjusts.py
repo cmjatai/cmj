@@ -33,6 +33,7 @@ from sapl.materia.models import MateriaLegislativa, DocumentoAcessorio
 from sapl.norma.models import NormaJuridica
 from sapl.protocoloadm.models import DocumentoAdministrativo,\
     DocumentoAcessorioAdministrativo
+from sapl.sessao.models import SessaoPlenaria
 
 
 def _get_registration_key(model):
@@ -109,21 +110,34 @@ class Command(BaseCommand):
 
     def run_capture_fields_from_pdf(self):
         models = (
-            (NormaJuridica, 'ano__gte', 2019),
-            (MateriaLegislativa, 'ano__gte',  2020),
-            (DocumentoAcessorio, 'data__year__gte',  2014),
-            (DocumentoAdministrativo, 'ano__gte',  2014),
-            (DocumentoAcessorioAdministrativo,  'data__year__gte',  2014),
+            (NormaJuridica, 'ano__gte', 2010, 'data_ultima_atualizacao'),
+            (MateriaLegislativa, 'ano__gte',  2010, 'data_ultima_atualizacao'),
+            #(DocumentoAcessorio, 'data__year__gte',  2010),
+            #(DocumentoAdministrativo, 'ano__gte',  2010),
+            #(DocumentoAcessorioAdministrativo,  'data__year__gte',  2010),
+            #(SessaoPlenaria,  'data_inicio__year__gte',  2010),
         )
 
         for model in models:
             m = model[0]
+
+            dua = m._meta.get_field(model[3])
+            if hasattr(dua, 'auto_now') and dua.auto_now:
+                #print(m, 'auto_now deve ser desativado.')
+                # continue  # auto_now deve ser desativado
+                print(m, 'desativando auto_now')
+                dua.auto_now = False
+
             params = {
                 model[1]: model[2]
             }
+
             qs = m.objects.filter(**params)
             for item in qs:
-                if not hasattr(item, 'FIELDFILE_NAME') or not hasattr(item, 'metadata'):
+                print(item)
+                item.save()  # o pre_save fará a caputra da assinatura
+                # LEMBRAR QUE auto_now DEVE SER DESATIVADO
+                """if not hasattr(item, 'FIELDFILE_NAME') or not hasattr(item, 'metadata'):
                     break
                 metadata = item.metadata
                 for fn in m.FIELDFILE_NAME:  # fn -> field_name
@@ -149,7 +163,7 @@ class Command(BaseCommand):
                     metadata['signs'][fn] = signs
 
                 item.metadata = metadata
-                item.save()
+                item.save()"""
 
     def run_veririca_pdf_tem_assinatura(self):
         global sss

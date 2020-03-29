@@ -2,7 +2,7 @@ from datetime import datetime
 import os
 
 from PyPDF4.pdf import PdfFileReader
-from django import apps
+from django.apps import apps
 from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.mail.message import EmailMultiAlternatives
@@ -75,34 +75,40 @@ def signed_name_and_date_extract_pre_save(sender, instance, using, **kwargs):
         if not ff:
             continue
 
-        file = ff.file.file
-        if not isinstance(ff.file, InMemoryUploadedFile):
-            original_absolute_path = '{}/original__{}'.format(
-                ff.storage.location,
-                ff.name)
-            file = open(original_absolute_path, "rb")
-            signs = signed_name_and_date_extract(file)
-            file.close()
-        else:
-            signs = signed_name_and_date_extract(file)
+        try:
+            file = ff.file.file
+            if not isinstance(ff.file, InMemoryUploadedFile):
+                original_absolute_path = '{}/original__{}'.format(
+                    ff.storage.location,
+                    ff.name)
 
-        if not signs:
-            continue
+                with open(original_absolute_path, "rb") as file:
+                    signs = signed_name_and_date_extract(file)
+                    file.close()
+            else:
+                signs = signed_name_and_date_extract(file)
 
-        if not metadata:
-            metadata = {'signs': {}}
+            if not signs:
+                continue
 
-        if 'signs' not in metadata:
-            metadata['signs'] = {}
+            if not metadata:
+                metadata = {'signs': {}}
 
-        metadata['signs'][fn] = signs
+            if 'signs' not in metadata:
+                metadata['signs'] = {}
+
+            metadata['signs'][fn] = signs
+        except:
+            pass
 
     instance.metadata = metadata
 
 
-for app in apps.apps.get_app_configs():
+for app in apps.get_app_configs():
     for model in app.get_models():
-        if hasattr(model, 'FIELDFILE_NAME'):
+        if hasattr(model, 'FIELDFILE_NAME') and not hasattr(model, 'metadata'):
+            print(model)
+        if hasattr(model, 'FIELDFILE_NAME') and hasattr(model, 'metadata'):
             pre_save.connect(
                 signed_name_and_date_extract_pre_save,
                 sender=model)
