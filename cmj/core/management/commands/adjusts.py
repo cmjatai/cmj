@@ -116,8 +116,12 @@ class Command(BaseCommand):
             (DocumentoAcessorioAdministrativo,  'data__year__gte',  2014),
         )
 
-        for m in models:
-            qs = m.objects.filter(ano__gte=2010)
+        for model in models:
+            m = model[0]
+            params = {
+                model[1]: model[2]
+            }
+            qs = m.objects.filter(**params)
             for item in qs:
                 if not hasattr(item, 'FIELDFILE_NAME') or not hasattr(item, 'metadata'):
                     break
