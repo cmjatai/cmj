@@ -150,6 +150,34 @@
   }
 }
 
+.box-assinatura-eletronica {
+  text-align: left;
+  .title {
+    font-weight: bold;
+    padding: 1px 5px;
+    display: inline-block;
+  }
+  .sigs {
+    margin-right: 15px;
+  }
+  .sig {
+    background-color: white;
+    padding: 5px 10px;
+    display: inline-block;
+    line-height: 1;
+    margin-bottom: 3px;
+    border-radius: 5px;
+    text-align: center;
+    .sig-nome {
+      display: block;
+    }
+    .sig-data {
+
+    }
+  }
+
+}
+
 .container-table {
   .item-listas {
     &:hover {
