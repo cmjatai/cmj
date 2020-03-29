@@ -1,6 +1,8 @@
 from operator import xor
 
+from django.contrib.postgres.fields.jsonb import JSONField
 from django.core.exceptions import ValidationError
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models import Q
 from django.utils import timezone, formats
@@ -94,10 +96,11 @@ def anexo_upload_path(instance, filename):
 @reversion.register()
 class SessaoPlenaria(models.Model):
     FIELDFILE_NAME = ('upload_pauta', 'upload_ata', 'upload_anexo')
-    # TODO trash??? Seems to have been a FK in the past. Would be:
-    # andamento_sessao = models.ForeignKey(
-    #    AndamentoSessao, blank=True, null=True)
-    # TODO analyze querying all hosted databases !
+
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+
     cod_andamento_sessao = models.PositiveIntegerField(blank=True, null=True)
 
     painel_aberto = models.BooleanField(blank=True, default=False,

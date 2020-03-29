@@ -29,9 +29,10 @@ from reportlab.platypus.paragraph import Paragraph
 from cmj.core.models import OcrMyPDF
 from cmj.utils import signed_name_and_date_extract
 from sapl.compilacao.models import Dispositivo
-from sapl.materia.models import MateriaLegislativa
+from sapl.materia.models import MateriaLegislativa, DocumentoAcessorio
 from sapl.norma.models import NormaJuridica
-from sapl.protocoloadm.models import DocumentoAdministrativo
+from sapl.protocoloadm.models import DocumentoAdministrativo,\
+    DocumentoAcessorioAdministrativo
 
 
 def _get_registration_key(model):
@@ -107,11 +108,20 @@ class Command(BaseCommand):
         self.run_capture_fields_from_pdf()
 
     def run_capture_fields_from_pdf(self):
-        models = (NormaJuridica, )
+        models = (
+            (NormaJuridica, 'ano__gte', 2019),
+            (MateriaLegislativa, 'ano__gte',  2020),
+            (DocumentoAcessorio, 'data__year__gte',  2014),
+            (DocumentoAdministrativo, 'ano__gte',  2014),
+            (DocumentoAcessorioAdministrativo,  'data__year__gte',  2014),
+        )
 
         for m in models:
-            qs = m.objects.order_by('-ano', '-id')[:5]  # qs -> queryset
+            qs = m.objects.filter(ano__gte=2010)
             for item in qs:
+                if not hasattr(item, 'FIELDFILE_NAME') or not hasattr(item, 'metadata'):
+                    break
+                metadata = item.metadata
                 for fn in m.FIELDFILE_NAME:  # fn -> field_name
                     ff = getattr(item, fn)  # ff -> file_field
 
@@ -122,16 +132,20 @@ class Command(BaseCommand):
                         ff.storage.location,
                         ff.name)
 
-                    signs = signed_name_and_date_extract(
-                        original_absolute_path)
+                    file = open(original_absolute_path, "rb")
+                    signs = signed_name_and_date_extract(file)
+                    file.close()
 
-                    metadata = item.metadata if item.metadata else {}
+                    if not metadata:
+                        metadata = {'signs': {}}
 
-                    fn_signs = {'signs': {fn: signs}}
+                    if 'signs' not in metadata:
+                        metadata['signs'] = {}
 
-                    metadata.update(fn_signs)
-                    item.metadata = metadata
-                    item.save()
+                    metadata['signs'][fn] = signs
+
+                item.metadata = metadata
+                item.save()
 
     def run_veririca_pdf_tem_assinatura(self):
         global sss

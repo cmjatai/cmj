@@ -90,9 +90,13 @@ def signed_name_and_date_extract_pre_save(sender, instance, using, **kwargs):
             continue
 
         if not metadata:
-            metadata = {}
+            metadata = {'signs': {}}
 
-        metadata.update({'signs': {fn: signs}})
+        if 'signs' not in metadata:
+            metadata['signs'] = {}
+
+        metadata['signs'][fn] = signs
+
     instance.metadata = metadata
 
 
