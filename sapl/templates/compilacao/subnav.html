@@ -2,7 +2,10 @@
 {% load compilacao_filters %}
 {% load common_tags %}
   <ul class="nav nav-tabs justify-content-end">
-    {%if object and object|has_perm_change_instance:perms %}
+
+    {% if object and object|model_name == 'norma.NormaJuridica' and not object|has_perm_change_instance:perms  %}
+
+    {%else%}
       <li class="nav-item">
         {% if request.GET.back_type == 'history' and object.content_object %}
           <a class="nav-link" href="javascript:window.history.back()" title="{% trans 'Voltar para '%}{{object}}">{% trans 'Voltar para '%}{{object}}</a>

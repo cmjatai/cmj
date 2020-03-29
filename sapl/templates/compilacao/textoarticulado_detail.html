@@ -5,9 +5,9 @@
 {% load static %}
 {% load webpack_static from webpack_loader %}
 
+{% block base_container_header %}
 {% if object.content_object and object.content_object|model_name == 'norma.NormaJuridica' and not object.content_object|has_perm_change_instance:perms  %}
  
-  {% block base_container_header %}
     <div class="pt-3 d-flex justify-content-around align-items-center">
       <div>
         <img height="100"
@@ -37,8 +37,10 @@
         </h2>
       </div>
     </div>
-  {% endblock base_container_header %}
+{% else %}
+  {{ block.super }}
 {% endif %}
+{% endblock base_container_header %}
 
 {% block sections_nav %}
   {% include 'compilacao/subnav.html'%}
