@@ -17,7 +17,6 @@ from django.db import connection
 from django.db.models import F, Q
 from django.db.models.signals import post_delete, post_save
 from django.utils import timezone
-from fpdf.fpdf import FPDF
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import mm
