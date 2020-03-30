@@ -24,7 +24,7 @@ from haystack.utils.app_loading import haystack_get_model,\
     haystack_get_models
 
 from cmj import globalrules
-from cmj.core.models import AreaTrabalho
+from cmj.core.models import AreaTrabalho, CertidaoPublicacao
 from cmj.sigad import forms, models
 from cmj.sigad.forms import DocumentoForm, CaixaPublicacaoForm
 from cmj.sigad.models import Documento, Classe, ReferenciaEntreDocumentos,\
@@ -89,6 +89,13 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
         return results
 
     def get_ultimas_publicacoes(self):
+        qs = CertidaoPublicacao.objects.all()[:20]
+        r = []
+        for cert in qs:
+            r.append(cert)
+        return r
+
+    def get_ultimas_publicacoes__deprecated(self):
         sqs = SearchQuerySet().all()
         sqs = sqs.filter(
             Q(at=0) |

@@ -213,6 +213,14 @@ class NormaJuridica(CountPageMixin):
         return anexos
 
     @property
+    def is_signed(self):
+        try:
+            return self.metadata and self.metadata['signs'] and \
+                self.metadata['signs']['texto_integral']
+        except:
+            return False
+
+    @property
     def certidao(self):
         return self._certidao.all().first()
 

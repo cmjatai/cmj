@@ -59,54 +59,9 @@
           <tr>
             <td class="item-listas">
               <div class="item-raiz">
-                <strong>
-                  <a href="{% url 'sapl.norma:normajuridica_detail' n.pk %}">{{ n }}</a>
-                </strong>
-
-                <div class="text-ementa">
-                  {{n.ementa|safe}}
-                </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            </div>
+                {% include 'norma/normajuridica_widget_list.html' %}
+             </div>
             </td>
-            {% comment "" %}
-            
-            <td>
-                {% if n.get_normas_relacionadas.0|length == 0 and n.get_normas_relacionadas.1|length == 0%}
-                   Norma sem alterações posteriores.
-                {% else %}
-                  {% for p in n.get_normas_relacionadas.0 %}
-                    <div>
-                      <b>{{ p.tipo_vinculo.descricao_ativa }}</b>&nbsp;
-                        <a href="{% url 'sapl.norma:normajuridica_detail' p.norma_relacionada.pk %}">
-                          {{ p.norma_relacionada }}
-                        </a>
-                    </div>
-                  {% endfor %}
-                  {% for r in n.get_normas_relacionadas.1 %}
-                    <div>
-                      <b>{{ r.tipo_vinculo.descricao_passiva }}</b>&nbsp;
-                        <a href="{% url 'sapl.norma:normajuridica_detail' r.norma_principal.pk %}">
-                          {{ r.norma_principal }}
-                        </a>
-                    </div>
-                  {% endfor %}
-              {% endif %}
-            </td>
-            {% endcomment %}
     			</tr>
     		{% endfor %}
     	</table>

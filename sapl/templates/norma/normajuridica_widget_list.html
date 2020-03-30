@@ -1,0 +1,23 @@
+{% load i18n %}
+{% load compilacao_filters %}
+{% load common_cmj_tags common_tags%}
+
+<strong>
+  <a href="{% url 'sapl.norma:normajuridica_detail' n.pk %}">
+    {% if n.is_signed %}
+      <i class="fas fa-1x fa-certificate" title="Documento com Assinatura Digital"></i>
+    {% endif %}
+    {{ n }}
+  </a>
+</strong>
+{% comment %}
+{% if n.certidao %}
+  <br><small><small>
+  <span class="text-danger">Certidão de Publicação nº {{n.certidao.id|stringformat:"06d" }} de {{n.certidao.created}}</span>
+  </small>
+  </small>
+{% endif %}
+{% endcomment %}
+<div class="text-ementa">
+  {{n.ementa}}
+</div>

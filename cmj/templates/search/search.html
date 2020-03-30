@@ -238,10 +238,6 @@
                     {% endfor %}
                   </small>
 
-
-
-
-
                 {% elif result.model_name == 'diariooficial' %}
                     <div class="links-texto">
                       {% if result.object.arquivo %}
@@ -253,11 +249,6 @@
 
                     <a href="{% url 'cmj.diarios:diariooficial_detail' result.object.pk %}">{{ result.object }}</a>
                     <br><strong>Data:</strong> {{result.object.data}}
-
-
-
-
-                    
 
                 {% elif result.model_name == 'normajuridica' %}
                   {% comment %}
@@ -284,10 +275,6 @@
                   <div class="text-ementa">
                     {{result.object.ementa}}
                   </div>
-
-
-
-
                   
                 {% elif result.model_name == 'sessaoplenaria' %}
                     <strong>
