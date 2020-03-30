@@ -15,14 +15,25 @@
 {% block detail_content %}
 
   <div class="item-listas">
+
+  {% if not object.is_signed %}
+    {% with True as render_ementa %}
+      {% with object as n %}
+        {% include 'norma/normajuridica_widget_file.html' %}
+      {% endwith %}
+    {% endwith %}
+  {% else %}
     <div class="text-ementa">
       {{object.ementa|safe}}
     </div>
-  </div>
+  {% endif %}
 
-  {% with object as n %}
-    {% include 'norma/normajuridica_widget_file.html' %}
-  {% endwith %}
+  </div>
+  {% if object.is_signed %}
+    {% with object as n %}
+      {% include 'norma/normajuridica_widget_file.html' %}
+    {% endwith %}
+  {% endif %}
 
   {{ block.super }}
 

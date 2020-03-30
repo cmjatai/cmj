@@ -5,30 +5,30 @@
 {% load webpack_static from webpack_loader %}
 
 <div class="d-flex justify-content-between">
-  <div class="item-listas row align-items-center  justify-content-between">
-      <div class="col-sm-auto text-center">
+  <div class="item-listas row align-items-center file-normajuridica justify-content-between">
+    
+
+    <div class="col-12 col-md-auto justify-content-center">
       {% if n.texto_integral and '.pdf' in n.texto_integral.path %}
-        <a class="link-texto m-0" target="_blank" href="{{n.texto_integral.url}}" title="Documento Digitalizado">
+        <a class="link-texto" target="_blank" href="{{n.texto_integral.url}}" title="Documento Digitalizado">
           <i class="far fa-2x fa-file-pdf"></i>
           <br>
-          <strong style="white-space: nowrap">
+          <strong>
               Documento Digitalizado
-              <small>
+              <small style="white-space: nowrap;">
                 <br>Com OCR Otimizado para Download
               </small>
           </strong>
         </a>
       {% endif %}
-    </div>
-    <div class="col-sm-auto">
-      <a class="link-texto m-0"  target="_blank" href="{{n.texto_integral.url}}?original" title="Documento Eletrônico">
+      <a class="link-texto"  target="_blank" href="{{n.texto_integral.url}}?original" title="Documento Eletrônico">
         {% if n.metadata.signs and n.metadata.signs.texto_integral %}
           <i class="fas fa-2x fa-certificate"></i>
         {% else %}
           <i class="far fa-2x fa-file-{% if '.pdf' in n.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
         {% endif %}
         <br>
-        <strong style="white-space: nowrap">Documento 
+        <strong>Documento 
           {% if n.metadata.signs and n.metadata.signs.texto_integral %}
             Eletrônico
             <small>
@@ -36,7 +36,7 @@
             </small>
           {% else %}
             {% if '.pdf' in n.texto_integral.path %}
-                Digitalizado<br>Original
+                <br>Digitalizado Original
             {% else %}
               <br>Eletrônico
             {% endif %}
@@ -44,12 +44,16 @@
         </strong>
       </a>
     </div>
-
+    {% if render_ementa %}
+      <div class="col">
+        <div class="text-ementa">
+          {{n.ementa|safe}}
+        </div>
+      </div>
+    {% endif %}
     {% with n.metadata.signs.texto_integral as signs %}
       {% include 'core/sign_widget.html' %}
     {% endwith %}
-
-
 
   </div>
 </div>

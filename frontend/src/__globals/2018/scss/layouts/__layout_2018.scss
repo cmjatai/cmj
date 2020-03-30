@@ -141,6 +141,20 @@
   button {
     margin: 0 0 10px 10px;
   }
+
+  &.file-normajuridica {
+    margin-bottom: 20px;
+    .link-texto {
+      //margin: 0 0 10px 0;
+      //padding: 0;
+      &:not(:last-child) {
+        margin-right: 15px;
+      }
+    }
+    .col-md-auto {
+      display: flex;
+    }
+  }
 }
 
 .container-table {
@@ -164,7 +178,15 @@
 }
 .container-detail {
   .link-texto {
-    margin: 10px 20px 10px 0;
+    margin: 10px 10px 10px 0;
+  }
+  .childs {
+    padding: 10px;
+  }
+  .item-node {
+    padding: 10px;
+    .link-texto {
+    }
   }
 }
 
@@ -173,6 +195,9 @@
   text-align: left;
   padding: 5px 10px;
   border-radius: 5px;
+  flex: 0 0 auto;
+  width: auto;
+  max-width: 100%;
   .title {
     font-weight: bold;
     padding: 1px 5px;
@@ -405,41 +430,51 @@
       padding: 4px 2px;
     }
   }
-
-  .item-listas {
-    font-size: 80%;
-    line-height: 1.2;
-    
-    .item-raiz {
-      //padding-left: 0.5em;
-      //padding-top: 0.5em;
+  .container-table {
+    .result-count {
+      font-size: 80%;
     }
-    
-    .item-titulo {
-      font-size: 95%;
-    }
-
-    .text-ementa {
-      font-size: 120%;
-      padding: 0;
-      line-height: 1.5;
-    }
-
-    .item-node {
-       //margin: 0.5em 0 0.9em 0.5em;
-       //padding: 1em 0 0 0.5em;
-      //padding: 9px 0 0 9px;
-      //margin: 0;
-    }
-    .childs {
-
+    .item-listas {
+      font-size: 90%;
+      .item-node {
+        padding: 10px 0px 10px 10px;
+        margin: 5px 0 5px 10px;
+      }
       .link-texto {
-        //margin-left: 0.4em;
-        //margin-right: 0.9em ;
+        margin: 0px 10px 0 0px;
       }
     }
   }
+  
+  .container-detail {
+    .item-raiz {
+      padding-top: 20px;
+    }
+  }
+  .item-listas {
+    line-height: 1.15;
+    
 
+    .childs {
+      .item-node {
+        padding-top: 20px;
+      }
+      .link-texto {
+        margin: 5px 10px 0 0px;
+      }
+      .parent-right {
+        top: 10px;
+        left: 5px;
+        right: auto;
+      }
+    }
+
+    &.file-normajuridica {
+      .col-md-auto {
+        margin-bottom: 10px;
+      }
+    }
+  }
 }
 
 
@@ -463,6 +498,21 @@
       }
     }
   }
+
+  .item-listas {
+    &.file-normajuridica {
+      .link-texto {
+        &:not(:last-child) {
+          margin-right: 0px;
+          margin-bottom: 10px;
+        }
+      }
+      .col-md-auto {
+        flex-direction: column;
+        margin-bottom: 10px;
+      }
+    }
+  }
 }
 
 @media screen and (min-width: 576px) {
@@ -476,40 +526,3 @@
 }
 
 
-
-
-/* 
-main {
-  .item-action-or-input {
-    border-color: darken($color_main_bg, 10%);
-    &:hover {
-      border-color: darken($color_main_bg, 20%);
-      box-shadow: 0 0 30px  lighten($color_main_bg, 3%);
-    }
-    &:focus, &:active {
-      border-color: darken($color_main_bg, 40%);
-      box-shadow: 0 0 30px  lighten($color_main_bg, 3%);
-        background-color:  darken($color_container_bg, 10%);
-    }
-  }
-  .form-control, .btn-outline-primary {
-    @extend .item-action-or-input;
-  }
-  .btn-outline-primary {
-    color: darken($color_main_bg, 60%);
-    &:hover {
-      color: darken($color_main_bg, 70%);
-      background-color: $color_main_bg;
-    }
-    &.btn-excluir {
-      color: $danger;
-      &:hover {
-        color: white;
-        border-color: lighten($danger, 5%);
-        background-color: lighten($danger, 5%);
-      }
-    }
-  }
-}
-
- */

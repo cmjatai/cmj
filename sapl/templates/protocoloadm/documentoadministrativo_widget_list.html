@@ -1,10 +1,13 @@
 {% load i18n sigad_filters social_utils common_tags%}
 
-{% if doc_adm.texto_integral %}
-  <a href="{{doc_adm.texto_integral.url}}?u={% now "u"%}" title="Documento Administrativo">
-    <i class="far fa-file-{% if '.pdf' in doc_adm.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
-  </a>
-{% endif %}
+{% comment %}
+  {% if doc_adm.texto_integral %}
+    <a href="{{doc_adm.texto_integral.url}}?u={% now "u"%}" title="Documento Administrativo">
+      <i class="far fa-file-{% if '.pdf' in doc_adm.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
+    </a>
+  {% endif %}
+{% endcomment %}
+
 <strong>
   <a href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' doc_adm.pk %}">
     {% if doc_adm.is_signed %}
