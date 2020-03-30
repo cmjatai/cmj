@@ -213,11 +213,13 @@ class NormaTaView(IntegracaoTaView):
 
                 co = self.object.content_object
                 return redirect(
-                    reverse('{}:{}_detail'.format(
-                        co._meta.app_config.name,
-                        co._meta.model_name
-                    ),
-                        kwargs={'pk': self.object.object_id})
+                    reverse(
+                        '{}:{}_detail'.format(
+                            co._meta.app_config.name,
+                            co._meta.model_name
+                        ),
+                        kwargs={'pk': self.object.object_id}
+                    ) + '?display'
                 )
 
             return response
@@ -260,7 +262,7 @@ class NormaCrud(Crud):
             return btns
 
         def get(self, request, *args, **kwargs):
-            if not request.user.has_perm('norma.change_normajuridica') and \
+            if not 'display' in request.GET and not request.user.has_perm('norma.change_normajuridica') and \
                     self.get_object().texto_articulado.exists():
                 return redirect(reverse('sapl.norma:norma_ta',
                                         kwargs={'pk': self.kwargs['pk']}))

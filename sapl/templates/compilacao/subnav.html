@@ -3,6 +3,7 @@
 {% load common_tags %}
   <ul class="nav nav-tabs justify-content-end">
     {% if object.content_object and object.content_object|model_name == 'norma.NormaJuridica' and not object.content_object|has_perm_change_instance:perms  %}
+      
     {%else%}
       <li class="nav-item">
         {% if request.GET.back_type == 'history' and object.content_object %}

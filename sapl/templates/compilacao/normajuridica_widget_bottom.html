@@ -1,0 +1,41 @@
+{% load i18n %}
+{% load compilacao_filters %}
+{% load common_tags common_cmj_tags %}
+{% load static %}
+
+{% if n.get_normas_relacionadas.0|length > 0 or n.get_normas_relacionadas.1|length > 0 or n.get_anexos_norma_juridica|length > 0 %}
+  <div class="page-break"></div>
+{% endif %}
+
+<div class="row">
+  <div class="col-sm-12">
+
+      {% if n.get_normas_relacionadas.0|length > 0 or n.get_normas_relacionadas.1|length > 0%}
+        
+        <hr />
+        <p class="control-label">Normas Relacionadas</p>
+      {% endif %}
+
+      {% if n.get_normas_relacionadas.0|length > 0 %}
+        {% for p in n.get_normas_relacionadas.0 %}
+          <div class="form-control-static">
+            <b>{{ p.tipo_vinculo.descricao_ativa }}</b>&nbsp;
+            <a href="{% url 'sapl.norma:normajuridica_detail' p.norma_relacionada.pk %}">
+              {{ p.norma_relacionada.epigrafe }}
+            </a>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      {% if n.get_normas_relacionadas.1|length > 0 %}
+        {% for r in n.get_normas_relacionadas.1 %}
+          <div class="form-control-static">
+            <b>{{ r.tipo_vinculo.descricao_passiva }}</b>&nbsp;
+            <a href="{% url 'sapl.norma:normajuridica_detail' r.norma_principal.pk %}">
+            {{ r.norma_principal.epigrafe }}
+            </a>
+          </div>
+        {% endfor %}
+      {% endif %}
+  </div>
+</div>

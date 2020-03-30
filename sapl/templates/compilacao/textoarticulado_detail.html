@@ -5,16 +5,6 @@
 {% load static %}
 {% load webpack_static from webpack_loader %}
 
-{% block base_container_header %}
-
-
-{% if object.content_object and object.content_object|model_name == 'norma.NormaJuridica' and not object.content_object|has_perm_change_instance:perms  %}
-  {% include 'compilacao/normajuridica_widget.html' %}
-{% else %}
-  {{ block.super }}
-{% endif %}
-{% endblock base_container_header %}
-
 {% block sections_nav %}
   {% include 'compilacao/subnav.html'%}
 {% endblock %}

@@ -48,8 +48,6 @@
 
 .item-listas {
   position: relative;
-  padding: 2px 0 10px 0 !important;
-  border-bottom: 1px solid white;
 
   .links-texto {
     float:left;
@@ -60,7 +58,6 @@
     padding: 0.5em 1em;
     text-align: center;
     border-radius: 3px;
-    margin: 10px 20px 10px 10px;
     &:hover {
       background-color: $color_container_bg;
       text-decoration: none;
@@ -97,8 +94,6 @@
     }
   }
   .item-raiz {
-    padding: 10px 0 0 10px;
-    //margin-bottom: 10px;
     &.anexador {
       font-size: 75%;
     }
@@ -107,8 +102,6 @@
   
   .item-node {
     position: relative;
-    padding: 15px 0px 11px 15px;
-    margin: 11px 0 11px 18px;
     
     border:1px solid #fffa;
     border-right-width: 0;
@@ -150,15 +143,42 @@
   }
 }
 
+.container-table {
+  .item-listas {
+    border-bottom: 1px solid white;
+    &:hover {
+      background-color: rgba(#000, 0.1);
+    }
+  }
+  .item-raiz {
+    padding: 10px 0 0 10px;
+    margin-bottom: 10px;
+  }
+  .item-node {
+    padding: 15px 0px 11px 15px;
+    margin: 11px 0 11px 18px;
+  }
+  .link-texto {
+    margin: 10px 20px 10px 10px;
+  }
+}
+.container-detail {
+  .link-texto {
+    margin: 10px 20px 10px 0;
+  }
+}
+
 .box-assinatura-eletronica {
+  border: 1px solid darken($color_container_border, 10%);
   text-align: left;
+  padding: 5px 10px;
+  border-radius: 5px;
   .title {
     font-weight: bold;
     padding: 1px 5px;
     display: inline-block;
   }
   .sigs {
-    margin-right: 15px;
   }
   .sig {
     background-color: white;
@@ -168,6 +188,7 @@
     margin-bottom: 3px;
     border-radius: 5px;
     text-align: center;
+    font-size: 90%;
     .sig-nome {
       display: block;
     }
@@ -175,18 +196,7 @@
 
     }
   }
-
 }
-
-.container-table {
-  .item-listas {
-    &:hover {
-      background-color: rgba(#000, 0.1);
-    }
-  }
-}
-
-
 
 .page-header {
   padding: $grid-gutter-width * 0.5 $grid-gutter-width * 0.5 $grid-gutter-width * 0.3;
@@ -401,8 +411,8 @@
     line-height: 1.2;
     
     .item-raiz {
-      padding-left: 0.5em;
-      padding-top: 0.5em;
+      //padding-left: 0.5em;
+      //padding-top: 0.5em;
     }
     
     .item-titulo {
@@ -416,16 +426,16 @@
     }
 
     .item-node {
-       margin: 0.5em 0 0.9em 0.5em;
-       padding: 1em 0 0 0.5em;
+       //margin: 0.5em 0 0.9em 0.5em;
+       //padding: 1em 0 0 0.5em;
       //padding: 9px 0 0 9px;
       //margin: 0;
     }
     .childs {
 
       .link-texto {
-        margin-left: 0.4em;
-        margin-right: 0.9em ;
+        //margin-left: 0.4em;
+        //margin-right: 0.9em ;
       }
     }
   }

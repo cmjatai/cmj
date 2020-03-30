@@ -260,20 +260,22 @@
                     
 
                 {% elif result.model_name == 'normajuridica' %}
-                  <div class="links-texto">
-                    {% if result.object.texto_integral %}
-                      <a class="link-texto" href="{{result.object.texto_integral.url}}?u={% now "u"%}" title="Arquivo Digitalizado da Norma ">
-                        <i class="far fa-2x fa-file-{% if '.pdf' in result.object.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
-                        <br><small>Arquivo<br>Digitalizado da Norma</small>
+                  {% comment %}
+                    <div class="links-texto">
+                      {% if result.object.texto_integral %}
+                        <a class="link-texto" href="{{result.object.texto_integral.url}}?u={% now "u"%}" title="Arquivo Digitalizado da Norma ">
+                          <i class="far fa-2x fa-file-{% if '.pdf' in result.object.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
+                          <br><small>Arquivo<br>Digitalizado da Norma</small>
 
-                      </a>
-                    {% endif %}
-                    {% if result.object.texto_articulado.exists and result.object.texto_articulado.first.privacidade == 0 or perms.compilacao.change_dispositivo_edicao_dinamica%}
-                      <a class="link-texto" href="{% url 'sapl.norma:norma_ta' result.object.pk%}">
-                        Texto Articulado
-                      </a>
-                    {% endif %}
-                  </div>
+                        </a>
+                      {% endif %}
+                      {% if result.object.texto_articulado.exists and result.object.texto_articulado.first.privacidade == 0 or perms.compilacao.change_dispositivo_edicao_dinamica%}
+                        <a class="link-texto" href="{% url 'sapl.norma:norma_ta' result.object.pk%}">
+                          Texto Articulado
+                        </a>
+                      {% endif %}
+                    </div>
+                  {% endcomment %}
                   
                   <strong>
                     <a href="{% url 'sapl.norma:normajuridica_detail' result.object.pk %}">{{ result.object }}</a>

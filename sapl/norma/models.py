@@ -400,13 +400,14 @@ class AnexoNormaJuridica(CountPageMixin):
         verbose_name=_('Assunto do Anexo'),
         max_length=250
     )
-    anexo_arquivo = models.FileField(
+    anexo_arquivo = PortalFileField(
         blank=True,
         null=True,
         upload_to=norma_upload_path,
         verbose_name=_('Arquivo Anexo'),
         storage=OverwriteStorage(),
         validators=[restringe_tipos_de_arquivo_midias])
+
     ano = models.PositiveSmallIntegerField(verbose_name=_('Ano'),
                                            choices=RANGE_ANOS)
 
