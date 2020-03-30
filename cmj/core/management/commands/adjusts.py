@@ -8,81 +8,33 @@ import subprocess
 import time
 
 from PIL import Image
+from PyPDF4.generic import (
+    DictionaryObject,
+    NumberObject,
+    FloatObject,
+    NameObject,
+    TextStringObject,
+    ArrayObject
+)
 from PyPDF4.generic import IndirectObject
 from PyPDF4.pdf import PdfFileReader
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
-from django.db import connection
 from django.db.models import F, Q
 from django.db.models.signals import post_delete, post_save
 from django.utils import timezone
-from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.lib.units import mm
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.pdfgen import canvas
-from reportlab.platypus.paragraph import Paragraph
 
 from cmj.core.models import OcrMyPDF
-from cmj.utils import signed_name_and_date_extract
 from sapl.compilacao.models import Dispositivo, TextoArticulado,\
     TipoDispositivo
-from sapl.materia.models import MateriaLegislativa, DocumentoAcessorio
+from sapl.materia.models import MateriaLegislativa
 from sapl.norma.models import NormaJuridica
-from sapl.protocoloadm.models import DocumentoAdministrativo,\
-    DocumentoAcessorioAdministrativo
-from sapl.sessao.models import SessaoPlenaria
+from sapl.protocoloadm.models import DocumentoAdministrativo
 
 
 def _get_registration_key(model):
     return '%s_%s' % (model._meta.app_label, model._meta.model_name)
-
-
-class CompressPDF:
-
-    quality = {
-        0: '/default',
-        1: '/prepress',
-        2: '/printer',
-        3: '/ebook',
-        4: '/screen'
-    }
-
-    def compress(self, compress_level, file=None, new_file=None):
-
-        try:
-            initial_size = os.path.getsize(file)
-
-            r = subprocess.call([
-                'gs',
-                '-sDEVICE=pdfwrite',
-                '-dCompatibilityLevel=1.4',
-                '-dPDFSETTINGS=/prepress',
-                '-dNOPAUSE',
-                '-dQUIET',
-                '-dBATCH',
-                '-dAutoRotatePages=/None',
-                '-dCompressPages=true',
-                '-dColorImageResolution=96',
-                #'-dColorImageDownsampleType=/Bicubic',
-                '-sOutputFile={}'.format(new_file),
-                file]
-            )
-
-            final_size = os.path.getsize(new_file)
-            ratio = 1 - (final_size / initial_size)
-            print("Compression by {0:.0%}.".format(ratio))
-            print("Final file size is {0:.1f}MB".format(
-                final_size / 1000000))
-            return True
-
-        except Exception as error:
-            print('Caught this error: ' + repr(error))
-        except subprocess.CalledProcessError as e:
-            print("Unexpected error:".format(e.output))
-            return False
 
 
 class Command(BaseCommand):
@@ -179,199 +131,6 @@ class Command(BaseCommand):
                 item.metadata = metadata
                 item.save()"""
 
-    def run_veririca_pdf_tem_assinatura(self):
-        global sss
-        sss = 1
-
-        def tree_print(field_name, fields):
-            global sss
-            ss = " "
-            print(ss * sss, field_name, '.............')
-            if not isinstance(fields, dict):
-                if field_name == '/Contents':
-                    with open('/home/leandro/Downloads/content{}.ext'.format(sss), 'wb') as f:
-                        f.write(fields)
-                        f.close()
-                    return
-                else:
-                    print(' ' * sss, fields)
-                    return
-            for field_name, value in fields.items():
-                sss += 2
-                tree_print(field_name, value)
-                sss -= 2
-
-        ifile = '/home/leandro/Downloads/portaria_23_duas_assinaturas.pdf'
-        ifile = '/home/leandro/Downloads/Ofício Major sobre PLOE 13-2020.pdf'
-        o_path = '/home/leandro/Downloads/'
-
-        r = PdfFileReader(open(ifile, "rb"))
-
-        fields = r.getFields()
-
-        tree_print('file', fields)
-
-        #self.get_all_images_sign(r, o_path)
-
-    def get_all_images_sign(self, r, o_path):
-        global img_count
-
-        img_count = 0
-        o_path = o_path + 'img{}{}'
-
-        def busca_imagem(node):
-            global img_count
-
-            if isinstance(node, IndirectObject):
-                node = node.getObject()
-
-            if not isinstance(node, dict):
-                return
-
-            if '/Type' in node and node['/Type'] == '/XObject' and\
-                    '/Subtype' in node and node['/Subtype'] == '/Image':
-                size = (node['/Width'], node['/Height'])
-                data = node.getData()
-
-                if node['/ColorSpace'] == '/DeviceRGB':
-                    mode = "RGB"
-                elif node['/ColorSpace'] == '/DeviceGray':
-                    return
-                else:
-                    mode = "P"
-
-                try:
-                    if '/Filter' in node:
-                        if node['/Filter'] == '/FlateDecode':
-                            img = Image.frombytes(mode, size, data)
-                            img.save(o_path.format(img_count, ".png"))
-                        elif node['/Filter'] == '/DCTDecode':
-                            img = open(o_path .format(img_count, ".jpg"), "wb")
-                            img.write(data)
-                            img.close()
-                        elif node['/Filter'] == '/JPXDecode':
-                            img = open(o_path.format(img_count, ".jp2"), "wb")
-                            img.write(data)
-                            img.close()
-                        elif node['/Filter'] == '/CCITTFaxDecode':
-                            img = open(o_path.format(img_count, ".tiff"), "wb")
-                            img.write(data)
-                            img.close()
-                    else:
-                        img = Image.frombytes(mode, size, data)
-                        img.save(o_path.format(img_count, ".png"))
-                    img_count += 1
-                except Exception as e:
-                    print(e)
-
-            for key, value in node.items():
-                busca_imagem(value)
-
-        pageNo = 0
-        while (pageNo < r.numPages):
-            page = r.getPage(pageNo)
-
-            if '/Annots' not in page:
-                pageNo += 1
-                continue
-
-            for annot in page['/Annots']:
-
-                obj_annot = annot.getObject()
-                if '/AP' not in obj_annot or '/N' not in obj_annot['/AP']:
-                    continue
-
-                node = obj_annot['/AP']['/N'].getObject()
-
-                busca_imagem(node)
-
-            pageNo += 1
-
-    def get_all_images(self, r, o_path):
-        pageNo = 0
-        while (pageNo < r.numPages):
-            page = r.getPage(pageNo)
-
-            if '/XObject' in page['/Resources']:
-                xObject = page['/Resources']['/XObject'].getObject()
-
-                for obj in xObject:
-                    if xObject[obj]['/Subtype'] == '/Image':
-                        size = (xObject[obj]['/Width'],
-                                xObject[obj]['/Height'])
-                        data = xObject[obj].getData()
-
-                        if xObject[obj]['/ColorSpace'] == '/DeviceRGB':
-                            mode = "RGB"
-                        else:
-                            mode = "P"
-
-                        if '/Filter' in xObject[obj]:
-                            if xObject[obj]['/Filter'] == '/FlateDecode':
-                                img = Image.frombytes(mode, size, data)
-                                img.save(o_path + obj[1:] + ".png")
-                            elif xObject[obj]['/Filter'] == '/DCTDecode':
-                                img = open(o_path + obj[1:] + ".jpg", "wb")
-                                img.write(data)
-                                img.close()
-                            elif xObject[obj]['/Filter'] == '/JPXDecode':
-                                img = open(o_path + obj[1:] + ".jp2", "wb")
-                                img.write(data)
-                                img.close()
-                            elif xObject[obj]['/Filter'] == '/CCITTFaxDecode':
-                                img = open(o_path + obj[1:] + ".tiff", "wb")
-                                img.write(data)
-                                img.close()
-                        else:
-                            img = Image.frombytes(mode, size, data)
-                            img.save(o_path + obj[1:] + ".png")
-            else:
-                print("No image found.")
-
-            pageNo += 1
-
-        pass
-
-    def run_insert_font_pdf_file__test3(self):
-        ifile = '/home/leandro/TEMP/4084__com_fonte__.pdf'
-        pdf = open(ifile)
-
-        for p in pdf:
-            fl = p.getFontList()
-            for f in fl:
-                print(f)
-
-    def run_insert_font_pdf_file__test2(self):
-        helvetica_font = settings.FONTS_DIR.child('Helvetica.ttf')
-
-        ifile = '/home/leandro/TEMP/4084.pdf'
-
-        style = getSampleStyleSheet()
-        width, height = A4
-        c = canvas.Canvas(ofile, pagesize=A4)
-        pdfmetrics.registerFont(TTFont("Helvetica", helvetica_font))
-
-        cmj_string = '<font name="Helvetica" size="16">%s</font>'
-        cmj_string = cmj_string % "CMJ DOC"
-
-        p = Paragraph(cmj_string, style=style["Normal"])
-        p.wrapOn(c, width, height)
-        p.drawOn(c, 20, 750, mm)
-
-        c.save()
-
-    def run_insert_font_pdf_file__test1(self):
-        helvetica_font = settings.FONTS_DIR.child('Helvetica.ttf')
-
-        ifile = '/home/leandro/TEMP/4084.pdf'
-        ofile = '/home/leandro/TEMP/4084__com_fonte.pdf'
-
-        ppdf = FPDF()
-        ppdf.add_font('helvetica', style='', fname=helvetica_font, uni=True)
-
-        ppdf.set_font('helvetica')
-        ppdf.output(ofile, 'F')
-
     def run_checkcheck_olds(self):
         MateriaLegislativa.objects.filter(
             ano__lte=2012).update(checkcheck=True)
@@ -391,33 +150,6 @@ class Command(BaseCommand):
             except Exception as e:
                 print(e)
             # print(m.normajuridica())
-
-    def delete_itens_tmp_folder(self):
-        list = os.scandir('/home/leandro/desenvolvimento/envs/cmj/tmp/')
-
-        now = time.time()
-        for i in list:
-            age = now - os.stat(i.path)[stat.ST_MTIME]
-
-            if age > 86400:
-                if i.name.startswith('pymp') or\
-                        i.name.startswith('com.github.ocrmypdf'):
-                    shutil.rmtree(i.path, ignore_errors=True)
-
-    def reset_id_model(self, model):
-
-        query = """SELECT setval(pg_get_serial_sequence('"%(app_model_name)s"','id'),
-                    coalesce(max("id"), 1), max("id") IS NOT null) 
-                    FROM "%(app_model_name)s";
-                """ % {
-            'app_model_name': _get_registration_key(model)
-        }
-
-        with connection.cursor() as cursor:
-            cursor.execute(query)
-            # get all the rows as a list
-            rows = cursor.fetchall()
-            print(rows)
 
     def run_distibui_ocr_ao_longo_do_ano(self):
         ocrs = OcrMyPDF.objects.all().order_by('id')
@@ -449,18 +181,6 @@ class Command(BaseCommand):
                 m_new.checkcheck = True
                 m_new.save()
                 print(m_new)
-
-    def run_testa_ghostscript(self):
-        m = MateriaLegislativa.objects.get(pk=13576)
-
-        file_path = m.texto_original.file.name
-
-        p = CompressPDF()
-        p.compress(0, file_path, file_path + '__0__new.pdf')
-        #p.compress(1, file_path, file_path + '__1__new.pdf')
-        #p.compress(2, file_path, file_path + '__2__new.pdf')
-        #p.compress(3, file_path, file_path + '__3__new.pdf')
-        #p.compress(4, file_path, file_path + '__4__new.pdf')
 
     def run_ajusta_datas_de_edicao_com_certidoes(self):
 

@@ -6,7 +6,7 @@
 
 <div class="d-flex justify-content-between">
   <div class="item-listas row align-items-center  justify-content-between">
-      <div class="col-sm-auto mb-3 text-center">
+      <div class="col-sm-auto text-center">
       {% if n.texto_integral and '.pdf' in n.texto_integral.path %}
         <a class="link-texto m-0" target="_blank" href="{{n.texto_integral.url}}" title="Documento Digitalizado">
           <i class="far fa-2x fa-file-pdf"></i>
@@ -20,7 +20,7 @@
         </a>
       {% endif %}
     </div>
-    <div class="col-sm-auto mb-3">
+    <div class="col-sm-auto">
       <a class="link-texto m-0"  target="_blank" href="{{n.texto_integral.url}}?original" title="Documento Eletrônico">
         {% if n.metadata.signs and n.metadata.signs.texto_integral %}
           <i class="fas fa-2x fa-certificate"></i>
@@ -44,28 +44,12 @@
         </strong>
       </a>
     </div>
-    {% for nome, data in n.metadata.signs.texto_integral %}
-      {% if forloop.first %}
-        <div class="col mb-3">
-          <div class="box-assinatura-eletronica">
-            <span class="title">
-              Assinatura Digital
-            </span>
-            <div class="sigs">
-      {% endif %}
-            <div class="sig w-100">
-              <span class="sig-nome">
-                {{nome}}
-              </span>
-              <small class="sig-data">
-                Assinado em: {{data|parse_datetime|date:"DATETIME_FORMAT" }}
-              </small>
-            </div>
-      {% if forloop.last %}
-            </div>
-          </div>
-        </div>
-      {% endif %}
-    {% endfor %}
+
+    {% with n.metadata.signs.texto_integral as signs %}
+      {% include 'core/sign_widget.html' %}
+    {% endwith %}
+
+
+
   </div>
 </div>

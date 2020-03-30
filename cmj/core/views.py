@@ -4,6 +4,7 @@ import collections
 import json
 import re
 
+from django import template
 from django.conf import settings
 from django.conf.locale import ru
 from django.contrib import messages
@@ -380,7 +381,8 @@ class CertidaoPublicacaoCrud(Crud):
     DeleteView = None
 
     class BaseMixin(Crud.BaseMixin):
-        list_field_names = ['id', 'created', 'content_type', 'content_object']
+        list_field_names = ['id', 'created',
+                            'content_type', 'content_object', 'signs']
 
         @property
         def create_url(self):
@@ -392,6 +394,30 @@ class CertidaoPublicacaoCrud(Crud):
 
         def split_bylen(self, item, maxlen):
             return [item[ind:ind + maxlen] for ind in range(0, len(item), maxlen)]
+
+        def hook_header_signs(self, **kwargs):
+            return 'Assinaturas Digitais'
+
+        def hook_signs(self, *args, **kwargs):
+
+            obj = args[0].content_object
+            sig_tuples = []
+            try:
+                signs = obj.metadata['signs']
+                for fn, sigs in signs.items():
+                    for sig in sigs:
+                        sig_tuples.append(sig)
+
+                sign_template = template.loader.get_template(
+                    'core/sign_widget.html')
+                context = {}
+                context['signs'] = sig_tuples
+                rendered = sign_template.render(context, self.request)
+
+                return rendered, ''
+
+            except Exception as e:
+                return args[1], args[2]
 
         def hook_content_object(self, *args, **kwargs):
             hash = args[0].hash_code  # self.split_bylen(args[0].hash_code, 64)
