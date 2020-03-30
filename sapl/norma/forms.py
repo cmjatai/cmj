@@ -39,6 +39,12 @@ ORDENACAO_CHOICES = [('', '---------'),
                      ('data,tipo,ano,numero', _('Data/Tipo/Ano/Número'))]
 
 
+def CHOICE_SIGNEDS():
+    return [('', 'Ambos'),
+            (1, 'Documentos Com Assinatura Digital'),
+            (0, 'Documentos Sem Assinatura Digital')]
+
+
 class NormaFilterSet(django_filters.FilterSet):
 
     ano = django_filters.ChoiceFilter(required=False,
@@ -70,6 +76,12 @@ class NormaFilterSet(django_filters.FilterSet):
     vigencia = django_filters.BooleanFilter(
         label='Vigência', method='filter_vigencia')
 
+    signeds = django_filters.ChoiceFilter(
+        required=False,
+        choices=CHOICE_SIGNEDS,
+        label=_('Com Assinatura Digital?'),
+        method='filter_signeds')
+
     o = NormaPesquisaOrderingFilter(help_text='')
 
     class Meta(FilterOverridesMetaMixin):
@@ -84,7 +96,7 @@ class NormaFilterSet(django_filters.FilterSet):
         row2 = to_row([('ementa', 6), ('assuntos', 6)])
         row3 = to_row([('data', 6), ('data_publicacao', 6)])
         #row4 = to_row([('data_vigencia', 10), ('vigencia', 2)])
-        row5 = to_row([('o', 4), ('indexacao', 4), ('apelido', 4)])
+        row5 = to_row([('o', 4), ('signeds', 4), ('apelido', 4)])
 
         self.form.helper = SaplFormHelper()
         self.form.helper.form_method = 'GET'
@@ -105,6 +117,20 @@ class NormaFilterSet(django_filters.FilterSet):
         q = Q()
         for t in texto:
             q &= Q(ementa__icontains=t)
+        return queryset.filter(q)
+
+    def filter_signeds(self, queryset, name, value):
+        q = Q()
+
+        if not value:
+            return queryset
+
+        if value == '1':
+            q &= Q(metadata__signs__texto_integral__0__isnull=False)
+
+        else:
+            q &= (Q(metadata__signs__texto_integral__isnull=True) |
+                  Q(metadata__signs__texto_integral__len=0))
 
         return queryset.filter(q)
 
