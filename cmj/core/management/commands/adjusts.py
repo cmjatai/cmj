@@ -78,8 +78,9 @@ class Command(BaseCommand):
         models = (
             (NormaJuridica, 'ano__gte', 2010, 'data_ultima_atualizacao'),
             (MateriaLegislativa, 'ano__gte',  2010, 'data_ultima_atualizacao'),
+            (DocumentoAdministrativo, 'ano__gte',
+             2010, 'data_ultima_atualizacao'),
             #(DocumentoAcessorio, 'data__year__gte',  2010),
-            #(DocumentoAdministrativo, 'ano__gte',  2010),
             #(DocumentoAcessorioAdministrativo,  'data__year__gte',  2010),
             #(SessaoPlenaria,  'data_inicio__year__gte',  2010),
         )

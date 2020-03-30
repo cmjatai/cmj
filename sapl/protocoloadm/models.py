@@ -160,6 +160,10 @@ class Protocolo(models.Model):
 class DocumentoAdministrativo(CountPageMixin):
     FIELDFILE_NAME = ('texto_integral', )
 
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+
     tipo = models.ForeignKey(
         TipoDocumentoAdministrativo, on_delete=models.PROTECT,
         verbose_name=_('Tipo Documento'))
@@ -268,6 +272,14 @@ class DocumentoAdministrativo(CountPageMixin):
     @property
     def certidao(self):
         return self._certidao.all().first()
+
+    @property
+    def is_signed(self):
+        try:
+            return self.metadata and self.metadata['signs'] and \
+                self.metadata['signs']['texto_integral']
+        except:
+            return False
 
     @property
     def __descr__(self):

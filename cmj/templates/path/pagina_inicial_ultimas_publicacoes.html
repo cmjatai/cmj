@@ -3,54 +3,21 @@
   <h2 class="title-container-noticias">Últimas Publicações</h2>
   {% for cert in ultimas_publicacoes%}
     <div class="path-item-list">
+      <small class="pl-1">
+        {{ cert.content_object|meta_model_value:'verbose_name' }}
+      </small>
       <div class="inner">
         {% if cert.content_object|model_name == 'norma.NormaJuridica' %}
           {% with cert.content_object as n %}
             {% include 'norma/normajuridica_widget_list.html' %}
           {% endwith %}
-        {% elif False %}
+        {% elif cert.content_object|model_name == 'protocoloadm.DocumentoAdministrativo' %}
+
+          {% with cert.content_object as doc_adm %}
+            {% include 'protocoloadm/documentoadministrativo_widget_list.html' %}
+          {% endwith %}
 
 
-
-                {% if obj.texto_integral %}
-                  <a class="link-texto" href="{{obj.texto_integral.url}}?u={% now "u"%}" title="Documento Administrativo">
-                    <i class="far fa-file-{% if '.pdf' in obj.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
-                  </a>
-                {% endif %}
-                <strong>
-                  <a href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' obj.pk %}">{{ obj }}</a>
-                </strong>
-                <small>
-                  <br>
-                  <strong>Data:</strong> {{obj.data}}
-                  <div class="text-ementa">{{ obj.assunto }}</div>
-
-                  <small>
-                    {% for anexado in obj.documento_principal_set.all %}
-                      {% if forloop.first %}
-                        <div class="clearfix"></div>
-                        <strong>Documentos Vinculados:</strong>
-                        <ul>
-                      {% endif %}
-                      <li><a href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' anexado.documento_anexado.pk %}">{{ anexado.documento_anexado }}</a></li>
-                      {% if forloop.last %}
-                        </ul>
-                        {% endif %}
-                    {% endfor %}
-                    {% for principal in obj.documento_anexado_set.all %}
-                      {% if forloop.first %}
-                        <div class="clearfix"></div>
-                        
-                        <strong>Vinculado a:</strong>
-                        <ul>
-                      {% endif %}
-                        <li><a href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' principal.documento_principal.pk %}">{{ principal.documento_principal }}</a></li>
-                      {% if forloop.last %}
-                        </ul>
-                      {% endif %}
-                    {% endfor %}
-                  </small>
-                </small>
         {% endif %}
       </div>
     </div>

@@ -60,6 +60,11 @@ def model_name(instance):
 
 
 @register.filter
+def meta_model_value(instance, attr):
+    return getattr(instance._meta, attr)
+
+
+@register.filter
 def split(value, arg):
     return value.split(arg)
 

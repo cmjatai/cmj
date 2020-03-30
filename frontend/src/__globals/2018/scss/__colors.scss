@@ -117,7 +117,7 @@
 }
 
 
-.text-documentosadministrativos {
+.text-documentoadministrativo, .text-documentosadministrativos  {
   color: $color_documentoadministrativo !important;
 }
 .text-parlamentar {
@@ -138,7 +138,7 @@
 .text-transparencia {
   color: $color_transparencia !important;
 }
-.text-normasjuridicas {
+.text-normajuridica, .text-normasjuridicas {
   color: $color_normajuridica !important;
 }
 .text-documentosacessorios {

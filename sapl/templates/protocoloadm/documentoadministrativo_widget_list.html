@@ -1,0 +1,45 @@
+{% load i18n sigad_filters social_utils common_tags%}
+
+{% if doc_adm.texto_integral %}
+  <a href="{{doc_adm.texto_integral.url}}?u={% now "u"%}" title="Documento Administrativo">
+    <i class="far fa-file-{% if '.pdf' in doc_adm.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
+  </a>
+{% endif %}
+<strong>
+  <a href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' doc_adm.pk %}">
+    {% if doc_adm.is_signed %}
+      <i class="fas fa-1x fa-certificate" title="Documento possui versão com Assinatura Digital, entre nos detalhes do documento para visualizá-la."></i>
+    {% endif %}
+  {{ doc_adm }}</a>
+</strong>
+<small>
+  <br>
+  <strong>Data:</strong> {{doc_adm.data}}
+  <div class="text-ementa">{{ doc_adm.assunto }}</div>
+
+  <small>
+    {% for anexado in doc_adm.documento_principal_set.all %}
+      {% if forloop.first %}
+        <div class="clearfix"></div>
+        <strong>Documentos Vinculados:</strong>
+        <ul>
+      {% endif %}
+      <li><a href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' anexado.documento_anexado.pk %}">{{ anexado.documento_anexado }}</a></li>
+      {% if forloop.last %}
+        </ul>
+        {% endif %}
+    {% endfor %}
+    {% for principal in doc_adm.documento_anexado_set.all %}
+      {% if forloop.first %}
+        <div class="clearfix"></div>
+        
+        <strong>Vinculado a:</strong>
+        <ul>
+      {% endif %}
+        <li><a href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' principal.documento_principal.pk %}">{{ principal.documento_principal }}</a></li>
+      {% if forloop.last %}
+        </ul>
+      {% endif %}
+    {% endfor %}
+  </small>
+</small>
