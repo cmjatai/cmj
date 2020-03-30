@@ -2,7 +2,8 @@
 {% load i18n %}
 {% load compilacao_filters %}
 {% load common_tags %}
-
+{% block head_title %}{{object}}{% endblock head_title %}
+{% block meta_description%}{% if object.content_object %}{{object.content_object.ementa}}{% else %}{{object}}{% endif %}{% endblock meta_description %}
 {% block base_container_header %}
   {% if object.content_object and object.content_object|model_name == 'norma.NormaJuridica' and not object.content_object|has_perm_change_instance:perms  %}
     {% with object.content_object as n %}
