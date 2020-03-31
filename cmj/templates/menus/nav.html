@@ -18,6 +18,10 @@
         {% if item.url %}
           <li><a href="{{ item.url }}" title="{%trans 'Conteúdo' %}: {{item.title|striptags}}">
            <span title="">{% trans item.title|safe %}</span></a></li>
+        {% elif not item.url and not item.title%}
+          <li role="separator" class="divider"></li>
+        {% elif not item.url and not item.check_permission%}
+          <li class="dropdown-header">{{item.title|safe}}</li>
         {% endif %}
       {% endif %}
     {% endfor %}
