@@ -530,7 +530,7 @@ class RegistroVotacao(models.Model):
     class Meta:
         verbose_name = _('Votação')
         verbose_name_plural = _('Votações')
-        ordering = ('id')
+        ordering = ('id', )
 
     def __str__(self):
         return _('Ordem: %(ordem)s - Votação: %(votacao)s - '
