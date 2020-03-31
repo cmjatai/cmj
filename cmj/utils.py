@@ -144,6 +144,12 @@ def create_barcode(value):
     return data.decode('utf-8')"""
 
 
+def CHOICE_SIGNEDS():
+    return [('', 'Ambos'),
+            (1, 'Documentos Com Assinatura Digital'),
+            (0, 'Documentos Sem Assinatura Digital')]
+
+
 YES_NO_CHOICES = [(True, _('Sim')), (False, _('Não'))]
 
 

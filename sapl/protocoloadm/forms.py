@@ -8,6 +8,7 @@ from django.core.exceptions import (MultipleObjectsReturned,
                                     ObjectDoesNotExist, ValidationError)
 from django.db import models, transaction
 from django.db.models import Max
+from django.db.models import Q
 from django.forms import ModelForm
 from django.forms.widgets import ClearableFileInput
 from django.utils import timezone
@@ -15,6 +16,7 @@ from django.utils.translation import ugettext_lazy as _
 import django_filters
 
 from cmj.core.models import AreaTrabalho
+from cmj.utils import CHOICE_SIGNEDS
 from sapl.base.models import Autor, TipoAutor, AppConfig
 from sapl.crispy_layout_mixin import SaplFormHelper, to_column
 from sapl.crispy_layout_mixin import SaplFormLayout, form_actions, to_row
@@ -164,6 +166,12 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
                                              label='Em Tramitação?',
                                              choices=YES_NO_CHOICES)
 
+    signeds = django_filters.ChoiceFilter(
+        required=False,
+        choices=CHOICE_SIGNEDS,
+        label=_('Com Assinatura Digital?'),
+        method='filter_signeds')
+
     assunto = django_filters.CharFilter(
         label=_('Assunto'),
         lookup_expr='icontains')
@@ -221,8 +229,9 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
              ('data', 4)])
 
         row3 = to_row(
-            [('interessado', 6),
-             ('assunto', 6)])
+            [('interessado', 4),
+             ('assunto', 4),
+             ('signeds', 4)])
 
         row4 = to_row(
             [
@@ -257,6 +266,21 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
                 row3, row4,
                 buttons,)
         )
+
+    def filter_signeds(self, queryset, name, value):
+        q = Q()
+
+        if not value:
+            return queryset
+
+        if value == '1':
+            q &= Q(metadata__signs__texto_integral__0__isnull=False)
+
+        else:
+            q &= (Q(metadata__signs__texto_integral__isnull=True) |
+                  Q(metadata__signs__texto_integral__len=0))
+
+        return queryset.filter(q)
 
     def filter_numero(self, qs, name, value):
         value = str(value)

@@ -11,6 +11,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 import django_filters
 
+from cmj.utils import CHOICE_SIGNEDS
 from sapl.base.models import Autor, TipoAutor
 from sapl.crispy_layout_mixin import SaplFormHelper
 from sapl.crispy_layout_mixin import form_actions, to_row
@@ -37,12 +38,6 @@ YES_NO_CHOICES = [('', '---------'),
 ORDENACAO_CHOICES = [('', '---------'),
                      ('tipo,ano,numero', _('Tipo/Ano/Número')),
                      ('data,tipo,ano,numero', _('Data/Tipo/Ano/Número'))]
-
-
-def CHOICE_SIGNEDS():
-    return [('', 'Ambos'),
-            (1, 'Documentos Com Assinatura Digital'),
-            (0, 'Documentos Sem Assinatura Digital')]
 
 
 class NormaFilterSet(django_filters.FilterSet):
