@@ -12,6 +12,9 @@
 {% block detail_content %}
 <div class="item-listas">  
   <div class="item-raiz">
+
+    {% comment %}
+    
     <div class="links-texto">
       {% if object.texto_original %}
         <a class="link-texto" target="_blank"  href="{{object.texto_original.url}}?u={% now "u"%}" title="Texto Original">
@@ -26,7 +29,8 @@
         </a>
       {% endif %}
     </div>
-    
+    {% endcomment %}
+
     {% with object.autores.all.count as count_parlamentares %}
       {% for autor in object.autores.all %}
         {% if forloop.counter0 > 0 and forloop.counter0|organize_direction_horizontal_avatars:count_parlamentares %}
@@ -53,6 +57,7 @@
     {% endwith %}
 
     <div class="text-ementa">{{ object.ementa }}</div>
+
     <small>
       {% with object.tramitacao_set.last as tram %}
         {% if tram.unidade_tramitacao_destino %}        
@@ -64,6 +69,12 @@
       {% endwith %}
       <br>      
     </small>
+
+
+    {% with object as m %}
+      {% include 'materia/materialegislativa_widget_file.html' %}
+    {% endwith %}
+
     {{ block.super }}
 
   </div>

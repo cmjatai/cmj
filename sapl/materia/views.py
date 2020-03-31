@@ -9,6 +9,7 @@ from string import ascii_letters, digits
 import tempfile
 
 from crispy_forms.layout import HTML
+from django import template
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required, login_required
@@ -1806,6 +1807,20 @@ class MateriaLegislativaCrud(Crud):
                     return btns
 
         def hook_documentoadministrativo_set(self, obj):
+
+            docs = obj.documentoadministrativo_set.all()
+            if not docs.exists():
+                return '', ''
+
+            doc_template = template.loader.get_template(
+                'protocoloadm/documentoadministrativo_widget_materia.html')
+            context = {}
+            context['doc_list'] = docs
+            rendered = doc_template.render(context, self.request)
+
+            return 'Documentos Administrativos Vinculados a Matéria', rendered
+
+        def hook_documentoadministrativo_set__deprecated(self, obj):
 
             docs = obj.documentoadministrativo_set.all()
             if not docs.exists():

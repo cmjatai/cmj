@@ -3,11 +3,12 @@
 {% load common_cmj_tags common_tags%}
 {% load static %}
 {% load webpack_static from webpack_loader %}
-{% if d.texto_integral %}
-  <div class="row item-listas align-items-center file-documentoadministrativo justify-content-between">
+
+{% if m.texto_original %}
+  <div class="row item-listas align-items-center file-normajuridica justify-content-between">
     <div class="col-12 col-md-auto justify-content-center">
-      {% if d.texto_integral and '.pdf' in d.texto_integral.path %}
-        <a class="link-texto" target="_blank" href="{{d.texto_integral.url}}" title="Documento Digitalizado">
+      {% if m.texto_original and '.pdf' in m.texto_original.path %}
+        <a class="link-texto" target="_blank" href="{{m.texto_original.url}}" title="Documento Digitalizado">
           <i class="far fa-2x fa-file-pdf"></i>
           <br>
           <strong>
@@ -18,21 +19,21 @@
           </strong>
         </a>
       {% endif %}
-      <a class="link-texto"  target="_blank" href="{{d.texto_integral.url}}?original" title="Documento Eletrônico">
-        {% if d.metadata.signs and d.metadata.signs.texto_integral %}
+      <a class="link-texto"  target="_blank" href="{{m.texto_original.url}}?original" title="Documento Eletrônico">
+        {% if m.metadata.signs and m.metadata.signs.texto_original %}
           <i class="fas fa-2x fa-certificate"></i>
         {% else %}
-          <i class="far fa-2x fa-file-{% if '.pdf' in d.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
+          <i class="far fa-2x fa-file-{% if '.pdf' in m.texto_original.path %}pdf{% else %}archive{% endif %}"></i>
         {% endif %}
         <br>
         <strong>Documento 
-          {% if d.metadata.signs and d.metadata.signs.texto_integral %}
+          {% if m.metadata.signs and m.metadata.signs.texto_original %}
             Eletrônico
             <small>
               <br>com Assinatura Digital
             </small>
           {% else %}
-            {% if '.pdf' in n.texto_integral.path %}
+            {% if '.pdf' in m.texto_original.path %}
                 <br>Digitalizado Original
             {% else %}
               <br>Eletrônico
@@ -41,15 +42,15 @@
         </strong>
       </a>
     </div>
-    {% with d.metadata.signs.texto_integral as signs %}
-      {% include 'core/sign_widget.html' %}
-    {% endwith %}
     {% if render_ementa %}
-      <div class="col{% if d.metadata.signs.texto_integral %}-12{% endif %}">
+      <div class="col">
         <div class="text-ementa">
-          {{d.assunto|safe}}
+          {{m.ementa|safe}}
         </div>
       </div>
     {% endif %}
+    {% with m.metadata.signs.texto_original as signs %}
+      {% include 'core/sign_widget.html' %}
+    {% endwith %}
   </div>
 {% endif %}

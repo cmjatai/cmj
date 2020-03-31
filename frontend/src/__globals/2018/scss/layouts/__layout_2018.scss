@@ -195,6 +195,11 @@
     }
   }
 }
+.form-control-static {
+  .link-texto {
+    line-height: 1.15;
+  }
+}
 
 .box-assinatura-eletronica {
   border: 1px solid darken($color_container_border, 10%);

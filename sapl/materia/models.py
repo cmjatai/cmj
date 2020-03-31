@@ -327,6 +327,14 @@ class MateriaLegislativa(CountPageMixin):
             'tipo': self.tipo, 'numero': self.numero, 'ano': self.ano}
 
     @property
+    def is_signed(self):
+        try:
+            return self.metadata and self.metadata['signs'] and \
+                self.metadata['signs']['texto_original']
+        except:
+            return False
+
+    @property
     def epigrafe(self):
         return _('%(tipo)s nº %(numero)s de %(data)s') % {
             'tipo': self.tipo,

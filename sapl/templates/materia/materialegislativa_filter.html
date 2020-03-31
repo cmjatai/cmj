@@ -83,15 +83,14 @@
                           <i class="far fa-2x fa-file-{% if '.pdf' in m.texto_original.path %}pdf{% else %}archive{% endif %}"></i>
                         </a>
                       {% endif %}
-                      {% if m.texto_articulado.exists %}
-                        <a class="link-texto" href="{% url 'sapl.materia:materia_ta' m.id%}">
-                          Texto Articulado
-                        </a>
-                      {% endif %}
                     </div>
                     
                     <strong>
-                      <a href="{% url 'sapl.materia:materialegislativa_detail' m.id %}">{{m.tipo.sigla}} {{m.numero}}/{{m.ano}} - {{m.tipo}}</a>
+                      <a href="{% url 'sapl.materia:materialegislativa_detail' m.id %}">
+                          {% if m.is_signed %}
+                            <i class="fas fa-1x fa-certificate" title="Documento possui versão com Assinatura Digital, entre nos detalhes do documento para abrir o Arquivo Original"></i>
+                          {% endif %}
+                      {{m.tipo.sigla}} {{m.numero}}/{{m.ano}} - {{m.tipo}}</a>
                     </strong><br>
                     {% if m.numero_protocolo %}
                         <strong>Protocolo: </strong>{{m.numero_protocolo}}/{{m.ano}} | 

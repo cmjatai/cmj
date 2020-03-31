@@ -1,0 +1,18 @@
+{% load i18n sigad_filters social_utils common_tags%}
+
+{% for d in doc_list %}
+  <strong>
+      {% if d.is_signed %}
+        <i class="fas fa-1x fa-certificate" title="Documento possui versão com Assinatura Digital, entre nos detalhes do documento para abrir o Arquivo Original"></i>
+      {% endif %}
+    {{ d }}
+  </strong>
+  <small>
+    <br><strong>Data:</strong> {{d.data}}
+    {% with True as render_ementa %}
+      {% include "protocoloadm/documentoadministrativo_widget_file.html" %}
+    {% endwith %}
+    {{ d.observacao|safe }}
+
+  </small>
+{% endfor %}
