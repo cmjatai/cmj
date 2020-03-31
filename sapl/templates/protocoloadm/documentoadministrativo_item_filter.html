@@ -21,24 +21,22 @@
     </div>
 {% endif %}
   
+  {% if not render_widget_file %}
+    <div class="links-texto">
+        {% if d.texto_integral %}
+          <a class="link-texto"  target="_blank" href="{{d.texto_integral.url}}" title="Documento Administrativo">
+            <i class="far fa-2x fa-file-{% if '.pdf' in d.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
+          </a>
+      {% endif %}
+    </div>
+  {% endif %}
 
-  <div class="links-texto">
-      {% if d.texto_integral %}
-        <a class="link-texto"  target="_blank" href="{{d.texto_integral.url}}" title="Documento Administrativo">
-          <i class="far fa-2x fa-file-{% if '.pdf' in d.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
-        </a>
-          
-        
-         
-    {% endif %}
-  </div>
-
-    <a class="item-titulo" href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' d.pk %}">{% if d.is_signed %} <i class="fas fa-1x fa-certificate" title="Documento possui versão com Assinatura Digital, entre nos detalhes do documento e abra o Arquivo Original"></i>{% endif %} {{ d }}</a>
-    {% if d.certidao %}
-      <br><small>
-      <span class="text-danger">Certidão de Publicação nº {{d.certidao.id|stringformat:"06d" }} de {{d.certidao.created}}</span>
-      </small>
-    {% endif %}
+  <a class="item-titulo" href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' d.pk %}">{% if d.is_signed %} <i class="fas fa-1x fa-certificate" title="Documento possui versão com Assinatura Digital, entre nos detalhes do documento e abra o Arquivo Original"></i>{% endif %} {{ d }}</a>
+  {% if d.certidao %}
+    <br><small>
+    <span class="text-danger">Certidão de Publicação nº {{d.certidao.id|stringformat:"06d" }} de {{d.certidao.created}}</span>
+    </small>
+  {% endif %}
      
   <br><strong>Data do documento:</strong> {{d.data}} | {{d.tipo}} | {{d.tipo.sigla}} {{d.numero}}/{{d.ano}}
   {% if d.protocolo %}
@@ -57,6 +55,9 @@
     <div class="text-ementa">{{ d.assunto|safe }}</div>
   {% endif %}
 
+  {% if render_widget_file %}
+    {% include 'protocoloadm/documentoadministrativo_widget_file.html' %}
+  {% endif %}
 
   <small>
     {% if d.interessado %}
@@ -86,11 +87,14 @@
   </small>
 
     {% for anexado in d.documento_principal_set.childs_anexados %}
-      {% if forloop.first %}
+      {% if forloop.first %}        
+        <strong>Documentos Anexados:</strong>
         <div class="childs">
       {% endif %}
-        {% with anexado.documento_anexado as d %}
-          {% include "protocoloadm/documentoadministrativo_item_filter.html" %}
+        {% with True as render_widget_file %}
+          {% with anexado.documento_anexado as d %}
+            {% include "protocoloadm/documentoadministrativo_item_filter.html" %}
+          {% endwith %}
         {% endwith %}
       {% if forloop.last %}
         </div>

@@ -7,8 +7,10 @@
 
   <div class="item-listas">  
 
-          {% with object as d %}
-            {% include "protocoloadm/documentoadministrativo_item_filter.html" %}
+          {% with True as render_widget_file %}
+            {% with object as d %}
+              {% include "protocoloadm/documentoadministrativo_item_filter.html" %}
+            {% endwith %}
           {% endwith %}
 
           {% for principal in object.documento_anexado_set.all %}
