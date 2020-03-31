@@ -1110,8 +1110,9 @@ class MateriaLegislativaFilterSet(django_filters.FilterSet):
 
         row8 = to_row(
             [
-                ('o', 8),
-                ('tipo_listagem', 4)
+                ('o', 5),
+                ('signeds', 4),
+                ('tipo_listagem', 3)
             ])
 
         # row10 = to_row([
