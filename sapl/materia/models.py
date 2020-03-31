@@ -3,6 +3,8 @@ from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.postgres.fields.jsonb import JSONField
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models.functions import Concat
 from django.template import defaultfilters
@@ -189,6 +191,10 @@ def anexo_upload_path(instance, filename):
 @reversion.register()
 class MateriaLegislativa(CountPageMixin):
     FIELDFILE_NAME = ('texto_original', )
+
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
 
     tipo = models.ForeignKey(
         TipoMateriaLegislativa,

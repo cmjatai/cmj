@@ -23,6 +23,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 import django_filters
 
+from cmj.utils import CHOICE_SIGNEDS
 import sapl
 from sapl.base.models import AppConfig, Autor, TipoAutor
 from sapl.comissoes.models import Comissao, Participacao, Composicao
@@ -984,6 +985,12 @@ class MateriaLegislativaFilterSet(django_filters.FilterSet):
         required=False,
         label=_('Número do processo'))
 
+    signeds = django_filters.ChoiceFilter(
+        required=False,
+        choices=CHOICE_SIGNEDS,
+        label=_('Com Assinatura Digital?'),
+        method='filter_signeds')
+
     o = MateriaPesquisaOrderingFilter(help_text='')
 
     tipo_listagem = forms.ChoiceField(
@@ -1014,6 +1021,21 @@ class MateriaLegislativaFilterSet(django_filters.FilterSet):
                   'data_origem_externa',
                   'local_origem_externa',
                   ]
+
+    def filter_signeds(self, queryset, name, value):
+        q = Q()
+
+        if not value:
+            return queryset
+
+        if value == '1':
+            q &= Q(metadata__signs__texto_original__0__isnull=False)
+
+        else:
+            q &= (Q(metadata__signs__texto_original__isnull=True) |
+                  Q(metadata__signs__texto_original__len=0))
+
+        return queryset.filter(q)
 
     def filter_numero(self, qs, name, value):
 
