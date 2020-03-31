@@ -4,9 +4,7 @@
 {% load static %}
 {% load webpack_static from webpack_loader %}
 {% if d.texto_integral %}
-<div class="d-flex justify-content-between">
-  <div class="item-listas row align-items-center file-normajuridica justify-content-between">
-    
+  <div class="row item-listas align-items-center file-documentoadministrativo justify-content-between">
     <div class="col-12 col-md-auto justify-content-center">
       {% if d.texto_integral and '.pdf' in d.texto_integral.path %}
         <a class="link-texto" target="_blank" href="{{d.texto_integral.url}}" title="Documento Digitalizado">
@@ -14,7 +12,7 @@
           <br>
           <strong>
               Documento Digitalizado
-              <small style="white-space: nowrap;">
+              <small>
                 <br>Com OCR Otimizado para Download
               </small>
           </strong>
@@ -53,7 +51,5 @@
     {% with d.metadata.signs.texto_integral as signs %}
       {% include 'core/sign_widget.html' %}
     {% endwith %}
-
   </div>
-</div>
 {% endif %}

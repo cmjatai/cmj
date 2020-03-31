@@ -61,9 +61,12 @@
     padding: 0.5em 1em;
     text-align: center;
     border-radius: 3px;
+    &:not(:last-child) {
+      margin-right: 15px;
+    }
+
     &:hover {
       background-color: $color_container_bg;
-      text-decoration: none;
     }
   }
   .verbose_name {
@@ -100,12 +103,10 @@
     &.anexador {
       font-size: 75%;
     }
-    
   }
   
   .item-node {
     position: relative;
-    
     border:1px solid #fffa;
     border-right-width: 0;
     border-bottom-width: 0;
@@ -121,7 +122,6 @@
     .item-titulo {
       color:#004499;
     }
-    
   }
   
   .parent, .parent-right {
@@ -145,18 +145,9 @@
     margin: 0 0 10px 10px;
   }
 
-  &.file-normajuridica {
-    margin-bottom: 20px;
-    .link-texto {
-      //margin: 0 0 10px 0;
-      //padding: 0;
-      &:not(:last-child) {
-        margin-right: 15px;
-      }
-    }
-    .col-md-auto {
-      display: flex;
-    }
+  .col-md-auto {
+    display: flex;
+    padding-right: 0;
   }
 }
 
@@ -167,6 +158,7 @@
       background-color: rgba(#000, 0.1);
     }
   }
+
   .item-raiz {
     padding: 10px 0 0 10px;
     margin-bottom: 10px;
@@ -175,20 +167,31 @@
     padding: 15px 0px 11px 15px;
     margin: 11px 0 11px 18px;
   }
+
   .link-texto {
     margin: 10px 20px 10px 10px;
   }
 }
+
 .container-detail {
+  .item-listas {
+    padding-bottom: 15px;
+    .item-raiz {
+      padding-top: 15px;
+    }
+  }
   .link-texto {
-    margin: 10px 10px 10px 0;
+    //margin: 10px 10px 10px 0;
   }
   .childs {
     padding: 10px;
   }
   .item-node {
-    padding: 10px;
-    .link-texto {
+    padding: 15px;
+    line-height: 1.15;
+    margin-bottom: 10px;
+    .item-listas {
+      padding-bottom: 0;
     }
   }
 }
@@ -288,7 +291,6 @@
   }
 }
 
-
 .context-actions{
   display: flex;
   align-items: center;
@@ -369,7 +371,6 @@
   margin-top: 0;
   padding: 15px;
 
-
   bottom: 0;
   background: linear-gradient(to bottom, #fff0, #ffff);
   left: 0;
@@ -407,7 +408,6 @@
   }
 }
 
-
 @media screen and (max-width: 991px) {
   .header-accessibility {
     .links-to-content {
@@ -415,24 +415,30 @@
       height: 0px;
     }
   }
-
-  .container-leis-capa {
-    a {
-      font-size: 0.9rem;
-    }
-  }
 }
 
-
-
-
 @media screen and (max-width: 767px) {
-
-  .container-leis-capa {
-    a {
-      padding: 4px 2px;
+  .item-listas {
+    .col-md-auto {
+      padding-right: 15px;
+      padding-bottom: 15px;
     }
   }
+
+  .container-detail {
+    .item-listas {
+      line-height: 1.15;
+      .item-node {
+        padding-top: 20px;
+        .parent-right {
+          top: 10px;
+          left: auto;
+          right: 0;
+        }
+      }
+    }
+  }
+
   .container-table {
     .result-count {
       font-size: 80%;
@@ -440,8 +446,13 @@
     .item-listas {
       font-size: 90%;
       .item-node {
-        padding: 10px 0px 10px 10px;
+        padding: 20px 0px 10px 10px;
         margin: 5px 0 5px 10px;
+        .parent-right {
+          top: 10px;
+          left: auto;
+          right: 0;
+        }
       }
       .link-texto {
         margin: 0px 10px 0 0px;
@@ -449,46 +460,10 @@
     }
   }
   
-  .container-detail {
-    .item-raiz {
-      padding-top: 20px;
-    }
-  }
-  .item-listas {
-    line-height: 1.15;
-    
-
-    .childs {
-      .item-node {
-        padding-top: 20px;
-      }
-      .link-texto {
-        margin: 5px 10px 0 0px;
-      }
-      .parent-right {
-        top: 10px;
-        left: auto;
-        right: 0;
-      }
-    }
-
-    &.file-normajuridica {
-      .col-md-auto {
-        margin-bottom: 10px;
-      }
-    }
-  }
 }
 
 
 @media screen and (max-width: 575.98px) {
-
-  .container-leis-capa {
-    a {
-      font-size: 0.7rem;
-    }
-  }
-
   .nav-pagination {
     .pagination {
       display: flex;
@@ -501,21 +476,7 @@
       }
     }
   }
-
-  .item-listas {
-    &.file-normajuridica {
-      .link-texto {
-        &:not(:last-child) {
-          margin-right: 0px;
-          margin-bottom: 10px;
-        }
-      }
-      .col-md-auto {
-        flex-direction: column;
-        margin-bottom: 10px;
-      }
-    }
-  }
+  
 }
 
 @media screen and (min-width: 576px) {

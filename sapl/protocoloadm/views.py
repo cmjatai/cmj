@@ -274,6 +274,12 @@ class DocumentoAdministrativoCrud(Crud):
         def get_url_regex(cls):
             return r'^(?P<pk>\d+)$'
 
+        def get_context_data(self, **kwargs):
+            context = DetailView.get_context_data(self, **kwargs)
+            if self.object.epigrafe:
+                context['title'] = self.object.epigrafe
+            return context
+
     class ListView(QuerySetContainerPrivPubMixin, FilterView):
         filterset_class = DocumentoAdministrativoFilterSet
         paginate_by = 10

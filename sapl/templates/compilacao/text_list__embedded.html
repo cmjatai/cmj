@@ -3,6 +3,7 @@
 {% load common_tags %}
 
 <div class="cp">
+
   {% if object_list %}
     <div class="clearfix">
       <div class="actions btn-group float-right" role="group">
@@ -11,7 +12,7 @@
       </div>
     </div>
   {% endif %}
-
+  
   {% for key, values in view.get_vigencias.items %}
     {% if forloop.first %}
       <ul class="cp-linha-vigencias">

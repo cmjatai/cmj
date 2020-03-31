@@ -4,10 +4,7 @@
 {% load static %}
 {% load webpack_static from webpack_loader %}
 
-<div class="d-flex justify-content-between">
-  <div class="item-listas row align-items-center file-normajuridica justify-content-between">
-    
-
+  <div class="row item-listas align-items-center file-normajuridica justify-content-between">
     <div class="col-12 col-md-auto justify-content-center">
       {% if n.texto_integral and '.pdf' in n.texto_integral.path %}
         <a class="link-texto" target="_blank" href="{{n.texto_integral.url}}" title="Documento Digitalizado">
@@ -15,7 +12,7 @@
           <br>
           <strong>
               Documento Digitalizado
-              <small style="white-space: nowrap;">
+              <small>
                 <br>Com OCR Otimizado para Download
               </small>
           </strong>
@@ -56,4 +53,3 @@
     {% endwith %}
 
   </div>
-</div>

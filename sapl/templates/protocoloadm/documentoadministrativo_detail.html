@@ -21,14 +21,6 @@
             {% endif %}
             <li>
               {% with principal.documento_principal as d %}
-                <div class="links-texto">
-                    {% if d.texto_integral %}
-                      <a class="link-texto"  target="_blank" href="{{d.texto_integral.url}}" title="Documento Administrativo">
-                        <i class="far fa-2x fa-file-{% if '.pdf' in d.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
-                      </a>
-                    {% endif %}
-                </div>
-
                 <a class="item-titulo" href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' d.pk %}">{{ d }}</a>
                 {% if d.certidao %}
                   <br><small>

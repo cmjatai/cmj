@@ -68,7 +68,7 @@
                     {% endif %}
                   </div>
 
-                  <a class="item-titulo" href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' d.pk %}">{% if d.is_signed %} <i class="fas fa-1x fa-certificate"  title="Documento possui versão com Assinatura Digital, entre nos detalhes do documento e abra o Arquivo Original"></i>{% endif %} {{ d }}</a>
+                  <a class="item-titulo" href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' d.pk %}">{% if d.is_signed %} <i class="fas fa-1x fa-certificate"  title="Documento possui versão com Assinatura Digital, entre nos detalhes do documento para abrir o Arquivo Original"></i>{% endif %} {{ d }}</a>
                   {% if d.certidao %}
                     <br><small>
                     <span class="text-danger">Certidão de Publicação nº {{d.certidao.id|stringformat:"06d" }} de {{d.certidao.created}}</span>
@@ -160,7 +160,7 @@
                     {% endif %}
                     <li>
                       {% with principal.documento_principal as d %}
-
+                        {% comment %}
                         <div class="links-texto">
                             {% if d.texto_integral %}
                               <a class="link-texto" href="{{d.texto_integral.url}}" title="Documento Administrativo">
@@ -168,6 +168,7 @@
                               </a>
                             {% endif %}
                         </div>
+                        {% endcomment %}
 
                         <a class="item-titulo" href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' d.pk %}">{{ d }}</a>
                         {% if d.certidao %}
