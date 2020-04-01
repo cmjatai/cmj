@@ -1,6 +1,7 @@
 {% load i18n sigad_filters social_utils common_tags%}
 
 {% for d in doc_list %}
+<div>
   <strong>
       {% if d.is_signed %}
         <i class="fas fa-1x fa-certificate" title="Documento possui versão com Assinatura Digital."></i>
@@ -13,6 +14,6 @@
       {% include "protocoloadm/documentoadministrativo_widget_file.html" %}
     {% endwith %}
     {{ d.observacao|safe }}
-
   </small>
+</div>
 {% endfor %}
