@@ -303,7 +303,7 @@ export default {
   $width-sideright: 36px;
 
   .base-layout {
-    grid-template-columns: $width-sideleft $width-sideleft * 3 auto $width-sideright;
+    grid-template-columns: $width-sideleft $width-sideleft * 3 auto auto $width-sideright;
 
     header {
       grid-template-columns: auto 1px $width-sideleft;
