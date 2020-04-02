@@ -21,7 +21,7 @@ export default {
     visivel: function (nv, old) {
       if (nv) {
         this.api = undefined
-        const domain = 'jitsih.interlegis.leg.br'
+        const domain = 'meet.jit.si'
         const options = {
           roomName: 'CMJTeste',
           width: '100%',
