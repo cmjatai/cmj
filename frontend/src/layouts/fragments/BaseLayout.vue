@@ -262,7 +262,7 @@ export default {
   $width-sideright: 48px;
 
   .base-layout {
-    grid-template-columns: $width-sideleft $width-sideleft * 3 auto $width-sideright;
+    grid-template-columns: $width-sideleft $width-sideleft * 3 auto auto $width-sideright;
 
     font-size: 0.9rem;
     header {
