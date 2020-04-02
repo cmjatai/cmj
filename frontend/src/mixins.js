@@ -33,6 +33,9 @@ Vue.mixin({
     nivel (value, teste_local) {
       return this.nivel_detalhe >= value && teste_local ? '' : 'd-none'
     },
+    is_nivel (value) {
+      return this.nivel_detalhe === value
+    },
     month_text (month_num) {
       let month = [
         'Janeiro',

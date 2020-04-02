@@ -1,5 +1,5 @@
 <template>
-  <div :class="['base-layout', sideleft_expand ? 'left-expand': '']">
+  <div :class="['base-layout', sideleft_expand ? 'left-expand': '', is_nivel(NIVEL4) ? 'videoconf-show': '']">
 
     <header>
 
@@ -28,6 +28,10 @@
 
     <div class="sideleft">
       <slot name="sideleft"></slot>
+    </div>
+
+    <div class="videoconf">
+      <slot name="videoconf"></slot>
     </div>
 
     <div class="main" v-on:scroll.passive="handleScroll">
@@ -101,7 +105,7 @@ export default {
   line-height: 1;
 
   display: grid;
-  grid-template-columns: $width-sideleft $width-sideleft * 3 auto $width-sideright;
+  grid-template-columns: $width-sideleft $width-sideleft * 3 1fr 1fr $width-sideright;
   grid-template-rows: 60px auto;
   z-index: 4000;
 
@@ -121,7 +125,7 @@ export default {
     grid-row-start: 1;
     grid-row-end: 2;
     grid-column-start: 1;
-    grid-column-end: 5;
+    grid-column-end: 6;
     align-content: stretch;
     height: 60px;
 
@@ -168,9 +172,7 @@ export default {
     }
   }
 
-  .sideleft, .main, .sideright {
-    grid-row-start: 2;
-    grid-row-end: 3;
+  .sideleft, .main, .sideright, .videoconf {
     background-color: rgba($color: #f0f0f0, $alpha: 1);
     background-image: url("~@/assets/img/bg.png");
   }
@@ -181,16 +183,35 @@ export default {
     border-right: 1px #ddd solid;
   }
 
+  .videoconf {
+    display: none;
+  }
+
   .main {
     grid-column-start: 2;
-    grid-column-end: 4;
+    grid-column-end: 5;
     overflow: auto;
   }
 
   .sideright {
-    grid-column-start: 4;
-    grid-column-end: 5;
+    grid-column-start: 5;
+    grid-column-end: 6;
     border-left: 1px #ddd solid;
+  }
+  &.videoconf-show {
+    .sideleft {
+      grid-column-start: 1;
+      grid-column-end: 2;
+    }
+    .videoconf {
+      display: grid;
+      grid-column-start: 2;
+      grid-column-end: 4;
+    }
+    .main {
+      grid-column-start: 4;
+      grid-column-end: 5;
+    }
   }
 
   &.left-expand {
@@ -200,10 +221,26 @@ export default {
     }
     .main {
       grid-column-start: 3;
-      grid-column-end: 4;
+      grid-column-end: 5;
     }
-  }
 
+    &.videoconf-show {
+      .sideleft {
+        grid-column-start: 1;
+        grid-column-end: 3;
+      }
+      .videoconf {
+        display: grid;
+        grid-column-start: 3;
+        grid-column-end: 4;
+      }
+      .main {
+        grid-column-start: 4;
+        grid-column-end: 5;
+      }
+    }
+
+  }
   .empty-list {
     background-color: rgba($color: #e0e0e0, $alpha: 0.9);
     background-image: url("~@/assets/img/bg.png");

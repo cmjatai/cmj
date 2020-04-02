@@ -23,6 +23,10 @@
       <side-right></side-right>
     </template>
 
+    <template slot="videoconf">
+      <video-conferencia></video-conferencia>
+    </template>
+
     <template slot="main">
       <router-view></router-view>
     </template>
@@ -36,6 +40,7 @@ import SideLeft from './fragments/SideLeft'
 import Brand from './fragments/Brand'
 import BaseLayout from './fragments/BaseLayout'
 import NivelDetalhe from './NivelDetalhe'
+import VideoConferencia from '../pages/sessao/VideoConferencia'
 
 export default {
   name: 'online',
@@ -44,7 +49,8 @@ export default {
     SideRight,
     SideLeft,
     Brand,
-    NivelDetalhe
+    NivelDetalhe,
+    VideoConferencia
   },
   data () {
     return {

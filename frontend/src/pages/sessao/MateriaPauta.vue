@@ -171,7 +171,7 @@ export default {
     display: flex;
     font-size: 95%;
     align-items: center;
-    flex-flow: row nowrap;
+    flex-flow: row wrap;
 
     .protocolo-data {
       flex: 0 0 auto;

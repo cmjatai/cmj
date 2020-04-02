@@ -1,6 +1,10 @@
 {% extends "index.html" %}
 {% load render_bundle from webpack_loader %}
 
+{% block head_content %}
+<script src='https://meet.jit.si/external_api.js'></script>
+{% endblock %}
+
 {% block webpack_loader_css %}
     {{ block.super }}
 {% endblock %}
