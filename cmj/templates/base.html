@@ -149,20 +149,13 @@
               <div class="navbar-collapse collapse" id="navbar-menu">
                 <ul class="navbar-nav" id="menu_content">
                   
-                  {% if areatrabalho %}
-                    {% navbar 'navbar_areatrabalho.yaml' %}
+                  {% if areatrabalho%}
+                    {% navbar 'navbar/navbar_areatrabalho.yaml' %}
+                  {% elif perms.materia.add_proposicao %}
+                    {% navbar 'navbar/navbar_autor.yaml' %}
                   {% else %}
-                    {% navbar 'navbar_cmj.yaml' %}
-                    <li class="dropdown">
-                      <a href="#linkMenu" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                        {% trans "Atividade Legislativa" %}<span class="caret"></span>
-                      </a>
-                      <ul class="dropdown-menu menu-left" role="menu">
-                        {% navbar 'navbar_sapl.yaml' %}
-                      </ul>
-                    </li>
+                    {% navbar 'navbar/navbar_public.yaml' %}
                   {% endif %}
-
                 </ul>
 
                 {% include "base_menu_right.html" %}

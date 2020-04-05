@@ -1,31 +1,15 @@
 {% load i18n common_cmj_tags %}
-{% comment %}
-- title: {% trans 'Institucional' %}
+- title: {% trans 'Atividade Legislativa' %}
   children:
-    - title: {% trans 'Audiências Públicas' %}
-      url: sapl.audiencia:audienciapublica_list
-{% endcomment %}
-- title: {% trans 'Protocolo' %}
-  check_permission: protocoloadm.list_protocolo
-  children:
-    - title: {% trans 'Protocolo Geral' %}
-      url: sapl.protocoloadm:protocolo
-    - title: {% trans 'Protocolo de Matéria' %}
-      url: sapl.protocoloadm:protocolar_mat
-    - title: {% trans 'Protocolo de Documento' %}
-      url: sapl.protocoloadm:protocolar_doc
-    - title: {% trans 'Receber Proposições' %}
-      url: sapl.materia:receber-proposicao
-- title: {% trans 'Matérias Legislativas' %}
-  url: {% url 'sapl.materia:pesquisar_materia' %}
-- title: {% trans 'Sessões Plenárias' %}
-  url: {% url 'sapl.sessao:pesquisar_sessao' %}?data_inicio__year={% now 'Y' %}
+  - title: {% trans 'Matérias Legislativas' %}
+    url: {% url 'sapl.materia:pesquisar_materia' %}
+  - title: {% trans 'Sessões Plenárias' %}
+    url: {% url 'sapl.sessao:pesquisar_sessao' %}?data_inicio__year={% now 'Y' %}
+  - title: {% trans 'Relatórios' %}
+    url: sapl.base:relatorios_list
 
-- title: {% trans 'Relatórios' %}
-  url: sapl.base:relatorios_list
-
-- title: {% trans 'Sessão OnLine' %}
-  url: /online/
+  - title: {% trans 'Sessão OnLine' %}
+    url: /online/
                   
 {% if user.is_superuser %}
 - title: {% trans 'Documentos Administrativos (SUPERUSER)' %}

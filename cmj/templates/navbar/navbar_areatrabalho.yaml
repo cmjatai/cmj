@@ -1,0 +1,24 @@
+{% load i18n common_cmj_tags %}
+- title: {% trans "Portal" %}
+  url: ''
+  children:
+  {{ "navbar/navbar_public.yaml"|yaml_render:2|safe }}
+
+{% if user.is_superuser %}
+- title: {% trans "SAAP" %}
+  url: ''
+  children: 
+  {{ "navbar/restrict/navbar_saap.yaml"|yaml_render:2|safe }}
+{% else %}
+{{ "navbar/restrict/navbar_saap.yaml"|yaml_render:0|safe }}
+{% endif %}
+
+{% if perms.ouvidoria.list_solicitacao %}
+  {{ "navbar/public/navbar_esic.yaml"|yaml_render:0|safe }}
+{% endif %}
+
+{{ "navbar/restrict/navbar_protocolo.yaml"|yaml_render:0|safe }}
+
+{% if not perms.protocoloadm.list_protocolo %}
+  {{ "navbar/public/navbar_atividadelegislativa.yaml"|yaml_render:0|safe }}
+{% endif %}

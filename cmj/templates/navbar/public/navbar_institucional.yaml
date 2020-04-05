@@ -1,0 +1,27 @@
+{% load i18n common_cmj_tags %}
+- title: {% trans 'Institucional' %}
+  url: ''
+  children:
+  - title: {% trans 'Comissões' %}
+    url: sapl.comissoes:comissao_list
+  - title: {% trans 'Frentes' %}
+    url: sapl.parlamentares:frente_list
+
+  - title: {% trans 'Mesa Diretora' %}
+    url: sapl.parlamentares:mesa_diretora
+    check_permission: parlamentares.add_composicaomesa
+
+  - title: {% trans 'Procuradoria Geral' %}
+    url: /institucional/procuradoria-geral
+
+  - title: {% trans 'Agenda Pública' %}
+    url: /evento/
+
+  - title: {% trans 'Nossa Jataí' %}
+    url: /institucional/nossa-jatai
+
+  - title: {% trans 'História' %}
+    url: ''
+    children:
+    - title: {% trans 'Prefeitos de Nossa História' %}
+      url: /institucional/historia/prefeitos-de-nossa-historia

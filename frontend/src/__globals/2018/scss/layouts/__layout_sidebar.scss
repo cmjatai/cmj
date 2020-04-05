@@ -279,7 +279,7 @@ $fator-xl: 1.06;
     & > ul {
       display: flex;
       flex-direction: column;
-      justify-content: end;
+      justify-content: flex-end;
       text-align: right;
       ul {
         //display: flex;
