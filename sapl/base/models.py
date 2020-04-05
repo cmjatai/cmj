@@ -203,7 +203,8 @@ class Autor(models.Model):
 
     user = models.OneToOneField(get_settings_auth_user_model(),
                                 on_delete=models.SET_NULL,
-                                null=True)
+                                null=True,
+                                related_name='autor')
 
     tipo = models.ForeignKey(TipoAutor, verbose_name=_('Tipo do Autor'),
                              on_delete=models.PROTECT)
