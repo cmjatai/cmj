@@ -9,13 +9,17 @@
   url: ''
   children: 
   {{ "navbar/restrict/navbar_saap.yaml"|yaml_render:2|safe }}
+- title: {% trans "Ouvidoria" %}
+  url: ''
+  children: 
+  {{ "navbar/public/navbar_esic.yaml"|yaml_render:2|safe }}
 {% else %}
-{{ "navbar/restrict/navbar_saap.yaml"|yaml_render:0|safe }}
+  {{ "navbar/restrict/navbar_saap.yaml"|yaml_render:0|safe }}
+  {% if perms.ouvidoria.list_solicitacao %}
+    {{ "navbar/public/navbar_esic.yaml"|yaml_render:0|safe }}
+  {% endif %}
 {% endif %}
 
-{% if perms.ouvidoria.list_solicitacao %}
-  {{ "navbar/public/navbar_esic.yaml"|yaml_render:0|safe }}
-{% endif %}
 
 {{ "navbar/restrict/navbar_protocolo.yaml"|yaml_render:0|safe }}
 
