@@ -805,6 +805,13 @@ class Parecer(models.Model):
 
 @reversion.register()
 class Proposicao(models.Model):
+
+    FIELDFILE_NAME = ('texto_original', )
+
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+
     autor = models.ForeignKey(Autor,
                               null=True,
                               blank=True,
