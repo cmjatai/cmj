@@ -341,60 +341,6 @@ class _ParlamentarViewSet:
         return Response(serializer.data)
 
 
-@customize(Proposicao)
-class _ProposicaoViewSet():
-    """
-    list:
-        Retorna lista de Proposições
-
-        * Permissões:
-
-            * Usuário Dono:
-                * Pode listar todas suas Proposições 
-
-            * Usuário Conectado ou Anônimo:
-                * Pode listar todas as Proposições incorporadas
-
-    retrieve:
-        Retorna uma proposição passada pelo 'id'
-
-        * Permissões:
-
-            * Usuário Dono:
-                * Pode recuperar qualquer de suas Proposições 
-
-            * Usuário Conectado ou Anônimo:
-                * Pode recuperar qualquer das proposições incorporadas
-
-    """
-    class ProposicaoPermission(SaplModelPermissions):
-        def has_permission(self, request, view):
-            if request.method == 'GET':
-                return True
-                # se a solicitação é list ou detail, libera o teste de permissão
-                # e deixa o get_queryset filtrar de acordo com a regra de
-                # visibilidade das proposições, ou seja:
-                # 1. proposição incorporada é proposição pública
-                # 2. não incorporada só o autor pode ver
-            else:
-                perm = super().has_permission(request, view)
-                return perm
-                # não é list ou detail, então passa pelas regras de permissão e,
-                # depois disso ainda passa pelo filtro de get_queryset
-
-    permission_classes = (ProposicaoPermission, )
-
-    def get_queryset(self):
-        qs = super().get_queryset()
-
-        q = Q(data_recebimento__isnull=False, object_id__isnull=False)
-        if not self.request.user.is_anonymous():
-            q |= Q(autor__user=self.request.user)
-
-        qs = qs.filter(q)
-        return qs
-
-
 class ResponseFileMixin:
 
     def response_file(self, request, *args, **kwargs):
@@ -614,4 +560,62 @@ class _NormaJuridicaViewset(ResponseFileMixin):
 
     @action(detail=True)
     def texto_integral(self, request, *args, **kwargs):
+        return self.response_file(request, *args, **kwargs)
+
+
+@customize(Proposicao)
+class _ProposicaoViewSet(ResponseFileMixin):
+    """
+    list:
+        Retorna lista de Proposições
+
+        * Permissões:
+
+            * Usuário Dono:
+                * Pode listar todas suas Proposições 
+
+            * Usuário Conectado ou Anônimo:
+                * Pode listar todas as Proposições incorporadas
+
+    retrieve:
+        Retorna uma proposição passada pelo 'id'
+
+        * Permissões:
+
+            * Usuário Dono:
+                * Pode recuperar qualquer de suas Proposições 
+
+            * Usuário Conectado ou Anônimo:
+                * Pode recuperar qualquer das proposições incorporadas
+
+    """
+    class ProposicaoPermission(SaplModelPermissions):
+        def has_permission(self, request, view):
+            if request.method == 'GET':
+                return True
+                # se a solicitação é list ou detail, libera o teste de permissão
+                # e deixa o get_queryset filtrar de acordo com a regra de
+                # visibilidade das proposições, ou seja:
+                # 1. proposição incorporada é proposição pública
+                # 2. não incorporada só o autor pode ver
+            else:
+                perm = super().has_permission(request, view)
+                return perm
+                # não é list ou detail, então passa pelas regras de permissão e,
+                # depois disso ainda passa pelo filtro de get_queryset
+
+    permission_classes = (ProposicaoPermission, )
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        q = Q(data_recebimento__isnull=False, object_id__isnull=False)
+        if not self.request.user.is_anonymous():
+            q |= Q(autor__user=self.request.user)
+
+        qs = qs.filter(q)
+        return qs
+
+    @action(detail=True)
+    def texto_original(self, request, *args, **kwargs):
         return self.response_file(request, *args, **kwargs)
