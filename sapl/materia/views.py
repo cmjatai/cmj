@@ -827,15 +827,15 @@ class ProposicaoCrud(Crud):
                                               "atributos tipo={} e ano={}."
                                               .format(p.tipo.tipo_conteudo_related, p.ano))
 
-                            if p.numero_materia_futuro:
-                                numero = p.numero_materia_futuro
-                            else:
-                                numero = MateriaLegislativa.objects.filter(tipo=p.tipo.tipo_conteudo_related,
-                                                                           ano=p.ano).last().numero + 1
-                            messages.success(request, _(
-                                '%s : nº %s de %s <br>Atenção! Este número é apenas um provável '
-                                'número que pode não corresponder com a realidade'
-                                % (p.tipo, numero, p.ano)))
+                            # if p.numero_materia_futuro:
+                            #    numero = p.numero_materia_futuro
+                            # else:
+                            #    numero = MateriaLegislativa.objects.filter(tipo=p.tipo.tipo_conteudo_related,
+                            #                                               ano=p.ano).last().numero + 1
+                            # messages.success(request, _(
+                            #    '%s : nº %s de %s <br>Atenção! Este número é apenas um provável '
+                            #    'número que pode não corresponder com a realidade'
+                            #    % (p.tipo, numero, p.ano)))
                         except ValueError as e:
                             self.logger.error(
                                 "user=" + username + "." + str(e))

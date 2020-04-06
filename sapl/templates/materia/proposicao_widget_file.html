@@ -1,0 +1,44 @@
+{% load i18n %}
+{% load compilacao_filters %}
+{% load common_cmj_tags common_tags%}
+{% load static %}
+{% load webpack_static from webpack_loader %}
+
+{% if p.texto_original %}
+  <div class="row item-listas align-items-center file-normajuridica justify-content-between">
+    <div class="col-12 col-md-auto justify-content-center">
+      <a class="link-texto"  target="_blank" href="{{p.texto_original.url}}?original" title="Documento Eletrônico">
+        {% if p.metadata.signs and p.metadata.signs.texto_original %}
+          <i class="fas fa-2x fa-certificate"></i>
+        {% else %}
+          <i class="far fa-2x fa-file-{% if '.pdf' in p.texto_original.path %}pdf{% else %}archive{% endif %}"></i>
+        {% endif %}
+        <br>
+        <strong>Documento 
+          {% if p.metadata.signs and p.metadata.signs.texto_original %}
+            Eletrônico
+            <small>
+              <br>com Assinatura Digital
+            </small>
+          {% else %}
+            {% if '.pdf' in p.texto_original.path %}
+                <br>Digitalizado Original
+            {% else %}
+              <br>Eletrônico
+            {% endif %}
+          {% endif %}
+        </strong>
+      </a>
+    </div>
+    {% if p.metadata.signs and p.metadata.signs.texto_original %}
+      {% with p.metadata.signs.texto_original as signs %}
+        {% include 'core/sign_widget.html' %}
+      {% endwith %}
+    {% else %}
+      <div class="col alert alert-danger">
+        <strong>Atenção!!!</strong><br>
+        Arquivo não possui assinatura eletrônica. Não é permitido o envio!!!
+      </div>
+    {% endif %}
+  </div>
+{% endif %}

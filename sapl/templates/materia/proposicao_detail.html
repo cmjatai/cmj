@@ -1,14 +1,19 @@
 {% extends "crud/detail.html" %}
 {% load i18n common_tags %}
 {% load tz %}
+{% block title %}
+{{ block.super }}
+  {% if not object.data_recebimento and object.data_envio%}
+    <div class="alert alert-info alert-dismissible " role="alert">
+      <strong>{% trans "Proposição aguardando recebimento!" %}</strong>
+    </div>
+  {% endif %}
+{% endblock title %}
 {% block sub_actions %}
   {{block.super}}
   <div class="actions btn-group btn-group-sm {%block sub_actions_pull%}{% endblock%}" role="group">
     {% if object.texto_articulado.exists %}
       <a class="btn btn-success" href="{% url 'sapl.materia:proposicao_ta' object.pk%}">{% trans "Texto Eletrônico" %}</a>
-    {% endif %}
-    {% if object.texto_original %}
-      <a class="btn btn-success" href="{% url 'sapl.materia:proposicao_texto' object.pk %}">{% trans "Texto Original" %}</a>
     {% endif %}
   </div>
 {% endblock sub_actions%}
@@ -26,9 +31,11 @@
     {% endif %}
   {% else %}
     {% block editions_actions_send %}
-      <div class="actions btn-group" role="group">
-        <a href="{{ view.detail_url }}?action=send" class="btn btn-primary">{% trans 'Enviar' %}</a>
-      </div>
+      {% if object.metadata.signs and object.metadata.signs.texto_original %}
+        <div class="actions btn-group" role="group">
+          <a href="{{ view.detail_url }}?action=send" class="btn btn-primary">{% trans 'Enviar' %}</a>
+        </div>
+      {% endif %}
       <div class="actions btn-group" role="group">
         <a href="{{ view.update_url }}" class="btn btn-outline-primary">{% trans 'Editar' %}</a>
         <a href="{{ view.delete_url }}" class="btn btn-outline-primary btn-outline-danger">{% trans 'Excluir' %}</a>
@@ -37,9 +44,14 @@
   {% endif %}
 {% endblock editions %}
 {% block detail_content %}
+
+  {% with object as p %}
+    {% include 'materia/proposicao_widget_file.html' %}
+  {% endwith %}
+
   <h2 class="legend">{% model_verbose_name 'sapl.materia.models.Proposicao' %}</h2>
   <div class="row">
-    <div class="col-sm-3">
+    <div class="col-sm-4 small">
       <div id="div_id_tipo" class="form-group">
         <p class="control-label">{%field_verbose_name object 'tipo'%}</p>
         <div class="controls">
@@ -48,7 +60,7 @@
       </div>
     </div>
     {% if object.data_devolucao %}
-      <div class="col-sm-9">
+      <div class="col-sm-8">
         <div class="alert alert-danger alert-dismissible " role="alert">
           <strong>{% trans "Proposição devolvida em:" %} {{ object.data_devolucao}}</strong>
           <div >{% trans "Justificativa:" %} {{object.justificativa_devolucao}}</div>
@@ -56,7 +68,7 @@
       </div>
     {% else %}
       {% if object.data_envio %}
-        <div class="col-sm-3">
+        <div class="col-sm-4 small">
           <div id="div_id_data_envio" class="form-group">
             <p class="control-label">{%field_verbose_name object 'data_envio' %}</p>
             <div class="controls">
@@ -66,18 +78,12 @@
         </div>
       {% endif %}
       {% if object.data_recebimento %}
-        <div class="col-sm-3">
+        <div class="col-sm-4 small">
           <div id="div_id_data_envio" class="form-group">
             <p class="control-label">{%field_verbose_name object 'data_recebimento'%}</p>
             <div class="controls">
               <div class="form-control-static">{{object.data_recebimento}}</div>
             </div>
-          </div>
-        </div>
-      {% elif object.data_envio %}
-        <div class="col-sm-6">
-          <div class="alert alert-info alert-dismissible " role="alert">
-            <div >{% trans "Proposição aguardando recebimento!" %}</div>
           </div>
         </div>
       {% endif %}

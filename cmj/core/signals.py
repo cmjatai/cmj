@@ -72,6 +72,11 @@ def signed_name_and_date_extract_pre_save(sender, instance, using, **kwargs):
     for fn in instance.FIELDFILE_NAME:  # fn -> field_name
         ff = getattr(instance, fn)  # ff -> file_field
 
+        if metadata and 'signs' in metadata and \
+                        fn in metadata['signs'] and\
+                        metadata['signs'][fn]:
+            metadata['signs'][fn] = []
+
         if not ff:
             continue
 
@@ -99,6 +104,7 @@ def signed_name_and_date_extract_pre_save(sender, instance, using, **kwargs):
 
             metadata['signs'][fn] = signs
         except:
+
             pass
 
     instance.metadata = metadata
