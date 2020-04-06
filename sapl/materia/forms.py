@@ -1927,10 +1927,7 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
         fields = [
             to_column((Fieldset(
                 TipoProposicao._meta.verbose_name, Field('tipo')), 12)),
-            to_column(
-                (Alert('teste',
-                       css_class="ementa_materia hidden alert-info",
-                       dismiss=False), 12)),
+
             to_column(('descricao', 12)),
             to_column(('observacao', 12)),
 
@@ -1955,9 +1952,24 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
                     Fieldset(
                         _('Outras informações - Vincular a Matéria Legislativa Existente'),
                         to_row([('tipo_materia', 12), ]),
-                        to_row([('numero_materia', 6),
-                                ('ano_materia', 6)]),
-                    ), 12)),
+                        to_row(
+                            [
+                                ('numero_materia', 6),
+                                ('ano_materia', 6),
+                                (
+                                    Alert(
+                                        '',
+                                        css_class="ementa_materia hidden alert-info",
+                                        dismiss=False
+                                    ),
+                                    12
+                                )
+                            ]
+                        ),
+                    ),
+                    12
+                )
+            ),
         )
         self.helper = SaplFormHelper()
         self.helper.layout = SaplFormLayout(*fields)
