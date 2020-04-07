@@ -245,8 +245,10 @@ class TextoArticulado(TimestampedMixin):
         permissions = (
             ('view_restricted_textoarticulado',
              _('Pode ver qualquer Texto Articulado')),
-            ('lock_unlock_textoarticulado',
-             _('Pode bloquear/desbloquear edição de Texto Articulado')),
+            ('lock_textoarticulado',
+             _('Pode bloquear edição de Texto Articulado')),
+            ('unlock_textoarticulado',
+             _('Pode desbloquear edição de Texto Articulado')),
         )
 
     def __str__(self):
@@ -343,7 +345,7 @@ class TextoArticulado(TimestampedMixin):
         if self.editing_locked and\
             self.privacidade in (STATUS_TA_PUBLIC, STATUS_TA_EDITION) and\
                 not request.user.has_perm(
-                    'compilacao.lock_unlock_textoarticulado'):
+                    'compilacao.unlock_textoarticulado'):
             messages.error(request, _(
                 'A edição deste Texto Articulado está bloqueada. '
                 'É necessário acessar com usuário que possui '

@@ -171,7 +171,11 @@ rules_group_norma = {
             'change_dispositivo_edicao_avancada',
             'change_dispositivo_registros_compilacao',
             'change_dispositivo_de_vigencia_global'
-        ], __perms_publicas__)
+        ], __perms_publicas__),
+
+        (compilacao.TextoArticulado,
+         __base__ + ['lock_textoarticulado'], set()),
+
     ]
 }
 
@@ -317,7 +321,7 @@ rules_group_geral = {
         # confundir Autores, operadores de matéria e/ou norma.
         # Por isso está adicionado apenas para o operador geral
         (compilacao.TextoArticulado,
-         __base__ + ['lock_unlock_textoarticulado'], set()),
+         __base__ + ['unlock_textoarticulado', 'lock_textoarticulado'], set()),
 
         # estes tres models são complexos e a principio apenas o admin tem perm
         (compilacao.TipoDispositivo, [], set()),

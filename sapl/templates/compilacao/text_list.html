@@ -9,21 +9,13 @@
     {% with object.content_object as n %}
       {% include 'compilacao/normajuridica_widget_top.html' %}
     {% endwith %}
-  {% else %}
+  {% else %} 
     {{ block.super }}
   {% endif %}
 {% endblock base_container_header %}
 
 {% block base_content %}
-
-  {% block actions %}
-    {{block.super}}
-  {% endblock %}
-
-  {% block detail_content %}
-    {{block.super}}
-  {% endblock %}
-  
+  {{ block.super }}
   {% include 'compilacao/text_list__embedded.html'%}
 
   {% if object.content_object and object.content_object|model_name == 'norma.NormaJuridica' and not object.content_object|has_perm_change_instance:perms  %}

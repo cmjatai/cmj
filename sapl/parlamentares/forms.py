@@ -20,7 +20,7 @@ from sapl.base.models import Autor, TipoAutor
 from sapl.crispy_layout_mixin import SaplFormHelper
 from sapl.crispy_layout_mixin import form_actions, to_row
 from sapl.rules import SAPL_GROUP_VOTANTE
-from sapl.utils import FileFieldCheckMixin, filiacao_data, intervalos_tem_intersecao
+from sapl.utils import FileFieldCheckMixin, intervalos_tem_intersecao
 
 from .models import (ComposicaoColigacao, Filiacao, Frente, Legislatura,
                      Mandato, Parlamentar, Votante, Bloco, Bancada, CargoBloco,
@@ -91,7 +91,8 @@ class MandatoForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['tipo_afastamento'].queryset = TipoAfastamento.objects.filter(indicador='F')
+        self.fields['tipo_afastamento'].queryset = TipoAfastamento.objects.filter(
+            indicador='F')
 
     def clean(self):
         super(MandatoForm, self).clean()
@@ -266,7 +267,8 @@ class ParlamentarCreateForm(ParlamentarForm):
             return self.cleaned_data
 
         cleaned_data = self.cleaned_data
-        parlamentar = Parlamentar.objects.filter(nome_parlamentar=cleaned_data['nome_parlamentar']).exists()
+        parlamentar = Parlamentar.objects.filter(
+            nome_parlamentar=cleaned_data['nome_parlamentar']).exists()
 
         if parlamentar:
             self.logger.error('Parlamentar já cadastrado.')
@@ -592,11 +594,15 @@ class VincularParlamentarForm(forms.Form):
         data_expedicao_diploma = cleaned_data['data_expedicao_diploma']
 
         if parlamentar.mandato_set.filter(legislatura=legislatura):
-            self.logger.error('Parlamentar já está vinculado a legislatura informada.')
-            raise ValidationError(_('Parlamentar já está vinculado a legislatura informada.'))
+            self.logger.error(
+                'Parlamentar já está vinculado a legislatura informada.')
+            raise ValidationError(
+                _('Parlamentar já está vinculado a legislatura informada.'))
         elif data_expedicao_diploma and legislatura.data_inicio <= data_expedicao_diploma:
-            self.logger.error('Data da Expedição do Diploma deve ser anterior a data de início da Legislatura.')
-            raise ValidationError(_('Data da Expedição do Diploma deve ser anterior a data de início da Legislatura.'))
+            self.logger.error(
+                'Data da Expedição do Diploma deve ser anterior a data de início da Legislatura.')
+            raise ValidationError(
+                _('Data da Expedição do Diploma deve ser anterior a data de início da Legislatura.'))
 
         return cleaned_data
 
@@ -708,8 +714,10 @@ class CargoBlocoPartidoForm(ModelForm):
         if bloco_pk:
             self.bloco = Bloco.objects.get(pk=bloco_pk)
             partidos = self.bloco.partidos.all().values_list('id', flat=True)
-            parlamentares_filiacao = Filiacao.objects.select_related('partido').filter(partido__in=partidos).values_list('parlamentar', flat=True)
-            self.fields['parlamentar'].queryset = Parlamentar.objects.filter(id__in=parlamentares_filiacao)
+            parlamentares_filiacao = Filiacao.objects.select_related('partido').filter(
+                partido__in=partidos).values_list('parlamentar', flat=True)
+            self.fields['parlamentar'].queryset = Parlamentar.objects.filter(
+                id__in=parlamentares_filiacao)
 
         if self.instance and self.instance.pk:
             self.fields['parlamentar'].widget.attrs['disabled'] = 'disabled'
@@ -719,39 +727,45 @@ class CargoBlocoPartidoForm(ModelForm):
         super(CargoBlocoPartidoForm, self).clean()
         cleaned_data = self.cleaned_data
 
-        aux_data_fim = cleaned_data['data_fim'] if cleaned_data['data_fim'] else (cleaned_data['data_inicio'] + timedelta(days=1))
+        aux_data_fim = cleaned_data['data_fim'] if cleaned_data['data_fim'] else (
+            cleaned_data['data_inicio'] + timedelta(days=1))
 
         if cleaned_data['cargo'].unico:
             for vinculo in CargoBlocoPartido.objects.filter(bloco=self.bloco):
                 if not vinculo.data_fim:
                     vinculo.data_fim = timezone.now().date()
                 if intervalos_tem_intersecao(cleaned_data['data_inicio'],
-                    aux_data_fim,
-                    vinculo.data_inicio,
-                    vinculo.data_fim) and vinculo.cargo.unico and \
-                    not(self.instance and self.instance.id == vinculo.id):
-                        raise ValidationError("Cargo unico já é utilizado nesse período.")
+                                             aux_data_fim,
+                                             vinculo.data_inicio,
+                                             vinculo.data_fim) and vinculo.cargo.unico and \
+                        not(self.instance and self.instance.id == vinculo.id):
+                    raise ValidationError(
+                        "Cargo unico já é utilizado nesse período.")
 
         if aux_data_fim <= cleaned_data['data_inicio']:
-            raise ValidationError("Data Inicial deve ser anterior a data final.")
+            raise ValidationError(
+                "Data Inicial deve ser anterior a data final.")
 
         if self.instance and self.instance.pk:
             self.cleaned_data['parlamentar'] = self.instance.parlamentar
         else:
-            self.cleaned_data['parlamentar'] = self.cleaned_data.get('parlamentar')
+            self.cleaned_data['parlamentar'] = self.cleaned_data.get(
+                'parlamentar')
 
         fora_de_mandato = True
         for mandato in Mandato.objects.filter(parlamentar=self.cleaned_data.get('parlamentar')):
             if not intervalos_tem_intersecao(mandato.data_inicio_mandato,
-                    cleaned_data['data_inicio'],
-                    aux_data_fim,
-                    mandato.legislatura.data_fim):
+                                             cleaned_data['data_inicio'],
+                                             aux_data_fim,
+                                             mandato.legislatura.data_fim):
                 fora_de_mandato = False
         if fora_de_mandato:
-            raise ValidationError("Data de inicio e fim fora de periodo do mandato do parlamentar.")
+            raise ValidationError(
+                "Data de inicio e fim fora de periodo do mandato do parlamentar.")
 
         if self.instance.pk and (cleaned_data['parlamentar'].id != self.instance.parlamentar.id):
-            raise ValidationError("Não é possivel alterar o parlamentar " + str(self.instance.parlamentar))
+            raise ValidationError(
+                "Não é possivel alterar o parlamentar " + str(self.instance.parlamentar))
 
 
 class AfastamentoParlamentarForm(ModelForm):
@@ -768,9 +782,11 @@ class AfastamentoParlamentarForm(ModelForm):
 
         if not (self.instance and self.instance.pk):
             parlamentar = kwargs['initial']['parlamentar']
-            self.fields['mandato'].queryset = Mandato.objects.filter(parlamentar=parlamentar)
+            self.fields['mandato'].queryset = Mandato.objects.filter(
+                parlamentar=parlamentar)
 
-        self.fields['tipo_afastamento'].queryset = TipoAfastamento.objects.filter(indicador='A')
+        self.fields['tipo_afastamento'].queryset = TipoAfastamento.objects.filter(
+            indicador='A')
 
     def clean(self):
         super(AfastamentoParlamentarForm, self).clean()
@@ -796,8 +812,8 @@ class AfastamentoParlamentarForm(ModelForm):
 
         if data_fim_mandato and data_inicio_afastamento > data_fim_mandato:
             self.logger.error("Data início de afastamento ({}) posterior ao fim"
-                                " do mandato informado ({} a {})."
-                                .format(data_inicio_afastamento, data_fim_mandato))
+                              " do mandato informado ({} a {})."
+                              .format(data_inicio_afastamento, data_fim_mandato))
             raise ValidationError(_("Data início do afastamento posterior ao fim"
                                     " do mandato informado."))
 
@@ -812,16 +828,16 @@ class AfastamentoParlamentarForm(ModelForm):
             if data_fim_afastamento < data_inicio_mandato:
                 self.logger.error("Data fim de afastamento ({}) anterior ao início"
                                   " do mandato informado ({} a {})."
-                                .format(data_fim_afastamento, data_inicio_mandato))
+                                  .format(data_fim_afastamento, data_inicio_mandato))
                 raise ValidationError(_("Data fim do afastamento anterior ao início"
-                               " do mandato informado."))
+                                        " do mandato informado."))
 
             if data_fim_mandato and data_fim_afastamento > data_fim_mandato:
                 self.logger.error("Data fim de afastamento ({}) posterior ao fim"
                                   " do mandato informado ({})."
-                                .format(data_inicio_afastamento, data_fim_mandato))
+                                  .format(data_inicio_afastamento, data_fim_mandato))
                 raise ValidationError(_("Data fim do afastamento posterior ao fim"
-                               " do mandato informado."))
+                                        " do mandato informado."))
 
         ultimo_afastamento = AfastamentoParlamentar.objects.last()
         if ultimo_afastamento and not ultimo_afastamento.data_fim \

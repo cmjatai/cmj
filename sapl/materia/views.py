@@ -101,7 +101,7 @@ def autores_ja_adicionados(materia_pk):
     return autorias
 
 
-def proposicao_texto(request, pk):
+def proposicao_texto__deprecated(request, pk):
     logger = logging.getLogger(__name__)
     username = request.user.username
     logger.debug('user=' + username +
@@ -316,7 +316,7 @@ class ProposicaoTaView(IntegracaoTaView):
             proposicao = get_object_or_404(self.model, pk=kwargs['pk'])
 
             if not proposicao.data_envio and\
-                    request.user != proposicao.autor.user:
+                    request.user not in proposicao.autor.operadoes.all():
                 raise Http404()
 
             return IntegracaoTaView.get(self, request, *args, **kwargs)
@@ -1110,7 +1110,7 @@ class ReciboProposicaoView(TemplateView):
 
         return (Proposicao.objects.filter(
             id=self.kwargs['pk'],
-            autor__user_id=self.request.user.id).exists())
+            autor__operadores=self.request.user).exists())
 
     def get_context_data(self, **kwargs):
         context = super(ReciboProposicaoView, self).get_context_data(

@@ -10,27 +10,21 @@
 {% block actions %}
   {% if perms.compilacao.change_textoarticulado %}
     <div class="container-actions mt-4 mb-4 justify-content-between d-flex">
-
-      {% comment %}
-        {% if not object.temp_check_migrations %}
-          <div class="actions btn-group" role="group"> 
-            <a href="{% url 'sapl.compilacao:ta_text_edit' object.pk %}?check" class="btn btn-primary">
-              Confirmar Migração
-            </a>
-          </div>
-        {% else %}
-          <div class="actions btn-group" role="group"> 
-            <div class="btn btn-success">
-              Migração Confirmada
-            </div>
-          </div>      
-        {% endif %}
-      {% endcomment %}
-
-
       <div class="actions btn-group" role="group">
-        {% if perms.compilacao.lock_unlock_textoarticulado and not object.editable_only_by_owners%}
-              <a href="{% url 'sapl.compilacao:ta_text_edit' object.pk %}?{% if object.editing_locked %}unlock{%else%}lock{% endif %}" class="btn {% if object.editing_locked %}btn-outline-danger{%else%}btn-outline-primary{% endif %}">{% if object.editing_locked %}{% trans 'Desbloquear Edição' %}{%else%}{% trans 'Publicar Texto' %}{% endif %}</a>
+        {% if object.editing_locked %}
+          {% if perms.compilacao.unlock_textoarticulado and not object.editable_only_by_owners%}
+            <a href="{% url 'sapl.compilacao:ta_text_edit' object.pk %}?{% if object.editing_locked %}unlock{%else%}lock{% endif %}"
+                class="btn {% if object.editing_locked %}btn-danger{%else%}btn-outline-primary{% endif %}">
+                    {% trans 'Desbloquear Edição' %}
+                  </a>
+          {% endif %}
+        {% else %}
+          {% if perms.compilacao.unlock_textoarticulado and not object.editable_only_by_owners%}
+            <a href="{% url 'sapl.compilacao:ta_text_edit' object.pk %}?{% if object.editing_locked %}unlock{%else%}lock{% endif %}" 
+              class="btn {% if object.editing_locked %}btn-danger{%else%}btn-outline-primary{% endif %}">
+                {% trans 'Publicar Texto' %}
+                </a>
+          {% endif %}
         {% endif %}
 
         <a href="{% url 'sapl.compilacao:ta_edit' object.pk %}" class="btn btn-outline-primary">{% trans 'Editar Metadados do Texto Articulado' %}</a>
