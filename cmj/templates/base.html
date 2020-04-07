@@ -151,10 +151,10 @@
                   
                   {% if user.is_superuser %}
                     {% navbar 'navbar/navbar_superuser.yaml' %}
-                  {% elif areatrabalho%}
-                    {% navbar 'navbar/navbar_areatrabalho.yaml' %}
                   {% elif perms.materia.add_proposicao %}
                     {% navbar 'navbar/navbar_autor.yaml' %}
+                  {% elif areatrabalho%}
+                    {% navbar 'navbar/navbar_areatrabalho.yaml' %}
                   {% else %}
                     {% navbar 'navbar/navbar_public.yaml' %}
                   {% endif %}

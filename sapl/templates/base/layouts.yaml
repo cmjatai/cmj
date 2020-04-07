@@ -42,7 +42,12 @@ Autor:
   {% trans 'Autor' %}:
   - tipo:3  nome
   - cargo
+  - operadores
 
 AutorCreate:
   {% trans 'Cadastro de Usuários Autores' %}:
   - tipo:3 search_autor
+
+OperadorAutor:
+  {% trans 'Operador de Autor' %}:
+  - user operador_principal enviar_email

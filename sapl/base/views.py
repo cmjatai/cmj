@@ -15,6 +15,7 @@ from django.core.mail import send_mail
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.db import connection
 from django.db.models import Count, Q, ProtectedError
+from django.forms.utils import ErrorList
 from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.template import TemplateDoesNotExist
@@ -32,12 +33,14 @@ from django_filters.views import FilterView
 from haystack.query import SearchQuerySet
 from haystack.views import SearchView
 
+from cmj.core.models import groups_remove_user, groups_add_user
 from sapl import settings
 from sapl.audiencia.models import AudienciaPublica, TipoAudienciaPublica
-from sapl.base.forms import AutorForm, AutorFormForAdmin, TipoAutorForm
-from sapl.base.models import Autor, TipoAutor
+from sapl.base.forms import AutorForm, TipoAutorForm,\
+    OperadorAutorForm
+from sapl.base.models import Autor, TipoAutor, OperadorAutor
 from sapl.comissoes.models import Reuniao, Comissao
-from sapl.crud.base import CrudAux, make_pagination
+from sapl.crud.base import CrudAux, make_pagination, MasterDetailCrud
 from sapl.materia.models import (Autoria, MateriaLegislativa, Proposicao, Anexada,
                                  TipoMateriaLegislativa, StatusTramitacao, UnidadeTramitacao,
                                  DocumentoAcessorio, TipoDocumento)
@@ -174,20 +177,31 @@ class AutorCrud(CrudAux):
     help_topic = 'autor'
 
     class BaseMixin(CrudAux.BaseMixin):
-        list_field_names = ['tipo', 'nome', 'user']
+        paginate_by = 500
+        list_field_names = ['tipo', 'nome', 'operadores']
+
+    class DetailView(CrudAux.DetailView):
+
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            context[
+                'subnav_template_name'] = 'base/subnav_autor.yaml'
+            return context
 
     class DeleteView(CrudAux.DeleteView):
 
         def delete(self, *args, **kwargs):
             self.object = self.get_object()
+            grupo = Group.objects.filter(name='Autor')[0]
+            lista_operadores = list(self.object.operadores.all())
 
-            if self.object.user:
-                # FIXME melhorar captura de grupo de Autor, levando em conta
-                # trad
-                grupo = Group.objects.filter(name='Autor')[0]
-                self.object.user.groups.remove(grupo)
+            response = CrudAux.DeleteView.delete(self, *args, **kwargs)
 
-            return CrudAux.DeleteView.delete(self, *args, **kwargs)
+            if not Autor.objects.filter(pk=kwargs['pk']).exists():
+                for u in lista_operadores:
+                    u.groups.remove(grupo)
+
+            return response
 
     class UpdateView(CrudAux.UpdateView):
         logger = logging.getLogger(__name__)
@@ -198,22 +212,15 @@ class AutorCrud(CrudAux):
             # devido a implement do form o form_valid do Crud deve ser pulado
             return super(CrudAux.UpdateView, self).form_valid(form)
 
-        def post(self, request, *args, **kwargs):
-            if request.user.is_superuser:
-                self.form_class = AutorFormForAdmin
-            return CrudAux.UpdateView.post(self, request, *args, **kwargs)
-
-        def get(self, request, *args, **kwargs):
-            if request.user.is_superuser:
-                self.form_class = AutorFormForAdmin
-            return CrudAux.UpdateView.get(self, request, *args, **kwargs)
-
         def get_success_url(self):
             username = self.request.user.username
             pk_autor = self.object.id
             url_reverse = reverse('sapl.base:autor_detail',
                                   kwargs={'pk': pk_autor})
 
+            return url_reverse
+
+            # TODO: analisar envio de email neste cadastro dentro do portal CMJ
             if not mail_service_configured():
                 self.logger.warning(_('Registro de Autor sem envio de email. '
                                       'Servidor de email não configurado.'))
@@ -259,22 +266,15 @@ class AutorCrud(CrudAux):
         form_class = AutorForm
         layout_key = None
 
-        def post(self, request, *args, **kwargs):
-            if request.user.is_superuser:
-                self.form_class = AutorFormForAdmin
-            return CrudAux.CreateView.post(self, request, *args, **kwargs)
-
-        def get(self, request, *args, **kwargs):
-            if request.user.is_superuser:
-                self.form_class = AutorFormForAdmin
-            return CrudAux.CreateView.get(self, request, *args, **kwargs)
-
         def get_success_url(self):
             username = self.request.user.username
             pk_autor = self.object.id
             url_reverse = reverse('sapl.base:autor_detail',
                                   kwargs={'pk': pk_autor})
 
+            return url_reverse
+
+            # TODO: analisar envio de email neste cadastro dentro do portal CMJ
             if not mail_service_configured():
                 self.logger.warning(_('Registro de Autor sem envio de email. '
                                       'Servidor de email não configurado.'))
@@ -2203,3 +2203,77 @@ class RelatorioNormasPorAutorView(FilterView):
             ' - ' + self.request.GET['data_1'])
 
         return context
+
+
+class OperadorAutorCrud(MasterDetailCrud):
+    parent_field = 'autor'
+    model = OperadorAutor
+    help_path = 'operadorautor'
+
+    class BaseMixin(MasterDetailCrud.BaseMixin):
+
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            context[
+                'subnav_template_name'] = 'base/subnav_autor.yaml'
+            return context
+
+    class UpdateView(MasterDetailCrud.UpdateView):
+        form_class = OperadorAutorForm
+
+        # TODO tornar operador readonly na edição
+        def form_valid(self, form):
+            old = OperadorAutor.objects.get(pk=self.object.pk)
+
+            groups_remove_user(old.user, 'Autor')
+
+            response = super().form_valid(form)
+
+            groups_add_user(self.object.user, 'Autor')
+
+            return response
+
+    class CreateView(MasterDetailCrud.CreateView):
+        form_class = OperadorAutorForm
+        # TODO mostrar apenas usuários que não possuem grupo ou que são de
+        # acesso social
+
+        def form_valid(self, form):
+            self.object = form.save(commit=False)
+            oper = OperadorAutor.objects.filter(
+                user_id=self.object.user_id,
+                autor_id=self.object.autor_id
+            ).exists()
+
+            if oper:
+                form._errors['user'] = ErrorList([_(
+                    'Este Operador já está registrado '
+                    'para este Autor.')])
+                return self.form_invalid(form)
+
+            oper = OperadorAutor.objects.filter(
+                user_id=self.object.user_id).exclude(
+                autor_id=self.object.autor_id
+            ).exists()
+
+            if oper:
+                form._errors['user'] = ErrorList([_(
+                    'Este Operador já está registrado '
+                    'para outro Autor.')])
+                return self.form_invalid(form)
+
+            response = super().form_valid(form)
+
+            groups_add_user(self.object.user, 'Autor')
+            return response
+
+    class DeleteView(MasterDetailCrud.DeleteView):
+
+        def post(self, request, *args, **kwargs):
+
+            self.object = self.get_object()
+
+            groups_remove_user(self.object.user, 'Autor')
+
+            return MasterDetailCrud.DeleteView.post(
+                self, request, *args, **kwargs)

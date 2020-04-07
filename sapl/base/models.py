@@ -209,7 +209,8 @@ class Autor(models.Model):
         through='OperadorAutor',
         through_fields=('autor', 'user'),
         symmetrical=False,
-        related_name='autor_set')
+        related_name='autor_set',
+        verbose_name='Operadores')
 
     tipo = models.ForeignKey(TipoAutor, verbose_name=_('Tipo do Autor'),
                              on_delete=models.PROTECT)
