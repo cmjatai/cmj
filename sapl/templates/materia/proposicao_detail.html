@@ -1,14 +1,15 @@
 {% extends "crud/detail.html" %}
 {% load i18n common_tags %}
 {% load tz %}
-{% block title %}
-{{ block.super }}
-  {% if not object.data_recebimento and object.data_envio%}
-    <div class="alert alert-info alert-dismissible " role="alert">
-      <strong>{% trans "Proposição aguardando recebimento!" %}</strong>
+
+{% block base_workspace %}
+  {% if view.is_contained %}
+    <div class="box-area-trabalho">
+          <a>
+          Autor de Documentos e Proposições: <strong>{{user.autor_set.all.0}}</strong></a>
     </div>
   {% endif %}
-{% endblock title %}
+{% endblock base_workspace %}
 {% block sub_actions %}
   {{block.super}}
   <div class="actions btn-group btn-group-sm {%block sub_actions_pull%}{% endblock%}" role="group">
@@ -19,7 +20,7 @@
 {% endblock sub_actions%}
 {% block editions %}
   {% if object.data_envio %}
-    {% if user == object.autor.user  %}
+    {% if user in object.autor.operadores.all  %}
       {% block editions_actions_return %}
         <div class="actions btn-group" role="group">
           <a class="btn btn-outline-primary" onclick="window.open('{% url 'sapl.materia:recibo-proposicao' object.pk %}','Recibo','width=1100, height=600, scrollbars=yes')">{% trans "Recibo de Envio" %}</a>
@@ -44,6 +45,12 @@
   {% endif %}
 {% endblock editions %}
 {% block detail_content %}
+
+  {% if not object.data_recebimento and object.data_envio%}
+    <div class="alert alert-info alert-dismissible " role="alert">
+      <strong>{% trans "Proposição aguardando recebimento!" %}</strong>
+    </div>
+  {% endif %}
 
   {% with object as p %}
     {% include 'materia/proposicao_widget_file.html' %}

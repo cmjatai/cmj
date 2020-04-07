@@ -588,7 +588,7 @@ class RetornarProposicao(UpdateView):
                 "user=" + username + ". Objeto Proposicao com id={} não encontrado.".format(kwargs['pk']))
             raise Http404()
 
-        if p.autor.user != request.user:
+        if not p.autor.operadores.filter(pk=request.user.id).exists():
             self.logger.error(
                 "user=" + username + ". Usuário ({}) sem acesso a esta opção.".format(request.user))
             messages.error(
@@ -730,7 +730,7 @@ class UnidadeTramitacaoCrud(CrudAux):
 class ProposicaoCrud(Crud):
     model = Proposicao
     help_topic = 'proposicao'
-    container_field = 'autor__user'
+    container_field = 'autor__operadores'
 
     class BaseMixin(Crud.BaseMixin):
         list_field_names = ['data_envio', 'data_recebimento', 'descricao',
@@ -893,7 +893,7 @@ class ProposicaoCrud(Crud):
             if not self.has_permission():
                 return self.handle_no_permission()
 
-            if p.autor.user != request.user:
+            if not p.autor.operadores.filter(pk=request.user.id).exists():
                 if not p.data_envio and not p.data_devolucao:
                     raise Http404()
 

@@ -1,6 +1,15 @@
 {% extends "crud/form.html" %}
 {% load i18n %}
 {% load crispy_forms_tags %}
+
+{% block base_workspace %}
+  {% if view.is_contained %}
+    <div class="box-area-trabalho">
+          <a>
+          Autor de Documentos e Proposições: <strong>{{user.autor_set.all.0}}</strong></a>
+    </div>
+  {% endif %}
+{% endblock base_workspace %}
 {% block extra_js %}
    <script type="text/javascript">
 
