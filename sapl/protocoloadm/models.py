@@ -268,6 +268,7 @@ class DocumentoAdministrativo(CountPageMixin):
     class Meta:
         verbose_name = _('Documento Administrativo')
         verbose_name_plural = _('Documentos Administrativos')
+        ordering = ('-ano', ('-id'))
 
     @property
     def certidao(self):
