@@ -1,11 +1,14 @@
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.db.models.deletion import CASCADE
 from django.utils.translation import ugettext_lazy as _
 import reversion
 
-from sapl.utils import (LISTA_DE_UFS, YES_NO_CHOICES,
-                        get_settings_auth_user_model)
+from cmj.mixins import CmjAuditoriaModelMixin
+from cmj.utils import get_settings_auth_user_model
+from sapl.utils import (LISTA_DE_UFS, YES_NO_CHOICES)
+
 
 RELATORIO_ATOS_ACESSADOS = (('S', _('Sim')),
                             ('N', _('Não')))
@@ -201,10 +204,12 @@ class TipoAutor(models.Model):
 @reversion.register()
 class Autor(models.Model):
 
-    user = models.OneToOneField(get_settings_auth_user_model(),
-                                on_delete=models.SET_NULL,
-                                null=True,
-                                related_name='autor')
+    operadores = models.ManyToManyField(
+        get_settings_auth_user_model(),
+        through='OperadorAutor',
+        through_fields=('autor', 'user'),
+        symmetrical=False,
+        related_name='autor_set')
 
     tipo = models.ForeignKey(TipoAutor, verbose_name=_('Tipo do Autor'),
                              on_delete=models.PROTECT)
@@ -239,3 +244,41 @@ class Autor(models.Model):
         if self.user:
             return str(self.user.username)
         return '?'
+
+
+class OperadorAutor(CmjAuditoriaModelMixin):
+
+    user = models.ForeignKey(
+        get_settings_auth_user_model(),
+        verbose_name=_('Operador do Autor'),
+        related_name='operadorautor_set',
+        on_delete=CASCADE)
+
+    autor = models.ForeignKey(
+        Autor,
+        related_name='operadorautor_set',
+        verbose_name=_('Autor'),
+        on_delete=CASCADE)
+
+    operador_principal = models.BooleanField(
+        verbose_name=_('Operador Principal do Autor'),
+        choices=YES_NO_CHOICES, default=False)
+
+    enviar_email = models.BooleanField(
+        verbose_name=_('Enviar emails de notificação a este usuário'),
+        choices=YES_NO_CHOICES, default=False)
+
+    @property
+    def user_name(self):
+        return '%s - %s' % (
+            self.user.get_display_name(),
+            self.user.email)
+
+    class Meta:
+        verbose_name = _('Operador do Autor')
+        verbose_name_plural = _('Operadores do Autor')
+        unique_together = (
+            ('user', 'autor', ),)
+
+    def __str__(self):
+        return self.user_name

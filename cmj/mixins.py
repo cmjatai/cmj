@@ -1,12 +1,14 @@
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.db.models.deletion import PROTECT
 from django.urls.base import reverse
 from django.utils.translation import ugettext_lazy as _
 from floppyforms import ClearableFileInput
 from model_utils.choices import Choices
 from pdfrw.pdfreader import PdfReader
 from social_core.backends.facebook import FacebookOAuth2
-from cmj.utils import run_sql
+
+from cmj.utils import run_sql, get_settings_auth_user_model
 
 
 class FacebookOAuth2(FacebookOAuth2):
@@ -153,3 +155,88 @@ class CountPageMixin(models.Model):
             if count_pages == -1:
                 raise Exception
             return count_pages
+
+
+class CmjCleanMixin:
+
+    def clean(self):
+        """
+        Check for instances with null values in unique_together fields.
+        """
+        from django.core.exceptions import ValidationError
+
+        super(CmjCleanMixin, self).clean()
+
+        for field_tuple in self._meta.unique_together[:]:
+            unique_filter = {}
+            unique_fields = []
+            null_found = False
+            for field_name in field_tuple:
+                field_value = getattr(self, field_name)
+                if getattr(self, field_name) is None:
+                    unique_filter['%s__isnull' % field_name] = True
+                    null_found = True
+                else:
+                    unique_filter['%s' % field_name] = field_value
+                    unique_fields.append(field_name)
+            if null_found:
+                unique_queryset = self.__class__.objects.filter(
+                    **unique_filter)
+                if self.pk:
+                    unique_queryset = unique_queryset.exclude(pk=self.pk)
+                if unique_queryset.exists():
+                    msg = self.unique_error_message(
+                        self.__class__, tuple(unique_fields))
+                    raise ValidationError(msg)
+
+
+class CmjModelMixin(CmjCleanMixin, models.Model):
+    # para migração
+    """created = models.DateTimeField(
+        verbose_name=_('created'),
+        editable=True, auto_now_add=False)
+    modified = models.DateTimeField(
+        verbose_name=_('modified'), editable=True, auto_now=False)"""
+    # para produção
+    created = models.DateTimeField(
+        verbose_name=_('created'),
+        editable=False, auto_now_add=True)
+    modified = models.DateTimeField(
+        verbose_name=_('modified'), editable=False, auto_now=True)
+
+    class Meta:
+        abstract = True
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None, clean=True):
+
+        import inspect
+        funcs = list(filter(lambda x: x == 'revision_pre_delete_signal',
+                            map(lambda x: x[3], inspect.stack())))
+
+        if clean and not funcs:
+            self.clean()
+
+        return models.Model.save(
+            self,
+            force_insert=force_insert,
+            force_update=force_update,
+            using=using,
+            update_fields=update_fields)
+
+
+class CmjAuditoriaModelMixin(CmjModelMixin):
+
+    owner = models.ForeignKey(
+        get_settings_auth_user_model(),
+        verbose_name=_('owner'),
+        related_name='+',
+        on_delete=PROTECT)
+    modifier = models.ForeignKey(
+        get_settings_auth_user_model(),
+        verbose_name=_('modifier'),
+        related_name='+',
+        on_delete=PROTECT)
+
+    class Meta:
+        abstract = True
