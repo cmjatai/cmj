@@ -439,9 +439,10 @@ class _DocumentoAdministrativoViewSet(ControlAccessFileForContainerMixin):
                 if d and d.materia:
                     if d.workspace.tipo == AreaTrabalho.TIPO_PUBLICO:
                         return qs_new
-                    elif d.workspace.tipo == AreaTrabalho.TIPO_PROCURADORIA and \
-                        self.request.user.groups.filter(
-                            name=GROUP_MATERIA_WORKSPACE_VIEWER).exists():
+                    elif d.workspace.tipo == AreaTrabalho.TIPO_PROCURADORIA:
+                        # and \
+                        # self.request.user.groups.filter(
+                        #    name=GROUP_MATERIA_WORKSPACE_VIEWER).exists():
                         return qs_new
         return qs
 
