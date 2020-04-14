@@ -1531,10 +1531,12 @@ class TipoProposicaoForm(ModelForm):
                   'content_type',
                   'tipo_conteudo_related_radio',
                   'tipo_conteudo_related',
-                  'perfis']
+                  'perfis',
+                  'tipo_autores']
 
         widgets = {'tipo_conteudo_related': forms.HiddenInput(),
-                   'perfis': widgets.CheckboxSelectMultiple()}
+                   'perfis': widgets.CheckboxSelectMultiple(),
+                   'tipo_autores': widgets.CheckboxSelectMultiple()}
 
     def __init__(self, *args, **kwargs):
 
@@ -1546,6 +1548,7 @@ class TipoProposicaoForm(ModelForm):
                         Row(
                             to_column(('descricao', 12)),
                             to_column(('perfis', 12)),
+                            to_column(('tipo_autores', 12)),
                         ),
                         5
                     )
@@ -1588,6 +1591,11 @@ class TipoProposicaoForm(ModelForm):
 
         cd = self.cleaned_data
 
+        if not cd['tipo_autores'].exists():
+            raise ValidationError(
+                _('O Tipo de Proposição deve ser associado '
+                  'a ao menos um Tipo de Autor.'))
+
         content_type = cd['content_type']
 
         if 'tipo_conteudo_related' not in cd or not cd[
@@ -1604,11 +1612,11 @@ class TipoProposicaoForm(ModelForm):
                 _('O Registro definido (%s) não está na base de %s.'
                   ) % (cd['tipo_conteudo_related'], content_type))
 
-        """
-        A unicidade de tipo proposição para tipo de conteudo
-        foi desabilitada pois existem casos em quem é o procedimento da
-        instituição convergir vários tipos de proposição
-        para um tipo de matéria.
+        #"""
+        # A unicidade de tipo proposição para tipo de conteudo
+        # foi desabilitada pois existem casos em quem é o procedimento da
+        # instituição convergir vários tipos de proposição
+        # para um tipo de matéria.
 
         unique_value = self._meta.model.objects.filter(
             content_type=content_type, object_id=cd['tipo_conteudo_related'])
@@ -1624,7 +1632,7 @@ class TipoProposicaoForm(ModelForm):
                   'que foi defindo como (%s) para (%s)'
                   ) % (unique_value,
                        content_type,
-                       unique_value.tipo_conteudo_related))"""
+                       unique_value.tipo_conteudo_related))
 
         return self.cleaned_data
 

@@ -93,6 +93,7 @@ TipoProposicao:
   {% trans 'Tipo Proposição' %}:
   - descricao content_type
   - tipo_conteudo_related perfis
+  - tipo_autores
 
 Proposicao:
   {% trans 'Proposição' %}:
