@@ -15,16 +15,17 @@
 
     $(document).ready(function(){
 
-    	$("input[name=tipo_texto]").change(function(event) {
+    	$("select[name=content_type]").change(function(event) {
         if (this.value == 'D' && this.checked)
           $("#div_id_texto_original").removeClass('hidden');
         else if (this.value == 'T' && this.checked)
           $("#div_id_texto_original").addClass('hidden');
       });
 
+
       $("select[name=tipo]").change(function(event) {
 
-        if (this.selectedOptions[0].getAttribute('data-has-perfil') === "True") {
+        if (this.selectedOptions[0] && this.selectedOptions[0].getAttribute('data-has-perfil') === "true") {
           $("input[name=tipo_texto]").closest('label').removeClass('disabled');
           $("input[name=tipo_texto]").closest('.form-group').parent().removeClass('hidden');
           $("input[name=tipo_texto]").prop('disabled', false);
@@ -59,7 +60,44 @@
         });
   		});
 
-      $("input[name=tipo_texto], select[name=tipo_materia], select[name=tipo]").trigger('change');
+      $("select[name=content_type]").change(function(event) {
+        $("#id_tipo option").remove()
+        var url = '{% url 'sapl.api:tipoproposicao-tiposdoautor'%}'
+
+        var formData = {
+              content_type : $("select[name=content_type]").val(),
+              page: 1
+        }
+        if (formData.content_type === '')
+          return;
+
+        var get_pages_recursive = function() {
+          $.get(url, formData).done(function(data) {
+
+            if (data !== null) {
+                $.each(data.results, function(idx, obj) {
+                    $("#id_tipo")
+                      .append($("<option></option>")
+                      .attr("value", obj.id)
+                      .attr("data-has-perfil", obj.perfis.length > 0 )
+                      .text(obj.descricao));
+                });
+                if (data.pagination.next_page > 0) {
+                  formData.page = data.pagination.next_page
+                  get_pages_recursive()
+                }
+                else {
+                  $("#id_tipo").prop("selectedIndex", 0);
+
+                }
+              }
+              
+          });
+        }
+        get_pages_recursive()
+  		});
+
+      $("input[name=tipo_texto], select[name=tipo_materia], select[name=tipo], select[name=content_type]").trigger('change');
 
     });
 	</script>

@@ -28,7 +28,7 @@ from sapl.api.permissions import SaplModelPermissions
 from sapl.api.serializers import ChoiceSerializer
 from sapl.base.models import Autor
 from sapl.materia.models import Proposicao, TipoMateriaLegislativa,\
-    MateriaLegislativa, Tramitacao, DocumentoAcessorio
+    MateriaLegislativa, Tramitacao, DocumentoAcessorio, TipoProposicao
 from sapl.norma.models import NormaJuridica
 from sapl.parlamentares.models import Parlamentar
 from sapl.protocoloadm.models import DocumentoAdministrativo,\
@@ -562,6 +562,18 @@ class _NormaJuridicaViewset(ResponseFileMixin):
     @action(detail=True)
     def texto_integral(self, request, *args, **kwargs):
         return self.response_file(request, *args, **kwargs)
+
+
+@customize(TipoProposicao)
+class _TipoProposicaoViewset:
+
+    @action(detail=False, methods=['GET'])
+    def tiposdoautor(self, request, *args, **kwargs):
+        qs = self.get_queryset()
+        qs = qs.filter(
+            tipo_autores=request.user.autor_set.first().tipo)
+        self.queryset = qs
+        return self.list(request, *args, **kwargs)
 
 
 @customize(Proposicao)

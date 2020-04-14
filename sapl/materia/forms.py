@@ -1650,18 +1650,6 @@ class TipoProposicaoForm(ModelForm):
         return super().save(True)
 
 
-class TipoProposicaoSelect(Select):
-
-    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
-        option = super().create_option(name, value, label, selected,
-                                       index, subindex=subindex, attrs=attrs)
-        if value:
-            tipo = TipoProposicao.objects.get(id=value)
-            option['attrs']['data-has-perfil'] = str(tipo.perfis.exists())
-
-        return option
-
-
 class TramitacaoEmLoteForm(ModelForm):
     logger = logging.getLogger(__name__)
 
@@ -1891,6 +1879,16 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
     numero_materia_futuro = forms.IntegerField(
         label='Número (Opcional)', required=False)
 
+    content_type = forms.ModelChoiceField(
+        queryset=ContentType.objects.all(),
+        label=_('Espécie da Proposição'),
+        required=True)
+
+    tipo = forms.ModelChoiceField(
+        queryset=TipoProposicao.objects.all(),
+        label=_('Tipo da Proposição'),
+        required=True)
+
     class Meta:
         model = Proposicao
         fields = ['tipo',
@@ -1907,11 +1905,11 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
                   'numero_materia_futuro',
                   'user',
                   'ip',
-                  'ultima_edicao']
+                  'ultima_edicao',
+                  'content_type']
 
         widgets = {
             'descricao': widgets.Textarea(attrs={'rows': 4}),
-            'tipo': TipoProposicaoSelect(),
             'hash_code': forms.HiddenInput(),
             'user': forms.HiddenInput(),
             'ip': forms.HiddenInput(),
@@ -1933,12 +1931,14 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
                 self._meta.fields.append('tipo_texto')
 
         fields = [
-            to_column((Fieldset(
-                TipoProposicao._meta.verbose_name, Field('tipo')), 12)),
-
-            to_column(('descricao', 12)),
-            to_column(('observacao', 12)),
-
+            to_row([
+                ('content_type', 5),
+                ('tipo', 7)]
+            ),
+            to_row([
+                ('descricao', 12),
+                ('observacao', 12)
+            ])
         ]
 
         if AppConfig.objects.last().escolher_numero_materia_proposicao:
@@ -1984,6 +1984,14 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
 
         super(ProposicaoForm, self).__init__(*args, **kwargs)
 
+        content_types = ContentType.objects.get_for_models(
+            *models_with_gr_for_model(TipoProposicao))
+
+        self.fields['content_type'].choices = [
+            (ct.pk, ct) for k, ct in content_types.items()]
+        # Ordena por id
+        self.fields['content_type'].choices.sort(key=lambda x: x[0])
+
         if self.instance.pk:
             self.fields['tipo_texto'].initial = ''
             if self.instance.texto_original:
@@ -2003,11 +2011,11 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
                     'ano_materia'
                 ].initial = self.instance.materia_de_vinculo.ano
 
-        self.fields['tipo'].choices = [
-            (tp.id, tp)
-            for tp in TipoProposicao.objects.filter(
-                tipo_autores=kwargs['initial']['user'].autor_set.first().tipo)
-        ]
+        self.fields['tipo'].choices = []
+        #    (tp.id, tp)
+        # for tp in TipoProposicao.objects.filter(
+        #        tipo_autores=kwargs['initial']['user'].autor_set.first().tipo)
+        #]
 
     def clean_texto_original(self):
         texto_original = self.cleaned_data.get('texto_original', False)
