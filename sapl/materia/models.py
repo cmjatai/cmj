@@ -14,7 +14,8 @@ from model_utils import Choices
 import reversion
 
 from cmj.mixins import CountPageMixin
-from sapl.base.models import SEQUENCIA_NUMERACAO_PROTOCOLO, Autor
+from sapl.base.models import SEQUENCIA_NUMERACAO_PROTOCOLO, Autor,\
+    TipoAutor
 from sapl.comissoes.models import Comissao, Reuniao
 from sapl.compilacao.models import (PerfilEstruturalTextoArticulado,
                                     TextoArticulado)
@@ -63,6 +64,12 @@ class TipoProposicao(models.Model):
     tipo_conteudo_related = SaplGenericForeignKey(
         'content_type', 'object_id', verbose_name=_('Tipo Correspondente'))
 
+    tipo_autores = models.ManyToManyField(
+        TipoAutor,
+        blank=True, verbose_name=_('Tipos de Autores'),
+        help_text=_("""
+                    Tipo de Autores que pode enviar este tipo de Proposição.
+                    """))
     perfis = models.ManyToManyField(
         PerfilEstruturalTextoArticulado,
         blank=True, verbose_name=_('Perfis Estruturais de Textos Articulados'),
@@ -871,6 +878,7 @@ class Proposicao(models.Model):
                                        ('R', 'Recebida'),
                                        ('I', 'Incorporada')),
                               verbose_name=_('Status Proposição'))
+
     texto_original = PortalFileField(
         upload_to=materia_upload_path,
         blank=True,
@@ -896,6 +904,7 @@ class Proposicao(models.Model):
         blank=True, null=True, default=None)
     conteudo_gerado_related = SaplGenericForeignKey(
         'content_type', 'object_id', verbose_name=_('Conteúdo Gerado'))
+
     observacao = models.TextField(
         blank=True, verbose_name=_('Observação'))
     cancelado = models.BooleanField(verbose_name=_('Cancelada ?'),
