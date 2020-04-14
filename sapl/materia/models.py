@@ -897,6 +897,12 @@ class Proposicao(models.Model):
         verbose_name=_('Matéria anexadora'),
         related_name=_('proposicao_set'))
 
+    proposicao_vinculada = models.ForeignKey(
+        'self', blank=True, null=True,
+        on_delete=models.CASCADE,
+        verbose_name=_('Proposição Vinculada'),
+        related_name=_('proposicao_vinculada_set'))
+
     content_type = models.ForeignKey(
         ContentType, default=None, blank=True, null=True,
         verbose_name=_('Tipo de Material Gerado'))
