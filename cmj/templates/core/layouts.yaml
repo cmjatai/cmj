@@ -5,11 +5,11 @@ Cep:
 
 UserDetail:
   {% trans 'Usuário' %}:
-  - email first_name last_name
+  - email first_name last_name is_active
 
 User:
   {% trans 'Usuário' %}:
-  - email first_name last_name
+  - email first_name last_name is_active
   - new_password1 new_password2
 
 RegiaoMunicipal:

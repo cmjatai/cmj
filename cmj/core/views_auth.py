@@ -58,7 +58,7 @@ class UserCrud(CrudAux):
 
     class BaseMixin(CrudAux.BaseMixin):
         list_field_names = [
-            'usuario', 'autor_set', 'areatrabalho_set'
+            'usuario', 'autor_set', 'areatrabalho_set', 'is_active'
         ]
 
     class CreateView(CrudAux.CreateView):
@@ -66,6 +66,7 @@ class UserCrud(CrudAux):
 
     class UpdateView(CrudAux.UpdateView):
         form_class = CmjUserAdminForm
+        layout_key = ''
 
     class DetailView(CrudAux.DetailView):
         layout_key = 'UserDetail'

@@ -12,7 +12,10 @@ from django.core.exceptions import ValidationError
 from django.forms.models import ModelForm
 from django.utils.translation import ugettext_lazy as _
 from image_cropping.widgets import ImageCropWidget, CropWidget
-from sapl.crispy_layout_mixin import to_row, form_actions, SaplFormLayout
+
+from cmj.utils import YES_NO_CHOICES
+from sapl.crispy_layout_mixin import to_row, form_actions, SaplFormLayout,\
+    SaplFormHelper
 
 
 # admin forms
@@ -203,6 +206,10 @@ class CmjUserAdminForm(ModelForm):
         'password_mismatch': _("As senhas informadas são diferentes"),
     }
 
+    is_active = forms.TypedChoiceField(label=_('Usuário Ativo'),
+                                       choices=YES_NO_CHOICES,
+                                       coerce=lambda x: x == 'True')
+
     new_password1 = forms.CharField(
         label='Nova senha',
         max_length=50,
@@ -224,6 +231,7 @@ class CmjUserAdminForm(ModelForm):
         fields = ['email',
                   'first_name',
                   'last_name',
+                  'is_active',
 
                   'new_password1',
                   'new_password2',
@@ -231,19 +239,20 @@ class CmjUserAdminForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
 
-        super(CmjUserAdminForm, self).__init__(*args, **kwargs)
         row_pwd = to_row(
             [
-                ('email', 5),
-                ('first_name', 5),
-                ('last_name', 4),
+                ('email', 4),
+                ('first_name', 3),
+                ('last_name', 3),
+                ('is_active', 2),
 
                 ('new_password1', 6),
                 ('new_password2', 6)
             ]
         )
-        self.helper = FormHelper()
-        self.helper.layout = SaplFormLayout(*row_pwd)
+        self.helper = SaplFormHelper()
+        self.helper.layout = SaplFormLayout(row_pwd)
+        super(CmjUserAdminForm, self).__init__(*args, **kwargs)
 
     def save(self, commit=True):
         new_password = self.cleaned_data['new_password1']
