@@ -50,13 +50,60 @@
               'ano'    : $("input[name=ano_materia]").val(),
               'numero' : $("input[name=numero_materia]").val(),
         }
-        if (formData.tipo == '' || formData.ano == '' || formData.numero == '')
+        if (formData.tipo == '' || formData.ano == '' || formData.numero == '') {
+          $("#vinculo_proposicao").removeClass('hidden');
+          $(".ementa_materia").html('').addClass('hidden');
+          $("input[name=vinculo_ano]").val('')
+          $("input[name=vinculo_numero]").val('')
           return;
+        }
+        $("#vinculo_proposicao").addClass('hidden');
+
         $.get(url, formData).done(function(data) {
           if (data.pagination.total_entries == 1)
-            $(".ementa_materia").html(data.results[0].ementa).removeClass('hidden');
+            $(".ementa_materia").html(
+              `<a target="_blank" href="{% url 'sapl.materia:materialegislativa_list' %}${data.results[0].id}">
+                  <strong>${data.results[0].__str__}</strong>
+                  </a>
+                  <br>${data.results[0].ementa}`
+              ).removeClass('hidden');
           else
-            $(".ementa_materia").html('').addClass('hidden');
+            $(".ementa_materia").html('<strong>Atenção!!!</strong> Matéria Legislativa não localizada!').removeClass('hidden');
+        });
+  		});
+      
+      $("input[name=vinculo_numero], input[name=vinculo_ano]").change(function(event) {
+        var url = '{% url 'sapl.api:proposicao-list'%}'
+        var proposicao_id = {% if object %}{{object.id}}{% else %}0{% endif %};
+
+        var formData = {
+              'data_envio__year'    : $("input[name=vinculo_ano]").val(),
+              'numero_proposicao' : $("input[name=vinculo_numero]").val(),
+        }
+        if (formData.data_envio__year === '' || formData.numero_proposicao === '') {
+          $("#vinculo_materia").removeClass('hidden');
+          $(".ementa_proposicao").html('').addClass('hidden');
+          $("input[name=ano_materia]").val('')
+          $("input[name=numero_materia]").val('')
+          return;
+        }
+        $("#vinculo_materia").addClass('hidden');
+
+        $.get(url, formData).done(function(data) {
+          if (data.pagination.total_entries == 1) {
+            if (data.results[0].id === proposicao_id) {
+              $(".ementa_proposicao").html('<strong>Atenção!!!</strong> Não é possível vincular uma proposição a ela mesma!').removeClass('hidden');
+              return;
+            }
+            $(".ementa_proposicao").html(
+              `<a target="_blank" href="{% url 'sapl.materia:proposicao_list' %}${data.results[0].id}">
+                  <strong>${data.results[0].__str__}</strong>
+                  </a>
+                  <br>${data.results[0].descricao}`
+              ).removeClass('hidden');
+          }
+          else
+              $(".ementa_proposicao").html('<strong>Atenção!!!</strong>Proposição não localizada!').removeClass('hidden');
         });
   		});
 

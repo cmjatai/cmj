@@ -119,51 +119,10 @@
     </div>
   {% endif %}
   <div class="row">
-    {% if object.conteudo_gerado_related %}
-      <div class="col-sm-6">
-        <h2 class="legend">{% trans "Conteúdo Gerado" %}</h2>
-        <div id="div_id_conteudo_gerado_related" class="form-group">
-          <div class="controls">
-            <a href="{% url object|urldetail_content_type:object.conteudo_gerado_related object.conteudo_gerado_related.id%}">
-              {{object.conteudo_gerado_related}}
-            </a>
-          </div>
-        </div>
-      </div>
-    {% endif %}
-    {% if object.materia_de_vinculo %}
-      <div class="col-sm-6">
-        <h2 class="legend">{% trans "Vínculo com a Matéria Legislativa" %}</h2>
-        <div id="div_id_materia_de_vinculo" class="form-group">
-          <div class="controls">
-            Matéria</br>
-            &nbsp;&nbsp;&nbsp;&nbsp;
-            <a href="{% url object.materia_de_vinculo|urldetail object.materia_de_vinculo.id%}">
-              {{object.materia_de_vinculo}}
-            </a>
-            </br>
-            {% if object.materia_de_vinculo.autoria_set.all %}
-            	Autores
-            	{% for a in object.materia_de_vinculo.autoria_set.all %}
-                </br>&nbsp;&nbsp;&nbsp;&nbsp;{{a.autor}}
-              {% endfor %}
-            {% endif %}
-            </br>
-            Texto Original
-            </br>
-            {% if object.materia_de_vinculo.texto_original %}
-              <a href="{{object.materia_de_vinculo.texto_original.url}}">
-                {{object.materia_de_vinculo.texto_original| to_str | split:"/" | get_last_item_from_list:-1}}
-              </a>
-            {% endif %}
-            </br>
-          </div>
-        </div>
-      </div>
-    {% endif %}
+
     {% if not AppConfig.receber_recibo_proposicao %}
       {% if object.hash_code %}
-        <div class="col-sm-12">
+        <div class="col-sm-6">
           <div id="div_id_hash_code" class="form-group">
             <p class="control-label">{%field_verbose_name object 'hash_code'%}</p>
             <div class="controls">
@@ -173,6 +132,77 @@
         </div>
       {% endif %}
     {% endif %}
+    {% if object.conteudo_gerado_related %}
+      <div class="col-sm-6">
+        <p class="control-label">{% trans "Conteúdo Gerado" %}</p>
+        <div id="div_id_conteudo_gerado_related" class="form-group">
+          <div class="controls form-control-static">
+            <a href="{% url object|urldetail_content_type:object.conteudo_gerado_related object.conteudo_gerado_related.id%}">
+              {{object.conteudo_gerado_related}}
+            </a>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+    
+
+    {% if object.materia_de_vinculo %}
+      <div class="col-sm-12">
+        <p class="control-label">{% trans "Vínculo com Matéria Legislativa" %}</p>
+        <div id="div_id_materia_de_vinculo" class="form-group">
+          <div class="controls form-control-static w-100">
+            <a href="{% url object.materia_de_vinculo|urldetail object.materia_de_vinculo.id%}">
+              {{object.materia_de_vinculo}}
+            </a>
+            </br>
+            <small class="d-inline-block" style="line-height: 1em !important">
+            {% if object.materia_de_vinculo.autoria_set.all %}
+            	<strong>Autores:</strong>
+            	{% for a in object.materia_de_vinculo.autoria_set.all %}
+                </br>&nbsp;&nbsp;&nbsp;&nbsp;{{a.autor}}
+              {% endfor %}
+            {% endif %}
+            </small>
+            {% comment %}</br>
+            Texto Original
+            </br>
+            {% if object.materia_de_vinculo.texto_original %}
+              <a href="{{object.materia_de_vinculo.texto_original.url}}">
+                {{object.materia_de_vinculo.texto_original| to_str | split:"/" | get_last_item_from_list:-1}}
+              </a>
+            {% endif %}
+            </br>
+            {% endcomment %}
+          </div>
+        </div>
+      </div>
+    {% endif %}
+    {% if object.proposicao_vinculada %}
+      <div class="col-sm-12">
+        <p class="control-label">{% trans "Vínculo com Proposição" %}</p>
+        <div id="div_id_proposicao_vinculada" class="form-group">
+          <div class="controls form-control-static w-100">
+            <a href="{% url object.proposicao_vinculada|urldetail object.proposicao_vinculada.id%}">
+              {{object.proposicao_vinculada}}
+            </a><BR>
+            <small>
+              {{object.proposicao_vinculada.descricao}}
+            </small>
+            {% comment %}</br>
+              Texto Original
+              </br>
+              {% if object.proposicao_vinculada.texto_original %}
+                <a href="{{object.proposicao_vinculada.texto_original.url}}">
+                  {{object.proposicao_vinculada.texto_original| to_str | split:"/" | get_last_item_from_list:-1}}
+                </a>
+              {% endif %}
+              </br>
+            {% endcomment %}
+          </div>
+        </div>
+      </div>
+    {% endif %}
+    
   </div>
   {% if user.is_superuser %}
     <div class="row">

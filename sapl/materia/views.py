@@ -949,6 +949,17 @@ class ProposicaoCrud(Crud):
         logger = logging.getLogger(__name__)
         form_class = ProposicaoForm
 
+        def get_initial(self):
+            initial = super().get_initial()
+
+            initial['user'] = self.request.user
+            initial['ip'] = get_client_ip(self.request)
+
+            tz = timezone.get_current_timezone()
+            initial['ultima_edicao'] = tz.localize(datetime.now())
+
+            return initial
+
         def form_valid(self, form):
             tz = timezone.get_current_timezone()
 

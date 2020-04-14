@@ -4,7 +4,7 @@ import os
 
 from crispy_forms.bootstrap import Alert, InlineRadios
 from crispy_forms.layout import (HTML, Button, Field, Fieldset,
-                                 Layout, Row)
+                                 Layout, Row, Div)
 from django import forms
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
@@ -1860,6 +1860,12 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
     ano_materia = forms.CharField(
         label='Ano', required=False)
 
+    vinculo_numero = forms.CharField(
+        label='Número', required=False,)
+
+    vinculo_ano = forms.CharField(
+        label='Ano', required=False)
+
     tipo_texto = forms.ChoiceField(
         label=_('Tipo do Texto da Proposição'),
         required=False,
@@ -1868,6 +1874,11 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
 
     materia_de_vinculo = forms.ModelChoiceField(
         queryset=MateriaLegislativa.objects.all(),
+        widget=widgets.HiddenInput(),
+        required=False)
+
+    proposicao_vinculada = forms.ModelChoiceField(
+        queryset=Proposicao.objects.all(),
         widget=widgets.HiddenInput(),
         required=False)
 
@@ -1897,9 +1908,15 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
                   'observacao',
                   'texto_original',
                   'materia_de_vinculo',
+                  'proposicao_vinculada',
+
                   'tipo_materia',
                   'numero_materia',
                   'ano_materia',
+
+                  'vinculo_numero',
+                  'vinculo_ano',
+
                   'tipo_texto',
                   'hash_code',
                   'numero_materia_futuro',
@@ -1955,30 +1972,83 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
             'texto_original', 7 if self.texto_articulado_proposicao else 12)))
 
         fields.append(
-            to_column(
-                (
-                    Fieldset(
-                        _('Outras informações - Vincular a Matéria Legislativa Existente'),
-                        to_row([('tipo_materia', 12), ]),
-                        to_row(
-                            [
-                                ('numero_materia', 6),
-                                ('ano_materia', 6),
-                                (
-                                    Alert(
-                                        '',
-                                        css_class="ementa_materia hidden alert-info",
-                                        dismiss=False
-                                    ),
-                                    12
-                                )
-                            ]
-                        ),
-                    ),
-                    12
-                )
-            ),
+            to_row([
+
+
+            ])
         )
+        fields.append(
+            Div(
+                to_row([
+                    (
+                        Fieldset(_('Víncular a Proposição ainda não recebida')), 12),
+                    (
+                        HTML(
+                            '<small class="form-text text-muted">Esta proposição é parte de outra de sua própria autoria? '
+                            'Exemplo: Você está está registrando um '
+                            'documento acessório de uma proposição que '
+                            'ainda não foi recebida pelo protocolo, '
+                            'informe aqui que proposição é essa! (Caso a proposição já tenha sido recebida pelo protocolo, o sistema fará vínculo automatícamente com a matéria, e não com a proposição.</small>'
+                        ), 12),
+                    (
+                        Div(
+                            to_row(
+                                [
+                                    ('vinculo_numero', 6),
+                                    ('vinculo_ano', 6),
+                                    (
+                                        Alert(
+                                            '',
+                                            css_class="ementa_proposicao hidden alert-info",
+                                            dismiss=False
+                                        ),
+                                        12
+                                    )
+                                ]
+                            ),
+                        ),
+                        8
+                    ),
+                ]),
+                css_id='vinculo_proposicao'
+            )
+        )
+
+        fields.append(
+            Div(
+                to_row([
+                    (Fieldset(_('Víncular a uma Matéria Legislativa')), 12),
+                    (
+                        HTML(
+                            '<small class="form-text text-muted">Colabore com o protocolo informando que esta '
+                            'proposição se trata de uma matéria anexada a outra. '
+                            'Exemplo: Você está criando uma proposição que é uma emenda, '
+                            'então informe aqui de que projeto é essa emenda.</small>'), 12),
+                    (
+                        Div(
+                            to_row(
+                                [
+                                    ('tipo_materia', 6),
+                                    ('numero_materia', 3),
+                                    ('ano_materia', 3),
+                                    (
+                                        Alert(
+                                            '',
+                                            css_class="ementa_materia hidden alert-info",
+                                            dismiss=False
+                                        ),
+                                        12
+                                    )
+                                ]
+                            ),
+                        ),
+                        12
+                    ),
+                ]),
+                css_id="vinculo_materia"
+            )
+        )
+
         self.helper = SaplFormHelper()
         self.helper.layout = SaplFormLayout(*fields)
 
@@ -2011,11 +2081,13 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
                     'ano_materia'
                 ].initial = self.instance.materia_de_vinculo.ano
 
-        self.fields['tipo'].choices = []
-        #    (tp.id, tp)
-        # for tp in TipoProposicao.objects.filter(
-        #        tipo_autores=kwargs['initial']['user'].autor_set.first().tipo)
-        #]
+            if self.instance.proposicao_vinculada:
+                self.fields[
+                    'vinculo_numero'
+                ].initial = self.instance.proposicao_vinculada.numero
+                self.fields[
+                    'vinculo_ano'
+                ].initial = self.instance.proposicao_vinculada.ano
 
     def clean_texto_original(self):
         texto_original = self.cleaned_data.get('texto_original', False)
@@ -2077,6 +2149,35 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
                 self.logger.info("MateriaLegislativa vinculada (tipo_id={}, ano={}, numero={}) com sucesso."
                                  .format(tm, am, nm))
                 cd['materia_de_vinculo'] = materia_de_vinculo
+
+        vn, va = (cd.get('vinculo_numero', ''),
+                  cd.get('vinculo_ano', ''))
+
+        if vn and va:
+            if cd['materia_de_vinculo']:
+                raise ValidationError(
+                    _('Não é possível vincular a uma proposição e a uma matéria ao mesmo tempo!'))
+            try:
+                self.logger.debug("Tentando obter objeto Proposição (numero={}, ano={})."
+                                  .format(vn, va))
+                proposicao_vinculada = Proposicao.objects.get(
+                    numero_proposicao=vn,
+                    data_envio__year=va,
+                    autor=self.initial['user'].autor_set.first()
+
+                )
+            except ObjectDoesNotExist:
+                self.logger.error("Objeto Proposição vinculada (numero={}, ano={}) não existe!"
+                                  .format(vn, va))
+                raise ValidationError(_('Proposição Vinculada não existe!'))
+            else:
+                self.logger.info("Proposição vinculada (ano={}, numero={}) com sucesso."
+                                 .format(va, vn))
+
+                if not proposicao_vinculada.conteudo_gerado_related:
+                    cd['proposicao_vinculada'] = proposicao_vinculada
+                else:
+                    cd['materia_de_vinculo'] = proposicao_vinculada.conteudo_gerado_related
 
         return cd
 

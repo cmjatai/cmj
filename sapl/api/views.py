@@ -622,9 +622,11 @@ class _ProposicaoViewSet(ResponseFileMixin):
     def get_queryset(self):
         qs = super().get_queryset()
 
-        q = Q(data_recebimento__isnull=False, object_id__isnull=False)
-        if not self.request.user.is_anonymous():
-            q |= Q(autor__user=self.request.user)
+        q = Q()
+        if self.request.user.is_anonymous():
+            q = Q(data_recebimento__isnull=False, object_id__isnull=False)
+        else:
+            q = Q(autor=self.request.user.autor_set.first())
 
         qs = qs.filter(q)
         return qs
