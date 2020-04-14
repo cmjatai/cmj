@@ -2003,6 +2003,12 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
                     'ano_materia'
                 ].initial = self.instance.materia_de_vinculo.ano
 
+        self.fields['tipo'].choices = [
+            (tp.id, tp)
+            for tp in TipoProposicao.objects.filter(
+                tipo_autores=kwargs['initial']['user'].autor_set.first().tipo)
+        ]
+
     def clean_texto_original(self):
         texto_original = self.cleaned_data.get('texto_original', False)
 
