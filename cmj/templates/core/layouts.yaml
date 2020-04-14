@@ -3,6 +3,15 @@ Cep:
   {% trans 'Número do CEP' %}:
   - numero
 
+UserDetail:
+  {% trans 'Usuário' %}:
+  - email first_name last_name
+
+User:
+  {% trans 'Usuário' %}:
+  - email first_name last_name
+  - new_password1 new_password2
+
 RegiaoMunicipal:
   {% trans 'Região Municipal' %}:
   - tipo nome:8

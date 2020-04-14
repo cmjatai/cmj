@@ -155,18 +155,18 @@ class UsuarioCreateForm(ModelForm):
 
 class UsuarioFilterSet(django_filters.FilterSet):
 
-    username = django_filters.CharFilter(
+    email = django_filters.CharFilter(
         label=_('Nome de Usuário'),
         lookup_expr='icontains')
 
     class Meta:
         model = get_user_model()
-        fields = ['username']
+        fields = ['email']
 
     def __init__(self, *args, **kwargs):
         super(UsuarioFilterSet, self).__init__(*args, **kwargs)
 
-        row0 = to_row([('username', 12)])
+        row0 = to_row([('email', 12)])
 
         self.form.helper = SaplFormHelper()
         self.form.helper.form_method = 'GET'

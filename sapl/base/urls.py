@@ -236,4 +236,4 @@ urlpatterns = [
         LogotipoView.as_view(), name='logotipo'),
 
 
-] + recuperar_senha + alterar_senha + admin_user + channels_url
+] + recuperar_senha + alterar_senha + channels_url  # +admin_user

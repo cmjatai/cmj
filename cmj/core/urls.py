@@ -12,7 +12,7 @@ from cmj.core.views import CepCrud, RegiaoMunicipalCrud, DistritoCrud,\
     NotificacaoRedirectView, chanel_index, chanel_room, time_refresh_log_test,\
     app_vue_view, template_render, CertidaoPublicacaoCrud, BiView
 from cmj.core.views_auth import CmjUserChangeView, CmjLoginView,\
-    CmjPasswordResetView
+    CmjPasswordResetView, UserCrud
 from cmj.core.views_search import CmjSearchView
 
 from .apps import AppConfig
@@ -101,7 +101,12 @@ urlpatterns = user_urlpatterns + [
     url(r'^sistema/core/tipologradouro/',
         include(TipoLogradouroCrud.get_urls())),
     url(r'^sistema/core/logradouro/', include(LogradouroCrud.get_urls())),
+
+
+
     url(r'^sistema/core/trecho/', include(TrechoCrud.get_urls())),
+
+    url(r'^sistema/usuario/', include(UserCrud.get_urls())),
 
     url(r'^sistema/core/impressoenderecamento/',
         include(ImpressoEnderecamentoCrud.get_urls())),

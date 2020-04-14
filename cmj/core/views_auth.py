@@ -3,13 +3,15 @@ from braces.views import FormMessagesMixin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.views import LoginView, PasswordResetView
 from django.core.urlresolvers import reverse, reverse_lazy
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.edit import FormView, UpdateView
 
+from cmj.core.forms import ListWithSearchForm
 from cmj.core.forms_auth import CmjUserChangeForm, LoginForm,\
-    RecuperarSenhaForm
+    RecuperarSenhaForm, CmjUserAdminForm
 from cmj.settings import EMAIL_SEND_USER
-from sapl.crud.base import FORM_MESSAGES, ACTION_UPDATE
+from sapl.crud.base import FORM_MESSAGES, ACTION_UPDATE, Crud, CrudAux
 
 
 class CmjUserChangeView(FormMessagesMixin, UpdateView):
@@ -49,3 +51,55 @@ class CmjPasswordResetView(PasswordResetView):
     template_name = 'core/user/recuperar_senha_email_form.html'
     from_email = EMAIL_SEND_USER
     form_class = RecuperarSenhaForm
+
+
+class UserCrud(CrudAux):
+    model = get_user_model()
+
+    class BaseMixin(CrudAux.BaseMixin):
+        list_field_names = [
+            'usuario', 'autor_set', 'areatrabalho_set'
+        ]
+
+    class CreateView(CrudAux.CreateView):
+        form_class = CmjUserAdminForm
+
+    class UpdateView(CrudAux.UpdateView):
+        form_class = CmjUserAdminForm
+
+    class DetailView(CrudAux.DetailView):
+        layout_key = 'UserDetail'
+
+    class ListView(CrudAux.ListView):
+        form_search_class = ListWithSearchForm
+        ordered_list = None
+        paginate_by = 300
+
+        def hook_header_usuario(self, *args, **kwargs):
+            return 'Usuario'
+
+        def hook_usuario(self, *args, **kwargs):
+            return '{}<br><small>{}</small>'.format(
+                args[0].get_full_name(),
+                args[0].email
+            ), args[2]
+
+        def hook_header_autor_set(self, *args, **kwargs):
+            return 'Operador de Autor'
+
+        def hook_header_areatrabalho_set(self, *args, **kwargs):
+            return 'Operador de Área de Trabalho'
+
+        def get_queryset(self):
+            qs = self.model.objects.all()
+            q_param = self.request.GET.get('q', '')
+            if q_param:
+                q = Q(first_name__icontains=q_param)
+                q |= Q(last_name__icontains=q_param)
+                q |= Q(email__icontains=q_param)
+                qs = qs.filter(q)
+
+            return qs
+
+        def dispatch(self, request, *args, **kwargs):
+            return CrudAux.ListView.dispatch(self, request, *args, **kwargs)

@@ -152,6 +152,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         abstract = False
         permissions = MENU_PERMS_FOR_USERS
         ordering = ('first_name', 'last_name')
+        verbose_name = _('Usuário')
+        verbose_name_plural = _('Usuários')
 
     def __str__(self):
         return self.get_display_name()

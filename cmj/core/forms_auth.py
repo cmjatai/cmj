@@ -197,6 +197,85 @@ class CmjUserChangeForm(ModelForm):
                     new_password2, self.instance)
 
 
+class CmjUserAdminForm(ModelForm):
+
+    error_messages = {
+        'password_mismatch': _("As senhas informadas são diferentes"),
+    }
+
+    new_password1 = forms.CharField(
+        label='Nova senha',
+        max_length=50,
+        strip=False,
+        required=False,
+        widget=forms.PasswordInput(),
+        help_text='Deixe os campos em branco para não fazer alteração de senha')
+
+    new_password2 = forms.CharField(
+        label='Confirmar senha',
+        max_length=50,
+        strip=False,
+        required=False,
+        widget=forms.PasswordInput(),
+        help_text='Deixe os campos em branco para não fazer alteração de senha')
+
+    class Meta:
+        model = get_user_model()
+        fields = ['email',
+                  'first_name',
+                  'last_name',
+
+                  'new_password1',
+                  'new_password2',
+                  ]
+
+    def __init__(self, *args, **kwargs):
+
+        super(CmjUserAdminForm, self).__init__(*args, **kwargs)
+        row_pwd = to_row(
+            [
+                ('email', 5),
+                ('first_name', 5),
+                ('last_name', 4),
+
+                ('new_password1', 6),
+                ('new_password2', 6)
+            ]
+        )
+        self.helper = FormHelper()
+        self.helper.layout = SaplFormLayout(*row_pwd)
+
+    def save(self, commit=True):
+        new_password = self.cleaned_data['new_password1']
+
+        user = self.instance
+
+        if new_password:
+            user.set_password(new_password)
+            user.pwd_created = True
+
+        return super().save(commit)
+
+    def clean(self):
+        data = super().clean()
+
+        if self.errors:
+            return data
+
+        new_password1 = data.get('new_password1', '')
+        new_password2 = data.get('new_password2', '')
+
+        if new_password1 != new_password2:
+            raise forms.ValidationError(
+                self.error_messages['password_mismatch'],
+                code='password_mismatch',
+            )
+        else:
+            if new_password1 and new_password2:
+                password_validation.validate_password(
+                    new_password2, self.instance)
+
+
 class RecuperarSenhaForm(PasswordResetForm):
 
     def __init__(self, *args, **kwargs):

@@ -1717,7 +1717,7 @@ class PesquisarUsuarioView(PermissionRequiredMixin, FilterView):
     model = get_user_model()
     filterset_class = UsuarioFilterSet
     permission_required = ('base.list_appconfig',)
-    paginate_by = 10
+    paginate_by = 100
 
     def get_filterset_kwargs(self, filterset_class):
         super(PesquisarUsuarioView,
@@ -1756,7 +1756,7 @@ class PesquisarUsuarioView(PermissionRequiredMixin, FilterView):
         if data:
             url = "&" + str(self.request.META['QUERY_STRING'])
             if url.startswith("&page"):
-                ponto_comeco = url.find('username=') - 1
+                ponto_comeco = url.find('email=') - 1
                 url = url[ponto_comeco:]
 
         context = self.get_context_data(filter=self.filterset,

@@ -62,6 +62,11 @@
         {% if perms.core.menu_area_trabalho %}<li><a href="{% url 'cmj.core:areatrabalho_list' %}">{% trans "Áreas de Trabalho" %}</a></li>{% endif %}
         {% if perms.core.menu_impresso_enderecamento %}<li><a href="{% url 'cmj.core:impressoenderecamento_list' %}">{% trans "Impressos de Endereçamento" %}</a></li>{% endif %}
 
+        {% if perms.core.add_user %}
+          <li role="separator" class="divider"></li>
+          <li class="dropdown-header">{% trans "Usuários" %}</li>
+          <li><a href="{% url 'cmj.core:user_list' %}">{% trans "Cadastro de Usuários" %}</a></li>
+        {% endif %}
       </ul>
     </li>
   {% endif %}
