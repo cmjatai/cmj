@@ -8,7 +8,7 @@ import os
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import Group
 from django.contrib.auth.tokens import default_token_generator
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, ValidationError
 from django.core.mail import send_mail
@@ -1714,7 +1714,7 @@ class ListarProtocolosDuplicadosView(PermissionRequiredMixin, ListView):
 
 
 class PesquisarUsuarioView(PermissionRequiredMixin, FilterView):
-    model = User
+    model = get_user_model()
     filterset_class = UsuarioFilterSet
     permission_required = ('base.list_appconfig',)
     paginate_by = 10
@@ -1725,7 +1725,7 @@ class PesquisarUsuarioView(PermissionRequiredMixin, FilterView):
 
         kwargs = {'data': self.request.GET or None}
 
-        qs = self.get_queryset().order_by('username').distinct()
+        qs = self.get_queryset().order_by(get_user_model().USERNAME_FIELD).distinct()
 
         kwargs.update({
             'queryset': qs,

@@ -2,14 +2,16 @@ import logging
 from operator import xor
 import os
 
-from crispy_forms.bootstrap import FieldWithButtons, InlineRadios, StrictButton
-from crispy_forms.layout import HTML, Button, Div, Field, Fieldset, Layout, Row
+from crispy_forms.bootstrap import FieldWithButtons, InlineRadios, StrictButton,\
+    FormActions
+from crispy_forms.layout import HTML, Button, Div, Field, Fieldset, Layout, Row,\
+    Submit
 from django import forms
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import (AuthenticationForm, PasswordResetForm,
                                        SetPasswordForm)
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models import Q
@@ -158,7 +160,7 @@ class UsuarioFilterSet(django_filters.FilterSet):
         lookup_expr='icontains')
 
     class Meta:
-        model = User
+        model = get_user_model()
         fields = ['username']
 
     def __init__(self, *args, **kwargs):
@@ -1147,7 +1149,7 @@ class RecuperarSenhaForm(PasswordResetForm):
         if not self.is_valid():
             return self.cleaned_data
 
-        email_existente = User.objects.filter(
+        email_existente = get_user_model().objects.filter(
             email=self.data['email']).exists()
 
         if not email_existente:
@@ -1237,7 +1239,7 @@ class AlterarSenhaForm(Form):
 
         username = data['username']
         old_password = data['old_password']
-        user = User.objects.get(username=username)
+        user = get_user_model().objects.get(username=username)
 
         if user.is_anonymous():
             self.logger.error(
