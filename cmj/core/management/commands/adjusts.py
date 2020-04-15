@@ -1,25 +1,6 @@
 
 from datetime import datetime, timedelta
 import logging
-import os
-import shutil
-import stat
-import subprocess
-import time
-
-from PIL import Image
-from PyPDF4.generic import (
-    DictionaryObject,
-    NumberObject,
-    FloatObject,
-    NameObject,
-    TextStringObject,
-    ArrayObject
-)
-from PyPDF4.generic import IndirectObject
-from PyPDF4.pdf import PdfFileReader
-from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 from django.db.models import F, Q
 from django.db.models.signals import post_delete, post_save
@@ -30,7 +11,7 @@ from sapl.compilacao.models import Dispositivo, TextoArticulado,\
     TipoDispositivo
 from sapl.materia.models import MateriaLegislativa
 from sapl.norma.models import NormaJuridica
-from sapl.protocoloadm.models import DocumentoAdministrativo
+from sapl.protocoloadm.models import DocumentoAdministrativo, Protocolo
 
 
 def _get_registration_key(model):
@@ -58,7 +39,30 @@ class Command(BaseCommand):
 
         # self.run_veririca_pdf_tem_assinatura()
 
-        self.run_capture_fields_from_pdf()
+        # self.run_capture_fields_from_pdf()
+        self.associa_tipo_conteudo_gerado__e__conteudo_gerado()
+
+    def associa_tipo_conteudo_gerado__e__conteudo_gerado(self):
+
+        protocolos = Protocolo.objects.all()
+
+        count = 0
+        for p in protocolos:
+            if p.tipo_documento:
+                p.tipo_conteudo_protolocado = p.tipo_documento
+                p.conteudo_protocolado = p.documentoadministrativo_set.first()
+                p.save()
+
+            elif p.tipo_materia:
+                p.tipo_conteudo_protolocado = p.tipo_materia
+
+                materia = MateriaLegislativa.objects.filter(
+                    numero_protocolo=p.numero,
+                    ano=p.ano).first()
+
+                if materia:
+                    p.conteudo_protocolado = materia
+                p.save()
 
     def run_insere_ementa_em_textos_articulados_que_o_cadastro_esqueceu(self):
         for t in TextoArticulado.objects.exclude(dispositivos_set__tipo_dispositivo=2):

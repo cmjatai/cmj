@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields.jsonb import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
@@ -17,7 +18,8 @@ from sapl.materia.models import TipoMateriaLegislativa, UnidadeTramitacao,\
     MateriaLegislativa
 from sapl.utils import (RANGE_ANOS, YES_NO_CHOICES, texto_upload_path,
                         get_settings_auth_user_model,
-                        OverwriteStorage, PortalFileField)
+                        OverwriteStorage, PortalFileField,
+                        SaplGenericForeignKey)
 
 
 @reversion.register()
@@ -122,6 +124,24 @@ class Protocolo(models.Model):
         null=True,
         on_delete=models.PROTECT,
         verbose_name=_('Tipo de Matéria'))
+
+    tipo_content_type = models.ForeignKey(
+        ContentType, default=None, blank=True, null=True,
+        verbose_name=_('Tipo de Material Gerado'),
+        related_name='tipo_content_type_set')
+    tipo_object_id = models.PositiveIntegerField(
+        blank=True, null=True, default=None)
+    tipo_conteudo_protolocado = SaplGenericForeignKey(
+        'tipo_content_type', 'tipo_object_id', verbose_name=_('Tipo do Conteúdo Protocolado'))
+
+    conteudo_content_type = models.ForeignKey(
+        ContentType, default=None, blank=True, null=True,
+        verbose_name=_('Tipo de Material Gerado'),
+        related_name='conteudo_content_type_set')
+    conteudo_object_id = models.PositiveIntegerField(
+        blank=True, null=True, default=None)
+    conteudo_protolocado = SaplGenericForeignKey(
+        'conteudo_content_type', 'conteudo_object_id', verbose_name=_('Conteúdo Protocolado'))
 
     numero_paginas = models.PositiveIntegerField(
         blank=True, null=True, verbose_name=_('Número de Páginas'))
