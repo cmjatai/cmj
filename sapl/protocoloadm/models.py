@@ -131,7 +131,7 @@ class Protocolo(models.Model):
         related_name='tipo_content_type_set')
     tipo_object_id = models.PositiveIntegerField(
         blank=True, null=True, default=None)
-    tipo_conteudo_protolocado = SaplGenericForeignKey(
+    tipo_conteudo_protocolado = SaplGenericForeignKey(
         'tipo_content_type', 'tipo_object_id', verbose_name=_('Tipo do Conteúdo Protocolado'))
 
     conteudo_content_type = models.ForeignKey(
@@ -140,7 +140,7 @@ class Protocolo(models.Model):
         related_name='conteudo_content_type_set')
     conteudo_object_id = models.PositiveIntegerField(
         blank=True, null=True, default=None)
-    conteudo_protolocado = SaplGenericForeignKey(
+    conteudo_protocolado = SaplGenericForeignKey(
         'conteudo_content_type', 'conteudo_object_id', verbose_name=_('Conteúdo Protocolado'))
 
     numero_paginas = models.PositiveIntegerField(
@@ -198,6 +198,9 @@ class DocumentoAdministrativo(CountPageMixin):
         null=True,
         on_delete=models.PROTECT,
         verbose_name=_('Protocolo'))
+
+    protocolo_gr = GenericRelation(
+        'protocoloadm.Protocolo', related_query_name='protocolo_gr')
 
     materia = models.ForeignKey(
         MateriaLegislativa,

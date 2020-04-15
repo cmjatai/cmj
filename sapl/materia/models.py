@@ -287,6 +287,9 @@ class MateriaLegislativa(CountPageMixin):
     proposicao = GenericRelation(
         'Proposicao', related_query_name='proposicao')
 
+    protocolo_gr = GenericRelation(
+        'protocoloadm.Protocolo', related_query_name='protocolo_gr')
+
     autores = models.ManyToManyField(
         Autor,
         through='Autoria',
@@ -599,6 +602,9 @@ class DocumentoAcessorio(CountPageMixin):
 
     proposicao = GenericRelation(
         'Proposicao', related_query_name='proposicao')
+
+    protocolo_gr = GenericRelation(
+        'protocoloadm.Protocolo', related_query_name='protocolo_gr')
 
     data_ultima_atualizacao = models.DateTimeField(
         blank=True, null=True,

@@ -24,7 +24,6 @@
       <div class="container-table">
         <div class="result-count">Total de Protocolos encontrados: <strong>{{paginator.count}}</strong></div>
         <table class="table table-striped table-hover table-link-ordering">
-          
           {% for p in page_obj %}
             <tr>
               <td>
@@ -45,26 +44,27 @@
                   <strong>Autor:</strong> {{ p.autor.nome|default_if_none:"Não informado" }}</br>
                 {% endif %}
 
-                <strong>Natureza do Processo:</strong>
-                {% if p.tipo_processo == 0 %} Administrativo {% elif p.tipo_processo == 1 %} Matéria Legislativa {% endif %}</br>
-                <strong>Classificação:</strong> {{ p.tipo_documento|default_if_none:p.tipo_materia }} </br>
                 {% if p.anulado %}
                   <strong>Anulado por: </strong>{{ p.user_anulacao }} - IP {{ p.ip_anulacao }}</br>
                   <strong>Motivo Anulação: </strong>{{ p.justificativa_anulacao }}</br>
                 {% endif %}
-                {% if p.tipo_documento and p.documentoadministrativo_set.first %}
-                  <strong>Documentos vinculados: </strong>
-                  <a href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' p.documentoadministrativo_set.first.pk %}">
-                  {{ p.documentoadministrativo_set.first.tipo }} - {{ p.documentoadministrativo_set.first.numero }} /
-                  {{ p.documentoadministrativo_set.first.ano }}
-                  </a>
-                {% endif %}
-                {% if p.tipo_materia and p.materia_vinculada %}
-                  <strong>Materia Vinculada: </strong>
-                  <a href="{% url 'sapl.materia:materialegislativa_detail' p.materia_vinculada.pk %}">
-                    {{ p.materia_vinculada }}
-                  </a>
-                {% endif %}
+
+                  {% if p.conteudo_protocolado %}
+                    <strong>Especie do Documento: </strong>
+                    {{p.conteudo_content_type}}
+                    <br><strong>Tipo do Documento: </strong>
+                    {{p.tipo_conteudo_protocolado}}
+                    <br><strong>Documento: </strong>
+                    <a href="{% url 'sapl.protocoloadm:redirect_conteudo' p.pk %}">{{p.conteudo_protocolado}}</a>
+                  {% endif %}
+                  
+
+                  <small class="text-red"><br><br>
+                    <strong>Natureza do Processo:</strong>
+                    {% if p.tipo_processo == 0 %} Administrativo {% elif p.tipo_processo == 1 %} Matéria Legislativa {% endif %}</br>
+                    <strong>Classificação:</strong> {{ p.tipo_documento|default_if_none:p.tipo_materia }} </br>
+                  </small>
+
               </td>
             </tr>
           {% endfor %}

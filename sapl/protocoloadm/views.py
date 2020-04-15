@@ -1478,6 +1478,22 @@ class CriarDocumentoProtocolo(PermissionRequiredMixin, CreateView):
         return doc
 
 
+class ProtocoloRedirectConteudoView(PermissionRequiredMixin, RedirectView):
+    permanent = False
+    permission_required = ('protocoloadm.detail_protocolo',)
+
+    def get_redirect_url(self, *args, **kwargs):
+        try:
+            p = Protocolo.objects.get(pk=kwargs['pk'])
+        except:
+            raise Http404
+
+        return reverse('%s:%s_detail' % (
+            p.conteudo_protocolado._meta.app_config.name,
+            p.conteudo_protocolado._meta.model_name
+        ), args=(p.conteudo_protocolado.id,))
+
+
 class ProtocoloMostrarView(PermissionRequiredMixin, TemplateView):
     logger = logging.getLogger(__name__)
 

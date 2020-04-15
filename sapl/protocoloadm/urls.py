@@ -21,7 +21,8 @@ from sapl.protocoloadm.views import (
     AnexadoCrud, DocumentoAnexadoEmLoteView,
     PrimeiraTramitacaoEmLoteAdmView,
     TramitacaoEmLoteAdmView, AcompanhamentoExcluirView,
-    AcompanhamentoConfirmarView, AcompanhamentoDocumentoView)
+    AcompanhamentoConfirmarView, AcompanhamentoDocumentoView,
+    ProtocoloRedirectConteudoView)
 
 from .apps import AppConfig
 
@@ -56,6 +57,8 @@ urlpatterns_protocolo = [
 
     url(r'^protocoloadm/(?P<pk>\d+)/protocolo-mostrar$',
         ProtocoloMostrarView.as_view(), name='protocolo_mostrar'),
+    url(r'^protocoloadm/(?P<pk>\d+)/conteudo$',
+        ProtocoloRedirectConteudoView.as_view(), name='redirect_conteudo'),
 
 
     url(r'^doc/(?P<pk>\d+)/acompanhar-documento/$',
