@@ -1835,7 +1835,7 @@ class DeleteUsuarioView(PermissionRequiredMixin, DeleteView):
 
     @property
     def cancel_url(self):
-        return reverse('sapl.base:user_edit',
+        return reverse('cmj.core:user_update',
                        kwargs={'pk': self.kwargs['pk']})
 
 
