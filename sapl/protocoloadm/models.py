@@ -109,6 +109,7 @@ class Protocolo(models.Model):
                               null=True,
                               on_delete=models.PROTECT)
     assunto_ementa = models.TextField(blank=True)
+
     tipo_documento = models.ForeignKey(
         TipoDocumentoAdministrativo,
         blank=True,
@@ -121,6 +122,7 @@ class Protocolo(models.Model):
         null=True,
         on_delete=models.PROTECT,
         verbose_name=_('Tipo de Matéria'))
+
     numero_paginas = models.PositiveIntegerField(
         blank=True, null=True, verbose_name=_('Número de Páginas'))
     observacao = models.TextField(

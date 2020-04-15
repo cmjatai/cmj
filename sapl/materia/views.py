@@ -465,7 +465,7 @@ class ProposicaoPendente(PermissionRequiredMixin, ListView):
     template_name = 'materia/prop_pendentes_list.html'
     model = Proposicao
     ordering = ['data_envio', 'autor', 'tipo', 'descricao']
-    paginate_by = 10
+    paginate_by = 50
     permission_required = ('materia.detail_proposicao_enviada',)
 
     def get_queryset(self):
@@ -617,6 +617,16 @@ class ConfirmarProposicao(PermissionRequiredForAppCrudMixin, UpdateView):
 
         return self.object.results['url']
 
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        if self.object and self.object.proposicao_vinculada:
+            messages.error(request, ('Esta proposição está vinculada a: {}. Acesse-a e faça a incorporação primeiro dela.').format(
+                self.object.proposicao_vinculada))
+            return redirect(reverse('sapl.materia:proposicao-pendente'))
+
+        return UpdateView.get(self, request, *args, **kwargs)
+
     def get_initial(self):
         initial = UpdateView.get_initial(self)
         obj = self.get_object()
@@ -625,6 +635,10 @@ class ConfirmarProposicao(PermissionRequiredForAppCrudMixin, UpdateView):
         return initial
 
     def get_object(self, queryset=None):
+
+        if hasattr(self, 'object') and self.object:
+            return self.object
+
         username = self.request.user.username
 
         try:

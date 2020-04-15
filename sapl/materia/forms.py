@@ -2379,6 +2379,8 @@ class ConfirmarProposicaoForm(ProposicaoForm):
         if self.instance.tipo.content_type.model_class() ==\
                 TipoMateriaLegislativa:
             self.fields['regime_tramitacao'].required = True
+        self.fields['content_type'].required = False
+        self.fields['tipo'].required = False
 
         fields = [
             Fieldset(
@@ -2489,10 +2491,10 @@ class ConfirmarProposicaoForm(ProposicaoForm):
         if self.instance.proposicao_vinculada:
             self.fields[
                 'vinculo_numero'
-            ].initial = self.instance.proposicao_vinculada.numero
+            ].initial = self.instance.proposicao_vinculada.numero_proposicao
             self.fields[
                 'vinculo_ano'
-            ].initial = self.instance.proposicao_vinculada.data_envio.year
+            ].initial = self.instance.proposicao_vinculada.ano
 
         if self.proposicao_incorporacao_obrigatoria == 'C':
             self.fields['gerar_protocolo'].initial = True
@@ -2674,6 +2676,14 @@ class ConfirmarProposicaoForm(ProposicaoForm):
                 'sapl.materia:materialegislativa_detail',
                 kwargs={'pk': materia.pk})
 
+            if proposicao.proposicao_vinculada_set.exists():
+                vinculos = proposicao.proposicao_vinculada_set.all()
+                for v in vinculos:
+                    v.materia_de_vinculo = materia
+                    v.proposicao_vinculada = None
+                    v.save()
+                pass
+
         elif self.instance.tipo.content_type.model_class() == TipoDocumento:
 
             # dados básicos
@@ -2703,6 +2713,13 @@ class ConfirmarProposicaoForm(ProposicaoForm):
             self.instance.results['url'] = reverse(
                 'sapl.materia:documentoacessorio_detail',
                 kwargs={'pk': doc.pk})
+
+            if proposicao.proposicao_vinculada_set.exists():
+                vinculos = proposicao.proposicao_vinculada_set.all()
+                for v in vinculos:
+                    v.materia_de_vinculo = doc.materia
+                    v.proposicao_vinculada = None
+                    v.save()
 
         proposicao.conteudo_gerado_related = conteudo_gerado
         proposicao.save()

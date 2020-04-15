@@ -738,6 +738,10 @@ class DocumentoAdministrativoOrderingFilter(django_filters.OrderingFilter):
 
 
 def gerar_hash_arquivo(arquivo, pk, block_size=2 ** 20):
+
+    arquivo = arquivo.replace('media/sapl/', 'media/original__sapl/')
+    arquivo = arquivo.replace('media/cmj/', 'media/original__cmj/')
+
     md5 = hashlib.md5()
     arq = open(arquivo, 'rb')
     while True:

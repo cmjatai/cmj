@@ -1,10 +1,15 @@
-{% extends "base.html" %}
+{% extends "crud/list.html" %}
 {% load i18n %}
 {% load tz %}
 {% load common_tags %}
-{% block base_content %}
+{% block title %}
+  <h1 class="page-header {{bg_title}}">
+    Proposições Não Recebidas
+  </h1>
+  {% endblock title %}
+
+{% block container_table_list %}
   <fieldset>
-    <legend>Proposições Não Recebidas</legend>
     {% if not object_list %}
       <p>{{ NO_ENTRIES_MSG }}</p>
     {% else %}
@@ -53,7 +58,7 @@
                    <a href="{% url 'sapl.materia:proposicao_detail' prop.pk %}">{{ prop.data_envio|localtime|date:"d/m/Y H:i:s" }}</a>
                 </td>
                 <td>{{ prop.tipo.descricao }}</td>
-                <td>{{ prop.descricao }}</td>
+                <td><strong>{{prop}}</strong><br>{{ prop.descricao }}</td>
                 <td>{{ prop.autor }}</td>
                 <td>
                   {% if not AppConfig.receber_recibo_proposicao %}
@@ -70,7 +75,4 @@
         </tbody>
       </table>
     {% endif %}
-  </fieldset>
-
-  {% include 'paginacao.html'%}
 {% endblock %}
