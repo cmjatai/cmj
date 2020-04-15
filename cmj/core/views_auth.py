@@ -61,6 +61,9 @@ class UserCrud(CrudAux):
             'usuario', 'autor_set', 'areatrabalho_set', 'is_active'
         ]
 
+        def get_context_object_name(self, *args, **kwargs):
+            return None
+
     class CreateView(CrudAux.CreateView):
         form_class = CmjUserAdminForm
 
