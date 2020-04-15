@@ -1,7 +1,6 @@
 {% extends "crud/form.html" %}
 {% load i18n %}
 {% load crispy_forms_tags %}
-
 {% block base_workspace %}
   {% if view.is_contained %}
     <div class="box-area-trabalho">
@@ -57,7 +56,6 @@
           $("input[name=vinculo_numero]").val('')
           return;
         }
-        $("#vinculo_proposicao").addClass('hidden');
 
         $.get(url, formData).done(function(data) {
           if (data.pagination.total_entries == 1)
@@ -69,6 +67,7 @@
               ).removeClass('hidden');
           else
             $(".ementa_materia").html('<strong>Atenção!!!</strong> Matéria Legislativa não localizada!').removeClass('hidden');
+          $("#vinculo_proposicao").addClass('hidden');
         });
   		});
       
@@ -77,20 +76,19 @@
         var proposicao_id = {% if object %}{{object.id}}{% else %}0{% endif %};
 
         var formData = {
-              'data_envio__year'    : $("input[name=vinculo_ano]").val(),
+              'ano'    : $("input[name=vinculo_ano]").val(),
               'numero_proposicao' : $("input[name=vinculo_numero]").val(),
         }
-        if (formData.data_envio__year === '' || formData.numero_proposicao === '') {
+        if (formData.ano === '' || formData.numero_proposicao === '') {
           $("#vinculo_materia").removeClass('hidden');
           $(".ementa_proposicao").html('').addClass('hidden');
           $("input[name=ano_materia]").val('')
           $("input[name=numero_materia]").val('')
           return;
         }
-        $("#vinculo_materia").addClass('hidden');
 
         $.get(url, formData).done(function(data) {
-          if (data.pagination.total_entries == 1) {
+          if (data.pagination !== undefined && data.pagination.total_entries == 1) {
             if (data.results[0].id === proposicao_id) {
               $(".ementa_proposicao").html('<strong>Atenção!!!</strong> Não é possível vincular uma proposição a ela mesma!').removeClass('hidden');
               return;
@@ -104,6 +102,10 @@
           }
           else
               $(".ementa_proposicao").html('<strong>Atenção!!!</strong>Proposição não localizada!').removeClass('hidden');
+          $("#vinculo_materia").addClass('hidden');
+        }).catch(function(data) {
+              $(".ementa_proposicao").html('<strong>Atenção!!!</strong>Proposição não localizada!').removeClass('hidden');
+          $("#vinculo_materia").addClass('hidden');
         });
   		});
 

@@ -2331,6 +2331,7 @@ class ConfirmarProposicaoForm(ProposicaoForm):
             'descricao',
             'observacao',
             'gerar_protocolo',
+
             'numero_de_paginas',
             'numero_materia_futuro'
         ]
@@ -2373,7 +2374,6 @@ class ConfirmarProposicaoForm(ProposicaoForm):
             if 'regime_tramitacao' in self._meta.fields:
                 self._meta.fields.remove('regime_tramitacao')
 
-        # esta chamada isola o __init__ de ProposicaoForm
         super(ProposicaoForm, self).__init__(*args, **kwargs)
 
         if self.instance.tipo.content_type.model_class() ==\
@@ -2385,9 +2385,9 @@ class ConfirmarProposicaoForm(ProposicaoForm):
                 _('Dados Básicos'),
                 to_row(
                     [
-                        ('tipo_readonly', 3),
+                        ('tipo_readonly', 5),
                         ('data_envio', 3),
-                        ('autor_readonly', 3),
+                        ('autor_readonly', 4),
                         ('numero_materia_futuro', 3),
                         ('descricao', 12),
                         ('observacao', 12)
@@ -2402,27 +2402,46 @@ class ConfirmarProposicaoForm(ProposicaoForm):
                 del fields[0][0][3]
 
         fields.append(
-            Fieldset(
-                _('Vinculado a Matéria Legislativa'),
-                to_row(
-                    [
-                        ('tipo_materia', 3),
-                        ('numero_materia', 2),
-                        ('ano_materia', 2),
-                        (Alert(_('O responsável pela incorporação pode '
-                                 'alterar a anexação. Limpar os campos '
-                                 'de Vinculação gera um %s independente '
-                                 'sem anexação se for possível para esta '
-                                 'Proposição. Não sendo, a rotina de incorporação '
-                                 'não permitirá estes campos serem vazios.'
-                                 ) % self.instance.tipo.content_type,
-                               css_class="alert-info",
-                               dismiss=False), 5),
-                        (Alert('',
-                               css_class="ementa_materia hidden alert-info",
-                               dismiss=False), 12),
-                    ]
-                )
+            Div(
+                to_row([
+                    (Fieldset(_('Víncular a uma Matéria Legislativa')), 12),
+                    (
+                        HTML(
+                            '''<small class="form-text text-muted">
+                            O Autor da proposição vinculou esta proposição a uma 
+                            Matéria Legislativa. Verifique se está correto 
+                            para prosseguir com a Incorporação.</small>
+                            '''
+                            if self.instance.materia_de_vinculo else
+                            '''
+                                <small class="form-text text-muted">
+                                Você pode fazer a anexação diretamente aqui na
+                                incorporaçao, basta informar a qual 
+                                matéria legislativa deseja incorporar.</small>
+                            '''
+                        ), 12),
+                    (
+                        Div(
+                            to_row(
+                                [
+                                    ('tipo_materia', 6),
+                                    ('numero_materia', 3),
+                                    ('ano_materia', 3),
+                                    (
+                                        Alert(
+                                            '',
+                                            css_class="ementa_materia hidden alert-info",
+                                            dismiss=False
+                                        ),
+                                        12
+                                    )
+                                ]
+                            ),
+                        ),
+                        12
+                    ),
+                ]),
+                css_id="vinculo_materia"
             )
         )
 
@@ -2466,6 +2485,14 @@ class ConfirmarProposicaoForm(ProposicaoForm):
             self.fields[
                 'ano_materia'
             ].initial = self.instance.materia_de_vinculo.ano
+
+        if self.instance.proposicao_vinculada:
+            self.fields[
+                'vinculo_numero'
+            ].initial = self.instance.proposicao_vinculada.numero
+            self.fields[
+                'vinculo_ano'
+            ].initial = self.instance.proposicao_vinculada.data_envio.year
 
         if self.proposicao_incorporacao_obrigatoria == 'C':
             self.fields['gerar_protocolo'].initial = True

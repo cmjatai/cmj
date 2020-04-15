@@ -617,6 +617,13 @@ class ConfirmarProposicao(PermissionRequiredForAppCrudMixin, UpdateView):
 
         return self.object.results['url']
 
+    def get_initial(self):
+        initial = UpdateView.get_initial(self)
+        obj = self.get_object()
+        initial['numero_de_paginas'] = obj.paginas
+
+        return initial
+
     def get_object(self, queryset=None):
         username = self.request.user.username
 
@@ -733,8 +740,9 @@ class ProposicaoCrud(Crud):
     container_field = 'autor__operadores'
 
     class BaseMixin(Crud.BaseMixin):
-        list_field_names = ['data_envio', 'data_recebimento', 'descricao',
-                            'tipo', 'conteudo_gerado_related', 'cancelado', ]
+        list_field_names = ['detalhe', 'tipo', 'data_envio', 'data_recebimento',
+                            'conteudo_gerado_related', ]  # 'cancelado', ]
+        ordered_list = False
 
     class BaseLocalMixin:
         form_class = ProposicaoForm
@@ -1086,6 +1094,14 @@ class ProposicaoCrud(Crud):
 
     class ListView(Crud.ListView):
         ordering = ['-data_envio', 'descricao']
+
+        def hook_header_detalhe(self, *args, **kwargs):
+            return 'Proposição'
+
+        def hook_detalhe(self, *args, **kwargs):
+            return '''
+                <strong>{}</strong><br>{}            
+            '''.format(args[0], args[0].descricao), args[2]
 
         def get_rows(self, object_list):
 

@@ -811,7 +811,7 @@ class Parecer(models.Model):
 
 
 @reversion.register()
-class Proposicao(models.Model):
+class Proposicao(CountPageMixin):
 
     FIELDFILE_NAME = ('texto_original', )
 
