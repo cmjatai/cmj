@@ -1,6 +1,6 @@
 {% load i18n common_cmj_tags %}
 - title: {% trans 'Solicitações' %}
-  url: ouvidoria.solicitacao_manage_list
+  url: cmj.ouvidoria:solicitacao_manage_list
   check_permission: ouvidoria.list_solicitacao
 - title: {% trans 'Fale Conosco' %}
   url: ''

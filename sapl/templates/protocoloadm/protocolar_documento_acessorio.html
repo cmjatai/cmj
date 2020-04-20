@@ -1,0 +1,56 @@
+{% extends "protocoloadm/protocoloadm_detail.html" %}
+{% load i18n %}
+
+{% block title %}
+  <h1 class="page-header {{bg_title}}">
+    Protocolar Documento Acessório de uma Matéria Legislativa
+  </h1>
+{% endblock title %}
+
+{% block extra_js %}
+   <script language="Javascript">
+      $(document).ready(function() {
+
+        $("input[name=data_hora_manual]").change(function(event) {
+          if (this.value === 'True' && this.checked)
+            $("#protocolo_data_hora_manual").show();
+          else if (this.value === 'False' && this.checked)
+            $("#protocolo_data_hora_manual").hide();
+        });
+        $("input[name=data_hora_manual]").trigger('change')
+        
+      $("select[name=tipo_materia], input[name=numero_materia], input[name=ano_materia]").change(function(event) {
+        var url = '{% url 'sapl.api:materialegislativa-list'%}'
+
+        var formData = {
+              'tipo'   : $("select[name=tipo_materia]").val(),
+              'ano'    : $("input[name=ano_materia]").val(),
+              'numero' : $("input[name=numero_materia]").val(),
+        }
+        if (formData.tipo == '' || formData.ano == '' || formData.numero == '') {
+          $("#vinculo_proposicao").removeClass('hidden');
+          $(".ementa_materia").html('').addClass('hidden');
+          $("input[name=vinculo_ano]").val('')
+          $("input[name=vinculo_numero]").val('')
+          return;
+        }
+        $("#vinculo_proposicao").addClass('hidden');
+
+        $.get(url, formData).done(function(data) {
+          if (data.pagination.total_entries == 1)
+            $(".ementa_materia").html(
+              `<a target="_blank" href="{% url 'sapl.materia:materialegislativa_list' %}${data.results[0].id}">
+                  <strong>${data.results[0].__str__}</strong>
+                  </a>
+                  <br>${data.results[0].ementa}`
+              ).removeClass('hidden');
+          else
+            $(".ementa_materia").html('<strong>Atenção!!!</strong> Matéria Legislativa não localizada!').removeClass('hidden');
+        });
+  		});
+
+      $("select[name=tipo_materia]").trigger('change');
+
+    });
+	</script>
+{% endblock %}

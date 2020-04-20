@@ -1,9 +1,12 @@
 from datetime import date, timedelta
 import datetime
+import json
 
 from dateutil.relativedelta import relativedelta
 from django import template
 from django.conf import settings
+from django.core.serializers import serialize
+from django.db.models.query import QuerySet
 from django.template.defaultfilters import stringfilter
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime as django_parse_datetime
@@ -31,6 +34,18 @@ def startswith(text, starts):
     if isinstance(text, str):
         return text.startswith(starts)
     return False
+
+
+@register.filter('jsonify')
+def jsonify(object):
+    if isinstance(object, QuerySet):
+        return mark_safe(serialize('json', object))
+    return mark_safe(json.dumps(object))
+
+
+@register.filter('to_dict')
+def to_dict(object):
+    return object.__dict__
 
 
 def get_class(class_string):

@@ -6,7 +6,6 @@ from sapl.protocoloadm.views import (
     CriarDocumentoProtocolo,
     DocumentoAcessorioAdministrativoCrud,
     DocumentoAdministrativoCrud,
-    ProtocoloDocumentoView,
     ProtocoloMateriaTemplateView,
     ProtocoloMateriaView,
     ProtocoloMostrarView,
@@ -22,7 +21,8 @@ from sapl.protocoloadm.views import (
     PrimeiraTramitacaoEmLoteAdmView,
     TramitacaoEmLoteAdmView, AcompanhamentoExcluirView,
     AcompanhamentoConfirmarView, AcompanhamentoDocumentoView,
-    ProtocoloRedirectConteudoView)
+    ProtocoloRedirectConteudoView, ProtocoloDocumentoAcessorioView,
+    ProtocoloDocumentoView)
 
 from .apps import AppConfig
 
@@ -51,8 +51,12 @@ urlpatterns_protocolo = [
     url(r'^protocoloadm/$',
         ProtocoloPesquisaView.as_view(), name='protocolo'),
 
-    url(r'^protocoloadm/protocolar-doc',
+    url(r'^protocoloadm/protocolar-doc$',
         ProtocoloDocumentoView.as_view(), name='protocolar_doc'),
+
+
+    url(r'^protocoloadm/protocolar-doc-acess$',
+        ProtocoloDocumentoAcessorioView.as_view(), name='protocolar_doc_acess'),
 
 
     url(r'^protocoloadm/(?P<pk>\d+)/protocolo-mostrar$',
@@ -101,7 +105,6 @@ urlpatterns_protocolo = [
 
     url(r'^protocoloadm/tramitacao-em-lote', TramitacaoEmLoteAdmView.as_view(),
         name='tramitacao_em_lote_docadm'),
-
 ]
 
 urlpatterns_sistema = [

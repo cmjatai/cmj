@@ -362,6 +362,127 @@ class DocumentoAcessorioForm(FileFieldCheckMixin, ModelForm):
         return self.cleaned_data
 
 
+class DocumentoAcessorioProtocoloForm(FileFieldCheckMixin, ModelForm):
+
+    logger = logging.getLogger(__name__)
+
+    data = forms.DateField(required=True)
+
+    materia = forms.ModelChoiceField(
+        label=MateriaLegislativa._meta.verbose_name,
+        required=False,
+        queryset=MateriaLegislativa.objects.all(),
+        empty_label='Selecione',
+        widget=forms.HiddenInput())
+
+    tipo_materia = forms.ModelChoiceField(
+        label=TipoMateriaLegislativa._meta.verbose_name,
+        required=False,
+        queryset=TipoMateriaLegislativa.objects.all(),
+        empty_label='Selecione')
+
+    numero_materia = forms.CharField(
+        label='Número', required=False)
+
+    ano_materia = forms.CharField(
+        label='Ano', required=False)
+
+    class Meta:
+        model = DocumentoAcessorio
+        fields = ['tipo',
+                  'nome',
+                  'data',
+                  'autor',
+                  'ementa',
+                  'indexacao',
+                  'arquivo',
+                  'tipo_materia',
+                  'numero_materia',
+                  'ano_materia',
+                  'materia'
+                  ]
+
+    def clean(self):
+
+        super(DocumentoAcessorioProtocoloForm, self).clean()
+
+        if not self.is_valid():
+            return self.cleaned_data
+        cleaned_data = self.cleaned_data
+
+        arquivo = self.cleaned_data.get('arquivo', False)
+
+        if arquivo and arquivo.size > MAX_DOC_UPLOAD_SIZE:
+            raise ValidationError("O arquivo Texto Integral deve ser menor que {0:.1f} mb, o tamanho atual desse arquivo é {1:.1f} mb"
+                                  .format((MAX_DOC_UPLOAD_SIZE / 1024) / 1024, (arquivo.size / 1024) / 1024))
+
+        tm, am, nm = (cleaned_data.get('tipo_materia', ''),
+                      cleaned_data.get('ano_materia', ''),
+                      cleaned_data.get('numero_materia', ''))
+
+        if tm and am and nm:
+            try:
+                self.logger.debug("Tentando obter objeto MateriaLegislativa (tipo_id={}, ano={}, numero={})."
+                                  .format(tm, am, nm))
+                materia_de_vinculo = MateriaLegislativa.objects.get(
+                    tipo_id=tm,
+                    ano=am,
+                    numero=nm
+                )
+            except ObjectDoesNotExist:
+                self.logger.error("Objeto MateriaLegislativa vinculada (tipo_id={}, ano={}, numero={}) não existe!"
+                                  .format(tm, am, nm))
+                raise ValidationError(_('Matéria Vinculada não existe!'))
+            else:
+                self.logger.info("MateriaLegislativa vinculada (tipo_id={}, ano={}, numero={}) com sucesso."
+                                 .format(tm, am, nm))
+                cleaned_data['materia'] = materia_de_vinculo
+
+        return self.cleaned_data
+
+    def save(self, commit=True):
+        documento = super(DocumentoAcessorioProtocoloForm, self).save(commit)
+
+        protocolo = self.initial['protocolo']
+        protocolo.tipo_conteudo_protocolado = documento.tipo
+        protocolo.conteudo_protocolado = documento
+        protocolo.save()
+
+        return documento
+
+    def __init__(self, *args, **kwargs):
+
+        fields = []
+
+        row1 = to_row(
+            [('tipo', 4), ('nome', 5), ('data', 3)])
+
+        row2 = to_row(
+            [('autor', 5), ('arquivo', 7), ])
+        row3 = to_row(
+            [('ementa', 8), ('indexacao', 4), ])
+
+        fields.append(
+            Fieldset(_('Dados do Documento Acessório'), row1, row2, row3)
+        )
+
+        row0 = to_row(
+            [('tipo_materia', 6), ('numero_materia', 3), ('ano_materia', 3)])
+        fields.append(
+            Fieldset(_('Vincular a Matéria Legislativa'), row0,
+                     to_column(
+                (Alert('<strong></strong><br><span></span>',
+                       css_class="ementa_materia hidden alert-info",
+
+                       dismiss=False), 12)))
+        )
+
+        self.helper = SaplFormHelper()
+
+        self.helper.layout = SaplFormLayout(*fields)
+        super().__init__(*args, **kwargs)
+
+
 class RelatoriaForm(ModelForm):
     logger = logging.getLogger(__name__)
 

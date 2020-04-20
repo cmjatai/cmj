@@ -1,0 +1,41 @@
+{% extends "crud/form.html" %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block detail_content %}
+  {% crispy form %}
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script language="Javascript">
+
+  $("select[name=tipo_materia], input[name=numero_materia], input[name=ano_materia]").change(function(event) {
+    var url = '{% url 'sapl.api:materialegislativa-list'%}'
+
+    var formData = {
+          'tipo'   : $("select[name=tipo_materia]").val(),
+          'ano'    : $("input[name=ano_materia]").val(),
+          'numero' : $("input[name=numero_materia]").val(),
+    }
+    if (formData.tipo == '' || formData.ano == '' || formData.numero == '')
+      return;
+    $.get(url, formData).done(function(data) {
+      if (data.pagination.total_entries == 1) {
+        $(".ementa_materia strong").html(data.results[0].__str__);
+        $(".ementa_materia span").html(data.results[0].ementa);
+        $(".ementa_materia").removeClass('hidden').removeClass('alert-danger').addClass('alert-info');
+      }
+      else {
+        $(".ementa_materia strong").html('Atenção!');
+        $(".ementa_materia span").html('Matéria não localizada...');
+        $(".ementa_materia").removeClass('hidden').removeClass('alert-info').addClass('alert-danger');
+
+      }
+        
+    });
+  });
+  $("select[name=tipo_materia]").trigger('change');
+</script>
+{% endblock %}

@@ -1,7 +1,7 @@
 {% extends "protocoloadm/protocoloadm_detail.html" %}
 {% load i18n %}
 {% load tz %}
-{% load static %}
+{% load static common_tags %}
 {% load webpack_static from webpack_loader %}
 
 {% block base_content %}
@@ -33,10 +33,7 @@
 	<strong>Observação: </strong>{{ protocolo.observacao|default:"Não informado" }}</br>
 	<strong>Anulado: {% if protocolo.anulado %} <font color="red"> Sim {% else %} <font color="green"> Não {% endif %} </font></strong>
 	{% if protocolo.anulado%}<br><strong>Motivo da Anulação:</strong> {{protocolo.justificativa_anulacao}}{%endif%}
-
 	<br>
-
-
 	{% if protocolo.conteudo_protocolado %}
 		<br><strong>Especie do Documento: </strong>
 		{{protocolo.conteudo_content_type}}
@@ -50,12 +47,24 @@
 
 		<br><strong>Tipo do Documento: </strong>
 		{{protocolo.tipo_conteudo_protocolado}}
+		{% if not protocolo.anulado%}
+			{% if protocolo.tipo_conteudo_protocolado|model_name == 'protocoloadm.TipoMateriaLegislativa' %}
+				<br>
+				<a href="{% url 'sapl.materia:materia_create_simplificado' protocolo.pk %}" 
+						class="btn btn-primary">
+							Criar Matéria Legislativa
+							</a>
+			{% elif protocolo.tipo_conteudo_protocolado|model_name == 'protocoloadm.TipoDocumentoAdministrativo' %}
+				<br><a href="{% url 'sapl.protocoloadm:criar_documento' protocolo.pk %}" class="btn btn-primary">Criar Documento</a>
 
+			{% elif protocolo.tipo_conteudo_protocolado|model_name == 'materia.TipoDocumento' %}
+				<br><a href="{% url 'sapl.materia:materia_create_doc_acess$' protocolo.pk %}" class="btn btn-primary">Criar Documento Acessorio</a>
+			{% endif %}
+		{% endif %}
 	{% endif %}
 	
 	{% comment %}
 	<strong>Natureza do Processo: </strong>{% if protocolo.tipo_processo == 0 %} Administrativo {% elif protocolo.tipo_processo == 1 %} Legislativo {% endif %}</br>
-
 		<strong>Documentos Vinculados:</strong>
 		<br/>
 		{% if protocolo.tipo_documento %}
@@ -72,7 +81,6 @@
 				<a href="{% url 'sapl.materia:materialegislativa_detail' m.pk %}"> {{m}} </a></br>
 			{% endfor %}
 				</br>
-				{% if not protocolo.anulado%}{% if not materia %}<a href="{% url 'sapl.materia:materia_create_simplificado' protocolo.pk %}" class="btn btn-primary">Criar Matéria</a>&nbsp;&nbsp;&nbsp;&nbsp;{% endif %}{% endif %}
 		{% endif %}
 	{% endcomment %}
 

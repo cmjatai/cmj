@@ -1,6 +1,12 @@
 {% extends "protocoloadm/protocoloadm_detail.html" %}
 {% load i18n %}
 
+{% block title %}
+  <h1 class="page-header {{bg_title}}">
+    Protocolar Documento Administrativo
+  </h1>
+{% endblock title %}
+
 {% block extra_js %}
    <script language="Javascript">
       $(document).ready(function() {

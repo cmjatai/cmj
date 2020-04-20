@@ -28,7 +28,8 @@ from sapl.materia.views import (AcompanhamentoConfirmarView,
                                 ExcluirTramitacaoEmLoteView, RetornarProposicao,
                                 MateriaPesquisaSimplesView,
                                 DespachoInicialMultiCreateView,
-                                MateriaLegislativaCheckView)
+                                MateriaLegislativaCheckView,
+                                CriarDocumentoAcessorioProtocolo)
 from sapl.norma.views import NormaPesquisaSimplesView
 from sapl.protocoloadm.views import (
     FichaPesquisaAdmView, FichaSelecionaAdmView)
@@ -86,6 +87,11 @@ urlpatterns_materia = [
     url(r'^materia/(?P<pk>[0-9]+)/create_simplificado$',
         CriarProtocoloMateriaView.as_view(),
         name='materia_create_simplificado'),
+
+    url(r'^materia/(?P<pk>[0-9]+)/create_doc_acess$',
+        CriarDocumentoAcessorioProtocolo.as_view(),
+        name='materia_create_doc_acess$'),
+
     url(r'^materia/recuperar-materia',
         recuperar_materia, name='recuperar_materia'),
     url(r'^materia/(?P<pk>[0-9]+)/ta$',

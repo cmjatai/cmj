@@ -49,7 +49,8 @@ from sapl.materia.forms import (AnexadaForm, AutoriaForm,
                                 DevolverProposicaoForm, LegislacaoCitadaForm,
                                 OrgaoForm, ProposicaoForm, TipoProposicaoForm,
                                 TramitacaoForm, TramitacaoUpdateForm, MateriaPesquisaSimplesForm,
-                                DespachoInicialCreateForm)
+                                DespachoInicialCreateForm,
+                                DocumentoAcessorioProtocoloForm)
 from sapl.norma.models import LegislacaoCitada
 from sapl.parlamentares.models import Legislatura
 from sapl.protocoloadm.models import Protocolo
@@ -209,14 +210,14 @@ class CriarProtocoloMateriaView(CreateView):
                               ". Tentando obter materias do último ano.")
             materias_ano = MateriaLegislativa.objects.filter(
                 ano=protocolo.ano,
-                tipo=protocolo.tipo_materia).latest('numero')
+                tipo=protocolo.tipo_conteudo_protocolado).latest('numero')
             numero = materias_ano.numero + 1
         except ObjectDoesNotExist:
             self.logger.error("user=" + username + ". Não foram encontradas matérias no último ano ({}). "
                               "Definido 1 como padrão.".format(protocolo.ano))
             pass  # numero ficou com o valor padrão 1 acima
 
-        context['form'].fields['tipo'].initial = protocolo.tipo_materia
+        context['form'].fields['tipo'].initial = protocolo.tipo_conteudo_protocolado
         context['form'].fields['numero'].initial = numero
         context['form'].fields['ano'].initial = protocolo.ano
         if protocolo:
@@ -240,6 +241,8 @@ class CriarProtocoloMateriaView(CreateView):
             self.logger.info(
                 "user=" + username + ". Tentando obter objeto Procolo com pk={}.".format(self.kwargs['pk']))
             protocolo = Protocolo.objects.get(pk=self.kwargs['pk'])
+            protocolo.conteudo_protocolado = materia
+            protocolo.save()
         except ObjectDoesNotExist:
             self.logger.error(
                 'user=' + username + '. Objeto Protocolo com pk={} não encontrado.'.format(self.kwargs['pk']))
@@ -1480,7 +1483,8 @@ class DocumentoAcessorioCrud(MasterDetailCrud):
     public = [RP_LIST, RP_DETAIL]
 
     class BaseMixin(MasterDetailCrud.BaseMixin):
-        list_field_names = ['nome', 'tipo', 'data', ('ementa', 'autor')]
+        list_field_names = ['nome', 'tipo', 'data',
+                            ('ementa', 'autor'), 'protocolo_gr']
 
     class CreateView(MasterDetailCrud.CreateView):
         form_class = DocumentoAcessorioForm
@@ -1498,6 +1502,9 @@ class DocumentoAcessorioCrud(MasterDetailCrud):
 
         def hook_ementa(self, obj, default, url):
             return '<strong>{}</strong>'.format(default), ''
+
+        def hook_header_protocolo_gr(self):
+            return 'Protocolo'
 
         def hook_nome(self, obj, default, url):
             return """
@@ -2893,3 +2900,33 @@ class MateriaLegislativaCheckView(ListView):
         qs = qs.order_by('-data_apresentacao')
 
         return qs
+
+
+class CriarDocumentoAcessorioProtocolo(PermissionRequiredMixin, CreateView):
+    template_name = "materia/criar_documentoacessorio_protocolo.html"
+    form_class = DocumentoAcessorioProtocoloForm
+    permission_required = ('protocoloadm.add_documentoacessorio',)
+
+    def get_initial(self):
+        protocolo = Protocolo.objects.get(pk=self.kwargs['pk'])
+        return self.criar_documento(protocolo)
+
+    def get_success_url(self):
+        return reverse('sapl.protocoloadm:protocolo_mostrar',
+                       kwargs={'pk': self.kwargs['pk']})
+
+    def criar_documento(self, protocolo):
+        #curr_year = timezone.now().year
+
+        # numero_max = DocumentoAcessorio.objects.filter(
+        #    tipo=protocolo.tipo_conteudo_protocolado, ano=curr_year
+        #).aggregate(Max('numero'))['numero__max']
+
+        doc = {}
+        doc['tipo'] = protocolo.tipo_conteudo_protocolado
+        doc['data'] = timezone.now()
+        doc['ementa'] = protocolo.assunto_ementa
+        doc['autor'] = protocolo.interessado
+        doc['protocolo'] = protocolo
+
+        return doc

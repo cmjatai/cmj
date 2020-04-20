@@ -41,6 +41,7 @@ from sapl.crud.base import (Crud, CrudAux, MasterDetailCrud, make_pagination,
 from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa, UnidadeTramitacao
 from sapl.materia.views import gerar_pdf_impressos
 from sapl.parlamentares.models import Legislatura, Parlamentar
+from sapl.protocoloadm.forms import ProtocoloDocumentoAcessorioForm
 from sapl.protocoloadm.models import Protocolo, DocumentoAdministrativo
 from sapl.relatorios.views import relatorio_doc_administrativos, get_rodape, \
     make_pdf
@@ -1436,6 +1437,95 @@ class ProtocoloDocumentoView(PermissionRequiredMixin,
             protocolo.hora = None
             protocolo.user_data_hora_manual = ''
             protocolo.ip_data_hora_manual = ''
+        protocolo.tipo_conteudo_protocolado = form.cleaned_data['tipo_documento']
+
+        protocolo.save()
+        self.object = protocolo
+        return redirect(self.get_success_url())
+
+
+class ProtocoloDocumentoAcessorioView(PermissionRequiredMixin,
+                                      FormValidMessageMixin,
+                                      CreateView):
+
+    logger = logging.getLogger(__name__)
+
+    template_name = "protocoloadm/protocolar_documento_acessorio.html"
+    form_class = ProtocoloDocumentoAcessorioForm
+    form_valid_message = _('Protocolo cadastrado com sucesso!')
+    permission_required = ('protocoloadm.add_protocolo',)
+
+    def get_success_url(self):
+        return reverse('sapl.protocoloadm:protocolo_mostrar',
+                       kwargs={'pk': self.object.id})
+
+    def get_initial(self):
+        initial = super().get_initial()
+
+        initial['user_data_hora_manual'] = self.request.user
+        initial['ip_data_hora_manual'] = get_client_ip(self.request)
+        initial['data'] = timezone.localdate(timezone.now())
+        initial['hora'] = timezone.localtime(timezone.now())
+        return initial
+
+    @transaction.atomic
+    def form_valid(self, form):
+        protocolo = form.save(commit=False)
+        username = self.request.user.username
+
+        self.logger.debug("user=" + username +
+                          ". Tentando obter sequência de numeração.")
+        numeracao = AppConfig.objects.last(
+        ).sequencia_numeracao_protocolo
+        if not numeracao:
+            self.logger.error("user=" + username + ". É preciso definir a sequencia de "
+                              "numeração na tabelas auxiliares! ")
+            msg = _('É preciso definir a sequencia de ' +
+                    'numeração na tabelas auxiliares!')
+            messages.add_message(self.request, messages.ERROR, msg)
+            return self.render_to_response(self.get_context_data())
+
+        if numeracao == 'A':
+            numero = Protocolo.objects.filter(
+                ano=timezone.now().year).aggregate(Max('numero'))
+        elif numeracao == 'L':
+            legislatura = Legislatura.objects.filter(
+                data_inicio__year__lte=timezone.now().year,
+                data_fim__year__gte=timezone.now().year).first()
+            data_inicio = legislatura.data_inicio
+            data_fim = legislatura.data_fim
+            numero = Protocolo.objects.filter(
+                data__gte=data_inicio,
+                data__lte=data_fim).aggregate(
+                Max('numero'))
+        elif numeracao == 'U':
+            numero = Protocolo.objects.all().aggregate(Max('numero'))
+
+        protocolo.tipo_processo = '0'  # TODO validar o significado
+        protocolo.anulado = False
+        if not protocolo.numero:
+            protocolo.numero = (
+                numero['numero__max'] + 1) if numero['numero__max'] else 1
+        elif protocolo.numero < (numero['numero__max'] + 1) if numero['numero__max'] else 0:
+            msg = _('Número de protocolo deve ser maior que {}'.format(
+                numero['numero__max']))
+            self.logger.error(
+                "user=" + username + ". Número de protocolo deve ser maior que {}.".format(numero['numero__max']))
+            messages.add_message(self.request, messages.ERROR, msg)
+            return self.render_to_response(self.get_context_data())
+        protocolo.ano = timezone.now().year
+        protocolo.assunto_ementa = self.request.POST['assunto']
+
+        if form.cleaned_data['data_hora_manual'] == 'True':
+            protocolo.timestamp = None
+            protocolo.user_data_hora_manual = username
+            protocolo.ip_data_hora_manual = get_client_ip(self.request)
+        else:
+            protocolo.data = None
+            protocolo.hora = None
+            protocolo.user_data_hora_manual = ''
+            protocolo.ip_data_hora_manual = ''
+        #protocolo.tipo_conteudo_protocolado = form.cleaned_data['tipo_conteudo_protocolado']
 
         protocolo.save()
         self.object = protocolo
@@ -1459,11 +1549,11 @@ class CriarDocumentoProtocolo(PermissionRequiredMixin, CreateView):
         curr_year = timezone.now().year
 
         numero_max = DocumentoAdministrativo.objects.filter(
-            tipo=protocolo.tipo_documento, ano=curr_year
+            tipo=protocolo.tipo_conteudo_protocolado, ano=curr_year
         ).aggregate(Max('numero'))['numero__max']
 
         doc = {}
-        doc['tipo'] = protocolo.tipo_documento
+        doc['tipo'] = protocolo.tipo_conteudo_protocolado
         doc['ano'] = curr_year
         doc['data'] = timezone.now()
         doc['numero_protocolo'] = protocolo.numero
@@ -1658,8 +1748,10 @@ class ProtocoloMateriaView(PermissionRequiredMixin, CreateView):
 
         if form.cleaned_data['autor']:
             protocolo.autor = form.cleaned_data['autor']
-        protocolo.tipo_materia = TipoMateriaLegislativa.objects.get(
+
+        protocolo.tipo_conteudo_protocolado = TipoMateriaLegislativa.objects.get(
             id=self.request.POST['tipo_materia'])
+
         protocolo.numero_paginas = self.request.POST['numero_paginas']
         protocolo.observacao = self.request.POST['observacao']
         protocolo.assunto_ementa = self.request.POST['assunto_ementa']
@@ -1674,13 +1766,14 @@ class ProtocoloMateriaView(PermissionRequiredMixin, CreateView):
             protocolo.user_data_hora_manual = ''
             protocolo.ip_data_hora_manual = ''
         protocolo.save()
-        data = form.cleaned_data
-        if data['vincular_materia'] == 'True':
-            materia = MateriaLegislativa.objects.get(ano=data['ano_materia'],
-                                                     numero=data['numero_materia'],
-                                                     tipo=data['tipo_materia'])
-            materia.numero_protocolo = protocolo.numero
-            materia.save()
+        #
+        #data = form.cleaned_data
+        # if data['vincular_materia'] == 'True':
+        #    materia = MateriaLegislativa.objects.get(ano=data['ano_materia'],
+        #                                             numero=data['numero_materia'],
+        #                                             tipo=data['tipo_materia'])
+        #    materia.numero_protocolo = protocolo.numero
+        #    materia.save()
 
         return redirect(self.get_success_url(protocolo))
 
