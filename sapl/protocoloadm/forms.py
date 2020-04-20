@@ -1493,7 +1493,8 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
 
     def save(self, commit=True):
         documento = super(DocumentoAdministrativoForm, self).save(False)
-        if self.fields['protocolo'].initial:
+        protocolo = None
+        if 'protocolo' in self.fields and self.fields['protocolo'].initial:
             protocolo = Protocolo.objects.get(
                 id=int(self.fields['protocolo'].initial))
 
@@ -1503,9 +1504,10 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
 
         documento.save()
 
-        protocolo.tipo_conteudo_protocolado = documento.tipo
-        protocolo.conteudo_protocolado = documento
-        protocolo.save()
+        if protocolo:
+            protocolo.tipo_conteudo_protocolado = documento.tipo
+            protocolo.conteudo_protocolado = documento
+            protocolo.save()
 
         tx, ax, nx = (cleaned_data.get('tipo_anexador', ''),
                       cleaned_data.get('ano_anexador', ''),
