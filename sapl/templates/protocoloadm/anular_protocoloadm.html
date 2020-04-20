@@ -2,6 +2,15 @@
 {% load i18n %}
 
 {% load crispy_forms_tags %}  
+
+
+{% block title %}
+  <h1 class="page-header bg-red">
+    Anulação de Protocolo
+  </h1>
+{% endblock title %}
+
+
 {% block detail_content %}
 	<div>{{ message }}</div>
     {% crispy form %}

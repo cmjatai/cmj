@@ -4,6 +4,12 @@
 {% load static common_tags %}
 {% load webpack_static from webpack_loader %}
 
+{% block title %}
+  <h1 class="page-header {{bg_title}}">
+    Protocolo: {{ protocolo.numero|stringformat:'06d' }}/{{ protocolo.ano }} 
+  </h1>
+{% endblock title %}
+
 {% block base_content %}
 
 	{% block container_actions %}{{ block.super }}

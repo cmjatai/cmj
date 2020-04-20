@@ -200,7 +200,10 @@ class DocumentoAdministrativo(CountPageMixin):
         verbose_name=_('Protocolo'))
 
     protocolo_gr = GenericRelation(
-        'protocoloadm.Protocolo', related_query_name='protocolo_gr')
+        'protocoloadm.Protocolo',
+        object_id_field='conteudo_object_id',
+        content_type_field='conteudo_content_type',
+        related_query_name='protocolo_gr')
 
     materia = models.ForeignKey(
         MateriaLegislativa,
