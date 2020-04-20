@@ -290,6 +290,12 @@ class CmjUserAdminForm(ModelForm):
             if oper_aut:
                 self.fields['autor'].initial = oper_aut.autor.id
 
+            self.fields['autor'].choices = [('', '----------')] + [
+                (a.id, '{} - {}'.format(
+                    a, a.tipo
+                )) for a in Autor.objects.all().order_by('nome')
+            ]
+
             self.fields[
                 'groups'].widget = forms.CheckboxSelectMultiple()
             self.fields['groups'].choices = [
