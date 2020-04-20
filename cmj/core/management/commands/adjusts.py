@@ -49,12 +49,12 @@ class Command(BaseCommand):
         count = 0
         for p in protocolos:
             if p.tipo_documento:
-                p.tipo_conteudo_protolocado = p.tipo_documento
+                p.tipo_conteudo_protocolado = p.tipo_documento
                 p.conteudo_protocolado = p.documentoadministrativo_set.first()
                 p.save()
 
             elif p.tipo_materia:
-                p.tipo_conteudo_protolocado = p.tipo_materia
+                p.tipo_conteudo_protocolado = p.tipo_materia
 
                 materia = MateriaLegislativa.objects.filter(
                     numero_protocolo=p.numero,
