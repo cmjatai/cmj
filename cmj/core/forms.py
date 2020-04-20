@@ -29,9 +29,11 @@ class OperadorAreaTrabalhoForm(ModelForm):
         super(OperadorAreaTrabalhoForm, self).__init__(*args, **kwargs)
         self.fields[
             'grupos_associados'].widget = forms.CheckboxSelectMultiple()
+        # self.fields['grupos_associados'].queryset = self.fields[
+        #    'grupos_associados'].queryset.filter(
+        #        name__in=WORKSPACE_GROUPS).order_by('name')
         self.fields['grupos_associados'].queryset = self.fields[
-            'grupos_associados'].queryset.filter(
-                name__in=WORKSPACE_GROUPS).order_by('name')
+            'grupos_associados'].queryset.all().order_by('name')
 
 
 class ImpressoEnderecamentoForm(ModelForm):

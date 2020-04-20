@@ -213,6 +213,17 @@ class AreaTrabalhoCrud(Crud):
             context['subnav_template_name'] = ''
             return context
 
+        def hook_header_ativo(self):
+            return "At. Ativa"
+
+        def hook_operadores(self, *args, **kwargs):
+            lista_html = ''
+            for u in args[0].operadores.all():
+                lista_html += '<li>{}<br><small>{}</small></li>'.format(
+                    u.get_full_name(), u.email)
+
+            return '<ul>{}</ul>'.format(lista_html), ''
+
 
 class OperadorAreaTrabalhoCrud(MasterDetailCrud):
     parent_field = 'areatrabalho'
@@ -226,6 +237,15 @@ class OperadorAreaTrabalhoCrud(MasterDetailCrud):
             context[
                 'subnav_template_name'] = 'core/subnav_areatrabalho.yaml'
             return context
+
+    class ListView(MasterDetailCrud.ListView):
+
+        def hook_user(self, *args, **kwargs):
+            u = args[0].user
+            lista_html = '{}<br><small>{}</small></li>'.format(
+                u.get_full_name(), u.email)
+
+            return lista_html, args[2]
 
     class UpdateView(MasterDetailCrud.UpdateView):
         form_class = OperadorAreaTrabalhoForm

@@ -5,7 +5,12 @@ Cep:
 
 UserDetail:
   {% trans 'Usuário' %}:
-  - email first_name last_name is_active
+  - email:8 is_active
+  - first_name last_name
+  - areatrabalho_set autor_set
+  - groups
+  - user_permissions
+
 
 User:
   {% trans 'Usuário' %}:

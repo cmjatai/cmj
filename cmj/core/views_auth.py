@@ -71,6 +71,11 @@ class UserCrud(CrudAux):
         form_class = CmjUserAdminForm
         layout_key = ''
 
+        def get_form_kwargs(self):
+            kwargs = CrudAux.UpdateView.get_form_kwargs(self)
+            kwargs['user_session'] = self.request.user
+            return kwargs
+
     class DetailView(CrudAux.DetailView):
         layout_key = 'UserDetail'
 
