@@ -33,6 +33,12 @@ class TipoDocumentoAdministrativo(models.Model):
         related_name='tipodocumentoadministrativo_set',
         blank=True, null=True, on_delete=PROTECT)
 
+    tipo_protocolo_gr = GenericRelation(
+        'protocoloadm.Protocolo',
+        object_id_field='tipo_object_id',
+        content_type_field='tipo_content_type',
+        related_query_name='tipo_protocolo_gr')
+
     class Meta:
         verbose_name = _('Tipo de Documento Administrativo')
         verbose_name_plural = _('Tipos de Documento Administrativo')
