@@ -2504,7 +2504,7 @@ class ConfirmarProposicaoForm(ProposicaoForm):
         if self.instance.tipo.content_type.model_class() ==\
                 TipoMateriaLegislativa:
             self.fields['regime_tramitacao'].required = True
-        self.fields['content_type'].required = False
+        self.fields['especie'].required = False
         self.fields['tipo'].required = False
 
         fields = [
@@ -2849,8 +2849,8 @@ class ConfirmarProposicaoForm(ProposicaoForm):
         proposicao.conteudo_gerado_related = conteudo_gerado
         proposicao.save()
 
-        if self.instance.tipo.content_type.model_class() == TipoDocumento:
-            return self.instance
+        # if self.instance.tipo.content_type.model_class() == TipoDocumento:
+        #   return self.instance
 
         # Nunca gerar protocolo
         if self.proposicao_incorporacao_obrigatoria == 'N':
@@ -2905,13 +2905,14 @@ class ConfirmarProposicaoForm(ProposicaoForm):
         protocolo.numero_paginas = cd['numero_de_paginas']
         protocolo.anulado = False
 
+        protocolo.tipo_conteudo_protocolado = proposicao.tipo.tipo_conteudo_related
+        protocolo.conteudo_protocolado = conteudo_gerado
+
+        protocolo.tipo_processo = '0'
         if self.instance.tipo.content_type.model_class(
-        ) == TipoMateriaLegislativa:
-            protocolo.tipo_materia = proposicao.tipo.tipo_conteudo_related
+        ) in (TipoMateriaLegislativa, TipoDocumento):
+            #protocolo.tipo_materia = proposicao.tipo.tipo_conteudo_related
             protocolo.tipo_processo = '1'
-        elif self.instance.tipo.content_type.model_class() == TipoDocumento:
-            protocolo.tipo_documento = proposicao.tipo.tipo_conteudo_related
-            protocolo.tipo_processo = '0'
 
         protocolo.save()
 
