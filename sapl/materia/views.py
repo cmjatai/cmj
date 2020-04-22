@@ -1005,7 +1005,7 @@ class ProposicaoCrud(Crud):
 
             atributos = [
                 'tipo_id', 'descricao', 'observacao', 'texto_original',
-                'materia_de_vinculo_id'
+                'materia_de_vinculo_id', 'proposicao_vinculada_id'
             ]
 
             for atributo in atributos:

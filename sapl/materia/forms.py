@@ -2011,7 +2011,7 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
     numero_materia_futuro = forms.IntegerField(
         label='Número (Opcional)', required=False)
 
-    content_type = forms.ModelChoiceField(
+    especie = forms.ModelChoiceField(
         queryset=ContentType.objects.all(),
         label=_('Espécie da Proposição'),
         required=True)
@@ -2044,7 +2044,7 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
                   'user',
                   'ip',
                   'ultima_edicao',
-                  'content_type']
+                  'especie']
 
         widgets = {
             'descricao': widgets.Textarea(attrs={'rows': 4}),
@@ -2070,7 +2070,7 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
 
         fields = [
             to_row([
-                ('content_type', 5),
+                ('especie', 5),
                 ('tipo', 7)]
             ),
             to_row([
@@ -2092,12 +2092,6 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
         fields.append(to_column((
             'texto_original', 7 if self.texto_articulado_proposicao else 12)))
 
-        fields.append(
-            to_row([
-
-
-            ])
-        )
         fields.append(
             Div(
                 to_row([
@@ -2178,12 +2172,15 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
         content_types = ContentType.objects.get_for_models(
             *models_with_gr_for_model(TipoProposicao))
 
-        self.fields['content_type'].choices = [
+        self.fields['especie'].choices = [
             (ct.pk, ct) for k, ct in content_types.items()]
         # Ordena por id
-        self.fields['content_type'].choices.sort(key=lambda x: x[0])
+        self.fields['especie'].choices.sort(key=lambda x: x[0])
 
         if self.instance.pk:
+
+            self.fields['especie'].initial = self.instance.tipo.content_type_id
+
             self.fields['tipo_texto'].initial = ''
             if self.instance.texto_original:
                 self.fields['tipo_texto'].initial = 'D'
@@ -2205,10 +2202,12 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
             if self.instance.proposicao_vinculada:
                 self.fields[
                     'vinculo_numero'
-                ].initial = self.instance.proposicao_vinculada.numero
+                ].initial = self.instance.proposicao_vinculada.numero_proposicao
                 self.fields[
                     'vinculo_ano'
-                ].initial = self.instance.proposicao_vinculada.ano
+                ].initial = self.instance.proposicao_vinculada.data_envio.year \
+                    if self.instance.proposicao_vinculada.data_envio else \
+                    self.instance.proposicao_vinculada.ultima_edicao.year
 
     def clean_texto_original(self):
         texto_original = self.cleaned_data.get('texto_original', False)
@@ -2278,18 +2277,23 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
             if cd['materia_de_vinculo']:
                 raise ValidationError(
                     _('Não é possível vincular a uma proposição e a uma matéria ao mesmo tempo!'))
-            try:
-                self.logger.debug("Tentando obter objeto Proposição (numero={}, ano={})."
-                                  .format(vn, va))
-                proposicao_vinculada = Proposicao.objects.get(
-                    numero_proposicao=vn,
-                    data_envio__year=va,
-                    autor=self.initial['user'].autor_set.first()
+            self.logger.debug("Tentando obter objeto Proposição (numero={}, ano={})."
+                              .format(vn, va))
 
-                )
-            except ObjectDoesNotExist:
-                self.logger.error("Objeto Proposição vinculada (numero={}, ano={}) não existe!"
-                                  .format(vn, va))
+            q = Q(
+                autor=self.initial['user'].autor_set.first(),
+                numero_proposicao=vn,
+                data_envio__year=va
+            ) | Q(
+                autor=self.initial['user'].autor_set.first(),
+                numero_proposicao=vn,
+                data_envio__isnull=True,
+                ultima_edicao__year=va
+            )
+
+            proposicao_vinculada = Proposicao.objects.filter(q).first()
+
+            if not proposicao_vinculada:
                 raise ValidationError(_('Proposição Vinculada não existe!'))
             else:
                 self.logger.info("Proposição vinculada (ano={}, numero={}) com sucesso."

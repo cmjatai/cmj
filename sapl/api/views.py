@@ -568,7 +568,7 @@ class _NormaJuridicaViewset(ResponseFileMixin):
 class _TipoProposicaoViewset:
 
     @action(detail=False, methods=['GET'])
-    def tiposdoautor(self, request, *args, **kwargs):
+    def tipos_do_autor_contectado(self, request, *args, **kwargs):
         qs = self.get_queryset()
         qs = qs.filter(
             tipo_autores=request.user.autor_set.first().tipo)
