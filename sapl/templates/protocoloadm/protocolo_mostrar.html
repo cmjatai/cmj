@@ -54,7 +54,7 @@
 		<br><strong>Tipo do Documento: </strong>
 		{{protocolo.tipo_conteudo_protocolado}}
 		{% if not protocolo.anulado%}
-			{% if protocolo.tipo_conteudo_protocolado|model_name == 'protocoloadm.TipoMateriaLegislativa' %}
+			{% if protocolo.tipo_conteudo_protocolado|model_name == 'materia.TipoMateriaLegislativa' %}
 				<br>
 				<a href="{% url 'sapl.materia:materia_create_simplificado' protocolo.pk %}" 
 						class="btn btn-primary">

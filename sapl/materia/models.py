@@ -386,6 +386,10 @@ class MateriaLegislativa(CountPageMixin):
             p.cancelado = True
             p.save()
 
+        for p in self.protocolo_gr.all():
+            p.conteudo_protocolado = None
+            p.save()
+
         return models.Model.delete(
             self, using=using, keep_parents=keep_parents)
 
@@ -638,6 +642,10 @@ class DocumentoAcessorio(CountPageMixin):
 
         for p in self.proposicao.all():
             p.conteudo_gerado_related = None
+            p.save()
+
+        for p in self.protocolo_gr.all():
+            p.conteudo_protocolado = None
             p.save()
 
         arquivo = self.arquivo
