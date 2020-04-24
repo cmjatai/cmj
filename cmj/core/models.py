@@ -181,14 +181,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_absolute_url(self):
         return 'users_profile', [self.pk], {}
 
-    def delete(self, using=None, keep_parents=False):
+    """def delete(self, using=None, keep_parents=False):
 
         if self.groups.all().exclude(name=GROUP_SOCIAL_USERS).exists():
             raise PermissionDenied(
                 _('Você não possui permissão para se autoremover do Portal!'))
 
         return AbstractBaseUser.delete(
-            self, using=using, keep_parents=keep_parents)
+            self, using=using, keep_parents=keep_parents)"""
 
 
 class CmjSearchMixin(models.Model):
