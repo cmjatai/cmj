@@ -7,7 +7,7 @@
       <table class="table table-striped table-hover table-link-ordering">
         
         <tr>            
-          {% if user.is_superuser %}
+          {% if perms.materia.can_check_complete %}
             <th>Check</th>
           {% endif %}
           <th>Matérias Legislativas</th>
@@ -17,7 +17,7 @@
 
         {% for m in object_list %}
           <tr>
-            {% if user.is_superuser %}
+            {% if perms.materia.can_check_complete %}
               <td><a href="?check={{m.id}}">Check</a></td>
             {% endif %}
             <td width="35%">
