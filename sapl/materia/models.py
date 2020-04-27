@@ -333,7 +333,11 @@ class MateriaLegislativa(CountPageMixin):
         verbose_name_plural = _('Matérias Legislativas')
         unique_together = (("tipo", "numero", "ano"),)
         ordering = ['-id']
-        permissions = (("can_access_impressos", "Can access impressos"),)
+        permissions = (
+            ("can_access_impressos", "Can access impressos"),
+
+            ("can_check_complete", "Pode checar conclusão de processo"),
+        )
 
     def __str__(self):
         return _('%(tipo)s nº %(numero)s de %(ano)s') % {
