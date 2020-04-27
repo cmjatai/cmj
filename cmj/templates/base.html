@@ -289,20 +289,21 @@
     });
   </script>
 
-  {% if not DEBUG %}
+  
     <script>
       window.fbAsyncInit = function () {
         FB.init({
           appId      : '{% settings_key_tag 'SOCIAL_AUTH_FACEBOOK_KEY' %}', 
           cookie     : true,
           xfbml      : true,
-          version    : 'v3.2'
+          version    : 'v6.0'
         });
 
         FB.AppEvents.logPageView();
 
         FB.getLoginStatus(function(response) {
-            // console.log(response);
+
+            console.log(response);
         });
       };
 
@@ -315,6 +316,7 @@
         }(document, 'script', 'facebook-jssdk'));
     </script>
 
+  {% if not DEBUG %}  
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-2431536-7"></script>
     <script>

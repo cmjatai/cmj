@@ -18,7 +18,6 @@ from floppyforms import ClearableFileInput
 import magic
 from model_utils.choices import Choices
 from reversion.admin import VersionAdmin
-from social_core.backends.facebook import FacebookOAuth2
 from unipath.path import Path
 
 
