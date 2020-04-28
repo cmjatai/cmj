@@ -16,6 +16,9 @@
               <b>Turno:</b> {{m.turno|default:''}} |
               <b>Autor{{ m.autor|length|pluralize:"es" }}</b>: {{ m.autor|join:', ' }}
               <div class="text-ementa">{{ m.ementa }}</div>
+              {% if not user.is_anonymous  %}
+                {{m.observacao|linebreaksbr|safe}}
+              {% endif %}
               {% comment %}
                 <b>{{m.resultado}}</b><br/>{{m.resultado_observacao}}
               {% endcomment %}

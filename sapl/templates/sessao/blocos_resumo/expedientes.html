@@ -1,4 +1,4 @@
-{% if expedientes and False %}
+{% if expedientes and not user.is_anonymous %}
 <fieldset>
   <legend>Expedientes</legend>
     <table class="table">
@@ -7,10 +7,8 @@
           {% if e.conteudo %}
             <tr>
               <td>
-                <b>{{e.tipo}}: </b> <br /><br />
-                <div style="border:0.5px solid #BAB4B1; border-radius: 10px; background-color: rgba(225, 225, 225, .8);">
+                <b>{{e.tipo}}: </b> <br />
                   <p>{{e.conteudo|safe}}</p>
-                </div>
               </td>
             </tr>
           {% endif %}

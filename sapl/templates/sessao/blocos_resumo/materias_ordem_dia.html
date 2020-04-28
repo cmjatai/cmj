@@ -30,8 +30,9 @@
                 {% endwith %}
                 <br>      
               </small>
-              {% comment %}
-              {% endcomment %}
+              {% if not user.is_anonymous  %}
+                {{m.ementa_observacao|linebreaksbr|safe}}
+              {% endif %}
             </div>
           </td>
           <td>
@@ -41,6 +42,5 @@
       {% endfor %}
       </table>
 </fieldset>
-<br>
 <br>
 {% endif %}
