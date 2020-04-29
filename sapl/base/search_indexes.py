@@ -93,6 +93,9 @@ class TextExtractField(CharField):
     def string_extractor(self, value):
         return value
 
+    def list_string_extractor(self, value):
+        return '\n'.join(map(str, value.all()))
+
     def extract_data(self, obj):
 
         data = ''
@@ -135,6 +138,7 @@ class DocumentoAcessorioIndex(CelerySearchIndex, Indexable):
         document=True, use_template=True,
         model_attr=(
             ('arquivo', 'file_extractor'),
+            ('autor', 'string_extractor'),
             ('ementa', 'string_extractor'),
             ('indexacao', 'string_extractor'),
         )
@@ -186,5 +190,6 @@ class MateriaLegislativaIndex(DocumentoAcessorioIndex):
             ('ementa', 'string_extractor'),
             ('indexacao', 'string_extractor'),
             ('observacao', 'string_extractor'),
+            ('autores', 'list_string_extractor'),
         )
     )
