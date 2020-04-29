@@ -182,6 +182,7 @@ class MateriaLegislativaIndex(DocumentoAcessorioIndex):
         model_attr=(
             ('texto_original', 'file_extractor'),
             ('texto_articulado', 'ta_extractor'),
+            ('epigrafe', 'string_extractor'),
             ('ementa', 'string_extractor'),
             ('indexacao', 'string_extractor'),
             ('observacao', 'string_extractor'),
