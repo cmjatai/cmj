@@ -1973,6 +1973,7 @@ class ResumoView(DetailView):
 
             dados_votacao_od = {
                 'titulo': t_materia,
+
                 'votos': votos_materia_od
             }
             votacoes_od.append(dados_votacao_od)

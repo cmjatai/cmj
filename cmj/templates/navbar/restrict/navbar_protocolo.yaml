@@ -13,7 +13,7 @@
 {%endcomment%}
     
 - title: {% trans 'Receber Proposições' %}
-  url: sapl.materia:receber-proposicao
+  url: sapl.materia:proposicao-pendente
   check_permission: protocoloadm.list_protocolo 
 
 - title: {% trans 'Documentos' %}

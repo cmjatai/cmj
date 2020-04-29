@@ -26,7 +26,7 @@
     - title: {% trans 'Protocolo de Documento' %}
       url: sapl.protocoloadm:protocolar_doc
     - title: {% trans 'Receber Proposições' %}
-      url: sapl.materia:receber-proposicao
+      url: sapl.materia:proposicao-pendente
 
 - title: {% trans 'Documentos Administrativos' %}
   check_permission: protocoloadm.list_documentoadministrativo
