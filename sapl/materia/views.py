@@ -1492,10 +1492,25 @@ class DocumentoAcessorioCrud(MasterDetailCrud):
         def get_initial(self):
             initial = super(CreateView, self).get_initial()
             initial['data'] = timezone.now().date()
+            initial['user'] = self.request.user
             return initial
+
+    class DetailView(MasterDetailCrud.DetailView):
+        layout_key = 'DocumentoAcessorioDetail'
+
+        def hook_protocolo_gr(self, obj):
+            if obj.protocolo_gr.exists():
+                return 'Protocolo', obj.protocolo_gr.first().epigrafe
+            else:
+                return 'Protocolo', ''
 
     class UpdateView(MasterDetailCrud.UpdateView):
         form_class = DocumentoAcessorioForm
+
+        def get_initial(self):
+            initial = super(UpdateView, self).get_initial()
+            initial['user'] = self.request.user
+            return initial
 
     class ListView(MasterDetailCrud.ListView):
         paginate_by = None

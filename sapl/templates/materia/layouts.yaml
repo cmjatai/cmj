@@ -66,15 +66,22 @@ Autoria:
   {% trans 'Autoria' %}:
   - autor primeiro_autor
 
-
 DocumentoAcessorio:
   {% trans 'Documento Acessório' %}:
   - tipo nome data
-  - autor
+  - autor numero_protocolo:3 ano_protocolo:3
   - ementa
   - indexacao
   - arquivo
 
+DocumentoAcessorioDetail:
+  {% trans 'Documento Acessório' %}:
+  - tipo nome data
+  - autor protocolo_gr
+  - ementa
+  - indexacao
+  - arquivo
+      
 Numeracao:
   {% trans 'Numeração' %}:
   - tipo_materia numero_materia ano_materia data_materia

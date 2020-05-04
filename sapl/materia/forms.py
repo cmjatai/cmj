@@ -342,10 +342,34 @@ class AcompanhamentoMateriaForm(ModelForm):
 class DocumentoAcessorioForm(FileFieldCheckMixin, ModelForm):
     data = forms.DateField(required=True)
 
+    numero_protocolo = forms.IntegerField(
+        required=False,
+        label=_('Número do Protocolo'))
+
+    ano_protocolo = forms.IntegerField(
+        required=False,
+        label=_('Ano do Protocolo'))
+
     class Meta:
         model = DocumentoAcessorio
         fields = ['tipo', 'nome', 'data', 'autor',
-                  'ementa', 'indexacao', 'arquivo', ]
+                  'ementa', 'indexacao', 'arquivo', 'numero_protocolo',
+                  'ano_protocolo']
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs['initial'].pop('user', None)
+        super().__init__(*args, **kwargs)
+
+        if self.instance.pk:
+            if self.instance.protocolo_gr.exists():
+                self.fields['numero_protocolo'].initial = self.instance.protocolo_gr.first(
+                ).numero
+                self.fields['ano_protocolo'].initial = self.instance.protocolo_gr.first(
+                ).ano
+
+            if not self.user or not self.user.is_superuser:
+                self.fields['numero_protocolo'].widget.attrs['readonly'] = True
+                self.fields['ano_protocolo'].widget.attrs['readonly'] = True
 
     def clean(self):
         super(DocumentoAcessorioForm, self).clean()
@@ -353,13 +377,39 @@ class DocumentoAcessorioForm(FileFieldCheckMixin, ModelForm):
         if not self.is_valid():
             return self.cleaned_data
 
-        arquivo = self.cleaned_data.get('arquivo', False)
+        cd = self.cleaned_data
+
+        arquivo = cd.get('arquivo', False)
 
         if arquivo and arquivo.size > MAX_DOC_UPLOAD_SIZE:
             raise ValidationError("O arquivo Texto Integral deve ser menor que {0:.1f} mb, o tamanho atual desse arquivo é {1:.1f} mb"
                                   .format((MAX_DOC_UPLOAD_SIZE / 1024) / 1024, (arquivo.size / 1024) / 1024))
 
-        return self.cleaned_data
+        if not self.instance.pk or self.user.is_superuser:
+            p_list = Protocolo.objects.filter(
+                numero=cd['numero_protocolo'],
+                ano=cd['ano_protocolo'])
+
+            if not p_list.exists():
+                raise ValidationError(_('Protocolo não encontrado!'))
+
+        return cd
+
+    def save(self, commit=True):
+
+        cd = self.cleaned_data
+        documento = super().save(commit)
+
+        p = Protocolo.objects.filter(
+            numero=cd['numero_protocolo'],
+            ano=cd['ano_protocolo']).first()
+
+        if p:
+            p.tipo_conteudo_protocolado = documento.tipo
+            p.conteudo_protocolado = documento
+            p.save()
+
+        return documento
 
 
 class DocumentoAcessorioProtocoloForm(FileFieldCheckMixin, ModelForm):

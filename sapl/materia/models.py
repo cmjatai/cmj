@@ -594,7 +594,8 @@ class DocumentoAcessorio(CountPageMixin):
     tipo = models.ForeignKey(TipoDocumento,
                              on_delete=models.PROTECT,
                              verbose_name=_('Tipo'))
-    nome = models.CharField(max_length=50, verbose_name=_('Nome'))
+    nome = models.CharField(
+        max_length=50, verbose_name=_('Título do Documento'))
 
     data = models.DateField(blank=True, null=True,
                             default=None, verbose_name=_('Data'))
