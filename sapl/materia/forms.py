@@ -345,7 +345,7 @@ class DocumentoAcessorioForm(FileFieldCheckMixin, ModelForm):
     class Meta:
         model = DocumentoAcessorio
         fields = ['tipo', 'nome', 'data', 'autor',
-                  'ementa', 'indexacao', 'arquivo']
+                  'ementa', 'indexacao', 'arquivo', ]
 
     def clean(self):
         super(DocumentoAcessorioForm, self).clean()

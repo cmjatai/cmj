@@ -6,7 +6,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models.deletion import PROTECT
 from django.urls.base import reverse
-from django.utils import timezone
+from django.utils import timezone, formats
 from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices
 import reversion
@@ -165,6 +165,22 @@ class Protocolo(models.Model):
         return _('%(numero)s/%(ano)s') % {
             'numero': self.numero, 'ano': self.ano
         }
+
+    @property
+    def epigrafe(self):
+        return '{}/{} - {}'.format(
+            self.numero,
+            self.ano,
+            formats.date_format(self.timestamp, 'd/m/Y - H:i')
+            if self.timestamp else
+            '{} - {}'.format(
+                formats.date_format(self.data, 'd/m/Y'),
+                formats.date_format(self.hora, 'H:i')
+
+            )
+
+
+        )
 
     def materia_vinculada(self):
         try:

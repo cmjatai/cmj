@@ -1506,6 +1506,12 @@ class DocumentoAcessorioCrud(MasterDetailCrud):
         def hook_header_protocolo_gr(self):
             return 'Protocolo'
 
+        def hook_protocolo_gr(self, obj, default, url):
+            if obj.protocolo_gr.exists():
+                return obj.protocolo_gr.first().epigrafe, ''
+            else:
+                return '', ''
+
         def hook_nome(self, obj, default, url):
             return """
             <a href="{}" pk="{}" class="d-block text-center">{}</a><br>
@@ -1867,6 +1873,12 @@ class MateriaLegislativaCrud(Crud):
             rendered = doc_template.render(context, self.request)
 
             return 'Documentos Administrativos Vinculados a Matéria', rendered
+
+        def hook_protocolo_gr(self, obj):
+            if obj.protocolo_gr.exists():
+                return 'Protocolo', obj.protocolo_gr.first().epigrafe
+            else:
+                return 'Protocolo', ''
 
         def hook_documentoadministrativo_set__deprecated(self, obj):
 

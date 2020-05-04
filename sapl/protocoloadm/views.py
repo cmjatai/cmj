@@ -1525,7 +1525,7 @@ class ProtocoloDocumentoAcessorioView(PermissionRequiredMixin,
             protocolo.hora = None
             protocolo.user_data_hora_manual = ''
             protocolo.ip_data_hora_manual = ''
-        #protocolo.tipo_conteudo_protocolado = form.cleaned_data['tipo_conteudo_protocolado']
+        protocolo.tipo_conteudo_protocolado = form.cleaned_data['tipo_conteudo_protocolado']
 
         protocolo.save()
         self.object = protocolo
