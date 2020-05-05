@@ -76,3 +76,20 @@ class DiarioOficial(CountPageMixin):
     @property
     def ano(self):
         return self.data.year
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+
+        if not self.pk and self.arquivo:
+            arquivo = self.arquivo
+            self.arquivo = None
+            models.Model.save(self, force_insert=force_insert,
+                              force_update=force_update,
+                              using=using,
+                              update_fields=update_fields)
+            self.arquivo = arquivo
+
+        return models.Model.save(self, force_insert=force_insert,
+                                 force_update=force_update,
+                                 using=using,
+                                 update_fields=update_fields)
