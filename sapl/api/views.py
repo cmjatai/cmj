@@ -632,7 +632,7 @@ class _ProposicaoViewSet(ResponseFileMixin):
                 # só acessa suas próprias proposições
                 q_user = Q(autor=operador_de_autor)
 
-                if not self.request.GET('all', None) is None:
+                if not self.request.GET.get('all', None) is None:
                     q |= q_user
                 else:
                     q = q_user
