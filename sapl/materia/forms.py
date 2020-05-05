@@ -386,12 +386,13 @@ class DocumentoAcessorioForm(FileFieldCheckMixin, ModelForm):
                                   .format((MAX_DOC_UPLOAD_SIZE / 1024) / 1024, (arquivo.size / 1024) / 1024))
 
         if not self.instance.pk or self.user.is_superuser:
-            p_list = Protocolo.objects.filter(
-                numero=cd['numero_protocolo'],
-                ano=cd['ano_protocolo'])
+            if cd['numero_protocolo'] and cd['ano_protocolo']:
+                p_list = Protocolo.objects.filter(
+                    numero=cd['numero_protocolo'],
+                    ano=cd['ano_protocolo'])
 
-            if not p_list.exists():
-                raise ValidationError(_('Protocolo não encontrado!'))
+                if not p_list.exists():
+                    raise ValidationError(_('Protocolo não encontrado!'))
 
         return cd
 
