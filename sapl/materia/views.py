@@ -2907,7 +2907,7 @@ class MateriaLegislativaCheckView(ListView):
 
         check = request.GET.get('check', '')
         uncheck = request.GET.get('uncheck', '')
-        if request.user.has_perm('can_check_complete') and (check or uncheck):
+        if request.user.has_perm('materia.can_check_complete') and (check or uncheck):
             try:
                 m = MateriaLegislativa.objects.get(pk=check or uncheck)
             except:
