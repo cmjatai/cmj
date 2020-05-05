@@ -160,7 +160,7 @@ class Command(BaseCommand):
 
         try:
 
-            s3 = boto3.resource(
+            s3 = boto3.client(
                 's3',
                 # endpoint_url='https://object-storage.locaweb.com.br/',
                 endpoint_url='https://lss.locawebcorp.com.br',
@@ -176,23 +176,23 @@ class Command(BaseCommand):
             print(e)
             return
 
-        t = s3.Bucket('cmjatai_teste')
-        for o in t.objects.all():
-            print(o)
+        #t = s3.Bucket('cmjatai_teste')
+        # for o in t.objects.all():
+        #    print(o)
 
         #result = s3.get_bucket_policy(Bucket='cmjatai_teste')
 
         #t = s3.create_bucket(Bucket='cmjatai_teste')
 
-        norma = NormaJuridica.objects.get(pk=8668)
+        norma = NormaJuridica.objects.get(pk=8670)
 
-        # s3.upload_file(norma.texto_integral.path,
-        #               'cmjatai_teste',
-        # norma.texto_integral.name,
-        #               ExtraArgs={'ACL': 'public-read',
-        #                          'Metadata': {'pk': f'{norma._meta.label_lower}.{norma.id}'}
-        #                          }
-        #               )
+        s3.upload_file(norma.texto_integral.path,
+                       'cmjatai_teste',
+                       norma.texto_integral.name,
+                       ExtraArgs={'ACL': 'public-read',
+                                  'Metadata': {'pk': f'{norma._meta.label_lower}.{norma.id}'}
+                                  }
+                       )
 
         #t = s3.Bucket('cmjatai_teste')
         #t = t.load()

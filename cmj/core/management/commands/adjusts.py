@@ -40,7 +40,7 @@ class Command(BaseCommand):
         # self.run_veririca_pdf_tem_assinatura()
 
         # self.run_capture_fields_from_pdf()
-        self.associa_tipo_conteudo_gerado__e__conteudo_gerado()
+        # self.associa_tipo_conteudo_gerado__e__conteudo_gerado()
 
     def associa_tipo_conteudo_gerado__e__conteudo_gerado(self):
 
