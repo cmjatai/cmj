@@ -18,6 +18,10 @@ from PyPDF4.generic import (
 )
 from PyPDF4.generic import IndirectObject
 from PyPDF4.pdf import PdfFileReader, PdfFileWriter
+import boto
+from boto.s3.connection import OrdinaryCallingFormat
+import boto3
+from boto3.session import Session
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
@@ -147,6 +151,53 @@ class Command(BaseCommand):
         self.logger = logging.getLogger(__name__)
 
         # self.run_test_add_hi()
+
+        self.run_backup_locaweb()
+
+    def run_backup_locaweb(self):
+        access_key = settings.AWS_ACCESS_KEY_ID
+        secret_key = settings.AWS_SECRET_ACCESS_KEY
+
+        try:
+
+            s3 = boto3.resource(
+                's3',
+                # endpoint_url='https://object-storage.locaweb.com.br/',
+                endpoint_url='https://lss.locawebcorp.com.br',
+                aws_access_key_id=access_key,
+                aws_secret_access_key=secret_key,
+                region_name='sa-east-1',
+                # use_ssl=True
+            )
+
+            # for bucket in s3.buckets.all():
+            #    print(bucket.name)
+        except Exception as e:
+            print(e)
+            return
+
+        t = s3.Bucket('cmjatai_teste')
+        for o in t.objects.all():
+            print(o)
+
+        #result = s3.get_bucket_policy(Bucket='cmjatai_teste')
+
+        #t = s3.create_bucket(Bucket='cmjatai_teste')
+
+        norma = NormaJuridica.objects.get(pk=8668)
+
+        # s3.upload_file(norma.texto_integral.path,
+        #               'cmjatai_teste',
+        # norma.texto_integral.name,
+        #               ExtraArgs={'ACL': 'public-read',
+        #                          'Metadata': {'pk': f'{norma._meta.label_lower}.{norma.id}'}
+        #                          }
+        #               )
+
+        #t = s3.Bucket('cmjatai_teste')
+        #t = t.load()
+        # print(t)
+        # print(result['Policy'])
 
     def run_test_add_hi(self):
 

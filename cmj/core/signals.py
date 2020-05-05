@@ -113,7 +113,8 @@ def signed_name_and_date_extract_pre_save(sender, instance, using, **kwargs):
 for app in apps.get_app_configs():
     for model in app.get_models():
         if hasattr(model, 'FIELDFILE_NAME') and not hasattr(model, 'metadata'):
-            print(model)
+            # print(model)
+            pass
         if hasattr(model, 'FIELDFILE_NAME') and hasattr(model, 'metadata'):
             pre_save.connect(
                 signed_name_and_date_extract_pre_save,
