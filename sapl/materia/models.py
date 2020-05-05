@@ -590,6 +590,10 @@ class TipoDocumento(models.Model):
 class DocumentoAcessorio(CountPageMixin):
     FIELDFILE_NAME = ('arquivo', )
 
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+
     materia = models.ForeignKey(MateriaLegislativa, on_delete=models.CASCADE)
     tipo = models.ForeignKey(TipoDocumento,
                              on_delete=models.PROTECT,

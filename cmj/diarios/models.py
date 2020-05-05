@@ -1,3 +1,5 @@
+from django.contrib.postgres.fields.jsonb import JSONField
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 import reversion
@@ -27,6 +29,10 @@ def diario_upload_path(instance, filename):
 @reversion.register()
 class DiarioOficial(CountPageMixin):
     FIELDFILE_NAME = ('arquivo', )
+
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
 
     edicao = models.PositiveIntegerField(
         default=0,
@@ -62,7 +68,7 @@ class DiarioOficial(CountPageMixin):
     class Meta:
         verbose_name = _('Diário Oficial')
         verbose_name_plural = _('Diários Oficiais')
-        ordering = ('-data', )
+        ordering = ('-data', 'edicao')
 
     def __str__(self):
         return self.descricao

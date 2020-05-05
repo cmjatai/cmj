@@ -375,6 +375,10 @@ class DocumentoAdministrativo(CountPageMixin):
 class DocumentoAcessorioAdministrativo(CountPageMixin):
     FIELDFILE_NAME = ('arquivo', )
 
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+
     documento = models.ForeignKey(DocumentoAdministrativo,
                                   on_delete=models.PROTECT)
     tipo = models.ForeignKey(

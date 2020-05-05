@@ -397,6 +397,10 @@ class NormaRelacionada(models.Model):
 class AnexoNormaJuridica(CountPageMixin):
     FIELDFILE_NAME = ('anexo_arquivo', )
 
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+
     norma = models.ForeignKey(
         NormaJuridica,
         related_name='anexos_set',

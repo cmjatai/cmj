@@ -1,17 +1,21 @@
 
 from datetime import datetime, timedelta
 import logging
+
 from django.core.management.base import BaseCommand
 from django.db.models import F, Q
 from django.db.models.signals import post_delete, post_save
 from django.utils import timezone
 
 from cmj.core.models import OcrMyPDF
+from cmj.diarios.models import DiarioOficial
 from sapl.compilacao.models import Dispositivo, TextoArticulado,\
     TipoDispositivo
-from sapl.materia.models import MateriaLegislativa
+from sapl.materia.models import MateriaLegislativa, DocumentoAcessorio
 from sapl.norma.models import NormaJuridica
-from sapl.protocoloadm.models import DocumentoAdministrativo, Protocolo
+from sapl.protocoloadm.models import DocumentoAdministrativo, Protocolo,\
+    DocumentoAcessorioAdministrativo
+from sapl.sessao.models import SessaoPlenaria
 
 
 def _get_registration_key(model):
@@ -39,7 +43,7 @@ class Command(BaseCommand):
 
         # self.run_veririca_pdf_tem_assinatura()
 
-        # self.run_capture_fields_from_pdf()
+        self.run_capture_fields_from_pdf()
         # self.associa_tipo_conteudo_gerado__e__conteudo_gerado()
 
     def associa_tipo_conteudo_gerado__e__conteudo_gerado(self):
@@ -80,24 +84,27 @@ class Command(BaseCommand):
 
     def run_capture_fields_from_pdf(self):
         models = (
-            (NormaJuridica, 'ano__gte', 2010, 'data_ultima_atualizacao'),
-            (MateriaLegislativa, 'ano__gte',  2010, 'data_ultima_atualizacao'),
-            (DocumentoAdministrativo, 'ano__gte',
-             2010, 'data_ultima_atualizacao'),
-            #(DocumentoAcessorio, 'data__year__gte',  2010),
-            #(DocumentoAcessorioAdministrativo,  'data__year__gte',  2010),
-            #(SessaoPlenaria,  'data_inicio__year__gte',  2010),
+            (NormaJuridica, 'ano__gte', 2020, 'data_ultima_atualizacao'),
+            (MateriaLegislativa, 'ano__gte',  2020, 'data_ultima_atualizacao'),
+            (DocumentoAdministrativo, 'ano__gte', 2020, 'data_ultima_atualizacao'),
+            (DocumentoAcessorio, 'data__year__gte',
+             2020, 'data_ultima_atualizacao'),
+            (DocumentoAcessorioAdministrativo,  'data__year__gte',  2020, ''),
+            (SessaoPlenaria,  'data_inicio__year__gte',
+             2020, 'data_ultima_atualizacao'),
+            (DiarioOficial,  'data__year__gte', 2020, 'data_ultima_atualizacao'),
         )
 
         for model in models:
             m = model[0]
 
-            dua = m._meta.get_field(model[3])
-            if hasattr(dua, 'auto_now') and dua.auto_now:
-                #print(m, 'auto_now deve ser desativado.')
-                # continue  # auto_now deve ser desativado
-                print(m, 'desativando auto_now')
-                dua.auto_now = False
+            if model[3]:
+                dua = m._meta.get_field(model[3])
+                if hasattr(dua, 'auto_now') and dua.auto_now:
+                    #print(m, 'auto_now deve ser desativado.')
+                    # continue  # auto_now deve ser desativado
+                    print(m, 'desativando auto_now')
+                    dua.auto_now = False
 
             params = {
                 model[1]: model[2]
