@@ -2,7 +2,9 @@
 import hashlib
 
 from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.postgres.fields.jsonb import JSONField
 from django.core.files.base import File
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models import Q, F
 from django.db.models.deletion import PROTECT
@@ -119,6 +121,12 @@ def anexo_ouvidoria_path(instance, filename):
 
 
 class MensagemSolicitacao(models.Model):
+
+    FIELDFILE_NAME = ('anexo', )
+
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
 
     created = models.DateTimeField(
         verbose_name=_('created'), editable=False, auto_now_add=True)

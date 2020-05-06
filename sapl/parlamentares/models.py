@@ -1,4 +1,6 @@
 
+from django.contrib.postgres.fields.jsonb import JSONField
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -99,10 +101,18 @@ def get_logo_media_path(instance, subpath, filename):
 
 
 def logo_upload_path(instance, filename):
-    return get_logo_media_path(instance, 'logo', filename)  
+    return get_logo_media_path(instance, 'logo', filename)
+
 
 @reversion.register()
 class Partido(models.Model):
+
+    FIELDFILE_NAME = ('logo_partido', )
+
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+
     sigla = models.CharField(
         max_length=9,
         verbose_name=_('Sigla')
@@ -146,6 +156,13 @@ class Partido(models.Model):
 
 @reversion.register()
 class HistoricoPartido(models.Model):
+
+    FIELDFILE_NAME = ('logo_partido', )
+
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+
     sigla = models.CharField(
         max_length=9,
         verbose_name=_('Sigla')
@@ -176,6 +193,7 @@ class HistoricoPartido(models.Model):
         return _('%(sigla)s - %(nome)s') % {
             'sigla': self.sigla, 'nome': self.nome
         }
+
 
 @reversion.register()
 class ComposicaoColigacao(models.Model):
@@ -227,7 +245,6 @@ def foto_upload_path(instance, filename):
     return texto_upload_path(instance, filename, subpath='')
 
 
-
 def capa_upload_path(instance, filename):
     return texto_upload_path(instance, filename, subpath='capa', pk_first=True)
 
@@ -243,6 +260,13 @@ def true_false_none(x):
 
 @reversion.register()
 class Parlamentar(models.Model):
+
+    FIELDFILE_NAME = ('capa', 'fotografia', )
+
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+
     FEMININO = 'F'
     MASCULINO = 'M'
     SEXO_CHOICE = ((FEMININO, _('Feminino')),
@@ -327,8 +351,7 @@ class Parlamentar(models.Model):
         'fotografia', '128x128', verbose_name=_('Avatar'), size_warning=True,
         help_text=_('A configuração do Avatar '
                     'é possível após a atualização da fotografia.'))
-    
-    
+
     capa = ImageCropField(
         verbose_name=_('Imagem de Capa'), upload_to=capa_upload_path,
         validators=[restringe_tipos_de_arquivo_img], null=True, blank=True)
@@ -337,7 +360,6 @@ class Parlamentar(models.Model):
         'capa', '280x105', verbose_name=_('Capa'), size_warning=True,
         help_text=_('A configuração da capa '
                     'é possível após a atualização.'))
-    
 
     # campo conceitual de reversão genérica para o model Autor que dá a
     # o meio possível de localização de tipos de autores.
@@ -376,34 +398,34 @@ class Parlamentar(models.Model):
 
         r = models.Model.delete(
             self, using=using, keep_parents=keep_parents)
-        
+
         if self.fotografia:
             self.fotografia.delete()
 
         if self.capa:
             self.capa.delete()
-            
+
         return r
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
-        
+
         if not self.pk:
             fotografia = None
             capa = None
             if self.fotografia:
                 fotografia = self.fotografia
                 self.fotografia = None
-            
+
             if self.capa:
                 capa = self.capa
                 self.capa = None
-                
+
             models.Model.save(self, force_insert=force_insert,
                               force_update=force_update,
                               using=using,
                               update_fields=update_fields)
-                
+
             self.fotografia = fotografia
             self.capa = capa
 
@@ -480,7 +502,7 @@ class Filiacao(models.Model):
         for h in historico:
             if h.inicio_historico.year <= ano <= h.fim_historico.year:
                 return h
-        return self.partido    
+        return self.partido
 
     def __str__(self):
         return _('%(parlamentar)s - %(partido)s') % {
@@ -510,12 +532,12 @@ class TipoAfastamento(models.Model):
 @reversion.register()
 class Mandato(models.Model):
     parlamentar = models.ForeignKey(Parlamentar, on_delete=models.CASCADE)
-    tipo_afastamento = models.ForeignKey(TipoAfastamento, 
-                                         blank=True, 
-                                         null=True, 
-                                         on_delete=models.PROTECT, 
+    tipo_afastamento = models.ForeignKey(TipoAfastamento,
+                                         blank=True,
+                                         null=True,
+                                         on_delete=models.PROTECT,
                                          verbose_name=_('Tipo de Afastamento'))
-                                         
+
     legislatura = models.ForeignKey(Legislatura, on_delete=models.PROTECT,
                                     verbose_name=_('Legislatura'))
     coligacao = models.ForeignKey(
@@ -730,6 +752,7 @@ class Bancada(models.Model):
         verbose_name_plural = _('Bancadas Parlamentares')
         ordering = ('-legislatura__numero', )
 
+
 class CargoBloco(models.Model):
     class Meta:
         verbose_name = _('Cargo de Bloco')
@@ -763,6 +786,7 @@ class CargoBancada(models.Model):
     def __str__(self):
         return self.nome_cargo
 
+
 class CargoBlocoPartido(models.Model):
     class Meta:
         verbose_name = _('Vinculo bloco parlamentar')
@@ -770,19 +794,20 @@ class CargoBlocoPartido(models.Model):
         ordering = ['data_inicio']
 
     bloco = models.ForeignKey(
-    Bloco,
-    on_delete=models.PROTECT)
+        Bloco,
+        on_delete=models.PROTECT)
 
     cargo = models.ForeignKey(
-    CargoBloco,
-    on_delete=models.PROTECT)
+        CargoBloco,
+        on_delete=models.PROTECT)
 
     parlamentar = models.ForeignKey(
-    Parlamentar,
-    on_delete=models.PROTECT)
+        Parlamentar,
+        on_delete=models.PROTECT)
 
     data_inicio = models.DateField(verbose_name=_('Data Início'))
-    data_fim = models.DateField(blank=True, null=True, verbose_name=_('Data Fim'))
+    data_fim = models.DateField(
+        blank=True, null=True, verbose_name=_('Data Fim'))
 
 
 @reversion.register()
@@ -790,7 +815,7 @@ class AfastamentoParlamentar(models.Model):
     parlamentar = models.ForeignKey(Parlamentar, on_delete=models.CASCADE)
     mandato = models.ForeignKey(Mandato, on_delete=models.CASCADE,
                                 verbose_name=_('Mandato'))
-    tipo_afastamento = models.ForeignKey(TipoAfastamento, 
+    tipo_afastamento = models.ForeignKey(TipoAfastamento,
                                          on_delete=models.PROTECT,
                                          verbose_name=_('Tipo de Afastamento'),
                                          blank=True,

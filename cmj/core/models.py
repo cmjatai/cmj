@@ -113,6 +113,12 @@ def avatar_validation(image):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    FIELDFILE_NAME = ('avatar', )
+
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+
     objects = UserManager()
     USERNAME_FIELD = 'email'
 

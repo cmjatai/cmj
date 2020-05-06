@@ -9,10 +9,12 @@ from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.postgres.fields.jsonb import JSONField
 from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.base import File
 from django.core.files.storage import FileSystemStorage
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models import Q, F
 from django.http.response import HttpResponse
@@ -20,7 +22,7 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
-from django_extensions.db.fields.json import JSONField
+from django_extensions.db.fields.json import JSONField as django_extensions_JSONField
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.units import cm
 from reportlab.pdfgen import canvas
@@ -170,7 +172,7 @@ class Revisao(models.Model):
         get_settings_auth_user_model(),
         verbose_name=_('user'), related_name='+')
 
-    json = JSONField(verbose_name=_('Json'))
+    json = django_extensions_JSONField(verbose_name=_('Json'))
 
     content_type = models.ForeignKey(
         ContentType,
@@ -940,8 +942,9 @@ class Documento(ShortUrl, CMSMixin):
         verbose_name=_('Json no Portal Modelo 1.0'),
         blank=True, null=True, default=None)
 
-    extra_data = JSONField(verbose_name=_('Dados Extras'),
-                           blank=True, null=True, default=None)
+    extra_data = django_extensions_JSONField(
+        verbose_name=_('Dados Extras'),
+        blank=True, null=True, default=None)
 
     parlamentares = models.ManyToManyField(
         Parlamentar, related_name='documento_set',
@@ -1286,6 +1289,13 @@ def media_path(instance, filename):
 
 
 class VersaoDeMidia(models.Model):
+
+    FIELDFILE_NAME = ('file', )
+
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+
     created = models.DateTimeField(
         verbose_name=_('created'),
         editable=False, auto_now_add=True)

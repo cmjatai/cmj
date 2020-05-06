@@ -1,11 +1,13 @@
-import reversion
+from django.contrib.postgres.fields.jsonb import JSONField
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices
+import reversion
+
 from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import (CargoMesa, Parlamentar)
-
 from sapl.utils import (YES_NO_CHOICES, SaplGenericRelation,
                         restringe_tipos_de_arquivo_txt, texto_upload_path,
                         OverwriteStorage)
@@ -41,7 +43,6 @@ class TipoAudienciaPublica(models.Model):
     tipo = models.CharField(
         max_length=1, verbose_name=_('Tipo de Audiência Pública'), choices=TIPO_AUDIENCIA_CHOICES, default='A')
 
-
     class Meta:
         verbose_name = _('Tipo de Audiência Pública')
         verbose_name_plural = _('Tipos de Audiência Pública')
@@ -53,6 +54,13 @@ class TipoAudienciaPublica(models.Model):
 
 @reversion.register()
 class AudienciaPublica(models.Model):
+
+    FIELDFILE_NAME = ('upload_pauta', 'upload_ata', 'upload_anexo')
+
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+
     materia = models.ForeignKey(
         MateriaLegislativa,
         on_delete=models.PROTECT,
@@ -156,6 +164,13 @@ class AudienciaPublica(models.Model):
 
 @reversion.register()
 class AnexoAudienciaPublica(models.Model):
+
+    FIELDFILE_NAME = ('arquivo', )
+
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+
     audiencia = models.ForeignKey(AudienciaPublica,
                                   on_delete=models.PROTECT)
     arquivo = models.FileField(

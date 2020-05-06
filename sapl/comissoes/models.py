@@ -1,7 +1,9 @@
-import reversion
+from django.contrib.postgres.fields.jsonb import JSONField
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices
+import reversion
 
 from sapl.base.models import Autor
 from sapl.parlamentares.models import Parlamentar
@@ -203,6 +205,13 @@ def anexo_upload_path(instance, filename):
 
 
 class Reuniao(models.Model):
+
+    FIELDFILE_NAME = ('upload_pauta', 'upload_ata', 'upload_anexo')
+
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+
     periodo = models. ForeignKey(
         Periodo,
         null=True,
@@ -301,6 +310,12 @@ class Reuniao(models.Model):
 
 @reversion.register()
 class DocumentoAcessorio(models.Model):
+    FIELDFILE_NAME = ('arquivo', )
+
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+
     reuniao = models.ForeignKey(Reuniao,
                                 related_name='documentoacessorio_set',
                                 on_delete=models.PROTECT)

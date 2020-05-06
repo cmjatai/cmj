@@ -1,5 +1,7 @@
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.postgres.fields.jsonb import JSONField
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models.deletion import CASCADE
 from django.utils.translation import ugettext_lazy as _
@@ -34,8 +36,11 @@ ASSINATURA_ATA_CHOICES = (
 
 @reversion.register()
 class CasaLegislativa(models.Model):
-    # TODO ajustar todos os max_length !!!!
-    # cod_casa => id (pk)
+    FIELDFILE_NAME = ('logotipo', )
+
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
 
     codigo = models.CharField(max_length=100,
                               blank=True,

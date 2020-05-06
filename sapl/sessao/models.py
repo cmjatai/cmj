@@ -393,6 +393,13 @@ class IntegranteMesa(models.Model):  # MesaSessaoPlenaria
 
 @reversion.register()
 class AbstractOrador(models.Model):  # Oradores
+
+    FIELDFILE_NAME = ('upload_anexo', )
+
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+
     sessao_plenaria = models.ForeignKey(SessaoPlenaria,
                                         on_delete=models.CASCADE)
     parlamentar = models.ForeignKey(Parlamentar,
@@ -725,6 +732,13 @@ class TipoJustificativa(models.Model):
 
 @reversion.register()
 class JustificativaAusencia(models.Model):
+
+    FIELDFILE_NAME = ('upload_anexo', )
+
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+
     TIPO_AUSENCIA_CHOICES = Choices(
         (1, 'materia', 'Matéria'),
         (2, 'sessao', 'Sessão'),
