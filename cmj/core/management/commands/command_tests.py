@@ -7,6 +7,7 @@ import stat
 import subprocess
 import time
 
+from OpenSSL import crypto
 from PIL import Image
 from PyPDF4.generic import (
     DictionaryObject,
@@ -14,14 +15,13 @@ from PyPDF4.generic import (
     FloatObject,
     NameObject,
     TextStringObject,
-    ArrayObject
-)
+    ArrayObject, ByteStringObject)
 from PyPDF4.generic import IndirectObject
 from PyPDF4.pdf import PdfFileReader, PdfFileWriter
-import boto
-from boto.s3.connection import OrdinaryCallingFormat
+from asn1crypto import cms
 import boto3
-from boto3.session import Session
+from cryptography import x509
+from cryptography.hazmat.backends import default_backend
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
@@ -29,6 +29,9 @@ from django.db import connection
 from django.db.models import F, Q
 from django.db.models.signals import post_delete, post_save
 from django.utils import timezone
+from endesive import pdf
+from pyasn1.codec.der.decoder import decode
+from pyasn1.codec.der.encoder import encode
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import mm
@@ -38,14 +41,10 @@ from reportlab.pdfgen import canvas
 from reportlab.platypus.paragraph import Paragraph
 
 from cmj.core.models import OcrMyPDF
-from cmj.utils import signed_name_and_date_extract
-from sapl.compilacao.models import Dispositivo, TextoArticulado,\
-    TipoDispositivo
-from sapl.materia.models import MateriaLegislativa, DocumentoAcessorio
+from sapl.compilacao.models import Dispositivo
+from sapl.materia.models import MateriaLegislativa
 from sapl.norma.models import NormaJuridica
-from sapl.protocoloadm.models import DocumentoAdministrativo,\
-    DocumentoAcessorioAdministrativo
-from sapl.sessao.models import SessaoPlenaria
+from sapl.protocoloadm.models import DocumentoAdministrativo
 
 
 # x1, y1 starts in bottom left corner
@@ -151,8 +150,8 @@ class Command(BaseCommand):
         self.logger = logging.getLogger(__name__)
 
         # self.run_test_add_hi()
-
-        self.run_backup_locaweb()
+        self.run_veririca_pdf_tem_assinatura()
+        # self.run_backup_locaweb()
 
     def run_backup_locaweb(self):
         access_key = settings.AWS_ACCESS_KEY_ID
@@ -230,7 +229,20 @@ class Command(BaseCommand):
             ss = " "
             print(ss * sss, field_name, '.............')
             if not isinstance(fields, dict):
+                ByteStringObject
                 if field_name == '/Contents':
+                    try:
+                        signed_data = cms.ContentInfo.load(fields)['content']
+
+                        for cert in signed_data['certificates']:
+                            print('cert.issuer:',
+                                  cert.native['tbs_certificate']['issuer'])
+                            print('cert.subject:',
+                                  cert.native['tbs_certificate']['subject'])
+
+                    except Exception as e:
+                        pass
+
                     with open('/home/leandro/Downloads/content{}.ext'.format(sss), 'wb') as f:
                         f.write(fields)
                         f.close()
@@ -243,9 +255,94 @@ class Command(BaseCommand):
                 tree_print(field_name, value)
                 sss -= 2
 
-        ifile = '/home/leandro/Downloads/portaria_23_duas_assinaturas.pdf'
-        ifile = '/home/leandro/Downloads/Ofício Major sobre PLOE 13-2020.pdf'
-        o_path = '/home/leandro/Downloads/'
+        ifile = '/home/leandro/Downloads/016 - Projeto da LDO 2021_Assinado.pdf'
+        ifile = '/home/leandro/Downloads/plol_violencia_nas_escolas.pdf'
+
+        (hashok, signatureok, certok) = pdf.verify(open(ifile, 'rb').read())
+        print('signature ok?', signatureok)
+        print('hash ok?', hashok)
+        print('cert ok?', certok)
+
+        r = PdfFileReader(open(ifile, "rb"))
+
+        fields = r.getFields()
+
+        tree_print('file', fields)
+
+        #self.get_all_images_sign(r, o_path)
+
+    def run_veririca_pdf_tem_assinatura_old(self):
+        global sss
+        sss = 1
+
+        def tree_print(field_name, fields):
+            global sss
+            ss = " "
+            print(ss * sss, field_name, '.............')
+            if not isinstance(fields, dict):
+                ByteStringObject
+                if field_name == '/Contents':
+                    try:
+
+                        cert, rest = decode(fields)
+
+                        realcert = encode(cert[1][3])
+                        # remove the first DER identifier from the front
+                        realcert = realcert[2 + (realcert[1] & 0x7F)
+                                            if realcert[1] & 0x80 > 1 else 2:]
+                        aa = x509.load_der_x509_certificate(
+                            realcert, default_backend())
+
+                    except Exception as e:
+                        print(e)
+                        try:
+                            pkcs7 = crypto.load_pkcs7_data(
+                                crypto.FILETYPE_ASN1, fields)
+                        except Exception as e:
+                            print(e)
+
+                        else:
+                            if pkcs7.type_is_signed():
+                                certs = pkcs7._pkcs7.d.sign.cert
+                            elif pkcs7.type_is_signedAndEnveloped():
+                                certs = pkcs7._pkcs7.d.signed_and_enveloped.cert
+                            pycerts = []
+                            for i in range(crypto._lib.sk_X509_num(certs)):
+                                pycert = crypto.X509.__new__(crypto.X509)
+                                # pycert._x509 = _lib.sk_X509_value(certs, i)
+                                # According to comment from @ Jari Turkia
+                                # to prevent segfaults use '_lib.X509_dup('
+                                pycert._x509 = crypto._lib.X509_dup(
+                                    crypto._lib.sk_X509_value(certs, i))
+                                pycerts.append(pycert)
+
+                            certs_final = None if not pycerts else tuple(
+                                pycerts)
+
+                            for cert in certs_final:
+                                for idx in range(cert.get_extension_count()):
+                                    ext = cert.get_extension(idx)
+                                    print(ext.get_short_name())
+
+                    with open('/home/leandro/Downloads/content{}.ext'.format(sss), 'wb') as f:
+                        f.write(fields)
+                        f.close()
+                    return
+                else:
+                    print(' ' * sss, fields)
+                    return
+            for field_name, value in fields.items():
+                sss += 2
+                tree_print(field_name, value)
+                sss -= 2
+
+        ifile = '/home/leandro/Downloads/016 - Projeto da LDO 2021_Assinado.pdf'
+        ifile = '/home/leandro/Downloads/plol_violencia_nas_escolas.pdf'
+
+        (hashok, signatureok, certok) = pdf.verify(open(ifile, 'rb').read())
+        print('signature ok?', signatureok)
+        print('hash ok?', hashok)
+        print('cert ok?', certok)
 
         r = PdfFileReader(open(ifile, "rb"))
 

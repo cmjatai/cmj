@@ -4,6 +4,7 @@ import re
 from unicodedata import normalize as unicodedata_normalize
 
 from PyPDF4.pdf import PdfFileReader
+from asn1crypto import cms
 from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
@@ -336,10 +337,21 @@ def signed_name_and_date_extract(file):
     for key, field in fields.items():
         if '/FT' not in field and field['/FT'] != '/Sig':
             continue
-        if '/V' not in field and '/Name' not in field['/V']:
+        if '/V' not in field:
             continue
 
-        nome = field['/V']['/Name']
+            # .format(field['/V']['/Reason'])
+        nome = 'Nome do assinante não localizado.'
+        content_sign = field['/V']['/Contents']
+        try:
+            signed_data = cms.ContentInfo.load(content_sign)['content']
+            for cert in signed_data['certificates']:
+                nome = cert.native['tbs_certificate']['subject'][
+                    'common_name'].split(':')[0]
+        except:
+            if '/Name' in field['/V']:
+                nome = field['/V']['/Name']
+
         fd = None
         try:
             data = str(field['/V']['/M'])
