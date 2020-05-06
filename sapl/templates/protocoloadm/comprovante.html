@@ -14,6 +14,9 @@
 		th, td {
 			padding: 5px;
 		}
+		th {
+			text-align:left;
+		}
 		.row {
 			display:flex;
 			justify-content: space-between;
@@ -45,7 +48,7 @@
 	</div>
 	<table>
 		<tr>
-			<td colspan="2" align="center">
+			<td colspan="4" align="center">
 				<div class="row">
 					<div class="col-1">
 						<img height="90"
@@ -73,17 +76,17 @@
 
 			</td>
 		</tr>
-		<tr> <td colspan="2" align="center"><b>COMPROVANTE DE PROTOCOLO</b> - Autenticação: {{ autenticacao }}</td></tr>
-
-		<tr>
-			
+		<tr> <td colspan="2" align="center"><b>COMPROVANTE DE PROTOCOLO</b><br>Autenticação: {{ autenticacao }}</td>
+		
+			<th>Emitido por</th>
+			<td>{{ request.user }}</td>
+		
 		</tr>
 
+
 		<tr>
-			<th>Número / Ano</th>
-			<td>{{ protocolo.numero|stringformat:'06d' }}/{{ protocolo.ano }}</td>
-		</tr>
-		<tr>
+			<th width=15%>Número / Ano</th>
+			<td width=35%>{{ protocolo.numero|stringformat:'06d' }}/{{ protocolo.ano }}</td>
 			<th>Data / Horário</th>
 			{% if protocolo.timestamp %}
 				<td>{{ protocolo.timestamp|date:"d/m/Y" }} - {{ protocolo.timestamp|date:"H:i:s" }}</td>
@@ -91,46 +94,58 @@
 				<td>{{ protocolo.data|date:"d/m/Y" }} - {{ protocolo.hora|date:"H:i:s" }}</td>
 			{% endif %}
 		</tr>
+		<tr>
+		</tr>
 		{% if protocolo.tipo_processo == 1 %}
 			<tr>
 				<th>Ementa</th>
 				<td class="downsize">{{ protocolo.assunto_ementa }}</td>
-			</tr>
-			<tr>
 				<th>Autor</th>
 				<td>{{ protocolo.autor }}</td>
 			</tr>
-        {% else %}
-            <tr>
-                    <th>Assunto</th>
-                    <td>{{ protocolo.assunto_ementa }}</td>
-            </tr>
-            <tr>
-                    <th>Interessado</th>
-                    <td>{{ protocolo.interessado }}
-										
-											{% if protocolo.email %}
-												<small>
-													<br>Comprovante de protocolo enviado para:
-													{{ protocolo.email }}
-												</small>
-											{% endif %}
-										</td>
-            </tr>
+		{% else %}
+			<tr>
+				<th>Assunto</th>
+				<td>{{ protocolo.assunto_ementa }}</td>
+				<th>Interessado</th>
+				<td>{{ protocolo.interessado }}
+				
+					{% if protocolo.email and False%}
+						<small>
+							<br>Comprovante de protocolo enviado para:
+							{{ protocolo.email }}
+						</small>
+					{% endif %}
+				</td>
+			</tr>
 		{% endif %}
 		<tr>
 			<th>Natureza</th>
 			<td>
 				{% if protocolo.tipo_processo == 0 %} Administrativo {% elif protocolo.tipo_processo == 1 %} Legislativo {% endif %}
 			</td>
+			<th>Número Páginas</th>
+			<td>{{ protocolo.conteudo_protocolado.paginas|default_if_none:"0" }}</td>
 		</tr>
 		<tr>
+			<td colspan=4>
+				{% if protocolo.conteudo_protocolado %}
+					<strong>Especie do Documento: </strong>
+					{{protocolo.conteudo_content_type}}
+					<br><strong>Tipo do Documento: </strong>
+					{{protocolo.tipo_conteudo_protocolado}}
+					<br><strong>Documento: </strong>
+					<a href="{% url 'sapl.protocoloadm:redirect_conteudo' protocolo.pk %}">{{protocolo.conteudo_protocolado|default:''}}</a>
+				{% endif %}
+			</td>
+
+			{% comment %}
 			<th>{% if protocolo.tipo_documento %} Tipo Documento {% else %} Tipo Matéria {% endif %}</th>
 			<td>{% if protocolo.tipo_documento %} {{protocolo.tipo_documento}} {% else %} {{protocolo.tipo_materia}} {% endif %}</td>
+			{% endcomment %}
 		</tr>
 		<tr>
-			<th>Número Páginas</th>
-			<td>{{ protocolo.numero_paginas|default_if_none:"0" }}</td>
+			
 		</tr>
 		{% if materia %}
 		<tr>
@@ -139,8 +154,6 @@
 		</tr>
 		{% endif %}
 		<tr>
-			<th>Emitido por</th>
-			<td>{{ request.user }}</td>
 		</tr>
 		{% if protocolo.observacao %}
 			<tr>
