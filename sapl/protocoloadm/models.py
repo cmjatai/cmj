@@ -171,7 +171,11 @@ class Protocolo(models.Model):
         return '{}/{} - {}'.format(
             self.numero,
             self.ano,
-            formats.date_format(self.timestamp, 'd/m/Y - H:i')
+            formats.date_format(timezone.localtime(self.timestamp),
+
+                                "DATETIME_FORMAT"
+
+                                )
             if self.timestamp else
             '{} - {}'.format(
                 formats.date_format(self.data, 'd/m/Y'),

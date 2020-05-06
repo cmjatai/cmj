@@ -2812,6 +2812,7 @@ class ConfirmarProposicaoForm(ProposicaoForm):
                     os.path.basename(proposicao.texto_original.path))
 
             materia.save()
+            materia.save()
             conteudo_gerado = materia
 
             if proposicao.texto_articulado.exists():
@@ -2880,6 +2881,7 @@ class ConfirmarProposicaoForm(ProposicaoForm):
                 proposicao.texto_original,
                 os.path.basename(proposicao.texto_original.path))
             doc.save()
+            doc.save()
             conteudo_gerado = doc
 
             self.instance.results['messages']['success'].append(_(
@@ -2898,6 +2900,7 @@ class ConfirmarProposicaoForm(ProposicaoForm):
                     v.save()
 
         proposicao.conteudo_gerado_related = conteudo_gerado
+        proposicao.save()
         proposicao.save()
 
         # if self.instance.tipo.content_type.model_class() == TipoDocumento:

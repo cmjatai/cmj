@@ -144,23 +144,11 @@
 			<td>{% if protocolo.tipo_documento %} {{protocolo.tipo_documento}} {% else %} {{protocolo.tipo_materia}} {% endif %}</td>
 			{% endcomment %}
 		</tr>
-		<tr>
-			
-		</tr>
-		{% if materia %}
-		<tr>
-			<th>Matéria Legislativa</th>
-			<td>{{ materia }}</td>
-		</tr>
-		{% endif %}
-		<tr>
-		</tr>
 		{% if protocolo.observacao %}
 			<tr>
 				<th>Outros dados</th>
 				<td>{{ protocolo.observacao }}</td>
 			</tr>
 		{% endif %}
-
 	</table>
 {% endblock detail_content %}

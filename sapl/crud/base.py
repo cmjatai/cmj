@@ -184,8 +184,10 @@ class PermissionRequiredContainerCrudMixin(PermissionRequiredMixin):
 
     def has_permission(self):
         perms = self.get_permission_required()
+
         # Torna a view pública se não possuir conteudo
         # no atributo permission_required
+
         if not len(perms):
             return True
 

@@ -103,7 +103,8 @@ def signed_name_and_date_extract_pre_save(sender, instance, using, **kwargs):
                 metadata['signs'] = {}
 
             metadata['signs'][fn] = signs
-        except:
+        except Exception as e:
+            print(e)
             pass
 
     instance.metadata = metadata

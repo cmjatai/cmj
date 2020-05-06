@@ -14,7 +14,8 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required, login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, ValidationError
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, ValidationError,\
+    PermissionDenied
 from django.core.urlresolvers import reverse
 from django.db.models import Max, Q
 from django.http import HttpResponse, JsonResponse
@@ -918,6 +919,9 @@ class ProposicaoCrud(Crud):
             if not self.has_permission():
                 return self.handle_no_permission()
 
+            if p.autor != request.user.autor_set.first():
+                raise Http404()
+
             if not p.autor.operadores.filter(pk=request.user.id).exists():
                 if not p.data_envio and not p.data_devolucao:
                     raise Http404()
@@ -1157,9 +1161,37 @@ class ReciboProposicaoView(TemplateView):
             autor__operadores=self.request.user).exists())
 
     def get_context_data(self, **kwargs):
+        from sapl.utils import create_barcode
+
         context = super(ReciboProposicaoView, self).get_context_data(
             **kwargs)
         proposicao = Proposicao.objects.get(pk=self.kwargs['pk'])
+
+        if proposicao.conteudo_gerado_related:
+            self.template_name = "protocoloadm/comprovante.html"
+
+            protocolo = proposicao.conteudo_gerado_related.protocolo_gr.first()
+            # numero is string, padd with zeros left via .zfill()
+            base64_data = create_barcode(str(protocolo.numero).zfill(6))
+            barcode = 'data:image/png;base64,{0}'.format(base64_data)
+
+            autenticacao = _("** NULO **")
+
+            if not protocolo.anulado:
+                if protocolo.timestamp:
+                    data = protocolo.timestamp.strftime("%Y/%m/%d")
+                else:
+                    data = protocolo.data.strftime("%Y/%m/%d")
+
+                # data is not i18n sensitive 'Y-m-d' is the right format.
+                autenticacao = str(protocolo.tipo_processo) + \
+                    data + str(protocolo.numero).zfill(6)
+
+            context.update({"protocolo": protocolo,
+                            "barcode": barcode,
+                            "autenticacao": autenticacao})
+
+            return context
 
         if proposicao.texto_original:
             _hash = gerar_hash_arquivo(
@@ -1170,7 +1202,6 @@ class ReciboProposicaoView(TemplateView):
             # FIXME hash para textos articulados
             _hash = 'P' + ta.hash() + '/' + str(proposicao.id)
 
-        from sapl.utils import create_barcode
         base64_data = create_barcode(_hash, 100, 500)
         barcode = 'data:image/png;base64,{0}'.format(base64_data)
 

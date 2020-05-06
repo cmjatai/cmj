@@ -1657,6 +1657,7 @@ class ComprovanteProtocoloView(PermissionRequiredMixin, TemplateView):
         context.update({"protocolo": protocolo,
                         "barcode": barcode,
                         "autenticacao": autenticacao})
+
         return context
 
 
