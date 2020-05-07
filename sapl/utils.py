@@ -241,6 +241,16 @@ class OverwriteStorage(FileSystemStorage):
 class PortalFieldFile(FieldFile):
 
     @property
+    def original_path(self):
+        self._require_file()
+        return self.storage.path('original__{}'.format(self.name))
+
+    @property
+    def original_name(self):
+        self._require_file()
+        return 'original__{}'.format(self.name)
+
+    @property
     def url(self):
         self._require_file()
         # if settings.DEBUG:

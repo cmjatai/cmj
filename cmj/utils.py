@@ -334,6 +334,9 @@ def signed_name_and_date_extract(file):
 
     fields = pdf.getFields()
 
+    if not fields:
+        return signs
+
     for key, field in fields.items():
         if '/FT' not in field and field['/FT'] != '/Sig':
             continue
