@@ -62,7 +62,7 @@
 
                   <div class="links-texto">
                     {% if d.texto_integral %}
-                      <a class="link-texto"  target="_blank" href="{{d.texto_integral.url}}" title="Documento Administrativo">
+                      <a class="link-texto"  target="_blank" href="{{d.texto_integral.url}}?u={% now "u"%}" title="Documento Administrativo">
                         <i class="far fa-2x fa-file-{% if '.pdf' in d.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
                       </a>
                     {% endif %}

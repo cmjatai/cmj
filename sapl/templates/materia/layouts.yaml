@@ -79,7 +79,6 @@ DocumentoAcessorioDetail:
   - tipo nome data
   - autor protocolo_gr
   - ementa
-  - indexacao
   - arquivo
       
 Numeracao:

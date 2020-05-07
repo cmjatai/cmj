@@ -1,0 +1,31 @@
+{% load i18n %}
+{% load compilacao_filters %}
+{% load common_cmj_tags common_tags%}
+{% load static %}
+{% load webpack_static from webpack_loader %}
+
+
+<div class="links-texto">
+  {% if object.arquivo %}
+    <a class="link-texto" target="_blank" href="{{object.arquivo.url}}?u={% now "u"%}" title="Texto Original">
+      <i class="far fa-2x fa-file-{% if '.pdf' in object.arquivo.path %}pdf{% else %}archive{% endif %}"></i>
+    </a>
+  {% endif %}
+</div>
+                    
+
+<strong>
+  <a href="{% url 'sapl.materia:documentoacessorio_detail' object.id %}">
+      {% if object.is_signed %}
+        <i class="fas fa-1x fa-certificate" title="Documento possui versão com Assinatura Digital, entre nos detalhes do documento para abrir o Arquivo Original"></i>
+      {% endif %}
+  {{object.nome}}</a>
+</strong><br>
+
+{% if object.protocolo_gr.first %}
+  <strong>Protocolo: </strong>{{object.protocolo_gr.first.epigrafe}} |
+{% endif %}
+ <strong>Data</strong>: {{object.data}} | 
+ <strong>Autor</strong>: {{object.autor}}
+
+<div class="text-ementa">{{ object.ementa }}</div>

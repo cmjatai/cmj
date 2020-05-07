@@ -1514,8 +1514,7 @@ class DocumentoAcessorioCrud(MasterDetailCrud):
     public = [RP_LIST, RP_DETAIL]
 
     class BaseMixin(MasterDetailCrud.BaseMixin):
-        list_field_names = ['nome', 'tipo', 'data',
-                            ('ementa', 'autor'), 'protocolo_gr']
+        list_field_names = ['itemlist']
 
     class CreateView(MasterDetailCrud.CreateView):
         form_class = DocumentoAcessorioForm
@@ -1535,6 +1534,16 @@ class DocumentoAcessorioCrud(MasterDetailCrud):
             else:
                 return 'Protocolo', ''
 
+        def hook_arquivo(self, obj):
+
+            doc_template = template.loader.get_template(
+                'materia/documentoacessorio_widget_file.html')
+            context = {}
+            context['doc'] = obj
+            rendered = doc_template.render(context, self.request)
+
+            return 'Arquivo do Documento Acessório', rendered
+
     class UpdateView(MasterDetailCrud.UpdateView):
         form_class = DocumentoAcessorioForm
 
@@ -1546,32 +1555,18 @@ class DocumentoAcessorioCrud(MasterDetailCrud):
     class ListView(MasterDetailCrud.ListView):
         paginate_by = None
 
-        def hook_ementa(self, obj, default, url):
-            return '<strong>{}</strong>'.format(default), ''
+        def hook_header_itemlist(self):
+            return 'Documentos Acessórios'
 
-        def hook_header_protocolo_gr(self):
-            return 'Protocolo'
+        def hook_itemlist(self, obj, default, url):
 
-        def hook_protocolo_gr(self, obj, default, url):
-            if obj.protocolo_gr.exists():
-                return obj.protocolo_gr.first().epigrafe, ''
-            else:
-                return '', ''
+            doc_template = template.loader.get_template(
+                'materia/documentoacessorio_widget_itemlist.html')
+            context = {}
+            context['object'] = obj
+            rendered = doc_template.render(context, self.request)
 
-        def hook_nome(self, obj, default, url):
-            return """
-            <a href="{}" pk="{}" class="d-block text-center">{}</a><br>
-            {}
-            """.format(
-                url, obj.id, obj.nome,
-                """
-                   <small>
-                     <a href="{}" pk="{}" class="d-block text-center">
-                       Arquivo<br>Digitalizado
-                     </a>
-                   </small>
-               """.format(obj.arquivo.url, obj.id) if obj.arquivo else ''
-            ), ''
+            return '{}'.format(rendered), ''
 
 
 class AutoriaCrud(MasterDetailCrud):

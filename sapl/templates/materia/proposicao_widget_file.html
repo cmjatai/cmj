@@ -5,7 +5,7 @@
 {% load webpack_static from webpack_loader %}
 
 {% if p.texto_original %}
-  <div class="row item-listas align-items-center file-normajuridica justify-content-between">
+  <div class="row item-listas align-items-center justify-content-between">
     <div class="col-12 col-md-auto justify-content-center">
       <a class="link-texto"  target="_blank" href="{{p.texto_original.url}}?original" title="Documento Eletrônico">
         {% if p.metadata.signs and p.metadata.signs.texto_original %}

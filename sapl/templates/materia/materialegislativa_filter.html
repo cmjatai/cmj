@@ -92,8 +92,8 @@
                           {% endif %}
                       {{m.tipo.sigla}} {{m.numero}}/{{m.ano}} - {{m.tipo}}</a>
                     </strong><br>
-                    {% if m.numero_protocolo %}
-                        <strong>Protocolo: </strong>{{m.numero_protocolo}}/{{m.ano}} | 
+                    {% if m.protocolo_gr.first %}
+                        <strong>Protocolo: </strong>{{m.protocolo_gr.first.epigrafe}} | 
                     {% endif %}
                     <strong>Data de Apresentação:</strong> {{m.data_apresentacao}}
 

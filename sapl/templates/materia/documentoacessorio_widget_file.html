@@ -4,10 +4,11 @@
 {% load static %}
 {% load webpack_static from webpack_loader %}
 
+{% if doc.arquivo %}
   <div class="row item-listas align-items-center justify-content-between">
-    <div class="col-12 col-md-auto justify-content-center">
-      {% if n.texto_integral and '.pdf' in n.texto_integral.path %}
-        <a class="link-texto" target="_blank" href="{{n.texto_integral.url}}?u={% now "u"%}" title="Documento Digitalizado">
+    <div class="col-12 col-md-auto justify-content-center  my-3" >
+      {% if doc.arquivo and '.pdf' in doc.arquivo.path %}
+        <a class="link-texto" target="_blank" href="{{doc.arquivo.url}}" title="Documento Digitalizado">
           <i class="far fa-2x fa-file-pdf"></i>
           <br>
           <strong>
@@ -18,21 +19,22 @@
           </strong>
         </a>
       {% endif %}
-      <a class="link-texto"  target="_blank" href="{{n.texto_integral.url}}?original" title="Documento Eletrônico">
-        {% if n.metadata.signs and n.metadata.signs.texto_integral %}
+
+      <a class="link-texto"  target="_blank" href="{{doc.arquivo.url}}?original" title="Documento Eletrônico">
+        {% if doc.metadata.signs and doc.metadata.signs.arquivo %}
           <i class="fas fa-2x fa-certificate"></i>
         {% else %}
-          <i class="far fa-2x fa-file-{% if '.pdf' in n.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
+          <i class="far fa-2x fa-file-{% if '.pdf' in doc.arquivo.path %}pdf{% else %}archive{% endif %}"></i>
         {% endif %}
         <br>
         <strong>Documento 
-          {% if n.metadata.signs and n.metadata.signs.texto_integral %}
+          {% if doc.metadata.signs and doc.metadata.signs.arquivo %}
             Eletrônico
             <small>
               <br>com Assinatura Digital
             </small>
           {% else %}
-            {% if '.pdf' in n.texto_integral.path %}
+            {% if '.pdf' in doc.arquivo.path %}
                 <br>Digitalizado Original
             {% else %}
               <br>Eletrônico
@@ -44,12 +46,12 @@
     {% if render_ementa %}
       <div class="col">
         <div class="text-ementa">
-          {{n.ementa|safe}}
+          {{doc.ementa|safe}}
         </div>
       </div>
     {% endif %}
-    {% with n.metadata.signs.texto_integral as signs %}
+    {% with doc.metadata.signs.arquivo as signs %}
       {% include 'core/sign_widget.html' %}
     {% endwith %}
-
   </div>
+{% endif %}

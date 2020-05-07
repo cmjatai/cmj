@@ -639,6 +639,14 @@ class DocumentoAcessorio(CountPageMixin):
         verbose_name_plural = _('Documentos Acessórios')
         ordering = 'data', 'id'
 
+    @property
+    def is_signed(self):
+        try:
+            return self.metadata and self.metadata['signs'] and \
+                self.metadata['signs']['arquivo']
+        except:
+            return False
+
     def __str__(self):
         return _('%(tipo)s - %(nome)s de %(data)s por %(autor)s') % {
             'tipo': self.tipo,

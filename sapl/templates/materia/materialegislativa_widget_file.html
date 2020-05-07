@@ -5,7 +5,7 @@
 {% load webpack_static from webpack_loader %}
 
 {% if m.texto_original %}
-  <div class="row item-listas align-items-center file-normajuridica justify-content-between">
+  <div class="row item-listas align-items-centerjustify-content-between">
     <div class="col-12 col-md-auto justify-content-center">
       {% if m.texto_original and '.pdf' in m.texto_original.path %}
         <a class="link-texto" target="_blank" href="{{m.texto_original.url}}" title="Documento Digitalizado">
