@@ -25,6 +25,40 @@
 		.col-2 {
 			flex-grow: 2;
 		}
+		.box-assinatura-eletronica {
+			
+			text-align: left;
+			padding: 5px 10px;
+			border-radius: 5px;
+			flex: 0 0 auto;
+			width: auto;
+			max-width: 100%;
+		}
+		.box-assinatura-eletronica .title {
+			font-weight: bold;
+			padding: 1px 5px;
+			display: inline-block;
+			white-space: nowrap;
+			border-bottom: 1px solid black;
+		}
+		.box-assinatura-eletronica .sigs {
+		}
+		.box-assinatura-eletronica .sig {
+			background-color: white;
+			padding: 5px 10px;
+			display: inline-block;
+			line-height: 1;
+			margin-bottom: 3px;
+			border-radius: 5px;
+			text-align: center;
+			font-size: 90%;
+		}
+		.box-assinatura-eletronica .sig .sig-nome {
+			display: block;
+		}
+		.box-assinatura-eletronica .sig	.sig-data {
+		}
+
 		@media print {
 			table {
 				width: 100%;
@@ -101,7 +135,14 @@
 				<th>Ementa</th>
 				<td class="downsize">{{ protocolo.assunto_ementa }}</td>
 				<th>Autor</th>
-				<td>{{ protocolo.autor }}</td>
+				<td>{{ protocolo.autor }}
+						{% if protocolo.conteudo_protocolado %}
+							{% with protocolo.conteudo_protocolado.metadata.signs.texto_original as signs %}
+								{% include 'core/sign_widget.html' %}
+							{% endwith %}
+						{% endif %}
+				
+				</td>
 			</tr>
 		{% else %}
 			<tr>

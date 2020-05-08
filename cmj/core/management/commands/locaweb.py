@@ -1,5 +1,7 @@
 
+from datetime import datetime
 import logging
+import os
 
 import boto3
 from django.apps import apps
@@ -8,6 +10,8 @@ from django.core.management.base import BaseCommand
 from django.db.models import Q
 from django.db.models.fields.files import FileField
 from django.db.models.signals import post_delete, post_save
+from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 
 from sapl.norma.models import NormaJuridica
 
@@ -33,7 +37,7 @@ class Command(BaseCommand):
 
         self.s3_connect()
         # self.__clear_bucket('cmjatai_teste')
-        self.s3_sync()
+        self.s3_sync(app_label='sapl.norma', model_name='NormaJuridica')
 
     def download_file_from_object(self, bucket_name, obj):
         b = self.get_bucket(bucket_name)
@@ -100,11 +104,12 @@ class Command(BaseCommand):
     def s3_sync(self, app_label=None, model_name=None):
 
         print('--------- Locaweb ----------')
-        reset = True
+        reset = False
 
         count = 0
         for app in apps.get_app_configs():
             if app_label and app.name != app_label:
+                print(app.name)
                 continue
 
             if not app.name.startswith('cmj') and not app.name.startswith('sapl'):
@@ -147,13 +152,14 @@ class Command(BaseCommand):
                 if not model_exec:
                     continue
                 print(m)
-                for i in m.objects.all():
+                for i in m.objects.all().order_by('-id'):
+
                     if not hasattr(i, 'metadata'):
                         #print(i, 'não tem metadata')
                         continue
                     # else:
                     #    if i.metadata and \
-                    #            'locaweb' in i.metadata:
+                    # 'locaweb' in i.metadata:
                     #        i.metadata['locaweb'] = {}
                     #        i.save()
                     #        print(i)
@@ -166,6 +172,9 @@ class Command(BaseCommand):
                         if not ff:
                             continue
 
+                        self.checar_consistencia(i, ff, fn)
+                        continue
+
                         if not metadata:
                             metadata = {}
 
@@ -173,46 +182,69 @@ class Command(BaseCommand):
                             metadata['locaweb'] = {}
 
                         if fn not in metadata['locaweb']:
-                            metadata['locaweb'][fn] = False
+                            metadata['locaweb'][fn] = {
+                                'path': None,
+                                'original_path': None
+                            }
 
                         if reset:
-                            metadata['locaweb'][fn] = False
+                            metadata['locaweb'][fn] = {
+                                'path': None,
+                                'original_path': None
+                            }
 
-                        if metadata['locaweb'][fn]:
-                            continue
-
+                        count_update = 0
                         try:
-                            self.s3c.upload_file(
-                                ff.path,
-                                self.bucket_name,
-                                ff.name,
-                                ExtraArgs={
-                                    'ACL': 'private',
-                                    'Metadata': {
-                                        'pk': f'{i._meta.label_lower}.{i.id}'
-                                    }
-                                }
-                            )
-                            if hasattr(ff, 'original_path'):
-                                self.s3c.upload_file(
-                                    ff.original_path,
-                                    self.bucket_name,
-                                    'original__{}'.format(ff.name),
-                                    ExtraArgs={
-                                        'ACL': 'private',
-                                        'Metadata': {
-                                            'pk': f'{i._meta.label_lower}.{i.id}'
-                                        }
-                                    }
-                                )
+                            count_update += self.send_file(
+                                metadata, i, ff, fn, 'path')
+
+                            count_update += self.send_file(
+                                metadata, i, ff, fn, 'original_path')
+
                         except Exception as e:
                             print(e)
                         else:
-                            metadata['locaweb'][fn] = True
-                            i.metadata = metadata
-                            i.save()
-
-                            count += 1
+                            if count_update:
+                                i.metadata = metadata
+                                i.save()
+                                count += 1
 
                             if count == 100:
                                 return
+
+    def checar_consistencia(self, i, ff, fn):
+        existe_path = os.path.exists(ff.path)
+        existe_original_path = os.path.exists(ff.original_path)
+        if not existe_path:
+            print('ARQUIVO PATH NÃO ENCONTRADO:',
+                  i.id, i, ff.name)
+        if not existe_original_path:
+            print('ARQUIVO ORIGINAL PATH NÃO ENCONTRADO:',
+                  i.id, i, ff.name)
+
+    def send_file(self, metadata, i, ff, fn, attr):
+        if os.path.exists(getattr(ff, attr)):
+
+            if metadata['locaweb'][fn][attr]:
+                t = os.path.getmtime(getattr(ff, attr))
+                date_file = datetime.fromtimestamp(
+                    t, timezone.utc)
+
+                if parse_datetime(metadata['locaweb'][fn][attr]) > date_file:
+                    return 0
+
+            self.s3c.upload_file(
+                getattr(ff, attr),
+                self.bucket_name,
+                ff.original_name if 'original' in attr else ff.name,
+                ExtraArgs={
+                    'ACL': 'private',
+                    'Metadata': {
+                        'pk': f'{i._meta.label_lower}.{i.id}'
+                    }
+                }
+            )
+
+            metadata['locaweb'][fn][attr] = timezone.localtime()
+            return 1
+        return 0
