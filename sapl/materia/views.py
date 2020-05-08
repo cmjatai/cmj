@@ -919,9 +919,6 @@ class ProposicaoCrud(Crud):
             if not self.has_permission():
                 return self.handle_no_permission()
 
-            if p.autor != request.user.autor_set.first():
-                raise Http404()
-
             if not p.autor.operadores.filter(pk=request.user.id).exists():
                 if not p.data_envio and not p.data_devolucao:
                     raise Http404()

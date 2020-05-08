@@ -622,24 +622,20 @@ class _ProposicaoViewSet(ResponseFileMixin):
     def get_queryset(self):
         qs = super().get_queryset()
 
-        # se usuário anônimo, ou não pertence a autor nenhum, nem ao protocolo
-        # pode ver apenas proposições recebidas
+        # se usuário anônimo, pode ver apenas proposições recebidas
         q = Q(data_recebimento__isnull=False, object_id__isnull=False)
         if not self.request.user.is_anonymous():
-            operador_de_autor = self.request.user.autor_set.first()
-            if operador_de_autor:
-                # se o usuário logado é um operador de autor
-                # só acessa suas próprias proposições
-                q_user = Q(autor=operador_de_autor)
 
-                if not self.request.GET.get('all', None) is None:
-                    q |= q_user
-                else:
-                    q = q_user
+            autor_do_usuario_logado = self.request.user.autor_set.first()
 
-            else:
-                if self.request.user.has_perm('protocoloadm.list_protocolo'):
-                    q = Q(data_envio__isnull=False)
+            # se usuário logado é operador de algum autor
+            if autor_do_usuario_logado:
+                q = Q(autor=autor_do_usuario_logado)
+
+            # se é operador de protocolo, ve qualquer coisa enviada
+            if self.request.user.has_perm('protocoloadm.list_protocolo'):
+                q = Q(data_envio__isnull=False) | Q(
+                    data_devolucao__isnull=False)
 
         qs = qs.filter(q)
         return qs
