@@ -173,7 +173,7 @@ class Command(BaseCommand):
                 ('djangoapps', 'pymp'),
                 ('djangoapps', 'com.github.ocrmypdf'),
                 ('djangoapps', 'yarn--'),
-                ('solr', 'upload_'),
+                #('solr', 'upload_'),
                 ('djangoapps', 'br.leg.go.jatai.portalcmj.')
             ]
 
@@ -181,10 +181,14 @@ class Command(BaseCommand):
                 for user, start_name in clears:
                     if i.name.startswith(start_name):
                         if getpwuid(os.stat(i.path).st_uid).pw_name == user:
-                            shutil.rmtree(i.path, ignore_errors=True)
-                            if os.path.exists(i.path):
-                                os.remove(i.path)
-                            break
+                            try:
+                                shutil.rmtree(i.path, ignore_errors=True)
+                                if os.path.exists(i.path):
+                                    os.remove(i.path)
+                                break
+                            except Exception as e:
+                                print(e)
+                                break
 
     def handle(self, *args, **options):
         post_delete.disconnect(dispatch_uid='sapl_post_delete_signal')
