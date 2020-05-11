@@ -182,7 +182,8 @@ class Command(BaseCommand):
                     if i.name.startswith(start_name):
                         if getpwuid(os.stat(i.path).st_uid).pw_name == user:
                             shutil.rmtree(i.path, ignore_errors=True)
-                            os.remove(i.path)
+                            if os.path.exists(i.path):
+                                os.remove(i.path)
                             break
 
     def handle(self, *args, **options):
@@ -194,7 +195,6 @@ class Command(BaseCommand):
         self.logger = logging.getLogger(__name__)
 
         self.delete_itens_tmp_folder()
-        return
 
         init = datetime.now()
 
