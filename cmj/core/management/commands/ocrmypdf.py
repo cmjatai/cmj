@@ -2,6 +2,7 @@
 from datetime import datetime, timedelta
 import logging
 import os
+from pwd import getpwuid
 import random
 import shutil
 import stat
@@ -168,10 +169,21 @@ class Command(BaseCommand):
         for i in list:
             age = now - os.stat(i.path)[stat.ST_MTIME]
 
+            clears = [
+                ('djangoapps', 'pymp'),
+                ('djangoapps', 'com.github.ocrmypdf'),
+                ('djangoapps', 'yarn--'),
+                ('solr', 'upload_'),
+                ('djangoapps', 'br.leg.go.jatai.portalcmj.')
+            ]
+
             if age > 86400:
-                if i.name.startswith('pymp') or\
-                        i.name.startswith('com.github.ocrmypdf'):
-                    shutil.rmtree(i.path, ignore_errors=True)
+                for user, start_name in clears:
+                    if i.name.startswith(start_name):
+                        if getpwuid(os.stat(i.path).st_uid).pw_name == user:
+                            shutil.rmtree(i.path, ignore_errors=True)
+                            os.remove(i.path)
+                            break
 
     def handle(self, *args, **options):
         post_delete.disconnect(dispatch_uid='sapl_post_delete_signal')
@@ -182,6 +194,7 @@ class Command(BaseCommand):
         self.logger = logging.getLogger(__name__)
 
         self.delete_itens_tmp_folder()
+        return
 
         init = datetime.now()
 
