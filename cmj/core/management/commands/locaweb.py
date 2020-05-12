@@ -29,7 +29,7 @@ class Command(BaseCommand):
     days_validate = 60
 
     start_time = None
-    exec_time = 180
+    exec_time = 1800
 
     def handle(self, *args, **options):
         post_delete.disconnect(dispatch_uid='sapl_post_delete_signal')
@@ -242,13 +242,14 @@ class Command(BaseCommand):
 
                         except Exception as e:
                             print(e)
+                            return
                         else:
                             if count_update:
                                 i.metadata = metadata
                                 i.save()
                                 count += 1
 
-                            if (count == 1000 or
+                            if (  # count == 1000 or
                                     timezone.localtime() -
                                     self.start_time >
                                     timedelta(seconds=self.exec_time)):

@@ -771,6 +771,7 @@ def hash_sha512(arquivo):
         # Read and update hash string value in blocks of 4K
         for byte_block in iter(lambda: f.read(4096), b""):
             sha512_hash.update(byte_block)
+        f.close()
     return sha512_hash.hexdigest()
 
 
