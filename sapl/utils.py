@@ -767,11 +767,11 @@ def gerar_hash_arquivo(arquivo, pk, block_size=2 ** 20):
 
 def hash_sha512(arquivo):
     sha512_hash = hashlib.sha512()
-    with open(arquivo, "rb") as f:
-        # Read and update hash string value in blocks of 4K
-        for byte_block in iter(lambda: f.read(4096), b""):
-            sha512_hash.update(byte_block)
-        f.close()
+    f = open(arquivo, "rb")
+    # Read and update hash string value in blocks of 4K
+    for byte_block in iter(lambda: f.read(4096), b""):
+        sha512_hash.update(byte_block)
+    f.close()
     return sha512_hash.hexdigest()
 
 

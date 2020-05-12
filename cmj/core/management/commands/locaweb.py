@@ -1,7 +1,11 @@
 
+import builtins
 from datetime import datetime, timedelta
+from functools import wraps
+import io
 import logging
 import os
+import traceback
 
 import boto3
 from django.apps import apps
@@ -39,6 +43,7 @@ class Command(BaseCommand):
 
         self.logger = logging.getLogger(__name__)
 
+        # self.close_files()
         self.s3_connect()
         # self.__clear_bucket('cmjatai_teste')
         self.start_time = timezone.localtime()
@@ -375,3 +380,24 @@ class Command(BaseCommand):
 
             return 1
         return 0
+
+    def close_files(self):
+
+        def opener(old_open):
+            @wraps(old_open)
+            def tracking_open(*args, **kw):
+                file = old_open(*args, **kw)
+
+                old_close = file.close
+
+                @wraps(old_close)
+                def close():
+                    old_close()
+                file.close = close
+                file.stack = traceback.extract_stack()
+
+                return file
+            return tracking_open
+
+        io.open = opener(io.open)
+        builtins.open = opener(builtins.open)
