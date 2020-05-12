@@ -527,7 +527,7 @@ class _TipoMateriaLegislativaViewSet:
 
 
 @customize(SessaoPlenaria)
-class _SessaoPlenariaViewSet:
+class _SessaoPlenariaViewSet(ResponseFileMixin):
 
     @action(detail=False)
     def years(self, request, *args, **kwargs):
@@ -549,6 +549,18 @@ class _SessaoPlenariaViewSet:
 
         serializer = self.get_serializer(page, many=True)
         return Response(serializer.data)
+
+    @action(detail=True)
+    def upload_ata(self, request, *args, **kwargs):
+        return self.response_file(request, *args, **kwargs)
+
+    @action(detail=True)
+    def upload_pauta(self, request, *args, **kwargs):
+        return self.response_file(request, *args, **kwargs)
+
+    @action(detail=True)
+    def upload_anexo(self, request, *args, **kwargs):
+        return self.response_file(request, *args, **kwargs)
 
 
 @customize(NormaJuridica)
