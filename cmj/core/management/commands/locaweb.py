@@ -35,6 +35,8 @@ class Command(BaseCommand):
     start_time = None
     exec_time = 1800
 
+    count_registros = 0
+
     def handle(self, *args, **options):
         post_delete.disconnect(dispatch_uid='sapl_post_delete_signal')
         post_save.disconnect(dispatch_uid='sapl_post_save_signal')
@@ -51,6 +53,7 @@ class Command(BaseCommand):
 
         print(self.start_time)
         print(timezone.localtime())
+        print(self.count_registros)
 
         #self.s3_sync(only_reset=False, model_name='NormaJuridica')
         #self.s3_sync(app_label='sapl.norma', model_name='NormaJuridica')
@@ -247,14 +250,17 @@ class Command(BaseCommand):
 
                         except Exception as e:
                             print(e)
+                            print(count)
                             return
                         else:
                             if count_update:
                                 i.metadata = metadata
                                 i.save()
                                 count += 1
+                            else:
+                                self.count_registros += 1
 
-                            if (  # count == 1000 or
+                            if (count == 500 or
                                     timezone.localtime() -
                                     self.start_time >
                                     timedelta(seconds=self.exec_time)):
@@ -351,7 +357,7 @@ class Command(BaseCommand):
         if os.path.exists(getattr(ff, attr_path)):
 
             if metadata['locaweb'][fn][attr_path]:
-
+                # return 0
                 t = os.path.getmtime(getattr(ff, attr_path))
                 date_file = datetime.fromtimestamp(t, timezone.utc)
 
@@ -360,7 +366,9 @@ class Command(BaseCommand):
                         metadata, i, fn, attr_path, attr_hash)
                     if result:
                         return 0
+            # return 0
             print('Enviando...', i, attr_path)
+
             """self.s3c.upload_file(
                 getattr(ff, attr_path),
                 self.bucket_name,
@@ -394,24 +402,3 @@ class Command(BaseCommand):
 
             return 1
         return 0
-
-    def close_files(self):
-
-        def opener(old_open):
-            @wraps(old_open)
-            def tracking_open(*args, **kw):
-                file = old_open(*args, **kw)
-
-                old_close = file.close
-
-                @wraps(old_close)
-                def close():
-                    old_close()
-                file.close = close
-                file.stack = traceback.extract_stack()
-
-                return file
-            return tracking_open
-
-        io.open = opener(io.open)
-        builtins.open = opener(builtins.open)

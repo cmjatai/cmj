@@ -17,7 +17,7 @@ from sapl.parlamentares.models import (CargoMesa, Legislatura, Parlamentar,
 from sapl.utils import (YES_NO_CHOICES, SaplGenericRelation,
                         get_settings_auth_user_model,
                         restringe_tipos_de_arquivo_txt, texto_upload_path,
-                        OverwriteStorage)
+                        OverwriteStorage, PortalFileField)
 
 
 @reversion.register()
@@ -130,21 +130,21 @@ class SessaoPlenaria(models.Model):
     url_video = models.URLField(
         max_length=150, blank=True,
         verbose_name=_('URL Arquivo Vídeo (Formatos MP4 / FLV / WebM)'))
-    upload_pauta = models.FileField(
+    upload_pauta = PortalFileField(
         blank=True,
         null=True,
         upload_to=pauta_upload_path,
         verbose_name=_('Pauta da Sessão'),
         storage=OverwriteStorage(),
         validators=[restringe_tipos_de_arquivo_txt])
-    upload_ata = models.FileField(
+    upload_ata = PortalFileField(
         blank=True,
         null=True,
         upload_to=ata_upload_path,
         storage=OverwriteStorage(),
         verbose_name=_('Ata da Sessão'),
         validators=[restringe_tipos_de_arquivo_txt])
-    upload_anexo = models.FileField(
+    upload_anexo = PortalFileField(
         blank=True,
         null=True,
         storage=OverwriteStorage(),
