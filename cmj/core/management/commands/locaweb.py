@@ -29,6 +29,7 @@ class Command(BaseCommand):
     days_validate = 60
 
     start_time = None
+    exec_time = 180
 
     def handle(self, *args, **options):
         post_delete.disconnect(dispatch_uid='sapl_post_delete_signal')
@@ -41,7 +42,7 @@ class Command(BaseCommand):
         self.s3_connect()
         # self.__clear_bucket('cmjatai_teste')
         self.start_time = timezone.localtime()
-        self.s3_sync(model_name='MateriaLegislativa')
+        self.s3_sync()
 
         print(self.start_time)
         print(timezone.localtime())
@@ -249,7 +250,10 @@ class Command(BaseCommand):
 
                             # se está em execução ha mais de 2min ou fez upload
                             # de 100 registros
-                            if count == 100 or timezone.localtime() - self.start_time > timedelta(seconds=120):
+                            if (count == 100 or
+                                    timezone.localtime() -
+                                    self.start_time >
+                                    timedelta(seconds=self.exec_time)):
                                 return
 
     def checar_consistencia(self, i, ff, fn):
