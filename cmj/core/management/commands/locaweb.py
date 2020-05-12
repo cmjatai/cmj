@@ -361,7 +361,7 @@ class Command(BaseCommand):
                     if result:
                         return 0
             print('Enviando...', i, attr_path)
-            self.s3c.upload_file(
+            """self.s3c.upload_file(
                 getattr(ff, attr_path),
                 self.bucket_name,
                 ff.original_name if 'original' in attr_path else ff.name,
@@ -371,7 +371,21 @@ class Command(BaseCommand):
                         'pk': f'{i._meta.label_lower}.{i.id}'
                     }
                 }
+            )"""
+
+            obj = self.s3r.Object(
+                self.bucket_name,
+                ff.original_name if 'original' in attr_path else ff.name,
             )
+            with open(getattr(ff, attr_path), "rb") as f:
+                obj.upload_fileobj(
+                    f,
+                    ExtraArgs={
+                        'ACL': 'private',
+                        'Metadata': {
+                            'pk': f'{i._meta.label_lower}.{i.id}'
+                        }
+                    })
 
             metadata['locaweb'][fn][attr_path] = timezone.localtime()
             metadata['locaweb'][fn][attr_hash] = hash_sha512(
