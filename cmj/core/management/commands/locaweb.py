@@ -248,9 +248,7 @@ class Command(BaseCommand):
                                 i.save()
                                 count += 1
 
-                            # se está em execução ha mais de 2min ou fez upload
-                            # de 100 registros
-                            if (count == 100 or
+                            if (count == 1000 or
                                     timezone.localtime() -
                                     self.start_time >
                                     timedelta(seconds=self.exec_time)):
