@@ -7,40 +7,54 @@
 {% if m.texto_original %}
   <div class="row item-listas align-items-centerjustify-content-between">
     <div class="col-12 col-md-auto justify-content-center">
-      {% if m.texto_original and '.pdf' in m.texto_original.path %}
-        <a class="link-texto" target="_blank" href="{{m.texto_original.url}}" title="Documento Digitalizado">
-          <i class="far fa-2x fa-file-pdf"></i>
+
+      {% if m.metadata.signs and m.metadata.locaweb and m.metadata.signs.texto_original and m.metadata.locaweb.texto_original.hash == m.metadata.locaweb.texto_original.original_hash %}
+        <a class="link-texto"  target="_blank" href="{{m.texto_original.url}}?original" title="Documento Eletrônico">
+          <i class="fas fa-2x fa-certificate"></i>
           <br>
-          <strong>
-              Documento Digitalizado
+          <strong>Documento 
+              Eletrônico
               <small>
-                <br>Com OCR Otimizado para Download
+                <br>com Assinatura Digital
               </small>
           </strong>
         </a>
-      {% endif %}
-      <a class="link-texto"  target="_blank" href="{{m.texto_original.url}}?original" title="Documento Eletrônico">
-        {% if m.metadata.signs and m.metadata.signs.texto_original %}
-          <i class="fas fa-2x fa-certificate"></i>
-        {% else %}
-          <i class="far fa-2x fa-file-{% if '.pdf' in m.texto_original.path %}pdf{% else %}archive{% endif %}"></i>
+      {% else %}
+        {% if m.texto_original and '.pdf' in m.texto_original.path %}
+          <a class="link-texto" target="_blank" href="{{m.texto_original.url}}" title="Documento Digitalizado">
+            <i class="far fa-2x fa-file-pdf"></i>
+            <br>
+            <strong>
+                Documento Digitalizado
+                <small>
+                  <br>Com OCR Otimizado para Download
+                </small>
+            </strong>
+          </a>
         {% endif %}
-        <br>
-        <strong>Documento 
+        <a class="link-texto"  target="_blank" href="{{m.texto_original.url}}?original" title="Documento Eletrônico">
           {% if m.metadata.signs and m.metadata.signs.texto_original %}
-            Eletrônico
-            <small>
-              <br>com Assinatura Digital
-            </small>
+            <i class="fas fa-2x fa-certificate"></i>
           {% else %}
-            {% if '.pdf' in m.texto_original.path %}
-                <br>Digitalizado Original
-            {% else %}
-              <br>Eletrônico
-            {% endif %}
+            <i class="far fa-2x fa-file-{% if '.pdf' in m.texto_original.path %}pdf{% else %}archive{% endif %}"></i>
           {% endif %}
-        </strong>
-      </a>
+          <br>
+          <strong>Documento 
+            {% if m.metadata.signs and m.metadata.signs.texto_original %}
+              Eletrônico
+              <small>
+                <br>com Assinatura Digital
+              </small>
+            {% else %}
+              {% if '.pdf' in m.texto_original.path %}
+                  <br>Digitalizado Original
+              {% else %}
+                <br>Eletrônico
+              {% endif %}
+            {% endif %}
+          </strong>
+        </a>
+      {% endif %}
     </div>
     {% if render_ementa %}
       <div class="col">
