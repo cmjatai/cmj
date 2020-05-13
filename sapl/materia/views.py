@@ -2162,8 +2162,8 @@ class MateriaLegislativaPesquisaView(FilterView):
                                      "autoria_set__autor",
                                      "tipo",)
 
-        if 'o' in self.request.GET and not self.request.GET['o']:
-            qs = qs.order_by('-ano', 'tipo__sigla', '-numero')
+        # if 'o' in self.request.GET and not self.request.GET['o']:
+        #    qs = qs.order_by('-ano', '-id')
 
         kwargs.update({
             'queryset': qs,

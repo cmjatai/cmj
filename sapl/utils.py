@@ -638,7 +638,7 @@ class MateriaPesquisaOrderingFilter(django_filters.OrderingFilter):
         if value:
             _value = self.order_by_mapping[value[0]] if value else value
         else:
-            _value = self.order_by_mapping['dataD']
+            _value = ['-data_apresentacao', '-id']
 
         return super().filter(qs, _value)
 
