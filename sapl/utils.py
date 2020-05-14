@@ -252,15 +252,18 @@ class PortalFieldFile(FieldFile):
 
     @property
     def url(self):
-        self._require_file()
-        # if settings.DEBUG:
-        #    return self.storage.url(self.name)
+        try:
+            self._require_file()
+            # if settings.DEBUG:
+            #    return self.storage.url(self.name)
 
-        field_name_action = self.field.name.replace('_', '-')
-        return '%s' % reverse(
-            'sapl.api:%s-%s' % (self.instance._meta.model_name,
-                                field_name_action),
-            kwargs={'pk': self.instance.pk})
+            field_name_action = self.field.name.replace('_', '-')
+            return '%s' % reverse(
+                'sapl.api:%s-%s' % (self.instance._meta.model_name,
+                                    field_name_action),
+                kwargs={'pk': self.instance.pk})
+        except:
+            return ''
 
     def delete(self, save=True):
         if not self:

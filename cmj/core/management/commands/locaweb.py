@@ -17,6 +17,7 @@ from django.db.models.signals import post_delete, post_save
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
+from sapl.norma.models import NormaJuridica
 from sapl.utils import hash_sha512
 
 
@@ -47,7 +48,11 @@ class Command(BaseCommand):
 
         # self.close_files()
         self.s3_connect()
-        # self.__clear_bucket('cmjatai_teste')
+
+        # self.__clear_bucket('cmjatai_postgresql')
+        # return
+        self.update_backup_postgresql()
+
         self.start_time = timezone.localtime()
         self.s3_sync()
 
@@ -60,6 +65,42 @@ class Command(BaseCommand):
 
         #obj = n = NormaJuridica.objects.get(pk=8727)
         #self.restore_file_from_object(self.bucket_name, obj)
+
+    def update_backup_postgresql(self):
+
+        path_name = '{}BD_POSTGRESQL/'.format(settings.ABSOLUTE_PATH_BACKUP)
+
+        list_dir = os.listdir(path_name)
+
+        for item in list_dir:
+
+            t = os.path.getmtime(f'{path_name}{item}')
+            date_file = datetime.fromtimestamp(t, timezone.utc)
+
+            obj = self.s3r.Object(
+                'cmjatai_postgresql',
+                f'{path_name}{item}'[1:]
+
+            )
+
+            send = True
+
+            try:
+                if date_file < obj.last_modified:
+                    send = False
+            except:
+                pass
+
+            if not send:
+                continue
+
+            print('Enviando...', path_name, item)
+            with open(f'{path_name}{item}', "rb") as f:
+                obj.upload_fileobj(
+                    f,
+                    ExtraArgs={
+                        'ACL': 'private',
+                    })
 
     def restore_file_from_object(self, bucket_name, obj):
         b = self.get_bucket(bucket_name)
