@@ -47,10 +47,15 @@ class Command(BaseCommand):
         self.logger = logging.getLogger(__name__)
 
         # self.close_files()
+
+        # self.distribuir_validacao()
+        # return
+
         self.s3_connect()
 
         # self.__clear_bucket('cmjatai_postgresql')
         # return
+
         self.update_backup_postgresql()
 
         self.start_time = timezone.localtime()
@@ -368,6 +373,7 @@ class Command(BaseCommand):
             v = parse_datetime(metadata['locaweb'][fn]['validate'])
 
             # if timezone.localtime() - v > timedelta(seconds=30):
+            print(self.start_time - v)
             if self.start_time - v < timedelta(days=self.days_validate):
                 return True
 
@@ -443,3 +449,89 @@ class Command(BaseCommand):
 
             return 1
         return 0
+
+    def distribuir_validacao(self):
+
+        count = 0
+        for app in apps.get_app_configs():
+
+            if not app.name.startswith('cmj') and not app.name.startswith('sapl'):
+                continue
+            print(app)
+
+            for m in app.get_models():
+                model_exec = False
+
+                for f in m._meta.get_fields():
+                    dua = f
+                    print(dua)
+                    if hasattr(dua, 'auto_now') and dua.auto_now:
+                        #print(m, 'auto_now deve ser desativado.')
+                        # continue  # auto_now deve ser desativado
+                        print(m, 'desativando auto_now')
+                        dua.auto_now = False
+
+                    if not isinstance(f, FileField):
+                        continue
+
+                    # se possui FileField, o model então
+                    # deve possuir FIELDFILE_NAME
+                    assert hasattr(m, 'FIELDFILE_NAME'), '{} não possui FIELDFILE_NAME'.format(
+                        m._meta.label)
+
+                    # se possui FileField, o model então
+                    # deve possuir metadata
+                    assert hasattr(m, 'metadata'), '{} não possui metadata'.format(
+                        m._meta.label)
+
+                    # o campo field deve estar em FIELDFILE_NAME
+                    assert f.name in m.FIELDFILE_NAME, '{} não está no FIELDFILE_NAME de {}'.format(
+                        f.name,
+                        m._meta.label)
+
+                    model_exec = True
+
+                if not model_exec:
+                    continue
+                print(m)
+
+                count_model = m.objects.count()
+
+                if not count_model:
+                    continue
+
+                total_seconds = self.days_validate * 86400
+                interval_seconds = timedelta(
+                    seconds=total_seconds / count_model)
+
+                td = timedelta(seconds=total_seconds)
+
+                for i in m.objects.all().order_by('-id'):
+
+                    if not hasattr(i, 'metadata'):
+                        #print(i, 'não tem metadata')
+                        continue
+
+                    if not i.metadata:
+                        continue
+
+                    if 'locaweb' not in i.metadata:
+                        continue
+
+                    #metadata = i.metadata if i.metadata else {}
+                    for fn in i.FIELDFILE_NAME:
+
+                        if fn not in i.metadata['locaweb']:
+                            continue
+
+                        if 'validate' not in i.metadata['locaweb'][fn]:
+                            continue
+
+                        if not i.metadata['locaweb'][fn]['validate']:
+                            continue
+
+                        i.metadata['locaweb'][fn]['validate'] = timezone.localtime(
+                        ) - td
+                        i.save()
+
+                    td -= interval_seconds
