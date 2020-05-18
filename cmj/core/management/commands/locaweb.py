@@ -56,7 +56,8 @@ class Command(BaseCommand):
         # self.__clear_bucket('cmjatai_postgresql')
         # return
 
-        self.update_backup_postgresql()
+        if not settings.DEBUG:
+            self.update_backup_postgresql()
 
         self.start_time = timezone.localtime()
         self.s3_sync()
@@ -370,7 +371,10 @@ class Command(BaseCommand):
 
     def validate_file(self, metadata, i, fn, attr_path, attr_hash):
         if metadata['locaweb'][fn]['validate']:
-            v = parse_datetime(metadata['locaweb'][fn]['validate'])
+            if isinstance(metadata['locaweb'][fn]['validate'], str):
+                v = parse_datetime(metadata['locaweb'][fn]['validate'])
+            else:
+                v = metadata['locaweb'][fn]['validate']
 
             # if timezone.localtime() - v > timedelta(seconds=30):
             print(self.start_time - v)
