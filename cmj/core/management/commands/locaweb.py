@@ -377,7 +377,7 @@ class Command(BaseCommand):
                 v = metadata['locaweb'][fn]['validate']
 
             # if timezone.localtime() - v > timedelta(seconds=30):
-            print(self.start_time - v)
+            #print(self.start_time - v)
             if self.start_time - v < timedelta(days=self.days_validate):
                 return True
 
