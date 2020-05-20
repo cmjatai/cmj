@@ -199,7 +199,7 @@ def url(value):
 def notificacoes_unread(context):
     request = context['request']
 
-    if request.user.is_anonymous():
+    if request.user.is_anonymous:
         return {'notificacoes_anonimas': [],
                 'notificacoes_usuarios': [],
                 'notificacoes': 0, }
@@ -225,7 +225,7 @@ def notificacoes_unread(context):
 
 @register.filter
 def notificacoes_unread_count(user):
-    if not user or user and user.is_anonymous():
+    if not user or user and user.is_anonymous:
         return 0
 
     return user.notificacao_set.unread().count()

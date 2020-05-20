@@ -869,7 +869,7 @@ class DocumentoManager(models.Manager):
 
         qs = qs.filter(q_filter, self.q_doc_public)
 
-        if user and not user.is_anonymous():
+        if user and not user.is_anonymous:
             # FIXME: manter condição apenas enquanto estiver desenvolvendo
             if user.is_superuser:
                 qs_user = self.get_queryset()

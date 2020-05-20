@@ -183,7 +183,7 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
                     file, content_type=midia.content_type)
 
                 response['Cache-Control'] = 'max-age=2592000'
-                if not request.user.is_anonymous():
+                if not request.user.is_anonymous:
                     if request.META.get('HTTP_REFERER', '').endswith('construct'):
                         response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
 
@@ -462,7 +462,7 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
         # Analise de Permissão
         if obj[0]:
             u = request.user
-            if u.is_anonymous() and obj[0].visibilidade != \
+            if u.is_anonymous and obj[0].visibilidade != \
                     CMSMixin.STATUS_PUBLIC:
                 raise Http404()
 
@@ -615,7 +615,7 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
         # Analise de Permissão
         if obj[0]:
             u = request.user
-            if u.is_anonymous() and obj[0].visibilidade != \
+            if u.is_anonymous and obj[0].visibilidade != \
                     CMSMixin.STATUS_PUBLIC:
                 raise Http404()
 
@@ -978,7 +978,7 @@ class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
                     if p not in qs:
                         qs.append(p)
 
-        if not self.request.user.is_anonymous():
+        if not self.request.user.is_anonymous:
 
             ''' Seleciona todas as classes com permissões expressas e visuali-
             zação para o usuário conectado
@@ -1044,7 +1044,7 @@ class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
                         if has_permission:
                             break
 
-                    if not has_permission and not request.user.is_anonymous():
+                    if not has_permission and not request.user.is_anonymous:
                         if (self.object.visibilidade ==
                                 Classe.STATUS_PRIVATE and
                                 self.object.owner != request.user):

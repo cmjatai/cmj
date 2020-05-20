@@ -187,7 +187,7 @@ class IntegracaoTaView(TemplateView):
 
         if not ta_exists:
             if ta.editable_only_by_owners and\
-                    not self.request.user.is_anonymous():
+                    not self.request.user.is_anonymous:
                 ta.owners.add(self.request.user)
 
         if not Dispositivo.objects.filter(ta_id=ta.pk).exists() and\
