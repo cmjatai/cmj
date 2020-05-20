@@ -1,6 +1,6 @@
 from django import template
-from django.core.urlresolvers import reverse
 from django.shortcuts import render
+from django.urls.base import reverse
 from django.utils.translation import ugettext_lazy as _
 import yaml
 
@@ -39,7 +39,7 @@ def nav_run(context, path=None, pk=None):
             será realizado o teste de permissão para renderizá-lo.
     """
     menu = None
-    
+
     if not pk:
         root_pk = context.get('root_pk', None)
         if not root_pk:
@@ -48,8 +48,6 @@ def nav_run(context, path=None, pk=None):
                 root_pk = obj.pk
     else:
         root_pk = pk
-            
-            
 
     if root_pk or 'subnav_template_name' in context or path:
         request = context['request']

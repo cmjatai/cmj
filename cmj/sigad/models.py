@@ -17,6 +17,7 @@ from django.core.files.storage import FileSystemStorage
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models import Q, F
+from django.db.models.deletion import PROTECT
 from django.http.response import HttpResponse
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -113,13 +114,15 @@ class Parent(models.Model):
         'self',
         blank=True, null=True, default=None,
         related_name='childs',
-        verbose_name=_('Filhos'))
+        verbose_name=_('Filhos'),
+        on_delete=PROTECT)
 
     raiz = models.ForeignKey(
         'self',
         blank=True, null=True, default=None,
         related_name='nodes',
-        verbose_name=_('Containers'))
+        verbose_name=_('Containers'),
+        on_delete=PROTECT)
 
     related_classes = models.ManyToManyField(
         'self', blank=True,
@@ -170,13 +173,15 @@ class Revisao(models.Model):
         editable=False, auto_now_add=True)
     user = models.ForeignKey(
         get_settings_auth_user_model(),
-        verbose_name=_('user'), related_name='+')
+        verbose_name=_('user'), related_name='+',
+        on_delete=PROTECT)
 
     json = django_extensions_JSONField(verbose_name=_('Json'))
 
     content_type = models.ForeignKey(
         ContentType,
-        blank=True, null=True, default=None)
+        blank=True, null=True, default=None,
+        on_delete=PROTECT)
     object_id = models.PositiveIntegerField(
         blank=True, null=True, default=None)
     content_object = GenericForeignKey('content_type', 'object_id')
@@ -316,7 +321,8 @@ class CMSMixin(models.Model):
 
     owner = models.ForeignKey(
         get_settings_auth_user_model(),
-        verbose_name=_('owner'), related_name='+')
+        verbose_name=_('owner'), related_name='+',
+        on_delete=PROTECT)
 
     descricao = models.TextField(
         verbose_name=_('Descrição'),
@@ -624,13 +630,15 @@ class Classe(ShortUrl, CMSMixin):
     parlamentar = models.ForeignKey(
         Parlamentar, related_name='classe_set',
         verbose_name=_('Parlamentar'),
-        blank=True, null=True, default=None)
+        blank=True, null=True, default=None,
+        on_delete=PROTECT)
 
     capa = models.OneToOneField(
         'Documento',
         blank=True, null=True, default=None,
         verbose_name=_('Capa da Classe'),
-        related_name='capa')
+        related_name='capa',
+        on_delete=PROTECT)
 
     class Meta:
         ordering = ('codigo', '-public_date',)
@@ -671,12 +679,15 @@ class Classe(ShortUrl, CMSMixin):
 class PermissionsUserClasse(CMSMixin):
     user = models.ForeignKey(get_settings_auth_user_model(),
                              blank=True, null=True, default=None,
-                             verbose_name=_('Usuário'))
+                             verbose_name=_('Usuário'),
+                             on_delete=PROTECT)
     classe = models.ForeignKey(Classe, verbose_name=_('Classe'),
-                               related_name='permissions_user_set')
+                               related_name='permissions_user_set',
+                               on_delete=PROTECT)
     permission = models.ForeignKey(Permission,
                                    blank=True, null=True, default=None,
-                                   verbose_name=_('Permissão'))
+                                   verbose_name=_('Permissão'),
+                                   on_delete=PROTECT)
 
     def __str__(self):
         return '%s - %s' % (self.permission, self.user or '')
@@ -958,7 +969,8 @@ class Documento(ShortUrl, CMSMixin):
         Classe,
         related_name='documento_set',
         verbose_name=_('Classes'),
-        blank=True, null=True, default=None)
+        blank=True, null=True, default=None,
+        on_delete=PROTECT)
 
     tipo = models.IntegerField(
         _('Tipo da Parte do Documento'),
@@ -990,7 +1002,7 @@ class Documento(ShortUrl, CMSMixin):
         verbose_name = _('Documento')
         verbose_name_plural = _('Documentos')
         permissions = (
-            ('view_documento', _('Visualização dos Metadados do Documento.')),
+            ('view_documento_show', _('Visualização dos Metadados do Documento.')),
             ('view_documento_media',
              _('Visualização das mídias do Documento')),
         )
@@ -1242,13 +1254,16 @@ class ReferenciaEntreDocumentos(ShortUrl):
 class PermissionsUserDocumento(CMSMixin):
     user = models.ForeignKey(get_settings_auth_user_model(),
                              blank=True, null=True, default=None,
-                             verbose_name=_('Usuário'))
+                             verbose_name=_('Usuário'),
+                             on_delete=PROTECT)
     documento = models.ForeignKey(Documento,
                                   related_name='permissions_user_set',
-                                  verbose_name=_('Documento'))
+                                  verbose_name=_('Documento'),
+                                  on_delete=PROTECT)
     permission = models.ForeignKey(Permission,
                                    blank=True, null=True, default=None,
-                                   verbose_name=_('Permissão'))
+                                   verbose_name=_('Permissão'),
+                                   on_delete=PROTECT)
 
     class Meta:
         unique_together = (
@@ -1264,13 +1279,15 @@ class Midia(models.Model):
         Documento,
         blank=True, null=True, default=None,
         verbose_name=_('Documento'),
-        related_name='midia')
+        related_name='midia',
+        on_delete=PROTECT)
 
     revisao = models.OneToOneField(
         Revisao,
         blank=True, null=True, default=None,
         verbose_name=_('Revisão'),
-        related_name='midia')
+        related_name='midia',
+        on_delete=PROTECT)
 
     class Meta:
         verbose_name = _('Mídia Versionada')
@@ -1301,7 +1318,8 @@ class VersaoDeMidia(models.Model):
         editable=False, auto_now_add=True)
     owner = models.ForeignKey(
         get_settings_auth_user_model(),
-        verbose_name=_('owner'), related_name='+')
+        verbose_name=_('owner'), related_name='+',
+        on_delete=PROTECT)
 
     file = models.FileField(
         blank=True,
@@ -1317,7 +1335,8 @@ class VersaoDeMidia(models.Model):
 
     midia = models.ForeignKey(
         Midia, verbose_name=_('Mídia Versionada'),
-        related_name='versions')
+        related_name='versions',
+        on_delete=PROTECT)
 
     def delete(self, using=None, keep_parents=False):
         if self.file:
@@ -1448,7 +1467,8 @@ class CaixaPublicacao(models.Model):
         Classe,
         related_name='caixapublicacao_set',
         verbose_name=_('Classes'),
-        blank=True, null=True, default=None)
+        blank=True, null=True, default=None,
+        on_delete=PROTECT)
 
     documentos = models.ManyToManyField(
         'sigad.Documento', blank=True,

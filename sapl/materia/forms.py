@@ -10,13 +10,13 @@ from django import forms
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.files.base import File
-from django.core.urlresolvers import reverse
 from django.db import models, transaction
 from django.db.models import Max, Q, F
 from django.forms import ModelChoiceField, ModelForm, widgets
 from django.forms.forms import Form
 from django.forms.models import ModelMultipleChoiceField
 from django.forms.widgets import CheckboxSelectMultiple, HiddenInput, Select
+from django.urls.base import reverse
 from django.utils import timezone
 from django.utils.encoding import force_text
 from django.utils.html import format_html

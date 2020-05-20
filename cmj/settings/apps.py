@@ -17,7 +17,7 @@ INSTALLED_APPS = (
     'image_cropping',
 
     'rest_framework',
-    'rest_framework_recursive',
+    #'rest_framework_recursive',
 
     'django_filters',
     'reversion',

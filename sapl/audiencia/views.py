@@ -1,5 +1,6 @@
-from django.core.urlresolvers import reverse
+
 from django.http import HttpResponse
+from django.urls.base import reverse
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.generic import UpdateView
 

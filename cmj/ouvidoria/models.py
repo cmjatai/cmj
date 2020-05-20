@@ -64,7 +64,8 @@ class Solicitacao(models.Model):
 
     areatrabalho = models.ForeignKey(
         AreaTrabalho,
-        verbose_name=_('Área de Trablho'))
+        verbose_name=_('Área de Trablho'),
+        on_delete=PROTECT)
 
     tipo = models.IntegerField(
         _('Tipo de Solicitação'),
@@ -134,7 +135,8 @@ class MensagemSolicitacao(models.Model):
     owner = models.ForeignKey(
         get_settings_auth_user_model(),
         blank=True, null=True, default=None,
-        verbose_name=_('owner'), related_name='+')
+        verbose_name=_('owner'), related_name='+',
+        on_delete=PROTECT)
 
     descricao = models.TextField(
         default='',  verbose_name=_('Descrição'))
@@ -142,7 +144,8 @@ class MensagemSolicitacao(models.Model):
     solicitacao = models.ForeignKey(
         Solicitacao,
         verbose_name=_('Solicitação'),
-        related_name='mensagemsolicitacao_set')
+        related_name='mensagemsolicitacao_set',
+        on_delete=PROTECT)
 
     notificacoes = GenericRelation(
         Notificacao, related_query_name='notificacoes')

@@ -1,14 +1,14 @@
 
+from django.contrib.auth.models import Group
 from django.db import models
+from django.db.models.deletion import SET_NULL, PROTECT, CASCADE
 from django.utils.translation import ugettext_lazy as _
-from sapl.parlamentares.models import Parlamentar, Partido
 
 from cmj.core.models import CmjModelMixin, Trecho, Distrito, RegiaoMunicipal,\
     CmjAuditoriaModelMixin, CmjSearchMixin, AreaTrabalho, Bairro, Municipio
 from cmj.utils import YES_NO_CHOICES, NONE_YES_NO_CHOICES,\
     get_settings_auth_user_model
-from django.contrib.auth.models import Group
-from django.db.models.deletion import SET_NULL, PROTECT, CASCADE
+from sapl.parlamentares.models import Parlamentar, Partido
 from sapl.utils import LISTA_DE_UFS
 
 
@@ -687,7 +687,8 @@ class FiliacaoPartidaria(CmjAuditoriaModelMixin):
     data = models.DateField(verbose_name=_('Data de Filiação'))
     partido = models.ForeignKey(Partido,
                                 related_name='filiacaopartidaria_set',
-                                verbose_name=Partido._meta.verbose_name)
+                                verbose_name=Partido._meta.verbose_name,
+                                on_delete=PROTECT)
     data_desfiliacao = models.DateField(
         blank=True, null=True, verbose_name=_('Data de Desfiliação'))
 

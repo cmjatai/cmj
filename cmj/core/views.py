@@ -10,12 +10,12 @@ from django.conf.locale import ru
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.contenttypes.models import ContentType
-from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.forms.utils import ErrorList
 from django.http.response import Http404, HttpResponse
 from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
+from django.urls.base import reverse
 from django.utils import formats, timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _

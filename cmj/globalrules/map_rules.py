@@ -197,7 +197,7 @@ rules_sigad_view_status_restritos = {
         ]),
 
         (Documento, [
-            'view_documento'
+            'view_documento_show'
         ])]
 }
 

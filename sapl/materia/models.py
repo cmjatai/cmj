@@ -6,6 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields.jsonb import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
+from django.db.models.deletion import PROTECT
 from django.db.models.functions import Concat
 from django.template import defaultfilters
 from django.utils import formats, timezone
@@ -490,8 +491,8 @@ class PautaReuniao(models.Model):
     )
     materia = models.ForeignKey(
         MateriaLegislativa, related_name='materia_set',
-        verbose_name=_('Matéria')
-    )
+        verbose_name=_('Matéria'),
+        on_delete=PROTECT)
 
     class Meta:
         verbose_name = _('Matéria da Pauta')
@@ -942,7 +943,8 @@ class Proposicao(CountPageMixin):
 
     content_type = models.ForeignKey(
         ContentType, default=None, blank=True, null=True,
-        verbose_name=_('Tipo de Material Gerado'))
+        verbose_name=_('Tipo de Material Gerado'),
+        on_delete=PROTECT)
     object_id = models.PositiveIntegerField(
         blank=True, null=True, default=None)
     conteudo_gerado_related = SaplGenericForeignKey(

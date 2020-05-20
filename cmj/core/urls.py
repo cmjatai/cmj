@@ -1,6 +1,8 @@
 from django.conf.urls import url, include
 from django.contrib.auth import views as v_auth
 from django.contrib.auth.decorators import permission_required, login_required
+from django.contrib.auth.views import PasswordResetDoneView,\
+    PasswordResetConfirmView, PasswordResetCompleteView, LogoutView
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import TemplateView
 
@@ -29,25 +31,25 @@ user_urlpatterns = [
         name='recuperar_senha_email'),
 
     url(r'^user/recuperar-senha/finalizado/$',
-        v_auth.password_reset_done,
+        PasswordResetDoneView.as_view(),
         {'template_name': 'core/user/recupera_senha_email_enviado.html'},
         name='recuperar_senha_finalizado'),
 
     url(r'^user/recuperar-senha/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$',
-        v_auth.password_reset_confirm,
+        PasswordResetConfirmView.as_view(),
         {'post_reset_redirect': 'cmj.core:recuperar_senha_completo',
          'template_name': 'core/user/nova_senha_form.html',
          'set_password_form': NovaSenhaForm},
         name='recuperar_senha_confirma'),
 
     url(r'^user/recuperar-senha/completo/$',
-        v_auth.password_reset_complete,
+        PasswordResetCompleteView.as_view(),
         {'template_name': 'core/user/recuperar_senha_completo.html'},
         name='recuperar_senha_completo'),
 
     url(r'^login/$', CmjLoginView.as_view(), name='login'),
 
-    url(r'^logout/$', v_auth.logout,
+    url(r'^logout/$', LogoutView,
         {'next_page': '/'}, name='logout', ),
 
 

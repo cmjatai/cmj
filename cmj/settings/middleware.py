@@ -1,4 +1,4 @@
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'reversion.middleware.RevisionMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',

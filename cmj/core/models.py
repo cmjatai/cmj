@@ -9,7 +9,6 @@ from django.contrib.postgres.fields.jsonb import JSONField
 from django.core.exceptions import PermissionDenied
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
-from django.db.models import permalink
 from django.db.models.deletion import PROTECT, CASCADE, SET_NULL
 from django.utils import timezone
 from django.utils.decorators import classonlymethod
@@ -183,7 +182,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_display_name(self):
         return self.get_full_name() or self.email
 
-    @permalink
     def get_absolute_url(self):
         return 'users_profile', [self.pk], {}
 
@@ -366,36 +364,42 @@ class Trecho(CmjSearchMixin, CmjModelMixin):
         Logradouro,
         blank=True, null=True, default=None,
         related_name='trechos_set',
-        verbose_name=_('Logradouro'))
+        verbose_name=_('Logradouro'),
+        on_delete=PROTECT)
 
     tipo = models.ForeignKey(
         TipoLogradouro,
         blank=True, null=True, default=None,
         related_name='trechos_set',
-        verbose_name=_('Tipo de Logradouro'))
+        verbose_name=_('Tipo de Logradouro'),
+        on_delete=PROTECT)
 
     bairro = models.ForeignKey(
         Bairro,
         blank=True, null=True, default=None,
         related_name='trechos_set',
-        verbose_name=_('Bairro'))
+        verbose_name=_('Bairro'),
+        on_delete=PROTECT)
 
     distrito = models.ForeignKey(
         Distrito,
         blank=True, null=True, default=None,
         related_name='trechos_set',
-        verbose_name=_('Distrito'))
+        verbose_name=_('Distrito'),
+        on_delete=PROTECT)
 
     regiao_municipal = models.ForeignKey(
         RegiaoMunicipal,
         blank=True, null=True, default=None,
         related_name='trechos_set',
-        verbose_name=_('Região Municipal'))
+        verbose_name=_('Região Municipal'),
+        on_delete=PROTECT)
 
     municipio = models.ForeignKey(
         Municipio,
         related_name='trechos_set',
-        verbose_name=_('Município'))
+        verbose_name=_('Município'),
+        on_delete=PROTECT)
 
     LADO_CHOICES = [
         ('NA', _('Não Aplicável')),
@@ -694,7 +698,8 @@ class Notificacao(CmjModelMixin):
 
     content_type = models.ForeignKey(
         ContentType,
-        blank=True, null=True, default=None)
+        blank=True, null=True, default=None,
+        on_delete=PROTECT)
     object_id = models.PositiveIntegerField(
         blank=True, null=True, default=None)
     content_object = GenericForeignKey('content_type', 'object_id')
@@ -732,7 +737,8 @@ class OcrMyPDF(models.Model):
 
     content_type = models.ForeignKey(
         ContentType,
-        blank=True, null=True, default=None)
+        blank=True, null=True, default=None,
+        on_delete=PROTECT)
     object_id = models.PositiveIntegerField(
         blank=True, null=True, default=None)
     content_object = GenericForeignKey('content_type', 'object_id')
@@ -756,7 +762,8 @@ class OcrMyPDF(models.Model):
 
 class Bi(models.Model):
 
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType,
+                                     on_delete=PROTECT)
 
     ano = models.PositiveSmallIntegerField(
         verbose_name=_('Ano'),
@@ -780,7 +787,8 @@ class CertidaoPublicacao(CmjAuditoriaModelMixin):
 
     content_type = models.ForeignKey(
         ContentType,
-        blank=True, null=True, default=None)
+        blank=True, null=True, default=None,
+        on_delete=PROTECT)
     object_id = models.PositiveIntegerField(
         blank=True, null=True, default=None)
     content_object = GenericForeignKey('content_type', 'object_id')

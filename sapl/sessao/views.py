@@ -6,12 +6,12 @@ from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse
 from django.db.models import Max, Q
 from django.forms.utils import ErrorList
 from django.http import JsonResponse
 from django.http.response import Http404, HttpResponseRedirect
 from django.shortcuts import render
+from django.urls.base import reverse
 from django.utils import timezone
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import method_decorator

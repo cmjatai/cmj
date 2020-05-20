@@ -5,11 +5,11 @@ import logging
 from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.http.response import Http404, HttpResponseRedirect
 from django.shortcuts import render
+from django.urls.base import reverse
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
@@ -27,7 +27,9 @@ from sapl.utils import filiacao_data, get_client_ip, sort_lista_chave
 from .forms import CronometroForm, ConfiguracoesPainelForm
 from .models import Cronometro, PainelConfig
 
+
 VOTACAO_NOMINAL = 2
+
 
 class CronometroPainelCrud(CrudAux):
     model = Cronometro
@@ -124,9 +126,9 @@ def votacao_aberta(request):
         if numero_materias_abertas > 1:
             logger.info('user=' + username + '. Existe mais de uma votação aberta na Sessão: ' +
                         ('''<li><a href="%s">%s</a></li>''' % (
-                        reverse('sapl.sessao:sessaoplenaria_detail',
-                                kwargs={'pk': votacoes_abertas.first().id}),
-                        votacoes_abertas.first().__str__())))
+                            reverse('sapl.sessao:sessaoplenaria_detail',
+                                    kwargs={'pk': votacoes_abertas.first().id}),
+                            votacoes_abertas.first().__str__())))
             msg = _('Existe mais de uma votação aberta na Sessão: ' +
                     ('''<li><a href="%s">%s</a></li>''' % (
                         reverse('sapl.sessao:sessaoplenaria_detail',
@@ -139,7 +141,7 @@ def votacao_aberta(request):
     return votacoes_abertas.first(), None
 
 
-def votacao(context,context_vars):
+def votacao(context, context_vars):
     logger = logging.getLogger(__name__)
     parlamentar = context_vars['votante'].parlamentar
     parlamentar_presente = False
@@ -162,23 +164,26 @@ def votacao(context,context_vars):
 
         if voto:
             try:
-                logger.debug("Tentando obter objeto VotoParlamentar com parlamentar={}.".format(context_vars['parlamentar']))
+                logger.debug("Tentando obter objeto VotoParlamentar com parlamentar={}.".format(
+                    context_vars['parlamentar']))
                 voto = voto.get(parlamentar=context_vars['parlamentar'])
                 context.update({'voto_parlamentar': voto.voto})
             except ObjectDoesNotExist:
-                logger.error("Voto do parlamentar {} não computado.".format(context_vars['parlamentar']))
+                logger.error("Voto do parlamentar {} não computado.".format(
+                    context_vars['parlamentar']))
                 context.update(
                     {'voto_parlamentar': 'Voto não '
                      'computado.'})
     else:
         logger.error("Parlamentar com id={} não está presente na "
-                    "Ordem do Dia/Expediente em votação.".format(parlamentar.id))
+                     "Ordem do Dia/Expediente em votação.".format(parlamentar.id))
         context.update({'error_message':
                         'Você não está presente na '
                         'Ordem do Dia/Expediente em votação.'})
     return context, context_vars
 
-def sessao_votacao(context,context_vars):
+
+def sessao_votacao(context, context_vars):
     pk = context_vars['sessao'].pk
     context.update({'sessao_id': pk})
     context.update({'sessao': context_vars['sessao'],
@@ -189,9 +194,9 @@ def sessao_votacao(context,context_vars):
     presentes = []
     ordem_dia = get_materia_aberta(pk)
     expediente = get_materia_expediente_aberta(pk)
-    errors_msgs = {'materia':'Não há nenhuma matéria aberta.',
-            'registro':'A votação para esta matéria já encerrou.',
-            'tipo':'A matéria aberta não é do tipo votação nominal.'}
+    errors_msgs = {'materia': 'Não há nenhuma matéria aberta.',
+                   'registro': 'A votação para esta matéria já encerrou.',
+                   'tipo': 'A matéria aberta não é do tipo votação nominal.'}
 
     materia_aberta = None
     if ordem_dia:
@@ -206,8 +211,8 @@ def sessao_votacao(context,context_vars):
             'parlamentar_id', flat=True).distinct()
 
     context_vars.update({'ordem_dia': ordem_dia,
-                        'expediente':expediente,
-                        'presentes': presentes})
+                         'expediente': expediente,
+                         'presentes': presentes})
 
     # Verifica votação aberta
     # Se aberta, verifica se é nominal. ID nominal == 2
@@ -234,7 +239,7 @@ def can_vote(context, context_vars, request):
 
     # Pega sessão
     sessao, msg = votacao_aberta(request)
-    context_vars.update({'sessao':sessao})
+    context_vars.update({'sessao': sessao})
     if sessao and not msg:
         context, context_vars = sessao_votacao(context, context_vars)
     elif not sessao and msg:
@@ -255,14 +260,15 @@ def votante_view(request):
     context_vars = {}
 
     try:
-        logger.debug('user=' + username + '. Tentando obter objeto Votante com user={}.'.format(request.user))
+        logger.debug('user=' + username +
+                     '. Tentando obter objeto Votante com user={}.'.format(request.user))
         votante = Votante.objects.get(user=request.user)
     except ObjectDoesNotExist:
-        logger.error("user=" + username + ". Usuário (user={}) não cadastrado como votante na tela de parlamentares. " 
+        logger.error("user=" + username + ". Usuário (user={}) não cadastrado como votante na tela de parlamentares. "
                      "Contate a administração de sua Casa Legislativa!".format(request.user))
         msg = _("Usuário não cadastrado como votante na tela de parlamentares. Contate a administração de sua Casa Legislativa!")
         context.update({
-            'error_message':msg
+            'error_message': msg
         })
 
         return render(request, template_name, context)
@@ -272,9 +278,11 @@ def votante_view(request):
     # Verifica se usuário possui permissão para votar
     if 'parlamentares.can_vote' in request.user.get_all_permissions():
         context, context_vars = can_vote(context, context_vars, request)
-        logger.debug("user=" + username + ". Verificando se usuário {} possui permissão para votar.".format(request.user))
+        logger.debug("user=" + username +
+                     ". Verificando se usuário {} possui permissão para votar.".format(request.user))
     else:
-        logger.error("user=" + username + ". Usuário {} sem permissão para votar.".format(request.user))
+        logger.error("user=" + username +
+                     ". Usuário {} sem permissão para votar.".format(request.user))
         context.update({'permissao': False,
                         'error_message': 'Usuário sem permissão para votar.'})
 
@@ -343,8 +351,8 @@ def painel_view(request, pk):
         'resultado': True,
         'materia': True
     }
-    context = {'head_title': str(_('Painel Plenário')), 
-               'sessao_id': pk, 
+    context = {'head_title': str(_('Painel Plenário')),
+               'sessao_id': pk,
                'cronometros': Cronometro.objects.filter(ativo=True).order_by('ordenacao'),
                'painel_config': PainelConfig.objects.first(),
                'casa': CasaLegislativa.objects.last(),
@@ -352,21 +360,23 @@ def painel_view(request, pk):
                }
     return render(request, 'painel/index.html', context)
 
+
 def bit_is_set(number, bit):
     return (number & (1 << bit)) != 0
+
 
 @user_passes_test(check_permission)
 def painel_parcial_view(request, pk, opcoes):
     opcoes = int(opcoes)
     exibicao = {
-        'parlamentares': bit_is_set(opcoes,0),
-        'oradores': bit_is_set(opcoes,1),
+        'parlamentares': bit_is_set(opcoes, 0),
+        'oradores': bit_is_set(opcoes, 1),
         'cronometros': bit_is_set(opcoes, 2),
         'resultado': bit_is_set(opcoes, 3),
         'materia': bit_is_set(opcoes, 4)
     }
-    context = {'head_title': str(_('Painel Plenário')), 
-               'sessao_id': pk, 
+    context = {'head_title': str(_('Painel Plenário')),
+               'sessao_id': pk,
                'cronometros': Cronometro.objects.filter(ativo=True).order_by('ordenacao'),
                'painel_config': PainelConfig.objects.first(),
                'casa': CasaLegislativa.objects.last(),
@@ -401,18 +411,20 @@ def verifica_painel(request):
         'C': 'increment'
     }
 
-    dict_status_cronometros = dict(Cronometro.objects.filter(ativo=True).order_by('ordenacao').values_list('id', 'status'))
+    dict_status_cronometros = dict(Cronometro.objects.filter(
+        ativo=True).order_by('ordenacao').values_list('id', 'status'))
 
     for key, value in dict_status_cronometros.items():
         dict_status_cronometros[key] = CRONOMETRO_STATUS[dict_status_cronometros[key]]
-    
-    dict_duracao_cronometros = dict(Cronometro.objects.filter(ativo=True).order_by('ordenacao').values_list('id', 'duracao_cronometro'))
-    
+
+    dict_duracao_cronometros = dict(Cronometro.objects.filter(
+        ativo=True).order_by('ordenacao').values_list('id', 'duracao_cronometro'))
+
     for key, value in dict_duracao_cronometros.items():
         dict_duracao_cronometros[key] = value.seconds
 
-    resposta = JsonResponse(dict(status=status, 
-                                 cronometros=dict_status_cronometros, 
+    resposta = JsonResponse(dict(status=status,
+                                 cronometros=dict_status_cronometros,
                                  duracao_cronometros=dict_duracao_cronometros)
                             )
     return resposta
@@ -434,11 +446,12 @@ def painel_votacao_view(request):
 
 
 CRONOMETRO_STATUS = {
-        'start': 'I',
-        'reset': 'R',
-        'stop': 'S',
-        'increment': 'C'
+    'start': 'I',
+    'reset': 'R',
+    'stop': 'S',
+    'increment': 'C'
 }
+
 
 @user_passes_test(check_permission)
 def cronometro_painel(request):
@@ -573,18 +586,23 @@ def get_votos(response, materia):
                 votos_parlamentares = VotoParlamentar.objects.filter(
                     expediente_id=materia.id).order_by(
                         'parlamentar__nome_parlamentar')
-            
+
             if PainelConfig.attr('mostrar_votos_antecedencia'):
-                response['numero_votos_sim'] = votos_parlamentares.filter(voto="Sim").count()
-                response['numero_votos_nao'] = votos_parlamentares.filter(voto="Não").count()
-                response['numero_abstencoes'] = votos_parlamentares.filter(voto="Abstenção").count()
+                response['numero_votos_sim'] = votos_parlamentares.filter(
+                    voto="Sim").count()
+                response['numero_votos_nao'] = votos_parlamentares.filter(
+                    voto="Não").count()
+                response['numero_abstencoes'] = votos_parlamentares.filter(
+                    voto="Abstenção").count()
                 response['total_votos'] = response['numero_votos_sim'] + response['numero_votos_nao'] + \
-                                          response['numero_abstencoes']
+                    response['numero_abstencoes']
 
             for i, p in enumerate(response['presentes']):
                 try:
-                    logger.info("Tentando obter votos do parlamentar (id={}).".format(p['parlamentar_id']))
-                    vot_parl = votos_parlamentares.get(parlamentar_id=p['parlamentar_id']).voto
+                    logger.info("Tentando obter votos do parlamentar (id={}).".format(
+                        p['parlamentar_id']))
+                    vot_parl = votos_parlamentares.get(
+                        parlamentar_id=p['parlamentar_id']).voto
                     if vot_parl:
                         response['presentes'][i]['voto'] = vot_parl
                     else:
@@ -606,11 +624,13 @@ def get_votos(response, materia):
 
             for i, p in enumerate(response['presentes']):
                 try:
-                    logger.debug("Tentando obter votos do parlamentar (id={}).".format(p['parlamentar_id']))
+                    logger.debug("Tentando obter votos do parlamentar (id={}).".format(
+                        p['parlamentar_id']))
                     response['presentes'][i]['voto'] = votos_parlamentares.get(
                         parlamentar_id=p['parlamentar_id']).voto
                 except ObjectDoesNotExist:
-                    logger.error("Votos do parlamentar (id={}) não encontrados. Retornado None.".format(p['parlamentar_id']))
+                    logger.error("Votos do parlamentar (id={}) não encontrados. Retornado None.".format(
+                        p['parlamentar_id']))
                     response['presentes'][i]['voto'] = None
 
         response.update({
@@ -637,7 +657,7 @@ def get_dados_painel(request, pk):
     if casa and app_config and (bool(casa.logotipo)):
         brasao = casa.logotipo.url \
             if app_config.mostrar_brasao_painel else None
-    
+
     CRONOMETRO_STATUS = {
         'I': 'start',
         'R': 'reset',
@@ -645,13 +665,15 @@ def get_dados_painel(request, pk):
         'C': 'increment'
     }
 
-    dict_status_cronometros = dict(Cronometro.objects.filter(ativo=True).order_by('ordenacao').values_list('id', 'status'))
+    dict_status_cronometros = dict(Cronometro.objects.filter(
+        ativo=True).order_by('ordenacao').values_list('id', 'status'))
 
     for key, value in dict_status_cronometros.items():
         dict_status_cronometros[key] = CRONOMETRO_STATUS[dict_status_cronometros[key]]
-    
-    dict_duracao_cronometros = dict(Cronometro.objects.filter(ativo=True).order_by('ordenacao').values_list('id', 'duracao_cronometro'))
-    
+
+    dict_duracao_cronometros = dict(Cronometro.objects.filter(
+        ativo=True).order_by('ordenacao').values_list('id', 'duracao_cronometro'))
+
     for key, value in dict_duracao_cronometros.items():
         dict_duracao_cronometros[key] = value.seconds
 
