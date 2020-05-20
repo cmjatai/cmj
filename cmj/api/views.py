@@ -50,7 +50,7 @@ class DocumentoViewSet(viewsets.ModelViewSet):
 
     def dispatch(self, request, *args, **kwargs):
         # FIXME
-        if self.request.user.is_anonymous():
+        if self.request.user.is_anonymous:
             self.serializer_class = DocumentoUserAnonymousSerializer
             self.permission_classes = (IsAuthenticatedOrReadOnly, )
             self.queryset = Documento.objects.qs_docs()

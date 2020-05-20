@@ -56,7 +56,7 @@ class CmjSearchForm(ModelSearchForm):
                 if not self.workspaces:
                     choices[i] = (None, None)
                 else:
-                    if not self.user.is_anonymous() and \
+                    if not self.user.is_anonymous and \
                             self.user.areatrabalho_set.exists() and \
                             not self.user.has_perm('protocoloadm.list_documentoadministrativo'):
 
@@ -120,7 +120,7 @@ class CmjSearchView(SearchView):
             'user': user
         }
 
-        if not user.is_anonymous() and user.areatrabalho_set.exists():
+        if not user.is_anonymous and user.areatrabalho_set.exists():
 
             at = user.areatrabalho_set.all()
             #.union(

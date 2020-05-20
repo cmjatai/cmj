@@ -1075,7 +1075,7 @@ class PainelView(PermissionRequiredForAppCrudMixin, TemplateView):
     logger = logging.getLogger(__name__)
 
     def get(self, request, *args, **kwargs):
-        if request.user.is_anonymous():
+        if request.user.is_anonymous:
             self.template_name = 'painel/index.html'
 
         cronometros = Cronometro.objects.filter(

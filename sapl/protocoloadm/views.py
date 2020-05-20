@@ -99,7 +99,7 @@ def recuperar_materia_protocolo(request):
 
 
 def atualizar_numero_documento(request):
-    if request.user.is_anonymous():
+    if request.user.is_anonymous:
         raise Http404()
     tipo = TipoDocumentoAdministrativo.objects.get(pk=request.GET['tipo'])
     ano = request.GET['ano']
@@ -189,7 +189,7 @@ class DocumentoAdministrativoCrud(Crud):
                 crud.container_field: self.request.user
             }
 
-            if u.is_anonymous() or not u.areatrabalho_set.exists():
+            if u.is_anonymous or not u.areatrabalho_set.exists():
                 qs = qs.filter(**param_tip_pub)
             else:
                 if u.has_perms(self.permission_required):
@@ -326,7 +326,7 @@ class DocumentoAdministrativoCrud(Crud):
             kwargs.update({
                 'queryset': qs,
                 'workspace': AreaTrabalho.objects.areatrabalho_publica(
-                ).first() if self.request.user.is_anonymous() or
+                ).first() if self.request.user.is_anonymous or
                 not self.request.user.has_perms(self.permission_required)
                 or not self.request.user.areatrabalho_set.exists()
                 else self.request.user.areatrabalho_set.first()
@@ -449,7 +449,7 @@ class DocumentoAcessorioAdministrativoCrud(MasterDetailCrud):
 
             u = self.request.user
 
-            if u.is_anonymous():
+            if u.is_anonymous:
                 if dp.workspace.tipo != AreaTrabalho.TIPO_PUBLICO:
                     raise Http404
             else:
@@ -498,7 +498,7 @@ class DocumentoAcessorioAdministrativoCrud(MasterDetailCrud):
 
             u = self.request.user
 
-            if u.is_anonymous():
+            if u.is_anonymous:
                 if dp.workspace.tipo != AreaTrabalho.TIPO_PUBLICO:
                     raise Http404
             else:
@@ -594,7 +594,7 @@ class AnexadoCrud(MasterDetailCrud):
 
             u = self.request.user
 
-            if u.is_anonymous():
+            if u.is_anonymous:
                 if dp.workspace.tipo != AreaTrabalho.TIPO_PUBLICO:
                     raise Http404
             else:
@@ -643,7 +643,7 @@ class AnexadoCrud(MasterDetailCrud):
 
             u = self.request.user
 
-            if u.is_anonymous():
+            if u.is_anonymous:
                 if dp.workspace.tipo != AreaTrabalho.TIPO_PUBLICO:
                     raise Http404
             else:
@@ -966,7 +966,7 @@ class TramitacaoAdmCrud(MasterDetailCrud):
 
             u = self.request.user
 
-            if u.is_anonymous():
+            if u.is_anonymous:
                 if dp.workspace.tipo != AreaTrabalho.TIPO_PUBLICO:
                     raise Http404
             else:
@@ -1014,7 +1014,7 @@ class TramitacaoAdmCrud(MasterDetailCrud):
 
             u = self.request.user
 
-            if u.is_anonymous():
+            if u.is_anonymous:
                 if dp.workspace.tipo != AreaTrabalho.TIPO_PUBLICO:
                     raise Http404
             else:

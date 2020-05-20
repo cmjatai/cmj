@@ -404,7 +404,7 @@ class ControlAccessFileForContainerMixin(ResponseFileMixin):
             self.container_field: u
         }
 
-        if u.is_anonymous() or not u.areatrabalho_set.exists():
+        if u.is_anonymous or not u.areatrabalho_set.exists():
             qs = qs.filter(**param_tip_pub)
         else:
             if u.has_perms(self.permission_required):
@@ -636,7 +636,7 @@ class _ProposicaoViewSet(ResponseFileMixin):
 
         # se usuário anônimo, pode ver apenas proposições recebidas
         q = Q(data_recebimento__isnull=False, object_id__isnull=False)
-        if not self.request.user.is_anonymous():
+        if not self.request.user.is_anonymous:
 
             autor_do_usuario_logado = self.request.user.autor_set.first()
 

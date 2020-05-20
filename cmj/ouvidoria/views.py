@@ -247,7 +247,7 @@ class SolicitacaoMensagemAnexoView(PermissionRequiredMixin, DetailView):
 
     def has_permission(self):
 
-        if self.request.user.is_anonymous() and \
+        if self.request.user.is_anonymous and \
                 self.object.solicitacao.hash_code and\
                 self.kwargs.get('hash', '') == self.object.solicitacao.hash_code:
             return True
@@ -281,7 +281,7 @@ class SolicitacaoInteractionView(PermissionRequiredMixin, FormView):
 
     def has_permission(self):
 
-        if self.request.user.is_anonymous() and \
+        if self.request.user.is_anonymous and \
                 self.object.hash_code and\
                 self.kwargs.get('hash', '') == self.object.hash_code:
             return True
@@ -300,7 +300,7 @@ class SolicitacaoInteractionView(PermissionRequiredMixin, FormView):
     def get_initial(self):
         u = self.request.user
         initial = FormView.get_initial(self)
-        initial.update({'owner': None if u.is_anonymous() else u})
+        initial.update({'owner': None if u.is_anonymous else u})
         initial.update({'solicitacao': self.object})
 
         return initial
@@ -310,7 +310,7 @@ class SolicitacaoInteractionView(PermissionRequiredMixin, FormView):
         context = FormView.get_context_data(self, **kwargs)
         context['solicitacao'] = self.object
 
-        if not self.request.user.is_anonymous():
+        if not self.request.user.is_anonymous:
             self.object.notificacoes.filter(
                 user=self.request.user).update(read=True)
 
@@ -326,7 +326,7 @@ class SolicitacaoInteractionView(PermissionRequiredMixin, FormView):
     def get_success_url(self):
         return reverse_lazy(
             'cmj.ouvidoria:solicitacao_interact{}'.format(
-                '_hash' if self.request.user.is_anonymous() else ''
+                '_hash' if self.request.user.is_anonymous else ''
             ), kwargs=self.kwargs)
 
     def form_valid(self, form):
