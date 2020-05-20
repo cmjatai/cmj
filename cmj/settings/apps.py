@@ -26,11 +26,11 @@ INSTALLED_APPS = (
     'django_celery_results',
     'haystack',
     'celery_haystack',
-    'whoosh',
-    'speedinfo',
+    #'whoosh',
+    #'speedinfo',
 
 
-    'taggit',
+    #'taggit',
     'webpack_loader',
 
     'channels',
