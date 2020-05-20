@@ -2,8 +2,8 @@
 from braces.views import FormMessagesMixin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.views import LoginView, PasswordResetView
-from django.core.urlresolvers import reverse, reverse_lazy
 from django.db.models import Q
+from django.urls.base import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.edit import FormView, UpdateView
 

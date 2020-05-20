@@ -6,13 +6,13 @@ from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
-from django.core.urlresolvers import reverse, reverse_lazy
 from django.db.models import F, Q
 from django.db.models.aggregates import Count
 from django.http import JsonResponse
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.templatetags.static import static
+from django.urls.base import reverse_lazy, reverse
 from django.utils import timezone
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.translation import ugettext_lazy as _
@@ -37,12 +37,12 @@ from .forms import (FiliacaoForm, FrenteForm, LegislaturaForm, MandatoForm,
                     ParlamentarFilterSet, VincularParlamentarForm,
                     BlocoForm, CargoBlocoForm, CargoBlocoPartidoForm,
                     BancadaForm, AfastamentoParlamentarForm)
-
 from .models import (Bancada, CargoBancada, CargoMesa, Coligacao, ComposicaoColigacao, ComposicaoMesa,
                      Dependente, Filiacao, Frente, Legislatura, Mandato,
                      NivelInstrucao, Parlamentar, Partido, SessaoLegislativa,
                      SituacaoMilitar, TipoAfastamento, TipoDependente, Votante,
                      Bloco, CargoBlocoPartido, HistoricoPartido, CargoBloco, AfastamentoParlamentar)
+
 
 CargoBancadaCrud = CrudAux.build(CargoBancada, '')
 CargoMesaCrud = CrudAux.build(CargoMesa, 'cargo_mesa')

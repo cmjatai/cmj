@@ -12,16 +12,16 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.core.signing import Signer
-from django.core.urlresolvers import reverse, reverse_lazy
 from django.db import transaction
 from django.db.models import Q
 from django.db.models.query import QuerySet
 from django.http.response import (HttpResponse, HttpResponseRedirect,
                                   JsonResponse, Http404)
 from django.shortcuts import get_object_or_404, redirect
+from django.urls.base import reverse_lazy, reverse
 from django.utils.dateparse import parse_date
 from django.utils.encoding import force_text
-from django.utils.translation import string_concat
+from django.utils.text import format_lazy
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
@@ -122,10 +122,10 @@ class IntegracaoTaView(TemplateView):
 
         except Exception as e:
             print(
-                string_concat(
-                    _('Ocorreu erro na importação do arquivo base dos Tipos de'
-                      'Dispositivos, entre outras informações iniciais.'),
-                    str(e)))
+                format_lazy('{} {} {}',
+                            _('Ocorreu erro na importação do arquivo base dos Tipos de'
+                              'Dispositivos, entre outras informações iniciais.'),
+                            str(e)))
             return self.get_redirect_deactivated()
 
         assert hasattr(self, 'map_fields'), _(
@@ -1906,24 +1906,24 @@ class ActionDispositivoCreateMixin(ActionsCommonsMixin):
             base = Dispositivo.objects.get(
                 pk=self.kwargs['dispositivo_id'] if not _base else _base)
 
-            result = [{'tipo_insert': force_text(string_concat(
-                _('Inserir Após'),
-                ' ',
-                base.tipo_dispositivo.nome)),
-                'icone': '&#8631;&nbsp;',
-                'action': 'json_add_next',
-                'itens': []},
-                {'tipo_insert': force_text(string_concat(
-                    _('Inserir em'),
-                    ' ',
-                    base.tipo_dispositivo.nome)),
-                 'icone': '&#8690;&nbsp;',
-                 'action': 'json_add_in',
-                 'itens': []},
-                {'tipo_insert': force_text(_('Inserir Antes')),
-                 'icone': '&#8630;&nbsp;',
-                 'action': 'json_add_prior',
-                 'itens': []}]
+            result = [{'tipo_insert': force_text(
+                format_lazy('{} {}',
+                            _('Inserir Após'),
+                            base.tipo_dispositivo.nome)),
+                       'icone': '&#8631;&nbsp;',
+                       'action': 'json_add_next',
+                       'itens': []},
+                      {'tipo_insert': force_text(
+                          format_lazy('{} {}',
+                                      _('Inserir em'),
+                                      base.tipo_dispositivo.nome)),
+                       'icone': '&#8690;&nbsp;',
+                       'action': 'json_add_in',
+                       'itens': []},
+                      {'tipo_insert': force_text(_('Inserir Antes')),
+                       'icone': '&#8630;&nbsp;',
+                       'action': 'json_add_prior',
+                       'itens': []}]
 
             perfil_pk = request.session['perfil_estrutural']
 

@@ -6,11 +6,11 @@ from django.conf.urls import url
 from django.contrib.auth import logout
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.db.models.base import Model
 from django.http.response import Http404
 from django.shortcuts import redirect
+from django.urls.base import reverse
 from django.utils import six
 from django.utils.datastructures import OrderedSet
 from django.utils.decorators import classonlymethod

@@ -4,7 +4,7 @@ from crispy_forms.bootstrap import FormActions
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import HTML, Div, Fieldset, Layout, Submit
 from django import template
-from django.core.urlresolvers import reverse, reverse_lazy
+from django.urls.base import reverse
 from django.utils import formats
 from django.utils.translation import ugettext as _
 import rtyaml

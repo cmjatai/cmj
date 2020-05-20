@@ -10,7 +10,6 @@ from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
-from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.db.models import Max, Q
 from django.db.models.fields.related import ForeignKey, ManyToManyField
@@ -18,6 +17,7 @@ from django.http import Http404, HttpResponse, JsonResponse
 from django.http.response import HttpResponseRedirect, Http404
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
+from django.urls.base import reverse
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import ListView, CreateView, UpdateView

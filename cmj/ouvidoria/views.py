@@ -4,9 +4,9 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.views import LoginView
-from django.core.urlresolvers import reverse, reverse_lazy
 from django.http.response import Http404, HttpResponse
 from django.shortcuts import redirect
+from django.urls.base import reverse_lazy
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _

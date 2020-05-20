@@ -200,7 +200,8 @@ class TextoArticulado(TimestampedMixin):
     tipo_ta = models.ForeignKey(
         TipoTextoArticulado,
         blank=True, null=True, default=None,
-        verbose_name=_('Tipo de Texto Articulado'))
+        verbose_name=_('Tipo de Texto Articulado'),
+        on_delete=PROTECT)
     participacao_social = models.NullBooleanField(
         default=None,
         blank=True, null=True,
@@ -209,7 +210,8 @@ class TextoArticulado(TimestampedMixin):
 
     content_type = models.ForeignKey(
         ContentType,
-        blank=True, null=True, default=None)
+        blank=True, null=True, default=None,
+        on_delete=PROTECT)
     object_id = models.PositiveIntegerField(
         blank=True, null=True, default=None)
     content_object = GenericForeignKey('content_type', 'object_id')
@@ -782,11 +784,14 @@ class TipoDispositivo(BaseModel):
 
 @reversion.register()
 class TipoDispositivoRelationship(BaseModel):
-    pai = models.ForeignKey(TipoDispositivo, related_name='filhos_permitidos')
+    pai = models.ForeignKey(TipoDispositivo, related_name='filhos_permitidos',
+                            on_delete=PROTECT)
     filho_permitido = models.ForeignKey(
         TipoDispositivo,
-        related_name='possiveis_pais')
-    perfil = models.ForeignKey(PerfilEstruturalTextoArticulado)
+        related_name='possiveis_pais',
+        on_delete=PROTECT)
+    perfil = models.ForeignKey(PerfilEstruturalTextoArticulado,
+                               on_delete=PROTECT)
     filho_de_insercao_automatica = models.BooleanField(
         default=False,
         choices=YES_NO_CHOICES,
@@ -844,11 +849,14 @@ class VeiculoPublicacao(models.Model):
 @reversion.register()
 class Publicacao(TimestampedMixin):
     ta = models.ForeignKey(
-        TextoArticulado, verbose_name=_('Texto Articulado'))
+        TextoArticulado, verbose_name=_('Texto Articulado'),
+        on_delete=PROTECT)
     veiculo_publicacao = models.ForeignKey(
-        VeiculoPublicacao, verbose_name=_('Veículo de Publicação'))
+        VeiculoPublicacao, verbose_name=_('Veículo de Publicação'),
+        on_delete=PROTECT)
     tipo_publicacao = models.ForeignKey(
-        TipoPublicacao, verbose_name=_('Tipo de Publicação'))
+        TipoPublicacao, verbose_name=_('Tipo de Publicação'),
+        on_delete=PROTECT)
 
     data = models.DateField(verbose_name=_('Data de Publicação'))
     hora = models.TimeField(
@@ -980,7 +988,8 @@ class Dispositivo(BaseModel, TimestampedMixin):
 
     publicacao = models.ForeignKey(
         Publicacao,
-        blank=True, null=True, default=None, verbose_name=_('Publicação'))
+        blank=True, null=True, default=None, verbose_name=_('Publicação'),
+        on_delete=PROTECT)
 
     ta = models.ForeignKey(
         TextoArticulado,
@@ -1010,12 +1019,14 @@ class Dispositivo(BaseModel, TimestampedMixin):
         'self',
         blank=True, null=True, default=None,
         related_name='dispositivos_filhos_set',
-        verbose_name=_('Dispositivo Pai'))
+        verbose_name=_('Dispositivo Pai'),
+        on_delete=PROTECT)
     dispositivo_raiz = models.ForeignKey(
         'self',
         blank=True, null=True, default=None,
         related_name='nodes',
-        verbose_name=_('Dispositivo Raiz'))
+        verbose_name=_('Dispositivo Raiz'),
+        on_delete=PROTECT)
     dispositivo_vigencia = models.ForeignKey(
         'self',
         blank=True, null=True, default=None,
@@ -1026,7 +1037,8 @@ class Dispositivo(BaseModel, TimestampedMixin):
         'self',
         blank=True, null=True, default=None,
         related_name='dispositivos_alterados_set',
-        verbose_name=_('Dispositivo Atualizador'))
+        verbose_name=_('Dispositivo Atualizador'),
+        on_delete=PROTECT)
 
     contagem_continua = models.BooleanField(
         default=False,
@@ -1747,16 +1759,19 @@ class Dispositivo(BaseModel, TimestampedMixin):
 class Vide(TimestampedMixin):
     texto = models.TextField(verbose_name=_('Texto do Vide'))
 
-    tipo = models.ForeignKey(TipoVide, verbose_name=_('Tipo do Vide'))
+    tipo = models.ForeignKey(TipoVide, verbose_name=_('Tipo do Vide'),
+                             on_delete=PROTECT)
 
     dispositivo_base = models.ForeignKey(
         Dispositivo,
         verbose_name=_('Dispositivo Base'),
-        related_name='dispositivo_base_set')
+        related_name='dispositivo_base_set',
+        on_delete=PROTECT)
     dispositivo_ref = models.ForeignKey(
         Dispositivo,
         related_name='dispositivo_citado_set',
-        verbose_name=_('Dispositivo Referido'))
+        verbose_name=_('Dispositivo Referido'),
+        on_delete=PROTECT)
 
     class Meta:
         verbose_name = _('Vide')
@@ -1801,14 +1816,17 @@ class Nota(TimestampedMixin):
     publicacao = models.DateTimeField(verbose_name=_('Data de Publicação'))
     efetividade = models.DateTimeField(verbose_name=_('Data de Efeito'))
 
-    tipo = models.ForeignKey(TipoNota, verbose_name=_('Tipo da Nota'))
+    tipo = models.ForeignKey(TipoNota, verbose_name=_('Tipo da Nota'),
+                             on_delete=PROTECT)
     dispositivo = models.ForeignKey(
         Dispositivo,
         verbose_name=_('Dispositivo da Nota'),
-        related_name='dispositivo_nota_set')
+        related_name='dispositivo_nota_set',
+        on_delete=PROTECT)
 
     owner = models.ForeignKey(
-        get_settings_auth_user_model(), verbose_name=_('Dono da Nota'))
+        get_settings_auth_user_model(), verbose_name=_('Dono da Nota'),
+        on_delete=PROTECT)
     publicidade = models.PositiveSmallIntegerField(
         choices=NOTAS_PUBLICIDADE_CHOICES,
         verbose_name=_('Nível de Publicidade'))

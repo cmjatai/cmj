@@ -17,15 +17,12 @@ from django.db import models, transaction
 from django.db.models import Q
 from django.forms import Form, ModelForm
 from django.utils import timezone
-from django.utils.translation import string_concat
 from django.utils.translation import ugettext_lazy as _
 import django_filters
 
-from sapl.audiencia.models import AudienciaPublica, TipoAudienciaPublica
-from sapl.audiencia.models import AudienciaPublica, TipoAudienciaPublica
+from sapl.audiencia.models import AudienciaPublica
 from sapl.base.models import Autor, TipoAutor, OperadorAutor
-from sapl.comissoes.models import Reuniao, Comissao
-from sapl.comissoes.models import Reuniao, Comissao
+from sapl.comissoes.models import Reuniao
 from sapl.crispy_layout_mixin import (SaplFormLayout, form_actions, to_column,
                                       to_row)
 from sapl.crispy_layout_mixin import SaplFormHelper

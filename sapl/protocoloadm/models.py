@@ -128,7 +128,8 @@ class Protocolo(models.Model):
     tipo_content_type = models.ForeignKey(
         ContentType, default=None, blank=True, null=True,
         verbose_name=_('Tipo de Material Gerado'),
-        related_name='tipo_content_type_set')
+        related_name='tipo_content_type_set',
+        on_delete=PROTECT)
     tipo_object_id = models.PositiveIntegerField(
         blank=True, null=True, default=None)
     tipo_conteudo_protocolado = SaplGenericForeignKey(
@@ -137,7 +138,8 @@ class Protocolo(models.Model):
     conteudo_content_type = models.ForeignKey(
         ContentType, default=None, blank=True, null=True,
         verbose_name=_('Tipo de Material Gerado'),
-        related_name='conteudo_content_type_set')
+        related_name='conteudo_content_type_set',
+        on_delete=PROTECT)
     conteudo_object_id = models.PositiveIntegerField(
         blank=True, null=True, default=None)
     conteudo_protocolado = SaplGenericForeignKey(

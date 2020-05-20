@@ -3,7 +3,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields.jsonb import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
-from django.db.models.deletion import CASCADE
+from django.db.models.deletion import CASCADE, PROTECT
 from django.utils.translation import ugettext_lazy as _
 import reversion
 
@@ -195,7 +195,8 @@ class TipoAutor(models.Model):
     content_type = models.OneToOneField(
         ContentType,
         null=True, default=None,
-        verbose_name=_('Modelagem no SAPL'))
+        verbose_name=_('Modelagem no SAPL'),
+        on_delete=PROTECT)
 
     class Meta:
         ordering = ['descricao']
@@ -222,7 +223,8 @@ class Autor(models.Model):
 
     content_type = models.ForeignKey(
         ContentType,
-        blank=True, null=True, default=None)
+        blank=True, null=True, default=None,
+        on_delete=PROTECT)
     object_id = models.PositiveIntegerField(
         blank=True, null=True, default=None)
     autor_related = GenericForeignKey('content_type', 'object_id')

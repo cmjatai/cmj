@@ -11,7 +11,9 @@ from django.db import models, router
 from django.db.models.signals import post_save, post_delete, post_migrate
 from django.db.utils import DEFAULT_DB_ALIAS
 from django.dispatch.dispatcher import receiver
-from django.utils.translation import ugettext_lazy as _, string_concat
+from django.utils.text import format_lazy
+from django.utils.translation import ugettext_lazy as _
+
 from sapl.rules.apps import send_signal_for_websocket_time_refresh
 
 
@@ -68,9 +70,11 @@ def update_groups_cmj(app_config, verbosity=2, interactive=True,
 
         def update_groups(self):
             print('')
-            print(string_concat('\033[93m\033[1m',
-                                _('Atualizando grupos do Portal CMJ:'),
-                                '\033[0m'))
+            print(
+                format_lazy(
+                    '{}{}{}', '\033[93m\033[1m',
+                    _('Atualizando grupos do Portal CMJ:'),
+                    '\033[0m'))
             for rules_group in self.rules_patterns:
                 group_name = rules_group['group']
                 rules_list = rules_group['rules']

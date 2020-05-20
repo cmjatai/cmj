@@ -4,7 +4,6 @@ import re
 from unicodedata import normalize as unicodedata_normalize
 
 from PyPDF4.pdf import PdfFileReader
-from asn1crypto import cms
 from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
@@ -20,6 +19,8 @@ import magic
 from model_utils.choices import Choices
 from reversion.admin import VersionAdmin
 from unipath.path import Path
+
+from asn1crypto import cms
 
 
 def pil_image(source, exif_orientation=False, **options):

@@ -5,10 +5,10 @@ from django.urls.base import reverse
 from django.utils.translation import ugettext_lazy as _
 from floppyforms import ClearableFileInput
 from model_utils.choices import Choices
-from pdfrw.pdfreader import PdfReader
 from social_core.backends.facebook import FacebookOAuth2
 
 from cmj.utils import run_sql, get_settings_auth_user_model
+from pdfrw.pdfreader import PdfReader
 
 
 class FacebookOAuth2(FacebookOAuth2):

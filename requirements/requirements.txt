@@ -14,7 +14,7 @@ django-webpack4-loader
 
 djangorestframework==3.11.0
 drf_yasg==1.17.0
-
+asn1crypto
 billiard==3.6.3.0
 celery==4.4.2
 celery-haystack==0.10
@@ -27,6 +27,7 @@ easy-thumbnails==2.7.0
 
 gunicorn==20.0.4
 kombu==4.6.8
+pdfrw
 Pillow==7.1.2
 psycopg2-binary==2.8.5
 pyoai==2.5.0

@@ -16,12 +16,12 @@ from django.contrib.auth.decorators import permission_required, login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, ValidationError,\
     PermissionDenied
-from django.core.urlresolvers import reverse
 from django.db.models import Max, Q
 from django.http import HttpResponse, JsonResponse
 from django.http.response import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.template import RequestContext, loader
+from django.urls.base import reverse
 from django.utils import formats, timezone
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import ListView, TemplateView, CreateView, UpdateView

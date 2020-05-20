@@ -12,7 +12,6 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.tokens import default_token_generator
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, ValidationError
 from django.core.mail import send_mail
-from django.core.urlresolvers import reverse, reverse_lazy
 from django.db import connection
 from django.db.models import Count, Q, ProtectedError
 from django.forms.utils import ErrorList
@@ -20,11 +19,12 @@ from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
+from django.urls.base import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.safestring import mark_safe
-from django.utils.translation import string_concat
+from django.utils.text import format_lazy
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import (CreateView, DeleteView, FormView, ListView,
                                   UpdateView)
@@ -135,7 +135,8 @@ class TipoAutorCrud(CrudAux):
         @property
         def verbose_name(self):
             vn = super().verbose_name
-            vn = string_concat(vn, ' ', _('Externo ao SAPL'))
+            vn = format_lazy(
+                '{} {}', vn, _('Externo ao SAPL'))
             return vn
 
     class ListView(CrudAux.ListView):
@@ -2012,28 +2013,6 @@ class SaplSearchView(SearchView):
             context['models'] = context['models'] + '&models=' + m
 
         return context
-
-
-class AlterarSenha(FormView):
-    from sapl.settings import LOGIN_URL
-
-    form_class = AlterarSenhaForm
-    template_name = 'base/alterar_senha.html'
-    success_url = LOGIN_URL
-
-    def get_initial(self):
-        initial = super(AlterarSenha, self).get_initial()
-        initial['username'] = self.request.user
-        return initial
-
-    def form_valid(self, form):
-        new_password = form.cleaned_data['new_password1']
-
-        user = self.request.user
-        user.set_password(new_password)
-        user.save()
-
-        return super().form_valid(form)
 
 
 STATIC_LOGO = os.path.join(settings.STATIC_URL, 'img/logo.png')
