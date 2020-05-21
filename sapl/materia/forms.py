@@ -1,4 +1,5 @@
 
+from distutils.command.clean import clean
 import logging
 import os
 
@@ -191,8 +192,13 @@ class MateriaLegislativaForm(FileFieldCheckMixin, ModelForm):
                                                         widget=forms.HiddenInput())
             self.fields['autor'] = forms.CharField(required=False,
                                                    widget=forms.HiddenInput())
-            if kwargs['instance'].numero_protocolo and Protocolo.objects.filter(numero=kwargs['instance'].numero_protocolo, ano=kwargs['instance'].ano).exists():
-                self.fields['numero_protocolo'].widget.attrs['readonly'] = True
+
+            p = Protocolo.objects.filter(
+                numero=kwargs['instance'].numero_protocolo, ano=kwargs['instance'].ano)
+            if kwargs['instance'].numero_protocolo and p.exists():
+                if not kwargs['initial']['user'].is_superuser:
+                    self.fields['numero_protocolo'].widget.attrs['readonly'] = True
+                self.fields['numero_protocolo'].help_text = p[0].epigrafe
 
     def clean(self):
         super(MateriaLegislativaForm, self).clean()
@@ -208,35 +214,35 @@ class MateriaLegislativaForm(FileFieldCheckMixin, ModelForm):
         protocolo_antigo = self.instance.numero_protocolo
 
         if protocolo:
-            if not Protocolo.objects.filter(numero=protocolo, ano=ano).exists():
+            pn = Protocolo.objects.filter(numero=protocolo, ano=ano)
+            if not pn.exists():
                 self.logger.error("Protocolo %s/%s não"
-                                  " existe" % (protocolo, ano))
+                                  " existe." % (protocolo, ano))
                 raise ValidationError(_('Protocolo %s/%s não'
                                         ' existe' % (protocolo, ano)))
 
-            if protocolo_antigo != protocolo:
-                exist_materia = MateriaLegislativa.objects.filter(
-                    numero_protocolo=protocolo,
-                    ano=ano).exists()
-
-                exist_doc = DocumentoAdministrativo.objects.filter(
-                    protocolo_id=protocolo,
-                    ano=ano).exists()
-
-                if exist_materia or exist_doc:
+            if not cleaned_data['user'].is_superuser:
+                if pn.first().conteudo_protocolado and \
+                        pn.first().conteudo_protocolado != self.instance:
                     self.logger.error("Protocolo %s/%s ja possui"
-                                      " documento vinculado"
+                                      " documento vinculado."
                                       % (protocolo, ano))
                     raise ValidationError(_('Protocolo %s/%s ja possui'
-                                            ' documento vinculado'
-                                            % (protocolo, ano)))
+                                            ' documento vinculado - %s.'
+                                            % (protocolo, ano, pn.first().conteudo_protocolado)))
 
-                p = Protocolo.objects.get(numero=protocolo, ano=ano)
-                if p.tipo_materia != cleaned_data['tipo']:
+                if pn.first().tipo_conteudo_protocolado != cleaned_data['tipo']:
                     self.logger.error("Tipo do Protocolo ({}) deve ser o mesmo do Tipo Matéria ({})."
-                                      .format(cleaned_data['tipo'], p.tipo_materia))
+                                      .format(cleaned_data['tipo'], pn.first().tipo_conteudo_protocolado))
                     raise ValidationError(
-                        _('Tipo do Protocolo deve ser o mesmo do Tipo Matéria'))
+                        _('Tipo do Protocolo deve ser o mesmo do Tipo de Matéria'))
+
+        elif protocolo_antigo and not protocolo:
+            if not cleaned_data['user'].is_superuser:
+                self.logger.error(
+                    "Usuário não possui permissão para desvincular protocolo via edição de matéria")
+                raise ValidationError(
+                    _('Usuário não possui permissão para desvincular protocolo via edição de matéria'))
 
         ano_origem_externa = cleaned_data['ano_origem_externa']
         data_origem_externa = cleaned_data['data_origem_externa']
@@ -259,13 +265,33 @@ class MateriaLegislativaForm(FileFieldCheckMixin, ModelForm):
         return cleaned_data
 
     def save(self, commit=False):
+        iold = None
         if not self.instance.pk:
             primeiro_autor = True
         else:
             primeiro_autor = False
+            iold = MateriaLegislativa.objects.get(pk=self.instance.pk)
+
+        ano = self.cleaned_data['ano']
+        protocolo = self.cleaned_data['numero_protocolo']
+        ano_antigo = iold.ano if iold else 0
+        protocolo_antigo = iold.numero_protocolo if iold else 0
 
         materia = super(MateriaLegislativaForm, self).save(commit)
         materia.save()
+
+        if protocolo:
+            pn = Protocolo.objects.filter(numero=protocolo, ano=ano).first()
+            pn.conteudo_protocolado = materia
+            pn.tipo_conteudo_protocolado = materia.tipo
+            pn.save()
+
+        if protocolo_antigo and protocolo != protocolo_antigo:
+            po = Protocolo.objects.filter(
+                numero=protocolo_antigo, ano=ano_antigo).first()
+            po.conteudo_protocolado = None
+            po.tipo_conteudo_protocolado = None
+            po.save()
 
         if self.cleaned_data['autor']:
             autoria = Autoria()

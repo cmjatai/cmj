@@ -330,7 +330,10 @@ def signed_name_and_date_extract(file):
     try:
         pdf = PdfFileReader(file)
     except Exception as e:
-        return signs
+        try:
+            pdf = PdfFileReader(file, strict=False)
+        except Exception as ee:
+            return signs
 
     fields = pdf.getFields()
 

@@ -1828,6 +1828,14 @@ class MateriaLegislativaCrud(Crud):
 
         form_class = MateriaLegislativaForm
 
+        def get_initial(self):
+            initial = super().get_initial()
+
+            initial['user'] = self.request.user
+            initial['ip'] = get_client_ip(self.request)
+
+            return initial
+
         def form_valid(self, form):
             dict_objeto_antigo = MateriaLegislativa.objects.get(
                 pk=self.kwargs['pk']
@@ -2955,7 +2963,7 @@ class MateriaLegislativaCheckView(ListView):
 class CriarDocumentoAcessorioProtocolo(PermissionRequiredMixin, CreateView):
     template_name = "materia/criar_documentoacessorio_protocolo.html"
     form_class = DocumentoAcessorioProtocoloForm
-    permission_required = ('protocoloadm.add_documentoacessorio',)
+    permission_required = ('materia.add_documentoacessorio',)
 
     def get_initial(self):
         protocolo = Protocolo.objects.get(pk=self.kwargs['pk'])

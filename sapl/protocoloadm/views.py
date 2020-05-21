@@ -1660,6 +1660,19 @@ class ComprovanteProtocoloView(PermissionRequiredMixin, TemplateView):
 
         return context
 
+    def get(self, request, *args, **kwargs):
+        if 'send_mail' not in request.GET:
+            return TemplateView.get(self, request, *args, **kwargs)
+
+        protocolo = Protocolo.objects.get(pk=self.kwargs['pk'])
+
+        messages.info(request, _('Email enviado com sucesso!'))
+
+        return redirect(
+            reverse('sapl.protocoloadm:protocolo_mostrar', kwargs={
+                'pk': protocolo.pk})
+        )
+
 
 class ProtocoloMateriaView(PermissionRequiredMixin, CreateView):
 
