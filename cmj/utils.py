@@ -329,7 +329,7 @@ def signed_name_and_date_extract(file):
     signs = []
     try:
         pdf = PdfFileReader(file)
-    except:
+    except Exception as e:
         return signs
 
     fields = pdf.getFields()
@@ -348,9 +348,17 @@ def signed_name_and_date_extract(file):
         content_sign = field['/V']['/Contents']
         try:
             signed_data = cms.ContentInfo.load(content_sign)['content']
+            oun_old = []
             for cert in signed_data['certificates']:
-                nome = cert.native['tbs_certificate']['subject'][
-                    'common_name'].split(':')[0]
+                subject = cert.native['tbs_certificate']['subject']
+                oun = subject['organizational_unit_name']
+
+                if isinstance(oun, str):
+                    continue
+
+                if len(oun) > len(oun_old):
+                    oun_old = oun
+                    nome = subject['common_name'].split(':')[0]
         except:
             if '/Name' in field['/V']:
                 nome = field['/V']['/Name']
