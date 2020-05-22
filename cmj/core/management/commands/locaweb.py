@@ -57,7 +57,7 @@ class Command(BaseCommand):
             self.update_backup_postgresql()
 
         self.start_time = timezone.localtime()
-        self.s3_sync(app_label='cmj.core', model_name='User')
+        self.s3_sync()
 
         print(self.start_time)
         print(timezone.localtime())
