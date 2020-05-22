@@ -187,6 +187,7 @@ class Command(BaseCommand):
         reset = False
 
         count = 0
+        count_validate = 0
         for app in apps.get_app_configs():
             if app_label and app.name != app_label:
                 print(app.name)
@@ -308,6 +309,7 @@ class Command(BaseCommand):
                             else:
                                 self.count_registros += 1
                                 try:
+                                    count_validate += 1
                                     validate = i.metadata['locaweb'][fn]['validate']
                                     if validate:
                                         lt = timezone.localtime()
@@ -316,10 +318,11 @@ class Command(BaseCommand):
                                             i.metadata['locaweb'][
                                                 fn]['validate'] = lt
                                             i.save()
+                                    print(count_validate)
                                 except Exception as ee:
                                     print(ee, metadata)
 
-                            if (count == 500 or
+                            if (count == 500 or count_validate == 900 or
                                     timezone.localtime() -
                                     self.start_time >
                                     timedelta(seconds=self.exec_time)):
