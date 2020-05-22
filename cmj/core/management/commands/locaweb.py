@@ -57,7 +57,7 @@ class Command(BaseCommand):
             self.update_backup_postgresql()
 
         self.start_time = timezone.localtime()
-        self.s3_sync()
+        self.s3_sync(app_label='cmj.core', model_name='User')
 
         print(self.start_time)
         print(timezone.localtime())
@@ -254,6 +254,9 @@ class Command(BaseCommand):
                         ff = getattr(i, fn)
                         if not ff:
                             continue
+                        if not os.path.exists(ff.path):
+                            print('Arquivo registrado mas não existe', i.id, i)
+                            continue
 
                         # if hasattr(ff, 'original_path'):
                         #    self.checar_consistencia(i, ff, fn)
@@ -304,14 +307,17 @@ class Command(BaseCommand):
                                 count += 1
                             else:
                                 self.count_registros += 1
-                                validate = i.metadata['locaweb'][fn]['validate']
-                                if validate:
-                                    lt = timezone.localtime()
-                                    validate = parse_datetime(validate)
-                                    if (lt - validate).days > self.days_validate:
-                                        i.metadata['locaweb'][
-                                            fn]['validate'] = lt
-                                        i.save()
+                                try:
+                                    validate = i.metadata['locaweb'][fn]['validate']
+                                    if validate:
+                                        lt = timezone.localtime()
+                                        validate = parse_datetime(validate)
+                                        if (lt - validate).days > self.days_validate:
+                                            i.metadata['locaweb'][
+                                                fn]['validate'] = lt
+                                            i.save()
+                                except Exception as ee:
+                                    print(ee, metadata)
 
                             if (count == 500 or
                                     timezone.localtime() -
