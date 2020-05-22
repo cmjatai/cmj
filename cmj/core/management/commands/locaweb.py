@@ -1,11 +1,6 @@
-
-import builtins
 from datetime import datetime, timedelta
-from functools import wraps
-import io
 import logging
 import os
-import traceback
 
 import boto3
 from django.apps import apps
@@ -17,7 +12,6 @@ from django.db.models.signals import post_delete, post_save
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
-from sapl.norma.models import NormaJuridica
 from sapl.utils import hash_sha512
 
 
@@ -47,6 +41,9 @@ class Command(BaseCommand):
         self.logger = logging.getLogger(__name__)
 
         # self.close_files()
+
+        # self.calcular_validacao()
+        # return
 
         # self.distribuir_validacao()
         # return
@@ -293,7 +290,8 @@ class Command(BaseCommand):
                                 metadata, i, ff, fn, 'path', 'hash')
 
                             count_update += self.send_file(
-                                metadata, i, ff, fn, 'original_path', 'original_hash')
+                                metadata, i, ff, fn,
+                                'original_path', 'original_hash')
 
                         except Exception as e:
                             print(e)
@@ -306,6 +304,14 @@ class Command(BaseCommand):
                                 count += 1
                             else:
                                 self.count_registros += 1
+                                validate = i.metadata['locaweb'][fn]['validate']
+                                if validate:
+                                    lt = timezone.localtime()
+                                    validate = parse_datetime(validate)
+                                    if (lt - validate).days > self.days_validate:
+                                        i.metadata['locaweb'][
+                                            fn]['validate'] = lt
+                                        i.save()
 
                             if (count == 500 or
                                     timezone.localtime() -
@@ -539,3 +545,76 @@ class Command(BaseCommand):
                         i.save()
 
                     td -= interval_seconds
+
+    def calcular_validacao(self):
+
+        count = 0
+        lt = timezone.localtime()
+
+        calc = {}
+
+        for app in apps.get_app_configs():
+
+            if not app.name.startswith('cmj') and not app.name.startswith('sapl'):
+                continue
+            print(app)
+
+            for m in app.get_models():
+                model_exec = False
+
+                for f in m._meta.get_fields():
+                    dua = f
+                    print(dua)
+                    if hasattr(dua, 'auto_now') and dua.auto_now:
+                        #print(m, 'auto_now deve ser desativado.')
+                        # continue  # auto_now deve ser desativado
+                        print(m, 'desativando auto_now')
+                        dua.auto_now = False
+
+                    if not isinstance(f, FileField):
+                        continue
+
+                    # se possui FileField, o model então
+                    # deve possuir FIELDFILE_NAME
+                    assert hasattr(m, 'FIELDFILE_NAME'), '{} não possui FIELDFILE_NAME'.format(
+                        m._meta.label)
+
+                    # se possui FileField, o model então
+                    # deve possuir metadata
+                    assert hasattr(m, 'metadata'), '{} não possui metadata'.format(
+                        m._meta.label)
+
+                    # o campo field deve estar em FIELDFILE_NAME
+                    assert f.name in m.FIELDFILE_NAME, '{} não está no FIELDFILE_NAME de {}'.format(
+                        f.name,
+                        m._meta.label)
+
+                    model_exec = True
+
+                if not model_exec:
+                    continue
+                print(m)
+
+                for i in m.objects.all().order_by('-id'):
+                    if not hasattr(i, 'metadata'):
+                        continue
+                    if not i.metadata:
+                        continue
+                    if 'locaweb' not in i.metadata:
+                        continue
+
+                    md = i.metadata if i.metadata else {}
+                    for fn in i.FIELDFILE_NAME:
+                        if fn not in md['locaweb']:
+                            continue
+                        if 'validate' not in md['locaweb'][fn]:
+                            continue
+                        if not md['locaweb'][fn]['validate']:
+                            continue
+                        td = lt - parse_datetime(md['locaweb'][fn]['validate'])
+                        d = td.days if td.days > 0 else -1
+                        if d not in calc:
+                            calc[d] = 0
+
+                        calc[d] += 1
+        print(calc)
