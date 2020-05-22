@@ -5,7 +5,7 @@
 {% load webpack_static from webpack_loader %}
 
 {% if m.texto_original %}
-  <div class="row item-listas align-items-centerjustify-content-between">
+  <div class="row item-listas align-items-center justify-content-between">
     <div class="col-12 col-md-auto justify-content-center">
 
       {% if m.metadata.signs and m.metadata.locaweb and m.metadata.signs.texto_original and m.metadata.locaweb.texto_original.hash == m.metadata.locaweb.texto_original.original_hash %}

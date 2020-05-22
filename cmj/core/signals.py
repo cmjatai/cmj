@@ -115,4 +115,9 @@ for app in apps.get_app_configs():
         if hasattr(model, 'FIELDFILE_NAME') and hasattr(model, 'metadata'):
             pre_save.connect(
                 signed_name_and_date_extract_pre_save,
-                sender=model)
+                sender=model,
+                dispatch_uid='cmj_pre_save_signed_{}_{}'.format(
+                    app.name.replace('.', '_'),
+                    model._meta.model_name
+                )
+            )

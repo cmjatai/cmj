@@ -8,7 +8,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db.models import Q
 from django.db.models.fields.files import FileField
-from django.db.models.signals import post_delete, post_save
+from django.db.models.signals import post_delete, post_save, pre_save
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
@@ -234,6 +234,13 @@ class Command(BaseCommand):
                 if not model_exec:
                     continue
                 print(m)
+                pre_save.disconnect(
+                    sender=m,
+                    dispatch_uid='cmj_pre_save_signed_{}_{}'.format(
+                        app.name.replace('.', '_'),
+                        m._meta.model_name
+                    ))
+
                 for i in m.objects.all().order_by('-id'):
 
                     if not hasattr(i, 'metadata'):
@@ -313,7 +320,7 @@ class Command(BaseCommand):
                                     if validate:
                                         lt = timezone.localtime()
                                         validate = parse_datetime(validate)
-                                        if (lt - validate).days > self.days_validate:
+                                        if (lt - validate).days >= self.days_validate:
                                             i.metadata['locaweb'][
                                                 fn]['validate'] = lt
                                             i.save()
@@ -512,6 +519,13 @@ class Command(BaseCommand):
                     continue
                 print(m)
 
+                pre_save.disconnect(
+                    sender=m,
+                    dispatch_uid='cmj_pre_save_signed_{}_{}'.format(
+                        app.name.replace('.', '_'),
+                        m._meta.model_name
+                    ))
+
                 count_model = m.objects.count()
 
                 if not count_model:
@@ -601,6 +615,13 @@ class Command(BaseCommand):
                 if not model_exec:
                     continue
                 print(m)
+
+                pre_save.disconnect(
+                    sender=m,
+                    dispatch_uid='cmj_pre_save_signed_{}_{}'.format(
+                        app.name.replace('.', '_'),
+                        m._meta.model_name
+                    ))
 
                 for i in m.objects.all().order_by('-id'):
                     if not hasattr(i, 'metadata'):

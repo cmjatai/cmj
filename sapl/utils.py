@@ -565,6 +565,7 @@ TIPOS_TEXTO_PERMITIDOS = (
     'application/octet-stream',
     'text/xml',
     'text/html',
+    'video/mp4'
 )
 
 TIPOS_IMG_PERMITIDOS = (
