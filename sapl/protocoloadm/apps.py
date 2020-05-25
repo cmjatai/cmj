@@ -9,3 +9,4 @@ class AppConfig(apps.AppConfig):
 
     def ready(self):
         from sapl.base import receivers
+        from . import signals

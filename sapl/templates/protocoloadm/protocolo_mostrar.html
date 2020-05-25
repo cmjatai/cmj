@@ -92,7 +92,7 @@
 
 	</a>
 	{% if protocolo.email %}
-		<a class="btn btn-primary d-none" href="{% url 'sapl.protocoloadm:comprovante_protocolo' protocolo.pk%}?send_mail">
+		<a class="btn btn-primary" href="{% url 'sapl.protocoloadm:comprovante_protocolo' protocolo.pk%}?send_mail">
 			Enviar Comprovante por Email
 		</a>
 	{% endif %}

@@ -1665,6 +1665,7 @@ class ComprovanteProtocoloView(PermissionRequiredMixin, TemplateView):
             return TemplateView.get(self, request, *args, **kwargs)
 
         protocolo = Protocolo.objects.get(pk=self.kwargs['pk'])
+        protocolo.save()
 
         messages.info(request, _('Email enviado com sucesso!'))
 
