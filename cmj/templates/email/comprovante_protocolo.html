@@ -1,21 +1,72 @@
 {% extends "base_email.html" %}
 {% load i18n staticfiles %}
 
-{% block email_content %}
-  <div style="padding: 30px 20px 40px;">
-    <p>Você está recebendo este e-mail do sistema de notificações<br>do Portal CMJ - Câmara Municipal de Jataí</p>
-    <div style="text-align:left;">
-      <b>Data do Envio:</b> {{notificacao.content_object.created}}<br>
-      <b>Mensagem de:</b> {{notificacao.user_origin}}<br><br>
-      <b>Mensagem:</b> {{notificacao.content_object.descricao|safe}}
-    </div>
+{% block email_content_table %}
 
-    <br><br>
-    <a style="color: #ffffff; background-color: #02baf2; border-radius: 4px; padding: 7px 15px 6px 15px; text-decoration: none; text-transform: uppercase; font-weight: bold;"
-      href="https://www.jatai.go.leg.br{% url 'cmj.ouvidoria:solicitacao_interact' notificacao.content_object.solicitacao.pk%}">
-      Acesse por aqui o Portal CMJ para enviar sua resposta
-    </a>
-    <br><br>
-    Não responda este email.<br>Sua resposta deve ser dada no Portal CMJ.
-  </div>
-{% endblock email_content %} 
+<tr>
+  <td colspan="8" align="center" style="padding: 10px;">
+   <b>COMPROVANTE DE PROTOCOLO</b>
+    <br>
+    Autenticação: {{ autenticacao }}
+    <br>  
+  </td>
+  <td colspan=4>
+    <img src="{{barcode}}" height="50px" width="170px">
+  </td>
+</tr>
+<tr>
+   <td colspan=12 style="text-align: left; padding: 10px;">
+	   <strong>Número / Ano:</strong>
+{{ protocolo.numero|stringformat:'06d' }}/{{ protocolo.ano }} | 
+<strong>Data / Horário:</strong>
+{% if protocolo.timestamp %}
+  {{ protocolo.timestamp|date:"d/m/Y" }} - {{ protocolo.timestamp|date:"H:i:s" }}
+{% else %}
+  {{ protocolo.data|date:"d/m/Y" }} - {{ protocolo.hora|date:"H:i:s" }}
+{% endif %}
+
+<br>
+
+{% if protocolo.tipo_processo == 1 %}
+
+<br><strong>Ementa: </strong>{{protocolo.assunto_ementa}}
+<br>
+<strong>Autor: </strong>{{ protocolo.autor }}
+	{% if protocolo.conteudo_protocolado %}
+		{% with protocolo.conteudo_protocolado.metadata.signs.texto_original as signs %}
+			{% include 'core/sign_widget.html' %}
+		{% endwith %}
+	{% endif %}
+
+
+{% else %}
+
+<br><strong>Assunto:</strong> {{ protocolo.assunto_ementa }}
+<br><strong>Interessado:</strong> {{ protocolo.interessado }}
+
+<br><strong>Natureza:</strong>  
+{% if protocolo.tipo_processo == 0 %} Administrativo {% elif protocolo.tipo_processo == 1 %} Legislativo {% endif %}
+
+{% endif %}
+<hr>
+{% if protocolo.conteudo_protocolado %}
+	<strong>Especie do Documento: </strong>
+	{{protocolo.conteudo_content_type}}
+	<br><strong>Tipo do Documento: </strong>
+	{{protocolo.tipo_conteudo_protocolado}}
+	<br><strong>Documento: </strong>
+	{{protocolo.conteudo_protocolado|default:''}}
+<br><strong>Número de Páginas:</strong>
+{{ protocolo.conteudo_protocolado.paginas|default_if_none:"0" }}
+
+{% endif %}
+
+
+
+
+   </td>
+</tr>
+
+{% endblock email_content_table %}
+{% block email_message_ti %}
+{% endblock email_message_ti %}

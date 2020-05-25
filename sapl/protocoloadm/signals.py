@@ -1,4 +1,4 @@
-
+from sapl.utils import create_barcode
 from django.db.models.signals import post_save, pre_save
 from django.dispatch.dispatcher import receiver
 
@@ -22,10 +22,22 @@ def protocolo_pre_save(sender, instance, using, **kwargs):
     try:
 
         if instance.email:
+
+            if instance.timestamp:
+                data = instance.timestamp.strftime("%Y/%m/%d")
+            else:
+                data = instance.data.strftime("%Y/%m/%d")
+
+            base64_data = create_barcode(str(instance.numero).zfill(6))
+            barcode = 'data:image/png;base64,{0}'.format(base64_data)
+            autenticacao = str(instance.tipo_processo) + data + str(instance.numero).zfill(6)
+
             send_mail(
                 'Protocolo: {}'.format(instance.epigrafe),
                 'email/comprovante_protocolo.html',
-                {'protocolo': instance}, EMAIL_SEND_USER, 'leandro@jatai.go.leg.br')  # instance.email)
+                {'protocolo': instance,
+                    'barcode': barcode,
+                    'autenticacao': autenticacao}, EMAIL_SEND_USER, 'leandro@jatai.go.leg.br')  # instance.email)
 
             print('Um Email com comprovante de protocolo foi enviado '
                   '%s - user: %s - user_origin: %s' % (
