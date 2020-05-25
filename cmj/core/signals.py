@@ -1,7 +1,4 @@
-from datetime import datetime
-import os
 
-from PyPDF4.pdf import PdfFileReader
 from django.apps import apps
 from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -9,14 +6,9 @@ from django.core.mail.message import EmailMultiAlternatives
 from django.db.models.signals import post_save, pre_save
 from django.dispatch.dispatcher import receiver
 from django.template import loader
-from django.utils.encoding import force_text
-from django.utils.six import BytesIO
-
 from cmj.core.models import Notificacao
 from cmj.settings import EMAIL_SEND_USER
 from cmj.utils import signed_name_and_date_extract
-from sapl.materia.models import MateriaLegislativa
-from sapl.norma.models import NormaJuridica
 
 
 def send_mail(subject, email_template_name,
