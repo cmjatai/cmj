@@ -49,7 +49,7 @@ user_urlpatterns = [
 
     url(r'^login/$', CmjLoginView.as_view(), name='login'),
 
-    url(r'^logout/$', LogoutView,
+    url(r'^lll/$', LogoutView.as_view(),
         {'next_page': '/'}, name='logout', ),
 
 

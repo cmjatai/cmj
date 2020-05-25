@@ -1,10 +1,10 @@
-from sapl.utils import create_barcode
 from django.db.models.signals import post_save, pre_save
 from django.dispatch.dispatcher import receiver
 
 from cmj.core.signals import send_mail
 from cmj.settings import EMAIL_SEND_USER
 from sapl.protocoloadm.models import Protocolo
+from sapl.utils import create_barcode
 
 
 @receiver(pre_save, sender=Protocolo, dispatch_uid='protocolo_pre_save')
@@ -30,7 +30,8 @@ def protocolo_pre_save(sender, instance, using, **kwargs):
 
             base64_data = create_barcode(str(instance.numero).zfill(6))
             barcode = 'data:image/png;base64,{0}'.format(base64_data)
-            autenticacao = str(instance.tipo_processo) + data + str(instance.numero).zfill(6)
+            autenticacao = str(instance.tipo_processo) + \
+                data + str(instance.numero).zfill(6)
 
             send_mail(
                 'Protocolo: {}'.format(instance.epigrafe),
@@ -40,7 +41,7 @@ def protocolo_pre_save(sender, instance, using, **kwargs):
                     'autenticacao': autenticacao}, EMAIL_SEND_USER, 'leandro@jatai.go.leg.br')  # instance.email)
 
             print('Um Email com comprovante de protocolo foi enviado '
-                  '%s - user: %s - user_origin: %s' % (
+                  '%s - email: %s - interessado: %s' % (
                       instance.pk,
                       instance.email,
                       instance.interessado))

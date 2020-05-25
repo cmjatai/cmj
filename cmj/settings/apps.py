@@ -17,6 +17,7 @@ INSTALLED_APPS = (
     'image_cropping',
 
     'rest_framework',
+    'rest_framework.authtoken',
     #'rest_framework_recursive',
 
     'django_filters',
