@@ -23,7 +23,7 @@ def protocolo_pre_save(sender, instance, using, **kwargs):
 
         if instance.email:
             send_mail(
-                instance.epigrafe,
+                'Protocolo: {}'.format(instance.epigrafe),
                 'email/comprovante_protocolo.html',
                 {'protocolo': instance}, EMAIL_SEND_USER, 'leandro@jatai.go.leg.br')  # instance.email)
 
@@ -33,5 +33,6 @@ def protocolo_pre_save(sender, instance, using, **kwargs):
                       instance.email,
                       instance.interessado))
             instance.comprovante_automatico_enviado = True
-    except:
+    except Exception as e:
+        print(e)
         pass
