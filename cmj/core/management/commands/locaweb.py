@@ -48,6 +48,9 @@ class Command(BaseCommand):
         # self.distribuir_validacao()
         # return
 
+        # self.count_registers(full=False)
+        # return
+
         self.s3_connect()
 
         # self.__clear_bucket('cmjatai_postgresql')
@@ -68,6 +71,16 @@ class Command(BaseCommand):
 
         #obj = n = NormaJuridica.objects.get(pk=8727)
         #self.restore_file_from_object(self.bucket_name, obj)
+
+    def count_registers(self, full=True):
+
+        print('--------- CountRegisters ----------')
+
+        for app in apps.get_app_configs():
+            for m in app.get_models():
+                count = m.objects.all().count()
+                if full or count > 1000:
+                    print(count, m, app)
 
     def update_backup_postgresql(self):
 
@@ -233,7 +246,7 @@ class Command(BaseCommand):
 
                 if not model_exec:
                     continue
-                print(m)
+                print(m, m.objects.all().count())
                 pre_save.disconnect(
                     sender=m,
                     dispatch_uid='cmj_pre_save_signed_{}_{}'.format(
