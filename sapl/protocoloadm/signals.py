@@ -1,5 +1,5 @@
 
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch.dispatcher import receiver
 
 from cmj.core.signals import send_mail
@@ -7,8 +7,8 @@ from cmj.settings import EMAIL_SEND_USER
 from sapl.protocoloadm.models import Protocolo
 
 
-@receiver(post_save, sender=Protocolo, dispatch_uid='protocolo_post_save')
-def protocolo_post_save(sender, instance, using, **kwargs):
+@receiver(pre_save, sender=Protocolo, dispatch_uid='protocolo_pre_save')
+def protocolo_pre_save(sender, instance, using, **kwargs):
 
     import inspect
     funcs = list(filter(lambda x: x == 'revision_pre_delete_signal',
@@ -32,5 +32,6 @@ def protocolo_post_save(sender, instance, using, **kwargs):
                       instance.pk,
                       instance.email,
                       instance.interessado))
+            instance.comprovante_automatico_enviado = True
     except:
         pass

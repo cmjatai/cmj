@@ -106,6 +106,8 @@ class Protocolo(models.Model):
     tipo_processo = models.PositiveIntegerField()
     email = models.EmailField(
         blank=True, verbose_name=_('Email do Interessado'))
+    comprovante_automatico_enviado = models.BooleanField(
+        default=False, verbose_name=_('Comprovante Automático Enviado'))
     autor = models.ForeignKey(Autor,
                               blank=True,
                               null=True,
