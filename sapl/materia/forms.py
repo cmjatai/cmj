@@ -175,8 +175,14 @@ class MateriaLegislativaForm(FileFieldCheckMixin, ModelForm):
 
     class Meta:
         model = MateriaLegislativa
-        exclude = ['texto_articulado', 'autores', 'proposicao',
-                   'anexadas', 'data_ultima_atualizacao', '_paginas']
+        exclude = ['texto_articulado',
+                   'autores',
+                   'proposicao',
+                   'anexadas',
+                   'data_ultima_atualizacao',
+                   '_paginas',
+                   'checkcheck',
+                   'arquivado']
         widgets = {
             'user': forms.HiddenInput(),
             'ip': forms.HiddenInput(),

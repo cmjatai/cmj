@@ -1,12 +1,17 @@
+from django.conf import settings
 from django.core.files.base import File
 from django.db import transaction
+from django.db.models.signals import post_save
+from django.dispatch.dispatcher import receiver
 from django.utils.translation import ugettext_lazy as _
 from django_filters import rest_framework as filters
 from rest_framework import viewsets, status, mixins
+from rest_framework.authtoken.models import Token
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.permissions import IsAuthenticated,\
-    IsAuthenticatedOrReadOnly
+    IsAuthenticatedOrReadOnly, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
@@ -17,6 +22,35 @@ from cmj.api.serializers import DocumentoSerializer,\
 from cmj.core.models import Bi
 from cmj.sigad.models import Documento, VersaoDeMidia, Midia,\
     ReferenciaEntreDocumentos
+
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_auth_token(sender, instance=None, created=False, **kwargs):
+    if created:
+        Token.objects.create(user=instance)
+
+
+@api_view(['POST'])
+@permission_classes([IsAdminUser])
+def recria_token(request, pk):
+    Token.objects.get(user_id=pk).delete()
+    token = Token.objects.create(user_id=pk)
+
+    return Response({"message": "Token recriado com sucesso!", "token": token.key})
+
+
+class AppVersionView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        content = {
+            'name': 'PortalCMJ',
+            'description': 'Câmara Municipal de Jataí - Estado de Goiás',
+            'version': settings.PORTALCMJ_VERSION,
+            'user': request.user.email,
+            'is_authenticated': request.user.is_authenticated,
+        }
+        return Response(content)
 
 
 class BiViewSet(viewsets.ModelViewSet):

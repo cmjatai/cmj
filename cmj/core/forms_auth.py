@@ -1,5 +1,5 @@
 from celery.canvas import group
-from crispy_forms.bootstrap import Alert
+from crispy_forms.bootstrap import Alert, FieldWithButtons, StrictButton
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, Div
 from django import forms
@@ -242,12 +242,20 @@ class CmjUserAdminForm(ModelForm):
         queryset=Autor.objects.all(),
         required=False)
 
+    token = forms.CharField(
+        required=False,
+        label="Token",
+        max_length=40,
+        widget=forms.TextInput(attrs={'readonly': 'readonly'}))
+
     class Meta:
         model = get_user_model()
         fields = ['email',
                   'first_name',
                   'last_name',
                   'is_active',
+
+                  'token',
 
                   'new_password1',
                   'new_password2',
@@ -268,8 +276,18 @@ class CmjUserAdminForm(ModelForm):
                 ('last_name', 3),
                 ('is_active', 2),
 
-                ('new_password1', 6),
-                ('new_password2', 6),
+                ('new_password1', 4),
+                ('new_password2', 4),
+                (
+                    FieldWithButtons(
+                        'token',
+                        StrictButton(
+                            'Renovar',
+                            id="renovar-token",
+                            css_class="btn-outline-primary")
+                    ),
+                    4
+                ),
                 ('areatrabalho', 6),
                 ('autor', 6),
                 ('groups', 12),
@@ -282,6 +300,9 @@ class CmjUserAdminForm(ModelForm):
         super(CmjUserAdminForm, self).__init__(*args, **kwargs)
 
         if self.instance.pk:
+
+            self.fields['token'].initial = self.instance.auth_token.key
+
             oper_at = self.instance.operadorareatrabalho_set.first()
             if oper_at:
                 self.fields['areatrabalho'].initial = oper_at.areatrabalho.id

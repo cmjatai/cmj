@@ -52,7 +52,7 @@ DATABASES = {
     )
 }
 
-SAPL_VERSION = 'master'
+PORTALCMJ_VERSION = 'master'
 
 SITE_URL = 'https://www.jatai.go.leg.br'
 # if DEBUG:
