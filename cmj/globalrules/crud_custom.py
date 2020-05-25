@@ -161,7 +161,7 @@ class PerfilAbstractCrud(Crud):
         template_name = 'cerimonial/contato_form.html'
 
         def get(self, request, *args, **kwargs):
-            if request.user.is_authenticated():
+            if request.user.is_authenticated:
                 if request.user.contato_set.exists():
                     return redirect(reverse('cmj.cerimonial:perfil_detail'))
 

@@ -343,7 +343,7 @@ class PartidoCrud(Crud):
 
         """def get_queryset(self):
             queryset = CrudListView.get_queryset(self)
-            if not self.request.user.is_authenticated():
+            if not self.request.user.is_authenticated:
                 return queryset
 
             if 'queryset_liberar_sem_container' in self.kwargs and\
