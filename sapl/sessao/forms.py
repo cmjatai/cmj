@@ -18,6 +18,7 @@ from sapl.materia.forms import MateriaLegislativaFilterSet
 from sapl.materia.models import (MateriaLegislativa, StatusTramitacao,
                                  TipoMateriaLegislativa)
 from sapl.parlamentares.models import Parlamentar, Mandato
+from sapl.sessao.models import RegistroLeitura
 from sapl.settings import MAX_DOC_UPLOAD_SIZE
 from sapl.utils import (RANGE_DIAS_MES, RANGE_MESES,
                         MateriaPesquisaOrderingFilter, autor_label,
@@ -302,6 +303,8 @@ class ExpedienteMateriaForm(ModelForm):
         label='Data Sessão',
         initial=datetime.strftime(timezone.now(), '%d/%m/%Y'),
         widget=forms.TextInput(attrs={'readonly': 'readonly'}))
+
+    apenas_leitura = forms.BooleanField(label='Apenas Leitura', required=False)
 
     class Meta:
         model = ExpedienteMateria
@@ -838,3 +841,49 @@ class JustificativaAusenciaForm(ModelForm):
             justificativa.materias_do_expediente.clear()
             justificativa.materias_da_ordem_do_dia.clear()
         return justificativa
+
+class OrdemExpedienteLeituraForm(forms.ModelForm):
+
+    observacao = forms.CharField(required=False, label='Observação', widget=forms.Textarea,)
+
+    class Meta:
+        model = RegistroLeitura
+        fields = ['materia',
+                  'ordem',
+                  'expediente',
+                  'observacao',
+                  'user', 
+                  'ip']
+        widgets = {'materia': forms.HiddenInput(),
+                   'ordem': forms.HiddenInput(),
+                   'expediente': forms.HiddenInput(),
+                   'user': forms.HiddenInput(),
+                   'ip': forms.HiddenInput()
+                   }
+
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+        
+        instance = self.initial['instance']
+        if instance:
+            self.instance = instance.first()
+            self.fields['observacao'].initial = self.instance.observacao
+
+        row1 = to_row(
+            [('observacao', 12)])   
+
+        actions = [HTML('<a href="{{ view.cancel_url }}"'
+                        ' class="btn btn-warning">Cancelar Leitura</a>')]
+
+        self.helper = SaplFormHelper()
+        self.helper.form_method = 'POST'
+        self.helper.layout = Layout(
+            Fieldset(_('Leitura de Matéria'),
+                    HTML('''
+                        <b>Matéria:</b> {{materia}}<br>
+                        <b>Ementa:</b> {{materia.ementa}} <br>
+                    '''),
+                     row1,
+                     form_actions(more=actions),
+                    )

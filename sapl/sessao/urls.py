@@ -194,4 +194,14 @@ urlpatterns = [
         voto_nominal_parlamentar,
         name='votacao_nominal_parlamentar'
         ),
+
+
+    url(r'^sessao/(?P<pk>\d+)/matexp/leitura/(?P<oid>\d+)/(?P<mid>\d+)$',
+        ExpedienteLeituraView.as_view(), name='leituraexp'),
+    url(r'^sessao/(?P<pk>\d+)/matordemdia/leitura/(?P<oid>\d+)/(?P<mid>\d+)$',
+        OrdemDiaLeituraView.as_view(), name='leituraod'),
+
+    url(r'^sessao/(?P<pk>\d+)/(?P<iso>\d+)/(?P<oid>\d+)/retirar-leitura$',
+        retirar_leitura, name='retirar_leitura'),
+
 ]

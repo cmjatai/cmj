@@ -37,7 +37,9 @@ from sapl.parlamentares.models import (Filiacao, Legislatura, Mandato,
                                        Parlamentar, SessaoLegislativa,
                                        AfastamentoParlamentar)
 from sapl.sessao.apps import AppConfig
-from sapl.sessao.forms import ExpedienteMateriaForm, OrdemDiaForm
+from sapl.sessao.forms import ExpedienteMateriaForm, OrdemDiaForm,\
+    OrdemExpedienteLeituraForm
+from sapl.sessao.models import RegistroLeitura
 from sapl.utils import (show_results_filter_set, remover_acentos, get_client_ip, filiacao_data,
                         verifica_afastamento_parlamentar)
 
@@ -60,6 +62,13 @@ TipoJustificativaCrud = CrudAux.build(TipoJustificativa, 'tipo_justificativa')
 TipoResultadoVotacaoCrud = CrudAux.build(
     TipoResultadoVotacao, 'tipo_resultado_votacao')
 TipoRetiradaPautaCrud = CrudAux.build(TipoRetiradaPauta, 'tipo_retirada_pauta')
+
+
+# constantes
+SIMBOLICA = 1
+NOMINAL = 2
+SECRETA = 3
+LEITURA = 4
 
 
 def reordernar_materias_expediente(request, pk):
@@ -117,13 +126,18 @@ def renumerar_materias_expediente(request, pk):
         reverse('sapl.sessao:expedientemateria_list', kwargs={'pk': pk}))
 
 
-def verifica_presenca(request, model, spk):
+def verifica_presenca(request, model, spk, is_leitura=False):
     logger = logging.getLogger(__name__)
     if not model.objects.filter(sessao_plenaria_id=spk).exists():
         username = request.user.username
-        logger.error("user=" + username +
-                     ". Votação não pode ser aberta sem registro de presenças (sessao_plenaria_id={}).".format(spk))
-        msg = _('Votação não pode ser aberta sem registro de presenças.')
+        if is_leitura:
+            text = 'Leitura não pode ser feita sem presenças'
+        else:
+            text = 'Votação não pode ser aberta sem presenças'
+
+        logger.error("user={}. {} (sessao_plenaria_id={}).".format(
+            username, text, spk))
+        msg = _(text)
         messages.add_message(request, messages.ERROR, msg)
         return False
     return True
@@ -144,12 +158,12 @@ def verifica_votacoes_abertas(request):
                         kwargs={'pk': v.id}),
                 v.__str__()))
         username = request.user.username
-        logger.info('user=' + username + '. Já existem votações abertas nas seguintes Sessões: ' +
+        logger.info('user=' + username + '. Já existem votações ou leituras abertas nas seguintes Sessões: ' +
                     ', '.join(msg_abertas) + '. Para abrir '
                     'outra, termine ou feche as votações abertas.')
-        msg = _('Já existem votações abertas nas seguintes Sessões: ' +
+        msg = _('Já existem votações ou leituras abertas nas seguintes Sessões: ' +
                 ', '.join(msg_abertas) + '. Para abrir '
-                'outra, termine ou feche as votações abertas.')
+                'outra, termine ou feche as votações ou leituras abertas.')
         messages.add_message(request, messages.INFO, msg)
 
         return False
@@ -157,17 +171,18 @@ def verifica_votacoes_abertas(request):
     return True
 
 
-def verifica_sessao_iniciada(request, spk):
+def verifica_sessao_iniciada(request, spk, is_leitura=False):
     logger = logging.getLogger(__name__)
     sessao = SessaoPlenaria.objects.get(id=spk)
 
     if not sessao.iniciada or sessao.finalizada:
         username = request.user.username
-        logger.info('user=' + username + '. Não é possível abrir matérias para votação. '
-                    'Esta SessaoPlenaria (id={}) não foi iniciada ou está finalizada.'.format(spk))
-        msg = _('Não é possível abrir matérias para votação. '
+        aux_text = 'leitura' if is_leitura else 'votação'
+        logger.info('user=' + username + '. Não é possível abrir matérias para {}. '
+                    'Esta SessaoPlenaria (id={}) não foi iniciada ou está finalizada.'.format(aux_text, spk))
+        msg = _('Não é possível abrir matérias para {}. '
                 'Esta Sessão Plenária não foi iniciada ou está finalizada.'
-                ' Vá em "Abertura"->"Dados Básicos" e altere os valores dos campos necessários.')
+                ' Vá em "Abertura"->"Dados Básicos" e altere os valores dos campos necessários.'.format(aux_text))
         messages.add_message(request, messages.INFO, msg)
         return False
 
@@ -192,21 +207,22 @@ def abrir_votacao(request, pk, spk):
     if not model:
         raise Http404()
 
-    if (verifica_sessao_iniciada(request, spk) and
-        verifica_presenca(request, presenca_model, spk) and
-            verifica_votacoes_abertas(request)):
-        materia_votacao = model.objects.get(id=pk)
+    materia_votacao = model.objects.get(id=pk)
+    is_leitura = materia_votacao.tipo_votacao == 4
+    if (verifica_presenca(request, presenca_model, spk, is_leitura) and
+        verifica_votacoes_abertas(request) and
+            verifica_sessao_iniciada(request, spk, is_leitura)):
         materia_votacao.votacao_aberta = True
         sessao = SessaoPlenaria.objects.get(id=spk)
         sessao.painel_aberto = True
         sessao.save()
         materia_votacao.save()
-    else:
-        url = reverse('sapl.sessao:' + redirect_url, kwargs={'pk': spk})
-        return HttpResponseRedirect(url)
 
-    url = reverse('sapl.sessao:' + redirect_url, kwargs={'pk': spk})
-    return HttpResponseRedirect('{}#id{}'.format(url, materia_votacao.materia.pk))
+    query_params = "#id{}".format(materia_votacao.materia.id)
+    success_url = reverse('sapl.sessao:' + redirect_url, kwargs={'pk': spk})
+    success_url += query_params
+
+    return HttpResponseRedirect(success_url)
 
 
 def customize_link_materia(context, pk, has_permission, is_expediente):
@@ -261,54 +277,82 @@ def customize_link_materia(context, pk, has_permission, is_expediente):
             materia=obj.materia).exists()
         exist_retirada = obj.retiradapauta_set.filter(
             materia=obj.materia).exists()
-        if not exist_resultado and not exist_retirada:
+
+        exist_leitura = obj.registroleitura_set.filter(
+            materia=obj.materia).exists()
+
+        if (obj.tipo_votacao != 4 and not exist_resultado and not exist_retirada) or\
+                (obj.tipo_votacao == 4 and not exist_leitura):
             if obj.votacao_aberta:
                 url = ''
                 if is_expediente:
-                    if obj.tipo_votacao == 1:
+                    if obj.tipo_votacao == SIMBOLICA:
                         url = reverse('sapl.sessao:votacaosimbolicaexp',
                                       kwargs={
                                           'pk': obj.sessao_plenaria_id,
                                           'oid': obj.pk,
                                           'mid': obj.materia_id})
-                    elif obj.tipo_votacao == 2:
+                    elif obj.tipo_votacao == NOMINAL:
                         url = reverse('sapl.sessao:votacaonominalexp',
                                       kwargs={
                                           'pk': obj.sessao_plenaria_id,
                                           'oid': obj.pk,
                                           'mid': obj.materia_id})
-                    elif obj.tipo_votacao == 3:
+                    elif obj.tipo_votacao == SECRETA:
                         url = reverse('sapl.sessao:votacaosecretaexp',
                                       kwargs={
                                           'pk': obj.sessao_plenaria_id,
                                           'oid': obj.pk,
                                           'mid': obj.materia_id})
+
+                    elif obj.tipo_votacao == LEITURA:
+                        url = reverse('sapl.sessao:leituraexp',
+                                      kwargs={
+                                          'pk': obj.sessao_plenaria_id,
+                                          'oid': obj.pk,
+                                          'mid': obj.materia_id})
                 else:
-                    if obj.tipo_votacao == 1:
+                    if obj.tipo_votacao == SIMBOLICA:
                         url = reverse('sapl.sessao:votacaosimbolica',
                                       kwargs={
                                           'pk': obj.sessao_plenaria_id,
                                           'oid': obj.pk,
                                           'mid': obj.materia_id})
-                    elif obj.tipo_votacao == 2:
+                    elif obj.tipo_votacao == NOMINAL:
                         url = reverse('sapl.sessao:votacaonominal',
                                       kwargs={
                                           'pk': obj.sessao_plenaria_id,
                                           'oid': obj.pk,
                                           'mid': obj.materia_id})
-                    elif obj.tipo_votacao == 3:
+                    elif obj.tipo_votacao == SECRETA:
                         url = reverse('sapl.sessao:votacaosecreta',
                                       kwargs={
                                           'pk': obj.sessao_plenaria_id,
                                           'oid': obj.pk,
                                           'mid': obj.materia_id})
+                    elif obj.tipo_votacao == LEITURA:
+                        url = reverse('sapl.sessao:leituraod',
+                                      kwargs={
+                                          'pk': obj.sessao_plenaria_id,
+                                          'oid': obj.pk,
+                                          'mid': obj.materia_id})
                 if has_permission:
-                    btn_registrar = '''
-                                    <form action="%s">
-                                     <input type="submit" class="btn btn-primary"
-                                      value="Registrar Votação" />
-                                 </form>''' % (
-                        url)
+                    if obj.tipo_votacao != LEITURA:
+                        btn_registrar = '''
+                                        <form action="%s">
+                                        <input type="submit" class="btn btn-primary"
+                                        value="Registrar Votação" />
+                                        
+                                    </form>''' % (
+                            url)
+                    else:
+                        btn_registrar = '''
+                                        <form action="%s">
+                                        <input type="submit" class="btn btn-primary"
+                                        value="Registrar Leitura" />
+                                        
+                                    </form>''' % (
+                            url)
 
                     resultado = btn_registrar
                 else:
@@ -326,12 +370,20 @@ def customize_link_materia(context, pk, has_permission, is_expediente):
                     }) + '?tipo_materia=ordem'
 
                 if has_permission:
-                    btn_abrir = '''
-                                        Matéria não votada<br />
-                                        <a href="%s"
-                                           class="btn btn-primary"
-                                           role="button">Abrir Votação</a>''' % (url)
-                    resultado = btn_abrir
+                    if not obj.tipo_votacao == LEITURA:
+                        btn_abrir = '''
+                                            Matéria não votada<br />
+                                            <a href="%s"
+                                            class="btn btn-primary"
+                                            role="button">Abrir Votação</a>''' % (url)
+                        resultado = btn_abrir
+                    else:
+                        btn_abrir = '''
+                                            Matéria não lida<br />
+                                            <a href="%s"
+                                            class="btn btn-primary"
+                                            role="button">Abrir para Leitura</a>''' % (url)
+                        resultado = btn_abrir
                 else:
                     resultado = '''Não há resultado'''
 
@@ -348,48 +400,66 @@ def customize_link_materia(context, pk, has_permission, is_expediente):
                           retirada_observacao))
 
         else:
-            resultado = obj.registrovotacao_set.filter(
-                materia_id=obj.materia_id).last()
-            resultado_descricao = resultado.tipo_resultado_votacao.nome
-            resultado_observacao = resultado.observacao
+            if obj.tipo_votacao == LEITURA:
+                resultado = obj.registroleitura_set.filter(
+                    materia_id=obj.materia_id).last()
+                resultado_descricao = "Matéria lida"
+                resultado_observacao = resultado.observacao
+            else:
+                resultado = obj.registrovotacao_set.filter(
+                    materia_id=obj.materia_id).last()
+                resultado_descricao = resultado.tipo_resultado_votacao.nome
+                resultado_observacao = resultado.observacao
 
             if has_permission:
                 url = ''
                 if is_expediente:
-                    if obj.tipo_votacao == 1:
+                    if obj.tipo_votacao == SIMBOLICA:
                         url = reverse(
                             'sapl.sessao:votacaosimbolicaexpedit',
                             kwargs={
                                 'pk': obj.sessao_plenaria_id,
                                 'oid': obj.pk,
                                 'mid': obj.materia_id})
-                    elif obj.tipo_votacao == 2:
+                    elif obj.tipo_votacao == NOMINAL:
                         url = reverse('sapl.sessao:votacaonominalexpedit',
                                       kwargs={
                                           'pk': obj.sessao_plenaria_id,
                                           'oid': obj.pk,
                                           'mid': obj.materia_id})
-                    elif obj.tipo_votacao == 3:
+                    elif obj.tipo_votacao == SECRETA:
                         url = reverse('sapl.sessao:votacaosecretaexpedit',
                                       kwargs={
                                           'pk': obj.sessao_plenaria_id,
                                           'oid': obj.pk,
                                           'mid': obj.materia_id})
+                    elif obj.tipo_votacao == LEITURA:
+                        url = reverse('sapl.sessao:leituraexp',
+                                      kwargs={
+                                          'pk': obj.sessao_plenaria_id,
+                                          'oid': obj.pk,
+                                          'mid': obj.materia_id})
                 else:
-                    if obj.tipo_votacao == 1:
+                    if obj.tipo_votacao == SIMBOLICA:
                         url = reverse('sapl.sessao:votacaosimbolicaedit',
                                       kwargs={
                                           'pk': obj.sessao_plenaria_id,
                                           'oid': obj.pk,
                                           'mid': obj.materia_id})
-                    elif obj.tipo_votacao == 2:
+                    elif obj.tipo_votacao == NOMINAL:
                         url = reverse('sapl.sessao:votacaonominaledit',
                                       kwargs={
                                           'pk': obj.sessao_plenaria_id,
                                           'oid': obj.pk,
                                           'mid': obj.materia_id})
-                    elif obj.tipo_votacao == 3:
+                    elif obj.tipo_votacao == SECRETA:
                         url = reverse('sapl.sessao:votacaosecretaedit',
+                                      kwargs={
+                                          'pk': obj.sessao_plenaria_id,
+                                          'oid': obj.pk,
+                                          'mid': obj.materia_id})
+                    elif obj.tipo_votacao == LEITURA:
+                        url = reverse('sapl.sessao:leituraod',
                                       kwargs={
                                           'pk': obj.sessao_plenaria_id,
                                           'oid': obj.pk,
@@ -401,7 +471,7 @@ def customize_link_materia(context, pk, has_permission, is_expediente):
                               resultado_observacao))
             else:
 
-                if obj.tipo_votacao == 2:
+                if obj.tipo_votacao == NOMINAL:
                     if is_expediente:
                         url = reverse(
                             'sapl.sessao:votacao_nominal_transparencia',
@@ -424,7 +494,7 @@ def customize_link_materia(context, pk, has_permission, is_expediente):
                                   resultado_descricao,
                                   resultado_observacao))
 
-                elif obj.tipo_votacao == 1:
+                elif obj.tipo_votacao == SIMBOLICA:
                     if is_expediente:
                         url = reverse(
                             'sapl.sessao:votacao_simbolica_transparencia',
@@ -4437,3 +4507,108 @@ def voto_nominal_parlamentar(request):
                 voto.save()
 
     return JsonResponse({})
+
+
+class AbstractLeituraView(FormView):
+    template_name = 'sessao/votacao/leitura_form.html'
+    success_url = '/'
+    form_class = OrdemExpedienteLeituraForm()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['materia'] = MateriaLegislativa.objects.get(
+            id=self.kwargs['mid'])
+        return context
+
+    def get_initial(self):
+        initial = super().get_initial()
+        materia = MateriaLegislativa.objects.get(id=self.kwargs['mid'])
+        initial['materia'] = materia
+        initial['materia__ementa'] = materia.ementa
+        if self.expediente:
+            expediente = ExpedienteMateria.objects.get(id=self.kwargs['oid'])
+            instance = RegistroLeitura.objects.filter(
+                materia=materia, expediente=expediente)
+            initial['expediente'] = expediente
+        else:
+            ordem = OrdemDia.objects.get(id=self.kwargs['oid'])
+            instance = RegistroLeitura.objects.filter(
+                materia=materia, ordem=ordem)
+            initial['ordem'] = ordem
+        initial['instance'] = instance
+        initial['user'] = self.request.user
+        initial['ip'] = get_client_ip(self.request)
+        return initial
+
+    def form_valid(self, form):
+        if self.expediente:
+            model = ExpedienteMateria
+        else:
+            model = OrdemDia
+        ordem_expediente = model.objects.get(id=self.kwargs['oid'])
+        ordem_expediente.resultado = "Matéria lida"
+        ordem_expediente.votacao_aberta = False
+        ordem_expediente.save()
+        form.save()
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        page = ''
+        if 'page' in self.request.GET:
+            page = '?page={}'.format(self.request.GET['page'])
+
+        pk = self.kwargs['pk']
+        if self.expediente:
+            url = reverse('sapl.sessao:expedientemateria_list',
+                          kwargs={'pk': pk}) + page
+        else:
+            url = reverse('sapl.sessao:ordemdia_list',
+                          kwargs={'pk': pk}) + page
+        return url
+
+    def cancel_url(self):
+        page = ''
+        if 'page' in self.request.GET:
+            page = '?page={}'.format(self.request.GET['page'])
+        url = reverse('sapl.sessao:retirar_leitura',
+                      kwargs={
+                          'pk': self.kwargs['pk'],
+                          'iso': 1 if not self.expediente else 0,
+                          'oid': self.kwargs['oid'],
+                      },
+                      ) + page
+        return url
+
+
+class ExpedienteLeituraView(AbstractLeituraView):
+    expediente = True
+
+
+class OrdemDiaLeituraView(AbstractLeituraView):
+    expediente = False
+
+
+@permission_required('sessao.change_expedientemateria',
+                     'sessao.change_ordemdia')
+def retirar_leitura(request, pk, iso, oid):
+    page = ''
+    if 'page' in request.GET:
+        page = '?page={}'.format(request.GET['page'])
+
+    is_ordem = bool(int(iso))
+    if not is_ordem:
+        ordem_expediente = ExpedienteMateria.objects.get(id=oid)
+        RegistroLeitura.objects.filter(
+            materia=ordem_expediente.materia, expediente=ordem_expediente).delete()
+        succ_url = reverse('sapl.sessao:expedientemateria_list',
+                           kwargs={'pk': pk}) + page
+    else:
+        ordem_expediente = OrdemDia.objects.get(id=oid)
+        RegistroLeitura.objects.filter(
+            materia=ordem_expediente.materia, ordem=ordem_expediente).delete()
+        succ_url = reverse('sapl.sessao:ordemdia_list',
+                           kwargs={'pk': pk}) + page
+    ordem_expediente.resultado = ""
+    ordem_expediente.votacao_aberta = False
+    ordem_expediente.save()
+    return HttpResponseRedirect(succ_url)
