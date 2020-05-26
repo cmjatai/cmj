@@ -842,9 +842,11 @@ class JustificativaAusenciaForm(ModelForm):
             justificativa.materias_da_ordem_do_dia.clear()
         return justificativa
 
+
 class OrdemExpedienteLeituraForm(forms.ModelForm):
 
-    observacao = forms.CharField(required=False, label='Observação', widget=forms.Textarea,)
+    observacao = forms.CharField(
+        required=False, label='Observação', widget=forms.Textarea,)
 
     class Meta:
         model = RegistroLeitura
@@ -852,7 +854,7 @@ class OrdemExpedienteLeituraForm(forms.ModelForm):
                   'ordem',
                   'expediente',
                   'observacao',
-                  'user', 
+                  'user',
                   'ip']
         widgets = {'materia': forms.HiddenInput(),
                    'ordem': forms.HiddenInput(),
@@ -864,14 +866,14 @@ class OrdemExpedienteLeituraForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
 
         super().__init__(*args, **kwargs)
-        
+
         instance = self.initial['instance']
         if instance:
             self.instance = instance.first()
             self.fields['observacao'].initial = self.instance.observacao
 
         row1 = to_row(
-            [('observacao', 12)])   
+            [('observacao', 12)])
 
         actions = [HTML('<a href="{{ view.cancel_url }}"'
                         ' class="btn btn-warning">Cancelar Leitura</a>')]
@@ -879,11 +881,13 @@ class OrdemExpedienteLeituraForm(forms.ModelForm):
         self.helper = SaplFormHelper()
         self.helper.form_method = 'POST'
         self.helper.layout = Layout(
-            Fieldset(_('Leitura de Matéria'),
-                    HTML('''
+            Fieldset(
+                _('Leitura de Matéria'),
+                HTML('''
                         <b>Matéria:</b> {{materia}}<br>
                         <b>Ementa:</b> {{materia.ementa}} <br>
                     '''),
-                     row1,
-                     form_actions(more=actions),
-                    )
+                row1,
+                form_actions(more=actions),
+            )
+        )

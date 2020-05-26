@@ -34,11 +34,9 @@ from sapl.materia.models import (Autoria, TipoMateriaLegislativa,
 from sapl.materia.views import MateriaLegislativaPesquisaView
 from sapl.painel.models import Cronometro, PainelConfig
 from sapl.parlamentares.models import (Filiacao, Legislatura, Mandato,
-                                       Parlamentar, SessaoLegislativa,
-                                       AfastamentoParlamentar)
+                                       Parlamentar, SessaoLegislativa)
 from sapl.sessao.apps import AppConfig
-from sapl.sessao.forms import ExpedienteMateriaForm, OrdemDiaForm,\
-    OrdemExpedienteLeituraForm
+from sapl.sessao.forms import OrdemExpedienteLeituraForm, ExpedienteMateriaForm, OrdemDiaForm
 from sapl.sessao.models import RegistroLeitura
 from sapl.utils import (show_results_filter_set, remover_acentos, get_client_ip, filiacao_data,
                         verifica_afastamento_parlamentar)
@@ -1733,17 +1731,30 @@ def get_materias_expediente(sessao_plenaria):
         if tramitacao:
             turno = get_turno(tramitacao.turno)
 
-        rv = m.registrovotacao_set.first()
-        rp = m.retiradapauta_set.filter(materia=m.materia).first()
-        if rv:
-            resultado = rv.tipo_resultado_votacao.nome
-            resultado_observacao = rv.observacao
-        elif rp:
-            resultado = rp.tipo_de_retirada.descricao
-            resultado_observacao = rp.observacao
+        if m.tipo_votacao == LEITURA:
+            rv = m.registroleitura_set.first()
+            rp = m.retiradapauta_set.filter(materia=m.materia).first()
+            if rv:
+                resultado = 'Matéria Lida.'
+                resultado_observacao = rv.observacao
+            elif rp:
+                resultado = rp.tipo_de_retirada.descricao
+                resultado_observacao = rp.observacao
+            else:
+                resultado = _('Matéria não lida.')
+                resultado_observacao = _(' ')
         else:
-            resultado = _('Matéria não votada')
-            resultado_observacao = _(' ')
+            rv = m.registrovotacao_set.first()
+            rp = m.retiradapauta_set.filter(materia=m.materia).first()
+            if rv:
+                resultado = rv.tipo_resultado_votacao.nome
+                resultado_observacao = rv.observacao
+            elif rp:
+                resultado = rp.tipo_de_retirada.descricao
+                resultado_observacao = rp.observacao
+            else:
+                resultado = _('Matéria não votada.')
+                resultado_observacao = _(' ')
 
         autoria = Autoria.objects.filter(materia_id=m.materia_id)
         autor = [str(x.autor) for x in autoria]
@@ -4512,7 +4523,7 @@ def voto_nominal_parlamentar(request):
 class AbstractLeituraView(FormView):
     template_name = 'sessao/votacao/leitura_form.html'
     success_url = '/'
-    form_class = OrdemExpedienteLeituraForm()
+    form_class = OrdemExpedienteLeituraForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

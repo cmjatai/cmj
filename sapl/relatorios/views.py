@@ -30,7 +30,8 @@ from sapl.sessao.views import (get_identificacao_basica, get_mesa_diretora,
                                get_materias_expediente, get_oradores_expediente,
                                get_presenca_ordem_do_dia, get_materias_ordem_do_dia,
                                get_oradores_ordemdia,
-                               get_oradores_explicacoes_pessoais, get_ocorrencias_da_sessao, get_assinaturas)
+                               get_oradores_explicacoes_pessoais, get_ocorrencias_da_sessao, get_assinaturas,
+                               LEITURA)
 from sapl.settings import MEDIA_URL
 from sapl.settings import STATIC_ROOT
 from sapl.utils import LISTA_DE_UFS, TrocaTag, filiacao_data
@@ -655,15 +656,26 @@ def get_sessao_plenaria(sessao, casa):
             dic_expediente_materia["nom_autor"] = 'Desconhecido'
 
         dic_expediente_materia["votacao_observacao"] = ' '
-        resultados = expediente_materia.registrovotacao_set.all()
+        if expediente_materia.tipo_votacao == LEITURA:
+            resultados = expediente_materia.registroleitura_set.all()
+        else:
+            resultados = expediente_materia.registrovotacao_set.all()
+
         if resultados:
             for i in resultados:
-                dic_expediente_materia["nom_resultado"] = (
-                    i.tipo_resultado_votacao.nome)
-                dic_expediente_materia["votacao_observacao"] = (
-                    i.observacao)
+                if expediente_materia.tipo_votacao == LEITURA:
+
+                    dic_expediente_materia["nom_resultado"] = 'Matéria Lida'
+                    dic_expediente_materia["votacao_observacao"] = (
+                        i.observacao)
+                else:
+                    dic_expediente_materia["nom_resultado"] = (
+                        i.tipo_resultado_votacao.nome)
+                    dic_expediente_materia["votacao_observacao"] = (
+                        i.observacao)
         else:
-            dic_expediente_materia["nom_resultado"] = 'Matéria não votada'
+            dic_expediente_materia["nom_resultado"] = 'Matéria não {}'.format(
+                'Lida' if expediente_materia.tipo_votacao == LEITURA else 'Votada')
             dic_expediente_materia["votacao_observacao"] = ' '
         lst_expediente_materia.append(dic_expediente_materia)
 
@@ -775,7 +787,9 @@ def get_sessao_plenaria(sessao, casa):
                 if i.observacao:
                     dic_votacao["votacao_observacao"] = i.observacao
         else:
-            dic_votacao["nom_resultado"] = "Matéria não votada"
+            dic_votacao["nom_resultado"] = 'Matéria não {}'.format(
+                'Lida' if expediente_materia.tipo_votacao == LEITURA else 'Votada')
+
         lst_votacao.append(dic_votacao)
 
     # Lista dos votos nominais das matérias da Ordem do Dia

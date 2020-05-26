@@ -35,7 +35,9 @@ from sapl.sessao.views import (AdicionarVariasMateriasExpediente,
                                VotacaoEmBlocoSimbolicaView, VotacaoEmBlocoNominalView,
                                resumo_ordenacao,
                                recuperar_nome_tipo_sessao,
-                               voto_nominal_parlamentar)
+                               voto_nominal_parlamentar,
+                               ExpedienteLeituraView,
+                               OrdemDiaLeituraView, retirar_leitura)
 
 from .apps import AppConfig
 
