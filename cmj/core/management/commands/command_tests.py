@@ -5,23 +5,19 @@ import os
 import shutil
 import stat
 import subprocess
+import sys
 import time
 
-from OpenSSL import crypto
 from PIL import Image
-from PyPDF4.generic import (
-    DictionaryObject,
-    NumberObject,
-    FloatObject,
-    NameObject,
-    TextStringObject,
-    ArrayObject, ByteStringObject)
+from PyPDF4.generic import ByteStringObject
 from PyPDF4.generic import IndirectObject
 from PyPDF4.pdf import PdfFileReader, PdfFileWriter
 from asn1crypto import cms
 import boto3
 from cryptography import x509
+from cryptography.hazmat import backends
 from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.serialization import pkcs12
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
@@ -30,113 +26,15 @@ from django.db.models import F, Q
 from django.db.models.signals import post_delete, post_save
 from django.utils import timezone
 from endesive import pdf
-from pyasn1.codec.der.decoder import decode
-from pyasn1.codec.der.encoder import encode
-from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.lib.units import mm
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.pdfgen import canvas
-from reportlab.platypus.paragraph import Paragraph
 
 from cmj.core.models import OcrMyPDF
 from sapl.compilacao.models import Dispositivo
 from sapl.materia.models import MateriaLegislativa
-from sapl.norma.models import NormaJuridica
 from sapl.protocoloadm.models import DocumentoAdministrativo
-
-
-# x1, y1 starts in bottom left corner
-def createHighlight(x1, y1, x2, y2, meta, color=[1, 0, 0]):
-    newHighlight = DictionaryObject()
-
-    newHighlight.update({
-        NameObject("/F"): NumberObject(4),
-        NameObject("/Type"): NameObject("/Annot"),
-        NameObject("/Subtype"): NameObject("/Highlight"),
-
-        NameObject("/T"): TextStringObject(meta["author"]),
-        NameObject("/Contents"): TextStringObject(meta["contents"]),
-
-        NameObject("/C"): ArrayObject([FloatObject(c) for c in color]),
-        NameObject("/Rect"): ArrayObject([
-            FloatObject(x1),
-            FloatObject(y1),
-            FloatObject(x2),
-            FloatObject(y2)
-        ]),
-        NameObject("/QuadPoints"): ArrayObject([
-            FloatObject(x1),
-            FloatObject(y2),
-            FloatObject(x2),
-            FloatObject(y2),
-            FloatObject(x1),
-            FloatObject(y1),
-            FloatObject(x2),
-            FloatObject(y1)
-        ]),
-    })
-
-    return newHighlight
-
-
-def addHighlightToPage(highlight, page, output):
-    highlight_ref = output._addObject(highlight)
-
-    if "/Annots" in page:
-        page[NameObject("/Annots")].append(highlight_ref)
-    else:
-        page[NameObject("/Annots")] = ArrayObject([highlight_ref])
 
 
 def _get_registration_key(model):
     return '%s_%s' % (model._meta.app_label, model._meta.model_name)
-
-
-class CompressPDF:
-
-    quality = {
-        0: '/default',
-        1: '/prepress',
-        2: '/printer',
-        3: '/ebook',
-        4: '/screen'
-    }
-
-    def compress(self, compress_level, file=None, new_file=None):
-
-        try:
-            initial_size = os.path.getsize(file)
-
-            r = subprocess.call([
-                'gs',
-                '-sDEVICE=pdfwrite',
-                '-dCompatibilityLevel=1.4',
-                '-dPDFSETTINGS=/prepress',
-                '-dNOPAUSE',
-                '-dQUIET',
-                '-dBATCH',
-                '-dAutoRotatePages=/None',
-                '-dCompressPages=true',
-                '-dColorImageResolution=96',
-                #'-dColorImageDownsampleType=/Bicubic',
-                '-sOutputFile={}'.format(new_file),
-                file]
-            )
-
-            final_size = os.path.getsize(new_file)
-            ratio = 1 - (final_size / initial_size)
-            print("Compression by {0:.0%}.".format(ratio))
-            print("Final file size is {0:.1f}MB".format(
-                final_size / 1000000))
-            return True
-
-        except Exception as error:
-            print('Caught this error: ' + repr(error))
-        except subprocess.CalledProcessError as e:
-            print("Unexpected error:".format(e.output))
-            return False
 
 
 class Command(BaseCommand):
@@ -150,75 +48,50 @@ class Command(BaseCommand):
         self.logger = logging.getLogger(__name__)
 
         # self.run_test_add_hi()
-        self.run_veririca_pdf_tem_assinatura()
+        # self.run_veririca_pdf_tem_assinatura()
         # self.run_backup_locaweb()
+        self.run_test_add_sign_pil()
 
-    def run_backup_locaweb(self):
-        access_key = settings.AWS_ACCESS_KEY_ID
-        secret_key = settings.AWS_SECRET_ACCESS_KEY
+    def run_test_add_sign_pil(self):
+        m = MateriaLegislativa.objects.get(pk=17738)
+        print(m.texto_original.original_path)
 
-        try:
-
-            s3 = boto3.client(
-                's3',
-                # endpoint_url='https://object-storage.locaweb.com.br/',
-                endpoint_url='https://lss.locawebcorp.com.br',
-                aws_access_key_id=access_key,
-                aws_secret_access_key=secret_key,
-                region_name='sa-east-1',
-                # use_ssl=True
+        date = timezone.localtime()
+        date = date.strftime('%Y%m%d%H%M%S+00\'00\'')
+        img = Image.open('/home/leandro/Câmara/logo/logo_256.jpg')
+        dct = {
+            b'sigflags': 3,
+            # b'sigpage': 0,
+            b'sigbutton': True,
+            b'signature_img': img,
+            b'contact': b'leandro@jatai.go.leg.br',
+            b'location': b'CMJ',
+            b'signingdate': date.encode(),
+            b'reason': b'Certificar Protocolo',
+            b'signature': b'Leandro Roberto da Silva',
+            b'signaturebox': (100, 100, 100, 100),
+        }
+        with open(settings.CERT_PRIVATE_KEY_ID, 'rb') as fp:
+            p12 = pkcs12.load_key_and_certificates(
+                fp.read(),
+                settings.CERT_PRIVATE_ACCESS_KEY.encode(),
+                backends.default_backend()
             )
 
-            # for bucket in s3.buckets.all():
-            #    print(bucket.name)
-        except Exception as e:
-            print(e)
-            return
+        #fname = m.texto_original.original_path
+        fname = '/home/leandro/Downloads/ed_020_assinado.pdf'
 
-        #t = s3.Bucket('cmjatai_teste')
-        # for o in t.objects.all():
-        #    print(o)
-
-        #result = s3.get_bucket_policy(Bucket='cmjatai_teste')
-
-        #t = s3.create_bucket(Bucket='cmjatai_teste')
-
-        norma = NormaJuridica.objects.get(pk=8670)
-
-        s3.upload_file(norma.texto_integral.path,
-                       'cmjatai_teste',
-                       norma.texto_integral.name,
-                       ExtraArgs={'ACL': 'public-read',
-                                  'Metadata': {'pk': f'{norma._meta.label_lower}.{norma.id}'}
-                                  }
-                       )
-
-        #t = s3.Bucket('cmjatai_teste')
-        #t = t.load()
-        # print(t)
-        # print(result['Policy'])
-
-    def run_test_add_hi(self):
-
-        ifile = '/home/leandro/Downloads/portaria_23_duas_assinaturas.pdf'
-        ofile = '/home/leandro/Downloads/portaria_23_duas_assinaturas__hi.pdf'
-
-        pdfInput = PdfFileReader(open(ifile, "rb"))
-        pdfOutput = PdfFileWriter()
-
-        for numPage in range(0, pdfInput.numPages):
-            pg = pdfInput.getPage(numPage)
-            if numPage == 0:
-                highlight = createHighlight(100, 400, 400, 500, {
-                    "author": "eu eu eu",
-                    "contents": "Bla-bla-bla"
-                })
-
-                addHighlightToPage(highlight, pg, pdfOutput)
-            pdfOutput.addPage(pg)
-
-        outputStream = open(ofile, "wb")
-        pdfOutput.write(outputStream)
+        datau = open(fname, 'rb').read()
+        datas = pdf.cms.sign(datau, dct,
+                             p12[0],
+                             p12[1],
+                             p12[2],
+                             'sha256'
+                             )
+        fname = '/home/leandro/TEMP/teste.pdf'
+        with open(fname, 'wb') as fp:
+            fp.write(datau)
+            fp.write(datas)
 
     def run_veririca_pdf_tem_assinatura(self):
         global sss
@@ -242,87 +115,6 @@ class Command(BaseCommand):
 
                     except Exception as e:
                         pass
-
-                    with open('/home/leandro/Downloads/content{}.ext'.format(sss), 'wb') as f:
-                        f.write(fields)
-                        f.close()
-                    return
-                else:
-                    print(' ' * sss, fields)
-                    return
-            for field_name, value in fields.items():
-                sss += 2
-                tree_print(field_name, value)
-                sss -= 2
-
-        ifile = '/home/leandro/Downloads/016 - Projeto da LDO 2021_Assinado.pdf'
-        ifile = '/home/leandro/Downloads/plol_violencia_nas_escolas.pdf'
-
-        (hashok, signatureok, certok) = pdf.verify(open(ifile, 'rb').read())
-        print('signature ok?', signatureok)
-        print('hash ok?', hashok)
-        print('cert ok?', certok)
-
-        r = PdfFileReader(open(ifile, "rb"))
-
-        fields = r.getFields()
-
-        tree_print('file', fields)
-
-        #self.get_all_images_sign(r, o_path)
-
-    def run_veririca_pdf_tem_assinatura_old(self):
-        global sss
-        sss = 1
-
-        def tree_print(field_name, fields):
-            global sss
-            ss = " "
-            print(ss * sss, field_name, '.............')
-            if not isinstance(fields, dict):
-                ByteStringObject
-                if field_name == '/Contents':
-                    try:
-
-                        cert, rest = decode(fields)
-
-                        realcert = encode(cert[1][3])
-                        # remove the first DER identifier from the front
-                        realcert = realcert[2 + (realcert[1] & 0x7F)
-                                            if realcert[1] & 0x80 > 1 else 2:]
-                        aa = x509.load_der_x509_certificate(
-                            realcert, default_backend())
-
-                    except Exception as e:
-                        print(e)
-                        try:
-                            pkcs7 = crypto.load_pkcs7_data(
-                                crypto.FILETYPE_ASN1, fields)
-                        except Exception as e:
-                            print(e)
-
-                        else:
-                            if pkcs7.type_is_signed():
-                                certs = pkcs7._pkcs7.d.sign.cert
-                            elif pkcs7.type_is_signedAndEnveloped():
-                                certs = pkcs7._pkcs7.d.signed_and_enveloped.cert
-                            pycerts = []
-                            for i in range(crypto._lib.sk_X509_num(certs)):
-                                pycert = crypto.X509.__new__(crypto.X509)
-                                # pycert._x509 = _lib.sk_X509_value(certs, i)
-                                # According to comment from @ Jari Turkia
-                                # to prevent segfaults use '_lib.X509_dup('
-                                pycert._x509 = crypto._lib.X509_dup(
-                                    crypto._lib.sk_X509_value(certs, i))
-                                pycerts.append(pycert)
-
-                            certs_final = None if not pycerts else tuple(
-                                pycerts)
-
-                            for cert in certs_final:
-                                for idx in range(cert.get_extension_count()):
-                                    ext = cert.get_extension(idx)
-                                    print(ext.get_short_name())
 
                     with open('/home/leandro/Downloads/content{}.ext'.format(sss), 'wb') as f:
                         f.write(fields)
@@ -470,50 +262,6 @@ class Command(BaseCommand):
             pageNo += 1
 
         pass
-
-    def run_insert_font_pdf_file__test3(self):
-        ifile = '/home/leandro/TEMP/4084__com_fonte__.pdf'
-        pdf = open(ifile)
-
-        for p in pdf:
-            fl = p.getFontList()
-            for f in fl:
-                print(f)
-
-    def run_insert_font_pdf_file__test2(self):
-        helvetica_font = settings.FONTS_DIR.child('Helvetica.ttf')
-
-        ifile = '/home/leandro/TEMP/4084.pdf'
-
-        style = getSampleStyleSheet()
-        width, height = A4
-        c = canvas.Canvas(ofile, pagesize=A4)
-        pdfmetrics.registerFont(TTFont("Helvetica", helvetica_font))
-
-        cmj_string = '<font name="Helvetica" size="16">%s</font>'
-        cmj_string = cmj_string % "CMJ DOC"
-
-        p = Paragraph(cmj_string, style=style["Normal"])
-        p.wrapOn(c, width, height)
-        p.drawOn(c, 20, 750, mm)
-
-        c.save()
-
-    def run_insert_font_pdf_file__test1(self):
-        helvetica_font = settings.FONTS_DIR.child('Helvetica.ttf')
-
-        ifile = '/home/leandro/TEMP/4084.pdf'
-        ofile = '/home/leandro/TEMP/4084__com_fonte.pdf'
-
-        ppdf = FPDF()
-        ppdf.add_font('helvetica', style='', fname=helvetica_font, uni=True)
-
-        ppdf.set_font('helvetica')
-        ppdf.output(ofile, 'F')
-
-    def run_checkcheck_olds(self):
-        MateriaLegislativa.objects.filter(
-            ano__lte=2012).update(checkcheck=True)
 
     def run_invalida_checkcheck_projeto_com_norma_nao_viculada_a_autografo(self):
         materias = MateriaLegislativa.objects.filter(
@@ -678,3 +426,48 @@ class Command(BaseCommand):
                 numero = nd.get_numero_completo()
 
         busca(nodelist)
+
+
+class CompressPDF:
+
+    quality = {
+        0: '/default',
+        1: '/prepress',
+        2: '/printer',
+        3: '/ebook',
+        4: '/screen'
+    }
+
+    def compress(self, compress_level, file=None, new_file=None):
+
+        try:
+            initial_size = os.path.getsize(file)
+
+            r = subprocess.call([
+                'gs',
+                '-sDEVICE=pdfwrite',
+                '-dCompatibilityLevel=1.4',
+                '-dPDFSETTINGS=/prepress',
+                '-dNOPAUSE',
+                '-dQUIET',
+                '-dBATCH',
+                '-dAutoRotatePages=/None',
+                '-dCompressPages=true',
+                '-dColorImageResolution=96',
+                #'-dColorImageDownsampleType=/Bicubic',
+                '-sOutputFile={}'.format(new_file),
+                file]
+            )
+
+            final_size = os.path.getsize(new_file)
+            ratio = 1 - (final_size / initial_size)
+            print("Compression by {0:.0%}.".format(ratio))
+            print("Final file size is {0:.1f}MB".format(
+                final_size / 1000000))
+            return True
+
+        except Exception as error:
+            print('Caught this error: ' + repr(error))
+        except subprocess.CalledProcessError as e:
+            print("Unexpected error:".format(e.output))
+            return False

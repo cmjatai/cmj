@@ -68,11 +68,6 @@ USE_SOLR = config('USE_SOLR', cast=bool, default=False)
 SOLR_URL = config('SOLR_URL', cast=str, default='http://localhost:8983')
 SOLR_COLLECTION = config('SOLR_COLLECTION', cast=str, default='cmj_portal')
 
-# LOCAWEB
-AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID', cast=str, default='')
-AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY', cast=str, default='')
-ABSOLUTE_PATH_BACKUP = config('ABSOLUTE_PATH_BACKUP', cast=str, default='')
-
 
 if USE_SOLR:
     # enable auto-index

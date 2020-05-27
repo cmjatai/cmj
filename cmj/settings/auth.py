@@ -123,3 +123,14 @@ SOCIAL_AUTH_PIPELINE = (
     # Update the user record with any changed info from the auth service.
     'social_core.pipeline.user.user_details'
 )
+
+
+# LOCAWEB
+AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID', cast=str, default='')
+AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY', cast=str, default='')
+ABSOLUTE_PATH_BACKUP = config('ABSOLUTE_PATH_BACKUP', cast=str, default='')
+
+# cert_public
+CERT_PRIVATE_KEY_ID = config('CERT_PRIVATE_KEY_ID', cast=str, default='')
+CERT_PRIVATE_ACCESS_KEY = config(
+    'CERT_PRIVATE_ACCESS_KEY', cast=str, default='')
