@@ -212,12 +212,21 @@
   .title {
     font-weight: bold;
     padding: 1px 5px;
-    display: inline-block;
+    display: block;
     white-space: nowrap;
+    line-height: 1.2;
+
   }
   .sigs {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    align-content: stretch;
+    justify-content: space-around;
+    width: 100%;
   }
   .sig {
+    flex: 1 1 50%;
     background-color: white;
     padding: 5px 10px;
     display: inline-block;
@@ -228,9 +237,10 @@
     font-size: 90%;
     .sig-nome {
       display: block;
+      font-weight: bold;
     }
     .sig-data {
-
+      font-style: italic;
     }
   }
 }
@@ -421,6 +431,12 @@
       height: 0px;
     }
   }
+  .box-assinatura-eletronica {
+    .sig {
+      flex: 1 1 50%;
+    }
+  }
+
 }
 
 @media screen and (max-width: 767px) {
@@ -466,6 +482,11 @@
     }
   }
   
+  .box-assinatura-eletronica {
+    .sig {
+      flex: 1 1 100%;
+    }
+  }
 }
 
 

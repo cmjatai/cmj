@@ -93,10 +93,10 @@ class Command(BaseCommand):
                     continue
                 print(m, m.objects.all().count())
 
-                if m != MateriaLegislativa:
-                    continue
+                # if m != MateriaLegislativa:
+                #    continue
 
-                for i in m.objects.filter(id=17765).order_by('-id'):
+                for i in m.objects.all().order_by('-id')[:100]:
                     i.save()
                     print(i)
 

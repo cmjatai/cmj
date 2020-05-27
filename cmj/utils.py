@@ -383,5 +383,15 @@ def signed_name_and_date_extract(file):
         if nome not in signs:
             signs[nome] = fd
     signs = list(signs.items())
+    signs = sorted(signs, key=lambda sign: sign[0])
 
-    return signs
+    sr = []
+
+    for s in signs:
+        tt = s[0].title().split(' ')
+        for idx, t in enumerate(tt):
+            if t in ('Dos', 'De', 'Da', 'Do', 'Das', 'E'):
+                tt[idx] = t.lower()
+        sr.append((' '.join(tt), s[1]))
+
+    return sr
