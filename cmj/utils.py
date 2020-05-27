@@ -4,6 +4,7 @@ import re
 from unicodedata import normalize as unicodedata_normalize
 
 from PyPDF4.pdf import PdfFileReader
+from asn1crypto import cms
 from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
@@ -19,8 +20,6 @@ import magic
 from model_utils.choices import Choices
 from reversion.admin import VersionAdmin
 from unipath.path import Path
-
-from asn1crypto import cms
 
 
 def pil_image(source, exif_orientation=False, **options):
@@ -327,14 +326,14 @@ def run_sql(sql):
 
 
 def signed_name_and_date_extract(file):
-    signs = []
+    signs = {}
     try:
         pdf = PdfFileReader(file)
     except Exception as e:
         try:
             pdf = PdfFileReader(file, strict=False)
         except Exception as ee:
-            return signs
+            return []
 
     fields = pdf.getFields()
 
@@ -381,5 +380,8 @@ def signed_name_and_date_extract(file):
                 fd = datetime.strptime(data[2:], '%Y%m%d%H%M%S%z')
         except:
             pass
-        signs.append((nome, fd))
+        if nome not in signs:
+            signs[nome] = fd
+    signs = list(signs.items())
+
     return signs

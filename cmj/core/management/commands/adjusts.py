@@ -2,8 +2,10 @@
 from datetime import datetime, timedelta
 import logging
 
+from django.apps.registry import apps
 from django.core.management.base import BaseCommand
 from django.db.models import F, Q
+from django.db.models.fields.files import FileField
 from django.db.models.signals import post_delete, post_save
 from django.utils import timezone
 
@@ -43,8 +45,60 @@ class Command(BaseCommand):
 
         # self.run_veririca_pdf_tem_assinatura()
 
-        self.run_capture_fields_from_pdf()
+        # self.run_capture_fields_from_pdf()
         # self.associa_tipo_conteudo_gerado__e__conteudo_gerado()
+
+        self.ajuste_metadata_com_set_values()
+
+    def ajuste_metadata_com_set_values(self):
+        for app in apps.get_app_configs():
+
+            if not app.name.startswith('cmj') and not app.name.startswith('sapl'):
+                continue
+            print(app)
+
+            for m in app.get_models():
+                model_exec = False
+
+                for f in m._meta.get_fields():
+                    dua = f
+                    print(dua)
+                    if hasattr(dua, 'auto_now') and dua.auto_now:
+                        #print(m, 'auto_now deve ser desativado.')
+                        # continue  # auto_now deve ser desativado
+                        print(m, 'desativando auto_now')
+                        dua.auto_now = False
+
+                    if not isinstance(f, FileField):
+                        continue
+
+                    # se possui FileField, o model então
+                    # deve possuir FIELDFILE_NAME
+                    assert hasattr(m, 'FIELDFILE_NAME'), '{} não possui FIELDFILE_NAME'.format(
+                        m._meta.label)
+
+                    # se possui FileField, o model então
+                    # deve possuir metadata
+                    assert hasattr(m, 'metadata'), '{} não possui metadata'.format(
+                        m._meta.label)
+
+                    # o campo field deve estar em FIELDFILE_NAME
+                    assert f.name in m.FIELDFILE_NAME, '{} não está no FIELDFILE_NAME de {}'.format(
+                        f.name,
+                        m._meta.label)
+
+                    model_exec = True
+
+                if not model_exec:
+                    continue
+                print(m, m.objects.all().count())
+
+                if m != MateriaLegislativa:
+                    continue
+
+                for i in m.objects.filter(id=17765).order_by('-id'):
+                    i.save()
+                    print(i)
 
     def associa_tipo_conteudo_gerado__e__conteudo_gerado(self):
 
