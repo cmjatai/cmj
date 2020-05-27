@@ -788,7 +788,7 @@ def get_sessao_plenaria(sessao, casa):
                     dic_votacao["votacao_observacao"] = i.observacao
         else:
             dic_votacao["nom_resultado"] = 'Matéria não {}'.format(
-                'Lida' if expediente_materia.tipo_votacao == LEITURA else 'Votada')
+                'Lida' if votacao.tipo_votacao == LEITURA else 'Votada')
 
         lst_votacao.append(dic_votacao)
 
