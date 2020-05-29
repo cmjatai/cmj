@@ -21,7 +21,7 @@ def protocolo_pre_save(sender, instance, using, **kwargs):
         return
     try:
 
-        if instance.email:
+        if instance.email and instance.conteudo_protocolado:
 
             if instance.timestamp:
                 data = instance.timestamp.strftime("%Y/%m/%d")
@@ -38,7 +38,7 @@ def protocolo_pre_save(sender, instance, using, **kwargs):
                 'email/comprovante_protocolo.html',
                 {'protocolo': instance,
                     'barcode': barcode,
-                    'autenticacao': autenticacao}, EMAIL_SEND_USER, 'leandro@jatai.go.leg.br')  # instance.email)
+                    'autenticacao': autenticacao}, EMAIL_SEND_USER, instance.email)  # 'leandro@jatai.go.leg.br')  #
 
             print('Um Email com comprovante de protocolo foi enviado '
                   '%s - email: %s - interessado: %s' % (

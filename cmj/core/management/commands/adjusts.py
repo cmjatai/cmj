@@ -11,6 +11,7 @@ from django.utils import timezone
 
 from cmj.core.models import OcrMyPDF
 from cmj.diarios.models import DiarioOficial
+from cmj.utils import signed_name_and_date_extract
 from sapl.compilacao.models import Dispositivo, TextoArticulado,\
     TipoDispositivo
 from sapl.materia.models import MateriaLegislativa, DocumentoAcessorio
@@ -48,7 +49,13 @@ class Command(BaseCommand):
         # self.run_capture_fields_from_pdf()
         # self.associa_tipo_conteudo_gerado__e__conteudo_gerado()
 
-        self.ajuste_metadata_com_set_values()
+        # self.ajuste_metadata_com_set_values()
+        # with
+        # open('/home/leandro/desenvolvimento/envs/cmj_media_local/media/original__sapl/private/materialegislativa/2020/17709/teste.pdf',
+        # 'rb') as f:
+        with open('/home/leandro/TEMP/teste.pdf', 'rb') as f:
+
+            signed_name_and_date_extract(f)
 
     def ajuste_metadata_com_set_values(self):
         for app in apps.get_app_configs():
@@ -93,10 +100,10 @@ class Command(BaseCommand):
                     continue
                 print(m, m.objects.all().count())
 
-                # if m != MateriaLegislativa:
-                #    continue
+                if m != MateriaLegislativa:
+                    continue
 
-                for i in m.objects.all().order_by('-id')[:100]:
+                for i in m.objects.filter(pk=17709).order_by('-id')[:100]:
                     i.save()
                     print(i)
 
