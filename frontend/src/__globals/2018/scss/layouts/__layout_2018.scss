@@ -226,7 +226,7 @@
     width: 100%;
   }
   .sig {
-    flex: 1 1 50%;
+    flex: 1 1 100%;
     background-color: white;
     padding: 5px 10px;
     display: inline-block;
@@ -433,7 +433,7 @@
   }
   .box-assinatura-eletronica {
     .sig {
-      flex: 1 1 50%;
+      //flex: 1 1 50%;
     }
   }
 
@@ -484,7 +484,7 @@
   
   .box-assinatura-eletronica {
     .sig {
-      flex: 1 1 100%;
+      //flex: 1 1 100%;
     }
   }
 }

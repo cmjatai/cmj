@@ -197,8 +197,27 @@ class Protocolo(models.Model):
         return materia
 
 
+# class DocumentoAdministrativoManager(models.Manager):
+
+#    use_for_related_fields = True
+
+    # def childs(self):
+    #    qs = self.get_queryset()
+    #    return qs.order_by('-data_ultima_atualizacao')
+
+
 @reversion.register()
 class DocumentoAdministrativo(CountPageMixin):
+
+    #related_objects = DocumentoAdministrativoManager()
+    #objects = models.Manager()
+
+    class Meta:
+        verbose_name = _('Documento Administrativo')
+        verbose_name_plural = _('Documentos Administrativos')
+        ordering = ('-ano', ('-id'))
+        #base_manager_name = 'related_objects'
+
     FIELDFILE_NAME = ('texto_integral', )
 
     metadata = JSONField(
@@ -311,11 +330,6 @@ class DocumentoAdministrativo(CountPageMixin):
 
     _certidao = GenericRelation(
         CertidaoPublicacao, related_query_name='documentoadministrativo_cert')
-
-    class Meta:
-        verbose_name = _('Documento Administrativo')
-        verbose_name_plural = _('Documentos Administrativos')
-        ordering = ('-ano', ('-id'))
 
     @property
     def certidao(self):
