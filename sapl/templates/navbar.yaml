@@ -9,7 +9,7 @@
       url: sapl.parlamentares:mesa_diretora
     - title: {% trans 'Comissões' %}
       url: sapl.comissoes:comissao_list
-    - title: {% trans 'Frentes' %}
+    - title: {% trans 'Blocos Parlamentares' %}
       url: sapl.parlamentares:frente_list
     - title: {% trans 'Parlamentares' %}
       url: sapl.parlamentares:parlamentar_list

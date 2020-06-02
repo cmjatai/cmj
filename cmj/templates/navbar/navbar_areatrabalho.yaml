@@ -23,6 +23,6 @@
 
 {{ "navbar/restrict/navbar_protocolo.yaml"|yaml_render:0|safe }}
 
-{% if not perms.protocoloadm.list_protocolo %}
+{% if not perms.protocoloadm.add_protocolo %}
   {{ "navbar/public/navbar_atividadelegislativa.yaml"|yaml_render:0|safe }}
 {% endif %}

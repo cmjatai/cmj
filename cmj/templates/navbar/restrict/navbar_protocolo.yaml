@@ -22,4 +22,4 @@
   
 - title: {% trans 'Matérias Legislativas' %}
   url: sapl.materia:pesquisar_materia
-  check_permission: protocoloadm.list_protocolo 
+  check_permission: protocoloadm.add_protocolo 

@@ -4,9 +4,13 @@
   children:
   - title: {% trans 'Comissões' %}
     url: sapl.comissoes:comissao_list
-  - title: {% trans 'Frentes' %}
-    url: sapl.parlamentares:frente_list
 
+  - title: {% trans 'Blocos Parlamentares' %}
+    url: sapl.parlamentares:bloco_list
+
+  - title: {% trans 'Bancadas Partidárias' %}
+    url: sapl.parlamentares:bancada_list
+    
   - title: {% trans 'Mesa Diretora' %}
     url: sapl.parlamentares:mesa_diretora
     check_permission: parlamentares.add_composicaomesa

@@ -38,7 +38,8 @@ from sapl.crud.base import (Crud, CrudAux, MasterDetailCrud, make_pagination,
                             RP_LIST, RP_DETAIL,
                             PermissionRequiredContainerCrudMixin, CrudListView,
                             CrudDetailView)
-from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa, UnidadeTramitacao
+from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa, UnidadeTramitacao,\
+    DocumentoAcessorio
 from sapl.materia.views import gerar_pdf_impressos
 from sapl.parlamentares.models import Legislatura, Parlamentar
 from sapl.protocoloadm.forms import ProtocoloDocumentoAcessorioForm
@@ -1254,6 +1255,14 @@ class ProtocoloPesquisaView(PermissionRequiredMixin, FilterView):
 
         if 'o' in self.request.GET and not self.request.GET['o']:
             qs = qs.order_by('-ano', '-numero')
+
+        if not self.request.user.has_perm('protocoloadm.add_protocolo'):
+            cts = ContentType.objects.get_for_models(
+                MateriaLegislativa,
+                DocumentoAcessorio)
+            qs = qs.filter(
+                conteudo_content_type__in=cts.values()
+            )
 
         kwargs.update({
             'queryset': qs,
