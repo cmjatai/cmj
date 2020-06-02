@@ -82,8 +82,8 @@ class BlocoCrud(Crud):
     public = [RP_DETAIL, RP_LIST]
 
     class BaseMixin(Crud.BaseMixin):
-        list_field_names = ('nome', 'partidos',
-                            'data_criacao', 'data_extincao', 'cargoblocopartido_set')
+        list_field_names = ('nome', 'partidos', 'cargoblocopartido_set',
+                            'data_criacao', 'data_extincao',)
 
     class ListView(Crud.ListView):
 
@@ -91,8 +91,18 @@ class BlocoCrud(Crud):
             return "Parlamentares"
 
         def hook_cargoblocopartido_set(self, *args, **kwargs):
+            parlamentares = args[0].cargoblocopartido_set.all()
+            ul = []
+            for p in parlamentares:
+                ul.append(
+                    '<li><a href="{}">{}</a></li>'.format(
+                        reverse('sapl.parlamentares:parlamentar_detail',
+                                kwargs={'pk': p.parlamentar.id}),
+                        p
+                    )
+                )
 
-            return '', ''
+            return '<ul>{}</ul>'.format(''.join(ul)), ''
 
     class CreateView(CrudAux.CreateView):
         form_class = BlocoForm
