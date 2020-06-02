@@ -87,7 +87,7 @@ ParlamentarCreate:
 
 Filiacao:
   {% trans 'Filiações Partidárias' %}:
-  - partido  data  data_desfiliacao
+  - partido:8 data data_desfiliacao
 
 Mandato:
   {% trans 'Mandato' %}:

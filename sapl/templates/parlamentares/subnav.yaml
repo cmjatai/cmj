@@ -20,7 +20,7 @@
 - title: {% trans 'Dependentes' %}
   url: sapl.parlamentares:dependente_list
   check_permission: parlamentares.list_dependente
-- title: {% trans 'Frentes' %}
+- title: {% trans 'Blocos Parlamentares' %}
   url: sapl.parlamentares:frente_parlamentar_list
 - title: {% trans 'Usuário' %}
   url: sapl.parlamentares:votante_list

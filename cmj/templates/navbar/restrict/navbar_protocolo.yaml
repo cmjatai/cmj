@@ -14,7 +14,7 @@
     
 - title: {% trans 'Receber Proposições' %}
   url: sapl.materia:proposicao-pendente
-  check_permission: protocoloadm.list_protocolo 
+  check_permission: protocoloadm.add_protocolo 
 
 - title: {% trans 'Documentos' %}
   url: sapl.protocoloadm:documentoadministrativo_list

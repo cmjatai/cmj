@@ -748,9 +748,12 @@ class Bancada(models.Model):
 
     class Meta:
         db_table = 'parlamentares_bancada'
-        verbose_name = _('Bancada Parlamentar')
-        verbose_name_plural = _('Bancadas Parlamentares')
+        verbose_name = _('Bancada Partidária')
+        verbose_name_plural = _('Bancadas Partidárias')
         ordering = ('-legislatura__numero', )
+
+    def __str__(self):
+        return self.nome
 
 
 class CargoBloco(models.Model):
@@ -779,7 +782,6 @@ class CargoBancada(models.Model):
                                       verbose_name=_('Cargo Único ?'))
 
     class Meta:
-        db_table = 'parlamentares_cargobancada'
         verbose_name = _('Cargo de Bancada')
         verbose_name_plural = _('Cargos de Bancada')
 
@@ -795,7 +797,8 @@ class CargoBlocoPartido(models.Model):
 
     bloco = models.ForeignKey(
         Bloco,
-        on_delete=models.PROTECT)
+        on_delete=models.PROTECT,
+        related_name='cargoblocopartido_set')
 
     cargo = models.ForeignKey(
         CargoBloco,
@@ -808,6 +811,9 @@ class CargoBlocoPartido(models.Model):
     data_inicio = models.DateField(verbose_name=_('Data Início'))
     data_fim = models.DateField(
         blank=True, null=True, verbose_name=_('Data Fim'))
+
+    def __str__(self):
+        return '{} - {}'.format(self.parlamentar, self.cargo)
 
 
 @reversion.register()

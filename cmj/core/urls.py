@@ -113,7 +113,7 @@ urlpatterns = user_urlpatterns + [
     url(r'^sistema/core/impressoenderecamento/',
         include(ImpressoEnderecamentoCrud.get_urls())),
 
-    url(r'^sistema/parlamentar/partido/', include(PartidoCrud.get_urls())),
+    #url(r'^sistema/parlamentar/partido/', include(PartidoCrud.get_urls())),
 
     url(r'^sistema/$', permission_required(
         'core.menu_tabelas_auxiliares', login_url='cmj.core:login')(

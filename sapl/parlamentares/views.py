@@ -15,6 +15,7 @@ from django.templatetags.static import static
 from django.urls.base import reverse_lazy, reverse
 from django.utils import timezone
 from django.utils.datastructures import MultiValueDictKeyError
+from django.utils.decorators import classonlymethod
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.generic import FormView
@@ -55,6 +56,71 @@ DependenteCrud = MasterDetailCrud.build(
     Dependente, 'parlamentar', 'dependente')
 
 
+class BancadaCrud(Crud):
+    model = Bancada
+    public = [RP_DETAIL, RP_LIST]
+
+    class DetailView(Crud.DetailView):
+
+        def get_context_data(self, **kwargs):
+            context = Crud.DetailView.get_context_data(self, **kwargs)
+
+            context['subnav_template_name'] = ''
+            return context
+
+    class UpdateView(CrudAux.UpdateView):
+
+        def get_context_data(self, **kwargs):
+            context = Crud.UpdateView.get_context_data(self, **kwargs)
+
+            context['subnav_template_name'] = ''
+            return context
+
+
+class BlocoCrud(Crud):
+    model = Bloco
+    public = [RP_DETAIL, RP_LIST]
+
+    class BaseMixin(Crud.BaseMixin):
+        list_field_names = ('nome', 'partidos',
+                            'data_criacao', 'data_extincao', 'cargoblocopartido_set')
+
+    class ListView(Crud.ListView):
+
+        def hook_header_cargoblocopartido_set(self):
+            return "Parlamentares"
+
+        def hook_cargoblocopartido_set(self, *args, **kwargs):
+
+            return '', ''
+
+    class CreateView(CrudAux.CreateView):
+        form_class = BlocoForm
+
+    class UpdateView(CrudAux.UpdateView):
+
+        def get_context_data(self, **kwargs):
+            context = Crud.UpdateView.get_context_data(self, **kwargs)
+
+            context['subnav_template_name'] = ''
+            return context
+
+    class DetailView(CrudAux.DetailView):
+
+        def get_template_names(self):
+            return ['parlamentares/detail_bloco.html']
+
+        def get_context_data(self, **kwargs):
+            context = super(BlocoCrud.DetailView,
+                            self).get_context_data(**kwargs)
+
+            context['subnav_template_name'] = ''
+            context['vinculados'] = CargoBlocoPartido.objects.filter(
+                bloco=self.object)
+
+            return context
+
+
 class SessaoLegislativaCrud(CrudAux):
     model = SessaoLegislativa
 
@@ -67,6 +133,8 @@ class SessaoLegislativaCrud(CrudAux):
 
 class PartidoCrud(CrudAux):
     model = Partido
+    #model_set = 'filiacaopartidaria_set'
+    #container_field_set = 'contato__workspace__operadores'
 
     class CreateView(CrudAux.CreateView):
         form_class = PartidoForm
@@ -77,12 +145,22 @@ class PartidoCrud(CrudAux):
         form_class = PartidoUpdateForm
 
     class DetailView(CrudAux.DetailView):
+        #layout_key_set = 'FiliacaoPartidariaPartido'
+
+        #list_field_names_set = ['contato', 'data', 'data_desfiliacao']
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(kwargs=kwargs)
+            #context['object'] = kwargs['object']
             context.update({'historico': HistoricoPartido.objects.filter(
                 partido=self.object).order_by('-inicio_historico')})
             return context
+
+    class ListView(CrudAux.ListView):
+        paginate_by = 100
+
+        def get(self, request, *args, **kwargs):
+            return CrudAux.ListView.get(self, request, *args, **kwargs)
 
 
 class VotanteView(MasterDetailCrud):
@@ -110,16 +188,6 @@ class VotanteView(MasterDetailCrud):
             return HttpResponseRedirect(
                 reverse('sapl.parlamentares:votante_list',
                         kwargs={'pk': obj.parlamentar.pk}))
-
-
-class BancadaCrud(CrudAux):
-    model = Bancada
-
-    class CreateView(CrudAux.CreateView):
-        form_class = BancadaForm
-
-        def get_success_url(self):
-            return reverse('sapl.parlamentares:bancada_list')
 
 
 class FrenteList(MasterDetailCrud):
@@ -1217,30 +1285,6 @@ class VincularParlamentarView(PermissionRequiredMixin, FormView):
         mandato.save()
 
         return HttpResponseRedirect(self.get_success_url())
-
-
-class BlocoCrud(CrudAux):
-    model = Bloco
-
-    class CreateView(CrudAux.CreateView):
-        form_class = BlocoForm
-
-        def get_success_url(self):
-            return reverse('sapl.parlamentares:bloco_list')
-
-    class DetailView(CrudAux.DetailView):
-
-        def get_template_names(self):
-            return ['parlamentares/detail_bloco.html']
-
-        def get_context_data(self, **kwargs):
-            context = super(BlocoCrud.DetailView,
-                            self).get_context_data(**kwargs)
-
-            context['vinculados'] = CargoBlocoPartido.objects.filter(
-                bloco=self.object)
-
-            return context
 
 
 class CargoBlocoCrud(CrudAux):

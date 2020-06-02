@@ -45,7 +45,7 @@
         {% if perms.cerimonial.list_operadoratelefonia %}<li><a href="{% url 'cmj.cerimonial:operadoratelefonia_list' %}">{% model_verbose_name_plural "cmj.cerimonial.models.OperadoraTelefonia"%}</a></li>{% endif %}
         {% if perms.cerimonial.list_nivelinstrucao %}<li><a href="{% url 'cmj.cerimonial:nivelinstrucao_list' %}">{% model_verbose_name_plural "cmj.cerimonial.models.NivelInstrucao"%}</a></li>{% endif %}
         {% if perms.cerimonial.list_estadocivil %}<li><a href="{% url 'cmj.cerimonial:estadocivil_list' %}">{% model_verbose_name_plural "cmj.cerimonial.models.EstadoCivil"%}</a></li>{% endif %}
-        {% if perms.parlamentares.detail_partido %}<li><a href="{% url 'cmj.core:partido_list' %}">{% model_verbose_name_plural "sapl.parlamentares.models.Partido"%}</a></li>{% endif %}
+        {% if perms.parlamentares.detail_partido %}<li><a href="{% url 'sapl.parlamentares:partido_list' %}">{% model_verbose_name_plural "sapl.parlamentares.models.Partido"%}</a></li>{% endif %}
         {% if areatrabalho %}
           <li role="separator" class="divider"></li>
           <li class="dropdown-header">{% trans "Tabelas da Área de Trabalho" %}</li>

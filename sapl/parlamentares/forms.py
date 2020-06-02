@@ -731,16 +731,22 @@ class CargoBlocoPartidoForm(ModelForm):
             cleaned_data['data_inicio'] + timedelta(days=1))
 
         if cleaned_data['cargo'].unico:
-            for vinculo in CargoBlocoPartido.objects.filter(bloco=self.bloco):
+            for vinculo in CargoBlocoPartido.objects.filter(
+                    bloco=self.bloco,
+                    cargo=cleaned_data['cargo']
+            ):
+                if not vinculo.cargo.unico:
+                    continue
                 if not vinculo.data_fim:
                     vinculo.data_fim = timezone.now().date()
                 if intervalos_tem_intersecao(cleaned_data['data_inicio'],
                                              aux_data_fim,
                                              vinculo.data_inicio,
-                                             vinculo.data_fim) and vinculo.cargo.unico and \
-                        not(self.instance and self.instance.id == vinculo.id):
-                    raise ValidationError(
-                        "Cargo unico já é utilizado nesse período.")
+                                             vinculo.data_fim) and vinculo.cargo.unico:
+
+                    if not(self.instance and self.instance.id == vinculo.id):
+                        raise ValidationError(
+                            "Cargo unico já é utilizado nesse período.")
 
         if aux_data_fim <= cleaned_data['data_inicio']:
             raise ValidationError(

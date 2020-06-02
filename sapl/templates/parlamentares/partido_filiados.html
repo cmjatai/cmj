@@ -1,11 +1,19 @@
 {% extends "crud/detail.html" %}
 {% load i18n %}
 {% load crispy_forms_tags cropping %}
+{% block title %}
+    <h1 class="page-header {{bg_title}}">
+      {{ partido.sigla }} - {{ partido.nome }}
+    </h1>
+{% endblock title %}
+
 {% block base_content %}
-    <h1>{{ partido.sigla }} - {{ partido.nome }}</h1>
-    <div class="actions btn-group btn-group-sm" role="group">
-        <a href="{% url 'sapl.parlamentares:partido_detail' partido.pk %}" class="btn btn-outline-primary">Informações do Partido</a>
-    </div>
+    {% block actions %}
+        <div class="actions btn-group btn-group-sm my-3" role="group">
+            <a href="{% url 'sapl.parlamentares:partido_detail' partido.pk %}" class="btn btn-outline-primary">Informações do Partido</a>
+        </div>
+    {% endblock actions %}
+
     <h2 class="legend">Parlamentares Filiados</h2>
     <div class="result-count">Total de Parlamentares: <strong>{{ parlamentares|length }}</strong></div>
     <div class="container-table lista-parlamentares">
@@ -31,7 +39,7 @@
                     <tr>
                         <td>
                             {% if parlamentar.fotografia %}
-                                <div id="w-100">
+                                <div>
                                     <img class="img-fluid img-thumbnail" src="{% cropped_thumbnail parlamentar "fotografia_cropping"%}">
                                 </div>
                             {% endif %}

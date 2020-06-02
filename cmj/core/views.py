@@ -319,6 +319,7 @@ class PartidoCrud(Crud):
         list_field_names_set = ['contato_nome', ]
 
     class ListView(Crud.ListView):
+        paginate_by = 100
 
         def get(self, request, *args, **kwargs):
 

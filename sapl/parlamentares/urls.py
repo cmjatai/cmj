@@ -23,7 +23,7 @@ from sapl.parlamentares.views import (CargoMesaCrud, ColigacaoCrud,
                                       lista_parlamentares,
                                       parlamentares_filiados,
                                       BlocoCrud, CargoBlocoCrud,
-                                      PesquisarParlamentarView, 
+                                      PesquisarParlamentarView,
                                       VincularParlamentarView,
                                       deleta_historico_partido,
                                       edita_vinculo_parlamentar_bloco,
@@ -43,7 +43,16 @@ urlpatterns = [
         ParticipacaoParlamentarCrud.get_urls() +
         ProposicaoParlamentarCrud.get_urls() +
         RelatoriaParlamentarCrud.get_urls() + FrenteList.get_urls() +
-        VotanteView.get_urls() + AfastamentoParlamentarCrud.get_urls()
+        VotanteView.get_urls() + AfastamentoParlamentarCrud.get_urls() +
+        BancadaCrud.get_urls()
+    )),
+
+    url(r'^parlamentar/bancada/', include(
+        BancadaCrud.get_urls()
+    )),
+
+    url(r'^parlamentar/bloco/', include(
+        BlocoCrud.get_urls()
     )),
 
     url(r'^parlamentar/lista$', lista_parlamentares, name='lista_parlamentares'),
@@ -64,22 +73,18 @@ urlpatterns = [
         include(ColigacaoCrud.get_urls() +
                 ComposicaoColigacaoCrud.get_urls())),
 
-    url(r'^sistema/bancada/',
-        include(BancadaCrud.get_urls())),
     url(r'^sistema/cargo-bancada/',
         include(CargoBancadaCrud.get_urls())),
 
-    url(r'^sistema/bloco/',
-        include(BlocoCrud.get_urls())),
     url(r'^sistema/cargo-bloco/',
         include(CargoBlocoCrud.get_urls())),
     url(r'^sistema/vincula-parlamentar-ao-bloco/(?P<pk>\d+)/',
-        vincula_parlamentar_ao_bloco,name='vincula_parlamentar_ao_bloco'),
+        vincula_parlamentar_ao_bloco, name='vincula_parlamentar_ao_bloco'),
     url(r'^sistema/edita-vinculo-parlamentar-bloco/(?P<pk>\d+)/',
-        edita_vinculo_parlamentar_bloco,name='edita-vinculo-parlamentar-bloco'),
+        edita_vinculo_parlamentar_bloco, name='edita-vinculo-parlamentar-bloco'),
     url(r'^sistema/deleta-vinculo-parlamentar-bloco/(?P<pk>\d+)/',
-        deleta_vinculo_parlamentar_bloco,name='deleta-vinculo-parlamentar-bloco'),
-        
+        deleta_vinculo_parlamentar_bloco, name='deleta-vinculo-parlamentar-bloco'),
+
     url(r'^sistema/frente/',
         include(FrenteCrud.get_urls())),
     url(r'^sistema/frente/atualiza-lista-parlamentares',
@@ -100,7 +105,9 @@ urlpatterns = [
     url(r'^sistema/parlamentar/tipo-militar/',
         include(TipoMilitarCrud.get_urls())),
     url(r'^sistema/parlamentar/partido/', include(PartidoCrud.get_urls())),
-    url(r'^sistema/parlamentar/partido/(?P<pk>\d+)/filiados$', parlamentares_filiados, name='parlamentares_filiados'),
+
+    url(r'^sistema/parlamentar/partido/(?P<pk>\d+)/filiados$',
+        parlamentares_filiados, name='parlamentares_filiados'),
 
     url(r'^sistema/mesa-diretora/sessao-legislativa/',
         include(SessaoLegislativaCrud.get_urls())),
