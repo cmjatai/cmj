@@ -81,14 +81,12 @@ def signed_name_and_date_extract_pre_save(sender, instance, using, **kwargs):
 
                 with open(original_absolute_path, "rb") as file:
                     meta_signs = signed_name_and_date_extract(
-                        file,
-                        instance=instance
+                        file
                     )
                     file.close()
             else:
                 meta_signs = signed_name_and_date_extract(
-                    file,
-                    instance=instance
+                    file
                 )
 
             if not meta_signs:

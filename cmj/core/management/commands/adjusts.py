@@ -61,8 +61,10 @@ class Command(BaseCommand):
         # with
         # open('/home/leandro/Downloads/plol_-_processos_eletronicos_-2020.pdf',
         # 'rb') as f:
-        with open('/home/leandro/TEMP/teste.pdf', 'rb') as f:
-            signed_name_and_date_extract(f)
+        # with open('/home/leandro/TEMP/teste.pdf', 'rb') as f:
+        #    signed_name_and_date_extract(f)
+
+        self.ajuste_metadata_com_set_values()
 
     def ajuste_metadata_com_set_values(self):
         for app in apps.get_app_configs():
@@ -110,7 +112,7 @@ class Command(BaseCommand):
                 if m != MateriaLegislativa:
                     continue
 
-                for i in m.objects.filter(pk=17709).order_by('-id')[:100]:
+                for i in m.objects.all().order_by('-id')[:500]:
                     i.save()
                     print(i)
 
