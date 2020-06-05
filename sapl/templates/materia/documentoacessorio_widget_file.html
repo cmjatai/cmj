@@ -9,7 +9,7 @@
     <div class="col-12 col-md-auto justify-content-center my-3" >
 
 
-      {% if doc.metadata.signs and doc.metadata.locaweb and doc.metadata.signs.arquivo and doc.metadata.locaweb.arquivo.hash == doc.metadata.locaweb.arquivo.original_hash %}
+      {% if doc.metadata.signs and doc.metadata.locaweb and doc.metadata.signs.arquivo.signs and doc.metadata.locaweb.arquivo.hash == doc.metadata.locaweb.arquivo.original_hash %}
         <a class="link-texto"  target="_blank" href="{{doc.arquivo.url}}?original" title="Documento Eletrônico">
           <i class="fas fa-2x fa-certificate"></i>
           <br>
@@ -37,14 +37,14 @@
         {% endif %}
 
         <a class="link-texto"  target="_blank" href="{{doc.arquivo.url}}?original" title="Documento Eletrônico">
-          {% if doc.metadata.signs and doc.metadata.signs.arquivo %}
+          {% if doc.metadata.signs and doc.metadata.signs.arquivo.signs %}
             <i class="fas fa-2x fa-certificate"></i>
           {% else %}
             <i class="far fa-2x fa-file-{% if '.pdf' in doc.arquivo.path %}pdf{% else %}archive{% endif %}"></i>
           {% endif %}
           <br>
           <strong>Documento 
-            {% if doc.metadata.signs and doc.metadata.signs.arquivo %}
+            {% if doc.metadata.signs and doc.metadata.signs.arquivo.signs %}
               Eletrônico
               <small>
                 <br>com Assinatura Digital
@@ -67,7 +67,7 @@
         </div>
       </div>
     {% endif %}
-    {% with doc.metadata.signs.arquivo as signs %}
+    {% with doc.metadata.signs.arquivo.signs as signs %}
       {% include 'core/sign_widget.html' %}
     {% endwith %}
   </div>

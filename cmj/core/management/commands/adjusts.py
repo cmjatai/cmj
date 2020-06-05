@@ -53,8 +53,15 @@ class Command(BaseCommand):
         # with
         # open('/home/leandro/desenvolvimento/envs/cmj_media_local/media/original__sapl/private/materialegislativa/2020/17709/teste.pdf',
         # 'rb') as f:
-        with open('/home/leandro/TEMP/teste.pdf', 'rb') as f:
 
+        # with
+        # open('/home/leandro/Downloads/requerimento_cpi-_2020_major_2_32.pdf',
+        # 'rb') as f:
+
+        # with
+        # open('/home/leandro/Downloads/plol_-_processos_eletronicos_-2020.pdf',
+        # 'rb') as f:
+        with open('/home/leandro/TEMP/teste.pdf', 'rb') as f:
             signed_name_and_date_extract(f)
 
     def ajuste_metadata_com_set_values(self):

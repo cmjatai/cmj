@@ -74,7 +74,7 @@ class Command(BaseCommand):
         with open(settings.CERT_PRIVATE_KEY_ID, 'rb') as fp:
             p12 = pkcs12.load_key_and_certificates(
                 fp.read(),
-                settings.CERT_PRIVATE_ACCESS_KEY.encode(),
+                settings.CERT_PRIVATE_KEY_ACCESS.encode(),
                 backends.default_backend()
             )
 

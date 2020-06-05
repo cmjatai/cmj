@@ -8,14 +8,14 @@
   <div class="row item-listas align-items-center justify-content-between">
     <div class="col-12 col-md-auto justify-content-center">
       <a class="link-texto"  target="_blank" href="{{p.texto_original.url}}?original" title="Documento Eletrônico">
-        {% if p.metadata.signs and p.metadata.signs.texto_original %}
+        {% if p.metadata.signs and p.metadata.signs.texto_original.signs %}
           <i class="fas fa-2x fa-certificate"></i>
         {% else %}
           <i class="far fa-2x fa-file-{% if '.pdf' in p.texto_original.path %}pdf{% else %}archive{% endif %}"></i>
         {% endif %}
         <br>
         <strong>Documento 
-          {% if p.metadata.signs and p.metadata.signs.texto_original %}
+          {% if p.metadata.signs and p.metadata.signs.texto_original.signs %}
             Eletrônico
             <small>
               <br>com Assinatura Digital
@@ -30,8 +30,8 @@
         </strong>
       </a>
     </div>
-    {% if p.metadata.signs and p.metadata.signs.texto_original %}
-      {% with p.metadata.signs.texto_original as signs %}
+    {% if p.metadata.signs and p.metadata.signs.texto_original.signs %}
+      {% with p.metadata.signs.texto_original.signs as signs %}
         {% include 'core/sign_widget.html' %}
       {% endwith %}
     {% else %}

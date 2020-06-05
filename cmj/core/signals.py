@@ -67,7 +67,7 @@ def signed_name_and_date_extract_pre_save(sender, instance, using, **kwargs):
         if metadata and 'signs' in metadata and \
                         fn in metadata['signs'] and\
                         metadata['signs'][fn]:
-            metadata['signs'][fn] = []
+            metadata['signs'][fn] = {}
 
         if not ff:
             continue
@@ -80,12 +80,18 @@ def signed_name_and_date_extract_pre_save(sender, instance, using, **kwargs):
                     ff.name)
 
                 with open(original_absolute_path, "rb") as file:
-                    signs = signed_name_and_date_extract(file)
+                    meta_signs = signed_name_and_date_extract(
+                        file,
+                        instance=instance
+                    )
                     file.close()
             else:
-                signs = signed_name_and_date_extract(file)
+                meta_signs = signed_name_and_date_extract(
+                    file,
+                    instance=instance
+                )
 
-            if not signs:
+            if not meta_signs:
                 continue
 
             if not metadata:
@@ -94,7 +100,7 @@ def signed_name_and_date_extract_pre_save(sender, instance, using, **kwargs):
             if 'signs' not in metadata:
                 metadata['signs'] = {}
 
-            metadata['signs'][fn] = signs
+            metadata['signs'][fn] = meta_signs
         except Exception as e:
             # print(e)
             pass

@@ -137,7 +137,7 @@
 				<th>Autor</th>
 				<td>{{ protocolo.autor }}
 						{% if protocolo.conteudo_protocolado %}
-							{% with protocolo.conteudo_protocolado.metadata.signs.texto_original as signs %}
+							{% with protocolo.conteudo_protocolado.metadata.signs.texto_original.signs as signs %}
 								{% include 'core/sign_widget.html' %}
 							{% endwith %}
 						{% endif %}

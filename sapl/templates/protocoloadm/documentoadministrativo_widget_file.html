@@ -8,7 +8,7 @@
     <div class="col-12 col-md-auto justify-content-center">
 
 
-      {% if d.metadata.signs and d.metadata.locaweb and d.metadata.signs.texto_integral and d.metadata.locaweb.texto_integral.hash == d.metadata.locaweb.texto_integral.original_hash %}
+      {% if d.metadata.signs and d.metadata.locaweb and d.metadata.signs.texto_integral.signs and d.metadata.locaweb.texto_integral.hash == d.metadata.locaweb.texto_integral.original_hash %}
         <a class="link-texto"  target="_blank" href="{{d.texto_integral.url}}?original" title="Documento Eletrônico">
           <i class="fas fa-2x fa-certificate"></i>
           <br>
@@ -34,14 +34,14 @@
           </a>
         {% endif %}
         <a class="link-texto"  target="_blank" href="{{d.texto_integral.url}}?original" title="Documento Eletrônico">
-          {% if d.metadata.signs and d.metadata.signs.texto_integral %}
+          {% if d.metadata.signs and d.metadata.signs.texto_integral.signs %}
             <i class="fas fa-2x fa-certificate"></i>
           {% else %}
             <i class="far fa-2x fa-file-{% if '.pdf' in d.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
           {% endif %}
           <br>
           <strong>Documento 
-            {% if d.metadata.signs and d.metadata.signs.texto_integral %}
+            {% if d.metadata.signs and d.metadata.signs.texto_integral.signs %}
               Eletrônico
               <small>
                 <br>com Assinatura Digital
@@ -57,11 +57,11 @@
         </a>
       {% endif %}
     </div>
-    {% with d.metadata.signs.texto_integral as signs %}
+    {% with d.metadata.signs.texto_integral.signs as signs %}
       {% include 'core/sign_widget.html' %}
     {% endwith %}
     {% if render_ementa %}
-      <div class="col{% if d.metadata.signs.texto_integral %}-12{% endif %}">
+      <div class="col{% if d.metadata.signs.texto_integral.signs %}-12{% endif %}">
         <div class="text-ementa">
           {{d.assunto|safe}}
         </div>

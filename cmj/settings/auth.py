@@ -131,6 +131,7 @@ AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY', cast=str, default='')
 ABSOLUTE_PATH_BACKUP = config('ABSOLUTE_PATH_BACKUP', cast=str, default='')
 
 # cert_public
+CERT_PRIVATE_KEY_NAME = config('CERT_PRIVATE_KEY_NAME', cast=str, default='')
 CERT_PRIVATE_KEY_ID = config('CERT_PRIVATE_KEY_ID', cast=str, default='')
-CERT_PRIVATE_ACCESS_KEY = config(
-    'CERT_PRIVATE_ACCESS_KEY', cast=str, default='')
+CERT_PRIVATE_KEY_ACCESS = config(
+    'CERT_PRIVATE_KEY_ACCESS', cast=str, default='')

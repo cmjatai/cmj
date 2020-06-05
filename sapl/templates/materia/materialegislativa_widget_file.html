@@ -8,7 +8,7 @@
   <div class="row item-listas align-items-center justify-content-between">
     <div class="col-12 col-md-auto justify-content-center">
 
-      {% if m.metadata.signs and m.metadata.locaweb and m.metadata.signs.texto_original and m.metadata.locaweb.texto_original.hash == m.metadata.locaweb.texto_original.original_hash %}
+      {% if m.metadata.signs and m.metadata.locaweb and m.metadata.signs.texto_original.signs and m.metadata.locaweb.texto_original.hash == m.metadata.locaweb.texto_original.original_hash %}
         <a class="link-texto"  target="_blank" href="{{m.texto_original.url}}?original" title="Documento Eletrônico">
           <i class="fas fa-2x fa-certificate"></i>
           <br>
@@ -33,14 +33,14 @@
           </a>
         {% endif %}
         <a class="link-texto"  target="_blank" href="{{m.texto_original.url}}?original" title="Documento Eletrônico">
-          {% if m.metadata.signs and m.metadata.signs.texto_original %}
+          {% if m.metadata.signs and m.metadata.signs.texto_original.signs %}
             <i class="fas fa-2x fa-certificate"></i>
           {% else %}
             <i class="far fa-2x fa-file-{% if '.pdf' in m.texto_original.path %}pdf{% else %}archive{% endif %}"></i>
           {% endif %}
           <br>
           <strong>Documento 
-            {% if m.metadata.signs and m.metadata.signs.texto_original %}
+            {% if m.metadata.signs and m.metadata.signs.texto_original.signs %}
               Eletrônico
               <small>
                 <br>com Assinatura Digital
@@ -63,7 +63,7 @@
         </div>
       </div>
     {% endif %}
-    {% with m.metadata.signs.texto_original as signs %}
+    {% with m.metadata.signs.texto_original.signs as signs %}
       {% include 'core/sign_widget.html' %}
     {% endwith %}
   </div>
