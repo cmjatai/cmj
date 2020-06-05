@@ -109,12 +109,12 @@ class Command(BaseCommand):
                     continue
                 print(m, m.objects.all().count())
 
-                if m != MateriaLegislativa:
-                    continue
+                # if m != MateriaLegislativa:
+                #    continue
 
                 for i in m.objects.all().order_by('-id')[:500]:
+                    print(i.id, i)
                     i.save()
-                    print(i)
 
     def associa_tipo_conteudo_gerado__e__conteudo_gerado(self):
 

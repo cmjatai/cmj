@@ -370,19 +370,8 @@ def run_signed_name_and_date_via_fields(fields):
 
         if nome not in signs:
             signs[nome] = fd
-    signs = list(signs.items())
-    signs = sorted(signs, key=lambda sign: sign[0])
 
-    sr = []
-
-    for s in signs:
-        tt = s[0].title().split(' ')
-        for idx, t in enumerate(tt):
-            if t in ('Dos', 'De', 'Da', 'Do', 'Das', 'E'):
-                tt[idx] = t.lower()
-        sr.append((' '.join(tt), s[1]))
-
-    return sr
+    return signs
 
 
 def run_signed_name_and_date_extract(file):
@@ -457,6 +446,16 @@ def run_signed_name_and_date_extract(file):
         except:
             pass
 
+    return signs
+
+
+def signed_name_and_date_extract(file):
+
+    try:
+        signs = run_signed_name_and_date_extract(file)
+    except:
+        return {}
+
     signs = list(signs.items())
     signs = sorted(signs, key=lambda sign: sign[0])
 
@@ -469,15 +468,7 @@ def run_signed_name_and_date_extract(file):
                 tt[idx] = t.lower()
         sr.append((' '.join(tt), s[1]))
 
-    return sr
-
-
-def signed_name_and_date_extract(file):
-
-    try:
-        signs = run_signed_name_and_date_extract(file)
-    except:
-        return {}
+    signs = sr
 
     meta_signs = {
         'signs': [],
