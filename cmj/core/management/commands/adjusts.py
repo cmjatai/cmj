@@ -1,6 +1,7 @@
 
 from datetime import datetime, timedelta
 import logging
+import os
 
 from django.apps.registry import apps
 from django.core.management.base import BaseCommand
@@ -11,7 +12,6 @@ from django.utils import timezone
 
 from cmj.core.models import OcrMyPDF
 from cmj.diarios.models import DiarioOficial
-from cmj.utils import signed_name_and_date_extract
 from sapl.compilacao.models import Dispositivo, TextoArticulado,\
     TipoDispositivo
 from sapl.materia.models import MateriaLegislativa, DocumentoAcessorio
@@ -71,6 +71,7 @@ class Command(BaseCommand):
 
             if not app.name.startswith('cmj') and not app.name.startswith('sapl'):
                 continue
+
             print(app)
 
             for m in app.get_models():
@@ -107,14 +108,40 @@ class Command(BaseCommand):
 
                 if not model_exec:
                     continue
+
                 print(m, m.objects.all().count())
 
-                # if m != MateriaLegislativa:
+                # if m != DocumentoAdministrativo:
                 #    continue
 
-                for i in m.objects.all().order_by('-id')[:500]:
-                    print(i.id, i)
-                    i.save()
+                for i in m.objects.all().order_by('-id'):  # [:500]:
+
+                    if not hasattr(i, 'metadata'):
+                        continue
+
+                    metadata = i.metadata if i.metadata else {}
+                    for fn in i.FIELDFILE_NAME:
+
+                        ff = getattr(i, fn)
+                        if not ff:
+                            continue
+
+                        if not os.path.exists(ff.path):
+                            print('Arquivo registrado mas não existe', i.id, i)
+                            continue
+
+                        if not metadata:
+                            continue
+
+                        if 'signs' not in metadata:
+                            continue
+
+                        if fn not in metadata['signs']:
+                            continue
+
+                        if not metadata['signs'][fn]:
+                            print(i)
+                            i.save()
 
     def associa_tipo_conteudo_gerado__e__conteudo_gerado(self):
 
