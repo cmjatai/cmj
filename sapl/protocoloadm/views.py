@@ -1593,6 +1593,28 @@ class ProtocoloRedirectConteudoView(PermissionRequiredMixin, RedirectView):
         ), args=(p.conteudo_protocolado.id,))
 
 
+class ProtocoloHomologarView(PermissionRequiredMixin, TemplateView):
+
+    permission_required = ('protocoloadm.action_homologar_protocolo',)
+
+    def get(self, request, *args, **kwargs):
+        self.object = Protocolo.objects.get(pk=self.kwargs['pk'])
+
+        messages.info(request, _('Em implementação...'))
+
+        return redirect(
+            reverse('sapl.protocoloadm:protocolo_mostrar', kwargs={
+                'pk': self.object.pk})
+        )
+
+    def get_context_data(self, **kwargs):
+        context = TemplateView.get_context_data(self, **kwargs)
+
+        context['protocolo'] = self.object
+
+        return context
+
+
 class ProtocoloMostrarView(PermissionRequiredMixin, TemplateView):
     logger = logging.getLogger(__name__)
 

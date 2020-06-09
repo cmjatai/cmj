@@ -1,3 +1,4 @@
+
 from datetime import date, timedelta
 import datetime
 import json
@@ -15,15 +16,10 @@ from django.utils.translation import ugettext_lazy as _
 from webpack_loader import utils
 from webpack_loader.utils import _get_bundle
 
-from cmj.diarios.models import DiarioOficial
-from cmj.sigad.models import Documento
 from sapl.base.models import AppConfig
-from sapl.materia.models import DocumentoAcessorio, MateriaLegislativa,\
-    TipoMateriaLegislativa
+from sapl.materia.models import TipoMateriaLegislativa
 from sapl.norma.models import NormaJuridica, TipoNormaJuridica
 from sapl.parlamentares.models import Filiacao
-from sapl.protocoloadm.models import DocumentoAdministrativo
-from sapl.sessao.models import SessaoPlenaria
 
 
 register = template.Library()
@@ -350,3 +346,28 @@ def timedelta_filter(data, td):
 @register.filter(expects_localtime=True)
 def parse_datetime(value):
     return django_parse_datetime(value)
+
+
+@register.filter
+def conteudo_protocolado_homologado(protocolo):
+    cp = protocolo.conteudo_protocolado
+
+    if not cp:
+        return False
+
+    if not hasattr(cp, 'FIELDFILE_NAME'):
+        return False
+
+    fieldfile_name = cp.FIELDFILE_NAME
+
+    homologado = True
+    for fn in fieldfile_name:
+
+        try:
+            homologado = not not cp.metadata['signs'][fn]['hom']
+        except:
+            return False
+
+        if not homologado:
+            return False
+    return True

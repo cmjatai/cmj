@@ -22,7 +22,7 @@ from sapl.protocoloadm.views import (
     TramitacaoEmLoteAdmView, AcompanhamentoExcluirView,
     AcompanhamentoConfirmarView, AcompanhamentoDocumentoView,
     ProtocoloRedirectConteudoView, ProtocoloDocumentoAcessorioView,
-    ProtocoloDocumentoView)
+    ProtocoloDocumentoView, ProtocoloHomologarView)
 
 from .apps import AppConfig
 
@@ -61,6 +61,14 @@ urlpatterns_protocolo = [
 
     url(r'^protocoloadm/(?P<pk>\d+)/protocolo-mostrar$',
         ProtocoloMostrarView.as_view(), name='protocolo_mostrar'),
+
+
+
+    url(r'^protocoloadm/(?P<pk>\d+)/homologar$',
+        ProtocoloHomologarView.as_view(), name='protocolo_homologar'),
+
+
+
     url(r'^protocoloadm/(?P<pk>\d+)/conteudo$',
         ProtocoloRedirectConteudoView.as_view(), name='redirect_conteudo'),
 

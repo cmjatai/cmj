@@ -163,6 +163,7 @@ class Protocolo(models.Model):
         verbose_name_plural = _('Protocolos')
         permissions = (
             ('action_anular_protocolo', _('Permissão para Anular Protocolo')),
+            ('action_homologar_protocolo', _('Permissão para Homologar Protocolo')),
         )
 
     def __str__(self):

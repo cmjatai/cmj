@@ -1,7 +1,7 @@
 {% extends "protocoloadm/protocoloadm_detail.html" %}
 {% load i18n %}
 {% load tz %}
-{% load static common_tags %}
+{% load static common_tags common_cmj_tags %}
 {% load webpack_static from webpack_loader %}
 
 {% block title %}
@@ -12,8 +12,13 @@
 
 {% block base_content %}
 
-	{% block container_actions %}{{ block.super }}
+	{% block container_actions %}
+	
+		{{ block.super }}
+
+
 	{% endblock container_actions %}
+                  
 
 	<strong>Protocolo: </strong>{{ protocolo.numero|stringformat:'06d' }}/{{ protocolo.ano }} - 
 	<a href="{% url 'sapl.relatorios:relatorio_etiqueta_protocolo' protocolo.numero protocolo.ano %}"><img src="{% webpack_static 'img/etiqueta.png' %}" alt="Etiqueta Individual"></a></br>
@@ -92,8 +97,17 @@
 
 	</a>
 	{% if protocolo.email %}
-		<a class="btn btn-primary" href="{% url 'sapl.protocoloadm:comprovante_protocolo' protocolo.pk%}?send_mail">
+		<a class="btn btn-primary d-none" href="{% url 'sapl.protocoloadm:comprovante_protocolo' protocolo.pk%}?send_mail">
 			Enviar Comprovante por Email
+		</a>
+	{% endif %}
+
+
+	{% if perms.protocoloadm.action_homologar_protocolo and not protocolo|conteudo_protocolado_homologado %}
+		<a
+			href="{% url 'sapl.protocoloadm:protocolo_homologar' protocolo.pk %}" 
+			class="btn btn-primary float-right">
+				Homologar
 		</a>
 	{% endif %}
 {% endblock base_content %}

@@ -24,14 +24,11 @@
       {% block editions_actions_return %}
         <div class="actions btn-group" role="group">
           <a class="btn btn-{% if object.data_recebimento %}success text-white{% else %}outline-primary{% endif %}" onclick="window.open('{% url 'sapl.materia:recibo-proposicao' object.pk %}','Recibo','width=1100, height=600, scrollbars=yes')">
-              
             {% if object.data_recebimento %}
               {% trans "Comprovante de Protocolo" %}
             {% else %}
               {% trans "Recibo de Envio" %}
             {% endif %}
-
-
           </a>
           {% if not object.data_recebimento %}
             <a href="{% url 'sapl.materia:retornar-proposicao' object.pk %}" class="btn btn-outline-primary btn-outline-danger">{% trans 'Retornar Proposição Enviada' %}</a>
