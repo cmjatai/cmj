@@ -14,7 +14,7 @@ from cmj.core.views import CepCrud, RegiaoMunicipalCrud, DistritoCrud,\
     NotificacaoRedirectView, chanel_index, chanel_room, time_refresh_log_test,\
     app_vue_view, template_render, CertidaoPublicacaoCrud, BiView
 from cmj.core.views_auth import CmjUserChangeView, CmjLoginView,\
-    CmjPasswordResetView, UserCrud
+    CmjPasswordResetView, UserCrud, CmjPasswordResetConfirmView
 from cmj.core.views_search import CmjSearchView
 
 from .apps import AppConfig
@@ -31,15 +31,12 @@ user_urlpatterns = [
         name='recuperar_senha_email'),
 
     url(r'^user/recuperar-senha/finalizado/$',
-        PasswordResetDoneView.as_view(),
+        CmjPasswordResetView.as_view(),
         {'template_name': 'core/user/recupera_senha_email_enviado.html'},
         name='recuperar_senha_finalizado'),
 
     url(r'^user/recuperar-senha/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$',
-        PasswordResetConfirmView.as_view(),
-        {'post_reset_redirect': 'cmj.core:recuperar_senha_completo',
-         'template_name': 'core/user/nova_senha_form.html',
-         'set_password_form': NovaSenhaForm},
+        CmjPasswordResetConfirmView.as_view(),
         name='recuperar_senha_confirma'),
 
     url(r'^user/recuperar-senha/completo/$',

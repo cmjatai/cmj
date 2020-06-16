@@ -1,7 +1,8 @@
 
 from braces.views import FormMessagesMixin
 from django.contrib.auth import get_user_model
-from django.contrib.auth.views import LoginView, PasswordResetView
+from django.contrib.auth.views import LoginView, PasswordResetView,\
+    PasswordResetConfirmView
 from django.db.models import Q
 from django.urls.base import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
@@ -9,7 +10,7 @@ from django.views.generic.edit import FormView, UpdateView
 
 from cmj.core.forms import ListWithSearchForm
 from cmj.core.forms_auth import CmjUserChangeForm, LoginForm,\
-    RecuperarSenhaForm, CmjUserAdminForm
+    RecuperarSenhaForm, CmjUserAdminForm, NovaSenhaForm
 from cmj.settings import EMAIL_SEND_USER
 from sapl.crud.base import FORM_MESSAGES, ACTION_UPDATE, Crud, CrudAux
 
@@ -51,6 +52,11 @@ class CmjPasswordResetView(PasswordResetView):
     template_name = 'core/user/recuperar_senha_email_form.html'
     from_email = EMAIL_SEND_USER
     form_class = RecuperarSenhaForm
+
+
+class CmjPasswordResetConfirmView(PasswordResetConfirmView):
+    form_class = NovaSenhaForm
+    template_name = 'core/user/nova_senha_form.html'
 
 
 class UserCrud(CrudAux):
