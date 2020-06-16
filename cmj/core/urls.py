@@ -14,7 +14,8 @@ from cmj.core.views import CepCrud, RegiaoMunicipalCrud, DistritoCrud,\
     NotificacaoRedirectView, chanel_index, chanel_room, time_refresh_log_test,\
     app_vue_view, template_render, CertidaoPublicacaoCrud, BiView
 from cmj.core.views_auth import CmjUserChangeView, CmjLoginView,\
-    CmjPasswordResetView, UserCrud, CmjPasswordResetConfirmView
+    CmjPasswordResetView, UserCrud, CmjPasswordResetConfirmView,\
+    CmjPasswordResetEncaminhadoView
 from cmj.core.views_search import CmjSearchView
 
 from .apps import AppConfig
@@ -31,8 +32,7 @@ user_urlpatterns = [
         name='recuperar_senha_email'),
 
     url(r'^user/recuperar-senha/finalizado/$',
-        CmjPasswordResetView.as_view(),
-        {'template_name': 'core/user/recupera_senha_email_enviado.html'},
+        CmjPasswordResetEncaminhadoView.as_view(),
         name='recuperar_senha_finalizado'),
 
     url(r'^user/recuperar-senha/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$',

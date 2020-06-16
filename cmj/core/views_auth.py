@@ -54,6 +54,10 @@ class CmjPasswordResetView(PasswordResetView):
     form_class = RecuperarSenhaForm
 
 
+class CmjPasswordResetEncaminhadoView(PasswordResetView):
+    template_name = 'core/user/recupera_senha_email_enviado.html'
+
+
 class CmjPasswordResetConfirmView(PasswordResetConfirmView):
     form_class = NovaSenhaForm
     template_name = 'core/user/nova_senha_form.html'
