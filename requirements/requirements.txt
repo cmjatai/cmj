@@ -1,4 +1,4 @@
-django>2.0,<3.0
+django>=2.2.13,<3.0
 django-braces==1.14.0
 django-celery-results==1.2.1
 django-crispy-forms==1.9.1
