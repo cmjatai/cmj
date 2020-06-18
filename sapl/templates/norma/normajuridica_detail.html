@@ -16,7 +16,7 @@
 
   <div class="item-listas">
 
-  {% if not object.is_signed %}
+  {% if object.texto_integral and  not object.is_signed %}
     {% with True as render_ementa %}
       {% with object as n %}
         {% include 'norma/normajuridica_widget_file.html' %}
@@ -29,7 +29,7 @@
   {% endif %}
 
   </div>
-  {% if object.is_signed %}
+  {% if object.texto_integral and object.is_signed %}
     {% with object as n %}
       {% include 'norma/normajuridica_widget_file.html' %}
     {% endwith %}

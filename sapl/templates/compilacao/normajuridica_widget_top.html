@@ -42,6 +42,7 @@
   </div>
 </div>
 <div class="d-print-none my-3">
+  {% if object.texto_integral  %}
   {% with object.content_object as n %}
       {% include 'norma/normajuridica_widget_file.html' %}
         {% comment %}
@@ -62,4 +63,5 @@
             </div>
         {% endcomment %}
   {% endwith %}
+  {% endif %}
 </div>
