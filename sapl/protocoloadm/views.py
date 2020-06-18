@@ -1579,7 +1579,7 @@ class CriarDocumentoProtocolo(PermissionRequiredMixin, CreateView):
 
 class ProtocoloRedirectConteudoView(PermissionRequiredMixin, RedirectView):
     permanent = False
-    permission_required = ('protocoloadm.detail_protocolo',)
+    permission_required = ('protocoloadm.list_protocolo',)
 
     def get_redirect_url(self, *args, **kwargs):
         try:

@@ -50,7 +50,7 @@
                 {% if p.conteudo_protocolado %}
                   
                   <div class="bg-white m-1 p-2">
-                    {% if not p|conteudo_protocolado_homologado %}
+                    {% if perms.protocoloadm.action_homologar_protocolo and not p|conteudo_protocolado_homologado %}
                       <a
                         href="{% url 'sapl.protocoloadm:protocolo_homologar' p.pk %}" 
                         class="btn btn-primary float-right">
