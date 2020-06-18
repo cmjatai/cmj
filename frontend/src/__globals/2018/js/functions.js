@@ -40,7 +40,14 @@ window.initTextRichEditor = function (elements, readonly = false) {
 
 window.refreshDatePicker = function () {
   $.datepicker.setDefaults($.datepicker.regional['pt-BR'])
-  $('.dateinput').datepicker()
+  $('.dateinput').datepicker({
+    beforeShow: function () {
+      setTimeout(() => {
+        $('.ui-datepicker').css('z-index', 3)
+      }, 500)
+    }
+
+  })
 
   let dateinput = document.querySelectorAll('.dateinput')
   _.each(dateinput, function (input, index) {
