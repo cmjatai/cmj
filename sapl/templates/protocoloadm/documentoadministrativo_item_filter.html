@@ -89,7 +89,7 @@
 
     {% for anexado in d.documento_principal_set.childs_anexados %}
       {% if forloop.first %}        
-        <strong>Documentos Anexados:</strong>
+        <br><strong>Documentos Anexados:</strong>
         <div class="childs">
       {% endif %}
         {% with True as render_widget_file %}

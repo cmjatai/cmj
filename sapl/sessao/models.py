@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models import Q
+from django.db.models.fields.related import ManyToManyField
 from django.utils import timezone, formats
 from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices
@@ -521,6 +522,10 @@ class RegistroVotacao(models.Model):
         verbose_name=_('Abstenções'))
     observacao = models.TextField(
         blank=True, verbose_name=_('Observações'))
+
+    subscricoes = ManyToManyField(Parlamentar,
+                                  related_name='subscricoes')
+
     user = models.ForeignKey(get_settings_auth_user_model(),
                              on_delete=models.PROTECT,
                              null=True,

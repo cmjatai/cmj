@@ -39,7 +39,8 @@ from sapl.sessao.apps import AppConfig
 from sapl.sessao.forms import OrdemExpedienteLeituraForm, ExpedienteMateriaForm, OrdemDiaForm
 from sapl.sessao.models import RegistroLeitura
 from sapl.utils import (show_results_filter_set, remover_acentos, get_client_ip, filiacao_data,
-                        verifica_afastamento_parlamentar)
+                        verifica_afastamento_parlamentar,
+                        parlamentares_ativos)
 
 from .forms import (AdicionarVariasMateriasFilterSet, ExpedienteForm,
                     JustificativaAusenciaForm, OcorrenciaSessaoForm, ListMateriaForm,
@@ -407,7 +408,22 @@ def customize_link_materia(context, pk, has_permission, is_expediente):
                 resultado = obj.registrovotacao_set.filter(
                     materia_id=obj.materia_id).last()
                 resultado_descricao = resultado.tipo_resultado_votacao.nome
-                resultado_observacao = resultado.observacao
+
+                resultado_observacao = '{}<br>{}'.format(
+                    resultado.observacao,
+                    '<ul>{}</ul>'.format(
+                        ''.join(
+                            [
+                                '<li>{}</li>'.format(p)
+                                for p in resultado.subscricoes.all()
+                            ]
+                        )
+
+                    )
+
+
+
+                )
 
             if has_permission:
                 url = ''
@@ -2313,7 +2329,8 @@ class VotacaoEditView(SessaoPermissionMixin):
     template_name = 'sessao/votacao/votacao_edit.html'
 
     def post(self, request, *args, **kwargs):
-
+        # TODO: refatorar código... forma incorreta de lidar com forms no
+        # django
         self.object = self.get_object()
         form = VotacaoEditForm(request.POST)
 
@@ -2329,6 +2346,10 @@ class VotacaoEditView(SessaoPermissionMixin):
             ordem.votacao_aberta = False
             ordem.resultado = ''
             ordem.save()
+        else:
+            rv = RegistroVotacao.objects.filter(ordem_id=ordem_id).last()
+            rv.observacao = request.POST['observacao']
+            rv.save()
 
         return self.form_valid(form)
 
@@ -2352,13 +2373,14 @@ class VotacaoEditView(SessaoPermissionMixin):
         materia = {'materia': ordem.materia, 'ementa': ordem.materia.ementa}
         context.update({'materia': materia})
 
-        votacao = RegistroVotacao.objects.filter(materia_id=materia_id,
-                                                 ordem_id=ordem_id).last()
-        votacao_existente = {'observacao': sub(
-            '&nbsp;', ' ', strip_tags(votacao.observacao)),
+        votacao = RegistroVotacao.objects.filter(
+            materia_id=materia_id, ordem_id=ordem_id).last()
+        votacao_existente = {
+            'observacao': votacao.observacao,
             'resultado': votacao.tipo_resultado_votacao.nome,
             'tipo_resultado':
-            votacao.tipo_resultado_votacao_id}
+            votacao.tipo_resultado_votacao_id
+        }
         context.update({'votacao_titulo': titulo,
                         'votacao': votacao_existente,
                         'tipos': self.get_tipos_votacao()})
@@ -2385,6 +2407,25 @@ class VotacaoView(SessaoPermissionMixin):
     form_class = VotacaoForm
 
     logger = logging.getLogger(__name__)
+
+    def get_initial(self):
+        initial = SessaoPermissionMixin.get_initial(self)
+
+        ordem_id = self.kwargs['oid']
+        ordem = OrdemDia.objects.get(id=ordem_id)
+
+        presentes_id = [
+            presente.parlamentar.id for presente in PresencaOrdemDia.objects.filter(
+                sessao_plenaria_id=self.kwargs['pk']
+            )
+        ]
+
+        presenca_ativos = Parlamentar.objects.filter(
+            id__in=presentes_id, ativo=True
+        )
+
+        initial['subscricoes_choice'] = presenca_ativos
+        return initial
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -2418,14 +2459,16 @@ class VotacaoView(SessaoPermissionMixin):
         context.update({'votacao_titulo': titulo,
                         'materia': materia,
                         'total_presentes': qtde_presentes,
-                        'total_votantes': qtde_ativos})
+                        'total_votantes': qtde_ativos,
+                        'subscricoes': presenca_ativos
+                        })
 
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        form = VotacaoForm(request.POST)
         context = self.get_context_data(object=self.object)
+        form = context['form']
         url = request.get_full_path()
 
         # ====================================================
@@ -2484,6 +2527,8 @@ class VotacaoView(SessaoPermissionMixin):
 
                 try:
 
+                    subs = form.cleaned_data['subscricoes']
+
                     resultado = TipoResultadoVotacao.objects.get(
                         id=request.POST['resultado_votacao'])
 
@@ -2498,6 +2543,8 @@ class VotacaoView(SessaoPermissionMixin):
                     votacao.user = request.user
                     votacao.ip = get_client_ip(request)
                     votacao.save()
+
+                    votacao.subscricoes.add(*list(subs))
                 except Exception as e:
                     username = request.user.username
                     self.logger.error('user=' + username + '. Problemas ao salvar RegistroVotacao da materia de id={} '

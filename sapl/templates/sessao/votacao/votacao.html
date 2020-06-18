@@ -36,37 +36,45 @@
 			<b>Total votantes:</b> {{total_votantes}} (com presidente)
 			<input type="hidden" id="total_votos" name="total_votos">
 		</div>
-		<br />
 
-		<div class="row">
-			<div class="col-md-4">Sim*: <input type="text" id="votos_sim" name="votos_sim" value="{{ total_presentes|add:"-1" }}" class="form-control"/></div>
-			<div class="col-md-4">Não*: <input type="text" id="votos_nao" name="votos_nao" value="0" class="form-control"/></div>
-			<div class="col-md-4">Abstenções*: <input type="text" id="abstencoes" name="abstencoes" value="0" class="form-control"/></div>
+		<div class="row mt-2">
+			<div class="col-md-4">Sim: * <input type="text" id="votos_sim" name="votos_sim" value="{{ total_presentes|add:"-1" }}" class="form-control"/></div>
+			<div class="col-md-4">Não: * <input type="text" id="votos_nao" name="votos_nao" value="0" class="form-control"/></div>
+			<div class="col-md-4">Abstenções: * <input type="text" id="abstencoes" name="abstencoes" value="0" class="form-control"/></div>
 		</div>
 
-   		<div class="row">
-			<div class="col-md-6">
-				A totalização inclui o voto do Presidente?*
-				<select id="voto_presidente" name="voto_presidente" class="form-control">
-				<option value="1">Sim</option>
-				<option value="0" selected>Não</option>
-				</select>
-			</div>
+   		<div class="row mt-2">
+				<div class="col-md-6">
+					A totalização inclui o voto do Presidente? *
+					<select id="voto_presidente" name="voto_presidente" class="form-control">
+					<option value="1">Sim</option>
+					<option value="0" selected>Não</option>
+					</select>
+				</div>
 
-			<div class="col-md-6">
-				Resultado da Votação*
-				<select id="resultado_votacao" name="resultado_votacao" class="form-control">
-				{% for tipo in view.get_tipos_votacao %}
-					<option value="{{tipo.id}}">{{tipo.nome}}</option>
-				{% endfor %}
-				</select>
-			</div>
+				<div class="col-md-6">
+					Resultado da Votação: *
+					<select id="resultado_votacao" name="resultado_votacao" class="form-control" >
+					{% for tipo in view.get_tipos_votacao %}
+						<option value="{{tipo.id}}">{{tipo.nome}}</option>
+					{% endfor %}
+					</select>
+				</div>
     	</div>
 
-		<div class="row">
-			<div class="col-md-12">
+		<div class="row mt-2">
+			<div class="col-md-8">
 				Observações
 				<textarea id="observacao" name="observacao" cols="10" rows="10" class="form-control"></textarea>
+			</div>
+			<div class="col-4">
+				Subscrições
+					<select id="subscricoes" name="subscricoes" class="form-control" multiple="multiple" size="12" >
+					{% for p in subscricoes %}
+						<option value="{{p.id}}">{{p.nome_parlamentar}}</option>
+					{% endfor %}
+					</select>
+			
 			</div>
 		</div>
 

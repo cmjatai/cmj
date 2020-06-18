@@ -23,7 +23,8 @@ from sapl.settings import MAX_DOC_UPLOAD_SIZE
 from sapl.utils import (RANGE_DIAS_MES, RANGE_MESES,
                         MateriaPesquisaOrderingFilter, autor_label,
                         autor_modal, timezone, choice_anos_com_sessaoplenaria,
-                        FileFieldCheckMixin, verifica_afastamento_parlamentar)
+                        FileFieldCheckMixin, verifica_afastamento_parlamentar,
+                        parlamentares_ativos)
 
 from .models import (ExpedienteMateria, JustificativaAusencia,
                      Orador, OradorExpediente, OrdemDia, PresencaOrdemDia, SessaoPlenaria,
@@ -439,6 +440,18 @@ class VotacaoForm(forms.Form):
     total_votos = forms.IntegerField(required=False, label='total')
     observacao = forms.CharField(required=False, label='Observação')
     resultado_votacao = forms.CharField(label='Resultado da Votação')
+
+    subscricoes = forms.ModelMultipleChoiceField(
+        queryset=Parlamentar.objects.all(),
+        required=False)
+
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        self.fields['subscricoes'].choices = [
+            (p.id, p.nome_parlamentar) for p in kwargs['initial']['subscricoes_choice']
+        ]
 
     def clean(self):
         cleaned_data = super(VotacaoForm, self).clean()
