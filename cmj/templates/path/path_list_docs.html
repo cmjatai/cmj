@@ -107,7 +107,7 @@
                 {{documento.descricao|striptags|safe}}
               </p>
               {% if not pagina_inicial and documento.tipo == documento.STATUS_PUBLIC %}
-                {% social_link_share documento 'pull-right'%}
+                {% social_link_share documento 'float-right'%}
               {% endif %}
             </div>
           {% endif %}

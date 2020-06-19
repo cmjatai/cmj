@@ -15,24 +15,69 @@
     text-align: center;
     i {
       color: rgba(green, 0.3);
+      //display: none;
     }
-    &:hover {
-      i {
-        color: rgba(white, 1);
-      }
-      &.facebook {
-        background-color: #3a579d;
-      }
-      &.twitter {
-        background-color: #5ba9e1;
-      }
-      &.whatsapp {
-        background-color: #65bc54;
+    
+
+    &.facebook {
+      &::after {
+      background-image: url(~@/assets/img/icon_facebook64x64.png);
       }
     }
+
     &.whatsapp {
-      padding: 1px;
+      &::after {
+      background-image: url(~@/assets/img/icon_whatsapp64x64.png);
+      }
     }
+
+    &.twitter {
+      &::after {
+      background-image: url(~@/assets/img/icon_twitter64x64.png);
+      }
+    }
+    &.youtube {
+      &::after {
+      background-image: url(~@/assets/img/icon_youtube64x64.png);
+      }
+    }
+    &.copylink {
+      cursor: pointer;
+      &::after {
+        background-image: url(~@/assets/img/icon_copy_area_transferencia.png);
+      }
+    }
+
+    &.facebook,
+    &.whatsapp, 
+    &.twitter,
+    &.youtube,
+    &.copylink {
+      position: relative;
+      i {
+        display: none;
+      }
+      &::after {
+        background-size: 100% 100%;
+        content: " ";
+        opacity: 0.5;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        position: absolute;
+        z-index: 0;   
+      }
+    }
+
+    &:hover {
+        &::after {
+          opacity: 1;
+        }
+    }
+
+
+
   }
   .icon-sessoes-online {
     margin-right: 0.7em;
@@ -78,4 +123,8 @@
   span {
     display: none;
   }
+}
+
+.navbar-collapse {
+
 }

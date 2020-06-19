@@ -72,4 +72,12 @@ $(function () {
   $('[data-toggle="popover"]').popover({
     trigger: 'focus'
   })
+
+  $('.copylink').click(event => {
+    var $temp = $('<input>')
+    $('body').append($temp)
+    $temp.val(event.target.getAttribute('data_href')).select()
+    document.execCommand('copy')
+    $temp.remove()
+  })
 })

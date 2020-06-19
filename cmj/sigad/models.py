@@ -597,7 +597,7 @@ class ShortUrl(Slugged):
             url.url_short = url_short
             url.save()
 
-        return 'https://www.jatai.go.leg.br/j' + url.url_short
+        return 'jatai.go.leg.br/j' + url.url_short
 
     class Meta:
         abstract = True
