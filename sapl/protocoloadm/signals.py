@@ -40,6 +40,13 @@ def protocolo_pre_save(sender, instance, using, **kwargs):
                     'barcode': barcode,
                     'autenticacao': autenticacao}, EMAIL_SEND_USER, instance.email)  # 'leandro@jatai.go.leg.br')  #
 
+            send_mail(
+                'Protocolo: {}'.format(instance.epigrafe),
+                'email/comprovante_protocolo.html',
+                {'protocolo': instance,
+                    'barcode': barcode,
+                    'autenticacao': autenticacao}, EMAIL_SEND_USER, 'leandro@jatai.go.leg.br')  #
+
             print('Um Email com comprovante de protocolo foi enviado '
                   '%s - email: %s - interessado: %s' % (
                       instance.pk,
