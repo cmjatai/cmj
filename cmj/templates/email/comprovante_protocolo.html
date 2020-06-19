@@ -56,8 +56,15 @@
 	{{protocolo.tipo_conteudo_protocolado}}
 	<br><strong>Documento: </strong>
 	{{protocolo.conteudo_protocolado|default:''}}
-<br><strong>Número de Páginas:</strong>
-{{ protocolo.conteudo_protocolado.paginas|default_if_none:"0" }}
+
+
+	<br><strong>Número de Páginas: </strong>
+  {{ protocolo.numero_paginas|default_if_none:"Não informado." }}
+
+  {% comment  %}
+    <br><strong>Número de Páginas:</strong>
+    {{ protocolo.conteudo_protocolado.paginas|default_if_none:"0" }}
+  {% endcomment %}
 
 {% endif %}
 
