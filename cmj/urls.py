@@ -36,6 +36,7 @@ import cmj.agenda.urls
 import cmj.api.urls
 import cmj.cerimonial.urls
 import cmj.core.urls
+from cmj.core.views_short import ShortRedirectView
 import cmj.diarios.urls
 import cmj.globalrules.urls
 import cmj.ouvidoria.urls
@@ -59,8 +60,13 @@ import sapl.sessao.urls
 #import sapl.api.urls
 # import sapl.api.urls
 urlpatterns_all = [
-    # FIXME: eliminar redirecionamento em 2019
-    url(r'^portal/?$', RedirectView.as_view(url='/')),
+
+
+    url(r'^j(?P<short>[0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]*)$',
+        ShortRedirectView.as_view(), name='short_view'),
+
+
+
     url(r'^admin/', admin.site.urls),
 
     url(r'^message$', TemplateView.as_view(template_name='base.html')),

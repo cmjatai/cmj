@@ -17,7 +17,7 @@ from django.core.files.storage import FileSystemStorage
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models import Q, F
-from django.db.models.deletion import PROTECT
+from django.db.models.deletion import PROTECT, CASCADE
 from django.http.response import HttpResponse
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -552,38 +552,16 @@ def short_url(**kwargs):
         return ''
 
 
-class UrlShortener(models.Model):
-    url_short = models.TextField(
-        verbose_name=_('Link Curto'),
-        db_index=True,
-        blank=True, null=True, default=None)
+class UrlShortenerManager(models.Manager):
 
-    url_long = models.TextField(
-        verbose_name=_('Link Longo'),
-        db_index=True)
+    def get_short(self, **kwargs):
+        url = self.get_queryset().filter(**kwargs).first()
+        if not url:
 
-    class Meta:
-        ordering = ('url_short',)
-
-        unique_together = (
-            ('url_short', 'url_long', ),
-        )
-        verbose_name = _('UrlShortener')
-        verbose_name_plural = _('UrlShortener')
-
-
-class ShortUrl(Slugged):
-
-    def short_url(self, sufix=None):
-        slug = self.absolute_slug + (sufix if sufix else '')
-        url_short = ''
-        try:
-            url = UrlShortener.objects.get(url_long=slug)
-        except:
             bts = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
             url = UrlShortener()
-            url.url_long = slug
+            url.url_long = kwargs['url_long']
             url.save()
 
             def b62encode(id):
@@ -596,8 +574,60 @@ class ShortUrl(Slugged):
             url_short = b62encode(url.id)
             url.url_short = url_short
             url.save()
-
         return 'jatai.go.leg.br/j' + url.url_short
+
+
+class UrlShortener(models.Model):
+
+    objects = UrlShortenerManager()
+
+    url_short = models.TextField(
+        verbose_name=_('Link Curto'),
+        db_index=True,
+        blank=True, null=True, default=None)
+
+    url_long = models.TextField(
+        verbose_name=_('Link Longo'),
+        db_index=True)
+
+    link_absoluto = models.BooleanField(
+        _('Link Absoluto'),
+        choices=YES_NO_CHOICES,
+        default=False)
+
+    class Meta:
+        ordering = ('url_short',)
+
+        unique_together = (
+            ('url_short', 'url_long', ),
+        )
+        verbose_name = _('UrlShortener')
+        verbose_name_plural = _('UrlShortener')
+
+
+class ShortRedirect(models.Model):
+
+    url = models.ForeignKey(UrlShortener, related_name='short_set',
+                            verbose_name=_('UrlShortner'),
+                            on_delete=CASCADE)
+
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+
+    created = models.DateTimeField(
+        verbose_name=_('created'),
+        editable=False, auto_now_add=True)
+
+    class Meta:
+        ordering = ('-created',)
+
+
+class ShortUrl(Slugged):
+
+    def short_url(self, sufix=None):
+        slug = self.absolute_slug + (sufix if sufix else '')
+        return UrlShortener.objects.get_short(url_long=slug)
 
     class Meta:
         abstract = True
