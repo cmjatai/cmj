@@ -17,6 +17,7 @@ from cmj.core.views_auth import CmjUserChangeView, CmjLoginView,\
     CmjPasswordResetView, UserCrud, CmjPasswordResetConfirmView,\
     CmjPasswordResetEncaminhadoView
 from cmj.core.views_search import CmjSearchView
+from cmj.core.views_short import ShortAdminView
 
 from .apps import AppConfig
 
@@ -24,6 +25,7 @@ from .apps import AppConfig
 app_name = AppConfig.name
 
 user_urlpatterns = [
+
     url(r'^user/edit/$', login_required(CmjUserChangeView.as_view()),
         name='cmj_user_change'),
 
@@ -70,6 +72,7 @@ user_urlpatterns = [
 
 
 urlpatterns = user_urlpatterns + [
+
 
     # url(r'^enderecos/', login_required(
     #    TrechoSearchView.as_view()), name='search_view'),

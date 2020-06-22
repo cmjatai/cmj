@@ -3,15 +3,15 @@ from django.shortcuts import redirect
 from django.views.generic.base import View
 
 from cmj.sigad.models import UrlShortener, ShortRedirect
+from sapl.crud.base import Crud
 
 
 class ShortRedirectView(View):
 
     def get(self, request, *args, **kwargs):
 
-        try:
-            url = UrlShortener.objects.get(url_short=kwargs['short'])
-        except:
+        url = UrlShortener.objects.filter(url_short=kwargs['short']).first()
+        if not url:
             raise Http404
 
         sr = ShortRedirect()
@@ -25,3 +25,12 @@ class ShortRedirectView(View):
                 url.url_long
             )
         )
+
+
+class ShortAdminView(Crud):
+    model = UrlShortener
+    model_set = 'short_set'
+
+    class ListView(Crud.ListView):
+        paginate_by = 100
+        ordering = '-id'

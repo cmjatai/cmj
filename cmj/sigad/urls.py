@@ -1,15 +1,19 @@
 from django.conf.urls import include, url
 
+from cmj.core.views_short import ShortAdminView
 from cmj.sigad import views, imports
 from cmj.sigad.views import PermissionsUserClasseCrud,\
     PermissionsUserDocumentoCrud, CaixaPublicacaoCrud,\
     CaixaPublicacaoClasseCrud
+
 from .apps import AppConfig
 
 
 app_name = AppConfig.name
 
 urlpatterns_sigad = [
+
+    url(r'^short/', include(ShortAdminView.get_urls())),
 
     url(r'^classe/create$',
         views.ClasseCreateView.as_view(), name='classe_create'),
