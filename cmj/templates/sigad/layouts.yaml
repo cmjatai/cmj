@@ -20,4 +20,7 @@ CaixaPublicacaoDetail:
   - nome key
 UrlShortener:
   {% trans 'Link Curtos' %}:
-  - url_short url_long
+  - url_long
+ShortRedirect:
+  {% trans 'Acessos' %}:
+    - created

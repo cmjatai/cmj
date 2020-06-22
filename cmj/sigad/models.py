@@ -604,6 +604,9 @@ class UrlShortener(models.Model):
         verbose_name = _('UrlShortener')
         verbose_name_plural = _('UrlShortener')
 
+    def __str__(self):
+        return 'Link Curto: {}'.format(self.url_short)
+
 
 class ShortRedirect(models.Model):
 

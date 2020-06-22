@@ -19,7 +19,14 @@ class ShortRedirectView(View):
         try:
             sr = ShortRedirect()
             sr.url = url
-            sr.metadata = request.META
+            sr.metadata = {
+                'request': {
+                    'meta': {
+                        'HTTP_USER_AGENT': request.META.get('HTTP_USER_AGENT', ''),
+                        'HTTP_X_FORWARDED_FOR': request.META.get('HTTP_X_FORWARDED_FOR', '')
+                    }
+                }
+            }
             sr.save()
         except Exception as e:
             logger = logging.getLogger(__name__)
@@ -35,7 +42,9 @@ class ShortRedirectView(View):
 
 class ShortAdminView(Crud):
     model = UrlShortener
-    model_set = 'short_set'
+
+    class BaseMixin(Crud.BaseMixin):
+        list_field_names = 'url_short', 'url_long'
 
     class ListView(Crud.ListView):
         paginate_by = 100
