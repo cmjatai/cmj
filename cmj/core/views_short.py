@@ -14,10 +14,13 @@ class ShortRedirectView(View):
         if not url:
             raise Http404
 
-        sr = ShortRedirect()
-        sr.url = url
-        sr.metadata = request.META
-        sr.save()
+        try:
+            sr = ShortRedirect()
+            sr.url = url
+            sr.metadata = request.META
+            sr.save()
+        except:
+            pass
 
         return redirect(
             '{}{}'.format(
