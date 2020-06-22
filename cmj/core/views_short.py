@@ -1,3 +1,5 @@
+import logging
+
 from django.http.response import Http404
 from django.shortcuts import redirect
 from django.views.generic.base import View
@@ -19,8 +21,9 @@ class ShortRedirectView(View):
             sr.url = url
             sr.metadata = request.META
             sr.save()
-        except:
-            pass
+        except Exception as e:
+            logger = logging.getLogger(__name__)
+            self.logger.error('Erro: ' + str(e))
 
         return redirect(
             '{}{}'.format(
