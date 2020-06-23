@@ -1,5 +1,31 @@
 @import 'variables';
 
+.copylink {
+  cursor: pointer;
+  position: relative;
+  width: 2em;
+  height: 2em;
+  display: inline-block;
+  &::after {
+    background-image: url(~@/assets/img/icon_copy_area_transferencia.png);
+  }
+  i {
+    display: none;
+  }
+  &::after {
+    background-size: 100% 100%;
+    content: " ";
+    opacity: 0.5;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    z-index: 0;   
+  }
+}
+
+
 .navbar-social-links {
   display: inline-block;
   padding: 0;
@@ -17,7 +43,6 @@
       color: rgba(green, 0.3);
       //display: none;
     }
-    
 
     &.facebook {
       &::after {
@@ -41,18 +66,11 @@
       background-image: url(~@/assets/img/icon_youtube64x64.png);
       }
     }
-    &.copylink {
-      cursor: pointer;
-      &::after {
-        background-image: url(~@/assets/img/icon_copy_area_transferencia.png);
-      }
-    }
 
     &.facebook,
     &.whatsapp, 
     &.twitter,
-    &.youtube,
-    &.copylink {
+    &.youtube{
       position: relative;
       i {
         display: none;

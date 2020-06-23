@@ -21,6 +21,10 @@ CaixaPublicacaoDetail:
 UrlShortener:
   {% trans 'Link Curtos' %}:
   - url_long
+UrlShortenerDetail:
+  {% trans 'Link Curtos' %}:
+  - created automatico link_absoluto
+  - url_long
 ShortRedirect:
   {% trans 'Acessos' %}:
     - created

@@ -5,6 +5,7 @@ from crispy_forms.layout import Layout, Field
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.forms import UserCreationForm as BaseUserCreationForm, UserChangeForm as BaseUserChangeForm
+from django.core.exceptions import ValidationError
 from django.forms.models import ModelForm
 from django.utils.translation import ugettext_lazy as _
 import django_filters
@@ -14,7 +15,37 @@ from image_cropping.widgets import ImageCropWidget, CropWidget
 from cmj.core.models import Trecho, TipoLogradouro, User, OperadorAreaTrabalho,\
     ImpressoEnderecamento
 from cmj.globalrules import WORKSPACE_GROUPS
+from cmj.sigad.models import UrlShortener
 from sapl.crispy_layout_mixin import to_row
+
+
+class UrlShortenerForm(ModelForm):
+
+    class Meta:
+        model = UrlShortener
+        fields = 'url_long',
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def clean_url_long(self):
+
+        url = self.cleaned_data['url_long']
+
+        if not url.startswith('http'):
+            raise ValidationError(
+                _('A url a ser encurtada deve iniciar com "http" ou "https".'))
+
+        return url
+
+    def save(self, commit=True):
+
+        instance = ModelForm.save(self, commit=False)
+        return UrlShortener.objects.get_or_create_short(
+            url_long=instance.url_long,
+            automatico=False,
+            link_absoluto=True
+        )
 
 
 class OperadorAreaTrabalhoForm(ModelForm):

@@ -554,7 +554,7 @@ def short_url(**kwargs):
 
 class UrlShortenerManager(models.Manager):
 
-    def get_short(self, **kwargs):
+    def get_or_create_short(self, **kwargs):
         url = self.get_queryset().filter(**kwargs).first()
         if not url:
 
@@ -562,6 +562,8 @@ class UrlShortenerManager(models.Manager):
 
             url = UrlShortener()
             url.url_long = kwargs['url_long']
+            url.automatico = kwargs.get('automatico', True)
+            url.link_absoluto = kwargs.get('link_absoluto', False)
             url.save()
 
             def b62encode(id):
@@ -574,7 +576,7 @@ class UrlShortenerManager(models.Manager):
             url_short = b62encode(url.id)
             url.url_short = url_short
             url.save()
-        return 'jatai.go.leg.br/j' + url.url_short
+        return url
 
 
 class UrlShortener(models.Model):
@@ -613,6 +615,13 @@ class UrlShortener(models.Model):
         verbose_name = _('UrlShortener')
         verbose_name_plural = _('UrlShortener')
 
+    @property
+    def absolute_short(self, protocol=False):
+        return '{}jatai.go.leg.br/j{}'.format(
+            'https://' if protocol else '',
+            self.url_short
+        )
+
     def __str__(self):
         return 'Link Curto: {}'.format(self.url_short)
 
@@ -639,7 +648,9 @@ class ShortUrl(Slugged):
 
     def short_url(self, sufix=None):
         slug = self.absolute_slug + (sufix if sufix else '')
-        return UrlShortener.objects.get_short(url_long=slug)
+        return UrlShortener.objects.get_or_create_short(
+            url_long=slug
+        ).absolute_short
 
     class Meta:
         abstract = True

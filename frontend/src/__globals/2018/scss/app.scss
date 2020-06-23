@@ -27,6 +27,10 @@ strong {
 }
 
 // ajuste bootstrap ########################################
+.dont-break-out {
+  word-wrap: break-word;
+  word-break: break-word;
+}
 
 .row-fluid:before, .row-fluid:after {
     content: " ";
