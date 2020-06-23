@@ -40,7 +40,7 @@ class ShortRedirectView(View):
         )
 
 
-class ShortAdminView(Crud):
+class ShortAdminCrud(Crud):
     model = UrlShortener
 
     class BaseMixin(Crud.BaseMixin):

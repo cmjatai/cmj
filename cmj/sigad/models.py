@@ -595,6 +595,10 @@ class UrlShortener(models.Model):
         choices=YES_NO_CHOICES,
         default=False)
 
+    created = models.DateTimeField(
+        verbose_name=_('created'),
+        editable=False, auto_now_add=True)
+
     class Meta:
         ordering = ('url_short',)
 
