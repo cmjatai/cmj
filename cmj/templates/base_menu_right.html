@@ -66,6 +66,11 @@
           <li role="separator" class="divider"></li>
           <li class="dropdown-header">{% trans "Usuários" %}</li>
           <li><a href="{% url 'cmj.core:user_list' %}">{% trans "Cadastro de Usuários" %}</a></li>
+        {% endif %} 
+        {% if perms.sigad.add_urlshortener %}
+          <li role="separator" class="divider"></li>
+          <li class="dropdown-header">{% trans "UrlShortener" %}</li>
+          <li><a href="{% url 'cmj.sigad:urlshortener_list' %}">{% trans "Manutenção de ShortLinks" %}</a></li>
         {% endif %}
       </ul>
     </li>
