@@ -51,7 +51,6 @@ class ShortAdminCrud(Crud):
     class BaseMixin(Crud.BaseMixin):
         list_field_names = 'url_short', 'url_long', 'created', 'acessos_set'
 
-        """
         @property
         def update_url(self):
             if self.object.automatico:
@@ -62,7 +61,7 @@ class ShortAdminCrud(Crud):
         def delete_url(self):
             if self.object.automatico:
                 return None
-            return super().delete_url"""
+            return super().delete_url
 
     class ListView(Crud.ListView):
         paginate_by = 100
