@@ -2,6 +2,7 @@ import logging
 
 from django.http.response import Http404
 from django.shortcuts import redirect
+from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import View
 
 from cmj.sigad.models import UrlShortener, ShortRedirect
@@ -44,8 +45,14 @@ class ShortAdminCrud(Crud):
     model = UrlShortener
 
     class BaseMixin(Crud.BaseMixin):
-        list_field_names = 'url_short', 'url_long'
+        list_field_names = 'url_short', 'url_long', 'created', 'acessos_set'
 
     class ListView(Crud.ListView):
         paginate_by = 100
         ordering = '-id'
+
+        def hook_header_acessos_set(self, *args, **kwargs):
+            return _('Acessos')
+
+        def hook_acessos_set(self, *args, **kwargs):
+            return '', ''

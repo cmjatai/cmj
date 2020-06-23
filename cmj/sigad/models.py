@@ -595,8 +595,13 @@ class UrlShortener(models.Model):
         choices=YES_NO_CHOICES,
         default=False)
 
+    automatico = models.BooleanField(
+        _('Link Automático'),
+        choices=YES_NO_CHOICES,
+        default=True)
+
     created = models.DateTimeField(
-        verbose_name=_('created'),
+        verbose_name=_('Data de Criação'),
         editable=False, auto_now_add=True)
 
     class Meta:
@@ -614,7 +619,7 @@ class UrlShortener(models.Model):
 
 class ShortRedirect(models.Model):
 
-    url = models.ForeignKey(UrlShortener, related_name='short_set',
+    url = models.ForeignKey(UrlShortener, related_name='acessos_set',
                             verbose_name=_('UrlShortner'),
                             on_delete=CASCADE)
 
