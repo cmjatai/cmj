@@ -3,6 +3,7 @@ import logging
 from django.contrib import messages
 from django.http.response import Http404
 from django.shortcuts import redirect
+from django.urls.base import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import View
 
@@ -86,6 +87,29 @@ class ShortAdminCrud(Crud):
                 args[0].absolute_short,
                 args[0].absolute_short
             ), ''
+
+    class DeleteView(Crud.DeleteView):
+
+        def get(self, request, *args, **kwargs):
+            r = Crud.DeleteView.get(self, request, *args, **kwargs)
+            if self.object.automatico:
+                return redirect(
+                    reverse('cmj.sigad:urlshortener_detail',
+                            kwargs={'pk': self.object.pk})
+                )
+            return r
+
+    class UpdateView(Crud.UpdateView):
+        form_class = UrlShortenerForm
+
+        def get(self, request, *args, **kwargs):
+            r = Crud.DetailView.get(self, request, *args, **kwargs)
+            if self.object.automatico:
+                return redirect(
+                    reverse('cmj.sigad:urlshortener_detail',
+                            kwargs={'pk': self.object.pk})
+                )
+            return r
 
     class DetailView(Crud.DetailView):
         layout_key = 'UrlShortenerDetail'
