@@ -24,6 +24,7 @@ UrlShortener:
 UrlShortenerDetail:
   {% trans 'Link Curtos' %}:
   - created automatico link_absoluto
+  - url_short  
   - url_long
 ShortRedirect:
   {% trans 'Acessos' %}:

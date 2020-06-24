@@ -88,10 +88,9 @@ class ShortAdminCrud(Crud):
                 args[0].absolute_short
             ), ''
 
-    class DeleteView(Crud.DeleteView):
-
+    class GetDeleteUpdateMixin:
         def get(self, request, *args, **kwargs):
-            r = Crud.DeleteView.get(self, request, *args, **kwargs)
+            r = super().get(self, request, *args, **kwargs)
             if self.object.automatico:
                 return redirect(
                     reverse('cmj.sigad:urlshortener_detail',
@@ -99,17 +98,11 @@ class ShortAdminCrud(Crud):
                 )
             return r
 
-    class UpdateView(Crud.UpdateView):
+    class DeleteView(GetDeleteUpdateMixin, Crud.DeleteView):
+        pass
+
+    class UpdateView(GetDeleteUpdateMixin, Crud.UpdateView):
         form_class = UrlShortenerForm
-
-        def get(self, request, *args, **kwargs):
-            r = Crud.DetailView.get(self, request, *args, **kwargs)
-            if self.object.automatico:
-                return redirect(
-                    reverse('cmj.sigad:urlshortener_detail',
-                            kwargs={'pk': self.object.pk})
-                )
-            return r
 
     class DetailView(Crud.DetailView):
         layout_key = 'UrlShortenerDetail'
@@ -125,6 +118,20 @@ class ShortAdminCrud(Crud):
                     )
                 )
             return r
+
+        def hook_url_short(self, obj):
+            return 'ShorLink', """
+                <div class="text-center">
+                    <a class="d-block" href="{}">{}</a>
+                    <a class="copylink" title="Copiar Link" data_href="{}">
+                      <span class="d-none">Copiar Link</span>
+                    </a>
+                </div>
+            """.format(
+                obj,
+                obj.absolute_short,
+                obj.absolute_short
+            )
 
     class CreateView(Crud.CreateView):
         form_class = UrlShortenerForm
