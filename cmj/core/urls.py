@@ -14,8 +14,8 @@ from cmj.core.views import CepCrud, RegiaoMunicipalCrud, DistritoCrud,\
     NotificacaoRedirectView, chanel_index, chanel_room, time_refresh_log_test,\
     app_vue_view, template_render, CertidaoPublicacaoCrud, BiView
 from cmj.core.views_auth import CmjUserChangeView, CmjLoginView,\
-    CmjPasswordResetView, UserCrud, CmjPasswordResetConfirmView,\
-    CmjPasswordResetEncaminhadoView
+    UserCrud, CmjPasswordResetView, CmjPasswordResetEncaminhadoView,\
+    CmjPasswordResetConfirmView, CmjPasswordResetCompleteView
 from cmj.core.views_search import CmjSearchView
 
 from .apps import AppConfig
@@ -24,32 +24,32 @@ from .apps import AppConfig
 app_name = AppConfig.name
 
 user_urlpatterns = [
-
-    url(r'^user/edit/$', login_required(CmjUserChangeView.as_view()),
-        name='cmj_user_change'),
-
+    # password_reset
     url(r'^user/recuperar-senha/email/$',
         CmjPasswordResetView.as_view(),
         name='recuperar_senha_email'),
 
+    # password_reset_done
     url(r'^user/recuperar-senha/finalizado/$',
         CmjPasswordResetEncaminhadoView.as_view(),
         name='recuperar_senha_finalizado'),
 
+    # password_reset_confirme
     url(r'^user/recuperar-senha/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$',
         CmjPasswordResetConfirmView.as_view(),
         name='recuperar_senha_confirma'),
 
+    # password_reset_complete
     url(r'^user/recuperar-senha/completo/$',
-        PasswordResetCompleteView.as_view(),
-        {'template_name': 'core/user/recuperar_senha_completo.html'},
-        name='recuperar_senha_completo'),
+        CmjPasswordResetCompleteView.as_view(),
+        name='password_reset_complete'),
+
+    url(r'^user/edit/$', login_required(CmjUserChangeView.as_view()),
+        name='cmj_user_change'),
 
     url(r'^login/$', CmjLoginView.as_view(), name='login'),
-
     url(r'^logout/$', LogoutView.as_view(),
         {'next_page': '/'}, name='logout', ),
-
 
     url(r'^channel$', chanel_index, name='channel_index'),
     url(r'^channel/(?P<room_name>[^/]+)/$',
@@ -62,8 +62,6 @@ user_urlpatterns = [
 
     url(r'^template/(?P<template_name>[^/]+)$',
         template_render, name='template_render'),
-
-
 
     url(r'^sistema/search/', CmjSearchView(), name='haystack_search'),
 

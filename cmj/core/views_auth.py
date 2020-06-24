@@ -2,7 +2,7 @@
 from braces.views import FormMessagesMixin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.views import LoginView, PasswordResetView,\
-    PasswordResetConfirmView
+    PasswordResetConfirmView, PasswordResetCompleteView
 from django.db.models import Q
 from django.urls.base import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
@@ -45,6 +45,7 @@ class CmjLoginView(LoginView):
 
 
 class CmjPasswordResetView(PasswordResetView):
+    # password_reset
     email_template_name = 'core/user/recuperar_senha_email.html'
     success_url = reverse_lazy('cmj.core:recuperar_senha_finalizado')
 
@@ -55,12 +56,19 @@ class CmjPasswordResetView(PasswordResetView):
 
 
 class CmjPasswordResetEncaminhadoView(PasswordResetView):
+    # password_reset_done
     template_name = 'core/user/recupera_senha_email_enviado.html'
 
 
 class CmjPasswordResetConfirmView(PasswordResetConfirmView):
+    # password_reset_confirme
     form_class = NovaSenhaForm
     template_name = 'core/user/nova_senha_form.html'
+
+
+class CmjPasswordResetCompleteView(PasswordResetCompleteView):
+    # password_reset_complete
+    template_name = 'core/user/recuperar_senha_completo.html'
 
 
 class UserCrud(CrudAux):

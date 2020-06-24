@@ -1077,8 +1077,8 @@ def mail_service_configured(request=None):
 
     logger = logging.getLogger(__name__)
 
-    if settings.DEBUG:
-        return False
+    # if settings.DEBUG:
+    #    return False
     if settings.EMAIL_RUNNING is None:
         result = True
         try:
