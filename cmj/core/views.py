@@ -412,6 +412,9 @@ class CertidaoPublicacaoCrud(Crud):
 
     class ListView(Crud.ListView):
 
+        def has_permission(self):
+            return True
+
         paginate_by = 50
 
         def split_bylen(self, item, maxlen):
@@ -427,7 +430,7 @@ class CertidaoPublicacaoCrud(Crud):
             try:
                 signs = obj.metadata['signs']
                 for fn, sigs in signs.items():
-                    for sig in sigs:
+                    for sig in sigs['signs']:
                         sig_tuples.append(sig)
 
                 sign_template = template.loader.get_template(
