@@ -5,7 +5,11 @@ from django.contrib.auth.views import LoginView, PasswordResetView,\
     PasswordResetConfirmView, PasswordResetCompleteView
 from django.db.models import Q
 from django.urls.base import reverse_lazy
+from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
+from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic.edit import FormView, UpdateView
 
 from cmj.core.forms import ListWithSearchForm
@@ -54,6 +58,10 @@ class CmjPasswordResetView(PasswordResetView):
     from_email = EMAIL_SEND_USER
     form_class = RecuperarSenhaForm
 
+    @method_decorator(csrf_protect)
+    def dispatch(self, *args, **kwargs):
+        return PasswordResetView.dispatch(self, *args, **kwargs)
+
 
 class CmjPasswordResetEncaminhadoView(PasswordResetView):
     # password_reset_done
@@ -64,6 +72,7 @@ class CmjPasswordResetConfirmView(PasswordResetConfirmView):
     # password_reset_confirme
     form_class = NovaSenhaForm
     template_name = 'core/user/nova_senha_form.html'
+    success_url = reverse_lazy('cmj.core:password_reset_complete')
 
 
 class CmjPasswordResetCompleteView(PasswordResetCompleteView):
