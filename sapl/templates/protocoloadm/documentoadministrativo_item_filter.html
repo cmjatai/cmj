@@ -62,7 +62,11 @@
 
   <small>
     {% if d.interessado %}
-      <strong>Interessado:</strong>&nbsp;{{ d.interessado|default_if_none:"Não informado"}}</br>
+      <strong>Interessado:</strong>&nbsp;{{ d.interessado|default_if_none:"Não informado"}}
+      {% if d.protocolo_gr.first.email %}               
+        <br><strong>Email:</strong>  {{ d.protocolo_gr.first.email}}                  
+      {% endif %}
+
     {% endif %}
 
     {% define d.tramitacaoadministrativo_set.first as tram %}
