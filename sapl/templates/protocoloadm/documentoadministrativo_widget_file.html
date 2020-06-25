@@ -9,16 +9,16 @@
 
 
       {% if d.metadata.signs and d.metadata.locaweb and d.metadata.signs.texto_integral.signs and d.metadata.locaweb.texto_integral.hash == d.metadata.locaweb.texto_integral.original_hash %}
-        <a class="link-texto"  target="_blank" href="{{d.texto_integral.url}}?original" title="Documento Eletrônico">
+        <button class="link-texto" target="_blank" title="Documento Eletrônico" onclick="window.open('{{d.texto_integral.url}}?original')">
           <i class="fas fa-2x fa-certificate"></i>
           <br>
-          <strong>Documento 
+          <strong>Documento
               Eletrônico
               <small>
                 <br>com Assinatura Digital
               </small>
           </strong>
-        </a>
+        </button>
       {% else %}
 
         {% if d.texto_integral and '.pdf' in d.texto_integral.path %}
@@ -40,7 +40,7 @@
             <i class="far fa-2x fa-file-{% if '.pdf' in d.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
           {% endif %}
           <br>
-          <strong>Documento 
+          <strong>Documento
             {% if d.metadata.signs and d.metadata.signs.texto_integral.signs %}
               Eletrônico
               <small>
