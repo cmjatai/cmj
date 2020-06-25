@@ -193,30 +193,33 @@ def url(value):
 
 @register.inclusion_tag('core/notificacoes_unread.html', takes_context=True)
 def notificacoes_unread(context):
-    request = context['request']
 
-    if request.user.is_anonymous:
-        return {'notificacoes_anonimas': [],
-                'notificacoes_usuarios': [],
-                'notificacoes': 0, }
+    try:
+        request = context['request']
 
-    result = {'notificacoes_anonimas':
-              request.user.notificacao_set.unread().filter(
-                  user_origin__isnull=True).order_by('-created'),
-              'notificacoes_usuarios':
-              request.user.notificacao_set.unread().filter(
-                  user_origin__isnull=False).order_by('-created')
-              }
+        if request.user.is_anonymous:
+            return {'notificacoes_anonimas': [],
+                    'notificacoes_usuarios': [],
+                    'notificacoes': 0, }
 
-    result.update(
-        {
-            'notificacoes': (
-                result['notificacoes_anonimas'].count() +
-                result['notificacoes_usuarios'].count()),
-        }
-    )
+        result = {'notificacoes_anonimas':
+                  request.user.notificacao_set.unread().filter(
+                      user_origin__isnull=True).order_by('-created'),
+                  'notificacoes_usuarios':
+                  request.user.notificacao_set.unread().filter(
+                      user_origin__isnull=False).order_by('-created')
+                  }
 
-    return result
+        result.update(
+            {
+                'notificacoes': (
+                    result['notificacoes_anonimas'].count() +
+                    result['notificacoes_usuarios'].count()),
+            }
+        )
+        return result
+    except:
+        return None
 
 
 @register.filter
