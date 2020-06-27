@@ -1698,7 +1698,7 @@ class ComprovanteProtocoloView(PermissionRequiredMixin, TemplateView):
         protocolo = Protocolo.objects.get(pk=self.kwargs['pk'])
         protocolo.save()
 
-        messages.info(request, _('Email enviado com sucesso!'))
+        #messages.info(request, _('Email enviado com sucesso!'))
 
         return redirect(
             reverse('sapl.protocoloadm:protocolo_mostrar', kwargs={

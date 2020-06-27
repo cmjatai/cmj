@@ -1,3 +1,6 @@
+import logging
+
+from django.conf import settings
 from django.db.models.signals import post_save, pre_save
 from django.dispatch.dispatcher import receiver
 
@@ -9,6 +12,7 @@ from sapl.utils import create_barcode
 
 @receiver(pre_save, sender=Protocolo, dispatch_uid='protocolo_pre_save')
 def protocolo_pre_save(sender, instance, using, **kwargs):
+    logger = logging.getLogger(__name__)
 
     import inspect
     funcs = list(filter(lambda x: x == 'revision_pre_delete_signal',
@@ -19,10 +23,8 @@ def protocolo_pre_save(sender, instance, using, **kwargs):
 
     if hasattr(instance, 'not_send_mail') and instance.not_send_mail:
         return
-    try:
-
-        if instance.email and instance.conteudo_protocolado:
-
+    if instance.email and instance.conteudo_protocolado:
+        try:
             if instance.timestamp:
                 data = instance.timestamp.strftime("%Y/%m/%d")
             else:
@@ -33,26 +35,42 @@ def protocolo_pre_save(sender, instance, using, **kwargs):
             autenticacao = str(instance.tipo_processo) + \
                 data + str(instance.numero).zfill(6)
 
-            send_mail(
-                'Protocolo: {}'.format(instance.epigrafe),
-                'email/comprovante_protocolo.html',
-                {'protocolo': instance,
-                    'barcode': barcode,
-                    'autenticacao': autenticacao}, EMAIL_SEND_USER, instance.email)  # 'leandro@jatai.go.leg.br')  #
+            if not settings.DEBUG:
+                send_mail(
+                    'Protocolo: {}'.format(instance.epigrafe),
+                    'email/comprovante_protocolo.html',
+                    {'protocolo': instance,
+                        'barcode': barcode,
+                        'autenticacao': autenticacao}, EMAIL_SEND_USER, instance.email)  # 'leandro@jatai.go.leg.br')  #
+            else:
+                send_mail(
+                    'Protocolo: {}'.format(instance.epigrafe),
+                    'email/comprovante_protocolo.html',
+                    {'protocolo': instance,
+                        'barcode': barcode,
+                        'autenticacao': autenticacao}, EMAIL_SEND_USER, 'leandro@jatai.go.leg.br')  #
 
-            send_mail(
-                'Protocolo: {}'.format(instance.epigrafe),
-                'email/comprovante_protocolo.html',
-                {'protocolo': instance,
-                    'barcode': barcode,
-                    'autenticacao': autenticacao}, EMAIL_SEND_USER, 'leandro@jatai.go.leg.br')  #
+            logger.info(
+                'Um Email com comprovante de protocolo foi enviado '
+                '%s - email: %s - interessado: %s' % (
+                    instance.pk,
+                    instance.email,
+                    instance.interessado))
 
-            print('Um Email com comprovante de protocolo foi enviado '
-                  '%s - email: %s - interessado: %s' % (
-                      instance.pk,
-                      instance.email,
-                      instance.interessado))
             instance.comprovante_automatico_enviado = True
-    except Exception as e:
-        print(e)
-        pass
+        except Exception as e:
+            logger.error(
+                """
+                Erro no envio de email de comprovante de protocolo.
+                para: {} 
+                {}
+                {}
+                --------------------
+                {}
+                """.format(
+                    instance.email,
+                    instance,
+                    instance.conteudo_protocolado,
+                    e
+
+                ))

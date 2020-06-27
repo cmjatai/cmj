@@ -96,11 +96,6 @@
 	{% endcomment %}
 
 	</a>
-	{% if protocolo.email %}
-		<a class="btn btn-primary d-none" href="{% url 'sapl.protocoloadm:comprovante_protocolo' protocolo.pk%}?send_mail">
-			Enviar Comprovante por Email
-		</a>
-	{% endif %}
 
 
 	{% if perms.protocoloadm.action_homologar_protocolo and not protocolo|conteudo_protocolado_homologado %}
@@ -108,6 +103,16 @@
 			href="{% url 'sapl.protocoloadm:protocolo_homologar' protocolo.pk %}" 
 			class="btn btn-primary float-right">
 				Homologar
+		</a>
+	{% endif %}
+	
+	{% if protocolo.email and user.is_superuser%}
+		<br><br>
+		{% if protocolo.comprovante_automatico_enviado %}
+			<small>Comprovante automático já enviado.</small><br>
+		{% endif %}
+		<a class="btn btn-primary" href="{% url 'sapl.protocoloadm:comprovante_protocolo' protocolo.pk%}?send_mail">
+			Enviar Comprovante por Email
 		</a>
 	{% endif %}
 {% endblock base_content %}

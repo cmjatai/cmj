@@ -14,9 +14,9 @@ from cmj.utils import signed_name_and_date_extract
 def send_mail(subject, email_template_name,
               context, from_email, to_email):
 
-    if settings.DEBUG:
-        print('DEBUG: Envio Teste', subject, from_email, to_email)
-        return
+    # if settings.DEBUG:
+    #    print('DEBUG: Envio Teste', subject, from_email, to_email)
+    #    return
 
     subject = ''.join(subject.splitlines())
 
