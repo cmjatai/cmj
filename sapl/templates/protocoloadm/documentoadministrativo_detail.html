@@ -23,8 +23,8 @@
               {% with principal.documento_principal as d %}
                 <a class="item-titulo" href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' d.pk %}">{{ d }}</a>
                 {% if d.certidao %}
-                  <br><small>
-                  <span class="text-danger">Certidão de Publicação nº {{d.certidao.id|stringformat:"06d" }} de {{d.certidao.created}}</span>
+                  <br><small>aaa
+                  <a class="text-danger" href="{% url 'cmj.core:certidaopublicacao_detail' d.certidao.id %}">Certidão de Publicação nº {{d.certidao.id|stringformat:"06d" }} de {{d.certidao.created}}</a>
                   </small>
                 {% endif %}
                 <br><strong>Data do documento:</strong> {{d.data}} | {{d.tipo}} | {{d.tipo.sigla}} {{d.numero}}/{{d.ano}}
