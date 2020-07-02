@@ -348,7 +348,8 @@ class MateriaLegislativa(CountPageMixin):
     def is_signed(self):
         try:
             return self.metadata and self.metadata['signs'] and \
-                self.metadata['signs']['texto_original']
+                self.metadata['signs']['texto_original'] and \
+                self.metadata['signs']['texto_original']['signs']
         except:
             return False
 
@@ -644,7 +645,8 @@ class DocumentoAcessorio(CountPageMixin):
     def is_signed(self):
         try:
             return self.metadata and self.metadata['signs'] and \
-                self.metadata['signs']['arquivo']
+                self.metadata['signs']['arquivo'] and \
+                self.metadata['signs']['arquivo']['signs']
         except:
             return False
 

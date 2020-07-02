@@ -340,7 +340,8 @@ class DocumentoAdministrativo(CountPageMixin):
     def is_signed(self):
         try:
             return self.metadata and self.metadata['signs'] and \
-                self.metadata['signs']['texto_integral']
+                self.metadata['signs']['texto_integral'] and \
+                self.metadata['signs']['texto_integral']['signs']
         except:
             return False
 
