@@ -1,7 +1,9 @@
 from datetime import datetime
+import io
 import logging
 from random import choice
 from string import ascii_letters, digits
+import zipfile
 
 from braces.views import FormValidMessageMixin
 from django.conf import settings
@@ -281,6 +283,47 @@ class DocumentoAdministrativoCrud(Crud):
             if self.object.epigrafe:
                 context['title'] = self.object.epigrafe
             return context
+
+        def get(self, request, *args, **kwargs):
+            self.object = self.get_object()
+
+            if 'download' in request.GET:
+                return self.monta_zip()
+
+            context = self.get_context_data(object=self.object)
+            return self.render_to_response(context)
+
+        def monta_zip(self):
+            file_buffer = io.BytesIO()
+            with zipfile.ZipFile(file_buffer, 'w') as file:
+
+                def tree_add_files(obj):
+                    if obj.texto_integral:
+                        file.write(
+                            obj.texto_integral.original_path,
+                            arcname='%s-%s' % (
+                                obj.id,
+                                obj.texto_integral.original_path.split(
+                                    '/')[-1]))
+
+                    for item in obj.documento_principal_set.childs_anexados():
+                        tree_add_files(item.documento_anexado)
+
+                tree_add_files(self.object)
+
+            response = HttpResponse(file_buffer.getvalue(),
+                                    content_type='application/zip')
+
+            response['Cache-Control'] = 'no-cache'
+            response['Pragma'] = 'no-cache'
+            response['Expires'] = 0
+            response['Content-Disposition'] = \
+                'inline; filename=%s-%s-%s.zip' % (
+                    self.object.tipo.sigla,
+                    self.object.numero,
+                    self.object.ano)
+
+            return response
 
     class ListView(QuerySetContainerPrivPubMixin, FilterView):
         filterset_class = DocumentoAdministrativoFilterSet
