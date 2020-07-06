@@ -1,5 +1,5 @@
 from django import template
-from cmj.sigad.models import CaixaPublicacao, Documento
+from cmj.sigad.models import CaixaPublicacao, Documento, Classe
 
 
 register = template.Library()
@@ -22,7 +22,7 @@ def organize_avatars(pos, total):
         '6': 2,
         '7': 2,
         '8': 2,
-        '9': 2,}
+        '9': 2, }
     return pos % map_arranjo[str(total if total <= 9 else 9)] == 0
 
 
@@ -67,6 +67,27 @@ def inspect(obj):
 @register.filter
 def caixa_publicacao(key, classe):
     try:
+        cp = CaixaPublicacao.objects.get(key=key, classe=classe)
+        docs = cp.caixapublicacaorelationship_set.all()
+        result = {'url_edit': 'cmj.sigad:caixapublicacao%s_update' % ('classe' if classe else ''),
+                  'cp': cp, 'docs':
+                  list(
+                      map(lambda x: (
+                          x.documento, x.documento.nodes.filter(
+                            tipo=Documento.TPD_IMAGE).order_by('ordem').first()),
+                          docs
+                          ))
+                  }
+
+        return result
+    except:
+        return None
+
+
+@register.filter
+def caixa_publicacao_popup(key):
+    try:
+        classe = Classe.objects.get(slug='popup')
         cp = CaixaPublicacao.objects.get(key=key, classe=classe)
         docs = cp.caixapublicacaorelationship_set.all()
         result = {'url_edit': 'cmj.sigad:caixapublicacao%s_update' % ('classe' if classe else ''),

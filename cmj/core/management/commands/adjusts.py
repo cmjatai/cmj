@@ -64,7 +64,7 @@ class Command(BaseCommand):
         # with open('/home/leandro/TEMP/teste.pdf', 'rb') as f:
         #    signed_name_and_date_extract(f)
 
-        self.ajuste_metadata_com_set_values()
+        # self.ajuste_metadata_com_set_values()
 
     def ajuste_metadata_com_set_values(self):
         for app in apps.get_app_configs():

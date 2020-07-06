@@ -260,7 +260,6 @@ window.AltoContraste = function () {
     this.setState(!this.currentState)
   }
 }
-window.AltoContraste()
 
 window.isElementInViewport = function (el) {
   if (typeof jQuery === 'function' && el instanceof window.jQuery) {

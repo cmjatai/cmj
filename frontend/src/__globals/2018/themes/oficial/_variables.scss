@@ -101,6 +101,8 @@ $zindex-galeria:                    5000 !default;
 $zindex-galeria-fixed:              9000 !default;
 $zindex-message:                    10000 !default;
 
+$zindex-popup:                      99999 !default;
+
 
 @import '~bootstrap/scss/functions';
 @import '~bootstrap/scss/variables';

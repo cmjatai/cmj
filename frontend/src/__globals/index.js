@@ -34,6 +34,7 @@ require('imports-loader?window.jQuery=jquery!./2018/js/jquery.runner.js')
 window.$ = $
 window.jQuery = $
 
+window.AltoContraste()
 window.autorModal()
 window.refreshMask()
 window.refreshDatePicker()
@@ -79,5 +80,13 @@ $(function () {
     $temp.val(event.target.getAttribute('data_href')).select()
     document.execCommand('copy')
     $temp.remove()
+  })
+
+  setTimeout(() => {
+    $('.container-popup').css('display', 'flex')
+  }, 1000)
+  $('.container-popup .btn-close').click(event => {
+    window.setCookie('popup_view', '1', 1) // 20s em dias -> 0.000231481
+    $('.container-popup').remove()
   })
 })

@@ -213,8 +213,9 @@ class CaixaPublicacaoForm(forms.ModelForm):
 
         if classe:
             tmpl = classe.template_classe
-            qs = getattr(classe.documento_set, CLASSE_DOC_MANAGER_CHOICE[tmpl])
-            qs = qs()
+            qs = classe.documento_set.public_all_docs()
+            #qs = getattr(classe.documento_set, CLASSE_DOC_MANAGER_CHOICE[tmpl])
+            #qs = qs()
         else:
             qs = Documento.objects.qs_news().filter(
                 nodes__midia__isnull=False
