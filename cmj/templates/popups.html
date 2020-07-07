@@ -22,9 +22,9 @@
           <div class="carousel-inner">
             {% for d in  popup_destaque.docs%}
               <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                  <a pk="{{d.2}}" {% if d.0.texto %}href="{{d.0.texto}}"{% else %}{% endif %}>
+                  <div class="click-item" pk="{{d.2}}" {% if d.0.texto %}href="{{d.0.texto}}"{% else %}{% endif %}>
                     <img src="/{{d.1.absolute_slug}}" alt="{% if d.1.titulo %}{{d.0.titulo}}{% else %}{{d.0.titulo}}{% endif %}">
-                  </a>
+                  </div>
                   {% comment %}
                     <div class="autor">{{d.1.autor|default:''}}</div>
                     <div class="d-block w-100 imagem" style="background-image: url(/{{d.1.absolute_slug}}.768);">

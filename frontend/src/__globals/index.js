@@ -90,10 +90,16 @@ $(function () {
     $('.container-popup').css('display', 'flex')
   }, 500)
 
-  $('#carousel-popup .carousel-item a').click(event => {
+  $('#carousel-popup .carousel-item .click-item').click(event => {
     let pk = event.currentTarget.getAttribute('pk')
+    let href = event.currentTarget.getAttribute('href')
+
     window.setCookie('popup_closed', '1', 0.006944444) // Caso o usuário clique em um popup, fica 10min sem mostrar popups
     window.setCookie(`popup_viewed_${pk}`, pk, 0.1) // Caso o usuário clique em um popup, fica 2h24min sem mostrar esse popup
+
+    setTimeout(() => {
+      document.location = href
+    }, 100)
 
     // DEV
     // window.setCookie('popup_closed', '1', 0.000231481) // Caso o usuário clique em um popup, fica 20s sem mostrar popups
