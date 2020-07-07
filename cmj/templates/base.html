@@ -32,9 +32,7 @@
   <body class="{% block body_class %}{%endblock%}">
 
   {% block root_body %}
-    {% if request.COOKIES.popup_view != '1' %}
-      {% include "popups.html" %}
-    {% endif %}
+    {% include "popups.html" %}
     <div class="page fadein" id="{% block id_wrapper %}wrapper{% endblock %}">
       
       <div class="header-accessibility">

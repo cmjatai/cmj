@@ -1,57 +1,59 @@
 {% load i18n sigad_filters social_utils%}
-{% with 'popup_destaque'|caixa_publicacao_popup as popup_destaque %}
-{% if popup_destaque.docs %}
-<div class="container-path container-popup">
-  <div class="inner-popup">
-    <div id="carousel-popup" class="carousel carousel-custom" data-ride="carousel" data-interval="7000">
-      <div class="btn-close"><i class="far fa-times-circle"></i></div>
-      <ol class="carousel-indicators">
-        {% for d in  popup_destaque.docs%}
-          <li data-target="#carousel-popup" data-slide-to="{{forloop.counter0}}" {% if forloop.first %}class="active"{% endif %}></li>
-        {% endfor %}
-      </ol>
-      {% if perms.sigad.change_documento %}
-        <div class="btn-edit-destaques">
-          <a href="{% url 'cmj.sigad:caixapublicacao_update' popup_destaque.cp.pk %}" title="{% trans "Editar Caixa de Publicação" %}">
-            <i class="fas fa-edit" aria-hidden="true"></i>
-          </a>
-        </div>
-      {% endif %}
-      <div class="carousel-inner">
-        {% for d in  popup_destaque.docs%}
-          <div class="carousel-item {% if forloop.first %}active{% endif %}">
-              <a {% if d.0.texto %}href="{{d.0.texto}}"{% else %}{% endif %}>
-                <img src="/{{d.1.absolute_slug}}" alt="{% if d.1.titulo %}{{d.0.titulo}}{% else %}{{d.0.titulo}}{% endif %}">
-              </a>
-              {% comment %}
-                <div class="autor">{{d.1.autor|default:''}}</div>
-                <div class="d-block w-100 imagem" style="background-image: url(/{{d.1.absolute_slug}}.768);">
-                <div class="carousel-caption">
-                  <p class="d-none d-sm-block">{{d.0.descricao}}</p>
-                  <a tabindex="{{view.tabindex}}" href="/{{d.0.slug}}" title="{{d.0.descricao}}">
-                    <h1 class="titulo">
-                      {{d.0.titulo}}
-                    </h1>
-                  </a>
-                </div>
-              {% endcomment %}
-          </div>
-        {% endfor %}
-      </div>
+{% with 'popup_destaque'|caixa_publicacao_popup:request as popup_destaque %}
 
-      <!-- Controls -->
-      {% comment %}   
-        <a class="carousel-control-prev" href="#carousel-popup" role="button" data-slide="prev">
-          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-          <span class="sr-only">Previous</span>
-        </a>
-        <a class=" carousel-control-next" href="#carousel-popup" role="button" data-slide="next">
-          <span class="carousel-control-next-icon" aria-hidden="true"></span>
-          <span class="sr-only">Next</span>
-        </a>
-      {% endcomment %}
+  {% if popup_destaque %}
+
+    <div class="container-path container-popup">
+      <div class="inner-popup">
+        <div id="carousel-popup" class="carousel carousel-custom" data-ride="carousel" data-interval="20000">
+          <div class="btn-close"><i class="far fa-times-circle"></i></div>
+          <ol class="carousel-indicators">
+            {% for d in  popup_destaque.docs%}
+              <li data-target="#carousel-popup" data-slide-to="{{forloop.counter0}}" {% if forloop.first %}class="active"{% endif %}></li>
+            {% endfor %}
+          </ol>
+          {% if perms.sigad.change_documento %}
+            <div class="btn-edit-destaques">
+              <a href="{% url 'cmj.sigad:caixapublicacao_update' popup_destaque.cp.pk %}" title="{% trans "Editar Caixa de Publicação" %}">
+                <i class="fas fa-edit" aria-hidden="true"></i>
+              </a>
+            </div>
+          {% endif %}
+          <div class="carousel-inner">
+            {% for d in  popup_destaque.docs%}
+              <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                  <a pk="{{d.2}}" {% if d.0.texto %}href="{{d.0.texto}}"{% else %}{% endif %}>
+                    <img src="/{{d.1.absolute_slug}}" alt="{% if d.1.titulo %}{{d.0.titulo}}{% else %}{{d.0.titulo}}{% endif %}">
+                  </a>
+                  {% comment %}
+                    <div class="autor">{{d.1.autor|default:''}}</div>
+                    <div class="d-block w-100 imagem" style="background-image: url(/{{d.1.absolute_slug}}.768);">
+                    <div class="carousel-caption">
+                      <p class="d-none d-sm-block">{{d.0.descricao}}</p>
+                      <a tabindex="{{view.tabindex}}" href="/{{d.0.slug}}" title="{{d.0.descricao}}">
+                        <h1 class="titulo">
+                          {{d.0.titulo}}
+                        </h1>
+                      </a>
+                    </div>
+                  {% endcomment %}
+              </div>
+            {% endfor %}
+          </div>
+
+          <!-- Controls -->
+          {% comment %}   
+            <a class="carousel-control-prev" href="#carousel-popup" role="button" data-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="sr-only">Previous</span>
+            </a>
+            <a class=" carousel-control-next" href="#carousel-popup" role="button" data-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="sr-only">Next</span>
+            </a>
+          {% endcomment %}
+        </div>
+      </div>
     </div>
-  </div>
-</div>
-{% endif %}
+  {% endif %}
 {% endwith %}

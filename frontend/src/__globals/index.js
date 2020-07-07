@@ -81,12 +81,30 @@ $(function () {
     document.execCommand('copy')
     $temp.remove()
   })
+})
+
+$(function () {
+  // popups
 
   setTimeout(() => {
     $('.container-popup').css('display', 'flex')
-  }, 1000)
+  }, 500)
+
+  $('#carousel-popup .carousel-item a').click(event => {
+    let pk = event.currentTarget.getAttribute('pk')
+    window.setCookie('popup_closed', '1', 0.006944444) // Caso o usuário clique em um popup, fica 10min sem mostrar popups
+    window.setCookie(`popup_viewed_${pk}`, pk, 0.1) // Caso o usuário clique em um popup, fica 2h24min sem mostrar esse popup
+
+    // DEV
+    // window.setCookie('popup_closed', '1', 0.000231481) // Caso o usuário clique em um popup, fica 20s sem mostrar popups
+    // window.setCookie(`popup_viewed_${pk}`, pk, 0.000462963) // Caso o usuário clique em um popup, 40s sem mostrar esse popup
+  })
+
   $('.container-popup .btn-close').click(event => {
-    window.setCookie('popup_view', '1', 1) // 20s em dias -> 0.000231481
+    window.setCookie('popup_closed', '1', 0.1) // 20s -> 0.000231481d // 2h24min -> 0.1d
     $('.container-popup').remove()
+
+    // DEV
+    // window.setCookie('popup_closed', '1', 0.001388889) // 2min
   })
 })

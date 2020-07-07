@@ -85,17 +85,32 @@ def caixa_publicacao(key, classe):
 
 
 @register.filter
-def caixa_publicacao_popup(key):
+def caixa_publicacao_popup(key, request):
     try:
+        cks = request.COOKIES
+
+        print(cks)
+
+        if 'popup_closed' in cks:
+            return False
+
+        excludes = []
+        for k, pk in cks.items():
+            if 'popup_viewed_' in k:
+                excludes.append(pk)
+
         classe = Classe.objects.get(slug='popup')
         cp = CaixaPublicacao.objects.get(key=key, classe=classe)
-        docs = cp.caixapublicacaorelationship_set.all()
+        docs = cp.caixapublicacaorelationship_set.exclude(id__in=excludes)
+
         result = {'url_edit': 'cmj.sigad:caixapublicacao%s_update' % ('classe' if classe else ''),
                   'cp': cp, 'docs':
                   list(
                       map(lambda x: (
-                          x.documento, x.documento.nodes.filter(
-                            tipo=Documento.TPD_IMAGE).order_by('ordem').first()),
+                          x.documento,
+                          x.documento.nodes.filter(
+                              tipo=Documento.TPD_IMAGE).order_by('ordem').first(),
+                          x.id),
                           docs
                           ))
                   }
