@@ -1,7 +1,7 @@
 {% load i18n sigad_filters social_utils%}
 {% with 'popup_destaque'|caixa_publicacao_popup:request as popup_destaque %}
 
-  {% if popup_destaque %}
+  {% if popup_destaque and popup_destaque.docs %}
 
     <div class="container-path container-popup">
       <div class="inner-popup">
