@@ -616,7 +616,7 @@ class UrlShortener(models.Model):
         verbose_name_plural = _('UrlShortener')
 
     @property
-    def absolute_short(self, protocol=False):
+    def absolute_short(self, protocol=True):
         return '{}jatai.go.leg.br/j{}'.format(
             'https://' if protocol else '',
             self.url_short

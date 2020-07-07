@@ -44,7 +44,7 @@ def social_link_share(context, obj=None, css_class=''):
             descricao = ''
 
         return {'url': url,
-                'whatsapp_url': f'https://{url}',
+                'whatsapp_url': url,
                 'titulo': obj.titulo,
                 'descricao': descricao,
                 'css_class': css_class,
