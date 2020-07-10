@@ -99,7 +99,7 @@ $(function () {
 
     setTimeout(() => {
       document.location = href
-    }, 100)
+    }, 1500)
 
     // DEV
     // window.setCookie('popup_closed', '1', 0.000231481) // Caso o usuário clique em um popup, fica 20s sem mostrar popups
