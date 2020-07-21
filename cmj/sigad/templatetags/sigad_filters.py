@@ -89,8 +89,6 @@ def caixa_publicacao_popup(key, request):
     try:
         cks = request.COOKIES
 
-        print(cks)
-
         if 'popup_closed' in cks:
             return False
 

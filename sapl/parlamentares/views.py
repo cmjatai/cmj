@@ -234,12 +234,17 @@ class ProposicaoParlamentarCrud(CrudBaseForListAndDetailExternalAppView):
     namespace = AppConfig.name
 
     class BaseMixin(CrudBaseForListAndDetailExternalAppView.BaseMixin):
+        list_field_names = ['tipo', 'descricao',
+                            'data_envio', 'data_recebimento']
 
         @classmethod
         def url_name(cls, suffix):
             return '%s_parlamentar_%s' % (cls.model._meta.model_name, suffix)
 
     class ListView(CrudBaseForListAndDetailExternalAppView.ListView):
+
+        def hook_descricao(self, *args, **kwargs):
+            return args[0].descricao, ''
 
         def get_context_data(self, **kwargs):
             context = CrudBaseForListAndDetailExternalAppView\
