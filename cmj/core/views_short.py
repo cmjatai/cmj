@@ -37,10 +37,13 @@ class ShortRedirectView(View):
             logger = logging.getLogger(__name__)
             self.logger.error('Erro: ' + str(e))
 
+        QUERY_STRING = request.META.get('QUERY_STRING', '')
+
         return redirect(
-            '{}{}'.format(
+            '{}{}{}'.format(
                 '' if url.link_absoluto else '/',
-                url.url_long
+                url.url_long,
+                '?{}'.format(QUERY_STRING) if QUERY_STRING else ''
             )
         )
 
