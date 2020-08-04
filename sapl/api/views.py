@@ -29,7 +29,7 @@ from sapl.api.serializers import ChoiceSerializer
 from sapl.base.models import Autor
 from sapl.materia.models import Proposicao, TipoMateriaLegislativa,\
     MateriaLegislativa, Tramitacao, DocumentoAcessorio, TipoProposicao
-from sapl.norma.models import NormaJuridica
+from sapl.norma.models import NormaJuridica, AnexoNormaJuridica
 from sapl.parlamentares.models import Parlamentar
 from sapl.protocoloadm.models import DocumentoAdministrativo,\
     DocumentoAcessorioAdministrativo, TramitacaoAdministrativo, Anexado,\
@@ -235,7 +235,6 @@ class customize(object):
         SaplApiViewSetConstrutor._built_sets[
             self.model._meta.app_config][self.model] = _SaplApiViewSet
         return _SaplApiViewSet
-
 
 # Customização para AutorViewSet com implementação de actions específicas
 
@@ -654,4 +653,12 @@ class _ProposicaoViewSet(ResponseFileMixin):
 
     @action(detail=True)
     def texto_original(self, request, *args, **kwargs):
+        return self.response_file(request, *args, **kwargs)
+
+
+@customize(AnexoNormaJuridica)
+class _AnexoNormaJuridicaViewSet(ResponseFileMixin):
+
+    @action(detail=True)
+    def anexo_arquivo(self, request, *args, **kwargs):
         return self.response_file(request, *args, **kwargs)
