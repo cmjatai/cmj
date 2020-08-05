@@ -409,9 +409,10 @@ def customize_link_materia(context, pk, has_permission, is_expediente):
                     materia_id=obj.materia_id).last()
                 resultado_descricao = resultado.tipo_resultado_votacao.nome
 
-                resultado_observacao = '{}<br>{}'.format(
+                resultado_observacao = '{}{}{}'.format(
                     resultado.observacao,
-                    '<ul>{}</ul>'.format(
+                    '<br>Subscrições:' if resultado.subscricoes.exists() else '',
+                    '<br><ul>{}</ul>'.format(
                         ''.join(
                             [
                                 '<li>{}</li>'.format(p)

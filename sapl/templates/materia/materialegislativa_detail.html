@@ -73,9 +73,7 @@
     {% with object as m %}
       {% include 'materia/materialegislativa_widget_file.html' %}
     {% endwith %}
-
     {{ block.super }}
-
   </div>
 
 
@@ -150,6 +148,22 @@
               {% if rv.observacao %}
                 - {{rv.observacao}}
               {% endif %}
+              
+              {% for subscricao in rv.subscricoes.all %}
+                {% if forloop.first %}
+                  <br><br><strong>Subscrições</strong><br>
+                  <div class="container-avatar">                  
+                {% endif %}
+                    <a class="avatar avatar7" 
+                      href="{% url 'sapl.materia:pesquisar_materia'%}?autoria__autor={{subscricao.autor.first.id}}" 
+                      title="{{subscricao}}">
+                      <img src="{% cropped_thumbnail subscricao "fotografia_cropping" %}" alt="{{subscricao}}">
+                    </a>
+                {% if forloop.last %}
+                  </div>
+                {% endif %}
+              {% endfor %}
+
             </td>
             <td>
               {{ rv.tipo_votacao }}
