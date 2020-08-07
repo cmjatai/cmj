@@ -130,6 +130,12 @@ AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID', cast=str, default='')
 AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY', cast=str, default='')
 ABSOLUTE_PATH_BACKUP = config('ABSOLUTE_PATH_BACKUP', cast=str, default='')
 
+
+# S3 CMJ
+S3_CMJ_ACCESS_KEY_ID = config('S3_CMJ_ACCESS_KEY_ID', cast=str, default='')
+S3_CMJ_SECRET_ACCESS_KEY = config('S3_CMJ_SECRET_ACCESS_KEY', cast=str, default='')
+S3_CMJ_ENDPOINT_URL = config('S3_CMJ_ENDPOINT_URL', cast=str, default='')
+
 # cert_public
 CERT_PRIVATE_KEY_NAME = config('CERT_PRIVATE_KEY_NAME', cast=str, default='')
 CERT_PRIVATE_KEY_ID = config('CERT_PRIVATE_KEY_ID', cast=str, default='')

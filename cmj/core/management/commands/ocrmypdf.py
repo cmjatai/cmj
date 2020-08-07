@@ -3,11 +3,9 @@ from datetime import datetime, timedelta
 import logging
 import os
 from pwd import getpwuid
-import random
 import shutil
 import stat
 import subprocess
-import threading
 from time import sleep
 import time
 
@@ -19,6 +17,7 @@ from django.utils import timezone
 
 from cmj.core.models import OcrMyPDF
 from cmj.diarios.models import DiarioOficial
+from cmj.utils import ProcessoExterno
 from sapl.materia.models import MateriaLegislativa, DocumentoAcessorio
 from sapl.norma.models import NormaJuridica
 from sapl.protocoloadm.models import DocumentoAdministrativo, \
@@ -68,36 +67,6 @@ class CompressPDF:
         except subprocess.CalledProcessError as e:
             print("Unexpected error:".format(e.output))
             return False
-
-
-class ProcessOCR(object):
-
-    def __init__(self, cmd, logger):
-        self.cmd = cmd
-        self.process = None
-        self.logger = logger
-
-    def run(self, timeout):
-
-        def target():
-            self.logger.info('Thread started')
-            self.process = subprocess.Popen(
-                self.cmd, shell=True, stdout=subprocess.PIPE)
-            self.process.communicate()
-            self.logger.info('Thread finished:')
-
-        thread = threading.Thread(target=target)
-        thread.start()
-
-        thread.join(timeout)
-        if thread.is_alive():
-            self.logger.info('Terminating process')
-            self.process.terminate()
-            return None
-            # thread.join()
-
-        self.logger.info(self.process.returncode)
-        return self.process.returncode
 
 
 class Command(BaseCommand):
@@ -352,7 +321,7 @@ class Command(BaseCommand):
                o_path, file.path]
 
         try:
-            p = ProcessOCR(' '.join(cmd), self.logger)
+            p = ProcessoExterno(' '.join(cmd), self.logger)
             r = p.run(timeout=300)
 
             if r is None:

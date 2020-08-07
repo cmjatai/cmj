@@ -1,6 +1,8 @@
 from datetime import date, datetime, timedelta
 from functools import wraps
 import re
+import subprocess
+import threading
 from unicodedata import normalize as unicodedata_normalize
 
 from PyPDF4.pdf import PdfFileReader
@@ -481,3 +483,33 @@ def signed_name_and_date_extract(file):
     return meta_signs
 
     # checa se documento está homologado
+
+
+class ProcessoExterno(object):
+
+    def __init__(self, cmd, logger):
+        self.cmd = cmd
+        self.process = None
+        self.logger = logger
+
+    def run(self, timeout):
+
+        def target():
+            self.logger.info('Thread started')
+            self.process = subprocess.Popen(
+                self.cmd, shell=True, stdout=subprocess.PIPE)
+            self.process.communicate()
+            self.logger.info('Thread finished:')
+
+        thread = threading.Thread(target=target)
+        thread.start()
+
+        thread.join(timeout)
+        if thread.is_alive():
+            self.logger.info('Terminating process')
+            self.process.terminate()
+            return None
+            # thread.join()
+
+        self.logger.info(self.process.returncode)
+        return self.process.returncode

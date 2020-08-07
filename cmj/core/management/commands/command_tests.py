@@ -28,6 +28,7 @@ from django.utils import timezone
 from endesive import pdf
 
 from cmj.core.models import OcrMyPDF
+from cmj.utils import ProcessoExterno
 from sapl.compilacao.models import Dispositivo
 from sapl.materia.models import MateriaLegislativa
 from sapl.protocoloadm.models import DocumentoAdministrativo
@@ -50,7 +51,71 @@ class Command(BaseCommand):
         # self.run_test_add_hi()
         # self.run_veririca_pdf_tem_assinatura()
         # self.run_backup_locaweb()
-        self.run_test_add_sign_pil()
+        # self.run_test_add_sign_pil()
+
+        self.run_add_selo_protocolo()
+
+    def run_add_selo_protocolo(self):
+
+        plugin_path = settings.PROJECT_DIR.child(
+            'scripts').child(
+            'java').child(
+            'PluginSignPortalCMJ').child(
+            'jar').child(
+            'PluginSignPortalCMJ.jar')
+
+        m = MateriaLegislativa.objects.get(pk=17865)
+        p = m.protocolo_gr.first()
+        print(m.texto_original.path)
+        print(m.texto_original.original_path)
+
+        file_path = m.texto_original.path
+
+        cmd = [
+            'java -jar "{plugin}"',
+            '{command}',
+            '{x}',
+            '{y}',
+            '"{protocolo}"',
+            '"{data_protocolo}"',
+            '"{hora_protocolo}"',
+            '"{sigla}"',
+            '"{file}"',
+            '"{certificado}"',
+            '"{password}"',
+        ]
+        cmd = ' '.join(cmd)
+        cmd = cmd.format(
+            **{
+                'plugin': plugin_path,
+                'command': 'cert_protocolo',
+                'x': 0,
+                'y': 0,
+                'protocolo': 'Protocolo: {}/{}'.format(p.numero, p.ano),
+                'data_protocolo': '06/08/2020',
+                'hora_protocolo': '12:00',
+                'sigla': '{} {}/{}'.format(m.tipo.sigla, m.numero, m.ano),
+                'file': file_path,
+                'certificado': settings.CERT_PRIVATE_KEY_ID,
+                'password': settings.CERT_PRIVATE_KEY_ACCESS
+
+            }
+        )
+
+        # print(cmd)
+        # return
+
+        try:
+            p = ProcessoExterno(cmd, self.logger)
+            r = p.run(timeout=300)
+
+            if r is None:
+                return None
+            if not r or r in (2, 6):
+                m.save()
+                return True
+        except:
+            return False
 
     def run_test_add_sign_pil(self):
         m = MateriaLegislativa.objects.get(pk=17738)
