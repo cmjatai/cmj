@@ -55,17 +55,15 @@ class Command(BaseCommand):
 
         self.start_time = timezone.localtime()
 
-        self.s3_server = 's3_cmj'
-        self.s3_connect()
-        self.s3_sync()
-
-        if not settings.DEBUG:
-            self.update_backup_postgresql()
-
         self.s3_server = 'locaweb'
         self.s3_connect()
         self.s3_sync()
+        if not settings.DEBUG:
+            self.update_backup_postgresql()
 
+        self.s3_server = 's3_cmj'
+        self.s3_connect()
+        self.s3_sync()
         if not settings.DEBUG:
             self.update_backup_postgresql()
 
