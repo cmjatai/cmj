@@ -20,7 +20,7 @@ from django.http.response import HttpResponseRedirect, Http404
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.urls.base import reverse
-from django.utils import timezone
+from django.utils import timezone, formats
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import ListView, CreateView, UpdateView
 from django.views.generic.base import RedirectView, TemplateView, ContextMixin
@@ -31,6 +31,7 @@ from weasyprint import HTML
 
 from cmj.core.models import AreaTrabalho
 from cmj.mixins import BtnCertMixin
+from cmj.utils import ProcessoExterno
 import sapl
 from sapl.base.email_utils import do_envia_email_confirmacao
 from sapl.base.models import Autor, CasaLegislativa, AppConfig
@@ -1637,13 +1638,19 @@ class ProtocoloRedirectConteudoView(PermissionRequiredMixin, RedirectView):
 
 
 class ProtocoloHomologarView(PermissionRequiredMixin, TemplateView):
+    logger = logging.getLogger(__name__)
 
     permission_required = ('protocoloadm.action_homologar_protocolo',)
 
     def get(self, request, *args, **kwargs):
         self.object = Protocolo.objects.get(pk=self.kwargs['pk'])
 
-        messages.info(request, _('Em implementação...'))
+        #messages.info(request, _('Em implementação...'))
+
+        if not request.user.is_superuser:
+            raise Http404
+
+        self.add_selo_protocolo()
 
         return redirect(
             reverse('sapl.protocoloadm:protocolo_mostrar', kwargs={
@@ -1652,10 +1659,80 @@ class ProtocoloHomologarView(PermissionRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = TemplateView.get_context_data(self, **kwargs)
-
         context['protocolo'] = self.object
-
         return context
+
+    def add_selo_protocolo(self):
+
+        plugin_path = settings.PROJECT_DIR.child(
+            'scripts').child(
+            'java').child(
+            'PluginSignPortalCMJ').child(
+            'jar').child(
+            'PluginSignPortalCMJ.jar')
+
+        item = self.object.conteudo_protocolado
+        p = self.object
+
+        for field_file in item.FIELDFILE_NAME:
+            file_path = getattr(item, field_file).path
+
+            cmd = [
+                'java -jar "{plugin}"',
+                '{command}',
+                '{x}',
+                '{y}',
+                '"{protocolo}"',
+                '"{data_protocolo}"',
+                '"{hora_protocolo}"',
+                '"{sigla}"',
+                '"{file}"',
+                '"{certificado}"',
+                '"{password}"',
+                '"{data_selo}"',
+                '"{hora_selo}"',
+            ]
+            cmd = ' '.join(cmd)
+
+            cmd = cmd.format(
+                **{
+                    'plugin': plugin_path,
+                    'command': 'cert_protocolo',
+                    'x': 0,
+                    'y': 0,
+                    'protocolo': 'Protocolo: {}/{}'.format(p.numero, p.ano),
+                    'data_protocolo': formats.date_format(
+                        timezone.localtime(
+                            p.timestamp if p.timestamp else p.data),
+                        'd/m/Y'
+                    ),
+                    'hora_protocolo': formats.date_format(
+                        timezone.localtime(
+                            p.timestamp if p.timestamp else p.hora),
+                        'H:i'
+                    ),
+                    'sigla': '{} {:03d}/{}'.format(item.tipo.sigla, item.numero, item.ano),
+                    'file': file_path,
+                    'certificado': settings.CERT_PRIVATE_KEY_ID,
+                    'password': settings.CERT_PRIVATE_KEY_ACCESS,
+                    'data_selo': formats.date_format(timezone.localtime(), 'd/m/Y'),
+                    'hora_selo': formats.date_format(timezone.localtime(), 'H:i'),
+                }
+            )
+
+            # print(cmd)
+            # return
+
+            try:
+                p = ProcessoExterno(cmd, self.logger)
+                r = p.run(timeout=300)
+                # if r is None:
+                #    return None
+                # if not r or r in (2, 6):
+                #    return True
+            except Exception as e:
+                pass
+        item.save()
 
 
 class ProtocoloMostrarView(PermissionRequiredMixin, TemplateView):

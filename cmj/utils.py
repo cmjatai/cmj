@@ -444,7 +444,7 @@ def run_signed_name_and_date_extract(file):
                     nome = subject['common_name'].split(':')[0]
 
                 if nome not in signs:
-                    signs[nome] = timezone.now()
+                    signs[nome] = timezone.localtime()
         except:
             pass
 

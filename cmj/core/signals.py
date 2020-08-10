@@ -74,16 +74,23 @@ def signed_name_and_date_extract_pre_save(sender, instance, using, **kwargs):
 
         try:
             file = ff.file.file
+            meta_signs = {}
             if not isinstance(ff.file, InMemoryUploadedFile):
-                original_absolute_path = '{}/original__{}'.format(
-                    ff.storage.location,
-                    ff.name)
-
+                original_absolute_path = ff.original_path
                 with open(original_absolute_path, "rb") as file:
                     meta_signs = signed_name_and_date_extract(
                         file
                     )
                     file.close()
+
+                absolute_path = ff.path
+                with open(absolute_path, "rb") as file:
+                    sign_hom = signed_name_and_date_extract(
+                        file
+                    )
+                    file.close()
+                    meta_signs['hom'] = sign_hom['hom']
+
             else:
                 meta_signs = signed_name_and_date_extract(
                     file

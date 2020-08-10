@@ -358,7 +358,7 @@ class ResponseFileMixin:
         mime = get_mime_type_from_file_extension(arquivo.name)
 
         if settings.DEBUG:
-            response = HttpResponse(arquivo, content_type=mime)
+            response = HttpResponse(arquivo.file, content_type=mime)
             return response
 
         response = HttpResponse(content_type='%s' % mime)

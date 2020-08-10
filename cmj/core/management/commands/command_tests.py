@@ -24,7 +24,7 @@ from django.core.management.base import BaseCommand
 from django.db import connection
 from django.db.models import F, Q
 from django.db.models.signals import post_delete, post_save
-from django.utils import timezone
+from django.utils import timezone, formats
 from endesive import pdf
 
 from cmj.core.models import OcrMyPDF
@@ -64,7 +64,7 @@ class Command(BaseCommand):
             'jar').child(
             'PluginSignPortalCMJ.jar')
 
-        m = MateriaLegislativa.objects.get(pk=17865)
+        m = MateriaLegislativa.objects.get(pk=17857)
         p = m.protocolo_gr.first()
         print(m.texto_original.path)
         print(m.texto_original.original_path)
@@ -83,8 +83,11 @@ class Command(BaseCommand):
             '"{file}"',
             '"{certificado}"',
             '"{password}"',
+            '"{data_selo}"',
+            '"{hora_selo}"',
         ]
         cmd = ' '.join(cmd)
+
         cmd = cmd.format(
             **{
                 'plugin': plugin_path,
@@ -92,13 +95,20 @@ class Command(BaseCommand):
                 'x': 0,
                 'y': 0,
                 'protocolo': 'Protocolo: {}/{}'.format(p.numero, p.ano),
-                'data_protocolo': '06/08/2020',
-                'hora_protocolo': '12:00',
-                'sigla': '{} {}/{}'.format(m.tipo.sigla, m.numero, m.ano),
+                'data_protocolo': formats.date_format(
+                    timezone.localtime(p.timestamp if p.timestamp else p.data),
+                    'd/m/Y'
+                ),
+                'hora_protocolo': formats.date_format(
+                    timezone.localtime(p.timestamp if p.timestamp else p.hora),
+                    'H:i'
+                ),
+                'sigla': '{} {:03d}/{}'.format(m.tipo.sigla, m.numero, m.ano),
                 'file': file_path,
                 'certificado': settings.CERT_PRIVATE_KEY_ID,
-                'password': settings.CERT_PRIVATE_KEY_ACCESS
-
+                'password': settings.CERT_PRIVATE_KEY_ACCESS,
+                'data_selo': formats.date_format(timezone.localtime(), 'd/m/Y'),
+                'hora_selo': formats.date_format(timezone.localtime(), 'H:i'),
             }
         )
 
