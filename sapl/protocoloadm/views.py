@@ -1703,12 +1703,12 @@ class ProtocoloHomologarView(PermissionRequiredMixin, TemplateView):
                     'protocolo': 'Protocolo: {}/{}'.format(p.numero, p.ano),
                     'data_protocolo': formats.date_format(
                         timezone.localtime(
-                            p.timestamp if p.timestamp else p.data),
+                            p.timestamp) if p.timestamp else p.data,
                         'd/m/Y'
                     ),
                     'hora_protocolo': formats.date_format(
                         timezone.localtime(
-                            p.timestamp if p.timestamp else p.hora),
+                            p.timestamp) if p.timestamp else p.hora,
                         'H:i'
                     ),
                     'sigla': item.epigrafe_short,
