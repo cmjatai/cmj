@@ -9,7 +9,7 @@
     <div class="col-12 col-md-auto justify-content-center">
 
       {% if m.metadata.signs and m.metadata.locaweb and m.metadata.signs.texto_original.signs and m.metadata.locaweb.texto_original.hash == m.metadata.locaweb.texto_original.original_hash %}
-        <a class="link-texto"  target="_blank" href="{{m.texto_original.url}}?original" title="Documento Eletrônico">
+        <a class="link-texto"  target="_blank" href="{{m.texto_original.url}}" title="Documento Eletrônico">
           <i class="fas fa-2x fa-certificate"></i>
           <br>
           <strong>Documento 
@@ -32,7 +32,7 @@
             </strong>
           </a>
         {% endif %}
-        <a class="link-texto"  target="_blank" href="{{m.texto_original.url}}?original" title="Documento Eletrônico">
+        <a class="link-texto"  target="_blank" href="{{m.texto_original.url}}" title="Documento Eletrônico">
           {% if m.metadata.signs and m.metadata.signs.texto_original.signs %}
             <i class="fas fa-2x fa-certificate"></i>
           {% else %}
