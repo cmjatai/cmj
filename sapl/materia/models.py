@@ -363,6 +363,10 @@ class MateriaLegislativa(CountPageMixin):
                 "d \d\e F \d\e Y"
             )}
 
+    @property
+    def epigrafe_short(self):
+        return '{} {:03d}/{}'.format(self.tipo.sigla, self.numero, self.ano)
+
     def data_entrada_protocolo(self):
         '''
            hack: recuperar a data de entrada do protocolo sem gerar
@@ -635,6 +639,10 @@ class DocumentoAcessorio(CountPageMixin):
     @property
     def ano(self):
         return self.data.year
+
+    @property
+    def epigrafe_short(self):
+        return self.nome
 
     class Meta:
         verbose_name = _('Documento Acessório')

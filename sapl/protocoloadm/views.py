@@ -1711,7 +1711,7 @@ class ProtocoloHomologarView(PermissionRequiredMixin, TemplateView):
                             p.timestamp if p.timestamp else p.hora),
                         'H:i'
                     ),
-                    'sigla': '{} {:03d}/{}'.format(item.tipo.sigla, item.numero, item.ano),
+                    'sigla': item.epigrafe_short,
                     'file': file_path,
                     'certificado': settings.CERT_PRIVATE_KEY_ID,
                     'password': settings.CERT_PRIVATE_KEY_ACCESS,
