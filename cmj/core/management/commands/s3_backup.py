@@ -30,7 +30,7 @@ class Command(BaseCommand):
     days_validate = 60
 
     start_time = None
-    exec_time = 1800
+    exec_time = 60
 
     count_registros = 0
 
@@ -54,7 +54,6 @@ class Command(BaseCommand):
         # return
 
         self.start_time = timezone.localtime()
-
         self.s3_server = 'locaweb'
         self.s3_connect()
         self.s3_sync()
@@ -62,14 +61,15 @@ class Command(BaseCommand):
             self.update_backup_postgresql()
 
         self.days_validate = 2
+        self.start_time = timezone.localtime()
         self.s3_server = 's3_cmj'
         self.s3_connect()
         self.s3_sync()
         if not settings.DEBUG:
             self.update_backup_postgresql()
 
-        print(timezone.localtime())
-        print(self.count_registros)
+        # print(timezone.localtime())
+        # print(self.count_registros)
 
         #self.s3_sync(only_reset=False, model_name='NormaJuridica')
         #self.s3_sync(app_label='sapl.norma', model_name='NormaJuridica')
@@ -139,7 +139,8 @@ class Command(BaseCommand):
 
     def s3_sync(self, app_label=None, model_name=None, only_reset=False):
 
-        print('--------- {} ----------'.format(self.s3_server))
+        print('--------- {} ---------- {}'.format(self.s3_server, self.start_time))
+
         reset = False
 
         count = 0
@@ -189,7 +190,7 @@ class Command(BaseCommand):
 
                 if not model_exec:
                     continue
-                print(m, m.objects.all().count())
+                #print(m, m.objects.all().count())
                 pre_save.disconnect(
                     sender=m,
                     dispatch_uid='cmj_pre_save_signed_{}_{}'.format(
@@ -287,6 +288,9 @@ class Command(BaseCommand):
                                     timezone.localtime() -
                                     self.start_time >
                                     timedelta(seconds=self.exec_time)):
+                                print(
+                                    '--------- {} ---------- ENCERRADO EM: {}'.format(self.s3_server, self.start_time))
+
                                 return
 
     def checar_consistencia(self, i, ff, fn):
@@ -369,6 +373,9 @@ class Command(BaseCommand):
 
             hash = hash_sha512(t_p)
 
+            if os.path.exists(t_p):
+                os.remove(t_p)
+
             if hash == metadata[self.s3_server][fn][attr_hash]:
                 return True
 
@@ -393,6 +400,9 @@ class Command(BaseCommand):
                         metadata, i, fn, attr_path, attr_hash)
                     if result:
                         return 0
+                else:
+                    print('Arquivo Substituído...', i, attr_path)
+
             # return 0
             print('Enviando...', i, attr_path)
 
