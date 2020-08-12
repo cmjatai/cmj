@@ -198,6 +198,7 @@ class Command(BaseCommand):
                         m._meta.model_name
                     ))
 
+                print(m)
                 for i in m.objects.all().order_by('-id'):
 
                     if not hasattr(i, 'metadata'):
