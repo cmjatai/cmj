@@ -404,7 +404,7 @@ class Command(BaseCommand):
                     print('Arquivo Substituído...', i, attr_path)
 
             # return 0
-            print('Enviando...', i, attr_path)
+            print('Enviando...', i.id, i, attr_path)
 
             """self.s3Lc.upload_file(
                 getattr(ff, attr_path),
