@@ -146,12 +146,12 @@ class Command(BaseCommand):
         count = 0
         for app in apps.get_app_configs():
             if app_label and app.name != app_label:
-                print(app.name)
+                # print(app.name)
                 continue
 
             if not app.name.startswith('cmj') and not app.name.startswith('sapl'):
                 continue
-            print(app)
+            # print(app)
 
             for m in app.get_models():
                 model_exec = False
@@ -161,7 +161,7 @@ class Command(BaseCommand):
 
                 for f in m._meta.get_fields():
                     dua = f
-                    print(dua)
+                    # print(dua)
                     if hasattr(dua, 'auto_now') and dua.auto_now:
                         #print(m, 'auto_now deve ser desativado.')
                         # continue  # auto_now deve ser desativado
@@ -209,7 +209,7 @@ class Command(BaseCommand):
                                     self.s3_server in i.metadata:
                                 i.metadata[self.s3_server] = {}
                                 i.save()
-                                print(i)
+                                # print(i)
                             continue
 
                     metadata = i.metadata if i.metadata else {}
@@ -269,7 +269,7 @@ class Command(BaseCommand):
                                 i.metadata = metadata
                                 i.save()
                                 count += 1
-                                print(count)
+                                # print(count)
                             else:
                                 self.count_registros += 1
                                 try:
