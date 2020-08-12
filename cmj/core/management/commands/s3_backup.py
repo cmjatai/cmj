@@ -30,7 +30,7 @@ class Command(BaseCommand):
     days_validate = 60
 
     start_time = None
-    exec_time = 60
+    exec_time = 1800
 
     count_registros = 0
 
