@@ -61,6 +61,7 @@ class Command(BaseCommand):
         if not settings.DEBUG:
             self.update_backup_postgresql()
 
+        self.days_validate = 2
         self.s3_server = 's3_cmj'
         self.s3_connect()
         self.s3_sync()
@@ -322,7 +323,7 @@ class Command(BaseCommand):
         if not hasattr(ff, attr_path):
             return None
 
-        b = self.get_locaweb_bucket(bucket_name)
+        b = self.get_bucket(bucket_name)
 
         t_p = '/tmp/br.leg.go.jatai.portalcmj.{}.{}.{}.{}.{}'.format(
             attr_path,
