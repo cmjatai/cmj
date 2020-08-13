@@ -768,7 +768,7 @@ class TramitacaoForm(ModelForm):
             anexadas_list = lista_anexados(materia)
             for ma in anexadas_list:
                 if not ma.tramitacao_set.all() \
-                        or ma.tramitacao_set.last().unidade_tramitacao_destino == tramitacao.unidade_tramitacao_local:
+                        or ma.tramitacao_set.first().unidade_tramitacao_destino == tramitacao.unidade_tramitacao_local:
                     ma.em_tramitacao = False if tramitacao.status.indicador == "F" else True
                     ma.save()
                     lista_tramitacao.append(Tramitacao(
@@ -882,7 +882,7 @@ class TramitacaoUpdateForm(TramitacaoForm):
         if tramitar_anexadas:
             anexadas_list = lista_anexados(materia)
             for ma in anexadas_list:
-                tram_anexada = ma.tramitacao_set.last()
+                tram_anexada = ma.tramitacao_set.first()
                 if compara_tramitacoes_mat(ant_tram_principal, tram_anexada):
                     tram_anexada.status = nova_tram_principal.status
                     tram_anexada.data_tramitacao = nova_tram_principal.data_tramitacao
@@ -2020,7 +2020,7 @@ class TramitacaoEmLoteForm(ModelForm):
                 anexadas = lista_anexados(mat)
                 for ml in anexadas:
                     if not ml.tramitacao_set.all() \
-                            or ml.tramitacao_set.last() \
+                            or ml.tramitacao_set.first() \
                             .unidade_tramitacao_destino == tramitacao.unidade_tramitacao_local:
                         ml.em_tramitacao = False if tramitacao.status.indicador == "F" else True
                         ml.save()

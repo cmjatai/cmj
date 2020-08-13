@@ -290,7 +290,7 @@ class Command(BaseCommand):
                                     self.start_time >
                                     timedelta(seconds=self.exec_time)):
                                 print(
-                                    '--------- {} ---------- ENCERRADO EM: {}'.format(self.s3_server, self.start_time))
+                                    '--------- {} ---------- ENCERRADO EM: {}'.format(self.s3_server, timezone.localtime()))
 
                                 return
 

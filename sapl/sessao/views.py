@@ -3440,7 +3440,7 @@ class PautaSessaoDetailView(DetailView):
             titulo = m.materia
             numero = m.numero_ordem
 
-            ultima_tramitacao = m.materia.tramitacao_set.last()
+            ultima_tramitacao = m.materia.tramitacao_set.first()
 
             situacao = ultima_tramitacao.status if ultima_tramitacao else None
 
@@ -3501,7 +3501,7 @@ class PautaSessaoDetailView(DetailView):
             titulo = o.materia
             numero = o.numero_ordem
 
-            ultima_tramitacao = o.materia.tramitacao_set.last()
+            ultima_tramitacao = o.materia.tramitacao_set.first()
 
             situacao = ultima_tramitacao.status if ultima_tramitacao else None
 

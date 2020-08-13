@@ -494,7 +494,7 @@ class _MateriaLegislativaViewSet(ResponseFileMixin):
         if not materia.tramitacao_set.exists():
             return Response({})
 
-        ultima_tramitacao = materia.tramitacao_set.last()
+        ultima_tramitacao = materia.tramitacao_set.first()
 
         serializer_class = SaplApiViewSetConstrutor.get_class_for_model(
             Tramitacao).serializer_class(ultima_tramitacao)

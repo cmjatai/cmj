@@ -1465,7 +1465,7 @@ class TramitacaoCrud(MasterDetailCrud):
                 if tramitar_anexadas:
                     mat_anexadas = lista_anexados(materia)
                     for ma in mat_anexadas:
-                        tram_anexada = ma.tramitacao_set.last()
+                        tram_anexada = ma.tramitacao_set.first()
                         if compara_tramitacoes_mat(tram_anexada, tramitacao):
                             tramitacoes_deletar.append(tram_anexada.id)
                             if ma.tramitacao_set.count() == 0:
@@ -2846,7 +2846,7 @@ class ExcluirTramitacaoEmLoteView(PermissionRequiredMixin, FormView):
             status=form.cleaned_data['status'])
         for tramitacao in tramitacao_set:
             materia = tramitacao.materia
-            if tramitacao == materia.tramitacao_set.last():
+            if tramitacao == materia.tramitacao_set.first():
                 tramitacao.delete()
 
         return redirect(self.get_success_url())

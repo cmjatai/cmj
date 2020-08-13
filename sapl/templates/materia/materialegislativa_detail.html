@@ -59,7 +59,7 @@
     <div class="text-ementa">{{ object.ementa }}</div>
 
     <small>
-      {% with object.tramitacao_set.last as tram %}
+      {% with object.tramitacao_set.first as tram %}
         {% if tram.unidade_tramitacao_destino %}        
           <strong>Localização Atual:</strong> &nbsp;{{tram.unidade_tramitacao_destino}}</br>        
           <strong>Status:</strong> {{tram.status}}<br>

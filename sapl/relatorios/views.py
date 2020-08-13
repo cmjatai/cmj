@@ -902,7 +902,7 @@ def get_sessao_plenaria(sessao, casa):
 def get_turno(materia):
     descricao_turno = ''
     descricao_tramitacao = ''
-    tramitacao = materia.tramitacao_set.last()
+    tramitacao = materia.tramitacao_set.first()
 
     if tramitacao:
         if tramitacao.turno:

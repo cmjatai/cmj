@@ -749,11 +749,11 @@ def test_tramitacoes_materias_anexadas(admin_client):
     assert form.is_valid()
 
     tramitacao_principal = form.save()
-    tramitacao_anexada = materia_anexada.tramitacao_set.last()
-    tramitacao_anexada_anexada = materia_anexada_anexada.tramitacao_set.last()
+    tramitacao_anexada = materia_anexada.tramitacao_set.first()
+    tramitacao_anexada_anexada = materia_anexada_anexada.tramitacao_set.first()
 
     # Verifica se foram criadas as tramitações para as matérias anexadas e anexadas às anexadas
-    assert materia_principal.tramitacao_set.last() == tramitacao_principal
+    assert materia_principal.tramitacao_set.first() == tramitacao_principal
     assert tramitacao_principal.materia.em_tramitacao == (tramitacao_principal.status.indicador != "F")
     assert compara_tramitacoes_mat(tramitacao_principal, tramitacao_anexada)
     assert MateriaLegislativa.objects.get(id=materia_anexada.pk).em_tramitacao \
@@ -776,8 +776,8 @@ def test_tramitacoes_materias_anexadas(admin_client):
 
     assert form.is_valid()
     tramitacao_principal = form.save()
-    tramitacao_anexada = materia_anexada.tramitacao_set.last()
-    tramitacao_anexada_anexada = materia_anexada_anexada.tramitacao_set.last()
+    tramitacao_anexada = materia_anexada.tramitacao_set.first()
+    tramitacao_anexada_anexada = materia_anexada_anexada.tramitacao_set.first()
 
     assert tramitacao_principal.unidade_tramitacao_destino == unidade_tramitacao_destino_2
     assert tramitacao_anexada.unidade_tramitacao_destino == unidade_tramitacao_destino_2
@@ -806,8 +806,8 @@ def test_tramitacoes_materias_anexadas(admin_client):
     assert form.is_valid()
 
     tramitacao_principal = form.save()
-    tramitacao_anexada = materia_anexada.tramitacao_set.last()
-    tramitacao_anexada_anexada = materia_anexada_anexada.tramitacao_set.last()
+    tramitacao_anexada = materia_anexada.tramitacao_set.first()
+    tramitacao_anexada_anexada = materia_anexada_anexada.tramitacao_set.first()
 
     form = TramitacaoUpdateForm(data={})
     # Alterando unidade_tramitacao_destino
@@ -822,7 +822,7 @@ def test_tramitacoes_materias_anexadas(admin_client):
     assert form.is_valid()
 
     tramitacao_anexada = form.save()
-    tramitacao_anexada_anexada = materia_anexada_anexada.tramitacao_set.last()
+    tramitacao_anexada_anexada = materia_anexada_anexada.tramitacao_set.first()
 
     assert tramitacao_principal.unidade_tramitacao_destino == unidade_tramitacao_destino_1
     assert tramitacao_anexada.unidade_tramitacao_destino == unidade_tramitacao_destino_2
@@ -841,8 +841,8 @@ def test_tramitacoes_materias_anexadas(admin_client):
 
     assert form.is_valid()
     tramitacao_principal = form.save()
-    tramitacao_anexada = materia_anexada.tramitacao_set.last()
-    tramitacao_anexada_anexada = materia_anexada_anexada.tramitacao_set.last()
+    tramitacao_anexada = materia_anexada.tramitacao_set.first()
+    tramitacao_anexada_anexada = materia_anexada_anexada.tramitacao_set.first()
 
     assert tramitacao_principal.texto == "Testando a alteração"
     assert not tramitacao_anexada.texto == "Testando a alteração"
@@ -885,11 +885,11 @@ def test_tramitacoes_materias_anexadas(admin_client):
     assert form.is_valid()
 
     tramitacao_principal = form.save()
-    tramitacao_anexada = materia_anexada.tramitacao_set.last()
-    tramitacao_anexada_anexada = materia_anexada_anexada.tramitacao_set.last()
+    tramitacao_anexada = materia_anexada.tramitacao_set.first()
+    tramitacao_anexada_anexada = materia_anexada_anexada.tramitacao_set.first()
 
     # Deve ser criada tramitação apenas para a matéria principal
-    assert materia_principal.tramitacao_set.last() == tramitacao_principal
+    assert materia_principal.tramitacao_set.first() == tramitacao_principal
     assert not tramitacao_anexada
     assert not tramitacao_anexada_anexada
 
@@ -907,10 +907,10 @@ def test_tramitacoes_materias_anexadas(admin_client):
     assert form.is_valid()
 
     tramitacao_anexada = form.save()
-    tramitacao_principal = materia_principal.tramitacao_set.last()
-    tramitacao_anexada_anexada = materia_anexada_anexada.tramitacao_set.last()
+    tramitacao_principal = materia_principal.tramitacao_set.first()
+    tramitacao_anexada_anexada = materia_anexada_anexada.tramitacao_set.first()
     
-    assert materia_anexada.tramitacao_set.last() == tramitacao_anexada
+    assert materia_anexada.tramitacao_set.first() == tramitacao_anexada
     assert materia_principal.tramitacao_set.all().count() == 1
     assert compara_tramitacoes_mat(tramitacao_principal, tramitacao_anexada)
     assert not tramitacao_anexada_anexada
@@ -928,8 +928,8 @@ def test_tramitacoes_materias_anexadas(admin_client):
 
     assert form.is_valid()
     tramitacao_principal = form.save()
-    tramitacao_anexada = materia_anexada.tramitacao_set.last()
-    tramitacao_anexada_anexada = materia_anexada_anexada.tramitacao_set.last()
+    tramitacao_anexada = materia_anexada.tramitacao_set.first()
+    tramitacao_anexada_anexada = materia_anexada_anexada.tramitacao_set.first()
 
     assert tramitacao_principal.unidade_tramitacao_destino == unidade_tramitacao_destino_2
     assert tramitacao_anexada.unidade_tramitacao_destino == unidade_tramitacao_destino_1
@@ -948,8 +948,8 @@ def test_tramitacoes_materias_anexadas(admin_client):
 
     assert form.is_valid()
     tramitacao_anexada = form.save()
-    tramitacao_principal = materia_principal.tramitacao_set.last()
-    tramitacao_anexada_anexada = materia_anexada_anexada.tramitacao_set.last()
+    tramitacao_principal = materia_principal.tramitacao_set.first()
+    tramitacao_anexada_anexada = materia_anexada_anexada.tramitacao_set.first()
 
     assert tramitacao_principal.unidade_tramitacao_destino == unidade_tramitacao_destino_2
     assert tramitacao_anexada.unidade_tramitacao_destino == unidade_tramitacao_destino_2
