@@ -13,6 +13,7 @@ from sapl.utils import restringe_tipos_de_arquivo_txt, OverwriteStorage
 @reversion.register()
 class TipoDeDiario(models.Model):
     descricao = models.CharField(max_length=50, verbose_name=_('Descrição'))
+    principal = models.BooleanField(default=False, verbose_name=_('Principal'))
 
     class Meta:
         verbose_name = _('Tipo de Diário')
