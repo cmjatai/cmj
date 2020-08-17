@@ -34,7 +34,7 @@ class CmjUserChangeView(FormMessagesMixin, UpdateView):
         return context
 
     def get_success_url(self):
-        return reverse('cmj.core:cmj_user_change')
+        return reverse_lazy('cmj.core:cmj_user_change')
 
     def cancel_url(self):
         return '/'

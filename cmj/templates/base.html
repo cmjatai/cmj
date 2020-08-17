@@ -34,7 +34,7 @@
   {% block root_body %}
     {% include "popups.html" %}
     <div class="page fadein" id="{% block id_wrapper %}wrapper{% endblock %}">
-      
+
       <div class="header-accessibility">
         <div class="container links-to-content justify-content-between">
           <div class="btn-group" role="group">
@@ -72,7 +72,7 @@
             {% endblock %}
 
             <div class="navbar-collapse collapse" id="navbar-access">
-              
+
               {% block social_links %}
                 <div class="navbar-social-links justify-content-center">
                   <a href="/online/" class="icon-sessoes-online" title="Sessão Plenária Online - Atualização em tempo real"><span>Sessões Online</span></a>
@@ -84,7 +84,7 @@
                   <a class="twitter" href="https://twitter.com/cmjatai"><i class="fab fa-twitter" aria-hidden="true"><span>Twitter</span></i></a>
                 </div>
               {% endblock %}
-                
+
               <ul class="navbar-nav justify-content-end">
                 {% if user and not user.is_anonymous %}
                   <li class="dropdown nav-user">
@@ -113,7 +113,7 @@
                           <ul class="dropdown-menu">
                             <li><a href="https://correio.interlegis.leg.br">{% trans "Webmail" %}</a></li>
                             <li><a href="http://gestaopublica.camara.jatai.bsit-br.com.br">{% trans "Gestão Pública" %}</a></li>
-                          </ul>                       
+                          </ul>
                         </li>
                     </ul>
                   </li>
@@ -121,17 +121,17 @@
                   <li>
                     <a href="#linkMenu" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Acessar" %}<span class="caret"></span></a>
                     <ul class="dropdown-menu">
-                    
+
                       <li><a href="{% url 'cmj.core:login' %}">{% trans "Portal" %}</a></li>
-                      
+
                       <li class=" text-right">
                         <a href="#linkMenu"  role="button" aria-haspopup="true" aria-expanded="false">{% trans "Intranet" %}<span class="caret"></span></a>
                         <ul class="dropdown-menu">
                           <li class="text-right"><a href="https://correio.interlegis.leg.br">{% trans "Webmail" %}</a></li>
                           <li class="text-right"><a href="http://gestaopublica.camara.jatai.bsit-br.com.br">{% trans "Gestão Pública" %}</a></li>
-                        </ul>                       
+                        </ul>
                       </li>
-                      
+
 
                     </ul>
                   </li>
@@ -147,7 +147,7 @@
             <div class="container{{fluid}}">
               <div class="navbar-collapse collapse" id="navbar-menu">
                 <ul class="navbar-nav" id="menu_content">
-                  
+
                   {% if user.is_superuser %}
                     {% navbar 'navbar/navbar_superuser.yaml' %}
                   {% elif perms.materia.add_proposicao %}
@@ -255,25 +255,22 @@
 
 
   {% endblock root_body %}
-  
+
   {% block foot_js %}
 
-      {% block webpack_loader_js %}    
+      {% block webpack_loader_js %}
         {% render_chunk_vendors 'js' %}
         {% render_bundle  'app' 'js' %}
       {% endblock webpack_loader_js %}
-    
+
     {% block extra_js %}{% endblock %}
-    
+
   {% endblock foot_js %}
 
   {% block widgets_form_js %}{% endblock widgets_form_js %}
-  
-  <script language="JavaScript" type="text/javascript" >
-  
-    $(function () {
-      
 
+  <script language="JavaScript" type="text/javascript" >
+    $(function () {
       $('a[data-social-sharing]').click(function(event){
         event.preventDefault();var socialNetwork=$(this).data('social-sharing');
         switch(socialNetwork){
@@ -288,11 +285,11 @@
     });
   </script>
 
-  
+  {% if not DEBUG %}
     <script>
       window.fbAsyncInit = function () {
         FB.init({
-          appId      : '{% settings_key_tag 'SOCIAL_AUTH_FACEBOOK_KEY' %}', 
+          appId      : '{% settings_key_tag 'SOCIAL_AUTH_FACEBOOK_KEY' %}',
           cookie     : true,
           xfbml      : true,
           version    : 'v6.0'
@@ -301,8 +298,7 @@
         FB.AppEvents.logPageView();
 
         FB.getLoginStatus(function(response) {
-
-            console.log(response);
+            //console.log(response);
         });
       };
 
@@ -315,8 +311,6 @@
         }(document, 'script', 'facebook-jssdk'));
     </script>
 
-  {% if not DEBUG %}  
-    <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-2431536-7"></script>
     <script>
       window.dataLayer = window.dataLayer || [];

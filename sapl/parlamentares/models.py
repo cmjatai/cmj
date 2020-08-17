@@ -345,16 +345,14 @@ class Parlamentar(models.Model):
     biografia = models.TextField(
         blank=True, verbose_name=_('Biografia'))
     fotografia = ImageCropField(
-        verbose_name=_('Fotografia'), upload_to=foto_upload_path,
-        validators=[restringe_tipos_de_arquivo_img], null=True, blank=True)
+        verbose_name=_('Fotografia'), upload_to=foto_upload_path, null=True, blank=True)  # validators=[restringe_tipos_de_arquivo_img],
     fotografia_cropping = ImageRatioField(
         'fotografia', '128x128', verbose_name=_('Avatar'), size_warning=True,
         help_text=_('A configuração do Avatar '
                     'é possível após a atualização da fotografia.'))
 
     capa = ImageCropField(
-        verbose_name=_('Imagem de Capa'), upload_to=capa_upload_path,
-        validators=[restringe_tipos_de_arquivo_img], null=True, blank=True)
+        verbose_name=_('Imagem de Capa'), upload_to=capa_upload_path, null=True, blank=True)  # validators=[restringe_tipos_de_arquivo_img]
 
     capa_cropping = ImageRatioField(
         'capa', '280x105', verbose_name=_('Capa'), size_warning=True,

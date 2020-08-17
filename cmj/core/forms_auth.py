@@ -13,7 +13,8 @@ from django.contrib.auth.models import Group, Permission
 from django.core.exceptions import ValidationError
 from django.forms.models import ModelForm
 from django.utils.translation import ugettext_lazy as _
-from image_cropping.widgets import ImageCropWidget, CropWidget
+from image_cropping.widgets import ImageCropWidget,\
+    get_attrs, CropWidget
 
 from cmj.core.models import AreaTrabalho, OperadorAreaTrabalho
 from cmj.globalrules import WORKSPACE_GROUPS
@@ -165,6 +166,12 @@ class CmjUserChangeForm(ModelForm):
 
         if not self.instance.pwd_created:
             self.fields['old_password'].widget = forms.HiddenInput()
+
+        avatar = self.fields['avatar'].widget
+        avatar.attrs.update(
+            get_attrs(self.instance.avatar, 'avatar')
+        )
+        del avatar.attrs['class']
 
     def save(self, commit=True):
         new_password = self.cleaned_data['new_password1']

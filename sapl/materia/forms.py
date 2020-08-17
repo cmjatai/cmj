@@ -182,7 +182,8 @@ class MateriaLegislativaForm(FileFieldCheckMixin, ModelForm):
                    'data_ultima_atualizacao',
                    '_paginas',
                    'checkcheck',
-                   'arquivado']
+                   'arquivado',
+                   'metadata']
         widgets = {
             'user': forms.HiddenInput(),
             'ip': forms.HiddenInput(),

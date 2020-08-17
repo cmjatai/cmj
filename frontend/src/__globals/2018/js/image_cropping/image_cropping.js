@@ -1,4 +1,4 @@
-/* eslint-disable */ 
+/* eslint-disable */
 var image_cropping = (function ($) {
     var jcrop = {}
     function init() {
@@ -10,7 +10,7 @@ var image_cropping = (function ($) {
 
         // there should only be one file field we're referencing but in special cases
         // there can be several. Deal with it gracefully.
-            $image_input = $('input.crop-thumb[data-field-name=' + field + ']:first')
+            $image_input = $('input[data-field-name=' + field + ']:first')
 
         // skip this image if it's empty and hide the whole field, within admin and by itself
         if (!$image_input.length || $image_input.data('thumbnail-url') === undefined) {
@@ -22,7 +22,7 @@ var image_cropping = (function ($) {
           $image_input.hide().parents('div.form-row:first').hide()
         }
 
-        var image_id = $this.attr('id') + '-image',
+        var image_id = $this.attr('id') + '',
             org_width = $image_input.data('org-width'),
             org_height = $image_input.data('org-height'),
             min_width = $this.data('min-width'),
@@ -55,11 +55,11 @@ var image_cropping = (function ($) {
         if ($this.data('ratio')) {
           options['aspectRatio'] = $this.data('ratio')
         }
-        if ($this.data('box_max_width')) {
-          options['boxWidth'] = $this.data('box_max_width')
+        if ($this.data('box-max-width')) {
+          options['boxWidth'] = $this.data('box-max-width')
         }
-        if ($this.data('box_max_height')) {
-          options['boxHeight'] = $this.data('box_max_height')
+        if ($this.data('box-max-height')) {
+          options['boxHeight'] = $this.data('box-max-height')
         }
 
         var cropping_disabled = false
@@ -84,7 +84,7 @@ var image_cropping = (function ($) {
         $.extend(options, {setSelect: initial})
 
         // hide the input field, show image to crop instead
-        $this.hide().after($image)
+        $this.hide().before($image)
 
         $('#' + image_id).Jcrop(options, function(){jcrop[image_id]=this;})
 

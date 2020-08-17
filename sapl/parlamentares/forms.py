@@ -10,11 +10,14 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Q
 from django.forms import ModelForm
+from django.forms.fields import CharField
+from django.forms.widgets import TextInput
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 import django_filters
 from floppyforms.widgets import ClearableFileInput
-from image_cropping.widgets import CropWidget, ImageCropWidget
+from image_cropping.widgets import CropWidget, ImageCropWidget,\
+    get_attrs
 
 from sapl.base.models import Autor, TipoAutor
 from sapl.crispy_layout_mixin import SaplFormHelper
@@ -214,15 +217,26 @@ class ParlamentarForm(FileFieldCheckMixin, ModelForm):
 
     class Meta:
         model = Parlamentar
-        exclude = []
+        exclude = ['metadata']
 
         widgets = {
-            'fotografia': CustomImageCropWidget(),
-            'fotografia_cropping': CropWidget(),
-            'capa': CustomImageCropWidget(),
-            'capa_cropping': CropWidget(),
             'biografia': forms.Textarea(
                 attrs={'id': 'texto-rico'})}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        fotografia = self.fields['fotografia'].widget
+        fotografia.attrs.update(
+            get_attrs(self.instance.fotografia, 'fotografia')
+        )
+        del fotografia.attrs['class']
+
+        capa = self.fields['capa'].widget
+        capa.attrs.update(
+            get_attrs(self.instance.capa, 'capa')
+        )
+        del capa.attrs['class']
 
 
 class ParlamentarFilterSet(django_filters.FilterSet):
