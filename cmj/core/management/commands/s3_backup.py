@@ -60,7 +60,7 @@ class Command(BaseCommand):
         if not settings.DEBUG:
             self.update_backup_postgresql()
 
-        self.days_validate = 2
+        self.days_validate = 60
         self.start_time = timezone.localtime()
         self.s3_server = 's3_cmj'
         self.s3_connect()
