@@ -33,7 +33,7 @@
   {% endif %}
 
   <a class="item-titulo" href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' d.pk %}">{% if d.is_signed %} <i class="fas fa-1x fa-certificate" title="Documento possui versão com Assinatura Digital, entre nos detalhes do documento para abrir o Arquivo Original"></i>{% endif %} {{ d }}</a>
-  
+
   {% if not d.documento_anexado_set.exists and d.documento_principal_set.exists %}
     <a class="float-right text-black-50" title="Download de todo o processo" href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' d.id%}?download"><i class="fas fa-2x fa-download"></i></a>
   {% endif %}
@@ -43,13 +43,13 @@
     <a class="text-danger" href="{% url 'cmj.core:certidaopublicacao_detail' d.certidao.id %}">Certidão de Publicação nº {{d.certidao.id|stringformat:"06d" }} de {{d.certidao.created}}</a>
     </small>
   {% endif %}
-     
+
   <br><strong>Data do documento:</strong> {{d.data}} | {{d.tipo}} | {{d.tipo.sigla}} {{d.numero}}/{{d.ano}}
 
   {% if d.paginas %}<br><strong>Número de Página(s):</strong> {{d.paginas}}{% endif %}
 
   {% if d.protocolo_gr.exists %}
-    | 
+    |
     {% if perms.detail_protocolo %}
       <strong>Protocolo:</strong>&nbsp;<a href="{% url 'sapl.protocoloadm:protocolo_mostrar' d.protocolo_gr.first.id %}">{{ d.protocolo_gr.first.epigrafe}}</a></br>
     {% else %}
@@ -57,8 +57,8 @@
     {% endif %}
   {% endif %}
 
-  
-  
+
+
   {% if d.data_vencimento %}
     <br><small>Data de Vencimento: {{d.data_vencimento}}</small>
   {% endif %}
@@ -75,15 +75,15 @@
   <small>
     {% if d.interessado %}
       <strong>Interessado:</strong>&nbsp;{{ d.interessado|default_if_none:"Não informado"}}
-      {% if d.protocolo_gr.first.email %}               
-        <br><strong>Email:</strong>  {{ d.protocolo_gr.first.email}}                  
+      {% if d.email %}
+        <br><strong>Email:</strong>  {{ d.email}}
       {% endif %}
 
     {% endif %}
 
     {% define d.tramitacaoadministrativo_set.first as tram %}
-    {% if tram.unidade_tramitacao_destino %}        
-      <strong>Localização Atual:</strong> &nbsp;{{tram.unidade_tramitacao_destino}}</br>        
+    {% if tram.unidade_tramitacao_destino %}
+      <strong>Localização Atual:</strong> &nbsp;{{tram.unidade_tramitacao_destino}}</br>
       <strong>Status:</strong> {{tram.status}}
     {% endif %}
     {% if not d.anexo_de.first %}
@@ -108,7 +108,7 @@
 
 
     {% for anexado in d.documento_principal_set.childs_anexados %}
-      {% if forloop.first %}        
+      {% if forloop.first %}
         <br><strong>Documentos Anexados:</strong>
         <div class="childs">
       {% endif %}

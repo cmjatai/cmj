@@ -16,7 +16,6 @@ from django.db import connection
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from easy_thumbnails import source_generators
-from endesive import verifier
 import magic
 from reversion.admin import VersionAdmin
 from unipath.path import Path

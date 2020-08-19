@@ -23,11 +23,12 @@ from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 from django.db import connection
 from django.db.models import F, Q
-from django.db.models.signals import post_delete, post_save
+from django.db.models.signals import post_delete, post_save, pre_save
 from django.utils import timezone, formats
 from endesive import pdf
 
 from cmj.core.models import OcrMyPDF
+from cmj.signals import Manutencao
 from cmj.utils import ProcessoExterno
 from sapl.compilacao.models import Dispositivo
 from sapl.materia.models import MateriaLegislativa
@@ -41,19 +42,26 @@ def _get_registration_key(model):
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
+        m = Manutencao()
+        # m.desativa_signals()
+        m.desativa_auto_now()
         post_delete.disconnect(dispatch_uid='sapl_post_delete_signal')
         post_save.disconnect(dispatch_uid='sapl_post_save_signal')
         post_delete.disconnect(dispatch_uid='cmj_post_delete_signal')
         post_save.disconnect(dispatch_uid='cmj_post_save_signal')
 
-        self.logger = logging.getLogger(__name__)
+        pre_save.disconnect(
+            dispatch_uid='cmj_pre_save_signed_sapl_protocoloadm_documentoadministrativo')
 
-        # self.run_test_add_hi()
-        # self.run_veririca_pdf_tem_assinatura()
-        # self.run_backup_locaweb()
-        # self.run_test_add_sign_pil()
+        #self.logger = logging.getLogger(__name__)
 
-        self.run_add_selo_protocolo()
+        docs = DocumentoAdministrativo.objects.all()
+
+        for d in docs:
+            p = d.protocolo_gr.first()
+            if p:
+                d.email = p.email
+                d.save()
 
     def run_add_selo_protocolo(self):
 

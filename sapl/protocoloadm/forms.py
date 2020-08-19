@@ -1346,6 +1346,7 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
             'ano_anexador',
             'tipo',
             'epigrafe',
+            'email',
             'numero',
             'ano',
             'data',
@@ -1546,7 +1547,7 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
             [('assunto', 12)])
 
         row4 = to_row(
-            [('interessado', 7), ('tramitacao', 2), ])
+            [('interessado', 6), ('email', 4), ('tramitacao', 2), ])
 
         row5 = to_row(
             [('texto_integral', 12)])

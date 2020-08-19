@@ -271,8 +271,13 @@ class DocumentoAdministrativo(CountPageMixin):
 
     epigrafe = models.CharField(
         max_length=1000, blank=True, verbose_name=_('Epigrafe / Título'))
+
     interessado = models.CharField(
         max_length=1000, blank=True, verbose_name=_('Interessado'))
+
+    email = models.EmailField(
+        blank=True, verbose_name=_('Email'))
+
     autor = models.ForeignKey(Autor, blank=True, null=True,
                               on_delete=models.PROTECT)
 

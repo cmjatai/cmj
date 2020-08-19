@@ -124,3 +124,7 @@ for app in apps.get_app_configs():
                     model._meta.model_name
                 )
             )
+            # print('cmj_pre_save_signed_{}_{}'.format(
+            #    app.name.replace('.', '_'),
+            #    model._meta.model_name
+            #))
