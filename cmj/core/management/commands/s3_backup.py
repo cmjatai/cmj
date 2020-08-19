@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 import logging
 import os
+from time import sleep
 
 import boto3
 from django.apps import apps
@@ -42,6 +43,26 @@ class Command(BaseCommand):
 
         self.logger = logging.getLogger(__name__)
 
+        for s3_server in ('locaweb', 's3_cmj'):
+            print('--------- Iniciando:', s3_server)
+            self.s3_server = s3_server
+            self.s3_connect()
+            if not settings.DEBUG:
+                print('--------- Atualizando backup do BD ----------')
+                self.update_backup_postgresql()
+
+            self.start_time = timezone.localtime()
+            print('--------- S3 Sync ---------')
+            self.s3_sync()
+
+            print('Encerrando conexão com ', s3_server)
+            sleep(10)
+            self.s3c = None
+            self.s3r = None
+            sleep(10)
+
+        print('Concluído...')
+
         # self.close_files()
 
         # self.calcular_validacao()
@@ -53,20 +74,10 @@ class Command(BaseCommand):
         # self.count_registers(full=False)
         # return
 
-        self.start_time = timezone.localtime()
-        self.s3_server = 'locaweb'
-        self.s3_connect()
-        self.s3_sync()
-        if not settings.DEBUG:
-            self.update_backup_postgresql()
-
-        self.days_validate = 60
-        self.start_time = timezone.localtime()
-        self.s3_server = 's3_cmj'
-        self.s3_connect()
-        self.s3_sync()
-        if not settings.DEBUG:
-            self.update_backup_postgresql()
+        #self.s3_server = 's3_cmj'
+        # self.s3_connect()
+        # self.restore_file_from_bucket('cmjatai_postgresql')
+        # return
 
         # print(timezone.localtime())
         # print(self.count_registros)
@@ -138,8 +149,6 @@ class Command(BaseCommand):
             o.delete()
 
     def s3_sync(self, app_label=None, model_name=None, only_reset=False):
-
-        print('--------- {} ---------- {}'.format(self.s3_server, self.start_time))
 
         reset = False
 
@@ -660,6 +669,38 @@ class Command(BaseCommand):
                     ExtraArgs={
                         'ACL': 'private',
                     })
+
+            sleep(5)
+
+    def restore_file_from_bucket(self, bucket_name):
+        b = self.get_bucket(bucket_name)
+
+        for o in b.objects.all():
+            # o.delete()
+            # continue
+
+            if not o.key.endswith('.backup'):
+                continue
+
+            opath = f'/tmp/{o.key}'
+
+            directory = os.path.dirname(opath)
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+
+            b.download_file(o.key, opath)
+            print(o)
+
+        try:
+            b.delete()
+        except Exception as e:
+            print(e)
+
+        sleep
+
+        # if o.key.endswith('.backup'):
+        # if o.key.startswith('.s3_multipart_uploads'):
+        #    o.delete()
 
     def restore_file_from_object(self, bucket_name, obj):
         b = self.get_bucket(bucket_name)
