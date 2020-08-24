@@ -33,7 +33,7 @@
         }
         if ($("input[name=tipo_texto]:checked").length == 0) {
           $("input[name=tipo_texto]").first().prop('checked', true);
-          $("input[name=tipo_texto]").first().closest('label').addClass('checked');          
+          $("input[name=tipo_texto]").first().closest('label').addClass('checked');
         }
       });
       {% endcomment %}
@@ -67,7 +67,7 @@
           $("#vinculo_proposicao").addClass('hidden');
         });
   		});
-      
+
       $("input[name=vinculo_numero], input[name=vinculo_ano]").change(function(event) {
         var url = '{% url 'sapl.api:proposicao-list'%}'
         var proposicao_id = {% if object %}{{object.id}}{% else %}0{% endif %};
@@ -122,11 +122,13 @@
 
             if (data !== null) {
                 $.each(data.results, function(idx, obj) {
+
+                    let exige_assinatura_digital = obj.exige_assinatura_digital ? '*NAD' : ''
                     $("#id_tipo")
                       .append($("<option></option>")
                       .attr("value", obj.id)
                       .attr("data-has-perfil", obj.perfis.length > 0 )
-                      .text(obj.descricao));
+                      .text(`${obj.descricao} ${exige_assinatura_digital}`));
                 });
                 if (data.pagination.next_page > 0) {
                   formData.page = data.pagination.next_page
@@ -140,7 +142,7 @@
                   }
                 }
               }
-              
+
           });
         }
         get_pages_recursive()

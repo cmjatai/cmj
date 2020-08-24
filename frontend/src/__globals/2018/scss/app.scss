@@ -146,10 +146,10 @@ a:hover {
     td {
       background-color:#e3d4b5;
     }
-    
+
   }
 }
-  
+
 .alert {
   margin: $grid-gutter-width $grid-gutter-width/2 $grid-gutter-width;
   &.ementa_materia {
@@ -251,6 +251,10 @@ h3 {
 
 .input-lg {
   height: 50px;
+}
+input[type="radio"] {
+  margin-right: 5px;
+  display: inline-block;
 }
 
 .embed-audio {

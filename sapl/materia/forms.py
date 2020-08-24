@@ -1737,7 +1737,9 @@ class TipoProposicaoForm(ModelForm):
                   'tipo_conteudo_related_radio',
                   'tipo_conteudo_related',
                   'perfis',
-                  'tipo_autores']
+                  'tipo_autores',
+                  'exige_assinatura_digital'
+                  ]
 
         widgets = {'tipo_conteudo_related': forms.HiddenInput(),
                    'perfis': widgets.CheckboxSelectMultiple(),
@@ -1752,8 +1754,9 @@ class TipoProposicaoForm(ModelForm):
                     (
                         Row(
                             to_column(('descricao', 12)),
-                            to_column(('perfis', 12)),
+                            to_column(('exige_assinatura_digital', 12)),
                             to_column(('tipo_autores', 12)),
+                            to_column(('perfis', 12)),
                         ),
                         5
                     )
@@ -2103,7 +2106,8 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
     tipo = forms.ModelChoiceField(
         queryset=TipoProposicao.objects.all(),
         label=_('Tipo da Proposição'),
-        required=True)
+        required=True,
+        help_text=_('NAD - Necessário Assinatural Digital'))
 
     class Meta:
         model = Proposicao

@@ -49,6 +49,12 @@ class TipoProposicao(models.Model):
         error_messages={
             'unique': _('Já existe um Tipo de Proposição com esta descrição.')
         })
+
+    exige_assinatura_digital = models.BooleanField(
+        default=True,
+        verbose_name=_('Exigir Assinatura Digital'),
+    )
+
     content_type = models.ForeignKey(
         ContentType, default=None,
         on_delete=models.PROTECT,

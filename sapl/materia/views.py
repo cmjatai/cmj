@@ -820,6 +820,7 @@ class ProposicaoCrud(Crud):
             msg_error = ''
             if p:
                 if action == 'send':
+
                     if p.data_envio and p.data_recebimento:
                         msg_error = _('Proposição já foi enviada e recebida.')
                     elif p.data_envio:
@@ -828,7 +829,16 @@ class ProposicaoCrud(Crud):
                             not p.texto_articulado.exists():
                         msg_error = _('Proposição não possui nenhum tipo de '
                                       'Texto associado.')
+                    elif p.tipo.exige_assinatura_digital and \
+                            (not p.metadata.get('signs', {}) or
+                             not p.metadata.get(
+                                'signs', {}).get(
+                                    'texto_original', {}).get(
+                                        'signs', {})):
+                        msg_error = _(
+                            'Documento não possui assinatura digital.')
                     else:
+
                         if p.texto_articulado.exists():
                             ta = p.texto_articulado.first()
                             ta.privacidade = STATUS_TA_IMMUTABLE_RESTRICT

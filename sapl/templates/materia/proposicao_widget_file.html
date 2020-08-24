@@ -14,7 +14,7 @@
           <i class="far fa-2x fa-file-{% if '.pdf' in p.texto_original.path %}pdf{% else %}archive{% endif %}"></i>
         {% endif %}
         <br>
-        <strong>Documento 
+        <strong>Documento
           {% if p.metadata.signs and p.metadata.signs.texto_original.signs %}
             Eletrônico
             <small>
@@ -30,15 +30,17 @@
         </strong>
       </a>
     </div>
-    {% if p.metadata.signs and p.metadata.signs.texto_original.signs %}
-      {% with p.metadata.signs.texto_original.signs as signs %}
-        {% include 'core/sign_widget.html' %}
-      {% endwith %}
-    {% else %}
-      <div class="col alert alert-danger">
-        <strong>Atenção!!!</strong><br>
-        Arquivo não possui assinatura digital. Não é permitido o envio!!!
-      </div>
+    {% if p.tipo.exige_assinatura_digital %}
+      {% if p.metadata.signs and p.metadata.signs.texto_original.signs or not p.tipo.exige_assinatura_digital %}
+        {% with p.metadata.signs.texto_original.signs as signs %}
+          {% include 'core/sign_widget.html' %}
+        {% endwith %}
+      {% else %}
+        <div class="col alert alert-danger">
+          <strong>Atenção!!!</strong><br>
+          Arquivo não possui assinatura digital. Não é permitido o envio!!!
+        </div>
+      {% endif %}
     {% endif %}
   </div>
 {% endif %}

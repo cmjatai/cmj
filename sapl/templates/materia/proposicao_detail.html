@@ -38,7 +38,8 @@
     {% endif %}
   {% else %}
     {% block editions_actions_send %}
-      {% if object.metadata.signs and object.metadata.signs.texto_original.signs %}
+
+      {% if object.metadata.signs and object.metadata.signs.texto_original.signs or not object.tipo.exige_assinatura_digital %}
         <div class="actions btn-group" role="group">
           <a href="{{ view.detail_url }}?action=send" class="btn btn-primary">{% trans 'Enviar' %}</a>
         </div>
@@ -150,7 +151,7 @@
         </div>
       </div>
     {% endif %}
-    
+
 
     {% if object.materia_de_vinculo %}
       <div class="col-sm-12">
@@ -208,7 +209,7 @@
         </div>
       </div>
     {% endif %}
-    
+
   </div>
   {% if user.is_superuser %}
     <div class="row">
