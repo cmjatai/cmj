@@ -2107,7 +2107,7 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
         queryset=TipoProposicao.objects.all(),
         label=_('Tipo da Proposição'),
         required=True,
-        help_text=_('NAD - Necessário Assinatural Digital'))
+        help_text=_('<i class="text-red">NAD - Necessário Assinatura Digital</i>'))
 
     class Meta:
         model = Proposicao
