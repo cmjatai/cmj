@@ -7,17 +7,17 @@
 
 {% block actions %}
   <div class="actions btn-group" role="group">
-    <a href="{% url 'sapl.base:haystack_search' %}?q=&models=protocoloadm.documentoadministrativo" 
+    <a href="{% url 'sapl.base:haystack_search' %}?q=&models=protocoloadm.documentoadministrativo"
         class="btn btn-outline-primary">
        Mudar para Pesquisa Textual
     </a>
     <button type="button"
-        class="btn btn-warning" 
-        data-trigger="focus" 
+        class="btn btn-warning"
+        data-trigger="focus"
         data-container="body"
         data-toggle="popover"
-        data-placement="top" 
-        title="Sobre a Pesquisa Textual" 
+        data-placement="top"
+        title="Sobre a Pesquisa Textual"
         data-content="Pesquisa Textual é diferente desta pesquisa em que escolhemos filtros específicos, uma pesquisa parametrizada. Na Pesquisa Textual é buscado conteúdo dentro dos documentos através de uma ferramenta sofisticada que leva em consideração as técnicas de escrita da lingua portuguesa. Experimente! No entanto, se você está buscando um conteúdo específico, como por exemplo um Processo em andamento, então a pesquisa parametrizada pode ser o ideal.">
       ?
     </button >
@@ -78,11 +78,11 @@
                     <span class="text-danger">Certidão de Publicação nº {{d.certidao.id|stringformat:"06d" }} de {{d.certidao.created}}</span>
                     </small>
                   {% endif %}
-                      
+
                   <br><strong>Data do documento:</strong> {{d.data}} | {{d.tipo}} | {{d.tipo.sigla}} {{d.numero}}/{{d.ano}}
 
                   {% if d.protocolo_gr.exists %}
-                    | 
+                    |
                     {% if perms.detail_protocolo %}
                       <strong>Protocolo:</strong>&nbsp;<a href="{% url 'sapl.protocoloadm:protocolo_mostrar' d.protocolo_gr.first.id %}">{{ d.protocolo_gr.first.epigrafe}}</a></br>
                     {% else %}
@@ -105,8 +105,8 @@
                     {% endif %}
 
                     {% define d.tramitacaoadministrativo_set.first as tram %}
-                    {% if tram.unidade_tramitacao_destino %}        
-                      <strong>Localização Atual:</strong> &nbsp;{{tram.unidade_tramitacao_destino}}</br>        
+                    {% if tram.unidade_tramitacao_destino %}
+                      <strong>Localização Atual:</strong> &nbsp;{{tram.unidade_tramitacao_destino}}</br>
                       <strong>Status:</strong> {{tram.status}}
                     {% endif %}
                     {% if not d.anexo_de.first %}
@@ -118,7 +118,7 @@
 
                     {% define d.documentoacessorioadministrativo_set.all as acess %}
                     {% if d.documentoacessorioadministrativo_set.all.exists %}
-                        <strong>Documentos Acessórios:</strong>
+                        <br><strong>Documentos Acessórios:</strong>
                         <a href="{% url 'sapl.protocoloadm:documentoacessorioadministrativo_list' d.id %}">
                             {{ d.documentoacessorioadministrativo_set.all.count }}
                         </a>
@@ -186,7 +186,7 @@
                         <br><strong>Data do documento:</strong> {{d.data}} | {{d.tipo}} | {{d.tipo.sigla}} {{d.numero}}/{{d.ano}}
 
                         {% if d.protocolo %}
-                          | 
+                          |
                           {% if perms.detail_protocolo %}
                             <strong>Protocolo:</strong>&nbsp;<a href="{% url 'sapl.protocoloadm:protocolo_mostrar' d.protocolo.id %}">{{ d.protocolo}}</a></br>
                           {% else %}
@@ -204,8 +204,8 @@
                           {% endif %}
 
                           {% define d.tramitacaoadministrativo_set.first as tram %}
-                          {% if tram.unidade_tramitacao_destino %}        
-                            <strong>Localização Atual:</strong> &nbsp;{{tram.unidade_tramitacao_destino}}</br>        
+                          {% if tram.unidade_tramitacao_destino %}
+                            <strong>Localização Atual:</strong> &nbsp;{{tram.unidade_tramitacao_destino}}</br>
                             <strong>Status:</strong> {{tram.status}}
                           {% endif %}
                           {% if not d.anexo_de.first %}
@@ -223,7 +223,7 @@
                   {% endfor %}
             </div>
           {% endfor %}
-     
+
       </div>
 
     {% else  %}

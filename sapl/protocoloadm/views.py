@@ -299,16 +299,30 @@ class DocumentoAdministrativoCrud(Crud):
             with zipfile.ZipFile(file_buffer, 'w') as file:
 
                 def tree_add_files(obj):
-                    if obj.texto_integral:
-                        file.write(
-                            obj.texto_integral.original_path,
-                            arcname='%s-%s' % (
-                                obj.id,
-                                obj.texto_integral.original_path.split(
-                                    '/')[-1]))
+                    if hasattr(obj, 'texto_integral'):
+                        if obj.texto_integral:
+                            file.write(
+                                obj.texto_integral.original_path,
+                                arcname='DA-%s-%s' % (
+                                    obj.id,
+                                    obj.texto_integral.original_path.split(
+                                        '/')[-1]))
 
-                    for item in obj.documento_principal_set.childs_anexados():
-                        tree_add_files(item.documento_anexado)
+                        for item in obj.documento_principal_set.childs_anexados():
+                            tree_add_files(item.documento_anexado)
+
+                        for item in obj.documentoacessorioadministrativo_set.all():
+                            tree_add_files(item)
+
+                    elif hasattr(obj, 'arquivo'):
+                        if obj.arquivo:
+                            file.write(
+                                obj.arquivo.original_path,
+                                arcname='DA-%s-DAA-%s-%s' % (
+                                    obj.documento.id,
+                                    obj.id,
+                                    obj.arquivo.original_path.split(
+                                        '/')[-1]))
 
                 tree_add_files(self.object)
 
