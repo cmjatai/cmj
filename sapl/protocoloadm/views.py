@@ -1628,6 +1628,7 @@ class CriarDocumentoProtocolo(PermissionRequiredMixin, CreateView):
         doc['protocolo'] = protocolo.id
         doc['assunto'] = protocolo.assunto_ementa
         doc['interessado'] = protocolo.interessado
+        doc['email'] = protocolo.email
         doc['numero'] = numero_max + 1 if numero_max else 1
 
         doc['workspace'] = self.request.user.areatrabalho_set.first()

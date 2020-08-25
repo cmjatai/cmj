@@ -54,7 +54,7 @@ class Command(BaseCommand):
             dispatch_uid='cmj_pre_save_signed_sapl_protocoloadm_documentoadministrativo')
 
         #self.logger = logging.getLogger(__name__)
-
+        return
         docs = DocumentoAdministrativo.objects.all()
 
         for d in docs:
