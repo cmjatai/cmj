@@ -16,7 +16,8 @@ from django.db import transaction
 from django.db.models import Max, Q
 from django.db.models.fields.related import ForeignKey, ManyToManyField
 from django.http import Http404, HttpResponse, JsonResponse
-from django.http.response import HttpResponseRedirect, Http404
+from django.http.response import HttpResponseRedirect, Http404,\
+    StreamingHttpResponse
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.urls.base import reverse
@@ -296,7 +297,7 @@ class DocumentoAdministrativoCrud(Crud):
 
         def monta_zip(self):
 
-            response = HttpResponse(content_type='application/zip')
+            response = StreamingHttpResponse(content_type='application/zip')
 
             response['Cache-Control'] = 'no-cache'
             response['Pragma'] = 'no-cache'
@@ -307,7 +308,7 @@ class DocumentoAdministrativoCrud(Crud):
                     self.object.numero,
                     self.object.ano)
 
-            with zipfile.LargeZipFile(response, 'w') as file:
+            with zipfile.ZipFile(response, 'w') as file:
 
                 def tree_add_files(obj):
                     if hasattr(obj, 'texto_integral'):
