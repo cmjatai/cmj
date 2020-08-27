@@ -3,6 +3,7 @@ import io
 import logging
 from random import choice
 from string import ascii_letters, digits
+import tempfile
 import zipfile
 
 from braces.views import FormValidMessageMixin
@@ -16,8 +17,7 @@ from django.db import transaction
 from django.db.models import Max, Q
 from django.db.models.fields.related import ForeignKey, ManyToManyField
 from django.http import Http404, HttpResponse, JsonResponse
-from django.http.response import HttpResponseRedirect, Http404,\
-    StreamingHttpResponse
+from django.http.response import HttpResponseRedirect, Http404
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.urls.base import reverse
@@ -297,22 +297,13 @@ class DocumentoAdministrativoCrud(Crud):
 
         def monta_zip(self):
 
-            response = StreamingHttpResponse(content_type='application/zip')
+            temp = tempfile.TemporaryFile()
 
-            response['Cache-Control'] = 'no-cache'
-            response['Pragma'] = 'no-cache'
-            response['Expires'] = 0
-            response['Content-Disposition'] = \
-                'inline; filename=%s-%s-%s.zip' % (
-                    self.object.tipo.sigla,
-                    self.object.numero,
-                    self.object.ano)
-
-            with zipfile.ZipFile(response, 'w') as file:
+            with zipfile.ZipFile(temp, 'w') as file:
 
                 def tree_add_files(obj):
                     if hasattr(obj, 'texto_integral'):
-                        #print(obj.id, obj)
+                        print(obj.id, obj)
                         if obj.texto_integral:
                             file.write(
                                 obj.texto_integral.original_path,
@@ -338,6 +329,18 @@ class DocumentoAdministrativoCrud(Crud):
                                         '/')[-1]))
 
                 tree_add_files(self.object)
+
+            response = HttpResponse(temp,
+                                    content_type='application/zip')
+
+            response['Cache-Control'] = 'no-cache'
+            response['Pragma'] = 'no-cache'
+            response['Expires'] = 0
+            response['Content-Disposition'] = \
+                'inline; filename=%s-%s-%s.zip' % (
+                    self.object.tipo.sigla,
+                    self.object.numero,
+                    self.object.ano)
 
             return response
 
