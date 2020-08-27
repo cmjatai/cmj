@@ -67,6 +67,7 @@ class AudienciaPublica(models.Model):
         null=True,
         blank=True,
         verbose_name=_('Matéria Legislativa'))
+
     tipo = models.ForeignKey(TipoAudienciaPublica,
                              on_delete=models.PROTECT,
                              null=True,

@@ -295,11 +295,23 @@ class DocumentoAdministrativoCrud(Crud):
             return self.render_to_response(context)
 
         def monta_zip(self):
-            file_buffer = io.BytesIO()
-            with zipfile.ZipFile(file_buffer, 'w') as file:
+
+            response = HttpResponse(content_type='application/zip')
+
+            response['Cache-Control'] = 'no-cache'
+            response['Pragma'] = 'no-cache'
+            response['Expires'] = 0
+            response['Content-Disposition'] = \
+                'inline; filename=%s-%s-%s.zip' % (
+                    self.object.tipo.sigla,
+                    self.object.numero,
+                    self.object.ano)
+
+            with zipfile.ZipFile(response, 'w') as file:
 
                 def tree_add_files(obj):
                     if hasattr(obj, 'texto_integral'):
+                        #print(obj.id, obj)
                         if obj.texto_integral:
                             file.write(
                                 obj.texto_integral.original_path,
@@ -325,18 +337,6 @@ class DocumentoAdministrativoCrud(Crud):
                                         '/')[-1]))
 
                 tree_add_files(self.object)
-
-            response = HttpResponse(file_buffer.getvalue(),
-                                    content_type='application/zip')
-
-            response['Cache-Control'] = 'no-cache'
-            response['Pragma'] = 'no-cache'
-            response['Expires'] = 0
-            response['Content-Disposition'] = \
-                'inline; filename=%s-%s-%s.zip' % (
-                    self.object.tipo.sigla,
-                    self.object.numero,
-                    self.object.ano)
 
             return response
 
