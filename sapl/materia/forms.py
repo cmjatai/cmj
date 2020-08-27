@@ -1172,7 +1172,7 @@ class MateriaLegislativaFilterSet(django_filters.FilterSet):
         label=_(
             'Pesquisar expressões na ementa'),
         help_text=_(
-            '"Para busca no conteúdo das matérias, use a Pesquisa Textual"'),
+            '"Para busca no conteúdo das matérias, use a Busca Textual acima"'),
         method='filter_ementa'
     )
     indexacao = django_filters.CharFilter(lookup_expr='icontains',
@@ -1335,7 +1335,7 @@ class MateriaLegislativaFilterSet(django_filters.FilterSet):
         self.form.helper.layout = Layout(
             Fieldset(_(
                 '''
-                Pesquisa Básica<br>
+                Pesquisa Parametrizada<br>
                 <small>
                 <strong class="text-red">TODOS OS CAMPOS SÃO OPCIONAIS!</strong>
                 </small>

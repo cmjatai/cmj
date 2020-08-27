@@ -3,7 +3,9 @@ import re
 from crispy_forms.bootstrap import FieldWithButtons, StrictButton
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Div, Field, Layout
+from django import forms
 from django.db.models import Q
+from django.http.request import QueryDict
 from django.utils.translation import ugettext_lazy as _
 from haystack.forms import ModelSearchForm
 from haystack.utils.app_loading import haystack_get_model
@@ -16,6 +18,10 @@ from sapl.crispy_layout_mixin import to_row
 
 class CmjSearchForm(ModelSearchForm):
 
+    fix_model = forms.CharField(
+        required=False, label=_('FixModel'),
+        widget=forms.HiddenInput())
+
     def no_query_found(self):
         return self.searchqueryset.all().order_by('-data')
 
@@ -25,6 +31,7 @@ class CmjSearchForm(ModelSearchForm):
         self.user = kwargs.pop('user')
 
         q_field = Div(
+            'fix_model',
             FieldWithButtons(
                 Field('q',
                       placeholder=_('Busca Textual'),
@@ -33,7 +40,8 @@ class CmjSearchForm(ModelSearchForm):
                     '<i class="fas fa-2x fa-search"></i>',
                     css_class='btn-outline-primary',
                     type='submit')
-            )
+            ),
+
         )
 
         row = to_row([(Div(), 2), (q_field, 8), (Div(Field('models')), 12)])
@@ -75,6 +83,12 @@ class CmjSearchForm(ModelSearchForm):
 
         self.fields['models'].label = _('Buscar em conteúdos específicos:')
         self.fields['q'].label = ''
+
+        if args and isinstance(args[0], QueryDict):
+            query_dict = args[0]
+            fix_model = query_dict.get('fix_model', '')
+            if fix_model:
+                self.fields['models'].widget = forms.MultipleHiddenInput()
 
     def search(self):
         sqs = super().search()
@@ -132,7 +146,9 @@ class CmjSearchView(SearchView):
         if form_kwargs:
             kwargs.update(form_kwargs)
 
-        return SearchView.build_form(self, form_kwargs=kwargs)
+        form = SearchView.build_form(self, form_kwargs=kwargs)
+
+        return form
 
     def get_context(self):
         context = super().get_context()

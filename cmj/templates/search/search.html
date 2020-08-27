@@ -5,88 +5,42 @@
 {% block title %}
   <h1 class="page-header container-search" >
     Pesquisa Textual
+        {% if request.GET.fix_model %}
+          em {% model_verbose_name_plural request.GET.models %}
+        {% endif %}
       <a class="btn btn-warning btn-ajuda" data-toggle="collapse" href="#collapseAjudaBuscaTextual" role="button" aria-expanded="false" aria-controls="collapseAjudaBuscaTextual">
         ?
       </a>
   </h1>
 {% endblock title %}
 
-
 {% block base_content %}
 <div class="container-search">
-
   <form method="get" action=".">
-    <div class="collapse" id="collapseAjudaBuscaTextual">
-      <div class="clearfix"></div>
-      <div class="card card-body">
-        <h2 class="card-title">Pesquisar uma correspondência exata</h2>
-        <p class="card-text">
-          Coloque o conteúdo entre aspas. Por exemplo: 
-          <span class="text-green">"Inclusão Social das Pessoas com Deficiência"</span>
-        </p>
-      </div> 
-      <div class="card card-body">
-        <h2 class="card-title">Excluir palavras da pesquisa</h2>
-        <p class="card-text">
-          Coloque o sinal de "-" antes da palavra que não deve aparecer na pesquisa. Por exemplo: 
-          <span class="text-green">servidor -executivo</span>
-        </p>
-      </div>
-      <div class="card card-body">
-        <h2 class="card-title">Combinar pesquisas</h2>
-        <p class="card-text">
-          Coloque "OR" na consulta. Por exemplo: 
-          <span class="text-green">servidor OR executivo</span>
-        </p>
-      </div>
-      <div class="card card-body">
-        <h2 class="card-title">Restringir pesquisas</h2>
-        <p class="card-text">Coloque "AND" na consulta. Por exemplo: 
-          <span class="text-green">servidor AND executivo</span>
-          <br><small>palavras soltas já são pesquisadas como se você colocasse "AND", ou seja,
-          pesquisar <span class="text-green">servidor AND executivo</span> é o mesmo que <span class="text-green">servidor executivo</span></small>. 
-        </p>
-      </div>
-      <div class="card card-body">
-        <h2 class="card-title">Combinar as opções de pesquisa</h2>
-        <p class="card-text">
-          Uma pesquisa exata com uma exclusão. Por exemplo:
-          <span class="text-green">"servidor efetivo" -câmara</span>
-          <br>
-          Duas pesquisas exatas. Por exemplo:
-          <span class="text-green">"audiência pública" AND "diretrizes orçamentárias"</span>
-          <br>
-          Duas pesquisas exatas e que o resultado tenha ao menos uma delas. Por exemplo:
-          <span class="text-green">"audiência pública" OR "diretrizes orçamentárias"</span>
-          <br>
-          Duas pesquisas exatas, que o resultado tenha ao menos uma delas e que não tenha a palavra "diário". Por exemplo:
-          <span class="text-green">"audiência pública" OR "diretrizes orçamentárias" -diário</span>
-          <br>
-        </p>
-      </div>
-    </div>
-
+    {% include 'search/search_help_text.html' %}
     <div class="row">
       {% crispy form %}
     </div>
-    <div class="row">
-      <div class="col-md-5 ">
-        <div class="checkbox" id="check_all">
-          <input type="checkbox" id="id_check_all" onchange="checkAll(this)" />
-          <label for="id_check_all">
-            Marcar/Desmarcar Todos
-          </label>
+    {% if not request.GET.fix_model %}
+      <div class="row">
+        <div class="col-md-5 ">
+          <div class="checkbox" id="check_all">
+            <input type="checkbox" id="id_check_all" onchange="checkAll(this)" />
+            <label for="id_check_all">
+              Marcar/Desmarcar Todos
+            </label>
+          </div>
         </div>
       </div>
-    </div>
+    {% endif %}
 
       <div class="container-table">
         <div class="result-count">Foram encontrados {{ page.paginator.count }} registros </div>
-        
+
         <table class="table table-striped table-bordered">
-        
+
         {% comment "" %}
-        
+
           <thead class="thead-default">
             <tr><td><h3>Resultados - Foram encontrados {{ page.paginator.count }} registros <br/>
               {% if page.paginator.count %}
@@ -99,17 +53,17 @@
         {% for result in page.object_list %}
           {% if result.object %}
             <tr>
-              <td class="item-listas">  
-              
+              <td class="item-listas">
+
                 <div class="item-raiz">
 
                 <div class="verbose_name">
-                  {% if not result.model_name == 'documento' %}{{result.verbose_name}}{%else%}Notícias{% endif %}                  
+                  {% if not result.model_name == 'documento' %}{{result.verbose_name}}{%else%}Notícias{% endif %}
                 </div>
 
                 {% if user.is_superuser %}
                   <div class="parent-right">
-                    {{ result.text|length }} 
+                    {{ result.text|length }}
                   </div>
                 {% endif %}
 
@@ -129,12 +83,12 @@
                         </a>
                       {% endif %}
                     </div>
-                    
+
                     <strong>
                       <a href="{% url 'sapl.materia:materialegislativa_detail' m.id %}">{{m.tipo.sigla}} {{m.numero}}/{{m.ano}} - {{m.tipo}}</a>
                     </strong><br>
                     {% if m.numero_protocolo %}
-                        <strong>Protocolo: </strong>{{m.numero_protocolo}}/{{m.ano}} | 
+                        <strong>Protocolo: </strong>{{m.numero_protocolo}}/{{m.ano}} |
                     {% endif %}
                     <strong>Data de Apresentação:</strong> {{m.data_apresentacao}}
                     <br><strong>Autoria:</strong> {{ m.autores.all|join:", "}}
@@ -164,11 +118,6 @@
                     {% endfor %}
                   </small>
 
-
-
-
-
-
                 {% elif result.model_name == 'documentoacessorio' %}
                   <div class="links-texto">
                     {% if result.object.arquivo %}
@@ -183,7 +132,7 @@
                   <div class="text-ementa">{{ result.object.ementa }}</div>
 
                 {% elif result.model_name == 'documentoadministrativo' %}
-                  
+
                     {% with result.object as doc_adm %}
                       {% include 'protocoloadm/documentoadministrativo_widget_list.html' %}
                     {% endwith %}
@@ -203,17 +152,17 @@
 
 
                 {% elif result.model_name == 'normajuridica' %}
-                  
+
                     {% with result.object as n %}
                       {% include 'norma/normajuridica_widget_list.html' %}
                     {% endwith %}
 
-                  
+
                 {% elif result.model_name == 'sessaoplenaria' %}
                     <strong>
                     <a href="{% url 'sapl.sessao:sessaoplenaria_detail' result.object.pk %}">{{ result.object }}</a>
                     </strong>
-                    
+
                     <br><strong>Data:</strong> {{result.object.data_inicio}}
                     {% if result.object.upload_ata %}
                       <br><strong>Ata da Sessão:</strong><a href="{{result.object.upload_ata.url}}?u={% now "u"%}">Clique aqui</a>
@@ -283,8 +232,8 @@
 		function checkAll(elem) {
       let checkboxes = document.getElementsByName('models');
       for (let i = 0; i < checkboxes.length; i++) {
-        if (checkboxes[i].type == 'checkbox') 
-            checkboxes[i].checked = elem.checked; 
+        if (checkboxes[i].type == 'checkbox')
+            checkboxes[i].checked = elem.checked;
       }
     }
   </script>

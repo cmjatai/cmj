@@ -6,6 +6,7 @@ import json
 from dateutil.relativedelta import relativedelta
 from django import template
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 from django.core.serializers import serialize
 from django.db.models.query import QuerySet
 from django.template.defaultfilters import stringfilter
@@ -49,8 +50,17 @@ def get_class(class_string):
         class_string = str(class_string)
         dot = class_string.rindex('.')
         mod_name, class_name = class_string[:dot], class_string[dot + 1:]
-        if class_name:
-            return getattr(__import__(mod_name, {}, {}, [str('')]), class_name)
+
+        try:
+            ct = ContentType.objects.get_by_natural_key(
+                mod_name, class_name.lower())
+            if ct:
+                return ct.model_class()
+            return None
+        except:
+            if class_name:
+                return getattr(__import__(mod_name, {}, {}, [str('')]), class_name)
+            return None
 
 
 @register.simple_tag
@@ -73,7 +83,9 @@ def model_verbose_name(class_name):
 @register.simple_tag
 def model_verbose_name_plural(class_name):
     model = get_class(class_name)
-    return model._meta.verbose_name_plural
+    if model:
+        return model._meta.verbose_name_plural
+    return ''
 
 
 @register.filter

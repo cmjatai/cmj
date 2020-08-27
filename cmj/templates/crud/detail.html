@@ -12,7 +12,7 @@
               <a href="{{ view.list_url }}" class="btn btn-outline-primary">{% trans 'Listar' %} {{view.verbose_name_plural}}</a>
             {% endif %}
             {% if view.search_url %}
-              <a href="{{ view.search_url }}" class="btn btn-outline-primary">{% trans 'Pesquisa Parametrizada' %}</a>
+              <a href="{{ view.search_url }}" class="btn btn-outline-primary">{% trans 'Pesquisa' %}</a>
             {% endif %}
             {% if view.create_url %}
               <a href="{{ view.create_url }}" class="btn btn-outline-primary">
@@ -49,7 +49,7 @@
       {% endblock actions %}
     </div>
   {% endblock container_actions %}
-  
+
   <div class="container-detail clearfix">
     {% block detail_content %}
       {% for fieldset in view.layout_display %}
@@ -83,7 +83,7 @@
                           frameborder="0"></iframe>
                         </div>
                       {% elif column.text|facebook_url %}
-                          <div class="fb-video" data-href="{{ column.text|safe }}" 
+                          <div class="fb-video" data-href="{{ column.text|safe }}"
                             data-width="420" data-show-text="false">
                           </div>
                       {% elif column.text|url %}
