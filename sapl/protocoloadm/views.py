@@ -307,7 +307,7 @@ class DocumentoAdministrativoCrud(Crud):
                     self.object.numero,
                     self.object.ano)
 
-            with zipfile.ZipFile(response, 'w') as file:
+            with zipfile.LargeZipFile(response, 'w') as file:
 
                 def tree_add_files(obj):
                     if hasattr(obj, 'texto_integral'):
