@@ -297,52 +297,52 @@ class DocumentoAdministrativoCrud(Crud):
 
         def monta_zip(self):
 
-            temp = tempfile.TemporaryFile()
+            with tempfile.SpooledTemporaryFile(max_size=512000000) as tmp:
 
-            with zipfile.ZipFile(temp, 'w') as file:
+                with zipfile.ZipFile(tmp, 'w', zipfile.ZIP_DEFLATED) as file:
 
-                def tree_add_files(obj):
-                    if hasattr(obj, 'texto_integral'):
-                        print(obj.id, obj)
-                        if obj.texto_integral:
-                            file.write(
-                                obj.texto_integral.original_path,
-                                arcname='DA-%s-%s' % (
-                                    obj.id,
-                                    obj.texto_integral.original_path.split(
-                                        '/')[-1]))
+                    def tree_add_files(obj):
+                        if hasattr(obj, 'texto_integral'):
+                            print(obj.id, obj)
+                            if obj.texto_integral:
+                                file.write(
+                                    obj.texto_integral.original_path,
+                                    arcname='DA-%s-%s' % (
+                                        obj.id,
+                                        obj.texto_integral.original_path.split(
+                                            '/')[-1]))
 
-                        for item in obj.documento_principal_set.childs_anexados():
-                            tree_add_files(item.documento_anexado)
+                            for item in obj.documento_principal_set.childs_anexados():
+                                tree_add_files(item.documento_anexado)
 
-                        for item in obj.documentoacessorioadministrativo_set.all():
-                            tree_add_files(item)
+                            for item in obj.documentoacessorioadministrativo_set.all():
+                                tree_add_files(item)
 
-                    elif hasattr(obj, 'arquivo'):
-                        if obj.arquivo:
-                            file.write(
-                                obj.arquivo.original_path,
-                                arcname='DA-%s-DAA-%s-%s' % (
-                                    obj.documento.id,
-                                    obj.id,
-                                    obj.arquivo.original_path.split(
-                                        '/')[-1]))
+                        elif hasattr(obj, 'arquivo'):
+                            if obj.arquivo:
+                                file.write(
+                                    obj.arquivo.original_path,
+                                    arcname='DA-%s-DAA-%s-%s' % (
+                                        obj.documento.id,
+                                        obj.id,
+                                        obj.arquivo.original_path.split(
+                                            '/')[-1]))
 
-                tree_add_files(self.object)
+                    tree_add_files(self.object)
+                tmp.seek(0)
+                response = HttpResponse(tmp.read(),
+                                        content_type='application/zip')
 
-            response = HttpResponse(temp,
-                                    content_type='application/zip')
+                response['Cache-Control'] = 'no-cache'
+                response['Pragma'] = 'no-cache'
+                response['Expires'] = 0
+                response['Content-Disposition'] = \
+                    'inline; filename=%s-%s-%s.zip' % (
+                        self.object.tipo.sigla,
+                        self.object.numero,
+                        self.object.ano)
 
-            response['Cache-Control'] = 'no-cache'
-            response['Pragma'] = 'no-cache'
-            response['Expires'] = 0
-            response['Content-Disposition'] = \
-                'inline; filename=%s-%s-%s.zip' % (
-                    self.object.tipo.sigla,
-                    self.object.numero,
-                    self.object.ano)
-
-            return response
+                return response
 
     class ListView(QuerySetContainerPrivPubMixin, FilterView):
         filterset_class = DocumentoAdministrativoFilterSet
