@@ -179,20 +179,6 @@ window.autorModal = function () {
       })
     })
   })
-
-  /* function get_nome_autor(fieldname) {
-    if ($(fieldname).length > 0) { // se campo existir
-      if ($(fieldname).val() != "") { // e não for vazio
-        var id = $(fieldname).val();
-        $.get("/proposicao/get-nome-autor?id=" + id, function(data, status){
-            $("#nome_autor").text(data.nome);
-        });
-      }
-    }
-  }
-
-  get_nome_autor("#id_autor");
-  get_nome_autor("#id_autoria__autor"); */
 }
 
 window.refreshMask = function () {

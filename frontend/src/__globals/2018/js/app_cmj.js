@@ -741,11 +741,3 @@ window.TrechoSearch = function (opts) {
     })
   })
 }
-
-$(function () {
-  window.refreshDatePicker()
-  window.refreshMask()
-  window.autorModal()
-  // initTinymce()
-  // window.OptionalCustomFrontEnd()
-})

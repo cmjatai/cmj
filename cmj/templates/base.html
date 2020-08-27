@@ -250,9 +250,14 @@
         Departamento de Tecnologia de Informação e Comunicação
       </div>
     </div>
+
+    <div vw class="enabled">
+      <div vw-access-button class="active"></div>
+      <div vw-plugin-wrapper>
+        <div class="vw-plugin-top-wrapper"></div>
+      </div>
+    </div>
   </footer>
-
-
 
   {% endblock root_body %}
 
@@ -269,24 +274,12 @@
 
   {% block widgets_form_js %}{% endblock widgets_form_js %}
 
-  <script language="JavaScript" type="text/javascript" >
-    $(function () {
-      $('a[data-social-sharing]').click(function(event){
-        event.preventDefault();var socialNetwork=$(this).data('social-sharing');
-        switch(socialNetwork){
-            case'facebook':_height=436;_width=626;break;
-            case'whatsapp':_height=591;_width=617;break;
-            case'twitter':_height=300;_width=600;}
-
-        var leftPosition=(window.screen.width/2)-((_width/2)+10);
-        var topPosition=(window.screen.height/2)-((_height/2)+50);
-        var stringSpecs='left='+leftPosition+',top='+topPosition+',toolbar=0,status=0,width='+_width+',height='+_height;
-        window.open($(this).attr('href'),'sharer',stringSpecs);});
-    });
-  </script>
-
   {% if not DEBUG %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-2431536-7"></script>
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
     <script>
+      new window.VLibras.Widget('https://vlibras.gov.br/app');
+
       window.fbAsyncInit = function () {
         FB.init({
           appId      : '{% settings_key_tag 'SOCIAL_AUTH_FACEBOOK_KEY' %}',
@@ -309,10 +302,7 @@
           js.src = "https://connect.facebook.net/pt_BR/sdk.js";
           fjs.parentNode.insertBefore(js, fjs);
         }(document, 'script', 'facebook-jssdk'));
-    </script>
 
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-2431536-7"></script>
-    <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());

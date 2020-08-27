@@ -114,11 +114,21 @@ a:hover {
   margin-bottom: 0;
   th, td {
     vertical-align: middle;
-    border: 1px solid #fff;
+    border-top: 1px solid #fff;
+    border-bottom: 1px solid #fff;
+
+    //border: 1px solid #fff;
   }
   thead {
     th {
-      border: 1px solid #fff;
+      border-bottom: 1px solid #fff;
+    }
+    th:not(:first-child) {
+      border-left: 1px solid #fff;
+    }
+
+    th:not(:last-child) {
+      border-right: 1px solid #fff;
     }
   }
   th {
@@ -140,6 +150,15 @@ a:hover {
     tr:hover {
       background-color: darken($color_container_bg, 10);
     }
+
+    td:not(:first-child) {
+      border-left: 1px solid #fff;
+    }
+
+    td:not(:last-child) {
+      border-right: 1px solid #fff;
+    }
+
   }
 
   .row-unread {

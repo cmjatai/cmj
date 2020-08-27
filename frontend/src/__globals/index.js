@@ -34,58 +34,48 @@ require('imports-loader?window.jQuery=jquery!./2018/js/jquery.runner.js')
 window.$ = $
 window.jQuery = $
 
-window.AltoContraste()
-window.autorModal()
-window.refreshMask()
-window.refreshDatePicker()
-window.initTextRichEditor('texto-rico')
 // initTinymce
 // import './2018/themes/dezembrolaranja/app.scss'
 
 $(function () {
-  /* let toggleWrapper = function (event) {
-    if (!$("#wrapper").hasClass('toggled')) {
-      window.localStorage.setItem('sidebarCmjCookie', 'toggled')
-      //$(".canais-absolute .box").off('click')
-    }
-    else {
-      window.localStorage.setItem('sidebarCmjCookie', '')
-      //$(".canais-absolute .box").click(toggleWrapper)
-    }
+  setTimeout(function () {
+    window.AltoContraste()
+    window.autorModal()
+    window.refreshMask()
+    window.refreshDatePicker()
+    window.initTextRichEditor('texto-rico')
 
-    $("#wrapper").toggleClass("toggled");
-    //$(".container").toggleClass("toggled");
+    $('a[data-social-sharing]').click(function (event) {
+      event.preventDefault()
+      let socialNetwork = $(this).data('social-sharing')
+      let _height, _width
+      switch (socialNetwork) {
+        case 'facebook': _height = 436; _width = 626; break
+        case 'whatsapp': _height = 591; _width = 617; break
+        case 'twitter': _height = 300; _width = 600
+      }
+      let leftPosition = (window.screen.width / 2) - ((_width / 2) + 10)
+      let topPosition = (window.screen.height / 2) - ((_height / 2) + 50)
+      let stringSpecs = 'left=' + leftPosition + ',top=' + topPosition + ',toolbar=0,status=0,width=' + _width + ',height=' + _height
+      window.open($(this).attr('href'), 'sharer', stringSpecs)
+    })
 
-    event.preventDefault();
-  }
+    $('[data-toggle="popover"]').popover({
+      trigger: 'focus'
+    })
 
-  $("#menu-toggle").click(function (event) {
-    toggleWrapper(event)
-  });
-
-  let sidebarCmjCookie = window.localStorage.getItem('sidebarCmjCookie')
-  if (sidebarCmjCookie !== undefined) {
-    $("#wrapper").toggleClass(sidebarCmjCookie);
-    //$(".container").toggleClass(sidebarCmjCookie);
-    //$(".canais-absolute .box").off('click')
-  } */
-
-  $('[data-toggle="popover"]').popover({
-    trigger: 'focus'
-  })
-
-  $('.copylink').click(event => {
-    var $temp = $('<input>')
-    $('body').append($temp)
-    $temp.val(event.target.getAttribute('data_href')).select()
-    document.execCommand('copy')
-    $temp.remove()
-  })
+    $('.copylink').click(event => {
+      var $temp = $('<input>')
+      $('body').append($temp)
+      $temp.val(event.target.getAttribute('data_href')).select()
+      document.execCommand('copy')
+      $temp.remove()
+    })
+  }, 1000)
 })
 
 $(function () {
   // popups
-
   setTimeout(() => {
     $('.container-popup').css('display', 'flex')
   }, 500)
@@ -100,17 +90,10 @@ $(function () {
     setTimeout(() => {
       document.location = `${href}?popup=1`
     }, 500)
-
-    // DEV
-    // window.setCookie('popup_closed', '1', 0.000231481) // Caso o usuário clique em um popup, fica 20s sem mostrar popups
-    // window.setCookie(`popup_viewed_${pk}`, pk, 0.000462963) // Caso o usuário clique em um popup, 40s sem mostrar esse popup
   })
 
   $('.container-popup .btn-close').click(event => {
     window.setCookie('popup_closed', '1', 0.2) // 20s -> 0.000231481d // 2h24min -> 0.1d
     $('.container-popup').remove()
-
-    // DEV
-    // window.setCookie('popup_closed', '1', 0.001388889) // 2min
   })
 })
