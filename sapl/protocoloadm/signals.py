@@ -124,7 +124,7 @@ def docadm_pre_save_segmenta_download(sender, instance, using, **kwargs):
                 cc['zs'] += nd.texto_integral.size
                 zf[key]['da'].append(nd.id)
 
-            for da in nd.anexados.all():
+            for da in nd.anexados.order_by('id'):
                 tree_add_files(da, zf, cc)
 
             for daa in nd.documentoacessorioadministrativo_set.all():

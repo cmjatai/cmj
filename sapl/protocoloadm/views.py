@@ -308,7 +308,7 @@ class DocumentoAdministrativoCrud(Crud):
                         id__in=self.object.metadata['zipfile'][download]['da'])
                     daas = DocumentoAcessorioAdministrativo.objects.filter(
                         id__in=self.object.metadata['zipfile'][download]['daa'])
-                    for d in das:
+                    for d in das.order_by('id'):
                         if d.texto_integral:
                             file.write(
                                 d.texto_integral.original_path,
