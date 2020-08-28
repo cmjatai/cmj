@@ -115,6 +115,11 @@
 .text-maroon {
   color: #85144b !important;
 }
+.text-black-50 {
+  &:hover {
+    color: black !important;
+  }
+}
 
 
 .text-documentoadministrativo, .text-documentosadministrativos  {
