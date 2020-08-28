@@ -6,7 +6,7 @@ from django.dispatch.dispatcher import receiver
 
 from cmj.core.signals import send_mail
 from cmj.settings import EMAIL_SEND_USER
-from sapl.protocoloadm.models import Protocolo
+from sapl.protocoloadm.models import Protocolo, DocumentoAdministrativo
 from sapl.utils import create_barcode
 
 
@@ -74,3 +74,66 @@ def protocolo_pre_save(sender, instance, using, **kwargs):
                     e
 
                 ))
+
+
+@receiver(pre_save, sender=DocumentoAdministrativo, dispatch_uid='docadm_pre_save_segmenta_download')
+def docadm_pre_save_segmenta_download(sender, instance, using, **kwargs):
+    logger = logging.getLogger(__name__)
+
+    import inspect
+    funcs = list(filter(lambda x: x == 'revision_pre_delete_signal',
+                        map(lambda x: x[3], inspect.stack())))
+
+    if funcs:
+        return
+
+    md = instance.metadata if instance.metadata else {}
+
+    # print(md)
+
+    md['zipfile'] = {}
+
+    zf = md['zipfile']
+
+    zip_num = 1
+    zip_size = 0
+
+    zf['{:03d}'.format(zip_num)] = {
+        'da': [],
+        'daa': [],
+    }
+    counts = {
+        'zn': 1,
+        'zs': 0
+    }
+
+    def tree_add_files(nd, zf, cc):
+
+        key = '{:03d}'.format(cc['zn'])
+        if cc['zs'] > (1024 ** 3):  # 1GB
+            cc['zn'] += 1
+            key = '{:03d}'.format(cc['zn'])
+            cc['zs'] = 0
+            zf[key] = {
+                'da': [],
+                'daa': [],
+            }
+
+        if hasattr(nd, 'texto_integral'):
+            if nd.texto_integral:
+                cc['zs'] += nd.texto_integral.size
+                zf[key]['da'].append(nd.id)
+
+            for da in nd.anexados.all():
+                tree_add_files(da, zf, cc)
+
+            for daa in nd.documentoacessorioadministrativo_set.all():
+                tree_add_files(daa, zf, cc)
+
+        elif hasattr(nd, 'arquivo'):
+            if nd.arquivo:
+                cc['zs'] += nd.arquivo.size
+                zf[key]['daa'].append(nd.id)
+
+    tree_add_files(instance, zf, counts)
+    instance.metadata = md

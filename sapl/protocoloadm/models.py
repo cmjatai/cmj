@@ -379,7 +379,6 @@ class DocumentoAdministrativo(CountPageMixin):
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
-        print(self)
         if not self.pk and self.texto_integral:
             texto_integral = self.texto_integral
             self.texto_integral = None

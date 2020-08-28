@@ -54,14 +54,14 @@ class Command(BaseCommand):
             dispatch_uid='cmj_pre_save_signed_sapl_protocoloadm_documentoadministrativo')
 
         #self.logger = logging.getLogger(__name__)
-        return
         docs = DocumentoAdministrativo.objects.all()
 
         for d in docs:
-            p = d.protocolo_gr.first()
-            if p:
-                d.email = p.email
-                d.save()
+            #p = d.protocolo_gr.first()
+            # if p:
+            #    d.email = p.email
+            print(d.id, d)
+            d.save()
 
     def run_add_selo_protocolo(self):
 
