@@ -29,7 +29,7 @@
   <tbody>
     {% for vinculo in vinculados%}
     <tr>
-      <td>{{vinculo.parlamentar}}</td>
+      <td>{{vinculo.parlamentar}} - {{vinculo.parlamentar.filiacao_set.first.partido.sigla}}</td>
       <td>{{vinculo.cargo}}</td>
       <td>{{vinculo.data_inicio}}</td>
       <td>{% if vinculo.data_fim %}{{vinculo.data_fim}}{% endif %}</td>

@@ -82,23 +82,24 @@ class BlocoCrud(Crud):
     public = [RP_DETAIL, RP_LIST]
 
     class BaseMixin(Crud.BaseMixin):
-        list_field_names = ('nome', 'partidos', 'cargoblocopartido_set',
+        list_field_names = ('nome', 'cargoblocopartido_set',
                             'data_criacao', 'data_extincao',)
 
     class ListView(Crud.ListView):
 
         def hook_header_cargoblocopartido_set(self):
-            return "Parlamentares"
+            return "Parlamentares - Cargo - Partido"
 
         def hook_cargoblocopartido_set(self, *args, **kwargs):
-            parlamentares = args[0].cargoblocopartido_set.all()
+            cbp = args[0].cargoblocopartido_set.order_by('id')
             ul = []
-            for p in parlamentares:
+            for b in cbp:
                 ul.append(
-                    '<li><a href="{}">{}</a></li>'.format(
+                    '<li><a href="{}">{} - {}</a></li>'.format(
                         reverse('sapl.parlamentares:parlamentar_detail',
-                                kwargs={'pk': p.parlamentar.id}),
-                        p
+                                kwargs={'pk': b.parlamentar.id}),
+                        b,
+                        b.parlamentar.filiacao_set.first().partido.sigla
                     )
                 )
 
