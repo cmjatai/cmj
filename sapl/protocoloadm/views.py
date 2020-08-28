@@ -289,46 +289,43 @@ class DocumentoAdministrativoCrud(Crud):
         def get(self, request, *args, **kwargs):
             self.object = self.get_object()
 
-            if 'download' in request.GET:
-                return self.monta_zip()
+            try:
+                download = request.GET.get('download', '')
+                if download:
+                    return self.monta_zip(download)
+            except:
+                messages.warning(request, 'Referência incorreta!')
 
             context = self.get_context_data(object=self.object)
             return self.render_to_response(context)
 
-        def monta_zip(self):
+        def monta_zip(self, download):
 
             with tempfile.SpooledTemporaryFile(max_size=512000000) as tmp:
 
-                with zipfile.ZipFile(tmp, 'w', zipfile.ZIP_DEFLATED) as file:
+                with zipfile.ZipFile(tmp, 'w') as file:
+                    das = DocumentoAdministrativo.objects.filter(
+                        id__in=self.object.metadata['zipfile'][download]['da'])
+                    daas = DocumentoAcessorioAdministrativo.objects.filter(
+                        id__in=self.object.metadata['zipfile'][download]['daa'])
+                    for d in das:
+                        if d.texto_integral:
+                            file.write(
+                                d.texto_integral.original_path,
+                                arcname='DA-%s-%s' % (
+                                    d.id,
+                                    d.texto_integral.original_path.split(
+                                        '/')[-1]))
+                    for d in daas:
+                        if d.arquivo:
+                            file.write(
+                                d.arquivo.original_path,
+                                arcname='DA-%s-DAA-%s-%s' % (
+                                    d.documento.id,
+                                    d.id,
+                                    d.arquivo.original_path.split(
+                                        '/')[-1]))
 
-                    def tree_add_files(obj):
-                        if hasattr(obj, 'texto_integral'):
-                            print(obj.id, obj)
-                            if obj.texto_integral:
-                                file.write(
-                                    obj.texto_integral.original_path,
-                                    arcname='DA-%s-%s' % (
-                                        obj.id,
-                                        obj.texto_integral.original_path.split(
-                                            '/')[-1]))
-
-                            for item in obj.documento_principal_set.childs_anexados():
-                                tree_add_files(item.documento_anexado)
-
-                            for item in obj.documentoacessorioadministrativo_set.all():
-                                tree_add_files(item)
-
-                        elif hasattr(obj, 'arquivo'):
-                            if obj.arquivo:
-                                file.write(
-                                    obj.arquivo.original_path,
-                                    arcname='DA-%s-DAA-%s-%s' % (
-                                        obj.documento.id,
-                                        obj.id,
-                                        obj.arquivo.original_path.split(
-                                            '/')[-1]))
-
-                    tree_add_files(self.object)
                 tmp.seek(0)
                 response = HttpResponse(tmp.read(),
                                         content_type='application/zip')
@@ -337,10 +334,11 @@ class DocumentoAdministrativoCrud(Crud):
                 response['Pragma'] = 'no-cache'
                 response['Expires'] = 0
                 response['Content-Disposition'] = \
-                    'inline; filename=%s-%s-%s.zip' % (
+                    'inline; filename=%s-%s-%s-%s.zip' % (
                         self.object.tipo.sigla,
                         self.object.numero,
-                        self.object.ano)
+                        self.object.ano,
+                        download)
 
                 return response
 

@@ -61,8 +61,21 @@
                   {% endif %}
 
                   {% if not d.documento_anexado_set.exists and d.documento_principal_set.exists %}
-                    <a class="float-right p-1 text-black-50" title="Download de todo o processo" href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' d.id%}?download"><i class="fas fa-2x fa-download"></i></a>
-                  {% endif %}
+
+                    <div class="float-right p-1 d-inline-flex">
+                      {% with d.metadata.zipfile.keys|length as zip_count %}
+                        {% for zn in d.metadata.zipfile.keys %}
+                          <a class="text-black-50"
+                          title="{% if zip_count > 1 %}Foi necessário segmentar o download dos arquivos do processo. Baixar parte {{forloop.counter}} de {{zip_count}}{% else %}Baixar arquivo compactado contendo todos os arquivos do processo.{% endif %}"
+                          href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' d.id%}?download={{zn}}">
+                          <i class="fas fa-2x fa-download">{% if zip_count > 1%}{{forloop.counter}}{% endif %}</i>
+                          </a>
+                        {% endfor %}
+                      {% endwith %}
+                    </div>
+
+
+                   {% endif %}
 
                   <div class="links-texto">
                     {% if d.texto_integral %}
