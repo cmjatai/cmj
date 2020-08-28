@@ -379,7 +379,7 @@ class DocumentoAdministrativo(CountPageMixin):
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
-
+        print(self)
         if not self.pk and self.texto_integral:
             texto_integral = self.texto_integral
             self.texto_integral = None
@@ -389,10 +389,12 @@ class DocumentoAdministrativo(CountPageMixin):
                               update_fields=update_fields)
             self.texto_integral = texto_integral
 
-        return models.Model.save(self, force_insert=force_insert,
-                                 force_update=force_update,
-                                 using=using,
-                                 update_fields=update_fields)
+        r = models.Model.save(self, force_insert=force_insert,
+                              force_update=force_update,
+                              using=using,
+                              update_fields=update_fields)
+
+        return r
 
 
 @reversion.register()

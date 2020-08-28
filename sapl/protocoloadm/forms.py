@@ -1527,6 +1527,17 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
             anexacao.data_anexacao = timezone.localdate()
             anexacao.save()
 
+            def ultima_atualizacao_raiz(obj):
+                anx = obj.documento_anexado_set.all()
+
+                if anx.exists():
+                    for a in anx:
+                        ultima_atualizacao_raiz(a.documento_principal)
+                else:
+                    obj.save()
+
+            ultima_atualizacao_raiz(doc_anexador)
+
         return documento
 
     def __init__(self, *args, **kwargs):
