@@ -274,11 +274,14 @@
 
   {% block widgets_form_js %}{% endblock widgets_form_js %}
 
-  {% if not DEBUG %}
+  {% if not DEBUG or True %}
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-2431536-7"></script>
     <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
     <script>
-      new window.VLibras.Widget('https://vlibras.gov.br/app');
+
+      {% if not perms.materia %}
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+      {% endif %}
 
       window.fbAsyncInit = function () {
         FB.init({
