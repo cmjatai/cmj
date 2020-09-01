@@ -1,15 +1,15 @@
 {% extends "compilacao/textoarticulado_detail.html" %}
 {% load i18n %}
 {% load compilacao_filters %}
-{% load common_tags %}
+{% load common_tags common_cmj_tags %}
 {% block head_title %}{{object}}{% endblock head_title %}
 {% block meta_description%}{% if object.content_object %}{{object.content_object.ementa}}{% else %}{{object}}{% endif %}{% endblock meta_description %}
 {% block base_container_header %}
-  {% if object.content_object and object.content_object|model_name == 'norma.NormaJuridica' and not object.content_object|has_perm_change_instance:perms  %}
+  {% if object.content_object and object.content_object|meta_model_value:'label' == 'norma.NormaJuridica' and not object.content_object|has_perm_change_instance:perms  %}
     {% with object.content_object as n %}
       {% include 'compilacao/normajuridica_widget_top.html' %}
     {% endwith %}
-  {% else %} 
+  {% else %}
     {{ block.super }}
   {% endif %}
 {% endblock base_container_header %}
@@ -18,7 +18,7 @@
   {{ block.super }}
   {% include 'compilacao/text_list__embedded.html'%}
 
-  {% if object.content_object and object.content_object|model_name == 'norma.NormaJuridica' and not object.content_object|has_perm_change_instance:perms  %}
+  {% if object.content_object and object.content_object|meta_model_value:'label' == 'norma.NormaJuridica' and not object.content_object|has_perm_change_instance:perms  %}
     {% with object.content_object as n %}
       {% include 'compilacao/normajuridica_widget_bottom.html' %}
     {% endwith %}

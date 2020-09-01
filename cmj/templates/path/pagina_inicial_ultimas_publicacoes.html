@@ -1,4 +1,4 @@
-{% load i18n sigad_filters social_utils common_tags%}
+{% load i18n sigad_filters social_utils common_cmj_tags%}
 <div class="container-ultimas-publicacoes">
   <h2 class="title-container-noticias">Últimas Publicações</h2>
   {% for cert in ultimas_publicacoes%}
@@ -7,16 +7,15 @@
         {{ cert.content_object|meta_model_value:'verbose_name' }}
       </small>
       <div class="inner">
-        {% if cert.content_object|model_name == 'norma.NormaJuridica' %}
+        {% if cert.content_object|meta_model_value:'label' == 'norma.NormaJuridica' %}
           {% with cert.content_object as n %}
             {% include 'norma/normajuridica_widget_list.html' %}
           {% endwith %}
-        {% elif cert.content_object|model_name == 'protocoloadm.DocumentoAdministrativo' %}
+        {% elif cert.content_object|meta_model_value:'label' == 'protocoloadm.DocumentoAdministrativo' %}
 
           {% with cert.content_object as doc_adm %}
             {% include 'protocoloadm/documentoadministrativo_widget_list.html' %}
           {% endwith %}
-
 
         {% endif %}
       </div>

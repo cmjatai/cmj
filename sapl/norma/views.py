@@ -103,7 +103,7 @@ class NormaPesquisaView(FilterView):
     def get_context_data(self, **kwargs):
         context = super(NormaPesquisaView, self).get_context_data(**kwargs)
 
-        context['title'] = _('Pesquisa Parametrizada de Normas Jurídicas')
+        context['title'] = _('Pesquisa de Normas Jurídicas')
         context['bg_title'] = 'bg-green text-white'
 
         self.filterset.form.fields['o'].label = _('Ordenação')

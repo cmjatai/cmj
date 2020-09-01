@@ -484,9 +484,9 @@ class ProtocoloDocumentForm(ModelForm):
             (Div(), 1),
             (Alert(
                 """
-                Usuário: <strong>{}</strong> - {}<br> 
+                Usuário: <strong>{}</strong> - {}<br>
                 IP: <strong>{}</strong> - {}<br>
-                
+
                 """.format(
                     kwargs['initial']['user_data_hora_manual'],
                     Protocolo._meta.get_field(
@@ -606,9 +606,9 @@ class ProtocoloDocumentoAcessorioForm(ModelForm):
             (Div(), 1),
             (Alert(
                 """
-                Usuário: <strong>{}</strong> - {}<br> 
+                Usuário: <strong>{}</strong> - {}<br>
                 IP: <strong>{}</strong> - {}<br>
-                
+
                 """.format(
                     kwargs['initial']['user_data_hora_manual'],
                     Protocolo._meta.get_field(
@@ -797,9 +797,9 @@ class ProtocoloMateriaForm(ModelForm):
             (Div(), 2),
             (Alert(
                 """
-                Usuário: <strong>{}</strong> - {}<br> 
+                Usuário: <strong>{}</strong> - {}<br>
                 IP: <strong>{}</strong> - {}<br>
-                
+
                 """.format(
                     kwargs['initial']['user_data_hora_manual'],
                     Protocolo._meta.get_field(
@@ -1282,7 +1282,7 @@ class AnexadoEmLoteFilterSet(django_filters.FilterSet):
         self.form.helper = SaplFormHelper()
         self.form.helper.form_method = 'GET'
         self.form.helper.layout = SaplFormLayout(
-            Fieldset(_('Pesquisa de Documentos'),
+            Fieldset(_('Pesquisa Parametrizada'),
                      row1, row2, ),
 
             save_label=_('Pesquisar')

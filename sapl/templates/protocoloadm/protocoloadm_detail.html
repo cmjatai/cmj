@@ -1,6 +1,6 @@
 {% extends "crud/detail.html" %}
 {% load i18n %}
-{% load crispy_forms_tags common_cmj_tags %}  
+{% load crispy_forms_tags common_cmj_tags %}
 
 {% block base_workspace %}
   <div class="box-area-trabalho">
@@ -30,7 +30,7 @@
 
     <div class="actions btn-group btn-group-sm" role="group">
       <a href="{{url_protocolar_docadm}}" class="btn btn-outline-primary {% if request.scope.path == url_protocolar_docadm %}active{% endif %}">{% trans 'Protocolar Documento Administrativo' %}</a>
-      
+
     </div>
     <div class="actions btn-group btn-group-sm" role="group">
       <a href="{% url 'sapl.protocoloadm:anular_protocolo' %}" class="btn btn-outline-danger">{% trans 'Anular Protocolo' %}</a>

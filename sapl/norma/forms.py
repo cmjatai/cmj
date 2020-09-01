@@ -98,7 +98,7 @@ class NormaFilterSet(django_filters.FilterSet):
         self.form.helper.layout = Layout(
             Fieldset(_(
                 '''
-                Pesquisa de Norma<br>
+                Pesquisa Parametrizada<br>
                 <small>
                 <strong class="text-red">TODOS OS CAMPOS SÃO OPCIONAIS!</strong>
                 </small>

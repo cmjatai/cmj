@@ -1,0 +1,39 @@
+{% load i18n common_cmj_tags %}
+
+<form method="get" action="{% url 'cmj.core:haystack_search'%}">
+  <div class="row mt-n{% if perms.materia or perms.norma %}4{% else %}5{% endif %}">
+    <div class="col-md-2">
+      <div>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <div class="container-search">
+        <div class="form-group">
+          <div>
+            <div class="input-group">
+              <input type="hidden" class="custom-control-input" name="models" id="id_models_4" value="{{view.model|meta_model_value:'label_lower'}}">
+              <input type="hidden" class="custom-control-input" name="fix_model" id="fix_model" value="1">
+              <input type="search" name="q" placeholder="Busca Textual" class="textinput textInput form-control" id="id_q">
+              <span class="input-group-append">
+                <button class="btn btn-outline-primary" type="submit">
+                  <i class="fas fa-2x fa-search"></i>
+                </button>
+              </span>
+            </div>
+              <small id="hint_id_ementa" class="float-right form-text text-muted text-red">
+                Para busca textual vc deve clicar na lupa acima para processar sua pesquisa!
+              </small>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-2 align-items-center d-flex">
+      <a class="btn btn-warning btn-ajuda" data-toggle="collapse" href="#collapseAjudaBuscaTextual" role="button" aria-expanded="false" aria-controls="collapseAjudaBuscaTextual">
+        ?
+      </a>
+    </div>
+  </div>
+    {% with 'Na Busca Textual a pesquisa é feita dentro dos documentos através de uma ferramenta sofisticada que leva em consideração as técnicas de escrita da lingua portuguesa. <strong>Experimente!</strong><br> No entanto, se você está buscando um conteúdo específico, como por exemplo uma Matéria em tramitação, então a pesquisa parametrizada pode ser o ideal.' as help_extra %}
+      {% include 'search/search_help_text.html' %}
+    {% endwith %}
+</form>

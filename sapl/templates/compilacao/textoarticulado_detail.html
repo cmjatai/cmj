@@ -1,7 +1,7 @@
 {% extends "compilacao/base_compilacao.html" %}
 {% load i18n %}
 {% load compilacao_filters %}
-{% load common_tags %}
+{% load common_tags common_cmj_tags %}
 {% load static %}
 {% load webpack_static from webpack_loader %}
 
@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block base_content %}
-  
+
   {% block actions %}
     {% if perms.compilacao.change_textoarticulado %}
     <div class="context-actions justify-content-between mb-4">
@@ -21,7 +21,7 @@
         {% if object|can_use_dynamic_editing:user %}
           <a href="{% url 'sapl.compilacao:ta_text_edit' object.pk %}" class="btn btn-outline-primary">{% trans 'Editar Texto' %}</a>
         {% endif %}
-        
+
         {% if object.editing_locked %}
           {% if perms.compilacao.unlock_textoarticulado and not object.editable_only_by_owners%}
             <a href="{% url 'sapl.compilacao:ta_text_edit' object.pk %}?{% if object.editing_locked %}unlock{%else%}lock{% endif %}"
@@ -31,7 +31,7 @@
           {% endif %}
         {% else %}
           {% if perms.compilacao.lock_textoarticulado and not object.editable_only_by_owners%}
-            <a href="{% url 'sapl.compilacao:ta_text_edit' object.pk %}?{% if object.editing_locked %}unlock{%else%}lock{% endif %}" 
+            <a href="{% url 'sapl.compilacao:ta_text_edit' object.pk %}?{% if object.editing_locked %}unlock{%else%}lock{% endif %}"
               class="btn {% if object.editing_locked %}btn-danger{%else%}btn-outline-primary{% endif %}">
                 {% trans 'Publicar Texto' %}
                 </a>
@@ -44,8 +44,8 @@
 
   {% block detail_content %}
 
-    {% if object.content_object and object.content_object|model_name == 'norma.NormaJuridica'  and not object.content_object|has_perm_change_instance:perms  %}
-    
+    {% if object.content_object and object.content_object|meta_model_value:'label' == 'norma.NormaJuridica'  and not object.content_object|has_perm_change_instance:perms  %}
+
     {% else %}
       <fieldset class="hidden-print">
           <legend>{%trans 'Identificação Básica'%}</legend>

@@ -7,22 +7,8 @@
 
 {% block actions %}
   <div class="actions btn-group" role="group">
-    <a href="{% url 'sapl.base:haystack_search' %}?q=&models=protocoloadm.documentoadministrativo"
-        class="btn btn-outline-primary">
-       Mudar para Pesquisa Textual
-    </a>
-    <button type="button"
-        class="btn btn-warning"
-        data-trigger="focus"
-        data-container="body"
-        data-toggle="popover"
-        data-placement="top"
-        title="Sobre a Pesquisa Textual"
-        data-content="Pesquisa Textual é diferente desta pesquisa em que escolhemos filtros específicos, uma pesquisa parametrizada. Na Pesquisa Textual é buscado conteúdo dentro dos documentos através de uma ferramenta sofisticada que leva em consideração as técnicas de escrita da lingua portuguesa. Experimente! No entanto, se você está buscando um conteúdo específico, como por exemplo um Processo em andamento, então a pesquisa parametrizada pode ser o ideal.">
-      ?
-    </button >
     {% if show_results %}
-      <a href="{% url 'sapl.protocoloadm:documentoadministrativo_list' %}" class="btn btn-outline-primary">{% trans 'Fazer nova Pesquisa Parametrizada' %}</a>
+      <a href="{% url 'sapl.protocoloadm:documentoadministrativo_list' %}" class="btn btn-outline-primary">{% trans 'Fazer nova pesquisa' %}</a>
     {% endif %}
   </div>
   <div class="actions btn-group btn-group-lg" role="group">
@@ -35,7 +21,11 @@
 {% endblock actions %}
 
 {% block detail_content %}
-  {% if not show_results %} {% crispy filter.form %} {% endif %}
+  {% if not show_results %}
+    {% include 'search/search_widget.html' %}
+    <hr>
+    {% crispy filter.form %}
+  {% endif %}
 {% endblock detail_content %}
 
 {% block table_content %}
@@ -73,9 +63,7 @@
                         {% endfor %}
                       {% endwith %}
                     </div>
-
-
-                   {% endif %}
+                  {% endif %}
 
                   <div class="links-texto">
                     {% if d.texto_integral %}

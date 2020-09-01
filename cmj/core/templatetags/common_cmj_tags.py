@@ -89,6 +89,11 @@ def model_verbose_name_plural(class_name):
 
 
 @register.filter
+def meta_model_value(instance, attr):
+    return getattr(instance._meta, attr)
+
+
+@register.filter
 def lookup(d, key):
     return d[key] if key in d else []
 

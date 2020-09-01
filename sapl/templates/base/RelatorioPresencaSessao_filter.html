@@ -41,7 +41,7 @@
         <tr class="active">
           <th>(Qtd Presente)</th>
           <th>(Qtde Afastado)</th>
-          <th>( % )</th> 
+          <th>( % )</th>
           {% if exibir_ordem %}
             <th>(Qtd Presente)</th>
             <th>(Qtde Afastado)</th>
@@ -58,7 +58,7 @@
             <td>{{p.sessao_count}}</td>
             <td>{{p.sessao_afast}}</td>
             <td>{{p.sessao_porc}}</td>
-            {% if exibir_ordem %} 
+            {% if exibir_ordem %}
               <td>{{p.ordemdia_count}}</td>
               <td>{{p.ordem_afast}}</td>
               <td>{{p.ordemdia_porc}}</td>
@@ -80,9 +80,9 @@
     $.each($("#id_sessao_legislativa").children(), function(idx, obj) {
       original_options.push($(obj));
     });
-    
+
     $('#id_legislatura').change(function(event) {
-      
+
       let legislatura = $("#id_legislatura").val();
       var json_data = {
         legislatura : legislatura,
@@ -112,7 +112,7 @@
         $("#id_sessao_legislativa").children().first().attr('selected', true);
       }
     })
-  
+
   });
 
 </script>
