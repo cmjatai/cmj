@@ -1,4 +1,4 @@
-{% load i18n staticfiles%}
+{% load i18n staticfiles common_cmj_tags cropping%}
 {% load webpack_static from webpack_loader %}
 
 <link rel="manifest" href="/manifest.json">
@@ -12,7 +12,7 @@
 <meta property="og:site_name" content="Portal da Câmara Municipal de Jataí - Goiás">
 
 {% if request.path == '/' %}
-  <meta property="og:url" content="https://{{request.get_host}}"> 
+  <meta property="og:url" content="https://{{request.get_host}}">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Portal CMJ - Câmara Municipal de Jataí">
   <meta property="og:description" content="Portal CMJ - Fonte de informações a respeito dos atos do poder legislativo do município de Jataí, na microrregião Sudoeste do Estado de Goiás.">
@@ -71,6 +71,18 @@
 
       <meta property="og:image:width" content="{{object.referenciado.midia.last.width}}">
       <meta property="og:image:height" content="{{object.referenciado.midia.last.height}}">
+    {% endif %}
+  {% endwith %}
+{% endif %}
+
+
+{% if object.autores.count == 1 %}
+  {% with object.autores.first.autor_related as autor %}
+    {% if autor|meta_model_value:'label' == 'parlamentares.Parlamentar' %}
+      <meta property="og:image:type" content="image/jpeg">
+      <meta property="og:image" content="https://{{request.get_host}}{% cropped_thumbnail autor "fotografia_cropping" width=128 %}">
+      <meta property="og:image:width" content="128">
+      <meta property="og:image:height" content="128">
     {% endif %}
   {% endwith %}
 {% endif %}

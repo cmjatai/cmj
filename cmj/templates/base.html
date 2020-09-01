@@ -11,7 +11,7 @@
     <meta name="theme-color" content="#006556">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{% if user|notificacoes_unread_count %}({{user|notificacoes_unread_count}}) {% endif %}{% block head_title %}{% trans 'Câmara Jataí' %}{% endblock %} - Portal da Câmara Municipal de Jataí - Estado de Goiás</title>
+    <title>{% if user|notificacoes_unread_count %}({{user|notificacoes_unread_count}}) {% endif %}{% block head_title %}{% trans 'Câmara Jataí' %}{% endblock %} - {% block head_title_sufix %}Portal da Câmara Municipal de Jataí - Estado de Goiás{% endblock head_title_sufix %}</title>
     <meta name="description" content="{% block meta_description %}Portal CMJ - Fonte de informações a respeito dos atos do poder legislativo do município de Jataí, na microrregião Sudoeste do Estado de Goiás.{% endblock meta_description %}">
 
     {% block meta_tags %}
