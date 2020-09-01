@@ -78,6 +78,10 @@ def protocolo_pre_save(sender, instance, using, **kwargs):
 
 @receiver(pre_save, sender=DocumentoAdministrativo, dispatch_uid='docadm_pre_save_segmenta_download')
 def docadm_pre_save_segmenta_download(sender, instance, using, **kwargs):
+
+    if not instance.id:
+        return
+
     logger = logging.getLogger(__name__)
 
     import inspect
