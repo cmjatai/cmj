@@ -4,10 +4,16 @@
 
 {% block title %}
   <h1 class="page-header container-search" >
+
+
     Pesquisa Textual
         {% if request.GET.fix_model %}
           em {% model_verbose_name_plural request.GET.models %}
         {% endif %}
+        {% if request.POST.fix_model %}
+          em {% model_verbose_name_plural request.POST.models %}
+        {% endif %}
+
       <a class="btn btn-warning btn-ajuda" data-toggle="collapse" href="#collapseAjudaBuscaTextual" role="button" aria-expanded="false" aria-controls="collapseAjudaBuscaTextual">
         ?
       </a>
@@ -16,12 +22,12 @@
 
 {% block base_content %}
 <div class="container-search">
-  <form method="get" action=".">
+  <form method="post" action=".">
     {% include 'search/search_help_text.html' %}
     <div class="row">
       {% crispy form %}
     </div>
-    {% if not request.GET.fix_model %}
+    {% if not request.GET.fix_model and not request.POST.fix_model %}
       <div class="row">
         <div class="col-md-5 ">
           <div class="checkbox" id="check_all">

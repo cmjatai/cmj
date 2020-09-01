@@ -48,7 +48,7 @@ class CmjSearchForm(ModelSearchForm):
 
         self.helper = FormHelper()
         self.helper.form_tag = False
-        self.helper.disable_csrf = True
+        self.helper.form_method = 'post'
         self.helper.layout = Layout(*row)
 
         super().__init__(*args, **kwargs)
@@ -131,7 +131,8 @@ class CmjSearchView(SearchView):
         user = self.request.user
         kwargs = {
             'workspaces': None,
-            'user': user
+            'user': user,
+            'load_all': self.load_all,
         }
 
         if not user.is_anonymous and user.areatrabalho_set.exists():
@@ -146,16 +147,25 @@ class CmjSearchView(SearchView):
         if form_kwargs:
             kwargs.update(form_kwargs)
 
-        form = SearchView.build_form(self, form_kwargs=kwargs)
+        data = self.request.GET or self.request.POST
 
-        return form
+        if self.searchqueryset is not None:
+            kwargs['searchqueryset'] = self.searchqueryset
+
+        return self.form_class(data, **kwargs)
 
     def get_context(self):
         context = super().get_context()
         #context['title'] = _('Pesquisa Textual')
 
-        if 'models' in self.request.GET:
-            models = self.request.GET.getlist('models')
+        data = self.request.GET or self.request.POST
+
+        data = data.copy()
+        if 'csrfmiddlewaretoken' in data:
+            del data['csrfmiddlewaretoken']
+
+        if 'models' in data:
+            models = data.getlist('models')
         else:
             models = []
 
@@ -168,11 +178,11 @@ class CmjSearchView(SearchView):
         context['page_range'] = make_pagination(
             page_obj.number, paginator.num_pages)
 
-        qr = self.request.GET.copy()
-        if 'page' in qr:
-            del qr['page']
+        if 'page' in data:
+            del data['page']
+
         context['filter_url'] = (
-            '&' + qr.urlencode()) if len(qr) > 0 else ''
+            '&' + data.urlencode()) if len(data) > 0 else ''
 
         for m in models:
             context['models'] = context['models'] + '&models=' + m
