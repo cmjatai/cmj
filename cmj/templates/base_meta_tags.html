@@ -75,14 +75,19 @@
   {% endwith %}
 {% endif %}
 
-
-{% if object.autores.count == 1 %}
-  {% with object.autores.first.autor_related as autor %}
-    {% if autor|meta_model_value:'label' == 'parlamentares.Parlamentar' %}
-      <meta property="og:image:type" content="image/jpeg">
-      <meta property="og:image" content="https://{{request.get_host}}{% cropped_thumbnail autor "fotografia_cropping" width=128 %}">
-      <meta property="og:image:width" content="128">
-      <meta property="og:image:height" content="128">
-    {% endif %}
-  {% endwith %}
+{% if object|meta_model_value:'label' == 'materia.MateriaLegislativa' %}
+  <meta property="og:url" content="https://{{request.get_host}}{% url 'sapl.materia:materialegislativa_detail' object.id %}">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{{object}} - Portal CMJ">
+  <meta property="og:description" content="{{object.ementa}}">
+  {% if object.autores.count == 1 %}
+    {% with object.autores.first.autor_related as autor %}
+      {% if autor|meta_model_value:'label' == 'parlamentares.Parlamentar' %}
+        <meta property="og:image:type" content="image/jpeg">
+        <meta property="og:image" content="https://{{request.get_host}}{% cropped_thumbnail autor "fotografia_cropping" width=128 %}">
+        <meta property="og:image:width" content="128">
+        <meta property="og:image:height" content="128">
+      {% endif %}
+    {% endwith %}
+  {% endif %}
 {% endif %}
