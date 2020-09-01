@@ -1,4 +1,5 @@
 from datetime import datetime
+from distutils.util import strtobool
 import io
 import logging
 from random import choice
@@ -405,6 +406,11 @@ class DocumentoAdministrativoCrud(Crud):
             context['title'] = _(
                 'Pesquisa de Documentos Administrativos')
             context['bg_title'] = 'bg-aqua text-white'
+
+            mostrar_anexos = self.request.GET.get('mostrar_anexos', '0')
+            mostrar_anexos = strtobool(mostrar_anexos)
+
+            context['mostrar_anexos'] = mostrar_anexos
 
             qr = self.request.GET.copy()
 

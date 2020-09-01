@@ -30,7 +30,8 @@ from sapl.utils import (RANGE_ANOS, YES_NO_CHOICES, AnoNumeroOrderingFilter,
                         choice_anos_com_documentoadministrativo,
                         FilterOverridesMetaMixin, choice_anos_com_materias,
                         FileFieldCheckMixin, lista_anexados,
-                        DocumentoAdministrativoOrderingFilter)
+                        DocumentoAdministrativoOrderingFilter,
+                        qs_override_django_filter)
 
 from .models import (AcompanhamentoDocumento, DocumentoAcessorioAdministrativo,
                      DocumentoAdministrativo,
@@ -187,6 +188,13 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
         method='filter_numero'
     )
 
+    mostrar_anexos = forms.ChoiceField(
+        required=False,
+        choices=YES_NO_CHOICES,
+        label=_('Incluir anexos?'),
+        initial=False
+    )
+
     class Meta(FilterOverridesMetaMixin):
         model = DocumentoAdministrativo
         fields = ['tipo',
@@ -230,8 +238,9 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
 
         row3 = to_row(
             [('interessado', 4),
-             ('assunto', 4),
-             ('signeds', 4)])
+             ('assunto', 3),
+             ('signeds', 3),
+             ('mostrar_anexos', 2)])
 
         row4 = to_row(
             [
@@ -267,6 +276,8 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
                 buttons,)
         )
 
+        self.form.fields['mostrar_anexos'] = self.mostrar_anexos
+
     def filter_signeds(self, queryset, name, value):
         q = Q()
 
@@ -294,8 +305,12 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
 
         return qs
 
-    def filter_queryset(self, queryset):
-        qs = django_filters.FilterSet.filter_queryset(self, queryset)
+    @property
+    def qs(self):
+        qs = qs_override_django_filter(self)
+
+        if not hasattr(self.form, 'cleaned_data'):
+            return qs
 
         cd = self.form.cleaned_data
 
@@ -304,7 +319,7 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
         if first and first.workspace.tipo == AreaTrabalho.TIPO_PUBLICO:
             raiz = True
             for k, v in cd.items():
-                if v:
+                if v and k != 'mostrar_anexos':
                     raiz = False
                     break
 
