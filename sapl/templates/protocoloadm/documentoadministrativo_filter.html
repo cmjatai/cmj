@@ -115,8 +115,6 @@
                         <br><a class="btn btn-sm btn-outline-primary" href="{% url 'sapl.protocoloadm:acompanhar_documento' d.id %}">Acompanhar Tramitação</a>
                       {% endif %}
                     {% endif %}
-
-
                     {% define d.documentoacessorioadministrativo_set.all as acess %}
                     {% if d.documentoacessorioadministrativo_set.all.exists %}
                         <br><strong>Documentos Acessórios:</strong>
