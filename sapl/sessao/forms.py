@@ -449,9 +449,10 @@ class VotacaoForm(forms.Form):
 
         super().__init__(*args, **kwargs)
 
-        self.fields['subscricoes'].choices = [
-            (p.id, p.nome_parlamentar) for p in kwargs['initial']['subscricoes_choice']
-        ]
+        if 'subscricoes_choice' in kwargs['initial']:
+            self.fields['subscricoes'].choices = [
+                (p.id, p.nome_parlamentar) for p in kwargs['initial']['subscricoes_choice']
+            ]
 
     def clean(self):
         cleaned_data = super(VotacaoForm, self).clean()
