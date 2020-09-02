@@ -449,7 +449,7 @@ class VotacaoForm(forms.Form):
 
         super().__init__(*args, **kwargs)
 
-        if 'subscricoes_choice' in kwargs['initial']:
+        if 'initial' in kwargs and 'subscricoes_choice' in kwargs['initial']:
             self.fields['subscricoes'].choices = [
                 (p.id, p.nome_parlamentar) for p in kwargs['initial']['subscricoes_choice']
             ]
