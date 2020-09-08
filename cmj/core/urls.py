@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.conf.urls import url, include
 from django.contrib.auth import views as v_auth
 from django.contrib.auth.decorators import permission_required, login_required
@@ -51,12 +52,6 @@ user_urlpatterns = [
     url(r'^logout/$', LogoutView.as_view(),
         {'next_page': '/'}, name='logout', ),
 
-    url(r'^channel$', chanel_index, name='channel_index'),
-    url(r'^channel/(?P<room_name>[^/]+)/$',
-        chanel_room, name='channel_room'),
-    url(r'^time-refresh/$',
-        time_refresh_log_test, name='time_refresh_log_test_index'),
-
     url(r'^online/',
         app_vue_view, name='app_vue_view_url'),
 
@@ -66,6 +61,17 @@ user_urlpatterns = [
     url(r'^sistema/search/', CmjSearchView(), name='haystack_search'),
 
 ]
+
+if settings.DEBUG:
+    user_urlpatterns += [
+        url(r'^channel$', chanel_index, name='channel_index'),
+
+        url(r'^channel/(?P<room_name>[^/]+)/$',
+            chanel_room, name='channel_room'),
+
+        url(r'^time-refresh/$',
+            time_refresh_log_test, name='time_refresh_log_test_index'),
+    ]
 
 
 urlpatterns = user_urlpatterns + [
