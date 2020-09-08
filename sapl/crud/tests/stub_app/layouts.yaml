@@ -1,7 +1,0 @@
-
-Country:
-  {% trans 'Basic Data' %}:
-  - name:9 continent
-  - population is_cold
-  {% trans 'More Details' %}:
-  - description
