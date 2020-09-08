@@ -1,9 +1,3 @@
-/*
-- App SaplFrontend - que será transformada em PWA.
-- Já possui comunicacão com o backend via websocket e contará
-com refresh online da tela do usuário.
-- atualmente invocada sobre o Sapl de layout tradicional via link /online
-*/
 
 import './__globals'
 import Vue from 'vue'

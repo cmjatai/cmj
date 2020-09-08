@@ -35,9 +35,6 @@ TEMPLATES = [
 
             ],
             'loaders': [
-                # Não troque a ordem, trocar a ordem faz, por exemplo,
-                # base.html do sapl ser lido primeiro que o base.html
-                # deste projeto
                 'cmj.utils.CmjLoader',
                 'django.template.loaders.app_directories.Loader'
             ]
