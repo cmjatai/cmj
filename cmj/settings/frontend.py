@@ -11,7 +11,7 @@ PROJECT_DIR = Path(__file__).ancestor(3)
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['cmj/templates', 'sapl/templates'],
+        'DIRS': ['_templates/v2', '_templates/v1'],
         'OPTIONS': {
             'debug': DEBUG,
             'context_processors': [
@@ -38,7 +38,7 @@ TEMPLATES = [
                 # Não troque a ordem, trocar a ordem faz, por exemplo,
                 # base.html do sapl ser lido primeiro que o base.html
                 # deste projeto
-                'django.template.loaders.filesystem.Loader',
+                'cmj.utils.CmjLoader',
                 'django.template.loaders.app_directories.Loader'
             ]
         },
