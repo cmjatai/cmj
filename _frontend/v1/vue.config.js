@@ -21,7 +21,7 @@ class RelativeBundleTrackerPlugin extends BundleTrackerPlugin {
 
 const dotenv = require('dotenv')
 dotenv.config({
-  path: '../cmj/.env'
+  path: '../../cmj/.env'
 })
 
 var HOST_NAME = 'localhost'

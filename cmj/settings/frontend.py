@@ -4,6 +4,7 @@ from unipath import Path
 
 config = AutoConfig()
 DEBUG = config('DEBUG', default=False, cast=bool)
+FRONTEND_VERSION = config('FRONTEND_VERSION', default='v1', cast=str)
 
 BASE_DIR = Path(__file__).ancestor(2)
 PROJECT_DIR = Path(__file__).ancestor(3)
@@ -55,7 +56,7 @@ WEBPACK_LOADER = {
     'DEFAULT': {
         'CACHE': not DEBUG,
         'BUNDLE_DIR_NAME': 'dist/',
-        'STATS_FILE': PROJECT_DIR.child('frontend').child('webpack-stats.json'),
+        'STATS_FILE': PROJECT_DIR.child('_frontend').child(FRONTEND_VERSION).child('webpack-stats.json'),
     }
 }
 
@@ -78,14 +79,14 @@ CHANNEL_LAYERS = {
 
 STATICFILES_DIRS = (
     # BASE_DIR.child('static'),
-    PROJECT_DIR.child('frontend').child('dist'),
+    PROJECT_DIR.child('_frontend').child(FRONTEND_VERSION).child('dist'),
 )
 
 # apenas para debug - na produção nginx deve entregar sw
 PWA_SERVICE_WORKER_PATH = PROJECT_DIR.child(
-    'frontend').child('dist').child('service-worker.js')
+    '_frontend').child(FRONTEND_VERSION).child('dist').child('service-worker.js')
 PWA_MANIFEST_PATH = PROJECT_DIR.child(
-    'frontend').child('dist').child('manifest.json')
+    '_frontend').child(FRONTEND_VERSION).child('dist').child('manifest.json')
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
