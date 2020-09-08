@@ -13,6 +13,7 @@ from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.db import connection
+from django.template.loaders.filesystem import Loader
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from easy_thumbnails import source_generators
@@ -512,3 +513,9 @@ class ProcessoExterno(object):
 
         self.logger.info(self.process.returncode)
         return self.process.returncode
+
+
+class CmjLoader(Loader):
+
+    def get_dirs(self):
+        return self.dirs if self.dirs is not None else self.engine.dirs
