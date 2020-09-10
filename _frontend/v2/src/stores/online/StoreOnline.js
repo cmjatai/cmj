@@ -8,7 +8,7 @@ import Resources from '@/resources'
 
 const mutations = {
   [STATE_DELETE] (state, wsdata) {
-    let data = wsdata
+    const data = wsdata
     if (!state.cache.hasOwnProperty(data.app)) {
       return
     }
@@ -66,7 +66,7 @@ const actions = {
     commit(SET_NIVEL_DETALHE, nivel)
   },
   getObject: ({ commit, getters, dispatch }, metadata) => {
-    let model = getters.getCache(metadata)
+    const model = getters.getCache(metadata)
 
     if (model !== null && model[metadata.id]) {
       return model[metadata.id]
@@ -95,12 +95,12 @@ const actions = {
     const utils = Resources.Utils
     const resource = metadata.func === undefined ? utils.getModel : metadata.func
 
-    let fetch = function () {
-      let exec = resource === utils.getModel ? resource(metadata.app, metadata.model, metadata.id) : resource(metadata)
+    const fetch = function () {
+      const exec = resource === utils.getModel ? resource(metadata.app, metadata.model, metadata.id) : resource(metadata)
 
       return exec
         .then(response => {
-          let meta = {
+          const meta = {
             app: metadata.app,
             model: metadata.model,
             value: response.data,
