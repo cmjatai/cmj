@@ -11,7 +11,6 @@ class RelativeBundleTrackerPlugin extends BundleTrackerPlugin {
       chunk.path = path.relative(this.options.path, chunk.path)
     }))(chunks)
   }
-
   writeOutput (compiler, contents) {
     if (contents.status === 'done') {
       this.convertPathChunks(contents.chunks)
@@ -65,7 +64,7 @@ module.exports = {
       .use('url-loader')
       .loader('url-loader')
       .tap(options => {
-        options.limit = 8192
+        options['limit'] = 8192
       })
 
     // config.resolve.alias
@@ -76,7 +75,7 @@ module.exports = {
       .use('vue-loader')
       .loader('vue-loader')
       .tap(options => {
-        options.transformAssetUrls = {
+        options['transformAssetUrls'] = {
           img: 'src',
           image: 'xlink:href',
           'b-img': 'src',
@@ -124,7 +123,6 @@ module.exports = {
 
         return args
       }) */
-
     /*
     config.entry('construct')
       .add('./src/__construct/main.js')
@@ -141,7 +139,7 @@ module.exports = {
     config.entryPoints.delete('app')
      config.entry('app')
       .add('./src/main.js')
-      .end() */
+      .end()  */
   },
 
   pwa: {

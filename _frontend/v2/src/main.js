@@ -1,3 +1,4 @@
+import './__globals'
 import Vue from 'vue'
 import Vuex from 'vuex'
 import BootstrapVue from 'bootstrap-vue'
