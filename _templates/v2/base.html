@@ -274,10 +274,9 @@
     {% endblock root_body %}
 
     {% block foot_js %}
-
         {% block webpack_loader_js %}
           {% render_chunk_vendors 'js' %}
-          {% render_bundle  'app' 'js' %}
+          {% render_bundle  'app' 'js' 'DEFAULT' 'theme="oficial"' %}
         {% endblock webpack_loader_js %}
 
       {% block extra_js %}{% endblock %}
