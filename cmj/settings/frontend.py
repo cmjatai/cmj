@@ -12,7 +12,9 @@ PROJECT_DIR = Path(__file__).ancestor(3)
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['_templates/v2', '_templates/v1'],
+        'DIRS': ([
+            '_templates/v2'] if FRONTEND_VERSION != 'v1' else []) + [
+            '_templates/v1'],
         'OPTIONS': {
             'debug': DEBUG,
             'context_processors': [

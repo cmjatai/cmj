@@ -17,7 +17,6 @@ from .logs import *
 from .medias import *
 from .middleware import *
 
-
 host = socket.gethostbyname_ex(socket.gethostname())[0]
 
 config = AutoConfig()
