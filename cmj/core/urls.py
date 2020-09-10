@@ -52,9 +52,6 @@ user_urlpatterns = [
     url(r'^logout/$', LogoutView.as_view(),
         {'next_page': '/'}, name='logout', ),
 
-    url(r'^online/',
-        app_vue_view, name='app_vue_view_url'),
-
     url(r'^template/(?P<template_name>[^/]+)$',
         template_render, name='template_render'),
 
