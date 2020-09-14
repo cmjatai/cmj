@@ -29,7 +29,7 @@ import './2018/js/functions'
 import './2018/js/app_cmj'
 
 // eslint-disable-next-line
-require('imports-loader?window.jQuery=jquery!./2018/js/jquery.runner.js')
+//require('imports-loader?window.jQuery=jquery!./2018/js/jquery.runner.js')
 
 window.$ = $
 window.jQuery = $

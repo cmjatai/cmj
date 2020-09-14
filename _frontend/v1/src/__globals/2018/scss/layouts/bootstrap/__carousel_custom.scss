@@ -1,4 +1,4 @@
-@import "variables";
+
 #pagina-inicial {
   .carousel-custom {
     margin-top: $spacer * 2;
@@ -7,7 +7,7 @@
 
 .carousel-custom {
   position: relative;
-  
+
   .imagem {
     background-size: cover;
     background-repeat: no-repeat;
