@@ -1,4 +1,4 @@
-importScripts("/static/precache-manifest.7d1230886ff1ec4ac0db027028fa212b.js", "https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
+importScripts("/static/precache-manifest.a91b06179262f2f748f86686e4980ae6.js", "https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 if (workbox) {
   workbox.core.setCacheNameDetails({prefix: "frontend"})
