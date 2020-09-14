@@ -31,6 +31,75 @@
 
   <body class="{% block body_class %}{%endblock%}">
     <div id="app-vue">
+      <!-- ========================================================== -->
+      <header>
+        <div class="container-fluid" id="header-accessibility">
+          <div class="container">
+            <div class="row justify-content-between" id="portalactions">
+              <div class="btn-group" role="group">
+              </div>
+              <div class="btn-group" role="group">
+                <a class="btn btn-link " href="#main_content" accesskey="1">Ir para Conteúdo<span class="badge badge-light">1</span></a>
+                <a class="btn btn-link" href="#menu_content" accesskey="2">Ir para Menu<span class="badge badge-light">2</span></a>
+                <a class="btn btn-link" href="#rodape_access" accesskey="3">Ir para Rodapé<span class="badge badge-light">3</span></a>
+                  <a class="btn btn-link" href="#" id="altocontraste" accesskey="4" onclick="window.toggleContrast()" onkeydown="window.toggleContrast()"><i class="fas fa-adjust" aria-hidden="true"> Alto Contraste</i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="container">
+          <div class="row" id="rowlogo">
+            <div class="col" id="portallogo">
+              <nav class="navbar">
+                <a class="navbar-brand" href="{{site_url}}/">
+                  <img src="{% webpack_static 'img/logo_256.png' %}">
+                  <div class="brand-name">
+                    <span>
+                      Câmara Municipal de
+                    </span>
+                    <span class="brand-cidade">
+                      Jataí
+                    </span>
+                    <span class="brand-estado">
+                      Poder Legislativo
+                    </span>
+                  </div>
+                </a>
+              </nav>
+            </div>
+            <div class="col-lg-4 col-md-6 col-12">
+              <div class="form-search">
+                <form method="post" action="{% url 'cmj.core:haystack_search'%}">
+                  {% csrf_token %}
+                  <div class="inner">
+                    <div class="item-form">
+                      <input type="search" name="q" placeholder="Busca Textual" class="textinput textInput form-control" id="id_q"  autocomplete="off" />
+                    </div>
+                    <div class="item-form">
+                      <button  class="button" type="submit"value="">
+                        <i class="fas fa-search"></i>
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+
+
+            </div>
+          </div>
+          <div class="row" id="header-menu">
+
+          </div>
+        </div>
+      </header>
+
+      <!-- ========================================================== -->
+      <main>
+      </main>
+
+      <!-- ========================================================== -->
+      <footer>
+      </footer>
       <router-view></router-view>
     </div>
 
@@ -46,16 +115,7 @@
       <div class="page fadein" id="{% block id_wrapper %}wrapper{% endblock %}">
 
         <div class="header-accessibility">
-          <div class="container links-to-content justify-content-between">
-            <div class="btn-group" role="group">
-              <a class="btn btn-link " href="#main_content" accesskey="1">Ir para Conteúdo<span class="badge badge-dark">1</span></a>
-              <a class="btn btn-link" href="#menu_content" accesskey="2">Ir para Menu<span class="badge badge-dark">2</span></a>
-              <a class="btn btn-link" href="#rodape_access" accesskey="3">Ir para Rodapé<span class="badge badge-dark">3</span></a>
-            </div>
-            <div class="btn-group" role="group">
-                <a class="btn btn-link" href="#" id="altocontraste" accesskey="4" onclick="window.toggleContrast()" onkeydown="window.toggleContrast()"><i class="fas fa-adjust" aria-hidden="true"> Alto Contraste</i></a>
-            </div>
-          </div>
+
         </div>
 
         <nav class="navbar navbar-topo navbar-expand-lg navbar-dark">

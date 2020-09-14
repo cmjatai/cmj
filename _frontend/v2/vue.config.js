@@ -49,7 +49,8 @@ module.exports = {
     if (process.env.NODE_ENV === 'production') {
       config
         .optimization
-        .minimizer([new TerserPlugin()])
+        .minimizer('terser')
+        .use(TerserPlugin)
 
       config
         .plugin('CompressionPlugin')

@@ -593,7 +593,7 @@ window.ImpressoEnderecamentoRenderer = function (opts) {
         let quociente = i / colunasfolha | 0
         let resto = i % colunasfolha
 
-        console.log(quociente + ' = ' + resto)
+        // console.log(quociente + ' = ' + resto)
 
         if (resto > 0) {
           left += (resto) * entreColunas + (resto) * larguraetiqueta
