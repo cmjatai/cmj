@@ -33,7 +33,7 @@ window.$ = $
 window.jQuery = $
 // initTinymce
 // import './2018/themes/dezembrolaranja/app.scss'
-console.log()
+
 $(function () {
   setTimeout(function () {
     window.AltoContraste()

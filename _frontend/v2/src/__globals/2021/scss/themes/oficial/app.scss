@@ -1,2 +1,138 @@
 @import './variables';
 @import '../../header.scss';
+
+
+header {
+  background: $bg_color_portal_cmj $url_bg_png;
+
+  &::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0.7;
+    background-image: url(~@/assets/img/header_bg_linha.png);
+    background-size: auto 20%;
+    background-repeat: no-repeat;
+    background-position: -18px -10px;
+  }
+
+  #header-accessibility {
+    background-color: transparent;
+    position: absolute;
+  }
+
+  #portalactions {
+
+    opacity: 0.7;
+
+    .btn-link {
+      color: white;
+      padding: 0 0.4rem;
+      font-size: 0.9rem;
+      .badge {
+        margin-left: 0.3rem;
+        padding-top: 2px;
+        padding-bottom: 2px;
+        line-height: 1;
+        background-color: #777;
+      }
+
+    }
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  #rowlogo {
+    border-bottom: 1px solid white;
+    align-items: center;
+  }
+
+  .navbar {
+    padding-left: 0;
+
+    &:hover {
+      text-shadow: 1px 1px 15px  lighten($bg_color_portal_cmj, 20%);
+    }
+  }
+  .navbar-brand {
+    display: flex;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    align-items: center;
+
+    img {
+      height: 96px;
+    }
+
+    .brand-name {
+      padding-left: 2rem;
+      display: flex;
+      flex-direction: column;
+      color: white;
+      line-height: 1;
+      font-family: Arial;
+      justify-content: center;
+      font-size: 1rem;
+    }
+    .brand-cidade {
+      font-weight: bold;
+      font-size: 380%;
+      border-bottom: 2px solid white;
+      line-height: 0.9;
+      text-transform: uppercase;
+    }
+    .brand-estado {
+      text-align: center;
+      padding-top: 0.3rem;
+    }
+  }
+
+  .form-search {
+    padding: 0.2rem;
+    opacity: 0.7;
+
+    &:hover {
+      opacity: 1;
+    }
+
+    .inner {
+      display: flex;
+      position: relative;
+
+      .item-form {
+        &:first-child {
+          flex: 1 1 100%;
+        }
+        &:last-child {
+          position: absolute;
+          top: 0px;
+          right: 0px;
+          height: 100%;
+        }
+      }
+      input {
+        border: 0px;
+        background-color: white;
+        border-radius: 5px;
+        font-size: 1.3rem;
+        padding-right: 60px;
+      }
+      button {
+        background-color: transparent;
+        border: 0;
+        width: 50px;
+        height: 100%;
+        border-left: 1px solid gray;
+
+      }
+    }
+  }
+
+  #header-menu {
+    height: 48px;
+  }
+
+}
+

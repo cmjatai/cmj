@@ -1,7 +1,7 @@
 <template>
-  <div>teste
+  <div>
     <message></message>
-    aa
+    Vue
     <router-view></router-view>
   </div>
 </template>
