@@ -100,7 +100,6 @@ whoosh_index/
 scripts_local/
 cmj/legacy/scripts/
 run/
-webpack-stats.json
 bundle/
 
 # Dependency directories
