@@ -309,6 +309,9 @@ class DocumentoAdministrativoCrud(Crud):
                         id__in=self.object.metadata['zipfile'][download]['da'])
                     daas = DocumentoAcessorioAdministrativo.objects.filter(
                         id__in=self.object.metadata['zipfile'][download]['daa'])
+                    mls = MateriaLegislativa.objects.filter(
+                        id__in=self.object.metadata['zipfile'][download]['ml'])
+
                     for d in das.order_by('id'):
                         if d.texto_integral:
                             file.write(
@@ -325,6 +328,14 @@ class DocumentoAdministrativoCrud(Crud):
                                     d.documento.id,
                                     d.id,
                                     d.arquivo.original_path.split(
+                                        '/')[-1]))
+                    for m in mls.order_by('id'):
+                        if m.texto_original:
+                            file.write(
+                                m.texto_original.original_path,
+                                arcname='ML-%s-%s' % (
+                                    m.id,
+                                    m.texto_original.original_path.split(
                                         '/')[-1]))
 
                 tmp.seek(0)

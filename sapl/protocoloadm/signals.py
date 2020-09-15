@@ -105,6 +105,7 @@ def docadm_pre_save_segmenta_download(sender, instance, using, **kwargs):
     zf['{:03d}'.format(zip_num)] = {
         'da': [],
         'daa': [],
+        'ml': [],
     }
     counts = {
         'zn': 1,
@@ -121,6 +122,7 @@ def docadm_pre_save_segmenta_download(sender, instance, using, **kwargs):
             zf[key] = {
                 'da': [],
                 'daa': [],
+                'ml': [],
             }
 
         if hasattr(nd, 'texto_integral'):
@@ -134,10 +136,18 @@ def docadm_pre_save_segmenta_download(sender, instance, using, **kwargs):
             for daa in nd.documentoacessorioadministrativo_set.all():
                 tree_add_files(daa, zf, cc)
 
+            if hasattr(nd, 'materia') and nd.materia:
+                tree_add_files(nd.materia, zf, cc)
+
         elif hasattr(nd, 'arquivo'):
             if nd.arquivo:
                 cc['zs'] += nd.arquivo.size
                 zf[key]['daa'].append(nd.id)
+
+        elif hasattr(nd, 'texto_original'):
+            if nd.texto_original:
+                cc['zs'] += nd.texto_original.size
+                zf[key]['ml'].append(nd.id)
 
     tree_add_files(instance, zf, counts)
     instance.metadata = md
