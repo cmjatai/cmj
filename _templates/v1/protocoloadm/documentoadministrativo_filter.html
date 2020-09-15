@@ -50,20 +50,7 @@
                     </div>
                   {% endif %}
 
-                  {% if not d.documento_anexado_set.exists and d.documento_principal_set.exists %}
 
-                    <div class="float-right p-1 d-inline-flex">
-                      {% with d.metadata.zipfile.keys|length as zip_count %}
-                        {% for zn in d.metadata.zipfile.keys %}
-                          <a class="text-black-50"
-                          title="{% if zip_count > 1 %}Foi necessário segmentar o download dos arquivos do processo. Baixar parte {{forloop.counter}} de {{zip_count}}{% else %}Baixar arquivo compactado contendo todos os arquivos do processo.{% endif %}"
-                          href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' d.id%}?download={{zn}}">
-                          <i class="fas fa-2x fa-download">{% if zip_count > 1%}{{forloop.counter}}{% endif %}</i>
-                          </a>
-                        {% endfor %}
-                      {% endwith %}
-                    </div>
-                  {% endif %}
 
                   <div class="links-texto">
                     {% if d.texto_integral %}
@@ -136,9 +123,13 @@
                     Ver Documentos Anexados
                   </button>
                 {% elif d.documento_principal_set.exists %}
-                  <a class="ml-2 mb-2 mt-n2 btn btn-link" href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' d.id%}">
+                  <a class="d-inline-block ml-2 mb-2 mt-n2 btn btn-link" href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' d.id%}">
                     Processo possui {{d.documento_principal_set.count }} Ite{% if d.documento_principal_set.count > 1 %}ns{% else %}m{% endif %}
                   </a>
+                  <div class="d-inline-block">
+                  {% include 'protocoloadm/documentoadministrativo_widget_zipfile.html' %}
+                  </div>
+
                 {% endif %}
               </div>
 
