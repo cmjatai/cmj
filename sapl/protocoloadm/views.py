@@ -305,12 +305,15 @@ class DocumentoAdministrativoCrud(Crud):
             with tempfile.SpooledTemporaryFile(max_size=512000000) as tmp:
 
                 with zipfile.ZipFile(tmp, 'w') as file:
+
                     das = DocumentoAdministrativo.objects.filter(
-                        id__in=self.object.metadata['zipfile'][download]['da'])
+                        id__in=self.object.metadata['zipfile'][download].get('da', []))
+
                     daas = DocumentoAcessorioAdministrativo.objects.filter(
-                        id__in=self.object.metadata['zipfile'][download]['daa'])
+                        id__in=self.object.metadata['zipfile'][download].get('daa', []))
+
                     mls = MateriaLegislativa.objects.filter(
-                        id__in=self.object.metadata['zipfile'][download]['ml'])
+                        id__in=self.object.metadata['zipfile'][download].get('ml', []))
 
                     for d in das.order_by('id'):
                         if d.texto_integral:
