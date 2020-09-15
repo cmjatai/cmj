@@ -1917,7 +1917,7 @@ class MateriaLegislativaCrud(Crud):
                     ]
                     return btns
 
-        def hook_documentoadministrativo_set(self, obj):
+        def hook_documentoadministrativo_set__deprecated(self, obj):
 
             docs = obj.documentoadministrativo_set.all()
             if not docs.exists():

@@ -154,7 +154,6 @@ MateriaLegislativaDetail:
   - materia_principal_set__materia_anexada|m2m_urlize_for_detail
   - normajuridica_set
   - autografo_set
-  - documentoadministrativo_set
 {%comment %}
   - numeracao_set
   - objeto
