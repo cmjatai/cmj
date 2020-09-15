@@ -34,8 +34,6 @@
 
   <a class="item-titulo" href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' d.pk %}">{% if d.is_signed %} <i class="fas fa-1x fa-certificate" title="Documento possui versão com Assinatura Digital, entre nos detalhes do documento para abrir o Arquivo Original"></i>{% endif %} {{ d }}</a>
 
-  {% include 'protocoloadm/documentoadministrativo_widget_zipfile.html' %}
-
   {% if d.certidao %}
     <br><small>
     <a class="text-danger" href="{% url 'cmj.core:certidaopublicacao_detail' d.certidao.id %}">Certidão de Publicação nº {{d.certidao.id|stringformat:"06d" }} de {{d.certidao.created}}</a>
@@ -108,6 +106,10 @@
       </a>
     </div>
   {% endif %}
+
+  <div class="d-inline-block">
+  {% include 'protocoloadm/documentoadministrativo_widget_zipfile.html' %}
+  </div>
 
   {% for anexado in d.documento_principal_set.childs_anexados %}
     {% if forloop.first %}
