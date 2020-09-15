@@ -34,23 +34,7 @@
 
   <a class="item-titulo" href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' d.pk %}">{% if d.is_signed %} <i class="fas fa-1x fa-certificate" title="Documento possui versão com Assinatura Digital, entre nos detalhes do documento para abrir o Arquivo Original"></i>{% endif %} {{ d }}</a>
 
-  {% if not d.documento_anexado_set.exists and d.documento_principal_set.exists or d.documentoacessorioadministrativo_set.exists %}
-
-    <div class="float-right d-inline-flex">
-      {% with d.metadata.zipfile.keys|length as zip_count %}
-        {% for zn in d.metadata.zipfile.keys %}
-          <a class="text-black-50"
-          title="{% if zip_count > 1 %}Foi necessário segmentar o download dos arquivos do processo. Baixar parte {{forloop.counter}} de {{zip_count}}{% else %}Baixar arquivo compactado contendo todos os arquivos do processo.{% endif %}"
-          href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' d.id%}?download={{zn}}">
-           <i class="fas fa-2x fa-download">{% if zip_count > 1%}{{forloop.counter}}{% endif %}</i>
-          </a>
-        {% endfor %}
-      {% endwith %}
-    </div>
-
-
-
-  {% endif %}
+  {% include 'protocoloadm/documentoadministrativo_widget_zipfile.html' %}
 
   {% if d.certidao %}
     <br><small>
@@ -116,18 +100,29 @@
     {% endif %}
   </small>
 
-    {% for anexado in d.documento_principal_set.childs_anexados %}
-      {% if forloop.first %}
-        <br><strong>Documentos Anexados:</strong>
-        <div class="childs">
-      {% endif %}
-        {% with True as render_widget_file %}
-          {% with anexado.documento_anexado as d %}
-            {% include "protocoloadm/documentoadministrativo_item_filter.html" %}
-          {% endwith %}
+  {% if d.materia %}
+    <div class="pt-2 pb-2">
+      <strong>Vínculo com Processo Legislativo:</strong><br>
+      <a href="{% url 'sapl.materia:materialegislativa_detail' d.materia.id %}">
+        {{d.materia}}
+      </a>
+    </div>
+  {% endif %}
+
+  {% for anexado in d.documento_principal_set.childs_anexados %}
+    {% if forloop.first %}
+      <div>
+      <strong>Documentos Anexados:</strong>
+      <div class="childs">
+    {% endif %}
+      {% with True as render_widget_file %}
+        {% with anexado.documento_anexado as d %}
+          {% include "protocoloadm/documentoadministrativo_item_filter.html" %}
         {% endwith %}
-      {% if forloop.last %}
-        </div>
-      {% endif %}
-    {% endfor %}
+      {% endwith %}
+    {% if forloop.last %}
+      </div>
+      </div>
+    {% endif %}
+  {% endfor %}
 </div>

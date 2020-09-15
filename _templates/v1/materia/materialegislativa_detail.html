@@ -75,12 +75,24 @@
       <br>
     </small>
     <div class="clearfix"></div>
+
+
     {% with object as m %}
       {% include 'materia/materialegislativa_widget_file.html' %}
     {% endwith %}
+
     {{ block.super }}
+
   </div>
 
+  {% if object.documentoadministrativo_set.exists %}
+      <p class="control-label">Documentos Administrativos Vinculados a Matéria</p>
+  <div class="bg-white p-3">
+      {% with object.documentoadministrativo_set.all as doc_list %}
+        {% include 'protocoloadm/documentoadministrativo_widget_materia.html' %}
+      {% endwith %}
+  </div>
+  {% endif %}
 
   {% if object.audienciapublica_set.exists %}
     <p class="control-label">&emsp; Audiência(s) Pública(s)</p>
