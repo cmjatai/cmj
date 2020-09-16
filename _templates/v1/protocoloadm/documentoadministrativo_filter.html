@@ -60,6 +60,12 @@
                     {% endif %}
                   </div>
 
+                  {% if d.metadata.zipfile.keys|length == 1 %}
+                    <div class="d-inline-block float-left pr-2">
+                    {% include 'protocoloadm/documentoadministrativo_widget_zipfile.html' %}
+                    </div>
+                  {% endif %}
+
                   <a class="item-titulo" href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' d.pk %}">{% if d.is_signed %} <i class="fas fa-1x fa-certificate"  title="Documento possui versão com Assinatura Digital, entre nos detalhes do documento para abrir o Arquivo Original"></i>{% endif %} {{ d }}</a>
                   {% if d.certidao %}
                     <br><small>
@@ -126,10 +132,12 @@
                   <a class="d-inline-block ml-2 mb-2 mt-n2 btn btn-link" href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' d.id%}">
                     Processo possui {{d.documento_principal_set.count }} Ite{% if d.documento_principal_set.count > 1 %}ns{% else %}m{% endif %}
                   </a>
-                  <div class="d-inline-block">
-                  {% include 'protocoloadm/documentoadministrativo_widget_zipfile.html' %}
-                  </div>
 
+                  {% if d.metadata.zipfile.keys|length > 1 %}
+                    <div class="d-inline-block">
+                    {% include 'protocoloadm/documentoadministrativo_widget_zipfile.html' %}
+                    </div>
+                  {% endif %}
                 {% endif %}
               </div>
 
