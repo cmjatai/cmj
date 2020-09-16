@@ -406,7 +406,7 @@ class AnexoNormaJuridica(CountPageMixin):
         NormaJuridica,
         related_name='anexos_set',
         on_delete=models.PROTECT,
-        verbose_name=_('Norma Juridica'))
+        verbose_name=_('Norma Jurídica'))
     assunto_anexo = models.TextField(
         blank=True,
         default="",
@@ -425,8 +425,8 @@ class AnexoNormaJuridica(CountPageMixin):
                                            choices=RANGE_ANOS)
 
     class Meta:
-        verbose_name = _('Anexo da Norma Juridica')
-        verbose_name_plural = _('Anexos da Norma Juridica')
+        verbose_name = _('Anexo da Norma Jurídica')
+        verbose_name_plural = _('Anexos da Norma Jurídica')
 
     def __str__(self):
         return _('Anexo: %(anexo)s da norma %(norma)s') % {
