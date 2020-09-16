@@ -71,7 +71,18 @@ class CompressPDF:
 
 class Command(BaseCommand):
 
+    max_paginas_noturno = 100  # avaliar tempo de execução para números maiores
+    max_paginas_diurno = 50
+
     models = [
+        {
+            'model': MateriaLegislativa,
+            'file_field': ('texto_original',),
+            'count': 0,
+            'count_base': 2,
+            'order_by': '-data_apresentacao',
+            'years_priority': 20
+        },
         {
             'model': DocumentoAdministrativo,
             'file_field': ('texto_integral',),
@@ -120,14 +131,6 @@ class Command(BaseCommand):
             'order_by': '-data_inicio',
             'years_priority': 20
         },
-        {
-            'model': MateriaLegislativa,
-            'file_field': ('texto_original',),
-            'count': 0,
-            'count_base': 2,
-            'order_by': '-data_apresentacao',
-            'years_priority': 20
-        },
 
     ]
 
@@ -159,7 +162,25 @@ class Command(BaseCommand):
                                 print(e)
                                 break
 
+    def is_running(self):
+        process = subprocess.Popen(
+            ['ps', '-eo', 'pid,args'],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+        mypid = str(os.getpid())
+        stdout, notused = process.communicate()
+        for line in stdout.splitlines():
+            line = line.decode("utf-8")
+            pid, cmdline = line.split(' ', 1)
+            if mypid != pid and 'manage.py ocrmypdf' in cmdline:
+                return True
+        return False
+
     def handle(self, *args, **options):
+        if self.is_running():
+            return
+
         post_delete.disconnect(dispatch_uid='sapl_post_delete_signal')
         post_save.disconnect(dispatch_uid='sapl_post_save_signal')
         post_delete.disconnect(dispatch_uid='cmj_post_delete_signal')
@@ -175,7 +196,7 @@ class Command(BaseCommand):
         # 1,9,18,27,36,45,54 0-22 * * * djangoapps
         # /storage1/django-apps/cmj/run__commands__9min.sh
 
-        exec_docs_antigos = init.hour < 8
+        execucao_noturna = init.hour < 6 or init.hour >= 22
 
         # Refaz tudo que foi feito a mais de dois anos
 
@@ -214,15 +235,30 @@ class Command(BaseCommand):
                 # se não existir nenhum registro pra processar do último ano
                 # ou ano atual, e a execução é de madrugada,
                 # então faz do passado.
-                if exec_docs_antigos and not items.exists():
+                if execucao_noturna and not items.exists():
                     items = model['model'].objects.order_by(model['order_by'])
 
                 for item in items:
+
+                    if hasattr(item, '_paginas'):
+                        if item._paginas > self.max_paginas_noturno:
+                            continue
+                        if item._paginas > self.max_paginas_diurno and not execucao_noturna:
+                            continue
 
                     if count >= model['count_base']:
                         break
 
                     for ff in model['file_field']:
+
+                        # se documento foi homologado na executa ocr
+                        if hasattr(item, 'metadata'):
+                            md = item.metadata
+                            if 'signs' in md and ff in md['signs']:
+                                if 'hom' in md['signs'][ff] and\
+                                        md['signs'][ff]['hom']:
+                                    continue
+
                         ocr = OcrMyPDF.objects.filter(
                             content_type=ct,
                             object_id=item.id,
@@ -269,6 +305,7 @@ class Command(BaseCommand):
                             o.sucesso = False
                             o.save()
                             try:
+                                init_item = datetime.now()
                                 result = self.run(item, ff)
                                 if result is None:
                                     return
@@ -277,18 +314,27 @@ class Command(BaseCommand):
                                 o.save()
                                 now = datetime.now()
 
+                                if hasattr(item, '_paginas'):
+                                    print(
+                                        item.id,
+                                        item._paginas,
+                                        model['model']._meta.label,
+                                        str(now - init_item)
+                                    )
+
                                 if result:
                                     post_save.send(
                                         model['model'],
                                         instance=item, using='default')
 
                                 self.logger.info(
-                                    str(now - init) + ' ' +
+                                    str(now - init_item) + ' ' +
                                     str(item.id) + ' ' +
                                     str(model['model']))
 
                                 if now - init > timedelta(minutes=9):
                                     return
+
                             except Exception as e:
                                 print(e)
                             self.logger.info('Aguardando...')
@@ -311,8 +357,8 @@ class Command(BaseCommand):
 
         o_path = file.path.replace('media/sapl/', 'media/original__sapl/')
         o_path = o_path.replace('media/cmj/', 'media/original__cmj/')
-        print(o_path)
-        print(file.path)
+        # print(o_path)
+        # print(file.path)
 
         cmd = ["ocrmypdf",
                "--deskew",
