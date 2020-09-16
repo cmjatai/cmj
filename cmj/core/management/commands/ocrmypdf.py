@@ -254,7 +254,7 @@ class Command(BaseCommand):
                         # se documento foi homologado na executa ocr
                         if hasattr(item, 'metadata'):
                             md = item.metadata
-                            if 'signs' in md and ff in md['signs']:
+                            if md and 'signs' in md and ff in md['signs']:
                                 if 'hom' in md['signs'][ff] and\
                                         md['signs'][ff]['hom']:
                                     continue
