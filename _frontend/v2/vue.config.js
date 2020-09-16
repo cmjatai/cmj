@@ -35,15 +35,11 @@ module.exports = {
   outputDir: 'dist',
 
   chainWebpack: config => {
-    // config.plugins.delete('html')
-    // config.plugins.delete('preload')
-    // config.plugins.delete('prefetch')
-
     config
       .plugin('RelativeBundleTrackerPlugin')
       .use(RelativeBundleTrackerPlugin, [{
         path: '.',
-        filename: './webpack-stats.json'
+        filename: `./${process.env.DEBUG === 'True' ? 'dev-' : ''}webpack-stats.json`
       }])
 
     if (process.env.NODE_ENV === 'production') {

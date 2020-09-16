@@ -101,6 +101,7 @@ scripts_local/
 cmj/legacy/scripts/
 run/
 bundle/
+dev-webpack-stats.json
 
 # Dependency directories
 node_modules

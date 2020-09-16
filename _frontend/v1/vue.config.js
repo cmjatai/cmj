@@ -24,7 +24,7 @@ dotenv.config({
   path: '../../cmj/.env'
 })
 
-var HOST_NAME = 'localhost'
+let HOST_NAME = 'localhost'
 // HOST_NAME = '192.168.15.7'
 // HOST_NAME = '10.42.0.1'
 // HOST_NAME = '10.3.163.200'
@@ -35,15 +35,11 @@ module.exports = {
   outputDir: 'dist',
 
   chainWebpack: config => {
-    // config.plugins.delete('html')
-    // config.plugins.delete('preload')
-    // config.plugins.delete('prefetch')
-
     config
       .plugin('RelativeBundleTrackerPlugin')
       .use(RelativeBundleTrackerPlugin, [{
         path: '.',
-        filename: './webpack-stats.json'
+        filename: `./${process.env.DEBUG === 'True' ? 'dev-' : ''}webpack-stats.json`
       }])
 
     if (process.env.NODE_ENV === 'production') {
