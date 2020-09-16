@@ -178,7 +178,10 @@ class Command(BaseCommand):
         return False
 
     def handle(self, *args, **options):
+
+        init = datetime.now()
         if self.is_running():
+            print(init, 'Command OcrMyPdf já está sendo executado por outro processo')
             return
 
         post_delete.disconnect(dispatch_uid='sapl_post_delete_signal')
@@ -189,8 +192,6 @@ class Command(BaseCommand):
         self.logger = logging.getLogger(__name__)
 
         self.delete_itens_tmp_folder()
-
-        init = datetime.now()
 
         # execução depende do crontab executado em:
         # 1,9,18,27,36,45,54 0-22 * * * djangoapps
