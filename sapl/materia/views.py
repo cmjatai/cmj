@@ -1129,7 +1129,7 @@ class ProposicaoCrud(Crud):
 
         def hook_detalhe(self, *args, **kwargs):
             return '''
-                <strong>{}</strong><br>{}            
+                <strong>{}</strong><br>{}
             '''.format(args[0], args[0].descricao), args[2]
 
         def get_rows(self, object_list):
@@ -1987,7 +1987,7 @@ class MateriaLegislativaCrud(Crud):
             if not d:
                 return '', ''
 
-            return _('Norma Juridica Vinculada'), '<a href="{}">{}</a>'.format(
+            return _('Norma Jurídica Vinculada'), '<a href="{}">{}</a>'.format(
                 reverse('sapl.norma:normajuridica_detail', kwargs={'pk': d.id}), d)
 
         def hook_autografo_set(self, obj):
