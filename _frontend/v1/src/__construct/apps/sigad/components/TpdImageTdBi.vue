@@ -51,7 +51,7 @@ export default {
       this.mouseover = false
     },
     dragend (ev) {
-      console.log('dragend: tpdimagetdbi', ev)
+      // console.log('dragend: tpdimagetdbi', ev)
       if (this.dragged) {
         this.$emit('ondragend', this.elemento)
       }
@@ -60,32 +60,32 @@ export default {
       this.draggedover = 0
     },
     dragenter (ev) {
-      console.log('dragenter: tpdimagetdbi', ev)
+      // console.log('dragenter: tpdimagetdbi', ev)
       if (this.dragged) {
         this.draggedleave = false // não deve ser atribuido true em caso contrário
       }
     },
     dragleave (ev) {
-      console.log('dragleave: tpdimagetdbi', ev)
+      // console.log('dragleave: tpdimagetdbi', ev)
       this.$emit('ondragleave', this.elemento, this.draggedover)
       this.draggedleave = this.dragged
       this.draggedover = 0
     },
     dragover (ev) {
-      console.log('dragover: tpdimagetdbi', ev)
+      // console.log('dragover: tpdimagetdbi', ev)
       if (!this.dragged) {
         this.draggedover = ev.offsetX - ev.target.offsetWidth / 2
       }
     },
     dragstart (ev) {
-      console.log('dragstart: tpdimagetdbi', ev)
+      // console.log('dragstart: tpdimagetdbi', ev)
       this.dragged = true
     },
     dragexit (ev) {
-      console.log('dragexit: tpdimagetdbi', ev)
+      // console.log('dragexit: tpdimagetdbi', ev)
     },
     drop (ev) {
-      console.log('drop: tpdimagetdbi', ev)
+      // console.log('drop: tpdimagetdbi', ev)
     }
   }
 }

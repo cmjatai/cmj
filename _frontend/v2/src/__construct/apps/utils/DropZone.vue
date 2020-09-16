@@ -58,7 +58,7 @@ export default {
       if (ev === undefined) {
         return
       }
-      console.log('Drop')
+      // console.log('Drop')
       ev.preventDefault()
 
       var dt = ev.dataTransfer
@@ -76,12 +76,12 @@ export default {
       }
     },
     dragover_handler (ev) {
-      console.log('dragOver')
+      // console.log('dragOver')
       // Prevent default select and drag behavior
       ev.preventDefault()
     },
     dragend_handler (ev) {
-      console.log('dragEnd')
+      // console.log('dragEnd')
       // Remove all of the drag data
       let dt = ev.dataTransfer
       if (dt.items) {

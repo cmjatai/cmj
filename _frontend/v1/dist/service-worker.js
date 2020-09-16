@@ -1,4 +1,4 @@
-importScripts("/static/precache-manifest.a1955564d80f9e70d8d05e7bdaf0d88d.js", "https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
+importScripts("/static/precache-manifest.29299ff55cb4f1764237bc2abc19d147.js", "https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 /* eslint-disable no-undef */
 if (workbox) {
@@ -18,6 +18,6 @@ if (workbox) {
   // console.log('self.__precacheManifest:')
   // console.log(self.__precacheManifest)
 } else {
-  console.log(`Workbox didn't load`)
+  // console.log(`Workbox didn't load`)
 }
 

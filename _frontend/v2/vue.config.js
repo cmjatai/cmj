@@ -120,7 +120,7 @@ module.exports = {
       .plugin('html')
       .tap(args => {
         args[0]['filename'] = '../../cmj/templates/index.test.html'
-        console.log(args)
+        // console.log(args)
 
         return args
       }) */

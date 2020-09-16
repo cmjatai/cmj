@@ -6,9 +6,9 @@ if (workbox) {
     url: '/offline/',
     revision: '000002'
   }].concat(self.__precacheManifest || [])
-  
+
   workbox.precaching.suppressWarnings()
-  
+
   workbox.precaching.precacheAndRoute(self.__precacheManifest, {})
 
   //workbox.routing.registerRoute(
@@ -19,9 +19,9 @@ if (workbox) {
   // console.log('self.__precacheManifest:')
   // console.log(self.__precacheManifest)
 
-} 
+}
 else {
-  console.log(`Workbox didn't load`)
+  // console.log(`Workbox didn't load`)
 }
 
 

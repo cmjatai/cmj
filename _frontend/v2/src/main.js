@@ -76,7 +76,7 @@ if ('serviceWorker' in navigator) {
     // From a page:
     /* navigator.storage.requestPersistent().then((granted) => {
       if (granted) {
-        console.log('Hurrah, your data is here to stay!')
+        // console.log('Hurrah, your data is here to stay!')
       }
     }); */
 
@@ -84,14 +84,14 @@ if ('serviceWorker' in navigator) {
       //First, see if we already have it
       navigator.storage.persisted().then(persistent => {
         if(persistent) {
-          console.log('already granted');
+          // console.log('already granted');
         } else {
-          console.log('not already granted, lets ask for it');
+          // console.log('not already granted, lets ask for it');
           navigator.storage.persist().then(granted => {
             if (granted) {
-              console.log("persisted storage granted ftw");
+              // console.log("persisted storage granted ftw");
             } else {
-              console.log("sad face");
+              // console.log("sad face");
             }
           });
         }
@@ -101,8 +101,8 @@ if ('serviceWorker' in navigator) {
     //what the heck
     if(navigator.storage && navigator.storage.estimate) {
       navigator.storage.estimate().then(result => {
-        console.log(result);
-        console.log('Percent used '+(result.usage/result.quota).toFixed(2));
+        // console.log(result);
+        // console.log('Percent used '+(result.usage/result.quota).toFixed(2));
       });
     } */
   })

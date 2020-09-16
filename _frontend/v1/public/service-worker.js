@@ -16,5 +16,5 @@ if (workbox) {
   // console.log('self.__precacheManifest:')
   // console.log(self.__precacheManifest)
 } else {
-  console.log(`Workbox didn't load`)
+  // console.log(`Workbox didn't load`)
 }

@@ -11,7 +11,7 @@
 {% block extra_js %}
 
     <script type="text/javascript">
-        
+
         $('tbody').sortable({
           revert: false,
           distance: 15,
@@ -38,7 +38,7 @@
                       'X-CSRFToken': getCookie('csrftoken')
                   },
                   error: function(e) {
-                    console.log(e);
+                    // console.log(e);
                   }
               });
 
