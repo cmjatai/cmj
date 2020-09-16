@@ -445,11 +445,23 @@ class CertidaoPublicacaoCrud(Crud):
                 return args[1], args[2]
 
         def hook_content_object(self, *args, **kwargs):
+
             hash = args[0].hash_code  # self.split_bylen(args[0].hash_code, 64)
 
-            return """%s<br><small>%s</small>""" % (
+            if hasattr(args[0].content_object, 'anexo_de') and\
+                    args[0].content_object.anexo_de.exists():
+                vinculo = f'Vínculo com: {args[0].content_object.anexo_de.first()}'
+            else:
+                vinculo = ''
+
+            return """%s<br>
+            <small>%s</small><br>
+            <small><i>%s</i></small>""" % (
                 args[1],
-                args[0].content_object.__descr__), ''
+                args[0].content_object.__descr__,
+                vinculo
+            ), ''
+
             return """
             %s<br><small>%s</small><br>
             <button 
