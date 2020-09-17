@@ -105,6 +105,9 @@ urlpatterns = user_urlpatterns + [
     url(r'^sistema/core/logradouro/', include(LogradouroCrud.get_urls())),
 
 
+    url(r'^online/',
+        app_vue_view, name='app_vue_view_url'),
+
 
     url(r'^sistema/core/trecho/', include(TrechoCrud.get_urls())),
 
