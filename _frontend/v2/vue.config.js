@@ -39,7 +39,7 @@ module.exports = {
       .plugin('RelativeBundleTrackerPlugin')
       .use(RelativeBundleTrackerPlugin, [{
         path: '.',
-        filename: `./${process.env.DEBUG === 'True' ? 'dev-' : ''}webpack-stats.json`
+        filename: `./${process.env.DEBUG === 'True' && process.env.NODE_ENV !== 'production' ? 'dev-' : ''}webpack-stats.json`
       }])
 
     if (process.env.NODE_ENV === 'production') {
