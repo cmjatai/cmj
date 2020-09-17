@@ -115,18 +115,23 @@ def docadm_pre_save_segmenta_download(sender, instance, using, **kwargs):
     def tree_add_files(nd, zf, cc):
 
         key = '{:03d}'.format(cc['zn'])
-        if cc['zs'] > (1024 ** 3):  # 1GB
-            cc['zn'] += 1
-            key = '{:03d}'.format(cc['zn'])
-            cc['zs'] = 0
-            zf[key] = {
-                'da': [],
-                'daa': [],
-                'ml': [],
-            }
 
         if hasattr(nd, 'texto_integral'):
             if nd.texto_integral:
+
+                if cc['zs'] > (1024 ** 3) or (
+                        cc['zs'] + nd.texto_integral.size > (1024 ** 3) * 2):
+                    # se já é maior que 1GB ou ao adicionar um arquivo fique
+                    # maior 2GB
+                    cc['zn'] += 1
+                    key = '{:03d}'.format(cc['zn'])
+                    cc['zs'] = 0
+                    zf[key] = {
+                        'da': [],
+                        'daa': [],
+                        'ml': [],
+                    }
+
                 cc['zs'] += nd.texto_integral.size
                 zf[key]['da'].append(nd.id)
 
@@ -141,11 +146,39 @@ def docadm_pre_save_segmenta_download(sender, instance, using, **kwargs):
 
         elif hasattr(nd, 'arquivo'):
             if nd.arquivo:
+
+                if cc['zs'] > (1024 ** 3) or (
+                        cc['zs'] + nd.arquivo.size > (1024 ** 3) * 2):
+                    # se já é maior que 1GB ou ao adicionar um arquivo fique
+                    # maior 2GB
+                    cc['zn'] += 1
+                    key = '{:03d}'.format(cc['zn'])
+                    cc['zs'] = 0
+                    zf[key] = {
+                        'da': [],
+                        'daa': [],
+                        'ml': [],
+                    }
+
                 cc['zs'] += nd.arquivo.size
                 zf[key]['daa'].append(nd.id)
 
         elif hasattr(nd, 'texto_original'):
             if nd.texto_original:
+
+                if cc['zs'] > (1024 ** 3) or (
+                        cc['zs'] + nd.texto_original.size > (1024 ** 3) * 2):
+                    # se já é maior que 1GB ou ao adicionar um arquivo fique
+                    # maior 2GB
+                    cc['zn'] += 1
+                    key = '{:03d}'.format(cc['zn'])
+                    cc['zs'] = 0
+                    zf[key] = {
+                        'da': [],
+                        'daa': [],
+                        'ml': [],
+                    }
+
                 cc['zs'] += nd.texto_original.size
                 zf[key]['ml'].append(nd.id)
 
