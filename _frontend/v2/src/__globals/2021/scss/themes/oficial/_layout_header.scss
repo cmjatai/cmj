@@ -1,15 +1,23 @@
 
-header {
-  background: $bg_color_portal_cmj $url_bg_png;
+header.main {
+  background: $bg_color_portal_cmj; // $url_bg_png;
+  transition: all 0.2s ease;
+  height: 160px;
+  position: fixed;
+  width: 100%;
+
+  & * {
+    transition: all 0.2s ease;
+  }
 
   &::before {
     content: '';
     position: absolute;
     width: 100%;
     height: 100%;
-    opacity: 0.7;
+    opacity: 0.3;
     background-image: url(~@/assets/img/header_bg_linha.png);
-    background-size: auto 20%;
+    background-size: auto 100%;
     background-repeat: no-repeat;
     background-position: -18px -10px;
   }
@@ -26,7 +34,7 @@ header {
     .btn-link {
       color: white;
       padding: 0 0.4rem;
-      font-size: 0.9rem;
+      font-size: 0.8rem;
       .badge {
         margin-left: 0.3rem;
         padding-top: 2px;
@@ -53,6 +61,7 @@ header {
       text-shadow: 1px 1px 15px  lighten($bg_color_portal_cmj, 20%);
     }
   }
+
   .navbar-brand {
     display: flex;
     padding-top: 0.5rem;
@@ -131,5 +140,10 @@ header {
     height: 48px;
   }
 
+
+  &.header-top {
+    height: 45vh;
+    position: relative;
+  }
 }
 

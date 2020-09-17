@@ -19,6 +19,8 @@ import { routes } from './routers'
 
 import './mixins'
 
+import BodyActions from './BodyActions'
+
 axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 
@@ -54,13 +56,18 @@ const router = new Router({
   routes,
   mode: 'history'
 })
+
 sync(store, router)
 
 const app = new Vue({ // eslint-disable-line
   delimiters: ['[[', ']]'],
   router,
   store,
-  el: '#app-vue'
+  el: '#app-vue',
+  extends: {
+    ...BodyActions
+  }
+
 })
 
 if ('serviceWorker' in navigator) {

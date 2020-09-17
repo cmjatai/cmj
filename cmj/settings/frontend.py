@@ -58,7 +58,7 @@ WEBPACK_LOADER = {
     'DEFAULT': {
         'CACHE': not DEBUG,
         'BUNDLE_DIR_NAME': 'dist/',
-        'STATS_FILE': PROJECT_DIR.child('_frontend').child(FRONTEND_VERSION).child(f'{"dev-" if False and DEBUG else ""}webpack-stats.json'),
+        'STATS_FILE': PROJECT_DIR.child('_frontend').child(FRONTEND_VERSION).child(f'{"dev-" if DEBUG else ""}webpack-stats.json'),
     }
 }
 

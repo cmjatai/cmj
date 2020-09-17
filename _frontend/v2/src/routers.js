@@ -6,7 +6,7 @@
 export const routes = [
   {
     path: '',
-    component: () => import('@/App.vue'),
+    component: () => import('@/views/About.vue'),
     children: [
 
     ]

@@ -1,9 +1,5 @@
 <template>
-  <div>
     <message></message>
-    Vue
-    <router-view></router-view>
-  </div>
 </template>
 
 <script>
@@ -14,7 +10,25 @@ export default {
   components: {
     Message
   },
+  methods: {
+    handleScroll: function (event) {
+      let h = document.getElementsByTagName('header')[0]
+      if (window.scrollY === 0) {
+        h.classList.add('header-top')
+      } else {
+        h.classList.remove('header-top')
+      }
+    },
+    teste: function (env) {
+      console.log('teste')
+    }
+  },
   mounted: function () {
+    window.addEventListener('scroll', this.handleScroll)
+
+    // let h = document.getElementsByTagName('header')[0]
+    // h.style.height = `${self.innerHeight * 1}px`
+
     this.$options.sockets.onmessage = (event) => {
       /**
        * Define um ouvinte para o socket implementado por VueNativeSock

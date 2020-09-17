@@ -27,12 +27,13 @@
     {% endblock webpack_loader_css %}
 
     {% block widgets_form_css %}{% endblock widgets_form_css %}
+
   </head>
 
   <body class="{% block body_class %}{%endblock%}">
     <div id="app-vue">
       <!-- ========================================================== -->
-      <header>
+      <header class="main header-top" v-on:click.passive="teste">
         <div class="container-fluid" id="header-accessibility">
           <div class="container">
             <div class="row justify-content-between" id="portalactions">
@@ -95,16 +96,22 @@
 
       <!-- ========================================================== -->
       <main>
+
+        <router-view></router-view>
+
       </main>
 
       <!-- ========================================================== -->
       <footer>
       </footer>
-      <router-view></router-view>
+
+      <app></app>
     </div>
 
 
 
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 
 <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 
