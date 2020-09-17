@@ -3,3 +3,11 @@
 // customize variáveis do bootstrap e/ou novas variáveis específicas do tema.
 
 $bg_color_portal_cmj: #114d81;
+
+
+$container-max-widths: (
+  sm: 100%,
+  md: 100%,
+  lg: 100%,
+  xl: 1140px
+) !default;

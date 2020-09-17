@@ -10,7 +10,7 @@ export default {
   },
   methods: {
     teste () {
-      console.log('teste')
+      // console.log('teste')
     }
   }
 }

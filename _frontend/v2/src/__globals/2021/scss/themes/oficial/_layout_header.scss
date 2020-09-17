@@ -1,13 +1,12 @@
 
 header.main {
   background: $bg_color_portal_cmj; // $url_bg_png;
-  transition: all 0.2s ease;
-  height: 160px;
+  transition: all 0.3s ease;
   position: fixed;
   width: 100%;
 
   & * {
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
   }
 
   &::before {
@@ -15,7 +14,7 @@ header.main {
     position: absolute;
     width: 100%;
     height: 100%;
-    opacity: 0.3;
+    opacity: 0.6;
     background-image: url(~@/assets/img/header_bg_linha.png);
     background-size: auto 100%;
     background-repeat: no-repeat;
@@ -24,13 +23,12 @@ header.main {
 
   #header-accessibility {
     background-color: transparent;
-    //position: absolute;
+    position: absolute;
   }
 
-  #portalactions {
 
+  #accessactions {
     opacity: 0.7;
-
     .btn-link {
       color: white;
       padding: 0 0.4rem;
@@ -42,7 +40,6 @@ header.main {
         line-height: 1;
         background-color: #777;
       }
-
     }
     &:hover {
       opacity: 1;
@@ -50,13 +47,12 @@ header.main {
   }
 
   #rowlogo {
-    border-bottom: 1px solid white;
     align-items: center;
+    padding-top: 1.8rem;
   }
 
   .navbar {
     padding-left: 0;
-
     &:hover {
       text-shadow: 1px 1px 15px  lighten($bg_color_portal_cmj, 20%);
     }
@@ -64,28 +60,28 @@ header.main {
 
   .navbar-brand {
     display: flex;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
+    padding: 0;
+    margin: 0;
     align-items: center;
 
     img {
-      height: 96px;
+      height: 64px;
     }
 
     .brand-name {
-      padding-left: 2rem;
+      padding-left: 1rem;
       display: flex;
       flex-direction: column;
       color: white;
       line-height: 1;
       font-family: Arial;
       justify-content: center;
-      font-size: 1rem;
+      font-size: 0.7rem;
     }
     .brand-cidade {
       font-weight: bold;
       font-size: 380%;
-      border-bottom: 2px solid white;
+      border-bottom: 1px solid white;
       line-height: 0.9;
       text-transform: uppercase;
     }
@@ -96,7 +92,7 @@ header.main {
   }
 
   .form-search {
-    padding: 0.2rem;
+    //padding: 0.2rem;
     opacity: 0.7;
 
     &:hover {
@@ -136,14 +132,92 @@ header.main {
     }
   }
 
+  #portalactions {
+    padding: 1rem 0;
+    .col-1 {
+      display: none;
+    }
+    .col-2 {
+      flex: 0 0 20%;
+      max-width: 20%;
+    }
+    a {
+      display: flex;
+      flex-direction: column;
+      color: white;
+      font-weight: bold;
+      text-align: center;
+      text-decoration: none;
+      .img {
+        background-image: url(../oficial/assets/icon_cmj_512.png);
+        background-size: auto 100%;
+        background-repeat: no-repeat;
+        background-position: center center;
+        height: 48px;
+        }
+      .label {
+        display: flex;
+        font-size: 0.8rem;
+        line-height: auto;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+  }
+
   #header-menu {
-    height: 48px;
+    //height: 48px;
   }
 
 
   &.header-top {
-    height: 45vh;
     position: relative;
+
+    #rowlogo {
+      padding-top: 1rem;
+    }
+
+    .navbar-brand {
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+
+      img {
+        height: 96px;
+      }
+
+      .brand-name {
+        padding-left: 1rem;
+        font-size: 1.3rem;
+      }
+    }
+
+    #portallogo {
+      flex: 1 1 auto;
+    }
+    #portalactions {
+      order: 3;
+      width: 100%;
+      flex: 0 0 100%;
+      a {
+        color: white;
+        font-weight: bold;
+        text-align: center;
+        text-decoration: none;
+        .img {
+          background-image: url(../oficial/assets/icon_cmj_512.png);
+          background-size: auto 100%;
+          background-repeat: no-repeat;
+          background-position: center center;
+          height: 96px;
+          }
+        .label {
+          display: flex;
+          height: 5rem;
+          min-height: 50px;
+          font-size: 1.1rem;
+        }
+      }
+    }
   }
 }
 

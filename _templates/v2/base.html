@@ -34,9 +34,10 @@
     <div id="app-vue">
       <!-- ========================================================== -->
       <header class="main header-top" v-on:click.passive="teste">
+
         <div class="container-fluid" id="header-accessibility">
           <div class="container">
-            <div class="row justify-content-between" id="portalactions">
+            <div class="row justify-content-between" id="accessactions">
               <div class="btn-group" role="group">
                 <a class="btn btn-link " href="#main_content" accesskey="1">Ir para Conteúdo<span class="badge badge-light">1</span></a>
                 <a class="btn btn-link" href="#menu_content" accesskey="2">Ir para Menu<span class="badge badge-light">2</span></a>
@@ -48,10 +49,11 @@
             </div>
           </div>
         </div>
+
         <div class="container">
           <div class="row" id="rowlogo">
-            <div class="col" id="portallogo">
-              <nav class="navbar">
+            <div class="col-auto" id="portallogo">
+              <div class="navbar">
                 <a class="navbar-brand" href="{{site_url}}/">
                   <img src="{% webpack_static 'img/logo_256.png' %}">
                   <div class="brand-name">
@@ -66,9 +68,47 @@
                     </span>
                   </div>
                 </a>
-              </nav>
+              </div>
             </div>
-            <div class="col-lg-4 col-md-6 col-12">
+
+            <div class="col" id="portalactions">
+              <div class="row">
+                <div class="col-1"></div>
+                <div class="col-2 btn-main ">
+                  <a class="inner" href="#">
+                    <div class="img"></div>
+                    <div class="label">OUVIDORIA</div>
+                  </a>
+                </div>
+                <div class="col-2 btn-main">
+                  <a class="inner" href="#">
+                    <div class="img"></div>
+                    <div class="label">DOCUMENTOS<BR>ADMINISTRATIVOS</div>
+                  </a>
+                </div>
+                <div class="col-2 btn-main">
+                  <a class="inner" href="#">
+                    <div class="img"></div>
+                    <div class="label">PRESTAÇÃO<BR>DE CONTAS</div>
+                  </a>
+                </div>
+                <div class="col-2 btn-main">
+                  <a class="inner" href="#">
+                    <div class="img"></div>
+                    <div class="label">ATIVIDADE<BR>LEGISLATIVA</div>
+                  </a>
+                </div>
+                <div class="col-2 btn-main">
+                  <a class="inner" href="#">
+                    <div class="img"></div>
+                    <div class="label">TV E RÁDIO<BR>CÂMARA</div>
+                  </a>
+                </div>
+                <div class="col-1"></div>
+              </div>
+            </div>
+
+            <div class="col-auto">
               <div class="form-search">
                 <form method="post" action="{% url 'cmj.core:haystack_search'%}">
                   {% csrf_token %}
@@ -84,9 +124,8 @@
                   </div>
                 </form>
               </div>
-
-
             </div>
+
           </div>
           <div class="row" id="header-menu">
 
