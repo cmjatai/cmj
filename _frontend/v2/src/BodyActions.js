@@ -6,11 +6,18 @@ export default {
   },
   data () {
     return {
+      searching: ''
     }
   },
   methods: {
     teste () {
       // console.log('teste')
+    },
+    handleBlurSearch (event) {
+      this.searching = ''
+    },
+    handleFocusSearch (event) {
+      this.searching = 'd-searching'
     }
   }
 }

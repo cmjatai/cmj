@@ -52,7 +52,7 @@
 
         <div class="container">
           <div class="row" id="rowlogo">
-            <div class="col-auto" id="portallogo">
+            <div :class="['col-auto', searching ]" id="portallogo">
               <div class="navbar">
                 <a class="navbar-brand" href="{{site_url}}/">
                   <img src="{% webpack_static 'img/logo_256.png' %}">
@@ -70,8 +70,7 @@
                 </a>
               </div>
             </div>
-
-            <div class="col" id="portalactions">
+            <div :class="['col', searching ]" id="portalactions">
               <div class="row">
                 <div class="col-1"></div>
                 <div class="col-2 btn-main ">
@@ -108,13 +107,19 @@
               </div>
             </div>
 
-            <div class="col-auto">
+            <div id="portalsearch" :class="['col-auto', searching ]" >
               <div class="form-search">
                 <form method="post" action="{% url 'cmj.core:haystack_search'%}">
                   {% csrf_token %}
                   <div class="inner">
                     <div class="item-form">
-                      <input type="search" name="q" placeholder="Busca Textual" class="textinput textInput form-control" id="id_q"  autocomplete="off" />
+                      <input type="search" name="q" id="id_q"
+                        placeholder="Busca Textual"
+                        class="textinput textInput form-control"
+                         autocomplete="off"
+                         v-on:blur="handleBlurSearch"
+                         v-on:focus="handleFocusSearch"
+                         />
                     </div>
                     <div class="item-form">
                       <button  class="button" type="submit"value="">
@@ -146,18 +151,18 @@
 
       <app></app>
     </div>
-
-
-
 <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 
 <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+{% comment %}
+
 
     {% block root_body %}
       {% comment  %}
       {% include "popups.html" %}
-      {% endcomment %}
+
       <div class="page fadein" id="{% block id_wrapper %}wrapper{% endblock %}">
 
         <div class="header-accessibility">
@@ -378,6 +383,8 @@
     </footer>
 
     {% endblock root_body %}
+
+{% endcomment %}
 
     {% block foot_js %}
         {% block webpack_loader_js %}

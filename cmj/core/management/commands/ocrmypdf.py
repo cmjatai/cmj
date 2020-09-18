@@ -173,8 +173,13 @@ class Command(BaseCommand):
         for line in stdout.splitlines():
             line = line.decode("utf-8")
             pid, cmdline = line.split(' ', 1)
-            if mypid != pid and 'manage.py ocrmypdf' in cmdline:
+
+            if pid == mypid:
+                continue
+
+            if 'manage.py ocrmypdf' in cmdline:
                 return True
+
         return False
 
     def handle(self, *args, **options):

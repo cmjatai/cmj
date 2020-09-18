@@ -1,0 +1,70 @@
+header.main {
+  background: $bg_color_portal_cmj; // $url_bg_png;
+  transition: all 0.3s ease;
+  position: fixed;
+  width: 100%;
+  line-height: 1;
+
+  & * {
+    transition: all 0.3s ease;
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0.1;
+    background-image: url(~@/assets/img/header_bg_linha.png);
+    background-size: auto 100%;
+    background-repeat: no-repeat;
+    background-position: -18px -10px;
+  }
+
+  #header-accessibility {
+    #accessactions {
+      opacity: 0.7;
+      .btn-link {
+        color: white;
+        padding: 0 $min_padding;
+        font-size: 0.8rem;
+        .badge {
+          margin-left: 0.3rem;
+          padding-top: 2px;
+          padding-bottom: 2px;
+          line-height: 1;
+          background-color: #777;
+        }
+      }
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
+
+
+  #rowlogo {
+    align-items: center;
+    //padding-top: 1.2rem;
+  }
+
+  &.header-top {
+    position: relative;
+    #rowlogo {
+      //padding-top: 1rem;
+    }
+  }
+}
+
+
+@import './portallogo';
+@import './portalsearch';
+@import './portalactions';
+
+
+
+@media screen and (max-width:767.98px) {
+  #header-accessibility {
+    display: none;
+  }
+}
