@@ -6,6 +6,7 @@ from pwd import getpwuid
 import shutil
 import stat
 import subprocess
+import sys
 from time import sleep
 import time
 
@@ -75,8 +76,10 @@ class Command(BaseCommand):
     max_paginas_diurno = 50
 
     # só usa os limites de tamanho de arquivo se não houver número de páginas
-    max_size_noturno = 20 * 1024 * 1024
-    max_size_diurno = 5 * 1024 * 1024
+    max_size_noturno = 40 * 1024 * 1024
+    max_size_diurno = 10 * 1024 * 1024
+
+    execucao_noturna = False
 
     models = [
         {
@@ -206,7 +209,7 @@ class Command(BaseCommand):
         # 1,9,18,27,36,45,54 0-22 * * * djangoapps
         # /storage1/django-apps/cmj/run__commands__9min.sh
 
-        execucao_noturna = init.hour < 6 or init.hour >= 22
+        self.execucao_noturna = init.hour < 6 or init.hour >= 22
 
         # Refaz tudo que foi feito a mais de dois anos
 
@@ -245,10 +248,10 @@ class Command(BaseCommand):
                 # se não existir nenhum registro pra processar do último ano
                 # ou ano atual, e a execução é de madrugada,
                 # então faz do passado.
-                if execucao_noturna and not items.exists():
+                if self.execucao_noturna and not items.exists():
                     items = model['model'].objects.order_by(model['order_by'])
 
-                #items = items.filter(pk=86)
+                #items = items.filter(pk=3559)
                 for item in items:
 
                     # item.save()
@@ -263,7 +266,7 @@ class Command(BaseCommand):
                         # se não tem conseguiu num de páginas
                         # só passa ao teste de tamanho de arquivo se a execução
                         # é noturna
-                        if not paginas and not execucao_noturna:
+                        if not paginas and not self.execucao_noturna:
                             continue
 
                         # mesmo a execução sendo noturna não faz arquivos com
@@ -273,7 +276,7 @@ class Command(BaseCommand):
 
                         # se diurno não faz ocr em arquivos com páginas
                         # superiores a max_paginas_diurno
-                        if paginas > self.max_paginas_diurno and not execucao_noturna:
+                        if paginas > self.max_paginas_diurno and not self.execucao_noturna:
                             continue
 
                     if count >= model['count_base']:
@@ -298,7 +301,7 @@ class Command(BaseCommand):
                             if file and file.name and file.size > self.max_size_noturno:
                                 continue
 
-                            if file and file.name and file.size > self.max_size_diurno and not execucao_noturna:
+                            if file and file.name and file.size > self.max_size_diurno and not self.execucao_noturna:
                                 continue
 
                         ocr = OcrMyPDF.objects.filter(
@@ -401,9 +404,10 @@ class Command(BaseCommand):
         # print(o_path)
         # print(file.path)
 
-        cmd = ["ocrmypdf",
+        cmd = ["{}/ocrmypdf".format('/'.join(sys.executable.split('/')[:-1])),
                "--deskew",
                "-l por",
+               "-j {}".format(3 if self.execucao_noturna else 1),
                "--output-type pdfa-1",
                o_path, file.path]
 
