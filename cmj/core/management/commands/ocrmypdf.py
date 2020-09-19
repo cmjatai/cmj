@@ -74,6 +74,10 @@ class Command(BaseCommand):
     max_paginas_noturno = 100  # avaliar tempo de execução para números maiores
     max_paginas_diurno = 50
 
+    # só usa os limites de tamanho de arquivo se não houver número de páginas
+    max_size_noturno = 20 * 1024 * 1024
+    max_size_diurno = 5 * 1024 * 1024
+
     models = [
         {
             'model': MateriaLegislativa,
@@ -185,7 +189,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         init = datetime.now()
-        if self.is_running():
+        if not settings.DEBUG and self.is_running():
             print(init, 'Command OcrMyPdf já está sendo executado por outro processo')
             return
 
@@ -244,12 +248,32 @@ class Command(BaseCommand):
                 if execucao_noturna and not items.exists():
                     items = model['model'].objects.order_by(model['order_by'])
 
+                #items = items.filter(pk=86)
                 for item in items:
 
+                    # item.save()
+                    paginas = 0
                     if hasattr(item, '_paginas'):
-                        if item._paginas > self.max_paginas_noturno:
+                        # tenta capturar o número de páginas
+                        try:
+                            paginas = item.paginas
+                        except:
+                            paginas = 0
+
+                        # se não tem conseguiu num de páginas
+                        # só passa ao teste de tamanho de arquivo se a execução
+                        # é noturna
+                        if not paginas and not execucao_noturna:
                             continue
-                        if item._paginas > self.max_paginas_diurno and not execucao_noturna:
+
+                        # mesmo a execução sendo noturna não faz arquivos com
+                        # mais de max_paginas_noturno
+                        if paginas > self.max_paginas_noturno:
+                            continue
+
+                        # se diurno não faz ocr em arquivos com páginas
+                        # superiores a max_paginas_diurno
+                        if paginas > self.max_paginas_diurno and not execucao_noturna:
                             continue
 
                     if count >= model['count_base']:
@@ -257,7 +281,7 @@ class Command(BaseCommand):
 
                     for ff in model['file_field']:
 
-                        # se documento foi homologado na executa ocr
+                        # se documento foi homologado não executa ocr
                         if hasattr(item, 'metadata'):
                             md = item.metadata
                             if md and 'signs' in md and ff in md['signs']:
@@ -265,13 +289,24 @@ class Command(BaseCommand):
                                         md['signs'][ff]['hom']:
                                     continue
 
+                        file = getattr(item, ff)
+
+                        if file and not file.name.endswith('.pdf'):
+                            continue
+
+                        if not paginas:
+                            if file and file.name and file.size > self.max_size_noturno:
+                                continue
+
+                            if file and file.name and file.size > self.max_size_diurno and not execucao_noturna:
+                                continue
+
                         ocr = OcrMyPDF.objects.filter(
                             content_type=ct,
                             object_id=item.id,
                             field=ff).first()
 
-                        file = getattr(item, ff)
-                        if ocr and file:
+                        if ocr and file and file.name:
                             # possui meta ocr anterior,
                             # testa se o arq é mais recente que último ocr
                             # feito
@@ -290,13 +325,13 @@ class Command(BaseCommand):
                             ocr.delete()
                             ocr = None
 
-                        elif ocr and not file:
+                        elif ocr and not file or ocr and file and not file.name:
                             # se existe um meta ocr mas não existe mais o
                             # arquivo
                             ocr.delete()
                             continue
 
-                        if not ocr and file:
+                        if not ocr and file and file.name:
                             # se existe arquivo mas não existe meta ocr por nunca
                             # ter feito ou por alguma regra de remoção acima
 
