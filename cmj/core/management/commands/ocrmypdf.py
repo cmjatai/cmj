@@ -407,6 +407,7 @@ class Command(BaseCommand):
         cmd = ["{}/ocrmypdf".format('/'.join(sys.executable.split('/')[:-1])),
                "--deskew",
                "-l por",
+               "-q",
                "-j {}".format(3 if self.execucao_noturna else 1),
                "--output-type pdfa-1",
                o_path, file.path]
