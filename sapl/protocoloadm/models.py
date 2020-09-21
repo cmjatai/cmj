@@ -12,7 +12,7 @@ from model_utils import Choices
 import reversion
 
 from cmj.core.models import AreaTrabalho, CertidaoPublicacao
-from cmj.mixins import CountPageMixin
+from cmj.mixins import CommonMixin
 from sapl.base.models import Autor
 from sapl.materia.models import TipoMateriaLegislativa, UnidadeTramitacao,\
     MateriaLegislativa
@@ -208,7 +208,7 @@ class Protocolo(models.Model):
 
 
 @reversion.register()
-class DocumentoAdministrativo(CountPageMixin):
+class DocumentoAdministrativo(CommonMixin):
 
     #related_objects = DocumentoAdministrativoManager()
     #objects = models.Manager()
@@ -397,7 +397,7 @@ class DocumentoAdministrativo(CountPageMixin):
 
 
 @reversion.register()
-class DocumentoAcessorioAdministrativo(CountPageMixin):
+class DocumentoAcessorioAdministrativo(CommonMixin):
     FIELDFILE_NAME = ('arquivo', )
 
     metadata = JSONField(

@@ -5,10 +5,11 @@ from django.urls.base import reverse
 from django.utils.translation import ugettext_lazy as _
 from floppyforms import ClearableFileInput
 from model_utils.choices import Choices
+from pdfrw.pdfreader import PdfReader
 from social_core.backends.facebook import FacebookOAuth2
 
-from cmj.utils import run_sql, get_settings_auth_user_model
-from pdfrw.pdfreader import PdfReader
+from cmj.utils import run_sql, get_settings_auth_user_model,\
+    YES_NO_CHOICES
 
 
 class FacebookOAuth2(FacebookOAuth2):
@@ -101,7 +102,7 @@ class BtnCertMixin:
         return btn
 
 
-class CountPageMixin(models.Model):
+class CommonMixin(models.Model):
 
     _paginas = models.IntegerField(
         default=0, verbose_name=_('Número de Páginas'))

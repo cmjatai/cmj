@@ -11,6 +11,7 @@ from haystack import connections
 from haystack.constants import Indexable
 from haystack.fields import CharField, DateTimeField, IntegerField
 from haystack.utils import get_model_ct_tuple
+import magic
 
 from sapl.compilacao.models import (STATUS_TA_IMMUTABLE_PUBLIC,
                                     STATUS_TA_PUBLIC, Dispositivo)
@@ -54,11 +55,23 @@ class TextExtractField(CharField):
         self.logger.error(msg, error)
 
     def file_extractor(self, arquivo):
-        if settings.DEBUG or not os.path.exists(arquivo.path) or \
-                not os.path.splitext(arquivo.path)[1][:1]:
+        # if settings.DEBUG or not os.path.exists(arquivo.path) or \
+        #        not os.path.splitext(arquivo.path)[1][:1]:
+        #    return ''
+
+        if not arquivo or arquivo and not arquivo.name:
             return ''
 
-        # Em ambiente de produção utiliza-se o SOLR
+        ext = arquivo.name.split('.')[-1]
+        #mime = magic.from_file(arquivo.path, mime=True)
+
+        if ext in ('zip', 'gz', 'tar', 'mp3', 'mp4', 'mpeg', 'jpeg', 'png'):
+            return ''
+
+        # manter limite maximo alinhado ao commando ocrmypdf
+        if arquivo.size > 40 * 1024 * 1024:
+            return ''
+
         if SOLR_URL:
             try:
                 return self.solr_extraction(arquivo)

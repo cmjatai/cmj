@@ -76,6 +76,7 @@ class Command(BaseCommand):
     max_paginas_diurno = 50
 
     # só usa os limites de tamanho de arquivo se não houver número de páginas
+    # ao alterar aqui, analisar tb a indexação no solr
     max_size_noturno = 40 * 1024 * 1024
     max_size_diurno = 10 * 1024 * 1024
 

@@ -14,7 +14,7 @@ from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices
 import reversion
 
-from cmj.mixins import CountPageMixin
+from cmj.mixins import CommonMixin
 from sapl.base.models import SEQUENCIA_NUMERACAO_PROTOCOLO, Autor,\
     TipoAutor
 from sapl.comissoes.models import Comissao, Reuniao
@@ -203,7 +203,7 @@ def anexo_upload_path(instance, filename):
 
 
 @reversion.register()
-class MateriaLegislativa(CountPageMixin):
+class MateriaLegislativa(CommonMixin):
     FIELDFILE_NAME = ('texto_original', )
 
     metadata = JSONField(
@@ -599,7 +599,7 @@ class TipoDocumento(models.Model):
 
 
 @reversion.register()
-class DocumentoAcessorio(CountPageMixin):
+class DocumentoAcessorio(CommonMixin):
     FIELDFILE_NAME = ('arquivo', )
 
     metadata = JSONField(
@@ -865,7 +865,7 @@ class Parecer(models.Model):
 
 
 @reversion.register()
-class Proposicao(CountPageMixin):
+class Proposicao(CommonMixin):
 
     FIELDFILE_NAME = ('texto_original', )
 
