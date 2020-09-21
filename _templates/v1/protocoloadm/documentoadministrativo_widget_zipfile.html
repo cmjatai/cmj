@@ -1,6 +1,6 @@
 
 {% if not d.documento_anexado_set.exists and d.documento_principal_set.exists or d.documentoacessorioadministrativo_set.exists %}
-  <div class="float-right d-inline-flex">
+  <div class="float-right d-inline-flex flex-wrap">
     {% with d.metadata.zipfile.keys|length as zip_count %}
       {% for zn in d.metadata.zipfile.keys %}
         <a class="text-black-50"
