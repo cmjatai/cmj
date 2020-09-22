@@ -10,13 +10,30 @@ export default {
   components: {
     Message
   },
+  data () {
+    return {
+      ro: null,
+      scrollAtivo: true
+
+    }
+  },
   methods: {
     handleScroll: function (event) {
       let h = document.getElementsByTagName('header')[0]
+      console.log(event)
       if (window.scrollY === 0) {
+        h.style.marginTop = '0px'
         h.classList.add('header-top')
-      } else {
+      } else if (window.scrollY > 0 && window.scrollY <= 200 && h.classList.contains('header-top')) {
+        h.style.marginTop = '0px'
         h.classList.remove('header-top')
+      } else {
+        // h.classList.remove('header-top')
+        if (window.scrollY > 200) {
+          h.style.marginTop = `${-1 * (window.scrollY - 200)}px`
+        } else {
+          h.style.marginTop = '0px'
+        }
       }
     },
     teste: function (env) {
@@ -25,6 +42,17 @@ export default {
   },
   mounted: function () {
     window.addEventListener('scroll', this.handleScroll)
+
+    this.ro = new ResizeObserver(entries => {
+      // let m = document.getElementsByTagName('main')[0]
+      // m.style.marginTop = `${entries[0].target.offsetHeight}px`
+
+      // console.log('resizeHeader')
+      // this.scrollAtivo = true
+    })
+
+    let h = document.getElementsByTagName('header')[0]
+    this.ro.observe(h)
 
     // let h = document.getElementsByTagName('header')[0]
     // h.style.height = `${self.innerHeight * 1}px`

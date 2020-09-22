@@ -1,23 +1,33 @@
 header.main {
   #portalactions {
-    padding: 0;
-    padding-top: $min_padding * 2;
+    padding: $min_padding * 2 0;
     font-size: 1rem;
-    height: 8rem;
+    height: auto;
+    flex-wrap: nowrap;
     .row {
+      margin-top: 0;
       margin-left: 0;
       width: 100%;
+      flex-wrap: nowrap;
     }
 
     &.d-searching {
+      //display: none;
       transition: all 0.3s ease;
       width: 0;
       overflow: hidden;
       opacity: 0;
       flex: 0 0 0;
+      height: 0;
       .row {
         margin-left: -10rem;
         width: 0;
+        a {
+          .img {
+            height: 0;
+          }
+        }
+
       }
     }
 
@@ -25,8 +35,11 @@ header.main {
       display: none;
     }
     .col-2 {
-      flex: 0 0 20%;
+      flex: 1 1 20%;
       max-width: 20%;
+      //flex: 1 1 auto;
+      //max-width: none;
+      //width: auto;
       padding-left: $min_padding;
       padding-right: $min_padding;
     }
@@ -43,13 +56,17 @@ header.main {
         text-shadow: 1px 1px 10px  lighten($bg_color_portal_cmj, 20%);
       }
       .img {
-        background-image: url(../oficial/assets/icon_cmj_512.png);
+        background-image: url(../oficial/assets/icon_prancheta_sombra.svg);
         background-size: auto 100%;
         background-repeat: no-repeat;
         background-position: center center;
-        height: 64px;
-
+        height: 72px;
+        opacity: 0.95;
+        &:hover {
+          opacity: 1;
         }
+
+      }
       .label {
         display: flex;
         font-size: 80%;
@@ -59,15 +76,24 @@ header.main {
         min-height: 38px;
       }
     }
+
+    .row {
+      .btn-main:nth-child(2n -1){
+        .img {
+          background-size: auto 80%;
+          background-position: center bottom;
+          background-image: url(../oficial/assets/icon_prancheta.svg);
+        }
+      }
+    }
   }
 
   &.header-top {
     #portalactions {
-      height: 13rem;
       order: 3;
       width: 100%;
       flex: 0 0 100%;
-      padding: 1rem 0 0;
+      //padding: 1rem 0 0;
       .col-1 {
         display: block;
       }
@@ -79,22 +105,19 @@ header.main {
       &.d-searching {
         height: 0;
         width: 0;
+        .row {
+          margin-top: -5rem;
+          margin-left: 5rem;
+        }
+
       }
 
       a {
-        color: white;
-        font-weight: bold;
-        text-align: center;
-        text-decoration: none;
         .img {
-          background-image: url(../oficial/assets/icon_cmj_512.png);
-          background-size: auto 100%;
-          background-repeat: no-repeat;
-          background-position: center center;
           height: 108px;
           }
         .label {
-          height: 4rem;
+          //height: 4rem;
           min-height: 50px;
           font-size: 110%;
         }
@@ -106,13 +129,26 @@ header.main {
 @media screen and (max-width:991.98px) {
   header.main {
     #portalactions {
-
+      padding: 0;
       a {
         .img {
-          //height: 48px;
+          height: 48px;
         }
         .label {
-          font-size: 75%;
+          font-size: 50%;
+        }
+      }
+    }
+    &.header-top {
+      #portalactions {
+
+        a {
+          .img {
+            //height: 80px;
+          }
+          .label {
+            font-size: 80%;
+          }
         }
       }
     }
@@ -126,7 +162,7 @@ header.main {
       width: 100%;
       flex: 0 0 100%;
       height: auto;
-      padding-bottom: $min_padding * 3;
+      //padding-bottom: $min_padding * 3;
 
       &.d-searching {
         transition: all 0.3s ease;
@@ -141,7 +177,7 @@ header.main {
       }
       a {
         .img {
-          height: 92px;
+          height: 56px;
         }
         .label {
           font-size: 75%;
@@ -152,6 +188,11 @@ header.main {
       #portalactions {
         height: auto;
         padding-bottom: $min_padding * 3;
+        a {
+          .img {
+            height: 56px;
+          }
+        }
 
         &.d-searching {
           width: 0;

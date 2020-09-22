@@ -64,8 +64,37 @@ header.main {
         }
       }
     }
-
   }
+}
+
+@media screen and (max-width:991.98px) {
+
+  header.main {
+    #portallogo {
+      .navbar-brand {
+        img {
+          height: 48px;
+        }
+        .brand-name {
+          font-size: 0.6rem;
+        }
+      }
+    }
+
+    &.header-top {
+      #portallogo {
+        .navbar-brand {
+          img {
+            height: 72px;
+          }
+          .brand-name {
+            font-size: 0.9rem;
+          }
+        }
+      }
+    }
+  }
+
 }
 
 @media screen and (max-width:767.98px) {
@@ -77,7 +106,7 @@ header.main {
           .navbar {
             justify-content: center;
           }
-          flex: 0 1 100%;
+          //flex: 0 1 100%;
         }
       }
     }
@@ -93,7 +122,6 @@ header.main {
         justify-content: center;
       }
     }
-
   }
 }
 

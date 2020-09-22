@@ -2,6 +2,7 @@ header.main {
   background: $bg_color_portal_cmj; // $url_bg_png;
   transition: all 0.3s ease;
   position: fixed;
+  top: 0;
   width: 100%;
   line-height: 1;
 
@@ -49,19 +50,27 @@ header.main {
   }
 
   &.header-top {
-    position: relative;
+    //position: relative;
     #rowlogo {
       //padding-top: 1rem;
     }
   }
 }
-
+main {
+  background-color: red;
+}
 
 @import './portallogo';
 @import './portalsearch';
 @import './portalactions';
 
+@media screen and (max-width:991.98px) {
 
+  header.main {
+   //position: relative;
+  }
+
+}
 
 @media screen and (max-width:767.98px) {
   #header-accessibility {

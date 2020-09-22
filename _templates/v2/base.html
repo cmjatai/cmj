@@ -73,6 +73,12 @@
             <div :class="['col', searching ]" id="portalactions">
               <div class="row">
                 <div class="col-1"></div>
+                <div class="col-2 btn-main">
+                  <a class="inner" href="#">
+                    <div class="img"></div>
+                    <div class="label">ATIVIDADE<BR>LEGISLATIVA</div>
+                  </a>
+                </div>
                 <div class="col-2 btn-main ">
                   <a class="inner" href="#">
                     <div class="img"></div>
@@ -88,19 +94,13 @@
                 <div class="col-2 btn-main">
                   <a class="inner" href="#">
                     <div class="img"></div>
-                    <div class="label">PRESTAÇÃO<BR>DE CONTAS</div>
-                  </a>
-                </div>
-                <div class="col-2 btn-main">
-                  <a class="inner" href="#">
-                    <div class="img"></div>
-                    <div class="label">ATIVIDADE<BR>LEGISLATIVA</div>
-                  </a>
-                </div>
-                <div class="col-2 btn-main">
-                  <a class="inner" href="#">
-                    <div class="img"></div>
                     <div class="label">TV E RÁDIO<BR>CÂMARA</div>
+                  </a>
+                </div>
+                <div class="col-2 btn-main">
+                  <a class="inner" href="#">
+                    <div class="img"></div>
+                    <div class="label">PRESTAÇÃO<BR>DE CONTAS</div>
                   </a>
                 </div>
                 <div class="col-1"></div>
@@ -143,6 +143,18 @@
 
         <router-view></router-view>
 
+    {% for n in ultimas_publicacoes %}
+        {{forloop.counter}}<br>
+    {% endfor %}
+
+    {% for n in ultimas_publicacoes %}
+        {{forloop.counter}}<br>
+    {% endfor %}
+
+    {% for n in ultimas_publicacoes %}
+        {{forloop.counter}}<br>
+    {% endfor %}
+
       </main>
 
       <!-- ========================================================== -->
@@ -151,6 +163,7 @@
 
       <app></app>
     </div>
+
 <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 
