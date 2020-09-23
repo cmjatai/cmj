@@ -190,6 +190,20 @@ class Command(BaseCommand):
 
         return False
 
+    def run_distibui_ocr_ao_longo_do_ano(self):
+        ocrs = OcrMyPDF.objects.all().order_by('id')
+
+        c = ocrs.count()
+        d = timezone.now() - timedelta(days=(365 * 3))
+        i = (31536000 * 3) // c
+        for o in ocrs:
+            concluido_interval = o.concluido - o.created
+            o.created = d
+            o.concluido = d + concluido_interval
+            o.save()
+
+            d = d + timedelta(seconds=i)
+
     def handle(self, *args, **options):
 
         init = datetime.now()
@@ -204,6 +218,9 @@ class Command(BaseCommand):
 
         self.logger = logging.getLogger(__name__)
 
+        # self.run_distibui_ocr_ao_longo_do_ano()
+        # return
+
         self.delete_itens_tmp_folder()
 
         # execução depende do crontab executado em:
@@ -212,14 +229,14 @@ class Command(BaseCommand):
 
         self.execucao_noturna = init.hour < 6 or init.hour >= 22
 
-        # Refaz tudo que foi feito a mais de dois anos
+        # Refaz tudo que foi feito a mais de tres anos
 
         OcrMyPDF.objects.filter(
-            created__lt=init - timedelta(days=730)).delete()
+            created__lt=init - timedelta(days=1095)).delete()
 
         # Refaz tudo que foi feito a mais de um mês e nao teve sucesso
         OcrMyPDF.objects.filter(
-            created__lt=init - timedelta(days=30),
+            created__lt=init - timedelta(days=90),
             sucesso=False).delete()
 
         # OcrMyPDF.objects.filter(
