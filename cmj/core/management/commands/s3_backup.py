@@ -43,23 +43,29 @@ class Command(BaseCommand):
 
         self.logger = logging.getLogger(__name__)
 
-        for s3_server in ('locaweb', 's3_cmj'):
-            print('--------- Iniciando:', s3_server)
-            self.s3_server = s3_server
-            self.s3_connect()
-            if not settings.DEBUG:
-                print('--------- Atualizando backup do BD ----------')
-                self.update_backup_postgresql()
+        init = datetime.now()
 
-            self.start_time = timezone.localtime()
-            print('--------- S3 Sync ---------')
-            self.s3_sync()
+        s3_servers = ('s3_cmj',)
+        s3_servers = ('locaweb', 's3_cmj')
 
-            print('Encerrando conexão com ', s3_server)
-            sleep(10)
-            self.s3c = None
-            self.s3r = None
-            sleep(10)
+        s3_server = s3_servers[init.hour % 2]
+
+        print('--------- Iniciando:', s3_server)
+        self.s3_server = s3_server
+        self.s3_connect()
+        if not settings.DEBUG:
+            print('--------- Atualizando backup do BD ----------')
+            self.update_backup_postgresql()
+
+        self.start_time = timezone.localtime()
+        print('--------- S3 Sync ---------')
+        self.s3_sync()
+
+        print('Encerrando conexão com ', s3_server)
+        sleep(10)
+        self.s3c = None
+        self.s3r = None
+        sleep(10)
 
         print('Concluído...')
 
@@ -663,12 +669,16 @@ class Command(BaseCommand):
                 continue
 
             print('Enviando...', path_name, item)
-            with open(f'{path_name}{item}', "rb") as f:
-                obj.upload_fileobj(
-                    f,
-                    ExtraArgs={
-                        'ACL': 'private',
-                    })
+            try:
+                with open(f'{path_name}{item}', "rb") as f:
+                    obj.upload_fileobj(
+                        f,
+                        ExtraArgs={
+                            'ACL': 'private',
+                        })
+            except Exception as e:
+                print(e)
+                self.logger.error(item, str(e))
 
             sleep(5)
 
@@ -695,8 +705,6 @@ class Command(BaseCommand):
             b.delete()
         except Exception as e:
             print(e)
-
-        sleep
 
         # if o.key.endswith('.backup'):
         # if o.key.startswith('.s3_multipart_uploads'):
