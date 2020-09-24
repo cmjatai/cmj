@@ -54,11 +54,22 @@ CRISPY_FAIL_SILENTLY = not DEBUG
 STATIC_URL = '/static/'
 STATIC_ROOT = PROJECT_DIR.child("collected_static")
 
+PROJECT_DIR_FRONTEND = PROJECT_DIR.child('_frontend').child(FRONTEND_VERSION)
+
+FRONTEND_BRASAO_PATH = {
+    '32': PROJECT_DIR_FRONTEND.child('public').child('brasao').child('brasao_32.png'),
+    '64': PROJECT_DIR_FRONTEND.child('public').child('brasao').child('brasao_64.png'),
+    '128': PROJECT_DIR_FRONTEND.child('public').child('brasao').child('brasao_128.png'),
+    '256': PROJECT_DIR_FRONTEND.child('public').child('brasao').child('brasao_256.png'),
+    '512': PROJECT_DIR_FRONTEND.child('public').child('brasao').child('brasao_512.png'),
+    '1024': PROJECT_DIR_FRONTEND.child('public').child('brasao').child('brasao_1024.png')
+}
+
 WEBPACK_LOADER = {
     'DEFAULT': {
         'CACHE': not DEBUG,
         'BUNDLE_DIR_NAME': 'dist/',
-        'STATS_FILE': PROJECT_DIR.child('_frontend').child(FRONTEND_VERSION).child(f'{"dev-" if DEBUG else ""}webpack-stats.json'),
+        'STATS_FILE': PROJECT_DIR_FRONTEND.child(f'{"dev-" if DEBUG else ""}webpack-stats.json'),
     }
 }
 

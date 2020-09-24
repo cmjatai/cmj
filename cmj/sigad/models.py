@@ -1,10 +1,12 @@
 from datetime import datetime
 import io
 import os
+import tempfile
 import zipfile
 
-from PIL import Image
+from PIL import Image, ImageFont
 from PIL.Image import LANCZOS
+from PIL.ImageDraw import Draw
 from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -24,6 +26,8 @@ from django.utils.functional import cached_property
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields.json import JSONField as django_extensions_JSONField
+import qrcode
+from qrcode.image.pil import PilImage
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.units import cm
 from reportlab.pdfgen import canvas
@@ -617,6 +621,10 @@ class UrlShortener(models.Model):
 
     @property
     def absolute_short(self, protocol=True):
+        if settings.DEBUG:
+            return 'http://localhost:9000/j{}'.format(
+                self.url_short
+            )
         return '{}jatai.go.leg.br/j{}'.format(
             'https://' if protocol else '',
             self.url_short
@@ -624,6 +632,62 @@ class UrlShortener(models.Model):
 
     def __str__(self):
         return 'Link Curto: {}'.format(self.url_short)
+
+    @property
+    def qrcode(self):
+        fn = '/tmp/portalcmj_qrcode_{}.png'.format(self.url_short)
+
+        brasao = settings.FRONTEND_BRASAO_PATH['128']
+
+        ibr = Image.open(brasao)
+
+        new_image = Image.new("RGBA", (144, 128), "WHITE")
+        new_image.paste(ibr, (8, -10), ibr)
+
+        draw = Draw(new_image)
+
+        font = ImageFont.truetype(
+            font=settings.PROJECT_DIR.child('fonts').child('Helvetica.ttf'),
+            size=11)
+        size_text = font.getsize(self.absolute_short)
+
+        draw.rectangle(
+            (0, 128 - size_text[1] - 8, 144 - 1, 128 - 1),
+            fill=(17, 77, 129),
+            outline=(17, 77, 129),
+            width=2)
+
+        draw.text(
+            (72 - size_text[0] / 2, 128 - size_text[1] - 4),
+            self.absolute_short,
+            (255, 255, 255),
+            font=font)
+
+        draw.rectangle(
+            (0, 0, 144 - 1, 128 - 1),
+            fill=None,
+            outline=(17, 77, 129),
+            width=2)
+
+        qr = qrcode.QRCode(
+            version=6,
+            error_correction=qrcode.constants.ERROR_CORRECT_H,
+            box_size=8,
+            border=2
+        )
+
+        qr.add_data(self.absolute_short)
+
+        qr.make()
+        irq = qr.make_image().convert('RGB')
+        pos = ((irq.size[0] - new_image.size[0]) // 2,
+               (irq.size[1] - new_image.size[1]) // 2)
+
+        irq.paste(new_image, pos)
+        irq.save(fn)
+
+        with open(fn, 'rb') as f:
+            return f.read()
 
 
 class ShortRedirect(models.Model):

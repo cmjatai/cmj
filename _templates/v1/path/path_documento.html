@@ -196,7 +196,7 @@
             <span class="path-autor">
               {{container.autor|default:''|safe|urlize}}
             </span>
-          
+
             {% with rev=container.revisoes.first %}
               <span class="data-pub">
                 {{rev.data}} - {% trans "por:" %} {{rev.user.first_name|default:rev.user.email}}
@@ -224,7 +224,7 @@
                   <span class="path-autor">
                     {{item.autor|default:''|safe|urlize}}
                   </span>
-                  
+
                   {% with rev=item.revisoes.first %}
                     <span class="data-pub">
                       {{rev.data}} - {% trans "por:" %} {{rev.user.first_name|default:rev.user.email}}
@@ -240,7 +240,7 @@
 
 
         <div class="container{% if container.tipo == container.TPD_CONTAINER_EXTENDIDO%}-fluid{% else %} container-simples{% endif %} {% if forloop.first%}container-first{% endif %}">
-          
+
           {% if container.titulo %}
             <div class="path-title-container">
                 <br>{{container.titulo}}
@@ -329,7 +329,7 @@
                   <span class="path-autor">
                     {{child.autor|default:''|safe|urlize}}
                   </span>
-                  
+
                   {% with rev=child.revisoes.first %}
                     <span class="data-pub">
                       {{rev.data}} - {% trans "por:" %} {{rev.user.first_name|default:rev.user.email}}
@@ -347,7 +347,7 @@
         </div>
       {% endif %}
       {% comment %}
-      
+
       {% if forloop.first and not forloop.last %}
         <div class="painel-corte">
           <div class="btn btn-success">
@@ -358,17 +358,16 @@
       {% endcomment %}
     {% endfor %}
 
-    
+
   {% endblock %}
-  
-  <div class="container"><small>ShortLink: {{object.short_url|urlize}}</small></div>
+
 
 <div class="container">
           <br>
           <table class="table">
           {% for m in object.materias.all %}
             <tr>
-              <td class="item-listas">  
+              <td class="item-listas">
                 <div class="p-3">
                 <div class="verbose_name">
                   Matéria Legislativa
@@ -391,7 +390,7 @@
                   <a href="{% url 'sapl.materia:materialegislativa_detail' m.id %}">{{m.tipo.sigla}} {{m.numero}}/{{m.ano}} - {{m.tipo}}</a>
                 </strong><br>
                 {% if m.numero_protocolo %}
-                    <strong>Protocolo: </strong>{{m.numero_protocolo}}/{{m.ano}} | 
+                    <strong>Protocolo: </strong>{{m.numero_protocolo}}/{{m.ano}} |
                 {% endif %}
                 <strong>Data de Apresentação:</strong> {{m.data_apresentacao}}
                 <br><strong>Autoria:</strong> {{ m.autores.all|join:", "}}
@@ -426,7 +425,7 @@
                             </br>
                         {% endfor %}
                     {% endif %}
-                    
+
                     {% if m.anexo_de.exists %}
                       {% for a in m.materia_anexada_set.all %}
                       <strong>Matéria Anexadora: </strong>&nbsp;
@@ -486,6 +485,11 @@
             </tr>
           {% endfor %}
           </table>
+</div>
+
+<div class="container text-center">
+  <div class="container"><small>ShortLink: {{object.short_url|urlize}}</small></div>
+  <img class="qrcode" src="{{object.short_url}}/qrcode" alt="">
 </div>
 
 

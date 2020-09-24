@@ -1,6 +1,7 @@
 import base64
 import io
 from operator import attrgetter
+import tempfile
 import zipfile
 
 from braces.views import FormMessagesMixin
@@ -401,10 +402,25 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
 
     def _dispath_url_short(self, slug):
         try:
+            slug = slug.split('/')
             url = UrlShortener.objects.get(
-                url_short=slug)
+                url_short=slug[0])
+
+            if len(slug) == 2 and slug[1] == 'qrcode':
+
+                response = HttpResponse(url.qrcode,
+                                        content_type='image/png')
+
+                response['Cache-Control'] = 'no-cache'
+                response['Pragma'] = 'no-cache'
+                response['Expires'] = 0
+                response['Content-Disposition'] = \
+                    'inline; filename=%s.png' % slug[0]
+                return response
+
             return redirect('/' + url.url_long, permanent=True)
-        except:
+
+        except Exception as e:
             raise Http404()
 
     def _pre_dispatch(self, request, *args, **kwargs):

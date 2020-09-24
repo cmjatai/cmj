@@ -53,7 +53,7 @@ class ShortAdminCrud(Crud):
     ordered_list = False
 
     class BaseMixin(Crud.BaseMixin):
-        list_field_names = 'url_short', 'url_long', 'created', 'acessos_set'
+        list_field_names = 'url_short', 'url_long', 'created', 'acessos_set', 'qrcode'
 
         @property
         def update_url(self):
@@ -70,6 +70,12 @@ class ShortAdminCrud(Crud):
     class ListView(Crud.ListView):
         paginate_by = 100
         ordering = '-id'
+
+        def hook_header_qrcode(self, *args, **kwargs):
+            return 'QrCode'
+
+        def hook_qrcode(self, *args, **kwargs):
+            return '<img class="qrcode" src="{}/qrcode" alt="">'.format(args[0].absolute_short), ''
 
         def hook_header_acessos_set(self, *args, **kwargs):
             return 'Acessos'
@@ -122,6 +128,9 @@ class ShortAdminCrud(Crud):
                 )
             return r
 
+        def hook_qrcode(self, obj):
+            return 'QrCode', '<img class="qrcode" src="{}/qrcode" alt="">'.format(obj.absolute_short)
+
         def hook_url_short(self, obj):
             return 'ShorLink', """
                 <div class="text-center">
@@ -131,7 +140,7 @@ class ShortAdminCrud(Crud):
                     </a>
                 </div>
             """.format(
-                obj,
+                obj.absolute_short,
                 obj.absolute_short,
                 obj.absolute_short
             )

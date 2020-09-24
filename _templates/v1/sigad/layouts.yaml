@@ -14,7 +14,7 @@ CaixaPublicacaoClasse:
   {% trans 'Nome e Chave' %}:
   - nome key
   {% trans 'Documentos' %}:
-  - documentos  
+  - documentos
 CaixaPublicacaoDetail:
   {% trans 'Nome e Chave' %}:
   - nome key
@@ -24,8 +24,9 @@ UrlShortener:
 UrlShortenerDetail:
   {% trans 'Link Curtos' %}:
   - created automatico link_absoluto
-  - url_short  
+  - url_short
   - url_long
+  - qrcode
 ShortRedirect:
   {% trans 'Acessos' %}:
     - created
