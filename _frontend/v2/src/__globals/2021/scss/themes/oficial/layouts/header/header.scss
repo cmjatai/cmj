@@ -52,7 +52,7 @@ header.main {
     flex-wrap: nowrap;
   }
 
-  #portalmenu {
+  #portalbtnmenu {
     padding: 0;
     .navbar-toggler {
       padding: 5px 15px;
@@ -81,12 +81,18 @@ header.main {
     }
   }
 
+  &.header-top {
+    #rowlogo {
+      flex-wrap: wrap;
+    }
+  }
+
 }
 
 
 main {
-  background-color: black;
-  color: yellow
+  background-color: white;
+  color: blue
 }
 
 @import './portallogo';

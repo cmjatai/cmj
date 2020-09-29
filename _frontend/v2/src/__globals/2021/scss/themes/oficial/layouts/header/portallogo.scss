@@ -40,9 +40,8 @@ header.main {
       }
     }
   }
-  &.header-top-old {
+  &.header-top {
     #portallogo {
-      padding-top: 0.5rem;
       flex: 1 1 auto;
       &.d-searching {
         flex: 0 0 auto;
@@ -99,6 +98,22 @@ header.main {
         }
       }
     }
+    &.header-top {
+      #portallogo {
+        .navbar-brand {
+          padding: 0;
+
+          img {
+            height: 80px;
+          }
+
+          .brand-name {
+            padding-left: 1rem;
+            font-size: 1rem;
+          }
+        }
+      }
+    }
   }
 }
 
@@ -108,6 +123,22 @@ header.main {
       flex: 1 1 auto;
       .navbar {
         padding: $min_padding 0;
+      }
+    }
+    &.header-top {
+      #portallogo {
+        .navbar-brand {
+          padding: 0;
+
+          img {
+            height: 64px;
+          }
+
+          .brand-name {
+            padding-left: 0rem;
+            font-size: 0.7rem;
+          }
+        }
       }
     }
   }
@@ -128,6 +159,23 @@ header.main {
         }
         .brand-name {
           font-size: 0.5rem;
+        }
+      }
+    }
+    &.header-top {
+      #portallogo {
+        flex: 0 0 auto;
+
+        .navbar-brand {
+
+          img {
+            height: 48px;
+          }
+
+          .brand-name {
+            padding-left: 0rem;
+            font-size: 0.5rem;
+          }
         }
       }
     }

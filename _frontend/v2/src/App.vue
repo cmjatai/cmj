@@ -19,21 +19,19 @@ export default {
   methods: {
     handleScroll: function (event) {
       let h = document.getElementsByTagName('header')[0]
-      let r = (window.scrollY / window.innerHeight)
+      let r = (window.scrollY / $(document).height())
 
-      console.log(this.offsetHeight)
+      // console.log(r, h.offsetHeight)
       if (window.scrollY === 0) {
         h.style.marginTop = '0px'
         h.classList.add('header-top')
-      } else if (window.scrollY > 0 && window.scrollY <= this.offsetHeight && h.classList.contains('header-top')) {
-        h.style.marginTop = '0px'
+      } else {
         h.classList.remove('header-top')
-      } else if (window.scrollY > this.offsetHeight) {
-        h.style.marginTop = `${(-1 * r * window.scrollY)}px`
       }
-    },
-    teste: function (env) {
-      console.log('teste')
+
+      if (window.scrollY > this.offsetHeight) {
+        h.style.marginTop = `${(-3 * r * h.offsetHeight)}px`
+      }
     }
   },
   mounted: function () {
@@ -44,7 +42,7 @@ export default {
 
     this.ro = new ResizeObserver(entries => {
       let m = document.getElementsByTagName('main')[0]
-      m.style.marginTop = `${entries[0].target.offsetHeight}px`
+      m.style.marginTop = `${entries[0].target.offsetHeight - 1}px`
     })
 
     this.ro.observe(h)

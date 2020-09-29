@@ -1,7 +1,23 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "29406757c72b0278a831",
-    "url": "/static/css/app.b8503d58.css"
+    "revision": "d44ac6d2a43c55274f04d4c050ed0692",
+    "url": "/static/brasao/brasao_1024.png"
+  },
+  {
+    "revision": "8f99e5ea64db3fcda01b117954e4af6f",
+    "url": "/static/brasao/brasao_128.png"
+  },
+  {
+    "revision": "6c307cb29fb97f80facd4199fb46d45f",
+    "url": "/static/brasao/brasao_256.png"
+  },
+  {
+    "revision": "7f74a84703400cee7e6807673fd939f8",
+    "url": "/static/brasao/brasao_512.png"
+  },
+  {
+    "revision": "1b27f7a122b3eee2a5fb",
+    "url": "/static/css/app.cf5c3a3c.css"
   },
   {
     "revision": "30cf676097ac5f2a9a55",
@@ -76,24 +92,28 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/header_bg_linha.png"
   },
   {
-    "revision": "d44ac6d2a43c55274f04d4c050ed0692",
-    "url": "/static/img/logo_1024.png"
+    "revision": "e12f38146f24c97d1133b2d2b502c13c",
+    "url": "/static/img/icon.e12f3814.svg"
   },
   {
-    "revision": "6c307cb29fb97f80facd4199fb46d45f",
-    "url": "/static/img/logo_256.png"
+    "revision": "9516930cfe890ecff6fb60409fc4e945",
+    "url": "/static/img/icon_atividade_legislativa.9516930c.svg"
   },
   {
-    "revision": "7f74a84703400cee7e6807673fd939f8",
-    "url": "/static/img/logo_512.png"
+    "revision": "c545c4a743ff7e182e24d84f2424e5fa",
+    "url": "/static/img/icon_doc_adm.c545c4a7.svg"
   },
   {
-    "revision": "67736902535820ab1ca49e9bc3a89d55",
+    "revision": "e736437c61edc388dcab3a33dd247e2c",
+    "url": "/static/img/icon_prestacao_contas.e736437c.svg"
+  },
+  {
+    "revision": "6a87ad5fe619a0f7798751c94f2cbdf1",
     "url": "/static/index.html"
   },
   {
-    "revision": "29406757c72b0278a831",
-    "url": "/static/js/app.1e23c83e.js"
+    "revision": "1b27f7a122b3eee2a5fb",
+    "url": "/static/js/app.d92859fd.js"
   },
   {
     "revision": "589ef26938cc8d653cce",

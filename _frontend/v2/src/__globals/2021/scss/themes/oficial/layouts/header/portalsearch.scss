@@ -60,7 +60,7 @@ header.main {
       .form-search {
         .inner {
           input {
-            width: 100%;
+            //width: 100%;
             font-size: 1rem;
           }
         }
@@ -83,6 +83,7 @@ header.main {
       .form-search {
         .inner {
           input {
+            width: 100%;
             font-size: 0.8rem;
             padding: $min_padding;
             padding-right: 42px;

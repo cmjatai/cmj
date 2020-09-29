@@ -56,38 +56,22 @@ header.main {
     }
   }
 
-  &.header-top-old {
+  &.header-top {
     #portalactions {
-      order: 3;
+      order: 4;
       width: 100%;
       flex: 0 0 100%;
-      //padding: 1rem 0 0;
-      .col-1 {
-        display: block;
-      }
-      .col-2 {
-        flex: 0 0 16.6666%;
-        max-width: 16.666%;
-      }
-
-      &.d-searching {
-        height: 0;
-        width: 0;
-        .row {
-          margin-top: -5rem;
-          margin-left: 5rem;
-        }
-
-      }
-
-      a {
-        .img {
-          height: 108px;
+      .btns-main {
+        .btn-main {
+          a {
+            .icon {
+              height: 108px;
+            }
+            .label {
+              font-size: 110%;
+              min-height: 56px;
+            }
           }
-        .label {
-          //height: 4rem;
-          min-height: 50px;
-          font-size: 110%;
         }
       }
     }
@@ -134,6 +118,25 @@ header.main {
             .label {
               font-size: 50%;
               min-height: 24px;
+            }
+          }
+        }
+      }
+    }
+
+    &.header-top {
+
+      #portalactions {
+        .btns-main {
+          .btn-main {
+            a {
+              .icon {
+                height: 80px;
+              }
+              .label {
+                font-size: 85%;
+                min-height: 48px;
+              }
             }
           }
         }
@@ -213,6 +216,23 @@ header.main {
             }
             .label {
               font-size: 60%;
+            }
+          }
+        }
+      }
+    }
+    &.header-top {
+      #portalactions {
+        .btns-main {
+          .btn-main {
+            a {
+              .icon {
+                height: 64px;
+              }
+              .label {
+                font-size: 60%;
+                min-height: 36px;
+              }
             }
           }
         }
