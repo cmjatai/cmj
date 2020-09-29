@@ -1,11 +1,12 @@
 header.main {
   #portalactions {
     padding: 0;
-    .row {
+    .btns-main {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: nowrap;
       .btn-main {
         flex: 1 1 20%;
-        max-width: 20%;
-
         a {
           display: flex;
           flex-direction: column;
@@ -17,9 +18,12 @@ header.main {
           &:hover {
             text-shadow: 1px 1px 10px  lighten($bg_color_portal_cmj, 20%);
           }
+          .icon {
+            height: 72px;
+          }
           .label {
             display: flex;
-            font-size: 80%;
+            font-size: 77%;
             line-height: 1.2;
             align-items: center;
             justify-content: center;
@@ -29,13 +33,7 @@ header.main {
       }
     }
 
-
-
-
-
-
     &.d-searching {
-      //display: none;
       transition: all 0.3s ease;
       width: 0;
       overflow: hidden;
@@ -49,12 +47,13 @@ header.main {
           .img {
             height: 0;
           }
+          .label {
+            font-size: 0;
+          }
         }
 
       }
     }
-
-
   }
 
   &.header-top-old {
@@ -98,25 +97,44 @@ header.main {
 @media screen and (max-width:991.98px) {
   header.main {
     #portalactions {
-      padding: 0;
-      a {
-        .img {
-          height: 48px;
-        }
-        .label {
-          font-size: 50%;
+      .btns-main {
+        .btn-main {
+          a {
+            .icon {
+              height: 64px;
+              .fas {
+                font-size: 1em;
+              }
+            }
+            .label {
+              font-size: 65%;
+            }
+          }
         }
       }
     }
-    &.header-top {
-      #portalactions {
+  }
+}
 
-        a {
-          .img {
-            //height: 80px;
-          }
-          .label {
-            font-size: 80%;
+@media screen and (max-width:828.98px) {
+  header.main {
+    #portalactions {
+      .btns-main {
+        .btn-main {
+          a {
+            .icon {
+              height: 48px;
+              .fas {
+                font-size: 0.7em;
+              }
+              .fa-2x {
+                font-size: 1em;
+              }
+            }
+            .label {
+              font-size: 50%;
+              min-height: 24px;
+            }
           }
         }
       }
@@ -127,92 +145,75 @@ header.main {
 @media screen and (max-width:767.98px) {
   header.main {
     #portalactions {
-      order: 3;
+      order: 4;
       width: 100%;
       flex: 0 0 100%;
-      height: auto;
-      //padding-bottom: $min_padding * 3;
-
-      &.d-searching {
-        transition: all 0.3s ease;
-        width: auto;
-        overflow: inherit;
-        opacity: 1;
-        flex: 0 0 100%;
-        .row {
-          margin-left: 0;
-          width: 100%;
-        }
-      }
-      a {
-        .img {
-          height: 56px;
-        }
-        .label {
-          font-size: 75%;
-        }
-      }
-    }
-    &.header-top {
-      #portalactions {
-        height: auto;
-        padding-bottom: $min_padding * 3;
-        a {
-          .img {
-            height: 56px;
+      padding-bottom: $min_padding;
+      .btns-main {
+        .btn-main {
+          a {
+            .icon {
+              height: 80px;
+              .fas {
+                font-size: 1em;
+              }
+              .fa-2x {
+                font-size: 1.4em;
+              }
+            }
+            .label {
+              font-size: 75%;
+              min-height: 36px;
+            }
           }
         }
-
-        &.d-searching {
-          width: 0;
-          overflow: hidden;
-          opacity: 0;
-          flex: 0 0 0;
-          .row {
-            margin-left: 0;
-            width: 0;
-          }
-        }
-        .col-1 {
-          display: none;
-        }
-        .col-2 {
-          flex: 0 0 20%;
-          max-width: 20%;
-        }
       }
-
     }
   }
 }
 
 @media screen and (max-width:575.98px) {
-
   header.main {
     #portalactions {
-      padding: $min_padding 0;
-      .col-2 {
-        padding: 0 0px;
-      }
-      a {
-        .img {
-          height: 68px;
-        }
-        .label {
-          font-size: 65%;
+      .btns-main {
+        .btn-main {
+          a {
+            .icon {
+              height: 64px;
+              .fas {
+                font-size: 1em;
+              }
+              .fa-2x {
+                font-size: 1.4em;
+              }
+            }
+            .label {
+              font-size: 70%;
+            }
+          }
         }
       }
     }
-    &.header-top {
-      #portalactions {
-        a {
-          .img {
-            height: 68px;
-          }
-          .label {
-            font-size: 65%;
-            height: auto;
-            min-height: 2.5rem;
+  }
+}
+@media screen and (max-width:419.98px) {
+  header.main {
+    #portalactions {
+      .btns-main {
+        .btn-main {
+          a {
+            .icon {
+              height: 64px;
+              .fas {
+                font-size: 1em;
+              }
+              .fa-2x {
+                font-size: 1.4em;
+              }
+            }
+            .label {
+              font-size: 60%;
+            }
           }
         }
       }

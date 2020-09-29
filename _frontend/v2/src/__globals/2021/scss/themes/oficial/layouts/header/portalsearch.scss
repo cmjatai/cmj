@@ -1,6 +1,8 @@
 header.main {
   #portalsearch {
     flex: 0 0 auto;
+    padding: 0;
+    padding-left: $min_padding * 2;
     &.d-searching {
       flex: 1 1 auto;
       input {
@@ -9,9 +11,17 @@ header.main {
     }
 
     .form-search {
+      opacity: 0.7;
+      &:hover {
+        opacity: 1;
+      }
       .inner {
         display: flex;
         position: relative;
+        justify-content: flex-end;
+        text-align: right;
+        background-color: white;
+        border-radius: 5px;
         .item-form {
           &:first-child {
             flex: 1 1 100%;
@@ -25,14 +35,14 @@ header.main {
         }
         input {
           border: 0px;
-          background-color: white;
-          border-radius: 5px;
+          background-color: transparent;
           font-size: 1.3rem;
           padding-right: 60px;
-          width: 20rem;
+          width: 14rem;
         }
         button {
-          background-color: transparent;
+          background-color: white;
+          border-radius: 0 5px 5px 0;
           border: 0;
           width: 50px;
           height: 100%;
@@ -45,11 +55,65 @@ header.main {
 
 
 @media screen and (max-width:991.98px) {
+  header.main {
+    #portalsearch {
+      .form-search {
+        .inner {
+          input {
+            width: 100%;
+            font-size: 1rem;
+          }
+        }
+      }
+    }
+  }
 }
 
 
 @media screen and (max-width:767.98px) {
+
 }
 
 @media screen and (max-width:575.98px) {
+}
+@media screen and (max-width:419.98px) {
+  header.main {
+    #portalsearch {
+      flex: 1 1 0;
+      .form-search {
+        .inner {
+          input {
+            font-size: 0.8rem;
+            padding: $min_padding;
+            padding-right: 42px;
+            line-height: 1;
+          }
+          button {
+            width: 36px;
+          }
+        }
+      }
+
+      &.d-searching {
+        flex: 1 1 0;
+        input {
+          width: 100% !important;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (min-width:1200px) {
+header.main {
+  #portalsearch {
+    .form-search {
+      .inner {
+        input {
+          width: auto;
+        }
+      }
+    }
+  }
+}
 }

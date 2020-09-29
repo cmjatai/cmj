@@ -1,7 +1,9 @@
 header.main {
   #portallogo {
+    padding: 0;
+    padding-right: $min_padding * 2;
     .navbar {
-      padding: $min_padding * 4 0;
+      padding: $min_padding * 5 0;
       &:hover {
         text-shadow: 1px 1px 15px  lighten($bg_color_portal_cmj, 20%);
       }
@@ -12,10 +14,10 @@ header.main {
       margin: 0;
       align-items: center;
       img {
-        height: 64px;
+        height: 80px;
+        padding: 0.5rem;
       }
       .brand-name {
-        padding-left: 1rem;
         display: flex;
         flex-direction: column;
         color: white;
@@ -62,13 +64,53 @@ header.main {
   }
 }
 
-@media screen and (max-width:991.98px) {
-
+@media screen and (max-width:1049.98px) {
+  header.main {
+    #portallogo {
+      .navbar-brand {
+        img {
+          height: 64px;
+        }
+        .brand-name {
+          font-size: 0.7rem;
+        }
+      }
+    }
+  }
 
 }
 
-@media screen and (max-width:767.98px) {
+@media screen and (max-width:991.98px) {
 
+}
+
+@media screen and (max-width:828.98px) {
+  header.main {
+    #portallogo {
+      .navbar {
+        padding: $min_padding * 3 0;
+      }
+      .navbar-brand {
+        img {
+          padding: $min_padding;
+        }
+        .brand-name {
+          font-size: 0.6rem;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width:767.98px) {
+  header.main {
+    #portallogo {
+      flex: 1 1 auto;
+      .navbar {
+        padding: $min_padding 0;
+      }
+    }
+  }
 }
 
 @media screen and (max-width:575.98px) {
@@ -76,5 +118,18 @@ header.main {
 }
 
 @media screen and (max-width:419.98px) {
-
+  header.main {
+    #portallogo {
+      flex: 0 0 auto;
+      padding-right: $min_padding;
+      .navbar-brand {
+        img {
+          height: 48px;
+        }
+        .brand-name {
+          font-size: 0.5rem;
+        }
+      }
+    }
+  }
 }
