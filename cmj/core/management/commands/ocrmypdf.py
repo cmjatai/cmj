@@ -224,7 +224,7 @@ class Command(BaseCommand):
         self.delete_itens_tmp_folder()
 
         # execução depende do crontab executado em:
-        # 1,9,18,27,36,45,54 0-22 * * * djangoapps
+        #  9,18,27,36,45,54 0-22 * * * djangoapps
         # /storage1/django-apps/cmj/run__commands__9min.sh
 
         self.execucao_noturna = init.hour < 6 or init.hour >= 22
@@ -234,7 +234,7 @@ class Command(BaseCommand):
         OcrMyPDF.objects.filter(
             created__lt=init - timedelta(days=1095)).delete()
 
-        # Refaz tudo que foi feito a mais de um mês e nao teve sucesso
+        # Refaz tudo que foi feito a mais de tres mêses e nao teve sucesso
         OcrMyPDF.objects.filter(
             created__lt=init - timedelta(days=90),
             sucesso=False).delete()

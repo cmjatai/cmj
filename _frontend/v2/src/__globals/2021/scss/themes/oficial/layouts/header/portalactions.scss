@@ -1,15 +1,38 @@
 header.main {
   #portalactions {
-    padding: $min_padding * 2 0;
-    font-size: 1rem;
-    height: auto;
-    flex-wrap: nowrap;
+    padding: 0;
     .row {
-      margin-top: 0;
-      margin-left: 0;
-      width: 100%;
-      flex-wrap: nowrap;
+      .btn-main {
+        flex: 1 1 20%;
+        max-width: 20%;
+
+        a {
+          display: flex;
+          flex-direction: column;
+          color: white;
+          font-weight: bold;
+          text-align: center;
+          text-decoration: none;
+          font-size: 100%;
+          &:hover {
+            text-shadow: 1px 1px 10px  lighten($bg_color_portal_cmj, 20%);
+          }
+          .label {
+            display: flex;
+            font-size: 80%;
+            line-height: 1.2;
+            align-items: center;
+            justify-content: center;
+            min-height: 38px;
+          }
+        }
+      }
     }
+
+
+
+
+
 
     &.d-searching {
       //display: none;
@@ -31,64 +54,10 @@ header.main {
       }
     }
 
-    .col-1 {
-      display: none;
-    }
-    .col-2 {
-      flex: 1 1 20%;
-      max-width: 20%;
-      //flex: 1 1 auto;
-      //max-width: none;
-      //width: auto;
-      padding-left: $min_padding;
-      padding-right: $min_padding;
-    }
 
-    a {
-      display: flex;
-      flex-direction: column;
-      color: white;
-      font-weight: bold;
-      text-align: center;
-      text-decoration: none;
-      font-size: 100%;
-      &:hover {
-        text-shadow: 1px 1px 10px  lighten($bg_color_portal_cmj, 20%);
-      }
-      .img {
-        background-image: url(../oficial/assets/icon_prancheta_sombra.svg);
-        background-size: auto 100%;
-        background-repeat: no-repeat;
-        background-position: center center;
-        height: 72px;
-        opacity: 0.95;
-        &:hover {
-          opacity: 1;
-        }
-
-      }
-      .label {
-        display: flex;
-        font-size: 80%;
-        line-height: 1.2;
-        align-items: center;
-        justify-content: center;
-        min-height: 38px;
-      }
-    }
-
-    .row {
-      .btn-main:nth-child(2n -1){
-        .img {
-          background-size: auto 80%;
-          background-position: center bottom;
-          background-image: url(../oficial/assets/icon_prancheta.svg);
-        }
-      }
-    }
   }
 
-  &.header-top {
+  &.header-top-old {
     #portalactions {
       order: 3;
       width: 100%;

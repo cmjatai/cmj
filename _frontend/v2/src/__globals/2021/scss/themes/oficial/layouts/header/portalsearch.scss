@@ -9,12 +9,9 @@ header.main {
     }
 
     .form-search {
-
-      padding: 3rem 0;
       .inner {
         display: flex;
         position: relative;
-
         .item-form {
           &:first-child {
             flex: 1 1 100%;
@@ -40,17 +37,6 @@ header.main {
           width: 50px;
           height: 100%;
           border-left: 1px solid gray;
-
-        }
-      }
-    }
-  }
-  &.header-top {
-    #portalsearch {
-      &.d-searching {
-        flex: 1 1 auto;
-        input {
-          width: 100%;
         }
       }
     }
@@ -59,81 +45,11 @@ header.main {
 
 
 @media screen and (max-width:991.98px) {
-  header.main {
-    #portalsearch {
-      .form-search {
-        padding: 1rem 0;
-        .inner {
-          input {
-            padding-left: 5px;
-            padding-right: 40px;
-            width: 13rem;
-            font-size: 1rem;
-          }
-        }
-      }
-    }
-  }
 }
 
 
 @media screen and (max-width:767.98px) {
-
-  header.main {
-    #portalsearch {
-      height: auto;
-      //padding: $min_padding * 4;
-      padding-left: $min_padding;
-      //flex: 1 1 auto;
-
-      &.d-searching {
-        padding-right: $min_padding * 4;
-      }
-      .form-search {
-        .inner {
-          input {
-            font-size: 1rem;
-            padding-right: 60px;
-            width: 100%;
-          }
-        }
-      }
-    }
-    &.header-top {
-      #portalsearch {
-        padding-left: $min_padding * 4;
-        &.d-searching {
-          padding-right: $min_padding * 4;
-          padding-bottom: $min_padding * 4;
-        }
-      }
-    }
-  }
 }
 
 @media screen and (max-width:575.98px) {
-
-  header.main {
-    #portalsearch {
-      padding: $min_padding;
-      padding-right: $min_padding * 4;
-
-      .form-search {
-        .inner {
-          input {
-            padding-right: 30px;
-
-          }
-          button {
-            width: 30px;
-          }
-        }
-      }
-    }
-    &.header-top {
-      #portalsearch {
-        padding: 0 $min_padding * 4;
-      }
-    }
-  }
 }

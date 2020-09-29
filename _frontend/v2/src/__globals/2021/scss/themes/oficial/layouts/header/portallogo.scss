@@ -1,24 +1,19 @@
 header.main {
-
   #portallogo {
-
     .navbar {
-      padding: 0;
+      padding: $min_padding * 4 0;
       &:hover {
         text-shadow: 1px 1px 15px  lighten($bg_color_portal_cmj, 20%);
       }
     }
-
     .navbar-brand {
       display: flex;
       padding: 0;
       margin: 0;
       align-items: center;
-
       img {
         height: 64px;
       }
-
       .brand-name {
         padding-left: 1rem;
         display: flex;
@@ -27,7 +22,7 @@ header.main {
         line-height: 1;
         font-family: Arial;
         justify-content: center;
-        font-size: 0.7rem;
+        font-size: 0.9rem;
       }
       .brand-cidade {
         font-weight: bold;
@@ -43,7 +38,7 @@ header.main {
       }
     }
   }
-  &.header-top {
+  &.header-top-old {
     #portallogo {
       padding-top: 0.5rem;
       flex: 1 1 auto;
@@ -69,90 +64,17 @@ header.main {
 
 @media screen and (max-width:991.98px) {
 
-  header.main {
-    #portallogo {
-      .navbar-brand {
-        img {
-          height: 48px;
-        }
-        .brand-name {
-          font-size: 0.6rem;
-        }
-      }
-    }
-
-    &.header-top {
-      #portallogo {
-        .navbar-brand {
-          img {
-            height: 72px;
-          }
-          .brand-name {
-            font-size: 0.9rem;
-          }
-        }
-      }
-    }
-  }
 
 }
 
 @media screen and (max-width:767.98px) {
-  header.main {
-    //position: relative;
-    &.header-top {
-      #portallogo {
-        &.d-searching {
-          .navbar {
-            justify-content: center;
-          }
-          //flex: 0 1 100%;
-        }
-      }
-    }
-  }
+
 }
 
 @media screen and (max-width:575.98px) {
 
-  header.main {
-    #portallogo {
-      padding: 0.5rem;
-      .navbar {
-        justify-content: center;
-      }
-    }
-  }
 }
 
 @media screen and (max-width:419.98px) {
-  header.main {
-    #portallogo {
 
-      &.d-searching {
-
-      }
-      .navbar-brand {
-        img {
-          height: 64px;
-        }
-        .brand-name {
-          display: none;
-        }
-      }
-    }
-    &.header-top {
-      #portallogo {
-        .navbar-brand {
-          img {
-            height: 64px;
-          }
-          .brand-name {
-            display: flex;
-            font-size: 0.7rem;
-          }
-        }
-      }
-    }
-  }
 }
