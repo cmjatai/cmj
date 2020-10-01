@@ -14,6 +14,7 @@ export default {
     return {
       ro: null,
       offsetHeight: 0
+
     }
   },
   methods: {
@@ -46,6 +47,8 @@ export default {
     })
 
     this.ro.observe(h)
+
+    // window.SetCookie('editortype', editortype, 30)
 
     this.$options.sockets.onmessage = (event) => {
       /**

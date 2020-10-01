@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <meta name="reply-to" content="manager@jatai.go.leg.br">
-    <meta name="theme-color" content="#006556">
+    <meta name="theme-color" content="#114d81">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>{% if user|notificacoes_unread_count %}({{user|notificacoes_unread_count}}) {% endif %}{% block head_title %}{% trans 'Câmara Jataí' %}{% endblock %} - {% block head_title_sufix %}Portal da Câmara Municipal de Jataí - Estado de Goiás{% endblock head_title_sufix %}</title>
@@ -152,9 +152,11 @@
                 </form>
               </div>
             </div>
-            <div id="portalbtnmenu" :class="['col-auto', searching ]" >
-              {% block button_toogle %}
-                <span type="button" class="navbar-toggler" data-toggle="collapse" data-target="#portalmenu" aria-controls="portalmenu" aria-expanded="false" aria-label="Toggle navigation">
+            <div id="portalbtnmenu"
+              :class="['col-auto', searching ]"
+              v-show="!portalmenu_opened">
+              {% block button_toogle_main %}
+                <span type="button" class="navbar-toggler" v-on:click="handleClickPortalMenu">
                   <span class="icon-bar"></span>
                   <span class="icon-bar"></span>
                   <span class="icon-bar"></span>
@@ -163,8 +165,32 @@
             </div>
           </div>
 
-          <div class="row navbar-collapse collapse" id="portalmenu">
-                menu menu
+          <div id="portalmenu"
+            v-show="portalmenu_opened">
+              <div class="btnmenu" v-on:click="handleClickPortalMenu">
+                {% block button_toogle_second %}
+                  <span class="navbar-toggler" >
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                  </span>
+                {% endblock %}
+                <div>Menu</div>
+              </div>
+
+                {% block social_links %}
+                  <div class="navbar-social-links">
+                    <a href="/online/" class="icon-sessoes-online" title="Sessão Plenária Online - Atualização em tempo real"><span>Sessões Online</span></a>
+                    <a href="/estatisticas/" title="Estatisticas de Dados do Portal"><i class="far fa-chart-bar"></i></a>
+                    <a href="https://soundcloud.com/camara-de-jatai"><i class="fab fa-soundcloud" aria-hidden="true"></i><span>SoundCloud</span></a>
+
+                    <a class="facebook" href="https://www.facebook.com/cmjatai"><span>Facebook</span></a>
+                    <a class="youtube" href="https://www.youtube.com/C%C3%A2maraMunicipalJata%C3%AD?sub_confirmation=1"><span>YouTube</span></a>
+                    <a class="twitter" href="https://twitter.com/cmjatai"><span>Twitter</span></a>
+                    <a class="instagram" href="http://instagram.com/cmjatai"><span>Instagram</span></a>
+                  </div>
+                {% endblock %}
+
           </div>
         </div>
       </header>
@@ -218,38 +244,11 @@
 
               {% notificacoes_unread %}
 
-              <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
-
               <a class="navbar-brand" href="{{site_url}}/">
                   <i class="fa fa-home" aria-hidden="true"></i>C<small>âmara</small> M<small>unicipal de</small> J<small>ataí</small><span class="brand-estado"> - E<small>stado</small> <small>de</small> G<small>oiás</small></span>
               </a>
 
-              {% block button_toogle %}
-                <button type="button" class="navbar-toggler toggle-access" data-toggle="collapse" data-target="#navbar-access" aria-controls="navbar-access" aria-expanded="false" aria-label="Toggle navigation">
-                  <span class="icon-bar"></span>
-                  <span class="icon-bar"></span>
-                  <span class="icon-bar"></span>
-                </button>
-              {% endblock %}
-
               <div class="navbar-collapse collapse" id="navbar-access">
-
-                {% block social_links %}
-                  <div class="navbar-social-links justify-content-center">
-                    <a href="/online/" class="icon-sessoes-online" title="Sessão Plenária Online - Atualização em tempo real"><span>Sessões Online</span></a>
-
-                    <a href="/estatisticas/"title="Estatisticas de Dados do Portal"><i class="far fa-chart-bar"></i></a>
-
-                    <a href="https://soundcloud.com/camara-de-jatai"><i class="fab fa-soundcloud" aria-hidden="true"></i><span>SoundCloud</span></i></a>
-                    <a class="facebook" href="https://www.facebook.com/cmjatai"><i class="fab fa-facebook-f" aria-hidden="true"><span>Facebook</span></i></a>
-                    <a class="youtube" href="https://www.youtube.com/C%C3%A2maraMunicipalJata%C3%AD?sub_confirmation=1"><i class="fab fa-youtube" aria-hidden="true"><span>YouTube</span></i></a>
-                    <a class="twitter" href="https://twitter.com/cmjatai"><i class="fab fa-twitter" aria-hidden="true"><span>Twitter</span></i></a>
-                  </div>
-                {% endblock %}
 
                 <ul class="navbar-nav justify-content-end">
                   {% if user and not user.is_anonymous %}

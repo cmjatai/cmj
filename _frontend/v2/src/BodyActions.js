@@ -6,7 +6,8 @@ export default {
   },
   data () {
     return {
-      searching: ''
+      searching: '',
+      portalmenu_opened: false
     }
   },
   methods: {
@@ -18,6 +19,21 @@ export default {
     },
     handleFocusSearch (event) {
       this.searching = 'd-searching'
+    },
+    handleClickPortalMenu (event) {
+      this.portalmenu_opened = !this.portalmenu_opened
+      this.$cookie.set('portalmenu_opened', this.portalmenu_opened ? 'opened' : 'closed')
     }
+  },
+  mounted: function () {
+    let portalmenu_opened = this.$cookie.get('portalmenu_opened')
+
+    if (portalmenu_opened === null) {
+      portalmenu_opened = false
+    } else {
+      portalmenu_opened = portalmenu_opened === 'opened'
+    }
+    this.portalmenu_opened = portalmenu_opened
   }
+
 }

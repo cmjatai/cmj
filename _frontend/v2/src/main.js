@@ -1,6 +1,7 @@
 import './__globals'
 import Vue from 'vue'
 import Vuex from 'vuex'
+import VueCookie from 'vue-cookie'
 import BootstrapVue from 'bootstrap-vue'
 import VueNativeSock from 'vue-native-websocket'
 import Router from 'vue-router'
@@ -27,6 +28,7 @@ axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 Vue.use(Vuex)
 Vue.use(Router)
 Vue.use(BootstrapVue)
+Vue.use(VueCookie)
 
 /*
 ws/time-refresh recebe uma notificacão sempre que um model do Sapl
