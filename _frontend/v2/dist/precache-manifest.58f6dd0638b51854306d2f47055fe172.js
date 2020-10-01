@@ -16,11 +16,11 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/brasao/brasao_512.png"
   },
   {
-    "revision": "8af73d3010671a9b4cd9",
-    "url": "/static/css/app.bb5f6f00.css"
+    "revision": "f6890612ed60c894936b",
+    "url": "/static/css/app.671574bf.css"
   },
   {
-    "revision": "f09ced4661db0997a0cd",
+    "revision": "d2d7d838ef709f50246d",
     "url": "/static/css/chunk-vendors.2fe795fd.css"
   },
   {
@@ -44,24 +44,28 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/icon_doc_adm.c545c4a7.svg"
   },
   {
+    "revision": "d507cda3770c0c4663c89aec2984e0db",
+    "url": "/static/img/icon_plenarias.d507cda3.svg"
+  },
+  {
     "revision": "e736437c61edc388dcab3a33dd247e2c",
     "url": "/static/img/icon_prestacao_contas.e736437c.svg"
   },
   {
-    "revision": "7d6be44b20f4136b13030e0468f85c5e",
+    "revision": "3e7b3ece46e37c8e30a2d6153a7c126c",
     "url": "/static/index.html"
   },
   {
-    "revision": "8af73d3010671a9b4cd9",
-    "url": "/static/js/app.2c1130af.js"
+    "revision": "f6890612ed60c894936b",
+    "url": "/static/js/app.81febc63.js"
   },
   {
     "revision": "589ef26938cc8d653cce",
     "url": "/static/js/chunk-2d22d746.b4c82dc4.js"
   },
   {
-    "revision": "f09ced4661db0997a0cd",
-    "url": "/static/js/chunk-vendors.0284a2b3.js"
+    "revision": "d2d7d838ef709f50246d",
+    "url": "/static/js/chunk-vendors.9e10c17e.js"
   },
   {
     "revision": "7516fc313b953a9501c3ae0c58933f63",
