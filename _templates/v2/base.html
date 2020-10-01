@@ -39,12 +39,12 @@
           <div class="container">
             <div class="row justify-content-between" id="accessactions">
               <div class="btn-group" role="group">
-                <a class="btn btn-link " href="#main_content" accesskey="1">Ir para Conteúdo<span class="badge badge-light">1</span></a>
-                <a class="btn btn-link" href="#menu_content" accesskey="2">Ir para Menu<span class="badge badge-light">2</span></a>
-                <a class="btn btn-link" href="#rodape_access" accesskey="3">Ir para Rodapé<span class="badge badge-light">3</span></a>
+                <a href="#main_content" accesskey="1">Ir para Conteúdo<span class="badge badge-light">1</span></a>
+                <a href="#menu_content" accesskey="2">Ir para Menu<span class="badge badge-light">2</span></a>
+                <a href="#rodape_access" accesskey="3">Ir para Rodapé<span class="badge badge-light">3</span></a>
               </div>
               <div class="btn-group" role="group">
-                  <a class="btn btn-link" href="#" id="altocontraste" accesskey="4" onclick="window.toggleContrast()" onkeydown="window.toggleContrast()"><i class="fas fa-adjust" aria-hidden="true"> Alto Contraste</i></a>
+                  <a href="#" id="altocontraste" accesskey="4" onclick="window.toggleContrast()" onkeydown="window.toggleContrast()">Alto Contraste <i class="fas fa-adjust" aria-hidden="true"></i></a>
               </div>
             </div>
           </div>
@@ -77,18 +77,35 @@
                     <div class="icon icon_atividade_legislativa"></div>
                     <div class="label">ATIVIDADE<BR>LEGISLATIVA</div>
                   </a>
+                  <ul class="subaction">
+                    {% navbar 'navbar/public/navbar_atividade_legislativa.yaml' %}
+
+                  </ul>
                 </div>
                 <div class="btn-main ">
                   <a class="inner" href="#">
                     <div class="icon icon_ouvidoria"><i class="fas fa-2x fa-bullhorn"></i></div>
-                    <div class="label">OUVIDORIA</div>
+                    <div class="label">FALE<BR>CONOSCO</div>
                   </a>
+                  <ul class="subaction">
+                    <li><a href="/fale-conosco/telefones-e-emails" title="Conteúdo: Telefones e Emails">
+                    <span title="">Telefones e Emails</span></a></li>
+                    <li><a href="http://camaradejatai.sigepnet.com.br/informacao/sic_primeiro_acesso.php?portal=2" title="Conteúdo: e-SIC">
+                    <span title="">SIC Físico - Localização e Horários</span></a></li>
+                    <li><a href="/fale-conosco/servico-de-informacoes-ao-cidadao-sic" title="Conteúdo: SIC Físico - Localização e Horários">
+                    <span title="">Ouvidoria Parlamentar</span></a></li>
+                    <li><a href="/fale-conosco/ouvidoria" title="Conteúdo: Ouvidoria Parlamentar">
+                    <span title="">e-SIC</span></a></li>
+                  </ul>
                 </div>
                 <div class="btn-main">
                   <a class="inner" href="#">
                     <div class="icon icon_doc_adm"></div>
                     <div class="label">DOCUMENTOS<BR>ADMINISTRATIVOS</div>
                   </a>
+                  <ul class="subaction">
+                    {% navbar 'navbar/public/navbar_documentos_administrativos.yaml' %}
+                  </ul>
                 </div>
                 <div class="btn-main">
                   <a class="inner" href="#">
@@ -98,6 +115,10 @@
                     </div>
                     <div class="label">TV E RÁDIO<BR>CÂMARA</div>
                   </a>
+                  <ul class="subaction">
+                    {% navbar 'navbar/public/navbar_midias.yaml' %}
+
+                  </ul>
                 </div>
                 <div class="btn-main">
                   <a class="inner" href="#">
@@ -133,7 +154,7 @@
             </div>
             <div id="portalbtnmenu" :class="['col-auto', searching ]" >
               {% block button_toogle %}
-                <span type="button" class="navbar-toggler" data-toggle="collapse" data-target="#header-menu" aria-controls="header-menu" aria-expanded="false" aria-label="Toggle navigation">
+                <span type="button" class="navbar-toggler" data-toggle="collapse" data-target="#portalmenu" aria-controls="portalmenu" aria-expanded="false" aria-label="Toggle navigation">
                   <span class="icon-bar"></span>
                   <span class="icon-bar"></span>
                   <span class="icon-bar"></span>
@@ -142,7 +163,7 @@
             </div>
           </div>
 
-          <div class="row navbar-collapse collapse" id="header-menu">
+          <div class="row navbar-collapse collapse" id="portalmenu">
                 menu menu
           </div>
         </div>

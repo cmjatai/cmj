@@ -11,3 +11,10 @@ $container-max-widths: (
   lg: 100%,
   xl: 1140px
 ) !default;
+
+$hover_background_05p: rgba(0,0,0,0.05);
+$hover_background_10p: rgba(0,0,0,0.1);
+$hover_background_20p: rgba(0,0,0,0.2);
+$hover_background_50p: rgba(0,0,0,0.5);
+$hover_background_10pw: rgba(205,255,200,0.1);
+$hover_background_20pw: rgba(205,255,200,.2);

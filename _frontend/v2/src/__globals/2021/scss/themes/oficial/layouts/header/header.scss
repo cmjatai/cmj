@@ -21,23 +21,28 @@ header.main {
     background-size: auto 100%;
     background-repeat: no-repeat;
     background-position: -18px -10px;
+    z-index: -1;
   }
 
   #header-accessibility {
     position: absolute;
     #accessactions {
       opacity: 0.7;
-      .btn-link {
+      a {
         color: white;
         padding: 0 $min_padding;
         font-size: 0.8rem;
         line-height: 1;
+        text-decoration: none;
         .badge {
           margin-left: 0.3rem;
           padding-top: 2px;
           padding-bottom: 2px;
           line-height: 1;
           background-color: #777;
+        }
+        &:hover {
+          background-color: $hover_background_20pw;
         }
       }
       &:hover {
@@ -87,6 +92,8 @@ header.main {
     }
   }
 
+
+
 }
 
 
@@ -98,6 +105,7 @@ main {
 @import './portallogo';
 @import './portalsearch';
 @import './portalactions';
+@import './portalmenu';
 
 @media screen and (max-width:991.98px) {
 }

@@ -29,7 +29,7 @@ export default {
         h.classList.remove('header-top')
       }
 
-      if (window.scrollY > this.offsetHeight) {
+      if (window.scrollY * 1.5 > this.offsetHeight) {
         h.style.marginTop = `${(-3 * r * h.offsetHeight)}px`
       }
     }

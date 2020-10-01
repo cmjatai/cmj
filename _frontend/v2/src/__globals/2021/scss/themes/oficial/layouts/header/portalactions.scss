@@ -1,25 +1,27 @@
 header.main {
   #portalactions {
     padding: 0;
+    //position: static;
     .btns-main {
       display: flex;
-      justify-content: space-between;
       flex-wrap: nowrap;
+      //position: static;
       .btn-main {
         flex: 1 1 20%;
-        a {
+        position: relative;
+        a.inner {
           display: flex;
           flex-direction: column;
           color: white;
           font-weight: bold;
           text-align: center;
           text-decoration: none;
-          font-size: 100%;
+          font-size: 95%;
           &:hover {
             text-shadow: 1px 1px 10px  lighten($bg_color_portal_cmj, 20%);
           }
           .icon {
-            height: 72px;
+            height: 56px;
           }
           .label {
             display: flex;
@@ -28,6 +30,71 @@ header.main {
             align-items: center;
             justify-content: center;
             min-height: 38px;
+          }
+          .fas {
+            font-size: 0.8em;
+          }
+          .fa-2x {
+            font-size: 1.5em;
+          }
+        }
+        ul {
+          display: none;
+          flex-direction: column;
+          margin: 0;// -$min_padding * 7 $min_padding * 2;
+          padding: 0;
+          list-style: none;
+          border: 1px solid lighten($color: $bg_color_portal_cmj, $amount: 50);
+          &.subaction {
+            position: absolute;
+            background-color: white;
+            border: 1px solid lighten($color: $bg_color_portal_cmj, $amount: 50);
+            border-radius: 5px;
+          }
+          a {
+            text-decoration: none;
+            color: $bg_color_portal_cmj;
+            padding: $min_padding*1.2 $min_padding*3 ;
+            white-space: nowrap;
+            display: block;
+
+            font-size: 80%;
+          }
+
+          li:not(.dropdown-header):hover {
+            background-color: rgba($bg_color_portal_cmj, 0.2);
+          }
+          .divider{
+            border-top: 1px solid lighten($color: $bg_color_portal_cmj, $amount: 50);
+          }
+          .dropdown-header {
+            font-size: 0.7rem;
+            padding: 2px $min_padding;
+            font-variant: small-caps;
+          }
+          span {
+            display: inline-block;
+          }
+
+        }
+
+        &:hover {
+          & > ul {
+            display: inline-flex;
+            &.subaction {
+              box-shadow: 1px 1px 10px  lighten($bg_color_portal_cmj, 20%);
+            }
+          }
+          li:hover {
+            & > ul {
+              display: flex;
+              left: 100%;
+              top: $min_padding;
+              margin-left: -$min_padding;
+            }
+          }
+          .icon {
+            opacity: 1;
           }
         }
       }
@@ -40,11 +107,11 @@ header.main {
       opacity: 0;
       flex: 0 0 0;
       height: 0;
-      .row {
-        margin-left: -10rem;
+      .btns-main {
+        margin-left: -20rem;
         width: 0;
-        a {
-          .img {
+        a.inner {
+          .icon {
             height: 0;
           }
           .label {
@@ -61,9 +128,16 @@ header.main {
       order: 4;
       width: 100%;
       flex: 0 0 100%;
+      padding-bottom: $min_padding * 2;
       .btns-main {
         .btn-main {
-          a {
+          a.inner {
+            .fas {
+              font-size: 1.3em;
+            }
+            .fa-2x {
+              font-size: 2em;
+            }
             .icon {
               height: 108px;
             }
@@ -72,6 +146,12 @@ header.main {
               min-height: 56px;
             }
           }
+        }
+      }
+      &.d-searching {
+        .btns-main {
+          margin-top: -5rem;
+          margin-left: 0rem;
         }
       }
     }
@@ -83,7 +163,7 @@ header.main {
     #portalactions {
       .btns-main {
         .btn-main {
-          a {
+          a.inner {
             .icon {
               height: 64px;
               .fas {
@@ -105,7 +185,7 @@ header.main {
     #portalactions {
       .btns-main {
         .btn-main {
-          a {
+          a.inner {
             .icon {
               height: 48px;
               .fas {
@@ -129,7 +209,7 @@ header.main {
       #portalactions {
         .btns-main {
           .btn-main {
-            a {
+            a.inner {
               .icon {
                 height: 80px;
               }
@@ -154,7 +234,7 @@ header.main {
       padding-bottom: $min_padding;
       .btns-main {
         .btn-main {
-          a {
+          a.inner {
             .icon {
               height: 80px;
               .fas {
@@ -180,7 +260,7 @@ header.main {
     #portalactions {
       .btns-main {
         .btn-main {
-          a {
+          a.inner {
             .icon {
               height: 64px;
               .fas {
@@ -204,7 +284,7 @@ header.main {
     #portalactions {
       .btns-main {
         .btn-main {
-          a {
+          a.inner {
             .icon {
               height: 64px;
               .fas {
@@ -218,6 +298,9 @@ header.main {
               font-size: 60%;
             }
           }
+          .subaction {
+            flex-direction: column;
+          }
         }
       }
     }
@@ -225,7 +308,7 @@ header.main {
       #portalactions {
         .btns-main {
           .btn-main {
-            a {
+            a.inner {
               .icon {
                 height: 64px;
               }
@@ -238,5 +321,18 @@ header.main {
         }
       }
     }
+  }
+}
+
+@media screen and (min-width: 992px) {
+  .subaction ul:before {
+      content: " ";
+      background: transparent;
+      position: absolute;
+      top: -20px;
+      bottom: -70px;
+      left: -20px;
+      right: -70px;
+      z-index: -1;
   }
 }
