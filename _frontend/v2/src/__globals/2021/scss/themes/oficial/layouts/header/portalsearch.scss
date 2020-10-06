@@ -2,7 +2,7 @@ header.main {
   #portalsearch {
     flex: 0 0 auto;
     //padding: 0;
-    padding-left: $min_padding * 2;
+    padding: 0 $min_padding * 2;
     &.d-searching {
       flex: 1 1 auto;
       input {
@@ -87,9 +87,6 @@ header.main {
 }
 
 
-@media screen and (max-width:767.98px) {
-
-}
 
 @media screen and (max-width:575.98px) {
 }

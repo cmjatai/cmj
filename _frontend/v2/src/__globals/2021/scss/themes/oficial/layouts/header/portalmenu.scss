@@ -1,20 +1,22 @@
 header.main {
 
-  #portalbtnmenu, #portalmenu {
+  #portalbtnmenu {
     display: none;
     padding: 0;
     .navbar-toggler {
       display: inline-block;
-      padding: 0px 15px 0 0;
+      padding: 0px 15px 0 2px;
       border: 0px;
       z-index: 1;
       cursor: pointer;
       .icon-bar {
         background: white;
         display: block;
-        height: 3px;
-        width: 24px;
-        margin: 7px 0;
+        height: 5px;
+        width: 5px;
+        margin: 4px 0;
+        border-radius: 2px;
+
       }
       &.toggle-access {
         .icon-bar {
@@ -35,6 +37,7 @@ header.main {
       display: none;
     }
   }
+
   #portalmenu {
     display: flex;
     border-top: 1px solid white;
@@ -55,6 +58,15 @@ header.main {
           box-shadow: 1px 1px 5px white;
         }
       }
+    }
+  }
+}
+
+@media screen and (max-width:767.98px) {
+  header.main {
+
+    #portalbtnmenu {
+      display: inline-block;
     }
   }
 }

@@ -22,11 +22,11 @@ export default {
     },
     handleClickPortalMenu (event) {
       this.portalmenu_opened = !this.portalmenu_opened
-      this.$cookie.set('portalmenu_opened', this.portalmenu_opened ? 'opened' : 'closed')
+      // this.$cookie.set('portalmenu_opened', this.portalmenu_opened ? 'opened' : 'closed')
     }
   },
   mounted: function () {
-    let portalmenu_opened = this.$cookie.get('portalmenu_opened')
+    let portalmenu_opened = 'closed' // this.$cookie.get('portalmenu_opened')
 
     if (portalmenu_opened === null) {
       portalmenu_opened = false

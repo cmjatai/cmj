@@ -38,6 +38,10 @@
     line-height: 2em;
     text-align: center;
     color: white;
+    &::after {
+      opacity: 0.5;
+    }
+
     &.facebook {
       &::after {
       background-image: url(./assets/icon_sl_facebook64x64.png);
@@ -80,7 +84,6 @@
         position: absolute;
         content: " ";
         background-size: 100% 100%;
-        opacity: 0.5;
         top: 0;
         left: 0;
         bottom: 0;
