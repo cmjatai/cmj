@@ -10,12 +10,12 @@ export const routes = [
     children: [
 
     ]
-  },
-  {
-    path: '*',
-    name: '404',
-    component: {
-      template: '<p>Page Not Found</p>'
-    }
   }
+  // {
+  //   path: '*',
+  //   name: '404',
+  //   component: {
+  //     template: '<p>Page Not Found</p>'
+  //   }
+  // }
 ]

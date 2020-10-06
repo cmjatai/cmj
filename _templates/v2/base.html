@@ -34,10 +34,21 @@
     <div id="app-vue">
       <!-- ========================================================== -->
       {% include 'base_header.html' %}
+
+
       <!-- ========================================================== -->
       <main>
 
         <router-view></router-view>
+
+
+        <div class="container">
+          {% block base_content %}
+
+
+
+          {% endblock %}
+        </div>
 
     {% for n in ultimas_publicacoes %}
         {{forloop.counter}}<br>
@@ -176,11 +187,6 @@
                   </div>
                 {% endfor %}
 
-                {% block base_content %}
-
-
-
-                {% endblock %}
               </div>
 
               {% block cmj_extra_content %}{% endblock %}
