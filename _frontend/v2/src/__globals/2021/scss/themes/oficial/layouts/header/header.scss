@@ -62,7 +62,7 @@ header.main {
       }
     }
     #socialactions {
-      padding: $min_padding * 0.5 $min_padding * 2;
+      padding: 0 $min_padding * 2;
     }
     #altocontraste {
       position: absolute;
@@ -94,6 +94,8 @@ main {
 @import './portalsearch';
 @import './portalactions';
 @import './portalmenu';
+
+@import './navuser';
 
 
 
