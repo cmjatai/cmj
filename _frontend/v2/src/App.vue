@@ -20,19 +20,26 @@ export default {
   methods: {
     handleScroll: function (event) {
       let h = document.getElementsByTagName('header')[0]
-      let r = (window.scrollY / $(document).height())
+      // let r = (window.scrollY / $(document).height())
 
       // console.log(r, h.offsetHeight)
       if (window.scrollY === 0) {
         h.style.marginTop = '0px'
         h.classList.add('header-top')
+        h.classList.remove('header-mini')
+      } else if (window.scrollY * 1.5 <= this.offsetHeight) {
+        if (h.classList.contains('header-mini') || h.classList.contains('header-top')) {
+          h.classList.remove('header-top')
+          h.classList.remove('header-mini')
+        }
       } else {
-        h.classList.remove('header-top')
+        if (!h.classList.contains('header-mini')) {
+          h.classList.add('header-mini')
+          h.classList.remove('header-top')
+        }
       }
 
-      if (window.scrollY * 1.5 > this.offsetHeight) {
-        h.style.marginTop = `${(-3 * r * h.offsetHeight)}px`
-      }
+      // h.style.marginTop = `${(-3 * r * h.offsetHeight)}px`
     }
   },
   mounted: function () {

@@ -51,6 +51,23 @@ header.main {
       }
     }
   }
+  &.header-mini {
+    #portalsearch {
+      .form-search {
+        .inner {
+          input {
+            line-height: 1.5rem;
+            font-size: 0.7rem;
+            padding: 0px 50px 0 10px;
+            height: auto;
+          }
+          button {
+            width: 36px;
+          }
+        }
+      }
+    }
+  }
 }
 
 

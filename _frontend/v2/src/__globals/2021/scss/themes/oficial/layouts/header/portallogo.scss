@@ -61,6 +61,22 @@ header.main {
       }
     }
   }
+
+  &.header-mini {
+    #portallogo {
+      .navbar {
+        padding: $min_padding 0;
+      }
+      .navbar-brand {
+        img {
+          height: 56px;
+        }
+        .brand-name {
+          font-size: 0.4rem;
+        }
+      }
+    }
+  }
 }
 
 @media screen and (max-width:1049.98px) {
@@ -175,6 +191,22 @@ header.main {
           .brand-name {
             padding-left: 0rem;
             font-size: 0.5rem;
+          }
+        }
+      }
+    }
+    &.header-mini {
+      #portallogo {
+        .navbar {
+          padding: $min_padding 0;
+        }
+        .navbar-brand {
+          img {
+            height: 36px;
+          }
+          .brand-name {
+            padding-left: 0rem;
+            font-size: 0.4rem;
           }
         }
       }

@@ -133,7 +133,7 @@ header.main {
         .btn-main {
           a.inner {
             .fas {
-              font-size: 1.3em;
+              font-size: 1.5em;
             }
             .fa-2x {
               font-size: 2em;
@@ -152,6 +152,35 @@ header.main {
         .btns-main {
           margin-top: -5rem;
           margin-left: 0rem;
+        }
+      }
+    }
+  }
+  &.header-mini {
+    #portalactions {
+      .btns-main {
+        .btn-main {
+          a.inner {
+            flex-direction: row;
+            justify-content: center;
+            .fas {
+              font-size: 0.5em;
+            }
+            .fa-tv, .fa-broadcast-tower {
+              width: 12px;
+
+            }
+            .fa-2x {
+              font-size: 1em;
+            }
+            .icon {
+              height: 36px;
+              width: 38px;
+            }
+            .label {
+              //display: none;
+            }
+          }
         }
       }
     }
@@ -217,6 +246,19 @@ header.main {
                 font-size: 85%;
                 min-height: 48px;
               }
+            }
+          }
+        }
+      }
+    }
+
+    &.header-mini {
+      #portalactions {
+        .btns-main {
+          .btn-main {
+            a.inner {
+              flex-direction: column;
+              align-items: center;
             }
           }
         }
@@ -315,6 +357,20 @@ header.main {
               .label {
                 font-size: 60%;
                 min-height: 36px;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    &.header-mini {
+      #portalactions {
+        .btns-main {
+          .btn-main {
+            a.inner {
+              .label {
+                display: none;
               }
             }
           }
