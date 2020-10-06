@@ -47,6 +47,14 @@ module.exports = {
         .optimization
         .minimizer('terser')
         .use(TerserPlugin)
+        /*
+        .tap((args) => {
+        args[0].terserOptions.compress.drop_console = true
+        args[0].extractComments = true
+        args[0].cache = true
+        return args
+      })
+       */
 
       config
         .plugin('CompressionPlugin')

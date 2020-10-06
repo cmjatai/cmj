@@ -24,15 +24,27 @@ header.main {
     z-index: -1;
   }
 
-  #header-accessibility {
-    position: absolute;
+  #nav-top-container {
+    //position: absolute;
+    background: lighten($bg_color_portal_cmj, 15); // $url_bg_png;
+
+    a {
+      color: white;
+      font-size: 0.8rem;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
     #accessactions {
       opacity: 0.7;
+      flex: 1 0 auto;
       a {
-        color: white;
         padding: 0 $min_padding;
-        font-size: 0.8rem;
-        line-height: 1;
+        line-height: 1.5;
         text-decoration: none;
         .badge {
           margin-left: 0.3rem;
@@ -48,6 +60,9 @@ header.main {
       &:hover {
         opacity: 1;
       }
+    }
+    #socialactions {
+      padding: $min_padding* 0.5  $min_padding * 2;
     }
   }
 

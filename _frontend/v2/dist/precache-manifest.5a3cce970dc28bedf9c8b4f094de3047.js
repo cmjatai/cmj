@@ -16,7 +16,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/brasao/brasao_512.png"
   },
   {
-    "revision": "f6890612ed60c894936b",
+    "revision": "7db1bd81ba8641ac82be",
     "url": "/static/css/app.671574bf.css"
   },
   {
@@ -52,16 +52,16 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/icon_prestacao_contas.e736437c.svg"
   },
   {
-    "revision": "3e7b3ece46e37c8e30a2d6153a7c126c",
+    "revision": "aafcb85270125c27d4726023cf3e7696",
     "url": "/static/index.html"
   },
   {
-    "revision": "f6890612ed60c894936b",
-    "url": "/static/js/app.81febc63.js"
+    "revision": "7db1bd81ba8641ac82be",
+    "url": "/static/js/app.21eb7f03.js"
   },
   {
-    "revision": "589ef26938cc8d653cce",
-    "url": "/static/js/chunk-2d22d746.b4c82dc4.js"
+    "revision": "1f667d819ad6b7e7a6c2",
+    "url": "/static/js/chunk-2d22d746.02178cab.js"
   },
   {
     "revision": "d2d7d838ef709f50246d",

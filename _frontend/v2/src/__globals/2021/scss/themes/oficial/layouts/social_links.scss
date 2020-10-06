@@ -5,7 +5,7 @@
   height: 2em;
   display: inline-block;
   &::after {
-    background-image: url(~@/assets/img/icon_copy_area_transferencia.png);
+    background-image: url(./assets/icon_sl_copy_area_transferencia.png);
   }
   i {
     display: none;
@@ -40,30 +40,30 @@
     color: white;
     &.facebook {
       &::after {
-      background-image: url(~@/assets/img/icon_facebook64x64.png);
+      background-image: url(./assets/icon_sl_facebook64x64.png);
       }
     }
 
     &.whatsapp {
       &::after {
-      background-image: url(~@/assets/img/icon_whatsapp64x64.png);
+      background-image: url(./assets/icon_sl_whatsapp64x64.png);
       }
     }
 
     &.twitter {
       &::after {
-      background-image: url(~@/assets/img/icon_twitter64x64.png);
+      background-image: url(./assets/icon_sl_twitter64x64.png);
       }
     }
     &.youtube {
       &::after {
-      background-image: url(~@/assets/img/icon_youtube64x64.png);
+      background-image: url(./assets/icon_sl_youtube64x64.png);
       }
     }
 
     &.instagram {
       &::after {
-      background-image: url(~@/assets/img/icon_instagram64x64.png);
+      background-image: url(./assets/icon_sl_instagram64x64.png);
       }
     }
 
@@ -77,14 +77,14 @@
         display: none;
       }
       &::after {
-        background-size: 100% 100%;
+        position: absolute;
         content: " ";
+        background-size: 100% 100%;
         opacity: 0.5;
         top: 0;
         left: 0;
         bottom: 0;
         right: 0;
-        position: absolute;
         z-index: 0;
       }
     }
@@ -97,7 +97,7 @@
   }
   .icon-sessoes-online {
     //margin-right: 0.7em;
-    background-image: url("~@/__globals/2021/scss/themes/oficial/assets/icon_plenarias.svg");
+    background-image: url("./assets/icon_plenarias.svg");
     //background-size: 1.8em auto;
     background-repeat: no-repeat;
     background-position: center center;
@@ -106,6 +106,7 @@
       opacity: 1;
     }
   }
+
   &.absolute-center {
     position: absolute;
     left: 50%;
