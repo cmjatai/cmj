@@ -28,9 +28,58 @@
           </div>
         {% endblock %}
 
-        <div class="btn-group" role="group">
-            <a href="#" id="altocontraste" accesskey="4" onclick="window.toggleContrast()" onkeydown="window.toggleContrast()">Alto Contraste <i class="fas fa-adjust" aria-hidden="true"></i></a>
-        </div>
+        <a href="#" id="altocontraste" accesskey="4" onclick="window.toggleContrast()" onkeydown="window.toggleContrast()"><i class="fas fa-adjust" aria-hidden="true"></i>Alto Contraste</a>
+
+        <ul class="navbar-nav justify-content-end">
+          {% if user and not user.is_anonymous %}
+            <li class="dropdown nav-user">
+              <a href="#">
+                {% avatar_user user%}
+              </a>
+
+              {% notificacoes_unread %}
+
+              <ul class="dropdown-menu">
+                <li class=" text-right"><a href="{% url 'cmj.core:logout' %}">{% trans "Sair" %}</a></li>
+                <li  class="divider"></li>
+                <li class=" text-right"><a href="{% url 'cmj.core:cmj_user_change' %}">{{ user.get_full_name|default:user.email }} <i class="fa fa-hand-o-left" aria-hidden="true"></i> {% trans "Meu Perfil" %}</a></li>
+                <li  class="divider"></li>
+                {% if perms.ouvidoria and not user.is_superuser %}
+                  <li class=" text-right"><a href="{% url 'cmj.ouvidoria:solicitacao_manage_list' %}">{{user.areatrabalho_set.all.first.nome}} <i class="fa fa-hand-o-left" aria-hidden="true"></i> {% trans "Ouvidoria" %}</a></li>
+                {% endif %}
+                {% if not user.is_superuser %}
+                  <li class=" text-right"><a href="{% url 'cmj.ouvidoria:solicitacao_list' %}">{% trans "Minhas Solicitações" %}</a></li>
+                  <li class="divider"></li>
+                {% endif %}
+
+
+                  <li class=" text-right">
+                    <a href="#linkMenu">{% trans "Intranet" %}<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                      <li><a href="https://correio.interlegis.leg.br">{% trans "Webmail" %}</a></li>
+                      <li><a href="http://gestaopublica.camara.jatai.bsit-br.com.br">{% trans "Gestão Pública" %}</a></li>
+                    </ul>
+                  </li>
+              </ul>
+            </li>
+          {% else %}
+            <li>
+              <a href="#linkMenu" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Acessar" %}<span class="caret"></span></a>
+              <ul class="dropdown-menu">
+
+                <li><a href="{% url 'cmj.core:login' %}">{% trans "Portal" %}</a></li>
+
+                <li class=" text-right">
+                  <a href="#linkMenu"  role="button" aria-haspopup="true" aria-expanded="false">{% trans "Intranet" %}<span class="caret"></span></a>
+                  <ul class="dropdown-menu">
+                    <li class="text-right"><a href="https://correio.interlegis.leg.br">{% trans "Webmail" %}</a></li>
+                    <li class="text-right"><a href="http://gestaopublica.camara.jatai.bsit-br.com.br">{% trans "Gestão Pública" %}</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          {% endif %}
+        </ul>
 
       </div>
 

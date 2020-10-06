@@ -25,7 +25,6 @@ header.main {
   }
 
   #nav-top-container {
-    //position: absolute;
     background: lighten($bg_color_portal_cmj, 15); // $url_bg_png;
 
     a {
@@ -34,6 +33,7 @@ header.main {
     }
 
     .row {
+      position: relative;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -62,7 +62,13 @@ header.main {
       }
     }
     #socialactions {
-      padding: $min_padding* 0.5  $min_padding * 2;
+      padding: $min_padding * 0.5 $min_padding * 2;
+    }
+    #altocontraste {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      padding-top: 3px;
     }
   }
 
