@@ -13,11 +13,11 @@
       <ul>
         <li><a href="{% url 'cmj.core:logout' %}">{% trans "Sair" %}</a></li>
         <li  class="divider"></li>
-        <li><a href="{% url 'cmj.core:cmj_user_change' %}">{{ user.get_full_name|default:user.email }} <i class="fa fa-hand-o-left" aria-hidden="true"></i> {% trans "Meu Perfil" %}</a></li>
+        <li><a href="{% url 'cmj.core:cmj_user_change' %}">{{ user.get_full_name|default:user.email }} <i class="fas fa-hand-point-left"></i> {% trans "Meu Perfil" %}</a></li>
         <li class="divider"></li>
 
         {% if perms.ouvidoria and not user.is_superuser %}
-          <li><a href="{% url 'cmj.ouvidoria:solicitacao_manage_list' %}">{{user.areatrabalho_set.all.first.nome}} <i class="fa fa-hand-o-left" aria-hidden="true"></i> {% trans "Ouvidoria" %}</a></li>
+          <li><a href="{% url 'cmj.ouvidoria:solicitacao_manage_list' %}">{{user.areatrabalho_set.all.first.nome}} <i class="fas fa-hand-point-left"></i> {% trans "Ouvidoria" %}</a></li>
         {% endif %}
 
         {% if not user.is_superuser %}

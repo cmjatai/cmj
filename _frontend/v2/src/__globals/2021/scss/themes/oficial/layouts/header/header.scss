@@ -2,6 +2,7 @@ header.main {
   background: $bg_color_portal_cmj; // $url_bg_png;
   transition: all 0.3s ease;
   position: fixed;
+  z-index: $zindex-fixed;
   left: 0;
   right: 0;
   top: 0;

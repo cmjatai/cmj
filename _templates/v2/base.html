@@ -43,24 +43,24 @@
 
 
         <div class="container">
+                                            {% for n in ultimas_publicacoes %}
+                                                {{forloop.counter}}<br>
+                                            {% endfor %}
+
+
           {% block base_content %}
-
-
 
           {% endblock %}
         </div>
 
-    {% for n in ultimas_publicacoes %}
-        {{forloop.counter}}<br>
-    {% endfor %}
 
-    {% for n in ultimas_publicacoes %}
-        {{forloop.counter}}<br>
-    {% endfor %}
+                                            {% for n in ultimas_publicacoes %}
+                                                {{forloop.counter}}<br>
+                                            {% endfor %}
 
-    {% for n in ultimas_publicacoes %}
-        {{forloop.counter}}<br>
-    {% endfor %}
+                                            {% for n in ultimas_publicacoes %}
+                                                {{forloop.counter}}<br>
+                                            {% endfor %}
 
       </main>
 

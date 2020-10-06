@@ -5,11 +5,21 @@
 $bg_color_portal_cmj: #114d81;
 $min_padding: 5px;
 
+$grid-breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1400px
+) !default;
+
 $container-max-widths: (
   sm: 100%,
   md: 100%,
   lg: 100%,
-  xl: 1140px
+  xl: 1140px,
+  xxl: 1350px
 ) !default;
 
 $hover_background_05p: rgba(0,0,0,0.05);

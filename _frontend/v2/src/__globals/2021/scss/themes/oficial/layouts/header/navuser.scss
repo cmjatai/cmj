@@ -7,13 +7,16 @@ header.main {
       margin: 0;
     }
     a {
-      line-height: 2rem;
-      padding: 0 $min_padding * 2;
+      padding: $min_padding $min_padding * 2;
       white-space: nowrap;
       display: block;
       width: 100%;
       text-decoration: none;
+      .avatar {
+        height: 1.5rem;
+      }
     }
+
     ul {
       display: none;
       position: absolute;
@@ -24,6 +27,9 @@ header.main {
       text-align: right;
       border-radius: $min_padding;
       border: 1px solid lighten($bg_color_portal_cmj, 30);
+      a {
+        line-height: 1.5rem;
+      }
 
       &:before {
         content: " ";
@@ -34,12 +40,12 @@ header.main {
         left: -20px;
         right: -$min_padding * 2;
         z-index: -1;
-    }
+      }
     }
     li {
       position: relative;
       .divider {
-
+        border-top: 1px solid lighten($bg_color_portal_cmj, 30);
       }
       &:hover {
         background-color: $hover_background_20pw;
