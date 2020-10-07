@@ -62,7 +62,7 @@ export default {
        * Define um ouvinte para o socket implementado por VueNativeSock
        */
       let data = JSON.parse(event.data)
-      // this.sendMessage({ alert: 'info', message: 'Base Atualizada', time: 3 })
+      this.sendMessage({ alert: 'info', message: 'Base Atualizada', time: 3 })
 
       setTimeout(() => {
         // Atualiza em Vuex/cache o elemento que o Servidor informou ter sofrido alteracão

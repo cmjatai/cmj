@@ -65,7 +65,7 @@ header.main {
   &.header-mini {
     #portallogo {
       .navbar {
-        padding: $min_padding 0;
+        padding: $min_padding * 0.5 0;
       }
       .navbar-brand {
         img {

@@ -1,8 +1,11 @@
+import '@fortawesome/fontawesome-free/js/all.js'
+
 import Vue from 'vue'
 import Vuex from 'vuex'
 import VueResource from 'vue-resource'
 import VueResize from 'vue-resize'
 import BootstrapVue from 'bootstrap-vue'
+
 // import VueCookie from 'vue-cookie'
 // import lodash from 'lodash'
 
@@ -23,7 +26,8 @@ import Components from './apps'
 
 // require('froala-editor/js/froala_editor.pkgd.min')
 // require('froala-editor/css/froala_editor.pkgd.min.css')
-require('font-awesome/css/font-awesome.css')
+// require('font-awesome/css/font-awesome.css')
+
 // require('froala-editor/css/froala_style.min.css')
 
 axios.defaults.xsrfCookieName = 'csrftoken'

@@ -18,7 +18,7 @@ if True:
 
 if __name__ == '__main__':
 
-    p = 'nome do parlamentar'
+    p = 'Mauro Bento Filho'
     at = AreaTrabalho.objects.filter(nome__icontains=p)
 
     with open('/home/leandro/TEMP/AT-{}.csv'.format(p), 'w', newline='', encoding='utf-8') as cf:

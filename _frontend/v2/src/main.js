@@ -6,7 +6,7 @@ import BootstrapVue from 'bootstrap-vue'
 import VueNativeSock from 'vue-native-websocket'
 import Router from 'vue-router'
 
-import VuexStore from './store'
+import VuexStore from './stores'
 
 import axios from 'axios'
 
@@ -16,7 +16,7 @@ import 'axios-progress-bar/dist/nprogress.css'
 
 import 'popper.js'
 
-import { routes } from './routers'
+import { routes } from './routers/'
 
 import './mixins'
 
@@ -56,7 +56,8 @@ Vue.config.productionTip = false
 const store = new Vuex.Store(VuexStore)
 const router = new Router({
   routes,
-  mode: 'history'
+  mode: 'history',
+  saveScrollPosition: true
 })
 
 sync(store, router)

@@ -54,14 +54,14 @@ header.main {
         margin: 0;
       }
       a {
-        padding: $min_padding * 0.5 $min_padding * 2;
+        //padding: $min_padding * 0.5 $min_padding * 2;
         white-space: nowrap;
         width: 100%;
         text-decoration: none;
         display: flex;
         align-items: center;
         .avatar {
-          height: 1.8rem;
+          height: 1.3rem;
         }
       }
 
@@ -78,6 +78,7 @@ header.main {
         a {
           line-height: 1.5rem;
           display: inline-block;
+          padding: $min_padding * 0.5 $min_padding * 2;
         }
 
         &:before {
@@ -116,11 +117,10 @@ header.main {
         }
       }
       .nav-user-container {
+        //padding: $min_padding * 0.5 $min_padding * 1;
         a {
-          padding: $min_padding * 0.5 $min_padding * 1;
-          line-height: 1.2rem;
           .avatar {
-            height: 1.2rem;
+            height: 1rem;
           }
         }
       }
@@ -140,7 +140,9 @@ header.main {
       }
       .nav-user-container {
         & > li > a {
-          padding: $min_padding * 2 $min_padding * 2;
+          .avatar {
+            height: 2.1rem;
+          }
         }
       }
     }
