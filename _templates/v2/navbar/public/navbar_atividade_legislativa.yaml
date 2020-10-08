@@ -3,6 +3,9 @@
   url: ''
 - title: {% trans 'Matérias Legislativas'%}
   url: sapl.materia:pesquisar_materia
+  app: materia
+  model: materialegislativa
+  params: o=&
 - title: {% trans 'Sessões Plenárias' %}
   url: {% url 'sapl.sessao:pesquisar_sessao' %}?data_inicio__year={% now 'Y' %}
 - title: {% trans 'Sessão OnLine' %}

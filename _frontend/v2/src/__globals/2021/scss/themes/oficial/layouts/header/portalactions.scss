@@ -9,6 +9,9 @@ header.main {
       .btn-main {
         flex: 1 1 20%;
         position: relative;
+        .col {
+          padding: 0;
+        }
         a.inner {
           display: flex;
           flex-direction: column;
@@ -17,6 +20,7 @@ header.main {
           text-align: center;
           text-decoration: none;
           font-size: 95%;
+          cursor: pointer;
           &:hover {
             text-shadow: 1px 1px 10px  lighten($bg_color_portal_cmj, 20%);
           }
@@ -79,11 +83,10 @@ header.main {
         }
 
         &:hover {
-          & > ul {
+          background-color: $hover_background_10p;
+          & ul.subaction {
             display: inline-flex;
-            &.subaction {
-              box-shadow: 1px 1px 10px  lighten($bg_color_portal_cmj, 20%);
-            }
+            box-shadow: 1px 1px 10px  lighten($bg_color_portal_cmj, 50%);
           }
           li:hover {
             & > ul {
@@ -119,6 +122,63 @@ header.main {
           }
         }
 
+      }
+    }
+    &.static {
+      position: static;
+      .action-details {
+        display: none;
+        position: absolute;
+        border-bottom: 2px solid lighten($color: $bg_color_portal_cmj, $amount: 30);
+        box-shadow: 0px 20px 30px #ddd;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background-color: white;
+        ul.subaction {
+          position: relative;
+          font-size: 130%;
+        }
+        .row {
+          width: 100%;
+        }
+        .col {
+          display: flex;
+          padding: 1rem;
+          &:first-child {
+            padding-left: 0;
+          }
+          &:last-child {
+            padding-right: 0;
+          }
+        }
+      }
+      .btns-main {
+        position: static;
+        .btn-main {
+          position: static;
+          &:hover {
+            .action-details {
+              display: flex;
+              z-index: 10;
+              &:before {
+                content:"";
+                position: absolute;
+                top: -20px;
+                left: 0;
+                right: 0;
+                bottom: -30px;
+                z-index: -1;
+
+              }
+              ul.subaction {
+                box-shadow: none;
+                border-radius: 0;
+                border-width: 0 0 0 0;
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -181,6 +241,8 @@ header.main {
               //display: none;
             }
           }
+
+
         }
       }
     }

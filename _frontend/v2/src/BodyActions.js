@@ -1,8 +1,10 @@
 
 import App from './App'
+import ActionDetails from '@/components/header/ActionDetails'
 export default {
   components: {
-    App
+    App,
+    ActionDetails
   },
   data () {
     return {

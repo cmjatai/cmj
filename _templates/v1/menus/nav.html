@@ -16,7 +16,7 @@
         </li>
       {% else %}
         {% if item.url %}
-          <li><a href="{{ item.url }}" title="{%trans 'Conteúdo' %}: {{item.title|striptags}}">
+          <li><a href="{{ item.url }}" title="{%trans 'Conteúdo' %}: {{item.title|striptags}}" app="{{item.app}}" model="{{item.model}}" params="{{item.params}}">
            <span title="">{% trans item.title|safe %}</span></a></li>
         {% elif not item.url and not item.title%}
           <li role="separator" class="divider"></li>
