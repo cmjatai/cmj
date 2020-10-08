@@ -135,6 +135,26 @@ header.main {
         left: 0;
         right: 0;
         background-color: white;
+        //min-height: 70vh;
+        max-height: 70vh;
+        &:after {
+          content: "";
+          position: absolute;
+          border: 10px solid white;
+          left: var(--leftvalue);
+          top: -16px;
+          width: 16px;
+          height: 16px;
+          border-left: 8px solid transparent;
+          border-right: 8px solid transparent;
+          border-top: 8px solid transparent;
+
+        }
+        .container-fluid {
+          overflow: hidden;
+          overflow-y: auto;
+          padding: 0;
+        }
         ul.subaction {
           position: relative;
           font-size: 130%;
@@ -175,6 +195,16 @@ header.main {
                 box-shadow: none;
                 border-radius: 0;
                 border-width: 0 0 0 0;
+                lai:hover {
+                  & > ul {
+                    left: 10px;
+                    margin: 0;
+                    &:before {
+                      bottom: 0;
+                      left: 0;
+                    }
+                  }
+                }
               }
             }
           }

@@ -21,29 +21,33 @@
         <div class="icon icon_ouvidoria"><i class="fas fa-2x fa-bullhorn"></i></div>
         <div class="label">FALE<BR>CONOSCO</div>
       </a>
-      <div>
-        <ul class="subaction">
-          <li><a href="/fale-conosco/telefones-e-emails" title="Conteúdo: Telefones e Emails">
-          <span title="">Telefones e Emails</span></a></li>
-          <li><a href="http://camaradejatai.sigepnet.com.br/informacao/sic_primeiro_acesso.php?portal=2" title="Conteúdo: e-SIC">
-          <span title="">SIC Físico - Localização e Horários</span></a></li>
-          <li><a href="/fale-conosco/servico-de-informacoes-ao-cidadao-sic" title="Conteúdo: SIC Físico - Localização e Horários">
-          <span title="">Ouvidoria Parlamentar</span></a></li>
-          <li><a href="/fale-conosco/ouvidoria" title="Conteúdo: Ouvidoria Parlamentar">
-          <span title="">e-SIC</span></a></li>
-        </ul>
-      </div>
+      <action-details>
+        <template slot="subaction">
+          <ul class="subaction">
+            <li><a href="/fale-conosco/telefones-e-emails" title="Conteúdo: Telefones e Emails">
+            <span title="">Telefones e Emails</span></a></li>
+            <li><a href="http://camaradejatai.sigepnet.com.br/informacao/sic_primeiro_acesso.php?portal=2" title="Conteúdo: e-SIC">
+            <span title="">SIC Físico - Localização e Horários</span></a></li>
+            <li><a href="/fale-conosco/servico-de-informacoes-ao-cidadao-sic" title="Conteúdo: SIC Físico - Localização e Horários">
+            <span title="">Ouvidoria Parlamentar</span></a></li>
+            <li><a href="/fale-conosco/ouvidoria" title="Conteúdo: Ouvidoria Parlamentar">
+            <span title="">e-SIC</span></a></li>
+          </ul>
+        </template>
+      </action-details>
     </div>
     <div class="btn-main">
       <a class="inner" href="#">
         <div class="icon icon_doc_adm"></div>
         <div class="label">DOCUMENTOS<BR>ADMINISTRATIVOS</div>
       </a>
-      <div>
-        <ul class="subaction">
-          {% navbar 'navbar/public/navbar_documentos_administrativos.yaml' %}
-        </ul>
-      </div>
+      <action-details>
+        <template slot="subaction">
+          <ul class="subaction">
+            {% navbar 'navbar/public/navbar_documentos_administrativos.yaml' %}
+          </ul>
+        </template>
+      </action-details>
     </div>
     <div class="btn-main">
       <a class="inner">
@@ -53,9 +57,13 @@
         </div>
         <div class="label">TV E RÁDIO<BR>CÂMARA</div>
       </a>
-        <ul class="subaction">
-          {% navbar 'navbar/public/navbar_midias.yaml' %}
-        </ul>
+      <action-details>
+        <template slot="subaction">
+          <ul class="subaction">
+            {% navbar 'navbar/public/navbar_midias.yaml' %}
+          </ul>
+        </template>
+      </action-details>
     </div>
     <div class="btn-main">
       <a class="inner">

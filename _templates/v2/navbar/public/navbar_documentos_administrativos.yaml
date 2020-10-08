@@ -1,4 +1,6 @@
 {% load i18n common_cmj_tags %}
+- title: {% trans 'Acesso Rápido' %}
+  url: ''
 - title: {% trans 'Últimas Publicações'%}
   url: /doc/?o=
 - title: {% trans 'Dispensas de Licitação'%}
