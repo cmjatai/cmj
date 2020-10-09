@@ -1211,7 +1211,7 @@ class ContatoAgrupadoPorGrupoFilterSet(FilterSet):
 
         super(ContatoAgrupadoPorGrupoFilterSet, self).__init__(
             data=data,
-            queryset=queryset, prefix=prefix, strict=strict, **kwargs)
+            queryset=queryset, prefix=prefix, **kwargs)
 
         c1_row1 = to_row([
             ('municipio', 7),

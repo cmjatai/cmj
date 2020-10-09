@@ -59,7 +59,8 @@ from sapl.settings import MEDIA_ROOT, MAX_DOC_UPLOAD_SIZE
 from sapl.utils import (YES_NO_CHOICES, autor_label, autor_modal, SEPARADOR_HASH_PROPOSICAO,
                         gerar_hash_arquivo, get_base_url, get_client_ip,
                         get_mime_type_from_file_extension, montar_row_autor,
-                        show_results_filter_set, mail_service_configured, lista_anexados)
+                        show_results_filter_set, mail_service_configured, lista_anexados,
+                        gerar_pdf_impressos)
 
 from .forms import (AcessorioEmLoteFilterSet, AcompanhamentoMateriaForm,
                     AnexadaEmLoteFilterSet,
@@ -2688,19 +2689,6 @@ class TramitacaoEmLoteView(PrimeiraTramitacaoEmLoteView):
 class ImpressosView(PermissionRequiredMixin, TemplateView):
     template_name = 'materia/impressos/impressos.html'
     permission_required = ('materia.can_access_impressos',)
-
-
-def gerar_pdf_impressos(request, context, template_name):
-    template = loader.get_template(template_name)
-    html = template.render(context, request)
-    pdf = weasyprint.HTML(
-        string=html, base_url=request.build_absolute_uri()).write_pdf()
-
-    response = HttpResponse(pdf, content_type='application/pdf')
-    response['Content-Disposition'] = 'inline; filename="relatorio_impressos.pdf"'
-    response['Content-Transfer-Encoding'] = 'binary'
-
-    return response
 
 
 class EtiquetaPesquisaView(PermissionRequiredMixin, FormView):

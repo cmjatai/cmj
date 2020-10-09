@@ -30,6 +30,7 @@ from cmj.cerimonial.forms import ImpressoEnderecamentoContatoFilterSet,\
 from cmj.cerimonial.models import Contato, Processo
 from cmj.core.models import AreaTrabalho
 from sapl.crud.base import make_pagination
+from sapl.utils import gerar_pdf_impressos
 
 
 class ImpressoEnderecamentoContatoView(PermissionRequiredMixin, FilterView):
@@ -323,8 +324,7 @@ class RelatorioContatoAgrupadoPorGrupoView(
             response = HttpResponse(content_type='application/pdf')
             response['Content-Disposition'] = \
                 'inline; filename="relatorio.pdf"'
-            self.build_pdf(response)
-            return response
+            return self.build_pdf(response)
 
         context = self.get_context_data(filter=self.filterset,
                                         object_list=self.object_list)
@@ -377,7 +377,14 @@ class RelatorioContatoAgrupadoPorGrupoView(
 
     def build_pdf(self, response):
 
-        cleaned_data = self.filterset.form.cleaned_data
+        template_name = 'cerimonial/impressos/contatos_por_grupo_pdf.html'
+
+        contatos = self.object_list
+
+        context = {'titulo': 'Relatório de Contatos por Grupo',
+                   'contatos': contatos}
+
+        return gerar_pdf_impressos(self.request, context, template_name)
 
 
 class RelatorioContatoAgrupadoPorProcessoView(

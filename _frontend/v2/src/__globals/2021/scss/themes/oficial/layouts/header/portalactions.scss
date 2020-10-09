@@ -129,6 +129,7 @@ header.main {
       .action-details {
         display: none;
         position: absolute;
+        border-top: 10px solid lighten($color: $bg_color_portal_cmj, $amount: 30);
         border-bottom: 2px solid lighten($color: $bg_color_portal_cmj, $amount: 30);
         box-shadow: 0px 20px 30px #ddd;
         top: 100%;
@@ -184,7 +185,8 @@ header.main {
               &:before {
                 content:"";
                 position: absolute;
-                top: -20px;
+                //background-color: red;
+                top: -30px;
                 left: 0;
                 right: 0;
                 bottom: -30px;

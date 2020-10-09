@@ -6,7 +6,13 @@
           <slot name="subaction"></slot>
         </div>
         <div class="col" v-show="details">
-          teste<br>
+          <component :is="`action-link-${link.model}`"
+            v-for="(link, key) in links"
+            :key="key"
+            :app="link.app"
+            :model="link.model"
+            :params="link.params"
+            v-show="showAction(link)"></component>
         </div>
       </div>
     </div>
@@ -15,19 +21,36 @@
 </template>
 
 <script>
+import ActionLinkMaterialegislativa from './ActionLinkMaterialegislativa'
+import ActionLinkDocumentoadministrativo from './ActionLinkDocumentoadministrativo'
 export default {
   name: 'action-details',
+  components: {
+    ActionLinkMaterialegislativa,
+    ActionLinkDocumentoadministrativo
+  },
   data () {
     return {
       ro: null,
       details: false,
-      links: []
+      links: [],
+      app: '',
+      model: '',
+      params: ''
+
+    }
+  },
+  computed: {
+    showAction: function () {
+      let t = this
+      return function (link) {
+        return link.app === t.app && link.model === t.model && link.params === t.params
+      }
     }
   },
   watch: {
-    details: (nv, od) => {
+    details: function (nv, od) {
       let p = document.getElementById('portalactions')
-
       if (nv) {
         p.classList.add('static')
       } else {
@@ -40,6 +63,38 @@ export default {
       let _t = this
       let el = _t.$el
       el.firstElementChild.scrollTo(0, 0)
+    },
+    mouseEnterLink: function (event) {
+      console.log(event.target.getAttribute('model'), event.target)
+    },
+    loadLinks: function () {
+      let _t = this
+      let el = _t.$el
+      let links = el.querySelectorAll('a')
+
+      links.forEach(link => {
+        let app = link.getAttribute('app')
+        let model = link.getAttribute('model')
+        let params = link.getAttribute('params')
+
+        if (app == null || app === '') {
+          return
+        }
+
+        if (_t.app === '') {
+          _t.app = app
+          _t.model = model
+          _t.params = params
+        }
+
+        link.addEventListener('mouseenter', this.mouseEnterLink)
+
+        _t.links.push({
+          app: app,
+          model: model,
+          params: params
+        })
+      })
     }
   },
   mounted: function () {
@@ -49,22 +104,11 @@ export default {
 
     this.ro = new ResizeObserver(entries => {
       _t.details = entries[0].target.offsetWidth >= 992
-
       let rect = el.parentElement.getBoundingClientRect()
       el.style.setProperty('--leftvalue', `${rect.left + rect.width / 2 - 10}px`)
     })
     this.ro.observe(h)
-
-    let links = el.querySelectorAll('a:not([app=""])')
-
-    links.forEach(link => {
-      _t.links.push({
-        app: link.getAttribute('app'),
-        model: link.getAttribute('model'),
-        params: link.getAttribute('params'),
-        values: []
-      })
-    })
+    this.loadLinks()
   }
 }
 </script>

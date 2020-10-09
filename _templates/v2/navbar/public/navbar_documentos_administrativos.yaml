@@ -3,6 +3,9 @@
   url: ''
 - title: {% trans 'Últimas Publicações'%}
   url: /doc/?o=
+  app: protocoloadm
+  model: documentoadministrativo
+  params: o=
 - title: {% trans 'Dispensas de Licitação'%}
   url: /doc/?tipo=197&o=
 - title: {% trans 'Edital de pregão Presencial'%}

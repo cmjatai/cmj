@@ -23,6 +23,8 @@ from django.db.models import Q
 from django.db.models.fields.files import FieldFile
 from django.forms import BaseForm
 from django.forms.widgets import SplitDateTimeWidget
+from django.http.response import HttpResponse
+from django.template import loader
 from django.urls.base import reverse
 from django.utils import six, timezone
 from django.utils.safestring import mark_safe
@@ -33,9 +35,11 @@ from floppyforms import ClearableFileInput
 import magic
 from reversion_compare.admin import CompareVersionAdmin
 from unipath.path import Path
+import weasyprint
 
 from sapl.crispy_layout_mixin import SaplFormHelper
 from sapl.crispy_layout_mixin import SaplFormLayout, form_actions, to_row
+
 
 # (26/10/2018): O separador foi mudador de '/' para 'K'
 # por conta dos leitores de códigos de barra, que trocavam
@@ -1155,3 +1159,16 @@ def from_date_to_datetime_utc(data):
     dt_unware = datetime.combine(data, datetime.min.time())
     dt_utc = pytz.utc.localize(dt_unware)
     return dt_utc
+
+
+def gerar_pdf_impressos(request, context, template_name):
+    template = loader.get_template(template_name)
+    html = template.render(context, request)
+    pdf = weasyprint.HTML(
+        string=html, base_url=request.build_absolute_uri()).write_pdf()
+
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; filename="relatorio_impressos.pdf"'
+    response['Content-Transfer-Encoding'] = 'binary'
+
+    return response

@@ -1,0 +1,89 @@
+
+{% load webpack_static from webpack_loader %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+  <meta charset="utf-8">
+  </meta>
+  <head>
+    <style>
+      @page{
+        margin-top: 4.5cm;
+        margin-left: 0.3cm;
+        margin-right: 0.5cm;
+        margin-bottom: 1.8cm;
+        size: A4 portrait;
+        font-size: 10px;
+        @top-right {
+          content: counter(page) " / " counter(pages);
+        }
+      }
+      table {
+        width: 19.9cm;
+        font-size: 10px;
+        border-spacing: 0px;
+        border: 0.5px solid black;
+      }
+      th, td {
+         border: 0.1px solid black;
+         padding: 3px 5px;
+      }
+      th {
+        text-align: center;
+      }
+      img {
+        width: 100%;
+      }
+      footer {
+        position:fixed;
+        bottom: -1.5cm;
+        left: 0;
+        right: 0;
+      }
+      header {
+        position: fixed;
+        top: -4cm;
+        left: 0;
+        right: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <img src="{% webpack_static 'img/pdf_cabec.jpg' %}">
+      <div style="text-align: center; font-weight: bold;">{{titulo}}</div>
+      <div style="text-align: center;"><small>{{contatos.0.workspace}}</small></div>
+    </header>
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Telefones</th>
+          <th>Endereços</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for contato in contatos %}
+          <tr>
+              <td>{{ contato.nome }}</td>
+              <td>
+                {% for tel in contato.telefone_set.all %}
+                  {{ tel }}
+                  {% if not forloop.last %} - {% endif %}
+                {% endfor %}
+              </td>
+              <td>
+                {% for endereco in contato.endereco_set.all %}
+                  {{ endereco }} - {{endereco.complemento}} - {{endereco.bairro|default:''}} - {{endereco.municipio}} - {{endereco.uf}}
+                  {% if not forloop.last %}<br>{% endif %}
+                {% endfor %}
+              </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <footer>
+      <img src="{% webpack_static 'img/pdf_rodape.jpg' %}">
+    </footer>
+  </body>
+</html>

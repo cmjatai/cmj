@@ -272,6 +272,14 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/manual.png"
   },
   {
+    "revision": "296d5d8e05785fd7d04439e18e9ff91d",
+    "url": "/static/img/pdf_cabec.jpg"
+  },
+  {
+    "revision": "c0e894ed8b441b6739133c2a7601150d",
+    "url": "/static/img/pdf_rodape.jpg"
+  },
+  {
     "revision": "fb71e48b2330408afac41e0bcfbbd4c0",
     "url": "/static/img/pdflogo.png"
   },
@@ -288,10 +296,6 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/perfil.png"
   },
   {
-    "revision": "c0e894ed8b441b6739133c2a7601150d",
-    "url": "/static/img/rodape.jpg"
-  },
-  {
     "revision": "6dc51af6e7a5ac30728639f3cdf62804",
     "url": "/static/img/search-gray.png"
   },
@@ -306,10 +310,6 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "dbb46e053254b0e6a8fc2488275dd6be",
     "url": "/static/img/search_box_icon36_delete.png"
-  },
-  {
-    "revision": "296d5d8e05785fd7d04439e18e9ff91d",
-    "url": "/static/img/topo_email.jpg"
   },
   {
     "revision": "9a0717578fe8e07bbd512ec97725cdc0",
