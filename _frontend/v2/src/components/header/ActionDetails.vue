@@ -5,7 +5,8 @@
         <div class="col col-auto">
           <slot name="subaction"></slot>
         </div>
-        <div class="col" v-show="details">
+        <div class="col flex-column" v-show="details && app !==''">
+          <h3>{{titulo}}</h3>
           <component :is="`action-link-${link.model}`"
             v-for="(link, key) in links"
             :key="key"
@@ -23,11 +24,13 @@
 <script>
 import ActionLinkMaterialegislativa from './ActionLinkMaterialegislativa'
 import ActionLinkDocumentoadministrativo from './ActionLinkDocumentoadministrativo'
+import ActionLinkSessaoplenaria from './ActionLinkSessaoplenaria'
 export default {
   name: 'action-details',
   components: {
     ActionLinkMaterialegislativa,
-    ActionLinkDocumentoadministrativo
+    ActionLinkDocumentoadministrativo,
+    ActionLinkSessaoplenaria
   },
   data () {
     return {
@@ -36,8 +39,8 @@ export default {
       links: [],
       app: '',
       model: '',
-      params: ''
-
+      params: '',
+      titulo: ''
     }
   },
   computed: {
@@ -63,9 +66,28 @@ export default {
       let _t = this
       let el = _t.$el
       el.firstElementChild.scrollTo(0, 0)
+
+      if (_t.links.length === 0) {
+        return
+      }
+
+      _t.app = _t.links[0].app
+      _t.model = _t.links[0].model
+      _t.params = _t.links[0].params
+      _t.titulo = _t.links[0].titulo
     },
     mouseEnterLink: function (event) {
-      console.log(event.target.getAttribute('model'), event.target)
+      let _t = this
+      let app = event.target.getAttribute('app')
+
+      if (app == null || app === '') {
+        // _t.app = ''
+        return
+      }
+      _t.titulo = event.target.text
+      _t.app = app
+      _t.model = event.target.getAttribute('model')
+      _t.params = event.target.getAttribute('params')
     },
     loadLinks: function () {
       let _t = this
@@ -73,6 +95,8 @@ export default {
       let links = el.querySelectorAll('a')
 
       links.forEach(link => {
+        link.addEventListener('mouseenter', this.mouseEnterLink)
+
         let app = link.getAttribute('app')
         let model = link.getAttribute('model')
         let params = link.getAttribute('params')
@@ -85,14 +109,15 @@ export default {
           _t.app = app
           _t.model = model
           _t.params = params
+          _t.titulo = link.text
         }
-
-        link.addEventListener('mouseenter', this.mouseEnterLink)
 
         _t.links.push({
           app: app,
           model: model,
-          params: params
+          params: params,
+          titulo: link.text
+
         })
       })
     }
@@ -109,6 +134,8 @@ export default {
     })
     this.ro.observe(h)
     this.loadLinks()
+    setTimeout(() => {
+    }, 10000)
   }
 }
 </script>

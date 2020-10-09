@@ -1,9 +1,11 @@
 from django.conf import settings
+from django.urls.base import reverse
 from rest_framework import serializers
 from rest_framework.relations import StringRelatedField
 
 from sapl.base.models import Autor, CasaLegislativa
 from sapl.protocoloadm.models import DocumentoAdministrativo
+from sapl.sessao.models import SessaoPlenaria
 
 
 class IntRelatedField(StringRelatedField):
@@ -56,4 +58,16 @@ class CasaLegislativaSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CasaLegislativa
+        fields = '__all__'
+
+
+class SessaoPlenariaSerializer(serializers.ModelSerializer):
+    link_detail_backend = serializers.SerializerMethodField()
+
+    def get_link_detail_backend(self, obj):
+        return reverse('sapl.sessao:sessaoplenaria_detail',
+                       kwargs={'pk': obj.pk})
+
+    class Meta:
+        model = SessaoPlenaria
         fields = '__all__'

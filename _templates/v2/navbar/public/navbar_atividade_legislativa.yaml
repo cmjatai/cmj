@@ -8,6 +8,9 @@
   params: o=
 - title: {% trans 'Sessões Plenárias' %}
   url: {% url 'sapl.sessao:pesquisar_sessao' %}?data_inicio__year={% now 'Y' %}
+  app: sessao
+  model: sessaoplenaria
+  params: o=-data_inicio&year={% now 'Y' %}
 - title: {% trans 'Sessão OnLine' %}
   url: /online/
 - title: {% trans 'Comissões'%}

@@ -90,31 +90,51 @@ class SaplApiViewSetConstrutor():
             object_name = _model._meta.object_name
 
             # Caso Exista, pega a classe sapl.api.serializers.{model}Serializer
-            serializer_name = '{model}Serializer'.format(model=object_name)
-            _serializer_class = serializers_classes.get(serializer_name, None)
+            # ou utiliza a base do drf para gerar uma automática para o model
+            serializer_name = f'{object_name}Serializer'
+            _serializer_class = serializers_classes.get(
+                serializer_name, rest_serializers.ModelSerializer)
 
             # Caso Exista, pega a classe sapl.api.forms.{model}FilterSet
-            filter_name = '{model}FilterSet'.format(model=object_name)
-            _filter_class = filters_classes.get(filter_name, None)
+            # ou utiliza a base definida em sapl.forms.SaplFilterSetMixin
+            filter_name = f'{object_name}FilterSet'
+            _filter_class = filters_classes.get(
+                filter_name, SaplFilterSetMixin)
 
             def create_class():
+
+                _meta_serializer = object if not hasattr(
+                    _serializer_class, 'Meta') else _serializer_class.Meta
+
                 # Define uma classe padrão para serializer caso não tenha sido
                 # criada a classe sapl.api.serializers.{model}Serializer
-                class SaplSerializer(rest_serializers.ModelSerializer):
+                class SaplSerializer(_serializer_class):
                     __str__ = SerializerMethodField()
 
-                    class Meta:
-                        model = _model
-                        fields = '__all__'
+                    class Meta(_meta_serializer):
+                        if not hasattr(_meta_serializer, 'model'):
+                            model = _model
+
+                        if not hasattr(_meta_serializer, 'fields'):
+                            fields = '__all__'
+                        elif _meta_serializer.fields != '__all__':
+                            fields = list(
+                                _meta_serializer.fields) + ['__str__', ]
+                        else:
+                            fields = _meta_serializer.fields
 
                     def get___str__(self, obj):
                         return str(obj)
 
+                _meta_filterset = object if not hasattr(
+                    _filter_class, 'Meta') else _filter_class.Meta
+
                 # Define uma classe padrão para filtro caso não tenha sido
                 # criada a classe sapl.api.forms.{model}FilterSet
-                class SaplFilterSet(SaplFilterSetMixin):
-                    class Meta(SaplFilterSetMixin.Meta):
-                        model = _model
+                class SaplFilterSet(_filter_class):
+                    class Meta(_meta_filterset):
+                        if not hasattr(_meta_filterset, 'model'):
+                            model = _model
 
                 # Define uma classe padrão ModelViewSet de DRF
                 class ModelSaplViewSet(SaplApiViewSet):
@@ -123,14 +143,12 @@ class SaplApiViewSetConstrutor():
                     # Utiliza o filtro customizado pela classe
                     # sapl.api.forms.{model}FilterSet
                     # ou utiliza o trivial SaplFilterSet definido acima
-                    filter_class = _filter_class \
-                        if _filter_class else SaplFilterSet
+                    filter_class = SaplFilterSet
 
                     # Utiliza o serializer customizado pela classe
                     # sapl.api.serializers.{model}Serializer
                     # ou utiliza o trivial SaplSerializer definido acima
-                    serializer_class = _serializer_class \
-                        if _serializer_class else SaplSerializer
+                    serializer_class = SaplSerializer
 
                 return ModelSaplViewSet
 
@@ -527,6 +545,9 @@ class _TipoMateriaLegislativaViewSet:
 
 @customize(SessaoPlenaria)
 class _SessaoPlenariaViewSet(ResponseFileMixin):
+
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
 
     @action(detail=False)
     def years(self, request, *args, **kwargs):
