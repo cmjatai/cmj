@@ -35,7 +35,7 @@ export default {
   },
   computed: {
     sessoes: function () {
-      return this.values.slice(0, 8)
+      return this.values.slice(0, 4)
     }
   },
   methods: {

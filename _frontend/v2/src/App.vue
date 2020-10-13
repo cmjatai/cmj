@@ -20,12 +20,17 @@ export default {
   methods: {
     handleScroll: function (event) {
       let h = document.getElementsByTagName('header')[0]
+      let u = document.getElementById('user_connected')
+
       // let r = (window.scrollY / $(document).height())
 
       // console.log(r, h.offsetHeight)
       if (window.scrollY === 0) {
         h.style.marginTop = '0px'
-        h.classList.add('header-top')
+        if (!u && window.location.pathname === '/') {
+          h.classList.add('header-top')
+        }
+
         h.classList.remove('header-mini')
       } else if (window.scrollY * 1.5 <= this.offsetHeight) {
         if (h.classList.contains('header-mini') || h.classList.contains('header-top')) {

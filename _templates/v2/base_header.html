@@ -1,7 +1,7 @@
 {% load i18n staticfiles menus common_cmj_tags cropping %}
 {% load webpack_static from webpack_loader %}
 
-<header class="main {% if not user.is_authenticated or view.raiz %}header-top{% endif %}" v-on:click.passive="teste">
+<header class="main {% if not user.is_authenticated and view.raiz %}header-top{% endif %}" v-on:click.passive="teste">
 
   <div :class="['container-fluid', portalmenu_opened ? 'opened': 'closed']" id="nav-top-container">
     <div class="container">

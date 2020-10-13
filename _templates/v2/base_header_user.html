@@ -4,7 +4,7 @@
 <ul class="nav-user-container">
   {% if user and not user.is_anonymous %}
     <li>
-      <a href="#">
+      <a id="user_connected" pk="{{user.pk}}" href="#">
         {% avatar_user user%}
       </a>
 
