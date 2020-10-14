@@ -195,6 +195,66 @@ class User(AbstractBaseUser, PermissionsMixin):
             self, using=using, keep_parents=keep_parents)"""
 
 
+class AuditLog(models.Model):
+
+    operation_choice = ('C', 'D', 'U')
+
+    user = models.ForeignKey(
+        get_settings_auth_user_model(),
+        verbose_name=_('Usuário'),
+        on_delete=SET_NULL,
+        blank=True, null=True, default=None
+    )
+
+    email = models.CharField(max_length=100,
+                             verbose_name=_('email'),
+                             blank=True,
+                             db_index=True)
+
+    operation = models.CharField(max_length=1,
+                                 verbose_name=_('operation'),
+                                 db_index=True)
+
+    timestamp = models.DateTimeField(
+        verbose_name=_('timestamp'),
+        editable=False, auto_now_add=True)
+
+    obj = JSONField(
+        verbose_name=_('Object'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+
+    content_type = models.ForeignKey(
+        ContentType,
+        blank=True, null=True, default=None,
+        on_delete=PROTECT)
+    object_id = models.PositiveIntegerField(
+        blank=True, null=True, default=None)
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    obj_id = models.PositiveIntegerField(verbose_name=_('object_id'),
+                                         db_index=True)
+
+    model_name = models.CharField(max_length=100, verbose_name=_('model'),
+
+                                  db_index=True)
+    app_name = models.CharField(max_length=100,
+                                verbose_name=_('app'),
+                                db_index=True)
+
+    class Meta:
+        verbose_name = _('AuditLog')
+        verbose_name_plural = _('AuditLogs')
+        ordering = ('-id',)
+
+    def __str__(self):
+        return "[%s] %s %s.%s %s" % (self.timestamp,
+                                     self.operation,
+                                     self.app_name,
+                                     self.model_name,
+                                     self.user,
+                                     )
+
+
 class CmjSearchMixin(models.Model):
 
     search = models.TextField(blank=True, default='')

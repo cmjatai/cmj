@@ -270,11 +270,12 @@ def update_groups(app_config, verbosity=2, interactive=True,
     rules.update_groups()
 
 
-@receiver(pre_delete, dispatch_uid='pre_delete_signal')
+"""@receiver(pre_delete, dispatch_uid='pre_delete_signal')
 def revision_pre_delete_signal(sender, **kwargs):
     with reversion.create_revision():
         kwargs['instance'].save()
         reversion.set_comment("Deletado pelo sinal.")
+"""
 
 
 @receiver(post_save, dispatch_uid='sapl_post_save_signal')

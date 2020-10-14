@@ -1,20 +1,16 @@
 from django.conf import settings
-from django.core.files.base import File
 from django.db import transaction
 from django.db.models.signals import post_save
 from django.dispatch.dispatcher import receiver
 from django.utils.translation import ugettext_lazy as _
-from django_filters import rest_framework as filters
-from rest_framework import viewsets, status, mixins
+from rest_framework import viewsets, status
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.exceptions import PermissionDenied
-from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.permissions import IsAuthenticated,\
     IsAuthenticatedOrReadOnly, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.viewsets import GenericViewSet
 
 from cmj.api.serializers import DocumentoSerializer,\
     DocumentoUserAnonymousSerializer, DocumentoChoiceSerializer,\
