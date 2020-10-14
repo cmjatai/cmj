@@ -12,9 +12,9 @@ from django.db.models.signals import post_save, pre_save, post_delete
 from django.dispatch.dispatcher import receiver
 from django.template import loader
 
-from cmj.core.models import Notificacao, AuditLog
+from cmj.core.models import Notificacao, AuditLog, OcrMyPDF
 from cmj.settings import EMAIL_SEND_USER
-from cmj.sigad.models import Revisao
+from cmj.sigad.models import Revisao, ShortRedirect
 from cmj.utils import signed_name_and_date_extract
 
 
@@ -149,7 +149,12 @@ def audit_log_function(sender, **kwargs):
         return
 
     instance = kwargs.get('instance')
-    if instance._meta.model in (AuditLog, Revisao):
+    if instance._meta.model in (
+        AuditLog,       # Causa recursividade
+        Revisao,        # já é o log de notícias
+        ShortRedirect,  # já é o log de redirecionamento de short links
+        OcrMyPDF        # já é o log de execução de ocr
+    ):
         return
 
     logger = logging.getLogger(__name__)
