@@ -63,7 +63,6 @@ class CasaLegislativaSerializer(serializers.ModelSerializer):
 
 class SessaoPlenariaSerializer(serializers.ModelSerializer):
     link_detail_backend = serializers.SerializerMethodField()
-    legislatura = serializers.ModelSerializer()
 
     def get_link_detail_backend(self, obj):
         return reverse('sapl.sessao:sessaoplenaria_detail',
