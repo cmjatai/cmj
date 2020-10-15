@@ -11,7 +11,7 @@ from django.db.models.signals import post_delete, post_save
 from django.utils import timezone
 
 from cmj.core.models import OcrMyPDF
-from cmj.diarios.models import DiarioOficial
+from cmj.diarios.models import DiarioOficial, VinculoDocDiarioOficial
 from sapl.compilacao.models import Dispositivo, TextoArticulado,\
     TipoDispositivo
 from sapl.materia.models import MateriaLegislativa, DocumentoAcessorio
@@ -65,6 +65,27 @@ class Command(BaseCommand):
         #    signed_name_and_date_extract(f)
 
         # self.ajuste_metadata_com_set_values()
+
+        # self.run_liga_norma_a_diario()
+
+    def run_liga_norma_a_diario(self):
+
+        normas = NormaJuridica.objects.exclude(
+            veiculo_publicacao='').all().order_by('ano', 'id')
+
+        for n in normas:
+
+            do = DiarioOficial.objects.filter(
+                edicao=n.veiculo_publicacao).order_by('id')
+
+            d = do.last() if n.ano == 2020 else do.first()
+
+            v = VinculoDocDiarioOficial()
+            v.diario = d
+            v.content_object = n
+            v.save()
+
+        print(normas.count())
 
     def ajuste_metadata_com_set_values(self):
         for app in apps.get_app_configs():
@@ -273,23 +294,6 @@ class Command(BaseCommand):
             o.save()
 
             d = d + timedelta(seconds=i)
-
-    def run_import_check_check(self):
-        from cmj.s3_to_cmj.models import S3MateriaLegislativa
-
-        materias_antigas = S3MateriaLegislativa.objects.filter(
-            checkcheck=1,
-            ind_excluido=0)
-
-        for m_old in materias_antigas:
-            try:
-                m_new = MateriaLegislativa.objects.get(pk=m_old.cod_materia)
-            except:
-                pass
-            else:
-                m_new.checkcheck = True
-                m_new.save()
-                print(m_new)
 
     def run_ajusta_datas_de_edicao_com_certidoes(self):
 

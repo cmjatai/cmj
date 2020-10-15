@@ -34,12 +34,20 @@
       {% include 'norma/normajuridica_widget_file.html' %}
     {% endwith %}
   {% endif %}
-
-
 <div class="row">
   <div class="col-sm-12">
+    <hr />
+    {% if object.diariosoficiais.exists %}
+
+      <p class="control-label">Diário Oficial</p>
+      <div class="form-control-static mb-3">
+        <a href="{% url 'cmj.diarios:diariooficial_detail' object.diariosoficiais.first.diario.pk %}">
+        {{object.diariosoficiais.first.diario}}
+        </a><i>&nbsp;({{object.diariosoficiais.first.diario.data}})</i>
+      </div>
+    {% endif %}
+
     {% if object.materia %}
-      <hr />
       <p class="control-label">Matéria Legislativa</p>
       <div class="form-control-static mb-3">
         <a href="{% url 'sapl.materia:materialegislativa_detail' object.materia.pk %}">
@@ -57,32 +65,22 @@
 
     {% if object.get_anexos_norma_juridica|length > 0 %}
       <p class="control-label">Anexos Norma Jurídica</p>
-      {% for p in object.get_anexos_norma_juridica %}
         <div class="form-control-static mb-3">
-          <a href="/media/{{p.anexo_arquivo}}">
-          {{ p.anexo_arquivo | to_str | split:"/" | get_last_item_from_list:-1 }}
-          </a>
+          {% for p in object.get_anexos_norma_juridica %}
+            <a href="/media/{{p.anexo_arquivo}}">
+            {{ p.anexo_arquivo | to_str | split:"/" | get_last_item_from_list:-1 }}</a>{% if not forloop.last %}, {% endif %}
+
+          {% endfor %}
         </div>
-      {% endfor %}
     {% endif %}
 
-    {% if object.diariosoficiais.exists %}
-      <p class="control-label">Diário Oficial</p>
-      <div class="form-control-static mb-3">
-        <a href="{% url 'cmj.diarios:diariooficial_detail' object.diariosoficiais.first.diario.pk %}">
-        {{object.diariosoficiais.first.diario}}
-        </a><i>&nbsp;({{object.diariosoficiais.first.diario.data}})</i>
-      </div>
-    {% endif %}
 
     {% if object.assuntos.exists %}
       <p class="control-label">Assuntos</p>
       <div class="form-control-static mb-3">
-        <ul>
-          {% for assunto in object.assuntos.all %}
-            <li>{{assunto}}</li>
-          {% endfor %}
-        </ul>
+        {% for assunto in object.assuntos.all %}
+          {{assunto}}{% if not forloop.last %} - {% endif %}
+        {% endfor %}
       </div>
     {% endif %}
 
