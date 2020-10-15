@@ -165,7 +165,6 @@
               {% if rv.observacao %}
                 - {{rv.observacao}}
               {% endif %}
-
               {% for subscricao in rv.subscricoes.all %}
                 {% if forloop.first %}
                   <br><br><strong>Subscrições</strong><br>
@@ -198,6 +197,16 @@
               {% endif %}
             </td>
           </tr>
+          {% if forloop.last and object.diariosoficiais.exists %}
+            <tr>
+              <th colspan=2 class="text-left small">
+                <strong>Deliberações em plenário finalizadas e aprovação publicada em:</strong><br>
+                  <a href="{% url 'cmj.diarios:diariooficial_detail' object.diariosoficiais.first.diario.pk %}">
+                  {{object.diariosoficiais.first.diario}}
+                  </a><i>&nbsp;({{object.diariosoficiais.first.diario.data}})</i>
+              </th>
+            </tr>
+              {% endif %}
         {% endfor %}
       </table>
     </div>
