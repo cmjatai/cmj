@@ -167,6 +167,8 @@ def audit_log_function(sender, **kwargs):
         try:
             if r.user._meta.label == settings.AUTH_USER_MODEL:
                 u = r.user
+                if u.is_anonymous:
+                    return
                 break
         except:
             # não é necessário usar logger, aqui é usada apenas para
