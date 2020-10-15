@@ -10,8 +10,35 @@
 <div class="row">
   <div class="col-sm-12">
 
+      {% if n.diariooficial_set.exists %}
+        <hr />
+        <p class="control-label">Diário Oficial</p>
+        <div class="form-control-static">
+          <a href="{% url 'cmj.diarios:diariooficial_detail' n.diariooficial_set.first.pk %}">
+          {{n.diariooficial_set.first}}
+          </a>
+        </div>
+      {% endif %}
+
+      {% if n.materia %}
+        <hr />
+        <p class="control-label">Matéria Legislativa</p>
+        <div class="form-control-static">
+          <a href="{% url 'sapl.materia:materialegislativa_detail' n.materia.pk %}">
+          {{n.materia}}
+          </a>
+          {% for a in n.materia.autores.all %}
+            {% if forloop.first %}
+              <br>
+              <b>Autoria:</b>&nbsp;
+            {% endif %}
+              {{a}}{% if not forloop.last %}, {% endif %}
+          {% endfor %}
+
+        </div>
+      {% endif %}
+
       {% if n.get_normas_relacionadas.0|length > 0 or n.get_normas_relacionadas.1|length > 0%}
-        
         <hr />
         <p class="control-label">Normas Relacionadas</p>
       {% endif %}
@@ -37,5 +64,6 @@
           </div>
         {% endfor %}
       {% endif %}
+
   </div>
 </div>

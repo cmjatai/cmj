@@ -29,8 +29,6 @@ NormaJuridicaDetail:
   {% trans 'Outras Informações' %}:
   - data_publicacao  veiculo_publicacao data_vigencia pagina_inicio_publicacao  pagina_fim_publicacao
   - materia
-  - apelido
-  - observacao
   - assuntos
 
 AnexoNormaJuridica:
