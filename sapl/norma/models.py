@@ -119,14 +119,7 @@ class NormaJuridica(CommonMixin):
     data = models.DateField(blank=False, null=True, verbose_name=_('Data'))
     data_publicacao = models.DateField(
         blank=True, null=True, verbose_name=_('Data de Publicação'))
-    veiculo_publicacao = models.CharField(
-        max_length=30,
-        blank=True,
-        verbose_name=_('Veículo de Publicação'))
-    pagina_inicio_publicacao = models.PositiveIntegerField(
-        blank=True, null=True, verbose_name=_('Pg. Início'))
-    pagina_fim_publicacao = models.PositiveIntegerField(
-        blank=True, null=True, verbose_name=_('Pg. Fim'))
+
     ementa = models.TextField(verbose_name=_('Ementa'))
     indexacao = models.TextField(
         blank=True, verbose_name=_('Indexação'))
@@ -184,19 +177,6 @@ class NormaJuridica(CommonMixin):
 
     _certidao = GenericRelation(
         CertidaoPublicacao, related_query_name='normajuridica_cert')
-
-    def diariooficial(self):
-        if self.veiculo_publicacao:
-            if not self.diariooficial_set.filter(edicao=self.veiculo_publicacao).exists():
-                from cmj.diarios.models import DiarioOficial
-
-                d = DiarioOficial.objects.filter(
-                    edicao=self.veiculo_publicacao).last()
-
-                if d:
-                    d.normas.add(self)
-
-        return self.diariooficial_set.all()
 
     class Meta:
         verbose_name = _('Norma Jurídica')

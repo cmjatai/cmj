@@ -18,6 +18,7 @@ from sapl.materia.models import MateriaLegislativa, DocumentoAcessorio
 from sapl.norma.models import NormaJuridica
 from sapl.protocoloadm.models import DocumentoAdministrativo, Protocolo,\
     DocumentoAcessorioAdministrativo
+from sapl.rules.apps import reset_id_model
 from sapl.sessao.models import SessaoPlenaria
 
 
@@ -38,7 +39,6 @@ class Command(BaseCommand):
 
         # self.run_ajusta_datas_de_edicao_com_certidoes()
         # self.run_ajusta_datas_de_edicao_com_data_doc()
-        # self.reset_id_model(TipoDispositivoRelationship)
         # self.delete_itens_tmp_folder()
 
         # self.run_checkcheck_olds()
@@ -65,10 +65,19 @@ class Command(BaseCommand):
         #    signed_name_and_date_extract(f)
 
         # self.ajuste_metadata_com_set_values()
-
         # self.run_liga_norma_a_diario()
 
+        # veiculo_publicacao='',
+        normas = NormaJuridica.objects.exclude(
+            data_publicacao=F('data')).all().order_by('ano', 'id')
+
+        for n in normas:
+            print(n.id, n)
+        print(normas.count())
+
     def run_liga_norma_a_diario(self):
+        VinculoDocDiarioOficial.objects.all().delete()
+        reset_id_model(VinculoDocDiarioOficial)
 
         normas = NormaJuridica.objects.exclude(
             veiculo_publicacao='').all().order_by('ano', 'id')
@@ -80,10 +89,16 @@ class Command(BaseCommand):
 
             d = do.last() if n.ano == 2020 else do.first()
 
-            v = VinculoDocDiarioOficial()
-            v.diario = d
-            v.content_object = n
-            v.save()
+            try:
+                v = VinculoDocDiarioOficial()
+                v.diario = d
+                v.content_object = n
+                if n.pagina_inicio_publicacao:
+                    v.pagina = n.pagina_inicio_publicacao
+                v.save()
+            except:
+                print(n.id, n)
+                return
 
         print(normas.count())
 

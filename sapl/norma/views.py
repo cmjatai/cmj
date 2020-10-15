@@ -205,7 +205,7 @@ class NormaTaView(IntegracaoTaView):
                         self.object.content_object._meta.verbose_name,
                         '''
                             No entanto, sua consulta é possível da forma trivial através
-                            do Arquivo Digitalizado abaixo. 
+                            do Arquivo Digitalizado abaixo.
                             ''' if self.object.content_object.texto_integral else ''
                     )))
 
@@ -384,9 +384,7 @@ class NormaCrud(Crud):
 
             atributos = ['tipo_id', 'numero', 'ano', 'data', 'esfera_federacao',
                          'complemento', 'materia_id', 'numero',
-                         'data_publicacao', 'data_vigencia',
-                         'veiculo_publicacao', 'pagina_inicio_publicacao',
-                         'pagina_fim_publicacao', 'ementa', 'indexacao',
+                         'data_publicacao', 'data_vigencia','ementa', 'indexacao',
                          'observacao', 'texto_integral']
 
             for atributo in atributos:
