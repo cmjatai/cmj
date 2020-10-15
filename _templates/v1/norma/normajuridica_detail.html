@@ -35,46 +35,76 @@
     {% endwith %}
   {% endif %}
 
-  {{ block.super }}
 
 <div class="row">
   <div class="col-sm-12">
-      {% if object.get_normas_relacionadas.0|length > 0 %}
-        <hr />
-        <p class="control-label">Normas Relacionadas</p>
-        {% for p in object.get_normas_relacionadas.0 %}
-          <div class="form-control-static">
-            <b>{{ p.tipo_vinculo.descricao_ativa }}</b>&nbsp;
-            <a href="{% url 'sapl.norma:normajuridica_detail' p.norma_relacionada.pk %}">
-              {{ p.norma_relacionada.epigrafe }}
-            </a>
-          </div>
-        {% endfor %}
-      {% endif %}
-
-      {% if object.get_normas_relacionadas.1|length > 0 %}
-        {% for r in object.get_normas_relacionadas.1 %}
-          <div class="form-control-static">
-            <b>{{ r.tipo_vinculo.descricao_passiva }}</b>&nbsp;
-            <a href="{% url 'sapl.norma:normajuridica_detail' r.norma_principal.pk %}">
-            {{ r.norma_principal.epigrafe }}
-            </a>
-          </div>
-        {% endfor %}
-      {% endif %}
-
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-sm-12">
-    {% if object.get_anexos_norma_juridica|length > 0 %}
+    {% if object.materia %}
       <hr />
+      <p class="control-label">Matéria Legislativa</p>
+      <div class="form-control-static mb-3">
+        <a href="{% url 'sapl.materia:materialegislativa_detail' object.materia.pk %}">
+        {{object.materia}}
+        </a>
+        {% for a in object.materia.autores.all %}
+          {% if forloop.first %}
+            <br>
+            <b>Autoria:</b>&nbsp;
+          {% endif %}
+            {{a}}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if object.get_anexos_norma_juridica|length > 0 %}
       <p class="control-label">Anexos Norma Jurídica</p>
       {% for p in object.get_anexos_norma_juridica %}
-        <div class="form-control-static">
+        <div class="form-control-static mb-3">
           <a href="/media/{{p.anexo_arquivo}}">
           {{ p.anexo_arquivo | to_str | split:"/" | get_last_item_from_list:-1 }}
+          </a>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    {% if object.diariosoficiais.exists %}
+      <p class="control-label">Diário Oficial</p>
+      <div class="form-control-static mb-3">
+        <a href="{% url 'cmj.diarios:diariooficial_detail' object.diariosoficiais.first.diario.pk %}">
+        {{object.diariosoficiais.first.diario}}
+        </a><i>&nbsp;({{object.diariosoficiais.first.diario.data}})</i>
+      </div>
+    {% endif %}
+
+    {% if object.assuntos.exists %}
+      <p class="control-label">Assuntos</p>
+      <div class="form-control-static mb-3">
+        <ul>
+          {% for assunto in object.assuntos.all %}
+            <li>{{assunto}}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+
+    {% if object.get_normas_relacionadas.0|length > 0 %}
+      <p class="control-label">Normas Relacionadas</p>
+      {% for p in object.get_normas_relacionadas.0 %}
+        <div class="form-control-static mb-3">
+          <b>{{ p.tipo_vinculo.descricao_ativa }}</b>&nbsp;
+          <a href="{% url 'sapl.norma:normajuridica_detail' p.norma_relacionada.pk %}">
+            {{ p.norma_relacionada.epigrafe }}
+          </a>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    {% if object.get_normas_relacionadas.1|length > 0 %}
+      {% for r in object.get_normas_relacionadas.1 %}
+        <div class="form-control-static mb-3">
+          <b>{{ r.tipo_vinculo.descricao_passiva }}</b>&nbsp;
+          <a href="{% url 'sapl.norma:normajuridica_detail' r.norma_principal.pk %}">
+          {{ r.norma_principal.epigrafe }}
           </a>
         </div>
       {% endfor %}
@@ -114,45 +144,4 @@
       {% endif %}
       </div>
     {% endif %}
-
-
-  {% comment %}
-  {% if object.texto_articulado.exists and object.texto_articulado.first.has_view_permission %}
-    <hr />
-    <div class="row">
-      <div class="col-sm-12">
-        <br>
-        <p class="control-label">{%trans 'Texto Multivigente' %}</p>
-        <div id="textomultivigente"></div>
-      </div>
-    </div>
-  {% endif %}
-  {% endcomment %}
 {% endblock detail_content %}
-
-{% comment %}
-{% block webpack_loader_js %}
-    {{ block.super }}
-    {% if object.texto_articulado.exists and object.texto_articulado.first.has_view_permission  %}
-      {% render_bundle 'compilacao' 'js' %}
-    {% endif %}
-{% endblock %}
-
-
-{% block extra_js %}
-{% if object.texto_articulado.exists and object.texto_articulado.first.has_view_permission  %}
-  <script language="Javascript">
-    window.onload = function () {
-      $.get("{% url 'sapl.compilacao:ta_text' object.texto_articulado.first.id %}?embedded",
-      function(data, status) {
-        $('#textomultivigente').html(data)
-        $('cp a[data-toggle="dropdown"]').dropdown()
-        $('.dne').remove()
-        $('.dnli ul').remove()
-      });
-    }
-  </script>
-{% endif %}
-{% endblock extra_js %}
-
-{% endcomment %}

@@ -232,7 +232,7 @@ class NormaCrud(Crud):
 
     class DetailView(BtnCertMixin, Crud.DetailView):
 
-        layout_key = 'NormaJuridicaDetail'
+        layout_key = None
 
         @property
         def extras_url(self):

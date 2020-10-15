@@ -49,6 +49,9 @@ strong {
     transform: rotate(180deg);
   }
 }
+.page-break {
+  page-break-before: always;
+}
 
 .avatar {
   padding: 0 0 0 0;
