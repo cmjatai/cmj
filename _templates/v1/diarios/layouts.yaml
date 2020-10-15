@@ -7,3 +7,8 @@ DiarioOficial:
   - edicao:3 data:3 tipo
   - descricao
   - arquivo
+  - vinculodocdiariooficial_set
+VinculoDocDiarioOficial:
+  {% trans 'Documentos Publicos' %}:
+  - content_type:3 pagina
+  - content_object

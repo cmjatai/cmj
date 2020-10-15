@@ -9,6 +9,7 @@ from model_utils import Choices
 import reversion
 
 from cmj.core.models import CertidaoPublicacao
+from cmj.diarios.models import VinculoDocDiarioOficial
 from cmj.mixins import CommonMixin
 from cmj.utils import restringe_tipos_de_arquivo_midias
 from sapl.base.models import Autor
@@ -144,6 +145,10 @@ class NormaJuridica(CommonMixin):
 
     texto_articulado = GenericRelation(
         TextoArticulado, related_query_name='texto_articulado')
+
+    diariosoficiais = GenericRelation(
+        VinculoDocDiarioOficial,
+        related_query_name='diariosoficiais')
 
     data_ultima_atualizacao = models.DateTimeField(
         blank=True, null=True,
@@ -292,7 +297,7 @@ class AutoriaNorma(models.Model):
                               on_delete=models.CASCADE)
     norma = models.ForeignKey(
         NormaJuridica, on_delete=models.CASCADE,
-        verbose_name=_('Matéria Legislativa'))
+        verbose_name=_('Norma Jurídica'))
     primeiro_autor = models.BooleanField(verbose_name=_('Primeiro Autor'),
                                          choices=YES_NO_CHOICES,
                                          default=False)

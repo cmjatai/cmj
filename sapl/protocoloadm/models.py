@@ -12,6 +12,7 @@ from model_utils import Choices
 import reversion
 
 from cmj.core.models import AreaTrabalho, CertidaoPublicacao
+from cmj.diarios.models import VinculoDocDiarioOficial
 from cmj.mixins import CommonMixin
 from sapl.base.models import Autor
 from sapl.materia.models import TipoMateriaLegislativa, UnidadeTramitacao,\
@@ -243,6 +244,10 @@ class DocumentoAdministrativo(CommonMixin):
         object_id_field='conteudo_object_id',
         content_type_field='conteudo_content_type',
         related_query_name='protocolo_gr')
+
+    diariosoficiais = GenericRelation(
+        VinculoDocDiarioOficial,
+        related_query_name='diariosoficiais',)
 
     materia = models.ForeignKey(
         MateriaLegislativa,

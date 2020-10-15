@@ -5,8 +5,8 @@
     <div class="container-table">
       <div class="result-count">Total de Registros {{object_list.count}}</div>
       <table class="table table-striped table-hover table-link-ordering">
-        
-        <tr>            
+
+        <tr>
           {% if perms.materia.can_check_complete %}
             <th>Check</th>
           {% endif %}
@@ -32,17 +32,17 @@
               <br>
               <small>
 
-                <strong>Autoria:</strong> 
+                <strong>Autoria:</strong>
                 {% for autor in m.autores.all %}
                   {{autor}}{% if not forloop.last %},{% else %}<br>{% endif %}
                 {% endfor %}
 
                 {% with m.tramitacao_set.first as tram %}
-                  {% if tram.unidade_tramitacao_destino %}        
-                    <strong>Localização Atual:</strong> &nbsp;{{tram.unidade_tramitacao_destino}}</br>        
+                  {% if tram.unidade_tramitacao_destino %}
+                    <strong>Localização Atual:</strong> &nbsp;{{tram.unidade_tramitacao_destino}}</br>
                     <strong>Status:</strong> {{tram.status}}<br>
                     <strong>Ultima Ação:</strong> {{tram.texto}}<br>
-                    <strong>Data da última Tramitação:</strong> {{tram.data_tramitacao}}<br>       
+                    <strong>Data da última Tramitação:</strong> {{tram.data_tramitacao}}<br>
                   {% endif %}
                 {% endwith %}
               </small>
@@ -58,14 +58,14 @@
               {% if m.normajuridica %}
                 <a href="{% url 'sapl.norma:normajuridica_detail' m.normajuridica.id %}">{{m.normajuridica}}</a>
                 <br>{{m.normajuridica.ementa}}
-                
-                {% if not m.normajuridica.veiculo_publicacao %}
+
+                {% if not m.normajuridica.diariosoficiais.exists %}
                   <br><strong>Diário Oficial não informado.</strong>
                 {% else %}
                   <br> <strong>Diário Oficial Relacionado: </strong><br>
-                  <a href="{% url 'cmj.diarios:diariooficial_detail' m.normajuridica.diariooficial.first.id%}">
+                  <a href="{% url 'cmj.diarios:diariooficial_detail' m.normajuridica.diariosoficiais.first.diario.id%}">
                     <small class="text-info">
-                      {{m.normajuridica.diariooficial.first}}
+                      {{m.normajuridica.diariosoficiais.first.diario}}
                     </small>
                   </a>
                 {% endif %}

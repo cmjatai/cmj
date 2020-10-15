@@ -18,7 +18,7 @@
   {{ block.super }}
   {% include 'compilacao/text_list__embedded.html'%}
 
-  {% if object.content_object and object.content_object|meta_model_value:'label' == 'norma.NormaJuridica' and not object.content_object|has_perm_change_instance:perms  %}
+  {% if object.content_object and object.content_object|meta_model_value:'label' == 'norma.NormaJuridica'%}
     {% with object.content_object as n %}
       {% include 'compilacao/normajuridica_widget_bottom.html' %}
     {% endwith %}

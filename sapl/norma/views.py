@@ -344,17 +344,6 @@ class NormaCrud(Crud):
         def hook_header_epigrafe(self):
             return force_text(_('Epigrafe'))
 
-        """def hook_header_has_texto_articulado(self):
-            return force_text(_('Texto Articulado'))
-
-        def hook_has_texto_articulado(self, obj, ss, url):
-
-            return (
-                ('Sim - {}'.format(
-                    obj.texto_articulado.first().privacidade)
-
-                 ) if obj.texto_articulado.exists() else 'Não', url)"""
-
         def get_context_data(self, **kwargs):
             context = Crud.ListView.get_context_data(self, **kwargs)
 
@@ -364,13 +353,6 @@ class NormaCrud(Crud):
         @classmethod
         def get_url_regex(cls):
             return r'^check$'
-
-        """def get_redirect_url(self, *args, **kwargs):
-            namespace = self.model._meta.app_config.name
-            return reverse('%s:%s' % (namespace, 'norma_pesquisa'))
-
-        def get(self, request, *args, **kwargs):
-            return RedirectView.get(self, request, *args, **kwargs)"""
 
     class UpdateView(Crud.UpdateView):
         form_class = NormaJuridicaForm

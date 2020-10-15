@@ -1,12 +1,14 @@
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields.jsonb import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
+from django.urls.base import reverse
 from django.utils.translation import ugettext_lazy as _
 import reversion
 
 from cmj.mixins import CommonMixin
 from cmj.utils import texto_upload_path
-from sapl.norma.models import NormaJuridica
 from sapl.utils import restringe_tipos_de_arquivo_txt, OverwriteStorage
 
 
@@ -58,7 +60,7 @@ class DiarioOficial(CommonMixin):
         validators=[restringe_tipos_de_arquivo_txt])
 
     normas = models.ManyToManyField(
-        NormaJuridica,
+        'norma.NormaJuridica',
         verbose_name=_('Normas Publicadas no Diário'))
 
     data_ultima_atualizacao = models.DateTimeField(
@@ -94,3 +96,39 @@ class DiarioOficial(CommonMixin):
                                  force_update=force_update,
                                  using=using,
                                  update_fields=update_fields)
+
+
+class VinculoDocDiarioOficial(models.Model):
+
+    diario = models.ForeignKey(
+        DiarioOficial,
+        on_delete=models.PROTECT,
+        verbose_name=_('Diário Oficial'))
+
+    pagina = models.PositiveIntegerField(
+        default=0,
+        verbose_name=_('Página Inicial'))
+
+    content_type = models.ForeignKey(
+        ContentType,
+        blank=True, null=True, default=None,
+        on_delete=models.PROTECT,
+        verbose_name=_('Espécie'))
+    object_id = models.PositiveIntegerField(
+        blank=True, null=True, default=None)
+    content_object = GenericForeignKey(
+        'content_type',
+        'object_id'
+    )
+
+    class Meta:
+        verbose_name = _('Documento Publicado no Diário Oficial')
+        verbose_name_plural = _('Documentos Publicados no Diário Oficial')
+        ordering = ('id', )
+
+    def __str__(self):
+        return str(self.content_object)
+
+    @property
+    def reverse_link_content_object(self):
+        return reverse(f'{self.content_object._meta.app_config.name}:{self.content_object._meta.model_name}_detail', kwargs={'pk': self.content_object.id})

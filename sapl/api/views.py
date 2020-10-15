@@ -6,6 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 from django.db.models.fields.files import FileField
 from django.http.response import Http404, HttpResponse
+from django.urls.base import reverse
 from django.utils.decorators import classonlymethod
 from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy as _
@@ -110,6 +111,11 @@ class SaplApiViewSetConstrutor():
                 # criada a classe sapl.api.serializers.{model}Serializer
                 class SaplSerializer(_serializer_class):
                     __str__ = SerializerMethodField()
+                    link_detail_backend = rest_serializers.SerializerMethodField()
+
+                    def get_link_detail_backend(self, obj):
+                        return reverse(f'{self.Meta.model._meta.app_config.name}:{self.Meta.model._meta.model_name}_detail',
+                                       kwargs={'pk': obj.pk})
 
                     class Meta(_meta_serializer):
                         if not hasattr(_meta_serializer, 'model'):

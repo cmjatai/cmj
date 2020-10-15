@@ -1,0 +1,81 @@
+{% extends "crud/form.html" %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% block extra_js %}
+   <script type="text/javascript">
+    $(document).ready(function(){
+
+      $("select[name=tipo], input[name=numero], input[name=ano]").change(function(event) {
+        let opt_seleted = document.getElementById('id_content_type').selectedOptions[0]
+        let url = `/api/${opt_seleted.getAttribute('app_label')}/${opt_seleted.getAttribute('model')}/`
+
+        var formData = {
+              'tipo'   : $("select[name=tipo]").val(),
+              'ano'    : $("input[name=ano]").val(),
+              'numero' : $("input[name=numero]").val(),
+        }
+        if (formData.tipo === '' || formData.ano === '' || formData.numero === '') {
+          $(".doc_selected").html('').addClass('hidden');
+          return;
+        }
+
+        $.get(url, formData).done(function(data) {
+          if (data.pagination.total_entries == 1)
+            $(".doc_selected").html(
+              `<a target="_blank" href="${data.results[0].link_detail_backend}">
+                  <strong>${data.results[0].__str__}</strong>
+                  </a>
+                  <br>${data.results[0].ementa || data.results[0].assunto }`
+              ).removeClass('hidden');
+          else
+            $(".doc_selected").html('<strong>Atenção!!!</strong> Registro não localizado!').removeClass('hidden');
+
+        }).catch(function() {
+            $(".doc_selected").html('<strong>Atenção!!!</strong> Registro não localizado!').removeClass('hidden');
+        });
+  		});
+
+      $("select[name=content_type]").change(function(event) {
+        $("#id_tipo option").remove()
+        let opt_seleted = event.target.selectedOptions[0]
+        let url = `/api/${opt_seleted.getAttribute('app_label')}/tipo${opt_seleted.getAttribute('model')}/`
+
+        var especie_persistida = '{% if object %}{{object.content_type_id}}{% else %}0{% endif %}'
+        var tipo_persistido = '{% if object %}{{object.content_object.tipo_id}}{% else %}0{% endif %}'
+
+
+        let formData = {
+              page: 1
+        }
+
+        let get_pages_recursive = function() {
+          $.get(url, formData).done(function(data) {
+
+            if (data !== null) {
+                $.each(data.results, function(idx, obj) {
+
+                    $("#id_tipo")
+                      .append($("<option></option>")
+                      .attr("value", obj.id)
+                      .text(obj.descricao));
+                });
+                if (data.pagination.next_page > 0) {
+                  formData.page = data.pagination.next_page
+                  get_pages_recursive()
+                }
+                else {
+                    $("#id_tipo").val(tipo_persistido)
+                    $("select[name=tipo]").trigger('change');
+                }
+              }
+
+          });
+        }
+        get_pages_recursive()
+  		});
+
+      $("select[name=content_type]").trigger('change');
+
+    });
+	</script>
+{% endblock %}
