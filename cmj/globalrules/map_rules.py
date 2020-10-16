@@ -168,7 +168,7 @@ rules_agenda_group_workspace = {
 rules_diarios_group_operador = {
     'group': GROUP_DIARIOS_OPERADOR,
     'rules': [
-        (DiarioOficial, __base__)
+        (DiarioOficial, __base__),
         (VinculoDocDiarioOficial, __base__)
     ]
 }
