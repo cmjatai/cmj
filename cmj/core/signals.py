@@ -12,7 +12,7 @@ from django.db.models.signals import post_save, pre_save, post_delete
 from django.dispatch.dispatcher import receiver
 from django.template import loader
 
-from cmj.core.models import Notificacao, AuditLog, OcrMyPDF
+from cmj.core.models import Notificacao, AuditLog, OcrMyPDF, Bi
 from cmj.settings import EMAIL_SEND_USER
 from cmj.sigad.models import Revisao, ShortRedirect
 from cmj.utils import signed_name_and_date_extract
@@ -153,7 +153,8 @@ def audit_log_function(sender, **kwargs):
         AuditLog,       # Causa recursividade
         Revisao,        # já é o log de notícias
         ShortRedirect,  # já é o log de redirecionamento de short links
-        OcrMyPDF        # já é o log de execução de ocr
+        OcrMyPDF,       # já é o log de execução de ocr
+        Bi              # Bi é um processo automático estatístico
     ):
         return
 

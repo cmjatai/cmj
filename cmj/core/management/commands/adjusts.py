@@ -5,12 +5,14 @@ import os
 
 from django.apps.registry import apps
 from django.core.management.base import BaseCommand
+from django.db import transaction
 from django.db.models import F, Q
 from django.db.models.fields.files import FileField
 from django.db.models.signals import post_delete, post_save
+from django.db.transaction import atomic
 from django.utils import timezone
 
-from cmj.core.models import OcrMyPDF
+from cmj.core.models import OcrMyPDF, AuditLog
 from cmj.diarios.models import DiarioOficial, VinculoDocDiarioOficial
 from sapl.compilacao.models import Dispositivo, TextoArticulado,\
     TipoDispositivo
@@ -68,16 +70,10 @@ class Command(BaseCommand):
         # self.run_liga_norma_a_diario()
 
         # veiculo_publicacao='',
-        normas = NormaJuridica.objects.exclude(
-            data_publicacao=F('data')).all().order_by('ano', 'id')
-
-        for n in normas:
-            print(n.id, n)
-        print(normas.count())
+        # with transaction.atomic():
+        #    reset_id_model(AuditLog)
 
     def run_liga_norma_a_diario(self):
-        VinculoDocDiarioOficial.objects.all().delete()
-        reset_id_model(VinculoDocDiarioOficial)
 
         normas = NormaJuridica.objects.exclude(
             veiculo_publicacao='').all().order_by('ano', 'id')
