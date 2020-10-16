@@ -29,6 +29,8 @@ class DiarioOficialCrud(Crud):
             return c
 
     class DetailView(Crud.PublicMixin, Crud.DetailView):
+        layout_key = 'DiarioOficialDetail'
+
         def get_context_data(self, **kwargs):
             c = super().get_context_data(**kwargs)
             c['bg_title'] = 'bg-maroon text-white'
