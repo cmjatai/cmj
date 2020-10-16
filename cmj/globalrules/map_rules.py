@@ -11,7 +11,8 @@ from cmj.cerimonial.models import Perfil, EnderecoPerfil, EmailPerfil,\
 from cmj.core.models import Trecho, Municipio, AreaTrabalho,\
     OperadorAreaTrabalho, Cep, RegiaoMunicipal, Bairro, TipoLogradouro,\
     Distrito, Logradouro, ImpressoEnderecamento, Notificacao
-from cmj.diarios.models import DiarioOficial, TipoDeDiario
+from cmj.diarios.models import DiarioOficial, TipoDeDiario,\
+    VinculoDocDiarioOficial
 from cmj.globalrules import (RP_ADD, RP_CHANGE, RP_DELETE, RP_DETAIL, RP_LIST,
                              GROUP_SOCIAL_USERS,
                              GROUP_SAAP_WORKSPACE_OPER_CONTATOS,
@@ -168,6 +169,7 @@ rules_diarios_group_operador = {
     'group': GROUP_DIARIOS_OPERADOR,
     'rules': [
         (DiarioOficial, __base__)
+        (VinculoDocDiarioOficial, __base__)
     ]
 }
 
