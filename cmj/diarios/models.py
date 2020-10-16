@@ -3,11 +3,12 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields.jsonb import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
+from django.db.models.fields import related_descriptors
 from django.urls.base import reverse
 from django.utils.translation import ugettext_lazy as _
 import reversion
 
-from cmj.mixins import CommonMixin
+from cmj.mixins import CommonMixin, CmjCleanMixin
 from cmj.utils import texto_upload_path
 from sapl.utils import restringe_tipos_de_arquivo_txt, OverwriteStorage
 
@@ -98,7 +99,7 @@ class DiarioOficial(CommonMixin):
                                  update_fields=update_fields)
 
 
-class VinculoDocDiarioOficial(models.Model):
+class VinculoDocDiarioOficial(CmjCleanMixin, models.Model):
 
     diario = models.ForeignKey(
         DiarioOficial,
@@ -125,6 +126,7 @@ class VinculoDocDiarioOficial(models.Model):
         verbose_name = _('Documento Publicado no Diário Oficial')
         verbose_name_plural = _('Documentos Publicados no Diário Oficial')
         ordering = ('id', )
+        unique_together = (('object_id', 'content_type', 'diario'), )
 
     def __str__(self):
         return str(self.content_object)

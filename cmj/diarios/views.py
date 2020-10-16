@@ -1,4 +1,5 @@
 
+from braces.views._forms import FormMessagesMixin
 from django.shortcuts import get_object_or_404
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
@@ -77,9 +78,17 @@ class VinculoDocDiarioOficialCrud(MasterDetailCrud):
             else:
                 return args[1], ''
 
-    class CreateView(MasterDetailCrud.CreateView):
+    class CreateView(MasterDetailCrud.CreateView, FormMessagesMixin):
         layout_key = None
         form_class = VinculoDocDiarioOficialForm
+
+        def get_initial(self):
+            i = MasterDetailCrud.CreateView.get_initial(self)
+            i.update({
+                'diario': DiarioOficial.objects.get(pk=self.kwargs['pk']),
+            })
+
+            return i
 
     class UpdateView(MasterDetailCrud.UpdateView):
         layout_key = None
@@ -91,6 +100,7 @@ class VinculoDocDiarioOficialCrud(MasterDetailCrud):
                 'content_type': self.object.content_type,
                 'tipo': self.object.content_object.tipo_id,
                 'numero': self.object.content_object.numero,
-                'ano': self.object.content_object.ano
+                'ano': self.object.content_object.ano,
+                'diario': self.object.diario
             })
             return i

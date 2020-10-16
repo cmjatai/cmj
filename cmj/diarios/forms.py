@@ -2,10 +2,13 @@ from crispy_forms.bootstrap import Alert
 from crispy_forms.layout import Fieldset, Row, Div
 from django import forms
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 from django.forms.models import ModelForm
+from django.forms.widgets import HiddenInput
 from django.utils.encoding import force_text
+from django.utils.translation import ugettext_lazy as _
 
-from cmj.diarios.models import VinculoDocDiarioOficial
+from cmj.diarios.models import VinculoDocDiarioOficial, DiarioOficial
 from sapl.crispy_layout_mixin import SaplFormHelper, SaplFormLayout,\
     to_column
 from sapl.utils import ChoiceWithoutValidationField,\
@@ -46,7 +49,7 @@ class VinculoDocDiarioOficialForm(ModelForm):
 
     tipo = ChoiceWithoutValidationField(
         label="Seleção de Tipo",
-        required=False,
+        required=True,
         widget=forms.Select())
 
     numero = forms.CharField(
@@ -55,9 +58,21 @@ class VinculoDocDiarioOficialForm(ModelForm):
     ano = forms.CharField(
         label='Ano', required=False)
 
+    diario = forms.ModelChoiceField(
+        queryset=DiarioOficial.objects.all(),
+        widget=HiddenInput(), required=False)
+
     class Meta:
         model = VinculoDocDiarioOficial
-        fields = ('content_type', 'tipo', 'ano', 'numero', 'pagina')
+        fields = ('content_type', 'tipo', 'ano',
+                  'numero', 'pagina', 'object_id', 'diario')
+
+        error_messages = {
+            NON_FIELD_ERRORS: {
+                'unique_together':
+                _("Documento Já Registrado no Diário"),
+            }
+        }
 
     def __init__(self, *args, **kwargs):
 
@@ -69,6 +84,7 @@ class VinculoDocDiarioOficialForm(ModelForm):
                 to_column(('numero', 2)),
                 to_column(('ano', 2)),
                 to_column(('pagina', 2)),
+                to_column(('diario', 0)),
             ),
             Alert(
                 '',
@@ -90,12 +106,18 @@ class VinculoDocDiarioOficialForm(ModelForm):
         # Ordena por id
         self.fields['content_type'].choices.sort(key=lambda x: x[0])
 
-    def save(self, commit=True):
+    def clean(self):
         cd = self.cleaned_data
-        inst = ModelForm.save(self, commit=False)
+        inst = self.instance
+        try:
+            inst.content_object = cd['content_type'].get_object_for_this_type(
+                numero=cd['numero'], ano=cd['ano'], tipo_id=cd['tipo'])
+        except:
+            raise ValidationError('Registro não encontrado!')
+        cd['object_id'] = inst.object_id
+        cd['diario'] = inst.diario
+        return ModelForm.clean(self)
 
-        inst.content_object = inst.content_type.get_object_for_this_type(
-            numero=cd['numero'], ano=cd['ano'], tipo_id=cd['tipo'])
-        inst.save()
-
+    def save(self, commit=True):
+        inst = ModelForm.save(self, commit=True)
         return inst
