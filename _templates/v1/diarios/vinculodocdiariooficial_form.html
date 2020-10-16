@@ -14,7 +14,8 @@
               'ano'    : $("input[name=ano]").val(),
               'numero' : $("input[name=numero]").val(),
         }
-        if (formData.tipo === '' || formData.ano === '' || formData.numero === '') {
+        let nulls = Array('', null, undefined)
+        if (nulls.includes(formData.tipo) || nulls.includes(formData.ano) || nulls.includes(formData.numero)) {
           $(".doc_selected").html('').addClass('hidden');
           return;
         }

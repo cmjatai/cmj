@@ -1,0 +1,17 @@
+{% extends "crud/detail.html" %}
+{% block detail_content %}
+  {{ block.super }}
+
+
+{% if not object.tipo.principal %}
+  <div class="text-primary">
+    A Câmara Municipal de Jataí republica os Diários Oficiais no Município de Jataí,
+    originalmente publicados em <a href="https://www.jatai.go.gov.br">https://www.jatai.go.gov.br</a>,
+    com o objetivo de oferecer histórico integral do processo legislativo.
+    Portanto, dos diversos documentos produzidos pelo Poder Executivo, com a mesma finalidade,
+    são republicadas no PortalCMJ documentos gerados por aquele Porder que ora tramitaram nesta casa
+    que, devido a estas características,
+    no item acima - "Republicação de documentos no PortalCMJ" - são listados apenas os documentos que estão no <i>{{object}}</i> relevantes ao processo legislativo.
+  </div>
+{% endif %}
+{% endblock detail_content %}
