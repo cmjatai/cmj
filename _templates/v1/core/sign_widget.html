@@ -3,15 +3,12 @@
 {% for nome, data in signs %}
   {% if forloop.first %}
     <div class="col d-flex align-items-center">
-      <div class="box-assinatura-eletronica my-2">
-        <a class="btn btn-primary" data-toggle="collapse" href="#collapseSigns" role="button" aria-expanded="false" aria-controls="collapseSigns">
+      <div class="box-assinatura-eletronica my-3 ">
           {% if signs|length == 1 %}
             Assinatura Digital
           {% else %}
             Assinaturas Digitais
           {% endif %}
-        </a>
-        <div class="collapse" id="collapseSigns">
           <div class="sigs">
   {% endif %}
           <div class="sig">
@@ -23,7 +20,6 @@
             </small>
           </div>
   {% if forloop.last %}
-          </div>
         </div>
       </div>
     </div>

@@ -6,7 +6,7 @@
 
 {% if m.texto_original %}
   <div class="row item-listas align-items-center justify-content-between">
-    <div class="col-12 col-md-auto justify-content-center">
+    <div class="col-12 col-md-auto flex-column">
       {% if m.metadata.signs and m.metadata.signs.texto_original.signs %}
         <a class="link-texto"  target="_blank" href="{{m.texto_original.url}}" title="Documento Eletrônico">
           <i class="fas fa-2x fa-certificate"></i>
@@ -33,6 +33,9 @@
           <strong>Documento<br>Eletrônico</strong>
         </a>
       {% endif %}
+      {% with m.metadata.signs.texto_original.signs as signs %}
+        {% include 'core/sign_widget.html' %}
+      {% endwith %}
     </div>
     {% if render_ementa %}
       <div class="col">
@@ -41,8 +44,5 @@
         </div>
       </div>
     {% endif %}
-    {% with m.metadata.signs.texto_original.signs as signs %}
-      {% include 'core/sign_widget.html' %}
-    {% endwith %}
   </div>
 {% endif %}

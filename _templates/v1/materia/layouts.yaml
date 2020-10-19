@@ -30,7 +30,7 @@ MateriaLegislativa:
   - tipo_autor autor
   - texto_original
   {% trans 'Outras Informações' %}:
-  - apelido  dias_prazo  polemica
+  - apelido:3 url_video:5 dias_prazo:2 polemica:2
   - objeto  regime_tramitacao  em_tramitacao
   - data_fim_prazo  data_publicacao  complementar
   {% trans 'Origem Externa' %}:

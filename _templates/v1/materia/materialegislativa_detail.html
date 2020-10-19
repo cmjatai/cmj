@@ -1,9 +1,41 @@
 {% extends "crud/detail.html" %}
-{% load i18n sigad_filters cropping %}
+{% load i18n sigad_filters cropping common_tags%}
 
 {% block head_title %}{{object}}{% endblock head_title %}
 {% block meta_description%}{{object.ementa}}{% endblock meta_description %}
 {% block head_title_sufix %}PortalCMJ{% endblock head_title_sufix %}
+{% block title %}
+<h3 class="page-header {{bg_title}} d-flex justify-content-between">
+  <div>
+    <a href="#collapseSigns" data-toggle="collapse" href="#collapseSigns" role="button" aria-expanded="false" aria-controls="collapseSigns">
+        {% if object.is_signed %}
+          <i class="fas fa-1x fa-certificate" title="Documento com Assinatura Digital"></i>
+        {% endif %}
+    </a>
+    {{object.tipo.sigla}} {{object.numero}}/{{object.ano}} - {{object.tipo}}
+  </div>
+
+
+</h3>
+
+  <div class="collapse" id="collapseSigns">
+  {% with object.metadata.signs.texto_original.signs as signs %}
+    {% include 'core/sign_widget.html' %}
+  {% endwith %}
+  </div>
+
+{% endblock title %}
+
+  {% block container_actions %}
+    {% if not user.is_anonymous %}
+      {{ block.super }}
+    {% else %}
+      <div class="pt-2">
+      {% block actions %}{{ block.super }}
+      {% endblock actions %}
+      </div>
+    {% endif %}
+  {% endblock container_actions %}
 
 {% block sub_actions %}
     {{ block.super }}
@@ -15,27 +47,8 @@
 {% endblock sub_actions %}
 
 {% block detail_content %}
-<div class="item-listas">
-  <div class="item-raiz">
-
-    {% comment %}
-
-    <div class="links-texto">
-      {% if object.texto_original %}
-        <a class="link-texto" target="_blank"  href="{{object.texto_original.url}}?u={% now "u"%}" title="Texto Original">
-          <i class="far fa-2x fa-file-{% if '.pdf' in object.texto_original.path %}pdf{% else %}archive{% endif %}"></i>
-          <br>
-          Texto Original
-        </a>
-      {% endif %}
-      {% if object.texto_articulado.exists %}
-        <a class="link-texto" href="{% url 'sapl.materia:materia_ta' object.id%}">
-          Texto Articulado
-        </a>
-      {% endif %}
-    </div>
-    {% endcomment %}
-
+<div class="item-listas container-table">
+  <div class="item-raiz px-4">
     {% with object.autores.all.count as count_parlamentares %}
       {% for autor in object.autores.all %}
         {% if forloop.counter0 > 0 and forloop.counter0|organize_direction_horizontal_avatars:count_parlamentares %}
@@ -61,6 +74,14 @@
       {% endfor %}
     {% endwith %}
 
+    <div class="links-texto">
+      {% if object.texto_original %}
+        <a class="link-texto" target="_blank" href="{{object.texto_original.url}}?u={% now "u"%}" title="Texto Original">
+          <i class="far fa-2x fa-file-{% if '.pdf' in object.texto_original.path %}pdf{% else %}archive{% endif %}"></i>
+        </a>
+      {% endif %}
+    </div>
+
     <div class="text-ementa">{{ object.ementa }}</div>
 
     <small>
@@ -75,23 +96,34 @@
       <br>
     </small>
     <div class="clearfix"></div>
+  </div>
+
+  {% if object.url_video %}
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col col-sm-7 pb-3">
+          <div class="embed-responsive embed-responsive-16by9">
+            <iframe id="ytplayer" type="text/html" allowfullscreen
+            src="https://www.youtube.com/embed/{{ object.url_video|youtube_id }}"
+            frameborder="0"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
 
 
-    {% with object as m %}
-      {% include 'materia/materialegislativa_widget_file.html' %}
-    {% endwith %}
-
+  <div class="container">
     {{ block.super }}
-
   </div>
 
   {% if object.documentoadministrativo_set.exists %}
-      <p class="control-label">Documentos Administrativos Vinculados a Matéria</p>
-  <div class="bg-white p-3">
-      {% with object.documentoadministrativo_set.all as doc_list %}
-        {% include 'protocoloadm/documentoadministrativo_widget_materia.html' %}
-      {% endwith %}
-  </div>
+    <p class="control-label">Documentos Administrativos Vinculados a Matéria</p>
+    <div class="bg-white p-3">
+        {% with object.documentoadministrativo_set.all as doc_list %}
+          {% include 'protocoloadm/documentoadministrativo_widget_materia.html' %}
+        {% endwith %}
+    </div>
   {% endif %}
 
   {% if object.audienciapublica_set.exists %}
@@ -107,6 +139,7 @@
   {% endif %}
 
   {% if user.is_superuser %}
+    <div class="container">
     <div class="row">
       {% if materialegislativa.user %}
         <div class="col-sm-6">
@@ -134,6 +167,7 @@
           </div>
         </div>
       {% endif %}
+    </div>
     </div>
   {% endif %}
 
