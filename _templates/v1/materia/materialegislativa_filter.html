@@ -99,6 +99,13 @@
                       </a>
                     </strong><br>
 
+                    <div class="links-texto">
+                      {% if m.texto_original %}
+                        <a class="link-texto" target="_blank" href="{{m.texto_original.url}}?u={% now "u"%}" title="Texto Original">
+                          <i class="far fa-2x fa-file-{% if '.pdf' in m.texto_original.path %}pdf{% else %}archive{% endif %}"></i>
+                        </a>
+                      {% endif %}
+                    </div>
 
                     <div class="text-ementa">
                     {{ m.ementa }}
