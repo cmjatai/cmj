@@ -16,8 +16,11 @@
           <a :href="item.link_detail_backend">{{item.__str__}}</a>
         </div>
         <div class="card-text">
-        <i><small>{{data_sessao(item.data_inicio)}}</small></i> -
-        <i><small>{{item.hora_inicio}}</small></i>
+          <strong>Abertura:</strong> {{ data_sessao(item.data_inicio) }} <br>
+          <strong>Legislatura:</strong> {{ string_legislatura(item.legislatura) }} <br>
+          <strong>Sessão Legislativa:</strong> {{item.sessao_legislativa}} <br>
+          <strong>Tipo:</strong> {{item.tipo}} <br>
+          <strong v-if="item.upload_ata"></strong> <a :href="item.upload_ata">Ata da Sessão</a> <br>
         </div>
 
       </div>
@@ -39,6 +42,16 @@ export default {
     }
   },
   methods: {
+    string_legislatura (pk_legislatura) {
+      let leg = this.getObject(
+        {
+          'action': null,
+          'id': pk_legislatura,
+          'app': 'parlamentares',
+          'model': 'legislatura'
+        })
+      return leg.__str__
+    },
     data_sessao (data_inicio) {
       try {
         const data = this.stringToDate(data_inicio, 'yyyy-mm-dd', '-')

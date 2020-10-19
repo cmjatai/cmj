@@ -8,7 +8,7 @@
         <div class="col flex-column" v-show="details && app !==''">
           <h3>{{titulo}}</h3>
           <component :is="`action-link-${link.model}`"
-            v-for="(link, key) in links"
+            v-for="(link, key) in linksArray"
             :key="key"
             :app="link.app"
             :model="link.model"
@@ -18,9 +18,7 @@
       </div>
     </div>
   </div>
-
 </template>
-
 <script>
 import ActionLinkMaterialegislativa from './ActionLinkMaterialegislativa'
 import ActionLinkDocumentoadministrativo from './ActionLinkDocumentoadministrativo'
@@ -44,6 +42,9 @@ export default {
     }
   },
   computed: {
+    linksArray: function () {
+      return this.links
+    },
     showAction: function () {
       let t = this
       return function (link) {

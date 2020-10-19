@@ -12,55 +12,37 @@ export default {
   },
   data () {
     return {
-      ro: null,
-      offsetHeight: 0
-
     }
   },
   methods: {
     handleScroll: function (event) {
       let h = document.getElementsByTagName('header')[0]
       let u = document.getElementById('user_connected')
-
-      // let r = (window.scrollY / $(document).height())
-
-      // console.log(r, h.offsetHeight)
       if (window.scrollY === 0) {
-        h.style.marginTop = '0px'
+        h.classList.remove('header-mini')
         if (!u && window.location.pathname === '/') {
           h.classList.add('header-top')
         }
-
-        h.classList.remove('header-mini')
-      } else if (window.scrollY * 1.5 <= this.offsetHeight) {
+        // console.log('topo', window.scrollY)
+      } else if (window.scrollY > 220 && window.scrollY < 300) {
         if (h.classList.contains('header-mini') || h.classList.contains('header-top')) {
           h.classList.remove('header-top')
           h.classList.remove('header-mini')
         }
-      } else {
+        // console.log('meio', window.scrollY)
+      } else if (window.scrollY > 400) {
         if (!h.classList.contains('header-mini')) {
           h.classList.add('header-mini')
           h.classList.remove('header-top')
+          // console.log('fim', window.scrollY)
         }
+      } else {
+        // console.log('limbo', window.scrollY)
       }
-
-      // h.style.marginTop = `${(-3 * r * h.offsetHeight)}px`
     }
   },
   mounted: function () {
     window.addEventListener('scroll', this.handleScroll)
-
-    let h = document.getElementsByTagName('header')[0]
-    this.offsetHeight = h.offsetHeight
-
-    this.ro = new ResizeObserver(entries => {
-      let m = document.getElementsByTagName('main')[0]
-      m.style.marginTop = `${entries[0].target.offsetHeight - 1}px`
-    })
-
-    this.ro.observe(h)
-
-    // window.SetCookie('editortype', editortype, 30)
 
     this.$options.sockets.onmessage = (event) => {
       /**

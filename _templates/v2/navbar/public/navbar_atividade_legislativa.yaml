@@ -15,8 +15,6 @@
   url: /online/
 - title: {% trans 'Comissões'%}
   url: sapl.comissoes:comissao_list
-- title: {% trans 'Comissões Parlamentares de Inquérito'%}
-  url: /doc/?tipo=233&o=
 - title: ''
   url: ''
 - title: {% trans 'Legislação' %}
