@@ -7,53 +7,30 @@
   <div class="row item-listas align-items-center file-documentoadministrativo justify-content-between">
     <div class="col-12 col-md-auto justify-content-center">
 
-
-      {% if d.metadata.signs and d.metadata.locaweb and d.metadata.signs.texto_integral.signs and d.metadata.locaweb.texto_integral.hash == d.metadata.locaweb.texto_integral.original_hash %}
-        <a class="link-texto"  target="_blank" href="{{d.texto_integral.url}}?original" title="Documento Eletrônico">
+      {% if d.metadata.signs and d.metadata.signs.texto_integral.signs %}
+        <a class="link-texto"  target="_blank" href="{{d.texto_integral.url}}" title="Documento Eletrônico">
           <i class="fas fa-2x fa-certificate"></i>
           <br>
-          <strong>Documento 
+          <strong>Documento
               Eletrônico
               <small>
                 <br>com Assinatura Digital
               </small>
           </strong>
         </a>
-      {% else %}
-
-        {% if d.texto_integral and '.pdf' in d.texto_integral.path %}
+      {% elif d.texto_integral and '.pdf' in d.texto_integral.path %}
           <a class="link-texto" target="_blank" href="{{d.texto_integral.url}}" title="Documento Digitalizado">
             <i class="far fa-2x fa-file-pdf"></i>
             <br>
             <strong>
-                Documento Digitalizado
-                <small>
-                  <br>Com OCR Otimizado para Download
-                </small>
+                Documento<br>Digitalizado
             </strong>
           </a>
-        {% endif %}
-        <a class="link-texto"  target="_blank" href="{{d.texto_integral.url}}?original" title="Documento Eletrônico">
-          {% if d.metadata.signs and d.metadata.signs.texto_integral.signs %}
-            <i class="fas fa-2x fa-certificate"></i>
-          {% else %}
-            <i class="far fa-2x fa-file-{% if '.pdf' in d.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
-          {% endif %}
+      {% else %}
+        <a class="link-texto"  target="_blank" href="{{d.texto_integral.url}}" title="Documento Eletrônico">
+          <i class="far fa-2x fa-file-archive"></i>
           <br>
-          <strong>Documento 
-            {% if d.metadata.signs and d.metadata.signs.texto_integral.signs %}
-              Eletrônico
-              <small>
-                <br>com Assinatura Digital
-              </small>
-            {% else %}
-              {% if '.pdf' in d.texto_integral.path %}
-                  <br>Digitalizado Original
-              {% else %}
-                <br>Eletrônico
-              {% endif %}
-            {% endif %}
-          </strong>
+          <strong>Documento<br>Eletrônico</strong>
         </a>
       {% endif %}
     </div>

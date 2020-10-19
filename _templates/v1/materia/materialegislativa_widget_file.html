@@ -7,52 +7,30 @@
 {% if m.texto_original %}
   <div class="row item-listas align-items-center justify-content-between">
     <div class="col-12 col-md-auto justify-content-center">
-
-      {% if m.metadata.signs and m.metadata.locaweb and m.metadata.signs.texto_original.signs and m.metadata.locaweb.texto_original.hash == m.metadata.locaweb.texto_original.original_hash %}
+      {% if m.metadata.signs and m.metadata.signs.texto_original.signs %}
         <a class="link-texto"  target="_blank" href="{{m.texto_original.url}}" title="Documento Eletrônico">
           <i class="fas fa-2x fa-certificate"></i>
           <br>
-          <strong>Documento 
+          <strong>Documento
               Eletrônico
               <small>
                 <br>com Assinatura Digital
               </small>
           </strong>
         </a>
-      {% else %}
-        {% if m.texto_original and '.pdf' in m.texto_original.path %}
+      {% elif m.texto_original and '.pdf' in m.texto_original.path %}
           <a class="link-texto" target="_blank" href="{{m.texto_original.url}}" title="Documento Digitalizado">
             <i class="far fa-2x fa-file-pdf"></i>
             <br>
             <strong>
-                Documento Digitalizado
-                <small>
-                  <br>Com OCR Otimizado para Download
-                </small>
+                Documento<br>Digitalizado
             </strong>
           </a>
-        {% endif %}
+      {% else %}
         <a class="link-texto"  target="_blank" href="{{m.texto_original.url}}" title="Documento Eletrônico">
-          {% if m.metadata.signs and m.metadata.signs.texto_original.signs %}
-            <i class="fas fa-2x fa-certificate"></i>
-          {% else %}
-            <i class="far fa-2x fa-file-{% if '.pdf' in m.texto_original.path %}pdf{% else %}archive{% endif %}"></i>
-          {% endif %}
+          <i class="far fa-2x fa-file-archive"></i>
           <br>
-          <strong>Documento 
-            {% if m.metadata.signs and m.metadata.signs.texto_original.signs %}
-              Eletrônico
-              <small>
-                <br>com Assinatura Digital
-              </small>
-            {% else %}
-              {% if '.pdf' in m.texto_original.path %}
-                  <br>Digitalizado Original
-              {% else %}
-                <br>Eletrônico
-              {% endif %}
-            {% endif %}
-          </strong>
+          <strong>Documento<br>Eletrônico</strong>
         </a>
       {% endif %}
     </div>

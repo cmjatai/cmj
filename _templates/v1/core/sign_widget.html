@@ -4,20 +4,52 @@
   {% if forloop.first %}
     <div class="col d-flex align-items-center">
       <div class="box-assinatura-eletronica my-2">
-        <span class="title"> Assinatura Digital </span>
-        <div class="sigs">
+        <a class="btn btn-primary" data-toggle="collapse" href="#collapseSigns" role="button" aria-expanded="false" aria-controls="collapseSigns">
+          {% if signs|length == 1 %}
+            Assinatura Digital
+          {% else %}
+            Assinaturas Digitais
+          {% endif %}
+        </a>
+        <div class="collapse" id="collapseSigns">
+          <div class="sigs">
   {% endif %}
-        <div class="sig">
-          <span class="sig-nome">
-            {{nome}}
-          </span>
-          <small class="sig-data">
-            Assinado em: {{data|parse_datetime|date:"DATETIME_FORMAT" }}
-          </small>
-        </div>
+          <div class="sig">
+            <span class="sig-nome">
+              {{nome}}
+            </span>
+            <small class="sig-data">
+              Assinado em: {{data|parse_datetime|date:"DATETIME_FORMAT" }}
+            </small>
+          </div>
   {% if forloop.last %}
+          </div>
         </div>
       </div>
     </div>
   {% endif %}
 {% endfor %}
+
+{% if False %}
+  {% for nome, data in signs %}
+    {% if forloop.first %}
+      <div class="col d-flex align-items-center">
+        <div class="box-assinatura-eletronica my-2">
+          <span class="title"> Assinatura Digital </span>
+          <div class="sigs">
+    {% endif %}
+          <div class="sig col-3">
+            <span class="sig-nome">
+              {{nome}}
+            </span>
+            <small class="sig-data">
+              Assinado em: {{data|parse_datetime|date:"DATETIME_FORMAT" }}
+            </small>
+          </div>
+    {% if forloop.last %}
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  {% endfor %}
+{% endif %}

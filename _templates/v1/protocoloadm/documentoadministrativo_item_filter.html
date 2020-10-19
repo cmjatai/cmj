@@ -104,10 +104,9 @@
     {% endif %}
   </small>
 
-  {% if d.metadata.zipfile.keys|length > 1 %}
+  {% if d.metadata.zipfile.keys|length > 1 and not d.documento_anexado_set.exists %}
     <div class="d-inline-block p-3">
       <h5>Baixar todo processo:</h5>
-
     {% include 'protocoloadm/documentoadministrativo_widget_zipfile.html' %}
     </div>
   {% endif %}

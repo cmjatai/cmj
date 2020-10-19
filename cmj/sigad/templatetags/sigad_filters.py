@@ -52,9 +52,9 @@ def organize_direction_horizontal_avatars(pos, total):
         '4': 2,
         '5': 3,
         '6': 3,
-        '7': 3,
-        '8': 3,
-        '9': 3}
+        '7': 4,
+        '8': 4,
+        '9': 5}
     return pos % map_arranjo[str(total if total <= 9 else 9)] == 0
 
 

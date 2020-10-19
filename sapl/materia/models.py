@@ -340,6 +340,10 @@ class MateriaLegislativa(CommonMixin):
         default=False,
         choices=YES_NO_CHOICES)
 
+    url_video = models.URLField(
+        max_length=150, blank=True,
+        verbose_name=_('URL Arquivo Vídeo (Formatos MP4 / FLV / WebM)'))
+
     class Meta:
         verbose_name = _('Matéria Legislativa')
         verbose_name_plural = _('Matérias Legislativas')
