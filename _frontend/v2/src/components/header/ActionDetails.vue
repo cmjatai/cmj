@@ -54,11 +54,10 @@ export default {
   },
   watch: {
     details: function (nv, od) {
-      let p = document.getElementById('portalactions')
       if (nv) {
-        p.classList.add('static')
+        this.$emit('statictoggle', true)
       } else {
-        p.classList.remove('static')
+        this.$emit('statictoggle', false)
       }
     }
   },
@@ -135,8 +134,6 @@ export default {
     })
     this.ro.observe(h)
     this.loadLinks()
-    setTimeout(() => {
-    }, 10000)
   }
 }
 </script>

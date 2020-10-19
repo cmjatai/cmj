@@ -9,6 +9,7 @@ export default {
   data () {
     return {
       searching: '',
+      static: 'static',
       portalmenu_opened: false
     }
   },
@@ -25,6 +26,9 @@ export default {
     handleClickPortalMenu (event) {
       this.portalmenu_opened = !this.portalmenu_opened
       // this.$cookie.set('portalmenu_opened', this.portalmenu_opened ? 'opened' : 'closed')
+    },
+    staticToggleAction (flag) {
+      this.static = flag ? 'static' : ''
     }
   },
   mounted: function () {
