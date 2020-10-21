@@ -13,7 +13,7 @@
     </template>
     <template slot="header-right">
       <div class="hover-circle" @click="fechar" >
-        <i class="fas fa-sign-out-alt hover-circle" title="Sair da Interface Online"></i>
+        <i class="fas fa-sign-out-alt" title="Sair da Interface Online"></i>
       </div>
     </template>
 
@@ -134,13 +134,14 @@ export default {
   display: grid;
   align-items: center;
   justify-items: center;
-  i {
-    color: rgba(black, 0.5);
-    padding: 8px;
+  .hover-circle {
+    padding: 5px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    &:hover {
-      color: black;
-    }
   }
 }
 </style>

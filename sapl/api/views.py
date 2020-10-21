@@ -114,8 +114,11 @@ class SaplApiViewSetConstrutor():
                     link_detail_backend = rest_serializers.SerializerMethodField()
 
                     def get_link_detail_backend(self, obj):
-                        return reverse(f'{self.Meta.model._meta.app_config.name}:{self.Meta.model._meta.model_name}_detail',
-                                       kwargs={'pk': obj.pk})
+                        try:
+                            return reverse(f'{self.Meta.model._meta.app_config.name}:{self.Meta.model._meta.model_name}_detail',
+                                           kwargs={'pk': obj.pk})
+                        except:
+                            return ''
 
                     class Meta(_meta_serializer):
                         if not hasattr(_meta_serializer, 'model'):

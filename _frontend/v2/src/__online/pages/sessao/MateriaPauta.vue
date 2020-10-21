@@ -92,7 +92,7 @@ export default {
     refresh () {
       const t = this
 
-      if (t.materia === undefined) {
+      if (t.materia === undefined || t.materia.tipo === undefined) {
         return
       }
 
