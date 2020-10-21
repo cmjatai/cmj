@@ -44,11 +44,12 @@ class DiarioOficialCrud(Crud):
                 _('Republicação de documentos no PortalCMJ')
             )
             text = []
-            for vinculo in obj.vinculodocdiariooficial_set.all():
-                text.append(
-                    f'<li><a href="{vinculo.reverse_link_content_object}">{vinculo.content_object}</a></li>'
-                )
-            empty:
+            if obj.vinculodocdiariooficial_set.exists():
+                for vinculo in obj.vinculodocdiariooficial_set.all():
+                    text.append(
+                        f'<li><a href="{vinculo.reverse_link_content_object}">{vinculo.content_object}</a></li>'
+                    )
+            else:
                 text.append(
                     f'<li>Não existe no PortalCMJ registros associados a este Diário</li>'
                 )
