@@ -1524,6 +1524,7 @@ class DocumentoAcessorioCrud(MasterDetailCrud):
 
     class BaseMixin(MasterDetailCrud.BaseMixin):
         list_field_names = ['itemlist']
+        ordered_list = False
 
     class CreateView(MasterDetailCrud.CreateView):
         form_class = DocumentoAcessorioForm

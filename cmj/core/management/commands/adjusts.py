@@ -1,5 +1,6 @@
 
 from datetime import datetime, timedelta
+import json
 import logging
 import os
 
@@ -11,6 +12,7 @@ from django.db.models.fields.files import FileField
 from django.db.models.signals import post_delete, post_save
 from django.db.transaction import atomic
 from django.utils import timezone
+import urllib3
 
 from cmj.core.models import OcrMyPDF, AuditLog
 from cmj.diarios.models import DiarioOficial, VinculoDocDiarioOficial
@@ -37,6 +39,19 @@ class Command(BaseCommand):
         post_save.disconnect(dispatch_uid='cmj_post_save_signal')
 
         self.logger = logging.getLogger(__name__)
+
+        """url = 'https://www.jatai.go.leg.br/noticias/morre-o-ex-vereador-eudes-assis-carvalho'
+
+        http = urllib3.PoolManager()
+        try:
+            r = http.request('GET', url)
+
+            data = r.data.decode('utf-8')
+            jdata = json.loads(data)
+            print(jdata)
+        except Exception as e:
+            print(e)"""
+
         # self.run_busca_desordem_de_dispositivos()
 
         # self.run_ajusta_datas_de_edicao_com_certidoes()

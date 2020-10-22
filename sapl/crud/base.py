@@ -609,8 +609,9 @@ class CrudListView(PermissionRequiredContainerCrudMixin, ListView):
                                     rmo = rmo[1:]
                                 fo = '%s__%s' % (fo, rmo)
 
-                        fo = desc + fo
-                        ordering += (fo,)
+                        if fm:
+                            fo = desc + fo
+                            ordering += (fo,)
 
                     model = self.model
                     model_ordering = model._meta.ordering
