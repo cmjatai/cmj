@@ -132,8 +132,15 @@ Vue.mixin({
           t.sendMessage(
             { alert: 'danger', message: 'Não foi possível recuperar a Listagem.', time: 5 })
         })
+    },
+    delay: function (sec) {
+      return new Promise(resolve => {
+        setTimeout(() => {
+          // console.log('resolved')
+          resolve(sec)
+        }, sec)
+      })
     }
-
   },
   created: function () {
     /*
