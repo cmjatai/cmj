@@ -16,6 +16,7 @@ header.main {
       img {
         height: 80px;
         padding: 0.5rem;
+        box-sizing: content-box;
       }
       .brand-name {
         display: flex;
@@ -69,7 +70,7 @@ header.main {
       }
       .navbar-brand {
         img {
-          height: 56px;
+          height: 36px;
         }
         .brand-name {
           font-size: 0.4rem;
