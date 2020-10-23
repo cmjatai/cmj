@@ -1,0 +1,37 @@
+
+main .second_header{
+  background: #f5f5f5 $url_bg_png;
+  //color: white;
+
+  h1 {
+    padding-top: 2rem;
+  }
+  h3 {
+    text-indent: 2rem;
+    font-style: italic;
+    color: #777;
+    padding-bottom: 1rem;
+    //border-bottom: 1px solid #777;
+    margin-bottom: 3rem;
+  }
+
+  .nav-tabs {
+    border-bottom: 0;
+  }
+
+  .nav {
+    li {
+      //border-bottom: 1px solid  lighten($color: $bg_color_portal_cmj, $amount: 10%);;
+      &.active {
+        background: #aaa;
+        a {
+          color: white;
+        }
+      }
+    }
+    a {
+      color: #444;
+      padding: 4px 7px;
+    }
+  }
+}

@@ -16,15 +16,15 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/brasao/brasao_512.png"
   },
   {
-    "revision": "4640420d1745c2b97def",
-    "url": "/static/css/app.bbd3935c.css"
+    "revision": "e1ab8ce42fd2f442ba3d",
+    "url": "/static/css/app.45b7f96b.css"
   },
   {
     "revision": "4efcaf85da4c50761ba1",
     "url": "/static/css/chunk-44ab9ccc.6695f763.css"
   },
   {
-    "revision": "50fbd233e3be03e9535a",
+    "revision": "73586a661ded098bf214",
     "url": "/static/css/chunk-5cedb00e.c515a2da.css"
   },
   {
@@ -64,6 +64,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/icon_prestacao_contas.e736437c.svg"
   },
   {
+    "revision": "a1a5cb8ccda80ba8d2e53de044a749a0",
+    "url": "/static/img/logo_sic.png"
+  },
+  {
     "revision": "296d5d8e05785fd7d04439e18e9ff91d",
     "url": "/static/img/pdf_cabec.jpg"
   },
@@ -72,12 +76,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/pdf_rodape.jpg"
   },
   {
-    "revision": "a11b57e6053e3fcbe093b499f965a4c1",
+    "revision": "49ecc35b6e6676e5f307d193ba09d053",
     "url": "/static/index.html"
   },
   {
-    "revision": "4640420d1745c2b97def",
-    "url": "/static/js/app.bb692679.js"
+    "revision": "e1ab8ce42fd2f442ba3d",
+    "url": "/static/js/app.217daca1.js"
   },
   {
     "revision": "7562403a1b4bef588d85",
@@ -92,8 +96,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/js/chunk-44ab9ccc.e895deff.js"
   },
   {
-    "revision": "50fbd233e3be03e9535a",
-    "url": "/static/js/chunk-5cedb00e.bd9a6477.js"
+    "revision": "73586a661ded098bf214",
+    "url": "/static/js/chunk-5cedb00e.c28bb147.js"
   },
   {
     "revision": "dfe822e3fa5104e21caa",
@@ -108,7 +112,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/manifest.json"
   },
   {
-    "revision": "5db7f7f9589fb1173f80593d7de83f59",
+    "revision": "4fe4cddc853459bb91c805050c40f25e",
     "url": "/static/robots.txt"
   },
   {

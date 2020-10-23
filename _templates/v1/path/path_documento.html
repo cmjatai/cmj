@@ -479,20 +479,18 @@
                       {% endif %}
                   </small>
 
-
-                    {% if m.url_video %}
-                      <div class="container">
-                        <div class="row justify-content-center">
-                          <div class="col col-sm-7 pb-3">
-                            <div class="embed-responsive embed-responsive-16by9">
-                              <iframe id="ytplayer" type="text/html" allowfullscreen
-                              src="https://www.youtube.com/embed/{{ m.url_video|youtube_id }}"
-                              frameborder="0"></iframe>
-                            </div>
-                          </div>
+                  {% if m.url_video %}
+                    <div class="container">
+                      <div class="row justify-content-center">
+                        <div class="col col-sm-7">
+                          {% with m.url_video as url_video %}
+                            {% include 'youtube_widget.html' %}
+                          {% endwith %}
                         </div>
                       </div>
-                    {% endif %}
+                    </div>
+                  {% endif %}
+
 
 
                 </div>

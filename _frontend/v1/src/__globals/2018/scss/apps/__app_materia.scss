@@ -1,0 +1,38 @@
+.youtube-materia-list {
+  position: relative;
+  //right: 0;
+  float: right;
+  width: 30%;
+  opacity: 0.4;
+  padding-left: 10px;
+  padding-bottom: 10px;
+  z-index: 1;
+
+  transition: all 0.3s ease-in;
+  &:before {
+    content: "";
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    width: 1rem;
+    height: 1rem;
+    border-left: 1px solid black;
+    border-bottom: 1px solid black;
+  }
+  &:hover, &:active {
+    transition: all 0.3s ease-out;
+    width: 60%;
+    opacity: 1;
+    &:before {
+      transform: rotate(180deg);
+    }
+  }
+}
+@media screen and (max-width: 575.98px) {
+
+  .youtube-materia-list {
+    opacity: 0.7;
+    width: 45%;
+  }
+
+}

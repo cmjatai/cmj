@@ -1,12 +1,18 @@
 {% extends "crud/detail.html" %}
-{% load i18n sigad_filters cropping%}
+{% load i18n sigad_filters cropping common_tags%}
 
 {% block head_title %}{{object}}{% endblock head_title %}
 {% block meta_description%}{{object.ementa}}{% endblock meta_description %}
 {% block head_title_sufix %}PortalCMJ{% endblock head_title_sufix %}
+
+{% block social_links %}
+{% endblock social_links %}
+
 {% block title %}
-<h3 class="page-header {{bg_title}} d-flex justify-content-between">
-  <div>
+
+<h1 class="page-header {{bg_title}} d-flex justify-content-between">
+
+  <div>teste
     <a href="#collapseSigns" data-toggle="collapse" href="#collapseSigns" role="button" aria-expanded="false" aria-controls="collapseSigns">
         {% if object.is_signed %}
           <i class="fas fa-1x fa-certificate" title="Documento com Assinatura Digital"></i>
@@ -16,7 +22,7 @@
   </div>
 
 
-</h3>
+</h1>
 
   <div class="collapse" id="collapseSigns">
   {% with object.metadata.signs.texto_original.signs as signs %}
@@ -46,7 +52,7 @@
     {% endif %}
 {% endblock sub_actions %}
 
-{% block detail_content %}
+{% block detail_content %} teste 2
 <div class="item-listas container-table">
   <div class="item-raiz px-4">
     {% with object.autores.all.count as count_parlamentares %}
@@ -101,27 +107,17 @@
   {% if object.url_video %}
     <div class="container">
       <div class="row justify-content-center">
-        <div class="col col-sm-7">
-          {% with object.url_video as url_video %}
-            {% include 'youtube_widget.html' %}
-          {% endwith %}
+        <div class="col col-sm-7 pb-3">
+          <div class="embed-responsive embed-responsive-16by9">
+            <iframe id="ytplayer" type="text/html" allowfullscreen
+            src="https://www.youtube.com/embed/{{ object.url_video|youtube_id }}"
+            frameborder="0"></iframe>
+          </div>
         </div>
       </div>
     </div>
   {% endif %}
 
-  {% if object.documento_set.exists %}
-    <div class="container">
-      <div class="row justify-content-center">
-        <div class="col col-sm-7">
-          <strong>Notícia: </strong>
-          {% for n in object.documento_set.all %}
-            <a href="/{{n.absolute_slug}}">{{n}}</a>{% if not forloop.last %}, {% endif %}
-          {% endfor %}
-        </div>
-      </div>
-    </div>
-  {% endif %}
 
   <div class="container">
     {{ block.super }}

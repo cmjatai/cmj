@@ -11,7 +11,7 @@
       <action-details v-on:staticToggle="staticToggleAction">
         <template slot="subaction">
           <ul class="subaction">
-            {% navbar 'navbar/public/navbar_atividade_legislativa.yaml' %}
+            {% navbar 'yaml/navbar/public/navbar_atividade_legislativa.yaml' %}
           </ul>
         </template>
       </action-details>
@@ -24,14 +24,7 @@
       <action-details>
         <template slot="subaction">
           <ul class="subaction">
-            <li><a href="/fale-conosco/telefones-e-emails" title="Conteúdo: Telefones e Emails">
-            <span title="">Telefones e Emails</span></a></li>
-            <li><a href="http://camaradejatai.sigepnet.com.br/informacao/sic_primeiro_acesso.php?portal=2" title="Conteúdo: e-SIC">
-            <span title="">SIC Físico - Localização e Horários</span></a></li>
-            <li><a href="/fale-conosco/servico-de-informacoes-ao-cidadao-sic" title="Conteúdo: SIC Físico - Localização e Horários">
-            <span title="">Ouvidoria Parlamentar</span></a></li>
-            <li><a href="/fale-conosco/ouvidoria" title="Conteúdo: Ouvidoria Parlamentar">
-            <span title="">e-SIC</span></a></li>
+            {% navbar 'yaml/navbar/public/navbar_fale_conosco.yaml' %}
           </ul>
         </template>
       </action-details>
@@ -44,7 +37,7 @@
       <action-details>
         <template slot="subaction">
           <ul class="subaction">
-            {% navbar 'navbar/public/navbar_documentos_administrativos.yaml' %}
+            {% navbar 'yaml/navbar/public/navbar_documentos_administrativos.yaml' %}
           </ul>
         </template>
       </action-details>
@@ -60,7 +53,7 @@
       <action-details>
         <template slot="subaction">
           <ul class="subaction">
-            {% navbar 'navbar/public/navbar_midias.yaml' %}
+            {% navbar 'yaml/navbar/public/navbar_midias.yaml' %}
           </ul>
         </template>
       </action-details>

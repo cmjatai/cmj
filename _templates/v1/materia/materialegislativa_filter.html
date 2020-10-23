@@ -111,8 +111,16 @@
                     {{ m.ementa }}
                     </div>
 
+                        {% if m.url_video %}
+                          <div class="youtube-materia-list ">
+                                {% with m.url_video as url_video %}
+                                  {% include 'youtube_widget.html' %}
+                                {% endwith %}
+                          </div>
+                        {% endif %}
+
                     <div class="">
-                      <strong>Data de Apresentação:</strong> {{m.data_apresentacao}}
+                      <strong>Data de Apresentação:</strong> <span style="white-space: nowrap">{{m.data_apresentacao}}</span>
                       {% if m.protocolo_gr.first %}
                         <br><strong>Protocolo: </strong>{{m.protocolo_gr.first.epigrafe}}
                       {% endif %}
@@ -134,8 +142,9 @@
 
                     {% if not tipo_listagem or tipo_listagem == '1' %}
                       <div class="">
+
                         {% if m.tramitacao_set.first.unidade_tramitacao_destino %}
-                          <strong>Data da última Tramitação:</strong> {{m.tramitacao_set.first.data_tramitacao}}</br>
+                          <strong>Data da última Tramitação:</strong><br>{{m.tramitacao_set.first.data_tramitacao}}</br>
                           {% if m.tramitacao_set.first.data_fim_prazo %}
                               <strong>Data Fim Prazo (Tramitação):</strong> {{m.tramitacao_set.first.data_fim_prazo|default_if_none:""}}</br>
                           {% endif %}
@@ -147,6 +156,7 @@
                           {% if m.tramitacao_set.first.data_tramitacao %}
                           <strong>Ultima Ação:</strong> {{m.tramitacao_set.first.texto}}</br>
                         {% endif %}
+
                       </div>
                       <div class="mt-2">
                         {% if m.documentoacessorio_set.all.exists %}
@@ -270,6 +280,9 @@
                       {% endif %}
                       <p></p>
                     {% endif %}
+
+
+
                 </td>
               </tr>
             {% endfor %}

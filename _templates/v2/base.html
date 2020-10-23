@@ -5,39 +5,160 @@
 <!--[if gt IE 8]><!-->
 <html class="no-js {% block html_class %}{%endblock%}" lang="pt-br">
 <!--<![endif]-->
-  <head>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8">
-    <meta name="reply-to" content="manager@jatai.go.leg.br">
-    <meta name="theme-color" content="#114d81">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="reply-to" content="manager@jatai.go.leg.br">
+  <meta name="theme-color" content="#114d81">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{% if user|notificacoes_unread_count %}({{user|notificacoes_unread_count}}) {% endif %}{% block head_title %}{% trans 'Câmara Jataí' %}{% endblock %} - {% block head_title_sufix %}Portal da Câmara Municipal de Jataí - Estado de Goiás{% endblock head_title_sufix %}</title>
-    <meta name="description" content="{% block meta_description %}Portal CMJ - Fonte de informações a respeito dos atos do poder legislativo do município de Jataí, na microrregião Sudoeste do Estado de Goiás.{% endblock meta_description %}">
+  <title>{% if user|notificacoes_unread_count %}({{user|notificacoes_unread_count}}) {% endif %}{% block head_title %}{% trans 'Câmara Jataí' %}{% endblock %} - {% block head_title_sufix %}Portal da Câmara Municipal de Jataí - Estado de Goiás{% endblock head_title_sufix %}</title>
+  <meta name="description" content="{% block meta_description %}Portal CMJ - Fonte de informações a respeito dos atos do poder legislativo do município de Jataí, na microrregião Sudoeste do Estado de Goiás.{% endblock meta_description %}">
 
-    {% block meta_tags %}
-      {% include "base_meta_tags.html" %}
-    {% endblock %}
+  {% block meta_tags %}
+    {% include "base_meta_tags.html" %}
+  {% endblock %}
 
-    {% block head_content %}
-    {% endblock %}
+  {% block head_content %}
+  {% endblock %}
 
-    {% block webpack_loader_css %}
-      {% render_chunk_vendors 'css' %}
-      {% render_bundle  'app' 'css' %}
-    {% endblock webpack_loader_css %}
+  {% block webpack_loader_css %}
+    {% render_chunk_vendors 'css' %}
+    {% render_bundle  'app' 'css' %}
+  {% endblock webpack_loader_css %}
 
-    {% block widgets_form_css %}{% endblock widgets_form_css %}
+  {% block widgets_form_css %}{% endblock widgets_form_css %}
 
-  </head>
+</head>
 
-  <body class="{% block body_class %}{%endblock%}">
+<body class="{% block body_class %}{%endblock%}">
+  {% block root_body %}
     <div id="app-vue">
-      <!-- ========================================================== -->
-      {% include 'base_header.html' %}
+      {% block global_container %}
+        {% block navigation %}
+          <!-- ========================================================== -->
 
+            <header class="main {% if not user.is_authenticated and view.raiz %}header-top{% endif %}" v-on:click.passive="teste">
+
+              <div :class="['container-fluid', portalmenu_opened ? 'opened': 'closed']" id="nav-top-container">
+                <div class="container">
+                  <div class="row">
+
+                    <div id="accessactions">
+                      <div class="btn-group" role="group">
+                        <a href="#main_content" accesskey="1">Ir para Conteúdo<span class="badge badge-light">1</span></a>
+                        <a href="#menu_content" accesskey="2">Ir para Menu<span class="badge badge-light">2</span></a>
+                        <a href="#rodape_access" accesskey="3">Ir para Rodapé<span class="badge badge-light">3</span></a>
+                      </div>
+                    </div>
+
+                    {% block social_links %}
+                      <div class="navbar-social-links" id="socialactions">
+                        {% include 'social_links_global.html' %}
+                      </div>
+                    {% endblock %}
+
+                    <a href="#" id="altocontraste" accesskey="4" onclick="window.toggleContrast()" onkeydown="window.toggleContrast()"><i class="fas fa-adjust" aria-hidden="true"></i>Alto Contraste</a>
+
+                    {% include 'base_header_user.html' %}
+
+                  </div>
+
+                </div>
+              </div>
+
+              <div class="container">
+                <div class="row" id="rowlogo">
+                  <div :class="['col-auto', searching ]" id="portallogo">
+                    <div class="navbar">
+                      <a class="navbar-brand" href="{{site_url}}/">
+                        <img src="{% webpack_static 'brasao/brasao_256.png' %}">
+                        <div class="brand-name">
+                          <span>
+                            Câmara Municipal de
+                          </span>
+                          <span class="brand-cidade">
+                            Jataí
+                          </span>
+                          <span class="brand-estado">
+                            Poder Legislativo
+                          </span>
+                        </div>
+                      </a>
+                    </div>
+                  </div>
+
+                  {% include 'base_header_portalactions.html' %}
+
+                  <div id="portalsearch" :class="['col-auto', searching ]" >
+                    <div class="form-search">
+                      <form method="post" action="{% url 'cmj.core:haystack_search'%}">
+                        {% csrf_token %}
+                        <div class="inner">
+                          <div class="item-form">
+                            <input type="search" name="q" id="id_q"
+                              placeholder="Busca Textual"
+                              class="textinput textInput form-control"
+                                autocomplete="off"
+                                v-on:blur="handleBlurSearch"
+                                v-on:focus="handleFocusSearch"
+                                />
+                          </div>
+                          <div class="item-form">
+                            <button  class="button" type="submit"value="">
+                              <i class="fas fa-search"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+
+                  <div id="portalbtnmenu"
+                    :class="['col-auto', searching ]">
+                    {% block button_toogle_main %}
+                      <span type="button" class="navbar-toggler" v-on:click="handleClickPortalMenu">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                      </span>
+                    {% endblock %}
+                  </div>
+                </div>
+              </div>
+
+            </header>
+
+        {% endblock navigation %}
 
       <!-- ========================================================== -->
       <main>
+
+        <div class="second_header">
+          {% block second_header %}
+            <div class="container">
+              {% block base_functions %}{% endblock %}
+              {% block base_container_header %}
+                {% block base_header %}
+                    {% block title %}
+                      <h1 class="page-header">
+                        {% if title %}
+                          {{ title|safe|linebreaksbr }}
+                        {% elif view.title %}
+                          {{ view.title|safe|linebreaksbr }}
+                        {% elif object %}
+                          {{ object|safe|linebreaksbr }}
+                        {% endif %}
+                      </h1>
+                    {% endblock %}
+                {% endblock base_header %}
+              {% endblock base_container_header %}
+            </div>
+
+            <div class="container{{fluid}}">
+                {% block sections_nav %}{% subnav %}{% endblock sections_nav %}
+            </div>
+          {% endblock second_header %}
+        </div>
 
         <router-view></router-view>
 
@@ -70,28 +191,21 @@
 
       <!-- App.vue -->
       <app></app>
+
+      {% endblock global_container %}
     </div>
+
     <!-- ========================================================== -->
     {% include 'base_footer.html' %}
 
+  {% endblock root_body %}
 
-<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-
-<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-
-{% comment %}
-
-
-    {% block root_body %}
+  {% comment %}
+    {% block %}
       {% comment  %}
       {% include "popups.html" %}
 
       <div class="page fadein" id="{% block id_wrapper %}wrapper{% endblock %}">
-
-        <div class="header-accessibility">
-
-        </div>
 
         <nav class="navbar navbar-topo navbar-expand-lg navbar-dark">
             <div class="container{{fluid}} justify-content-between container-notificacoes">
@@ -109,21 +223,21 @@
             </div>
         </nav>
 
-        {% block global_container %}
-          {% block navigation %}
+        {% block  %}
+          {% block  %}
             <nav class="navbar navbar-menu navbar-expand-lg navbar-dark">
               <div class="container{{fluid}}">
                 <div class="navbar-collapse collapse" id="navbar-menu">
                   <ul class="navbar-nav" id="menu_content">
 
                     {% if user.is_superuser %}
-                      {% navbar 'navbar/navbar_superuser.yaml' %}
+                      {% navbar 'yaml/navbar/navbar_superuser.yaml' %}
                     {% elif perms.materia.add_proposicao %}
-                      {% navbar 'navbar/navbar_autor.yaml' %}
+                      {% navbar 'yaml/navbar/navbar_autor.yaml' %}
                     {% elif areatrabalho%}
-                      {% navbar 'navbar/navbar_areatrabalho.yaml' %}
+                      {% navbar 'yaml/navbar/navbar_areatrabalho.yaml' %}
                     {% else %}
-                      {% navbar 'navbar/navbar_public.yaml' %}
+                      {% navbar 'yaml/navbar/navbar_public.yaml' %}
                     {% endif %}
                   </ul>
 
@@ -132,42 +246,18 @@
               </div>
             </nav>
 
-          {% endblock navigation %}
+          {% endblock  %}
 
           {% block canais_diretos %}
             {% include "base_sidebar.html" %}
           {% endblock canais_diretos%}
 
-          {# Header #}
-          {% block main_header %}
-            <header class="masthead">
-              <div class="container{{fluid}}">
-                  {% block sections_nav %}{% subnav %}{% endblock sections_nav %}
-              </div>
-            </header>
-          {% endblock main_header %}
+
           <main id="content" class="content page__row screen-lg">
           {% block content_container %}
               <div class="{% block main_container_class %}container container{{fluid}}{{path}} container-box{% endblock %}">
 
-                {% block base_functions %}{% endblock %}
-                {% block base_container_header %}
-                  {% block base_header %}
-                    <div class="clearfix">
-                      {% block title %}
-                        <h1 class="page-header {{bg_title}}">
-                          {% if title %}
-                            {{ title|safe|linebreaksbr }}
-                          {% elif view.title %}
-                            {{ view.title|safe|linebreaksbr }}
-                          {% elif object %}
-                            {{ object|safe|linebreaksbr }}
-                          {% endif %}
-                        </h1>
-                      {% endblock %}
-                    </div>
-                  {% endblock base_header %}
-                {% endblock base_container_header %}
+
 
                 {% block base_workspace %}
                   {% if view.is_contained %}
@@ -194,14 +284,13 @@
               {% block cmj_extra_content %}{% endblock %}
           {% endblock content_container %}
             </main>
-        {% endblock global_container %}
+        {% endblock  %}
       </div>
     {% block login_container %}
     {% endblock%}
 
 
 
-    {% endblock root_body %}
 
 {% endcomment %}
 
@@ -211,6 +300,7 @@
         <div class="vw-plugin-top-wrapper"></div>
       </div>
     </div>
+
 
     {% block foot_js %}
         {% block webpack_loader_js %}

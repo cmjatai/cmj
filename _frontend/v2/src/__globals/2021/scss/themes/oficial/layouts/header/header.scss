@@ -1,5 +1,7 @@
+
 header.main {
   background: $bg_color_portal_cmj; // $url_bg_png;
+
   transition: all 0.3s ease;
   position: sticky;
   z-index: $zindex-fixed;
@@ -43,13 +45,13 @@ header.main {
   }
 }
 
+
 @import './portallogo';
 @import './portalsearch';
 @import './portalactions';
 @import './portalmenu';
 
 @import './portalnavtop';
-
 
 
 @media screen and (max-width:991.98px) {
