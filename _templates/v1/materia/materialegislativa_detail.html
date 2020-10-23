@@ -101,7 +101,7 @@
   {% if object.url_video %}
     <div class="container">
       <div class="row justify-content-center">
-        <div class="col col-sm-7 pb-3">
+        <div class="col col-sm-7">
           <div class="embed-responsive embed-responsive-16by9">
             <iframe id="ytplayer" type="text/html" allowfullscreen
             src="https://www.youtube.com/embed/{{ object.url_video|youtube_id }}"
@@ -112,6 +112,18 @@
     </div>
   {% endif %}
 
+  {% if object.documento_set.exists %}
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col col-sm-7">
+          <strong>Notícia: </strong>
+          {% for n in object.documento_set.all %}
+            <a href="/{{n.absolute_slug}}">{{n}}</a>{% if not forloop.last %}, {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
 
   <div class="container">
     {{ block.super }}
