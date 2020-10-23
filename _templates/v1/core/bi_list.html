@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block main_header %}{% endblock main_header %}
+{% block second_header %}{% endblock second_header %}
 
 {% block content_container %}
   <div class="container-fluid bi-app">
-    
+
     <div class="container-bi-global">
-      <h2 class="legend">           
+      <h2 class="legend">
             Portal CMJ em números
       </h2>
       <div class="row justify-content-between">
@@ -29,7 +29,7 @@
     <div class="row">
       <div class="col">
         <div class="container-bi bi-graph bi-graph-barra-horizontal">
-          <h3 class="legend">           
+          <h3 class="legend">
                 Atividades Anuais
           </h3>
           <div class="inner">
@@ -39,8 +39,8 @@
                 {{ano}}
                 </span>
               {% endfor %}
-            </div>            
-            
+            </div>
+
             <div class="ly2">
               {% for ano, value in producao_anual %}
                 <span class="ly-item p-row">
@@ -75,7 +75,7 @@
                   </div>
                 </div>
               {% endfor %}
-            </div>   
+            </div>
             <div class="graph2">
               {% for ano, value in producao_anual %}
                 <div class="group-row">
@@ -94,7 +94,7 @@
                   </div>
                 </div>
               {% endfor %}
-            </div>  
+            </div>
             <div class="graph3">
               {% for ano, value in producao_anual %}
                 <div class="group-row">
@@ -113,7 +113,7 @@
                   </div>
                 </div>
               {% endfor %}
-            </div>      
+            </div>
             <div class="lx">
                 <span class="lx-titulo">Documentos Cadastrados</span>
                 <span class="lx-item"></span>
@@ -131,13 +131,13 @@
           BI: v0.1<br>
           <small><i>
             O BI do Portal CMJ está em sua versão beta.<br>
-            Neste gráfico sintético são monitorados o registro de: 
-            Matérias, 
-            Normas, 
-            Documentos Administrativos, 
-            Diários Oficiais, 
-            Notícias, 
-            Galerias de Imagens, Vídeos e Áudios.<br> 
+            Neste gráfico sintético são monitorados o registro de:
+            Matérias,
+            Normas,
+            Documentos Administrativos,
+            Diários Oficiais,
+            Notícias,
+            Galerias de Imagens, Vídeos e Áudios.<br>
           </i>
           </small>
         </div>

@@ -1,6 +1,6 @@
 <template>
   <div :class="['materia-pauta']">
-    <div class="epigrafe">{{tipo_string}} n&#186; {{materia.numero}}/{{materia.ano}}</div>
+    <a :href="materia.link_detail_backend" target="_blank" class="epigrafe">{{tipo_string}} n&#186; {{materia.numero}}/{{materia.ano}}</a>
 
     <div :class="['item-header', tipo_string ? '': 'd-none']">
       <div class="link-file" :id="`${type}-${materia.id}`" >

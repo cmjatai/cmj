@@ -4,7 +4,7 @@
 
 {% block main_container_class %}container container-path-parlamentar{% endblock main_container_class %}
 {% block base_functions %}{% endblock %}
-{% block main_header %}{% endblock %}
+{% block second_header %}{% endblock %}
 
 
 {% block base_container_header %}
@@ -19,9 +19,9 @@
 
   <div class="path-capa {% if not object.parlamentar.capa  %}path-capa-semfoto{% endif %}">
     <img src="{% thumbnail object.parlamentar.capa 9000x9000 box=object.parlamentar.capa_cropping crop detail %}">
-  </div> 
+  </div>
 
-  
+
   <div class="container-fluid path-header">
     <div class="">
       <div class="inner">
@@ -41,12 +41,12 @@
           </div>
           <div class="col-10 w-100 d-flex justify-content-between align-items-center">
               {% social_link_share object %}
-      
+
             <span class="title">
               {{ object.parlamentar }}
             </span>
           </div>
-        
+
         </div>
 
 

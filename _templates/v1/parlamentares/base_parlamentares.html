@@ -2,7 +2,7 @@
 {% load i18n cropping thumbnail common_tags social_utils menus%}
 {% load webpack_static from webpack_loader %}
 
-{% block main_header %}{% endblock main_header %}
+{% block second_header %}{% endblock second_header %}
 {% block main_container_class %}container container-box container-path-parlamentar{% endblock main_container_class %}
 
 
@@ -11,9 +11,9 @@
 <div class="container-topo-parlamentar">
   <div class="path-capa {% if not parlamentar.capa  %}path-capa-semfoto{% endif %}">
     <img src="{% thumbnail parlamentar.capa 9000x9000 box=parlamentar.capa_cropping crop detail %}">
-  </div> 
+  </div>
 
-  
+
   <div class="container-fluid path-header">
     <div class="">
       <div class="inner">
@@ -37,7 +37,7 @@
             </a>
 
             {% social_link_share parlamentar.classe_set.first %}
-      
+
             <span class="title">
               {% if title %}
                 {{ title|safe|linebreaksbr }}
@@ -48,7 +48,7 @@
               {% endif %}
             </span>
           </div>
-        
+
         </div>
 
 

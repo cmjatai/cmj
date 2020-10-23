@@ -171,13 +171,13 @@
         {% endblock canais_diretos%}
 
         {# Header #}
-        {% block main_header %}
+        {% block second_header %}
           <header class="masthead">
             <div class="container{{fluid}}">
                 {% block sections_nav %}{% subnav %}{% endblock sections_nav %}
             </div>
           </header>
-        {% endblock main_header %}
+        {% endblock second_header %}
         <main id="content" class="content page__row screen-lg">
         {% block content_container %}
             <div class="{% block main_container_class %}container container{{fluid}}{{path}} container-box{% endblock %}">
