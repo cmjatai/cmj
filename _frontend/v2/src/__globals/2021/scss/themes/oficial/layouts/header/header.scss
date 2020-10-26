@@ -1,6 +1,7 @@
 
 header.main {
-  background: $bg_color_portal_cmj; // $url_bg_png;
+  //background-color: $bg_color_portal_cmj;
+  background: linear-gradient(to top, $bg_color_portal_cmj 100%, darken($bg_color_portal_cmj, 10) 100%);
 
   transition: all 0.3s ease;
   position: sticky;
@@ -14,7 +15,7 @@ header.main {
     transition: all 0.3s ease;
   }
 
-  &::before {
+  &::before, &::after {
     content: '';
     position: absolute;
     width: 100%;
@@ -26,6 +27,17 @@ header.main {
     background-position: -18px -10px;
     z-index: -1;
   }
+  &::after {
+    background-image: url(~@/assets/img/fundo_topo.jpg);
+    background-position: center center;
+    background-size: 100% auto;
+    opacity: 0.05;
+    filter: grayscale(100%);
+
+    top: 0;
+    right: 0;
+
+  }
 
   #rowlogo {
     align-items: center;
@@ -33,9 +45,14 @@ header.main {
   }
 
   &.header-top {
+
+    &::after {
+      opacity: 0.2;
+    }
     #rowlogo {
       flex-wrap: wrap;
     }
+
   }
   &.header-mini {
     opacity: 0.95;
