@@ -29,7 +29,7 @@ header.main {
   }
   &::after {
     background-image: url(~@/assets/img/fundo_topo.jpg);
-    background-position: center center;
+    background-position: 0 30%;
     background-size: 100% auto;
     opacity: 0.05;
     filter: grayscale(100%);
