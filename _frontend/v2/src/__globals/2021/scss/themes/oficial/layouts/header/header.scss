@@ -1,7 +1,7 @@
 
 header.main {
   //background-color: $bg_color_portal_cmj;
-  background: linear-gradient(to top, $bg_color_portal_cmj 100%, darken($bg_color_portal_cmj, 10) 100%);
+  background: linear-gradient(to top, $bg_color_portal_cmj 0%, darken($bg_color_portal_cmj, 5) 100%);
 
   transition: all 0.3s ease;
   position: sticky;
@@ -32,7 +32,7 @@ header.main {
     background-position: 0 30%;
     background-size: 100% auto;
     opacity: 0.05;
-    filter: grayscale(100%);
+    filter: grayscale(60%);
 
     top: 0;
     right: 0;
@@ -45,9 +45,10 @@ header.main {
   }
 
   &.header-top {
+    background: linear-gradient(to top, $bg_color_portal_cmj 0%, darken($bg_color_portal_cmj,20) 100%);
 
     &::after {
-      opacity: 0.2;
+      opacity: 0.15;
     }
     #rowlogo {
       flex-wrap: wrap;

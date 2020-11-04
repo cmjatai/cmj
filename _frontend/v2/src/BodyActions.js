@@ -1,10 +1,8 @@
 
-import App from './App'
-import ActionDetails from '@/components/header/ActionDetails'
 export default {
   components: {
-    App,
-    ActionDetails
+    App: () => import('./App'),
+    ActionDetails: () => import('@/components/header/ActionDetails')
   },
   data () {
     return {

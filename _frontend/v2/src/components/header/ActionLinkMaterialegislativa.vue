@@ -1,8 +1,8 @@
 <template>
   <div>
-    <div
-      v-for="(item, key) in values"
-      :key="key">{{item.__str__}} <br>
+    <div v-for="(item, key) in values" :key="key">
+      {{item.__str__}}
+      <br>
       <i><small>{{item.ementa}}</small></i><br><br>
     </div>
 

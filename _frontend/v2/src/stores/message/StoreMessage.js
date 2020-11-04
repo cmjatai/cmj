@@ -6,6 +6,11 @@ import {
 const mutations = {
   [MESSAGE_SHIFT] (state, data) {
     data.id = state.counter_id++
+
+    if (data.time === undefined) {
+      data.time = 3
+    }
+
     state.messages.unshift(data)
   },
   [MESSAGE_POP] (state, message_id) {

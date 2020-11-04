@@ -1,12 +1,39 @@
+
+$circle_avatar: (1: 256, 2: 160, 3: 128, 4: 96, 5: 64, 6: 48, 7: 40, 8: 36, 9: 24);
+
+
+@each $i, $size_avatar in $circle_avatar {
+  .avatar#{$i} {
+    width: #{$size_avatar}px;
+    height: #{$size_avatar}px;
+  }
+}
+
 .avatar {
   border-radius: 50%;
-  //display: inline-block;
   overflow: hidden;
-  height: 100%;
   display: inline-block;
-  max-width: 96px;
-  max-height: 96px;
+  opacity: 0.75;
+
+  &:hover {
+    opacity: 1;
+  }
+
   img {
     height: 100%;
+    width: 100%;
   }
+}
+
+.container-avatar {
+  height: 100%;
+  div {
+    display: flex;
+    justify-content: center;
+  }
+  a {
+    margin: 0 3px;
+  }
+
+
 }

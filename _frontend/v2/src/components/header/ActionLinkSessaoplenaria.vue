@@ -1,9 +1,6 @@
 <template>
   <div class="card-group">
-    <div class="card"
-      v-for="(item, key) in sessoes"
-      :key="key">
-
+    <div class="card" v-for="(item, key) in sessoes" :key="key">
       <div class="card-img-top">
         <div v-if="item.url_video" class="embed-responsive embed-responsive-16by9">
           <iframe :id="`ytplayer${key}`" type="text/html" allowfullscreen
@@ -23,9 +20,7 @@
               Ata da Sessão</a>
           </strong>
         </div>
-
       </div>
-
     </div>
   </div>
 </template>
@@ -39,7 +34,7 @@ export default {
   },
   computed: {
     sessoes: function () {
-      let ss = this.values.slice(0, 3)
+      let ss = this.values.slice(4, 7)
       return ss
     }
   },

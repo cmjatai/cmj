@@ -131,16 +131,17 @@
         {% endblock navigation %}
 
       <!-- ========================================================== -->
-      <main>
+      <main class="{% block main_container_class %}{% endblock %}">
 
-        <div class="second_header">
-          {% block second_header %}
-            <div class="container">
+        {% block second_header %}
+          <div class="second_header" {% block attrs_header %}{% endblock attrs_header%}>
+            <div class="container{{fluid}}">
               {% block base_functions %}{% endblock %}
               {% block base_container_header %}
                 {% block base_header %}
-                    {% block title %}
-                      <h1 class="page-header">
+                  {% block title %}
+                    <h1>
+                      {% block title_inner %}
                         {% if title %}
                           {{ title|safe|linebreaksbr }}
                         {% elif view.title %}
@@ -148,8 +149,24 @@
                         {% elif object %}
                           {{ object|safe|linebreaksbr }}
                         {% endif %}
-                      </h1>
-                    {% endblock %}
+                      {% endblock title_inner %}
+                    </h1>
+                  {% endblock title %}
+
+                  {% block sub_title %}
+                    {% if sub_title or view.sub_title %}
+                      <h3>
+                        {% block sub_title_inner %}
+                          {% if sub_title %}
+                            {{ sub_title|safe|linebreaksbr }}
+                          {% elif view.sub_title %}
+                            {{ view.sub_title|safe|linebreaksbr }}
+                          {% endif %}
+                        {% endblock %}
+                      </h3>
+                    {% endif %}
+                  {% endblock %}
+
                 {% endblock base_header %}
               {% endblock base_container_header %}
             </div>
@@ -157,13 +174,13 @@
             <div class="container{{fluid}}">
                 {% block sections_nav %}{% subnav %}{% endblock sections_nav %}
             </div>
-          {% endblock second_header %}
-        </div>
+          </div>
+        {% endblock second_header %}
 
         <router-view></router-view>
 
 
-        <div class="container">
+        <div class="container " >
                                             {% for n in ultimas_publicacoes %}
                                                 {{forloop.counter}}<br>
                                             {% endfor %}

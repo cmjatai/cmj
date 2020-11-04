@@ -1,17 +1,18 @@
 @import './variables';
-@import '../../imports.scss';
+@import '../__/imports.scss';
 
 @import './layouts/avatar';
 @import './layouts/icons';
 
 @import './layouts/social_links';
+
 @import './layouts/header/header';
-
 @import './layouts/main/main';
-
 @import './layouts/footer/footer';
 
 
+
+@import './apps/app_sigad';
 
 
 .caret {

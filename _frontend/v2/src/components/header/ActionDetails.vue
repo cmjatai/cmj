@@ -20,15 +20,12 @@
   </div>
 </template>
 <script>
-import ActionLinkMaterialegislativa from './ActionLinkMaterialegislativa'
-import ActionLinkDocumentoadministrativo from './ActionLinkDocumentoadministrativo'
-import ActionLinkSessaoplenaria from './ActionLinkSessaoplenaria'
 export default {
   name: 'action-details',
   components: {
-    ActionLinkMaterialegislativa,
-    ActionLinkDocumentoadministrativo,
-    ActionLinkSessaoplenaria
+    ActionLinkMaterialegislativa: () => import('./ActionLinkMaterialegislativa'),
+    ActionLinkDocumentoadministrativo: () => import('./ActionLinkDocumentoadministrativo'),
+    ActionLinkSessaoplenaria: () => import('./ActionLinkSessaoplenaria')
   },
   data () {
     return {

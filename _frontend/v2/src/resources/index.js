@@ -38,5 +38,44 @@ export default {
       url: `${basePath}/${m.app}/${m.model}/${m.id}${m.id !== '' ? '/' : ''}${m.action}${m.action !== '' ? '/' : ''}${query_string !== '' ? '?' : ''}${query_string}`,
       method: 'GET'
     })
+  },
+  DocumentoResource: {
+    getDocumentoChoiceList: (tipo, page) => call_axios({
+      url: `${basePath}/documento/?page=${page}&tipo=${tipo}`,
+      method: 'GET'
+    }),
+    getDocumento: id => call_axios({
+      url: `${basePath}/documento/${id}/`,
+      method: 'GET'
+    }),
+    createDocumento: (data) => call_axios({
+      url: `${basePath}/documento/`,
+      data: data,
+      method: 'POST'
+    }),
+    putDocumento: (data) => call_axios({
+      url: `${basePath}/documento/${data.id}/`,
+      data: data,
+      method: 'PUT'
+    }),
+    updateDocumento: (data) => call_axios({
+      url: `${basePath}/documento/${data.id}/`,
+      data: data,
+      method: 'PATCH'
+    }),
+    uploadFiles: (id, form) => call_axios({
+      url: `${basePath}/documento/${id}/`,
+      data: form,
+      method: 'PATCH'
+    }),
+    deleteDocumento: (id) => call_axios({
+      url: `${basePath}/documento/${id}/`,
+      method: 'DELETE'
+    }),
+    deleteReferencia: (data) => call_axios({
+      url: `${basePath}/documento/${data.id}/`,
+      data: data,
+      method: 'DELETE'
+    })
   }
 }

@@ -1,10 +1,13 @@
 import './__globals'
+
 import Vue from 'vue'
 import Vuex from 'vuex'
 import VueCookie from 'vue-cookie'
 import BootstrapVue from 'bootstrap-vue'
 import VueNativeSock from 'vue-native-websocket'
 import Router from 'vue-router'
+
+import VueResize from 'vue-resize'
 
 import VuexStore from './stores'
 
@@ -22,6 +25,8 @@ import './mixins'
 
 import BodyActions from './BodyActions'
 
+import 'vue-resize/dist/vue-resize.css'
+
 axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 
@@ -29,6 +34,7 @@ Vue.use(Vuex)
 Vue.use(Router)
 Vue.use(BootstrapVue)
 Vue.use(VueCookie)
+Vue.use(VueResize)
 
 /*
 ws/time-refresh recebe uma notificacão sempre que um model do Sapl

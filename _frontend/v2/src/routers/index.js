@@ -10,27 +10,38 @@ export const routes = [
     children: [
       {
         path: '/online',
-        component: () => import('@/__online/layouts/OnlineLayout'),
+        component: () => import('@/__apps/online/layouts/OnlineLayout'),
         children: [
           {
             path: '', // list
             name: 'sessao_link',
-            component: () => import('@/__online/pages/sessao/SessaoPlenariaModule.vue'),
+            component: () => import('@/__apps/online/pages/sessao/SessaoPlenariaModule.vue'),
             children: [
               {
                 path: '',
                 name: 'sessao_list_link',
-                component: () => import('@/__online/pages/sessao/SessaoList.vue')
+                component: () => import('@/__apps/online/pages/sessao/SessaoList.vue')
               },
               {
                 path: ':id/',
                 name: 'sessao_plenaria_online_link',
-                component: () => import('@/__online/pages/sessao/SessaoPlenariaOnline.vue')
+                component: () => import('@/__apps/online/pages/sessao/SessaoPlenariaOnline.vue')
               }
             ]
           }
         ]
+      },
+      {
+        name: 'documento_construct',
+        path: '/documento/:id/construct',
+        component: () => import('@/__apps/sigad/components/DocumentoEdit.vue')
+      },
+      {
+        name: 'documento_construct_create',
+        path: '/classe/:id/documento/construct',
+        component: () => import('@/__apps/sigad/components/DocumentoEdit.vue')
       }
+
     ]
   }
 
