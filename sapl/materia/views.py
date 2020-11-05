@@ -1821,6 +1821,13 @@ class MateriaLegislativaCrud(Crud):
             namespace = self.model._meta.app_config.name
             return reverse('%s:%s' % (namespace, 'pesquisar_materia'))
 
+        @property
+        def sub_title(self):
+            try:
+                return self.object.ementa
+            except:
+                return ''
+
     class CreateView(Crud.CreateView):
 
         form_class = MateriaLegislativaForm
