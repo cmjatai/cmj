@@ -1,2 +1,39 @@
 
 @import './second_header';
+@import './forms';
+
+
+a {
+  color: $bg_color_portal_cmj;
+}
+
+.context-actions{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: $grid-gutter-width 0;
+  .search {
+    flex: 1 1 auto;
+    margin-right: $grid-gutter-width;
+  }
+}
+
+.mce-branding {
+  display: none !important;
+}
+
+
+.link-texto {
+  display: block;
+  border: 1px solid darken($color_container_border, 10%);
+  padding: 0.5em 1em;
+  text-align: center;
+  border-radius: 3px;
+  &:not(:last-child) {
+    margin-right: 15px;
+  }
+
+  &:hover {
+    background-color: $color_container_bg;
+  }
+}

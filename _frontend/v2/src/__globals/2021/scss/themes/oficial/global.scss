@@ -1,5 +1,8 @@
 @import './variables';
-@import '../__/imports.scss';
+@import '../__/imports';
+@import '../__/mixins';
+@import './layouts/bootstrap/_btn';
+@import './layouts/bootstrap/_carousel_custom';
 
 @import './layouts/avatar';
 @import './layouts/icons';
@@ -10,9 +13,8 @@
 @import './layouts/main/main';
 @import './layouts/footer/footer';
 
-
-
 @import './apps/app_sigad';
+@import './apps/app_materia';
 
 
 .caret {

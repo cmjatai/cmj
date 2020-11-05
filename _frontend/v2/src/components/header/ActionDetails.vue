@@ -125,9 +125,12 @@ export default {
     let el = _t.$el
 
     this.ro = new ResizeObserver(entries => {
-      _t.details = entries[0].target.offsetWidth >= 992
-      let rect = el.parentElement.getBoundingClientRect()
-      el.style.setProperty('--leftvalue', `${rect.left + rect.width / 2 - 10}px`)
+      // para liberar details, ajustar bodyactions.js
+      _t.details = false // entries[0].target.offsetWidth >= 992
+      if (_t.details) {
+        let rect = el.parentElement.getBoundingClientRect()
+        el.style.setProperty('--leftvalue', `${rect.left + rect.width / 2 - 10}px`)
+      }
     })
     this.ro.observe(h)
     this.loadLinks()

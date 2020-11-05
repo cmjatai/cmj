@@ -21,15 +21,15 @@ main .second_header{
     right: 0;
     width: 100%;
     height: 100%;
-    opacity: 0.2;
+    opacity: 0.3;
     background-repeat: no-repeat;
     background-position: 0 30%;
     background-size: 100% auto;
     filter: grayscale(100%);
+    z-index: -1;
   }
 
   h1 {
-    position: relative;
     margin: 0;
     padding: 4rem 0;
   }
@@ -38,7 +38,7 @@ main .second_header{
     font-weight: 300;
     font-style: italic;
     line-height: 1.2;
-    color: #777;
+    color: $bg_color_portal_cmj;
     margin: -3.2rem 0 2rem 2rem;
   }
 
@@ -58,7 +58,6 @@ main .second_header{
       }
     }
     a {
-      color: #444;
       padding: 4px 7px;
     }
   }

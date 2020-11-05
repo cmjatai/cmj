@@ -26,7 +26,7 @@ import './2021/js/functions'
 import './2021/js/app_cmj'
 
 const theme = window.document.currentScript.getAttribute('theme') || 'oficial'
-require(`./2021/scss/themes/${theme}/app.scss`)
+require(`./2021/scss/themes/${theme}/global.scss`)
 // eslint-disable-next-line
 
 window.$ = $

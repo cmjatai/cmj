@@ -17,7 +17,7 @@
 
 {% block title_inner %}
   {% if object.texto_original %}
-    <a class="link-texto" target="_blank" href="{{object.texto_original.url}}?u={% now "u"%}" title="Texto Original">
+    <a target="_blank" href="{{object.texto_original.url}}?u={% now "u"%}" title="Texto Original">
       <i class="far fa-file-{% if '.pdf' in object.texto_original.path %}pdf{% else %}archive{% endif %}"></i>
     </a>
   {% endif %}
@@ -56,6 +56,20 @@
 
   {{ block.super }}
 
+
+  <small>
+    {% with object.tramitacao_set.first as tram %}
+      {% if tram and tram.unidade_tramitacao_destino %}
+        <strong>Localização Atual:</strong> &nbsp;{{tram.unidade_tramitacao_destino}}</br>
+        <strong>Status:</strong> {{tram.status}}<br>
+        <strong>Ultima Ação:</strong> {{tram.texto}}<br>
+        <strong>Data da última Tramitação:</strong> {{tram.data_tramitacao}}<br>
+      {% endif %}
+      <br>
+    {% endwith %}
+  </small>
+
+
 {% endblock base_container_header %}
 
 {% block sections_nav %}
@@ -64,86 +78,30 @@
   {% endif %}
 {% endblock sections_nav %}
 
-<!-- ====================================== -->
-{% block second_header_test %}
 
-{{ block.super }}
-<h1 class="page-header {{bg_title}} d-flex justify-content-between">
-  <div class="text-red">
-    <a class="d-none" href="#collapseSigns" data-toggle="collapse" href="#collapseSigns" role="button" aria-expanded="false" aria-controls="collapseSigns">
-        {% if object.is_signed %}
-          <i class="fas fa-1x fa-certificate" title="Documento com Assinatura Digital"></i>
-        {% endif %}
-    </a>
-
-  </div>
-</h1>
-
-  <div class="collapse" id="collapseSigns">
-  {% with object.metadata.signs.texto_original.signs as signs %}
-    {% include 'core/sign_widget.html' %}
-  {% endwith %}
-  </div>
-{% endblock second_header_test %}
-
-  {% block container_actions %}
-    {% if not user.is_anonymous %}
-      {{ block.super }}
-    {% else %}
-      <div class="pt-2">
-      {% block actions %}{{ block.super }}
-      {% endblock actions %}
-      </div>
-    {% endif %}
-  {% endblock container_actions %}
-
-{% block sub_actions %}
-<br><br><br><br><br><br><br><br><br><br>
-    {{ block.super }}
-    {% if object.em_tramitacao and mail_service_configured or user.is_superuser %}
+{% block extra_actions %}
+    {% if object.em_tramitacao and mail_service_configured or user.is_superuser%}
       <div class="actions btn-group btn-group-sm" role="group">
         <a href="{% url 'sapl.materia:acompanhar_materia' object.id %}" class="btn btn-outline-primary"  data-toggle="tooltip" data-placement="top" title="Registre seu email para acompanhamento desta matéria. Você receberá um email sempre que está materia tramitar.">Acompanhar Matéria</a>
       </div>
     {% endif %}
-{% endblock sub_actions %}
+{% endblock extra_actions %}
+
+
 
 {% block detail_content %}
-<div class="item-listas container-table">
-  <div class="item-raiz px-4">
-    <div class="text-ementa">{{ object.ementa|safe }}</div>
-
-    <small>
-      {% with object.tramitacao_set.first as tram %}
-        {% if tram.unidade_tramitacao_destino %}
-          <strong>Localização Atual:</strong> &nbsp;{{tram.unidade_tramitacao_destino}}</br>
-          <strong>Status:</strong> {{tram.status}}<br>
-          <strong>Ultima Ação:</strong> {{tram.texto}}<br>
-          <strong>Data da última Tramitação:</strong> {{tram.data_tramitacao}}<br>
-        {% endif %}
-      {% endwith %}
-      <br>
-    </small>
-    <div class="clearfix"></div>
-  </div>
 
   {% if object.url_video %}
-    <div class="container">
-      <div class="row justify-content-center">
-        <div class="col col-sm-7 pb-3">
-          <div class="embed-responsive embed-responsive-16by9">
-            <iframe id="ytplayer" type="text/html" allowfullscreen
-            src="https://www.youtube.com/embed/{{ object.url_video|youtube_id }}"
-            frameborder="0"></iframe>
-          </div>
-        </div>
-      </div>
+    <div class="youtube-materia-list ">
+      {% with object.url_video as url_video %}
+        {% include 'youtube_widget.html' %}
+      {% endwith %}
     </div>
   {% endif %}
 
-
-  <div class="container">
     {{ block.super }}
-  </div>
+
+
 
   {% if object.documentoadministrativo_set.exists %}
     <p class="control-label">Documentos Administrativos Vinculados a Matéria</p>
@@ -202,7 +160,7 @@
 
   {% if object.registrovotacao_set.exists %}
     <div class="pt-4">
-      <table class="table">
+      <table class="table table-striped table-hover">
         {% for rv in object.registrovotacao_set.all %}
           {% if forloop.first %}
             <tr>
@@ -279,4 +237,42 @@
   {% endwith %}
 
 
+
+
+
+
+
+
 {% endblock detail_content %}
+
+
+<!-- ====================================== -->
+{% block second_header_test %}
+                                                      {{ block.super }}
+                                                      <h1 class="page-header {{bg_title}} d-flex justify-content-between">
+                                                        <div class="text-red">
+                                                          <a href="#collapseSigns" data-toggle="collapse" href="#collapseSigns" role="button" aria-expanded="false" aria-controls="collapseSigns">
+                                                              {% if object.is_signed %}
+                                                                <i class="fas fa-1x fa-certificate" title="Documento com Assinatura Digital"></i>
+                                                              {% endif %}
+                                                          </a>
+
+                                                        </div>
+                                                      </h1>
+                                                      <div class="collapse" id="collapseSigns">
+                                                      {% with object.metadata.signs.texto_original.signs as signs %}
+                                                        {% include 'core/sign_widget.html' %}
+                                                      {% endwith %}
+                                                      </div>
+{% endblock second_header_test %}
+
+
+{% block detail_content___old %}
+<div class="item-listas container-table">
+  <div class="item-raiz px-4">
+
+    <div class="clearfix"></div>
+  </div>
+
+
+{% endblock detail_content___old %}

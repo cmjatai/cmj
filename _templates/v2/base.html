@@ -158,9 +158,9 @@
                       <h3>
                         {% block sub_title_inner %}
                           {% if sub_title %}
-                            {{ sub_title|safe|linebreaksbr }}
+                            {{ sub_title|safe }}
                           {% elif view.sub_title %}
-                            {{ view.sub_title|safe|linebreaksbr }}
+                            {{ view.sub_title|safe }}
                           {% endif %}
                         {% endblock %}
                       </h3>
@@ -179,36 +179,13 @@
 
         <router-view></router-view>
 
-
-        <div class="container " >
-                                            {% for n in ultimas_publicacoes %}
-                                                {{forloop.counter}}<br>
-                                            {% endfor %}
-
-
+        <div class="container{{fluid}}">
           {% block base_content %}
-
           {% endblock %}
-
-
         </div>
-
-
-                                            {% for n in ultimas_publicacoes %}
-                                                {{forloop.counter}}<br>
-                                            {% endfor %}
-
-                                            {% for n in ultimas_publicacoes %}
-                                                {{forloop.counter}}<br>
-                                            {% endfor %}
-
       </main>
-
-
-
       <!-- App.vue -->
       <app></app>
-
       {% endblock global_container %}
     </div>
 

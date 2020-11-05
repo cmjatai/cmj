@@ -7,7 +7,7 @@ export default {
   data () {
     return {
       searching: '',
-      static: 'static',
+      static: '',
       portalmenu_opened: false
     }
   },
@@ -26,7 +26,8 @@ export default {
       // this.$cookie.set('portalmenu_opened', this.portalmenu_opened ? 'opened' : 'closed')
     },
     staticToggleAction (flag) {
-      this.static = flag ? 'static' : ''
+      this.static = flag ? '' : ''
+      // this.static = flag ? 'static' : ''
     }
   },
   mounted: function () {
