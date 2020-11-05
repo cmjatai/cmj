@@ -230,13 +230,17 @@ class ParlamentarForm(FileFieldCheckMixin, ModelForm):
         fotografia.attrs.update(
             get_attrs(self.instance.fotografia, 'fotografia')
         )
-        del fotografia.attrs['class']
+
+        if 'class' in fotografia.attrs:
+            fotografia.attrs.pop('class')
 
         capa = self.fields['capa'].widget
         capa.attrs.update(
             get_attrs(self.instance.capa, 'capa')
         )
-        del capa.attrs['class']
+
+        if 'class' in capa.attrs:
+            capa.attrs.pop('class')
 
 
 class ParlamentarFilterSet(django_filters.FilterSet):
