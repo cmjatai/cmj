@@ -969,24 +969,33 @@ class Crud:
         CrudDeleteView = _add_base(cls.DeleteView)
 
         cruds_base = [
-            (CrudListView.get_url_regex()
-             if CrudListView else None, CrudListView, ACTION_LIST),
-            (CrudCreateView.get_url_regex()
-             if CrudCreateView else None, CrudCreateView, ACTION_CREATE),
-            (CrudDetailView.get_url_regex()
-             if CrudDetailView else None, CrudDetailView, ACTION_DETAIL),
-            (CrudUpdateView.get_url_regex()
-             if CrudUpdateView else None, CrudUpdateView, ACTION_UPDATE),
-            (CrudDeleteView.get_url_regex()
-             if CrudDeleteView else None, CrudDeleteView, ACTION_DELETE)]
+            [CrudListView.get_url_regex()
+             if CrudListView else None, CrudListView, ACTION_LIST],
+            [CrudCreateView.get_url_regex()
+             if CrudCreateView else None, CrudCreateView, ACTION_CREATE],
+            [CrudDetailView.get_url_regex()
+             if CrudDetailView else None, CrudDetailView, ACTION_DETAIL],
+            [CrudUpdateView.get_url_regex()
+             if CrudUpdateView else None, CrudUpdateView, ACTION_UPDATE],
+            [CrudDeleteView.get_url_regex()
+             if CrudDeleteView else None, CrudDeleteView, ACTION_DELETE]]
 
         cruds = []
         for crud in cruds_base:
             if crud[0]:
                 cruds.append(crud)
+                if not isinstance(crud[0], tuple):
+                    crud[0] = ((crud[0], ''), )
 
-        return [url(regex, view.as_view(), name=view.url_name(suffix))
-                for regex, view, suffix in cruds]
+        urls = []
+        for regex_list, view, suffix in cruds:
+            for i, regex in enumerate(regex_list):
+                suf = f'{suffix}_{regex[1]}' if i else suffix
+                u = url(regex[0], view.as_view(),
+                        name=view.url_name(suf))
+                urls.append(u)
+
+        return urls
 
     @classonlymethod
     def build(cls, _model, _help_topic, _model_set=None, list_field_names=[]):
