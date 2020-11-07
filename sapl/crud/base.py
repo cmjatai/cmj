@@ -989,9 +989,9 @@ class Crud:
 
         urls = []
         for regex_list, view, suffix in cruds:
-            for i, regex in enumerate(regex_list):
-                suf = f'{suffix}_{regex[1]}' if i else suffix
-                u = url(regex[0], view.as_view(),
+            for regex, suf in regex_list:
+                suf = f'{suffix}_{suf}' if suf else suffix
+                u = url(regex, view.as_view(),
                         name=view.url_name(suf))
                 urls.append(u)
 
