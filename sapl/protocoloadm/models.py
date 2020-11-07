@@ -213,14 +213,25 @@ class DocumentoAdministrativo(CommonMixin):
 
     #related_objects = DocumentoAdministrativoManager()
     #objects = models.Manager()
+    FIELDFILE_NAME = ('texto_integral', )
+
+    STATUS_DOC_ADM_PUBLICO = 99
+    STATUS_DOC_ADM_RESTRITO = 49
+    STATUS_DOC_ADM_PRIVADO = 0
+
+    PRIVACIDADE_DOC_ADM_STATUS = (
+        # Só o usuário da Area de trabalho pode ver e não deve ser
+        # listado através do link share
+        (STATUS_DOC_ADM_PRIVADO, _('Privado')),
+        (STATUS_DOC_ADM_RESTRITO, _('Restrito')),
+        (STATUS_DOC_ADM_PUBLICO, _('Público')),
+    )
 
     class Meta:
         verbose_name = _('Documento Administrativo')
         verbose_name_plural = _('Documentos Administrativos')
         ordering = ('-ano', ('-id'))
         #base_manager_name = 'related_objects'
-
-    FIELDFILE_NAME = ('texto_integral', )
 
     metadata = JSONField(
         verbose_name=_('Metadados'),
@@ -229,6 +240,7 @@ class DocumentoAdministrativo(CommonMixin):
     tipo = models.ForeignKey(
         TipoDocumentoAdministrativo, on_delete=models.PROTECT,
         verbose_name=_('Tipo Documento'))
+
     numero = models.PositiveIntegerField(verbose_name=_('Número'))
     ano = models.PositiveSmallIntegerField(verbose_name=_('Ano'),
                                            choices=RANGE_ANOS)
@@ -333,6 +345,17 @@ class DocumentoAdministrativo(CommonMixin):
         verbose_name=_('Área de Trabalho'),
         related_name='documentoadministrativo_set',
         blank=True, null=True, on_delete=PROTECT)
+
+    # Todo Documento é privado, a não ser que a Área de Trabalho seja pub
+    visibilidade = models.PositiveIntegerField(
+        verbose_name=_('Visibilidade'),
+        choices=PRIVACIDADE_DOC_ADM_STATUS,
+        default=STATUS_DOC_ADM_PRIVADO)
+
+    link_share = models.CharField(
+        _('Link de Compartilhamento'),
+        max_length=128,
+        blank=True, null=True, default=None)
 
     data_ultima_atualizacao = models.DateTimeField(
         blank=True, null=True,
