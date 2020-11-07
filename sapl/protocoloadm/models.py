@@ -1,7 +1,10 @@
+import hashlib
+
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields.jsonb import JSONField
+from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models.deletion import PROTECT
@@ -233,6 +236,10 @@ class DocumentoAdministrativo(CommonMixin):
         ordering = ('-ano', ('-id'))
         #base_manager_name = 'related_objects'
 
+        permissions = (
+            ('link_share_create_documentoadministrativo', _('Gerar Link Público')),
+        )
+
     metadata = JSONField(
         verbose_name=_('Metadados'),
         blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
@@ -422,6 +429,15 @@ class DocumentoAdministrativo(CommonMixin):
                               update_fields=update_fields)
 
         return r
+
+    def link_share_create(self):
+        md5 = hashlib.md5()
+        data = '{}{}'.format(
+            timezone.localtime(),
+            serializers.serialize('json', [self]))
+        md5.update(data.encode())
+        self.link_share = md5.hexdigest()
+        self.save()
 
 
 @reversion.register()

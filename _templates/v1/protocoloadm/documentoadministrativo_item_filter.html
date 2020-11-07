@@ -17,6 +17,21 @@
       </div>
     {% endif %}
   {% else %}
+    {% if d.link_share and user in d.workspace.operadores.all %}
+      <div class="alert alert-secondary">
+        <strong>ATENÇÃO... <span class="text-maroon">Use o link abaixo para compartilhar!!!</span></strong><br>
+        <div class="form-clickboard input-group input-group-sm d-flex">
+          <input class="form-control" readonly="readonly" type="text" value="https://www.jatai.go.leg.br{% url 'sapl.protocoloadm:documentoadministrativo_detail_hash' d.link_share  d.pk %}" id="input-copy-clipboard">
+          <div class="input-group-append">
+            <button onclick="copyInputClipboard()" class="btn btn-outline-primary" type="button">
+              <i class="fas fa-clipboard"></i> Copiar Link
+            </button>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+
     <div class="parent-right">
       Última Atualização: {{d.data_ultima_atualizacao}}
     </div>
@@ -70,9 +85,6 @@
     <div class="text-ementa">{{ d.assunto|safe }}</div>
   {% endif %}
 
-  {% if render_widget_file and render_widget_file_list is None or render_widget_file_list == True %}
-    {% include 'protocoloadm/documentoadministrativo_widget_file.html' %}
-  {% endif %}
 
   <small>
     {% if d.interessado %}
@@ -103,6 +115,9 @@
         </br>
     {% endif %}
   </small>
+  {% if render_widget_file and render_widget_file_list is None or render_widget_file_list%}
+    {% include 'protocoloadm/documentoadministrativo_widget_file.html' %}
+  {% endif %}
 
   {% if d.metadata.zipfile.keys|length > 1 and not d.documento_anexado_set.exists %}
     <div class="d-inline-block p-3">

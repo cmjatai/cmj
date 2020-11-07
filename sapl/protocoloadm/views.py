@@ -1,5 +1,6 @@
 from datetime import datetime
 from distutils.util import strtobool
+import hashlib
 import io
 import logging
 from random import choice
@@ -13,6 +14,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.contenttypes.models import ContentType
+from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.db import transaction
 from django.db.models import Max, Q
@@ -277,15 +279,70 @@ class DocumentoAdministrativoCrud(Crud):
 
         layout_key = 'DocumentoAdministrativoDetail'
 
+        @property
+        def extras_url(self):
+            r = [
+                self.btn_certidao('texto_integral'),
+                self.btn_link_share_create()
+            ]
+            r = list(filter(None, r))
+            return r
+
+        def btn_link_share_create(self):
+
+            if self.object.documento_anexado_set.exists():
+                return None
+
+            if not self.request.user.has_perm('protocoloadm.link_share_create_documentoadministrativo'):
+                return None
+
+            btn = [
+                '{}?{}'.format(
+                    reverse(
+                        'sapl.protocoloadm:documentoadministrativo_detail',
+                        kwargs={'pk': self.object.pk}
+                    ),
+                    'share_create'
+                ),
+
+                'btn-success',
+                _('Gerar Novo Link Público')
+            ]
+            return btn
+
         @classmethod
         def get_url_regex(cls):
-            return r'^(?P<pk>\d+)$'
+            return (
+                (r'^(?P<pk>\d+)$', ''),
+                (r'^(?P<hash>[0-9A-Fa-f]+)/(?P<pk>\d+)$', 'hash')
+            )
 
         def get_context_data(self, **kwargs):
             context = DetailView.get_context_data(self, **kwargs)
             if self.object.epigrafe:
                 context['title'] = self.object.epigrafe
             return context
+
+        def get_queryset(self):
+
+            self.link_share = self.kwargs.get('hash', '')
+
+            if not self.link_share:
+                return super().get_queryset()
+
+            crud = self.crud
+            qs = crud.model.objects.all()
+
+            return qs
+
+        def get_object(self, queryset=None):
+            obj = super().get_object(queryset=queryset)
+
+            self.link_share = self.kwargs.get('hash', '')
+            if self.link_share and self.link_share != obj.link_share:
+                raise Http404
+
+            return obj
 
         def get(self, request, *args, **kwargs):
             self.object = self.get_object()
@@ -296,6 +353,30 @@ class DocumentoAdministrativoCrud(Crud):
                     return self.monta_zip(download)
             except:
                 messages.warning(request, 'Referência incorreta!')
+
+            if 'share_create' in request.GET:
+                if request.user.has_perm(
+                    'protocoloadm.'
+                        'link_share_create_documentoadministrativo'):
+                    try:
+                        self.object.link_share_create()
+                        msg = (messages.SUCCESS, _(
+                            "Link Público Gerado com sucesso."))
+
+                    except:
+                        msg = (messages.ERROR, _(
+                            'Ocorreu erro na geração do link.'))
+                else:
+                    msg = (messages.ERROR, _(
+                        'Seu usuário não possui permissão '
+                        'para gerar links públicos.'))
+
+                messages.add_message(self.request, msg[0], msg[1])
+
+                return redirect(reverse(
+                    'sapl.protocoloadm:documentoadministrativo_detail',
+                    kwargs={'pk': self.object.pk}
+                ))
 
             context = self.get_context_data(object=self.object)
             return self.render_to_response(context)

@@ -120,14 +120,14 @@
                 </div>
 
                 {% if mostrar_anexos and d.documento_principal_set.exists %}
-                  <button class="btn btn-link"
+                  <a class="btn btn-link"
                     type="button"
                     data-toggle="collapse"
                     data-target="#collapse-{{d.id}}"
                     aria-expanded="false"
                     aria-controls="collapse-{{d.id}}">
                     Ver Documentos Anexados
-                  </button>
+                  </a>
                 {% elif d.documento_principal_set.exists %}
                   <a class="d-inline-block ml-2 mb-2 mt-n2 btn btn-link" href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' d.id%}">
                     Processo possui {{d.documento_principal_set.count }} Ite{% if d.documento_principal_set.count > 1 %}ns{% else %}m{% endif %}
