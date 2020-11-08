@@ -70,9 +70,11 @@
           </div>
         {% endif %}
 
-        {% with d.documento_principal_set.childs_anexados as anexados %}
-          {% include "protocoloadm/documentoadministrativo_item_detail_link_share.html" %}
-        {% endwith %}
+        {% if d.visibilidade != d.STATUS_DOC_ADM_PRIVADO %}
+          {% with d.documento_principal_set.childs_anexados as anexados %}
+            {% include "protocoloadm/documentoadministrativo_item_detail_link_share.html" %}
+          {% endwith %}
+        {% endif %}
 
       {% endwith %}
 
