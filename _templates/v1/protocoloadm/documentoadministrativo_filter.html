@@ -46,7 +46,17 @@
                     </div>
                   {% else %}
                     <div class="parent-right">
-                      Última Atualização: {{d.data_ultima_atualizacao}}
+                      {% if perms.add_documentoadministrativo %}
+                        {% if d.visibilidade == d.STATUS_DOC_ADM_PUBLICO %}
+                          <span class="bg-green">Última Atualização: {{d.data_ultima_atualizacao}}</span>
+                        {% elif d.visibilidade == d.STATUS_DOC_ADM_RESTRITO %}
+                          <span class="bg-yellow">Última Atualização: {{d.data_ultima_atualizacao}}</span>
+                        {% elif d.visibilidade == d.STATUS_DOC_ADM_PRIVADO %}
+                          <span class="bg-red">Última Atualização: {{d.data_ultima_atualizacao}}</span>
+                        {% endif %}
+                      {% else %}
+                        Última Atualização: {{d.data_ultima_atualizacao}}
+                      {% endif %}
                     </div>
                   {% endif %}
 

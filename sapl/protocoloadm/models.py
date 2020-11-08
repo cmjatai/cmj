@@ -443,6 +443,7 @@ class DocumentoAdministrativo(CommonMixin):
             serializers.serialize('json', [self]))
         md5.update(data.encode())
         self.link_share = md5.hexdigest()
+        self.visibilidade = self.STATUS_DOC_ADM_PUBLICO
         self.save()
 
 
@@ -590,7 +591,7 @@ class TramitacaoAdministrativo(models.Model):
 class AnexadoManager(models.Manager):
 
     def childs_anexados(self):
-        return self.all().order_by('-documento_anexado__data_ultima_atualizacao')
+        return self.all().order_by('-documento_anexado__id')
 
 
 @reversion.register()

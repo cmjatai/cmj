@@ -21,7 +21,7 @@
     </div>
 
     <div class="item-raiz pt-4">
-      {% if object.metadata.zipfile.keys|length == 1 %}
+      {% if False and object.metadata.zipfile.keys|length == 1 %}
         <div class="d-inline-block float-left pr-3">
           {% with object as d %}
 
@@ -41,6 +41,23 @@
           {% endwith %}
         </div>
       {% endif %}
+      <div class="links-texto">
+        {% if object.texto_integral %}
+          <a
+            {% if object.visibilidade == object.STATUS_DOC_ADM_PUBLICO %}
+              target="_blank"
+              class="link-texto"
+              title="Mídia Digital"
+              href="{{object.texto_integral.url}}?u={% now "u"%}"
+            {% else %}
+              class="link-texto text-red"
+              title="Mídia Digital - Acesso Restrito"
+            {% endif %}
+            >
+            <i class="far fa-2x fa-file-{% if '.pdf' in object.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
+          </a>
+        {% endif %}
+      </div>
 
       <strong>Data do documento:</strong> {{object.data}} | {{object.tipo}} | {{object.tipo.sigla}} {{object.numero}}/{{object.ano}}
       {% if object.paginas %}<br><strong>Número de Página(s):</strong> {{object.paginas}}{% endif %}

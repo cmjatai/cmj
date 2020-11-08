@@ -7,22 +7,27 @@
 <div {% if not d.anexo_de.first %}class="item-raiz"{% else %}class="item-node"{% endif %}>
   {% if d.anexo_de.first %}
     <div class="parent">
-      <strong>Nº </strong>
+      {% if forloop %}
+        <strong>Nº </strong>
           {{forloop.revcounter}} - Vinculado a: {{d.anexo_de.first}}
+      {% endif %}
     </div>
-    {% if not user.is_superuser %}
-      <div class="parent-right">
-        <small>
-          Última Atualização: {{d.data_ultima_atualizacao}}
-        </small>
-      </div>
-    {% endif %}
-  {% else %}
+  {% endif %}
 
-    <div class="parent-right">
+  <div class="parent-right">
+    {% if perms.add_documentoadministrativo %}
+      {% if d.visibilidade == d.STATUS_DOC_ADM_PUBLICO %}
+        <span class="bg-green">Última Atualização: {{d.data_ultima_atualizacao}}</span>
+      {% elif d.visibilidade == d.STATUS_DOC_ADM_RESTRITO %}
+        <span class="bg-yellow">Última Atualização: {{d.data_ultima_atualizacao}}</span>
+      {% elif d.visibilidade == d.STATUS_DOC_ADM_PRIVADO %}
+        <span class="bg-red">Última Atualização: {{d.data_ultima_atualizacao}}</span>
+      {% endif %}
+    {% else %}
       Última Atualização: {{d.data_ultima_atualizacao}}
+    {% endif %}
     </div>
-{% endif %}
+
 
   {% if not render_widget_file or render_widget_file_list == False%}
     <div class="links-texto">

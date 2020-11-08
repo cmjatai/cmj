@@ -46,6 +46,9 @@
         <br>
         {% if d.visibilidade != d.STATUS_DOC_ADM_PRIVADO %}
           <strong>Data do documento:</strong> {{d.data}}
+          {% if d.epigrafe %}
+           | {{d.tipo}} | {{d.tipo.sigla}} {{d.numero}}/{{d.ano}}
+          {% endif %}
           {% if d.paginas %}| <strong>Número de Página(s):</strong> {{d.paginas}}{% endif %}
           {% if d.protocolo_gr.exists %}
             <strong>Protocolo:</strong> {{ d.protocolo_gr.first.epigrafe}}

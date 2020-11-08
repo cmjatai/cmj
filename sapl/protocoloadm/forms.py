@@ -1353,6 +1353,13 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
         required=False
     )
 
+    visibilidade = forms.ChoiceField(
+        required=False,
+        label=DocumentoAdministrativo._meta.get_field(
+            'visibilidade').verbose_name,
+        choices=DocumentoAdministrativo.PRIVACIDADE_DOC_ADM_STATUS,
+        widget=forms.Select(attrs={'class': 'selector'}))
+
     class Meta:
         model = DocumentoAdministrativo
         fields = [
@@ -1381,6 +1388,7 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
             'tipo_materia',
             'numero_materia',
             'ano_materia',
+            'visibilidade',
             'workspace'
         ]
 
@@ -1561,7 +1569,7 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
             [('tipo_anexador', 6), ('numero_anexador', 3), ('ano_anexador', 3)])
 
         row1 = to_row(
-            [('tipo', 6), ('numero', 3), ('ano', 3)])
+            [('tipo', 5), ('numero', 2), ('ano', 2), ('visibilidade', 3)])
 
         row2 = to_row(
             [('data', 3), ('data_vencimento', 3), ('numero_protocolo', 3), ('ano_protocolo', 3)])
