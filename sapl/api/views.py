@@ -455,10 +455,35 @@ class _DocumentoAdministrativoViewSet(ControlAccessFileForContainerMixin):
     def get_queryset(self):
         qs = ControlAccessFileForContainerMixin.get_queryset(self)
         if self.action == 'texto_integral':
-            pk = self.kwargs['pk']
-            item = qs.filter(pk=pk).first()
 
-            if not item:
+            pk = self.kwargs['pk']
+            if not self.link_share:
+                d = qs.filter(pk=pk).first()
+            else:
+
+                qs = DocumentoAdministrativo.objects.filter(pk=pk)
+
+                item = qs.first()
+
+                if item and item.visibilidade != item.STATUS_DOC_ADM_PUBLICO:
+                    raise PermissionDenied('Arquivo de Acesso restrito!')
+
+                def check_hash_parent(d, hash):
+                    if d.link_share == hash:
+                        return True
+                    while d.documento_anexado_set.exists():
+                        parents = d.documento_anexado_set.all()
+                        for p in parents:
+                            return check_hash_parent(p.documento_principal, hash)
+                    return False
+
+                if check_hash_parent(item, self.link_share):
+                    return qs
+                else:
+                    raise PermissionDenied(
+                        'HashCode de compartilhamento não confere!')
+
+            if not d:
                 qs_new = DocumentoAdministrativo.objects.filter(pk=pk)
                 d = qs_new.first()
 
@@ -474,6 +499,7 @@ class _DocumentoAdministrativoViewSet(ControlAccessFileForContainerMixin):
 
     @action(detail=True)
     def texto_integral(self, request, *args, **kwargs):
+        self.link_share = request.GET.get('hash', '')
         return self.response_file(request, *args, **kwargs)
 
 

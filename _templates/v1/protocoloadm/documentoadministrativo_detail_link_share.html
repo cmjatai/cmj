@@ -48,7 +48,7 @@
               target="_blank"
               class="link-texto"
               title="Mídia Digital"
-              href="{{object.texto_integral.url}}?u={% now "u"%}"
+              href="{{object.texto_integral.url}}?u={% now "u"%}&hash={{object.link_share}}"
             {% else %}
               class="link-texto text-red"
               title="Mídia Digital - Acesso Restrito"
