@@ -1,0 +1,88 @@
+{% for anexado in anexados %}
+  {% if forloop.first %}
+    <div>
+    <strong>Documentos Anexados:</strong>
+    <div class="childs pl-3 mt-2">
+  {% endif %}
+
+    <div class="item-node  pr-0 p-3">
+      <div class="parent">
+        <strong>Nº </strong>
+          {{forloop.revcounter}}
+      </div>
+      {% with anexado.documento_anexado as d %}
+        <div class="links-texto">
+          {% if d.texto_integral %}
+            <a
+              {% if d.visibilidade == d.STATUS_DOC_ADM_PUBLICO %}
+                target="_blank"
+                class="link-texto"
+                title="Mídia Digital"
+                href="{{d.texto_integral.url}}?u={% now "u"%}"
+              {% else %}
+                class="link-texto text-red"
+                title="Mídia Digital - Acesso Restrito"
+              {% endif %}
+              >
+              <i class="far fa-2x fa-file-{% if '.pdf' in d.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
+            </a>
+          {% endif %}
+        </div>
+
+        <div class="parent-right text-right">
+          <strong>Última Atualização: </strong>{{d.auditlog.last_action_user.timestamp}}.
+          <strong>Por:</strong> {{d.auditlog.last_action_user.user.first_name}}<br>
+          <strong>Adicionado em: </strong>{{d.auditlog.first_action_user.timestamp}}.
+          <strong>Por:</strong> {{d.auditlog.first_action_user.user.first_name}}
+        </div>
+
+        <span class="item-titulo">
+          {% if d.visibilidade != d.STATUS_DOC_ADM_PRIVADO %}
+            {{ d }}
+          {% else %}
+            xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+          {% endif %}
+        </span>
+        <br>
+        {% if d.visibilidade != d.STATUS_DOC_ADM_PRIVADO %}
+          <strong>Data do documento:</strong> {{d.data}}
+          {% if d.paginas %}| <strong>Número de Página(s):</strong> {{d.paginas}}{% endif %}
+          {% if d.protocolo_gr.exists %}
+            <strong>Protocolo:</strong> {{ d.protocolo_gr.first.epigrafe}}
+          {% endif %}
+
+          {% if d.data_vencimento %}
+            <br><small>Data de Vencimento: {{d.data_vencimento}}</small>
+          {% endif %}
+
+          {% if d.interessado %}
+            <br><strong>Interessado:</strong>&nbsp;{{ d.interessado|default_if_none:"Não informado"}}
+          {% endif %}
+        {% endif %}
+
+        {% if d.assunto %}
+          <div class="text-ementa">
+            {% if d.visibilidade != d.STATUS_DOC_ADM_PRIVADO %}
+              {{ d.assunto|safe }}
+            {% else %}
+              xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+            {% endif %}
+          </div>
+        {% endif %}
+
+        {% with d.documento_principal_set.childs_anexados as anexados %}
+          {% include "protocoloadm/documentoadministrativo_item_detail_link_share.html" %}
+        {% endwith %}
+
+      {% endwith %}
+
+
+
+
+    </div>
+
+  {% if forloop.last %}
+    </div>
+    </div>
+  {% endif %}
+{% endfor %}

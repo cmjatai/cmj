@@ -3,11 +3,12 @@
 {% load common_tags %}
 
 
-<div {% if not d.anexo_de.first %}class="item-raiz"{% else %}class="item-node"{% endif %}>
 
+<div {% if not d.anexo_de.first %}class="item-raiz"{% else %}class="item-node"{% endif %}>
   {% if d.anexo_de.first %}
     <div class="parent">
-      Vinculado a: {{d.anexo_de.first}}
+      <strong>Nº </strong>
+          {{forloop.revcounter}} - Vinculado a: {{d.anexo_de.first}}
     </div>
     {% if not user.is_superuser %}
       <div class="parent-right">
@@ -17,20 +18,6 @@
       </div>
     {% endif %}
   {% else %}
-    {% if d.link_share and user in d.workspace.operadores.all %}
-      <div class="alert alert-secondary">
-        <strong>ATENÇÃO... <span class="text-maroon">Use o link abaixo para compartilhar!!!</span></strong><br>
-        <div class="form-clickboard input-group input-group-sm d-flex">
-          <input class="form-control" readonly="readonly" type="text" value="https://www.jatai.go.leg.br{% url 'sapl.protocoloadm:documentoadministrativo_detail_hash' d.link_share  d.pk %}" id="input-copy-clipboard">
-          <div class="input-group-append">
-            <button onclick="copyInputClipboard()" class="btn btn-outline-primary" type="button">
-              <i class="fas fa-clipboard"></i> Copiar Link
-            </button>
-          </div>
-        </div>
-      </div>
-    {% endif %}
-
 
     <div class="parent-right">
       Última Atualização: {{d.data_ultima_atualizacao}}
@@ -74,17 +61,13 @@
     {% endif %}
   {% endif %}
 
-
-
   {% if d.data_vencimento %}
     <br><small>Data de Vencimento: {{d.data_vencimento}}</small>
   {% endif %}
 
   {% if d.assunto %}
-
     <div class="text-ementa">{{ d.assunto|safe }}</div>
   {% endif %}
-
 
   <small>
     {% if d.interessado %}
@@ -136,6 +119,21 @@
       (<small><i>{{d.materia.ementa}}</i></small>)
     </div>
   {% endif %}
+
+  {% if d.link_share and user in d.workspace.operadores.all %}
+    <div class="alert alert-secondary my-0">
+      <strong>ATENÇÃO... <span class="text-maroon">Use o link abaixo para compartilhar!!!</span></strong><br>
+      <div class="form-clickboard input-group input-group-sm d-flex">
+        <input class="form-control" readonly="readonly" type="text" value="https://www.jatai.go.leg.br{% url 'sapl.protocoloadm:documentoadministrativo_detail_hash' d.link_share  d.pk %}" id="input-copy-clipboard">
+        <div class="input-group-append">
+          <button onclick="copyInputClipboard()" class="btn btn-outline-primary" type="button">
+            <i class="fas fa-clipboard"></i> Copiar Link
+          </button>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
 
   {% for anexado in d.documento_principal_set.childs_anexados %}
     {% if forloop.first %}

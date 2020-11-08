@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% block sections_nav %}{% endblock  %}
+{% block title %}
+<h1 class="page-header">
+  {% if object.epigrafe %}
+    {{object.epigrafe}}
+  {% else %}
+    {{object.tipo.sigla}} - {{object.tipo}} - nº {{object.numero}}/{{object.ano}}
+  {% endif %}
+</h1>
+{% endblock title %}
+
+{% block base_content %}
+  <div class="item-listas">
+
+    <div class="parent-right text-right">
+        <strong>Última Atualização: </strong>{{object.auditlog.last_action_user.timestamp}}.
+        <strong>Por:</strong> {{object.auditlog.last_action_user.user.first_name}}<br>
+        <strong>Adicionado em: </strong>{{object.auditlog.first_action_user.timestamp}}.
+        <strong>Por:</strong> {{object.auditlog.first_action_user.user.first_name}}
+    </div>
+
+    <div class="item-raiz pt-4">
+      {% if object.metadata.zipfile.keys|length == 1 %}
+        <div class="d-inline-block float-left pr-3">
+          {% with object as d %}
+
+            {% if not d.documento_anexado_set.exists and d.documento_principal_set.exists or d.documentoacessorioadministrativo_set.exists %}
+              <div class="float-right d-inline-flex flex-wrap">
+                {% with d.metadata.zipfile.keys|length as zip_count %}
+                  {% for zn in d.metadata.zipfile.keys %}
+                    <a class="text-black-50"
+                    title="{% if zip_count > 1 %}Foi necessário segmentar o download dos arquivos do processo. Baixar parte {{forloop.counter}} de {{zip_count}}{% else %}Baixar arquivo compactado contendo todos os arquivos públicos do processo.{% endif %}"
+                    href="{% url 'sapl.protocoloadm:documentoadministrativo_detail_hash' d.link_share d.id %}?download={{zn}}">
+                      <i class="fas fa-2x fa-download">{% if zip_count > 1%}{{forloop.counter}}{% endif %}</i>
+                    </a>
+                  {% endfor %}
+                {% endwith %}
+              </div>
+            {% endif %}
+          {% endwith %}
+        </div>
+      {% endif %}
+
+      <strong>Data do documento:</strong> {{object.data}} | {{object.tipo}} | {{object.tipo.sigla}} {{object.numero}}/{{object.ano}}
+      {% if object.paginas %}<br><strong>Número de Página(s):</strong> {{object.paginas}}{% endif %}
+      {% if object.protocolo_gr.exists %}
+        {% if perms.detail_protocolo %}
+          <strong>Protocolo:</strong>&nbsp;<a href="{% url 'sapl.protocoloadm:protocolo_mostrar' object.protocolo_gr.first.id %}">{{ object.protocolo_gr.first.epigrafe}}</a></br>
+        {% else %}
+          <strong>Protocolo:</strong> {{ object.protocolo_gr.first.epigrafe}}
+        {% endif %}
+      {% endif %}
+
+      {% if object.data_vencimento %}
+        <br><small>Data de Vencimento: {{object.data_vencimento}}</small>
+      {% endif %}
+
+      {% if object.interessado %}
+         <br><strong>Interessado:</strong>&nbsp;{{ object.interessado|default_if_none:"Não informado"}}
+      {% endif %}
+
+      {% if object.assunto %}
+        <div class="text-ementa">{{ object.assunto|safe }}</div>
+      {% endif %}
+
+      <hr>
+
+      {% with object.documento_principal_set.childs_anexados as anexados %}
+        {% include "protocoloadm/documentoadministrativo_item_detail_link_share.html" %}
+      {% endwith %}
+
+    </div>
+  </div>
+{% endblock %}
+
+
+{% comment %}
+
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% load common_tags %}
+
+{% block title %}
+<h1 class="page-header"> link share
+  {% if object.epigrafe %}
+    {{object.epigrafe}}
+  {% else %}
+    {{object.tipo.sigla}} - {{object.tipo}} nº {{object.numero}}/{{object.ano}}
+  {% endif %}
+  {% if object.interessado %}
+    <br>
+    <small>({{object.interessado}})</small>
+  {% endif %}
+</h1>
+{% endblock title %}
+
+{% block detail_content %}
+
+  <div class="item-listas">
+
+          {% with True as render_widget_file %}
+            {% with object as d %}
+              {% include "protocoloadm/documentoadministrativo_item_filter.html" %}
+            {% endwith %}
+          {% endwith %}
+
+          {% for principal in object.documento_anexado_set.all %}
+            {% if forloop.first %}
+              <div class="item-raiz anexador">
+              <strong>Anexado a:</strong>
+              <ul>
+            {% endif %}
+            <li>
+              {% with principal.documento_principal as d %}
+                <a class="item-titulo" href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' object.pk %}">{{ d }}</a>
+                {% if object.certidao %}
+                  <br><small>
+                  <a class="text-danger" href="{% url 'cmj.core:certidaopublicacao_detail' object.certidao.id %}">Certidão de Publicação nº {{object.certidao.id|stringformat:"06d" }} de {{object.certidao.created}}</a>
+                  </small>
+                {% endif %}
+                <br><strong>Data do documento:</strong> {{object.data}} | {{object.tipo}} | {{object.tipo.sigla}} {{object.numero}}/{{object.ano}}
+
+                {% if object.protocolo_gr.exists %}
+                  |
+                  {% if perms.detail_protocolo %}
+                    <strong>Protocolo:</strong>&nbsp;<a href="{% url 'sapl.protocoloadm:protocolo_mostrar' object.protocolo_gr.first.id %}">{{ object.protocolo_gr.first.epigrafe}}</a></br>
+                  {% else %}
+                    <strong>Protocolo:</strong> {{ object.protocolo_gr.first.epigrafe}}
+                  {% endif %}
+                {% endif %}
+
+
+                {% if object.assunto %}
+                  <div class="text-ementa">{{ object.assunto|safe }}</div>
+                {% endif %}
+
+
+                <small>
+                  {% if object.interessado %}
+                    <strong>Interessado:</strong>&nbsp;{{ object.interessado|default_if_none:"Não informado"}}</br>
+                  {% endif %}
+
+                  {% define object.tramitacaoadministrativo_set.first as tram %}
+                  {% if tram.unidade_tramitacao_destino %}
+                    <strong>Localização Atual:</strong> &nbsp;{{tram.unidade_tramitacao_destino}}</br>
+                    <strong>Status:</strong> {{tram.status}}
+                  {% endif %}
+                  {% if not object.anexo_de.first %}
+                    {% if object.tramitacao and not perms.protocoloadm.detail_documentoadministrativo and object.workspace.tipo == object.workspace.TIPO_PUBLICO and mail_service_configured %}
+                      <br><a class="btn btn-sm btn-outline-primary" href="{% url 'sapl.protocoloadm:acompanhar_documento' object.id %}">Acompanhar Tramitação</a>
+                    {% endif %}
+                  {% endif %}
+                  </small>
+                {% endwith %}
+                  </li>
+                {% if forloop.last %}
+                  </ul>
+                </div>
+                {% endif %}
+              {% endfor %}
+  </div>
+
+  {{ block.super }}
+
+{% endblock detail_content %}
+{% endcomment %}

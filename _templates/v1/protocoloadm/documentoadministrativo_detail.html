@@ -3,6 +3,20 @@
 {% load crispy_forms_tags %}
 {% load common_tags %}
 
+{% block title %}
+<h1 class="page-header">
+  {% if object.epigrafe %}
+    {{object.epigrafe}}
+  {% else %}
+    {{object.tipo.sigla}} - {{object.tipo}} nº {{object.numero}}/{{object.ano}}
+  {% endif %}
+  {% if object.interessado %}
+    <br>
+    <small>({{object.interessado}})</small>
+  {% endif %}
+</h1>
+{% endblock title %}
+
 {% block detail_content %}
 
   <div class="item-listas">

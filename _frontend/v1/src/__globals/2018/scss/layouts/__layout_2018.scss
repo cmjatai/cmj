@@ -8,7 +8,7 @@
     position: absolute;
     right: $grid-gutter-width / 2;
     margin-top: $grid-gutter-width / -3;
-    
+
     a {
       border: 1px solid darken($color_main_bg, 1%);
       font-family: Lato;
@@ -20,7 +20,7 @@
     }
   }
 
-  .legend, legend { 
+  .legend, legend {
     clear:both;
     display: block;
     width: 100%;
@@ -84,7 +84,7 @@
     font-size: 120%;
     padding-right: 0.5em;
   }
-  
+
   .childs {
     .text-ementa {
       font-size: 110%;
@@ -104,13 +104,13 @@
       font-size: 75%;
     }
   }
-  
+
   .item-node {
     position: relative;
     border:1px solid #fffa;
     border-right-width: 0;
     border-bottom-width: 0;
-    
+
     &:hover {
       background-color: rgba(#fff, 0.5);
     }
@@ -123,7 +123,7 @@
       color:#004499;
     }
   }
-  
+
   .parent, .parent-right {
     position: absolute;
     font-size: 0.7em;
@@ -139,10 +139,6 @@
   .parent-right {
     left: auto;
     right: 2px;
-  }
-  
-  button {
-    margin: 0 0 10px 10px;
   }
 
   .col-md-auto {
@@ -354,7 +350,7 @@
   font-size: 1.4rem;
   align-items: center;
   display: flex;
-  
+
   span {
     font-variant: small-caps;
     font-weight: bold;
@@ -364,7 +360,7 @@
     text-decoration: none;
     background: darken($color_main_bg, 30%) $url_bg_png;
   }
-    
+
   &:not(:last-child) {
     margin-bottom: 0.25rem;
   }
@@ -482,7 +478,7 @@
       }
     }
   }
-  
+
   .box-assinatura-eletronica {
     .sig {
       //flex: 1 1 100%;
@@ -504,7 +500,7 @@
       }
     }
   }
-  
+
 }
 
 @media screen and (min-width: 576px) {

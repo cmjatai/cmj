@@ -195,7 +195,31 @@ class User(AbstractBaseUser, PermissionsMixin):
             self, using=using, keep_parents=keep_parents)"""
 
 
+class AuditLogManager(models.Manager):
+    use_for_related_fields = True
+
+    def last_action_user(self):
+        # for_related_fields
+        qs = self.get_queryset()
+        qs = qs.filter(user__isnull=False).first()
+        return qs
+
+    def first_action_user(self):
+        # for_related_fields
+        qs = self.get_queryset()
+        qs = qs.filter(user__isnull=False).last()
+        return qs
+
+    def actions_users(self):
+        # for_related_fields
+        qs = self.get_queryset()
+        qs = qs.filter(user__isnull=False)
+        return qs
+
+
 class AuditLog(models.Model):
+
+    objects = AuditLogManager()
 
     operation_choice = ('C', 'D', 'U')
 
@@ -235,7 +259,6 @@ class AuditLog(models.Model):
                                          db_index=True)
 
     model_name = models.CharField(max_length=100, verbose_name=_('model'),
-
                                   db_index=True)
     app_name = models.CharField(max_length=100,
                                 verbose_name=_('app'),

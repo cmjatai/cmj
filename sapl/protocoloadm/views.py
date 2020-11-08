@@ -330,8 +330,7 @@ class DocumentoAdministrativoCrud(Crud):
             if not self.link_share:
                 return super().get_queryset()
 
-            crud = self.crud
-            qs = crud.model.objects.all()
+            qs = self.model.objects.all()
 
             return qs
 
@@ -377,6 +376,9 @@ class DocumentoAdministrativoCrud(Crud):
                     'sapl.protocoloadm:documentoadministrativo_detail',
                     kwargs={'pk': self.object.pk}
                 ))
+
+            if self.link_share:
+                self.template_name = 'protocoloadm/documentoadministrativo_detail_link_share.html'
 
             context = self.get_context_data(object=self.object)
             return self.render_to_response(context)
