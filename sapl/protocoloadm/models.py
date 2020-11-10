@@ -429,6 +429,9 @@ class DocumentoAdministrativo(CommonMixin):
                               update_fields=update_fields)
             self.texto_integral = texto_integral
 
+        if self.visibilidade != self.STATUS_DOC_ADM_PUBLICO:
+            self.link_share = ''
+
         r = models.Model.save(self, force_insert=force_insert,
                               force_update=force_update,
                               using=using,

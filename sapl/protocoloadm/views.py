@@ -305,7 +305,7 @@ class DocumentoAdministrativoCrud(Crud):
                     'share_create'
                 ),
 
-                'btn-success',
+                'btn-primary',
                 _('Gerar Novo Link Público')
             ]
             return btn
