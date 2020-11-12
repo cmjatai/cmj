@@ -9,12 +9,12 @@
        Mudar para Pesquisa Textual
     </a>
     <button type="button"
-        class="btn btn-warning" 
-        data-trigger="focus" 
+        class="btn btn-warning"
+        data-trigger="focus"
         data-container="body"
         data-toggle="popover"
-        data-placement="top" 
-        title="Sobre a Pesquisa Textual" 
+        data-placement="top"
+        title="Sobre a Pesquisa Textual"
         data-content="Pesquisa Textual é diferente desta pesquisa em que escolhemos filtros específicos, uma pesquisa parametrizada. Na Pesquisa Textual é buscado conteúdo dentro dos documentos através de uma ferramenta sofisticada que leva em consideração as técnicas de escrita da lingua portuguesa. Experimente! No entanto, se você está buscando um conteúdo específico, como por exemplo uma Sessão Especial de Eleição da Mesa Diretora, então a pesquisa parametrizada pode ser o ideal.">
       ?
     </button >
@@ -33,41 +33,49 @@
   {% crispy filter.form %}
 
   {% if show_results %}
-    <div class="container-table">
+    <div class="container">
       <div class="result-count">Total de Sessões: <strong>{{paginator.count}}</strong></div>
-      <table class="table table-striped table-hover">
         {% for s in page_obj %}
-          <tr>
-            <td>
-              <div class="row align-items-center">
-                <div class="col-12 pb-{% if s.url_video %}2{% else %}1{% endif %}">
-                  <strong><a href="{% url 'sapl.sessao:sessaoplenaria_detail' s.id %}">{{s}}</strong></a></br>
-                </div>
+          {% if forloop.counter0|divisibleby:3 %}
+            {% if forloop.counter0 != 0%}
+              </div>
+            {% endif %}
+            <div class="row align-items-stretch">
+          {% endif %}
+            <div class="col-4 d-flex">
+              <div class="card my-3 overflow-hidden">
                 {% if s.url_video %}
-                <div class="col-md-5">
-                  <div class="embed-responsive embed-responsive-16by9">
-                    <iframe id="ytplayer" type="text/html" allowfullscreen
-                    src="https://www.youtube.com/embed/{{ s.url_video|youtube_id }}"
-                    frameborder="0"></iframe>
+                  <div class="car-img-top">
+                    <div class="embed-responsive embed-responsive-16by9">
+                      <iframe id="ytplayer" type="text/html" allowfullscreen
+                      src="https://www.youtube.com/embed/{{ s.url_video|youtube_id }}"
+                      frameborder="0"></iframe>
+                    </div>
                   </div>
-                </div>
                 {% endif %}
-                <div class="col ">
-                  <strong>Abertura:</strong> {{s.data_inicio}}</br>
-                  <strong>Legislatura:</strong> {{s.legislatura}}</br>
-                  <strong>Sessão Legislativa:</strong> {{s.sessao_legislativa}}</br>
-                  <strong>Tipo:</strong> {{s.tipo}}</br>
+                <div class="card-body">
+                  <div class="card-title">
+                    <a href="{% url 'sapl.sessao:sessaoplenaria_detail' s.id %}">{{s}}</a>
+                  </div>
+                  <div class="card-text">
+                    <strong>Abertura:</strong> {{s.data_inicio}}</br>
+                    <strong>Legislatura:</strong> {{s.legislatura}}</br>
+                    <strong>Sessão Legislativa:</strong> {{s.sessao_legislativa}}</br>
+                    <strong>Tipo:</strong> {{s.tipo}}</br>
+                  </div>
                   {% if s.upload_ata %}
-                  <strong><a href="{{s.upload_ata.url}}">Ata da Sessão</strong></a></br>
+                    <a class="btn btn-primary" href="{{s.upload_ata.url}}">Ata da Sessão</a>
                   {% endif %}
                 </div>
               </div>
-            </td>
-          </tr>
+            </div>
+          {% if forloop.last %}
+            </div>
+          {% endif %}
         {% empty  %}
-        <tr><td><h3>Nenhuma Sessão Plenária encontrada com essas especificações</h3></tr>
+          <h3>Nenhuma Sessão Plenária encontrada com essas especificações</h3>
         {% endfor %}
-      </table>
+      </div>
       {% include "paginacao.html" %}
     </div>
   {% endif %}
