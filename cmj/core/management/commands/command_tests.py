@@ -1,6 +1,8 @@
 
+import cv2
 from datetime import datetime, timedelta
 import logging
+import math
 import os
 import shutil
 import stat
@@ -26,6 +28,7 @@ from django.db.models import F, Q
 from django.db.models.signals import post_delete, post_save, pre_save
 from django.utils import timezone, formats
 from endesive import pdf
+import pytube
 
 from cmj.core.models import OcrMyPDF
 from cmj.signals import Manutencao
@@ -33,10 +36,91 @@ from cmj.utils import ProcessoExterno
 from sapl.compilacao.models import Dispositivo
 from sapl.materia.models import MateriaLegislativa
 from sapl.protocoloadm.models import DocumentoAdministrativo
+from sapl.sessao.models import SessaoPlenaria
+import speech_recognition as sr
 
 
 def _get_registration_key(model):
     return '%s_%s' % (model._meta.app_label, model._meta.model_name)
+
+
+class FrameExtractor():
+    '''
+    Class used for extracting frames from a video file.
+    '''
+
+    def __init__(self, video_path):
+        self.video_path = video_path
+        self.vid_cap = cv2.VideoCapture(video_path)
+        self.n_frames = int(self.vid_cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        self.fps = int(self.vid_cap.get(cv2.CAP_PROP_FPS))
+
+        self.frames = []
+
+    def reload(self):
+        if not self.vid_cap.isOpened():
+            self.vid_cap = cv2.VideoCapture(self.video_path)
+
+        frame_cnt = 0
+
+        self.frames = []
+
+        while self.vid_cap.isOpened():
+
+            success, image = self.vid_cap.read()
+
+            if not success:
+                break
+
+            frame_cnt += 1
+
+            print(frame_cnt)
+            # self.frames.append(image)
+        print(frame_cnt)
+
+        self.vid_cap.release()
+        cv2.destroyAllWindows()
+
+    def get_video_duration(self):
+        duration = self.n_frames / self.fps
+        print(f'Duration: {timedelta(seconds=duration)}')
+
+    def get_n_images(self, every_x_frame):
+        n_images = math.floor(self.n_frames / every_x_frame) + 1
+        print(
+            f'Extracting every {every_x_frame} (nd/rd/th) frame would result in {n_images} images.')
+
+    def extract_frames(self, every_x_frame, img_name, dest_path=None, img_ext='.jpg'):
+        if not self.vid_cap.isOpened():
+            self.vid_cap = cv2.VideoCapture(self.video_path)
+
+        if dest_path is None:
+            dest_path = os.getcwd()
+        else:
+            if not os.path.isdir(dest_path):
+                os.mkdir(dest_path)
+                print(f'Created the following directory: {dest_path}')
+
+        frame_cnt = 0
+        img_cnt = 0
+
+        while self.vid_cap.isOpened():
+
+            success, image = self.vid_cap.read()
+
+            if not success:
+                break
+
+            if frame_cnt % every_x_frame == 0:
+                img_path = os.path.join(dest_path, ''.join(
+                    [img_name, '_', str(img_cnt), img_ext]))
+                cv2.imwrite(img_path, image)
+                img_cnt += 1
+
+            frame_cnt += 1
+
+        self.vid_cap.release()
+        cv2.destroyAllWindows()
 
 
 class Command(BaseCommand):
@@ -50,6 +134,56 @@ class Command(BaseCommand):
         post_delete.disconnect(dispatch_uid='cmj_post_delete_signal')
         post_save.disconnect(dispatch_uid='cmj_post_save_signal')
 
+        # sps = SessaoPlenaria.objects.filter(
+        #    url_video__icontains='https').order_by('-id')
+
+        #sp = sps.first()
+        # print(sp.url_video)
+
+        #yt = pytube.YouTube(sp.url_video)
+
+        # path_audio = yt.streams.filter(
+        # type="audio").order_by('abr').asc().first().download('/tmp',
+        # 'teste.mp4', skip_existing=True)
+
+        path_audio = '/tmp/teste.wav'
+        print(path_audio)
+
+        # use the audio file as the audio source
+        r = sr.Recognizer()
+        with sr.AudioFile(path_audio) as source:
+            # read the entire audio file
+            audio = r.record(source, duration=60, offset=3080)
+
+        # recognize speech using Google Speech Recognition
+        try:
+            # for testing purposes, we're just using the default API key
+            # to use another API key, use `r.recognize_google(audio, key="GOOGLE_SPEECH_RECOGNITION_API_KEY")`
+            # instead of `r.recognize_google(audio)`
+            print("Google Speech Recognition thinks you said " +
+                  r.recognize_google(audio,  language='pt-BR'))
+        except sr.UnknownValueError:
+            print("Google Speech Recognition could not understand audio")
+        except sr.RequestError as e:
+            print(
+                "Could not request results from Google Speech Recognition service; {0}".format(e))
+
+        #
+        #
+        #
+        #
+        #
+        #
+        #
+        #
+        return
+        path_video = '/home/leandro/Vídeos/video-aula/tela_2.mp4'
+        fe = FrameExtractor(path_video)
+        fe.reload()
+        print(fe.n_frames, fe.fps)
+        print(fe.get_video_duration())
+
+        return
         pre_save.disconnect(
             dispatch_uid='cmj_pre_save_signed_sapl_protocoloadm_documentoadministrativo')
 

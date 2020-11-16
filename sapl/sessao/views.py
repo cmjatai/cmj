@@ -16,6 +16,7 @@ from django.utils import timezone
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import method_decorator
 from django.utils.html import strip_tags
+from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import FormView, ListView, TemplateView, CreateView, UpdateView
@@ -224,7 +225,7 @@ def abrir_votacao(request, pk, spk):
     return HttpResponseRedirect(success_url)
 
 
-def customize_link_materia(context, pk, has_permission, is_expediente):
+def customize_link_materia(context, pk, has_permission, is_expediente, user=None):
     for i, row in enumerate(context['rows']):
         materia = context['object_list'][i].materia
         obj = context['object_list'][i]
@@ -248,6 +249,10 @@ def customize_link_materia(context, pk, has_permission, is_expediente):
             'materia__tipo').order_by(
             '-data_tramitacao'
         ).first()
+
+        if user and user.is_anonymous:
+            row[2] = (materia.ementa, None)
+
         turno = '  '
         if tramitacao:
             for t in Tramitacao.TURNO_CHOICES:
@@ -536,6 +541,7 @@ def customize_link_materia(context, pk, has_permission, is_expediente):
                                  (resultado_descricao,
                                   resultado_observacao))
         context['rows'][i][3] = (resultado, None)
+
     return context
 
 
@@ -604,7 +610,7 @@ class MateriaOrdemDiaCrud(MasterDetailCrud):
 
     class BaseMixin(MasterDetailCrud.BaseMixin):
         list_field_names = ['numero_ordem', 'materia',
-                            ('materia__ementa', '', 'observacao'),
+                            ('materia__ementa', '', 'observacao', 'url_video'),
                             'resultado']
 
     class CreateView(MasterDetailCrud.CreateView):
@@ -637,6 +643,12 @@ class MateriaOrdemDiaCrud(MasterDetailCrud):
     class DetailView(MasterDetailCrud.DetailView):
         layout_key = 'OrdemDiaDetail'
 
+        def hook_observacao(self, *args, **kwargs):
+            if self.request.user.is_anonymous:
+                return '', ''
+            else:
+                return _('Observação'), args[0].observacao.replace('\n', '<br>')
+
     class ListView(MasterDetailCrud.ListView):
         paginate_by = None
         ordering = ['numero_ordem', 'materia', 'resultado']
@@ -644,7 +656,19 @@ class MateriaOrdemDiaCrud(MasterDetailCrud):
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
             has_permition = self.request.user.has_module_perms(AppConfig.label)
-            return customize_link_materia(context, self.kwargs['pk'], has_permition, False)
+            return customize_link_materia(context, self.kwargs['pk'], has_permition, False, self.request.user)
+
+        def hook_header_materiaementa(self, *args, **kwargs):
+            return _('Ementa')
+
+        def hook_header_url_video(self, *args, **kwargs):
+            return ''
+
+        def hook_header_observacao(self, *args, **kwargs):
+            if self.request.user.is_anonymous:
+                return ''
+            else:
+                return _('Observação')
 
 
 def recuperar_materia(request):
@@ -673,7 +697,7 @@ class ExpedienteMateriaCrud(MasterDetailCrud):
 
     class BaseMixin(MasterDetailCrud.BaseMixin):
         list_field_names = ['numero_ordem', 'materia',
-                            ('materia__ementa', '', 'observacao'),
+                            ('materia__ementa', '', 'observacao', 'url_video'),
                             'resultado']
 
     class ListView(MasterDetailCrud.ListView):
@@ -683,7 +707,19 @@ class ExpedienteMateriaCrud(MasterDetailCrud):
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
             has_permition = self.request.user.has_module_perms(AppConfig.label)
-            return customize_link_materia(context, self.kwargs['pk'], has_permition, True)
+            return customize_link_materia(context, self.kwargs['pk'], has_permition, True, user=self.request.user)
+
+        def hook_header_materiaementa(self, *args, **kwargs):
+            return _('Ementa')
+
+        def hook_header_url_video(self, *args, **kwargs):
+            return ''
+
+        def hook_header_observacao(self, *args, **kwargs):
+            if self.request.user.is_anonymous:
+                return ''
+            else:
+                return _('Observação')
 
     class CreateView(MasterDetailCrud.CreateView):
         form_class = ExpedienteMateriaForm
@@ -716,6 +752,12 @@ class ExpedienteMateriaCrud(MasterDetailCrud):
     class DetailView(MasterDetailCrud.DetailView):
 
         layout_key = 'ExpedienteMateriaDetail'
+
+        def hook_observacao(self, *args, **kwargs):
+            if self.request.user.is_anonymous:
+                return '', ''
+            else:
+                return _('Observação'), args[0].observacao.replace('\n', '<br>')
 
 
 # Orador das Explicações Pessoais

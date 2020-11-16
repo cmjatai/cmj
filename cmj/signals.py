@@ -55,5 +55,5 @@ class Manutencao():
                     dua = f
                     # print(dua)
                     if hasattr(dua, 'auto_now') and dua.auto_now:
-                        print(m, 'desativando auto_now')
+                        #print(m, 'desativando auto_now')
                         dua.auto_now = False

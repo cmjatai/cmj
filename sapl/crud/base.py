@@ -431,7 +431,7 @@ class CrudListView(PermissionRequiredContainerCrudMixin, ListView):
                     hook = 'hook_header_{}'.format(''.join(fn))
                     if hasattr(self, hook):
                         header = getattr(self, hook)()
-                        s.append(header)
+                        s.append(force_text(header))
                     else:
                         s.append(force_text(f.verbose_name))
                 else:
@@ -440,7 +440,7 @@ class CrudListView(PermissionRequiredContainerCrudMixin, ListView):
                         header = getattr(self, hook)()
                         s.append(header)
 
-            s = ' / '.join(s)
+            s = ' / '.join(filter(lambda x: x, s))
             r.append(s)
         return r
 

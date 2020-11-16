@@ -14,7 +14,7 @@
     var ano_materia = $("#id_ano_materia").val()
 
     if (tipo_materia && numero_materia && ano_materia) {
-      $.get("/sessao/recuperar-materia", {
+      $.get("{% url 'sapl.sessao:recuperar_materia' %}", {
           tipo_materia: tipo_materia,
           numero_materia: numero_materia,
           ano_materia: ano_materia
@@ -37,7 +37,7 @@
     $(fields[i]).change(recuperar_materia);
   }
   recuperar_materia()
-  
+
   $(document).ready(function(){
     $("select[name='tipo_votacao']").children("option[value='4']").remove();
     $('#id_apenas_leitura').change(function(event){
@@ -52,7 +52,7 @@
       }
     })
   });
-  
+
 </script>
 
 {% endblock %}

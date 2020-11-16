@@ -31,7 +31,7 @@
         window.open("{% url 'sapl.painel:voto_individual' %}",'Voto Individual','width=1000, height=800, scrollbars=yes');
       };
     });
-    
+
     {% if perms.sessao.add_ordemdia %} {# DJANGO template #}
       $('tbody').sortable({
         start: function(event, ui) {

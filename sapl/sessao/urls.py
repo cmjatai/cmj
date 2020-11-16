@@ -67,7 +67,8 @@ urlpatterns = [
         remove_parlamentar_composicao,
         name='remove_parlamentar_composicao'),
 
-    url(r'^sessao/recuperar-materia/', recuperar_materia),
+    url(r'^sessao/recuperar-materia/',
+        recuperar_materia, name="recuperar_materia"),
     url(r'^sessao/recuperar-numero-sessao/',
         recuperar_numero_sessao_view,
         name='recuperar_numero_sessao_view'

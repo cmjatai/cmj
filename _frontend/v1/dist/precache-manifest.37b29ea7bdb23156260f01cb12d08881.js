@@ -24,8 +24,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/brasao/brasao_64.png"
   },
   {
-    "revision": "4839c2838a645b2819b7",
-    "url": "/static/css/app.9da792ca.css"
+    "revision": "0da72d12739f653332d2",
+    "url": "/static/css/app.8f00261e.css"
   },
   {
     "revision": "3ff0c3832aa07532f785",
@@ -316,11 +316,11 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/user.png"
   },
   {
-    "revision": "b9cf7a56f6a6ea5be5639a6520b46aa7",
+    "revision": "8107bc0d8da31f1b7c241fb36875c75b",
     "url": "/static/index.html"
   },
   {
-    "revision": "4839c2838a645b2819b7",
+    "revision": "0da72d12739f653332d2",
     "url": "/static/js/app.4de581d6.js"
   },
   {

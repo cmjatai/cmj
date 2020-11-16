@@ -194,6 +194,14 @@
           {% endif %}
           <tr>
             <td>
+              {% if  rv.ordem.url_video %}
+                <div class="youtube-materia-list mini">
+                  {% with rv.ordem.url_video as url_video %}
+                    {% include 'youtube_widget.html' %}
+                  {% endwith %}
+                </div>
+              {% endif %}
+
               {% if rv.ordem %}
                 <a href="{% url 'sapl.sessao:ordemdia_list' rv.ordem.sessao_plenaria_id %}#id{{object.id}}">
                   {{rv.ordem.sessao_plenaria.str_short}}
@@ -223,6 +231,10 @@
                   </div>
                 {% endif %}
               {% endfor %}
+
+
+
+
             </td>
             <td>
               {{ rv.tipo_votacao }}

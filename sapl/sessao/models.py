@@ -306,8 +306,13 @@ class AbstractOrdemDia(models.Model):
         choices=YES_NO_CHOICES,
         verbose_name=_('Registro de Votação Iniciado?'))
 
+    url_video = models.URLField(
+        max_length=150, blank=True,
+        verbose_name=_('URL Arquivo Vídeo (Formatos MP4 / FLV / WebM)'))
+
     class Meta:
         abstract = True
+        ordering = ('-sessao_plenaria', 'numero_ordem',)
 
     @property
     def ementa(self):
@@ -321,10 +326,9 @@ class AbstractOrdemDia(models.Model):
 @reversion.register()
 class ExpedienteMateria(AbstractOrdemDia):
 
-    class Meta:
+    class Meta(AbstractOrdemDia.Meta):
         verbose_name = _('Matéria do Expediente')
         verbose_name_plural = _('Matérias do Expediente')
-        ordering = ['numero_ordem']
 
 
 @reversion.register()
@@ -456,10 +460,9 @@ class OradorOrdemDia(AbstractOrador):  # OradoresOrdemDia
 @reversion.register()
 class OrdemDia(AbstractOrdemDia):
 
-    class Meta:
+    class Meta(AbstractOrdemDia.Meta):
         verbose_name = _('Matéria da Ordem do Dia')
         verbose_name_plural = _('Matérias da Ordem do Dia')
-        ordering = ['numero_ordem']
 
 
 @reversion.register()

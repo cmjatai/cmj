@@ -310,6 +310,7 @@ class ExpedienteMateriaForm(ModelForm):
     class Meta:
         model = ExpedienteMateria
         fields = ['data_ordem', 'numero_ordem', 'tipo_materia', 'observacao',
+                  'url_video',
                   'numero_materia', 'ano_materia', 'tipo_votacao']
 
     def clean_numero_ordem(self):
@@ -370,7 +371,11 @@ class OrdemDiaForm(ExpedienteMateriaForm):
 
     class Meta:
         model = OrdemDia
-        fields = ['data_ordem', 'numero_ordem', 'tipo_materia', 'observacao',
+        fields = ['data_ordem',
+                  'numero_ordem',
+                  'tipo_materia',
+                  'observacao',
+                  'url_video',
                   'numero_materia', 'ano_materia', 'tipo_votacao']
 
     def clean_data_ordem(self):

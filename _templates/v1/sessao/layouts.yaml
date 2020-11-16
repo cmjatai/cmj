@@ -9,7 +9,7 @@ SessaoPlenaria:
   - data_inicio:5  hora_inicio:5  iniciada
   - data_fim:5  hora_fim:5  finalizada
   - upload_pauta  upload_ata  upload_anexo
-  - url_audio  url_video
+  - url_audio url_video
 
 SessaoSolene:
   {% trans 'Dados Básicos' %}:
@@ -18,7 +18,7 @@ SessaoSolene:
   - data_fim:5  hora_fim:5  finalizada
   - tema_solene
   - upload_pauta  upload_ata  upload_anexo
-  - url_audio  url_video
+  - url_audio url_video
 
 TipoResultadoVotacao:
   {% trans 'Tipo de Resultado da Votação' %}:
@@ -53,12 +53,12 @@ OradorOrdemDia:
   - numero_ordem parlamentar
   - url_discurso observacao
   - upload_anexo
-  
+
 ExpedienteMateria:
   {% trans 'Matéria do Expediente' %}:
   - data_ordem numero_ordem
   - tipo_materia numero_materia ano_materia
-  - tipo_votacao
+  - tipo_votacao url_video:7
   - apenas_leitura
   - observacao
 
@@ -66,7 +66,7 @@ OrdemDia:
   {% trans 'Matéria da Ordem do Dia' %}:
   - data_ordem numero_ordem
   - tipo_materia numero_materia ano_materia
-  - tipo_votacao
+  - tipo_votacao url_video:7
   - apenas_leitura
   - observacao
 
@@ -76,6 +76,7 @@ ExpedienteMateriaDetail:
   - ementa
   - tipo_votacao
   - observacao
+  - url_video
 
 OrdemDiaDetail:
   {% trans 'Matérias da Ordem do Dia' %}:
@@ -83,6 +84,7 @@ OrdemDiaDetail:
   - ementa
   - tipo_votacao
   - observacao
+  - url_video
 
 TipoJustificativa:
   {% trans 'Tipo de Justificativa' %}:
