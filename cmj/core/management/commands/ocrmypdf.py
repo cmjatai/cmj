@@ -180,7 +180,7 @@ class Command(BaseCommand):
         stdout, notused = process.communicate()
         for line in stdout.splitlines():
             line = line.decode("utf-8")
-            pid, cmdline = line.split(' ', 1)
+            pid, cmdline = line.strip().split(' ', 1)
 
             if pid == mypid:
                 continue
