@@ -4,6 +4,7 @@ from rest_framework import serializers
 from rest_framework.relations import StringRelatedField
 
 from sapl.base.models import Autor, CasaLegislativa
+from sapl.parlamentares.models import Parlamentar
 from sapl.protocoloadm.models import DocumentoAdministrativo
 from sapl.sessao.models import SessaoPlenaria
 
@@ -71,3 +72,12 @@ class SessaoPlenariaSerializer(serializers.ModelSerializer):
                 SessaoPlenaria._meta.get_fields()
             )
         ) + ['legislatura']"""
+
+
+class ParlamentarSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Parlamentar
+        exclude = ["fax", "endereco_residencia", "municipio_residencia",
+                   "uf_residencia", "cep_residencia", "telefone_residencia",
+                   "titulo_eleitor", "fax_residencia"]
