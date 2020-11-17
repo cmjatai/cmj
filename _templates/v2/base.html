@@ -134,7 +134,7 @@
       <main class="{% block main_container_class %}{% endblock %}">
 
         {% block second_header %}
-          <div class="second_header" {% block attrs_header %}{% endblock attrs_header%}>
+          <div class="second_header {% block class_header %}{% endblock class_header%}" >
             <div class="container{{fluid}}">
               {% block base_functions %}{% endblock %}
               {% block base_container_header %}

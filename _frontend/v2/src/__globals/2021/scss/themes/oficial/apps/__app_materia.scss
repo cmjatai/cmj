@@ -1,33 +1,35 @@
-.youtube-materia-list {
-  position: relative;
-  opacity: 0.4;
-  padding-left: 10px;
-  padding-bottom: 10px;
-  z-index: 1;
-  float: right;
-  width: 35%;
-  transition: all 0.3s ease-in;
-
-  &:before {
-    content: "";
-    position: absolute;
-    bottom: 0px;
-    left: 0px;
-    width: 1rem;
-    height: 1rem;
-    border-left: 1px solid black;
-    border-bottom: 1px solid black;
+main .header-materia{
+  h1 {
+    padding: 4rem 0 0rem 0;
   }
 
+  .tipo_header {
+    &.materia {
+      color: #4943;
+    }
+  }
+  &:hover {
+    .tipo_header {
+      &.materia {
+        transition: all 0.3s ease;
+        color: #494f;
+      }
+    }
+  }
+}
+
+.container-youtube {
+  position: relative;
+  float: right;
+  width: 35%;
+  z-index: 1;
+  opacity: 0.4;
+  transition: all 0.3s ease-in;
+  padding-left: 1rem;
   &:hover, &:active {
     width: 60%;
     transition: all 0.3s ease-out;
     opacity: 1;
-    margin-left: 10px;
-    padding-left: 5px;
-    &:before {
-      transform: rotate(180deg);
-    }
   }
 }
 
@@ -36,34 +38,80 @@
   align-items: center;
   .inner-content {
     flex: 1 1 0%;
-    border-right: 1px solid #000;
     padding-right: 10px;
   }
-  .youtube-materia-list {
+  .container-youtube {
     flex: 0 0 35%;
     width: auto;
     float: none;
+    padding-left: 0rem;
     &.mini {
       flex: 0 0 20%;
-      padding-left: 0px;
       padding-bottom: 0px;
       padding-right: 10px;
     }
-    &:hover, &:active {
+  }
+  &:hover {
+    .container-youtube {
       width: auto;
       flex: 0 0 60%;
     }
   }
-  &:hover {
-    .youtube-materia-list {
+}
+
+@media screen and (max-width: 767.98px) {
+  main .header-materia{
+    h1 {
+      padding: 3rem 0 0 0;
+      font-size: 1.5rem;
+    }
+    h3 {
+      padding-left: 0rem;
+      font-size: 1.5rem;
     }
   }
+  .container-youtube {
+    opacity: 1;
+    float: none;
+    width: auto;
+    padding-left: 0;
+    padding-bottom: 1rem;
+    margin: 0 -15px;
+    &:hover {
+      width: auto;
+    }
+  }
+  .container-video {
+    .inner-content {
+      border: 0;
+      padding-right: 0;
+    }
+    .container-youtube {
+      margin: 0;
+      &.mini {
+        padding-right: 0;
+        flex: 0 0 50%;
+      }
+    }
+  }
+
 }
 
 @media screen and (max-width: 575.98px) {
 
-  .youtube-materia-list {
-    opacity: 0.7;
-    width: 45%;
+  .container-video {
+    flex-direction: column;
+    .inner-content {
+      border: 0;
+    }
+    .container-youtube {
+      height: 100px;
+      width: 100%;
+
+      &.mini {
+        flex: 0 0 100%;
+      }
+    }
+
   }
 }

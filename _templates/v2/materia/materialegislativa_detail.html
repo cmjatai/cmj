@@ -4,7 +4,7 @@
 {% block head_title %}{{object}}{% endblock head_title %}
 {% block meta_description%}{{object.ementa}}{% endblock meta_description %}
 {% block head_title_sufix %}PortalCMJ{% endblock head_title_sufix %}
-
+{% block class_header %}header-materia{% endblock class_header %}
 {% block widgets_form_css %}
 {% if object.autores.count == 1 and object.autores.first.autor_related.capa %}
   <style>
@@ -27,7 +27,10 @@
 {% block base_container_header %}
   <span class="tipo_header materia">Matéria Legislativa</span>
 
-  <div class="container-avatar float-right my-4 ml-4">
+  {% block title %}{{ block.super }}
+  {% endblock title %}
+
+  <div class="container-avatar float-right">
     {% with object.autores.all.count as count_parlamentares %}
       {% for autor in object.autores.all %}
         {% if forloop.counter0 > 0 and forloop.counter0|organize_direction_horizontal_avatars:count_parlamentares %}
@@ -54,7 +57,8 @@
     {% endwith %}
   </div>
 
-  {{ block.super }}
+  {% block sub_title %}{{ block.super }}
+  {% endblock sub_title %}
 
   <small>
     {% with object.tramitacao_set.first as tram %}
@@ -87,7 +91,7 @@
 {% block detail_content %}
 
   {% if object.url_video %}
-    <div class="youtube-materia-list ">
+    <div class="container-youtube ">
       {% with object.url_video as url_video %}
         {% include 'youtube_widget.html' %}
       {% endwith %}
@@ -164,7 +168,7 @@
             <td>
               <div class="container-video">
                 {% if rv.ordem.url_video %}
-                  <div class="youtube-materia-list mini">
+                  <div class="container-youtube mini">
                     {% with rv.ordem.url_video as url_video %}
                       {% include 'youtube_widget.html' %}
                     {% endwith %}

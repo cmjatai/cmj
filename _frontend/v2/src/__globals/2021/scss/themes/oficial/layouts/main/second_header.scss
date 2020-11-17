@@ -5,13 +5,12 @@ main .second_header{
   flex-direction: column;
   justify-content: flex-end;
 
+  overflow: hidden;
   .tipo_header {
     position: absolute;
     top: 0;
-    font-size: 2.5rem;
-    &.materia {
-      color: #4944;
-    }
+    font-size: 3rem;
+    //left: 1rem;
   }
 
   &::before {
@@ -23,15 +22,24 @@ main .second_header{
     height: 100%;
     opacity: 0.3;
     background-repeat: no-repeat;
-    background-position: 0 30%;
-    background-size: 100% auto;
+    background-position: center center;
+    background-size: cover;
     filter: grayscale(100%);
+    transition: all 0.3s ease;
     z-index: -1;
+  }
+  &:hover {
+    &::before {
+      transition: all 0.3s ease;
+      opacity: 0.8;
+      transform: scale(1.2, 1.2);
+    }
   }
 
   h1 {
     margin: 0;
-    padding: 4rem 0;
+    padding: 1rem 0;
+    font-size: 2.2rem;
   }
 
   h3 {
@@ -39,7 +47,7 @@ main .second_header{
     font-style: italic;
     line-height: 1.2;
     color: $bg_color_portal_cmj;
-    margin: -3.2rem 0 2rem 2rem;
+    padding-left: 2rem;
   }
 
   .nav-tabs {
@@ -59,6 +67,15 @@ main .second_header{
     }
     a {
       padding: 4px 7px;
+    }
+  }
+}
+
+@media screen and (max-width: 767.98px) {
+  main .second_header{
+    .tipo_header {
+      font-size: 2rem;
+      right: 1rem;
     }
   }
 }

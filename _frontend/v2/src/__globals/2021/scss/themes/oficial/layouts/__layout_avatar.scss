@@ -34,6 +34,19 @@ $circle_avatar: (1: 256, 2: 160, 3: 128, 4: 96, 5: 64, 6: 48, 7: 40, 8: 36, 9: 2
   a {
     margin: 0 3px;
   }
+}
 
+
+@media screen and (max-width: 767.98px) {
+
+  $circle_avatar: (1: 192, 2: 128, 3: 96, 4: 64, 5: 36, 6: 48, 7: 40, 8: 36, 9: 24);
+
+
+  @each $i, $size_avatar in $circle_avatar {
+    .avatar#{$i} {
+      width: #{$size_avatar}px;
+      height: #{$size_avatar}px;
+    }
+  }
 
 }

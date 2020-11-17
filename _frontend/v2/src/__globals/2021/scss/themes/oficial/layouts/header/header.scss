@@ -38,7 +38,6 @@ header.main {
     right: 0;
 
   }
-
   #rowlogo {
     align-items: center;
     flex-wrap: nowrap;
@@ -61,6 +60,17 @@ header.main {
       opacity: 1;
     }
   }
+
+  &:hover {
+
+    &::after {
+      transition: all 0.3s ease;
+
+      opacity: 0.2;
+
+    }
+  }
+
 }
 
 

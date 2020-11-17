@@ -1,4 +1,4 @@
-.youtube-materia-list {
+.container-youtube {
   position: relative;
   //right: 0;
   float: right;
@@ -40,7 +40,7 @@
 }
 @media screen and (max-width: 575.98px) {
 
-  .youtube-materia-list {
+  .container-youtube {
     opacity: 0.7;
     width: 45%;
 

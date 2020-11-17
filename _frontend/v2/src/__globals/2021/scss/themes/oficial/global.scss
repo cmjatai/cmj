@@ -24,3 +24,14 @@
   border-right: 4px solid transparent;
   border-left: 4px solid transparent;
 }
+
+
+@media print {
+  .container-youtube,
+  footer, header {
+    display: none !important;
+  }
+  * {
+    color: black !important;
+  }
+}
