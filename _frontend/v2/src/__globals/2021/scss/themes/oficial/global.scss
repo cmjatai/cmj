@@ -1,21 +1,17 @@
 @import './variables';
+
 @import '../__/imports';
 @import '../__/mixins';
-@import './layouts/bootstrap/_btn';
-@import './layouts/bootstrap/_carousel_custom';
 
-@import './layouts/avatar';
-@import './layouts/icons';
+@import './layouts/_layout';
 
-@import './layouts/social_links';
-
-@import './layouts/header/header';
-@import './layouts/main/main';
-@import './layouts/footer/footer';
-
-@import './apps/app_sigad';
-@import './apps/app_materia';
-
+@import './apps/__app_agenda';
+@import './apps/__app_compilacao';
+@import './apps/__app_core';
+@import './apps/__app_materia';
+@import './apps/__app_ouvidoria';
+@import './apps/__app_parlamentares';
+@import './apps/__app_sigad';
 
 .caret {
   display: inline-block;

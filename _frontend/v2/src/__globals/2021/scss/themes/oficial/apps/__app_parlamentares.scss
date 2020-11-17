@@ -1,0 +1,164 @@
+.container-legislaturas {
+  font-family: "Lato";
+  text-align: center;
+  a {
+    color: black;
+    span, small {
+      line-height: 1;
+      display: block;
+    }
+    span {
+      padding-top: 0.5em;
+    }
+    line-height: 2em;
+    text-decoration: none;
+    display: inline-block;
+    vertical-align: top;
+    border: 1px solid transparent;
+  }
+  .active {
+    font-weight: bold;
+    font-size: 140%;
+    background: $hover_background_10p $url_bg_png;
+  }
+  .selected {
+    color:gray;
+    border: 1px solid #bbb;
+    border-radius: 3px;
+  }
+  .tags {
+    display: block;
+    text-align: left;
+    font-size: 130%;
+    font-variant: small-caps;
+    line-height: 1;
+    padding: 5px 0;
+    &:hover {
+      text-decoration: none;
+    } 
+  }
+  .inner-topo {
+    padding: $grid-gutter-width / 2 0;
+  }
+  .inner-sessoes, .inner-legis {
+    a {
+      border-radius: 3px;
+      &:hover:not(.active):not(.inner-titulo):not(.selected) {
+        border-color: $color_topo_bg;
+        background: $color_topo_bg;
+        color: white;
+      }
+    }
+  }
+  .inner-legis {
+    font-size: 120%;
+    border: solid #bbb;
+    border-width: 0px 1px 0 0
+  }
+  .inner-titulo {
+    font-size: 130%;
+    padding: 0 $grid-gutter-width $grid-gutter-width;
+    width: 100%;
+    span {
+      border-radius: 10px;
+      padding: $grid-gutter-width / 2;
+    }
+  }
+  .inner-sessoes {
+    padding: 0 $grid-gutter-width / 2 $grid-gutter-width / 2;
+    a {
+      padding: 0px $grid-gutter-width / 2;
+      margin: $grid-gutter-width / 2 $grid-gutter-width / 3 0;
+      border: 1px solid #bbb;
+    }
+  }
+  .inner-mesa {
+    padding: 0 $grid-gutter-width / 2 $grid-gutter-width / 2;
+    border: solid #bbb;
+    border-width: 1px 0 0 1px;
+    margin-left: -$grid-gutter-width / 2 - 1px;
+  }
+
+  .inner-parlamentares {
+    background: $hover_background_05p;
+    .inner-ativos {
+      padding: $grid-gutter-width / 2;
+    }
+    .avatar {
+      margin: 0.6em;
+    }
+  }
+
+  .inner-parla {
+    display: flex;
+    justify-content: center;
+    a {
+      display: inline-block;
+      flex: 1 1 30%;
+      margin: 5px;
+      img {
+        border: 1px solid #ddd;
+      }
+      &:nth-child(2) {
+        flex-basis: 40%;
+      }
+    }
+  }
+  .inner-extra {
+    background: $hover_background_10p;
+    padding: $grid-gutter-width / 2 0;
+  }
+  .inner-inativos {
+    border: 0 solid #bbb;
+    border-left-width: 1px;
+    .avatar {
+      opacity: 0.35;
+    }
+  }
+}
+
+@media screen and (max-width: 991px) {
+  .container-legislaturas {
+    .avatar3 {
+      width: 100px;
+    }
+  }
+}
+
+@media screen and (max-width: 800px) {
+  .container-legislaturas {
+    .avatar3 {
+      width: 80px;
+    }
+    .inner-parla {
+      a {
+        flex: 0 1 40%;
+        &:nth-child(2) {
+          flex-basis: 50%;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 575px) {
+  .container-legislaturas {
+    .inner-parlamentares .avatar {
+      margin: 0.3em;
+    }
+    .avatar3 {
+      width: 90px;
+      span {
+        font-size: 80%;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .container-legislaturas {
+    .avatar3 {
+      width: 75px;
+    }
+  }
+}

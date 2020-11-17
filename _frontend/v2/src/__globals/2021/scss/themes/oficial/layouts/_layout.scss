@@ -1,0 +1,25 @@
+@import '__layout_bootstrap';
+
+@import './_layout_avatar';
+@import './_layout_icons';
+
+@import './_layout_social_links';
+
+@import './header/header';
+@import './main/main';
+@import './footer/footer';
+
+@import '_layout_forms';
+
+//@import '_layout_2018';
+//@import '_layout_footer';
+@import '_layout_certidao_publicacao';
+@import '_layout_galeria';
+@import '_layout_navbar';
+@import '_layout_noticias_procuradoria';
+@import '_layout_noticias_secundarias';
+@import '_layout_noticias_parlamentares';
+@import '_layout_popup';
+@import '_layout_sidebar';
+@import '_layout_ultimas_publicacoes';
+@import '_layout_videos';

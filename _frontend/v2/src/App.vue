@@ -17,6 +17,11 @@ export default {
     handleScroll: function (event) {
       let h = document.getElementsByTagName('header')[0]
       let u = document.getElementById('user_connected')
+      if (u && window.location.pathname !== '/') {
+        h.classList.remove('header-top')
+        h.classList.add('header-mini')
+        return
+      }
       if (window.scrollY === 0) {
         h.classList.remove('header-mini')
         if (!u && window.location.pathname === '/') {
@@ -41,6 +46,15 @@ export default {
     }
   },
   mounted: function () {
+    let h = document.getElementsByTagName('header')[0]
+    let u = document.getElementById('user_connected')
+
+    if (u && window.location.pathname !== '/') {
+      h.classList.remove('header-top')
+      h.classList.add('header-mini')
+      return
+    }
+
     window.addEventListener('scroll', this.handleScroll)
 
     this.$options.sockets.onmessage = (event) => {
