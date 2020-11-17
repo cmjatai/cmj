@@ -642,6 +642,10 @@ class _TipoProposicaoViewset:
         qs = self.get_queryset()
         qs = qs.filter(
             tipo_autores=request.user.autor_set.first().tipo)
+
+        if qs.exists() and qs[0].tipo_conteudo_related._meta.model == TipoMateriaLegislativa:
+            qs = qs.order_by(
+                'tipomaterialegislativa_set__sequencia_regimental')
         self.queryset = qs
         return self.list(request, *args, **kwargs)
 
