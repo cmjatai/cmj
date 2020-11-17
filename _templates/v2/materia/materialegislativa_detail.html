@@ -56,20 +56,18 @@
 
   {{ block.super }}
 
-
   <small>
     {% with object.tramitacao_set.first as tram %}
       {% if tram and tram.unidade_tramitacao_destino %}
         <strong>Localização Atual:</strong> &nbsp;{{tram.unidade_tramitacao_destino}}</br>
         <strong>Status:</strong> {{tram.status}}<br>
         <strong>Ultima Ação:</strong> {{tram.texto}}<br>
-        <strong>Data da última Tramitação:</strong> {{tram.data_tramitacao}}<br>
-      {% endif %}
+        <strong>Data da última Tramitação:</strong> {{tram.data_tramitacao}}
       <br>
+      <br>
+      {% endif %}
     {% endwith %}
   </small>
-
-
 {% endblock base_container_header %}
 
 {% block sections_nav %}
@@ -78,7 +76,6 @@
   {% endif %}
 {% endblock sections_nav %}
 
-
 {% block extra_actions %}
     {% if object.em_tramitacao and mail_service_configured or user.is_superuser%}
       <div class="actions btn-group btn-group-sm" role="group">
@@ -86,8 +83,6 @@
       </div>
     {% endif %}
 {% endblock extra_actions %}
-
-
 
 {% block detail_content %}
 
@@ -100,8 +95,6 @@
   {% endif %}
 
     {{ block.super }}
-
-
 
   {% if object.documentoadministrativo_set.exists %}
     <p class="control-label">Documentos Administrativos Vinculados a Matéria</p>
@@ -157,7 +150,6 @@
     </div>
   {% endif %}
 
-
   {% if object.registrovotacao_set.exists %}
     <div class="pt-4">
       <table class="table table-striped table-hover">
@@ -170,35 +162,46 @@
           {% endif %}
           <tr>
             <td>
-              {% if rv.ordem %}
-                <a href="{% url 'sapl.sessao:ordemdia_list' rv.ordem.sessao_plenaria_id %}#id{{object.id}}">
-                  {{rv.ordem.sessao_plenaria.str_short}}
-                </a>
-              <br><strong>Data:</strong> {{ rv.ordem.sessao_plenaria.data_inicio}}
-              {% elif rv.expediente %}
-                <a href="{% url 'sapl.sessao:expedientemateria_list' rv.expediente.sessao_plenaria_id %}#id{{object.id}}">
-                  {{rv.expediente.sessao_plenaria.str_short}}
-                </a>
-              <br><strong>Data:</strong> {{ rv.expediente.sessao_plenaria.data_inicio}}
-              {% endif %}
-              <br><strong>{{rv.tipo_resultado_votacao}}</strong>
-              {% if rv.observacao %}
-                - {{rv.observacao}}
-              {% endif %}
-              {% for subscricao in rv.subscricoes.all %}
-                {% if forloop.first %}
-                  <br><br><strong>Subscrições</strong><br>
-                  <div class="container-avatar">
-                {% endif %}
-                    <a class="avatar avatar7"
-                      href="{% url 'sapl.materia:pesquisar_materia'%}?autoria__autor={{subscricao.autor.first.id}}"
-                      title="{{subscricao}}">
-                      <img src="{% cropped_thumbnail subscricao "fotografia_cropping" %}" alt="{{subscricao}}">
-                    </a>
-                {% if forloop.last %}
+              <div class="container-video">
+                {% if rv.ordem.url_video %}
+                  <div class="youtube-materia-list mini">
+                    {% with rv.ordem.url_video as url_video %}
+                      {% include 'youtube_widget.html' %}
+                    {% endwith %}
                   </div>
                 {% endif %}
-              {% endfor %}
+                <div class="inner-content">
+                  {% if rv.ordem %}
+                    <a href="{% url 'sapl.sessao:ordemdia_list' rv.ordem.sessao_plenaria_id %}#id{{object.id}}">
+                      {{rv.ordem.sessao_plenaria.str_short}}
+                    </a>
+                    <br><strong>Data:</strong> {{ rv.ordem.sessao_plenaria.data_inicio}}
+                  {% elif rv.expediente %}
+                    <a href="{% url 'sapl.sessao:expedientemateria_list' rv.expediente.sessao_plenaria_id %}#id{{object.id}}">
+                      {{rv.expediente.sessao_plenaria.str_short}}
+                    </a>
+                  <br><strong>Data:</strong> {{ rv.expediente.sessao_plenaria.data_inicio}}
+                  {% endif %}
+                  <br><strong>{{rv.tipo_resultado_votacao}}</strong>
+                  {% if rv.observacao %}
+                    - {{rv.observacao}}
+                  {% endif %}
+                  {% for subscricao in rv.subscricoes.all %}
+                    {% if forloop.first %}
+                      <br><br><strong>Subscrições</strong><br>
+                      <div class="container-avatar">
+                    {% endif %}
+                        <a class="avatar avatar7"
+                          href="{% url 'sapl.materia:pesquisar_materia'%}?autoria__autor={{subscricao.autor.first.id}}"
+                          title="{{subscricao}}">
+                          <img src="{% cropped_thumbnail subscricao "fotografia_cropping" %}" alt="{{subscricao}}">
+                        </a>
+                    {% if forloop.last %}
+                      </div>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              </div>
             </td>
             <td>
               {{ rv.tipo_votacao }}
@@ -214,6 +217,7 @@
                   <br><strong>{{vp.voto}}</strong> - {{vp.parlamentar}}
                 {% endfor %}
               {% endif %}
+
             </td>
           </tr>
           {% if forloop.last and object.diariosoficiais.exists %}
