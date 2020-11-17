@@ -355,7 +355,13 @@ input[type="radio"] {
   #wrapper.toggled {
     padding: 0px;
   }
-  .masthead, .btn-group, .canais-absolute, .btn, .box-area-trabalho, .context-actions {
+  .masthead,
+  .btn-group,
+  .canais-absolute,
+  .btn,
+  .box-area-trabalho,
+  .context-actions,
+  .youtube-materia-list {
     display: none !important;
   }
   a[href]:after {
