@@ -11,6 +11,7 @@ export default {
   },
   data () {
     return {
+      header_top: true
     }
   },
   methods: {
@@ -25,7 +26,10 @@ export default {
       if (window.scrollY === 0) {
         h.classList.remove('header-mini')
         if (!u && window.location.pathname === '/') {
-          h.classList.add('header-top')
+          if (this.header_top) {
+            h.classList.add('header-top')
+            this.header_top = false
+          }
         }
         // console.log('topo', window.scrollY)
       } else if (window.scrollY > 220 && window.scrollY < 300) {
@@ -36,12 +40,16 @@ export default {
         // console.log('meio', window.scrollY)
       } else if (window.scrollY > 400) {
         if (!h.classList.contains('header-mini')) {
+          this.header_top = true
           h.classList.add('header-mini')
           h.classList.remove('header-top')
           // console.log('fim', window.scrollY)
         }
       } else {
-        // console.log('limbo', window.scrollY)
+        if (!this.header_top) {
+          h.classList.remove('header-top')
+          this.header_top = false
+        }
       }
     }
   },
