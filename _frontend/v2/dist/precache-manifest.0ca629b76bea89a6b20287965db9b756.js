@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/brasao/brasao_512.png"
   },
   {
-    "revision": "fae4b82cfa766cf77f07",
-    "url": "/static/css/app.9a17315f.css"
+    "revision": "bc1798f52aab5fc1f2a9",
+    "url": "/static/css/app.7fa87bfd.css"
   },
   {
     "revision": "bf0ac6cb959f57715ca9",
@@ -132,8 +132,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/icon_atividade_legislativa.9516930c.svg"
   },
   {
-    "revision": "c545c4a743ff7e182e24d84f2424e5fa",
-    "url": "/static/img/icon_doc_adm.c545c4a7.svg"
+    "revision": "b7fb4f1f422f9f8c8021cad2169259e9",
+    "url": "/static/img/icon_doc_adm.b7fb4f1f.svg"
+  },
+  {
+    "revision": "ed302d3ad30c6db9dfa8e0c4c9525cca",
+    "url": "/static/img/icon_ouvidoria.ed302d3a.svg"
   },
   {
     "revision": "d507cda3770c0c4663c89aec2984e0db",
@@ -142,6 +146,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "e736437c61edc388dcab3a33dd247e2c",
     "url": "/static/img/icon_prestacao_contas.e736437c.svg"
+  },
+  {
+    "revision": "f4a60fd13382dcbd72b2a95987434753",
+    "url": "/static/img/icon_tv_radio.f4a60fd1.svg"
   },
   {
     "revision": "a1a5cb8ccda80ba8d2e53de044a749a0",
@@ -156,12 +164,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/pdf_rodape.jpg"
   },
   {
-    "revision": "c9609d116baca2aa0dcadcac3e4b7401",
+    "revision": "8b26fe62a2bc337301aafea04c717e36",
     "url": "/static/index.html"
   },
   {
-    "revision": "fae4b82cfa766cf77f07",
-    "url": "/static/js/app.55e6110f.js"
+    "revision": "bc1798f52aab5fc1f2a9",
+    "url": "/static/js/app.054dddb4.js"
   },
   {
     "revision": "bf0ac6cb959f57715ca9",
@@ -256,8 +264,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/js/chunk-7ca9920e.43a4c799.js"
   },
   {
-    "revision": "16710b3a9b70eed8f25b",
-    "url": "/static/js/chunk-7f62b3a0.95252ca6.js"
+    "revision": "e4374881699023824db1",
+    "url": "/static/js/chunk-7f62b3a0.aba86d00.js"
   },
   {
     "revision": "508c1507ea0c41e3bd56",
