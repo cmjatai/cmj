@@ -172,7 +172,7 @@ export default {
     grid-row-start: 2;
     grid-row-end: 3;
     background-color: rgba($color: #f0f0f0, $alpha: 1);
-    background-image: url("~@/assets/img/bg.png");
+    background-image: url("/static/img/bg.png");
   }
 
   .sideleft {
@@ -206,7 +206,7 @@ export default {
 
   .empty-list {
     background-color: rgba($color: #e0e0e0, $alpha: 0.9);
-    background-image: url("~@/assets/img/bg.png");
+    background-image: url("/static/img/bg.png");
     padding: 3rem;
     text-align: center;
     font-size: 120%;

@@ -5,7 +5,7 @@
   height: 2em;
   display: inline-block;
   &::after {
-    background-image: url(./assets/icon_sl_copy_area_transferencia.png);
+    background-image: url(/static/icons/icon_sl_copy_area_transferencia.png);
   }
   i {
     display: none;
@@ -50,30 +50,30 @@
 
     &.facebook {
       &::after {
-      background-image: url(./assets/icon_sl_facebook64x64.png);
+      background-image: url(/static/icons/icon_sl_facebook64x64.png);
       }
     }
 
     &.whatsapp {
       &::after {
-      background-image: url(./assets/icon_sl_whatsapp64x64.png);
+      background-image: url(/static/icons/icon_sl_whatsapp64x64.png);
       }
     }
 
     &.twitter {
       &::after {
-      background-image: url(./assets/icon_sl_twitter64x64.png);
+      background-image: url(/static/icons/icon_sl_twitter64x64.png);
       }
     }
     &.youtube {
       &::after {
-      background-image: url(./assets/icon_sl_youtube64x64.png);
+      background-image: url(/static/icons/icon_sl_youtube64x64.png);
       }
     }
 
     &.instagram {
       &::after {
-      background-image: url(./assets/icon_sl_instagram64x64.png);
+      background-image: url(/static/icons/icon_sl_instagram64x64.png);
       }
     }
 
@@ -106,7 +106,7 @@
   }
   .icon-sessoes-online {
     //margin-right: 0.7em;
-    background-image: url("./assets/icon_plenarias.svg");
+    background-image: url("/static/icons/icon_plenarias.svg");
     //background-size: 1.8em auto;
     background-repeat: no-repeat;
     background-position: center center;

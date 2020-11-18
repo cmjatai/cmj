@@ -21,42 +21,42 @@ export default {
       clicked: '',
       links: [
         {
-          image: require('@/assets/img/icon_mesa_diretora.png'),
+          image: '/static/img/icon_mesa_diretora.png',
           route: '',
           texto: 'Mesa Diretora'
         },
         {
-          image: require('@/assets/img/icon_comissoes.png'),
+          image: '/static/img/icon_comissoes.png',
           route: '',
           texto: 'Comissões'
         },
         {
-          image: require('@/assets/img/icon_parlamentares.png'),
+          image: '/static/img/icon_parlamentares.png',
           route: '',
           texto: 'Parlamentares'
         },
         {
-          image: require('@/assets/img/icon_pautas.png'),
+          image: '/static/img/icon_pautas.png',
           route: '',
           texto: 'Pautas'
         },
         {
-          image: require('@/assets/img/icon_plenarias.png'),
+          image: '/static/img/icon_plenarias.png',
           route: 'sessao_list_link',
           texto: 'Sessões Plenárias'
         },
         {
-          image: require('@/assets/img/icon_materia_legislativa.png'),
+          image: '/static/img/icon_materia_legislativa.png',
           route: '',
           texto: 'Matérias Legislativas'
         },
         {
-          image: require('@/assets/img/icon_normas_juridicas.png'),
+          image: '/static/img/icon_normas_juridicas.png',
           route: '',
           texto: 'Normas Jurídicas'
         },
         {
-          image: require('@/assets/img/icon_relatorios.png'),
+          image: '/static/img/icon_relatorios.png',
           route: '',
           texto: 'Relatórios'
         }

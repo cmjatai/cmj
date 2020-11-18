@@ -1,6 +1,6 @@
 <template>
   <div class="w-100 d-flex inner-brand">
-    <img :src="casa.logotipo !== undefined ? casa.logotipo : require('@/assets/img/brasao_transp.gif')"/>
+    <img :src="casa.logotipo !== undefined ? casa.logotipo : '/static/img/brasao_transp.gif'"/>
     <h6 class="title-brand">
       {{casa.nome}}<br>
       <small>SAPL - Sistema de Apoio ao Processo Legislativo</small>

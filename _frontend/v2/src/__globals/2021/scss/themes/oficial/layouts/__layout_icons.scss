@@ -3,7 +3,7 @@
   align-items: center;
   justify-content: center;
   height: 72px;
-  background-image: url('../oficial/assets/icon.svg');
+  background-image: url('/static/icons/icon.svg');
   background-size: auto 100%;
   background-repeat: no-repeat;
   background-position: center center;
@@ -14,21 +14,21 @@
 }
 
 .icon_atividade_legislativa {
-  background-image: url('../oficial/assets/icon_atividade_legislativa.svg');
+  background-image: url('/static/icons/icon_atividade_legislativa.svg');
 }
 
 .icon_ouvidoria {
-  background-image: url('../oficial/assets/icon_ouvidoria.svg');
+  background-image: url('/static/icons/icon_ouvidoria.svg');
 }
 
 .icon_doc_adm {
-  background-image: url('~@/__globals/2021/scss/themes/oficial/assets/icon_doc_adm.svg');
+  background-image: url(/static/icons/icon_doc_adm.svg);
 }
 
 .icon_tv_radio_camara {
-  background-image: url(../oficial/assets/icon_tv_radio.svg);
+  background-image: url(/static/icons/icon_tv_radio.svg);
 }
 
 .icon_prestacao_contas {
-  background-image: url(../oficial/assets/icon_prestacao_contas.svg);
+  background-image: url(/static/icons/icon_prestacao_contas.svg);
 }

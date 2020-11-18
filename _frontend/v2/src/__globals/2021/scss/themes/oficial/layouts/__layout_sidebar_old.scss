@@ -18,24 +18,24 @@
     background-position: right;
     background-repeat: no-repeat;
     opacity: 0.15;
-    
+
     &.icon-atividade-legislativa {
-      background-image: url(~@/assets/img/icon_materia_legislativa.png);
+      background-image: url(/static/img/icon_materia_legislativa.png);
     }
     &.icon-diario-oficial {
-      background-image: url(~@/assets/img/icon_diario_oficial.png);
+      background-image: url(/static/img/icon_diario_oficial.png);
     }
     &.icon-sessao-plenaria {
-      background-image: url(~@/assets/img/icon_plenarias.png);
+      background-image: url(/static/img/icon_plenarias.png);
     }
     &.icon-norma-juridica {
-      background-image: url(~@/assets/img/icon_normas_juridicas.png);
+      background-image: url(/static/img/icon_normas_juridicas.png);
     }
     &.icon-licitacao {
-      background-image: url(~@/assets/img/icon_licitacao.png);
+      background-image: url(/static/img/icon_licitacao.png);
     }
     &.icon-transparencia {
-      background-image: url(~@/assets/img/icon_transparencia.png);
+      background-image: url(/static/img/icon_transparencia.png);
     }
   }
   .box {
@@ -100,7 +100,7 @@
 .canais-columns {
   padding: 0;
   height: 70px;
-  display: flex;     
+  display: flex;
   transition: height 0.4s ease-in-out;
   .box {
     flex: 1 1 auto;
@@ -128,7 +128,7 @@
   .path-previous {
     left: $width-wrapper-lg - 43px;
   }
-  
+
   #menu-toggle {
     color: rgba(white, 0.4);
     top: 0px;
@@ -180,7 +180,7 @@
       display: inline;
     }
   }
-  
+
   &.toggled {
     @include toggled_mixin();
   }
@@ -272,7 +272,7 @@
 
 
 @media screen and (max-width: 767px) {
-  
+
   .canais-columns {
     .inner {
       font-size: 1.2em;

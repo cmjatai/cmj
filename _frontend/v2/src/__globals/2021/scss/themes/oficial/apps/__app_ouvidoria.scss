@@ -170,7 +170,7 @@
     border-radius: 5px;
     color: white !important;
     background: rgba(#0073b7, 0.8) $url_bg_png;
-  
+
     &:hover {
       background-color: rgba(#0073b7, 0.9);
     }
@@ -195,7 +195,7 @@
     opacity: 0.7;
     .link-e-sic {
       color: transparent;
-      background: url(~@/assets/img/logo_sic.png);
+      background: url(/static/img/logo_sic.png);
       height: 100px;
       display: block;
       background-size: contain;
@@ -237,7 +237,7 @@
 }
 
 @media screen and (min-width: 1200px) {
-  
+
   .container-ouvidoria {
     &.container-login-inner {
       margin: 0 auto 30px;
