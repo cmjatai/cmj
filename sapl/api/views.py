@@ -99,7 +99,7 @@ class SaplApiViewSetConstrutor():
             # Caso Exista, pega a classe sapl.api.forms.{model}FilterSet
             # ou utiliza a base definida em sapl.forms.SaplFilterSetMixin
             filter_name = f'{object_name}FilterSet'
-            _filter_class = filters_classes.get(
+            _filterset_class = filters_classes.get(
                 filter_name, SaplFilterSetMixin)
 
             def create_class():
@@ -139,11 +139,11 @@ class SaplApiViewSetConstrutor():
                         return str(obj)
 
                 _meta_filterset = object if not hasattr(
-                    _filter_class, 'Meta') else _filter_class.Meta
+                    _filterset_class, 'Meta') else _filterset_class.Meta
 
                 # Define uma classe padrão para filtro caso não tenha sido
                 # criada a classe sapl.api.forms.{model}FilterSet
-                class SaplFilterSet(_filter_class):
+                class SaplFilterSet(_filterset_class):
                     class Meta(_meta_filterset):
                         if not hasattr(_meta_filterset, 'model'):
                             model = _model
@@ -155,7 +155,7 @@ class SaplApiViewSetConstrutor():
                     # Utiliza o filtro customizado pela classe
                     # sapl.api.forms.{model}FilterSet
                     # ou utiliza o trivial SaplFilterSet definido acima
-                    filter_class = SaplFilterSet
+                    filterset_class = SaplFilterSet
 
                     # Utiliza o serializer customizado pela classe
                     # sapl.api.serializers.{model}Serializer
@@ -350,24 +350,32 @@ class _ParlamentarViewSet:
         # recupera proposições enviadas e incorporadas do parlamentar
         # deve coincidir com
         # /parlamentar/{pk}/proposicao
-        content_type = ContentType.objects.get_for_model(Parlamentar)
 
-        qs = Proposicao.objects.filter(
+        # viewset proposicao
+        api_proposicao = SaplApiViewSetConstrutor.get_class_for_model(
+            Proposicao
+        )
+
+        self.serializer_class = api_proposicao.serializer_class
+        self.filterset_class = api_proposicao.filterset_class
+        self.queryset = Proposicao.objects.all()
+
+        qs = self.filter_queryset(self.get_queryset())
+
+        qs = qs.filter(
             data_envio__isnull=False,
             data_recebimento__isnull=False,
             cancelado=False,
             autor__object_id=kwargs['pk'],
-            autor__content_type=content_type
+            autor__content_type=ContentType.objects.get_for_model(Parlamentar)
         )
 
         page = self.paginate_queryset(qs)
-        if page is not None:
-            serializer = SaplApiViewSetConstrutor.get_class_for_model(
-                Proposicao).serializer_class(page, many=True)
-            return self.get_paginated_response(serializer.data)
+        data = self.serializer_class(
+            page if page is not None else qs, many=True).data
 
-        serializer = self.get_serializer(page, many=True)
-        return Response(serializer.data)
+        return self.get_paginated_response(
+            data) if page is not None else Response(data)
 
 
 class ResponseFileMixin:
@@ -598,15 +606,23 @@ class _SessaoPlenariaViewSet(ResponseFileMixin):
     def expedientes(self, request, *args, **kwargs):
 
         sessao = self.get_object()
+        # viewset expediente
+        api_expediente = SaplApiViewSetConstrutor.get_class_for_model(
+            ExpedienteSessao
+        )
 
-        page = self.paginate_queryset(sessao.expedientesessao_set.all())
-        if page is not None:
-            serializer = SaplApiViewSetConstrutor.get_class_for_model(
-                ExpedienteSessao).serializer_class(page, many=True)
-            return self.get_paginated_response(serializer.data)
+        self.serializer_class = api_expediente.serializer_class
+        self.filterset_class = api_expediente.filterset_class
+        self.queryset = sessao.expedientesessao_set.all()
 
-        serializer = self.get_serializer(page, many=True)
-        return Response(serializer.data)
+        qs = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(qs)
+        data = self.serializer_class(
+            page if page is not None else qs, many=True).data
+
+        return self.get_paginated_response(
+            data) if page is not None else Response(data)
 
     @action(detail=True)
     def upload_ata(self, request, *args, **kwargs):
