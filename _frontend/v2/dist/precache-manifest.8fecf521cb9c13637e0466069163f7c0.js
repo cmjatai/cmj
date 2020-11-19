@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/brasao/brasao_512.png"
   },
   {
-    "revision": "bc1798f52aab5fc1f2a9",
-    "url": "/static/css/app.7fa87bfd.css"
+    "revision": "585c26a105b67077deb8",
+    "url": "/static/css/app.95f730a5.css"
   },
   {
     "revision": "bf0ac6cb959f57715ca9",
@@ -164,11 +164,11 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/pdf_rodape.jpg"
   },
   {
-    "revision": "8b26fe62a2bc337301aafea04c717e36",
+    "revision": "f64a32c33253d1e122495341bce452f0",
     "url": "/static/index.html"
   },
   {
-    "revision": "bc1798f52aab5fc1f2a9",
+    "revision": "585c26a105b67077deb8",
     "url": "/static/js/app.054dddb4.js"
   },
   {
