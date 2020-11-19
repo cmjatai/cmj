@@ -4,13 +4,11 @@ main .second_header{
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-
+  padding: 1rem 0;
   overflow: hidden;
   .tipo_header {
-    position: absolute;
-    top: 0;
     font-size: 3rem;
-    //left: 1rem;
+    line-height: 2rem;
   }
 
   &::before {
@@ -38,7 +36,6 @@ main .second_header{
 
   h1 {
     margin: 0;
-    padding: 1rem 0;
     font-size: 2.2rem;
   }
 
@@ -47,7 +44,7 @@ main .second_header{
     font-style: italic;
     line-height: 1.2;
     color: $bg_color_portal_cmj;
-    padding-left: 2rem;
+    margin: 0;
   }
 
   .nav-tabs {
@@ -75,7 +72,6 @@ main .second_header{
   main .second_header{
     .tipo_header {
       font-size: 2rem;
-      right: 1rem;
     }
   }
 }

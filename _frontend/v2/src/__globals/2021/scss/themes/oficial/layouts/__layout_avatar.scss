@@ -26,13 +26,31 @@ $circle_avatar: (1: 256, 2: 160, 3: 128, 4: 96, 5: 64, 6: 48, 7: 40, 8: 36, 9: 2
 }
 
 .container-avatar {
-  height: 100%;
-  div {
-    display: flex;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  .line-avatar {
+    display: inline-flex;
     justify-content: center;
+    align-items: flex-end;
+  }
+  small {
+    text-align: center;
+    border-top: 1px solid #ccc;
+  }
+
+  .subscricoes {
+    display: inline-flex;
+    flex-direction: column;
+    .line-avatar {
+      flex-direction: row;
+      justify-content: flex-end;
+    }
   }
   a {
-    margin: 0 3px;
+    margin: 3px;
   }
 }
 
@@ -49,4 +67,11 @@ $circle_avatar: (1: 256, 2: 160, 3: 128, 4: 96, 5: 64, 6: 48, 7: 40, 8: 36, 9: 2
     }
   }
 
+  .container-avatar {
+    flex-direction: row;
+    align-items: flex-start;
+    .line-avatar {
+      flex-direction: column;
+    }
+  }
 }

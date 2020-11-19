@@ -1349,7 +1349,7 @@ class MateriaLegislativaFilterSet(django_filters.FilterSet):
                      to_row([
                          (row8, 'col'),
                          (form_actions(label=_('Processar Pesquisa')),
-                          'col-md-auto mt-4 pt-3')
+                          'col-md-auto mt-3 pt-3')
                      ])
                      ),
             # Fieldset(_('Origem externa'),
@@ -2623,15 +2623,15 @@ class ConfirmarProposicaoForm(ProposicaoForm):
                     (
                         HTML(
                             '''<small class="form-text text-muted">
-                            O Autor da proposição vinculou esta proposição a uma 
-                            Matéria Legislativa. Verifique se está correto 
+                            O Autor da proposição vinculou esta proposição a uma
+                            Matéria Legislativa. Verifique se está correto
                             para prosseguir com a Incorporação.</small>
                             '''
                             if self.instance.materia_de_vinculo else
                             '''
                                 <small class="form-text text-muted">
                                 Você pode fazer a anexação diretamente aqui na
-                                incorporaçao, basta informar a qual 
+                                incorporaçao, basta informar a qual
                                 matéria legislativa deseja incorporar.</small>
                             '''
                         ), 12),

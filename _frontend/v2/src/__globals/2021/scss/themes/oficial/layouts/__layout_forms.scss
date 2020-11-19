@@ -1,6 +1,9 @@
 main {
 
   form {
+    fieldset {
+      border-top: 1px solid $bg_color_portal_cmj;
+    }
     margin-top: $grid-gutter-width / 2;
     .form-group {
       &.disabled {

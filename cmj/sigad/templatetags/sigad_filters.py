@@ -48,7 +48,7 @@ def organize_direction_horizontal_avatars(pos, total):
         '0': 1,
         '1': 1,
         '2': 2,
-        '3': 2,
+        '3': 3,
         '4': 2,
         '5': 3,
         '6': 3,

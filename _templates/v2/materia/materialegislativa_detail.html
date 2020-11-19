@@ -1,34 +1,37 @@
 {% extends "crud/detail.html" %}
 {% load i18n sigad_filters cropping common_tags thumbnail %}
+{% load webpack_static from webpack_loader %}
 
 {% block head_title %}{{object}}{% endblock head_title %}
 {% block meta_description%}{{object.ementa}}{% endblock meta_description %}
 {% block head_title_sufix %}PortalCMJ{% endblock head_title_sufix %}
 {% block class_header %}header-materia{% endblock class_header %}
+
 {% block widgets_form_css %}
-{% if object.autores.count == 1 and object.autores.first.autor_related.capa %}
   <style>
     .second_header::before {
-      background-image: url({% thumbnail object.autores.first.autor_related.capa 9000x9000 box=object.autores.first.autor_related.capa_cropping crop detail %});
+      {% if object.autores.count == 1 and object.autores.first.autor_related.capa %}
+          background-image: url({% thumbnail object.autores.first.autor_related.capa 9000x9000 box=object.autores.first.autor_related.capa_cropping crop detail %});
+      {% else %}
+          background-image: url({% webpack_static 'img/fundo_topo.jpg' %});
+      {% endif %}
     }
   </style>
-{% endif %}
 {% endblock widgets_form_css %}
 
 {% block title_inner %}
   {% if object.texto_original %}
-    <a target="_blank" href="{{object.texto_original.url}}?u={% now "u"%}" title="Texto Original">
-      <i class="far fa-file-{% if '.pdf' in object.texto_original.path %}pdf{% else %}archive{% endif %}"></i>
-    </a>
+    <div class="links-texto">
+      <a class="link-texto" target="_blank" href="{{object.texto_original.url}}?u={% now "u"%}" title="Texto Original">
+        <i class="far fa-file-{% if '.pdf' in object.texto_original.path %}pdf{% else %}archive{% endif %}"></i>
+      </a>
+    </div>
   {% endif %}
   {{ block.super }}
 {% endblock title_inner %}
 
 {% block base_container_header %}
   <span class="tipo_header materia">Matéria Legislativa</span>
-
-  {% block title %}{{ block.super }}
-  {% endblock title %}
 
   <div class="container-avatar float-right">
     {% with object.autores.all.count as count_parlamentares %}
@@ -37,7 +40,7 @@
           </div>
         {% endif %}
         {% if forloop.counter0|organize_direction_horizontal_avatars:count_parlamentares %}
-          <div class="mt-1">
+          <div class="line-avatar">
         {% endif %}
 
         {% if autor.autor_related.fotografia %}
@@ -57,6 +60,9 @@
     {% endwith %}
   </div>
 
+  {% block title %}{{ block.super }}
+  {% endblock title %}
+
   {% block sub_title %}{{ block.super }}
   {% endblock sub_title %}
 
@@ -67,8 +73,6 @@
         <strong>Status:</strong> {{tram.status}}<br>
         <strong>Ultima Ação:</strong> {{tram.texto}}<br>
         <strong>Data da última Tramitação:</strong> {{tram.data_tramitacao}}
-      <br>
-      <br>
       {% endif %}
     {% endwith %}
   </small>
@@ -193,7 +197,7 @@
                   {% for subscricao in rv.subscricoes.all %}
                     {% if forloop.first %}
                       <br><br><strong>Subscrições</strong><br>
-                      <div class="container-avatar">
+                      <div class="container-avatar flex-row justify-content-start">
                     {% endif %}
                         <a class="avatar avatar7"
                           href="{% url 'sapl.materia:pesquisar_materia'%}?autoria__autor={{subscricao.autor.first.id}}"
