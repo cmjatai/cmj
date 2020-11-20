@@ -1,3 +1,14 @@
+.item-listas {
+  padding: 0.5rem 1rem 1rem;
+  border-top: 1px solid lighten($bg_color_portal_cmj, 50%);
+  &:hover {
+    background-color: $hover_background_05p;
+  }
+
+  .container-avatar {
+    padding-left: 1rem;
+  }
+}
 
 .links-texto {
   float:left;
@@ -10,12 +21,10 @@
   padding: 0.5rem 1rem;
   text-align: center;
   border-radius: 3px;
-
   &:hover {
     background-color: $color_container_bg;
   }
 }
-
 
 .text-ementa {
   color: lighten($bg_color_portal_cmj, 30%) !important;
@@ -41,8 +50,34 @@
   }
 }
 
-@media screen and (max-width: 767.98px) {
+@media screen and (max-width: 991.98px) {
+  .item-listas {
+    padding: 0.2rem 0.5rem 1rem;
+  }
   .text-ementa {
-    font-size: 125%;
+    font-size: 110%;
+  }
+
+  .links-texto {
+    padding: 0.5rem 0.5rem 0.5rem 0;
+  }
+
+  .link-texto {
+    padding: 0.1rem 0.5rem;
+  }
+
+  .nav-pagination {
+    padding: 0px;
+    bottom: -3px;
+    .pagination {
+      display: flex;
+      li {
+        flex: 1 1 8.333%;
+      }
+      a {
+        padding: 0.2rem 5px;
+        text-align: center;
+      }
+    }
   }
 }

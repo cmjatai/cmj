@@ -1,4 +1,3 @@
-
 $circle_avatar: (1: 256, 2: 160, 3: 128, 4: 96, 5: 64, 6: 48, 7: 40, 8: 36, 9: 24);
 
 
@@ -26,10 +25,15 @@ $circle_avatar: (1: 256, 2: 160, 3: 128, 4: 96, 5: 64, 6: 48, 7: 40, 8: 36, 9: 2
 }
 
 .container-avatar {
-  padding: 0.5rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
+
+  .avatar-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
 
   .line-avatar {
     display: inline-flex;
@@ -55,9 +59,23 @@ $circle_avatar: (1: 256, 2: 160, 3: 128, 4: 96, 5: 64, 6: 48, 7: 40, 8: 36, 9: 2
 }
 
 
+@media screen and (max-width: 991.98px) {
+
+  $circle_avatar: (1: 136, 2: 112, 3: 88, 4: 64, 5: 36, 6: 48, 7: 40, 8: 36, 9: 24);
+
+
+  @each $i, $size_avatar in $circle_avatar {
+    .avatar#{$i} {
+      width: #{$size_avatar}px;
+      height: #{$size_avatar}px;
+    }
+  }
+
+}
+
 @media screen and (max-width: 767.98px) {
 
-  $circle_avatar: (1: 192, 2: 128, 3: 96, 4: 64, 5: 36, 6: 48, 7: 40, 8: 36, 9: 24);
+  $circle_avatar: (1: 112, 2: 96, 3: 80, 4: 56, 5: 36, 6: 48, 7: 40, 8: 36, 9: 24);
 
 
   @each $i, $size_avatar in $circle_avatar {
@@ -68,10 +86,29 @@ $circle_avatar: (1: 256, 2: 160, 3: 128, 4: 96, 5: 64, 6: 48, 7: 40, 8: 36, 9: 2
   }
 
   .container-avatar {
-    flex-direction: row;
-    align-items: flex-start;
+    .avatar-group {
+      flex-direction: row;
+      &.subscricoes {
+        flex-direction: column;
+      }
+    }
+
     .line-avatar {
       flex-direction: column;
+    }
+
+  }
+}
+
+@media screen and (max-width: 575.98px) {
+
+  $circle_avatar: (1: 96, 2: 80, 3: 64, 4: 48, 5: 36, 6: 48, 7: 40, 8: 36, 9: 24);
+
+
+  @each $i, $size_avatar in $circle_avatar {
+    .avatar#{$i} {
+      width: #{$size_avatar}px;
+      height: #{$size_avatar}px;
     }
   }
 }

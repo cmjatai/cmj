@@ -5,7 +5,7 @@
 {% block head_title %}{{object}}{% endblock head_title %}
 {% block meta_description%}{{object.ementa}}{% endblock meta_description %}
 {% block head_title_sufix %}PortalCMJ{% endblock head_title_sufix %}
-{% block class_header %}header-materia{% endblock class_header %}
+{% block class_header %}detail-materias{% endblock class_header %}
 
 {% block widgets_form_css %}
   <style>
@@ -13,6 +13,7 @@
       {% if object.autores.count == 1 and object.autores.first.autor_related.capa %}
           background-image: url({% thumbnail object.autores.first.autor_related.capa 9000x9000 box=object.autores.first.autor_related.capa_cropping crop detail %});
       {% else %}
+          background-color: red;
           background-image: url({% webpack_static 'img/fundo_topo.jpg' %});
       {% endif %}
     }
@@ -44,7 +45,7 @@
         {% endif %}
 
         {% if autor.autor_related.fotografia %}
-          <a class="avatar avatar{% if count_parlamentares >= 5 %}5{%else%}3{% endif %}"
+          <a class="avatar avatar{% if count_parlamentares >= 5 %}5{%else%}{% if count_parlamentares >= 2 %}3{% else %}2{% endif %}{% endif %}"
             href="{% url 'sapl.materia:pesquisar_materia'%}?autoria__autor={{autor.id}}"
             title="{{parlamentar}}">
             <img src="{% cropped_thumbnail autor.autor_related "fotografia_cropping" %}" alt="{{autor.autor_related}}">
