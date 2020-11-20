@@ -85,6 +85,10 @@ main .second_header {
 
   main .second_header {
     &.list-materias {
+      h1 {
+        font-size: 1.5rem;
+        padding: 0rem;
+      }
       h3 {
         font-size: 2rem;
         padding: 2rem 0;

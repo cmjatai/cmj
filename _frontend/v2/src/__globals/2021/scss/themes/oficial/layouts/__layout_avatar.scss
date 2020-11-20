@@ -48,6 +48,7 @@ $circle_avatar: (1: 256, 2: 160, 3: 128, 4: 96, 5: 64, 6: 48, 7: 40, 8: 36, 9: 2
   .subscricoes {
     display: inline-flex;
     flex-direction: column;
+    padding-top: 0.5rem;
     .line-avatar {
       flex-direction: row;
       justify-content: flex-end;
