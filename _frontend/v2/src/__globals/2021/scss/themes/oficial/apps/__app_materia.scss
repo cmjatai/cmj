@@ -15,6 +15,7 @@ main .second_header {
     }
   }
   &.detail-materias {
+    padding-bottom: 1rem;
     .tipo_header {
       line-height: 1em;
       padding-top: 1.5rem;
@@ -25,6 +26,9 @@ main .second_header {
         transition: all 0.3s ease;
         color: #494d;
       }
+    }
+    .nav-tabs {
+      margin-bottom: -1rem;
     }
   }
 }

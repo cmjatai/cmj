@@ -20,7 +20,7 @@
   {% if object.texto_integral %}
     <div class="links-texto">
       <a class="link-texto" target="_blank" href="{{object.texto_integral.url}}?u={% now "u"%}" title="Texto Original">
-        <i class="far fa-file-{% if '.pdf' in object.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
+        <i class="far fa-2x fa-file-{% if '.pdf' in object.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
       </a>
     </div>
   {% endif %}

@@ -4,8 +4,6 @@ main .second_header{
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-
-  padding-bottom: 1rem;
   //padding: 1rem 0;
   overflow: hidden;
 
@@ -36,7 +34,6 @@ main .second_header{
   .nav-tabs {
     border-bottom: 0;
     clear: both;
-    margin-bottom: -1rem;
   }
 
   .nav {

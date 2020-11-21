@@ -20,13 +20,13 @@
 
 .links-texto {
   float:left;
-  padding: 1rem 1rem 1rem 0;
+  padding: 0.5rem 1rem 0.5rem 0;
 }
 
 .link-texto {
   display: block;
   border: 1px solid darken($bg_color_portal_cmj, 10%);
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 1rem 0.3rem;
   text-align: center;
   border-radius: 3px;
   &:hover {
@@ -34,7 +34,7 @@
   }
 }
 .text-epigrafe {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   &.top-avatar {
     display: none;
   }
