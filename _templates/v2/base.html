@@ -125,7 +125,6 @@
                   </div>
                 </div>
               </div>
-
             </header>
 
         {% endblock navigation %}
@@ -179,10 +178,13 @@
 
         <router-view></router-view>
 
-        <div class="container{{fluid}}">
-          {% block base_content %}
-          {% endblock %}
-        </div>
+        {% block main_content %}
+          <div class="container{{fluid}}">
+            {% block base_content %}
+            {% endblock %}
+          </div>
+        {% endblock %}
+
       </main>
       <!-- App.vue -->
       <app></app>

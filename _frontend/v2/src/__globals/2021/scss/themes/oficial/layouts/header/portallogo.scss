@@ -3,7 +3,7 @@ header.main {
     padding: 0;
     padding-right: $min_padding * 2;
     .navbar {
-      padding: $min_padding * 5 0;
+      //padding: $min_padding * 5 0;
       &:hover {
         text-shadow: 1px 1px 15px  lighten($bg_color_portal_cmj, 20%);
       }
@@ -48,16 +48,16 @@ header.main {
         flex: 0 0 auto;
       }
       .navbar-brand {
-        padding-top: 0.5rem;
-        padding-bottom: 0.5rem;
+        //padding-top: 0.5rem;
+        //padding-bottom: 0.5rem;
 
         img {
-          height: 96px;
+          //height: 96px;
         }
 
         .brand-name {
           padding-left: 1rem;
-          font-size: 1.3rem;
+          font-size: 1rem;
         }
       }
     }
@@ -208,6 +208,29 @@ header.main {
           .brand-name {
             padding-left: 0rem;
             font-size: 0.4rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+
+@media screen and (min-width:1400px) {
+  header.main {
+    &.header-top {
+      #portallogo {
+        .navbar-brand {
+          padding-top: 1rem;
+          padding-bottom: 1rem;
+
+          img {
+            height: 108px;
+          }
+
+          .brand-name {
+            padding-left: 2rem;
+            font-size: 1.3rem;
           }
         }
       }

@@ -131,6 +131,11 @@
     right: 5px;
     top: 5px;
   }
+  &.absolute-bottom-right {
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+  }
   &.top-right {
     position: relative;
     right: 0;

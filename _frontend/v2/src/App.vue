@@ -16,6 +16,7 @@ export default {
   },
   methods: {
     handleScroll: function (event) {
+      let b = document.getElementsByTagName('body')[0]
       let h = document.getElementsByTagName('header')[0]
       let u = document.getElementById('user_connected')
       if (u && window.location.pathname !== '/') {
@@ -50,6 +51,11 @@ export default {
           h.classList.remove('header-top')
           this.header_top = false
         }
+      }
+      if (h.classList.contains('header-top')) {
+        b.classList.add('header-top')
+      } else {
+        b.classList.remove('header-top')
       }
     }
   },

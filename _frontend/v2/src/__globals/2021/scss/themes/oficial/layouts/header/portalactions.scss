@@ -87,7 +87,7 @@ header.main {
           background-color: $hover_background_50p;
           & ul.subaction {
             display: inline-flex;
-            box-shadow: 0px 20px 50px  lighten(black, 80%);
+            //box-shadow: 0px 10px 50px #000f;
           }
           li:hover {
             & > ul {
@@ -113,7 +113,7 @@ header.main {
       height: 0;
       .btns-main {
         margin-left: -20rem;
-        width: 0;
+        //width: 0;
         a.inner {
           .icon {
             height: 0;
@@ -132,7 +132,7 @@ header.main {
         position: absolute;
         border-top: 10px solid lighten($color: $bg_color_portal_cmj, $amount: 30);
         border-bottom: 2px solid lighten($color: $bg_color_portal_cmj, $amount: 30);
-        box-shadow: 0px 20px 30px rgba(black,0.15);
+        box-shadow: 0px 20px 30px rgba(black, 0.15);
         top: 100%;
         left: 0;
         right: 0;
@@ -217,25 +217,26 @@ header.main {
   }
 
   &.header-top {
+    #rowlogo {
+      justify-content: center;
+    }
     #portalactions {
       order: 4;
       width: 100%;
       flex: 0 0 100%;
-      padding-bottom: $min_padding * 2;
+      //padding-bottom: $min_padding * 2;
+      opacity: 0.7;
+      &:hover {
+        opacity: 1;
+      }
       .btns-main {
         .btn-main {
           a.inner {
-            .fas {
-              font-size: 1.5em;
-            }
-            .fa-2x {
-              font-size: 2em;
-            }
             .icon {
-              height: 108px;
+              height: 64px;
             }
             .label {
-              font-size: 110%;
+              font-size: 100%;
               min-height: 56px;
             }
           }
@@ -485,5 +486,39 @@ header.main {
       left: -20px;
       right: -70px;
       z-index: -1;
+  }
+}
+
+
+@media screen and (min-width: 1050px) {
+  header.main {
+    &.header-top {
+      #portalactions {
+        flex: 0 0 80%;
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 1400px) {
+  header.main {
+    &.header-top {
+      #portalactions {
+        flex: 0 0 85%;
+        .btns-main {
+          .btn-main {
+            a.inner {
+              .icon {
+                height: 96px;
+              }
+              .label {
+                font-size: 120%;
+                min-height: 4rem;
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }

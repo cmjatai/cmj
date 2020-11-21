@@ -1,135 +1,173 @@
-
-#pagina-inicial {
-  .carousel-custom {
-    margin-top: $spacer * 2;
-  }
-}
-
 .carousel-custom {
-  position: relative;
-
   .imagem {
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center 25%;
-    height: 410px;
+    height: 60vh;
+
+    //filter: grayscale(50%);
+
   }
-  .navbar-social-links {
-    padding-top: 5px;
-    i {
-      color: white;
-      text-shadow: 1px 1px 1px $bg_color_portal_cmj;
-    }
-  }
-  .autor {
-    position: absolute;
-    top: 0px;
-    right: 3px;
-    font-size: 0.6em;
-    color: white;
-    &:hover {
-      background: rgba(black, 0.6);
-    }
-  }
-  .carousel-indicators {
-    bottom: 0px;
-    margin: 0px;
-    width: 100%;
-    li {
-      height: 4px;
-      flex: 1 1 auto;
-      margin: 0px;
-      width: auto;
-      border-width: 0;
-      &.active {
-        background-color: $color_text_title;
-      }
-      &:hover {
-        background-color: rgba($color_text_title, 0.7);
-      }
-    }
-    &:hover {
-      li {
-        height: 15px;
-      }
-    }
-  }
-  .carousel-caption {
-    bottom: 0px;
-    padding: 0px;
-    right: 0px;
-    left: 0px;
-    background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0.0) 0%, rgba(0, 0, 0, 1) 100%);
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.0) 0%, rgba(0, 0, 0, 1) 100%);
-    &:hover {
-      padding-top: 10%;
-    }
-    .titulo,
-    p {
-      color: white;
-      font-size: 90%;
-      line-height: 1.2em;
-      display: block;
-    }
-    .titulo {
-      padding: 0 20px 15px;
-      font-size: 120%;
-      font-weight: bold;
-      &:hover {
-        color: white;
-      }
-    }
-  }
-  .carousel-control-prev {
-    &:hover {
-      background: -webkit-linear-gradient(left, rgba(0, 0, 0, 0.15) 0, rgba(0, 0, 0, 0.0001) 100%);
-      background: linear-gradient(to right, rgba(0, 0, 0, 0.15) 0, rgba(0, 0, 0, 0.0001) 100%);
-    }
-  }
+
+  .carousel-control-prev,
   .carousel-control-next {
-    &:hover {
-      background: -webkit-linear-gradient(left, rgba(0, 0, 0, 0.0001) 0, rgba(0, 0, 0, 0.15) 100%);
-      background: linear-gradient(to right, rgba(0, 0, 0, 0.0001) 0, rgba(0, 0, 0, 0.15) 100%);
+    z-index: 2;
+    bottom: 2.2rem;
+    width: 3rem;
+  }
+
+  .navbar-social-links {
+    z-index: $zindex-social-links;
+
+    a {
+      z-index: $zindex-social-links;
     }
   }
-  &:hover {
-    .carousel-indicators {
-      li {
-        height: 15px;
+
+  .carousel-indicators {
+    margin: 1rem 1rem;
+    right: auto;
+    z-index: $zindex-path-direction + 1;
+
+    li {
+      height: 15px;
+      width: 15px;
+      border-radius: 50%;
+      margin: 0 5px;
+      border: 0;
+
+      &:first-child {
+        margin-left: 0;
+      }
+
+      transition: all 0.3s ease;
+
+      &:hover {
+        transition: all 0.3s ease;
+        border-radius: 0%;
       }
     }
   }
-}
 
-@media screen and (max-width: 767px) {
-  .carousel p {
-    display: none;
-  }
-}
+  .carousel-caption {
+    z-index: 2500;
+    background: linear-gradient(to top, #000b 0%, #0000 100%);
+    right: 0;
+    left: 0;
+    bottom: 0;
+    padding: 33% 8rem 4rem 3rem;
+    text-align: left;
 
-@media screen and (max-width: 575px) {
-  #pagina-inicial {
-    .carousel-custom {
-      margin: 0 -15px;
+    a {
+      color: white;
+      text-decoration: none;
+
+      h1 {
+        font-weight: bold;
+        font-size: 3rem;
+        margin: 0;
+      }
+    }
+
+    p {
+      margin: 0;
     }
   }
-  .container-ouvidoria {
-    margin-top: 15px;
-    .btn-ouvidoria {
-      margin-bottom: 15px;
-    }
-  }
+
 }
 
-@media screen and (max-width: 480px) {
-  #pagina-inicial {
-    .carousel-custom {
-      margin: 0 -15px;
-    }
-  }
+body.header-top {
   .carousel-custom {
     .imagem {
-      height: 350px;
+      height: 90vh;
+
+      &::after {
+        content: " ";
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        //opacity: 0.5;
+        background: linear-gradient(to top, #0000 40%, darken($bg_color_portal_cmj, 5) 95%);
+      }
+    }
+
+  }
+}
+
+@media screen and (max-width:991.98px) {
+
+  body.header-top {
+    .carousel-custom {
+      .imagem {
+        height: 70vh;
+      }
+    }
+  }
+
+  .carousel-custom {
+    .carousel-caption {
+      padding: 33% 1rem 2.5rem 2rem;
+
+      p {
+        margin-left: -1rem;
+      }
+
+      a {
+
+        h1 {
+          font-size: 2.5rem;
+        }
+      }
     }
   }
 }
+
+@media screen and (min-width:1200px) {
+  .carousel-custom {
+    .carousel-indicators {
+      margin: 2rem;
+
+    }
+    .carousel-caption {
+      padding: 33% 5rem 5rem 4.5rem;
+
+      a {
+        h1 {
+          font-size: 3.5rem;
+        }
+      }
+
+      p {
+        font-size: 1.5rem;
+      }
+    }
+  }
+}
+
+
+
+@media screen and (min-width:1400px) {
+  .carousel-custom {
+    .carousel-indicators {
+      margin: 3rem;
+
+    }
+    .carousel-caption {
+      padding: 33% 10rem 7rem 7rem;
+
+      a {
+        h1 {
+          font-size: 5rem;
+        }
+      }
+
+      p {
+        font-size: 2rem;
+      }
+    }
+  }
+}
+
+

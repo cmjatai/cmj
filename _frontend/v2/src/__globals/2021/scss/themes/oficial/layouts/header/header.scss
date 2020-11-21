@@ -1,4 +1,3 @@
-
 header.main {
   //background-color: $bg_color_portal_cmj;
   background: linear-gradient(to top, $bg_color_portal_cmj 0%, darken($bg_color_portal_cmj, 5) 100%);
@@ -11,11 +10,13 @@ header.main {
   top: 0;
 
   line-height: 1;
+
   & * {
     transition: all 0.3s ease;
   }
 
-  &::before, &::after {
+  &::before,
+  &::after {
     content: '';
     position: absolute;
     width: 100%;
@@ -27,6 +28,7 @@ header.main {
     background-position: -18px -10px;
     z-index: -1;
   }
+
   &::after {
     background-image: url(~@/assets/img/fundo_topo.jpg);
     background-position: 0 30%;
@@ -38,24 +40,29 @@ header.main {
     right: 0;
 
   }
+
   #rowlogo {
     align-items: center;
     flex-wrap: nowrap;
   }
 
   &.header-top {
-    background: linear-gradient(to top, $bg_color_portal_cmj 0%, darken($bg_color_portal_cmj,20) 100%);
+    background: linear-gradient(to top, $bg_color_portal_cmj 0%, darken($bg_color_portal_cmj, 20) 100%);
 
     &::after {
       opacity: 0.15;
     }
+
     #rowlogo {
       flex-wrap: wrap;
+      height: 0;
     }
 
   }
+
   &.header-mini {
     opacity: 0.95;
+
     &:hover {
       opacity: 1;
     }
@@ -82,13 +89,13 @@ header.main {
 @import './portalnavtop';
 
 
-@media screen and (max-width:991.98px) {
-}
+@media screen and (max-width:991.98px) {}
 
 @media screen and (max-width:767.98px) {
   #header-accessibility {
     display: none;
   }
+
   header.main {
     #rowlogo {
       padding: 0;
@@ -99,16 +106,47 @@ header.main {
 
 
 
-@media screen and (min-width:992px) {
+@media screen and (min-width:1px) {
   header.main {
+
     //height: 15vh;
     &.header-top {
-      //height: 40vh;
+      position: absolute;
+      background-color: transparent;
+      background-image: none;
+      //height: 60vh;
+
+      .teste {
+        #rowlogo {
+          flex-wrap: nowrap;
+        }
+
+        #portallogo {
+          flex: 0 0 0;
+          order: 1;
+        }
+
+        #portalactions {
+          order: 2;
+          width: auto;
+          flex: 1 1 0%;
+        }
+
+        #portalsearch {
+          order: 3;
+        }
+
+      }
+
+      &::after {
+        background-image: none;
+        background-color: transparent;
+      }
+
     }
+
     &.header-mini {
       //height: auto;
     }
   }
 }
-
-
