@@ -96,3 +96,19 @@ header.main {
     }
   }
 }
+
+
+
+@media screen and (min-width:992px) {
+  header.main {
+    //height: 15vh;
+    &.header-top {
+      //height: 40vh;
+    }
+    &.header-mini {
+      //height: auto;
+    }
+  }
+}
+
+
