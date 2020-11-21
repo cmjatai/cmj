@@ -1,5 +1,5 @@
 import './__globals'
-
+import './__apps/compilacao'
 import Vue from 'vue'
 import Vuex from 'vuex'
 import VueCookie from 'vue-cookie'

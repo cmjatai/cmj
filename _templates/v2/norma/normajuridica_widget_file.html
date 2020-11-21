@@ -1,0 +1,71 @@
+{% load i18n %}
+{% load compilacao_filters %}
+{% load common_cmj_tags common_tags%}
+{% load static %}
+{% load webpack_static from webpack_loader %}
+
+  <div class="row pt-2 align-items-center justify-content-between">
+    <div class="col-12 col-md-auto justify-content-center">
+
+
+      {% if n.metadata.signs and n.metadata.locaweb and n.metadata.signs.texto_integral.signs and n.metadata.locaweb.texto_integral.hash == n.metadata.locaweb.texto_integral.original_hash %}
+        <a class="link-texto"  target="_blank" href="{{n.texto_integral.url}}?original" title="Documento Eletrônico">
+          <i class="fas fa-2x fa-certificate"></i>
+          <br>
+          <strong>Documento
+              Eletrônico
+              <small>
+                <br>com Assinatura Digital
+              </small>
+          </strong>
+        </a>
+      {% else %}
+
+        {% if n.texto_integral and '.pdf' in n.texto_integral.path %}
+          <a class="link-texto" target="_blank" href="{{n.texto_integral.url}}?u={% now "u"%}" title="Documento Digitalizado">
+            <i class="far fa-2x fa-file-pdf"></i>
+            <br>
+            <strong>
+                Documento Digitalizado
+                <small>
+                  <br>Com OCR Otimizado para Download
+                </small>
+            </strong>
+          </a>
+        {% endif %}
+        <a class="link-texto"  target="_blank" href="{{n.texto_integral.url}}?original" title="Documento Eletrônico">
+          {% if n.metadata.signs and n.metadata.signs.texto_integral.signs %}
+            <i class="fas fa-2x fa-certificate"></i>
+          {% else %}
+            <i class="far fa-2x fa-file-{% if '.pdf' in n.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
+          {% endif %}
+          <br>
+          <strong>Documento
+            {% if n.metadata.signs and n.metadata.signs.texto_integral.signs %}
+              Eletrônico
+              <small>
+                <br>com Assinatura Digital
+              </small>
+            {% else %}
+              {% if '.pdf' in n.texto_integral.path %}
+                  <br>Digitalizado Original
+              {% else %}
+                <br>Eletrônico
+              {% endif %}
+            {% endif %}
+          </strong>
+        </a>
+      {% endif %}
+    </div>
+    {% if render_ementa %}
+      <div class="col">
+        <div class="text-ementa">
+          {{n.ementa|safe}}
+        </div>
+      </div>
+    {% endif %}
+    {% with n.metadata.signs.texto_integral.signs as signs %}
+      {% include 'core/sign_widget.html' %}
+    {% endwith %}
+
+  </div>

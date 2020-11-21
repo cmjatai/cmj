@@ -67,6 +67,49 @@
   }
 }
 
+.box-assinatura-eletronica {
+  border: 1px solid darken($color_container_border, 10%);
+  text-align: left;
+  padding: 5px 10px;
+  border-radius: 5px;
+  flex: 0 0 auto;
+  width: auto;
+  max-width: 100%;
+  .title {
+    font-weight: bold;
+    padding: 1px 5px;
+    display: block;
+    white-space: nowrap;
+    line-height: 1.2;
+  }
+  .sigs {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    align-content: stretch;
+    justify-content: space-around;
+    width: 100%;
+  }
+  .sig {
+    flex: 1 1 100%;
+    background-color: white;
+    padding: 5px 10px;
+    display: inline-block;
+    line-height: 1;
+    margin-bottom: 3px;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 90%;
+    .sig-nome {
+      display: block;
+      font-weight: bold;
+    }
+    .sig-data {
+      font-style: italic;
+    }
+  }
+}
+
 @media screen and (max-width: 991.98px) {
   .item-listas {
     padding: 0.2rem 0.5rem 1rem;

@@ -1,0 +1,13 @@
+
+main .second_header {
+  &.list-normas {
+    h1 {
+      padding-bottom: 0;
+    }
+  }
+  &.detail-normas {
+    h1 {
+      padding-bottom: 0.5rem;
+    }
+  }
+}

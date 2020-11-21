@@ -1,0 +1,12 @@
+{% load i18n%}
+{% if url %}
+  <span class="navbar-social-links {{css_class}}">
+    <a class="facebook" data-social-sharing="facebook" title="{% trans "Compartilhar no Facebook" %} [{{titulo}}]" href="https://www.facebook.com/sharer/sharer.php?u={{url}}"><span>Facebook</span></a>
+    <a class="twitter" data-social-sharing="twitter" title="{% trans "Compartilhar no Twitter" %} [{{titulo}}]" href="https://twitter.com/intent/tweet?text={{titulo|urlencode}}&url={{url}}"></i><span>Twitter</span></a>
+    <a class="whatsapp" data-social-sharing="whatsapp" title="{% trans "Compartilhar no WhatsApp" %} [{{titulo}}]" href="https://api.whatsapp.com/send?text={{whatsapp_text|urlencode|striptags|safe}}.%20{{whatsapp_url}}"><span>WhatsApp</span></a>
+
+    <a class="copylink" title="{% trans "Copiar Link"%}" data_href="{{url}}" >
+      <span>Copiar Link</span>
+    </a>
+  </span>
+{% endif %}

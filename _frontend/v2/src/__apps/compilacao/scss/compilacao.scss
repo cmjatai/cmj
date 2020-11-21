@@ -200,7 +200,7 @@ a:link:after, a:visited:after {
         margin: -5px auto 0;
         border-radius: 50%;
       }
-      
+
       & > a {
         position: absolute;
         white-space: nowrap;
@@ -219,10 +219,10 @@ a:link:after, a:visited:after {
           margin-bottom: 5px;
         }
       }
-      
+
       ul {
         z-index: 1;
-        position: absolute; 
+        position: absolute;
         display: none;
         background: white;
         margin: 30px 0;
@@ -252,7 +252,7 @@ a:link:after, a:visited:after {
           &:hover {
             background: #eee;
           }
-        }     
+        }
       }
 
       &.active {
@@ -354,7 +354,7 @@ a:link:after, a:visited:after {
       padding-left: 1em;
     }
     .ementa {
-      padding: 2em 0em 2em 35%;
+      padding: 1em 0em 2em 35%;
       font-weight: bold;
     }
 
@@ -437,16 +437,16 @@ a:link:after, a:visited:after {
       font-size: 1.0em;
       margin-top: 2px;
     }
-    
+
     .assinatura {
       margin-top: 0.6em;
       font-size: 1.15em;
     }
-    
+
     .fecho_lei {
       margin-top: 0.6em;
       font-size: 1.15em;
-    }    
+    }
 
     .bloco_alteracao {
       padding-left: 10%;
@@ -1600,7 +1600,7 @@ a:link:after, a:visited:after {
   }
 }
 
-.cp-nav-parents { 
+.cp-nav-parents {
   .dropdown-menu {
     left: 0;
     right: auto;
@@ -1790,7 +1790,7 @@ a:link:after, a:visited:after {
           height: 8px;
           margin: -4px auto 0;
         }
-        
+
         & > a {
           font-size: 0.75rem;
         }
@@ -1804,22 +1804,22 @@ a:link:after, a:visited:after {
             margin-bottom: 4px;
           }
         }
-        
+
         ul {
           a {
             line-height: 1.3rem;
             font-size: 0.7rem;
             background: #fff;
-          }     
+          }
         }
-        
+
         &.active {
           .circle {
             width:  14px;
             height: 14px;
             margin: -7px auto 0;
           }
-          
+
           &:not(:last-child) {
             & > a {
               margin-bottom: 15px;
@@ -1837,13 +1837,13 @@ a:link:after, a:visited:after {
 }
 
 @media print {
-  .cp .vigencias, 
-  .toggle-topbar, 
-  .menu-icon, 
-  .button, 
-  .tipo-vigencias, 
+  .cp .vigencias,
+  .toggle-topbar,
+  .menu-icon,
+  .button,
+  .tipo-vigencias,
   .dne,
-  .cp-linha-vigencias, 
+  .cp-linha-vigencias,
   .tipo-vigencias {
     display:none !important;
   }

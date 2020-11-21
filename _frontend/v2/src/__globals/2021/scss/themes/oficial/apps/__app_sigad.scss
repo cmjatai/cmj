@@ -111,10 +111,10 @@
 
 
   a:not(.btn) {
-    color: #794905;
+    color: $color_text_title;
 
     &:hover {
-      color: darken(#794905, 15%);
+      color: darken($bg_color_portal_cmj, 15%);
     }
   }
 
@@ -125,6 +125,7 @@
   }
 
   .path-title-classe {
+
     font-size: 170%;
     line-height: 1;
     padding-left: 10px;
@@ -134,6 +135,7 @@
     a {
       text-decoration: none;
     }
+
   }
 
   .path-title {
@@ -158,7 +160,7 @@
   }
 
   .path-data-pub {
-    border-top: 1px solid transparentize(#a97905, 0.6);
+    border-top: 1px solid transparentize($bg_color_portal_cmj, 0.6);
     text-align: center;
     font-size: 0.6em;
     margin: 0;
@@ -180,7 +182,7 @@
         content: '';
         display: block;
         height: 3px;
-        background-color: transparentize(#a97905, 0.6);
+        background-color: transparentize($bg_color_portal_cmj, 0.6);
       }
 
       a {

@@ -1,0 +1,141 @@
+{% extends "crud/detail.html" %}
+{% load i18n common_tags %}
+{% load render_bundle from webpack_loader %}
+{% comment %}
+{% block webpack_loader_css %}
+  {{ block.super }}
+  {% if object.texto_articulado.exists and object.texto_articulado.first.has_view_permission  %}
+    {% render_bundle 'compilacao' 'css' %}
+  {% endif %}
+{% endblock %}
+{% endcomment %}
+{% block head_title %}{{object}}{% endblock head_title %}
+{% block meta_description%}{{object.ementa}}{% endblock meta_description %}
+{% block class_header %}detail-normas{% endblock class_header %}
+
+{% block detail_content %}
+
+<div class="row">
+  <div class="col">
+  {% if object.texto_integral %}
+    <div class="links-texto">
+      <a class="link-texto" target="_blank" href="{{object.texto_integral.url}}?u={% now "u"%}" title="Texto Original">
+        <i class="far fa-file-{% if '.pdf' in object.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
+      </a>
+    </div>
+  {% endif %}
+    <div class="text-ementa">
+      {{object.ementa|safe}}
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <hr />
+    {% if object.diariosoficiais.exists %}
+
+      <p class="control-label">Diário Oficial</p>
+      <div class="form-control-static mb-3">
+        <a href="{% url 'cmj.diarios:diariooficial_detail' object.diariosoficiais.first.diario.pk %}">
+        {{object.diariosoficiais.first.diario}}
+        </a><i>&nbsp;({{object.diariosoficiais.first.diario.data}})</i>
+      </div>
+    {% endif %}
+
+    {% if object.materia %}
+      <p class="control-label">Matéria Legislativa</p>
+      <div class="form-control-static mb-3">
+        <a href="{% url 'sapl.materia:materialegislativa_detail' object.materia.pk %}">
+        {{object.materia}}
+        </a>
+        {% for a in object.materia.autores.all %}
+          {% if forloop.first %}
+            <br>
+            <b>Autoria:</b>&nbsp;
+          {% endif %}
+            {{a}}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if object.get_anexos_norma_juridica|length > 0 %}
+      <p class="control-label">Anexos Norma Jurídica</p>
+        <div class="form-control-static mb-3">
+          {% for p in object.get_anexos_norma_juridica %}
+            <a href="/media/{{p.anexo_arquivo}}">
+            {{ p.anexo_arquivo | to_str | split:"/" | get_last_item_from_list:-1 }}</a>{% if not forloop.last %}, {% endif %}
+
+          {% endfor %}
+        </div>
+    {% endif %}
+
+
+    {% if object.assuntos.exists %}
+      <p class="control-label">Assuntos</p>
+      <div class="form-control-static mb-3">
+        {% for assunto in object.assuntos.all %}
+          {{assunto}}{% if not forloop.last %} - {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+
+
+    {% if object.get_normas_relacionadas.0|length > 0 %}
+      <p class="control-label">Normas Relacionadas</p>
+      {% for p in object.get_normas_relacionadas.0 %}
+        <div class="form-control-static mb-3">
+          <b>{{ p.tipo_vinculo.descricao_ativa }}</b>&nbsp;
+          <a href="{% url 'sapl.norma:normajuridica_detail' p.norma_relacionada.pk %}">
+            {{ p.norma_relacionada.epigrafe }}
+          </a>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    {% if object.get_normas_relacionadas.1|length > 0 %}
+      {% for r in object.get_normas_relacionadas.1 %}
+        <div class="form-control-static mb-3">
+          <b>{{ r.tipo_vinculo.descricao_passiva }}</b>&nbsp;
+          <a href="{% url 'sapl.norma:normajuridica_detail' r.norma_principal.pk %}">
+          {{ r.norma_principal.epigrafe }}
+          </a>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+</div>
+
+
+  {% if user.is_superuser %}
+    <br><br>
+    <div class="row">
+      {% if object.user %}
+        <div class="col-sm-6">
+          <div id="div_id_user" class="form-group">
+            <p class="control-label">Usuário</p>
+            <div class="controls">
+              <div class="form-control-static">
+                <div class="dont-break-out">
+                  <a href="{% url 'cmj.core:user_update' object.user.pk %}">{{object.user}}</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+      {% if object.ip %}
+        <div class="col-sm-6">
+          <div id="div_ip_user" class="form-group">
+            <p class="control-label">IP</p>
+            <div class="controls">
+              <div class="form-control-static">
+                <div class="dont-break-out">{{object.ip}}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+      </div>
+    {% endif %}
+{% endblock detail_content %}
