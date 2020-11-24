@@ -4,7 +4,7 @@ header.main {
 
   transition: all 0.3s ease;
   position: sticky;
-  z-index: $zindex-fixed;
+  z-index: $zindex-header-main;
   left: 0;
   right: 0;
   top: 0;
@@ -43,7 +43,7 @@ header.main {
 
   #rowlogo {
     align-items: center;
-    flex-wrap: nowrap;
+    //flex-wrap: nowrap;
   }
 
   &.header-top {
@@ -54,8 +54,8 @@ header.main {
     }
 
     #rowlogo {
-      flex-wrap: wrap;
-      height: 0;
+      //flex-wrap: wrap;
+      //height: 0;
     }
 
   }
@@ -96,7 +96,7 @@ header.main {
     display: none;
   }
 
-  header.main {
+  header.main__old {
     #rowlogo {
       padding: 0;
       flex-wrap: wrap;
@@ -110,11 +110,10 @@ header.main {
   header.main {
 
     //height: 15vh;
-    &.header-top {
+    &.header-top__old {
       position: absolute;
       background-color: transparent;
       background-image: none;
-      //height: 60vh;
 
       .teste {
         #rowlogo {

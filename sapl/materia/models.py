@@ -28,7 +28,6 @@ from sapl.utils import (RANGE_ANOS, YES_NO_CHOICES, SaplGenericForeignKey,
                         OverwriteStorage, PortalFileField)
 
 
-#from sapl.protocoloadm.models import Protocolo
 EM_TRAMITACAO = [(1, 'Sim'),
                  (0, 'Não')]
 

@@ -13,7 +13,7 @@
   .carousel-control-next {
     z-index: 2;
     bottom: 2.2rem;
-    width: 3rem;
+    width: 5vw;
   }
 
   .navbar-social-links {
@@ -51,12 +51,20 @@
 
   .carousel-caption {
     z-index: 2500;
-    background: linear-gradient(to top, #000b 0%, #0000 100%);
+    background: linear-gradient(to top, #000f 0%, #0000 100%);
     right: 0;
     left: 0;
     bottom: 0;
     padding: 33% 8rem 4rem 3rem;
     text-align: left;
+    transition: all 1s ease;
+
+
+    &:hover {
+      padding-top: 70%;
+      transition: all 1s ease;
+
+    }
 
     a {
       color: white;
@@ -79,7 +87,7 @@
 body.header-top {
   .carousel-custom {
     .imagem {
-      height: 90vh;
+      height: 85vh;
 
       &::after {
         content: " ";
@@ -97,77 +105,14 @@ body.header-top {
 }
 
 @media screen and (max-width:991.98px) {
-
-  body.header-top {
-    .carousel-custom {
-      .imagem {
-        height: 70vh;
-      }
-    }
-  }
-
-  .carousel-custom {
-    .carousel-caption {
-      padding: 33% 1rem 2.5rem 2rem;
-
-      p {
-        margin-left: -1rem;
-      }
-
-      a {
-
-        h1 {
-          font-size: 2.5rem;
-        }
-      }
-    }
-  }
 }
 
 @media screen and (min-width:1200px) {
-  .carousel-custom {
-    .carousel-indicators {
-      margin: 2rem;
-
-    }
-    .carousel-caption {
-      padding: 33% 5rem 5rem 4.5rem;
-
-      a {
-        h1 {
-          font-size: 3.5rem;
-        }
-      }
-
-      p {
-        font-size: 1.5rem;
-      }
-    }
-  }
 }
 
 
 
 @media screen and (min-width:1400px) {
-  .carousel-custom {
-    .carousel-indicators {
-      margin: 3rem;
-
-    }
-    .carousel-caption {
-      padding: 33% 10rem 7rem 7rem;
-
-      a {
-        h1 {
-          font-size: 5rem;
-        }
-      }
-
-      p {
-        font-size: 2rem;
-      }
-    }
-  }
 }
 
 

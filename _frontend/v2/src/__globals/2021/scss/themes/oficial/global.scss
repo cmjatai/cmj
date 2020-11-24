@@ -26,6 +26,11 @@
   border-left: 4px solid transparent;
 }
 
+div[vw].enabled {
+  top: auto;
+  bottom: 0.5rem;
+  right: 0.5rem;
+}
 
 @media print {
   .container-youtube,

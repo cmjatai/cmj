@@ -133,6 +133,23 @@ a {
   }
 }
 
+.btn-edit-destaques {
+  position: absolute;
+  z-index: 3;
+  padding: 3px 6px 3px 8px;
+  background: rgba(black, 0.6);
+  line-height: 1.1;
+  top: 0px;
+  font-size: 1.4rem;
+
+  a {
+    color: rgba(255, 255, 255, 0.6);
+
+    &:hover {
+      color: white;
+    }
+  }
+}
 @media screen and (max-width: 991.98px) {
   .item-listas {
     padding: 0.2rem 0.5rem 1rem;
@@ -150,7 +167,6 @@ a {
       display: none;
     }
   }
-
 
   .links-texto {
     padding: 0.5rem 0.5rem 0.5rem 0;
