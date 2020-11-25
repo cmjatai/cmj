@@ -3,8 +3,10 @@ header.main {
     flex: 0 0 auto;
     //padding: 0;
     padding: 0 $min_padding * 2;
+
     &.d-searching {
       flex: 1 1 auto;
+
       input {
         width: 100% !important;
       }
@@ -12,9 +14,13 @@ header.main {
 
     .form-search {
       opacity: 0.7;
-      &:hover, &:focus-within , &:focus {
+
+      &:hover,
+      &:focus-within,
+      &:focus {
         opacity: 1;
       }
+
       .inner {
         display: flex;
         position: relative;
@@ -22,10 +28,12 @@ header.main {
         text-align: right;
         background-color: white;
         border-radius: 5px;
+
         .item-form {
           &:first-child {
             flex: 1 1 100%;
           }
+
           &:last-child {
             position: absolute;
             top: 0px;
@@ -33,6 +41,7 @@ header.main {
             height: 100%;
           }
         }
+
         input {
           border: 0px;
           background-color: transparent;
@@ -40,6 +49,7 @@ header.main {
           padding-right: 60px;
           width: 14rem;
         }
+
         button {
           background-color: white;
           border-radius: 0 5px 5px 0;
@@ -51,6 +61,7 @@ header.main {
       }
     }
   }
+
   &.header-mini {
     #portalsearch {
       .form-search {
@@ -61,6 +72,7 @@ header.main {
             padding: 0px 50px 0 10px;
             height: auto;
           }
+
           button {
             width: 36px;
           }
@@ -77,8 +89,13 @@ header.main {
       .form-search {
         .inner {
           input {
-            //width: 100%;
-            font-size: 1rem;
+            line-height: 1.5rem;
+            font-size: 0.8rem;
+            padding: 0px 2.2rem 0 $min_padding;
+            height: auto;
+          }
+          button {
+            width: 36px;
           }
         }
       }
@@ -87,13 +104,43 @@ header.main {
 }
 
 
+@media screen and (max-width:767.98px) {
+  header.main {
+    #portalsearch {
+      .form-search {
+        .inner {
+          input {
+            font-size: 0.6rem;
+            width: 8rem;
+            padding: 0px 2.2rem 0 $min_padding;
+          }
+        }
+      }
+    }
 
-@media screen and (max-width:575.98px) {
+  &.header-mini {
+    #portalsearch {
+      .form-search {
+        .inner {
+          input {
+            font-size: 0.6rem;
+            width: 8rem;
+            padding: 0px 2.2rem 0 $min_padding;
+          }
+
+        }
+      }
+    }
+  }
+  }
 }
+
+
 @media screen and (max-width:419.98px) {
   header.main {
     #portalsearch {
       flex: 1 1 0;
+
       .form-search {
         .inner {
           input {
@@ -103,6 +150,7 @@ header.main {
             padding-right: 42px;
             line-height: 1;
           }
+
           button {
             width: 36px;
           }
@@ -111,6 +159,7 @@ header.main {
 
       &.d-searching {
         flex: 1 1 0;
+
         input {
           width: 100% !important;
         }
@@ -120,15 +169,15 @@ header.main {
 }
 
 @media screen and (min-width:1200px) {
-header.main {
-  #portalsearch {
-    .form-search {
-      .inner {
-        input {
-          width: auto;
+  header.main {
+    #portalsearch {
+      .form-search {
+        .inner {
+          input {
+            width: auto;
+          }
         }
       }
     }
   }
-}
 }

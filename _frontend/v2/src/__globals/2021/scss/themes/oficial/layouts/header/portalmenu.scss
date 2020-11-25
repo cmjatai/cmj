@@ -12,8 +12,8 @@ header.main {
       .icon-bar {
         background: white;
         display: block;
-        height: 5px;
-        width: 5px;
+        width: 4px;
+        height: 4px;
         margin: 4px 0;
         border-radius: 2px;
 
@@ -67,6 +67,11 @@ header.main {
 
     #portalbtnmenu {
       display: inline-block;
+      .navbar-toggler {
+        padding-right: 0.5rem;
+        .icon-bar {
+        }
+      }
     }
   }
 }

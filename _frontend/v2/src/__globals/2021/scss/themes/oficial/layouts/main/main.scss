@@ -4,3 +4,13 @@
 main {
   min-height: 100vh;
 }
+
+
+body.header-top {
+  div[vw].enabled {
+    top: auto;
+    bottom: 0.5rem;
+    right: 0.5rem;
+    transition: all 1s ease;
+  }
+}

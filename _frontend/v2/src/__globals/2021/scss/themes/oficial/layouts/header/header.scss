@@ -30,7 +30,7 @@ header.main {
   }
 
   &::after {
-    background-image: url(~@/assets/img/fundo_topo.jpg);
+    background-image: url(~@/assets/img/fundo_topo_compressed.jpg);
     background-position: 0 30%;
     background-size: 100% auto;
     opacity: 0.05;
@@ -53,11 +53,6 @@ header.main {
       opacity: 0.15;
     }
 
-    #rowlogo {
-      //flex-wrap: wrap;
-      //height: 0;
-    }
-
   }
 
   &.header-mini {
@@ -77,7 +72,6 @@ header.main {
 
     }
   }
-
 }
 
 
@@ -104,48 +98,40 @@ header.main {
   }
 }
 
-
-
-@media screen and (min-width: 992px) {
+@media screen and (max-width: 767.98px) and (orientation: portrait){
   header.main {
-
-    //height: 15vh;
-    &.header-top__old {
+    &.header-top {
       position: absolute;
       background-color: transparent;
       background-image: none;
-
-      .teste {
-        #rowlogo {
-          flex-wrap: nowrap;
-        }
-
-        #portallogo {
-          flex: 0 0 0;
-          order: 1;
-        }
-
-        #portalactions {
-          order: 2;
-          width: auto;
-          flex: 1 1 0%;
-        }
-
-        #portalsearch {
-          order: 3;
-        }
-
+      &::after {
+        background-image: none;
+        background-color: transparent;
       }
+
+      #rowlogo {
+        height: 0;
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 992px) {
+  header.main {
+    &.header-top {
+      position: absolute;
+      background-color: transparent;
+      background-image: none;
 
       &::after {
         background-image: none;
         background-color: transparent;
       }
 
-    }
-
-    &.header-mini {
-      //height: auto;
+      #rowlogo {
+        justify-content: center;
+        height: 0;
+      }
     }
   }
 }

@@ -1,9 +1,10 @@
 header.main {
   #portallogo {
-    padding: 0;
-    padding-right: $min_padding * 2;
+    padding: 0 $min_padding * 2;
 
     .navbar {
+      padding: 0;
+
       &:hover {
         text-shadow: 1px 1px 15px lighten($bg_color_portal_cmj, 20%);
       }
@@ -16,8 +17,9 @@ header.main {
       align-items: center;
 
       img {
-        height: 6rem;
-        padding: 0.5rem;
+        height: 3.5rem;
+        padding: 1.44rem $min_padding * 2;
+        padding-left: 0;
         box-sizing: content-box;
       }
 
@@ -28,7 +30,7 @@ header.main {
         line-height: 1;
         font-family: Arial;
         justify-content: center;
-        font-size: 0.9rem;
+        font-size: 0.6rem;
       }
 
       .brand-cidade {
@@ -42,24 +44,17 @@ header.main {
       .brand-estado {
         text-align: center;
         //display: none;
-        padding-top: 0.3rem;
+        padding-top: $min_padding;
       }
     }
   }
 
   &.header-top {
     #portallogo {
-      flex: 1 1 auto;
-
-      &.d-searching {
-        flex: 0 0 auto;
-      }
-
       .navbar-brand {
-
-        .brand-name {
-          padding-left: 1rem;
-          font-size: 1rem;
+        img {
+          padding: $min_padding * 2;
+          padding-left: 0;
         }
       }
     }
@@ -67,13 +62,11 @@ header.main {
 
   &.header-mini {
     #portallogo {
-      .navbar {
-        padding: $min_padding * 0.5 0;
-      }
-
       .navbar-brand {
         img {
-          height: 36px;
+          height: 3rem;
+          padding: $min_padding * 2;
+          padding-left: 0;
         }
 
         .brand-name {
@@ -84,24 +77,20 @@ header.main {
   }
 }
 
-@media screen and (max-width:991.98px) {
+@media screen and (max-width: 991.98px) {
   header.main {
     #portallogo {
-      &.d-searching {
-        flex: 0 0 auto;
-      }
-
-      .navbar {
-        padding: $min_padding;
-      }
+      flex: 0 0 auto;
 
       .navbar-brand {
         img {
-          height: 3.5rem;
+          height: 2.5rem;
+          padding: $min_padding * 2.2;
+          padding-left: 0;
         }
 
         .brand-name {
-          font-size: 0.65rem;
+          font-size: 0.4rem;
         }
       }
     }
@@ -109,8 +98,30 @@ header.main {
     &.header-top {
       #portallogo {
         .navbar-brand {
+          img {
+            height: 2.5rem;
+            padding: $min_padding * 4.3;
+            padding-left: 0;
+          }
+
           .brand-name {
-            font-size: 0.8rem;
+            font-size: 0.4rem;
+          }
+        }
+      }
+    }
+
+    &.header-mini {
+      #portallogo {
+        .navbar-brand {
+          img {
+            height: 2rem;
+            padding: $min_padding * 2.6;
+            padding-left: 0;
+          }
+
+          .brand-name {
+            font-size: 0.37rem;
           }
         }
       }
@@ -118,46 +129,99 @@ header.main {
   }
 }
 
-@media screen and (max-width:767.98px) {
+@media screen and (max-width: 767.98px) {
   header.main {
     #portallogo {
-      flex: 1 1 0%;
-    }
-  }
-}
-
-@media screen and (max-width:575.98px) {
-  header.main {
-    #portallogo {
-      padding: 0;
-      flex: 1 1 0%;
-
-      .navbar {
-        padding: 0;
-      }
+      padding: 0 $min_padding;
 
       .navbar-brand {
         img {
-          height: 3rem;
+          height: 2rem;
+          padding: $min_padding * 1.4;
+          padding-left: 0;
         }
 
         .brand-name {
-          font-size: 0.5rem;
-          padding-left: 0.25rem;
+          font-size: 0.35rem;
         }
       }
     }
 
     &.header-top {
       #portallogo {
+        .navbar-brand {
+          img {
+            height: 2.5rem;
+            padding: $min_padding * 1.4;
+            padding-left: 0;
+          }
+
+          .brand-name {
+            font-size: 0.4rem;
+          }
+        }
+      }
+    }
+
+    &.header-mini {
+      #portallogo {
+        .navbar-brand {
+          img {
+            height: 2rem;
+            padding: $min_padding * 1.4;
+            padding-left: 0;
+          }
+
+          .brand-name {
+            font-size: 0.35rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 575.98px) {
+  header.main {
+    #portallogo {
+      flex: 1 1 0%;
+
+      .navbar-brand {
+        img {
+          height: 1.7rem;
+          padding: $min_padding * 3 $min_padding;
+          padding-left: 0;
+        }
+      }
+    }
+
+    &.header-top {
+      #portallogo {
+        flex: 1 1 0%;
+
         &.d-searching {
           flex: 0 0 auto;
         }
 
         .navbar-brand {
-          .brand-name {
-            font-size: 0.5rem;
-            padding-left: 0.25rem;
+          img {
+            height: 1.7rem;
+            padding: $min_padding * 3 $min_padding;
+            padding-left: 0;
+          }
+        }
+      }
+    }
+
+    &.header-mini {
+      #portallogo {
+        flex: 1 1 0%;
+
+        .navbar-brand {
+          img {
+            height: 1.7rem;
+            padding: $min_padding* 2 $min_padding;
+            padding-left: 0;
           }
         }
       }
@@ -165,32 +229,68 @@ header.main {
   }
 }
 
-@media screen and (max-width:419.98px) {
+
+
+@media screen and (min-width: 992px) {
+  header.main {
+    &.header-top {
+      #portallogo {
+        flex: 1 1 0%;
+
+        &.d-searching {
+          flex: 0 0 auto;
+        }
+      }
+    }
+  }
+}
+
+
+@media screen and (min-width: 1281px) {
   header.main {
     #portallogo {
-      padding: 0;
-      flex: 0 0 auto;
-
-      &.d-searching {
-        .navbar {
-          padding: 0;
+      .navbar-brand {
+        img {
+          height: 4rem;
+          padding: $min_padding * 4.5;
+          padding-left: 0;
         }
-        .navbar-brand {
-          img {
-            height: 2rem;
-          }
 
-          .brand-name {
-            font-size: 0.4rem;
-            padding: 0.25rem;
-          }
+        .brand-name {
+          font-size: 0.9rem;
         }
       }
     }
 
     &.header-top {
       #portallogo {
-        flex: 0 0 auto;
+        .navbar-brand {
+          img {
+            height: 5rem;
+            padding: $min_padding * 5;
+            padding-left: 0;
+          }
+
+          .brand-name {
+            font-size: 1.2rem;
+          }
+        }
+      }
+    }
+
+    &.header-mini {
+      #portallogo {
+        .navbar-brand {
+          img {
+            height: 3rem;
+            padding: $min_padding * 2;
+            padding-left: 0;
+          }
+
+          .brand-name {
+            font-size: 0.6rem;
+          }
+        }
       }
     }
   }

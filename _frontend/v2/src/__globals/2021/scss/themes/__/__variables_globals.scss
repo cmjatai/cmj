@@ -13,7 +13,6 @@ $zindex-popover:                    1060 !default;
 $zindex-tooltip:                    1070 !default;
 
 $zindex-notify:                     1500 !default;
-$zindex-path-direction:             2000 !default;
 $zindex-footer:                     2100 !default;
 
 $zindex-navbar-menu:                2150 !default;
@@ -28,7 +27,8 @@ $zindex-social-links:               3000 !default;
 
 $zindex-apps:                       4000 !default;
 
-$zindex-header-main:                5000 !default;
+$zindex-header-main:                4500 !default;
+$zindex-path-direction:             4400 !default;
 
 $zindex-galeria:                    5000 !default;
 $zindex-galeria-fixed:              9000 !default;

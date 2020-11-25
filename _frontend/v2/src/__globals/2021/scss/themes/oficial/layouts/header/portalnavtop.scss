@@ -1,7 +1,11 @@
 header.main {
-  &, &.header-top, &.header-mini {
+
+  &,
+  &.header-top,
+  &.header-mini {
     #nav-top-container {
       display: none;
+
       &.opened {
         display: block;
       }
@@ -15,6 +19,7 @@ header.main {
       color: white;
       font-size: 0.8rem;
     }
+
     .row {
       position: relative;
       display: flex;
@@ -25,10 +30,12 @@ header.main {
     #accessactions {
       opacity: 0.7;
       flex: 1 0 auto;
+
       a {
         padding: 0 $min_padding;
         line-height: 1.5;
         text-decoration: none;
+
         .badge {
           margin-left: 0.3rem;
           padding-top: 2px;
@@ -36,14 +43,17 @@ header.main {
           line-height: 1;
           background-color: #777;
         }
+
         &:hover {
           background-color: $hover_background_20pw;
         }
       }
+
       &:hover {
         opacity: 1;
       }
     }
+
     #socialactions {
       padding: 0 $min_padding * 2;
     }
@@ -58,11 +68,16 @@ header.main {
 
     .nav-user-container {
       z-index: 1;
-      &, & ul {
+      height: 100%;
+
+      &,
+      & ul {
         list-style: none;
         padding: 0;
         margin: 0;
+        line-height: 2rem;
       }
+
       a {
         //padding: $min_padding * 0.5 $min_padding * 2;
         white-space: nowrap;
@@ -70,6 +85,7 @@ header.main {
         text-decoration: none;
         display: flex;
         align-items: center;
+
         .avatar {
           width: 1.3rem;
           height: 1.3rem;
@@ -86,6 +102,7 @@ header.main {
         text-align: right;
         border-radius: $min_padding;
         border: 1px solid lighten($bg_color_portal_cmj, 30);
+
         a {
           line-height: 1.5rem;
           display: inline-block;
@@ -103,14 +120,18 @@ header.main {
           z-index: -1;
         }
       }
+
       li {
         position: relative;
+
         .divider {
           border-top: 1px solid lighten($bg_color_portal_cmj, 30);
         }
+
         &:hover {
           background-color: $hover_background_20pw;
-          & > ul {
+
+          &>ul {
             display: flex;
             flex-direction: column;
           }
@@ -118,6 +139,7 @@ header.main {
       }
     }
   }
+
   &.header-mini {
 
     #nav-top-container {
@@ -128,7 +150,9 @@ header.main {
           height: 1.2rem;
         }
       }
+
       .nav-user-container {
+
         //padding: $min_padding * 0.5 $min_padding * 1;
         a {
           .avatar {
@@ -139,11 +163,13 @@ header.main {
       }
     }
   }
+
   &.header-top {
     #nav-top-container {
       #socialactions {
-        padding:  $min_padding  $min_padding * 4;
+        padding: $min_padding $min_padding * 4;
       }
+
       .navbar-social-links {
         a {
           line-height: 2.5rem;
@@ -151,8 +177,9 @@ header.main {
           height: 2.5rem;
         }
       }
+
       .nav-user-container {
-        & > li > a {
+        &>li>a {
           .avatar {
             height: 2.1rem;
           }
@@ -163,9 +190,35 @@ header.main {
 }
 
 
+@media screen and (max-width:991.98px) {
+
+  header.main {
+    &.header-top {
+      #nav-top-container {
+        #socialactions {
+          padding: $min_padding * 0.5 $min_padding * 4;
+        }
+
+        .navbar-social-links {
+          a {
+            line-height: 2rem;
+            width: 2rem;
+            height: 2rem;
+          }
+        }
+
+      }
+    }
+  }
+}
+
+
 @media screen and (max-width:767.98px) {
   header.main {
-    &, &.header-top, &.header-mini {
+
+    &,
+    &.header-top,
+    &.header-mini {
       #nav-top-container {
         background: darken($bg_color_portal_cmj, 10); // $url_bg_png;
 
@@ -174,27 +227,33 @@ header.main {
         }
 
         padding: 0;
+
         .navbar-social-links {
           a {
             line-height: 2.5rem;
             width: 2.5rem;
             height: 2.5rem;
+
             &::after {
               opacity: 1;
             }
           }
         }
+
         .row {
           flex-direction: column;
         }
+
         #altocontraste {
           padding: 0;
           right: 1rem;
         }
+
         .nav-user-container {
           border-bottom: 1px solid lighten($bg_color_portal_cmj, 30);
           width: 100%;
           padding-bottom: $min_padding * 2;
+
           ul {
             background: darken($bg_color_portal_cmj, 10); // $url_bg_png;
             flex-direction: column;
@@ -203,12 +262,15 @@ header.main {
             margin: 0;
             border-radius: 0;
             border: 0px;
+
             a {
               padding: $min_padding $min_padding * 2;
             }
+
             &:hover {
               display: flex;
             }
+
             &:before {
               top: 0;
               bottom: 0;
@@ -217,15 +279,18 @@ header.main {
               z-index: -1;
             }
           }
-          & > li {
+
+          &>li {
             .avatar {
               height: 5rem;
             }
-            & > a {
+
+            &>a {
               line-height: 1;
               justify-content: center;
             }
-            & > ul {
+
+            &>ul {
               display: flex;
             }
           }
@@ -237,9 +302,17 @@ header.main {
 
 @media screen and (min-width:768px) {
   header.main {
-    &, &.header-top, &.header-mini {
+
+    &,
+    &.header-top {
       #nav-top-container {
         display: block;
+      }
+    }
+
+    &.header-mini {
+      #nav-top-container {
+        display: none;
       }
     }
   }
