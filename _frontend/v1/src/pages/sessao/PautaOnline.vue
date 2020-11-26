@@ -96,7 +96,9 @@ export default {
       const t = this
       t.getObject(metadata)
         .then(obj => {
-          t.$set(t.itens[`${metadata.model}_list`], metadata.id, obj)
+          if (obj.sessao_plenaria === t.sessao.id) {
+            t.$set(t.itens[`${metadata.model}_list`], metadata.id, obj)
+          }
         })
 
       /* t.utils.getModel(data.app, data.model, data.id)
