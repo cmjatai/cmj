@@ -26,7 +26,8 @@ from cmj.core.models import AreaTrabalho
 from cmj.globalrules import GROUP_MATERIA_WORKSPACE_VIEWER
 from sapl.api.forms import SaplFilterSetMixin
 from sapl.api.permissions import SaplModelPermissions
-from sapl.api.serializers import ChoiceSerializer
+from sapl.api.serializers import ChoiceSerializer,\
+    ParlamentarEditSerializer
 from sapl.base.models import Autor
 from sapl.materia.models import Proposicao, TipoMateriaLegislativa,\
     MateriaLegislativa, Tramitacao, DocumentoAcessorio, TipoProposicao
@@ -243,6 +244,47 @@ SaplApiViewSetConstrutor.build_class()
 # das possibilidades para uma classe normal criada a partir de
 # rest_framework.viewsets.ModelViewSet conforme exemplo para a classe autor
 
+
+# decorator que processa um endpoint detail trivial com base no model passado,
+# Um endpoint detail geralmente é um conteúdo baseado numa FK com outros possíveis filtros
+# e os passados pelo proprio cliente, além de o serializer e o filterset
+# ser desse model passado
+
+
+class wrapper_queryset_response_for_drf_action(object):
+    def __init__(self, model):
+        self.model = model
+
+    def __call__(self, cls):
+
+        def wrapper(instance_view, *args, **kwargs):
+            # recupera a viewset do model anotado
+            iv = instance_view
+            viewset_from_model = SaplApiViewSetConstrutor._built_sets[
+                self.model._meta.app_config][self.model]
+
+            # apossa da instancia da viewset mae do action
+            # em uma viewset que processa dados do model passado no decorator
+            iv.queryset = viewset_from_model.queryset
+            iv.serializer_class = viewset_from_model.serializer_class
+            iv.filterset_class = viewset_from_model.filterset_class
+
+            iv.queryset = instance_view.filter_queryset(
+                iv.get_queryset())
+
+            # chama efetivamente o metodo anotado que deve devolver um queryset
+            # com os filtros específicos definido pelo programador customizador
+            qs = cls(instance_view, *args, **kwargs)
+
+            page = iv.paginate_queryset(qs)
+            data = iv.get_serializer(
+                page if page is not None else qs, many=True).data
+
+            return iv.get_paginated_response(
+                data) if page is not None else Response(data)
+
+        return wrapper
+
 # decorator para recuperar e transformar o default
 
 
@@ -338,6 +380,22 @@ class _AutorViewSet:
 
 @customize(Parlamentar)
 class _ParlamentarViewSet:
+
+    class ParlamentarPermission(SaplModelPermissions):
+        def has_permission(self, request, view):
+            if request.method == 'GET':
+                return True
+            else:
+                perm = super().has_permission(request, view)
+                return perm
+
+    permission_classes = (ParlamentarPermission, )
+
+    def get_serializer(self, *args, **kwargs):
+        if self.request.user.has_perm('parlamentares.add_parlamentar'):
+            self.serializer_class = ParlamentarEditSerializer
+        return super().get_serializer(*args, **kwargs)
+
     @action(detail=True)
     def proposicoes(self, request, *args, **kwargs):
         """
@@ -351,31 +409,18 @@ class _ParlamentarViewSet:
         # deve coincidir com
         # /parlamentar/{pk}/proposicao
 
-        # viewset proposicao
-        api_proposicao = SaplApiViewSetConstrutor.get_class_for_model(
-            Proposicao
-        )
+        return self.get_proposicoes(**kwargs)
 
-        self.serializer_class = api_proposicao.serializer_class
-        self.filterset_class = api_proposicao.filterset_class
-        self.queryset = Proposicao.objects.all()
+    @wrapper_queryset_response_for_drf_action(model=Proposicao)
+    def get_proposicoes(self, **kwargs):
 
-        qs = self.filter_queryset(self.get_queryset())
-
-        qs = qs.filter(
+        return self.get_queryset().filter(
             data_envio__isnull=False,
             data_recebimento__isnull=False,
             cancelado=False,
             autor__object_id=kwargs['pk'],
             autor__content_type=ContentType.objects.get_for_model(Parlamentar)
         )
-
-        page = self.paginate_queryset(qs)
-        data = self.serializer_class(
-            page if page is not None else qs, many=True).data
-
-        return self.get_paginated_response(
-            data) if page is not None else Response(data)
 
 
 class ResponseFileMixin:
@@ -604,25 +649,11 @@ class _SessaoPlenariaViewSet(ResponseFileMixin):
 
     @action(detail=True)
     def expedientes(self, request, *args, **kwargs):
+        return self.get_expedientes()
 
-        sessao = self.get_object()
-        # viewset expediente
-        api_expediente = SaplApiViewSetConstrutor.get_class_for_model(
-            ExpedienteSessao
-        )
-
-        self.serializer_class = api_expediente.serializer_class
-        self.filterset_class = api_expediente.filterset_class
-        self.queryset = sessao.expedientesessao_set.all()
-
-        qs = self.filter_queryset(self.get_queryset())
-
-        page = self.paginate_queryset(qs)
-        data = self.serializer_class(
-            page if page is not None else qs, many=True).data
-
-        return self.get_paginated_response(
-            data) if page is not None else Response(data)
+    @wrapper_queryset_response_for_drf_action(model=ExpedienteSessao)
+    def get_expedientes(self):
+        return self.get_queryset().filter(sessao_plenaria_id=self.kwargs['pk'])
 
     @action(detail=True)
     def upload_ata(self, request, *args, **kwargs):
