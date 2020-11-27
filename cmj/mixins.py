@@ -123,7 +123,7 @@ class CommonMixin(models.Model):
         if self._paginas > 0:
             return self._paginas
         elif self._paginas == -1:
-            raise Exception
+            return 0
 
         count_pages = 0
         try:
@@ -142,6 +142,7 @@ class CommonMixin(models.Model):
 
         except Exception as e:
             count_pages = -1
+
         finally:
             self._paginas = count_pages
             run_sql(
@@ -154,7 +155,7 @@ class CommonMixin(models.Model):
                     self.id
                 ))
             if count_pages == -1:
-                raise Exception
+                return 0
             return count_pages
 
 

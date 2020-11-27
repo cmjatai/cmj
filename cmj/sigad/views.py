@@ -21,21 +21,20 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView, MultipleObjectMixin
 from haystack.forms import model_choices
 from haystack.query import SearchQuerySet
-from haystack.utils.app_loading import haystack_get_model,\
-    haystack_get_models
+from haystack.utils.app_loading import haystack_get_models
 
 from cmj import globalrules
 from cmj.core.models import AreaTrabalho, CertidaoPublicacao
 from cmj.sigad import forms, models
 from cmj.sigad.forms import DocumentoForm, CaixaPublicacaoForm
 from cmj.sigad.models import Documento, Classe, ReferenciaEntreDocumentos,\
-    PermissionsUserClasse, PermissionsUserDocumento, Revisao, CMSMixin,\
+    PermissionsUserClasse, PermissionsUserDocumento, CMSMixin,\
     CLASSE_TEMPLATES_CHOICE, CaixaPublicacao, CaixaPublicacaoClasse,\
     CaixaPublicacaoRelationship, UrlShortener
 from cmj.utils import make_pagination
 from sapl.crud.base import MasterDetailCrud, Crud
-from sapl.parlamentares.models import Parlamentar, Legislatura,\
-    AfastamentoParlamentar
+from sapl.parlamentares.models import Parlamentar, Legislatura
+from sapl.protocoloadm.models import DocumentoAdministrativo
 
 
 class TabIndexMixin:
@@ -61,11 +60,22 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
 
         context['noticias_dos_parlamentares'] = np
 
-        context['noticias_da_procuradoria'] = self.get_noticias_da_procuradoria()
+        #context['noticias_da_procuradoria'] = self.get_noticias_da_procuradoria()
 
         context['ultimas_publicacoes'] = self.get_ultimas_publicacoes()
 
+        context['docs_adms_pagina_inicial'] = self.get_docs_adms_pagina_inicial()
+
         return context
+
+    def get_docs_adms_pagina_inicial(self):
+        param_tip_pub = {
+            'workspace__tipo': AreaTrabalho.TIPO_PUBLICO,
+            'visibilidade': DocumentoAdministrativo.STATUS_DOC_ADM_PUBLICO,
+            'documento_anexado_set__isnull': True
+        }
+        docs = DocumentoAdministrativo.objects.filter(**param_tip_pub)
+        return list(docs[:20])
 
     def get_noticias_da_procuradoria(self):
 

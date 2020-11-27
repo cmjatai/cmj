@@ -4,10 +4,8 @@ from re import sub, search
 
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Max, Q
-from django.forms.utils import ErrorList
 from django.http import JsonResponse
 from django.http.response import Http404, HttpResponseRedirect
 from django.shortcuts import render
@@ -16,10 +14,9 @@ from django.utils import timezone
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import method_decorator
 from django.utils.html import strip_tags
-from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import FormView, ListView, TemplateView, CreateView, UpdateView
+from django.views.generic import FormView, ListView, TemplateView
 from django.views.generic.base import RedirectView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormMixin
@@ -39,9 +36,8 @@ from sapl.parlamentares.models import (Filiacao, Legislatura, Mandato,
 from sapl.sessao.apps import AppConfig
 from sapl.sessao.forms import OrdemExpedienteLeituraForm, ExpedienteMateriaForm, OrdemDiaForm
 from sapl.sessao.models import RegistroLeitura
-from sapl.utils import (show_results_filter_set, remover_acentos, get_client_ip, filiacao_data,
-                        verifica_afastamento_parlamentar,
-                        parlamentares_ativos)
+from sapl.utils import (show_results_filter_set, remover_acentos, get_client_ip,
+                        verifica_afastamento_parlamentar)
 
 from .forms import (AdicionarVariasMateriasFilterSet, ExpedienteForm,
                     JustificativaAusenciaForm, OcorrenciaSessaoForm, ListMateriaForm,
