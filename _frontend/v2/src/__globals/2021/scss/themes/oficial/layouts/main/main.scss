@@ -14,3 +14,25 @@ body.header-top {
     transition: all 1s ease;
   }
 }
+
+.container-divider {
+  //background-image: url(~@/assets/img/bg.png);
+  position: relative;
+  height: 0;
+  background-color: red;
+  opacity: 1;
+  &:before {
+    content: " ";
+    position: absolute;
+    left: 50%;
+    right: 50%;
+    margin-left: -$min_padding * 12;
+    margin-right: -$min_padding * 12;
+    top: -$min_padding * 15;
+    bottom: -$min_padding * 12;
+    background-image: url(./assets/icon_line.svg);
+    background-repeat: no-repeat;
+    background-position: center center;
+  }
+
+}
