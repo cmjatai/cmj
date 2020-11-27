@@ -2019,10 +2019,16 @@ class MateriaLegislativaCrud(Crud):
             return qs"""
 
         def hook_anexadas__materias_anexadas(self, *args, **kwargs):
-            return 'Matérias Anexadas', kwargs['text']
+            if kwargs['text']:
+                return 'Matérias Anexadas', kwargs['text']
+            else:
+                return '', ''
 
         def hook_anexadas__materias_desanexadas(self, *args, **kwargs):
-            return 'Matérias Desanexadas', kwargs['text']
+            if kwargs['text']:
+                return 'Matérias Desanexadas', kwargs['text']
+            else:
+                return '', ''
 
     class ListView(Crud.ListView, RedirectView):
 

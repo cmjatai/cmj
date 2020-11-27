@@ -151,6 +151,7 @@ MateriaLegislativaDetail:
   - data_apresentacao:4 protocolo_gr
   - regime_tramitacao tipo_apresentacao
   - anexadas__materias_anexadas|m2m_urlize_for_detail anexadas__materias_desanexadas|m2m_urlize_for_detail
+  - materia_anexada_set__materia_principal|m2m_urlize_for_detail
   - normajuridica_set
   - autografo_set
 {%comment %}

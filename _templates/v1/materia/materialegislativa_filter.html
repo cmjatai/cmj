@@ -239,27 +239,46 @@
                           {% endfor %}
                         {% endif %}
 
-                        {% if m.anexadas.all.exists %}
-                          {% for anexada in m.materia_principal_set.all %}
-                            {% if forloop.first %}
-                              <strong>
-                                Matérias anexadas:
-                              </strong>
-                              <ul>
-                            {% endif %}
+                        {% if m.anexadas.materias_anexadas.exists or m.anexadas.materias_desanexadas.exists %}
+                          <div class="row">
+                              {% for anexada in m.anexadas.materias_anexadas %}
+                                {% if forloop.first %}
+                                  <div class="col-md-6">
+                                  <strong>
+                                    Matérias anexadas:
+                                  </strong>
+                                  <ul>
+                                {% endif %}
 
-                            <li>
-                              <a href="{% url 'sapl.materia:materialegislativa_detail' anexada.materia_anexada.id %}">
-                                  {{ anexada.materia_anexada }}.
-                              </a>
-                              <small>
-                              <i>Data de anexação: {{anexada.data_anexacao}}</i>
-                              </small>
-                            </li>
-                            {% if forloop.last %}
-                              </ul>
-                            {% endif %}
-                          {% endfor %}
+                                <li>
+                                  <a href="{% url 'sapl.materia:materialegislativa_detail' anexada.id %}">
+                                      {{ anexada }}
+                                  </a>
+                                </li>
+                                {% if forloop.last %}
+                                  </ul>
+                                  </div>
+                                {% endif %}
+                              {% endfor %}
+                              {% for desanexada in m.anexadas.materias_desanexadas %}
+                                {% if forloop.first %}
+                                  <div class="col-md-6">
+                                    <strong>
+                                      Matérias Desanexadas:
+                                    </strong>
+                                    <ul>
+                                {% endif %}
+                                      <li>
+                                        <a href="{% url 'sapl.materia:materialegislativa_detail' desanexada.id %}">
+                                            {{ desanexada }}
+                                        </a>
+                                      </li>
+                                {% if forloop.last %}
+                                    </ul>
+                                  </div>
+                                {% endif %}
+                              {% endfor %}
+                          </div>
                         {% endif %}
                       </div>
                     {% endif %}
