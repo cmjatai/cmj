@@ -1,0 +1,23 @@
+{% load i18n %}
+
+
+{% if docs_adms_pagina_inicial %}
+  <div class="container-scroll-x">
+    <div class="inner-container">
+
+      <div class="title-container">
+        <div class="icon icon-martelo"></div>
+        <label>Licitações em Andamento</label>
+      </div>
+
+      <div class="scroll-container">
+      {% for doc in docs_adms_pagina_inicial %}
+        <div class="item-scroll">
+          {{doc}}<br>
+        </div>
+
+      {% endfor %}
+      </div>
+    </div>
+  </div>
+{% endif %}
