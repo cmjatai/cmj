@@ -1,11 +1,11 @@
 
-from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields.jsonb import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
+from django.db.models import Q
 from django.db.models.deletion import PROTECT
 from django.db.models.functions import Concat
 from django.template import defaultfilters
@@ -202,8 +202,33 @@ def anexo_upload_path(instance, filename):
     return texto_upload_path(instance, filename, subpath=instance.materia.ano)
 
 
+class MateriaLegislativaManager(models.Manager):
+
+    use_for_related_fields = True
+
+    def materias_anexadas(self):
+        return self.get_anexacao('filter')
+
+    def materias_desanexadas(self):
+        return self.get_anexacao('exclude')
+
+    def get_anexacao(self, type_select):
+        return getattr(
+            self.get_queryset(), type_select
+        )(
+            Q(
+                materia_anexada_set__data_desanexacao__isnull=True
+            ) | Q(
+                materia_anexada_set__data_desanexacao__gt=timezone.now()
+            )
+        )
+
+
 @reversion.register()
 class MateriaLegislativa(CommonMixin):
+
+    objects = MateriaLegislativaManager()
+
     FIELDFILE_NAME = ('texto_original', )
 
     metadata = JSONField(

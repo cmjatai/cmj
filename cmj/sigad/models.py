@@ -27,11 +27,8 @@ from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields.json import JSONField as django_extensions_JSONField
 import qrcode
-from qrcode.image.pil import PilImage
 from reportlab.lib.pagesizes import A4, landscape
-from reportlab.lib.units import cm
 from reportlab.pdfgen import canvas
-from reportlab.pdfgen.pdfimages import PDFImage
 from reportlab.platypus.doctemplate import SimpleDocTemplate
 
 from cmj import globalrules

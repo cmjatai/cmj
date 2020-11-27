@@ -103,7 +103,7 @@ export default {
   display: grid;
   grid-template-columns: $width-sideleft $width-sideleft * 3 auto $width-sideright;
   grid-template-rows: 60px auto;
-  z-index: 4000;
+  z-index: $zindex-apps;
 
   .btn-outline-dark {
     border: 1px solid #bbb;

@@ -1,9 +1,12 @@
 from django.conf import settings
+from django.db.models import Q
 from django.urls.base import reverse
+from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.relations import StringRelatedField
 
 from sapl.base.models import Autor, CasaLegislativa
+from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
 from sapl.protocoloadm.models import DocumentoAdministrativo
 from sapl.sessao.models import SessaoPlenaria
@@ -89,3 +92,18 @@ class ParlamentarEditSerializer(serializers.ModelSerializer):
     class Meta:
         model = Parlamentar
         fields = '__all__'
+
+
+class MateriaLegislativaSerializer(serializers.ModelSerializer):
+    anexadas = serializers.SerializerMethodField()
+    desanexadas = serializers.SerializerMethodField()
+
+    class Meta:
+        model = MateriaLegislativa
+        fields = '__all__'
+
+    def get_anexadas(self, obj):
+        return obj.anexadas.materias_anexadas().values_list('id', flat=True)
+
+    def get_desanexadas(self, obj):
+        return obj.anexadas.materias_desanexadas().values_list('id', flat=True)

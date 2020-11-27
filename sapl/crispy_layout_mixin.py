@@ -1,9 +1,13 @@
+from builtins import classmethod
 from math import ceil
+import types
 
 from crispy_forms.bootstrap import FormActions
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import HTML, Div, Fieldset, Layout, Submit
 from django import template
+from django.db import models
+from django.db.models.query import QuerySet
 from django.urls.base import reverse
 from django.utils import formats
 from django.utils.translation import ugettext as _
@@ -259,15 +263,20 @@ class CrispyLayoutFormMixin:
         if '|' in fieldname:
             fieldname, func = tuple(fieldname.split('|'))
 
+        text = ''
         if func:
             verbose_name, text = getattr(self, func)(obj, fieldname)
-        else:
-            hook_fieldname = 'hook_%s' % fieldname
-            if hasattr(self, hook_fieldname):
+
+        hook_fieldname = 'hook_%s' % fieldname
+        if hasattr(self, hook_fieldname):
+            try:
+                verbose_name, text = getattr(
+                    self, hook_fieldname)(obj, text=text)
+            except:
                 verbose_name, text = getattr(
                     self, hook_fieldname)(obj)
-            else:
-                verbose_name, text = get_field_display(obj, fieldname)
+        elif not func:
+            verbose_name, text = get_field_display(obj, fieldname)
 
         return {
             'id': fieldname,
@@ -294,19 +303,39 @@ class CrispyLayoutFormMixin:
 
     def m2m_urlize_for_detail(self, obj, fieldname):
 
-        manager, fieldname = tuple(fieldname.split('__'))
+        lookup_split = fieldname.split('__')
+        fieldname = lookup_split[-1]
 
-        manager = getattr(obj, manager)
+        manager = obj
 
-        verbose_name = manager.model._meta.verbose_name
+        for l in lookup_split:
+            if hasattr(manager, l):
+                manager = getattr(manager, l)
+
+            if not isinstance(manager, models.Manager):
+                break
+
+        if isinstance(manager, models.Manager):
+            manager = manager.all
+
+        if l == lookup_split[-1]:
+            fieldname = l
+        else:
+            fieldname = ''
+
+        verbose_name = obj._meta.verbose_name
         display = ''
-        for item in manager.all():
-            obj_m2m = getattr(item, fieldname)
+        for item in manager():
+
+            obj_m2m = getattr(item, fieldname) if hasattr(
+                item, fieldname) else item
 
             if obj == obj_m2m:
                 continue
 
-            verbose_name = item._meta.get_field(fieldname).verbose_name
+            verbose_name = item._meta.get_field(
+                fieldname
+            ).verbose_name if hasattr(item, fieldname) else item._meta.verbose_name
 
             display += '<li><a href="{}">{}</a></li>'.format(
                 reverse(

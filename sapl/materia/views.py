@@ -1757,7 +1757,8 @@ class AnexadaCrud(MasterDetailCrud):
     public = [RP_LIST, RP_DETAIL]
 
     class BaseMixin(MasterDetailCrud.BaseMixin):
-        list_field_names = ['materia_anexada', 'data_anexacao']
+        list_field_names = ['materia_anexada',
+                            'data_anexacao', 'data_desanexacao']
 
     class CreateView(MasterDetailCrud.CreateView):
         form_class = AnexadaForm
@@ -2016,6 +2017,12 @@ class MateriaLegislativaCrud(Crud):
                 qs = qs.exclude(despachoinicial_set__isnull=True)
 
             return qs"""
+
+        def hook_anexadas__materias_anexadas(self, *args, **kwargs):
+            return 'Matérias Anexadas', kwargs['text']
+
+        def hook_anexadas__materias_desanexadas(self, *args, **kwargs):
+            return 'Matérias Desanexadas', kwargs['text']
 
     class ListView(Crud.ListView, RedirectView):
 

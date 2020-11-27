@@ -7,6 +7,7 @@ from django.db.models import Q
 from django.db.models.fields.files import FileField
 from django.http.response import Http404, HttpResponse
 from django.urls.base import reverse
+from django.utils import timezone
 from django.utils.decorators import classonlymethod
 from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy as _
@@ -27,7 +28,7 @@ from cmj.globalrules import GROUP_MATERIA_WORKSPACE_VIEWER
 from sapl.api.forms import SaplFilterSetMixin
 from sapl.api.permissions import SaplModelPermissions
 from sapl.api.serializers import ChoiceSerializer,\
-    ParlamentarEditSerializer
+    ParlamentarEditSerializer, MateriaLegislativaSerializer
 from sapl.base.models import Autor
 from sapl.materia.models import Proposicao, TipoMateriaLegislativa,\
     MateriaLegislativa, Tramitacao, DocumentoAcessorio, TipoProposicao
@@ -612,7 +613,12 @@ class _MateriaLegislativaViewSet(ResponseFileMixin):
 
     @action(detail=True, methods=['GET'])
     def anexadas(self, request, *args, **kwargs):
-        self.queryset = self.get_object().anexadas.all()
+        self.queryset = self.get_object().anexadas.materias_anexadas()
+        return self.list(request, *args, **kwargs)
+
+    @action(detail=True, methods=['GET'])
+    def desanexadas(self, request, *args, **kwargs):
+        self.queryset = self.get_object().anexadas.materias_desanexadas()
         return self.list(request, *args, **kwargs)
 
 

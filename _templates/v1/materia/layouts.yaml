@@ -26,7 +26,7 @@ TipoFimRelatoria:
 MateriaLegislativa:
   {% trans 'Identificação Básica' %}:
   - tipo:6 ano numero
-  - data_apresentacao  numero_protocolo  tipo_apresentacao
+  - data_apresentacao numero_protocolo tipo_apresentacao
   - tipo_autor autor
   - texto_original
   {% trans 'Outras Informações' %}:
@@ -54,13 +54,13 @@ MateriaAssunto:
 Anexada:
   {% trans 'Matéria Anexada' %}:
   - tipo numero ano
-  - data_anexacao  data_desanexacao
+  - data_anexacao data_desanexacao
 
 AnexadaDetail:
   {% trans 'Matéria Anexada' %}:
   - materia_principal|fk_urlize_for_detail
   - materia_anexada|fk_urlize_for_detail
-  - data_anexacao  data_desanexacao
+  - data_anexacao data_desanexacao
 
 Autoria:
   {% trans 'Autoria' %}:
@@ -150,8 +150,7 @@ MateriaLegislativaDetail:
   - tipo:5 ano:2 numero:2 em_tramitacao:3
   - data_apresentacao:4 protocolo_gr
   - regime_tramitacao tipo_apresentacao
-  - materia_anexada_set__materia_principal|m2m_urlize_for_detail
-  - materia_principal_set__materia_anexada|m2m_urlize_for_detail
+  - anexadas__materias_anexadas|m2m_urlize_for_detail anexadas__materias_desanexadas|m2m_urlize_for_detail
   - normajuridica_set
   - autografo_set
 {%comment %}
