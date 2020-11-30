@@ -5,18 +5,18 @@ from unipath import Path
 
 config = AutoConfig()
 
-DEVELOPING = config('DEVELOPING', default=False, cast=bool)
+MEDIA_DEV_LOCAL = config('MEDIA_DEV_LOCAL', default=False, cast=bool)
 
 BASE_DIR = Path(__file__).ancestor(2)
 PROJECT_DIR = Path(__file__).ancestor(3)
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = PROJECT_DIR.ancestor(1).child("cmj_media{}".format(
-    '_local' if DEVELOPING else ''
+    '_local' if MEDIA_DEV_LOCAL else ''
 )).child("media")
 MEDIA_PROTECTED_ROOT = PROJECT_DIR.ancestor(
     1).child("cmj_media{}".format(
-        '_local' if DEVELOPING else ''
+        '_local' if MEDIA_DEV_LOCAL else ''
     )).child("media_protected")
 
 FILTERS_HELP_TEXT_FILTER = False

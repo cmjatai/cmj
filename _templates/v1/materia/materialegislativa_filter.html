@@ -244,19 +244,18 @@
                               {% for anexada in m.anexadas.materias_anexadas %}
                                 {% if forloop.first %}
                                   <div class="col-md-6">
-                                  <strong>
-                                    Matérias anexadas:
-                                  </strong>
-                                  <ul>
+                                    <strong>
+                                      Matérias anexadas:
+                                    </strong>
+                                    <ul>
                                 {% endif %}
-
-                                <li>
-                                  <a href="{% url 'sapl.materia:materialegislativa_detail' anexada.id %}">
-                                      {{ anexada }}
-                                  </a>
-                                </li>
+                                      <li>
+                                        <a href="{% url 'sapl.materia:materialegislativa_detail' anexada.id %}">
+                                            {{ anexada }}
+                                        </a>
+                                      </li>
                                 {% if forloop.last %}
-                                  </ul>
+                                    </ul>
                                   </div>
                                 {% endif %}
                               {% endfor %}
