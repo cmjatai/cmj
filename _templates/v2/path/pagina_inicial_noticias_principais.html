@@ -24,14 +24,17 @@
       <span class="carousel-control-next-icon" aria-hidden="true"></span>
       <span class="sr-only">Next</span>
     </a>
-    <div class="carousel-inner" role="listbox" >
+    <div class="carousel-inner" role="listbox">
+
       {% for d in  noticias_destaque.docs%}
+
         <div class="carousel-item {% if forloop.first %}active{% endif %}">
+
           <div class="autor">{{d.1.autor|default:''}}</div>
+
           {% social_link_share d.0 'absolute-bottom-right' %}
 
-
-          <div class="d-block w-100 imagem" style="background-image: url(/{{d.1.absolute_slug}}.768);">
+          <div class="d-block w-100 imagem" id="image{{d.0.id}}" style="background-image: url(/{{d.1.absolute_slug}}.768);">
             {% comment %}
             <img src="/{{d.1.absolute_slug}}" alt="{% if d.1.titulo %}{{d.0.titulo}}{% else %}{{d.0.titulo}}{% endif %}">
             {% endcomment %}
