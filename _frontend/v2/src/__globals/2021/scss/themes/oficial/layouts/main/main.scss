@@ -5,8 +5,15 @@ main {
 }
 
 section:not(:first-child) {
-  min-height: 85vh;
+  //min-height: 80vh;
 }
+
+section#section_docs_adms {
+  background-color: $color_documentoadministrativo;
+}
+
+
+
 
 body.header-top {
   div[vw].enabled {

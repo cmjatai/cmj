@@ -72,10 +72,11 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
         param_tip_pub = {
             'workspace__tipo': AreaTrabalho.TIPO_PUBLICO,
             'visibilidade': DocumentoAdministrativo.STATUS_DOC_ADM_PUBLICO,
-            'documento_anexado_set__isnull': True
+            'documento_anexado_set__isnull': True,
         }
-        docs = DocumentoAdministrativo.objects.filter(**param_tip_pub)
-        return list(docs[:20])
+        docs = DocumentoAdministrativo.objects.filter(
+            **param_tip_pub).order_by('-data_ultima_atualizacao')
+        return list(docs[:100])
 
     def get_noticias_da_procuradoria(self):
 

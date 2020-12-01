@@ -119,6 +119,13 @@ header.main {
 @media screen and (min-width: 992px) {
   header.main {
     &.header-top {
+      #rowlogo {
+        justify-content: center;
+      }
+    }
+
+
+    &.header-top__inner_no_custom {
       position: absolute;
       background-color: transparent;
       background-image: none;

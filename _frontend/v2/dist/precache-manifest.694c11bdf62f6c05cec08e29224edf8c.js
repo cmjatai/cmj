@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/brasao/brasao_512.png"
   },
   {
-    "revision": "b02b4458dd9da5d51d38",
-    "url": "/static/css/app.8a6ecaa1.css"
+    "revision": "3af863d10d057c7d03de",
+    "url": "/static/css/app.eae64f9a.css"
   },
   {
     "revision": "bf0ac6cb959f57715ca9",
@@ -144,6 +144,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/icon_line.761d394d.svg"
   },
   {
+    "revision": "b23db9f1b53ae0eeea9be2e691657e7d",
+    "url": "/static/img/icon_martelo.b23db9f1.svg"
+  },
+  {
     "revision": "ed302d3ad30c6db9dfa8e0c4c9525cca",
     "url": "/static/img/icon_ouvidoria.ed302d3a.svg"
   },
@@ -172,12 +176,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/pdf_rodape.jpg"
   },
   {
-    "revision": "316d172d344ae3f243c1844e42860568",
+    "revision": "422c5c7913c5eb632744b31a5651a475",
     "url": "/static/index.html"
   },
   {
-    "revision": "b02b4458dd9da5d51d38",
-    "url": "/static/js/app.e6e1eb3e.js"
+    "revision": "3af863d10d057c7d03de",
+    "url": "/static/js/app.f1312cb7.js"
   },
   {
     "revision": "bf0ac6cb959f57715ca9",

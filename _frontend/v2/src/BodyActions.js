@@ -15,6 +15,51 @@ export default {
     teste () {
       // console.log('teste')
     },
+    handleTouch (event) {
+      let ct = event.currentTarget
+
+      if (event.type === 'touchstart') {
+        ct.setAttribute('touchstart', event.changedTouches[0].screenX)
+      } else {
+        let x_inicial = ct.getAttribute('touchstart')
+
+        if (x_inicial - event.changedTouches[0].screenX > 20) {
+          let clickEvent = new CustomEvent('click')
+          ct.children[1].dispatchEvent(clickEvent)
+        } else if (x_inicial - event.changedTouches[0].screenX < -20) {
+          let clickEvent = new CustomEvent('click')
+          ct.children[0].dispatchEvent(clickEvent)
+        }
+      }
+    },
+    handleClickContainerScrollX (event) {
+      let innerScroll = event.target.nextElementSibling
+
+      let direction = 1
+      if (innerScroll.classList.contains('btn-action-right')) {
+        innerScroll = innerScroll.nextElementSibling
+        direction = -1
+      }
+
+      let offsetWidth = (innerScroll.firstChild.offsetWidth + 23) * 3 * direction
+
+      if (innerScroll.style.transform === '') {
+        innerScroll.setAttribute('translate', 0)
+      }
+
+      let newTranslate = innerScroll.getAttribute('translate') - offsetWidth
+      if (newTranslate < 0 && newTranslate * (-1) + offsetWidth / 3 < innerScroll.scrollWidth) {
+        innerScroll.style.transform = `translateX(${newTranslate}px)`
+        innerScroll.setAttribute('translate', newTranslate)
+
+        innerScroll.previousElementSibling.previousElementSibling.style = 'display: flex'
+      } else {
+        innerScroll.setAttribute('translate', '')
+        innerScroll.style.transform = `translateX(0px)`
+        innerScroll.previousElementSibling.previousElementSibling.style = 'display: none'
+      }
+    },
+
     handleBlurSearch (event) {
       this.searching = ''
     },

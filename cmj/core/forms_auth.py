@@ -171,7 +171,8 @@ class CmjUserChangeForm(ModelForm):
         avatar.attrs.update(
             get_attrs(self.instance.avatar, 'avatar')
         )
-        del avatar.attrs['class']
+        if 'class' in avatar.attrs:
+            avatar.attrs.pop('class')
 
     def save(self, commit=True):
         new_password = self.cleaned_data['new_password1']

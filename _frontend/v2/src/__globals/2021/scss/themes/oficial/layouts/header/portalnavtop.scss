@@ -68,14 +68,12 @@ header.main {
 
     .nav-user-container {
       z-index: 1;
-      height: 100%;
 
       &,
       & ul {
         list-style: none;
         padding: 0;
         margin: 0;
-        line-height: 2rem;
       }
 
       a {
@@ -85,14 +83,22 @@ header.main {
         text-decoration: none;
         display: flex;
         align-items: center;
+        padding: $min_padding * 0.5 1rem;
+        line-height: 2.5rem;
+        height: 2.5rem;
 
-        .avatar {
-          width: 1.3rem;
-          height: 1.3rem;
+        &#user_connected {
+          padding: $min_padding * 0.5 $min_padding;
+          line-height: 1rem;
+          .avatar {
+            width: 2rem;
+            height: 2rem;
+          }
         }
       }
 
       ul {
+        line-height: 1rem;
         display: none;
         position: absolute;
         background: lighten($bg_color_portal_cmj, 10); // $url_bg_png;
@@ -107,6 +113,7 @@ header.main {
           line-height: 1.5rem;
           display: inline-block;
           padding: $min_padding * 0.5 $min_padding * 2;
+          height: auto;
         }
 
         &:before {
@@ -263,6 +270,8 @@ header.main {
             border-radius: 0;
             border: 0px;
 
+
+
             a {
               padding: $min_padding $min_padding * 2;
             }
@@ -316,4 +325,24 @@ header.main {
       }
     }
   }
+}
+
+@media screen and (min-width:992px) {
+  header.main {
+
+    &,
+    &.header-top,
+    &.header-mini {
+      #nav-top-container {
+        .container {
+          padding: 0;
+        }
+        .row {
+          margin: 0;
+          padding: 0;
+        }
+      }
+    }
+  }
+
 }

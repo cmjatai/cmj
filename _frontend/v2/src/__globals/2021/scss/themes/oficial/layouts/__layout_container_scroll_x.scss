@@ -1,0 +1,150 @@
+.container-scroll-x {
+  font-size: 1rem;
+
+  .title-container {
+    margin: 1rem;
+    display: inline-flex;
+    align-items: center;
+    font-size: 2em;
+    color: white;
+    padding: 0 1em 0 0em;
+    position: absolute;
+
+    .icon {
+      width: 2em;
+      height: 2em;
+      border-radius: 50%;
+      opacity: 1;
+      margin-right: 0.5em;
+    }
+
+    label {
+      margin: 0;
+    }
+  }
+
+  .scroll-container {
+    overflow: hidden;
+    position: relative;
+
+    .btn-action-left,
+    .btn-action-right {
+      position: absolute;
+      width: 1.7rem;
+      //height: 3rem;
+      top: 50%;
+      margin-top: -1rem;
+      padding: 0.3rem 0;
+      background-color: #000f;
+      z-index: 1;
+      cursor: pointer;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      opacity: 0.2;
+      transition: opacity 0.3s ease;
+      font-size: 2em;
+      font-weight: bold;
+
+    }
+
+    &:hover {
+      .btn-action-left,
+      .btn-action-right {
+        transition: opacity 0.3s ease;
+        opacity: 1;
+      }
+    }
+
+    .btn-action-left {
+      border-radius: 0 0.5rem 0.5rem 0;
+      left: 0;
+      display: none;
+    }
+
+    .btn-action-right {
+      border-radius: 0.5rem 0 0 0.5rem;
+      right: 0;
+
+    }
+
+    .inner-scroll {
+      display: flex;
+      width: auto;
+      transition: all 1s ease;
+
+      .item-scroll {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 27vw;
+        min-height: 55vh;
+        max-height: 65vh;
+        flex: 0 0 27vw;
+        background-color: #ffffffe0;
+        padding: 0.5em;
+        margin: 6em 0.75em 4em;
+        overflow: hidden;
+        transition: all 0.3s ease;
+
+        &:hover {
+          transition: all 0.3s ease;
+          background-color: white;
+        }
+
+        &:first-child {
+          margin-left: 5em;
+        }
+
+        &:last-child {
+          margin-right: 5em;
+        }
+      }
+
+      .item-body {
+        flex: 2 1 auto;
+        overflow: hidden;
+        padding: 0 0 1rem 0;
+
+        .text-ementa {
+          overflow: hidden;
+          font-size: 0.8em;
+        }
+      }
+
+      .item-footer {
+        font-size: 70%;
+        background-color: white;
+        padding: 0.2em;
+        border: 1px solid #cdf;
+        margin-top: 0.4em;
+      }
+
+      strong {
+        font-weight: bold;
+      }
+
+
+    }
+
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  .container-scroll-x {
+    font-size: 1.2rem;
+  }
+}
+
+@media screen and (min-width: 1600px) {
+  .container-scroll-x {
+    font-size: 1.4rem;
+  }
+}
+
+@media screen and (min-width: 1600px) {
+  .container-scroll-x {
+    font-size: 1.6rem;
+  }
+}
