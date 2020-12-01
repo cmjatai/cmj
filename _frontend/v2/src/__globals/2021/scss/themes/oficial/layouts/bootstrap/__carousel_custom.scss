@@ -261,7 +261,7 @@ body.header-top {
     .carousel-custom {
       .carousel-item {
         .imagem {
-          height: 65vh;
+          height: 60vh;
         }
       }
     }
@@ -325,7 +325,7 @@ body.header-top {
     .carousel-custom {
       .carousel-item {
         .imagem {
-          height: 90vh;
+          height: 53vh;
         }
       }
     }
@@ -337,6 +337,11 @@ body.header-top {
 @media screen and (min-width:1600px) {
 
   .carousel-custom {
+    .carousel-item {
+      .imagem {
+        height: 80vh;
+      }
+    }
 
     .carousel-caption {
       font-size: 1.6rem;
@@ -357,4 +362,15 @@ body.header-top {
       }
     }
   }
+  body.header-top {
+    .carousel-custom {
+      .carousel-item {
+        .imagem {
+          height: 63vh;
+        }
+      }
+    }
+
+  }
+
 }
