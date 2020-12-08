@@ -1,3 +1,4 @@
+from _collections import OrderedDict
 import collections
 import datetime
 import itertools
@@ -907,12 +908,27 @@ class RelatorioMateriasPorAutorView(FilterView):
     def get_filterset_kwargs(self, filterset_class):
         super().get_filterset_kwargs(filterset_class)
         kwargs = {'data': self.request.GET or None}
+
         return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         context['title'] = _('Matérias por Autor')
+
+        data = self.request.GET
+        stop_filter = True
+        if data:
+            for k, v in data.items():
+                if v:
+                    stop_filter = False
+
+        if data and stop_filter:
+            messages.error(
+                self.request, 'Informe ao menos um dos filtros abaixo.')
+            context['object_list'] = []
+            return context
+
         if not self.filterset.form.is_valid():
             return context
 
@@ -924,6 +940,14 @@ class RelatorioMateriasPorAutorView(FilterView):
                 qtdes[tipo] = qtde
         context['qtdes'] = qtdes
         context['qtdes_total'] = context['object_list'].count()
+
+        if context['object_list'].count() > 2000:
+            messages.error(
+                self.request,
+                'Exitem mais de 2000 registros com o filtro aplicado. '
+                'É um processamento muito alto para mostrar todos... '
+                'Será mostrado um quadro geral com a totalidade, '
+                'mas para uma lista detalhada segmente a pesquisa.')
 
         qr = self.request.GET.copy()
 
@@ -951,16 +975,27 @@ class RelatorioMateriasPorAutorView(FilterView):
             if autor_seleted not in r:
                 r[autor_seleted] = {}
 
-        for m in kwargs['object_list']:
+        contagem = 0
+        for m in context['object_list']:
             if autor_seleted:
                 if m.ano not in r[autor_seleted]:
                     r[autor_seleted][m.ano] = []
                 r[autor_seleted][m.ano].append(m)
             else:
                 for a in m.autores.all():
+                    if a not in r:
+                        r[a] = OrderedDict()
                     if m.ano not in r[a]:
                         r[a][m.ano] = []
                     r[a][m.ano].append(m)
+            contagem += 1
+
+            if contagem > 2000:
+                break
+
+        for autor, anos in context['result_dict'].items():
+            context['result_dict'][autor] = dict(
+                sorted(anos.items(), reverse=True))
 
         return context
 
