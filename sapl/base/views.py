@@ -918,30 +918,49 @@ class RelatorioMateriasPorAutorView(FilterView):
 
         qtdes = {}
         for tipo in TipoMateriaLegislativa.objects.all():
-            qs = kwargs['object_list']
+            qs = context['object_list']
             qtde = len(qs.filter(tipo_id=tipo.id))
             if qtde > 0:
                 qtdes[tipo] = qtde
         context['qtdes'] = qtdes
+        context['qtdes_total'] = context['object_list'].count()
 
         qr = self.request.GET.copy()
-        context['filter_url'] = ('&' + qr.urlencode()) if len(qr) > 0 else ''
 
         context['show_results'] = show_results_filter_set(qr)
         if self.request.GET['tipo']:
             tipo = int(self.request.GET['tipo'])
-            context['tipo'] = (
-                str(TipoMateriaLegislativa.objects.get(id=tipo)))
+            context['tipo'] = TipoMateriaLegislativa.objects.get(id=tipo)
         else:
             context['tipo'] = ''
         if self.request.GET['autoria__autor']:
             autor = int(self.request.GET['autoria__autor'])
-            context['autor'] = (str(Autor.objects.get(id=autor)))
+            context['autor'] = Autor.objects.get(id=autor)
         else:
             context['autor'] = ''
-        context['periodo'] = (
-            self.request.GET['data_apresentacao_0'] +
-            ' - ' + self.request.GET['data_apresentacao_1'])
+
+        if self.request.GET['data_apresentacao_0']:
+            context['periodo'] = (
+                self.request.GET['data_apresentacao_0'] +
+                ' - ' + self.request.GET['data_apresentacao_1'])
+
+        autor_seleted = context['autor']
+        context['result_dict'] = r = {}
+
+        if autor_seleted:
+            if autor_seleted not in r:
+                r[autor_seleted] = {}
+
+        for m in kwargs['object_list']:
+            if autor_seleted:
+                if m.ano not in r[autor_seleted]:
+                    r[autor_seleted][m.ano] = []
+                r[autor_seleted][m.ano].append(m)
+            else:
+                for a in m.autores.all():
+                    if m.ano not in r[a]:
+                        r[a][m.ano] = []
+                    r[a][m.ano].append(m)
 
         return context
 
