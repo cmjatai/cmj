@@ -45,7 +45,6 @@
         {% if object.texto_integral %}
           <a
             {% if object.visibilidade == object.STATUS_DOC_ADM_PUBLICO %}
-              target="_blank"
               class="link-texto"
               title="Mídia Digital"
               href="{{object.texto_integral.url}}?u={% now "u"%}&hash={{object.link_share}}"

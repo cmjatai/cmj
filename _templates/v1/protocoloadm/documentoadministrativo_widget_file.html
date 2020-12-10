@@ -8,7 +8,7 @@
     <div class="col-12 col-md-auto justify-content-center">
 
       {% if d.metadata.signs and d.metadata.signs.texto_integral.signs %}
-        <a class="link-texto"  target="_blank" href="{{d.texto_integral.url}}" title="Documento Eletrônico">
+        <a class="link-texto" href="{{d.texto_integral.url}}" title="Documento Eletrônico">
           <i class="fas fa-2x fa-certificate"></i>
           <br>
           <strong>Documento
@@ -19,7 +19,7 @@
           </strong>
         </a>
       {% elif d.texto_integral and '.pdf' in d.texto_integral.path %}
-          <a class="link-texto" target="_blank" href="{{d.texto_integral.url}}" title="Documento Digitalizado">
+          <a class="link-texto" href="{{d.texto_integral.url}}" title="Documento Digitalizado">
             <i class="far fa-2x fa-file-pdf"></i>
             <br>
             <strong>
@@ -27,7 +27,7 @@
             </strong>
           </a>
       {% else %}
-        <a class="link-texto"  target="_blank" href="{{d.texto_integral.url}}" title="Documento Eletrônico">
+        <a class="link-texto" href="{{d.texto_integral.url}}" title="Documento Eletrônico">
           <i class="far fa-2x fa-file-archive"></i>
           <br>
           <strong>Documento<br>Eletrônico</strong>
