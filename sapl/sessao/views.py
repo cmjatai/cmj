@@ -3580,7 +3580,7 @@ class PautaSessaoDetailView(DetailView):
 class PesquisarSessaoPlenariaView(FilterView):
     model = SessaoPlenaria
     filterset_class = SessaoPlenariaFilterSet
-    paginate_by = 10
+    paginate_by = 12
 
     logger = logging.getLogger(__name__)
 
