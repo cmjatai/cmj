@@ -23,7 +23,7 @@
 {% block title_inner %}
   {% if object.texto_original %}
     <div class="links-texto">
-      <a class="link-texto" target="_blank" href="{{object.texto_original.url}}?u={% now "u"%}" title="Texto Original">
+      <a class="link-texto" href="{{object.texto_original.url}}?u={% now "u"%}" title="Texto Original">
         <i class="far fa-file-{% if '.pdf' in object.texto_original.path %}pdf{% else %}archive{% endif %}"></i>
       </a>
     </div>
