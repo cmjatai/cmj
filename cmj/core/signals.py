@@ -99,6 +99,7 @@ def signed_name_and_date_extract_pre_save(sender, instance, using, **kwargs):
                     meta_signs['hom'] = sign_hom['hom']
 
             else:
+                file.seek(0)
                 meta_signs = signed_name_and_date_extract(
                     file
                 )
