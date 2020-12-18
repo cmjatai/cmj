@@ -114,11 +114,11 @@ class Partido(models.Model):
         blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
 
     sigla = models.CharField(
-        max_length=9,
+        max_length=100,
         verbose_name=_('Sigla')
     )
     nome = models.CharField(
-        max_length=50,
+        max_length=100,
         verbose_name=_('Nome')
     )
     data_criacao = models.DateField(
