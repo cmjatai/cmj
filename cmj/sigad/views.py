@@ -130,7 +130,9 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
         return r
 
     def get_noticias_dos_parlamentares(self):
-        legislatura_atual = Legislatura.objects.first()
+        for legislatura_atual in Legislatura.objects.all():
+            if legislatura_atual.atual():
+                break
 
         docs = Documento.objects.qs_news()
 
