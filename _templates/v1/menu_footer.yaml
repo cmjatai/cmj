@@ -22,12 +22,34 @@
   url: /parlamentar
   css_class: head_title
   children:
+{% if ""|now_year == 2021 %}
+  - title: Abimael Silva da TV
+    url: /parlamentar/abimael-silva-da-tv
+  - title: Adilson de Carvalho
+    url: /parlamentar/adilson-de-carvalho
+  - title: Alessandra do Adote
+    url: /parlamentar/alessandra-do-adote
+  - title: Carlinhos Canzi
+    url: /parlamentar/carlinhos-canzi
+  - title: Deuzair Parente
+    url: /parlamentar/deuzair-parente
+  - title: Durval Júnior
+    url: /parlamentar/durval-junior
+  - title: Genilson Santos
+    url: /parlamentar/genilson-santos
+  - title: Patrick
+    url: /parlamentar/patrick
+  - title: Professora Marina Silveira
+    url: /parlamentar/professora-marina-silveira
+  - title: Vicente Mantelli
+    url: /parlamentar/vicente-Mantelli
+{% else %}
   - title: Kátia Carvalho
     url: /parlamentar/katia-carvalho
   - title: Adilson de Carvalho
     url: /parlamentar/adilson-de-carvalho
   - title: -----------------
-    url: 
+    url:
   - title: Carlos Miranda
     url: /parlamentar/carlos-miranda
   - title: Carvalinho
@@ -45,7 +67,7 @@
   - title: Thiago Maggioni
     url: /parlamentar/thiago-maggioni
   - title: -----------------
-    url: 
+    url:
   - title: Gildenicio Santos
     url: /parlamentar/gildenicio-santos
   - title: João Rosa
@@ -54,6 +76,7 @@
     url: /parlamentar/jose-carapo
   - title: Marcos Antônio
     url: /parlamentar/marcos-antonio
+{% endif %}
 - title: {% trans 'Comunicação' %}
   url: ''
   css_class: head_title

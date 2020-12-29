@@ -362,6 +362,10 @@ def timedelta_filter(data, td):
     data += timedelta(days=int(td))
     return data
 
+@register.filter
+def now_year(obj):
+    return timezone.now().year
+
 
 @register.filter(expects_localtime=True)
 def parse_datetime(value):
