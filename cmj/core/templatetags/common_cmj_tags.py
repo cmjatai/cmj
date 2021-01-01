@@ -1,6 +1,5 @@
 
 from datetime import date, timedelta
-import datetime
 import json
 
 from dateutil.relativedelta import relativedelta
@@ -21,6 +20,7 @@ from sapl.base.models import AppConfig
 from sapl.materia.models import TipoMateriaLegislativa
 from sapl.norma.models import NormaJuridica, TipoNormaJuridica
 from sapl.parlamentares.models import Filiacao
+from sapl.sessao.models import SessaoPlenaria
 
 
 register = template.Library()
@@ -43,6 +43,19 @@ def jsonify(object):
 @register.filter('to_dict')
 def to_dict(object):
     return object.__dict__
+
+
+@register.filter
+def sessao_em_andamento(obj):
+    sps = SessaoPlenaria.objects.order_by('-id')
+    for sp in sps:
+        if not sp.legislatura.atual():
+            continue
+
+        if sp.iniciada and not sp.finalizada:
+            return True
+
+    return False
 
 
 def get_class(class_string):
@@ -361,6 +374,7 @@ def timedelta_filter(data, td):
         data = timezone.now()
     data += timedelta(days=int(td))
     return data
+
 
 @register.filter
 def now_year(obj):

@@ -141,7 +141,8 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
         ).filter(
             parlamentares__mandato__legislatura_id=legislatura_atual.id,
             count_parlamentar=1,
-            parlamentares__ativo=True
+            parlamentares__ativo=True,
+            public_date__gte=legislatura_atual.data_inicio
         ).values_list('id', flat=True)
 
         docs = Documento.objects.filter(

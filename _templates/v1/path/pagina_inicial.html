@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load i18n common_cmj_tags %}
 
 {% block base_header %}{% endblock %}
 
@@ -8,6 +8,16 @@
 {% block base_functions %}{% endblock %}
 {% block main_container_class %}container container{{fluid}}{{path}}{% endblock %}
 {% block base_content %}
+{% if user.is_anonymous and ""|sessao_em_andamento %}
+  <div class="row justify-content-center mt-2">
+    <div class="col-12 col-lg-7 mt-4" id="aovivo_content">
+      <div class="embed-responsive embed-responsive-16by9">
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/yfODSAlkgIc?controls=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+{% endif %}
+
   <div class="row">
     <div class="col-lg-8 pr-lg-0 mt-lg-4 mt-3" id="main_content">
       {% include "path/pagina_inicial_noticias_principais.html" %}
@@ -15,7 +25,6 @@
     <div class="col-lg-4 d-flex flex-column mt-lg-4 pl-lg-1">
       {% include "path/pagina_inicial_buttons.html" %}
       </div>
-
   </div>
 
   <div class="row">
@@ -28,7 +37,9 @@
     </div>
 
     <div class="col-lg-6">
+
       {% include "path/pagina_inicial_link_e_sic.html" %}
+
       {% with noticias_dos_parlamentares as object_list %}
         {% include "path/pagina_inicial_noticia_parlamentares.html" %}
       {% endwith %}
