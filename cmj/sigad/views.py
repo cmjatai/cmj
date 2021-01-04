@@ -1,4 +1,5 @@
 import base64
+from datetime import timedelta
 import io
 from operator import attrgetter
 import tempfile
@@ -142,7 +143,7 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
             parlamentares__mandato__legislatura_id=legislatura_atual.id,
             count_parlamentar=1,
             parlamentares__ativo=True,
-            public_date__gte=legislatura_atual.data_inicio
+            public_date__gte=legislatura_atual.data_inicio - timedelta(days=60)
         ).values_list('id', flat=True)
 
         docs = Documento.objects.filter(
