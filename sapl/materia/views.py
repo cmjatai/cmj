@@ -31,6 +31,7 @@ from django_filters.views import FilterView
 
 from cmj.core.models import AreaTrabalho
 from cmj.globalrules import GROUP_MATERIA_WORKSPACE_VIEWER
+from cmj.mixins import BtnCertMixin
 import sapl
 from sapl.base.email_utils import do_envia_email_confirmacao
 from sapl.base.models import Autor, CasaLegislativa, AppConfig as BaseAppConfig
@@ -1900,16 +1901,18 @@ class MateriaLegislativaCrud(Crud):
         def get_success_url(self):
             return self.search_url
 
-    class DetailView(Crud.DetailView):
+    class DetailView(BtnCertMixin, Crud.DetailView):
 
         layout_key = 'MateriaLegislativaDetail'
         template_name = "materia/materialegislativa_detail.html"
 
         @property
         def extras_url(self):
+            btns = [self.btn_certidao('texto_original')]
+
             if self.request.user.has_perm('compilacao.add_textoarticulado'):
                 if not self.object.texto_articulado.exists():
-                    btns = [(
+                    btns += [(
                         reverse('sapl.materia:materia_ta',
                                 kwargs={'pk': self.kwargs['pk']}),
                         'btn-primary',
@@ -1918,7 +1921,7 @@ class MateriaLegislativaCrud(Crud):
                     ]
                     return btns
                 elif self.request.user.is_superuser:
-                    btns = [(
+                    btns += [(
                         reverse('sapl.compilacao:ta_delete',
                                 kwargs={'pk': self.object.texto_articulado.first().pk}),
                         'btn-danger',

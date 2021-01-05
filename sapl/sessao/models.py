@@ -1,5 +1,6 @@
 from operator import xor
 
+from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.postgres.fields.jsonb import JSONField
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
@@ -11,6 +12,7 @@ from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices
 import reversion
 
+from cmj.core.models import CertidaoPublicacao
 from sapl.base.models import Autor
 from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import (CargoMesa, Legislatura, Parlamentar,
@@ -170,9 +172,20 @@ class SessaoPlenaria(models.Model):
         auto_now=True,
         verbose_name=_('Data'))
 
+    _certidao = GenericRelation(
+        CertidaoPublicacao, related_query_name='sessaoplenaria_cert')
+
     class Meta:
         verbose_name = _('Sessão Plenária')
         verbose_name_plural = _('Sessões Plenárias')
+
+    @property
+    def __descr__(self):
+        return str(self)
+
+    @property
+    def certidao(self):
+        return self._certidao.all().first()
 
     def __str__(self):
 

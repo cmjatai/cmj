@@ -22,6 +22,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormMixin
 from django_filters.views import FilterView
 
+from cmj.mixins import BtnCertMixin
 from sapl.base.models import AppConfig as AppsAppConfig
 from sapl.crud.base import (RP_DETAIL, RP_LIST, Crud, CrudAux,
                             MasterDetailCrud,
@@ -1091,7 +1092,12 @@ class SessaoCrud(Crud):
                     {'subnav_template_name': 'sessao/subnav-solene.yaml'})
             return context
 
-    class DetailView(Crud.DetailView):
+    class DetailView(BtnCertMixin, Crud.DetailView):
+
+        @property
+        def extras_url(self):
+            btns = [self.btn_certidao('upload_ata')]
+            return btns
 
         @property
         def layout_key(self):

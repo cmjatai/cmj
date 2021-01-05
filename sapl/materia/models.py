@@ -14,6 +14,7 @@ from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices
 import reversion
 
+from cmj.core.models import CertidaoPublicacao
 from cmj.diarios.models import VinculoDocDiarioOficial
 from cmj.mixins import CommonMixin
 from sapl.base.models import SEQUENCIA_NUMERACAO_PROTOCOLO, Autor,\
@@ -368,6 +369,9 @@ class MateriaLegislativa(CommonMixin):
         max_length=150, blank=True,
         verbose_name=_('URL Arquivo Vídeo (Formatos MP4 / FLV / WebM)'))
 
+    _certidao = GenericRelation(
+        CertidaoPublicacao, related_query_name='materialegislativa_cert')
+
     class Meta:
         verbose_name = _('Matéria Legislativa')
         verbose_name_plural = _('Matérias Legislativas')
@@ -378,6 +382,14 @@ class MateriaLegislativa(CommonMixin):
 
             ("can_check_complete", "Pode checar conclusão de processo"),
         )
+
+    @property
+    def __descr__(self):
+        return str(self)
+
+    @property
+    def certidao(self):
+        return self._certidao.all().first()
 
     def __str__(self):
         return _('%(tipo)s nº %(numero)s de %(ano)s') % {

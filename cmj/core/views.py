@@ -415,7 +415,7 @@ class CertidaoPublicacaoCrud(Crud):
         def has_permission(self):
             return True
 
-        paginate_by = 50
+        paginate_by = 100
 
         def split_bylen(self, item, maxlen):
             return [item[ind:ind + maxlen] for ind in range(0, len(item), maxlen)]
@@ -464,13 +464,13 @@ class CertidaoPublicacaoCrud(Crud):
 
             return """
             %s<br><small>%s</small><br>
-            <button 
+            <button
             class="hash_code btn btn-info"
-            data-trigger="focus" 
+            data-trigger="focus"
             data-container="body"
             data-toggle="popover"
-            data-placement="top" 
-            title="Hash 512" 
+            data-placement="top"
+            title="Hash 512"
             data-content="%s">Hash 512</button>""" % (
                 args[1],
                 args[0].content_object.__descr__,

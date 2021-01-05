@@ -369,14 +369,14 @@ class DocumentoAdministrativo(CommonMixin):
         auto_now=True,
         verbose_name=_('Data'))
 
-    _certidao = GenericRelation(
-        CertidaoPublicacao, related_query_name='documentoadministrativo_cert')
-
     auditlog = GenericRelation(
         'core.AuditLog',
         object_id_field='object_id',
         content_type_field='content_type',
         related_query_name='auditlog')
+
+    _certidao = GenericRelation(
+        CertidaoPublicacao, related_query_name='documentoadministrativo_cert')
 
     @property
     def certidao(self):

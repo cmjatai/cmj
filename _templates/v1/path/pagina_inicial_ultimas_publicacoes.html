@@ -1,18 +1,35 @@
 {% load i18n sigad_filters social_utils common_cmj_tags%}
 <div class="container-ultimas-publicacoes">
   <h2 class="title-container-noticias">Últimas Publicações</h2>
+  <br>
   {% for cert in ultimas_publicacoes%}
-    <div class="path-item-list">
-      <small class="pl-1">
+    <div class="path-item-list col-md-6 ">
+      <small class="pl-1 text-{{ cert.content_object|meta_model_value:'model_name' }}">
         {{ cert.content_object|meta_model_value:'verbose_name' }}
       </small>
+      <h6>
+      <a href="{% url 'cmj.core:certidaopublicacao_detail' cert.id %}">
+      Certidão de Publicação nº {{cert.id|stringformat:"06d" }} de {{cert.created}}
+      </a>
+
+      </h6>
       <div class="inner">
         {% if cert.content_object|meta_model_value:'label' == 'norma.NormaJuridica' %}
           {% with cert.content_object as n %}
             {% include 'norma/normajuridica_widget_list.html' %}
           {% endwith %}
-        {% elif cert.content_object|meta_model_value:'label' == 'protocoloadm.DocumentoAdministrativo' %}
 
+        {% elif cert.content_object|meta_model_value:'label' == 'sessao.SessaoPlenaria' %}
+          {% with cert.content_object as sp %}
+            {% include 'sessao/sessaoplenaria_widget_list.html' %}
+          {% endwith %}
+
+        {% elif cert.content_object|meta_model_value:'label' == 'materia.MateriaLegislativa' %}
+          {% with cert.content_object as ml %}
+            {% include 'materia/materialegislativa_widget_list.html' %}
+          {% endwith %}
+
+        {% elif cert.content_object|meta_model_value:'label' == 'protocoloadm.DocumentoAdministrativo' %}
           {% with cert.content_object as doc_adm %}
             {% include 'protocoloadm/documentoadministrativo_widget_list.html' %}
           {% endwith %}

@@ -3,14 +3,13 @@
 {% load common_cmj_tags common_tags%}
 
 <strong>
-  <a class="text-epigrafe" href="{% url 'sapl.norma:normajuridica_detail' n.pk %}">
-    {% if n.is_signed %}
+  <a class="text-epigrafe" href="{% url 'sapl.sessao:sessaoplenaria_detail' sp.pk %}">
+    {% if sp.is_signed %}
       <i class="fas fa-1x fa-certificate" title="Documento possui versão com Assinatura Digital, entre nos detalhes do documento para abrir o Arquivo Original"></i>
     {% endif %}
-    {{ n }}
+    {{ sp }}
   </a>
 </strong>
-<br>
 <small>
-  {{n.ementa}}
+  {{sp}}
 </small>
