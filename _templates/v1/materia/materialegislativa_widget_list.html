@@ -3,7 +3,7 @@
 {% load common_cmj_tags common_tags%}
 
 <strong>
-  <a class="text-epigrafe" href="{% url 'sapl.materia:materialegislativa_detail' ml.pk %}">
+  <a class="text-epigrafe text-{{ cert.content_object|meta_model_value:'model_name' }}" href="{% url 'sapl.materia:materialegislativa_detail' ml.pk %}">
     {% if ml.is_signed %}
       <i class="fas fa-1x fa-certificate" title="Documento possui versão com Assinatura Digital, entre nos detalhes do documento para abrir o Arquivo Original"></i>
     {% endif %}

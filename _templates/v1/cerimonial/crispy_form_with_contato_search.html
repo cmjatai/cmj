@@ -5,7 +5,7 @@
 
   <script type="text/javascript">
 
-    OptionalCustomFrontEnd();
+    //OptionalCustomFrontEnd();
     function changeHideShow() {
       let help_text = $('#hint_id_contatos')
       if (help_text.parent().children().length > 1) {
@@ -14,11 +14,12 @@
         help_text.css('display', 'block')
       }
     }
+
     function updateBindChange() {
       changeHideShow();
       $('.form-group-contatos input').on('change', function (event) {
         if (!event.currentTarget.checked)
-          event.currentTarget.parentElement.parentElement.remove();
+          event.currentTarget.parentElement.remove();
         changeHideShow();
       });
     }
@@ -38,7 +39,7 @@
 
         $( ".form-group-contatos-search .controls, .form-group-contatos .controls" ).sortable({
           connectWith: ".controls",
-          items: ".form-check",
+          items: ".custom-control",
           stop: function ( event, ui ) {
             var value = ui.item.find('input').val();
             var text =  ui.item.text()
@@ -55,7 +56,7 @@
               updateBindChange()
             }
           }
-        }).disableSelection();
+        })//.disableSelection();
       });
     }
     updateBindChange();
@@ -63,5 +64,4 @@
         return event.keyCode != 13;
     });
   </script>
-
 {% endblock %}

@@ -1,4 +1,4 @@
-{% load i18n sigad_filters social_utils common_tags%}
+{% load i18n sigad_filters social_utils common_tags common_cmj_tags%}
 
 {% comment %}
   {% if doc_adm.texto_integral %}
@@ -9,7 +9,7 @@
 {% endcomment %}
 
 <strong>
-  <a href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' doc_adm.pk %}">
+  <a class="text-{{ cert.content_object|meta_model_value:'model_name' }}" href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' doc_adm.pk %}">
     {% if doc_adm.is_signed %}
       <i class="fas fa-1x fa-certificate" title="Documento possui versão com Assinatura Digital, entre nos detalhes do documento para abrir o Arquivo Original"></i>
     {% endif %}

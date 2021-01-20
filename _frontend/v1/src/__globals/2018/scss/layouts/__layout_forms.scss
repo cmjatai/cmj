@@ -60,11 +60,18 @@ form {
       }
     }
   }
+  .form-group-contatos {
+    background-color: white;
+    border: 3px #ccc dashed;
+    padding: 5px;
+  }
 
   .form-group-contatos-search {
+    margin-bottom: 1em;
     .checkbox {
       padding-left: $grid-gutter-width / 4;
     }
+
     label {
           min-height: 0;
           margin: 0;

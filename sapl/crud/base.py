@@ -1452,6 +1452,9 @@ class MasterDetailCrud(Crud):
                     else:
                         parent_object = getattr(self.object, obj.parent_field)
 
+                        parent_object = parent_object.filter(
+                            pk=root_pk).first()
+
                     return url + '?pkk=' + str(parent_object.pk)
             else:
                 return ''
