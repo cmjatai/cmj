@@ -103,7 +103,10 @@ def model_verbose_name_plural(class_name):
 
 @register.filter
 def meta_model_value(instance, attr):
-    return getattr(instance._meta, attr)
+    try:
+        return getattr(instance._meta, attr)
+    except:
+        return ''
 
 
 @register.filter
