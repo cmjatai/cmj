@@ -218,10 +218,14 @@ class ImpressoEnderecamentoContatoView(PermissionRequiredMixin, FilterView):
                     contato.pronome_tratamento,
                     'enderecamento_singular_%s' % lower(
                         contato.sexo))
-            prefixo_nome = getattr(
-                contato.pronome_tratamento,
-                'prefixo_nome_singular_%s' % lower(
-                    contato.sexo))
+
+            try:
+                prefixo_nome = getattr(
+                    contato.pronome_tratamento,
+                    'prefixo_nome_singular_%s' % lower(
+                        contato.sexo))
+            except:
+                prefixo_nome = ''
 
         if local_cargo == ImpressoEnderecamentoContatoFilterSet.DEPOIS_PRONOME\
                 and imprimir_cargo and (linha_pronome or contato.cargo):
