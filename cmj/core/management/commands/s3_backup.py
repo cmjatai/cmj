@@ -13,6 +13,7 @@ from django.db.models.signals import post_delete, post_save, pre_save
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
+from sapl.materia.models import MateriaLegislativa
 from sapl.utils import hash_sha512
 
 
@@ -28,7 +29,7 @@ class Command(BaseCommand):
     s3_server = 's3_cmj'
 
     bucket_name = 'cmjatai_portal'
-    days_validate = 60
+    days_validate = 10
 
     start_time = None
     exec_time = 1800
@@ -45,10 +46,10 @@ class Command(BaseCommand):
 
         init = datetime.now()
 
-        s3_servers = ('s3_cmj',)
-        s3_servers = ('locaweb', 's3_cmj')
+        s3_server = 's3_cmj'
 
-        s3_server = s3_servers[init.hour % 2]
+        #s3_servers = ('locaweb', 's3_cmj')
+        #s3_server = s3_servers[init.hour % 2]
 
         print('--------- Iniciando:', s3_server)
         self.s3_server = s3_server
@@ -355,7 +356,7 @@ class Command(BaseCommand):
 
         try:
             r_p = b.download_file(
-                ff.name,
+                ff.original_name if 'original' in attr_path else ff.name,
                 t_p
             )
 
