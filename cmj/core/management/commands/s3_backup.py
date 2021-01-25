@@ -46,10 +46,10 @@ class Command(BaseCommand):
 
         init = datetime.now()
 
-        #s3_server = 's3_cmj'
+        s3_server = 's3_cmj'
 
-        s3_servers = ('locaweb', 's3_cmj')
-        s3_server = s3_servers[init.hour % 2]
+        #s3_servers = ('locaweb', 's3_cmj')
+        #s3_server = s3_servers[init.hour % 2]
 
         print('--------- Iniciando:', s3_server)
         self.s3_server = s3_server
