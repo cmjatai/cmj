@@ -3,6 +3,7 @@ from crispy_forms.bootstrap import Alert, FieldWithButtons, StrictButton
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, Div
 from django import forms
+from django.conf import settings
 from django.contrib.auth import get_user_model, password_validation
 from django.contrib.auth.forms import AuthenticationForm, \
     SetPasswordForm, PasswordResetForm
@@ -428,7 +429,14 @@ class RecuperarSenhaForm(PasswordResetForm):
 
     def __init__(self, *args, **kwargs):
         row1 = to_row(
-            [('email', 12)])
+            [
+                (Div(
+                 css_class="g-recaptcha float-right" if not settings.DEBUG else '',
+                 data_sitekey=settings.GOOGLE_RECAPTCHA_SITE_KEY
+                 ), 5),
+                ('email', 7),
+
+            ])
         self.helper = FormHelper()
         self.helper.layout = SaplFormLayout(
             Fieldset(_('Insira o e-mail cadastrado com a sua conta'),

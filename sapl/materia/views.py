@@ -1,26 +1,22 @@
 
 from datetime import datetime
-import itertools
 import logging
 import os
 from random import choice
 import shutil
 from string import ascii_letters, digits
-import tempfile
 
 from crispy_forms.layout import HTML
 from django import template
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import permission_required, login_required
+from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, ValidationError,\
-    PermissionDenied
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, ValidationError
 from django.db.models import Max, Q
 from django.http import HttpResponse, JsonResponse
 from django.http.response import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
-from django.template import RequestContext, loader
 from django.urls.base import reverse
 from django.utils import formats, timezone
 from django.utils.translation import ugettext_lazy as _
