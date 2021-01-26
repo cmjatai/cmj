@@ -447,6 +447,7 @@ class RecuperarSenhaForm(PasswordResetForm):
         super(RecuperarSenhaForm, self).__init__(*args, **kwargs)
 
     def clean(self):
+
         super(RecuperarSenhaForm, self).clean()
 
         email_existente = get_user_model().objects.filter(
@@ -456,7 +457,41 @@ class RecuperarSenhaForm(PasswordResetForm):
             msg = 'Não existe nenhum usuário cadastrado com este e-mail.'
             raise ValidationError(msg)
 
-        return self.cleaned_data
+        cd = self.cleaned_data
+        if settings.DEBUG:
+            return cd
+
+        recaptcha = self.data.get('g-recaptcha-response', '')
+        if not recaptcha:
+            raise ValidationError(
+                _('Verificação do reCAPTCHA não efetuada.'))
+
+        import urllib3
+        import json
+
+        #encoded_data = json.dumps(fields).encode('utf-8')
+
+        url = ('https://www.google.com/recaptcha/api/siteverify?'
+               'secret=%s'
+               '&response=%s' % (settings.GOOGLE_RECAPTCHA_SECRET_KEY,
+                                 recaptcha))
+
+        http = urllib3.PoolManager()
+        try:
+            r = http.request('POST', url)
+            data = r.data.decode('utf-8')
+            jdata = json.loads(data)
+        except Exception as e:
+            raise ValidationError(
+                _('Ocorreu um erro na validação do reCAPTCHA.'))
+
+        if jdata['success']:
+            return cd
+        else:
+            raise ValidationError(
+                _('Ocorreu um erro na validação do reCAPTCHA.'))
+
+        return cd
 
     def get_users(self, email):
         active_users = get_user_model()._default_manager.filter(**{
