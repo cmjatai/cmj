@@ -73,6 +73,10 @@ WEBPACK_LOADER = {
     }
 }
 
+if DEBUG and not WEBPACK_LOADER['DEFAULT']['STATS_FILE'].exists():
+    WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = PROJECT_DIR_FRONTEND.child(
+        f'webpack-stats.json')
+
 
 USE_CHANNEL_LAYERS = config(
     'USE_CHANNEL_LAYERS', cast=bool, default=False)

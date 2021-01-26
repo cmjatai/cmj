@@ -1,9 +1,12 @@
 const path = require('path')
 const each = require('lodash/fp/each')
 
+const shell = require('shelljs')
+
 const BundleTrackerPlugin = require('webpack-bundle-tracker')
 const CompressionPlugin = require('compression-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
+const CopyPlugin = require('copy-webpack-plugin')
 
 class RelativeBundleTrackerPlugin extends BundleTrackerPlugin {
   convertPathChunks (chunks) {
@@ -43,6 +46,15 @@ module.exports = {
         filename: `./${process.env.DEBUG === 'True' && process.env.NODE_ENV !== 'production' ? 'dev-' : ''}webpack-stats.json`
       }])
 
+    config.plugin('copy').use(CopyPlugin, [
+      [
+        {
+          from: path.join(__dirname, '/node_modules/tinymce/skins'),
+          to: 'js/skins/[path][name].[ext]'
+        }
+      ]
+    ])
+
     if (process.env.NODE_ENV === 'production') {
       config
         .optimization
@@ -52,6 +64,9 @@ module.exports = {
       config
         .plugin('CompressionPlugin')
         .use(CompressionPlugin, [{}])
+
+      shell
+        .rm('./dev-webpack-stats.json')
     } else {
       config
         .devtool('source-map')

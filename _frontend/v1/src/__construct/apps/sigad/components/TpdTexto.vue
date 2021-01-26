@@ -31,7 +31,7 @@
 import Container from './Container'
 
 import Editor from '@tinymce/tinymce-vue'
-import 'tinymce/themes/modern/theme'
+import 'tinymce/themes/silver/theme'
 
 export default {
   name: 'tpd-texto',

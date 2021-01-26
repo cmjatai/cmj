@@ -10,14 +10,14 @@ import 'jquery-ui/ui/i18n/datepicker-pt-BR'
 
 import 'jquery-ui-themes/themes/pepper-grinder/jquery-ui.min.css'
 
-import 'tinymce/tinymce'
+import tinymce from 'tinymce/tinymce'
 import './2018/js/tinymce/lang/pt_BR.js'
 
-import 'tinymce/themes/modern'
+import 'tinymce/themes/silver'
+import 'tinymce/icons/default'
 import 'tinymce/plugins/table'
 import 'tinymce/plugins/lists'
 import 'tinymce/plugins/code'
-import 'tinymce/plugins/colorpicker'
 
 import 'jquery-mask-plugin'
 
@@ -33,6 +33,7 @@ import './2018/js/app_cmj'
 
 window.$ = $
 window.jQuery = $
+window.tinymce = tinymce
 
 // initTinymce
 // import './2018/themes/dezembrolaranja/app.scss'
@@ -43,7 +44,7 @@ $(function () {
     window.autorModal()
     window.refreshMask()
     window.refreshDatePicker()
-    window.initTextRichEditor('texto-rico')
+    window.initTextRichEditor('#texto-rico')
 
     $('a[data-social-sharing]').click(function (event) {
       event.preventDefault()
