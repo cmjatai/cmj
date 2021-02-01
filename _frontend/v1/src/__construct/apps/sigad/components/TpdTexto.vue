@@ -13,6 +13,7 @@
     <span v-if="has_titulo || elemento.titulo" class="path-title-partes">
       <input v-model.lazy="elemento.titulo" placeholder="Subtítulo para Fragmento de Texto..."/>
     </span>
+
     <div class="construct" v-if="usartinymce" >
       <editor v-if="usartinymce" inline  v-model.lazy="elemento.texto"></editor>
     </div>

@@ -65,6 +65,10 @@ FRONTEND_BRASAO_PATH = {
     '1024': PROJECT_DIR_FRONTEND.child('public').child('brasao').child('brasao_1024.png')
 }
 
+FRONTEND_ESCOLA_PATH = {
+    '1024': PROJECT_DIR_FRONTEND.child('public').child('brasao').child('escola_1024.png')
+}
+
 WEBPACK_LOADER = {
     'DEFAULT': {
         'CACHE': not DEBUG,
