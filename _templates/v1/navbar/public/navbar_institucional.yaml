@@ -10,16 +10,24 @@
 
   - title: {% trans 'Bancadas Partidárias' %}
     url: sapl.parlamentares:bancada_list
-    
+
   - title: {% trans 'Mesa Diretora' %}
     url: sapl.parlamentares:mesa_diretora
     check_permission: parlamentares.add_composicaomesa
 
+  - title: {% trans 'Agenda Pública' %}
+    url: /evento/
+
+  - title: ''
+    url: ''
+
+  - title: {% trans 'EGEL' %}
+    url: /escola/
   - title: {% trans 'Procuradoria Geral' %}
     url: /institucional/procuradoria-geral
 
-  - title: {% trans 'Agenda Pública' %}
-    url: /evento/
+  - title: ''
+    url: ''
 
   - title: {% trans 'Nossa Jataí' %}
     url: /institucional/nossa-jatai
