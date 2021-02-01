@@ -22,7 +22,7 @@
     url: ''
 
   - title: {% trans 'EGEL' %}
-    url: /escola/
+    url: /escola
   - title: {% trans 'Procuradoria Geral' %}
     url: /institucional/procuradoria-geral
 
