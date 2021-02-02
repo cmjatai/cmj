@@ -51,6 +51,10 @@ module.exports = {
         {
           from: path.join(__dirname, '/node_modules/tinymce/skins'),
           to: 'js/skins/[path][name].[ext]'
+        },
+        {
+          from: path.join(__dirname, '/public'),
+          to: '[path][name].[ext]'
         }
       ]
     ])
