@@ -1,9 +1,12 @@
 
 from braces.views._forms import FormMessagesMixin
-from django.shortcuts import get_object_or_404
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect
+from django.urls.base import reverse
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 
+from cmj.core.models import CertidaoPublicacao
 from cmj.diarios.forms import VinculoDocDiarioOficialForm
 from cmj.diarios.models import TipoDeDiario, DiarioOficial,\
     VinculoDocDiarioOficial
@@ -32,6 +35,21 @@ class DiarioOficialCrud(Crud):
     class DetailView(Crud.PublicMixin, Crud.DetailView):
         layout_key = 'DiarioOficialDetail'
 
+        @property
+        def extras_url(self):
+            btns = []
+
+            if self.request.user.has_perm('diarios.change_diariooficial'):
+                btns += [(
+                    '%s?associar_certidoes' % reverse(
+                        'cmj.diarios:diariooficial_detail',
+                        kwargs={'pk': self.kwargs['pk']}),
+                    'btn-primary',
+                    _('Associar Certidões')
+                )
+                ]
+                return btns
+
         def get_context_data(self, **kwargs):
             c = super().get_context_data(**kwargs)
             c['bg_title'] = 'bg-maroon text-white'
@@ -55,6 +73,46 @@ class DiarioOficialCrud(Crud):
                 )
 
             return v, f"<ul>{''.join(text)}</ul>"
+
+        def get(self, request, *args, **kwargs):
+
+            if request.GET.get('associar_certidoes', None) is not None and \
+                    self.request.user.has_perm('diarios.change_diariooficial'):
+                self.associar_certidoes()
+                messages.add_message(
+                    self.request,
+                    messages.INFO,
+                    _('As certidões encontradas foram associadas a este diário!'))
+                return redirect(
+                    reverse(
+                        'cmj.diarios:diariooficial_detail',
+                        kwargs={'pk': self.kwargs['pk']}
+                    )
+                )
+
+            return Crud.DetailView.get(self, request, *args, **kwargs)
+
+        def associar_certidoes(self):
+            self.object = self.model.objects.get(pk=self.kwargs['pk'])
+
+            certs = CertidaoPublicacao.objects.filter(
+                created__gte=self.object.data).order_by('id')
+
+            # VinculoDocDiarioOficial.objects.filter(diario=self.object).delete()
+
+            for c in certs:
+                print(c.content_object)
+                # continue
+                if not VinculoDocDiarioOficial.objects.filter(
+                    diario=self.object,
+                    content_type_id=c.content_type_id,
+                    object_id=c.object_id
+                ).exists():
+                    v = VinculoDocDiarioOficial()
+                    v.content_object = c.content_object
+                    v.diario = self.object
+                    v.pagina = 1
+                    v.save()
 
 
 class VinculoDocDiarioOficialCrud(MasterDetailCrud):

@@ -2,6 +2,11 @@
 {% load i18n %}
 {% load crispy_forms_tags %}
 {% block actions %} {% endblock %}
+
+{% block head_content %}{{block.super}}
+<script src='https://www.google.com/recaptcha/api.js'></script>
+{% endblock %}
+
 {% block detail_content %}
 
 <h1>Acompanhamento de Documento</h1>
