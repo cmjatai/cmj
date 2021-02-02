@@ -7,11 +7,11 @@
 {% if user.is_superuser %}
 - title: {% trans "SAAP" %}
   url: ''
-  children: 
+  children:
   {{ "navbar/restrict/navbar_saap.yaml"|yaml_render:2|safe }}
 - title: {% trans "Ouvidoria" %}
   url: ''
-  children: 
+  children:
   {{ "navbar/public/navbar_esic.yaml"|yaml_render:2|safe }}
 {% else %}
   {{ "navbar/restrict/navbar_saap.yaml"|yaml_render:0|safe }}
@@ -20,6 +20,10 @@
   {% endif %}
 {% endif %}
 
+{% if perms.sigad.view_documento %}
+- title: {% trans "Notícias" %}
+  url: '/noticias'
+{% endif %}
 
 {{ "navbar/restrict/navbar_protocolo.yaml"|yaml_render:0|safe }}
 
