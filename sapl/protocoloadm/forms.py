@@ -4,6 +4,7 @@ import logging
 from crispy_forms.bootstrap import InlineRadios, Alert, FormActions
 from crispy_forms.layout import HTML, Button, Column, Fieldset, Layout, Div, Submit
 from django import forms
+from django.conf import settings
 from django.core.exceptions import (MultipleObjectsReturned,
                                     ObjectDoesNotExist, ValidationError)
 from django.db import models, transaction
@@ -59,7 +60,15 @@ class AcompanhamentoDocumentoForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
 
-        row1 = to_row([('email', 12)])
+        row1 = to_row(
+            [
+                (Div(
+                 css_class="g-recaptcha float-right" if not settings.DEBUG else '',
+                 data_sitekey=settings.GOOGLE_RECAPTCHA_SITE_KEY
+                 ), 5),
+                ('email', 7),
+
+            ])
 
         self.helper = SaplFormHelper()
         self.helper.layout = Layout(
@@ -70,6 +79,46 @@ class AcompanhamentoDocumentoForm(ModelForm):
             )
         )
         super(AcompanhamentoDocumentoForm, self).__init__(*args, **kwargs)
+
+    def clean(self):
+
+        super(AcompanhamentoDocumentoForm, self).clean()
+
+        cd = self.cleaned_data
+        if settings.DEBUG:
+            return cd
+
+        recaptcha = self.data.get('g-recaptcha-response', '')
+        if not recaptcha:
+            raise ValidationError(
+                _('Verificação do reCAPTCHA não efetuada.'))
+
+        import urllib3
+        import json
+
+        #encoded_data = json.dumps(fields).encode('utf-8')
+
+        url = ('https://www.google.com/recaptcha/api/siteverify?'
+               'secret=%s'
+               '&response=%s' % (settings.GOOGLE_RECAPTCHA_SECRET_KEY,
+                                 recaptcha))
+
+        http = urllib3.PoolManager()
+        try:
+            r = http.request('POST', url)
+            data = r.data.decode('utf-8')
+            jdata = json.loads(data)
+        except Exception as e:
+            raise ValidationError(
+                _('Ocorreu um erro na validação do reCAPTCHA.'))
+
+        if jdata['success']:
+            return cd
+        else:
+            raise ValidationError(
+                _('Ocorreu um erro na validação do reCAPTCHA.'))
+
+        return cd
 
 
 class ProtocoloFilterSet(django_filters.FilterSet):
