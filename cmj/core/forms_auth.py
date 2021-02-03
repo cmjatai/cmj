@@ -19,6 +19,7 @@ from image_cropping.widgets import ImageCropWidget,\
 
 from cmj.core.models import AreaTrabalho, OperadorAreaTrabalho
 from cmj.globalrules import WORKSPACE_GROUPS
+from cmj.mixins import GoogleRecapthaMixin
 from cmj.utils import YES_NO_CHOICES
 from sapl.base.models import Autor, OperadorAutor
 from sapl.crispy_layout_mixin import to_row, form_actions, SaplFormLayout,\
@@ -425,26 +426,14 @@ class CmjUserAdminForm(ModelForm):
                     new_password2, self.instance)
 
 
-class RecuperarSenhaForm(PasswordResetForm):
+class RecuperarSenhaForm(GoogleRecapthaMixin, PasswordResetForm):
 
     def __init__(self, *args, **kwargs):
-        row1 = to_row(
-            [
-                (Div(
-                 css_class="g-recaptcha float-right" if not settings.DEBUG else '',
-                 data_sitekey=settings.GOOGLE_RECAPTCHA_SITE_KEY
-                 ), 5),
-                ('email', 7),
 
-            ])
-        self.helper = FormHelper()
-        self.helper.layout = SaplFormLayout(
-            Fieldset(_('Insira o e-mail cadastrado com a sua conta'),
-                     row1),
-            actions=form_actions(label=_('Enviar'))
-        )
+        kwargs['title_label'] = _('Insira o e-mail cadastrado com a sua conta')
+        kwargs['action_label'] = _('Enviar')
 
-        super(RecuperarSenhaForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def clean(self):
 
@@ -458,38 +447,6 @@ class RecuperarSenhaForm(PasswordResetForm):
             raise ValidationError(msg)
 
         cd = self.cleaned_data
-        if settings.DEBUG:
-            return cd
-
-        recaptcha = self.data.get('g-recaptcha-response', '')
-        if not recaptcha:
-            raise ValidationError(
-                _('Verificação do reCAPTCHA não efetuada.'))
-
-        import urllib3
-        import json
-
-        #encoded_data = json.dumps(fields).encode('utf-8')
-
-        url = ('https://www.google.com/recaptcha/api/siteverify?'
-               'secret=%s'
-               '&response=%s' % (settings.GOOGLE_RECAPTCHA_SECRET_KEY,
-                                 recaptcha))
-
-        http = urllib3.PoolManager()
-        try:
-            r = http.request('POST', url)
-            data = r.data.decode('utf-8')
-            jdata = json.loads(data)
-        except Exception as e:
-            raise ValidationError(
-                _('Ocorreu um erro na validação do reCAPTCHA.'))
-
-        if jdata['success']:
-            return cd
-        else:
-            raise ValidationError(
-                _('Ocorreu um erro na validação do reCAPTCHA.'))
 
         return cd
 

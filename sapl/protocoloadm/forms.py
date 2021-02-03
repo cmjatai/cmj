@@ -17,6 +17,7 @@ from django.utils.translation import ugettext_lazy as _
 import django_filters
 
 from cmj.core.models import AreaTrabalho
+from cmj.mixins import GoogleRecapthaMixin
 from cmj.utils import CHOICE_SIGNEDS
 from sapl.base.models import Autor, TipoAutor, AppConfig
 from sapl.crispy_layout_mixin import SaplFormHelper, to_column
@@ -52,7 +53,7 @@ NATUREZA_PROCESSO = [('0', 'Administrativo'),
 EM_TRAMITACAO = [(0, 'Sim'), (1, 'Não')]
 
 
-class AcompanhamentoDocumentoForm(ModelForm):
+class AcompanhamentoDocumentoForm(GoogleRecapthaMixin, ModelForm):
 
     class Meta:
         model = AcompanhamentoDocumento
@@ -60,65 +61,10 @@ class AcompanhamentoDocumentoForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
 
-        row1 = to_row(
-            [
-                (Div(
-                 css_class="g-recaptcha float-right" if not settings.DEBUG else '',
-                 data_sitekey=settings.GOOGLE_RECAPTCHA_SITE_KEY
-                 ), 5),
-                ('email', 7),
+        kwargs['title_label'] = _('Acompanhamento de Documento por e-mail')
+        kwargs['action_label'] = _('Cadastrar')
 
-            ])
-
-        self.helper = SaplFormHelper()
-        self.helper.layout = Layout(
-            Fieldset(
-                _('Acompanhamento de Documento por e-mail'),
-                row1,
-                form_actions(label='Cadastrar')
-            )
-        )
-        super(AcompanhamentoDocumentoForm, self).__init__(*args, **kwargs)
-
-    def clean(self):
-
-        super(AcompanhamentoDocumentoForm, self).clean()
-
-        cd = self.cleaned_data
-        if settings.DEBUG:
-            return cd
-
-        recaptcha = self.data.get('g-recaptcha-response', '')
-        if not recaptcha:
-            raise ValidationError(
-                _('Verificação do reCAPTCHA não efetuada.'))
-
-        import urllib3
-        import json
-
-        #encoded_data = json.dumps(fields).encode('utf-8')
-
-        url = ('https://www.google.com/recaptcha/api/siteverify?'
-               'secret=%s'
-               '&response=%s' % (settings.GOOGLE_RECAPTCHA_SECRET_KEY,
-                                 recaptcha))
-
-        http = urllib3.PoolManager()
-        try:
-            r = http.request('POST', url)
-            data = r.data.decode('utf-8')
-            jdata = json.loads(data)
-        except Exception as e:
-            raise ValidationError(
-                _('Ocorreu um erro na validação do reCAPTCHA.'))
-
-        if jdata['success']:
-            return cd
-        else:
-            raise ValidationError(
-                _('Ocorreu um erro na validação do reCAPTCHA.'))
-
-        return cd
+        super().__init__(*args, **kwargs)
 
 
 class ProtocoloFilterSet(django_filters.FilterSet):

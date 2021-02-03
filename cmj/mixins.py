@@ -1,4 +1,8 @@
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Div, Fieldset
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.deletion import PROTECT
 from django.urls.base import reverse
@@ -10,6 +14,8 @@ from social_core.backends.facebook import FacebookOAuth2
 
 from cmj.utils import run_sql, get_settings_auth_user_model,\
     YES_NO_CHOICES
+from sapl.crispy_layout_mixin import to_row, SaplFormLayout,\
+    form_actions
 
 
 class FacebookOAuth2(FacebookOAuth2):
@@ -242,3 +248,71 @@ class CmjAuditoriaModelMixin(CmjModelMixin):
 
     class Meta:
         abstract = True
+
+
+class GoogleRecapthaMixin:
+
+    def __init__(self, *args, **kwargs):
+
+        title_label = kwargs.pop('title_label')
+        action_label = kwargs.pop('action_label')
+
+        row1 = to_row(
+            [
+                (Div(
+                 css_class="g-recaptcha float-right",  # if not settings.DEBUG else '',
+                 data_sitekey=settings.GOOGLE_RECAPTCHA_SITE_KEY
+                 ), 5),
+                ('email', 7),
+
+            ]
+        )
+
+        self.helper = FormHelper()
+        self.helper.layout = SaplFormLayout(
+            Fieldset(
+                title_label,
+                row1
+            ),
+            actions=form_actions(label=action_label)
+        )
+
+        super().__init__(*args, **kwargs)
+
+    def clean(self):
+
+        super().clean()
+
+        cd = self.cleaned_data
+
+        recaptcha = self.data.get('g-recaptcha-response', '')
+        if not recaptcha:
+            raise ValidationError(
+                _('Verificação do reCAPTCHA não efetuada.'))
+
+        import urllib3
+        import json
+
+        #encoded_data = json.dumps(fields).encode('utf-8')
+
+        url = ('https://www.google.com/recaptcha/api/siteverify?'
+               'secret=%s'
+               '&response=%s' % (settings.GOOGLE_RECAPTCHA_SECRET_KEY,
+                                 recaptcha))
+
+        http = urllib3.PoolManager()
+        try:
+            r = http.request('POST', url)
+            data = r.data.decode('utf-8')
+            jdata = json.loads(data)
+        except Exception as e:
+            raise ValidationError(
+                _('Ocorreu um erro na validação do reCAPTCHA.'))
+
+        if jdata['success']:
+            return cd
+        else:
+            raise ValidationError(
+                _('Ocorreu um erro na validação do reCAPTCHA.'))
+
+        return cd
