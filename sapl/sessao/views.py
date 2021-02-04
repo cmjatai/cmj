@@ -1097,6 +1097,7 @@ class SessaoCrud(Crud):
         @property
         def extras_url(self):
             btns = [self.btn_certidao('upload_ata')]
+            btns = list(filter(lambda x: x, btns))
             return btns
 
         @property
