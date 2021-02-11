@@ -478,21 +478,49 @@ class ProposicaoPendente(PermissionRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super(ProposicaoPendente, self).get_context_data(**kwargs)
+
         context['object_list'] = Proposicao.objects.filter(
             data_envio__isnull=False,
             data_recebimento__isnull=True,
             data_devolucao__isnull=True)
+
         paginator = context['paginator']
         page_obj = context['page_obj']
-        context['AppConfig'] = sapl.base.models.AppConfig.objects.all().last()
         context['page_range'] = make_pagination(
             page_obj.number, paginator.num_pages)
+
+        context['AppConfig'] = sapl.base.models.AppConfig.objects.all().last()
+
         context['NO_ENTRIES_MSG'] = 'Nenhuma proposição pendente.'
 
         context['subnav_template_name'] = 'materia/subnav_prop.yaml'
+
         qr = self.request.GET.copy()
         context['filter_url'] = ('&o=' + qr['o']) if 'o' in qr.keys() else ''
+
+        context['tipos_autores_materias'] = self.tipos_autores_materias()
+
         return context
+
+    def tipos_autores_materias(self):
+        materias_em_tramitacao = MateriaLegislativa.objects.filter(
+            em_tramitacao=True)
+
+        r = {}
+        for m in materias_em_tramitacao:
+
+            if m.autores.count() >= 5:
+                continue
+
+            if m.tipo not in r:
+                r[m.tipo] = {}
+
+            for a in m.autores.all():
+                if a not in r[m.tipo]:
+                    r[m.tipo][a] = [m]
+                else:
+                    r[m.tipo][a].append(m)
+        return r
 
 
 class ProposicaoRecebida(PermissionRequiredMixin, ListView):
@@ -1150,6 +1178,23 @@ class ProposicaoCrud(Crud):
                         obj.data_envio, "DATETIME_FORMAT")
 
             return [self._as_row(obj) for obj in object_list]
+
+        def tipos_autores_materias(self):
+            materias_em_tramitacao = MateriaLegislativa.objects.filter(
+                em_tramitacao=True,
+                autores__operadores=self.request.user)
+
+            r = {}
+            for m in materias_em_tramitacao:
+
+                if m.autores.count() >= 5:
+                    continue
+
+                if m.tipo not in r:
+                    r[m.tipo] = [m]
+                else:
+                    r[m.tipo].append(m)
+            return r
 
 
 class ReciboProposicaoView(TemplateView):

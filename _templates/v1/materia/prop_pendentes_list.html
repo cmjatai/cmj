@@ -75,4 +75,25 @@
         </tbody>
       </table>
     {% endif %}
+    {% if tipos_autores_materias %}
+      <fieldset>
+        <legend><h1>Matérias em Tramitação</h1></legend>
+      </fieldset>
+    {% endif %}
+
+    {% for tipo,autores in tipos_autores_materias.items %}
+      <fieldset>
+        <legend>{{tipo}}</legend>
+
+          {% for autor, materias in autores.items %}
+
+
+              {{autor.autor_related}} <strong>({{materias|length}})</strong><br>
+          {% endfor %}
+
+
+
+        <br>
+      </fieldset>
+    {% endfor %}
 {% endblock %}
