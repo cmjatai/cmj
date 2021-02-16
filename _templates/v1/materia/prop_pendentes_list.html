@@ -81,14 +81,18 @@
       </fieldset>
     {% endif %}
 
-    {% for tipo,autores in tipos_autores_materias.items %}
+    {% for tipo, autores in tipos_autores_materias.items %}
       <fieldset>
         <legend>{{tipo}}</legend>
 
           {% for autor, materias in autores.items %}
 
+              {% if autor.autor_related %}
+                {{autor.autor_related}} <strong>({{materias|length}})</strong><br>
+              {% else %}
+                {{autor.nome}} <strong>({{materias|length}})</strong><br>
+              {% endif %}
 
-              {{autor.autor_related}} <strong>({{materias|length}})</strong><br>
           {% endfor %}
 
 
