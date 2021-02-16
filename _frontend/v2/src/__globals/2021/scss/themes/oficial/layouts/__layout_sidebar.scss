@@ -36,11 +36,11 @@ $fator-xl: 1.06;
 
 #wrapper {
   padding-left: $width-wrapper-closed;
-  
+
   .path-previous {
     left: $width-wrapper-closed - 41px;
   }
-  
+
   aside {
     width: $width-wrapper-closed;
     position: fixed;
@@ -48,7 +48,7 @@ $fator-xl: 1.06;
     left: 0;
     bottom: 0;
     background: #212a2d $url_bg_png;
-    z-index: 2500;
+    z-index: $zindex-sidebar;
 
     font-size: 1rem;
 
@@ -56,12 +56,12 @@ $fator-xl: 1.06;
     background: -webkit-linear-gradient(left, rgba(9, 20, 38, 0.99) 0%, #000000 100%);
     background: linear-gradient(to right, rgba(9, 20, 38, 0.99) 0%, #000000 100%);
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#091426', endColorstr='#000000',GradientType=1 );
-     
+
     .container-aside {
       position: absolute;
       display: flex;
       flex-direction: column;
-      
+
       opacity: 0.7;
 
       top: 0;
@@ -88,13 +88,13 @@ $fator-xl: 1.06;
         padding: 20px 30px;
         a {
           font-size: 1.4em;
-        }        
+        }
         & > li {
           //padding: 20px;
           & > a {
             font-size: 2em;
           }
-        }             
+        }
         ul {
           display: block;
           position: static;
@@ -103,10 +103,10 @@ $fator-xl: 1.06;
         }
       }
       &.submenu-materia {
-        background: #f56954f5 !important;    
+        background: #f56954f5 !important;
       }
       &.submenu-docadm {
-        background: #00c0eef5 !important;    
+        background: #00c0eef5 !important;
       }
     }
 
@@ -120,7 +120,7 @@ $fator-xl: 1.06;
 
       }
       &.box-search:hover {
-        background: #fff3 !important; 
+        background: #fff3 !important;
       }
       &.box-parlamentares:hover {
         background: $color_parlamentar !important;
@@ -165,7 +165,7 @@ $fator-xl: 1.06;
         display: none;
         align-self: center;
         flex: 1 1 100%;
-  
+
         & > a {
           color: #aaa;
           font-size: 1.1em;
@@ -175,11 +175,11 @@ $fator-xl: 1.06;
         }
       }
     }
-    
+
     .icon {
       width: 100%;
       height: 100%;
-      
+
       flex: 0 0 $width-wrapper-closed;
       align-self: center;
 
@@ -229,7 +229,7 @@ $fator-xl: 1.06;
             ul {
               display: block;
             }
-              
+
           }
         }
       }
@@ -420,8 +420,8 @@ $fator-xl: 1.06;
         width: $width-wrapper-lg;
         animation-delay: 0s;
         animation-duration: 0.7s;
-        animation-name: toggledin; 
-      
+        animation-name: toggledin;
+
       }
     }
   }
@@ -447,8 +447,8 @@ $fator-xl: 1.06;
         width: $width-wrapper-lg * $fator-xl;
         animation-delay: 0s;
         animation-duration: 0.7s;
-        animation-name: toggledin_lg; 
-        
+        animation-name: toggledin_lg;
+
         .box {
           & > .inner {
             & > a {

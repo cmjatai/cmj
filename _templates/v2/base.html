@@ -30,7 +30,7 @@
 
 </head>
 
-<body class="{% block body_class %}{%endblock%}">
+<body id="wrapper" class="{% block body_class %}{%endblock%}">
   {% block root_body %}
     <div id="app-vue">
       {% block global_container %}
@@ -128,6 +128,10 @@
             </header>
 
         {% endblock navigation %}
+
+        {% block canais_diretos %}
+          {% include "base_sidebar.html" %}
+        {% endblock canais_diretos%}
 
       <!-- ========================================================== -->
       <main class="{% block main_container_class %}{% endblock %}">

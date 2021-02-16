@@ -16,34 +16,44 @@
 
   - title: {% trans 'Legislação' %}
     url: sapl.norma:norma_pesquisa
-  - title: {% trans 'Normas de Destaque' %}
+  - title: {% trans 'Normas e Códigos de Destaque' %}
     url: sapl.norma:norma_de_destaque
 - title: {% trans 'Parlamentares' %}
   url: /parlamentar
   css_class: head_title
   children:
-  - title: Professora Marina Silveira
-    url: /parlamentar/professora-marina-silveira
-  - title: Alessandra do Adote
-    url: /parlamentar/alessandra-do-adote
-  - title: Durval Júnior
-    url: /parlamentar/durval-junior
-  - title: -----------------
-    url:
-  - title: Abimael Silva da TV
-    url: /parlamentar/abimael-silva-da-tv
+  - title: Kátia Carvalho
+    url: /parlamentar/katia-carvalho
   - title: Adilson de Carvalho
     url: /parlamentar/adilson-de-carvalho
-  - title: Carlinhos Canzi
-    url: /parlamentar/carlinhos-canzi
-  - title: Deuzair Parente
-    url: /parlamentar/deuzair-parente
-  - title: Genilson Santos
-    url: /parlamentar/genilson-santos
-  - title: Marcos Patrick
-    url: /parlamentar/patrick
-  - title: Vicente Mantelli
-    url: /parlamentar/vicente-Mantelli
+  - title: -----------------
+    url:
+  - title: Carlos Miranda
+    url: /parlamentar/carlos-miranda
+  - title: Carvalinho
+    url: /parlamentar/carvalhinho
+  - title: Creso Vilela
+    url: /parlamentar/creso-de-oliveira-vilela
+  - title: Major Davi Pires
+    url: /parlamentar/major-davi-pires
+  - title: Maria Aparecida (CIDA)
+    url: /parlamentar/maria-aparecida-cida
+  - title: Mauro Bento Filho
+    url: /parlamentar/mauro-bento-filho
+  - title: Pastor Luiz Carlos
+    url: /parlamentar/pastor-luiz-carlos
+  - title: Thiago Maggioni
+    url: /parlamentar/thiago-maggioni
+  - title: -----------------
+    url:
+  - title: Gildenicio Santos
+    url: /parlamentar/gildenicio-santos
+  - title: João Rosa
+    url: /parlamentar/joao-rosa
+  - title: José Carapô
+    url: /parlamentar/jose-carapo
+  - title: Marcos Antônio
+    url: /parlamentar/marcos-antonio
 - title: {% trans 'Comunicação' %}
   url: ''
   css_class: head_title
@@ -62,26 +72,6 @@
       url: /galerias/imagens
     - title: Galeria de Áudios
       url: /radio-cmj
-    - title: Vídeos
-      url: ''
-      children:
-      - title: Sessẽs Solenes
-        url: /tv-cmj/sessoes/sessoes-solenes
-      - title: Sessões Plenárias
-        url: ''
-        children:
-        - title: '2018'
-          url: /tv-cmj/sessoes/sessoes-plenarias/2018
-        - title: '2017'
-          url: /tv-cmj/sessoes/sessoes-plenarias/2017
-        - title: '2016'
-          url: /tv-cmj/sessoes/sessoes-plenarias/2016
-        - title: '2015'
-          url: /tv-cmj/sessoes/sessoes-plenarias/2015
-        - title: '2014'
-          url: /tv-cmj/sessoes/sessoes-plenarias/2014
-        - title: '2013'
-          url: /tv-cmj/sessoes/sessoes-plenarias/2013
 
 - title: {% trans 'Processo Legislativo' %}
   url: ''

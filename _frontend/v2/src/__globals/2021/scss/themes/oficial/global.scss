@@ -28,6 +28,11 @@
 
 
 @media print {
+
+  #wrapper {
+    padding-left: 0;
+  }
+
   .container-youtube,
   footer, header {
     display: none !important;
