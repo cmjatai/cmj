@@ -10,6 +10,7 @@ TipoMateriaLegislativaDetail:
 TipoMateriaLegislativa:
   {% trans 'Tipo Matéria Legislativa' %}:
   - sigla:2 descricao sequencia_numeracao:3
+  - limite_em_tramitacao_por_autor
 
 RegimeTramitacao:
   {% trans 'Tipo de Documento' %}:

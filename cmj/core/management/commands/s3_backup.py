@@ -13,6 +13,7 @@ from django.db.models.signals import post_delete, post_save, pre_save
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
+from cmj.signals import Manutencao
 from sapl.materia.models import MateriaLegislativa
 from sapl.utils import hash_sha512
 
@@ -36,7 +37,12 @@ class Command(BaseCommand):
 
     count_registros = 0
 
+    def add_arguments(self, parser):
+        parser.add_argument('--s3_server', type=str, default='')
+
     def handle(self, *args, **options):
+        m = Manutencao()
+        m.desativa_auto_now()
         post_delete.disconnect(dispatch_uid='sapl_post_delete_signal')
         post_save.disconnect(dispatch_uid='sapl_post_save_signal')
         post_delete.disconnect(dispatch_uid='cmj_post_delete_signal')
@@ -44,12 +50,17 @@ class Command(BaseCommand):
 
         self.logger = logging.getLogger(__name__)
 
+        self.s3_server = options['s3_server']
+
         init = datetime.now()
 
         #s3_server = 's3_cmj'
 
         s3_servers = ('locaweb', 's3_cmj')
         s3_server = s3_servers[init.hour % 2]
+
+        if self.s3_server:
+            s3_server = self.s3_server
 
         print('--------- Iniciando:', s3_server)
         self.s3_server = s3_server

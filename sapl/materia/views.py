@@ -81,6 +81,24 @@ from .models import (AcompanhamentoMateria, Anexada, AssuntoMateria, Autoria,
                      TipoProposicao, Tramitacao, UnidadeTramitacao)
 
 
+def tipos_autores_materias(user):
+    materias_em_tramitacao = MateriaLegislativa.objects.filter(
+        em_tramitacao=True,
+        autores__operadores=user)
+
+    r = {}
+    for m in materias_em_tramitacao:
+
+        if m.autores.count() >= 5:
+            continue
+
+        if m.tipo not in r:
+            r[m.tipo] = [m]
+        else:
+            r[m.tipo].append(m)
+    return r
+
+
 AssuntoMateriaCrud = CrudAux.build(AssuntoMateria, 'assunto_materia')
 
 OrigemCrud = CrudAux.build(Origem, '')
@@ -866,51 +884,63 @@ class ProposicaoCrud(Crud):
                         msg_error = _(
                             'Documento não possui assinatura digital.')
                     else:
-                        if p.texto_articulado.exists():
-                            ta = p.texto_articulado.first()
-                            ta.privacidade = STATUS_TA_IMMUTABLE_RESTRICT
-                            ta.editing_locked = True
-                            ta.save()
 
-                            receber_recibo = BaseAppConfig.attr(
-                                'receber_recibo_proposicao')
+                        tam = tipos_autores_materias(self.request.user)
+                        tcr = p.tipo.tipo_conteudo_related
+                        if tcr in tam:
+                            if tcr.id == 3:
+                                if len(tam[tcr]) >= 10:
 
-                            if not receber_recibo:
+                                    msg_error = _(
+                                        'Limite Regimental atingido. O envio só será possível quando a quantidade de Requerimentos em tramitação do Vereador for inferior a 10 Requerimentos.')
+
+                        if not msg_error:
+
+                            if p.texto_articulado.exists():
                                 ta = p.texto_articulado.first()
-                                p.hash_code = 'P' + ta.hash() + SEPARADOR_HASH_PROPOSICAO + str(p.pk)
+                                ta.privacidade = STATUS_TA_IMMUTABLE_RESTRICT
+                                ta.editing_locked = True
+                                ta.save()
 
-                        p.data_devolucao = None
-                        p.data_envio = timezone.now()
-                        p.save()
+                                receber_recibo = BaseAppConfig.attr(
+                                    'receber_recibo_proposicao')
 
-                        messages.success(request, _(
-                            'Proposição enviada com sucesso.'))
-                        try:
-                            self.logger.debug("user=" + username + ". Tentando obter número do objeto MateriaLegislativa com "
-                                              "atributos tipo={} e ano={}."
-                                              .format(p.tipo.tipo_conteudo_related, p.ano))
+                                if not receber_recibo:
+                                    ta = p.texto_articulado.first()
+                                    p.hash_code = 'P' + ta.hash() + SEPARADOR_HASH_PROPOSICAO + str(p.pk)
 
-                            # if p.numero_materia_futuro:
-                            #    numero = p.numero_materia_futuro
-                            # else:
-                            #    numero = MateriaLegislativa.objects.filter(tipo=p.tipo.tipo_conteudo_related,
-                            #                                               ano=p.ano).last().numero + 1
-                            # messages.success(request, _(
-                            #    '%s : nº %s de %s <br>Atenção! Este número é apenas um provável '
-                            #    'número que pode não corresponder com a realidade'
-                            #    % (p.tipo, numero, p.ano)))
-                        except ValueError as e:
-                            self.logger.error(
-                                "user=" + username + "." + str(e))
-                            pass
-                        except AttributeError as e:
-                            self.logger.error(
-                                "user=" + username + "." + str(e))
-                            pass
-                        except TypeError as e:
-                            self.logger.error(
-                                "user=" + username + "." + str(e))
-                            pass
+                            p.data_devolucao = None
+                            p.data_envio = timezone.now()
+                            p.save()
+
+                            messages.success(request, _(
+                                'Proposição enviada com sucesso.'))
+                            try:
+                                self.logger.debug("user=" + username + ". Tentando obter número do objeto MateriaLegislativa com "
+                                                  "atributos tipo={} e ano={}."
+                                                  .format(p.tipo.tipo_conteudo_related, p.ano))
+
+                                # if p.numero_materia_futuro:
+                                #    numero = p.numero_materia_futuro
+                                # else:
+                                #    numero = MateriaLegislativa.objects.filter(tipo=p.tipo.tipo_conteudo_related,
+                                #                                               ano=p.ano).last().numero + 1
+                                # messages.success(request, _(
+                                #    '%s : nº %s de %s <br>Atenção! Este número é apenas um provável '
+                                #    'número que pode não corresponder com a realidade'
+                                #    % (p.tipo, numero, p.ano)))
+                            except ValueError as e:
+                                self.logger.error(
+                                    "user=" + username + "." + str(e))
+                                pass
+                            except AttributeError as e:
+                                self.logger.error(
+                                    "user=" + username + "." + str(e))
+                                pass
+                            except TypeError as e:
+                                self.logger.error(
+                                    "user=" + username + "." + str(e))
+                                pass
 
                 elif action == 'return':
                     if not p.data_envio:
@@ -1160,19 +1190,32 @@ class ProposicaoCrud(Crud):
 
         def get_rows(self, object_list):
 
+            tam = tipos_autores_materias(self.request.user)
             for obj in object_list:
+
+                # TODO: GENERALIZAR INFORMAÇÃO DE ENVIO
+
                 if obj.data_recebimento is None:
                     obj.data_recebimento = 'Não recebida'\
                         if obj.data_envio else 'Não enviada'
+
+                    tcr = obj.tipo.tipo_conteudo_related
+                    if tcr in tam:
+                        if tcr.id == 3:
+                            if len(tam[tcr]) >= 10:
+                                obj.data_envio = """
+                                <strong class="text-red">Limite Regimental atingido.</strong>
+                                """
+                                continue
                 else:
                     obj.data_recebimento = timezone.localtime(
                         obj.data_recebimento)
                     obj.data_recebimento = formats.date_format(
                         obj.data_recebimento, "DATETIME_FORMAT")
+
                 if obj.data_envio is None:
                     obj.data_envio = 'Em elaboração...'
                 else:
-
                     obj.data_envio = timezone.localtime(obj.data_envio)
                     obj.data_envio = formats.date_format(
                         obj.data_envio, "DATETIME_FORMAT")
@@ -1180,21 +1223,7 @@ class ProposicaoCrud(Crud):
             return [self._as_row(obj) for obj in object_list]
 
         def tipos_autores_materias(self):
-            materias_em_tramitacao = MateriaLegislativa.objects.filter(
-                em_tramitacao=True,
-                autores__operadores=self.request.user)
-
-            r = {}
-            for m in materias_em_tramitacao:
-
-                if m.autores.count() >= 5:
-                    continue
-
-                if m.tipo not in r:
-                    r[m.tipo] = [m]
-                else:
-                    r[m.tipo].append(m)
-            return r
+            return tipos_autores_materias(self.request.user)
 
 
 class ReciboProposicaoView(TemplateView):

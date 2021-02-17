@@ -7,7 +7,7 @@
 {% block title %}
 <h3 class="page-header {{bg_title}} d-flex justify-content-between">
   <div>
-    <a href="#collapseSigns" data-toggle="collapse" href="#collapseSigns" role="button" aria-expanded="false" aria-controls="collapseSigns">
+    <a href="#collapseSigns" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseSigns">
         {% if object.is_signed %}
           <i class="fas fa-1x fa-certificate" title="Documento com Assinatura Digital"></i>
         {% endif %}
@@ -15,7 +15,12 @@
     {{object.tipo.sigla}} {{object.numero}}/{{object.ano}} - {{object.tipo}}
   </div>
 
+  <div>
+    <a href="{% url 'sapl.api:materialegislativa-detail' object.id %}" target="_blank" rel="noopener noreferrer">
+      <i class="far fa-file-code"></i>
+    </a>
 
+  </div>
 </h3>
 
   <div class="collapse" id="collapseSigns">
