@@ -1999,6 +1999,8 @@ class MateriaLegislativaCrud(Crud):
                     )
                     ]
                     return btns
+            btns = list(filter(None, btns))
+            return btns
 
         def hook_documentoadministrativo_set__deprecated(self, obj):
 

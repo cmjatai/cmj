@@ -104,7 +104,6 @@ class BtnCertMixin:
                 'btn-primary',
                 _('Gerar Certidão de Publicação')
             ]
-
         return btn
 
 
