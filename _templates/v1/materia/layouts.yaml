@@ -155,6 +155,7 @@ MateriaLegislativaDetail:
   - materia_anexada_set__materia_principal|m2m_urlize_for_detail
   - normajuridica_set
   - autografo_set
+  - diariooficial_set
 {%comment %}
   - numeracao_set
   - objeto

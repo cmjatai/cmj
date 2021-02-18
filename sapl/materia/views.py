@@ -2030,6 +2030,20 @@ class MateriaLegislativaCrud(Crud):
             else:
                 return 'Protocolo', ''
 
+        def hook_diariooficial_set(self, obj):
+            if obj.diariosoficiais.exists():
+                d = obj.diariosoficiais.first().diario
+                value = '<a href="{}">{}</a> <small><i>({})</i></small>'.format(
+                    reverse('cmj.diarios:diariooficial_detail',
+                            kwargs={'pk': d.id}),
+                    d,
+                    formats.date_format(
+                        d.data, "DATE_FORMAT")
+                )
+                return 'Diário Oficial', value
+            else:
+                return 'Diário Oficial', ''
+
         def hook_documentoadministrativo_set__deprecated(self, obj):
 
             docs = obj.documentoadministrativo_set.all()
