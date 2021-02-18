@@ -2018,7 +2018,15 @@ class MateriaLegislativaCrud(Crud):
 
         def hook_protocolo_gr(self, obj):
             if obj.protocolo_gr.exists():
-                return 'Protocolo', obj.protocolo_gr.first().epigrafe
+                p = obj.protocolo_gr.first()
+                value = p.epigrafe
+                if self.request.user.has_perm('protocoloadm.list_protocolo'):
+                    value = '<a href="{}">{}</a>'.format(
+                        reverse('sapl.protocoloadm:protocolo_mostrar',
+                                kwargs={'pk': p.id}),
+                        value)
+
+                return 'Protocolo', value
             else:
                 return 'Protocolo', ''
 
