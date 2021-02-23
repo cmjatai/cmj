@@ -44,7 +44,10 @@ $(function () {
     window.autorModal()
     window.refreshMask()
     window.refreshDatePicker()
-    window.initTextRichEditor('#texto-rico')
+
+    if (document.getElementById('texto-rico') !== null) {
+      window.initTextRichEditor('#texto-rico')
+    }
 
     $('a[data-social-sharing]').click(function (event) {
       event.preventDefault()
