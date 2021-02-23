@@ -1,5 +1,6 @@
 
-from django.core.exceptions import PermissionDenied
+from django.contrib import messages
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models.aggregates import Max
 from django.http.response import HttpResponse
 from django.utils.translation import ugettext_lazy as _
@@ -138,7 +139,12 @@ class ContatoCrud(Crud):
         template_name = 'cerimonial/contato_form.html'
 
         def form_valid(self, form):
-            response = super().form_valid(form)
+            try:
+                response = super().form_valid(form)
+            except ValidationError as ve:
+                messages.error(
+                    self.request, ve.messages[0] if ve.messages else 'Erro na validação do formulário de cadastro.')
+                return super().form_invalid(form)
 
             grupos = list(form.cleaned_data['grupodecontatos_set'])
             self.object.grupodecontatos_set.clear()
