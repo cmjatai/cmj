@@ -12,7 +12,7 @@ django-reversion==3.0.7
 django-reversion-compare==0.12.2
 django-webpack4-loader
 
-djangorestframework==3.11.0
+djangorestframework==3.11.2
 drf_yasg==1.17.0
 asn1crypto
 billiard==3.6.3.0
