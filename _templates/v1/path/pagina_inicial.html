@@ -8,11 +8,12 @@
 {% block base_functions %}{% endblock %}
 {% block main_container_class %}container container{{fluid}}{{path}}{% endblock %}
 {% block base_content %}
+
 {% if user.is_anonymous and ""|sessao_em_andamento %}
   <div class="row justify-content-center mt-2">
     <div class="col-12 col-lg-7 mt-4" id="aovivo_content">
       <div class="embed-responsive embed-responsive-16by9">
-        <iframe width="560" height="315" src="https://www.youtube.com/embed/yfODSAlkgIc?controls=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/live_stream?channel=UCZXKjzKW2n1w4JQ3bYlrA-w" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;" allowfullscreen></iframe>
       </div>
     </div>
   </div>

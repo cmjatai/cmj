@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
+from django.db.models.aggregates import Count
 from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.urls.base import reverse
@@ -334,11 +335,20 @@ class NormaCrud(Crud):
 
         def get_queryset(self):
             qs = Crud.ListView.get_queryset(self)
+            """normas = NormaJuridica.objects.annotate(
+                count_ds=Count('texto_articulado__dispositivos_set')
+            ).filter(
+                count_ds__lte=5,
+                texto_articulado__privacidade=0
+            ).exclude(count_ds=0).order_by('-count_ds')"""
+
             q = Q(
                 texto_articulado__privacidade=0
             ) | Q(
                 texto_articulado__isnull=True)
+
             qs = qs.exclude(q)
+
             return qs.order_by('-texto_articulado__privacidade', '-ano', '-numero')
 
         def hook_header_epigrafe(self):
@@ -384,7 +394,7 @@ class NormaCrud(Crud):
 
             atributos = ['tipo_id', 'numero', 'ano', 'data', 'esfera_federacao',
                          'complemento', 'materia_id', 'numero',
-                         'data_publicacao', 'data_vigencia','ementa', 'indexacao',
+                         'data_publicacao', 'data_vigencia', 'ementa', 'indexacao',
                          'observacao', 'texto_integral']
 
             for atributo in atributos:

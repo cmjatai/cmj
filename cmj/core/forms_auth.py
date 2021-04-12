@@ -214,6 +214,7 @@ class CmjUserChangeForm(ModelForm):
             if new_password1 and new_password2:
                 password_validation.validate_password(
                     new_password2, self.instance)
+        return data
 
 
 class CmjUserAdminForm(ModelForm):

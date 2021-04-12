@@ -30,7 +30,7 @@ dotenv.config({
 let HOST_NAME = 'localhost'
 // HOST_NAME = '192.168.15.7'
 // HOST_NAME = '10.42.0.1'
-HOST_NAME = '10.3.163.200'
+// HOST_NAME = '10.3.163.200'
 // HOST_NAME = '192.168.43.48'
 
 module.exports = {
