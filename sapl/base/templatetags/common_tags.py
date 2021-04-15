@@ -55,6 +55,14 @@ def model_verbose_name_plural(class_name):
 
 
 @register.filter
+def meta_model_value(instance, attr):
+    try:
+        return getattr(instance._meta, attr)
+    except:
+        return ''
+
+
+@register.filter
 def model_name(instance):
     return instance._meta.label
 
@@ -67,6 +75,16 @@ def split(value, arg):
 @register.filter
 def to_str(arg):
     return str(arg)
+
+
+@register.filter
+def to_dict(arg):
+    return arg.__dict__
+
+
+@register.filter
+def to_descr(arg):
+    return arg.__descr__
 
 
 @register.filter

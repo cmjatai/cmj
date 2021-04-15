@@ -40,19 +40,33 @@ class DiarioOficialCrud(Crud):
             btns = []
 
             if self.request.user.has_perm('diarios.change_diariooficial'):
-                btns += [(
-                    '%s?associar_certidoes' % reverse(
-                        'cmj.diarios:diariooficial_detail',
-                        kwargs={'pk': self.kwargs['pk']}),
-                    'btn-primary',
-                    _('Associar Certidões')
-                )
+                btns += [
+                    (
+                        '%s?associar_certidoes' % reverse(
+                            'cmj.diarios:diariooficial_detail',
+                            kwargs={'pk': self.kwargs['pk']}),
+                        'btn-primary',
+                        _('Associar Certidões')
+                    ),
+                    (
+                        '%s?extrato' % reverse(
+                            'cmj.diarios:diariooficial_detail',
+                            kwargs={'pk': self.kwargs['pk']}),
+                        'btn-secondary',
+                        _('Extrato')
+                    ),
+
                 ]
                 return btns
 
         def get_context_data(self, **kwargs):
             c = super().get_context_data(**kwargs)
             c['bg_title'] = 'bg-maroon text-white'
+
+            if self.extrato:
+                c['object_list'] = VinculoDocDiarioOficial.objects.filter(
+                    diario=self.object).order_by('content_type_id', 'object_id')
+
             return c
 
         def hook_vinculodocdiariooficial_set(self, obj):
@@ -76,7 +90,13 @@ class DiarioOficialCrud(Crud):
 
         def get(self, request, *args, **kwargs):
 
-            if request.GET.get('associar_certidoes', None) is not None and \
+            self.extrato = False
+            if request.GET.get('extrato', None) is not None and \
+                    self.request.user.has_perm('diarios.change_diariooficial'):
+                self.template_name = 'diarios/diariooficial_extrato.html'
+                self.extrato = True
+
+            elif request.GET.get('associar_certidoes', None) is not None and \
                     self.request.user.has_perm('diarios.change_diariooficial'):
                 self.associar_certidoes()
                 messages.add_message(

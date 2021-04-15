@@ -385,7 +385,7 @@ class MateriaLegislativa(CommonMixin):
 
     @property
     def __descr__(self):
-        return str(self)
+        return str(self.ementa)
 
     @property
     def certidao(self):

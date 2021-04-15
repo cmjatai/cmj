@@ -1,0 +1,22 @@
+{% load common_tags %}
+
+{% for item in object_list %}
+  {% ifchanged item.content_type %}
+    {{item.content_object|meta_model_value:"verbose_name_plural"}}<br>
+  {% endifchanged %}
+  {{item.content_object}}<br>
+  {{item.content_object|to_descr}}<br>
+
+  Jataí, {{item.content_object.certidao.created|date }}.<br>
+
+  {% if item.content_object.autores.exists %}
+    {% for autor in item.content_object.autores.all %}
+      {{autor}}{% if not forloop.last %},{% else %}<br>.................<br>{% endif %}
+    {% endfor %}
+  {% endif %}
+
+  Publicação Integral: {{request.META.HTTP_HOST}}{% url item|urldetail_content_type:item.content_object item.content_object.pk %}
+  <br><br>
+
+
+{% endfor %}

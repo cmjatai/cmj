@@ -10,9 +10,9 @@ def areatrabalho(request):
     return result
 
 
-def debug(context):
+def debug(request):
     return {'DEBUG': settings.DEBUG}
 
 
-def site_url(context):
+def site_url(request):
     return {'site_url': settings.SITE_URL}
