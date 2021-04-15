@@ -80,8 +80,8 @@
                   {% if d.certidao %}
                     <br><small>
                     <span class="text-danger">Certidão de Publicação nº {{d.certidao.id|stringformat:"06d" }} de {{d.certidao.created}}</span>
-                    {% if d.diariooficial %}
-                      <small>
+                    {% if perms.protocoloadm.change_documentoadministrativo and d.diariooficial %}
+                      <br><small>
                         <a class="text-green" href="{% url 'cmj.diarios:diariooficial_detail' d.diariooficial.id %}">{{d.diariooficial}}</a>
                       </small>
                     {% endif %}
@@ -198,8 +198,8 @@
                     {% if d.certidao %}
                       <br><small>
                       <span class="text-danger">Certidão de Publicação nº {{d.certidao.id|stringformat:"06d" }} de {{d.certidao.created}}</span>
-                      {% if d.diariooficial %}
-                        <small>
+                      {% if perms.protocoloadm.change_documentoadministrativo and d.diariooficial %}
+                        <br><small>
                           <a class="text-green" href="{% url 'cmj.diarios:diariooficial_detail' d.diariooficial.id %}">{{d.diariooficial}}</a>
                         </small>
                       {% endif %}

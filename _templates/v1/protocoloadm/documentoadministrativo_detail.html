@@ -40,8 +40,8 @@
                   <br><small>
                   <a class="text-danger" href="{% url 'cmj.core:certidaopublicacao_detail' d.certidao.id %}">Certidão de Publicação nº {{d.certidao.id|stringformat:"06d" }} de {{d.certidao.created}}</a>
 
-                  {% if d.diariooficial %}
-                    <small>
+                  {% if perms.protocoloadm.change_documentoadministrativo and d.diariooficial %}
+                    <br><small>
                       <a class="text-green" href="{% url 'cmj.diarios:diariooficial_detail' d.diariooficial.id %}">{{d.diariooficial}}</a>
                     </small>
                   {% endif %}
