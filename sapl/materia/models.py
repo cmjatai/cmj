@@ -15,7 +15,7 @@ from model_utils import Choices
 import reversion
 
 from cmj.core.models import CertidaoPublicacao
-from cmj.diarios.models import VinculoDocDiarioOficial
+from cmj.diarios.models import VinculoDocDiarioOficial, DiarioOficial
 from cmj.mixins import CommonMixin
 from sapl.base.models import SEQUENCIA_NUMERACAO_PROTOCOLO, Autor,\
     TipoAutor
@@ -372,6 +372,9 @@ class MateriaLegislativa(CommonMixin):
     _certidao = GenericRelation(
         CertidaoPublicacao, related_query_name='materialegislativa_cert')
 
+    _diario = GenericRelation(
+        VinculoDocDiarioOficial, related_query_name='materialegislativa_diario')
+
     class Meta:
         verbose_name = _('Matéria Legislativa')
         verbose_name_plural = _('Matérias Legislativas')
@@ -390,6 +393,13 @@ class MateriaLegislativa(CommonMixin):
     @property
     def certidao(self):
         return self._certidao.all().first()
+
+    @property
+    def diariooficial(self):
+        try:
+            return self._diario.all().first().diario
+        except:
+            return None
 
     def __str__(self):
         return _('%(tipo)s nº %(numero)s de %(ano)s') % {

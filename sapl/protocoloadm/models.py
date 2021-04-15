@@ -15,7 +15,7 @@ from model_utils import Choices
 import reversion
 
 from cmj.core.models import AreaTrabalho, CertidaoPublicacao
-from cmj.diarios.models import VinculoDocDiarioOficial
+from cmj.diarios.models import VinculoDocDiarioOficial, DiarioOficial
 from cmj.mixins import CommonMixin
 from sapl.base.models import Autor
 from sapl.materia.models import TipoMateriaLegislativa, UnidadeTramitacao,\
@@ -378,9 +378,19 @@ class DocumentoAdministrativo(CommonMixin):
     _certidao = GenericRelation(
         CertidaoPublicacao, related_query_name='documentoadministrativo_cert')
 
+    _diario = GenericRelation(
+        VinculoDocDiarioOficial, related_query_name='documentoadministrativo_diario')
+
     @property
     def certidao(self):
         return self._certidao.all().first()
+
+    @property
+    def diariooficial(self):
+        try:
+            return self._diario.all().first().diario
+        except:
+            return None
 
     @property
     def is_signed(self):

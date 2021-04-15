@@ -14,3 +14,19 @@
 <small>
   {{n.ementa}}
 </small>
+
+{% if perms.change_normajuridica %}
+  <div class="bg-white d-flex flex-column mt-2">
+    {% if n.certidao %}
+      <small>
+      <a class="text-danger" href="{% url 'cmj.core:certidaopublicacao_detail' n.certidao.id %}">Certidão de Publicação nº {{n.certidao.id|stringformat:"06d" }} de {{n.certidao.created}}</a>
+      </small>
+    {% endif %}
+    {% if n.diariooficial %}
+      <small>
+        <a class="text-green" href="{% url 'cmj.diarios:diariooficial_detail' n.diariooficial.id %}">{{n.diariooficial}}</a>
+      </small>
+    {% endif %}
+  </div>
+{% endif %}
+

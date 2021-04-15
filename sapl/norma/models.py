@@ -9,7 +9,7 @@ from model_utils import Choices
 import reversion
 
 from cmj.core.models import CertidaoPublicacao
-from cmj.diarios.models import VinculoDocDiarioOficial
+from cmj.diarios.models import VinculoDocDiarioOficial, DiarioOficial
 from cmj.mixins import CommonMixin
 from cmj.utils import restringe_tipos_de_arquivo_midias
 from sapl.base.models import Autor
@@ -178,6 +178,9 @@ class NormaJuridica(CommonMixin):
     _certidao = GenericRelation(
         CertidaoPublicacao, related_query_name='normajuridica_cert')
 
+    _diario = GenericRelation(
+        VinculoDocDiarioOficial, related_query_name='normajuridica_diario')
+
     class Meta:
         verbose_name = _('Norma Jurídica')
         verbose_name_plural = _('Normas Jurídicas')
@@ -209,6 +212,13 @@ class NormaJuridica(CommonMixin):
     @property
     def certidao(self):
         return self._certidao.all().first()
+
+    @property
+    def diariooficial(self):
+        try:
+            return self._diario.all().first().diario
+        except:
+            return None
 
     @property
     def __descr__(self):

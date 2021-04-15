@@ -13,6 +13,7 @@ from model_utils import Choices
 import reversion
 
 from cmj.core.models import CertidaoPublicacao
+from cmj.diarios.models import DiarioOficial, VinculoDocDiarioOficial
 from sapl.base.models import Autor
 from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import (CargoMesa, Legislatura, Parlamentar,
@@ -175,6 +176,9 @@ class SessaoPlenaria(models.Model):
     _certidao = GenericRelation(
         CertidaoPublicacao, related_query_name='sessaoplenaria_cert')
 
+    _diario = GenericRelation(
+        VinculoDocDiarioOficial, related_query_name='sessaoplenaria_diario')
+
     class Meta:
         verbose_name = _('Sessão Plenária')
         verbose_name_plural = _('Sessões Plenárias')
@@ -186,6 +190,13 @@ class SessaoPlenaria(models.Model):
     @property
     def certidao(self):
         return self._certidao.all().first()
+
+    @property
+    def diariooficial(self):
+        try:
+            return self._diario.all().first().diario
+        except:
+            return None
 
     def __str__(self):
 

@@ -299,6 +299,27 @@
                       <p></p>
                     {% endif %}
 
+                      {% if perms.change_materialegislativa %}
+                        <div class="bg-white d-flex flex-column mt-2">
+                        {% if m.certidao %}
+                          <small>
+                          <a class="text-danger" href="{% url 'cmj.core:certidaopublicacao_detail' m.certidao.id %}">Certidão de Publicação nº {{m.certidao.id|stringformat:"06d" }} de {{m.certidao.created}}</a>
+                          </small>
+                        {% endif %}
+                        {% if m.diariooficial %}
+                          <small>
+                            <a class="text-green" href="{% url 'cmj.diarios:diariooficial_detail' m.diariooficial.id %}">{{m.diariooficial}}</a>
+                          </small>
+                        {% endif %}
+                        {% if m.metadata.signs.texto_original.hom %}
+                          <small>
+                          Homologação: {{m.metadata.signs.texto_original.hom.0}}
+                          </small>
+                        {% endif %}
+                        </div>
+                      {% endif %}
+
+
 
 
                 </td>
