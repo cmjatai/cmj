@@ -28,9 +28,10 @@ class Command(BaseCommand):
     s3r = None
 
     s3_server = 's3_cmj'
+    s3_full = False
 
     bucket_name = 'cmjatai_portal'
-    days_validate = 10
+    days_validate = 60
 
     start_time = None
     exec_time = 1800
@@ -39,6 +40,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--s3_server', type=str, default='')
+        parser.add_argument('--s3_full', type=bool, default=False)
 
     def handle(self, *args, **options):
         m = Manutencao()
@@ -51,6 +53,7 @@ class Command(BaseCommand):
         self.logger = logging.getLogger(__name__)
 
         self.s3_server = options['s3_server']
+        self.s3_full = options['s3_full']
 
         init = datetime.now()
 
@@ -312,14 +315,15 @@ class Command(BaseCommand):
                                 except Exception as ee:
                                     print(ee, metadata)
 
-                            if (count == 500 or
-                                    timezone.localtime() -
-                                    self.start_time >
-                                    timedelta(seconds=self.exec_time)):
-                                print(
-                                    '--------- {} ---------- ENCERRADO EM: {}'.format(self.s3_server, timezone.localtime()))
+                            if not self.s3_full:
+                                if (count == 500 or
+                                        timezone.localtime() -
+                                        self.start_time >
+                                        timedelta(seconds=self.exec_time)):
+                                    print(
+                                        '--------- {} ---------- ENCERRADO EM: {}'.format(self.s3_server, timezone.localtime()))
 
-                                return
+                                    return
 
     def checar_consistencia(self, i, ff, fn):
         try:
@@ -418,18 +422,19 @@ class Command(BaseCommand):
 
         if os.path.exists(getattr(ff, attr_path)):
 
-            if metadata[self.s3_server][fn][attr_path]:
-                # return 0
-                t = os.path.getmtime(getattr(ff, attr_path))
-                date_file = datetime.fromtimestamp(t, timezone.utc)
+            if not self.s3_full:
+                if metadata[self.s3_server][fn][attr_path]:
+                    # return 0
+                    t = os.path.getmtime(getattr(ff, attr_path))
+                    date_file = datetime.fromtimestamp(t, timezone.utc)
 
-                if parse_datetime(metadata[self.s3_server][fn][attr_path]) > date_file:
-                    result = self.validate_file(
-                        metadata, i, fn, attr_path, attr_hash)
-                    if result:
-                        return 0
-                else:
-                    print('Arquivo Substituído...', i, attr_path)
+                    if parse_datetime(metadata[self.s3_server][fn][attr_path]) > date_file:
+                        result = self.validate_file(
+                            metadata, i, fn, attr_path, attr_hash)
+                        if result:
+                            return 0
+                    else:
+                        print('Arquivo Substituído...', i, attr_path)
 
             # return 0
             print('Enviando...', i.id, i, attr_path)
@@ -460,11 +465,11 @@ class Command(BaseCommand):
                         }
                     })
 
-            metadata[self.s3_server][fn][attr_path] = timezone.localtime()
-            metadata[self.s3_server][fn][attr_hash] = hash_sha512(
-                getattr(ff, attr_path))
-            metadata[self.s3_server][fn]['validate'] = timezone.localtime()
-
+            if not self.s3_full or metadata[self.s3_server][fn][attr_hash] is None:
+                metadata[self.s3_server][fn][attr_path] = timezone.localtime()
+                metadata[self.s3_server][fn][attr_hash] = hash_sha512(
+                    getattr(ff, attr_path))
+                metadata[self.s3_server][fn]['validate'] = timezone.localtime()
             return 1
         return 0
 
