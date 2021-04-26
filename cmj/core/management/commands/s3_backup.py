@@ -28,7 +28,7 @@ class Command(BaseCommand):
     s3r = None
 
     s3_server = 's3_cmj'
-    s3_full = False
+    s3_full = ''
 
     bucket_name = 'cmjatai_portal'
     days_validate = 60
@@ -40,7 +40,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--s3_server', type=str, default='')
-        parser.add_argument('--s3_full', type=bool, default=False)
+        parser.add_argument('--s3_full', type=str, default='')
 
     def handle(self, *args, **options):
         m = Manutencao()
@@ -437,8 +437,6 @@ class Command(BaseCommand):
                         print('Arquivo Substituído...', i, attr_path)
 
             # return 0
-            print('Enviando...', i.id, i, attr_path)
-
             """self.s3Lc.upload_file(
                 getattr(ff, attr_path),
                 self.bucket_name,
@@ -455,6 +453,20 @@ class Command(BaseCommand):
                 self.bucket_name,
                 ff.original_name if 'original' in attr_path else ff.name,
             )
+
+            if self.s3_full == 'only_new':
+                try:
+                    meta = obj.metadata
+                    pk = meta['Pk' if 'Pk' in meta else 'pk']
+
+                    if pk == f'{i._meta.label_lower}.{i.id}':
+                        return 0
+
+                except:
+                    pass
+
+            print('Enviando...', i.id, i, attr_path)
+
             with open(getattr(ff, attr_path), "rb") as f:
                 obj.upload_fileobj(
                     f,
