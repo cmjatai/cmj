@@ -11,7 +11,20 @@
 
   {% if item.content_object.autores.exists %}
     {% for autor in item.content_object.autores.all %}
-      {{autor}}{% if not forloop.last %},{% else %}<br>.................<br>{% endif %}
+      {{autor}}{% if not forloop.last %},{% else %}
+        <br>
+        {% if forloop.counter0 %}
+          Vereadores
+        {% else %}
+          {% if autor.autor_related.sexo == 'M' %}
+            Vereador
+          {% elif  autor.autor_related.sexo == 'F' %}
+            Vereadora
+          {% endif %}
+        {% endif %}
+          <br>
+
+        {% endif %}
     {% endfor %}
   {% endif %}
 
