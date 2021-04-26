@@ -1229,11 +1229,11 @@ class MateriaLegislativaFilterSet(django_filters.FilterSet):
             return queryset
 
         if value == '1':
-            q &= Q(metadata__signs__texto_original__0__isnull=False)
+            q &= Q(metadata__signs__texto_original__signs__0__isnull=False)
 
         else:
-            q &= (Q(metadata__signs__texto_original__isnull=True) |
-                  Q(metadata__signs__texto_original__len=0))
+            q &= (Q(metadata__signs__texto_original__signs__isnull=True) |
+                  Q(metadata__signs__texto_original__signs__len=0))
 
         return queryset.filter(q)
 

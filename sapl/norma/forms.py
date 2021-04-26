@@ -121,11 +121,11 @@ class NormaFilterSet(django_filters.FilterSet):
             return queryset
 
         if value == '1':
-            q &= Q(metadata__signs__texto_integral__0__isnull=False)
+            q &= Q(metadata__signs__texto_integral__signs__0__isnull=False)
 
         else:
-            q &= (Q(metadata__signs__texto_integral__isnull=True) |
-                  Q(metadata__signs__texto_integral__len=0))
+            q &= (Q(metadata__signs__texto_integral__signs__isnull=True) |
+                  Q(metadata__signs__texto_integral__signs__len=0))
 
         return queryset.filter(q)
 
