@@ -6,23 +6,20 @@ import os
 
 from django.apps.registry import apps
 from django.core.management.base import BaseCommand
-from django.db import transaction
 from django.db.models import F, Q
 from django.db.models.fields.files import FileField
 from django.db.models.signals import post_delete, post_save
-from django.db.transaction import atomic
 from django.utils import timezone
-import urllib3
 
-from cmj.core.models import OcrMyPDF, AuditLog
-from cmj.diarios.models import DiarioOficial, VinculoDocDiarioOficial
+from cmj.core.models import OcrMyPDF
+from cmj.diarios.models import DiarioOficial
+from cmj.signals import Manutencao
 from sapl.compilacao.models import Dispositivo, TextoArticulado,\
     TipoDispositivo
 from sapl.materia.models import MateriaLegislativa, DocumentoAcessorio
 from sapl.norma.models import NormaJuridica
 from sapl.protocoloadm.models import DocumentoAdministrativo, Protocolo,\
     DocumentoAcessorioAdministrativo
-from sapl.rules.apps import reset_id_model
 from sapl.sessao.models import SessaoPlenaria
 
 
@@ -33,6 +30,8 @@ def _get_registration_key(model):
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
+        m = Manutencao()
+        m.desativa_auto_now()
         post_delete.disconnect(dispatch_uid='sapl_post_delete_signal')
         post_save.disconnect(dispatch_uid='sapl_post_save_signal')
         post_delete.disconnect(dispatch_uid='cmj_post_delete_signal')
@@ -40,17 +39,7 @@ class Command(BaseCommand):
 
         self.logger = logging.getLogger(__name__)
 
-        """url = 'https://www.jatai.go.leg.br/noticias/morre-o-ex-vereador-eudes-assis-carvalho'
-
-        http = urllib3.PoolManager()
-        try:
-            r = http.request('GET', url)
-
-            data = r.data.decode('utf-8')
-            jdata = json.loads(data)
-            print(jdata)
-        except Exception as e:
-            print(e)"""
+        self.count_registers(full=False)
 
         # self.run_busca_desordem_de_dispositivos()
 
@@ -88,30 +77,15 @@ class Command(BaseCommand):
         # with transaction.atomic():
         #    reset_id_model(AuditLog)
 
-    def run_liga_norma_a_diario(self):
+    def count_registers(self, full=True):
 
-        normas = NormaJuridica.objects.exclude(
-            veiculo_publicacao='').all().order_by('ano', 'id')
+        print('--------- CountRegisters ----------')
 
-        for n in normas:
-
-            do = DiarioOficial.objects.filter(
-                edicao=n.veiculo_publicacao).order_by('id')
-
-            d = do.last() if n.ano == 2020 else do.first()
-
-            try:
-                v = VinculoDocDiarioOficial()
-                v.diario = d
-                v.content_object = n
-                if n.pagina_inicio_publicacao:
-                    v.pagina = n.pagina_inicio_publicacao
-                v.save()
-            except:
-                print(n.id, n)
-                return
-
-        print(normas.count())
+        for app in apps.get_app_configs():
+            for m in app.get_models():
+                count = m.objects.all().count()
+                if full or count > 100000:
+                    print(count, m, app)
 
     def ajuste_metadata_com_set_values(self):
         for app in apps.get_app_configs():

@@ -659,16 +659,6 @@ class Command(BaseCommand):
                         calc[d] += 1
         print(calc)
 
-    def count_registers(self, full=True):
-
-        print('--------- CountRegisters ----------')
-
-        for app in apps.get_app_configs():
-            for m in app.get_models():
-                count = m.objects.all().count()
-                if full or count > 1000:
-                    print(count, m, app)
-
     def update_backup_postgresql(self):
 
         path_name = '{}BD_POSTGRESQL/'.format(settings.ABSOLUTE_PATH_BACKUP)
