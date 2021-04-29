@@ -11,7 +11,7 @@ from django.db.models.query import QuerySet
 from django.urls.base import reverse
 from django.utils import formats
 from django.utils.translation import ugettext as _
-import rtyaml
+import yaml
 
 
 def heads_and_tails(list_of_lists):
@@ -370,7 +370,7 @@ def read_yaml_from_file(yaml_layout):
     # aqui é importante converter para str pois, dependendo do ambiente,
     # o rtyaml pode usar yaml.CSafeLoader, que exige str ou stream
     rendered = str(t.render())
-    return rtyaml.load(rendered)
+    return yaml.load(rendered)
 
 
 def read_layout_from_yaml(yaml_layout, key):
