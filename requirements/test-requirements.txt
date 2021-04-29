@@ -1,7 +1,7 @@
 -r requirements.txt
 coverage==4.0.3
 django-webtest
-flake8==2.5.4
+flake8
 flake8-docstrings
 isort==4.2.5
 model_mommy==1.2.6
