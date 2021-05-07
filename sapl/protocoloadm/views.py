@@ -35,7 +35,7 @@ from weasyprint import HTML
 
 from cmj.core.models import AreaTrabalho
 from cmj.mixins import BtnCertMixin
-from cmj.utils import ProcessoExterno
+from cmj.utils import ProcessoExterno, PluginSignMixin
 import sapl
 from sapl.base.email_utils import do_envia_email_confirmacao
 from sapl.base.models import Autor, CasaLegislativa, AppConfig
@@ -1757,16 +1757,9 @@ class ProtocoloRedirectConteudoView(PermissionRequiredMixin, RedirectView):
         ), args=(p.conteudo_protocolado.id,))
 
 
-class SeloProtocoloMixin:
+class SeloProtocoloMixin(PluginSignMixin):
 
     def add_selo_protocolo(self):
-
-        plugin_path = settings.PROJECT_DIR.child(
-            'scripts').child(
-            'java').child(
-            'PluginSignPortalCMJ').child(
-            'jar').child(
-            'PluginSignPortalCMJ.jar')
 
         item = self.object.conteudo_protocolado
         p = self.object
@@ -1774,61 +1767,44 @@ class SeloProtocoloMixin:
         for field_file in item.FIELDFILE_NAME:
             file_path = getattr(item, field_file).path
 
-            cmd = [
-                'java -jar "{plugin}"',
-                '{command}',
-                '{x}',
-                '{y}',
-                '"{protocolo}"',
-                '"{data_protocolo}"',
-                '"{hora_protocolo}"',
-                '"{sigla}"',
-                '"{file}"',
-                '"{certificado}"',
-                '"{password}"',
-                '"{data_selo}"',
-                '"{hora_selo}"',
-            ]
-            cmd = ' '.join(cmd)
+            cmd = self.cmd_mask
 
             cmd = cmd.format(
                 **{
-                    'plugin': plugin_path,
-                    'command': 'cert_protocolo',
-                    'x': 0,
-                    'y': 0,
-                    'protocolo': 'Protocolo: {}/{}'.format(p.numero, p.ano),
-                    'data_protocolo': formats.date_format(
+                    'plugin': self.plugin_path,
+                    'comando': 'cert_protocolo',
+                    'in_file': file_path,
+                    'certificado': settings.CERT_PRIVATE_KEY_ID,
+                    'password': settings.CERT_PRIVATE_KEY_ACCESS,
+                    'data_ocorrencia': formats.date_format(
                         timezone.localtime(
                             p.timestamp) if p.timestamp else p.data,
                         'd/m/Y'
                     ),
-                    'hora_protocolo': formats.date_format(
+                    'hora_ocorrencia': formats.date_format(
                         timezone.localtime(
                             p.timestamp) if p.timestamp else p.hora,
                         'H:i'
                     ),
-                    'sigla': item.epigrafe_short,
-                    'file': file_path,
-                    'certificado': settings.CERT_PRIVATE_KEY_ID,
-                    'password': settings.CERT_PRIVATE_KEY_ACCESS,
-                    'data_selo': formats.date_format(timezone.localtime(), 'd/m/Y'),
-                    'hora_selo': formats.date_format(timezone.localtime(), 'H:i'),
+                    'data_comando': formats.date_format(timezone.localtime(), 'd/m/Y'),
+                    'hora_comando': formats.date_format(timezone.localtime(), 'H:i'),
+                    'titulopre': 'Protocolo: {}/{}'.format(p.numero, p.ano),
+                    'titulo': item.epigrafe_short,
+                    'titulopos': '',
+                    'x': 190,
+                    'y': 50,
+                    'w': 12,
+                    'h': 65,
+                    'cor': "0, 76, 64, 255",
+                    'debug': False  # settings.DEBUG
                 }
             )
+
+            self.run(cmd)
 
             # print(cmd)
             # return
 
-            try:
-                p = ProcessoExterno(cmd, self.logger)
-                r = p.run(timeout=300)
-                # if r is None:
-                #    return None
-                # if not r or r in (2, 6):
-                #    return True
-            except Exception as e:
-                pass
         item.save()
 
 

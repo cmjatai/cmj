@@ -515,6 +515,46 @@ class ProcessoExterno(object):
         return self.process.returncode
 
 
+class PluginSignMixin:
+
+    plugin_path = settings.PROJECT_DIR.child(
+        'scripts').child(
+        'java').child(
+        'PluginSignPortalCMJ').child(
+        'jar').child(
+        'PluginSignPortalCMJ.jar')
+
+    _cmd_mask = [
+        'java -jar "{plugin}"',
+        '{comando}',
+        '"{in_file}"',
+        '"{certificado}"',
+        '"{password}"',
+        '"{data_ocorrencia}"',
+        '"{hora_ocorrencia}"',
+        '"{data_comando}"',
+        '"{hora_comando}"',
+        '"{titulopre}"',
+        '"{titulo}"',
+        '"{titulopos}"',
+        '{x}',
+        '{y}',
+        '{w}',
+        '{h}',
+        '"{cor}"',
+        '{debug}',
+    ]
+
+    cmd_mask = ' '.join(_cmd_mask)
+
+    def run(self, cmd=""):
+        try:
+            p = ProcessoExterno(cmd, self.logger)
+            r = p.run(timeout=300)
+        except Exception as e:
+            pass
+
+
 class CmjLoader(Loader):
 
     def get_dirs(self):
