@@ -1759,13 +1759,19 @@ class ProtocoloRedirectConteudoView(PermissionRequiredMixin, RedirectView):
 
 class SeloProtocoloMixin(PluginSignMixin):
 
-    def add_selo_protocolo(self):
+    def add_selo_protocolo(self, original2copia=False):
 
         item = self.object.conteudo_protocolado
         p = self.object
 
         for field_file in item.FIELDFILE_NAME:
-            file_path = getattr(item, field_file).path
+            if original2copia:
+                paths = '{},{}'.format(
+                    getattr(item, field_file).original_path,
+                    getattr(item, field_file).path,
+                )
+            else:
+                paths = getattr(item, field_file).path
 
             cmd = self.cmd_mask
 
@@ -1773,7 +1779,7 @@ class SeloProtocoloMixin(PluginSignMixin):
                 **{
                     'plugin': self.plugin_path,
                     'comando': 'cert_protocolo',
-                    'in_file': file_path,
+                    'in_file': paths,
                     'certificado': settings.CERT_PRIVATE_KEY_ID,
                     'password': settings.CERT_PRIVATE_KEY_ACCESS,
                     'data_ocorrencia': formats.date_format(
@@ -1816,7 +1822,8 @@ class ProtocoloHomologarView(SeloProtocoloMixin, PermissionRequiredMixin, Templa
     def get(self, request, *args, **kwargs):
         self.object = Protocolo.objects.get(pk=self.kwargs['pk'])
 
-        self.add_selo_protocolo()
+        self.add_selo_protocolo(original2copia='recreate' in request.GET)
+
         messages.info(request, _('Selo de Protocolo adicionado...'))
 
         return redirect(
