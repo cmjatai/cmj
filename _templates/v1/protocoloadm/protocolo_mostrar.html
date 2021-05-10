@@ -104,6 +104,12 @@
 			class="btn btn-primary float-right">
 				Homologar
 		</a>
+	{% elif user.is_superuser %}
+			<a
+			href="{% url 'sapl.protocoloadm:protocolo_homologar' protocolo.pk %}?recreate"
+			class="btn btn-primary float-right">
+				RE - Homologar
+		</a>
 	{% endif %}
 
 	{% if protocolo.email and user.is_superuser%}
