@@ -1800,7 +1800,7 @@ class SeloProtocoloMixin(PluginSignMixin):
                     'x': 190,
                     'y': 50,
                     'w': 12,
-                    'h': 65,
+                    'h': 60,
                     'cor': "0, 76, 64, 255",
                     'debug': False  # settings.DEBUG
                 }
