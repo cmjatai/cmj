@@ -9,8 +9,7 @@ TipoMateriaLegislativaDetail:
 
 TipoMateriaLegislativa:
   {% trans 'Tipo Matéria Legislativa' %}:
-  - sigla:2 descricao sequencia_numeracao:3
-  - limite_em_tramitacao_por_autor
+  - sigla:2 descricao sequencia_numeracao:3 turnos_aprovacao:2
 
 RegimeTramitacao:
   {% trans 'Tipo de Documento' %}:

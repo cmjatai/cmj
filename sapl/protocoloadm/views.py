@@ -31,12 +31,9 @@ from django.views.generic.base import RedirectView, TemplateView, ContextMixin
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from django_filters.views import FilterView
-from weasyprint import HTML
 
 from cmj.core.models import AreaTrabalho
-from cmj.mixins import BtnCertMixin
-from cmj.utils import ProcessoExterno, PluginSignMixin
-import sapl
+from cmj.mixins import BtnCertMixin, PluginSignMixin
 from sapl.base.email_utils import do_envia_email_confirmacao
 from sapl.base.models import Autor, CasaLegislativa, AppConfig
 from sapl.base.signals import tramitacao_signal

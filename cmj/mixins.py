@@ -13,7 +13,7 @@ from pdfrw.pdfreader import PdfReader
 from social_core.backends.facebook import FacebookOAuth2
 
 from cmj.utils import run_sql, get_settings_auth_user_model,\
-    YES_NO_CHOICES
+    YES_NO_CHOICES, ProcessoExterno
 from sapl.crispy_layout_mixin import to_row, SaplFormLayout,\
     form_actions
 
@@ -68,6 +68,47 @@ class CmjChoices(Choices):
         # radd is never called for matching types, so we don't check here
         other = list(other)
         return CmjChoices(*(other + self._triples))
+
+
+class PluginSignMixin:
+
+    plugin_path = settings.PROJECT_DIR.child(
+        'scripts').child(
+        'java').child(
+        'PluginSignPortalCMJ').child(
+        'jar').child(
+        'PluginSignPortalCMJ.jar')
+
+    _cmd_mask = [
+        'java -jar "{plugin}"',
+        '{comando}',
+        '"{in_file}"',
+        '"{certificado}"',
+        '"{password}"',
+        '"{data_ocorrencia}"',
+        '"{hora_ocorrencia}"',
+        '"{data_comando}"',
+        '"{hora_comando}"',
+        '"{titulopre}"',
+        '"{titulo}"',
+        '"{titulopos}"',
+        '{x}',
+        '{y}',
+        '{w}',
+        '{h}',
+        '"{cor}"',
+        '{debug}',
+    ]
+
+    cmd_mask = ' '.join(_cmd_mask)
+
+    def run(self, cmd=""):
+        try:
+            p = ProcessoExterno(cmd, self.logger)
+            r = p.run(timeout=300)
+        except Exception as e:
+            print(e)
+            print(r)
 
 
 class BtnCertMixin:

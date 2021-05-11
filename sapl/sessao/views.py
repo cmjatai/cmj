@@ -2,6 +2,7 @@ import ast
 import logging
 from re import sub, search
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
 from django.core.exceptions import ObjectDoesNotExist
@@ -10,7 +11,7 @@ from django.http import JsonResponse
 from django.http.response import Http404, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls.base import reverse
-from django.utils import timezone
+from django.utils import timezone, formats
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import method_decorator
 from django.utils.html import strip_tags
@@ -22,7 +23,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormMixin
 from django_filters.views import FilterView
 
-from cmj.mixins import BtnCertMixin
+from cmj.mixins import BtnCertMixin, PluginSignMixin
 from sapl.base.models import AppConfig as AppsAppConfig
 from sapl.crud.base import (RP_DETAIL, RP_LIST, Crud, CrudAux,
                             MasterDetailCrud,
@@ -1092,11 +1093,127 @@ class SessaoCrud(Crud):
                     {'subnav_template_name': 'sessao/subnav-solene.yaml'})
             return context
 
-    class DetailView(BtnCertMixin, Crud.DetailView):
+    class SeloVotacaoMixin(PluginSignMixin):
+
+        def btn_selo_votacao(self):
+
+            btn = []
+            if not self.object.selo_votacao_adicionado and \
+                    self.object.iniciada and self.object.finalizada and \
+                    self.request.user.has_perm('core.add_certidaopublicacao'):
+
+                btn = [
+                    reverse('sapl.sessao:sessaoplenaria_detail',
+                            kwargs={'pk': self.object.pk}) + '?add_selo_votacao',
+                    'btn-success',
+                    _('Adicionar Selo de Votação')
+                ]
+            return btn
+
+        def add_selo_votacao(self):
+
+            item = self.object
+
+            q = Q(registrovotacao__ordem__sessao_plenaria=item) | Q(
+                registrovotacao__expediente__sessao_plenaria=item)
+
+            materias_votadas = MateriaLegislativa.objects.filter(
+                q,
+                registrovotacao__tipo_resultado_votacao__natureza__in=(
+                    'A', 'R'
+                )
+            ).order_by('id')
+
+            for m in materias_votadas:
+
+                votacoes_da_materia = RegistroVotacao.objects.filter(
+                    materia=m, tipo_resultado_votacao__natureza__in=(
+                        'A', 'R'
+                    )
+                ).order_by('data_hora')
+
+                titulopre = ''
+                titulo = ''
+                titulopos = ''
+
+                v_unica = False
+
+                titulopos_mask = 'Sim: {} - Não: {} - Abstenção: {} - {}'
+
+                # titulopos_mask = f'S: {v.numero_votos_sim} N
+                # {v.numero_votos_nao}: A:{v.numero_abstencoes} - {'
+
+                if votacoes_da_materia.count() == 1 and \
+                        m.tipo.turnos_aprovacao == 1:
+                    v = votacoes_da_materia.first()
+                    v_unica = True
+
+                count = 1
+                for v in votacoes_da_materia:
+                    oe = v.ordem or v.expediente
+                    sp = oe.sessao_plenaria
+
+                    if sp != item:
+                        count += 1
+                        continue
+
+                    titulopre = '{}\n{}'.format(
+                        sp.str_title(), sp.str_subtitle())
+                    titulo = str(v.tipo_resultado_votacao).upper()
+                    titulopos = titulopos_mask.format(
+                        v.numero_votos_sim,
+                        v.numero_votos_nao,
+                        v.numero_abstencoes,
+                        '{}{}'.format(
+                            'Votação Única' if v_unica else count,
+                            '' if v_unica else 'ª Votação'
+                        )
+                    )
+
+                    paths = m.texto_original.path
+
+                    cmd = self.cmd_mask
+
+                    cmd = cmd.format(
+                        **{
+                            'plugin': self.plugin_path,
+                            'comando': 'deliberacao_plenario',
+                            'in_file': paths,
+                            'certificado': settings.CERT_PRIVATE_KEY_ID,
+                            'password': settings.CERT_PRIVATE_KEY_ACCESS,
+                            'data_ocorrencia': formats.date_format(
+                                timezone.localtime(v.data_hora), 'd/m/Y'
+                            ),
+                            'hora_ocorrencia': formats.date_format(
+                                timezone.localtime(v.data_hora), 'H:i'
+                            ),
+                            'data_comando': formats.date_format(timezone.localtime(), 'd/m/Y'),
+                            'hora_comando': formats.date_format(timezone.localtime(), 'H:i'),
+                            'titulopre': titulopre,
+                            'titulo': titulo,
+                            'titulopos': titulopos,
+                            'x': 190,
+                            'y': (count - 1) * 53 + 120,
+                            'w': 12,
+                            'h': 50,
+                            'cor': "0, 76, {}, 255".format(170 - count * 20) if v.tipo_resultado_votacao.natureza == 'A' else "150, 20, 0, 255",
+                            'debug': False  # settings.DEBUG
+                        }
+                    )
+
+                    self.run(cmd)
+                    print(cmd)
+
+                # print(cmd)
+                # return
+
+            # item.save()
+
+    class DetailView(SeloVotacaoMixin, BtnCertMixin, Crud.DetailView):
 
         @property
         def extras_url(self):
-            btns = [self.btn_certidao('upload_ata')]
+            btns = [self.btn_certidao('upload_ata'), self.btn_selo_votacao()]
             btns = list(filter(lambda x: x, btns))
             return btns
 
@@ -1116,6 +1233,17 @@ class SessaoCrud(Crud):
                 context.update(
                     {'subnav_template_name': 'sessao/subnav-solene.yaml'})
             return context
+
+        def get(self, request, *args, **kwargs):
+
+            response = Crud.DetailView.get(self, request, *args, **kwargs)
+
+            if 'add_selo_votacao' in request.GET:
+                self.add_selo_votacao()
+                messages.add_message(
+                    request, messages.SUCCESS, 'Selos de Votação Adicionados.')
+
+            return response
 
 
 class SessaoPermissionMixin(PermissionRequiredForAppCrudMixin,

@@ -162,6 +162,11 @@ class SessaoPlenaria(models.Model):
                                          choices=YES_NO_CHOICES,
                                          verbose_name=_('Sessão finalizada?'),
                                          default=False)
+    selo_votacao_adicionado = models.NullBooleanField(blank=True,
+                                                      choices=YES_NO_CHOICES,
+                                                      verbose_name=_(
+                                                          'Selo de Votação Adicionado?'),
+                                                      default=False)
     interativa = models.NullBooleanField(blank=True,
                                          choices=YES_NO_CHOICES,
                                          verbose_name=_('Sessão interativa'))
@@ -254,6 +259,24 @@ class SessaoPlenaria(models.Model):
 
         if self.tipo.tipo_numeracao <= tnc.anual:
             base += ' de {}'.format(self.data_inicio.year)
+
+        return base
+
+    def str_title(self):
+        return self.str_short()
+
+    def str_subtitle(self):
+
+        tnc = self.tipo.TIPO_NUMERACAO_CHOICES
+
+        base = ''
+        if self.tipo.tipo_numeracao <= tnc.sessao_legislativa:
+            base = '{}ª Sessão Legislativa'.format(
+                self.sessao_legislativa.numero)
+
+        if self.tipo.tipo_numeracao <= tnc.legislatura:
+            base += ' da {}ª Legislatura'.format(
+                self.legislatura.numero)
 
         return base
 

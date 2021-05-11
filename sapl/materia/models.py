@@ -157,6 +157,10 @@ class TipoMateriaLegislativa(models.Model):
                     'o regimento da Casa Legislativa sobre qual a ordem '
                     'de entrada das proposições nas Sessões Plenárias.'))
 
+    turnos_aprovacao = models.PositiveIntegerField(
+        default=1,
+        verbose_name=_('Turnos para aprovação.'),)
+
     class Meta:
         verbose_name = _('Tipo de Matéria Legislativa')
         verbose_name_plural = _('Tipos de Matérias Legislativas')
