@@ -32,7 +32,7 @@ class Command(BaseCommand):
     bucket_name = 'cmjatai_portal'
 
     def add_arguments(self, parser):
-        parser.add_argument('--last_days',  type=int, default='')
+        parser.add_argument('--last_days',  type=int, default=0)
         parser.add_argument('--model', type=str, default='')
         parser.add_argument('--s3_server', type=str, default='s3_cmj')
 
