@@ -9,14 +9,14 @@
 {% block base_content %}
   <div class="row inner-topo">
     <div class="col-md-4 inner-legis">
-      
+
       {% if perms.parlamentares.change_parlamentar %}
         <div class="btn-group">
           <a class="btn btn-outline-primary" href="{% url 'sapl.parlamentares:parlamentar_list' %}">[ Editar ]
           </a>
         </div>
       {% endif %}
-      
+
       <div class="tags">
         Legislaturas
       </div>
@@ -48,7 +48,7 @@
             {% endif %}
           {% endfor %}
         </div>
-      </div> 
+      </div>
       <div class="row container-avatar inner-mesa">
         <div class="tags w-100">Mesa Diretora</div>
         <div class="inner-parla w-100">
@@ -81,14 +81,15 @@
   </div>
 
   <div class="row inner-parlamentares">
-    <div class="tags w-100 pl-3">Parlamentares Titulares</div>
     <div class="col-xs-12 container-avatar inner-ativos w-100">
       {% for leg in legislaturas %}
         {% if leg.legislatura == legislatura_ativa %}
           {% for sessao in leg.sessoes %}
             {% if sessao.sessao == sessaolegislativa_ativa %}
-              {% for parlamentar in sessao.parlamentares %}
-                {% if parlamentar.titular and not parlamentar.afastado%}
+              {% for parlamentar in sessao.parlamentares.titular %}
+                {% if forloop.first %}
+                  <div class="tags w-100 pl-3">Parlamentares Titulares</div>
+                {% endif %}
                   <a class="avatar avatar3" href="/{{parlamentar.classe_set.first.absolute_slug}}" class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">
                   {% if parlamentar.fotografia %}
                       <img src="{% cropped_thumbnail parlamentar "fotografia_cropping" %}">
@@ -97,7 +98,6 @@
                   {% endif %}
                     <span>{{parlamentar}}</span>
                   </a>
-                {% endif %}
               {% endfor %}
             {% endif %}
           {% endfor %}
@@ -108,14 +108,15 @@
 
   <div class="row inner-extra">
     <div class="col-6 container-avatar inner-suplentes">
-      <div class="tags">Parlamentares Suplentes</div>
       {% for leg in legislaturas %}
         {% if leg.legislatura == legislatura_ativa %}
           {% for sessao in leg.sessoes %}
             {% if sessao.sessao == sessaolegislativa_ativa %}
-              {% for parlamentar in sessao.parlamentares %}
-                {% if not parlamentar.titular and not parlamentar.afastado %}
-                  <a class="avatar avatar3" href="/{{parlamentar.classe_set.first.absolute_slug}}" class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">
+              {% for parlamentar in sessao.parlamentares.suplente %}
+                {% if forloop.first %}
+                  <div class="tags">Parlamentares Suplentes</div>
+                {% endif %}
+                  <a class="avatar avatar4" href="/{{parlamentar.classe_set.first.absolute_slug}}" class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">
                   {% if parlamentar.fotografia %}
                       <img src="{% cropped_thumbnail parlamentar "fotografia_cropping" %}">
                   {% else %}
@@ -123,7 +124,6 @@
                   {% endif %}
                     <span>{{parlamentar}}</span>
                   </a>
-                {% endif %}
               {% endfor %}
             {% endif %}
           {% endfor %}
@@ -131,15 +131,15 @@
       {% endfor %}
     </div>
     <div class="col-6 container-avatar inner-inativos ">
-      <div class="tags">Parlamentares Inativos</div>
       {% for leg in legislaturas %}
         {% if leg.legislatura == legislatura_ativa %}
           {% for sessao in leg.sessoes %}
-            {% if sessao.sessao == sessaolegislativa_ativa %} 
-              {% for parlamentar in sessao.parlamentares %}
-
-                {% if parlamentar.afastado %}
-                  <a class="avatar avatar3" href="/{{parlamentar.classe_set.first.absolute_slug}}" class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">
+            {% if sessao.sessao == sessaolegislativa_ativa %}
+              {% for parlamentar in sessao.parlamentares.afastado %}
+                {% if forloop.first %}
+                  <div class="tags">Parlamentares Inativos</div>
+                {% endif %}
+                  <a class="avatar avatar4" href="/{{parlamentar.classe_set.first.absolute_slug}}" class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">
                   {% if parlamentar.fotografia %}
                       <img src="{% cropped_thumbnail parlamentar "fotografia_cropping" %}">
                   {% else %}
@@ -147,13 +147,47 @@
                   {% endif %}
                     <span>{{parlamentar}}</span>
                   </a>
-                {% endif %}
               {% endfor %}
             {% endif %}
           {% endfor %}
         {% endif %}
       {% endfor %}
     </div>
+  </div>
+  <div class="row inner-extra">
+    <div class="col-12">
+      <h1 class="text-left">Comissões</h1>
+    </div>
+
+    {% for leg in legislaturas %}
+      {% if leg.legislatura == legislatura_ativa %}
+        {% for sessao in leg.sessoes %}
+          {% if sessao.sessao == sessaolegislativa_ativa %}
+            {% for comissao, composicao, participacoes in sessao.comissoes %}
+              <div class="col-md-6 container-avatar">
+                  <hr>
+                  <a class="d-flex" href="{% url 'sapl.comissoes:composicao_detail' composicao.id %}">
+                    <div class="tags">
+                    {{comissao}}
+                    </div>
+                  </a>
+                {% for part in participacoes %}
+                  <a class="avatar avatar4" href="/{{part.parlamentar.classe_set.first.absolute_slug}}" class="{% if part.parlamentar == parlamentar_ativo %}active{% endif %}">
+                  {% if part.parlamentar.fotografia %}
+                      <img src="{% cropped_thumbnail part.parlamentar "fotografia_cropping" %}">
+                  {% else %}
+                      <img src="{% webpack_static 'img/perfil.jpg' %}">
+                  {% endif %}
+                    <span>{{part.parlamentar}}</span>
+                    <small>{{part.cargo}}</small>
+                  </a>
+                {% endfor %}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    {% endfor %}
   </div>
 {% endblock %}
 

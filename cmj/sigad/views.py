@@ -33,6 +33,7 @@ from cmj.sigad.models import Documento, Classe, ReferenciaEntreDocumentos,\
     CLASSE_TEMPLATES_CHOICE, CaixaPublicacao, CaixaPublicacaoClasse,\
     CaixaPublicacaoRelationship, UrlShortener
 from cmj.utils import make_pagination
+from sapl.comissoes.models import Comissao
 from sapl.crud.base import MasterDetailCrud, Crud
 from sapl.parlamentares.models import Parlamentar, Legislatura
 from sapl.protocoloadm.models import DocumentoAdministrativo
@@ -771,7 +772,9 @@ class PathParlamentarView(PathView):
                     #    continue
 
                     sessao = {
-                        'sessao': s, }
+                        'sessao': s,
+                        'comissoes': []
+                    }
 
                     if s == context['sessaolegislativa_ativa']:
                         sessao.update({
@@ -805,29 +808,64 @@ class PathParlamentarView(PathView):
                         })
 
                     if 'parlamentares' in sessao:
-                        n = timezone.now()
-                        sessao['parlamentares'] = sorted(
+                        parlamentares = sorted(
                             list(set(sessao['parlamentares'])),
                             key=lambda x: x.nome_parlamentar)
 
-                        for p in sessao['parlamentares']:
+                        n = timezone.now()
+                        sessao['parlamentares'] = {
+                            'titular': [],
+                            'suplente': [],
+                            'afastado': []
+                        }
+
+                        sp = sessao['parlamentares']
+
+                        for p in parlamentares:
+
+                            key = 'titular' if p.titular else 'suplente'
                             if not l_atual:
-                                p.afastado = False
+                                sp[key].append(p)
                                 continue
 
                             if not p.data_inicio_mandato <= n.date() <= p.data_fim_mandato:
-                                p.afastado = True
+                                sp['afastado'].append(p)
+                                continue
+                            else:
+
+                                if not p.afastado:
+                                    sp[key].append(p)
+                                    continue
+
+                                af = p.afastamentoparlamentar_set.filter(
+                                    data_inicio__lte=n,
+                                    data_fim__gte=n).exists()
+
+                                if not af:
+                                    p.afastado = None
+                                else:
+                                    sp[key].append(p)
+
+                        for comissao in Comissao.objects.all():
+
+                            composicao = comissao.composicao_set.filter(
+                                Q(periodo__data_inicio__lte=s.data_fim,
+                                  periodo__data_fim__gte=s.data_fim) |
+                                Q(periodo__data_inicio__gte=s.data_inicio,
+                                  periodo__data_fim__lte=s.data_inicio)
+                            ).order_by('-id').first()
+
+                            if not composicao:
                                 continue
 
-                            if not p.afastado:
-                                continue
-
-                            af = p.afastamentoparlamentar_set.filter(
-                                data_inicio__lte=n,
-                                data_fim__gte=n).exists()
-
-                            if not af:
-                                p.afastado = None
+                            sessao['comissoes'].append(
+                                (
+                                    comissao,
+                                    composicao,
+                                    [p for p in composicao.participacao_set.all(
+                                    ).order_by('id')]
+                                )
+                            )
 
                     leg['sessoes'].append(sessao)
 
