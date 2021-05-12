@@ -1,5 +1,5 @@
 
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 import os
 from random import choice
@@ -19,6 +19,7 @@ from django.http.response import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.urls.base import reverse
 from django.utils import formats, timezone
+from django.utils.timezone import get_default_timezone
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import ListView, TemplateView, CreateView, UpdateView
 from django.views.generic.base import RedirectView
@@ -82,8 +83,21 @@ from .models import (AcompanhamentoMateria, Anexada, AssuntoMateria, Autoria,
 
 
 def tipos_autores_materias(user):
+
+    noww = timezone.localdate()
+    data_ini = noww - \
+        timedelta(days=noww.day - (1 if noww.day <= 15 else 16))
+
+    data_fim = noww + \
+        timedelta(days=-noww.day + (15 if noww.day <= 15 else 31))
+
+    while data_fim.day <= data_ini.day:
+        data_fim -= timedelta(days=1)
+
     materias_em_tramitacao = MateriaLegislativa.objects.filter(
-        em_tramitacao=True,
+        Q(registrovotacao__data_hora__gte=data_ini,
+          registrovotacao__data_hora__lte=data_fim
+          ) | Q(em_tramitacao=True),
         autores__operadores=user)
 
     r = {}
@@ -521,8 +535,21 @@ class ProposicaoPendente(PermissionRequiredMixin, ListView):
         return context
 
     def tipos_autores_materias(self):
+        noww = timezone.localdate()
+        data_ini = noww - \
+            timedelta(days=noww.day - (1 if noww.day <= 15 else 16))
+
+        data_fim = noww + \
+            timedelta(days=-noww.day + (15 if noww.day <= 15 else 31))
+
+        while data_fim.day <= data_ini.day:
+            data_fim -= timedelta(days=1)
+
         materias_em_tramitacao = MateriaLegislativa.objects.filter(
-            em_tramitacao=True)
+            Q(registrovotacao__data_hora__gte=data_ini,
+              registrovotacao__data_hora__lte=data_fim
+              ) | Q(em_tramitacao=True)
+        )
 
         r = {}
         for m in materias_em_tramitacao:
