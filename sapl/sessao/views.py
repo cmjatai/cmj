@@ -1,5 +1,6 @@
 import ast
 import logging
+from pickle import TRUE
 from re import sub, search
 
 from django.conf import settings
@@ -1129,7 +1130,8 @@ class SessaoCrud(Crud):
                 votacoes_da_materia = RegistroVotacao.objects.filter(
                     materia=m, tipo_resultado_votacao__natureza__in=(
                         'A', 'R'
-                    )
+                    ),
+                    selo_votacao=False
                 ).order_by('data_hora')
 
                 titulopre = ''
@@ -1202,7 +1204,9 @@ class SessaoCrud(Crud):
                     )
 
                     self.run(cmd)
-                    print(cmd)
+
+                    v.selo_votacao = True
+                    v.save()
 
                 # print(cmd)
                 # return

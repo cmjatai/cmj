@@ -590,6 +590,12 @@ class RegistroVotacao(models.Model):
         blank=True,
         null=True)
 
+    selo_votacao = models.NullBooleanField(
+        blank=True,
+        default=False,
+        choices=YES_NO_CHOICES,
+        verbose_name=_('Selo de Votação Adicionado'))
+
     class Meta:
         verbose_name = _('Votação')
         verbose_name_plural = _('Votações')
