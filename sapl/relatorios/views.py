@@ -745,6 +745,7 @@ def get_sessao_plenaria(sessao, casa):
         dic_votacao = {}
         dic_votacao["nom_resultado"] = ''
         dic_votacao["num_ordem"] = votacao.numero_ordem
+        dic_votacao["materia"] = votacao.materia
         dic_votacao["id_materia"] = (
             materia.tipo.sigla + ' ' +
             # materia.tipo.descricao + ' ' +

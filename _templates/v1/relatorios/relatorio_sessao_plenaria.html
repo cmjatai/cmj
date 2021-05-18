@@ -5,7 +5,7 @@
 </meta>
 
 <head>
-  <title>Resumo Sessão Plenária</title> 
+  <title>Resumo Sessão Plenária</title>
   <style>
     @page {
 
@@ -14,7 +14,7 @@
         height: 1.5cm;
         font-size: 8pt;
       }
-    
+
       @bottom-center {
         border-top: 1px solid black;
         font-size: 8pt;
@@ -22,13 +22,13 @@
         content: "{{rodape|safe}}";
         font-style:italic;
       }
-      
+
       @bottom-left {
         content: "{{data}}";
         height: 1.5cm;
         font-size: 8pt;
       }
-        
+
       {% comment %}
         @top-center {
           content:  string(title);
@@ -109,7 +109,7 @@
             <dl>
               <dt><b>{{materia.num_ordem}} -</b> {{materia.id_materia}}</dt>
               <dt><b>Turno:</b> {{materia.des_turno}}</dt>
-              <dt><b>{{materia.num_autores}}: </b>{{materia.nom_autor}}</dt>
+              <dt><b>{{materia.num_autores}}: </b><br>{{materia.nom_autor}}</dt>
             </dl>
           </td>
           <td>{{materia.txt_ementa}}
@@ -158,11 +158,18 @@
                 <dl>
                   <dt><b>{{materia.num_ordem}} -</b> {{materia.id_materia}}</dt>
                   <dt><b>Turno:</b> {{materia.des_turno}}</dt>
-                  <dt><b>{{materia.num_autores}}: </b>{{materia.nom_autor}}</dt>
+                  <dt><b>{{materia.num_autores}}: </b><br>{{materia.nom_autor}}</dt>
                 </dl>
               </td>
-              <td><div style="margin:10px">{{materia.txt_ementa}}</div></td>
-              <td style="width:30px">
+              <td><div>{{materia.txt_ementa}}</div>
+                {% for anexada in materia.materia.anexadas.all %}
+                    {% if forloop.first %}
+                      <strong>Matérias Anexadas:</strong><br>
+                    {% endif %}
+                    - {{anexada}}<br>
+                {% endfor %}
+              </td>
+              <td style="width:30px; text-align: center;">
                 <b>{{materia.nom_resultado}}</b>
                 </td>
             </tr>
@@ -172,7 +179,7 @@
     </table>
 
     {% comment %}
-      <div>    
+      <div>
         <h2 class="gray-title">Oradores das Explicações Pessoais</h2>
         {% for orador in lst_oradores%}
           <tr>
@@ -188,4 +195,4 @@
 </body>
 
 
-</html> 
+</html>
