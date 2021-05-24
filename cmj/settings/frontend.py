@@ -9,12 +9,20 @@ FRONTEND_VERSION = config('FRONTEND_VERSION', default='v1', cast=str)
 BASE_DIR = Path(__file__).ancestor(2)
 PROJECT_DIR = Path(__file__).ancestor(3)
 
+
+def front_version():
+    if FRONTEND_VERSION == 'v1':
+        return ['_templates/v1']
+    elif FRONTEND_VERSION == 'v2':
+        return ['_templates/v2', '_templates/v1']
+    elif FRONTEND_VERSION == 'v3':
+        return ['_templates/v3', '_templates/v1']
+
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ([
-            '_templates/v2'] if FRONTEND_VERSION != 'v1' else []) + [
-            '_templates/v1'],
+        'DIRS': front_version(),
         'OPTIONS': {
             'debug': DEBUG,
             'context_processors': [
