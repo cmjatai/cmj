@@ -1122,7 +1122,8 @@ class SessaoCrud(Crud):
                 q,
                 registrovotacao__tipo_resultado_votacao__natureza__in=(
                     'A', 'R'
-                )
+                ),
+                selo_votacao=False
             ).order_by('id')
 
             for m in materias_votadas:
@@ -1130,8 +1131,7 @@ class SessaoCrud(Crud):
                 votacoes_da_materia = RegistroVotacao.objects.filter(
                     materia=m, tipo_resultado_votacao__natureza__in=(
                         'A', 'R'
-                    ),
-                    selo_votacao=False
+                    )
                 ).order_by('data_hora')
 
                 titulopre = ''
