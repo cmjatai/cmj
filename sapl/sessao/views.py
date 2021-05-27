@@ -1356,7 +1356,6 @@ class PainelView(PermissionRequiredForAppCrudMixin, TemplateView):
             ativo=True).order_by('ordenacao')
 
         if not cronometros:
-
             username = self.request.user.username
             self.logger.error('user=' + username + '. Você precisa primeiro configurar os cronômetros'
                               ' nas Configurações da Aplicação')
