@@ -305,6 +305,7 @@ $fator-xl: 1.06;
     aside {
       width: 100%;
       position: relative;
+      z-index: $zindex-header-main - 1;
       // height: 64px;
 
       .container-aside {

@@ -1,7 +1,7 @@
 {% load i18n sigad_filters social_utils%}
 
 {% with 'noticias_destaque'|caixa_publicacao:None as noticias_destaque %}
-  <div id="carousel-custom" class="carousel carousel-fade carousel-custom slide" data-ride="carousel" data-interval="7000">
+  <div id="carousel-custom" class="carousel carousel-fade carousel-custom slide" data-ride="carousel" data-interval="70000">
     <ol class="carousel-indicators">
       {% for d in  noticias_destaque.docs%}
         <li data-target="#carousel-custom" data-slide-to="{{forloop.counter0}}" {% if forloop.first %}class="active"{% endif %}></li>

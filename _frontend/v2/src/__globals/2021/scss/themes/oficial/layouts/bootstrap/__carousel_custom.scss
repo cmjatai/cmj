@@ -1,11 +1,12 @@
+
 .carousel-custom {
   z-index: 0;
   .carousel-item {
     .imagem {
+      height: 70vh;
       background-size: 0 0;
       background-repeat: no-repeat;
       background-position: 0 0;
-      height: 70vh;
       transition: all 0.3s ease;
       &::before {
         transition: all 1s ease;
@@ -21,8 +22,15 @@
         background-position: center 25%;
       }
     }
+    .autor {
+      position: absolute;
+      background-color: rgba($bg_color_portal_cmj, 0.3);
+      padding: 0 5px;
+      color: white;
+      bottom: 0;
+      z-index: 10000;
+    }
   }
-
   &:hover {
     .carousel-item.active {
       .imagem {
@@ -33,17 +41,14 @@
       }
     }
   }
-
   .carousel-control-prev,
   .carousel-control-next {
     z-index: $zindex-path-direction;
     bottom: 3rem;
     width: 5vw;
   }
-
   .navbar-social-links {
     z-index: $zindex-social-links;
-
     a {
       z-index: $zindex-social-links;
     }
@@ -156,13 +161,11 @@
       font-size: 1.3em;
     }
   }
-
 }
 
 body.header-top {
-  .carousel-custom {
+  .carousel-custom{
     .imagem {
-
       &::after {
         content: " ";
         position: absolute;
@@ -170,22 +173,24 @@ body.header-top {
         right: 0;
         bottom: 0;
         left: 0;
-        //opacity: 0.5;
         background: linear-gradient(to top, #0000 40%, darken($bg_color_portal_cmj, 5) 90%);
       }
     }
-
   }
 }
 
 @media screen and (max-width: 767.98px) and (orientation: portrait) {
-  .carousel-custom {
+  .carousel-custom{
     .carousel-item {
       .imagem {
         height: 70vh;
       }
+      .autor {
+        top: 0;
+        bottom: auto;
+        right: inherit;
+      }
     }
-
     .carousel-control-prev,
     .carousel-control-next {
       width: 8vw;
@@ -216,7 +221,6 @@ body.header-top {
     .carousel-custom {
       .imagem {
         height: 85vh;
-
       }
     }
   }
@@ -270,7 +274,7 @@ body.header-top {
 }
 
 @media screen and (min-width: 1281px) {
-  .carousel-custom {
+  .carousel-custom{
 
     .carousel-control-prev,
     .carousel-control-next {
@@ -363,7 +367,7 @@ body.header-top {
     }
   }
   body.header-top {
-    .carousel-custom {
+    .carousel-custom  {
       .carousel-item {
         .imagem {
           height: 63vh;
