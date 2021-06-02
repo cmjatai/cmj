@@ -1,0 +1,30 @@
+
+.bg-image {
+  position: relative;
+  background-size: 0 0;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  transition: all 0.3s ease;
+  &::before {
+    transition: all 1s ease;
+    content: "";
+    background-image: inherit;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center 25%;
+  }
+  .bg-autor {
+    position: absolute;
+    background-color: rgba($bg_color_portal_cmj, 0.3);
+    padding: 0 5px;
+    color: white;
+    top: 0;
+    right: 0;
+    z-index: 10000;
+  }
+}

@@ -1,42 +1,16 @@
-
 .carousel-custom {
   z-index: 0;
   .carousel-item {
-    .imagem {
+    .bg-image {
       height: 70vh;
-      background-size: 0 0;
-      background-repeat: no-repeat;
-      background-position: 0 0;
-      transition: all 0.3s ease;
-      &::before {
-        transition: all 1s ease;
-        content: "";
-        background-image: inherit;
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center 25%;
-      }
-    }
-    .autor {
-      position: absolute;
-      background-color: rgba($bg_color_portal_cmj, 0.3);
-      padding: 0 5px;
-      color: white;
-      bottom: 0;
-      z-index: 10000;
     }
   }
   &:hover {
     .carousel-item.active {
-      .imagem {
+      .bg-image {
         &::before {
           transition: all 1s ease;
-        transform: scale(1.1 , 1.1);
+          transform: scale(1.1 , 1.1);
         }
       }
     }
@@ -165,7 +139,7 @@
 
 body.header-top {
   .carousel-custom{
-    .imagem {
+    .bg-image {
       &::after {
         content: " ";
         position: absolute;
@@ -182,7 +156,7 @@ body.header-top {
 @media screen and (max-width: 767.98px) and (orientation: portrait) {
   .carousel-custom{
     .carousel-item {
-      .imagem {
+      .bg-image {
         height: 70vh;
       }
       .autor {
@@ -214,26 +188,23 @@ body.header-top {
         font-size: 1em;
       }
     }
-
   }
 
   body.header-top {
     .carousel-custom {
-      .imagem {
+      .bg-image {
         height: 85vh;
       }
     }
   }
-
 }
 
 
 @media screen and (min-width:768px) and (orientation: landscape) {
-
   body.header-top {
     .carousel-custom {
       .carousel-item {
-        .imagem {
+        .bg-image {
           height: 60vh;
         }
       }
@@ -245,11 +216,10 @@ body.header-top {
 
 
 @media screen and (min-width:992px) {
-
   body.header-top {
     .carousel-custom {
       .carousel-item {
-        .imagem {
+        .bg-image {
           height: 59vh;
         }
       }
@@ -264,7 +234,7 @@ body.header-top {
   body.header-top {
     .carousel-custom {
       .carousel-item {
-        .imagem {
+        .bg-image {
           height: 60vh;
         }
       }
@@ -308,18 +278,14 @@ body.header-top {
       p {
         font-size: 1em;
       }
-
     }
-
   }
-
 }
 
 @media screen and (min-width:1400px) {
-
   .carousel-custom {
     .carousel-item {
-      .imagem {
+      .bg-image {
         height: 75vh;
       }
     }
@@ -328,21 +294,18 @@ body.header-top {
   body.header-top {
     .carousel-custom {
       .carousel-item {
-        .imagem {
+        .bg-image {
           height: 53vh;
         }
       }
     }
-
   }
-
 }
 
 @media screen and (min-width:1600px) {
-
   .carousel-custom {
     .carousel-item {
-      .imagem {
+      .bg-image {
         height: 80vh;
       }
     }
@@ -369,12 +332,10 @@ body.header-top {
   body.header-top {
     .carousel-custom  {
       .carousel-item {
-        .imagem {
+        .bg-image {
           height: 63vh;
         }
       }
     }
-
   }
-
 }

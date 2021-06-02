@@ -47,6 +47,13 @@
                 {% if s.url_video %}
                   <div class="car-img-top">
                     <div class="embed-responsive embed-responsive-16by9">
+
+                      {% comment %}
+                        verificar troca de iframe por imagem do video a ser
+                        listado com o link para o details onde só ficaria o iframe
+                        https://img.youtube.com/vi/GmePdPCd-BQ/0.jpg
+                      {% endcomment %}
+
                       <iframe id="ytplayer" type="text/html" allowfullscreen
                       src="https://www.youtube.com/embed/{{ s.url_video|youtube_id }}"
                       frameborder="0"></iframe>

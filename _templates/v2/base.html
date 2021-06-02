@@ -30,7 +30,7 @@
 
 </head>
 
-<body id="wrapper" class="{% block body_class %}{%endblock%}">
+<body id="wrapper___usar_id_para_ativar_sidebar" class="{% block body_class %}{%endblock%}">
   {% block root_body %}
     <div id="app-vue">
       {% block global_container %}
@@ -130,7 +130,9 @@
         {% endblock navigation %}
 
         {% block canais_diretos %}
+          {% comment %}
           {% include "base_sidebar.html" %}
+          {% endcomment %}
         {% endblock canais_diretos%}
 
       <!-- ========================================================== -->
