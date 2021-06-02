@@ -11,13 +11,14 @@
         <div class="btn-action-left" v-on:click="handleClickContainerScrollX">&lt;</div>
         <div class="btn-action-right" v-on:click="handleClickContainerScrollX">&gt;</div>
         <div class="inner-scroll">
-          {% for d in noticias_secundarias.docs %}
-            <div class="item-scroll item-scroll-3">
+          {% for d in noticias_secundarias.docs%}
+            <div class="item-scroll item-scroll-lg-3">
               <div class="item-head">
               </div>
-              <div class="bg-image" style="background-image: url(/{{d.1.absolute_slug}}.512)">
+              <a class="bg-image" style="background-image: url(/{{d.1.absolute_slug}}.512)"
+                 tabindex="{{view.tabindex}}" href="{% url 'cmj.sigad:path_view' d.0.absolute_slug %}">
                 <div class="bg-autor">{{d.1.autor|default:''}}</div>
-              </div>
+              </a>
 
               <a class="item-titulo text-white" tabindex="{{view.tabindex}}" href="{% url 'cmj.sigad:path_view' d.0.absolute_slug %}">
                 {{d.0.titulo}}
@@ -35,8 +36,4 @@
       </div>
     </div>
   </div>
-
-
-
-
 {% endwith %}

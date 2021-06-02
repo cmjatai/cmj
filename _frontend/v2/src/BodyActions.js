@@ -34,24 +34,26 @@ export default {
     },
     handleClickContainerScrollX (event) {
       let innerScroll = event.target.nextElementSibling
-
       let direction = 1
+
       if (innerScroll.classList.contains('btn-action-right')) {
         innerScroll = innerScroll.nextElementSibling
         direction = -1
       }
 
-      let offsetWidth = (innerScroll.firstChild.offsetWidth + 23) * 3 * direction
+      const itens_visiveis = Math.floor(innerScroll.offsetWidth / innerScroll.firstChild.offsetWidth)
+
+      const offsetWidth = (innerScroll.firstChild.offsetWidth + 22) * itens_visiveis * direction
 
       if (innerScroll.style.transform === '') {
         innerScroll.setAttribute('translate', 0)
       }
 
-      let newTranslate = innerScroll.getAttribute('translate') - offsetWidth
-      if (newTranslate < 0 && newTranslate * (-1) + offsetWidth / 3 < innerScroll.scrollWidth) {
+      const newTranslate = innerScroll.getAttribute('translate') - offsetWidth
+
+      if (newTranslate < 0 && newTranslate * (-1) + offsetWidth / itens_visiveis < innerScroll.scrollWidth) {
         innerScroll.style.transform = `translateX(${newTranslate}px)`
         innerScroll.setAttribute('translate', newTranslate)
-
         innerScroll.previousElementSibling.previousElementSibling.style = 'display: flex'
       } else {
         innerScroll.setAttribute('translate', '')

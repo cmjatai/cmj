@@ -1,10 +1,10 @@
-
 .bg-image {
   position: relative;
   background-size: 0 0;
   background-repeat: no-repeat;
   background-position: 0 0;
   transition: all 0.3s ease;
+
   &::before {
     transition: all 1s ease;
     content: "";
@@ -18,13 +18,24 @@
     background-repeat: no-repeat;
     background-position: center 25%;
   }
+
   .bg-autor {
     position: absolute;
     background-color: rgba($bg_color_portal_cmj, 0.3);
     padding: 0 5px;
     color: white;
-    top: 0;
-    right: 0;
     z-index: 10000;
+    transform: rotate(-90deg) translate(100%, 0);
+    transform-origin: bottom right;
+    bottom: 3em;
+    right: 0px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .bg-image {
+    .bg-autor {
+      font-size: 0.9rem;
+    }
   }
 }

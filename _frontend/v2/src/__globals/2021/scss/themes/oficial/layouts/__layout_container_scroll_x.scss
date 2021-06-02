@@ -6,9 +6,10 @@
     display: inline-flex;
     align-items: center;
     font-size: 2.2em;
-    //font-weight: bold;
+    font-weight: bold;
     padding: 0 1em 0 0em;
     position: absolute;
+
 
     .icon {
       width: 2em;
@@ -31,8 +32,7 @@
     .btn-action-right {
       position: absolute;
       width: 1.7rem;
-      //height: 3rem;
-      top: 50%;
+      top: 30vh;
       margin-top: -1rem;
       padding: 0.3rem 0;
       background-color: #000f;
@@ -42,14 +42,14 @@
       justify-content: center;
       align-items: center;
       color: white;
-      opacity: 0.2;
+      opacity: 0.5;
       transition: opacity 0.3s ease;
       font-size: 2em;
       font-weight: bold;
-
     }
 
     &:hover {
+
       .btn-action-left,
       .btn-action-right {
         transition: opacity 0.3s ease;
@@ -66,7 +66,6 @@
     .btn-action-right {
       border-radius: 0.5rem 0 0 0.5rem;
       right: 0;
-
     }
 
     .inner-scroll {
@@ -79,10 +78,8 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        width: 50vw;
-        //min-height: 60vh;
-        //max-height: 70vh;
-        flex: 0 0 50vw;
+        width: 75vw;
+        flex: 0 0 75vw;
         padding: 0.5em;
         margin: 6.4em 0.7em 3em;
         overflow: hidden;
@@ -91,7 +88,7 @@
         border-radius: 0.7em;
 
         .bg-image {
-          height: 20vh;
+          height: 25vh;
           margin: -0.5em;
           margin-bottom: 0.5em;
         }
@@ -100,13 +97,9 @@
           font-size: 1.4em;
           font-weight: bold;
         }
+
         .item-body {
           font-size: 1.2em;
-        }
-
-        &.item-scroll-3 {
-          width: 27vw;
-          flex: 0 0 27vw;
         }
 
         &.item-scroll-4 {
@@ -120,14 +113,20 @@
           transition: all 0.3s ease;
           background-color: #0007;
 
+          .bg-image {
+            height: 35vh;
+          }
+
           .item-titulo {
             font-size: 2em;
           }
+
           .item-body {
             font-size: 1.5em;
           }
 
-          .item-titulo, .item-body {
+          .item-titulo,
+          .item-body {
             padding: 0.5em;
           }
 
@@ -148,13 +147,7 @@
         padding: 0;
       }
 
-      .item-footer {
-        //font-size: 70%;
-        //background-color: white;
-        //padding: 0.2em;
-        //border: 1px solid #cdf;
-        //margin-top: 0.4em;
-      }
+      .item-footer {}
 
       strong {
         font-weight: bold;
@@ -163,32 +156,83 @@
   }
 }
 
+@media screen and (max-width: 480px) {
+  .container-scroll-x {
+    font-size: 0.8rem;
+
+    .scroll-container {
+
+      .btn-action-left,
+      .btn-action-right {
+        top: 20vh;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 359px) {
+  .container-scroll-x {
+    font-size: 0.7rem;
+
+    .scroll-container {
+      .inner-scroll {
+        .item-scroll {
+          .bg-image {
+            height: 16vh;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 992px) {
+  .container-scroll-x {
+    .scroll-container {
+      .inner-scroll {
+        .item-scroll {
+          &.item-scroll-lg-3 {
+            width: 27vw;
+            flex: 0 0 27vw;
+          }
+        }
+      }
+    }
+  }
+}
+
 @media screen and (min-width: 1200px) {
   .container-scroll-x {
-    font-size: 1.25em;
+    .scroll-container {
+      .inner-scroll {
+        .item-scroll {
+          .bg-image {
+            //height: 30vh;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 1400px) {
+  .container-scroll-x {
+    font-size: 1.2em;
+
     .scroll-container {
       .inner-scroll {
         .item-scroll {
           .bg-image {
             height: 30vh;
           }
-          &.item-scroll-3 {
-
-          }
         }
       }
     }
-    }
-}
-
-@media screen and (min-width: 1600px) {
-  .container-scroll-xx {
-    font-size: 1.4rem;
   }
 }
 
 @media screen and (min-width: 1600px) {
-  .container-scroll-xx {
-    font-size: 1.6rem;
+  .container-scroll-x {
+    font-size: 1.5em;
   }
 }
