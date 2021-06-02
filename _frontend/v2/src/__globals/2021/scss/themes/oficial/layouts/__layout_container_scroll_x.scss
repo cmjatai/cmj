@@ -108,8 +108,8 @@
         }
 
         &:hover {
-          width: 55vw;
-          flex: 0 0 55vw;
+          width: 85vw;
+          flex: 0 0 85vw;
           transition: all 0.3s ease;
           background-color: #0007;
 
@@ -194,6 +194,11 @@
           &.item-scroll-lg-3 {
             width: 27vw;
             flex: 0 0 27vw;
+
+            &:hover {
+              width: 55vw;
+              flex: 0 0 55vw;
+            }
           }
         }
       }

@@ -1,4 +1,3 @@
-
 export default {
   components: {
     App: () => import('./App'),
@@ -41,9 +40,12 @@ export default {
         direction = -1
       }
 
-      const itens_visiveis = Math.floor(innerScroll.offsetWidth / innerScroll.firstChild.offsetWidth)
+      const itens_visiveis = Math.floor(
+        innerScroll.offsetWidth / innerScroll.firstChild.offsetWidth
+      )
 
-      const offsetWidth = (innerScroll.firstChild.offsetWidth + 22) * itens_visiveis * direction
+      const offsetWidth =
+        (innerScroll.firstChild.offsetWidth + 22) * itens_visiveis * direction
 
       if (innerScroll.style.transform === '') {
         innerScroll.setAttribute('translate', 0)
@@ -51,14 +53,20 @@ export default {
 
       const newTranslate = innerScroll.getAttribute('translate') - offsetWidth
 
-      if (newTranslate < 0 && newTranslate * (-1) + offsetWidth / itens_visiveis < innerScroll.scrollWidth) {
+      if (
+        newTranslate < 0 &&
+        newTranslate * -1 + offsetWidth / itens_visiveis <
+          innerScroll.scrollWidth
+      ) {
         innerScroll.style.transform = `translateX(${newTranslate}px)`
         innerScroll.setAttribute('translate', newTranslate)
-        innerScroll.previousElementSibling.previousElementSibling.style = 'display: flex'
+        innerScroll.previousElementSibling.previousElementSibling.style =
+          'display: flex'
       } else {
         innerScroll.setAttribute('translate', '')
         innerScroll.style.transform = `translateX(0px)`
-        innerScroll.previousElementSibling.previousElementSibling.style = 'display: none'
+        innerScroll.previousElementSibling.previousElementSibling.style =
+          'display: none'
       }
     },
 
@@ -87,5 +95,4 @@ export default {
     }
     this.portalmenu_opened = portalmenu_opened
   }
-
 }
