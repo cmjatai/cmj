@@ -64,6 +64,10 @@ class TipoNormaJuridica(models.Model):
     sigla = models.CharField(max_length=3, verbose_name=_('Sigla'))
     descricao = models.CharField(max_length=50, verbose_name=_('Descrição'))
 
+    origem_processo_legislativo = models.NullBooleanField(
+        blank=True, default=True, verbose_name=_('Possui Origem no Processo Legislativo?'),
+        choices=YES_NO_CHOICES)
+
     class Meta:
         verbose_name = _('Tipo de Norma Jurídica')
         verbose_name_plural = _('Tipos de Norma Jurídica')
@@ -174,6 +178,11 @@ class NormaJuridica(CommonMixin):
         blank=True,
         default=''
     )
+
+    checkcheck = models.BooleanField(
+        verbose_name=_('Registro de Norma Jurídica Auditado?'),
+        default=False,
+        choices=YES_NO_CHOICES)
 
     _certidao = GenericRelation(
         CertidaoPublicacao, related_query_name='normajuridica_cert')

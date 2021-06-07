@@ -11,6 +11,7 @@ AssuntoNorma:
 TipoNormaJuridica:
   {% trans 'Tipo Norma Jurídica' %}:
   - descricao  sigla  equivalente_lexml
+  - origem_processo_legislativo
 
 NormaJuridica:
   {% trans 'Identificação Básica' %}:

@@ -7,6 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.db.models.aggregates import Count
 from django.http import JsonResponse
+from django.http.response import Http404
 from django.shortcuts import redirect
 from django.urls.base import reverse
 from django.utils import timezone
@@ -323,8 +324,14 @@ class NormaCrud(Crud):
 
     class BaseMixin(Crud.BaseMixin):
         # 'has_texto_articulado')
-        list_field_names = ('epigrafe', 'ementa')
         list_url = ''
+
+        @property
+        def list_field_names(self):
+            if self.request.user.is_superuser:
+                return ('epigrafe', 'ementa', 'checkcheck')
+            else:
+                return ('epigrafe', 'ementa')
 
         @property
         def search_url(self):
@@ -332,6 +339,22 @@ class NormaCrud(Crud):
             return reverse('%s:%s' % (namespace, 'norma_pesquisa'))
 
     class ListView(Crud.ListView):  # , RedirectView):
+
+        def get(self, request, *args, **kwargs):
+
+            check = request.GET.get('check', '')
+            uncheck = request.GET.get('uncheck', '')
+            if request.user.is_superuser and (check or uncheck):
+                try:
+                    m = NormaJuridica.objects.get(pk=check or uncheck)
+                except:
+                    raise Http404
+                else:
+                    m.checkcheck = True if check else False
+                    m.save()
+                    return redirect('/norma/check')
+
+            return Crud.ListView.get(self, request, *args, **kwargs)
 
         def get_queryset(self):
             qs = Crud.ListView.get_queryset(self)
@@ -342,14 +365,30 @@ class NormaCrud(Crud):
                 texto_articulado__privacidade=0
             ).exclude(count_ds=0).order_by('-count_ds')"""
 
-            q = Q(
+            q1 = Q(
                 texto_articulado__privacidade=0
             ) | Q(
-                texto_articulado__isnull=True)
+                texto_articulado__isnull=True
+            )
 
-            qs = qs.exclude(q)
+            q2 = Q(
+                materia__isnull=True,
+                tipo__origem_processo_legislativo=True,
+                checkcheck=False
+            )
 
-            return qs.order_by('-texto_articulado__privacidade', '-ano', '-numero')
+            qs1 = qs.exclude(q1)
+            qs2 = qs.filter(q2)
+
+            qs = qs1.union(qs2)
+
+            return qs.order_by('-ano', '-numero')
+
+        def hook_checkcheck(self, obj, ss, url):
+            return 'uncheck' if obj.checkcheck else 'check', f'/norma/check?{"un" if obj.checkcheck else ""}check={obj.id}'
+
+        def hook_header_checkcheck(self):
+            return force_text(_('Check'))
 
         def hook_header_epigrafe(self):
             return force_text(_('Epigrafe'))

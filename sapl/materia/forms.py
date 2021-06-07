@@ -298,9 +298,10 @@ class MateriaLegislativaForm(FileFieldCheckMixin, ModelForm):
         if protocolo_antigo and protocolo != protocolo_antigo:
             po = Protocolo.objects.filter(
                 numero=protocolo_antigo, ano=ano_antigo).first()
-            po.conteudo_protocolado = None
-            po.tipo_conteudo_protocolado = None
-            po.save()
+            if po:
+                po.conteudo_protocolado = None
+                po.tipo_conteudo_protocolado = None
+                po.save()
 
         if self.cleaned_data['autor']:
             autoria = Autoria()
