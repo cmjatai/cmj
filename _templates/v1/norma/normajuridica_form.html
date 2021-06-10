@@ -23,6 +23,7 @@
                 'ano'    : ano_materia,
                 'numero' : numero_materia,
           }
+
         if (formData.tipo === '' || formData.ano === '' || formData.numero === '') {
           return;
         }
@@ -33,6 +34,7 @@
             $("#id_indexacao").val(data.results[0].indexacao);
           }
         })
+
       }
     }
     var fields = ["#id_tipo_materia", "#id_numero_materia", "#id_ano_materia"]

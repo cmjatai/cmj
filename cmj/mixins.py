@@ -12,6 +12,7 @@ from model_utils.choices import Choices
 from pdfrw.pdfreader import PdfReader
 from social_core.backends.facebook import FacebookOAuth2
 
+import cmj
 from cmj.utils import run_sql, get_settings_auth_user_model,\
     YES_NO_CHOICES, ProcessoExterno
 from sapl.crispy_layout_mixin import to_row, SaplFormLayout,\
@@ -104,6 +105,8 @@ class PluginSignMixin:
 
     def run(self, cmd=""):
         try:
+            print(cmd)
+            self.logger.info(cmd)
             p = ProcessoExterno(cmd, self.logger)
             r = p.run(timeout=300)
         except Exception as e:
