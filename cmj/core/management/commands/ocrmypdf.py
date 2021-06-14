@@ -89,7 +89,7 @@ class Command(BaseCommand):
             'count': 0,
             'count_base': 2,
             'order_by': '-data_apresentacao',
-            'years_priority': 20
+            'years_priority': 0
         },
         {
             'model': DocumentoAdministrativo,
@@ -97,7 +97,7 @@ class Command(BaseCommand):
             'count': 0,
             'count_base': 9,
             'order_by': '-data',
-            'years_priority': 20
+            'years_priority': 0
         },
         {
             'model': DocumentoAcessorioAdministrativo,
@@ -105,7 +105,7 @@ class Command(BaseCommand):
             'count': 0,
             'count_base': 2,
             'order_by': '-data',
-            'years_priority': 20
+            'years_priority': 0
         },
         {
             'model': NormaJuridica,
@@ -113,7 +113,7 @@ class Command(BaseCommand):
             'count': 0,
             'count_base': 2,
             'order_by': '-data',
-            'years_priority': 20
+            'years_priority': 0
         },
         {
             'model': DocumentoAcessorio,
@@ -121,7 +121,7 @@ class Command(BaseCommand):
             'count': 0,
             'count_base': 2,
             'order_by': '-data',
-            'years_priority': 20
+            'years_priority': 0
         },
         {
             'model': DiarioOficial,
@@ -129,7 +129,7 @@ class Command(BaseCommand):
             'count': 0,
             'count_base': 2,
             'order_by': '-data',
-            'years_priority': 20
+            'years_priority': 0
         },
         {
             'model': SessaoPlenaria,
@@ -137,7 +137,7 @@ class Command(BaseCommand):
             'count': 0,
             'count_base': 2,
             'order_by': '-data_inicio',
-            'years_priority': 20
+            'years_priority': 0
         },
 
     ]
@@ -229,15 +229,17 @@ class Command(BaseCommand):
 
         self.execucao_noturna = init.hour < 6 or init.hour >= 22
 
-        # Refaz tudo que foi feito a mais de tres anos
+        # só faz limpeza em execução norturna
+        if self.execucao_noturna:
+            # Refaz tudo que foi feito a mais de tres anos
 
-        OcrMyPDF.objects.filter(
-            created__lt=init - timedelta(days=1095)).delete()
+            OcrMyPDF.objects.filter(
+                created__lt=init - timedelta(days=1095)).delete()
 
-        # Refaz tudo que foi feito a mais de tres mêses e nao teve sucesso
-        OcrMyPDF.objects.filter(
-            created__lt=init - timedelta(days=90),
-            sucesso=False).delete()
+            # Refaz tudo que foi feito a mais de tres mêses e nao teve sucesso
+            OcrMyPDF.objects.filter(
+                created__lt=init - timedelta(days=90),
+                sucesso=False).delete()
 
         # OcrMyPDF.objects.filter(
         #    object_id=xxxx).delete()
@@ -332,6 +334,7 @@ class Command(BaseCommand):
                             # testa se o arq é mais recente que último ocr
                             # feito
                             try:
+
                                 t = os.path.getmtime(file.path) - 86400
                                 date_file = datetime.fromtimestamp(
                                     t, timezone.utc)

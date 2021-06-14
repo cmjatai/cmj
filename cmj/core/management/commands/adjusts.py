@@ -39,7 +39,9 @@ class Command(BaseCommand):
 
         self.logger = logging.getLogger(__name__)
 
-        self.count_registers(full=False)
+        # self.count_registers(full=False)
+
+        self.vincular_materia_norma()
 
         # self.run_busca_desordem_de_dispositivos()
 
@@ -76,6 +78,9 @@ class Command(BaseCommand):
         # veiculo_publicacao='',
         # with transaction.atomic():
         #    reset_id_model(AuditLog)
+
+    def vincular_materia_norma(self):
+        pass
 
     def count_registers(self, full=True):
 
