@@ -53,6 +53,7 @@ from sapl.materia.forms import (AnexadaForm, AutoriaForm,
 from sapl.norma.models import LegislacaoCitada
 from sapl.parlamentares.models import Legislatura
 from sapl.protocoloadm.models import Protocolo
+from sapl.sessao.models import SessaoPlenaria
 from sapl.settings import MEDIA_ROOT, MAX_DOC_UPLOAD_SIZE
 from sapl.utils import (YES_NO_CHOICES, autor_label, autor_modal, SEPARADOR_HASH_PROPOSICAO,
                         gerar_hash_arquivo, get_base_url, get_client_ip,
@@ -94,11 +95,22 @@ def tipos_autores_materias(user):
     while data_fim.day <= data_ini.day:
         data_fim -= timedelta(days=1)
 
-    materias_em_tramitacao = MateriaLegislativa.objects.filter(
-        Q(registrovotacao__data_hora__gte=data_ini,
-          registrovotacao__data_hora__lte=data_fim
-          ) | Q(em_tramitacao=True),
-        autores__operadores=user)
+    sq = SessaoPlenaria.objects.filter(
+        data_fim__range=(data_ini, data_fim)
+    ).order_by('data_fim').last()
+
+    q = Q(em_tramitacao=True)
+
+    if sq and (noww - sq.data_fim).days < 3:
+        q |= Q(
+            registrovotacao__data_hora__gte=data_ini,
+            registrovotacao__data_hora__lte=data_fim
+        )
+
+    if user:
+        q &= Q(autores__operadores=user)
+
+    materias_em_tramitacao = MateriaLegislativa.objects.filter(q)
 
     r = {}
     for m in materias_em_tramitacao:
@@ -106,10 +118,21 @@ def tipos_autores_materias(user):
         if m.autores.count() >= 5:
             continue
 
-        if m.tipo not in r:
-            r[m.tipo] = [m]
+        if user:
+            if m.tipo not in r:
+                r[m.tipo] = [m]
+            else:
+                r[m.tipo].append(m)
         else:
-            r[m.tipo].append(m)
+            if m.tipo not in r:
+                r[m.tipo] = {}
+
+            for a in m.autores.all():
+                if a not in r[m.tipo]:
+                    r[m.tipo][a] = [m]
+                else:
+                    r[m.tipo][a].append(m)
+
     return r
 
 
@@ -530,42 +553,9 @@ class ProposicaoPendente(PermissionRequiredMixin, ListView):
         qr = self.request.GET.copy()
         context['filter_url'] = ('&o=' + qr['o']) if 'o' in qr.keys() else ''
 
-        context['tipos_autores_materias'] = self.tipos_autores_materias()
+        context['tipos_autores_materias'] = tipos_autores_materias(None)
 
         return context
-
-    def tipos_autores_materias(self):
-        noww = timezone.localdate()
-        data_ini = noww - \
-            timedelta(days=noww.day - (1 if noww.day <= 15 else 16))
-
-        data_fim = noww + \
-            timedelta(days=-noww.day + (15 if noww.day <= 15 else 31))
-
-        while data_fim.day <= data_ini.day:
-            data_fim -= timedelta(days=1)
-
-        materias_em_tramitacao = MateriaLegislativa.objects.filter(
-            Q(registrovotacao__data_hora__gte=data_ini,
-              registrovotacao__data_hora__lte=data_fim
-              ) | Q(em_tramitacao=True)
-        )
-
-        r = {}
-        for m in materias_em_tramitacao:
-
-            if m.autores.count() >= 5:
-                continue
-
-            if m.tipo not in r:
-                r[m.tipo] = {}
-
-            for a in m.autores.all():
-                if a not in r[m.tipo]:
-                    r[m.tipo][a] = [m]
-                else:
-                    r[m.tipo][a].append(m)
-        return r
 
 
 class ProposicaoRecebida(PermissionRequiredMixin, ListView):
@@ -1250,6 +1240,7 @@ class ProposicaoCrud(Crud):
             return [self._as_row(obj) for obj in object_list]
 
         def tipos_autores_materias(self):
+            # chamado do template
             return tipos_autores_materias(self.request.user)
 
 
