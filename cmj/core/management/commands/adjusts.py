@@ -80,7 +80,12 @@ class Command(BaseCommand):
         #    reset_id_model(AuditLog)
 
     def vincular_materia_norma(self):
-        pass
+
+        for n in NormaJuridica.objects.filter(
+                tipo__origem_processo_legislativo=True,
+                materia__isnull=True
+        ):
+            print(n)
 
     def count_registers(self, full=True):
 
