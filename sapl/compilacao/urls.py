@@ -106,15 +106,15 @@ urlpatterns_compilacao = [
 urlpatterns = [
     url(r'^ta/', include(urlpatterns_compilacao)),
 
-    url(r'^sistema/ta/config/tipo-nota/',
+    url(r'^sistema/ta/config/tipo-nota',
         include(TipoNotaCrud.get_urls())),
-    url(r'^sistema/ta/config/tipo-vide/',
+    url(r'^sistema/ta/config/tipo-vide',
         include(TipoVideCrud.get_urls())),
-    url(r'^sistema/ta/config/tipo-publicacao/',
+    url(r'^sistema/ta/config/tipo-publicacao',
         include(TipoPublicacaoCrud.get_urls())),
-    url(r'^sistema/ta/config/veiculo-publicacao/',
+    url(r'^sistema/ta/config/veiculo-publicacao',
         include(VeiculoPublicacaoCrud.get_urls())),
-    url(r'^sistema/ta/config/tipo/',
+    url(r'^sistema/ta/config/tipo',
         include(TipoTextoArticuladoCrud.get_urls())),
 
 ]

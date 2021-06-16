@@ -45,13 +45,13 @@ app_name = AppConfig.name
 
 
 urlpatterns = [
-    url(r'^sessao/', include(SessaoCrud.get_urls() + OradorCrud.get_urls() +
-                             OradorExpedienteCrud.get_urls() +
-                             ExpedienteMateriaCrud.get_urls() +
-                             JustificativaAusenciaCrud.get_urls() +
-                             MateriaOrdemDiaCrud.get_urls() +
-                             OradorOrdemDiaCrud.get_urls() +
-                             RetiradaPautaCrud.get_urls())),
+    url(r'^sessao', include(SessaoCrud.get_urls() + OradorCrud.get_urls() +
+                            OradorExpedienteCrud.get_urls() +
+                            ExpedienteMateriaCrud.get_urls() +
+                            JustificativaAusenciaCrud.get_urls() +
+                            MateriaOrdemDiaCrud.get_urls() +
+                            OradorOrdemDiaCrud.get_urls() +
+                            RetiradaPautaCrud.get_urls())),
 
     url(r'^sessao/(?P<pk>\d+)/mesa$', MesaView.as_view(), name='mesa'),
 
@@ -92,17 +92,17 @@ urlpatterns = [
         name="renumerar_ordem"),
     url(r'^sessao/(?P<pk>\d+)/renumerar-materias-expediente$', renumerar_materias_expediente,
         name="renumerar_materias_expediente"),
-    url(r'^sistema/sessao-plenaria/tipo/',
+    url(r'^sistema/sessao-plenaria/tipo',
         include(TipoSessaoCrud.get_urls())),
-    url(r'^sistema/sessao-plenaria/tipo-resultado-votacao/',
+    url(r'^sistema/sessao-plenaria/tipo-resultado-votacao',
         include(TipoResultadoVotacaoCrud.get_urls())),
-    url(r'^sistema/sessao-plenaria/tipo-expediente/',
+    url(r'^sistema/sessao-plenaria/tipo-expediente',
         include(TipoExpedienteCrud.get_urls())),
-    url(r'^sistema/sessao-plenaria/tipo-justificativa/',
+    url(r'^sistema/sessao-plenaria/tipo-justificativa',
         include(TipoJustificativaCrud.get_urls())),
-    url(r'^sistema/sessao-plenaria/tipo-retirada-pauta/',
+    url(r'^sistema/sessao-plenaria/tipo-retirada-pauta',
         include(TipoRetiradaPautaCrud.get_urls())),
-    url(r'^sistema/resumo-ordenacao/',
+    url(r'^sistema/resumo-ordenacao',
         resumo_ordenacao,
         name='resumo_ordenacao'),
     url(r'^sessao/(?P<pk>\d+)/adicionar-varias-materias-expediente/',

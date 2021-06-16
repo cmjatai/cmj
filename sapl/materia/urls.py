@@ -73,16 +73,16 @@ urlpatterns_materia = [
         DespachoInicialMultiCreateView.as_view(),
         name='despacho-inicial-multi'),
 
-    url(r'^materia/', include(MateriaLegislativaCrud.get_urls() +
-                              AnexadaCrud.get_urls() +
-                              AutoriaCrud.get_urls() +
-                              DespachoInicialCrud.get_urls() +
-                              MateriaAssuntoCrud.get_urls() +
-                              NumeracaoCrud.get_urls() +
-                              LegislacaoCitadaCrud.get_urls() +
-                              TramitacaoCrud.get_urls() +
-                              RelatoriaCrud.get_urls() +
-                              DocumentoAcessorioCrud.get_urls())),
+    url(r'^materia', include(MateriaLegislativaCrud.get_urls() +
+                             AnexadaCrud.get_urls() +
+                             AutoriaCrud.get_urls() +
+                             DespachoInicialCrud.get_urls() +
+                             MateriaAssuntoCrud.get_urls() +
+                             NumeracaoCrud.get_urls() +
+                             LegislacaoCitadaCrud.get_urls() +
+                             TramitacaoCrud.get_urls() +
+                             RelatoriaCrud.get_urls() +
+                             DocumentoAcessorioCrud.get_urls())),
 
     url(r'^materia/(?P<pk>[0-9]+)/create_simplificado$',
         CriarProtocoloMateriaView.as_view(),
@@ -132,7 +132,7 @@ urlpatterns_materia = [
 
 
 urlpatterns_proposicao = [
-    url(r'^proposicao/', include(ProposicaoCrud.get_urls())),
+    url(r'^proposicao', include(ProposicaoCrud.get_urls())),
     url(r'^proposicao/recibo/(?P<pk>\d+)', ReciboProposicaoView.as_view(),
         name='recibo-proposicao'),
     url(r'^proposicao/receber/', ReceberProposicao.as_view(),
@@ -146,7 +146,7 @@ urlpatterns_proposicao = [
     url(r'^proposicao/confirmar/P(?P<hash>[0-9A-Fa-f]+)/'
         '(?P<pk>\d+)', ConfirmarProposicao.as_view(),
         name='proposicao-confirmar'),
-    url(r'^sistema/proposicao/tipo/',
+    url(r'^sistema/proposicao/tipo',
         include(TipoProposicaoCrud.get_urls())),
 
     url(r'^proposicao/(?P<pk>[0-9]+)/ta$',
@@ -163,23 +163,23 @@ urlpatterns_proposicao = [
 ]
 
 urlpatterns_sistema = [
-    url(r'^sistema/assunto-materia/',
+    url(r'^sistema/assunto-materia',
         include(AssuntoMateriaCrud.get_urls())),
-    url(r'^sistema/proposicao/tipo/',
+    url(r'^sistema/proposicao/tipo',
         include(TipoProposicaoCrud.get_urls())),
-    url(r'^sistema/materia/tipo/', include(TipoMateriaCrud.get_urls())),
-    url(r'^sistema/materia/regime-tramitacao/',
+    url(r'^sistema/materia/tipo', include(TipoMateriaCrud.get_urls())),
+    url(r'^sistema/materia/regime-tramitacao',
         include(RegimeTramitacaoCrud.get_urls())),
-    url(r'^sistema/materia/tipo-documento/',
+    url(r'^sistema/materia/tipo-documento',
         include(TipoDocumentoCrud.get_urls())),
-    url(r'^sistema/materia/tipo-fim-relatoria/',
+    url(r'^sistema/materia/tipo-fim-relatoria',
         include(TipoFimRelatoriaCrud.get_urls())),
-    url(r'^sistema/materia/unidade-tramitacao/',
+    url(r'^sistema/materia/unidade-tramitacao',
         include(UnidadeTramitacaoCrud.get_urls())),
-    url(r'^sistema/materia/origem/', include(OrigemCrud.get_urls())),
-    url(r'^sistema/materia/status-tramitacao/',
+    url(r'^sistema/materia/origem', include(OrigemCrud.get_urls())),
+    url(r'^sistema/materia/status-tramitacao',
         include(StatusTramitacaoCrud.get_urls())),
-    url(r'^sistema/materia/orgao/', include(OrgaoCrud.get_urls())),
+    url(r'^sistema/materia/orgao', include(OrgaoCrud.get_urls())),
 ]
 
 urlpatterns = urlpatterns_impressos + urlpatterns_materia + \

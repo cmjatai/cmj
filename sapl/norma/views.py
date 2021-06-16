@@ -401,7 +401,7 @@ class NormaCrud(Crud):
 
         @classmethod
         def get_url_regex(cls):
-            return r'^check$'
+            return r'^/check$'
 
     class UpdateView(Crud.UpdateView):
         form_class = NormaJuridicaForm

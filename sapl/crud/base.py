@@ -651,7 +651,7 @@ class CrudCreateView(PermissionRequiredContainerCrudMixin,
 
     @classmethod
     def get_url_regex(cls):
-        return r'^create$'
+        return r'^/create$'
 
     form_valid_message, form_invalid_message = FORM_MESSAGES[ACTION_CREATE]
 
@@ -725,7 +725,7 @@ class CrudDetailView(PermissionRequiredContainerCrudMixin,
 
     @classmethod
     def get_url_regex(cls):
-        return r'^(?P<pk>\d+)$'
+        return r'^/(?P<pk>\d+)$'
 
     def get_rows(self, object_list):
         return [self._as_row(obj) for obj in object_list]
@@ -881,7 +881,7 @@ class CrudUpdateView(PermissionRequiredContainerCrudMixin,
 
     @classmethod
     def get_url_regex(cls):
-        return r'^(?P<pk>\d+)/edit$'
+        return r'^/(?P<pk>\d+)/edit$'
 
     form_valid_message, form_invalid_message = FORM_MESSAGES[ACTION_UPDATE]
 
@@ -900,7 +900,7 @@ class CrudDeleteView(PermissionRequiredContainerCrudMixin,
 
     @classmethod
     def get_url_regex(cls):
-        return r'^(?P<pk>\d+)/delete$'
+        return r'^/(?P<pk>\d+)/delete$'
 
     form_valid_message, form_invalid_message = FORM_MESSAGES[ACTION_DELETE]
 
@@ -1151,7 +1151,7 @@ class MasterDetailCrud(Crud):
 
         @classmethod
         def get_url_regex(cls):
-            return r'^(?P<pk>\d+)/%s$' % cls.model._meta.model_name
+            return r'^/(?P<pk>\d+)/%s$' % cls.model._meta.model_name
 
         def get_context_data(self, **kwargs):
             obj = self.crud if hasattr(self, 'crud') else self
@@ -1223,7 +1223,7 @@ class MasterDetailCrud(Crud):
 
         @classmethod
         def get_url_regex(cls):
-            return r'^(?P<pk>\d+)/%s/create$' % cls.model._meta.model_name
+            return r'^/(?P<pk>\d+)/%s/create$' % cls.model._meta.model_name
 
         def get_form(self, form_class=None):
             obj = self.crud if hasattr(self, 'crud') else self
@@ -1331,14 +1331,14 @@ class MasterDetailCrud(Crud):
 
         @classmethod
         def get_url_regex(cls):
-            return r'^%s/(?P<pk>\d+)/edit$' % cls.model._meta.model_name
+            return r'^/%s/(?P<pk>\d+)/edit$' % cls.model._meta.model_name
 
     class DeleteView(Crud.DeleteView):
         permission_required = RP_DELETE,
 
         @classmethod
         def get_url_regex(cls):
-            return r'^%s/(?P<pk>\d+)/delete$' % cls.model._meta.model_name
+            return r'^/%s/(?P<pk>\d+)/delete$' % cls.model._meta.model_name
 
         def get_success_url(self):
             obj = self.crud if hasattr(self, 'crud') else self
@@ -1380,7 +1380,7 @@ class MasterDetailCrud(Crud):
 
         @classmethod
         def get_url_regex(cls):
-            return r'^%s/(?P<pk>\d+)$' % cls.model._meta.model_name
+            return r'^/%s/(?P<pk>\d+)$' % cls.model._meta.model_name
 
         @property
         def detail_list_url(self):

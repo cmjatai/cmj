@@ -502,7 +502,7 @@ class CertidaoPublicacaoCrud(Crud):
 
         @classmethod
         def get_url_regex(cls):
-            return r'^(?P<pk>\d+)$'
+            return r'^/(?P<pk>\d+)$'
 
         def get(self, request, *args, **kwargs):
             self.object = self.get_object()
@@ -557,7 +557,7 @@ class CertidaoPublicacaoCrud(Crud):
 
         @classmethod
         def get_url_regex(cls):
-            return r'^(?P<content_type>\d+)/create/(?P<pk>\d+)/(?P<field_name>\w+)$'
+            return r'^/(?P<content_type>\d+)/create/(?P<pk>\d+)/(?P<field_name>\w+)$'
 
         def get(self, request, *args, **kwargs):
 

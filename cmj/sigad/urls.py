@@ -13,7 +13,7 @@ app_name = AppConfig.name
 
 urlpatterns_sigad = [
 
-    url(r'^short/', include(ShortAdminCrud.get_urls())),
+    url(r'^short', include(ShortAdminCrud.get_urls())),
 
     url(r'^classe/create$',
         views.ClasseCreateView.as_view(), name='classe_create'),
@@ -55,11 +55,11 @@ urlpatterns_sigad = [
     url(r'^documento/pm_import$',
         imports.DocumentoPmImportView.as_view(), name='documento_pm_import'),
 
-    url(r'^documento/', include(PermissionsUserDocumentoCrud.get_urls())),
-    url(r'^caixapublicacao/', include(CaixaPublicacaoCrud.get_urls())),
-    url(r'^classe/', include(PermissionsUserClasseCrud.get_urls() +
-                             CaixaPublicacaoClasseCrud.get_urls()
-                             )),
+    url(r'^documento', include(PermissionsUserDocumentoCrud.get_urls())),
+    url(r'^caixapublicacao', include(CaixaPublicacaoCrud.get_urls())),
+    url(r'^classe', include(PermissionsUserClasseCrud.get_urls() +
+                            CaixaPublicacaoClasseCrud.get_urls()
+                            )),
 
 ]
 

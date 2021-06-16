@@ -271,7 +271,8 @@ class CriarProtocoloMateriaView(CreateView):
                               "Definido 1 como padrão.".format(protocolo.ano))
             pass  # numero ficou com o valor padrão 1 acima
 
-        context['form'].fields['tipo'].initial = protocolo.tipo_conteudo_protocolado
+        context['form'].fields[
+            'tipo'].initial = protocolo.tipo_conteudo_protocolado
         context['form'].fields['numero'].initial = numero
         context['form'].fields['ano'].initial = protocolo.ano
         if protocolo:
@@ -279,9 +280,11 @@ class CriarProtocoloMateriaView(CreateView):
                 context['form'].fields['data_apresentacao'].initial = protocolo.timestamp.date(
                 )
             elif protocolo.timestamp_data_hora_manual:
-                context['form'].fields['data_apresentacao'].initial = protocolo.timestamp_data_hora_manual.date()
+                context['form'].fields[
+                    'data_apresentacao'].initial = protocolo.timestamp_data_hora_manual.date()
             elif protocolo.data:
-                context['form'].fields['data_apresentacao'].initial = protocolo.data
+                context['form'].fields[
+                    'data_apresentacao'].initial = protocolo.data
         context['form'].fields['numero_protocolo'].initial = protocolo.numero
         context['form'].fields['ementa'].initial = protocolo.assunto_ementa
 
@@ -1711,7 +1714,7 @@ class AutoriaMultiCreateView(PermissionRequiredForAppCrudMixin, FormView):
 
     @classmethod
     def get_url_regex(cls):
-        return r'^(?P<pk>\d+)/%s/multicreate' % cls.model._meta.model_name
+        return r'^/(?P<pk>\d+)/%s/multicreate' % cls.model._meta.model_name
 
     @property
     def layout_key(self):
@@ -3055,7 +3058,8 @@ class TipoMateriaCrud(CrudAux):
             else:
                 sr__max = TipoMateriaLegislativa.objects.all().aggregate(
                     Max('sequencia_regimental'))
-                self.object.sequencia_regimental = sr__max['sequencia_regimental__max'] + 1
+                self.object.sequencia_regimental = sr__max[
+                    'sequencia_regimental__max'] + 1
                 self.object.save()
 
             return fv

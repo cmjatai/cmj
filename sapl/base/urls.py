@@ -53,17 +53,17 @@ admin_user = [
 
 
 urlpatterns = [
-    url(r'^sistema/autor/tipo/', include(TipoAutorCrud.get_urls())),
-    url(r'^sistema/autor/', include(AutorCrud.get_urls() +
-                                    OperadorAutorCrud.get_urls())),
+    url(r'^sistema/autor/tipo', include(TipoAutorCrud.get_urls())),
+    url(r'^sistema/autor', include(AutorCrud.get_urls() +
+                                   OperadorAutorCrud.get_urls())),
 
     url(r'^sistema/ajuda/(?P<topic>\w+)$',
         HelpTopicView.as_view(), name='help_topic'),
     url(r'^sistema/ajuda/$', TemplateView.as_view(template_name='ajuda.html'),
         name='help'),
-    url(r'^sistema/casa-legislativa/', include(CasaLegislativaCrud.get_urls()),
+    url(r'^sistema/casa-legislativa', include(CasaLegislativaCrud.get_urls()),
         name="casa_legislativa"),
-    url(r'^sistema/app-config/', include(AppConfigCrud.get_urls())),
+    url(r'^sistema/app-config', include(AppConfigCrud.get_urls())),
 
     # TODO mover estas telas para a app 'relatorios'
     url(r'^sistema/relatorios/$',

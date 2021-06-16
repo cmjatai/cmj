@@ -7,11 +7,12 @@ from .apps import AppConfig
 app_name = AppConfig.name
 
 urlpatterns = [
-    url(r'^sistema/lexml/provedor/',
+    url(r'^sistema/lexml/provedor',
         include(LexmlProvedorCrud.get_urls())),
-    url(r'^sistema/lexml/publicador/',
+    url(r'^sistema/lexml/publicador',
         include(LexmlPublicadorCrud.get_urls())),
-    url(r'^sistema/lexml/request_search/(?P<keyword>[\w\-]+)/', request_search, name='lexml_search'),
+    url(r'^sistema/lexml/request_search/(?P<keyword>[\w\-]+)/',
+        request_search, name='lexml_search'),
     url(r'^sistema/lexml/oai', lexml_request, name='lexml_endpoint'),
 
 ]

@@ -9,7 +9,7 @@
   - title: {% trans 'Publicações Diversas Cerfiticadas' %}
     url: cmj.core:certidaopublicacao_list
   - title: {% trans 'Documentos Administrativos Diversos'%}
-    url: /doc/?o=
+    url: /doc?o=
   - title: ''
     url: ''
   - title: {% trans 'Legislação' %}
@@ -23,28 +23,28 @@
   - title: {% trans 'Licitações' %}
     url: ''
   - title: {% trans 'Em Andamento' %}
-    url: /doc/?tipo=187&o=&tramitacaoadministrativo__status=12
+    url: /doc?tipo=187&o=&tramitacaoadministrativo__status=12
   - title: {% trans 'Com Contratos Assinados' %}
-    url: /doc/?tipo=187&o=&tramitacaoadministrativo__status=13
+    url: /doc?tipo=187&o=&tramitacaoadministrativo__status=13
   - title: {% trans 'Encerradas' %}
-    url: /doc/?tipo=187&o=&tramitacaoadministrativo__status=14
+    url: /doc?tipo=187&o=&tramitacaoadministrativo__status=14
   - title: {% trans 'Canceladas' %}
-    url: /doc/?tipo=187&o=&tramitacaoadministrativo__status=15
+    url: /doc?tipo=187&o=&tramitacaoadministrativo__status=15
   - title: ''
     url: ''
   - title: {% trans 'Contratos' %}
     url: ''
   - title: Contratos em Vigência
-    url: /doc/?data_vencimento_0={% now "d/m/Y" %}
+    url: /doc?data_vencimento_0={% now "d/m/Y" %}
   - title: Contratos Encerrados
-    url: /doc/?data_vencimento_1={% now "d/m/Y" %}
+    url: /doc?data_vencimento_1={% now "d/m/Y" %}
   - title: ''
     url: ''
   - title: {% trans 'Finanças' %}
     url: ''
   - title: {% trans 'Relatórios de Gestão Fiscal'%}
-    url: /doc/?tipo=185&o=
+    url: /doc?tipo=185&o=
   - title: {% trans 'Balancetes Contábeis'%}
-    url: /doc/?tipo=182&o=
+    url: /doc?tipo=182&o=
   - title: {% trans 'Prestação de Contas' %}
     url: http://camaradejatai.sigepnet.com.br

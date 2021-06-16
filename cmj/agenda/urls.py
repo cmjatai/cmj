@@ -11,8 +11,8 @@ urlpatterns_agenda = [
 
     # url(r'^fale-conosco/ouvidoria',
     # OuvidoriaPaginaInicialView.as_view(), name='ouvidoria_pagina_inicial'),
-    url(r'^evento/', include(EventoCrud.get_urls())),
-    url(r'^sistema/agenda/tipoevento/',
+    url(r'^evento', include(EventoCrud.get_urls())),
+    url(r'^sistema/agenda/tipoevento',
         include(TipoEventoCrud.get_urls())),
 ]
 

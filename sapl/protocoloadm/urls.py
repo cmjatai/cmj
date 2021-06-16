@@ -29,7 +29,7 @@ from .apps import AppConfig
 app_name = AppConfig.name
 
 urlpatterns_documento_administrativo = [
-    url(r'^doc/',
+    url(r'^doc',
         include(DocumentoAdministrativoCrud.get_urls() +
                 AnexadoCrud.get_urls() +
                 TramitacaoAdmCrud.get_urls() +
@@ -116,9 +116,9 @@ urlpatterns_protocolo = [
 ]
 
 urlpatterns_sistema = [
-    url(r'^sistema/tipo-documento-adm/',
+    url(r'^sistema/tipo-documento-adm',
         include(TipoDocumentoAdministrativoCrud.get_urls())),
-    url(r'^sistema/status-tramitacao-adm/',
+    url(r'^sistema/status-tramitacao-adm',
         include(StatusTramitacaoAdministrativoCrud.get_urls())),
 
     # FIXME: Usado para pesquisar autor- SOLUÇÃO-foi transformado em api/autor

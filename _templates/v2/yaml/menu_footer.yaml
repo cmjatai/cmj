@@ -111,17 +111,17 @@
   css_class: head_title
   children:
   - title: Últimas Publicações
-    url: /doc/?o=
+    url: /doc?o=
   - title: Licitações e Contratos
     url: ''
     css_class: head_title
     children:
     - title: Licitações em Andamento
-      url: /doc/?tipo=187&o=&tramitacaoadministrativo__status=12
+      url: /doc?tipo=187&o=&tramitacaoadministrativo__status=12
     - title: Contratos em Vigência
-      url: /doc/?data_vencimento_0={% now "d/m/Y" %}
+      url: /doc?data_vencimento_0={% now "d/m/Y" %}
     - title: Contratos Encerrados
-      url: /doc/?data_vencimento_1={% now "d/m/Y" %}
+      url: /doc?data_vencimento_1={% now "d/m/Y" %}
     - title: {% trans 'Transparência' %}
       url: ''
       css_class: head_title

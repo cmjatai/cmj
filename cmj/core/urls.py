@@ -77,16 +77,16 @@ urlpatterns = user_urlpatterns + [
     # url(r'^enderecos/', login_required(
     #    TrechoSearchView.as_view()), name='search_view'),
 
-    url(r'^areatrabalho/', include(AreaTrabalhoCrud.get_urls() +
-                                   OperadorAreaTrabalhoCrud.get_urls())),
+    url(r'^areatrabalho', include(AreaTrabalhoCrud.get_urls() +
+                                  OperadorAreaTrabalhoCrud.get_urls())),
 
-    url(r'^cert/', include(CertidaoPublicacaoCrud.get_urls())),
+    url(r'^cert', include(CertidaoPublicacaoCrud.get_urls())),
 
     url(r'^notificacao/(?P<pk>[0-9]+)$', NotificacaoRedirectView.as_view(),
         name='notificacao_redirect'),
 
 
-    url(r'^estatisticas/$', BiView.as_view(),
+    url(r'^estatisticas$', BiView.as_view(),
         name='bi_render'),
 
 
@@ -95,25 +95,25 @@ urlpatterns = user_urlpatterns + [
     url(r'^api/trecho.json/(?P<pk>[0-9]+)$', TrechoJsonView.as_view(
         {'get': 'retrieve'}), name='trecho_rest_json'),
 
-    url(r'^sistema/core/cep/', include(CepCrud.get_urls())),
-    url(r'^sistema/core/regiaomunicipal/',
+    url(r'^sistema/core/cep', include(CepCrud.get_urls())),
+    url(r'^sistema/core/regiaomunicipal',
         include(RegiaoMunicipalCrud.get_urls())),
-    url(r'^sistema/core/distrito/', include(DistritoCrud.get_urls())),
-    url(r'^sistema/core/bairro/', include(BairroCrud.get_urls())),
-    url(r'^sistema/core/tipologradouro/',
+    url(r'^sistema/core/distrito', include(DistritoCrud.get_urls())),
+    url(r'^sistema/core/bairro', include(BairroCrud.get_urls())),
+    url(r'^sistema/core/tipologradouro',
         include(TipoLogradouroCrud.get_urls())),
-    url(r'^sistema/core/logradouro/', include(LogradouroCrud.get_urls())),
+    url(r'^sistema/core/logradouro', include(LogradouroCrud.get_urls())),
 
 
     url(r'^online/',
         app_vue_view, name='app_vue_view_url'),
 
 
-    url(r'^sistema/core/trecho/', include(TrechoCrud.get_urls())),
+    url(r'^sistema/core/trecho', include(TrechoCrud.get_urls())),
 
-    url(r'^sistema/usuario/', include(UserCrud.get_urls())),
+    url(r'^sistema/usuario', include(UserCrud.get_urls())),
 
-    url(r'^sistema/core/impressoenderecamento/',
+    url(r'^sistema/core/impressoenderecamento',
         include(ImpressoEnderecamentoCrud.get_urls())),
 
     #url(r'^sistema/parlamentar/partido/', include(PartidoCrud.get_urls())),

@@ -310,8 +310,8 @@ class DocumentoAdministrativoCrud(Crud):
         @classmethod
         def get_url_regex(cls):
             return (
-                (r'^(?P<pk>\d+)$', ''),
-                (r'^(?P<hash>[0-9A-Fa-f]+)/(?P<pk>\d+)$', 'hash')
+                (r'^/(?P<pk>\d+)$', ''),
+                (r'^/(?P<hash>[0-9A-Fa-f]+)/(?P<pk>\d+)$', 'hash')
             )
 
         def get_context_data(self, **kwargs):
@@ -1392,7 +1392,8 @@ class DesvincularDocumentoView(PermissionRequiredMixin, CreateView):
 
     def form_valid(self, form):
         documento = DocumentoAdministrativo.objects.get(numero=form.cleaned_data['numero'],
-                                                        ano=form.cleaned_data['ano'],
+                                                        ano=form.cleaned_data[
+                                                            'ano'],
                                                         tipo=form.cleaned_data['tipo'])
         documento.protocolo = None
         documento.save()
@@ -1606,7 +1607,8 @@ class ProtocoloDocumentoView(PermissionRequiredMixin,
             protocolo.hora = None
             protocolo.user_data_hora_manual = ''
             protocolo.ip_data_hora_manual = ''
-        protocolo.tipo_conteudo_protocolado = form.cleaned_data['tipo_documento']
+        protocolo.tipo_conteudo_protocolado = form.cleaned_data[
+            'tipo_documento']
 
         protocolo.save()
         self.object = protocolo
@@ -1694,7 +1696,8 @@ class ProtocoloDocumentoAcessorioView(PermissionRequiredMixin,
             protocolo.hora = None
             protocolo.user_data_hora_manual = ''
             protocolo.ip_data_hora_manual = ''
-        protocolo.tipo_conteudo_protocolado = form.cleaned_data['tipo_conteudo_protocolado']
+        protocolo.tipo_conteudo_protocolado = form.cleaned_data[
+            'tipo_conteudo_protocolado']
 
         protocolo.save()
         self.object = protocolo
