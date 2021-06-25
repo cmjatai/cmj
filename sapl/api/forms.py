@@ -34,7 +34,7 @@ class SaplFilterSetMixin(FilterSet):
     def filter_o(self, queryset, name, value):
         try:
             return queryset.order_by(
-                *map(str.strip, value.split(',')))
+                *filter(lambda x: x, map(str.strip, value.split(','))))
         except:
             return queryset
 
