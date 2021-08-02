@@ -102,3 +102,5 @@ CACHES = {
         'LOCATION': '/var/tmp/django_cache',
     }
 }
+
+APPEND_SLASH = False

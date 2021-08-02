@@ -23,7 +23,7 @@ from rest_framework.fields import SerializerMethodField
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from cmj.core.models import AreaTrabalho
+from cmj.core.models import AreaTrabalho, AuditLog
 from cmj.globalrules import GROUP_MATERIA_WORKSPACE_VIEWER
 from sapl.api.forms import SaplFilterSetMixin
 from sapl.api.permissions import SaplModelPermissions
@@ -41,6 +41,53 @@ from sapl.sessao.models import SessaoPlenaria, ExpedienteSessao
 from sapl.utils import models_with_gr_for_model, choice_anos_com_sessaoplenaria,\
     get_mime_type_from_file_extension
 
+# Toda Classe construida acima, pode ser redefinida e aplicado quaisquer
+# das possibilidades para uma classe normal criada a partir de
+# rest_framework.viewsets.ModelViewSet conforme exemplo para a classe autor
+
+
+# decorator que processa um endpoint detail trivial com base no model passado,
+# Um endpoint detail geralmente é um conteúdo baseado numa FK com outros possíveis filtros
+# e os passados pelo proprio cliente, além de o serializer e o filterset
+# ser desse model passado
+
+
+class wrapper_queryset_response_for_drf_action(object):
+    def __init__(self, model):
+        self.model = model
+
+    def __call__(self, cls):
+
+        def wrapper(instance_view, *args, **kwargs):
+            # recupera a viewset do model anotado
+            iv = instance_view
+            viewset_from_model = SaplApiViewSetConstrutor._built_sets[
+                self.model._meta.app_config][self.model]
+
+            # apossa da instancia da viewset mae do action
+            # em uma viewset que processa dados do model passado no decorator
+            iv.queryset = viewset_from_model.queryset
+            iv.serializer_class = viewset_from_model.serializer_class
+            iv.filterset_class = viewset_from_model.filterset_class
+
+            iv.queryset = instance_view.filter_queryset(
+                iv.get_queryset())
+
+            # chama efetivamente o metodo anotado que deve devolver um queryset
+            # com os filtros específicos definido pelo programador customizador
+            qs = cls(instance_view, *args, **kwargs)
+
+            page = iv.paginate_queryset(qs)
+            data = iv.get_serializer(
+                page if page is not None else qs, many=True).data
+
+            return iv.get_paginated_response(
+                data) if page is not None else Response(data)
+
+        return wrapper
+
+# decorator para recuperar e transformar o default
+
 
 class BusinessRulesNotImplementedMixin:
     def create(self, request, *args, **kwargs):
@@ -55,6 +102,28 @@ class BusinessRulesNotImplementedMixin:
 
 class SaplApiViewSet(ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
+
+    @action(detail=True)
+    def auditlog(self, request, *args, **kwargs):
+
+        def get_queryset():
+            return AuditLog.objects.all()
+
+        self.get_queryset = get_queryset
+
+        kwargs.update(
+            {
+                'api_model': self.serializer_class.Meta.model
+            }
+        )
+        return self.get_auditlog(**kwargs)
+
+    @wrapper_queryset_response_for_drf_action(model=AuditLog)
+    def get_auditlog(self, **kwargs):
+        return self.get_queryset().filter(
+            object_id=kwargs['pk'],
+            content_type=ContentType.objects.get_for_model(kwargs['api_model'])
+        ).order_by('-timestamp')
 
 
 class SaplApiViewSetConstrutor():
@@ -170,8 +239,11 @@ class SaplApiViewSetConstrutor():
             viewset.__name__ = '%sModelSaplViewSet' % _model.__name__
             return viewset
 
-        apps_sapl = [apps.apps.get_app_config(
-            n[5:]) for n in settings.SAPL_APPS]
+        apps_sapl = [
+            apps.apps.get_app_config(
+                n.split('.')[-1]
+            ) for n in settings.SAPL_APPS + settings.CMJ_APPS
+        ]
         for app in apps_sapl:
             cls._built_sets[app] = {}
             for model in app.get_models():
@@ -240,53 +312,6 @@ SaplApiViewSetConstrutor.build_class()
         
     }
 """
-
-# Toda Classe construida acima, pode ser redefinida e aplicado quaisquer
-# das possibilidades para uma classe normal criada a partir de
-# rest_framework.viewsets.ModelViewSet conforme exemplo para a classe autor
-
-
-# decorator que processa um endpoint detail trivial com base no model passado,
-# Um endpoint detail geralmente é um conteúdo baseado numa FK com outros possíveis filtros
-# e os passados pelo proprio cliente, além de o serializer e o filterset
-# ser desse model passado
-
-
-class wrapper_queryset_response_for_drf_action(object):
-    def __init__(self, model):
-        self.model = model
-
-    def __call__(self, cls):
-
-        def wrapper(instance_view, *args, **kwargs):
-            # recupera a viewset do model anotado
-            iv = instance_view
-            viewset_from_model = SaplApiViewSetConstrutor._built_sets[
-                self.model._meta.app_config][self.model]
-
-            # apossa da instancia da viewset mae do action
-            # em uma viewset que processa dados do model passado no decorator
-            iv.queryset = viewset_from_model.queryset
-            iv.serializer_class = viewset_from_model.serializer_class
-            iv.filterset_class = viewset_from_model.filterset_class
-
-            iv.queryset = instance_view.filter_queryset(
-                iv.get_queryset())
-
-            # chama efetivamente o metodo anotado que deve devolver um queryset
-            # com os filtros específicos definido pelo programador customizador
-            qs = cls(instance_view, *args, **kwargs)
-
-            page = iv.paginate_queryset(qs)
-            data = iv.get_serializer(
-                page if page is not None else qs, many=True).data
-
-            return iv.get_paginated_response(
-                data) if page is not None else Response(data)
-
-        return wrapper
-
-# decorator para recuperar e transformar o default
 
 
 class customize(object):

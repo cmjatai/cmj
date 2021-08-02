@@ -28,6 +28,7 @@ e com qualquer outro tipo de permissão customizada, nesta ordem de precedência
 """
 from django.contrib.auth import get_user_model
 
+from cmj.core.models import AuditLog
 from cmj.globalrules import menu_dados_auxiliares
 from sapl.audiencia import models as audiencia
 from sapl.base import models as base
@@ -244,6 +245,7 @@ rules_group_geral = {
          [RP_ADD], __perms_publicas__),
         (base.TipoAutor, __base__, __perms_publicas__),
         (base.Autor, __base__, __perms_publicas__),
+        (AuditLog, __base__, set()),
 
         (protocoloadm.StatusTramitacaoAdministrativo, __base__, set()),
         (protocoloadm.TipoDocumentoAdministrativo, __base__, set()),
