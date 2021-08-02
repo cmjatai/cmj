@@ -156,7 +156,7 @@ class IntegracaoTaView(TemplateView):
             content_type=related_object_type)
 
         ta_exists = bool(ta.exists())
-        if (ta_exists or
+        if (
                 (request.user.has_perm(
                     'compilacao.change_dispositivo_edicao_dinamica') and
                  ta_values.get('privacidade', STATUS_TA_EDITION
@@ -179,6 +179,7 @@ class IntegracaoTaView(TemplateView):
             """
             pass
         else:
+            self.object = ta.first()
             messages.info(request, _('%s não possui %s.') % (
                 item, TextoArticulado._meta.verbose_name))
             return redirect('/message')
