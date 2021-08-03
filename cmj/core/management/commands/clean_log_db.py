@@ -36,6 +36,9 @@ class Command(BaseCommand):
                 if full or count > 10000:
                     print(count, m, app)
 
+        tr = TaskResult.objects.all().count()
+        print(tr, TaskResult)
+
     def clean_task_result(self):
         data = timezone.localtime() - timedelta(days=5)
         objs = TaskResult.objects.filter(
