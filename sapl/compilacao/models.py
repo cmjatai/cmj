@@ -1,5 +1,3 @@
-
-from bs4 import BeautifulSoup
 from django.contrib import messages
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType

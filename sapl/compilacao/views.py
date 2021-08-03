@@ -4,7 +4,6 @@ import logging
 import sys
 
 from braces.views import FormMessagesMixin
-from bs4 import BeautifulSoup
 from django import forms
 from django.conf import settings
 from django.contrib import messages
