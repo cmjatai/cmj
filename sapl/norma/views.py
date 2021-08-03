@@ -8,7 +8,7 @@ from django.db.models import Q
 from django.db.models.aggregates import Count
 from django.http import JsonResponse
 from django.http.response import Http404
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.urls.base import reverse
 from django.utils import timezone
 from django.utils.encoding import force_text
@@ -193,32 +193,32 @@ class NormaTaView(IntegracaoTaView):
             STATUS_TA_IMMUTABLE_PUBLIC
 
         if AppConfig.attr('texto_articulado_norma'):
+            norma = get_object_or_404(self.model, pk=kwargs['pk'])
 
             response = super().get(request, *args, **kwargs)
 
             perm = self.object.has_view_permission(
-                self.request, message=False)
+                self.request, message=False) if self.object else None
 
             if perm is None:
                 messages.error(self.request, _(
                     '''<strong>O Texto Articulado desta {} está em edição
                             ou ainda não foi cadastrado.</strong><br>{}
                         '''.format(
-                        self.object.content_object._meta.verbose_name,
+                        norma._meta.verbose_name,
                         '''
                             No entanto, sua consulta é possível da forma trivial através
                             do Arquivo Digitalizado abaixo.
-                            ''' if self.object.content_object.texto_integral else ''
+                            ''' if norma.texto_integral else ''
                     )))
 
-                co = self.object.content_object
                 return redirect(
                     reverse(
                         '{}:{}_detail'.format(
-                            co._meta.app_config.name,
-                            co._meta.model_name
+                            norma._meta.app_config.name,
+                            norma._meta.model_name
                         ),
-                        kwargs={'pk': self.object.object_id}
+                        kwargs={'pk': norma.id}
                     ) + '?display'
                 )
 
