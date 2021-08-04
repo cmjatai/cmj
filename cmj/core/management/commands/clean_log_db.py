@@ -22,7 +22,7 @@ class Command(BaseCommand):
 
         self.logger = logging.getLogger(__name__)
 
-        self.clean_task_result()
+        # self.clean_task_result()
 
         self.count_registers(full=False)
 

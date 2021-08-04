@@ -27,7 +27,7 @@ SOCIAL_AUTH_POSTGRES_JSONFIELD = True
 
 AUTHENTICATION_BACKENDS = (
     #    'social_core.backends.facebook.FacebookOAuth2',
-    'cmj.mixins.FacebookOAuth2',
+    # 'cmj.mixins.FacebookOAuth2',
     'django.contrib.auth.backends.ModelBackend',
     'social_core.backends.google.GoogleOAuth2',
 )
@@ -70,10 +70,10 @@ SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
 }
 
 SOCIAL_BACKEND_INFO = {
-    'facebook': {
-        'title': 'Facebook',
-        'icon': 'fa-facebook',
-    },
+    #'facebook': {
+    #    'title': 'Facebook',
+    #    'icon': 'fa-facebook',
+    #},
     'google-oauth2': {
         'title': 'Google',
         'icon': 'fa-google',
@@ -133,7 +133,8 @@ ABSOLUTE_PATH_BACKUP = config('ABSOLUTE_PATH_BACKUP', cast=str, default='')
 
 # S3 CMJ
 S3_CMJ_ACCESS_KEY_ID = config('S3_CMJ_ACCESS_KEY_ID', cast=str, default='')
-S3_CMJ_SECRET_ACCESS_KEY = config('S3_CMJ_SECRET_ACCESS_KEY', cast=str, default='')
+S3_CMJ_SECRET_ACCESS_KEY = config(
+    'S3_CMJ_SECRET_ACCESS_KEY', cast=str, default='')
 S3_CMJ_ENDPOINT_URL = config('S3_CMJ_ENDPOINT_URL', cast=str, default='')
 
 # cert_public

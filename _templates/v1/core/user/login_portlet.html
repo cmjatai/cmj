@@ -2,7 +2,7 @@
 
 <div class="container-login">
   <form id="login-form" method="post" action="#">
-    <div class="label{{backends.backends|length}}">{% trans "Entrar no Portal" %}</div>
+    <div class="label2">{% trans "Entrar no Portal" %}</div>
     <div class="inner">
       {% csrf_token %}
       <div class="text-center">
@@ -10,7 +10,7 @@
           <strong>Seu primeiro acesso?</strong><br>
           Conecte com uma das redes sociais abaixo.<br>
           Depois você pode entrar em seu perfil aqui no Portal CMJ e definir uma senha.<br>
-          Assim, em seus acessos futuros, 
+          Assim, em seus acessos futuros,
           você poderá acessar com seu email e senha caso não queria mais usar as redes sociais!
         </small>
       </div>
@@ -18,16 +18,16 @@
         <div class="alert alert-danger">Usuário e/ou Senha inválidos.
         </div>
       {% endif %}
-      <div class="row btns-login">
+      <div class="row btns-login justify-content-center">
             {% for backend in backends.backends %}
               <div class="col-lg-6">
               <a class="btn-login" id="{{ backend }}-button" name="{{ backend }}"
                 title = "{% blocktrans with backend_name=backend|social_title %}Acessar com {{ backend_name }}{% endblocktrans %}"
                 href="{% url 'social:begin' backend=backend %}?next={{view.get_success_url}}">
-                
+
                 <i class="fab {{ backend|social_icon }}"></i>
                 {% blocktrans with backend_name=backend|social_title %}Continuar com {{ backend_name }}{% endblocktrans %}
-              </a>    
+              </a>
             </div>
             {% endfor %}
       </div>
