@@ -242,7 +242,7 @@ class SaplApiViewSetConstrutor():
         apps_sapl = [
             apps.apps.get_app_config(
                 n.split('.')[-1]
-            ) for n in settings.SAPL_APPS + settings.CMJ_APPS
+            ) for n in settings.SAPL_APPS  # + settings.CMJ_APPS
         ]
         for app in apps_sapl:
             cls._built_sets[app] = {}
