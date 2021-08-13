@@ -1,7 +1,7 @@
 from django.conf.urls import include, url
 
 from cmj.core.views_short import ShortAdminCrud
-from cmj.sigad import views, imports
+from cmj.sigad import views
 from cmj.sigad.views import PermissionsUserClasseCrud,\
     PermissionsUserDocumentoCrud, CaixaPublicacaoCrud,\
     CaixaPublicacaoClasseCrud
@@ -49,11 +49,6 @@ urlpatterns_sigad = [
 
     url(r'^documento/(?P<pk>[0-9]+)/delete$',
         views.DocumentoDeleteView.as_view(), name='documento_delete'),
-
-
-
-    url(r'^documento/pm_import$',
-        imports.DocumentoPmImportView.as_view(), name='documento_pm_import'),
 
     url(r'^documento', include(PermissionsUserDocumentoCrud.get_urls())),
     url(r'^caixapublicacao', include(CaixaPublicacaoCrud.get_urls())),

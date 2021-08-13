@@ -32,6 +32,7 @@ from reportlab.pdfgen import canvas
 from reportlab.platypus.doctemplate import SimpleDocTemplate
 
 from cmj import globalrules
+from cmj.core.models import AuditLog
 from cmj.mixins import CmjChoices
 from cmj.utils import get_settings_auth_user_model, YES_NO_CHOICES,\
     restringe_tipos_de_arquivo_midias, TIPOS_IMG_PERMITIDOS,\
@@ -153,68 +154,6 @@ class Parent(models.Model):
         for child in self.childs.view_childs():
             for item in child.tree2list():
                 yield item
-
-
-class Revisao(models.Model):
-
-    STATUS_PRIVATE = 99
-    STATUS_RESTRICT_PERMISSION = 2
-    STATUS_RESTRICT_USER = 1
-    STATUS_PUBLIC = 0
-
-    VISIBILIDADE_STATUS = (
-        (STATUS_RESTRICT_PERMISSION, _('Restrição por Permissão')),
-        (STATUS_RESTRICT_USER, _('Restrição por Usuário')),
-        (STATUS_PRIVATE, _('Privado')),
-        (STATUS_PUBLIC, _('Público')),
-    )
-
-    data = models.DateTimeField(
-        verbose_name=_('created'),
-        editable=False, auto_now_add=True)
-    user = models.ForeignKey(
-        get_settings_auth_user_model(),
-        verbose_name=_('user'), related_name='+',
-        on_delete=PROTECT)
-
-    json = django_extensions_JSONField(verbose_name=_('Json'))
-
-    content_type = models.ForeignKey(
-        ContentType,
-        blank=True, null=True, default=None,
-        on_delete=PROTECT)
-    object_id = models.PositiveIntegerField(
-        blank=True, null=True, default=None)
-    content_object = GenericForeignKey('content_type', 'object_id')
-
-    visibilidade = models.IntegerField(
-        _('Visibilidade'),
-        choices=VISIBILIDADE_STATUS,
-        blank=True, null=True, default=None)
-
-    class Meta:
-        ordering = ('-data',)
-        verbose_name = _('Revisão')
-        verbose_name_plural = _('Revisões')
-
-    @classmethod
-    def gerar_revisao(cls, instance_model, user):
-        revisao = Revisao()
-
-        if user:
-            revisao.user = user
-        else:
-            revisao.user_id = 1  # FIXME: necessário para execuções manual...
-            # resolver no model
-
-        revisao.content_object = instance_model
-        revisao.json = serializers.serialize("json", (instance_model,))
-
-        if hasattr(instance_model, 'visibilidade'):
-            revisao.visibilidade = instance_model.visibilidade
-
-        revisao.save()
-        return revisao
 
 
 class CMSMixin(models.Model):
@@ -348,6 +287,20 @@ class CMSMixin(models.Model):
 
     @property
     def revisoes(self):
+
+        # implementado como property, e não como GR, devido a necessidade
+        # de manter a Revisão se o Documento for excluido.
+        concret_model = None
+        for kls in reversed(self.__class__.__mro__):
+            if issubclass(kls, CMSMixin) and not kls._meta.abstract:
+                concret_model = kls
+        qs = AuditLog.objects.filter(
+            content_type=ContentType.objects.get_for_model(concret_model),
+            object_id=self.pk)
+        return qs
+
+    @property
+    def revisoes_old(self):
         # implementado como property, e não como GR, devido a necessidade
         # de manter a Revisão se o Documento for excluido.
         concret_model = None
@@ -362,7 +315,7 @@ class CMSMixin(models.Model):
     @property
     def modified(self):
         rev = self.revisoes
-        return rev.first.data
+        return rev.first().timestamp
 
     def clean(self):
         """
@@ -1195,14 +1148,12 @@ class Documento(ShortUrl, CMSMixin):
             child.delete()
 
         ultima_revisao = self.revisoes.first()
-        if not ultima_revisao:
-            ultima_revisao = Revisao.gerar_revisao(self, user)
 
         if hasattr(self, 'midia'):
             midia = self.midia
-
+            print(midia.pk)
             midia.documento = None
-            midia.revisao = ultima_revisao
+            midia.auditlog = ultima_revisao
             midia.save()
 
         for cita in self.cita.all():
@@ -1396,10 +1347,10 @@ class Midia(models.Model):
         related_name='midia',
         on_delete=PROTECT)
 
-    revisao = models.OneToOneField(
-        Revisao,
+    auditlog = models.OneToOneField(
+        AuditLog,
         blank=True, null=True, default=None,
-        verbose_name=_('Revisão'),
+        verbose_name=_('AuditLog'),
         related_name='midia',
         on_delete=PROTECT)
 

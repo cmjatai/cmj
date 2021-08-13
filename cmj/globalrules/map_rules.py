@@ -31,7 +31,7 @@ from cmj.globalrules import (RP_ADD, RP_CHANGE, RP_DELETE, RP_DETAIL, RP_LIST,
                              GROUP_MATERIA_WORKSPACE_VIEWER,
                              GROUP_DIARIOS_OPERADOR)
 from cmj.ouvidoria.models import Solicitacao, MensagemSolicitacao
-from cmj.sigad.models import Revisao, Classe, Documento, Midia
+from cmj.sigad.models import Classe, Documento, Midia
 from sapl.parlamentares.models import Partido
 from sapl.rules import SAPL_GROUP_GERAL
 from sapl.rules.map_rules import __base__
@@ -85,7 +85,6 @@ rules_group_admin = {
         (StatusProcesso, __base__),
         (ClassificacaoProcesso, __base__),
         (TopicoProcesso, __base__),
-        (Revisao, __base__),
 
     ]
 }

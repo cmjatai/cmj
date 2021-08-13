@@ -16,6 +16,8 @@ djangorestframework==3.11.2
 drf_yasg==1.17.0
 asn1crypto
 
+boto3==1.18.19
+
 billiard==3.6.3.0
 celery==4.4.2
 
@@ -32,6 +34,7 @@ dj-database-url==0.5.0
 easy-thumbnails==2.7.0
 
 gunicorn==20.0.4
+jedi==0.17.2
 kombu==4.6.8
 pdfrw
 Pillow==8.2.0
@@ -51,6 +54,7 @@ unipath==1.1
 WeasyPrint==51
 qrcode
 #html5lib==0.999999
+
 
 git+git://github.com/interlegis/django-admin-bootstrapped
 git+git://github.com/interlegis/trml2pdf.git

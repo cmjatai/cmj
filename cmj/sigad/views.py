@@ -948,14 +948,6 @@ class ClasseCreateView(ClasseParentMixin,
 
         response = super(ClasseCreateView, self).form_valid(form)
 
-        # Revisao.gerar_revisao(self.object, self.request.user)
-        """if self.object.visibilidade == Classe.STATUS_PUBLIC:
-            parents = self.object.parents
-            for p in parents:
-                p.visibilidade = Classe.STATUS_PUBLIC
-                p.save()
-                # Revisao.gerar_revisao(p, self.request.user)"""
-
         return response
 
     def get_initial(self):
@@ -986,7 +978,6 @@ class ClasseUpdateView(ClasseParentMixin,
         return UpdateView.get_initial(self)
 
     def form_valid(self, form):
-        # Revisao.gerar_revisao(form.instance, self.request.user)
         return super(ClasseUpdateView, self).form_valid(form)
 
 
@@ -1286,26 +1277,6 @@ class DocumentoDeleteView(DocumentoPermissionRequiredMixin, DeleteView):
         return reverse_lazy(
             'cmj.sigad:path_view',
             kwargs={'slug': self.object.classe.slug})
-
-    # movido para o model documento
-    """def delete_doc(self, doc):
-        # transfere  midia, caso exista, para ult rev de cada descendente
-
-        childs = doc.childs.view_childs()
-
-        for child in childs:
-            self.delete_doc(child)
-
-        ultima_revisao = doc.revisoes.first()
-        if not ultima_revisao:
-            ultima_revisao = Revisao.gerar_revisao(doc, self.request.user)
-
-        if hasattr(doc, 'midia'):
-            midia = doc.midia
-
-            midia.documento = None
-            midia.revisao = ultima_revisao
-            midia.save()"""
 
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()

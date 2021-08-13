@@ -39,7 +39,7 @@
             <div class="collapse" id="list-revisoes">
               {% for rev in object.revisoes.all %}
                   <span class="">
-                    {{rev.get_visibilidade_display}} - {{rev.data}} - {% trans "por:" %} {{rev.user.first_name|default:rev.user.email}}
+                    {{rev.get_visibilidade_display}} - {{rev.timestamp}} - {% trans "por:" %} {{rev.user.first_name|default:rev.user.email}}
                   </span>
               {% endfor %}
 

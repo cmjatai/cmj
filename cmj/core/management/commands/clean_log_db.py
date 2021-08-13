@@ -22,7 +22,8 @@ class Command(BaseCommand):
 
         self.logger = logging.getLogger(__name__)
 
-        # self.clean_task_result()
+        self.clean_task_result()
+        self.clean_audit_log()
 
         self.count_registers(full=False)
 
@@ -43,3 +44,6 @@ class Command(BaseCommand):
         data = timezone.localtime() - timedelta(days=5)
         objs = TaskResult.objects.filter(
             date_done__lt=data).order_by('-date_done').delete()
+
+    def clean_audit_log(self):
+        pass

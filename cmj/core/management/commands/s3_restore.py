@@ -3,7 +3,6 @@ import logging
 import os
 from time import sleep
 
-import boto3
 from django.apps import apps
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -13,6 +12,7 @@ from django.db.models.signals import post_delete, post_save, pre_save
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
+import boto3
 from cmj.signals import Manutencao
 from sapl.norma.models import NormaJuridica
 from sapl.utils import hash_sha512

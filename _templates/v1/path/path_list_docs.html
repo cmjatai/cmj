@@ -37,7 +37,7 @@
               {{documento.public_date|date:"d"}} {% trans "de" %} {{documento.public_date|date:"F"}} {% trans "de" %} {{documento.public_date|date:"Y"}}
             {% else%}
               {% with documento.revisoes.first as rev %}
-                {{rev.get_visibilidade_display}} - {{rev.data}} - {% trans "por:" %} {{rev.user.first_name|default:rev.user.email}}
+                {{rev.get_visibilidade_display}} - {{rev.timestamp}} - {% trans "por:" %} {{rev.user.first_name|default:rev.user.email}}
               {% endwith %}
             {% endif %}
 
@@ -139,5 +139,5 @@
     </div>
   {% endif %}
 
-  
+
 {% endfor %}

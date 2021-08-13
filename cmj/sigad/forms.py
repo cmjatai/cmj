@@ -1,17 +1,14 @@
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Fieldset
 from django import forms
-from django.db.models import Q
 from django.forms import widgets
 from django.forms.models import ModelForm, ModelMultipleChoiceField
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from cmj.sigad import models
-from cmj.sigad.models import Classe, Documento, Revisao, CaixaPublicacao,\
-    CLASSE_DOC_MANAGER_CHOICE, CaixaPublicacaoClasse,\
-    CaixaPublicacaoRelationship
-from cmj.sigad.templatetags.sigad_filters import caixa_publicacao
+from cmj.sigad.models import Classe, Documento, CaixaPublicacaoRelationship,\
+    CaixaPublicacaoClasse
 from cmj.utils import YES_NO_CHOICES
 from sapl.crispy_layout_mixin import to_row, SaplFormLayout
 from sapl.materia.models import MateriaLegislativa

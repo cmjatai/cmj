@@ -218,10 +218,26 @@ class AuditLogManager(models.Manager):
 
 
 class AuditLog(models.Model):
-
     objects = AuditLogManager()
 
+    STATUS_PRIVATE = 99
+    STATUS_RESTRICT_PERMISSION = 2
+    STATUS_RESTRICT_USER = 1
+    STATUS_PUBLIC = 0
+
+    VISIBILIDADE_STATUS = (
+        (STATUS_RESTRICT_PERMISSION, _('Restrição por Permissão')),
+        (STATUS_RESTRICT_USER, _('Restrição por Usuário')),
+        (STATUS_PRIVATE, _('Privado')),
+        (STATUS_PUBLIC, _('Público')),
+    )
+
     operation_choice = ('C', 'D', 'U')
+
+    visibilidade = models.IntegerField(
+        _('Visibilidade'),
+        choices=VISIBILIDADE_STATUS,
+        blank=True, null=True, default=None)
 
     user = models.ForeignKey(
         get_settings_auth_user_model(),
