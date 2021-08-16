@@ -871,8 +871,10 @@ class TramitacaoUpdateForm(TramitacaoForm):
         ant_tram_principal = Tramitacao.objects.get(id=self.instance.id)
         nova_tram_principal = super(TramitacaoUpdateForm, self).save(commit)
         materia = nova_tram_principal.materia
-        materia.em_tramitacao = False if nova_tram_principal.status.indicador == "F" else True
-        materia.save()
+
+        if materia.em_tramitacao != (False if nova_tram_principal.status.indicador == "F" else True):
+            materia.em_tramitacao = False if nova_tram_principal.status.indicador == "F" else True
+            materia.save()
 
         tramitar_anexadas = sapl.base.models.AppConfig.attr(
             'tramitacao_materia')

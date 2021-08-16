@@ -1523,8 +1523,7 @@ class TramitacaoCrud(MasterDetailCrud):
                                     'de matéria não enviado. Há problemas na configuração '
                                     'do e-mail.')
                 messages.add_message(self.request, messages.WARNING, msg)
-                return HttpResponseRedirect(self.get_success_url())
-            return super().form_valid(form)
+            return HttpResponseRedirect(self.get_success_url())
 
     class ListView(MasterDetailCrud.ListView):
         paginate_by = None
