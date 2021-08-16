@@ -34,18 +34,18 @@
           <li><a>Licitações</a>
             <ul>
               <li><a href="/doc?tipo=187&o=&tramitacaoadministrativo__status=12">Em Andamento</a></li>
-              <li><a href="/doc?tipo=187&o=&tramitacaoadministrativo__status=13">Com Contratos Assinados</a></li>
               <li><a href="/doc?tipo=187&o=&tramitacaoadministrativo__status=14">Encerradas</a></li>
-              <li><a href="/doc?tipo=187&o=&tramitacaoadministrativo__status=15">Canceladas</a></li>
             </ul>
           </li>
 
           <li><a>Contratos</a>
             <ul>
-              <li><a href="/doc?tipo=189">Credenciamentos da Imprensa</a></li>
               <li><a href="/doc?data_vencimento_0={% now "d/m/Y" %}">Contratos Em Vigência</a></li>
-              <li><a href="/doc?data_vencimento_0={% now "d/m/Y" %}&data_vencimento_1={{""|timedelta_filter:90|date:"d/m/Y"}}" title="Contratos a vencer nos próximos 90 dias.">Contratos a Vencer</a></li>
+              {% comment %}
+                <li><a href="/doc?data_vencimento_0={% now "d/m/Y" %}&data_vencimento_1={{""|timedelta_filter:90|date:"d/m/Y"}}" title="Contratos a vencer nos próximos 90 dias.">Contratos a Vencer</a></li>
+              {% endcomment %}
               <li><a href="/doc?data_vencimento_1={% now "d/m/Y" %}">Contratos Encerrados</a></li>
+              <li><a href="/doc?tipo=189">Credenciamentos da Imprensa</a></li>
             </ul>
           </li>
 
@@ -56,13 +56,9 @@
               <li><a href="/doc?tipo=193&o=">Edital de Pregão Presencial</a></li>
               <li><a href="/doc?tipo=182&o=">Balancetes Contábeis</a></li>
               <li><a href="/doc?tipo=185&o=">Relatórios de Gestão Fiscal</a></li>
-              <li><a href="/doc?tipo=233&o=">Comissões Parlamentares de Inquérito</a></li>
             </ul>
           </li>
-
         </ul>
-
-
       </div>
     </div>
     <div class="box box-materia">
