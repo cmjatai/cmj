@@ -558,7 +558,7 @@ class TramitacaoAdministrativo(models.Model):
     status = models.ForeignKey(
         StatusTramitacaoAdministrativo,
         on_delete=models.PROTECT,
-        verbose_name=_('Status'))
+        verbose_name=_('Status'),)
     documento = models.ForeignKey(DocumentoAdministrativo,
                                   on_delete=models.PROTECT)
     timestamp = models.DateTimeField(default=timezone.now)

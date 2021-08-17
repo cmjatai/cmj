@@ -17,11 +17,13 @@ from cmj.diarios.models import DiarioOficial
 from cmj.signals import Manutencao
 from sapl.compilacao.models import Dispositivo, TextoArticulado,\
     TipoDispositivo
-from sapl.materia.models import MateriaLegislativa, DocumentoAcessorio
+from sapl.materia.models import MateriaLegislativa, DocumentoAcessorio,\
+    Tramitacao
 from sapl.norma.models import NormaJuridica
 from sapl.protocoloadm.forms import pega_ultima_tramitacao_adm
 from sapl.protocoloadm.models import DocumentoAdministrativo, Protocolo,\
-    DocumentoAcessorioAdministrativo, TramitacaoAdministrativo
+    DocumentoAcessorioAdministrativo, TramitacaoAdministrativo,\
+    StatusTramitacaoAdministrativo
 from sapl.sessao.models import SessaoPlenaria
 
 
@@ -82,26 +84,15 @@ class Command(BaseCommand):
         #    reset_id_model(AuditLog)
 
     def organiza_docs_adms(self):
-        """DocumentoAdministrativo.objects.filter(
-            workspace_id=22
-        ).exclude(
-            id=7618
-        ).update(tramitacao=False)
-
-        return"""
-
-        #ts = TramitacaoAdministrativo.objects.filter(status_id=13)
-
-        # print(ts.count())
-        # ts.delete()
-        # return
-
+        print('organiza_docs_adms')
         for d in DocumentoAdministrativo.objects.filter(
                 workspace_id=22,
-                tipo_id=189, ano=2011
-        ).order_by('-id'):
-
-            print(d.id, d.data, d.data_vencimento, d)
+                # tramitacaoadministrativo__isnull=True,
+                # anexo_de__isnull=True,
+                # anexados__isnull=False,
+                id=5346
+        ).distinct().order_by('-id'):
+            print(d.id, d)
 
     def vincular_materia_norma(self):
 

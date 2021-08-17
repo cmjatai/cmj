@@ -176,7 +176,7 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
         label=_('Interessado'),
         lookup_expr='icontains')
 
-    o = DocumentoAdministrativoOrderingFilter(help_text='')
+    o = DocumentoAdministrativoOrderingFilter(label='Ordenação', help_text='')
 
     numero = django_filters.NumberFilter(
         label=_('Número'),
@@ -215,7 +215,7 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
             workspace=workspace)
 
         self.filters['tas'].queryset = StatusTramitacaoAdministrativo.objects.filter(
-            workspace=workspace)
+            workspace=workspace).order_by('descricao')
 
         local_atual = 'tramitacaoadministrativo__unidade_tramitacao_destino'
         self.filters['tipo'].label = 'Tipo de Documento'
