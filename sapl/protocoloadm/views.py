@@ -159,7 +159,8 @@ class StatusTramitacaoAdministrativoCrud(CrudSemSubNavMixin):
     container_field = 'workspace__operadores'
 
     class BaseMixin(Crud.BaseMixin):
-        list_field_names = ['sigla', 'indicador', 'descricao']
+        list_field_names = ['sigla', 'indicador',
+                            'descricao', 'descricao_plural']
 
     class ListView(Crud.ListView):
         ordering = 'sigla'
@@ -450,7 +451,7 @@ class DocumentoAdministrativoCrud(Crud):
             kwargs = super().get_filterset_kwargs(filterset_class)
 
             status_tramitacao = kwargs['request'].GET.get(
-                'tramitacaoadministrativo__status')
+                'tas')
             unidade_destino = kwargs['request'].GET.get(
                 'tramitacaoadministrativo__unidade_tramitacao_destino')
 
@@ -497,8 +498,7 @@ class DocumentoAdministrativoCrud(Crud):
                 page_obj = context['page_obj']
                 context['page_range'] = make_pagination(
                     page_obj.number, paginator.num_pages)
-            context['title'] = _(
-                'Pesquisa de Documentos Administrativos')
+            context['title'] = self.titulo()
             context['bg_title'] = 'bg-aqua text-white'
 
             mostrar_anexos = self.request.GET.get('mostrar_anexos', '0')
@@ -547,6 +547,37 @@ class DocumentoAdministrativoCrud(Crud):
                 return relatorio_doc_administrativos(request, context)
             else:
                 return self.render_to_response(context)
+
+        def titulo(self):
+            data = self.filterset.data
+
+            t = _('Documentos administrativos')
+
+            try:
+                if 'tas' in data and data['tas']:
+                    status = StatusTramitacaoAdministrativo.objects.get(
+                        pk=data['tas'])
+                    t = status.descricao_plural if status.descricao_plural else status.descricao
+
+                if 'ano' in data and data['ano']:
+                    t += f' em {data["ano"]}'
+
+                if 'data_vencimento_0' in data and data['data_vencimento_0']:
+                    if 'data_vencimento_1' in data and data['data_vencimento_1']:
+                        t += f' com vencimento entre {data["data_vencimento_0"]} e {data["data_vencimento_1"]} '
+                    else:
+                        t += f' com vencimento a partir de {data["data_vencimento_0"]}'
+                else:
+                    if 'data_vencimento_1' in data and data['data_vencimento_1']:
+                        t += f' com vencimento até {data["data_vencimento_1"]}'
+
+            except:
+                pass
+
+            if not len(data):
+                t = _('Pesquisa de Documentos Administrativos')
+
+            return t
 
 
 class DocumentoAcessorioAdministrativoCrud(MasterDetailCrud):

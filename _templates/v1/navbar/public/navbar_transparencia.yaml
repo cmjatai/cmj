@@ -23,9 +23,9 @@
   - title: {% trans 'Licitações' %}
     url: ''
   - title: {% trans 'Em Andamento' %}
-    url: /doc?tipo=187&o=&tramitacaoadministrativo__status=12
+    url: /doc?tipo=187&o=&tas=12
   - title: {% trans 'Encerradas' %}
-    url: /doc?tipo=187&o=&tramitacaoadministrativo__status=14
+    url: /doc?tipo=187&o=&tas=14
   - title: ''
     url: ''
   - title: {% trans 'Contratos' %}

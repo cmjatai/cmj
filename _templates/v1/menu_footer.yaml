@@ -112,23 +112,31 @@
   children:
   - title: Últimas Publicações
     url: /doc?o=
-  - title: Licitações e Contratos
+  - title: Licitações
     url: ''
     css_class: head_title
     children:
     - title: Licitações em Andamento
-      url: /doc?tipo=187&o=&tramitacaoadministrativo__status=12
+      url: /doc?tipo=187&o=&tas=12
+    - title: Licitações Encerradas
+      url: /doc?tipo=187&o=&tas=14
+  - title: Contratos
+    url: ''
+    css_class: head_title
+    children:
     - title: Contratos em Vigência
       url: /doc?data_vencimento_0={% now "d/m/Y" %}
     - title: Contratos Encerrados
       url: /doc?data_vencimento_1={% now "d/m/Y" %}
-    - title: {% trans 'Transparência' %}
-      url: ''
-      css_class: head_title
-      children:
-      - title: Lei de Acesso à Informação
-        url: http://camaradejatai.sigepnet.com.br/index.php?portal=2
-      - title: Portal da Transparência
-        url: http://camaradejatai.sigepnet.com.br/transparencia/?portal=1
-      - title: Servidores
-        url: http://camaradejatai.sigepnet.com.br/index.php?portal=3
+    - title: {% trans 'Credenciamentos da Imprensa' %}
+      url: /doc?tipo=189
+  - title: {% trans 'Transparência' %}
+    url: ''
+    css_class: head_title
+    children:
+    - title: Lei de Acesso à Informação
+      url: http://camaradejatai.sigepnet.com.br/index.php?portal=2
+    - title: Portal da Transparência
+      url: http://camaradejatai.sigepnet.com.br/transparencia/?portal=1
+    - title: Servidores
+      url: http://camaradejatai.sigepnet.com.br/index.php?portal=3

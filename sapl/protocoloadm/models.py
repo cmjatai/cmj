@@ -536,6 +536,8 @@ class StatusTramitacaoAdministrativo(models.Model):
 
     sigla = models.CharField(max_length=10, verbose_name=_('Sigla'))
     descricao = models.CharField(max_length=60, verbose_name=_('Descrição'))
+    descricao_plural = models.CharField(
+        max_length=60, verbose_name=_('Descrição no plural'), default='')
     # TODO make specific migration considering both ind_fim_tramitacao,
     # ind_retorno_tramitacao
     indicador = models.CharField(

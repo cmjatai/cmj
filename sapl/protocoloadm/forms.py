@@ -190,6 +190,11 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
         initial=False
     )
 
+    tas = django_filters.ModelChoiceFilter(
+        queryset=StatusTramitacaoAdministrativo.objects.all(),
+        field_name='tramitacaoadministrativo__status'
+    )
+
     class Meta(FilterOverridesMetaMixin):
         model = DocumentoAdministrativo
         fields = ['tipo',
@@ -199,7 +204,7 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
                   'data',
                   'data_vencimento',
                   'tramitacaoadministrativo__unidade_tramitacao_destino',
-                  'tramitacaoadministrativo__status']
+                  'tas']
 
     def __init__(self, *args, **kwargs):
         workspace = kwargs.pop('workspace')
@@ -209,40 +214,50 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
         self.filters['tipo'].queryset = TipoDocumentoAdministrativo.objects.filter(
             workspace=workspace)
 
-        self.filters['tramitacaoadministrativo__status'].queryset = StatusTramitacaoAdministrativo.objects.filter(
+        self.filters['tas'].queryset = StatusTramitacaoAdministrativo.objects.filter(
             workspace=workspace)
 
         local_atual = 'tramitacaoadministrativo__unidade_tramitacao_destino'
         self.filters['tipo'].label = 'Tipo de Documento'
         self.filters['protocolo__numero'].label = 'Núm. Protocolo'
-        self.filters['tramitacaoadministrativo__status'].label = 'Situação'
+        self.filters['tas'].label = 'Situação'
         self.filters[local_atual].label = 'Localização Atual'
         self.form.fields['data_vencimento'].help_text = 'Ao Informar um periodo de vencimento, o campo ordenação se torna irrelevante.'
 
         row1 = to_row(
-            [('tipo', 5),
-             ('o', 3),
-             ('data_vencimento', 4), ])
+            [
+                ('tipo', 4),
+                ('tas', 4),
+                ('ano', 2),
+                ('numero', 2),
+            ]
+        )
 
         row2 = to_row(
-            [('numero', 2),
-             ('ano', 2),
-             ('protocolo__numero', 2),
-             ('numero_externo', 2),
-             ('data', 4)])
+            [
+                ('mostrar_anexos', 2),
+                ('tramitacao', 2),
+                ('data', 4),
+                ('data_vencimento', 4),
+            ]
+        )
 
         row3 = to_row(
-            [('interessado', 4),
-             ('assunto', 3),
-             ('signeds', 3),
-             ('mostrar_anexos', 2)])
+            [
+                ('assunto', 3),
+                ('interessado', 3),
+                ('signeds', 3),
+                ('o', 3),
+            ]
+        )
 
         row4 = to_row(
             [
-                ('tramitacao', 2),
-                ('tramitacaoadministrativo__status', 4),
+                ('numero_externo', 2),
+                ('protocolo__numero', 2),
                 ('tramitacaoadministrativo__unidade_tramitacao_destino', 6),
-            ])
+            ]
+        )
 
         """            *[
                 HTML('''
@@ -259,6 +274,12 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
             css_class='form-group row justify-content-between',
         )
 
+        fields = [row1, row2, row3, ]
+
+        if workspace.tipo != 99:
+            fields += row4
+        fields += buttons
+
         self.form.helper = SaplFormHelper()
         self.form.helper.form_method = 'GET'
         self.form.helper.layout = Layout(
@@ -266,9 +287,7 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
                 '''Pesquisar Documentos<br>
                 <small>
                 <strong class="text-red">TODOS OS CAMPOS SÃO OPCIONAIS!</strong>'''),
-                row1, row2,
-                row3, row4,
-                buttons,)
+                *fields)
         )
 
         self.form.fields['mostrar_anexos'] = self.mostrar_anexos

@@ -37,7 +37,8 @@ DocumentoAcessorioAdministrativo:
 
 StatusTramitacaoAdministrativo:
   {% trans 'Status Tramitação Administrativo' %}:
-  - indicador:3  sigla:2  descricao
+  - indicador:3  sigla:2
+  - descricao descricao_plural
 
 TramitacaoAdministrativo:
   {% trans 'Tramitação' %}:
