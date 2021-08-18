@@ -192,7 +192,8 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
 
     tas = django_filters.ModelChoiceFilter(
         queryset=StatusTramitacaoAdministrativo.objects.all(),
-        field_name='tramitacaoadministrativo__status'
+        field_name='tramitacaoadministrativo__status',
+        empty_label='Todos documentos publicados'
     )
 
     class Meta(FilterOverridesMetaMixin):
@@ -212,22 +213,24 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
         super(DocumentoAdministrativoFilterSet, self).__init__(*args, **kwargs)
 
         self.filters['tipo'].queryset = TipoDocumentoAdministrativo.objects.filter(
-            workspace=workspace)
+            workspace=workspace).order_by('-prioridade', 'descricao')
 
         self.filters['tas'].queryset = StatusTramitacaoAdministrativo.objects.filter(
-            workspace=workspace).order_by('descricao')
+            workspace=workspace, filtro=True).order_by('descricao')
 
         local_atual = 'tramitacaoadministrativo__unidade_tramitacao_destino'
         self.filters['tipo'].label = 'Tipo de Documento'
         self.filters['protocolo__numero'].label = 'Núm. Protocolo'
-        self.filters['tas'].label = 'Situação'
+        self.filters['tas'].label = 'Status de Processos'
         self.filters[local_atual].label = 'Localização Atual'
-        self.form.fields['data_vencimento'].help_text = 'Ao Informar um periodo de vencimento, o campo ordenação se torna irrelevante.'
+        self.form.fields[
+            'data_vencimento'
+        ].help_text = 'Ao informar um período de vencimento, o campo ordenação se torna irrelevante.'
 
         row1 = to_row(
             [
-                ('tipo', 4),
                 ('tas', 4),
+                ('tipo', 4),
                 ('ano', 2),
                 ('numero', 2),
             ]

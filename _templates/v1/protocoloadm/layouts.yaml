@@ -1,7 +1,7 @@
 {% load i18n %}
 TipoDocumentoAdministrativo:
   {% trans 'Tipo Documento Administrativo' %}:
-  - sigla:4  descricao
+  -  prioridade:3 sigla:3 descricao
 
 DocumentoAdministrativo:
   {% trans 'Identificação Básica' %}:
@@ -37,7 +37,7 @@ DocumentoAcessorioAdministrativo:
 
 StatusTramitacaoAdministrativo:
   {% trans 'Status Tramitação Administrativo' %}:
-  - indicador:3  sigla:2
+  - indicador:3 sigla:2 filtro:2
   - descricao descricao_plural
 
 TramitacaoAdministrativo:

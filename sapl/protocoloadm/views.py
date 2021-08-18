@@ -440,7 +440,7 @@ class DocumentoAdministrativoCrud(Crud):
 
     class ListView(QuerySetContainerPrivPubMixin, FilterView):
         filterset_class = DocumentoAdministrativoFilterSet
-        paginate_by = 10
+        paginate_by = 30
         permission_required = ('protocoloadm.list_documentoadministrativo',)
 
         @classmethod

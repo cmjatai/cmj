@@ -85,14 +85,45 @@ class Command(BaseCommand):
 
     def organiza_docs_adms(self):
         print('organiza_docs_adms')
-        for d in DocumentoAdministrativo.objects.filter(
-                workspace_id=22,
-                # tramitacaoadministrativo__isnull=True,
-                # anexo_de__isnull=True,
-                # anexados__isnull=False,
-                id=5346
-        ).distinct().order_by('-id'):
-            print(d.id, d)
+
+        docs = DocumentoAdministrativo.objects.filter(
+            workspace_id=22,
+            tramitacaoadministrativo__isnull=True,
+            anexo_de__isnull=True,
+            # anexados__isnull=False,
+            # id=7909,
+        ).distinct().order_by('-id')
+
+        print(docs.count())
+
+        for d in docs:
+
+            anexo = d.anexados.order_by('id').first()
+
+            if not anexo:
+                continue
+
+            if anexo.tipo_id == 197:
+                gerar = True
+                if gerar:
+                    t = TramitacaoAdministrativo()
+                    t.status_id = 15
+                    t.documento_id = d.id
+                    if anexo.certidao:
+                        t.timestamp = anexo.certidao.created
+                        t.data_tramitacao = anexo.certidao.created
+                    else:
+                        t.timestamp = anexo.data
+                        t.data_tramitacao = anexo.data
+
+                    t.unidade_tramitacao_local_id = 3
+                    t.unidade_tramitacao_destino_id = 3
+                    t.texto = f'Publicação da {anexo}'
+                    t.user_id = 1
+                    t.ip = '10.3.163.200'
+                    t.save()
+
+            print(d.id, anexo)
 
     def vincular_materia_norma(self):
 

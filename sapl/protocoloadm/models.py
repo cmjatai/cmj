@@ -31,6 +31,9 @@ class TipoDocumentoAdministrativo(models.Model):
     sigla = models.CharField(max_length=5, verbose_name=_('Sigla'))
     descricao = models.CharField(max_length=100, verbose_name=_('Descrição'))
 
+    prioridade = models.BooleanField(
+        default=False, verbose_name=_('Prioridade'))
+
     workspace = models.ForeignKey(
         AreaTrabalho,
         verbose_name=_('Área de Trabalho'),
@@ -543,6 +546,10 @@ class StatusTramitacaoAdministrativo(models.Model):
     indicador = models.CharField(
         max_length=1, verbose_name=_('Indicador da Tramitação'),
         choices=INDICADOR_CHOICES)
+
+    filtro = models.BooleanField(verbose_name=_('Filtro ?'),
+                                 choices=YES_NO_CHOICES,
+                                 default=True)
 
     class Meta:
         verbose_name = _('Status de Tramitação de Documentos Administrativos')
