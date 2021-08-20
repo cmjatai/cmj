@@ -33,7 +33,6 @@ import django_filters
 from easy_thumbnails import source_generators
 from floppyforms import ClearableFileInput
 import magic
-from reversion_compare.admin import CompareVersionAdmin
 from unipath.path import Path
 import weasyprint
 
@@ -352,13 +351,8 @@ def register_all_models_in_admin(module_name, exclude_list=[]):
     appname = appname[1] if appname[0] == 'sapl' else appname[0]
     app = apps.get_app_config(appname)
     for model in app.get_models():
-
-        class CustomModelAdmin(CompareVersionAdmin):
-            list_display = [f.name for f in model._meta.fields
-                            if f.name != 'id' and f.name not in exclude_list]
-
         if not admin.site.is_registered(model):
-            admin.site.register(model, CustomModelAdmin)
+            admin.site.register(model)
 
 
 def xstr(s):

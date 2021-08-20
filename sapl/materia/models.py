@@ -12,7 +12,6 @@ from django.template import defaultfilters
 from django.utils import formats, timezone
 from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices
-import reversion
 
 from cmj.core.models import CertidaoPublicacao
 from cmj.diarios.models import VinculoDocDiarioOficial, DiarioOficial
@@ -41,7 +40,7 @@ def grupo_autor():
     return grupo.id
 
 
-@reversion.register()
+
 class TipoProposicao(models.Model):
     descricao = models.CharField(
         max_length=50,
@@ -126,7 +125,7 @@ class TipoMateriaManager(models.Manager):
         )
 
 
-@reversion.register()
+
 class TipoMateriaLegislativa(models.Model):
     objects = TipoMateriaManager()
     sigla = models.CharField(max_length=5, verbose_name=_('Sigla'))
@@ -170,7 +169,7 @@ class TipoMateriaLegislativa(models.Model):
         return self.descricao
 
 
-@reversion.register()
+
 class RegimeTramitacao(models.Model):
     descricao = models.CharField(max_length=50, verbose_name=_('Descrição'))
 
@@ -182,7 +181,7 @@ class RegimeTramitacao(models.Model):
         return self.descricao
 
 
-@reversion.register()
+
 class Origem(models.Model):
     sigla = models.CharField(max_length=10, verbose_name=_('Sigla'))
     nome = models.CharField(max_length=50, verbose_name=_('Nome'))
@@ -229,7 +228,7 @@ class MateriaLegislativaManager(models.Manager):
         )
 
 
-@reversion.register()
+
 class MateriaLegislativa(CommonMixin):
 
     objects = MateriaLegislativaManager()
@@ -501,7 +500,7 @@ class MateriaLegislativa(CommonMixin):
         return ''
 
 
-@reversion.register()
+
 class Autoria(models.Model):
     autor = models.ForeignKey(Autor,
                               verbose_name=_('Autor'),
@@ -524,7 +523,7 @@ class Autoria(models.Model):
             'autor': self.autor, 'materia': self.materia}
 
 
-@reversion.register()
+
 class AcompanhamentoMateria(models.Model):
     usuario = models.CharField(max_length=50)
     materia = models.ForeignKey(MateriaLegislativa, on_delete=models.CASCADE)
@@ -552,7 +551,7 @@ class AcompanhamentoMateria(models.Model):
             }
 
 
-@reversion.register()
+
 class PautaReuniao(models.Model):
     reuniao = models.ForeignKey(
         Reuniao, related_name='reuniao_set',
@@ -576,7 +575,7 @@ class PautaReuniao(models.Model):
         }
 
 
-@reversion.register()
+
 class Anexada(models.Model):
     materia_principal = models.ForeignKey(
         MateriaLegislativa, related_name='materia_principal_set',
@@ -601,7 +600,7 @@ class Anexada(models.Model):
             'materia_anexada': self.materia_anexada}
 
 
-@reversion.register()
+
 class AssuntoMateria(models.Model):
     assunto = models.CharField(
         max_length=50,
@@ -619,7 +618,7 @@ class AssuntoMateria(models.Model):
         return self.assunto
 
 
-@reversion.register()
+
 class DespachoInicial(models.Model):
     materia = models.ForeignKey(
         MateriaLegislativa, related_name="despachoinicial_set", on_delete=models.CASCADE)
@@ -636,7 +635,7 @@ class DespachoInicial(models.Model):
             'comissao': self.comissao}
 
 
-@reversion.register()
+
 class TipoDocumento(models.Model):
     descricao = models.CharField(
         max_length=50, verbose_name=_('Tipo Documento'))
@@ -657,7 +656,7 @@ class TipoDocumento(models.Model):
         return self.descricao
 
 
-@reversion.register()
+
 class DocumentoAcessorio(CommonMixin):
     FIELDFILE_NAME = ('arquivo', )
 
@@ -776,7 +775,7 @@ class DocumentoAcessorio(CommonMixin):
                                  update_fields=update_fields)
 
 
-@reversion.register()
+
 class MateriaAssunto(models.Model):
     # TODO M2M ??
     assunto = models.ForeignKey(
@@ -797,7 +796,7 @@ class MateriaAssunto(models.Model):
             'materia': self.materia, 'assunto': self.assunto}
 
 
-@reversion.register()
+
 class Numeracao(models.Model):
     materia = models.ForeignKey(MateriaLegislativa, on_delete=models.CASCADE)
     tipo_materia = models.ForeignKey(
@@ -825,7 +824,7 @@ class Numeracao(models.Model):
             'ano': self.ano_materia}
 
 
-@reversion.register()
+
 class Orgao(models.Model):
     nome = models.CharField(max_length=60, verbose_name=_('Nome'))
     sigla = models.CharField(max_length=10, verbose_name=_('Sigla'))
@@ -855,7 +854,7 @@ class Orgao(models.Model):
             '%(nome)s - %(sigla)s') % {'nome': self.nome, 'sigla': self.sigla}
 
 
-@reversion.register()
+
 class TipoFimRelatoria(models.Model):
     descricao = models.CharField(
         max_length=50, verbose_name=_('Tipo Fim Relatoria'))
@@ -868,7 +867,7 @@ class TipoFimRelatoria(models.Model):
         return self.descricao
 
 
-@reversion.register()
+
 class Relatoria(models.Model):
     materia = models.ForeignKey(MateriaLegislativa, on_delete=models.CASCADE)
     parlamentar = models.ForeignKey(Parlamentar,
@@ -904,7 +903,7 @@ class Relatoria(models.Model):
                 'data': self.data_designacao_relator.strftime("%d/%m/%Y")}
 
 
-@reversion.register()
+
 class Parecer(models.Model):
     relatoria = models.ForeignKey(Relatoria, on_delete=models.CASCADE)
     materia = models.ForeignKey(MateriaLegislativa, on_delete=models.CASCADE)
@@ -923,7 +922,7 @@ class Parecer(models.Model):
         }
 
 
-@reversion.register()
+
 class Proposicao(CommonMixin):
 
     FIELDFILE_NAME = ('texto_original', )
@@ -1132,7 +1131,7 @@ class Proposicao(CommonMixin):
                                  update_fields=update_fields)
 
 
-@reversion.register()
+
 class StatusTramitacao(models.Model):
     INDICADOR_CHOICES = Choices(('F', 'fim', _('Fim')),
                                 ('R', 'retorno', _('Retorno')))
@@ -1168,7 +1167,7 @@ class UnidadeTramitacaoManager(models.Manager):
         ).order_by('nome_composto')
 
 
-@reversion.register()
+
 class UnidadeTramitacao(models.Model):
     comissao = models.ForeignKey(
         Comissao, blank=True, null=True,
@@ -1212,7 +1211,7 @@ class UnidadeTramitacao(models.Model):
             return _('%(parlamentar)s') % {'parlamentar': self.parlamentar}
 
 
-@reversion.register()
+
 class Tramitacao(models.Model):
     TURNO_CHOICES = Choices(
         ('P', 'primeiro', _('Primeiro')),

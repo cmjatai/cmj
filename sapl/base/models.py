@@ -5,7 +5,6 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models.deletion import CASCADE, PROTECT
 from django.utils.translation import ugettext_lazy as _
-import reversion
 
 from cmj.mixins import CmjAuditoriaModelMixin
 from cmj.utils import get_settings_auth_user_model
@@ -34,7 +33,6 @@ ASSINATURA_ATA_CHOICES = (
 )
 
 
-@reversion.register()
 class CasaLegislativa(models.Model):
     FIELDFILE_NAME = ('logotipo', )
 
@@ -79,7 +77,6 @@ class CasaLegislativa(models.Model):
             'municipio': self.municipio}
 
 
-@reversion.register()
 class AppConfig(models.Model):
 
     POLITICA_PROTOCOLO_CHOICES = (
@@ -185,7 +182,6 @@ class AppConfig(models.Model):
             'id': self.id}
 
 
-@reversion.register()
 class TipoAutor(models.Model):
     descricao = models.CharField(
         max_length=50, verbose_name=_('Descrição'),
@@ -207,7 +203,6 @@ class TipoAutor(models.Model):
         return self.descricao
 
 
-@reversion.register()
 class Autor(models.Model):
 
     operadores = models.ManyToManyField(

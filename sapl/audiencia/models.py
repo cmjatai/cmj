@@ -4,7 +4,6 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices
-import reversion
 
 from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import (CargoMesa, Parlamentar)
@@ -31,7 +30,7 @@ def anexo_upload_path(instance, filename):
         instance, filename, subpath='anexo', pk_first=True)
 
 
-@reversion.register()
+
 class TipoAudienciaPublica(models.Model):
     TIPO_AUDIENCIA_CHOICES = Choices(('A', 'audiencia', _('Audiência Pública')),
                                      ('P', 'plebiscito', _('Plebiscito')),
@@ -52,7 +51,7 @@ class TipoAudienciaPublica(models.Model):
         return self.nome
 
 
-@reversion.register()
+
 class AudienciaPublica(models.Model):
 
     FIELDFILE_NAME = ('upload_pauta', 'upload_ata', 'upload_anexo')
@@ -163,7 +162,7 @@ class AudienciaPublica(models.Model):
                                  update_fields=update_fields)
 
 
-@reversion.register()
+
 class AnexoAudienciaPublica(models.Model):
 
     FIELDFILE_NAME = ('arquivo', )

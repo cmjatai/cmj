@@ -1,10 +1,10 @@
-import reversion
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
-from sapl.utils import YES_NO_CHOICES
 from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
 
-@reversion.register()
+from sapl.utils import YES_NO_CHOICES
+
+
 class Painel(models.Model):
     PAINEL_TYPES = (
         ('C', 'Completo'),
@@ -22,7 +22,6 @@ class Painel(models.Model):
         return str(self.aberto) + ":" + self.data_painel.strftime("%d/%m/%Y")
 
 
-@reversion.register()
 class Cronometro(models.Model):
 
     CRONOMETRO_STATUS = (
@@ -49,12 +48,12 @@ class Cronometro(models.Model):
         verbose_name=_('Duração do cronômetro'))
 
     tipo = models.CharField(
-        max_length=100, 
-        verbose_name=_('Tipo Cronômetro'), 
+        max_length=100,
+        verbose_name=_('Tipo Cronômetro'),
         unique=True)
 
     ativo = models.BooleanField(
-        default=False, 
+        default=False,
         choices=YES_NO_CHOICES,
         verbose_name=_('Ativo?'))
 
@@ -72,11 +71,11 @@ class Cronometro(models.Model):
         return self.tipo
 
 
-@reversion.register()
 class PainelConfig(models.Model):
 
     cronometro_ordem = models.BooleanField(
-        verbose_name=_('Cronômetro da Questão de Ordem deve travar os demais?'),
+        verbose_name=_(
+            'Cronômetro da Questão de Ordem deve travar os demais?'),
         choices=YES_NO_CHOICES, default=True)
 
     disparo_cronometro = models.BooleanField(
@@ -84,13 +83,15 @@ class PainelConfig(models.Model):
         choices=YES_NO_CHOICES, default=True)
 
     tempo_disparo_antecedencia = models.DurationField(
-        verbose_name=_('Cronômetros devem disparar com quanto tempo de antecedência?'),
+        verbose_name=_(
+            'Cronômetros devem disparar com quanto tempo de antecedência?'),
         default="00:00:30",
         blank=True,
         null=True)
 
     tempo_disparo_termino = models.DurationField(
-        verbose_name=_('Cronômetros devem permanecer tocando por quanto tempo ao término?'),
+        verbose_name=_(
+            'Cronômetros devem permanecer tocando por quanto tempo ao término?'),
         default="00:00:05",
         blank=True,
         null=True)
@@ -100,7 +101,7 @@ class PainelConfig(models.Model):
         choices=YES_NO_CHOICES, default=True)
 
     mostrar_votos_antecedencia = models.BooleanField(
-        default=False, 
+        default=False,
         choices=YES_NO_CHOICES,
         verbose_name=_('Mostrar votos informados antes do fim da votação?'))
 

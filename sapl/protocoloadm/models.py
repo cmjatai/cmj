@@ -12,7 +12,6 @@ from django.urls.base import reverse
 from django.utils import timezone, formats
 from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices
-import reversion
 
 from cmj.core.models import AreaTrabalho, CertidaoPublicacao
 from cmj.diarios.models import VinculoDocDiarioOficial, DiarioOficial
@@ -26,7 +25,6 @@ from sapl.utils import (RANGE_ANOS, YES_NO_CHOICES, texto_upload_path,
                         SaplGenericForeignKey)
 
 
-@reversion.register()
 class TipoDocumentoAdministrativo(models.Model):
     sigla = models.CharField(max_length=5, verbose_name=_('Sigla'))
     descricao = models.CharField(max_length=100, verbose_name=_('Descrição'))
@@ -74,7 +72,6 @@ def texto_upload_path(instance, filename):
 """
 
 
-@reversion.register()
 class Protocolo(models.Model):
     numero = models.PositiveIntegerField(
         blank=False, null=False, verbose_name=_('Número de Protocolo'))
@@ -214,7 +211,6 @@ class Protocolo(models.Model):
     #    return qs.order_by('-data_ultima_atualizacao')
 
 
-@reversion.register()
 class DocumentoAdministrativo(CommonMixin):
 
     #related_objects = DocumentoAdministrativoManager()
@@ -463,7 +459,6 @@ class DocumentoAdministrativo(CommonMixin):
         self.save()
 
 
-@reversion.register()
 class DocumentoAcessorioAdministrativo(CommonMixin):
     FIELDFILE_NAME = ('arquivo', )
 
@@ -524,7 +519,6 @@ class DocumentoAcessorioAdministrativo(CommonMixin):
                                  update_fields=update_fields)
 
 
-@reversion.register()
 class StatusTramitacaoAdministrativo(models.Model):
     INDICADOR_CHOICES = Choices(
         ('F', 'fim', _('Fim')),
@@ -560,7 +554,6 @@ class StatusTramitacaoAdministrativo(models.Model):
         return self.descricao
 
 
-@reversion.register()
 class TramitacaoAdministrativo(models.Model):
     status = models.ForeignKey(
         StatusTramitacaoAdministrativo,
@@ -616,7 +609,6 @@ class AnexadoManager(models.Manager):
         return self.all().order_by('-documento_anexado__id')
 
 
-@reversion.register()
 class Anexado(models.Model):
 
     objects = AnexadoManager()
@@ -651,7 +643,6 @@ class Anexado(models.Model):
         }
 
 
-@reversion.register()
 class AcompanhamentoDocumento(models.Model):
     usuario = models.CharField(max_length=50)
     documento = models.ForeignKey(

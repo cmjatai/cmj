@@ -15,7 +15,6 @@ from django.db.utils import DEFAULT_DB_ALIAS
 from django.dispatch.dispatcher import receiver
 from django.utils.text import format_lazy
 from django.utils.translation import ugettext_lazy as _
-import reversion
 
 
 class AppConfig(django.apps.AppConfig):

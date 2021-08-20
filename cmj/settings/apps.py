@@ -21,8 +21,8 @@ INSTALLED_APPS = (
     #'rest_framework_recursive',
 
     'django_filters',
-    'reversion',
-    'reversion_compare',
+    #'reversion',
+    #'reversion_compare',
 
     'django_celery_results',
     'haystack',

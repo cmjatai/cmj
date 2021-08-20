@@ -3,17 +3,14 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields.jsonb import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
-from django.db.models.fields import related_descriptors
 from django.urls.base import reverse
 from django.utils.translation import ugettext_lazy as _
-import reversion
 
 from cmj.mixins import CommonMixin, CmjCleanMixin
 from cmj.utils import texto_upload_path
 from sapl.utils import restringe_tipos_de_arquivo_txt, OverwriteStorage
 
 
-@reversion.register()
 class TipoDeDiario(models.Model):
     descricao = models.CharField(max_length=50, verbose_name=_('Descrição'))
     principal = models.BooleanField(default=False, verbose_name=_('Principal'))
@@ -30,7 +27,6 @@ def diario_upload_path(instance, filename):
     return texto_upload_path(instance, filename, subpath=instance.ano)
 
 
-@reversion.register()
 class DiarioOficial(CommonMixin):
     FIELDFILE_NAME = ('arquivo', )
 

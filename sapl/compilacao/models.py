@@ -11,14 +11,12 @@ from django.utils import timezone
 from django.utils.decorators import classonlymethod
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
-import reversion
 
 from sapl.compilacao.utils import (get_integrations_view_names, int_to_letter,
                                    int_to_roman)
 from sapl.utils import YES_NO_CHOICES, get_settings_auth_user_model
 
 
-@reversion.register()
 class TimestampedMixin(models.Model):
     created = models.DateTimeField(
         verbose_name=_('created'),
@@ -30,7 +28,6 @@ class TimestampedMixin(models.Model):
         abstract = True
 
 
-@reversion.register()
 class BaseModel(models.Model):
 
     class Meta:
@@ -85,7 +82,6 @@ class BaseModel(models.Model):
             update_fields=update_fields)
 
 
-@reversion.register()
 class PerfilEstruturalTextoArticulado(BaseModel):
     sigla = models.CharField(
         max_length=10, unique=True, verbose_name=_('Sigla'))
@@ -119,7 +115,6 @@ class PerfilEstruturalTextoArticulado(BaseModel):
         return parents
 
 
-@reversion.register()
 class TipoTextoArticulado(models.Model):
     sigla = models.CharField(max_length=3, verbose_name=_('Sigla'))
     descricao = models.CharField(max_length=50, verbose_name=_('Descrição'))
@@ -187,7 +182,6 @@ PRIVACIDADE_STATUS = (
 )
 
 
-@reversion.register()
 class TextoArticulado(TimestampedMixin):
     data = models.DateField(blank=True, null=True, verbose_name=_('Data'))
     ementa = models.TextField(verbose_name=_('Ementa'))
@@ -540,7 +534,6 @@ class TextoArticulado(TimestampedMixin):
             update(dpk)
 
 
-@reversion.register()
 class TipoNota(models.Model):
     sigla = models.CharField(
         max_length=10, unique=True, verbose_name=_('Sigla'))
@@ -556,7 +549,6 @@ class TipoNota(models.Model):
         return '%s: %s' % (self.sigla, self.nome)
 
 
-@reversion.register()
 class TipoVide(models.Model):
     sigla = models.CharField(
         max_length=10, unique=True, verbose_name=_('Sigla'))
@@ -570,7 +562,6 @@ class TipoVide(models.Model):
         return '%s: %s' % (self.sigla, self.nome)
 
 
-@reversion.register()
 class TipoDispositivo(BaseModel):
     """
     - no attributo rotulo_prefixo_texto, caso haja um ';' (ponto e vírgula), e
@@ -780,7 +771,6 @@ class TipoDispositivo(BaseModel):
         return False
 
 
-@reversion.register()
 class TipoDispositivoRelationship(BaseModel):
     pai = models.ForeignKey(TipoDispositivo, related_name='filhos_permitidos',
                             on_delete=PROTECT)
@@ -816,7 +806,6 @@ class TipoDispositivoRelationship(BaseModel):
             self.filho_permitido.nome if self.filho_permitido else '')
 
 
-@reversion.register()
 class TipoPublicacao(models.Model):
     sigla = models.CharField(
         max_length=10, unique=True, verbose_name=_('Sigla'))
@@ -830,7 +819,6 @@ class TipoPublicacao(models.Model):
         return self.nome
 
 
-@reversion.register()
 class VeiculoPublicacao(models.Model):
     sigla = models.CharField(
         max_length=10, unique=True, verbose_name=_('Sigla'))
@@ -844,7 +832,6 @@ class VeiculoPublicacao(models.Model):
         return '%s: %s' % (self.sigla, self.nome)
 
 
-@reversion.register()
 class Publicacao(TimestampedMixin):
     ta = models.ForeignKey(
         TextoArticulado, verbose_name=_('Texto Articulado'),
@@ -889,7 +876,6 @@ class Publicacao(TimestampedMixin):
             self.ta)
 
 
-@reversion.register()
 class Dispositivo(BaseModel, TimestampedMixin):
     TEXTO_PADRAO_DISPOSITIVO_REVOGADO = force_text(_('(Revogado)'))
     INTERVALO_ORDEM = 1000
@@ -1753,7 +1739,6 @@ class Dispositivo(BaseModel, TimestampedMixin):
                 ordem_bloco_atualizador=count)
 
 
-@reversion.register()
 class Vide(TimestampedMixin):
     texto = models.TextField(verbose_name=_('Texto do Vide'))
 
@@ -1793,7 +1778,6 @@ NOTAS_PUBLICIDADE_CHOICES = (
 )
 
 
-@reversion.register()
 class Nota(TimestampedMixin):
 
     NPRIV = 1
