@@ -43,7 +43,7 @@ class Command(BaseCommand):
 
         self.logger = logging.getLogger(__name__)
 
-        self.organiza_docs_adms()
+        # self.organiza_docs_adms()
 
         # self.count_registers(full=False)
 
