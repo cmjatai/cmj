@@ -163,7 +163,9 @@ def audit_log_function(sender, **kwargs):
     logger = logging.getLogger(__name__)
 
     u = None
+    stack = ''
     for i in inspect.stack():
+        stack = str(i)
         if i.function == 'migrate':
             return
         r = i.frame.f_locals.get('request', None)
@@ -179,6 +181,8 @@ def audit_log_function(sender, **kwargs):
             pass
 
     try:
+        # logger.info('\n'.join(stack))
+
         operation = kwargs.get('operation')
         al = AuditLog()
         al.user = u
@@ -189,6 +193,8 @@ def audit_log_function(sender, **kwargs):
         al.obj_id = instance.id
         al.model_name = instance._meta.model_name
         al.app_name = instance._meta.app_label
+
+        al.obj[0]['stack'] = stack
 
         if hasattr(instance, 'visibilidade'):
             al.visibilidade = instance.visibilidade
