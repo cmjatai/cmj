@@ -9,7 +9,7 @@ from django.apps.registry import apps
 from django.core.management.base import BaseCommand
 from django.db.models import F, Q
 from django.db.models.fields.files import FileField
-from django.db.models.signals import post_delete, post_save
+from django.db.models.signals import post_delete, post_save, pre_save
 from django.utils import timezone
 
 from cmj.core.models import OcrMyPDF
@@ -42,6 +42,57 @@ class Command(BaseCommand):
         post_save.disconnect(dispatch_uid='cmj_post_save_signal')
 
         self.logger = logging.getLogger(__name__)
+
+        for app in apps.get_app_configs():
+
+            if not app.name.startswith('cmj') and not app.name.startswith('sapl'):
+                continue
+            # print(app)
+
+            for m in app.get_models():
+                pre_save.disconnect(
+                    sender=m,
+                    dispatch_uid='cmj_pre_save_signed_{}_{}'.format(
+                        app.name.replace('.', '_'),
+                        m._meta.model_name
+                    ))
+                print(m)
+                for i in m.objects.all().order_by('-id'):
+
+                    if not hasattr(i, 'metadata'):
+                        continue
+
+                    metadata = i.metadata if i.metadata else {}
+                    updated = False
+                    for fn in i.FIELDFILE_NAME:
+
+                        ff = getattr(i, fn)
+                        if not ff:
+                            continue
+
+                        if not os.path.exists(ff.path):
+                            print('Arquivo registrado mas não existe', i.id, i)
+                            continue
+
+                        if 'size' not in metadata['locaweb'][fn]:
+                            updated = True
+                            metadata['locaweb'][fn]['size'] = os.path.getsize(
+                                getattr(ff, 'path'))
+                            if hasattr(ff, 'original_path'):
+                                metadata['locaweb'][fn]['original_size'] = os.path.getsize(
+                                    getattr(ff, 'original_path'))
+
+                        if 'size' not in metadata['s3_cmj'][fn]:
+                            updated = True
+                            metadata['s3_cmj'][fn]['size'] = os.path.getsize(
+                                getattr(ff, 'path'))
+                            if hasattr(ff, 'original_path'):
+                                metadata['s3_cmj'][fn]['original_size'] = os.path.getsize(
+                                    getattr(ff, 'original_path'))
+
+                    if updated:
+                        print(i.id, i)
+                        i.save()
 
         # self.organiza_docs_adms()
 
