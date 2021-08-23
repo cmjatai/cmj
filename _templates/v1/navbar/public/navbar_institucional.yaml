@@ -16,7 +16,7 @@
     check_permission: parlamentares.add_composicaomesa
 
   - title: {% trans 'Agenda Pública' %}
-    url: /evento/
+    url: /evento
 
   - title: ''
     url: ''
