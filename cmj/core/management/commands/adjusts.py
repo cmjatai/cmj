@@ -74,7 +74,7 @@ class Command(BaseCommand):
                             print('Arquivo registrado mas não existe', i.id, i)
                             continue
 
-                        if 'size' not in metadata['locaweb'][fn]:
+                        if 'locaweb' in metadata and 'size' not in metadata['locaweb'][fn]:
                             updated = True
                             metadata['locaweb'][fn]['size'] = os.path.getsize(
                                 getattr(ff, 'path'))
@@ -82,7 +82,7 @@ class Command(BaseCommand):
                                 metadata['locaweb'][fn]['original_size'] = os.path.getsize(
                                     getattr(ff, 'original_path'))
 
-                        if 'size' not in metadata['s3_cmj'][fn]:
+                        if 's3_cmj' in metadata and 'size' not in metadata['s3_cmj'][fn]:
                             updated = True
                             metadata['s3_cmj'][fn]['size'] = os.path.getsize(
                                 getattr(ff, 'path'))
