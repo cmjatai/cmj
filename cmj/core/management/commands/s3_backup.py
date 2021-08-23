@@ -269,7 +269,9 @@ class Command(BaseCommand):
                                 'original_path': None,
                                 'validate': None,
                                 'hash': None,
-                                'original_hash': None
+                                'original_hash': None,
+                                'size': 0,
+                                'original_size': 0
 
                             }
 
@@ -279,17 +281,19 @@ class Command(BaseCommand):
                                 'original_path': None,
                                 'validate': None,
                                 'hash': None,
-                                'original_hash': None
+                                'original_hash': None,
+                                'size': 0,
+                                'original_size': 0
                             }
 
                         count_update = 0
                         try:
                             count_update += self.send_file(
-                                metadata, i, ff, fn, 'path', 'hash')
+                                metadata, i, ff, fn, 'path', 'hash', 'size')
 
                             count_update += self.send_file(
                                 metadata, i, ff, fn,
-                                'original_path', 'original_hash')
+                                'original_path', 'original_hash', 'original_size')
 
                         except Exception as e:
                             print(e)
@@ -415,7 +419,7 @@ class Command(BaseCommand):
             print('Documento Sem validação:', i.id, i)
         return False
 
-    def send_file(self, metadata, i, ff, fn, attr_path, attr_hash):
+    def send_file(self, metadata, i, ff, fn, attr_path, attr_hash, attr_size):
 
         if not hasattr(ff, attr_path):
             return 0
@@ -482,6 +486,10 @@ class Command(BaseCommand):
                 metadata[self.s3_server][fn][attr_hash] = hash_sha512(
                     getattr(ff, attr_path))
                 metadata[self.s3_server][fn]['validate'] = timezone.localtime()
+
+                metadata[self.s3_server][fn][attr_size] = os.path.getsize(
+                    getattr(ff, attr_path))
+
             return 1
         return 0
 
