@@ -6,13 +6,16 @@ import os
 from pickle import FALSE
 
 from django.apps.registry import apps
+from django.contrib.contenttypes.models import ContentType
 from django.core.management.base import BaseCommand
 from django.db.models import F, Q
+from django.db.models.aggregates import Count
 from django.db.models.fields.files import FileField
 from django.db.models.signals import post_delete, post_save, pre_save
 from django.utils import timezone
+from pygments.formatters.html import ctags
 
-from cmj.core.models import OcrMyPDF
+from cmj.core.models import OcrMyPDF, AuditLog
 from cmj.diarios.models import DiarioOficial
 from cmj.signals import Manutencao
 from sapl.compilacao.models import Dispositivo, TextoArticulado,\
@@ -42,6 +45,48 @@ class Command(BaseCommand):
         post_save.disconnect(dispatch_uid='cmj_post_save_signal')
 
         self.logger = logging.getLogger(__name__)
+
+        group_logs = AuditLog.objects.filter(
+            email=''
+        ).values(
+            'content_type_id', 'obj_id'
+        ).annotate(
+            count_tipos_obj=Count('obj_id')
+        ).filter(
+            count_tipos_obj__gt=2
+        ).order_by('content_type_id', '-obj_id')
+
+        print(group_logs.query)
+        print(group_logs.count())
+
+        for gl in group_logs:  # [:10000]:
+
+            if gl['content_type_id']:
+                ct = ContentType.objects.get(pk=gl['content_type_id'])
+            else:
+                ct = None
+
+            print(gl, ct)
+
+            logs = AuditLog.objects.filter(
+                email='',
+                content_type=ct,
+                obj_id=gl['obj_id']
+            ).order_by('-id')
+
+            logs_a_deletar = list(logs[2:].values_list('id', flat=True))
+
+            # print(logs.count())
+            #print(logs.values_list('id', flat=True))
+
+            dd = AuditLog.objects.filter(id__in=logs_a_deletar)
+            dd.delete()
+            # for ld in logs_a_deletar:
+            #    ld.delete()
+
+            #print(logs_a_deletar.values_list('id', flat=True))
+
+        return  # ****************************************
 
         for app in apps.get_app_configs():
 
