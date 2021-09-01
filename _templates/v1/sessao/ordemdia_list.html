@@ -32,7 +32,7 @@
       };
     });
 
-    {% if perms.sessao.add_ordemdia %} {# DJANGO template #}
+    {% if user.is_superuser %} {# DJANGO template perms.sessao.add_ordemdia #}
       $('tbody').sortable({
         start: function(event, ui) {
           ui.item.startPos = ui.item.index();

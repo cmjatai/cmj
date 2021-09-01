@@ -33,7 +33,7 @@
       };
     });
 
-    {% if perms.sessao.add_ordemdia %}
+    {% if user.is_superuser %} {# perms.sessao.add_ordemdia  #}
       $('tbody').sortable({
         start: function(event, ui) {
           ui.item.startPos = ui.item.index();
