@@ -2,16 +2,23 @@
 {% load i18n %}
 {% load crispy_forms_tags %}
 
+{% block head_title %}PortalCMJ{% endblock %}
+{% block head_title_sufix %}{{sessaoplenaria}}{% endblock %}
+{% block meta_description %}{{ block.super }}{% endblock %}
+
+
 {% block title %}
 	<h1 class="page-header">
-		Resumo <small>({{sessaoplenaria}})</small>
-		<br/>
+		Resumo <small><small>({{sessaoplenaria}})</small></small>
 	</h1>
+{% endblock %}
+
+{% block container_actions %}
 {% endblock %}
 
 {% block detail_content %}
 <div>
-	<p align="right">
+	<p align="right" class="pt-4">
 		<strong>
 			<a href="{% url 'sapl.relatorios:relatorio_sessao_plenaria_pdf' sessaoplenaria.pk %}">
 				Impressão PDF
@@ -47,5 +54,5 @@
     {% include 'sessao/blocos_resumo/'|add:decimo_terceiro_ordenacao %}
 
     {% include 'sessao/blocos_resumo/'|add:decimo_quarto_ordenacao %}
-    
+
 {% endblock detail_content %}
