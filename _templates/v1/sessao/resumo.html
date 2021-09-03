@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load crispy_forms_tags %}
 
-{% block head_title %}PortalCMJ{% endblock %}
+{% block head_title %}{{ block.super }}{% endblock %}
 {% block head_title_sufix %}{{sessaoplenaria}}{% endblock %}
 {% block meta_description %}{{ block.super }}{% endblock %}
 
