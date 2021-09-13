@@ -722,6 +722,9 @@ class PathParlamentarView(PathView):
 
     def get_context_data(self, **kwargs):
 
+        if not self.parlamentar:
+            raise Http404
+        
         if self.parlamentar.template_classe != \
                 CLASSE_TEMPLATES_CHOICE.parlamentares:
             context = PathView.get_context_data(self, **kwargs)
