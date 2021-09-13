@@ -141,25 +141,26 @@ class VinculoDocDiarioOficialCrud(MasterDetailCrud):
     public = [RP_LIST, RP_DETAIL]
 
     class BaseMixin(Crud.PublicMixin, MasterDetailCrud.BaseMixin):
-        list_field_names = ['content_object', 'pagina']
+        list_field_names = ['object_id', 'pagina']
 
     class ListView(MasterDetailCrud.ListView):
+        ordered_list = False
         def get(self, request, *args, **kwargs):
             self.parent_object = get_object_or_404(DiarioOficial, **kwargs)
             return MasterDetailCrud.ListView.get(self, request, *args, **kwargs)
 
-        def hook_header_content_object(self, *args,  **kwargs):
+        def hook_header_object_id(self, *args,  **kwargs):
             if self.parent_object.tipo.principal:
                 return force_text(_('Documentos Públicados no PortalCMJ'))
             return force_text(_('Republicação de documentos no PortalCMJ'))
 
-        def hook_content_object(self, *args, **kwargs):
+        def hook_object_id(self, *args, **kwargs):
             ct = args[0].content_type
             if self.request.user.has_perm(
                     f'{ct.app_label}.change_{ct.model}'):
                 return args[0].content_object, args[2]
             else:
-                return args[1], ''
+                return args[0].content_object, args[0].reverse_link_content_object
 
     class CreateView(MasterDetailCrud.CreateView, FormMessagesMixin):
         layout_key = None
