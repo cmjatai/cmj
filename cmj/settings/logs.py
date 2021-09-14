@@ -1,12 +1,23 @@
 import logging
 import socket
 import sys
+from django.utils import log
 
 host = socket.gethostbyname_ex(socket.gethostname())[0]
 
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': False,
+    'disable_existing_loggers': True,
+
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
+
     'formatters': {
         'verbose': {
             'format': '%(levelname)s %(asctime)s ' + host + ' %(pathname)s %(name)s:%(funcName)s:%(lineno)d %(message)s'
@@ -17,39 +28,39 @@ LOGGING = {
     },
     'handlers': {
         'console': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.StreamHandler',
-            'formatter': 'simple',
-        },
-        'applogfile': {
-            'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': 'sapl.log',
-            'maxBytes': 1024 * 1024 * 15,  # 15MB
-            'backupCount': 10,
             'formatter': 'verbose',
+            'filters': ['require_debug_true'],
+
         },
-        'cmjlogfile': {
+        'cmj_logger_file': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': 'ocrmypdf.log',
+            'filename': 'logs/cmj_logger.log',
             'maxBytes': 1024 * 1024 * 15,  # 15MB
             'backupCount': 10,
             'formatter': 'verbose',
+            'filters': ['require_debug_false'],
+
         },
     },
     'loggers': {
-        #'sapl': {
-        #    'handlers': ['applogfile'],
-        #    'level': 'INFO',
-        #    'propagate': True,
-        #},
-        'cmj': {
-            'handlers': ['cmjlogfile'],
+        'sapl': {
+            'handlers': ['console', 'cmj_logger_file'],
             'level': 'DEBUG',
             'propagate': True,
         },
-    }
+        'cmj': {
+            'handlers': ['console', 'cmj_logger_file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+    'root': {
+        'handlers': ['console', 'cmj_logger_file'],
+        'level': 'WARNING',
+        }
 }
 
 

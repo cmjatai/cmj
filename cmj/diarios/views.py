@@ -1,4 +1,6 @@
 
+import logging
+
 from braces.views._forms import FormMessagesMixin
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
@@ -8,12 +10,11 @@ from django.utils.translation import ugettext_lazy as _
 
 from cmj.core.models import CertidaoPublicacao
 from cmj.diarios.forms import VinculoDocDiarioOficialForm
-from cmj.diarios.models import TipoDeDiario, DiarioOficial,\
+from cmj.diarios.models import TipoDeDiario, DiarioOficial, \
     VinculoDocDiarioOficial
 from sapl.crispy_layout_mixin import get_field_display
-from sapl.crud.base import CrudAux, Crud, RP_DETAIL, RP_LIST,\
+from sapl.crud.base import CrudAux, Crud, RP_DETAIL, RP_LIST, \
     MasterDetailCrud
-
 
 TipoDeDiarioCrud = CrudAux.build(TipoDeDiario, None)
 
@@ -27,9 +28,11 @@ class DiarioOficialCrud(Crud):
         list_field_names = ['edicao', 'data', 'tipo', 'descricao', 'arquivo']
 
     class ListView(Crud.PublicMixin, Crud.ListView):
+
         def get_context_data(self, **kwargs):
             c = super().get_context_data(**kwargs)
             c['bg_title'] = 'bg-maroon text-white'
+
             return c
 
     class DetailView(Crud.PublicMixin, Crud.DetailView):
@@ -145,11 +148,12 @@ class VinculoDocDiarioOficialCrud(MasterDetailCrud):
 
     class ListView(MasterDetailCrud.ListView):
         ordered_list = False
+
         def get(self, request, *args, **kwargs):
             self.parent_object = get_object_or_404(DiarioOficial, **kwargs)
             return MasterDetailCrud.ListView.get(self, request, *args, **kwargs)
 
-        def hook_header_object_id(self, *args,  **kwargs):
+        def hook_header_object_id(self, *args, **kwargs):
             if self.parent_object.tipo.principal:
                 return force_text(_('Documentos Públicados no PortalCMJ'))
             return force_text(_('Republicação de documentos no PortalCMJ'))

@@ -1,9 +1,9 @@
 
 from datetime import datetime, timedelta, date
+from pickle import FALSE
 import json
 import logging
 import os
-from pickle import FALSE
 
 from django.apps.registry import apps
 from django.contrib.contenttypes.models import ContentType
@@ -18,14 +18,14 @@ from pygments.formatters.html import ctags
 from cmj.core.models import OcrMyPDF, AuditLog
 from cmj.diarios.models import DiarioOficial
 from cmj.signals import Manutencao
-from sapl.compilacao.models import Dispositivo, TextoArticulado,\
+from sapl.compilacao.models import Dispositivo, TextoArticulado, \
     TipoDispositivo
-from sapl.materia.models import MateriaLegislativa, DocumentoAcessorio,\
+from sapl.materia.models import MateriaLegislativa, DocumentoAcessorio, \
     Tramitacao
 from sapl.norma.models import NormaJuridica
 from sapl.protocoloadm.forms import pega_ultima_tramitacao_adm
-from sapl.protocoloadm.models import DocumentoAdministrativo, Protocolo,\
-    DocumentoAcessorioAdministrativo, TramitacaoAdministrativo,\
+from sapl.protocoloadm.models import DocumentoAdministrativo, Protocolo, \
+    DocumentoAcessorioAdministrativo, TramitacaoAdministrativo, \
     StatusTramitacaoAdministrativo
 from sapl.sessao.models import SessaoPlenaria
 
@@ -46,6 +46,7 @@ class Command(BaseCommand):
 
         self.logger = logging.getLogger(__name__)
 
+        return
         group_logs = AuditLog.objects.filter(
             email=''
         ).values(
@@ -77,14 +78,14 @@ class Command(BaseCommand):
             logs_a_deletar = list(logs[2:].values_list('id', flat=True))
 
             # print(logs.count())
-            #print(logs.values_list('id', flat=True))
+            # print(logs.values_list('id', flat=True))
 
             dd = AuditLog.objects.filter(id__in=logs_a_deletar)
             dd.delete()
             # for ld in logs_a_deletar:
             #    ld.delete()
 
-            #print(logs_a_deletar.values_list('id', flat=True))
+            # print(logs_a_deletar.values_list('id', flat=True))
 
         return  # ****************************************
 
@@ -257,7 +258,7 @@ class Command(BaseCommand):
                     dua = f
                     print(dua)
                     if hasattr(dua, 'auto_now') and dua.auto_now:
-                        #print(m, 'auto_now deve ser desativado.')
+                        # print(m, 'auto_now deve ser desativado.')
                         # continue  # auto_now deve ser desativado
                         print(m, 'desativando auto_now')
                         dua.auto_now = False
@@ -358,14 +359,14 @@ class Command(BaseCommand):
     def run_capture_fields_from_pdf(self):
         models = (
             (NormaJuridica, 'ano__gte', 2020, 'data_ultima_atualizacao'),
-            (MateriaLegislativa, 'ano__gte',  2020, 'data_ultima_atualizacao'),
+            (MateriaLegislativa, 'ano__gte', 2020, 'data_ultima_atualizacao'),
             (DocumentoAdministrativo, 'ano__gte', 2020, 'data_ultima_atualizacao'),
             (DocumentoAcessorio, 'data__year__gte',
              2020, 'data_ultima_atualizacao'),
-            (DocumentoAcessorioAdministrativo,  'data__year__gte',  2020, ''),
-            (SessaoPlenaria,  'data_inicio__year__gte',
+            (DocumentoAcessorioAdministrativo, 'data__year__gte', 2020, ''),
+            (SessaoPlenaria, 'data_inicio__year__gte',
              2020, 'data_ultima_atualizacao'),
-            (DiarioOficial,  'data__year__gte', 2020, 'data_ultima_atualizacao'),
+            (DiarioOficial, 'data__year__gte', 2020, 'data_ultima_atualizacao'),
         )
 
         for model in models:
@@ -374,7 +375,7 @@ class Command(BaseCommand):
             if model[3]:
                 dua = m._meta.get_field(model[3])
                 if hasattr(dua, 'auto_now') and dua.auto_now:
-                    #print(m, 'auto_now deve ser desativado.')
+                    # print(m, 'auto_now deve ser desativado.')
                     # continue  # auto_now deve ser desativado
                     print(m, 'desativando auto_now')
                     dua.auto_now = False
@@ -483,7 +484,7 @@ class Command(BaseCommand):
 
         for d in docs:
 
-            #v = Version.objects.get_for_object(d)
+            # v = Version.objects.get_for_object(d)
 
             # if v.exists():
             #    d.data_ultima_atualizacao = v[0].revision.date_created

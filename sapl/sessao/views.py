@@ -1,7 +1,7 @@
-import ast
-import logging
 from pickle import TRUE
 from re import sub, search
+import ast
+import logging
 
 from django.conf import settings
 from django.contrib import messages
@@ -55,13 +55,11 @@ from .models import (CargoMesa, ExpedienteMateria, ExpedienteSessao, OcorrenciaS
                      TipoResultadoVotacao, TipoSessaoPlenaria, VotoParlamentar, TipoRetiradaPauta,
                      RetiradaPauta, TipoJustificativa, JustificativaAusencia, OradorOrdemDia, ORDENACAO_RESUMO)
 
-
 TipoSessaoCrud = CrudAux.build(TipoSessaoPlenaria, 'tipo_sessao_plenaria')
 TipoJustificativaCrud = CrudAux.build(TipoJustificativa, 'tipo_justificativa')
 TipoResultadoVotacaoCrud = CrudAux.build(
     TipoResultadoVotacao, 'tipo_resultado_votacao')
 TipoRetiradaPautaCrud = CrudAux.build(TipoRetiradaPauta, 'tipo_retirada_pauta')
-
 
 # constantes
 SIMBOLICA = 1
@@ -345,7 +343,7 @@ def customize_link_materia(context, pk, has_permission, is_expediente, user=None
                                         <form action="%s">
                                         <input type="submit" class="btn btn-primary"
                                         value="Registrar Votação" />
-                                        
+
                                     </form>''' % (
                             url)
                     else:
@@ -353,7 +351,7 @@ def customize_link_materia(context, pk, has_permission, is_expediente, user=None
                                         <form action="%s">
                                         <input type="submit" class="btn btn-primary"
                                         value="Registrar Leitura" />
-                                        
+
                                     </form>''' % (
                             url)
 
@@ -425,8 +423,6 @@ def customize_link_materia(context, pk, has_permission, is_expediente, user=None
                         )
 
                     )
-
-
 
                 )
 
@@ -1303,7 +1299,7 @@ class PresencaView(FormMixin, PresencaMixin, DetailView):
 
             # Id dos parlamentares presentes
             marcados = request.POST.getlist('presenca_ativos') \
-                + request.POST.getlist('presenca_inativos')
+                +request.POST.getlist('presenca_inativos')
 
             # Deletar os que foram desmarcados
             deletar = set(presentes_banco) - set(marcados)
@@ -1410,7 +1406,7 @@ class PresencaOrdemDiaView(FormMixin, PresencaMixin, DetailView):
 
             # Id dos parlamentares presentes
             marcados = request.POST.getlist('presenca_ativos') \
-                + request.POST.getlist('presenca_inativos')
+                +request.POST.getlist('presenca_inativos')
 
             # Deletar os que foram desmarcados
             deletar = set(presentes_banco) - set(marcados)
@@ -2336,7 +2332,6 @@ class ResumoView(DetailView):
 class ResumoAtaView(ResumoView):
     template_name = 'sessao/resumo_ata.html'
     logger = logging.getLogger(__name__)
-    logger.debug('Gerando Resumo.')
 
 
 class ExpedienteView(FormMixin, DetailView):
@@ -3787,7 +3782,6 @@ class PesquisarPautaSessaoView(PesquisarSessaoPlenariaView):
     template_name = 'sessao/pauta_sessao_filter.html'
 
     logger = logging.getLogger(__name__)
-    logger.debug('Pesquisa de PautaSessao.')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -4696,8 +4690,7 @@ def voto_nominal_parlamentar(request):
                 ordem_id=id_ordem_expediente, parlamentar_id=parlamentar_id).delete()
         else:
             # Salva o voto
-            parlamentar_voto = "Abstenção" if parlamentar_voto == 'Abst' else parlamentar_voto[
-                :3]
+            parlamentar_voto = "Abstenção" if parlamentar_voto == 'Abst' else parlamentar_voto[:3]
             try:
                 voto = VotoParlamentar.objects.get(
                     parlamentar_id=parlamentar_id,
