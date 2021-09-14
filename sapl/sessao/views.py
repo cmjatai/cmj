@@ -3771,9 +3771,6 @@ class PesquisarSessaoPlenariaView(FilterView):
         context['show_results'] = show_results_filter_set(
             self.request.GET.copy())
 
-        username = request.user.username
-        self.logger.debug('user=' + username + '. Pesquisa de SessaoPlenaria.')
-
         return self.render_to_response(context)
 
 

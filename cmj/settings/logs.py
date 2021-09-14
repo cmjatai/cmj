@@ -1,8 +1,23 @@
+
 import logging
-import socket
 import sys
 
-host = socket.gethostbyname_ex(socket.gethostname())[0]
+"""class MyFormatter(logging.Formatter):
+
+        'verbose': {
+            'class': 'cmj.settings.logs.MyFormatter',
+
+    def __init__(self, fmt=None, datefmt=None, style='%'):
+        logging.Formatter.__init__(self, fmt=fmt, datefmt=datefmt, style=style)
+
+    def format(self, record):
+        s = logging.Formatter.format(self, record)
+
+        for i in inspect.stack():
+                r = i.frame.f_locals.get('request', None)
+                if r:
+                    print(r)
+        return s"""
 
 LOGGING = {
     'version': 1,
@@ -19,7 +34,7 @@ LOGGING = {
 
     'formatters': {
         'verbose': {
-            'format': '%(levelname)s %(asctime)s ' + host + ' %(pathname)s %(name)s:%(funcName)s:%(lineno)d %(message)s'
+            'format': '%(levelname)s %(asctime)s %(pathname)s %(name)s:%(funcName)s:%(lineno)d %(message)s'
         },
         'simple': {
             'format': '%(levelname)s %(asctime)s - %(message)s'
