@@ -1,7 +1,6 @@
 import logging
 import socket
 import sys
-from django.utils import log
 
 host = socket.gethostbyname_ex(socket.gethostname())[0]
 
