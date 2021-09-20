@@ -26,20 +26,19 @@ from django.utils.functional import cached_property
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields.json import JSONField as django_extensions_JSONField
-import qrcode
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.pdfgen import canvas
 from reportlab.platypus.doctemplate import SimpleDocTemplate
+import qrcode
 
 from cmj import globalrules
 from cmj.core.models import AuditLog
 from cmj.mixins import CmjChoices
-from cmj.utils import get_settings_auth_user_model, YES_NO_CHOICES,\
-    restringe_tipos_de_arquivo_midias, TIPOS_IMG_PERMITIDOS,\
+from cmj.utils import get_settings_auth_user_model, YES_NO_CHOICES, \
+    restringe_tipos_de_arquivo_midias, TIPOS_IMG_PERMITIDOS, \
     media_protected_storage
 from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
-
 
 CLASSE_ESTRUTURAL = 0
 CLASSE_DOCUMENTAL = 1
@@ -58,11 +57,11 @@ DOC_TEMPLATES_CHOICE_FILES = {
         'template_name': 'path/path_documento.html',
         'create_url': 'cmj.sigad:documento_construct_create'
     },
-    2:  {
+    2: {
         'template_name': 'path/path_thumbnails.html',
         'create_url': 'cmj.sigad:documento_construct_create'
     },
-    99:  {
+    99: {
         'template_name': 'path/path_documento.html',
         'create_url': 'cmj.sigad:documento_construct_create'
     },
@@ -72,7 +71,6 @@ DOC_TEMPLATES_CHOICE = CmjChoices(
     (1, 'noticia', _('Notícia Pública')),
     (2, 'galeria', _('Galeria de Imagens')),
 )
-
 
 CLASSE_TEMPLATES_CHOICE_FILES = {
     1: 'path/path_classe.html',
@@ -85,7 +83,6 @@ CLASSE_TEMPLATES_CHOICE_FILES = {
     99: 'path/path_documento.html',
 }
 
-
 CLASSE_DOC_MANAGER_CHOICE = {
     1: 'qs_news',
     2: 'view_public_gallery',
@@ -96,7 +93,6 @@ CLASSE_DOC_MANAGER_CHOICE = {
     7: 'qs_video_news',
     99: None,
 }
-
 
 CLASSE_TEMPLATES_CHOICE = CmjChoices(
     (1, 'lista_em_linha', _('Listagem em Linha')),
@@ -239,7 +235,7 @@ class CMSMixin(models.Model):
             (TPD_VIDEO, 'tpd_video', _('Vídeo')),
             (TPD_AUDIO, 'tpd_audio', _('Áudio')),
             (TPD_IMAGE, 'tpd_image', _('Imagem')),
-            (TPD_GALLERY, 'tpd_gallery',  _('Galeria de Imagens')),
+            (TPD_GALLERY, 'tpd_gallery', _('Galeria de Imagens')),
 
         )
     }
@@ -396,7 +392,7 @@ class Slugged(Parent):
             count = self.documento_set.filter(parent__isnull=True).count()
             for documento in self.documento_set.filter(parent__isnull=True):
                 documento.save()
-                #print(self.titulo, count, self.slug)
+                # print(self.titulo, count, self.slug)
                 count -= 1
 
         for child in self.childs.all():
@@ -433,7 +429,7 @@ class Slugged(Parent):
             try:
                 obj = concret_model.objects.get(
                     #    **{'slug': slug, 'parent': self.parent})
-                    **{'slug': slug})
+                    ** {'slug': slug})
                 if obj == self:
                     raise ObjectDoesNotExist
 
@@ -564,7 +560,7 @@ class UrlShortener(models.Model):
         ordering = ('url_short',)
 
         unique_together = (
-            ('url_short', 'url_long', ),
+            ('url_short', 'url_long',),
         )
         verbose_name = _('UrlShortener')
         verbose_name_plural = _('UrlShortener')
@@ -711,7 +707,7 @@ class Classe(ShortUrl, CMSMixin):
         ordering = ('codigo', '-public_date',)
 
         unique_together = (
-            ('slug', 'parent', ),
+            ('slug', 'parent',),
         )
         verbose_name = _('Classe')
         verbose_name_plural = _('Classes')
@@ -779,9 +775,9 @@ class DocumentoManager(models.Manager):
 
     @property
     def q_doc_public(self):
-        return (Q(public_end_date__gte=datetime.now()) |
+        return (Q(public_end_date__gte=timezone.now()) |
                 Q(public_end_date__isnull=True) &
-                Q(public_date__lte=datetime.now(),
+                Q(public_date__lte=timezone.now(),
                   visibilidade=Documento.STATUS_PUBLIC))
 
     def q_filters(self):
@@ -1065,7 +1061,7 @@ class Documento(ShortUrl, CMSMixin):
         symmetrical=False,)
 
     class Meta:
-        ordering = ('public_date', )
+        ordering = ('public_date',)
         verbose_name = _('Documento')
         verbose_name_plural = _('Documentos')
         permissions = (
@@ -1243,6 +1239,7 @@ class Documento(ShortUrl, CMSMixin):
 
 
 class ReferenciaEntreDocumentosManager(models.Manager):
+
     def create_space(self, referente, ordem, exclude=None):
         qs = self.get_queryset()
 
@@ -1372,7 +1369,7 @@ def media_path(instance, filename):
 
 class VersaoDeMidia(models.Model):
 
-    FIELDFILE_NAME = ('file', )
+    FIELDFILE_NAME = ('file',)
 
     metadata = JSONField(
         verbose_name=_('Metadados'),

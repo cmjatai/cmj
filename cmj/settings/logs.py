@@ -1,11 +1,16 @@
 
+import inspect
 import logging
 import sys
+from decouple import AutoConfig
 
-"""class MyFormatter(logging.Formatter):
+config = AutoConfig()
+LOGGING_ROOT_LEVEL = config('LOGGING_ROOT_LEVEL', default='WARNING', cast=str)
 
-        'verbose': {
-            'class': 'cmj.settings.logs.MyFormatter',
+logging.captureWarnings(True)
+
+
+class MyFormatter(logging.Formatter):
 
     def __init__(self, fmt=None, datefmt=None, style='%'):
         logging.Formatter.__init__(self, fmt=fmt, datefmt=datefmt, style=style)
@@ -16,8 +21,10 @@ import sys
         for i in inspect.stack():
                 r = i.frame.f_locals.get('request', None)
                 if r:
-                    print(r)
-        return s"""
+                    url = r.path_info
+                    return f'{s} - {url}'
+        return s
+
 
 LOGGING = {
     'version': 1,
@@ -34,6 +41,7 @@ LOGGING = {
 
     'formatters': {
         'verbose': {
+            'class': 'cmj.settings.logs.MyFormatter',
             'format': '%(levelname)s %(asctime)s %(pathname)s %(name)s:%(funcName)s:%(lineno)d %(message)s'
         },
         'simple': {
@@ -73,7 +81,7 @@ LOGGING = {
     },
     'root': {
         'handlers': ['console', 'cmj_logger_file'],
-        'level': 'WARNING',
+        'level': LOGGING_ROOT_LEVEL,
         }
 }
 
