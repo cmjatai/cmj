@@ -1,13 +1,13 @@
 
 from datetime import datetime, timedelta
+from pwd import getpwuid
+from time import sleep
 import logging
 import os
-from pwd import getpwuid
 import shutil
 import stat
 import subprocess
 import sys
-from time import sleep
 import time
 
 from django.conf import settings
@@ -153,7 +153,7 @@ class Command(BaseCommand):
                 ('djangoapps', 'pymp'),
                 ('djangoapps', 'com.github.ocrmypdf'),
                 ('djangoapps', 'yarn--'),
-                #('solr', 'upload_'),
+                # ('solr', 'upload_'),
                 ('djangoapps', 'br.leg.go.jatai.portalcmj.')
             ]
 
@@ -205,6 +205,7 @@ class Command(BaseCommand):
             d = d + timedelta(seconds=i)
 
     def handle(self, *args, **options):
+        self.logger = logging.getLogger(__name__)
 
         init = datetime.now()
         if not settings.DEBUG and self.is_running():
@@ -215,8 +216,6 @@ class Command(BaseCommand):
         post_save.disconnect(dispatch_uid='sapl_post_save_signal')
         post_delete.disconnect(dispatch_uid='cmj_post_delete_signal')
         post_save.disconnect(dispatch_uid='cmj_post_save_signal')
-
-        self.logger = logging.getLogger(__name__)
 
         # self.run_distibui_ocr_ao_longo_do_ano()
         # return
@@ -271,7 +270,7 @@ class Command(BaseCommand):
                 if self.execucao_noturna and not items.exists():
                     items = model['model'].objects.order_by(model['order_by'])
 
-                #items = items.filter(pk=3559)
+                # items = items.filter(pk=3559)
                 for item in items:
 
                     # item.save()

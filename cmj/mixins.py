@@ -12,10 +12,9 @@ from model_utils.choices import Choices
 from pdfrw.pdfreader import PdfReader
 from social_core.backends.facebook import FacebookOAuth2
 
-import cmj
-from cmj.utils import run_sql, get_settings_auth_user_model,\
+from cmj.utils import run_sql, get_settings_auth_user_model, \
     YES_NO_CHOICES, ProcessoExterno
-from sapl.crispy_layout_mixin import to_row, SaplFormLayout,\
+from sapl.crispy_layout_mixin import to_row, SaplFormLayout, \
     form_actions
 
 
@@ -29,6 +28,7 @@ class ImageThumbnailFileInput(ClearableFileInput):
 
 
 class CmjChoices(Choices):
+
     def _process(self, choices, triple_collector=None, double_collector=None):
         Choices._process(self, choices, triple_collector=triple_collector,
                          double_collector=double_collector)
@@ -336,7 +336,7 @@ class GoogleRecapthaMixin:
         import urllib3
         import json
 
-        #encoded_data = json.dumps(fields).encode('utf-8')
+        # encoded_data = json.dumps(fields).encode('utf-8')
 
         url = ('https://www.google.com/recaptcha/api/siteverify?'
                'secret=%s'

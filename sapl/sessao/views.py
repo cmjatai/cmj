@@ -1,5 +1,4 @@
-from pickle import TRUE
-from re import sub, search
+from re import sub
 import ast
 import logging
 
