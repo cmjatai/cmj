@@ -23,7 +23,7 @@ class MyFormatter(logging.Formatter):
         for i in inspect.stack():
                 r = i.frame.f_locals.get('request', None)
                 if r:
-                    url = r.path_info
+                    url = r.path
                     return f'{s} - {url}'
         return s
 

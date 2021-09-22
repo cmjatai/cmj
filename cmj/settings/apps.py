@@ -18,24 +18,20 @@ INSTALLED_APPS = (
 
     'rest_framework',
     'rest_framework.authtoken',
-    #'rest_framework_recursive',
 
     'django_filters',
-    #'reversion',
-    #'reversion_compare',
 
     'django_celery_results',
     'haystack',
     'celery_haystack',
-    #'whoosh',
-    #'speedinfo',
 
-
-    #'taggit',
     'webpack_loader',
 
     'channels',
 
+    # 'whoosh',
+    # 'speedinfo',
+    # 'taggit',
 
     'sapl',  # não retire, é necessário para os templates centralizados do sapl
 )
@@ -74,7 +70,6 @@ RULES_APPS = (
     'sapl.rules',
     'cmj.globalrules',
 )
-
 
 INSTALLED_APPS = INSTALLED_APPS + SAPL_APPS + CMJ_APPS + RULES_APPS
 

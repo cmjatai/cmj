@@ -1,10 +1,10 @@
 from datetime import datetime
 from distutils.util import strtobool
+from random import choice
+from string import ascii_letters, digits
 import hashlib
 import io
 import logging
-from random import choice
-from string import ascii_letters, digits
 import tempfile
 import zipfile
 
@@ -42,7 +42,7 @@ from sapl.crud.base import (Crud, CrudAux, MasterDetailCrud, make_pagination,
                             RP_LIST, RP_DETAIL,
                             PermissionRequiredContainerCrudMixin, CrudListView,
                             CrudDetailView)
-from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa, UnidadeTramitacao,\
+from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa, UnidadeTramitacao, \
     DocumentoAcessorio
 from sapl.materia.views import gerar_pdf_impressos
 from sapl.parlamentares.models import Legislatura, Parlamentar
@@ -1801,6 +1801,10 @@ class SeloProtocoloMixin(PluginSignMixin):
                     getattr(item, field_file).original_path,
                     getattr(item, field_file).path,
                 )
+
+                if isinstance(item, MateriaLegislativa):
+                    item.registrovotacao_set.all().update(selo_votacao=False)
+
             else:
                 paths = getattr(item, field_file).path
 
@@ -1951,7 +1955,7 @@ class ComprovanteProtocoloView(PermissionRequiredMixin, TemplateView):
         protocolo = Protocolo.objects.get(pk=self.kwargs['pk'])
         protocolo.save()
 
-        #messages.info(request, _('Email enviado com sucesso!'))
+        # messages.info(request, _('Email enviado com sucesso!'))
 
         return redirect(
             reverse('sapl.protocoloadm:protocolo_mostrar', kwargs={
@@ -2066,7 +2070,7 @@ class ProtocoloMateriaView(PermissionRequiredMixin, CreateView):
             protocolo.ip_data_hora_manual = ''
         protocolo.save()
         #
-        #data = form.cleaned_data
+        # data = form.cleaned_data
         # if data['vincular_materia'] == 'True':
         #    materia = MateriaLegislativa.objects.get(ano=data['ano_materia'],
         #                                             numero=data['numero_materia'],
