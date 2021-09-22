@@ -27,7 +27,6 @@ import django_filters
 
 from cmj.mixins import GoogleRecapthaMixin
 from cmj.utils import CHOICE_SIGNEDS
-import sapl
 from sapl.base.models import AppConfig, Autor, TipoAutor
 from sapl.comissoes.models import Comissao, Participacao, Composicao
 from sapl.compilacao.models import (STATUS_TA_IMMUTABLE_PUBLIC,
@@ -51,6 +50,7 @@ from sapl.utils import (YES_NO_CHOICES, SEPARADOR_HASH_PROPOSICAO,
                         models_with_gr_for_model, qs_override_django_filter,
                         choice_anos_com_materias, FilterOverridesMetaMixin, FileFieldCheckMixin,
                         lista_anexados)
+import sapl
 
 from .models import (AcompanhamentoMateria, Anexada, Autoria, DespachoInicial,
                      DocumentoAcessorio, Numeracao, Proposicao, Relatoria,
@@ -168,7 +168,7 @@ class MateriaLegislativaForm(FileFieldCheckMixin, ModelForm):
     tipo_autor = ModelChoiceField(label=_('Tipo Autor'),
                                   required=False,
                                   queryset=TipoAutor.objects.all(),
-                                  empty_label=_('------'), )
+                                  empty_label=_('------'),)
 
     autor = forms.ModelChoiceField(required=False,
                                    empty_label='------',
@@ -1322,11 +1322,11 @@ class MateriaLegislativaFilterSet(django_filters.FilterSet):
         #    ('tipo_origem_externa', 4),
         #    ('numero_origem_externa', 4),
         #    ('ano_origem_externa', 4),
-        #])
+        # ])
         # row11 = to_row([
         #    ('data_origem_externa', 8),
         #    ('local_origem_externa', 4)
-        #])
+        # ])
 
         self.form.helper = SaplFormHelper()
         self.form.helper.form_method = 'GET'
@@ -1818,7 +1818,7 @@ class TipoProposicaoForm(ModelForm):
                 _('O Registro definido (%s) não está na base de %s.'
                   ) % (cd['tipo_conteudo_related'], content_type))
 
-        #"""
+        # """
         # A unicidade de tipo proposição para tipo de conteudo
         # foi desabilitada pois existem casos em quem é o procedimento da
         # instituição convergir vários tipos de proposição
@@ -2549,7 +2549,7 @@ class ConfirmarProposicaoForm(ProposicaoForm):
         widgets = {
             'descricao': widgets.Textarea(
                 attrs={'readonly': 'readonly', 'rows': 4}),
-            'data_envio':  widgets.DateTimeInput(
+            'data_envio': widgets.DateTimeInput(
                 attrs={'readonly': 'readonly'}),
         }
 
@@ -2587,7 +2587,7 @@ class ConfirmarProposicaoForm(ProposicaoForm):
 
         super(ProposicaoForm, self).__init__(*args, **kwargs)
 
-        if self.instance.tipo.content_type.model_class() ==\
+        if self.instance.tipo.content_type.model_class() == \
                 TipoMateriaLegislativa:
             self.fields['regime_tramitacao'].required = True
         self.fields['especie'].required = False
@@ -2728,7 +2728,7 @@ class ConfirmarProposicaoForm(ProposicaoForm):
 
         cd = ProposicaoForm.clean(self)
 
-        if self.instance.tipo.content_type.model_class() ==\
+        if self.instance.tipo.content_type.model_class() == \
                 TipoMateriaLegislativa:
             if 'regime_tramitacao' not in cd or\
                     not cd['regime_tramitacao']:
@@ -2868,9 +2868,31 @@ class ConfirmarProposicaoForm(ProposicaoForm):
             autoria.primeiro_autor = True
             autoria.save()
 
+            try:
+                if isinstance(autoria.autor.autor_related, Parlamentar):
+                    signs = list(
+                        map(lambda s: s[0],
+                            self.instance.metadata['signs']['texto_original']['signs']
+                            )
+                        )
+                    parlamentares = Parlamentar.objects.filter(
+                        nome_completo__in=signs
+                        ).exclude(
+                            pk=autoria.autor.autor_related.id
+                            )
+                    for p in parlamentares:
+                        autoria = Autoria()
+                        autoria.autor = p.autor.first()
+                        autoria.materia = materia
+                        autoria.primeiro_autor = True
+                        autoria.save()
+            except Exception as e:
+                self.logger.debug(f"Erro no Registro de multiplas autorias. Proposicao id={proposicao.id}")
+
+            autores = materia.autores.all()
             self.instance.results['messages']['success'].append(_(
                 'Autoria registrada para (%s)'
-            ) % str(autoria.autor))
+            ) % ', '.join(map(lambda a: a.nome, autores)))
 
             # Matéria de vinlculo
             if proposicao.materia_de_vinculo:
@@ -2987,8 +3009,7 @@ class ConfirmarProposicaoForm(ProposicaoForm):
 
         protocolo.tipo_protocolo = '1'
 
-        protocolo.interessado = str(proposicao.autor)[
-            :200]  # tamanho máximo 200
+        protocolo.interessado = str(proposicao.autor)[:200]  # tamanho máximo 200
         protocolo.autor = proposicao.autor
         protocolo.assunto_ementa = proposicao.descricao
         protocolo.numero_paginas = cd['numero_de_paginas']
@@ -3000,7 +3021,7 @@ class ConfirmarProposicaoForm(ProposicaoForm):
         protocolo.tipo_processo = '0'
         if self.instance.tipo.content_type.model_class(
         ) in (TipoMateriaLegislativa, TipoDocumento):
-            #protocolo.tipo_materia = proposicao.tipo.tipo_conteudo_related
+            # protocolo.tipo_materia = proposicao.tipo.tipo_conteudo_related
             protocolo.tipo_processo = '1'
 
         protocolo.save()
