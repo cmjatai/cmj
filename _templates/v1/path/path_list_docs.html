@@ -103,12 +103,17 @@
           {% if documento.descricao %}
 
             <div class="descricao">
+                {% social_link_share documento 'float-right'%}
               <p tabindex="{{view.tabindex}}" >
                 {{documento.descricao|striptags|safe}}
               </p>
               {% if not pagina_inicial and documento.tipo == documento.STATUS_PUBLIC %}
-                {% social_link_share documento 'float-right'%}
+                <small class="text-black-50">
+                  {{documento.texto|striptags|safe|truncatewords_html:50}}
+                </small>
               {% endif %}
+
+
             </div>
           {% endif %}
 
