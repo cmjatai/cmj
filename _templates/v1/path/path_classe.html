@@ -15,9 +15,18 @@
 {% endblock %}
 
 {% block base_content %}
-  <div class="row  justify-content-lg-center">
-    {% with 'path-item-list col-lg-8' as css_class %}
-      {% include "path/path_list_docs.html" %}
+
+  <div class="row {% if not object.childs.exists %}justify-content-center{% endif %}">
+    {% with 0 as split_row %}
+      <div class="col-12 col-md-9">
+        {% with 'path-item-list w-100 px-3' as css_class %}
+          {% include "path/path_list_docs.html" %}
+        {% endwith %}
+      </div>
+       {% if object.childs.exists %}
+          <div class="col order-first order-md-last">
+          </div>
+       {% endif %}
     {% endwith %}
   </div>
   {% include "paginacao.html" %}

@@ -1,7 +1,7 @@
-import base64
 from datetime import timedelta
-import io
 from operator import attrgetter
+import base64
+import io
 import tempfile
 import zipfile
 
@@ -10,7 +10,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models import F, Q
 from django.db.models.aggregates import Max, Count
-from django.http.response import Http404, HttpResponse, HttpResponseForbidden,\
+from django.http.response import Http404, HttpResponse, HttpResponseForbidden, \
     HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.urls.base import reverse_lazy
@@ -23,14 +23,15 @@ from django.views.generic.list import ListView, MultipleObjectMixin
 from haystack.forms import model_choices
 from haystack.query import SearchQuerySet
 from haystack.utils.app_loading import haystack_get_models
+from prompt_toolkit.key_binding.bindings.named_commands import self_insert
 
 from cmj import globalrules
 from cmj.core.models import AreaTrabalho, CertidaoPublicacao
 from cmj.sigad import forms, models
 from cmj.sigad.forms import DocumentoForm, CaixaPublicacaoForm
-from cmj.sigad.models import Documento, Classe, ReferenciaEntreDocumentos,\
-    PermissionsUserClasse, PermissionsUserDocumento, CMSMixin,\
-    CLASSE_TEMPLATES_CHOICE, CaixaPublicacao, CaixaPublicacaoClasse,\
+from cmj.sigad.models import Documento, Classe, ReferenciaEntreDocumentos, \
+    PermissionsUserClasse, PermissionsUserDocumento, CMSMixin, \
+    CLASSE_TEMPLATES_CHOICE, CaixaPublicacao, CaixaPublicacaoClasse, \
     CaixaPublicacaoRelationship, UrlShortener
 from cmj.utils import make_pagination
 from sapl.comissoes.models import Comissao
@@ -62,7 +63,7 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
 
         context['noticias_dos_parlamentares'] = np
 
-        #context['noticias_da_procuradoria'] = self.get_noticias_da_procuradoria()
+        # context['noticias_da_procuradoria'] = self.get_noticias_da_procuradoria()
 
         context['ultimas_publicacoes'] = self.get_ultimas_publicacoes()
 
@@ -724,7 +725,7 @@ class PathParlamentarView(PathView):
 
         if not self.parlamentar:
             raise Http404
-        
+
         if self.parlamentar.template_classe != \
                 CLASSE_TEMPLATES_CHOICE.parlamentares:
             context = PathView.get_context_data(self, **kwargs)
@@ -735,7 +736,7 @@ class PathParlamentarView(PathView):
 
             legislatura_ativa = int(self.request.GET.get('l', '0'))
             sl_ativa = int(self.request.GET.get('sl', '0'))
-            #parlamentar_ativo = int(self.request.GET.get('p', '0'))
+            # parlamentar_ativo = int(self.request.GET.get('p', '0'))
 
             legs = Legislatura.objects
             pms = Parlamentar.objects
@@ -911,8 +912,8 @@ class ClasseParentMixin:
         if not self.parent:
             return _('Cadastro de Classe Geral')
 
-        return '%s <small>(%s)</small>' % (
-            self.parent, _('Cadastro de SubClasse'))
+        return '%s - %s - <small>(%s)</small>' % (
+            self.parent, self.parent.apelido or '', _('Cadastro de SubClasse'))
 
     @property
     def cancel_url(self):

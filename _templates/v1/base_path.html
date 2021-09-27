@@ -17,9 +17,9 @@
     <div style="position:relative;">
       <h1 class="path-title-classe">
         {% if object.classe %}
-          <a tabindex="{{view.tabindex}}" href="/{{object.classe.slug}}" title="Listar {{object.classe}}">{{object.classe}}</a>
+          <a tabindex="{{view.tabindex}}" href="/{{object.classe.slug}}" title="Listar {{object.classe}}">{{object.classe.apelido|default:object.classe}}</a>
         {% else %}
-        <a tabindex="{{view.tabindex}}" href="#"  id="main_content">{{object}}</a>
+          <a tabindex="{{view.tabindex}}" href="#"  id="main_content">{{object.apelido|default:object}}</a>
         {% endif %}
       </h1>
       <div class="path-data-pub">

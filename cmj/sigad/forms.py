@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from cmj.sigad import models
-from cmj.sigad.models import Classe, Documento, CaixaPublicacaoRelationship,\
+from cmj.sigad.models import Classe, Documento, CaixaPublicacaoRelationship, \
     CaixaPublicacaoClasse
 from cmj.utils import YES_NO_CHOICES
 from sapl.crispy_layout_mixin import to_row, SaplFormLayout
@@ -56,6 +56,7 @@ class ClasseForm(ModelForm):
         fields = [
             'codigo',
             'titulo',
+            'apelido',
             'visibilidade',
             'perfil',
             'descricao',
@@ -70,9 +71,10 @@ class ClasseForm(ModelForm):
 
         row1 = to_row([
             ('codigo', 2),
-            ('titulo', 4),
-            ('perfil', 3),
-            ('parlamentar', 3),
+            ('titulo', 3),
+            ('apelido', 3),
+            ('perfil', 2),
+            ('parlamentar', 2),
         ])
 
         row2 = to_row([
@@ -211,8 +213,8 @@ class CaixaPublicacaoForm(forms.ModelForm):
         if classe:
             tmpl = classe.template_classe
             qs = classe.documento_set.public_all_docs()
-            #qs = getattr(classe.documento_set, CLASSE_DOC_MANAGER_CHOICE[tmpl])
-            #qs = qs()
+            # qs = getattr(classe.documento_set, CLASSE_DOC_MANAGER_CHOICE[tmpl])
+            # qs = qs()
         else:
             qs = Documento.objects.qs_news().filter(
                 nodes__midia__isnull=False

@@ -109,10 +109,9 @@
               </p>
               {% if not pagina_inicial and documento.tipo == documento.STATUS_PUBLIC %}
                 <small class="text-black-50">
-                  {{documento.texto|striptags|safe|truncatewords_html:50}}
+                  {{documento.texto|default:""|striptags|safe|truncatewords_html:50}}
                 </small>
               {% endif %}
-
 
             </div>
           {% endif %}

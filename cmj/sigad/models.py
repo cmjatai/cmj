@@ -350,6 +350,11 @@ class Slugged(Parent):
         max_length=250,
         blank=True, null=True, default='')
 
+    apelido = models.CharField(
+        verbose_name=_('Apelido'),
+        max_length=250,
+        blank=True, null=True, default='')
+
     slug = models.SlugField(max_length=2000)
 
     class Meta:
