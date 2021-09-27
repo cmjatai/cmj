@@ -25,6 +25,14 @@
       </div>
        {% if object.childs.exists %}
           <div class="col order-first order-md-last">
+            <ul class="nav">
+              {% for ch in object.childs.all %}
+                <li>
+                  <a href="{{ch.absolute_slug}}">{{ch.apelido|default:ch.titulo}}</a>
+                </li>
+              {% endfor %}
+
+            </ul>
           </div>
        {% endif %}
     {% endwith %}
