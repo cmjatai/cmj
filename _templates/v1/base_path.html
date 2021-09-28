@@ -3,13 +3,32 @@
 
 {% block html_class %}html{{path}}{%endblock%}
 {% block body_class %}body{{path}}{%endblock%}
+
+{% block second_header %}
+
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      {% for p in object.parents_and_me %}
+        {% if forloop.first %}
+        <li class="breadcrumb-item"><a href="/">Página Inicial</a></li>
+        {% endif %}
+        <li class="breadcrumb-item {% if p == object %}active{% endif %}">
+          <a href="/{{p.absolute_slug}}" {% if p == object %}aria-current="page"{% endif %}>
+            {% if p == object %}Esta Página{% else %}{{p.apelido|default:p.titulo}}{% endif %}
+          </a>
+        </li>
+      {% endfor %}
+    </ol>
+  </nav>
+{% endblock second_header %}
+
 {% block base_functions %}
   <div class="container">
-    <div class="btn-toolbar">
-      <div class="btn-group" role="group" aria-label="First group">
-        {% block controls_content %}{% endblock %}
+      <div class="btn-toolbar">
+        <div class="btn-group" role="group" aria-label="First group">
+          {% block controls_content %}{% endblock %}
+        </div>
       </div>
-    </div>
   </div>
 {% endblock %}
 
@@ -19,7 +38,7 @@
         {% if object.classe %}
           <a tabindex="{{view.tabindex}}" href="/{{object.classe.slug}}" title="Listar {{object.classe}}">{{object.classe.apelido|default:object.classe}}</a>
         {% else %}
-          <a tabindex="{{view.tabindex}}" href="#"  id="main_content">{{object.apelido|default:object}}</a>
+          <a tabindex="{{view.tabindex}}" href="#"  id="main_content">{{object.apelido|default:object.titulo}}</a>
         {% endif %}
       </h1>
       <div class="path-data-pub">

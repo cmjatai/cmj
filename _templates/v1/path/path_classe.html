@@ -14,11 +14,12 @@
   {% endif %}
 {% endblock %}
 
+
 {% block base_content %}
 
   <div class="row {% if not object.childs.exists %}justify-content-center{% endif %}">
     {% with 0 as split_row %}
-      <div class="col-12 col-md-9">
+      <div class="col-12 col-md-8">
         {% with 'path-item-list w-100 px-3' as css_class %}
           {% include "path/path_list_docs.html" %}
         {% endwith %}
@@ -28,7 +29,7 @@
             <ul class="nav">
               {% for ch in object.childs.all %}
                 <li>
-                  <a href="{{ch.absolute_slug}}">{{ch.apelido|default:ch.titulo}}</a>
+                  <a href="/{{ch.absolute_slug}}">{{ch.apelido|default:ch.titulo}}</a>
                 </li>
               {% endfor %}
 

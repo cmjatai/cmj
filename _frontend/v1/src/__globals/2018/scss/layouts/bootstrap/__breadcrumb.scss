@@ -1,0 +1,12 @@
+.breadcrumb {
+  border-radius: 0;
+  margin-bottom: 0.5rem;
+  padding: 0rem 0.25rem;
+  font-size: 0.9em;
+
+  li:not(.active) {
+    a {
+      color: #794905;
+    }
+  }
+}
