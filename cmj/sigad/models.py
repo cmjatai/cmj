@@ -145,10 +145,33 @@ class Parent(models.Model):
         parents = self.parent.parents + [self.parent, self]
         return parents
 
-    def tree2list(self):
+    @property
+    def classes_parents(self):
+
+        if not hasattr(self, 'classe'):
+            return self.parents
+
+        _p = self.parents
+        p = _p or [self]
+
+        parents = p[0].classe.parents_and_me + _p
+        return parents
+
+    @property
+    def classes_parents_and_me(self):
+
+        if not hasattr(self, 'classe'):
+            return self.parents_and_me
+
+        p = self.parents_and_me
+
+        parents = p[0].classe.parents_and_me + p
+        return parents
+
+    def treechilds2list(self):
         yield self
         for child in self.childs.view_childs():
-            for item in child.tree2list():
+            for item in child.treechilds2list():
                 yield item
 
 

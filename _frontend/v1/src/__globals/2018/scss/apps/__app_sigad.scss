@@ -234,7 +234,7 @@
     }
 
     &.alinhamento-left {
-      margin-right: $grid-gutter-width;
+      margin-right: $grid-gutter-width / 2;
       float: left;
 
       &.img128 {

@@ -8,7 +8,7 @@
 
   <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
-      {% for p in object.parents_and_me %}
+      {% for p in object.classes_parents_and_me %}
         {% if forloop.first %}
         <li class="breadcrumb-item"><a href="/">Página Inicial</a></li>
         {% endif %}
@@ -57,11 +57,13 @@
             </a>
             <div class="collapse" id="list-revisoes">
               {% for rev in object.revisoes.all %}
-                  <span class="">
-                    {{rev.get_visibilidade_display}} - {{rev.timestamp}} - {% trans "por:" %} {{rev.user.first_name|default:rev.user.email}}
-                  </span>
+                  {% if rev.user %}
+                    <span class="">
+                      {{rev.get_visibilidade_display}} - {{rev.timestamp}} - {% trans "por:" %}
+                        {{rev.user.first_name|default:rev.user.email}}
+                    </span>
+                  {% endif %}
               {% endfor %}
-
             </div>
           </div>
         {% endblock %}
