@@ -75,7 +75,7 @@
       <div class="row">
         <div class="col-sm-12">
           <div id="div_id_notificacoes" class="form-group">
-            <p class="control-label">Essa Denúncia foi encaminhada para os seguintes usuários:</p>
+            <p class="control-label">Esta manifestação ({{solicitacao.get_tipo_display}}) foi encaminhada para os seguintes usuários:</p>
             <div class="controls">
               <div class="form-control-static">
                 <ul>
@@ -99,7 +99,7 @@
   </div>
 
 <div class="container-mensagens">
-  {% for msg in solicitacao.mensagemsolicitacao_set.all %} 
+  {% for msg in solicitacao.mensagemsolicitacao_set.all %}
     <div class="{% if msg.owner == user or user.is_anonymous and not msg.owner %}container-logged-user{% else %}container-member {%if not forloop.counter0|divisibleby:2  %}odd{%endif%}{% endif %}">
       <a href="#" name="item-{{msg.pk}}"></a>
       <div class="inner">
