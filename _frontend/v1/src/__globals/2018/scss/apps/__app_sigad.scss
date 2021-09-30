@@ -139,6 +139,10 @@
     font-weight: 800;
     margin-top: $grid-gutter-width;
 
+    &.display-doc {
+      font-size: 100%;
+    }
+
     a {
       text-decoration: none;
     }

@@ -34,7 +34,7 @@
 
 {% block base_header %}
     <div style="position:relative;">
-      <h1 class="path-title-classe">
+      <h1 class="path-title-classe {% if object.classe %}display-doc{% endif %}">
         {% if object.classe %}
           <a tabindex="{{view.tabindex}}" href="/{{object.classe.slug}}" title="Listar {{object.classe}}">{{object.classe.apelido|default:object.classe}}</a>
         {% else %}
