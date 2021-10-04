@@ -5,7 +5,7 @@ from django.contrib.postgres.fields.jsonb import JSONField
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, F
 from django.db.models.fields.related import ManyToManyField
 from django.utils import timezone, formats
 from django.utils.translation import ugettext_lazy as _
@@ -300,7 +300,7 @@ class SessaoPlenaria(models.Model):
             self.upload_pauta = None
             self.upload_ata = None
             self.upload_anexo = None
-            models.Model.save(self, force_insert=force_insert,
+            sp = models.Model.save(self, force_insert=force_insert,
                               force_update=force_update,
                               using=using,
                               update_fields=update_fields)
@@ -309,10 +309,20 @@ class SessaoPlenaria(models.Model):
             self.upload_ata = upload_ata
             self.upload_anexo = upload_anexo
 
-        return models.Model.save(self, force_insert=force_insert,
+        sp = models.Model.save(self, force_insert=force_insert,
                                  force_update=force_update,
                                  using=using,
                                  update_fields=update_fields)
+
+        sp.ordemdia_set.exclude(
+            data_ordem=F('sessao_plenaria__data_inicio')
+        ).update(data_ordem=sp.data_inicio)
+
+        sp.expedientemateria_set.exclude(
+            data_ordem=F('sessao_plenaria__data_inicio')
+        ).update(data_ordem=sp.data_inicio)
+
+        return sp
 
     @property
     def ano(self):
@@ -436,7 +446,7 @@ class IntegranteMesa(models.Model):  # MesaSessaoPlenaria
 
 class AbstractOrador(models.Model):  # Oradores
 
-    FIELDFILE_NAME = ('upload_anexo', )
+    FIELDFILE_NAME = ('upload_anexo',)
 
     metadata = JSONField(
         verbose_name=_('Metadados'),
@@ -581,7 +591,7 @@ class RegistroVotacao(models.Model):
     class Meta:
         verbose_name = _('Votação')
         verbose_name_plural = _('Votações')
-        ordering = ('id', )
+        ordering = ('id',)
 
     def __str__(self):
         return _('Ordem: %(ordem)s - Votação: %(votacao)s - '
@@ -771,7 +781,7 @@ class TipoJustificativa(models.Model):
 
 class JustificativaAusencia(models.Model):
 
-    FIELDFILE_NAME = ('upload_anexo', )
+    FIELDFILE_NAME = ('upload_anexo',)
 
     metadata = JSONField(
         verbose_name=_('Metadados'),
