@@ -22,7 +22,6 @@ from sapl.norma.models import NormaJuridica, TipoNormaJuridica
 from sapl.parlamentares.models import Filiacao
 from sapl.sessao.models import SessaoPlenaria
 
-
 register = template.Library()
 
 
@@ -336,16 +335,16 @@ def render_chunk_vendors(extension=None):
         return ''
 
 
-@register.filter
-def yaml_render(template_name, increment_space=0):
+@register.simple_tag(takes_context=True)
+def yaml_render(context, template_name, increment_space=0):
     t = template.loader.get_template(template_name)
-    r = t.render()
+    r = t.template.render(context)
     if not increment_space:
         return r
 
     r = r.split('\n')
     r = ['%s%s' % (' ' * increment_space, line) for line in r]
-    return '\n'.join(r)
+    return mark_safe('\n'.join(r))
 
 
 @register.filter(is_safe=True)

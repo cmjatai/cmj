@@ -2,21 +2,21 @@
 - title: {% trans "Portal" %}
   url: ''
   children:
-  {{ "navbar/navbar_public.yaml"|yaml_render:2|safe }}
+  {% yaml_render "navbar/navbar_public.yaml" 2 %}
 
 {% if user.is_superuser %}
 - title: {% trans "SAAP" %}
   url: ''
   children:
-  {{ "navbar/restrict/navbar_saap.yaml"|yaml_render:2|safe }}
+  {% yaml_render "navbar/restrict/navbar_saap.yaml" 2 %}
 - title: {% trans "Ouvidoria" %}
   url: ''
   children:
-  {{ "navbar/public/navbar_esic.yaml"|yaml_render:2|safe }}
+  {% yaml_render "navbar/public/navbar_esic.yaml" 2 %}
 {% else %}
-  {{ "navbar/restrict/navbar_saap.yaml"|yaml_render:0|safe }}
+  {% yaml_render "navbar/restrict/navbar_saap.yaml" 0 %}
   {% if perms.ouvidoria.list_solicitacao %}
-    {{ "navbar/public/navbar_esic.yaml"|yaml_render:0|safe }}
+    {% yaml_render "navbar/public/navbar_esic.yaml" 0 %}
   {% endif %}
 {% endif %}
 
@@ -25,8 +25,8 @@
   url: '/noticias'
 {% endif %}
 
-{{ "navbar/restrict/navbar_protocolo.yaml"|yaml_render:0|safe }}
+{% yaml_render "navbar/restrict/navbar_protocolo.yaml" 0 %}
 
 {% if not perms.protocoloadm.add_protocolo %}
-  {{ "navbar/public/navbar_atividadelegislativa.yaml"|yaml_render:0|safe }}
+  {% yaml_render "navbar/public/navbar_atividadelegislativa.yaml" 0 %}
 {% endif %}

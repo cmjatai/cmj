@@ -1,5 +1,5 @@
 {% load i18n common_cmj_tags %}
-{{ "navbar/navbar_areatrabalho.yaml"|yaml_render:0|safe }}
+{% yaml_render "navbar/navbar_areatrabalho.yaml" 0 %}
 
 - title: {% trans 'Proposições' %}
   url: sapl.materia:proposicao_list

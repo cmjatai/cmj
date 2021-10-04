@@ -1,9 +1,13 @@
+import logging
+
 from django import template
 from django.shortcuts import render
 from django.urls.base import reverse
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 import yaml
 
+logger = logging.getLogger(__name__)
 
 register = template.Library()
 
@@ -85,16 +89,15 @@ def nav_run(context, path=None, pk=None):
             return
 
         try:
+            # print(timezone.now())
             rendered = yaml_template.template.render(context)
             menu = yaml.load(rendered)
             resolve_urls_inplace(menu, root_pk, rm, context)
+            # print(timezone.now())
         except Exception as e:
-            """sapl_logger.error(_('Erro na conversão do yaml %s. App: %s.
-                                    Erro:
-                                      %s
-                                ') % (
-                yaml_path, rm.app_name, str(e)))"""
-            pass
+            logger.error(
+                _('Erro na conversão do yaml %s. App: %s. Erro: %s') % (
+                    yaml_path, rm.app_name, str(e)))
 
     return {'menu': menu}
 
@@ -103,6 +106,7 @@ def resolve_urls_inplace(menu, pk, rm, context):
     if isinstance(menu, list):
         list_active = ''
         for item in menu:
+            # print(item)
             menuactive = resolve_urls_inplace(item, pk, rm, context)
             list_active = menuactive if menuactive else list_active
             if not isinstance(item, list):

@@ -15,29 +15,24 @@
   - title: {% trans 'Excluir Tramitação em Lote' %}
     url: sapl.materia:excluir_tramitacao_em_lote
     check_permission: materia.list_tramitacao {% comment %} FIXME transformar para checagens de menu_[funcionalidade]{% endcomment%}
-                  
-{% if user.is_superuser %}
-- title: {% trans 'Documentos Administrativos (SUPERUSER)' %}
-  check_permission: protocoloadm.list_documentoadministrativo
-  children:
-  - title: {% trans 'Pesquisar Documentos Administrativos (SUPERUSER)' %}
-    url: sapl.protocoloadm:documentoadministrativo_list
-  - title: {% trans 'Tramitação em Lote (SUPERUSER)' %}
-    url: sapl.protocoloadm:primeira_tramitacao_em_lote_docadm
-    check_permission: sapl.documento:add_tramitacao
-- title: {% trans 'Impressos (SUPERUSER)' %}
-  url: sapl.materia:impressos
-  check_permission: materia.can_access_impressos {% comment %} FIXME transformar para checagens de menu_[funcionalidade]{% endcomment%}
-- title: {% trans 'Proposições (SUPERUSER)' %}
-  url: sapl.materia:proposicao_list
-  check_permission: materia.add_proposicao
 
-- title: {% trans 'Acessório em Lote (SUPERUSER)' %}
-  url: sapl.materia:acessorio_em_lote
-  check_permission: materia.list_documentoacessorio {% comment %} FIXME transformar para checagens de menu_[funcionalidade]{% endcomment%}
-- title: {% trans 'Pautas das Sessões (SUPERUSER)' %}
-  url: sapl.sessao:pauta_sessao
-{% endif %}
+  {% if False and user.is_superuser %}
+  - title: {% trans 'Documentos Administrativos (SUPERUSER)' %}
+    check_permission: protocoloadm.list_documentoadministrativo
+    children:
+    - title: {% trans 'Tramitação em Lote (SUPERUSER)' %}
+      url: sapl.protocoloadm:primeira_tramitacao_em_lote_docadm
+      check_permission: sapl.documento:add_tramitacao
+  - title: {% trans 'Impressos (SUPERUSER)' %}
+    url: sapl.materia:impressos
+    check_permission: materia.can_access_impressos {% comment %} FIXME transformar para checagens de menu_[funcionalidade]{% endcomment%}
+
+  - title: {% trans 'Acessório em Lote (SUPERUSER)' %}
+    url: sapl.materia:acessorio_em_lote
+    check_permission: materia.list_documentoacessorio {% comment %} FIXME transformar para checagens de menu_[funcionalidade]{% endcomment%}
+  - title: {% trans 'Pautas das Sessões (SUPERUSER)' %}
+    url: sapl.sessao:pauta_sessao
+  {% endif %}
 
 
 

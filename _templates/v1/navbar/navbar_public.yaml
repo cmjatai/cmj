@@ -1,11 +1,11 @@
 {% load i18n common_cmj_tags %}
 
-{{ "navbar/public/navbar_institucional.yaml"|yaml_render:0|safe }}
+{% yaml_render "navbar/public/navbar_institucional.yaml" 0 %}
 
 - title: {% trans 'Vereadores' %}
   url: /parlamentar
 
-{{ "navbar/public/navbar_midias.yaml"|yaml_render:0|safe }}
-{{ "navbar/public/navbar_esic.yaml"|yaml_render:0|safe }}
-{{ "navbar/public/navbar_atividadelegislativa.yaml"|yaml_render:0|safe }}
-{{ "navbar/public/navbar_transparencia.yaml"|yaml_render:0|safe }}
+{% yaml_render "navbar/public/navbar_midias.yaml" 0 %}
+{% yaml_render "navbar/public/navbar_esic.yaml" 0 %}
+{% yaml_render "navbar/public/navbar_atividadelegislativa.yaml" 0 %}
+{% yaml_render "navbar/public/navbar_transparencia.yaml" 0 %}
