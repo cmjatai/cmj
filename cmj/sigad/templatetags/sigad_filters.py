@@ -74,7 +74,7 @@ def caixa_publicacao(key, classe):
                   list(
                       map(lambda x: (
                           x.documento, x.documento.nodes.filter(
-                            tipo=Documento.TPD_IMAGE).order_by('ordem').first()),
+                            tipo=Documento.TPD_IMAGE).order_by('parent__ordem', 'ordem').first()),
                           docs
                           ))
                   }
