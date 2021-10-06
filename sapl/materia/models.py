@@ -16,7 +16,7 @@ from model_utils import Choices
 from cmj.core.models import CertidaoPublicacao
 from cmj.diarios.models import VinculoDocDiarioOficial, DiarioOficial
 from cmj.mixins import CommonMixin
-from sapl.base.models import SEQUENCIA_NUMERACAO_PROTOCOLO, Autor,\
+from sapl.base.models import SEQUENCIA_NUMERACAO_PROTOCOLO, Autor, \
     TipoAutor
 from sapl.comissoes.models import Comissao, Reuniao
 from sapl.compilacao.models import (PerfilEstruturalTextoArticulado,
@@ -26,7 +26,6 @@ from sapl.utils import (RANGE_ANOS, YES_NO_CHOICES, SaplGenericForeignKey,
                         SaplGenericRelation, restringe_tipos_de_arquivo_txt,
                         texto_upload_path, get_settings_auth_user_model,
                         OverwriteStorage, PortalFileField)
-
 
 EM_TRAMITACAO = [(1, 'Sim'),
                  (0, 'Não')]
@@ -38,7 +37,6 @@ def grupo_autor():
     except Group.DoesNotExist:
         return None
     return grupo.id
-
 
 
 class TipoProposicao(models.Model):
@@ -125,7 +123,6 @@ class TipoMateriaManager(models.Manager):
         )
 
 
-
 class TipoMateriaLegislativa(models.Model):
     objects = TipoMateriaManager()
     sigla = models.CharField(max_length=5, verbose_name=_('Sigla'))
@@ -169,7 +166,6 @@ class TipoMateriaLegislativa(models.Model):
         return self.descricao
 
 
-
 class RegimeTramitacao(models.Model):
     descricao = models.CharField(max_length=50, verbose_name=_('Descrição'))
 
@@ -179,7 +175,6 @@ class RegimeTramitacao(models.Model):
 
     def __str__(self):
         return self.descricao
-
 
 
 class Origem(models.Model):
@@ -228,12 +223,11 @@ class MateriaLegislativaManager(models.Manager):
         )
 
 
-
 class MateriaLegislativa(CommonMixin):
 
     objects = MateriaLegislativaManager()
 
-    FIELDFILE_NAME = ('texto_original', )
+    FIELDFILE_NAME = ('texto_original',)
 
     metadata = JSONField(
         verbose_name=_('Metadados'),
@@ -500,7 +494,6 @@ class MateriaLegislativa(CommonMixin):
         return ''
 
 
-
 class Autoria(models.Model):
     autor = models.ForeignKey(Autor,
                               verbose_name=_('Autor'),
@@ -515,13 +508,12 @@ class Autoria(models.Model):
     class Meta:
         verbose_name = _('Autoria')
         verbose_name_plural = _('Autorias')
-        unique_together = (('autor', 'materia'), )
+        unique_together = (('autor', 'materia'),)
         ordering = ('-primeiro_autor', 'autor__nome')
 
     def __str__(self):
         return _('Autoria: %(autor)s - %(materia)s') % {
             'autor': self.autor, 'materia': self.materia}
-
 
 
 class AcompanhamentoMateria(models.Model):
@@ -551,7 +543,6 @@ class AcompanhamentoMateria(models.Model):
             }
 
 
-
 class PautaReuniao(models.Model):
     reuniao = models.ForeignKey(
         Reuniao, related_name='reuniao_set',
@@ -573,7 +564,6 @@ class PautaReuniao(models.Model):
                      'reuniao': self.reuniao,
                      'materia': self.materia
         }
-
 
 
 class Anexada(models.Model):
@@ -600,7 +590,6 @@ class Anexada(models.Model):
             'materia_anexada': self.materia_anexada}
 
 
-
 class AssuntoMateria(models.Model):
     assunto = models.CharField(
         max_length=50,
@@ -618,7 +607,6 @@ class AssuntoMateria(models.Model):
         return self.assunto
 
 
-
 class DespachoInicial(models.Model):
     materia = models.ForeignKey(
         MateriaLegislativa, related_name="despachoinicial_set", on_delete=models.CASCADE)
@@ -633,7 +621,6 @@ class DespachoInicial(models.Model):
         return _('%(materia)s - %(comissao)s') % {
             'materia': self.materia,
             'comissao': self.comissao}
-
 
 
 class TipoDocumento(models.Model):
@@ -656,9 +643,8 @@ class TipoDocumento(models.Model):
         return self.descricao
 
 
-
 class DocumentoAcessorio(CommonMixin):
-    FIELDFILE_NAME = ('arquivo', )
+    FIELDFILE_NAME = ('arquivo',)
 
     metadata = JSONField(
         verbose_name=_('Metadados'),
@@ -775,7 +761,6 @@ class DocumentoAcessorio(CommonMixin):
                                  update_fields=update_fields)
 
 
-
 class MateriaAssunto(models.Model):
     # TODO M2M ??
     assunto = models.ForeignKey(
@@ -794,7 +779,6 @@ class MateriaAssunto(models.Model):
     def __str__(self):
         return _('%(materia)s - %(assunto)s') % {
             'materia': self.materia, 'assunto': self.assunto}
-
 
 
 class Numeracao(models.Model):
@@ -822,7 +806,6 @@ class Numeracao(models.Model):
         return _('%(numero)s/%(ano)s') % {
             'numero': self.numero_materia,
             'ano': self.ano_materia}
-
 
 
 class Orgao(models.Model):
@@ -854,7 +837,6 @@ class Orgao(models.Model):
             '%(nome)s - %(sigla)s') % {'nome': self.nome, 'sigla': self.sigla}
 
 
-
 class TipoFimRelatoria(models.Model):
     descricao = models.CharField(
         max_length=50, verbose_name=_('Tipo Fim Relatoria'))
@@ -865,7 +847,6 @@ class TipoFimRelatoria(models.Model):
 
     def __str__(self):
         return self.descricao
-
 
 
 class Relatoria(models.Model):
@@ -903,7 +884,6 @@ class Relatoria(models.Model):
                 'data': self.data_designacao_relator.strftime("%d/%m/%Y")}
 
 
-
 class Parecer(models.Model):
     relatoria = models.ForeignKey(Relatoria, on_delete=models.CASCADE)
     materia = models.ForeignKey(MateriaLegislativa, on_delete=models.CASCADE)
@@ -922,10 +902,9 @@ class Parecer(models.Model):
         }
 
 
-
 class Proposicao(CommonMixin):
 
-    FIELDFILE_NAME = ('texto_original', )
+    FIELDFILE_NAME = ('texto_original',)
 
     metadata = JSONField(
         verbose_name=_('Metadados'),
@@ -1071,7 +1050,7 @@ class Proposicao(CommonMixin):
         ordering = ['-data_recebimento']
         verbose_name = _('Proposição')
         verbose_name_plural = _('Proposições')
-        unique_together = (('content_type', 'object_id'), )
+        unique_together = (('content_type', 'object_id'),)
         permissions = (
             ('detail_proposicao_enviada',
              _('Pode acessar detalhes de uma proposição enviada.')),
@@ -1131,7 +1110,6 @@ class Proposicao(CommonMixin):
                                  update_fields=update_fields)
 
 
-
 class StatusTramitacao(models.Model):
     INDICADOR_CHOICES = Choices(('F', 'fim', _('Fim')),
                                 ('R', 'retorno', _('Retorno')))
@@ -1165,7 +1143,6 @@ class UnidadeTramitacaoManager(models.Manager):
                                  'comissao__sigla',
                                  'parlamentar__nome_parlamentar')
         ).order_by('nome_composto')
-
 
 
 class UnidadeTramitacao(models.Model):
@@ -1211,32 +1188,17 @@ class UnidadeTramitacao(models.Model):
             return _('%(parlamentar)s') % {'parlamentar': self.parlamentar}
 
 
-
 class Tramitacao(models.Model):
     TURNO_CHOICES = Choices(
         ('P', 'primeiro', _('Primeiro')),
         ('S', 'segundo', _('Segundo')),
         ('U', 'unico', _('Único')),
-        ('L', 'suplementar', _('Suplementar')),
-        ('F', 'final', _('Final')),
-        ('A', 'votacao_unica', _('Votação única em Regime de Urgência')),
-        ('B', 'primeira_votacao', _('1ª Votação')),
-        ('C', 'segunda_terceira_votacao', _('2ª e 3ª Votação')),
-        ('D', 'deliberacao', _('Deliberação')),
-        ('E', 'primeira_segunda_votacao_urgencia', _(
-            '1ª e 2ª votações em regime de urgência'))
-
     )
 
     status = models.ForeignKey(StatusTramitacao, on_delete=models.PROTECT,
-                               # TODO PÓS MIGRACAO INICIAL (vide #1381)
-                               # não nulo quando todas as
-                               # bases tiverem sido corrigidas
                                null=True,
                                verbose_name=_('Status'))
     materia = models.ForeignKey(MateriaLegislativa, on_delete=models.CASCADE)
-    # TODO: Remover os campos de data
-    # TODO: pois timestamp supre a necessidade
     timestamp = models.DateTimeField(default=timezone.now)
     data_tramitacao = models.DateField(verbose_name=_('Data Tramitação'))
     unidade_tramitacao_local = models.ForeignKey(
@@ -1248,9 +1210,6 @@ class Tramitacao(models.Model):
         blank=True, null=True, verbose_name=_('Data Encaminhamento'))
     unidade_tramitacao_destino = models.ForeignKey(
         UnidadeTramitacao,
-        # TODO PÓS MIGRACAO INICIAL (vide #1381)
-        # não nulo quando todas as
-        # bases tiverem sido corrigidas
         null=True,
         related_name='tramitacoes_destino',
         on_delete=models.PROTECT,
@@ -1264,11 +1223,13 @@ class Tramitacao(models.Model):
     texto = models.TextField(verbose_name=_('Texto da Ação'))
     data_fim_prazo = models.DateField(
         blank=True, null=True, verbose_name=_('Data Fim Prazo'))
-    user = models.ForeignKey(get_settings_auth_user_model(),
-                             verbose_name=_('Usuário'),
-                             on_delete=models.PROTECT,
-                             null=True,
-                             blank=True)
+    user = models.ForeignKey(
+        get_settings_auth_user_model(),
+        verbose_name=_('Usuário'),
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True
+    )
     ip = models.CharField(verbose_name=_('IP'),
                           max_length=30,
                           blank=True,
@@ -1277,7 +1238,7 @@ class Tramitacao(models.Model):
     class Meta:
         verbose_name = _('Tramitação')
         verbose_name_plural = _('Tramitações')
-        ordering = ('-data_tramitacao', '-id', )
+        ordering = ('-data_tramitacao', '-id',)
 
     def __str__(self):
         return _('%(materia)s | %(status)s | %(data)s') % {

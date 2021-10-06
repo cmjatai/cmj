@@ -1,10 +1,10 @@
 
 from datetime import datetime, timedelta
+from random import choice
+from string import ascii_letters, digits
 import logging
 import os
-from random import choice
 import shutil
-from string import ascii_letters, digits
 
 from crispy_forms.layout import HTML
 from django import template
@@ -29,7 +29,6 @@ from django_filters.views import FilterView
 from cmj.core.models import AreaTrabalho
 from cmj.globalrules import GROUP_MATERIA_WORKSPACE_VIEWER
 from cmj.mixins import BtnCertMixin
-import sapl
 from sapl.base.email_utils import do_envia_email_confirmacao
 from sapl.base.models import Autor, CasaLegislativa, AppConfig as BaseAppConfig
 from sapl.base.signals import tramitacao_signal
@@ -60,6 +59,7 @@ from sapl.utils import (YES_NO_CHOICES, autor_label, autor_modal, SEPARADOR_HASH
                         get_mime_type_from_file_extension, montar_row_autor,
                         show_results_filter_set, mail_service_configured, lista_anexados,
                         gerar_pdf_impressos)
+import sapl
 
 from .forms import (AcessorioEmLoteFilterSet, AcompanhamentoMateriaForm,
                     AnexadaEmLoteFilterSet,
@@ -1415,6 +1415,14 @@ class TramitacaoCrud(MasterDetailCrud):
             if local:
                 initial['unidade_tramitacao_local'
                         ] = local.unidade_tramitacao_destino.pk
+
+                if local.materia.tipo.turnos_aprovacao == 1:
+                    initial['turno'] = 'U'
+                else:
+                    initial[
+                        'turno'
+                    ] = 'S' if local.materia.registrovotacao_set.exists() else 'P'
+
             else:
                 initial['unidade_tramitacao_local'] = ''
             initial['data_tramitacao'] = timezone.now().date()
