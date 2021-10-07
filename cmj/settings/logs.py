@@ -21,10 +21,13 @@ class MyFormatter(logging.Formatter):
         s = logging.Formatter.format(self, record)
 
         for i in inspect.stack():
-                r = i.frame.f_locals.get('request', None)
-                if r:
+            r = i.frame.f_locals.get('request', None)
+            if r:
+                try:
                     url = r.path
-                    return f'{s} - {url}'
+                except:
+                    url = ''
+                return f'{s} - {url}'
         return s
 
 
@@ -84,7 +87,7 @@ LOGGING = {
     'root': {
         'handlers': ['cmj_logger_file', 'console'],
         'level': LOGGING_ROOT_LEVEL,
-        }
+    }
 }
 
 
