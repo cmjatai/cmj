@@ -98,6 +98,7 @@ class ShortAdminCrud(Crud):
             ), ''
 
     class GetDeleteUpdateMixin:
+
         def get(self, request, *args, **kwargs):
             r = super().get(self, request, *args, **kwargs)
             if self.object.automatico:

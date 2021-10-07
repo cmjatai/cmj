@@ -263,26 +263,30 @@ class CrispyLayoutFormMixin:
         if '|' in fieldname:
             fieldname, func = tuple(fieldname.split('|'))
 
-        text = ''
+        try:
+            verbose_name, field_display = get_field_display(obj, fieldname)
+        except:
+            verbose_name, field_display = '', ''
+
         if func:
-            verbose_name, text = getattr(self, func)(obj, fieldname)
+            verbose_name, field_display = getattr(self, func)(obj, fieldname)
 
         hook_fieldname = 'hook_%s' % fieldname
         if hasattr(self, hook_fieldname):
             try:
-                verbose_name, text = getattr(
-                    self, hook_fieldname)(obj, text=text)
+                verbose_name, field_display = getattr(
+                    self, hook_fieldname)(obj, verbose_name=verbose_name, field_display=field_display)
             except:
-                verbose_name, text = getattr(
+                verbose_name, field_display = getattr(
                     self, hook_fieldname)(obj)
         elif not func:
-            verbose_name, text = get_field_display(obj, fieldname)
+            verbose_name, field_display = get_field_display(obj, fieldname)
 
         return {
             'id': fieldname,
             'span': span,
             'verbose_name': verbose_name,
-            'text': text,
+            'text': field_display,
         }
 
     def fk_urlize_for_detail(self, obj, fieldname):

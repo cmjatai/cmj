@@ -41,6 +41,9 @@ class TipoSessaoPlenaria(models.Model):
         verbose_name=_('Tipo de Numeração'),
         choices=TIPO_NUMERACAO_CHOICES, default=11)
 
+    gera_selo_votacao = models.BooleanField(blank=True, default=True,
+                                            verbose_name=_('Gera Selo de Votação?'))
+
     class Meta:
         verbose_name = _('Tipo de Sessão Plenária')
         verbose_name_plural = _('Tipos de Sessão Plenária')
@@ -542,6 +545,7 @@ class TipoResultadoVotacao(models.Model):
 
 
 class RegistroVotacao(models.Model):
+
     tipo_resultado_votacao = models.ForeignKey(
         TipoResultadoVotacao,
         on_delete=models.PROTECT,
@@ -589,7 +593,7 @@ class RegistroVotacao(models.Model):
     class Meta:
         verbose_name = _('Votação')
         verbose_name_plural = _('Votações')
-        ordering = ('id',)
+        ordering = ('data_hora', 'id',)
 
     def __str__(self):
         return _('Ordem: %(ordem)s - Votação: %(votacao)s - '

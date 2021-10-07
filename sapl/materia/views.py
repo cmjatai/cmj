@@ -2144,14 +2144,14 @@ class MateriaLegislativaCrud(Crud):
             return qs"""
 
         def hook_anexadas__materias_anexadas(self, *args, **kwargs):
-            if kwargs['text']:
-                return 'Matérias Anexadas', kwargs['text']
+            if kwargs.get('field_display', ''):
+                return 'Matérias Anexadas', kwargs['field_display']
             else:
                 return '', ''
 
         def hook_anexadas__materias_desanexadas(self, *args, **kwargs):
-            if kwargs['text']:
-                return 'Matérias Desanexadas', kwargs['text']
+            if kwargs['field_display']:
+                return 'Matérias Desanexadas', kwargs['field_display']
             else:
                 return '', ''
 

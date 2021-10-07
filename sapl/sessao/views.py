@@ -1212,7 +1212,8 @@ class SessaoCrud(Crud):
 
         @property
         def extras_url(self):
-            btns = [self.btn_certidao('upload_ata'), self.btn_selo_votacao()]
+            btns = [self.btn_certidao('upload_ata'),
+                    self.btn_selo_votacao() if self.object.tipo.gera_selo_votacao else None]
             btns = list(filter(lambda x: x, btns))
             return btns
 
@@ -1238,11 +1239,40 @@ class SessaoCrud(Crud):
             response = Crud.DetailView.get(self, request, *args, **kwargs)
 
             if 'add_selo_votacao' in request.GET:
-                self.add_selo_votacao()
-                messages.add_message(
-                    request, messages.SUCCESS, 'Selos de Votação Adicionados.')
+                if self.object.tipo.gera_selo_votacao:
+                    self.add_selo_votacao()
+                    messages.add_message(
+                        request, messages.SUCCESS, 'Selos de Votação Adicionados.')
+                else:
+                    messages.add_message(
+                        request, messages.ERROR, 'Este tipo de sessão não gera selo de votação.')
 
             return response
+
+        def hook_url_video(self, obj, verbose_name, field_display):
+            if 'youtu' in obj.url_video:
+                return _(f'Vídeo da {obj.tipo.nome}'), field_display
+            return verbose_name, field_display
+
+        def hook_url_audio(self, obj, verbose_name, field_display):
+            if not obj.url_audio:
+                return '', ''
+            return verbose_name, field_display
+
+        def hook_upload_pauta(self, obj, verbose_name, field_display):
+            if not obj.upload_pauta:
+                return '', ''
+            return verbose_name, field_display
+
+        def hook_upload_ata(self, obj, verbose_name, field_display):
+            if not obj.upload_ata:
+                return '', ''
+            return verbose_name, field_display
+
+        def hook_upload_anexo(self, obj, verbose_name, field_display):
+            if not obj.upload_anexo:
+                return '', ''
+            return verbose_name, field_display
 
 
 class SessaoPermissionMixin(PermissionRequiredForAppCrudMixin,
@@ -1298,7 +1328,7 @@ class PresencaView(FormMixin, PresencaMixin, DetailView):
 
             # Id dos parlamentares presentes
             marcados = request.POST.getlist('presenca_ativos') \
-                +request.POST.getlist('presenca_inativos')
+                + request.POST.getlist('presenca_inativos')
 
             # Deletar os que foram desmarcados
             deletar = set(presentes_banco) - set(marcados)
@@ -1405,7 +1435,7 @@ class PresencaOrdemDiaView(FormMixin, PresencaMixin, DetailView):
 
             # Id dos parlamentares presentes
             marcados = request.POST.getlist('presenca_ativos') \
-                +request.POST.getlist('presenca_inativos')
+                + request.POST.getlist('presenca_inativos')
 
             # Deletar os que foram desmarcados
             deletar = set(presentes_banco) - set(marcados)
@@ -4686,7 +4716,8 @@ def voto_nominal_parlamentar(request):
                 ordem_id=id_ordem_expediente, parlamentar_id=parlamentar_id).delete()
         else:
             # Salva o voto
-            parlamentar_voto = "Abstenção" if parlamentar_voto == 'Abst' else parlamentar_voto[:3]
+            parlamentar_voto = "Abstenção" if parlamentar_voto == 'Abst' else parlamentar_voto[
+                :3]
             try:
                 voto = VotoParlamentar.objects.get(
                     parlamentar_id=parlamentar_id,
