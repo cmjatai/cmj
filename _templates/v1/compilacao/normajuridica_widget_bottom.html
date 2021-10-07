@@ -14,9 +14,11 @@
       {% if n.diariosoficiais.exists %}
         <p class="control-label">Diário Oficial</p>
         <div class="form-control-static mb-3">
-          <a href="{% url 'cmj.diarios:diariooficial_detail' n.diariosoficiais.first.diario.pk %}">
-          {{n.diariosoficiais.first.diario}}
-          </a><i>&nbsp;({{n.diariosoficiais.first.diario.data}})</i>
+          {% for d in n.diariosoficiais.all %}
+            <a href="{% url 'cmj.diarios:diariooficial_detail' d.diario.pk %}">
+              {{d.diario}}
+            </a><i>&nbsp;({{d.diario.data}})</i><br>
+          {% endfor %}
         </div>
       {% endif %}
 
