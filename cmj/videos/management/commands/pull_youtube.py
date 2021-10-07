@@ -1,4 +1,5 @@
 
+from _functools import reduce
 from datetime import datetime, timedelta
 from random import random
 import json
@@ -77,10 +78,17 @@ class Command(BaseCommand):
                       '&channelId=UCZXKjzKW2n1w4JQ3bYlrA-w'
                       '&part=snippet,id&order=date&maxResults=50')
 
-        pulls = list(PullYoutube.objects.all().order_by(
-            '-id'))[:1] + list(PullYoutube.objects.all().order_by('execucao', '-id')[:3])
+        now = timezone.localtime()
+
+        pulls = list(PullYoutube.objects.all().order_by('execucao', '-id')[:3])
+        if 7 < now.hour < 21:
+            pull_atual = PullYoutube.objects.all().order_by('-id').first()
+            if pull_atual not in pulls:
+                pulls.insert(0, pull_atual)
 
         for pull in pulls:
+
+            reduce
 
             pageToken = ''
 
