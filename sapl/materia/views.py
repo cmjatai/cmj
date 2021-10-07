@@ -103,14 +103,15 @@ def tipos_autores_materias(user):
 
     if sq and (noww - sq.data_fim).days < 3:
         q |= Q(
+            tipo__turnos_aprovacao=1,
             registrovotacao__data_hora__gte=data_ini,
-            registrovotacao__data_hora__lte=data_fim
+            registrovotacao__data_hora__lte=data_fim,
         )
 
     if user:
         q &= Q(autores__operadores=user)
 
-    materias_em_tramitacao = MateriaLegislativa.objects.filter(q)
+    materias_em_tramitacao = MateriaLegislativa.objects.filter(q).distinct()
 
     r = {}
     for m in materias_em_tramitacao:
@@ -120,18 +121,18 @@ def tipos_autores_materias(user):
 
         if user:
             if m.tipo not in r:
-                r[m.tipo] = [m]
+                r[m.tipo] = {m}
             else:
-                r[m.tipo].append(m)
+                r[m.tipo] = r[m.tipo].union({m})
         else:
             if m.tipo not in r:
                 r[m.tipo] = {}
 
             for a in m.autores.all():
                 if a not in r[m.tipo]:
-                    r[m.tipo][a] = [m]
+                    r[m.tipo][a] = {m}
                 else:
-                    r[m.tipo][a].append(m)
+                    r[m.tipo][a] = r[m.tipo][a].union({m})
 
     return r
 
