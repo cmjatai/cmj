@@ -1122,12 +1122,14 @@ class Documento(ShortUrl, CMSMixin):
             citado = self.cita.first()
             return citado
 
-        img = self.nodes.view_childs().filter(tipo=Documento.TPD_IMAGE).first()
+        img = self.nodes.view_childs().filter(
+            tipo=Documento.TPD_IMAGE).order_by('parent__ordem', 'ordem').first()
 
         if img:
             return img
 
-        galeria = self.nodes.view_childs().filter(tipo=Documento.TPD_GALLERY).first()
+        galeria = self.nodes.view_childs().filter(
+            tipo=Documento.TPD_GALLERY).order_by('parent__ordem', 'ordem').first()
         if galeria:
             img = galeria.cita.first()
             return img

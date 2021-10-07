@@ -1,8 +1,6 @@
 from datetime import timedelta
 from operator import attrgetter
-import base64
 import io
-import tempfile
 import zipfile
 
 from braces.views import FormMessagesMixin
