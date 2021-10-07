@@ -3,6 +3,7 @@ from django.apps import apps
 from django.db.models.signals import pre_init, post_init, pre_save,\
     post_save, pre_delete, post_delete, pre_migrate, post_migrate
 
+from cmj.core.models import AuditLog
 from cmj.sigad.models import Documento
 
 
@@ -50,6 +51,8 @@ class Manutencao():
                 continue
 
             for m in app.get_models():
+                if m == AuditLog:
+                    continue
 
                 for f in m._meta.get_fields():
                     dua = f

@@ -29,3 +29,16 @@ class Video(CmjAuditoriaModelMixin):
 
     def __str__(self):
         return self.titulo
+
+
+class PullYoutube(models.Model):
+    published_before = models.DateTimeField(verbose_name=_('published_before'))
+    published_after = models.DateTimeField(verbose_name=_('published_after'))
+
+    execucao = models.PositiveIntegerField(
+        verbose_name=_('Execução'), default=0)
+
+    class Meta:
+        verbose_name = _('PullYoutube')
+        verbose_name_plural = _("PullYoutube")
+        ordering = ('id',)

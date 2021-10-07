@@ -1,16 +1,18 @@
 
 from datetime import datetime, timedelta
+from random import random
 import json
 import logging
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.db.models import Q, F
 from django.db.models.signals import post_delete, post_save
 from django.utils import timezone
 import dateutil.parser
 
 from cmj.signals import Manutencao
-from cmj.videos.models import Video
+from cmj.videos.models import Video, PullYoutube
 import requests as rq
 
 
@@ -29,6 +31,35 @@ class Command(BaseCommand):
         post_save.disconnect(dispatch_uid='cmj_post_save_signal')
 
         self.logger = logging.getLogger(__name__)
+
+        # Video.objects.all().update(created=F('modified'))
+
+        py = PullYoutube.objects.last()
+
+        if not py:
+            data_base = dateutil.parser.parse('2013-11-01T00:00:00Z')
+            data_base = timezone.localtime(data_base)
+        else:
+            data_base = py.published_before
+
+        now = timezone.now()
+
+        while data_base < now:
+            td = timedelta(
+                weeks=1,
+                days=int(5 * random()),
+                hours=int(24 * random()),
+                minutes=int(60 * random()),
+                seconds=int(60 * random()),
+            )
+
+            py = PullYoutube()
+            py.published_after = data_base
+            data_base = data_base + td
+            py.published_before = data_base
+
+            py.save()
+
         self.pull_youtube()
 
     def pull_youtube(self):
@@ -46,16 +77,15 @@ class Command(BaseCommand):
                       '&channelId=UCZXKjzKW2n1w4JQ3bYlrA-w'
                       '&part=snippet,id&order=date&maxResults=50')
 
-        data_base = timezone.now()
-        td = timedelta(days=10)
+        pulls = list(PullYoutube.objects.all().order_by(
+            '-id'))[:1] + list(PullYoutube.objects.all().order_by('execucao', '-id')[:3])
 
-        while True:
-            print(data_base)
+        for pull in pulls:
+
             pageToken = ''
 
-            publishedBefore = data_base.isoformat('T')[:19] + 'Z'
-            data_base = data_base - td
-            publishedAfter = data_base.isoformat('T')[:19] + 'Z'
+            publishedBefore = pull.published_before.isoformat('T')[:19] + 'Z'
+            publishedAfter = pull.published_after.isoformat('T')[:19] + 'Z'
 
             while pageToken is not None:
 
@@ -108,6 +138,5 @@ class Command(BaseCommand):
 
                 # if stop_page:
                 #    pageToken = None
-
-            if data_base.year < 2013:
-                return
+            pull.execucao += 1
+            pull.save()
