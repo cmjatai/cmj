@@ -95,8 +95,8 @@ def uncaught_exceptions(type, value, error_traceback):
     import traceback
     logger = logging.getLogger(__name__)
     error_msg = ''.join(traceback.format_tb(error_traceback))
-    logger.error(error_msg)
-    print(error_msg)
+    logger.error(f'{type}\n{value}\n{error_msg}')
+    print(f'{type}\n{value}\n{error_msg}')
 
 
 # captura exceções que não foram tratadas

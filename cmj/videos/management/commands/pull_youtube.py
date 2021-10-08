@@ -1,19 +1,23 @@
 
-from _functools import reduce
-from datetime import datetime, timedelta
+from datetime import timedelta
 from random import random
 import json
 import logging
+import re
 
+from django.apps import apps
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 from django.core.management.base import BaseCommand
 from django.db.models import Q, F
 from django.db.models.signals import post_delete, post_save
 from django.utils import timezone
 import dateutil.parser
 
+from cmj.core.models import AuditLog
+from cmj.sigad.models import Documento
 from cmj.signals import Manutencao
-from cmj.videos.models import Video, PullYoutube
+from cmj.videos.models import Video, PullYoutube, VideoParte
 import requests as rq
 
 
@@ -25,7 +29,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         m = Manutencao()
-        m.desativa_auto_now()
         post_delete.disconnect(dispatch_uid='sapl_post_delete_signal')
         post_save.disconnect(dispatch_uid='sapl_post_save_signal')
         post_delete.disconnect(dispatch_uid='cmj_post_delete_signal')
@@ -34,6 +37,148 @@ class Command(BaseCommand):
         self.logger = logging.getLogger(__name__)
 
         # Video.objects.all().update(created=F('modified'))
+
+        m.desativa_auto_now()
+
+        if not settings.DEBUG:
+            self.pull_youtube()
+
+        m.ativa_auto_now()
+
+        self.vincular_sistema_aos_videos()
+        self.video_documento_na_galeria()
+
+    def vincular_sistema_aos_videos(self):
+
+        videos = Video.objects.order_by('created')
+
+        ct_doc = ContentType.objects.get_for_model(Documento)
+        for v in videos:
+
+            for app in apps.get_app_configs():
+                if not app.name.startswith('cmj') and not app.name.startswith('sapl'):
+                    continue
+
+                if app.name not in ('cmj.sigad', 'sapl.sessao', 'sapl.materia'):
+                    continue
+
+                for m in app.get_models():
+                    ct = ContentType.objects.get_for_model(m)
+                    fields_name = tuple(
+                        map(lambda x: x.name, m._meta.get_fields()
+                            )
+                    )
+
+                    if m != Documento:
+                        if 'url_video' not in fields_name:
+                            continue
+
+                    f = 'texto' if m == Documento else 'url_video'
+
+                    p = {f'{f}__contains': v.vid}
+
+                    for item in m.objects.filter(**p):
+                        try:
+
+                            vf = getattr(item, f)
+                            i = item if m != Documento else item.raiz
+
+                            vp = VideoParte.objects.filter(
+                                video=v,
+                                content_type=ct,
+                                object_id=i.id
+                            )
+
+                            if vp.exists():
+                                continue
+
+                            vp = VideoParte()
+                            vp.video = v
+                            vp.content_object = i
+                            vp.fieldname = f
+
+                            r = re.findall(r'http.+youtu.+\?.*t=(\d+)', vf)
+
+                            if r:
+                                vp.time_start = int(r[-1])
+
+                            vp.save()
+
+                        except:
+                            pass
+
+    def video_documento_na_galeria(self):
+
+        videos = Video.objects.order_by('created')
+
+        ct_doc = ContentType.objects.get_for_model(Documento)
+        for v in videos:
+
+            vps = v.videoparte_set.filter(content_type=ct_doc)
+
+            docs = tuple(
+                filter(
+                    lambda o: o.classe_id == 233,
+                    map(
+                        lambda vp: vp.content_object,
+                        vps)
+                )
+            )
+            if docs:
+                continue
+
+            video_dict = v.json['snippet']
+
+            documento = Documento()
+            documento.titulo = video_dict['title']
+            documento.descricao = video_dict['description']
+            documento.public_date = dateutil.parser.parse(
+                video_dict['publishedAt'])
+            documento.classe_id = 233
+            documento.tipo = Documento.TD_VIDEO_NEWS
+            documento.template_doc = 1
+            documento.owner_id = 1
+            documento.visibilidade = Documento.STATUS_PUBLIC
+
+            documento.extra_data = video_dict
+            documento.save()
+
+            documento.childs.all().delete()
+
+            container = Documento()
+            container.raiz = documento
+            container.titulo = ''
+            container.descricao = ''
+            container.classe_id = 233
+            container.tipo = Documento.TPD_CONTAINER_SIMPLES
+            container.owner_id = 1
+            container.parent = documento
+            container.ordem = 1
+            container.visibilidade = documento.visibilidade
+            container.save()
+
+            video = Documento()
+            video.raiz = documento
+            video.titulo = ''
+            video.descricao = ''
+            video.classe_id = 233
+            video.tipo = Documento.TPD_VIDEO
+            video.owner_id = 1
+            video.parent = container
+            video.ordem = 1
+            video.extra_data = video_dict
+            video.visibilidade = documento.visibilidade
+
+            video.texto = (
+                '<iframe width="560" height="315"'
+                'src="https://www.youtube.com/embed/%s" '
+                'frameborder="0" '
+                'allow="autoplay; encrypted-media" allowfullscreen>'
+                '</iframe>' % v.vid)
+
+            video.save()
+
+    def pull_youtube(self):
 
         py = PullYoutube.objects.last()
 
@@ -61,10 +206,6 @@ class Command(BaseCommand):
 
             py.save()
 
-        self.pull_youtube()
-
-    def pull_youtube(self):
-
         # 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'}
         headers = {}
         headers["Referer"] = settings.SITE_URL
@@ -87,8 +228,6 @@ class Command(BaseCommand):
                 pulls.insert(0, pull_atual)
 
         for pull in pulls:
-
-            reduce
 
             pageToken = ''
 

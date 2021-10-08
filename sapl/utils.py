@@ -1,10 +1,10 @@
 from functools import wraps
+from operator import itemgetter
+from unicodedata import normalize as unicodedata_normalize
 import hashlib
 import logging
-from operator import itemgetter
 import os
 import re
-from unicodedata import normalize as unicodedata_normalize
 import unicodedata
 
 from crispy_forms.layout import HTML, Button
@@ -29,11 +29,11 @@ from django.urls.base import reverse
 from django.utils import six, timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
-import django_filters
 from easy_thumbnails import source_generators
 from floppyforms import ClearableFileInput
-import magic
 from unipath.path import Path
+import django_filters
+import magic
 import weasyprint
 
 from sapl.crispy_layout_mixin import SaplFormHelper
@@ -162,7 +162,7 @@ def montar_helper_autor(self):
 class SaplGenericForeignKey(GenericForeignKey):
 
     def __init__(
-            self,
+        self,
             ct_field='content_type',
             fk_field='object_id',
             for_concrete_model=True,

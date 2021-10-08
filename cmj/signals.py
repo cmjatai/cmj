@@ -63,3 +63,23 @@ class Manutencao():
                     if hasattr(dua, 'auto_now_add') and dua.auto_now_add:
                         #print(m, 'desativando auto_now')
                         dua.auto_now_add = False
+
+    def ativa_auto_now(self):
+        for app in apps.get_app_configs():
+
+            if not app.name.startswith('cmj') and not app.name.startswith('sapl'):
+                continue
+
+            for m in app.get_models():
+                if m == AuditLog:
+                    continue
+
+                for f in m._meta.get_fields():
+                    dua = f
+                    # print(dua)
+                    if hasattr(dua, 'auto_now') and not dua.auto_now:
+                        #print(m, 'desativando auto_now')
+                        dua.auto_now = True
+                    if hasattr(dua, 'auto_now_add') and not dua.auto_now_add:
+                        #print(m, 'desativando auto_now')
+                        dua.auto_now_add = True

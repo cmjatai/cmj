@@ -5,11 +5,25 @@
 - title: {% trans 'Mídias' %}
   url: ''
   children:
+  - title: {% trans 'TV Câmara - Ao Vivo' %}
+    url: /tv-cmj/ao-vivo
+  - title: ''
+    url: ''
+  - title: {% trans 'Rádio ao vivo' %}
+    url: /radio-cmj/ao-vivo
+  - title: ''
+    url: ''
+  - title: {% trans 'Galeria de Vídeo' %}
+    url: /galerias/videos
+  - title: {% trans 'Galeria de Imagens' %}
+    url: /galerias/imagens
+  - title: {% trans 'Galeria de Áudio' %}
+    url: /galerias/audios
+
+{% comment %}
   - title: {% trans 'TV CMJ' %}
     url: ''
     children:
-    - title: {% trans 'Transmissão ao vivo' %}
-      url: http://www.jatai.go.leg.br/tv-cmj/ao-vivo
     - title: {% trans 'Sessões Transmitidas' %}
       url: ''
       children:
@@ -43,11 +57,5 @@
   - title: {% trans 'Rádio CMJ' %}
     url: ''
     children:
-    - title: {% trans 'Rádio ao vivo' %}
-      url: http://www.jatai.go.leg.br/radio-cmj/ao-vivo
-    - title: {% trans 'Galeria de Áudio' %}
-      url: /radio-cmj
-  - title: {% trans 'Galerias' %}
-    children:
-    - title: {% trans 'Imagens' %}
-      url: /galerias/imagens
+
+{% endcomment %}
