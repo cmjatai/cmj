@@ -28,6 +28,9 @@ def _get_registration_key(model):
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
+
+        self.video_documento_na_galeria()
+
         m = Manutencao()
         post_delete.disconnect(dispatch_uid='sapl_post_delete_signal')
         post_save.disconnect(dispatch_uid='sapl_post_save_signal')
@@ -43,9 +46,7 @@ class Command(BaseCommand):
         if not settings.DEBUG:
             self.pull_youtube()
 
-        m.ativa_auto_now()
-
-        self.video_documento_na_galeria()
+        # m.ativa_auto_now()
 
         self.vincular_sistema_aos_videos()
 
