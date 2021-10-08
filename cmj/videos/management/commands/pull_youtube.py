@@ -45,8 +45,9 @@ class Command(BaseCommand):
 
         m.ativa_auto_now()
 
-        self.vincular_sistema_aos_videos()
         self.video_documento_na_galeria()
+
+        self.vincular_sistema_aos_videos()
 
     def vincular_sistema_aos_videos(self):
 
