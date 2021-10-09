@@ -48,40 +48,18 @@
   url: ''
   css_class: head_title
   children:
-  - title: TV CMJ
-    url: /tv-cmj/ao-vivo
-  - title: Rádio CMJ
-    url: /radio-cmj/ao-vivo
-  - title: Notícias
+  - title: {% trans 'Notícias' %}
     url: /noticias
-  - title: Multimídia
+  - title: {% trans 'TV Câmara - Ao Vivo' %}
+    url: /tv-cmj/ao-vivo
+  - title: {% trans 'Rádio Câmara - Ao Vivo' %}
     url: /radio-cmj/ao-vivo
-    css_class: head_title
-    children:
-    - title: Galeria de imagens
-      url: /galerias/imagens
-    - title: Galeria de Áudios
-      url: /radio-cmj
-    - title: Vídeos
-      url: ''
-      children:
-      - title: Sessẽs Solenes
-        url: /tv-cmj/sessoes/sessoes-solenes
-      - title: Sessões Plenárias
-        url: ''
-        children:
-        - title: '2018'
-          url: /tv-cmj/sessoes/sessoes-plenarias/2018
-        - title: '2017'
-          url: /tv-cmj/sessoes/sessoes-plenarias/2017
-        - title: '2016'
-          url: /tv-cmj/sessoes/sessoes-plenarias/2016
-        - title: '2015'
-          url: /tv-cmj/sessoes/sessoes-plenarias/2015
-        - title: '2014'
-          url: /tv-cmj/sessoes/sessoes-plenarias/2014
-        - title: '2013'
-          url: /tv-cmj/sessoes/sessoes-plenarias/2013
+  - title: {% trans 'Galeria de Vídeos' %}
+    url: /galerias/videos
+  - title: {% trans 'Galeria de Imagens' %}
+    url: /galerias/imagens
+  - title: {% trans 'Galeria de Áudios' %}
+    url: /galerias/audios
 
 - title: {% trans 'Processo Legislativo' %}
   url: ''

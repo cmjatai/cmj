@@ -9,15 +9,15 @@
     url: /tv-cmj/ao-vivo
   - title: ''
     url: ''
-  - title: {% trans 'Rádio ao vivo' %}
+  - title: {% trans 'Rádio Câmara - Ao Vivo' %}
     url: /radio-cmj/ao-vivo
   - title: ''
     url: ''
-  - title: {% trans 'Galeria de Vídeo' %}
+  - title: {% trans 'Galeria de Vídeos' %}
     url: /galerias/videos
   - title: {% trans 'Galeria de Imagens' %}
     url: /galerias/imagens
-  - title: {% trans 'Galeria de Áudio' %}
+  - title: {% trans 'Galeria de Áudios' %}
     url: /galerias/audios
 
 {% comment %}
