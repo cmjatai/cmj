@@ -98,11 +98,11 @@ class Command(BaseCommand):
 
                         for dp in d.treechilds2list():
                             if dp == d:
-                                d.extra_data = r
-                                d.texto = r['snippet']['description']
+                                d.extra_data = v.json
+                                d.descricao = v.json['snippet']['description']
                                 d.save()
                             elif dp.tipo == Documento.TPD_VIDEO:
-                                dp.extra_data = r
+                                dp.extra_data = v.json
                                 dp.save()
             except:
                 pass
@@ -199,7 +199,7 @@ class Command(BaseCommand):
             documento.owner_id = 1
             documento.visibilidade = Documento.STATUS_PUBLIC
 
-            documento.extra_data = video_dict
+            documento.extra_data = v.json
             documento.save()
 
             documento.childs.all().delete()
@@ -225,7 +225,7 @@ class Command(BaseCommand):
             video.owner_id = 1
             video.parent = container
             video.ordem = 1
-            video.extra_data = video_dict
+            video.extra_data = v.json
             video.visibilidade = documento.visibilidade
 
             video.texto = (
