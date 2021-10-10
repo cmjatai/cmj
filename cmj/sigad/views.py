@@ -168,7 +168,7 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
     documento = None
     classe = None
     referencia = None
-    paginate_by = 30
+    paginate_by = 36
 
     def post(self, request, *args, **kwargs):
         return self.get(request, *args, **kwargs)
