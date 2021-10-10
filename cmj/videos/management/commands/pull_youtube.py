@@ -99,6 +99,7 @@ class Command(BaseCommand):
                         for dp in d.treechilds2list():
                             if dp == d:
                                 d.extra_data = r
+                                d.texto = r['snippet']['description']
                                 d.save()
                             elif dp.tipo == Documento.TPD_VIDEO:
                                 dp.extra_data = r
