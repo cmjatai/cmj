@@ -64,7 +64,7 @@
                 <div class="item-raiz">
 
                 <div class="verbose_name">
-                  {% if not result.model_name == 'documento' %}{{result.verbose_name}}{%else%}Notícias{% endif %}
+                  {% if not result.model_name == 'documento' %}{{result.verbose_name}}{%else%}{{result.object.classe}}{% endif %}
                 </div>
 
                 {% if user.is_superuser %}
