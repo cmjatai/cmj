@@ -55,6 +55,8 @@ class Command(BaseCommand):
 
         videos = videos[:100]
 
+        now = timezone.now()
+
         for v in videos:
             print(v.id, v.vid, v)
             r = ''
@@ -84,7 +86,13 @@ class Command(BaseCommand):
                 r = json.loads(data)
 
                 v.json = r['items'][0]
-                v.execucao += 1
+
+                try:
+                    peso = timezone.now().year - v.created.year
+                    peso = peso if peso else 1
+                except:
+                    peso = 1
+                v.execucao += peso
                 v.save()
                 for vp in v.videoparte_set.all():
 
