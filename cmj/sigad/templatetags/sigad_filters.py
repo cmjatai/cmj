@@ -1,5 +1,6 @@
 from django import template
 from cmj.sigad.models import CaixaPublicacao, Documento, Classe
+from cmj.utils import time_of_period
 
 
 register = template.Library()
@@ -117,3 +118,16 @@ def caixa_publicacao_popup(key, request):
         return result
     except:
         return None
+
+
+@register.filter
+def video_duration(obj):
+
+    j = obj.extra_data
+
+    if not j or 'contentDetails' not in j or 'duration' not in j['contentDetails']:
+        return ''
+
+    d = j['contentDetails']['duration']
+
+    return time_of_period(d)

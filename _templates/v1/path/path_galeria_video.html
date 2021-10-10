@@ -1,5 +1,5 @@
 {% extends "path/path_classe.html" %}
-{% load i18n sigad_filters social_utils%}
+{% load i18n sigad_filters social_utils common_cmj_tags %}
 {% block main_container_class %}container-fluid container-path container-videos{% endblock %}
 {% block base_functions %}
   {% if not user.is_anonymous and perms.sigad.change_documento or perms.sigad.change_classe%}
@@ -71,8 +71,13 @@
               <a class="imagem" href="/{{doc.slug}}" style="background-image: url({% if imagem %}/{{imagem.absolute_slug}}.512{%elif doc.extra_data.snippet %}{{doc.extra_data.snippet.thumbnails.high.url}}{% else %}{{doc.extra_data.thumbnails.high.url}}{% endif %})">
                   <i class="fa fa-play" aria-hidden="true"></i>
               </a>
+              {% if doc.extra_data.contentDetails.duration %}
+                <span class="duration">
+                {{ doc|video_duration }}
+                </span>
+              {% endif %}
             </div>
-            <span class="data-pub">
+            <span class="data-pub d-none">
               <i class="far fa-clock" aria-hidden="true"></i>
                 {{doc.public_date|date:"d"}} {% trans "de" %} {{doc.public_date|date:"F"}} {% trans "de" %} {{doc.public_date|date:"Y"}}
             </span>
@@ -80,6 +85,27 @@
                 <a class="btn-play" href="/{{doc.slug}}" >
                     <span class="titulo">{{doc.titulo}}</span>
                 </a>
+                <br>
+                {% if doc.extra_data.statistics %}
+                  <span class="statistics">
+                    {% if doc.extra_data.statistics.viewCount == '0' %}
+                      Nenhuma Visualização
+                    {% elif doc.extra_data.statistics.viewCount == '1' %}
+                      1 Visualização
+                    {% else %}
+                      {{ doc.extra_data.statistics.viewCount }} Visualizações
+                    {% endif %}
+
+
+                    {% if doc.extra_data.statistics.likeCount != '0' %}
+                      &#8226; {{ doc.extra_data.statistics.likeCount }} <i class="fas fa-thumbs-up"></i>
+                    {% endif %}
+                    {% if doc.extra_data.statistics.dislikeCount != '0' %}
+                      &#8226; {{ doc.extra_data.statistics.dislikeCount }} <i class="fas fa-thumbs-down"></i>
+                    {% endif %}
+                    <br>&#8226; há {{ doc.public_date|age:0}}
+                  </span>
+                {% endif %}
             </div>
           </div>
         </div>

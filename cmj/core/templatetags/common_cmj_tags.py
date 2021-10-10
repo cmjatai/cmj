@@ -1,4 +1,5 @@
 
+from copy import deepcopy
 from datetime import date, timedelta
 import json
 
@@ -11,8 +12,10 @@ from django.db.models.query import QuerySet
 from django.template.defaultfilters import stringfilter
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime as django_parse_datetime
+from django.utils.formats import date_format
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
+from webob.datetime_utils import hour
 from webpack_loader import utils
 from webpack_loader.utils import _get_bundle
 
@@ -21,6 +24,7 @@ from sapl.materia.models import TipoMateriaLegislativa
 from sapl.norma.models import NormaJuridica, TipoNormaJuridica
 from sapl.parlamentares.models import Filiacao
 from sapl.sessao.models import SessaoPlenaria
+
 
 register = template.Library()
 
@@ -120,25 +124,58 @@ def isinst(value, class_str):
 
 
 @register.filter
-def age(data):
-    today = date.today()
-    idade = relativedelta(today, data)
-    years = '%s %s%s' % (
-        idade.years if idade.years else '',
-        _('ano') if idade.years else '',
-        's' if idade.years > 1 else '')
+def age(data, max_age=0):
 
-    months = '%s%s %s%s' % (
-        ', ' if idade.years and idade.months else '',
-        idade.months if idade.months else '',
-        _('mes') if idade.months else '',
-        'es' if idade.months > 1 else '')
-    days = '%s%s %s%s' % (
-        ', ' if idade.days and (idade.months or idade.years) else '',
+    if not data:
+        return ''
+    now = timezone.localtime()
+    today = deepcopy(now)
+    if not hasattr(data, 'tzinfo') or not data.tzinfo:
+        data = now.replace(year=data.year, month=data.month, day=data.day)
+
+    idade = relativedelta(today, data)
+
+    if max_age:
+        td = today - data
+        if td.total_seconds() > max_age * 86400:
+            return date_format(data, 'd \d\e M \d\e Y')
+
+    if idade.years or idade.months or idade.days > 2:
+        years = '%s %s%s' % (
+            idade.years if idade.years else '',
+            _('ano') if idade.years else '',
+            's' if idade.years > 1 else '')
+
+        months = '%s%s %s%s' % (
+            ', ' if idade.years and idade.months else '',
+            idade.months if idade.months else '',
+            _('mes') if idade.months else '',
+            'es' if idade.months > 1 else '')
+        days = '%s%s %s%s' % (
+            ', ' if idade.days and (idade.months or idade.years) else '',
+            idade.days if idade.days else '',
+            _('dia') if idade.days else '',
+            's' if idade.days > 1 else '')
+        return '%s%s%s' % (years.strip(), months.strip(), days.strip())
+
+    days = '%s %s%s' % (
         idade.days if idade.days else '',
         _('dia') if idade.days else '',
         's' if idade.days > 1 else '')
-    return '%s%s%s' % (years.strip(), months.strip(), days.strip())
+
+    hours = '%s%s %s%s' % (
+        ', ' if idade.hours and idade.days else '',
+        idade.hours if idade.hours else '',
+        _('hora') if idade.hours else '',
+        's' if idade.hours > 1 else '')
+
+    minutes = '%s%s %s%s' % (
+        ', ' if idade.minutes and (idade.hours or idade.days) else '',
+        idade.minutes if idade.minutes else '',
+        _('minuto') if idade.minutes else '',
+        's' if idade.minutes > 1 else '')
+
+    return '%s%s%s' % (days.strip(), hours.strip(), minutes.strip())
 
 
 @register.filter

@@ -1,9 +1,9 @@
 from datetime import date, datetime, timedelta
 from functools import wraps
+from unicodedata import normalize as unicodedata_normalize
 import re
 import subprocess
 import threading
-from unicodedata import normalize as unicodedata_normalize
 
 from PyPDF4.pdf import PdfFileReader
 from asn1crypto import cms
@@ -17,8 +17,8 @@ from django.template.loaders.filesystem import Loader
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from easy_thumbnails import source_generators
-import magic
 from unipath.path import Path
+import magic
 
 
 def pil_image(source, exif_orientation=False, **options):
@@ -306,6 +306,62 @@ def texto_upload_path(instance, filename, subpath='', pk_first=False):
         }
 
     return path
+
+
+def period2dict(period):
+
+    ISO8601_PERIOD_REGEX = re.compile(
+        r"^(?P<sign>[+-])?"
+        r"P(?!\b)"
+        r"(?P<years>[0-9]+Y)?"
+        r"(?P<months>[0-9]+M)?"
+        r"(?P<weeks>[0-9]+W)?"
+        r"(?P<days>[0-9]+D)?"
+        r"((?P<separator>T)(?P<hours>[0-9]+H)?"
+        r"(?P<minutes>[0-9]+M)?"
+        r"(?P<seconds>[0-9]+S)?)?$")
+
+    m = ISO8601_PERIOD_REGEX.match(period)
+    if not m:
+        return {}
+    groups = m.groupdict()
+
+    for k, v in groups.items():
+        if k not in ('separator', 'sign'):
+            if v is None:
+                groups[k] = "0n"
+            groups[k] = int(groups[k][:-1])
+    return groups
+
+
+def time_of_period(period):
+
+    pd = period2dict(period)
+
+    if not pd:
+        return ''
+
+    pd['hours'] = int(pd['hours']) if pd['hours'] else 0
+
+    pd['hours'] += int(pd['years']) * \
+        8760 if 'years' in pd and pd['years'] else 0
+
+    pd['hours'] += int(pd['months']) * \
+        730 if 'months' in pd and pd['months'] else 0
+
+    pd['hours'] += int(pd['weeks']) * \
+        168 if 'weeks' in pd and pd['weeks'] else 0
+
+    pd['hours'] += int(pd['days']) * \
+        168 if 'days' in pd and pd['days'] else 0
+
+    r = '{hours}{separator1}{minutes:02d}:{seconds:02d}'.format(
+        hours=pd['hours'] if pd['hours'] else '',
+        separator1=':' if pd['hours'] else '',
+        minutes=pd['minutes'],
+        seconds=pd['seconds'],
+    )
+    return r
 
 
 def run_sql(sql):
