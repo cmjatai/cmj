@@ -29,8 +29,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        self.video_documento_na_galeria()
-
         m = Manutencao()
         post_delete.disconnect(dispatch_uid='sapl_post_delete_signal')
         post_save.disconnect(dispatch_uid='sapl_post_save_signal')
@@ -45,10 +43,68 @@ class Command(BaseCommand):
 
         if not settings.DEBUG:
             self.pull_youtube()
+        self.get_full_metadata_video()
 
-        # m.ativa_auto_now()
+        m.ativa_auto_now()
 
         self.vincular_sistema_aos_videos()
+
+        self.video_documento_na_galeria()
+
+    def get_full_metadata_video(self):
+        videos = Video.objects.filter(
+            json__snippet__description__endswith='...').order_by('-created')
+
+        if not videos.exists():
+            videos = Video.objects.all().order_by('execucao', '-created')
+
+        videos = videos[:3]
+
+        for v in videos:
+            print(v.id, v.vid, v)
+            r = ''
+            try:
+
+                # 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'}
+                headers = {}
+                headers["Referer"] = settings.SITE_URL
+                headers['Content-Type'] = 'application/json'
+
+                url_search = ('https://www.googleapis.com/youtube/v3/videos'
+                              '?key={}'
+                              '&id={}'
+                              '&part=snippet,id,contentDetails,statistics')
+
+                #'&channelId=UCZXKjzKW2n1w4JQ3bYlrA-w'
+
+                url = url_search.format(
+                    settings.GOOGLE_URL_API_NEW_KEY,
+                    v.vid
+                )
+
+                r = rq.get(url, headers=headers)
+
+                data = r._content.decode('utf-8')
+
+                r = json.loads(data)
+
+                v.json = r['items'][0]
+                v.execucao += 1
+                v.save()
+                for vp in v.videoparte_set.all():
+
+                    if isinstance(vp.content_object, Documento):
+                        d = vp.content_object
+
+                        for dp in d.treechilds2list():
+                            if dp == d:
+                                d.extra_data = r
+                                d.save()
+                            elif dp.tipo == Documento.TPD_VIDEO:
+                                dp.extra_data = r
+                                dp.save()
+            except:
+                pass
 
     def vincular_sistema_aos_videos(self):
 
@@ -256,7 +312,6 @@ class Command(BaseCommand):
                 if 'nextPageToken' in r:
                     pageToken = r['nextPageToken']
 
-                stop_page = False
                 if not 'items' in r:
                     continue
 
@@ -268,7 +323,6 @@ class Command(BaseCommand):
                     qs = Video.objects.filter(vid=i['id']['videoId'])
 
                     if qs.exists():
-                        stop_page = True
                         continue
 
                     v = Video()

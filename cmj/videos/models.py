@@ -26,6 +26,9 @@ class Video(CmjAuditoriaModelMixin):
         max_length=250,
         blank=True, null=True, default='')
 
+    execucao = models.PositiveIntegerField(
+        verbose_name=_('Execução'), default=0)
+
     class Meta:
         verbose_name = _('Vídeo')
         verbose_name_plural = _("Vídeos")
