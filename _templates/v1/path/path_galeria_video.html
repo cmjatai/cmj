@@ -1,19 +1,19 @@
 {% extends "path/path_classe.html" %}
 {% load i18n sigad_filters social_utils%}
-{% block main_container_class %}container-path container-videos{% endblock %}
+{% block main_container_class %}container-fluid container-path container-videos{% endblock %}
 {% block base_functions %}
   {% if not user.is_anonymous and perms.sigad.change_documento or perms.sigad.change_classe%}
     {{block.super}}
   {% endif %}
 {% endblock %}
-{% block base_header %}{% endblock %}
+
 {% block base_content %}
   {% with 'video_destaque'|caixa_publicacao:object as video_destaque %}
     {% if video_destaque and video_destaque.docs|length  %}
-      <div id="carousel-example-generic" class="carousel slide" data-ride="carousel" data-interval="7000">
+      <div id="carousel-custom" class="carousel carousel-custom slide" data-ride="carousel" data-interval="7000">
         <ol class="carousel-indicators">
           {% for d in  video_destaque.docs%}
-            <li data-target="#carousel-example-generic" data-slide-to="{{forloop.counter0}}" {% if forloop.first %}class="active"{% endif %}></li>
+            <li data-target="#carousel-custom" data-slide-to="{{forloop.counter0}}" {% if forloop.first %}class="active"{% endif %}></li>
           {% endfor %}
         </ol>
         {% if perms.sigad.change_documento %}
@@ -25,13 +25,14 @@
         {% endif %}
         <div class="carousel-inner" role="listbox">
           {% for d in  video_destaque.docs%}
-            <div class="item {% if forloop.first %}active{% endif %}" >
+            <div class="carousel-item {% if forloop.first %}active{% endif %}" >
+
               {% social_link_share d.0 'absolute-center'%}
 
               {% with d.0.imagem_representativa as imagem %}
-                <a class="imagem btn-play container" href="/{{d.0.slug}}" style="background-image: url({% if imagem %}/{{imagem.absolute_slug}}.512{% else %}{{d.0.extra_data.thumbnails.high.url}}{% endif %})">
+                <a class="imagem btn-play d-block w-100" href="/{{d.0.slug}}" style="background-image: url({% if imagem %}/{{imagem.absolute_slug}}.512{% else %}{{d.0.extra_data.thumbnails.high.url}}{% endif %})">
                   <div class="carousel-caption">
-                    <div class="container">
+                    <div class="container-fluid">
                       <p>{{d.0.descricao}}</p>
                       <span class="titulo">{{d.0.titulo}}</span>
                     </div>
@@ -45,39 +46,46 @@
         </div>
 
         <!-- Controls -->
-        <a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
-          <span aria-hidden="true">&times;</span>
+        <a class="carousel-control-prev" href="#carousel-custom" role="button" data-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
           <span class="sr-only">Previous</span>
         </a>
-        <a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
-          <span aria-hidden="true">&times;</span>
+        <a class=" carousel-control-next" href="#carousel-custom" role="button" data-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
           <span class="sr-only">Next</span>
         </a>
       </div>
     {% endif %}
   {% endwith %}
 
-  <div class="container video-list">
+
+  <div class="row video-list">
     {% for doc  in object_list %}
-      <div class="item">
-        <div class="inner">
-          {% social_link_share doc 'absolute-center'%}
-            {% with doc.imagem_representativa as imagem %}
-              <a class="btn-play" href="/{{doc.slug}}" style="background-image: url({% if imagem %}/{{imagem.absolute_slug}}.512{% else %}{{doc.extra_data.thumbnails.high.url}}{% endif %})">
-                <i class="fa fa-play" aria-hidden="true"></i>
-                <div class="inner-text">
-                  <span class="titulo">{{doc.titulo}}</span>
-                  {% if doc.descricao %}
-                    <span class="descricao">{{doc.descricao|default:''}}</span>
-                  {% endif %}
-                </div>
+      {% with doc.imagem_representativa as imagem %}
+        <div class="item col-12 col-xxl-2 col-xl-3 col-lg-4 col-md-6 col-sm-6 ">
+          <div class="inner">
+
+
+            <div class="inner-imagem">
+              {% comment %}{% social_link_share doc 'absolute-center'%}{% endcomment %}
+              <a class="imagem" href="/{{doc.slug}}" style="background-image: url({% if imagem %}/{{imagem.absolute_slug}}.512{% else %}{{doc.extra_data.thumbnails.high.url}}{% endif %})">
+                  <i class="fa fa-play" aria-hidden="true"></i>
               </a>
-            {% endwith %}
+            </div>
+            <span class="data-pub">
+              <i class="far fa-clock" aria-hidden="true"></i>
+                {{doc.public_date|date:"d"}} {% trans "de" %} {{doc.public_date|date:"F"}} {% trans "de" %} {{doc.public_date|date:"Y"}}
+            </span>
+            <div class="inner-text">
+                <a class="btn-play" href="/{{doc.slug}}" >
+                    <span class="titulo">{{doc.titulo}}</span>
+                </a>
+            </div>
           </div>
-      </div>
+        </div>
+      {% endwith %}
     {% endfor %}
   </div>
-
 
   {% include "paginacao.html" %}
 {% endblock %}

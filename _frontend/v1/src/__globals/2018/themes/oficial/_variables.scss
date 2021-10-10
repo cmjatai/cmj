@@ -5,7 +5,7 @@ $color_text_brand_hover: #4effa0;
 
 $color_text_menu: #9c9;
 
-$color_border_menu_hover: rgba(240,239,231,0.3);
+$color_border_menu_hover: rgba(240, 239, 231, 0.3);
 
 
 $color_text: #006556;
@@ -19,12 +19,12 @@ $color_text_title: #a97905;
 
 $url_bg_png: url(~@/assets/img/bg.png);
 
-$hover_background_05p: rgba(0,0,0,0.05);
-$hover_background_10p: rgba(0,0,0,0.1);
-$hover_background_20p: rgba(0,0,0,0.2);
-$hover_background_50p: rgba(0,0,0,0.5);
-$hover_background_10pw: rgba(205,255,200,0.1);
-$hover_background_20pw: rgba(205,255,200,.2);
+$hover_background_05p: rgba(0, 0, 0, 0.05);
+$hover_background_10p: rgba(0, 0, 0, 0.1);
+$hover_background_20p: rgba(0, 0, 0, 0.2);
+$hover_background_50p: rgba(0, 0, 0, 0.5);
+$hover_background_10pw: rgba(205, 255, 200, 0.1);
+$hover_background_20pw: rgba(205, 255, 200, .2);
 
 // variaveis wrapper ########################################
 $width-wrapper-lg: 320px !default;
@@ -67,41 +67,53 @@ $font-size-base: 1rem !default;
 
 // variaveis grid bootstrap ########################################
 
-$container-max-widths: (
-  xl: 1140px
-) !default;
+
+$grid-breakpoints: (xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1400px) !default;
+
+$container-max-widths: (xl: 1140px) !default;
+
+$container-max-widths: (sm: 100%,
+  md: 100%,
+  lg: 100%,
+  xl: 1140px,
+  xxl: 1350px) !default;
 
 
-$zindex-dropdown:                   1000 !default;
-$zindex-sticky:                     1020 !default;
-$zindex-fixed:                      1030 !default;
-$zindex-modal-backdrop:             1040 !default;
-$zindex-modal:                      1050 !default;
-$zindex-popover:                    1060 !default;
-$zindex-tooltip:                    1070 !default;
+$zindex-dropdown: 1000 !default;
+$zindex-sticky: 1020 !default;
+$zindex-fixed: 1030 !default;
+$zindex-modal-backdrop: 1040 !default;
+$zindex-modal: 1050 !default;
+$zindex-popover: 1060 !default;
+$zindex-tooltip: 1070 !default;
 
-$zindex-notify:                     1500 !default;
-$zindex-path-direction:             2000 !default;
-$zindex-footer:                     2100 !default;
+$zindex-notify: 1500 !default;
+$zindex-path-direction: 2000 !default;
+$zindex-footer: 2100 !default;
 
-$zindex-navbar-menu:                2150 !default;
-$zindex-accessibility:              2160 !default;
-$zindex-navbar-topo:                2170 !default;
+$zindex-navbar-menu: 2150 !default;
+$zindex-accessibility: 2160 !default;
+$zindex-navbar-topo: 2170 !default;
 
-$zindex-pagination:                 2300 !default;
+$zindex-pagination: 2300 !default;
 
-$zindex-sidebar:                    2500 !default;
+$zindex-sidebar: 2500 !default;
 
 
-$zindex-google-search:              3000 !default;
+$zindex-google-search: 3000 !default;
 
-$zindex-apps:                       4000 !default;
+$zindex-apps: 4000 !default;
 
-$zindex-galeria:                    5000 !default;
-$zindex-galeria-fixed:              9000 !default;
-$zindex-message:                    10000 !default;
+$zindex-galeria: 5000 !default;
+$zindex-galeria-fixed: 9000 !default;
+$zindex-message: 10000 !default;
 
-$zindex-popup:                      99999 !default;
+$zindex-popup: 99999 !default;
 
 
 @import '~bootstrap/scss/functions';
