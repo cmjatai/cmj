@@ -57,11 +57,13 @@ class Manutencao():
                 for f in m._meta.get_fields():
                     dua = f
                     # print(dua)
-                    if hasattr(dua, 'auto_now') and dua.auto_now:
-                        #print(m, 'desativando auto_now')
+
+                    if hasattr(dua, 'auto_now'):
+                        dua._auto_now = dua.auto_now
                         dua.auto_now = False
-                    if hasattr(dua, 'auto_now_add') and dua.auto_now_add:
-                        #print(m, 'desativando auto_now')
+
+                    if hasattr(dua, 'auto_now_add'):
+                        dua._auto_now_add = dua.auto_now_add
                         dua.auto_now_add = False
 
     def ativa_auto_now(self):
@@ -77,9 +79,9 @@ class Manutencao():
                 for f in m._meta.get_fields():
                     dua = f
                     # print(dua)
-                    if hasattr(dua, 'auto_now') and not dua.auto_now:
-                        #print(m, 'desativando auto_now')
-                        dua.auto_now = True
-                    if hasattr(dua, 'auto_now_add') and not dua.auto_now_add:
-                        #print(m, 'desativando auto_now')
-                        dua.auto_now_add = True
+
+                    if hasattr(dua, '_auto_now'):
+                        dua.auto_now = dua._auto_now
+
+                    if hasattr(dua, '_auto_now_add'):
+                        dua.auto_now_add = dua._auto_now_add
