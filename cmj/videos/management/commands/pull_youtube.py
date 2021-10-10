@@ -14,7 +14,6 @@ from django.db.models.signals import post_delete, post_save
 from django.utils import timezone
 import dateutil.parser
 
-from cmj.core.models import AuditLog
 from cmj.sigad.models import Documento
 from cmj.signals import Manutencao
 from cmj.videos.models import Video, PullYoutube, VideoParte
@@ -52,13 +51,9 @@ class Command(BaseCommand):
         self.video_documento_na_galeria()
 
     def get_full_metadata_video(self):
-        videos = Video.objects.filter(
-            json__snippet__description__endswith='...').order_by('-created')
+        videos = Video.objects.all().order_by('execucao', '-created')
 
-        if not videos.exists():
-            videos = Video.objects.all().order_by('execucao', '-created')
-
-        videos = videos[:3]
+        videos = videos[:100]
 
         for v in videos:
             print(v.id, v.vid, v)
@@ -281,7 +276,7 @@ class Command(BaseCommand):
         now = timezone.localtime()
 
         pulls = list(PullYoutube.objects.all().order_by('execucao', '-id')[:3])
-        if 7 < now.hour < 21 and 0 < now.weekday() < 5:
+        if 9 <= now.hour <= 17 and 0 <= now.weekday() <= 4:
             pull_atual = PullYoutube.objects.all().order_by('-id').first()
             if pull_atual not in pulls:
                 pulls.insert(0, pull_atual)
