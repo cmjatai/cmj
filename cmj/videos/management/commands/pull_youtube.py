@@ -281,7 +281,7 @@ class Command(BaseCommand):
         now = timezone.localtime()
 
         pulls = list(PullYoutube.objects.all().order_by('execucao', '-id')[:3])
-        if 7 < now.hour < 21:
+        if 7 < now.hour < 21 and 0 < now.weekday() < 5:
             pull_atual = PullYoutube.objects.all().order_by('-id').first()
             if pull_atual not in pulls:
                 pulls.insert(0, pull_atual)

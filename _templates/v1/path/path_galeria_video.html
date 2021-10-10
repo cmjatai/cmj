@@ -30,7 +30,7 @@
               {% social_link_share d.0 'absolute-center'%}
 
               {% with d.0.imagem_representativa as imagem %}
-                <a class="imagem btn-play d-block w-100" href="/{{d.0.slug}}" style="background-image: url({% if imagem %}/{{imagem.absolute_slug}}.512{% else %}{{d.0.extra_data.thumbnails.high.url}}{% endif %})">
+                <a class="imagem btn-play d-block w-100" href="/{{d.0.slug}}" style="background-image: url({% if imagem %}/{{imagem.absolute_slug}}.512{%elif doc.extra_data.snippet%}{{d.0.extra_data.snippet.thumbnails.high.url}}{% else %}{{d.0.extra_data.thumbnails.high.url}}{% endif %})">
                   <div class="carousel-caption">
                     <div class="container-fluid">
                       <p>{{d.0.descricao}}</p>
@@ -68,7 +68,7 @@
 
             <div class="inner-imagem">
               {% comment %}{% social_link_share doc 'absolute-center'%}{% endcomment %}
-              <a class="imagem" href="/{{doc.slug}}" style="background-image: url({% if imagem %}/{{imagem.absolute_slug}}.512{% else %}{{doc.extra_data.thumbnails.high.url}}{% endif %})">
+              <a class="imagem" href="/{{doc.slug}}" style="background-image: url({% if imagem %}/{{imagem.absolute_slug}}.512{%elif doc.extra_data.snippet %}{{doc.extra_data.snippet.thumbnails.high.url}}{% else %}{{doc.extra_data.thumbnails.high.url}}{% endif %})">
                   <i class="fa fa-play" aria-hidden="true"></i>
               </a>
             </div>
