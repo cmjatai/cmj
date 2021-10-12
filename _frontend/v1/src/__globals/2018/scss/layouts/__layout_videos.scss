@@ -8,7 +8,7 @@
       margin-bottom: 5px;
 
       &:hover {
-        background-color: #e5f5e5;
+        background-color: #e5e5e5;
       }
     }
 
@@ -105,128 +105,26 @@
       }
     }
   }
+}
 
+@media screen and (max-width: 575.98px) {
 
-  .old {
-
-    .carousel {
-      margin-bottom: 0px;
-    }
-
-    .carousel-caption {
-      font-size: 100%;
-    }
-
-    .btn-play {
-      text-align: center;
-      height: auto;
-      line-height: 400px;
-      font-size: 1.7em;
-      color: rgba(white, 0.3);
-
-
-      .titulo {
-        font-size: 90%;
-      }
-
-      p {
-        font-size: 70%;
-      }
-
-      &:hover {
-        color: rgba(white, 0.9);
-
-        .fa-play {
-          border-color: rgba(white, 0.9);
-        }
-      }
-    }
+  .container-videos {
 
     .video-list {
-      display: table;
-      font-size: 0px;
+      margin: 50px -15px;
 
       .item {
-        display: inline-block;
-        width: calc(33.33%);
-        vertical-align: top;
-        padding: 20px 10px 0;
-        font-size: 2.5rem;
-      }
-
-      .inner {
-        position: relative;
-        color: white;
+        padding: 0px 0px 15px;
+        margin-bottom: 5px;
       }
 
       .inner-text {
-        line-height: 1em;
-        position: absolute;
-        bottom: 0px;
-        font-size: 65%;
-        padding: 0px 10px 10px;
-        color: white;
-        width: 100%;
-        transition: all 0.5s ease;
-
-        span {
-          display: block;
-          width: 100%;
-        }
+        line-height: 1.2;
+        padding: 0 10px;
 
         .titulo {
-          padding-top: 10%;
-        }
-
-        .descricao {
-          height: 0;
-          overflow: hidden;
-          font-size: 95%;
-        }
-      }
-
-      .btn-play {
-        width: 100%;
-        display: inline-block;
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: 50% center;
-        line-height: 200px;
-        font-size: 1em;
-
-        .fa-play {
-          color: transparent;
-          border: .1em solid transparent;
-          border-radius: 50%;
-          padding: 0.44em 0 0 0.205em;
-          width: 2em;
-          height: 2em;
-        }
-
-        &:hover {
-          box-shadow: 2px 2px 6px #bba;
-
-          .fa-play {
-            color: rgba(white, 0.8);
-            border-color: rgba(white, 0.8);
-          }
-
-          .descricao {
-            height: auto;
-            position: absolute;
-            top: 100%;
-            margin-top: -5px;
-            z-index: 1020;
-            background: darken($color_topo_bg, 5%) $url_bg_png;
-            box-shadow: 2px 2px 6px #444;
-            padding: 10px;
-            border: 1px solid rgba(white, 0.2);
-          }
-
-          .titulo {
-            font-weight: bold;
-            padding-top: 40%;
-          }
+          padding-top: 5px;
         }
       }
     }

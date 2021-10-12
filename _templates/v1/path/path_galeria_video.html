@@ -82,8 +82,8 @@
                 {{doc.public_date|date:"d"}} {% trans "de" %} {{doc.public_date|date:"F"}} {% trans "de" %} {{doc.public_date|date:"Y"}}
             </span>
             <div class="inner-text">
-                <a class="btn-play" href="/{{doc.slug}}" >
-                    <span class="titulo">{{doc.titulo}}</span>
+                <a class="titulo" href="/{{doc.slug}}" >
+                    {{doc.titulo}}
                 </a>
                 <br>
                 {% if doc.extra_data.statistics %}
