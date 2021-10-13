@@ -1,7 +1,7 @@
 {% load i18n %}
 TipoSessaoPlenaria:
   {% trans 'Tipo de Sessão Plenária' %}:
-  - nome  quorum_minimo tipo_numeracao gera_selo_votacao
+  - nome tipo_numeracao tipogeral:2 quorum_minimo:2 gera_selo_votacao:2
 
 SessaoPlenaria:
   {% trans 'Dados Básicos' %}:
@@ -12,13 +12,29 @@ SessaoPlenaria:
   - url_video
   - url_audio
 
-SessaoSolene:
+SessaoPlenariaSessaoEdit:
   {% trans 'Dados Básicos' %}:
   - legislatura  sessao_legislativa tipo:3  numero:1
   - data_inicio:5  hora_inicio:5  iniciada
   - data_fim:5  hora_fim:5  finalizada
-  - tema_solene
-  - upload_pauta  upload_ata  upload_anexo
+  - upload_pauta upload_ata upload_anexo
+  - url_audio url_video
+
+SessaoPlenariaAudienciaEdit:
+  {% trans 'Dados Básicos' %}:
+  - legislatura  sessao_legislativa tipo:3  numero:1
+  - data_inicio:5  hora_inicio:5  iniciada
+  - data_fim:5  hora_fim:5  finalizada
+  - titulo
+  - upload_pauta upload_ata upload_anexo
+  - url_audio url_video
+
+SessaoPlenariaReuniaoEdit:
+  {% trans 'Dados Básicos' %}:
+  - legislatura  sessao_legislativa tipo:3  numero:1
+  - data_inicio:5  hora_inicio:5  iniciada
+  - data_fim:5  hora_fim:5 finalizada
+  - upload_pauta upload_ata upload_anexo
   - url_audio url_video
 
 TipoResultadoVotacao:

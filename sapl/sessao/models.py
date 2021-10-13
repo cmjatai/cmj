@@ -10,8 +10,10 @@ from django.db.models.fields.related import ManyToManyField
 from django.utils import timezone, formats
 from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices
+
 from cmj.core.models import CertidaoPublicacao
 from cmj.diarios.models import DiarioOficial, VinculoDocDiarioOficial
+from cmj.mixins import CmjChoices
 from sapl.base.models import Autor
 from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import (CargoMesa, Legislatura, Parlamentar,
@@ -33,6 +35,12 @@ class TipoSessaoPlenaria(models.Model):
         (99, 'unica', 'Numeração Única'),
     )
 
+    TIPOGERAL_CHOICES = CmjChoices(
+        (10, 'sessao', 'Sessão'),
+        (20, 'reuniao', 'Reunião'),
+        (30, 'audiencia', 'Audiência'),
+    )
+
     nome = models.CharField(max_length=30, verbose_name=_('Descrição do Tipo'))
     quorum_minimo = models.PositiveIntegerField(
         verbose_name=_('Quórum mínimo'))
@@ -40,6 +48,12 @@ class TipoSessaoPlenaria(models.Model):
     tipo_numeracao = models.PositiveIntegerField(
         verbose_name=_('Tipo de Numeração'),
         choices=TIPO_NUMERACAO_CHOICES, default=11)
+
+    tipogeral = models.PositiveIntegerField(
+        verbose_name=_('Tipo Geral'),
+        choices=TIPOGERAL_CHOICES,
+        default=10
+    )
 
     gera_selo_votacao = models.BooleanField(blank=True, default=True,
                                             verbose_name=_('Gera Selo de Votação?'))
@@ -108,6 +122,13 @@ class SessaoPlenaria(models.Model):
 
     painel_aberto = models.BooleanField(blank=True, default=False,
                                         verbose_name=_('Painel está aberto?'))
+
+    titulo = models.CharField(
+        max_length=256,
+        verbose_name=_('Título'),
+        blank=True, default=''
+    )
+
     tipo = models.ForeignKey(TipoSessaoPlenaria,
                              on_delete=models.PROTECT,
                              verbose_name=_('Tipo'))

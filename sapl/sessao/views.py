@@ -1025,15 +1025,21 @@ class SessaoCrud(Crud):
 
         @property
         def layout_key(self):
-            return 'SessaoSolene'
+            tipogeral = self.object.tipo.TIPOGERAL_CHOICES.triple(
+                self.object.tipo.tipogeral).capitalize()
+
+            return f'SessaoPlenaria{tipogeral}Edit'
 
         def get_context_data(self, **kwargs):
+
             context = super().get_context_data(**kwargs)
-            sessao = context['object']
-            tipo_sessao = sessao.tipo
-            if tipo_sessao.nome == "Solene":
-                context.update(
-                    {'subnav_template_name': 'sessao/subnav-solene.yaml'})
+
+            tipogeral = self.object.tipo.TIPOGERAL_CHOICES.triple(
+                self.object.tipo.tipogeral).capitalize()
+
+            # context.update(
+            #    {'subnav_template_name': 'sessao/subnav-solene.yaml'})
+
             return context
 
         def get_initial(self):
