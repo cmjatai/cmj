@@ -1030,18 +1030,6 @@ class SessaoCrud(Crud):
 
             return f'SessaoPlenaria{tipogeral}Edit'
 
-        def get_context_data(self, **kwargs):
-
-            context = super().get_context_data(**kwargs)
-
-            tipogeral = self.object.tipo.TIPOGERAL_CHOICES.triple(
-                self.object.tipo.tipogeral).capitalize()
-
-            # context.update(
-            #    {'subnav_template_name': 'sessao/subnav-solene.yaml'})
-
-            return context
-
         def get_initial(self):
             return {'sessao_legislativa': self.object.sessao_legislativa}
 
@@ -1210,21 +1198,14 @@ class SessaoCrud(Crud):
             btns = list(filter(lambda x: x, btns))
             return btns
 
-        @property
-        def layout_key(self):
-            sessao = self.object
-            tipo_sessao = sessao.tipo
-            if tipo_sessao.nome == "Solene":
-                return 'SessaoSolene'
-            return 'SessaoPlenaria'
-
         def get_context_data(self, **kwargs):
+
             context = super().get_context_data(**kwargs)
-            sessao = context['object']
-            tipo_sessao = sessao.tipo
-            if tipo_sessao.nome == "Solene":
+
+            if self.request.user.is_anonymous and self.object.tipo.tipogeral == TipoSessaoPlenaria.TIPOGERAL_AUDIENCIA:
                 context.update(
-                    {'subnav_template_name': 'sessao/subnav-solene.yaml'})
+                    {'subnav_template_name': 'sessao/subnav-audiencia.yaml'})
+
             return context
 
         def get(self, request, *args, **kwargs):

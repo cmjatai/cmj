@@ -35,10 +35,14 @@ class TipoSessaoPlenaria(models.Model):
         (99, 'unica', 'Numeração Única'),
     )
 
+    TIPOGERAL_SESSAO = 10
+    TIPOGERAL_REUNIAO = 20
+    TIPOGERAL_AUDIENCIA = 30
+
     TIPOGERAL_CHOICES = CmjChoices(
-        (10, 'sessao', 'Sessão'),
-        (20, 'reuniao', 'Reunião'),
-        (30, 'audiencia', 'Audiência'),
+        (TIPOGERAL_SESSAO, 'sessao', 'Sessão'),
+        (TIPOGERAL_REUNIAO, 'reuniao', 'Reunião'),
+        (TIPOGERAL_AUDIENCIA, 'audiencia', 'Audiência'),
     )
 
     nome = models.CharField(max_length=30, verbose_name=_('Descrição do Tipo'))
