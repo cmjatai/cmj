@@ -194,11 +194,15 @@
                                   title="{{rv.ordem.sessao_plenaria}}">
                                   {{rv.ordem.sessao_plenaria.tipo}}
                                   - {{ rv.ordem.sessao_plenaria.data_inicio }}
+                                  {% if rv.ordem.resultado %}
+                                  - {{ rv.ordem.resultado }}
+                                  {% else %}
                                   - {{ rv.tipo_resultado_votacao.nome }}
-                                  {% if rv.resultado %}
-                                  - {{ rv.resultado }}
                                   {% endif %}
                                 </a>
+                                  <i>
+                                  <br><small>{{rv.ordem.sessao_plenaria}}</small>
+                                  </i>
                                   <i>
                                   {% if rv.ordem.registrovotacao_set.first.observacao %}<br><small>{{ rv.ordem.registrovotacao_set.first.observacao}}</small>{% endif %}
                                   </i>
