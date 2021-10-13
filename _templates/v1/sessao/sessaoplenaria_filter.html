@@ -33,16 +33,11 @@
   {% crispy filter.form %}
 
   {% if show_results %}
-    <div class="container">
+    <div class="container mx-0">
       <div class="result-count">Total de Sessões: <strong>{{paginator.count}}</strong></div>
+        <div class="row align-items-stretch">
         {% for s in page_obj %}
-          {% if forloop.counter0|divisibleby:3 %}
-            {% if forloop.counter0 != 0%}
-              </div>
-            {% endif %}
-            <div class="row align-items-stretch">
-          {% endif %}
-            <div class="col-md-4 d-flex">
+            <div class="d-flex col-12 col-lg-4 col-md-6 col-sm-6 ">
               <div class="card my-3 overflow-hidden">
                 {% if s.url_video %}
                   <div class="car-img-top">
@@ -76,9 +71,6 @@
                 </div>
               </div>
             </div>
-          {% if forloop.last %}
-            </div>
-          {% endif %}
         {% empty  %}
           <h3>Nenhuma Sessão Plenária encontrada com essas especificações</h3>
         {% endfor %}
