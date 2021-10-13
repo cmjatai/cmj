@@ -14,6 +14,7 @@ from model_utils import Choices
 from cmj.core.models import CertidaoPublicacao
 from cmj.diarios.models import DiarioOficial, VinculoDocDiarioOficial
 from cmj.mixins import CmjChoices
+from cmj.videos.models import VideoParte
 from sapl.base.models import Autor
 from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import (CargoMesa, Legislatura, Parlamentar,
@@ -208,6 +209,14 @@ class SessaoPlenaria(models.Model):
     _diario = GenericRelation(
         VinculoDocDiarioOficial, related_query_name='sessaoplenaria_diario')
 
+    _videoparte = SaplGenericRelation(
+        VideoParte,
+        related_query_name='sessaoplenaria_videoparte',
+        fields_search=(
+            ('video__titulo', '__icontains'),
+        )
+    )
+
     class Meta:
         verbose_name = _('Sessão Plenária')
         verbose_name_plural = _('Sessões Plenárias')
@@ -215,6 +224,10 @@ class SessaoPlenaria(models.Model):
     @property
     def __descr__(self):
         return str(self)
+
+    @property
+    def videoparte(self):
+        return self._videoparte.all().first()
 
     @property
     def certidao(self):

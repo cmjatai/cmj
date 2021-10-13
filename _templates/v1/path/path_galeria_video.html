@@ -62,7 +62,7 @@
   <div class="row video-list">
     {% for doc  in object_list %}
       {% with doc.imagem_representativa as imagem %}
-        <div class="item col-12 col-xxl-2 col-xl-3 col-lg-4 col-md-6 col-sm-6 ">
+        <div class="item col-12 col-xl-3 col-lg-4 col-md-6">
           <div class="inner">
 
 
@@ -73,7 +73,7 @@
               </a>
               {% if doc.extra_data.contentDetails.duration %}
                 <span class="duration">
-                {{ doc|video_duration }}
+                {{ doc.extra_data|video_duration }}
                 </span>
               {% endif %}
             </div>

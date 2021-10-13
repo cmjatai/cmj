@@ -121,9 +121,9 @@ def caixa_publicacao_popup(key, request):
 
 
 @register.filter
-def video_duration(obj):
+def video_duration(jdata):
 
-    j = obj.extra_data
+    j = jdata
 
     if not j or 'contentDetails' not in j or 'duration' not in j['contentDetails']:
         return ''

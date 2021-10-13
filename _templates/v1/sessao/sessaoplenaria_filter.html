@@ -1,6 +1,6 @@
 {% extends "crud/detail.html" %}
 {% load i18n %}
-{% load crispy_forms_tags common_tags %}
+{% load crispy_forms_tags common_tags sigad_filters %}
 
 {% block actions %}
   <div class="actions btn-group" role="group">
@@ -33,26 +33,22 @@
   {% crispy filter.form %}
 
   {% if show_results %}
-    <div class="container mx-0">
+    <div class="container container-videos">
       <div class="result-count">Total de Sessões: <strong>{{paginator.count}}</strong></div>
-        <div class="row align-items-stretch">
+        <div class="row sessao-list align-items-stretch">
         {% for s in page_obj %}
-            <div class="d-flex col-12 col-lg-4 col-md-6 col-sm-6 ">
-              <div class="card my-3 overflow-hidden">
+            <div class="item col-12 col-lg-4 col-md-6" >
+              <div class="card">
                 {% if s.url_video %}
-                  <div class="car-img-top">
-                    <div class="embed-responsive embed-responsive-16by9">
-
-                      {% comment %}
-                        verificar troca de iframe por imagem do video a ser
-                        listado com o link para o details onde só ficaria o iframe
-                        https://img.youtube.com/vi/GmePdPCd-BQ/0.jpg
-                      {% endcomment %}
-
-                      <iframe id="ytplayer" type="text/html" allowfullscreen
-                      src="https://www.youtube.com/embed/{{ s.url_video|youtube_id }}"
-                      frameborder="0"></iframe>
-                    </div>
+                  <div class="card-image">
+                    <a href="{% url 'sapl.sessao:sessaoplenaria_detail' s.id %}" style="background-image: url({{s.videoparte.video.json.snippet.thumbnails.high.url}})">
+                      <i class="fa fa-play" aria-hidden="true"></i>
+                        {% if s.videoparte.video.json.contentDetails.duration %}
+                          <span class="duration">
+                          {{ s.videoparte.video.json|video_duration }}
+                          </span>
+                        {% endif %}
+                    </a>
                   </div>
                 {% endif %}
                 <div class="card-body">
