@@ -1051,10 +1051,6 @@ class SessaoCrud(Crud):
         logger = logging.getLogger(__name__)
 
         @property
-        def layout_key(self):
-            return 'SessaoSolene'
-
-        @property
         def cancel_url(self):
             return self.search_url
 
@@ -1085,15 +1081,6 @@ class SessaoCrud(Crud):
         def get_success_url(self):
             namespace = self.model._meta.app_config.name
             return reverse('%s:%s' % (namespace, 'sessaoplenaria_list'))
-
-        def get_context_data(self, **kwargs):
-            context = super().get_context_data(**kwargs)
-            sessao = context['object']
-            tipo_sessao = sessao.tipo
-            if tipo_sessao.nome == "Solene":
-                context.update(
-                    {'subnav_template_name': 'sessao/subnav-solene.yaml'})
-            return context
 
     class SeloVotacaoMixin(PluginSignMixin):
 
