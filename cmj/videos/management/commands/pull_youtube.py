@@ -99,6 +99,9 @@ class Command(BaseCommand):
                     if isinstance(vp.content_object, Documento):
                         d = vp.content_object
 
+                        if d.classe_id != 233:
+                            continue
+
                         for dp in d.treechilds2list():
                             if dp == d:
                                 d.extra_data = v.json
