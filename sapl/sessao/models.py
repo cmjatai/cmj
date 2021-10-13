@@ -225,6 +225,9 @@ class SessaoPlenaria(models.Model):
 
     def __str__(self):
 
+        if self.titulo:
+            return self.titulo
+
         tnc = self.tipo.TIPO_NUMERACAO_CHOICES
 
         base = '{}ª {}'.format(self.numero, self.tipo.nome)
