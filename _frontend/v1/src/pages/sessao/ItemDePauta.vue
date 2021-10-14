@@ -1,8 +1,7 @@
 <template>
   <div :class="['item-de-pauta', type]">
-
     <div :class="['empty-list', materia.id === undefined ? '' : 'd-none']">
-        Carregando Matéria...
+      Carregando Matéria...
     </div>
 
     <div :class="[resultadoVotacao]">
@@ -14,56 +13,79 @@
 
     <div :class="['item-body']"></div>
 
-    <div :class="['item-body', materia.id !== undefined && materia.anexadas.length > 0 ? 'col-anexadas':'']">
+    <div
+      :class="[
+        'item-body',
+        materia.id !== undefined && materia.anexadas.length > 0
+          ? 'col-anexadas'
+          : '',
+      ]"
+    >
       <div class="col-1-body">
-
         <div class="status-tramitacao">
-          <div :class="['ultima_tramitacao', nivel(NIVEL2, tramitacao.ultima !== {})]">
-            <strong>Situação:</strong> {{tramitacao.status.descricao}}<br>
-            <strong>Ultima Ação:</strong> {{tramitacao.ultima.texto}}
-          </div>
-          <div :class="['observacao', nivel(NIVEL3, observacao.length > 0)]" v-html="observacao"></div>
+          <div
+            :class="['observacao', nivel(NIVEL3, observacao.length > 0)]"
+            v-html="observacao"
+          ></div>
         </div>
 
-        <div :class="['sub-containers', itensLegislacaoCitada.length === 0 ? 'd-none':'container-legis-citada']">
+        <div
+          :class="[
+            'sub-containers',
+            itensLegislacaoCitada.length === 0
+              ? 'd-none'
+              : 'container-legis-citada',
+          ]"
+        >
           <div class="title">
-            <span>
-              Legislação Citada
-            </span>
-            </div>
+            <span> Legislação Citada </span>
+          </div>
           <div class="inner">
-              <button v-for="legis in itensLegislacaoCitada" :key="`legiscit${legis.id}`"
-                type="button"
-                class="btn btn-link"
-                data-toggle="modal"
-                :data-target="`modal-legis-citada-${legis.id}`"
-                @click="modal_legis_citada=legis">
-                  {{legis.__str__}}
-              </button>
+            <button
+              v-for="legis in itensLegislacaoCitada"
+              :key="`legiscit${legis.id}`"
+              type="button"
+              class="btn btn-link"
+              data-toggle="modal"
+              :data-target="`modal-legis-citada-${legis.id}`"
+              @click="modal_legis_citada = legis"
+            >
+              {{ legis.__str__ }}
+            </button>
           </div>
         </div>
 
-        <div :class="['sub-containers', nivel(NIVEL2, itensDocumentosAcessorios.length > 0), itensDocumentosAcessorios.length === 0 ? 'd-none':'container-docs-acessorios']">
+        <div
+          :class="[
+            'sub-containers',
+            nivel(NIVEL2, itensDocumentosAcessorios.length > 0),
+            itensDocumentosAcessorios.length === 0
+              ? 'd-none'
+              : 'container-docs-acessorios',
+          ]"
+        >
           <div class="title">
-            <span>
-              Documentos Acessórios
-            </span>
-            </div>
+            <span> Documentos Acessórios </span>
+          </div>
           <div class="inner">
-              <a :href="docs.arquivo"  class="btn btn-link" v-for="docs in itensDocumentosAcessorios" :key="`docsacc${docs.id}`">
-                {{docs.__str__}}
-              </a>
+            <a
+              :href="docs.arquivo"
+              class="btn btn-link"
+              v-for="docs in itensDocumentosAcessorios"
+              :key="`docsacc${docs.id}`"
+            >
+              {{ docs.__str__ }}
+            </a>
           </div>
         </div>
-
       </div>
       <div class="col-2-body">
-        <div :class="['sub-containers', nivel(NIVEL2, itensAnexados.length > 0)]">
+        <div
+          :class="['sub-containers', nivel(NIVEL2, itensAnexados.length > 0)]"
+        >
           <div class="title">
-            <span>
-              Matérias Anexadas
-            </span>
-            </div>
+            <span> Matérias Anexadas </span>
+          </div>
           <div class="inner">
             <div v-for="anexada in itensAnexados" :key="`${type}${anexada.id}`">
               <materia-pauta :materia="anexada" :type="type"></materia-pauta>
@@ -72,7 +94,12 @@
         </div>
       </div>
     </div>
-    <norma-simple-modal-view v-if="modal_legis_citada" :html_id="`modal-legis-citada-${modal_legis_citada.id}`" :modal_norma="null" :idd="modal_legis_citada.norma"></norma-simple-modal-view>
+    <norma-simple-modal-view
+      v-if="modal_legis_citada"
+      :html_id="`modal-legis-citada-${modal_legis_citada.id}`"
+      :modal_norma="null"
+      :idd="modal_legis_citada.norma"
+    ></norma-simple-modal-view>
   </div>
 </template>
 <script>
@@ -184,7 +211,7 @@ export default {
         })
       t.$nextTick()
         .then(() => {
-          t.fetchUltimaTramitacao()
+          // t.fetchUltimaTramitacao()
         })
         .then(() => {
           t.fetchLegislacaoCitada()
@@ -324,7 +351,6 @@ export default {
 </script>
 
 <style lang="scss">
-
 .item-de-pauta {
   position: relative;
   background-color: #ffffff55;
@@ -338,9 +364,9 @@ export default {
   }
 
   &::before {
-    content: 'Ordem do Dia';
+    content: "Ordem do Dia";
     position: absolute;
-    bottom: 5px;
+    bottom: 1px;
     right: 5px;
     color: rgba(#000, 0.1);
     font-size: 200%;
@@ -349,12 +375,12 @@ export default {
   }
 
   &.expedientemateria {
-      background-color: #ffffe3;
+    background-color: #ffffe3;
     &:hover {
       background-color: #f5d576;
     }
     &::before {
-      content: 'Grande Expediente';
+      content: "Grande Expediente";
     }
   }
   .status-votacao {
@@ -398,7 +424,7 @@ export default {
         font-weight: bold;
         color: white;
         background-color: #5696ca;
-        display: inline-block
+        display: inline-block;
       }
     }
     .inner {
@@ -411,10 +437,9 @@ export default {
       }
     }
     .materia-pauta {
-      border-bottom: 1px solid #aaa;
-      padding: 10px 15px 0 ;
+      border-bottom: 1px solid #fff;
+      padding: 10px 15px 0;
     }
-
   }
   .status-tramitacao {
     font-size: 1em;
@@ -429,18 +454,15 @@ export default {
     .ultima_tramitacao {
       line-height: 1.3;
       strong:first-child {
-      padding-top: 0.5em;
+        padding-top: 0.5em;
         border-top: 1px solid #5696ca;
-
       }
     }
-
   }
 
   .sub-containers__old {
-
     .container-legis-citada {
-        //border-top: 1px solid #5696ca;
+      //border-top: 1px solid #5696ca;
       button {
         text-align: left;
       }
@@ -453,9 +475,7 @@ export default {
       &.col-anexadas {
         grid-template-columns: auto;
       }
-
     }
-
   }
 }
 

@@ -35,6 +35,18 @@
           </div>
         </div>
         <div class="ementa">{{ materia.ementa }}</div>
+
+        <div v-if="true" class="status-tramitacao">
+          <div
+            :class="[
+              'ultima_tramitacao',
+              nivel(NIVEL2, tramitacao.ultima !== {}),
+            ]"
+          >
+            <strong>Situação:</strong> {{ tramitacao.status.descricao }}<br />
+            <strong>Ultima Ação:</strong> {{ tramitacao.ultima.texto }}
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -49,6 +61,10 @@ export default {
       app: ['materia'],
       model: ['materialegislativa', 'tramitacao', 'anexada', 'autoria'],
       autores: {},
+      tramitacao: {
+        ultima: {},
+        status: {}
+      },
       tipo_string: '',
       blob: null,
       baixando: false
@@ -81,13 +97,44 @@ export default {
   },
   mounted () {
     const t = this
+    if (!t.blob && t.materia.id !== undefined) {
+      t.refresh()
+    }
+    /*
     setTimeout(() => {
       if (!t.blob) {
         t.refresh()
       }
-    }, 1000)
+    }, 1000) */
   },
   methods: {
+
+    fetchUltimaTramitacao () {
+      const t = this
+      return t.utils
+        .getByMetadata({
+          action: 'ultima_tramitacao',
+          app: 'materia',
+          model: 'materialegislativa',
+          id: t.materia.id
+        })
+        .then((response) => {
+          t.tramitacao.ultima = response.data
+          if (t.tramitacao.ultima.id === undefined) {
+            return
+          }
+
+          t.getObject({
+            action: '',
+            app: 'materia',
+            model: 'statustramitacao',
+            id: t.tramitacao.ultima.status
+          })
+            .then(obj => {
+              t.tramitacao.status = obj
+            })
+        })
+    },
     clickFile (event) {
       const url = window.URL.createObjectURL(this.blob)
       window.location = url
@@ -105,7 +152,7 @@ export default {
     refresh () {
       const t = this
 
-      if (t.materia === undefined) {
+      if (t.materia === undefined || t.materia.id === undefined) {
         return
       }
 
@@ -127,6 +174,8 @@ export default {
             id: value
           }).then((obj) => {
             t.$set(t.autores, obj.id, obj)
+
+            t.fetchUltimaTramitacao()
           })
         })
 
@@ -169,17 +218,21 @@ export default {
     text-align: left;
   }
   .item-header {
-    display: grid;
-    grid-template-columns: minmax(0, 50px) auto;
-    align-items: center;
-    grid-column-gap: 1em;
+    //display: grid;
+    //grid-template-columns: minmax(0, 50px) auto;
+    //align-items: center;
+    //grid-column-gap: 1em;
     small {
       text-align: center;
       display: inline-block;
     }
+    .link-file {
+      float: left;
+    }
   }
   .btn-link {
     cursor: pointer;
+    margin: 0.5rem 0.5rem 0 -0.5rem;
   }
   .detail-header {
     display: flex;
