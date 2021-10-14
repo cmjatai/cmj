@@ -40,6 +40,9 @@ class Command(BaseCommand):
 
         m.desativa_auto_now()
 
+        # self.corrigir_erro_causado_em_full_metadata()
+        # return
+
         if not settings.DEBUG:
             self.pull_youtube()
         self.get_full_metadata_video()
@@ -350,3 +353,27 @@ class Command(BaseCommand):
                 #    pageToken = None
             pull.execucao += 1
             pull.save()
+
+    def corrigir_erro_causado_em_full_metadata(self):
+
+        videos = Video.objects.all()
+
+        for v in videos:
+
+            for vp in v.videoparte_set.all():
+
+                if isinstance(vp.content_object, Documento):
+                    d = vp.content_object
+
+                    if d.classe_id == 233:
+                        continue
+
+                    for r in d.revisoes.all():
+                        if not r.user:
+                            continue
+
+                        if r.user.id == 76:
+                            d.descricao = r.obj[0]['fields']['descricao']
+                            d.save()
+                            print(r.id, r.user.id, r.user, d.id, d)
+                            break

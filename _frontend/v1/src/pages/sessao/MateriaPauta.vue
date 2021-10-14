@@ -1,13 +1,22 @@
 <template>
   <div :class="['materia-pauta']">
-    <a :href="materia.link_detail_backend" target="_blank" class="epigrafe">{{tipo_string}} n&#186; {{materia.numero}}/{{materia.ano}}</a>
+    <a :href="materia.link_detail_backend" target="_blank" class="epigrafe"
+      >{{ tipo_string }} n&#186; {{ materia.numero }}/{{ materia.ano }}</a
+    >
 
-    <div :class="['item-header', tipo_string ? '': 'd-none']">
-      <div class="link-file" :id="`${type}-${materia.id}`" >
-        <a :class="['btn btn-link', `link-file-${materia.id}`, !blob ? 'd-none' : '' ]" @click="clickFile">
+    <div :class="['item-header', tipo_string ? '' : 'd-none']">
+      <div class="link-file" :id="`${type}-${materia.id}`">
+        <a
+          :class="[
+            'btn btn-link',
+            `link-file-${materia.id}`,
+            !blob ? 'd-none' : '',
+          ]"
+          @click="clickFile"
+        >
           <i class="far fa-2x fa-file-pdf"></i>
         </a>
-        <small :class="!baixando?'d-none': ''">Baixando<br>Arquivo</small>
+        <small :class="!baixando ? 'd-none' : ''">Baixando<br />Arquivo</small>
       </div>
 
       <div class="data-header">
@@ -15,15 +24,17 @@
           <div class="protocolo-data">
             <span>
               Protocolo:
-              <strong>{{materia.numero_protocolo}}</strong>
+              <strong>{{ materia.numero_protocolo }}</strong>
             </span>
-            <span>{{data_apresentacao}}</span>
+            <span>{{ data_apresentacao }}</span>
           </div>
           <div class="autoria">
-            <span v-for="(autores, key) in autores_list" :key="`au${key}`">{{autores.nome}}</span>
+            <span v-for="(autores, key) in autores_list" :key="`au${key}`">{{
+              autores.nome
+            }}</span>
           </div>
         </div>
-        <div class="ementa">{{materia.ementa}}</div>
+        <div class="ementa">{{ materia.ementa }}</div>
       </div>
     </div>
   </div>
@@ -78,14 +89,16 @@ export default {
   },
   methods: {
     clickFile (event) {
-      const url = window.URL.createObjectURL(
-        this.blob
-      )
+      const url = window.URL.createObjectURL(this.blob)
       window.location = url
     },
     fetch (metadata) {
       const t = this
-      if (t.materia !== undefined && t.materia.id === metadata.id && metadata.model === t.model[0]) {
+      if (
+        t.materia !== undefined &&
+        t.materia.id === metadata.id &&
+        metadata.model === t.model[0]
+      ) {
         this.refresh()
       }
     },
@@ -100,19 +113,19 @@ export default {
         app: 'materia',
         model: 'tipomaterialegislativa',
         id: t.materia.tipo
-      }).then(obj => {
+      }).then((obj) => {
         t.tipo_string = obj.descricao
       })
 
       t.$set(t, 'autores', {})
 
       t.$nextTick().then(() => {
-        _.each(t.materia.autores, value => {
+        _.each(t.materia.autores, (value) => {
           t.getObject({
             app: 'base',
             model: 'autor',
             id: value
-          }).then(obj => {
+          }).then((obj) => {
             t.$set(t.autores, obj.id, obj)
           })
         })
@@ -125,12 +138,14 @@ export default {
             url: url,
             method: 'GET',
             responseType: 'blob' // important
-          }).then(response => {
-            t.baixando = false
-            t.blob = new Blob([response.data], { type: 'application/pdf' })
-          }).catch(() => {
-            t.baixando = false
           })
+            .then((response) => {
+              t.baixando = false
+              t.blob = new Blob([response.data], { type: 'application/pdf' })
+            })
+            .catch(() => {
+              t.baixando = false
+            })
         }
       })
     }
@@ -139,7 +154,6 @@ export default {
 </script>
 
 <style lang="scss">
-
 .materia-pauta {
   .epigrafe {
     color: #044079;
