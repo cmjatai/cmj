@@ -5,7 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields.jsonb import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, F
 from django.db.models.deletion import PROTECT
 from django.db.models.functions import Concat
 from django.template import defaultfilters
@@ -206,10 +206,10 @@ class MateriaLegislativaManager(models.Manager):
     use_for_related_fields = True
 
     def materias_anexadas(self):
-        return self.get_anexacao('filter')
+        return self.get_anexacao('filter').annotate(data_anexacao=F('materia_anexada_set__data_anexacao'))
 
     def materias_desanexadas(self):
-        return self.get_anexacao('exclude')
+        return self.get_anexacao('exclude').annotate(data_desanexacao=F('materia_anexada_set__data_desanexacao'))
 
     def get_anexacao(self, type_select):
         return getattr(

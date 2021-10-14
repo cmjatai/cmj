@@ -3,17 +3,17 @@
 {% if materias_ordem %}
 <fieldset>
   <legend>Matérias da Ordem do Dia</legend>
-  
+
       <table class="table">
       {% for m in materias_ordem %}
         <tr>
-          <td class="item-listas">  
+          <td class="item-listas">
             <div class="item-raiz">
               <strong>
-                {{m.numero}} - {{m.titulo}}                  
+                {{m.numero}} - {{m.titulo}}
               </strong>
               {% if m.numero_protocolo %}
-                <br><strong>Protocolo: </strong>{{m.numero_protocolo}} | 
+                <br><strong>Protocolo: </strong>{{m.numero_protocolo}} |
               {% endif %}
               <b>Turno:</b> {{m.turno|default:''}} |
               <b>Autor{{ m.autor|length|pluralize:"es" }}</b>: {{ m.autor|join:', ' }}
@@ -21,14 +21,41 @@
 
               <small>
                 {% with m.materia.tramitacao_set.first as tram %}
-                  {% if tram.unidade_tramitacao_destino %}        
-                    <strong>Localização Atual:</strong> &nbsp;{{tram.unidade_tramitacao_destino}}</br>        
+                  {% if tram.unidade_tramitacao_destino %}
+                    <strong>Localização Atual:</strong> &nbsp;{{tram.unidade_tramitacao_destino}}</br>
                     <strong>Status:</strong> {{tram.status}}<br>
                     <strong>Ultima Ação:</strong> {{tram.texto}}<br>
-                    <strong>Data da última Tramitação:</strong> {{tram.data_tramitacao}}<br>       
+                    <strong>Data da última Tramitação:</strong> {{tram.data_tramitacao}}<br>
                   {% endif %}
                 {% endwith %}
-                <br>      
+              </small>
+              <small>
+                {% for anexada in m.materia.anexadas.materias_anexadas %}
+                  {% if forloop.first %}
+                    <strong>Matérias Anexadas</strong>
+                    <ul>
+                  {% endif %}
+                    <li>
+                      {{ anexada }} - Data de Anexação: {{anexada.data_anexacao}}
+                    </li>
+                  {% if forloop.last %}
+                    </ul>
+                    <br>
+                  {% endif %}
+                {% endfor %}
+                {% for anexada in m.materia.anexadas.materias_desanexadas %}
+                  {% if forloop.first %}
+                    <strong>Matérias Desanexadas</strong>
+                    <ul>
+                  {% endif %}
+                    <li>
+                      {{ anexada }} - Data de Desanexação: {{anexada.data_desanexacao}}
+                    </li>
+                  {% if forloop.last %}
+                    </ul>
+                    <br>
+                  {% endif %}
+                {% endfor %}
               </small>
               {% if not user.is_anonymous  %}
                 {{m.ementa_observacao|linebreaksbr|safe}}
@@ -36,7 +63,7 @@
             </div>
           </td>
           <td>
-              <b>{{m.resultado}}</b><br/>{{m.resultado_observacao}}
+            <b>{{m.resultado}}</b><br/>{{m.resultado_observacao}}
           </td>
         </tr>
       {% endfor %}
