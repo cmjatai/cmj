@@ -33,7 +33,7 @@ def task_pull_youtube_live(*args, **kwargs):
             except:
                 pass
 
-        delay = timezone.now() + timedelta(seconds=10)
+        delay = timezone.now() + timedelta(seconds=60)
         task_pull_youtube_live.apply_async(eta=delay)
 
 
@@ -65,7 +65,7 @@ def task_pull_youtube_upcoming(*args, **kwargs):
                 v.json['liveStreamingDetails']['scheduledStartTime'])
 
             if scheduledStartTime < timezone.now():
-                scheduledStartTime = timezone.now() + timedelta(seconds=15)
+                scheduledStartTime = timezone.now() + timedelta(seconds=60)
 
             task_pull_youtube_upcoming.apply_async(eta=scheduledStartTime)
 
