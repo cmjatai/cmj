@@ -124,11 +124,10 @@ def task_pull_youtube_upcoming(*args, **kwargs):
 @app.task(queue='celery', bind=True)
 def task_pull_youtube(self, *args, **kwargs):
 
-    tasks = get_tasks_scheduled()
-    # pull_youtube()
+    pull_youtube()
 
-    # vincular_sistema_aos_videos()
-    # video_documento_na_galeria()
+    vincular_sistema_aos_videos()
+    video_documento_na_galeria()
 
     now = timezone.now()
 
