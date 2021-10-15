@@ -14,6 +14,33 @@ from cmj.videos.models import Video
 logger = logging.getLogger(__name__)
 
 
+def get_tasks_scheduled():
+
+    from cmj.celery import app as celery_app
+
+    i = celery_app.control.inspect()
+
+    tasks = set()
+    try:
+        if i:
+            queues = i.scheduled()
+            if queues:
+                for k, tarefas_agendadas in queues.items():
+                    for ta in tarefas_agendadas:
+                        tasks.add(ta['request']['name'])
+    except:
+        pass
+    return tasks
+
+
+def start_task(task_name, task, eta):
+
+    tasks = get_tasks_scheduled()
+
+    if task_name not in tasks:
+        task.apply_async(eta=eta)
+
+
 @app.task(queue='celery', bind=True)
 def task_pull_youtube_geral(*args, **kwargs):
 
@@ -31,8 +58,9 @@ def task_pull_youtube_geral(*args, **kwargs):
         except:
             pass
 
-        delay = timezone.now() + timedelta(seconds=60)
-        task_pull_youtube_geral.apply_async(eta=delay)
+        start_task('task_pull_youtube_geral',
+                   task_pull_youtube_geral,
+                   timezone.now() + timedelta(seconds=60))
 
 
 @app.task(queue='celery', bind=True)
@@ -54,8 +82,9 @@ def task_pull_youtube_live(*args, **kwargs):
             except:
                 pass
 
-        delay = timezone.now() + timedelta(seconds=60)
-        task_pull_youtube_live.apply_async(eta=delay)
+        start_task('task_pull_youtube_live',
+                   task_pull_youtube_geral,
+                   timezone.now() + timedelta(seconds=60))
 
 
 @app.task(queue='celery', bind=True)
@@ -79,8 +108,10 @@ def task_pull_youtube_upcoming(*args, **kwargs):
                 pass
 
         if liveBroadcastContent == 'live':
-            delay = timezone.now() + timedelta(seconds=10)
-            task_pull_youtube_live.apply_async(eta=delay)
+            start_task('task_pull_youtube_live',
+                       task_pull_youtube_geral,
+                       timezone.now() + timedelta(seconds=60))
+
         else:
             scheduledStartTime = dateutil.parser.parse(
                 v.json['liveStreamingDetails']['scheduledStartTime'])
@@ -88,27 +119,15 @@ def task_pull_youtube_upcoming(*args, **kwargs):
             if scheduledStartTime < timezone.now():
                 scheduledStartTime = timezone.now() + timedelta(seconds=60)
 
-            task_pull_youtube_upcoming.apply_async(eta=scheduledStartTime)
+            start_task('task_pull_youtube_upcoming',
+                       task_pull_youtube_upcoming,
+                       scheduledStartTime)
 
 
 @app.task(queue='celery', bind=True)
 def task_pull_youtube(self, *args, **kwargs):
 
-    from cmj.celery import app as celery_app
-
-    i = celery_app.control.inspect()
-
-    tasks = set()
-    try:
-        if i:
-            queues = i.scheduled()
-            if queues:
-                for k, tarefas_agendadas in queues.items():
-                    for ta in tarefas_agendadas:
-                        tasks.add(ta['request']['name'])
-    except:
-        pass
-
+    tasks = get_tasks_scheduled()
     # pull_youtube()
 
     # vincular_sistema_aos_videos()
@@ -116,14 +135,19 @@ def task_pull_youtube(self, *args, **kwargs):
 
     now = timezone.now()
 
-    if 'task_pull_youtube_upcoming' not in tasks:
-        task_pull_youtube_upcoming.apply_async(eta=now + timedelta(seconds=10))
+    start_task('task_pull_youtube_geral',
+               task_pull_youtube_geral,
+               now + timedelta(seconds=10))
 
-    if 'task_pull_youtube_live' not in tasks:
-        task_pull_youtube_live.apply_async(eta=now + timedelta(seconds=20))
+    start_task('task_pull_youtube_upcoming',
+               task_pull_youtube_upcoming,
+               now + timedelta(seconds=10))
 
-    if 'task_pull_youtube' not in tasks:
-        if now.hour <= 1:
-            task_pull_youtube.apply_async(eta=now + timedelta(hours=7))
-        else:
-            task_pull_youtube.apply_async(eta=now + timedelta(minutes=20))
+    start_task('task_pull_youtube_live',
+               task_pull_youtube_live,
+               now + timedelta(seconds=10))
+
+    td = timedelta(hours=7) if now.hour <= 1 else timedelta(minutes=20)
+    start_task('task_pull_youtube',
+               task_pull_youtube,
+               now + td)
