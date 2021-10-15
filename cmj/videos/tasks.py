@@ -144,7 +144,7 @@ def task_pull_youtube(self, *args, **kwargs):
                task_pull_youtube_live,
                now + timedelta(seconds=10))
 
-    td = timedelta(hours=7) if now.hour <= 1 else timedelta(minutes=20)
+    td = timedelta(hours=7) if now.hour <= 1 else timedelta(minutes=30)
     start_task('task_pull_youtube',
                task_pull_youtube,
                now + td)
