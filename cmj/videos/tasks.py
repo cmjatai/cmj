@@ -36,15 +36,16 @@ def get_tasks_scheduled():
 def start_task(task_name, task, eta):
 
     tasks = get_tasks_scheduled()
+    t_str = ', '.join(tasks)
 
-    if task_name not in tasks:
+    logger.debug(f'{task_name} {eta} SET: {t_str}')
+
+    if f'cmj.videos.tasks.{task_name}' not in tasks:
         task.apply_async(eta=eta)
 
 
 @app.task(queue='celery', bind=True)
 def task_pull_youtube_geral(*args, **kwargs):
-
-    logger.debug('----------- logger task_pull_youtube_geral')
 
     v = Video.objects.all(
     ).order_by('execucao', '-created').first()
@@ -65,8 +66,6 @@ def task_pull_youtube_geral(*args, **kwargs):
 
 @app.task(queue='celery', bind=True)
 def task_pull_youtube_live(*args, **kwargs):
-
-    logger.debug('----------- logger task_pull_youtube_live')
 
     live = Video.objects.filter(
         json__snippet__liveBroadcastContent='live')
@@ -89,8 +88,6 @@ def task_pull_youtube_live(*args, **kwargs):
 
 @app.task(queue='celery', bind=True)
 def task_pull_youtube_upcoming(*args, **kwargs):
-
-    logger.debug('----------- logger task_pull_youtube_upcoming')
 
     upcoming = Video.objects.filter(
         json__snippet__liveBroadcastContent='upcoming')
