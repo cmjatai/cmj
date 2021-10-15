@@ -66,9 +66,9 @@ class Command(BaseCommand):
         self.video_documento_na_galeria()
 
     def get_full_metadata_video(self):
-        videos = Video.objects.exclude(
-            json__snippet__liveBroadcastContent__in=('upcoming', 'live')
+        videos = Video.objects.all(
         ).order_by('execucao', '-created')
+        #    json__snippet__liveBroadcastContent__in=('upcoming', 'live')
 
         videos = videos[:100]
 
