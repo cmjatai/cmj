@@ -15,6 +15,27 @@ logger = logging.getLogger(__name__)
 
 
 @app.task(queue='celery', bind=True)
+def task_pull_youtube_geral(*args, **kwargs):
+
+    logger.debug('----------- logger task_pull_youtube_geral')
+
+    v = Video.objects.all(
+    ).order_by('execucao', '-created').first()
+
+    if v:
+        try:
+            v = pull_youtube_metadata_video(v)
+            logger.info(
+                f'pull geral  {v.id} {v.vid} {v.created} {v.modified}')
+
+        except:
+            pass
+
+        delay = timezone.now() + timedelta(seconds=60)
+        task_pull_youtube_geral.apply_async(eta=delay)
+
+
+@app.task(queue='celery', bind=True)
 def task_pull_youtube_live(*args, **kwargs):
 
     logger.debug('----------- logger task_pull_youtube_live')
@@ -77,27 +98,32 @@ def task_pull_youtube(self, *args, **kwargs):
 
     i = celery_app.control.inspect()
 
+    tasks = set()
     try:
         if i:
             queues = i.scheduled()
             if queues:
                 for k, tarefas_agendadas in queues.items():
                     for ta in tarefas_agendadas:
-                        if ta['request']['name'] == 'cmj.videos.tasks.task_pull_youtube':
-                            return
+                        tasks.add(ta['request']['name'])
     except:
         pass
 
-    pull_youtube()
+    # pull_youtube()
 
-    vincular_sistema_aos_videos()
-    video_documento_na_galeria()
+    # vincular_sistema_aos_videos()
+    # video_documento_na_galeria()
 
     now = timezone.now()
-    task_pull_youtube_upcoming.apply_async(eta=now + timedelta(seconds=10))
-    task_pull_youtube_live.apply_async(eta=now + timedelta(seconds=20))
 
-    if now.hour <= 1:
-        task_pull_youtube.apply_async(eta=now + timedelta(hours=7))
-    else:
-        task_pull_youtube.apply_async(countdown=1800)
+    if 'task_pull_youtube_upcoming' not in tasks:
+        task_pull_youtube_upcoming.apply_async(eta=now + timedelta(seconds=10))
+
+    if 'task_pull_youtube_live' not in tasks:
+        task_pull_youtube_live.apply_async(eta=now + timedelta(seconds=20))
+
+    if 'task_pull_youtube' not in tasks:
+        if now.hour <= 1:
+            task_pull_youtube.apply_async(eta=now + timedelta(hours=7))
+        else:
+            task_pull_youtube.apply_async(eta=now + timedelta(minutes=20))
