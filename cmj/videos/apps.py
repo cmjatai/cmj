@@ -10,3 +10,4 @@ class AppConfig(apps.AppConfig):
 
     def ready(self):
         from . import signals
+        #from . import tasks

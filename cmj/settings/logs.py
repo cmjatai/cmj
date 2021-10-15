@@ -68,7 +68,7 @@ LOGGING = {
             'maxBytes': 1024 * 1024 * 15,  # 15MB
             'backupCount': 10,
             'formatter': 'verbose',
-            'filters': ['require_debug_false'],
+            #'filters': ['require_debug_false'],
 
         },
     },

@@ -1,5 +1,5 @@
 
-from datetime import timedelta
+from datetime import timedelta, datetime
 from random import random
 import json
 import logging
@@ -16,6 +16,7 @@ import dateutil.parser
 
 from cmj.sigad.models import Documento
 from cmj.signals import Manutencao
+from cmj.videos.functions import pull_full_metadata_video
 from cmj.videos.models import Video, PullYoutube, VideoParte
 import requests as rq
 
@@ -43,9 +44,20 @@ class Command(BaseCommand):
         # self.corrigir_erro_causado_em_full_metadata()
         # return
 
+        """upcoming_or_live = Video.objects.filter(
+            json__snippet__liveBroadcastContent__in=('upcoming', 'live')).exists()
+
+        if upcoming_or_live:
+            delay = timezone.now() + timedelta(seconds=10)
+            task_pull_youtube.apply_async((upcoming_or_live,), eta=delay)
+
+        return"""
+
         if not settings.DEBUG:
             self.pull_youtube()
+
         self.get_full_metadata_video()
+        # return
 
         m.ativa_auto_now()
 
@@ -54,67 +66,32 @@ class Command(BaseCommand):
         self.video_documento_na_galeria()
 
     def get_full_metadata_video(self):
-        videos = Video.objects.all().order_by('execucao', '-created')
+        videos = Video.objects.exclude(
+            json__snippet__liveBroadcastContent__in=('upcoming', 'live')
+        ).order_by('execucao', '-created')
 
         videos = videos[:100]
 
-        now = timezone.now()
+        #now = timezone.now()
 
         for v in videos:
             print(v.id, v.vid, v)
-            r = ''
             try:
-
-                # 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'}
-                headers = {}
-                headers["Referer"] = settings.SITE_URL
-                headers['Content-Type'] = 'application/json'
-
-                url_search = ('https://www.googleapis.com/youtube/v3/videos'
-                              '?key={}'
-                              '&id={}'
-                              '&part=snippet,id,contentDetails,statistics')
-
-                #'&channelId=UCZXKjzKW2n1w4JQ3bYlrA-w'
-
-                url = url_search.format(
-                    settings.GOOGLE_URL_API_NEW_KEY,
-                    v.vid
-                )
-
-                r = rq.get(url, headers=headers)
-
-                data = r._content.decode('utf-8')
-
-                r = json.loads(data)
-
-                v.json = r['items'][0]
-
-                try:
-                    peso = timezone.now().year - v.created.year
-                    peso = peso if peso else 1
-                except:
-                    peso = 1
-                v.execucao += peso
-                v.save()
-                for vp in v.videoparte_set.all():
-
-                    if isinstance(vp.content_object, Documento):
-                        d = vp.content_object
-
-                        if d.classe_id != 233:
-                            continue
-
-                        for dp in d.treechilds2list():
-                            if dp == d:
-                                d.extra_data = v.json
-                                d.descricao = v.json['snippet']['description']
-                                d.save()
-                            elif dp.tipo == Documento.TPD_VIDEO:
-                                dp.extra_data = v.json
-                                dp.save()
+                pull_full_metadata_video(v)
             except:
                 pass
+
+        """upcoming_or_live = Video.objects.filter(
+            json__snippet__liveBroadcastContent__in=('upcoming', 'live'))
+
+        if upcoming_or_live.exists():
+            v = upcoming_or_live.first()
+
+            td = now - v.modified
+
+            if td.total_seconds() > 600:
+                delay = timezone.now() + timedelta(seconds=30)
+                task_pull_youtube.apply_async(eta=delay)"""
 
     def vincular_sistema_aos_videos(self):
 

@@ -71,10 +71,13 @@
               <a class="imagem" href="/{{doc.slug}}" style="background-image: url({% if imagem %}/{{imagem.absolute_slug}}.512{%elif doc.extra_data.snippet %}{{doc.extra_data.snippet.thumbnails.high.url}}{% else %}{{doc.extra_data.thumbnails.high.url}}{% endif %})">
                   <i class="fa fa-play" aria-hidden="true"></i>
               </a>
-              {% if doc.extra_data.contentDetails.duration %}
-                <span class="duration">
-                {{ doc.extra_data|video_duration }}
-                </span>
+
+              {% if doc.extra_data.snippet.liveBroadcastContent == 'none' %}
+                {% if doc.extra_data.contentDetails.duration %}
+                  <span class="duration">
+                  {{ doc.extra_data|video_duration }}
+                  </span>
+                {% endif %}
               {% endif %}
             </div>
             <span class="data-pub d-none">
@@ -86,26 +89,37 @@
                     {{doc.titulo}}
                 </a>
                 <br>
-                {% if doc.extra_data.statistics %}
-                  <span class="statistics">
-                    &#8226;
-                    {% if doc.extra_data.statistics.viewCount == '0' %}
-                      Nenhuma Visualização
-                    {% elif doc.extra_data.statistics.viewCount == '1' %}
-                      1 Visualização
-                    {% else %}
-                      {{ doc.extra_data.statistics.viewCount }} Visualizações
-                    {% endif %}
-
-
-                    {% if doc.extra_data.statistics.likeCount != '0' %}
-                      &#8226; {{ doc.extra_data.statistics.likeCount }} <i class="fas fa-thumbs-up"></i>
-                    {% endif %}
-                    {% if doc.extra_data.statistics.dislikeCount != '0' %}
-                      &#8226; {{ doc.extra_data.statistics.dislikeCount }} <i class="fas fa-thumbs-down"></i>
-                    {% endif %}
-                    <br>&#8226; há {{ doc.public_date|age:0}}
-                  </span>
+                {% if doc.extra_data.snippet.liveBroadcastContent == 'none'  %}
+                  {% if doc.extra_data.statistics %}
+                    <span class="statistics">
+                      &#8226;
+                      {% if doc.extra_data.statistics.viewCount == '0' %}
+                        Nenhuma Visualização
+                      {% elif doc.extra_data.statistics.viewCount == '1' %}
+                        1 Visualização
+                      {% else %}
+                        {{ doc.extra_data.statistics.viewCount }} Visualizações
+                      {% endif %}
+                      {% if doc.extra_data.statistics.likeCount != '0' %}
+                        &#8226; {{ doc.extra_data.statistics.likeCount }} <i class="fas fa-thumbs-up"></i>
+                      {% endif %}
+                      {% if doc.extra_data.statistics.dislikeCount != '0' %}
+                        &#8226; {{ doc.extra_data.statistics.dislikeCount }} <i class="fas fa-thumbs-down"></i>
+                      {% endif %}
+                      <br>&#8226; há {{ doc.public_date|age:0}}
+                    </span>
+                  {% endif %}
+                {% elif doc.extra_data.snippet.liveBroadcastContent == 'live'  %}
+                    <span class="{{doc.extra_data.snippet.liveBroadcastContent}}">
+                    AO VIVO AGORA
+                    </span>
+                {% elif doc.extra_data.snippet.liveBroadcastContent == 'upcoming'  %}
+                    <span class="{{doc.extra_data.snippet.liveBroadcastContent}}">
+                    ESTREIA PROGRAMADA
+                    </span>
+                    <span class="upcoming-time">
+                    {{doc.extra_data.liveStreamingDetails.scheduledStartTime|parse_datetime}}
+                    </span>
                 {% endif %}
             </div>
           </div>
