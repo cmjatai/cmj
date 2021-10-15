@@ -16,7 +16,7 @@ import dateutil.parser
 
 from cmj.sigad.models import Documento
 from cmj.signals import Manutencao
-from cmj.videos.functions import pull_full_metadata_video
+from cmj.videos.functions import pull_youtube_metadata_video
 from cmj.videos.models import Video, PullYoutube, VideoParte
 import requests as rq
 
@@ -38,7 +38,7 @@ class Command(BaseCommand):
         self.logger = logging.getLogger(__name__)
 
         # Video.objects.all().update(created=F('modified'))
-
+        return
         m.desativa_auto_now()
 
         # self.corrigir_erro_causado_em_full_metadata()
@@ -77,7 +77,7 @@ class Command(BaseCommand):
         for v in videos:
             print(v.id, v.vid, v)
             try:
-                pull_full_metadata_video(v)
+                pull_youtube_metadata_video(v)
             except:
                 pass
 
@@ -222,114 +222,6 @@ class Command(BaseCommand):
                 '</iframe>' % v.vid)
 
             video.save()
-
-    def pull_youtube(self):
-
-        py = PullYoutube.objects.last()
-
-        if not py:
-            data_base = dateutil.parser.parse('2013-11-01T00:00:00Z')
-            data_base = timezone.localtime(data_base)
-        else:
-            data_base = py.published_before
-
-        now = timezone.now()
-
-        while data_base < now:
-            td = timedelta(
-                weeks=1,
-                days=int(5 * random()),
-                hours=int(24 * random()),
-                minutes=int(60 * random()),
-                seconds=int(60 * random()),
-            )
-
-            py = PullYoutube()
-            py.published_after = data_base
-            data_base = data_base + td
-            py.published_before = data_base
-
-            py.save()
-
-        # 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'}
-        headers = {}
-        headers["Referer"] = settings.SITE_URL
-        headers['Content-Type'] = 'application/json'
-
-        url_search = ('https://www.googleapis.com/youtube/v3/search'
-                      '?key={}'
-                      '&pageToken={}'
-                      '&publishedAfter={}'
-                      '&publishedBefore={}'
-                      '&channelId=UCZXKjzKW2n1w4JQ3bYlrA-w'
-                      '&part=snippet,id&order=date&maxResults=50')
-
-        now = timezone.localtime()
-
-        pulls = list(PullYoutube.objects.all().order_by('execucao', '-id')[:3])
-        if 9 <= now.hour <= 17 and 0 <= now.weekday() <= 4:
-            pull_atual = PullYoutube.objects.all().order_by('-id').first()
-            if pull_atual not in pulls:
-                pulls.insert(0, pull_atual)
-
-        for pull in pulls:
-
-            pageToken = ''
-
-            publishedBefore = pull.published_before.isoformat('T')[:19] + 'Z'
-            publishedAfter = pull.published_after.isoformat('T')[:19] + 'Z'
-
-            while pageToken is not None:
-
-                url = url_search.format(
-                    settings.GOOGLE_URL_API_NEW_KEY,
-                    pageToken,
-                    publishedAfter,
-                    publishedBefore
-                )
-
-                r = rq.get(url, headers=headers)
-
-                data = r._content.decode('utf-8')
-
-                r = json.loads(data)
-
-                pageToken = None
-
-                if 'nextPageToken' in r:
-                    pageToken = r['nextPageToken']
-
-                if not 'items' in r:
-                    continue
-
-                for i in r['items']:
-
-                    if not 'videoId' in i['id']:
-                        continue
-
-                    qs = Video.objects.filter(vid=i['id']['videoId'])
-
-                    if qs.exists():
-                        continue
-
-                    v = Video()
-                    v.json = i
-                    v.vid = i['id']['videoId']
-                    v.titulo = i['snippet']['title']
-                    v.owner_id = 1
-                    v.modifier_id = 1
-
-                    v.created = dateutil.parser.parse(
-                        i['snippet']['publishedAt'])
-                    v.modified = dateutil.parser.parse(
-                        i['snippet']['publishedAt'])
-
-                    v.save()
-
-                # if stop_page:
-                #    pageToken = None
-            pull.execucao += 1
-            pull.save()
 
     def corrigir_erro_causado_em_full_metadata(self):
 

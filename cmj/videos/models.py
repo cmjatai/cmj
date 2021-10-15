@@ -43,6 +43,9 @@ class PullYoutube(models.Model):
     published_before = models.DateTimeField(verbose_name=_('published_before'))
     published_after = models.DateTimeField(verbose_name=_('published_after'))
 
+    last_run = models.DateTimeField(
+        verbose_name=_('last_run'), editable=False, auto_now=True)
+
     execucao = models.PositiveIntegerField(
         verbose_name=_('Execução'), default=0)
 
