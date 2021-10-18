@@ -12,11 +12,13 @@ from django.utils import timezone
 import dateutil.parser
 
 from cmj.sigad.models import Documento
-from cmj.videos.models import PullYoutube, Video, VideoParte
+from cmj.videos.models import PullYoutube, Video, VideoParte, PullExec
 import requests as rq
 
 
 logger = logging.getLogger(__name__)
+
+DEBUG_TASKS = True
 
 
 def pull_youtube_metadata_video(v):
@@ -33,21 +35,29 @@ def pull_youtube_metadata_video(v):
 
     #'&channelId=UCZXKjzKW2n1w4JQ3bYlrA-w'
 
-    url = url_search.format(
-        settings.GOOGLE_URL_API_NEW_KEY,
-        v.vid
-    )
+    if not DEBUG_TASKS:
+        url = url_search.format(
+            settings.GOOGLE_URL_API_NEW_KEY,
+            v.vid
+        )
 
-    r = rq.get(url, headers=headers)
+        r = rq.get(url, headers=headers)
 
-    data = r._content.decode('utf-8')
+        data = r._content.decode('utf-8')
 
-    r = json.loads(data)
+        r = json.loads(data)
 
-    v.json = r['items'][0]
+        v.json = r['items'][0]
+
+    now = timezone.now()
+
+    p = PullExec()
+    p.pull = PullYoutube.objects.pull_from_date()
+    p.quota = 1
+    p.save()
 
     try:
-        peso = timezone.now().year - v.created.year
+        peso = now.year - v.created.year
         peso = peso if peso else 1
     except:
         peso = 1
@@ -77,32 +87,6 @@ def pull_youtube_metadata_video(v):
 
 def pull_youtube():
 
-    py = PullYoutube.objects.last()
-
-    if not py:
-        data_base = dateutil.parser.parse('2013-11-01T00:00:00Z')
-        data_base = timezone.localtime(data_base)
-    else:
-        data_base = py.published_before
-
-    now = timezone.now()
-
-    while data_base < now:
-        td = timedelta(
-            weeks=1,
-            days=int(5 * random()),
-            hours=int(24 * random()),
-            minutes=int(60 * random()),
-            seconds=int(60 * random()),
-        )
-
-        py = PullYoutube()
-        py.published_after = data_base
-        data_base = data_base + td
-        py.published_before = data_base
-
-        py.save()
-
     # 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'}
     headers = {}
     headers["Referer"] = settings.SITE_URL
@@ -118,9 +102,9 @@ def pull_youtube():
 
     now = timezone.now()
 
-    pulls = list(PullYoutube.objects.all().order_by('execucao', '-id')[:2])
+    pull_atual = PullYoutube.objects.pull_from_date()
 
-    pull_atual = PullYoutube.objects.all().order_by('-id').first()
+    pulls = list(PullYoutube.objects.all().order_by('execucao', '-id')[:2])
 
     if pull_atual not in pulls:
         pulls.insert(0, pull_atual)
@@ -136,20 +120,31 @@ def pull_youtube():
 
         while pageToken is not None:
 
-            url = url_search.format(
-                settings.GOOGLE_URL_API_NEW_KEY,
-                pageToken,
-                publishedAfter,
-                publishedBefore
-            )
+            p = PullExec()
+            p.pull = pull
+            p.quota = 100
+            p.save()
 
-            r = rq.get(url, headers=headers)
+            r = None
 
-            data = r._content.decode('utf-8')
+            if not DEBUG_TASKS:
+                url = url_search.format(
+                    settings.GOOGLE_URL_API_NEW_KEY,
+                    pageToken,
+                    publishedAfter,
+                    publishedBefore
+                )
 
-            r = json.loads(data)
+                r = rq.get(url, headers=headers)
+
+                data = r._content.decode('utf-8')
+
+                r = json.loads(data)
 
             pageToken = None
+
+            if not r:
+                continue
 
             if 'nextPageToken' in r:
                 pageToken = r['nextPageToken']
@@ -252,6 +247,9 @@ def vincular_sistema_aos_videos():
 
 
 def video_documento_na_galeria():
+
+    if DEBUG_TASKS:
+        return
 
     videos = Video.objects.order_by('created')
 

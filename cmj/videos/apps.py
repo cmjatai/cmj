@@ -11,9 +11,13 @@ class AppConfig(apps.AppConfig):
     def ready(self):
         from . import signals
         from . import tasks
+
         from cmj.celery import app as celery_app
 
         i = celery_app.control.inspect()
+
+        if not i.registered():
+            return
 
         try:
             if i:

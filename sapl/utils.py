@@ -230,6 +230,7 @@ class SaplGenericRelation(GenericRelation):
 
 
 class OverwriteStorage(FileSystemStorage):
+
     def save(self, name, content, max_length=None):
 
         prod_name = FileSystemStorage.save(

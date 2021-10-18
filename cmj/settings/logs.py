@@ -47,7 +47,7 @@ LOGGING = {
     'formatters': {
         'verbose': {
             'class': 'cmj.settings.logs.MyFormatter',
-            'format': '%(levelname)s %(asctime)s %(pathname)s %(name)s:%(funcName)s:%(lineno)d %(message)s'
+            'format': '%(levelname)s %(asctime)s %(name)s:%(funcName)s:%(lineno)d %(message)s'
         },
         'simple': {
             'format': '%(levelname)s %(asctime)s - %(message)s'
@@ -68,7 +68,7 @@ LOGGING = {
             'maxBytes': 1024 * 1024 * 15,  # 15MB
             'backupCount': 10,
             'formatter': 'verbose',
-            'filters': ['require_debug_false'],
+            #'filters': ['require_debug_false'],
 
         },
     },

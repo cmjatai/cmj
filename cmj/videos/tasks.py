@@ -1,4 +1,5 @@
 
+from asyncio.tasks import sleep
 from datetime import timedelta
 import logging
 
@@ -8,7 +9,7 @@ import dateutil.parser
 from cmj.celery import app
 from cmj.videos.functions import pull_youtube_metadata_video, pull_youtube,\
     vincular_sistema_aos_videos, video_documento_na_galeria
-from cmj.videos.models import Video
+from cmj.videos.models import Video, PullExec
 
 
 logger = logging.getLogger(__name__)
@@ -36,12 +37,16 @@ def get_tasks_scheduled():
 def start_task(task_name, task, eta):
 
     tasks = get_tasks_scheduled()
-    t_str = ', '.join(tasks)
+    #t_str = ', '.join(tasks)
 
-    logger.debug(f'{task_name} {eta} SET: {t_str}')
+    #logger.debug(f'{task_name} {eta} SET: {t_str}')
 
     if f'cmj.videos.tasks.{task_name}' not in tasks:
+        logger.debug(f'START TRUE {task_name} {eta}')
         task.apply_async(eta=eta)
+        return True
+    logger.debug(f'START FALSE {task_name} {eta}')
+    return False
 
 
 @app.task(queue='celery', bind=True)
@@ -54,7 +59,7 @@ def task_pull_youtube_geral(*args, **kwargs):
         try:
             v = pull_youtube_metadata_video(v)
             logger.info(
-                f'pull geral  {v.id} {v.vid} {v.created} {v.modified}')
+                f'TASK GERAL {v.id} {v.vid} {v.created} {v.modified}')
 
         except:
             pass
@@ -76,13 +81,13 @@ def task_pull_youtube_live(*args, **kwargs):
             try:
                 v = pull_youtube_metadata_video(v)
                 logger.info(
-                    f'pull live  {v.id} {v.vid} {v.created} {v.modified}')
+                    f'TASK LIVE {v.id} {v.vid} {v.created} {v.modified}')
 
             except:
                 pass
 
         start_task('task_pull_youtube_live',
-                   task_pull_youtube_geral,
+                   task_pull_youtube_live,
                    timezone.now() + timedelta(seconds=60))
 
 
@@ -99,17 +104,17 @@ def task_pull_youtube_upcoming(*args, **kwargs):
             try:
                 v = pull_youtube_metadata_video(v)
                 logger.info(
-                    f'pull comming {v.id} {v.vid} {v.created} {v.modified}')
+                    f'TASK UPCOMING {v.id} {v.vid} {v.created} {v.modified}')
                 liveBroadcastContent = v.json['snippet']['liveBroadcastContent']
             except:
                 pass
 
         if liveBroadcastContent == 'live':
             start_task('task_pull_youtube_live',
-                       task_pull_youtube_geral,
+                       task_pull_youtube_live,
                        timezone.now() + timedelta(seconds=60))
 
-        else:
+        elif liveBroadcastContent == 'upcoming':
             scheduledStartTime = dateutil.parser.parse(
                 v.json['liveStreamingDetails']['scheduledStartTime'])
 
@@ -124,26 +129,32 @@ def task_pull_youtube_upcoming(*args, **kwargs):
 @app.task(queue='celery', bind=True)
 def task_pull_youtube(self, *args, **kwargs):
 
-    pull_youtube()
+    now = timezone.now()
 
-    vincular_sistema_aos_videos()
-    video_documento_na_galeria()
+    td = PullExec.objects.timedelta_quota_pull()
+
+    logger.debug(
+        f'RUNNING Task_pull_youtube - proximo em: {td.total_seconds()}')
+    new_started = start_task('task_pull_youtube',
+                             task_pull_youtube,
+                             now + td)
+
+    if not new_started:
+        return
+    pull_youtube()
+    # vincular_sistema_aos_videos()
+    # video_documento_na_galeria()
 
     now = timezone.now()
 
     start_task('task_pull_youtube_geral',
                task_pull_youtube_geral,
-               now + timedelta(seconds=10))
+               now + timedelta(seconds=60))
 
     start_task('task_pull_youtube_upcoming',
                task_pull_youtube_upcoming,
-               now + timedelta(seconds=10))
+               now + timedelta(seconds=40))
 
     start_task('task_pull_youtube_live',
                task_pull_youtube_live,
-               now + timedelta(seconds=10))
-
-    td = timedelta(hours=7) if now.hour <= 1 else timedelta(minutes=30)
-    start_task('task_pull_youtube',
-               task_pull_youtube,
-               now + td)
+               now + timedelta(seconds=20))
