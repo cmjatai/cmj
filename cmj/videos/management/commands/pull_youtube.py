@@ -43,6 +43,7 @@ class Command(BaseCommand):
         PullExec.objects.timedelta_quota_pull()
 
         # pull_youtube()
+        # pull_youtube_metadata_video(Video.objects.first())
 
         return
         m.desativa_auto_now()

@@ -142,8 +142,8 @@ def task_pull_youtube(self, *args, **kwargs):
     if not new_started:
         return
     pull_youtube()
-    # vincular_sistema_aos_videos()
-    # video_documento_na_galeria()
+    vincular_sistema_aos_videos()
+    video_documento_na_galeria()
 
     now = timezone.now()
 

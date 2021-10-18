@@ -18,7 +18,7 @@ import requests as rq
 
 logger = logging.getLogger(__name__)
 
-DEBUG_TASKS = True
+DEBUG_TASKS = settings.DEBUG
 
 
 def pull_youtube_metadata_video(v):
@@ -75,14 +75,39 @@ def pull_youtube_metadata_video(v):
                 continue
 
             for dp in d.treechilds2list():
+
                 if dp == d:
                     d.extra_data = v.json
                     d.descricao = v.json['snippet']['description']
+                    d.public_date = dateutil.parser.parse(
+                        v.json['snippet']['publishedAt'])
                     d.save()
                 elif dp.tipo == Documento.TPD_VIDEO:
                     dp.extra_data = v.json
                     dp.save()
+
     return v
+
+
+def update_auto_now(m, disabled=True):
+
+    for f in m._meta.get_fields():
+        dua = f
+
+        if disabled:
+            if hasattr(dua, 'auto_now'):
+                dua._auto_now = dua.auto_now
+                dua.auto_now = False
+
+            if hasattr(dua, 'auto_now_add'):
+                dua._auto_now_add = dua.auto_now_add
+                dua.auto_now_add = False
+        else:
+            if hasattr(dua, '_auto_now'):
+                dua.auto_now = dua._auto_now
+
+            if hasattr(dua, '_auto_now_add'):
+                dua.auto_now_add = dua._auto_now_add
 
 
 def pull_youtube():
@@ -109,6 +134,7 @@ def pull_youtube():
     if pull_atual not in pulls:
         pulls.insert(0, pull_atual)
 
+    update_auto_now(Video, disabled=True)
     for pull in pulls:
 
         pageToken = ''
@@ -184,6 +210,7 @@ def pull_youtube():
 
         pull.execucao += peso
         pull.save()
+    update_auto_now(Video, disabled=False)
 
 
 def vincular_sistema_aos_videos():
