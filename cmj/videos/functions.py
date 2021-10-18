@@ -127,9 +127,13 @@ def pull_youtube():
 
     now = timezone.now()
 
+    td_execs = PullExec.objects.timedelta_quota_pull().total_seconds()
+
     pull_atual = PullYoutube.objects.pull_from_date()
 
-    pulls = list(PullYoutube.objects.all().order_by('execucao', '-id')[:2])
+    pulls = list(PullYoutube.objects.exclude(id=pull_atual.id).order_by(
+        'execucao', '-id')[:1 if td_execs > 2500 else 2]
+    )
 
     if pull_atual not in pulls:
         pulls.insert(0, pull_atual)
