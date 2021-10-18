@@ -44,9 +44,9 @@ class Command(BaseCommand):
         # PullExec.objects.timedelta_quota_pull()
 
         # pull_youtube()
-
-        vincular_sistema_aos_videos()
-        video_documento_na_galeria()
+        # return
+        # vincular_sistema_aos_videos()
+        # video_documento_na_galeria()
         # pull_youtube_metadata_video(Video.objects.first())
 
         return

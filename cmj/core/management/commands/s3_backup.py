@@ -1,9 +1,8 @@
 from datetime import datetime, timedelta
+from time import sleep
 import logging
 import os
-from time import sleep
 
-import boto3
 from django.apps import apps
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -12,9 +11,9 @@ from django.db.models.fields.files import FileField
 from django.db.models.signals import post_delete, post_save, pre_save
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
+import boto3
 
 from cmj.signals import Manutencao
-from sapl.materia.models import MateriaLegislativa
 from sapl.utils import hash_sha512
 
 
@@ -51,6 +50,9 @@ class Command(BaseCommand):
         post_save.disconnect(dispatch_uid='cmj_post_save_signal')
 
         self.logger = logging.getLogger(__name__)
+
+        # self.check_size_download_month_locaweb()
+        # return
 
         self.s3_server = options['s3_server']
         self.s3_full = options['s3_full']
@@ -229,7 +231,7 @@ class Command(BaseCommand):
                     ))
 
                 print(m)
-                for i in m.objects.all().order_by('-id'):
+                for i in m.objects.all().order_by('-id'):  # .filter(id=15219)
 
                     if not hasattr(i, 'metadata'):
                         #print(i, 'não tem metadata')
@@ -312,7 +314,18 @@ class Command(BaseCommand):
                                     if validate:
                                         lt = timezone.localtime()
                                         validate = parse_datetime(validate)
-                                        if (lt - validate).days >= self.days_validate:
+                                        try:
+                                            td = lt - \
+                                                parse_datetime(
+                                                    i.metadata[self.s3_server][fn]['path'])
+                                            peso = td.days / 60 + 1
+                                        except:
+                                            peso = 1
+
+                                        if not peso:
+                                            peso = 1
+
+                                        if (lt - validate).days >= self.days_validate * peso:
                                             i.metadata[self.s3_server][
                                                 fn]['validate'] = lt
                                             i.save()
@@ -662,10 +675,22 @@ class Command(BaseCommand):
                             parse_datetime(md[self.s3_server][fn]['validate'])
                         d = td.days if td.days > 0 else -1
                         if d not in calc:
-                            calc[d] = 0
+                            calc[d] = [0, md[self.s3_server][fn].get('size', 0) +
+                                       md[self.s3_server][fn].get('original_size', 0)]
 
-                        calc[d] += 1
+                        if d == 2:
+                            print(i.id, parse_datetime(
+                                md[self.s3_server][fn]['path']), i)
+
+                        calc[d][0] += 1
+                        calc[d][1] += md[self.s3_server][fn].get('size', 0) + \
+                            md[self.s3_server][fn].get('original_size', 0)
         print(calc)
+        size = 0
+        for k, v in calc.items():
+            if k <= 18:
+                size += v[1]
+        print(size)
 
     def update_backup_postgresql(self):
 
@@ -771,3 +796,18 @@ class Command(BaseCommand):
                     )
                 except Exception as e:
                     print(e)
+
+    def check_size_download_month_locaweb(self):
+
+        self.s3_server = 'locaweb'
+        self.calcular_validacao()
+        return
+
+        for app in apps.get_app_configs():
+            if not app.name.startswith('cmj') and not app.name.startswith('sapl'):
+                continue
+            # print(app)
+
+            for m in app.get_models():
+                for i in m.objects.all().order_by('-id'):
+                    pass
