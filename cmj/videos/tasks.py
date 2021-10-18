@@ -53,7 +53,7 @@ def start_task(task_name, task, eta):
 def task_pull_youtube_geral(*args, **kwargs):
 
     v = Video.objects.exclude(
-        json__snippet__liveBroadcastContent__in=('live', 'upcoming'))(
+        json__snippet__liveBroadcastContent__in=('live', 'upcoming')
     ).order_by('execucao', '-created').first()
 
     if v:
@@ -67,7 +67,7 @@ def task_pull_youtube_geral(*args, **kwargs):
 
         start_task('task_pull_youtube_geral',
                    task_pull_youtube_geral,
-                   timezone.now() + timedelta(seconds=60))
+                   timezone.now() + timedelta(seconds=120))
 
 
 @app.task(queue='celery', bind=True)
