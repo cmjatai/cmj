@@ -1,4 +1,5 @@
 from django import apps
+from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -11,8 +12,10 @@ class AppConfig(apps.AppConfig):
     def ready(self):
         from . import signals
         from . import tasks
-
         from cmj.celery import app as celery_app
+
+        if settings.DEBUG:
+            return
 
         i = celery_app.control.inspect()
 
@@ -29,4 +32,4 @@ class AppConfig(apps.AppConfig):
                                 return
         except:
             pass
-        tasks.task_pull_youtube.apply_async(countdown=10)
+        tasks.task_pull_youtube.apply_async(countdown=60)

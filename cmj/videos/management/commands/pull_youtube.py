@@ -16,7 +16,8 @@ import dateutil.parser
 
 from cmj.sigad.models import Documento
 from cmj.signals import Manutencao
-from cmj.videos.functions import pull_youtube_metadata_video, pull_youtube
+from cmj.videos.functions import pull_youtube_metadata_video, pull_youtube,\
+    vincular_sistema_aos_videos, video_documento_na_galeria
 from cmj.videos.models import Video, PullYoutube, VideoParte, PullExec
 import requests as rq
 
@@ -39,10 +40,13 @@ class Command(BaseCommand):
 
         # Video.objects.all().update(created=F('modified'))
 
-        PullYoutube.objects.pull_from_date()
-        PullExec.objects.timedelta_quota_pull()
+        # PullYoutube.objects.pull_from_date()
+        # PullExec.objects.timedelta_quota_pull()
 
         # pull_youtube()
+
+        vincular_sistema_aos_videos()
+        video_documento_na_galeria()
         # pull_youtube_metadata_video(Video.objects.first())
 
         return

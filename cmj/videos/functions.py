@@ -219,7 +219,10 @@ def pull_youtube():
 
 def vincular_sistema_aos_videos():
 
-    videos = Video.objects.order_by('created')
+    if DEBUG_TASKS:
+        return
+
+    videos = Video.objects.order_by('-created')
 
     ct_doc = ContentType.objects.get_for_model(Documento)
     for v in videos:
@@ -282,9 +285,10 @@ def video_documento_na_galeria():
     if DEBUG_TASKS:
         return
 
-    videos = Video.objects.order_by('created')
+    videos = Video.objects.order_by('-created')
 
     ct_doc = ContentType.objects.get_for_model(Documento)
+    created = False
     for v in videos:
 
         vps = v.videoparte_set.filter(content_type=ct_doc)
@@ -350,3 +354,7 @@ def video_documento_na_galeria():
             '</iframe>' % v.vid)
 
         video.save()
+        created = True
+
+    if created:
+        vincular_sistema_aos_videos()
