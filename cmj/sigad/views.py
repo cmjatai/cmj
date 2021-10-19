@@ -65,9 +65,17 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
 
         context['ultimas_publicacoes'] = self.get_ultimas_publicacoes()
 
+        context['ultimos_videos'] = self.get_ultimos_videos()
+
         context['docs_adms_pagina_inicial'] = self.get_docs_adms_pagina_inicial()
 
         return context
+
+    def get_ultimos_videos(self):
+
+        docs = Documento.objects.qs_video_news()[:4]
+
+        return docs
 
     def get_docs_adms_pagina_inicial(self):
         param_tip_pub = {
