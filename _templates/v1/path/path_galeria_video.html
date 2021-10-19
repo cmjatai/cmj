@@ -106,7 +106,12 @@
                       {% if doc.extra_data.statistics.dislikeCount != '0' %}
                         &#8226; {{ doc.extra_data.statistics.dislikeCount }} <i class="fas fa-thumbs-down"></i>
                       {% endif %}
-                      <br>&#8226; há {{ doc.public_date|age:0}}
+                      <br>&#8226;
+                      {% if doc.extra_data.liveStreamingDetails.actualStartTime %}
+                      Transmitido há {{ doc.extra_data.liveStreamingDetails.actualStartTime|parse_datetime|age:0}}
+                      {% else %}
+                        há {{ doc.public_date|age:0}}
+                      {% endif %}
                     </span>
                   {% endif %}
                 {% elif doc.extra_data.snippet.liveBroadcastContent == 'live'  %}

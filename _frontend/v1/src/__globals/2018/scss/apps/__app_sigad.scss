@@ -310,7 +310,7 @@
 
   .btn-edit-destaques {
     position: absolute;
-    z-index: 3;
+    z-index: $zindex-fixed;
     padding: 3px 6px 3px 8px;
     background: rgba(black, 0.6);
     line-height: 1.1;
