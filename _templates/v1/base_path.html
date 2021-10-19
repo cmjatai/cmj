@@ -83,9 +83,9 @@
   <div class="path-description">
     {% block descricao %}
       {% if object.descricao %}
-        {{object.descricao|striptags|safe}}
+        {{object.descricao|striptags|safe|linebreaksbr }}
       {% else %}
-        {{ object.parents.0.descricao|striptags|safe }}
+        {{ object.parents.0.descricao|striptags|safe|linebreaksbr  }}
       {% endif %}
     {% endblock %}
     {% social_link_share object 'top-right block'%}
