@@ -124,8 +124,9 @@ class PullExecManager(manager.Manager):
         f = from_date_to_datetime_utc
         interval = f(now), f(now + timedelta(days=1))
         qu = qs.filter(
-            data_exec__gte=interval[0],
-            data_exec__lt=interval[1]
+            # faz até meia noite América/São Paulo
+            data_exec__gte=interval[0] + timedelta(hours=3),
+            data_exec__lt=interval[1] + timedelta(hours=3)
         ).aggregate(Sum('quota'))
 
         if isinstance(qu, dict) and 'quota__sum' in qu:
@@ -138,7 +139,8 @@ class PullExecManager(manager.Manager):
         chamada_livre = (9000 - qu) / 100
 
         if chamada_livre < 1 or seconds_final_day < 600:
-            return (interval[1] - now) + timedelta(hours=7)
+            # reinicia as 7h da manhã América/São Paulo
+            return (interval[1] - now) + timedelta(hours=4)
 
         seconds_entre_chamadas = max(seconds_final_day / chamada_livre, 1800)
 
