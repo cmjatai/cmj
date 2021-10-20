@@ -41,7 +41,7 @@ class Command(BaseCommand):
         # Video.objects.all().update(created=F('modified'))
 
         # PullYoutube.objects.pull_from_date()
-        # PullExec.objects.timedelta_quota_pull()
+        PullExec.objects.timedelta_quota_pull()
 
         # pull_youtube()
         # return

@@ -138,7 +138,7 @@
   &.pagina-inicial {
     background: darken($color_main_bg, 10%) $url_bg_png;
     ///min-height: 90vh;
-    margin: 1em;
+    margin: 1em 0 0;
     padding: 15px 0;
 
     .title-container-noticias {
@@ -159,7 +159,7 @@
 }
 
 
-@media screen and (max-width: 1199.98px) {
+@media screen and (max-width: 991.98px) {
   .container-videos {
     &.pagina-inicial {
       margin-left: 15px;
@@ -211,7 +211,7 @@
 @media screen and (max-width: 575.98px) {
   .container-videos {
     &.pagina-inicial {
-      margin: 1em -15px;
+      //margin: 1em -15px;
 
       .video-list {
         margin: 0;
