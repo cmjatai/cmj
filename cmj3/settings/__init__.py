@@ -1,6 +1,6 @@
-import os
 from datetime import timedelta
 from pathlib import Path
+import os
 
 from .apps import *
 from .auth import *
@@ -11,6 +11,7 @@ from .languages import *
 from .logs import *
 from .medias import *
 from .middleware import *
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -31,6 +32,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',
 
     'rest_framework',
 
