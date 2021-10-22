@@ -231,7 +231,7 @@ class Command(BaseCommand):
                     ))
 
                 print(m)
-                for i in m.objects.all().order_by('-id'):  # .filter(id=15219)
+                for i in m.objects.all().order_by('-id'):  #
 
                     if not hasattr(i, 'metadata'):
                         #print(i, 'não tem metadata')
@@ -288,6 +288,20 @@ class Command(BaseCommand):
                                 'original_size': 0
                             }
 
+                        try:
+
+                            td = parse_datetime(
+                                metadata[self.s3_server][fn]['validate']
+                            ) - parse_datetime(
+                                metadata[self.s3_server][fn]['original_path']
+                            )
+
+                            dv = (td.days / 180.0) * 60.0
+
+                            self.days_validate = min(max(dv, 60), 365)
+                        except:
+                            self.days_validate = 60
+
                         count_update = 0
                         try:
                             count_update += self.send_file(
@@ -314,18 +328,8 @@ class Command(BaseCommand):
                                     if validate:
                                         lt = timezone.localtime()
                                         validate = parse_datetime(validate)
-                                        try:
-                                            td = lt - \
-                                                parse_datetime(
-                                                    i.metadata[self.s3_server][fn]['path'])
-                                            peso = td.days / 60 + 1
-                                        except:
-                                            peso = 1
 
-                                        if not peso:
-                                            peso = 1
-
-                                        if (lt - validate).days >= self.days_validate * peso:
+                                        if (lt - validate).days >= self.days_validate:
                                             i.metadata[self.s3_server][
                                                 fn]['validate'] = lt
                                             i.save()
@@ -429,6 +433,8 @@ class Command(BaseCommand):
                 return True
 
         else:
+            self.logger.warn(
+                'Documento Sem validação: {} - {}'.format(i.id, i))
             print('Documento Sem validação:', i.id, i)
         return False
 
@@ -606,6 +612,8 @@ class Command(BaseCommand):
 
         calc = {}
 
+        data_min = lt
+
         for app in apps.get_app_configs():
 
             if not app.name.startswith('cmj') and not app.name.startswith('sapl'):
@@ -614,6 +622,8 @@ class Command(BaseCommand):
 
             for m in app.get_models():
                 model_exec = False
+                if m not in calc:
+                    calc[m] = {}
 
                 for f in m._meta.get_fields():
                     dua = f
@@ -674,16 +684,22 @@ class Command(BaseCommand):
                         td = lt - \
                             parse_datetime(md[self.s3_server][fn]['validate'])
                         d = td.days if td.days > 0 else -1
-                        if d not in calc:
-                            calc[d] = [0, md[self.s3_server][fn].get('size', 0) +
-                                       md[self.s3_server][fn].get('original_size', 0)]
+                        if d not in calc[m]:
+                            calc[m][d] = [0, md[self.s3_server][fn].get('size', 0) +
+                                          md[self.s3_server][fn].get('original_size', 0)]
 
-                        if d == 2:
-                            print(i.id, parse_datetime(
-                                md[self.s3_server][fn]['path']), i)
+                        try:
+                            data_min = min(
+                                data_min,
+                                parse_datetime(md[self.s3_server][fn]['path']),
+                                datetime.fromtimestamp(os.path.getmtime(
+                                    getattr(i, fn).path), timezone.utc)
+                            )
+                        except:
+                            print(i)
 
-                        calc[d][0] += 1
-                        calc[d][1] += md[self.s3_server][fn].get('size', 0) + \
+                        calc[m][d][0] += 1
+                        calc[m][d][1] += md[self.s3_server][fn].get('size', 0) + \
                             md[self.s3_server][fn].get('original_size', 0)
         print(calc)
         size = 0
