@@ -73,7 +73,15 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
 
     def get_ultimos_videos(self):
 
-        docs = Documento.objects.qs_video_news()[:4]
+        docs = list(Documento.objects.qs_video_news()[:4])
+        """for d in docs:
+            d.grid = 'col-12 col-md-3 col-sm-6'
+        try:
+            if docs[0].extra_data['snippet']['liveBroadcastContent'] != 'none':
+                docs.pop()
+                docs[0].grid = 'col-12 col-md-6 col-sm-6'
+        except:
+            pass"""
 
         return docs
 

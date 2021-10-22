@@ -121,6 +121,13 @@
         color: #212529;
       }
 
+      .titulo-upcoming,
+      .titulo-live {
+        line-height: 1.3;
+        font-weight: bold;
+        font-family: Graduate;
+        font-variant: small-caps;
+      }
     }
   }
 
@@ -142,8 +149,8 @@
     padding: 15px 0;
 
     .title-container-noticias {
-      padding-left: 1em;
-      margin-bottom: 1em;
+      padding: 0 1em;
+      margin-bottom: 1.1em;
     }
 
     .video-list {
@@ -211,17 +218,25 @@
 @media screen and (max-width: 575.98px) {
   .container-videos {
     &.pagina-inicial {
-      //margin: 1em -15px;
+      padding: 0.4em 0 0 0;
 
       .video-list {
         margin: 0;
       }
 
+      .title-container-noticias {
+        padding: 0 0.5em;
+        margin-bottom: 0.5em;
+      }
+
       .item {
-        padding: 0px;
+        padding: 0.5em;
         margin-bottom: 5px;
       }
 
+      .upcoming-time {
+        padding-top: 3px;
+      }
     }
   }
 }

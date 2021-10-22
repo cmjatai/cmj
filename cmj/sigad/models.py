@@ -259,7 +259,6 @@ class CMSMixin(models.Model):
             (TPD_AUDIO, 'tpd_audio', _('Áudio')),
             (TPD_IMAGE, 'tpd_image', _('Imagem')),
             (TPD_GALLERY, 'tpd_gallery', _('Galeria de Imagens')),
-
         )
     }
 
