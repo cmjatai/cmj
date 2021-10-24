@@ -7,7 +7,6 @@ from django.db import models
 from django.db.models.deletion import PROTECT
 from django.urls.base import reverse
 from django.utils.translation import ugettext_lazy as _
-from floppyforms import ClearableFileInput
 from model_utils.choices import Choices
 from pdfrw.pdfreader import PdfReader
 from social_core.backends.facebook import FacebookOAuth2
@@ -21,10 +20,6 @@ from sapl.crispy_layout_mixin import to_row, SaplFormLayout, \
 class FacebookOAuth2(FacebookOAuth2):
     STATE_PARAMETER = False
     REDIRECT_STATE = False
-
-
-class ImageThumbnailFileInput(ClearableFileInput):
-    template_name = 'floppyforms/image_thumbnail.html'
 
 
 class CmjChoices(Choices):

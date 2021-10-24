@@ -1,19 +1,17 @@
-import logging
 from operator import xor
-import os
+import logging
 
-from crispy_forms.bootstrap import FieldWithButtons, InlineRadios, StrictButton,\
+from crispy_forms.bootstrap import FieldWithButtons, StrictButton,\
     FormActions
 from crispy_forms.layout import HTML, Button, Div, Field, Fieldset, Layout, Row,\
     Submit
 from django import forms
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import (AuthenticationForm, PasswordResetForm,
                                        SetPasswordForm)
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
-from django.db import models, transaction
+from django.db import transaction
 from django.db.models import Q
 from django.forms import Form, ModelForm
 from django.utils import timezone
@@ -27,19 +25,17 @@ from sapl.crispy_layout_mixin import (SaplFormLayout, form_actions, to_column,
                                       to_row)
 from sapl.crispy_layout_mixin import SaplFormHelper
 from sapl.materia.models import (MateriaLegislativa, UnidadeTramitacao, StatusTramitacao,
-                                 DocumentoAcessorio, TipoMateriaLegislativa)
-from sapl.norma.models import (NormaJuridica, NormaEstatisticas)
+                                 DocumentoAcessorio)
+from sapl.norma.models import NormaJuridica
 from sapl.parlamentares.models import SessaoLegislativa, Partido, HistoricoPartido
 from sapl.protocoloadm.models import DocumentoAdministrativo
 from sapl.sessao.models import SessaoPlenaria
 from sapl.settings import MAX_IMAGE_UPLOAD_SIZE
 from sapl.utils import (RANGE_ANOS, YES_NO_CHOICES,
                         ChoiceWithoutValidationField, ImageThumbnailFileInput,
-                        RangeWidgetOverride, autor_label, autor_modal,
-                        models_with_gr_for_model, qs_override_django_filter,
+                        autor_label, autor_modal, qs_override_django_filter,
                         choice_anos_com_normas, choice_anos_com_materias,
-                        FilterOverridesMetaMixin, FileFieldCheckMixin,
-                        intervalos_tem_intersecao)
+                        FilterOverridesMetaMixin, FileFieldCheckMixin)
 
 from .models import AppConfig, CasaLegislativa
 

@@ -10,14 +10,10 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Q
 from django.forms import ModelForm
-from django.forms.fields import CharField
-from django.forms.widgets import TextInput
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+from image_cropping.widgets import get_attrs
 import django_filters
-from floppyforms.widgets import ClearableFileInput
-from image_cropping.widgets import CropWidget, ImageCropWidget,\
-    get_attrs
 
 from sapl.base.models import Autor, TipoAutor
 from sapl.crispy_layout_mixin import SaplFormHelper
@@ -28,22 +24,6 @@ from sapl.utils import FileFieldCheckMixin, intervalos_tem_intersecao
 from .models import (ComposicaoColigacao, Filiacao, Frente, Legislatura,
                      Mandato, Parlamentar, Votante, Bloco, Bancada, CargoBloco,
                      CargoBlocoPartido, AfastamentoParlamentar, TipoAfastamento)
-
-
-class ImageThumbnailFileInput(ClearableFileInput):
-    template_name = 'floppyforms/image_thumbnail.html'
-
-
-class CustomImageCropWidget(ImageCropWidget):
-    """
-    Custom ImageCropWidget that doesn't show the initial value of the field.
-    We use this trick, and place it right under the CropWidget so that
-    it looks like the user is seeing the image and clearing the image.
-    """
-    template_with_initial = (
-        # '%(initial_text)s: <a href="%(initial_url)s">%(initial)s</a> '
-        '%(clear_template)s<br />%(input_text)s: %(input)s'
-    )
 
 
 def validar_datas_legislatura(eleicao, inicio, fim, pk=None):

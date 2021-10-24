@@ -11,7 +11,6 @@ from django.db import models, transaction
 from django.db.models import Max
 from django.db.models import Q
 from django.forms import ModelForm
-from django.forms.widgets import ClearableFileInput
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 import django_filters
