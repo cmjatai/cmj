@@ -1,9 +1,8 @@
-from celery.canvas import group
+
 from crispy_forms.bootstrap import Alert, FieldWithButtons, StrictButton
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Fieldset, Div
+from crispy_forms.layout import Layout, Fieldset
 from django import forms
-from django.conf import settings
 from django.contrib.auth import get_user_model, password_validation
 from django.contrib.auth.forms import AuthenticationForm, \
     SetPasswordForm, PasswordResetForm
@@ -61,18 +60,6 @@ class LoginForm(AuthenticationForm):
                 'autocomplete': "current-password"}))
 
 
-class CustomImageCropWidget(ImageCropWidget):
-    """
-    Custom ImageCropWidget that doesn't show the initial value of the field.
-    We use this trick, and place it right under the CropWidget so that
-    it looks like the user is seeing the image and clearing the image.
-    """
-    template_with_initial = (
-        # '%(initial_text)s: <a href="%(initial_url)s">%(initial)s</a> '
-        '%(clear_template)s<br />%(input_text)s: %(input)s'
-    )
-
-
 class CmjUserChangeForm(ModelForm):
 
     error_messages = {
@@ -109,7 +96,7 @@ class CmjUserChangeForm(ModelForm):
                   'be_notified_by_email']
 
         widgets = {
-            'avatar': CustomImageCropWidget(),
+            'avatar': ImageCropWidget(),
             'cropping': CropWidget(),
         }
 
