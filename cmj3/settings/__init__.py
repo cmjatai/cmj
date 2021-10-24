@@ -1,7 +1,4 @@
-from pathlib import Path
-import os
-
-import environ
+from . import ambiente
 
 from .apps import *
 from .auth import *
@@ -14,11 +11,9 @@ from .medias import *
 from .middleware import *
 
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-
-env = environ.Env()
-environ.Env.read_env(BASE_DIR.joinpath('cmj3', '.env'))
+env = ambiente.env
+BASE_DIR = ambiente.BASE_DIR
+PROJECT_ROOT = ambiente.PROJECT_ROOT
 
 SECRET_KEY = env.str('SECRET_KEY', default='Env')
 

@@ -1,5 +1,6 @@
+from .ambiente import env, BASE_DIR, PROJECT_ROOT
 
-CORS_ORIGIN_WHITELIST = ["http://localhost:3000", "http://127.0.0.1:3000"]
+CORS_ORIGIN_WHITELIST = ['http://localhost:3000', 'http://127.0.0.1:3000']
 
 
 TEMPLATES = [
@@ -17,3 +18,6 @@ TEMPLATES = [
         },
     },
 ]
+
+STATIC_URL = '/static/'
+STATIC_ROOT = PROJECT_ROOT.joinpath('collected_static')

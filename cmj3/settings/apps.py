@@ -14,7 +14,7 @@ INSTALLED_APPS = [
 ]
 
 CMJ_APPS = [
-    'cmj.core'
+    #'cmj.core'
 ]
 
 INSTALLED_APPS += CMJ_APPS

@@ -26,6 +26,8 @@ pdfrw = "^0.4"
 PyPDF4 = "^1.27.0"
 asn1crypto = "^1.4.0"
 easy-thumbnails = "^2.7.2"
+Unipath = "^1.1"
+python-magic = "^0.4.24"
 
 [tool.poetry.dev-dependencies]
 autopep8 = "^1.5.7"
