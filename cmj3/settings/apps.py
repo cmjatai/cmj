@@ -12,3 +12,8 @@ INSTALLED_APPS = [
 
     'channels'
 ]
+
+CMJ_APPS = [
+]
+
+INSTALLED_APPS += CMJ_APPS
