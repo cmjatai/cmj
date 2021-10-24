@@ -9,17 +9,9 @@ from django.urls.base import reverse
 from django.utils.translation import ugettext_lazy as _
 from model_utils.choices import Choices
 from pdfrw.pdfreader import PdfReader
-from social_core.backends.facebook import FacebookOAuth2
-
-from cmj.utils import run_sql, get_settings_auth_user_model, \
-    YES_NO_CHOICES, ProcessoExterno
+from cmj.utils import run_sql, get_settings_auth_user_model, ProcessoExterno
 from sapl.crispy_layout_mixin import to_row, SaplFormLayout, \
     form_actions
-
-
-class FacebookOAuth2(FacebookOAuth2):
-    STATE_PARAMETER = False
-    REDIRECT_STATE = False
 
 
 class CmjChoices(Choices):
