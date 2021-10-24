@@ -47,10 +47,6 @@ from sapl.crispy_layout_mixin import SaplFormLayout, form_actions, to_row
 SEPARADOR_HASH_PROPOSICAO = 'K'
 
 
-def pil_image(source, exif_orientation=False, **options):
-    return source_generators.pil_image(source, exif_orientation, **options)
-
-
 def dont_break_out(value, max_part=50):
     _safe = value.split()
 
