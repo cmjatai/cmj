@@ -72,8 +72,20 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
         return context
 
     def get_ultimos_videos(self):
+        docs = list(Documento.objects.qs_video_news()[:10])
 
-        docs = list(Documento.objects.qs_video_news()[:4])
+        r = []
+
+        for d in docs:
+            ed = d.extra_data
+            if 'snippet' in ed and \
+                'liveBroadcastContent' in ed['snippet'] and\
+                    ed['snippet']['liveBroadcastContent'] == 'live':
+                continue
+            r.append(d)
+            if len(r) == 4:
+                break
+
         """for d in docs:
             d.grid = 'col-12 col-md-3 col-sm-6'
         try:
@@ -83,7 +95,7 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
         except:
             pass"""
 
-        return docs
+        return r
 
     def get_docs_adms_pagina_inicial(self):
         param_tip_pub = {

@@ -1,6 +1,20 @@
 .container-videos {
   //margin: 0;
   //padding: 0;
+  overflow: auto;
+
+  .tag-aovivo {
+    position: absolute;
+    background-color: red;
+    color: white;
+    top: 2px;
+    left: 3px;
+    font-family: 'Courier New', Courier, monospace;
+    line-height: 1;
+    font-weight: bold;
+    padding: 2px 5px 0;
+    margin-top: -15px;
+  }
 
   .video-list,
   .sessao-list {
