@@ -9,18 +9,31 @@
 {% block main_container_class %}container-fluid p-0 container{{fluid}}{{path}}{% endblock %}
 {% block base_content %}
 
-  <div class="container container-videos">
-    {% if user.is_anonymous and ""|transmissao_ao_vivo %}
-      <div class="row justify-content-center mt-3 mt-lg-4">
-        <div class="col-12" id="aovivo_content">
-          <div class="embed-responsive embed-responsive-16by9">
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/live_stream?channel=UCZXKjzKW2n1w4JQ3bYlrA-w" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;" allowfullscreen></iframe>
+  {% if user.is_anonymous and ""|transmissao_ao_vivo %}
+    <div class="container-videos portlet-aovivo">
+      <div class="container">
+        <div class="row justify-content-center">
+
+          <div class="col-12 col-sm-8" id="aovivo_content">
+            <h2 class="title-container-noticias">TV Câmara - Ao Vivo</h2>
+            <div class="embed-responsive embed-responsive-16by9">
+              <iframe width="560" height="315" src="https://www.youtube.com/embed/live_stream?channel=UCZXKjzKW2n1w4JQ3bYlrA-w" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;" allowfullscreen></iframe>
+            </div>
           </div>
-          <div class="tag-aovivo">AO VIVO</div>
+          {% comment %}
+            <div class="col-4 video-list">
+            {% with " " as grid %}
+              {% for doc in ultimos_videos%}
+                {% include 'path/path_galeria_video_item.html' %}
+              {% endfor %}
+            {% endwith %}
+            </div>
+          {% endcomment %}
         </div>
       </div>
-    {% endif %}
-  </div>
+    </div>
+    {% include "path/pagina_inicial_ultimos_videos.html" %}
+  {% endif %}
 
   <div class="container">
     <div class="row">
@@ -32,8 +45,12 @@
         </div>
     </div>
   </div>
-
+  {% if not ""|transmissao_ao_vivo %}
+    <div class="pt-4">
     {% include "path/pagina_inicial_ultimos_videos.html" %}
+    </div>
+
+  {% endif %}
 
   <div class="container">
     <div class="row">

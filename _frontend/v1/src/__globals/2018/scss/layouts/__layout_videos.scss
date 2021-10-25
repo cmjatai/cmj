@@ -3,19 +3,6 @@
   //padding: 0;
   overflow: auto;
 
-  .tag-aovivo {
-    position: absolute;
-    background-color: red;
-    color: white;
-    top: 2px;
-    left: 3px;
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 1em;
-    line-height: 1em;
-    font-weight: bold;
-    padding: 4px 5px 0;
-    margin-top: -15px;
-  }
 
   .video-list,
   .sessao-list {
@@ -160,7 +147,7 @@
   &.pagina-inicial {
     background: darken($color_main_bg, 10%) $url_bg_png;
     ///min-height: 90vh;
-    margin: 1em 0 0;
+    //margin: 1em 0 0;
     padding: 15px 0;
 
     .title-container-noticias {
@@ -178,14 +165,109 @@
       }
     }
   }
+
+  &.portlet-aovivo {
+    background: darken($color_main_bg, 10%) $url_bg_png;
+    padding: 1rem 0 1rem;
+    //min-height: 70vmin;
+    //min-height: calc(100vh - 100px);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    //.container {
+    //  width: 80%;
+    //}
+
+    .title-container-noticias {
+      margin-bottom: 1rem;
+      color: #c00;
+      border-color: #c00;
+      padding-bottom: 2px;
+      font-size: 1em;
+    }
+
+    .video-list {
+      background: white;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: stretch;
+      padding: 7.5px;
+    }
+
+    .item {
+      padding: 7.5px;
+      margin: 0;
+      font-size: 0.7rem;
+      flex: 0 0 25%;
+
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: stretch;
+    }
+
+    .inner {
+      flex: 0 0 100%;
+
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      justify-content: stretch;
+
+    }
+
+    .inner-imagem {
+      padding: 0;
+      width: auto;
+      flex: 0 0 40%;
+    }
+
+    .inner-text {
+      display: flex;
+      flex-direction: column;
+      align-items: top;
+      justify-content: left;
+      padding-left: 10px;
+
+      .titulo {
+        padding: 0;
+      }
+
+      br {
+        display: none;
+      }
+    }
+
+    .statistics {
+      overflow: hidden;
+      //flex: 0 0 2em;
+      font-size: 0.6rem;
+    }
+
+  }
 }
 
+@media (min-width: 992px) and (max-width: 1199px) {
+
+  .container-videos {
+    &.portlet-aovivo {
+      .container {
+        width: 100%;
+      }
+    }
+  }
+}
 
 @media screen and (max-width: 991.98px) {
   .container-videos {
     &.pagina-inicial {
-      margin-left: 15px;
-      margin-right: 15px;
+      margin-left: 0;
+      margin-right: 0;
 
       .video-list {
         margin: 0 0.5em;
@@ -232,12 +314,10 @@
 
 @media screen and (max-width: 575.98px) {
   .container-videos {
-
-    .tag-aovivo {
-      padding: 1px 5px;
+    &.portlet-aovivo {
+      //padding: 1px 5px 1rem;
+      //min-height: 0;
     }
-
-
 
     &.pagina-inicial {
       padding: 0.4em 0 0 0;

@@ -86,15 +86,6 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
             if len(r) == 4:
                 break
 
-        """for d in docs:
-            d.grid = 'col-12 col-md-3 col-sm-6'
-        try:
-            if docs[0].extra_data['snippet']['liveBroadcastContent'] != 'none':
-                docs.pop()
-                docs[0].grid = 'col-12 col-md-6 col-sm-6'
-        except:
-            pass"""
-
         return r
 
     def get_docs_adms_pagina_inicial(self):
