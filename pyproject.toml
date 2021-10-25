@@ -28,6 +28,7 @@ asn1crypto = "^1.4.0"
 easy-thumbnails = "^2.7.2"
 Unipath = "^1.1"
 python-magic = "^0.4.24"
+django-webpack-loader = "^1.4.1"
 
 [tool.poetry.dev-dependencies]
 autopep8 = "^1.5.7"

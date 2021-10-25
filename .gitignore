@@ -118,3 +118,5 @@ yarn.lock
 .node_repl_history
 
 package-lock.json
+
+db.sqlite3

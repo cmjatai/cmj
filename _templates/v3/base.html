@@ -1,0 +1,35 @@
+{% load i18n %}
+
+{% load webpack_static from webpack_loader %}
+{% load render_bundle from webpack_loader %}
+
+<!DOCTYPE html>
+<!--[if IE 8]>
+<html class="no-js lt-ie9" lang="pt-br">
+<![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="pt-br">
+<!--<![endif]-->
+<head>
+
+  {% block webpack_loader_css %}
+    {% render_bundle  'app' 'css' %}
+  {% endblock webpack_loader_css %}
+
+</head>
+
+<body>
+  {{webpack_static}}
+  {% block root_body %}
+    <div id="app">
+    </div>
+  {% endblock root_body %}
+
+
+
+  {% block webpack_loader_js %}
+    {% render_bundle  'app' 'js' 'DEFAULT' "?theme='oficial'" %}
+  {% endblock webpack_loader_js %}
+</body>
+</html>
+

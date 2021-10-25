@@ -414,6 +414,14 @@ python-versions = "*"
 Django = ">=2.0.1"
 
 [[package]]
+name = "django-webpack-loader"
+version = "1.4.1"
+description = "Transparently use webpack with django"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "djangorestframework"
 version = "3.12.4"
 description = "Web APIs for Django, made easy."
@@ -949,7 +957,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<4.0"
-content-hash = "44126ac26d8fb9f5a58499008f454ccf773ec472c753de79b2f22cebf2b808a2"
+content-hash = "d2c117d8795653cbce9596a28371f14f6bd5d1c2b035cb61967443331333de2e"
 
 [metadata.files]
 amqp = [
@@ -1145,6 +1153,10 @@ django-image-cropping = [
 django-model-utils = [
     {file = "django-model-utils-4.2.0.tar.gz", hash = "sha256:e7a95e102f9c9653427eadab980d5d59e1dea972913b9c9e01ac37f86bba0ddf"},
     {file = "django_model_utils-4.2.0-py3-none-any.whl", hash = "sha256:a768a25c80514e0ad4e4a6f9c02c44498985f36c5dfdea47b5b1e8cf994beba6"},
+]
+django-webpack-loader = [
+    {file = "django-webpack-loader-1.4.1.tar.gz", hash = "sha256:7e34085b7fc4d352e482ff9cf7d09ae4524e730675e25432ab1d25a2dd94e583"},
+    {file = "django_webpack_loader-1.4.1-py2.py3-none-any.whl", hash = "sha256:290ce20a1347e14ba1cadfb5df90f2d1218eb81a1ecdcfb7ccc8ef9adab4b7d3"},
 ]
 djangorestframework = [
     {file = "djangorestframework-3.12.4-py3-none-any.whl", hash = "sha256:6d1d59f623a5ad0509fe0d6bfe93cbdfe17b8116ebc8eda86d45f6e16e819aaf"},

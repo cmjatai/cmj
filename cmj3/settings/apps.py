@@ -8,9 +8,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
 
+    'webpack_loader',
+
     'rest_framework',
 
     'channels'
+
 ]
 
 CMJ_APPS = [
