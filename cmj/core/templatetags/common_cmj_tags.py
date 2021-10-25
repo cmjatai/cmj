@@ -1,6 +1,6 @@
 
 from copy import deepcopy
-from datetime import date, timedelta
+from datetime import timedelta
 import json
 
 from dateutil.relativedelta import relativedelta
@@ -15,10 +15,10 @@ from django.utils.dateparse import parse_datetime as django_parse_datetime
 from django.utils.formats import date_format
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
-from webob.datetime_utils import hour
 from webpack_loader import utils
 from webpack_loader.utils import _get_bundle
 
+from cmj.videos.models import Video
 from sapl.base.models import AppConfig
 from sapl.materia.models import TipoMateriaLegislativa
 from sapl.norma.models import NormaJuridica, TipoNormaJuridica
@@ -49,16 +49,11 @@ def to_dict(object):
 
 
 @register.filter
-def sessao_em_andamento(obj):
-    sps = SessaoPlenaria.objects.order_by('-id')
-    for sp in sps:
-        if not sp.legislatura.atual():
-            continue
+def transmissao_ao_vivo(obj):
 
-        if sp.iniciada and not sp.finalizada:
-            return True
-
-    return False
+    return Video.objects.filter(
+        json__snippet__liveBroadcastContent__exact='live'
+    ).exists()
 
 
 def get_class(class_string):
