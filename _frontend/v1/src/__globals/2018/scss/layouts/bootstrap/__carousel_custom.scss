@@ -41,11 +41,13 @@
     width: 100%;
 
     li {
+      display: inline-block;
       height: 4px;
       flex: 1 1 auto;
       margin: 0px;
       width: auto;
       border-width: 0;
+      margin-top: 11px;
 
       &.active {
         background-color: $color_text_title;
@@ -58,7 +60,7 @@
 
     &:hover {
       li {
-        height: 15px;
+        //height: 15px;
       }
     }
   }
@@ -96,6 +98,8 @@
 
   .carousel-control-prev {
     z-index: 16;
+    margin-bottom: 15px;
+
 
     &:hover {
       background: -webkit-linear-gradient(left, rgba(0, 0, 0, 0.15) 0, rgba(0, 0, 0, 0.0001) 100%);
@@ -106,6 +110,7 @@
   .carousel-control-next {
     z-index: 16;
 
+
     &:hover {
       background: -webkit-linear-gradient(left, rgba(0, 0, 0, 0.0001) 0, rgba(0, 0, 0, 0.15) 100%);
       background: linear-gradient(to right, rgba(0, 0, 0, 0.0001) 0, rgba(0, 0, 0, 0.15) 100%);
@@ -115,7 +120,8 @@
   &:hover {
     .carousel-indicators {
       li {
-        height: 15px;
+        margin-top: 0;
+        padding-top: 11px;
       }
     }
   }
