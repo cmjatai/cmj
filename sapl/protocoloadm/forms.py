@@ -255,8 +255,8 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
 
         row4 = to_row(
             [
-                ('numero_externo', 2),
-                ('protocolo__numero', 2),
+                ('numero_externo', 3),
+                ('protocolo__numero', 3),
                 ('tramitacaoadministrativo__unidade_tramitacao_destino', 6),
             ]
         )
@@ -279,7 +279,7 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
         fields = [row1, row2, row3, ]
 
         if workspace.tipo != 99:
-            fields += row4
+            fields += [row4, ]
         fields += buttons
 
         self.form.helper = SaplFormHelper()
