@@ -494,6 +494,7 @@ class RelatorioPresencaSessaoView(FilterView):
             **param0).distinct('sessao_plenaria__id').order_by(
             'sessao_plenaria__id').count()
 
+        context['object_list'] = context['object_list'].filter(iniciada=True)
         total_sessao = context['object_list'].count()
 
         username = self.request.user.username

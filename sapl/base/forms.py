@@ -27,7 +27,8 @@ from sapl.crispy_layout_mixin import SaplFormHelper
 from sapl.materia.models import (MateriaLegislativa, UnidadeTramitacao, StatusTramitacao,
                                  DocumentoAcessorio)
 from sapl.norma.models import NormaJuridica
-from sapl.parlamentares.models import SessaoLegislativa, Partido, HistoricoPartido
+from sapl.parlamentares.models import SessaoLegislativa, Partido, HistoricoPartido,\
+    Legislatura
 from sapl.protocoloadm.models import DocumentoAdministrativo
 from sapl.sessao.models import SessaoPlenaria
 from sapl.settings import MAX_IMAGE_UPLOAD_SIZE
@@ -744,16 +745,32 @@ class RelatorioPresencaSessaoFilterSet(django_filters.FilterSet):
 
         self.filters['data_inicio'].label = 'Período (Inicial - Final)'
 
-        tipo_sessao_ordinaria = self.filters['tipo'].queryset.filter(
-            nome='Ordinária')
-        if tipo_sessao_ordinaria:
-            self.form.initial['tipo'] = tipo_sessao_ordinaria.first()
+        now = timezone.now()
+        self.form.initial['legislatura'] = Legislatura.objects.filter(
+            data_inicio__lte=now,
+            data_fim__gte=now
+        ).first()
+
+        if self.form.initial['legislatura']:
+            self.form.initial['sessao_legislativa'] = SessaoLegislativa.objects.filter(
+                legislatura=self.form.initial['legislatura'],
+                data_inicio__lte=now,
+                data_fim__gte=now
+            ).first()
+
+        self.form.initial['tipo'] = self.filters['tipo'].queryset.filter(
+            nome__endswith=' Ordinária').first()
 
         row1 = to_row([('data_inicio', 12)])
         row2 = to_row([('legislatura', 4),
                        ('sessao_legislativa', 4),
                        ('tipo', 4)])
         row3 = to_row([('exibir_ordem_dia', 12)])
+
+        self.form.fields['legislatura'].required = True
+        #self.form.fields['data_inicio'].required = True
+        self.form.fields['tipo'].required = True
+        self.form.fields['sessao_legislativa'].required = True
 
         self.form.helper = SaplFormHelper()
         self.form.helper.form_method = 'GET'
