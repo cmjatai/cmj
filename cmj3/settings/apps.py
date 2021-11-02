@@ -11,6 +11,7 @@ INSTALLED_APPS = [
     'webpack_loader',
 
     'rest_framework',
+    'corsheaders',
 
     'channels'
 
@@ -20,4 +21,8 @@ CMJ_APPS = [
     #'cmj.core'
 ]
 
-INSTALLED_APPS += CMJ_APPS
+CMJ3_APPS = [
+    'cmj3.core'
+]
+
+INSTALLED_APPS += CMJ_APPS + CMJ3_APPS

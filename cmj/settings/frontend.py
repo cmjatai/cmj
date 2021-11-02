@@ -1,5 +1,6 @@
-from decouple import AutoConfig
 from unipath import Path
+
+from decouple import AutoConfig
 
 
 config = AutoConfig()

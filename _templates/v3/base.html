@@ -1,35 +1,49 @@
-{% load i18n %}
-
+<!DOCTYPE html>{% spaceless %}
+{% load i18n core_tags%}
 {% load webpack_static from webpack_loader %}
 {% load render_bundle from webpack_loader %}
-
-<!DOCTYPE html>
-<!--[if IE 8]>
-<html class="no-js lt-ie9" lang="pt-br">
-<![endif]-->
-<!--[if gt IE 8]><!-->
-<html class="no-js" lang="pt-br">
-<!--<![endif]-->
+{% endspaceless %}
+<html lang="pt-br">
 <head>
 
-  {% block webpack_loader_css %}
-    {% render_bundle  'app' 'css' %}
-  {% endblock webpack_loader_css %}
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  {% render_bundle 'app' 'js' attrs='defer="defer" type="module"'%}
+
+  <meta name="theme-color" content="#006556">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  {% with "Django 3 + Vue 3 - Project" as title_tag %}
+  <meta name="apple-mobile-web-app-title" content="{{title_tag}}">
+  <title>{{title_tag}}</title>
+  {% endwith %}
+  {% render_manifest %}
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="{% webpack_static 'img/icons/favicon-32x32.png' %}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{% webpack_static 'img/icons/favicon-16x16.png' %}">
+  <link rel="apple-touch-icon" href="{% webpack_static 'img/icons/apple-touch-icon-152x152.png' %}">
+  <link rel="mask-icon" href="{% webpack_static 'img/icons/safari-pinned-tab.svg' %}" color="#4DBA87">
+
+  {% render_bundle 'app' 'css' %}
+
+  <meta name="msapplication-TileImage" content="{% webpack_static 'img/icons/msapplication-icon-144x144.png' %}">
+  <meta name="msapplication-TileColor" content="#000000">
 
 </head>
-
 <body>
-  {{webpack_static}}
   {% block root_body %}
-    <div id="app">
+    <div id="app-vue">
+    teste base <span>[[var_teste]]</span>
+    <router-view></router-view>
+
+
+    <push></push>
     </div>
   {% endblock root_body %}
 
-
-
-  {% block webpack_loader_js %}
-    {% render_bundle  'app' 'js' 'DEFAULT' "?theme='oficial'" %}
-  {% endblock webpack_loader_js %}
 </body>
 </html>
 

@@ -1,160 +1,172 @@
 {
   "status": "done",
   "assets": {
-    "img/logo.82b9c7a5.png": {
-      "name": "img/logo.82b9c7a5.png",
-      "path": "/home/leandro/desenvolvimento/envs/cmj3/_frontend/v3/dist/img/logo.82b9c7a5.png",
-      "publicPath": "/static/img/logo.82b9c7a5.png"
-    },
-    "js/about.3198a755.js": {
-      "name": "js/about.3198a755.js",
-      "path": "/home/leandro/desenvolvimento/envs/cmj3/_frontend/v3/dist/js/about.3198a755.js",
-      "publicPath": "/static/js/about.3198a755.js"
-    },
-    "css/app.17d0086d.css": {
-      "name": "css/app.17d0086d.css",
-      "path": "/home/leandro/desenvolvimento/envs/cmj3/_frontend/v3/dist/css/app.17d0086d.css",
-      "publicPath": "/static/css/app.17d0086d.css"
-    },
-    "js/app.1342a383.js": {
-      "name": "js/app.1342a383.js",
-      "path": "/home/leandro/desenvolvimento/envs/cmj3/_frontend/v3/dist/js/app.1342a383.js",
-      "publicPath": "/static/js/app.1342a383.js"
-    },
-    "js/chunk-vendors.94d94ae4.js": {
-      "name": "js/chunk-vendors.94d94ae4.js",
-      "path": "/home/leandro/desenvolvimento/envs/cmj3/_frontend/v3/dist/js/chunk-vendors.94d94ae4.js",
-      "publicPath": "/static/js/chunk-vendors.94d94ae4.js"
-    },
-    "js/about.3198a755.js.map": {
-      "name": "js/about.3198a755.js.map",
-      "path": "/home/leandro/desenvolvimento/envs/cmj3/_frontend/v3/dist/js/about.3198a755.js.map",
-      "publicPath": "/static/js/about.3198a755.js.map"
-    },
-    "js/app.1342a383.js.map": {
-      "name": "js/app.1342a383.js.map",
-      "path": "/home/leandro/desenvolvimento/envs/cmj3/_frontend/v3/dist/js/app.1342a383.js.map",
-      "publicPath": "/static/js/app.1342a383.js.map"
-    },
-    "js/chunk-vendors.94d94ae4.js.map": {
-      "name": "js/chunk-vendors.94d94ae4.js.map",
-      "path": "/home/leandro/desenvolvimento/envs/cmj3/_frontend/v3/dist/js/chunk-vendors.94d94ae4.js.map",
-      "publicPath": "/static/js/chunk-vendors.94d94ae4.js.map"
-    },
-    "index.html": {
-      "name": "index.html",
-      "path": "/home/leandro/desenvolvimento/envs/cmj3/_frontend/v3/dist/index.html",
-      "publicPath": "/static/index.html"
-    },
     "manifest.json": {
       "name": "manifest.json",
-      "path": "/home/leandro/desenvolvimento/envs/cmj3/_frontend/v3/dist/manifest.json",
+      "path": "manifest.json",
       "publicPath": "/static/manifest.json"
+    },
+    "service-worker.js": {
+      "name": "service-worker.js",
+      "path": "service-worker.js",
+      "publicPath": "/static/service-worker.js"
+    },
+    "css/app.1fd867c6.css": {
+      "name": "css/app.1fd867c6.css",
+      "path": "css/app.1fd867c6.css",
+      "publicPath": "/static/css/app.1fd867c6.css"
+    },
+    "js/app.f679e045.js": {
+      "name": "js/app.f679e045.js",
+      "path": "js/app.f679e045.js",
+      "publicPath": "/static/js/app.f679e045.js"
+    },
+    "js/724.9c1a1011.js": {
+      "name": "js/724.9c1a1011.js",
+      "path": "js/724.9c1a1011.js",
+      "publicPath": "/static/js/724.9c1a1011.js"
+    },
+    "js/924.518deca7.js": {
+      "name": "js/924.518deca7.js",
+      "path": "js/924.518deca7.js",
+      "publicPath": "/static/js/924.518deca7.js"
+    },
+    "js/chunk-vendors.16b2a61c.js": {
+      "name": "js/chunk-vendors.16b2a61c.js",
+      "path": "js/chunk-vendors.16b2a61c.js",
+      "publicPath": "/static/js/chunk-vendors.16b2a61c.js"
     },
     "favicon.ico": {
       "name": "favicon.ico",
-      "path": "/home/leandro/desenvolvimento/envs/cmj3/_frontend/v3/dist/favicon.ico",
+      "path": "favicon.ico",
       "publicPath": "/static/favicon.ico"
+    },
+    "robots.txt": {
+      "name": "robots.txt",
+      "path": "robots.txt",
+      "publicPath": "/static/robots.txt"
     },
     "img/icons/android-chrome-192x192.png": {
       "name": "img/icons/android-chrome-192x192.png",
-      "path": "/home/leandro/desenvolvimento/envs/cmj3/_frontend/v3/dist/img/icons/android-chrome-192x192.png",
+      "path": "img/icons/android-chrome-192x192.png",
       "publicPath": "/static/img/icons/android-chrome-192x192.png"
-    },
-    "img/icons/android-chrome-maskable-192x192.png": {
-      "name": "img/icons/android-chrome-maskable-192x192.png",
-      "path": "/home/leandro/desenvolvimento/envs/cmj3/_frontend/v3/dist/img/icons/android-chrome-maskable-192x192.png",
-      "publicPath": "/static/img/icons/android-chrome-maskable-192x192.png"
-    },
-    "img/icons/android-chrome-maskable-512x512.png": {
-      "name": "img/icons/android-chrome-maskable-512x512.png",
-      "path": "/home/leandro/desenvolvimento/envs/cmj3/_frontend/v3/dist/img/icons/android-chrome-maskable-512x512.png",
-      "publicPath": "/static/img/icons/android-chrome-maskable-512x512.png"
     },
     "img/icons/android-chrome-512x512.png": {
       "name": "img/icons/android-chrome-512x512.png",
-      "path": "/home/leandro/desenvolvimento/envs/cmj3/_frontend/v3/dist/img/icons/android-chrome-512x512.png",
+      "path": "img/icons/android-chrome-512x512.png",
       "publicPath": "/static/img/icons/android-chrome-512x512.png"
     },
     "img/icons/apple-touch-icon-120x120.png": {
       "name": "img/icons/apple-touch-icon-120x120.png",
-      "path": "/home/leandro/desenvolvimento/envs/cmj3/_frontend/v3/dist/img/icons/apple-touch-icon-120x120.png",
+      "path": "img/icons/apple-touch-icon-120x120.png",
       "publicPath": "/static/img/icons/apple-touch-icon-120x120.png"
     },
     "img/icons/apple-touch-icon-152x152.png": {
       "name": "img/icons/apple-touch-icon-152x152.png",
-      "path": "/home/leandro/desenvolvimento/envs/cmj3/_frontend/v3/dist/img/icons/apple-touch-icon-152x152.png",
+      "path": "img/icons/apple-touch-icon-152x152.png",
       "publicPath": "/static/img/icons/apple-touch-icon-152x152.png"
     },
     "img/icons/apple-touch-icon-180x180.png": {
       "name": "img/icons/apple-touch-icon-180x180.png",
-      "path": "/home/leandro/desenvolvimento/envs/cmj3/_frontend/v3/dist/img/icons/apple-touch-icon-180x180.png",
+      "path": "img/icons/apple-touch-icon-180x180.png",
       "publicPath": "/static/img/icons/apple-touch-icon-180x180.png"
     },
     "img/icons/apple-touch-icon-60x60.png": {
       "name": "img/icons/apple-touch-icon-60x60.png",
-      "path": "/home/leandro/desenvolvimento/envs/cmj3/_frontend/v3/dist/img/icons/apple-touch-icon-60x60.png",
+      "path": "img/icons/apple-touch-icon-60x60.png",
       "publicPath": "/static/img/icons/apple-touch-icon-60x60.png"
     },
     "img/icons/apple-touch-icon-76x76.png": {
       "name": "img/icons/apple-touch-icon-76x76.png",
-      "path": "/home/leandro/desenvolvimento/envs/cmj3/_frontend/v3/dist/img/icons/apple-touch-icon-76x76.png",
+      "path": "img/icons/apple-touch-icon-76x76.png",
       "publicPath": "/static/img/icons/apple-touch-icon-76x76.png"
     },
     "img/icons/apple-touch-icon.png": {
       "name": "img/icons/apple-touch-icon.png",
-      "path": "/home/leandro/desenvolvimento/envs/cmj3/_frontend/v3/dist/img/icons/apple-touch-icon.png",
+      "path": "img/icons/apple-touch-icon.png",
       "publicPath": "/static/img/icons/apple-touch-icon.png"
     },
     "img/icons/favicon-16x16.png": {
       "name": "img/icons/favicon-16x16.png",
-      "path": "/home/leandro/desenvolvimento/envs/cmj3/_frontend/v3/dist/img/icons/favicon-16x16.png",
+      "path": "img/icons/favicon-16x16.png",
       "publicPath": "/static/img/icons/favicon-16x16.png"
     },
     "img/icons/favicon-32x32.png": {
       "name": "img/icons/favicon-32x32.png",
-      "path": "/home/leandro/desenvolvimento/envs/cmj3/_frontend/v3/dist/img/icons/favicon-32x32.png",
+      "path": "img/icons/favicon-32x32.png",
       "publicPath": "/static/img/icons/favicon-32x32.png"
     },
     "img/icons/msapplication-icon-144x144.png": {
       "name": "img/icons/msapplication-icon-144x144.png",
-      "path": "/home/leandro/desenvolvimento/envs/cmj3/_frontend/v3/dist/img/icons/msapplication-icon-144x144.png",
+      "path": "img/icons/msapplication-icon-144x144.png",
       "publicPath": "/static/img/icons/msapplication-icon-144x144.png"
     },
     "img/icons/mstile-150x150.png": {
       "name": "img/icons/mstile-150x150.png",
-      "path": "/home/leandro/desenvolvimento/envs/cmj3/_frontend/v3/dist/img/icons/mstile-150x150.png",
+      "path": "img/icons/mstile-150x150.png",
       "publicPath": "/static/img/icons/mstile-150x150.png"
     },
-    "img/icons/safari-pinned-tab.svg": {
-      "name": "img/icons/safari-pinned-tab.svg",
-      "path": "/home/leandro/desenvolvimento/envs/cmj3/_frontend/v3/dist/img/icons/safari-pinned-tab.svg",
-      "publicPath": "/static/img/icons/safari-pinned-tab.svg"
+    "index.html": {
+      "name": "index.html",
+      "path": "index.html",
+      "publicPath": "/static/index.html"
     },
-    "robots.txt": {
-      "name": "robots.txt",
-      "path": "/home/leandro/desenvolvimento/envs/cmj3/_frontend/v3/dist/robots.txt",
-      "publicPath": "/static/robots.txt"
+    "manifest.json.gz": {
+      "name": "manifest.json.gz",
+      "path": "manifest.json.gz",
+      "publicPath": "/static/manifest.json.gz"
     },
-    "precache-manifest.7d65ac263ad9dbe823fc48b6f0e4711f.js": {
-      "name": "precache-manifest.7d65ac263ad9dbe823fc48b6f0e4711f.js",
-      "path": "/home/leandro/desenvolvimento/envs/cmj3/_frontend/v3/dist/precache-manifest.7d65ac263ad9dbe823fc48b6f0e4711f.js",
-      "publicPath": "/static/precache-manifest.7d65ac263ad9dbe823fc48b6f0e4711f.js"
+    "css/app.1fd867c6.css.gz": {
+      "name": "css/app.1fd867c6.css.gz",
+      "path": "css/app.1fd867c6.css.gz",
+      "publicPath": "/static/css/app.1fd867c6.css.gz"
     },
-    "service-worker.js": {
-      "name": "service-worker.js",
-      "path": "/home/leandro/desenvolvimento/envs/cmj3/_frontend/v3/dist/service-worker.js",
-      "publicPath": "/static/service-worker.js"
+    "js/724.9c1a1011.js.gz": {
+      "name": "js/724.9c1a1011.js.gz",
+      "path": "js/724.9c1a1011.js.gz",
+      "publicPath": "/static/js/724.9c1a1011.js.gz"
+    },
+    "js/924.518deca7.js.gz": {
+      "name": "js/924.518deca7.js.gz",
+      "path": "js/924.518deca7.js.gz",
+      "publicPath": "/static/js/924.518deca7.js.gz"
+    },
+    "service-worker.js.gz": {
+      "name": "service-worker.js.gz",
+      "path": "service-worker.js.gz",
+      "publicPath": "/static/service-worker.js.gz"
+    },
+    "favicon.ico.gz": {
+      "name": "favicon.ico.gz",
+      "path": "favicon.ico.gz",
+      "publicPath": "/static/favicon.ico.gz"
+    },
+    "js/app.f679e045.js.gz": {
+      "name": "js/app.f679e045.js.gz",
+      "path": "js/app.f679e045.js.gz",
+      "publicPath": "/static/js/app.f679e045.js.gz"
+    },
+    "robots.txt.gz": {
+      "name": "robots.txt.gz",
+      "path": "robots.txt.gz",
+      "publicPath": "/static/robots.txt.gz"
+    },
+    "index.html.gz": {
+      "name": "index.html.gz",
+      "path": "index.html.gz",
+      "publicPath": "/static/index.html.gz"
+    },
+    "js/chunk-vendors.16b2a61c.js.gz": {
+      "name": "js/chunk-vendors.16b2a61c.js.gz",
+      "path": "js/chunk-vendors.16b2a61c.js.gz",
+      "publicPath": "/static/js/chunk-vendors.16b2a61c.js.gz"
     }
   },
   "chunks": {
     "app": [
-      "js/chunk-vendors.94d94ae4.js",
-      "js/chunk-vendors.94d94ae4.js.map",
-      "css/app.17d0086d.css",
-      "js/app.1342a383.js",
-      "css/app.17d0086d.css.map",
-      "js/app.1342a383.js.map"
+      "js/chunk-vendors.16b2a61c.js",
+      "css/app.1fd867c6.css",
+      "js/app.f679e045.js"
     ]
   },
   "publicPath": "/static/"

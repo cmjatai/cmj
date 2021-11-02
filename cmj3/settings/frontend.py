@@ -1,10 +1,11 @@
 from .ambiente import env, BASE_DIR, PROJECT_ROOT, DEBUG
 
+CORS_ALLOWED_ORIGINS = ['http://localhost:8080', 'http://127.0.0.1:8080']
+
 FRONTEND_VERSION = env.str('FRONTEND_VERSION', default='v3')
 
-
-CORS_ORIGIN_WHITELIST = ['http://localhost:8080', 'http://127.0.0.1:8080']
-
+PROJECT_DIR_FRONTEND = PROJECT_ROOT.joinpath(
+    '_frontend').joinpath(FRONTEND_VERSION)
 
 TEMPLATES = [
     {
@@ -30,8 +31,6 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
 
-PROJECT_DIR_FRONTEND = PROJECT_ROOT.joinpath(
-    '_frontend').joinpath(FRONTEND_VERSION)
 
 STATICFILES_DIRS = (
     PROJECT_ROOT.joinpath('_frontend').joinpath(
@@ -47,15 +46,15 @@ WEBPACK_LOADER = {
 
 if DEBUG and not WEBPACK_LOADER['DEFAULT']['STATS_FILE'].exists():
     WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = PROJECT_DIR_FRONTEND.joinpath(
-        f'webpack-stats.json')
-"""
+        'webpack-stats.json')
 
 
-
-
-# apenas para debug - na produção nginx deve entregar sw
 PWA_SERVICE_WORKER_PATH = PROJECT_DIR_FRONTEND.joinpath(
     'dist').joinpath('service-worker.js')
+
+
+"""
+# apenas para debug - na produção nginx deve entregar sw
 PWA_MANIFEST_PATH = PROJECT_DIR_FRONTEND.joinpath(
     'dist').joinpath('manifest.json')
 
