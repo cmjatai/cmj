@@ -1,4 +1,4 @@
-import { EventBus } from '@/portal/root/event-bus'
+import EventBus from './root/event-bus'
 
 export default {
   computed: {
