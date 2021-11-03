@@ -1,4 +1,5 @@
 import { createStore } from 'vuex'
+import StoreMessage from './message/StoreMessage'
 
 export default createStore({
   state: {
@@ -8,5 +9,7 @@ export default createStore({
   actions: {
   },
   modules: {
+    store__message: StoreMessage
+
   }
 })

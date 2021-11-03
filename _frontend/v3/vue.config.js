@@ -30,6 +30,16 @@ module.exports = {
         filename: `./${process.env.DEBUG === 'True' && process.env.NODE_ENV !== 'production' ? 'dev-' : ''}webpack-stats.json`
       }])
 
+    config
+      .plugin('provide')
+      .use(require('webpack/lib/ProvidePlugin'), [{
+        // $: 'jquery',
+        // jquery: 'jquery',
+        // 'window.jQuery': 'jquery',
+        // jQuery: 'jquery',
+        _: 'lodash'
+      }])
+
     if (process.env.NODE_ENV === 'production') {
       shell
         .rm('./dev-webpack-stats.json')

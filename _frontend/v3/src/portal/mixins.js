@@ -1,4 +1,5 @@
 import EventBus from './root/event-bus'
+import Vuex from 'vuex'
 
 export default {
   computed: {
@@ -8,6 +9,9 @@ export default {
     }
   },
   methods: {
+    ...Vuex.mapActions([
+      'sendMessage'
+    ]),
     on_ws_message (data) {
     }
   },

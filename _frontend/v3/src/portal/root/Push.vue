@@ -1,23 +1,23 @@
 <template>
-  <div class="container-messages">
-    teste compomente
-  </div>
+  <message></message>
 </template>
 
 <script>
+import Message from '../components/utils/message/Message.vue'
 import EventBus from './event-bus'
 
 export default {
+  components: { Message },
   name: 'Push',
-  mounted_old: function () {
+  mounted: function () {
     const t = this
+    this.sendMessage({ alert: 'info', message: 'Base Atualizada', time: 3 })
 
     t.$options.sockets.onmessage = (event) => {
       /**
        * Define um ouvinte para o socket implementado por VueNativeSock
        */
       const data = JSON.parse(event.data)
-      // this.sendMessage({ alert: 'info', message: 'Base Atualizada', time: 3 })
 
       setTimeout(() => {
         EventBus.$emit('ws-message', data.message)
