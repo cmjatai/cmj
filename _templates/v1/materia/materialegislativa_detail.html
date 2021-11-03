@@ -87,7 +87,7 @@
       {% endif %}
     </div>
 
-    <div class="text-ementa">{{ object.ementa }}</div>
+    <div class="text-ementa">{{ object.ementa|safe }}</div>
 
     <small>
       {% with object.tramitacao_set.first as tram %}

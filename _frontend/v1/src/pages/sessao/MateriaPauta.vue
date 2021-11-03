@@ -34,7 +34,7 @@
             }}</span>
           </div>
         </div>
-        <div class="ementa">{{ materia.ementa }}</div>
+        <div class="ementa" v-html="materia.ementa"></div>
 
         <div v-if="true" class="status-tramitacao">
           <div

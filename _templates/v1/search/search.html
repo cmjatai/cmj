@@ -98,7 +98,7 @@
                     {% endif %}
                     <strong>Data de Apresentação:</strong> {{m.data_apresentacao}}
                     <br><strong>Autoria:</strong> {{ m.autores.all|join:", "}}
-                    <div class="text-ementa">{{ m.ementa }}</div>
+                    <div class="text-ementa">{{ m.ementa|safe }}</div>
                   {% endwith %}
 
                   <small>
