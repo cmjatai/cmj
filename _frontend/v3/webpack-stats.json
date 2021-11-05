@@ -11,30 +11,60 @@
       "path": "service-worker.js",
       "publicPath": "/static/service-worker.js"
     },
-    "css/app.1fd867c6.css": {
-      "name": "css/app.1fd867c6.css",
-      "path": "css/app.1fd867c6.css",
-      "publicPath": "/static/css/app.1fd867c6.css"
+    "fonts/materialdesignicons-webfont.5d875350..eot": {
+      "name": "fonts/materialdesignicons-webfont.5d875350..eot",
+      "path": "fonts/materialdesignicons-webfont.5d875350..eot",
+      "publicPath": "/static/fonts/materialdesignicons-webfont.5d875350..eot"
     },
-    "js/app.f679e045.js": {
-      "name": "js/app.f679e045.js",
-      "path": "js/app.f679e045.js",
-      "publicPath": "/static/js/app.f679e045.js"
+    "fonts/materialdesignicons-webfont.21f691f0..ttf": {
+      "name": "fonts/materialdesignicons-webfont.21f691f0..ttf",
+      "path": "fonts/materialdesignicons-webfont.21f691f0..ttf",
+      "publicPath": "/static/fonts/materialdesignicons-webfont.21f691f0..ttf"
     },
-    "js/724.9c1a1011.js": {
-      "name": "js/724.9c1a1011.js",
-      "path": "js/724.9c1a1011.js",
-      "publicPath": "/static/js/724.9c1a1011.js"
+    "fonts/materialdesignicons-webfont.54b0f60d..woff2": {
+      "name": "fonts/materialdesignicons-webfont.54b0f60d..woff2",
+      "path": "fonts/materialdesignicons-webfont.54b0f60d..woff2",
+      "publicPath": "/static/fonts/materialdesignicons-webfont.54b0f60d..woff2"
     },
-    "js/924.518deca7.js": {
-      "name": "js/924.518deca7.js",
-      "path": "js/924.518deca7.js",
-      "publicPath": "/static/js/924.518deca7.js"
+    "fonts/materialdesignicons-webfont.d671cbf6..woff": {
+      "name": "fonts/materialdesignicons-webfont.d671cbf6..woff",
+      "path": "fonts/materialdesignicons-webfont.d671cbf6..woff",
+      "publicPath": "/static/fonts/materialdesignicons-webfont.d671cbf6..woff"
     },
-    "js/chunk-vendors.16b2a61c.js": {
-      "name": "js/chunk-vendors.16b2a61c.js",
-      "path": "js/chunk-vendors.16b2a61c.js",
-      "publicPath": "/static/js/chunk-vendors.16b2a61c.js"
+    "css/app.8b3d5229.css": {
+      "name": "css/app.8b3d5229.css",
+      "path": "css/app.8b3d5229.css",
+      "publicPath": "/static/css/app.8b3d5229.css"
+    },
+    "js/app.e8fc062a.js": {
+      "name": "js/app.e8fc062a.js",
+      "path": "js/app.e8fc062a.js",
+      "publicPath": "/static/js/app.e8fc062a.js"
+    },
+    "img/logo.4d6033c9..svg": {
+      "name": "img/logo.4d6033c9..svg",
+      "path": "img/logo.4d6033c9..svg",
+      "publicPath": "/static/img/logo.4d6033c9..svg"
+    },
+    "js/495.c61af332.js": {
+      "name": "js/495.c61af332.js",
+      "path": "js/495.c61af332.js",
+      "publicPath": "/static/js/495.c61af332.js"
+    },
+    "js/929.6f8ba0ac.js": {
+      "name": "js/929.6f8ba0ac.js",
+      "path": "js/929.6f8ba0ac.js",
+      "publicPath": "/static/js/929.6f8ba0ac.js"
+    },
+    "css/chunk-vendors.83076fac.css": {
+      "name": "css/chunk-vendors.83076fac.css",
+      "path": "css/chunk-vendors.83076fac.css",
+      "publicPath": "/static/css/chunk-vendors.83076fac.css"
+    },
+    "js/chunk-vendors.3ad4faf5.js": {
+      "name": "js/chunk-vendors.3ad4faf5.js",
+      "path": "js/chunk-vendors.3ad4faf5.js",
+      "publicPath": "/static/js/chunk-vendors.3ad4faf5.js"
     },
     "favicon.ico": {
       "name": "favicon.ico",
@@ -116,35 +146,30 @@
       "path": "manifest.json.gz",
       "publicPath": "/static/manifest.json.gz"
     },
-    "css/app.1fd867c6.css.gz": {
-      "name": "css/app.1fd867c6.css.gz",
-      "path": "css/app.1fd867c6.css.gz",
-      "publicPath": "/static/css/app.1fd867c6.css.gz"
+    "js/app.e8fc062a.js.gz": {
+      "name": "js/app.e8fc062a.js.gz",
+      "path": "js/app.e8fc062a.js.gz",
+      "publicPath": "/static/js/app.e8fc062a.js.gz"
     },
-    "js/724.9c1a1011.js.gz": {
-      "name": "js/724.9c1a1011.js.gz",
-      "path": "js/724.9c1a1011.js.gz",
-      "publicPath": "/static/js/724.9c1a1011.js.gz"
+    "img/logo.4d6033c9..svg.gz": {
+      "name": "img/logo.4d6033c9..svg.gz",
+      "path": "img/logo.4d6033c9..svg.gz",
+      "publicPath": "/static/img/logo.4d6033c9..svg.gz"
     },
-    "js/924.518deca7.js.gz": {
-      "name": "js/924.518deca7.js.gz",
-      "path": "js/924.518deca7.js.gz",
-      "publicPath": "/static/js/924.518deca7.js.gz"
+    "js/495.c61af332.js.gz": {
+      "name": "js/495.c61af332.js.gz",
+      "path": "js/495.c61af332.js.gz",
+      "publicPath": "/static/js/495.c61af332.js.gz"
     },
-    "service-worker.js.gz": {
-      "name": "service-worker.js.gz",
-      "path": "service-worker.js.gz",
-      "publicPath": "/static/service-worker.js.gz"
+    "js/929.6f8ba0ac.js.gz": {
+      "name": "js/929.6f8ba0ac.js.gz",
+      "path": "js/929.6f8ba0ac.js.gz",
+      "publicPath": "/static/js/929.6f8ba0ac.js.gz"
     },
     "favicon.ico.gz": {
       "name": "favicon.ico.gz",
       "path": "favicon.ico.gz",
       "publicPath": "/static/favicon.ico.gz"
-    },
-    "js/app.f679e045.js.gz": {
-      "name": "js/app.f679e045.js.gz",
-      "path": "js/app.f679e045.js.gz",
-      "publicPath": "/static/js/app.f679e045.js.gz"
     },
     "robots.txt.gz": {
       "name": "robots.txt.gz",
@@ -156,17 +181,38 @@
       "path": "index.html.gz",
       "publicPath": "/static/index.html.gz"
     },
-    "js/chunk-vendors.16b2a61c.js.gz": {
-      "name": "js/chunk-vendors.16b2a61c.js.gz",
-      "path": "js/chunk-vendors.16b2a61c.js.gz",
-      "publicPath": "/static/js/chunk-vendors.16b2a61c.js.gz"
+    "service-worker.js.gz": {
+      "name": "service-worker.js.gz",
+      "path": "service-worker.js.gz",
+      "publicPath": "/static/service-worker.js.gz"
+    },
+    "js/chunk-vendors.3ad4faf5.js.gz": {
+      "name": "js/chunk-vendors.3ad4faf5.js.gz",
+      "path": "js/chunk-vendors.3ad4faf5.js.gz",
+      "publicPath": "/static/js/chunk-vendors.3ad4faf5.js.gz"
+    },
+    "fonts/materialdesignicons-webfont.5d875350..eot.gz": {
+      "name": "fonts/materialdesignicons-webfont.5d875350..eot.gz",
+      "path": "fonts/materialdesignicons-webfont.5d875350..eot.gz",
+      "publicPath": "/static/fonts/materialdesignicons-webfont.5d875350..eot.gz"
+    },
+    "fonts/materialdesignicons-webfont.21f691f0..ttf.gz": {
+      "name": "fonts/materialdesignicons-webfont.21f691f0..ttf.gz",
+      "path": "fonts/materialdesignicons-webfont.21f691f0..ttf.gz",
+      "publicPath": "/static/fonts/materialdesignicons-webfont.21f691f0..ttf.gz"
+    },
+    "css/chunk-vendors.83076fac.css.gz": {
+      "name": "css/chunk-vendors.83076fac.css.gz",
+      "path": "css/chunk-vendors.83076fac.css.gz",
+      "publicPath": "/static/css/chunk-vendors.83076fac.css.gz"
     }
   },
   "chunks": {
     "app": [
-      "js/chunk-vendors.16b2a61c.js",
-      "css/app.1fd867c6.css",
-      "js/app.f679e045.js"
+      "css/chunk-vendors.83076fac.css",
+      "js/chunk-vendors.3ad4faf5.js",
+      "css/app.8b3d5229.css",
+      "js/app.e8fc062a.js"
     ]
   },
   "publicPath": "/static/"

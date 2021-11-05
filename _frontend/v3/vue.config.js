@@ -10,7 +10,6 @@ dotenv.config({
 const HOST_NAME = 'localhost'
 
 module.exports = {
-
   runtimeCompiler: true,
   publicPath: process.env.NODE_ENV === 'production' ? '/static' : `http://${HOST_NAME}:8080/`,
   productionSourceMap: false,
@@ -75,5 +74,9 @@ module.exports = {
       swSrc: './public/service-worker.js'
       // ...other Workbox options...
     }
-  }
+  },
+
+  transpileDependencies: [
+    'vuetify'
+  ]
 }

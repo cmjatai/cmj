@@ -1,7 +1,9 @@
-import Push from './Push.vue'
+
+import RootRoute from './RootRoute.vue'
+
 export default {
   components: {
-    Push
+    RootRoute
   },
   data () {
     return {

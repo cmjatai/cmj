@@ -36,14 +36,19 @@
 <body>
   {% block root_body %}
     <div id="app-vue">
-    teste base <span>[[var_teste]]</span>
-    <router-view></router-view>
+      <root-route>
+        teste base <span>[[var_teste]]</span>
+        testeeeeeeeeeee
+
+        <v-alert
+          dismissible
+          type="success"
+        >teste</v-alert>
 
 
-    <push></push>
+      </root-route>
     </div>
   {% endblock root_body %}
-
 </body>
 </html>
 
