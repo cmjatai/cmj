@@ -1,0 +1,49 @@
+{
+  "name": "v3",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "@mdi/font": "5.9.55",
+    "@vue/compiler-sfc": "^3.2.21",
+    "core-js": "^3.6.5",
+    "lodash": "^4.17.21",
+    "mitt": "^3.0.0",
+    "register-service-worker": "^1.7.1",
+    "roboto-fontface": "*",
+    "vue": "^3.0.0",
+    "vue-native-websocket-vue3": "^3.1.4",
+    "vue-router": "^4.0.0-0",
+    "vuetify": "^3.0.0-alpha.0",
+    "vuex": "^4.0.0-0",
+    "webfontloader": "^1.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.15.8",
+    "@babel/eslint-parser": "^7.15.8",
+    "@vue/cli-plugin-babel": "~5.0.0-beta.7",
+    "@vue/cli-plugin-eslint": "~5.0.0-beta.7",
+    "@vue/cli-plugin-pwa": "~5.0.0-beta.7",
+    "@vue/cli-plugin-router": "~5.0.0-beta.7",
+    "@vue/cli-plugin-vuex": "~5.0.0-beta.7",
+    "@vue/cli-service": "~5.0.0-beta.7",
+    "@vue/eslint-config-standard": "^6.1.0",
+    "compression-webpack-plugin": "^9.0.0",
+    "eslint": "^7.20.0",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.1.0",
+    "eslint-plugin-standard": "^4.0.0",
+    "eslint-plugin-vue": "^7.6.0",
+    "sass": "^1.43.4",
+    "sass-loader": "^12.3.0",
+    "shelljs": "^0.8.4",
+    "vue-cli-plugin-vuetify": "~2.4.3",
+    "vuetify-loader": "^2.0.0-alpha.0",
+    "webpack-bundle-tracker": "^1.4.0"
+  }
+}
