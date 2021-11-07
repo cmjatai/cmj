@@ -1,3 +1,4 @@
+import webpack from 'webpack'
 import colors from 'vuetify/es5/util/colors'
 
 export default {
@@ -49,7 +50,7 @@ export default {
   // PWA module configuration: https://go.nuxtjs.dev/pwa
   pwa: {
     manifest: {
-      lang: 'en'
+      lang: 'pt-BR'
     }
   },
 
@@ -57,7 +58,7 @@ export default {
   vuetify: {
     customVariables: ['~/assets/variables.scss'],
     theme: {
-      dark: true,
+      dark: false,
       themes: {
         dark: {
           primary: colors.blue.darken2,
@@ -74,5 +75,15 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
+    plugins: [
+      new webpack.ProvidePlugin({
+        // global modules
+        //$: 'jquery',
+        _: 'lodash'
+      })
+    ]
   }
+
+
+
 }
