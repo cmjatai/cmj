@@ -41,25 +41,25 @@ export default {
           this.sendMessage({
             alert: 'error',
             message: 'erro - Base Atualizada',
-            time: 3,
+            timeout: 30,
           })
           this.sendMessage({
             alert: 'success',
             message: 'success - Base Atualizada',
-            time: 7,
+            timeout: 700,
           })
           this.sendMessage({
             alert: 'info',
             message: data.ementa,
-            time: 15,
+            timeout: 1500,
           })
           return data
         })
-    }, 3000)
+    }, 1)
   },
   methods: {
     ...mapActions({
-      sendMessage: 'messages/sendMessage',
+      sendMessage: 'utils/messages/sendMessage',
     }),
   },
 }

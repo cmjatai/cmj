@@ -22,8 +22,8 @@ export const mutations = {
   [MESSAGE_SHIFT] (state, data) {
     data.id = state.counterId++
 
-    if (data.time === undefined) {
-      data.time = 3
+    if (data.timeout === undefined) {
+      data.timeout = 3
     }
 
     state.messages.unshift(data)

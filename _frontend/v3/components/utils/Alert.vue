@@ -1,6 +1,12 @@
 <template>
   <div>
-    <v-alert dismissible :type="message.alert" :value="visible">
+    <v-alert
+      dense
+      dismissible
+      min-width="25vw"
+      :type="message.alert"
+      :value="visible"
+    >
       {{ message.message }}
     </v-alert>
   </div>
@@ -35,16 +41,26 @@ export default {
     setTimeout(() => {
       t.popMessage(t.message)
       t.visible = false
-    }, t.message.time * 1000 || 3000)
+    }, t.message.timeout * 1000 || 3000)
   },
 
   methods: {
     ...mapActions({
-      popMessage: 'messages/popMessage',
+      popMessage: 'utils/messages/popMessage',
     }),
   },
 }
 </script>
 
 <style lang="scss" scoped>
+@media screen and (max-width: 958.98px) {
+  .v-alert {
+    margin-bottom: 0.5rem;
+  }
+}
+@media screen and (min-width: 960px) {
+  .v-alert {
+    max-width: 50vw;
+  }
+}
 </style>
