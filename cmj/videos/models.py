@@ -146,7 +146,7 @@ class PullExecManager(manager.Manager):
             return (interval[1] - now)  # + timedelta(hours=4)
 
         week = now.weekday()
-        maxs = 1800 if chamada_livre < 60 else 600
+        maxs = 1800 if chamada_livre < 50 else 600
         if week in (5, 6):
             maxs = 3600
         seconds_entre_chamadas = max(
