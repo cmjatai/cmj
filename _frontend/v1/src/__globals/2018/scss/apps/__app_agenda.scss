@@ -263,7 +263,7 @@
       top: -50px;
       font-size: 200%;
       a {
-        padding: 0 $grid-gutter-width / 2;
+        padding: 0 $grid-gutter-width * 0.5;
       }
     }
     .semana {

@@ -1,3 +1,5 @@
+@use "sass:math";
+
 .container-first {
   position: relative;
   overflow: hidden;
@@ -222,7 +224,7 @@
   .path-imagem {
     width: 49.9%;
     position: relative;
-    margin-bottom: $grid-gutter-width / 4;
+    margin-bottom: $grid-gutter-width * 0.25;
 
     img {
       width: 100%;
@@ -238,7 +240,7 @@
     }
 
     &.alinhamento-left {
-      margin-right: $grid-gutter-width / 2;
+      margin-right: $grid-gutter-width * 0.5;
       float: left;
 
       &.img128 {
@@ -373,7 +375,7 @@
   }
 
   .titulo {
-    padding: 0 0 $grid-gutter-width/4 0;
+    padding: 0 0 $grid-gutter-width*0.25 0;
     font-weight: 600;
 
     a {
@@ -390,7 +392,7 @@
     color: #006556;
     font-size: 90%;
     padding: 0;
-    padding: 0 $grid-gutter-width/4;
+    padding: 0 $grid-gutter-width*0.25;
   }
 
   .path-imagem {
@@ -440,7 +442,7 @@
     float: left;
 
     &:first-child {
-      margin-top: $grid-gutter-width / 1.5;
+      margin-top: math.div($grid-gutter-width, 1.5);
     }
 
     .avatar {
@@ -451,7 +453,7 @@
   }
 
   .inner {
-    padding: $grid-gutter-width / 2 0;
+    padding: $grid-gutter-width * 0.5 0;
     margin-bottom: 1rem;
 
     p {
@@ -801,11 +803,11 @@ img.qrcode {
       }
 
       &.alinhamento-left {
-        margin-right: $grid-gutter-width / 2;
+        margin-right: $grid-gutter-width * 0.5;
       }
 
       &.alinhamento-right {
-        margin-left: $grid-gutter-width / 2;
+        margin-left: $grid-gutter-width * 0.5;
       }
     }
 

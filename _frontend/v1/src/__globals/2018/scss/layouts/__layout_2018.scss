@@ -1,13 +1,15 @@
+@use "sass:math";
+
 .container-box {
   margin: 0 auto $grid-gutter-width;
   background: darken($color_main_bg, 3%) $url_bg_png;
-  padding-bottom: $grid-gutter-width / 2;
+  padding-bottom: $grid-gutter-width * 0.5;
   position: relative;
   .box-area-trabalho {
     display: inline-block;
     position: absolute;
-    right: $grid-gutter-width / 2;
-    margin-top: $grid-gutter-width / -3;
+    right: $grid-gutter-width * 0.5;
+    margin-top: math.div($grid-gutter-width, -3);
 
     a {
       border: 1px solid darken($color_main_bg, 1%);
@@ -16,7 +18,7 @@
       line-height: 1;
       background: darken($color_main_bg, 40%) $url_bg_png;
       color: #fff;
-      padding: 3px $grid-gutter-width / 2;
+      padding: 3px $grid-gutter-width * 0.5;
     }
   }
 
@@ -256,7 +258,7 @@
 }
 
 .page-subheader {
-  padding: $grid-gutter-width /2 ;
+  padding: $grid-gutter-width *0.5 ;
   background: darken($color_main_bg, 3%) $url_bg_png;
   border-radius: 5px 5px 0 0;
   border-bottom: 1px solid $color_container_border;

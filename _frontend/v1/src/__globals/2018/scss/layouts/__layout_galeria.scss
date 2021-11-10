@@ -1,3 +1,5 @@
+@use "sass:math";
+
 .container-thumbnails {
   display: flex;
   flex-wrap: wrap;
@@ -80,7 +82,7 @@
 }
 
 .container-gallery {
-  margin: 0 $grid-gutter-width / -2 ;
+  margin: 0 math.div($grid-gutter-width, -2) ;
   position: relative;
   z-index: 5000;
 
@@ -151,7 +153,7 @@
       width: 95%;
       overflow-y: auto;
       height: 100%;
-      padding: $grid-gutter-width * 2 $grid-gutter-width / 4 $grid-gutter-width / 4 $grid-gutter-width;
+      padding: $grid-gutter-width * 2 $grid-gutter-width * 0.25 $grid-gutter-width * 0.25 $grid-gutter-width;
     }
     .show-descricao {
       font-size: 75%;

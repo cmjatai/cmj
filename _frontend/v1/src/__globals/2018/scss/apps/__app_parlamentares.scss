@@ -1,3 +1,5 @@
+@use "sass:math";
+
 .container-legislaturas {
   font-family: "Lato";
   text-align: center;
@@ -38,7 +40,7 @@
     } 
   }
   .inner-topo {
-    padding: $grid-gutter-width / 2 0;
+    padding: $grid-gutter-width * 0.5 0;
   }
   .inner-sessoes, .inner-legis {
     a {
@@ -61,28 +63,28 @@
     width: 100%;
     span {
       border-radius: 10px;
-      padding: $grid-gutter-width / 2;
+      padding: $grid-gutter-width * 0.5;
     }
   }
   .inner-sessoes {
-    padding: 0 $grid-gutter-width / 2 $grid-gutter-width / 2;
+    padding: 0 $grid-gutter-width * 0.5 $grid-gutter-width * 0.5;
     a {
-      padding: 0px $grid-gutter-width / 2;
-      margin: $grid-gutter-width / 2 $grid-gutter-width / 3 0;
+      padding: 0px $grid-gutter-width * 0.5;
+      margin: $grid-gutter-width * 0.5 math.div($grid-gutter-width, 3) 0;
       border: 1px solid #bbb;
     }
   }
   .inner-mesa {
-    padding: 0 $grid-gutter-width / 2 $grid-gutter-width / 2;
+    padding: 0 $grid-gutter-width * 0.5 $grid-gutter-width * 0.5;
     border: solid #bbb;
     border-width: 1px 0 0 1px;
-    margin-left: -$grid-gutter-width / 2 - 1px;
+    margin-left: -$grid-gutter-width * 0.5 - 1px;
   }
 
   .inner-parlamentares {
     background: $hover_background_05p;
     .inner-ativos {
-      padding: $grid-gutter-width / 2;
+      padding: $grid-gutter-width * 0.5;
     }
     .avatar {
       margin: 0.6em;
@@ -106,7 +108,7 @@
   }
   .inner-extra {
     background: $hover_background_10p;
-    padding: $grid-gutter-width / 2 0;
+    padding: $grid-gutter-width * 0.5 0;
   }
   .inner-inativos {
     border: 0 solid #bbb;

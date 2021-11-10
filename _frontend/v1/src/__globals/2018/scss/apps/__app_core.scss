@@ -148,7 +148,7 @@
 .ier {
   background: darken($color_main_bg, 10%) $url_bg_png;
   height: 100px;
-  margin: 0 $grid-gutter-width / 2 $grid-gutter-width $grid-gutter-width / 2;
+  margin: 0 $grid-gutter-width * 0.5 $grid-gutter-width $grid-gutter-width * 0.5;
   overflow: hidden;
   position: relative;
   .etiqueta {
@@ -302,7 +302,7 @@
 
 @media screen and (max-width: 1199px) {
   .container-login {
-    margin: 0 10% $grid-gutter-width/2;
+    margin: 0 10% $grid-gutter-width*0.5;
     .btns-login {
       .col-lg-6 {
         padding: 0;
@@ -360,12 +360,12 @@
 
 @media screen and (max-width: 767px) {
   .container-login {
-    margin: $grid-gutter-width / 2 0;
+    margin: $grid-gutter-width * 0.5 0;
     .inner {
-      padding: $grid-gutter-width / 2;
+      padding: $grid-gutter-width * 0.5;
     }
     .input-icon {
-      margin: $grid-gutter-width / 2;
+      margin: $grid-gutter-width * 0.5;
     }
     .btns-login {
       .btn-login {
