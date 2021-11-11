@@ -1107,7 +1107,8 @@ class SessaoCrud(Crud):
                 votacoes_da_materia = RegistroVotacao.objects.filter(
                     materia=m, tipo_resultado_votacao__natureza__in=(
                         'A', 'R'
-                    )
+                    ),
+                    ordem__sessao_plenaria__tipo__gera_selo_votacao=True
                 ).order_by('data_hora')
 
                 titulopre = ''
