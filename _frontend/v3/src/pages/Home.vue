@@ -1,14 +1,14 @@
 <template>
   <div>
     <h1>{{teste}}</h1>
-      <img src="../assets/logo.png" alt="logo" />
+            <img src="../assets/logo.png" alt="logo" /> 
   </div>
 </template>
 <script>
-export default {
+export default { 
   data() {
     return {
-      teste: 'Home'
+      teste: 'Home' 
     }
   },
 }

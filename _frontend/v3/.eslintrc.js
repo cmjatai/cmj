@@ -5,9 +5,10 @@ module.exports = {
     browser: true
   },
   extends: [
-    'plugin:vue/vue3-essential',
     'eslint:recommended',
-    'plugin:prettier/recommended'
+    'plugin:vue/vue3-recommended',
+    // "plugin:prettier/recommended",
+    'prettier'
   ],
   parserOptions: {
     parser: '@babel/eslint-parser'
@@ -22,7 +23,8 @@ module.exports = {
       }
     ],
     'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
+    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+    'vue/require-default-prop': 'on'
   },
   globals: {}
 }
