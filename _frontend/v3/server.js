@@ -1,6 +1,11 @@
-const fs = require('fs')
-const path = require('path')
-const express = require('express')
+import fs from 'fs'
+import express from 'express'
+import Vite from 'vite'
+import path from 'path'
+
+import { fileURLToPath } from 'url'
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 const isTest = process.env.NODE_ENV === 'test' || !!process.env.VITE_TEST_BUILD
 
@@ -26,7 +31,7 @@ async function createServer(
    */
   let vite
   if (!isProd) {
-    vite = await require('vite').createServer({
+    vite = await Vite.createServer({
       root,
       logLevel: isTest ? 'error' : 'info',
       server: {
@@ -89,6 +94,4 @@ if (!isTest) {
     })
   )
 }
-
-// for test use
-exports.createServer = createServer
+export default createServer

@@ -6,13 +6,18 @@ module.exports = {
   },
   extends: [
     'eslint:recommended',
-    'plugin:vue/vue3-recommended',
+    'plugin:vue/vue3-strongly-recommended',
     // "plugin:prettier/recommended",
-    'prettier'
+    'prettier',
+    '@vue/prettier'
   ],
+  parser: 'vue-eslint-parser',
+
   parserOptions: {
-    parser: '@babel/eslint-parser'
+    parser: '@babel/eslint-parser',
+    sourceType: 'module'
   },
+  plugins: ['vue'],
   rules: {
     'prettier/prettier': [
       'warn',

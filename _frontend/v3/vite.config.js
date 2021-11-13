@@ -1,9 +1,11 @@
-const vuePlugin = require('@vitejs/plugin-vue')
-const eslintPlugin = require('vite-plugin-eslint')
-console.log(eslintPlugin)
-module.exports = {
-  plugins: [vuePlugin(), eslintPlugin()],
-  build: {
-    minify: false
-  }
-}
+import { defineConfig } from 'vite'
+import vuePlugin from '@vitejs/plugin-vue'
+
+export default defineConfig({
+  plugins: [vuePlugin()]
+})
+
+// export const plugins = [vuePlugin(), eslintPlugin()]
+// export const build = {
+//   minify: false
+// }
