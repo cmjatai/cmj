@@ -1,0 +1,18 @@
+version: "3.7"
+services:
+  cmj3-dev:
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    container_name: cmj3-dev
+    labels:
+       NAME: "Cmj3"
+    restart: always
+    ports:
+      - "3000:3000"
+    networks:
+      - cmj3-net
+networks:
+  cmj3-net:
+    name: cmj3-net
+    driver: bridge

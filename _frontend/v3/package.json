@@ -1,32 +1,36 @@
 {
-  "name": "v3",
-  "private": true,
-  "version": "1.0.0",
-  "type": "module",
   "scripts": {
-    "dev": "node server",
-    "build": "rm -rf dist && npm run build:client && npm run build:server",
-    "build:client": "vite build --ssrManifest --outDir dist/client",
-    "build:server": "vite build --ssr src/entry-server.js --outDir dist/server",
-    "generate": "vite build --ssrManifest --outDir dist/static && npm run build:server && node prerender",
-    "serve": "cross-env NODE_ENV=production node server",
-    "debug": "node --inspect-brk server"
+    "start": "npm run dev",
+    "dev": "ts-node ./server",
+    "prod": "npm run build && npm run prod:serve",
+    "// Build for production": "",
+    "build": "npm run build:clean && npm run build:vite && npm run build:prerender",
+    "build:clean": "rimraf dist/",
+    "build:vite": "vite build && vite build --ssr",
+    "build:prerender": "vite-plugin-ssr prerender",
+    "// Static serve for production": "",
+    "prod:serve": "serve dist/client/ --listen 3000"
   },
   "dependencies": {
-    "vue": "^3.2.21",
-    "vue-router": "~4.0.0",
-    "vuex": "~4.0.0"
+    "@types/express": "^4.17.13",
+    "@types/node": "^16.11.0",
+    "@types/node-fetch": "^2.5.12",
+    "@vitejs/plugin-vue": "^1.9.3",
+    "@vue/compiler-sfc": "3.2.20",
+    "@vue/server-renderer": "3.2.20",
+    "cross-fetch": "^3.1.4",
+    "express": "^4.17.1",
+    "node-fetch": "^2.6.1",
+    "rimraf": "^3.0.2",
+    "serve": "^12.0.1",
+    "ts-node": "^10.3.0",
+    "typescript": "^4.4.4",
+    "vite": "^2.6.7",
+    "vite-plugin-md": "^0.11.1",
+    "vite-plugin-ssr": "0.3.27",
+    "vue": "3.2.20"
   },
-  "devDependencies": {
-    "@babel/eslint-parser": "~7.16.0",
-    "@vitejs/plugin-vue": "~1.9.0",
-    "compression": "^1.7.4",
-    "cross-env": "^7.0.3",
-    "eslint": "^8.2.0",
-    "eslint-plugin-vue": "^8.0.3",
-    "express": "~4.17.0",
-    "prettier": "^2.4.1",
-    "serve-static": "^1.14.1",
-    "vite": "^2.6.14"
-  }
+  "// Needed for Yarn workspaces": "",
+  "name": "example-vue-full",
+  "version": "0.0.0"
 }
