@@ -6,17 +6,15 @@ WORKDIR /app
 COPY _frontend/v3/package.json .
 COPY _frontend/v3/yarn.lock .
 
-RUN rm -rf dist
-RUN rm -rf node_modules
 
 RUN yarn install
 COPY _frontend/v3/. .
-RUN npm run build
+RUN yarn build
 
 
 EXPOSE 3000
 
-CMD [ "npm", "run", "prod:serve" ]
+CMD [ "yarn", "prod" ]
 
 # estágio de produção
 #FROM nginx:stable-alpine as production-stage
