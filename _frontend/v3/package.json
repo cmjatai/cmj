@@ -5,8 +5,8 @@
     "start": "npm run dev",
     "dev": "ts-node ./server",
     "build": "npm run build:client && npm run build:server",
-    "build:client": "vite build --ssrManifest --outDir dist/client",
-    "build:server": "vite build --outDir dist/server --ssr src/entry-server.ts",
+    "build:client": "vite build --outDir dist/client --ssrManifest",
+    "build:server": "vite build --outDir dist/server --ssr src/entry-server.ts ",
     "build:start": "NODE_ENV=production ts-node ./server",
     "prod": "npm run build && npm run build:start"
 

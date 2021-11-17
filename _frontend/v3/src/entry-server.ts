@@ -3,7 +3,6 @@ import { renderToString, SSRContext} from 'vue/server-renderer'
 
 export async function render(url:string, ssrMmanifest: object, rootDir: string) {
   const { app, router } = createApp()
-
   router.push(url)
   await router.isReady()
 

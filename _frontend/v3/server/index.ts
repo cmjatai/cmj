@@ -11,7 +11,6 @@ startServer()
 async function startServer() {
   const app = express()
 
-
   const indexProd = isProduction
     ? fs.readFileSync(
       path.resolve(root, 'dist/client/index.html'),
@@ -23,6 +22,7 @@ async function startServer() {
   let viteDevServer: any
   if (isProduction) {
     app.use(express.static(`${root}/dist/client`, {index: false}))
+    app.use('/favicon.ico', express.static(`${root}/dist/client/favicon.ico`))
   } else {
     viteDevServer = await vite.createServer({
       root,
@@ -77,7 +77,7 @@ async function startServer() {
 
             const reIncludeMask = value.reIncludeMask ? mask : ''
             html = html.replace(mask, `${value.rendered}${reIncludeMask}`)  
-            
+
             // console.log(value, mask, reIncludeMask,  html)        
           })
         })
