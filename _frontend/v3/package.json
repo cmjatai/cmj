@@ -4,7 +4,9 @@
     "dev": "ts-node ./server",
     "build": "npm run build:client && npm run build:server",
     "build:client": "vite build --outDir dist/client",
-    "build:server": "vite build --outDir dist/server --ssr src/entry-server.js "
+    "build:server": "vite build --outDir dist/server --ssr src/entry-server.ts",
+
+    "prod": "NODE_ENV=production ts-node ./server"
   },
   "dependencies": {
     "@types/express": "^4.17.13",

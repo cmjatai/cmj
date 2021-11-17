@@ -11,6 +11,14 @@ startServer()
 async function startServer() {
   const app = express()
 
+
+  const indexProd = isProduction
+    ? fs.readFileSync(
+      path.resolve(root, 'dist/client/index.html'),
+      'utf-8'
+    ) : ''
+      
+
   let viteDevServer: any
   if (isProduction) {
     app.use(express.static(`${root}/dist/client`))
@@ -26,33 +34,30 @@ async function startServer() {
     const url = req.originalUrl
 
     try {
-      // 1. Read index.html
-      let template = fs.readFileSync(
-        path.resolve(root, 'index.html'),
-        'utf-8'
-      )
 
-      // 2. Apply Vite HTML transforms. This injects the Vite HMR client, and
-      //    also applies HTML transforms from Vite plugins, e.g. global preambles
-      //    from @vitejs/plugin-react-refresh
-      template = await viteDevServer.transformIndexHtml(url, template)
+      let template: any
+      let render: any
 
-      // 3. Load the server entry. vite.ssrLoadModule automatically transforms
-      //    your ESM source code to be usable in Node.js! There is no bundling
-      //    required, and provides efficient invalidation similar to HMR.
-      const { render } = await viteDevServer.ssrLoadModule('/src/entry-server.ts')
+      if (!isProduction) {
+        // always read fresh template in dev
+        template = fs.readFileSync(path.resolve(root, 'index.html'), 'utf-8')
+        template = await viteDevServer.transformIndexHtml(url, template)
 
-      // 4. render the app HTML. This assumes entry-server.js's exported `render`
-      //    function calls appropriate framework SSR APIs,
-      //    e.g. ReactDOMServer.renderToString()
-      console.log(render)
+        render = await viteDevServer.ssrLoadModule('/src/entry-server.ts')
+        render = render.render
+      } else {
+        template = indexProd
+        render = require('../dist/server/entry-server.js')
+        render = render.render
+      }
+
       const appHtml = await render(url)
 
       // 5. Inject the app-rendered HTML into the template.
       const html = template.replace(`<!--ssr-outlet-->`, appHtml)
 
       // 6. Send the rendered HTML back.
-      res.status(200).end(html) //.set({ 'Content-Type': 'text/html' })
+      res.status(200).set({ 'Content-Type': 'text/html' }).end(html) //
     } catch (e: any) {
       // If an error is caught, let Vite fix the stracktrace so it maps back to
       // your actual source code.
