@@ -53,24 +53,37 @@ async function startServer() {
         render = render.render
       }
 
-      const [appHtml, preloadLinks] = await render(url, ssrMmanifest, __dirname)
+      const rendered = await render(url, ssrMmanifest, __dirname)
       
-      const repls = {
-        '<!--head-links-->': [
-          {rendered:preloadLinks, reInludeKey: true}
-        ],
-        '<!--ssr-outlet-->': [
-          {rendered:appHtml, reInludeKey: false}
-        ],
-      }
+      const repls = [ 
+        { // subset
+          '<!--head-links-->': [  //mask: [rendereds]
+            {rendered:rendered.favicons, reIncludeMask: true},
+            {rendered:rendered.preloadLinks, reIncludeMask: false}
+          ]
+        },
+        {
+          '<!--ssr-outlet-->': [
+            {rendered:rendered.appHtml, reIncludeMask: false}
+          ],
+        }
+      ]
 
       let html = template
 
-      Object.keys(repls).map((mask: string) => {
-        repls[mask].forEach((value:any) => {
-          html = html.replace(mask, `${value.rendered}${value.reIncludeKey?mask:''}`)          
-        });
-      });
+      repls.forEach((subset: any) => {
+        Object.keys(subset).map((mask: string) => {
+          subset[mask].forEach((value:any) => {
+
+            const reIncludeMask = value.reIncludeMask ? mask : ''
+            html = html.replace(mask, `${value.rendered}${reIncludeMask}`)  
+            
+            // console.log(value, mask, reIncludeMask,  html)        
+          })
+        })
+      })
+      // html = html.split('><').join('>\n<')
+      // html = html.split('> <').join('>\n<')      
       // console.log(repls, html)
 
       res.status(200).set({ 'Content-Type': 'text/html' }).end(html) //

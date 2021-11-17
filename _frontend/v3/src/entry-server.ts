@@ -11,10 +11,23 @@ export async function render(url:string, ssrMmanifest: object, rootDir: string) 
   let html = await renderToString(app, ctx)
   
   const preloadLinks = renderPreloadLinks(ctx.modules, ssrMmanifest)
-  return [html, preloadLinks]
+
+  const renderedFavIcons = renderFavIcons()
+
+  return {
+    appHtml: html,
+    favicons: renderedFavIcons,
+    preloadLinks: preloadLinks
+  }
 }
 
-function renderPreloadLinks(modules:any, ssrMmanifest:object) {
+function renderFavIcons(): string {
+  let links: string = '<link rel=icon type=image/png sizes=32x32  href="/img/icons/favicon-32x32.png">'
+  links += '<link rel=icon type=image/png sizes=16x16  href="/img/icons/favicon-16x16.png">'
+  return links
+}
+
+function renderPreloadLinks(modules:any, ssrMmanifest:any):string {
   // console.log(ssrMmanifest)
   let links = ''
   const seen = new Set()
