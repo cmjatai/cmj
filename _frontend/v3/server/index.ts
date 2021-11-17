@@ -18,7 +18,7 @@ async function startServer() {
       'utf-8'
     ) : ''
       
-  const manifest = isProduction ? JSON.parse(fs.readFileSync(path.resolve(root, 'dist/client/ssr-manifest.json'), 'utf-8')) : {}
+  const ssrMmanifest = isProduction ? JSON.parse(fs.readFileSync(path.resolve(root, 'dist/client/ssr-manifest.json'), 'utf-8')) : {}
 
   let viteDevServer: any
   if (isProduction) {
@@ -33,6 +33,7 @@ async function startServer() {
 
   app.get('*', async (req, res, next) => {
     const url = req.originalUrl
+    console.log(url)
 
     try {
 
@@ -51,15 +52,33 @@ async function startServer() {
         render = require('../dist/server/entry-server.js')
         render = render.render
       }
-      const [appHtml, preloadLinks] = await render(url, manifest, __dirname)
+
+      const [appHtml, preloadLinks] = await render(url, ssrMmanifest, __dirname)
       
-      const html = template
-        .replace(`<!--preload-links-->`, preloadLinks)
-        .replace('<!--ssr-outlet-->', appHtml)
+      const repls = {
+        '<!--head-links-->': [
+          {rendered:preloadLinks, reInludeKey: true}
+        ],
+        '<!--ssr-outlet-->': [
+          {rendered:appHtml, reInludeKey: false}
+        ],
+      }
+
+      let html = template
+
+      Object.keys(repls).map((mask: string) => {
+        repls[mask].forEach((value:any) => {
+          html = html.replace(mask, `${value.rendered}${value.reIncludeKey?mask:''}`)          
+        });
+      });
+      // console.log(repls, html)
 
       res.status(200).set({ 'Content-Type': 'text/html' }).end(html) //
+
     } catch (e: any) {
-      viteDevServer.ssrFixStacktrace(e)
+      if (!isProduction) {
+        viteDevServer.ssrFixStacktrace(e)
+      }
       console.error(e)
       res.status(500).end(e.message)
     }
