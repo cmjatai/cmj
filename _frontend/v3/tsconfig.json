@@ -7,7 +7,9 @@
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "types": ["vite/client"],
     "skipLibCheck": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+
+    "sourceMap": true
   },
   "ts-node": {
     "transpileOnly": true,

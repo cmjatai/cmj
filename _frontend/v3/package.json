@@ -5,7 +5,7 @@
     "start": "npm run dev",
     "dev": "ts-node ./server",
     "build": "npm run build:client && npm run build:server",
-    "build:client": "vite build --outDir dist/client",
+    "build:client": "vite build --ssrManifest --outDir dist/client",
     "build:server": "vite build --outDir dist/server --ssr src/entry-server.ts",
 
     "prod": "NODE_ENV=production ts-node ./server"
@@ -20,6 +20,9 @@
     "ts-node": "^10.3.0",
     "typescript": "^4.4.4",
     "vite": "~2.6.0",
-    "vue": "~3.2.0"
+    "vue": "~3.2.0",
+
+    "vue-router": "~4.0.0",
+    "vuex": "~4.0.0"
   }
 }

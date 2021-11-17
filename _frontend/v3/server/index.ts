@@ -18,6 +18,7 @@ async function startServer() {
       'utf-8'
     ) : ''
       
+  const manifest = isProduction ? JSON.parse(fs.readFileSync(path.resolve(root, 'dist/client/ssr-manifest.json'), 'utf-8')) : {}
 
   let viteDevServer: any
   if (isProduction) {
@@ -50,9 +51,12 @@ async function startServer() {
         render = require('../dist/server/entry-server.js')
         render = render.render
       }
+      const [appHtml, preloadLinks] = await render(url, manifest, __dirname)
+      
+      const html = template
+        .replace(`<!--preload-links-->`, preloadLinks)
+        .replace('<!--ssr-outlet-->', appHtml)
 
-      const appHtml = await render(url)
-      const html = template.replace('<!--ssr-outlet-->', appHtml)
       res.status(200).set({ 'Content-Type': 'text/html' }).end(html) //
     } catch (e: any) {
       viteDevServer.ssrFixStacktrace(e)
