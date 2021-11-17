@@ -2,14 +2,9 @@
   "scripts": {
     "start": "npm run dev",
     "dev": "ts-node ./server",
-    "prod": "npm run build && npm run prod:serve",
-    "// Build for production": "",
-    "build": "npm run build:clean && npm run build:vite && npm run build:prerender",
-    "build:clean": "rimraf dist/",
-    "build:vite": "vite build && vite build --ssr",
-    "build:prerender": "vite-plugin-ssr prerender",
-    "// Static serve for production": "",
-    "prod:serve": "serve dist/client/ --listen 3000"
+    "build": "npm run build:client && npm run build:server",
+    "build:client": "vite build --outDir dist/client",
+    "build:server": "vite build --outDir dist/server --ssr src/entry-server.js "
   },
   "dependencies": {
     "@types/express": "^4.17.13",
