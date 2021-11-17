@@ -21,7 +21,7 @@ async function startServer() {
 
   let viteDevServer: any
   if (isProduction) {
-    app.use(express.static(`${root}/dist/client`))
+    app.use(express.static(`${root}/dist/client`, {index: false}))
   } else {
     viteDevServer = await vite.createServer({
       root,
@@ -52,15 +52,9 @@ async function startServer() {
       }
 
       const appHtml = await render(url)
-
-      // 5. Inject the app-rendered HTML into the template.
-      const html = template.replace(`<!--ssr-outlet-->`, appHtml)
-
-      // 6. Send the rendered HTML back.
+      const html = template.replace('<!--ssr-outlet-->', appHtml)
       res.status(200).set({ 'Content-Type': 'text/html' }).end(html) //
     } catch (e: any) {
-      // If an error is caught, let Vite fix the stracktrace so it maps back to
-      // your actual source code.
       viteDevServer.ssrFixStacktrace(e)
       console.error(e)
       res.status(500).end(e.message)

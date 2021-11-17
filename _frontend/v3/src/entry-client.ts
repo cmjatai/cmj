@@ -1,7 +1,7 @@
 import { createApp } from './main'
 
 const { app } = createApp()
-app.mount('#app')
+app.mount('#app', true)
 
 // wait until router is ready before mounting to ensure hydration match
 //router.isReady().then(() => {
