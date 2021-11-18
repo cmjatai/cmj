@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-  import { usePageContext } from '../../renderer/usePageContext'
+  import { usePageContext } from '../../app/usePageContext'
 
   const ctx:any = usePageContext()
 

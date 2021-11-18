@@ -44,7 +44,7 @@ async function startServer() {
         template = fs.readFileSync(path.resolve(root, 'index.html'), 'utf-8')
         template = await viteDevServer.transformIndexHtml(url, template)
 
-        render = await viteDevServer.ssrLoadModule('/renderer/entry-server.ts')
+        render = await viteDevServer.ssrLoadModule('/app/entry-server.ts')
         render = render.render
       } else {
         template = indexProd

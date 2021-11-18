@@ -1,16 +1,14 @@
 # estágio de compilação
-FROM node:14.18.1-buster-slim
+FROM node:lts-buster-slim
 
 WORKDIR /app
 
 COPY _frontend/v3/package.json .
 COPY _frontend/v3/yarn.lock .
 
-
 RUN yarn install
 COPY _frontend/v3/. .
 RUN yarn build
-
 
 EXPOSE 3000
 
