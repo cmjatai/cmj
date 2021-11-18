@@ -1,11 +1,13 @@
 import vue from '@vitejs/plugin-vue'
-import { UserConfig } from 'vite'
+import { defineConfig } from 'vite'
 
-const config: UserConfig = {
-  plugins: [
-    vue(),
-  ],
-  clearScreen: false
-}
 
-export default config
+export default defineConfig(({ command, mode }) => {
+  return {
+    plugins: [
+      vue(),
+    ],
+    clearScreen: false,
+    envPrefix: 'V3_'
+  }
+})

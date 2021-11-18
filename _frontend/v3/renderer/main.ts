@@ -28,6 +28,7 @@ function createApp(pageContext: PageContext) {
   setPageContext(app, pageContextReactive,  (title:string) => {
     pageContext.documentProps.title = title
 
+    
     if ( !import.meta.env.SSR ) {
       document.title = title
     }

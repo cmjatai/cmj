@@ -9,6 +9,7 @@ export async function render(url:string, ssrMmanifest: object, rootDir: string) 
       title: 'V3 Project'
     }
   }
+
   const { app, router } = createApp(pageContext)
   router.push(url)
   await router.isReady()
