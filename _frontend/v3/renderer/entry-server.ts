@@ -1,19 +1,26 @@
 import { createApp } from './main'
 import { renderToString, SSRContext} from 'vue/server-renderer'
+import type { PageContext } from './types'
 
 export async function render(url:string, ssrMmanifest: object, rootDir: string) {
-  const { app, router } = createApp()
+
+  const pageContext: PageContext = {
+    documentProps: {
+      title: 'V3 Project'
+    }
+  }
+  const { app, router } = createApp(pageContext)
   router.push(url)
   await router.isReady()
 
   const ctx: SSRContext = {}
   let html = await renderToString(app, ctx)
-  
-  const preloadLinks = renderPreloadLinks(ctx.modules, ssrMmanifest)
 
+  const preloadLinks = renderPreloadLinks(ctx.modules, ssrMmanifest)
   const renderedFavIcons = renderFavIcons()
 
   return {
+    titleHtml: pageContext.documentProps?.title,
     appHtml: html,
     favicons: renderedFavIcons,
     preloadLinks: preloadLinks

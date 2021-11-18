@@ -33,7 +33,6 @@ async function startServer() {
 
   app.get('*', async (req, res, next) => {
     const url = req.originalUrl
-    console.log(url)
 
     try {
 
@@ -56,10 +55,15 @@ async function startServer() {
       const rendered = await render(url, ssrMmanifest, __dirname)
       
       const repls = [ 
+        {
+          '<!--title-html-->': [
+            {rendered: rendered.titleHtml, reIncludeMask: false}
+          ]
+        },
         { // subset
           '<!--head-links-->': [  //mask: [rendereds]
-            {rendered:rendered.favicons, reIncludeMask: true},
-            {rendered:rendered.preloadLinks, reIncludeMask: false}
+            {rendered: rendered.favicons, reIncludeMask: true},
+            {rendered: rendered.preloadLinks, reIncludeMask: false}
           ]
         },
         {

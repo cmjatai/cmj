@@ -6,9 +6,12 @@
 </template> 
 <script setup lang="ts">
   import HelloWorld from '../components/HelloWorld.vue'
+  import { usePageContext } from '../../renderer/usePageContext'
 
-  
-  
+  const ctx:any = usePageContext()
+
+  ctx.updateTitle('Título Dinamico')  
+
 </script>
 <style>
 h1,

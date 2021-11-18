@@ -1,15 +1,14 @@
 <template>
-  <h1>{{ msg }}</h1>
+  <h1>{{ ctx.pageContext.documentProps.title }}</h1>
 </template>
 
-<script>
-export default {
-  async setup() {
-    return {
-      msg: 'About'
-    } 
-  }
-}
+<script setup lang="ts">
+  import { usePageContext } from '../../renderer/usePageContext'
+
+  const ctx:any = usePageContext()
+
+  ctx.updateTitle('About - Título Dinamico')  
+
 </script>
 
 <style scoped>

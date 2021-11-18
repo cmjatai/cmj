@@ -1,12 +1,38 @@
 import App from './App.vue'
-import { createSSRApp } from 'vue'
+import { createSSRApp, defineComponent, h, markRaw, reactive } from 'vue'
+import { setPageContext } from './usePageContext'
 import { createRouter } from './router'
+import type { Component, PageContext } from './types'
 
-// SSR requires a fresh app instance per request, therefore we export a function
-// that creates a fresh app instance. If using Vuex, we'd also be creating a
-// fresh store here.
-export function createApp() {
-  const app = createSSRApp(App)
+
+
+export { createApp }
+
+function createApp(pageContext: PageContext) {
+  let rootComponent: Component
+  const PageWithShareContext = defineComponent({
+    data: () => ({}),
+    created() {
+      rootComponent = this
+    },
+    render() {
+      return h(App)      
+    }
+  })
+
+  const app = createSSRApp(PageWithShareContext)
+
+  const pageContextReactive = reactive(pageContext)
+  
+
+  setPageContext(app, pageContextReactive,  (title:string) => {
+    pageContext.documentProps.title = title
+
+    if ( !import.meta.env.SSR ) {
+      document.title = title
+    }
+  })
+  
   const router = createRouter()
   app.use(router)
   return { app, router }
