@@ -12,14 +12,17 @@ export default defineConfig(({ command, mode }) => {
   return {
     clearScreen: false,
     envPrefix: 'V3_',
+    build: {
+      sourcemap: true,
+    },
     plugins: [
       vue(), 
       VitePWA({
         registerType: 'autoUpdate',
         includeAssets: ['favicon.ico', 'robots.txt'],  
-        workbox: {
-          sourcemap: true  
-        },      
+        strategies: 'injectManifest',
+        srcDir: 'app',
+        filename: 'sw.ts',
         manifest: {
           name: "V3 Project",
           short_name: "V3",

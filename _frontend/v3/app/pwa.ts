@@ -11,6 +11,6 @@ const updateSW = registerSW({
     },
     onRegistered(registration: ServiceWorkerRegistration | undefined) {
         console.log('pwa: isReady from router.ts - onRegistred')
-        console.log(registration)
+        //console.log(registration)
     }
 })
