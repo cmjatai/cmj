@@ -1,8 +1,9 @@
-import App from './App.vue'
 import { createSSRApp, defineComponent, h, reactive } from 'vue'
 import { setPageContext } from './usePageContext'
 import { createRouter } from './router'
 import type { Component, PageContext } from './types'
+import App from './App.vue'
+import Api from './plugins/api'
 
 export { createApp }
 
@@ -33,5 +34,6 @@ function createApp(pageContext: PageContext) {
   
   const router = createRouter()
   app.use(router)
+  app.use(Api)
   return { app, router }
 }
