@@ -1,5 +1,7 @@
+import '@/assets/scss/app.scss'
+
 import { createApp } from '~/main'
-import type { PageContext } from './types'
+import type { PageContext } from '~/types'
 
 const pageContext: PageContext = {
   documentProps: {

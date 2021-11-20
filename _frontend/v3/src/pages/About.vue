@@ -1,9 +1,11 @@
 <template>
   <h1>{{ ctx.pageContext.documentProps.title }}</h1>
+
+    <img src="/img/fundo_topo.jpg" alt="logo" />     
 </template>
 
 <script setup lang="ts">
-  import { usePageContext } from '../../app/usePageContext'
+  import { usePageContext } from '~/usePageContext'
 
   const ctx:any = usePageContext()
 

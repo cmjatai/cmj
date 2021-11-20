@@ -27,6 +27,7 @@
     "vuex": "~4.0.0"
   },
   "devDependencies": {
+    "sass": "^1.43.4",
     "vite-plugin-pwa": "^0.11.5",
     "workbox-build": "^6.4.1",
     "workbox-core": "^6.4.1",

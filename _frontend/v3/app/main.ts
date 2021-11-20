@@ -22,11 +22,9 @@ function createApp(pageContext: PageContext) {
   const app = createSSRApp(PageWithShareContext)
 
   const pageContextReactive = reactive(pageContext)
-  
 
   setPageContext(app, pageContextReactive,  (title:string) => {
     pageContext.documentProps.title = title
-
     
     if ( !import.meta.env.SSR ) {
       document.title = title
