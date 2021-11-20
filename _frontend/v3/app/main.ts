@@ -1,14 +1,13 @@
 import App from './App.vue'
-import { createSSRApp, defineComponent, h, markRaw, reactive } from 'vue'
+import { createSSRApp, defineComponent, h, reactive } from 'vue'
 import { setPageContext } from './usePageContext'
 import { createRouter } from './router'
 import type { Component, PageContext } from './types'
 
-
-
 export { createApp }
 
 function createApp(pageContext: PageContext) {
+
   let rootComponent: Component
   const PageWithShareContext = defineComponent({
     data: () => ({}),

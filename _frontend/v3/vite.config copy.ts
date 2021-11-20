@@ -15,11 +15,11 @@ export default defineConfig(({ command, mode }) => {
     plugins: [
       vue(), 
       VitePWA({
+        strategies: "injectManifest",
         registerType: 'autoUpdate',
-        includeAssets: ['favicon.ico', 'robots.txt'],  
         workbox: {
           sourcemap: true  
-        },      
+        },
         manifest: {
           name: "V3 Project",
           short_name: "V3",

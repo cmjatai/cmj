@@ -9,6 +9,8 @@ const pageContext: PageContext = {
 const { app, router } = createApp(pageContext)
 
 // wait until router is ready before mounting to ensure hydration match
-router.isReady().then(() => {
+router.isReady().then(async () => {
+  await import('./pwa')
   app.mount('#app')
+
 })
