@@ -11,7 +11,8 @@
     "esModuleInterop": true,
     "isolatedModules": true,
     "paths": {
-      "~/*": ["./src/*"]
+      "~/*": ["./app/*"],
+      "@/*": ["./src/*"]
     }
   },
   "ts-node": {

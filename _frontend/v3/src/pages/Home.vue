@@ -1,12 +1,12 @@
 <template>
   <div>
-    <img src="../assets/logo.png" alt="logo" />     
+    <img src="@/assets/logo.png" alt="logo" />     
     <HelloWorld msg="Hello Vue 3 + TypeScript + Vite" />
   </div> 
 </template> 
-<script setup lang="ts">
-  import HelloWorld from '../components/HelloWorld.vue'
-  import { usePageContext } from '../../app/usePageContext'
+<script async setup lang="ts">
+  import HelloWorld from '@/components/HelloWorld.vue'
+  import { usePageContext } from '~/usePageContext'
 
   const ctx:any = usePageContext()
 

@@ -1,4 +1,4 @@
-import { createApp } from './main'
+import { createApp } from '~/main'
 import type { PageContext } from './types'
 
 const pageContext: PageContext = {
