@@ -1,31 +1,50 @@
 import { createApp } from './main'
 import { renderToString, SSRContext} from 'vue/server-renderer'
 import type { PageContext } from './types'
+import serialize from 'serialize-javascript'
 
 export async function render(url:string, ssrMmanifest: object, rootDir: string) {
 
   const pageContext: PageContext = {
     documentProps: {
-      title: 'V3 Project'
+      title: 'V3 Project' 
     }
   }
 
-  const { app, router } = createApp(pageContext)
+  const { app, router, store} = createApp(pageContext)
   router.push(url)
   await router.isReady()
 
   const ctx: SSRContext = {}
-  let html = await renderToString(app, ctx)
+  const appHtml = await renderToString(app, ctx)
 
   const preloadLinks = renderPreloadLinks(ctx.modules, ssrMmanifest)
   const renderedFavIcons = renderFavIcons()
+  const storeSerializer = renderStore(store)
 
   return {
     titleHtml: pageContext.documentProps?.title,
-    appHtml: html,
+    appHtml: appHtml,
     favicons: renderedFavIcons,
-    preloadLinks: preloadLinks
+    preloadLinks: preloadLinks,
+    storeSerializer: storeSerializer
   }
+}
+
+function renderStore(store: any):string {
+  const str_state = serialize(store.state, {isJSON: true})
+  const autoRemove =
+        ';(function(){var s;(s=document.currentScript||document.scripts[document.scripts.length-1]).parentNode.removeChild(s);}());';
+  const nonceAttr = store.nonce ? ' nonce="' + store.nonce + '"' : ''
+  return store
+        ? '<script' +
+        nonceAttr +
+        '>window.__INITIAL_STATE__' +
+        '=' +
+        str_state +
+        autoRemove +
+        '</script>'
+        : '';
 }
 
 function renderFavIcons(): string {

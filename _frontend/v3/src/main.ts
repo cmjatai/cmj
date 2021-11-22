@@ -1,26 +1,21 @@
-import { createSSRApp, defineComponent, h, reactive } from 'vue'
+import { createApp as _createApp, createSSRApp, defineComponent, h, reactive } from 'vue'
 import { setPageContext } from './usePageContext'
 import { createRouter } from './router'
 import type { Component, PageContext } from './types'
 import App from './App.vue'
-import Api from './plugins/api'
+import { createStore } from './stores'
 
 export { createApp }
+const isSSR = typeof window === 'undefined';
 
 function createApp(pageContext: PageContext) {
 
-  let rootComponent: Component
   const PageWithShareContext = defineComponent({
-    data: () => ({}),
-    created() {
-      rootComponent = this
-    },
-    render() {
-      return h(App)      
-    }
+    components: { App },
+    render: () => h(App)
   })
 
-  const app = createSSRApp(PageWithShareContext)
+  const app = isSSR ? createSSRApp(PageWithShareContext) : createSSRApp(PageWithShareContext)
 
   const pageContextReactive = reactive(pageContext)
 
@@ -33,7 +28,10 @@ function createApp(pageContext: PageContext) {
   })
   
   const router = createRouter()
+  const store = createStore()
+
   app.use(router)
-  app.use(Api)
-  return { app, router }
+  app.use(store)
+
+  return { app, router, store }
 }

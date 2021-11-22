@@ -13,7 +13,7 @@ async function startServer() {
 
   const indexProd = isProduction
     ? fs.readFileSync(
-      path.resolve(root, 'dist/client/index.html'),
+      path.resolve(root, 'dist/client/index.template.html'),
       'utf-8'
     ) : ''
       
@@ -33,7 +33,6 @@ async function startServer() {
 
   app.get('*', async (req, res, next) => {
     const url = req.originalUrl
-
     try {
 
       let template: any
@@ -41,10 +40,10 @@ async function startServer() {
 
       if (!isProduction) {
         // always read fresh template in dev
-        template = fs.readFileSync(path.resolve(root, 'index.html'), 'utf-8')
+        template = fs.readFileSync(path.resolve(root, 'index.template.html'), 'utf-8')
         template = await viteDevServer.transformIndexHtml(url, template)
 
-        render = await viteDevServer.ssrLoadModule('/app/entry-server.ts')
+        render = await viteDevServer.ssrLoadModule('/src/entry-server.ts')
         render = render.render
       } else {
         template = indexProd
@@ -67,10 +66,15 @@ async function startServer() {
           ]
         },
         {
+          '<!--ssr-state-->': [
+            {rendered:rendered.storeSerializer, reIncludeMask: false}
+          ],
+        },
+        {
           '<!--ssr-outlet-->': [
             {rendered:rendered.appHtml, reIncludeMask: false}
           ],
-        }
+        },
       ]
 
       let html = template

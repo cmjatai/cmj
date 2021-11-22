@@ -6,7 +6,7 @@
 </template> 
 <script async setup lang="ts">
   import HelloWorld from '@/components/HelloWorld.vue'
-  import { usePageContext } from '~/usePageContext'
+  import { usePageContext } from '@/usePageContext'
 
   const ctx:any = usePageContext()
 
