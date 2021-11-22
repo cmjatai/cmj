@@ -2,6 +2,8 @@ import express from 'express'
 import * as vite from 'vite'
 import fs from 'fs'
 import path from 'path'
+import serialize from 'serialize-javascript'
+import Api from '../src/api'
 
 const isProduction = process.env.NODE_ENV === 'production'
 const root = `${__dirname}/..`
@@ -30,6 +32,17 @@ async function startServer() {
     })
     app.use(viteDevServer.middlewares)
   }
+
+  app.get('/api/*', async(req, res, next) => {
+    await Api.get(req.url).then((r) => {
+      res.json(r.data)
+    }).catch((e) => {
+      console.log(e)
+      res.json(e.response.data)
+    })
+
+    
+  })
 
   app.get('*', async (req, res, next) => {
     const url = req.originalUrl

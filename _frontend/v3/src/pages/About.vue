@@ -1,7 +1,7 @@
 <template>
   <h1>{{ ctx.pageContext.documentProps.title }}</h1>
   <br>
-  <div v-for="(item, index) in autores" :key="index">
+  <div v-for="(item, index) in ordered_autores" :key="index">
     {{item.__str__}}
     <br>
     <span v-html="item.nome"></span>
@@ -28,10 +28,15 @@ onMounted(() => {
 </script>
 
 <script lang="ts">
+
 export default {
   computed: {
     autores () {
       return this.store.state.teste.autores
+    },
+    ordered_autores () {
+      const t = this
+      return Object.values(t.autores).sort((a, b) => a.nome > b.nome ? 1 : -1)
     }
   },
   async serverPrefetch() {
