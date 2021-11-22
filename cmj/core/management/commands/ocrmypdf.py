@@ -419,10 +419,14 @@ class Command(BaseCommand):
 
         # cmd = ["ocrmypdf",  "--deskew",  "-l por", file.path, file.path]
 
-        o_path = file.path.replace('media/sapl/', 'media/original__sapl/')
-        o_path = o_path.replace('media/cmj/', 'media/original__cmj/')
+        in_path = file.path.replace('media/sapl/', 'media/original__sapl/')
+        in_path = in_path.replace('media/cmj/', 'media/original__cmj/')
         # print(o_path)
         # print(file.path)
+
+        out_path = file.path
+        if out_path.endswith('jpeg'):
+            out_path = out_path + '.pdf'
 
         cmd = ["{}/ocrmypdf".format('/'.join(sys.executable.split('/')[:-1])),
                "--deskew",
@@ -430,7 +434,7 @@ class Command(BaseCommand):
                "-q",
                "-j {}".format(3 if self.execucao_noturna else 1),
                "--output-type pdfa-1",
-               o_path, file.path]
+               in_path, out_path]
 
         try:
             p = ProcessoExterno(' '.join(cmd), self.logger)

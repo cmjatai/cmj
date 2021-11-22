@@ -465,39 +465,42 @@ def run_signed_name_and_date_extract(file):
     except Exception as e:
         pass
 
-    for n in byterange:
+    try:
+        for n in byterange:
 
-        start = pdfdata.find(b"[", n)
-        stop = pdfdata.find(b"]", start)
-        assert n != -1 and start != -1 and stop != -1
-        n += 1
+            start = pdfdata.find(b"[", n)
+            stop = pdfdata.find(b"]", start)
+            assert n != -1 and start != -1 and stop != -1
+            n += 1
 
-        br = [int(i, 10) for i in pdfdata[start + 1: stop].split()]
-        contents = pdfdata[br[0] + br[1] + 1: br[2] - 1]
-        bcontents = bytes.fromhex(contents.decode("utf8"))
-        data1 = pdfdata[br[0]: br[0] + br[1]]
-        data2 = pdfdata[br[2]: br[2] + br[3]]
-        #signedData = data1 + data2
+            br = [int(i, 10) for i in pdfdata[start + 1: stop].split()]
+            contents = pdfdata[br[0] + br[1] + 1: br[2] - 1]
+            bcontents = bytes.fromhex(contents.decode("utf8"))
+            data1 = pdfdata[br[0]: br[0] + br[1]]
+            data2 = pdfdata[br[2]: br[2] + br[3]]
+            #signedData = data1 + data2
 
-        nome = 'Nome do assinante não localizado.'
-        try:
-            signed_data = cms.ContentInfo.load(bcontents)['content']
-            oun_old = []
-            for cert in signed_data['certificates']:
-                subject = cert.native['tbs_certificate']['subject']
-                oun = subject['organizational_unit_name']
+            nome = 'Nome do assinante não localizado.'
+            try:
+                signed_data = cms.ContentInfo.load(bcontents)['content']
+                oun_old = []
+                for cert in signed_data['certificates']:
+                    subject = cert.native['tbs_certificate']['subject']
+                    oun = subject['organizational_unit_name']
 
-                if isinstance(oun, str):
-                    continue
+                    if isinstance(oun, str):
+                        continue
 
-                if len(oun) > len(oun_old):
-                    oun_old = oun
-                    nome = subject['common_name'].split(':')[0]
+                    if len(oun) > len(oun_old):
+                        oun_old = oun
+                        nome = subject['common_name'].split(':')[0]
 
-                if nome not in signs:
-                    signs[nome] = timezone.localtime()
-        except:
-            pass
+                    if nome not in signs:
+                        signs[nome] = timezone.localtime()
+            except Exception as e:
+                pass
+    except Exception as e:
+        pass
 
     return signs
 
@@ -506,7 +509,7 @@ def signed_name_and_date_extract(file):
 
     try:
         signs = run_signed_name_and_date_extract(file)
-    except:
+    except Exception as e:
         return {}
 
     signs = list(signs.items())
