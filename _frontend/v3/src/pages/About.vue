@@ -4,7 +4,7 @@
   <div v-for="(item, index) in ordered_autores" :key="index">
     {{item.__str__}}
     <br>
-    <span v-html="item.nome"></span>
+    <span v-html="item.__str__"></span>
   </div>
 </template>
 
@@ -36,7 +36,7 @@ export default {
     },
     ordered_autores () {
       const t = this
-      return Object.values(t.autores).sort((a, b) => a.nome > b.nome ? 1 : -1)
+      return Object.values(t.autores).sort((a, b) => a.__str__ > b.__str__ ? 1 : -1)
     }
   },
   async serverPrefetch() {

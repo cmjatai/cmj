@@ -15,7 +15,7 @@ async function startServer() {
 
   const indexProd = isProduction
     ? fs.readFileSync(
-      path.resolve(root, 'dist/client/index.template.html'),
+      path.resolve(root, 'dist/client/index.html'),
       'utf-8'
     ) : ''
       
@@ -40,8 +40,6 @@ async function startServer() {
       console.log(e)
       res.json(e.response.data)
     })
-
-    
   })
 
   app.get('*', async (req, res, next) => {
@@ -53,7 +51,7 @@ async function startServer() {
 
       if (!isProduction) {
         // always read fresh template in dev
-        template = fs.readFileSync(path.resolve(root, 'index.template.html'), 'utf-8')
+        template = fs.readFileSync(path.resolve(root, 'index.html'), 'utf-8')
         template = await viteDevServer.transformIndexHtml(url, template)
 
         render = await viteDevServer.ssrLoadModule('/src/entry-server.ts')

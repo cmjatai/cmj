@@ -27,7 +27,7 @@ export default defineConfig(({ command, mode }) => {
         registerType: 'autoUpdate',
         includeAssets: ['favicon.ico', 'robots.txt'],  
         strategies: 'injectManifest',
-        srcDir: 'app',
+        srcDir: 'src',
         filename: 'sw.ts',
         manifest: {
           name: "V3 Project",

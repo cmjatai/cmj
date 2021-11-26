@@ -1,14 +1,14 @@
 import axios from 'axios'
 
 //const basePath = `${import.meta.env.V3_API_URL}`
-const V3_API_BACKEND= 'https://www.jatai.go.leg.br'
-const V3_API_FRONTEND= 'http://localhost:3000'
+const V3_API_BACKEND = 'https://www.jatai.go.leg.br'
+const V3_API_FRONTEND = 'https://www.jatai.go.leg.br' // 'http://localhost:3000'
 
 axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 
 const call_axios = function (obj:Object) {
-  // console.log(obj)
+  console.log(obj)
   return axios(obj)
 }
 

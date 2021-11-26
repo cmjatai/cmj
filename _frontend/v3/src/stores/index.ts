@@ -15,7 +15,7 @@ export function createStore(): Store<any> {
     },
 
     strict: debug,
-    plugins: debug ? [createLogger()] : []
+    // plugins: debug ? [createLogger()] : []
 
   })
 }
