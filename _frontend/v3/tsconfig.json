@@ -1,23 +1,14 @@
 {
-  "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "Node",
-    "strict": true,
-    "sourceMap": true,
-    "lib": ["DOM", "DOM.Iterable", "ESNext", "WebWorker"],
-    "types": ["vite/client", "vite-plugin-pwa/client"],
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "isolatedModules": true,
-    "paths": {
-      "@/*": ["./src/*"]
-    }
-  },
-  "ts-node": {
-    "transpileOnly": true,
-    "compilerOptions": {
-      "module": "CommonJS"
-    }
-  }
+  // https://v3.nuxtjs.org/concepts/typescript
+  "extends": "./.nuxt/tsconfig.json",
+  // "compilerOptions": {
+  //   "paths": {
+  //     "~": [
+  //       "./node_modules/"
+  //     ],
+  //     "~/*": [
+  //       "./node_modules/*"
+  //     ],
+  //   }
+  // }
 }

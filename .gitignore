@@ -122,3 +122,6 @@ yarn.lock
 package-lock.json
 
 db.sqlite3
+
+.nuxt
+.output
