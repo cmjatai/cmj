@@ -11,7 +11,6 @@ from django.utils import timezone
 from django.utils.decorators import classonlymethod
 from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy as _
-import django_filters
 from django_filters.filters import CharFilter
 from django_filters.rest_framework.backends import DjangoFilterBackend
 from django_filters.rest_framework.filterset import FilterSet
@@ -22,6 +21,7 @@ from rest_framework.exceptions import PermissionDenied, NotFound
 from rest_framework.fields import SerializerMethodField
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
+import django_filters
 
 from cmj.core.models import AreaTrabalho, AuditLog
 from cmj.globalrules import GROUP_MATERIA_WORKSPACE_VIEWER
@@ -41,17 +41,14 @@ from sapl.sessao.models import SessaoPlenaria, ExpedienteSessao
 from sapl.utils import models_with_gr_for_model, choice_anos_com_sessaoplenaria,\
     get_mime_type_from_file_extension
 
+
 # Toda Classe construida acima, pode ser redefinida e aplicado quaisquer
 # das possibilidades para uma classe normal criada a partir de
 # rest_framework.viewsets.ModelViewSet conforme exemplo para a classe autor
-
-
 # decorator que processa um endpoint detail trivial com base no model passado,
 # Um endpoint detail geralmente é um conteúdo baseado numa FK com outros possíveis filtros
 # e os passados pelo proprio cliente, além de o serializer e o filterset
 # ser desse model passado
-
-
 class wrapper_queryset_response_for_drf_action(object):
     def __init__(self, model):
         self.model = model
@@ -398,6 +395,7 @@ class _AutorViewSet:
             func.mapping['get'] = func.kwargs['name']
             func.url_name = func.kwargs['name']
             func.url_path = func.kwargs['name']
+            func.__name__ = func.kwargs['name']
             func.__model = _model
 
             setattr(cls, _model._meta.model_name, func)

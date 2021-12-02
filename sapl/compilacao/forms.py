@@ -21,7 +21,7 @@ from sapl.compilacao.models import (NOTAS_PUBLICIDADE_CHOICES,
                                     Nota, Publicacao, TextoArticulado,
                                     TipoDispositivo, TipoNota, TipoPublicacao,
                                     TipoTextoArticulado, TipoVide,
-                                    VeiculoPublicacao, Vide)
+                                    VeiculoPublicacao, Vide, STATUS_TA_EDITION)
 from sapl.compilacao.utils import DISPOSITIVO_SELECT_RELATED
 from sapl.crispy_layout_mixin import SaplFormHelper
 from sapl.crispy_layout_mixin import SaplFormLayout, to_column, to_row,\
@@ -158,6 +158,9 @@ class TaForm(ModelForm):
                   'ementa',
                   'observacao',
                   'participacao_social',
+                  'privacidade',
+                  'editable_only_by_owners',
+                  'editing_locked'
                   ]
 
     def __init__(self, *args, **kwargs):
@@ -168,6 +171,8 @@ class TaForm(ModelForm):
             ('ano', 2),
             ('data', 2),
             ('participacao_social', 3),
+            ('privacidade', 6),
+            ('editable_only_by_owners', 6),
         ])
 
         self.helper = SaplFormHelper()
@@ -179,7 +184,6 @@ class TaForm(ModelForm):
             Fieldset(
                 TextoArticulado._meta.get_field('observacao').verbose_name,
                 Column('observacao'), css_class="col-md-12"),
-
         )
 
         super(TaForm, self).__init__(*args, **kwargs)
@@ -187,6 +191,10 @@ class TaForm(ModelForm):
         if instance and instance.pk:
             self.fields['tipo_ta'].widget.attrs['disabled'] = True
             self.fields['tipo_ta'].required = False
+        else:
+            self.fields['privacidade'].initial = STATUS_TA_EDITION,
+            self.fields['editable_only_by_owners'].initial = False,
+            self.fields['editing_locked'].initial = False,
 
     def clean_tipo_ta(self):
         instance = getattr(self, 'instance', None)

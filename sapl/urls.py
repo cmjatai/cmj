@@ -25,7 +25,6 @@ import sapl.audiencia.urls
 import sapl.base.urls
 import sapl.comissoes.urls
 import sapl.compilacao.urls
-import sapl.lexml.urls
 import sapl.materia.urls
 import sapl.norma.urls
 import sapl.painel.urls
@@ -46,7 +45,6 @@ urlpatterns = [
     url(r'', include(sapl.parlamentares.urls)),
     url(r'', include(sapl.materia.urls)),
     url(r'', include(sapl.norma.urls)),
-    url(r'', include(sapl.lexml.urls)),
     url(r'', include(sapl.painel.urls)),
     url(r'', include(sapl.protocoloadm.urls)),
     url(r'', include(sapl.compilacao.urls)),
@@ -73,9 +71,9 @@ if settings.DEBUG:
     import debug_toolbar
 
     urlpatterns += [
-                      url(r'^__debug__/', include(debug_toolbar.urls)),
+        url(r'^__debug__/', include(debug_toolbar.urls)),
 
-                  ]
+    ]
     urlpatterns += static(settings.STATIC_URL,
                           document_root=settings.STATIC_ROOT)
 

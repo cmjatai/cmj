@@ -1132,7 +1132,21 @@ class TextEditView(CompMixin, TemplateView):
     def get(self, request, *args, **kwargs):
 
         if self.object.editing_locked:
-            if 'unlock' not in request.GET:
+            if 'clone_generico_original' in request.GET:
+                ta = self.object
+                clone = TextoArticulado.objects.filter(
+                    numero=ta.numero,
+                    ano=ta.ano,
+                    content_type__isnull=True,
+                    object_id=0,
+                    ementa=ta.ementa).first()
+
+                if not clone:
+                    clone = ta.create_clone_generico_original()
+                return redirect(to=reverse_lazy(
+                    'sapl.compilacao:ta_text', kwargs={
+                        'ta_id': clone.id}))
+            elif 'unlock' not in request.GET:
                 messages.error(
                     request, _(
                         'A edição deste Texto Articulado está bloqueada.'))

@@ -1,3 +1,5 @@
+from pickle import NONE
+
 from django.contrib import messages
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -257,6 +259,13 @@ class TextoArticulado(TimestampedMixin):
                 'numero': self.numero,
                 'data': defaultfilters.date(self.data, "d \d\e F \d\e Y")}
 
+    def delete(self, using=None, keep_parents=False):
+
+        for d in self.dispositivos_set.filter(dispositivo_pai__isnull=True):
+            d.delete()
+
+        return TimestampedMixin.delete(self, using=using, keep_parents=keep_parents)
+
     def hash(self):
         from django.core import serializers
         import hashlib
@@ -417,6 +426,59 @@ class TextoArticulado(TimestampedMixin):
                          if map_fields['ano'] else 'xxx', now.year)
 
         ta.save()
+        return ta
+
+    def create_clone_generico_original(self):
+        id_original = self.id
+        ta = self
+        ta.id = None
+        ta.content_type = None
+        ta.object_id = 0
+        ta.privacidade = 89
+        ta.editable_only_by_owners = False
+        ta.editing_locked = False
+
+        ta.save()
+        clone = ta
+
+        dispositivos = Dispositivo.objects.filter(
+            ta=id_original,
+            ta_publicado__isnull=True
+        ).order_by('ordem')
+
+        map_ids = {}
+        for d in dispositivos:
+            id_old = d.id
+
+            d.id = None
+            d.inicio_vigencia = clone.data
+            d.fim_vigencia = None
+            d.inicio_eficacia = clone.data
+            d.fim_eficacia = None
+            d.publicacao = None
+            d.ta = clone
+            d.ta_publicado = None
+            d.dispositivo_subsequente = None
+            d.dispositivo_substituido = None
+            d.dispositivo_vigencia = None
+            d.dispositivo_atualizador = None
+            d.save()
+            map_ids[id_old] = d.id
+
+        dispositivos = Dispositivo.objects.filter(ta=ta).order_by('ordem')
+
+        for d in dispositivos:
+            if not d.dispositivo_pai:
+                continue
+
+            versoes_do_pai = list(d.dispositivo_pai.history())
+
+            if len(versoes_do_pai) > 1:
+                print(versoes_do_pai)
+
+            d.dispositivo_pai_id = map_ids[versoes_do_pai[-1].id]
+            d.save()
+
         return ta
 
     def clone_for(self, obj):
@@ -1114,6 +1176,11 @@ class Dispositivo(BaseModel, TimestampedMixin):
                     msg = self.unique_error_message(
                         self.__class__, tuple(unique_fields))
                     raise ValidationError(msg)
+
+    def delete(self, using=None, keep_parents=False):
+        for d in self.dispositivos_filhos_set.all():
+            d.delete()
+        return BaseModel.delete(self, using=using, keep_parents=keep_parents)
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None, clean=True):

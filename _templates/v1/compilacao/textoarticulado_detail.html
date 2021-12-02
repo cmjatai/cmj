@@ -8,7 +8,8 @@
 {% block sections_nav %}
   {% include 'compilacao/subnav.html'%}
 {% endblock %}
-
+{% block main_container_class %}container{{fluid}}{{path}} container-box" {% if object and object.object_id == 0 %}style="border-left: 5px solid green;{% endif %}
+{% endblock %}
 {% block base_content %}
 
   {% block actions %}
@@ -24,11 +25,15 @@
 
         {% if object.editing_locked %}
           {% if perms.compilacao.unlock_textoarticulado and not object.editable_only_by_owners%}
-            <a href="{% url 'sapl.compilacao:ta_text_edit' object.pk %}?{% if object.editing_locked %}unlock{%else%}lock{% endif %}"
-                class="btn {% if object.editing_locked %}btn-danger{%else%}btn-outline-primary{% endif %}">
-                    {% trans 'Desbloquear Edição' %}
-                  </a>
-          {% endif %}
+          <a href="{% url 'sapl.compilacao:ta_text_edit' object.pk %}?{% if object.editing_locked %}unlock{%else%}lock{% endif %}"
+          class="btn {% if object.editing_locked %}btn-danger{%else%}btn-outline-primary{% endif %}">
+              {% trans 'Desbloquear Edição' %}
+            </a>      &nbsp;      
+            {% endif %}
+          <a href="{% url 'sapl.compilacao:ta_text_edit' object.pk %}?{% if object.editing_locked %}clone_generico_original{%else%}lock{% endif %}"
+            class="btn {% if object.editing_locked %}btn-danger{%else%}btn-outline-primary{% endif %}">
+              {% trans 'Clone do Texto Original' %}
+            </a>
         {% else %}
           {% if perms.compilacao.lock_textoarticulado and not object.editable_only_by_owners%}
             <a href="{% url 'sapl.compilacao:ta_text_edit' object.pk %}?{% if object.editing_locked %}unlock{%else%}lock{% endif %}"

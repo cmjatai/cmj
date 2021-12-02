@@ -3,6 +3,7 @@ from django.conf.urls import include, url
 from rest_framework import permissions
 from rest_framework.routers import DefaultRouter
 
+
 from sapl.api.deprecated import MateriaLegislativaViewSet, SessaoPlenariaViewSet,\
     AutoresProvaveisListView, AutoresPossiveisListView, AutorListView,\
     ModelChoiceView
@@ -62,17 +63,10 @@ deprecated_urlpatterns_api = [
 
     url(r'^model/(?P<content_type>\d+)/(?P<pk>\d*)$',
         ModelChoiceView.as_view(), name='model_list'),
-
-
 ]
 
 urlpatterns = [
     url(r'^api/', include(deprecated_urlpatterns_api)),
     url(r'^api/', include(urlpatterns_api_doc)),
     url(r'^api/', include(urlpatterns_router)),
-
-
-    # implementar caminho para autenticação
-    # https://www.django-rest-framework.org/tutorial/4-authentication-and-permissions/
-    # url(r'^api/auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]

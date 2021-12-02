@@ -1,3 +1,8 @@
+import sys
+
+PYTHON_VERSION = sys.version_info[0:3]
+PYTHON_VERSION_MIN_FOR_JWT = 3, 7, 0
+
 
 INSTALLED_APPS = (
     'django_admin_bootstrapped',  # must come before django.contrib.admin
@@ -17,7 +22,7 @@ INSTALLED_APPS = (
     'image_cropping',
 
     'rest_framework',
-    'rest_framework.authtoken',
+    'rest_framework_simplejwt' if PYTHON_VERSION >= PYTHON_VERSION_MIN_FOR_JWT else 'rest_framework.authtoken',
 
     'django_filters',
 
@@ -45,7 +50,7 @@ SAPL_APPS = (
     'sapl.materia',
     'sapl.norma',
     'sapl.sessao',
-    'sapl.lexml',
+    #'sapl.lexml',
     'sapl.painel',
     'sapl.protocoloadm',
     'sapl.redireciona_urls',
