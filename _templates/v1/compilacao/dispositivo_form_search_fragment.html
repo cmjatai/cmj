@@ -25,14 +25,14 @@
     {% if not forloop.first %}</ul>{% endif %}
     <ul class="cp" id="ta{{dpt.ta.pk}}">
       {% if request.GET.data_type_selection == 'checkbox' %}
-        <li class="ta_title">
+        <li class="ta_title" {% if dpt.ta.object_id == 0 %}style="border-right: 5px solid green"{% endif %}>
           <div class="iteminput">
             <input type="{{request.GET.data_type_selection}}" name="ta_select_all" id="ta_title{{dpt.ta.pk}}" value="{{dpt.ta.pk}}"/>
           </div>
           <label class="itemlabel" for="ta_title{{dpt.ta.pk}}">{{dpt.ta}}</label>
         </li>
       {% else %}
-        <li class="ta_title"><span>{{dpt.ta}}</span></li>
+        <li class="ta_title" ><span>{{dpt.ta}}</span></li>
       {% endif %}
   {% endifchanged %}
 

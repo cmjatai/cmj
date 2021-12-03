@@ -77,6 +77,7 @@ function DispositivoSearch (opts) {
         let rotuloDispositivo = _$('input[name="rotulo_dispositivo"]').val()
         let textoDispositivo = _$('input[name="texto_dispositivo"]').val()
         let maxResults = _$('select[name="max_results"]').val()
+        let taEditor = _$('input[name="texto_articulado_do_editor"]').val()
         let url = ''
 
         if (rotuloDispositivo.length > 0 || textoDispositivo.length > 0) {
@@ -106,7 +107,8 @@ function DispositivoSearch (opts) {
           'max_results': maxResults,
           'data_type_selection': dataTypeSelection,
           'data_field': dataField,
-          'data_function': dataFunction
+          'data_function': dataFunction,
+          'texto_articulado_do_editor': taEditor
         }
 
         window.localStorage.setItem('dispositivo_search_form_data', JSON.stringify(formData))

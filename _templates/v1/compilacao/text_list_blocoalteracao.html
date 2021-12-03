@@ -32,6 +32,24 @@
             {% endif %}
           </div>
         </div>
+    {% else %}
+      <div class="dn" id="dn{{ch.pk}}" pk="{{ch.pk}}">{# Dispostivo Nota e Vides #}
+        <ul class="dnl">{# Dispostivo Nota Lista#}
+          <div class="ntitulo">Vide Alteração Tácita em: </div>
+            <div class="ntexto">
+              <a class="nota-alteracao" href="{%url 'sapl.compilacao:ta_text' ch.ta.pk %}#{{ch.pk}}">
+                {% for p in ch.get_parents_asc %}
+                  {% if p.dispositivo_pai %}
+                    {{p}},
+                  {% endif %}
+                {% endfor %}
+                {{ch}} - {{ch.ta}}
+              </a>
+
+            </div>
+          </div>
+        </ul>
+
     {% endif %}
   {% endspaceless %}
 {% endfor %}

@@ -796,6 +796,9 @@ class DispositivoSearchModalForm(Form):
         label=_('Pesquisa Textual'),
         required=False)
 
+    texto_articulado_do_editor = forms.CharField(widget=forms.HiddenInput(),
+                                                 required=False)
+
     def __init__(self, *args, **kwargs):
 
         fields_search = Fieldset(
@@ -832,9 +835,11 @@ class DispositivoSearchModalForm(Form):
                 )
             ))
 
+        ff = Field('texto_articulado_do_editor')
+
         self.helper = SaplFormHelper()
         self.helper.layout = Layout(
-            fields_search,
+            fields_search, ff,
             Row(to_column((Div(css_class='result-busca-dispositivo'), 12))))
 
         if 'choice_model_type_foreignkey_in_extenal_views' in kwargs:
@@ -849,6 +854,7 @@ class DispositivoSearchModalForm(Form):
 
         kwargs['initial'].update({'tipo_resultado': 'C'})
         super(DispositivoSearchModalForm, self).__init__(*args, **kwargs)
+        self.fields['texto_articulado_do_editor'].initial = kwargs['initial']['texto_articulado_do_editor']
 
 
 class DispositivoEdicaoVigenciaForm(ModelForm):
@@ -1386,6 +1392,9 @@ class DispositivoRegistroAlteracaoForm(Form):
     dispositivo_search_form = forms.CharField(widget=forms.HiddenInput(),
                                               required=False)
 
+    texto_articulado_do_editor = forms.CharField(widget=forms.HiddenInput(),
+                                                 required=False)
+
     def __init__(self, *args, **kwargs):
 
         layout = []
@@ -1404,6 +1413,7 @@ class DispositivoRegistroAlteracaoForm(Form):
                                row_dispositivo,
                                css_class="col-md-12"))
         layout.append(Field('dispositivo_search_form'))
+        layout.append(Field('texto_articulado_do_editor'))
 
         more = [
             HTML('<a class="btn btn-dark btn-fechar" href="">%s</a>' %
@@ -1422,6 +1432,7 @@ class DispositivoRegistroAlteracaoForm(Form):
         super(DispositivoRegistroAlteracaoForm, self).__init__(*args, **kwargs)
 
         self.fields['dispositivo_alterado'].choices = []
+        self.fields['texto_articulado_do_editor'].initial = kwargs['initial']['texto_articulado_do_editor']
 
 
 class DispositivoRegistroRevogacaoForm(Form):
@@ -1441,6 +1452,9 @@ class DispositivoRegistroRevogacaoForm(Form):
 
     dispositivo_search_form = forms.CharField(widget=forms.HiddenInput(),
                                               required=False)
+
+    texto_articulado_do_editor = forms.CharField(widget=forms.HiddenInput(),
+                                                 required=False)
 
     def __init__(self, *args, **kwargs):
 
@@ -1462,6 +1476,7 @@ class DispositivoRegistroRevogacaoForm(Form):
                                css_class="col-md-12"))
         layout.append(Field('dispositivo_search_form'))
 
+        layout.append(Field('texto_articulado_do_editor'))
         more = [
             HTML('<a class="btn btn-dark btn-fechar" href="">%s</a>' %
                  _('Cancelar')),
@@ -1479,6 +1494,7 @@ class DispositivoRegistroRevogacaoForm(Form):
         super(DispositivoRegistroRevogacaoForm, self).__init__(*args, **kwargs)
 
         self.fields['dispositivo_revogado'].choices = []
+        self.fields['texto_articulado_do_editor'].initial = kwargs['initial']['texto_articulado_do_editor']
 
 
 class DispositivoRegistroInclusaoForm(Form):
@@ -1490,6 +1506,9 @@ class DispositivoRegistroInclusaoForm(Form):
 
     dispositivo_search_form = forms.CharField(widget=forms.HiddenInput(),
                                               required=False)
+
+    texto_articulado_do_editor = forms.CharField(widget=forms.HiddenInput(),
+                                                 required=False)
 
     def __init__(self, *args, **kwargs):
 
@@ -1512,6 +1531,7 @@ class DispositivoRegistroInclusaoForm(Form):
         layout.append(Field('dispositivo_search_form'))
         layout.append(Div(css_class="allowed_inserts col-md-12"))
 
+        layout.append(Field('texto_articulado_do_editor'))
         more = [
             HTML('<a class="btn btn-dark btn-fechar" href="">%s</a>' %
                  _('Cancelar')),
@@ -1529,3 +1549,4 @@ class DispositivoRegistroInclusaoForm(Form):
         super(DispositivoRegistroInclusaoForm, self).__init__(*args, **kwargs)
 
         self.fields['dispositivo_base_para_inclusao'].choices = []
+        self.fields['texto_articulado_do_editor'].initial = kwargs['initial']['texto_articulado_do_editor']

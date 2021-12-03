@@ -3118,6 +3118,8 @@ class DispositivoSearchFragmentFormView(ListView):
         result = []
 
         try:
+            texto_articulado_do_editor = self.request.GET.get(
+                'texto_articulado_do_editor', '')
             tipo_model = self.request.GET.get('tipo_model', '')
             limit = int(self.request.GET.get('max_results', 100))
             tipo_ta = self.request.GET.get('tipo_ta', '')
@@ -3134,6 +3136,13 @@ class DispositivoSearchFragmentFormView(ListView):
 
             if tipo_ta:
                 tipo_ta = TipoTextoArticulado.objects.get(pk=tipo_ta)
+
+            if texto_articulado_do_editor:
+                try:
+                    ta = TextoArticulado.objects.get(
+                        id=texto_articulado_do_editor)
+                except:
+                    ta = None
 
             if tipo_ta and tipo_model:
                 integrations_view_names = get_integrations_view_names()
@@ -3195,6 +3204,10 @@ class DispositivoSearchFragmentFormView(ListView):
                     gfk_field_type_id=tipo_model.id,
                 )
 
+            AND_EDIT_CLONE = ''
+            if ta:
+                AND_EDIT_CLONE = 'AND ta.object_id != 0' if ta.object_id else 'AND ta.object_id = 0'
+
             sql = ''' 
                 SELECT d.* FROM compilacao_dispositivo d 
                     JOIN compilacao_dispositivo dp on (d.dispositivo_pai_id = dp.id)
@@ -3212,6 +3225,8 @@ class DispositivoSearchFragmentFormView(ListView):
                     {AND2_ANO}
                     {AND3_TIPO_TA}
                     {AND_CONTROLS}
+                   
+                    {AND_EDIT_CLONE}
                    
                     order by ta.data desc, 
                             ta.numero desc, 
@@ -3235,7 +3250,8 @@ class DispositivoSearchFragmentFormView(ListView):
                     num_ta) if num_ta else '',
 
                 AND_TEXTO_ROTULO=AND_TEXTO_ROTULO if AND_TEXTO_ROTULO else '',
-                AND_CONTROLS=AND_CONTROLS if AND_CONTROLS else ''
+                AND_CONTROLS=AND_CONTROLS if AND_CONTROLS else '',
+                AND_EDIT_CLONE=AND_EDIT_CLONE
             )
 
             result = Dispositivo.objects.raw(sql)
@@ -3277,6 +3293,13 @@ class DispositivoSearchFragmentFormView(ListView):
 class DispositivoSearchModalView(FormView):
     template_name = 'compilacao/dispositivo_form_search.html'
     form_class = DispositivoSearchModalForm
+
+    def get_initial(self):
+        initial = FormView.get_initial(self)
+        initial.update({'texto_articulado_do_editor':
+                        self.request.GET.get('ta_base_id', 0)})
+
+        return initial
 
 
 class DispositivoEdicaoBasicaView(CompMixin, FormMessagesMixin, UpdateView):

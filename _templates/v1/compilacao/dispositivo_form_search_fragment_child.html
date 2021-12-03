@@ -1,6 +1,6 @@
 {% load i18n compilacao_filters %}
 
-<li>
+<li {% if df.ta.object_id == 0 %}style="border-right: 5px solid green"{% endif %}>
   <div class="iteminput">
     <input type="{{request.GET.data_type_selection}}" name="{{request.GET.data_field}}" id="dpt{{df.pk}}" value="{{df.pk}}"/>
   </div>

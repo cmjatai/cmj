@@ -114,7 +114,7 @@ window.DispositivoEdit = function () {
     _$('.dpt-actions, .dpt-actions-bottom').html('')
 
     let dpt_form = _this.children().filter('.dpt-form').children().first()
-    let url_search = dpt_form[0]['id_dispositivo_search_form'].value
+    let url_search = `${dpt_form[0]['id_dispositivo_search_form'].value}?ta_base_id=${dpt_form[0]['id_texto_articulado_do_editor'].value}`
     window.DispositivoSearch({
       'url_form': url_search,
       'text_button': 'Selecionar',
@@ -138,7 +138,7 @@ window.DispositivoEdit = function () {
     _$('.dpt-actions, .dpt-actions-bottom').html('')
 
     let dpt_form = _this.children().filter('.dpt-form').children().first()
-    let url_search = dpt_form[0]['id_dispositivo_search_form'].value
+    let url_search = `${dpt_form[0]['id_dispositivo_search_form'].value}?ta_base_id=${dpt_form[0]['id_texto_articulado_do_editor'].value}`
     window.DispositivoSearch({
       'url_form': url_search,
       'text_button': 'Selecionar',
@@ -165,7 +165,7 @@ window.DispositivoEdit = function () {
     _$('.dpt-actions, .dpt-actions-bottom').html('')
 
     let dpt_form = _this.children().filter('.dpt-form').children().first()
-    let url_search = dpt_form[0]['id_dispositivo_search_form'].value
+    let url_search = `${dpt_form[0]['id_dispositivo_search_form'].value}?ta_base_id=${dpt_form[0]['id_texto_articulado_do_editor'].value}`
     window.DispositivoSearch({
       'url_form': url_search,
       'text_button': 'Selecionar',
