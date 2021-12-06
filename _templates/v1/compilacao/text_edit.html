@@ -8,30 +8,30 @@
 {% endblock %}
 
 {% block actions %}
-  {% if perms.compilacao.change_textoarticulado %}
-    <div class="container-actions mt-4 mb-4 justify-content-between d-flex">
-      <div class="actions btn-group" role="group">
-        {% if object.editing_locked %}
-          {% if perms.compilacao.unlock_textoarticulado and not object.editable_only_by_owners%}
+  {% if not object.original %}
+    {% if perms.compilacao.change_textoarticulado %}
+      <div class="container-actions mt-4 mb-4 justify-content-between d-flex">
+        <div class="actions btn-group" role="group">
+          {% if object.editing_locked %}
+            {% if perms.compilacao.unlock_textoarticulado and not object.editable_only_by_owners%}
             <a href="{% url 'sapl.compilacao:ta_text_edit' object.pk %}?{% if object.editing_locked %}unlock{%else%}lock{% endif %}"
-                class="btn {% if object.editing_locked %}btn-danger{%else%}btn-outline-primary{% endif %}">
-                    {% trans 'Desbloquear Edição' %}
-                  </a>
-          {% endif %}
-        {% else %}
-          {% if perms.compilacao.unlock_textoarticulado and not object.editable_only_by_owners%}
-            <a href="{% url 'sapl.compilacao:ta_text_edit' object.pk %}?{% if object.editing_locked %}unlock{%else%}lock{% endif %}" 
               class="btn {% if object.editing_locked %}btn-danger{%else%}btn-outline-primary{% endif %}">
+              {% trans 'Desbloquear Edição' %}
+            </a>
+            {% endif %}
+          {% else %}
+            {% if perms.compilacao.unlock_textoarticulado and not object.editable_only_by_owners%}
+              <a href="{% url 'sapl.compilacao:ta_text_edit' object.pk %}?{% if object.editing_locked %}unlock{%else%}lock{% endif %}" 
+                class="btn {% if object.editing_locked %}btn-danger{%else%}btn-outline-primary{% endif %}">
                 {% trans 'Publicar Texto' %}
-                </a>
+              </a>
           {% endif %}
         {% endif %}
-
         <a href="{% url 'sapl.compilacao:ta_edit' object.pk %}" class="btn btn-outline-primary">{% trans 'Editar Metadados do Texto Articulado' %}</a>
-        {% include 'compilacao/textoarticulado_menu_config.html' %}
+          {% include 'compilacao/textoarticulado_menu_config.html' %}
+        </div>
       </div>
-
-    </div>
+    {% endif %}
   {% endif %}
 {% endblock actions %}
 

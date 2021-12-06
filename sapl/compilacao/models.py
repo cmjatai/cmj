@@ -234,6 +234,12 @@ class TextoArticulado(TimestampedMixin):
         default=False,
         verbose_name=_('Check de Migração?'))
 
+    clone = models.OneToOneField(
+        'self', related_name='original', on_delete=PROTECT,
+        blank=True, null=True, default=None,
+        verbose_name=_('Clone')
+    )
+
     class Meta:
         verbose_name = _('Texto Articulado')
         verbose_name_plural = _('Textos Articulados')
@@ -440,6 +446,9 @@ class TextoArticulado(TimestampedMixin):
 
         ta.save()
         clone = ta
+
+        TextoArticulado.objects.filter(
+            id=id_original).update(clone_id=clone.id)
 
         dispositivos = Dispositivo.objects.filter(
             ta=id_original,
