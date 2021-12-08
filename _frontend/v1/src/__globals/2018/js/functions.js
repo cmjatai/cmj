@@ -11,7 +11,7 @@ window.initTextRichEditor = function (elements, readonly = false) {
     force_br_newlines: false,
     force_p_newlines: false,
     forced_root_block: '',
-    min_height: 200,
+    min_height: 500,
     language: 'pt_BR',
     plugins: ['lists table code'],
     menubar: 'edit view format table tools',

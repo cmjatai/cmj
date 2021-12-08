@@ -1150,9 +1150,9 @@ class TextEditView(CompMixin, TemplateView):
                     'sapl.compilacao:ta_text', kwargs={
                         'ta_id': clone.id}))
 
-        if self.object.editing_locked and not request.user.is_superuser:
+        if self.object.editing_locked:
 
-            if 'unlock' not in request.GET:
+            if 'unlock' not in request.GET and not request.user.is_superuser:
                 messages.error(
                     request, _(
                         'A edição deste Texto Articulado está bloqueada.'))

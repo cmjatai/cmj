@@ -457,22 +457,28 @@ class TextoArticulado(TimestampedMixin):
 
         map_ids = {}
         for d in dispositivos:
-            id_old = d.id
 
-            d.id = None
-            d.inicio_vigencia = clone.data
-            d.fim_vigencia = None
-            d.inicio_eficacia = clone.data
-            d.fim_eficacia = None
-            d.publicacao = None
-            d.ta = clone
-            d.ta_publicado = None
-            d.dispositivo_subsequente = None
-            d.dispositivo_substituido = None
-            d.dispositivo_vigencia = None
-            d.dispositivo_atualizador = None
-            d.save()
-            map_ids[id_old] = d.id
+            # if d.ordem > 63000:
+            #    continue
+            try:
+                id_old = d.id
+
+                d.id = None
+                d.inicio_vigencia = clone.data
+                d.fim_vigencia = None
+                d.inicio_eficacia = clone.data
+                d.fim_eficacia = None
+                d.publicacao = None
+                d.ta = clone
+                d.ta_publicado = None
+                d.dispositivo_subsequente = None
+                d.dispositivo_substituido = None
+                d.dispositivo_vigencia = None
+                d.dispositivo_atualizador = None
+                d.save()
+                map_ids[id_old] = d.id
+            except:
+                break
 
         dispositivos = Dispositivo.objects.filter(ta=ta).order_by('ordem')
 
@@ -486,7 +492,8 @@ class TextoArticulado(TimestampedMixin):
                 print(versoes_do_pai)
 
             d.dispositivo_pai_id = map_ids[versoes_do_pai[-1].id]
-            d.save()
+            d.dispositivo_raiz_id = map_ids[d.dispositivo_raiz_id]
+            BaseModel.save(d)
 
         return ta
 

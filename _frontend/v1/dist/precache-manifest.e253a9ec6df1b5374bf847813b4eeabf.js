@@ -28,7 +28,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/brasao/escola_1024.png"
   },
   {
-    "revision": "251e3d4dce6d13e7aea7",
+    "revision": "89d9969539ed7373c57f",
     "url": "/static/css/app.8d7aa873.css"
   },
   {
@@ -40,8 +40,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/css/chunk-227d0a6e.79a56ae1.css"
   },
   {
-    "revision": "9a4a60fe774e046ba918",
-    "url": "/static/css/chunk-38d06efb.e84c3ec9.css"
+    "revision": "90997d8c87ab403d1ff1",
+    "url": "/static/css/chunk-38d06efb.d4696fb9.css"
   },
   {
     "revision": "3558c2cd741085d00c4f",
@@ -52,8 +52,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/css/chunk-vendors.7cbba22c.css"
   },
   {
-    "revision": "f4a855aeea30b35e9f01",
-    "url": "/static/css/compilacao.2fd128f7.css"
+    "revision": "086e6bb842ace4ba2cd9",
+    "url": "/static/css/compilacao.a246a51d.css"
   },
   {
     "revision": "94ade09668e0b2765ee0",
@@ -320,12 +320,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/user.png"
   },
   {
-    "revision": "7029b68181a5f10533252da083889f5d",
+    "revision": "5b700bbbf899c000b81c37c6f3951d23",
     "url": "/static/index.html"
   },
   {
-    "revision": "251e3d4dce6d13e7aea7",
-    "url": "/static/js/app.1e27875c.js"
+    "revision": "89d9969539ed7373c57f",
+    "url": "/static/js/app.a2c4be87.js"
   },
   {
     "revision": "2d9dcc9be90ce85c13d2",
@@ -340,7 +340,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/js/chunk-2d0c4a82.d6526175.js"
   },
   {
-    "revision": "9a4a60fe774e046ba918",
+    "revision": "90997d8c87ab403d1ff1",
     "url": "/static/js/chunk-38d06efb.f973e15d.js"
   },
   {
@@ -352,7 +352,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/js/chunk-vendors.a319ae66.js"
   },
   {
-    "revision": "f4a855aeea30b35e9f01",
+    "revision": "086e6bb842ace4ba2cd9",
     "url": "/static/js/compilacao.608d2d2f.js"
   },
   {

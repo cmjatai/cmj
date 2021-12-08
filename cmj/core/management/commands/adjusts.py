@@ -11,6 +11,7 @@ from django.db.models.signals import post_delete, post_save
 from cmj.core.models import OcrMyPDF
 from cmj.diarios.models import DiarioOficial
 from cmj.signals import Manutencao
+from sapl.compilacao.models import TextoArticulado, Dispositivo
 from sapl.materia.models import MateriaLegislativa, DocumentoAcessorio
 from sapl.norma.models import NormaJuridica
 from sapl.protocoloadm.models import DocumentoAdministrativo,\
@@ -33,6 +34,39 @@ class Command(BaseCommand):
         post_save.disconnect(dispatch_uid='cmj_post_save_signal')
 
         self.logger = logging.getLogger(__name__)
+
+        """        parents = [173261, ]
+        for d in Dispositivo.objects.filter(
+            ta_id=8660,
+            ordem__gt=77000
+        ):
+            parents = parents[:d.nivel]
+            if d.nivel >= len(parents):
+                parents.append(d.id)
+
+            d.dispositivo_pai_id = parents[d.nivel - 1]
+            d.save()"""
+
+        """for ta in TextoArticulado.objects.filter(
+                clone__isnull=False, id=762).order_by('numero'):
+            print(ta)
+
+            for d in ta.clone.dispositivos_set.filter(id__gte=173279).order_by('ordem'):
+                if not d.dispositivo_raiz:
+                    continue
+
+                p = d.dispositivo_pai
+                novo_pai = Dispositivo.objects.filter(
+                    texto=p.texto,
+                    tipo_dispositivo=p.tipo_dispositivo,
+                    ta=ta.clone,
+                    nivel=p.nivel
+                ).first()
+
+                if novo_pai:
+                    d.dispositivo_pai = novo_pai
+                    #d.dispositivo_raiz_id = 173263
+                    d.save()"""
 
     def transforma_imagens_armazenadas_em_pdf(self):
         models = [
