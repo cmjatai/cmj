@@ -18,7 +18,7 @@ import requests as rq
 
 logger = logging.getLogger(__name__)
 
-DEBUG_TASKS = settings.DEBUG
+DEBUG_TASKS = not settings.DEBUG
 
 
 def pull_youtube_metadata_video(v):
@@ -262,6 +262,10 @@ def vincular_sistema_aos_videos():
                         )
 
                         if vp.exists():
+                            if hasattr(i, 'titulo') and i.titulo != v.titulo:
+                                i.titulo = v.titulo
+                                i.descricao = v.json['snippet']['description']
+                                i.save()
                             continue
 
                         vp = VideoParte()
