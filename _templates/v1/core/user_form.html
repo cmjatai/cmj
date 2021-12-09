@@ -7,7 +7,7 @@
     var $crf_token = $('[name="csrfmiddlewaretoken"]').attr('value');
     $("#renovar-token").click(() => {
       $.ajax({
-        url: "{% url 'cmj.api:recria_token' user.id %}",
+        url: "{% url 'cmj.api:token_refresh' user.id %}",
         type: "POST",
         headers: { "X-CSRFToken": $crf_token },
         dataType: "json",

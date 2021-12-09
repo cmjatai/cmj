@@ -29,11 +29,11 @@ urlpatterns = [
 
 if settings.PYTHON_VERSION >= settings.PYTHON_VERSION_MIN_FOR_JWT:
     urlpatterns.append(
-        url(r'^api/token$', TokenObtainPairView.as_view(), name='token_obtain_pair'))
+        url(r'^api/token$', TokenObtainPairView.as_view(), name='api_token_auth'))
     urlpatterns.append(
         url(r'^api/token/refresh$', TokenRefreshView.as_view(), name='token_refresh'))
 else:
     urlpatterns.append(
         url(r'^api/token$', obtain_auth_token, name="api_token_auth"))
     urlpatterns.append(
-        url(r'^api/token/refresh$/(?P<pk>\d*)$', recria_token, name="recria_token"))
+        url(r'^api/token/refresh/(?P<pk>\d*)$', recria_token, name="token_refresh"))
