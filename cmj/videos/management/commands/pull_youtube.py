@@ -115,8 +115,8 @@ class Command(BaseCommand):
                 if isinstance(vp.content_object, Documento):
                     d = vp.content_object
 
-                    if d.classe_id == 233:
-                        continue
+                    # if d.classe_id == 233:
+                    #    continue
 
                     for r in d.revisoes.all():
                         if not r.user:
