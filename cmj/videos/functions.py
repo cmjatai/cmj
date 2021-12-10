@@ -263,9 +263,10 @@ def vincular_sistema_aos_videos():
 
                         if vp.exists():
                             if hasattr(i, 'titulo') and i.titulo != v.titulo:
-                                i.titulo = v.titulo
-                                i.descricao = v.json['snippet']['description']
-                                i.save()
+                                if hasattr(i, 'classe_id') and i.classe_id == 233:
+                                    i.titulo = v.titulo
+                                    i.descricao = v.json['snippet']['description']
+                                    i.save()
                             continue
 
                         vp = VideoParte()

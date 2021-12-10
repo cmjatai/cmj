@@ -41,8 +41,8 @@ class Command(BaseCommand):
         # Video.objects.all().update(created=F('modified'))
 
         # PullYoutube.objects.pull_from_date()
-        PullExec.objects.timedelta_quota_pull()
-
+        # PullExec.objects.timedelta_quota_pull()
+        self.corrigir_erro_causado_em_full_metadata()
         # pull_youtube()
         # return
         # vincular_sistema_aos_videos()
@@ -123,6 +123,7 @@ class Command(BaseCommand):
                             continue
 
                         if r.user.id == 76:
+                            d.titulo = r.obj[0]['fields']['titulo']
                             d.descricao = r.obj[0]['fields']['descricao']
                             d.save()
                             print(r.id, r.user.id, r.user, d.id, d)
