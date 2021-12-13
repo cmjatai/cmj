@@ -18,7 +18,7 @@ import requests as rq
 
 logger = logging.getLogger(__name__)
 
-DEBUG_TASKS = not settings.DEBUG
+DEBUG_TASKS = settings.DEBUG
 
 
 def pull_youtube_metadata_video(v):
