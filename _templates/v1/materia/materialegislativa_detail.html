@@ -16,9 +16,15 @@
   </div>
 
   <div>
-    <a href="{% url 'sapl.api:materialegislativa-detail' object.id %}" target="_blank" rel="noopener noreferrer">
+    <a href="{% url 'sapl.api:materialegislativa-detail' object.id %}" target="_blank" rel="noopener noreferrer" title="Dados Abertos">
       <i class="far fa-file-code"></i>
     </a>
+
+    {% if not object.anexo_de.exists %}
+      <a href="{% url 'sapl.materia:materialegislativa_detail' object.id %}?download" title="Baixar todos os arquivos deste Processo Legislativo">
+        <i class="fas fa-download"></i>
+      </a>
+    {% endif %}
 
   </div>
 </h3>

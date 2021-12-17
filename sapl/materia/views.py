@@ -5,6 +5,8 @@ from string import ascii_letters, digits
 import logging
 import os
 import shutil
+import tempfile
+import zipfile
 
 from crispy_forms.layout import HTML
 from django import template
@@ -19,12 +21,14 @@ from django.http.response import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.urls.base import reverse
 from django.utils import formats, timezone
+from django.utils.text import slugify
 from django.utils.timezone import get_default_timezone
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import ListView, TemplateView, CreateView, UpdateView
 from django.views.generic.base import RedirectView
 from django.views.generic.edit import FormView
 from django_filters.views import FilterView
+import weasyprint
 
 from cmj.core.models import AreaTrabalho
 from cmj.globalrules import GROUP_MATERIA_WORKSPACE_VIEWER
@@ -59,6 +63,7 @@ from sapl.utils import (YES_NO_CHOICES, autor_label, autor_modal, SEPARADOR_HASH
                         get_mime_type_from_file_extension, montar_row_autor,
                         show_results_filter_set, mail_service_configured, lista_anexados,
                         gerar_pdf_impressos)
+import requests as rq
 import sapl
 
 from .forms import (AcessorioEmLoteFilterSet, AcompanhamentoMateriaForm,
@@ -2007,7 +2012,7 @@ class MateriaLegislativaCrud(Crud):
 
         @property
         def extras_url(self):
-            btns = [self.btn_certidao('texto_original')]
+            btns = [self.btn_certidao('texto_original'), ]
 
             if self.request.user.has_perm('compilacao.add_textoarticulado'):
                 if not self.object.texto_articulado.exists():
@@ -2030,6 +2035,70 @@ class MateriaLegislativaCrud(Crud):
                     return btns
             btns = list(filter(None, btns))
             return btns
+
+        def download(self, download):
+
+            ff = 'original_path' if download == 'original' else 'path'
+
+            m_paths = []
+
+            principal = self.get_object()
+
+            def get_anexadas_from(m):
+                p = getattr(m.texto_original, ff)
+                m_paths.append((m, p))
+                for a in m.materia_principal_set.filter(
+                    data_desanexacao__isnull=True
+                ).order_by('data_anexacao'):
+                    get_anexadas_from(a.materia_anexada)
+
+            get_anexadas_from(principal)
+
+            docs = principal.documentoadministrativo_set.all()
+            for d in docs:
+                p = getattr(d.texto_integral, ff)
+                m_paths.append((d, p))
+
+            m_paths = list(set(m_paths))
+
+            with tempfile.SpooledTemporaryFile(max_size=512000000) as tmp:
+
+                with zipfile.ZipFile(tmp, 'w') as file:
+
+                    for m, p in m_paths:
+
+                        file.write(
+                            p,
+                            arcname='{}-{}-{:02d}-{}-{}.{}'.format(
+                                m.id,
+                                m.ano,
+                                m.numero,
+                                slugify(m.tipo.sigla),
+                                slugify(m.tipo.descricao),
+                                p.split('.')[-1]
+                            )
+                        )
+
+                tmp.seek(0)
+
+                response = HttpResponse(tmp.read(),
+                                        content_type='application/zip')
+
+            response['Cache-Control'] = 'no-cache'
+            response['Pragma'] = 'no-cache'
+            response['Expires'] = 0
+            response['Content-Disposition'] = \
+                'inline; filename=%s-%s-%s.zip' % (
+                    slugify(principal.tipo.sigla),
+                    principal.numero,
+                    principal.ano)
+
+            return response
+
+        def get(self, request, *args, **kwargs):
+            if 'download' in request.GET:
+                return self.download(request.GET.get('download'))
+            return Crud.DetailView.get(self, request, *args, **kwargs)
 
         def hook_documentoadministrativo_set__deprecated(self, obj):
 
