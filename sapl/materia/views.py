@@ -2052,6 +2052,9 @@ class MateriaLegislativaCrud(Crud):
                 ).order_by('data_anexacao'):
                     get_anexadas_from(a.materia_anexada)
 
+                for d in m.documentoacessorio_set.all():
+                    m_paths.append((d, getattr(d.arquivo, ff)))
+
             get_anexadas_from(principal)
 
             docs = principal.documentoadministrativo_set.all()
@@ -2065,18 +2068,28 @@ class MateriaLegislativaCrud(Crud):
 
                 with zipfile.ZipFile(tmp, 'w') as file:
 
-                    for m, p in m_paths:
+                    for i, p in m_paths:
+
+                        if isinstance(i, DocumentoAcessorio):
+                            arcname = '{}-{}-{}-{}.{}'.format(
+                                i.id,
+                                i.ano,
+                                slugify(i.tipo.descricao),
+                                slugify(i.nome),
+                                p.split('.')[-1]
+                            )
+                        else:
+                            arcname = '{}-{}-{:02d}-{}-{}.{}'.format(
+                                i.id,
+                                i.ano,
+                                i.numero,
+                                slugify(i.tipo.sigla),
+                                slugify(i.tipo.descricao),
+                                p.split('.')[-1])
 
                         file.write(
                             p,
-                            arcname='{}-{}-{:02d}-{}-{}.{}'.format(
-                                m.id,
-                                m.ano,
-                                m.numero,
-                                slugify(m.tipo.sigla),
-                                slugify(m.tipo.descricao),
-                                p.split('.')[-1]
-                            )
+                            arcname
                         )
 
                 tmp.seek(0)
