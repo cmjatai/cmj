@@ -11,8 +11,13 @@ class AppConfig(apps.AppConfig):
 
     def ready(self):
         from . import signals
+
+
+        return
         from . import tasks
         from cmj.celery import app as celery_app
+
+
 
         if settings.DEBUG:
             return
