@@ -39,7 +39,7 @@
                 {% if doc.extra_data.statistics.likeCount != '0' %}
                   &#8226; {{ doc.extra_data.statistics.likeCount }} <i class="fas fa-thumbs-up"></i>
                 {% endif %}
-                {% if doc.extra_data.statistics.dislikeCount != '0' %}
+                {% if doc.extra_data.statistics.dislikeCount != '0' and doc.extra_data_statistics.dislikeCount %}
                   &#8226; {{ doc.extra_data.statistics.dislikeCount }} <i class="fas fa-thumbs-down"></i>
                 {% endif %}
                 <br>&#8226;
