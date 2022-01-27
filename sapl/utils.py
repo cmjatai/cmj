@@ -504,12 +504,20 @@ def choice_anos_com_documentoadministrativo():
 def choice_anos_com_sessaoplenaria():
     try:
         from sapl.sessao.models import SessaoPlenaria
-        anos_list = SessaoPlenaria.objects.all().dates('data_inicio', 'year')
-        # a listagem deve ser em ordem descrescente, mas por algum motivo
-        # a adicao de .order_by acima depois do all() nao surte efeito
-        # apos a adicao do .dates(), por isso o reversed() abaixo
-        anos = [(k.year, k.year) for k in reversed(anos_list)]
-        return anos
+        y = SessaoPlenaria.objects.all().dates('data_inicio', 'year')
+        
+        y = list(map(lambda x: x.year, y))
+        
+        now = timezone.now()
+        
+        if now.year not in y:
+            y.append(now.year)
+            
+        y.sort(reverse=True)
+        
+        y = map(lambda x: (x, x), y)
+        
+        return y    
     except Exception:
         return []
 
