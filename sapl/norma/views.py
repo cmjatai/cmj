@@ -78,7 +78,7 @@ class NormaDestaquesView(ListView):
     paginate_by = 1000
 
     def get_queryset(self):
-        return NormaJuridica.objects.filter(norma_de_destaque=True).order_by('data')
+        return NormaJuridica.objects.filter(norma_de_destaque=True).order_by('tipo__relevancia', '-data')
 
     @property
     def title(self):

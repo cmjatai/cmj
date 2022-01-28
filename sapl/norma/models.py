@@ -61,6 +61,10 @@ class TipoNormaJuridica(models.Model):
     sigla = models.CharField(max_length=3, verbose_name=_('Sigla'))
     descricao = models.CharField(max_length=50, verbose_name=_('Descrição'))
 
+    relevancia = models.PositiveIntegerField(
+        default=0,
+        verbose_name=_('Relevância'),)
+
     origem_processo_legislativo = models.NullBooleanField(
         blank=True, default=True, verbose_name=_('Possui Origem no Processo Legislativo?'),
         choices=YES_NO_CHOICES)
