@@ -27,6 +27,7 @@ import django_filters
 
 from cmj.mixins import GoogleRecapthaMixin
 from cmj.utils import CHOICE_SIGNEDS
+import sapl
 from sapl.base.models import AppConfig, Autor, TipoAutor
 from sapl.comissoes.models import Comissao, Participacao, Composicao
 from sapl.compilacao.models import (STATUS_TA_IMMUTABLE_PUBLIC,
@@ -50,7 +51,6 @@ from sapl.utils import (YES_NO_CHOICES, SEPARADOR_HASH_PROPOSICAO,
                         models_with_gr_for_model, qs_override_django_filter,
                         choice_anos_com_materias, FilterOverridesMetaMixin, FileFieldCheckMixin,
                         lista_anexados)
-import sapl
 
 from .models import (AcompanhamentoMateria, Anexada, Autoria, DespachoInicial,
                      DocumentoAcessorio, Numeracao, Proposicao, Relatoria,
@@ -58,7 +58,7 @@ from .models import (AcompanhamentoMateria, Anexada, Autoria, DespachoInicial,
 
 
 def CHOICE_TRAMITACAO():
-    return [('', 'Tanto Faz'),
+    return [('', 'Ambos'),
             (1, 'Sim'),
             (0, 'Não')]
 
@@ -1280,30 +1280,45 @@ class MateriaLegislativaFilterSet(django_filters.FilterSet):
         self.form.fields['tipo_listagem'] = self.tipo_listagem
 
         row1 = to_row(
-            [('tipo', 5), ('ementa', 7)])
+            [
+                ('em_tramitacao', 2),
+                ('tipo', 4),
+                ('numero', 3),
+                ('ano', 3),
+            ]
+        )
+
         row2 = to_row(
-            [('numero', 3),
-             ('numeracao__numero_materia', 3),
-             ('numero_protocolo', 3),
-             ('ano', 3)])
+            [
+                ('ementa', 12)
+            ]
+        )
+
+        # row2 = to_row(
+        #    [
+        #        ('numeracao__numero_materia', 3),
+        #        ('numero_protocolo', 3),
+        #    ]
+        #)
+
         row3 = to_row(
             [('data_apresentacao', 6),
              ('data_publicacao', 6)])
         row4 = to_row([
             ('autoria__autor', 0),
             (Button('pesquisar',
-                    'Pesquisar Autor',
+                    'Selecionar Autor',
                     css_class='btn btn-secondary btn-sm'), 2),
             (Button('limpar',
                     'limpar Autor',
                     css_class='btn btn-secondary btn-sm'), 2),
-            ('autoria__primeiro_autor', 2),
-            ('autoria__autor__tipo', 3),
-            ('autoria__autor__parlamentar_set__filiacao__partido', 3)
+            #('autoria__primeiro_autor', 2),
+            ('autoria__autor__tipo', 4),
+            ('autoria__autor__parlamentar_set__filiacao__partido', 4)
         ])
         row6 = to_row(
             [('relatoria__parlamentar_id', 6),
-             ('em_tramitacao', 6)])
+             ])
         row7 = to_row(
             [('tramitacao__unidade_tramitacao_destino', 6),
              ('tramitacao__status', 6),
@@ -1331,34 +1346,43 @@ class MateriaLegislativaFilterSet(django_filters.FilterSet):
         self.form.helper = SaplFormHelper()
         self.form.helper.form_method = 'GET'
         self.form.helper.layout = Layout(
-            Fieldset(_(
-                '''
+            Fieldset(
+                _(
+                    '''
                 Pesquisa Parametrizada<br>
                 <small>
                 <strong class="text-red">TODOS OS CAMPOS SÃO OPCIONAIS!</strong>
                 </small>
                 '''
-            ),
-                row1, row2
+                ),
+                row1,
+                to_row([
+                    (row2, 'col'),
+                    (form_actions(label=_('Processar Pesquisa')),
+                     'col-md-auto mt-3 pt-3')
+                ])
             ),
 
-            Fieldset(_('Como listar os resultados da pesquisa'),
+            Fieldset(
+                _('Como listar os resultados da pesquisa'),
 
-                     to_row([
-                         (row8, 'col'),
-                         (form_actions(label=_('Processar Pesquisa')),
-                          'col-md-auto mt-3 pt-3')
-                     ])
-                     ),
+                row8,
+
+            ),
             # Fieldset(_('Origem externa'),
             #         row10, row11
             #         ),
-            Fieldset(_('Pesquisa Avançada'),
-                     row3,
-                     HTML(autor_label),
-                     HTML(autor_modal),
-                     row4, row6, row7, row9,
-                     )
+            Fieldset(
+                _('Pesquisa Avançada'),
+                HTML(autor_label),
+                HTML(autor_modal),
+                row4,
+                row3,
+                row7,
+
+                # row6,
+                # row9,
+            )
         )
 
     @property
@@ -2874,12 +2898,12 @@ class ConfirmarProposicaoForm(ProposicaoForm):
                         map(lambda s: s[0],
                             self.instance.metadata['signs']['texto_original']['signs']
                             )
-                        )
+                    )
                     parlamentares = Parlamentar.objects.filter(
                         nome_completo__in=signs
-                        ).exclude(
-                            pk=autoria.autor.autor_related.id
-                            )
+                    ).exclude(
+                        pk=autoria.autor.autor_related.id
+                    )
                     for p in parlamentares:
                         autoria = Autoria()
                         autoria.autor = p.autor.first()
@@ -2887,7 +2911,8 @@ class ConfirmarProposicaoForm(ProposicaoForm):
                         autoria.primeiro_autor = True
                         autoria.save()
             except Exception as e:
-                self.logger.debug(f"Erro no Registro de multiplas autorias. Proposicao id={proposicao.id}")
+                self.logger.debug(
+                    f"Erro no Registro de multiplas autorias. Proposicao id={proposicao.id}")
 
             autores = materia.autores.all()
             self.instance.results['messages']['success'].append(_(
@@ -3009,7 +3034,8 @@ class ConfirmarProposicaoForm(ProposicaoForm):
 
         protocolo.tipo_protocolo = '1'
 
-        protocolo.interessado = str(proposicao.autor)[:200]  # tamanho máximo 200
+        protocolo.interessado = str(proposicao.autor)[
+            :200]  # tamanho máximo 200
         protocolo.autor = proposicao.autor
         protocolo.assunto_ementa = proposicao.descricao
         protocolo.numero_paginas = cd['numero_de_paginas']
