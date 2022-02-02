@@ -1,6 +1,7 @@
 from datetime import timedelta, datetime
 from random import random
 
+import dateutil.parser
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields.jsonb import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
@@ -10,7 +11,7 @@ from django.db.models.aggregates import Sum
 from django.db.models.deletion import PROTECT, CASCADE
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-import dateutil.parser
+import pytz
 
 from cmj.mixins import CmjAuditoriaModelMixin
 from sapl.utils import SaplGenericForeignKey, from_date_to_datetime_utc
@@ -120,12 +121,21 @@ class PullExecManager(manager.Manager):
 
     def timedelta_quota_pull(self):
         qs = self.get_queryset()
-        now = timezone.now()
-        f = from_date_to_datetime_utc
-        interval = f(now) + timedelta(hours=7), f(
-            now +
-            timedelta(days=1)
-        ) + timedelta(hours=7)
+
+        pacific_timezone = pytz.timezone('US/Pacific')
+        pacific_time = timezone.localtime(timezone=pacific_timezone)
+
+        st = datetime.combine(pacific_time, datetime.min.time())
+        st = pacific_timezone.localize(st)
+
+        et = st + timedelta(hours=24)
+
+        if pacific_time.hour > 17:
+            st = st + timedelta(days=1)
+            return st - pacific_time
+
+        interval = st, et
+
         qu = qs.filter(
             # faz até meia noite América/São Paulo
             data_exec__gte=interval[0],
@@ -137,15 +147,14 @@ class PullExecManager(manager.Manager):
         else:
             qu = 0
 
-        seconds_final_day = (interval[1] - now).seconds
+        seconds_final_day = (interval[1] - pacific_time).seconds
 
         chamada_livre = (9000 - qu) / 100
 
-        if chamada_livre < 1 or seconds_final_day < 600:
-            # reinicia as 7h da manhã América/São Paulo
-            return (interval[1] - now)  # + timedelta(hours=4)
+        if chamada_livre < 1 or seconds_final_day < 1800:
+            return (interval[1] - pacific_time)
 
-        week = now.weekday()
+        week = pacific_time.weekday()
         maxs = 1800 if chamada_livre < 50 else 600
         if week in (5, 6):
             maxs = 3600

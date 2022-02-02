@@ -1,13 +1,13 @@
 import io
 import logging
 
+import PyPDF4
 from PyPDF4.pdf import PdfFileReader, PdfFileWriter
 from django.core.management.base import BaseCommand
 from django.db.models.signals import post_delete, post_save
 from reportlab.lib.pagesizes import A4, landscape, portrait
 from reportlab.lib.utils import open_and_read
 from reportlab.pdfgen import canvas
-import PyPDF4
 
 
 class Command(BaseCommand):
@@ -70,6 +70,7 @@ class Command(BaseCommand):
             )
 
         return arquivos
+
     def get_parametros_847(self):
 
         coordenadas = [
@@ -109,7 +110,7 @@ class Command(BaseCommand):
                     'xfh': 183, 'yfh': 505, 'wfh': 450, 'hfh': 63,  # fundo do cabeçalho
                 }
             ),
-            
+
             (
                 67,
                 {
@@ -119,7 +120,7 @@ class Command(BaseCommand):
                     'xfh': 156, 'yfh': 502, 'wfh': 450, 'hfh': 67,  # fundo do cabeçalho
                 }
             ),
-            
+
             (
                 56,
                 {
@@ -129,7 +130,7 @@ class Command(BaseCommand):
                     'xfh': 166, 'yfh': 502, 'wfh': 450, 'hfh': 67,  # fundo do cabeçalho
                 }
             ),
-            
+
             (
                 54,
                 {
@@ -140,7 +141,7 @@ class Command(BaseCommand):
                 }
             ),
 
-            
+
             (
                 27,
                 {
@@ -236,6 +237,7 @@ class Command(BaseCommand):
         page_mask = None
         pl = None
         count_page = 0
+
         def pagina_com_logotipo(coord, num_page):
 
             nonlocal page_mask
@@ -291,6 +293,7 @@ class Command(BaseCommand):
                 can.save()
 
             except Exception as e:
+
                 print(e)
 
             packet.seek(0)
@@ -300,7 +303,7 @@ class Command(BaseCommand):
 
         if partes_ou_completo == 'P':
             vo = ''
-            
+
             for i, o, coord in arquivos:
                 print(i)
                 ofile = PdfFileWriter()
@@ -326,9 +329,9 @@ class Command(BaseCommand):
                     if coord:
                         pl = pagina_com_logotipo(coord, num_page)
                         count_page += 1
-                        
+
                     p = ifile.getPage(num_page)
-                    if coord:      
+                    if coord:
                         p.mergePage(pl.getPage(0))
                         #p.mergeRotatedPage(pl.getPage(0), 90, False)
 

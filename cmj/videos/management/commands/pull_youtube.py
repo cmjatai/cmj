@@ -1,10 +1,11 @@
 
 from datetime import timedelta, datetime
-from random import random
 import json
 import logging
+from random import random
 import re
 
+import dateutil.parser
 from django.apps import apps
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -12,7 +13,6 @@ from django.core.management.base import BaseCommand
 from django.db.models import Q, F
 from django.db.models.signals import post_delete, post_save
 from django.utils import timezone
-import dateutil.parser
 
 from cmj.sigad.models import Documento
 from cmj.signals import Manutencao
@@ -41,8 +41,8 @@ class Command(BaseCommand):
         # Video.objects.all().update(created=F('modified'))
 
         # PullYoutube.objects.pull_from_date()
-        # PullExec.objects.timedelta_quota_pull()
-        self.corrigir_erro_causado_em_full_metadata()
+        PullExec.objects.timedelta_quota_pull()
+        # self.corrigir_erro_causado_em_full_metadata()
         # pull_youtube()
         # return
         # vincular_sistema_aos_videos()
