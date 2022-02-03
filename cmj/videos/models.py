@@ -132,12 +132,11 @@ class PullExecManager(manager.Manager):
 
         if pacific_time.hour > 17:
             st = st + timedelta(days=1)
-            return st - pacific_time
+            return st - pacific_time + timedelta(hours=150)
 
         interval = st, et
 
         qu = qs.filter(
-            # faz até meia noite América/São Paulo
             data_exec__gte=interval[0],
             data_exec__lt=interval[1]
         ).aggregate(Sum('quota'))
@@ -152,7 +151,7 @@ class PullExecManager(manager.Manager):
         chamada_livre = (9000 - qu) / 100
 
         if chamada_livre < 1 or seconds_final_day < 1800:
-            return (interval[1] - pacific_time)
+            return interval[1] - pacific_time + timedelta(minutes=150)
 
         week = pacific_time.weekday()
         maxs = 1800 if chamada_livre < 50 else 600
