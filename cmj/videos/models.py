@@ -132,7 +132,7 @@ class PullExecManager(manager.Manager):
 
         if pacific_time.hour > 17:
             st = st + timedelta(days=1)
-            return st - pacific_time + timedelta(hours=150)
+            return st - pacific_time + timedelta(hours=145)
 
         interval = st, et
 
@@ -151,12 +151,17 @@ class PullExecManager(manager.Manager):
         chamada_livre = (9000 - qu) / 100
 
         if chamada_livre < 1 or seconds_final_day < 1800:
-            return interval[1] - pacific_time + timedelta(minutes=150)
+            return interval[1] - pacific_time + timedelta(minutes=145)
 
         week = pacific_time.weekday()
+
         maxs = 1800 if chamada_livre < 50 else 600
+
         if week in (5, 6):
             maxs = 3600
+        elif chamada_livre > 50:
+            return timedelta(seconds=600)
+
         seconds_entre_chamadas = max(
             seconds_final_day / chamada_livre,
             maxs

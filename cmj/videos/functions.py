@@ -1,15 +1,15 @@
 
 from datetime import timedelta
-from random import random
 import json
 import logging
+from random import random
 import re
 
+import dateutil.parser
 from django.apps import apps
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
-import dateutil.parser
 
 from cmj.sigad.models import Documento
 from cmj.videos.models import PullYoutube, Video, VideoParte, PullExec
@@ -127,18 +127,16 @@ def pull_youtube():
 
     now = timezone.now()
 
-    td_execs = PullExec.objects.timedelta_quota_pull().total_seconds()
-
     pull_atual = PullYoutube.objects.pull_from_date()
 
-    pulls = list(PullYoutube.objects.exclude(id=pull_atual.id).order_by(
-        'execucao', '-id')[:1 if td_execs > 2500 else 2]
-    )
+    pulls = PullYoutube.objects.exclude(
+        id=pull_atual.id).order_by('execucao', '-id').first()
 
     if pull_atual not in pulls:
         pulls.insert(0, pull_atual)
 
     update_auto_now(Video, disabled=True)
+
     for pull in pulls:
 
         pageToken = ''
