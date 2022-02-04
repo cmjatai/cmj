@@ -1,3 +1,4 @@
+import glob
 import logging
 import os
 
@@ -35,38 +36,30 @@ class Command(BaseCommand):
 
         self.logger = logging.getLogger(__name__)
 
-        """        parents = [173261, ]
-        for d in Dispositivo.objects.filter(
-            ta_id=8660,
-            ordem__gt=77000
-        ):
-            parents = parents[:d.nivel]
-            if d.nivel >= len(parents):
-                parents.append(d.id)
+        folder_in = '/home/leandro/TEMP/scanners/'
+        folder_out = folder_in + 'out/'
+        os.makedirs(folder_out, exist_ok=True)
 
-            d.dispositivo_pai_id = parents[d.nivel - 1]
-            d.save()"""
+        lf = glob.glob(folder_in + '**', recursive=True)
+        lf.sort()
 
-        """for ta in TextoArticulado.objects.filter(
-                clone__isnull=False, id=762).order_by('numero'):
-            print(ta)
+        for f in lf:
+            f_out = f.split(folder_in)
+            f_out = folder_out.join(f_out)
+            print(f, f_out)
 
-            for d in ta.clone.dispositivos_set.filter(id__gte=173279).order_by('ordem'):
-                if not d.dispositivo_raiz:
-                    continue
+            try:
+                i = Image.open(f)
+                i.convert(mode='P', palette=Image.W)
 
-                p = d.dispositivo_pai
-                novo_pai = Dispositivo.objects.filter(
-                    texto=p.texto,
-                    tipo_dispositivo=p.tipo_dispositivo,
-                    ta=ta.clone,
-                    nivel=p.nivel
-                ).first()
+                #f_out = f_out.replace('jpeg', 'png')
+                #f_out = f_out.replace('jpg', 'png')
 
-                if novo_pai:
-                    d.dispositivo_pai = novo_pai
-                    #d.dispositivo_raiz_id = 173263
-                    d.save()"""
+                i.save(f_out)
+                break
+
+            except IsADirectoryError:
+                os.makedirs(f_out, exist_ok=True)
 
     def transforma_imagens_armazenadas_em_pdf(self):
         models = [

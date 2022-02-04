@@ -41,9 +41,9 @@ class Command(BaseCommand):
         # Video.objects.all().update(created=F('modified'))
 
         # PullYoutube.objects.pull_from_date()
-        PullExec.objects.timedelta_quota_pull()
+        # PullExec.objects.timedelta_quota_pull()
         # self.corrigir_erro_causado_em_full_metadata()
-        # pull_youtube()
+        pull_youtube()
         # return
         # vincular_sistema_aos_videos()
         # video_documento_na_galeria()

@@ -129,8 +129,8 @@ def pull_youtube():
 
     pull_atual = PullYoutube.objects.pull_from_date()
 
-    pulls = PullYoutube.objects.exclude(
-        id=pull_atual.id).order_by('execucao', '-id').first()
+    pulls = [PullYoutube.objects.exclude(
+        id=pull_atual.id).order_by('execucao', '-id').first(), ]
 
     if pull_atual not in pulls:
         pulls.insert(0, pull_atual)
