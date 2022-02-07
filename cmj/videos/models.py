@@ -132,7 +132,7 @@ class PullExecManager(manager.Manager):
 
         if pacific_time.hour > 17:
             st = st + timedelta(days=1)
-            return st - pacific_time + timedelta(hours=145)
+            return st - pacific_time + timedelta(minutes=145)
 
         interval = st, et
 
