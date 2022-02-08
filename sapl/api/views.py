@@ -9,8 +9,9 @@ from django.http.response import Http404, HttpResponse
 from django.urls.base import reverse
 from django.utils import timezone
 from django.utils.decorators import classonlymethod
-from django.utils.text import capfirst
+from django.utils.text import capfirst, slugify
 from django.utils.translation import ugettext_lazy as _
+import django_filters
 from django_filters.filters import CharFilter
 from django_filters.rest_framework.backends import DjangoFilterBackend
 from django_filters.rest_framework.filterset import FilterSet
@@ -21,7 +22,6 @@ from rest_framework.exceptions import PermissionDenied, NotFound
 from rest_framework.fields import SerializerMethodField
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-import django_filters
 
 from cmj.core.models import AreaTrabalho, AuditLog
 from cmj.globalrules import GROUP_MATERIA_WORKSPACE_VIEWER
@@ -464,13 +464,17 @@ class ResponseFileMixin:
 
         mime = get_mime_type_from_file_extension(arquivo.name)
 
-        if settings.DEBUG:
+        """if settings.DEBUG:
             response = HttpResponse(arquivo.file, content_type=mime)
-            return response
+            return response"""
+
+        custom_filename = arquivo.name.split('/')[-1]
+        if hasattr(self, 'custom_filename'):
+            custom_filename = self.custom_filename(item)
 
         response = HttpResponse(content_type='%s' % mime)
         response['Content-Disposition'] = (
-            'inline; filename="%s"' % arquivo.name.split('/')[-1])
+            'inline; filename="%s"' % custom_filename)
 
         response['Cache-Control'] = 'no-cache'
         response['Pragma'] = 'no-cache'
@@ -615,6 +619,15 @@ class _DocumentoAcessorioViewSet(ResponseFileMixin):
 
 @customize(MateriaLegislativa)
 class _MateriaLegislativaViewSet(ResponseFileMixin):
+
+    def custom_filename(self, item):
+        arcname = '{}-{:03d}-{}-{}.{}'.format(
+            item.ano,
+            item.numero,
+            slugify(item.tipo.sigla),
+            slugify(item.tipo.descricao),
+            item.texto_original.path.split('.')[-1])
+        return arcname
 
     @action(detail=True)
     def texto_original(self, request, *args, **kwargs):

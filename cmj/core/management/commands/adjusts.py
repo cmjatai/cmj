@@ -1,17 +1,25 @@
 import glob
 import logging
 import os
+import subprocess
+import sys
 
 from PIL import Image
+import cv2
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.base import File
 from django.core.management.base import BaseCommand
 from django.db.models import Q
 from django.db.models.signals import post_delete, post_save
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from reportlab.platypus.doctemplate import SimpleDocTemplate
 
 from cmj.core.models import OcrMyPDF
 from cmj.diarios.models import DiarioOficial
 from cmj.signals import Manutencao
+from cmj.utils import ProcessoExterno
+import numpy as np
 from sapl.compilacao.models import TextoArticulado, Dispositivo
 from sapl.materia.models import MateriaLegislativa, DocumentoAcessorio
 from sapl.norma.models import NormaJuridica
@@ -27,6 +35,7 @@ def _get_registration_key(model):
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
+        self.logger = logging.getLogger(__name__)
         m = Manutencao()
         m.desativa_auto_now()
         post_delete.disconnect(dispatch_uid='sapl_post_delete_signal')
@@ -43,23 +52,99 @@ class Command(BaseCommand):
         lf = glob.glob(folder_in + '**', recursive=True)
         lf.sort()
 
+        doc = SimpleDocTemplate(
+            folder_out + 'out.pdf',
+            rightMargin=0,
+            leftMargin=0,
+            topMargin=0,
+            bottomMargin=0)
+
+        c = canvas.Canvas(folder_out + 'out.pdf')
+
+        flist_out = []
         for f in lf:
+            if folder_out in f:
+                continue
             f_out = f.split(folder_in)
             f_out = folder_out.join(f_out)
             print(f, f_out)
 
             try:
+                i = cv2.imread(f)
+                ig = i  # cv2.cvtColor(i, cv2.COLOR_RGB2GRAY)
+                cv2.imwrite(
+                    f_out, i, [
+                        int(cv2.IMWRITE_JPEG_QUALITY), 20,
+                        int(cv2.IMWRITE_JPEG_PROGRESSIVE), 1,
+                    ])
+
+                # flist_out.append(f_out)
+                c.drawImage(f_out, 0, 0,
+                            width=595,
+                            height=841)
+                c.showPage()
+            except:
+                continue
+        c.save()
+
+        """
+        cria pdf através da pillow
+        
+        flist_out_img_obj = []
+        for f in flist_out:
+            flist_out_img_obj.append(Image.open(f))
+
+        f = flist_out_img_obj.pop(0)
+
+        f.save(
+            folder_out + 'out.pdf',
+            "PDF",
+            resolution=100.0,
+            save_all=True,
+            append_images=flist_out_img_obj)"""
+
+        cmd = ["{}/ocrmypdf".format('/'.join(sys.executable.split('/')[:-1])),
+               "-q",                  # Execução silenciosa
+               "-l por",              # tesseract portugues
+               "-j {}".format(8),     # oito threads
+               "--fast-web-view 0",   # não inclui fast web view
+               # "--deskew",
+               #"--optimize 3 --jbig2-lossy",
+               #"--image-dpi 300",
+               #"--jpeg-quality 10",
+               # "--rotate-page",
+               "--pdfa-image-compression lossless",  # jpeg
+               "--output-type pdfa-1",
+
+               folder_out + 'out.pdf',
+               folder_out + 'out_ocr.pdf']
+
+        print(' '.join(cmd))
+        # subprocess.Popen(
+        #    ' '.join(cmd), shell=True, stdout=subprocess.PIPE)
+        try:
+            p = ProcessoExterno(' '.join(cmd), self.logger)
+            r = p.run(timeout=300)
+
+            if r is None:
+                return
+            if not r or r in (2, 6):
+                return
+        except:
+            return
+
+        """try:
                 i = Image.open(f)
                 i.convert(mode='P', palette=Image.W)
-
+    
                 #f_out = f_out.replace('jpeg', 'png')
                 #f_out = f_out.replace('jpg', 'png')
-
+    
                 i.save(f_out)
                 break
-
+    
             except IsADirectoryError:
-                os.makedirs(f_out, exist_ok=True)
+                os.makedirs(f_out, exist_ok=True)"""
 
     def transforma_imagens_armazenadas_em_pdf(self):
         models = [

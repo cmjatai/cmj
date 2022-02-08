@@ -1,13 +1,13 @@
 
 from datetime import datetime, timedelta
-from pwd import getpwuid
-from time import sleep
 import logging
 import os
+from pwd import getpwuid
 import shutil
 import stat
 import subprocess
 import sys
+from time import sleep
 import time
 
 from django.conf import settings

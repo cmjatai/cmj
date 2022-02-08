@@ -803,7 +803,7 @@ def get_sessao_plenaria(sessao, casa):
     for modvn in materias_ordem_dia_votacao_nominal:
         votos_materia_od = []
         t_materia = modvn.materia
-        registro_od = RegistroVotacao.objects.filter(ordem=modvn)
+        registro_od = RegistroVotacao.objects.filter(ordem=modvn).first()
 
         if registro_od:
             for vp_od in VotoParlamentar.objects.filter(votacao=registro_od).order_by('parlamentar'):
