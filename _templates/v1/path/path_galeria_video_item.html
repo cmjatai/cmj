@@ -22,7 +22,7 @@
       </span>
       <div class="inner-text">
           <a class="titulo {% if doc.extra_data.snippet.liveBroadcastContent != 'none' %}titulo-{{doc.extra_data.snippet.liveBroadcastContent}}{% endif %}" href="/{{doc.slug}}" >
-              {{doc.titulo}}
+              {{doc.titulo|safe}}
           </a>
           <br>
           {% if doc.extra_data.snippet.liveBroadcastContent == 'none'  %}
