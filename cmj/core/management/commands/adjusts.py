@@ -4,7 +4,7 @@ import os
 import subprocess
 import sys
 
-from PIL import Image
+from PIL import Image, ImageFilter
 import cv2
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.base import File
@@ -52,6 +52,23 @@ class Command(BaseCommand):
         lf = glob.glob(folder_in + '**', recursive=True)
         lf.sort()
 
+        flist_out = []
+
+        composicao = [
+            ['out-0451', 'out-0538'],
+            # ['out-0533', 'out-0538']
+        ]
+
+        for c in composicao:
+            for f in lf:
+                if c[0] and c[0] not in f:
+                    continue
+                c[0] = ''
+
+                flist_out.append(f)
+                if c[1] in f:
+                    break
+
         doc = SimpleDocTemplate(
             folder_out + 'out.pdf',
             rightMargin=0,
@@ -61,32 +78,56 @@ class Command(BaseCommand):
 
         c = canvas.Canvas(folder_out + 'out.pdf')
 
-        flist_out = []
-        for f in lf:
+        """def get_white_noise_image(w, h):
+            pil_map = Image.fromarray(np.random.randint(
+                0, 255, (w, h, 3), dtype=np.dtype('uint8')))
+            return pil_map"""
+
+        for f in flist_out:
             if folder_out in f:
                 continue
+
+            # if '.png' not in f:
+            #    continue
+
+            if '.jpeg' not in f.lower() and '.jpg' not in f.lower():
+                continue
+
             f_out = f.split(folder_in)
             f_out = folder_out.join(f_out)
             print(f, f_out)
 
+            #f_out = f_out.replace('.png', '.jpeg')
+
             try:
+                """i = Image.open(f)
+                i = i.convert("L")
+                i = np.array(i)
+                i = (i > 128) * 255
+                #i = Image.fromarray(i).convert("L")
+                i = Image.fromarray(np.uint8(i))
+                i.save(f_out, optimize=True, quality=5)"""
+
+                #img = Image.open(f)
+                #img = img.convert("L")
+                # img.save(f_out)  # , optimize=True, quality=10)"""
+
                 i = cv2.imread(f)
-                ig = i  # cv2.cvtColor(i, cv2.COLOR_RGB2GRAY)
+                ig = cv2.cvtColor(i, cv2.COLOR_RGB2GRAY)
+                #ig = cv2.inRange(ig, 200, 255)
                 cv2.imwrite(
-                    f_out, i, [
+                    f_out, ig, [
                         int(cv2.IMWRITE_JPEG_QUALITY), 20,
                         int(cv2.IMWRITE_JPEG_PROGRESSIVE), 1,
                     ])
 
-                # flist_out.append(f_out)
                 c.drawImage(f_out, 0, 0,
                             width=595,
                             height=841)
                 c.showPage()
-            except:
+            except Exception as e:
                 continue
         c.save()
-
         """
         cria pdf através da pillow
         
@@ -108,14 +149,18 @@ class Command(BaseCommand):
                "-l por",              # tesseract portugues
                "-j {}".format(8),     # oito threads
                "--fast-web-view 0",   # não inclui fast web view
-               # "--deskew",
-               #"--optimize 3 --jbig2-lossy",
-               #"--image-dpi 300",
-               #"--jpeg-quality 10",
-               # "--rotate-page",
-               "--pdfa-image-compression lossless",  # jpeg
-               "--output-type pdfa-1",
+               "--image-dpi 300",
+               #"--rotate-pages",
+               "--remove-background",
 
+               "--optimize 3",
+               "--jpeg-quality 5",
+
+               # "--deskew",
+               #"--clean-final",
+               "--pdfa-image-compression jpeg",  # jpeg
+               "--output-type pdfa-1",
+               #"--tesseract-timeout 0",
                folder_out + 'out.pdf',
                folder_out + 'out_ocr.pdf']
 
