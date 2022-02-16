@@ -60,7 +60,7 @@
 
   {% if n.get_normas_relacionadas.0|length > 0 %}
     {% for p in n.get_normas_relacionadas.0 %}
-      <div class="col-6 small text-blue">
+      <div class="col-{% if n.get_normas_relacionadas.10|length > 6 %}6{%else%}12{%endif%}  small text-blue">
         <b>{{ p.tipo_vinculo.descricao_ativa }}</b>&nbsp;
         <a href="{% url 'sapl.norma:normajuridica_detail' p.norma_relacionada.pk %}">
           {{ p.norma_relacionada.epigrafe }}
