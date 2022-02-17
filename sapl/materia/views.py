@@ -1,10 +1,10 @@
 
 from datetime import datetime, timedelta
-from random import choice
-from string import ascii_letters, digits
 import logging
 import os
+from random import choice
 import shutil
+from string import ascii_letters, digits
 import tempfile
 import zipfile
 
@@ -14,7 +14,8 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, ValidationError
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, ValidationError,\
+    PermissionDenied
 from django.db.models import Max, Q
 from django.http import HttpResponse, JsonResponse
 from django.http.response import Http404, HttpResponseRedirect
@@ -33,6 +34,8 @@ import weasyprint
 from cmj.core.models import AreaTrabalho
 from cmj.globalrules import GROUP_MATERIA_WORKSPACE_VIEWER
 from cmj.mixins import BtnCertMixin
+import requests as rq
+import sapl
 from sapl.base.email_utils import do_envia_email_confirmacao
 from sapl.base.models import Autor, CasaLegislativa, AppConfig as BaseAppConfig
 from sapl.base.signals import tramitacao_signal
@@ -63,8 +66,6 @@ from sapl.utils import (YES_NO_CHOICES, autor_label, autor_modal, SEPARADOR_HASH
                         get_mime_type_from_file_extension, montar_row_autor,
                         show_results_filter_set, mail_service_configured, lista_anexados,
                         gerar_pdf_impressos)
-import requests as rq
-import sapl
 
 from .forms import (AcessorioEmLoteFilterSet, AcompanhamentoMateriaForm,
                     AnexadaEmLoteFilterSet,
@@ -843,6 +844,15 @@ class ProposicaoCrud(Crud):
 
         def get(self, request, *args, **kwargs):
 
+            p = Proposicao.objects.get(id=kwargs['pk'])
+
+            u = request.user
+            oa = u.operadorautor_set.all().first()
+
+            if oa and oa.visibilidade_restrita and u != p.user and p.data_recebimento is None:
+                raise PermissionDenied(
+                    "Proposição de criação e edição por: {}".format(p.user))
+
             if not self._action_is_valid(request, *args, **kwargs):
                 return redirect(reverse('sapl.materia:proposicao_detail',
                                         kwargs={'pk': kwargs['pk']}))
@@ -882,10 +892,17 @@ class ProposicaoCrud(Crud):
             action = request.GET.get('action', '')
             username = request.user.username
 
-            if not action:
-                return Crud.DetailView.get(self, request, *args, **kwargs)
-
             p = Proposicao.objects.get(id=kwargs['pk'])
+
+            if not action:
+                u = request.user
+                oa = u.operadorautor_set.all().first()
+
+                if oa and oa.visibilidade_restrita and u != p.user and p.data_recebimento is None:
+                    raise PermissionDenied(
+                        "Proposição de criação e edição por: {}".format(p.user))
+
+                return Crud.DetailView.get(self, request, *args, **kwargs)
 
             msg_error = ''
             if p:
@@ -1211,8 +1228,30 @@ class ProposicaoCrud(Crud):
 
         def hook_detalhe(self, *args, **kwargs):
             return '''
-                <strong>{}</strong><br>{}
-            '''.format(args[0], args[0].descricao), args[2]
+                <strong>{}</strong><br>{}<br><small><i>Registrado por: {}</i></small>
+            '''.format(args[0], args[0].descricao, args[0].user), args[2]
+
+        def get_queryset(self):
+            qs = super().get_queryset()
+
+            u = self.request.user
+            oa = u.operadorautor_set.all().first()
+
+            if oa and oa.visibilidade_restrita:
+                qs = Proposicao.objects.all()
+
+                q = Q(
+                    data_recebimento__isnull=True,
+                    autor__operadores=u,
+                    user=u,
+                ) | Q(
+                    data_recebimento__isnull=False,
+                    autor__operadores=u
+                )
+
+                qs = qs.filter(q).order_by('-data_recebimento', '-id')
+
+            return qs
 
         def get_rows(self, object_list):
 

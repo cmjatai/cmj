@@ -1496,13 +1496,14 @@ class OperadorAutorForm(ModelForm):
         model = OperadorAutor
         fields = ['user',
                   'operador_principal',
-                  'enviar_email']
+                  'enviar_email','visibilidade_restrita']
 
     def __init__(self, *args, **kwargs):
 
-        row = to_row([('user', 6),
+        row = to_row([('user', 3),
                       ('operador_principal', 3),
-                      ('enviar_email', 3)])
+                      ('enviar_email', 3,),
+                      ('visibilidade_restrita', 3)])
 
         self.helper = SaplFormHelper()
         self.helper.layout = SaplFormLayout(

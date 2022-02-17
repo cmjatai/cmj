@@ -50,4 +50,4 @@ AutorCreate:
 
 OperadorAutor:
   {% trans 'Operador de Autor' %}:
-  - user operador_principal enviar_email
+  - user operador_principal enviar_email visibilidade_restrita

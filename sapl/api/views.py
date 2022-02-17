@@ -464,9 +464,9 @@ class ResponseFileMixin:
 
         mime = get_mime_type_from_file_extension(arquivo.name)
 
-        """if settings.DEBUG:
+        if settings.DEBUG:
             response = HttpResponse(arquivo.file, content_type=mime)
-            return response"""
+            return response
 
         custom_filename = arquivo.name.split('/')[-1]
         if hasattr(self, 'custom_filename'):

@@ -272,6 +272,10 @@ class OperadorAutor(CmjAuditoriaModelMixin):
         verbose_name=_('Enviar emails de notificação a este usuário'),
         choices=YES_NO_CHOICES, default=False)
 
+    visibilidade_restrita = models.BooleanField(
+        verbose_name=_('Ver apenas proposições criadas por este usuário'),
+        choices=YES_NO_CHOICES, default=False)
+
     @property
     def user_name(self):
         return '%s - %s' % (
