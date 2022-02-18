@@ -89,6 +89,14 @@
                         {% endfor %}
                       {% endif %}
                     </div>
+                    
+                    <div class="links-texto">
+                      {% if m.texto_original %}
+                        <a class="link-texto" href="{{m.texto_original.url}}?u={% now "u"%}" title="Texto Original">
+                          <i class="far fa-2x fa-file-{% if '.pdf' in m.texto_original.path %}pdf{% else %}archive{% endif %}"></i>
+                        </a>
+                      {% endif %}
+                    </div>
 
                     <strong>
                       <a href="{% url 'sapl.materia:materialegislativa_detail' m.id %}">
@@ -97,15 +105,8 @@
                           {% endif %}
                         {{m.tipo.sigla}} {{m.numero}}/{{m.ano}} - {{m.tipo}}
                       </a>
-                    </strong><br>
+                    </strong>
 
-                    <div class="links-texto">
-                      {% if m.texto_original %}
-                        <a class="link-texto" href="{{m.texto_original.url}}?u={% now "u"%}" title="Texto Original">
-                          <i class="far fa-2x fa-file-{% if '.pdf' in m.texto_original.path %}pdf{% else %}archive{% endif %}"></i>
-                        </a>
-                      {% endif %}
-                    </div>
 
                     <div class="text-ementa">
                     {{ m.ementa }}
