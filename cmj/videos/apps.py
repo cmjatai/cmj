@@ -1,3 +1,5 @@
+import random
+
 from django import apps
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
@@ -12,12 +14,9 @@ class AppConfig(apps.AppConfig):
     def ready(self):
         from . import signals
 
-
         return
         from . import tasks
         from cmj.celery import app as celery_app
-
-
 
         if settings.DEBUG:
             return
@@ -37,4 +36,7 @@ class AppConfig(apps.AppConfig):
                                 return
         except:
             pass
-        tasks.task_pull_youtube.apply_async(countdown=60)
+
+        tasks.task_pull_youtube.apply_async(
+            countdown=int(random.random() * 120)
+        )
