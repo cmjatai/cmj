@@ -14,11 +14,10 @@ class AppConfig(apps.AppConfig):
     def ready(self):
         from . import signals
 
-        return
         from . import tasks
         from cmj.celery import app as celery_app
 
-        if settings.DEBUG:
+        if settings.DEBUG or settings.FRONTEND_VERSION != 'v1':
             return
 
         i = celery_app.control.inspect()
@@ -38,5 +37,5 @@ class AppConfig(apps.AppConfig):
             pass
 
         tasks.task_pull_youtube.apply_async(
-            countdown=int(random.random() * 120)
+            countdown=int(60 + random.random() * 120)
         )

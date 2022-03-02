@@ -43,9 +43,9 @@ class Command(BaseCommand):
         # PullYoutube.objects.pull_from_date()
         PullExec.objects.timedelta_quota_pull()
         # self.corrigir_erro_causado_em_full_metadata()
-        pull_youtube()
-        vincular_sistema_aos_videos()
-        video_documento_na_galeria()
+        # spull_youtube()
+        # vincular_sistema_aos_videos()
+        # video_documento_na_galeria()
         # return
         # vincular_sistema_aos_videos()
         # video_documento_na_galeria()
