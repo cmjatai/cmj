@@ -339,6 +339,7 @@ class NormaCrud(Crud):
             return reverse('%s:%s' % (namespace, 'norma_pesquisa'))
 
     class ListView(Crud.ListView):  # , RedirectView):
+        paginate_by = 100
 
         def get(self, request, *args, **kwargs):
 
@@ -365,7 +366,7 @@ class NormaCrud(Crud):
                 texto_articulado__privacidade=0
             ).exclude(count_ds=0).order_by('-count_ds')"""
 
-            q1 = Q(
+            """q1 = Q(
                 texto_articulado__privacidade=0
             ) | Q(
                 texto_articulado__isnull=True
@@ -380,7 +381,9 @@ class NormaCrud(Crud):
             qs1 = qs.exclude(q1)
             qs2 = qs.filter(q2)
 
-            qs = qs1.union(qs2)
+            qs = qs1.union(qs2)"""
+
+            qs = qs.filter(checkcheck=False)
 
             return qs.order_by('-ano', '-numero')
 
