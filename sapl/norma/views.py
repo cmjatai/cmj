@@ -236,9 +236,24 @@ class NormaCrud(Crud):
 
         layout_key = None
 
+        def btn_check(self):
+
+            btn = []
+            if self.request.user.is_superuser and not self.object.checkcheck:
+                btn = [
+                    '{}?check={}'.format(
+                        reverse('sapl.norma:normajuridica_list'),
+                        self.object.pk
+                    ),
+                    'btn-warning',
+                    _('Check')
+                ]
+
+            return btn
+
         @property
         def extras_url(self):
-            btns = [self.btn_certidao('texto_integral')]
+            btns = [self.btn_check(), self.btn_certidao('texto_integral'), ]
 
             if self.request.user.has_perm('compilacao.add_textoarticulado'):
                 if not self.object.texto_articulado.exists():
