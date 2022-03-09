@@ -38,14 +38,35 @@ class Command(BaseCommand):
 
         self.logger = logging.getLogger(__name__)
 
+        for v in Video.objects.order_by('-id')[:2]:
+            print(v.id, v)
+            pull_youtube_metadata_video(v)
+            continue
+            for vp in v.videoparte_set.all():
+                d = vp.content_object
+
+                if not d:
+                    vp.delete()
+                    continue
+
+                if vp.content_type_id == 202:
+                    d.delete()
+                    vp.delete()
+
+            if not v.videoparte_set.exists():
+                v.delete()
+                continue
+
+        return
+
         # Video.objects.all().update(created=F('modified'))
 
         # PullYoutube.objects.pull_from_date()
         PullExec.objects.timedelta_quota_pull()
         # self.corrigir_erro_causado_em_full_metadata()
-        # spull_youtube()
-        # vincular_sistema_aos_videos()
-        # video_documento_na_galeria()
+        pull_youtube()
+        vincular_sistema_aos_videos()
+        video_documento_na_galeria()
         # return
         # vincular_sistema_aos_videos()
         # video_documento_na_galeria()

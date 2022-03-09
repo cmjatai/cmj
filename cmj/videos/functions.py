@@ -298,7 +298,7 @@ def video_documento_na_galeria():
 
         docs = tuple(
             filter(
-                lambda o: o.classe_id == 233,
+                lambda o: o and o.classe_id == 233,
                 map(
                     lambda vp: vp.content_object,
                     vps)
