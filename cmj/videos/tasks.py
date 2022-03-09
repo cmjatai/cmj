@@ -3,8 +3,8 @@ from asyncio.tasks import sleep
 from datetime import timedelta
 import logging
 
-from django.utils import timezone
 import dateutil.parser
+from django.utils import timezone
 
 from cmj.celery import app
 from cmj.videos.functions import pull_youtube_metadata_video, pull_youtube,\
@@ -141,10 +141,16 @@ def task_pull_youtube(self, *args, **kwargs):
                              now + td)
 
     if not new_started:
+        logger.debug(
+            f'NEW_STARTED FALSE Task_pull_youtube - proximo em: {td.total_seconds()}')
         return
-    pull_youtube()
-    vincular_sistema_aos_videos()
-    video_documento_na_galeria()
+
+    try:
+        pull_youtube()
+        vincular_sistema_aos_videos()
+        video_documento_na_galeria()
+    except Exception as e:
+        logger.error('ERROR in Task_pull_youtube')
 
     now = timezone.now()
 
