@@ -38,9 +38,10 @@ class Command(BaseCommand):
 
         self.logger = logging.getLogger(__name__)
 
-        for v in Video.objects.order_by('-id')[:2]:
+        for v in Video.objects.order_by('-id')[:40]:
             print(v.id, v)
-            pull_youtube_metadata_video(v)
+            if v.id == 1219:
+                pull_youtube_metadata_video(v)
             continue
             for vp in v.videoparte_set.all():
                 d = vp.content_object

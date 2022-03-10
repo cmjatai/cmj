@@ -79,8 +79,15 @@ def pull_youtube_metadata_video(v):
                 if dp == d:
                     d.extra_data = v.json
                     d.descricao = v.json['snippet']['description']
+
                     d.public_date = dateutil.parser.parse(
                         v.json['snippet']['publishedAt'])
+
+                    if 'liveStreamingDetails' in v.json and \
+                            'actualStartTime' in v.json['liveStreamingDetails']:
+                        d.public_date = dateutil.parser.parse(
+                            v.json['liveStreamingDetails']['actualStartTime'])
+
                     d.save()
                 elif dp.tipo == Documento.TPD_VIDEO:
                     dp.extra_data = v.json
