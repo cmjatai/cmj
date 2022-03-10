@@ -11,15 +11,17 @@
             <div class="embed-responsive embed-responsive-16by9">
               <iframe width="560" height="315" src="https://www.youtube.com/embed/live_stream?channel=UCZXKjzKW2n1w4JQ3bYlrA-w" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;" allowfullscreen></iframe>
             </div>
-            <small><small>
-              {% with ""|video_ao_vivo as v %}
-                {{ v.json.liveStreamingDetails.concurrentViewers }} assistindo
-              {% endwith %}
-              &#8226;
-              {% with ""|video_ao_vivo as v %}
-                Transmissão iniciada há {{ v.json.liveStreamingDetails.actualStartTime|parse_datetime|age:0}}
-              {% endwith %}
-            </small></small>
+            {% comment %}
+              <small><small>
+                {% with ""|video_ao_vivo as v %}
+                  {{ v.json.liveStreamingDetails.concurrentViewers }} assistindo
+                {% endwith %}
+                &#8226;
+                {% with ""|video_ao_vivo as v %}
+                  Transmissão iniciada há {{ v.json.liveStreamingDetails.actualStartTime|parse_datetime|age:0}}
+                {% endwith %}
+              </small></small>
+            {% endcomment %}
           </div>
           {% comment %}
             <div class="col-4 video-list">
