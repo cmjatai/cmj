@@ -1,6 +1,6 @@
 from datetime import timedelta
-from operator import attrgetter
 import io
+from operator import attrgetter
 import zipfile
 
 from braces.views import FormMessagesMixin
@@ -72,19 +72,26 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
         return context
 
     def get_ultimos_videos(self):
-        docs = list(Documento.objects.qs_video_news()[:10])
+        docs = list(Documento.objects.qs_video_news()[:20])
 
         r = []
 
+        inserir_programa_diario = True
         for d in docs:
             ed = d.extra_data
             if 'snippet' in ed and \
                 'liveBroadcastContent' in ed['snippet'] and\
-                    ed['snippet']['liveBroadcastContent'] == 'live':
+                    ed['snippet']['liveBroadcastContent'] == 'live' or\
+                    "Manhã CMJ" in d.titulo and not inserir_programa_diario:
                 continue
+
             r.append(d)
+
             if len(r) == 4:
                 break
+
+            if "Manhã CMJ" in d.titulo and inserir_programa_diario:
+                inserir_programa_diario = False
 
         return r
 
