@@ -1,8 +1,9 @@
 from datetime import datetime, timedelta
-from time import sleep
 import logging
 import os
+from time import sleep
 
+import boto3
 from django.apps import apps
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -11,7 +12,6 @@ from django.db.models.fields.files import FileField
 from django.db.models.signals import post_delete, post_save, pre_save
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
-import boto3
 
 from cmj.signals import Manutencao
 from sapl.utils import hash_sha512
@@ -50,6 +50,10 @@ class Command(BaseCommand):
         post_save.disconnect(dispatch_uid='cmj_post_save_signal')
 
         self.logger = logging.getLogger(__name__)
+
+        if settings.DEBUG:
+            self.manutencao_buckets()
+            return
 
         # self.check_size_download_month_locaweb()
         # return
@@ -827,3 +831,26 @@ class Command(BaseCommand):
             for m in app.get_models():
                 for i in m.objects.all().order_by('-id'):
                     pass
+
+    def manutencao_buckets(self):
+
+        self.s3_server = 's3_cmj'
+        self.s3_connect()
+
+        # self.list_bucket()
+
+        b = self.get_bucket('cmjatai_postgresql')
+
+        for o in b.objects.all():
+            # o.delete()
+            # continue
+
+            print(o.last_modified, '{:.1f}MB'.format(
+                o.size / 1024 / 1024), o.key)
+
+            """if '2021-0' in o.key or\
+               '2021-1' in o.key or\
+               '2021-2' in o.key or\
+               '2021-3' in o.key or\
+               '2021-6' in o.key:
+                o.delete()"""

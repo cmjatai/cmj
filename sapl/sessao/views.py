@@ -1,6 +1,6 @@
-from re import sub
 import ast
 import logging
+from re import sub
 
 from django.conf import settings
 from django.contrib import messages
@@ -53,6 +53,7 @@ from .models import (CargoMesa, ExpedienteMateria, ExpedienteSessao, OcorrenciaS
                      SessaoPlenaria, SessaoPlenariaPresenca, TipoExpediente,
                      TipoResultadoVotacao, TipoSessaoPlenaria, VotoParlamentar, TipoRetiradaPauta,
                      RetiradaPauta, TipoJustificativa, JustificativaAusencia, OradorOrdemDia, ORDENACAO_RESUMO)
+
 
 TipoSessaoCrud = CrudAux.build(TipoSessaoPlenaria, 'tipo_sessao_plenaria')
 TipoJustificativaCrud = CrudAux.build(TipoJustificativa, 'tipo_justificativa')
@@ -228,9 +229,8 @@ def customize_link_materia(context, pk, has_permission, is_expediente, user=None
         url_materia = reverse('sapl.materia:materialegislativa_detail',
                               kwargs={'pk': materia.id})
         numeracao = materia.numeracao_set.first()
-        autoria = materia.autoria_set.filter(
-            primeiro_autor=True).first()
-        autor = autoria.autor if autoria else None
+        autoria = materia.autoria_set.all()
+        autores = ', '.join(map(lambda x: x.autor.nome, autoria))
         num_protocolo = materia.numero_protocolo
 
         data_inicio_sessao = SessaoPlenaria.objects.get(id=pk).data_inicio
@@ -256,8 +256,8 @@ def customize_link_materia(context, pk, has_permission, is_expediente, user=None
                     turno = t[1]
                     break
 
+        # <b>Processo:</b> %s </br>
         title_materia = '''<a name="id%s" href=%s>%s</a> </br>
-                           <b>Processo:</b> %s </br>
                            <b>Autor:</b> %s </br>
                            <b>Protocolo:</b> %s </br>
                            <b>Turno:</b> %s </br>
@@ -265,7 +265,7 @@ def customize_link_materia(context, pk, has_permission, is_expediente, user=None
                                url_materia,
                                row[1][0],
                                numeracao if numeracao else '',
-                               autor if autor else '',
+                               autores if autores else '',
                                num_protocolo if num_protocolo else '',
                                turno)
 

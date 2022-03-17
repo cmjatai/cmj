@@ -45,6 +45,7 @@ class Command(BaseCommand):
 
         self.logger = logging.getLogger(__name__)
 
+    def criar_pdfs(self, *args, **options):
         folder_in = '/home/leandro/TEMP/scanners/'
         folder_out = folder_in + 'out/'
         os.makedirs(folder_out, exist_ok=True)
