@@ -256,7 +256,7 @@ def customize_link_materia(context, pk, has_permission, is_expediente, user=None
                     turno = t[1]
                     break
 
-        # <b>Processo:</b> %s </br>
+        #                   <b>Processo:</b> %s </br>
         title_materia = '''<a name="id%s" href=%s>%s</a> </br>
                            <b>Autor:</b> %s </br>
                            <b>Protocolo:</b> %s </br>
@@ -264,7 +264,7 @@ def customize_link_materia(context, pk, has_permission, is_expediente, user=None
                         ''' % (obj.materia.id,
                                url_materia,
                                row[1][0],
-                               numeracao if numeracao else '',
+                               #numeracao if numeracao else '',
                                autores if autores else '',
                                num_protocolo if num_protocolo else '',
                                turno)
