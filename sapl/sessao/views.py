@@ -258,7 +258,7 @@ def customize_link_materia(context, pk, has_permission, is_expediente, user=None
 
         #                   <b>Processo:</b> %s </br>
         title_materia = '''<a name="id%s" href=%s>%s</a> </br>
-                           <b>Autor:</b> %s </br>
+                           <b>Autoria:</b> %s </br>
                            <b>Protocolo:</b> %s </br>
                            <b>Turno:</b> %s </br>
                         ''' % (obj.materia.id,
