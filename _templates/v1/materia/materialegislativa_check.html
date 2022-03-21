@@ -48,9 +48,11 @@
               </small>
             </td>
             <td>
-              {% if m.autografo %}
-                <a href="{% url 'sapl.norma:normajuridica_detail' m.autografo.id %}">{{m.autografo}}</a>
-                 <br>{{m.autografo.ementa}}
+              {% if m.autografos.exists %}
+                {% for a in m.autografos %}
+                  <a href="{% url 'sapl.norma:normajuridica_detail' a.id %}">{{a}}</a>
+                  <br>{{a.ementa}}<br>
+                {% endfor %}
               {% endif %}
 
             </td>
@@ -70,10 +72,10 @@
                   </a>
                 {% endif %}
 
-                {% if m.autografovinculado_a_normajuridica %}
-                  <br> <strong>Autógrafo Relacionado: </strong><br>
+                {% if m.autografosvinculado_a_normajuridica.exists %}
+                  <br> <strong>Autógrafos Relacionado: </strong><br>
                   <small class="text-info">
-                    {{m.autografovinculado_a_normajuridica}}
+                    {{m.autografosvinculado_a_normajuridica.all}}
                   </small
                 {% else %}
                   <br> <strong>Norma não vinculada ao Autógrafo</strong>

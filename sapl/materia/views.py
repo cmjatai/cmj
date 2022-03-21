@@ -2240,21 +2240,27 @@ class MateriaLegislativaCrud(Crud):
 
         def hook_normajuridica_set(self, obj):
 
-            d = obj.normajuridica_set.exclude(tipo_id=27).first()
-            if not d:
+            normas = obj.normajuridica_set.exclude(tipo_id=27)
+            if not normas.exists():
                 return '', ''
 
-            return _('Norma Jurídica Vinculada'), '<a href="{}">{}</a>'.format(
-                reverse('sapl.norma:normajuridica_detail', kwargs={'pk': d.id}), d)
+            return _('Norma Jurídica Vinculada'),  '<br>'.join(['<a href="{}">{}</a>'.format(
+                reverse('sapl.norma:normajuridica_detail',
+                        kwargs={'pk': n.id}), n
+            ) for n in normas]
+            )
 
         def hook_autografo_set(self, obj):
 
-            d = obj.normajuridica_set.filter(tipo_id=27).first()
-            if not d:
+            autografos = obj.normajuridica_set.filter(tipo_id=27)
+            if not autografos.exists():
                 return '', ''
 
-            return _('Autógrafo'), '<a href="{}">{}</a>'.format(
-                reverse('sapl.norma:normajuridica_detail', kwargs={'pk': d.id}), d)
+            return _('Autógrafo'), '<br>'.join(['<a href="{}">{}</a>'.format(
+                reverse('sapl.norma:normajuridica_detail',
+                        kwargs={'pk': a.id}), a
+            ) for a in autografos]
+            )
 
         """def get_queryset(self):
             qs = Crud.DetailView.get_queryset(self)
