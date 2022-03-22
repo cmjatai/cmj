@@ -398,7 +398,9 @@ class NormaCrud(Crud):
 
             qs = qs1.union(qs2)"""
 
-            qs = qs.filter(checkcheck=False)
+            q = Q(checkcheck=False) | Q(texto_articulado__privacidade=89)
+
+            qs = qs.filter(q)
 
             return qs.order_by('-ano', '-numero')
 
