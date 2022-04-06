@@ -75,7 +75,9 @@
                 {% if m.autografosvinculado_a_normajuridica.exists %}
                   <br> <strong>Autógrafos Relacionado: </strong><br>
                   <small class="text-info">
-                    {{m.autografosvinculado_a_normajuridica.all}}
+                    {% for a in m.autografosvinculado_a_normajuridica.all %}
+                      {{a.norma_relacionada}}
+                    {% endfor %}
                   </small
                 {% else %}
                   <br> <strong>Norma não vinculada ao Autógrafo</strong>
