@@ -1,10 +1,10 @@
 from datetime import datetime
 from distutils.util import strtobool
-from random import choice
-from string import ascii_letters, digits
 import hashlib
 import io
 import logging
+from random import choice
+from string import ascii_letters, digits
 import tempfile
 import zipfile
 
@@ -1795,15 +1795,15 @@ class SeloProtocoloMixin(PluginSignMixin):
         item = self.object.conteudo_protocolado
         p = self.object
 
+        if isinstance(item, MateriaLegislativa):
+            item.registrovotacao_set.all().update(selo_votacao=False)
+
         for field_file in item.FIELDFILE_NAME:
             if original2copia:
                 paths = '{},{}'.format(
                     getattr(item, field_file).original_path,
                     getattr(item, field_file).path,
                 )
-
-                if isinstance(item, MateriaLegislativa):
-                    item.registrovotacao_set.all().update(selo_votacao=False)
 
             else:
                 paths = getattr(item, field_file).path
