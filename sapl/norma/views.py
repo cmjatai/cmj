@@ -239,14 +239,15 @@ class NormaCrud(Crud):
         def btn_check(self):
 
             btn = []
-            if self.request.user.is_superuser and not self.object.checkcheck:
+            if self.request.user.is_superuser:
                 btn = [
-                    '{}?check={}'.format(
+                    '{}?{}check={}'.format(
                         reverse('sapl.norma:normajuridica_list'),
+                        '' if not self.object.checkcheck else 'un',
                         self.object.pk
                     ),
                     'btn-warning',
-                    _('Check')
+                    _('UnCheck') if self.object.checkcheck else _('Check')
                 ]
 
             return btn
@@ -374,34 +375,8 @@ class NormaCrud(Crud):
 
         def get_queryset(self):
             qs = Crud.ListView.get_queryset(self)
-            """normas = NormaJuridica.objects.annotate(
-                count_ds=Count('texto_articulado__dispositivos_set')
-            ).filter(
-                count_ds__lte=5,
-                texto_articulado__privacidade=0
-            ).exclude(count_ds=0).order_by('-count_ds')"""
-
-            """q1 = Q(
-                texto_articulado__privacidade=0
-            ) | Q(
-                texto_articulado__isnull=True
-            )
-
-            q2 = Q(
-                materia__isnull=True,
-                tipo__origem_processo_legislativo=True,
-                checkcheck=False
-            )
-
-            qs1 = qs.exclude(q1)
-            qs2 = qs.filter(q2)
-
-            qs = qs1.union(qs2)"""
-
             q = Q(checkcheck=False) | Q(texto_articulado__privacidade=89)
-
             qs = qs.filter(q)
-
             return qs.order_by('-ano', '-numero')
 
         def hook_checkcheck(self, obj, ss, url):

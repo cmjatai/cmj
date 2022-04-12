@@ -73,12 +73,12 @@
                 {% endif %}
 
                 {% if m.autografosvinculado_a_normajuridica.exists %}
-                  <br> <strong>Autógrafos Relacionado: </strong><br>
+                  <br> <strong>Autógrafos Relacionados: </strong><br>
                   <small class="text-info">
                     {% for a in m.autografosvinculado_a_normajuridica.all %}
                       {{a.norma_relacionada}}
                     {% endfor %}
-                  </small
+                  </small>
                 {% else %}
                   <br> <strong>Norma não vinculada ao Autógrafo</strong>
 
