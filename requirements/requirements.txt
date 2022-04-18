@@ -18,7 +18,7 @@ djangorestframework-simplejwt==4.4.0
 drf_yasg==1.17.0
 asn1crypto
 
-boto3==1.20.41
+boto3==1.21.36
 
 billiard==3.6.3.0
 celery==4.4.2

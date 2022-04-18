@@ -14,7 +14,6 @@ from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
 from cmj.signals import Manutencao
-from sapl.base.models import CasaLegislativa
 from sapl.utils import hash_sha512
 
 
@@ -75,49 +74,58 @@ class Command(BaseCommand):
 
         print('--------- Iniciando:', s3_server)
         self.s3_server = s3_server
-
-        #self.s3_server = 's3_cmj'
         self.s3_connect()
 
-        if not settings.DEBUG and self.s3_server == 's3_cmj':
-            # TODO: formular envio do backup do postgrel para o s3_aws
+        if not settings.DEBUG:
             print('--------- Atualizando backup do BD ----------')
             self.update_backup_postgresql()
 
         self.start_time = timezone.localtime()
 
         try:
-
-            self.s3_sync(count_exec=10)
-            self.s3_size()
-
-            """casa = CasaLegislativa.objects.first().logotipo.name
-
-            resp = self.s3c.list_object_versions(
-                Bucket='cmjatai-portal',
-                Prefix=casa)
-
-            for v in resp['Versions']:
-                if v['StorageClass'] == 'STANDARD':
-                    self.s3c.delete_object(
-                        Bucket='cmjatai-portal',
-                        Key=v['Key'],
-                        VersionId=v['VersionId']
-                    )
-
-            print(resp)"""
+            # if self.s3c.meta.service_model.service_name == 'glacier':
+            #    print('--------- S3 Glacier Sync ---------')
+            #    self.s3_glacier_sync()
+            # else:
+            print('--------- S3 Sync ---------')
+            self.s3_sync(model_name='CasaLegislativa')
             # self.s3_sync()
 
-        except Exception as e:
-            print('erro na sincronização:', e)
+        except:
+            print('erro na sincronização')
 
-        print('Encerrando conexão com ', self.s3_server)
-        sleep(5)
+        print('Encerrando conexão com ', s3_server)
+        sleep(10)
         self.s3c = None
         self.s3r = None
-        sleep(5)
+        sleep(10)
 
         print('Concluído...')
+
+        # self.close_files()
+
+        # self.calcular_validacao()
+        # return
+
+        # self.distribuir_validacao()
+        # return
+
+        # self.count_registers(full=False)
+        # return
+
+        #self.s3_server = 's3_cmj'
+        # self.s3_connect()
+        # self.restore_file_from_bucket('cmjatai_postgresql')
+        # return
+
+        # print(timezone.localtime())
+        # print(self.count_registros)
+
+        #self.s3_sync(only_reset=False, model_name='NormaJuridica')
+        #self.s3_sync(app_label='sapl.norma', model_name='NormaJuridica')
+
+        #obj = n = NormaJuridica.objects.get(pk=8727)
+        #self.restore_file_from_object(self.bucket_name, obj)
 
     def s3_connect(self):
 
@@ -195,8 +203,7 @@ class Command(BaseCommand):
             print(o)
             o.delete()
 
-    def s3_sync(self, app_label=None, model_name=None, only_reset=False, count_exec=100):
-        print('--------- S3 Sync ---------')
+    def s3_sync(self, app_label=None, model_name=None, only_reset=False):
 
         reset = False
 
@@ -257,7 +264,6 @@ class Command(BaseCommand):
 
                 print(m)
                 for i in m.objects.all().order_by('-id'):  #
-                    #print(i.id, i)
 
                     if not hasattr(i, 'metadata'):
                         #print(i, 'não tem metadata')
@@ -267,13 +273,13 @@ class Command(BaseCommand):
                             if i.metadata and \
                                     self.s3_server in i.metadata:
 
+                                # if 'locaweb' in i.metadata:
+                                #    del i.metadata['locaweb']
+
                                 i.metadata[self.s3_server] = {}
                                 i.save()
                                 # print(i)
                             continue
-
-                    if i.metadata and 'locaweb' in i.metadata:
-                        del i.metadata['locaweb']
 
                     metadata = i.metadata if i.metadata else {}
                     for fn in i.FIELDFILE_NAME:
@@ -326,9 +332,7 @@ class Command(BaseCommand):
                             td = parse_datetime(
                                 metadata[self.s3_server][fn]['validate']
                             ) - parse_datetime(
-                                metadata[self.s3_server][fn][
-                                    'original_path' if metadata[self.s3_server][fn]['original_path'] else 'path'
-                                ]
+                                metadata[self.s3_server][fn]['path']
                             )
 
                             dv = (td.days / 180.0) * 60.0
@@ -372,12 +376,10 @@ class Command(BaseCommand):
                                     print(ee, metadata)
 
                             if not self.s3_full:
-                                if (count == count_exec or
+                                if (count == 500 or
                                         timezone.localtime() -
                                         self.start_time >
                                         timedelta(seconds=self.exec_time)):
-                                    print(
-                                        '--------- {} ---------- INICIADO EM: {}'.format(self.s3_server, self.start_time))
                                     print(
                                         '--------- {} ---------- ENCERRADO EM: {}'.format(self.s3_server, timezone.localtime()))
 
@@ -451,10 +453,6 @@ class Command(BaseCommand):
             if self.start_time - v < timedelta(days=self.days_validate):
                 return True
 
-            if self.s3_server == 's3_aws':
-                # TODO: formular estratégia de validação periódica para AWS.
-                return True
-
             t_p = self.temp_file_from_object(
                 self.bucket_name,
                 i,
@@ -519,8 +517,9 @@ class Command(BaseCommand):
 
             print('Enviando...', i.id, i, attr_path)
 
+            r = None
             with open(getattr(ff, attr_path), "rb") as f:
-                obj.upload_fileobj(
+                r = obj.upload_fileobj(
                     f,
                     ExtraArgs={
                         'ACL': 'private',
@@ -530,6 +529,7 @@ class Command(BaseCommand):
                         'StorageClass': 'DEEP_ARCHIVE'  # 'INTELLIGENT_TIERING'
 
                     })
+            print(r)
 
             if not self.s3_full or metadata[self.s3_server][fn][attr_hash] is None:
                 metadata[self.s3_server][fn][attr_path] = timezone.localtime()
@@ -543,6 +543,202 @@ class Command(BaseCommand):
             return 1
         return 0
 
+    def distribuir_validacao(self):
+        # distribui base em days_validate
+        count = 0
+        for app in apps.get_app_configs():
+
+            if not app.name.startswith('cmj') and not app.name.startswith('sapl'):
+                continue
+            print(app)
+
+            for m in app.get_models():
+                model_exec = False
+
+                for f in m._meta.get_fields():
+                    dua = f
+                    print(dua)
+                    if hasattr(dua, 'auto_now') and dua.auto_now:
+                        #print(m, 'auto_now deve ser desativado.')
+                        # continue  # auto_now deve ser desativado
+                        print(m, 'desativando auto_now')
+                        dua.auto_now = False
+
+                    if not isinstance(f, FileField):
+                        continue
+
+                    # se possui FileField, o model então
+                    # deve possuir FIELDFILE_NAME
+                    assert hasattr(m, 'FIELDFILE_NAME'), '{} não possui FIELDFILE_NAME'.format(
+                        m._meta.label)
+
+                    # se possui FileField, o model então
+                    # deve possuir metadata
+                    assert hasattr(m, 'metadata'), '{} não possui metadata'.format(
+                        m._meta.label)
+
+                    # o campo field deve estar em FIELDFILE_NAME
+                    assert f.name in m.FIELDFILE_NAME, '{} não está no FIELDFILE_NAME de {}'.format(
+                        f.name,
+                        m._meta.label)
+
+                    model_exec = True
+
+                if not model_exec:
+                    continue
+                print(m)
+
+                pre_save.disconnect(
+                    sender=m,
+                    dispatch_uid='cmj_pre_save_signed_{}_{}'.format(
+                        app.name.replace('.', '_'),
+                        m._meta.model_name
+                    ))
+
+                count_model = m.objects.count()
+
+                if not count_model:
+                    continue
+
+                total_seconds = self.days_validate * 86400
+                interval_seconds = timedelta(
+                    seconds=total_seconds / count_model)
+
+                td = timedelta(seconds=total_seconds)
+
+                for i in m.objects.all().order_by('-id'):
+
+                    if not hasattr(i, 'metadata'):
+                        #print(i, 'não tem metadata')
+                        continue
+
+                    if not i.metadata:
+                        continue
+
+                    if self.s3_server not in i.metadata:
+                        continue
+
+                    #metadata = i.metadata if i.metadata else {}
+                    for fn in i.FIELDFILE_NAME:
+
+                        if fn not in i.metadata[self.s3_server]:
+                            continue
+
+                        if 'validate' not in i.metadata[self.s3_server][fn]:
+                            continue
+
+                        if not i.metadata[self.s3_server][fn]['validate']:
+                            continue
+
+                        i.metadata[self.s3_server][fn]['validate'] = timezone.localtime(
+                        ) - td
+                        i.save()
+
+                    td -= interval_seconds
+
+    def calcular_validacao(self):
+
+        count = 0
+        lt = timezone.localtime()
+
+        calc = {}
+
+        data_min = lt
+
+        for app in apps.get_app_configs():
+
+            if not app.name.startswith('cmj') and not app.name.startswith('sapl'):
+                continue
+            print(app)
+
+            for m in app.get_models():
+                model_exec = False
+                if m not in calc:
+                    calc[m] = {}
+
+                for f in m._meta.get_fields():
+                    dua = f
+                    print(dua)
+                    if hasattr(dua, 'auto_now') and dua.auto_now:
+                        #print(m, 'auto_now deve ser desativado.')
+                        # continue  # auto_now deve ser desativado
+                        print(m, 'desativando auto_now')
+                        dua.auto_now = False
+
+                    if not isinstance(f, FileField):
+                        continue
+
+                    # se possui FileField, o model então
+                    # deve possuir FIELDFILE_NAME
+                    assert hasattr(m, 'FIELDFILE_NAME'), '{} não possui FIELDFILE_NAME'.format(
+                        m._meta.label)
+
+                    # se possui FileField, o model então
+                    # deve possuir metadata
+                    assert hasattr(m, 'metadata'), '{} não possui metadata'.format(
+                        m._meta.label)
+
+                    # o campo field deve estar em FIELDFILE_NAME
+                    assert f.name in m.FIELDFILE_NAME, '{} não está no FIELDFILE_NAME de {}'.format(
+                        f.name,
+                        m._meta.label)
+
+                    model_exec = True
+
+                if not model_exec:
+                    continue
+                print(m)
+
+                pre_save.disconnect(
+                    sender=m,
+                    dispatch_uid='cmj_pre_save_signed_{}_{}'.format(
+                        app.name.replace('.', '_'),
+                        m._meta.model_name
+                    ))
+
+                for i in m.objects.all().order_by('-id'):
+                    if not hasattr(i, 'metadata'):
+                        continue
+                    if not i.metadata:
+                        continue
+                    if self.s3_server not in i.metadata:
+                        continue
+
+                    md = i.metadata if i.metadata else {}
+                    for fn in i.FIELDFILE_NAME:
+                        if fn not in md[self.s3_server]:
+                            continue
+                        if 'validate' not in md[self.s3_server][fn]:
+                            continue
+                        if not md[self.s3_server][fn]['validate']:
+                            continue
+                        td = lt - \
+                            parse_datetime(md[self.s3_server][fn]['validate'])
+                        d = td.days if td.days > 0 else -1
+                        if d not in calc[m]:
+                            calc[m][d] = [0, md[self.s3_server][fn].get('size', 0) +
+                                          md[self.s3_server][fn].get('original_size', 0)]
+
+                        try:
+                            data_min = min(
+                                data_min,
+                                parse_datetime(md[self.s3_server][fn]['path']),
+                                datetime.fromtimestamp(os.path.getmtime(
+                                    getattr(i, fn).path), timezone.utc)
+                            )
+                        except:
+                            print(i)
+
+                        calc[m][d][0] += 1
+                        calc[m][d][1] += md[self.s3_server][fn].get('size', 0) + \
+                            md[self.s3_server][fn].get('original_size', 0)
+        print(calc)
+        size = 0
+        for k, v in calc.items():
+            if k <= 18:
+                size += v[1]
+        print(size)
+
     def update_backup_postgresql(self):
 
         path_name = '{}BD_POSTGRESQL/'.format(settings.ABSOLUTE_PATH_BACKUP)
@@ -555,7 +751,7 @@ class Command(BaseCommand):
             date_file = datetime.fromtimestamp(t, timezone.utc)
 
             obj = self.s3r.Object(
-                'cmjatai-postgresql',
+                'cmjatai_postgresql',
                 f'{path_name}{item}'[1:]
 
             )
@@ -589,6 +785,8 @@ class Command(BaseCommand):
         b = self.get_bucket(bucket_name)
 
         for o in b.objects.all():
+            # o.delete()
+            # continue
 
             if not o.key.endswith('.backup'):
                 continue
@@ -606,6 +804,10 @@ class Command(BaseCommand):
             b.delete()
         except Exception as e:
             print(e)
+
+        # if o.key.endswith('.backup'):
+        # if o.key.startswith('.s3_multipart_uploads'):
+        #    o.delete()
 
     def restore_file_from_object(self, bucket_name, obj):
         b = self.get_bucket(bucket_name)
@@ -642,9 +844,24 @@ class Command(BaseCommand):
                 except Exception as e:
                     print(e)
 
+    def check_size_download_month_locaweb(self):
+
+        self.s3_server = 'locaweb'
+        self.calcular_validacao()
+        return
+
+        for app in apps.get_app_configs():
+            if not app.name.startswith('cmj') and not app.name.startswith('sapl'):
+                continue
+            # print(app)
+
+            for m in app.get_models():
+                for i in m.objects.all().order_by('-id'):
+                    pass
+
     def manutencao_buckets(self):
 
-        self.s3_server = 's3_cmj'
+        self.s3_server = 's3_aws'
         self.s3_connect()
 
         # self.list_bucket()
@@ -664,83 +881,3 @@ class Command(BaseCommand):
                '2021-3' in o.key or\
                '2021-6' in o.key:
                 o.delete()"""
-
-    def s3_size(self):
-
-        size_global = 0
-        count_global = 0
-        print('--------- S3 Size ---------')
-
-        for app in apps.get_app_configs():
-
-            if not app.name.startswith('cmj') and not app.name.startswith('sapl'):
-                continue
-
-            for m in app.get_models():
-                model_exec = False
-
-                for f in m._meta.get_fields():
-                    dua = f
-                    # print(dua)
-                    if hasattr(dua, 'auto_now') and dua.auto_now:
-                        #print(m, 'auto_now deve ser desativado.')
-                        # continue  # auto_now deve ser desativado
-                        print(m, 'desativando auto_now')
-                        dua.auto_now = False
-
-                    if not isinstance(f, FileField):
-                        continue
-
-                    # se possui FileField, o model então
-                    # deve possuir FIELDFILE_NAME
-                    assert hasattr(m, 'FIELDFILE_NAME'), '{} não possui FIELDFILE_NAME'.format(
-                        m._meta.label)
-
-                    # se possui FileField, o model então
-                    # deve possuir metadata
-                    assert hasattr(m, 'metadata'), '{} não possui metadata'.format(
-                        m._meta.label)
-
-                    # o campo field deve estar em FIELDFILE_NAME
-                    assert f.name in m.FIELDFILE_NAME, '{} não está no FIELDFILE_NAME de {}'.format(
-                        f.name,
-                        m._meta.label)
-
-                    model_exec = True
-
-                if not model_exec:
-                    continue
-
-                size_model = 0
-                count_model = 0
-                for i in m.objects.all().order_by('-id').values_list('metadata', flat=True):
-
-                    metadata = i
-
-                    if not metadata:
-                        continue
-                    if self.s3_server not in metadata:
-                        continue
-
-                    for fn in m.FIELDFILE_NAME:
-
-                        if fn not in metadata[self.s3_server]:
-                            continue
-
-                        s = 0
-                        if 'original_size' in metadata[self.s3_server][fn] and metadata[self.s3_server][fn]['original_size']:
-                            s += metadata[self.s3_server][fn]['original_size']
-
-                        if 'size' in metadata[self.s3_server][fn] and metadata[self.s3_server][fn]['size']:
-                            s += metadata[self.s3_server][fn]['size']
-
-                        size_global += s
-                        size_model += s
-
-                        count_global += 1
-                        count_model += 1
-
-                print(m, count_model, size_model)
-
-        print(
-            f'S3 Server: {self.s3_server}. Itens: {count_global}. Size: {size_global}')

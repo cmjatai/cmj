@@ -131,8 +131,13 @@ SOCIAL_AUTH_PIPELINE = (
 
 
 # LOCAWEB
+LOCAWEB_ACCESS_KEY_ID = config('LOCAWEB_ACCESS_KEY_ID', cast=str, default='')
+LOCAWEB_SECRET_ACCESS_KEY = config('LOCAWEB_SECRET_ACCESS_KEY', cast=str, default='')
+
+# LOCAWEB
 AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID', cast=str, default='')
 AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY', cast=str, default='')
+
 ABSOLUTE_PATH_BACKUP = config('ABSOLUTE_PATH_BACKUP', cast=str, default='')
 
 
