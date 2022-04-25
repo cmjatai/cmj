@@ -79,7 +79,7 @@ class Command(BaseCommand):
         #self.s3_server = 's3_cmj'
         self.s3_connect()
 
-        if not settings.DEBUG and self.s3_server == 's3_cmj':
+        if not settings.DEBUG:
             # TODO: formular envio do backup do postgrel para o s3_aws
             print('--------- Atualizando backup do BD ----------')
             self.update_backup_postgresql()
@@ -88,7 +88,7 @@ class Command(BaseCommand):
 
         try:
 
-            self.s3_sync(count_exec=10)
+            self.s3_sync(count_exec=500)
             self.s3_size()
 
             """casa = CasaLegislativa.objects.first().logotipo.name
@@ -200,7 +200,6 @@ class Command(BaseCommand):
 
         reset = False
 
-        count = 0
         for app in apps.get_app_configs():
             if app_label and app.name != app_label:
                 # print(app.name)
@@ -348,16 +347,15 @@ class Command(BaseCommand):
 
                         except Exception as e:
                             print(e)
-                            print(count)
+                            print(self.count_registros)
                             return
                         else:
                             if count_update:
                                 i.metadata = metadata
                                 i.save()
-                                count += 1
+                                self.count_registros += 1
                                 # print(count)
                             else:
-                                self.count_registros += 1
                                 try:
                                     validate = i.metadata[self.s3_server][fn]['validate']
                                     if validate:
@@ -372,7 +370,7 @@ class Command(BaseCommand):
                                     print(ee, metadata)
 
                             if not self.s3_full:
-                                if (count == count_exec or
+                                if (self.count_registros == count_exec or
                                         timezone.localtime() -
                                         self.start_time >
                                         timedelta(seconds=self.exec_time)):
@@ -517,7 +515,7 @@ class Command(BaseCommand):
                 except:
                     pass
 
-            print('Enviando...', i.id, i, attr_path)
+            print(self.count_registros, 'Enviando...', i.id, i, attr_path)
 
             with open(getattr(ff, attr_path), "rb") as f:
                 obj.upload_fileobj(

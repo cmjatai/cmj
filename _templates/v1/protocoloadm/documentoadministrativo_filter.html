@@ -78,17 +78,21 @@
 
                   <a class="item-titulo" href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' d.pk %}">{% if d.is_signed %} <i class="fas fa-1x fa-certificate"  title="Documento possui versão com Assinatura Digital, entre nos detalhes do documento para abrir o Arquivo Original"></i>{% endif %} {{ d }}</a>
                   {% if d.certidao %}
-                    <br><small>
-                    <span class="text-danger">Certidão de Publicação nº {{d.certidao.id|stringformat:"06d" }} de {{d.certidao.created}}</span>
-                    {% if perms.protocoloadm.change_documentoadministrativo and d.diariooficial %}
-                      <br><small>
-                        <a class="text-green" href="{% url 'cmj.diarios:diariooficial_detail' d.diariooficial.id %}">{{d.diariooficial}}</a>
-                      </small>
+                    {% if d.diariooficial %}
+                    <br>
+                    <small>
+                      <a class="text-green" href="{% url 'cmj.diarios:diariooficial_detail' d.diariooficial.id %}">{{d.diariooficial}}</a> |
+                    </small>
                     {% endif %}
+                    <small>
+                      <span class="text-danger">Certidão de Publicação nº {{d.certidao.id|stringformat:"06d" }} de {{d.certidao.created}}</span>
                     </small>
                   {% endif %}
 
                   <br><strong>Data do documento:</strong> {{d.data}} | {{d.tipo}} | {{d.tipo.sigla}} {{d.numero}}/{{d.ano}}
+                  {% if d.data_vencimento %}
+                    | <strong>Data de Vencimento:</strong> {{d.data_vencimento}}
+                  {% endif %}
 
                   {% if d.protocolo_gr.exists %}
                     |
@@ -99,9 +103,6 @@
                     {% endif %}
                   {% endif %}
 
-                  {% if d.data_vencimento %}
-                    <br><small>Data de Vencimento: {{d.data_vencimento}}</small>
-                  {% endif %}
 
                   {% if d.assunto %}
                     <div class="text-ementa">{{ d.assunto|safe }}</div>
