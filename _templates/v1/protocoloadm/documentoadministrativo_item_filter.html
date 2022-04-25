@@ -63,6 +63,7 @@
   {% if d.data_vencimento %}
     | <strong>Data de Vencimento:</strong> {{d.data_vencimento}}
   {% endif %}
+  {% if d.paginas %}<br><strong>Número de Página(s):</strong> {{d.paginas}}{% endif %}
 
   {% if d.protocolo_gr.exists %}
     |
