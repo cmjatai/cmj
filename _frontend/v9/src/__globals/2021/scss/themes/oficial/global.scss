@@ -1,0 +1,43 @@
+@import './variables';
+
+@import '../__/imports';
+@import '../__/mixins';
+
+@import './layouts/_layout';
+
+@import './apps/__app_agenda';
+@import './apps/__app_compilacao';
+@import './apps/__app_core';
+@import './apps/__app_materia';
+@import './apps/__app_norma';
+@import './apps/__app_ouvidoria';
+@import './apps/__app_parlamentares';
+@import './apps/__app_sigad';
+
+.caret {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-left: 2px;
+  vertical-align: middle;
+  border-top: 4px dashed;
+  border-top: 4px solid \9;
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
+}
+
+
+@media print {
+
+  #wrapper {
+    padding-left: 0;
+  }
+
+  .container-youtube,
+  footer, header {
+    display: none !important;
+  }
+  * {
+    color: black !important;
+  }
+}

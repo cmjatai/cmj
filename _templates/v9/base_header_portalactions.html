@@ -1,0 +1,66 @@
+{% load i18n staticfiles menus common_cmj_tags cropping %}
+{% load webpack_static from webpack_loader %}
+<div :class="['col', searching, static ]" id="portalactions">
+  <div class="btns-main">
+    <div class="btn-main">
+      <a class="inner">
+        <div class="icon icon_atividade_legislativa"></div>
+        <div class="label">ATIVIDADE<BR>LEGISLATIVA</div>
+      </a>
+
+      <action-details v-on:staticToggle="staticToggleAction">
+        <template slot="subaction">
+          <ul class="subaction">
+            {% navbar 'yaml/navbar/public/navbar_atividade_legislativa.yaml' %}
+          </ul>
+        </template>
+      </action-details>
+    </div>
+    <div class="btn-main ">
+      <a class="inner">
+        <div class="icon icon_ouvidoria"></div>
+        <div class="label">FALE<BR>CONOSCO</div>
+      </a>
+      <action-details>
+        <template slot="subaction">
+          <ul class="subaction">
+            {% navbar 'yaml/navbar/public/navbar_fale_conosco.yaml' %}
+          </ul>
+        </template>
+      </action-details>
+    </div>
+    <div class="btn-main">
+      <a class="inner" href="#">
+        <div class="icon icon_doc_adm"></div>
+        <div class="label">DOCUMENTOS<BR>ADMINISTRATIVOS</div>
+      </a>
+      <action-details>
+        <template slot="subaction">
+          <ul class="subaction">
+            {% navbar 'yaml/navbar/public/navbar_documentos_administrativos.yaml' %}
+          </ul>
+        </template>
+      </action-details>
+    </div>
+    <div class="btn-main">
+      <a class="inner">
+        <div class="icon icon_tv_radio_camara">
+        </div>
+        <div class="label">TV E RÁDIO<BR>CÂMARA</div>
+      </a>
+      <action-details>
+        <template slot="subaction">
+          <ul class="subaction">
+            {% navbar 'yaml/navbar/public/navbar_midias.yaml' %}
+          </ul>
+        </template>
+      </action-details>
+    </div>
+    <div class="btn-main">
+      <a class="inner">
+        <div class="icon icon_prestacao_contas"></div>
+        <div class="label">PRESTAÇÃO<BR>DE CONTAS</div>
+      </a>
+    </div>
+  </div>
+</div>

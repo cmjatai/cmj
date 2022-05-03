@@ -1,0 +1,115 @@
+$circle_avatar: (1: 256, 2: 160, 3: 128, 4: 96, 5: 64, 6: 48, 7: 40, 8: 36, 9: 24);
+
+
+@each $i, $size_avatar in $circle_avatar {
+  .avatar#{$i} {
+    width: #{$size_avatar}px;
+    height: #{$size_avatar}px;
+  }
+}
+
+.avatar {
+  border-radius: 50%;
+  overflow: hidden;
+  display: inline-block;
+  opacity: 0.75;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  img {
+    height: 100%;
+    width: 100%;
+  }
+}
+
+.container-avatar {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  .avatar-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .line-avatar {
+    display: inline-flex;
+    justify-content: center;
+    align-items: flex-end;
+  }
+  small {
+    text-align: center;
+    border-top: 1px solid #ccc;
+  }
+
+  .subscricoes {
+    display: inline-flex;
+    flex-direction: column;
+    padding-top: 0.5rem;
+    .line-avatar {
+      flex-direction: row;
+      justify-content: flex-end;
+    }
+  }
+  a {
+    margin: 3px;
+  }
+}
+
+
+@media screen and (max-width: 991.98px) {
+
+  $circle_avatar: (1: 136, 2: 112, 3: 88, 4: 64, 5: 36, 6: 48, 7: 40, 8: 36, 9: 24);
+
+
+  @each $i, $size_avatar in $circle_avatar {
+    .avatar#{$i} {
+      width: #{$size_avatar}px;
+      height: #{$size_avatar}px;
+    }
+  }
+
+}
+
+@media screen and (max-width: 767.98px) {
+
+  $circle_avatar: (1: 112, 2: 96, 3: 80, 4: 56, 5: 36, 6: 48, 7: 40, 8: 36, 9: 24);
+
+
+  @each $i, $size_avatar in $circle_avatar {
+    .avatar#{$i} {
+      width: #{$size_avatar}px;
+      height: #{$size_avatar}px;
+    }
+  }
+
+  .container-avatar {
+    .avatar-group {
+      flex-direction: row;
+      &.subscricoes {
+        flex-direction: column;
+      }
+    }
+
+    .line-avatar {
+      flex-direction: column;
+    }
+
+  }
+}
+
+@media screen and (max-width: 575.98px) {
+
+  $circle_avatar: (1: 96, 2: 80, 3: 64, 4: 48, 5: 36, 6: 48, 7: 40, 8: 36, 9: 24);
+
+
+  @each $i, $size_avatar in $circle_avatar {
+    .avatar#{$i} {
+      width: #{$size_avatar}px;
+      height: #{$size_avatar}px;
+    }
+  }
+}

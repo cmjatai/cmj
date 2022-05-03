@@ -1,0 +1,144 @@
+header.main {
+  //background-color: $bg_color_portal_cmj;
+  background: linear-gradient(to top, $bg_color_portal_cmj 0%, darken($bg_color_portal_cmj, 5) 100%);
+
+  transition: all 0.3s ease;
+  position: sticky;
+  z-index: $zindex-header-main;
+  left: 0;
+  right: 0;
+  top: 0;
+
+  line-height: 1;
+
+  & * {
+    transition: all 0.3s ease;
+  }
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0.3;
+    background-image: url(~@/assets/img/header_bg_linha.png);
+    background-size: auto 100%;
+    background-repeat: no-repeat;
+    background-position: -18px -10px;
+    z-index: -1;
+  }
+
+  &::after {
+    background-image: url(~@/assets/img/fundo_topo_compressed.jpg);
+    background-position: 0 30%;
+    background-size: 100% auto;
+    opacity: 0.05;
+    filter: grayscale(60%);
+
+    top: 0;
+    right: 0;
+
+  }
+
+  #rowlogo {
+    align-items: center;
+    //flex-wrap: nowrap;
+  }
+
+  &.header-top {
+    background: linear-gradient(to top, $bg_color_portal_cmj 0%, darken($bg_color_portal_cmj, 20) 100%);
+
+    &::after {
+      opacity: 0.15;
+    }
+
+  }
+
+  &.header-mini {
+    opacity: 0.95;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  &:hover {
+
+    &::after {
+      transition: all 0.3s ease;
+
+      opacity: 0.2;
+
+    }
+  }
+}
+
+
+@import './portallogo';
+@import './portalsearch';
+@import './portalactions';
+@import './portalmenu';
+
+@import './portalnavtop';
+
+
+@media screen and (max-width:991.98px) {}
+
+@media screen and (max-width:767.98px) {
+  #header-accessibility {
+    display: none;
+  }
+
+  header.main__old {
+    #rowlogo {
+      padding: 0;
+      flex-wrap: wrap;
+    }
+  }
+}
+
+@media screen and (max-width: 767.98px) and (orientation: portrait){
+  header.main {
+    &.header-top {
+      position: absolute;
+      background-color: transparent;
+      background-image: none;
+      &::after {
+        background-image: none;
+        background-color: transparent;
+      }
+
+      #rowlogo {
+        height: 0;
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 992px) {
+  header.main {
+    &.header-top {
+      #rowlogo {
+        justify-content: center;
+      }
+    }
+
+
+    &.header-top__inner_no_custom {
+      position: absolute;
+      background-color: transparent;
+      background-image: none;
+
+      &::after {
+        background-image: none;
+        background-color: transparent;
+      }
+
+      #rowlogo {
+        justify-content: center;
+        height: 0;
+      }
+    }
+  }
+}

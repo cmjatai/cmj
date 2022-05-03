@@ -1,0 +1,85 @@
+@import './second_header';
+
+main {
+  min-height: 100vh;
+}
+
+section:not(:first-child) {
+  //min-height: 80vh;
+}
+
+section#section_docs_adms {
+  background-color: $color_documentoadministrativo;
+}
+
+
+
+
+body.header-top {
+  div[vw].enabled {
+    top: auto;
+    bottom: 0.5rem;
+    right: 0.5rem;
+    transition: all 1s ease;
+  }
+}
+
+.container-divider {
+  $ZOOM: 2.2;
+  $RAZAO_HEXAGONO: 1.7166;
+  $RAZAO_HEIGHT: 0.3;
+
+  position: relative;
+  height: $min_padding * $ZOOM * $RAZAO_HEIGHT;
+  background-color: $bg_color_portal_cmj;
+  opacity: 1;
+  display: flex;
+  justify-content: center;
+  z-index: 1;
+
+  .favo {
+    position: relative;
+    background-color: $bg_color_portal_cmj;
+    width: $min_padding * $ZOOM;
+    height: $min_padding * $RAZAO_HEXAGONO * $ZOOM;
+    margin-top: -$min_padding * $RAZAO_HEXAGONO * $ZOOM / 2 + $min_padding * $ZOOM * $RAZAO_HEIGHT / 2;
+
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0%;
+      bottom: 0%;
+      border-top: $min_padding * 0.856 * $ZOOM solid transparent;
+      border-bottom: $min_padding * 0.856 * $ZOOM solid transparent;
+    }
+
+    &::before {
+      right: 100%;
+      border-right: $min_padding * 0.5 * $ZOOM solid $bg_color_portal_cmj;
+    }
+
+    &:after {
+      left: 100%;
+      border-left: $min_padding * 0.5 * $ZOOM solid $bg_color_portal_cmj;
+    }
+  }
+
+
+
+
+  &.before__old {
+    content: " ";
+    position: absolute;
+    left: 50%;
+    right: 50%;
+    margin-left: -$min_padding * 12;
+    margin-right: -$min_padding * 12;
+    top: -$min_padding * 15;
+    bottom: -$min_padding * 12;
+    background-image: url(./assets/icon_line.svg);
+    background-repeat: no-repeat;
+    background-position: center center;
+  }
+
+}

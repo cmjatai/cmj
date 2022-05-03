@@ -1,0 +1,55 @@
+{% load i18n %}
+
+
+{% if docs_adms_pagina_inicial %}
+
+  <div class="container-scroll-x">
+    <div class="inner-container">
+
+      <div class="title-container">
+        <div class="icon icon_martelo"></div>
+        <label>Licitações em Andamento</label>
+      </div>
+
+      <div class="scroll-container" v-on:touchstart="handleTouch" v-on:touchend="handleTouch">
+        <div class="btn-action-left" v-on:click="handleClickContainerScrollX">&lt;</div>
+        <div class="btn-action-right" v-on:click="handleClickContainerScrollX">&gt;</div>
+        <div class="inner-scroll">
+          {% for d in docs_adms_pagina_inicial %}
+            <div class="item-scroll">
+
+              <div class="item-head">
+                <a class="item-titulo" href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' d.pk %}">
+                  {{ d }}
+                </a>
+              </div>
+
+              <div class="item-body">
+                {{d.data}}
+                {% if d.data_vencimento %}
+                  <br><small>Data de Vencimento: {{d.data_vencimento}}</small>
+                {% endif %}
+
+                {% if d.assunto %}
+                  <div class="text-ementa">{{ d.assunto|safe }}</div>
+                {% endif %}
+              </div>
+              <div class="item-footer">
+                  {% if d.interessado %}
+                    <strong>Interessado:</strong>&nbsp;{{ d.interessado|default_if_none:"Não informado"}}</br>
+                  {% endif %}
+
+                  {% if d.tramitacaoadministrativo_set.first.unidade_tramitacao_destino %}
+                    <strong>Localização Atual:</strong> {{d.tramitacaoadministrativo_set.first.unidade_tramitacao_destino}}
+                    <br><strong>Status:</strong> {{d.tramitacaoadministrativo_set.first.status}}
+                    <br><strong>Última Ação:</strong> {{d.tramitacaoadministrativo_set.first.ultima_acao}}
+                  {% endif %}
+              </div>
+
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endif %}

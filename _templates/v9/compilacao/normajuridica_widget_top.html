@@ -1,0 +1,67 @@
+{% load i18n %}
+{% load compilacao_filters %}
+{% load common_cmj_tags common_tags%}
+{% load static %}
+{% load webpack_static from webpack_loader %}
+
+<div class="d-flex justify-content-between pt-3 d-print-none">
+  <a href="{% url 'sapl.norma:norma_pesquisa' %}" class="btn btn-outline-primary">{% trans 'Fazer nova pesquisa' %}</a>
+  <a class="btn btn-outline-primary" href="{% url object|urldetail_content_type:object.content_object object.content_object.pk %}?display" title="Dados Complementares">Dados Complementares</a>
+</div>
+
+
+<div class="pt-3 d-flex justify-content-center  align-items-center">
+  <div class="pr-3">
+    <img
+      height="100"
+      src="{% if logotipo %}{{ MEDIA_URL }}{{ logotipo }}{% else %}{% webpack_static 'img/logo.png' %}{% endif %}"
+      alt="Logotipo"
+      class="img-responsive visible-lg-inline-block vcenter">
+  </div>
+  <div class="control-label pt-1">
+    <h1 class="text-center">
+      {% if nome %}
+        <b>{{ nome }}</b>
+      {% else %}
+        <b>{% trans 'Sem Nome Cadastrado' %}</b>
+      {% endif %}
+    </h1>
+    <h2 class="text-center">
+      Poder Legislativo
+    </h2>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col pt-3">
+    <h2 class="text-center">
+      <strong>
+        {{object.content_object}}
+      </strong>
+    </h2>
+  </div>
+</div>
+<div class="d-print-none my-3">
+  {% if object.texto_integral  %}
+  {% with object.content_object as n %}
+      {% include 'norma/normajuridica_widget_file.html' %}
+        {% comment %}
+            <div class="row">
+              <div class="col-sm-12">
+                {% if n.get_anexos_norma_juridica|length > 0 %}
+                  <hr />
+                  <p class="control-label">Anexos Norma Jurídica</p>
+                  {% for p in n.get_anexos_norma_juridica %}
+                    <div class="form-control-static">
+                      <a href="/media/{{p.anexo_arquivo}}">
+                      {{ p.anexo_arquivo | to_str | split:"/" | get_last_item_from_list:-1 }}
+                      </a>
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              </div>
+            </div>
+        {% endcomment %}
+  {% endwith %}
+  {% endif %}
+</div>

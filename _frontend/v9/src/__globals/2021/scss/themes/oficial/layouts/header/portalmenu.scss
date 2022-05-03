@@ -1,0 +1,77 @@
+header.main {
+
+  #portalbtnmenu {
+    display: none;
+    padding: 0;
+    .navbar-toggler {
+      display: inline-block;
+      padding: 0px 15px 0 2px;
+      border: 0px;
+      z-index: 1;
+      cursor: pointer;
+      .icon-bar {
+        background: white;
+        display: block;
+        width: 4px;
+        height: 4px;
+        margin: 4px 0;
+        border-radius: 2px;
+
+      }
+      &.toggle-access {
+        .icon-bar {
+          width: 4px;
+          height: 4px;
+          margin: 5px 0;
+          border-radius: 50%;
+        }
+      }
+      &:hover {
+        .icon-bar {
+          box-shadow: 1px 1px 5px white;
+        }
+      }
+    }
+
+    &.d-searching {
+      display: none;
+    }
+  }
+
+  #portalmenu___old {
+    display: flex;
+    border-top: 1px solid white;
+    justify-content: space-between;
+    align-items: center;
+    .navbar-toggler {
+      padding: 5px 10px;
+    }
+    .btnmenu {
+      display: flex;
+      align-items: center;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      &:hover {
+        text-shadow: 1px 1px 5px white;
+        .icon-bar {
+          box-shadow: 1px 1px 5px white;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width:767.98px) {
+  header.main {
+
+    #portalbtnmenu {
+      display: inline-block;
+      .navbar-toggler {
+        padding-right: 0.5rem;
+        .icon-bar {
+        }
+      }
+    }
+  }
+}
