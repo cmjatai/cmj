@@ -52,20 +52,13 @@ class Command(BaseCommand):
 
         self.logger = logging.getLogger(__name__)
 
-        # if settings.DEBUG:
-        #    self.test_glacier()
         # self.manutencao_buckets()
-        #    return
-
-        # self.check_size_download_month_locaweb()
         # return
 
         self.s3_server = options['s3_server']
         self.s3_full = options['s3_full']
 
         init = datetime.now()
-
-        #s3_server = 's3_aws'
 
         s3_servers = ('s3_aws', 's3_cmj')
         s3_server = s3_servers[init.hour % 2]
@@ -76,11 +69,9 @@ class Command(BaseCommand):
         print('--------- Iniciando:', s3_server)
         self.s3_server = s3_server
 
-        #self.s3_server = 's3_cmj'
         self.s3_connect()
 
         if not settings.DEBUG:
-            # TODO: formular envio do backup do postgrel para o s3_aws
             print('--------- Atualizando backup do BD ----------')
             self.update_backup_postgresql()
 
@@ -90,23 +81,6 @@ class Command(BaseCommand):
 
             self.s3_sync(count_exec=500)
             self.s3_size()
-
-            """casa = CasaLegislativa.objects.first().logotipo.name
-
-            resp = self.s3c.list_object_versions(
-                Bucket='cmjatai-portal',
-                Prefix=casa)
-
-            for v in resp['Versions']:
-                if v['StorageClass'] == 'STANDARD':
-                    self.s3c.delete_object(
-                        Bucket='cmjatai-portal',
-                        Key=v['Key'],
-                        VersionId=v['VersionId']
-                    )
-
-            print(resp)"""
-            # self.s3_sync()
 
         except Exception as e:
             print('erro na sincronização:', e)
@@ -125,10 +99,6 @@ class Command(BaseCommand):
         if self.s3_server == 's3_aws':
             access_key = settings.AWS_ACCESS_KEY_ID
             secret_key = settings.AWS_SECRET_ACCESS_KEY
-        elif self.s3_server == 'locaweb':
-            access_key = settings.LOCAWEB_ACCESS_KEY_ID
-            secret_key = settings.LOCAWEB_SECRET_ACCESS_KEY
-            endpoint_url = 'https://lss.locawebcorp.com.br'
         elif self.s3_server == 's3_cmj':
             access_key = settings.S3_CMJ_ACCESS_KEY_ID
             secret_key = settings.S3_CMJ_SECRET_ACCESS_KEY
@@ -642,19 +612,18 @@ class Command(BaseCommand):
 
     def manutencao_buckets(self):
 
-        self.s3_server = 's3_cmj'
+        self.s3_server = 'locaweb'
         self.s3_connect()
 
         # self.list_bucket()
 
-        b = self.get_bucket('cmjatai_postgresql')
+        b = self.get_bucket('cmjatai_portal')
 
         for o in b.objects.all():
-            # o.delete()
-            # continue
-
             print(o.last_modified, '{:.1f}MB'.format(
                 o.size / 1024 / 1024), o.key)
+            o.delete()
+            continue
 
             """if '2021-0' in o.key or\
                '2021-1' in o.key or\
@@ -662,11 +631,14 @@ class Command(BaseCommand):
                '2021-3' in o.key or\
                '2021-6' in o.key:
                 o.delete()"""
+        b.delete()
+        return
 
     def s3_size(self):
 
         size_global = 0
         count_global = 0
+        count_uploaded = 0
         print('--------- S3 Size ---------')
 
         for app in apps.get_app_configs():
@@ -711,12 +683,17 @@ class Command(BaseCommand):
 
                 size_model = 0
                 count_model = 0
+                count_model_uploaded = 0
                 for i in m.objects.all().order_by('-id').values_list('metadata', flat=True):
 
                     metadata = i
 
                     if not metadata:
                         continue
+
+                    count_global += 1
+                    count_model += 1
+
                     if self.s3_server not in metadata:
                         continue
 
@@ -732,13 +709,14 @@ class Command(BaseCommand):
                         if 'size' in metadata[self.s3_server][fn] and metadata[self.s3_server][fn]['size']:
                             s += metadata[self.s3_server][fn]['size']
 
+                        if s:
+                            count_uploaded += 1
+                            count_model_uploaded += 1
+
                         size_global += s
                         size_model += s
 
-                        count_global += 1
-                        count_model += 1
-
-                print(m, count_model, size_model)
+                print(m, count_model, count_model_uploaded, size_model)
 
         print(
-            f'S3 Server: {self.s3_server}. Itens: {count_global}. Size: {size_global}')
+            f'S3 Server: {self.s3_server}. Itens Totais: {count_global}. Itens com cópia: {count_uploaded} Size: {size_global}')

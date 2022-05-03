@@ -38,11 +38,25 @@ class Command(BaseCommand):
 
         self.logger = logging.getLogger(__name__)
 
+        # PullExec.objects.timedelta_quota_pull()
+        # self.corrigir_erro_causado_em_full_metadata()
+        # pull_youtube()
+        # vincular_sistema_aos_videos()
+        # video_documento_na_galeria()
+        # return
+        # vincular_sistema_aos_videos()
+        # video_documento_na_galeria()
+        # pull_youtube_metadata_video(Video.objects.first())
+
+        return
+
         for v in Video.objects.order_by('-id')[:40]:
+
             print(v.id, v)
-            if v.id == 1219:
+            if v.id == 1273:
                 pull_youtube_metadata_video(v)
             continue
+
             for vp in v.videoparte_set.all():
                 d = vp.content_object
 
@@ -63,17 +77,6 @@ class Command(BaseCommand):
         # Video.objects.all().update(created=F('modified'))
 
         # PullYoutube.objects.pull_from_date()
-        PullExec.objects.timedelta_quota_pull()
-        # self.corrigir_erro_causado_em_full_metadata()
-        pull_youtube()
-        vincular_sistema_aos_videos()
-        video_documento_na_galeria()
-        # return
-        # vincular_sistema_aos_videos()
-        # video_documento_na_galeria()
-        # pull_youtube_metadata_video(Video.objects.first())
-
-        return
         m.desativa_auto_now()
 
         # self.corrigir_erro_causado_em_full_metadata()

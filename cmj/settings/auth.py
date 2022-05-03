@@ -129,17 +129,11 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.user.user_details'
 )
 
-
-# LOCAWEB
-LOCAWEB_ACCESS_KEY_ID = config('LOCAWEB_ACCESS_KEY_ID', cast=str, default='')
-LOCAWEB_SECRET_ACCESS_KEY = config('LOCAWEB_SECRET_ACCESS_KEY', cast=str, default='')
-
-# LOCAWEB
+# AWS
 AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID', cast=str, default='')
 AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY', cast=str, default='')
 
 ABSOLUTE_PATH_BACKUP = config('ABSOLUTE_PATH_BACKUP', cast=str, default='')
-
 
 # S3 CMJ
 S3_CMJ_ACCESS_KEY_ID = config('S3_CMJ_ACCESS_KEY_ID', cast=str, default='')

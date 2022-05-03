@@ -55,11 +55,7 @@ class Command(BaseCommand):
 
     def s3_connect(self):
 
-        if self.s3_server == 'locaweb':
-            access_key = settings.LOCAWEB_ACCESS_KEY_ID
-            secret_key = settings.LOCAWEB_SECRET_ACCESS_KEY
-            endpoint_url = 'https://lss.locawebcorp.com.br'
-        elif self.s3_server == 's3_cmj':
+        if self.s3_server == 's3_cmj':
             access_key = settings.S3_CMJ_ACCESS_KEY_ID
             secret_key = settings.S3_CMJ_SECRET_ACCESS_KEY
             endpoint_url = settings.S3_CMJ_ENDPOINT_URL
