@@ -1810,38 +1810,47 @@ class SeloProtocoloMixin(PluginSignMixin):
 
             cmd = self.cmd_mask
 
+            params = {
+                'plugin': self.plugin_path,
+                'comando': 'cert_protocolo',
+                'in_file': paths,
+                'certificado': settings.CERT_PRIVATE_KEY_ID,
+                'password': settings.CERT_PRIVATE_KEY_ACCESS,
+                'data_ocorrencia': formats.date_format(
+                    timezone.localtime(
+                        p.timestamp) if p.timestamp else p.data,
+                    'd/m/Y'
+                ),
+                'hora_ocorrencia': formats.date_format(
+                    timezone.localtime(
+                        p.timestamp) if p.timestamp else p.hora,
+                    'H:i'
+                ),
+                'data_comando': formats.date_format(timezone.localtime(), 'd/m/Y'),
+                'hora_comando': formats.date_format(timezone.localtime(), 'H:i'),
+                'titulopre': 'Protocolo: {}/{}'.format(p.numero, p.ano),
+                'titulo': item.epigrafe_short,
+                'titulopos': '',
+                'x': int(self.request.GET.get('x', 190)),
+                'y': int(self.request.GET.get('y', 50)),
+                'w': 12,
+                'h': 60,
+                'cor': "0, 76, 64, 255",
+                'debug': False  # settings.DEBUG
+            }
             cmd = cmd.format(
-                **{
-                    'plugin': self.plugin_path,
-                    'comando': 'cert_protocolo',
-                    'in_file': paths,
-                    'certificado': settings.CERT_PRIVATE_KEY_ID,
-                    'password': settings.CERT_PRIVATE_KEY_ACCESS,
-                    'data_ocorrencia': formats.date_format(
-                        timezone.localtime(
-                            p.timestamp) if p.timestamp else p.data,
-                        'd/m/Y'
-                    ),
-                    'hora_ocorrencia': formats.date_format(
-                        timezone.localtime(
-                            p.timestamp) if p.timestamp else p.hora,
-                        'H:i'
-                    ),
-                    'data_comando': formats.date_format(timezone.localtime(), 'd/m/Y'),
-                    'hora_comando': formats.date_format(timezone.localtime(), 'H:i'),
-                    'titulopre': 'Protocolo: {}/{}'.format(p.numero, p.ano),
-                    'titulo': item.epigrafe_short,
-                    'titulopos': '',
-                    'x': self.request.GET.get('x', 190),
-                    'y': self.request.GET.get('y', 50),
-                    'w': 12,
-                    'h': 60,
-                    'cor': "0, 76, 64, 255",
-                    'debug': False  # settings.DEBUG
-                }
+                **params
             )
 
             self.run(cmd)
+
+            del params['plugin']
+            del params['in_file']
+            del params['certificado']
+            del params['password']
+            del params['debug']
+            del params['comando']
+            item.metadata['selos'] = {'cert_protocolo': params}
 
             # print(cmd)
             # return

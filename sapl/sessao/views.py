@@ -1151,36 +1151,52 @@ class SessaoCrud(Crud):
 
                     paths = m.texto_original.path
 
+                    try:
+                        x = m.metadata['selos']['cert_protocolo']['x']
+                        y = m.metadata['selos']['cert_protocolo']['y'] + \
+                            m.metadata['selos']['cert_protocolo']['h'] + 10
+                    except:
+                        x = 190
+                        y = 120
+
                     cmd = self.cmd_mask
 
-                    cmd = cmd.format(
-                        **{
-                            'plugin': self.plugin_path,
-                            'comando': 'deliberacao_plenario',
-                            'in_file': paths,
-                            'certificado': settings.CERT_PRIVATE_KEY_ID,
-                            'password': settings.CERT_PRIVATE_KEY_ACCESS,
-                            'data_ocorrencia': formats.date_format(
-                                timezone.localtime(v.data_hora), 'd/m/Y'
-                            ),
-                            'hora_ocorrencia': formats.date_format(
-                                timezone.localtime(v.data_hora), 'H:i'
-                            ),
-                            'data_comando': formats.date_format(timezone.localtime(), 'd/m/Y'),
-                            'hora_comando': formats.date_format(timezone.localtime(), 'H:i'),
-                            'titulopre': titulopre,
-                            'titulo': titulo,
-                            'titulopos': titulopos,
-                            'x': 190,
-                            'y': (count - 1) * 53 + 120,
-                            'w': 12,
-                            'h': 50,
-                            'cor': "0, 76, {}, 255".format(170 - count * 20) if v.tipo_resultado_votacao.natureza == 'A' else "150, 20, 0, 255",
-                            'debug': False  # settings.DEBUG
-                        }
-                    )
+                    params = {
+                        'plugin': self.plugin_path,
+                        'comando': 'deliberacao_plenario',
+                        'in_file': paths,
+                        'certificado': settings.CERT_PRIVATE_KEY_ID,
+                        'password': settings.CERT_PRIVATE_KEY_ACCESS,
+                        'data_ocorrencia': formats.date_format(
+                            timezone.localtime(v.data_hora), 'd/m/Y'
+                        ),
+                        'hora_ocorrencia': formats.date_format(
+                            timezone.localtime(v.data_hora), 'H:i'
+                        ),
+                        'data_comando': formats.date_format(timezone.localtime(), 'd/m/Y'),
+                        'hora_comando': formats.date_format(timezone.localtime(), 'H:i'),
+                        'titulopre': titulopre,
+                        'titulo': titulo,
+                        'titulopos': titulopos,
+                        'x': x,
+                        'y': (count - 1) * 53 + y,
+                        'w': 12,
+                        'h': 50,
+                        'cor': "0, 76, {}, 255".format(170 - count * 20) if v.tipo_resultado_votacao.natureza == 'A' else "150, 20, 0, 255",
+                        'debug': False  # settings.DEBUG
+                    }
 
+                    cmd = cmd.format(**params)
                     self.run(cmd)
+
+                    del params['plugin']
+                    del params['in_file']
+                    del params['certificado']
+                    del params['password']
+                    del params['debug']
+                    del params['comando']
+                    m.metadata['selos'][f'deliberacao_plenario_{count}'] = params
+                    m.save()
 
                     v.selo_votacao = True
                     v.save()
