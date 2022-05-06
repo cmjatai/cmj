@@ -1,5 +1,31 @@
 @use "sass:math";
 
+
+.header-accessibility {
+  background: darken($color_topo_bg,10) $url_bg_png;
+  position: relative;
+  .links-to-content {
+    position: relative;
+    display: flex;
+    z-index: $zindex-accessibility;
+    .btn {
+      color: rgb(202, 125, 24);
+      font-size: 75%;
+      line-height: 1;
+      color: white;
+      .badge {
+        margin-left: 3px;
+        opacity: 0.3;
+      }
+      &:hover {
+        box-shadow: 0 0 0 0;
+      }
+    }
+  }
+}
+
+
+
 .container-box {
   margin: 0 auto $grid-gutter-width;
   background: darken($color_main_bg, 3%) $url_bg_png;
@@ -319,33 +345,6 @@
   display: none !important;
 }
 
-.header-accessibility {
-  background: $color_topo_bg $url_bg_png;
-  position: relative;
-  height: 0;
-  .links-to-content {
-    position: relative;
-    display: flex;
-    line-height: 1;
-    z-index: $zindex-accessibility;
-    top: 43px;
-    .btn {
-      color: rgb(202, 125, 24);
-      font-size: 75%;
-      padding: 0 3px;
-      line-height: 1;
-      color: white;
-      .badge {
-        margin-left: 3px;
-        opacity: 0.3;
-      }
-      &:hover {
-        box-shadow: 0 0 0 0;
-      }
-    }
-  }
-}
-
 .btn-segmentos {
   background: darken($color_main_bg, 10%) $url_bg_png;
   flex: 1 1 20%;
@@ -376,6 +375,11 @@
     line-height: 4rem;
     margin: 5px 10px;
   }
+}
+
+// #### pagination ########################################
+.pagination {
+  padding-top: 15px;
 }
 
 .nav-pagination {
@@ -510,8 +514,6 @@
   .nav-pagination {
     left: auto;
     top: 90px;
-    .pagination {
-    }
   }
 }
 
