@@ -1539,6 +1539,17 @@ class TramitacaoCrud(MasterDetailCrud):
 
         layout_key = 'TramitacaoUpdate'
 
+        def get(self, request, *args, **kwargs):
+            t = self.get_object()
+
+            if t.materia.checkcheck and not request.user.is_superuser:
+                raise PermissionDenied(
+                    'Matéria já no arquivo morto, '
+                    'a edição é restrita ao gestor do sistema!'
+                )
+
+            return super().get(request, *args, **kwargs)
+
         def form_valid(self, form):
             dict_objeto_antigo = Tramitacao.objects.get(
                 pk=self.kwargs['pk']).__dict__
@@ -1700,6 +1711,17 @@ class DocumentoAcessorioCrud(MasterDetailCrud):
 
     class UpdateView(MasterDetailCrud.UpdateView):
         form_class = DocumentoAcessorioForm
+
+        def get(self, request, *args, **kwargs):
+            d = self.get_object()
+
+            if d.materia.checkcheck and not request.user.is_superuser:
+                raise PermissionDenied(
+                    'Matéria já no arquivo morto, '
+                    'a edição é restrita ao gestor do sistema!'
+                )
+
+            return super().get(request, *args, **kwargs)
 
         def get_initial(self):
             initial = super(UpdateView, self).get_initial()
@@ -2000,6 +2022,17 @@ class MateriaLegislativaCrud(Crud):
             initial['ip'] = get_client_ip(self.request)
 
             return initial
+
+        def get(self, request, *args, **kwargs):
+            m = self.get_object()
+
+            if m.checkcheck and not request.user.is_superuser:
+                raise PermissionDenied(
+                    'Matéria já no arquivo morto, '
+                    'a edição é restrita ao gestor do sistema!'
+                )
+
+            return super().get(request, *args, **kwargs)
 
         def form_valid(self, form):
             dict_objeto_antigo = MateriaLegislativa.objects.get(
