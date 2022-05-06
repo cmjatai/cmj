@@ -163,7 +163,7 @@
   .path-description {
     display: block;
     font-weight: normal;
-    color: $color_topo_bg;
+    color: $color_primary;
     margin-bottom: 0.9em;
     font-size: 90%;
     margin-left: 5%;
@@ -525,7 +525,7 @@
       position: relative;
 
       margin-bottom: 50px;
-      color: transparentize($color_topo_bg, 0.3);
+      color: transparentize($color_primary, 0.3);
       box-shadow: 0px -30px 100px #fff;
       background: darken($color_main_bg, 15%) $url_bg_png;
       text-align: right;

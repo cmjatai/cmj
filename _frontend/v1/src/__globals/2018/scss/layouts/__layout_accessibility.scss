@@ -1,0 +1,48 @@
+.header-accessibility {
+  background: darken($color_primary,5) $url_bg_png;
+  position: relative;
+  .links-to-content {
+    position: relative;
+    display: flex;
+
+    span {
+      color:white;
+      padding: 0 0.2rem;
+      line-height: 1;
+    }
+    .btn {
+      color: rgb(202, 125, 24);
+      font-size: 70%;
+      color: white;
+      padding: 0.1rem 0.3rem;
+      .badge {
+        margin-left: 3px;
+        opacity: 0.7;
+        padding: 0.1rem 0.2rem;
+      }
+      &:hover {
+        box-shadow: 0 0 0 0;
+      }
+    }
+    .group-font {
+      display: flex;
+      gap: 0.3rem;
+      align-items: center;
+      .btn {
+        text-decoration: none;
+        margin: 0.3rem 0;
+        padding: 0rem 0.2rem;
+        background-color: #fff3;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 991px) {
+  .header-accessibility {
+    .links-to-content {
+      overflow: hidden;
+      height: 0px;
+    }
+  }
+}

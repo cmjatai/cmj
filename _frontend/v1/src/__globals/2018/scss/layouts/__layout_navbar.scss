@@ -1,6 +1,6 @@
 
 .navbar {
-  background: darken($color_topo_bg, 5%) $url_bg_png;
+  background: darken($color_primary, 5%) $url_bg_png;
   padding: 0px;
   .navbar-nav {
     flex-basis: 100%;
@@ -61,7 +61,7 @@
         border-color: $color_border_menu_hover;
         margin: -1px 0 0 0;
         padding: 0;
-        background: $color_topo_bg $url_bg_png;
+        background: $color_primary $url_bg_png;
         a {
           line-height: 2em;
         }
@@ -122,7 +122,7 @@
     li {
       ul {
         min-width: auto;
-        background: darken($color_topo_bg, 5%) $url_bg_png;
+        background: darken($color_primary, 5%) $url_bg_png;
         li {
           padding: 0 20px;
 
@@ -160,7 +160,7 @@
 }
 
 .navbar-topo {
-  background: $color_topo_bg $url_bg_png;
+  background: $color_primary $url_bg_png;
   padding: 0 0 0 0;
   z-index: $zindex-navbar-topo;
   a.navbar-brand {

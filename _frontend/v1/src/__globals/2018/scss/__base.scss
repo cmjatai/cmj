@@ -2,7 +2,6 @@
 body,
 html {
   background: $color_main_bg $url_bg_png;
-  // scroll-behavior: smooth;
   font-size: 1rem;
 }
 
@@ -86,12 +85,12 @@ strong {
 
 
 a {
-  color: $color_topo_bg;
+  color: $color_primary;
 }
 
 a:focus,
 a:hover {
-  color: darken($color_topo_bg, 20%);
+  color: darken($color_primary, 20%);
 }
 
 .bg-back-image {
@@ -254,20 +253,20 @@ p.control-label {
 
 // ADJUST DRUNKEN PARROT STYLES ########################################
 .panel-primary {
-  border-color: $color_topo_bg;
+  border-color: $color_primary;
 
   .panel-heading {
-    background-color: $color_topo_bg;
-    color: lighten($color_topo_bg, 20%);
+    background-color: $color_primary;
+    color: lighten($color_primary, 20%);
   }
 
   .panel-footer {
     padding: 0;
-    background-color: $color_topo_bg;
+    background-color: $color_primary;
     border-width: 0;
 
     small {
-      color: lighten($color_topo_bg, 20%);
+      color: lighten($color_primary, 20%);
       text-align: center;
       display: block;
     }

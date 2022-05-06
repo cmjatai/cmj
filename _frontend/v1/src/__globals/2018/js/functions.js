@@ -186,7 +186,7 @@ window.refreshMask = function () {
   $('.datetimeinput').mask('00/00/0000 00:00:00', { placeholder: '__/__/____ hh:mm:ss' })
 }
 
-window.AltoContraste = function () {
+window.Accessibilidade = function () {
   let Contrast = {
     storage: 'contrastState',
     cssClass: 'contrast',
@@ -231,6 +231,60 @@ window.AltoContraste = function () {
 
   function toogleContrast () {
     this.setState(!this.currentState)
+  }
+
+  let FontSizeZoom = {
+    storage: 'fontSizeZoomState',
+    getState: getFontSizeZoomState,
+    setState: setFontSizeZoomState,
+    currentState: 1.0,
+    updateView: updateViewFontSizeZoom,
+    toogle: execFontSizeZoom,
+    check: checkFontSizeZoom
+  }
+
+  FontSizeZoom.check()
+
+  function checkFontSizeZoom () {
+    this.updateView()
+  }
+
+  function execFontSizeZoom (action) {
+    this.setState(action)
+  }
+
+  window.execFontSizeZoom = function (action) {
+    FontSizeZoom.toogle(action)
+  }
+
+  function updateViewFontSizeZoom () {
+    let body = document.body
+    if (this.currentState === null) {
+      this.currentState = 1
+    }
+    body.style.fontSize = `${this.getState()}rem`
+  }
+
+  function getFontSizeZoomState () {
+    return localStorage.getItem(this.storage)
+  }
+
+  function setFontSizeZoomState (state) {
+    let st = this.getState()
+    if (state === 'up') {
+      if (st < 1.8) {
+        st *= 1.1
+      }
+    } else if (state === 'down') {
+      if (st > 0.7) {
+        st /= 1.1
+      }
+    } else {
+      st = 1
+    }
+    localStorage.setItem(this.storage, st)
+    this.currentState = state
+    this.updateView()
   }
 }
 

@@ -46,8 +46,8 @@
     a {
       border-radius: 3px;
       &:hover:not(.active):not(.inner-titulo):not(.selected) {
-        border-color: $color_topo_bg;
-        background: $color_topo_bg;
+        border-color: $color_primary;
+        background: $color_primary;
         color: white;
       }
     }

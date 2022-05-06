@@ -30,14 +30,14 @@
 
 // ADJUST tela de login ########################################
 .html-login, {
-  background-color: $color_topo_bg;
+  background-color: $color_primary;
   background-image: none;
   a.navbar-brand {
     font-size: 50px;
     margin-left: -10px !important;
   }
   body, .navbar {
-    background-color: $color_topo_bg;
+    background-color: $color_primary;
     background-image: none;
   }
 }
@@ -58,7 +58,7 @@
   position: relative;
   margin: 7% 15%;
   background-color: transparent;
-  color: $color_topo_bg;
+  color: $color_primary;
   .logo-cmj {
     position: absolute;
     opacity: 0.7;
@@ -74,7 +74,7 @@
     margin: 0;
     font-weight: normal;
     font-size: 2em;
-    background: $color_topo_bg;
+    background: $color_primary;
     padding: 0 20px;
   }
   .input-icon {
@@ -92,14 +92,14 @@
   input {
     height: 2.5em;
     font-size: 1.4em;
-    border: 1px solid rgba($color_topo_bg, 0.7);
+    border: 1px solid rgba($color_primary, 0.7);
 
     padding: 1em;
     background-color: rgba(255, 255, 255, 0.8);
     &:focus {
       background-color: white;
     }
-    @include placeholder($color_topo_bg, 0.5, 1em, normal);
+    @include placeholder($color_primary, 0.5, 1em, normal);
 
   }
   .btn-recovery {
@@ -120,8 +120,8 @@
       text-align: center;
       font-family: "Graduate";
 
-      border: 1px solid $color_topo_bg;
-      background-color: $color_topo_bg;
+      border: 1px solid $color_primary;
+      background-color: $color_primary;
       line-height: 40px;
       color: white;
 
