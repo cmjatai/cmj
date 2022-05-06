@@ -12,9 +12,9 @@
     z-index: 1;
     font-size: 300%;
     a {
-      color: rgba($color_topo_bg, 0.3);
+      color: rgba($color_primary, 0.3);
       &:hover {
-          color: rgba($color_topo_bg, 0.9);
+          color: rgba($color_primary, 0.9);
       }
     }
   }
@@ -44,7 +44,7 @@
     .numero {
       font-size: 300%;
       font-weight: bold;
-      color: rgba($color_topo_bg, 0.09);
+      color: rgba($color_primary, 0.09);
       position: absolute;
       right: 10px;
       line-height: 1;
@@ -63,7 +63,7 @@
       }
     }
     .dia-destaque {
-     // background-color: rgba($color_topo_bg, 0.2);
+     // background-color: rgba($color_primary, 0.2);
       .numero {
         color: rgba(red,0.5);
       }
@@ -115,7 +115,7 @@
   }
 
   .nomes {
-    background: rgba($color_topo_bg,0.5);
+    background: rgba($color_primary,0.5);
     color: white;
     font-weight: bold;
     text-align: center;
@@ -124,7 +124,7 @@
     }
   }
   .mes {
-    color: $color_topo_bg;
+    color: $color_primary;
     background:white;
     font-size: 130%;
     display: inline-block;
@@ -271,13 +271,13 @@
         font-size: 0.65rem;
       }
       .numero {
-        color: rgba($color_topo_bg, 0.1);
+        color: rgba($color_primary, 0.1);
         right: 2px;
         padding: 0px;
       }
       .dia-now {
         .numero {
-          color: rgba($color_topo_bg, 0.6);
+          color: rgba($color_primary, 0.6);
         }
       }
       .dia-destaque {

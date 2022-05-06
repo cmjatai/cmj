@@ -1,31 +1,5 @@
 @use "sass:math";
 
-
-.header-accessibility {
-  background: darken($color_topo_bg,10) $url_bg_png;
-  position: relative;
-  .links-to-content {
-    position: relative;
-    display: flex;
-    z-index: $zindex-accessibility;
-    .btn {
-      color: rgb(202, 125, 24);
-      font-size: 75%;
-      line-height: 1;
-      color: white;
-      .badge {
-        margin-left: 3px;
-        opacity: 0.3;
-      }
-      &:hover {
-        box-shadow: 0 0 0 0;
-      }
-    }
-  }
-}
-
-
-
 .container-box {
   margin: 0 auto $grid-gutter-width;
   background: darken($color_main_bg, 3%) $url_bg_png;
@@ -36,7 +10,6 @@
     position: absolute;
     right: $grid-gutter-width * 0.5;
     margin-top: math.div($grid-gutter-width, -3);
-
     a {
       border: 1px solid darken($color_main_bg, 1%);
       font-family: Lato;
@@ -272,7 +245,7 @@
 .page-header {
   padding: $grid-gutter-width * 0.5 $grid-gutter-width * 0.5 $grid-gutter-width * 0.3;
   margin: 0em $grid-gutter-width * -0.5;
-  color: transparentize($color_topo_bg, 0.3);
+  color: transparentize($color_primary, 0.3);
   background: darken($color_main_bg, 10%) $url_bg_png;
   border-radius: 5px 5px 0 0;
   border-bottom: 1px solid $color_container_border;
@@ -426,22 +399,6 @@
   }
 }
 
-
-@media screen and (max-width: 991px) {
-  .header-accessibility {
-    .links-to-content {
-      overflow: hidden;
-      height: 0px;
-    }
-  }
-  .box-assinatura-eletronica {
-    .sig {
-      //flex: 1 1 50%;
-    }
-  }
-
-}
-
 @media screen and (max-width: 767px) {
   .item-listas {
     .col-md-auto {
@@ -484,12 +441,6 @@
       }
     }
   }
-
-  .box-assinatura-eletronica {
-    .sig {
-      //flex: 1 1 100%;
-    }
-  }
 }
 
 
@@ -506,11 +457,9 @@
       }
     }
   }
-
 }
 
 @media screen and (min-width: 576px) {
-
   .nav-pagination {
     left: auto;
     top: 90px;

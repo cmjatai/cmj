@@ -1,14 +1,14 @@
 
 // ADJUST tela de login ########################################
 .html-login {
-  background-color: $color_topo_bg;
+  background-color: $color_primary;
   background-image: none;
   a.navbar-brand {
     font-size: 50px;
     margin-left: -10px !important;
   }
   body, .navbar {
-    background-color: $color_topo_bg;
+    background-color: $color_primary;
     background-image: none;
   }
 }
@@ -30,7 +30,7 @@
   position: relative;
   margin: 3% 15%;
   background-color: transparent;
-  color: $color_topo_bg;
+  color: $color_primary;
   border: 0;
   .inner {
     padding: $grid-gutter-width;
@@ -51,7 +51,7 @@
     margin: 0;
     font-weight: normal;
     font-size: 2em;
-    background: $color_topo_bg;
+    background: $color_primary;
     padding: 0 20px;
   }
   .input-icon {
@@ -73,14 +73,14 @@
   input {
     height: 3em;
     font-size: 1.3em;
-    border: 1px solid rgba($color_topo_bg, 0.7);
+    border: 1px solid rgba($color_primary, 0.7);
 
     padding: 1em 1em 1em 2.2em;
     background-color: rgba(255, 255, 255, 0.8);
     &:focus {
       background-color: white;
     }
-    @include placeholder($color_topo_bg, 0.5, 1em, normal);
+    @include placeholder($color_primary, 0.5, 1em, normal);
 
 
   }
@@ -88,8 +88,8 @@
   .btns-login {
     margin: 1em 0;
     .btn-login {
-      border: 0px solid $color_topo_bg;
-      background-color: $color_topo_bg;
+      border: 0px solid $color_primary;
+      background-color: $color_primary;
       cursor: pointer;
       display: inline-block;
       line-height: 3rem;

@@ -199,7 +199,9 @@
 
             {% with rev=container.revisoes.first %}
               <span class="data-pub">
+                {% if rev %}
                 {{rev.timestamp}} - {% trans "por:" %} {{rev.user.first_name|default:rev.user.email}}
+                {% endif %}
               </span>
             {% endwith %}
           {% endif %}
@@ -227,7 +229,9 @@
 
                   {% with rev=item.revisoes.first %}
                     <span class="data-pub">
-                      {{rev.timestamp}} - {% trans "por:" %} {{rev.user.first_name|default:rev.user.email}}
+                      {% if rev %}
+                        {{rev.timestamp}} - {% trans "por:" %} {{rev.user.first_name|default:rev.user.email}}
+                      {% endif %}
                     </span>
                   {% endwith %}
                 </div>
@@ -373,7 +377,9 @@
 
                   {% with rev=child.revisoes.first %}
                     <span class="data-pub">
-                      {{rev.timestamp}} - {% trans "por:" %} {{rev.user.first_name|default:rev.user.email}}
+                      {% if rev %}
+                        {{rev.timestamp}} - {% trans "por:" %} {{rev.user.first_name|default:rev.user.email}}
+                      {% endif %}
                     </span>
                   {% endwith %}
                 </div>
