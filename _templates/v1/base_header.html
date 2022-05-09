@@ -16,7 +16,7 @@
         <div id="portallogo">
           <div>
             <a class="navbar-brand" href="{{site_url}}/">
-              <img src="{% webpack_static 'brasao/brasao_256.png' %}">
+              <img src="{% webpack_static 'brasao/brasao_128.png' %}">
               <div class="brand-name">
                 <span>
                   Câmara Municipal de
@@ -43,10 +43,11 @@
 
       <div class="navbar-collapse collapse" id="navbar-access">
 
-        <div class="d-flex flex-column">
-          <div class="row-1 d-flex justify-content-end">
+        <div class="d-flex flex-column  justify-content-end">
+
+          <div class="row-1 d-flex justify-content-end align-items-center">
             {% block social_links %}
-              <div class="navbar-social-links justify-content-center">
+              <div class="navbar-social-links justify-content-end">
                 <a href="/online/" class="icon-sessoes-online" title="Sessão Plenária Online - Atualização em tempo real"><span>Sessões Online</span></a>
                 <a href="/estatisticas"title="Estatisticas de Dados do Portal"><i class="far fa-chart-bar"></i></a>
     
@@ -57,8 +58,8 @@
               </div>
             {% endblock %}
     
-            <ul class="navbar-nav d-none">
-              {% if user and not user.is_anonymous %}
+            {% if user and not user.is_anonymous %}
+              <ul class="navbar-nav justify-content-end">
                 <li class="dropdown nav-user">
     
                   <a href="#">
@@ -90,27 +91,10 @@
                       </li>
                   </ul>
                 </li>
-              {% else %}
-                <li>
-                  <a href="#linkMenu" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Acessar" %}<span class="caret"></span></a>
-                  <ul class="dropdown-menu">
-    
-                    <li><a href="{% url 'cmj.core:login' %}">{% trans "Portal" %}</a></li>
-    
-                    <li class=" text-right">
-                      <a href="#linkMenu"  role="button" aria-haspopup="true" aria-expanded="false">{% trans "Intranet" %}<span class="caret"></span></a>
-                      <ul class="dropdown-menu">
-                        <li class="text-right"><a href="http://mail.jatai.go.leg.br">{% trans "Webmail" %}</a></li>
-                        <li class="text-right"><a href="http://gestaopublica.camara.jatai.bsit-br.com.br">{% trans "Gestão Pública" %}</a></li>
-                      </ul>
-                    </li>
-    
-                  </ul>
-                </li>
+                </ul>
               {% endif %}
-            </ul>
           </div>
-          <div class="row-2 d-flex">
+          <div class="row-2 d-flex justify-content-end">
             <form class="form-search" method="get" action="{% url 'cmj.core:haystack_search'%}">
               <div class="inner">
                 <div class="item-form">
@@ -139,6 +123,26 @@
             </div>
 
           </div>
+
+          {% if user.is_anonymous %}
+            <ul class="navbar-nav nav-login-mogile justify-content-end">
+              <li>
+                <a href="#linkMenu" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Acessar" %}<span class="caret"></span></a>
+                <ul class="dropdown-menu">
+
+                  <li><a href="{% url 'cmj.core:login' %}">{% trans "Portal" %}</a></li>
+
+                  <li class=" text-right">
+                    <a href="#linkMenu"  role="button" aria-haspopup="true" aria-expanded="false">{% trans "Intranet" %}<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                      <li class="text-right"><a href="http://mail.jatai.go.leg.br">{% trans "Webmail" %}</a></li>
+                      <li class="text-right"><a href="http://gestaopublica.camara.jatai.bsit-br.com.br">{% trans "Gestão Pública" %}</a></li>
+                    </ul>
+                  </li>
+
+                </li>
+            </ul>
+          {% endif %}
 
         </div>
 

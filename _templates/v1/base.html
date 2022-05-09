@@ -59,6 +59,30 @@
                 </ul>
 
                 {% include "base_menu_right.html" %}
+
+
+                {% if user.is_anonymous %}
+                <ul class="navbar-nav justify-content-end">
+                    <li>
+                      <a href="#linkMenu" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Acessar" %}<span class="caret"></span></a>
+                      <ul class="dropdown-menu">
+        
+                        <li><a href="{% url 'cmj.core:login' %}">{% trans "Portal" %}</a></li>
+        
+                        <li class=" text-right">
+                          <a href="#linkMenu"  role="button" aria-haspopup="true" aria-expanded="false">{% trans "Intranet" %}<span class="caret"></span></a>
+                          <ul class="dropdown-menu">
+                            <li class="text-right"><a href="http://mail.jatai.go.leg.br">{% trans "Webmail" %}</a></li>
+                            <li class="text-right"><a href="http://gestaopublica.camara.jatai.bsit-br.com.br">{% trans "Gestão Pública" %}</a></li>
+                          </ul>
+                        </li>
+        
+                      </ul>
+                    </li>
+                  </ul>
+                  {% endif %}
+
+                
               </div>
             </div>
           </nav>
