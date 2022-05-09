@@ -1,5 +1,5 @@
 .navbar {
-  background: darken($color_primary, 5%) $url_bg_png;
+  background: darken($color_primary, 7%) $url_bg_png;
   
   padding: 0px;
   .navbar-nav {
@@ -104,7 +104,7 @@
 }
 
 .navbar-menu {
-  //z-index: $zindex-navbar-menu;
+  z-index: $zindex-navbar-menu;
   .navbar-nav {
     z-index: 2;
     & > li {
@@ -146,7 +146,7 @@
 }
 
 .navbar-topo {
-  z-index: $zindex-navbar-menu;
+  z-index: $zindex-navbar-topo;
   background: $color_primary;
   padding: 0 0 0 0;
   .before {
@@ -191,10 +191,12 @@
   }
 
   .navbar-nav {
-    flex-basis: 100%;
+    flex-basis: 0%;
+    &.nav-login-mogile  {
+      display: none;
+    }
     .nav-user {
       border: 1px solid transparent;
-      border-bottom-width: 0px;
       &:hover {
         border-color: $color_border_menu_hover;
       }
@@ -244,6 +246,7 @@
     .inner {
       height: 100%;
       display: flex;
+      position: relative;
       align-items: stretch;
       background-color: white;
       align-items: center;
@@ -253,12 +256,20 @@
       }
       
       .button, input {
-        padding: 0 20px;
+        padding: 0 10px;
         border: 0;
         background-color: transparent;    
         height: 100%;    
-        border-radius: 0;
+        //border-radius: 0;
         font-size: 1rem;
+      }
+      .button {
+        position: absolute;
+        top: 0;
+        right: 5px;
+      }
+      input {
+        padding-right: 35px;
       }
     }
   }
@@ -275,7 +286,6 @@
 
     font-family: "Graduate";
     img {
-      height: 5rem;
       padding: 0 20px;
       padding-left: 0;
       box-sizing: content-box;
@@ -343,6 +353,7 @@
     padding: 12px 10px 10px 10px;
     right: 15px;
     display: none;
+    z-index: 99999;
     
     &::before {
       content:"";
@@ -361,6 +372,7 @@
       padding: 15px;
       box-shadow: 0px 10px 30px #0007;
       border-radius: 20px;
+      z-index: 9000;
     }
   }
   &:hover {
@@ -510,6 +522,10 @@
       padding: 2px 10px;
     }
     .navbar-nav {
+      &.nav-login-mogile  {
+        display: flex;
+        flex-direction: row;
+      }
       li {
         border: 1px;
         &:hover {
@@ -545,11 +561,8 @@
   }
 
   .navbar-topo {
-    a.navbar-brand {
-      flex: 1 1 auto;
-      font-size: 18px;
-      line-height: 40px;
-      flex-basis: 0%
+    .row-1, .row-2 {
+      padding: 0 7px;
     }
     .navbar-nav {
       .nav-user {
@@ -571,6 +584,24 @@
       }
     }
   }
+
+  #portallogo {
+    .navbar-brand {
+      img {
+        height: 48px;
+        padding: 0 10px;
+      }
+
+      .brand-name {
+        font-size: 0.45rem;
+      }
+
+      .brand-estado {
+        padding-top: 1px;
+      }
+    }
+  }
+
 }
 
 @media screen and (max-width: 480px) {
@@ -579,34 +610,12 @@
       padding: 2px 15px;
     }
   }
-  .navbar-topo {
-    a.navbar-brand {
-      margin-right: 0;
-      .fa-home {
-        padding: 0 0.7rem 0 0;
-      }
-    }
-  }
 }
 
 
-
-
-
-@media screen and (max-width: 767px) {
-  .navbar-topo {
-    a.navbar-brand {
-      font-size: 100%;
-    }
-    .brand-estado {
-      display: none;
-    }
-  }
-}
 
 
 @media screen and (max-width: 359px) {
-
   .navbar {
     .navbar-toggler {
       padding: 2px 10px;
@@ -614,15 +623,6 @@
         height: 2px;
         width: 20px;
         margin: 7px 0;
-      }
-
-    }
-  }
-  .navbar-topo {
-    a.navbar-brand {
-      margin-right: 0;
-      .fa-home {
-        padding: 0 0.5rem 0 0;
       }
     }
   }
