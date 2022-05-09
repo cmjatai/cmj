@@ -260,7 +260,7 @@ window.Accessibilidade = function () {
   function updateViewFontSizeZoom () {
     let body = document.body
     if (this.currentState === null) {
-      this.currentState = 1
+      this.currentState = 1.0
     }
     body.style.fontSize = `${this.getState()}rem`
   }
@@ -271,11 +271,11 @@ window.Accessibilidade = function () {
 
   function setFontSizeZoomState (state) {
     let st = this.getState()
-    if (state === 'up') {
+    if (st && state === 'up') {
       if (st < 1.8) {
         st *= 1.1
       }
-    } else if (state === 'down') {
+    } else if (st && state === 'down') {
       if (st > 0.7) {
         st /= 1.1
       }
