@@ -1,0 +1,28 @@
+{% load i18n staticfiles menus common_cmj_tags cropping %}
+{% load webpack_static from webpack_loader %}
+
+  <div class="header-accessibility">
+    <div class="container{{fluid}} links-to-content justify-content-between">
+      <div class="btn-group d-flex align-items-center" role="group">
+        <a class="btn btn-link " href="#main_content" accesskey="1">Ir para Conteúdo<span class="badge badge-dark">1</span></a>
+        <a class="btn btn-link" href="#menu_content" accesskey="2">Ir para Menu<span class="badge badge-dark">2</span></a>
+        <a class="btn btn-link" href="#rodape_access" accesskey="3">Ir para Rodapé<span class="badge badge-dark">3</span></a>
+      </div>
+      <div class="btn-group d-flex align-items-center" role="group" >
+        <a class="btn btn-link" href="#" id="accessibility"><i class="fab fa-accessible-icon"></i> ACESSIBILIDADE</a>
+        <span>&#8226;</span>
+        <a class="btn btn-link" href="#" id="mapasite">MAPA DO SITE</a>
+        <span>&#8226;</span>
+        {% comment %}
+        {% endcomment %}
+        <a class="btn btn-link" href="#" id="altocontraste" accesskey="4" onclick="window.toggleContrast()" onkeydown="window.toggleContrast()"><i class="fas fa-adjust" aria-hidden="true"> Alto Contraste</i></a>
+        <span>&#8226;</span>
+        <span><small>TAMANHO DA FONTE:</small></span>
+        <div class="group-font">
+          <a class="btn btn-link" id="font_up" accesskey="5" onclick="window.execFontSizeZoom('up')">A+</a>
+          <a class="btn btn-link" id="font_default" accesskey="6" onclick="window.execFontSizeZoom('default')">A</a>
+          <a class="btn btn-link" id="font_down" accesskey="7" onclick="window.execFontSizeZoom('down')">A-</a>
+        </div>
+      </div>
+    </div>
+  </div>

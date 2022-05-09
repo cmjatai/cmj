@@ -188,27 +188,6 @@
     }
   }
 
-  .container-sic {
-    border: 2px solid #00723A;
-    padding: 10px;
-    border-radius: 10px;
-    opacity: 0.7;
-    .link-e-sic {
-      color: transparent;
-      background: url(~@/assets/img/logo_sic.png);
-      height: 120px;
-      display: block;
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: center;
-      &:hover {
-        color: transparent;
-      }
-    }
-    &:hover {
-      opacity: 1;
-    }
-  }
 }
 
 .container-resposta {
