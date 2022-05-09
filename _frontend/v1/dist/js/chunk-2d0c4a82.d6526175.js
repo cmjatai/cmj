@@ -1,0 +1,1 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([["chunk-2d0c4a82"],{"3c84":function(e,s,a){"use strict";a.r(s);var n={name:"sessaoplenaria-module"},t=a("2877"),l=Object(t.a)(n,(function(){var e=this.$createElement,s=this._self._c||e;return s("div",{staticClass:"sessaoplenaria-module"},[s("router-view")],1)}),[],!1,null,null,null);s.default=l.exports}}]);
