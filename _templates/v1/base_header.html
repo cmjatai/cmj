@@ -1,0 +1,147 @@
+{% load i18n staticfiles menus common_cmj_tags cropping %}
+{% load webpack_static from webpack_loader %}
+
+<nav class="navbar navbar-topo navbar-expand-lg navbar-dark">
+    <div class="d-flex container{{fluid}} justify-content-between container-notificacoes">
+
+      {% notificacoes_unread %}
+
+      <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+
+      <div id="rowlogo">
+        <div id="portallogo">
+          <div>
+            <a class="navbar-brand" href="{{site_url}}/">
+              <img src="{% webpack_static 'brasao/brasao_256.png' %}">
+              <div class="brand-name">
+                <span>
+                  Câmara Municipal de
+                </span>
+                <span class="brand-cidade">
+                  Jataí
+                </span>
+                <span class="brand-estado">
+                  Poder Legislativo
+                </span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {% block button_toogle %}
+        <button type="button" class="navbar-toggler toggle-access" data-toggle="collapse" data-target="#navbar-access" aria-controls="navbar-access" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+      {% endblock %}
+
+      <div class="navbar-collapse collapse" id="navbar-access">
+
+        <div class="d-flex flex-column">
+          <div class="row-1 d-flex justify-content-end">
+            {% block social_links %}
+              <div class="navbar-social-links justify-content-center">
+                <a href="/online/" class="icon-sessoes-online" title="Sessão Plenária Online - Atualização em tempo real"><span>Sessões Online</span></a>
+                <a href="/estatisticas"title="Estatisticas de Dados do Portal"><i class="far fa-chart-bar"></i></a>
+    
+                <a href="https://soundcloud.com/camara-de-jatai"><i class="fab fa-soundcloud" aria-hidden="true"></i><span>SoundCloud</span></i></a>
+                <a class="facebook" href="https://www.facebook.com/cmjatai"><i class="fab fa-facebook-f" aria-hidden="true"><span>Facebook</span></i></a>
+                <a class="youtube" href="https://www.youtube.com/C%C3%A2maraMunicipalJata%C3%AD?sub_confirmation=1"><i class="fab fa-youtube" aria-hidden="true"><span>YouTube</span></i></a>
+                <a class="twitter" href="https://twitter.com/cmjatai"><i class="fab fa-twitter" aria-hidden="true"><span>Twitter</span></i></a>
+              </div>
+            {% endblock %}
+    
+            <ul class="navbar-nav d-none">
+              {% if user and not user.is_anonymous %}
+                <li class="dropdown nav-user">
+    
+                  <a href="#">
+                    {% avatar_user user%}
+                  </a>
+    
+                  {% notificacoes_unread %}
+    
+                  <ul class="dropdown-menu">
+                    <li class=" text-right"><a href="{% url 'cmj.core:logout' %}">{% trans "Sair" %}</a></li>
+                    <li  class="divider"></li>
+                    <li class=" text-right"><a href="{% url 'cmj.core:cmj_user_change' %}">{{ user.get_full_name|default:user.email }} <i class="fa fa-hand-o-left" aria-hidden="true"></i> {% trans "Meu Perfil" %}</a></li>
+                    <li  class="divider"></li>
+                    {% if perms.ouvidoria and not user.is_superuser %}
+                      <li class=" text-right"><a href="{% url 'cmj.ouvidoria:solicitacao_manage_list' %}">{{user.areatrabalho_set.all.first.nome}} <i class="fa fa-hand-o-left" aria-hidden="true"></i> {% trans "Ouvidoria" %}</a></li>
+                    {% endif %}
+    
+                    {% if not user.is_superuser %}
+                      <li class=" text-right"><a href="{% url 'cmj.ouvidoria:solicitacao_list' %}">{% trans "Minhas Solicitações" %}</a></li>
+                      <li class="divider"></li>
+                    {% endif %}
+    
+                      <li class=" text-right">
+                        <a href="#linkMenu">{% trans "Intranet" %}<span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                          <li><a href="http://mail.jatai.go.leg.br">{% trans "Webmail" %}</a></li>
+                          <li><a href="http://gestaopublica.camara.jatai.bsit-br.com.br">{% trans "Gestão Pública" %}</a></li>
+                        </ul>
+                      </li>
+                  </ul>
+                </li>
+              {% else %}
+                <li>
+                  <a href="#linkMenu" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Acessar" %}<span class="caret"></span></a>
+                  <ul class="dropdown-menu">
+    
+                    <li><a href="{% url 'cmj.core:login' %}">{% trans "Portal" %}</a></li>
+    
+                    <li class=" text-right">
+                      <a href="#linkMenu"  role="button" aria-haspopup="true" aria-expanded="false">{% trans "Intranet" %}<span class="caret"></span></a>
+                      <ul class="dropdown-menu">
+                        <li class="text-right"><a href="http://mail.jatai.go.leg.br">{% trans "Webmail" %}</a></li>
+                        <li class="text-right"><a href="http://gestaopublica.camara.jatai.bsit-br.com.br">{% trans "Gestão Pública" %}</a></li>
+                      </ul>
+                    </li>
+    
+                  </ul>
+                </li>
+              {% endif %}
+            </ul>
+          </div>
+          <div class="row-2 d-flex">
+            <form class="form-search" method="get" action="{% url 'cmj.core:haystack_search'%}">
+              <div class="inner">
+                <div class="item-form">
+                  <input type="search" name="q" placeholder="Busca Textual" class="textinput textInput form-control" id="id_q"  autocomplete="off" />
+                </div>
+                <div class="item-form">
+                  <button class="button" type="submit"value="">
+                    <i class="fas fa-search"></i>
+                  </button>
+                </div>
+              </div>
+            </form>
+
+            <div class="container-sic">
+              <a class="link-e-sic" href="/fale-conosco">Acesso à<br>Informação</a>
+              <div class="popup-sic">
+                <div class="inner">
+                  <div class="row">
+                    <div class="col-4">{% lorem 2 b random %}</div>
+                    <div class="col-4">{% lorem 2 b random %}</div>
+                    <div class="col-4">{% lorem 2 b random %}</div>
+                  </div>
+                  
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+</nav>

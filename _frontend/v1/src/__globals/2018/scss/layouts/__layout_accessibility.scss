@@ -1,5 +1,5 @@
 .header-accessibility {
-  background: darken($color_primary,5) $url_bg_png;
+  background: darken($color_primary,15) $url_bg_png;
   position: relative;
   .links-to-content {
     position: relative;
@@ -30,7 +30,7 @@
       align-items: center;
       .btn {
         text-decoration: none;
-        margin: 0.3rem 0;
+        margin: 0.2rem 0;
         padding: 0rem 0.2rem;
         background-color: #fff3;
       }
