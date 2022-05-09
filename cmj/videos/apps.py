@@ -17,7 +17,7 @@ class AppConfig(apps.AppConfig):
         from . import tasks
         from cmj.celery import app as celery_app
 
-        if settings.DEBUG or settings.FRONTEND_VERSION != 'v1':
+        if settings.DEBUG or settings.FRONTEND_VERSION != 'v1' or 'www2' in __file__:
             return
 
         i = celery_app.control.inspect()
