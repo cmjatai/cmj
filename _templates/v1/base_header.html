@@ -127,7 +127,7 @@
           {% if user.is_anonymous %}
             <ul class="navbar-nav nav-login-mogile justify-content-end">
               <li>
-                <a href="#linkMenu" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Acessar" %}<span class="caret"></span></a>
+                <a  class="menu-intranet"  href="#linkMenu" role="button" aria-haspopup="true" aria-expanded="false" title="{% trans 'Acessar' %}"><i class="fas fa-sign-in-alt"></i></a>
                 <ul class="dropdown-menu">
 
                   <li><a href="{% url 'cmj.core:login' %}">{% trans "Portal" %}</a></li>
