@@ -51,6 +51,10 @@ class ClasseForm(ModelForm):
         widget=forms.HiddenInput(),
         required=False)
 
+    url_redirect = forms.CharField(
+        label=Classe._meta.get_field('url_redirect').verbose_name,
+        required=False)
+
     class Meta:
         model = Classe
         fields = [
@@ -64,7 +68,12 @@ class ClasseForm(ModelForm):
             'tipo_doc_padrao',
             'template_doc_padrao',
             'template_classe',
-            'parlamentar'
+            'parlamentar',
+            'list_in_mapa',
+            'list_in_inf',
+            'list_in_menu',
+            'url_redirect'
+
         ]
 
     def __init__(self, *args, **kwargs):
@@ -83,14 +92,20 @@ class ClasseForm(ModelForm):
             ('tipo_doc_padrao', 4),
             ('template_doc_padrao', 3),
         ])
-        row3 = to_row([
+        row4 = to_row([
             ('descricao', 12),
+        ])
+        row3 = to_row([
+            ('list_in_mapa', 3),
+            ('list_in_inf', 3),
+            ('list_in_menu', 3),
+            ('url_redirect', 3),
         ])
 
         self.helper = FormHelper()
         self.helper.layout = SaplFormLayout(
             Fieldset(_('Identificação Básica'),
-                     row1, row2, row3))
+                     row1, row2, row3, row4))
 
         super(ClasseForm, self).__init__(*args, **kwargs)
 

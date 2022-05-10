@@ -26,10 +26,10 @@ from django.utils.functional import cached_property
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields.json import JSONField as django_extensions_JSONField
+import qrcode
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.pdfgen import canvas
 from reportlab.platypus.doctemplate import SimpleDocTemplate
-import qrcode
 
 from cmj import globalrules
 from cmj.core.models import AuditLog
@@ -39,6 +39,7 @@ from cmj.utils import get_settings_auth_user_model, YES_NO_CHOICES, \
     media_protected_storage
 from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
+
 
 CLASSE_ESTRUTURAL = 0
 CLASSE_DOCUMENTAL = 1
@@ -729,6 +730,26 @@ class Classe(ShortUrl, CMSMixin):
         verbose_name=_('Capa da Classe'),
         related_name='capa',
         on_delete=PROTECT)
+
+    list_in_mapa = models.BooleanField(
+        _('Listar no mapa do site'),
+        choices=YES_NO_CHOICES,
+        default=False)
+
+    list_in_inf = models.BooleanField(
+        _('Listar no Acesso à Informação'),
+        choices=YES_NO_CHOICES,
+        default=False)
+
+    list_in_menu = models.BooleanField(
+        _('Listar no Menu Geral'),
+        choices=YES_NO_CHOICES,
+        default=False)
+
+    url_redirect = models.CharField(
+        _('URL de redirecionamento'),
+        max_length=1024,
+        default='')
 
     class Meta:
         ordering = ('codigo', '-public_date',)
