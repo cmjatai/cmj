@@ -1195,6 +1195,10 @@ class SessaoCrud(Crud):
                     del params['password']
                     del params['debug']
                     del params['comando']
+
+                    if 'selos' not in m.metadata:
+                        m.metadata['selos'] = {}
+
                     m.metadata['selos'][f'deliberacao_plenario_{count}'] = params
                     m.save()
 
