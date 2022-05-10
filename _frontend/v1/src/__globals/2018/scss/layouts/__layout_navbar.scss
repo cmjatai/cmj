@@ -356,8 +356,9 @@
     margin-top: 7px;
     padding: 12px 10px 10px 10px;
     right: 15px;
+    left: 15px;
     display: none;
-    z-index: 99999;
+    //z-index: 99999;
     
     &::before {
       content:"";
@@ -378,6 +379,18 @@
       border-radius: 20px;
       z-index: 9000;
     }
+  }
+  .titulo {
+    font-weight: bold;
+    padding-bottom: 7px;
+    display: inline-block;
+    font-variant: small-caps;
+  }
+  ul {
+    padding-inline-start: 30px;
+  }
+  li {
+    line-height: 1.5rem;
   }
   &:hover {
     .popup-sic {

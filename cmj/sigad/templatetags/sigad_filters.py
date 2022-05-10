@@ -131,3 +131,38 @@ def video_duration(jdata):
     d = j['contentDetails']['duration']
 
     return time_of_period(d)
+
+
+@register.filter
+def list_in_informacao(node):
+    classes = Classe.objects.filter(list_in_inf=True)
+
+    if node:
+        classes = classes.filter(
+            parent=node
+        )
+        # classes.update(visibilidade=1)
+    else:
+        classes = classes.filter(parent__isnull=True)
+
+        classes = Classe.objects.filter(
+            list_in_inf=True,
+            parent=classes.first()
+        )
+
+        items = [[], [], []]
+
+        items[0].append(classes[0])
+        items[0].append(classes[1])
+
+        items[1].append(classes[2])
+        items[1].append(classes[3])
+        items[1].append(classes[4])
+
+        items[2].append(classes[5])
+        items[2].append(classes[6])
+        items[2].append(classes[7])
+        items[2].append(classes[8])
+        classes = items
+
+    return classes

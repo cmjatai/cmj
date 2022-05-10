@@ -1,0 +1,37 @@
+{% load i18n sigad_filters%}
+
+
+<div class="container-sic">
+  <a class="link-e-sic">Acesso à<br>Informação</a>
+  <div class="popup-sic">
+    <div class="inner">
+      <div class="row">
+        {% for col in None|list_in_informacao %}
+          <div class="col-md-4">
+            {% for classe in col %}
+              <div class="subclasse-sic">
+                <span class="titulo">{{classe.apelido|default:classe.titulo}}</span>
+                <ul>
+                {% for item in classe|list_in_informacao %}
+                  {% if item.visibilidade == 0 %}
+                    <li>
+                      <a {% if item.url_redirect %}href="{{item.url_redirect}}"{% else %}href="/{{item.absolute_slug}}"{% endif %}>{{item.apelido|default:item.titulo}}</a>
+                    </li>
+                  {% else%}
+                    {% if perms.sigad %}
+                      <li>
+                        <a class="text-red" {% if item.url_redirect %}href="{{item.url_redirect}}"{% else %}href="/{{item.absolute_slug}}}}"{% endif %}>{{item.apelido|default:item.titulo}}</a>
+                      </li>
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+                </ul>
+              </div>
+            {% endfor %}
+          </div>
+        {% endfor %}
+      </div>
+     
+    </div>
+  </div>
+</div>
