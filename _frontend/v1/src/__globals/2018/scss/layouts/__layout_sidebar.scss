@@ -48,7 +48,7 @@ $fator-xl: 1.06;
     left: 0;
     bottom: 0;
     background: #212a2d $url_bg_png;
-    z-index: 2500;
+    z-index: $zindex-sidebar;
 
     font-size: 1rem;
 
@@ -416,6 +416,7 @@ $fator-xl: 1.06;
 @media screen and (min-width: 992px) {
   #wrapper {
     aside {
+      z-index: $zindex-sidebar-desktop;
       &:hover {
         width: $width-wrapper-lg;
         animation-delay: 0s;
