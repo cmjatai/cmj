@@ -20,7 +20,7 @@
                   {% else%}
                     {% if perms.sigad %}
                       <li>
-                        <a class="text-red" {% if item.url_redirect %}href="{{item.url_redirect}}"{% else %}href="/{{item.absolute_slug}}}}"{% endif %}>{{item.apelido|default:item.titulo}}</a>
+                        <a class="text-red" {% if item.url_redirect %}href="{{item.url_redirect}}"{% else %}href="/{{item.absolute_slug}}"{% endif %}>{{item.apelido|default:item.titulo}}</a>
                       </li>
                     {% endif %}
                   {% endif %}
