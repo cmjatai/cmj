@@ -15,12 +15,12 @@
                 {% for item in classe|list_in_informacao %}
                   {% if item.visibilidade == 0 %}
                     <li>
-                      <a {% if item.url_redirect %}href="{{item.url_redirect}}"{% else %}href="/{{item.absolute_slug}}"{% endif %}>{{item.apelido|default:item.titulo}}</a>
+                      <a href="/{{item.absolute_slug}}">{{item.apelido|default:item.titulo}}</a>
                     </li>
                   {% else%}
                     {% if perms.sigad %}
                       <li>
-                        <a class="text-red" {% if item.url_redirect %}href="{{item.url_redirect}}"{% else %}href="/{{item.absolute_slug}}"{% endif %}>{{item.apelido|default:item.titulo}}</a>
+                        <a class="text-red" href="/{{item.absolute_slug}}">{{item.apelido|default:item.titulo}}</a>
                       </li>
                     {% endif %}
                   {% endif %}

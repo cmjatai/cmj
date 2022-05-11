@@ -265,6 +265,8 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
             elif self.documento.tipo == Documento.TPD_GALLERY and \
                     request.META['REQUEST_METHOD'] == 'GET':
                 return HttpResponseForbidden()
+        elif self.classe and self.classe.url_redirect:
+            return redirect(self.classe.url_redirect)
 
         return TemplateView.get(self, request, *args, **kwargs)
 

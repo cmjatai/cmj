@@ -172,10 +172,12 @@
         <div class="container container-simples">
           {{object.texto|default:''|safe|urlize}}
         </div>
-        <div class="clearfix"></div>
       </div>
     {% endwith %}
 
+             
+
+    
     {% for container in object.childs.view_childs %}
       {% if container.tipo == container.TPD_CONTAINER_FILE and container.childs.exists %}
         <div class="container container-file">
@@ -241,7 +243,6 @@
 
         </div>
       {% else %}
-
 
         <div class="container{% if container.tipo == container.TPD_CONTAINER_EXTENDIDO%}-fluid{% else %} container-simples{% endif %} {% if forloop.first%}container-first{% endif %}">
 

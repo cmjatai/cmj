@@ -30,7 +30,7 @@
               {% for ch in object.childs.all %}
                 <li>
                   <a href="/{{ch.absolute_slug}}">{{ch.apelido|default:ch.titulo}}</a>
-                </li>
+                </li> 
               {% endfor %}
 
             </ul>
