@@ -13,6 +13,7 @@
         <li class="breadcrumb-item"><a href="/">Página Inicial</a></li>
         {% endif %}
         <li class="breadcrumb-item {% if p == object %}active{% endif %}">
+          
           <a href="/{{p.absolute_slug}}" {% if p == object %}aria-current="page"{% endif %}>
             {% if p == object %}Esta Página{% else %}{{p.apelido|default:p.titulo}}{% endif %}
           </a>
@@ -20,6 +21,8 @@
       {% endfor %}
     </ol>
   </nav>
+
+
 {% endblock second_header %}
 
 {% block base_functions %}
@@ -33,6 +36,22 @@
 {% endblock %}
 
 {% block base_header %}
+
+{% comment %}
+  <div class=" float-right col-5 {% if not object.classe.childs.exists %}d-none{% endif %}">
+    {% if object.classe.childs.exists %}
+    <ul class="nav">
+      {% for ch in object.classe.childs.all %}
+      <li>
+        <a href="/{{ch.absolute_slug}}">{{ch.apelido|default:ch.titulo}}</a>
+      </li> 
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </div>
+{% endcomment %}
+
+
     <div style="position:relative;">
       <h1 class="path-title-classe {% if object.classe %}display-doc{% endif %}">
         {% if object.classe %}
@@ -68,26 +87,27 @@
           </div>
         {% endblock %}
       </div>
-
     </div>
-  {% block title %}
-    <h1  id="main_content" class="path-title" tabindex="{{view.tabindex}}">
+
+    {% block title %}
+      <h1  id="main_content" class="path-title" tabindex="{{view.tabindex}}">
         {% if object.titulo %}
           {{ object.titulo|safe|linebreaksbr }}
-        {% else %}
+          {% else %}
           {{ object.parents.0.titulo|safe|linebreaksbr }}
-        {% endif %}
-    </h1>
-  {% endblock %}
-
-  <div class="path-description">
-    {% block descricao %}
+          {% endif %}
+      </h1>
+    {% endblock %}
+          
+    <div class="path-description">
+      {% block descricao %}
       {% if object.descricao %}
         {{object.descricao|striptags|safe|linebreaksbr }}
       {% else %}
         {{ object.parents.0.descricao|striptags|safe|linebreaksbr  }}
       {% endif %}
-    {% endblock %}
-    {% social_link_share object 'top-right block'%}
-  </div>
+        {% endblock %}
+        {% social_link_share object 'top-right block'%}
+    </div>
+
 {% endblock %}

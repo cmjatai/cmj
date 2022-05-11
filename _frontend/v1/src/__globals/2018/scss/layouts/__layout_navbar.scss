@@ -322,14 +322,14 @@
   padding: 7px 15px;
   border-radius: 10px;
   margin-left: 10px;
-  line-height: 1;
+  line-height: 1em;
   .link-e-sic {
     color: #00723A;
     display: inline-block;
     position: relative;
     height: 100%;
     padding-left: 40px;
-    line-height: 1;
+    line-height: 1em;
     font-weight: bold;
     
     &::after {
@@ -386,7 +386,7 @@
     padding-inline-start: 30px;
   }
   li {
-    line-height: 1.5rem;
+    line-height: 1.5em;
   }
   &:hover {
     .popup-sic {
