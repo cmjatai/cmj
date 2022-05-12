@@ -9,7 +9,7 @@
         {% for col in None|list_in_informacao %}
           <div class="col-md-4">
             {% for classe in col %}
-              <div class="subclasse-sic">
+              <div class="subclasse-sic {% if classe.visibilidade and perms.sigad %}text-red{% endif %}">
                 <span class="titulo">{{classe.apelido|default:classe.titulo}}</span>
                 <ul>
                 {% for item in classe|list_in_informacao %}
