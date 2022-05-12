@@ -24,6 +24,8 @@ from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 import django_filters
+from django_filters.filters import ModelMultipleChoiceFilter
+from django_filters.widgets import CSVWidget
 
 from cmj.mixins import GoogleRecapthaMixin
 from cmj.utils import CHOICE_SIGNEDS
@@ -1201,6 +1203,11 @@ class MateriaLegislativaFilterSet(django_filters.FilterSet):
         choices=CHOICE_TIPO_LISTAGEM,
         label=_('Tipo da Pesquisa'))
 
+    tml = ModelMultipleChoiceFilter(
+        required=False,
+        queryset=TipoMateriaLegislativa.objects.all(),
+        method='filter_tml')
+
     class Meta(FilterOverridesMetaMixin):
         model = MateriaLegislativa
         fields = ['numero',
@@ -1223,7 +1230,17 @@ class MateriaLegislativaFilterSet(django_filters.FilterSet):
                   'ano_origem_externa',
                   'data_origem_externa',
                   'local_origem_externa',
+                  'tml'
                   ]
+
+    def filter_tml(self, queryset, field_name,  value):
+        if not value:
+            return queryset
+
+        q = None
+        for tipo in value:
+            q = q | Q(tipo=tipo) if q else Q(tipo=tipo)
+        return queryset.filter(q)
 
     def filter_signeds(self, queryset, name, value):
         q = Q()
