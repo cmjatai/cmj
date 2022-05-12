@@ -195,6 +195,9 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
         empty_label='Todos documentos publicados'
     )
 
+    dv = django_filters.CharFilter(
+        method='filter_dv')
+
     class Meta(FilterOverridesMetaMixin):
         model = DocumentoAdministrativo
         fields = ['tipo',
@@ -204,7 +207,8 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
                   'data',
                   'data_vencimento',
                   'tramitacaoadministrativo__unidade_tramitacao_destino',
-                  'tas']
+                  'tas',
+                  'dv']
 
     def __init__(self, *args, **kwargs):
         workspace = kwargs.pop('workspace')
@@ -293,6 +297,25 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
         )
 
         self.form.fields['mostrar_anexos'] = self.mostrar_anexos
+
+    def filter_dv(self, qs, name, v):
+
+        if not v:
+            return qs
+
+        str_sql = str(qs.query).lower().split('from')[1]
+
+        if 'data_vencimento' in str_sql:
+            return qs
+
+        if v == '1':  # documento a vencer
+            qs = qs.filter(data_vencimento__gte=timezone.now()).order_by('data_vencimento',
+                                                                         '-data_ultima_atualizacao')
+        elif v == '-1':  # documento vencido
+            qs = qs.filter(data_vencimento__lte=timezone.now()).order_by('-data_vencimento',
+                                                                         '-data_ultima_atualizacao')
+
+        return qs
 
     def filter_signeds(self, queryset, name, value):
         q = Q()

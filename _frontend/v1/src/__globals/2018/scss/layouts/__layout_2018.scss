@@ -108,12 +108,12 @@
 
   .item-node {
     position: relative;
-    border:1px solid #fffa;
-    border-right-width: 0;
-    border-bottom-width: 0;
+    //border:1px solid #fffa;
+    //border-right-width: 0;
+    //border-bottom-width: 0;
 
     &:hover {
-      background-color: rgba(#fff, 0.5);
+      //background-color: rgba(#fff, 0.5);
     }
     .item-node {
       &:hover {
@@ -161,8 +161,8 @@
     margin-bottom: 10px;
   }
   .item-node {
-    padding: 15px 0px 11px 15px;
-    margin: 11px 0 11px 18px;
+    padding: 15px;// 0px 11px 15px;
+    margin: 11px;//0 11px 18px;
   }
 
   .link-texto {
