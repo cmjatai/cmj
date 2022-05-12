@@ -25,6 +25,9 @@ urlpatterns_sigad = [
     url(r'^classe/(?P<pk>[0-9]+)/edit$',
         views.ClasseUpdateView.as_view(), name='classe_edit'),
 
+    url(r'^classe/(?P<pk>[0-9]+)/delete',
+        views.ClasseDeleteView.as_view(), name='classe_delete'),
+
     url(r'^classe$',
         views.ClasseListView.as_view(), name='classe_list'),
 
