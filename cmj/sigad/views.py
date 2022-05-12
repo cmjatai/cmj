@@ -1011,6 +1011,23 @@ class ClasseUpdateView(ClasseParentMixin,
         return super(ClasseUpdateView, self).form_valid(form)
 
 
+class ClasseDeleteView(PermissionRequiredMixin, DeleteView):
+    permission_required = 'sigad.delete_classe'
+    template_name = 'crud/confirm_delete.html'
+    model = Classe
+
+    def post(self, request, *args, **kwargs):
+        obj = self.get_object()
+        self.parent = obj.parent
+
+        return DeleteView.post(self, request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse_lazy(
+            'cmj.sigad:subclasse_list',
+            kwargs={'pk': self.parent.id})
+
+
 class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
     permission_required = 'sigad.view_subclasse'
 
@@ -1035,6 +1052,15 @@ class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
         return reverse_lazy(
             'cmj.sigad:classe_edit',
             kwargs={'pk': self.kwargs['pk']})
+
+    @property
+    def delete_url(self):
+        if not self.object.parent and not self.request.user.is_superuser:
+            return ''
+        else:
+            return reverse_lazy(
+                'cmj.sigad:classe_delete',
+                kwargs={'pk': self.kwargs['pk']})
 
     def get_context_data(self, **kwargs):
         context = {}
