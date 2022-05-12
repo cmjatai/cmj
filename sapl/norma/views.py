@@ -37,6 +37,7 @@ from .models import (AnexoNormaJuridica, AssuntoNorma, NormaJuridica, NormaRelac
 AssuntoNormaCrud = CrudAux.build(AssuntoNorma, 'assunto_norma_juridica',
                                  list_field_names=['assunto', 'descricao'])
 
+AssuntoNormaCrud.ListView.paginate_by = None
 
 TipoNormaCrud = CrudAux.build(
     TipoNormaJuridica, 'tipo_norma_juridica',
