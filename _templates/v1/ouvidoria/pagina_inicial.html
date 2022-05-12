@@ -11,15 +11,28 @@
 
 {% block base_content %}
 <div class="inner-ouvidoria">
-
-  <h3 class="text-center">Neste espaço a Câmara Municipal de Jataí disponibiliza a você um ambiente de comunicação<br>
-    com a Ouvidoria Parlamentar.</h3>
+  
+  {% include "ouvidoria/actions_nova_solicitacao.html" %}
+  <h3 class="text-center">Neste espaço a Câmara Municipal de Jataí disponibiliza a você<br>
+    um ambiente de comunicação com a Ouvidoria Parlamentar.<br>
+    <small class="text-blue">
+      <i>
+        Para utilizar as opções acima, você precisa estar autenticado no PortalCMJ.
+        <br>Por questões tecnológicas, atualmente seu login só é possível através de uma autenticação pelo Google.
+        <br>
+      </i>
+    </small>
+    <small>
+      <i>
+        Para enviar uma denúncia sem se identificar,
+        <a href="/fale-conosco/ouvidoria/denuncia-anonima">clique aqui.</a>
+        Neste caso, você receberá um link anônimo para acompanhar o andamento.
+      </i>
+    </small>
+  </h3>
 
   {% if user.is_anonymous %}
       {% include "core/user/login_portlet.html" %}
-  {% else %}
-      {% include "ouvidoria/actions_nova_solicitacao.html" %}
   {% endif %}
-Para enviar uma denúncia sem se identificar, <a href="/fale-conosco/ouvidoria/denuncia-anonima">clique aqui.</a>
 </div>
 {% endblock %}

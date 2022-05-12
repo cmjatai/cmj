@@ -175,9 +175,6 @@
       </div>
     {% endwith %}
 
-             
-
-    
     {% for container in object.childs.view_childs %}
       {% if container.tipo == container.TPD_CONTAINER_FILE and container.childs.exists %}
         <div class="container container-file">

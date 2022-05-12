@@ -1,6 +1,6 @@
 .navbar {
   background: darken($color_primary, 7%) $url_bg_png;
-  
+
   padding: 0px;
   .navbar-nav {
     flex-basis: 100%;
@@ -32,7 +32,7 @@
       text-decoration: none;
       display: flex;
       align-items: center;
-      color: lighten($color_text_menu,15);
+      color: lighten($color_text_menu, 15);
       font-family: Lato, Helvetica, sans-serif;
       font-weight: 400;
       padding: 0 6px;
@@ -158,15 +158,16 @@
     height: 100%;
     opacity: 0.35;
     z-index: -1;
-    background: transparent url(~@/assets/img/bg_cmj_topo_menu_box_left.png) no-repeat scroll left top;
+    background: transparent url(~@/assets/img/bg_cmj_topo_menu_box_left.png)
+      no-repeat scroll left top;
     background-size: auto $navbar-brand-height * 4;
   }
   & > .container {
     background: radial-gradient(transparent, $color_primary);
     &::after {
       content: "";
-      position: absolute; 
-      z-index: -1;      
+      position: absolute;
+      z-index: -1;
       background-image: url(~@/assets/img/fundo_topo_compressed.jpg);
       background-position: center 40%;
       background-size: cover;
@@ -192,8 +193,8 @@
 
   .navbar-nav {
     flex-basis: 0%;
-    
-    &.nav-login-mobile  {
+
+    &.nav-login-mobile {
       display: none;
     }
     .nav-user {
@@ -224,7 +225,7 @@
     a {
       font-size: 1.3em;
       i {
-        color: rgba(255,255,255,0.6);
+        color: rgba(255, 255, 255, 0.6);
         &:hover {
           color: white;
         }
@@ -233,7 +234,7 @@
   }
   .navbar-collapse.show {
     .navbar-social-links {
-      justify-content: center
+      justify-content: center;
     }
   }
 
@@ -255,14 +256,15 @@
       .item-form {
         height: 100%;
       }
-      
-      .button, input {
+
+      .button,
+      input {
         padding: 0 10px;
         border: 0;
-        background-color: transparent;    
-        height: 100%;    
+        background-color: transparent;
+        height: 100%;
         //border-radius: 0;
-        font-size: 1rem;
+        font-size: 1em;
       }
       .button {
         position: absolute;
@@ -312,7 +314,7 @@
     .brand-estado {
       text-align: center;
       //display: none;
-      padding-top: 10px;
+      padding-top: 3px;
     }
   }
 }
@@ -321,17 +323,17 @@
   background: #ffd976;
   padding: 7px 15px;
   border-radius: 10px;
-  margin-left: 10px;
+  margin-left: 20px;
   line-height: 1em;
   .link-e-sic {
-    color: #00723A;
+    color: #00723a;
     display: inline-block;
     position: relative;
     height: 100%;
     padding-left: 40px;
     line-height: 1em;
     font-weight: bold;
-    
+
     &::after {
       content: "";
       display: block;
@@ -343,8 +345,8 @@
       background: url(~@/assets/img/logo_sic.png);
       background-size: contain;
       background-repeat: no-repeat;
-      background-position: left;      
-    }    
+      background-position: left;
+    }
   }
 
   .popup-sic {
@@ -355,9 +357,9 @@
     left: 15px;
     display: none;
     //z-index: 99999;
-    
+
     &::before {
-      content:"";
+      content: "";
       position: absolute;
       width: 0;
       height: 0;
@@ -366,7 +368,6 @@
       border-color: transparent transparent #fff;
       right: 60px;
       top: 0;
-
     }
     .inner {
       background-color: white;
@@ -401,7 +402,6 @@
     height: 1px;
   }
 }
-
 
 .navbar {
   .container-notificacoes {
@@ -495,7 +495,7 @@
         }
       }
       .time {
-        line-height:2;
+        line-height: 2;
         font-size: 75%;
         color: #aaa;
       }
@@ -512,7 +512,6 @@
 
 @media screen and (max-width: 1199px) {
   .navbar-menu {
-
     .navbar-nav {
       & > li {
         a {
@@ -535,7 +534,7 @@
       padding: 2px 10px;
     }
     .navbar-nav {
-      &.nav-login-mobile  {
+      &.nav-login-mobile {
         display: flex;
         flex-direction: row;
       }
@@ -552,7 +551,7 @@
   }
   .navbar-menu {
     .navbar-collapse.show {
-      padding:  5px;
+      padding: 5px;
     }
     .container {
       width: 100%;
@@ -574,7 +573,8 @@
   }
 
   .navbar-topo {
-    .row-1, .row-2 {
+    .row-1,
+    .row-2 {
       padding: 0 7px;
     }
     .navbar-nav {
@@ -588,11 +588,10 @@
             width: 90%;
             overflow: hidden;
           }
-
         }
         & > a {
           line-height: 60px;
-          display: inline-block
+          display: inline-block;
         }
       }
     }
@@ -614,7 +613,6 @@
       }
     }
   }
-
 }
 
 @media screen and (max-width: 480px) {
@@ -624,9 +622,6 @@
     }
   }
 }
-
-
-
 
 @media screen and (max-width: 359px) {
   .navbar {
@@ -662,6 +657,27 @@
             top: -5px;
             //bottom: -10px;
           }
+        }
+      }
+    }
+  }
+  .navbar-topo {
+    .form-search {
+      .inner {
+        input {
+          min-width: 30vw;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 1400px) {
+  .navbar-topo {
+    .form-search {
+      .inner {
+        input {
+          min-width: 20vw;
         }
       }
     }
