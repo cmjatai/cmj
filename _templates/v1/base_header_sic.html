@@ -16,6 +16,18 @@
                   {% if item.visibilidade == 0 %}
                     <li>
                       <a href="/{{item.absolute_slug}}">{{item.apelido|default:item.titulo}}</a>
+
+                      {% for child in item|list_in_informacao %}
+                        {% if forloop.first %}
+                          <ul>
+                        {% endif %}
+                            <li>
+                              <a href="/{{child.absolute_slug}}">{{child.apelido|default:child.titulo}}</a>
+                            </li>
+                        {% if forloop.last %}
+                          </ul>
+                        {% endif %}
+                  {% endfor %}
                     </li>
                   {% else%}
                     {% if perms.sigad %}
