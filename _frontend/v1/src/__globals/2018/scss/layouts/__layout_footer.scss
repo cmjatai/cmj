@@ -41,6 +41,7 @@ footer {
     color: yellow;
   }
 
+
   & > div:nth-child(2) {
     background: $color_primary none repeat scroll 0 0;
     color: lighten($color_primary, 20%);
@@ -61,6 +62,12 @@ footer {
       }
     }
   }
+
+  div[vw].enabled {
+    top: auto;
+    bottom: 20%;
+  }
+
 }
 
 .container-footer {

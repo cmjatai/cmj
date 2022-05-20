@@ -264,6 +264,11 @@
       justify-content: flex-end;
       .item-form {
         height: 100%;
+        transition: all 3s ease;         
+        flex: 0 0 auto;
+        &.item-form:first-child {
+          flex: 0 1 auto;
+        }
       }
       
       .button,
@@ -288,7 +293,8 @@
     &:hover {
       .inner {
         .item-form:first-child {
-          flex: 0 0 100%;
+          flex: 1 1 auto;
+          transition: all 1s ease;
         }
       }
     }
