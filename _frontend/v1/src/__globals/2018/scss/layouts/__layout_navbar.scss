@@ -252,13 +252,16 @@
     margin: 0;
     margin-left: 10px;
     width: 100%;
+    display: flex;
+    justify-content: flex-end;
     .inner {
+      width: 100%;
       height: 100%;
       display: flex;
       position: relative;
       align-items: stretch;
       align-items: center;
-      justify-content: end;
+      justify-content: flex-end;
       .item-form {
         height: 100%;
       }
@@ -551,6 +554,15 @@
       &.nav-login-mobile {
         display: flex;
         flex-direction: row;
+        .menu-intranet {
+          padding: 10px;
+          display: none;
+        }
+        &:hover {
+          .menu-intranet {
+            display: none;
+          }
+        }
       }
       li {
         border: 1px;
@@ -589,7 +601,11 @@
   .navbar-topo {
     .row-1,
     .row-2 {
-      padding: 0 7px;
+      padding: 0 15px 0 7px;
+      margin: 0 0 10px 0;
+    }
+    .row-1 {
+      flex-direction: column;
     }
     .navbar-nav {
       .nav-user {
@@ -609,8 +625,15 @@
         }
       }
     }
+    
+    .form-search {
+      .inner {
+        .item-form:first-child {
+          flex: 0 0 100%;
+        }
+      }
+    }
   }
-
   #portallogo {
     .navbar-brand {
       img {
