@@ -98,7 +98,7 @@
             <form class="form-search" method="get" action="{% url 'cmj.core:haystack_search'%}">
               <div class="inner">
                 <div class="item-form">
-                  <input type="search" name="q" placeholder="O que você procura?" class="textinput textInput form-control" id="id_q" value="{{request.GET.q|default:request.POST.q}}" autocomplete="off" />
+                  <input type="search" name="q" placeholder="O que você procura?" class="textinput textInput form-control" id="id_q" value="{{request.POST|lookup:'q'|default:request.GET|lookup:'q'|default:''}}" autocomplete="off" />
                 </div>
                 <div class="item-form">
                   <button class="button" type="submit"value="">
