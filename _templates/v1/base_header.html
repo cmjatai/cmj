@@ -43,7 +43,7 @@
 
       <div class="navbar-collapse collapse" id="navbar-access">
 
-        <div class="d-flex flex-column  justify-content-end">
+        <div class="d-flex w-100 flex-column  justify-content-end">
 
           <div class="row-1 d-flex justify-content-end align-items-center">
             {% block social_links %}
@@ -98,7 +98,7 @@
             <form class="form-search" method="get" action="{% url 'cmj.core:haystack_search'%}">
               <div class="inner">
                 <div class="item-form">
-                  <input type="search" name="q" placeholder="Busca Textual" class="textinput textInput form-control" id="id_q"  autocomplete="off" />
+                  <input type="search" name="q" placeholder="O que você procura?" class="textinput textInput form-control" id="id_q" value="{{request.GET.q|default:request.POST.q}}" autocomplete="off" />
                 </div>
                 <div class="item-form">
                   <button class="button" type="submit"value="">

@@ -243,25 +243,32 @@
     align-items: stretch;
   }
 
+  .navbar-collapse {
+    justify-content: end;
+    flex-grow: 1;
+  }
+
   .form-search {
     margin: 0;
+    margin-left: 10px;
+    width: 100%;
     .inner {
       height: 100%;
       display: flex;
       position: relative;
       align-items: stretch;
-      background-color: white;
       align-items: center;
-      border-radius: 10px;
+      justify-content: end;
       .item-form {
         height: 100%;
       }
-
+      
       .button,
       input {
         padding: 0 10px;
+        border-radius: 10px;
         border: 0;
-        background-color: transparent;
+        background-color: white;
         height: 100%;
         //border-radius: 0;
         font-size: 1em;
@@ -272,7 +279,14 @@
         right: 5px;
       }
       input {
-        padding-right: 35px;
+        padding-right: 40px;
+      }
+    }
+    &:hover {
+      .inner {
+        .item-form:first-child {
+          flex: 0 0 100%;
+        }
       }
     }
   }
@@ -665,7 +679,7 @@
     .form-search {
       .inner {
         input {
-          min-width: 30vw;
+          //min-width: 30vw;
         }
       }
     }

@@ -34,7 +34,7 @@ class CmjSearchForm(ModelSearchForm):
             'fix_model',
             FieldWithButtons(
                 Field('q',
-                      placeholder=_('Busca Textual'),
+                      placeholder=_('O que você procura?'),
                       type='search',),
                 StrictButton(
                     '<i class="fas fa-2x fa-search"></i>',
