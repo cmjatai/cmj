@@ -36,7 +36,8 @@
       </div>
 
       <div class="col-lg-6">
-        {% include "path/pagina_inicial_links.html" %}
+        
+        {% comment %}{% include "path/pagina_inicial_links.html" %}{% endcomment %}
 
         {% with noticias_dos_parlamentares as object_list %}
           {% include "path/pagina_inicial_noticia_parlamentares.html" %}
