@@ -50,24 +50,25 @@
               <div class="navbar-social-links justify-content-end">
                 <a href="/online/" class="icon-sessoes-online" title="Sessão Plenária Online - Atualização em tempo real"><span>Sessões Online</span></a>
                 <a href="/estatisticas"title="Estatisticas de Dados do Portal"><i class="far fa-chart-bar"></i></a>
-    
+
                 <a href="https://soundcloud.com/camara-de-jatai"><i class="fab fa-soundcloud" aria-hidden="true"></i><span>SoundCloud</span></i></a>
                 <a class="facebook" href="https://www.facebook.com/cmjatai"><i class="fab fa-facebook-f" aria-hidden="true"><span>Facebook</span></i></a>
-                <a class="youtube" href="https://www.youtube.com/C%C3%A2maraMunicipalJata%C3%AD?sub_confirmation=1"><i class="fab fa-youtube" aria-hidden="true"><span>YouTube</span></i></a>
+                <a class="instagram" href="https://www.instagram.com/cmjatai"><i class="fab fa-instagram" aria-hidden="true"><span>Instagram</span></i></a>
+                <a class="youtube" href="https://www.youtube.com/C%C3%A2maraMunicipalJata%C3%AD"><i class="fab fa-youtube" aria-hidden="true"><span>YouTube</span></i></a>
                 <a class="twitter" href="https://twitter.com/cmjatai"><i class="fab fa-twitter" aria-hidden="true"><span>Twitter</span></i></a>
               </div>
             {% endblock %}
-    
+
             {% if user and not user.is_anonymous %}
               <ul class="navbar-nav justify-content-end">
                 <li class="dropdown nav-user">
-    
+
                   <a href="#">
                     {% avatar_user user%}
                   </a>
-    
+
                   {% notificacoes_unread %}
-    
+
                   <ul class="dropdown-menu">
                     <li class=" text-right"><a href="{% url 'cmj.core:logout' %}">{% trans "Sair" %}</a></li>
                     <li  class="divider"></li>
@@ -76,12 +77,12 @@
                     {% if perms.ouvidoria and not user.is_superuser %}
                       <li class=" text-right"><a href="{% url 'cmj.ouvidoria:solicitacao_manage_list' %}">{{user.areatrabalho_set.all.first.nome}} <i class="fa fa-hand-o-left" aria-hidden="true"></i> {% trans "Ouvidoria" %}</a></li>
                     {% endif %}
-    
+
                     {% if not user.is_superuser %}
                       <li class=" text-right"><a href="{% url 'cmj.ouvidoria:solicitacao_list' %}">{% trans "Minhas Solicitações" %}</a></li>
                       <li class="divider"></li>
                     {% endif %}
-    
+
                       <li class=" text-right">
                         <a href="#linkMenu">{% trans "Intranet" %}<span class="caret"></span></a>
                         <ul class="dropdown-menu">

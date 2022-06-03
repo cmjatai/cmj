@@ -21,7 +21,6 @@ from django.views.generic.list import ListView, MultipleObjectMixin
 from haystack.forms import model_choices
 from haystack.query import SearchQuerySet
 from haystack.utils.app_loading import haystack_get_models
-from prompt_toolkit.key_binding.bindings.named_commands import self_insert
 
 from cmj import globalrules
 from cmj.core.models import AreaTrabalho, CertidaoPublicacao

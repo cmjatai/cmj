@@ -21,7 +21,7 @@
     bottom: 0;
     right: 0;
     position: absolute;
-    z-index: 0;   
+    z-index: 0;
   }
 }
 
@@ -67,10 +67,17 @@
       }
     }
 
+    &.instagram {
+      &::after {
+      background-image: url(~@/assets/img/icon_instagram64x64.png);
+      }
+    }
+
     &.facebook,
-    &.whatsapp, 
+    &.whatsapp,
     &.twitter,
-    &.youtube{
+    &.youtube,
+    &.instagram {
       position: relative;
       i {
         display: none;
@@ -84,7 +91,7 @@
         bottom: 0;
         right: 0;
         position: absolute;
-        z-index: 0;   
+        z-index: 0;
       }
     }
 

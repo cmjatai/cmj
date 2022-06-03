@@ -1,6 +1,18 @@
 .container-acesso-rapido {
   background: $color_new_primary $url_bg_png;
   padding: 15px 0;
+  min-height: 50vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  h1 {
+    color: #fff;
+    padding: 0 0 25px;
+    margin: 0;
+    font-weight: bold;
+    font-family: Graduate;
+  }
 
   .container {
     justify-content: center;
@@ -13,6 +25,7 @@
     width: 80%;
     justify-content: center;
   }
+
   .col {
     display: flex;
     gap: 0;
@@ -23,25 +36,71 @@
     margin: 0 -0.7rem;
   }
   .favo {
-    background: url(~@/assets/img/icon_favo.svg);
     position: relative;
     width: 100%;
     height: 0;
     padding-bottom: 100%;
+    background: radial-gradient(#00000015 1%, transparent 60%);
 
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    background-position: center center;
-    opacity: 0.3;
+    &::before {
+      content: "";
+      background: url(~@/assets/img/icon_favo.svg);
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      background-position: center center;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      opacity: 0.3;
+
+    }
+
+    .action-acesso-rapido {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      color: #fff;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.9;
+      .inner {
+        text-align: center;
+        line-height: 1.4rem;
+        font-size: 1.2rem;
+        font-weight: 400;
+        //font-variant-caps: all-petite-caps;
+        text-transform: uppercase;
+        //font-variant-caps: small-caps;
+        font-family: Roboto;
+
+      }
+      &:hover {
+        opacity: 1;
+        color: #fff;
+        text-decoration: none;
+      }
+
+    }
+
     &:hover {
-      opacity: 1;
+      background: radial-gradient(#0005 1%, transparent 60%);
+
+      &::before {
+        opacity: 1;
+      }
     }
   }
 }
 
 @media screen and (max-width: 767.98px) {
   .container-acesso-rapido {
-    padding: 7px 0;
+    min-height: 0vh;
+    padding: 20px 0;
+    h1 {
+      padding: 0;
+    }
     .row {
       width: 95%;
     }
