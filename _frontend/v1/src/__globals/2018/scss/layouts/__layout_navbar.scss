@@ -264,13 +264,13 @@
       justify-content: flex-end;
       .item-form {
         height: 100%;
-        transition: all 3s ease;         
+        transition: all 3s ease;
         flex: 0 0 auto;
         &.item-form:first-child {
           flex: 0 1 auto;
         }
       }
-      
+
       .button,
       input {
         padding: 0 10px;
@@ -631,7 +631,7 @@
         }
       }
     }
-    
+
     .form-search {
       .inner {
         .item-form:first-child {
