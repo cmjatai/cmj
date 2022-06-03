@@ -12,19 +12,23 @@
 {% endblock %}
 {% block base_content %}
 
-{% include "path/pagina_inicial_noticias_principais.html" %}
-{% include "base_acesso_rapido.html" %}
-{% include "path/pagina_inicial_video_aovivo.html" %}
+<div id="main_content">
+  {% include "path/pagina_inicial_noticias_principais.html" %}
+  {% include "base_acesso_rapido.html" %}
+  {% include "path/pagina_inicial_video_aovivo.html" %}
+</div>
 
-<div class="container d-none">
-  <div class="row">
-    <div class="col-lg-8 pr-lg-0 mt-lg-4 mt-3" id="main_content">
-    </div>
-    <div class="col-lg-4 d-flex flex-column mt-lg-4 pl-lg-1">
-      {% include "path/pagina_inicial_buttons.html" %}
+{% comment %}
+  <div class="container d-none">
+    <div class="row">
+      <div class="col-lg-8 pr-lg-0 mt-lg-4 mt-3" id="main_content">
+      </div>
+      <div class="col-lg-4 d-flex flex-column mt-lg-4 pl-lg-1">
+        {% include "path/pagina_inicial_buttons.html" %}
+      </div>
     </div>
   </div>
-</div>
+{% endcomment %}
 
   {% if not ""|transmissao_ao_vivo %}
     {% include "path/pagina_inicial_ultimos_videos.html" %}
