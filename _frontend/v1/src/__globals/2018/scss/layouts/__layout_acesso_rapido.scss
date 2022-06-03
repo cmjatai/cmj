@@ -1,16 +1,16 @@
 .container-acesso-rapido {
   background: $color_new_primary $url_bg_png;
-  padding: 15px 0;
-  min-height: 50vh;
+  padding: 20px 0 15px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-around;
+  min-height: 0;
 
   h1 {
     color: #fff;
-    padding: 0 0 25px;
+    padding: 0 0 5px 0;
     margin: 0;
-    font-weight: bold;
+    font-weight: 600;
     font-family: Graduate;
   }
 
@@ -69,23 +69,26 @@
         text-align: center;
         line-height: 1.4rem;
         font-size: 1.2rem;
-        font-weight: 400;
+        //font-weight: bold;
         //font-variant-caps: all-petite-caps;
         text-transform: uppercase;
         //font-variant-caps: small-caps;
-        font-family: Roboto;
+        font-family: "Fira Sans", sans-serif;
 
       }
       &:hover {
         opacity: 1;
         color: #fff;
         text-decoration: none;
+        .inner {
+          font-weight: 900;
+        }
       }
 
     }
 
     &:hover {
-      background: radial-gradient(#0005 1%, transparent 60%);
+      background: radial-gradient(#0535 1%, transparent 60%);
 
       &::before {
         opacity: 1;
@@ -112,6 +115,9 @@
       font-size: 1.7rem;
     }
     .favo {
+      &::before {
+        opacity: 0.5;
+      }
       .action-acesso-rapido {
         .inner {
           line-height: 1rem;
@@ -124,10 +130,7 @@
 
 @media screen and (max-width: 767.98px) {
   .container-acesso-rapido {
-    min-height: 0vh;
-    padding: 20px 0;
     h1 {
-      padding: 0;
       font-size: 1.3rem;
     }
     .row {
