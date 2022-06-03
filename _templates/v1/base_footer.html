@@ -1,0 +1,53 @@
+{% load i18n staticfiles menus common_cmj_tags cropping %}
+{% load webpack_static from webpack_loader %}
+
+<footer id="rodape_access">
+  <div class="container-fluid">
+    {% comment %}
+      <div class="container">
+        <ul>
+          {% menu 'yaml/menu_footer.yaml'%}
+        </ul>
+      </div>
+    {% endcomment %}
+    <div class="container">
+      <div class="row pt-4">
+
+
+        <div class="col text-white">
+          <strong>LOCALIZAÇÃO:</strong><br>
+
+          <a href="/informacao/ouvidoria/sic-fisico">
+            <i class="fa fa-map-marker"></i>
+            <strong>Câmara Municipal de Jataí</strong>
+          </a><br>
+              Praça da Bandeira, 96 - Centro - Jataí - GO<br>
+              Cep: 75800-020<br>
+              Fone: (64) 3636-0800<br>
+        </div>
+
+
+        <div class="col text-right text-white">
+          <strong>FUNCIONAMENTO:</strong><br>
+            O trabalho legislativo na Câmara Municipal de Jataí compreende os períodos
+            de 19 de janeiro a 30 de junho e de 1º de agosto a 20 de dezembro.<br>
+
+            Semanalmente de segunda a sexta-feira das 8 às 11h e das 13h às 17h.
+
+            O recesso ocorre de 1º de julho a 31 de julho e de 21 de dezembro a 18 de janeiro.
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container-fluid">
+    <div class="container">
+      <ul>
+        {% menu 'yaml/menu_footer_base.yaml'%}
+        <li>
+          Departamento de Tecnologia de Informação e Comunicação
+        </li>
+      </ul>
+    </div>
+  </div>
+</footer>

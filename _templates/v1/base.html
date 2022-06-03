@@ -157,31 +157,14 @@
   {% endblock%}
 
 
-  <footer id="rodape_access">
-    <div class="container-fluid">
-      <div class="container">
+  <div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper>
+      <div class="vw-plugin-top-wrapper"></div>
+    </div>
+  </div>
 
-        <ul>
-          {% menu 'menu_footer.yaml'%}
-        </ul>
-      </div>
-    </div>
-    <div class="container-fluid">
-      <div class="container">
-        <ul>
-          {% menu 'menu_footer_base.yaml'%}
-        </ul>
-        Departamento de Tecnologia de Informação e Comunicação
-      </div>
-    </div>
-
-    <div vw class="enabled">
-      <div vw-access-button class="active"></div>
-      <div vw-plugin-wrapper>
-        <div class="vw-plugin-top-wrapper"></div>
-      </div>
-    </div>
-  </footer>
+  {% include 'base_footer.html' %}
 
   {% endblock root_body %}
 
