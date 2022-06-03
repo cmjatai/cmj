@@ -1,0 +1,22 @@
+{% load i18n staticfiles menus common_cmj_tags cropping %}
+{% load webpack_static from webpack_loader %}
+
+<footer id="rodape_access">
+  <div class="container-fluid">
+    <div class="container">
+
+      <ul>
+        {% menu 'menu_footer.yaml'%}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    <div class="container">
+      <ul>
+        {% menu 'menu_footer_base.yaml'%}
+      </ul>
+      Departamento de Tecnologia de Informação e Comunicação
+    </div>
+  </div>
+
+</footer>
