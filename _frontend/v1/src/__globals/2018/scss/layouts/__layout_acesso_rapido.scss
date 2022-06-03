@@ -108,6 +108,9 @@
 
 @media screen and (max-width: 991.98px) {
   .container-acesso-rapido {
+    h1 {
+      font-size: 1.7rem;
+    }
     .favo {
       .action-acesso-rapido {
         .inner {
@@ -125,6 +128,7 @@
     padding: 20px 0;
     h1 {
       padding: 0;
+      font-size: 1.3rem;
     }
     .row {
       width: 95%;
@@ -161,11 +165,33 @@
     .col {
       margin: 0 -0.3rem;
     }
+    h1 {
+      font-size: 1rem;
+    }
     .favo {
       .action-acesso-rapido {
         .inner {
           line-height: 0.7rem;
           font-size: 0.55rem;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 425px) {
+  .container-acesso-rapido {
+    .col {
+      margin: 0 -0.3rem;
+    }
+    h1 {
+      font-size: 0.75rem;
+    }
+    .favo {
+      .action-acesso-rapido {
+        .inner {
+          line-height: 0.55rem;
+          font-size: 0.5rem;
         }
       }
     }
