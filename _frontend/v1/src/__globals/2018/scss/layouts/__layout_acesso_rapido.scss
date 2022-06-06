@@ -137,10 +137,10 @@
       width: 100%;
     }
     .col {
-      margin: 0 -0.75rem;
+      margin: 0 -0.7rem;
     }
     .favo {
-      margin: -0.25rem 0;
+      margin: -0.2rem 0;
       .action-acesso-rapido {
         .inner {
           line-height: 1rem;
@@ -154,9 +154,10 @@
 @media screen and (max-width: 599.98px) {
   .container-acesso-rapido {
     .col {
-      margin: 0 -0.3rem;
+      margin: 0 -0.6rem;
     }
     .favo {
+      margin: -0.2rem 0;
       .action-acesso-rapido {
         .inner {
           line-height: 0.8rem;
@@ -172,7 +173,11 @@
     h1 {
       font-size: 1rem;
     }
+    .col {
+      margin: 0 -0.5rem;
+    }
     .favo {
+      margin: -0.15rem 0;
       .action-acesso-rapido {
         .inner {
           line-height: 0.7rem;
@@ -188,7 +193,11 @@
     h1 {
       font-size: 0.75rem;
     }
+    .col {
+      margin: 0 -0.35rem;
+    }
     .favo {
+      margin: -0.1rem 0;
       .action-acesso-rapido {
         .inner {
           line-height: 0.55rem;
