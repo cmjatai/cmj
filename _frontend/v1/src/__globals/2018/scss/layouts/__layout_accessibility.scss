@@ -29,9 +29,12 @@
       gap: 0.3rem;
       align-items: center;
       .btn {
+        line-height: 1rem;
         text-decoration: none;
-        margin: 0.2rem 0;
-        padding: 0rem 0.2rem;
+        margin: 0;
+        padding: 0 0.2rem;
+        //margin: 0.2rem 0;
+        //padding: 0rem 0.2rem;
         background-color: #fff3;
       }
     }
