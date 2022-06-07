@@ -41,6 +41,7 @@ window.refreshDatePicker = function () {
     input.setAttribute('autocomplete', 'off')
   })
 }
+
 window.setCookie = function (cookieName, cookieValue, nDays) {
   let today = new Date()
   let expire = new Date()
@@ -81,108 +82,6 @@ window.refreshMask = function () {
   $('.timeinput').mask('00:00:00', { placeholder: 'hh:mm:ss' })
   $('.cronometro').mask('00:00:00', { placeholder: 'hh:mm:ss' })
   $('.datetimeinput').mask('00/00/0000 00:00:00', { placeholder: '__/__/____ hh:mm:ss' })
-}
-
-window.Accessibilidade = function () {
-  let Contrast = {
-    storage: 'contrastState',
-    cssClass: 'contrast',
-    currentState: null,
-    check: checkContrast,
-    getState: getContrastState,
-    setState: setContrastState,
-    toogle: toogleContrast,
-    updateView: updateViewContrast
-  }
-
-  window.toggleContrast = function () {
-    Contrast.toogle()
-  }
-  Contrast.check()
-
-  function checkContrast () {
-    this.updateView()
-  }
-
-  function getContrastState () {
-    return localStorage.getItem(this.storage) === 'true'
-  }
-
-  function setContrastState (state) {
-    localStorage.setItem(this.storage, '' + state)
-    this.currentState = state
-    this.updateView()
-  }
-
-  function updateViewContrast () {
-    let body = document.body
-    if (this.currentState === null) {
-      this.currentState = this.getState()
-    }
-    if (this.currentState) {
-      body.classList.add(this.cssClass)
-    } else {
-      body.classList.remove(this.cssClass)
-    }
-  }
-
-  function toogleContrast () {
-    this.setState(!this.currentState)
-  }
-
-  let FontSizeZoom = {
-    storage: 'fontSizeZoomState',
-    getState: getFontSizeZoomState,
-    setState: setFontSizeZoomState,
-    currentState: 1.0,
-    updateView: updateViewFontSizeZoom,
-    toogle: execFontSizeZoom,
-    check: checkFontSizeZoom
-  }
-
-  FontSizeZoom.check()
-
-  function checkFontSizeZoom () {
-    this.updateView()
-  }
-
-  function execFontSizeZoom (action) {
-    this.setState(action)
-  }
-
-  window.execFontSizeZoom = function (action) {
-    FontSizeZoom.toogle(action)
-  }
-
-  function updateViewFontSizeZoom () {
-    let body = document.body
-    if (this.currentState === null) {
-      this.currentState = 1.0
-    }
-    body.style.fontSize = `${this.getState()}rem`
-  }
-
-  function getFontSizeZoomState () {
-    return localStorage.getItem(this.storage)
-  }
-
-  function setFontSizeZoomState (state) {
-    let st = this.getState()
-    if (st && state === 'up') {
-      if (st < 1.8) {
-        st *= 1.1
-      }
-    } else if (st && state === 'down') {
-      if (st > 0.7) {
-        st /= 1.1
-      }
-    } else {
-      st = 1
-    }
-    localStorage.setItem(this.storage, st)
-    this.currentState = state
-    this.updateView()
-  }
 }
 
 window.isElementInViewport = function (el) {
