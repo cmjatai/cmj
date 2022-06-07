@@ -40,7 +40,8 @@ window.tinymce = tinymce
 
 $(function () {
   setTimeout(function () {
-    window.Accessibilidade()
+    window.Acessibilidade()
+
     window.autorModal()
     window.refreshMask()
     window.refreshDatePicker()
