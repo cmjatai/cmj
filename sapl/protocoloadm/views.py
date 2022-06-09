@@ -1831,7 +1831,7 @@ class SeloProtocoloMixin(PluginSignMixin):
                 'titulopre': 'Protocolo: {}/{}'.format(p.numero, p.ano),
                 'titulo': item.epigrafe_short,
                 'titulopos': '',
-                'x': int(self.request.GET.get('x', 190)),
+                'x': int(self.request.GET.get('x', 193)),
                 'y': int(self.request.GET.get('y', 50)),
                 'w': 12,
                 'h': 60,
