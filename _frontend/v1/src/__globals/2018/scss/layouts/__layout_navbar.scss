@@ -232,6 +232,7 @@
       }
     }
   }
+
   .navbar-collapse.show {
     .navbar-social-links {
       justify-content: center;
@@ -264,9 +265,9 @@
       justify-content: flex-end;
       .item-form {
         height: 100%;
-        transition: all 3s ease;
         flex: 0 0 auto;
         &.item-form:first-child {
+          min-width: 50%;
           flex: 0 1 auto;
         }
       }
@@ -297,8 +298,8 @@
     &:hover {
       .inner {
         .item-form:first-child {
-          flex: 1 1 auto;
-          transition: all 1s ease;
+          // flex: 1 1 auto;
+          // transition: all 1s ease;
         }
       }
     }
