@@ -47,10 +47,15 @@
 
           <div class="row-1 d-flex justify-content-between align-items-center">
             <div>
-              {% if user.is_anonymous and ""|transmissao_ao_vivo %}
-              <a class="btn btn-danger btn-sm p-0 px-1" href="#aovivo_content">
-                <i class="fas fa-tv"></i> AoVivo
+              {% if ""|transmissao_ao_vivo %}
+              <a class="btn bg-danger text-white p-0 px-1" href="/tv-cmj/ao-vivo">
+                  <i class="fas fa-tv"></i> AoVivo
               </a>
+              {% else %}
+              <a class="btn bg-danger text-white p-0 px-1" href="/galerias/videos">
+                <i class="fas fa-tv"></i>TvCMJ
+              </a>
+
               {% endif %}
             </div>
             {% block social_links %}
