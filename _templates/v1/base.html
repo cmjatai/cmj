@@ -182,29 +182,26 @@
   {% block widgets_form_js %}{% endblock widgets_form_js %}
 
 
-  {% if not perms.diarios %}
-    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
-    <script>
-      $(function () {
-        new window.VLibras.Widget('https://vlibras.gov.br/app');
-        document.querySelector('#btn_libras').onclick = function(e) {
-          let vw = document.querySelector('[vw]')
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+  <script>
+    $(function () {
+      new window.VLibras.Widget('https://vlibras.gov.br/app');
+      document.querySelector('#btn_libras').onclick = function(e) {
+        let vw = document.querySelector('[vw]')
 
-          if (vw.classList.contains('disabled')) {
-            vw.classList.remove('disabled')
-            vw.classList.add('enabled')
-          }
-          else {
-            vw.classList.remove('enabled')
-            vw.classList.add('disabled')
-          }
+        if (vw.classList.contains('disabled')) {
+          vw.classList.remove('disabled')
+          vw.classList.add('enabled')
         }
-      })
-    </script>
-  {% endif %}
+        else {
+          vw.classList.remove('enabled')
+          vw.classList.add('disabled')
+        }
+      }
+    })
+  </script>
+
   {% if not DEBUG %}
-
-
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-2431536-7"></script>
     <script>
       window.fbAsyncInit = function () {
