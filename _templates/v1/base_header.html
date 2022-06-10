@@ -45,13 +45,21 @@
 
         <div class="d-flex w-100 flex-column  justify-content-end">
 
-          <div class="row-1 d-flex justify-content-end align-items-center">
+          <div class="row-1 d-flex justify-content-between align-items-center">
+            <div>
+              {% if user.is_anonymous and ""|transmissao_ao_vivo %}
+              <a class="btn btn-danger btn-sm p-0 px-1" href="#aovivo_content">
+                <i class="fas fa-tv"></i> AoVivo
+              </a>
+              {% endif %}
+            </div>
             {% block social_links %}
               <div class="navbar-social-links justify-content-end">
-                <a href="/online/" class="icon-sessoes-online" title="Sessão Plenária Online - Atualização em tempo real"><span>Sessões Online</span></a>
                 <a href="/estatisticas"title="Estatisticas de Dados do Portal"><i class="far fa-chart-bar"></i></a>
-
-                <a href="https://soundcloud.com/camara-de-jatai"><i class="fab fa-soundcloud" aria-hidden="true"></i><span>SoundCloud</span></i></a>
+                {% comment %}
+                  <a href="https://soundcloud.com/camara-de-jatai"><i class="fab fa-soundcloud" aria-hidden="true"></i><span>SoundCloud</span></i></a>
+                {% endcomment %}
+                <a href="/online/" class="icon-sessoes-online" title="Sessão Plenária Online - Atualização em tempo real"><span>Sessões Online</span></a>
                 <a class="facebook" href="https://www.facebook.com/cmjatai"><i class="fab fa-facebook-f" aria-hidden="true"><span>Facebook</span></i></a>
                 <a class="instagram" href="https://www.instagram.com/cmjatai"><i class="fab fa-instagram" aria-hidden="true"><span>Instagram</span></i></a>
                 <a class="youtube" href="https://www.youtube.com/C%C3%A2maraMunicipalJata%C3%AD"><i class="fab fa-youtube" aria-hidden="true"><span>YouTube</span></i></a>
