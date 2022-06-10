@@ -847,7 +847,7 @@ window.Acessibilidade = function () {
 
   function loadKeysAcessibilidade () {
     document.onkeydown = function isKeyPressed (event) {
-      if ((KeysAcessibilidade.keys === 'AltGraph' || (event.ctrlKey && event.altKey)) && [49, 50, 51, 52, 53].includes(event.keyCode)) {
+      if ((KeysAcessibilidade.keys === 'AltGraph' || (event.ctrlKey && event.altKey)) && _.range(48, 58).includes(event.keyCode)) {
         KeysAcessibilidade.keys = ''
         switch (event.keyCode) {
           case 49: // 1
@@ -863,7 +863,22 @@ window.Acessibilidade = function () {
             window.location = '/sistema/search/'
             break
           case 53: // 5
+            window.location = '#'
+            break
+          case 54: // 6
+            window.location = '#'
+            break
+          case 55: // 7
+            window.location = '#'
+            break
+          case 56: // 8
+            window.location = '#'
+            break
+          case 57: // 9
             window.location = '/informacao/sic-fisico'
+            break
+          case 48: // 0
+            window.location = '/acessibilidade'
             break
           default:
             break
