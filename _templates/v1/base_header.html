@@ -12,7 +12,7 @@
         <span class="icon-bar"></span>
       </button>
 
-      <div id="rowlogo">
+      <div id="rowlogo" class="d-flex align-items-center">
         <div id="portallogo">
           <div>
             <a class="navbar-brand" href="{{site_url}}/">
@@ -31,6 +31,21 @@
             </a>
           </div>
         </div>
+
+        <div>
+          {% if ""|transmissao_ao_vivo %}
+          <a class="btn bg-danger text-white p-0 px-1" href="/tv-cmj/ao-vivo">
+              <i class="fas fa-tv"></i> AoVivo
+          </a>
+          {% comment %}
+            {% else %}
+            <a class="btn bg-danger text-white p-0 px-1" href="/galerias/videos">
+              <i class="fas fa-tv"></i>TvCMJ
+            </a>
+          {% endcomment %}
+          {% endif %}
+        </div>
+
       </div>
 
       {% block button_toogle %}
@@ -42,27 +57,11 @@
       {% endblock %}
 
       <div class="navbar-collapse collapse" id="navbar-access">
+        <div class="d-flex w-100 flex-column justify-content-end">
 
-        <div class="d-flex w-100 flex-column  justify-content-end">
-
-          <div class="row-1 d-flex justify-content-between align-items-center">
-            <div>
-              {% if ""|transmissao_ao_vivo %}
-              <a class="btn bg-danger text-white p-0 px-1" href="/tv-cmj/ao-vivo">
-                  <i class="fas fa-tv"></i> AoVivo
-              </a>
-              {% else %}
-              <a class="btn bg-danger text-white p-0 px-1" href="/galerias/videos">
-                <i class="fas fa-tv"></i>TvCMJ
-              </a>
-
-              {% endif %}
-            </div>
+          <div class="row-1 d-flex justify-content-end align-items-center">
             {% block social_links %}
               <div class="navbar-social-links justify-content-end">
-
-
-
                 <a href="/estatisticas"title="Estatisticas de Dados do Portal"><i class="far fa-chart-bar"></i></a>
                 {% comment %}
                   <a href="https://soundcloud.com/camara-de-jatai"><i class="fab fa-soundcloud" aria-hidden="true"></i><span>SoundCloud</span></i></a>
