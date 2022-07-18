@@ -375,7 +375,7 @@ class MateriaLegislativa(CommonMixin):
     class Meta:
         verbose_name = _('Matéria Legislativa')
         verbose_name_plural = _('Matérias Legislativas')
-        unique_together = (("tipo", "numero", "ano"),)
+        # unique_together = (("tipo", "numero", "ano"),)
         ordering = ['-id']
         permissions = (
             ("can_access_impressos", "Can access impressos"),
