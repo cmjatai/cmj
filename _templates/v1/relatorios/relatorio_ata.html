@@ -8,7 +8,7 @@
                 height: 3cm;
                 font-size: 8pt;
             }
-        
+
             @bottom-center {
                 border-top: 1px solid black;
                 font-size: 8pt;
@@ -21,7 +21,7 @@
                 height: 3cm;
                 font-size: 8pt;
             }
-              
+
             @top-center {
                 content:  string(title);
             }
@@ -34,13 +34,13 @@
         }
     </style>
      <link rel="stylesheet" href="{% static 'sapl/css/relatorio.css'%}">
-</head>	
+</head>
 
 <body>
     <h3 style="text-align:center;">Ata Eletrônica da {{sessaoplenaria}}</h3>
     {% include 'sessao/blocos_ata/identificacao_basica.html' %}
     {% include 'sessao/blocos_ata/mesa_diretora.html' %}
-    {% include 'sessao/blocos_ata/lista_presenca.html' %}
+    {% include 'sessao/blocos_ata/lista_presenca_sessao.html' %}
     {% include 'sessao/blocos_ata/expedientes.html' %}
     {% include 'sessao/blocos_ata/materias_expediente.html' %}
     {% include 'sessao/blocos_ata/oradores_expediente.html' %}
@@ -49,7 +49,7 @@
     {% include 'sessao/blocos_ata/oradores_ordemdia.html' %}
     {% include 'sessao/blocos_ata/oradores_explicacoes.html' %}
     {% include 'sessao/blocos_ata/ocorrencias_da_sessao.html' %}
-    
+
     {% if assinatura_mesa or assinatura_presentes %}
 
     <div style="padding:5px;margin-top:50px;border-top: 1px solid black;">
@@ -101,4 +101,3 @@
         {% endif%}
     </div>
 </body>
-    

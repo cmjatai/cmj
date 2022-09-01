@@ -2328,7 +2328,7 @@ class ResumoView(DetailView):
                 'primeiro_ordenacao': 'identificacao_basica.html',
                 'segundo_ordenacao': 'conteudo_multimidia.html',
                 'terceiro_ordenacao': 'mesa_diretora.html',
-                'quarto_ordenacao': 'lista_presenca.html',
+                'quarto_ordenacao': 'lista_presenca_sessao.html',
                 'quinto_ordenacao': 'expedientes.html',
                 'sexto_ordenacao': 'materias_expediente.html',
                 'setimo_ordenacao': 'votos_nominais_materias_expediente.html',
