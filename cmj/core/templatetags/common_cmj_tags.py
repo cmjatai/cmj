@@ -2,6 +2,7 @@
 from copy import deepcopy
 from datetime import timedelta
 import json
+import logging
 
 from dateutil.relativedelta import relativedelta
 from django import template
@@ -23,7 +24,9 @@ from sapl.base.models import AppConfig
 from sapl.materia.models import TipoMateriaLegislativa
 from sapl.norma.models import NormaJuridica, TipoNormaJuridica
 from sapl.parlamentares.models import Filiacao
-from sapl.sessao.models import SessaoPlenaria
+
+
+logger = logging.getLogger(__name__)
 
 
 register = template.Library()
@@ -54,6 +57,7 @@ def transmissao_ao_vivo(obj):
     return Video.objects.filter(
         json__snippet__liveBroadcastContent__exact='live'
     ).exists()
+
 
 @register.filter
 def video_ao_vivo(obj):
@@ -117,6 +121,17 @@ def meta_model_value(instance, attr):
 @register.filter
 def lookup(d, key):
     return d[key] if key in d else []
+
+
+@register.filter
+def search_value(request):
+    try:
+        q = getattr(request, request.method).get('q', '')
+        return q
+    except Exception as e:
+        logger.error(e)
+
+    return ''
 
 
 @register.filter
