@@ -20,11 +20,6 @@ from cmj.utils import signed_name_and_date_extract
 
 def send_mail(subject, email_template_name,
               context, from_email, to_email):
-
-    # if settings.DEBUG:
-    #    print('DEBUG: Envio Teste', subject, from_email, to_email)
-    #    return
-
     subject = ''.join(subject.splitlines())
 
     html_email = loader.render_to_string(email_template_name, context)
@@ -132,10 +127,6 @@ for app in apps.get_app_configs():
                     model._meta.model_name
                 )
             )
-            # print('cmj_pre_save_signed_{}_{}'.format(
-            #    app.name.replace('.', '_'),
-            #    model._meta.model_name
-            #))
 
 
 def audit_log_function(sender, **kwargs):

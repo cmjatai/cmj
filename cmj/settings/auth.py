@@ -16,6 +16,14 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': str_pv + '.NumericPasswordValidator', },
 ]
 
+TELEGRAM_CMJATAI_BOT_KEY = config(
+    'TELEGRAM_CMJATAI_BOT_KEY', cast=str, default='')
+TELEGRAM_API_ID = config(
+    'TELEGRAM_API_ID', cast=str, default='')
+TELEGRAM_API_HASH = config(
+    'TELEGRAM_API_HASH', cast=str, default='')
+TELEGRAM_CHAT_ID = config(
+    'TELEGRAM_CHAT_ID', cast=str, default='')
 
 GOOGLE_URL_SHORTENER_KEY = config(
     'GOOGLE_URL_SHORTENER_KEY', cast=str, default='')
