@@ -23,6 +23,8 @@ boto3==1.21.36
 billiard==3.6.3.0
 celery==4.4.2
 
+python-telegram-bot==13.14
+
 #billiard<4.0,>=3.6.4.0
 #celery==5.1.2
 
