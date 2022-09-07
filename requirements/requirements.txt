@@ -13,7 +13,7 @@ django-model-utils==4.0.0
 django-webpack4-loader
 
 djangorestframework==3.12.4
-djangorestframework-simplejwt==4.5.0
+djangorestframework-simplejwt==4.4.0
 
 drf_yasg==1.17.0
 asn1crypto
