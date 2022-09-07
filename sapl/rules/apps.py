@@ -217,49 +217,6 @@ def get_rules():
     return Rules(rules_patterns)
 
 
-def send_signal_for_websocket_time_refresh(project, action, inst):
-    if not settings.USE_CHANNEL_LAYERS:
-        return
-
-    if hasattr(inst, '_meta') and not inst._meta.app_config is None and \
-            inst._meta.app_config.name[:4] == project:
-
-        # um mensagem não deve ser enviada se é post_save mas originou se de
-        # revision_pre_delete_signal
-
-        funcs = []
-
-        if action == 'post_save':
-            import inspect
-            funcs = list(filter(lambda x: x == 'revision_pre_delete_signal',
-                                map(lambda x: x[3], inspect.stack())))
-
-        if not funcs:
-            try:
-                if hasattr(inst, 'ws_sync') and not inst.ws_sync():
-                    return
-
-                channel_layer = get_channel_layer()
-
-                async_to_sync(channel_layer.group_send)(
-                    "group_time_refresh_channel", {
-                        "type": "time_refresh.message",
-                        'message': {
-                            'action': action,
-                            'id': inst.id,
-                            'app': inst._meta.app_label,
-                            'model': inst._meta.model_name
-                        }
-                    }
-                )
-            except Exception as e:
-                logger = logging.getLogger(__name__)
-                logger.info(_("Erro na comunicação com o backend do redis. "
-                              "Certifique se possuir um servidor de redis "
-                              "ativo funcionando como configurado em "
-                              "CHANNEL_LAYERS"))
-
-
 @receiver(post_migrate, dispatch_uid='update_groups')
 def update_groups(app_config, verbosity=2, interactive=True,
                   using=DEFAULT_DB_ALIAS, **kwargs):
@@ -267,24 +224,6 @@ def update_groups(app_config, verbosity=2, interactive=True,
         return
     rules = get_rules()
     rules.update_groups()
-
-
-"""@receiver(pre_delete, dispatch_uid='pre_delete_signal')
-def revision_pre_delete_signal(sender, **kwargs):
-    with reversion.create_revision():
-        kwargs['instance'].save()
-        reversion.set_comment("Deletado pelo sinal.")
-"""
-
-
-@receiver(post_save, dispatch_uid='sapl_post_save_signal')
-def sapl_post_save_signal(sender, instance, using, **kwargs):
-    send_signal_for_websocket_time_refresh('sapl', 'post_save', instance)
-
-
-@receiver(post_delete, dispatch_uid='sapl_post_delete_signal')
-def sapl_post_delete_signal(sender, instance, using, **kwargs):
-    send_signal_for_websocket_time_refresh('sapl', 'post_delete', instance)
 
 
 def reset_id_model(model):

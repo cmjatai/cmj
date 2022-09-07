@@ -1,20 +1,9 @@
-import logging
-
-from asgiref.sync import async_to_sync
-from channels.layers import get_channel_layer
 from django import apps
-from django.conf import settings
-from django.contrib.auth import get_user_model
-from django.contrib.auth.management import _get_all_permissions
-from django.core import exceptions
-from django.db import models, router
 from django.db.models.signals import post_save, post_delete, post_migrate
 from django.db.utils import DEFAULT_DB_ALIAS
 from django.dispatch.dispatcher import receiver
 from django.utils.text import format_lazy
 from django.utils.translation import ugettext_lazy as _
-
-from sapl.rules.apps import send_signal_for_websocket_time_refresh
 
 
 class AppConfig(apps.AppConfig):
