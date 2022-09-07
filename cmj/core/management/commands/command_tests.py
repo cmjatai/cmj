@@ -14,8 +14,6 @@ from PyPDF4.generic import ByteStringObject
 from PyPDF4.generic import IndirectObject
 from PyPDF4.pdf import PdfFileReader
 from asn1crypto import cms
-from cryptography.hazmat import backends
-from cryptography.hazmat.primitives.serialization import pkcs12
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db import connection
