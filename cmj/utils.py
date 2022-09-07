@@ -1,9 +1,9 @@
 from datetime import date, datetime, timedelta
 from functools import wraps
-from unicodedata import normalize as unicodedata_normalize
 import re
 import subprocess
 import threading
+from unicodedata import normalize as unicodedata_normalize
 
 from PyPDF4.pdf import PdfFileReader
 from asn1crypto import cms
@@ -13,12 +13,15 @@ from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.db import connection
+from django.db.models.signals import pre_init, post_init, pre_save, post_save,\
+    pre_delete, post_delete, post_migrate, pre_migrate
 from django.template.loaders.filesystem import Loader
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from easy_thumbnails import source_generators
-from unipath.path import Path
 import magic
+from unipath.path import Path
+from cmj.core.models import AuditLog
 
 
 def pil_image(source, exif_orientation=False, **options):
@@ -573,3 +576,69 @@ class CmjLoader(Loader):
 
     def get_dirs(self):
         return self.dirs if self.dirs is not None else self.engine.dirs
+
+
+class Manutencao():
+
+    def desativa_signals(self, app_signal=None):
+
+        disabled_signals = [
+            pre_init, post_init,
+            pre_save, post_save,
+            pre_delete, post_delete,
+            pre_migrate, post_migrate,
+        ]
+
+        for app in apps.get_app_configs():
+            if not app.name.startswith('cmj') and not app.name.startswith('sapl'):
+                continue
+
+            for m in app.get_models():
+                for s in disabled_signals:
+                    rs = s._live_receivers(m)
+                    if rs:
+                        for r in rs:
+                            if s.disconnect(receiver=r, sender=m):
+                                print(m, s, r)
+
+    def desativa_auto_now(self):
+        for app in apps.get_app_configs():
+
+            if not app.name.startswith('cmj') and not app.name.startswith('sapl'):
+                continue
+
+            for m in app.get_models():
+                if m == AuditLog:
+                    continue
+
+                for f in m._meta.get_fields():
+                    dua = f
+                    # print(dua)
+
+                    if hasattr(dua, 'auto_now'):
+                        dua._auto_now = dua.auto_now
+                        dua.auto_now = False
+
+                    if hasattr(dua, 'auto_now_add'):
+                        dua._auto_now_add = dua.auto_now_add
+                        dua.auto_now_add = False
+
+    def ativa_auto_now(self):
+        for app in apps.get_app_configs():
+
+            if not app.name.startswith('cmj') and not app.name.startswith('sapl'):
+                continue
+
+            for m in app.get_models():
+                if m == AuditLog:
+                    continue
+
+                for f in m._meta.get_fields():
+                    dua = f
+                    # print(dua)
+
+                    if hasattr(dua, '_auto_now'):
+                        dua.auto_now = dua._auto_now
+
+                    if hasattr(dua, '_auto_now_add'):
+                        dua.auto_now_add = dua._auto_now_add

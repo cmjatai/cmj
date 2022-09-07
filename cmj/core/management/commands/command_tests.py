@@ -25,7 +25,7 @@ from django.utils import timezone, formats
 from endesive import pdf
 
 from cmj.core.models import OcrMyPDF
-from cmj.signals import Manutencao
+from cmj.utils import Manutencao
 from cmj.utils import ProcessoExterno
 from sapl.compilacao.models import Dispositivo
 from sapl.materia.models import MateriaLegislativa
@@ -47,7 +47,7 @@ class Command(BaseCommand):
         post_delete.disconnect(dispatch_uid='cmj_post_delete_signal')
         post_save.disconnect(dispatch_uid='cmj_post_save_signal')
 
-    def 
+    def
 
 
     def run_add_selo_protocolo(self):
@@ -364,7 +364,7 @@ class Command(BaseCommand):
     def reset_id_model(self, model):
 
         query = """SELECT setval(pg_get_serial_sequence('"%(app_model_name)s"','id'),
-                    coalesce(max("id"), 1), max("id") IS NOT null) 
+                    coalesce(max("id"), 1), max("id") IS NOT null)
                     FROM "%(app_model_name)s";
                 """ % {
             'app_model_name': _get_registration_key(model)
