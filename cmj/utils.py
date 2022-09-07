@@ -21,7 +21,6 @@ from django.utils.translation import ugettext_lazy as _
 from easy_thumbnails import source_generators
 import magic
 from unipath.path import Path
-from cmj.core.models import AuditLog
 
 
 def pil_image(source, exif_orientation=False, **options):
@@ -602,6 +601,7 @@ class Manutencao():
                                 print(m, s, r)
 
     def desativa_auto_now(self):
+        from cmj.core.models import AuditLog
         for app in apps.get_app_configs():
 
             if not app.name.startswith('cmj') and not app.name.startswith('sapl'):
@@ -624,6 +624,7 @@ class Manutencao():
                         dua.auto_now_add = False
 
     def ativa_auto_now(self):
+        from cmj.core.models import AuditLog
         for app in apps.get_app_configs():
 
             if not app.name.startswith('cmj') and not app.name.startswith('sapl'):

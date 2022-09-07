@@ -14,13 +14,6 @@ from sapl.utils import create_barcode
 def protocolo_pre_save(sender, instance, using, **kwargs):
     logger = logging.getLogger(__name__)
 
-    import inspect
-    funcs = list(filter(lambda x: x == 'revision_pre_delete_signal',
-                        map(lambda x: x[3], inspect.stack())))
-
-    if funcs:
-        return
-
     if hasattr(instance, 'not_send_mail') and instance.not_send_mail:
         return
     if instance.email and instance.conteudo_protocolado:
@@ -62,7 +55,7 @@ def protocolo_pre_save(sender, instance, using, **kwargs):
             logger.error(
                 """
                 Erro no envio de email de comprovante de protocolo.
-                para: {} 
+                para: {}
                 {}
                 {}
                 --------------------
@@ -83,13 +76,6 @@ def docadm_pre_save_segmenta_download(sender, instance, using, **kwargs):
         return
 
     logger = logging.getLogger(__name__)
-
-    import inspect
-    funcs = list(filter(lambda x: x == 'revision_pre_delete_signal',
-                        map(lambda x: x[3], inspect.stack())))
-
-    if funcs:
-        return
 
     md = instance.metadata if instance.metadata else {}
 

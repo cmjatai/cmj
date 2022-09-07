@@ -31,14 +31,6 @@ def send_mail(subject, email_template_name,
 
 @receiver(post_save, sender=Notificacao, dispatch_uid='notificacao_post_save')
 def notificacao_post_save(sender, instance, using, **kwargs):
-
-    import inspect
-    funcs = list(filter(lambda x: x == 'revision_pre_delete_signal',
-                        map(lambda x: x[3], inspect.stack())))
-
-    if funcs:
-        return
-
     if hasattr(instance, 'not_send_mail') and instance.not_send_mail:
         return
 
