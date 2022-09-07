@@ -20,10 +20,10 @@ from sapl.protocoloadm.models import DocumentoAdministrativo,\
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        post_delete.disconnect(dispatch_uid='sapl_post_delete_signal')
-        post_save.disconnect(dispatch_uid='sapl_post_save_signal')
-        post_delete.disconnect(dispatch_uid='cmj_post_delete_signal')
-        post_save.disconnect(dispatch_uid='cmj_post_save_signal')
+        post_delete.disconnect(dispatch_uid='timerefresh_post_delete_signal')
+        post_save.disconnect(dispatch_uid='timerefresh_post_save_signal')
+
+
 
         self.logger = logging.getLogger(__name__)
 
@@ -101,8 +101,8 @@ class Command(BaseCommand):
 
             if mt['reset_errors_count_page']:
                 run_sql(
-                    '''update {} 
-                            set _paginas = 0 
+                    '''update {}
+                            set _paginas = 0
                             where _paginas = -1;'''.format(
                         '%s_%s' % (mt['model']._meta.app_label,
                                    mt['model']._meta.model_name)

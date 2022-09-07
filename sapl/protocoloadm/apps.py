@@ -8,5 +8,4 @@ class AppConfig(apps.AppConfig):
     verbose_name = _('Protocolo Administrativo')
 
     def ready(self):
-        from sapl.base import receivers
         from . import signals

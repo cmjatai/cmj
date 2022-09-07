@@ -42,12 +42,10 @@ class Command(BaseCommand):
         m = Manutencao()
         # m.desativa_signals()
         m.desativa_auto_now()
-        post_delete.disconnect(dispatch_uid='sapl_post_delete_signal')
-        post_save.disconnect(dispatch_uid='sapl_post_save_signal')
-        post_delete.disconnect(dispatch_uid='cmj_post_delete_signal')
-        post_save.disconnect(dispatch_uid='cmj_post_save_signal')
+        post_delete.disconnect(dispatch_uid='timerefresh_post_delete_signal')
+        post_save.disconnect(dispatch_uid='timerefresh_post_save_signal')
 
-    def
+
 
 
     def run_add_selo_protocolo(self):

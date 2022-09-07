@@ -75,12 +75,12 @@ LOGGING = {
     'loggers': {
         'sapl': {
             'handlers': ['cmj_logger_file', 'console'],
-            'level': 'DEBUG',
+            'level': LOGGING_ROOT_LEVEL,
             'propagate': False,
         },
         'cmj': {
             'handlers': ['cmj_logger_file', 'console'],
-            'level': 'DEBUG',
+            'level': LOGGING_ROOT_LEVEL,
             'propagate': False,
         },
     },

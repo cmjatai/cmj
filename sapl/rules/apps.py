@@ -15,6 +15,7 @@ from django.db.utils import DEFAULT_DB_ALIAS
 from django.dispatch.dispatcher import receiver
 from django.utils.text import format_lazy
 from django.utils.translation import ugettext_lazy as _
+logger = logging.getLogger(__name__)
 
 
 class AppConfig(django.apps.AppConfig):
@@ -29,11 +30,11 @@ def create_proxy_permissions(
         using=DEFAULT_DB_ALIAS, **kwargs):
     if not app_config.models_module:
         return
-    logger = logging.getLogger(__name__)
+
     # print(app_config)
 
     try:
-        logger.info("Tentando obter modelo de permissão do app.")
+        logger.debug("Tentando obter modelo de permissão do app.")
         Permission = django.apps.apps.get_model('auth', 'Permission')
     except LookupError as e:
         logger.error(str(e))
@@ -76,7 +77,7 @@ def create_proxy_permissions(
             app_label, model = opts.app_label, opts.model_name
 
             try:
-                logger.info("Tentando obter db_manager.")
+                logger.debug("Tentando obter db_manager.")
                 ctype = ContentType.objects.db_manager(
                     using).get_by_natural_key(app_label, model)
             except Exception as e:
@@ -144,11 +145,13 @@ def get_rules():
             self.rules_patterns = rules_patterns
 
         def associar(self, g, model, tipo):
-            for t in tipo:
+            try:
                 content_type = ContentType.objects.get_by_natural_key(
                     app_label=model._meta.app_label,
                     model=model._meta.model_name)
-
+            except:
+                return
+            for t in tipo:
                 codename = (t[1:] + model._meta.model_name)\
                     if t[0] == '.' and t[-1] == '_' else t
 
@@ -161,12 +164,11 @@ def get_rules():
         def _config_group(self, group_name, rules_list):
             if not group_name:
                 return
-            logger = logging.getLogger(__name__)
             group, created = Group.objects.get_or_create(name=group_name)
             group.permissions.clear()
 
             try:
-                logger.info("Tentando associar grupos.")
+                logger.debug("Tentando associar grupos.")
                 print(' ', group_name)
                 for model, perms, perms_publicas in rules_list:
                     self.associar(group, model, perms)
@@ -241,7 +243,7 @@ def reset_id_model(model):
     #                 mesmo que sequencia exista mas sem vínvulo.
 
     query = """SELECT setval(pg_get_serial_sequence('%(table_name)s','id'),
-                coalesce(max("id"), 1), max("id") IS NOT null) 
+                coalesce(max("id"), 1), max("id") IS NOT null)
                 FROM "%(table_name)s";
             """ % {
         'table_name': model._meta.db_table
@@ -274,7 +276,7 @@ def reset_id_model(model):
                     CREATE SEQUENCE %(table_name)s_id_seq start 1
                         OWNED BY %(table_name)s.id;
                     ALTER TABLE %(table_name)s
-                        ALTER COLUMN id SET DEFAULT 
+                        ALTER COLUMN id SET DEFAULT
                             nextval('%(table_name)s_id_seq'::regclass);
                     """ + query
                 ) % {
@@ -282,9 +284,8 @@ def reset_id_model(model):
                 }
                 cursor.execute(create_sequence)
 
-    except Exception as e:
-        if 'column "id" does not exist' not in str(e):
-            print('ERRO:', model)
+    except:
+        pass
 
 
 @receiver(post_migrate, dispatch_uid='check_ids_sequences')

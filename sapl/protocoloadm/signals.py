@@ -9,10 +9,11 @@ from cmj.settings import EMAIL_SEND_USER
 from sapl.protocoloadm.models import Protocolo, DocumentoAdministrativo
 from sapl.utils import create_barcode
 
+logger = logging.getLogger(__name__)
+
 
 @receiver(pre_save, sender=Protocolo, dispatch_uid='protocolo_pre_save')
 def protocolo_pre_save(sender, instance, using, **kwargs):
-    logger = logging.getLogger(__name__)
 
     if hasattr(instance, 'not_send_mail') and instance.not_send_mail:
         return
@@ -74,8 +75,6 @@ def docadm_pre_save_segmenta_download(sender, instance, using, **kwargs):
 
     if not instance.id:
         return
-
-    logger = logging.getLogger(__name__)
 
     md = instance.metadata if instance.metadata else {}
 
