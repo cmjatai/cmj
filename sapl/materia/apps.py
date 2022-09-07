@@ -8,4 +8,4 @@ class AppConfig(apps.AppConfig):
     verbose_name = _('Matéria')
 
     def ready(self):
-        from sapl.base import receivers
+        from sapl.base import signals

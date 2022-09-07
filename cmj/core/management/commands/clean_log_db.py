@@ -23,10 +23,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         m = Manutencao()
         m.desativa_auto_now()
-        post_delete.disconnect(dispatch_uid='sapl_post_delete_signal')
-        post_save.disconnect(dispatch_uid='sapl_post_save_signal')
-        post_delete.disconnect(dispatch_uid='cmj_post_delete_signal')
-        post_save.disconnect(dispatch_uid='cmj_post_save_signal')
+        post_delete.disconnect(dispatch_uid='timerefresh_post_delete_signal')
+        post_save.disconnect(dispatch_uid='timerefresh_post_save_signal')
+
+
 
         self.logger = logging.getLogger(__name__)
 

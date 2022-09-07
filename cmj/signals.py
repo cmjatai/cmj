@@ -6,6 +6,7 @@ from channels.layers import get_channel_layer
 from django.conf import settings
 from django.db.models.signals import post_save, post_delete
 from django.dispatch.dispatcher import receiver
+from django.utils.translation import ugettext_lazy as _
 
 from cmj.sigad.models import Documento
 
@@ -26,12 +27,13 @@ class CelerySignalProcessor(CelerySignalProcessor):
         return self.enqueue('delete', instance, sender, **kwargs)
 
 
-def send_signal_for_websocket_time_refresh(project, action, inst):
+def send_signal_for_websocket_time_refresh(action, inst):
     if not settings.USE_CHANNEL_LAYERS:
         return
 
-    if hasattr(inst, '_meta') and not inst._meta.app_config is None and \
-            inst._meta.app_config.name[:4] == project:
+    if hasattr(inst, '_meta') and \
+        not inst._meta.app_config is None and \
+            inst._meta.app_config.name[:4] in ('sapl', ):  # 'cmj.'):
 
         try:
             if hasattr(inst, 'ws_sync') and not inst.ws_sync():
@@ -57,11 +59,11 @@ def send_signal_for_websocket_time_refresh(project, action, inst):
                           "CHANNEL_LAYERS"))
 
 
-@receiver(post_save, dispatch_uid='sapl_post_save_signal')
-def sapl_post_save_signal(sender, instance, using, **kwargs):
-    send_signal_for_websocket_time_refresh('sapl', 'post_save', instance)
+@receiver(post_save, dispatch_uid='timerefresh_post_save_signal')
+def timerefresh_post_save_signal(sender, instance, using, **kwargs):
+    send_signal_for_websocket_time_refresh('post_save', instance)
 
 
-@receiver(post_delete, dispatch_uid='sapl_post_delete_signal')
-def sapl_post_delete_signal(sender, instance, using, **kwargs):
-    send_signal_for_websocket_time_refresh('sapl', 'post_delete', instance)
+@receiver(post_delete, dispatch_uid='timerefresh_post_delete_signal')
+def timerefresh_post_delete_signal(sender, instance, using, **kwargs):
+    send_signal_for_websocket_time_refresh('post_delete', instance)

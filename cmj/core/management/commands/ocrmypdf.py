@@ -212,10 +212,10 @@ class Command(BaseCommand):
             print(init, 'Command OcrMyPdf já está sendo executado por outro processo')
             return
 
-        post_delete.disconnect(dispatch_uid='sapl_post_delete_signal')
-        post_save.disconnect(dispatch_uid='sapl_post_save_signal')
-        post_delete.disconnect(dispatch_uid='cmj_post_delete_signal')
-        post_save.disconnect(dispatch_uid='cmj_post_save_signal')
+        post_delete.disconnect(dispatch_uid='timerefresh_post_delete_signal')
+        post_save.disconnect(dispatch_uid='timerefresh_post_save_signal')
+
+
 
         # self.run_distibui_ocr_ao_longo_do_ano()
         # return

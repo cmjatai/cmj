@@ -5,8 +5,6 @@ import subprocess
 import threading
 from unicodedata import normalize as unicodedata_normalize
 
-from PyPDF4.pdf import PdfFileReader
-from asn1crypto import cms
 from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
@@ -16,7 +14,6 @@ from django.db import connection
 from django.db.models.signals import pre_init, post_init, pre_save, post_save,\
     pre_delete, post_delete, post_migrate, pre_migrate
 from django.template.loaders.filesystem import Loader
-from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from easy_thumbnails import source_generators
 import magic
@@ -376,169 +373,6 @@ def run_sql(sql):
 
             if settings.DEBUG:
                 print(rows)
-
-
-def run_signed_name_and_date_via_fields(fields):
-    signs = {}
-
-    for key, field in fields.items():
-
-        if '/FT' not in field and field['/FT'] != '/Sig':
-            continue
-        if '/V' not in field:
-            continue
-
-            # .format(field['/V']['/Reason'])
-        nome = 'Nome do assinante não localizado.'
-        content_sign = field['/V']['/Contents']
-        try:
-            signed_data = cms.ContentInfo.load(content_sign)['content']
-            oun_old = []
-            for cert in signed_data['certificates']:
-                subject = cert.native['tbs_certificate']['subject']
-                oun = subject['organizational_unit_name']
-
-                if isinstance(oun, str):
-                    continue
-
-                if len(oun) > len(oun_old):
-                    oun_old = oun
-                    nome = subject['common_name'].split(':')[0]
-        except:
-            if '/Name' in field['/V']:
-                nome = field['/V']['/Name']
-
-        fd = None
-        try:
-            data = str(field['/V']['/M'])
-
-            if 'D:' not in data:
-                data = None
-            else:
-                if not data.endswith('Z'):
-                    data = data.replace('Z', '+')
-                data = data.replace("'", '')
-
-                fd = datetime.strptime(data[2:], '%Y%m%d%H%M%S%z')
-        except:
-            pass
-
-        if nome not in signs:
-            signs[nome] = fd
-
-    return signs
-
-
-def run_signed_name_and_date_extract(file):
-    signs = {}
-    fields = {}
-    pdfdata = file.read()
-
-    # se não tem byterange então não é assinado
-    byterange = []
-    n = -1
-    while True:
-        n = pdfdata.find(b"/ByteRange", n + 1)
-        if n == -1:
-            break
-        byterange.append(n)
-
-    if not byterange:
-        return signs
-
-    # tenta extrair via /Fields
-    try:
-        pdf = PdfFileReader(file)
-        fields = pdf.getFields()
-    except Exception as e:
-        try:
-            pdf = PdfFileReader(file, strict=False)
-            fields = pdf.getFields()
-        except Exception as ee:
-            fields = ee
-
-    try:
-        # se a extração via /Fields ocorrer sem erros e forem capturadas
-        # tantas assinaturas quanto byteranges
-        if isinstance(fields, dict):
-            signs = run_signed_name_and_date_via_fields(fields)
-            if len(signs) == len(byterange):
-                return signs
-    except Exception as e:
-        pass
-
-    try:
-        for n in byterange:
-
-            start = pdfdata.find(b"[", n)
-            stop = pdfdata.find(b"]", start)
-            assert n != -1 and start != -1 and stop != -1
-            n += 1
-
-            br = [int(i, 10) for i in pdfdata[start + 1: stop].split()]
-            contents = pdfdata[br[0] + br[1] + 1: br[2] - 1]
-            bcontents = bytes.fromhex(contents.decode("utf8"))
-            data1 = pdfdata[br[0]: br[0] + br[1]]
-            data2 = pdfdata[br[2]: br[2] + br[3]]
-            #signedData = data1 + data2
-
-            nome = 'Nome do assinante não localizado.'
-            try:
-                signed_data = cms.ContentInfo.load(bcontents)['content']
-                oun_old = []
-                for cert in signed_data['certificates']:
-                    subject = cert.native['tbs_certificate']['subject']
-                    oun = subject['organizational_unit_name']
-
-                    if isinstance(oun, str):
-                        continue
-
-                    if len(oun) > len(oun_old):
-                        oun_old = oun
-                        nome = subject['common_name'].split(':')[0]
-
-                    if nome not in signs:
-                        signs[nome] = timezone.localtime()
-            except Exception as e:
-                pass
-    except Exception as e:
-        pass
-
-    return signs
-
-
-def signed_name_and_date_extract(file):
-
-    try:
-        signs = run_signed_name_and_date_extract(file)
-    except Exception as e:
-        return {}
-
-    signs = list(signs.items())
-    signs = sorted(signs, key=lambda sign: sign[0])
-
-    sr = []
-
-    for s in signs:
-        tt = s[0].title().split(' ')
-        for idx, t in enumerate(tt):
-            if t in ('Dos', 'De', 'Da', 'Do', 'Das', 'E'):
-                tt[idx] = t.lower()
-        sr.append((' '.join(tt), s[1]))
-
-    signs = sr
-
-    meta_signs = {
-        'signs': [],
-        'hom': []
-    }
-
-    for s in signs:
-        cn = settings.CERT_PRIVATE_KEY_NAME
-        meta_signs['hom' if s[0] == cn else 'signs'].append(s)
-    return meta_signs
-
-    # checa se documento está homologado
 
 
 class ProcessoExterno(object):
