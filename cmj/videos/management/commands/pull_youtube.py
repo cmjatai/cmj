@@ -15,7 +15,7 @@ from django.db.models.signals import post_delete, post_save
 from django.utils import timezone
 
 from cmj.sigad.models import Documento
-from cmj.signals import Manutencao
+from cmj.utils import Manutencao
 from cmj.videos.functions import pull_youtube_metadata_video, pull_youtube,\
     vincular_sistema_aos_videos, video_documento_na_galeria
 from cmj.videos.models import Video, PullYoutube, VideoParte, PullExec

@@ -17,7 +17,7 @@ from reportlab.platypus.doctemplate import SimpleDocTemplate
 
 from cmj.core.models import OcrMyPDF
 from cmj.diarios.models import DiarioOficial
-from cmj.signals import Manutencao
+from cmj.utils import Manutencao
 from cmj.utils import ProcessoExterno
 import numpy as np
 from sapl.compilacao.models import TextoArticulado, Dispositivo
@@ -131,7 +131,7 @@ class Command(BaseCommand):
         c.save()
         """
         cria pdf através da pillow
-        
+
         flist_out_img_obj = []
         for f in flist_out:
             flist_out_img_obj.append(Image.open(f))
@@ -182,13 +182,13 @@ class Command(BaseCommand):
         """try:
                 i = Image.open(f)
                 i.convert(mode='P', palette=Image.W)
-    
+
                 #f_out = f_out.replace('jpeg', 'png')
                 #f_out = f_out.replace('jpg', 'png')
-    
+
                 i.save(f_out)
                 break
-    
+
             except IsADirectoryError:
                 os.makedirs(f_out, exist_ok=True)"""
 

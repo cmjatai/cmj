@@ -13,7 +13,7 @@ from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
 import boto3
-from cmj.signals import Manutencao
+from cmj.utils import Manutencao
 from sapl.norma.models import NormaJuridica
 from sapl.utils import hash_sha512
 

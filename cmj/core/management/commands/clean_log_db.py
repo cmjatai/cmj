@@ -11,7 +11,7 @@ from django.utils import timezone
 from django_celery_results.models import TaskResult
 
 from cmj.core.models import AuditLog
-from cmj.signals import Manutencao
+from cmj.utils import Manutencao
 
 
 class Array(Subquery):
