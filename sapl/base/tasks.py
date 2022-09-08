@@ -4,7 +4,7 @@ from sapl.materia.models import StatusTramitacao, UnidadeTramitacao, MateriaLegi
 from sapl.protocoloadm.models import StatusTramitacaoAdministrativo, DocumentoAdministrativo
 
 
-@app.task(queue='email_queue')
+@app.task(queue='celery')
 def task_envia_email_tramitacao(kwargs):
 
     tipo = kwargs.get("tipo")

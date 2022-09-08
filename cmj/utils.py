@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import date, datetime, timedelta
 from functools import wraps
 import re
@@ -12,7 +13,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.db import connection
 from django.db.models.signals import pre_init, post_init, pre_save, post_save,\
-    pre_delete, post_delete, post_migrate, pre_migrate
+    pre_delete, post_delete, post_migrate, pre_migrate, m2m_changed
 from django.template.loaders.filesystem import Loader
 from django.utils.translation import ugettext_lazy as _
 from easy_thumbnails import source_generators
@@ -411,7 +412,7 @@ class CmjLoader(Loader):
         return self.dirs if self.dirs is not None else self.engine.dirs
 
 
-class Manutencao():
+class Manutencao(object):
 
     def desativa_signals(self, app_signal=None):
 
@@ -420,7 +421,14 @@ class Manutencao():
             pre_save, post_save,
             pre_delete, post_delete,
             pre_migrate, post_migrate,
+            m2m_changed
         ]
+        for s in disabled_signals:
+            for r in s.receivers:
+                print(r)
+            s.receivers = []
+
+        return
 
         for app in apps.get_app_configs():
             if not app.name.startswith('cmj') and not app.name.startswith('sapl'):

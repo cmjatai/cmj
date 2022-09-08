@@ -76,8 +76,8 @@ RULES_APPS = (
     'sapl.rules',
     'cmj.globalrules',
 )
-
-INSTALLED_APPS = INSTALLED_APPS + SAPL_APPS + CMJ_APPS + RULES_APPS
+BUSINESS_APPS = SAPL_APPS + CMJ_APPS + RULES_APPS
+INSTALLED_APPS = INSTALLED_APPS + BUSINESS_APPS
 
 # if DEBUG and 'debug_toolbar' not in INSTALLED_APPS:
 #    INSTALLED_APPS += ('debug_toolbar',)
