@@ -30,10 +30,17 @@ for app in apps.get_app_configs():
 
 @receiver(post_save, dispatch_uid='post_save_rede_social')
 def post_save_rede_social(sender, instance, using, **kwargs):
-    # if not hasattr(instance, '_meta') or \
-    #    instance._meta.app_config is None or \
-    #        not instance._meta.app_config.name in settings.BUSINESS_APPS:
-    #    return
+
+    if not hasattr(instance, '_meta') or \
+        instance._meta.app_config is None or \
+            not instance._meta.app_config.name in settings.BUSINESS_APPS:
+        return
+
+    running = {
+        'MateriaLegislativa': date(2022, 9, 7),
+    }
+    if instance._meta.object_name not in running.keys():
+        return
 
     if not hasattr(instance, 'metadata'):
         return
@@ -63,7 +70,7 @@ def post_save_rede_social(sender, instance, using, **kwargs):
                 if isinstance(d, datetime):
                     d = d.date()
 
-                if d < date(2022, 9, 7):
+                if d < running[instance._meta.object_name]:
                     return
 
         now = timezone.now()
@@ -73,7 +80,11 @@ def post_save_rede_social(sender, instance, using, **kwargs):
         instance.metadata = md
         instance.save()
 
-        td = timedelta(seconds=1 + 10 * i)
+        td = timedelta(
+            seconds=(
+                1 if settings.DEBUG else 600
+            ) + 10 * i
+        )
 
         task_send_rede_social.apply_async(
             (r, serialize('json', [instance]), ),
