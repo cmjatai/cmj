@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, date, datetime
 import logging
 
 from django.apps import apps
@@ -38,17 +38,42 @@ def post_save_rede_social(sender, instance, using, **kwargs):
     if not hasattr(instance, 'metadata'):
         return
 
-    md = instance.metadata
-
     redes = [
         'telegram'
     ]
 
     for i, r in enumerate(redes, 1):
-        if 'send' in md and r in md['send'] and md['send'][r]:
+        md = instance.metadata
+        if not md:
+            md = {}
+
+        if 'send' in md and r in md['send']:
             return
+
+        s = md.get('send', {r: None})
+
+        if r in s and s[r]:
+            return
+
+        for d in ('data', 'data_apresentacao', 'public_date'):
+            if hasattr(instance, d):
+                d = getattr(instance, d)
+                if not d:
+                    return
+                if isinstance(d, datetime):
+                    d = d.date()
+
+                if d < date(2022, 9, 7):
+                    return
+
         now = timezone.now()
-        td = timedelta(seconds=10 * i + now.microsecond % 60)
+
+        s[r] = now
+        md['send'] = s
+        instance.metadata = md
+        instance.save()
+
+        td = timedelta(seconds=1 + 10 * i)
 
         task_send_rede_social.apply_async(
             (r, serialize('json', [instance]), ),

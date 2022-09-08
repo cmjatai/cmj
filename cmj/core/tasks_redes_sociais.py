@@ -42,23 +42,16 @@ def task_send_rede_social(self, rede, instance_serialized):
 def send_telegram_materia_materialegislativa(instance):
     print('send_telegram_materia_materialegislativa')
     md = instance.metadata
+    if 'send' not in md:
+        md['send'] = {}
 
-    if not md:
-        md = {}
-
-    if 'send' in md and 'telegram' in md['send']:
-        return
-
-    s = md.get('send', {'telegram': None})
-
-    if s['telegram']:
-        return
-
-    md['send'] = s
-
-    s['telegram'] = timezone.now()
+    md['send']['telegram'] = timezone.now()
     instance.metadata = md
     instance.save()
+
+    autores_hash_tag = ' '.join(
+        map(lambda a: '#{}'.format(''.join(str(a.nome).split(' '))), instance.autores.all()))
+
     autores = '\n'.join(
         map(lambda a: '<i>{}</i>'.format(a), instance.autores.all()))
 
@@ -70,10 +63,13 @@ Autoria:
 {autores}
 
 <a href="{settings.SITE_URL}/materia/{instance.id}">Acompanhe o Processo Legislativo desta Matéria clicando aqui.</a>
-.
+#{instance.tipo.sigla} #MatériaLegislativa {autores_hash_tag}
     """
+
     #<tg-spoiler>spoiler</tg-spoiler>
-    print(text)
+    if settings.DEBUG:
+        print(text)
+        return
 
     url_base = socials_connects['telegram']['url_base']
     CHAT_ID = socials_connects['telegram']['CHAT_ID']
