@@ -42,6 +42,10 @@ def task_send_rede_social(self, rede, instance_serialized):
 def send_telegram_materia_materialegislativa(instance):
     print('send_telegram_materia_materialegislativa')
     md = instance.metadata
+
+    if not md:
+        md = {}
+
     if 'send' not in md:
         md['send'] = {}
 
