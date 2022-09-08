@@ -29,14 +29,14 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.views.generic.base import TemplateView, RedirectView
+from django.views.generic.base import TemplateView
 from django.views.static import serve as view_static_server
 
-from cmj.core.views_short import ShortRedirectView
 import cmj.agenda.urls
 import cmj.api.urls
 import cmj.cerimonial.urls
 import cmj.core.urls
+from cmj.core.views_short import ShortRedirectView
 import cmj.diarios.urls
 import cmj.globalrules.urls
 import cmj.ouvidoria.urls
@@ -58,15 +58,9 @@ import sapl.relatorios.urls
 import sapl.sessao.urls
 
 
-#import sapl.api.urls
-# import sapl.api.urls
 urlpatterns_all = [
-
-
     url(r'^j(?P<short>[0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]*)$',
         ShortRedirectView.as_view(), name='short_view'),
-
-
 
     url(r'^admin/', admin.site.urls),
 
@@ -75,9 +69,6 @@ urlpatterns_all = [
 
 
     url(r'', include(cmj.globalrules.urls)),
-
-    # Todo o conjunto de urls que passarão por adaptação do sapl
-    # devem ficar antes do sapl. para isso criar a app cmj.sapl_adapter
 
     url(r'', include(cmj.core.urls)),
     url(r'', include(cmj.cerimonial.urls)),
@@ -129,31 +120,4 @@ urlpatterns_all += [
     url(r'', include(cmj.sigad.urls)),
 ]
 
-"""urlpatterns_remove = [
-    'sistema/search/',
-    'sistema/ajuda/'
-]"""
-
 urlpatterns = urlpatterns_all
-
-"""
-def urlpatterns_filter(ponto, urls):
-    remove_url = []
-    for url in urls:
-        if isinstance(url, RegexURLResolver):
-            print('.' * ponto, url)
-            urlpatterns_filter(ponto + 4, url.url_patterns)
-        else:
-            print('.' * ponto, url)
-            if url.name == 'haystack_search':
-                print('parar')
-            if list(filter(url.regex.match, urlpatterns_remove)) and url.name:
-
-                remove_url.append(url)
-
-    for r_url in remove_url:
-        urls.remove(r_url)
-
-
-urlpatterns_filter(1, urlpatterns_all)
-"""
