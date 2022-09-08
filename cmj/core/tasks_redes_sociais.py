@@ -7,6 +7,7 @@ from django.utils.text import slugify
 import requests
 
 from cmj.celery import app
+from sapl.materia.models import MateriaLegislativa
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +24,6 @@ socials_connects = {
 
 @app.task(queue='celery', bind=True)
 def task_send_rede_social(self, rede, instance_serialized):
-    print('task_send_rede_social')
 
     list_objs = list(serializers.deserialize('json', instance_serialized))
 
@@ -40,7 +40,7 @@ def task_send_rede_social(self, rede, instance_serialized):
 
 
 def send_telegram_materia_materialegislativa(instance):
-    print('send_telegram_materia_materialegislativa')
+    instance = MateriaLegislativa.objects.get(pk=instance.id)
     md = instance.metadata
 
     if not md:
