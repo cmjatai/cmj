@@ -8,11 +8,14 @@ from django.db.models.signals import post_save, pre_save, post_delete
 from django.dispatch.dispatcher import receiver
 from django.utils import timezone
 
+from cmj.core import tasks
 from cmj.core.functions_for_signals import send_mail,\
     signed_name_and_date_extract_pre_save, audit_log_function
 from cmj.core.models import Notificacao
-from cmj.core.tasks_redes_sociais import task_send_rede_social
 from cmj.settings import EMAIL_SEND_USER
+
+
+logger = logging.getLogger(__name__)
 
 
 for app in apps.get_app_configs():
@@ -37,7 +40,7 @@ def post_save_rede_social(sender, instance, using, **kwargs):
         return
 
     running = {
-        'MateriaLegislativa': date(2022, 9, 7),
+        'MateriaLegislativa': date(2022, 9, 1),
     }
     if instance._meta.object_name not in running.keys():
         return
@@ -75,18 +78,19 @@ def post_save_rede_social(sender, instance, using, **kwargs):
 
         now = timezone.now()
 
-        s[r] = now
+        s[r] = timezone.localtime()
         md['send'] = s
         instance.metadata = md
         instance.save()
 
         td = timedelta(
             seconds=(
-                1 if settings.DEBUG else 600
+                30 if settings.DEBUG else 600
             ) + 10 * i
         )
-
-        task_send_rede_social.apply_async(
+        print('chamou task_send_rede_social', td)
+        logger.info('chamou task_send_rede_social')
+        tasks.task_send_rede_social.apply_async(
             (r, serialize('json', [instance]), ),
             eta=now + td
         )

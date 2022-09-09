@@ -31,24 +31,19 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         m = Manutencao()
-        post_delete.disconnect(dispatch_uid='timerefresh_post_delete_signal')
-        post_save.disconnect(dispatch_uid='timerefresh_post_save_signal')
-
-
+        m.desativa_signals()
 
         self.logger = logging.getLogger(__name__)
 
-        # PullExec.objects.timedelta_quota_pull()
+        PullExec.objects.timedelta_quota_pull()
         # self.corrigir_erro_causado_em_full_metadata()
-        # pull_youtube()
-        # vincular_sistema_aos_videos()
-        # video_documento_na_galeria()
-        # return
+        return
+        pull_youtube()
+        vincular_sistema_aos_videos()
+        video_documento_na_galeria()
         # vincular_sistema_aos_videos()
         # video_documento_na_galeria()
         # pull_youtube_metadata_video(Video.objects.first())
-
-        return
 
         for v in Video.objects.order_by('-id')[:40]:
 
