@@ -201,7 +201,7 @@
     })
   </script>
 
-  {% if not DEBUG %}
+  {% if not DEBUG and not perms.materia and not perms.norma and not perms.sessao %}
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-2431536-7"></script>
     <script>
       window.fbAsyncInit = function () {
