@@ -1,10 +1,12 @@
-from datetime import datetime
+from datetime import datetime, date, timedelta
 import inspect
 import json
 import logging
 
 from PyPDF4.pdf import PdfFileReader
+from asgiref.sync import async_to_sync
 from asn1crypto import cms
+from channels.layers import get_channel_layer
 from django.conf import settings
 from django.core import serializers
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -12,22 +14,16 @@ from django.core.mail.message import EmailMultiAlternatives
 from django.template import loader
 from django.utils import timezone
 
+from cmj.core import tasks
 from cmj.core.models import AuditLog, OcrMyPDF, Bi
+from cmj.settings.email import EMAIL_SEND_USER
 from cmj.sigad.models import ShortRedirect
 
 
-def send_mail(subject, email_template_name,
-              context, from_email, to_email):
-    subject = ''.join(subject.splitlines())
-
-    html_email = loader.render_to_string(email_template_name, context)
-
-    email_message = EmailMultiAlternatives(subject, '', from_email, [to_email])
-    email_message.attach_alternative(html_email, 'text/html')
-    email_message.send()
+logger = logging.getLogger(__name__)
 
 
-def audit_log_function(sender, **kwargs):
+def auditlog_signal_function(sender, **kwargs):
 
     try:
         app_name = sender._meta.app_config.name[:4]
@@ -48,8 +44,6 @@ def audit_log_function(sender, **kwargs):
         # Documento
     ):
         return
-
-    logger = logging.getLogger(__name__)
 
     u = None
     stack = ''
@@ -72,7 +66,10 @@ def audit_log_function(sender, **kwargs):
     try:
         # logger.info('\n'.join(stack))
 
-        operation = kwargs.get('operation')
+        operation = kwargs.get('created', 'D')
+        if operation != 'D':
+            operation = 'C' if operation else 'U'
+
         al = AuditLog()
         al.user = u
         al.email = u.email if u else ''
@@ -95,58 +92,191 @@ def audit_log_function(sender, **kwargs):
         logger.error(e)
 
 
-def run_signed_name_and_date_via_fields(fields):
-    signs = {}
+def notificacao_signal_function(sender, instance, **kwargs):
 
-    for key, field in fields.items():
+    if hasattr(instance, 'not_send_mail') and instance.not_send_mail:
+        return
 
-        if '/FT' not in field and field['/FT'] != '/Sig':
-            continue
-        if '/V' not in field:
-            continue
+    if instance.user.be_notified_by_email:
 
-            # .format(field['/V']['/Reason'])
-        nome = 'Nome do assinante não localizado.'
-        content_sign = field['/V']['/Contents']
+        send_mail(
+            instance.content_object.email_notify['subject'],
+            'email/notificacao_%s_%s.html' % (
+                instance.content_object._meta.app_label,
+                instance.content_object._meta.model_name
+            ),
+            {'notificacao': instance}, EMAIL_SEND_USER, instance.user.email)
+
+        print('Uma Notificação foi enviada %s - user: %s - user_origin: %s' % (
+            instance.pk,
+            instance.user,
+            instance.user_origin))
+
+
+def redesocial_post_function(sender, instance, **kwargs):
+
+    if not hasattr(instance, '_meta') or \
+        instance._meta.app_config is None or \
+            not instance._meta.app_config.name in settings.BUSINESS_APPS:
+        return
+
+    running = {
+        'MateriaLegislativa': date(2022, 9, 1),
+    }
+    if instance._meta.object_name not in running.keys():
+        return
+
+    if not hasattr(instance, 'metadata'):
+        return
+
+    redes = [
+        'telegram'
+    ]
+
+    for i, r in enumerate(redes, 1):
+        md = instance.metadata
+        if not md:
+            md = {}
+
+        if 'send' in md and r in md['send']:
+            return
+
+        s = md.get('send', {r: None})
+
+        if r in s and s[r]:
+            return
+
+        for d in ('data', 'data_apresentacao', 'public_date'):
+            if hasattr(instance, d):
+                d = getattr(instance, d)
+                if not d:
+                    return
+                if isinstance(d, datetime):
+                    d = d.date()
+
+                if d < running[instance._meta.object_name]:
+                    return
+
+        now = timezone.now()
+
+        s[r] = timezone.localtime()
+        md['send'] = s
+        instance.metadata = md
+        instance.save()
+
+        td = timedelta(
+            seconds=(
+                30 if settings.DEBUG else 600
+            ) + 10 * i
+        )
+        print('chamou task_send_rede_social', td)
+        logger.info('chamou task_send_rede_social')
+        tasks.task_send_rede_social.apply_async(
+            (
+                r,
+                instance._meta.app_label,
+                instance._meta.model_name,
+                instance.id
+            ),
+            eta=now + td
+        )
+
+
+def send_mail(subject, email_template_name, context, from_email, to_email):
+    subject = ''.join(subject.splitlines())
+    html_email = loader.render_to_string(email_template_name, context)
+    email_message = EmailMultiAlternatives(subject, '', from_email, [to_email])
+    email_message.attach_alternative(html_email, 'text/html')
+    email_message.send()
+
+
+def send_signal_for_websocket_time_refresh(inst, **kwargs):
+
+    action = 'post_save' if 'created' in kwargs else 'post_delete'
+
+    if not settings.USE_CHANNEL_LAYERS:
+        return
+
+    if hasattr(inst, '_meta') and \
+        not inst._meta.app_config is None and \
+            inst._meta.app_config.name[:4] in ('sapl', ):  # 'cmj.'):
+
         try:
-            signed_data = cms.ContentInfo.load(content_sign)['content']
-            oun_old = []
-            for cert in signed_data['certificates']:
-                subject = cert.native['tbs_certificate']['subject']
-                oun = subject['organizational_unit_name']
+            if hasattr(inst, 'ws_sync') and not inst.ws_sync():
+                return
 
-                if isinstance(oun, str):
-                    continue
+            channel_layer = get_channel_layer()
 
-                if len(oun) > len(oun_old):
-                    oun_old = oun
-                    nome = subject['common_name'].split(':')[0]
-        except:
-            if '/Name' in field['/V']:
-                nome = field['/V']['/Name']
-
-        fd = None
-        try:
-            data = str(field['/V']['/M'])
-
-            if 'D:' not in data:
-                data = None
-            else:
-                if not data.endswith('Z'):
-                    data = data.replace('Z', '+')
-                data = data.replace("'", '')
-
-                fd = datetime.strptime(data[2:], '%Y%m%d%H%M%S%z')
-        except:
-            pass
-
-        if nome not in signs:
-            signs[nome] = fd
-
-    return signs
+            async_to_sync(channel_layer.group_send)(
+                "group_time_refresh_channel", {
+                    "type": "time_refresh.message",
+                    'message': {
+                        'action': action,
+                        'id': inst.id,
+                        'app': inst._meta.app_label,
+                        'model': inst._meta.model_name
+                    }
+                }
+            )
+        except Exception as e:
+            logger.info(_("Erro na comunicação com o backend do redis. "
+                          "Certifique se possuir um servidor de redis "
+                          "ativo funcionando como configurado em "
+                          "CHANNEL_LAYERS"))
 
 
-def signed_name_and_date_extract_pre_save(sender, instance, using, **kwargs):
+def signed_files_extraction_function(sender, instance, **kwargs):
+
+    def run_signed_name_and_date_via_fields(fields):
+        signs = {}
+
+        for key, field in fields.items():
+
+            if '/FT' not in field and field['/FT'] != '/Sig':
+                continue
+            if '/V' not in field:
+                continue
+
+                # .format(field['/V']['/Reason'])
+            nome = 'Nome do assinante não localizado.'
+            content_sign = field['/V']['/Contents']
+            try:
+                signed_data = cms.ContentInfo.load(content_sign)['content']
+                oun_old = []
+                for cert in signed_data['certificates']:
+                    subject = cert.native['tbs_certificate']['subject']
+                    oun = subject['organizational_unit_name']
+
+                    if isinstance(oun, str):
+                        continue
+
+                    if len(oun) > len(oun_old):
+                        oun_old = oun
+                        nome = subject['common_name'].split(':')[0]
+            except:
+                if '/Name' in field['/V']:
+                    nome = field['/V']['/Name']
+
+            fd = None
+            try:
+                data = str(field['/V']['/M'])
+
+                if 'D:' not in data:
+                    data = None
+                else:
+                    if not data.endswith('Z'):
+                        data = data.replace('Z', '+')
+                    data = data.replace("'", '')
+
+                    fd = datetime.strptime(data[2:], '%Y%m%d%H%M%S%z')
+            except:
+                pass
+
+            if nome not in signs:
+                signs[nome] = fd
+
+        return signs
+
     def run_signed_name_and_date_extract(file):
         signs = {}
         fields = {}
@@ -255,7 +385,7 @@ def signed_name_and_date_extract_pre_save(sender, instance, using, **kwargs):
             meta_signs['hom' if s[0] == cn else 'signs'].append(s)
         return meta_signs
 
-        # checa se documento está homologado
+    # checa se documento está homologado
 
     if not hasattr(instance, 'FIELDFILE_NAME') or not hasattr(instance, 'metadata'):
         return

@@ -1,7 +1,6 @@
 import logging
 
 from django.conf import settings
-from django.core import serializers
 from django.utils import timezone
 from django.utils.text import slugify
 import requests
@@ -23,42 +22,25 @@ socials_connects = {
 
 
 @app.task(queue='celery', bind=True)
-def task_send_rede_social(self, *args, **kwargs):
+def task_send_rede_social(self, rede, app_label, model_name, pk):
     # print(args)
     # print(kwargs)
     # return
 
-    print('task_send_rede_social iniciou execução')
-    logger.info('task_send_rede_social iniciou execução')
-
-    print(args[0])
-
-    print(args[1])
-
-    try:
-        list_objs = list(serializers.deserialize('json', args[1]))
-    except Exception as e:
-        print(e)
-        return
-
-    print(list_objs)
-    if not list_objs:
-        return
-
-    instance = list_objs[0].object
-
-    send_func = f'send_{args[0]}_{instance._meta.db_table}'
+    send_func = f'send_{rede}_{app_label}_{model_name}'
+    print(f'print, task_send_rede_social iniciou execução: {send_func}')
+    logger.info(f'logger task_send_rede_social iniciou execução: {send_func}')
 
     gf = globals()
     if send_func in gf:
-        return gf[send_func](instance)
+        return gf[send_func](pk)
 
 
-def send_telegram_materia_materialegislativa(instance):
+def send_telegram_materia_materialegislativa(pk):
     print('send matéria iniciou execução')
     logger.info('send matéria iniciou execução')
 
-    instance = MateriaLegislativa.objects.get(pk=instance.id)
+    instance = MateriaLegislativa.objects.get(pk=pk)
     md = instance.metadata
 
     if not md:
@@ -85,8 +67,8 @@ def send_telegram_materia_materialegislativa(instance):
 Autoria:
 {autores}
 
-<a href="{settings.SITE_URL}/materia/{instance.id}">Acompanhe o Processo Legislativo desta Matéria clicando aqui.</a>
 {autores_hash_tag}
+<a href="{settings.SITE_URL}/materia/{instance.id}">Acompanhe o Processo Legislativo desta Matéria clicando aqui.</a>
     """
 
     #<tg-spoiler>spoiler</tg-spoiler>

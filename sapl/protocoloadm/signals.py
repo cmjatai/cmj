@@ -4,10 +4,11 @@ from django.conf import settings
 from django.db.models.signals import post_save, pre_save
 from django.dispatch.dispatcher import receiver
 
-from cmj.core.signals import send_mail
+from cmj.core.signals_functions import send_mail
 from cmj.settings import EMAIL_SEND_USER
 from sapl.protocoloadm.models import Protocolo, DocumentoAdministrativo
 from sapl.utils import create_barcode
+
 
 logger = logging.getLogger(__name__)
 

@@ -38,8 +38,7 @@ class Command(BaseCommand):
         self.logger = logging.getLogger(__name__)
         m = Manutencao()
         m.desativa_auto_now()
-        post_delete.disconnect(dispatch_uid='timerefresh_post_delete_signal')
-        post_save.disconnect(dispatch_uid='timerefresh_post_save_signal')
+        post_save.disconnect(dispatch_uid='timerefresh_post_signal')
         self.logger = logging.getLogger(__name__)
 
     def criar_pdfs(self, *args, **options):
