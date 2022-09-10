@@ -2,14 +2,21 @@
 import inspect
 import logging
 import sys
+import warnings
+
 from decouple import AutoConfig
 import yaml
+
 
 config = AutoConfig()
 LOGGING_ROOT_LEVEL = config('LOGGING_ROOT_LEVEL', default='WARNING', cast=str)
 
 logging.captureWarnings(True)
 yaml.warnings({'YAMLLoadWarning': False})
+
+
+warnings.filterwarnings('ignore', module='floppyforms',
+                        message='Unable to import floppyforms.gis')
 
 
 class MyFormatter(logging.Formatter):
