@@ -11,5 +11,3 @@ class AppConfig(apps.AppConfig):
 
     def ready(self):
         from . import signals
-
-        # run_celery()
