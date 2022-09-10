@@ -21,11 +21,3 @@ EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool, default=True)
 EMAIL_USE_SSL = config('EMAIL_USE_SSL', cast=bool, default=False)
 EMAIL_SEND_USER = config('EMAIL_SEND_USER', cast=str, default='')
 EMAIL_RUNNING = None
-
-len_emails = len(EMAIL_HOST_USER)
-if len_emails > 0:
-    pos = int(random() * len_emails)
-    pos = pos % len_emails
-
-    print(pos, EMAIL_HOST_USER)
-    EMAIL_HOST_USER = EMAIL_HOST_USER[0]
