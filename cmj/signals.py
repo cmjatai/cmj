@@ -7,8 +7,15 @@ from django.conf import settings
 from django.db.models.signals import post_save, post_delete
 from django.dispatch.dispatcher import receiver
 from django.utils.translation import ugettext_lazy as _
+from django_celery_results.models import TaskResult
 
+from cmj.diarios.models import DiarioOficial
 from cmj.sigad.models import Documento
+from sapl.materia.models import MateriaLegislativa, DocumentoAcessorio
+from sapl.norma.models import NormaJuridica
+from sapl.protocoloadm.models import DocumentoAdministrativo
+from sapl.sessao.models import SessaoPlenaria
+
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +23,15 @@ logger = logging.getLogger(__name__)
 class CelerySignalProcessor(CelerySignalProcessor):
 
     def enqueue_save(self, sender, instance, **kwargs):
+        if sender not in (DiarioOficial,
+                          Documento,
+                          DocumentoAdministrativo,
+                          DocumentoAcessorio,
+                          MateriaLegislativa,
+                          NormaJuridica,
+                          SessaoPlenaria):
+            return
+
         action = 'update'
         if isinstance(instance, Documento):
             if instance.visibilidade != Documento.STATUS_PUBLIC:
