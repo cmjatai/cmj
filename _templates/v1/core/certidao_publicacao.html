@@ -10,7 +10,7 @@
 	@page{
     margin-top: 1cm;
     margin-left: {% if print %}1cm;{% else %}3.5cm;{% endif %}
-    size: A4 portrait;	
+    size: A4 portrait;
 
 	}
 	.container-cert-pub {
@@ -50,7 +50,7 @@
   .hash {
     overflow-wrap: break-word;
     word-wrap: break-word;
-    word-break: break-word;
+    
     font-size: 0.7em;
   }
   .url {
@@ -83,7 +83,7 @@
           2){{ content_object_url.ocr }}
           <div class="hash">
             <strong>Original com hash512:</strong><br>{{object.hash_code}}
-          </div> 
+          </div>
         </div>
     </div>
     <div class="inner-body">
@@ -96,10 +96,10 @@
         <div class="assinatura">
         Departamento de Documentação Eletrônica
         </div>
-        
+
       </div>
     </div>
   </div>
-</body> 
+</body>
 
 </html>

@@ -21,6 +21,7 @@ class CelerySignalProcessor(CelerySignalProcessor):
             if instance.visibilidade != Documento.STATUS_PUBLIC:
                 action = 'delete'
 
+        logger.info(f'{str(sender)} - {instance.id} - {instance}')
         return self.enqueue(action, instance, sender, **kwargs)
 
     def enqueue_delete(self, sender, instance, **kwargs):
