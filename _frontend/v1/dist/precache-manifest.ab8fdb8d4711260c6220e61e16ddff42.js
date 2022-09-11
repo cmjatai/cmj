@@ -28,8 +28,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/brasao/escola_1024.png"
   },
   {
-    "revision": "3b248c22cc4948cf9ba8",
-    "url": "/static/css/app.4af48486.css"
+    "revision": "336ad30c39d676298f29",
+    "url": "/static/css/app.6fc93e9b.css"
   },
   {
     "revision": "2d9dcc9be90ce85c13d2",
@@ -236,6 +236,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/icon_save_white.png"
   },
   {
+    "revision": "c79840b15ffb49df44967f48807086b3",
+    "url": "/static/img/icon_telegram64x64.png"
+  },
+  {
     "revision": "1d5eeaaa12bce45bbff08db8649e8236",
     "url": "/static/img/icon_transparencia.png"
   },
@@ -324,11 +328,11 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/user.png"
   },
   {
-    "revision": "ecfceb7d4a1d0c7c7c5852c7c0d49217",
+    "revision": "9ce5c84033c0240aa853c6cd76d9147e",
     "url": "/static/index.html"
   },
   {
-    "revision": "3b248c22cc4948cf9ba8",
+    "revision": "336ad30c39d676298f29",
     "url": "/static/js/app.02f447b3.js"
   },
   {

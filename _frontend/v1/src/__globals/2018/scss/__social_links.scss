@@ -72,12 +72,18 @@
       background-image: url(~@/assets/img/icon_instagram64x64.png);
       }
     }
+    &.telegram {
+      &::after {
+      background-image: url(~@/assets/img/icon_telegram64x64.png);
+      }
+    }
 
     &.facebook,
     &.whatsapp,
     &.twitter,
     &.youtube,
-    &.instagram {
+    &.instagram,
+    &.telegram {
       position: relative;
       i {
         display: none;
