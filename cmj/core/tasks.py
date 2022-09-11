@@ -1,12 +1,16 @@
 import logging
 
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 from django.utils.text import slugify
 import requests
 
 from cmj.celery import app
+from cmj.sigad.models import Documento
+from cmj.videos.models import VideoParte
 from sapl.materia.models import MateriaLegislativa
+
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +38,80 @@ def task_send_rede_social(self, rede, app_label, model_name, pk):
     gf = globals()
     if send_func in gf:
         return gf[send_func](pk)
+
+
+def send_telegram_sigad_documento(pk):
+    print('send documento iniciou execução')
+    logger.info('send documento iniciou execução')
+
+    instance = Documento.objects.filter(pk=pk).first()
+    if not instance:
+        return
+
+    md = instance.metadata
+
+    if not md:
+        md = {}
+
+    if 'send' not in md:
+        md['send'] = {}
+
+    md['send']['telegram'] = timezone.localtime()
+    instance.metadata = md
+    instance.save()
+
+    ct = ContentType.objects.get_by_natural_key('sigad', 'documento')
+    vp = VideoParte.objects.filter(
+        content_type=ct, object_id=instance.id).first()
+
+    texto = ''
+    if vp:
+        link = f'https://youtu.be/{vp.video.vid}'
+    else:
+        link = f'<a href="{settings.SITE_URL}/{instance.slug}">Leia mais!</a>'
+
+        texto = instance.texto or ''
+        tt = ''
+        for t in texto.split(' '):
+            if len(tt) < 200:
+                tt += t + ' '
+            else:
+                texto = tt.strip() + '...'
+                texto = f"""
+                <pre>{texto}</pre>
+                """
+                break
+
+    text = f"""#{instance.classe.titulo}
+<b>{str(instance.titulo).upper()}</b>   
+    
+<i>{instance.descricao or ''}</i>
+{texto}
+{link}
+    """
+
+    #<tg-spoiler>spoiler</tg-spoiler>
+    # if settings.DEBUG:
+    print(text)
+    logger.info(text)
+    #    return
+
+    url_base = socials_connects['telegram']['url_base']
+    CHAT_ID = socials_connects['telegram']['CHAT_ID']
+
+    try:
+        r = requests.post(
+            url_base.format(
+                endpoint='sendMessage'
+            ),
+            data={
+                'parse_mode': 'html',
+                'chat_id': CHAT_ID,
+                'text': text,
+            }
+        )
+    except Exception as e:
+        print(e)
 
 
 def send_telegram_materia_materialegislativa(pk):

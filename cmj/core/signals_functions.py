@@ -120,13 +120,24 @@ def redesocial_post_function(sender, instance, **kwargs):
             not instance._meta.app_config.name in settings.BUSINESS_APPS:
         return
 
-    running = {
-        'MateriaLegislativa': date(2022, 9, 7),
-    }
-    if instance._meta.object_name not in running.keys():
+    if not hasattr(instance, 'metadata'):
         return
 
-    if not hasattr(instance, 'metadata'):
+    if hasattr(instance, 'parent') and instance.parent:
+        return
+
+    running = {
+        'MateriaLegislativa': {
+            'data_min': date(2022, 9, 7),
+            'time_call': 30 if settings.DEBUG else 600
+        },
+        'Documento': {
+            'data_min': date(2022, 9, 11),
+            'time_call': 30 if settings.DEBUG else 3600
+        },
+    }
+
+    if instance._meta.object_name not in running.keys():
         return
 
     redes = [
@@ -147,14 +158,16 @@ def redesocial_post_function(sender, instance, **kwargs):
             return
 
         for d in ('data', 'data_apresentacao', 'public_date'):
+
             if hasattr(instance, d):
                 d = getattr(instance, d)
+
                 if not d:
                     return
                 if isinstance(d, datetime):
                     d = d.date()
 
-                if d < running[instance._meta.object_name]:
+                if d < running[instance._meta.object_name]['data_min']:
                     return
 
         now = timezone.now()
@@ -165,9 +178,7 @@ def redesocial_post_function(sender, instance, **kwargs):
         instance.save()
 
         td = timedelta(
-            seconds=(
-                30 if settings.DEBUG else 600
-            ) + 10 * i
+            seconds=running[instance._meta.object_name]['time_call']
         )
         print('chamou task_send_rede_social', td)
         logger.info('chamou task_send_rede_social')

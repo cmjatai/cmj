@@ -127,6 +127,10 @@ class Parent(models.Model):
         'self', blank=True,
         verbose_name=_('Classes Relacionadas'))
 
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+
     class Meta:
         abstract = True
 
