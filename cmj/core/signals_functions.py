@@ -121,7 +121,7 @@ def redesocial_post_function(sender, instance, **kwargs):
         return
 
     running = {
-        'MateriaLegislativa': date(2022, 9, 1),
+        'MateriaLegislativa': date(2022, 9, 7),
     }
     if instance._meta.object_name not in running.keys():
         return
