@@ -60,35 +60,36 @@ def send_telegram_sigad_documento(pk):
     instance.metadata = md
     instance.save()
 
+    descricao = instance.descricao or ''
+    if descricao and descricao != instance.titulo:
+        descricao = f'{chr(10)}{chr(10)}<i>{descricao}</i>'
+    else:
+        descricao = ''
+
+    texto = instance.texto or ''
+    tt = ''
+    for t in texto.split(' '):
+        if len(tt) < 200:
+            tt += t + ' '
+        else:
+            texto = tt.strip() + '...'
+            break
+    if texto:
+        texto = f"""{chr(10)}{chr(10)}<pre>{texto}</pre>"""
+
     ct = ContentType.objects.get_by_natural_key('sigad', 'documento')
     vp = VideoParte.objects.filter(
         content_type=ct, object_id=instance.id).first()
-
-    texto = ''
-    if vp:
-        link = f'https://youtu.be/{vp.video.vid}'
+    live = ''
+    if vp and 'video' in instance.slug:
+        link = f'{chr(10)}{chr(10)}https://youtu.be/{vp.video.vid}'
+        if vp.video.json['snippet']['liveBroadcastContent'] == 'live':
+            live = f'#AoVivo'
     else:
-        link = f'<a href="{settings.SITE_URL}/{instance.slug}">Leia mais!</a>'
+        link = f'{chr(10)}{chr(10)}<a href="{settings.SITE_URL}/{instance.slug}">Leia mais!</a>'
 
-        texto = instance.texto or ''
-        tt = ''
-        for t in texto.split(' '):
-            if len(tt) < 200:
-                tt += t + ' '
-            else:
-                texto = tt.strip() + '...'
-                texto = f"""
-                <pre>{texto}</pre>
-                """
-                break
-
-    text = f"""#{instance.classe.titulo}
-<b>{str(instance.titulo).upper()}</b>   
-    
-<i>{instance.descricao or ''}</i>
-{texto}
-{link}
-    """
+    text = f"""#{instance.classe.titulo} {live}
+<b>{instance.titulo}</b>{descricao}{texto}{link}"""
 
     #<tg-spoiler>spoiler</tg-spoiler>
     # if settings.DEBUG:
