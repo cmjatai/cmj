@@ -8,6 +8,7 @@ from asgiref.sync import async_to_sync
 from asn1crypto import cms
 from channels.layers import get_channel_layer
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 from django.core import serializers
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.mail.message import EmailMultiAlternatives
@@ -18,6 +19,7 @@ from cmj.core import tasks
 from cmj.core.models import AuditLog, OcrMyPDF, Bi
 from cmj.settings.email import EMAIL_SEND_USER
 from cmj.sigad.models import ShortRedirect
+from cmj.videos.models import VideoParte
 
 
 logger = logging.getLogger(__name__)
@@ -113,6 +115,29 @@ def notificacao_signal_function(sender, instance, **kwargs):
             instance.user_origin))
 
 
+def redesocial_post_function_time_call_documento(inst):
+    if settings.DEBUG:
+        return 30
+    ct = ContentType.objects.get_by_natural_key('sigad', 'documento')
+    vp = VideoParte.objects.filter(
+        content_type=ct, object_id=inst.id).first()
+
+    if not vp:
+        return 3600
+
+    if vp.video.json['snippet']['liveBroadcastContent'] == 'live':
+        return 120
+    elif vp.video.json['snippet']['liveBroadcastContent'] == 'none':
+        return 3600
+    raise Exception
+
+
+def redesocial_post_function_time_call_materialegislativa(inst):
+    if settings.DEBUG:
+        return 30
+    return 600
+
+
 def redesocial_post_function(sender, instance, **kwargs):
 
     if not hasattr(instance, '_meta') or \
@@ -128,12 +153,12 @@ def redesocial_post_function(sender, instance, **kwargs):
 
     running = {
         'MateriaLegislativa': {
-            'data_min': date(2022, 9, 7),
-            'time_call': 30 if settings.DEBUG else 600
+            'data_min': date(2022, 9, 7) if not settings.DEBUG else date(2022, 1, 1),
+            'time_call': redesocial_post_function_time_call_materialegislativa
         },
         'Documento': {
-            'data_min': date(2022, 9, 11),
-            'time_call': 30 if settings.DEBUG else 3600
+            'data_min': date(2022, 9, 11) if not settings.DEBUG else date(2022, 1, 1),
+            'time_call': redesocial_post_function_time_call_documento
         },
     }
 
@@ -171,15 +196,19 @@ def redesocial_post_function(sender, instance, **kwargs):
                     return
 
         now = timezone.now()
+        try:
+            td = timedelta(
+                seconds=running[instance._meta.object_name]['time_call'](
+                    instance)
+            )
+        except:
+            return
 
         s[r] = timezone.localtime()
         md['send'] = s
         instance.metadata = md
         instance.save()
 
-        td = timedelta(
-            seconds=running[instance._meta.object_name]['time_call']
-        )
         print('chamou task_send_rede_social', td)
         logger.info('chamou task_send_rede_social')
         tasks.task_send_rede_social.apply_async(
