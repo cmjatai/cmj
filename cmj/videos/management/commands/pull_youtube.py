@@ -35,12 +35,17 @@ class Command(BaseCommand):
 
         self.logger = logging.getLogger(__name__)
 
-        PullExec.objects.timedelta_quota_pull()
+        # PullExec.objects.timedelta_quota_pull()
         # self.corrigir_erro_causado_em_full_metadata()
+        videos = Video.objects.filter(
+            json__snippet__liveBroadcastContent='upcoming')
+        for v in videos[:50]:
+            print(v.execucao, v.created, v)
+            pull_youtube_metadata_video(v)
+        # pull_youtube()
+        # vincular_sistema_aos_videos()
+        # video_documento_na_galeria()
         return
-        pull_youtube()
-        vincular_sistema_aos_videos()
-        video_documento_na_galeria()
         # vincular_sistema_aos_videos()
         # video_documento_na_galeria()
         # pull_youtube_metadata_video(Video.objects.first())

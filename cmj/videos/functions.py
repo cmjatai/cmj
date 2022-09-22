@@ -18,7 +18,7 @@ import requests as rq
 
 logger = logging.getLogger(__name__)
 
-DEBUG_TASKS = settings.DEBUG
+DEBUG_TASKS = not settings.DEBUG
 
 
 def pull_youtube_metadata_video(v):
@@ -46,6 +46,16 @@ def pull_youtube_metadata_video(v):
         data = r._content.decode('utf-8')
 
         r = json.loads(data)
+
+        if r.status_code == 200 and not r['items']:
+            for vp in v.videoparte_set.all():
+                if isinstance(vp.content_object, Documento):
+                    d = vp.content_object
+
+                    if d.classe_id == 233:
+                        d.delete()
+                vp.delete()
+            v.delete()
 
         v.json = r['items'][0]
 
