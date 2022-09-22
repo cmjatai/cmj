@@ -71,26 +71,36 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
         return context
 
     def get_ultimos_videos(self):
-        docs = list(Documento.objects.qs_video_news()[:20])
+        docs = list(Documento.objects.qs_video_news()[:100])
 
         r = []
 
-        inserir_programa_diario = True
+        inserir_programa_diario = {
+            'manhã cmj': True,
+            'doação de corpos': True,
+            'sessão ordinária': True
+        }
         for d in docs:
             ed = d.extra_data
             if 'snippet' in ed and \
                 'liveBroadcastContent' in ed['snippet'] and\
-                    ed['snippet']['liveBroadcastContent'] == 'live' or\
-                    "Manhã CMJ" in d.titulo and not inserir_programa_diario:
+                    ed['snippet']['liveBroadcastContent'] == 'live':
                 continue
 
-            r.append(d)
+            is_ipd = False
+            for ipd in inserir_programa_diario.keys():
+                if ipd in d.titulo.lower():
+                    is_ipd = True
+                    if inserir_programa_diario[ipd]:
+                        inserir_programa_diario[ipd] = False
+                        r.append(d)
+                        break
+
+            if not is_ipd:
+                r.append(d)
 
             if len(r) == 4:
                 break
-
-            if "Manhã CMJ" in d.titulo and inserir_programa_diario:
-                inserir_programa_diario = False
 
         return r
 
