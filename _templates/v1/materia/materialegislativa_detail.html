@@ -58,6 +58,11 @@
 {% endblock sub_actions %}
 
 {% block detail_content %}
+
+{% if object.em_tramitacao and perms.add_materialegislativa and not object.texto_articulado.exists %}
+<strong class="text-red">ATENÇÂO!!! Verificar Texto Articulado...</strong>
+{% endif %}
+
 <div class="item-listas container-table">
   <div class="item-raiz px-4">
     {% with object.autores.all.count as count_parlamentares %}

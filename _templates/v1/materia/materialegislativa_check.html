@@ -28,6 +28,9 @@
               {% if m.em_tramitacao %}
                 <br><strong class="text-red">Em Tramitação</strong>
               {% endif %}
+              {% if not m.texto_articulado.exists %}
+                <br><strong class="text-red">Sem Texto Articulado</strong>
+              {% endif %}
               <br>{{m.ementa}}
               <br>
               <small>

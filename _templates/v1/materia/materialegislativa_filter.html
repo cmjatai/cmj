@@ -36,7 +36,6 @@
               <tr>
                 <td class="item-listas">
                   <div class="item-raiz">
-
                     <div class="float-right">
                       {% with m.autores.all.count as count_parlamentares %}
                         {% for autor in m.autores.all %}
@@ -89,7 +88,7 @@
                         {% endfor %}
                       {% endif %}
                     </div>
-                    
+
                     <div class="links-texto">
                       {% if m.texto_original %}
                         <a class="link-texto" href="{{m.texto_original.url}}?u={% now "u"%}" title="Texto Original">
@@ -106,12 +105,9 @@
                         {{m.tipo.sigla}} {{m.numero}}/{{m.ano}} - {{m.tipo}}
                       </a>
                     </strong>
-
-
                     <div class="text-ementa">
                     {{ m.ementa }}
                     </div>
-
                         {% if m.url_video %}
                           <div class="container-youtube ">
                                 {% with m.url_video as url_video %}
@@ -119,7 +115,6 @@
                                 {% endwith %}
                           </div>
                         {% endif %}
-
                     <div class="">
                       <strong>Data de Apresentação:</strong> <span style="white-space: nowrap">{{m.data_apresentacao}}</span>
                       {% if m.protocolo_gr.first %}
@@ -290,10 +285,14 @@
                         {% endif %}
                       </div>
                     {% endif %}
+                    {% if m.em_tramitacao and perms.add_materialegislativa and not m.texto_articulado.exists %}
+                      <strong class="text-red">ATENÇÂO!!! Verificar Texto Articulado...</strong><br>
+                    {% endif %}
 
                     {% if m.em_tramitacao and mail_service_configured %}
-                      <a class="btn btn-sm btn-outline-primary" href="{% url 'sapl.materia:acompanhar_materia' m.id %}" data-toggle="tooltip" data-placement="top" title="Registre seu email para acompanhamento desta matéria. Você receberá um email sempre que está materia tramitar.">Acompanhar Matéria</a>
+                    <a class="btn btn-sm btn-outline-primary" href="{% url 'sapl.materia:acompanhar_materia' m.id %}" data-toggle="tooltip" data-placement="top" title="Registre seu email para acompanhamento desta matéria. Você receberá um email sempre que está materia tramitar.">Acompanhar Matéria</a>
                     {% endif %}
+
 
                     {% if False %}
                       {% if m.audienciapublica_set.exists %}
