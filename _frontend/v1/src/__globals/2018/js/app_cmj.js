@@ -412,11 +412,11 @@ window.Gallery = function () {
 
 window.autorModal = function () {
   $(function () {
-    let dialog = $('#modal_autor').dialog({
+    const dialog = $('#modal_autor').dialog({
       autoOpen: false,
       modal: true,
       width: 500,
-      height: 300,
+      height: 340,
       show: {
         effect: 'blind',
         duration: 500
@@ -430,46 +430,70 @@ window.autorModal = function () {
     $('#button-id-limpar').click(function () {
       $('#nome_autor').text('')
 
-      function cleanIfExists (fieldname) {
+      function clean_if_exists (fieldname) {
         if ($(fieldname).length > 0) {
           $(fieldname).val('')
         }
       }
-      cleanIfExists('#id_autor')
-      cleanIfExists('#id_autoria__autor')
+
+      clean_if_exists('#id_autor')
+      clean_if_exists('#id_autoria__autor')
+      clean_if_exists('#id_autorianorma__autor')
     })
 
     $('#button-id-pesquisar').click(function () {
       $('#q').val('')
-      $('#div-resultado').children().remove()
+      $('#div-resultado')
+        .children()
+        .remove()
       $('#modal_autor').dialog('open')
       $('#selecionar').attr('hidden', 'hidden')
     })
 
     $('#pesquisar').click(function () {
-      let query = $('#q').val()
-
-      $.get('/api/autor?q=' + query, function (data, status) {
-        $('#div-resultado').children().remove()
+      const json_data = {
+        q: $('#q').val()
+        // get_all: true
+      }
+      $.get('/api/base/autor/', json_data, function (data) {
+        $('#div-resultado')
+          .children()
+          .remove()
         if (data.pagination.total_entries === 0) {
           $('#selecionar').attr('hidden', 'hidden')
-          $('#div-resultado').html('<span class="alert"><strong>Nenhum resultado</strong></span>')
+          $('#div-resultado').html(
+            "<span class='alert'><strong>Nenhum resultado</strong></span>"
+          )
           return
         }
 
-        let select = $('<select id="resultados" style="min-width: 90%; max-width:90%;" size="5"/>')
+        const select = $(
+          '<select id="resultados" style="min-width: 90%; max-width:90%;" size="5"/>'
+        )
 
-        data.results.forEach(function (item, index) {
-          select.append($('<option>').attr('value', item.value).text(item.text))
+        data.results.forEach(function (item) {
+          select.append(
+            $('<option>')
+              .attr('value', item.id)
+              .text(item.nome)
+          )
         })
 
-        $('#div-resultado').append('<br/>').append(select)
+        $('#div-resultado')
+          .append('<br/>')
+          .append(select)
         $('#selecionar').removeAttr('hidden', 'hidden')
 
+        if (data.pagination.total_pages > 1) {
+          $('#div-resultado').prepend(
+            '<span><br/>Mostrando 10 primeiros autores relativos a sua busca.<br/></span>'
+          )
+        }
+
         $('#selecionar').click(function () {
-          let res = $('#resultados option:selected')
-          let id = res.val()
-          let nome = res.text()
+          const res = $('#resultados option:selected')
+          const id = res.val()
+          const nome = res.text()
 
           $('#nome_autor').text(nome)
 
@@ -481,11 +505,30 @@ window.autorModal = function () {
           if ($('#id_autor').length) {
             $('#id_autor').val(id)
           }
+          // MateriaLegislativa pesquisa Autor via a tabela AutoriaNorma
+          if ($('#id_autorianorma__autor').length) {
+            $('#id_autorianorma__autor').val(id)
+          }
+
           dialog.dialog('close')
         })
       })
     })
   })
+
+  /* function get_nome_autor(fieldname) {
+    if ($(fieldname).length > 0) { // se campo existir
+      if ($(fieldname).val() != "") { // e não for vazio
+        var id = $(fieldname).val();
+        $.get("/proposicao/get-nome-autor?id=" + id, function(data, status){
+            $("#nome_autor").text(data.nome);
+        });
+      }
+    }
+  }
+
+  get_nome_autor("#id_autor");
+  get_nome_autor("#id_autoria__autor"); */
 }
 
 window.OptionalCustomFrontEnd = function () {

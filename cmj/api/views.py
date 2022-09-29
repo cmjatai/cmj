@@ -20,21 +20,6 @@ from cmj.sigad.models import Documento, VersaoDeMidia, Midia,\
     ReferenciaEntreDocumentos
 
 
-@receiver(post_save, sender=settings.AUTH_USER_MODEL)
-def create_auth_token(sender, instance=None, created=False, **kwargs):
-    if created:
-        Token.objects.create(user=instance)
-
-
-@api_view(['POST'])
-@permission_classes([IsAdminUser])
-def recria_token(request, pk):
-    Token.objects.get(user_id=pk).delete()
-    token = Token.objects.create(user_id=pk)
-
-    return Response({"message": "Token recriado com sucesso!", "token": token.key})
-
-
 class AppVersionView(APIView):
     permission_classes = (IsAuthenticated,)
 

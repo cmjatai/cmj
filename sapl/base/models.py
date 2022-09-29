@@ -290,3 +290,29 @@ class OperadorAutor(CmjAuditoriaModelMixin):
 
     def __str__(self):
         return self.user_name
+
+
+class Metadata(models.Model):
+    content_type = models.ForeignKey(
+        ContentType,
+        blank=True,
+        null=True,
+        default=None,
+        on_delete=models.PROTECT)
+    object_id = models.PositiveIntegerField(
+        blank=True,
+        null=True,
+        default=None)
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+
+    class Meta:
+        verbose_name = _('Metadado')
+        verbose_name_plural = _('Metadados')
+        unique_together = (('content_type', 'object_id'), )
+
+    def __str__(self):
+        return f'Metadata de {self.content_object}'

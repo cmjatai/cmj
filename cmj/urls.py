@@ -90,7 +90,6 @@ urlpatterns_all = [
     url(r'', include(sapl.compilacao.urls)),
     url(r'', include(sapl.relatorios.urls)),
     url(r'', include(sapl.base.urls)),
-    url(r'', include(sapl.api.urls)),
 
 
     url(r'', include(sapl.redireciona_urls.urls)),
@@ -115,6 +114,7 @@ if settings.DEBUG:
 
 urlpatterns_all += [
     url(r'', include(cmj.api.urls)),
+    url(r'', include(sapl.api.urls)),
 
     # urls não tratadas até aqui será capturada por PathView de cmj.sigad
     url(r'', include(cmj.sigad.urls)),
