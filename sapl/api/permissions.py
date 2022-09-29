@@ -51,3 +51,11 @@ class SaplModelPermissions(DjangoModelPermissions):
             (request.user.is_authenticated or not self.authenticated_users_only) and
             request.user.has_perms(perms)
         )
+
+
+class ContainerPermission(SaplModelPermissions):
+
+    def has_permission(self, request, view):
+        view.permission_required = self.get_required_permissions(
+            request.method, view.queryset.model)
+        return True

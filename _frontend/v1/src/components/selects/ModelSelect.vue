@@ -34,9 +34,11 @@ export default {
        *
        */
       let _this = this
-      _this.options = [
-        { value: null, text: this.label }
-      ]
+      if (next_page === 1) {
+        _this.options = [
+          { value: null, text: this.label }
+        ]
+      }
       _this.utils.getModelOrderedList(_this.app, _this.model, _this.ordering, next_page)
         .then((response) => {
           _.each(response.data.results, function (item, idx) {

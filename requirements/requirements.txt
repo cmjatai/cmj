@@ -8,6 +8,9 @@ django-floppyforms==1.9.0
 django-haystack==2.8.1
 django-image-cropping==1.2.0
 django-model-utils==4.0.0
+drf-spectacular==0.24.2
+
+
 #django-reversion==3.0.7
 #django-reversion-compare==0.12.2
 django-webpack4-loader
@@ -15,7 +18,6 @@ django-webpack4-loader
 djangorestframework==3.12.4
 djangorestframework-simplejwt==4.4.0
 
-drf_yasg==1.17.0
 asn1crypto
 
 boto3==1.21.36

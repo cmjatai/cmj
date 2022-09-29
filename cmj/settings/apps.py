@@ -13,6 +13,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
+
     'social_django',
 
     'crispy_forms',
@@ -21,8 +22,11 @@ INSTALLED_APPS = (
     'easy_thumbnails',
     'image_cropping',
 
+    'drf_spectacular',
     'rest_framework',
-    'rest_framework_simplejwt' if PYTHON_VERSION >= PYTHON_VERSION_MIN_FOR_JWT else 'rest_framework.authtoken',
+
+    'rest_framework.authtoken',
+    #'rest_framework_simplejwt' if PYTHON_VERSION >= PYTHON_VERSION_MIN_FOR_JWT else 'rest_framework.authtoken',
 
     'django_filters',
 
