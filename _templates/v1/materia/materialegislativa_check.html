@@ -28,7 +28,7 @@
               {% if m.em_tramitacao %}
                 <br><strong class="text-red">Em Tramitação</strong>
               {% endif %}
-              {% if not m.texto_articulado.exists %}
+              {% if m.texto_articulado.first.dispositivos_set.count < 4 %}
                 <br><strong class="text-red">Sem Texto Articulado</strong>
               {% endif %}
               <br>{{m.ementa}}

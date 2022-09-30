@@ -285,7 +285,7 @@
                         {% endif %}
                       </div>
                     {% endif %}
-                    {% if m.tipo_id != 3 and m.em_tramitacao and perms.compilacao.add_textoarticulado and not m.texto_articulado.exists %}
+                    {% if m.tipo_id != 3 and m.em_tramitacao and perms.compilacao.add_textoarticulado and not m.texto_articulado.first.dispositivos_set.count < 4 %}
                       <strong class="text-red">ATENÇÂO!!! Verificar Texto Articulado...</strong><br>
                     {% endif %}
 

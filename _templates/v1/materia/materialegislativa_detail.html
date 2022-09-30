@@ -59,7 +59,7 @@
 
 {% block detail_content %}
 
-{% if object.tipo_id != 3 and object.em_tramitacao and perms.add_materialegislativa and not object.texto_articulado.exists %}
+{% if object.tipo_id != 3 and object.em_tramitacao and perms.add_materialegislativa and object.texto_articulado.first.dispositivos_set.count < 4 %}
   <strong class="text-red">ATENÇÂO!!! Verificar Texto Articulado...</strong>
 {% endif %}
 
