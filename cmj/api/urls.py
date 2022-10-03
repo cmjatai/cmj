@@ -1,9 +1,6 @@
-from django.conf import settings
-from django.conf.urls import include, url
-from rest_framework.authtoken.views import obtain_auth_token
-from rest_framework.routers import DefaultRouter
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
+from django.conf.urls import include, url
+from rest_framework.routers import DefaultRouter
 from cmj.api.views import DocumentoViewSet, BiViewSet, AppVersionView
 
 

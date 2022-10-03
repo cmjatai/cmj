@@ -16,7 +16,7 @@ drf-spectacular==0.24.2
 django-webpack4-loader
 
 djangorestframework==3.12.4
-djangorestframework-simplejwt==4.3.0
+#djangorestframework-simplejwt==4.4.0
 
 asn1crypto
 
@@ -62,7 +62,11 @@ unipath==1.1
 WeasyPrint==51
 qrcode
 #html5lib==0.999999
+kazoo==2.8.0
 
+
+
+ipython
 
 git+https://github.com/interlegis/django-admin-bootstrapped.git
 git+https://github.com/interlegis/trml2pdf.git

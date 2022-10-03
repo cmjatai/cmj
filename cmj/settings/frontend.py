@@ -91,22 +91,6 @@ if DEBUG and not WEBPACK_LOADER['DEFAULT']['STATS_FILE'].exists():
         f'webpack-stats.json')
 
 
-USE_CHANNEL_LAYERS = config(
-    'USE_CHANNEL_LAYERS', cast=bool, default=False)
-HOST_CHANNEL_LAYERS = config(
-    'HOST_CHANNEL_LAYERS', cast=str, default='localhost')
-PORT_CHANNEL_LAYERS = config(
-    'PORT_CHANNEL_LAYERS', cast=int, default=6379)
-
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [(HOST_CHANNEL_LAYERS, PORT_CHANNEL_LAYERS)],
-        },
-    },
-}
-
 STATICFILES_DIRS = (
     # BASE_DIR.child('static'),
     PROJECT_DIR.child('_frontend').child(FRONTEND_VERSION).child('dist'),
