@@ -9,9 +9,8 @@ from drfautoapi.drfautoapi import ApiViewSetConstrutor, \
     customize, wrapper_queryset_response_for_drf_action
 from sapl.api.mixins import ResponseFileMixin
 from sapl.api.permissions import SaplModelPermissions
-from sapl.comissoes.models import DocumentoAcessorio
 from sapl.materia.models import TipoMateriaLegislativa, Tramitacao,\
-    MateriaLegislativa, Proposicao, TipoProposicao
+    MateriaLegislativa, Proposicao, TipoProposicao, DocumentoAcessorio
 
 
 ApiViewSetConstrutor.build_class(
