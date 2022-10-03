@@ -71,7 +71,11 @@ export default {
     }
   },
   mounted: function () {
-    this.$connect()
+    try {
+      this.$connect()
+    } catch (e) {
+      console.log(e) // Logs the error
+    }
     this.initCache()
   },
   beforeDestroy: function () {

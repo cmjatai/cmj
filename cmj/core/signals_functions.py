@@ -144,6 +144,8 @@ def redesocial_post_function_time_call_materialegislativa(inst):
 
 def redesocial_post_function(sender, instance, **kwargs):
 
+    return
+
     if not hasattr(instance, '_meta') or \
         instance._meta.app_config is None or \
             not instance._meta.app_config.name in settings.BUSINESS_APPS:
@@ -237,9 +239,6 @@ def send_mail(subject, email_template_name, context, from_email, to_email):
 def send_signal_for_websocket_time_refresh(inst, **kwargs):
 
     action = 'post_save' if 'created' in kwargs else 'post_delete'
-
-    if not settings.USE_CHANNEL_LAYERS:
-        return
 
     if hasattr(inst, '_meta') and \
         not inst._meta.app_config is None and \

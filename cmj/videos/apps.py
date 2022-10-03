@@ -1,3 +1,4 @@
+import inspect
 import random
 
 from django import apps
@@ -17,7 +18,19 @@ class AppConfig(apps.AppConfig):
         from . import tasks
         from cmj.celery import app as celery_app
 
-        if settings.DEBUG or settings.FRONTEND_VERSION != 'v1' or 'www2' in __file__:
+        return
+
+        for i in inspect.stack():
+            try:
+                if i.frame.f_locals['subcommand'] == 'migrate':
+                    return
+            except:
+                pass
+
+        if settings.DEBUG:
+            return
+
+        if 'sqlite3' in settings.DATABASES['default']['ENGINE']:
             return
 
         try:

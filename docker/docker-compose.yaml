@@ -1,0 +1,78 @@
+version: "3.7"
+services:
+  cmjredis:
+    image: redis:alpine
+    container_name: cmjredis
+    labels:
+       NAME: "cmjredis"
+    networks:
+      - cmj-net
+  cmjsolr:
+    image: solr:8.11
+    restart: always
+    command: bin/solr start -c -f
+    container_name: cmjsolr
+    labels:
+        NAME: "cmjsolr"
+    volumes:
+      - solr_data:/opt/solr/server/solr
+      - solr_configsets:/opt/solr/server/solr/configsets
+    #ports:
+    #  - "8983:8983"
+    networks:
+      - cmj-net
+  cmjdb:
+    image: postgres:14.5-alpine
+    restart: always
+    container_name: cmjpostgres
+    labels:
+        NAME: "cmjpostgres"
+    environment:
+      POSTGRES_PASSWORD: cmj
+      POSTGRES_USER: cmj
+      POSTGRES_DB: cmj
+      PGDATA : /var/lib/postgresql/data/
+    volumes:
+      - cmjdb_data:/var/lib/postgresql/data/
+        #ports:
+        #  - "5433:5432"
+    networks:
+      - cmj-net
+  cmj:
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    container_name: cmj
+    labels:
+       NAME: "cmj"
+    restart: always
+    environment:
+      DEBUG: 'False'
+      USE_SOLR: 'True'
+      SOLR_COLLECTION: cmj_portal
+      SOLR_URL: http://solr:solr@cmjsolr:8983
+      IS_ZK_EMBEDDED: 'True'
+      TZ: America/Sao_Paulo
+    volumes:
+      - cmj_data:/var/cmjatai/cmj_data
+      - cmj_media:/var/cmjatai/cmj_media
+      - cmj_logs:/var/cmjatai/cmj/logs
+    depends_on:
+      - cmjredis
+      - cmjdb
+      - cmjsolr
+    ports:
+      - "8001:80"
+    networks:
+      - cmj-net
+networks:
+  cmj-net:
+    name: cmj-net
+    driver: bridge
+volumes:
+  cmjdb_data:
+  cmj_data:
+  cmj_media:
+  cmj_logs:
+  solr_data:
+  solr_configsets:

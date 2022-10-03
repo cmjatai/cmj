@@ -29,7 +29,7 @@ class Command(BaseCommand):
 
     s3_server = 's3_cmj'
 
-    bucket_name = 'cmjatai_portal'
+    bucket_name = 'cmjatai-portal'
 
     def add_arguments(self, parser):
         parser.add_argument('--last_days',  type=int, default=0)
