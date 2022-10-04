@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.db.models import Q
+from django.urls.base import reverse
 from image_cropping.utils import get_backend
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
@@ -17,9 +18,17 @@ from sapl.sessao.models import OrdemDia, SessaoPlenaria
 class SaplSerializerMixin(serializers.ModelSerializer):
     __str__ = SerializerMethodField()
     #metadata = SerializerMethodField()
+    link_detail_backend = SerializerMethodField()
 
     class Meta:
         fields = '__all__'
+
+    def get_link_detail_backend(self, obj):
+        try:
+            return reverse(f'{self.Meta.model._meta.app_config.name}:{self.Meta.model._meta.model_name}_detail',
+                           kwargs={'pk': obj.pk})
+        except:
+            return ''
 
     def get___str__(self, obj) -> str:
         return str(obj)
