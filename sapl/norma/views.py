@@ -376,9 +376,19 @@ class NormaCrud(Crud):
 
         def get_queryset(self):
             qs = Crud.ListView.get_queryset(self)
-            q = Q(checkcheck=False) | Q(texto_articulado__privacidade=89)
+            q = Q(
+                checkcheck=False) | Q(
+                    texto_articulado__privacidade=89) | Q(
+                        texto_articulado__isnull=True, checkcheck=False)
             qs = qs.filter(q)
             return qs.order_by('-ano', '-numero')
+
+        def hook_ementa(self, obj, ss, url):
+            return '''{}<br>{}'''.format(
+                obj.ementa,
+                '<span class="text-danger">Sem Texto Articulado</span>' if not obj.texto_articulado.exists(
+                ) or obj.texto_articulado.first().dispositivos_set.count() < 4 else ''
+            ), ''
 
         def hook_checkcheck(self, obj, ss, url):
             return 'uncheck' if obj.checkcheck else 'check', f'/norma/check?{"un" if obj.checkcheck else ""}check={obj.id}'
