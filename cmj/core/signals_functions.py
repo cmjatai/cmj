@@ -122,6 +122,9 @@ def redesocial_post_function_time_call_documento(inst):
     vp = VideoParte.objects.filter(
         content_type=ct, object_id=inst.id).first()
 
+    if inst.classe_id in (10, ):
+        raise Exception
+
     if not vp:
         return 3600
 
