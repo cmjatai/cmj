@@ -1,0 +1,38 @@
+version: '3.7'
+
+services:
+  cmjdb-dev:
+    container_name: cmjdb-dev
+    image: postgres:10.5-alpine
+    environment:
+      POSTGRES_PASSWORD: cmj
+      POSTGRES_USER: cmj
+      POSTGRES_DB: cmj
+    ports:
+      - "5433:5432"
+    networks:
+      - cmj-net-dev
+
+  cmj-dev:
+    container_name: cmj-dev
+    image: cmj:dev
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile.dev
+    command: python3 manage.py runserver 0:8000
+    volumes:
+      - ..:/cmj-dev
+    ports:
+      - "8000:8000"
+    environment:
+      SECRET_KEY: '$dkhxm-$zvxdox$g2-&w^1i!_z1juq0xwox6e3#gy6w_88!3t^'
+      DEBUG: 'True'
+      DATABASE_URL: postgresql://cmj:cmj@cmjdb-dev:5432/cmj
+      TZ: America/Sao_Paulo
+    networks:
+      - cmj-net-dev
+
+networks:
+  cmj-net-dev:
+    name: cmj-net-dev
+    driver: bridge
