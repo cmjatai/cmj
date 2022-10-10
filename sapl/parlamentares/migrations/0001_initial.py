@@ -340,4 +340,10 @@ class Migration(migrations.Migration):
             name='legislatura',
             field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='parlamentares.Legislatura', verbose_name='Legislatura'),
         ),
+
+        migrations.AddField(
+            model_name='partido',
+            name='metadata',
+            field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, default=None, encoder=django.core.serializers.json.DjangoJSONEncoder, null=True, verbose_name='Metadados'),
+        ),
     ]

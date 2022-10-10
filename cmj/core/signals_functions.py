@@ -14,6 +14,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.mail.message import EmailMultiAlternatives
 from django.template import loader
 from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
 
 from cmj.core import tasks
 from cmj.core.models import AuditLog, OcrMyPDF, Bi
