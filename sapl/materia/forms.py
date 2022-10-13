@@ -1753,15 +1753,19 @@ class TramitacaoEmLoteFilterSet(django_filters.FilterSet):
 class TipoProposicaoForm(ModelForm):
 
     logger = logging.getLogger(__name__)
-    content_types_choices = [
-        (
-            f'{ct.app_label}/{ct.model}',
-            ct
-        )
-        for k, ct in ContentType.objects.get_for_models(
-            *models_with_gr_for_model(TipoProposicao)
-        ).items()
-    ]
+    try:
+        content_types_choices = [
+            (
+                f'{ct.app_label}/{ct.model}',
+                ct
+            )
+            for k, ct in ContentType.objects.get_for_models(
+                *models_with_gr_for_model(TipoProposicao)
+            ).items()
+        ]
+    except:
+        content_types_choices = []
+
     content_type = forms.ChoiceField(
         choices=content_types_choices,
         label=TipoProposicao._meta.get_field('content_type').verbose_name,

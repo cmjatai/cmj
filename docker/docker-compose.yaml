@@ -3,9 +3,9 @@ services:
   cmjdb:
     image: postgres:14.5-alpine
     restart: always
-    container_name: cmj_postgres
+    container_name: cmjpostgres
     labels:
-        NAME: "cmj_postgres"
+        NAME: "cmjpostgres"
     environment:
       POSTGRES_PASSWORD: cmj
       POSTGRES_USER: cmj
@@ -21,9 +21,9 @@ services:
     image: solr:8.11
     restart: always
     command: bin/solr start -c -f
-    container_name: cmj_solr
+    container_name: cmjsolr
     labels:
-        NAME: "cmj_solr"
+        NAME: "cmjsolr"
     volumes:
       - solr_data:/opt/solr/server/solr
       - solr_configsets:/opt/solr/server/solr/configsets
@@ -32,16 +32,15 @@ services:
     networks:
       - cmj-net
 
-  cmj_redis:
+  cmjredis:
     image: redis:alpine
-    container_name: cmj_redis
+    container_name: cmjredis
     labels:
-       NAME: "cmj_redis"
+       NAME: "cmjredis"
     networks:
       - cmj-net
 
   cmj:
-    #image: cmjatai/cmj
     build:
       context: ../
       dockerfile: ./docker/Dockerfile
@@ -50,25 +49,18 @@ services:
        NAME: "cmj"
     restart: always
     environment:
-      ADMIN_PASSWORD: cmj
-      ADMIN_EMAIL: email@dominio.net
       DEBUG: 'False'
-      EMAIL_PORT: 587
-      EMAIL_USE_TLS: 'False'
-      EMAIL_HOST: smtp.dominio.net
-      EMAIL_HOST_USER: usuariosmtp
-      EMAIL_SEND_USER: usuariosmtp
-      EMAIL_HOST_PASSWORD: senhasmtp
-      USE_SOLR: 'False'
+      USE_SOLR: 'True'
       SOLR_COLLECTION: cmj
       SOLR_URL: http://solr:solr@cmjsolr:8983
       IS_ZK_EMBEDDED: 'True'
       TZ: America/Sao_Paulo
     volumes:
-      - cmj_data:/var/cmjatai/cmj/data
+      - cmj_data:/var/cmjatai/cmj_data
       - cmj_media:/var/cmjatai/cmj_media
+      - cmj_logs:/var/cmjatai/cmj/logs
     depends_on:
-      - cmj_redis
+      - cmjredis
       - cmjdb
       - cmjsolr
     ports:
@@ -83,5 +75,6 @@ volumes:
   cmjdb_data:
   cmj_data:
   cmj_media:
+  cmj_logs:
   solr_data:
   solr_configsets:
