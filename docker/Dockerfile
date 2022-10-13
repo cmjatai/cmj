@@ -6,92 +6,65 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED=1
 ENV DEBIAN_FRONTEND noninteractive
 
-ENV BUILD_PACKAGES apt-utils apt-file libpq-dev graphviz-dev build-essential git pkg-config \
+ENV BUILD_PACKAGES apt-utils apt-file libpq-dev graphviz-dev build-essential  pkg-config \
                    python3-dev libxml2-dev libjpeg-dev libssl-dev libffi-dev libxslt1-dev \
                    libcairo2-dev software-properties-common python3-setuptools python3-pip
 
-ENV RUN_PACKAGES graphviz python3-lxml python3-magic postgresql-client python3-psycopg2 \
+ENV RUN_PACKAGES git graphviz python3-lxml python3-magic postgresql-client python3-psycopg2 \
                  poppler-utils curl jq bash vim python3-venv tzdata nodejs \
                  fontconfig ttf-dejavu python nginx
-
-#https://download.documentfoundation.org/libreoffice/stable/7.4.0/deb/x86_64/LibreOffice_7.4.0_Linux_x86-64_deb.tar.gz
-
-ENV LIBRE_PACKAGES libreoffice \
-                    libreoffice-writer \
-                    ure \
-                    libreoffice-java-common \
-                    libreoffice-core \
-                    libreoffice-common \
-                    openjdk-11-jdk-headless \
-                    fonts-opensymbol \
-                    hyphen-pt-br \
-                    fonts-dejavu \
-                    fonts-dejavu-core \
-                    fonts-dejavu-extra \
-                    fonts-droid-fallback \
-                    fonts-dustin \
-                    fonts-f500 \
-                    fonts-fanwood \
-                    fonts-freefont-ttf \
-                    fonts-liberation \
-                    fonts-lmodern \
-                    fonts-lyx \
-                    fonts-sil-gentium \
-                    fonts-texgyre \
-                    fonts-tlwg-purisa
-
-RUN mkdir -p /var/cmjatai/cmj
-
-WORKDIR /var/cmjatai/cmj/
-
-ADD . /var/cmjatai/cmj/
 
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y --no-install-recommends $BUILD_PACKAGES $RUN_PACKAGES && \
     fc-cache -fv && \
-    apt-get -y -q install ${LIBRE_PACKAGES} && \
-    apt-get -y -q remove libreoffice-gnome && \
-    pip3 install --no-cache-dir --upgrade pip setuptools && \
-    rm -f /etc/nginx/conf.d/* && \
-    pip install --no-cache-dir -r /var/cmjatai/cmj/requirements/requirements.txt --upgrade setuptools
+    pip3 install --no-cache-dir --upgrade pip setuptools
 
+RUN rm -f /etc/nginx/conf.d/* && \
+    rm -f /etc/nginx/sites-enabled/*
     #&& \
     #SUDO_FORCE_REMOVE=yes apt-get purge -y --auto-remove $BUILD_PACKAGES && \
     #apt-get -y autoremove && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN adduser --home=/opt/libreoffice --disabled-password --gecos "" --shell=/bin/bash libreoffice
-ADD libreoffice_entrypoint.sh /opt/libreoffice/libreoffice_entrypoint.sh
-RUN chmod +x /opt/libreoffice/libreoffice_entrypoint.sh
+
+RUN mkdir -p /var/cmjatai/cmj
+RUN mkdir -p /var/cmjatai/cmj/run
+RUN mkdir -p /var/cmjatai/cmj/logs
+RUN mkdir -p /var/cmjatai/cmj_data
+RUN mkdir -p /var/cmjatai/cmj_media
 
 WORKDIR /var/cmjatai/cmj/
-ADD . /var/cmjatai/cmj/
+
+COPY requirements/requirements.txt $HOME
+RUN pip install -r /var/cmjatai/cmj/requirements.txt
+
+ADD docker      /var/cmjatai/cmj/docker
+ADD drfautoapi  /var/cmjatai/cmj/drfautoapi
+ADD fonts       /var/cmjatai/cmj/fonts
+ADD _frontend   /var/cmjatai/cmj/_frontend
+ADD _templates  /var/cmjatai/cmj/_templates
+ADD cmj         /var/cmjatai/cmj/cmj
+ADD sapl        /var/cmjatai/cmj/sapl
+
+COPY manage.py $HOME
+RUN python3 manage.py collectstatic --noinput --clear --settings=cmj.settings.fake
+RUN rm -rf /var/cmjatai/cmj/db.sqlite3
 
 COPY docker/start.sh $HOME
-COPY docker/solr_cli.py $HOME
+COPY docker/start_gunicorn.sh $HOME
+COPY docker/start_daphne.sh $HOME
 COPY docker/wait-for-pg.sh $HOME
 COPY docker/wait-for-solr.sh $HOME
-COPY docker/create_admin.py $HOME
-COPY docker/genkey.py $HOME
-COPY docker/gunicorn_start.sh $HOME
 
-COPY docker/config/nginx/cmj.conf /etc/nginx/conf.d
-COPY docker/config/nginx/nginx.conf /etc/nginx/nginx.conf
-#COPY docker/config/env_dockerfile /var/cmjatai/cmj/cmj/.env
+COPY docker/nginx/cmj_docker.conf /etc/nginx/conf.d/.
+COPY docker/nginx/nginx_docker.conf /etc/nginx/nginx.conf
 
-RUN python3 manage.py collectstatic --noinput --clear
 
-# Remove .env(fake) e cmj.db da imagem
-#RUN rm -rf /var/cmjatai/cmj/cmj/.env && \
-#    rm -rf /var/cmjatai/cmj/cmj.db
-
-RUN chmod +x /var/cmjatai/cmj/start.sh && \
+RUN chmod +x /var/cmjatai/cmj/docker/start.sh && \
+    chmod +x /var/cmjatai/cmj/docker/start_gunicorn.sh && \
+    chmod +x /var/cmjatai/cmj/docker/start_daphne.sh && \
     chmod +x /var/cmjatai/cmj/wait-for-solr.sh && \
-    chmod +x /var/cmjatai/cmj/wait-for-pg.sh && \
-    ln -sf /dev/stdout /var/log/nginx/access.log && \
-    ln -sf /dev/stderr /var/log/nginx/error.log && \
-    mkdir /var/log/cmj/ && touch /var/cmjatai/cmj/cmj.log && \
-    ln -s /var/cmjatai/cmj/cmj.log /var/log/cmj/cmj.log
+    chmod +x /var/cmjatai/cmj/wait-for-pg.sh
 
 
 # Debian não possui usuário 'nginx' necessário para o Debian
@@ -101,6 +74,6 @@ ENV DEBIAN_FRONTEND teletype
 
 EXPOSE 80/tcp 443/tcp
 
-VOLUME ["/var/cmjatai/cmj/data", "/var/cmjatai/cmj/media"]
+VOLUME ["/var/cmjatai/cmj/data", "/var/cmjatai/cmj_media"]
 
 CMD ["/var/cmjatai/cmj/start.sh"]
