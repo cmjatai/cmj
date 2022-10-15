@@ -4,7 +4,6 @@ from django import apps
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
-
 class AppConfig(apps.AppConfig):
     name = 'cmj.videos'
     label = 'videos'
@@ -18,8 +17,10 @@ class AppConfig(apps.AppConfig):
         from cmj.celery import app as celery_app
 
         return
-
         if settings.DEBUG or settings.FRONTEND_VERSION != 'v1' or 'www2' in __file__:
+            return
+
+        if 'sqlite3' in settings.DATABASES['default']['ENGINE']:
             return
 
         try:

@@ -1,16 +1,7 @@
 #!/usr/bin/env bash
-CMJ_DIR="/var/cmjatai/cmj"
-
-# Seta um novo diretório foi passado como raiz para o SAPL
-# caso esse tenha sido passado como parâmetro
-if [ "$1" ]
-then
-    CMJ_DIR="$1"
-fi
-
-NAME="PortalCMJ"                                     # Name of the application (*)
-DJANGODIR=/var/cmjatai/cmj/                    # Django project directory (*)
-SOCKFILE=/var/cmjatai/cmj/run/gunicorn.sock    # we will communicate using this unix socket (*)
+NAME="PortalCMJ.wsgi"                                     # Name of the application (*)
+DJANGODIR=/var/cmjatai/cmj                      # Django project directory (*)
+SOCKFILE=/var/cmjatai/cmj/run/gunicorn.sock     # we will communicate using this unix socket (*)
 USER=`whoami`                                   # the user to run as (*)
 GROUP=`whoami`                                  # the group to run as (*)
 NUM_WORKERS=9                                   # how many worker processes should Gunicorn spawn (*)
@@ -20,7 +11,7 @@ MAX_REQUESTS=100                                # number of requests before rest
 DJANGO_SETTINGS_MODULE=cmj.settings            # which settings file should Django use (*)
 DJANGO_WSGI_MODULE=cmj.wsgi                    # WSGI module name (*)
 
-echo "Starting $NAME as `whoami` on base dir $CMJ_DIR"
+echo "Starting $NAME as `whoami` on base dir $DJANGODIR"
 
 # Create the run directory if it doesn't exist
 RUNDIR=$(dirname $SOCKFILE)
