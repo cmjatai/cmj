@@ -87,15 +87,6 @@ HAYSTACK_CONNECTIONS = {
     },
 }
 
-CELERY_BROKER_URL = 'redis://localhost:6379'
-
-CELERY_RESULT_BACKEND = 'django-db'
-CELERY_CACHE_BACKEND = 'django-cache'
-
-#CELERY_ACCEPT_CONTENT = ['application/json']
-#CELERY_RESULT_SERIALIZER = 'json'
-#CELERY_TASK_SERIALIZER = 'json'
-
 CACHES = {
     'default': {
         'BACKEND': 'speedinfo.backends.proxy_cache',
@@ -103,5 +94,28 @@ CACHES = {
         'LOCATION': '/var/tmp/django_cache',
     }
 }
+
+REDIS_HOST = config(
+    'REDIS_HOST', cast=str, default='localhost')
+REDIS_PORT = config(
+    'REDIS_PORT', cast=int, default=6379)
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [(REDIS_HOST, REDIS_PORT)],
+        },
+    },
+}
+
+CELERY_BROKER_URL = 'redis://{}:{}'.format(REDIS_HOST, REDIS_PORT)
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_CACHE_BACKEND = 'django-cache'
+
+#CELERY_ACCEPT_CONTENT = ['application/json']
+#CELERY_RESULT_SERIALIZER = 'json'
+#CELERY_TASK_SERIALIZER = 'json'
+
 
 APPEND_SLASH = False

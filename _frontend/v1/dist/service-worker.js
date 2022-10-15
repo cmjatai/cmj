@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 importScripts("/static/precache-manifest.fce24756f31b2c5b2775ff1e14c175fe.js", "https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
+=======
+importScripts("/static/precache-manifest.1f0215f8dfac2ee54896cab758b46056.js", "https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
+>>>>>>> 18376731 (config docker com asgi)
 
 /* eslint-disable no-undef */
 if (workbox) {

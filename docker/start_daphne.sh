@@ -2,7 +2,7 @@
 
 # As seen in http://tutos.readthedocs.org/en/latest/source/ndg.html
 
-NAME="CMJ"                                     # Name of the application (*)
+NAME="PortalCMJ.asgi"                                     # Name of the application (*)
 DJANGODIR=/var/cmjatai/cmj                    # Django project directory (*)
 SOCKFILE=/var/cmjatai/cmj/run/daphne.sock    # we will communicate using this unix socket (*)
 USER=`whoami`                                   # the user to run as (*)
@@ -12,7 +12,7 @@ NUM_WORKERS=1                                   # how many worker processes shou
 DJANGO_SETTINGS_MODULE=cmj.settings            # which settings file should Django use (*)
 DJANGO_ASGI_MODULE=cmj.asgi                    # WSGI module name (*)
 
-echo "Starting $NAME as `whoami` on base dir $CMJ_DIR"
+echo "Starting $NAME as `whoami` on base dir $DJANGODIR"
 
 # Create the run directory if it doesn't exist
 RUNDIR=$(dirname $SOCKFILE)

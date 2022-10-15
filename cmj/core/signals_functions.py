@@ -238,9 +238,6 @@ def send_signal_for_websocket_time_refresh(inst, **kwargs):
 
     action = 'post_save' if 'created' in kwargs else 'post_delete'
 
-    if not settings.USE_CHANNEL_LAYERS:
-        return
-
     if hasattr(inst, '_meta') and \
         not inst._meta.app_config is None and \
             inst._meta.app_config.name[:4] in ('sapl', ):  # 'cmj.'):

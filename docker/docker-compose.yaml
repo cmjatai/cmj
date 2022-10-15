@@ -1,20 +1,10 @@
 version: "3.7"
 services:
-  cmjdb:
-    image: postgres:14.5-alpine
-    restart: always
-    container_name: cmjpostgres
+  cmjredis:
+    image: redis:alpine
+    container_name: cmjredis
     labels:
-        NAME: "cmjpostgres"
-    environment:
-      POSTGRES_PASSWORD: cmj
-      POSTGRES_USER: cmj
-      POSTGRES_DB: cmj
-      PGDATA : /var/lib/postgresql/data/
-    volumes:
-      - cmjdb_data:/var/lib/postgresql/data/
-        #ports:
-        #  - "5433:5432"
+       NAME: "cmjredis"
     networks:
       - cmj-net
   cmjsolr:
@@ -31,12 +21,21 @@ services:
       - "8983:8983"
     networks:
       - cmj-net
-
-  cmjredis:
-    image: redis:alpine
-    container_name: cmjredis
+  cmjdb:
+    image: postgres:14.5-alpine
+    restart: always
+    container_name: cmjpostgres
     labels:
-       NAME: "cmjredis"
+        NAME: "cmjpostgres"
+    environment:
+      POSTGRES_PASSWORD: cmj
+      POSTGRES_USER: cmj
+      POSTGRES_DB: cmj
+      PGDATA : /var/lib/postgresql/data/
+    volumes:
+      - cmjdb_data:/var/lib/postgresql/data/
+        #ports:
+        #  - "5433:5432"
     networks:
       - cmj-net
 
@@ -58,7 +57,7 @@ services:
     volumes:
       - cmj_data:/var/cmjatai/cmj_data
       - cmj_media:/var/cmjatai/cmj_media
-      - cmj_logs:/var/cmjatai/cmj/logs
+      #- cmj_logs:/var/cmjatai/cmj/logs
     depends_on:
       - cmjredis
       - cmjdb
@@ -75,6 +74,6 @@ volumes:
   cmjdb_data:
   cmj_data:
   cmj_media:
-  cmj_logs:
+  #cmj_logs:
   solr_data:
   solr_configsets:

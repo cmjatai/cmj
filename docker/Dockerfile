@@ -8,7 +8,8 @@ ENV DEBIAN_FRONTEND noninteractive
 
 ENV BUILD_PACKAGES apt-utils apt-file libpq-dev graphviz-dev build-essential  pkg-config \
                    python3-dev libxml2-dev libjpeg-dev libssl-dev libffi-dev libxslt1-dev \
-                   libcairo2-dev software-properties-common python3-setuptools python3-pip
+                   libcairo2-dev software-properties-common python3-setuptools python3-pip \
+                   procps nmap
 
 ENV RUN_PACKAGES git graphviz python3-lxml python3-magic postgresql-client python3-psycopg2 \
                  poppler-utils curl jq bash vim python3-venv tzdata nodejs \
@@ -27,9 +28,8 @@ RUN rm -f /etc/nginx/conf.d/* && \
     #apt-get -y autoremove && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 
-RUN mkdir -p /var/cmjatai/cmj
 RUN mkdir -p /var/cmjatai/cmj/run
-RUN mkdir -p /var/cmjatai/cmj/logs
+RUN mkdir -p /var/cmjatai/cmj/logs/celery
 RUN mkdir -p /var/cmjatai/cmj_data
 RUN mkdir -p /var/cmjatai/cmj_media
 
@@ -41,6 +41,7 @@ RUN pip install -r /var/cmjatai/cmj/requirements.txt
 ADD docker      /var/cmjatai/cmj/docker
 ADD drfautoapi  /var/cmjatai/cmj/drfautoapi
 ADD fonts       /var/cmjatai/cmj/fonts
+ADD scripts     /var/cmjatai/cmj/scripts
 ADD _frontend   /var/cmjatai/cmj/_frontend
 ADD _templates  /var/cmjatai/cmj/_templates
 ADD cmj         /var/cmjatai/cmj/cmj
