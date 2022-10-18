@@ -47,7 +47,7 @@ ASGI_APPLICATION = "cmj.routing.application"
 
 DATABASES = {
     'default': config(
-        'DATABASE_URL',
+        'DATABASE_URL_DEV' if DEBUG else 'DATABASE_URL_PRD',
         cast=db_url,
     )
 }
@@ -62,20 +62,15 @@ HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.BaseSignalProcessor'  # Disable au
 SEARCH_BACKEND = ''
 SEARCH_URL = ['', '']
 
-
-# SOLR
-USE_SOLR = config('USE_SOLR', cast=bool, default=False)
-SOLR_URL = config('SOLR_URL', cast=str, default='http://localhost:8983')
-SOLR_COLLECTION = config('SOLR_COLLECTION', cast=str, default='cmj_portal')
+USE_SOLR = True
+SOLR_URL = 'http://localhost:8983' if DEBUG else 'http://cmjsolr:8983'
+SOLR_COLLECTION = 'cmj_portal'
 
 
-if USE_SOLR:
-    # enable auto-index
-
-    #HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
-    HAYSTACK_SIGNAL_PROCESSOR = 'cmj.signal_celery_haystack.CelerySignalProcessor'
-    SEARCH_BACKEND = 'haystack.backends.solr_backend.SolrEngine'
-    SEARCH_URL = ('URL', '{}/solr/{}'.format(SOLR_URL, SOLR_COLLECTION))
+#HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+HAYSTACK_SIGNAL_PROCESSOR = 'cmj.signal_celery_haystack.CelerySignalProcessor'
+SEARCH_BACKEND = 'haystack.backends.solr_backend.SolrEngine'
+SEARCH_URL = ('URL', '{}/solr/{}'.format(SOLR_URL, SOLR_COLLECTION))
 
 #  BATCH_SIZE: default is 1000 if omitted, avoid Too Large Entity Body errors
 HAYSTACK_CONNECTIONS = {
@@ -96,7 +91,7 @@ CACHES = {
 }
 
 REDIS_HOST = config(
-    'REDIS_HOST', cast=str, default='localhost')
+    'REDIS_HOST', cast=str, default='localhost' if DEBUG else 'cmjredis')
 REDIS_PORT = config(
     'REDIS_PORT', cast=int, default=6379)
 
