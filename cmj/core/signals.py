@@ -34,5 +34,4 @@ def notificacao_post_signal(sender, instance, **kwargs):
 
 @receiver(post_save, dispatch_uid='redesocial_post_signal')
 def redesocial_post_signal(sender, instance, **kwargs):
-    return
     redesocial_post_function(sender, instance, **kwargs)
