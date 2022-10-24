@@ -50,7 +50,7 @@ services:
     environment:
       DEBUG: 'False'
       USE_SOLR: 'True'
-      SOLR_COLLECTION: cmj
+      SOLR_COLLECTION: cmj_portal
       SOLR_URL: http://solr:solr@cmjsolr:8983
       IS_ZK_EMBEDDED: 'True'
       TZ: America/Sao_Paulo

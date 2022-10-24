@@ -62,6 +62,9 @@ unipath==1.1
 WeasyPrint==51
 qrcode
 #html5lib==0.999999
+kazoo==2.8.0
+
+
 
 ipython
 

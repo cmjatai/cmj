@@ -63,9 +63,8 @@ SEARCH_BACKEND = ''
 SEARCH_URL = ['', '']
 
 USE_SOLR = True
-SOLR_URL = 'http://localhost:8983' if DEBUG else 'http://cmjsolr:8983'
+SOLR_URL = 'http://solr:solr@localhost:8983' if DEBUG else 'http://solr:solr@cmjsolr:8983'
 SOLR_COLLECTION = 'cmj_portal'
-
 
 #HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 HAYSTACK_SIGNAL_PROCESSOR = 'cmj.signal_celery_haystack.CelerySignalProcessor'
