@@ -46,16 +46,18 @@ ADD _frontend   /var/cmjatai/cmj/_frontend
 ADD _templates  /var/cmjatai/cmj/_templates
 ADD cmj         /var/cmjatai/cmj/cmj
 ADD sapl        /var/cmjatai/cmj/sapl
+ADD solr        /var/cmjatai/cmj/solr
 
 COPY manage.py $HOME
 RUN python3 manage.py collectstatic --noinput --clear --settings=cmj.settings.fake
 RUN rm -rf /var/cmjatai/cmj/db.sqlite3
 
 COPY docker/start.sh $HOME
-COPY docker/start_gunicorn.sh $HOME
-COPY docker/start_daphne.sh $HOME
+COPY docker/solr_cli.py $HOME
 COPY docker/wait-for-pg.sh $HOME
 COPY docker/wait-for-solr.sh $HOME
+COPY docker/start_gunicorn.sh $HOME
+COPY docker/start_daphne.sh $HOME
 
 COPY docker/nginx/cmj_docker.conf /etc/nginx/conf.d/.
 COPY docker/nginx/nginx_docker.conf /etc/nginx/nginx.conf
