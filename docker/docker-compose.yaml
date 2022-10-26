@@ -57,7 +57,7 @@ services:
     volumes:
       - cmj_data:/var/cmjatai/cmj_data
       - cmj_media:/var/cmjatai/cmj_media
-      #- cmj_logs:/var/cmjatai/cmj/logs
+      - cmj_logs:/var/cmjatai/cmj/logs
     depends_on:
       - cmjredis
       - cmjdb
@@ -74,6 +74,6 @@ volumes:
   cmjdb_data:
   cmj_data:
   cmj_media:
-  #cmj_logs:
+  cmj_logs:
   solr_data:
   solr_configsets:
