@@ -10,6 +10,7 @@ from django.db import models
 from django.db.models.query import QuerySet
 from django.urls.base import reverse
 from django.utils import formats
+from django.utils.encoding import force_text
 from django.utils.translation import ugettext as _
 import yaml
 
@@ -45,7 +46,7 @@ def form_actions(more=[Div(css_class='clearfix')],
                  label=_('Salvar'), name='salvar',
                  css_class='float-right', disabled=True):
 
-    if disabled:
+    if disabled and not 'pesquisa' in force_text(label).lower():
         doubleclick = 'this.form.submit();this.disabled=true;'
     else:
         doubleclick = 'return true;'
