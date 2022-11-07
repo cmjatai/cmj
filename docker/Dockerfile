@@ -13,7 +13,7 @@ ENV BUILD_PACKAGES apt-utils apt-file libpq-dev graphviz-dev build-essential  pk
 
 ENV RUN_PACKAGES git graphviz python3-lxml python3-magic postgresql-client python3-psycopg2 \
                  poppler-utils curl jq bash vim python3-venv tzdata nodejs \
-                 fontconfig ttf-dejavu python nginx
+                 fontconfig ttf-dejavu python nginx openjdk-11-jdk-headless
 
 RUN apt-get update && \
     apt-get upgrade -y && \
@@ -68,7 +68,6 @@ RUN chmod +x /var/cmjatai/cmj/docker/start.sh && \
     chmod +x /var/cmjatai/cmj/docker/start_daphne.sh && \
     chmod +x /var/cmjatai/cmj/wait-for-solr.sh && \
     chmod +x /var/cmjatai/cmj/wait-for-pg.sh
-
 
 # Debian não possui usuário 'nginx' necessário para o Debian
 RUN useradd --no-create-home nginx
