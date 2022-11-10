@@ -48,6 +48,7 @@ ADD cmj         /var/cmjatai/cmj/cmj
 ADD sapl        /var/cmjatai/cmj/sapl
 ADD solr        /var/cmjatai/cmj/solr
 
+COPY cmj/.env $HOME/cmj/
 COPY manage.py $HOME
 RUN python3 manage.py collectstatic --noinput --clear --settings=cmj.settings.fake
 RUN rm -rf /var/cmjatai/cmj/db.sqlite3
