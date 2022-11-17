@@ -379,15 +379,17 @@ class NormaCrud(Crud):
             q = Q(
                 checkcheck=False) | Q(
                     texto_articulado__privacidade=89) | Q(
-                        texto_articulado__isnull=True, checkcheck=False)
+                        texto_articulado__isnull=True, checkcheck=False) | Q(
+                        texto_integral__exact='', checkcheck=True)
             qs = qs.filter(q)
             return qs.order_by('-ano', '-numero')
 
         def hook_ementa(self, obj, ss, url):
-            return '''{}<br>{}'''.format(
+            return '''{}<br>{} - {}'''.format(
                 obj.ementa,
                 '<span class="text-danger">Sem Texto Articulado</span>' if not obj.texto_articulado.exists(
-                ) or obj.texto_articulado.first().dispositivos_set.count() < 4 else ''
+                ) or obj.texto_articulado.first().dispositivos_set.count() < 4 else '',
+                '<span class="text-danger">Sem Arquivo</span>' if not obj.texto_integral else ''
             ), ''
 
         def hook_checkcheck(self, obj, ss, url):
