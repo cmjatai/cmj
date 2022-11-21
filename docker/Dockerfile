@@ -38,7 +38,6 @@ WORKDIR /var/cmjatai/cmj/
 COPY requirements/requirements.txt $HOME
 RUN pip install -r /var/cmjatai/cmj/requirements.txt
 
-ADD docker      /var/cmjatai/cmj/docker
 ADD drfautoapi  /var/cmjatai/cmj/drfautoapi
 ADD fonts       /var/cmjatai/cmj/fonts
 ADD scripts     /var/cmjatai/cmj/scripts
@@ -47,6 +46,7 @@ ADD _templates  /var/cmjatai/cmj/_templates
 ADD cmj         /var/cmjatai/cmj/cmj
 ADD sapl        /var/cmjatai/cmj/sapl
 ADD solr        /var/cmjatai/cmj/solr
+ADD docker      /var/cmjatai/cmj/docker
 
 COPY cmj/.env $HOME/cmj/
 COPY manage.py $HOME
@@ -70,13 +70,16 @@ RUN chmod +x /var/cmjatai/cmj/docker/start.sh && \
     chmod +x /var/cmjatai/cmj/wait-for-solr.sh && \
     chmod +x /var/cmjatai/cmj/wait-for-pg.sh
 
+
 # Debian não possui usuário 'nginx' necessário para o Debian
-RUN useradd --no-create-home nginx
+RUN useradd -r -u 1002 --no-create-home -g root nginx
+
+USER nginx
 
 ENV DEBIAN_FRONTEND teletype
 
 EXPOSE 80/tcp 443/tcp
 
-VOLUME ["/var/cmjatai/cmj/data", "/var/cmjatai/cmj_media"]
+VOLUME ["/var/cmjatai/cmj/data", "/var/cmjatai/cmj_media", "/var/cmjatai/cmj/logs"]
 
 CMD ["/var/cmjatai/cmj/start.sh"]

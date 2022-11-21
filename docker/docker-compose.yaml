@@ -43,6 +43,7 @@ services:
       context: ../
       dockerfile: ./docker/Dockerfile
     container_name: cmj
+    user: "root:root"
     labels:
        NAME: "cmj"
     restart: always
