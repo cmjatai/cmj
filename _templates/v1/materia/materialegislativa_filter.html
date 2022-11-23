@@ -106,7 +106,7 @@
                       </a>
                     </strong>
                     <div class="text-ementa">
-                    {{ m.ementa }}
+                    {{ m.ementa|safe }}
                     </div>
                         {% if m.url_video %}
                           <div class="container-youtube ">
