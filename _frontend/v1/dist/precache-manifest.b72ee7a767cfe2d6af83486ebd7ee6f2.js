@@ -516,7 +516,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/robots.txt"
   },
   {
-    "revision": "a86f9f2ebe3931d7b46e266c05625689",
+    "revision": "2d86b89ea0685ad15ac3020d5a643135",
     "url": "/static/service-worker.js"
   }
 ]);
