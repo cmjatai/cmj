@@ -38,6 +38,7 @@ services:
         #  - "5433:5432"
     networks:
       - cmj-net
+  
   cmj:
     build:
       context: ../

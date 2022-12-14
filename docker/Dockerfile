@@ -49,6 +49,7 @@ ADD solr        /var/cmjatai/cmj/solr
 ADD docker      /var/cmjatai/cmj/docker
 
 COPY cmj/.env $HOME/cmj/
+COPY key_cert.pfx $HOME
 COPY manage.py $HOME
 RUN python3 manage.py collectstatic --noinput --clear --settings=cmj.settings.fake
 RUN rm -rf /var/cmjatai/cmj/db.sqlite3
