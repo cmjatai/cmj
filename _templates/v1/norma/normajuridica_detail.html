@@ -85,6 +85,14 @@
       </div>
     {% endif %}
 
+        {% if object.observacao %}
+          <p class="control-label">Observações</p>
+          <div class="form-control-static mb-3">
+              {{object.observacao}}
+          </div>
+        {% endif %}
+
+
 
     {% if object.get_normas_relacionadas.0|length > 0 %}
       <p class="control-label">Normas Relacionadas</p>
