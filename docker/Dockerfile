@@ -13,7 +13,7 @@ ENV BUILD_PACKAGES apt-utils apt-file libpq-dev graphviz-dev build-essential  pk
 
 ENV RUN_PACKAGES git graphviz python3-lxml python3-magic postgresql-client python3-psycopg2 \
                  poppler-utils curl jq bash vim python3-venv tzdata nodejs \
-                 fontconfig ttf-dejavu python nginx openjdk-11-jdk-headless
+                 fontconfig ttf-dejavu python nginx openjdk-11-jdk-headless fonts-liberation
 
 RUN apt-get update && \
     apt-get upgrade -y && \
