@@ -11,7 +11,15 @@
   <div class="col-sm-12">
 
     <hr />
-      
+    <div class="d-flex justify-content-center">
+      {% with False as render_ementa %}
+        {% with object as object.content_object %}
+          {% include 'norma/normajuridica_widget_file.html' %}
+        {% endwith %}
+      {% endwith %}
+    </div>
+
+    <hr />
     {% if n.get_anexos_norma_juridica|length > 0 %}
       <p class="control-label">Anexos da Norma Jurídica</p>
         <div class="form-control-static mb-3">

@@ -21,7 +21,7 @@
         </a>
       {% else %}
 
-        {% if n.texto_integral and '.pdf' in n.texto_integral.path %}
+        {% if n.texto_integral and '.pdf' in n.texto_integral.path and not n.metadata.signs%}
           <a class="link-texto" href="{{n.texto_integral.url}}?u={% now "u"%}" title="Documento Digitalizado">
             <i class="far fa-2x fa-file-pdf"></i>
             <br>
