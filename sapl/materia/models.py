@@ -222,6 +222,9 @@ class MateriaLegislativaManager(models.Manager):
             )
         )
 
+    def materias_anexadas_ordem_crescente(self):
+        return self.materias_anexadas().order_by('tipo__sequencia_regimental', 'ano', 'numero')
+
 
 class MateriaLegislativa(CommonMixin):
 
