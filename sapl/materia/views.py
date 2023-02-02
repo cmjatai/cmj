@@ -473,6 +473,7 @@ class TipoProposicaoCrud(CrudAux):
             initial['tipo_conteudo_related'] = self.object.object_id
             return initial
 
+
 def criar_materia_proposicao(proposicao):
     tipo_materia = TipoMateriaLegislativa.objects.get(
         descricao=proposicao.tipo.descricao)
@@ -1227,7 +1228,7 @@ class ProposicaoCrud(Crud):
                 return Crud.CreateView.get_success_url(self)
 
     class ListView(Crud.ListView):
-        ordering = ['-data_envio', 'descricao']
+        ordering = ['-data_recebimento', '-data_envio', '-id']
 
         def hook_header_detalhe(self, *args, **kwargs):
             return 'Proposição'
@@ -1255,7 +1256,8 @@ class ProposicaoCrud(Crud):
                     autor__operadores=u
                 )
 
-                qs = qs.filter(q).order_by('-data_recebimento', '-id')
+                qs = qs.filter(q).order_by(
+                    '-data_recebimento', '-data_envio', '-id')
 
             return qs
 
@@ -1286,6 +1288,13 @@ class ProposicaoCrud(Crud):
 
                 if obj.data_envio is None:
                     obj.data_envio = 'Em elaboração...'
+                    if obj.justificativa_devolucao:
+                        obj.data_envio = f"""
+                        <div class="text-red">
+                        <strong>Proposição devolvida</strong><br>
+                        {obj.justificativa_devolucao}
+                        </div>
+                        """
                 else:
                     obj.data_envio = timezone.localtime(obj.data_envio)
                     obj.data_envio = formats.date_format(
