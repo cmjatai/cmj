@@ -418,6 +418,10 @@ class AbstractOrdemDia(models.Model):
 
 
 class ExpedienteMateria(AbstractOrdemDia):
+    parent = models.ForeignKey('self',
+                               blank=True, null=True, default=None,
+                               on_delete=models.CASCADE,
+                               verbose_name=_('Expendiente Principal'))
 
     class Meta(AbstractOrdemDia.Meta):
         verbose_name = _('Matéria do Expediente')
@@ -543,6 +547,11 @@ class OradorOrdemDia(AbstractOrador):  # OradoresOrdemDia
 
 
 class OrdemDia(AbstractOrdemDia):
+
+    parent = models.ForeignKey('self',
+                               blank=True, null=True, default=None,
+                               on_delete=models.CASCADE,
+                               verbose_name=_('Ordem Dia Principal'))
 
     class Meta(AbstractOrdemDia.Meta):
         verbose_name = _('Matéria da Ordem do Dia')
