@@ -102,6 +102,7 @@ OrdemDiaDetail:
   - tipo_votacao
   - observacao
   - url_video
+  - childs
 
 TipoJustificativa:
   {% trans 'Tipo de Justificativa' %}:

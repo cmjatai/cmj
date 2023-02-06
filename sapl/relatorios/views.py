@@ -739,7 +739,8 @@ def get_sessao_plenaria(sessao, casa):
     # Lista das matérias da Ordem do Dia, incluindo o resultado das votacoes
     lst_votacao = []
     for votacao in OrdemDia.objects.filter(
-            sessao_plenaria=sessao):
+            sessao_plenaria=sessao,
+            parent__isnull=True):
         # seleciona os detalhes de uma matéria
         materia = votacao.materia
         dic_votacao = {}
