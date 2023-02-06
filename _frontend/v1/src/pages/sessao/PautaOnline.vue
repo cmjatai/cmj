@@ -137,7 +137,7 @@ export default {
     fetchList (page = null, model = null) {
       const t = this
 
-      let query_string = `&sessao_plenaria=${this.sessao.id}`
+      let query_string = `&sessao_plenaria=${this.sessao.id}&parent__isnull=True`
 
       t.utils.getModelOrderedList('sessao', model, 'numero_ordem', page === null ? 1 : page, query_string)
         .then((response) => {

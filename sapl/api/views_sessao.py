@@ -8,7 +8,7 @@ from drfautoapi.drfautoapi import ApiViewSetConstrutor, \
 from sapl.api.mixins import ResponseFileMixin
 from sapl.api.serializers import ChoiceSerializer,\
     SessaoPlenariaECidadaniaSerializer
-from sapl.sessao.models import SessaoPlenaria, ExpedienteSessao
+from sapl.sessao.models import SessaoPlenaria, ExpedienteSessao, OrdemDia
 from sapl.utils import choice_anos_com_sessaoplenaria
 
 

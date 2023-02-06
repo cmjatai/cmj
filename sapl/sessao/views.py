@@ -6,10 +6,10 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Max, Q
+from django.db.models import Max, Q, F
 from django.http import JsonResponse
 from django.http.response import Http404, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls.base import reverse
 from django.utils import timezone, formats
 from django.utils.datastructures import MultiValueDictKeyError
@@ -87,7 +87,8 @@ def reordernar_materias_expediente(request, pk):
 
 def reordernar_materias_ordem(request, pk):
     ordens = OrdemDia.objects.filter(
-        sessao_plenaria_id=pk
+        sessao_plenaria_id=pk,
+        parent__isnull=True
     ).order_by(
         'materia__tipo__sequencia_regimental',
         'materia__ano',
@@ -102,7 +103,10 @@ def reordernar_materias_ordem(request, pk):
 
 
 def renumerar_materias_ordem(request, pk):
-    ordens = OrdemDia.objects.filter(sessao_plenaria_id=pk)
+    ordens = OrdemDia.objects.filter(
+        sessao_plenaria_id=pk,
+        parent__isnull=True
+    )
 
     for ordem_num, o in enumerate(ordens, 1):
         o.numero_ordem = ordem_num
@@ -223,9 +227,48 @@ def abrir_votacao(request, pk, spk):
 
 
 def customize_link_materia(context, pk, has_permission, is_expediente, user=None):
+    rows = context['rows']
+
+    rows_dict = {}
+
     for i, row in enumerate(context['rows']):
-        materia = context['object_list'][i].materia
         obj = context['object_list'][i]
+        row.append(obj)
+        if obj.parent:
+            continue
+
+        rows_dict[obj.id] = {
+            'item': row,
+            'childs': []
+        }
+
+    for i, row in enumerate(context['rows']):
+        obj = context['object_list'][i]
+        if not obj.parent:
+            continue
+        rows_dict[obj.parent.id]['childs'].append(row)
+
+    rows_new = []
+
+    for i, row in enumerate(context['rows']):
+        obj = context['object_list'][i]
+        if obj.id not in rows_dict:
+            continue
+        rows_new.append(row)
+        for c in rows_dict[obj.id]['childs']:
+            items_row = list(c[0])
+            items_row[0] = rows_dict[obj.id]['item'][0][0] + '.' + items_row[0]
+            c[0] = items_row
+            rows_new.append(c)
+
+        #rows_new += rows_dict[obj.id]['childs']
+    context['rows'] = rows_new
+
+    for i, row in enumerate(context['rows']):
+        obj = row[-1]
+        del row[-1]
+        materia = obj.materia
+
         url_materia = reverse('sapl.materia:materialegislativa_detail',
                               kwargs={'pk': materia.id})
         numeracao = materia.numeracao_set.first()
@@ -261,6 +304,7 @@ def customize_link_materia(context, pk, has_permission, is_expediente, user=None
                            <b>Autoria:</b> %s </br>
                            <b>Protocolo:</b> %s </br>
                            <b>Turno:</b> %s </br>
+                           
                         ''' % (obj.materia.id,
                                url_materia,
                                row[1][0],
@@ -268,6 +312,14 @@ def customize_link_materia(context, pk, has_permission, is_expediente, user=None
                                autores if autores else '',
                                num_protocolo if num_protocolo else '',
                                turno)
+
+        if isinstance(obj, OrdemDia) and materia.anexadas.exists() and user and user.has_perm('sessao.add_ordemdia'):
+            title_materia += '''
+                <a href="%s?add_anexadas"><small>Adicionar emendas nesta sessão</small></a>
+            ''' % (
+                row[0][1],
+
+            )
 
         # Na linha abaixo, o segundo argumento é None para não colocar
         # url em toda a string de title_materia
@@ -643,9 +695,77 @@ class MateriaOrdemDiaCrud(MasterDetailCrud):
             else:
                 return _('Observação'), args[0].observacao.replace('\n', '<br>')
 
+        def get(self, request, *args, **kwargs):
+
+            add_anexadas = request.GET.get('add_anexadas', None)
+            if add_anexadas is None or not request.user.has_perm('sessao.add_ordemdia'):
+                return MasterDetailCrud.DetailView.get(self, request, *args, **kwargs)
+
+            obj = self.get_object()
+
+            materias_ja_adicionadas = set(
+                obj.childs.values_list('materia', flat=True))
+
+            # OrdemDia.objects.filter(
+            #    sessao_plenaria=obj.sessao_plenaria,
+            #    id__gt=13288
+            #).delete()
+            # OrdemDia.objects.filter(
+            #    materia__in=list(materias_ja_adicionadas)).delete()
+
+            materias = set()
+            for m in obj.materia.anexadas.materias_anexadas_ordem_crescente():
+                if not m.registrovotacao_set.filter(
+                        tipo_resultado_votacao__natureza='A').exists():
+                    materias.add(m.id)
+
+            materias_a_adicionar = materias - materias_ja_adicionadas
+
+            # OrdemDia.objects.filter(
+            #    sessao_plenaria=obj.sessao_plenaria,
+            #    numero_ordem__gt=obj.numero_ordem
+            #).update(numero_ordem=F('numero_ordem') + len(materias_a_adicionar))
+
+            for m in materias_a_adicionar:
+                oc = OrdemDia()
+                oc.parent = obj
+                oc.sessao_plenaria = obj.sessao_plenaria
+                oc.materia_id = m
+                oc.numero_ordem = 1
+                oc.data_ordem = obj.data_ordem
+                oc.observacao = ''
+                oc.resultado = ''
+                oc.tipo_votacao = obj.tipo_votacao
+                oc.votacao_aberta = False
+                oc.registro_aberto = False
+                oc.save()
+
+            if materias_a_adicionar:
+                sub_ordens = obj.childs.order_by('numero_ordem')
+                numero_ordem = 1
+                for o in sub_ordens:
+                    o.numero_ordem = numero_ordem
+                    o.save()
+                    numero_ordem += 1
+
+            return HttpResponseRedirect(
+                '{}#id{}'.format(
+                    reverse('sapl.sessao:ordemdia_list', kwargs={
+                            'pk': obj.sessao_plenaria.id}),
+                    obj.materia.id
+                )
+            )
+
     class ListView(MasterDetailCrud.ListView):
         paginate_by = None
         ordering = ['numero_ordem', 'materia', 'resultado']
+
+        def get_queryset(self):
+            qs = MasterDetailCrud.ListView.get_queryset(self)
+
+            if not self.request.user.has_perm('sessao.add_ordemdia'):
+                qs = qs.filter(parent__isnull=True)
+            return qs
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
@@ -2054,7 +2174,9 @@ def get_assinaturas(sessao_plenaria):
 
 
 def get_materias_ordem_do_dia(sessao_plenaria):
-    ordem = OrdemDia.objects.filter(sessao_plenaria_id=sessao_plenaria.id)
+    ordem = OrdemDia.objects.filter(
+        sessao_plenaria_id=sessao_plenaria.id,
+        parent__isnull=True)
     materias_ordem = []
     for o in ordem:
         ementa = o.materia.ementa

@@ -551,6 +551,7 @@ class OrdemDia(AbstractOrdemDia):
     parent = models.ForeignKey('self',
                                blank=True, null=True, default=None,
                                on_delete=models.CASCADE,
+                               related_name='childs',
                                verbose_name=_('Ordem Dia Principal'))
 
     class Meta(AbstractOrdemDia.Meta):
