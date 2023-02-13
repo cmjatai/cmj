@@ -88,10 +88,16 @@ class TipoSessaoPlenaria(models.Model):
             qs &= Q(data_inicio__year=data.year, data_inicio__month=data.month)
 
             if self.tipo_numeracao == tnc.quizenal:
-                if data.day <= 15:
-                    qs &= Q(data_inicio__day__lte=15)
+                if data.year == 2023 and data.month == 2:
+                    if data.day <= 14:
+                        qs &= Q(data_inicio__day__lte=14)
+                    else:
+                        qs &= Q(data_inicio__day__gt=14)
                 else:
-                    qs &= Q(data_inicio__day__gt=15)
+                    if data.day <= 15:
+                        qs &= Q(data_inicio__day__lte=15)
+                    else:
+                        qs &= Q(data_inicio__day__gt=15)
         return qs
 
 
@@ -250,8 +256,12 @@ class SessaoPlenaria(models.Model):
         base = '{}ª {}'.format(self.numero, self.tipo.nome)
 
         if self.tipo.tipo_numeracao == tnc.quizenal:
-            base += ' da {}ª Quinzena'.format(
-                1 if self.data_inicio.day <= 15 else 2)
+            if self.data_inicio.year == 2023 and self.data_inicio.month == 2:
+                base += ' da {}ª Quinzena'.format(
+                    1 if self.data_inicio.day <= 14 else 2)
+            else:
+                base += ' da {}ª Quinzena'.format(
+                    1 if self.data_inicio.day <= 15 else 2)
 
         if self.tipo.tipo_numeracao <= tnc.mensal:
             base += ' do mês de {}'.format(
