@@ -11,6 +11,7 @@ from django.core.files.base import File
 from django.core.management.base import BaseCommand
 from django.db.models import Q
 from django.db.models.signals import post_delete, post_save
+import fitz
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.platypus.doctemplate import SimpleDocTemplate
@@ -41,139 +42,251 @@ class Command(BaseCommand):
         post_save.disconnect(dispatch_uid='timerefresh_post_signal')
         self.logger = logging.getLogger(__name__)
 
+        # self.transformar_pdfs_em_imagens()
+        self.criar_pdfs()
+
+    def transformar_pdfs_em_imagens(self, *args, **options):
+        folder_raiz = '/home/leandro/TEMP/scanners/'
+
+        folder_in_pdfs = folder_raiz + 'in_pdfs/'
+        folder_in_images = folder_raiz + 'in_images/'
+
+        os.makedirs(folder_in_images, exist_ok=True)
+
+        lfpdf = glob.glob(glob.escape(folder_in_pdfs) + '**', recursive=True)
+        lfpdf.sort()
+
+        for f in lfpdf:
+
+            fimg_out = f.replace('in_pdfs', 'in_images')
+            if not f.endswith('.pdf'):
+                os.makedirs(fimg_out, exist_ok=True)
+                continue
+
+            doc = fitz.open(f)
+
+            for index, page in enumerate(doc):
+                pix = page.get_pixmap(dpi=300)
+                pix.save(f'{fimg_out}-{index:0>6}.png')
+        return
+
     def criar_pdfs(self, *args, **options):
-        folder_in = '/home/leandro/TEMP/scanners/'
-        folder_out = folder_in + 'out/'
-        os.makedirs(folder_out, exist_ok=True)
+        folder_raiz = '/home/leandro/TEMP/scanners/'
 
-        lf = glob.glob(folder_in + '**', recursive=True)
-        lf.sort()
+        folder_in_images = folder_raiz + 'in_images/'
 
-        flist_out = []
+        os.makedirs(folder_in_images, exist_ok=True)
+        os.makedirs(folder_in_images.replace(
+            'in_images', 'out_images'), exist_ok=True)
 
-        composicao = [
-            ['out-0451', 'out-0538'],
-            # ['out-0533', 'out-0538']
+        lfimagens = glob.glob(glob.escape(
+            folder_in_images) + '**', recursive=True)
+        lfimagens.sort()
+
+        for ipath in lfimagens:
+            if ipath.endswith('.png'):
+                continue
+            # print(f"'{ipath}',")
+            pass
+
+        arquivos_d_saida = [
+            [
+                '/home/leandro/TEMP/scanners/in_images/OFICIO DE ENCAMINHAMENTO E PARECER CI',
+                '/home/leandro/TEMP/scanners/in_images/OFICIO DE ENCAMINHAMENTO E PARECER CI/OFÍCIO ENCAMINHAMENTO DAS CONTAS 2022',
+                '/home/leandro/TEMP/scanners/in_images/OFICIO DE ENCAMINHAMENTO E PARECER CI/PARECER',
+                '/home/leandro/TEMP/scanners/in_images/OFICIO DE ENCAMINHAMENTO E PARECER CI/DECLARAÇÕES ART.1º, b, IV E VII IN 0012023',
+                '/home/leandro/TEMP/scanners/in_images/APLICAÇÕES',
+            ],
+        ]
+        conjunto = [
+            [
+                '/home/leandro/TEMP/scanners/in_images/SUBSIDIOS VEREADORES E SECRETARIO GERAL',
+                '/home/leandro/TEMP/scanners/in_images/SUBSIDIOS VEREADORES E SECRETARIO GERAL/FOLHA VEREADORES',
+                '/home/leandro/TEMP/scanners/in_images/SUBSIDIOS VEREADORES E SECRETARIO GERAL/FOLHA VEREADORES/DEMONSTRATIVO SUBSÍDIOS VEREADORES',
+                '/home/leandro/TEMP/scanners/in_images/SUBSIDIOS VEREADORES E SECRETARIO GERAL/FOLHA VEREADORES/FOLHA JANEIRO',
+                '/home/leandro/TEMP/scanners/in_images/SUBSIDIOS VEREADORES E SECRETARIO GERAL/FOLHA VEREADORES/FOLHA FEVEREIRO',
+                '/home/leandro/TEMP/scanners/in_images/SUBSIDIOS VEREADORES E SECRETARIO GERAL/FOLHA VEREADORES/FOLHA MARÇO',
+                '/home/leandro/TEMP/scanners/in_images/SUBSIDIOS VEREADORES E SECRETARIO GERAL/FOLHA VEREADORES/FOLHA ABRIL',
+                '/home/leandro/TEMP/scanners/in_images/SUBSIDIOS VEREADORES E SECRETARIO GERAL/FOLHA VEREADORES/FOLHA MAIO',
+                '/home/leandro/TEMP/scanners/in_images/SUBSIDIOS VEREADORES E SECRETARIO GERAL/FOLHA VEREADORES/FOLHA JUNHO',
+                '/home/leandro/TEMP/scanners/in_images/SUBSIDIOS VEREADORES E SECRETARIO GERAL/FOLHA VEREADORES/FOLHA JULHO',
+                '/home/leandro/TEMP/scanners/in_images/SUBSIDIOS VEREADORES E SECRETARIO GERAL/FOLHA VEREADORES/FOLHA AGOSTO',
+                '/home/leandro/TEMP/scanners/in_images/SUBSIDIOS VEREADORES E SECRETARIO GERAL/FOLHA VEREADORES/FOLHA SETEMBRO',
+                '/home/leandro/TEMP/scanners/in_images/SUBSIDIOS VEREADORES E SECRETARIO GERAL/FOLHA VEREADORES/FOLHA OUTUBRO',
+                '/home/leandro/TEMP/scanners/in_images/SUBSIDIOS VEREADORES E SECRETARIO GERAL/FOLHA VEREADORES/FOLHA NOVEMBRO',
+                '/home/leandro/TEMP/scanners/in_images/SUBSIDIOS VEREADORES E SECRETARIO GERAL/FOLHA VEREADORES/FOLHA DEZEMBRO',
+            ],
+            [
+                '/home/leandro/TEMP/scanners/in_images/RPPS E FOLHAS',
+                '/home/leandro/TEMP/scanners/in_images/RPPS E FOLHAS/CERTIDÃO NEGATIVA DE DÉBITO RPPS',
+                '/home/leandro/TEMP/scanners/in_images/RPPS E FOLHAS/DEMONSTRATIVO ART. 1º, b, II da IN 0012023',
+                '/home/leandro/TEMP/scanners/in_images/RPPS E FOLHAS/LEIS RPPS 2022',
+                '/home/leandro/TEMP/scanners/in_images/RPPS E FOLHAS/RPPS JANEIRO',
+                '/home/leandro/TEMP/scanners/in_images/RPPS E FOLHAS/RPPS FEVEREIRO',
+                '/home/leandro/TEMP/scanners/in_images/RPPS E FOLHAS/RPPS MARÇO',
+                '/home/leandro/TEMP/scanners/in_images/RPPS E FOLHAS/RPPS ABRIL',
+                '/home/leandro/TEMP/scanners/in_images/RPPS E FOLHAS/RPPS MAIO',
+            ],
+            [
+                '/home/leandro/TEMP/scanners/in_images/RPPS E FOLHAS',
+                '/home/leandro/TEMP/scanners/in_images/RPPS E FOLHAS/RPPS JUNHO',
+                '/home/leandro/TEMP/scanners/in_images/RPPS E FOLHAS/RPPS JULHO',
+                '/home/leandro/TEMP/scanners/in_images/RPPS E FOLHAS/RPPS AGOSTO',
+                '/home/leandro/TEMP/scanners/in_images/RPPS E FOLHAS/RPPS SETEMBRO',
+                '/home/leandro/TEMP/scanners/in_images/RPPS E FOLHAS/RPPS OUTUBRO',
+                '/home/leandro/TEMP/scanners/in_images/RPPS E FOLHAS/RPPS NOVEMBRO',
+                '/home/leandro/TEMP/scanners/in_images/RPPS E FOLHAS/RPPS DEZEMBRO',
+            ],
+            [
+                '/home/leandro/TEMP/scanners/in_images/EXTRATOS 2022',
+                '/home/leandro/TEMP/scanners/in_images/EXTRATOS 2022/EXTRATO JANEIRO',
+                '/home/leandro/TEMP/scanners/in_images/EXTRATOS 2022/EXTRATO FEVEREIRO',
+                '/home/leandro/TEMP/scanners/in_images/EXTRATOS 2022/EXTRATO MARÇO',
+                '/home/leandro/TEMP/scanners/in_images/EXTRATOS 2022/EXTRATO ABRIL',
+                '/home/leandro/TEMP/scanners/in_images/EXTRATOS 2022/EXTRATO MAIO',
+                '/home/leandro/TEMP/scanners/in_images/EXTRATOS 2022/EXTRATO JUNHO',
+                '/home/leandro/TEMP/scanners/in_images/EXTRATOS 2022/EXTRATO JULHO',
+                '/home/leandro/TEMP/scanners/in_images/EXTRATOS 2022/EXTRATO AGOSTO',
+                '/home/leandro/TEMP/scanners/in_images/EXTRATOS 2022/EXTRATO SETEMBRO',
+                '/home/leandro/TEMP/scanners/in_images/EXTRATOS 2022/EXTRATO OUTUBRO',
+                '/home/leandro/TEMP/scanners/in_images/EXTRATOS 2022/EXTRATO NOVEMBRO',
+                '/home/leandro/TEMP/scanners/in_images/EXTRATOS 2022/EXTRATO DEZEMBRO',
+            ],
         ]
 
-        for c in composicao:
-            for f in lf:
-                if c[0] and c[0] not in f:
+        for index, folders_in in enumerate(arquivos_d_saida):
+
+            pages_out = []
+
+            for fdIn in folders_in:
+                lfpdf = glob.glob(glob.escape(fdIn) + '/*.png', recursive=True)
+                lfpdf.sort()
+                pages_out += lfpdf
+
+            folder_out = folders_in[0].replace('in_images', 'out')
+
+            doc = SimpleDocTemplate(
+                folder_out + f'{index}.pdf',
+                rightMargin=0,
+                leftMargin=0,
+                topMargin=0,
+                bottomMargin=0)
+
+            c = canvas.Canvas(folder_out + f'out{index}.pdf')
+
+            """def get_white_noise_image(w, h):
+                pil_map = Image.fromarray(np.random.randint(
+                    0, 255, (w, h, 3), dtype=np.dtype('uint8')))
+                return pil_map"""
+
+            for f in pages_out:
+                if folder_out in f:
                     continue
-                c[0] = ''
 
-                flist_out.append(f)
-                if c[1] in f:
-                    break
+                # if '.png' not in f:
+                #    continue
 
-        doc = SimpleDocTemplate(
-            folder_out + 'out.pdf',
-            rightMargin=0,
-            leftMargin=0,
-            topMargin=0,
-            bottomMargin=0)
+                # if '.jpeg' not in f.lower() and '.jpg' not in f.lower():
+                #    continue
 
-        c = canvas.Canvas(folder_out + 'out.pdf')
+                f_out_image = f.replace('in_image', 'out_image')
+                os.makedirs(
+                    '/'.join(f_out_image.split('/')[:-1]), exist_ok=True)
+                #f_out = f_out.replace('.png', '.jpeg')
 
-        """def get_white_noise_image(w, h):
-            pil_map = Image.fromarray(np.random.randint(
-                0, 255, (w, h, 3), dtype=np.dtype('uint8')))
-            return pil_map"""
+                try:
+                    """i = Image.open(f)
+                    i = i.convert("L")
+                    i = np.array(i)
+                    i = (i > 128) * 255
+                    #i = Image.fromarray(i).convert("L")
+                    i = Image.fromarray(np.uint8(i))
+                    i.save(f_out, optimize=True, quality=5)"""
 
-        for f in flist_out:
-            if folder_out in f:
-                continue
+                    #img = Image.open(f)
+                    #img = img.convert("L")
+                    # img.save(f_out)  # , optimize=True, quality=10)"""
 
-            # if '.png' not in f:
-            #    continue
+                    def adjust_contrast_brightness(img, contrast: float=1.0, brightness: int=0):
+                        """
+                        Adjusts contrast and brightness of an uint8 image.
+                        contrast:   (0.0,  inf) with 1.0 leaving the contrast as is
+                        brightness: [-255, 255] with 0 leaving the brightness as is
+                        """
+                        brightness += int(round(255 * (1 - contrast) / 2))
+                        return cv2.addWeighted(img, contrast, img, 0, brightness)
 
-            if '.jpeg' not in f.lower() and '.jpg' not in f.lower():
-                continue
+                    i = cv2.imread(f)
+                    ig = cv2.cvtColor(i, cv2.COLOR_RGB2GRAY)
+                    ig = adjust_contrast_brightness(ig, 1.1, 0)
+                    cv2.imwrite(
+                        f_out_image, ig, [
+                            int(cv2.IMWRITE_JPEG_QUALITY), 100,
+                            #int(cv2.IMWRITE_JPEG_PROGRESSIVE), 1,
+                            #int(cv2.IMWRITE_PNG_COMPRESSION), 9
+                        ])
 
-            f_out = f.split(folder_in)
-            f_out = folder_out.join(f_out)
-            print(f, f_out)
+                    c.drawImage(f_out_image, 0, 0,
+                                width=595,
+                                height=841)
+                    c.showPage()
+                    # c.save()
+                    # return
+                except Exception as e:
+                    continue
+            c.save()
 
-            #f_out = f_out.replace('.png', '.jpeg')
+            """
+            cria pdf através da pillow
+    
+            flist_out_img_obj = []
+            for f in flist_out:
+                flist_out_img_obj.append(Image.open(f))
+    
+            f = flist_out_img_obj.pop(0)
+    
+            f.save(
+                folder_out + 'out.pdf',
+                "PDF",
+                resolution=100.0,
+                save_all=True,
+                append_images=flist_out_img_obj)"""
 
-            try:
-                """i = Image.open(f)
-                i = i.convert("L")
-                i = np.array(i)
-                i = (i > 128) * 255
-                #i = Image.fromarray(i).convert("L")
-                i = Image.fromarray(np.uint8(i))
-                i.save(f_out, optimize=True, quality=5)"""
+            cmd = ["{}/ocrmypdf".format('/'.join(sys.executable.split('/')[:-1])),
+                   #"-q",                  # Execução silenciosa
+                   "-l por",              # tesseract portugues
+                   "-j 8",     # oito threads
+                   "--fast-web-view 10000000",   # não inclui fast web view
+                   "--image-dpi 300",
+                   #"--rotate-pages",
+                   #"--remove-background",
 
-                #img = Image.open(f)
-                #img = img.convert("L")
-                # img.save(f_out)  # , optimize=True, quality=10)"""
+                   "--optimize 0",
+                   "--jpeg-quality 100",
+                   "--png-quality 100",
+                   #"--jbig2-lossy",
 
-                i = cv2.imread(f)
-                ig = cv2.cvtColor(i, cv2.COLOR_RGB2GRAY)
-                #ig = cv2.inRange(ig, 200, 255)
-                cv2.imwrite(
-                    f_out, ig, [
-                        int(cv2.IMWRITE_JPEG_QUALITY), 20,
-                        int(cv2.IMWRITE_JPEG_PROGRESSIVE), 1,
-                    ])
+                   # "--deskew",
+                   #"--clean-final",
+                   "--pdfa-image-compression jpeg",  # jpeg  lossless
+                   "--output-type pdfa-1",
+                   #"--tesseract-timeout 0",
+                   f'"{folder_out}out{index}.pdf"',
+                   f'"{folder_out}out_ocr{index}.pdf"']
 
-                c.drawImage(f_out, 0, 0,
-                            width=595,
-                            height=841)
-                c.showPage()
-            except Exception as e:
-                continue
-        c.save()
-        """
-        cria pdf através da pillow
+            print(' '.join(cmd))
+            subprocess.Popen(
+                ' '.join(cmd), shell=True, stdout=subprocess.PIPE)
+            # try:
+            #    p = ProcessoExterno(' '.join(cmd), self.logger)
+            #    r = p.run(timeout=300)#
 
-        flist_out_img_obj = []
-        for f in flist_out:
-            flist_out_img_obj.append(Image.open(f))
-
-        f = flist_out_img_obj.pop(0)
-
-        f.save(
-            folder_out + 'out.pdf',
-            "PDF",
-            resolution=100.0,
-            save_all=True,
-            append_images=flist_out_img_obj)"""
-
-        cmd = ["{}/ocrmypdf".format('/'.join(sys.executable.split('/')[:-1])),
-               "-q",                  # Execução silenciosa
-               "-l por",              # tesseract portugues
-               "-j {}".format(8),     # oito threads
-               "--fast-web-view 0",   # não inclui fast web view
-               "--image-dpi 300",
-               #"--rotate-pages",
-               "--remove-background",
-
-               "--optimize 3",
-               "--jpeg-quality 5",
-
-               # "--deskew",
-               #"--clean-final",
-               "--pdfa-image-compression jpeg",  # jpeg
-               "--output-type pdfa-1",
-               #"--tesseract-timeout 0",
-               folder_out + 'out.pdf',
-               folder_out + 'out_ocr.pdf']
-
-        print(' '.join(cmd))
-        # subprocess.Popen(
-        #    ' '.join(cmd), shell=True, stdout=subprocess.PIPE)
-        try:
-            p = ProcessoExterno(' '.join(cmd), self.logger)
-            r = p.run(timeout=300)
-
-            if r is None:
-                return
-            if not r or r in (2, 6):
-                return
-        except:
-            return
+            #    if r is None:
+            #        return
+            #    if not r or r in (2, 6):
+            #        return
+            # except:
+            #    return
 
         """try:
                 i = Image.open(f)
@@ -187,117 +300,3 @@ class Command(BaseCommand):
 
             except IsADirectoryError:
                 os.makedirs(f_out, exist_ok=True)"""
-
-    def transforma_imagens_armazenadas_em_pdf(self):
-        models = [
-            {
-                'model': MateriaLegislativa,
-                'file_field': ('texto_original',),
-                'count': 0,
-                'count_base': 2,
-                'order_by': '-data_apresentacao',
-                'years_priority': 0
-            },
-            {
-                'model': DocumentoAdministrativo,
-                'file_field': ('texto_integral',),
-                'count': 0,
-                'count_base': 9,
-                'order_by': '-data',
-                'years_priority': 0
-            },
-            {
-                'model': DocumentoAcessorioAdministrativo,
-                'file_field': ('arquivo',),
-                'count': 0,
-                'count_base': 2,
-                'order_by': '-data',
-                'years_priority': 0
-            },
-            {
-                'model': NormaJuridica,
-                'file_field': ('texto_integral',),
-                'count': 0,
-                'count_base': 2,
-                'order_by': '-data',
-                'years_priority': 0
-            },
-            {
-                'model': DocumentoAcessorio,
-                'file_field': ('arquivo',),
-                'count': 0,
-                'count_base': 2,
-                'order_by': '-data',
-                'years_priority': 0
-            },
-            {
-                'model': DiarioOficial,
-                'file_field': ('arquivo',),
-                'count': 0,
-                'count_base': 2,
-                'order_by': '-data',
-                'years_priority': 0
-            },
-            {
-                'model': SessaoPlenaria,
-                'file_field': ('upload_pauta', 'upload_ata', 'upload_anexo'),
-                'count': 0,
-                'count_base': 2,
-                'order_by': '-data_inicio',
-                'years_priority': 0
-            },
-
-        ]
-
-        for md in models:
-
-            m = md['model']
-
-            q = Q()
-            for f in md['file_field']:
-                param = {f'{f}__iendswith': '.jpeg'}
-                q |= Q(**param)
-                param = {f'{f}__iendswith': '.jpg'}
-                q |= Q(**param)
-                param = {f'{f}__iendswith': '.png'}
-                q |= Q(**param)
-
-            qs = m.objects.filter(q)
-
-            ct = ContentType.objects.get_for_model(m)
-            for i in qs:
-                if not OcrMyPDF.objects.filter(content_type=ct, object_id=i.id).exists():
-                    OcrMyPDF.objects.filter(
-                        content_type=ct, object_id=i.id).delete()
-
-                for f in md['file_field']:
-                    p = getattr(i, f)
-                    if p:
-                        print(i.id, f, p.path)
-
-                        inn = p.path.replace(
-                            'media/sapl/', 'media/original__sapl/')
-                        inn = inn.replace('media/cmj/', 'media/original__cmj/')
-
-                        out = inn.split('.')
-                        out[-1] = 'pdf'
-                        out = '.'.join(out)
-
-                        temp_out = f'/tmp/{out.split("/")[-1]}'
-
-                        img = Image.open(inn)
-                        try:
-                            dx, dy = img.info['dpi']
-                        except:
-                            dx, dy = 100, 100
-
-                        img.convert('RGB')
-                        img.save(temp_out, resolution=dx)
-
-                        destino = os.path.basename(temp_out)
-
-                        with open(temp_out, 'rb') as f_in:
-                            p.save(destino, File(f_in), save=True)
-
-                        print(p.path)
-                        print(p.original_path)

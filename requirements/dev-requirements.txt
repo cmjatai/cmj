@@ -6,3 +6,13 @@ pygraphviz==1.4rc1
 pytest-ipdb==0.1-prerelease2
 pipdeptree
 
+
+
+opencv-contrib-python-headless
+pymupdf
+ocrmypdf
+
+sudo apt install tesseract
+sudo apt install tesseract-ocr
+sudo apt install tesseract-ocr-por
+#sudo apt install jbig2enc
