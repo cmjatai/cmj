@@ -92,11 +92,20 @@ from .models import (AcompanhamentoMateria, Anexada, AssuntoMateria, Autoria,
 def tipos_autores_materias(user):
 
     noww = timezone.localdate()
-    data_ini = noww - \
-        timedelta(days=noww.day - (1 if noww.day <= 15 else 16))
 
-    data_fim = noww + \
-        timedelta(days=-noww.day + (15 if noww.day <= 15 else 31))
+    if noww.year == 2023 and noww.month == 2:
+        data_ini = noww - \
+            timedelta(days=noww.day - (1 if noww.day <= 13 else 14))
+
+        data_fim = noww + \
+            timedelta(days=-noww.day + (14 if noww.day <= 14 else 31))
+    else:
+
+        data_ini = noww - \
+            timedelta(days=noww.day - (1 if noww.day <= 15 else 16))
+
+        data_fim = noww + \
+            timedelta(days=-noww.day + (15 if noww.day <= 15 else 31))
 
     while data_fim.day <= data_ini.day:
         data_fim -= timedelta(days=1)
