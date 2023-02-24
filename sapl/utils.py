@@ -1,10 +1,10 @@
 from functools import wraps
-from operator import itemgetter
-from unicodedata import normalize as unicodedata_normalize
 import hashlib
 import logging
+from operator import itemgetter
 import os
 import re
+from unicodedata import normalize as unicodedata_normalize
 import unicodedata
 
 from crispy_forms.layout import HTML, Button
@@ -29,12 +29,12 @@ from django.urls.base import reverse
 from django.utils import six, timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
+import django_filters
 from easy_thumbnails import source_generators
 from floppyforms.widgets import ClearableFileInput
 from image_cropping.widgets import ImageCropWidget
-from unipath.path import Path
-import django_filters
 import magic
+from unipath.path import Path
 import weasyprint
 
 from sapl.crispy_layout_mixin import SaplFormHelper
@@ -265,6 +265,33 @@ class PortalFieldFile(FieldFile):
                 kwargs={'pk': self.instance.pk})
         except:
             return ''
+
+    def shorten_file_name(self):
+        name = self.name
+
+        if not name:
+            return
+
+        nl = name.split('/')
+
+        if len(nl[-1]) < 128:
+            return
+
+        name = nl[-1][-20:]
+
+        name = f'f_{name}'
+
+        nl[-1] = name
+        new_path = f"{settings.MEDIA_ROOT}/{'/'.join(nl)}"
+        new_original_path = new_path.replace('sapl/', 'original__sapl/')
+        new_original_path = new_original_path.replace('cmj/', 'original__cmj/')
+
+        os.rename(self.path, new_path)
+        os.rename(self.original_path, new_original_path)
+
+        self.name = '/'.join(nl)
+        self.instance.save()
+        #os.rename(self.original_path, f"{settings.MEDIA_ROOT}/{'/'.join(nl)}")
 
     def delete(self, save=True):
         if not self:
@@ -505,19 +532,19 @@ def choice_anos_com_sessaoplenaria():
     try:
         from sapl.sessao.models import SessaoPlenaria
         y = SessaoPlenaria.objects.all().dates('data_inicio', 'year')
-        
+
         y = list(map(lambda x: x.year, y))
-        
+
         now = timezone.now()
-        
+
         if now.year not in y:
             y.append(now.year)
-            
+
         y.sort(reverse=True)
-        
+
         y = map(lambda x: (x, x), y)
-        
-        return y    
+
+        return y
     except Exception:
         return []
 

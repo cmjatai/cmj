@@ -42,7 +42,11 @@ class Command(BaseCommand):
         post_save.disconnect(dispatch_uid='timerefresh_post_signal')
         self.logger = logging.getLogger(__name__)
 
+        m = MateriaLegislativa.objects.get(pk=19819)
+        m.texto_original.shorten_file_name()
+
         # self.transformar_pdfs_em_imagens()
+        return
         self.criar_pdfs()
 
     def transformar_pdfs_em_imagens(self, *args, **options):
