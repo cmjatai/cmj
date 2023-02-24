@@ -291,7 +291,6 @@ class PortalFieldFile(FieldFile):
 
         self.name = '/'.join(nl)
         self.instance.save()
-        #os.rename(self.original_path, f"{settings.MEDIA_ROOT}/{'/'.join(nl)}")
 
     def delete(self, save=True):
         if not self:

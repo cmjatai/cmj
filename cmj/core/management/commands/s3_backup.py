@@ -48,8 +48,6 @@ class Command(BaseCommand):
 
         post_save.disconnect(dispatch_uid='timerefresh_post_signal')
 
-
-
         self.logger = logging.getLogger(__name__)
 
         # self.manutencao_buckets()
@@ -258,6 +256,11 @@ class Command(BaseCommand):
                         #    self.checar_consistencia(i, ff, fn)
                         # continue
 
+                        try:
+                            ff.shorten_file_name()
+                        except:
+                            pass
+
                         if not metadata:
                             metadata = {}
 
@@ -308,6 +311,7 @@ class Command(BaseCommand):
 
                         count_update = 0
                         try:
+
                             count_update += self.send_file(
                                 metadata, i, ff, fn, 'path', 'hash', 'size')
 
