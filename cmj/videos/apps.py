@@ -18,8 +18,6 @@ class AppConfig(apps.AppConfig):
         from . import tasks
         from cmj.celery import app as celery_app
 
-        return
-
         for i in inspect.stack():
             try:
                 if i.frame.f_locals['subcommand'] == 'migrate':
