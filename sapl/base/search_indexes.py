@@ -59,25 +59,25 @@ class TextExtractField(CharField):
         #        not os.path.splitext(arquivo.path)[1][:1]:
         #    return ''
 
-        if not arquivo or arquivo and not arquivo.name:
-            return ''
+        try:
+            if not arquivo or arquivo and not arquivo.name:
+                return ''
 
-        ext = arquivo.name.split('.')[-1]
-        #mime = magic.from_file(arquivo.path, mime=True)
+            ext = arquivo.name.split('.')[-1]
+            #mime = magic.from_file(arquivo.path, mime=True)
 
-        if ext in ('zip', 'gz', 'tar', 'mp3', 'mp4', 'mpeg', 'jpeg', 'png'):
-            return ''
+            if ext in ('zip', 'gz', 'tar', 'mp3', 'mp4', 'mpeg', 'jpeg', 'png'):
+                return ''
 
-        # manter limite maximo alinhado ao commando ocrmypdf
-        if arquivo.size > 40 * 1024 * 1024:
-            return ''
+            # manter limite maximo alinhado ao commando ocrmypdf
+            if arquivo.size > 40 * 1024 * 1024:
+                return ''
 
-        if SOLR_URL:
-            try:
+            if SOLR_URL:
                 return self.solr_extraction(arquivo)
-            except Exception as err:
-                print(str(err))
-                self.print_error(arquivo, err)
+        except Exception as err:
+            print(str(err))
+            self.print_error(arquivo, err)
         return ''
 
     def ta_extractor(self, value):
