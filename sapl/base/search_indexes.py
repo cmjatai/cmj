@@ -38,9 +38,13 @@ class TextExtractField(CharField):
         try:
             with open(arquivo.path, 'rb') as f:
                 content = self.backend.extract_file_contents(f)
-                if not content or not content['contents']:
-                    return ''
-                data = content['contents']
+                data = ''
+                if content:
+                    # update from Solr 7.5 to 8.9
+                    if content['contents']:
+                        data += content['contents']
+                    if content['file']:
+                        data += content['file']
         except Exception as e:
             print('erro processando arquivo: ' % arquivo.path)
             self.logger.error(arquivo.path)
