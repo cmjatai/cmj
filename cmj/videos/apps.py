@@ -49,3 +49,16 @@ class AppConfig(apps.AppConfig):
             )
         except:
             pass
+
+"""
+from cmj.celery import app as celery_app
+    i = celery_app.control.inspect()
+    if i:
+        queues = i.scheduled()
+        if queues:
+            for k, tarefas_agendadas in queues.items():
+                for ta in tarefas_agendadas:
+                    print(ta['eta'], ta['request']['name'])
+    print('-----------------------------')
+    print(timezone.now())
+"""
