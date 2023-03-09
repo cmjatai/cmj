@@ -157,11 +157,11 @@ def redesocial_post_function(sender, instance, **kwargs):
 
     running = {
         'MateriaLegislativa': {
-            'data_min': date(2022, 9, 7) if not settings.DEBUG else date(2022, 1, 1),
+            'data_min': date(2023, 3, 10) if not settings.DEBUG else date(2022, 1, 1),
             'time_call': redesocial_post_function_time_call_materialegislativa
         },
         'Documento': {
-            'data_min': date(2022, 9, 11) if not settings.DEBUG else date(2022, 1, 1),
+            'data_min': date(2023, 3, 10) if not settings.DEBUG else date(2022, 1, 1),
             'time_call': redesocial_post_function_time_call_documento
         },
     }
