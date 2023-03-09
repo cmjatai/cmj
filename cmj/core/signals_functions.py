@@ -144,8 +144,6 @@ def redesocial_post_function_time_call_materialegislativa(inst):
 
 def redesocial_post_function(sender, instance, **kwargs):
 
-    return
-
     if not hasattr(instance, '_meta') or \
         instance._meta.app_config is None or \
             not instance._meta.app_config.name in settings.BUSINESS_APPS:
