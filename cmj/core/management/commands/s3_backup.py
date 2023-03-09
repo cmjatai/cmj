@@ -7,14 +7,11 @@ import boto3
 from django.apps import apps
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from django.db.models import Q
 from django.db.models.fields.files import FileField
-from django.db.models.signals import post_delete, post_save, pre_save
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
 from cmj.utils import Manutencao
-from sapl.base.models import CasaLegislativa
 from sapl.utils import hash_sha512
 
 
@@ -45,8 +42,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         m = Manutencao()
         m.desativa_auto_now()
+        m.desativa_signals()
 
-        post_save.disconnect(dispatch_uid='timerefresh_post_signal')
+        # post_save.disconnect(dispatch_uid='timerefresh_post_signal')
 
         self.logger = logging.getLogger(__name__)
 
@@ -215,12 +213,12 @@ class Command(BaseCommand):
                 if not model_exec:
                     continue
                 #print(m, m.objects.all().count())
-                pre_save.disconnect(
-                    sender=m,
-                    dispatch_uid='cmj_pre_save_signed_{}_{}'.format(
-                        app.name.replace('.', '_'),
-                        m._meta.model_name
-                    ))
+                # pre_save.disconnect(
+                #    sender=m,
+                #    dispatch_uid='cmj_pre_save_signed_{}_{}'.format(
+                #        app.name.replace('.', '_'),
+                #        m._meta.model_name
+                #    ))
 
                 print(m)
                 for i in m.objects.all().order_by('-id'):  #
