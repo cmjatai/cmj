@@ -1,5 +1,5 @@
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import logging
 import os
 from random import choice
@@ -91,37 +91,29 @@ from .models import (AcompanhamentoMateria, Anexada, AssuntoMateria, Autoria,
 
 def tipos_autores_materias(user):
 
-    noww = timezone.localdate()
+    noww = date(2023, 3, 15)  # timezone.localdate()
 
-    if noww.year == 2023 and noww.month == 2:
-        data_ini = noww - \
-            timedelta(days=noww.day - (1 if noww.day <= 13 else 14))
-
-        data_fim = noww + \
-            timedelta(days=-noww.day + (14 if noww.day <= 14 else 31))
-    else:
-
-        data_ini = noww - \
-            timedelta(days=noww.day - (1 if noww.day <= 15 else 16))
-
-        data_fim = noww + \
-            timedelta(days=-noww.day + (15 if noww.day <= 15 else 31))
+    data_ini = noww - timedelta(
+        days=noww.day - (1 if noww.day <= 15 else 16))
+    data_fim = noww + timedelta(
+        days=-noww.day + (15 if noww.day <= 15 else 31))
 
     while data_fim.day <= data_ini.day:
         data_fim -= timedelta(days=1)
 
     sq = SessaoPlenaria.objects.filter(
         data_fim__range=(data_ini, data_fim)
-    ).order_by('data_fim').last()
+    ).order_by('data_fim', 'id')
 
     q = Q(em_tramitacao=True)
 
-    if sq and (noww - sq.data_fim).days < 3:
-        q |= Q(
-            tipo__turnos_aprovacao=1,
-            registrovotacao__data_hora__gte=data_ini,
-            registrovotacao__data_hora__lte=data_fim,
-        )
+    if sq.exists():
+        if sq.count() < 3 or (noww - sq.last().data_fim).days == 0:
+            q |= Q(
+                tipo__turnos_aprovacao=1,
+                registrovotacao__data_hora__gte=data_ini,
+                registrovotacao__data_hora__lte=data_fim,
+            )
 
     if user:
         q &= Q(autores__operadores=user)
