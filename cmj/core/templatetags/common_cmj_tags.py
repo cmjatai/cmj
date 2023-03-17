@@ -51,6 +51,11 @@ def to_dict(object):
     return object.__dict__
 
 
+@register.filter('islist')
+def islist(object):
+    return isinstance(object, list)
+
+
 @register.filter
 def transmissao_ao_vivo(obj):
 

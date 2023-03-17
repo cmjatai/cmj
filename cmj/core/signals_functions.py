@@ -280,12 +280,20 @@ def signed_files_extraction_function(sender, instance, **kwargs):
 
                 # .format(field['/V']['/Reason'])
             nome = 'Nome do assinante não localizado.'
+            oname = ''
             content_sign = field['/V']['/Contents']
             try:
                 signed_data = cms.ContentInfo.load(content_sign)['content']
                 oun_old = []
                 for cert in signed_data['certificates']:
                     subject = cert.native['tbs_certificate']['subject']
+                    issuer = cert.native['tbs_certificate']['issuer']
+                    oname = issuer.get('organization_name', '')
+
+                    if oname == 'Gov-Br':
+                        nome = subject['common_name'].split(':')[0]
+                        continue
+
                     oun = subject['organizational_unit_name']
 
                     if isinstance(oun, str):
@@ -294,6 +302,10 @@ def signed_files_extraction_function(sender, instance, **kwargs):
                     if len(oun) > len(oun_old):
                         oun_old = oun
                         nome = subject['common_name'].split(':')[0]
+
+                        if oun and isinstance(oun, list) and len(oun) == 4:
+                            oname += ' - ' + oun[3]
+
             except:
                 if '/Name' in field['/V']:
                     nome = field['/V']['/Name']
@@ -314,7 +326,7 @@ def signed_files_extraction_function(sender, instance, **kwargs):
                 pass
 
             if nome not in signs:
-                signs[nome] = fd
+                signs[nome] = [fd, oname]
 
         return signs
 
