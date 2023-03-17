@@ -91,7 +91,7 @@ from .models import (AcompanhamentoMateria, Anexada, AssuntoMateria, Autoria,
 
 def tipos_autores_materias(user):
 
-    noww = date(2023, 3, 15)  # timezone.localdate()
+    noww = timezone.localdate()
 
     data_ini = noww - timedelta(
         days=noww.day - (1 if noww.day <= 15 else 16))
