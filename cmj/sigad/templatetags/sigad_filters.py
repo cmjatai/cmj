@@ -143,7 +143,10 @@ def list_in_informacao(node):
         )
         # classes.update(visibilidade=1)
     else:
-        classes = classes.filter(parent__isnull=True)
+        classes = classes.filter(
+            list_in_inf=True,
+            parent__isnull=True
+        )
 
         classes = Classe.objects.filter(
             list_in_inf=True,

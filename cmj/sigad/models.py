@@ -82,6 +82,7 @@ CLASSE_TEMPLATES_CHOICE_FILES = {
     6: 'path/path_classe.html',
     7: 'path/path_galeria_video.html',
     99: 'path/path_documento.html',
+    999: 'path/path_mapa_site.html',
 }
 
 CLASSE_DOC_MANAGER_CHOICE = {
@@ -93,6 +94,7 @@ CLASSE_DOC_MANAGER_CHOICE = {
     6: 'qs_audio_news',
     7: 'qs_video_news',
     99: None,
+    999: 'qs_mapa_site',
 }
 
 CLASSE_TEMPLATES_CHOICE = CmjChoices(
@@ -104,6 +106,7 @@ CLASSE_TEMPLATES_CHOICE = CmjChoices(
     (6, 'galeria_audio', _('Galeria de Áudios')),
     (7, 'galeria_video', _('Galeria de Vídeos')),
     (99, 'documento_especifico', _('Documento Específico')),
+    (999, 'mapa_site', _('Mapa do Site')),
 )
 
 
@@ -698,7 +701,21 @@ class ShortUrl(Slugged):
         abstract = True
 
 
+class ClasseManager(models.Manager):
+    use_for_related_fields = True
+
+    def qs_mapa_site(self, user=None):
+        qs = self.get_queryset()
+        qs = qs.filter(
+            visibilidade=Classe.STATUS_PUBLIC,
+            list_in_mapa=True
+        )
+
+        return qs.order_by('-parent', 'parent__codigo', 'codigo')
+
+
 class Classe(ShortUrl, CMSMixin):
+    objects = ClasseManager()
 
     codigo = models.PositiveIntegerField(verbose_name=_('Código'), default=0)
 
@@ -778,7 +795,7 @@ class Classe(ShortUrl, CMSMixin):
             return self.parlamentar
         return None
 
-    @cached_property
+    @property
     def conta(self):
         ct = [str(p.codigo) for p in self.parents]
         ct.append(str(self.codigo))

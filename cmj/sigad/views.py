@@ -395,7 +395,15 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
         elif template == models.CLASSE_TEMPLATES_CHOICE.parlamentar:
             docs = self.classe.parlamentar.documento_set
             kwargs['object_list'] = docs.qs_news(self.request.user)
-        elif models.CLASSE_TEMPLATES_CHOICE.documento_especifico:
+        elif template == models.CLASSE_TEMPLATES_CHOICE.documento_especifico:
+            kwargs['object_list'] = Documento.objects.qs_news().filter(
+                parlamentares__isnull=True)[:4]
+        elif template == models.CLASSE_TEMPLATES_CHOICE.mapa_site:
+            kwargs['object_list'] = Classe.objects.qs_mapa_site(
+                self.request.user)
+            self.paginate_by = None
+
+        else:
             kwargs['object_list'] = Documento.objects.qs_news().filter(
                 parlamentares__isnull=True)[:4]
 

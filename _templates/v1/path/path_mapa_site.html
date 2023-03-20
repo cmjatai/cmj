@@ -1,0 +1,51 @@
+{% extends "base_path.html" %}
+{% load i18n sigad_filters common_cmj_tags%}
+{% block historico_publicacao %}{% endblock %}
+{% block main_container_class %}container container-path container-list{% endblock %}
+{% block title %}
+
+{% endblock title %}
+{% block controls_content %}
+  {% if perms.sigad.change_classe %}
+    <a class="btn btn-outline-primary" href="{% url 'cmj.sigad:subclasse_list' object.id %}">{% trans "Admin" %}</a>
+  {% endif %}
+  {% if perms.sigad.add_documento %}
+    <a class="btn btn-outline-primary" href="{% url create_doc_url object.id %}">{% trans "Adicionar item a" %} {{object }}</a>
+  {% endif %}
+{% endblock %}
+
+{% block base_content %}
+
+  <div class="row d-none {% if not object.childs.exists %}justify-content-center{% endif %}">
+    {% with 0 as split_row %}
+      <div class="col-12 col-md-7">
+        {% with 'path-item-list w-100 px-3' as css_class %}
+          {% include "path/path_list_docs.html" %}
+        {% endwith %}
+      </div>
+       {% if object.childs.exists %}
+          <div class="col order-first order-md-last">
+            <ul class="nav">
+              {% for ch in object.childs.all %}
+                <li>
+                  <a href="/{{ch.absolute_slug}}">{{ch.apelido|default:ch.titulo}}</a>
+                </li>
+              {% endfor %}
+
+            </ul>
+          </div>
+       {% endif %}
+    {% endwith %}
+    {% include "paginacao.html" %}
+  </div>
+
+  <div class="row container-mapa-site">
+    {% with object_list as obj_list %}
+      {% include "path/path_mapa_site_sub.html" %}
+    {% endwith %}
+  </div>
+
+{% endblock %}
+
+{% block cmj_extra_content %}
+{% endblock %}

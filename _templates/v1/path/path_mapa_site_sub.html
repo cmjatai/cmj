@@ -1,0 +1,12 @@
+{% load i18n sigad_filters social_utils  cropping thumbnail %}
+
+{% for item in obj_list %}
+  <ul class="submapa {% if not item.parent %}col-12{% endif %}">
+    <a class="title" href="{{item.url_redirect}}">
+      {{item.titulo}}
+    </a>
+    {% with item.childs.all as obj_list %}
+      {% include "path/path_mapa_site_sub.html" %}
+    {% endwith %}
+  </ul>
+{% endfor %}
