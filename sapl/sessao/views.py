@@ -716,6 +716,7 @@ class MateriaOrdemDiaCrud(MasterDetailCrud):
             materias = set()
             for m in obj.materia.anexadas.materias_anexadas_ordem_crescente():
                 if not m.registrovotacao_set.filter(
+                        ordem__sessao_plenaria__tipo__gera_selo_votacao=True,
                         tipo_resultado_votacao__natureza='A').exists():
                     materias.add(m.id)
 
