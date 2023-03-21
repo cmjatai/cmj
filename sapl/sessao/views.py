@@ -3907,7 +3907,11 @@ class PesquisarSessaoPlenariaView(FilterView):
                 ponto_comeco = url.find('data_inicio__year=') - 1
                 url = url[ponto_comeco:]
         else:
-            url = ''
+            return HttpResponseRedirect(
+                reverse(
+                    'sapl.sessao:pesquisar_sessao'
+                ) + f'?data_inicio__year={timezone.now().year}'
+            )
 
         context = self.get_context_data(filter=self.filterset,
                                         object_list=self.object_list,

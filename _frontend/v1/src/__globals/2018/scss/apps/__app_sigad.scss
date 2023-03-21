@@ -327,6 +327,38 @@
       }
     }
   }
+  .container-mapa-site {
+    li {
+      list-style-type: none;
+    }
+    .submapa {
+      font-weight: bold;
+      font-size: 95%;
+      li {
+        list-style-type: none;
+        &::before {
+          color: #794905;
+          content: "\2022";
+        }
+      }
+    }
+    .title {
+      color: #794905;
+
+      &:hover {
+        color: darken(#794905, 15%);
+      }
+    }
+    .submapa .submapa {
+      border-top: 1px dotted black;
+      font-weight: 300;
+    }
+    .submapa .submapa .submapa {
+      border-top: 0px dotted black;
+    }
+
+
+  }
 }
 
 .path-item-list {
