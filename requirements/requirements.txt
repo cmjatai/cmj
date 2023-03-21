@@ -12,21 +12,20 @@ drf-spectacular==0.24.2
 django-webpack4-loader
 djangorestframework==3.12.4
 
-ocrmypdf==14.0.4
+ocrmypdf==13.7.0
 python-telegram-bot==13.12
 
 asn1crypto
-
 boto3==1.26.95
+
+celery-haystack==0.10
+
 
 billiard==3.6.3.0
 celery==4.4.2
 
-
 #billiard<4.0,>=3.6.4.0
 #celery==5.1.2
-
-celery-haystack==0.10
 
 channels==2.4.0
 channels_redis==2.4.2

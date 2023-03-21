@@ -84,19 +84,19 @@ class Command(BaseCommand):
 
     models = [
         {
-            'model': MateriaLegislativa,
-            'file_field': ('texto_original',),
-            'count': 0,
-            'count_base': 2,
-            'order_by': '-data_apresentacao',
-            'years_priority': 0
-        },
-        {
             'model': DocumentoAdministrativo,
             'file_field': ('texto_integral',),
             'count': 0,
             'count_base': 9,
             'order_by': '-data',
+            'years_priority': 0
+        },
+        {
+            'model': MateriaLegislativa,
+            'file_field': ('texto_original',),
+            'count': 0,
+            'count_base': 2,
+            'order_by': '-data_apresentacao',
             'years_priority': 0
         },
         {
@@ -212,10 +212,7 @@ class Command(BaseCommand):
             print(init, 'Command OcrMyPdf já está sendo executado por outro processo')
             return
 
-
         post_save.disconnect(dispatch_uid='timerefresh_post_signal')
-
-
 
         # self.run_distibui_ocr_ao_longo_do_ano()
         # return
@@ -372,7 +369,7 @@ class Command(BaseCommand):
                                 init_item = datetime.now()
                                 result = self.run(item, ff)
                                 if result is None:
-                                    return
+                                    break
 
                                 o.sucesso = result
                                 o.save()
