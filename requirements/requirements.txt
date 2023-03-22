@@ -20,7 +20,7 @@ boto3==1.26.95
 
 
 celery-haystack==0.10
-django-celery-results==2.0.0
+django-celery-results==2.4.0
 billiard==3.6.3.0
 celery==4.4.2
 
