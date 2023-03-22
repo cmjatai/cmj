@@ -9,7 +9,7 @@
           {{item.apelido|default:item.titulo}}
         </span>
       {% else %}
-        <a class="title" href="{{item.url_redirect}}">
+        <a class="title" href="{{item.url_redirect|default:item.absolute_slug}}">
           {{item.apelido|default:item.titulo}}
         </a>
       {% endif %}
