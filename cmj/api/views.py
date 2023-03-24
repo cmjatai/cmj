@@ -13,11 +13,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from cmj.api.serializers import DocumentoSerializer,\
-    DocumentoUserAnonymousSerializer, DocumentoChoiceSerializer,\
-    BiSerializer
+    DocumentoUserAnonymousSerializer, DocumentoChoiceSerializer
 from cmj.core.models import Bi
 from cmj.sigad.models import Documento, VersaoDeMidia, Midia,\
     ReferenciaEntreDocumentos
+from drfautoapi.drfautoapi import ApiViewSetConstrutor
 
 
 class AppVersionView(APIView):
@@ -34,9 +34,16 @@ class AppVersionView(APIView):
         return Response(content)
 
 
-class BiViewSet(viewsets.ModelViewSet):
-    queryset = Bi.objects.all()
-    serializer_class = BiSerializer
+CmjApiViewSetConstrutor = ApiViewSetConstrutor
+CmjApiViewSetConstrutor.import_modules([
+    'cmj.api.views_core',
+    'cmj.api.views_agenda',
+]
+)
+
+# class BiViewSet(viewsets.ModelViewSet):
+#    queryset = Bi.objects.all()
+#    serializer_class = BiSerializer
 
 
 class DocumentoViewSet(viewsets.ModelViewSet):

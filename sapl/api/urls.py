@@ -4,25 +4,22 @@ from drf_spectacular.views import SpectacularSwaggerView, SpectacularRedocView,\
     SpectacularAPIView
 from rest_framework.authtoken.views import obtain_auth_token
 
+from cmj.api.views import DocumentoViewSet,  AppVersionView,\
+    CmjApiViewSetConstrutor
 from sapl.api.deprecated import SessaoPlenariaViewSet
-from sapl.api.views import AppVersionView, recria_token,\
-    SaplApiViewSetConstrutor
+from sapl.api.views import recria_token, SaplApiViewSetConstrutor
 
 from .apps import AppConfig
 
 
 app_name = AppConfig.name
 
-router = SaplApiViewSetConstrutor.router()
+router_sapl = SaplApiViewSetConstrutor.router()
+router_cmj = CmjApiViewSetConstrutor.router()
 
-# TODO: eliminar endpoint, transferido para SaplApiViewSetConstrutor
-# verificar se ainda permanece necessidade desses endpoint's
-# /api/sessao-planaria -> /api/sessao/sessaoplenaria/ecidadania
-#  /api/sessao-planaria/{pk} -> /api/sessao/sessaoplenaria/{pk}/ecidadania
-router.register(r'sessao-plenaria', SessaoPlenariaViewSet,
-                basename='sessao_plenaria_old')
+router_cmj.register(r'documento', DocumentoViewSet)
 
-urlpatterns_router = router.urls
+urlpatterns_router = router_sapl.urls + router_cmj.urls
 
 urlpatterns_api_doc = [
     url('^schema/swagger-ui/',

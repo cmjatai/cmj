@@ -52,7 +52,7 @@ SaplApiViewSetConstrutor.import_modules([
 
 """
 1. ApiViewSetConstrutor constroi uma rest_framework.viewsets.ModelViewSet
-     para todos os models de todas as app_configs passadas no list 
+     para todos os models de todas as app_configs passadas no list
 2. Define DjangoFilterBackend como ferramenta de filtro dos campos
 3. Define Serializer como a seguir:
     3.1   - Define um Serializer genérico para cada módel
@@ -60,7 +60,7 @@ SaplApiViewSetConstrutor.import_modules([
             recupera Serializer customizados no módulo DEFAULT_SERIALIZER_MODULE
     3.2 - Para todo model é opcional a existência de {model}Serializer.
           Caso não seja definido um Serializer customizado, utiliza-se o genérico
-    3.3 - Caso exista GLOBAL_SERIALIZER_MIXIN definido, 
+    3.3 - Caso exista GLOBAL_SERIALIZER_MIXIN definido,
           utiliza este Serializer para construir o genérico de 3.1
 4. Define um FilterSet como a seguir:
     4.1 -   Define um FilterSet genérico para cada módel
@@ -68,13 +68,13 @@ SaplApiViewSetConstrutor.import_modules([
             recupera o FilterSet customizado no módulo DEFAULT_FILTER_MODULE
     4.2 - Para todo model é opcional a existência de {model}FilterSet.
           Caso não seja definido um FilterSet customizado, utiliza-se o genérico
-    4.3 - Caso exista GLOBAL_FILTERSET_MIXIN definido, 
+    4.3 - Caso exista GLOBAL_FILTERSET_MIXIN definido,
           utiliza este FilterSet para construir o genérico de 4.1
-    4.4 - Caso não exista GLOBAL_FILTERSET_MIXIN, será aplicado 
+    4.4 - Caso não exista GLOBAL_FILTERSET_MIXIN, será aplicado
           drfautoapi.drjautoapi.ApiFilterSetMixin que inclui parametro para:
           - order_by: através do parâmetro "o"
-          - amplia os lookups aceitos pelo FilterSet default 
-            para os aceitos pelo django sem a necessidade de criar 
+          - amplia os lookups aceitos pelo FilterSet default
+            para os aceitos pelo django sem a necessidade de criar
             fields específicos em um FilterSet customizado.
 
 5. ApiViewSetConstrutor não cria padrões e/ou exige conhecimento alem dos

@@ -105,7 +105,7 @@ if settings.DEBUG:
     urlpatterns_all += static(settings.STATIC_URL,
                               document_root=settings.STATIC_ROOT)
 
-    urlpatterns_all += [ 
+    urlpatterns_all += [
         url(r'^media/(?P<path>.*)$', view_static_server, {
             'document_root': settings.MEDIA_ROOT,
         }),
@@ -113,7 +113,6 @@ if settings.DEBUG:
 
 
 urlpatterns_all += [
-    url(r'', include(cmj.api.urls)),
     url(r'', include(sapl.api.urls)),
 
     # urls não tratadas até aqui será capturada por PathView de cmj.sigad

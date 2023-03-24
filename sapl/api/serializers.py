@@ -5,6 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.db.models import Q
 from django.urls.base import reverse
+from drf_spectacular.utils import extend_schema_field
 from image_cropping.utils import get_backend
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
@@ -23,7 +24,7 @@ class SaplSerializerMixin(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
 
-    def get_link_detail_backend(self, obj):
+    def get_link_detail_backend(self, obj) -> str:
         try:
             return reverse(f'{self.Meta.model._meta.app_config.name}:{self.Meta.model._meta.model_name}_detail',
                            kwargs={'pk': obj.pk})
@@ -66,6 +67,7 @@ class ModelChoiceSerializer(ChoiceSerializer):
         return obj.id
 
 
+@extend_schema_field({'type': 'string'})
 class ModelChoiceObjectRelatedField(serializers.RelatedField):
 
     def to_representation(self, value):
