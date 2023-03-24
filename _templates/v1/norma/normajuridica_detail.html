@@ -15,7 +15,7 @@
 {% block detail_content %}
 
 <div class="item-listas">
-  <a class="link-texto float-left" href="{{n.texto_integral.url}}" title="Documento Eletrônico">
+  <a class="link-texto float-left" href="{{object.texto_integral.url}}" title="Documento Eletrônico">
     <i class="far fa-2x fa-file-{% if '.pdf' in object.texto_integral.path %}pdf{% else %}archive{% endif %}"></i>
   </a>
   <div class="text-ementa pr-0">

@@ -6,7 +6,7 @@ from cmj.api.views import DocumentoViewSet, BiViewSet, AppVersionView
 
 from .apps import AppConfig
 
-app_name = AppConfig.name
+app_name = AppConfig.name 
 
 router = DefaultRouter()
 router.register(r'documento', DocumentoViewSet)
