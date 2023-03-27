@@ -5,11 +5,15 @@
 
 export const routes = [
   {
+    path: '/arq/draft',
+    component: () => import('@/layouts/arq/DraftLayout')
+  },
+  {
     path: '/online',
     component: () => import('@/layouts/OnlineLayout'),
     children: [
       {
-        path: '/', // list
+        path: '', // list
         name: 'sessao_link',
         component: () => import('@/pages/sessao/SessaoPlenariaModule.vue'),
         children: [

@@ -1,14 +1,5 @@
-{% extends "index.html" %}
-{% load render_bundle from webpack_loader %}
-
-{% block webpack_loader_css %}
-    {{ block.super }}
-{% endblock %}
-
-{% block root_body %}
-    <div id="app"></div>
-{% endblock root_body %}
-
-{% block webpack_loader_js %}
-    {{ block.super }}
+{% extends "base.html" %}
+{% block second_header %}{% endblock %}
+{% block content_container %}
+<div id="app"></div>
 {% endblock %}

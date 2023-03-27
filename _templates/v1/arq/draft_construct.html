@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load render_bundle from webpack_loader %}
+{% load i18n staticfiles%}
+{% block second_header %}{% endblock second_header %}
+
+{% block webpack_loader_css %}
+{{block.super}}
+  {% render_bundle 'draft' 'css' %}
+{% endblock %}
+{% block content_container %}
+<div id="app-vue">
+  <app></app>
+</div>
+{% endblock content_container %}
+
+{% block webpack_loader_js %}{{block.super}}
+{% render_bundle 'draft' 'js' %}
+{% endblock %}

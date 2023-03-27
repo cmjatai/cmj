@@ -33,7 +33,7 @@ from django.views.generic.base import TemplateView
 from django.views.static import serve as view_static_server
 
 import cmj.agenda.urls
-import cmj.api.urls
+import cmj.arq.urls
 import cmj.cerimonial.urls
 import cmj.core.urls
 from cmj.core.views_short import ShortRedirectView
@@ -73,6 +73,7 @@ urlpatterns_all = [
     url(r'', include(cmj.core.urls)),
     url(r'', include(cmj.cerimonial.urls)),
     url(r'', include(cmj.diarios.urls)),
+    url(r'', include(cmj.arq.urls)),
     url(r'', include(cmj.ouvidoria.urls)),
     url(r'', include(cmj.agenda.urls)),
     url(r'', include(cmj.videos.urls)),

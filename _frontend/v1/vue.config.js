@@ -149,7 +149,7 @@ module.exports = {
       .add('./src/__apps/compilacao/main.js')
       .end()
 
-    config.entry('painel')
+      config.entry('painel')
       .add('./src/__apps/painel/main.js')
       .end()
 

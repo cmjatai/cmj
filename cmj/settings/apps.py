@@ -70,6 +70,7 @@ CMJ_APPS = (
     'cmj.diarios',
     'cmj.cerimonial',
     'cmj.ouvidoria',
+    'cmj.arq',
     'cmj.agenda',
     'cmj.videos',
     'cmj.sigad',
