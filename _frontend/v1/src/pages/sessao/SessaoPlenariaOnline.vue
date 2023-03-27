@@ -1,5 +1,6 @@
 <template>
   <div class="sessao-plenaria-online" >
+    <nivel-detalhe></nivel-detalhe>
     <template v-if="sessao" >
       <sessao-plenaria-topo :sessao="sessao"></sessao-plenaria-topo>
       <pauta-online :sessao="sessao"></pauta-online>
@@ -9,11 +10,14 @@
 <script>
 import SessaoPlenariaTopo from './SessaoPlenariaTopo'
 import PautaOnline from './PautaOnline'
+import NivelDetalhe from './NivelDetalhe'
+
 export default {
   name: 'sessao-plenaria-online',
   components: {
     SessaoPlenariaTopo,
-    PautaOnline
+    PautaOnline,
+    NivelDetalhe
   },
   data () {
     return {
@@ -68,6 +72,7 @@ export default {
 
 <style lang="scss">
   .sessao-plenaria-online {
+    position: relative;
     .sessao-plenaria-item-list {
       padding: 5px;
       .subtitulo {

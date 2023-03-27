@@ -57,4 +57,14 @@ export default {
 </script>
 
 <style lang="scss">
+.nivel-detalhe {
+  position: absolute;
+  right: 5px;
+  top: 25px;
+  z-index: 0;
+  a.btn {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+}
 </style>

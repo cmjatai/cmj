@@ -3,7 +3,7 @@
     <img :src="casa.logotipo !== undefined ? casa.logotipo : require('@/assets/img/brasao_transp.gif')"/>
     <h6 class="title-brand">
       {{casa.nome}}<br>
-      <small>SAPL - Sistema de Apoio ao Processo Legislativo</small>
+      <small>PortalCMJ</small>
     </h6>
   </div>
 </template>

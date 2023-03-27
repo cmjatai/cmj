@@ -6,11 +6,11 @@
 export const routes = [
   {
     path: '/arq/draft',
-    component: () => import('@/layouts/arq/DraftLayout')
+    component: () => import('@/layouts/arq/ArqLayout')
   },
   {
     path: '/online',
-    component: () => import('@/layouts/OnlineLayout'),
+    component: () => import('@/layouts/online/OnlineLayout'),
     children: [
       {
         path: '', // list
