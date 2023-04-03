@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-form-select v-model="selected" :options="options"/>
+    <b-form-select v-model="selected" :options="options" :select-size="height"/>
   </div>
 </template>
 
@@ -8,14 +8,11 @@
 
 export default {
   name: 'model-select',
-  props: ['app', 'model', 'label', 'limit', 'ordering', 'choice'],
+  props: ['app', 'model', 'label', 'limit', 'ordering', 'choice', 'height'],
   data () {
     return {
-
       selected: null,
-      options: [
-        { value: null, text: this.label }
-      ]
+      options: []
     }
   },
   watch: {
@@ -35,9 +32,13 @@ export default {
        */
       let _this = this
       if (next_page === 1) {
-        _this.options = [
-          { value: null, text: this.label }
-        ]
+        if (_this.height === 1) {
+          _this.options = [
+            { value: null, text: this.label }
+          ]
+        } else {
+          _this.options = []
+        }
       }
       _this.utils.getModelOrderedList(_this.app, _this.model, _this.ordering, next_page)
         .then((response) => {

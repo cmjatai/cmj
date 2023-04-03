@@ -33,6 +33,11 @@ export default {
     getByMetadata: (m, query_string = '') => axios({
       url: `${basePath}/${m.app}/${m.model}/${m.id}${m.id !== '' ? '/' : ''}${m.action}${m.action !== '' ? '/' : ''}${query_string !== '' ? '?' : ''}${query_string}`,
       method: 'GET'
-    })
+    }),
+    postModelAction: (app, model, id, action, form, progress = {}) => axios.post(
+      `${basePath}/${app}/${model}/${id}/${action}/`,
+      form,
+      progress
+    )
   }
 }

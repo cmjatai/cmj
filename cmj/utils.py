@@ -280,11 +280,11 @@ media_protected_storage = FileSystemStorage(
     location=settings.MEDIA_PROTECTED_ROOT, base_url='DO_NOT_USE')
 
 
-def texto_upload_path(instance, filename, subpath='', pk_first=False):
+def texto_upload_path(instance, filename, subpath='', pk_first=False, _prefix='public'):
 
     filename = re.sub('\s', '_', normalize(filename.strip()).lower())
 
-    prefix = 'public'
+    prefix = _prefix
 
     str_path = ('./cmj/%(prefix)s/%(model_name)s/'
                 '%(subpath)s/%(pk)s/%(filename)s')

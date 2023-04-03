@@ -1,0 +1,62 @@
+<template>
+  <div class="draft-manage container-fluid py-3">
+    <h1>Draft</h1>
+    <div class="row align-items-stretch align-content-stretch">
+      <div class="col-3 d-flex align-items-stretch">
+        <model-select v-on:change="value => draftselected=value"
+          class="form-opacity d-flex w-100 "
+          app="arq"
+          model="draft"
+          choice="descricao"
+          ordering="descricao"
+          :height="3"
+          ></model-select>
+      </div>
+      <div class="col-9">
+        <div class="drop-area">
+          <drop-zone :pk="draftselected" :multiple="true" v-on:uploaded="uploadedFiles" v-if="draftselected"/>
+        </div>
+      </div>
+    </div>
+    <div v-show="draftselected">
+      <draft-manage-list :draftselected="draftselected" ref="listdraft"></draft-manage-list>
+    </div>
+  </div>
+</template>
+
+<script>
+import ModelSelect from '@/components/selects/ModelSelect.vue'
+import DropZone from '@/components/utils/DropZone.vue'
+import DraftManageList from './DraftManageList.vue'
+
+export default {
+  name: 'draft-manage',
+  components: {
+    DropZone,
+    ModelSelect,
+    DraftManageList
+  },
+  data () {
+    return {
+      draftselected: null
+    }
+  },
+  methods: {
+    uploadedFiles (response) {
+      if (response.statusText === 'OK') {
+        this.$refs.listdraft.fetchMidias(response.data.id, 1)
+      }
+    }
+  },
+  mounted: function () {
+  }
+}
+</script>
+
+<style lang="scss">
+  @import "~@/scss/variables";
+
+.draft-manage {
+  min-height: 60vh;
+}
+</style>

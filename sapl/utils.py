@@ -906,11 +906,15 @@ def texto_upload_path(instance, filename, subpath='', pk_first=False):
     from sapl.protocoloadm.models import DocumentoAdministrativo, \
         DocumentoAcessorioAdministrativo
 
-    if isinstance(instance, (DocumentoAdministrativo,
-                             Proposicao,
-                             DocumentoAcessorioAdministrativo,
-                             DocumentoAcessorio,
-                             MateriaLegislativa)):
+    if isinstance(
+        instance, (
+            DocumentoAdministrativo,
+            Proposicao,
+            DocumentoAcessorioAdministrativo,
+            DocumentoAcessorio,
+            MateriaLegislativa,
+        )
+    ):
         prefix = 'private'
     else:
         prefix = 'public'

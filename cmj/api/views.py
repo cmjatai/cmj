@@ -39,6 +39,7 @@ CmjApiViewSetConstrutor.import_modules([
     'cmj.api.views_core',
     'cmj.api.views_agenda',
     'cmj.api.views_videos',
+    'cmj.api.views_arq',
 ]
 )
 

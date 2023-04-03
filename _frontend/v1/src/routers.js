@@ -6,7 +6,7 @@
 export const routes = [
   {
     path: '/arq/draft',
-    component: () => import('@/layouts/arq/ArqLayout')
+    component: () => import('@/layouts/arq/draft/DraftManage')
   },
   {
     path: '/online',

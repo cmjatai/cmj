@@ -1,10 +1,13 @@
+import re
+
 from django.contrib.postgres.fields.jsonb import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models.deletion import PROTECT
 from django.utils.translation import ugettext_lazy as _
 
-from cmj.utils import get_settings_auth_user_model
+from cmj.utils import get_settings_auth_user_model, texto_upload_path, normalize
+from sapl.utils import PortalFileField
 
 
 class Draft(models.Model):
@@ -32,10 +35,36 @@ class Draft(models.Model):
         verbose_name_plural = _('Draft')
 
 
+def draftmidia_path(instance, filename):
+
+    filename = re.sub('\s', '_', normalize(filename.strip()).lower())
+    filename = filename.split('.')
+
+    filename = '' if len(filename[-1]) > 4 else f'.{filename[-1]}'
+
+    str_path = ('./cmj/private/%(model_name)s/%(owner)s/%(draft)s/%(filename)s')
+
+    path = str_path % \
+        {
+            'model_name': instance._meta.model_name,
+            'owner': instance.draft.owner.id,
+            'draft': instance.draft.id,
+            'filename': f'{instance.id:09}{filename}'
+        }
+
+    return path
+
+
 class DraftMidia(models.Model):
 
+    FIELDFILE_NAME = ('arquivo',)
+
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+
     draft = models.ForeignKey(
-        get_settings_auth_user_model(),
+        Draft,
         verbose_name=_('Draft Midia'), related_name='draftmidia_set',
         on_delete=PROTECT)
 
@@ -43,11 +72,39 @@ class DraftMidia(models.Model):
         default=0,
         verbose_name=_('Sequência'),)
 
+    created = models.DateTimeField(
+        verbose_name=_('created'), editable=False, auto_now_add=True)
+
+    arquivo = PortalFileField(
+        blank=True,
+        null=True,
+        # storage=media_protected_storage,
+        upload_to=draftmidia_path,
+        verbose_name=_('Arquivo'),)
+    # validators=[restringe_tipos_de_arquivo_midias])
+
     class Meta:
         ordering = ('sequencia',)
 
         verbose_name = _('Mídia')
         verbose_name_plural = _('Mídias')
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+
+        if not self.pk and self.arquivo:
+            arquivo = self.arquivo
+            self.arquivo = None
+            models.Model.save(self, force_insert=force_insert,
+                              force_update=force_update,
+                              using=using,
+                              update_fields=update_fields)
+            self.arquivo = arquivo
+
+        return models.Model.save(self, force_insert=force_insert,
+                                 force_update=force_update,
+                                 using=using,
+                                 update_fields=update_fields)
 
 
 """

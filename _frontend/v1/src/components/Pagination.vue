@@ -1,5 +1,5 @@
 <template>
-  <div class="widget-pagination d-flex justify-content-between align-items-center w-100">
+  <div v-if="pagination.total_entries !== 0" class="widget-pagination d-flex justify-content-between align-items-center w-100">
     <span :class="['arrow', pagination.previous_page !== null ? 'hover-circle' : 'disabled']" @click="previousPage">
       <i class="fas fa-chevron-left"></i>
     </span>
@@ -26,7 +26,9 @@ export default {
   },
   watch: {
     currentPage: function (nv, ov) {
-      this.$emit('currentPage', nv)
+      if (nv !== ov) {
+        this.$emit('currentPage', nv)
+      }
     },
     pagination: function (nv) {
       this.currentPage = nv.page
