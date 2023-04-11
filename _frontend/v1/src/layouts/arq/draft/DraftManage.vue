@@ -1,16 +1,25 @@
 <template>
   <div class="draft-manage container-fluid py-3">
     <h1>Draft</h1>
-    <div class="row align-items-stretch align-content-stretch">
-      <div class="col-3 d-flex align-items-stretch">
-        <model-select v-on:change="value => draftselected=value"
-          class="form-opacity d-flex w-100 "
-          app="arq"
-          model="draft"
-          choice="descricao"
-          ordering="descricao"
-          :height="3"
-          ></model-select>
+    <div class="row">
+      <div class="col-3 d-flex">
+        <div class="btn-group-vertical mr-3">
+          <button type="button" class="btn btn-primary">+</button>
+          <button type="button" class="btn btn-danger">-</button>
+        </div>
+        <div class="d-flex flex-column w-100">
+          <model-select v-on:change="value => draftselected=value"
+            class="form-opacity d-flex w-100"
+            app="arq"
+            model="draft"
+            choice="descricao"
+            ordering="descricao"
+            :height="3"
+            ></model-select>
+          <div>
+            teste
+          </div>
+          </div>
       </div>
       <div class="col-9">
         <div class="drop-area">
@@ -54,9 +63,12 @@ export default {
 </script>
 
 <style lang="scss">
-  @import "~@/scss/variables";
-
+@import "~@/scss/variables";
 .draft-manage {
-  min-height: 60vh;
+  min-height: 100vh;
+}
+
+.btn-group-vertical {
+  align-content: center;
 }
 </style>

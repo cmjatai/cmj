@@ -6,13 +6,12 @@
     <div class="pages">
       {{pagination.start_index}}–{{pagination.end_index}} de {{pagination.total_entries}}
       <div class="inner">
-        <b-pagination align="right" :total-rows="pagination.total_entries" v-model="currentPage" :per-page="10"/>
+        <b-pagination align="right" :total-rows="pagination.total_entries" v-model="currentPage" :per-page="18"/>
       </div>
     </div>
     <span :class="['arrow', pagination.next_page !== null ? 'hover-circle' : 'disabled']"  @click="nextPage">
       <i class="fas fa-chevron-right"></i>
     </span>
-
   </div>
 </template>
 <script>

@@ -78,6 +78,7 @@ class _Draft:
                     'hash_code': hash_sha512(f)
                 }
             }
+
             dm.save()
 
         serializer = self.get_serializer(draft)

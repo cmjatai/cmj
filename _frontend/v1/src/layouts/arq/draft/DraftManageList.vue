@@ -1,13 +1,17 @@
 <template>
   <div class="draftmanagelist py-3">
     <div class="row p-3">
-      <div class="col-4 offset-4">
+      <div class="col d-flex grade">
+        <div class="d-flex grade">
+          <b-form-spinbutton id="spincols" v-model="cols" min="1" max="100" inline></b-form-spinbutton>
+          <b-form-spinbutton id="spinrows" v-model="rows" min="1" max="100" inline></b-form-spinbutton>
+        </div>
         <pagination :pagination="pagination" v-on:nextPage="nextPage" v-on:previousPage="previousPage" v-on:currentPage="currentPage"></pagination>
       </div>
     </div>
     <div class="container">
       <div class="row">
-        <draft-midia :elemento="item" :col="12/cols" v-for="item, k in draftmidialist_ordered" :key="`dm${k}`"></draft-midia>
+        <draft-midia :elemento="item" :cols="cols" v-for="item, k in draftmidialist_ordered" :key="`dm${k}`"></draft-midia>
       </div>
     </div>
   </div>
@@ -42,12 +46,29 @@ export default {
   watch: {
     draftselected (nw, old) {
       this.fetchMidias(nw)
+    },
+    rows (nw, old) {
+      this.fetchMidias(this.draftselected)
+    },
+    cols (nw, old) {
+      this.fetchMidias(this.draftselected)
     }
   },
+  mounted () {
+    this.changeMatriz()
+  },
   methods: {
+    changeMatriz () {
+      let dm = document.getElementsByClassName('draft-midia')
+      let t = this
+      _.each(dm, function (item, idx) {
+        item.style.maxWidth = `${100 / t.cols}%`
+        item.style.flex = `0 0 ${100 / t.cols}%`
+      })
+    },
     currentPage (value) {
       console.log('currentPage', value)
-      if (value >= 0) {
+      if (value !== null && value >= 0) {
         this.fetchMidias(this.draftselected, value)
       }
     },
@@ -70,6 +91,9 @@ export default {
                   _this.$set(_this.draftmidialist, item.id, item)
                 })
               })
+              .then(function () {
+                _this.changeMatriz()
+              })
               .catch((response) => _this.sendMessage(
                 { alert: 'danger', message: 'Não foi possível recuperar a lista...', time: 5 }))
           })
@@ -81,6 +105,22 @@ export default {
 }
 </script>
 
-<style>
-
+<style lang="scss">
+.draftmanagelist {
+  .grade {
+    gap: 1em;
+  }
+  .b-form-spinbutton {
+    output {
+      padding: 0 10px;
+    }
+  }
+}
+.draft-midia {
+  max-height: 25vh;
+  img {
+    height: 100%;
+    width: auto;
+  }
+}
 </style>
