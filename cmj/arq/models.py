@@ -107,7 +107,6 @@ class DraftMidia(models.Model):
                                  update_fields=update_fields)
 
 
-"""
 CLASSE_ESTRUTURAL = 0
 CLASSE_DOCUMENTAL = 1
 CLASSE_MISTA = 2
@@ -118,6 +117,7 @@ PERFIL_CLASSE = ((
     (
     CLASSE_MISTA, _('Classe Mista'))
 )
+
 
 class Parent(models.Model):
 
@@ -188,9 +188,9 @@ class Parent(models.Model):
                 yield item
 
     def clean(self):
-        
-        #Check for instances with null values in unique_together fields.
-        
+
+        # Check for instances with null values in unique_together fields.
+
         from django.core.exceptions import ValidationError
 
         super(CMSMixin, self).clean()
@@ -218,7 +218,7 @@ class Parent(models.Model):
                     raise ValidationError(msg)
 
 
-class Classe(Parent):
+class ArqClasse(Parent):
 
     codigo = models.PositiveIntegerField(verbose_name=_('Código'), default=0)
 
@@ -235,10 +235,6 @@ class Classe(Parent):
         _('Perfil da Classe'),
         choices=PERFIL_CLASSE,
         default=CLASSE_ESTRUTURAL)
-
-    autor = models.TextField(
-        verbose_name=_('Autor'),
-        blank=True, null=True, default=None)
 
     created = models.DateTimeField(
         verbose_name=_('created'), editable=False, auto_now_add=True)
@@ -261,4 +257,3 @@ class Classe(Parent):
         if len(ct[0]) < 3:
             ct[0] = '{:03,d}'.format(int(ct[0]))
         return '.'.join(ct)
-"""

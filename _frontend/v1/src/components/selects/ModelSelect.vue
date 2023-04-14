@@ -43,7 +43,7 @@ export default {
       _this.utils.getModelOrderedList(_this.app, _this.model, _this.ordering, next_page)
         .then((response) => {
           _.each(response.data.results, function (item, idx) {
-            _this.options.push({ value: item.id, text: item[_this.choice] })
+            _this.options.push({ value: item, text: item[_this.choice] })
             _this.refreshState({
               app: _this.app,
               model: _this.model,

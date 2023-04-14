@@ -16,10 +16,10 @@
             ordering="descricao"
             :height="3"
             ></model-select>
-          <div>
-            teste
+          <div class="pt-2" v-if="draftselected">
+            <b-form-input v-model="draftselected.descricao" @change="changeDescricao($event)"></b-form-input>
           </div>
-          </div>
+        </div>
       </div>
       <div class="col-9">
         <div class="drop-area">
@@ -55,6 +55,16 @@ export default {
       if (response.statusText === 'OK') {
         this.$refs.listdraft.fetchMidias(response.data.id, 1)
       }
+    },
+    changeDescricao (event) {
+      console.log(event)
+      let t = this
+      t.utils.patchModel('arq', 'draft', this.draftselected.id, {
+        descricao: event
+      })
+        .then((response) => {
+          console.log(response)
+        })
     }
   },
   mounted: function () {
