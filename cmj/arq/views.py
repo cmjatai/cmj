@@ -64,7 +64,7 @@ class ArqClasseCreateView(ArqClasseParentMixin,
                           FormMessagesMixin,
                           PermissionRequiredMixin,
                           CreateView):
-    permission_required = 'arq.add_classe'
+    permission_required = 'arq.add_arqclasse'
     form_valid_message = _('ArqClasse criada com sucesso!')
     form_invalid_message = _('Existem erros no formulário de cadastro!')
     template_name = 'crud/form.html'
@@ -100,7 +100,7 @@ class ArqClasseUpdateView(ArqClasseParentMixin,
                           FormMessagesMixin,
                           PermissionRequiredMixin,
                           UpdateView):
-    permission_required = 'arq.change_classe'
+    permission_required = 'arq.change_arqclasse'
     form_valid_message = _('ArqClasse Alterada com sucesso!')
     form_invalid_message = _('Existem erros no formulário!')
     template_name = 'crud/form.html'
@@ -116,7 +116,7 @@ class ArqClasseUpdateView(ArqClasseParentMixin,
 
 
 class ArqClasseDeleteView(PermissionRequiredMixin, DeleteView):
-    permission_required = 'arq.delete_classe'
+    permission_required = 'arq.delete_arqclasse'
     template_name = 'crud/confirm_delete.html'
     model = ArqClasse
 
@@ -133,14 +133,14 @@ class ArqClasseDeleteView(PermissionRequiredMixin, DeleteView):
 
 
 class ArqClasseListView(ArqClasseParentMixin, PermissionRequiredMixin, ListView):
-    permission_required = 'arq.view_subclasse'
+    permission_required = 'arq.view_subarqclasse'
 
     model = ArqClasse
     template_name = 'arq/arqclasse_list.html'
 
     @property
     def create_url(self):
-        if not self.request.user.has_perm('arq.add_classe'):
+        if not self.request.user.has_perm('arq.add_arqclasse'):
             return ''
         if 'pk' not in self.kwargs:
             return reverse_lazy('cmj.arq:arqclasse_create')
@@ -151,7 +151,7 @@ class ArqClasseListView(ArqClasseParentMixin, PermissionRequiredMixin, ListView)
 
     @property
     def update_url(self):
-        if not self.request.user.has_perm('arq.change_classe'):
+        if not self.request.user.has_perm('arq.change_arqclasse'):
             return ''
         return reverse_lazy(
             'cmj.arq:arqclasse_edit',

@@ -2,7 +2,7 @@
 {% load i18n common_cmj_tags %}
 
 {% block extra_actions %}
-  <div class="actions btn-group-sm" role="group"> 
+  <div class="actions btn-group-sm" role="group">
     {% if object and object.parent%}
     <a  class="btn btn-outline-primary" href="{% url 'cmj.sigad:subclasse_list' object.parent.pk %}">{% trans "Voltar para" %} {{ object.parent.titulo }}</a>
     {% elif object and not object.parent%}
