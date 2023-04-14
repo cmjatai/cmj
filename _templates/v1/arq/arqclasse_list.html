@@ -1,0 +1,61 @@
+{% extends "crud/detail.html" %}
+{% load i18n common_cmj_tags %}
+
+{% block extra_actions %}
+  <div class="actions btn-group-sm" role="group">
+    {% if object and object.parent%}
+    <a  class="btn btn-outline-primary" href="{% url 'cmj.arq:subarqclasse_list' object.parent.pk %}">{% trans "Voltar para" %} {{ object.parent.titulo }}</a>
+    {% elif object and not object.parent%}
+    <a  class="btn btn-outline-primary" href="{% url 'cmj.arq:arqclasse_list' %}">{% trans "Voltar para Raiz" %}</a>
+    {% endif %}
+  </div>
+{% endblock extra_actions %}
+
+{% block detail_content %}
+
+<h4><i>{{object.descricao}}</i></h4>
+{% if object and object_list or not object and object_list%}
+    <table class="table table-hover" width="100%">
+        <thead>
+            <tr>
+              <th>{% fieldclass_verbose_name 'cmj.arq.models.ArqClasse' 'codigo' %}</th>
+              <th>{% fieldclass_verbose_name 'cmj.arq.models.ArqClasse' 'titulo' %}</th>
+              <th>{% fieldclass_verbose_name 'cmj.arq.models.ArqClasse' 'perfil' %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for arqclasse in object_list %}
+            <tr>
+              <td width=15%>
+                <a href="{% url 'cmj.arq:subarqclasse_list' arqclasse.pk %}">
+                {{ arqclasse.conta }}</td>
+                </a>
+              <td width=15%>{{ arqclasse.get_perfil_display }}</td>
+              <td>
+                {{ arqclasse.titulo }}
+              </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
+{% if object %}
+  <br>
+  <hr>
+  <h2>
+    Documentos da ArqClasse {{object.nome}}<br>Conta: {{object.conta}}
+  </h2>
+  <table class="table table-hover" width="100%">
+      <caption>Quantidade: 0</caption>
+      <thead>
+
+      </thead>
+      <tbody>
+      </tbody>
+  </table>
+
+{% endif %}
+
+
+{% endblock %}

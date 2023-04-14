@@ -107,15 +107,15 @@ class DraftMidia(models.Model):
                                  update_fields=update_fields)
 
 
-CLASSE_ESTRUTURAL = 0
-CLASSE_DOCUMENTAL = 1
-CLASSE_MISTA = 2
-PERFIL_CLASSE = ((
-    CLASSE_ESTRUTURAL, _('Classe Estrutural')),
+ARQCLASSE_ESTRUTURAL = 0
+ARQCLASSE_DOCUMENTAL = 1
+ARQCLASSE_MISTA = 2
+PERFIL_ARQCLASSE = ((
+    ARQCLASSE_ESTRUTURAL, _('Classe Estrutural')),
     (
-    CLASSE_DOCUMENTAL, _('Classe de Conteúdo')),
+    ARQCLASSE_DOCUMENTAL, _('Classe de Conteúdo')),
     (
-    CLASSE_MISTA, _('Classe Mista'))
+    ARQCLASSE_MISTA, _('Classe Mista'))
 )
 
 
@@ -193,7 +193,7 @@ class Parent(models.Model):
 
         from django.core.exceptions import ValidationError
 
-        super(CMSMixin, self).clean()
+        super(Parent, self).clean()
 
         for field_tuple in self._meta.unique_together[:]:
             unique_filter = {}
@@ -233,8 +233,8 @@ class ArqClasse(Parent):
 
     perfil = models.IntegerField(
         _('Perfil da Classe'),
-        choices=PERFIL_CLASSE,
-        default=CLASSE_ESTRUTURAL)
+        choices=PERFIL_ARQCLASSE,
+        default=ARQCLASSE_ESTRUTURAL)
 
     created = models.DateTimeField(
         verbose_name=_('created'), editable=False, auto_now_add=True)
@@ -257,3 +257,22 @@ class ArqClasse(Parent):
         if len(ct[0]) < 3:
             ct[0] = '{:03,d}'.format(int(ct[0]))
         return '.'.join(ct)
+
+    @property
+    def nivel(self):
+        parents = self.parents
+        return len(parents)
+
+    @property
+    def strparents(self):
+        if not self.parent:
+            return []
+
+        parents = self.parent.strparents + [self.parent.titulo, ]
+        return parents
+
+    def __str__(self):
+        parents = self.strparents
+        parents.append(self.titulo)
+
+        return ':'.join(parents)

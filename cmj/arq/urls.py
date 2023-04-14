@@ -11,32 +11,28 @@ urlpatterns_arq = [
 
     url(r'^draft$',
         app_vue_view, name='app_vue_draft_view_url'),
-]
-"""urlpatterns_arq = [
 
     url(r'^classe/create$',
-        views.ClasseCreateView.as_view(), name='classe_create'),
+        views.ArqClasseCreateView.as_view(), name='arqclasse_create'),
 
     url(r'^classe/(?P<pk>[0-9]+)/create$',
-        views.ClasseCreateView.as_view(), name='subclasse_create'),
+        views.ArqClasseCreateView.as_view(), name='subarqclasse_create'),
 
 
     url(r'^classe/(?P<pk>[0-9]+)/edit$',
-        views.ClasseUpdateView.as_view(), name='classe_edit'),
+        views.ArqClasseUpdateView.as_view(), name='arqclasse_edit'),
 
     url(r'^classe/(?P<pk>[0-9]+)/delete',
-        views.ClasseDeleteView.as_view(), name='classe_delete'),
+        views.ArqClasseDeleteView.as_view(), name='arqclasse_delete'),
 
     url(r'^classe$',
-        views.ClasseListView.as_view(), name='classe_list'),
-
-
+        views.ArqClasseListView.as_view(), name='arqclasse_list'),
 
     url(r'^classe/(?P<pk>[0-9]+)$',
-        views.ClasseListView.as_view(), name='subclasse_list'),
+        views.ArqClasseListView.as_view(), name='subarqclasse_list'),
 
 ]
-"""
+
 urlpatterns = [
     url(r'^arq/', include(urlpatterns_arq)),
 ]

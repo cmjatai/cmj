@@ -1,17 +1,20 @@
 
+from operator import attrgetter
+
 from braces.views._forms import FormMessagesMixin
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.db.models.aggregates import Max
 from django.shortcuts import get_object_or_404
 from django.urls.base import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic.base import TemplateView
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.list import ListView
 
 from cmj.arq import forms
+from cmj.arq.models import ArqClasse
 
 
-"""
-class ClasseParentMixin:
+class ArqClasseParentMixin:
     _parent = None
 
     @property
@@ -37,36 +40,36 @@ class ClasseParentMixin:
     @property
     def title(self):
         if not self.parent:
-            return _('Cadastro de Classe Geral')
+            return _('Cadastro de ArqClasse Geral')
 
         return '%s - %s - <small>(%s)</small>' % (
-            self.parent, self.parent.apelido or '', _('Cadastro de SubClasse'))
+            self.parent, self.parent.titulo or '', _('Cadastro de SubArqClasse'))
 
     @property
     def cancel_url(self):
         if 'pk' not in self.kwargs:
-            return reverse_lazy('cmj.arq:classe_list')
+            return reverse_lazy('cmj.arq:arqclasse_list')
         else:
             return reverse_lazy(
-                'cmj.arq:subclasse_list',
+                'cmj.arq:subarqclasse_list',
                 kwargs={'pk': self.kwargs['pk']})
 
     def get_success_url(self):
         return reverse_lazy(
-            'cmj.arq:subclasse_list',
+            'cmj.arq:subarqclasse_list',
             kwargs={'pk': self.object.id})
 
 
-class ClasseCreateView(ClasseParentMixin,
-                       FormMessagesMixin,
-                       PermissionRequiredMixin,
-                       CreateView):
+class ArqClasseCreateView(ArqClasseParentMixin,
+                          FormMessagesMixin,
+                          PermissionRequiredMixin,
+                          CreateView):
     permission_required = 'arq.add_classe'
-    form_valid_message = _('Classe criada com sucesso!')
+    form_valid_message = _('ArqClasse criada com sucesso!')
     form_invalid_message = _('Existem erros no formulário de cadastro!')
     template_name = 'crud/form.html'
-    form_class = forms.ClasseForm
-    model = Classe
+    form_class = forms.ArqClasseForm
+    model = ArqClasse
 
     def form_valid(self, form):
 
@@ -77,14 +80,14 @@ class ClasseCreateView(ClasseParentMixin,
         if self.parent:
             self.object.parent = self.parent
 
-        response = super(ClasseCreateView, self).form_valid(form)
+        response = super(ArqClasseCreateView, self).form_valid(form)
 
         return response
 
     def get_initial(self):
         self.initial = {'parent': self.parent}
 
-        cod__max = Classe.objects.filter(
+        cod__max = ArqClasse.objects.filter(
             parent=self.parent).order_by('codigo').aggregate(Max('codigo'))
 
         self.initial['codigo'] = cod__max['codigo__max'] + \
@@ -93,29 +96,29 @@ class ClasseCreateView(ClasseParentMixin,
         return CreateView.get_initial(self)
 
 
-class ClasseUpdateView(ClasseParentMixin,
-                       FormMessagesMixin,
-                       PermissionRequiredMixin,
-                       UpdateView):
+class ArqClasseUpdateView(ArqClasseParentMixin,
+                          FormMessagesMixin,
+                          PermissionRequiredMixin,
+                          UpdateView):
     permission_required = 'arq.change_classe'
-    form_valid_message = _('Classe Alterada com sucesso!')
+    form_valid_message = _('ArqClasse Alterada com sucesso!')
     form_invalid_message = _('Existem erros no formulário!')
     template_name = 'crud/form.html'
-    form_class = forms.ClasseForm
-    model = Classe
+    form_class = forms.ArqClasseForm
+    model = ArqClasse
 
     def get_initial(self):
         self.initial = {'parent': self.parent.parent}
         return UpdateView.get_initial(self)
 
     def form_valid(self, form):
-        return super(ClasseUpdateView, self).form_valid(form)
+        return super(ArqClasseUpdateView, self).form_valid(form)
 
 
-class ClasseDeleteView(PermissionRequiredMixin, DeleteView):
+class ArqClasseDeleteView(PermissionRequiredMixin, DeleteView):
     permission_required = 'arq.delete_classe'
     template_name = 'crud/confirm_delete.html'
-    model = Classe
+    model = ArqClasse
 
     def post(self, request, *args, **kwargs):
         obj = self.get_object()
@@ -125,25 +128,25 @@ class ClasseDeleteView(PermissionRequiredMixin, DeleteView):
 
     def get_success_url(self):
         return reverse_lazy(
-            'cmj.arq:subclasse_list',
+            'cmj.arq:subarqclasse_list',
             kwargs={'pk': self.parent.id})
 
 
-class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
+class ArqClasseListView(ArqClasseParentMixin, PermissionRequiredMixin, ListView):
     permission_required = 'arq.view_subclasse'
 
-    model = Classe
-    template_name = 'arq/classe_list.html'
+    model = ArqClasse
+    template_name = 'arq/arqclasse_list.html'
 
     @property
     def create_url(self):
         if not self.request.user.has_perm('arq.add_classe'):
             return ''
         if 'pk' not in self.kwargs:
-            return reverse_lazy('cmj.arq:classe_create')
+            return reverse_lazy('cmj.arq:arqclasse_create')
         else:
             return reverse_lazy(
-                'cmj.arq:subclasse_create',
+                'cmj.arq:subarqclasse_create',
                 kwargs={'pk': self.kwargs['pk']})
 
     @property
@@ -151,7 +154,7 @@ class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
         if not self.request.user.has_perm('arq.change_classe'):
             return ''
         return reverse_lazy(
-            'cmj.arq:classe_edit',
+            'cmj.arq:arqclasse_edit',
             kwargs={'pk': self.kwargs['pk']})
 
     @property
@@ -160,15 +163,15 @@ class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
             return ''
         else:
             return reverse_lazy(
-                'cmj.arq:classe_delete',
+                'cmj.arq:arqclasse_delete',
                 kwargs={'pk': self.kwargs['pk']})
 
     def get_context_data(self, **kwargs):
         context = {}
         context['object'] = self.object
 
-        if self.object:
-            context['subnav_template_name'] = 'arq/subnav_classe.yaml'
+        # if self.object:
+        #    context['subnav_template_name'] = 'arq/subnav_classe.yaml'
 
         return ListView.get_context_data(self, **context)
 
@@ -176,20 +179,17 @@ class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
         qpub = None
         if 'pk' not in self.kwargs:
             self.object = None
-            qpub = Classe.objects.filter(parent__isnull=True)
+            qpub = ArqClasse.objects.filter(parent__isnull=True)
         else:
-            qpub = Classe.objects.filter(parent_id=self.kwargs['pk'])
+            qpub = ArqClasse.objects.filter(parent_id=self.kwargs['pk'])
 
-        if self.has_permission():
-            return qpub
+        # if self.has_permission():
+        return qpub
 
-        qpub = qpub.filter(visibilidade=Classe.STATUS_PUBLIC)
+        #qpub = qpub.filter(visibilidade=ArqClasse.STATUS_PUBLIC)
 
         qs = list(qpub)
-        ''' Inclui os filhos da classe atual de visualização que
-        possuam algum herdeiro que seja público'''
-        pubs = Classe.objects.filter(
-            visibilidade=Classe.STATUS_PUBLIC).select_related(
+        pubs = ArqClasse.objects.all().select_related(
             'parent', 'parent__parent')
         for pub in pubs:
             parents = pub.parents
@@ -198,98 +198,11 @@ class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
                     if p not in qs:
                         qs.append(p)
 
-        if not self.request.user.is_anonymous:
-
-            ''' Seleciona todas as classes com permissões expressas e visuali-
-            zação para o usuário conectado
-            '''
-            pr = self.permission_required.split('.')
-            puc_list = PermissionsUserClasse.objects.filter(
-                user=self.request.user,
-                permission__content_type__app_label=pr[0],
-                permission__codename=pr[1]).select_related(
-                    'classe__parent', 'classe__parent__parent')
-
-            for puc in puc_list:
-                ''' Inclui no resultado a classe que possui autorização
-                expressa de visualização e é filha direta da classe em
-                visualizaçao'''
-                if self.object == puc.classe.parent:
-                    if puc.classe not in qs:
-                        qs.append(puc.classe)
-                        continue
-
-                ''' Inclui todos os filhos imediatos da classe em visualiza-
-                ção caso seja esta a com permissão expressa para o usuário
-                conectado'''
-                if self.object and self.object == puc.classe:
-                    qs = qs + \
-                        [sub for sub in self.object.subclasses.all()
-                         if sub not in qs]
-                    continue
-
-                ''' Inclui os filhos da classe atual de visualização que
-                possuam algum herdeiro que o usuário conectado possua direito
-                de visualização'''
-                parents = puc.classe.parents
-                for p in parents[::-1]:
-                    if p.parent == self.object:
-                        if p not in qs:
-                            qs.append(p)
-
         return sorted(qs, key=attrgetter('codigo'))
 
     def dispatch(self, request, *args, **kwargs):
         self.object = None
         if 'pk' in self.kwargs:
-            self.object = get_object_or_404(Classe, pk=self.kwargs['pk'])
-
-            has_permission = self.has_permission()
-
-            if not has_permission:
-                if not request.user.is_superuser and \
-                        self.object.visibilidade != Classe.STATUS_PUBLIC:
-                    has_permission = False
-
-                    # FIXME: refatorar e analisar apartir de self.object
-                    pubs = Classe.objects.filter(
-                        visibilidade=Classe.STATUS_PUBLIC).select_related(
-                        'parent', 'parent__parent')
-                    for pub in pubs:
-                        parents = pub.parents
-                        for p in parents[::-1]:
-                            if p == self.object:
-                                has_permission = True
-                                break
-                        if has_permission:
-                            break
-
-                    if not has_permission and not request.user.is_anonymous:
-                        if (self.object.visibilidade ==
-                                Classe.STATUS_PRIVATE and
-                                self.object.owner != request.user):
-                            has_permission = False
-                        else:
-                            pr = self.permission_required.split('.')
-                            puc_list = PermissionsUserClasse.objects.filter(
-                                user=request.user,
-                                permission__content_type__app_label=pr[0],
-                                permission__codename=pr[1]).select_related(
-                                    'classe__parent', 'classe__parent__parent')
-                            for puc in puc_list:
-                                if puc.classe == self.object:
-                                    has_permission = True
-                                    break
-
-                                parents = puc.classe.parents
-                                for p in parents[::-1]:
-                                    if p == self.object:
-                                        has_permission = True
-                                        break
-                                if has_permission:
-                                    break
-                    if not has_permission:
-                        return self.handle_no_permission()
+            self.object = get_object_or_404(ArqClasse, pk=self.kwargs['pk'])
 
         return ListView.dispatch(self, request, *args, **kwargs)
-"""
