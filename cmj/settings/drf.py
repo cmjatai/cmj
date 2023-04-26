@@ -28,6 +28,7 @@ REST_FRAMEWORK = {
         "rest_framework.filters.SearchFilter",
         "django_filters.rest_framework.DjangoFilterBackend",
     ),
+
 }
 # "rest_framework.permissions.IsAuthenticated",
 

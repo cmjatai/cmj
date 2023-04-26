@@ -275,4 +275,4 @@ class ArqClasse(Parent):
         parents = self.strparents
         parents.append(self.titulo)
 
-        return ':'.join(parents)
+        return ' : '.join(parents)

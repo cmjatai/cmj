@@ -269,7 +269,7 @@ def send_signal_for_websocket_time_refresh(inst, **kwargs):
 def signed_files_extraction_function(sender, instance, **kwargs):
 
     def run_signed_name_and_date_via_fields(fields):
-        signs = {}
+        signs = []
 
         for key, field in fields.items():
 
@@ -278,12 +278,12 @@ def signed_files_extraction_function(sender, instance, **kwargs):
             if '/V' not in field:
                 continue
 
-                # .format(field['/V']['/Reason'])
+            content_sign = field['/V']['/Contents']
             nome = 'Nome do assinante não localizado.'
             oname = ''
-            content_sign = field['/V']['/Contents']
             try:
-                signed_data = cms.ContentInfo.load(content_sign)['content']
+                info = cms.ContentInfo.load(content_sign)
+                signed_data = info['content']
                 oun_old = []
                 for cert in signed_data['certificates']:
                     subject = cert.native['tbs_certificate']['subject']
@@ -303,8 +303,9 @@ def signed_files_extraction_function(sender, instance, **kwargs):
                         oun_old = oun
                         nome = subject['common_name'].split(':')[0]
 
-                        if oun and isinstance(oun, list) and len(oun) == 4:
-                            oname += ' - ' + oun[3]
+                    if oun and isinstance(oun, list) and len(oun) == 4:
+                        oname += ' - ' + oun[3]
+                        break
 
             except:
                 if '/Name' in field['/V']:
@@ -325,8 +326,7 @@ def signed_files_extraction_function(sender, instance, **kwargs):
             except:
                 pass
 
-            if nome not in signs:
-                signs[nome] = [fd, oname]
+            signs.append((nome, [fd, oname]))
 
         return signs
 
@@ -365,10 +365,7 @@ def signed_files_extraction_function(sender, instance, **kwargs):
                 signs = run_signed_name_and_date_via_fields(fields)
                 if len(signs) == len(byterange):
                     return signs
-        except Exception as e:
-            pass
 
-        try:
             for n in byterange:
 
                 start = pdfdata.find(b"[", n)
@@ -384,11 +381,21 @@ def signed_files_extraction_function(sender, instance, **kwargs):
                 #signedData = data1 + data2
 
                 nome = 'Nome do assinante não localizado.'
+                oname = ''
                 try:
-                    signed_data = cms.ContentInfo.load(bcontents)['content']
+                    info = cms.ContentInfo.load(bcontents)
+                    signed_data = info['content']
+
                     oun_old = []
                     for cert in signed_data['certificates']:
                         subject = cert.native['tbs_certificate']['subject']
+                        issuer = cert.native['tbs_certificate']['issuer']
+                        oname = issuer.get('organization_name', '')
+
+                        if oname == 'Gov-Br':
+                            nome = subject['common_name'].split(':')[0]
+                            continue
+
                         oun = subject['organizational_unit_name']
 
                         if isinstance(oun, str):
@@ -398,10 +405,15 @@ def signed_files_extraction_function(sender, instance, **kwargs):
                             oun_old = oun
                             nome = subject['common_name'].split(':')[0]
 
-                        if nome not in signs:
-                            signs[nome] = timezone.localtime()
+                        if oun and isinstance(oun, list) and len(oun) == 4:
+                            oname += ' - ' + oun[3]
+                            break
+
                 except Exception as e:
                     pass
+
+                fd = None
+                signs.append((nome, [fd, oname]))
         except Exception as e:
             pass
 
@@ -414,8 +426,17 @@ def signed_files_extraction_function(sender, instance, **kwargs):
         except Exception as e:
             return {}
 
-        signs = list(signs.items())
-        signs = sorted(signs, key=lambda sign: sign[0])
+        signs = sorted(signs, key=lambda sign: (
+            sign[0], sign[1][1], sign[1][0]))
+
+        signs_dict = {}
+
+        for s in signs:
+            if s[0] not in signs_dict or 'ICP' in s[1][1] and 'ICP' not in signs_dict[s[0]][1]:
+                signs_dict[s[0]] = s[1]
+
+        signs = sorted(signs_dict.items(), key=lambda sign: (
+            sign[0], sign[1][1], sign[1][0]))
 
         sr = []
 
@@ -437,8 +458,6 @@ def signed_files_extraction_function(sender, instance, **kwargs):
             cn = settings.CERT_PRIVATE_KEY_NAME
             meta_signs['hom' if s[0] == cn else 'signs'].append(s)
         return meta_signs
-
-    # checa se documento está homologado
 
     if not hasattr(instance, 'FIELDFILE_NAME') or not hasattr(instance, 'metadata'):
         return

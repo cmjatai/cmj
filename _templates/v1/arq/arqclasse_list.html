@@ -2,11 +2,17 @@
 {% load i18n common_cmj_tags %}
 
 {% block extra_actions %}
+
+  <div class="actions btn-group-sm" role="group">
+    <a  class="btn btn-outline-primary" href="{{request.path}}?view=table">TabView</a>
+    <a  class="btn btn-outline-primary" href="{{request.path}}?view=tree">TreeView</a>
+  </div>
+
   <div class="actions btn-group-sm" role="group">
     {% if object and object.parent%}
-    <a  class="btn btn-outline-primary" href="{% url 'cmj.arq:subarqclasse_list' object.parent.pk %}">{% trans "Voltar para" %} {{ object.parent.titulo }}</a>
+    <a  class="btn btn-outline-primary" href="{% url 'cmj.arq:subarqclasse_list' object.parent.pk %}?view={{request.GET.view|default:view_format}}">{% trans "Voltar para" %} {{ object.parent.titulo }}</a>
     {% elif object and not object.parent%}
-    <a  class="btn btn-outline-primary" href="{% url 'cmj.arq:arqclasse_list' %}">{% trans "Voltar para Raiz" %}</a>
+      <a  class="btn btn-outline-primary" href="{% url 'cmj.arq:arqclasse_list' %}?view={{request.GET.view|default:view_format}}">{% trans "Ver a Raiz" %}</a>
     {% endif %}
   </div>
 {% endblock extra_actions %}
@@ -27,9 +33,10 @@
             {% for arqclasse in object_list %}
             <tr>
               <td width=15%>
-                <a href="{% url 'cmj.arq:subarqclasse_list' arqclasse.pk %}">
-                {{ arqclasse.conta }}</td>
+                <a href="{% url 'cmj.arq:subarqclasse_list' arqclasse.pk %}?view={{request.GET.view|default:view_format}}">
+                {{ arqclasse.conta }}
                 </a>
+              </td>
               <td width=15%>{{ arqclasse.get_perfil_display }}</td>
               <td>
                 {{ arqclasse.titulo }}<br>
@@ -37,6 +44,14 @@
                   <i>
                     {{arqclasse.descricao|linebreaksbr}}
                   </i>
+                  <ul>
+                    {% for c in arqclasse.childs.all %}
+                      <li>{{c.titulo}}<br>
+                        <i>{{c.descricao|linebreaksbr}}</i>
+                      </li>
+                    {% endfor %}
+                  </ul>
+
                 </small>
               </td>
             </tr>

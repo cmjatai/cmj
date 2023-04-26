@@ -138,6 +138,14 @@ class ArqClasseListView(ArqClasseParentMixin, PermissionRequiredMixin, ListView)
     model = ArqClasse
     template_name = 'arq/arqclasse_list.html'
 
+    def get(self, request, *args, **kwargs):
+        self.view_format = request.GET.get('view', 'table')
+
+        if self.view_format == 'tree':
+            self.template_name = 'arq/arqclasse_tree.html'
+
+        return ListView.get(self, request, *args, **kwargs)
+
     @property
     def create_url(self):
         if not self.request.user.has_perm('arq.add_arqclasse'):
@@ -169,6 +177,8 @@ class ArqClasseListView(ArqClasseParentMixin, PermissionRequiredMixin, ListView)
     def get_context_data(self, **kwargs):
         context = {}
         context['object'] = self.object
+
+        context['view_format'] = self.view_format
 
         # if self.object:
         #    context['subnav_template_name'] = 'arq/subnav_classe.yaml'
