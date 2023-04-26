@@ -1,0 +1,28 @@
+{% load i18n common_cmj_tags %}
+<ul>
+  {% for o in object.childs.all %}
+    <li>
+      <a href="{% url 'cmj.arq:subarqclasse_list' o.pk %}?view={{request.GET.view|default:view_format}}">
+        {{ o.conta }} - {{ o.titulo }}
+      </a> -
+      <small class="text-info">
+        <i>
+          {{o.parent.titulo}}
+        </i> -
+        <i>
+          {{o.parent.parent.titulo}}
+        </i>
+      </small>
+      <br>
+
+      <small>
+        <i>
+          {{o.descricao|linebreaksbr}}
+        </i>
+      </small>
+      {% with o as object %}
+        {% include 'arq/arqclasse_subtree.html' %}
+      {% endwith %}
+    </li>
+  {% endfor %}
+</ul>

@@ -1,0 +1,43 @@
+{% extends "crud/detail.html" %}
+{% load i18n common_cmj_tags %}
+
+{% block extra_actions %}
+
+  <div class="actions btn-group-sm" role="group">
+    <a  class="btn btn-outline-primary" href="{{request.path}}?view=table">TabView</a>
+    <a  class="btn btn-outline-primary" href="{{request.path}}?view=tree">TreeView</a>
+  </div>
+
+  <div class="actions btn-group-sm" role="group">
+    {% if object and object.parent%}
+    <a  class="btn btn-outline-primary" href="{% url 'cmj.arq:subarqclasse_list' object.parent.pk %}?view={{request.GET.view|default:view_format}}">{% trans "Voltar para" %} {{ object.parent.titulo }}</a>
+    {% elif object and not object.parent%}
+      <a  class="btn btn-outline-primary" href="{% url 'cmj.arq:arqclasse_list' %}?view={{request.GET.view|default:view_format}}">{% trans "Ver a Raiz" %}</a>
+    {% endif %}
+  </div>
+{% endblock extra_actions %}
+
+{% block detail_content %}
+
+<i>{{object.descricao|linebreaksbr}}</i><br><br>
+
+  {% if object and object_list or not object and object_list%}
+    <ul>
+      {% for arqclasse in object_list %}
+        <li>
+          {{arqclasse}}
+          <small>
+            <i>
+              {{arqclasse.descricao|linebreaksbr}}
+            </i>
+          </small>
+          {% with arqclasse as object %}
+            {% include 'arq/arqclasse_subtree.html' %}
+          {% endwith %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+
+{% endblock %}
