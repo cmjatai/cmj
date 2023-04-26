@@ -21,11 +21,27 @@
 
 <i>{{object.descricao|linebreaksbr}}</i><br><br>
 
-  {% if object and object_list or not object and object_list%}
-    <ul>
+{% if object and object_list or not object and object_list%}
+    <ul >
       {% for arqclasse in object_list %}
         <li>
-          {{arqclasse}}
+          <a href="{% url 'cmj.arq:subarqclasse_list' arqclasse.pk %}?view={{request.GET.view|default:view_format}}">
+            {{ arqclasse.conta }} - {{ arqclasse.titulo }}
+          </a> -
+          <small class="text-info">
+            <small>
+              <i>
+                {{arqclasse.parent.titulo}}
+              </i> -
+              <i>
+                {{arqclasse.parent.parent.titulo}}
+              </i> -
+              <i>
+                {{arqclasse.parent.parent.parent.titulo}}
+              </i>
+            </small>
+          </small>
+          <br>
           <small>
             <i>
               {{arqclasse.descricao|linebreaksbr}}

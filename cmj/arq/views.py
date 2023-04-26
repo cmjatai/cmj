@@ -180,6 +180,8 @@ class ArqClasseListView(ArqClasseParentMixin, PermissionRequiredMixin, ListView)
 
         context['view_format'] = self.view_format
 
+        context['title'] = self.object
+
         # if self.object:
         #    context['subnav_template_name'] = 'arq/subnav_classe.yaml'
 

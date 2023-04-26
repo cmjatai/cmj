@@ -6,12 +6,17 @@
         {{ o.conta }} - {{ o.titulo }}
       </a> -
       <small class="text-info">
-        <i>
-          {{o.parent.titulo}}
-        </i> -
-        <i>
-          {{o.parent.parent.titulo}}
-        </i>
+        <small>
+          <i>
+            {{o.parent.titulo}}
+          </i> -
+          <i>
+            {{o.parent.parent.titulo}}
+          </i> -
+          <i>
+            {{o.parent.parent.parent.titulo}}
+          </i>
+        </small>
       </small>
       <br>
 
