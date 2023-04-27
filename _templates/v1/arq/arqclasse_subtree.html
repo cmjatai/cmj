@@ -4,9 +4,10 @@
     <li>
       <a href="{% url 'cmj.arq:subarqclasse_list' o.pk %}?view={{request.GET.view|default:view_format}}">
         {{ o.conta }} - {{ o.titulo }}
-      </a> -
-      <small class="text-info">
+      </a>
+      <small class="text-black-50">
         <small>
+          -
           <i>
             {{o.parent.titulo}}
           </i> -
@@ -18,10 +19,8 @@
           </i>
         </small>
       </small>
-      <br>
-
       <small>
-        <i>
+        <i class="text-secondary">
           {{o.descricao|linebreaksbr}}
         </i>
       </small>

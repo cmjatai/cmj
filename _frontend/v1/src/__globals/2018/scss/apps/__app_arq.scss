@@ -1,0 +1,23 @@
+
+
+.container-arqclasse-tree {
+  padding-left: 10px;
+  ul {
+    padding-left: 25px;
+  }
+  .text-secondary {
+    line-height: 1.3;
+    //ackground-color: black ;
+    display: block;
+    margin-bottom: 10px;
+  }
+  .text-black-50 {
+    font-variant: small-caps;
+  }
+  li {
+    padding: 5px;
+    &:hover {
+      background-color: #00000009;
+    }
+  }
+}

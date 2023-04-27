@@ -22,7 +22,7 @@
 <i>{{object.descricao|linebreaksbr}}</i><br><br>
 
 {% if object and object_list or not object and object_list%}
-    <ul >
+    <ul class="container-arqclasse-tree">
       {% for arqclasse in object_list %}
         <li>
           <a href="{% url 'cmj.arq:subarqclasse_list' arqclasse.pk %}?view={{request.GET.view|default:view_format}}">
@@ -41,9 +41,8 @@
               </i>
             </small>
           </small>
-          <br>
           <small>
-            <i>
+            <i class="text-secondary">
               {{arqclasse.descricao|linebreaksbr}}
             </i>
           </small>
