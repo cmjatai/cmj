@@ -66,10 +66,13 @@
       flex: 0 0 10%;
     }
   }
-
-  .ul-nivel3 {
+  .ul-nivel2 {
     flex-direction: column-reverse;
 
+  }
+
+  .ul-nivel3 {
+    flex-direction: row;
     //align-items: stretch;
     //justify-content: center;
     //align-content: center;
@@ -122,6 +125,7 @@
       justify-content: center;
       text-align: center;
       font-size: 60%;
+      border: 1px solid #ccc;
       small {
         display: none;
       }
