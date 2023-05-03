@@ -129,6 +129,11 @@
       small {
         display: none;
       }
+      &:hover {
+        small {
+          display: block;
+        }
+      }
     }
   }
 
@@ -149,6 +154,11 @@
       padding: 2px;
       small {
         display: none;
+      }
+      &:hover {
+        small {
+          display: block;
+        }
       }
     }
   }
