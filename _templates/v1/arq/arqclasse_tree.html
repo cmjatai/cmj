@@ -6,6 +6,9 @@
   <div class="actions btn-group-sm" role="group">
     <a  class="btn btn-outline-primary" href="{{request.path}}?view=table">TabView</a>
     <a  class="btn btn-outline-primary" href="{{request.path}}?view=tree">TreeView</a>
+    {% if not object %}
+      <a  class="btn btn-outline-primary" href="{{request.path}}?view=tree2">Tree2View</a>
+    {% endif %}
   </div>
 
   <div class="actions btn-group-sm" role="group">
@@ -22,30 +25,32 @@
 <i>{{object.descricao|linebreaksbr}}</i><br><br>
 
 {% if object and object_list or not object and object_list%}
-    <ul class="container-arqclasse-tree">
+    <ul class="container-arqclasse-{{request.GET.view|default:view_format}}">
       {% for arqclasse in object_list %}
-        <li>
-          <a href="{% url 'cmj.arq:subarqclasse_list' arqclasse.pk %}?view={{request.GET.view|default:view_format}}">
-            {{ arqclasse.conta }} - {{ arqclasse.titulo }}
-          </a> -
-          <small class="text-info">
+        <li class="li-nivel0">
+          <span class="inner">
+            <a href="{% url 'cmj.arq:subarqclasse_list' arqclasse.pk %}?view={{request.GET.view|default:view_format}}">
+              {{ arqclasse.conta }} - {{ arqclasse.titulo }}
+            </a> -
+            <small class="text-info">
+              <small>
+                <i>
+                  {{arqclasse.parent.titulo}}
+                </i> -
+                <i>
+                  {{arqclasse.parent.parent.titulo}}
+                </i> -
+                <i>
+                  {{arqclasse.parent.parent.parent.titulo}}
+                </i>
+              </small>
+            </small>
             <small>
-              <i>
-                {{arqclasse.parent.titulo}}
-              </i> -
-              <i>
-                {{arqclasse.parent.parent.titulo}}
-              </i> -
-              <i>
-                {{arqclasse.parent.parent.parent.titulo}}
+              <i class="text-secondary">
+                {{arqclasse.descricao|linebreaksbr}}
               </i>
             </small>
-          </small>
-          <small>
-            <i class="text-secondary">
-              {{arqclasse.descricao|linebreaksbr}}
-            </i>
-          </small>
+          </span>
           {% with arqclasse as object %}
             {% include 'arq/arqclasse_subtree.html' %}
           {% endwith %}

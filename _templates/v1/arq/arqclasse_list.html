@@ -6,6 +6,9 @@
   <div class="actions btn-group-sm" role="group">
     <a  class="btn btn-outline-primary" href="{{request.path}}?view=table">TabView</a>
     <a  class="btn btn-outline-primary" href="{{request.path}}?view=tree">TreeView</a>
+    {% if not object %}
+      <a  class="btn btn-outline-primary" href="{{request.path}}?view=tree2">Tree2View</a>
+    {% endif %}
   </div>
 
   <div class="actions btn-group-sm" role="group">

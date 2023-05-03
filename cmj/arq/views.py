@@ -4,7 +4,7 @@ from operator import attrgetter
 from braces.views._forms import FormMessagesMixin
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models.aggregates import Max
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls.base import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -141,7 +141,13 @@ class ArqClasseListView(ArqClasseParentMixin, PermissionRequiredMixin, ListView)
     def get(self, request, *args, **kwargs):
         self.view_format = request.GET.get('view', 'table')
 
-        if self.view_format == 'tree':
+        if self.view_format == 'tree2':
+            if 'pk' in self.kwargs:
+                return redirect('{}?view=tree'.format(reverse_lazy(
+                    'cmj.arq:subarqclasse_list',
+                    kwargs={'pk': self.kwargs['pk']})))
+
+        if self.view_format.startswith('tree'):
             self.template_name = 'arq/arqclasse_tree.html'
 
         return ListView.get(self, request, *args, **kwargs)

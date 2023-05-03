@@ -21,3 +21,160 @@
     }
   }
 }
+
+.container-arqclasse-tree2 {
+  height: 90vh;
+  display: flex;
+  padding: 0;
+  list-style: none;
+  position: relative;
+  font-size: 1rem;
+
+  ul {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    list-style: none;
+    li {
+      flex: 1 1 auto;
+    }
+  }
+  .space-tree {
+    flex: 0 0 5%;
+    background-color: #dfdfdf;
+    border: 0px;
+  }
+
+  .ul-nivel0 {
+    &::before {
+      content: " ";
+      z-index: 1;
+      background-color: #bbb;
+      position: absolute;
+      right: 10px;
+      top: -4px;
+      width: 10vw;
+      height: 10px;
+      display: block;
+    }
+  }
+
+  .ul-nivel1 {
+    flex-direction: column-reverse;
+    .space-tree {
+      flex: 0 0 10%;
+    }
+  }
+
+  .ul-nivel3 {
+    flex-direction: column-reverse;
+
+    //align-items: stretch;
+    //justify-content: center;
+    //align-content: center;
+    //align-self: center;
+  }
+
+  .inner {
+    display: none;
+    z-index: 1;
+    position: absolute;
+    background-color: #fffe;
+    border: 1px solid #ccc;
+    margin: 7px;
+    padding: 5px 10px;
+    a {
+      display: block;
+    }
+    .text-black-50 {
+      font-variant: small-caps;
+    }
+    .text-secondary {
+      line-height: 1.3;
+      //ackground-color: black ;
+      display: block;
+      margin-bottom: 10px;
+    }
+  }
+
+  li {
+
+  }
+
+  .li-nivel0 {
+    width: 100%;
+    background-color: #fff;
+    border: 2px solid #bbb;
+
+  }
+
+  .li-nivel1 {
+    display: flex;
+    flex-direction: column-reverse;
+    & > .inner {
+      z-index: 1;
+      display: flex;
+      position: relative;
+      flex-direction: column;
+      margin: 0;
+      padding: 0px 2px;
+      justify-content: center;
+      text-align: center;
+      font-size: 60%;
+      small {
+        display: none;
+      }
+    }
+  }
+
+  .li-nivel2 {
+    flex: 0 0 30%;
+    border: 1px solid #ccc;
+    display: flex;
+    flex-direction: column-reverse;
+    & > .inner {
+      z-index: 2;
+      flex: 1 1 0%;
+      display: block;
+      position: relative;
+      font-size: 50%;
+      text-align: center;
+      line-height: 1;
+      margin: 0;
+      padding: 2px;
+      small {
+        display: none;
+      }
+    }
+  }
+
+  .li-nivel4 {
+    border: 1px solid #ccc;
+    flex: 0 0 16.666%;
+    & > .inner {
+      z-index: 4;
+    }
+    &:not(.vazio) {
+      background: transparentize($color_primary, 0.5) $url_bg_png;
+    }
+  }
+
+  .li-nivel2, .li-nivel3, .li-nivel4{
+    &:hover {
+      background-color: #00000055;
+    }
+  }
+
+  .li-nivel4 {
+    &:hover {
+      & > .inner {
+        display: block;
+      }
+    }
+  }
+
+
+
+
+}
