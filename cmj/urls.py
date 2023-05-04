@@ -25,6 +25,7 @@ url(r'^sapl/', include(sapl.compilacao.urls)),
 url(r'^sapl/', include(sapl.relatorios.urls)),
 url(r'^sapl/', include(sapl.base.urls)),"""
 
+import debug_toolbar.toolbar
 from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
@@ -95,6 +96,7 @@ urlpatterns_all = [
 
     url(r'', include(sapl.redireciona_urls.urls)),
 
+    url('__debug__/', include(debug_toolbar.toolbar)),
 
 ]
 

@@ -1,3 +1,4 @@
+
 #'reversion.middleware.RevisionMiddleware',
 MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
