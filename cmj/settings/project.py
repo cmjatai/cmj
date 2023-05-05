@@ -81,18 +81,26 @@ HAYSTACK_CONNECTIONS = {
     },
 }
 
-CACHES = {
-    'default': {
-        'BACKEND': 'speedinfo.backends.proxy_cache',
-        'CACHE_BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': '/var/tmp/django_cache',
-    }
-}
 
 REDIS_HOST = config(
     'REDIS_HOST', cast=str, default='localhost' if DEBUG else 'cmjredis')
 REDIS_PORT = config(
     'REDIS_PORT', cast=int, default=6379)
+
+CACHES = {
+    #'default': {
+    #    'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+    #    'LOCATION': '/var/tmp/django_cache',
+    #}
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+    #"default": {
+    #    "BACKEND": "django.core.cache.backends.redis.RedisCache",
+    #    "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}",
+    #}
+}
 
 CHANNEL_LAYERS = {
     'default': {

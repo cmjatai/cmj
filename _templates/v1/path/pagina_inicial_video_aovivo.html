@@ -11,11 +11,11 @@
           </div>
           {% comment %}
             <small><small>
-              {% with ""|video_ao_vivo as v %}
+              {% with ""|transmissao_ao_vivo as v %}
                 {{ v.json.liveStreamingDetails.concurrentViewers }} assistindo
               {% endwith %}
               &#8226;
-              {% with ""|video_ao_vivo as v %}
+              {% with ""|transmissao_ao_vivo as v %}
                 Transmissão iniciada há {{ v.json.liveStreamingDetails.actualStartTime|parse_datetime|age:0}}
               {% endwith %}
             </small></small>

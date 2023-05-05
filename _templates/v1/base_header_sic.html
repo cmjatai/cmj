@@ -1,6 +1,6 @@
-{% load i18n sigad_filters%}
+{% load i18n cache sigad_filters%}
 
-
+{% cache 600 cache_acesso_informacao %}
 <div class="container-sic">
   <a class="link-e-sic">Acesso à<br>Informação</a>
   <div class="popup-sic">
@@ -43,7 +43,8 @@
           </div>
         {% endfor %}
       </div>
-     
+
     </div>
   </div>
 </div>
+{% endcache %}

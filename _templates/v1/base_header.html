@@ -1,4 +1,4 @@
-{% load i18n staticfiles menus common_cmj_tags cropping %}
+{% load i18n cache staticfiles menus common_cmj_tags cropping %}
 {% load webpack_static from webpack_loader %}
 
 <nav class="navbar navbar-topo navbar-expand-lg navbar-dark">
@@ -32,6 +32,7 @@
           </div>
         </div>
 
+        {% cache 300 cache_transmissao_ao_vivo %}
         <div>
           {% if ""|transmissao_ao_vivo %}
           <a class="btn bg-danger text-white p-0 px-1" href="/tv-cmj/ao-vivo">
@@ -45,6 +46,7 @@
           {% endcomment %}
           {% endif %}
         </div>
+        {% endcache %}
 
       </div>
 
