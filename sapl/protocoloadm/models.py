@@ -169,6 +169,10 @@ class Protocolo(models.Model):
             ('action_anular_protocolo', _('Permissão para Anular Protocolo')),
             ('action_homologar_protocolo', _('Permissão para Homologar Protocolo')),
         )
+        indexes = (
+            models.Index(
+                fields=['conteudo_content_type', 'conteudo_object_id']),
+        )
 
     def __str__(self):
         return _('%(numero)s/%(ano)s') % {
