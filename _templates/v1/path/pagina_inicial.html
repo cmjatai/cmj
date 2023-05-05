@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n common_cmj_tags %}
+{% load i18n cache common_cmj_tags %}
 {% block body_class %}body-initial{% endblock body_class %}
 {% block base_header %}{% endblock %}
 
@@ -12,6 +12,7 @@
 {% endblock %}
 {% block base_content %}
 
+{% cache 300 cache_pagina_inicial%}
 <div id="main_content">
   {% include "path/pagina_inicial_noticias_principais.html" %}
   {% include "base_acesso_rapido.html" %}
@@ -58,4 +59,6 @@
       </div>
     </div>
   </div>
+
+{% endcache %}
 {% endblock %}
