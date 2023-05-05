@@ -17,7 +17,7 @@ ocrmypdf==13.7.0
 asn1crypto
 boto3==1.26.95
 
-
+django-debug-toolbar==2.2.1
 
 celery-haystack==0.10
 django-celery-results==2.0.0
