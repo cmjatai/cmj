@@ -62,11 +62,11 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
 
         # context['noticias_da_procuradoria'] = self.get_noticias_da_procuradoria()
 
-        context['ultimas_publicacoes'] = self.get_ultimas_publicacoes()
+        #context['ultimas_publicacoes'] = self.get_ultimas_publicacoes()
 
         context['ultimos_videos'] = self.get_ultimos_videos()
 
-        context['docs_adms_pagina_inicial'] = self.get_docs_adms_pagina_inicial()
+        #context['docs_adms_pagina_inicial'] = self.get_docs_adms_pagina_inicial()
 
         return context
 
@@ -166,19 +166,18 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
         return r
 
     def get_noticias_dos_parlamentares(self):
-        for legislatura_atual in Legislatura.objects.all():
-            if legislatura_atual.atual():
-                break
+        legislatura_atual = Legislatura.cache_legislatura_atual()
 
         docs = Documento.objects.qs_news()
 
         docs = docs.annotate(
             count_parlamentar=Count("parlamentares", distinct=True)
         ).filter(
-            parlamentares__mandato__legislatura_id=legislatura_atual.id,
+            parlamentares__mandato__legislatura_id=legislatura_atual['id'],
             count_parlamentar=1,
             parlamentares__ativo=True,
-            public_date__gte=legislatura_atual.data_inicio - timedelta(days=60)
+            public_date__gte=legislatura_atual['data_inicio'] -
+            timedelta(days=60)
         ).values_list('id', flat=True)
 
         docs = Documento.objects.filter(

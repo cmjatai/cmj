@@ -1,5 +1,6 @@
 
 from django.contrib.postgres.fields.jsonb import JSONField
+from django.core.cache import cache
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.utils import timezone
@@ -13,7 +14,6 @@ from sapl.utils import (LISTA_DE_UFS, YES_NO_CHOICES, SaplGenericRelation,
                         get_settings_auth_user_model,
                         intervalos_tem_intersecao,
                         restringe_tipos_de_arquivo_img, texto_upload_path)
-
 
 
 class Legislatura(models.Model):
@@ -33,6 +33,24 @@ class Legislatura(models.Model):
             self.data_fim = timezone.now().date()
         return self.data_inicio.year <= current_year <= self.data_fim.year
 
+    @classmethod
+    def cache_legislatura_atual(cls):
+        value = cache.get('sapl_legislatura_atual')
+        if not value is None:
+            return value
+
+        current_year = timezone.now().year
+        value = list(Legislatura.objects.filter(
+            data_inicio__year__lte=current_year,
+            data_fim__year__gte=current_year
+        ).values()[:1])
+
+        value = [] if not value else value[0]
+
+        cache.set('sapl_legislatura_atual', value, 86400)
+
+        return value
+
     @vigencia_atual
     def __str__(self):
         if not self.data_fim:
@@ -41,7 +59,6 @@ class Legislatura(models.Model):
             'numero': self.numero,
             'start': self.data_inicio.year,
             'end': self.data_fim.year}
-
 
 
 class SessaoLegislativa(models.Model):
@@ -77,7 +94,6 @@ class SessaoLegislativa(models.Model):
             'fim': self.data_fim.year}
 
 
-
 class Coligacao(models.Model):
     legislatura = models.ForeignKey(Legislatura,
                                     on_delete=models.PROTECT,
@@ -101,7 +117,6 @@ def get_logo_media_path(instance, subpath, filename):
 
 def logo_upload_path(instance, filename):
     return get_logo_media_path(instance, 'logo', filename)
-
 
 
 class Partido(models.Model):
@@ -153,7 +168,6 @@ class Partido(models.Model):
         }
 
 
-
 class HistoricoPartido(models.Model):
 
     FIELDFILE_NAME = ('logo_partido', )
@@ -194,7 +208,6 @@ class HistoricoPartido(models.Model):
         }
 
 
-
 class ComposicaoColigacao(models.Model):
     # TODO M2M
     partido = models.ForeignKey(Partido,
@@ -212,7 +225,6 @@ class ComposicaoColigacao(models.Model):
         }
 
 
-
 class NivelInstrucao(models.Model):
     descricao = models.CharField(
         max_length=50, verbose_name=_('Nível de Instrução'))
@@ -224,7 +236,6 @@ class NivelInstrucao(models.Model):
 
     def __str__(self):
         return self.descricao
-
 
 
 class SituacaoMilitar(models.Model):
@@ -255,7 +266,6 @@ def true_false_none(x):
         return False
     else:
         return None
-
 
 
 class Parlamentar(models.Model):
@@ -432,7 +442,6 @@ class Parlamentar(models.Model):
                                  update_fields=update_fields)
 
 
-
 class TipoDependente(models.Model):
     descricao = models.CharField(max_length=150, verbose_name=_('Descrição'))
 
@@ -443,7 +452,6 @@ class TipoDependente(models.Model):
 
     def __str__(self):
         return self.descricao
-
 
 
 class Dependente(models.Model):
@@ -477,7 +485,6 @@ class Dependente(models.Model):
         return self.nome
 
 
-
 class Filiacao(models.Model):
     data = models.DateField(verbose_name=_('Data Filiação'))
     parlamentar = models.ForeignKey(Parlamentar, on_delete=models.CASCADE)
@@ -507,7 +514,6 @@ class Filiacao(models.Model):
         }
 
 
-
 class TipoAfastamento(models.Model):
     descricao = models.CharField(max_length=50, verbose_name=_('Descrição'))
     indicador = models.CharField(
@@ -524,7 +530,6 @@ class TipoAfastamento(models.Model):
 
     def __str__(self):
         return self.descricao
-
 
 
 class Mandato(models.Model):
@@ -583,7 +588,6 @@ class Mandato(models.Model):
                     f.data_desfiliacao or timezone.datetime.max.date())]
 
 
-
 class CargoMesa(models.Model):
     # TODO M2M ????
     descricao = models.CharField(
@@ -597,7 +601,6 @@ class CargoMesa(models.Model):
 
     def __str__(self):
         return self.descricao
-
 
 
 class ComposicaoMesa(models.Model):
@@ -615,7 +618,6 @@ class ComposicaoMesa(models.Model):
         return _('%(parlamentar)s - %(cargo)s') % {
             'parlamentar': self.parlamentar, 'cargo': self.cargo
         }
-
 
 
 class Frente(models.Model):
@@ -680,7 +682,6 @@ class Votante(models.Model):
         return self.user.username
 
 
-
 class Bloco(models.Model):
     '''
         * blocos podem existir por mais de uma legislatura
@@ -712,7 +713,6 @@ class Bloco(models.Model):
 
     def __str__(self):
         return self.nome
-
 
 
 class Bancada(models.Model):
@@ -769,7 +769,6 @@ class CargoBloco(models.Model):
         return self.nome
 
 
-
 class CargoBancada(models.Model):
     nome_cargo = models.CharField(max_length=80,
                                   verbose_name=_('Cargo de Bancada'))
@@ -811,7 +810,6 @@ class CargoBlocoPartido(models.Model):
 
     def __str__(self):
         return '{} - {}'.format(self.parlamentar, self.cargo)
-
 
 
 class AfastamentoParlamentar(models.Model):

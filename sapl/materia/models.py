@@ -386,7 +386,9 @@ class MateriaLegislativa(CommonMixin):
             ("can_check_complete", "Pode checar conclusão de processo"),
         )
         indexes = [
-            models.Index(fields=['-em_tramitacao'])
+            models.Index(fields=['-em_tramitacao']),
+            models.Index(fields=['-data_apresentacao']),
+            models.Index(fields=['-data_apresentacao', '-id'])
         ]
 
     @property

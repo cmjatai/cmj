@@ -1138,6 +1138,10 @@ class Documento(ShortUrl, CMSMixin):
             ('view_documento_media',
              _('Visualização das mídias do Documento')),
         )
+        indexes = (
+            models.Index(fields=['-public_date', ]),
+            models.Index(fields=['-public_date', '-created']),
+        )
 
     @property
     def ano(self):
