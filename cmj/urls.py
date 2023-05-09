@@ -25,7 +25,6 @@ url(r'^sapl/', include(sapl.compilacao.urls)),
 url(r'^sapl/', include(sapl.relatorios.urls)),
 url(r'^sapl/', include(sapl.base.urls)),"""
 
-import debug_toolbar.toolbar
 from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
@@ -96,13 +95,15 @@ urlpatterns_all = [
 
     url(r'', include(sapl.redireciona_urls.urls)),
 
-    url('__debug__/', include(debug_toolbar.toolbar)),
 
 ]
 
 admin.site.site_header = 'Cmj'
 
 if settings.DEBUG:
+
+    import debug_toolbar
+
     # urlpatterns += static(settings.MEDIA_URL,
     #                      document_root=settings.MEDIA_ROOT)
     urlpatterns_all += static(settings.STATIC_URL,
@@ -112,6 +113,7 @@ if settings.DEBUG:
         url(r'^media/(?P<path>.*)$', view_static_server, {
             'document_root': settings.MEDIA_ROOT,
         }),
+        url('__debug__/', include(debug_toolbar.urls))
     ]
 
 
