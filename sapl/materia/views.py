@@ -6,6 +6,7 @@ from random import choice
 import shutil
 from string import ascii_letters, digits
 import tempfile
+import traceback
 import zipfile
 
 from crispy_forms.layout import HTML
@@ -699,6 +700,16 @@ class ConfirmarProposicao(PermissionRequiredForAppCrudMixin, UpdateView):
                 getattr(messages, key)(self.request, item)
 
         return self.object.results['url']
+
+    def post(self, request, *args, **kwargs):
+
+        try:
+            return UpdateView.post(self, request, *args, **kwargs)
+        except Exception as e:
+            tb = ''.join(traceback.format_tb(e.__traceback__))
+            #x_type, ex, tb = sys.exc_info()
+            # raceback.print_tb(tb)
+            self.logger.error(str(tb))
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()

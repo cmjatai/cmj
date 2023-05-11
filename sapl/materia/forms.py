@@ -2380,7 +2380,7 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
                       cd.get('numero_materia', ''))
 
         if cd['numero_materia_futuro'] and \
-                'tipo' in cd and \
+                'tipo' in cd and cd['tipo'] and \
                 MateriaLegislativa.objects.filter(tipo=cd['tipo'].tipo_conteudo_related,
                                                   ano=timezone.now().year,
                                                   numero=cd['numero_materia_futuro']):
@@ -2598,7 +2598,7 @@ class ConfirmarProposicaoForm(ProposicaoForm):
         ]
         widgets = {
             'descricao': widgets.Textarea(
-                attrs={'readonly': 'readonly', 'rows': 4}),
+                attrs={'rows': 5}),
             'data_envio': widgets.DateTimeInput(
                 attrs={'readonly': 'readonly'}),
         }
@@ -2648,8 +2648,8 @@ class ConfirmarProposicaoForm(ProposicaoForm):
                 _('Dados Básicos'),
                 to_row(
                     [
-                        ('numero_materia_futuro', 2),
                         ('tipo_readonly', 4),
+                        ('numero_materia_futuro', 2),
                         ('data_envio', 3),
                         ('autor_readonly', 3),
                         (
@@ -2819,6 +2819,10 @@ class ConfirmarProposicaoForm(ProposicaoForm):
             ta.editing_locked = True
             ta.save()
 
+        if self.instance.id:
+            p = Proposicao.objects.get(pk=self.instance.id)
+            self.instance.descricao = p.descricao
+
         self.instance.save()
 
         """
@@ -2880,9 +2884,10 @@ class ConfirmarProposicaoForm(ProposicaoForm):
             if numeracao is None:
                 numero['numero__max'] = 0
 
-            if cd['numero_materia_futuro'] and not MateriaLegislativa.objects.filter(tipo=tipo,
-                                                                                     ano=ano,
-                                                                                     numero=cd['numero_materia_futuro']):
+            if cd['numero_materia_futuro'] and not MateriaLegislativa.objects.filter(
+                    tipo=tipo,
+                    ano=ano,
+                    numero=cd['numero_materia_futuro']):
                 max_numero = int(cd['numero_materia_futuro'])
             else:
                 max_numero = numero['numero__max'] + \
@@ -2892,7 +2897,7 @@ class ConfirmarProposicaoForm(ProposicaoForm):
             materia = MateriaLegislativa()
             materia.numero = max_numero
             materia.tipo = tipo
-            materia.ementa = proposicao.descricao
+            materia.ementa = cd['descricao']
             materia.ano = ano
             materia.data_apresentacao = timezone.now()
             materia.em_tramitacao = True
