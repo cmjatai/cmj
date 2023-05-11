@@ -364,13 +364,24 @@ class NormaCrud(Crud):
             uncheck = request.GET.get('uncheck', '')
             if request.user.is_superuser and (check or uncheck):
                 try:
-                    m = NormaJuridica.objects.get(pk=check or uncheck)
+                    n = NormaJuridica.objects.get(pk=check or uncheck)
+
+                    qs = self.get_queryset()
+                    nn = None
+
+                    for i, j in enumerate(qs):
+                        if j.id == n.id:
+                            nn = i + 1
+                            break
+                    nn = qs[nn].id
+
                 except:
                     raise Http404
                 else:
-                    m.checkcheck = True if check else False
-                    m.save()
-                    return redirect('/norma/check')
+                    n.checkcheck = True if check else False
+                    n.save()
+
+                    return redirect(f'/norma/check#{nn}')
 
             return Crud.ListView.get(self, request, *args, **kwargs)
 
@@ -386,7 +397,7 @@ class NormaCrud(Crud):
 
         def hook_ementa(self, obj, ss, url):
             return '''{}<br>{} - {}'''.format(
-                obj.ementa,
+                f'<a name="{obj.id}">{obj.ementa}</a>',
                 '<span class="text-danger">Sem Texto Articulado</span>' if not obj.texto_articulado.exists(
                 ) or obj.texto_articulado.first().dispositivos_set.count() < 4 else '',
                 '<span class="text-danger">Sem Arquivo</span>' if not obj.texto_integral else ''
