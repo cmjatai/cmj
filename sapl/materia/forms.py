@@ -2883,7 +2883,7 @@ class ConfirmarProposicaoForm(ProposicaoForm):
             if cd['numero_materia_futuro'] and not MateriaLegislativa.objects.filter(tipo=tipo,
                                                                                      ano=ano,
                                                                                      numero=cd['numero_materia_futuro']):
-                max_numero = cd['numero_materia_futuro']
+                max_numero = int(cd['numero_materia_futuro'])
             else:
                 max_numero = numero['numero__max'] + \
                     1 if numero['numero__max'] else 1
