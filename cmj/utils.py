@@ -425,6 +425,7 @@ class Manutencao(object):
         ]
         for s in disabled_signals:
             for r in s.receivers:
+                continue
                 print(r)
             s.receivers = []
 

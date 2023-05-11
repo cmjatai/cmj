@@ -1,10 +1,13 @@
+
 import glob
+import io
 import logging
 import os
+import re
 import subprocess
 import sys
 
-from PIL import Image, ImageFilter
+from PyPDF4.pdf import PdfFileReader
 import cv2
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.base import File
@@ -12,6 +15,10 @@ from django.core.management.base import BaseCommand
 from django.db.models import Q
 from django.db.models.signals import post_delete, post_save
 import fitz
+import pdfminer
+from pdfminer.high_level import extract_text_to_fp, extract_text
+from pdfminer.layout import LAParams
+import pikepdf
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.platypus.doctemplate import SimpleDocTemplate
@@ -39,15 +46,65 @@ class Command(BaseCommand):
         self.logger = logging.getLogger(__name__)
         m = Manutencao()
         m.desativa_auto_now()
-        post_save.disconnect(dispatch_uid='timerefresh_post_signal')
-        self.logger = logging.getLogger(__name__)
+        m.desativa_signals()
+        # post_save.disconnect(dispatch_uid='timerefresh_post_signal')
 
-        m = MateriaLegislativa.objects.get(pk=19819)
-        m.texto_original.shorten_file_name()
-
+        # m = MateriaLegislativa.objects.get(pk=19819)
+        # m.texto_original.shorten_file_name()
+        # self.criar_pdfs()
         # self.transformar_pdfs_em_imagens()
-        return
-        self.criar_pdfs()
+        # print(text)
+
+        #pdfFileObj = open(ff, 'rb')
+        # try:
+        #    pdfReader = PdfFileReader(pdfFileObj)
+        #    pageObj = pdfReader.getPage(0)
+        #    text = pageObj.extractText()
+        # except:
+        #    pdfReader = PdfFileReader(pdfFileObj, strict=False)
+        #    pageObj = pdfReader.getPage(0)
+        #    text = pageObj.extractText()
+
+        #doc = fitz.open(ff)
+
+        # for page in doc:
+        #    t = page.get_text("words")
+        #    text.append(t)
+        #text = '\n'.join(text)
+
+        materias = MateriaLegislativa.objects.filter(
+            tipo_id=1, ano__gte=2020
+        ).order_by('-ano', '-numero')
+
+        for m in materias:
+            ff = m.texto_original.path
+
+            #pdf = pikepdf.Pdf.open(ff)
+            #page1 = pdf.pages[0]
+
+            text = extract_text(ff)
+            text = text.split('\n')
+
+            text = map(lambda t: t.strip(), text)
+            text = map(lambda t: t.upper(), text)
+            text = list(text)
+
+            found = -1
+            for i, t in enumerate(text):
+                if t.startswith('PROJETO') or t.startswith('PROPOSTA'):
+                    found = i
+                    break
+
+            if found == -1:
+                print('padrão inicial não encontrado: ', m)
+                continue
+            text = ' '.join(text[i:])
+            while '  ' in text:
+                text = text.replace('  ', ' ')
+
+            print(text[0:100])
+
+            #rx = re.compile(r'(PROJETO|PROPOSTA)')
 
     def transformar_pdfs_em_imagens(self, *args, **options):
         folder_raiz = '/home/leandro/TEMP/scanners/'
@@ -74,7 +131,7 @@ class Command(BaseCommand):
                 pix.save(f'{fimg_out}-{index:0>6}.png')
         return
 
-    def criar_pdfs(self, *args, **options):
+    def criar_pdfs__simone(self, *args, **options):
         folder_raiz = '/home/leandro/TEMP/scanners/'
 
         folder_in_images = folder_raiz + 'in_images/'

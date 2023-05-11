@@ -2648,21 +2648,28 @@ class ConfirmarProposicaoForm(ProposicaoForm):
                 _('Dados Básicos'),
                 to_row(
                     [
-                        ('tipo_readonly', 5),
+                        ('numero_materia_futuro', 2),
+                        ('tipo_readonly', 4),
                         ('data_envio', 3),
-                        ('autor_readonly', 4),
-                        ('numero_materia_futuro', 3),
+                        ('autor_readonly', 3),
+                        (
+                            Alert(
+                                self.instance.extract_epigrafe,
+                                css_class="extract_epigrafe alert-info",
+                                dismiss=False
+                            ), 12
+                        ),
                         ('descricao', 12),
                         ('observacao', 12)
                     ]
-                )
+                ),
             )
         ]
 
-        if not AppConfig.objects.last().escolher_numero_materia_proposicao or \
-           not self.instance.numero_materia_futuro:
-            if 'numero_materia_futuro' in self._meta.fields:
-                del fields[0][0][3]
+        # if not AppConfig.objects.last().escolher_numero_materia_proposicao or \
+        #   not self.instance.numero_materia_futuro:
+        #    if 'numero_materia_futuro' in self._meta.fields:
+        #        del fields[0][0][3]
 
         fields.append(
             Div(

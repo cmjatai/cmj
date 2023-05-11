@@ -91,10 +91,12 @@ class _ProposicaoViewSet(ResponseFileMixin):
             # se usuário logado é operador de algum autor
             if autor_do_usuario_logado:
                 q = Q(autor=autor_do_usuario_logado)
+            else:
+                q = Q()
 
             # se é operador de protocolo, ve qualquer coisa enviada
             if self.request.user.has_perm('protocoloadm.list_protocolo'):
-                q = Q(data_envio__isnull=False) | Q(
+                q |= Q(data_envio__isnull=False) | Q(
                     data_devolucao__isnull=False)
 
         qs = qs.filter(q)

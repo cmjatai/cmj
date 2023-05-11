@@ -8,7 +8,9 @@ from django.db.models.deletion import PROTECT
 from django.urls.base import reverse
 from django.utils.translation import ugettext_lazy as _
 from model_utils.choices import Choices
+from pdfminer.high_level import extract_text
 from pdfrw.pdfreader import PdfReader
+
 from cmj.utils import run_sql, get_settings_auth_user_model, ProcessoExterno
 from sapl.crispy_layout_mixin import to_row, SaplFormLayout, \
     form_actions
@@ -147,6 +149,34 @@ class CommonMixin(models.Model):
 
     class Meta:
         abstract = True
+
+    @property
+    def extract_epigrafe(self):
+
+        if not self.FIELDFILE_NAME:
+            raise Exception
+
+        if not self.id:
+            raise Exception
+
+        try:
+            for field in self.FIELDFILE_NAME:
+                if not getattr(self, field):
+                    return None
+
+                path = getattr(self, field).path
+                text = extract_text(path)
+
+                text = text.split('\n')
+
+                text = map(lambda t: t.strip(), text)
+                text = map(lambda t: t.upper(), text)
+                text = list(text)
+
+                return text[0]
+
+        except Exception as e:
+            return None
 
     @property
     def paginas(self):
