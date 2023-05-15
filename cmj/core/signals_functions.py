@@ -119,6 +119,10 @@ def notificacao_signal_function(sender, instance, **kwargs):
 def redesocial_post_function_time_call_documento(inst):
     if settings.DEBUG:
         return 30
+
+    if inst.visibilidade:
+        raise Exception
+
     ct = ContentType.objects.get_by_natural_key('sigad', 'documento')
     vp = VideoParte.objects.filter(
         content_type=ct, object_id=inst.id).first()
