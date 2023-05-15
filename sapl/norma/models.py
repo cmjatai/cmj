@@ -426,6 +426,7 @@ class AnexoNormaJuridica(CommonMixin):
     class Meta:
         verbose_name = _('Anexo da Norma Jurídica')
         verbose_name_plural = _('Anexos da Norma Jurídica')
+        ordering = ('assunto_anexo', )
 
     def __str__(self):
         return _('Anexo: %(anexo)s da norma %(norma)s') % {

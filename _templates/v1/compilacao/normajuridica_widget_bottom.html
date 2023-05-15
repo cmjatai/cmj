@@ -22,12 +22,14 @@
     <hr />
     {% if n.get_anexos_norma_juridica|length > 0 %}
       <p class="control-label">Anexos da Norma Jurídica</p>
-        <div class="form-control-static mb-3">
+        <ul class="form-control-static mb-3">
           {% for p in n.get_anexos_norma_juridica %}
-            <a href="/media/{{p.anexo_arquivo}}">
-            {{ p.anexo_arquivo | to_str | split:"/" | get_last_item_from_list:-1 }}</a>{% if not forloop.last %}, {% endif %}
+            <li>
+              <a href="/media/{{p.anexo_arquivo}}">
+              {{p.assunto_anexo}}</a>
+            </li>
           {% endfor %}
-        </div>
+        </ul>
     {% endif %}
 
       {% if n.diariosoficiais.exists %}
