@@ -92,17 +92,17 @@ urlpatterns_all = [
     url(r'', include(sapl.relatorios.urls)),
     url(r'', include(sapl.base.urls)),
 
-
     url(r'', include(sapl.redireciona_urls.urls)),
-
 
 ]
 
 admin.site.site_header = 'Cmj'
 
-if settings.DEBUG:
-
+if settings.DEBUG_TOOLBAR_ACTIVE:
     import debug_toolbar
+    urlpatterns_all.append(url('__debug__/', include(debug_toolbar.urls)))
+
+if settings.DEBUG:
 
     # urlpatterns += static(settings.MEDIA_URL,
     #                      document_root=settings.MEDIA_ROOT)
@@ -112,8 +112,7 @@ if settings.DEBUG:
     urlpatterns_all += [
         url(r'^media/(?P<path>.*)$', view_static_server, {
             'document_root': settings.MEDIA_ROOT,
-        }),
-        url('__debug__/', include(debug_toolbar.urls))
+        })
     ]
 
 

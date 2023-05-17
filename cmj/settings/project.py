@@ -27,6 +27,7 @@ FONTS_DIR = Path(__file__).ancestor(3).child('fonts')
 
 SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
+DEBUG_TOOLBAR_ACTIVE = config('DEBUG_TOOLBAR_ACTIVE', default=False, cast=bool)
 
 ALLOWED_HOSTS = ['*']
 
@@ -122,7 +123,7 @@ CELERY_CACHE_BACKEND = 'django-cache'
 
 APPEND_SLASH = False
 
-if DEBUG:
+if DEBUG_TOOLBAR_ACTIVE:
     INSTALLED_APPS += ('debug_toolbar',)
     MIDDLEWARE = MIDDLEWARE + \
         ('debug_toolbar.middleware.DebugToolbarMiddleware', )

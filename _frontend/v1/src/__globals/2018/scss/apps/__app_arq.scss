@@ -42,21 +42,25 @@
   }
   .space-tree {
     flex: 0 0 5%;
-    background-color: #dfdfdf;
+    background-color: #aaa;
     border: 0px;
   }
 
   .ul-nivel0 {
     &::before {
-      content: " ";
+      content: "Entrada";
       z-index: 1;
-      background-color: #bbb;
+      background-color: #000;
       position: absolute;
       right: 10px;
-      top: -4px;
+      top: -10px;
       width: 10vw;
-      height: 10px;
+      //height: 20px;
+      color: #aaa;
       display: block;
+      text-align: center;
+      line-height: 1;
+      padding: 3px 0;
     }
   }
 
@@ -77,6 +81,7 @@
     //justify-content: center;
     //align-content: center;
     //align-self: center;
+
   }
 
   .inner {
@@ -85,7 +90,7 @@
     position: absolute;
     background-color: #fffe;
     border: 1px solid #ccc;
-    margin: 7px;
+    margin: 15px 0 0 0;
     padding: 5px 10px;
     a {
       display: block;
@@ -152,8 +157,9 @@
       line-height: 1;
       margin: 0;
       padding: 2px;
-      small {
+      & > small {
         display: none;
+        font-size: 130%;
       }
       &:hover {
         small {
@@ -165,7 +171,7 @@
 
   .li-nivel4 {
     border: 1px solid #ccc;
-    flex: 0 0 16.666%;
+    flex: 1 1 16.666%;
     & > .inner {
       z-index: 4;
     }
@@ -187,8 +193,4 @@
       }
     }
   }
-
-
-
-
 }
