@@ -223,4 +223,4 @@ class ArqClasseListView(ArqClasseParentMixin, PermissionRequiredMixin, ListView)
         if 'pk' in self.kwargs:
             self.object = get_object_or_404(ArqClasse, pk=self.kwargs['pk'])
 
-        return ListView.dispatch(self, request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
