@@ -682,6 +682,7 @@ class AreaTrabalho(CmjAuditoriaModelMixin):
     TIPO_GABINETE = 10
     TIPO_ADMINISTRATIVO = 20
     TIPO_INSTITUCIONAL = 30
+    TIPO_RECEPCAO = 40
     TIPO_PROCURADORIA = 90
     TIPO_PUBLICO = 99
 
@@ -690,6 +691,7 @@ class AreaTrabalho(CmjAuditoriaModelMixin):
         (TIPO_ADMINISTRATIVO, 'tipo_administrativo',
          _('Setor Administrativo')),
         (TIPO_INSTITUCIONAL, 'tipo_institucional', _('Institucional')),
+        (TIPO_RECEPCAO, 'tipo_recepcao', _('Recepção')),
         (TIPO_PROCURADORIA, 'tipo_procuradoria', _('Procuradoria Jurídica')),
         (TIPO_PUBLICO, 'tipo_publico', _('Documentos Públicos')),
     )

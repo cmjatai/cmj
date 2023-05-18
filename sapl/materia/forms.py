@@ -2654,7 +2654,8 @@ class ConfirmarProposicaoForm(ProposicaoForm):
                         ('autor_readonly', 3),
                         (
                             Alert(
-                                self.instance.extract_epigrafe,
+                                self.instance.extract_epigrafe if self.instance.tipo.content_type.model_class(
+                                ) == TipoMateriaLegislativa else '',
                                 css_class="extract_epigrafe alert-info",
                                 dismiss=False
                             ), 12
