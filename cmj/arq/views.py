@@ -133,7 +133,7 @@ class ArqClasseDeleteView(PermissionRequiredMixin, DeleteView):
 
 
 class ArqClasseListView(ArqClasseParentMixin, PermissionRequiredMixin, ListView):
-    permission_required = 'arq.view_subarqclasse'
+    permission_required = 'arq.view_arqclasse'
 
     model = ArqClasse
     template_name = 'arq/arqclasse_list.html'

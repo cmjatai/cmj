@@ -147,9 +147,11 @@ class UserCrud(Crud):
                 q = Q(first_name__icontains=q_param)
                 q |= Q(last_name__icontains=q_param)
                 q |= Q(email__icontains=q_param)
+                q |= Q(operadorareatrabalho_set__areatrabalho__nome__icontains=q_param)
+                q |= Q(operadorautor_set__autor__nome__icontains=q_param)
                 qs = qs.filter(q)
 
-            return qs.order_by('-is_active', 'autor_set__nome')
+            return qs.order_by('-is_active', 'autor_set__nome', 'first_name')
 
         def dispatch(self, request, *args, **kwargs):
             return Crud.ListView.dispatch(self, request, *args, **kwargs)
