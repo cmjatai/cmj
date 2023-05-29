@@ -906,6 +906,8 @@ def texto_upload_path(instance, filename, subpath='', pk_first=False):
     from sapl.protocoloadm.models import DocumentoAdministrativo, \
         DocumentoAcessorioAdministrativo
 
+    from cmj.cerimonial.models import Visita, Visitante
+
     if isinstance(
         instance, (
             DocumentoAdministrativo,
@@ -913,6 +915,7 @@ def texto_upload_path(instance, filename, subpath='', pk_first=False):
             DocumentoAcessorioAdministrativo,
             DocumentoAcessorio,
             MateriaLegislativa,
+            Visita, Visitante
         )
     ):
         prefix = 'private'

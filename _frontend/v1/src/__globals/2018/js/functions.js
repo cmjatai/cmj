@@ -1,3 +1,8 @@
+
+import dateFormat from 'dateformat'
+
+window.dateFormat = dateFormat
+
 window.removeTinymce = function () {
   while (window.tinymce.editors.length > 0) {
     window.tinymce.remove(window.tinymce.editors[0])

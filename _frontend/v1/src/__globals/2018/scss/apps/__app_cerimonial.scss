@@ -1,0 +1,99 @@
+.app-registro-entrada {
+  //position: fixed ;
+  //z-index: 10000;
+  //background: darken($color_main_bg, 3%) $url_bg_png;
+  //top: 0;
+  //left: 0;
+  //right: 0;
+  //bottom: 0;
+
+  .container-table {
+    img {
+      max-width: 100px;
+    }
+    ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+  }
+
+  form {
+    #div_id_fotografia {
+      overflow: hidden;
+      height: 0;
+      position: absolute;
+      width: 0;
+      display: none;
+    }
+    .row0 {
+      //background-color: red;
+    }
+    .row1 {
+      //background-color: gray;
+    }
+    .row2 {
+      //background-color: black;
+    }
+
+    #div_id_setores {
+      display: flex;
+      flex-direction: column;
+      height: 200px;
+      font-size: 80%;
+      & > div {
+        border: 1px solid white;
+        padding: 10px;
+        background-color: #fafafa;
+        overflow-y: scroll;
+      }
+      & > label {
+        //font-weight: bolder;
+      }
+      .custom-checkbox {
+        &:hover {
+          background-color: $hover_background_05p;
+        }
+        label {
+          display: block;
+        }
+      }
+
+    }
+  }
+}
+.container-camera {
+  position: relative;
+  background-color: black;
+  border: 1px solid red;
+  min-height: 50px;
+  border-radius: 5px;
+  overflow: hidden;
+  video {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    //top: 0;
+    //left: 0;
+  }
+  canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .btn {
+    padding: 4px 7px;
+    line-height: 1;
+  }
+
+  .btn-controls {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    #capture {
+      display: none;
+    }
+  }
+}

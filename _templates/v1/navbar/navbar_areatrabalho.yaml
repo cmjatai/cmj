@@ -1,8 +1,13 @@
 {% load i18n common_cmj_tags %}
+
 - title: {% trans "Portal" %}
   url: ''
   children:
   {% yaml_render "navbar/navbar_public.yaml" 2 %}
+
+{% if not perms.protocoloadm.add_protocolo %}
+  {% yaml_render "navbar/public/navbar_atividadelegislativa.yaml" 0 %}
+{% endif %}
 
 {% if user.is_superuser %}
 - title: {% trans "SAAP" %}
@@ -26,7 +31,3 @@
 {% endif %}
 
 {% yaml_render "navbar/restrict/navbar_protocolo.yaml" 0 %}
-
-{% if not perms.protocoloadm.add_protocolo %}
-  {% yaml_render "navbar/public/navbar_atividadelegislativa.yaml" 0 %}
-{% endif %}

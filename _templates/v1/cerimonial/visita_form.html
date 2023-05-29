@@ -1,0 +1,183 @@
+{% extends "crud/form.html" %}
+{% load i18n crispy_forms_tags %}
+{% block main_container_class %}container container-box{{path}}{% endblock %}
+
+{% block extra_js %}{{block.super}}
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      let camera_ligada = false
+      let imagem_caputurada = false
+      let stream = null
+      const container_camera = document.querySelector('.container-camera')
+      const container_ultimas_visitas = document.querySelector('.container-ultimas-visitas')
+
+      const btn_liga = document.querySelector('#liga')
+      const btn_capt = document.querySelector('#capture')
+      const btn_subm = document.querySelector('#submit-id-salvar')
+      const input_doc = document.querySelector('#id_documento')
+
+      //const div_id_telefone = document.querySelector('#div_id_telefone')
+      let img_select = document.querySelector('#img_select')
+
+      input_doc.addEventListener('keyup', function(e) {
+        //console.log(e.target.value)
+        const json_data = {
+          documento__icontains: e.target.value
+          // get_all: true
+        }
+        $.get('/api/cerimonial/visitante/', json_data, function (data) {
+          let div_busca = document.querySelector('#div-busca')
+          /*if (div_busca === null) {
+            div_busca = document.createElement('div')
+            div_busca.id = 'div-busca'
+            e.target.parentElement.appendChild(div_busca)
+
+            img_select = document.createElement('img')
+            div_id_telefone.appendChild(img_select)
+          }*/
+
+          if (data.pagination.total_entries === 0) {
+            $('#div-busca').html(
+              '<small class="text-red"><i>Visitante sem registro anterior. Novo Cadastro!</i></small>'
+            )
+            img_select.src =''
+            $('#id_telefone').val('')
+            $('#id_nome').val('')
+            $('#id_data_nascimento').val('')
+            $('#id_bairro').val('').change()
+            $(container_ultimas_visitas).html('')
+            return
+          }
+          $('#div-busca').html('')
+          const select = $(
+            '<select id="resultados" style="min-width: 100%; max-width:100%;" size="6"/>'
+          )
+
+          data.results.forEach(function (item) {
+            select.append(
+              $('<option>')
+                .attr('data', JSON.stringify(item))
+                .attr('value', item.id)
+                .text(`${item.nome} - ${item.documento} - ${item.telefone}`)
+            )
+          })
+
+          $('#div-busca')
+            .append(select)
+
+          select.on("change", function(es) {
+            const item = JSON.parse(es.target.options[es.target.selectedIndex].getAttribute('data'))
+            $('#id_documento').val(item.documento)
+            $('#id_telefone').val(item.telefone)
+            $('#id_nome').val(item.nome)
+            $('#id_data_nascimento').val(dateFormat(Date.parse(item.data_nascimento), 'UTC:dd/mm/yyyy'))
+            $('#id_bairro').val(item.bairro).change()
+            img_select.src = item.fotografia
+            img_select.classList.add('w-75')
+            //$('#div-busca')
+            //  .children()
+            //  .remove()
+
+            const json_data_ultimas_visitas = {
+              visitante: item.id,
+              o: '-created',
+              page_size: 10
+              // get_all: true
+            }
+            $.get('/api/cerimonial/visita/', json_data_ultimas_visitas, function (data) {
+              $(container_ultimas_visitas).html('<br><strong>Últimas Visitas</strong><br>')
+              data.results.forEach(function (item2) {
+                $(container_ultimas_visitas).append(
+                  $('<li class="hover_background_05p">')
+                    .css('cursor', 'pointer')
+                    .attr('data', JSON.stringify(item2))
+                    .text(dateFormat(Date.parse(item2.created), 'dd/mm/yyyy HH:MM:ss'))
+                    .on('click', function(es2) {
+                      const item3 = JSON.parse(es2.target.getAttribute('data'))
+                      img_select.src = item3.fotografia
+                    })
+                )
+              })
+
+
+            })
+          })
+        })
+
+      })
+
+      resize_container_camera = function(e) {
+        container_camera.style.height = `${container_camera.clientWidth * 3 / 4}px`
+      }
+      resize_container_camera(null)
+      window.addEventListener("resize", resize_container_camera);
+
+      btn_subm.addEventListener('click', function (e) {
+        if (!imagem_caputurada) {
+          form.submit()
+          e.preventDefault()
+          return false
+        }
+        const form = e.target.form
+        const canvas = document.querySelector("#canvas");
+        canvas.toBlob(function (blob) {
+          let fileName = 'fotografia.jpg'
+          let file = new File([blob], fileName,{type:"image/jpeg", lastModified:new Date().getTime()}, 'utf-8');
+          let container = new DataTransfer();
+          container.items.add(file);
+          form.fotografia.files = container.files
+          form.submit()
+        }, 'image/jpeg');
+        e.preventDefault()
+        return false
+      })
+
+      btn_liga.addEventListener('click', function (e) {
+        const btn_liga = this
+        if (camera_ligada === true) {
+          imagem_caputurada = false
+          stream.getTracks().forEach(track => track.stop())
+          camera_ligada = false
+          btn_liga.setHTML('Ligar Câmera')
+          btn_capt.style.display = 'none'
+          return
+        }
+
+        navigator.mediaDevices.getUserMedia({video: true})
+        .then(function (mediaStream) {
+          const canvas = document.querySelector("#canvas")
+          const context = canvas.getContext('2d')
+          context.clearRect(0, 0, canvas.width, canvas.height)
+
+          const video = document.querySelector('#video-visita')
+          stream = mediaStream
+          video.srcObject = mediaStream
+          video.play()
+          btn_capt.style.display = 'block'
+          camera_ligada = true
+          btn_liga.setHTML('Desligar Câmera')
+        })
+        .catch(function (err) {
+          console.log(err)
+          console.log('Não há permissões para acessar a webcam')
+        })
+      })
+
+      btn_capt.addEventListener('click', function (e) {
+        imagem_caputurada = true
+        const video = document.querySelector('#video-visita');
+        const canvas = document.querySelector("#canvas");
+        canvas.height = video.videoHeight;
+        canvas.width = video.videoWidth;
+        var context = canvas.getContext('2d');
+        context.drawImage(video, 0, 0)
+        camera_ligada = false
+        stream.getTracks().forEach(track => track.stop())
+        btn_liga.setHTML('Ligar Câmera')
+        this.style.display = 'none'
+      })
+    })
+  </script>
+
+{% endblock %}

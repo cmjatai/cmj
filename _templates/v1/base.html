@@ -35,7 +35,6 @@
     {% include "popups.html" %}
     <div class="page fadein" id="{% block id_wrapper %}wrapper{% endblock %}">
 
-
       {% include 'base_accessibility.html' %}
 
       {% include 'base_header.html' %}
@@ -62,7 +61,7 @@
 
 
                 {% if user.is_anonymous %}
-                <ul class="navbar-nav justify-content-end">
+                  <ul class="navbar-nav justify-content-end">
                     <li>
                       <a  class="menu-intranet"  href="#linkMenu" role="button" aria-haspopup="true" aria-expanded="false" title="{% trans 'Acessar' %}"><i class="fas fa-sign-in-alt"></i>&nbsp;</a>
                       <ul class="dropdown-menu">
@@ -80,7 +79,7 @@
                       </ul>
                     </li>
                   </ul>
-                  {% endif %}
+                {% endif %}
 
 
               </div>
@@ -102,7 +101,7 @@
           </header>
         {% endblock second_header %}
         <main id="content" class="content page__row screen-lg">
-        {% block content_container %}
+          {% block content_container %}
             <div class="{% block main_container_class %}container{{fluid}}{{path}} container-box{% endblock %}">
               {% block base_functions %}{% endblock %}
               {% block base_container_header %}
@@ -127,7 +126,7 @@
                 {% if view.is_contained %}
                   <div class="box-area-trabalho">
                     {% for at in areatrabalho %}
-                        <a>{{at.nome}}</a>
+                      <a>{{at.nome}}</a>
                     {% endfor %}
                   </div>
                 {% endif %}
@@ -148,31 +147,31 @@
             </div>
 
             {% block cmj_extra_content %}{% endblock %}
-        {% endblock content_container %}
-          </main>
+          {% endblock content_container %}
+        </main>
       {% endblock global_container %}
     </div>
-  {% block login_container %}
-  {% endblock%}
 
+    {% block login_container %}
+    {% endblock%}
 
-  <div vw class="disabled">
-    <div vw-access-button class="active"></div>
-    <div vw-plugin-wrapper>
-      <div class="vw-plugin-top-wrapper"></div>
+    <div vw class="disabled">
+      <div vw-access-button class="active"></div>
+      <div vw-plugin-wrapper>
+        <div class="vw-plugin-top-wrapper"></div>
+      </div>
     </div>
-  </div>
 
-  {% include 'base_footer.html' %}
+    {% include 'base_footer.html' %}
 
   {% endblock root_body %}
 
   {% block foot_js %}
 
-      {% block webpack_loader_js %}
-        {% render_chunk_vendors 'js' %}
-        {% render_bundle  'app' 'js' %}
-      {% endblock webpack_loader_js %}
+    {% block webpack_loader_js %}
+      {% render_chunk_vendors 'js' %}
+      {% render_bundle  'app' 'js' %}
+    {% endblock webpack_loader_js %}
 
     {% block extra_js %}{% endblock %}
 

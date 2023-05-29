@@ -14,7 +14,7 @@ from cmj.cerimonial.views import ContatoCrud, TelefoneCrud, EmailCrud,\
     ContatoFragmentFormPronomesView, StatusProcessoCrud, TopicoProcessoCrud,\
     ClassificacaoProcessoCrud, ProcessoMasterCrud, AssuntoProcessoCrud,\
     ContatoFragmentFormSearchView, ProcessoContatoCrud,\
-    GrupoDeContatosMasterCrud
+    GrupoDeContatosMasterCrud, VisitaCrud
 
 from .apps import AppConfig
 
@@ -29,6 +29,10 @@ urlpatterns = [
         EmailCrud.get_urls() + DependenteCrud.get_urls() +
         LocalTrabalhoCrud.get_urls() + EnderecoCrud.get_urls() +
         FiliacaoPartidariaCrud.get_urls() + ProcessoContatoCrud.get_urls()
+    )),
+
+    url(r'^recepcao', include(
+        VisitaCrud.get_urls()
     )),
 
     url(r'^contato/ajax_search_radio_list',

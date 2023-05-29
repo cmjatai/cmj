@@ -10,6 +10,8 @@ RP_LIST, RP_DETAIL, RP_ADD, RP_CHANGE, RP_DELETE =\
 
 GROUP_SOCIAL_USERS = _('Usuários com Login Social')
 
+GROUP_SAAP_WORKSPACE_OPER_RECEPCAO = _(
+    'Área de Trabalho - Operadores da Recepção')
 GROUP_SAAP_WORKSPACE_OPER_CONTATOS = _(
     'Área de Trabalho - Operadores de Contatos')
 GROUP_SAAP_WORKSPACE_OPER_PROCESSOS = _(
@@ -44,6 +46,7 @@ CMJ_GROUPS = [
     GROUP_SAAP_WORKSPACE_OPER_CONTATOS,
     GROUP_SAAP_WORKSPACE_OPER_PROCESSOS,
     GROUP_SAAP_WORKSPACE_OPER_GRUPO_CONTATOS,
+    GROUP_SAAP_WORKSPACE_OPER_RECEPCAO,
     GROUP_MATERIA_WORKSPACE_VIEWER,
     GROUP_ANONYMOUS,
     GROUP_SIGAD_VIEW_STATUS_RESTRITOS,
@@ -67,6 +70,7 @@ WORKSPACE_GROUPS = [
 menu_dados_auxiliares = "menu_dados_auxiliares"
 menu_tabelas_auxiliares = "menu_tabelas_auxiliares"
 menu_area_trabalho = "menu_area_trabalho"
+menu_recepcao = "menu_recepcao"
 menu_contatos = "menu_contatos"
 menu_grupocontatos = "menu_grupocontatos"
 menu_processos = "menu_processos"
@@ -78,6 +82,7 @@ menu_agenda = "menu_agenda"
 MENU_PERMS_FOR_USERS = (
     (menu_dados_auxiliares, _('Mostrar Menu Dados Auxiliares')),
     (menu_tabelas_auxiliares, _('Mostrar Menu de Tabelas Auxiliares')),
+    (menu_recepcao, _('Mostrar Menu de Registro de Entradas')),
     (menu_contatos, _('Mostrar Menu de Cadastro de Contatos')),
     (menu_grupocontatos, _('Mostrar Menu de Cadastro de Grupos de Contatos')),
     (menu_processos, _('Mostrar Menu de Cadastro de Processos')),

@@ -1,6 +1,6 @@
 {% load i18n common_cmj_tags %}
 
-{% yaml_render "navbar/public/navbar_institucional.yaml" 0 %}
+{% yaml_render "navbar/public/navbar_institucional.yaml" 0 %} 
 
 - title: {% trans 'Vereadores' %}
   url: /parlamentar

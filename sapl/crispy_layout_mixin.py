@@ -1,4 +1,5 @@
 from builtins import classmethod
+from dis import dis
 from math import ceil
 import types
 
@@ -49,7 +50,7 @@ def form_actions(more=[Div(css_class='clearfix')],
     if disabled and not 'pesquisa' in force_text(label).lower():
         doubleclick = 'this.form.submit();this.disabled=true;'
     else:
-        doubleclick = 'return true;'
+        doubleclick = 'return true;' if not disabled is None else ''
 
     return FormActions(
         *more,
@@ -92,14 +93,14 @@ class SaplFormHelper(FormHelper):
 class SaplFormLayout(Layout):
 
     def __init__(self, *fields, cancel_label=_('Cancelar'),
-                 save_label=_('Salvar'), actions=None):
+                 save_label=_('Salvar'), actions=None, disabled=False):
 
         buttons = actions
         if not buttons:
             buttons = form_actions(label=save_label, more=[
                 HTML('<a href="{{ view.cancel_url }}"'
                      ' class="btn btn-inverse">%s</a>' % cancel_label)
-                if cancel_label else None])
+                if cancel_label else None], disabled=disabled)
 
         _fields = list(to_fieldsets(fields))
         if buttons:

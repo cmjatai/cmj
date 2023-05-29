@@ -7,7 +7,7 @@ html {
 
 strong {
   font-weight: bold;
-} 
+}
 
 .caret {
   display: inline-block;
@@ -323,6 +323,13 @@ input[type="radio"] {
 .embed-audio {
   padding-bottom: 18%;
 }
+
+.hover_background_05p {
+  &:hover {
+    background-color: $hover_background_05p;
+  }
+}
+
 
 
 .panel-nota-site-antigo {

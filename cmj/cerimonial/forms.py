@@ -7,7 +7,7 @@ import operator
 from crispy_forms.bootstrap import InlineRadios, FieldWithButtons, StrictButton
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Field, Row, Layout, Fieldset, Div, Button,\
-    Submit, BaseInput
+    Submit, BaseInput, HTML
 from crispy_forms.templatetags.crispy_forms_field import css_class
 from crispy_forms.utils import get_template_pack
 from dateutil.relativedelta import relativedelta
@@ -30,12 +30,13 @@ from cmj import settings
 from cmj.cerimonial.models import LocalTrabalho, Endereco,\
     TipoAutoridade, PronomeTratamento, Contato, Perfil, Processo,\
     IMPORTANCIA_CHOICE, AssuntoProcesso, StatusProcesso, ProcessoContato,\
-    GrupoDeContatos, TopicoProcesso
+    GrupoDeContatos, TopicoProcesso, Visita, Visitante
 from cmj.core.forms import ListWithSearchForm
-from cmj.core.models import Municipio, Trecho, ImpressoEnderecamento
+from cmj.core.models import Municipio, Trecho, ImpressoEnderecamento,\
+    AreaTrabalho, Bairro
 from cmj.utils import normalize, YES_NO_CHOICES
 from sapl.crispy_layout_mixin import to_column, SaplFormLayout, to_fieldsets,\
-    form_actions, to_row
+    form_actions, to_row, SaplFormHelper
 
 
 class ListTextWidget(forms.TextInput):
@@ -1253,3 +1254,140 @@ class ContatoAgrupadoPorGrupoFilterSet(FilterSet):
         self.form.fields['grupo'].queryset = GrupoDeContatos.objects.filter(
             workspace=workspace)
         self.form.fields['municipio'].queryset = Municipio.objects.all()
+
+
+class VisitaForm(ModelForm):
+
+    setores = ModelMultipleChoiceField(
+        queryset=AreaTrabalho.objects.filter(
+            tipo__in=(
+                AreaTrabalho.TIPO_GABINETE,
+                AreaTrabalho.TIPO_ADMINISTRATIVO,
+                AreaTrabalho.TIPO_PROCURADORIA,
+                AreaTrabalho.TIPO_INSTITUCIONAL
+            ),
+            ativo=True
+        ).order_by('tipo', 'nome'),
+        required=False,
+        label='Setores a Visitar',
+        widget=forms.CheckboxSelectMultiple(),
+    )
+
+    documento = forms.CharField(
+        required=True,
+        label='RG / CPF / CNH',
+        widget=forms.TextInput())
+
+    telefone = forms.CharField(
+        required=True,
+        label='Telefone',
+        widget=forms.TextInput())
+
+    nome = forms.CharField(
+        required=True,
+        label='Nome',
+        widget=forms.TextInput())
+
+    bairro = forms.ModelChoiceField(
+        queryset=Bairro.objects.order_by('nome'),
+        required=False,
+        label='Bairro'
+    )
+
+    data_nascimento = forms.DateField(
+        label='Data de Nascimento',
+        required=False,
+        widget=forms.DateInput(format='%d/%m/%Y')
+    )
+
+    class Meta:
+        model = Visita
+        fields = ('setores', 'fotografia')
+
+    def __init__(self, *args, **kwargs):
+
+        layout_form = [
+            to_row([
+                (to_row([
+                    ('documento', 7),
+                    ('telefone', 5),
+                    (HTML('''
+                            <div id="div-busca"></div>
+                    '''), 8),
+                    (HTML('''
+                            <div class="text-center"><img id="img_select"/></div>
+                    '''), 4),
+                    ('nome', 12),
+                    ('data_nascimento', 5),
+                    ('bairro', 7),
+                    ('fotografia', 12),
+                    ('setores', 12),
+
+                ]), 8),
+                (HTML(
+                    '''
+                    <div class="container-camera">
+                        <video id="video-visita"></video>
+                        <canvas id="canvas"></canvas>
+                        <div class="btn-controls btn-toobar">
+                            <div class="btn-group btn-group-sm">
+                                <div class="btn btn-primary" id="liga">Ligar Câmera</div>
+                            </div>
+                            <div class="btn-group btn-group-sm">
+                                <div class="btn btn-success" id="capture">Capturar</div>
+                            </div>
+                        </div>
+                    </div>
+                    <ul class="container-ultimas-visitas"</ul>
+                '''), 4),
+
+            ]),
+
+            to_row([
+
+            ]),
+        ]
+
+        self.helper = SaplFormHelper()
+        self.helper.layout = SaplFormLayout(
+            *layout_form, save_label=_('Registrar'), disabled=None)
+
+        for i, k in enumerate(self.helper.layout.fields):
+            k.css_class = f'row row{i}'
+
+        super().__init__(*args, **kwargs)
+
+    def clean(self):
+        return ModelForm.clean(self)
+
+    def save(self, commit=True):
+        cd = self.cleaned_data
+
+        visita = self.instance
+        visitante = Visitante.objects.filter(documento=cd['documento']).first()
+
+        if not visitante:
+            visitante = Visitante()
+
+        visitante.documento = cd['documento']
+        visitante.nome = cd['nome']
+        visitante.data_nascimento = cd['data_nascimento']
+        visitante.bairro = cd['bairro'] if cd['bairro'] else None
+        visitante.telefone = cd['telefone']
+        visitante.modifier = self.instance.modifier
+        visitante.owner = self.instance.owner
+
+        if not visitante.id:
+            visitante.fotografia = visita.fotografia
+
+        elif visitante.fotografia and not visita.fotografia:
+            visita.fotografia = visitante.fotografia
+
+        elif visitante.fotografia and visita.fotografia:
+            visitante.fotografia = visita.fotografia
+
+        visitante.save()
+
+        self.instance.visitante = visitante
+
+        return ModelForm.save(self, commit=commit)

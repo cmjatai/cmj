@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models.aggregates import Max
 from django.http.response import HttpResponse
+from django.utils import formats, timezone
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.edit import FormView
 
@@ -10,7 +11,7 @@ from cmj.cerimonial.forms import LocalTrabalhoForm, EnderecoForm,\
     TipoAutoridadeForm, LocalTrabalhoPerfilForm,\
     ContatoFragmentPronomesForm, ContatoForm, ProcessoForm,\
     ContatoFragmentSearchForm, ProcessoContatoForm, ListWithSearchProcessoForm,\
-    GrupoDeContatosForm
+    GrupoDeContatosForm, VisitaForm
 from cmj.cerimonial.models import TipoTelefone, TipoEndereco,\
     TipoEmail, Parentesco, EstadoCivil, TipoAutoridade, TipoLocalTrabalho,\
     NivelInstrucao, Contato, Telefone, OperadoraTelefonia, Email,\
@@ -18,7 +19,7 @@ from cmj.cerimonial.models import TipoTelefone, TipoEndereco,\
     DependentePerfil, LocalTrabalhoPerfil,\
     EmailPerfil, TelefonePerfil, EnderecoPerfil, FiliacaoPartidaria,\
     StatusProcesso, ClassificacaoProcesso, TopicoProcesso, Processo,\
-    AssuntoProcesso, ProcessoContato, GrupoDeContatos
+    AssuntoProcesso, ProcessoContato, GrupoDeContatos, Visita
 from cmj.core.forms import ListWithSearchForm
 from cmj.core.models import AreaTrabalho
 from cmj.globalrules.crud_custom import PerfilAbstractCrud,\
@@ -44,6 +45,78 @@ TopicoProcessoCrud = CrudAux.build(
 
 
 # ---- Details Master Crud herança ---------------------------
+
+class VisitaCrud(Crud):
+    model = Visita
+
+    class BaseMixin(Crud.BaseMixin):
+        list_field_names = [
+            "created",
+            "visitante__nome",
+            "setores",  'fotografia', ]
+
+    class DetailView(Crud.DetailView):
+        def get_context_data(self, **kwargs):
+            ctx = Crud.DetailView.get_context_data(self, **kwargs)
+            ctx['subnav_template_name'] = ''
+            ctx['path'] = ' app-registro-entrada'
+
+            return ctx
+
+        def hook_created(self, *args, **kwargs):
+            return 'Registro de Entrada', formats.date_format(
+                timezone.localtime(args[0].created), 'd/m/Y - H:i:s'
+            )
+
+        def hook_fotografia(self, *args, **kwargs):
+            if args[0].fotografia:
+                return 'Registro Fotogrático', f'<div class="text-center"><img src="{args[0].fotografia.url}"</div>'
+            else:
+                return '', ''
+
+    class CreateView(Crud.CreateView):
+        form_class = VisitaForm
+        layout_key = None
+
+        def get_context_data(self, **kwargs):
+            ctx = Crud.CreateView.get_context_data(self, **kwargs)
+            ctx['path'] = ' app-registro-entrada'
+            #ctx['title'] = 'Registo de Entradas - PortalCMJ'
+            return ctx
+
+    class ListView(Crud.ListView):
+
+        def get_context_data(self, **kwargs):
+            ctx = Crud.ListView.get_context_data(self, **kwargs)
+            ctx['path'] = ' app-registro-entrada'
+            #ctx['title'] = 'Registo de Entradas - PortalCMJ'
+            return ctx
+
+        def hook_header_created(self, *args, **kwargs):
+            return 'Registro de Entrada'
+
+        def hook_created(self, *args, **kwargs):
+            return '<div class="text-center">{}</div>'.format(
+                formats.date_format(
+                    timezone.localtime(args[0].created), 'd/m/Y - H:i:s'
+                )
+            ), args[2]
+
+        def hook_fotografia(self, *args, **kwargs):
+            if args[0].fotografia:
+                return f'<div class="text-center"><img src="{args[0].fotografia.url}"</div>', ''
+            else:
+                return '', ''
+
+        def hook_visitantenome(self, *args, **kwargs):
+            v = args[0].visitante
+            bairro = v.bairro or ''
+            return f'''
+                {v.nome} - {v.telefone}<br>
+                {v.documento} - {bairro}<br>
+            ''', ''
+
+
 class OperadoraTelefoniaCrud(Crud):
     model_set = 'telefone_set'
     model = OperadoraTelefonia

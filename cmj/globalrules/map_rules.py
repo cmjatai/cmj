@@ -7,7 +7,7 @@ from cmj.cerimonial.models import Perfil, EnderecoPerfil, EmailPerfil,\
     LocalTrabalho, Telefone, Email, Endereco, GrupoDeContatos, ProcessoContato,\
     Processo, AssuntoProcesso, TipoTelefone, TipoEmail, Parentesco,\
     PronomeTratamento, TipoAutoridade, TipoEndereco, TipoLocalTrabalho,\
-    StatusProcesso, ClassificacaoProcesso, TopicoProcesso
+    StatusProcesso, ClassificacaoProcesso, TopicoProcesso, Visita, Visitante
 from cmj.core.models import Trecho, Municipio, AreaTrabalho,\
     OperadorAreaTrabalho, Cep, RegiaoMunicipal, Bairro, TipoLogradouro,\
     Distrito, Logradouro, ImpressoEnderecamento, Notificacao
@@ -29,7 +29,8 @@ from cmj.globalrules import (RP_ADD, RP_CHANGE, RP_DELETE, RP_DETAIL, RP_LIST,
                              GROUP_OUVIDORIA_VISUALIZACAO_RESPOSTAS,
                              GROUP_AGENDA_WORKSPACE, menu_agenda,
                              GROUP_MATERIA_WORKSPACE_VIEWER,
-                             GROUP_DIARIOS_OPERADOR)
+                             GROUP_DIARIOS_OPERADOR,
+                             GROUP_SAAP_WORKSPACE_OPER_RECEPCAO, menu_recepcao)
 from cmj.ouvidoria.models import Solicitacao, MensagemSolicitacao
 from cmj.sigad.models import Classe, Documento, Midia
 from sapl.parlamentares.models import Partido
@@ -102,7 +103,6 @@ rules_saap_group_workspace_oper_contatos = {
         (get_user_model(), [
             menu_contatos,
             menu_dados_auxiliares,
-            menu_grupocontatos,
             menu_relatorios]),
         (Trecho, [RP_LIST, RP_DETAIL]),
         (OperadoraTelefonia, [RP_LIST, RP_DETAIL]),
@@ -131,6 +131,16 @@ rules_saap_group_workspace_oper_grupo_contatos = {
             menu_grupocontatos, ]),
         (GrupoDeContatos, __base__),
         (Contato, [RP_LIST, RP_DETAIL, ]),
+    ]
+}
+
+rules_saap_group_workspace_oper_recepcao = {
+    'group': GROUP_SAAP_WORKSPACE_OPER_RECEPCAO,
+    'rules': [
+        (get_user_model(), [
+            menu_recepcao, ]),
+        (Visita, [RP_LIST, RP_DETAIL, RP_ADD, ]),
+        (Visitante, [RP_LIST, RP_DETAIL, RP_ADD, RP_CHANGE, ]),
     ]
 }
 
@@ -220,6 +230,7 @@ rules_patterns = [
     rules_saap_group_workspace_managers,
     rules_saap_group_workspace_oper_contatos,
     rules_saap_group_workspace_oper_grupo_contatos,
+    rules_saap_group_workspace_oper_recepcao,
     rules_saap_group_workspace_oper_processos,
     rules_agenda_group_workspace,
     rules_materia_group_workspace,

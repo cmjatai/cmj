@@ -1,4 +1,6 @@
 {% load i18n common_cmj_tags %}
+- title: {% trans "Registro de Entrada" %}
+  url: cmj.cerimonial:visita_list
 - title: {% trans "Contatos" %}
   url: cmj.cerimonial:contato_list
   check_permission: core.menu_contatos

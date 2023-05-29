@@ -2,6 +2,7 @@
 from django.contrib.auth.models import Group
 from django.db import models
 from django.db.models.deletion import SET_NULL, PROTECT, CASCADE
+from django.utils import timezone, formats
 from django.utils.translation import ugettext_lazy as _
 
 from cmj.core.models import CmjModelMixin, Trecho, Distrito, RegiaoMunicipal,\
@@ -9,7 +10,7 @@ from cmj.core.models import CmjModelMixin, Trecho, Distrito, RegiaoMunicipal,\
 from cmj.utils import YES_NO_CHOICES, NONE_YES_NO_CHOICES,\
     get_settings_auth_user_model
 from sapl.parlamentares.models import Parlamentar, Partido
-from sapl.utils import LISTA_DE_UFS
+from sapl.utils import LISTA_DE_UFS, texto_upload_path
 
 
 FEMININO = 'F'
@@ -845,3 +846,102 @@ class GrupoDeContatos(CmjAuditoriaModelMixin):
 
     def __str__(self):
         return str(self.nome)
+
+
+class Visitante(CmjAuditoriaModelMixin):
+
+    nome = models.CharField(max_length=100, verbose_name=_('Nome'))
+
+    documento = models.CharField(
+        max_length=30, blank=True, unique=True,
+        verbose_name=_('RG/CPF/CNH'))
+
+    data_nascimento = models.DateField(
+        blank=True, null=True, verbose_name=_('Data de Nascimento'))
+
+    bairro = models.ForeignKey(
+        Bairro,
+        verbose_name=Bairro._meta.verbose_name,
+        related_name='visitante_set',
+        blank=True, null=True, on_delete=SET_NULL)
+
+    telefone = models.CharField(max_length=100,
+                                verbose_name='Telefone')
+
+    fotografia = models.ImageField(
+        blank=True,
+        null=True,
+        upload_to=texto_upload_path,
+        verbose_name=_('Fotografia'),
+        max_length=512)
+
+    class Meta:
+        verbose_name = _('Visitante')
+        verbose_name_plural = _('Visitantes')
+        ordering = ('nome', 'documento')
+
+    def __str__(self):
+        return str(self.nome)
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+
+        if not self.pk and self.fotografia:
+            fotografia = self.fotografia
+            self.fotografia = None
+            models.Model.save(self, force_insert=force_insert,
+                              force_update=force_update,
+                              using=using,
+                              update_fields=update_fields)
+            self.fotografia = fotografia
+
+        return models.Model.save(self, force_insert=force_insert,
+                                 force_update=force_update,
+                                 using=using,
+                                 update_fields=update_fields)
+
+
+class Visita(CmjAuditoriaModelMixin):
+
+    visitante = models.ForeignKey(
+        Visitante,
+        verbose_name=Visitante._meta.verbose_name,
+        related_name='visita_set',
+        blank=True, null=True, on_delete=SET_NULL)
+
+    setores = models.ManyToManyField(
+        AreaTrabalho,
+        verbose_name=_('Setores visitados')
+    )
+
+    fotografia = models.ImageField(
+        blank=True,
+        null=True,
+        upload_to=texto_upload_path,
+        verbose_name=_('Fotografia'),
+        max_length=512)
+
+    class Meta:
+        verbose_name = _('Registro de Entrada')
+        verbose_name_plural = _('Registros de Entrada')
+        ordering = ('-created', )
+
+    def __str__(self):
+        return f'{self.visitante.nome}: {formats.date_format(timezone.localtime(self.created), "d/m/Y - H:i:s")}'
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+
+        if not self.pk and self.fotografia:
+            fotografia = self.fotografia
+            self.fotografia = None
+            models.Model.save(self, force_insert=force_insert,
+                              force_update=force_update,
+                              using=using,
+                              update_fields=update_fields)
+            self.fotografia = fotografia
+
+        return models.Model.save(self, force_insert=force_insert,
+                                 force_update=force_update,
+                                 using=using,
+                                 update_fields=update_fields)
