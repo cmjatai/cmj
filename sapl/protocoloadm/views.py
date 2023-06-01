@@ -1836,7 +1836,7 @@ class SeloProtocoloMixin(PluginSignMixin):
                 'w': 12,
                 'h': 60,
                 'cor': "0, 76, 64, 255",
-                'debug': False  # settings.DEBUG
+                'debug': settings.DEBUG
             }
             cmd = cmd.format(
                 **params
