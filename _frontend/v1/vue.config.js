@@ -32,6 +32,7 @@ let HOST_NAME = 'localhost'
 // HOST_NAME = '10.42.0.1'
 // HOST_NAME = '10.3.163.200'
 // HOST_NAME = '192.168.43.48'
+//HOST_NAME = '168.228.184.70'
 
 module.exports = {
   runtimeCompiler: true,

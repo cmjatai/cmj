@@ -180,7 +180,7 @@ export default {
         })
 
         if (t.materia.texto_original !== null) {
-          let url = t.materia.texto_original
+          let url = `${t.materia.texto_original}?u=${parseInt(Math.random() * 65536)}`
           t.baixando = true
 
           axios({
