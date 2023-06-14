@@ -50,6 +50,7 @@ class AppConfig(apps.AppConfig):
         except:
             pass
 
+
 """
 from cmj.celery import app as celery_app
     i = celery_app.control.inspect()

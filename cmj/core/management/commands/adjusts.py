@@ -52,7 +52,8 @@ class Command(BaseCommand):
         # m = MateriaLegislativa.objects.get(pk=19819)
         # m.texto_original.shorten_file_name()
         # self.criar_pdfs()
-        # self.transformar_pdfs_em_imagens()
+        self.pdftopdfa()
+        return
         # print(text)
 
         #pdfFileObj = open(ff, 'rb')
@@ -107,7 +108,7 @@ class Command(BaseCommand):
             #rx = re.compile(r'(PROJETO|PROPOSTA)')
 
     def transformar_pdfs_em_imagens(self, *args, **options):
-        folder_raiz = '/home/leandro/TEMP/scanners/'
+        folder_raiz = '/home/leandro/Downloads/leyse/'
 
         folder_in_pdfs = folder_raiz + 'in_pdfs/'
         folder_in_images = folder_raiz + 'in_images/'
@@ -361,3 +362,50 @@ class Command(BaseCommand):
 
             except IsADirectoryError:
                 os.makedirs(f_out, exist_ok=True)"""
+
+    def pdftopdfa(self):
+        folder_in = '/home/leandro/Downloads/leyse/'
+
+        folder_out = folder_in + 'out_pdfa/'
+        os.makedirs(folder_out, exist_ok=True)
+
+        lfpdf = glob.glob(glob.escape(folder_in) + '**', recursive=True)
+        lfpdf.sort()
+
+        for f in lfpdf:
+
+            if 'out_pdfa' in f:
+                continue
+
+            fout = f.replace(folder_in, folder_out)
+            if '.pdf' not in f:
+                os.makedirs(fout, exist_ok=True)
+                continue
+
+            cmd = ["{}/ocrmypdf".format('/'.join(sys.executable.split('/')[:-1])),
+                   #"-q",                  # Execução silenciosa
+                   "-l por",              # tesseract portugues
+                   "-j 8",     # oito threads
+                   #"--fast-web-view 10000000",   # não inclui fast web view
+                   #"--image-dpi 300",
+                   #"--rotate-pages",
+                   #"--remove-background",
+                   "--force-ocr",
+                   #"--optimize 0",
+                   #"--jpeg-quality 100",
+                   #"--png-quality 100",
+                   #"--jbig2-lossy",
+
+                   # "--deskew",
+                   #"--clean-final",
+                   #"--pdfa-image-compression jpeg",  # jpeg  lossless
+                   "--output-type pdfa-2",
+                   #"--tesseract-timeout 0",
+                   f'"{f}"',
+                   f'"{fout}"']
+
+            print(' '.join(cmd))
+            p = subprocess.Popen(
+                ' '.join(cmd), shell=True, stdout=subprocess.PIPE)
+            p.wait()
+            #subprocess.call(' '.join(cmd))

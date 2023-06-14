@@ -1,11 +1,13 @@
 version: "3.7"
-name: PortalCMJ
+name: portalcmj
 services:
   cmjredis:
     image: redis:alpine
     container_name: cmjredis
     labels:
        NAME: "cmjredis"
+    #ports:
+    #  - "6379:6379"
     networks:
       - cmj-net
   cmjsolr:
