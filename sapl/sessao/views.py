@@ -1272,6 +1272,9 @@ class SessaoCrud(Crud):
 
                     paths = m.texto_original.path
 
+                    autor = m.autores.all().first()
+                    compression = False if not autor else autor.tipo.descricao == 'Executivo'
+
                     try:
                         x = m.metadata['selos']['cert_protocolo']['x']
                         y = m.metadata['selos']['cert_protocolo']['y'] + \
@@ -1304,6 +1307,7 @@ class SessaoCrud(Crud):
                         'w': 12,
                         'h': 50,
                         'cor': "0, 76, {}, 255".format(170 - count * 20) if v.tipo_resultado_votacao.natureza == 'A' else "150, 20, 0, 255",
+                        'compression': compression,
                         'debug': settings.DEBUG
                     }
 
