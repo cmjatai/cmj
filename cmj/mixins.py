@@ -87,6 +87,7 @@ class PluginSignMixin:
         '{w}',
         '{h}',
         '"{cor}"',
+        '{compression}',
         '{debug}',
     ]
 
