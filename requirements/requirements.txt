@@ -59,6 +59,8 @@ qrcode
 #html5lib==0.999999
 kazoo==2.8.0
 
+fitz
+pymupdf
 
 
 ipython

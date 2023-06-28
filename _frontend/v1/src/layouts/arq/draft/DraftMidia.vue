@@ -4,7 +4,7 @@
       <div class="inner-action">
         <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
           <div class="btn-group" role="group" aria-label="First group">
-            <a class="btn btn-outline-danger" title="Apagar Mídia"  @click="clickDel">
+            <a class="btn btn-outline-danger" title="Apagar Mídia" @click="clickDel">
               <i class="fas fa-trash-alt"></i>
             </a>
           </div>

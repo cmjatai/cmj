@@ -10,7 +10,6 @@ pipdeptree
 
 opencv-contrib-python-headless
 pymupdf
-ocrmypdf
 
 #sudo apt install tesseract
 #sudo apt install tesseract-ocr
