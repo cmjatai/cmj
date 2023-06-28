@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.http.response import HttpResponse
+import fitz
 from rest_framework.exceptions import NotFound
 
 from cmj.core.models import AreaTrabalho
@@ -8,8 +9,20 @@ from sapl.utils import get_mime_type_from_file_extension
 
 class ResponseFileMixin:
 
+    def response_pagepdftoimage(self, arquivo, _page, _dpi):
+        doc = fitz.open(arquivo.file)
+
+        for index, page in enumerate(doc, 1):
+            if index == _page:
+                png = page.get_pixmap(dpi=int(_dpi) if _dpi else 300)
+                bpng = png.tobytes()
+                response = HttpResponse(bpng, content_type='image/png')
+                return response
+
     def response_file(self, request, *args, **kwargs):
         item = self.get_queryset().filter(pk=kwargs['pk']).first()
+        page = request.GET.get('page', None)
+        dpi = request.GET.get('dpi', None)
 
         if not item:
             raise NotFound
@@ -23,8 +36,17 @@ class ResponseFileMixin:
 
         mime = get_mime_type_from_file_extension(arquivo.name)
 
+        if page and mime == 'application/pdf':
+            return self.response_pagepdftoimage(arquivo, int(page), dpi)
+
+        if mime == 'application/png':
+            mime = 'image/png'
+
         if settings.DEBUG:
-            response = HttpResponse(arquivo.file, content_type=mime)
+            file_path = arquivo.original_path if 'original' in request.GET else arquivo.path
+
+            with open(file_path, 'rb') as f:
+                response = HttpResponse(f, content_type=mime)
             return response
 
         custom_filename = arquivo.name.split('/')[-1]

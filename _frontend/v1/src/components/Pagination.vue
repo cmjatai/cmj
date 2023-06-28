@@ -1,5 +1,5 @@
 <template>
-  <div v-if="pagination.total_entries !== 0" class="widget-pagination d-flex justify-content-between align-items-center w-100">
+  <div v-if="pagination.total_entries !== 0" class="widget-pagination d-flex justify-content-between align-items-center">
     <span :class="['arrow', pagination.previous_page !== null ? 'hover-circle' : 'disabled']" @click="previousPage">
       <i class="fas fa-chevron-left"></i>
     </span>
@@ -35,10 +35,10 @@ export default {
   },
   methods: {
     nextPage () {
-      this.$emit('nextPage')
+      if (this.pagination.next_page !== null) this.$emit('nextPage')
     },
     previousPage () {
-      this.$emit('previousPage')
+      if (this.pagination.previous_page !== null) this.$emit('previousPage')
     }
   }
 }

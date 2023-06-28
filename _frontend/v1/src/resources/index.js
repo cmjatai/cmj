@@ -39,8 +39,15 @@ export default {
       form,
       progress
     ),
+    deleteModel: (app, model, id) => axios.delete(
+      `${basePath}/${app}/${model}/${id}/`
+    ),
     patchModel: (app, model, id, form) => axios.patch(
       `${basePath}/${app}/${model}/${id}/`,
+      form
+    ),
+    postModel: (app, model, form) => axios.post(
+      `${basePath}/${app}/${model}/`,
       form
     )
 

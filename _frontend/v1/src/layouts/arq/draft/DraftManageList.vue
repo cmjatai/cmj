@@ -1,17 +1,34 @@
 <template>
   <div class="draftmanagelist py-3">
-    <div class="row p-3">
+    <div class="row">
       <div class="col d-flex grade">
+        <div class="btn-group ">
+          <button class="btn" title="Atualizar lista" @click="drawList(0)">
+            <i class="fas fa-sync-alt"></i>
+          </button>
+        </div>
         <div class="d-flex grade">
-          <b-form-spinbutton id="spincols" v-model="cols" min="1" max="100" inline></b-form-spinbutton>
+          <b-form-spinbutton id="spincols" v-model="cols" min="1" max="12" inline></b-form-spinbutton>
           <b-form-spinbutton id="spinrows" v-model="rows" min="1" max="100" inline></b-form-spinbutton>
         </div>
         <pagination :pagination="pagination" v-on:nextPage="nextPage" v-on:previousPage="previousPage" v-on:currentPage="currentPage"></pagination>
+        <div v-if="draftselected" class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+          <div class="btn-group mr-2" role="group" aria-label="First group">
+            <a class="btn btn-primary" :href="`/api/arq/draft/${draftselected.id}/zipfile/`" target="_blank" rel="noopener noreferrer" title="Baixar todos os arquivos individualmente dentro de um arquivo compactado.">
+              <i class="fas fa-file-archive"></i>
+            </a>
+          </div>
+          <div class="btn-group" role="group" aria-label="First group">
+            <a class="btn btn-primary" href="#" target="_blank" rel="noopener noreferrer" title="Gerar um PDF/A-2 único.">
+              <i class="fas fa-file-export"></i>
+            </a>
+          </div>
+        </div>
       </div>
     </div>
     <div class="container">
       <div class="row">
-        <draft-midia :elemento="item" :cols="cols" v-for="item, k in draftmidialist_ordered" :key="`dm${k}`"></draft-midia>
+        <draft-midia :elemento="item" :cols="cols" v-for="item, k in draftmidialist_ordered" :key="`dm${k}`" v-on:deletedDraftMidia="drawList(-1)"></draft-midia>
       </div>
     </div>
   </div>
@@ -32,8 +49,8 @@ export default {
     return {
       pagination: {},
       draftmidialist: {},
-      cols: 6,
-      rows: 3
+      cols: 1,
+      rows: 10
     }
   },
   computed: {
@@ -58,6 +75,14 @@ export default {
     this.changeMatriz()
   },
   methods: {
+    drawList (value) {
+      let l = Object.keys(this.draftmidialist).length
+      if (value === -1) {
+        this.fetchMidias(this.draftselected, l > 1 ? this.pagination.page : (this.pagination.previous_page || 1))
+      } else {
+        this.fetchMidias(this.draftselected, l > 0 ? this.pagination.page : (this.pagination.previous_page || 1))
+      }
+    },
     changeMatriz () {
       let dm = document.getElementsByClassName('draft-midia')
       let t = this
@@ -67,7 +92,6 @@ export default {
       })
     },
     currentPage (value) {
-      console.log('currentPage', value)
       if (value !== null && value >= 0) {
         this.fetchMidias(this.draftselected, value)
       }
@@ -80,11 +104,11 @@ export default {
     },
     fetchMidias (draft, page = 1) {
       let _this = this
-      if (draft > 0) {
+      if (draft !== null && draft.id > 0) {
         _this.$set(_this, 'draftmidialist', {})
         _this.$nextTick()
           .then(function () {
-            _this.utils.getModelOrderedList('arq', 'draftmidia', 'sequencia', page, `&draft=${draft}&page_size=${_this.rows * _this.cols}`)
+            _this.utils.getModelOrderedList('arq', 'draftmidia', 'sequencia', page, `&draft=${draft.id}&page_size=${_this.rows * _this.cols}`)
               .then((response) => {
                 _this.$set(_this, 'pagination', response.data.pagination)
                 _.each(response.data.results, function (item, idx) {
@@ -115,12 +139,8 @@ export default {
       padding: 0 10px;
     }
   }
-}
-.draft-midia {
-  max-height: 25vh;
-  img {
-    height: 100%;
-    width: auto;
+  .widget-pagination {
+    flex: 1 1 auto;
   }
 }
 </style>

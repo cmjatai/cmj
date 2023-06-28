@@ -89,6 +89,12 @@ class DraftMidia(models.Model):
         verbose_name = _('Mídia')
         verbose_name_plural = _('Mídias')
 
+    def delete(self, using=None, keep_parents=False):
+        if self.arquivo:
+            self.arquivo.delete()
+
+        return models.Model.delete(self, using=using, keep_parents=keep_parents)
+
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
 
