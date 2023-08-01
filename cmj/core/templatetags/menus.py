@@ -91,7 +91,7 @@ def nav_run(context, path=None, pk=None):
         try:
             # print(timezone.now())
             rendered = yaml_template.template.render(context)
-            menu = yaml.load(rendered)
+            menu = yaml.full_load(rendered)
             resolve_urls_inplace(menu, root_pk, rm, context)
             # print(timezone.now())
         except Exception as e:
