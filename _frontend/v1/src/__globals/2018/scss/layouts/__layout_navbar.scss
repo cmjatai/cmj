@@ -347,62 +347,84 @@
   }
 }
 
-.container-sic {
-  background: #ffd976;
-  padding: 7px 15px;
-  border-radius: 10px;
-  margin-left: 20px;
-  line-height: 1em;
-  .link-e-sic {
-    color: #00723a;
+.container-transparencia {
+  display: flex;
+  .link-e-sic, .link-radar {
     display: inline-block;
     position: relative;
-    height: 100%;
-    padding-left: 40px;
+    border-radius: 7px;
+    color: #00723a;
+    white-space: nowrap;
+    padding: 7px 12px;
     line-height: 1em;
-    font-weight: bold;
-
+    font-weight: 700;
     &::after {
       content: "";
       display: block;
       position: absolute;
+      margin: 7px 10px;
       top: 0;
       left: 0;
       width: 100%;
-      height: 100%;
-      background: url(~@/assets/img/logo_sic.png);
+      bottom: 0;
       background-size: contain;
       background-repeat: no-repeat;
       background-position: left;
     }
   }
 
-  .popup-sic {
-    position: absolute;
-    margin-top: 7px;
-    padding: 12px 10px 10px 10px;
-    right: 15px;
-    left: 15px;
-    display: none;
-    //z-index: 99999;
-
-    &::before {
-      content: "";
-      position: absolute;
-      width: 0;
-      height: 0;
-      border-style: solid;
-      border-width: 0 9px 12px;
-      border-color: transparent transparent #fff;
-      right: 60px;
-      top: 0;
+  .link-e-sic {
+    background-color: #ffd976;
+    padding-left: 45px;
+    &::after {
+      background-image: url(~@/assets/img/logo_sic.png);
     }
-    .inner {
-      background-color: white;
-      padding: 15px;
-      box-shadow: 0px 10px 30px #0007;
-      border-radius: 20px;
-      z-index: 9000;
+  }
+  .link-radar {
+    margin: 0 15px;
+    background-color: #fff;
+    text-align: center;
+    font-size: 73%;
+    color: transparent;
+    &::after {
+      margin: 3px 0;
+      background-image: url(~@/assets/img/logo_radar.png);
+      background-position: center;
+    }
+  }
+  .container-e-sic {
+    .popup-sic {
+      position: absolute;
+      margin-top: 0px;
+      padding: 12px 10px 10px 10px;
+      right: 15px;
+      left: 15px;
+      display: none;
+      //z-index: 99999;
+
+      &::before {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 0 9px 12px;
+        border-color: transparent transparent #fff;
+        right: 60px;
+        top: 0;
+      }
+      .inner {
+        background-color: white;
+        padding: 15px;
+        box-shadow: 0px 10px 30px #0007;
+        border-radius: 20px;
+        z-index: 9000;
+      }
+    }
+    &:hover {
+      .popup-sic {
+        display: block;
+      }
     }
   }
   .titulo {
@@ -416,11 +438,6 @@
   }
   li {
     line-height: 1.5em;
-  }
-  &:hover {
-    .popup-sic {
-      display: block;
-    }
   }
 }
 
