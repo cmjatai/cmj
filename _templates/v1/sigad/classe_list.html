@@ -8,7 +8,8 @@
     {% elif object and not object.parent%}
     <a  class="btn btn-outline-primary" href="{% url 'cmj.sigad:classe_list' %}">{% trans "Voltar para Raiz" %}</a>
     {% endif %}
-      <a  class="btn btn-outline-primary" href="/{{object.slug}}">Slug</a>
+    <a  class="btn btn-outline-primary" href="/{{object.slug}}">Slug</a>
+    <a  class="btn btn-outline-primary" href="{% url 'cmj.sigad:subclasse_list' object.pk %}?renumere">Renumere SubClasses</a>
   </div>
 {% endblock extra_actions %}
 

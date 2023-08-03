@@ -48,7 +48,7 @@ class ClasseForm(ModelForm):
 
     parent = forms.ModelChoiceField(
         queryset=Classe.objects.all(),
-        widget=forms.HiddenInput(),
+        label=_('Classse Ascendente'),
         required=False)
 
     url_redirect = forms.CharField(
@@ -79,18 +79,19 @@ class ClasseForm(ModelForm):
     def __init__(self, *args, **kwargs):
 
         row1 = to_row([
+            ('parent', 2),
             ('codigo', 2),
             ('titulo', 3),
             ('apelido', 3),
             ('perfil', 2),
-            ('parlamentar', 2),
         ])
 
         row2 = to_row([
             ('visibilidade', 2),
             ('template_classe', 3),
-            ('tipo_doc_padrao', 4),
-            ('template_doc_padrao', 3),
+            ('tipo_doc_padrao', 3),
+            ('template_doc_padrao', 2),
+            ('parlamentar', 2),
         ])
         row4 = to_row([
             ('descricao', 12),
@@ -108,6 +109,28 @@ class ClasseForm(ModelForm):
                      row1, row2, row3, row4))
 
         super(ClasseForm, self).__init__(*args, **kwargs)
+
+        print(self.fields['parent'].choices)
+
+        pc = []
+
+        def get_pc_order_by(nd=None):
+
+            if not nd:
+                pc.append(('0', '--------------'))
+                childs = Classe.objects.filter(
+                    parent__isnull=True)
+            else:
+                pc.append((nd.id, str(nd)))
+                childs = nd.childs.all()
+
+            for c in childs.order_by('titulo'):
+                get_pc_order_by(c)
+
+        get_pc_order_by()
+        self.fields['parent'].choices = pc
+        l = list(self.fields['parent'].choices)
+        return
 
 
 class DocumentoForm(ModelForm):

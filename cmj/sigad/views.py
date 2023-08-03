@@ -274,6 +274,7 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
                     request.META['REQUEST_METHOD'] == 'GET':
                 return HttpResponseForbidden()
         elif self.classe and self.classe.url_redirect:
+            request.session['classe_mascara'] = self.classe
             return redirect(self.classe.url_redirect)
 
         return TemplateView.get(self, request, *args, **kwargs)
@@ -1153,6 +1154,17 @@ class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
                             qs.append(p)
 
         return sorted(qs, key=attrgetter('codigo'))
+
+    def get(self, request, *args, **kwargs):
+        renumere = request.GET.get('renumere', None)
+
+        if not renumere is None:
+            childs = self.object.childs.order_by('codigo', 'titulo')
+            for i, c in enumerate(childs, 1):
+                c.codigo = i
+                c.save()
+
+        return ListView.get(self, request, *args, **kwargs)
 
     def dispatch(self, request, *args, **kwargs):
         self.object = None

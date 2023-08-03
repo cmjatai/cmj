@@ -2527,7 +2527,14 @@ class MateriaLegislativaPesquisaView(FilterView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context['title'] = _('Pesquisar Matérias Legislativas')
+        classe_mascara = self.request.session.get('classe_mascara', None)
+
+        if classe_mascara:
+            context['classe_mascara'] = classe_mascara
+            classe_mascara = str(classe_mascara)
+            del self.request.session['classe_mascara']
+        context['title'] = _(
+            classe_mascara or 'Pesquisar Matérias Legislativas')
         context['bg_title'] = 'bg-red text-white'
 
         tipo_listagem = self.request.GET.get('tipo_listagem', '1')

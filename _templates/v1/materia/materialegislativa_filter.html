@@ -2,6 +2,26 @@
 {% load i18n %}
 {% load crispy_forms_tags common_tags sigad_filters cropping %}
 
+{% block second_header %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      {% for p in classe_mascara.classes_parents_and_me %}
+        {% if forloop.first %}
+        <li class="breadcrumb-item"><a href="/">Página Inicial</a></li>
+        {% endif %}
+        <li class="breadcrumb-item {% if p == object %}active{% endif %}">
+
+          <a href="/{{p.absolute_slug}}" {% if p == object %}aria-current="page"{% endif %}>
+            {% if p == object %}Esta Página{% else %}{{p.apelido|default:p.titulo}}{% endif %}
+          </a>
+        </li>
+      {% endfor %}
+    </ol>
+  </nav>
+  {{ block.super }}
+{% endblock second_header %}
+
+
   {% block actions %}
     <div class="actions btn-group" role="group">
       {% if show_results %}
@@ -28,6 +48,7 @@
 {% block table_content %}
 
     {% if show_results %}
+
         <div class="container-table">
           <div class="result-count">Total de Matérias: <strong>{{paginator.count}}</strong></div>
           <table class="table table-hover table-link-ordering">
