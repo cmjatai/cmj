@@ -2533,6 +2533,7 @@ class MateriaLegislativaPesquisaView(FilterView):
             context['classe_mascara'] = classe_mascara
             classe_mascara = str(classe_mascara)
             del self.request.session['classe_mascara']
+
         context['title'] = _(
             classe_mascara or 'Pesquisar Matérias Legislativas')
         context['bg_title'] = 'bg-red text-white'
