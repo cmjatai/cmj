@@ -154,18 +154,21 @@ def list_in_informacao(node):
         )
 
         items = [[], [], []]
+        try:
+            items[0].append(classes[0])
+            items[0].append(classes[1])
+            items[0].append(classes[2])
 
-        items[0].append(classes[0])
-        items[0].append(classes[1])
+            items[1].append(classes[3])
+            items[1].append(classes[4])
+            items[1].append(classes[5])
 
-        items[1].append(classes[2])
-        items[1].append(classes[3])
-        items[1].append(classes[4])
-
-        items[2].append(classes[5])
-        items[2].append(classes[6])
-        items[2].append(classes[7])
-        items[2].append(classes[8])
+            items[2].append(classes[6])
+            items[2].append(classes[7])
+            items[2].append(classes[8])
+            items[2].append(classes[9])
+        except:
+            pass
         classes = items
 
     return classes
