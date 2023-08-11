@@ -70,6 +70,35 @@ footer {
 
 }
 
+.container-lgpd {
+  display: none;
+  z-index: 100000;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 2.5em;
+  background-color: #000c;
+  border-top: 1px solid white;
+  .inner {
+    background-color: white;
+    padding: 1em;
+    text-align: center;
+    margin: 0 auto;
+    width: 85%;
+    .btn-lgpd-ciente {
+      text-transform: ver;
+    }
+    a {
+      color: #444;
+      text-decoration: underline;
+      &:hover {
+        color: black;
+      }
+    }
+  }
+}
+
 .container-footer {
   background: $hover_background_05p;
   margin: $grid-gutter-width 0 0 0;
@@ -94,11 +123,11 @@ footer {
     .titulo {
       font-size: 90%;
     }
-    
+
     .descricao {
       font-size: 70%;
     }
-    
+
   }
 }
 
@@ -123,6 +152,13 @@ footer {
       }
     }
   }
+  .container-lgpd {
+    padding: 1em;
+    .inner {
+      width: 100%;
+      padding: 0.5em;
+    }
+  }
 }
 
 @media screen and (max-width: 480px) {
@@ -130,6 +166,16 @@ footer {
     .path-item-list {
       flex: 0 0 100%;
       max-width: 100%;
+    }
+  }
+}
+
+
+@media screen and (min-width: 1280px) {
+
+  .container-lgpd {
+    .inner {
+      width: 60%;
     }
   }
 }

@@ -39,6 +39,14 @@ window.tinymce = tinymce
 // import './2018/themes/dezembrolaranja/app.scss'
 
 $(function () {
+  if (!localStorage.portalcmj_primeiro_acesso) {
+    document.getElementById('container-lgpd').style.display = 'block'
+    document.getElementById('btn-lgpd-ciente').onclick = function () {
+      document.getElementById('container-lgpd').style.display = 'none'
+      localStorage.portalcmj_primeiro_acesso = 1
+    }
+  }
+
   setTimeout(function () {
     window.Acessibilidade()
 
