@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load crispy_forms_tags cropping%}
 {% block actions %}
+
   <div class="actions btn-group float-right btn-group-sm" role="group">
     <a href="{% url 'sapl.parlamentares:pesquisar_parlamentar' %}" class="btn btn-outline-primary">Pesquisar Parlamentar</a>
     {% if not request.user.is_anonymous  %}
@@ -9,9 +10,18 @@
     {% endif %}
   {% block more_buttons %}{% endblock more_buttons %}
   </div>
+  <div class="float-right">
+    <a class="btn btn-outline-info" href="{% url 'sapl.parlamentares:parlamentar_list' %}" title="Listagem de Parlamentares por Legislatura">
+      <i class="fas fa-list"></i>
+    </a>
+    <a class="btn btn-outline-info" href="{% url 'cmj.sigad:path_parlamentar_view' '' '' '' '' ''%}" title="Legislaturas, Mesa, Parlamentares e Comissões">
+      <i class="fas fa-users"></i>
+    </a>
+  </div>
 {% endblock actions %}
 {% block extra_content %}
   <fieldset class="form-group">
+
     <legend>Selecione o Período</legend>
     <form method="GET">
       <select name="pk" class="form-control" onChange="form.submit();">
@@ -51,7 +61,7 @@
         <tr>
           {% for value, href, obj in value_list %}
             {% if forloop.first %}
-                <td> 
+                <td>
                   {% if obj.fotografia %}
                   <div id="w-100">
                     <img class="img-fluid img-thumbnail" src="{% cropped_thumbnail obj "fotografia_cropping"%}">
