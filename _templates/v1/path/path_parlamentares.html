@@ -7,8 +7,17 @@
 {% block base_header %}{% endblock %}
 
 {% block base_content %}
+
   <div class="row inner-topo">
     <div class="col-md-4 inner-legis">
+      <div class="float-right">
+        <a class="btn btn-outline-info" href="{% url 'sapl.parlamentares:parlamentar_list' %}" title="Listagem de Parlamentares por Legislatura">
+          <i class="fas fa-list"></i>
+        </a>
+        <a class="btn btn-outline-info" href="{% url 'cmj.sigad:path_parlamentar_view' '' '' '' '' ''%}" title="Legislaturas, Mesa, Parlamentares e Comissões">
+          <i class="fas fa-users"></i>
+        </a>
+      </div>
 
       {% if perms.parlamentares.change_parlamentar %}
         <div class="btn-group">
@@ -17,9 +26,10 @@
         </div>
       {% endif %}
 
-      <div class="tags">
+      <div class="tags w-50">
         Legislaturas
       </div>
+
       <a class="inner-titulo">
         <span class="active">
           {{legislatura_ativa.numero}}º<br>
@@ -32,19 +42,9 @@
           {{leg.legislatura.numero}}º
         </a>
       {% endfor %}
-      <div class="clearfix">
-
-      </div>
+      <div class="clearfix"></div>
     </div>
     <div class="col-md-8">
-      <div class="float-right">
-        <a class="btn btn-outline-info" href="{% url 'sapl.parlamentares:parlamentar_list' %}" title="Listagem de Parlamentares por Legislatura">
-          <i class="fas fa-list"></i>
-        </a>
-        <a class="btn btn-outline-info" href="{% url 'cmj.sigad:path_parlamentar_view' '' '' '' '' ''%}" title="Legislaturas, Mesa, Parlamentares e Comissões">
-          <i class="fas fa-users"></i>
-        </a>
-      </div>
       <div class="row inner-sessoes">
         <div class="col-xs-12">
           <div class="tags">Sessões Legislativas</div>
@@ -87,7 +87,6 @@
       </div>
     </div>
   </div>
-
   <div class="row inner-parlamentares">
     <div class="col-xs-12 container-avatar inner-ativos w-100">
       {% for leg in legislaturas %}
