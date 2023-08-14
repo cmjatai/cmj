@@ -151,22 +151,12 @@ def list_in_informacao(node):
         classes = Classe.objects.filter(
             list_in_inf=True,
             parent=classes.first()
-        )
+        ).order_by('codigo')
 
         items = [[], [], []]
         try:
-            items[0].append(classes[0])
-            items[0].append(classes[1])
-            items[0].append(classes[2])
-
-            items[1].append(classes[3])
-            items[1].append(classes[4])
-            items[1].append(classes[5])
-
-            items[2].append(classes[6])
-            items[2].append(classes[7])
-            items[2].append(classes[8])
-            items[2].append(classes[9])
+            for i in classes:
+                items[i.codigo // 10 - 1].append(i)
         except:
             pass
         classes = items
