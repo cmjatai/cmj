@@ -393,12 +393,13 @@
     }
   }
   .container-e-sic {
+    font-size: 1rem;
     .popup-sic {
       position: absolute;
       margin-top: 0px;
       padding: 12px 10px 10px 10px;
-      right: 15px;
-      left: 15px;
+      right: 10px;
+      left: 10px;
       display: none;
       //z-index: 99999;
 
@@ -415,9 +416,9 @@
       }
       .inner {
         background-color: white;
-        padding: 15px;
+        padding: 10px;
         box-shadow: 0px 10px 30px #0007;
-        border-radius: 20px;
+        border-radius: 10px;
         z-index: 9000;
       }
     }
@@ -429,7 +430,7 @@
   }
   .titulo {
     font-weight: bold;
-    padding-bottom: 7px;
+    //padding-bottom: 7px;
     display: inline-block;
     font-variant: small-caps;
   }
@@ -437,7 +438,7 @@
     padding-inline-start: 30px;
   }
   li {
-    line-height: 1.5em;
+    line-height: 1.35em;
   }
 }
 
