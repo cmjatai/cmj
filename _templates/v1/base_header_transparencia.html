@@ -9,7 +9,7 @@
       <div class="inner">
         <div class="row">
           {% for col in None|list_in_informacao %}
-            <div class="col-md-4">
+            <div class="col-md">
               {% for classe in col %}
                 <div class="subclasse-sic {% if classe.visibilidade and perms.sigad %}text-red{% endif %}">
                   <span class="titulo">{{classe.apelido|default:classe.titulo}}</span>

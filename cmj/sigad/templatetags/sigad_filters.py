@@ -153,7 +153,9 @@ def list_in_informacao(node):
             parent=classes.first()
         ).order_by('codigo')
 
-        items = [[], [], []]
+        max = classes.last().codigo // 10
+        items = [[] for m in range(max)]
+
         try:
             for i in classes:
                 items[i.codigo // 10 - 1].append(i)
