@@ -398,8 +398,8 @@
       position: absolute;
       margin-top: 0px;
       padding: 12px 10px 10px 10px;
-      right: 10px;
-      left: 10px;
+      right: 12px;
+      left: 12px;
       display: none;
       //z-index: 99999;
 
@@ -413,10 +413,19 @@
         border-color: transparent transparent #fff;
         right: 60px;
         top: 0;
+      }.row {
+        margin: -8px;
+        .col-md {
+          padding: 8px;
+          &:hover {
+            background-color: #0065560f;
+          }
+        }
       }
+
       .inner {
         background-color: white;
-        padding: 10px;
+        padding: 8px;
         box-shadow: 0px 10px 30px #0007;
         border-radius: 10px;
         z-index: 9000;

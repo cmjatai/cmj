@@ -40,7 +40,7 @@ DRFAUTOAPI = {
 }
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'API - docs',
-    'DESCRIPTION': 'API  - Docs',
+    'TITLE': 'PortalCMJ API - docs',
+    'DESCRIPTION': "API de dados abertos do PortalCMJ. Documentação dos modelos, seus atributos, filtros de busca e endpoint's de comunicação RestFULL.",
     'VERSION': '1.0.0',
 }
