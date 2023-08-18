@@ -11,17 +11,19 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.models import Group
 from django.contrib.auth.tokens import default_token_generator
+from django.contrib.postgres.aggregates.general import ArrayAgg
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, ValidationError
 from django.core.mail import send_mail
 from django.db import connection
 from django.db.models import Count, Q, ProtectedError
+from django.db.models.expressions import Case
 from django.forms.utils import ErrorList
 from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
 from django.urls.base import reverse, reverse_lazy
-from django.utils import timezone
+from django.utils import timezone, formats
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.safestring import mark_safe
@@ -906,18 +908,30 @@ class RelatorioMateriasPorAutorView(FilterView):
     filterset_class = RelatorioMateriasPorAutorFilterSet
     template_name = 'base/RelatorioMateriasPorAutor_filter.html'
 
+    data_init = {}
+
     def get_filterset_kwargs(self, filterset_class):
         super().get_filterset_kwargs(filterset_class)
-        kwargs = {'data': self.request.GET or None}
+        self.data_init = kwargs = {'data': self.request.GET or None}
 
+        if kwargs['data'] and 'legislatura_atual' in kwargs['data']:
+            kwargs['data'] = {'tipo': '', 'autoria__autor': ''}
+            la = Legislatura.cache_legislatura_atual()
+            kwargs['data']['data_apresentacao_0'] = formats.date_format(
+                la['data_inicio'], "d/m/Y")
+            kwargs['data']['data_apresentacao_1'] = formats.date_format(
+                la['data_fim'], "d/m/Y")
         return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context['title'] = _('Matérias por Autor')
-
-        data = self.request.GET
+        if 'legislatura_atual' not in self.request.GET:
+            data = self.request.GET
+            context['title'] = _('Matérias por Autor')
+        else:
+            data = self.data_init['data']
+            context['title'] = _('Matérias por Autor - Legislatura Atual')
         stop_filter = True
         if data:
             for k, v in data.items():
@@ -934,40 +948,46 @@ class RelatorioMateriasPorAutorView(FilterView):
             return context
 
         qtdes = {}
-        for tipo in TipoMateriaLegislativa.objects.all():
-            qs = context['object_list']
-            qtde = len(qs.filter(tipo_id=tipo.id))
-            if qtde > 0:
-                qtdes[tipo] = qtde
-        context['qtdes'] = qtdes
+        qs_qtds = context['object_list'].values(
+            'tipo__sequencia_regimental', 'tipo__id', 'tipo__descricao', 'tipo__sigla'
+        ).annotate(
+            total=Count('tipo')
+        ).order_by('tipo__sequencia_regimental')
+        # for tipo in TipoMateriaLegislativa.objects.all():
+        #    qs = context['object_list']
+        #    qtde = len(qs.filter(tipo_id=tipo.id))
+        #    if qtde > 0:
+        #        qtdes[tipo] = qtde
+        context['qtdes'] = qs_qtds
         context['qtdes_total'] = context['object_list'].count()
 
-        if context['object_list'].count() > 2000:
+        if context['object_list'].count() > 10000:
             messages.error(
                 self.request,
-                'Exitem mais de 2000 registros com o filtro aplicado. '
+                'Exitem mais de 10000 registros com o filtro aplicado. '
                 'É um processamento muito alto para mostrar todos... '
                 'Será mostrado um quadro geral com a totalidade, '
                 'mas para uma lista detalhada segmente a pesquisa.')
 
-        qr = self.request.GET.copy()
+        qr = self.request.GET.copy(
+        ) if 'legislatura_atual' not in self.request.GET else self.data_init['data']
 
         context['show_results'] = show_results_filter_set(qr)
-        if self.request.GET['tipo']:
-            tipo = int(self.request.GET['tipo'])
+        if qr['tipo']:
+            tipo = int(qr['tipo'])
             context['tipo'] = TipoMateriaLegislativa.objects.get(id=tipo)
         else:
             context['tipo'] = ''
-        if self.request.GET['autoria__autor']:
-            autor = int(self.request.GET['autoria__autor'])
+        if qr['autoria__autor']:
+            autor = int(qr['autoria__autor'])
             context['autor'] = Autor.objects.get(id=autor)
         else:
             context['autor'] = ''
-
-        if self.request.GET['data_apresentacao_0']:
+        Case
+        if qr['data_apresentacao_0']:
             context['periodo'] = (
-                self.request.GET['data_apresentacao_0'] +
-                ' - ' + self.request.GET['data_apresentacao_1'])
+                qr['data_apresentacao_0'] +
+                ' - ' + qr['data_apresentacao_1'])
 
         autor_seleted = context['autor']
         context['result_dict'] = r = {}
@@ -976,28 +996,39 @@ class RelatorioMateriasPorAutorView(FilterView):
             if autor_seleted not in r:
                 r[autor_seleted] = {}
 
+        qs_autores = context['object_list'].values('autoria__autor__id', 'autoria__autor__nome').order_by(
+            'autoria__autor__id', 'autoria__autor__nome').distinct()
+
+        autores = {}
+        for a in qs_autores:
+            if a['autoria__autor__id']:
+                autores[a['autoria__autor__id']] = a['autoria__autor__nome']
+
         contagem = 0
         for m in context['object_list']:
             if autor_seleted:
-                if m.ano not in r[autor_seleted]:
-                    r[autor_seleted][m.ano] = []
-                r[autor_seleted][m.ano].append(m)
+                if m.ano not in r[autor_seleted.nome]:
+                    r[autor_seleted.nome][m.ano] = []
+                r[autor_seleted.nome][m.ano].append(m)
             else:
-                for a in m.autores.all():
-                    if a not in r:
-                        r[a] = OrderedDict()
-                    if m.ano not in r[a]:
-                        r[a][m.ano] = []
-                    r[a][m.ano].append(m)
+                for a in m.autoria_list:
+                    if not a:
+                        continue
+                    if autores[a] not in r:
+                        r[autores[a]] = OrderedDict()
+                    if m.ano not in r[autores[a]]:
+                        r[autores[a]][m.ano] = []
+                    r[autores[a]][m.ano].append(m)
             contagem += 1
 
-            if contagem > 2000:
+            if contagem > 10000:
                 break
 
-        for autor, anos in context['result_dict'].items():
+        context['result_dict'] = {}
+        for autor, anos in r.items():
             context['result_dict'][autor] = dict(
                 sorted(anos.items(), reverse=True))
-
+        context['result_dict'] = dict(sorted(context['result_dict'].items()))
         return context
 
 

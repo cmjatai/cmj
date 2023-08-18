@@ -10,19 +10,20 @@
   {% if show_results %}
     <br>
 
-    <div class="actions btn-group float-right" role="group">
-      <a href="{% url 'sapl.base:materia_por_autor' %}" class="btn btn-outline-primary">{% trans 'Fazer nova pesquisa' %}</a>
-    </div>
-
-    <br /><br />
-    <b>PARÂMETROS DE PESQUISA:<br /></b>
-    &emsp;Autor: <strong>{{ autor }}</strong><br />
-    &emsp;Tipo de matéria: {{ tipo }}<br />
-    &emsp;Data de apresentação: {{periodo}}<br /><br />
+    {% if 'legislatura_atual' not in request.GET %}
+      <div class="actions btn-group float-right" role="group">
+        <a href="{% url 'sapl.base:materia_por_autor' %}" class="btn btn-outline-primary">{% trans 'Fazer nova pesquisa' %}</a>
+      </div>
+      <br /><br />
+      <b>PARÂMETROS DE PESQUISA:<br /></b>
+      &emsp;Autor: <strong>{{ autor }}</strong><br />
+      &emsp;Tipo de matéria: {{ tipo }}<br />
+      &emsp;Data de apresentação: {{periodo}}<br /><br />
+    {% endif %}
 
 
     <table class="table table-bordered table-hover">
-      {% for key, value in qtdes.items %}
+      {% for qtd in qtdes %}
         {% if forloop.first %}
           <thead class="thead-default" >
             <tr class="active"><th colspan="3" class="text-center">QUADRO GERAL</th></tr>
@@ -34,8 +35,12 @@
           <tbody>
         {% endif %}
         <tr>
-          <td style="text-align: center;">{{value}}</td>
-          <td colspan="2">{{key.sigla}} - {{key}}</td>
+          <td style="text-align: center;">{{qtd.total}}</td>
+          <td colspan="2">
+            <a href="{% url 'sapl.materia:pesquisar_materia' %}?tipo={{qtd.tipo__id}}&data_apresentacao_0={{request.GET.data_apresentacao_0}}&data_apresentacao_1={{request.GET.data_apresentacao_1}}&autoria__autor={{request.GET.autoria__autor}}">
+              {{qtd.tipo__sigla}} - {{qtd.tipo__descricao}}
+            </a>
+          </td>
         </tr>
         {% if forloop.last %}
           <tr>

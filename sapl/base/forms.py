@@ -1,5 +1,5 @@
-from operator import xor
 import logging
+from operator import xor
 
 from crispy_forms.bootstrap import FieldWithButtons, StrictButton,\
     FormActions
@@ -10,6 +10,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import (AuthenticationForm, PasswordResetForm,
                                        SetPasswordForm)
 from django.contrib.auth.models import Group
+from django.contrib.postgres.aggregates.general import ArrayAgg
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Q
@@ -997,10 +998,16 @@ class RelatorioMateriasPorAutorFilterSet(django_filters.FilterSet):
 
     autoria__autor = django_filters.CharFilter(widget=forms.HiddenInput())
 
+    #@property
+    # def qs(self):
+    #    parent = super().qs
+    # return parent.order_by('autoria__autor', '-ano',
+    # 'tipo__sequencia_regimental', '-numero').distinct()
+
     @property
     def qs(self):
-        parent = super().qs
-        return parent.order_by('autoria__autor', '-ano', 'tipo__sequencia_regimental', '-numero')
+        qs = super().qs
+        return qs.annotate(autoria_list=ArrayAgg('autoria__autor_id')).order_by('tipo__sequencia_regimental', '-numero')
 
     class Meta(FilterOverridesMetaMixin):
         model = MateriaLegislativa
@@ -1496,7 +1503,7 @@ class OperadorAutorForm(ModelForm):
         model = OperadorAutor
         fields = ['user',
                   'operador_principal',
-                  'enviar_email','visibilidade_restrita']
+                  'enviar_email', 'visibilidade_restrita']
 
     def __init__(self, *args, **kwargs):
 
