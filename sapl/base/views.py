@@ -932,6 +932,14 @@ class RelatorioMateriasPorAutorView(FilterView):
         else:
             data = self.data_init['data']
             context['title'] = _('Matérias por Autor - Legislatura Atual')
+
+        context['REQUEST_GET'] = {
+            'data_apresentacao_0': data.get('data_apresentacao_0', ''),
+            'data_apresentacao_1': data.get('data_apresentacao_1', ''),
+            'tipo': data.get('tipo', ''),
+            'autoria__autor': data.get('autoria__autor', ''),
+        }
+
         stop_filter = True
         if data:
             for k, v in data.items():
@@ -983,7 +991,6 @@ class RelatorioMateriasPorAutorView(FilterView):
             context['autor'] = Autor.objects.get(id=autor)
         else:
             context['autor'] = ''
-        Case
         if qr['data_apresentacao_0']:
             context['periodo'] = (
                 qr['data_apresentacao_0'] +

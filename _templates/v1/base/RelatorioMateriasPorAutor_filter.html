@@ -37,7 +37,7 @@
         <tr>
           <td style="text-align: center;">{{qtd.total}}</td>
           <td colspan="2">
-            <a href="{% url 'sapl.materia:pesquisar_materia' %}?tipo={{qtd.tipo__id}}&data_apresentacao_0={{request.GET.data_apresentacao_0}}&data_apresentacao_1={{request.GET.data_apresentacao_1}}&autoria__autor={{request.GET.autoria__autor}}">
+            <a href="{% url 'sapl.materia:pesquisar_materia' %}?tipo={{qtd.tipo__id}}&data_apresentacao_0={{REQUEST_GET.data_apresentacao_0}}&data_apresentacao_1={{REQUEST_GET.data_apresentacao_1}}&autoria__autor={{REQUEST_GET.autoria__autor}}">
               {{qtd.tipo__sigla}} - {{qtd.tipo__descricao}}
             </a>
           </td>
