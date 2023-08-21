@@ -304,7 +304,7 @@ def customize_link_materia(context, pk, has_permission, is_expediente, user=None
                            <b>Autoria:</b> %s </br>
                            <b>Protocolo:</b> %s </br>
                            <b>Turno:</b> %s </br>
-                           
+
                         ''' % (obj.materia.id,
                                url_materia,
                                row[1][0],
@@ -2417,7 +2417,7 @@ class ResumoView(DetailView):
             'cont_mult': 'conteudo_multimidia.html',
             'exp': 'expedientes.html',
             'id_basica': 'identificacao_basica.html',
-            'lista_p': 'lista_presenca.html',
+            'lista_p': 'lista_presenca_sessao.html',
             'lista_p_o_d': 'lista_presenca_ordem_dia.html',
             'mat_exp': 'materias_expediente.html',
             'v_n_mat_exp': 'votos_nominais_materias_expediente.html',
