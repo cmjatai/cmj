@@ -1,6 +1,7 @@
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields.jsonb import JSONField
+from django.core.cache import cache
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models.deletion import CASCADE, PROTECT
@@ -169,13 +170,20 @@ class AppConfig(models.Model):
 
     @classmethod
     def attr(cls, attr):
+        value = cache.get(f'sapl_{attr}')
+        if not value is None:
+            return value
+
         config = AppConfig.objects.first()
 
         if not config:
             config = AppConfig()
             config.save()
 
-        return getattr(config, attr)
+        value = getattr(config, attr)
+        cache.set(f'sapl_{attr}', value, 600)
+
+        return value
 
     def __str__(self):
         return _('Configurações da Aplicação - %(id)s') % {

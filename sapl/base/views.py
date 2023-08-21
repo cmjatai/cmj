@@ -954,7 +954,6 @@ class RelatorioMateriasPorAutorView(FilterView):
 
         if not self.filterset.form.is_valid():
             return context
-
         qtdes = {}
         qs_qtds = context['object_list'].values(
             'tipo__sequencia_regimental', 'tipo__id', 'tipo__descricao', 'tipo__sigla'
@@ -969,7 +968,7 @@ class RelatorioMateriasPorAutorView(FilterView):
         context['qtdes'] = qs_qtds
         context['qtdes_total'] = context['object_list'].count()
 
-        if context['object_list'].count() > 10000:
+        if context['qtdes_total'] > 10000:
             messages.error(
                 self.request,
                 'Exitem mais de 10000 registros com o filtro aplicado. '
@@ -981,6 +980,7 @@ class RelatorioMateriasPorAutorView(FilterView):
         ) if 'legislatura_atual' not in self.request.GET else self.data_init['data']
 
         context['show_results'] = show_results_filter_set(qr)
+
         if qr['tipo']:
             tipo = int(qr['tipo'])
             context['tipo'] = TipoMateriaLegislativa.objects.get(id=tipo)
@@ -996,12 +996,18 @@ class RelatorioMateriasPorAutorView(FilterView):
                 qr['data_apresentacao_0'] +
                 ' - ' + qr['data_apresentacao_1'])
 
+        if context['qtdes_total'] > 10000:
+            return context
+
         autor_seleted = context['autor']
         context['result_dict'] = r = {}
 
         if autor_seleted:
             if autor_seleted not in r:
-                r[autor_seleted] = {}
+                r[autor_seleted.nome] = {}
+        else:
+            context['object_list'] = context['object_list'].annotate(
+                autoria_list=ArrayAgg('autoria__autor_id'))
 
         qs_autores = context['object_list'].values('autoria__autor__id', 'autoria__autor__nome').order_by(
             'autoria__autor__id', 'autoria__autor__nome').distinct()

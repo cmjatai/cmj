@@ -74,11 +74,19 @@
               <td>{% autoescape off %}{{materia.ementa}}<br>{{materia.observacao}}{% endautoescape %}</td>
             </tr>
           {% endfor %}
+        {% empty%}
+        <tr>
+          <td colspan="2">
+            <span>Não foram encontradas matérias com os parâmetros pesquisados.</span>
+          </td>
+        </tr>
         {% endfor %}
       {% endfor %}
       </table>
     {% else %}
-      <h3>Não foram encontradas matérias com os parâmetros pesquisados.</h3>
+      {% if not qtdes %}
+        <h4>Não foram encontradas matérias com os parâmetros pesquisados.</h4>
+      {% endif %}
     {% endif %}
 
   {% endif %}

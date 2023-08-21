@@ -1007,7 +1007,7 @@ class RelatorioMateriasPorAutorFilterSet(django_filters.FilterSet):
     @property
     def qs(self):
         qs = super().qs
-        return qs.annotate(autoria_list=ArrayAgg('autoria__autor_id')).order_by('tipo__sequencia_regimental', '-numero')
+        return qs.select_related('tipo').order_by('tipo__sequencia_regimental', '-numero')
 
     class Meta(FilterOverridesMetaMixin):
         model = MateriaLegislativa
