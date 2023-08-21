@@ -13,7 +13,7 @@
         <li class="breadcrumb-item"><a href="/">Página Inicial</a></li>
         {% endif %}
         <li class="breadcrumb-item {% if p == object %}active{% endif %}">
-          
+
           <a href="/{{p.absolute_slug}}" {% if p == object %}aria-current="page"{% endif %}>
             {% if p == object %}Esta Página{% else %}{{p.apelido|default:p.titulo}}{% endif %}
           </a>
@@ -44,7 +44,7 @@
       {% for ch in object.classe.childs.all %}
       <li>
         <a href="/{{ch.absolute_slug}}">{{ch.apelido|default:ch.titulo}}</a>
-      </li> 
+      </li>
       {% endfor %}
     </ul>
     {% endif %}
@@ -79,7 +79,7 @@
                   {% if rev.user %}
                     <span class="">
                       {{rev.get_visibilidade_display}} - {{rev.timestamp}} - {% trans "por:" %}
-                        {{rev.user.first_name|default:rev.user.email}}
+                        {{rev.user|default:''}}
                     </span>
                   {% endif %}
               {% endfor %}
@@ -98,7 +98,7 @@
           {% endif %}
       </h1>
     {% endblock %}
-          
+
     <div class="path-description">
       {% block descricao %}
       {% if object.descricao %}
