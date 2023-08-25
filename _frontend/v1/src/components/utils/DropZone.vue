@@ -119,6 +119,7 @@ export default {
   background: transparentize(#fff, 0.5);
   position: relative;
   min-height: 120px;
+  border: 3px dashed #cccfcc;
   .progress {
     background: #3390fa;
     line-height: 7px;
@@ -134,7 +135,6 @@ export default {
   }
 }
 .drop_zone {
-  border: 3px dashed #cccfcc;
   cursor: pointer;
   position: absolute;
   line-height: 1;

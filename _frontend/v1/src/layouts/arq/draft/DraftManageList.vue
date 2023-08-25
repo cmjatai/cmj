@@ -1,5 +1,5 @@
 <template>
-  <div class="draftmanagelist py-3">
+  <div class="draftmanagelist">
     <div class="row">
       <div class="col d-flex grade">
         <div class="btn-group ">
@@ -28,7 +28,7 @@
     </div>
     <div class="container">
       <div class="row">
-        <draft-midia :elemento="item" :cols="cols" v-for="item, k in draftmidialist_ordered" :key="`dm${k}`" v-on:deletedDraftMidia="drawList(-1)"></draft-midia>
+        <draft-midia :elemento="item" :cols="cols" v-for="item, k in draftmidialist_ordered" :key="`dm${k}`" v-on:redrawDraftMidia="drawList(-1)"></draft-midia>
       </div>
     </div>
   </div>
@@ -49,8 +49,8 @@ export default {
     return {
       pagination: {},
       draftmidialist: {},
-      cols: 1,
-      rows: 10
+      cols: 4,
+      rows: 3
     }
   },
   computed: {

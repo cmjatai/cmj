@@ -1,3 +1,5 @@
+import os
+
 from django.conf import settings
 from django.http.response import HttpResponse
 import fitz
@@ -10,12 +12,24 @@ from sapl.utils import get_mime_type_from_file_extension
 class ResponseFileMixin:
 
     def response_pagepdftoimage(self, arquivo, _page, _dpi):
-        doc = fitz.open(arquivo.file)
 
+        fcache_path = f'{arquivo.file}-p{_page:0>3}-d{_dpi:0>3}.png'
+
+        if os.path.exists(fcache_path):
+            with open(fcache_path, 'rb') as f:
+                response = HttpResponse(f, content_type='image/png')
+            return response
+
+        doc = fitz.open(arquivo.file)
         for index, page in enumerate(doc, 1):
             if index == _page:
                 png = page.get_pixmap(dpi=int(_dpi) if _dpi else 300)
                 bpng = png.tobytes()
+
+                with open(fcache_path, 'wb') as f:
+                    f.write(bpng)
+
+                doc.close()
                 response = HttpResponse(bpng, content_type='image/png')
                 return response
 

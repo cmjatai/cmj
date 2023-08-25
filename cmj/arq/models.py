@@ -1,9 +1,13 @@
+import glob
+import os
+import pathlib
 import re
+import shutil
 
 from django.contrib.postgres.fields.jsonb import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
-from django.db.models.deletion import PROTECT
+from django.db.models.deletion import PROTECT, CASCADE
 from django.utils.translation import ugettext_lazy as _
 
 from cmj.utils import get_settings_auth_user_model, texto_upload_path, normalize
@@ -33,6 +37,27 @@ class Draft(models.Model):
 
         verbose_name = _('Draft')
         verbose_name_plural = _('Draft')
+
+    def delete(self, using=None, keep_parents=False):
+        dm = self.draftmidia_set.first()
+
+        if dm:
+            path = dm.arquivo.path
+            i = path.rfind('/')
+            path = path[0:i]
+            remove_files_and_folders(path)
+
+        return models.Model.delete(self, using=using, keep_parents=keep_parents)
+
+
+def remove_files_and_folders(directory):
+    for root, dirs, files in os.walk(directory, topdown=False):
+        for name in dirs:
+            folder_path = os.path.join(root, name)
+            os.rmdir(folder_path)
+        for name in files:
+            file_path = os.path.join(root, name)
+            os.remove(file_path)
 
 
 def draftmidia_path(instance, filename):
@@ -66,7 +91,7 @@ class DraftMidia(models.Model):
     draft = models.ForeignKey(
         Draft,
         verbose_name=_('Draft Midia'), related_name='draftmidia_set',
-        on_delete=PROTECT)
+        on_delete=CASCADE)
 
     sequencia = models.PositiveIntegerField(
         default=0,
@@ -80,7 +105,8 @@ class DraftMidia(models.Model):
         null=True,
         # storage=media_protected_storage,
         upload_to=draftmidia_path,
-        verbose_name=_('Arquivo'),)
+        verbose_name=_('Arquivo'),
+        max_length=512)
     # validators=[restringe_tipos_de_arquivo_midias])
 
     class Meta:
@@ -90,6 +116,7 @@ class DraftMidia(models.Model):
         verbose_name_plural = _('Mídias')
 
     def delete(self, using=None, keep_parents=False):
+        self.clear_cache()
         if self.arquivo:
             self.arquivo.delete()
 
@@ -111,6 +138,15 @@ class DraftMidia(models.Model):
                                  force_update=force_update,
                                  using=using,
                                  update_fields=update_fields)
+
+    def clear_cache(self, page=None):
+        fcache = glob.glob(
+            f'{self.arquivo.path}-p{page:0>3}*'
+            if page else f'{self.arquivo.path}-*'
+        )
+
+        for f in fcache:
+            os.remove(f)
 
 
 ARQCLASSE_ESTRUTURAL = 0

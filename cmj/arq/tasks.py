@@ -41,6 +41,7 @@ def task_ocrmypdf_function(app_label, model_name, field_name, pk):
            #"--fast-web-view 10000000",   # não inclui fast web view
            #"--image-dpi 300",
            #"--rotate-pages",
+           #"--rotate-pages-threshold 1",
            #"--remove-background",
            "--force-ocr",
            #"--optimize 0",
@@ -48,7 +49,7 @@ def task_ocrmypdf_function(app_label, model_name, field_name, pk):
            #"--png-quality 100",
            #"--jbig2-lossy",
 
-           # "--deskew",
+           #"--deskew",
            #"--clean-final",
            #"--pdfa-image-compression jpeg",  # jpeg  lossless
            "--output-type pdfa-2",

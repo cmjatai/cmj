@@ -132,8 +132,14 @@ Vue.mixin({
           t.sendMessage(
             { alert: 'danger', message: 'Não foi possível recuperar a Listagem.', time: 5 })
         })
+    },
+    removeAside () {
+      const aside = document.getElementsByTagName('aside')
+      const parent = aside[0].parentElement
+      parent.removeChild(aside[0])
+      const wrapper = document.getElementById('wrapper')
+      wrapper.id = ''
     }
-
   },
   created: function () {
     /*

@@ -12,7 +12,7 @@ django-webpack4-loader
 djangorestframework==3.12.4
 python-telegram-bot==20.1
 
-ocrmypdf==13.7.0
+ocrmypdf==14.4.0
 
 asn1crypto
 boto3==1.26.95

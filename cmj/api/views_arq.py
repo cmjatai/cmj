@@ -1,18 +1,22 @@
+from copy import deepcopy
 from datetime import datetime
+import glob
 import logging
 from operator import attrgetter
+import os
 import tempfile
 import zipfile
 
 from django.apps.registry import apps
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Q
+from django.db.models import Q, F
 from django.db.models.aggregates import Max
 from django.db.models.deletion import ProtectedError
 from django.http.response import HttpResponse
 from django.utils import timezone
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
+import fitz
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
@@ -96,21 +100,13 @@ class _Draft:
             f = item['file']
             dm = DraftMidia()
             dm.draft = draft
-            dm.arquivo = f
             dm.sequencia = seq
-
-            try:
-                lm = datetime.fromtimestamp(int(item['lastmodified']))
-            except:
-                lm = datetime.fromtimestamp(int(item['lastmodified']) / 1000)
+            dm.arquivo = f
 
             dm.metadata = {
                 'uploadedfile': {
                     'name': f.name,
-                    'size': f.size,
-                    'content_type': f.content_type,
-                    'lastmodified': lm,
-                    'hash_code': hash_sha512(f)
+                    'paginas': 0
                 },
                 'ocrmypdf': {
                     'pdfa': False
@@ -119,16 +115,44 @@ class _Draft:
 
             dm.save()
 
-            if f.content_type == 'application/pdf':
-                tasks.task_ocrmypdf.apply_async(
-                    (
-                        dm._meta.app_label,
-                        dm._meta.model_name,
-                        'arquivo',
-                        dm.id,
-                    ),
-                    countdown=10
-                )
+            if f.content_type != 'application/pdf':
+                fname = f.name + '.pdf'
+                doc = fitz.open()
+
+                # open pic as document
+                img = fitz.open(dm.arquivo.path)
+                rect = img[0].rect  # pic dimension
+                pdfbytes = img.convert_to_pdf()  # make a PDF stream
+                img.close()  # no longer needed
+                imgPDF = fitz.open("pdf", pdfbytes)  # open stream as PDF
+                page = doc.new_page(width=rect.width,  # new page with ...
+                                    height=rect.height)  # pic dimension
+                page.show_pdf_page(rect, imgPDF, 0)  # image fills the page
+
+                fpdf = dm.arquivo.path
+                fpdf = fpdf + '.pdf'
+                doc.save(fpdf)
+
+                dm.arquivo.delete()
+
+                dm.arquivo = fpdf
+                dm.metadata['uploadedfile']['name'] = fname
+                dm.metadata['uploadedfile']['paginas'] = 1
+                dm.save()
+
+            doc = fitz.open(dm.arquivo.file)
+            dm.metadata['uploadedfile']['paginas'] = len(doc)
+            dm.save()
+
+            tasks.task_ocrmypdf.apply_async(
+                (
+                    dm._meta.app_label,
+                    dm._meta.model_name,
+                    'arquivo',
+                    dm.id,
+                ),
+                countdown=10
+            )
 
         serializer = self.get_serializer(draft)
         return Response(serializer.data)
@@ -167,3 +191,98 @@ class _DraftMidia(ResponseFileMixin):
     @action(detail=True)
     def arquivo(self, request, *args, **kwargs):
         return self.response_file(request, *args, **kwargs)
+
+    @action(detail=True)
+    def expandir(self, request, *args, **kwargs):
+        dm_atual = self.get_queryset().filter(pk=kwargs['pk']).first()
+        dm_new = deepcopy(dm_atual)
+
+        doc = fitz.open(dm_atual.arquivo.file)
+        ldoc = len(doc)
+
+        if ldoc <= 1:
+            serializer = self.get_serializer(dm_atual)
+            return Response(serializer.data)
+
+        self.get_queryset().filter(
+            draft_id=dm_atual.draft_id,
+            sequencia__gt=dm_atual.sequencia
+        ).update(sequencia=F('sequencia') + ldoc)
+
+        for p in range(ldoc):
+
+            d = fitz.open()
+            d.insert_pdf(doc, from_page=p, to_page=p)
+
+            fn = f'{str(dm_atual.arquivo.file)}-p{p+1:0>3}.pdf'
+
+            d.save(fn)
+
+            dm_new.id = None
+            dm_new.arquivo = fn
+            dm_new.sequencia = dm_atual.sequencia + p - 1
+            dm_new.metadata['uploadedfile']['paginas'] = 1
+            dm_new.metadata['uploadedfile']['name'] = fn.split('/')[-1]
+            dm_new.metadata['ocrmypdf'] = {'pdfa': False}
+            dm_new.save()
+
+            tasks.task_ocrmypdf.apply_async(
+                (
+                    dm_new._meta.app_label,
+                    dm_new._meta.model_name,
+                    'arquivo',
+                    dm_new.id,
+                ),
+                countdown=10 + p
+            )
+
+        dm_atual.delete()
+
+        serializer = self.get_serializer(dm_new)
+        return Response(serializer.data)
+
+    @action(detail=True)
+    def rotate(self, request, *args, **kwargs):
+        dm = self.get_queryset().filter(pk=kwargs['pk']).first()
+        p = int(request.GET.get('page', 1)) - 1
+        angulo = int(request.GET.get('angulo', 90))
+
+        dm.clear_cache(page=p)
+
+        doc = fitz.open(dm.arquivo.path)
+        nd = fitz.open()
+        lp = len(doc)
+        if p:
+            nd.insert_pdf(doc, from_page=0, to_page=p - 1)
+
+        nd.insert_pdf(doc, from_page=p, to_page=p,
+                      rotate=doc[p].rotation + angulo)
+        if p != lp - 1:
+            nd.insert_pdf(doc, from_page=p + 1, to_page=lp - 1)
+        nd.save(doc.name)
+        nd.close()
+        doc.close()
+
+        serializer = self.get_serializer(dm)
+        return Response(serializer.data)
+
+    @action(detail=True)
+    def delete_page(self, request, *args, **kwargs):
+        dm = self.get_queryset().filter(pk=kwargs['pk']).first()
+        p = int(request.GET.get('page', 1)) - 1
+
+        dm.clear_cache(page=p)
+
+        doc = fitz.open(dm.arquivo.path)
+        nd = fitz.open()
+        lp = len(doc)
+
+        if p:
+            nd.insert_pdf(doc, from_page=0, to_page=p - 1)
+
+        nd.save(doc.name)
+        nd.close()
+        doc.close()
+
+        serializer = self.get_serializer(dm)
+        return Response(serializer.data)

@@ -1,13 +1,15 @@
 <template>
   <div class="draft-manage container-fluid py-3">
-    <h1>Draft</h1>
     <div class="row">
       <div class="col-3 d-flex">
-        <div class="btn-group-vertical mr-3">
-          <button type="button" class="btn btn-primary" @click="clickAdd">+</button>
-          <button type="button" class="btn btn-danger" @click="clickDel" :disabled="draftselected === null">-</button>
-        </div>
         <div class="d-flex flex-column w-100">
+          <div class="d-flex ">
+            <div>
+
+              <button type="button" class="btn btn-primary" @click="clickAdd">+</button>
+            </div>
+            <h1 class="ml-2">Draft</h1>
+          </div>
           <model-select @change="value => draftselected=value"
             class="form-opacity d-flex w-100"
             app="arq"
@@ -15,21 +17,24 @@
             choice="descricao"
             ordering="descricao"
             ref="draftSelect"
-            :height="3"
+            :height="6"
             ></model-select>
-          <div class="pt-2" v-if="draftselected">
+          <div v-if="draftselected" class="d-flex">
             <b-form-input v-model="draftselected.descricao" @change="changeDescricao($event)"></b-form-input>
+            <button type="button" class="btn btn-danger ml-2" @click="clickDel" :disabled="draftselected === null">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </div>
+          <div class="drop-area">
+            <drop-zone :pk="draftselected.id" :multiple="true" v-on:uploaded="uploadedFiles" v-if="draftselected"/>
           </div>
         </div>
       </div>
-      <div class="col-9">
-        <div class="drop-area">
-          <drop-zone :pk="draftselected.id" :multiple="true" v-on:uploaded="uploadedFiles" v-if="draftselected"/>
+      <div class="col-9 container-manage-list">
+        <div v-show="draftselected">
+          <draft-manage-list :draftselected="draftselected" ref="listdraft"></draft-manage-list>
         </div>
       </div>
-    </div>
-    <div v-show="draftselected">
-      <draft-manage-list :draftselected="draftselected" ref="listdraft"></draft-manage-list>
     </div>
   </div>
 </template>
@@ -90,6 +95,7 @@ export default {
     }
   },
   mounted: function () {
+    this.removeAside()
   }
 }
 </script>
@@ -98,6 +104,23 @@ export default {
 @import "~@/scss/variables";
 .draft-manage {
   min-height: 100vh;
+  .flex-column {
+    gap: 0.5rem;
+  }
+  .drop-area {
+    position: relative;
+    flex-grow: 2;
+    .drop_files {
+      height: 100%;
+      label {
+        position: sticky;
+        padding: 15vh 0;
+      }
+    }
+  }
+  .container-manage-list {
+    padding-left: 0;
+  }
 }
 
 .btn-group-vertical {
