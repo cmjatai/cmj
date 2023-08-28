@@ -1,4 +1,5 @@
-FROM python:3.10-slim-buster
+FROM python:3.10.12-bullseye
+#FROM python:3.10-slim-buster
 
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
@@ -11,15 +12,25 @@ ENV BUILD_PACKAGES apt-utils apt-file libpq-dev graphviz-dev build-essential  pk
                    libcairo2-dev software-properties-common python3-setuptools python3-pip \
                    procps nmap
 
-ENV RUN_PACKAGES git graphviz python3-lxml python3-magic postgresql-client python3-psycopg2 \
-                 poppler-utils curl jq bash vim python3-venv tzdata nodejs \
-                 fontconfig ttf-dejavu python nginx openjdk-11-jdk-headless fonts-liberation \
-                 tesseract-ocr tesseract-ocr-por ghostscript
+ENV RUN1_PACKAGES git graphviz python3-lxml python3-magic postgresql-client python3-psycopg2 \
+                 poppler-utils curl jq bash vim python3-venv tzdata nodejs nginx python
 
 RUN apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y --no-install-recommends $BUILD_PACKAGES $RUN_PACKAGES && \
-    fc-cache -fv && \
+    apt-get install -y --no-install-recommends $BUILD_PACKAGES
+
+RUN apt-get install -y --no-install-recommends $RUN1_PACKAGES
+
+ENV RUN2_PACKAGES fontconfig openjdk-11-jdk-headless fonts-liberation
+RUN apt-get install -y --no-install-recommends $RUN2_PACKAGES
+
+ENV RUN3_PACKAGES tesseract-ocr tesseract-ocr-por ghostscript
+RUN apt-get install -y --no-install-recommends $RUN3_PACKAGES
+
+RUN fc-cache -fv && \
+    pip3 install --no-cache-dir --upgrade pip setuptools
+
+RUN fc-cache -fv && \
     pip3 install --no-cache-dir --upgrade pip setuptools
 
 RUN rm -f /etc/nginx/conf.d/* && \
@@ -28,13 +39,11 @@ RUN rm -f /etc/nginx/conf.d/* && \
     #SUDO_FORCE_REMOVE=yes apt-get purge -y --auto-remove $BUILD_PACKAGES && \
     #apt-get -y autoremove && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-
 RUN mkdir -p /var/cmjatai/cmj/run
 RUN mkdir -p /var/cmjatai/cmj/logs/celery
 RUN mkdir -p /var/cmjatai/cmj_data
 RUN mkdir -p /var/cmjatai/cmj_media
 RUN mkdir -p /var/cmjatai/BD_POSTGRESQL
-
 
 WORKDIR /var/cmjatai/cmj/
 
