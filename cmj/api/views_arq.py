@@ -213,10 +213,12 @@ class _DraftMidia(ResponseFileMixin):
 
             d = fitz.open()
             d.insert_pdf(doc, from_page=p, to_page=p)
-
-            fn = f'{str(dm_atual.arquivo.file)}-p{p+1:0>3}.pdf'
+            fn = f'{str(dm_atual.arquivo.file)}'
+            fn = fn[0: fn.rindex('.pdf')]
+            fn = f'{fn}-p{p+1:0>3}.pdf'
 
             d.save(fn)
+            d.close()
 
             dm_new.id = None
             dm_new.arquivo = fn
@@ -247,7 +249,7 @@ class _DraftMidia(ResponseFileMixin):
         p = int(request.GET.get('page', 1)) - 1
         angulo = int(request.GET.get('angulo', 90))
 
-        dm.clear_cache(page=p)
+        dm.clear_cache(page=p + 1)
 
         doc = fitz.open(dm.arquivo.path)
         nd = fitz.open()
@@ -271,7 +273,7 @@ class _DraftMidia(ResponseFileMixin):
         dm = self.get_queryset().filter(pk=kwargs['pk']).first()
         p = int(request.GET.get('page', 1)) - 1
 
-        dm.clear_cache(page=p)
+        dm.clear_cache(page=p + 1)
 
         doc = fitz.open(dm.arquivo.path)
         nd = fitz.open()

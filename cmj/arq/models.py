@@ -142,7 +142,7 @@ class DraftMidia(models.Model):
     def clear_cache(self, page=None):
         fcache = glob.glob(
             f'{self.arquivo.path}-p{page:0>3}*'
-            if page else f'{self.arquivo.path}-*'
+            if page else f'{self.arquivo.path}*.png'
         )
 
         for f in fcache:
