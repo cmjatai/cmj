@@ -215,9 +215,11 @@ class _Draft:
         dm_primary.metadata['ocrmypdf'] = {
             'pdfa': DraftMidia.METADATA_PDFA_NONE}
 
+        fp_relative = fp[len(settings.MEDIA_ROOT) + 1:]
         dm_primary.clear_cache()
-        dm_primary.arquivo.delete()
-        dm_primary.arquivo = fp[len(settings.MEDIA_ROOT) + 1:]
+        if fp_relative != dm_primary.arquivo.name:
+            dm_primary.arquivo.delete()
+        dm_primary.arquivo = fp_relative
         dm_primary.sequencia = 1
         dm_primary.save()
 
