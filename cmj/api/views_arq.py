@@ -8,6 +8,7 @@ import tempfile
 import zipfile
 
 from django.apps.registry import apps
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q, F
 from django.db.models.aggregates import Max
@@ -136,7 +137,7 @@ class _Draft:
 
                 dm.arquivo.delete()
 
-                dm.arquivo = fpdf
+                dm.arquivo = fpdf[len(settings.MEDIA_ROOT) + 1:]
                 dm.metadata['uploadedfile']['name'] = fname
                 dm.metadata['uploadedfile']['paginas'] = 1
                 dm.save()
@@ -216,7 +217,7 @@ class _Draft:
 
         dm_primary.clear_cache()
         dm_primary.arquivo.delete()
-        dm_primary.arquivo = fp
+        dm_primary.arquivo = fp[len(settings.MEDIA_ROOT) + 1:]
         dm_primary.sequencia = 1
         dm_primary.save()
 
@@ -269,7 +270,7 @@ class _DraftMidia(ResponseFileMixin):
             dst.save(fn)
 
             dm_new.id = None
-            dm_new.arquivo = fn
+            dm_new.arquivo = fn[len(settings.MEDIA_ROOT) + 1:]
             dm_new.sequencia = dm_atual.sequencia + p
             dm_new.metadata['uploadedfile']['paginas'] = 1
             dm_new.metadata['uploadedfile']['name'] = fn.split('/')[-1]
