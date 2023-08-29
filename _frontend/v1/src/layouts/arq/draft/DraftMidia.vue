@@ -49,7 +49,34 @@ export default {
       data: (new Date()).getTime()
     }
   },
+  watch: {
+    elemento (nw, old) {
+      if (this.elemento.metadata.ocrmypdf.pdfa === 10) {
+        this.timeoutUpdate()
+      }
+    }
+  },
+  mounted () {
+    if (this.elemento.metadata.ocrmypdf.pdfa === 10) {
+      this.timeoutUpdate()
+    }
+  },
   methods: {
+    timeoutUpdate () {
+      let t = this
+      setTimeout(() => {
+        t.utils.getModel('arq', 'draftmidia', t.elemento.id)
+          .then((response) => {
+            if (response.data.metadata.ocrmypdf.pdfa === 10) {
+              console.log('timeoutUpdate novamente')
+              t.timeoutUpdate()
+            } else {
+              console.log('timeoutUpdate Fim')
+              t.$emit('updateElement', response.data)
+            }
+          })
+      }, 5000)
+    },
     clickDel () {
       const t = this
       t.utils.deleteModel('arq', 'draftmidia', t.elemento.id)
