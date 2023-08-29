@@ -1,3 +1,4 @@
+import logging
 import os
 
 from django.conf import settings
@@ -7,6 +8,9 @@ from rest_framework.exceptions import NotFound
 
 from cmj.core.models import AreaTrabalho
 from sapl.utils import get_mime_type_from_file_extension
+
+
+logger = logging.getLogger(__name__)
 
 
 class ResponseFileMixin:
@@ -39,13 +43,16 @@ class ResponseFileMixin:
         dpi = request.GET.get('dpi', None)
 
         if not item:
+            logger.info(f'response_file not item')
             raise NotFound
 
         if not hasattr(item, self.action):
+            logger.info(f'response_file not attr action')
             raise NotFound
 
         arquivo = getattr(item, self.action)
         if not arquivo:
+            logger.info(f'response_file not file')
             raise NotFound
 
         mime = get_mime_type_from_file_extension(arquivo.name)
@@ -82,6 +89,7 @@ class ResponseFileMixin:
             arquivo.name
         )
 
+        logger.info(f'response_file end method')
         return response
 
 
