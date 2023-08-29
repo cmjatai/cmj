@@ -82,6 +82,10 @@ def draftmidia_path(instance, filename):
 
 class DraftMidia(models.Model):
 
+    METADATA_PDFA_NONE = 0
+    METADATA_PDFA_AGND = 10
+    METADATA_PDFA_PDFA = 99
+
     FIELDFILE_NAME = ('arquivo',)
 
     metadata = JSONField(

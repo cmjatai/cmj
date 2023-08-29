@@ -8,6 +8,7 @@ import sys
 from django.apps import apps
 from django.utils import timezone
 
+from cmj.arq.models import DraftMidia
 from cmj.celery import app
 from sapl.utils import hash_sha512
 
@@ -16,66 +17,71 @@ logger = logging.getLogger(__name__)
 
 
 @app.task(queue='celery', bind=True)
-def task_ocrmypdf(self, app_label, model_name, field_name, pk):
+def task_ocrmypdf(self, app_label, model_name, field_name, pk, jobs):
     print('task_ocrmypdf')
-    task_ocrmypdf_function(app_label, model_name, field_name, pk)
+    task_ocrmypdf_function(app_label, model_name, field_name, pk, jobs)
 
 
 def console(cmd):
-    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+    p = subprocess.Popen(
+        cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate()
     return (p.returncode, out, err)
 
 
-def task_ocrmypdf_function(app_label, model_name, field_name, pk):
+def task_ocrmypdf_function(app_label, model_name, field_name, pk, jobs):
     model = apps.get_model(app_label, model_name)
 
-    instance = model.objects.get(pk=pk)
+    list_instances = model.objects.filter(id__in=pk)
 
-    f = getattr(instance, field_name).file
+    for instance in list_instances:
+        f = getattr(instance, field_name).file
 
-    cmd = ["{}/ocrmypdf".format('/'.join(sys.executable.split('/')[:-1])),
-           #"-q",                  # Execução silenciosa
-           "-l por",              # tesseract portugues
-           "-j 8",     # oito threads
-           #"--fast-web-view 10000000",   # não inclui fast web view
-           #"--image-dpi 300",
-           #"--rotate-pages",
-           #"--rotate-pages-threshold 1",
-           #"--remove-background",
-           "--force-ocr",
-           #"--optimize 0",
-           #"--jpeg-quality 100",
-           #"--png-quality 100",
-           #"--jbig2-lossy",
+        cmd = ["{}/ocrmypdf".format('/'.join(sys.executable.split('/')[:-1])),
+               #"-q",                  # Execução silenciosa
+               "-l por",              # tesseract portugues
+               f'-j {jobs}',     # duas threads
+               #"--fast-web-view 10000000",   # não inclui fast web view
+               #"--image-dpi 300",
+               #"--rotate-pages",
+               #"--rotate-pages-threshold 1",
+               #"--remove-background",
+               "--force-ocr",
+               #"--optimize 0",
+               #"--jpeg-quality 100",
+               #"--png-quality 100",
+               #"--jbig2-lossy",
+               "--invalidate-digital-signatures",
+               #"--deskew",
+               #"--clean-final",
+               #"--pdfa-image-compression jpeg",  # jpeg  lossless
+               "--output-type pdfa-2",
+               #"--tesseract-timeout 0",
+               f'"{f}"',
+               f'"{f}"']
 
-           #"--deskew",
-           #"--clean-final",
-           #"--pdfa-image-compression jpeg",  # jpeg  lossless
-           "--output-type pdfa-2",
-           #"--tesseract-timeout 0",
-           f'"{f}"',
-           f'"{f}"']
+        print(' '.join(cmd))
 
-    print(' '.join(cmd))
+        r = console(' '.join(cmd))
+        print(r[0])
+        print(r[1].decode('utf-8'))
+        print(r[2].decode('utf-8'))
+        md = instance.metadata or {}
 
-    r = console(' '.join(cmd))
+        if not r[0]:
+            md.update({
+                'ocrmypdf': {
+                    'pdfa': DraftMidia.METADATA_PDFA_PDFA,
+                    'hash_code': hash_sha512(f),
+                    'lastmodified': datetime.fromtimestamp(os.path.getmtime(f.file.name)),
+                    'size': os.path.getsize(f.file.name)
+                }
+            })
+        else:
+            md.update({
+                'ocrmypdf': {
+                    'pdfa': DraftMidia.METADATA_PDFA_NONE,
+                }
+            })
 
-    md = instance.metadata or {}
-
-    if not r[0]:
-        md.update({
-            'ocrmypdf': {
-                'pdfa': True,
-                'hash_code': hash_sha512(f),
-                'lastmodified': datetime.fromtimestamp(os.path.getmtime(f.file.name)),
-                'size': os.path.getsize(f.file.name)
-            }
-        })
-    else:
-        md.update({
-            'ocrmypdf': {
-                'pdfa': False,
-            }
-        })
-    instance.save()
+        instance.save()

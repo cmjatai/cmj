@@ -1,17 +1,17 @@
 <template>
   <div :class="['draft-midia', 'p-2',]" :id="`dm${elemento.id}`">
-    <div :class="['inner', elemento.metadata.ocrmypdf.pdfa ? 'border-blue': 'border-red']">
+    <div class="inner">
+      <div :class="['inner-status', elemento.metadata.ocrmypdf.pdfa === 99 ? 'border-blue': (elemento.metadata.ocrmypdf.pdfa === 10 ? 'border-yellow': 'border-red')]"
+      v-html="elemento.metadata.ocrmypdf.pdfa === 99 ? 'PDF/A-2b': (elemento.metadata.ocrmypdf.pdfa === 10 ? 'Conversão Agendada': 'Não PDF/A-2b')"></div>
       <div class="inner-action">
-        <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-          <div class="btn-group-vertical flex-column" role="group" aria-label="First group">
-            <a class="btn btn-outline-danger" title="Apagar Mídia" @click="clickDel">
-              <i class="fas fa-trash-alt"></i>
-            </a>
-            <a class="btn btn-outline-primary"
-            title="Expandir Páginas" @click="clickExpandir"
-            v-show="elemento.metadata.uploadedfile.paginas > 1">
-              <i class="fas fa-expand"></i>
-            </a>
+        <div class="dropleft">
+          <button class="btn btn-sm" type="button" data-toggle="dropdown" aria-expanded="true">
+            <i class="fas fa-ellipsis-v"></i>
+          </button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" v-show="elemento.metadata.ocrmypdf.pdfa !== 99" title="PDF -> PDF/A-2b" @click="clickPdf2Pdfa">PDF -> PDF/A-2b</a>
+            <a class="dropdown-item" title="Gerar um PDF para cada página" @click="clickDecompor">Decompor <i class="fas fa-expand"></i></a>
+            <a class="dropdown-item" title="Apagar Mídia" @click="clickDel">Apagar <i class="fas fa-trash-alt"></i></a>
           </div>
         </div>
       </div>
@@ -33,7 +33,7 @@
       </div>
       <div :class="['innerdesc', ]">
         <strong v-html="elemento.metadata.uploadedfile.name"></strong>
-        <small v-show="elemento.metadata.ocrmypdf.pdfa">PDF/A-2 com OCR</small>
+        <small v-show="elemento.metadata.ocrmypdf.pdfa">PDF/A-2b com OCR</small>
       </div>
     </div>
   </div>
@@ -61,9 +61,20 @@ export default {
           )
         })
     },
-    clickExpandir () {
+    clickDecompor () {
       const t = this
-      t.utils.getModelAction('arq', 'draftmidia', t.elemento.id, 'expandir')
+      t.utils.getModelAction('arq', 'draftmidia', t.elemento.id, 'decompor')
+        .then((response) => {
+          t.$emit('redrawDraftMidia')
+        }).catch((error) => {
+          t.sendMessage(
+            { alert: 'danger', message: error.response.data.message, time: 10 }
+          )
+        })
+    },
+    clickPdf2Pdfa () {
+      const t = this
+      t.utils.getModelAction('arq', 'draftmidia', t.elemento.id, 'pdf2pdfa')
         .then((response) => {
           t.$emit('redrawDraftMidia')
         }).catch((error) => {
@@ -81,7 +92,10 @@ export default {
         id: t.elemento.id
       }, `page=${t.page}&angulo=${angulo}`)
         .then((response) => {
-          this.data = (new Date()).getTime()
+          t.data = (new Date()).getTime()
+          // t.$set(t, 'elemento', response.data)
+          // console.log(response)
+          t.$emit('updateElement', response.data)
         })
         .catch((error) => {
           t.sendMessage(
@@ -111,33 +125,48 @@ export default {
     align-items: center;
     background-color: #fafafa;
     border: 1px solid #ccc;
-    &.border-blue, &.border-red, &.border-green {
+    .inner-status {
+      position: absolute;
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      top: 1px;
+      left: 1px;
+      border-radius: 50%;
+      font-size: 0;
       z-index: 1;
-      &::before {
-        content: " ";
-        position: absolute;
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        top: 2px;
-        left: 2px;
-        border-radius: 50%;
-        z-index: 1;
+
+      &:hover {
+        width: auto;
+        height: auto;
+        border-radius: 0%;
+        top: 0px;
+        left: 0px;
+        padding: 2px 3px;
+        color: #fff;
+        font-size: 1rem;
+        line-height: 1;
+
       }
-    }
-    &.border-blue {
-      &::before {
-        background-color: #0073b7dd;
+
+      &.border-blue, &.border-red, &.border-green, &.border-yellow {
+        &::before {
+          content: " ";
+          z-index: 1;
+        }
       }
-    }
-    &.border-red {
-      &::before {
-        background-color: #f56954dd;
+      &.border-blue {
+          background-color: #0073b7dd;
       }
-    }
-    &.border-green {
-      &::before {
-        background-color: #00a65add;
+      &.border-red {
+          background-color: #f56954dd;
+      }
+      &.border-yellow {
+          background-color: #ffd35add;
+          color:black;
+      }
+      &.border-green {
+          background-color: #00a65add;
       }
     }
     .inner-action {
@@ -153,10 +182,14 @@ export default {
         opacity: 0.4;
         border-width: 0px;
         color: #444;
-        border-radius: 50%;
+        cursor: pointer;
+        //border-radius: 50%;
         &:hover {
             opacity: 1;
         }
+      }
+      .dropdown-item {
+        cursor: pointer;
       }
     }
     .innerimg {

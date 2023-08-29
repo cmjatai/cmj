@@ -14,13 +14,18 @@
         <pagination :pagination="pagination" v-on:nextPage="nextPage" v-on:previousPage="previousPage" v-on:currentPage="currentPage"></pagination>
         <div v-if="draftselected" class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
           <div class="btn-group mr-2" role="group" aria-label="First group">
+            <a class="btn btn-danger" title="Excluir Draft Atual" @click="clickDel" :disabled="draftselected === null">
+                <i class="fas fa-trash-alt"></i>
+            </a>
+          </div>
+          <div class="btn-group mr-2" role="group" aria-label="First group">
             <a class="btn btn-primary" :href="`/api/arq/draft/${draftselected.id}/zipfile/`" target="_blank" rel="noopener noreferrer" title="Baixar todos os arquivos individualmente dentro de um arquivo compactado.">
               <i class="fas fa-file-archive"></i>
             </a>
           </div>
           <div class="btn-group" role="group" aria-label="First group">
-            <a class="btn btn-primary" href="#" target="_blank" rel="noopener noreferrer" title="Gerar um PDF/A-2 único.">
-              <i class="fas fa-file-export"></i>
+            <a @click="clickUnir" class="btn btn-primary" title="Unir PDFs do Draft em apenas um PDF">
+              <i class="fas fa-layer-group"></i>
             </a>
           </div>
         </div>
@@ -28,7 +33,7 @@
     </div>
     <div class="container">
       <div class="row">
-        <draft-midia :elemento="item" :cols="cols" v-for="item, k in draftmidialist_ordered" :key="`dm${k}`" v-on:redrawDraftMidia="drawList(-1)"></draft-midia>
+        <draft-midia :elemento="item" :cols="cols" v-for="item, k in draftmidialist_ordered" :key="`dm${k}`" v-on:redrawDraftMidia="drawList(-1)" v-on:updateElement="updateElement"></draft-midia>
       </div>
     </div>
   </div>
@@ -75,6 +80,28 @@ export default {
     this.changeMatriz()
   },
   methods: {
+    clickUnir () {
+      const t = this
+      t.utils.getModelAction('arq', 'draft', this.draftselected.id, 'unirmidias'
+      ).then((response) => {
+        this.fetchMidias(this.draftselected)
+      }).catch((error) => {
+        t.sendMessage(
+          { alert: 'danger', message: error.response.data.message, time: 10 }
+        )
+      })
+    },
+    clickDel () {
+      const t = this
+      this.utils.deleteModel('arq', 'draft', this.draftselected.id
+      ).then((response) => {
+        t.$emit('reloadDrafts')
+      }).catch((error) => {
+        t.sendMessage(
+          { alert: 'danger', message: error.response.data.message, time: 10 }
+        )
+      })
+    },
     drawList (value) {
       let l = Object.keys(this.draftmidialist).length
       if (value === -1) {
@@ -95,6 +122,9 @@ export default {
       if (value !== null && value >= 0) {
         this.fetchMidias(this.draftselected, value)
       }
+    },
+    updateElement (el) {
+      this.$set(this.draftmidialist, el.id, el)
     },
     nextPage () {
       this.fetchMidias(this.draftselected, this.pagination.next_page)

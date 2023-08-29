@@ -17,6 +17,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 import fitz
+from pikepdf._core import Pdf
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
@@ -109,7 +110,7 @@ class _Draft:
                     'paginas': 0
                 },
                 'ocrmypdf': {
-                    'pdfa': False
+                    'pdfa': DraftMidia.METADATA_PDFA_NONE
                 }
             }
 
@@ -143,16 +144,7 @@ class _Draft:
             doc = fitz.open(dm.arquivo.file)
             dm.metadata['uploadedfile']['paginas'] = len(doc)
             dm.save()
-
-            tasks.task_ocrmypdf.apply_async(
-                (
-                    dm._meta.app_label,
-                    dm._meta.model_name,
-                    'arquivo',
-                    dm.id,
-                ),
-                countdown=10
-            )
+            doc.close()
 
         serializer = self.get_serializer(draft)
         return Response(serializer.data)
@@ -184,6 +176,56 @@ class _Draft:
 
         return response
 
+    @action(detail=True, methods=['GET'])
+    def unirmidias(self, request, *args, **kwargs):
+
+        try:
+            draft = Draft.objects.get(pk=kwargs['pk'])
+        except:
+            raise NotFound('Draft não encontrado!')
+
+        dm_draft = list(draft.draftmidia_set.all())
+
+        if len(dm_draft) <= 1:
+            serializer = self.get_serializer(draft)
+            return Response(serializer.data)
+
+        dm_primary = dm_draft[0]
+        fp = dm_primary.arquivo.path.split('/')[:-1]
+        fname = f'{dm_primary.id:09}.pdf'
+        fp = f'{"/".join(fp)}/{fname}'
+
+        #d_new = fitz.open()
+        # for dm in dm_draft:
+        #    doc = fitz.open(dm.arquivo.file)
+        #    d_new.insert_pdf(doc, from_page=0, to_page=len(doc))
+        #    doc.close()
+        #d_new.save(fp, garbage=3, clean=True, deflate=True)
+
+        pdf = Pdf.new()
+        for dm in dm_draft:
+            doc = Pdf.open(dm.arquivo.file)
+            pdf.pages.extend(doc.pages)
+            doc.close()
+        pdf.save(fp)
+
+        dm_primary.metadata['uploadedfile']['name'] = fname
+        dm_primary.metadata['uploadedfile']['paginas'] = len(pdf.pages)
+        dm_primary.metadata['ocrmypdf'] = {
+            'pdfa': DraftMidia.METADATA_PDFA_NONE}
+
+        dm_primary.clear_cache()
+        dm_primary.arquivo.delete()
+        dm_primary.arquivo = fp
+        dm_primary.sequencia = 1
+        dm_primary.save()
+
+        for dm in dm_draft[1:]:
+            dm.delete()
+
+        serializer = self.get_serializer(draft)
+        return Response(serializer.data)
+
 
 @customize(DraftMidia)
 class _DraftMidia(ResponseFileMixin):
@@ -193,12 +235,14 @@ class _DraftMidia(ResponseFileMixin):
         return self.response_file(request, *args, **kwargs)
 
     @action(detail=True)
-    def expandir(self, request, *args, **kwargs):
+    def decompor(self, request, *args, **kwargs):
         dm_atual = self.get_queryset().filter(pk=kwargs['pk']).first()
         dm_new = deepcopy(dm_atual)
 
-        doc = fitz.open(dm_atual.arquivo.file)
-        ldoc = len(doc)
+        #doc = fitz.open(dm_atual.arquivo.file)
+        #ldoc = len(doc)
+        doc = Pdf.open(dm_atual.arquivo.file)
+        ldoc = len(doc.pages)
 
         if ldoc <= 1:
             serializer = self.get_serializer(dm_atual)
@@ -209,38 +253,51 @@ class _DraftMidia(ResponseFileMixin):
             sequencia__gt=dm_atual.sequencia
         ).update(sequencia=F('sequencia') + ldoc)
 
-        for p in range(ldoc):
+        # for p in range(ldoc):
+        for p, page in enumerate(doc.pages):
 
-            d = fitz.open()
-            d.insert_pdf(doc, from_page=p, to_page=p)
             fn = f'{str(dm_atual.arquivo.file)}'
             fn = fn[0: fn.rindex('.pdf')]
             fn = f'{fn}-p{p+1:0>3}.pdf'
 
-            d.save(fn)
-            d.close()
+            #d = fitz.open()
+            #d.insert_pdf(doc, from_page=p, to_page=p)
+            #d.save(fn, garbage=3, clean=True, deflate=True)
+            # d.close()
+            dst = Pdf.new()
+            dst.pages.append(page)
+            dst.save(fn)
 
             dm_new.id = None
             dm_new.arquivo = fn
-            dm_new.sequencia = dm_atual.sequencia + p - 1
+            dm_new.sequencia = dm_atual.sequencia + p
             dm_new.metadata['uploadedfile']['paginas'] = 1
             dm_new.metadata['uploadedfile']['name'] = fn.split('/')[-1]
-            dm_new.metadata['ocrmypdf'] = {'pdfa': False}
+            dm_new.metadata['ocrmypdf'] = {
+                'pdfa': DraftMidia.METADATA_PDFA_NONE}
             dm_new.save()
-
-            tasks.task_ocrmypdf.apply_async(
-                (
-                    dm_new._meta.app_label,
-                    dm_new._meta.model_name,
-                    'arquivo',
-                    dm_new.id,
-                ),
-                countdown=10 + p
-            )
 
         dm_atual.delete()
 
         serializer = self.get_serializer(dm_new)
+        return Response(serializer.data)
+
+    @action(detail=True)
+    def pdf2pdfa(self, request, *args, **kwargs):
+        dm = self.get_queryset().filter(pk=kwargs['pk']).first()
+        dm.metadata['ocrmypdf'] = {'pdfa': DraftMidia.METADATA_PDFA_AGND}
+        dm.save()
+        tasks.task_ocrmypdf.apply_async(
+            (
+                dm._meta.app_label,
+                dm._meta.model_name,
+                'arquivo',
+                [dm.id, ],
+                2
+            ),
+            countdown=1
+        )
+        serializer = self.get_serializer(dm)
         return Response(serializer.data)
 
     @action(detail=True)
@@ -265,6 +322,9 @@ class _DraftMidia(ResponseFileMixin):
         nd.close()
         doc.close()
 
+        dm.metadata['ocrmypdf'] = {'pdfa': DraftMidia.METADATA_PDFA_NONE}
+        dm.save()
+
         serializer = self.get_serializer(dm)
         return Response(serializer.data)
 
@@ -285,6 +345,9 @@ class _DraftMidia(ResponseFileMixin):
         nd.save(doc.name)
         nd.close()
         doc.close()
+
+        dm.metadata['ocrmypdf'] = {'pdfa': DraftMidia.METADATA_PDFA_NONE}
+        dm.save()
 
         serializer = self.get_serializer(dm)
         return Response(serializer.data)

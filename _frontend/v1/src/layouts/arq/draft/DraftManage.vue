@@ -5,8 +5,7 @@
         <div class="d-flex flex-column w-100">
           <div class="d-flex ">
             <div>
-
-              <button type="button" class="btn btn-primary" @click="clickAdd">+</button>
+              <button type="button" class="btn btn-primary" title="Novo Draft" @click="clickAdd">+</button>
             </div>
             <h1 class="ml-2">Draft</h1>
           </div>
@@ -21,9 +20,6 @@
             ></model-select>
           <div v-if="draftselected" class="d-flex">
             <b-form-input v-model="draftselected.descricao" @change="changeDescricao($event)"></b-form-input>
-            <button type="button" class="btn btn-danger ml-2" @click="clickDel" :disabled="draftselected === null">
-              <i class="fas fa-trash-alt"></i>
-            </button>
           </div>
           <div class="drop-area">
             <drop-zone :pk="draftselected.id" :multiple="true" v-on:uploaded="uploadedFiles" v-if="draftselected"/>
@@ -32,7 +28,7 @@
       </div>
       <div class="col-9 container-manage-list">
         <div v-show="draftselected">
-          <draft-manage-list :draftselected="draftselected" ref="listdraft"></draft-manage-list>
+          <draft-manage-list :draftselected="draftselected" v-on:reloadDrafts="reloadDrafts" ref="listdraft"></draft-manage-list>
         </div>
       </div>
     </div>
@@ -57,17 +53,9 @@ export default {
     }
   },
   methods: {
-    clickDel () {
-      const t = this
-      this.utils.deleteModel('arq', 'draft', this.draftselected.id
-      ).then((response) => {
-        t.draftselected = null
-        t.$refs.draftSelect.fetchModel()
-      }).catch((error) => {
-        t.sendMessage(
-          { alert: 'danger', message: error.response.data.message, time: 10 }
-        )
-      })
+    reloadDrafts () {
+      this.draftselected = null
+      this.$refs.draftSelect.fetchModel()
     },
     clickAdd () {
       const t = this
