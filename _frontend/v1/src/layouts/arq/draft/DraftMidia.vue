@@ -33,7 +33,7 @@
       </div>
       <div :class="['innerdesc', ]">
         <strong v-html="elemento.metadata.uploadedfile.name"></strong>
-        <small v-show="elemento.metadata.ocrmypdf.pdfa">PDF/A-2b com OCR</small>
+        <small v-show="elemento.metadata.ocrmypdf.pdfa === 99">PDF/A-2b com OCR</small>
       </div>
     </div>
   </div>

@@ -1,4 +1,5 @@
 import glob
+import logging
 import os
 import pathlib
 import re
@@ -12,6 +13,9 @@ from django.utils.translation import ugettext_lazy as _
 
 from cmj.utils import get_settings_auth_user_model, texto_upload_path, normalize
 from sapl.utils import PortalFileField
+
+
+logger = logging.getLogger(__name__)
 
 
 class Draft(models.Model):
@@ -41,7 +45,7 @@ class Draft(models.Model):
     def delete(self, using=None, keep_parents=False):
         dm = self.draftmidia_set.first()
 
-        if dm:
+        if dm and dm.arquivo:
             path = dm.arquivo.path
             i = path.rfind('/')
             path = path[0:i]
@@ -51,13 +55,17 @@ class Draft(models.Model):
 
 
 def remove_files_and_folders(directory):
-    for root, dirs, files in os.walk(directory, topdown=False):
-        for name in dirs:
-            folder_path = os.path.join(root, name)
-            os.rmdir(folder_path)
-        for name in files:
-            file_path = os.path.join(root, name)
-            os.remove(file_path)
+    try:
+        for root, dirs, files in os.walk(directory, topdown=False):
+            for name in dirs:
+                folder_path = os.path.join(root, name)
+                os.rmdir(folder_path)
+            for name in files:
+                file_path = os.path.join(root, name)
+                os.remove(file_path)
+            os.rmdir(root)
+    except Exception as e:
+        logger.error(f'Erro na exclusão de: {directory}. {e}')
 
 
 def draftmidia_path(instance, filename):

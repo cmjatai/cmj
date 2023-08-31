@@ -13,21 +13,20 @@
         </div>
         <pagination :pagination="pagination" v-on:nextPage="nextPage" v-on:previousPage="previousPage" v-on:currentPage="currentPage"></pagination>
         <div v-if="draftselected" class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-          <div class="btn-group mr-2" role="group" aria-label="First group">
-            <a class="btn btn-danger" title="Excluir Draft Atual" @click="clickDel" :disabled="draftselected === null">
-                <i class="fas fa-trash-alt"></i>
-            </a>
-          </div>
-          <div class="btn-group mr-2" role="group" aria-label="First group">
-            <a class="btn btn-primary" :href="`/api/arq/draft/${draftselected.id}/zipfile/`" target="_blank" rel="noopener noreferrer" title="Baixar todos os arquivos individualmente dentro de um arquivo compactado.">
-              <i class="fas fa-file-archive"></i>
-            </a>
-          </div>
-          <div class="btn-group" role="group" aria-label="First group">
-            <a @click="clickUnir" class="btn btn-primary" title="Unir PDFs do Draft em apenas um PDF">
-              <i class="fas fa-layer-group"></i>
-            </a>
-          </div>
+          <a class="btn btn-danger" title="Excluir Draft Atual" @click="clickDel" :disabled="draftselected === null">
+              <i class="fas fa-trash-alt"></i>
+          </a>
+          <a class="btn btn-primary ml-2 btn-pdf2pdfa" @click="clickPdf2Pdfa"  title="Iniciar conversão para PDF/A-2b de todos os arquivos do Draft selecionado.">
+            <span>
+              PDF -><br>PDF/A-2b
+            </span>
+          </a>
+          <a class="btn btn-primary ml-2" :href="`/api/arq/draft/${draftselected.id}/zipfile/`" target="_blank" rel="noopener noreferrer" title="Baixar todos os arquivos individualmente dentro de um arquivo compactado.">
+            <i class="fas fa-file-archive"></i>
+          </a>
+          <a class="btn btn-primary ml-2" @click="clickUnir" title="Unir PDFs do Draft em apenas um PDF">
+            <i class="fas fa-layer-group"></i>
+          </a>
         </div>
       </div>
     </div>
@@ -83,6 +82,17 @@ export default {
     clickUnir () {
       const t = this
       t.utils.getModelAction('arq', 'draft', this.draftselected.id, 'unirmidias'
+      ).then((response) => {
+        this.fetchMidias(this.draftselected)
+      }).catch((error) => {
+        t.sendMessage(
+          { alert: 'danger', message: error.response.data.message, time: 10 }
+        )
+      })
+    },
+    clickPdf2Pdfa () {
+      const t = this
+      t.utils.getModelAction('arq', 'draft', this.draftselected.id, 'pdf2pdfa'
       ).then((response) => {
         this.fetchMidias(this.draftselected)
       }).catch((error) => {
@@ -171,6 +181,13 @@ export default {
   }
   .widget-pagination {
     flex: 1 1 auto;
+  }
+  .btn-pdf2pdfa {
+    font-size: 10px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    padding: 3px;
   }
 }
 </style>

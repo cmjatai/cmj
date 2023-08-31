@@ -76,10 +76,7 @@ class _Draft:
     @action(detail=True, methods=['POST'])
     def uploadfiles(self, request, *args, **kwargs):
 
-        try:
-            draft = Draft.objects.get(pk=kwargs['pk'])
-        except:
-            raise NotFound('Draft não encontrado!')
+        draft = Draft.objects.get(pk=kwargs['pk'])
 
         smax = DraftMidia.objects.filter(
             draft=draft
@@ -196,35 +193,67 @@ class _Draft:
         fname = f'{dm_primary.id:09}.pdf'
         fp = f'{"/".join(fp)}/{fname}'
 
-        #d_new = fitz.open()
-        # for dm in dm_draft:
-        #    doc = fitz.open(dm.arquivo.file)
-        #    d_new.insert_pdf(doc, from_page=0, to_page=len(doc))
-        #    doc.close()
-        #d_new.save(fp, garbage=3, clean=True, deflate=True)
-
-        pdf = Pdf.new()
+        d_new = fitz.open()
         for dm in dm_draft:
-            doc = Pdf.open(dm.arquivo.file)
-            pdf.pages.extend(doc.pages)
+            doc = fitz.open(dm.arquivo.file)
+            d_new.insert_pdf(doc, from_page=0, to_page=len(doc))
             doc.close()
-        pdf.save(fp)
+        d_new.save(fp, garbage=3, clean=True, deflate=True)
+
+        #pdf = Pdf.new()
+        # for dm in dm_draft:
+        #    doc = Pdf.open(dm.arquivo.file)
+        #    pdf.pages.extend(doc.pages)
+        #    doc.close()
+        # pdf.save(fp)
 
         dm_primary.metadata['uploadedfile']['name'] = fname
-        dm_primary.metadata['uploadedfile']['paginas'] = len(pdf.pages)
+        dm_primary.metadata['uploadedfile']['paginas'] = len(d_new)
         dm_primary.metadata['ocrmypdf'] = {
             'pdfa': DraftMidia.METADATA_PDFA_NONE}
 
-        fp_relative = fp[len(settings.MEDIA_ROOT) + 1:]
         dm_primary.clear_cache()
+        fp_relative = fp[len(settings.MEDIA_ROOT) + 1:]
         if fp_relative != dm_primary.arquivo.name:
             dm_primary.arquivo.delete()
-        dm_primary.arquivo = fp_relative
+            dm_primary.arquivo = fp_relative
         dm_primary.sequencia = 1
         dm_primary.save()
 
         for dm in dm_draft[1:]:
             dm.delete()
+
+        serializer = self.get_serializer(draft)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['GET'])
+    def pdf2pdfa(self, request, *args, **kwargs):
+
+        try:
+            draft = Draft.objects.get(pk=kwargs['pk'])
+        except:
+            raise NotFound('Draft não encontrado!')
+
+        dms = draft.draftmidia_set.filter(
+            metadata__ocrmypdf__pdfa=DraftMidia.METADATA_PDFA_NONE)
+
+        dms_id = []
+        for dm in dms:
+            dms_id.append(dm.id)
+            dm.metadata['ocrmypdf'] = {
+                'pdfa': DraftMidia.METADATA_PDFA_AGND}
+            dm.save()
+
+        tasks.task_ocrmypdf.apply_async(
+            (
+                DraftMidia._meta.app_label,
+                DraftMidia._meta.model_name,
+                'arquivo',
+                dms_id,
+                4
+            ),
+            countdown=1
+        )
 
         serializer = self.get_serializer(draft)
         return Response(serializer.data)
@@ -242,10 +271,10 @@ class _DraftMidia(ResponseFileMixin):
         dm_atual = self.get_queryset().filter(pk=kwargs['pk']).first()
         dm_new = deepcopy(dm_atual)
 
-        #doc = fitz.open(dm_atual.arquivo.file)
-        #ldoc = len(doc)
-        doc = Pdf.open(dm_atual.arquivo.file)
-        ldoc = len(doc.pages)
+        doc = fitz.open(dm_atual.arquivo.file)
+        ldoc = len(doc)
+        #doc = Pdf.open(dm_atual.arquivo.file)
+        #ldoc = len(doc.pages)
 
         if ldoc <= 1:
             serializer = self.get_serializer(dm_atual)
@@ -256,20 +285,20 @@ class _DraftMidia(ResponseFileMixin):
             sequencia__gt=dm_atual.sequencia
         ).update(sequencia=F('sequencia') + ldoc)
 
-        # for p in range(ldoc):
-        for p, page in enumerate(doc.pages):
+        for p in range(ldoc):
+            # for p, page in enumerate(doc.pages):
 
             fn = f'{str(dm_atual.arquivo.file)}'
             fn = fn[0: fn.rindex('.pdf')]
             fn = f'{fn}-p{p+1:0>3}.pdf'
 
-            #d = fitz.open()
-            #d.insert_pdf(doc, from_page=p, to_page=p)
-            #d.save(fn, garbage=3, clean=True, deflate=True)
-            # d.close()
-            dst = Pdf.new()
-            dst.pages.append(page)
-            dst.save(fn)
+            d = fitz.open()
+            d.insert_pdf(doc, from_page=p, to_page=p)
+            d.save(fn, garbage=3, clean=True, deflate=True)
+            d.close()
+            #dst = Pdf.new()
+            # dst.pages.append(page)
+            # dst.save(fn)
 
             dm_new.id = None
             dm_new.arquivo = fn[len(settings.MEDIA_ROOT) + 1:]

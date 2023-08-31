@@ -675,7 +675,7 @@ class RegistroVotacao(models.Model):
                 '{}, {}'. format(self.ordem, self.expediente))
 
 
-class VotoParlamentar(models.Model):  # RegistroVotacaoParlamentar
+class VotoParlamentar(models.Model):
     '''
     As colunas ordem e expediente são redundantes, levando em consideração
     que RegistroVotacao já possui ordem/expediente. Entretanto, para
