@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 
 from cmj.agenda.models import Evento
+from cmj.arq.models import Draft, DraftMidia
 from cmj.cerimonial.models import Perfil, EnderecoPerfil, EmailPerfil,\
     TelefonePerfil, LocalTrabalhoPerfil, DependentePerfil, OperadoraTelefonia,\
     NivelInstrucao, EstadoCivil, Contato, FiliacaoPartidaria, Dependente,\
@@ -30,7 +31,8 @@ from cmj.globalrules import (RP_ADD, RP_CHANGE, RP_DELETE, RP_DETAIL, RP_LIST,
                              GROUP_AGENDA_WORKSPACE, menu_agenda,
                              GROUP_MATERIA_WORKSPACE_VIEWER,
                              GROUP_DIARIOS_OPERADOR,
-                             GROUP_SAAP_WORKSPACE_OPER_RECEPCAO, menu_recepcao)
+                             GROUP_SAAP_WORKSPACE_OPER_RECEPCAO, menu_recepcao,
+                             GROUP_DRAFT_OPERADOR)
 from cmj.ouvidoria.models import Solicitacao, MensagemSolicitacao
 from cmj.sigad.models import Classe, Documento, Midia
 from sapl.parlamentares.models import Partido
@@ -182,6 +184,15 @@ rules_diarios_group_operador = {
     ]
 }
 
+rules_draft_group_operador = {
+    'group': GROUP_DRAFT_OPERADOR,
+    'rules': [
+        (Draft, __base__),
+        (DraftMidia, __base__),
+    ]
+}
+
+
 """
 rules_group_geral = {
     'group': SAPL_GROUP_GERAL,
@@ -236,6 +247,7 @@ rules_patterns = [
     rules_materia_group_workspace,
 
     rules_diarios_group_operador,
+    rules_draft_group_operador,
 
     rules_sigad_view_status_restritos,
     rules_ouvidoria_visualizacao_respostas,

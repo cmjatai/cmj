@@ -18,7 +18,6 @@ from django.utils import timezone
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 import fitz
-from pikepdf._core import Pdf
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
