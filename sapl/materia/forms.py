@@ -1171,8 +1171,7 @@ class MateriaLegislativaFilterSet(django_filters.FilterSet):
     ementa = django_filters.CharFilter(
         label=_(
             'Pesquisar expressões na ementa'),
-        help_text=_(
-            '"Para busca no conteúdo das matérias, use a Busca Textual acima"'),
+
         method='filter_ementa'
     )
     indexacao = django_filters.CharFilter(lookup_expr='icontains',
@@ -1293,7 +1292,7 @@ class MateriaLegislativaFilterSet(django_filters.FilterSet):
         self.filters['tramitacao__status'].label = _(
             'Status da tramitação atual')
 
-        self.filters['o'].label = _('Ordenação')
+        self.filters['o'].label = _('Opções de ordenação da pesquisa')
         self.form.fields['tipo_listagem'] = self.tipo_listagem
 
         row1 = to_row(
@@ -1377,26 +1376,36 @@ class MateriaLegislativaFilterSet(django_filters.FilterSet):
                     (row2, 'col'),
                     (form_actions(label=_('Processar Pesquisa')),
                      'col-md-auto mt-3 pt-3')
-                ])
+                ]),
+
+                Button('btn_pesquisa_avancada', 'Pesquisa Avançada >>>',
+                       css_id='btn_pesquisa_avancada_id',
+                       css_class='btn btn-dark',
+                       onClick="pesquisaAvancada()",
+                       style='margin-bottom: 1em; font-weight: bold'
+                       ),
             ),
 
-            Fieldset(
-                _('Como listar os resultados da pesquisa'),
-
-                row8,
-
-            ),
             # Fieldset(_('Origem externa'),
             #         row10, row11
             #         ),
             Fieldset(
-                _('Pesquisa Avançada'),
+                _(
+                    '''
+                Pesquisa Avançada<br>
+                <small>
+                <strong class="text-red">TODOS OS CAMPOS SÃO OPCIONAIS!</strong>
+                </small>
+                '''
+                ),
                 HTML(autor_label),
                 HTML(autor_modal),
                 row4,
                 row3,
                 row7,
-
+                row8,
+                css_class='pesquisa_avancada',
+                style="display: none;"
                 # row6,
                 # row9,
             )

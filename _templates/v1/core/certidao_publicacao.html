@@ -32,6 +32,9 @@
     text-align: justify;
     border-bottom:1px solid black;
   }
+  .inner-text {
+    padding-right: 20px;
+  }
   .inner img {
       width: 100%;
   }
@@ -50,7 +53,7 @@
   .hash {
     overflow-wrap: break-word;
     word-wrap: break-word;
-    
+
     font-size: 0.7em;
   }
   .url {
@@ -71,13 +74,16 @@
         <span>nº {{object.id|stringformat:"06d" }}</span>
         <span>{{object.created|date:"d/m/Y H:i:s"}}</span>
       </div>
-        Certifico para os devidos fins, nos termos do §1º art. 81
-        da Lei Orgânica do Município de Jataí, que o presente
-        documento foi publicado eletronicamente no Portal
-        Transparência Pública do Legislativo Municipal de Jataí e está disponível para acesso em dois formatos:
-        <div class="hash"><div class="hash">
-          1) Original tal como digitalizado e com o hash abaixo, e 2) em OCR para sistemas de indexação e busca.
-        </div></div>
+      <div class="inner-text">
+        Certifico para os devidos fins, nos termos do §1º art. 81 da Lei Orgânica do Município de Jataí, que o presente documento foi publicado eletronicamente no Portal Transparência Pública do Legislativo Municipal de Jataí e está disponível para acesso em dois formatos:
+      </div>
+
+
+        <div class="hash">
+          <div class="hash">
+            1) Original tal como digitalizado e com o hash abaixo, e 2) em OCR para sistemas de indexação e busca.
+          </div>
+        </div>
         <div class="url">
           <strong>1){{ content_object_url.original }}</strong><br>
           2){{ content_object_url.ocr }}
