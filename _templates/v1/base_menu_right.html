@@ -1,6 +1,11 @@
 {% load i18n staticfiles menus common_cmj_tags cropping %}
 {% load webpack_static from webpack_loader %}
 <ul class="navbar-nav justify-content-end">
+  {% if perms.arq.list_draft %}
+    <li>
+      <li><a href="{% url 'cmj.arq:app_vue_draft_view_url' %}">Draft</a></li>
+    </li>
+  {% endif %}
   {% if perms.core.menu_relatorios%}
     <li class="dropdown">
       <a href="#"data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Relatórios" %}<span class="caret"></span></a>

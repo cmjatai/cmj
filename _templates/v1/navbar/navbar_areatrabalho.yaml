@@ -20,9 +20,6 @@
   {% yaml_render "navbar/public/navbar_esic.yaml" 2 %}
 {% else %}
   {% yaml_render "navbar/restrict/navbar_saap.yaml" 0 %}
-- title: {% trans "Draft" %}
-  url: cmj.arq:app_vue_draft_view_url
-  check_permission: arq.list_draft
 - title: {% trans "Registro de Entrada" %}
   url: cmj.cerimonial:visita_list
   check_permission: core.menu_recepcao
