@@ -14,7 +14,7 @@
     <br>
     No canto superior esquerdo de cada arquivo aparece um círculo que pode possuir três cores:
     <ul>
-      <li>Circulo vermelho - Significa que o arquivo não foi analisade desde a adição ou devido a uma edição e não há garantia que possua OCR ou seja um PDF/A-2b</li>
+      <li>Circulo vermelho - Significa que o arquivo não foi analisado desde a adição ou devido a edições, e não há garantia que possua OCR ou seja um PDF/A-2b.</li>
       <li>Circulo amarelo - Significa que você acionou um conversor "PDF -> PDF/A-2b"
           e que o Draft está trabalhando nessa tarefa.
           Tal tarefa não é feita em seu computador e neste momento está sendo feita em nuvem,
