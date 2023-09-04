@@ -28,7 +28,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/brasao/escola_1024.png"
   },
   {
-    "revision": "b4105c1383f41ff8d0f8",
+    "revision": "bef25765e8c44c6090f0",
     "url": "/static/css/app.1e0dc615.css"
   },
   {
@@ -44,7 +44,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/css/chunk-38d06efb.d4696fb9.css"
   },
   {
-    "revision": "1c82ac1261feb04bdbf0",
+    "revision": "f9e027a1a8f2ba3d399c",
     "url": "/static/css/chunk-4ca293ce.ea7cbc73.css"
   },
   {
@@ -332,12 +332,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/user.png"
   },
   {
-    "revision": "1571c880bc6863a53f97bdda372fdd8f",
+    "revision": "5eee291d379c144ca05f3c8495224559",
     "url": "/static/index.html"
   },
   {
-    "revision": "b4105c1383f41ff8d0f8",
-    "url": "/static/js/app.a98a0abc.js"
+    "revision": "bef25765e8c44c6090f0",
+    "url": "/static/js/app.62f5ec02.js"
   },
   {
     "revision": "d153d558f4c18ba116a5",
@@ -356,8 +356,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/js/chunk-443cae2b.ac2075e7.js"
   },
   {
-    "revision": "1c82ac1261feb04bdbf0",
-    "url": "/static/js/chunk-4ca293ce.6c918d1c.js"
+    "revision": "f9e027a1a8f2ba3d399c",
+    "url": "/static/js/chunk-4ca293ce.c95914bf.js"
   },
   {
     "revision": "2e97554a18d9483e9fc1",

@@ -2,7 +2,7 @@
   <div>
     <hr>
     <h3>O que é o Draft?</h3>
-    Draft é uma ferramenta para criação e edição de arquivos PDF/A-2b, além de também converter DOC, DOCx, ODT, PNG e JPG para PDFs.<br>
+    Draft é uma ferramenta para criação e edição de arquivos PDF/A-2b, além de também fazer OCR e converter DOC, DOCx, ODT, PNG e JPG para PDFs.<br>
     Esta área é só sua. Os Draft's criados aqui não são públicos e não são vistos por outros usuários.<br>
     Cada Draft é uma área de criação independente, clique no botão "+" acima para incluir um novo Draft.<br>
     <br>
