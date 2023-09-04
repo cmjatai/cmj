@@ -2,11 +2,11 @@
   <div>
     <hr>
     <h3>O que é o Draft?</h3>
-    Draft é uma ferramenta para criação e edição de arquivos PDF/A-2b.<br>
+    Draft é uma ferramenta para criação e edição de arquivos PDF/A-2b, além de também converter DOC, DOCx, ODT, PNG e JPG para PDFs.<br>
     Esta área é só sua. Os Draft's criados aqui não são públicos e não são vistos por outros usuários.<br>
     Cada Draft é uma área de criação independente, clique no botão "+" acima para incluir um novo Draft.<br>
     <br>
-    Em um Draft você pode incluir vários PDFs e até mesmo imagens, bem como desmembrar, excluir, rotacionar e reunir páginas.<br>
+    Em um Draft você pode incluir vários PDFs, bem como desmembrar, excluir, rotacionar e reunir páginas.<br>
     No Draft é possível adicionar vários PDFs e acionar o botão "PDF -> PDF/A-2b" que acionará uma tarefa interna do Draft que transformará seus arquivos em PDF/A-2b com OCR.
     Com seus arquivos já editados, você poderá baixá-los em um arquivo compactado se em seu Draft, possuir mais que um arquivo, ou ainda, clicar sobre ele e abrir uma nova janela para então salvar em seus documentos locais.<br>
     <br>

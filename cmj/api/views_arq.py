@@ -4,6 +4,9 @@ import glob
 import logging
 from operator import attrgetter
 import os
+import re
+from subprocess import TimeoutExpired, CalledProcessError
+import subprocess
 import tempfile
 import zipfile
 
@@ -99,9 +102,9 @@ class _Draft:
 
         for seq, item in enumerate(files, start=smax + 1):
             tipo = TIPOS_MIDIAS_PERMITIDOS.get(f.content_type, None)
-            if tipo not in ('pdf', 'jpg', 'png'):
+            if tipo not in ('pdf', 'jpg', 'png', 'doc', 'docx', 'odt'):
                 raise ValidationError(
-                    _('Os arquivos possíveis de envio são do tipo: PDF, JPG e PNG'))
+                    _('Os arquivos possíveis de envio são do tipo: PDF, JPG, PNG, ODT, DOC e DOCX'))
 
             f = item['file']
             dm = DraftMidia()
@@ -121,7 +124,7 @@ class _Draft:
 
             dm.save()
 
-            if f.content_type != 'application/pdf':
+            if tipo in ('jpg', 'png'):
                 fname = f.name + '.pdf'
                 doc = fitz.open()
 
@@ -145,6 +148,42 @@ class _Draft:
                 dm.metadata['uploadedfile']['name'] = fname
                 dm.metadata['uploadedfile']['paginas'] = 1
                 dm.save()
+            elif tipo in ('doc', 'docx', 'odt'):
+                fpdf = '/'.join(dm.arquivo.path.split('/')[:-1])
+                fname = dm.arquivo.path.split('/')[-1]
+                fname = re.sub(r'docx$', 'pdf', fname)
+                fname = re.sub(r'doc$', 'pdf', fname)
+                fname = re.sub(r'odt$', 'pdf', fname)
+
+                cmd = [
+                    'lowriter',
+                    '--headless',
+                    '--convert-to',
+                    'pdf',
+                    '--outdir', fpdf,
+                    str(dm.arquivo.path)
+                ]
+                try:
+                    subprocess.run(cmd, check=True, timeout=60)
+                except TimeoutExpired:
+                    logger.error('Timeout na converserção de arquivo')
+                    raise ValidationError('Timeout na converserção de arquivo')
+
+                except CalledProcessError:
+                    logger.error('Erro na execução de conversão de arquivo')
+                    raise ValidationError(
+                        'Erro na execução de conversão de arquivo')
+                else:
+                    logger.info('Arquivo convertido!')
+
+                    dm.arquivo.delete()
+
+                    fpdf = f'{fpdf}/{fname}'
+
+                    dm.arquivo = fpdf[len(settings.MEDIA_ROOT) + 1:]
+                    dm.metadata['uploadedfile']['name'] = fname
+                    dm.metadata['uploadedfile']['paginas'] = 1
+                    dm.save()
 
             doc = fitz.open(dm.arquivo.file)
             dm.metadata['uploadedfile']['paginas'] = len(doc)
