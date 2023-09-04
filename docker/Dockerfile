@@ -7,18 +7,16 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED=1
 ENV DEBIAN_FRONTEND noninteractive
 
-ENV BUILD_PACKAGES apt-utils apt-file libpq-dev graphviz-dev build-essential  pkg-config \
+ENV BUILD_PACKAGES apt-utils apt-file libpq-dev graphviz-dev build-essential pkg-config \
                    python3-dev libxml2-dev libjpeg-dev libssl-dev libffi-dev libxslt1-dev \
                    libcairo2-dev software-properties-common python3-setuptools python3-pip \
                    procps nmap
-
-ENV RUN1_PACKAGES git graphviz python3-lxml python3-magic postgresql-client python3-psycopg2 \
-                 poppler-utils curl jq bash vim python3-venv tzdata nodejs nginx python
-
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y --no-install-recommends $BUILD_PACKAGES
 
+ENV RUN1_PACKAGES git graphviz python3-lxml python3-magic postgresql-client python3-psycopg2 \
+                 poppler-utils curl jq bash vim python3-venv tzdata nodejs nginx python
 RUN apt-get install -y --no-install-recommends $RUN1_PACKAGES
 
 ENV RUN2_PACKAGES fontconfig openjdk-11-jdk-headless fonts-liberation
@@ -27,8 +25,28 @@ RUN apt-get install -y --no-install-recommends $RUN2_PACKAGES
 ENV RUN3_PACKAGES tesseract-ocr tesseract-ocr-por ghostscript
 RUN apt-get install -y --no-install-recommends $RUN3_PACKAGES
 
-RUN fc-cache -fv && \
-    pip3 install --no-cache-dir --upgrade pip setuptools
+ENV LIBRE_PACKAGES libreoffice \
+                    libreoffice-writer \
+                    ure \
+                    libreoffice-java-common \
+                    libreoffice-core \
+                    libreoffice-common \
+                    fonts-opensymbol \
+                    hyphen-pt-br \
+                    fonts-dejavu \
+                    fonts-dejavu-core \
+                    fonts-dejavu-extra \
+                    fonts-droid-fallback \
+                    fonts-dustin \
+                    fonts-f500 \
+                    fonts-fanwood \
+                    fonts-freefont-ttf \
+                    fonts-lmodern \
+                    fonts-lyx \
+                    fonts-sil-gentium \
+                    fonts-texgyre \
+                    fonts-tlwg-purisa
+RUN apt-get install -y -q $LIBRE_PACKAGES
 
 RUN fc-cache -fv && \
     pip3 install --no-cache-dir --upgrade pip setuptools
@@ -38,6 +56,10 @@ RUN rm -f /etc/nginx/conf.d/* && \
     #&& \
     #SUDO_FORCE_REMOVE=yes apt-get purge -y --auto-remove $BUILD_PACKAGES && \
     #apt-get -y autoremove && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN adduser --home=/opt/libreoffice --disabled-password --gecos "" --shell=/bin/bash libreoffice
+ADD libreoffice_entrypoint.sh /opt/libreoffice/libreoffice_entrypoint.sh
+RUN chmod +x /opt/libreoffice/libreoffice_entrypoint.sh
 
 RUN mkdir -p /var/cmjatai/cmj/run
 RUN mkdir -p /var/cmjatai/cmj/logs/celery

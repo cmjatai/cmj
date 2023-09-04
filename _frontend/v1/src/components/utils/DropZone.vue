@@ -65,7 +65,7 @@ export default {
           t.sendMessage({ alert: 'success', message: 'Envio de Arquivos concluído...', time: 5 })
         })
         .catch((response) => t.sendMessage(
-          { alert: 'danger', message: 'Não foi possível enviar os arquivos...', time: 5 }))
+          { alert: 'danger', message: response.response.data[0] || response.response.data.detail || 'Não foi possível enviar os arquivos...', time: 10 }))
       /*
       */
     },

@@ -20,13 +20,15 @@ from django.utils.translation import ugettext_lazy as _
 import fitz
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from cmj.arq import tasks
 from cmj.arq.models import DraftMidia, Draft
+from cmj.utils import TIPOS_IMG_PERMITIDOS, TIPOS_MIDIAS_PERMITIDOS
 from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize
+import sapl
 from sapl.api.mixins import ResponseFileMixin
 from sapl.utils import hash_sha512
 
@@ -96,6 +98,11 @@ class _Draft:
         files = sorted(files, key=lambda f: f['file'].name)
 
         for seq, item in enumerate(files, start=smax + 1):
+            tipo = TIPOS_MIDIAS_PERMITIDOS.get(f.content_type, None)
+            if tipo not in ('pdf', 'jpg', 'png'):
+                raise ValidationError(
+                    _('Os arquivos possíveis de envio são do tipo: PDF, JPG e PNG'))
+
             f = item['file']
             dm = DraftMidia()
             dm.draft = draft
