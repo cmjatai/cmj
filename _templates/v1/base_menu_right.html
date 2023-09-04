@@ -3,7 +3,7 @@
 <ul class="navbar-nav justify-content-end">
   {% if perms.arq.list_draft %}
     <li>
-      <li><a href="{% url 'cmj.arq:app_vue_draft_view_url' %}">Draft</a></li>
+      <li><a class="text-yellow" style="font-weight: bold;" href="{% url 'cmj.arq:app_vue_draft_view_url' %}">Draft</a></li>
     </li>
   {% endif %}
   {% if perms.core.menu_relatorios%}

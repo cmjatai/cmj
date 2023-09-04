@@ -16,7 +16,7 @@
             choice="descricao"
             ordering="descricao"
             ref="draftSelect"
-            :height="6"
+            :height="8"
             ></model-select>
           <div v-if="draftselected" class="d-flex">
             <b-form-input v-model="draftselected.descricao" @change="changeDescricao($event)"></b-form-input>
@@ -30,6 +30,7 @@
         <div v-show="draftselected">
           <draft-manage-list :draftselected="draftselected" v-on:reloadDrafts="reloadDrafts" ref="listdraft"></draft-manage-list>
         </div>
+        <draft-help/>
       </div>
     </div>
   </div>
@@ -39,13 +40,15 @@
 import ModelSelect from '@/components/selects/ModelSelect.vue'
 import DropZone from '@/components/utils/DropZone.vue'
 import DraftManageList from './DraftManageList.vue'
+import DraftHelp from './DraftHelp.vue'
 
 export default {
   name: 'draft-manage',
   components: {
     DropZone,
     ModelSelect,
-    DraftManageList
+    DraftManageList,
+    DraftHelp
   },
   data () {
     return {

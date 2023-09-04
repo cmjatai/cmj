@@ -69,6 +69,7 @@ class _Draft:
             serializer = super(type(self), self).get_serializer(
                 *args, **kwargs)
             return serializer
+
         self.get_serializer = get_serializer
         return super().create(request, *args, **kwargs)
 

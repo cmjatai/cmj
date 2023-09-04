@@ -1,7 +1,7 @@
 <template>
   <div :class="['draft-midia', 'p-2',]" :id="`dm${elemento.id}`">
     <div class="inner">
-      <div :class="['inner-status', elemento.metadata.ocrmypdf.pdfa === 99 ? 'border-blue': (elemento.metadata.ocrmypdf.pdfa === 10 ? 'border-yellow': 'border-red')]"
+      <div :class="['inner-status', elemento.metadata.ocrmypdf.pdfa === 99 ? 'border-green': (elemento.metadata.ocrmypdf.pdfa === 10 ? 'border-yellow': 'border-red')]"
       v-html="elemento.metadata.ocrmypdf.pdfa === 99 ? 'PDF/A-2b': (elemento.metadata.ocrmypdf.pdfa === 10 ? 'Conversão Agendada': 'Não PDF/A-2b')"></div>
       <div class="inner-action">
         <div class="dropleft">
@@ -176,13 +176,13 @@ export default {
 
       }
 
-      &.border-blue, &.border-red, &.border-green, &.border-yellow {
+      &.border-green, &.border-red, &.border-green, &.border-yellow {
         &::before {
           content: " ";
           z-index: 1;
         }
       }
-      &.border-blue {
+      &.border-green {
           background-color: #0073b7dd;
       }
       &.border-red {
