@@ -9,7 +9,7 @@
     Cada Draft é uma área de criação independente. Clique no botão "+" acima para incluir um novo Draft.<br>
     <br>
     Em um Draft você pode incluir vários PDFs, bem como desmembrar, excluir, rotacionar e reunir páginas. <br>
-    Alem de arquivos DOC, DOCx, ODT, PNG e JPG, que serão imediatamente convertidos para PDF.<br>
+    Alem de arquivos DOC, DOCx, ODT, XLS, XLSX, ODS, PNG e JPG, que serão imediatamente convertidos para PDF.<br>
     <br>
     No Draft é possível adicionar vários PDFs e clicar no botão "PDF -> PDF/A-2b" que acionará uma tarefa interna do Draft que transformará seus arquivos em PDF/A-2b com OCR.
     Com seus arquivos já editados, você poderá baixá-los em um arquivo compactado se em seu Draft houver mais que um arquivo ou ainda clicar sobre ele e abrir uma nova janela para então salvar em seus documentos locais.<br>
