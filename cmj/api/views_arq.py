@@ -101,12 +101,15 @@ class _Draft:
         files = sorted(files, key=lambda f: f['file'].name)
 
         for seq, item in enumerate(files, start=smax + 1):
-            tipo = TIPOS_MIDIAS_PERMITIDOS.get(f.content_type, None)
-            if tipo not in ('pdf', 'jpg', 'png', 'doc', 'docx', 'odt'):
-                raise ValidationError(
-                    _('Os arquivos possíveis de envio são do tipo: PDF, JPG, PNG, ODT, DOC e DOCX'))
-
             f = item['file']
+            tipo = TIPOS_MIDIAS_PERMITIDOS.get(f.content_type, None)
+
+            if tipo not in ('pdf', 'jpg', 'png',
+                            'doc', 'docx', 'odt',
+                            'xls', 'xlsx', 'ods'):
+                raise ValidationError(
+                    _('Os arquivos possíveis de envio são do tipo: PDF, JPG, PNG, ODT, DOC, DOCX, ODS, XLS, XLSX'))
+
             dm = DraftMidia()
             dm.draft = draft
             dm.sequencia = seq
@@ -148,18 +151,16 @@ class _Draft:
                 dm.metadata['uploadedfile']['name'] = fname
                 dm.metadata['uploadedfile']['paginas'] = 1
                 dm.save()
-            elif tipo in ('doc', 'docx', 'odt'):
+            elif tipo in ('doc', 'docx', 'odt', 'xls', 'xlsx', 'ods'):
                 fpdf = '/'.join(dm.arquivo.path.split('/')[:-1])
                 fname = dm.arquivo.path.split('/')[-1]
-                fname = re.sub(r'docx$', 'pdf', fname)
-                fname = re.sub(r'doc$', 'pdf', fname)
-                fname = re.sub(r'odt$', 'pdf', fname)
+                fname = re.sub(f'{tipo}$', 'pdf', fname)
 
                 cmd = [
                     'lowriter',
                     '--headless',
                     '--convert-to',
-                    'pdf',
+                    'pdf:draw_pdf_Export:{"SelectPdfVersion":{"type":"long","value":"2"}}',
                     '--outdir', fpdf,
                     str(dm.arquivo.path)
                 ]

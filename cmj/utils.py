@@ -215,9 +215,15 @@ TIPOS_MIDIAS_PERMITIDOS = {
     'application/x-pdf': 'pdf',
     'application/acrobat': 'pdf',
     'applications/vnd.pdf': 'pdf',
+
     'application/msword': 'doc',
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
     'application/vnd.oasis.opendocument.text': 'odt',
+
+    'application/vnd.ms-excel': 'xls',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'xlsx',
+    'application/vnd.oasis.opendocument.spreadsheet': 'ods',
+
     'image/jpeg': 'jpg',
     'image/jpg': 'jpg',
     'image/jpe_': 'jpg',
