@@ -3,18 +3,20 @@ import glob
 import io
 import logging
 import os
+from pathlib import Path
+import pathlib
 import re
 import subprocess
 import sys
 
 from PyPDF4.pdf import PdfFileReader
-import cv2
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.base import File
 from django.core.management.base import BaseCommand
 from django.db.models import Q
 from django.db.models.signals import post_delete, post_save
 import fitz
+import ocrmypdf
 import pdfminer
 from pdfminer.high_level import extract_text_to_fp, extract_text
 from pdfminer.layout import LAParams
@@ -25,9 +27,11 @@ from reportlab.platypus.doctemplate import SimpleDocTemplate
 
 from cmj.core.models import OcrMyPDF
 from cmj.diarios.models import DiarioOficial
+from cmj.settings.project import PROJECT_DIR
 from cmj.utils import Manutencao
 from cmj.utils import ProcessoExterno
 import numpy as np
+import ocrmypdf_plugin
 from sapl.compilacao.models import TextoArticulado, Dispositivo
 from sapl.materia.models import MateriaLegislativa, DocumentoAcessorio
 from sapl.norma.models import NormaJuridica
@@ -40,6 +44,17 @@ def _get_registration_key(model):
     return '%s_%s' % (model._meta.app_label, model._meta.model_name)
 
 
+def img_replace(page, xref, filename=None, stream=None, pixmap=None):
+
+    doc = page.parent
+    new_xref = page.insert_image(
+        page.rect, filename=filename, stream=stream, pixmap=pixmap
+    )
+    doc.xref_copy(new_xref, xref)
+    last_contents_xref = page.get_contents()[-1]
+    doc.update_stream(last_contents_xref, b" ")
+
+
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
@@ -47,11 +62,75 @@ class Command(BaseCommand):
         m = Manutencao()
         m.desativa_auto_now()
         m.desativa_signals()
+
+        ocrmypdf.ocr(
+            '/home/leandro/TEMP/teste/teste.pdf', '/home/leandro/TEMP/teste_out2.pdf',
+            language='por',
+            # force_ocr=True,
+            # redo_ocr=True,
+            skip_text=True,
+            jobs=4,
+            output_type='pdfa-2',
+            # image_dpi=72,
+            jpg_quality=60,
+            # png_quality=30,
+            # optimize=3,
+            # jbig2_lossy=True,
+            # oversample=20,
+            pdfa_image_compression="jpeg",
+            plugins=[
+                pathlib.Path(
+                    '/home/leandro/desenvolvimento/envs/cmj/ocrmypdf_plugin.py')
+            ]
+
+        )
+
+        return
+
+        inp = '/home/leandro/TEMP/teste/teste.pdf'
+        outp = '/home/leandro/TEMP/teste_out.pdf'
+
+        doc = fitz.open(inp)
+        doc_out = fitz.open()
+
+        for idx, p in enumerate(doc):
+            images = p.get_images()
+
+            for idxi, i in enumerate(images):
+
+                try:
+                    xref = i[0]
+                    mask = i[1]
+                    img_bytes = doc.extract_image(xref)['image']
+                    # print(len(img_bytes))
+
+                    imgpix = fitz.Pixmap(img_bytes)
+                    imggray = fitz.Pixmap(fitz.csGRAY, imgpix)
+
+                    imggray.save(f'/home/leandro/TEMP/teste/jpg/teste-{idx:0>4}-{idxi:0>3}.jpg',
+                                 output='jpg', jpg_quality=30)
+                    img_bytes = imggray.tobytes(output='jpg', jpg_quality=30)
+
+                    # print(len(img_bytes))
+
+                    img_replace(p, xref, stream=img_bytes)
+                except:
+                    pass
+
+        for idx, p in enumerate(doc):
+            doc_out.insert_pdf(doc, from_page=idx, to_page=idx)
+
+        doc_out.save(outp, garbage=4, pretty=True,
+                     deflate=True, deflate_images=True,
+                     clean=True, linear=True)
+
+        return
         # post_save.disconnect(dispatch_uid='timerefresh_post_signal')
 
         # m = MateriaLegislativa.objects.get(pk=19819)
         # m.texto_original.shorten_file_name()
         # self.criar_pdfs()
+
         self.pdftopdfa()
         return
         # print(text)

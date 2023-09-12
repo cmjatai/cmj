@@ -297,9 +297,10 @@ class _Draft:
                 DraftMidia._meta.model_name,
                 'arquivo',
                 dms_id,
-                4
+                4,
+                False
             ),
-            countdown=1
+            countdown=10
         )
 
         serializer = self.get_serializer(draft)
@@ -372,9 +373,29 @@ class _DraftMidia(ResponseFileMixin):
                 dm._meta.model_name,
                 'arquivo',
                 [dm.id, ],
-                2
+                4,
+                False
             ),
-            countdown=1
+            countdown=10
+        )
+        serializer = self.get_serializer(dm)
+        return Response(serializer.data)
+
+    @action(detail=True)
+    def pdfacompact(self, request, *args, **kwargs):
+        dm = self.get_queryset().filter(pk=kwargs['pk']).first()
+        dm.metadata['ocrmypdf'] = {'pdfa': DraftMidia.METADATA_PDFA_AGND}
+        dm.save()
+        tasks.task_ocrmypdf_compact_function(
+            #(
+            dm._meta.app_label,
+            dm._meta.model_name,
+            'arquivo',
+            [dm.id, ],
+            2,
+            True
+            #),
+            # countdown=1
         )
         serializer = self.get_serializer(dm)
         return Response(serializer.data)

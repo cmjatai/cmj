@@ -4,7 +4,7 @@
       <div :class="['inner-status', elemento.metadata.ocrmypdf.pdfa === 99 ? 'border-green': (elemento.metadata.ocrmypdf.pdfa === 10 ? 'border-yellow': 'border-red')]"
       v-html="elemento.metadata.ocrmypdf.pdfa === 99 ? 'PDF/A-2b': (elemento.metadata.ocrmypdf.pdfa === 10 ? 'Conversão Agendada': 'Não PDF/A-2b')"></div>
       <div class="inner-action">
-        <div class="dropleft">
+        <div class="dropleft" v-show="elemento.metadata.ocrmypdf.pdfa !== 10">
           <button class="btn btn-sm" type="button" data-toggle="dropdown" aria-expanded="true">
             <i class="fas fa-ellipsis-v"></i>
           </button>
