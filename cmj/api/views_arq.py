@@ -10,6 +10,7 @@ import subprocess
 import tempfile
 import zipfile
 
+from PIL import Image, ImageSequence
 from django.apps.registry import apps
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -106,9 +107,10 @@ class _Draft:
 
             if tipo not in ('pdf', 'jpg', 'png',
                             'doc', 'docx', 'odt',
-                            'xls', 'xlsx', 'ods'):
+                            'xls', 'xlsx', 'ods',
+                            'tif', 'tiff'):
                 raise ValidationError(
-                    _('Os arquivos possíveis de envio são do tipo: PDF, JPG, PNG, ODT, DOC, DOCX, ODS, XLS, XLSX'))
+                    _('Os arquivos possíveis de envio são do tipo: PDF, JPG, PNG, ODT, DOC, DOCX, ODS, XLS, XLSX, TIF, TIFF'))
 
             dm = DraftMidia()
             dm.draft = draft
@@ -151,6 +153,34 @@ class _Draft:
                 dm.metadata['uploadedfile']['name'] = fname
                 dm.metadata['uploadedfile']['paginas'] = 1
                 dm.save()
+            elif tipo in ('tiff',):
+
+                fname = dm.arquivo.path.split('/')[-1] + '.pdf'
+
+                tiff_path = dm.arquivo.path
+
+                fpdf = tiff_path.replace('.tiff', '.pdf')
+                fpdf = tiff_path.replace('.tif', '.pdf')
+
+                image = Image.open(tiff_path)
+
+                images = []
+                for i, page in enumerate(ImageSequence.Iterator(image)):
+                    page = page.convert("RGB")
+                    images.append(page)
+                if len(images) == 1:
+                    images[0].save(fpdf)
+                else:
+                    images[0].save(fpdf, save_all=True,
+                                   append_images=images[1:])
+
+                dm.arquivo.delete()
+
+                dm.arquivo = fpdf[len(settings.MEDIA_ROOT) + 1:]
+                dm.metadata['uploadedfile']['name'] = fname
+                dm.metadata['uploadedfile']['paginas'] = len(images)
+                dm.save()
+
             elif tipo in ('doc', 'docx', 'odt', 'xls', 'xlsx', 'ods'):
                 fpdf = '/'.join(dm.arquivo.path.split('/')[:-1])
                 fname = dm.arquivo.path.split('/')[-1]
@@ -309,6 +339,9 @@ class _Draft:
 
 @customize(DraftMidia)
 class _DraftMidia(ResponseFileMixin):
+
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
 
     @action(detail=True)
     def arquivo(self, request, *args, **kwargs):

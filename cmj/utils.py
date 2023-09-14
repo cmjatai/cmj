@@ -238,6 +238,7 @@ TIPOS_MIDIAS_PERMITIDOS = {
     'image/png': 'png',
     'application/png': 'png',
     'application/x-png': 'png',
+    'image/tiff': 'tiff'
 }
 
 TIPOS_IMG_PERMITIDOS = {

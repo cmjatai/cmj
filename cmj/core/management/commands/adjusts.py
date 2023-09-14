@@ -10,12 +10,14 @@ import subprocess
 import sys
 
 from PyPDF4.pdf import PdfFileReader
+import cv2
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.base import File
 from django.core.management.base import BaseCommand
 from django.db.models import Q
 from django.db.models.signals import post_delete, post_save
 import fitz
+from fitz.utils import scrub
 import ocrmypdf
 import pdfminer
 from pdfminer.high_level import extract_text_to_fp, extract_text
@@ -25,6 +27,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.platypus.doctemplate import SimpleDocTemplate
 
+from cmj.arq.tasks import console
 from cmj.core.models import OcrMyPDF
 from cmj.diarios.models import DiarioOficial
 from cmj.settings.project import PROJECT_DIR
@@ -55,6 +58,32 @@ def img_replace(page, xref, filename=None, stream=None, pixmap=None):
     doc.update_stream(last_contents_xref, b" ")
 
 
+def unsharp_mask(image, kernel_size=(5, 5), sigma=1.0, amount=1.0, threshold=0):
+    """Return a sharpened version of the image, using an unsharp mask."""
+    blurred = cv2.GaussianBlur(image, kernel_size, sigma)
+    sharpened = float(amount + 1) * image - float(amount) * blurred
+    sharpened = np.maximum(sharpened, np.zeros(sharpened.shape))
+    sharpened = np.minimum(sharpened, 255 * np.ones(sharpened.shape))
+    sharpened = sharpened.round().astype(np.uint8)
+    if threshold > 0:
+        low_contrast_mask = np.absolute(image - blurred) < threshold
+        np.copyto(sharpened, image, where=low_contrast_mask)
+    return sharpened
+
+
+def increase_brightness(img, value):
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    h, s, v = cv2.split(hsv)
+
+    lim = 255 - value
+    v[v > lim] = 255
+    v[v <= lim] += value
+
+    final_hsv = cv2.merge((h, s, v))
+    img = cv2.cvtColor(final_hsv, cv2.COLOR_HSV2BGR)
+    return img
+
+
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
@@ -63,6 +92,63 @@ class Command(BaseCommand):
         m.desativa_auto_now()
         m.desativa_signals()
 
+        in_file = '/home/leandro/TEMP/teste/teste3.pdf'
+        out_file = '/home/leandro/TEMP/teste/teste3_out.pdf'
+
+        os.makedirs('/home/leandro/TEMP/teste/rgb', exist_ok=True)
+        os.makedirs('/home/leandro/TEMP/teste/gray', exist_ok=True)
+
+        #in_file = '/home/leandro/TEMP/teste/teste_compact.pdf'
+        #out_file = '/home/leandro/TEMP/teste/teste_compact2.pdf'
+
+        doc = fitz.open(in_file)
+        doc_out = fitz.open()
+
+        for idx, p in enumerate(doc):
+            images = p.get_images()
+
+            for idxi, i in enumerate(images):
+
+                try:
+                    xref = i[0]
+                    mask = i[1]
+
+                    img = doc.extract_image(xref)
+                    img_bytes = img['image']
+                    # print(len(img_bytes))
+
+                    imgpix = fitz.Pixmap(img_bytes)
+                    imgpix.save(f'/home/leandro/TEMP/teste/rgb/teste-{idx:0>4}-{idxi:0>3}.{img["ext"]}',
+                                output=img['ext'])
+                    imggray = fitz.Pixmap(fitz.csGRAY, imgpix)
+                    imggray.save(f'/home/leandro/TEMP/teste/gray/teste-{idx:0>4}-{idxi:0>3}.{img["ext"]}',
+                                 output=img['ext'], jpg_quality=50)
+                    img_bytes = imggray.tobytes(
+                        output=img['ext'], jpg_quality=70)
+
+                    #imag = np.frombuffer(img_bytes, dtype='uint8')
+                    #imag = cv2.imdecode(imag, cv2.IMREAD_COLOR)
+                    #sharpened = unsharp_mask(imag)
+                    #imag = increase_brightness(sharpened, value=10)
+                    #img_bytes = imag.tobytes()
+                    # print(len(img_bytes))
+                    #cv2.imwrite('image.jpg', img2, [int(cv2.imwrite_jpeg_quality), 100])
+
+                    img_replace(p, xref, stream=img_bytes)
+                except Exception as e:
+                    pass
+
+        doc_out.insert_pdf(doc)
+
+        doc_out.save(out_file, garbage=4, pretty=True,
+                     deflate=True, deflate_images=True,
+                     clean=True)
+
+        return
+
+        #
+        #
+        #
         ocrmypdf.ocr(
             '/home/leandro/TEMP/teste/teste.pdf', '/home/leandro/TEMP/teste_out2.pdf',
             language='por',
@@ -87,44 +173,6 @@ class Command(BaseCommand):
 
         return
 
-        inp = '/home/leandro/TEMP/teste/teste.pdf'
-        outp = '/home/leandro/TEMP/teste_out.pdf'
-
-        doc = fitz.open(inp)
-        doc_out = fitz.open()
-
-        for idx, p in enumerate(doc):
-            images = p.get_images()
-
-            for idxi, i in enumerate(images):
-
-                try:
-                    xref = i[0]
-                    mask = i[1]
-                    img_bytes = doc.extract_image(xref)['image']
-                    # print(len(img_bytes))
-
-                    imgpix = fitz.Pixmap(img_bytes)
-                    imggray = fitz.Pixmap(fitz.csGRAY, imgpix)
-
-                    imggray.save(f'/home/leandro/TEMP/teste/jpg/teste-{idx:0>4}-{idxi:0>3}.jpg',
-                                 output='jpg', jpg_quality=30)
-                    img_bytes = imggray.tobytes(output='jpg', jpg_quality=30)
-
-                    # print(len(img_bytes))
-
-                    img_replace(p, xref, stream=img_bytes)
-                except:
-                    pass
-
-        for idx, p in enumerate(doc):
-            doc_out.insert_pdf(doc, from_page=idx, to_page=idx)
-
-        doc_out.save(outp, garbage=4, pretty=True,
-                     deflate=True, deflate_images=True,
-                     clean=True, linear=True)
-
-        return
         # post_save.disconnect(dispatch_uid='timerefresh_post_signal')
 
         # m = MateriaLegislativa.objects.get(pk=19819)
