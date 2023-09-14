@@ -83,10 +83,12 @@
               {{a}}{% if not forloop.last %}, {% endif %}
           {% endfor %}
         </div>
-        <div class="bg-white">
-          <p class="control-label p-3">Matérias Anexadas</p>
-          <div class="row px-3">
-            {% for anex in n.materia.anexadas.materias_anexadas_ordem_crescente %}
+        {% for anex in n.materia.anexadas.materias_anexadas_ordem_crescente %}
+          {% if forloop.first %}
+            <div class="bg-white">
+              <p class="control-label p-3">Matérias Anexadas</p>
+              <div class="row px-3">
+          {% endif %}
               <div class="col-lg-4 py-2" style="border-bottom: 1px solid #ccc;">
                 <small>
                   <a href="{% url 'sapl.materia:materialegislativa_detail' anex.pk %}">
@@ -95,9 +97,11 @@
                   <em>{{anex.ementa}}</em><br>
                 </small>
               </div>
-            {% endfor %}
-          </div>
-        </div>
+          {% if forloop.last %}
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
       {% endif %}
 
   </div>
