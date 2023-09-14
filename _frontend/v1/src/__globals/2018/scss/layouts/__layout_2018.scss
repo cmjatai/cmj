@@ -108,12 +108,11 @@
 
   .item-node {
     position: relative;
-    //border:1px solid #fffa;
-    //border-right-width: 0;
-    //border-bottom-width: 0;
+    border-left: 2px solid #fff0;
 
     &:hover {
-      //background-color: rgba(#fff, 0.5);
+      background-color: rgba(#fff, 0.5);
+      border-left-color: #ccc;
     }
     .item-node {
       &:hover {
