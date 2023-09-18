@@ -1,13 +1,9 @@
-import csv
 from datetime import timedelta
 
 from django.core.management.base import BaseCommand
-from django.db.models.fields import DateField
-from django.utils import formats, timezone
+from django.utils import timezone
 
 from cmj.arq.models import Draft
-from cmj.cerimonial.models import Endereco, Telefone, Contato
-from cmj.core.models import AreaTrabalho
 
 
 class Command(BaseCommand):
