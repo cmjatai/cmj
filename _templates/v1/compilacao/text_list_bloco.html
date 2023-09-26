@@ -28,7 +28,7 @@
               {{ dpt.tipo_dispositivo.rotulo_prefixo_html|safe }}
               <a class="dpt-link" name="{{dpt.pk}}" title="{{dpt.pk}}">{{ dpt.rotulo }}</a>{{ dpt.tipo_dispositivo.rotulo_sufixo_html|safe }}
             {% endif %}
-          
+
           {% endif %}
 
           <span class="dtxt" id="d{% if not dpt.dispositivo_subsequente_id and dpt.dispositivo_substituido_id %}a{% endif %}{{dpt.pk}}" pks="{{dpt.dispositivo_substituido_id|default:''}}" pk="{{dpt.pk}}">{{ dpt.tipo_dispositivo.texto_prefixo_html|safe }}{%if dpt.texto %}{{ dpt.texto|safe }}{%else%}{%if not dpt.tipo_dispositivo.dispositivo_de_articulacao %}&nbsp;{% endif %}{% endif %}</span>
@@ -148,8 +148,10 @@
                           {% endif %}
                         {% endif %}
                         <li class="ntipo">{{nota.tipo.nome}}</li>
-                        <li class="bullet">&#8226;</li>
-                        <li class="nowner" title="{% trans 'Criado Por' %}">{%if nota.owner.first_name%}{{nota.owner.first_name}}{%else%}{{nota.owner}}{% endif %}</li>
+                        {% if  user == nota.owner or nota.publicidade != nota.NPUBL %}
+                          <li class="bullet">&#8226;</li>
+                          <li class="nowner" title="{% trans 'Criado Por' %}">{%if nota.owner.first_name%}{{nota.owner.first_name}}{%else%}{{nota.owner}}{% endif %}</li>
+                        {% endif %}
                         <li class="bullet">&#8226;</li>
                         <li class="npublicacao" title="{% trans 'Data de Publicação'%}">{{nota.publicacao|date:"d M Y"}}</li>
                       </ul>
