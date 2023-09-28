@@ -80,11 +80,22 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
             'doação de corpos': True,
             'sessão ordinária': True
         }
+
         for d in docs:
             ed = d.extra_data
             if 'snippet' in ed and \
                 'liveBroadcastContent' in ed['snippet'] and\
-                    ed['snippet']['liveBroadcastContent'] == 'live':
+                    ed['snippet']['liveBroadcastContent'] == 'upcoming':
+                r.append(d)
+
+            if len(r) == 4:
+                return r
+
+        for d in docs:
+            ed = d.extra_data
+            if 'snippet' in ed and \
+                'liveBroadcastContent' in ed['snippet'] and\
+                    ed['snippet']['liveBroadcastContent'] in ('live', 'upcoming'):
                 continue
 
             is_ipd = False
