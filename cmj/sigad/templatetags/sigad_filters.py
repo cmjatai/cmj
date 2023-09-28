@@ -101,7 +101,7 @@ def caixa_publicacao_popup(key, request):
 
         #classe = Classe.objects.get(slug='popup')
         cp = CaixaPublicacao.objects.get(key=key, classe__slug='popup')
-        docs = cp.caixapublicacaorelationship_set.exclude(id__in=excludes)
+        docs = cp.caixapublicacaorelationship_set.exclude(id__in=excludes).order_by('pk')
 
         result = {'url_edit': 'cmj.sigad:caixapublicacao%s_update' % ('classe' if cp.classe_id else ''),
                   'cp': cp, 'docs':
