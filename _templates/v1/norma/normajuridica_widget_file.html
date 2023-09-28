@@ -5,7 +5,7 @@
 {% load webpack_static from webpack_loader %}
 
   <div class="row item-listas align-items-center justify-content-between">
-    <div class="col-12 col-md-auto justify-content-center">
+    <div class="d-print-none col-12 col-md-auto justify-content-center">
 
       {% if n.texto_integral %}
         {% if n.metadata.signs and n.metadata.locaweb and n.metadata.signs.texto_integral.signs and n.metadata.locaweb.texto_integral.hash == n.metadata.locaweb.texto_integral.original_hash %}
@@ -26,7 +26,6 @@
           <br>
           <strong>
             Imprimir<br>Texto Compilado
-
           </strong>
         </a>
 
