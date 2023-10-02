@@ -9,8 +9,9 @@
             <i class="fas fa-ellipsis-v"></i>
           </button>
           <div class="dropdown-menu">
-            <a class="dropdown-item" v-show="elemento.metadata.ocrmypdf.pdfa !== 99" title="PDF -> PDF/A-2b" @click="clickPdf2Pdfa">PDF -> PDF/A-2b</a>
-            <a class="dropdown-item" title="Gerar um PDF para cada página" @click="clickDecompor">Decompor <i class="fas fa-expand"></i></a>
+            <a class="dropdown-item" v-show="elemento.metadata.ocrmypdf.pdfa !== 99" title="PDF -> PDF/A-2b" @click="clickDraftmidiaAction('pdf2pdfa')">PDF -> PDF/A-2b</a>
+            <a class="dropdown-item" v-show="elemento.metadata.ocrmypdf.pdfa == 99" title="PDF/A-2b Compact" @click="clickDraftmidiaAction('pdfacompact')">PDF/A-2b Compact</a>
+            <a class="dropdown-item" title="Gerar um PDF para cada página" @click="clickDraftmidiaAction('decompor')">Decompor <i class="fas fa-expand"></i></a>
             <a class="dropdown-item" title="Apagar Mídia" @click="clickDel">Apagar <i class="fas fa-trash-alt"></i></a>
           </div>
         </div>
@@ -33,6 +34,7 @@
       </div>
       <div :class="['innerdesc', ]">
         <strong v-html="elemento.metadata.uploadedfile.name"></strong>
+        <small v-html="`${elemento.arquivo_size[1]} MB`"></small>
         <small v-show="elemento.metadata.ocrmypdf.pdfa === 99">PDF/A-2b com OCR</small>
       </div>
     </div>
@@ -88,20 +90,9 @@ export default {
           )
         })
     },
-    clickDecompor () {
+    clickDraftmidiaAction (action) {
       const t = this
-      t.utils.getModelAction('arq', 'draftmidia', t.elemento.id, 'decompor')
-        .then((response) => {
-          t.$emit('redrawDraftMidia')
-        }).catch((error) => {
-          t.sendMessage(
-            { alert: 'danger', message: error.response.data.message, time: 10 }
-          )
-        })
-    },
-    clickPdf2Pdfa () {
-      const t = this
-      t.utils.getModelAction('arq', 'draftmidia', t.elemento.id, 'pdf2pdfa')
+      t.utils.getModelAction('arq', 'draftmidia', t.elemento.id, action)
         .then((response) => {
           t.$emit('redrawDraftMidia')
         }).catch((error) => {
