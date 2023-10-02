@@ -93,7 +93,7 @@ def task_pull_youtube_live(*args, **kwargs):
                    timezone.now() + timedelta(seconds=300))
 
 
-@app.task(queue='celery', bind=True)
+#@app.task(queue='celery', bind=True)
 def task_pull_youtube_upcoming(*args, **kwargs):
 
     upcoming = Video.objects.filter(
@@ -129,7 +129,7 @@ def task_pull_youtube_upcoming(*args, **kwargs):
                 if scheduledStartTime < timezone.now():
                     scheduledStartTime = timezone.now() + timedelta(seconds=60)
 
-        if scheduledStartTime:
+        if scheduledStartTime and scheduledStartTime < (timezone.now() + timedelta(seconds=3600)):
             start_task('task_pull_youtube_upcoming',
                        task_pull_youtube_upcoming,
                        scheduledStartTime)
