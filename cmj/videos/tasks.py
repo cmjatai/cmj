@@ -1,4 +1,5 @@
 
+from _hashlib import new
 from asyncio.tasks import sleep
 from datetime import timedelta
 import logging
@@ -42,10 +43,10 @@ def start_task(task_name, task, eta):
     #logger.debug(f'{task_name} {eta} SET: {t_str}')
 
     if f'cmj.videos.tasks.{task_name}' not in tasks:
-        logger.debug(f'START TRUE {task_name} {eta}')
+        logger.info(f'START TRUE {task_name} {eta}')
         task.apply_async(eta=eta)
         return True
-    logger.debug(f'START FALSE {task_name} {eta}')
+    logger.info(f'START FALSE {task_name} {eta}')
     return False
 
 
@@ -101,27 +102,34 @@ def task_pull_youtube_upcoming(*args, **kwargs):
     if upcoming.exists():
 
         liveBroadcastContent = ''
+        scheduledStartTime = None
         for v in upcoming:
             try:
                 v = pull_youtube_metadata_video(v)
                 logger.info(
                     f'TASK UPCOMING {v.id} {v.vid} {v.created} {v.modified}')
                 liveBroadcastContent = v.json['snippet']['liveBroadcastContent']
-            except:
-                pass
+            except Exception as e:
+                logger.error(
+                    f'TASK UPCOMING {v.id} {v.vid} {v.created} {v.modified}')
 
-        if liveBroadcastContent == 'live':
-            start_task('task_pull_youtube_live',
-                       task_pull_youtube_live,
-                       timezone.now() + timedelta(seconds=60))
+            if liveBroadcastContent == 'live':
+                start_task('task_pull_youtube_live',
+                           task_pull_youtube_live,
+                           timezone.now() + timedelta(seconds=60))
 
-        elif liveBroadcastContent == 'upcoming':
-            scheduledStartTime = dateutil.parser.parse(
-                v.json['liveStreamingDetails']['scheduledStartTime'])
+            elif liveBroadcastContent == 'upcoming':
 
-            if scheduledStartTime < timezone.now():
-                scheduledStartTime = timezone.now() + timedelta(seconds=60)
+                newScheduledStartTime = dateutil.parser.parse(
+                    v.json['liveStreamingDetails']['scheduledStartTime'])
 
+                if not scheduledStartTime or newScheduledStartTime < scheduledStartTime:
+                    scheduledStartTime = newScheduledStartTime
+
+                if scheduledStartTime < timezone.now():
+                    scheduledStartTime = timezone.now() + timedelta(seconds=60)
+
+        if scheduledStartTime:
             start_task('task_pull_youtube_upcoming',
                        task_pull_youtube_upcoming,
                        scheduledStartTime)
