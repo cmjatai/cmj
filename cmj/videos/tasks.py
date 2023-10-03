@@ -93,7 +93,7 @@ def task_pull_youtube_live(*args, **kwargs):
                    timezone.now() + timedelta(seconds=300))
 
 
-#@app.task(queue='celery', bind=True)
+@app.task(queue='celery', bind=True)
 def task_pull_youtube_upcoming(*args, **kwargs):
 
     upcoming = Video.objects.filter(

@@ -31,9 +31,11 @@
   </div>
 {% endcomment %}
 
-  {% if not ""|transmissao_ao_vivo %}
+{% with ""|transmissao_ao_vivo as aovivo %}
+  {% if not aovivo.exists %}
     {% include "path/pagina_inicial_ultimos_videos.html" %}
   {% endif %}
+{% endwith %}
 
   <div class="container">
     <div class="row">

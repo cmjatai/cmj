@@ -60,7 +60,7 @@ def islist(object):
 def transmissao_ao_vivo(obj):
     return Video.objects.filter(
         json__snippet__liveBroadcastContent__exact='live'
-    ).exists()
+    )
 
 def get_class(class_string):
     if not hasattr(class_string, '__bases__'):

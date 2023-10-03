@@ -1,40 +1,44 @@
 {% load i18n  common_cmj_tags%}
 
-{% if ""|transmissao_ao_vivo %}
+{% with ""|transmissao_ao_vivo as aovivo %}
+  {% if aovivo.exists %}
   <div class="container-videos portlet-aovivo">
-    <div class="container">
-      <div class="row justify-content-center">
-        <div class="col-12 col-sm-8" id="aovivo_content">
-          <h2 class="title-container-noticias">TV Câmara - Ao Vivo</h2>
-          <div class="embed-responsive embed-responsive-16by9">
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/live_stream?channel=UCZXKjzKW2n1w4JQ3bYlrA-w" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;" allowfullscreen></iframe>
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-12 col-sm-8" id="aovivo_content">
+            <h2 class="title-container-noticias">TV Câmara - Ao Vivo</h2>
+            <div class="embed-responsive embed-responsive-16by9">
+              <iframe width="560" height="315" src="https://www.youtube.com/embed/{{aovivo.first.json.id}}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;" allowfullscreen></iframe>
+            </div>
+            {% comment %}
+              <iframe width="560" height="315" src="https://www.youtube.com/embed/live_stream?channel=UCZXKjzKW2n1w4JQ3bYlrA-w" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;" allowfullscreen></iframe>
+              <small><small>
+                {% with ""|transmissao_ao_vivo as v %}
+                  {{ v.json.liveStreamingDetails.concurrentViewers }} assistindo
+                  {% endwith %}
+                  &#8226;
+                  {% with ""|transmissao_ao_vivo as v %}
+                  Transmissão iniciada há {{ v.json.liveStreamingDetails.actualStartTime|parse_datetime|age:0}}
+                  {% endwith %}
+                </small></small>
+            {% endcomment %}
           </div>
           {% comment %}
-            <small><small>
-              {% with ""|transmissao_ao_vivo as v %}
-                {{ v.json.liveStreamingDetails.concurrentViewers }} assistindo
-              {% endwith %}
-              &#8226;
-              {% with ""|transmissao_ao_vivo as v %}
-                Transmissão iniciada há {{ v.json.liveStreamingDetails.actualStartTime|parse_datetime|age:0}}
-              {% endwith %}
-            </small></small>
+            <div class="col-4 video-list">
+            {% with " " as grid %}
+            {% for doc in ultimos_videos%}
+                {% include 'path/path_galeria_video_item.html' %}
+              {% endfor %}
+            {% endwith %}
+            </div>
           {% endcomment %}
         </div>
-        {% comment %}
-          <div class="col-4 video-list">
-          {% with " " as grid %}
-            {% for doc in ultimos_videos%}
-              {% include 'path/path_galeria_video_item.html' %}
-            {% endfor %}
-          {% endwith %}
-          </div>
-        {% endcomment %}
       </div>
     </div>
-  </div>
 
-  {% include "path/pagina_inicial_ultimos_videos.html" %}
-  {% comment %}
-  {% endcomment %}
-{% endif %}
+    {% include "path/pagina_inicial_ultimos_videos.html" %}
+    {% comment %}
+    {% endcomment %}
+    {% endif %}
+
+{% endwith %}
