@@ -3297,7 +3297,7 @@ class MateriaLegislativaCheckView(ListView):
 
         qs = qs.filter(checkcheck=False)
 
-        qs = qs.order_by('tipo__sequencia_regimental','-data_apresentacao')
+        qs = qs.order_by('tipo__sequencia_regimental','-data_apresentacao', '-numero')
 
         return qs
 
