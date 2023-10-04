@@ -28,6 +28,7 @@ from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
+from cmj.api.serializers import DraftMidiaSerializer
 from cmj.arq import tasks
 from cmj.arq.models import DraftMidia, Draft
 from cmj.utils import TIPOS_IMG_PERMITIDOS, TIPOS_MIDIAS_PERMITIDOS
@@ -339,6 +340,7 @@ class _Draft:
 
 @customize(DraftMidia)
 class _DraftMidia(ResponseFileMixin):
+    serializer_class = DraftMidiaSerializer
 
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
@@ -426,9 +428,9 @@ class _DraftMidia(ResponseFileMixin):
             'arquivo',
             [dm.id, ],
             2,
-            True
+            # True
             #),
-            # countdown=1
+            # countdown=10
         )
         serializer = self.get_serializer(dm)
         return Response(serializer.data)
