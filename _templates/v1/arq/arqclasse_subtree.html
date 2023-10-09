@@ -1,7 +1,7 @@
 {% load i18n common_cmj_tags %}
 <ul class="ul-nivel{{object.nivel}}" id="childs-from-{{object.id}}" data="{{ object.nivel }}">
   {% for o in object.childs.all %}
-    {% if forloop.counter0|divisibleby:"2" and not object.nivel and request.GET.view == 'tree2' %}
+    {% if forloop.counter0|divisibleby:"2" and object.nivel == 1 and request.GET.view == 'tree2' %}
       <li class="space-tree"></li>
     {% endif %}
     <li class="li-nivel{{o.nivel}} {% if not o.descricao %}vazio{% endif %}">
@@ -10,7 +10,6 @@
           {{ o.conta }} - {{ o.titulo }}
         </a>
         <small class="text-black-50">
-          <small>
             -
             <i>
               {{o.parent.titulo}}
@@ -21,22 +20,20 @@
             <i>
               {{o.parent.parent.parent.titulo}}
             </i>
-          </small>
-        </small>
-        <small>
-          <i class="text-secondary">
-            {{o.descricao|linebreaksbr}}
-          </i>
+            <i class="text-secondary">
+              {{o.descricao|linebreaksbr}}
+            </i>
         </small>
       </span>
       {% with o as object %}
         {% include 'arq/arqclasse_subtree.html' %}
       {% endwith %}
-    {% if forloop.last and not object.nivel %}
-      <li class="space-tree"></li>
-      {% elif forloop.last and object.nivel == 1 %}
-      <li class="space-tree"></li>
-    {% endif %}
+
+      {% if forloop.last and object.nivel == 1 %}
+        <li class="space-tree"></li>
+      {% elif forloop.last and object.nivel == 2 %}
+        <li class="space-tree"></li>
+      {% endif %}
     </li>
   {% endfor %}
 </ul>

@@ -5,8 +5,14 @@
 
 export const routes = [
   {
-    path: '/arq/draft',
-    component: () => import('@/layouts/arq/draft/DraftManage')
+    path: '/arq/',
+    component: () => import('@/layouts/arq/ArqLayout'),
+    children: [
+      {
+        path: 'draft',
+        component: () => import('@/layouts/arq/draft/DraftManage')
+      }
+    ]
   },
   {
     path: '/online',

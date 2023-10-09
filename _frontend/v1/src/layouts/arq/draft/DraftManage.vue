@@ -84,9 +84,6 @@ export default {
           t.$refs.draftSelect.fetchModel()
         })
     }
-  },
-  mounted: function () {
-    this.removeAside()
   }
 }
 </script>

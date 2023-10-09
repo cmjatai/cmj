@@ -17,7 +17,7 @@
             <slot name="brand"></slot>
         </div>
         <div class="header-detail">
-          <slot name="header-detail"></slot>
+          a<slot name="header-detail"></slot>
         </div>
       </div>
 

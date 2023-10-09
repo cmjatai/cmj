@@ -69,8 +69,7 @@ def time_refresh_log_test(request):
     return render(request, 'core/time_refresh_log_test.html', {})
 
 
-def app_vue_view(request):
-
+def app_vue_view(request, slug):
     return render(request, 'app_vue.html')
 
 

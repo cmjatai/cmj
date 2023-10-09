@@ -9,15 +9,11 @@ from .apps import AppConfig
 app_name = AppConfig.name
 urlpatterns_arq = [
 
-    url(r'^draft$',
-        app_vue_view, name='app_vue_draft_view_url'),
-
     url(r'^classe/create$',
         views.ArqClasseCreateView.as_view(), name='arqclasse_create'),
 
     url(r'^classe/(?P<pk>[0-9]+)/create$',
         views.ArqClasseCreateView.as_view(), name='subarqclasse_create'),
-
 
     url(r'^classe/(?P<pk>[0-9]+)/edit$',
         views.ArqClasseUpdateView.as_view(), name='arqclasse_edit'),
@@ -30,6 +26,9 @@ urlpatterns_arq = [
 
     url(r'^classe/(?P<pk>[0-9]+)$',
         views.ArqClasseListView.as_view(), name='subarqclasse_list'),
+
+    url(r'^(?P<slug>[^.]*)$',
+        app_vue_view, name='app_vue_arq_view_url'),
 
 ]
 

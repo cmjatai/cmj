@@ -524,8 +524,9 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
                         if self.documento:
                             return redirect('/' + self.documento.slug)
                     except:
-                        view = PaginaInicialView.as_view()(request, *args, **kwargs)
-                        return view
+                        raise Http404()
+                        #view = PaginaInicialView.as_view()(request, *args, **kwargs)
+                        # return view
 
         if self.documento and self.documento.tipo in Documento.TDp_exclude_render:
             raise Http404()
