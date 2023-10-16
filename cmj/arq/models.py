@@ -325,6 +325,14 @@ class ArqClasse(Parent):
         parents = self.parent.strparents + [self.parent.titulo, ]
         return parents
 
+    @property
+    def parents(self):
+        if not self.parent:
+            return []
+
+        parents = self.parent.parents + [self.parent, ]
+        return parents
+
     def __str__(self):
         parents = self.strparents
         parents.append(self.titulo)

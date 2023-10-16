@@ -12,7 +12,7 @@ from rest_framework.fields import empty, JSONField, ChoiceField,\
 from rest_framework.relations import RelatedField, ManyRelatedField,\
     MANY_RELATION_KWARGS
 
-from cmj.arq.models import DraftMidia
+from cmj.arq.models import DraftMidia, ArqClasse
 from cmj.core.models import Bi
 from cmj.sigad.models import Documento, ReferenciaEntreDocumentos,\
     DOC_TEMPLATES_CHOICE, CMSMixin
@@ -303,3 +303,14 @@ class DraftMidiaSerializer(SaplSerializerMixin):
 
     class Meta(SaplSerializerMixin.Meta):
         model = DraftMidia
+
+
+class ArqClasseSerializer(SaplSerializerMixin):
+
+    parents = serializers.SerializerMethodField()
+
+    def get_parents(self, obj):
+        return map(lambda x: {'id': x.id, 'titulo': x.titulo}, obj.parents)
+
+    class Meta(SaplSerializerMixin.Meta):
+        model = ArqClasse

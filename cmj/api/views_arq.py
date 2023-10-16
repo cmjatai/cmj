@@ -28,9 +28,9 @@ from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from cmj.api.serializers import DraftMidiaSerializer
+from cmj.api.serializers import DraftMidiaSerializer, ArqClasseSerializer
 from cmj.arq import tasks
-from cmj.arq.models import DraftMidia, Draft
+from cmj.arq.models import DraftMidia, Draft, ArqClasse
 from cmj.utils import TIPOS_IMG_PERMITIDOS, TIPOS_MIDIAS_PERMITIDOS
 from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize
 import sapl
@@ -486,3 +486,8 @@ class _DraftMidia(ResponseFileMixin):
 
         serializer = self.get_serializer(dm)
         return Response(serializer.data)
+
+
+@customize(ArqClasse)
+class _ArqClasse:
+    serializer_class = ArqClasseSerializer

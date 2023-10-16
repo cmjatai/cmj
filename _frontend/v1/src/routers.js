@@ -11,6 +11,18 @@ export const routes = [
       {
         path: 'draft',
         component: () => import('@/layouts/arq/draft/DraftManage')
+      },
+      {
+        path: ':node/',
+        name: 'adminroute',
+        component: () => import('@/layouts/arq/admin/AdminLayout'),
+        children: [
+          {
+            path: ':nodechild/',
+            name: 'childroute',
+            component: () => import('@/layouts/arq/admin/DocListLayout')
+          }
+        ]
       }
     ]
   },
