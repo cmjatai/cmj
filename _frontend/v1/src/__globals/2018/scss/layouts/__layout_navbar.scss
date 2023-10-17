@@ -413,7 +413,8 @@
         border-color: transparent transparent #fff;
         right: 60px;
         top: 0;
-      }.row {
+      }
+      .row {
         margin: -8px;
         .col-md {
           padding: 8px;
@@ -434,6 +435,33 @@
     &:hover {
       .popup-sic {
         display: block;
+      }
+    }
+    .item-sic a {
+      & > .sic-descricao {
+        display: none;
+        position: absolute;
+        background-color: white;
+        box-shadow: 0px 10px 30px #0007;
+        padding: 3px 5px;
+        left: 60px;
+        right: 0;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        font-size: 85%;
+        line-height: 1.15;
+        color: #747c01;
+        font-style: italic;
+      }
+      &:hover {
+        .sic-descricao {
+          display: block;
+        }
+      }
+    }
+    .subclasse-sic {
+      & > a {
+        color: #333;
       }
     }
   }

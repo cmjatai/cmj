@@ -72,9 +72,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.logger = logging.getLogger(__name__)
-        #m = Manutencao()
-        # m.desativa_auto_now()
-        # m.desativa_signals()
+        m = Manutencao()
+        m.desativa_auto_now()
+        m.desativa_signals()
 
         task_pull_youtube_upcoming()
 

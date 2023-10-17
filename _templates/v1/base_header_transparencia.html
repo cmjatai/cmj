@@ -1,32 +1,49 @@
-{% load i18n cache sigad_filters%}
+{% load i18n cache sigad_filters common_cmj_tags%}
 
 {% cache 600 cache_acesso_informacao %}
 <div class="container-transparencia">
   <a class="link-radar" href="https://radar.tce.mt.gov.br/extensions/radar-da-transparencia-publica/radar-da-transparencia-publica.html">Radar<br>de Transparência Pública</a>
   <div class="container-e-sic">
     <a class="link-e-sic">Acesso à<br>Informação</a>
-    <div class="popup-sic {% if False and DEBUG %}d-block{% endif %}">
+    <div class="popup-sic {% if True and DEBUG and request.scope.path == '/' %}d-block{% endif %}">
 
       <div class="inner">
         <div class="row">
           {% for col in None|list_in_informacao %}
             <div class="col-md">
               {% for classe in col %}
-                <div class="subclasse-sic {% if classe.visibilidade and perms.sigad %}text-red{% endif %}">
-                  <span class="titulo">{{classe.apelido|default:classe.titulo}}</span>
+                <div class="subclasse-sic item-sic {% if classe.visibilidade and perms.sigad %}text-red{% endif %}">
+                  <a class="titulo">{{classe.apelido|default:classe.titulo}}
+                    {% if col.descricao %}
+                      <span class="sic-descricao">
+                        {{col.descricao}}
+                      </span>
+                    {% endif %}
+                  </a>
                   <ul>
                   {% for item in classe|list_in_informacao %}
                     {% if item.visibilidade == 0 %}
-                      <li>
-                        <a href="/{{item.absolute_slug}}">{{item.apelido|default:item.titulo}}</a>
-
+                      <li class="item-sic">
+                        <a href="/{{item.absolute_slug}}">{{item.apelido|default:item.titulo}}
+                          {% if item.descricao %}
+                            <span class="sic-descricao">
+                              {{item.descricao}}
+                            </span>
+                          {% endif %}
+                        </a>
                         {% for child in item|list_in_informacao %}
                           {% if forloop.first %}
                             <ul>
                           {% endif %}
-                              <li>
-                                <a href="/{{child.absolute_slug}}">{{child.apelido|default:child.titulo}}</a>
-                              </li>
+                            <li class="item-sic">
+                              <a href="/{{child.absolute_slug}}">{{child.apelido|default:child.titulo}}
+                                {% if child.descricao %}
+                                  <span class="sic-descricao">
+                                    {{child.descricao}}
+                                  </span>
+                              </a>
+                              {% endif %}
+                            </li>
                           {% if forloop.last %}
                             </ul>
                           {% endif %}
@@ -36,6 +53,7 @@
                       {% if perms.sigad %}
                         <li>
                           <a class="text-red" href="/{{item.absolute_slug}}">{{item.apelido|default:item.titulo}}</a>
+                          c
                         </li>
                       {% endif %}
                     {% endif %}
