@@ -6,7 +6,6 @@
 {% if d.texto_integral %}
   <div class="row item-listas align-items-center file-documentoadministrativo justify-content-between">
     <div class="col-12 col-md-auto justify-content-center">
-
       {% if d.metadata.signs and d.metadata.signs.texto_integral.signs %}
         <a class="link-texto" href="{{d.texto_integral.url}}" title="Documento Eletrônico">
           <i class="fas fa-2x fa-certificate"></i>
@@ -44,5 +43,15 @@
         </div>
       </div>
     {% endif %}
+  </div>
+{% else %}
+  <div class="row item-listas align-items-center file-documentoadministrativo justify-content-between">
+      {% if render_ementa %}
+        <div class="col{% if d.metadata.signs.texto_integral.signs %}-12{% endif %}">
+          <div class="text-ementa">
+            {{d.assunto|safe}}
+          </div>
+        </div>
+      {% endif %}
   </div>
 {% endif %}

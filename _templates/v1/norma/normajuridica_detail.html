@@ -39,22 +39,6 @@
       </div>
     {% endif %}
 
-    {% if object.materia %}
-      <p class="control-label">Matéria Legislativa</p>
-      <div class="form-control-static mb-3">
-        <a href="{% url 'sapl.materia:materialegislativa_detail' object.materia.pk %}">
-        {{object.materia}}
-        </a>
-        {% for a in object.materia.autores.all %}
-          {% if forloop.first %}
-            <br>
-            <b>Autoria:</b>&nbsp;
-          {% endif %}
-            {{a}}{% if not forloop.last %}, {% endif %}
-        {% endfor %}
-      </div>
-    {% endif %}
-
     {% if object.get_anexos_norma_juridica|length > 0 %}
       <p class="control-label">Anexos Norma Jurídica</p>
         <div class="form-control-static mb-3">
@@ -76,12 +60,12 @@
       </div>
     {% endif %}
 
-        {% if object.observacao %}
-          <p class="control-label">Observações</p>
-          <div class="form-control-static mb-3">
-              {{object.observacao}}
-          </div>
-        {% endif %}
+    {% if object.observacao %}
+      <p class="control-label">Observações</p>
+      <div class="form-control-static mb-3">
+          {{object.observacao}}
+      </div>
+    {% endif %}
 
 
 
@@ -106,6 +90,32 @@
           </a>
         </div>
       {% endfor %}
+    {% endif %}
+
+    {% if object.materia %}
+      <p class="control-label">Matéria Legislativa</p>
+      <div class="form-control-static mb-3">
+        <a href="{% url 'sapl.materia:materialegislativa_detail' object.materia.pk %}">
+        {{object.materia}}
+        </a>
+        {% for a in object.materia.autores.all %}
+          {% if forloop.first %}
+            <br>
+            <b>Autoria:</b>&nbsp;
+          {% endif %}
+            {{a}}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+      </div>
+      {% if object.materia.documentoadministrativo_set.exists %}
+        <p class="control-label">Documentos Administrativos Vinculados a Matéria</p>
+        <div class="bg-white p-3">
+            <small>
+              {% with object.materia.documentoadministrativo_set.all as doc_list %}
+              {% include 'protocoloadm/documentoadministrativo_widget_materia.html' %}
+              {% endwith %}
+            </small>
+        </div>
+      {% endif %}
     {% endif %}
   </div>
 </div>

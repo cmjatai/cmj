@@ -164,40 +164,6 @@
     </div>
   {% endif %}
 
-  {% if user.is_superuser %}
-    <div class="container">
-    <div class="row">
-      {% if materialegislativa.user %}
-        <div class="col-sm-6">
-          <div id="div_id_user" class="form-group">
-            <p class="control-label">Usuário</p>
-            <div class="controls">
-              <div class="form-control-static">
-                <div class="dont-break-out">
-                  <a href="{% url 'cmj.core:user_update' materialegislativa.user.pk %}">{{materialegislativa.user}}</a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      {% endif %}
-      {% if materialegislativa.ip %}
-        <div class="col-sm-6">
-          <div id="div_ip_user" class="form-group">
-            <p class="control-label">IP</p>
-            <div class="controls">
-              <div class="form-control-static">
-                <div class="dont-break-out">{{materialegislativa.ip}}</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      {% endif %}
-    </div>
-    </div>
-  {% endif %}
-
-
   {% if object.registrovotacao_set.exists %}
     <div class="pt-4">
       <table class="table">
@@ -253,10 +219,6 @@
                   </div>
                 {% endif %}
               {% endfor %}
-
-
-
-
             </td>
             <td>
               {{ rv.tipo_votacao }}
@@ -293,6 +255,39 @@
     <br>
     {% include "materia/tramitacao_list_container.html" %}
   {% endwith %}
+
+  {% if user.is_superuser %}
+    <div class="container pt-5">
+    <div class="row">
+      {% if materialegislativa.user %}
+        <div class="col-sm-6">
+          <div id="div_id_user" class="form-group">
+            <p class="control-label">Usuário</p>
+            <div class="controls">
+              <div class="form-control-static">
+                <div class="dont-break-out">
+                  <a href="{% url 'cmj.core:user_update' materialegislativa.user.pk %}">{{materialegislativa.user}}</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+      {% if materialegislativa.ip %}
+        <div class="col-sm-6">
+          <div id="div_ip_user" class="form-group">
+            <p class="control-label">IP</p>
+            <div class="controls">
+              <div class="form-control-static">
+                <div class="dont-break-out">{{materialegislativa.ip}}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+    </div>
+  {% endif %}
 
 
 {% endblock detail_content %}
