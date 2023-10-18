@@ -2154,12 +2154,19 @@ class MateriaLegislativaCrud(Crud):
                 for d in m.documentoacessorio_set.all():
                     m_paths.append((d, getattr(d.arquivo, ff)))
 
+            def get_docadm_anexados_from(d):
+                if d.texto_integral:
+                    p = getattr(d.texto_integral, ff)
+                    m_paths.append((d, p))
+
+                for danex in d.anexados.all():
+                    get_docadm_anexados_from(danex)
+
             get_anexadas_from(principal)
 
             docs = principal.documentoadministrativo_set.all()
             for d in docs:
-                p = getattr(d.texto_integral, ff)
-                m_paths.append((d, p))
+                get_docadm_anexados_from(d)
 
             m_paths = list(set(m_paths))
 
@@ -2170,17 +2177,19 @@ class MateriaLegislativaCrud(Crud):
                     for i, p in m_paths:
 
                         if isinstance(i, DocumentoAcessorio):
-                            arcname = '{}-{}-{}-{}.{}'.format(
-                                i.id,
+                            arcname = 'da-{}-{}-{}-{}.{}'.format(
                                 i.ano,
+                                i.id,
                                 slugify(i.tipo.descricao),
                                 slugify(i.nome),
                                 p.split('.')[-1]
                             )
                         else:
-                            arcname = '{}-{}-{:02d}-{}-{}.{}'.format(
-                                i.id,
+                            arcname = '{}-{}-{}-{:02d}-{}-{}.{}'.format(
+                                'ml' if isinstance(
+                                    i, MateriaLegislativa) else 'docadm-vinculados/da',
                                 i.ano,
+                                i.id,
                                 i.numero,
                                 slugify(i.tipo.sigla),
                                 slugify(i.tipo.descricao),
@@ -3297,7 +3306,8 @@ class MateriaLegislativaCheckView(ListView):
 
         qs = qs.filter(checkcheck=False)
 
-        qs = qs.order_by('tipo__sequencia_regimental','-data_apresentacao', '-numero')
+        qs = qs.order_by('tipo__sequencia_regimental',
+                         '-data_apresentacao', '-numero')
 
         return qs
 
