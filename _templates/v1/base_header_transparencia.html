@@ -14,9 +14,9 @@
               {% for classe in col %}
                 <div class="subclasse-sic item-sic {% if classe.visibilidade and perms.sigad %}text-red{% endif %}">
                   <a class="titulo">{{classe.apelido|default:classe.titulo}}
-                    {% if col.descricao %}
+                    {% if classe.descricao %}
                       <span class="sic-descricao">
-                        {{col.descricao}}
+                        {{classe.descricao|safe|linebreaksbr}}
                       </span>
                     {% endif %}
                   </a>
@@ -24,25 +24,35 @@
                   {% for item in classe|list_in_informacao %}
                     {% if item.visibilidade == 0 %}
                       <li class="item-sic">
-                        <a href="/{{item.absolute_slug}}">{{item.apelido|default:item.titulo}}
-                          {% if item.descricao %}
-                            <span class="sic-descricao">
-                              {{item.descricao}}
-                            </span>
+                        <div>
+                          <a href="/{{item.absolute_slug}}">{{item.apelido|default:item.titulo}}
+                            {% if item.descricao %}
+                              <span class="sic-descricao">
+                                {{item.descricao|safe|linebreaksbr}}
+                              </span>
+                            {% endif %}
+                          </a>
+                          {% if perms.sigad %}
+                            <a class="btn-edit-classe" href="{% url "cmj.sigad:classe_edit" item.id %}"><i class="fas fa-edit"></i></a>
                           {% endif %}
-                        </a>
+                        </div>
                         {% for child in item|list_in_informacao %}
                           {% if forloop.first %}
                             <ul>
                           {% endif %}
                             <li class="item-sic">
-                              <a href="/{{child.absolute_slug}}">{{child.apelido|default:child.titulo}}
-                                {% if child.descricao %}
+                              <div>
+                                <a href="/{{child.absolute_slug}}">{{child.apelido|default:child.titulo}}
+                                  {% if child.descricao %}
                                   <span class="sic-descricao">
-                                    {{child.descricao}}
+                                    {{child.descricao|safe|linebreaksbr}}
                                   </span>
-                              </a>
-                              {% endif %}
+                                  {% endif %}
+                                </a>
+                                {% if perms.sigad %}
+                                  <a class="btn-edit-classe" href="{% url "cmj.sigad:classe_edit" child.id %}"><i class="fas fa-edit"></i></a>
+                                {% endif %}
+                              </div>
                             </li>
                           {% if forloop.last %}
                             </ul>
