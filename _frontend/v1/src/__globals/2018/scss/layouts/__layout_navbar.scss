@@ -476,17 +476,13 @@
         }
       }
     }
-    .subclasse-sic {
-      & > div > a {
-        color: #333;
-      }
-    }
   }
   .titulo {
     font-weight: bold;
     //padding-bottom: 7px;
     display: inline-block;
     font-variant: small-caps;
+    color: #333;
   }
   ul {
     padding-inline-start: 30px;
