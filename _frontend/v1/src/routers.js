@@ -14,12 +14,12 @@ export const routes = [
       },
       {
         path: ':node/',
-        name: 'adminroute',
+        name: 'arqadminroute',
         component: () => import('@/layouts/arq/admin/AdminLayout'),
         children: [
           {
             path: ':nodechild/',
-            name: 'childroute',
+            name: 'arqchildroute',
             component: () => import('@/layouts/arq/admin/DocListLayout')
           }
         ]

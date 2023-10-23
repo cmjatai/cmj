@@ -14,7 +14,7 @@
         </div>
       </div>
       <div id="col-docs">
-        <router-view :key="$route.fullPath"></router-view>
+        <router-view :key="$route.fullPath" ref="selectednode" @checkIsOpenedNodesTree="checkIsOpenedNodesTree"></router-view>
       </div>
     </div>
   </div>
@@ -25,35 +25,66 @@ import Split from 'split.js'
 export default {
   name: 'admin-layout',
   components: { NodeLayout },
+  data () {
+    return {
+      node_key_localstorage: 'portalcmj_arqnode_tree_opened',
+      check_opened: 0
+    }
+  },
   watch: {
     $route: function (nv, old) {
-      this.$refs.noderoot.node_params = this.$route.params.node
-      this.$refs.noderoot.nodechild_params = this.$route.params.nodechild
-      this.$refs.noderoot.reload()
+      if (nv.name === 'arqchildroute' && nv.params.node !== old.params.node) {
+        this.$refs.noderoot.node_params = nv.params.node
+        this.$refs.noderoot.nodechild_params = nv.params.nodechild
+        this.$refs.noderoot.reload()
+      }
     }
   },
   methods: {
+    checkIsOpenedNodesTree () {
+      this.check_opened += 1
+    },
     clickCollapseAll () {
       if (this.$refs.noderoot.is_opened) {
-        localStorage.clearArrayOfIds('portalcmj_arqnode_tree_opened')
-        this.$refs.noderoot.reload()
+        localStorage.clearArrayOfIds(this.node_key_localstorage)
+        this.$refs.noderoot.is_opened = false
+        // this.$refs.noderoot.reload()
       } else {
         const node = this.$refs.noderoot.node
         let node_parent = ''
-
         if (node !== null && node.parent !== null) {
           node_parent = node.parent
         } else {
           node_parent = 'root'
         }
-        if ((!_.isEmpty(node) && node.id !== node_parent) || this.$route.params.nodechild !== undefined) {
+        let selectednode = this.$refs.selectednode
+        if (!_.isEmpty(selectednode) && !_.isEmpty(selectednode.classe) && selectednode.classe.parent != null) {
+          let name = 'arqchildroute'
+          let params = {
+            node: node_parent,
+            nodechild: selectednode.classe.parent
+          }
+          localStorage.delItemArrayOfIds(this.node_key_localstorage, selectednode.classe.parent)
           this.$router.push({
-            name: 'adminroute',
-            params: {
-              node: node_parent
-            }
+            name,
+            params
+          })
+        } else if ((!_.isEmpty(node) && node.id !== node_parent) || this.$route.params.nodechild !== undefined) {
+          let name = 'arqadminroute'
+          let params = {
+            node: node_parent
+          }
+          if (node_parent !== 'root') {
+            params['nodechild'] = node_parent
+            name = 'arqchildroute'
+          }
+          this.$router.push({
+            name,
+            params
           })
         } else {
+          localStorage.clearArrayOfIds(this.node_key_localstorage)
+          this.$refs.noderoot.reload()
           this.sendMessage(
             { alert: 'danger', message: 'Topo atingido!', time: 2 })
         }

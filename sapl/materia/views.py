@@ -2177,7 +2177,7 @@ class MateriaLegislativaCrud(Crud):
                     for i, p in m_paths:
 
                         if isinstance(i, DocumentoAcessorio):
-                            arcname = 'da-{}-{}-{}-{}.{}'.format(
+                            arcname = 'DA-{}-{}-{}-{}.{}'.format(
                                 i.ano,
                                 i.id,
                                 slugify(i.tipo.descricao),
@@ -2186,7 +2186,7 @@ class MateriaLegislativaCrud(Crud):
                             )
                         else:
                             arcname = '{}-{}-{}-{:02d}-{}-{}.{}'.format(
-                                'ml' if isinstance(
+                                'ML' if isinstance(
                                     i, MateriaLegislativa) else 'docadm-vinculados/da',
                                 i.ano,
                                 i.id,

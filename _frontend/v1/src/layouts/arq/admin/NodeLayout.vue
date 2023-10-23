@@ -1,5 +1,9 @@
 <template>
-  <div :class="['node-element', node !== null && node.perfil === 1 ? 'type-content': '']">
+  <div :class="
+    ['node-element',
+    node !== null && node.perfil === 1 ? 'type-content': '',
+    node !== null && node.id === parseInt(nodechild_params) ? 'active': ''
+    ]">
     <div :class="['node-titulo', `level-${level}`]" v-if="node">
       <span class="spacer"></span>
       <span class="toggle" v-if="node.perfil !== 1" @click="clickToggle">
@@ -7,9 +11,12 @@
         <i v-if="is_opened && childs" class="fas fa-chevron-down"></i>
       </span>
       <span class="content">
-        <router-link :to="{ name: 'childroute', params: { node: node_params, nodechild: node.id } }">{{ node.titulo }}</router-link>
+        <router-link :to="{ name: 'arqchildroute', params: { node: node_params, nodechild: node.id } }"
+          @click.native="clickRoute">
+          {{ node.id }} - {{ node.titulo }}
+        </router-link>
         <div class="btn-group btn-group-sm el-actions">
-          <a :href="`/arq/${node.id}`" class="btn btn-link">
+          <a :href="`/arq/${node.id}/${node.id}`" class="btn btn-link">
             <i class="fas fa-expand"></i>
           </a>
         </div>
@@ -31,7 +38,8 @@ export default {
       node_params: this.$route.params.node,
       nodechild_params: this.$route.params.nodechild,
       node: null,
-      node_key_localstorage: 'portalcmj_arqnode_tree_opened'
+      node_key_localstorage: 'portalcmj_arqnode_tree_opened',
+      click_title: false
     }
   },
   mounted () {
@@ -52,13 +60,38 @@ export default {
         localStorage.addArrayOfIds(this.node_key_localstorage, this.node.id)
       } else {
         this.$set(this, 'childs', {})
-        localStorage.delItemArrayOfIds(this.node_key_localstorage, this.node.id)
+        if (!_.isEmpty(this.node)) {
+          localStorage.delItemArrayOfIds(this.node_key_localstorage, this.node.id)
+        }
       }
+    },
+    $route: function (nv, old) {
+      const t = this
+      t.node_params = nv.params.node
+      t.nodechild_params = nv.params.nodechild
+      // console.log(nv)
+      t.$nextTick()
+        .then(function () {
+          t.openIfInArrayOfIds()
+        })
     }
   },
   methods: {
+    clickRoute () {
+      if (this.click_title) {
+        this.clickToggle()
+      } else {
+        this.click_title = true
+      }
+    },
     clickToggle () {
       this.is_opened = !this.is_opened
+    },
+    openIfInArrayOfIds () {
+      if (!_.isEmpty(this.node) && !this.is_opened && localStorage.inArrayOfIds(this.node_key_localstorage, this.node.id)) {
+        this.is_opened = true
+        this.fetch(1, `&get_all=True&parent=${this.node.id}`)
+      }
     },
     reload () {
       const _this = this
@@ -74,10 +107,7 @@ export default {
               })
           })
       } else {
-        if (localStorage.inArrayOfIds(this.node_key_localstorage, this.node.id)) {
-          this.is_opened = true
-          this.fetch(1, `&get_all=True&parent=${this.node.id}`)
-        }
+        _this.openIfInArrayOfIds()
       }
     },
     fetch (page = 1, query_string = '') {
@@ -164,23 +194,23 @@ export default {
       small {
         padding: 7px;
         font-style: italic;
-        font-size: 110%;
+        font-size: 90%;
         color: #444;
         position: absolute;
         display: none;
-        background-color: white;
-        z-index: 1;
+        background-color: #fff;
         left: 40px;
         top: 100%;
+        right: -18px;
         margin-top: -3px;
-        white-space: nowrap;
         border: 1px solid #aaa;
       }
       &:hover {
-        background-color: #0001;
+        background-color: #0002;
         border-bottom: 1px solid #aaa;
         small {
-          display: block;
+          display: inline-block;
+          z-index: 1;
         }
         .toggle {
           color: #000;
@@ -194,6 +224,10 @@ export default {
       .node-titulo {
         padding-left: 10px;
       }
+    }
+    &.active > .node-titulo {
+      background-color: #0001;
+      border-bottom: 1px solid #ddd;
     }
   }
 }
