@@ -7,7 +7,7 @@
       <table class="table">
       {% for m in materias_ordem %}
         <tr>
-          <td class="item-listas">
+          <td class="item-listas" id="id{{m.materia.id}}">
             <div class="item-raiz">
               <strong>
                 {{m.numero}} - {{m.titulo}}
@@ -18,7 +18,6 @@
               <b>Turno:</b> {{m.turno|default:''}} |
               <b>Autor{{ m.autor|length|pluralize:"es" }}</b>: {{ m.autor|join:', ' }}
               <div class="text-ementa">{{ m.ementa }}</div>
-
               <small>
                 {% with m.materia.tramitacao_set.first as tram %}
                   {% if tram.unidade_tramitacao_destino %}

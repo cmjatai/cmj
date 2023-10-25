@@ -308,9 +308,18 @@ class DraftMidiaSerializer(SaplSerializerMixin):
 class ArqClasseSerializer(SaplSerializerMixin):
 
     parents = serializers.SerializerMethodField()
+    conta = serializers.SerializerMethodField()
+
+    count_childs = serializers.SerializerMethodField()
 
     def get_parents(self, obj):
         return map(lambda x: {'id': x.id, 'titulo': x.titulo}, obj.parents)
+
+    def get_conta(self, obj):
+        return obj.conta
+
+    def get_count_childs(self, obj):
+        return obj.childs.count()
 
     class Meta(SaplSerializerMixin.Meta):
         model = ArqClasse

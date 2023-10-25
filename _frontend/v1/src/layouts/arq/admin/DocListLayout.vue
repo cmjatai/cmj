@@ -14,6 +14,10 @@
       <div class="col">
         <h2>{{ classe.titulo }}</h2>
         <small v-html="descricao_html"></small>
+
+        <div v-for="doc, k in arqdocs" :key="`ad-${k}`">
+          {{ doc.titulo }}
+        </div>
       </div>
       <div class="col-3 d-none">
         <div class="classechild">
@@ -34,7 +38,8 @@ export default {
       params_node: this.$route.params.node,
       params_nodechild: this.$route.params.nodechild,
       classe: null,
-      node_key_localstorage: 'portalcmj_arqnode_tree_opened'
+      node_key_localstorage: 'portalcmj_arqnode_tree_opened',
+      arqdocs: {}
     }
   },
   mounted () {
@@ -45,6 +50,7 @@ export default {
           localStorage.addArrayOfIds(t.node_key_localstorage, item.id)
         })
         t.$emit('checkIsOpenedNodesTree')
+        t.fetch(1, `get_all=True&classe_estrutural=${t.classe.id}`)
       })
   },
   computed: {
@@ -59,6 +65,21 @@ export default {
     clickItemBreadCrumb () {
       this.$refs.noderoot.reload()
     },
+
+    fetch (page = 1, query_string = '') {
+      const _this = this
+      _this.$set(_this, 'arqdocs', {})
+
+      return _this.utils.getModelOrderedList('arq', 'arqdoc', '-data', page, query_string)
+        .then((response) => {
+          _.each(response.data, function (item, idx) {
+            _this.$set(_this.arqdocs, item.id, item)
+          })
+        })
+        .catch((response) => _this.sendMessage(
+          { alert: 'danger', message: 'Não foi possível recuperar os documentos...', time: 5 }))
+    },
+
     fetchClasse () {
       const _this = this
 

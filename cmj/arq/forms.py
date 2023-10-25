@@ -39,8 +39,8 @@ class ArqClasseForm(ModelForm):
 
         row1 = to_row([
             ('codigo', 2),
-            ('titulo', 5),
-            ('perfil', 2),
+            ('titulo', 7),
+            ('perfil', 3),
         ])
 
         row2 = to_row([

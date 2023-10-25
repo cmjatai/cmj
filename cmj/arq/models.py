@@ -11,6 +11,7 @@ from django.db import models
 from django.db.models.deletion import PROTECT, CASCADE
 from django.utils.translation import ugettext_lazy as _
 
+from cmj.mixins import CmjAuditoriaModelMixin
 from cmj.utils import get_settings_auth_user_model, texto_upload_path, normalize
 from sapl.utils import PortalFileField
 
@@ -161,15 +162,12 @@ class DraftMidia(models.Model):
             os.remove(f)
 
 
-ARQCLASSE_ESTRUTURAL = 0
-ARQCLASSE_DOCUMENTAL = 1
-ARQCLASSE_MISTA = 2
+ARQCLASSE_FISICA = 100
+ARQCLASSE_LOGICA = 200
 PERFIL_ARQCLASSE = ((
-    ARQCLASSE_ESTRUTURAL, _('Classe Estrutural')),
+    ARQCLASSE_FISICA, _('Classe de Localização Física')),
     (
-    ARQCLASSE_DOCUMENTAL, _('Classe de Conteúdo')),
-    (
-    ARQCLASSE_MISTA, _('Classe Mista'))
+    ARQCLASSE_LOGICA, _('Classe de Organização Lógica')),
 )
 
 
@@ -288,7 +286,7 @@ class ArqClasse(Parent):
     perfil = models.IntegerField(
         _('Perfil da Classe'),
         choices=PERFIL_ARQCLASSE,
-        default=ARQCLASSE_ESTRUTURAL)
+        default=ARQCLASSE_LOGICA)
 
     created = models.DateTimeField(
         verbose_name=_('created'), editable=False, auto_now_add=True)
@@ -338,3 +336,69 @@ class ArqClasse(Parent):
         parents.append(self.titulo)
 
         return ' : '.join(parents)
+
+
+def arqdoc_path(instance, filename):
+
+    filename = re.sub('\s', '_', normalize(filename.strip()).lower())
+    filename = filename.split('.')
+
+    filename = '' if len(filename[-1]) > 4 else f'.{filename[-1]}'
+
+    str_path = (
+        './cmj/private/%(model_name)s/%(classe_estrutural)s/%(arqdoc)s/%(filename)s')
+
+    path = str_path % \
+        {
+            'model_name': instance._meta.model_name,
+            'classe_estrutural': instance.classe_estrutural.id,
+            'arqdoc': instance.id,
+            'filename': f'{instance.id:09}{filename}'
+        }
+
+    return path
+
+
+class ArqDoc(Parent, CmjAuditoriaModelMixin):
+
+    codigo = models.PositiveIntegerField(verbose_name=_('Código'), default=0)
+
+    titulo = models.CharField(
+        verbose_name=_('Título'),
+        max_length=250,
+        blank=True, null=True, default='')
+
+    descricao = models.TextField(
+        verbose_name=_('Descrição'),
+        blank=True, null=True, default=None)
+
+    data = models.DateField(
+        verbose_name=_('Data do Documento'),
+        blank=True, null=True)
+
+    arquivo = PortalFileField(
+        blank=True,
+        null=True,
+        # storage=media_protected_storage,
+        upload_to=arqdoc_path,
+        verbose_name=_('Arquivo'),
+        max_length=512)
+
+    classe_logica = models.ForeignKey(
+        ArqClasse,
+        verbose_name=_('Classificação Lógica'),
+        related_name='arqdoc_logica_set',
+        blank=True, null=True, default=None,
+        on_delete=PROTECT)
+
+    classe_estrutural = models.ForeignKey(
+        ArqClasse,
+        verbose_name=_('Classificação Estrutural'),
+        related_name='arqdoc_estrutural_set',
+        on_delete=PROTECT)
+
+    class Meta:
+        ordering = ('codigo',)
+
+        verbose_name = _('ArqDoc')
+        verbose_name_plural = _('ArcDocs')

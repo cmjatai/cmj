@@ -1,12 +1,12 @@
 <template>
   <div :class="
     ['node-element',
-    node !== null && node.perfil === 1 ? 'type-content': '',
+    node !== null && node.count_childs === 0 ? 'type-content': '',
     node !== null && node.id === parseInt(nodechild_params) ? 'active': ''
     ]">
     <div :class="['node-titulo', `level-${level}`]" v-if="node">
       <span class="spacer"></span>
-      <span class="toggle" v-if="node.perfil !== 1" @click="clickToggle">
+      <span class="toggle" v-if="node.count_childs !== 0" @click="clickToggle">
         <i v-if="!is_opened || !childs" class="fas fa-chevron-right"></i>
         <i v-if="is_opened && childs" class="fas fa-chevron-down"></i>
       </span>
@@ -16,11 +16,14 @@
           {{ node.id }} - {{ node.titulo }}
         </router-link>
         <div class="btn-group btn-group-sm el-actions">
+          <a :href="`/arqadmin/classe/${node.id}/edit`" target="_blank" class="btn btn-link">
+            <i class="fas fa-edit"></i>
+          </a>
           <a :href="`/arq/${node.id}/${node.id}`" class="btn btn-link">
             <i class="fas fa-expand"></i>
           </a>
         </div>
-        <small v-if="node.descricao" v-html="descricao_html"></small>
+        <small class="box-descricao" v-html="descricao_html"></small>
       </span>
     </div>
     <node-layout :elemento="raiz" :parent="elemento" :level="level+1" v-for="raiz, k in childs" :key="`class-${k}`" ></node-layout>
@@ -39,7 +42,9 @@ export default {
       nodechild_params: this.$route.params.nodechild,
       node: null,
       node_key_localstorage: 'portalcmj_arqnode_tree_opened',
-      click_title: false
+      click_title: false,
+      ARQCLASSE_FISICA: 100,
+      ARQCLASSE_LOGICA: 200
     }
   },
   mounted () {
@@ -50,7 +55,7 @@ export default {
       let descr = this.node.descricao
       descr = descr.replace('\r\n', '<br>')
       descr = descr.replace('\n', '<br>')
-      return `${descr} - ${this.node.id}`
+      return `<strong>${this.node.conta}</strong> - <strong>${this.node.titulo}</strong><br><i>${descr}</i>`
     }
   },
   watch: {
@@ -165,6 +170,9 @@ export default {
         justify-content: space-between;
         align-items: center;
         position: relative;
+        a {
+          flex-grow: 2;
+        }
       }
       .spacer {
         grid-area: spacer;
@@ -191,24 +199,23 @@ export default {
       a {
         text-decoration: none;
       }
-      small {
+      .box-descricao {
         padding: 7px;
-        font-style: italic;
         font-size: 90%;
         color: #444;
         position: absolute;
         display: none;
         background-color: #fff;
-        left: 40px;
-        top: 100%;
-        right: -18px;
-        margin-top: -3px;
+        left: 100%;
+        top: 25%;
+        margin-left: -5px;
+        min-width: 30vw;
         border: 1px solid #aaa;
       }
       &:hover {
         background-color: #0002;
         border-bottom: 1px solid #aaa;
-        small {
+        .box-descricao {
           display: inline-block;
           z-index: 1;
         }

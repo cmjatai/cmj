@@ -27,11 +27,12 @@ urlpatterns_arq = [
     url(r'^classe/(?P<pk>[0-9]+)$',
         views.ArqClasseListView.as_view(), name='subarqclasse_list'),
 
-    url(r'^(?P<slug>[^.]*)$',
-        app_vue_view, name='app_vue_arq_view_url'),
-
 ]
 
 urlpatterns = [
-    url(r'^arq/', include(urlpatterns_arq)),
+    url(r'^arqadmin/', include(urlpatterns_arq)),
+
+    url(r'^arq/(?P<slug>[^.]*)$',
+        app_vue_view, name='app_vue_arq_view_url'),
+
 ]

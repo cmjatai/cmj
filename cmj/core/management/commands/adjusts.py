@@ -12,6 +12,7 @@ import sys
 from PIL import Image, ImageEnhance, ImageDraw
 from PIL.Image import Resampling
 import cv2
+from django.core.files import File
 from django.core.files.base import File
 from django.core.management.base import BaseCommand
 from django.db.models import Q
@@ -21,10 +22,13 @@ import ocrmypdf
 from reportlab.pdfgen import canvas
 from reportlab.platypus.doctemplate import SimpleDocTemplate
 
+from cmj.arq.models import ArqDoc
 from cmj.utils import Manutencao
 from cmj.videos.tasks import task_pull_youtube_upcoming
 import numpy as np
 from sapl.materia.models import MateriaLegislativa
+from sapl.norma.models import NormaJuridica
+from sapl.rules.apps import reset_id_model
 
 
 def _get_registration_key(model):
@@ -72,16 +76,36 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.logger = logging.getLogger(__name__)
-        m = Manutencao()
-        m.desativa_auto_now()
-        m.desativa_signals()
+        #m = Manutencao()
+        # m.desativa_auto_now()
+        # m.desativa_signals()
 
-        task_pull_youtube_upcoming()
+        #
 
-        return
+        """ocrmypdf.ocr(
+            '/home/leandro/Downloads/processo_10252023.pdf',
+            '/home/leandro/Downloads/processo_10252023_pdfa.pdf',
+            language='por',
+            force_ocr=True,
+            # redo_ocr=True,
+            # skip_text=True,
+            jobs=4,
+            output_type='pdfa-2',
+            # image_dpi=72,
+            # jpg_quality=60,
+            # png_quality=30,
+            optimize=3,
+            # jbig2_lossy=True,
+            # oversample=20,
+            pdfa_image_compression="jpeg",
+            plugins=[
+                pathlib.Path(
+                    '/home/leandro/desenvolvimento/envs/cmj/ocrmypdf_plugin.py')
+            ]
+        )"""
 
-        in_file = '/home/leandro/TEMP/teste/teste_original.pdf'
-        out_file = '/home/leandro/TEMP/teste/teste_original_out.pdf'
+        in_file = '/home/leandro/Downloads/processo_10252023.pdf'
+        out_file = '/home/leandro/Downloads/processo_10252023_out.pdf'
 
         os.makedirs('/home/leandro/TEMP/teste/rgb', exist_ok=True)
         os.makedirs('/home/leandro/TEMP/teste/gray', exist_ok=True)
@@ -112,7 +136,7 @@ class Command(BaseCommand):
                     igray = fitz.Pixmap(fitz.csGRAY, imgpix)
                     gray_path = f'/home/leandro/TEMP/teste/gray/teste-{idx:0>4}-{idxi:0>3}.{img["ext"]}'
                     # , jpg_quality=50)
-                    igray.save(gray_path, output=img['ext'], jpg_quality=70)
+                    igray.save(gray_path, output=img['ext'], jpg_quality=60)
                     # ,
                     #ibytes = igray.tobytes(output=img['ext'], jpg_quality=70)
 
@@ -143,7 +167,7 @@ class Command(BaseCommand):
                     im_resized = impil.resize(
                         (width, height), resample=Resampling.LANCZOS)
 
-                    im_resized.save(gray_path, quality=70, dpi=(72, 72))
+                    im_resized.save(gray_path, quality=60, dpi=(72, 72))
                     # return
 
                     #ibytes = impil.tobytes()
@@ -169,19 +193,20 @@ class Command(BaseCommand):
         # return
 
         ocrmypdf.ocr(
-            '/home/leandro/TEMP/teste/teste_original_out.pdf', '/home/leandro/TEMP/teste/teste_original_pdfa.pdf',
+            '/home/leandro/Downloads/processo_10252023_out.pdf',
+            '/home/leandro/Downloads/processo_10252023_pdfa.pdf',
             language='por',
             # force_ocr=True,
             # redo_ocr=True,
             skip_text=True,
             jobs=4,
             output_type='pdfa-2',
-            # image_dpi=72,
-            # jpg_quality=60,
-            # png_quality=30,
+            image_dpi=72,
+            jpg_quality=40,
+            png_quality=30,
             optimize=3,
-            # jbig2_lossy=True,
-            # oversample=20,
+            jbig2_lossy=True,
+            oversample=20,
             pdfa_image_compression="jpeg",
             plugins=[
                 pathlib.Path(
@@ -189,6 +214,42 @@ class Command(BaseCommand):
             ]
 
         )
+
+        return
+
+        normas = NormaJuridica.objects.filter(
+            numero__gte=1228,
+            ano__gte=1987,
+            numero__lte=1399,
+            ano__lte=1990
+        ).order_by('numero')
+
+        ArqDoc.objects.all().delete()
+        reset_id_model(ArqDoc)
+        for n in normas:
+
+            if not n.texto_integral:
+                continue
+
+            print(n)
+
+            ad = ArqDoc()
+            ad.codigo = n.numero
+            ad.titulo = n.epigrafe
+            ad.descricao = n.ementa
+            ad.data = n.data
+            ad.classe_estrutural_id = 1273
+
+            ad.owner_id = 1
+            ad.modifier_id = 1
+
+            ad.save()
+
+            path = n.texto_integral.original_path or n.texto_integral.path
+            f = open(path, 'rb')
+            f = File(f)
+            ad.arquivo.save(path.split('/')[-1], f)
+            ad.save()
 
         return
 

@@ -116,15 +116,22 @@ export default {
     min-height: 70vh;
     position: relative;
   }
+  #col-docs {
+    z-index: 0;
+  }
+  #col-classes {
+    z-index: 1;
+  }
+
   .arqtree-inner {
     position: sticky;
     display: block;
     top: 0;
   }
   .gutter {
-    background-color: #ddd;
+    background-color: #eee;
     background-repeat: no-repeat;
-    background-position: 50%;
+    background-position: 53% 30%;
   }
   .gutter.gutter-horizontal {
       background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
