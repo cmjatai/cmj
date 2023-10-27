@@ -30,7 +30,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from cmj.api.serializers import DraftMidiaSerializer, ArqClasseSerializer
 from cmj.arq import tasks
-from cmj.arq.models import DraftMidia, Draft, ArqClasse
+from cmj.arq.models import DraftMidia, Draft, ArqClasse, ArqDoc
 from cmj.utils import TIPOS_IMG_PERMITIDOS, TIPOS_MIDIAS_PERMITIDOS
 from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize
 import sapl
@@ -491,3 +491,14 @@ class _DraftMidia(ResponseFileMixin):
 @customize(ArqClasse)
 class _ArqClasse:
     serializer_class = ArqClasseSerializer
+
+
+@customize(ArqDoc)
+class _ArqDoc(ResponseFileMixin):
+
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    @action(detail=True)
+    def arquivo(self, request, *args, **kwargs):
+        return self.response_file(request, *args, **kwargs)

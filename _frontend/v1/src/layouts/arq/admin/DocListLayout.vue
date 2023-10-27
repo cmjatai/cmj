@@ -14,10 +14,12 @@
       <div class="col">
         <h2>{{ classe.titulo }}</h2>
         <small v-html="descricao_html"></small>
-
-        <div v-for="doc, k in arqdocs" :key="`ad-${k}`">
-          {{ doc.titulo }}
+        <div class="inner-list">
+          <arq-doc-item :arqdoc="doc" :classe="classe" v-for="doc, k in arqdocs_ordered" :key="`ad-${k}`">
+            {{ doc.titulo }}
+          </arq-doc-item>
         </div>
+        <div class="text-info">TODO: implementar paginação</div>
       </div>
       <div class="col-3 d-none">
         <div class="classechild">
@@ -31,15 +33,20 @@
   </div>
 </template>
 <script>
+import ArqDocItem from './ArqDocItem.vue'
+
 export default {
   name: 'doc-list-layout',
+  components: { ArqDocItem },
   data () {
     return {
       params_node: this.$route.params.node,
       params_nodechild: this.$route.params.nodechild,
       classe: null,
       node_key_localstorage: 'portalcmj_arqnode_tree_opened',
-      arqdocs: {}
+      arqdocs: {},
+      ARQCLASSE_FISICA: 100,
+      ARQCLASSE_LOGICA: 200
     }
   },
   mounted () {
@@ -50,10 +57,16 @@ export default {
           localStorage.addArrayOfIds(t.node_key_localstorage, item.id)
         })
         t.$emit('checkIsOpenedNodesTree')
-        t.fetch(1, `get_all=True&classe_estrutural=${t.classe.id}`)
+        const field_classe = t.classe.perfil === t.ARQCLASSE_FISICA ? 'classe_estrutural' : 'classe_logica'
+        t.fetch(1, `&get_all=True&${field_classe}=${t.classe.id}`)
       })
   },
   computed: {
+    arqdocs_ordered: {
+      get () {
+        return _.orderBy(this.arqdocs, ['id'], ['desc'])
+      }
+    },
     descricao_html: function () {
       let descr = this.classe.descricao
       descr = descr.replace('\r\n', '<br>')
@@ -104,6 +117,11 @@ export default {
     position: sticky;
     top: 0;
     z-index: 1;
+    .inner-list {
+      border: 1px solid #eee;
+      margin: 15px 0;
+      background-color: white;
+    }
   }
   .row, .col-3 {
     position: relative;

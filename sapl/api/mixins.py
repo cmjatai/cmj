@@ -2,7 +2,7 @@ import logging
 import os
 
 from django.conf import settings
-from django.http.response import HttpResponse
+from django.http.response import HttpResponse, Http404
 import fitz
 from rest_framework.exceptions import NotFound
 
@@ -37,10 +37,12 @@ class ResponseFileMixin:
                 response = HttpResponse(bpng, content_type='image/png')
                 return response
 
+        raise NotFound
+
     def response_file(self, request, *args, **kwargs):
         item = self.get_queryset().filter(pk=kwargs['pk']).first()
         page = request.GET.get('page', None)
-        dpi = request.GET.get('dpi', None)
+        dpi = request.GET.get('dpi', 72)
 
         if not item:
             logger.info(f'response_file not item')

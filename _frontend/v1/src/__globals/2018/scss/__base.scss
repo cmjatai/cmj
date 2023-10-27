@@ -4,6 +4,10 @@ html {
   background: $color_main_bg $url_bg_png;
   font-size: 1rem;
 }
+main:hover {
+  position: relative;
+  z-index: 2650;
+}
 
 strong {
   font-weight: bold;

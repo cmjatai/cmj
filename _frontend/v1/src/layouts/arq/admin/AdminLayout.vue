@@ -95,9 +95,13 @@ export default {
     let sizes = localStorage.getItem('split-sizes')
     if (sizes) {
       sizes = JSON.parse(sizes)
+      if (sizes[0] + sizes[1] > 100) {
+        sizes = [35, 65]
+      }
     } else {
-      sizes = [50, 50]
+      sizes = [35, 65]
     }
+    console.log(sizes[0] + sizes[1])
     Split(['#col-classes', '#col-docs'], {
       minSize: 350,
       sizes: sizes,
@@ -118,6 +122,7 @@ export default {
   }
   #col-docs {
     z-index: 0;
+    flex: 1 1 auto;
   }
   #col-classes {
     z-index: 1;
