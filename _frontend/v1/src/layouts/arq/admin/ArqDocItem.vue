@@ -17,8 +17,8 @@
         <span class="text-info">TODO: se acessado via <strong>localização física</strong>, mostrar aqui a <strong>localização lógica</strong> e viceversa</span>
       </div>
       <div class="inner-preview" ref="preview">
-        <img v-if="imgdisplay" ref="imgpreview">
-        <div class="actions">
+        <img v-if="imgdisplay" ref="imgpreview" @error="errorPreview" @load="loadPreview">
+        <div class="actions" ref="preview_actions">
           <a class="previous" @click="clickPrevious">
             <i class="fas fa-chevron-left"></i>
           </a>
@@ -52,6 +52,13 @@ export default {
       this.img_src = `${this.arqdoc.arquivo}?page=${nv}&dpi=${this.dpi}`
     },
     img_src (nv, old) {
+      const t = this
+      t.imgdisplay = true
+      t.$nextTick(() => {
+        t.$refs.imgpreview.src = nv
+      })
+    },
+    img_src__blob (nv, old) {
       const t = this
       axios({
         url: nv,
@@ -89,6 +96,19 @@ export default {
     }
   },
   methods: {
+    loadPreview (event) {
+      this.$refs.preview_actions.style.display = 'flex'
+    },
+    errorPreview (event) {
+      if (this.page > 1) {
+        this.page -= 1
+        this.sendMessage(
+          { alert: 'info', message: 'Esta é a última página.', time: 2 })
+      } else {
+        this.sendMessage(
+          { alert: 'info', message: 'Esta é a primeira página.', time: 2 })
+      }
+    },
     clickPrevious (event) {
       if (this.page > 1) {
         this.page -= 1
@@ -155,8 +175,9 @@ export default {
         width: 100%;
         height: 100%;
         position: absolute;
-        display: flex;
+        display: none;
         align-items: stretch;
+        justify-content: end;
         .previous, .next {
           display: flex;
           flex: 0 0 50%;

@@ -112,7 +112,10 @@ class BtnCertMixin:
         r = list(filter(None, r))
         return r
 
-    def btn_certidao(self, field_name):
+    def btn_certidao(self, field_name,
+                     btn_title_public=_('Certidão de Publicação'),
+                     btn_title_admin=_('Gerar Certidão de Publicação'),
+                     ):
 
         btn = []
         if self.object.certidao:
@@ -121,7 +124,7 @@ class BtnCertMixin:
                 reverse('cmj.core:certidaopublicacao_detail',
                         kwargs={'pk': self.object.certidao.pk}),
                 'btn-success',
-                _('Certidão de Publicação')
+                btn_title_public
             ]
 
         elif self.request.user.has_perm('core.add_certidaopublicacao'):
