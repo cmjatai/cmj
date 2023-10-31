@@ -38,6 +38,13 @@
     }
   }
 
+  .ul-nivel0 {
+    flex-direction: column;
+    & > li {
+      margin: 1rem 0
+    }
+  }
+
   .ul-nivel1 {
     height: 90vh;
     display: flex;
@@ -90,6 +97,7 @@
     }
   }
 
+
   .ul-nivel2, .ul-nivel3 {
     flex-direction: column-reverse;
   }
@@ -109,6 +117,18 @@
 
   .li-nivel0 {
     padding-top: 1em;
+  }
+
+  .li-nivel1 {
+    &.vazio {
+      .ul-nivel1 {
+        height: auto;
+        &::before {
+          content: "";
+          display: none;
+        }
+      }
+    }
   }
 
   .li-nivel2 {

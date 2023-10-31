@@ -42,8 +42,8 @@ class ArqClasseParentMixin:
         if not self.parent:
             return _('Cadastro de ArqClasse Geral')
 
-        return '%s - %s - <small>(%s)</small>' % (
-            self.parent, self.parent.titulo or '', _('Cadastro de SubArqClasse'))
+        return '%s<br><small>(%s)</small>' % (
+            self.parent, _('Cadastro de SubArqClasse'))
 
     @property
     def cancel_url(self):

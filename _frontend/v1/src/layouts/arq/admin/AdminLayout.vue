@@ -8,7 +8,7 @@
               <i class="fas fa-chevron-left"></i>
               <i class="fas fa-chevron-left"></i>
             </span>
-            <h1>ArqAdmin</h1>
+            <h1>ArqView</h1>
           </div>
           <node-layout :level="0" ref="noderoot"></node-layout>
         </div>

@@ -29,9 +29,11 @@
       {% for arqclasse in object_list %}
         <li class="li-nivel0">
           <span class="inner">
-            <a href="{% url 'cmj.arq:subarqclasse_list' arqclasse.pk %}?view={{request.GET.view|default:view_format}}">
-              {{ arqclasse.conta }} - {{ arqclasse.titulo }}
-            </a> -
+            <div class="d-flex justify-content-between">
+              <a href="{% url 'cmj.arq:subarqclasse_list' arqclasse.pk %}?view={{request.GET.view|default:view_format}}">
+                {{ arqclasse.conta }} - {{ arqclasse.titulo }}
+              </a>
+            </div>
             <small class="text-info">
               <small>
                 <i>

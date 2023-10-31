@@ -170,6 +170,7 @@ export default {
         justify-content: space-between;
         align-items: center;
         position: relative;
+        line-height: 2;
         a {
           flex-grow: 2;
         }
@@ -206,11 +207,11 @@ export default {
         position: absolute;
         display: none;
         background-color: #fff;
-        left: 100%;
-        top: 25%;
-        margin-left: -5px;
-        min-width: 30vw;
+        left: 60%;
+        top: 85%;
+        white-space: nowrap;
         border: 1px solid #aaa;
+        line-height: 1.3;
       }
       &:hover {
         background-color: #0002;

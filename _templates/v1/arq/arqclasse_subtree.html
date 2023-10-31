@@ -6,9 +6,17 @@
     {% endif %}
     <li class="li-nivel{{o.nivel}} {% if not o.descricao %}vazio{% endif %}">
       <span class="inner">
-        <a href="{% url 'cmj.arq:subarqclasse_list' o.pk %}?view={{request.GET.view|default:view_format}}">
-          {{ o.conta }} - {{ o.titulo }}
-        </a>
+        <div class="d-flex justify-content-between">
+          <a href="{% url 'cmj.arq:subarqclasse_list' o.pk %}?view={{request.GET.view|default:view_format}}">
+            {{ o.conta }} - {{ o.titulo }}
+          </a>
+          {% if o.nivel > 3 %}
+            <a href="/arq/root/{{o.id}}" target="_blank">
+              ArqView
+            </a>
+          {% endif %}
+        </div>
+
         <small class="text-black-50">
             -
             <i>
