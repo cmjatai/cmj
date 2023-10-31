@@ -337,6 +337,14 @@ class ArqClasse(Parent):
 
         return ' : '.join(parents)
 
+    def arqdoc_set(self):
+        if self.perfil == ARQCLASSE_FISICA:
+            return self.arqdoc_estrutural_set
+        elif self.perfil == ARQCLASSE_LOGICA:
+            return self.arqdoc_logica_set
+        else:
+            return []
+
 
 def arqdoc_path(instance, filename):
 

@@ -2143,21 +2143,35 @@ class MateriaLegislativaCrud(Crud):
 
             principal = self.get_object()
 
-            def get_anexadas_from(m):
+            def get_anexadas_from(m, prefixo=''):
                 p = getattr(m.texto_original, ff)
-                m_paths.append((m, p))
+                m_paths.append((m, prefixo, p))
                 for a in m.materia_principal_set.filter(
                     data_desanexacao__isnull=True
-                ).order_by('data_anexacao'):
-                    get_anexadas_from(a.materia_anexada)
+                ).order_by('materia_anexada__tipo', 'data_anexacao'):
+                    manex = a.materia_anexada
+                    p2 = 'MatAnexadas/{}/{}-{:03d}-{}'.format(
+                        slugify(manex.tipo.descricao),
+                        manex.ano,
+                        manex.numero,
+                        slugify(manex.tipo.sigla)
+                    )
+
+                    get_anexadas_from(
+                        a.materia_anexada,
+                        prefixo=p2)
 
                 for d in m.documentoacessorio_set.all():
-                    m_paths.append((d, getattr(d.arquivo, ff)))
+
+                    if d.data > timezone.localtime().date() - timedelta(days=30):
+                        continue
+
+                    m_paths.append((d, prefixo, getattr(d.arquivo, ff)))
 
             def get_docadm_anexados_from(d):
                 if d.texto_integral:
                     p = getattr(d.texto_integral, ff)
-                    m_paths.append((d, p))
+                    m_paths.append((d, 'DocAdms', p))
 
                 for danex in d.anexados.all():
                     get_docadm_anexados_from(danex)
@@ -2174,29 +2188,31 @@ class MateriaLegislativaCrud(Crud):
 
                 with zipfile.ZipFile(tmp, 'w') as file:
 
-                    for i, p in m_paths:
+                    for i, prefixo, path in m_paths:
 
                         if isinstance(i, DocumentoAcessorio):
-                            arcname = 'DA-{}-{}-{}-{}.{}'.format(
+                            arcname = '{}/DA-{}-{}-{}-{}.{}'.format(
+                                prefixo,
                                 i.ano,
-                                i.id,
                                 slugify(i.tipo.descricao),
                                 slugify(i.nome),
-                                p.split('.')[-1]
+                                i.id,
+                                path.split('.')[-1]
                             )
                         else:
-                            arcname = '{}-{}-{}-{:02d}-{}-{}.{}'.format(
+                            arcname = '{}/{}-{}-{}-{}-{}-{:02d}.{}'.format(
+                                prefixo,
                                 'ML' if isinstance(
-                                    i, MateriaLegislativa) else 'docadm-vinculados/da',
+                                    i, MateriaLegislativa) else 'DA',
                                 i.ano,
-                                i.id,
                                 i.numero,
                                 slugify(i.tipo.sigla),
                                 slugify(i.tipo.descricao),
-                                p.split('.')[-1])
+                                i.id,
+                                path.split('.')[-1])
 
                         file.write(
-                            p,
+                            path,
                             arcname
                         )
 
