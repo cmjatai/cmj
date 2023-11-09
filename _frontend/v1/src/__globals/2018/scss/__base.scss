@@ -4,10 +4,13 @@ html {
   background: $color_main_bg $url_bg_png;
   font-size: 1rem;
 }
-main:hover {
-  position: relative;
-  z-index: 2650;
+main {
+  &.appvue:hover {
+    position: relative;
+    z-index: 2650;
+  }
 }
+
 
 strong {
   font-weight: bold;
@@ -110,23 +113,6 @@ a:hover {
   margin: 0;
 }
 
-
-.container-table {
-  margin: 15px -15px -15px;
-
-  .result-count {
-    display: inline-block;
-    background-color: darken($color_container_bg, 5);
-    padding: 0px 10px;
-    margin-left: 10px;
-    border: 1px solid white;
-    border-bottom: 0px;
-  }
-
-  p {
-    margin: 0;
-  }
-}
 
 .table {
   margin-bottom: 0;
