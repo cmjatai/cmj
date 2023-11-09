@@ -40,9 +40,26 @@
 {% block detail_content %}
   {% if not show_results %}
     {% include 'search/search_widget.html' %}
-  <hr>
+    <hr>
     {% crispy filter.form %}
-  <hr>
+
+
+    {% if tipos_autores_materias %}
+    <br>
+        <fieldset>
+          <legend>
+            <a class="text-black-50" href="{% url 'sapl.materia:pesquisar_materia'%}?em_tramitacao=1">
+              Acesso Rápido às Matérias em Tramitação
+            </a>
+          </legend>
+          <br>
+        </fieldset>
+          {% include 'materia/materias_em_tramitacao_widget.html' %}
+
+      {% endif %}
+    </div>
+
+
   {% endif %}
 {% endblock detail_content %}
 

@@ -90,7 +90,7 @@ from .models import (AcompanhamentoMateria, Anexada, AssuntoMateria, Autoria,
                      TipoProposicao, Tramitacao, UnidadeTramitacao)
 
 
-def tipos_autores_materias(user):
+def tipos_autores_materias(user, restricao_regimental=True):
 
     noww = timezone.localdate()
 
@@ -124,8 +124,9 @@ def tipos_autores_materias(user):
     r = {}
     for m in materias_em_tramitacao:
 
-        if m.autores.count() >= 5:
-            continue
+        if restricao_regimental:
+            if m.autores.count() >= 5:
+                continue
 
         if user:
             if m.tipo not in r:
@@ -572,7 +573,8 @@ class ProposicaoPendente(PermissionRequiredMixin, ListView):
         qr = self.request.GET.copy()
         context['filter_url'] = ('&o=' + qr['o']) if 'o' in qr.keys() else ''
 
-        context['tipos_autores_materias'] = tipos_autores_materias(None)
+        context['tipos_autores_materias'] = tipos_autores_materias(
+            None).items()
 
         return context
 
@@ -1316,7 +1318,7 @@ class ProposicaoCrud(Crud):
 
         def tipos_autores_materias(self):
             # chamado do template
-            return tipos_autores_materias(self.request.user)
+            return tipos_autores_materias(self.request.user).items()
 
 
 class ReciboProposicaoView(TemplateView):
@@ -2561,6 +2563,7 @@ class MateriaLegislativaPesquisaView(FilterView):
 
         context['title'] = _(
             classe_mascara or 'Pesquisar Matérias Legislativas')
+
         context['bg_title'] = 'bg-red text-white'
 
         tipo_listagem = self.request.GET.get('tipo_listagem', '1')
@@ -2584,6 +2587,17 @@ class MateriaLegislativaPesquisaView(FilterView):
 
         context['USE_SOLR'] = settings.USE_SOLR if hasattr(
             settings, 'USE_SOLR') else False
+
+        acesso_rapido_list = list(tipos_autores_materias(
+            None, restricao_regimental=False).items()
+        )
+
+        acesso_rapido_list.sort(key=lambda tup: tup[0].sequencia_regimental)
+
+        for t, a in acesso_rapido_list:
+            print(t, a)
+
+        context['tipos_autores_materias'] = acesso_rapido_list
 
         return context
 
