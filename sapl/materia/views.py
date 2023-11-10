@@ -2594,9 +2594,6 @@ class MateriaLegislativaPesquisaView(FilterView):
 
         acesso_rapido_list.sort(key=lambda tup: tup[0].sequencia_regimental)
 
-        for t, a in acesso_rapido_list:
-            print(t, a)
-
         context['tipos_autores_materias'] = acesso_rapido_list
 
         return context
