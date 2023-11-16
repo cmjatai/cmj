@@ -333,6 +333,15 @@ class _Draft:
             ),
             countdown=10
         )
+        """
+        tasks.task_ocrmypdf_function(
+            DraftMidia._meta.app_label,
+            DraftMidia._meta.model_name,
+            'arquivo',
+            dms_id,
+            4,
+        )
+        """
 
         serializer = self.get_serializer(draft)
         return Response(serializer.data)
@@ -402,6 +411,7 @@ class _DraftMidia(ResponseFileMixin):
         dm = self.get_queryset().filter(pk=kwargs['pk']).first()
         dm.metadata['ocrmypdf'] = {'pdfa': DraftMidia.METADATA_PDFA_AGND}
         dm.save()
+        """
         tasks.task_ocrmypdf.apply_async(
             (
                 dm._meta.app_label,
@@ -413,6 +423,15 @@ class _DraftMidia(ResponseFileMixin):
             ),
             countdown=10
         )
+        """
+        tasks.task_ocrmypdf_function(
+            dm._meta.app_label,
+            dm._meta.model_name,
+            'arquivo',
+            [dm.id, ],
+            4,
+        )
+
         serializer = self.get_serializer(dm)
         return Response(serializer.data)
 
@@ -432,6 +451,7 @@ class _DraftMidia(ResponseFileMixin):
             #),
             # countdown=10
         )
+
         serializer = self.get_serializer(dm)
         return Response(serializer.data)
 
