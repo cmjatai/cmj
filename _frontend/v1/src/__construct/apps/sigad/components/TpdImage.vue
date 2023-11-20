@@ -46,7 +46,8 @@ export default {
         0: '<i class="fa fa-align-left" aria-hidden="true"></i>',
         1: '<i class="fa fa-align-justify" aria-hidden="true"></i>',
         2: '<i class="fa fa-align-right" aria-hidden="true"></i>',
-        3: '<i class="fa fa-align-center" aria-hidden="true"></i>'
+        3: '<i class="fa fa-align-center" aria-hidden="true"></i>',
+        4: '<i class="fas fa-expand"></i>'
       }
     }
   },
@@ -84,7 +85,7 @@ export default {
   .tpd-image {
     z-index: 3;
     margin-top: 13px ;
-    &.alinhamento-justify {
+    &.alinhamento-justify, &.alinhamento-expand {
       padding-top: 10px;
       padding-bottom: 10px;
       clear: left;

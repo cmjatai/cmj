@@ -72,6 +72,7 @@ class ClasseForm(ModelForm):
             'list_in_mapa',
             'list_in_inf',
             'list_in_menu',
+            'menu_lateral',
             'url_redirect'
 
         ]
@@ -97,10 +98,11 @@ class ClasseForm(ModelForm):
             ('descricao', 12),
         ])
         row3 = to_row([
-            ('list_in_mapa', 3),
-            ('list_in_inf', 3),
-            ('list_in_menu', 3),
-            ('url_redirect', 3),
+            ('list_in_mapa', 2),
+            ('list_in_inf', 2),
+            ('list_in_menu', 2),
+            ('menu_lateral', 2),
+            ('url_redirect', 4),
         ])
 
         self.helper = FormHelper()
