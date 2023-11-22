@@ -10,3 +10,12 @@
     }
   }
 }
+
+@media screen and (max-width: 991.98px) {
+.breadcrumb-item {
+  & + & {
+    display: block;
+    width: 100%;
+  }
+}
+}
