@@ -96,8 +96,23 @@ export default {
       const t = this
       t.getObject(metadata)
         .then(obj => {
-          if (obj.sessao_plenaria === t.sessao.id) {
-            t.$set(t.itens[`${metadata.model}_list`], metadata.id, obj)
+          if (obj.sessao_plenaria === t.sessao.id && obj.parent === null) {
+            const list = t.itens[`${metadata.model}_list`]
+            const id_obj = metadata.id
+            t.$nextTick()
+              .then(function () {
+                t.$set(list, id_obj, obj)
+              })
+          }
+          if (metadata.action === 'post_save' && metadata.created) {
+            metadata.app = 'materia'
+            metadata.model = 'materialegislativa'
+            metadata.id = obj.materia
+            t.getObject(metadata)
+              .then(obj_materia => {
+                t.sendMessage(
+                  { alert: 'info', message: `<strong>${obj_materia.__str__} adicionado a esta sessão.</strong><br><i>${obj_materia.ementa}</i>`, time: 25 })
+              })
           }
         })
 

@@ -81,7 +81,7 @@
       </div>
       <div class="col-2-body">
         <div
-          :class="['sub-containers', nivel(NIVEL2, itensAnexados.length > 0)]"
+          :class="['sub-containers', nivel(NIVEL1, itensAnexados.length > 0)]"
         >
           <div class="title">
             <span> Matérias Anexadas </span>

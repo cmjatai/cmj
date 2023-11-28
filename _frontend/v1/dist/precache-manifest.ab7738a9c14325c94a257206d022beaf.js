@@ -28,15 +28,15 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/brasao/escola_1024.png"
   },
   {
-    "revision": "eee3d8e5ec6ac836dd9e",
-    "url": "/static/css/app.11ed234d.css"
+    "revision": "4091831f25666ae67251",
+    "url": "/static/css/app.0fb4df26.css"
   },
   {
     "revision": "8b705c847227284ef0ef",
     "url": "/static/css/chunk-1f21aaae.707facdf.css"
   },
   {
-    "revision": "606828571a2673f4f280",
+    "revision": "83668e828642fe049e69",
     "url": "/static/css/chunk-36fdbf3a.ec12e97e.css"
   },
   {
@@ -340,12 +340,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/user.png"
   },
   {
-    "revision": "a26beaa108befd1940753936e6c47358",
+    "revision": "97f19c191a607b45d78b49fc46ec1be2",
     "url": "/static/index.html"
   },
   {
-    "revision": "eee3d8e5ec6ac836dd9e",
-    "url": "/static/js/app.72c2f3e2.js"
+    "revision": "4091831f25666ae67251",
+    "url": "/static/js/app.2c67650d.js"
   },
   {
     "revision": "8b705c847227284ef0ef",
@@ -356,8 +356,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/js/chunk-2d0ba83e.449ff714.js"
   },
   {
-    "revision": "606828571a2673f4f280",
-    "url": "/static/js/chunk-36fdbf3a.dccf46da.js"
+    "revision": "83668e828642fe049e69",
+    "url": "/static/js/chunk-36fdbf3a.2859bfb4.js"
   },
   {
     "revision": "1c314aad5b203348bba0",

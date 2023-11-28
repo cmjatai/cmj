@@ -402,8 +402,8 @@ class OrdemDiaForm(ExpedienteMateriaForm):
 
     def save(self, commit=False):
         ordem = super(OrdemDiaForm, self).save(commit)
-        ordem.materia = self.cleaned_data['materia']
-        ordem.save()
+        #ordem.materia = self.cleaned_data['materia']
+        # ordem.save()
         return ordem
 
 
