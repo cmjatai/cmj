@@ -87,7 +87,7 @@
             <span> Matérias Anexadas </span>
           </div>
           <div class="inner">
-            <div v-for="anexada in itensAnexados" :key="`${type}${anexada.id}`">
+            <div v-for="anexada in itensAnexados" :key="`${type}${anexada.id}`" >
               <materia-pauta :materia="anexada" :type="type"></materia-pauta>
             </div>
           </div>
@@ -161,7 +161,7 @@ export default {
     },
     itensAnexados: {
       get () {
-        return _.orderBy(this.anexadas, 'data_apresentacao')
+        return _.orderBy(_.filter(this.anexadas, (o) => o.em_tramitacao), 'data_apresentacao')
       }
     },
     itensLegislacaoCitada: {
