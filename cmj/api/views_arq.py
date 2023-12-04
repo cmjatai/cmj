@@ -31,6 +31,7 @@ from rest_framework.viewsets import ModelViewSet
 from cmj.api.serializers import DraftMidiaSerializer, ArqClasseSerializer
 from cmj.arq import tasks
 from cmj.arq.models import DraftMidia, Draft, ArqClasse, ArqDoc
+from cmj.settings.project import DEBUG
 from cmj.utils import TIPOS_IMG_PERMITIDOS, TIPOS_MIDIAS_PERMITIDOS
 from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize
 import sapl
@@ -322,26 +323,22 @@ class _Draft:
                 'pdfa': DraftMidia.METADATA_PDFA_AGND}
             dm.save()
 
-        tasks.task_ocrmypdf.apply_async(
-            (
-                DraftMidia._meta.app_label,
-                DraftMidia._meta.model_name,
-                'arquivo',
-                dms_id,
-                4,
-                False
-            ),
-            countdown=10
-        )
-        """
-        tasks.task_ocrmypdf_function(
+        params_task = (
             DraftMidia._meta.app_label,
             DraftMidia._meta.model_name,
             'arquivo',
             dms_id,
             4,
+            False
         )
-        """
+
+        if not DEBUG:
+            tasks.task_ocrmypdf.apply_async(
+                params_task,
+                countdown=10
+            )
+        else:
+            tasks.task_ocrmypdf_function(*params_task[:-1])
 
         serializer = self.get_serializer(draft)
         return Response(serializer.data)
@@ -411,26 +408,25 @@ class _DraftMidia(ResponseFileMixin):
         dm = self.get_queryset().filter(pk=kwargs['pk']).first()
         dm.metadata['ocrmypdf'] = {'pdfa': DraftMidia.METADATA_PDFA_AGND}
         dm.save()
-        """
-        tasks.task_ocrmypdf.apply_async(
-            (
-                dm._meta.app_label,
-                dm._meta.model_name,
-                'arquivo',
-                [dm.id, ],
-                4,
-                False
-            ),
-            countdown=10
-        )
-        """
-        tasks.task_ocrmypdf_function(
-            dm._meta.app_label,
-            dm._meta.model_name,
+
+        params_task = (
+            DraftMidia._meta.app_label,
+            DraftMidia._meta.model_name,
             'arquivo',
-            [dm.id, ],
+            dms_id,
             4,
+            False
         )
+
+        if not DEBUG:
+            tasks.task_ocrmypdf.apply_async(
+                params_task,
+                countdown=10
+            )
+        else:
+            tasks.task_ocrmypdf_function(*params_task[:-1])
+
+
 
         serializer = self.get_serializer(dm)
         return Response(serializer.data)

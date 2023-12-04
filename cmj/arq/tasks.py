@@ -16,12 +16,6 @@ from sapl.utils import hash_sha512
 logger = logging.getLogger(__name__)
 
 
-@app.task(queue='celery', bind=True)
-def task_ocrmypdf(self, app_label, model_name, field_name, pk, jobs, compact=False):
-    task = task_ocrmypdf_compact_function if compact else task_ocrmypdf_function
-    task(app_label, model_name, field_name, pk, jobs)
-
-
 def console(cmd):
     p = subprocess.Popen(
         cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -31,6 +25,7 @@ def console(cmd):
 
 def task_ocrmypdf_function(app_label, model_name, field_name, pk, jobs):
     print('task_ocrmypdf_function')
+
     model = apps.get_model(app_label, model_name)
 
     list_instances = model.objects.filter(id__in=pk)
@@ -86,6 +81,11 @@ def task_ocrmypdf_function(app_label, model_name, field_name, pk, jobs):
             })
 
         instance.save()
+
+@app.task(queue='celery', bind=True)
+def task_ocrmypdf(self, app_label, model_name, field_name, pk, jobs, compact=False):
+    task = task_ocrmypdf_compact_function if compact else task_ocrmypdf_function
+    task(app_label, model_name, field_name, pk, jobs)
 
 
 def task_ocrmypdf_compact_function(app_label, model_name, field_name, pk, jobs):

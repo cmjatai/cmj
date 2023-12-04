@@ -84,7 +84,7 @@
           :class="['sub-containers', nivel(NIVEL1, itensAnexados.length > 0)]"
         >
           <div class="title">
-            <span> Matérias Anexadas </span>
+            <span> Matérias Anexadas em Tramitação</span>
           </div>
           <div class="inner">
             <div v-for="anexada in itensAnexados" :key="`${type}${anexada.id}`" >
