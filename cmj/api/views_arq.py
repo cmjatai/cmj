@@ -413,7 +413,7 @@ class _DraftMidia(ResponseFileMixin):
             DraftMidia._meta.app_label,
             DraftMidia._meta.model_name,
             'arquivo',
-            dms_id,
+            [dm.id, ],
             4,
             False
         )
@@ -425,8 +425,6 @@ class _DraftMidia(ResponseFileMixin):
             )
         else:
             tasks.task_ocrmypdf_function(*params_task[:-1])
-
-
 
         serializer = self.get_serializer(dm)
         return Response(serializer.data)
