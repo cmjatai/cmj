@@ -124,7 +124,7 @@ def tipos_autores_materias(user, restricao_regimental=True):
     r = {}
     for m in materias_em_tramitacao:
 
-        if restricao_regimental:
+        if restricao_regimental and m.tipo_id == 3:
             if m.autores.count() >= 5:
                 continue
 
