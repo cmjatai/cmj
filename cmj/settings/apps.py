@@ -5,6 +5,9 @@ PYTHON_VERSION_MIN_FOR_JWT = 3, 7, 0
 
 
 INSTALLED_APPS = (
+    'daphne',
+    'channels',
+
     'django_admin_bootstrapped',  # must come before django.contrib.admin
     'django.contrib.admin',
     'django.contrib.auth',
@@ -36,7 +39,6 @@ INSTALLED_APPS = (
 
     'webpack_loader',
 
-    'channels',
 
     # 'whoosh',
     # 'speedinfo',
