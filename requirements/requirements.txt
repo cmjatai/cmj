@@ -4,7 +4,6 @@ django-crispy-forms==1.9.1
 django-extensions==3.1.5
 django-filter==2.4.0
 django-floppyforms==1.9.0
-django-haystack==2.8.1
 django-image-cropping==1.2.0
 django-model-utils==4.0.0
 drf-spectacular==0.24.2
@@ -21,16 +20,19 @@ asn1crypto
 boto3==1.26.95
 
 
-celery-haystack==0.10
-django-celery-results==2.0.0
-billiard==3.6.3.0
+#billiard==3.6.3.0
 
 #billiard<4.0,>=3.6.4.0
 #celery==5.1.2
+#kombu==4.6.8
 
 
 
-celery==4.4.2
+celery==5.3.6
+django-haystack==2.8.1
+django-celery-results==2.3.1
+git+https://github.com/LeandroJatai/celery-haystack.git
+#celery-haystack==0.10
 
 daphne==3.0.2
 channels==3.0.5
@@ -38,17 +40,16 @@ channels_redis==3.4.1
 redis==5.0.1
 gunicorn==21.2.0
 
+python-dateutil==2.8.2
 
 
 jedi==0.17.2
-kombu==4.6.8
 pdfrw
 Pillow==10.1.0
 psycopg2-binary==2.8.5
 pyoai==2.5.0
 pypdf4==1.27.0
 pysolr==3.9.0
-python-dateutil==2.8.1
 python-decouple==3.1
 python-magic==0.4.18
 pytz==2021.3
