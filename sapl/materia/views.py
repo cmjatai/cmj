@@ -32,6 +32,7 @@ from django.views.generic.edit import FormView
 from django_filters.views import FilterView
 import weasyprint
 
+from cmj import celery
 from cmj.core.models import AreaTrabalho
 from cmj.globalrules import GROUP_MATERIA_WORKSPACE_VIEWER
 from cmj.mixins import BtnCertMixin
@@ -2235,6 +2236,10 @@ class MateriaLegislativaCrud(Crud):
             return response
 
         def get(self, request, *args, **kwargs):
+            #celery.debug_task.apply_async(
+            #    (kwargs['pk'], ),
+            #    countdown=10
+            #)
             if 'download' in request.GET:
                 return self.download(request.GET.get('download'))
             return Crud.DetailView.get(self, request, *args, **kwargs)

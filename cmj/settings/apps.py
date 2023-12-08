@@ -33,8 +33,8 @@ INSTALLED_APPS = (
 
     'django_filters',
 
-    'django_celery_results',
     'haystack',
+    'django_celery_results',
     'celery_haystack',
 
     'webpack_loader',
