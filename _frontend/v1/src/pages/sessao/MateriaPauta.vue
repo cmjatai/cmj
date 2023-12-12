@@ -16,6 +16,17 @@
         >
           <i class="far fa-2x fa-file-pdf"></i>
         </a>
+        <a
+          :class="[
+            'btn btn-link',
+            `link-file-${materia.id}`,
+
+          ]"
+          :href="materia.texto_original"
+          target="_blank"
+        >
+          <i class="far fa-2x fa-file-pdf"></i>
+        </a>
         <small :class="!baixando ? 'd-none' : ''">Baixando<br />Arquivo</small>
       </div>
 
@@ -40,7 +51,7 @@
           <div
             :class="[
               'ultima_tramitacao',
-              nivel(NIVEL2, tramitacao.ultima !== {}),
+              nivel(NIVEL2, tramitacao.ultima !== null),
             ]"
           >
             <strong>Situação:</strong> {{ tramitacao.status.descricao }}<br />
@@ -52,7 +63,7 @@
   </div>
 </template>
 <script>
-import axios from 'axios'
+// import axios from 'axios'
 export default {
   name: 'materia-pauta',
   props: ['materia', 'type'],
@@ -179,7 +190,7 @@ export default {
           })
         })
 
-        if (t.materia.texto_original !== null) {
+        /* if (t.materia.texto_original !== null) {
           let url = `${t.materia.texto_original}?u=${parseInt(Math.random() * 65536)}`
           t.baixando = true
 
@@ -195,7 +206,7 @@ export default {
             .catch(() => {
               t.baixando = false
             })
-        }
+        } */
       })
     }
   }
