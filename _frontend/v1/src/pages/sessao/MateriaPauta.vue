@@ -288,5 +288,11 @@ export default {
 }
 
 @media screen and (max-width: 480px) {
+
+.materia-pauta {
+  .btn-link {
+    margin: 0.5rem -0.3rem 0 -0.5rem;
+  }
+}
 }
 </style>

@@ -423,7 +423,7 @@ export default {
         //line-height: 1;
         font-weight: bold;
         color: white;
-        background-color: #5696ca;
+        background-color: #55d651;
         display: inline-block;
       }
     }
@@ -439,6 +439,16 @@ export default {
     .materia-pauta {
       border-bottom: 1px solid #fff;
       padding: 10px 15px 0;
+      .epigrafe {
+        color: #09a503;
+      }
+      .ementa {
+        color: #114b3f;
+      }
+      .protocolo-data, .autoria {
+        padding-top: 0;
+        padding-bottom: 0;
+      }
     }
   }
   .status-tramitacao {
@@ -446,7 +456,7 @@ export default {
     padding-bottom: 15px;
     .observacao {
       display: inline-block;
-      border-top: 1px solid #5696ca;
+      border-top: 1px solid #71ca56;
       margin: 0.5em 1em 0 0;
       padding-top: 0.5em;
       line-height: 1.3;
