@@ -28,12 +28,16 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/brasao/escola_1024.png"
   },
   {
-    "revision": "a245fde73436690c0136",
+    "revision": "eae64a3b42bbeda85474",
     "url": "/static/css/app.679dd5e7.css"
   },
   {
     "revision": "0833a4da7277c20718e4",
     "url": "/static/css/chunk-3aa77237.e32376be.css"
+  },
+  {
+    "revision": "0f151d425d289892c0fe",
+    "url": "/static/css/chunk-57bc0346.c64144d4.css"
   },
   {
     "revision": "449f288b782355f77a9e",
@@ -42,10 +46,6 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "0c707d888e1d2c50fbaf",
     "url": "/static/css/chunk-9c43eecc.71109f00.css"
-  },
-  {
-    "revision": "bb8ce4cb3d843883fdef",
-    "url": "/static/css/chunk-a33d19e0.c64144d4.css"
   },
   {
     "revision": "b4f28ec83fac2e9e9df4",
@@ -340,12 +340,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/user.png"
   },
   {
-    "revision": "4fc59d7a22bbbd43fc0e3fbe56fe93df",
+    "revision": "ca7d3bd25fbda9b07f83383d21dd45e8",
     "url": "/static/index.html"
   },
   {
-    "revision": "a245fde73436690c0136",
-    "url": "/static/js/app.b6107ddf.js"
+    "revision": "eae64a3b42bbeda85474",
+    "url": "/static/js/app.7ccf6106.js"
   },
   {
     "revision": "c4bb07deda4a5236e480",
@@ -360,6 +360,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/js/chunk-443bfa1b.865d0938.js"
   },
   {
+    "revision": "0f151d425d289892c0fe",
+    "url": "/static/js/chunk-57bc0346.91b0cabb.js"
+  },
+  {
     "revision": "350fde48e192f7657df2",
     "url": "/static/js/chunk-5d18cef0.d1fdf472.js"
   },
@@ -370,10 +374,6 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "0c707d888e1d2c50fbaf",
     "url": "/static/js/chunk-9c43eecc.dcd4aba8.js"
-  },
-  {
-    "revision": "bb8ce4cb3d843883fdef",
-    "url": "/static/js/chunk-a33d19e0.a6d6d579.js"
   },
   {
     "revision": "b4f28ec83fac2e9e9df4",
