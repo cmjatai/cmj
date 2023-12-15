@@ -1,11 +1,4 @@
 {% load i18n %}
 Cronometro:
   {% trans 'Cronometro' %}:
-  - tipo:4  duracao_cronometro:4 ativo:2 ordenacao:2
-
-PainelConfig:
-  {% trans 'Configurações do Painel' %}:
-  - cronometro_ordem
-  - disparo_cronometro:6 tempo_disparo_antecedencia:6
-  - tempo_disparo_termino:6 exibir_nome_casa:6
-  - mostrar_votos_antecedencia
+  - status:3  data_cronometro:6  tipo

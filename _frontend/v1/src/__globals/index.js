@@ -26,7 +26,11 @@ import './2018/scss/app.scss'
 import './2018/js/image_cropping'
 import './2018/js/functions'
 
+import './2018/js/jquery.runner'
 import './2018/js/app_cmj'
+
+import * as moment from 'moment'
+import 'moment/locale/pt-br'
 
 // eslint-disable-next-line
 //require('imports-loader?window.jQuery=jquery!./2018/js/jquery.runner.js')
@@ -34,6 +38,8 @@ import './2018/js/app_cmj'
 window.$ = $
 window.jQuery = $
 window.tinymce = tinymce
+
+window.moment = moment
 
 // initTinymce
 // import './2018/themes/dezembrolaranja/app.scss'

@@ -26,6 +26,8 @@
     "jquery-mask-plugin": "^1.14.16",
     "jquery-ui-themes": "^1.12.0",
     "lodash": "^4.17.20",
+    "moment": "^2.29.4",
+    "moment-locales-webpack-plugin": "^1.2.0",
     "popper.js": "^1.16.1",
     "register-service-worker": "^1.7.1",
     "split.js": "^1.6.5",

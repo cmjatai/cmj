@@ -1100,6 +1100,12 @@ class LoginForm(AuthenticationForm):
 class ConfiguracoesAppForm(ModelForm):
     logger = logging.getLogger(__name__)
 
+    mostrar_voto = forms.BooleanField(
+        help_text=_('Se selecionado, exibe qual é o voto, e não apenas a indicação de que já votou, '
+                    'com a votação ainda aberta.'),
+        label=_('Mostrar voto do Parlamentar no painel durante a votação?'),
+        required=False)
+
     mostrar_brasao_painel = forms.BooleanField(
         help_text=_('Sugerimos fortemente que faça o upload de imagens com '
                     'o fundo transparente.'),
@@ -1118,12 +1124,25 @@ class ConfiguracoesAppForm(ModelForm):
                   'proposicao_incorporacao_obrigatoria',
                   'protocolo_manual',
                   'mostrar_brasao_painel',
+                  'mostrar_voto',
                   'receber_recibo_proposicao',
                   'assinatura_ata',
                   'estatisticas_acesso_normas',
                   'escolher_numero_materia_proposicao',
                   'tramitacao_materia',
-                  'tramitacao_documento']
+                  'tramitacao_documento',
+                  'cronometro_discurso',
+                  'cronometro_aparte',
+                  'cronometro_ordem',
+                  'cronometro_consideracoes',
+                  ]
+
+    def __init__(self, *args, **kwargs):
+        super(ConfiguracoesAppForm, self).__init__(*args, **kwargs)
+        self.fields['cronometro_discurso'].widget.attrs['class'] = 'cronometro'
+        self.fields['cronometro_aparte'].widget.attrs['class'] = 'cronometro'
+        self.fields['cronometro_ordem'].widget.attrs['class'] = 'cronometro'
+        self.fields['cronometro_consideracoes'].widget.attrs['class'] = 'cronometro'
 
     def clean_mostrar_brasao_painel(self):
         mostrar_brasao_painel = self.cleaned_data.get(

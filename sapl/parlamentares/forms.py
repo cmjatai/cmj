@@ -12,9 +12,10 @@ from django.db.models import Q
 from django.forms import ModelForm
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from image_cropping.widgets import get_attrs
 import django_filters
+from image_cropping.widgets import get_attrs
 
+from cmj.utils import get_settings_auth_user_model
 from sapl.base.models import Autor, TipoAutor
 from sapl.crispy_layout_mixin import SaplFormHelper
 from sapl.crispy_layout_mixin import form_actions, to_row
@@ -469,7 +470,7 @@ class FrenteForm(ModelForm):
 
 class VotanteForm(ModelForm):
 
-    username = forms.CharField(
+    email = forms.CharField(
         label=_('Usuário'),
         required=True,
         max_length=30)
@@ -478,10 +479,10 @@ class VotanteForm(ModelForm):
 
     class Meta:
         model = Votante
-        fields = ['username']
+        fields = ['email']
 
     def __init__(self, *args, **kwargs):
-        row1 = to_row([('username', 4)])
+        row1 = to_row([('email', 4)])
 
         self.helper = SaplFormHelper()
         self.helper.layout = Layout(
@@ -503,8 +504,8 @@ class VotanteForm(ModelForm):
 
         cd = self.cleaned_data
 
-        username = cd['username']
-        user = get_user_model().objects.filter(username=username)
+        username = cd['email']
+        user = get_user_model().objects.filter(email__iexact=username)
         if not user.exists():
             self.logger.error(
                 "Não foi possível vincular usuário. Usuário {} não existe.".format(username))
@@ -527,9 +528,8 @@ class VotanteForm(ModelForm):
     @transaction.atomic
     def save(self, commit=False):
         votante = super(VotanteForm, self).save(commit)
-
         # Cria user
-        u = User.objects.get(username=self.cleaned_data['username'])
+        u = get_user_model().objects.get(email=self.cleaned_data['email'])
         # Adiciona user ao grupo
         g = Group.objects.filter(name=SAPL_GROUP_VOTANTE)[0]
         u.groups.add(g)

@@ -5,6 +5,7 @@ const shell = require('shelljs')
 
 const BundleTrackerPlugin = require('webpack-bundle-tracker')
 const CompressionPlugin = require('compression-webpack-plugin')
+const MomentLocalesPlugin = require('moment-locales-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
 const CopyPlugin = require('copy-webpack-plugin')
 
@@ -58,6 +59,12 @@ module.exports = {
           to: '[path][name].[ext]'
         }
       ]
+    ])
+
+    config.plugin('MomentLocalesPlugin').use(MomentLocalesPlugin, [
+      {
+        localesToKeep: ['pt-BR']
+      }
     ])
 
     if (process.env.NODE_ENV === 'production') {
