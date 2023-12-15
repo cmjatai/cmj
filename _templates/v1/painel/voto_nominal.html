@@ -11,7 +11,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     {% render_chunk_vendors 'css' %}
-    {% render_bundle  'global' 'css' %}
+    {% render_bundle  'app' 'css' %}
     {% render_bundle  'painel' 'css' %}
 
     <style type="text/css">
@@ -19,9 +19,8 @@
             max-width: 100%;
             overflow-x: hidden;
         }
-      @media screen {
         body {
-          background: #1c1b1b;
+          background: #000000;
         }
         ul, li {
           list-style-type: none;
@@ -41,7 +40,6 @@
         #voltar {
           margin-left: 5rem;
         }
-      }
     </style>
   </head>
   <body>
@@ -92,11 +90,11 @@
         {% csrf_token %}
           <div class="row" align="center">
             <div class="col-md-12" id="votos">
-              <div id="votosim"><input type="submit" class="btn btn-lg btn-success" name="voto" type="submit" value="Sim" /></div>
+              <div id="votosim"><input type="submit" class="btn btn-lg btn-success" id="voto" name="voto" type="submit" value="Sim" /></div>
               &nbsp;
-              <div id="votonao"><input type="submit" class="btn btn-lg btn-danger" name="voto" type="submit" value="Não"/></div>
+              <div id="votonao"><input type="submit" class="btn btn-lg btn-danger" id="voto" name="voto" type="submit" value="Não"/></div>
               &nbsp;
-              <div id="votoabstencao"><input type="submit" class="btn btn-lg btn-secondary" name="voto" type="submit" value="Abstenção"/></div>
+              <div id="votoabstencao"><input type="submit" class="btn btn-lg btn-secondary" id="voto" name="voto" type="submit" value="Abstenção"/></div>
             </div>
           </div>
           </br>
@@ -128,9 +126,9 @@
 </html>
 
 {% render_chunk_vendors 'js' %}
-{% render_bundle  'global' 'js' %}  
-{% render_bundle  'painel' 'js' %}      
-    
+{% render_bundle  'app' 'js' %}
+{% render_bundle  'painel' 'js' %}
+
 <script type="text/javascript">
   var d = new Date();
   var n = d.toLocaleDateString();
@@ -165,7 +163,7 @@
 
   function checkTime(i) {
     if (i<10)
-      i = "0" + i; // add zero in front of numbers < 10  
+      i = "0" + i; // add zero in front of numbers < 10
     return i;
   }
 
@@ -184,7 +182,7 @@
 
   $(document).ready(function(){
     startTime();
-    
+
     setTimeout(function() {
       document.location.reload(true);
     }, 30000)

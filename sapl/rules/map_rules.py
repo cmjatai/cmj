@@ -239,7 +239,7 @@ rules_group_geral = {
             'view_tabelas_auxiliares'
         ], set()),
 
-        (painel.PainelConfig, __base__, set()),
+        #(painel.PainelConfig, __base__, set()),
 
         (base.CasaLegislativa, __listdetailchange__ +
          [RP_ADD], __perms_publicas__),
