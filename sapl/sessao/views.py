@@ -740,8 +740,12 @@ class MateriaOrdemDiaCrud(MasterDetailCrud):
                 oc.registro_aberto = False
                 oc.save()
 
-            if materias_a_adicionar:
-                sub_ordens = obj.childs.order_by('numero_ordem')
+            if materias_ja_adicionadas or materias_a_adicionar:
+                sub_ordens = obj.childs.order_by(
+                    'materia__tipo__sequencia_regimental',
+                    'materia__ano',
+                    'materia__numero'
+                )
                 numero_ordem = 1
                 for o in sub_ordens:
                     o.numero_ordem = numero_ordem
@@ -1545,7 +1549,6 @@ class PainelView(PermissionRequiredForAppCrudMixin, TemplateView):
                 {'subnav_template_name': 'sessao/subnav-solene.yaml'})
 
         return context
-
 
 
 class PresencaOrdemDiaView(FormMixin, PresencaMixin, DetailView):

@@ -438,7 +438,12 @@ export default {
     }
     .materia-pauta {
       border-bottom: 1px solid #fff;
+        border-top: 1px solid transparent;
       padding: 10px 15px 0;
+      &:hover {
+        border-top: 1px solid #bbb;
+        background-color: #0001;
+      }
       .epigrafe {
         color: #09a503;
       }
