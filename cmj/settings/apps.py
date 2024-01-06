@@ -58,6 +58,7 @@ SAPL_APPS = (
     'sapl.sessao',
     #'sapl.lexml',
     'sapl.painel',
+    'sapl.painelset',
     'sapl.protocoloadm',
     'sapl.redireciona_urls',
     'sapl.compilacao',
