@@ -1,9 +1,6 @@
-from django.contrib.contenttypes.models import ContentType
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-
-from sapl.utils import SaplGenericForeignKey
 
 
 class Tela(models.Model):
@@ -85,16 +82,11 @@ class PainelSET(models.Model):
         max_length=50, default='',
         verbose_name='Descrição do Conjunto de Paineis')
 
-    content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT)
-    object_id = models.PositiveIntegerField()
-    content_object = SaplGenericForeignKey('content_type', 'object_id')
-
     class Meta:
         ordering = ('descricao',)
-        unique_together = (('content_type', 'object_id'), )
 
     def __str__(self):
-        return self.descricao or str(self.content_object)
+        return self.descricao
 
 
 class Painel(models.Model):
