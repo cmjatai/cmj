@@ -84,6 +84,8 @@ class PainelSET(models.Model):
 
     class Meta:
         ordering = ('descricao',)
+        verbose_name = _('Conjunto de Paineis')
+        verbose_name_plural = _('Conjuntos de Paineis')
 
     def __str__(self):
         return self.descricao
