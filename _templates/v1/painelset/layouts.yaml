@@ -1,4 +1,13 @@
 {% load i18n %}
 PainelSET:
-  {% trans 'Descrição' %}:
+  {% trans 'PainelSET' %}:
   - descricao
+
+ComponenteBase:
+  {% trans 'ComponenteBase' %}:
+  - name:5 descricao
+
+Tela:
+  {% trans 'Tela para Paineis' %}:
+  - descricao
+  - timer cols rows

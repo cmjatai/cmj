@@ -8,6 +8,10 @@ class Tela(models.Model):
     timer = models.BooleanField(
         verbose_name=_('Tela de Timer Individual'), default=False)
 
+    descricao = models.CharField(
+        max_length=50, default='',
+        verbose_name='Descrição da Tela')
+
     cols = models.PositiveSmallIntegerField(
         default=12,
         validators=[
@@ -25,7 +29,9 @@ class Tela(models.Model):
     )
 
     class Meta:
-        pass
+        ordering = ('descricao',)
+        verbose_name = _('Tela para Paineis')
+        verbose_name_plural = _('Telas para Paineis')
 
 
 class ComponenteBase(models.Model):
@@ -39,7 +45,9 @@ class ComponenteBase(models.Model):
         verbose_name='Nome Vue do Componente')
 
     class Meta:
-        pass
+        ordering = ('descricao',)
+        verbose_name = _('Componente Base')
+        verbose_name_plural = _('Componentes Base')
 
 
 class ComponenteTela(models.Model):
