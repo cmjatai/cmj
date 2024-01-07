@@ -148,8 +148,10 @@
                 </div>
               {% endfor %}
 
-              <div id="app"></div>
+              {% block appfront_content_before %}<div id="app"></div>{% endblock %}
               {% block base_content %}{% endblock %}
+              {% block appfront_content_after %}{% endblock %}
+
             </div>
 
             {% block cmj_extra_content %}{% endblock %}
