@@ -32,7 +32,7 @@ export const routes = [
     children: [
       {
         path: '', // list
-        name: 'sessao_link',
+        // name: 'sessao_link',
         component: () => import('@/modules/online/sessao/SessaoPlenariaModule.vue'),
         children: [
           {
@@ -44,6 +44,25 @@ export const routes = [
             path: ':id/',
             name: 'sessao_plenaria_online_link',
             component: () => import('@/modules/online/sessao/SessaoPlenariaOnline.vue')
+          }
+        ]
+      }
+    ]
+  },
+  {
+    path: '/painelset/',
+    name: 'painelset_layout',
+    component: () => import('@/modules/painelset/PainelSetLayout'),
+    children: [
+      {
+        path: 'configs/',
+        name: 'painelset_configs_layout',
+        component: () => import('@/modules/painelset/configs/ConfigsLayout'),
+        children: [
+          {
+            path: 'tela/:id',
+            name: 'painelset_tela_layout',
+            component: () => import('@/modules/painelset/configs/tela/TelaLayout')
           }
         ]
       }

@@ -33,6 +33,9 @@ class Tela(models.Model):
         verbose_name = _('Tela para Paineis')
         verbose_name_plural = _('Telas para Paineis')
 
+    def __str__(self):
+        return self.descricao
+
 
 class ComponenteBase(models.Model):
 

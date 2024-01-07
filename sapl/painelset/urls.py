@@ -10,11 +10,11 @@ app_name = AppConfig.name
 
 urlpatterns = [
 
-    url(r'^painelset/', include(PainelSETCrud.get_urls())),
+    url(r'^painelset', include(PainelSETCrud.get_urls())),
 
 
-    url(r'^painelset/configs/tela/', include(TelaCrud.get_urls())),
-    url(r'^painelset/configs/componentebase/',
+    url(r'^painelset/configs/tela', include(TelaCrud.get_urls())),
+    url(r'^painelset/configs/componentebase',
         include(ComponenteBaseCrud.get_urls())),
 
 ]
