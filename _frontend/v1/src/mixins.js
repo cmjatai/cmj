@@ -150,8 +150,8 @@ Vue.mixin({
     /*
       Observador para o WebSocket...
       O Componente que se interesse por monitorar notificacões vindas
-      do servidor de que um model possui alteracão, basta implementar
-      o método on_ws_message.
+      do servidor de que um model possui alteracão, basta re-implementar
+      o método on_ws_message, ou usar o on_ws_message do mixin e implementar o fetch
     */
     let _this = this
     EventBus.$on('ws-message', _this.on_ws_message)

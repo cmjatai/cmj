@@ -11,7 +11,7 @@
         </div>
     </template>
     <template slot="header-right">
-      <i class="fas fa-sign-out-alt hover-circle" @click="close" title="Sair da Interface Sapl Online"></i>
+      <i class="fas fa-sign-out-alt hover-circle" @click="close" title="Sair da Interface Online"></i>
     </template>
 
     <template slot="sideleft">
