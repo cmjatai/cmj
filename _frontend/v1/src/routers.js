@@ -60,7 +60,7 @@ export const routes = [
         component: () => import('@/modules/painelset/configs/ConfigsLayout'),
         children: [
           {
-            path: 'tela/:id',
+            path: 'tela/:id_tela',
             name: 'painelset_tela_layout',
             component: () => import('@/modules/painelset/configs/tela/TelaLayout')
           }
