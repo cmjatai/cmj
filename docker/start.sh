@@ -51,7 +51,7 @@ fi
 
 
 rm /var/cmjatai/cmj/logs/celery/*.pid
-celery multi start 1 -A cmj -l INFO -Q:1 celery -c:1 4 --hostname=cmjredis --pidfile=./logs/celery/%n.pid --logfile=./logs/celery/%n%I.log
+celery multi start 1 -A cmj -l INFO -Q:1 celery -c:1 1 --hostname=cmjredis --pidfile=./logs/celery/%n.pid --logfile=./logs/celery/%n%I.log
 
 /bin/sh start_daphne.sh &
 /bin/sh start_gunicorn.sh &
