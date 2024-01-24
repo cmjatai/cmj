@@ -104,8 +104,8 @@ class Command(BaseCommand):
             ]
         )"""
 
-        in_file = '/home/leandro/Downloads/processo_10252023.pdf'
-        out_file = '/home/leandro/Downloads/processo_10252023_out.pdf'
+        in_file = '/home/leandro/Downloads/L4658.pdf'
+        out_file = '/home/leandro/Downloads/L4658_out.pdf'
 
         os.makedirs('/home/leandro/TEMP/teste/rgb', exist_ok=True)
         os.makedirs('/home/leandro/TEMP/teste/gray', exist_ok=True)
@@ -115,6 +115,8 @@ class Command(BaseCommand):
 
         doc = fitz.open(in_file)
         doc_out = fitz.open()
+
+        __quality = 80
 
         for idx, p in enumerate(doc):
             images = p.get_images()
@@ -136,7 +138,8 @@ class Command(BaseCommand):
                     igray = fitz.Pixmap(fitz.csGRAY, imgpix)
                     gray_path = f'/home/leandro/TEMP/teste/gray/teste-{idx:0>4}-{idxi:0>3}.{img["ext"]}'
                     # , jpg_quality=50)
-                    igray.save(gray_path, output=img['ext'], jpg_quality=60)
+                    igray.save(
+                        gray_path, output=img['ext'], jpg_quality=__quality)
                     # ,
                     #ibytes = igray.tobytes(output=img['ext'], jpg_quality=70)
 
@@ -167,7 +170,7 @@ class Command(BaseCommand):
                     im_resized = impil.resize(
                         (width, height), resample=Resampling.LANCZOS)
 
-                    im_resized.save(gray_path, quality=60, dpi=(72, 72))
+                    im_resized.save(gray_path, quality=__quality, dpi=(72, 72))
                     # return
 
                     #ibytes = impil.tobytes()
@@ -193,17 +196,17 @@ class Command(BaseCommand):
         # return
 
         ocrmypdf.ocr(
-            '/home/leandro/Downloads/processo_10252023_out.pdf',
-            '/home/leandro/Downloads/processo_10252023_pdfa.pdf',
+            '/home/leandro/Downloads/L4658_out.pdf',
+            '/home/leandro/Downloads/L4658_pdfa.pdf',
             language='por',
             # force_ocr=True,
             # redo_ocr=True,
             skip_text=True,
-            jobs=4,
+            jobs=8,
             output_type='pdfa-2',
             image_dpi=72,
-            jpg_quality=40,
-            png_quality=30,
+            jpg_quality=__quality,
+            png_quality=__quality,
             optimize=3,
             jbig2_lossy=True,
             oversample=20,
