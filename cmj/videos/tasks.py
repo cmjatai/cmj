@@ -44,7 +44,8 @@ def start_task(task_name, task, eta):
 
     if f'cmj.videos.tasks.{task_name}' not in tasks:
         logger.info(f'START TRUE {task_name} {eta}')
-        task.apply_async(eta=eta)
+        expires = eta + timedelta(days=1)
+        task.apply_async(eta=eta, expires=expires)
         return True
     logger.info(f'START FALSE {task_name} {eta}')
     return False
