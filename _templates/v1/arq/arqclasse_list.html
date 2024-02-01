@@ -61,42 +61,8 @@
             {% endfor %}
         </tbody>
     </table>
-{% endif %}
-
-{% if object %}
-<br>
-<hr>
-<h2>
-  Documentos da Classe {{object.nome}}<br>Conta: {{object.conta}}
-
-</h2>
-<table class="table table-hover" width="100%">
-  {% with object.arqdoc_set as arqdoc_set%}
-  <caption>Quantidade: {{arqdoc_set.all.count}}</caption>
-  <thead>
-        <tr>
-          <th>{% fieldclass_verbose_name 'cmj.arq.models.ArqDoc' 'data' %}</th>
-          <th>{% fieldclass_verbose_name 'cmj.arq.models.ArqDoc' 'titulo' %}</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for doc in arqdoc_set.all %}
-        <tr>
-          <td>{{ doc.data|date:"d/m/Y" }}</td>
-          <td>
-            <a href="#">{{ doc.titulo }}</a>
-            <br>
-            <small>
-              {{doc.descricao}}
-            </small>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-  {% endwith %}
-</table>
-
-{% endif %}
-
-
+  {% endif %}
+  {% if object %}
+      {% include "arq/arqdoc_widget_list.html" %}
+  {% endif %}
 {% endblock %}
