@@ -10,7 +10,7 @@
       let imagem_caputurada = false
       let stream = null
 
-      let facingMode = 'enviroment' // 'user'
+      let facingMode = 'environment' // 'user'
 
       const container_camera = document.querySelector('.container-camera')
       const container_ultimas_visitas = document.querySelector('.container-ultimas-visitas')
@@ -157,8 +157,11 @@
         btn_trash.style.display = 'none'
 
         navigator.mediaDevices.getUserMedia({
-          video: true,
-          facingMode: facingMode
+          video: {
+            facingMode: {
+              exact: facingMode
+            }
+          },
         })
         .then(function (mediaStream) {
           context.clearRect(0, 0, canvas.width, canvas.height)

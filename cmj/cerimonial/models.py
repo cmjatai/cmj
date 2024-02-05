@@ -10,7 +10,7 @@ from cmj.core.models import CmjModelMixin, Trecho, Distrito, RegiaoMunicipal,\
 from cmj.utils import YES_NO_CHOICES, NONE_YES_NO_CHOICES,\
     get_settings_auth_user_model
 from sapl.parlamentares.models import Parlamentar, Partido
-from sapl.utils import LISTA_DE_UFS, texto_upload_path
+from sapl.utils import LISTA_DE_UFS, texto_upload_path, PortalImageField
 
 
 FEMININO = 'F'
@@ -868,7 +868,7 @@ class Visitante(CmjAuditoriaModelMixin):
     telefone = models.CharField(max_length=100,
                                 verbose_name='Telefone')
 
-    fotografia = models.ImageField(
+    fotografia = PortalImageField(
         blank=True,
         null=True,
         upload_to=texto_upload_path,
@@ -914,7 +914,7 @@ class Visita(CmjAuditoriaModelMixin):
         verbose_name=_('Setores visitados')
     )
 
-    fotografia = models.ImageField(
+    fotografia = PortalImageField(
         blank=True,
         null=True,
         upload_to=texto_upload_path,
