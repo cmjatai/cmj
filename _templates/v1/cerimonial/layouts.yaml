@@ -170,6 +170,6 @@ GrupoDeContatosLayoutForForm:
   - nome
 Visita:
   {% trans 'Dados Básicos' %}:
-  - visitante created
+  - visitante created owner
   - setores
   - fotografia
