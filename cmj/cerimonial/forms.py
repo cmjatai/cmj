@@ -1300,9 +1300,15 @@ class VisitaForm(ModelForm):
         widget=forms.DateInput(format='%d/%m/%Y')
     )
 
+    observacoes = forms.CharField(
+        required=False,
+        label=Visita._meta.get_field(
+            'observacoes').verbose_name,
+        widget=forms.Textarea(attrs={'rows': 5}))
+
     class Meta:
         model = Visita
-        fields = ('setores', 'fotografia')
+        fields = ('setores', 'fotografia', 'observacoes')
 
     def __init__(self, *args, **kwargs):
 
@@ -1321,7 +1327,8 @@ class VisitaForm(ModelForm):
                     ('data_nascimento', 5),
                     ('bairro', 7),
                     ('fotografia', 12),
-                    ('setores', 12),
+                    ('setores', 7),
+                    ('observacoes', 5),
 
                 ]), 8),
                 (HTML(
@@ -1335,6 +1342,8 @@ class VisitaForm(ModelForm):
                             </div>
                             <div class="btn-group btn-group-sm">
                                 <div class="btn btn-success" id="capture">Capturar</div>
+                                <div class="btn btn-danger" id="trash"><i class="fas fa-trash-alt"></i></div>
+
                             </div>
                         </div>
                     </div>

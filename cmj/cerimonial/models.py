@@ -921,6 +921,10 @@ class Visita(CmjAuditoriaModelMixin):
         verbose_name=_('Fotografia'),
         max_length=512)
 
+    observacoes = models.TextField(
+        blank=True, default='',
+        verbose_name=_('Observações Gerais'))
+
     class Meta:
         verbose_name = _('Registro de Entrada')
         verbose_name_plural = _('Registros de Entrada')

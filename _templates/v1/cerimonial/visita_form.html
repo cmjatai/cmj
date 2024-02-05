@@ -9,13 +9,30 @@
       let camera_ligada = false
       let imagem_caputurada = false
       let stream = null
+
+      let facingMode = 'enviroment' // 'user'
+
       const container_camera = document.querySelector('.container-camera')
       const container_ultimas_visitas = document.querySelector('.container-ultimas-visitas')
 
       const btn_liga = document.querySelector('#liga')
       const btn_capt = document.querySelector('#capture')
+      const btn_trash = document.querySelector('#trash')
       const btn_subm = document.querySelector('#submit-id-salvar')
       const input_doc = document.querySelector('#id_documento')
+
+      const canvas = document.querySelector("#canvas")
+      const context = canvas.getContext('2d')
+
+      const action_close = function()  {
+        context.clearRect(0, 0, canvas.width, canvas.height)
+        imagem_caputurada = false
+        stream.getTracks().forEach(track => track.stop())
+        camera_ligada = false
+        btn_liga.innerHTML = 'Ligar Câmera'
+        btn_capt.style.display = 'none'
+        btn_trash.style.display = 'none'
+      }
 
       //const div_id_telefone = document.querySelector('#div_id_telefone')
       let img_select = document.querySelector('#img_select')
@@ -120,7 +137,6 @@
           return false
         }
         const form = e.target.form
-        const canvas = document.querySelector("#canvas");
         canvas.toBlob(function (blob) {
           let fileName = 'fotografia.jpg'
           let file = new File([blob], fileName,{type:"image/jpeg", lastModified:new Date().getTime()}, 'utf-8');
@@ -134,20 +150,17 @@
       })
 
       btn_liga.addEventListener('click', function (e) {
-        const btn_liga = this
         if (camera_ligada === true) {
-          imagem_caputurada = false
-          stream.getTracks().forEach(track => track.stop())
-          camera_ligada = false
-          btn_liga.setHTML('Ligar Câmera')
-          btn_capt.style.display = 'none'
+          action_close()
           return
         }
+        btn_trash.style.display = 'none'
 
-        navigator.mediaDevices.getUserMedia({video: true})
+        navigator.mediaDevices.getUserMedia({
+          video: true,
+          facingMode: facingMode
+        })
         .then(function (mediaStream) {
-          const canvas = document.querySelector("#canvas")
-          const context = canvas.getContext('2d')
           context.clearRect(0, 0, canvas.width, canvas.height)
 
           const video = document.querySelector('#video-visita')
@@ -156,12 +169,17 @@
           video.play()
           btn_capt.style.display = 'block'
           camera_ligada = true
-          btn_liga.setHTML('Desligar Câmera')
+          btn_liga.innerHTML = 'Desligar Câmera'
         })
         .catch(function (err) {
           console.log(err)
           console.log('Não há permissões para acessar a webcam')
         })
+      })
+
+      btn_trash.style.display = 'none'
+      btn_trash.addEventListener('click', function (e) {
+        action_close()
       })
 
       btn_capt.addEventListener('click', function (e) {
@@ -174,8 +192,9 @@
         context.drawImage(video, 0, 0)
         camera_ligada = false
         stream.getTracks().forEach(track => track.stop())
-        btn_liga.setHTML('Ligar Câmera')
+        btn_liga.innerHTML = 'Ligar Câmera'
         this.style.display = 'none'
+        btn_trash.style.display = 'block'
       })
     })
   </script>
