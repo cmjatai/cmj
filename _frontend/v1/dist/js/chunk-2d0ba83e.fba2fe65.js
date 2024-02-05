@@ -1,1 +1,0 @@
-(window.webpackJsonp=window.webpackJsonp||[]).push([["chunk-2d0ba83e"],{3814:function(e,n,t){"use strict";t.r(n);var u={name:"arq-layout",methods:{},mounted:function(){this.removeAside()}},o=t("2877"),i=Object(o.a)(u,(function(){var e=this._self._c;return e("div",[e("router-view")],1)}),[],!1,null,null,null);n.default=i.exports}}]);
