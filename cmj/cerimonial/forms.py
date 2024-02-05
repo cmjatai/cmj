@@ -1338,12 +1338,18 @@ class VisitaForm(ModelForm):
                         <canvas id="canvas"></canvas>
                         <div class="btn-controls btn-toobar">
                             <div class="btn-group btn-group-sm">
+                                <div class="btn btn-info" id="troca_camera">
+                                    <i class="fas fa-sync-alt"></i>
+                                </div>
+                            </div>
+                            <div class="btn-group btn-group-sm">
                                 <div class="btn btn-primary" id="liga">Ligar Câmera</div>
                             </div>
                             <div class="btn-group btn-group-sm">
                                 <div class="btn btn-success" id="capture">Capturar</div>
+                            </div>
+                            <div class="btn-group btn-group-sm">
                                 <div class="btn btn-danger" id="trash"><i class="fas fa-trash-alt"></i></div>
-
                             </div>
                         </div>
                     </div>

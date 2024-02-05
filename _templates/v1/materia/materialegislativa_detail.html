@@ -58,9 +58,10 @@
 {% endblock sub_actions %}
 
 {% block detail_content %}
-
-{% if object.tipo_id != 3 and object.em_tramitacao and perms.add_materialegislativa and object.texto_articulado.first.dispositivos_set.count < 4 %}
-  <strong class="text-red">ATENÇÂO!!! Verificar Texto Articulado...</strong>
+{% if object.tipo.turnos_aprovacao > 1 and object.em_tramitacao and perms.add_materialegislativa %}
+  {% if not object.texto_articulado.first or object.texto_articulado.first.dispositivos_set.count < 4 %}
+    <strong class="text-red">ATENÇÂO!!! Verificar Texto Articulado...</strong><br>
+  {% endif %}
 {% endif %}
 
 <div class="item-listas container-table">

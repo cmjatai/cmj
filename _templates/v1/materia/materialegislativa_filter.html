@@ -312,15 +312,18 @@
                                       </li>
                                 {% if forloop.last %}
                                     </ul>
-                                  </div>
+                               q   </div>
                                 {% endif %}
                               {% endfor %}
                           </div>
                         {% endif %}
                       </div>
                     {% endif %}
-                    {% if m.tipo_id != 3 and m.em_tramitacao and perms.compilacao.add_textoarticulado and m.texto_articulado.first.dispositivos_set.count < 4 %}
-                      <strong class="text-red">ATENÇÂO!!! Verificar Texto Articulado...</strong><br>
+
+                    {% if m.tipo.turnos_aprovacao > 1 and m.em_tramitacao and perms.add_materialegislativa %}
+                      {% if not m.texto_articulado.first or m.texto_articulado.first.dispositivos_set.count < 4 %}
+                        <strong class="text-red">ATENÇÂO!!! Verificar Texto Articulado...</strong><br>
+                      {% endif %}
                     {% endif %}
 
                     {% if m.em_tramitacao and mail_service_configured %}
