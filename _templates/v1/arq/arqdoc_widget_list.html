@@ -1,8 +1,15 @@
 {% load i18n common_cmj_tags %}
 <hr>
-<h2>
-  Documentos da Classe {{object.nome}}<br>Conta: {{object.conta}}
-</h2>
+<div class="d-flex w-100 justify-content-between align-items-center">
+  <h2>
+    ArqDocumentos da Classe {{object.nome}}<br>Conta: {{object.conta}}
+  </h2>
+  <div class="btn-group-sm" role="group">
+    <a class="btn btn-outline-primary" href="{% url 'cmj.arq:arqdoc_create' object.id %}">
+      Adicionar ArqDocumento
+    </a>
+  </div>
+</div>
 <table class="table table-hover" width="100%">
   {% with object.arqdoc_set as arqdoc_set%}
   <caption>Quantidade: {{arqdoc_set.all.count}}</caption>
@@ -17,7 +24,7 @@
         <tr>
           <td>{{ doc.data|date:"d/m/Y" }}</td>
           <td>
-            <a href="#">{{ doc.titulo }}</a>
+            <a href="{% url 'cmj.arq:arqdoc_edit' doc.classe_estrutural_id doc.pk %}">{{ doc.titulo }}</a>
             <br>
             <small>
               {{doc.descricao}}

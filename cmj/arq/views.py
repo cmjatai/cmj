@@ -11,7 +11,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
 
 from cmj.arq import forms
-from cmj.arq.models import ArqClasse
+from cmj.arq.models import ArqClasse, ArqDoc
 
 
 class ArqClasseParentMixin:
@@ -224,3 +224,77 @@ class ArqClasseListView(ArqClasseParentMixin, PermissionRequiredMixin, ListView)
             self.object = get_object_or_404(ArqClasse, pk=self.kwargs['pk'])
 
         return super().dispatch(request, *args, **kwargs)
+
+
+class ArqDocMixin:
+
+    @property
+    def verbose_name(self):
+        return self.model._meta.verbose_name
+
+    @property
+    def verbose_name_plural(self):
+        return self.model._meta.verbose_name_plural
+
+    @property
+    def title(self):
+        if 'pk' not in self.kwargs:
+            return _('Cadastro de ArqDocumento')
+
+        return '%s<br><small>(%s)</small>' % (
+            self.object.titulo, _('Edição de ArqDocumento'))
+
+    @property
+    def cancel_url(self):
+        return reverse_lazy(
+            'cmj.arq:subarqclasse_list',
+            kwargs={'pk': self.kwargs['classe_id']})
+
+    def get_success_url(self):
+        return reverse_lazy(
+            'cmj.arq:subarqclasse_list',
+            kwargs={'pk': self.object.classe_estrutural_id})
+
+
+class ArqDocUpdateView(ArqDocMixin, FormMessagesMixin,
+                       PermissionRequiredMixin,
+                       UpdateView):
+    permission_required = 'arq.change_arqdoc'
+    form_valid_message = _('ArqDoc alterado com sucesso!')
+    form_invalid_message = _('Existem erros no formulário!')
+    template_name = 'crud/form.html'
+    form_class = forms.ArqDocForm
+    model = ArqDoc
+
+    def get_initial(self):
+
+        initial = super().get_initial()
+        initial['request_user'] = self.request.user
+        initial = {'classe_estrutural': self.kwargs['classe_id']}
+        return initial
+
+
+class ArqDocCreateView(ArqDocMixin, FormMessagesMixin,
+                       PermissionRequiredMixin,
+                       CreateView):
+    permission_required = 'arq.add_arqdoc'
+    form_valid_message = _('ArqDoc criado com sucesso!')
+    form_invalid_message = _('Existem erros no formulário!')
+    template_name = 'crud/form.html'
+    form_class = forms.ArqDocForm
+    model = ArqDoc
+
+    def get_initial(self):
+
+        initial = super().get_initial()
+        initial['request_user'] = self.request.user
+
+        initial['classe_estrutural'] = self.kwargs['classe_id']
+
+        cod__max = ArqDoc.objects.filter(
+            classe_estrutural=self.kwargs['classe_id']).order_by('codigo').aggregate(Max('codigo'))
+
+        initial['codigo'] = cod__max['codigo__max'] + \
+            1 if cod__max['codigo__max'] else 1
+
+        return initial

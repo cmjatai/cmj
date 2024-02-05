@@ -12,7 +12,6 @@ import sys
 from PIL import Image, ImageEnhance, ImageDraw
 from PIL.Image import Resampling
 import cv2
-from django.core.files import File
 from django.core.files.base import File
 from django.core.management.base import BaseCommand
 from django.db.models import Q

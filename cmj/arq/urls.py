@@ -27,6 +27,12 @@ urlpatterns_arq = [
     url(r'^classe/(?P<pk>[0-9]+)$',
         views.ArqClasseListView.as_view(), name='subarqclasse_list'),
 
+    url(r'^classe/(?P<classe_id>[0-9]+)/doc/(?P<pk>[0-9]+)/edit$',
+        views.ArqDocUpdateView.as_view(), name='arqdoc_edit'),
+
+    url(r'^classe/(?P<classe_id>[0-9]+)/doc/create$',
+        views.ArqDocCreateView.as_view(), name='arqdoc_create'),
+
 ]
 
 urlpatterns = [

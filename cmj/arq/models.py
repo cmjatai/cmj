@@ -43,6 +43,9 @@ class Draft(models.Model):
         verbose_name = _('Draft')
         verbose_name_plural = _('Draft')
 
+    def __str__(self):
+        return self.descricao
+
     def delete(self, using=None, keep_parents=False):
         dm = self.draftmidia_set.first()
 
@@ -373,16 +376,13 @@ class ArqDoc(Parent, CmjAuditoriaModelMixin):
 
     titulo = models.CharField(
         verbose_name=_('Título'),
-        max_length=250,
-        blank=True, null=True, default='')
+        max_length=250,)
 
     descricao = models.TextField(
-        verbose_name=_('Descrição'),
-        blank=True, null=True, default=None)
+        verbose_name=_('Descrição'),)
 
     data = models.DateField(
-        verbose_name=_('Data do Documento'),
-        blank=True, null=True)
+        verbose_name=_('Data do Documento'),)
 
     arquivo = PortalFileField(
         blank=True,
@@ -410,3 +410,6 @@ class ArqDoc(Parent, CmjAuditoriaModelMixin):
 
         verbose_name = _('ArqDoc')
         verbose_name_plural = _('ArcDocs')
+
+    def __str__(self):
+        return self.titulo or ''
