@@ -1,6 +1,9 @@
 {% load i18n staticfiles menus common_cmj_tags cropping %}
 {% load webpack_static from webpack_loader %}
 <ul class="navbar-nav justify-content-end">
+  {% if perms.cerimonial.list_visita %}
+    <li><a class="text-yellow" style="font-weight: bold;" href="{% url 'cmj.cerimonial:visita_list'  %}">Registro de Entrada</a></li>
+  {% endif %}
   {% if perms.arq.list_draft %}
     <li><a class="text-yellow" style="font-weight: bold;" href="{% url 'cmj.arq:app_vue_arq_view_url' 'draft' %}">Draft</a></li>
   {% endif %}
