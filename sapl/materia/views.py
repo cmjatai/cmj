@@ -97,6 +97,7 @@ def tipos_autores_materias(user, restricao_regimental=True):
 
     data_ini = noww - timedelta(
         days=noww.day - (1 if noww.day <= 15 else 16))
+
     data_fim = noww + timedelta(
         days=-noww.day + (15 if noww.day <= 15 else 31))
 
@@ -113,6 +114,12 @@ def tipos_autores_materias(user, restricao_regimental=True):
         if sq.count() < 3 or (noww - sq.last().data_fim).days == 0:
             q |= Q(
                 tipo__turnos_aprovacao=1,
+                registrovotacao__ordem__sessao_plenaria__finalizada=False,
+                registrovotacao__data_hora__gte=data_ini,
+                registrovotacao__data_hora__lte=data_fim,
+            ) | Q(
+                tipo__turnos_aprovacao=1,
+                registrovotacao__expediente__sessao_plenaria__finalizada=False,
                 registrovotacao__data_hora__gte=data_ini,
                 registrovotacao__data_hora__lte=data_fim,
             )
@@ -2236,7 +2243,7 @@ class MateriaLegislativaCrud(Crud):
             return response
 
         def get(self, request, *args, **kwargs):
-            #celery.debug_task.apply_async(
+            # celery.debug_task.apply_async(
             #    (kwargs['pk'], ),
             #    countdown=10
             #)
