@@ -1279,7 +1279,7 @@ class VisitaForm(ModelForm):
         widget=forms.TextInput())
 
     telefone = forms.CharField(
-        required=True,
+        required=False,
         label='Telefone',
         widget=forms.TextInput())
 
@@ -1315,17 +1315,17 @@ class VisitaForm(ModelForm):
         layout_form = [
             to_row([
                 (to_row([
-                    ('documento', 7),
-                    ('telefone', 5),
+                    ('documento', 5), ('nome', 7),
                     (HTML('''
-                            <div id="div-busca"></div>
+                            <div id="div-busca" class="d-flex align-items-center h-100"></div>
                     '''), 8),
                     (HTML('''
                             <div class="text-center"><img id="img_select"/></div>
                     '''), 4),
-                    ('nome', 12),
-                    ('data_nascimento', 5),
-                    ('bairro', 7),
+                    (HTML('<hr>'), 12),
+                    ('telefone', 4),
+                    ('data_nascimento', 4),
+                    ('bairro', 4),
                     ('fotografia', 12),
                     ('setores', 7),
                     ('observacoes', 5),

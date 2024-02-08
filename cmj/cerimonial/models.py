@@ -853,7 +853,7 @@ class Visitante(CmjAuditoriaModelMixin):
     nome = models.CharField(max_length=100, verbose_name=_('Nome'))
 
     documento = models.CharField(
-        max_length=30, blank=True, unique=True,
+        max_length=30,
         verbose_name=_('RG/CPF/CNH'))
 
     data_nascimento = models.DateField(
@@ -865,7 +865,7 @@ class Visitante(CmjAuditoriaModelMixin):
         related_name='visitante_set',
         blank=True, null=True, on_delete=SET_NULL)
 
-    telefone = models.CharField(max_length=100,
+    telefone = models.CharField(max_length=100, blank=True, unique=True,
                                 verbose_name='Telefone')
 
     fotografia = PortalImageField(
