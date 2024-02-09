@@ -320,7 +320,7 @@
                       </div>
                     {% endif %}
 
-                    {% if m.tipo.turnos_aprovacao > 1 and m.em_tramitacao and perms.add_materialegislativa %}
+                    {% if m.tipo.turnos_aprovacao > 1 and m.em_tramitacao and perms.materia.add_materialegislativa %}
                       {% if not m.texto_articulado.first or m.texto_articulado.first.dispositivos_set.count < 4 %}
                         <strong class="text-red">ATENÇÂO!!! Verificar Texto Articulado...</strong><br>
                       {% endif %}
