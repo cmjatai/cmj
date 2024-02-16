@@ -1,71 +1,64 @@
-
 {% load webpack_static from webpack_loader %}
-
 <!DOCTYPE html>
-<meta charset="utf-8">
-</meta>
 <html lang="pt-br">
-<head>
-	<style>
-	@page{
-    margin-top: 1cm;
-    margin-left: {% if print %}1cm;{% else %}3.5cm;{% endif %}
-    size: A4 portrait;
+  <meta charset="utf-8"></meta>
+  <head>
+    <style>
+    @page{
+      margin-top: {{print}};
+      margin-left: {% if print %}1cm;{% else %}3.5cm;{% endif %}
+      size: A4 portrait;
+    }
+    .container-cert-pub {
+      {% if print %}transform: rotate(180deg);{% endif %}
+      border: 1px solid black;
+      padding: 5px;
+      font-size: 10pt;
+      font-family: courier;
+      width: 13cm;
+    }
+    .title {
+      display: flex;
+      justify-content: space-between;
+      font-variant: small-caps;
+      font-size: 1em;
+      font-weight: bold;
+    }
+    .inner {
+      text-align: justify;
+      border-bottom:1px solid black;
+    }
+    .inner-text {
+      padding-right: 20px;
+    }
+    .inner img {
+        width: 100%;
+    }
+    .inner-body {
+      display: flex;
+    }
+    .inner-body .col1 {
+      flex: 1 0 25%;
+    }
+    .inner-body .col2 {
+      flex: 1 0 75%;
+      margin-left: 0.5cm;
+    }
+    .hash {
+      overflow-wrap: break-word;
+      word-wrap: break-word;
 
-	}
-	.container-cert-pub {
-    {% if print %}transform: rotate(180deg);{% endif %}
-		border: 1px solid black;
-    padding: 5px;
-    font-size: 10pt;
-    font-family: courier;
-    width: 13cm;
-	}
-	.title {
-    display: flex;
-    justify-content: space-between;
-    font-variant: small-caps;
-    font-size: 1em;
-    font-weight: bold;
-	}
-  .inner {
-    text-align: justify;
-    border-bottom:1px solid black;
-  }
-  .inner-text {
-    padding-right: 20px;
-  }
-  .inner img {
-      width: 100%;
-  }
-  .inner-body {
-    display: flex;
-  }
-  .inner-body .col1 {
-    flex: 1 0 25%;
-  }
-  .inner-body .col2 {
-    flex: 1 0 75%;
-    margin-left: 0.5cm;
-  }
-
-
-  .hash {
-    overflow-wrap: break-word;
-    word-wrap: break-word;
-
-    font-size: 0.7em;
-  }
-  .url {
-    font-size: 6pt;
-  }
-  .assinatura {
-    text-align: center;
-    border-top: 1px solid black;
-  }
-	</style>
-</head>
-
+      font-size: 0.7em;
+    }
+    .url {
+      font-size: 6pt;
+    }
+    .assinatura {
+      text-align: center;
+      border-top: 1px solid black;
+    }
+    </style>
+  </head>
 <body>
   <div class="container-cert-pub">
     <div class="inner">
@@ -77,8 +70,6 @@
       <div class="inner-text">
         Certifico para os devidos fins, nos termos do §1º art. 81 da Lei Orgânica do Município de Jataí, que o presente documento foi publicado eletronicamente no Portal Transparência Pública do Legislativo Municipal de Jataí e está disponível para acesso em dois formatos:
       </div>
-
-
         <div class="hash">
           <div class="hash">
             1) Original tal como digitalizado e com o hash abaixo, e 2) em OCR para sistemas de indexação e busca.
@@ -107,5 +98,4 @@
     </div>
   </div>
 </body>
-
 </html>
