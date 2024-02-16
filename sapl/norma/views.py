@@ -381,17 +381,25 @@ class NormaCrud(Crud):
                     n.checkcheck = True if check else False
                     n.save()
 
-                    return redirect(f'/norma/check#{nn}')
+                    return redirect(f'/norma/check{kwargs.get("nivel","")}#{nn}')
 
             return Crud.ListView.get(self, request, *args, **kwargs)
 
         def get_queryset(self):
             qs = Crud.ListView.get_queryset(self)
-            q = Q(
-                checkcheck=False) | Q(
-                    texto_articulado__privacidade=89) | Q(
-                        texto_articulado__isnull=True, checkcheck=False) | Q(
-                        texto_integral__exact='', checkcheck=True)
+            nivel = self.kwargs.get('nivel', '')
+
+            if nivel == '9':
+                q = Q(checkcheck=False)
+            else:
+                q = Q(
+                    checkcheck=False
+                ) | Q(
+                    texto_articulado__privacidade=89
+                ) | Q(
+                    texto_articulado__isnull=True, checkcheck=False) | Q(
+                    texto_integral__exact='', checkcheck=True)
+
             qs = qs.filter(q)
             return qs.order_by('-ano', '-numero')
 
@@ -404,7 +412,7 @@ class NormaCrud(Crud):
             ), ''
 
         def hook_checkcheck(self, obj, ss, url):
-            return 'uncheck' if obj.checkcheck else 'check', f'/norma/check?{"un" if obj.checkcheck else ""}check={obj.id}'
+            return 'uncheck' if obj.checkcheck else 'check', f'/norma/check{self.kwargs.get("nivel","")}?{"un" if obj.checkcheck else ""}check={obj.id}'
 
         def hook_header_checkcheck(self):
             return force_text(_('Check'))
@@ -420,7 +428,7 @@ class NormaCrud(Crud):
 
         @classmethod
         def get_url_regex(cls):
-            return r'^/check$'
+            return r'^/check(?P<nivel>[0-9]*)$'
 
     class UpdateView(Crud.UpdateView):
         form_class = NormaJuridicaForm
