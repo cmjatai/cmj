@@ -4,6 +4,7 @@ services:
   cmjredis:
     image: redis:alpine
     container_name: cmjredis
+    restart: always
     labels:
        NAME: "cmjredis"
     #ports:

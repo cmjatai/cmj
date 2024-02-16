@@ -243,7 +243,7 @@ class NormaCrud(Crud):
             if self.request.user.is_superuser:
                 btn = [
                     '{}?{}check={}'.format(
-                        reverse('sapl.norma:normajuridica_list'),
+                        reverse('sapl.norma:normajuridica_list', kwargs={'nivel': ''}),
                         '' if not self.object.checkcheck else 'un',
                         self.object.pk
                     ),
