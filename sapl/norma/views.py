@@ -243,7 +243,8 @@ class NormaCrud(Crud):
             if self.request.user.is_superuser:
                 btn = [
                     '{}?{}check={}'.format(
-                        reverse('sapl.norma:normajuridica_list', kwargs={'nivel': ''}),
+                        reverse('sapl.norma:normajuridica_list',
+                                kwargs={'nivel': ''}),
                         '' if not self.object.checkcheck else 'un',
                         self.object.pk
                     ),
@@ -391,17 +392,23 @@ class NormaCrud(Crud):
 
             if nivel == '9':
                 q = Q(checkcheck=False)
+            elif nivel == '8':
+                q = Q(
+                    checkcheck=False,
+                    texto_articulado__dispositivos_set__tipo_dispositivo__dispositivo_de_alteracao=True
+                )
             else:
                 q = Q(
                     checkcheck=False
                 ) | Q(
                     texto_articulado__privacidade=89
                 ) | Q(
-                    texto_articulado__isnull=True, checkcheck=False) | Q(
+                    texto_articulado__isnull=True, checkcheck=False
+                ) | Q(
                     texto_integral__exact='', checkcheck=True)
 
             qs = qs.filter(q)
-            return qs.order_by('-ano', '-numero')
+            return qs.order_by('-ano', 'tipo__relevancia', '-numero', ).distinct()
 
         def hook_ementa(self, obj, ss, url):
             return '''{}<br>{} - {}'''.format(
