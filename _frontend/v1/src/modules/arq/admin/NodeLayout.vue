@@ -13,7 +13,7 @@
       <span class="content">
         <router-link :to="{ name: 'arqchildroute', params: { node: node_params, nodechild: node.id } }"
           @click.native="clickRoute">
-          {{ node.id }} - {{ node.titulo }}
+          {{ node.titulo }}
         </router-link>
         <div class="btn-group btn-group-sm el-actions">
           <a :href="`/arqadmin/classe/${node.id}`" target="_blank" class="btn btn-link">

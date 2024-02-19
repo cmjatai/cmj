@@ -28,7 +28,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/brasao/escola_1024.png"
   },
   {
-    "revision": "217e2b9d7a092a8cebbf",
+    "revision": "6673f0b2d0af106a963f",
     "url": "/static/css/app.7a1493fa.css"
   },
   {
@@ -40,8 +40,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/css/chunk-2e79323a.707facdf.css"
   },
   {
-    "revision": "764b5c9ecd9ee1432ac6",
-    "url": "/static/css/chunk-521fa3dc.043a2397.css"
+    "revision": "84a642d90942664ae880",
+    "url": "/static/css/chunk-36cdf1de.043a2397.css"
   },
   {
     "revision": "1bedcb03bc9030dd6876",
@@ -340,12 +340,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/user.png"
   },
   {
-    "revision": "261330ef8939a4840440408d28b1baca",
+    "revision": "0dccaac9861a1e5dae3d6c10377c1a83",
     "url": "/static/index.html"
   },
   {
-    "revision": "217e2b9d7a092a8cebbf",
-    "url": "/static/js/app.c7abec15.js"
+    "revision": "6673f0b2d0af106a963f",
+    "url": "/static/js/app.932ec86e.js"
   },
   {
     "revision": "86803dd954f5d0f5ebe0",
@@ -360,8 +360,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/js/chunk-2e79323a.93960f91.js"
   },
   {
-    "revision": "764b5c9ecd9ee1432ac6",
-    "url": "/static/js/chunk-521fa3dc.8bf5d665.js"
+    "revision": "84a642d90942664ae880",
+    "url": "/static/js/chunk-36cdf1de.f241fb6d.js"
   },
   {
     "revision": "350fde48e192f7657df2",
