@@ -298,3 +298,16 @@ class ArqDocCreateView(ArqDocMixin, FormMessagesMixin,
             1 if cod__max['codigo__max'] else 1
 
         return initial
+
+
+class ArqDocDeleteView(ArqDocMixin,
+                       PermissionRequiredMixin,
+                       DeleteView):
+    permission_required = 'arq.delete_arqdoc'
+    model = ArqDoc
+    template_name = 'crud/confirm_delete.html'
+
+    def get_success_url(self):
+        return reverse_lazy(
+            'cmj.arq:subarqclasse_list',
+            kwargs={'pk': self.object.classe_estrutural_id})

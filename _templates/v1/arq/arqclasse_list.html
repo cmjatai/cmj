@@ -8,6 +8,8 @@
     <a  class="btn btn-outline-primary" href="{{request.path}}?view=tree">TreeView</a>
     {% if not object %}
       <a  class="btn btn-outline-primary" href="{{request.path}}?view=tree2">Tree2View</a>
+    {% else %}
+      <a  class="btn btn-outline-primary" href="/arq/{{object.parent.id}}/{{object.id}}">ArqView</a>
     {% endif %}
   </div>
 

@@ -16,7 +16,7 @@
           {{ node.id }} - {{ node.titulo }}
         </router-link>
         <div class="btn-group btn-group-sm el-actions">
-          <a :href="`/arqadmin/classe/${node.id}/edit`" target="_blank" class="btn btn-link">
+          <a :href="`/arqadmin/classe/${node.id}`" target="_blank" class="btn btn-link">
             <i class="fas fa-edit"></i>
           </a>
           <a :href="`/arq/${node.id}/${node.id}`" class="btn btn-link">
