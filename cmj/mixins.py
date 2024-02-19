@@ -2,7 +2,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Div, Fieldset
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, PermissionDenied
 from django.db import models
 from django.db.models.deletion import PROTECT
 from django.urls.base import reverse
@@ -102,6 +102,33 @@ class PluginSignMixin:
         except Exception as e:
             print(e)
             print(r)
+
+
+class CheckCheckMixin:
+
+    def _checkcheck(self, request):
+
+        obj = self.get_object()
+
+        if hasattr(self, 'crud') and hasattr(self.crud, 'parent_field'):
+            checkcheck = getattr(obj, self.crud.parent_field).checkcheck
+        else:
+            checkcheck = obj.checkcheck if hasattr(
+                obj, 'checkcheck') else False
+
+        if checkcheck and not request.user.is_superuser:
+            raise PermissionDenied(
+                'Documento já no arquivo morto, '
+                'a edição é restrita ao gestor do sistema!'
+            )
+
+    def get(self, request, *args, **kwargs):
+        self._checkcheck(request)
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self._checkcheck(request)
+        return super().post(request, *args, **kwargs)
 
 
 class BtnCertMixin:

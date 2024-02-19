@@ -35,7 +35,7 @@ import weasyprint
 from cmj import celery
 from cmj.core.models import AreaTrabalho
 from cmj.globalrules import GROUP_MATERIA_WORKSPACE_VIEWER
-from cmj.mixins import BtnCertMixin
+from cmj.mixins import BtnCertMixin, CheckCheckMixin
 import requests as rq
 import sapl
 from sapl.base.email_utils import do_envia_email_confirmacao
@@ -1570,22 +1570,11 @@ class TramitacaoCrud(MasterDetailCrud):
                 return HttpResponseRedirect(self.get_success_url())
             return super().form_valid(form)
 
-    class UpdateView(MasterDetailCrud.UpdateView):
+    class UpdateView(CheckCheckMixin, MasterDetailCrud.UpdateView):
         form_class = TramitacaoUpdateForm
         logger = logging.getLogger(__name__)
 
         layout_key = 'TramitacaoUpdate'
-
-        def get(self, request, *args, **kwargs):
-            t = self.get_object()
-
-            if t.materia.checkcheck and not request.user.is_superuser:
-                raise PermissionDenied(
-                    'Matéria já no arquivo morto, '
-                    'a edição é restrita ao gestor do sistema!'
-                )
-
-            return super().get(request, *args, **kwargs)
 
         def form_valid(self, form):
             dict_objeto_antigo = Tramitacao.objects.get(
@@ -1636,7 +1625,7 @@ class TramitacaoCrud(MasterDetailCrud):
                                                 '-timestamp',
                                                 '-id')
 
-    class DeleteView(MasterDetailCrud.DeleteView):
+    class DeleteView(CheckCheckMixin, MasterDetailCrud.DeleteView):
 
         logger = logging.getLogger(__name__)
 
@@ -1727,6 +1716,9 @@ class DocumentoAcessorioCrud(MasterDetailCrud):
             initial['user'] = self.request.user
             return initial
 
+    class DeleteView(CheckCheckMixin, MasterDetailCrud.DeleteView):
+        pass
+
     class DetailView(MasterDetailCrud.DetailView):
         layout_key = 'DocumentoAcessorioDetail'
 
@@ -1746,19 +1738,8 @@ class DocumentoAcessorioCrud(MasterDetailCrud):
 
             return 'Arquivo do Documento Acessório', rendered
 
-    class UpdateView(MasterDetailCrud.UpdateView):
+    class UpdateView(CheckCheckMixin, MasterDetailCrud.UpdateView):
         form_class = DocumentoAcessorioForm
-
-        def get(self, request, *args, **kwargs):
-            d = self.get_object()
-
-            if d.materia.checkcheck and not request.user.is_superuser:
-                raise PermissionDenied(
-                    'Matéria já no arquivo morto, '
-                    'a edição é restrita ao gestor do sistema!'
-                )
-
-            return super().get(request, *args, **kwargs)
 
         def get_initial(self):
             initial = super(UpdateView, self).get_initial()
@@ -1806,7 +1787,7 @@ class AutoriaCrud(MasterDetailCrud):
             initial['materia'] = materia
             return initial
 
-    class UpdateView(LocalBaseMixin, MasterDetailCrud.UpdateView):
+    class UpdateView(CheckCheckMixin, LocalBaseMixin, MasterDetailCrud.UpdateView):
 
         def get_initial(self):
             initial = super().get_initial()
@@ -1816,6 +1797,9 @@ class AutoriaCrud(MasterDetailCrud):
                 'materia': self.object.materia
             })
             return initial
+
+    class DeleteView(CheckCheckMixin, MasterDetailCrud.DeleteView):
+        pass
 
 
 class AutoriaMultiCreateView(PermissionRequiredForAppCrudMixin, FormView):
@@ -1907,7 +1891,7 @@ class DespachoInicialCrud(MasterDetailCrud):
     help_topic = 'despacho_autoria'
     public = [RP_LIST, RP_DETAIL]
 
-    class UpdateView(MasterDetailCrud.UpdateView):
+    class UpdateView(CheckCheckMixin, MasterDetailCrud.UpdateView):
         form_class = DespachoInicialForm
 
 
@@ -1928,7 +1912,7 @@ class LegislacaoCitadaCrud(MasterDetailCrud):
     class CreateView(MasterDetailCrud.CreateView):
         form_class = LegislacaoCitadaForm
 
-    class UpdateView(MasterDetailCrud.UpdateView):
+    class UpdateView(CheckCheckMixin, MasterDetailCrud.UpdateView):
         form_class = LegislacaoCitadaForm
 
         def get_initial(self):
@@ -1942,7 +1926,7 @@ class LegislacaoCitadaCrud(MasterDetailCrud):
 
         layout_key = 'LegislacaoCitadaDetail'
 
-    class DeleteView(MasterDetailCrud.DeleteView):
+    class DeleteView(CheckCheckMixin, MasterDetailCrud.DeleteView):
         pass
 
 
@@ -1966,7 +1950,7 @@ class AnexadaCrud(MasterDetailCrud):
     class CreateView(MasterDetailCrud.CreateView):
         form_class = AnexadaForm
 
-    class UpdateView(MasterDetailCrud.UpdateView):
+    class UpdateView(CheckCheckMixin, MasterDetailCrud.UpdateView):
         form_class = AnexadaForm
 
         def get_initial(self):
@@ -1981,6 +1965,9 @@ class AnexadaCrud(MasterDetailCrud):
         @property
         def layout_key(self):
             return 'AnexadaDetail'
+
+    class DeleteView(CheckCheckMixin, MasterDetailCrud.DeleteView):
+        pass
 
 
 class MateriaAssuntoCrud(MasterDetailCrud):
@@ -2000,7 +1987,7 @@ class MateriaAssuntoCrud(MasterDetailCrud):
             initial['materia'] = self.kwargs['pk']
             return initial
 
-    class UpdateView(MasterDetailCrud.UpdateView):
+    class UpdateView(CheckCheckMixin, MasterDetailCrud.UpdateView):
         form_class = MateriaAssuntoForm
 
         def get_initial(self):
@@ -2008,6 +1995,9 @@ class MateriaAssuntoCrud(MasterDetailCrud):
             initial['materia'] = self.get_object().materia
             initial['assunto'] = self.get_object().assunto
             return initial
+
+    class DeleteView(CheckCheckMixin, MasterDetailCrud.DeleteView):
+        pass
 
 
 class MateriaLegislativaCrud(Crud):
@@ -2048,7 +2038,7 @@ class MateriaLegislativaCrud(Crud):
         def cancel_url(self):
             return self.search_url
 
-    class UpdateView(Crud.UpdateView):
+    class UpdateView(CheckCheckMixin, Crud.UpdateView):
 
         form_class = MateriaLegislativaForm
 
@@ -2059,17 +2049,6 @@ class MateriaLegislativaCrud(Crud):
             initial['ip'] = get_client_ip(self.request)
 
             return initial
-
-        def get(self, request, *args, **kwargs):
-            m = self.get_object()
-
-            if m.checkcheck and not request.user.is_superuser:
-                raise PermissionDenied(
-                    'Matéria já no arquivo morto, '
-                    'a edição é restrita ao gestor do sistema!'
-                )
-
-            return super().get(request, *args, **kwargs)
 
         def form_valid(self, form):
             dict_objeto_antigo = MateriaLegislativa.objects.get(
@@ -2109,7 +2088,7 @@ class MateriaLegislativaCrud(Crud):
         def cancel_url(self):
             return self.search_url
 
-    class DeleteView(Crud.DeleteView):
+    class DeleteView(CheckCheckMixin, Crud.DeleteView):
 
         def get_success_url(self):
             return self.search_url
