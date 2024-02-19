@@ -187,7 +187,7 @@ class Parent(models.Model):
         'self',
         blank=True, null=True, default=None,
         related_name='nodes',
-        verbose_name=_('Containers'),
+        verbose_name=_('Raiz'),
         on_delete=PROTECT)
 
     metadata = JSONField(
@@ -274,6 +274,9 @@ class Parent(models.Model):
 
 
 class ArqClasse(Parent):
+
+    arquivado = models.BooleanField(
+        verbose_name=_('Arquivado'), default=False)
 
     codigo = models.PositiveIntegerField(verbose_name=_('Código'), default=0)
 
@@ -371,6 +374,9 @@ def arqdoc_path(instance, filename):
 
 
 class ArqDoc(Parent, CmjAuditoriaModelMixin):
+
+    arquivado = models.BooleanField(
+        verbose_name=_('Arquivado'), default=False)
 
     codigo = models.PositiveIntegerField(verbose_name=_('Código'), default=0)
 
