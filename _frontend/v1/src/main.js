@@ -67,6 +67,32 @@ const app = new Vue({ // eslint-disable-line
   template: '<App/>'
 })
 
+Storage.prototype.addArrayOfIds = function (key, id) {
+  let ids = this.getItem(key) || '[]'
+  ids = JSON.parse(ids)
+  let idx = ids.indexOf(id)
+  if (idx === -1) {
+    ids.push(id)
+    return this.setItem(key, JSON.stringify(ids))
+  }
+}
+Storage.prototype.getArrayOfIds = function (key) {
+  return JSON.parse(this.getItem(key))
+}
+Storage.prototype.inArrayOfIds = function (key, id) {
+  let ids = this.getItem(key) || '[]'
+  ids = JSON.parse(ids)
+  return ids.indexOf(id) !== -1
+}
+Storage.prototype.delItemArrayOfIds = function (key, id) {
+  let ids = this.getItem(key) || '[]'
+  ids = JSON.parse(ids)
+  ids.splice(ids.indexOf(id), 1)
+  this.setItem(key, JSON.stringify(ids))
+}
+Storage.prototype.clearArrayOfIds = function (key) {
+  this.removeItem(key)
+}
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/service-worker.js')

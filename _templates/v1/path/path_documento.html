@@ -338,7 +338,7 @@
               <div class="path-imagem {{child.alinhamento_css_class}}">
 
                 <a href="/{{child.absolute_slug}}" target="_blank">
-                  <img src="/{{child.absolute_slug}}.{%if child.alinhamento == 1%}1024{%else%}512{%endif%}.jpg" alt="{% if child.titulo and not child.descricao %}{{child.titulo|default:child.parents.0.titulo}}{% endif %}{% if not child.titulo and child.descricao %}{{child.descricao|default:child.parents.0.descricao}}{% endif %}{% if not child.titulo and not child.descricao %}{{child.parents.0.descricao}}{% endif %}" />
+                  <img src="/{{child.absolute_slug}}{%if child.alinhamento == 4%}{%elif child.alinhamento == 1%}.1024.jpg{%else%}.512.jpg{%endif%}" alt="{% if child.titulo and not child.descricao %}{{child.titulo|default:child.parents.0.titulo}}{% endif %}{% if not child.titulo and child.descricao %}{{child.descricao|default:child.parents.0.descricao}}{% endif %}{% if not child.titulo and not child.descricao %}{{child.parents.0.descricao}}{% endif %}" />
                 </a>
                 <div  class="img-contexto">
 

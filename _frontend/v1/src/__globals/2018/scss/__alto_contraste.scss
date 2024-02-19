@@ -1,26 +1,42 @@
 .contrast {
-  background-image: none !important;
-  background-color: black !important;
-  color: white !important;
-  opacity: 1;
+  &, * {
+    opacity: 1;
+    &::before, &::after {
+      filter: grayscale(100%) contrast(110%);
+    }
+  }
+  &, .contrast_base {
+    background-image: none !important;
+    background-color: black !important;
+    color: white !important;
+  }
+
+  img,
+  a.imagem,
+  div.imagem,
+  div.path-capa,
+  .icon {
+    filter: grayscale(100%) contrast(110%);
+  }
+
+  a {
+    color: white !important;
+  }
 
   nav, div,  ol, header, footer, section, main, aside, article, span {
     background-color: black !important;
     color: white !important;
   }
   h1, h2, h3, h4,h5,h6,p,label,strong,em,cite,q,i,b,u,span {
+
     color: white !important;
     opacity: 1;
   }
 
-  button, input[type=button], input[type=reset], input[type=submit] {
+  button, input[type=button], input[type=reset], input[type=submit], .btn {
     background: black !important;
     color: yellow !important;
     border: none !important;
-  }
-
-  a {
-    color: yellow !important;
   }
 
   .navbar-social-links, div.path-parlamentares {
@@ -29,6 +45,35 @@
       text-shadow: 0 0 0;
     }
   }
+
+  table, .table {
+    th, td {
+      @extend .contrast_base;
+      &:hover {
+        @extend .contrast_base;
+      }
+    }
+  }
+
+  .header-accessibility {
+    @extend .contrast_base;
+    a {
+      @extend .contrast_base;
+      font-weight: bold;
+      font-size: 90% !important;
+    }
+  }
+
+  .navbar-topo .container {
+    background: none;
+  }
+
+  .carousel-indicators {
+    .active {
+      background-color: white !important;
+    }
+  }
+
   .container-calendar {
     .dia {
       .numero {
@@ -44,41 +89,20 @@
 
   .navbar, .navbar-nav, ul, .item-agenda, .heading,
   .btn-ouvidoria, .path-header, .page-link, .page-header,
-  .container-box, .inner {
+  .container-box, .inner, .nav-pagination {
     background-image: none !important;
     background-color: #000 !important;
     border-color: white !important;
-    ::before {
+    &::before, &::after {
       filter: grayscale(100%) contrast(110%);
     }
   }
 
-  .canais-columns, .navbar {
-    border-bottom: 1px solid white;
+  .link-e-sic {
+    background-color: white !important;
+    color: black !important;
   }
-  
-  img, 
-  div.imagem,
-  div.path-capa,
-  .icon {
-    filter: grayscale(100%) contrast(110%);
-  }
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 .contrast1 {
@@ -139,15 +163,15 @@
       }
     }
   }
-  
+
   .navbar-topo, .navbar-menu {
     background-color: #000 !important;
   }
 
-  img, 
+  img,
   div.imagem,
   .icon {
     filter: grayscale(100%) contrast(110%);
   }
-  
+
 }

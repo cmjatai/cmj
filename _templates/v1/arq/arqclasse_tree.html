@@ -8,6 +8,8 @@
     <a  class="btn btn-outline-primary" href="{{request.path}}?view=tree">TreeView</a>
     {% if not object %}
       <a  class="btn btn-outline-primary" href="{{request.path}}?view=tree2">Tree2View</a>
+    {% else %}
+      <a  class="btn btn-outline-primary" href="/arq/{{object.id}}/{{object.id}}">ArqView</a>
     {% endif %}
   </div>
 
@@ -29,9 +31,11 @@
       {% for arqclasse in object_list %}
         <li class="li-nivel0">
           <span class="inner">
-            <a href="{% url 'cmj.arq:subarqclasse_list' arqclasse.pk %}?view={{request.GET.view|default:view_format}}">
-              {{ arqclasse.conta }} - {{ arqclasse.titulo }}
-            </a> -
+            <div class="d-flex justify-content-between">
+              <a href="{% url 'cmj.arq:subarqclasse_list' arqclasse.pk %}?view={{request.GET.view|default:view_format}}">
+                {{ arqclasse.conta }} - {{ arqclasse.titulo }}
+              </a>
+            </div>
             <small class="text-info">
               <small>
                 <i>
@@ -58,6 +62,7 @@
       {% endfor %}
     </ul>
   {% endif %}
-
-
+  {% if object %}
+    {% include "arq/arqdoc_widget_list.html" %}
+  {% endif %}
 {% endblock %}

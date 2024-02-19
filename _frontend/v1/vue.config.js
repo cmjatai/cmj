@@ -5,6 +5,7 @@ const shell = require('shelljs')
 
 const BundleTrackerPlugin = require('webpack-bundle-tracker')
 const CompressionPlugin = require('compression-webpack-plugin')
+const MomentLocalesPlugin = require('moment-locales-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
 const CopyPlugin = require('copy-webpack-plugin')
 
@@ -31,7 +32,7 @@ let HOST_NAME = 'localhost'
 // HOST_NAME = '192.168.15.7'
 // HOST_NAME = '10.42.0.1'
 // HOST_NAME = '10.3.163.200'
-// HOST_NAME = '192.168.43.48'
+// HOST_NAME = '10.3.162.151'
 //HOST_NAME = '168.228.184.70'
 
 module.exports = {
@@ -58,6 +59,12 @@ module.exports = {
           to: '[path][name].[ext]'
         }
       ]
+    ])
+
+    config.plugin('MomentLocalesPlugin').use(MomentLocalesPlugin, [
+      {
+        localesToKeep: ['pt-BR']
+      }
     ])
 
     if (process.env.NODE_ENV === 'production') {

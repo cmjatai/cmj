@@ -3,7 +3,6 @@ autopep8==1.2.4
 beautifulsoup4==4.4.1
 django-debug-toolbar==2.2.1
 pygraphviz==1.10
-pytest-ipdb==0.1-prerelease2
 pipdeptree
 
 

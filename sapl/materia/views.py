@@ -32,9 +32,10 @@ from django.views.generic.edit import FormView
 from django_filters.views import FilterView
 import weasyprint
 
+from cmj import celery
 from cmj.core.models import AreaTrabalho
 from cmj.globalrules import GROUP_MATERIA_WORKSPACE_VIEWER
-from cmj.mixins import BtnCertMixin
+from cmj.mixins import BtnCertMixin, CheckCheckMixin
 import requests as rq
 import sapl
 from sapl.base.email_utils import do_envia_email_confirmacao
@@ -90,12 +91,13 @@ from .models import (AcompanhamentoMateria, Anexada, AssuntoMateria, Autoria,
                      TipoProposicao, Tramitacao, UnidadeTramitacao)
 
 
-def tipos_autores_materias(user):
+def tipos_autores_materias(user, restricao_regimental=True):
 
     noww = timezone.localdate()
 
     data_ini = noww - timedelta(
         days=noww.day - (1 if noww.day <= 15 else 16))
+
     data_fim = noww + timedelta(
         days=-noww.day + (15 if noww.day <= 15 else 31))
 
@@ -112,6 +114,12 @@ def tipos_autores_materias(user):
         if sq.count() < 3 or (noww - sq.last().data_fim).days == 0:
             q |= Q(
                 tipo__turnos_aprovacao=1,
+                registrovotacao__ordem__sessao_plenaria__finalizada=False,
+                registrovotacao__data_hora__gte=data_ini,
+                registrovotacao__data_hora__lte=data_fim,
+            ) | Q(
+                tipo__turnos_aprovacao=1,
+                registrovotacao__expediente__sessao_plenaria__finalizada=False,
                 registrovotacao__data_hora__gte=data_ini,
                 registrovotacao__data_hora__lte=data_fim,
             )
@@ -124,8 +132,9 @@ def tipos_autores_materias(user):
     r = {}
     for m in materias_em_tramitacao:
 
-        if m.autores.count() >= 5:
-            continue
+        if restricao_regimental and m.tipo_id == 3:
+            if m.autores.count() >= 5:
+                continue
 
         if user:
             if m.tipo not in r:
@@ -572,7 +581,8 @@ class ProposicaoPendente(PermissionRequiredMixin, ListView):
         qr = self.request.GET.copy()
         context['filter_url'] = ('&o=' + qr['o']) if 'o' in qr.keys() else ''
 
-        context['tipos_autores_materias'] = tipos_autores_materias(None)
+        context['tipos_autores_materias'] = tipos_autores_materias(
+            None).items()
 
         return context
 
@@ -1316,7 +1326,7 @@ class ProposicaoCrud(Crud):
 
         def tipos_autores_materias(self):
             # chamado do template
-            return tipos_autores_materias(self.request.user)
+            return tipos_autores_materias(self.request.user).items()
 
 
 class ReciboProposicaoView(TemplateView):
@@ -1560,22 +1570,11 @@ class TramitacaoCrud(MasterDetailCrud):
                 return HttpResponseRedirect(self.get_success_url())
             return super().form_valid(form)
 
-    class UpdateView(MasterDetailCrud.UpdateView):
+    class UpdateView(CheckCheckMixin, MasterDetailCrud.UpdateView):
         form_class = TramitacaoUpdateForm
         logger = logging.getLogger(__name__)
 
         layout_key = 'TramitacaoUpdate'
-
-        def get(self, request, *args, **kwargs):
-            t = self.get_object()
-
-            if t.materia.checkcheck and not request.user.is_superuser:
-                raise PermissionDenied(
-                    'Matéria já no arquivo morto, '
-                    'a edição é restrita ao gestor do sistema!'
-                )
-
-            return super().get(request, *args, **kwargs)
 
         def form_valid(self, form):
             dict_objeto_antigo = Tramitacao.objects.get(
@@ -1626,7 +1625,7 @@ class TramitacaoCrud(MasterDetailCrud):
                                                 '-timestamp',
                                                 '-id')
 
-    class DeleteView(MasterDetailCrud.DeleteView):
+    class DeleteView(CheckCheckMixin, MasterDetailCrud.DeleteView):
 
         logger = logging.getLogger(__name__)
 
@@ -1717,6 +1716,9 @@ class DocumentoAcessorioCrud(MasterDetailCrud):
             initial['user'] = self.request.user
             return initial
 
+    class DeleteView(CheckCheckMixin, MasterDetailCrud.DeleteView):
+        pass
+
     class DetailView(MasterDetailCrud.DetailView):
         layout_key = 'DocumentoAcessorioDetail'
 
@@ -1736,19 +1738,8 @@ class DocumentoAcessorioCrud(MasterDetailCrud):
 
             return 'Arquivo do Documento Acessório', rendered
 
-    class UpdateView(MasterDetailCrud.UpdateView):
+    class UpdateView(CheckCheckMixin, MasterDetailCrud.UpdateView):
         form_class = DocumentoAcessorioForm
-
-        def get(self, request, *args, **kwargs):
-            d = self.get_object()
-
-            if d.materia.checkcheck and not request.user.is_superuser:
-                raise PermissionDenied(
-                    'Matéria já no arquivo morto, '
-                    'a edição é restrita ao gestor do sistema!'
-                )
-
-            return super().get(request, *args, **kwargs)
 
         def get_initial(self):
             initial = super(UpdateView, self).get_initial()
@@ -1796,7 +1787,7 @@ class AutoriaCrud(MasterDetailCrud):
             initial['materia'] = materia
             return initial
 
-    class UpdateView(LocalBaseMixin, MasterDetailCrud.UpdateView):
+    class UpdateView(CheckCheckMixin, LocalBaseMixin, MasterDetailCrud.UpdateView):
 
         def get_initial(self):
             initial = super().get_initial()
@@ -1806,6 +1797,9 @@ class AutoriaCrud(MasterDetailCrud):
                 'materia': self.object.materia
             })
             return initial
+
+    class DeleteView(CheckCheckMixin, MasterDetailCrud.DeleteView):
+        pass
 
 
 class AutoriaMultiCreateView(PermissionRequiredForAppCrudMixin, FormView):
@@ -1897,7 +1891,7 @@ class DespachoInicialCrud(MasterDetailCrud):
     help_topic = 'despacho_autoria'
     public = [RP_LIST, RP_DETAIL]
 
-    class UpdateView(MasterDetailCrud.UpdateView):
+    class UpdateView(CheckCheckMixin, MasterDetailCrud.UpdateView):
         form_class = DespachoInicialForm
 
 
@@ -1918,7 +1912,7 @@ class LegislacaoCitadaCrud(MasterDetailCrud):
     class CreateView(MasterDetailCrud.CreateView):
         form_class = LegislacaoCitadaForm
 
-    class UpdateView(MasterDetailCrud.UpdateView):
+    class UpdateView(CheckCheckMixin, MasterDetailCrud.UpdateView):
         form_class = LegislacaoCitadaForm
 
         def get_initial(self):
@@ -1932,7 +1926,7 @@ class LegislacaoCitadaCrud(MasterDetailCrud):
 
         layout_key = 'LegislacaoCitadaDetail'
 
-    class DeleteView(MasterDetailCrud.DeleteView):
+    class DeleteView(CheckCheckMixin, MasterDetailCrud.DeleteView):
         pass
 
 
@@ -1956,7 +1950,7 @@ class AnexadaCrud(MasterDetailCrud):
     class CreateView(MasterDetailCrud.CreateView):
         form_class = AnexadaForm
 
-    class UpdateView(MasterDetailCrud.UpdateView):
+    class UpdateView(CheckCheckMixin, MasterDetailCrud.UpdateView):
         form_class = AnexadaForm
 
         def get_initial(self):
@@ -1971,6 +1965,9 @@ class AnexadaCrud(MasterDetailCrud):
         @property
         def layout_key(self):
             return 'AnexadaDetail'
+
+    class DeleteView(CheckCheckMixin, MasterDetailCrud.DeleteView):
+        pass
 
 
 class MateriaAssuntoCrud(MasterDetailCrud):
@@ -1990,7 +1987,7 @@ class MateriaAssuntoCrud(MasterDetailCrud):
             initial['materia'] = self.kwargs['pk']
             return initial
 
-    class UpdateView(MasterDetailCrud.UpdateView):
+    class UpdateView(CheckCheckMixin, MasterDetailCrud.UpdateView):
         form_class = MateriaAssuntoForm
 
         def get_initial(self):
@@ -1998,6 +1995,9 @@ class MateriaAssuntoCrud(MasterDetailCrud):
             initial['materia'] = self.get_object().materia
             initial['assunto'] = self.get_object().assunto
             return initial
+
+    class DeleteView(CheckCheckMixin, MasterDetailCrud.DeleteView):
+        pass
 
 
 class MateriaLegislativaCrud(Crud):
@@ -2038,7 +2038,7 @@ class MateriaLegislativaCrud(Crud):
         def cancel_url(self):
             return self.search_url
 
-    class UpdateView(Crud.UpdateView):
+    class UpdateView(CheckCheckMixin, Crud.UpdateView):
 
         form_class = MateriaLegislativaForm
 
@@ -2049,17 +2049,6 @@ class MateriaLegislativaCrud(Crud):
             initial['ip'] = get_client_ip(self.request)
 
             return initial
-
-        def get(self, request, *args, **kwargs):
-            m = self.get_object()
-
-            if m.checkcheck and not request.user.is_superuser:
-                raise PermissionDenied(
-                    'Matéria já no arquivo morto, '
-                    'a edição é restrita ao gestor do sistema!'
-                )
-
-            return super().get(request, *args, **kwargs)
 
         def form_valid(self, form):
             dict_objeto_antigo = MateriaLegislativa.objects.get(
@@ -2099,7 +2088,7 @@ class MateriaLegislativaCrud(Crud):
         def cancel_url(self):
             return self.search_url
 
-    class DeleteView(Crud.DeleteView):
+    class DeleteView(CheckCheckMixin, Crud.DeleteView):
 
         def get_success_url(self):
             return self.search_url
@@ -2143,23 +2132,44 @@ class MateriaLegislativaCrud(Crud):
 
             principal = self.get_object()
 
-            def get_anexadas_from(m):
+            def get_anexadas_from(m, prefixo=''):
                 p = getattr(m.texto_original, ff)
-                m_paths.append((m, p))
+                m_paths.append((m, prefixo, p))
                 for a in m.materia_principal_set.filter(
                     data_desanexacao__isnull=True
-                ).order_by('data_anexacao'):
-                    get_anexadas_from(a.materia_anexada)
+                ).order_by('materia_anexada__tipo', 'data_anexacao'):
+                    manex = a.materia_anexada
+                    p2 = 'MatAnexadas/{}/{}-{:03d}-{}'.format(
+                        slugify(manex.tipo.descricao),
+                        manex.ano,
+                        manex.numero,
+                        slugify(manex.tipo.sigla)
+                    )
+
+                    get_anexadas_from(
+                        a.materia_anexada,
+                        prefixo=p2)
 
                 for d in m.documentoacessorio_set.all():
-                    m_paths.append((d, getattr(d.arquivo, ff)))
+
+                    if d.data > timezone.localtime().date() - timedelta(days=30):
+                        continue
+
+                    m_paths.append((d, prefixo, getattr(d.arquivo, ff)))
+
+            def get_docadm_anexados_from(d):
+                if d.texto_integral:
+                    p = getattr(d.texto_integral, ff)
+                    m_paths.append((d, 'DocAdms', p))
+
+                for danex in d.anexados.all():
+                    get_docadm_anexados_from(danex)
 
             get_anexadas_from(principal)
 
             docs = principal.documentoadministrativo_set.all()
             for d in docs:
-                p = getattr(d.texto_integral, ff)
-                m_paths.append((d, p))
+                get_docadm_anexados_from(d)
 
             m_paths = list(set(m_paths))
 
@@ -2167,27 +2177,31 @@ class MateriaLegislativaCrud(Crud):
 
                 with zipfile.ZipFile(tmp, 'w') as file:
 
-                    for i, p in m_paths:
+                    for i, prefixo, path in m_paths:
 
                         if isinstance(i, DocumentoAcessorio):
-                            arcname = '{}-{}-{}-{}.{}'.format(
-                                i.id,
+                            arcname = '{}/DA-{}-{}-{}-{}.{}'.format(
+                                prefixo,
                                 i.ano,
                                 slugify(i.tipo.descricao),
                                 slugify(i.nome),
-                                p.split('.')[-1]
+                                i.id,
+                                path.split('.')[-1]
                             )
                         else:
-                            arcname = '{}-{}-{:02d}-{}-{}.{}'.format(
-                                i.id,
+                            arcname = '{}/{}-{}-{}-{}-{}-{:02d}.{}'.format(
+                                prefixo,
+                                'ML' if isinstance(
+                                    i, MateriaLegislativa) else 'DA',
                                 i.ano,
                                 i.numero,
                                 slugify(i.tipo.sigla),
                                 slugify(i.tipo.descricao),
-                                p.split('.')[-1])
+                                i.id,
+                                path.split('.')[-1])
 
                         file.write(
-                            p,
+                            path,
                             arcname
                         )
 
@@ -2208,6 +2222,10 @@ class MateriaLegislativaCrud(Crud):
             return response
 
         def get(self, request, *args, **kwargs):
+            # celery.debug_task.apply_async(
+            #    (kwargs['pk'], ),
+            #    countdown=10
+            #)
             if 'download' in request.GET:
                 return self.download(request.GET.get('download'))
             return Crud.DetailView.get(self, request, *args, **kwargs)
@@ -2536,6 +2554,7 @@ class MateriaLegislativaPesquisaView(FilterView):
 
         context['title'] = _(
             classe_mascara or 'Pesquisar Matérias Legislativas')
+
         context['bg_title'] = 'bg-red text-white'
 
         tipo_listagem = self.request.GET.get('tipo_listagem', '1')
@@ -2559,6 +2578,14 @@ class MateriaLegislativaPesquisaView(FilterView):
 
         context['USE_SOLR'] = settings.USE_SOLR if hasattr(
             settings, 'USE_SOLR') else False
+
+        acesso_rapido_list = list(tipos_autores_materias(
+            None, restricao_regimental=False).items()
+        )
+
+        acesso_rapido_list.sort(key=lambda tup: tup[0].sequencia_regimental)
+
+        context['tipos_autores_materias'] = acesso_rapido_list
 
         return context
 
@@ -3297,7 +3324,8 @@ class MateriaLegislativaCheckView(ListView):
 
         qs = qs.filter(checkcheck=False)
 
-        qs = qs.order_by('tipo__sequencia_regimental','-data_apresentacao', '-numero')
+        qs = qs.order_by('tipo__sequencia_regimental',
+                         '-data_apresentacao', '-numero')
 
         return qs
 

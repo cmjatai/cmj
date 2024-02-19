@@ -3,10 +3,20 @@
   margin-bottom: 0.5rem;
   padding: 0rem 0.25rem;
   font-size: 0.9em;
+  white-space: nowrap;
 
   li:not(.active) {
     a {
       color: #794905;
     }
   }
+}
+
+@media screen and (max-width: 991.98px) {
+.breadcrumb-item {
+  & + & {
+    display: block;
+    width: 100%;
+  }
+}
 }

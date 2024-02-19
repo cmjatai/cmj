@@ -199,12 +199,15 @@ class CMSMixin(models.Model):
     ALINHAMENTO_JUSTIFY = 1
     ALINHAMENTO_RIGHT = 2
     ALINHAMENTO_CENTER = 3
+    ALINHAMENTO_EXPAND = 4
 
     alinhamento_choice = CmjChoices(
         (ALINHAMENTO_LEFT, 'alinhamento_left', _('Alinhamento Esquerdo')),
         (ALINHAMENTO_JUSTIFY, 'alinhamento_justify', _('Alinhamento Completo')),
         (ALINHAMENTO_RIGHT, 'alinhamento_right', _('Alinhamento Direito')),
         (ALINHAMENTO_CENTER, 'alinhamento_center', _('Alinhamento Centralizado')),
+        (ALINHAMENTO_EXPAND, 'alinhamento_expand',
+         _('Alinhamento Completo - Render Large')),
     )
 
     TD_NEWS = 0
@@ -764,6 +767,11 @@ class Classe(ShortUrl, CMSMixin):
 
     list_in_menu = models.BooleanField(
         _('Listar no Menu Geral'),
+        choices=YES_NO_CHOICES,
+        default=False)
+
+    menu_lateral = models.BooleanField(
+        _('Montar Menu Lateral'),
         choices=YES_NO_CHOICES,
         default=False)
 

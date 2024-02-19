@@ -40,22 +40,35 @@
 {% block detail_content %}
   {% if not show_results %}
     {% include 'search/search_widget.html' %}
-  <hr>
+    <hr>
     {% crispy filter.form %}
+
+
+    {% if tipos_autores_materias %}
+    <br>
+        <fieldset>
+          <legend>
+            <a class="text-black-50" href="{% url 'sapl.materia:pesquisar_materia'%}?em_tramitacao=1">
+              Acesso Rápido às Matérias em Tramitação
+            </a>
+          </legend>
+          <br>
+        </fieldset>
+          {% include 'materia/materias_em_tramitacao_widget.html' %}
+
+      {% endif %}
+    </div>
   {% endif %}
 {% endblock detail_content %}
 
 {% block table_content %}
 
     {% if show_results %}
-
         <div class="container-table">
           <div class="result-count">Total de Matérias: <strong>{{paginator.count}}</strong></div>
-          <table class="table table-hover table-link-ordering">
             {% if paginator.count %}
             {% for m in page_obj %}
-              <tr>
-                <td class="item-listas">
+                <div class="item-listas p-2">
                   <div class="item-raiz">
                     <div class="float-right">
                       {% with m.autores.all.count as count_parlamentares %}
@@ -299,15 +312,18 @@
                                       </li>
                                 {% if forloop.last %}
                                     </ul>
-                                  </div>
+                               q   </div>
                                 {% endif %}
                               {% endfor %}
                           </div>
                         {% endif %}
                       </div>
                     {% endif %}
-                    {% if m.tipo_id != 3 and m.em_tramitacao and perms.compilacao.add_textoarticulado and m.texto_articulado.first.dispositivos_set.count < 4 %}
-                      <strong class="text-red">ATENÇÂO!!! Verificar Texto Articulado...</strong><br>
+
+                    {% if m.tipo.turnos_aprovacao > 1 and m.em_tramitacao and perms.materia.add_materialegislativa %}
+                      {% if not m.texto_articulado.first or m.texto_articulado.first.dispositivos_set.count < 4 %}
+                        <strong class="text-red">ATENÇÂO!!! Verificar Texto Articulado...</strong><br>
+                      {% endif %}
                     {% endif %}
 
                     {% if m.em_tramitacao and mail_service_configured %}
@@ -351,8 +367,7 @@
 
 
 
-                </td>
-              </tr>
+                      </div>
             {% endfor %}
           {% else  %}
             <tr><td><h3>Nenhuma matéria encontrada com essas especificações</h3></tr>

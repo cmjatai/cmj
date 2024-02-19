@@ -241,6 +241,7 @@ def send_mail(subject, email_template_name, context, from_email, to_email):
 def send_signal_for_websocket_time_refresh(inst, **kwargs):
 
     action = 'post_save' if 'created' in kwargs else 'post_delete'
+    created = kwargs.get('created', False)
 
     if hasattr(inst, '_meta') and \
         not inst._meta.app_config is None and \
@@ -259,7 +260,8 @@ def send_signal_for_websocket_time_refresh(inst, **kwargs):
                         'action': action,
                         'id': inst.id,
                         'app': inst._meta.app_label,
-                        'model': inst._meta.model_name
+                        'model': inst._meta.model_name,
+                        'created': created
                     }
                 }
             )

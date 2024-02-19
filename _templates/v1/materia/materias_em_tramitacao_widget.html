@@ -1,0 +1,22 @@
+{% load i18n cache tz %}
+{% load common_tags %}
+
+{% cache 300 cache_materias_em_tramitacao %}
+  {% for tipo, autores_materias in tipos_autores_materias %}
+      <div>
+        <a class="text-black-50" href="{% url 'sapl.materia:pesquisar_materia'%}?tipo={{tipo.id}}&em_tramitacao=1">
+          {{tipo}}
+        </a>
+      </div>
+      {% for autor, materias in autores_materias.items %}
+      <a href="{% url 'sapl.materia:pesquisar_materia'%}?tipo={{tipo.id}}&autoria__autor={{autor.id}}&em_tramitacao=1">
+          {% if autor.autor_related %}
+          {{autor.autor_related}} <strong>({{materias|length}})</strong><br>
+          {% else %}
+          {{autor.nome}} <strong>({{materias|length}})</strong><br>
+          {% endif %}
+        </a>
+        {% endfor %}
+        <br>
+  {% endfor %}
+{% endcache %}

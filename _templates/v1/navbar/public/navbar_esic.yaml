@@ -8,7 +8,7 @@
   - title: {% trans 'e-SIC' %}
     url: http://camaradejatai.sigepnet.com.br/informacao/sic_primeiro_acesso.php?portal=2
   - title: {% trans 'SIC Físico - Localização e Horários' %}
-    url: /informacao/ouvidoria/sic-fisico
+    url: /informacao/sic-fisico
   - title: {% trans 'Telefones e Emails' %}
     url: /fale-conosco/telefones-e-emails
   - title: {% trans 'Ouvidoria Parlamentar' %}

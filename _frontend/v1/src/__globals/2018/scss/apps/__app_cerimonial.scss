@@ -34,7 +34,12 @@
     .row2 {
       //background-color: black;
     }
-
+    #div_id_observacoes {
+      font-size: 80%;
+      textarea {
+        height: 174px;
+      }
+    }
     #div_id_setores {
       display: flex;
       flex-direction: column;

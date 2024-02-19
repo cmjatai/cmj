@@ -20,7 +20,7 @@ from django.core.files.uploadedfile import UploadedFile
 from django.core.mail import get_connection
 from django.db import models
 from django.db.models import Q
-from django.db.models.fields.files import FieldFile
+from django.db.models.fields.files import FieldFile, ImageFieldFile
 from django.forms import BaseForm
 from django.forms.widgets import SplitDateTimeWidget
 from django.http.response import HttpResponse
@@ -316,6 +316,28 @@ class PortalFieldFile(FieldFile):
 
 class PortalFileField(models.FileField):
     attr_class = PortalFieldFile
+
+
+class PortalFieldImage(ImageFieldFile):
+
+    @property
+    def url(self):
+        try:
+            self._require_file()
+            # if settings.DEBUG:
+            #    return self.storage.url(self.name)
+
+            field_name_action = self.field.name.replace('_', '-')
+            return '%s' % reverse(
+                'sapl.api:%s-%s' % (self.instance._meta.model_name,
+                                    field_name_action),
+                kwargs={'pk': self.instance.pk})
+        except:
+            return ''
+
+
+class PortalImageField(models.ImageField):
+    attr_class = PortalFieldImage
 
 
 class ImageThumbnailFileInput(ClearableFileInput):

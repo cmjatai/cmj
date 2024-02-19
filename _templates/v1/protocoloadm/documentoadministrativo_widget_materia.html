@@ -2,30 +2,24 @@
 
 {% for d in doc_list %}
   <div>
-
     <strong>
         {% if d.is_signed %}
           <i class="fas fa-1x fa-certificate" title="Documento possui versão com Assinatura Digital."></i>
         {% endif %}
         {% if d.workspace.tipo == d.workspace.TIPO_PUBLICO %}
-
           <div class="d-inner-block float-left pr-3">
           {% include 'protocoloadm/documentoadministrativo_widget_zipfile.html' %}
           </div>
-
           <a href="{% url 'sapl.protocoloadm:documentoadministrativo_detail' d.id %}">{{d}}</a>
         {% else %}
           {{ d }}
         {% endif %}
     </strong>
-
-
     <small>
       <br><strong>Data:</strong> {{d.data}}
       {% with True as render_ementa %}
         {% include "protocoloadm/documentoadministrativo_widget_file.html" %}
       {% endwith %}
-
     </small>
   </div>
   {% if not forloop.last %}

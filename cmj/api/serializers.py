@@ -1,4 +1,6 @@
 
+import os
+
 from django.db.models import Max
 from django.forms.models import model_to_dict
 from django.utils import timezone
@@ -10,9 +12,11 @@ from rest_framework.fields import empty, JSONField, ChoiceField,\
 from rest_framework.relations import RelatedField, ManyRelatedField,\
     MANY_RELATION_KWARGS
 
+from cmj.arq.models import DraftMidia, ArqClasse
 from cmj.core.models import Bi
 from cmj.sigad.models import Documento, ReferenciaEntreDocumentos,\
     DOC_TEMPLATES_CHOICE, CMSMixin
+from sapl.api.serializers import SaplSerializerMixin
 
 
 class ChoiceSerializer(serializers.Serializer):
@@ -285,3 +289,37 @@ class DocumentoUserAnonymousSerializer(DocumentoSerializer):
     class Meta(DocumentoSerializer.Meta):
         model = Documento
         exclude = ('old_json', 'old_path', 'owner')
+
+
+class DraftMidiaSerializer(SaplSerializerMixin):
+    arquivo_size = serializers.SerializerMethodField()
+
+    def get_arquivo_size(self, obj):
+        if not obj.arquivo:
+            return 0
+
+        size = os.path.getsize(obj.arquivo.path)
+        return size, round(size / 1024 / 1024, 1)
+
+    class Meta(SaplSerializerMixin.Meta):
+        model = DraftMidia
+
+
+class ArqClasseSerializer(SaplSerializerMixin):
+
+    parents = serializers.SerializerMethodField()
+    conta = serializers.SerializerMethodField()
+
+    count_childs = serializers.SerializerMethodField()
+
+    def get_parents(self, obj):
+        return map(lambda x: {'id': x.id, 'titulo': x.titulo}, obj.parents)
+
+    def get_conta(self, obj):
+        return obj.conta
+
+    def get_count_childs(self, obj):
+        return obj.childs.count()
+
+    class Meta(SaplSerializerMixin.Meta):
+        model = ArqClasse

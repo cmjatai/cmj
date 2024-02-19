@@ -69,8 +69,7 @@ def time_refresh_log_test(request):
     return render(request, 'core/time_refresh_log_test.html', {})
 
 
-def app_vue_view(request):
-
+def app_vue_view(request, slug=None):
     return render(request, 'app_vue.html')
 
 
@@ -514,7 +513,12 @@ class CertidaoPublicacaoCrud(Crud):
 
         def get_context_data(self, **kwargs):
             context = DetailView.get_context_data(self, **kwargs)
-            context['print'] = 'print' in self.request.GET
+            if 'print' not in self.request.GET:
+                context['print'] = ''
+            else:
+                print_value = self.request.GET.get('print', '1')
+                print_value = print_value or '1'
+                context['print'] = f"{print_value}cm"
             context['content_object_url'] = self.content_object_url()
             return context
 

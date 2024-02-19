@@ -59,6 +59,7 @@
 .links-texto {
   float:left;
 }
+
 .link-texto {
   display: block;
   border: 1px solid darken($color_container_border, 10%);
@@ -73,6 +74,7 @@
     background-color: $color_container_bg;
   }
 }
+
 .item-listas {
   position: relative;
 
@@ -148,8 +150,26 @@
 }
 
 .container-table {
+  margin: 15px -15px -15px;
+
+  .result-count {
+    display: inline-block;
+    background-color: darken($color_container_bg, 5);
+    padding: 0px 10px;
+    margin-left: 10px;
+    border: 1px solid white;
+    border-bottom: 0px;
+  }
+
+  p {
+    margin: 0;
+  }
+
   .item-listas {
-    border-bottom: 1px solid white;
+    border-top: 1px solid white;
+    &:last-child {
+      border-bottom: 1px solid white;
+    }
     &:hover {
       background-color: rgba(#000, 0.1);
     }

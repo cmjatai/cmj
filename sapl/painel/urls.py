@@ -1,10 +1,9 @@
-from django.conf.urls import url, include
+from django.conf.urls import url
 
 from .apps import AppConfig
 from .views import (cronometro_painel, get_dados_painel, painel_mensagem_view,
                     painel_parlamentar_view, painel_view, painel_votacao_view,
-                    switch_painel, verifica_painel, votante_view, CronometroPainelCrud,
-                    PainelConfigCrud, painel_parcial_view)
+                    switch_painel, verifica_painel, votante_view)
 
 app_name = AppConfig.name
 
@@ -21,13 +20,8 @@ urlpatterns = [
     url(r'^painel/verifica-painel$', verifica_painel,
         name="verifica_painel"),
     url(r'^painel/cronometro$', cronometro_painel, name='cronometro_painel'),
-
-    url(r'^sistema/cronometro', include(CronometroPainelCrud.get_urls())),
-    url(r'^sistema/painel-config', include(PainelConfigCrud.get_urls())),
+    # url(r'^painel/cronometro$', include(CronometroPainelCrud.get_urls())),
 
     url(r'^voto-individual/$', votante_view,
         name='voto_individual'),
-
-    url(r'^painel-parcial/(?P<pk>\d+)/(?P<opcoes>\d+)/$', painel_parcial_view,
-        name="painel_parcial"),
 ]

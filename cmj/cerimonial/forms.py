@@ -1279,7 +1279,7 @@ class VisitaForm(ModelForm):
         widget=forms.TextInput())
 
     telefone = forms.CharField(
-        required=True,
+        required=False,
         label='Telefone',
         widget=forms.TextInput())
 
@@ -1300,28 +1300,35 @@ class VisitaForm(ModelForm):
         widget=forms.DateInput(format='%d/%m/%Y')
     )
 
+    observacoes = forms.CharField(
+        required=False,
+        label=Visita._meta.get_field(
+            'observacoes').verbose_name,
+        widget=forms.Textarea(attrs={'rows': 5}))
+
     class Meta:
         model = Visita
-        fields = ('setores', 'fotografia')
+        fields = ('setores', 'fotografia', 'observacoes')
 
     def __init__(self, *args, **kwargs):
 
         layout_form = [
             to_row([
                 (to_row([
-                    ('documento', 7),
-                    ('telefone', 5),
+                    ('documento', 5), ('nome', 7),
                     (HTML('''
-                            <div id="div-busca"></div>
+                            <div id="div-busca" class="d-flex align-items-center h-100"></div>
                     '''), 8),
                     (HTML('''
                             <div class="text-center"><img id="img_select"/></div>
                     '''), 4),
-                    ('nome', 12),
-                    ('data_nascimento', 5),
-                    ('bairro', 7),
+                    (HTML('<hr>'), 12),
+                    ('telefone', 4),
+                    ('data_nascimento', 4),
+                    ('bairro', 4),
                     ('fotografia', 12),
-                    ('setores', 12),
+                    ('setores', 7),
+                    ('observacoes', 5),
 
                 ]), 8),
                 (HTML(
@@ -1331,10 +1338,18 @@ class VisitaForm(ModelForm):
                         <canvas id="canvas"></canvas>
                         <div class="btn-controls btn-toobar">
                             <div class="btn-group btn-group-sm">
+                                <div class="btn btn-info" id="troca_camera">
+                                    <i class="fas fa-sync-alt"></i>
+                                </div>
+                            </div>
+                            <div class="btn-group btn-group-sm">
                                 <div class="btn btn-primary" id="liga">Ligar Câmera</div>
                             </div>
                             <div class="btn-group btn-group-sm">
                                 <div class="btn btn-success" id="capture">Capturar</div>
+                            </div>
+                            <div class="btn-group btn-group-sm">
+                                <div class="btn btn-danger" id="trash"><i class="fas fa-trash-alt"></i></div>
                             </div>
                         </div>
                     </div>

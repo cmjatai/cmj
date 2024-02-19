@@ -68,6 +68,9 @@ class VisitaCrud(Crud):
                 timezone.localtime(args[0].created), 'd/m/Y - H:i:s'
             )
 
+        def hook_owner(self, *args, **kwargs):
+            return 'Registrado Por', str(args[0].owner)
+
         def hook_fotografia(self, *args, **kwargs):
             if args[0].fotografia:
                 return 'Registro Fotogrático', f'<div class="text-center"><img src="{args[0].fotografia.url}"</div>'

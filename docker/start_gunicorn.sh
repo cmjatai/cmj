@@ -7,7 +7,7 @@ GROUP=`whoami`                                  # the group to run as (*)
 NUM_WORKERS=16                                   # how many worker processes should Gunicorn spawn (*)
                                                 # NUM_WORKERS = 2 * CPUS + 1
 TIMEOUT=300
-MAX_REQUESTS=100                                # number of requests before restarting worker
+MAX_REQUESTS=1000                                # number of requests before restarting worker
 DJANGO_SETTINGS_MODULE=cmj.settings            # which settings file should Django use (*)
 DJANGO_WSGI_MODULE=cmj.wsgi                    # WSGI module name (*)
 

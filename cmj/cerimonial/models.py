@@ -10,7 +10,7 @@ from cmj.core.models import CmjModelMixin, Trecho, Distrito, RegiaoMunicipal,\
 from cmj.utils import YES_NO_CHOICES, NONE_YES_NO_CHOICES,\
     get_settings_auth_user_model
 from sapl.parlamentares.models import Parlamentar, Partido
-from sapl.utils import LISTA_DE_UFS, texto_upload_path
+from sapl.utils import LISTA_DE_UFS, texto_upload_path, PortalImageField
 
 
 FEMININO = 'F'
@@ -853,7 +853,7 @@ class Visitante(CmjAuditoriaModelMixin):
     nome = models.CharField(max_length=100, verbose_name=_('Nome'))
 
     documento = models.CharField(
-        max_length=30, blank=True, unique=True,
+        max_length=30,
         verbose_name=_('RG/CPF/CNH'))
 
     data_nascimento = models.DateField(
@@ -865,10 +865,10 @@ class Visitante(CmjAuditoriaModelMixin):
         related_name='visitante_set',
         blank=True, null=True, on_delete=SET_NULL)
 
-    telefone = models.CharField(max_length=100,
+    telefone = models.CharField(max_length=100, blank=True, unique=True,
                                 verbose_name='Telefone')
 
-    fotografia = models.ImageField(
+    fotografia = PortalImageField(
         blank=True,
         null=True,
         upload_to=texto_upload_path,
@@ -914,12 +914,16 @@ class Visita(CmjAuditoriaModelMixin):
         verbose_name=_('Setores visitados')
     )
 
-    fotografia = models.ImageField(
+    fotografia = PortalImageField(
         blank=True,
         null=True,
         upload_to=texto_upload_path,
         verbose_name=_('Fotografia'),
         max_length=512)
+
+    observacoes = models.TextField(
+        blank=True, default='',
+        verbose_name=_('Observações Gerais'))
 
     class Meta:
         verbose_name = _('Registro de Entrada')

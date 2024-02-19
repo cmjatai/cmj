@@ -46,7 +46,7 @@
                     </div>
                   {% else %}
                     <div class="parent-right">
-                      {% if perms.add_documentoadministrativo %}
+                      {% if perms.protocoloadm.add_documentoadministrativo %}
                         {% if d.visibilidade == d.STATUS_DOC_ADM_PUBLICO %}
                           <span class="bg-green">Última Atualização: {{d.data_ultima_atualizacao}}</span>
                         {% elif d.visibilidade == d.STATUS_DOC_ADM_RESTRITO %}

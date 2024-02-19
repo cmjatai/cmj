@@ -70,6 +70,7 @@
       {% endif %}
 
       {% if n.materia %}
+      <hr>
         <p class="control-label">Matéria Legislativa</p>
         <div class="form-control-static mb-3">
           <a href="{% url 'sapl.materia:materialegislativa_detail' n.materia.pk %}">
@@ -102,7 +103,14 @@
             </div>
           {% endif %}
         {% endfor %}
+        {% if n.materia.documentoadministrativo_set.exists %}
+          <p class="control-label">Documentos Administrativos Vinculados a Matéria</p>
+          <div class="bg-white p-3">
+              {% with n.materia.documentoadministrativo_set.all as doc_list %}
+                {% include 'protocoloadm/documentoadministrativo_widget_materia.html' %}
+              {% endwith %}
+          </div>
+        {% endif %}
       {% endif %}
-
   </div>
 </div>

@@ -58,9 +58,10 @@
 {% endblock sub_actions %}
 
 {% block detail_content %}
-
-{% if object.tipo_id != 3 and object.em_tramitacao and perms.add_materialegislativa and object.texto_articulado.first.dispositivos_set.count < 4 %}
-  <strong class="text-red">ATENÇÂO!!! Verificar Texto Articulado...</strong>
+{% if object.tipo.turnos_aprovacao > 1 and object.em_tramitacao and perms.materia.add_materialegislativa %}
+  {% if not object.texto_articulado.first or object.texto_articulado.first.dispositivos_set.count < 4 %}
+    <strong class="text-red">ATENÇÂO!!! Verificar Texto Articulado...</strong><br>
+  {% endif %}
 {% endif %}
 
 <div class="item-listas container-table">
@@ -164,40 +165,6 @@
     </div>
   {% endif %}
 
-  {% if user.is_superuser %}
-    <div class="container">
-    <div class="row">
-      {% if materialegislativa.user %}
-        <div class="col-sm-6">
-          <div id="div_id_user" class="form-group">
-            <p class="control-label">Usuário</p>
-            <div class="controls">
-              <div class="form-control-static">
-                <div class="dont-break-out">
-                  <a href="{% url 'cmj.core:user_update' materialegislativa.user.pk %}">{{materialegislativa.user}}</a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      {% endif %}
-      {% if materialegislativa.ip %}
-        <div class="col-sm-6">
-          <div id="div_ip_user" class="form-group">
-            <p class="control-label">IP</p>
-            <div class="controls">
-              <div class="form-control-static">
-                <div class="dont-break-out">{{materialegislativa.ip}}</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      {% endif %}
-    </div>
-    </div>
-  {% endif %}
-
-
   {% if object.registrovotacao_set.exists %}
     <div class="pt-4">
       <table class="table">
@@ -219,18 +186,22 @@
               {% endif %}
 
               {% if rv.ordem %}
-                <a href="{% url 'sapl.sessao:ordemdia_list' rv.ordem.sessao_plenaria_id %}#id{{object.id}}">
+              {% if rv.ordem.sessao_plenaria.upload_ata %}
+                <a class="link-texto float-left" href="{{ rv.ordem.sessao_plenaria.upload_ata.url }}" title="Ata da Sessão">
+                  <i class="far fa-2x fa-file-pdf"></i>
+                  <br>
+                  <strong>
+                    Ata da Sessão
+                  </strong>
+                </a>
+              {% endif %}
+                <a href="{% url 'sapl.sessao:resumo' rv.ordem.sessao_plenaria_id %}#id{{object.id}}">
                   {{rv.ordem.sessao_plenaria.str_short}}
                 </a>
                 <br>
-                {% if rv.ordem.sessao_plenaria.upload_ata %}
-                  <strong><a href="{{ rv.ordem.sessao_plenaria.upload_ata.url }}">
-                    Ata da Sessão
-                  </a></strong> |
-                {% endif %}
                 <strong>Data:</strong> {{ rv.ordem.sessao_plenaria.data_inicio}}
               {% elif rv.expediente %}
-                <a href="{% url 'sapl.sessao:expedientemateria_list' rv.expediente.sessao_plenaria_id %}#id{{object.id}}">
+                <a href="{% url 'sapl.sessao:resumo' rv.expediente.sessao_plenaria_id %}#id{{object.id}}">
                   {{rv.expediente.sessao_plenaria.str_short}}
                 </a>
               <br><strong>Data:</strong> {{ rv.expediente.sessao_plenaria.data_inicio}}
@@ -253,10 +224,6 @@
                   </div>
                 {% endif %}
               {% endfor %}
-
-
-
-
             </td>
             <td>
               {{ rv.tipo_votacao }}
@@ -293,6 +260,39 @@
     <br>
     {% include "materia/tramitacao_list_container.html" %}
   {% endwith %}
+
+  {% if user.is_superuser %}
+    <div class="container pt-5">
+    <div class="row">
+      {% if materialegislativa.user %}
+        <div class="col-sm-6">
+          <div id="div_id_user" class="form-group">
+            <p class="control-label">Usuário</p>
+            <div class="controls">
+              <div class="form-control-static">
+                <div class="dont-break-out">
+                  <a href="{% url 'cmj.core:user_update' materialegislativa.user.pk %}">{{materialegislativa.user}}</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+      {% if materialegislativa.ip %}
+        <div class="col-sm-6">
+          <div id="div_ip_user" class="form-group">
+            <p class="control-label">IP</p>
+            <div class="controls">
+              <div class="form-control-static">
+                <div class="dont-break-out">{{materialegislativa.ip}}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+    </div>
+  {% endif %}
 
 
 {% endblock detail_content %}

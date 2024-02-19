@@ -132,10 +132,6 @@ class AppConfig(models.Model):
         verbose_name=_('Quem deve assina a ata'),
         max_length=1, choices=ASSINATURA_ATA_CHOICES, default='T')
 
-    mostrar_brasao_painel = models.BooleanField(
-        default=False,
-        verbose_name=_('Mostrar brasão da Casa no painel?'))
-
     receber_recibo_proposicao = models.BooleanField(
         verbose_name=_('Protocolar proposição somente com recibo?'),
         choices=YES_NO_CHOICES, default=True)
@@ -158,6 +154,39 @@ class AppConfig(models.Model):
         verbose_name=_(
             'Tramitar documentos anexados junto com os documentos principais?'),
         choices=YES_NO_CHOICES, default=True)
+
+    # MÓDULO PAINEL
+
+
+    mostrar_brasao_painel = models.BooleanField(
+        default=False,
+        verbose_name=_('Mostrar brasão da Casa no painel?'))
+
+    mostrar_voto = models.BooleanField(
+        verbose_name=_(
+            'Exibir voto do Parlamentar antes de encerrar a votação?'),
+        choices=YES_NO_CHOICES, default=False)
+
+
+    cronometro_discurso = models.DurationField(
+        verbose_name=_('Cronômetro do Discurso'),
+        blank=True,
+        null=True)
+
+    cronometro_aparte = models.DurationField(
+        verbose_name=_('Cronômetro do Aparte'),
+        blank=True,
+        null=True)
+
+    cronometro_ordem = models.DurationField(
+        verbose_name=_('Cronômetro da Ordem'),
+        blank=True,
+        null=True)
+
+    cronometro_consideracoes = models.DurationField(
+        verbose_name=_('Cronômetro de Considerações Finais'),
+        blank=True,
+        null=True)
 
     class Meta:
         verbose_name = _('Configurações da Aplicação')

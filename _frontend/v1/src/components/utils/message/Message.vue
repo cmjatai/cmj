@@ -8,9 +8,8 @@
       :key="key"
       v-model="msg.time"
       :message_id="msg.id">
-        {{msg.message}}
+      <span v-html="msg.message"></span>
     </alert>
-
   </div>
 </template>
 
