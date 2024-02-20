@@ -65,8 +65,8 @@ services:
       - cmj_media:/var/cmjatai/cmj_media
       - cmj_logs:/var/cmjatai/cmj/logs
     depends_on:
-      - cmjredis
       - cmjdb
+      - cmjredis
       - cmjsolr
     ports:
       - "8001:80"
