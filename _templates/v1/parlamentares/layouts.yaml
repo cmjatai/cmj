@@ -33,21 +33,18 @@ Parlamentar:
   {% trans 'Dados do Parlamentar' %}:
   - nome_parlamentar:8  ativo
   - nome_completo
-  - nivel_instrucao  sexo  data_nascimento
-  - situacao_militar  profissao
-  - endereco_web
-  - email
-  - numero_gab_parlamentar  telefone
-  - municipio_residencia  uf_residencia
+  - profissao
+  - email telefone
   - biografia
 {% comment %}
+  - endereco_web
+  - nivel_instrucao  sexo  data_nascimento
+  - situacao_militar
   - cpf  rg  titulo_eleitor
   - endereco_residencia  cep_residencia
   - telefone_residencia
   - locais_atuacao
-
 {% endcomment %}
-
 
 ParlamentarUpdate:
   {% trans 'Dados do Parlamentar' %}:
