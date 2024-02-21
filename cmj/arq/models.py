@@ -370,6 +370,10 @@ class ArqClasse(Parent):
                 for d in self.arqdoc_logica_set.all():
                     d.checkcheck = True
                     d.save()
+        else:
+            if self.parent:
+                self.parent.checkcheck = False
+                self.parent.save()
 
         return r
 

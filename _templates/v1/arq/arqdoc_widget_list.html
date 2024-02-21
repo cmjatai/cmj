@@ -24,10 +24,8 @@
         <tr>
           <td align=center>
             {% if doc.checkcheck %}
-              <i class="fas fa-xs fa-lock text-red" title="Documento Arquivado."></i>
-            {% else %}
-              <i class="fas fa-xs fa-lock-open" title="Pendente de Arquivamento"></i>
-            {% endif %}<br>
+              <i class="fas fa-xs fa-lock text-red" title="Documento Arquivado."></i><br>
+            {% endif %}
             {{ doc.data|date:"d/m/Y" }}
           </td>
           <td>

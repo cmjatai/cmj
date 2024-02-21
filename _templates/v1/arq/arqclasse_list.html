@@ -38,11 +38,9 @@
         <tbody>
             {% for arqclasse in object_list %}
             <tr>
-              <td width=15%>
+              <td width=15% align=center>
                 {% if arqclasse.checkcheck %}
-                  <i class="fas fa-xs fa-lock text-red" title="SubArqClasse Arquivada."></i>
-                {% else %}
-                  <i class="fas fa-xs fa-lock-open" title="Arquivamento Pendente"></i>
+                  <i class="fas fa-xs fa-lock text-red" title="SubArqClasse Arquivada."></i><br>
                 {% endif %}
                 <a href="{% url 'cmj.arq:subarqclasse_list' arqclasse.pk %}?view={{request.GET.view|default:view_format}}">
                 {{ arqclasse.conta }}
@@ -57,7 +55,11 @@
                   </i>
                   <ul>
                     {% for c in arqclasse.childs.all %}
-                      <li>{{c.titulo}}<br>
+                      <li>
+                        {% if c.checkcheck %}
+                          <i class="fas fa-xs fa-lock text-red" title="SubArqClasse Arquivada."></i>
+                        {% endif %}
+                        {{c.titulo}}<br>
                         <i>{{c.descricao|linebreaksbr}}</i>
                       </li>
                     {% endfor %}
