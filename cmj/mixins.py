@@ -116,7 +116,7 @@ class CheckCheckMixin:
             checkcheck = obj.checkcheck if hasattr(
                 obj, 'checkcheck') else False
 
-        if checkcheck and not request.user.is_superuser:
+        if checkcheck:  # and not request.user.is_superuser:
             raise PermissionDenied(
                 'Documento já no arquivo morto, '
                 'a edição é restrita ao gestor do sistema!'

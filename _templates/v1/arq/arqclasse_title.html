@@ -1,0 +1,22 @@
+{% load i18n common_cmj_tags %}
+
+<h1 class="page-header d-flex justify-content-between">
+  <span>
+    {% if title %}
+      {{ title|safe|linebreaksbr }}
+    {% elif view.title %}
+      {{ view.title|safe|linebreaksbr }}
+    {% elif object %}
+      {{ object|safe|linebreaksbr }}
+    {% endif %}
+  </span>
+  {% if object %}
+    <a href="{{request.META.PATH_INFO}}?{{request.META.QUERY_STRING}}{% if request.META.QUERY_STRING %}&{% endif %}{% if 'toggle_padlock' not in request.META.QUERY_STRING %}toggle_padlock{% endif %}">
+      {% if object.checkcheck %}
+        <i class="fas fa-lock text-red" title="SubArqClasse Arquivada."></i>
+      {% else %}
+        <i class="fas fa-lock-open" title="Arquivar SubArqClasse"></i>
+      {% endif %}
+    </a>
+  {% endif %}
+</h1>

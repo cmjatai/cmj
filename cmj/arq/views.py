@@ -12,9 +12,10 @@ from django.views.generic.list import ListView
 
 from cmj.arq import forms
 from cmj.arq.models import ArqClasse, ArqDoc
+from cmj.mixins import CheckCheckMixin
 
 
-class ArqClasseParentMixin:
+class ArqClasseParentMixin(CheckCheckMixin):
     _parent = None
 
     @property
@@ -141,6 +142,17 @@ class ArqClasseListView(ArqClasseParentMixin, PermissionRequiredMixin, ListView)
     def get(self, request, *args, **kwargs):
         self.view_format = request.GET.get('view', 'table')
 
+        toggle_padlock = request.GET.get('toggle_padlock', None)
+
+        if toggle_padlock is not None and request.user.is_superuser:
+            if 'pk' in self.kwargs:
+                self.object.checkcheck = not self.object.checkcheck
+                self.object.save()
+                # transferir para dentro do save, bloquear todos docs e subclasses
+                # if self.object.checkcheck:
+
+                return ListView.get(self, request, *args, **kwargs)
+
         if self.view_format == 'tree2':
             if 'pk' in self.kwargs:
                 return redirect('{}?view=tree'.format(reverse_lazy(
@@ -226,7 +238,7 @@ class ArqClasseListView(ArqClasseParentMixin, PermissionRequiredMixin, ListView)
         return super().dispatch(request, *args, **kwargs)
 
 
-class ArqDocMixin:
+class ArqDocMixin(CheckCheckMixin):
 
     @property
     def verbose_name(self):

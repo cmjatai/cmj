@@ -1,8 +1,11 @@
 {% extends "crud/detail.html" %}
 {% load i18n common_cmj_tags %}
 
-{% block extra_actions %}
+{% block title %}
+  {% include "arq/arqclasse_title.html" %}
+{% endblock %}
 
+{% block extra_actions %}
   <div class="actions btn-group-sm" role="group">
     <a  class="btn btn-outline-primary" href="{{request.path}}?view=table">TabView</a>
     <a  class="btn btn-outline-primary" href="{{request.path}}?view=tree">TreeView</a>
@@ -12,7 +15,6 @@
       <a  class="btn btn-outline-primary" href="/arq/{{object.parent.id}}/{{object.id}}">ArqView</a>
     {% endif %}
   </div>
-
   <div class="actions btn-group-sm" role="group">
     {% if object and object.parent%}
     <a  class="btn btn-outline-primary" href="{% url 'cmj.arq:subarqclasse_list' object.parent.pk %}?view={{request.GET.view|default:view_format}}">{% trans "Voltar para" %} {{ object.parent.titulo }}</a>
@@ -23,7 +25,6 @@
 {% endblock extra_actions %}
 
 {% block detail_content %}
-
 <i>{{object.descricao|linebreaksbr}}</i><br><br>
 {% if object and object_list or not object and object_list%}
     <table class="table table-hover" width="100%">

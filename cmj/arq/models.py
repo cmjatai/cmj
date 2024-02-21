@@ -275,7 +275,7 @@ class Parent(models.Model):
 
 class ArqClasse(Parent):
 
-    arquivado = models.BooleanField(
+    checkcheck = models.BooleanField(
         verbose_name=_('Arquivado'), default=False)
 
     codigo = models.PositiveIntegerField(verbose_name=_('Código'), default=0)
@@ -375,7 +375,7 @@ def arqdoc_path(instance, filename):
 
 class ArqDoc(Parent, CmjAuditoriaModelMixin):
 
-    arquivado = models.BooleanField(
+    checkcheck = models.BooleanField(
         verbose_name=_('Arquivado'), default=False)
 
     codigo = models.PositiveIntegerField(verbose_name=_('Código'), default=0)
