@@ -5,9 +5,11 @@
     ArqDocumentos da Classe {{object.nome}}<br>Conta: {{object.conta}}
   </h2>
   <div class="btn-group-sm" role="group">
+    {% if not object.checkcheck %}
     <a class="btn btn-outline-primary" href="{% url 'cmj.arq:arqdoc_create' object.id %}">
       Adicionar ArqDocumento
     </a>
+    {% endif %}
   </div>
 </div>
 <table class="table table-hover" width="100%">
