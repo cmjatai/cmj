@@ -106,9 +106,12 @@ class PluginSignMixin:
 
 class CheckCheckMixin:
 
-    def _checkcheck(self, request):
+    def is_checkcheck(self):
 
-        obj = self.get_object()
+        if not hasattr(self, 'object'):
+            self.object = self.get_object()
+
+        obj = self.object
 
         if hasattr(self, 'crud') and hasattr(self.crud, 'parent_field'):
             checkcheck = getattr(obj, self.crud.parent_field).checkcheck
@@ -116,7 +119,10 @@ class CheckCheckMixin:
             checkcheck = obj.checkcheck if hasattr(
                 obj, 'checkcheck') else False
 
-        if checkcheck:  # and not request.user.is_superuser:
+        return checkcheck
+
+    def _checkcheck(self, request):
+        if self.is_checkcheck():  # and not request.user.is_superuser:
             raise PermissionDenied(
                 'Documento já no arquivo morto, '
                 'a edição é restrita ao gestor do sistema!'

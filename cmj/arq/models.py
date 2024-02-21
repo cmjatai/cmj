@@ -292,7 +292,7 @@ class ArqClasse(Parent):
     perfil = models.IntegerField(
         _('Perfil da Classe'),
         choices=PERFIL_ARQCLASSE,
-        default=ARQCLASSE_LOGICA)
+        default=ARQCLASSE_FISICA)
 
     created = models.DateTimeField(
         verbose_name=_('created'), editable=False, auto_now_add=True)
@@ -350,6 +350,28 @@ class ArqClasse(Parent):
             return self.arqdoc_logica_set
         else:
             return []
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+
+        r = super().save(force_insert=force_insert, force_update=force_update,
+                         using=using, update_fields=update_fields)
+
+        if self.checkcheck:
+            for c in self.childs.all():
+                c.checkcheck = True
+                c.save()
+
+            if self.perfil == ARQCLASSE_FISICA:
+                for d in self.arqdoc_estrutural_set.all():
+                    d.checkcheck = True
+                    d.save()
+            elif self.perfil == ARQCLASSE_LOGICA:
+                for d in self.arqdoc_logica_set.all():
+                    d.checkcheck = True
+                    d.save()
+
+        return r
 
 
 def arqdoc_path(instance, filename):

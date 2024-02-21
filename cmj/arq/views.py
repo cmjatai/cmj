@@ -148,11 +148,11 @@ class ArqClasseListView(ArqClasseParentMixin, PermissionRequiredMixin, ListView)
             if 'pk' in self.kwargs:
                 self.object.checkcheck = not self.object.checkcheck
                 self.object.save()
-                # transferir para dentro do save, bloquear todos docs e subclasses
-                # if self.object.checkcheck:
-
-                return ListView.get(self, request, *args, **kwargs)
-
+                return redirect('{}?view={}'.format(
+                    reverse_lazy('cmj.arq:subarqclasse_list',
+                                 kwargs={'pk': self.kwargs['pk']}),
+                    self.view_format
+                ))
         if self.view_format == 'tree2':
             if 'pk' in self.kwargs:
                 return redirect('{}?view=tree'.format(reverse_lazy(

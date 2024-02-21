@@ -8,6 +8,11 @@
       <span class="inner">
         <div class="d-flex justify-content-between">
           <a href="{% url 'cmj.arq:subarqclasse_list' o.pk %}?view={{request.GET.view|default:view_format}}">
+            {% if arqclasse.checkcheck %}
+              <i class="fas fa-xs fa-lock text-red" title="SubArqClasse Arquivada."></i>
+            {% else %}
+              <i class="fas fa-xs fa-lock-open" title="Arquivamento Pendente"></i>
+            {% endif %}
             {{ o.conta }} - {{ o.titulo }}
           </a>
           {% if o.nivel > 3 %}
