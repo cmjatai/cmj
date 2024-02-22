@@ -294,5 +294,58 @@
     </div>
   {% endif %}
 
+  {% for m in object.anexadas.materias_anexadas_ordem_crescente.all %}
+    {% if forloop.first %}
+      <div>
+        <table class="table">
+          <tr>
+          <th>Matérias Anexadas</th>
+          </tr>
+        </table>
+      {% endif %}
+    <div class="item-listas" >
+      <div class="item-raiz">
+        <div class="links-texto">
+          {% if m.texto_original and False %}
+            <a class="link-texto" href="{{m.texto_original.url}}?u={% now "u"%}" title="Texto Original">
+              <i class="far fa-2x fa-file-{% if '.pdf' in m.texto_original.path %}pdf{% else %}archive{% endif %}"></i>
+            </a>
+          {% endif %}
+        </div>
+
+        <strong>
+          <a href="{% url 'sapl.materia:materialegislativa_detail' m.id %}">
+              {% if m.is_signed %}
+                <i class="fas fa-1x fa-certificate" title="Documento possui versão com Assinatura Digital, entre nos detalhes do documento para abrir o Arquivo Original"></i>
+              {% endif %}
+            {{m.tipo.sigla}} {{m.numero}}/{{m.ano}} - {{m.tipo}}
+          </a>
+        </strong>
+        <div class="text-ementa">
+        {{ m.ementa|safe }}
+        </div>
+            {% if m.url_video %}
+              <div class="container-youtube ">
+                    {% with m.url_video as url_video %}
+                      {% include 'youtube_widget.html' %}
+                    {% endwith %}
+              </div>
+            {% endif %}
+        <div class="">
+          <strong>Data de Apresentação:</strong> <span style="white-space: nowrap">{{m.data_apresentacao}}</span>
+          {% if m.protocolo_gr.first %}
+            | <strong>Protocolo: </strong>{{m.protocolo_gr.first.epigrafe}}
+          {% endif %}
+
+          <br><strong>Autoria:</strong> {{ m.autores.all|join:", "}}
+
+          {% if m.data_fim_prazo %}
+            <strong>Data Fim Prazo (Matéria): </strong>{{ m.data_fim_prazo|default_if_none:"" }}
+            </br>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+{% endfor %}
 
 {% endblock detail_content %}

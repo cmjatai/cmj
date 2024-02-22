@@ -8,63 +8,105 @@
         <th>Tramitações</th>
       </tr>
     {% endif %}
-
-
-
     <tr>
       <td>
-        <div class="row mb-2">
-          <div class="col-md-3 d-block d-md-none font-weight-bold">
-            {% if user.is_anonymous %}
-              {{t.data_tramitacao}}
-            {% else %}
-              <a href="{% url 'sapl.materia:tramitacao_detail' t.pk %}">{{t.data_tramitacao}}</a>
-            {% endif %}
-          </div>
-          <div class="col-md-3 d-md-block d-none text-right font-weight-bold">
+
+        <div class="d-print-none">
+          <div class="row mb-2">
+            <div class="col-md-3 d-block d-md-none font-weight-bold">
               {% if user.is_anonymous %}
-              {{t.data_tramitacao}}
-            {% else %}
-              <a href="{% url 'sapl.materia:tramitacao_detail' t.pk %}">{{t.data_tramitacao}}</a>
-            {% endif %}
+                {{t.data_tramitacao}}
+              {% else %}
+                <a href="{% url 'sapl.materia:tramitacao_detail' t.pk %}">{{t.data_tramitacao}}</a>
+              {% endif %}
+            </div>
+            <div class="col-md-3 d-md-block d-none text-right font-weight-bold">
+                {% if user.is_anonymous %}
+                {{t.data_tramitacao}}
+              {% else %}
+                <a href="{% url 'sapl.materia:tramitacao_detail' t.pk %}">{{t.data_tramitacao}}</a>
+              {% endif %}
+            </div>
+            <div class="col">
+              {{t.unidade_tramitacao_destino}}
+            </div>
           </div>
-          <div class="col">
-            {{t.unidade_tramitacao_destino}}
+          <div class="row mb-2">
+            <div class="col-md-3 d-block d-md-none font-weight-bold">
+                Situação{% if forloop.first %} Atual{% endif %}:
+            </div>
+            <div class="col-md-3 d-md-block d-none text-right font-weight-bold">
+                Situação{% if forloop.first %} Atual{% endif %}:
+            </div>
+            <div class="col">
+              {{t.status}}
+            </div>
           </div>
-        </div>
-        <div class="row mb-2">
-          <div class="col-md-3 d-block d-md-none font-weight-bold">
-              Situação{% if forloop.first %} Atual{% endif %}:
-          </div>
-          <div class="col-md-3 d-md-block d-none text-right font-weight-bold">
-              Situação{% if forloop.first %} Atual{% endif %}:
-          </div>
-          <div class="col">
-            {{t.status}}
-          </div>
-        </div>
 
-        <div class="row mb-2">
-          <div class="col-md-3 text-right font-weight-bold">
-              Turno:
+          <div class="row mb-2">
+            <div class="col-md-3 d-block d-md-none font-weight-bold">
+                Turno:
+            </div>
+            <div class="col-md-3 d-md-block d-none text-right font-weight-bold">
+                Turno:
+            </div>
+            <div class="col">
+              {{t.get_turno_display}}
+            </div>
           </div>
-          <div class="col">
-            {{t.get_turno_display}}
+
+          <div class="row">
+            <div class="col-md-3 d-block d-md-none font-weight-bold">
+                Ação:
+            </div>
+            <div class="col-md-3 d-md-block d-none text-right font-weight-bold">
+                Ação:
+            </div>
+            <div class="col">
+              {{t.texto}}
+            </div>
           </div>
         </div>
+        <div class="d-none d-print-block" style="page-break-inside:avoid">
+          <div class="row">
+            <div class="col-3 font-weight-bold">
+              {% if user.is_anonymous %}
+                {{t.data_tramitacao}}
+              {% else %}
+                <a href="{% url 'sapl.materia:tramitacao_detail' t.pk %}">{{t.data_tramitacao}}</a>
+              {% endif %}
+            </div>
+            <div class="col">
+              {{t.unidade_tramitacao_destino}}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-3 font-weight-bold">
+                Situação{% if forloop.first %} Atual{% endif %}:
+            </div>
+            <div class="col">
+              {{t.status}}
+            </div>
+          </div>
 
-        <div class="row">
-          <div class="col-md-3 d-block d-md-none font-weight-bold">
-              Ação:
+          <div class="row">
+            <div class="col-3 font-weight-bold">
+                Turno:
+            </div>
+            <div class="col">
+              {{t.get_turno_display}}
+            </div>
           </div>
-          <div class="col-md-3 d-md-block d-none text-right font-weight-bold">
-              Ação:
-          </div>
-          <div class="col">
-            {{t.texto}}
+
+          <div class="row">
+            <div class="col-3 font-weight-bold">
+                Ação:
+            </div>
+            <div class="col">
+              {{t.texto}}
+            </div>
           </div>
         </div>
-
       </td>
     </tr>
   {% empty  %}

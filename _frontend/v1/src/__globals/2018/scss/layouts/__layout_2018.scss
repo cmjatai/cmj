@@ -77,7 +77,6 @@
 
 .item-listas {
   position: relative;
-
   .verbose_name {
     margin-top: -5px;
     font-size: 1em;
@@ -167,6 +166,7 @@
 
   .item-listas {
     border-top: 1px solid white;
+    page-break-inside: avoid;
     &:last-child {
       border-bottom: 1px solid white;
     }
@@ -418,7 +418,7 @@
   }
 }
 
-@media screen and (max-width: 767px) {
+@media screen and (max-width: 767px)  {
   .item-listas {
     .col-md-auto {
       padding-right: 15px;
@@ -486,3 +486,21 @@
 }
 
 
+
+@media print {
+  .container-box {
+    .page-header {
+      a {
+        display: none;
+      }
+    }
+    .file-documentoadministrativo {
+      .link-texto, .text-ementa {
+        display: none;
+      }
+    }
+    .pt-4 {
+      padding: 0;
+    }
+  }
+}

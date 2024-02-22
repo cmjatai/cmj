@@ -91,7 +91,7 @@ class ResponseFileMixin:
             arquivo.name
         )
 
-        logger.info(f'response_file end method')
+        logger.debug(f'response_file end method')
         return response
 
 
