@@ -305,8 +305,8 @@ class ArqClasse(Parent):
     class Meta:
         ordering = ('codigo',)
 
-        verbose_name = _('Classe')
-        verbose_name_plural = _('Classes')
+        verbose_name = _('ArqClasse')
+        verbose_name_plural = _('ArqClasses')
 
     @property
     def conta(self):

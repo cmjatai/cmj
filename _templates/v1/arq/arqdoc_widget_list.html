@@ -2,7 +2,7 @@
 <hr>
 <div class="d-flex w-100 justify-content-between align-items-center">
   <h2>
-    ArqDocumentos da Classe {{object.nome}}<br>Conta: {{object.conta}}
+    ArqDocumentos da ArqClasse {{object.nome}}<br>Conta: {{object.conta}}
   </h2>
   <div class="btn-group-sm" role="group">
     {% if not object.checkcheck %}
@@ -12,42 +12,42 @@
     {% endif %}
   </div>
 </div>
+{% with object.arqdoc_set as arqdoc_set%}
+<caption>Quantidade de documentos na ArqClasse: {{arqdoc_set.all.count}}</caption>
 <table class="table table-hover" width="100%">
-  {% with object.arqdoc_set as arqdoc_set%}
-  <caption>Quantidade: {{arqdoc_set.all.count}}</caption>
   <thead>
-        <tr>
-          <th WIDTH="20%" align=center>{% fieldclass_verbose_name 'cmj.arq.models.ArqDoc' 'data' %}</th>
-          <th>{% fieldclass_verbose_name 'cmj.arq.models.ArqDoc' 'titulo' %}</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for doc in arqdoc_set.all %}
-        <tr>
-          <td align=center>
-            {% if doc.checkcheck %}
-              <i class="fas fa-xs fa-lock text-red" title="Documento Arquivado."></i><br>
-            {% endif %}
-            {{ doc.data|date:"d/m/Y" }}
-          </td>
-          <td>
-            <div class="d-flex w-100 justify-content-between">
-              <div class="d-block">
-                <a href="{% url 'cmj.arq:arqdoc_edit' doc.classe_estrutural_id doc.pk %}">{{ doc.titulo }}</a>
-                <br>
-                <small>
-                  {{doc.descricao}}
-                </small>
-              </div>
-              {% if not doc.checkcheck %}
-                <div class="d-block">
-                  <a href="{% url 'cmj.arq:arqdoc_delete' doc.classe_estrutural_id doc.pk %}" class="btn btn-outline-primary btn-excluir btn-sm">Excluir</a>
-                </div>
-              {% endif %}
+    <tr>
+      <th WIDTH="20%" align=center>{% fieldclass_verbose_name 'cmj.arq.models.ArqDoc' 'data' %}</th>
+      <th>{% fieldclass_verbose_name 'cmj.arq.models.ArqDoc' 'titulo' %}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for doc in arqdoc_set.all %}
+    <tr>
+      <td align=center>
+        {% if doc.checkcheck %}
+          <i class="fas fa-xs fa-lock text-red" title="Documento Arquivado."></i><br>
+        {% endif %}
+        {{ doc.data|date:"d/m/Y" }}
+      </td>
+      <td>
+        <div class="d-flex w-100 justify-content-between">
+          <div class="d-block">
+            <a href="{% url 'cmj.arq:arqdoc_edit' doc.classe_estrutural_id doc.pk %}">{{ doc.titulo }}</a>
+            <br>
+            <small>
+              {{doc.descricao}}
+            </small>
+          </div>
+          {% if not doc.checkcheck %}
+            <div class="d-block">
+              <a href="{% url 'cmj.arq:arqdoc_delete' doc.classe_estrutural_id doc.pk %}" class="btn btn-outline-primary btn-excluir btn-sm">Excluir</a>
             </div>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-  {% endwith %}
+          {% endif %}
+        </div>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
 </table>
+{% endwith %}
