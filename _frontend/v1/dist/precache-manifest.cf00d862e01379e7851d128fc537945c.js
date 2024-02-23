@@ -28,8 +28,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/brasao/escola_1024.png"
   },
   {
-    "revision": "362429d3b23f5f77f80c",
-    "url": "/static/css/app.f3038f0e.css"
+    "revision": "18176244f9f9714c9a18",
+    "url": "/static/css/app.8e976f0e.css"
   },
   {
     "revision": "061ef97c1564c1c4b220",
@@ -340,11 +340,11 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/user.png"
   },
   {
-    "revision": "6c4ac1d60deb5e65b95ca18d1f2db23e",
+    "revision": "72766a6074630a2a34aee503662faddc",
     "url": "/static/index.html"
   },
   {
-    "revision": "362429d3b23f5f77f80c",
+    "revision": "18176244f9f9714c9a18",
     "url": "/static/js/app.e1612560.js"
   },
   {
