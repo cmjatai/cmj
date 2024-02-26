@@ -336,12 +336,12 @@ class ExpedienteMateriaForm(ModelForm):
 
         sessao = self.instance.sessao_plenaria
 
-        try:
-            materia = MateriaLegislativa.objects.get(
-                numero=self.cleaned_data['numero_materia'],
-                ano=self.cleaned_data['ano_materia'],
-                tipo=self.cleaned_data['tipo_materia'])
-        except ObjectDoesNotExist:
+        materia = MateriaLegislativa.objects.filter(
+            numero=self.cleaned_data['numero_materia'],
+            ano=self.cleaned_data['ano_materia'],
+            tipo=self.cleaned_data['tipo_materia']
+        ).order_by('-em_tramitacao').first()
+        if not materia:
             msg = _('A matéria a ser inclusa não existe no cadastro'
                     ' de matérias legislativas.')
             raise ValidationError(msg)
