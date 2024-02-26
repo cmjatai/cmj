@@ -70,7 +70,7 @@
       {% endif %}
 
       {% if n.materia %}
-      <hr>
+        <hr>
         <p class="control-label">Matéria Legislativa</p>
         <div class="form-control-static mb-3">
           <a href="{% url 'sapl.materia:materialegislativa_detail' n.materia.pk %}">
@@ -104,13 +104,21 @@
           {% endif %}
         {% endfor %}
         {% if n.materia.documentoadministrativo_set.exists %}
-          <p class="control-label">Documentos Administrativos Vinculados a Matéria</p>
+          <p class="pt-3 control-label">Documentos Administrativos Vinculados a Matéria</p>
           <div class="bg-white p-3">
               {% with n.materia.documentoadministrativo_set.all as doc_list %}
                 {% include 'protocoloadm/documentoadministrativo_widget_materia.html' %}
               {% endwith %}
           </div>
         {% endif %}
+
+        {% if n.materia.mostrar_deliberacao and n.materia.registrovotacao_set.exists %}
+        <br>
+          {% with n.materia as materia %}
+            {% include "materia/materialegislativa_detail_deliberacao_plenario.html" %}
+          {% endwith %}
+        {% endif %}
+
       {% endif %}
   </div>
 </div>

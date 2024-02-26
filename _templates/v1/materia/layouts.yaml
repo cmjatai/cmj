@@ -153,13 +153,6 @@ MateriaLegislativaDetail:
   - diariooficial_set
   - autografo_set:5 normajuridica_set
 
-MateriaLegislativaDetailExtrato:
-  {% trans 'Identificação Básica' %}:
-  - tipo:5 ano:2 numero:2 em_tramitacao:3
-  - data_apresentacao:3 protocolo_gr:5 regime_tramitacao tipo_apresentacao
-  - materia_anexada_set__materia_principal|m2m_urlize_for_detail
-  - diariooficial_set
-  - autografo_set:5 normajuridica_set
 {%comment %}
   - numeracao_set
   - objeto

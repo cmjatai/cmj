@@ -186,6 +186,7 @@ class NormaJuridicaForm(FileFieldCheckMixin, ModelForm):
                   'tipo_materia',
                   'numero_materia',
                   'ano_materia',
+                  'mostrar_deliberacao',
                   'data_publicacao',
                   'data_vigencia',
                   'ementa',

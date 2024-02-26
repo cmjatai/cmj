@@ -116,6 +116,11 @@ class NormaJuridica(CommonMixin):
         verbose_name=_('Número'))
     ano = models.PositiveSmallIntegerField(verbose_name=_('Ano'),
                                            choices=RANGE_ANOS)
+
+    mostrar_deliberacao = models.BooleanField(
+        verbose_name=_('Mostrar Deliberacao?'),
+        choices=YES_NO_CHOICES, default=False)
+
     esfera_federacao = models.CharField(
         max_length=1,
         verbose_name=_('Esfera Federação'),
@@ -132,6 +137,7 @@ class NormaJuridica(CommonMixin):
     complemento = models.NullBooleanField(
         blank=True, verbose_name=_('Complementar ?'),
         choices=YES_NO_CHOICES)
+
     # XXX was a CharField (attention on migrate)
     assuntos = models.ManyToManyField(
         AssuntoNorma, blank=True,

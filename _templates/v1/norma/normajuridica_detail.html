@@ -116,10 +116,16 @@
             </small>
         </div>
       {% endif %}
+      {% if object.mostrar_deliberacao and object.materia.registrovotacao_set.exists %}
+        <div class="pt-4">
+          {% with object.materia as materia %}
+          {% include "materia/materialegislativa_detail_deliberacao_plenario.html" %}
+          {% endwith %}
+        </div>
+      {% endif %}
     {% endif %}
   </div>
 </div>
-
 
   {% if user.is_superuser %}
     <br><br>
