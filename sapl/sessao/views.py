@@ -3890,26 +3890,24 @@ class PesquisarSessaoPlenariaView(FilterView):
 
     logger = logging.getLogger(__name__)
 
-    def get_filterset_kwargs(self, filterset_class):
-        super().get_filterset_kwargs(filterset_class)
+    viewname = 'sapl.sessao:pesquisar_sessao'
 
-        kwargs = {'data': self.request.GET or None}
-
-        qs = self.get_queryset().select_related(
-            'tipo', 'sessao_legislativa', 'legislatura')
-
-        qs = qs.distinct().order_by(
+    def get_queryset(self):
+        qs = FilterView.get_queryset(self)
+        qs = qs.select_related(
+            'tipo', 'sessao_legislativa', 'legislatura').distinct().order_by(
             '-legislatura__numero', '-data_inicio', '-hora_inicio')
+        return qs
 
-        kwargs.update({
-            'queryset': qs,
-        })
+    def get_filterset_kwargs(self, filterset_class):
+        kwargs = super().get_filterset_kwargs(filterset_class)
         return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         context['title'] = _('Pesquisar Sessão Plenária')
+
         paginator = context['paginator']
         page_obj = context['page_obj']
 
@@ -3917,7 +3915,52 @@ class PesquisarSessaoPlenariaView(FilterView):
             page_obj.number, paginator.num_pages)
 
         context['bg_title'] = 'bg-yellow text-white'
+
+        context['show_results'] = show_results_filter_set(
+            self.request.GET.copy())
+
+        data = self.filterset.data
+        if data and data.get('data_inicio__year') is not None:
+            url = "&" + str(self.request.META['QUERY_STRING'])
+            if url.startswith("&page"):
+                ponto_comeco = url.find('data_inicio__year=') - 1
+                url = url[ponto_comeco:]
+            context['filter_url'] = url
+
+        context['numero_res'] = len(self.object_list)
+
         return context
+
+    def get(self, request, *args, **kwargs):
+
+        r = super().get(request)
+
+        data = self.filterset.data
+        if not data:
+            return HttpResponseRedirect(
+                reverse(
+                    self.viewname
+                ) + f'?data_inicio__year={timezone.now().year}'
+            )
+
+        return r
+
+
+class PesquisarPautaSessaoView(PesquisarSessaoPlenariaView):
+    filterset_class = PautaSessaoFilterSet
+    template_name = 'sessao/pauta_sessao_filter.html'
+
+    viewname = 'sapl.sessao:pesquisar_pauta'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = _('Pesquisar Pauta de Sessão')
+        return context
+
+
+class PesquisarSessaoPlenariaView__(FilterView):
+
+    logger = logging.getLogger(__name__)
 
     def get(self, request, *args, **kwargs):
         super().get(request)
@@ -3949,18 +3992,6 @@ class PesquisarSessaoPlenariaView(FilterView):
             self.request.GET.copy())
 
         return self.render_to_response(context)
-
-
-class PesquisarPautaSessaoView(PesquisarSessaoPlenariaView):
-    filterset_class = PautaSessaoFilterSet
-    template_name = 'sessao/pauta_sessao_filter.html'
-
-    logger = logging.getLogger(__name__)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = _('Pesquisar Pauta de Sessão')
-        return context
 
 
 def retira_materias_ja_adicionadas(id_sessao, model):

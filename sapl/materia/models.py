@@ -90,6 +90,7 @@ class TipoProposicao(models.Model):
     class Meta:
         verbose_name = _('Tipo de Proposição')
         verbose_name_plural = _('Tipos de Proposições')
+        ordering = ['id']
 
     def __str__(self):
         return self.descricao
@@ -172,6 +173,7 @@ class RegimeTramitacao(models.Model):
     class Meta:
         verbose_name = _('Regime de Tramitação')
         verbose_name_plural = _('Regimes de Tramitação')
+        ordering = ['id']
 
     def __str__(self):
         return self.descricao
@@ -184,6 +186,7 @@ class Origem(models.Model):
     class Meta:
         verbose_name = _('Origem')
         verbose_name_plural = _('Origens')
+        ordering = ['id']
 
     def __str__(self):
         return self.nome
@@ -533,6 +536,7 @@ class AcompanhamentoMateria(models.Model):
     class Meta:
         verbose_name = _('Acompanhamento de Matéria')
         verbose_name_plural = _('Acompanhamentos de Matéria')
+        ordering = ['id']
 
     def __str__(self):
         if self.data_cadastro is None:
@@ -562,6 +566,7 @@ class PautaReuniao(models.Model):
     class Meta:
         verbose_name = _('Matéria da Pauta')
         verbose_name_plural = ('Matérias da Pauta')
+        ordering = ['id']
 
     def __str__(self):
         return _('Reunião: %(reuniao)s'
@@ -587,6 +592,7 @@ class Anexada(models.Model):
     class Meta:
         verbose_name = _('Anexada')
         verbose_name_plural = _('Anexadas')
+        ordering = ['id']
 
     def __str__(self):
         return _('Principal: %(materia_principal)s'
@@ -607,6 +613,7 @@ class AssuntoMateria(models.Model):
     class Meta:
         verbose_name = _('Assunto de Matéria')
         verbose_name_plural = _('Assuntos de Matéria')
+        ordering = ['id']
 
     def __str__(self):
         return self.assunto
@@ -621,6 +628,7 @@ class DespachoInicial(models.Model):
     class Meta:
         verbose_name = _('Despacho Inicial')
         verbose_name_plural = _('Despachos Iniciais')
+        ordering = ['id']
 
     def __str__(self):
         return _('%(materia)s - %(comissao)s') % {
@@ -780,6 +788,7 @@ class MateriaAssunto(models.Model):
     class Meta:
         verbose_name = _('Relação Matéria - Assunto')
         verbose_name_plural = _('Relações Matéria - Assunto')
+        ordering = ['id']
 
     def __str__(self):
         return _('%(materia)s - %(assunto)s') % {
@@ -849,6 +858,7 @@ class TipoFimRelatoria(models.Model):
     class Meta:
         verbose_name = _('Tipo Fim de Relatoria')
         verbose_name_plural = _('Tipos Fim de Relatoria')
+        ordering = ['id']
 
     def __str__(self):
         return self.descricao
@@ -876,6 +886,7 @@ class Relatoria(models.Model):
     class Meta:
         verbose_name = _('Relatoria')
         verbose_name_plural = _('Relatorias')
+        ordering = ['id']
 
     def __str__(self):
         if self.tipo_fim_relatoria:
@@ -900,6 +911,7 @@ class Parecer(models.Model):
     class Meta:
         verbose_name = _('Parecer')
         verbose_name_plural = _('Pareceres')
+        ordering = ['id']
 
     def __str__(self):
         return _('%(relatoria)s - %(tipo)s') % {
@@ -1166,6 +1178,7 @@ class UnidadeTramitacao(models.Model):
     class Meta:
         verbose_name = _('Unidade de Tramitação')
         verbose_name_plural = _('Unidades de Tramitação')
+        ordering = ['id']
 
     def __str__(self):
         if self.orgao and self.comissao and self.parlamentar:

@@ -19,6 +19,7 @@ class TipoEvento(models.Model):
     class Meta:
         verbose_name = _('Tipo de Evento')
         verbose_name_plural = _('Tipos de Eventos')
+        ordering = ['id']
 
 
 class Evento(models.Model):
@@ -74,3 +75,6 @@ class Programacao(models.Model):
         Evento,
         verbose_name=_('Programacao do Evento'),
         related_name='programacao_set', on_delete=CASCADE)
+
+    class Meta:
+        ordering = ['id']

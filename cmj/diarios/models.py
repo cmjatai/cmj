@@ -18,6 +18,7 @@ class TipoDeDiario(models.Model):
     class Meta:
         verbose_name = _('Tipo de Diário')
         verbose_name_plural = _('Tipos de Diário')
+        ordering = ['id']
 
     def __str__(self):
         return self.descricao

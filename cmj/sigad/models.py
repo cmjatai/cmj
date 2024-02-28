@@ -838,6 +838,7 @@ class PermissionsUserClasse(CMSMixin):
         CMSMixin.validate_unique(self, exclude=exclude)
 
     class Meta:
+        ordering = ['id']
         unique_together = (
             ('user', 'classe', 'permission'),
         )
@@ -1416,7 +1417,7 @@ class PermissionsUserDocumento(CMSMixin):
         )
         verbose_name = _('Permissão de Usuário para Documento')
         verbose_name_plural = _('Permissões de Usuários para Documentos')
-
+        ordering = ['id']
 
 class Midia(models.Model):
 
@@ -1437,6 +1438,7 @@ class Midia(models.Model):
     class Meta:
         verbose_name = _('Mídia Versionada')
         verbose_name_plural = _('Mídias Versionadas')
+        ordering = ['id']
 
     @cached_property
     def last(self):
@@ -1639,7 +1641,7 @@ class CaixaPublicacao(models.Model):
     class Meta:
         verbose_name = _('Caixa de Publicação')
         verbose_name_plural = _('Caixas de Publicação')
-
+        ordering = ['id']
 
 class CaixaPublicacaoClasse(CaixaPublicacao):
 
@@ -1647,7 +1649,7 @@ class CaixaPublicacaoClasse(CaixaPublicacao):
         proxy = True
         verbose_name = _('Caixa de Publicação')
         verbose_name_plural = _('Caixas de Publicação')
-
+        ordering = ['id']
 
 class CaixaPublicacaoRelationship(models.Model):
 

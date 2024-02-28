@@ -112,7 +112,7 @@
           </div>
         {% endif %}
 
-        {% if n.materia.mostrar_deliberacao and n.materia.registrovotacao_set.exists %}
+        {% if n.mostrar_deliberacao and n.materia.registrovotacao_set.exists %}
         <br>
           {% with n.materia as materia %}
             {% include "materia/materialegislativa_detail_deliberacao_plenario.html" %}

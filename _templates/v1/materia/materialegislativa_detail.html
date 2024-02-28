@@ -252,15 +252,19 @@
             | <strong>Protocolo: </strong>{{m.protocolo_gr.first.epigrafe}}
           {% endif %}
 
-          <br><strong>Autoria:</strong> {{ m.autores.all|join:", "}}
-
-          {% if m.data_fim_prazo %}
-            <strong>Data Fim Prazo (Matéria): </strong>{{ m.data_fim_prazo|default_if_none:"" }}
-            </br>
-          {% endif %}
+          <small>
+            <br><strong>Autoria:</strong> {{ m.autores.all|join:", "}}
+            {% with m.tramitacao_set.first as tram %}
+                {% if tram.unidade_tramitacao_destino %}
+                  - <strong>Localização Atual:</strong> &nbsp;{{tram.unidade_tramitacao_destino}}</br>
+                  <strong>Status:</strong> {{tram.status}} - <strong>Ultima Ação:</strong> {{tram.texto}}<br>
+                {% endif %}
+            {% endwith %}
+          </small>
         </div>
       </div>
     </div>
 {% endfor %}
+
 
 {% endblock detail_content %}

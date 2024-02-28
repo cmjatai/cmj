@@ -12,6 +12,7 @@ import sys
 from PIL import Image, ImageEnhance, ImageDraw
 from PIL.Image import Resampling
 import cv2
+from django.apps import apps
 from django.core.files.base import File
 from django.core.management.base import BaseCommand
 from django.db.models import Q
@@ -78,6 +79,17 @@ class Command(BaseCommand):
         m = Manutencao()
         m.desativa_auto_now()
         m.desativa_signals()
+
+        for app in apps.get_app_configs():
+
+            if not app.name.startswith('cmj') and not app.name.startswith('sapl'):
+                continue
+
+            for m in app.get_models():
+                if not m._meta.ordering:
+                    print(m)
+
+        return
 
         #
 

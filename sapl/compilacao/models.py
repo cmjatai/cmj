@@ -149,6 +149,7 @@ class TipoTextoArticulado(models.Model):
     class Meta:
         verbose_name = _('Tipo de Texto Articulado')
         verbose_name_plural = _('Tipos de Texto Articulados')
+        ordering = ['id']
 
     def __str__(self):
         return self.descricao
@@ -612,6 +613,7 @@ class TipoNota(models.Model):
     class Meta:
         verbose_name = _('Tipo de Nota')
         verbose_name_plural = _('Tipos de Nota')
+        ordering = ['id']
 
     def __str__(self):
         return '%s: %s' % (self.sigla, self.nome)
@@ -625,6 +627,7 @@ class TipoVide(models.Model):
     class Meta:
         verbose_name = _('Tipo de Vide')
         verbose_name_plural = _('Tipos de Vide')
+        ordering = ['id']
 
     def __str__(self):
         return '%s: %s' % (self.sigla, self.nome)
@@ -882,6 +885,7 @@ class TipoPublicacao(models.Model):
     class Meta:
         verbose_name = _('Tipo de Publicação')
         verbose_name_plural = _('Tipos de Publicação')
+        ordering = ['id']
 
     def __str__(self):
         return self.nome
@@ -895,6 +899,7 @@ class VeiculoPublicacao(models.Model):
     class Meta:
         verbose_name = _('Veículo de Publicação')
         verbose_name_plural = _('Veículos de Publicação')
+        ordering = ['id']
 
     def __str__(self):
         return '%s: %s' % (self.sigla, self.nome)
@@ -936,6 +941,7 @@ class Publicacao(TimestampedMixin):
     class Meta:
         verbose_name = _('Publicação')
         verbose_name_plural = _('Publicações')
+        ordering = ['id']
 
     def __str__(self):
         return _('%s realizada em %s \n <small>%s</small>') % (
@@ -1833,6 +1839,7 @@ class Vide(TimestampedMixin):
         verbose_name = _('Vide')
         verbose_name_plural = _('Vides')
         unique_together = ['dispositivo_base', 'dispositivo_ref', 'tipo']
+        ordering = ['id']
 
     def __str__(self):
         return _('Vide %s') % self.texto

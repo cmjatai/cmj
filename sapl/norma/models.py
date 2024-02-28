@@ -118,7 +118,7 @@ class NormaJuridica(CommonMixin):
                                            choices=RANGE_ANOS)
 
     mostrar_deliberacao = models.BooleanField(
-        verbose_name=_('Mostrar Deliberacao?'),
+        verbose_name=_('Mostrar Deliberação?'),
         choices=YES_NO_CHOICES, default=False)
 
     esfera_federacao = models.CharField(
@@ -290,6 +290,9 @@ class NormaEstatisticas(models.Model):
     norma = models.ForeignKey(NormaJuridica,
                               on_delete=models.CASCADE)
 
+    class Meta:
+        ordering = ['id']
+
     def __str__(self):
         return _('Usuário: %(usuario)s, Norma: %(norma)s') % {
             'usuario': self.usuario, 'norma': self.norma}
@@ -348,6 +351,7 @@ class LegislacaoCitada(models.Model):
     class Meta:
         verbose_name = _('Legislação')
         verbose_name_plural = _('Legislações')
+        ordering = ['id']
 
     def __str__(self):
         return str(self.norma)
@@ -367,6 +371,7 @@ class TipoVinculoNormaJuridica(models.Model):
     class Meta:
         verbose_name = _('Tipo de Vínculo entre Normas Jurídicas')
         verbose_name_plural = _('Tipos de Vínculos entre Normas Jurídicas')
+        ordering = ['id']
 
     def __str__(self):
         return self.descricao_ativa

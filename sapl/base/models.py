@@ -72,6 +72,7 @@ class CasaLegislativa(models.Model):
     class Meta:
         verbose_name = _('Casa Legislativa')
         verbose_name_plural = _('Casa Legislativa')
+        ordering = ['id']
 
     def __str__(self):
         return _('Casa Legislativa de %(municipio)s') % {
@@ -324,6 +325,7 @@ class OperadorAutor(CmjAuditoriaModelMixin):
         verbose_name_plural = _('Operadores do Autor')
         unique_together = (
             ('user', 'autor', ),)
+        ordering = ['id']
 
     def __str__(self):
         return self.user_name
@@ -350,6 +352,7 @@ class Metadata(models.Model):
         verbose_name = _('Metadado')
         verbose_name_plural = _('Metadados')
         unique_together = (('content_type', 'object_id'), )
+        ordering = ['id']
 
     def __str__(self):
         return f'Metadata de {self.content_object}'

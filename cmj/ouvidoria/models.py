@@ -83,6 +83,7 @@ class Solicitacao(models.Model):
     class Meta:
         verbose_name = _('Solicitação')
         verbose_name_plural = _('Solicitações')
+        ordering = ['id']
 
     def __str__(self):
         return self.titulo

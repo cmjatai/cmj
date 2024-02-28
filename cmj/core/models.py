@@ -345,6 +345,7 @@ class Municipio(models.Model):  # Localidade
     class Meta:
         verbose_name = _('Município')
         verbose_name_plural = _('Municípios')
+        ordering = ['id']
 
     def __str__(self):
         return _('%(nome)s - %(uf)s (%(regiao)s)') % {
@@ -383,6 +384,7 @@ class RegiaoMunicipal(models.Model):
         verbose_name_plural = _('Regiões Municipais')
         unique_together = (
             ('nome', 'tipo'),)
+        ordering = ['id']
 
     def __str__(self):
         return '%s - %s' % (
@@ -398,6 +400,7 @@ class Distrito(models.Model):
     class Meta:
         verbose_name = _('Distrito')
         verbose_name_plural = _("Distritos")
+        ordering = ['id']
 
     def __str__(self):
         return self.nome
@@ -649,6 +652,7 @@ class ImpressoEnderecamento(models.Model):
     class Meta:
         verbose_name = _('Impresso para Endereçamento')
         verbose_name_plural = _("Impressos para Endereçamento")
+        ordering = ['id']
 
     def __str__(self):
         return self.nome
@@ -762,6 +766,7 @@ class OperadorAreaTrabalho(CmjAuditoriaModelMixin):
     class Meta:
         verbose_name = _('Operador')
         verbose_name_plural = _('Operadores')
+        ordering = ['id']
 
     def __str__(self):
         return self.user_name
@@ -819,6 +824,7 @@ class Notificacao(CmjModelMixin):
     class Meta:
         verbose_name = _('Notificação')
         verbose_name_plural = _('Notificações')
+        ordering = ['id']
         permissions = (
             ('popup_notificacao',
              _('Visualização das notificações em Popup no Avatar do Usuário')),
@@ -859,6 +865,8 @@ class OcrMyPDF(models.Model):
         _('Sucesso'),
         choices=YES_NO_CHOICES,
         default=True)
+    class Meta:
+        ordering = ['id']
 
 
 class Bi(models.Model):

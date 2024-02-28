@@ -26,6 +26,7 @@ class TipoComissao(models.Model):
     class Meta:
         verbose_name = _('Tipo de Comissão')
         verbose_name_plural = _('Tipos de Comissão')
+        ordering = ['id']
 
     def __str__(self):
         return self.nome
@@ -125,6 +126,7 @@ class CargoComissao(models.Model):
     class Meta:
         verbose_name = _('Cargo de Comissão')
         verbose_name_plural = _('Cargos de Comissão')
+        ordering = ['id']
 
     def __str__(self):
         return self.nome
@@ -175,6 +177,7 @@ class Participacao(models.Model):  # ComposicaoComissao
     class Meta:
         verbose_name = _('Participação em Comissão')
         verbose_name_plural = _('Participações em Comissão')
+        ordering = ['id']
 
     def __str__(self):
         return '%s : %s' % (self.cargo, self.parlamentar)
@@ -258,6 +261,7 @@ class Reuniao(models.Model):
     class Meta:
         verbose_name = _('Reunião de Comissão')
         verbose_name_plural = _('Reuniões de Comissão')
+        ordering = ['id']
 
     def __str__(self):
         return self.nome
@@ -335,6 +339,7 @@ class DocumentoAcessorio(models.Model):
     class Meta:
         verbose_name = _('Documento Acessório')
         verbose_name_plural = _('Documentos Acessórios')
+        ordering = ['id']
 
     def __str__(self):
         return _('%(nome)s por %(autor)s') % {

@@ -165,6 +165,7 @@ class Protocolo(models.Model):
     class Meta:
         verbose_name = _('Protocolo')
         verbose_name_plural = _('Protocolos')
+        ordering = ['id']
         permissions = (
             ('action_anular_protocolo', _('Permissão para Anular Protocolo')),
             ('action_homologar_protocolo', _('Permissão para Homologar Protocolo')),
@@ -494,6 +495,7 @@ class DocumentoAcessorioAdministrativo(CommonMixin):
     class Meta:
         verbose_name = _('Documento Acessório')
         verbose_name_plural = _('Documentos Acessórios')
+        ordering = ['id']
 
     def __str__(self):
         return self.nome
@@ -553,6 +555,7 @@ class StatusTramitacaoAdministrativo(models.Model):
         verbose_name = _('Status de Tramitação de Documentos Administrativos')
         verbose_name_plural = _(
             'Status de Tramitação de Documentos Administrativos')
+        ordering = ['id']
 
     def __str__(self):
         return self.descricao
@@ -660,6 +663,7 @@ class AcompanhamentoDocumento(models.Model):
     class Meta:
         verbose_name = _('Acompanhamento de Documento')
         verbose_name_plural = _('Acompanhamentos de Documento')
+        ordering = ['id']
 
     def __str__(self):
         if self.data_cadastro is None:

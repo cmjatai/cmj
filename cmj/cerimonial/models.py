@@ -166,6 +166,7 @@ class PronomeTratamento(models.Model):
     class Meta:
         verbose_name = _('Pronome de Tratamento')
         verbose_name_plural = _('Pronomes de tratamento')
+        ordering = ['id']
 
     def __str__(self):
         return self.nome_por_extenso
@@ -389,6 +390,7 @@ class Telefone(CmjAuditoriaModelMixin):
     class Meta:
         verbose_name = _('Telefone')
         verbose_name_plural = _('Telefones')
+        ordering = ['id']
 
     def __str__(self):
         return self.telefone
@@ -429,6 +431,7 @@ class Email(CmjAuditoriaModelMixin):
     class Meta:
         verbose_name = _('Email')
         verbose_name_plural = _("Email's")
+        ordering = ['id']
 
     def __str__(self):
         return self.email
@@ -440,7 +443,7 @@ class EmailPerfil(Email):
         proxy = True
         verbose_name = _('Email do Perfil')
         verbose_name_plural = _("Email's do Perfil")
-
+        ordering = ['id']
 
 class Dependente(CmjAuditoriaModelMixin):
 
@@ -478,6 +481,7 @@ class Dependente(CmjAuditoriaModelMixin):
     class Meta:
         verbose_name = _('Dependente')
         verbose_name_plural = _('Dependentes')
+        ordering = ['id']
 
     def __str__(self):
         return self.nome
@@ -489,6 +493,7 @@ class DependentePerfil(Dependente):
         proxy = True
         verbose_name = _('Dependente do Perfil')
         verbose_name_plural = _('Dependentes do Perfil')
+        ordering = ['id']
 
 
 class LocalTrabalho(CmjAuditoriaModelMixin):
@@ -577,6 +582,7 @@ class LocalTrabalho(CmjAuditoriaModelMixin):
     class Meta:
         verbose_name = _('Local de Trabalho')
         verbose_name_plural = _('Locais de Trabalho')
+        ordering = ['id']
 
     def __str__(self):
         return self.nome
@@ -588,7 +594,7 @@ class LocalTrabalhoPerfil(LocalTrabalho):
         proxy = True
         verbose_name = _('Local de Trabalho do Perfil')
         verbose_name_plural = _('Locais de Trabalho do Perfil')
-
+        ordering = ['id']
 
 class Endereco(CmjAuditoriaModelMixin):
     contato = models.ForeignKey(Contato,
@@ -665,6 +671,7 @@ class Endereco(CmjAuditoriaModelMixin):
     class Meta:
         verbose_name = _('Endereço')
         verbose_name_plural = _('Endereços')
+        ordering = ['id']
 
     def __str__(self):
         numero = (' - ' + self.numero) if self.numero else ''
@@ -677,7 +684,7 @@ class EnderecoPerfil(Endereco):
         proxy = True
         verbose_name = _('Endereço do Perfil')
         verbose_name_plural = _('Endereços do Perfil')
-
+        ordering = ['id']
 
 class FiliacaoPartidaria(CmjAuditoriaModelMixin):
     contato = models.ForeignKey(Contato,
@@ -700,6 +707,7 @@ class FiliacaoPartidaria(CmjAuditoriaModelMixin):
     class Meta:
         verbose_name = _('Filiação Partidária')
         verbose_name_plural = _('Filiações Partidárias')
+        ordering = ['id']
 
     def __str__(self):
         return str(self.partido)
@@ -820,7 +828,7 @@ class ProcessoContato(Processo):
         proxy = True
         verbose_name = _('Processo')
         verbose_name_plural = _('Processos')
-
+        ordering = ['id']
 
 class GrupoDeContatos(CmjAuditoriaModelMixin):
 
