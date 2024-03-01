@@ -1,6 +1,4 @@
 {% load i18n cache sigad_filters common_cmj_tags%}
-
-{% cache 600 cache_acesso_informacao %}
 <div class="container-transparencia">
   <a class="link-radar" href="https://radardatransparencia.atricon.org.br">Radar<br>de Transparência Pública</a>
   <div class="container-e-sic">
@@ -63,7 +61,6 @@
                       {% if perms.sigad %}
                         <li>
                           <a class="text-red" href="/{{item.absolute_slug}}">{{item.apelido|default:item.titulo}}</a>
-                          c
                         </li>
                       {% endif %}
                     {% endif %}
@@ -78,4 +75,3 @@
     </div>
   </div>
 </div>
-{% endcache %}
