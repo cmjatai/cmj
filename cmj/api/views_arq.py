@@ -277,6 +277,10 @@ class _Draft:
             doc = fitz.open(dm.arquivo.file)
             d_new.insert_pdf(doc, from_page=0, to_page=len(doc))
             doc.close()
+
+        d_new.metadata['title'] = draft.descricao
+        d_new.metadata['producer'] = 'PortalCMJ'
+        d_new.set_metadata(d_new.metadata)
         d_new.save(fp, garbage=3, clean=True, deflate=True)
 
         #pdf = Pdf.new()
@@ -365,7 +369,7 @@ class _DraftMidia(ResponseFileMixin):
         #doc = Pdf.open(dm_atual.arquivo.file)
         #ldoc = len(doc.pages)
 
-        if ldoc <= 1:
+        if ldoc < 1:
             serializer = self.get_serializer(dm_atual)
             return Response(serializer.data)
 
@@ -383,6 +387,11 @@ class _DraftMidia(ResponseFileMixin):
 
             d = fitz.open()
             d.insert_pdf(doc, from_page=p, to_page=p)
+            d.metadata['title'] = f'{dm_atual.draft.descricao} - página: {p+1}'
+            #d.metadata['creator'] = str(request.user)
+            d.metadata['producer'] = 'PortalCMJ'
+            #d.metadata['creationDate'] = str(timezone.now())
+            d.set_metadata(d.metadata)
             d.save(fn, garbage=3, clean=True, deflate=True)
             d.close()
             #dst = Pdf.new()
