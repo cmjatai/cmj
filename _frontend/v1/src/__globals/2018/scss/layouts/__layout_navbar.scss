@@ -163,7 +163,7 @@
     background-size: auto $navbar-brand-height * 4;
   }
   & > .container {
-    background: radial-gradient(transparent, $color_primary);
+    //background: radial-gradient(transparent, $color_primary);
     &::after {
       content: "";
       position: absolute;
@@ -172,7 +172,7 @@
       background-position: center 40%;
       background-size: cover;
       background-repeat: no-repeat;
-      opacity: 0.2;
+      opacity: 0.12;
       top: 0;
       left: 0;
       right: 0;
@@ -401,19 +401,6 @@
       right: 12px;
       left: 12px;
       display: none;
-      //z-index: 99999;
-
-      &::before {
-        content: "";
-        position: absolute;
-        width: 0;
-        height: 0;
-        border-style: solid;
-        border-width: 0 9px 12px;
-        border-color: transparent transparent #fff;
-        right: 60px;
-        top: 0;
-      }
       .row {
         margin: -8px;
         .col-md {
@@ -427,7 +414,7 @@
       .inner {
         background-color: white;
         padding: 8px;
-        box-shadow: 0px 10px 30px #0007;
+        box-shadow: 0px 24px 12px 12px #0007;
         border-radius: 10px;
         z-index: 9000;
       }
@@ -494,6 +481,21 @@
   li {
     line-height: 1.35em;
   }
+  :hover {
+    .link-e-sic {
+      &::before {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 0 9px 12px;
+        border-color: transparent transparent #fff;
+        right: 20%;
+        top: 100%;
+        }
+    }
+  }
 }
 
 .dropdown-menu {
@@ -516,7 +518,7 @@
   .popup-notificacoes {
     position: absolute;
     top: 2px;
-    right: 20px;
+    right: 7px;
     z-index: 1500;
     line-height: 1;
     width: auto;

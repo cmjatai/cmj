@@ -2,9 +2,8 @@
 {% load webpack_static from webpack_loader %}
 
 <nav class="navbar navbar-topo navbar-expand-lg navbar-dark">
-    <div class="d-flex container{{fluid}} justify-content-between container-notificacoes">
+    <div class="d-flex container{{fluid}} justify-content-between">
 
-      {% notificacoes_unread %}
 
       <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
         <span class="icon-bar"></span>
@@ -58,10 +57,12 @@
         </button>
       {% endblock %}
 
-      <div class="navbar-collapse collapse" id="navbar-access">
+      <div class="navbar-collapse collapse " id="navbar-access">
         <div class="d-flex w-100 flex-column justify-content-end">
 
-          <div class="row-1 d-flex justify-content-end align-items-center">
+
+          <div class="row-1 d-flex justify-content-end align-items-center  container-notificacoes">
+            {% notificacoes_unread %}
             {% block social_links %}
               <div class="navbar-social-links justify-content-end">
                 <a href="/estatisticas"title="Estatisticas de Dados do Portal"><i class="far fa-chart-bar"></i></a>
