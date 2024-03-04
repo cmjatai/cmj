@@ -164,6 +164,7 @@
   }
   & > .container {
     //background: radial-gradient(transparent, $color_primary);
+    transition: all 1s ease;
     &::after {
       content: "";
       position: absolute;
@@ -180,6 +181,8 @@
       transition: all 1s ease;
     }
     &:hover {
+      transition: all 1s ease;
+      padding: 0px 5px;
       &::after {
         opacity: 0.4;
         transition: all 1s ease;

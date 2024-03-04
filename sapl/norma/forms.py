@@ -231,15 +231,16 @@ class NormaJuridicaForm(FileFieldCheckMixin, ModelForm):
         if (cleaned_data['tipo_materia'] and
             cleaned_data['numero_materia'] and
                 cleaned_data['ano_materia']):
-            try:
-                self.logger.debug("Tentando obter objeto MateriaLegislativa com tipo={}, numero={}, ano={}."
-                                  .format(cleaned_data['tipo_materia'], cleaned_data['numero_materia'], cleaned_data['ano_materia']))
-                materia = MateriaLegislativa.objects.get(
-                    tipo_id=cleaned_data['tipo_materia'],
-                    numero=cleaned_data['numero_materia'],
-                    ano=cleaned_data['ano_materia'])
 
-            except ObjectDoesNotExist:
+            self.logger.debug("Tentando obter objeto MateriaLegislativa com tipo={}, numero={}, ano={}."
+                              .format(cleaned_data['tipo_materia'], cleaned_data['numero_materia'], cleaned_data['ano_materia']))
+            materia = MateriaLegislativa.objects.filter(
+                tipo_id=cleaned_data['tipo_materia'],
+                numero=cleaned_data['numero_materia'],
+                ano=cleaned_data['ano_materia']
+            ).order_by('-em_tramitacao').first()
+
+            if not materia:
                 self.logger.error("Matéria Legislativa %s/%s (%s) é inexistente." % (
                     self.cleaned_data['numero_materia'],
                     self.cleaned_data['ano_materia'],
