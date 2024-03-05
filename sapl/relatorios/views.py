@@ -2,8 +2,8 @@ from datetime import datetime as dt
 import html
 import logging
 import re
-import tempfile
 
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404, HttpResponse
 from django.template.loader import render_to_string
@@ -97,12 +97,10 @@ def get_rodape(casa):
     else:
         linha2 = ""
 
-    if casa.email:
-        if casa.endereco_web:
-            linha2 = linha2 + " - "
-        linha2 = linha2 + str(_("E-mail: ")) + casa.email
-
-    #data_emissao = dt.strftime(timezone.now(), "%d/%m/%Y")
+    # if casa.email:
+    #    if casa.endereco_web:
+    #        linha2 = linha2 + " - "
+    #    linha2 = linha2 + str(_("E-mail: ")) + casa.email
 
     return [linha1, linha2]
 
@@ -617,7 +615,7 @@ def get_sessao_plenaria(sessao, casa):
     # Lista das matérias do Expediente, incluindo o resultado das votacoes
     lst_expediente_materia = []
     for expediente_materia in ExpedienteMateria.objects.filter(
-            sessao_plenaria=sessao):
+            sessao_plenaria=sessao).order_by('numero_ordem'):
         # seleciona os detalhes de uma matéria
         materia = expediente_materia.materia
         dic_expediente_materia = {}
@@ -740,7 +738,7 @@ def get_sessao_plenaria(sessao, casa):
     lst_votacao = []
     for votacao in OrdemDia.objects.filter(
             sessao_plenaria=sessao,
-            parent__isnull=True):
+            parent__isnull=True).order_by('numero_ordem'):
         # seleciona os detalhes de uma matéria
         materia = votacao.materia
         dic_votacao = {}
@@ -1312,7 +1310,7 @@ def make_pdf(base_url, main_template, header_template, main_css='', header_css='
     # Template of header
     html = HTML(base_url=base_url, string=header_template)
     header = html.render(
-        stylesheets=[CSS(string='@page {size:A4; margin:1cm;}')])
+        stylesheets=[])
 
     header_page = header.pages[0]
     header_body = get_page_body(header_page._page_box.all_children())
@@ -1328,7 +1326,7 @@ def make_pdf(base_url, main_template, header_template, main_css='', header_css='
 
 
 def resumo_ata_pdf(request, pk):
-    base_url = request.build_absolute_uri()
+    base_url = settings.MEDIA_ROOT if settings.DEBUG else request.build_absolute_uri()
     casa = CasaLegislativa.objects.first()
     rodape = ' '.join(get_rodape(casa))
 
@@ -1350,12 +1348,15 @@ def resumo_ata_pdf(request, pk):
     context.update({'object': sessao_plenaria})
     context.update({'data': dt.today().strftime('%d/%m/%Y')})
     context.update({'rodape': rodape})
-    header_context = {"casa": casa,
-                      'logotipo': casa.logotipo, 'MEDIA_URL': MEDIA_URL}
+    header_context = {
+        "casa": casa,
+        'logotipo': casa.logotipo,
+        "MEDIA_URL": MEDIA_URL if not settings.DEBUG else '',
+    }
 
     html_template = render_to_string('relatorios/relatorio_ata.html', context)
     html_header = render_to_string(
-        'relatorios/header_ata.html', header_context)
+        'relatorios/header.html', header_context)
 
     pdf_file = make_pdf(
         base_url=base_url, main_template=html_template, header_template=html_header)
@@ -1369,20 +1370,23 @@ def resumo_ata_pdf(request, pk):
 
 
 def relatorio_doc_administrativos(request, context):
-    base_url = request.build_absolute_uri()
+    base_url = settings.MEDIA_ROOT if settings.DEBUG else request.build_absolute_uri()
     casa = CasaLegislativa.objects.first()
     rodape = ' '.join(get_rodape(casa))
 
     context.update({'data': dt.today().strftime('%d/%m/%Y')})
     context.update({'rodape': rodape})
 
-    header_context = {"casa": casa,
-                      'logotipo': casa.logotipo, 'MEDIA_URL': MEDIA_URL}
+    header_context = {
+        "casa": casa,
+        'logotipo': casa.logotipo,
+        "MEDIA_URL": MEDIA_URL if not settings.DEBUG else '',
+    }
 
     html_template = render_to_string(
         'relatorios/relatorio_doc_administrativos.html', context)
     html_header = render_to_string(
-        'relatorios/header_ata.html', header_context)
+        'relatorios/header.html', header_context)
 
     pdf_file = make_pdf(
         base_url=base_url, main_template=html_template, header_template=html_header)
@@ -1396,7 +1400,8 @@ def relatorio_doc_administrativos(request, context):
 
 
 def relatorio_sessao_plenaria_pdf(request, pk):
-    base_url = request.build_absolute_uri()
+    base_url = settings.MEDIA_ROOT if settings.DEBUG else request.build_absolute_uri()
+    #base_url = request.build_absolute_uri()
     logger = logging.getLogger(__name__)
     username = request.user.username
     casa = CasaLegislativa.objects.first()
@@ -1404,7 +1409,7 @@ def relatorio_sessao_plenaria_pdf(request, pk):
         raise Http404
 
     rodape = get_rodape(casa)
-    rodape = ' '.join(rodape)
+    rodape = ' - '.join(rodape)
 
     try:
         logger.debug("user=" + username +
@@ -1431,35 +1436,41 @@ def relatorio_sessao_plenaria_pdf(request, pk):
         lst_oradores,
         lst_ocorrencias) = get_sessao_plenaria(sessao, casa)
 
-    html_template = render_to_string('relatorios/relatorio_sessao_plenaria.html',
-                                     {
-                                         "inf_basicas_dic": inf_basicas_dic,
-                                         "lst_mesa": lst_mesa,
-                                         "lst_presenca_sessao": lst_presenca_sessao,
-                                         #"lst_ausencia_sessao": lst_ausencia_sessao,
-                                         #"lst_expedientes": lst_expedientes,
-                                         "lst_expediente_materia": lst_expediente_materia,
-                                         #"lst_oradores_expediente": lst_oradores_expediente,
-                                         "lst_presenca_ordem_dia": lst_presenca_ordem_dia,
-                                         "lst_votacao": lst_votacao,
-                                         #"lst_oradores": lst_oradores,
-                                         #"lst_ocorrencias": lst_ocorrencias,
-                                         "rodape": rodape,
-                                         "data": dt.today().strftime('%d/%m/%Y')
-                                     })
+    html_template = render_to_string(
+        'relatorios/relatorio_sessao_plenaria.html',
+        {
+            "inf_basicas_dic": inf_basicas_dic,
+            "lst_mesa": lst_mesa,
+            "lst_presenca_sessao": lst_presenca_sessao,
+            #"lst_ausencia_sessao": lst_ausencia_sessao,
+            #"lst_expedientes": lst_expedientes,
+            "lst_expediente_materia": lst_expediente_materia,
+            #"lst_oradores_expediente": lst_oradores_expediente,
+            "lst_presenca_ordem_dia": lst_presenca_ordem_dia,
+            "lst_votacao": lst_votacao,
+            #"lst_oradores": lst_oradores,
+            #"lst_ocorrencias": lst_ocorrencias,
+            "rodape": rodape,
+            "data": dt.strftime(timezone.localtime(), "%d/%m/%Y %H:%M:%S")
+        })
 
     info = "Resumo da {}ª Reunião {} \
-                da {}ª Sessão Legislativa da {} \
+                da<br>{}ª Sessão Legislativa da {} \
                 Legislatura".format(inf_basicas_dic['num_sessao_plen'],
                                     inf_basicas_dic['nom_sessao'],
                                     inf_basicas_dic['num_sessao_leg'],
                                     inf_basicas_dic['num_legislatura']
                                     )
 
-    html_header = render_to_string('relatorios/header_ata.html', {"casa": casa,
-                                                                  "MEDIA_URL": MEDIA_URL,
-                                                                  "logotipo": casa.logotipo,
-                                                                  "info": info})
+    html_header = render_to_string(
+        'relatorios/header.html',
+        {
+            "casa": casa,
+            "MEDIA_URL": MEDIA_URL if not settings.DEBUG else '',
+            "logotipo": casa.logotipo,
+            "info": info
+        }
+    )
 
     pdf_file = make_pdf(
         base_url=base_url, main_template=html_template, header_template=html_header)

@@ -89,6 +89,10 @@ LOGGING = {
             'level': LOGGING_ROOT_LEVEL,
             'propagate': False,
         },
+        #'daphne': {
+        #    'handlers': ['console'],
+        #    'level': LOGGING_ROOT_LEVEL,
+        #},
     },
     'root': {
         'handlers': ['cmj_logger_file', 'console'],

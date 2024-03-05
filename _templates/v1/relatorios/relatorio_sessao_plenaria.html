@@ -13,23 +13,22 @@
     @page {
       @bottom-right {
         content: "Página " counter(page);
-        height: 1.5cm;
-        font-size: 8pt;
+        height: 0.5cm;
+        font-size: 7pt;
       }
       @bottom-center {
         border-top: 1px solid black;
-        font-size: 8pt;
-        height: 1cm;
+        font-size: 6pt;
+        height: 0.5cm;
         content: "{{rodape|safe}}";
-        font-style:italic;
+        font-style: italic;
       }
       @bottom-left {
         content: "{{data}}";
-        height: 1.5cm;
-        font-size: 8pt;
+        height: 0.5cm;
+        font-size: 7pt;
       }
     }
-
       {% comment %}
         @top-center {
           content:  string(title);
@@ -57,7 +56,13 @@
 
     <h2 class="gray-title">Lista de Presença da Sessão</h2>
     {% for membro in lst_presenca_sessao%}
-      <p>{{membro.nom_parlamentar}}/{{membro.sgl_partido}}</p>
+      {% if forloop.first %}
+        <ul>
+      {% endif %}
+      <li>{{membro.nom_parlamentar}}/{{membro.sgl_partido}}</li>
+      {% if forloop.last %}
+        </ul>
+      {% endif %}
     {% endfor%}
 
     {% comment %}
@@ -103,21 +108,20 @@
     <tbody>
       {% for materia in lst_expediente_materia%}
         <tr>
-          <td style="width: 120px;">
+          <td style="width: 5cm">
             <dl>
               <dt><b>{{materia.num_ordem}} -</b> {{materia.id_materia}}</dt>
               <dt><b>Turno:</b> {{materia.des_turno}}</dt>
-              <dt><b>{{materia.num_autores}}: </b><br>{{materia.nom_autor}}</dt>
+              <dt><b>{{materia.num_autores}}:</b> {{materia.nom_autor}}</dt>
             </dl>
           </td>
           <td>{{materia.txt_ementa}}
           </td>
-          <td style="width: 130px;">
+          <td style="width: 4cm">
             <b><div style="text-align: center;">{{materia.nom_resultado}}</div></b>
           </td>
         </tr>
       {% endfor %}
-
     </tbody>
   </table>
 
@@ -132,16 +136,19 @@
   {% endcomment %}
 
     <h2 class="gray-title">Lista de Presença da Ordem do Dia</h2>
-
-    {% for orador in lst_presenca_ordem_dia%}
-      <tr>
-        <p>{{orador.nom_parlamentar}}/{{orador.sgl_partido}}</p>
-      </tr>
-    {% endfor %}
+    {% for membro in lst_presenca_ordem_dia%}
+      {% if forloop.first %}
+        <ul>
+      {% endif %}
+      <li>{{membro.nom_parlamentar}}/{{membro.sgl_partido}}</li>
+      {% if forloop.last %}
+        </ul>
+      {% endif %}
+    {% endfor%}
 
     <h2 class="gray-title">Matérias da Ordem do Dia</h2>
 
-    <table class="grayTable" style="height: 145px;" width="443">
+    <table class="grayTable">
         <thead>
           <tr>
             <th>Matéria</th>
@@ -152,11 +159,11 @@
         <tbody>
           {% for materia in lst_votacao%}
             <tr>
-              <td style="width: 120px;">
+              <td style="width: 6cm">
                 <dl>
-                  <dt><b>{{materia.num_ordem}} -</b> {{materia.id_materia}}</dt>
+                  <dt><b>{{materia.num_ordem}}</b> - {{materia.id_materia}}</dt>
                   <dt><b>Turno:</b> {{materia.des_turno}}</dt>
-                  <dt><b>{{materia.num_autores}}: </b><br>{{materia.nom_autor}}</dt>
+                  <dt><b>{{materia.num_autores}}:</b> {{materia.nom_autor}}</dt>
                 </dl>
               </td>
               <td><div>{{materia.txt_ementa}}</div>
@@ -167,8 +174,9 @@
                     - {{anexada}}<br>
                 {% endfor %}
               </td>
-              <td style="width:30px; text-align: center;">
-                <b>{{materia.nom_resultado}}</b>
+              <td style="width:4cm; text-align: center;">
+                <b>{{materia.nom_resultado}}</b><br>
+                <em>{{materia.votacao_observacao}}</em>
                 </td>
             </tr>
           {% endfor %}
