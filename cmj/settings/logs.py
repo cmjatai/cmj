@@ -76,7 +76,6 @@ LOGGING = {
             'backupCount': 10,
             'formatter': 'verbose',
             #'filters': ['require_debug_false'],
-
         },
     },
     'loggers': {

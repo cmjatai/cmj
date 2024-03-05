@@ -1,13 +1,18 @@
 {% load webpack_static from webpack_loader %}
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="pt-br">
   <meta charset="utf-8"></meta>
-  <head>
-    <style>
-    @page{
+<head>
+  <style>
+    {% include "css/base.css" %}
+    @page {
       margin-top: {{print}};
       margin-left: {% if print %}1cm;{% else %}3.5cm;{% endif %}
-      size: A4 portrait;
+    }
+    html {
+      line-height: 1;
     }
     .container-cert-pub {
       {% if print %}transform: rotate(180deg);{% endif %}
@@ -51,14 +56,14 @@
       font-size: 0.7em;
     }
     .url {
-      font-size: 6pt;
+      font-size: 5pt;
     }
     .assinatura {
       text-align: center;
       border-top: 1px solid black;
     }
-    </style>
-  </head>
+  </style>
+</head>
 <body>
   <div class="container-cert-pub">
     <div class="inner">
@@ -93,7 +98,6 @@
         <div class="assinatura">
         Departamento de Documentação Eletrônica
         </div>
-
       </div>
     </div>
   </div>

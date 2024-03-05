@@ -533,7 +533,7 @@ class CertidaoPublicacaoCrud(Crud):
             pdf_file = main_doc.write_pdf()
 
             response = HttpResponse(content_type='application/pdf;')
-            response['Content-Disposition'] = 'inline; filename=relatorio.pdf'
+            response['Content-Disposition'] = f'inline; filename=cert-cmj-{self.object.id}.pdf'
             response['Content-Transfer-Encoding'] = 'binary'
             response.write(pdf_file)
 

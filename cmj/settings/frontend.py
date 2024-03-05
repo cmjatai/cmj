@@ -92,7 +92,7 @@ if DEBUG and not WEBPACK_LOADER['DEFAULT']['STATS_FILE'].exists():
 
 
 STATICFILES_DIRS = (
-    # BASE_DIR.child('static'),
+    PROJECT_DIR.child('sapl').child('static'),
     PROJECT_DIR.child('_frontend').child(FRONTEND_VERSION).child('dist'),
 )
 

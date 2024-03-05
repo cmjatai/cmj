@@ -6,15 +6,16 @@
 
 <head>
   <title>Resumo Sessão Plenária</title>
-  <style>
-    @page {
 
+  <style>
+    {% include "css/base.css" %}
+    {% include "css/relatorio.css" %}
+    @page {
       @bottom-right {
         content: "Página " counter(page);
         height: 1.5cm;
         font-size: 8pt;
       }
-
       @bottom-center {
         border-top: 1px solid black;
         font-size: 8pt;
@@ -22,12 +23,12 @@
         content: "{{rodape|safe}}";
         font-style:italic;
       }
-
       @bottom-left {
         content: "{{data}}";
         height: 1.5cm;
         font-size: 8pt;
       }
+    }
 
       {% comment %}
         @top-center {
@@ -40,9 +41,7 @@
           string-set: title content();
         }
       {% endcomment %}
-    }
   </style>
-  <link rel="stylesheet" href="{% static '/sapl/css/relatorio.css'%}">
 
 </head>
 
@@ -51,7 +50,6 @@
     <p><b>Tipo da Sessão:</b> {{inf_basicas_dic.nom_sessao}}</p>
     <p><b>Abertura:</b> {{inf_basicas_dic.dat_inicio_sessao}} - {{inf_basicas_dic.hr_inicio_sessao}}</p>
     <p><b>Encerramento:</b> {{inf_basicas_dic.dat_fim_sessao}} - {{inf_basicas_dic.hr_fim_sessao}}</p>
-
     <h2 class="gray-title">Mesa Diretora</h2>
     {% for membro in lst_mesa%}
       <p><b>{{membro.des_cargo}}:</b> {{membro.nom_parlamentar}}/{{membro.sgl_partido}}</p>

@@ -1,7 +1,7 @@
 @page {
-  margin-top: 4cm;
+  margin-top: 10cm;
   size: A4 portrait;
-  margin-left: 1cm;
+  margin-left: 3cm;
   margin-right: 1cm;
 }
 html {
@@ -20,13 +20,13 @@ h2.gray-title{
 h3 {
   font-size: 10pt;
   break-after: avoid-page;
-  page-break-after: avoid; 
+  page-break-after: avoid;
   margin: 0;
-  padding: 0;  
+  padding: 0;
 }
 
 p, a {
-  font-size: 10pt; 
+  font-size: 10pt;
   text-align: justify;
   text-justify: inter-word;
   margin: 0 0 0 0.5cm;
@@ -71,7 +71,7 @@ table.grayTable thead {
 }
 table.grayTable thead th:first-child {
   border-left: none;
-} 
+}
 
 
 

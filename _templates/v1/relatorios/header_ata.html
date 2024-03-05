@@ -6,21 +6,19 @@
 <html lang="pt-br">
   <meta charset="utf-8">
   </meta>
-
+<head>
   <style>
+
+    {% include "css/header-relatorio.css" %}
     @page {
       margin-top: 0.5cm;
     }
     </style>
-
-<head>
-  <link rel="stylesheet" href="{% static 'sapl/css/header-relatorio.css'%}">
 </head>
-
 <body>
   <section id="informations">
     <dl>
-      <dt class="image-header"> 
+      <dt class="image-header">
         <img src="{% if logotipo %}{{ MEDIA_URL }}{{ logotipo }}{% else %}{% webpack_static 'img/logo.png' %}{% endif %}">
       </dt>
       <dd class="title-header">
@@ -32,6 +30,6 @@
       </dd>
     </dl>
   </section>
-</body> 
+</body>
 
 </html>
