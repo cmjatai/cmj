@@ -49,6 +49,11 @@ table.grayTable thead th {
   font-variant: small-caps;
 
 }
+
+fieldset {
+  border: 0px solid black;
+}
+
 /*
 table {
   /*max-width: 520px;

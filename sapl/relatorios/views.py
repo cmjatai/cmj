@@ -1348,10 +1348,14 @@ def resumo_ata_pdf(request, pk):
     context.update({'object': sessao_plenaria})
     context.update({'data': dt.today().strftime('%d/%m/%Y')})
     context.update({'rodape': rodape})
+
+    info = f"Ata Eletrônica da {context['sessaoplenaria']}"
+
     header_context = {
         "casa": casa,
         'logotipo': casa.logotipo,
         "MEDIA_URL": MEDIA_URL if not settings.DEBUG else '',
+        'info': info
     }
 
     html_template = render_to_string('relatorios/relatorio_ata.html', context)

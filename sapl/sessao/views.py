@@ -2070,7 +2070,7 @@ def get_expedientes(sessao_plenaria):
 
 def get_materias_expediente(sessao_plenaria):
     materias = ExpedienteMateria.objects.filter(
-        sessao_plenaria_id=sessao_plenaria.id)
+        sessao_plenaria_id=sessao_plenaria.id).order_by('numero_ordem')
 
     materias_expediente = []
     for m in materias:
@@ -2203,7 +2203,7 @@ def get_assinaturas(sessao_plenaria):
 def get_materias_ordem_do_dia(sessao_plenaria):
     ordem = OrdemDia.objects.filter(
         sessao_plenaria_id=sessao_plenaria.id,
-        parent__isnull=True)
+        parent__isnull=True).order_by('numero_ordem')
     materias_ordem = []
     for o in ordem:
         ementa = o.materia.ementa

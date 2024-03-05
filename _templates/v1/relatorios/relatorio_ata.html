@@ -2,6 +2,9 @@
 {% load static %}
 <head>
     <style>
+        {% include "css/base.css" %}
+        {% include "css/relatorio.css" %}
+
         @page{
             @bottom-right {
                 content: "Página" counter(page);
@@ -21,7 +24,6 @@
                 height: 3cm;
                 font-size: 8pt;
             }
-
             @top-center {
                 content:  string(title);
             }
@@ -33,11 +35,9 @@
             }
         }
     </style>
-     <link rel="stylesheet" href="{% static 'sapl/css/relatorio.css'%}">
 </head>
 
 <body>
-    <h3 style="text-align:center;">Ata Eletrônica da {{sessaoplenaria}}</h3>
     {% include 'sessao/blocos_ata/identificacao_basica.html' %}
     {% include 'sessao/blocos_ata/mesa_diretora.html' %}
     {% include 'sessao/blocos_ata/lista_presenca_sessao.html' %}
