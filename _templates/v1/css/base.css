@@ -1,0 +1,10 @@
+@page {
+  margin-top: 4cm;
+  size: A4 portrait;
+  margin-left: 1cm;
+  margin-right: 1cm;
+}
+
+html {
+  line-height: 1.3;
+}

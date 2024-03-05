@@ -1,0 +1,101 @@
+h2.gray-title{
+  color: gray;
+  font-size: 14pt;
+  break-after: avoid-page;
+  page-break-after: avoid;
+  margin: 0.7cm 0 0 0;
+  padding: 0;
+}
+
+h3 {
+  font-size: 10pt;
+  break-after: avoid-page;
+  page-break-after: avoid;
+  margin: 0;
+  padding: 0;
+}
+
+p, a {
+  font-size: 10pt;
+  text-align: justify;
+  text-justify: inter-word;
+  margin: 0 0 0 0.5cm;
+  padding: 0;
+
+}
+
+table.grayTable {
+  border: 1px solid #6e6e6e;
+  width: 100%;
+  text-align: left;
+  border-collapse: collapse;
+}
+table.grayTable td, table.grayTable th {
+  border: 1px solid #000000;
+}
+table.grayTable tbody td {
+  font-size: 10px;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  text-align: justify;
+  padding: 0.2cm;
+}
+table.grayTable thead th {
+  font-size: 10px;
+  color: rgb(0, 0, 0);
+  text-align: center;
+  padding: 0.3cm 0;
+  font-variant: small-caps;
+
+}
+/*
+table {
+  /*max-width: 520px;
+}
+table.grayTable tr:nth-child(even) {
+  background: #dddddd;
+}
+table.grayTable thead {
+  background: #BBBBBB;
+  border-bottom: 2px solid #000000;
+}
+table.grayTable thead th:first-child {
+  border-left: none;
+}
+
+
+
+fieldset {
+  border: 0;
+}
+
+
+html body section dl {
+  display: flex;
+  flex-wrap: wrap;
+  columns: 5;
+}
+
+
+html body section dt{
+  width: 50px;
+}
+
+html body section dd {
+  text-align: center;
+}
+
+html body section dd ul li {
+  list-style-type: none;
+  margin-left: 50px;
+}
+
+fieldset {
+  page-break-after: avoid;
+  margin:5px;
+  padding:0px;
+}
+
+
+
+*/

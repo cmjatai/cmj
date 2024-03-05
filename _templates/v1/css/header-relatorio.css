@@ -1,0 +1,22 @@
+.image-header img {
+  max-height: 2.54cm;
+  max-width: 2.54cm;
+  margin-right: 1cm;
+}
+#informations dl {
+  display: flex;
+}
+
+dt, dd, ul, li, h2, h3, h5, section {
+  padding: 0;
+  margin: 0;
+}
+.title-header {
+  text-align: center;
+  display: block;
+  width: 100%;
+}
+
+.title-header h5{
+  margin: 0.5cm 2cm 0;
+}
