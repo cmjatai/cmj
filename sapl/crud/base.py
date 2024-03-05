@@ -590,24 +590,28 @@ class CrudListView(PermissionRequiredContainerCrudMixin, ListView):
                             continue
 
                         fm = None
-                        try:
-                            fm = model._meta.get_field(fo)
-                        except Exception as e:
-                            username = self.request.user.username
-                            self.logger.error(
-                                "user=" + username + ". " + str(e))
-                            pass
+                        if '__' not in fo:
+                            try:
+                                fm = model._meta.get_field(fo)
+                            except Exception as e:
+                                username = self.request.user.username
+                                self.logger.error(
+                                    "user=" + username + ". " + str(e))
+                                pass
 
-                        if fm and hasattr(fm, 'related_model')\
-                                and fm.related_model:
-                            rmo = fm.related_model._meta.ordering
-                            if rmo:
-                                rmo = rmo[0]
-                                if not isinstance(rmo, str):
+                            if fm and hasattr(fm, 'related_model')\
+                                    and fm.related_model:
+                                rmo = fm.related_model._meta.ordering
+                                if rmo:
                                     rmo = rmo[0]
-                                if rmo.startswith('-'):
-                                    rmo = rmo[1:]
-                                fo = '%s__%s' % (fo, rmo)
+                                    if not isinstance(rmo, str):
+                                        rmo = rmo[0]
+                                    if rmo.startswith('-'):
+                                        rmo = rmo[1:]
+                                    fo = '%s__%s' % (fo, rmo)
+                        else:
+                            fo = desc + fo
+                            ordering += (fo,)
 
                         if fm:
                             fo = desc + fo

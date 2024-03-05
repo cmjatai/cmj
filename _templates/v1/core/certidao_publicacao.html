@@ -8,7 +8,7 @@
   <style>
     {% include "css/base.css" %}
     @page {
-      margin-top: {{print}};
+      {% if print %}margin-top: {{print}};{% endif %}
       margin-left: {% if print %}1cm;{% else %}3.5cm;{% endif %}
     }
     html {
