@@ -1,0 +1,68 @@
+version: "3.7"
+name: portalcmj
+services:
+  cmjredis:
+    image: redis:alpine
+    container_name: cmjredis
+    restart: always
+    labels:
+       NAME: "cmjredis"
+    volumes:
+      - credis_data:/data
+    #ports:
+    #  - "6379:6379"
+    networks:
+      - cmj-net
+  cmjsolr:
+    image: solr:8.11
+    restart: always
+    command: bin/solr start -c -f
+    container_name: cmjsolr
+    labels:
+        NAME: "cmjsolr"
+    volumes:
+      - csolr_data:/var/solr
+      - csolr_configsets:/opt/solr/server/solr/configsets
+    ports:
+      - "8983:8983"
+    networks:
+      - cmj-net
+  cmj:
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile.Dev
+    container_name: cmj
+    user: "root:root"
+    command: /var/cmjatai/cmj/start-dev.sh
+    labels:
+       NAME: "cmj"
+    restart: always
+    environment:
+      DEBUG: 'True'
+      USE_SOLR: 'True'
+      SOLR_COLLECTION: cmj_portal
+      SOLR_URL: http://solr:solr@cmjsolr:8983
+      IS_ZK_EMBEDDED: 'True'
+      TZ: America/Sao_Paulo
+    volumes:
+      - cmj_data:/var/cmjatai/cmj_data
+      - cmj_media:/var/cmjatai/cmj_media
+      - cmj_logs:/var/cmjatai/cmj/logs
+    depends_on:
+      - cmjredis
+      - cmjsolr
+    ports:
+      - "9000:9000"
+    networks:
+      - cmj-net
+networks:
+  cmj-net:
+    name: cmj-net
+    driver: bridge
+volumes:
+  cmj_data:
+  cmj_media:
+  cmj_logs:
+  csolr_data:
+  csolr_configsets:
+  credis_data:
