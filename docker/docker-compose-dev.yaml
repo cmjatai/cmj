@@ -44,7 +44,6 @@ services:
       IS_ZK_EMBEDDED: 'True'
       TZ: America/Sao_Paulo
     volumes:
-      - cmj_data:/var/cmjatai/cmj_data
       - /mnt/volumes/cmj_media:/var/cmjatai/cmj_media
       - cmj_logs:/var/cmjatai/cmj/logs
     depends_on:
@@ -59,7 +58,6 @@ networks:
     name: cmj-net
     driver: bridge
 volumes:
-  cmj_data:
   cmj_media:
     external: true
     # name: "portalcmj_cmj_media"
