@@ -55,14 +55,13 @@ RUN adduser --home=/opt/libreoffice --disabled-password --gecos "" --shell=/bin/
 ADD libreoffice_entrypoint.sh /opt/libreoffice/libreoffice_entrypoint.sh
 RUN chmod +x /opt/libreoffice/libreoffice_entrypoint.sh
 
-RUN mkdir -p /var/cmjatai/cmj/run
 RUN mkdir -p /var/cmjatai/cmj/logs/celery
 RUN mkdir -p /var/cmjatai/cmj_media
 
 WORKDIR /var/cmjatai/cmj/
 
-COPY requirements/requirements.txt $HOME
-RUN pip install -r /var/cmjatai/cmj/requirements.txt
+COPY requirements/dev-requirements.txt $HOME
+RUN pip install -r /var/cmjatai/cmj/dev-requirements.txt
 
 ADD drfautoapi  /var/cmjatai/cmj/drfautoapi
 ADD fonts       /var/cmjatai/cmj/fonts
