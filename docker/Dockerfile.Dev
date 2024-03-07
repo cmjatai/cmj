@@ -60,18 +60,21 @@ RUN mkdir -p /var/cmjatai/cmj_media
 
 WORKDIR /var/cmjatai/cmj/
 
-COPY requirements/dev-requirements.txt $HOME
-RUN pip install -r /var/cmjatai/cmj/dev-requirements.txt
+ADD requirements  /var/cmjatai/cmj/requirements
+RUN pip install -r /var/cmjatai/cmj/requirements/dev-requirements.txt
 
 ADD drfautoapi  /var/cmjatai/cmj/drfautoapi
 ADD fonts       /var/cmjatai/cmj/fonts
 ADD scripts     /var/cmjatai/cmj/scripts
+ADD solr        /var/cmjatai/cmj/solr
+
 ADD _frontend   /var/cmjatai/cmj/_frontend
 ADD _templates  /var/cmjatai/cmj/_templates
 ADD cmj         /var/cmjatai/cmj/cmj
 ADD sapl        /var/cmjatai/cmj/sapl
-ADD solr        /var/cmjatai/cmj/solr
 ADD docker      /var/cmjatai/cmj/docker
+
+
 
 COPY cmj/.env $HOME/cmj/
 COPY key_cert.pfx $HOME
@@ -85,7 +88,7 @@ COPY docker/wait-for-pg.sh $HOME
 COPY docker/wait-for-solr.sh $HOME
 
 
-RUN chmod +x /var/cmjatai/cmj/docker/start-dev.sh \
+RUN chmod +x /var/cmjatai/cmj/start-dev.sh && \
     chmod +x /var/cmjatai/cmj/wait-for-solr.sh && \
     chmod +x /var/cmjatai/cmj/wait-for-pg.sh
 
