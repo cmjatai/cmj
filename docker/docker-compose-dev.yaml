@@ -45,7 +45,6 @@ services:
       TZ: America/Sao_Paulo
     volumes:
       - /mnt/volumes/cmj_media:/var/cmjatai/cmj_media
-      - cmj_logs:/var/cmjatai/cmj/logs
     depends_on:
       - cmjredis
       - cmjsolr
@@ -58,11 +57,6 @@ networks:
     name: cmj-net
     driver: bridge
 volumes:
-  cmj_media:
-    external: true
-    # name: "portalcmj_cmj_media"
-    # montar com: sshfs -o allow_other ...
-  cmj_logs:
   csolr_data:
   csolr_configsets:
   credis_data:
