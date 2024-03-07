@@ -33,7 +33,6 @@ services:
       dockerfile: ./docker/Dockerfile.Dev
     container_name: cmj
     user: "root:root"
-    command: /var/cmjatai/cmj/start-dev.sh
     labels:
        NAME: "cmj"
     restart: always
@@ -46,7 +45,7 @@ services:
       TZ: America/Sao_Paulo
     volumes:
       - cmj_data:/var/cmjatai/cmj_data
-      - cmj_media:/var/cmjatai/cmj_media
+      - /mnt/volumes/cmj_media:/var/cmjatai/cmj_media
       - cmj_logs:/var/cmjatai/cmj/logs
     depends_on:
       - cmjredis
@@ -62,6 +61,9 @@ networks:
 volumes:
   cmj_data:
   cmj_media:
+    external: true
+    # name: "portalcmj_cmj_media"
+    # montar com: sshfs -o allow_other ...
   cmj_logs:
   csolr_data:
   csolr_configsets:
