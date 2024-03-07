@@ -6,6 +6,7 @@ from unipath import Path
 config = AutoConfig()
 
 MEDIA_DEV_LOCAL = config('MEDIA_DEV_LOCAL', default=False, cast=bool)
+DEBUG = config('DEBUG', default=False, cast=bool)
 
 BASE_DIR = Path(__file__).ancestor(2)
 PROJECT_DIR = Path(__file__).ancestor(3)
@@ -18,6 +19,10 @@ MEDIA_PROTECTED_ROOT = PROJECT_DIR.ancestor(
     1).child("cmj_media{}".format(
         '_local' if MEDIA_DEV_LOCAL else ''
     )).child("media_protected")
+
+if DEBUG and '_local' not in str(MEDIA_ROOT) and '/var/cmjatai' not in str(MEDIA_ROOT):
+    MEDIA_ROOT = Path('/mnt/volumes').child('cmj_media').child('media')
+    MEDIA_PROTECTED_ROOT = Path('/mnt/volumes').child('cmj_media').child('media_protected')
 
 FILTERS_HELP_TEXT_FILTER = False
 
