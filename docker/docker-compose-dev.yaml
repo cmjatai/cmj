@@ -27,11 +27,27 @@ services:
       - "8983:8983"
     networks:
       - cmj-net
+  cmjfront:
+    build:
+      context: ../_frontend/v1/
+      dockerfile: ../../docker/DockerfileFront.Dev
+    #command: yarn build
+    restart: always
+    container_name: cmjfront
+    labels:
+       NAME: "cmjfront"
+    volumes:
+      - ../:/var/cmjatai/cmj
+    networks:
+      - cmj-net
+    ports:
+      - "8080:8080"
   cmj:
     build:
       context: ../
       dockerfile: ./docker/Dockerfile.Dev
     container_name: cmj
+
     user: "root:root"
     labels:
        NAME: "cmj"
@@ -45,8 +61,10 @@ services:
       TZ: America/Sao_Paulo
     volumes:
       - /mnt/volumes/cmj_media:/var/cmjatai/cmj_media
+      - ../:/var/cmjatai/cmj
     depends_on:
       - cmjredis
+      - cmjfront
       - cmjsolr
     ports:
       - "9000:9000"

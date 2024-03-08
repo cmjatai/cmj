@@ -1,0 +1,17 @@
+FROM node:16.20.2-bullseye
+
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
+
+#ENV RUN1_PACKAGES bash vim
+#RUN apt-get install -y --no-install-recommends $RUN1_PACKAGES
+
+RUN mkdir -p /var/cmjatai/cmj/_frontend/v1
+
+WORKDIR /var/cmjatai/cmj/_frontend/v1
+
+EXPOSE 8080/tcp
+
+VOLUME ["/var/cmjatai/cmj"]
+
+CMD ["/var/cmjatai/cmj/_frontend/v1/startfront-dev.sh"]
