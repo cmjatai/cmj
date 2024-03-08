@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-/bin/bash wait-for-pg.sh "postgresql://cmj:cmj@10.3.163.254:5432/cmj"
+/bin/bash docker/wait-for-pg.sh "postgresql://cmj:cmj@10.3.163.254:5432/cmj"
 
 yes yes | python3 manage.py migrate
 
@@ -26,7 +26,7 @@ if [ "${USE_SOLR-False}" == "True" ] || [ "${USE_SOLR-False}" == "true" ]; then
     echo "========================================="
 
     echo "running Solr script"
-    /bin/bash wait-for-solr.sh $SOLR_URL
+    /bin/bash docker/wait-for-solr.sh $SOLR_URL
     CHECK_SOLR_RETURN=$?
 
     if [ $CHECK_SOLR_RETURN == 1 ]; then
@@ -38,7 +38,7 @@ if [ "${USE_SOLR-False}" == "True" ] || [ "${USE_SOLR-False}" == "true" ]; then
             echo "Assuming embedded ZooKeeper instalation..."
         fi
 
-        python3 solr_cli.py -u $SOLR_URL -c $SOLR_COLLECTION -s $NUM_SHARDS -rf $RF -ms $MAX_SHARDS_PER_NODE $ZK_EMBEDDED &
+        python3 docker/solr_cli.py -u $SOLR_URL -c $SOLR_COLLECTION -s $NUM_SHARDS -rf $RF -ms $MAX_SHARDS_PER_NODE $ZK_EMBEDDED &
     else
         echo "Solr is offline, not possible to connect."
     fi
