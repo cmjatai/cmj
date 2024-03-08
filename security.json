@@ -3,7 +3,7 @@
         "authentication":{
         "blockUnknown": true,
         "class":"solr.BasicAuthPlugin",
-        "credentials":{"solr":"X5NzSjJstSwE22iHWSGufEISWfak4lPmAuK1c9KYkA4= 4ury3rxrvyFq16k12Bwg9MPHtSOL5P7go/gx9EKhGM4="},
+        "credentials":{"solr":"Y35GJAGfg53+X38NZY0iSAGbIjCnJqRCPaYNxzyPM+c= csAyyVjPb4gbdxKyaV4oIjwGIUynAjQPEanJWo+imII="},
         "forwardCredentials": false,
         "realm": "Solr Login"
         },

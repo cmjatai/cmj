@@ -120,3 +120,4 @@ yarn.lock
 .node_repl_history
 
 package-lock.json
+security.json

@@ -19,6 +19,7 @@ from kazoo.client import KazooClient
 # Este módulo deve ser executado na raiz do projeto
 #
 
+
 logging.basicConfig()
 
 SECURITY_FILE_TEMPLATE = """
