@@ -417,9 +417,18 @@
       .inner {
         background-color: white;
         padding: 8px;
-        box-shadow: 0px 24px 12px 12px #0007;
         border-radius: 10px;
         z-index: 9000;
+        &::before {
+          content: "";
+          box-shadow: 0px 24px 24px 12px #0007;
+          position: absolute;
+          z-index: -1;
+          top: 12px;
+          bottom: 36px;
+          left: 12px;
+          right: 12px;
+        }
       }
     }
     &:hover {

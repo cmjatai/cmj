@@ -6,7 +6,6 @@ from decouple import AutoConfig
 from dj_database_url import parse as db_url
 from unipath import Path
 
-
 from .apps import *
 from .auth import *
 from .drf import *
@@ -16,6 +15,7 @@ from .languages import *
 from .logs import *
 from .medias import *
 from .middleware import *
+
 
 host = socket.gethostbyname_ex(socket.gethostname())[0]
 
@@ -28,6 +28,9 @@ FONTS_DIR = Path(__file__).ancestor(3).child('fonts')
 SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
 DEBUG_TOOLBAR_ACTIVE = config('DEBUG_TOOLBAR_ACTIVE', default=False, cast=bool)
+
+FOLDER_DEBUG_CONTAINER = Path(
+    config('FOLDER_DEBUG_CONTAINER', default=__file__, cast=str))
 
 ALLOWED_HOSTS = ['*']
 
@@ -59,20 +62,22 @@ SITE_URL = 'https://www.jatai.go.leg.br'
 # if DEBUG:
 #    SITE_URL = ''
 
-HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.BaseSignalProcessor'  # Disable auto index
-SEARCH_BACKEND = ''
-SEARCH_URL = ['', '']
-
 USE_SOLR = True
-SOLR_URL = 'http://solr:solr@localhost:8983' if DEBUG else 'http://solr:solr@cmjsolr:8983'
+SOLR_URL = 'http://solr:solr@cmjsolr:8983'
 SOLR_COLLECTION = 'cmj_portal'
-
-#HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 HAYSTACK_SIGNAL_PROCESSOR = 'cmj.signal_celery_haystack.CelerySignalProcessor'
+
+REDIS_HOST = config('REDIS_HOST', cast=str, default='cmjredis')
+REDIS_PORT = config('REDIS_PORT', cast=int, default=6379)
+
+if DEBUG:
+    if FOLDER_DEBUG_CONTAINER != PROJECT_DIR:
+        HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+        SOLR_URL = 'http://solr:solr@localhost:8983'
+        REDIS_HOST = 'localhost'
+
 SEARCH_BACKEND = 'haystack.backends.solr_backend.SolrEngine'
 SEARCH_URL = ('URL', '{}/solr/{}'.format(SOLR_URL, SOLR_COLLECTION))
-
-#  BATCH_SIZE: default is 1000 if omitted, avoid Too Large Entity Body errors
 HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': SEARCH_BACKEND,
@@ -80,27 +85,6 @@ HAYSTACK_CONNECTIONS = {
         'BATCH_SIZE': 1000,
         'TIMEOUT': 600,
     },
-}
-
-
-REDIS_HOST = config(
-    'REDIS_HOST', cast=str, default='localhost' if DEBUG else 'cmjredis')
-REDIS_PORT = config(
-    'REDIS_PORT', cast=int, default=6379)
-
-CACHES = {
-    #'default': {
-    #    'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-    #    'LOCATION': '/var/tmp/django_cache',
-    #}
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache' if not DEBUG else 'django.core.cache.backends.dummy.DummyCache',
-        'LOCATION': 'unique-snowflake',
-    }
-    #"default": {
-    #    "BACKEND": "django.core.cache.backends.redis.RedisCache",
-    #    "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}",
-    #}
 }
 
 CHANNEL_LAYERS = {
@@ -119,6 +103,22 @@ CELERY_CACHE_BACKEND = 'django-cache'
 #CELERY_ACCEPT_CONTENT = ['application/json']
 #CELERY_RESULT_SERIALIZER = 'json'
 #CELERY_TASK_SERIALIZER = 'json'
+
+
+CACHES = {
+    #'default': {
+    #    'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+    #    'LOCATION': '/var/tmp/django_cache',
+    #}
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache' if not DEBUG else 'django.core.cache.backends.dummy.DummyCache',
+        'LOCATION': 'unique-snowflake',
+    }
+    #"default": {
+    #    "BACKEND": "django.core.cache.backends.redis.RedisCache",
+    #    "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}",
+    #}
+}
 
 
 APPEND_SLASH = False
