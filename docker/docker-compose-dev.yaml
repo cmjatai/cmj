@@ -9,8 +9,8 @@ services:
        NAME: "cmjredis"
     volumes:
       - credis_data:/data
-    #ports:
-    #  - "6379:6379"
+    ports:
+      - "6379:6379"
     networks:
       - cmj-net
   cmjsolr:
