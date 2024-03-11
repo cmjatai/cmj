@@ -7,7 +7,7 @@ echo -e "\033[38;2;255;255;0;2m\033[1m====> StartDEV...\033[0m"
 ## SOLR
 USE_SOLR="${USE_SOLR:=False}"
 SOLR_URL="${SOLR_URL:=http://solr:solr@cmjsolr:8983}"
-SOLR_COLLECTION="${SOLR_COLLECTION:=portalcmj_default}"
+SOLR_COLLECTIONS="${SOLR_COLLECTIONS:=portalcmj_cmj}"
 NUM_SHARDS=${NUM_SHARDS:=1}
 RF=${RF:=1}
 MAX_SHARDS_PER_NODE=${MAX_SHARDS_PER_NODE:=1}
@@ -18,7 +18,7 @@ if [ "${USE_SOLR-False}" == "True" ] || [ "${USE_SOLR-False}" == "true" ]; then
     echo "Solr configurations"
     echo "==================="
     echo "URL: $SOLR_URL"
-    echo "COLLECTION: $SOLR_COLLECTION"
+    echo "COLLECTION: $SOLR_COLLECTIONS"
     echo "NUM_SHARDS: $NUM_SHARDS"
     echo "REPLICATION FACTOR: $RF"
     echo "MAX SHARDS PER NODE: $MAX_SHARDS_PER_NODE"
@@ -38,7 +38,7 @@ if [ "${USE_SOLR-False}" == "True" ] || [ "${USE_SOLR-False}" == "true" ]; then
             echo "Assuming embedded ZooKeeper instalation..."
         fi
 
-        python3 docker/solr_cli.py -u $SOLR_URL -s $NUM_SHARDS -rf $RF -ms $MAX_SHARDS_PER_NODE $ZK_EMBEDDED &
+        python3 docker/solr_cli.py -u $SOLR_URL -c $SOLR_COLLECTIONS -s $NUM_SHARDS -rf $RF -ms $MAX_SHARDS_PER_NODE $ZK_EMBEDDED &
     else
         echo "Solr is offline, not possible to connect."
     fi
