@@ -122,7 +122,7 @@ class CheckCheckMixin:
         return checkcheck
 
     def _checkcheck(self, request):
-        if self.is_checkcheck():  # and not request.user.is_superuser:
+        if self.is_checkcheck() and not request.user.is_superuser:
             raise PermissionDenied(
                 'Documento já no arquivo morto, '
                 'a edição é restrita ao gestor do sistema!'

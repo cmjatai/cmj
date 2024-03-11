@@ -60,9 +60,15 @@ class CmjDefaultRouter(DefaultRouter):
             return DEFAULT_ALIAS
 
         if 'instance' in hints:
-            if hints['instance']._meta in MODELS_SOLR_CMJARQ:
+            m = hints['instance']._meta.model
+            if m in MODELS_SOLR_CMJARQ:
                 return CMJARQ_ALIAS
+            elif m not in MODELS_SOLR_DEFAULT:
+                return None
         elif 'index' in hints:
-            if hints['index'].model._meta in MODELS_SOLR_CMJARQ:
+            m = hints['index'].model
+            if m in MODELS_SOLR_CMJARQ:
                 return CMJARQ_ALIAS
+            elif m not in MODELS_SOLR_DEFAULT:
+                return None
         return DEFAULT_ALIAS
