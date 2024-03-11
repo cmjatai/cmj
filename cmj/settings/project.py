@@ -64,8 +64,8 @@ SITE_URL = 'https://www.jatai.go.leg.br'
 
 USE_SOLR = True
 SOLR_URL = 'http://solr:solr@cmjsolr:8983'
-SOLR_COLLECTION = 'cmj_portal'
-HAYSTACK_SIGNAL_PROCESSOR = 'cmj.signal_celery_haystack.CelerySignalProcessor'
+SOLR_COLLECTION = 'portalcmj_default'
+HAYSTACK_SIGNAL_PROCESSOR = 'cmj.haystack.CelerySignalProcessor'
 
 REDIS_HOST = config('REDIS_HOST', cast=str, default='cmjredis')
 REDIS_PORT = config('REDIS_PORT', cast=int, default=6379)
@@ -78,10 +78,17 @@ if DEBUG:
 
 SEARCH_BACKEND = 'haystack.backends.solr_backend.SolrEngine'
 SEARCH_URL = ('URL', '{}/solr/{}'.format(SOLR_URL, SOLR_COLLECTION))
+HAYSTACK_ROUTERS = ['cmj.haystack.CmjDefaultRouter']
 HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': SEARCH_BACKEND,
         SEARCH_URL[0]: SEARCH_URL[1],
+        'BATCH_SIZE': 1000,
+        'TIMEOUT': 600,
+    },
+    'cmjarq': {
+        'ENGINE': SEARCH_BACKEND,
+        'URL': '{}/solr/{}'.format(SOLR_URL, 'portalcmj_arq'),
         'BATCH_SIZE': 1000,
         'TIMEOUT': 600,
     },

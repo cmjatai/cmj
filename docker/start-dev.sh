@@ -2,13 +2,12 @@
 
 echo -e "\033[38;2;255;255;0;2m\033[1m====> StartDEV...\033[0m"
 
-
 /bin/bash docker/wait-for-pg.sh "postgresql://cmj:cmj@10.3.163.254:5432/cmj"
 
 ## SOLR
 USE_SOLR="${USE_SOLR:=False}"
 SOLR_URL="${SOLR_URL:=http://solr:solr@cmjsolr:8983}"
-SOLR_COLLECTION="${SOLR_COLLECTION:=cmjportal}"
+SOLR_COLLECTION="${SOLR_COLLECTION:=portalcmj_default}"
 NUM_SHARDS=${NUM_SHARDS:=1}
 RF=${RF:=1}
 MAX_SHARDS_PER_NODE=${MAX_SHARDS_PER_NODE:=1}
@@ -39,7 +38,7 @@ if [ "${USE_SOLR-False}" == "True" ] || [ "${USE_SOLR-False}" == "true" ]; then
             echo "Assuming embedded ZooKeeper instalation..."
         fi
 
-        python3 docker/solr_cli.py -u $SOLR_URL -c $SOLR_COLLECTION -s $NUM_SHARDS -rf $RF -ms $MAX_SHARDS_PER_NODE $ZK_EMBEDDED &
+        python3 docker/solr_cli.py -u $SOLR_URL -s $NUM_SHARDS -rf $RF -ms $MAX_SHARDS_PER_NODE $ZK_EMBEDDED &
     else
         echo "Solr is offline, not possible to connect."
     fi

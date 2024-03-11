@@ -15,8 +15,8 @@ class SessaoPlenariaIndex(CelerySearchIndex, Indexable):
         document=True, use_template=True,
         model_attr=(
             ('__str__', 'string_extractor'),
-            ('upload_pauta', 'file_extractor'),
             ('upload_ata', 'file_extractor'),
+            ('upload_pauta', 'file_extractor'),
             ('upload_anexo', 'file_extractor'),
 
 
