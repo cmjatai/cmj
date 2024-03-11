@@ -128,9 +128,6 @@ class SolrClient:
             }
             self.COLLECTIONS.append(cd)
 
-
-
-
     def get_num_docs(self, collection_name):
         final_url = self.QUERY_DATA.format(self.url, collection_name)
         res = requests.get(final_url)
