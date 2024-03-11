@@ -64,7 +64,7 @@ SITE_URL = 'https://www.jatai.go.leg.br'
 
 USE_SOLR = True
 SOLR_URL = 'http://solr:solr@cmjsolr:8983'
-SOLR_COLLECTION = 'portalcmj_default'
+SOLR_COLLECTION = 'portalcmj_cmj'
 HAYSTACK_SIGNAL_PROCESSOR = 'cmj.haystack.CelerySignalProcessor'
 
 REDIS_HOST = config('REDIS_HOST', cast=str, default='cmjredis')
@@ -85,12 +85,24 @@ HAYSTACK_CONNECTIONS = {
         SEARCH_URL[0]: SEARCH_URL[1],
         'BATCH_SIZE': 1000,
         'TIMEOUT': 600,
+        'EXCLUDED_INDEXES': [
+            'cmj.arq.search_indexes.ArqDocIndex',
+        ]
     },
     'cmjarq': {
         'ENGINE': SEARCH_BACKEND,
         'URL': '{}/solr/{}'.format(SOLR_URL, 'portalcmj_arq'),
         'BATCH_SIZE': 1000,
         'TIMEOUT': 600,
+        'EXCLUDED_INDEXES': [
+            'cmj.core.search_indexes.SessaoPlenariaIndex',
+            'cmj.diarios.search_indexes.DiarioOficialIndex',
+            'cmj.sigad.search_indexes.DocumentoIndex',
+            'sapl.protocoloadm.search_indexes.DocumentoAdministrativoIndex',
+            'sapl.base.search_indexes.DocumentoAcessorioIndex',
+            'sapl.base.search_indexes.NormaJuridicaIndex',
+            'sapl.base.search_indexes.MateriaLegislativaIndex',
+        ]
     },
 }
 
