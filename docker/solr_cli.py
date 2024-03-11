@@ -112,21 +112,24 @@ class SolrClient:
     DELETE_DATA = "{}/solr/{}/update?commitWithin=1000&overwrite=true&wt=json"
     QUERY_DATA = "{}/solr/{}/select?q=*:*"
 
-    COLLECTIONS = [
-        {
-            'COLLECTION_NAME': 'portalcmj_default',
-            'CONFIGSET_NAME': 'cmj_configset',
-            'CONFIGSET_PATH': './solr/cmj_configset/conf'
-        },
-        {
-            'COLLECTION_NAME': 'portalcmj_arq',
-            'CONFIGSET_NAME': 'arq_configset',
-            'CONFIGSET_PATH': './solr/arq_configset/conf'
-        },
-    ]
+    COLLECTIONS = []
 
-    def __init__(self, url):
+    def __init__(self, url, collections):
         self.url = url
+
+        collections = map(lambda x: x.strip(), collections.split(','))
+
+        for c in collections:
+            c = c.split('_')
+            cd = {
+                'COLLECTION_NAME': f'{c[0]}_{c[1]}',
+                'CONFIGSET_NAME': f'{c[1]}_configset',
+                'CONFIGSET_PATH': f'./solr/{c[1]}_configset/conf'
+            }
+            self.COLLECTIONS.append(cd)
+
+
+
 
     def get_num_docs(self, collection_name):
         final_url = self.QUERY_DATA.format(self.url, collection_name)
@@ -285,6 +288,9 @@ if __name__ == '__main__':
     parser.add_argument('-u', type=str, metavar='URL', nargs=1, dest='url',
                         required=True, help='Endereço do servidor Solr na forma http(s)://<address>[:port]')
 
+    parser.add_argument('-c', type=str, metavar='COLLECTIONS', dest='collections', nargs=1,
+                        required=True, help='Collections Solr a serem criadas')
+
     # optional arguments
     parser.add_argument('-s', type=int, dest='shards', nargs='?',
                         help='Number of shards (default=1)', default=1)
@@ -302,13 +308,14 @@ if __name__ == '__main__':
         parser.error(str(msg))
         sys.exit(-1)
 
+    collections = args.collections.pop()
     url = args.url.pop()
 
     if args.embedded_zk:
         print("Setup embedded ZooKeeper...")
         setup_embedded_zk(url)
 
-    client = SolrClient(url=url)
+    client = SolrClient(url=url, collections=collections)
     for collection in client.COLLECTIONS:
 
         if not client.exists_collection(collection):
