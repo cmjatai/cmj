@@ -282,7 +282,7 @@ class ArqDocUpdateView(ArqDocMixin, FormMessagesMixin,
 
         initial = super().get_initial()
         initial['request_user'] = self.request.user
-        initial = {'classe_estrutural': self.kwargs['classe_id']}
+        initial['classe_estrutural'] = self.kwargs['classe_id']
         return initial
 
 
