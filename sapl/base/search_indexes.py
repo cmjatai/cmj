@@ -25,8 +25,8 @@ class TextExtractField(CharField):
     backend = None
     logger = logging.getLogger(__name__)
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         assert self.model_attr
 
         if not isinstance(self.model_attr, (list, tuple)):
@@ -34,7 +34,8 @@ class TextExtractField(CharField):
 
     def solr_extraction(self, arquivo):
         if not self.backend:
-            self.backend = connections['default'].get_backend()
+            # connections['default'].get_backend()
+            self.backend = self.search_index.get_backend()
         try:
             with open(arquivo.path, 'rb') as f:
                 content = self.backend.extract_file_contents(f)
@@ -154,10 +155,10 @@ class DocumentoAcessorioIndex(CelerySearchIndex, Indexable):
     text = TextExtractField(
         document=True, use_template=True,
         model_attr=(
-            ('arquivo', 'file_extractor'),
             ('autor', 'string_extractor'),
             ('ementa', 'string_extractor'),
             ('indexacao', 'string_extractor'),
+            ('arquivo', 'file_extractor'),
         )
     )
 
@@ -183,12 +184,12 @@ class NormaJuridicaIndex(DocumentoAcessorioIndex):
     text = TextExtractField(
         document=True, use_template=True,
         model_attr=(
-            ('texto_integral', 'file_extractor'),
-            ('texto_articulado', 'ta_extractor'),
             ('epigrafe', 'string_extractor'),
             ('ementa', 'string_extractor'),
             ('indexacao', 'string_extractor'),
             ('observacao', 'string_extractor'),
+            ('texto_articulado', 'ta_extractor'),
+            ('texto_integral', 'file_extractor'),
         )
     )
 
@@ -201,12 +202,15 @@ class MateriaLegislativaIndex(DocumentoAcessorioIndex):
     text = TextExtractField(
         document=True, use_template=True,
         model_attr=(
-            ('texto_original', 'file_extractor'),
-            ('texto_articulado', 'ta_extractor'),
             ('epigrafe', 'string_extractor'),
             ('ementa', 'string_extractor'),
             ('indexacao', 'string_extractor'),
             ('observacao', 'string_extractor'),
             ('autores', 'list_string_extractor'),
+            ('texto_articulado', 'ta_extractor'),
+            ('texto_original', 'file_extractor'),
         )
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
