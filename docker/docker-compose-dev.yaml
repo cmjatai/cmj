@@ -50,7 +50,7 @@ services:
     container_name: cmj
 
     user: "root:root"
-    labels:
+    labels: 
        NAME: "cmj"
     restart: always
     environment:
