@@ -13,16 +13,16 @@ services:
     #  - "6379:6379"
     networks:
       - cmj-net
-  cmjsolr:
+  cmjsolr2:
     image: solr:8.11
     restart: always
     command: bin/solr start -c -f
-    container_name: cmjsolr
+    container_name: cmjsolr2
     labels:
-        NAME: "cmjsolr"
+        NAME: "cmjsolr2"
     volumes:
-      - csolr_data:/var/solr
-      - csolr_configsets:/opt/solr/server/solr/configsets
+      - csolr_data2:/var/solr
+      - csolr_configsets2:/opt/solr/server/solr/configsets
     #ports:
     #  - "8983:8983"
     networks:
@@ -56,7 +56,7 @@ services:
     environment:
       DEBUG: 'False'
       USE_SOLR: 'True'
-      SOLR_COLLECTION: cmj_portal
+      SOLR_COLLECTIONS: portalcmj_cmj,portalcmj_arq
       SOLR_URL: http://solr:solr@cmjsolr:8983
       IS_ZK_EMBEDDED: 'True'
       TZ: America/Sao_Paulo
@@ -67,7 +67,7 @@ services:
     depends_on:
       - cmjdb
       - cmjredis
-      - cmjsolr
+      - cmjsolr2
     ports:
       - "8001:80"
     networks:
@@ -81,6 +81,6 @@ volumes:
   cmj_data:
   cmj_media:
   cmj_logs:
-  csolr_data:
-  csolr_configsets:
+  csolr_data2:
+  csolr_configsets2:
   credis_data:
