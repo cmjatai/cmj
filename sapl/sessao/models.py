@@ -233,7 +233,7 @@ class SessaoPlenaria(models.Model):
         o = self
         return f"""
             Abertura: {o.data_inicio.strftime("%d/%m/%Y")} às {o.hora_inicio}<br>
-            Encerramento: {o.data_inicio.strftime("%d/%m/%Y")} às {o.hora_inicio}<br>
+            Encerramento: {o.data_fim.strftime("%d/%m/%Y")} às {o.hora_fim}<br>
             
         """
 
