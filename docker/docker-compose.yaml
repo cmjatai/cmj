@@ -13,16 +13,16 @@ services:
     #  - "6379:6379"
     networks:
       - cmj-net
-  cmjsolr2:
+  cmjsolr:
     image: solr:8.11
     restart: always
     command: bin/solr start -c -f
-    container_name: cmjsolr2
+    container_name: cmjsolr
     labels:
-        NAME: "cmjsolr2"
+        NAME: "cmjsolr"
     volumes:
-      - csolr_data2:/var/solr
-      - csolr_configsets2:/opt/solr/server/solr/configsets
+      - csolr_data:/var/solr
+      - csolr_configsets:/opt/solr/server/solr/configsets
     #ports:
     #  - "8983:8983"
     networks:
@@ -67,7 +67,7 @@ services:
     depends_on:
       - cmjdb
       - cmjredis
-      - cmjsolr2
+      - cmjsolr
     ports:
       - "8001:80"
     networks:
@@ -81,6 +81,6 @@ volumes:
   cmj_data:
   cmj_media:
   cmj_logs:
-  csolr_data2:
-  csolr_configsets2:
+  csolr_data:
+  csolr_configsets:
   credis_data:
