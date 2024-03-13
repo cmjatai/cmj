@@ -5,7 +5,7 @@
     {{item.content_object|meta_model_value:"verbose_name_plural"}}<br>
   {% endifchanged %}
   {{item.content_object}}<br>
-  {{item.content_object|to_descr}}<br>
+  {{item.content_object|to_descr|safe}}<br>
 
   Jataí, {{item.content_object.certidao.created|date }}.<br>
 
