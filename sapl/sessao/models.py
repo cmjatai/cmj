@@ -230,7 +230,12 @@ class SessaoPlenaria(models.Model):
 
     @property
     def __descr__(self):
-        return str(self)
+        o = self
+        return f"""
+            Abertura: {o.data_inicio.strftime("%d/%m/%Y")} às {o.hora_inicio}<br>
+            Encerramento: {o.data_inicio.strftime("%d/%m/%Y")} às {o.hora_inicio}<br>
+            
+        """
 
     @property
     def videoparte(self):
@@ -554,12 +559,14 @@ class OradorExpediente(AbstractOrador):  # OradoresExpediente
         verbose_name_plural = _('Oradores do Expediente')
         ordering = ['id']
 
+
 class OradorOrdemDia(AbstractOrador):  # OradoresOrdemDia
 
     class Meta:
         verbose_name = _('Orador da Ordem do Dia')
         verbose_name_plural = _('Oradores da Ordem do Dia')
         ordering = ['id']
+
 
 class OrdemDia(AbstractOrdemDia):
 
