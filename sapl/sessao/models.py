@@ -351,6 +351,10 @@ class SessaoPlenaria(models.Model):
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
+        yt = 'https://www.youtube.com/live'
+
+        if self.url_video.startswith(yt):
+            self.url_video = self.url_video.replace(yt, 'https://youtu.be')
 
         if not self.pk and (self.upload_pauta or self.upload_ata or
                             self.upload_anexo):

@@ -1401,12 +1401,25 @@ class SessaoCrud(Crud):
         def hook_upload_ata(self, obj, verbose_name, field_display):
             if not obj.upload_ata:
                 return '', ''
-            return verbose_name, field_display
+            return verbose_name, sub(r'>.+</a>', '>ata_aprovada.pdf</a>', field_display)
 
         def hook_upload_anexo(self, obj, verbose_name, field_display):
             if not obj.upload_anexo:
                 return '', ''
             return verbose_name, field_display
+
+        def hook_diariooficial(self, obj, verbose_name, field_display):
+            d = obj.diariooficial
+            if not d:
+                return '', ''
+            return _('Diário Oficial'), '<a href="{}">{}</a>'.format(
+                reverse(
+                    '%s:%s_detail' % (
+                        d._meta.app_config.name, d._meta.model_name),
+                    args=(d.id,)
+                ),
+                field_display
+            )
 
 
 class SessaoPermissionMixin(PermissionRequiredForAppCrudMixin,

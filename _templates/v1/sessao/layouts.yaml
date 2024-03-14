@@ -8,7 +8,7 @@ SessaoPlenaria:
   - legislatura sessao_legislativa tipo numero:2
   - data_inicio:5 hora_inicio:5 iniciada
   - data_fim:5 hora_fim:5 finalizada
-  - upload_pauta upload_ata upload_anexo
+  - upload_pauta:4 upload_ata:4 upload_anexo:4 diariooficial:8
   - url_video
   - url_audio
 
