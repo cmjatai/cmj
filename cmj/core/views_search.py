@@ -99,8 +99,12 @@ class CmjSearchForm(ModelSearchForm):
                 Q(at__in=self.workspaces.values_list('id', flat=True)))
         else:
             sqs = sqs.filter(at=0)
-
-        return sqs.order_by('-data', '-last_update')
+        kwargs = {
+            'hl.simple.pre': '<span class="highlighted">',
+            'hl.simple.post': '</span>',
+            'max_length': 500
+        }
+        return sqs.highlight(**kwargs).order_by('-data', '-last_update')
 
     def get_models(self):
         """Return a list of the selected models."""

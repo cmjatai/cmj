@@ -19,7 +19,7 @@
   <br>
   <strong>Data:</strong> {{doc_adm.data}}
   <br>
-  <small>{{ doc_adm.assunto|safe }}</small>
+  <div class="text-ementa">{{ doc_adm.assunto|safe }}</div>
 
   <small>
     {% for anexado in doc_adm.documento_principal_set.all %}

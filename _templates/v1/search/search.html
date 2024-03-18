@@ -1,6 +1,7 @@
 {% extends 'crud/form.html' %}
 {% load crispy_forms_tags  cropping thumbnail  %}
-{% load common_cmj_tags %}
+{% load common_cmj_tags highlight %}
+
 
 {% block title %}
   <h1 class="page-header container-search" >
@@ -45,8 +46,7 @@
 
         <table class="table table-striped table-bordered">
 
-        {% comment "" %}
-
+        {% comment %}
           <thead class="thead-default">
             <tr><td><h3>Resultados - Foram encontrados {{ page.paginator.count }} registros <br/>
               {% if page.paginator.count %}
@@ -79,15 +79,17 @@
                       {% if m.texto_original %}
                         <a class="link-texto" href="{{m.texto_original.url}}?u={% now "u"%}" title="Texto Original">
                           <i class="far fa-2x fa-file-{% if '.pdf' in m.texto_original.path %}pdf{% else %}archive{% endif %}"></i>
-                          <br><small>Arquivo<br>Digitalizado da Matéria</small>
-
                         </a>
                       {% endif %}
-                      {% if m.texto_articulado.exists %}
+
+                      {% comment %}
+                        {% if m.texto_articulado.exists %}
                         <a class="link-texto" href="{% url 'sapl.materia:materia_ta' m.id%}">
                           Texto Articulado
                         </a>
-                      {% endif %}
+                        {% endif %}
+                      {% endcomment %}
+
                     </div>
 
                     <strong>
@@ -156,13 +158,11 @@
                     <a href="{% url 'cmj.diarios:diariooficial_detail' result.object.pk %}">{{ result.object }}</a>
                     <br><strong>Data:</strong> {{result.object.data}}
 
-
                 {% elif result.model_name == 'normajuridica' %}
 
                     {% with result.object as n %}
                       {% include 'norma/normajuridica_widget_list.html' %}
                     {% endwith %}
-
 
                 {% elif result.model_name == 'sessaoplenaria' %}
                     <strong>
@@ -173,10 +173,6 @@
                     {% if result.object.upload_ata %}
                       <br><strong>Ata da Sessão:</strong><a href="{{result.object.upload_ata.url}}?u={% now "u"%}">Clique aqui</a>
                     {% endif %}
-
-
-
-
 
                 {% elif result.model_name == 'documento' %}
                     <div class="container">
@@ -210,6 +206,20 @@
                       </div>
                     </div>
                 {% endif %}
+
+                {% if result.highlighted.text and result.model_name == 'normajuridica' %}
+                <div class="highlight">
+                    {% highlight result.text with query max_length 500 %}
+                  </div>
+                {% endif %}
+
+              {% if False and result.highlighted.text and result.model_name == 'normajuridica' %}
+                <div class="highlight">
+                  {% for hl in result.highlighted.text %}
+                   {{ hl|safe }}
+                  {% endfor %}
+                </div>
+              {% endif %}
                 </div>
               </td>
             </tr>

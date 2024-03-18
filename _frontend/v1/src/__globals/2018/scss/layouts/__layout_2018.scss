@@ -462,6 +462,16 @@
   }
 }
 
+.highlight {
+  color: #4d5156;
+  border-top: 10px solid #fff5;
+  padding: 10px;
+  .highlighted {
+    color: black;
+    font-weight: bold;
+  }
+}
+
 
 @media screen and (max-width: 575.98px) {
   .nav-pagination {
