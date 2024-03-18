@@ -33,7 +33,7 @@
       <td>
         <div class="d-flex w-100 justify-content-between">
           <div class="d-block">
-            <a href="{% url 'cmj.arq:arqdoc_edit' doc.classe_estrutural_id doc.pk %}">{{ doc.titulo }}</a>
+            <a name="{{doc.pk }}" href="{% url 'cmj.arq:arqdoc_edit' doc.classe_estrutural_id doc.pk %}">{{ doc.titulo }}</a>
             <br>
             <small>
               {{doc.descricao}}

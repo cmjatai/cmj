@@ -1,0 +1,82 @@
+{% extends 'crud/form.html' %}
+{% load crispy_forms_tags  cropping thumbnail  %}
+{% load common_cmj_tags %}
+
+{% block title %}
+  <h1 class="page-header container-search" >
+    ArqSearch - Pesquisa por documentos
+  </h1>
+{% endblock title %}
+
+{% block base_content %}
+<div class="container-search">
+  <form method="post" action=".">
+    <div class="row">
+      {% crispy form %}
+    </div>
+  </form>
+  <div class="container-table">
+    <div class="result-count">Foram encontrados {{ page.paginator.count }} registros </div>
+
+    <table class="table table-striped table-bordered">
+
+    {% for result in page.object_list %}
+      {% if result.object %}
+        <tr>
+          <td class="item-listas">
+            <div class="item-raiz pl-0">
+              {% with result.object as arqdoc %}
+
+                  {% comment %}
+                    {% if not result.model_name == 'documento' %}{{result.verbose_name}}{%else%}{{result.object.classe}}{% endif %}
+                  {% endcomment %}
+
+
+                  <nav aria-label="breadcrumb" class="verbose_name">
+                    <ol class="breadcrumb bg-transparent">
+                      {% for p in arqdoc.classe_estrutural.parents_and_me %}
+                        <li class="breadcrumb-item" aria-current="page">
+                          {{ p.titulo }}
+                        </li>
+                      {% endfor %}
+                    </ol>
+                  </nav>
+
+
+                {% if user.is_superuser %}
+                  <div class="parent-right">
+                    {{ result.text|length }}
+                  </div>
+                {% endif %}
+
+                <div class="links-texto">
+                  {% if arqdoc.arquivo %}
+                    <a class="link-texto" href="{{arqdoc.arquivo.url}}?u={% now "u"%}" title="Documento ArqDoc">
+                      <i class="far fa-2x fa-file-{% if '.pdf' in arqdoc.arquivo.path %}pdf{% else %}archive{% endif %}"></i>
+                    </a>
+                  {% endif %}
+                </div>
+                <a href="{% url 'cmj.arq:subarqclasse_list' arqdoc.classe_estrutural_id %}#{{arqdoc.id}}">{{ arqdoc }}</a>
+                <br><strong>Data:</strong> {{arqdoc.data}}
+                <div class="text-ementa">{{ arqdoc.descricao|safe }}</div>
+              {% endwith %}
+            </div>
+          </td>
+        </tr>
+      {% endif %}
+
+      {% empty %}
+        <tr>
+          <td>
+            <h3>Nenhum texto encontrado!</h3>
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% if page.object_list  %}
+    {% include "paginacao.html" %}
+  {% endif %}
+</div>
+{% endblock %}
+{% block extra_js %}{% endblock %}

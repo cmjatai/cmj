@@ -1,6 +1,7 @@
 from django.conf.urls import include, url
 
 from cmj.arq import views
+from cmj.arq.views_search import ArqSearchView
 from cmj.core.views import app_vue_view
 
 from .apps import AppConfig
@@ -36,6 +37,8 @@ urlpatterns_arq = [
     url(r'^classe/(?P<classe_id>[0-9]+)/doc/(?P<pk>[0-9]+)/delete',
         views.ArqDocDeleteView.as_view(), name='arqdoc_delete'),
 
+
+    url(r'^search/', ArqSearchView(), name='haystack_arqsearch'),
 
 
 ]

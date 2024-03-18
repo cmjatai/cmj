@@ -1,4 +1,3 @@
-
 from operator import attrgetter
 
 from braces.views._forms import FormMessagesMixin
@@ -9,6 +8,7 @@ from django.urls.base import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
+from haystack.views import SearchView
 
 from cmj.arq import forms
 from cmj.arq.models import ArqClasse, ArqDoc
