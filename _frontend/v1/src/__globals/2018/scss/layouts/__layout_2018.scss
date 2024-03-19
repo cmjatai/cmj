@@ -465,7 +465,9 @@
 .highlight {
   color: #4d5156;
   border-top: 10px solid #fff5;
-  padding: 10px;
+  padding: 10px 0 0 0;
+  margin-left: -10px;
+  clear:both;
   .highlighted {
     color: black;
     font-weight: bold;

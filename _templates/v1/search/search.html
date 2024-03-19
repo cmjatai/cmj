@@ -206,14 +206,7 @@
                       </div>
                     </div>
                 {% endif %}
-
-                {% if result.highlighted.text and result.model_name == 'normajuridica' %}
-                <div class="highlight">
-                    {% highlight result.text with query max_length 500 %}
-                  </div>
-                {% endif %}
-
-              {% if False and result.highlighted.text and result.model_name == 'normajuridica' %}
+              {% if result.highlighted.text %}
                 <div class="highlight">
                   {% for hl in result.highlighted.text %}
                    {{ hl|safe }}

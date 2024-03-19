@@ -102,9 +102,10 @@ class CmjSearchForm(ModelSearchForm):
         kwargs = {
             'hl.simple.pre': '<span class="highlighted">',
             'hl.simple.post': '</span>',
-            'max_length': 500
+            'hl.fragsize': 512
         }
-        return sqs.highlight(**kwargs).order_by('-data', '-last_update')
+        r = sqs.highlight(**kwargs).order_by('-data', '-last_update')
+        return r
 
     def get_models(self):
         """Return a list of the selected models."""

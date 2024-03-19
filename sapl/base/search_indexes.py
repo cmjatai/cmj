@@ -87,8 +87,8 @@ class TextExtractField(CharField):
 
     def ta_extractor(self, value):
 
-        if settings.DEBUG:
-            return ''
+        # if settings.DEBUG:
+        #    return ''
 
         r = []
         for ta in value.filter(privacidade__in=[
@@ -128,9 +128,16 @@ class TextExtractField(CharField):
 
             # if callable(value):
             if type(value) is type(self.extract_data):
-                data += getattr(self, func)(value()) + '  '
+                data_attr = getattr(self, func)(value()) + '  '
             else:
-                data += getattr(self, func)(value) + '  '
+                data_attr = getattr(self, func)(value) + '  '
+
+            data += data_attr
+
+            if func == 'ta_extractor':
+                data_attr = data_attr.strip()
+                if data_attr:
+                    break
 
         data = data.replace('\n', ' ')
 
