@@ -24,7 +24,7 @@
       {% if result.object %}
         <tr>
           <td class="item-listas">
-            <div class="item-raiz pl-0">
+            <div class="item-raiz">
               {% with result.object as arqdoc %}
 
                   {% comment %}
@@ -60,6 +60,15 @@
                 <br><strong>Data:</strong> {{arqdoc.data}}
                 <div class="text-ementa">{{ arqdoc.descricao|safe }}</div>
               {% endwith %}
+
+              {% if result.highlighted.text %}
+                <div class="highlight">
+                  {% for hl in result.highlighted.text %}
+                    {{ hl|safe }}
+                  {% endfor %}
+                </div>
+              {% endif %}
+
             </div>
           </td>
         </tr>

@@ -463,14 +463,17 @@
 }
 
 .highlight {
-  color: #4d5156;
+  color: #63676d;
   border-top: 10px solid #fff5;
   padding: 10px 0 0 0;
   margin-left: -10px;
   clear:both;
+  font-style: italic;
   .highlighted {
-    color: black;
+    color: #134435;
     font-weight: bold;
+    font-size: 110%;
+    font-style: normal;
   }
 }
 

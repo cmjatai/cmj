@@ -206,13 +206,15 @@
                       </div>
                     </div>
                 {% endif %}
-              {% if result.highlighted.text %}
-                <div class="highlight">
-                  {% for hl in result.highlighted.text %}
-                   {{ hl|safe }}
-                  {% endfor %}
-                </div>
-              {% endif %}
+
+                {% if result.highlighted.text %}
+                  <div class="highlight">
+                    {% for hl in result.highlighted.text %}
+                    {{ hl|safe }}
+                    {% endfor %}
+                  </div>
+                {% endif %}
+
                 </div>
               </td>
             </tr>

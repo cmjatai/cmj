@@ -60,8 +60,13 @@ class ArqSearchForm(ModelSearchForm):
 
     def search(self):
         sqs = super().search()
-
-        return sqs.order_by('-data', '-last_update')
+        kwargs = {
+            'hl.simple.pre': '<span class="highlighted">',
+            'hl.simple.post': '</span>',
+            'hl.fragsize': 512
+        }
+        s = sqs.highlight(**kwargs).order_by('-data', '-last_update')
+        return s
 
     def get_models(self):
         """Return a list of the selected models."""
