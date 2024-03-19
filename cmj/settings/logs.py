@@ -89,6 +89,11 @@ LOGGING = {
             'level': LOGGING_ROOT_LEVEL,
             'propagate': False,
         },
+        'haystack': {
+            'handlers': ['cmj_logger_file', 'console'],
+            'level': LOGGING_ROOT_LEVEL,
+            'propagate': False,
+        },
         #'daphne': {
         #    'handlers': ['console'],
         #    'level': LOGGING_ROOT_LEVEL,

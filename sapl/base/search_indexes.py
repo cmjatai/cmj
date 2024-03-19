@@ -134,10 +134,10 @@ class TextExtractField(CharField):
 
             data += data_attr
 
-            if func == 'ta_extractor':
-                data_attr = data_attr.strip()
-                if data_attr:
-                    break
+            # if func == 'ta_extractor':
+            #    data_attr = data_attr.strip()
+            #    if data_attr:
+            #        break
 
         data = data.replace('\n', ' ')
 
