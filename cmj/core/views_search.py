@@ -2,7 +2,8 @@ import re
 
 from crispy_forms.bootstrap import FieldWithButtons, StrictButton
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Div, Field, Layout
+from crispy_forms.layout import Div, Field, Layout, HTML
+from crispy_forms.utils import TEMPLATE_PACK
 from django import forms
 from django.db.models import Q
 from django.http.request import QueryDict
@@ -14,16 +15,36 @@ from haystack.views import SearchView
 from cmj.core.models import AreaTrabalho
 from cmj.utils import make_pagination
 from sapl.crispy_layout_mixin import to_row
+from sapl.utils import RangeWidgetNumber
+
+
+class RangeIntegerField(forms.IntegerField):
+    def clean(self, value):
+        vr = []
+        for v in value:
+            vr.append(forms.IntegerField.clean(self, v))
+
+        # if v[0] and v[1]:
+        #    vr.sort()
+        return vr
 
 
 class CmjSearchForm(ModelSearchForm):
+
+    ano = RangeIntegerField(
+        required=False,
+        label=_('Incluir filtro por ano?'),
+        help_text=_('''É opcional limitar a busca em um período específico.<br> 
+        Você pode informar simultaneamente, formando um período específico, os campos Inicial e Final, ou apenas um, ou nenhum deles.'''),
+        widget=RangeWidgetNumber()
+    )
 
     fix_model = forms.CharField(
         required=False, label=_('FixModel'),
         widget=forms.HiddenInput())
 
     def no_query_found(self):
-        return self.searchqueryset.all().order_by('-data')
+        return self.searchqueryset.order_by('-data')
 
     def __init__(self, *args, **kwargs):
 
@@ -39,12 +60,17 @@ class CmjSearchForm(ModelSearchForm):
                 StrictButton(
                     '<i class="fas fa-2x fa-search"></i>',
                     css_class='btn-outline-primary',
-                    type='submit')
+                    type='submit'),
+                css_class='div-search'
             ),
-
         )
 
-        row = to_row([(Div(), 2), (q_field, 8), (Div(Field('models')), 12)])
+        row = to_row([
+            (Div(), 2),
+            (q_field, 8),
+            ('ano', 4),
+            (Div(Field('models')), 8),
+        ])
 
         self.helper = FormHelper()
         self.helper.form_tag = False
@@ -81,7 +107,7 @@ class CmjSearchForm(ModelSearchForm):
 
             key=lambda x: x[1])
 
-        self.fields['models'].label = _('Buscar em conteúdos específicos:')
+        self.fields['models'].label = _('Buscar em conteúdos específicos?')
         self.fields['q'].label = ''
 
         if args and isinstance(args[0], QueryDict):
@@ -99,6 +125,16 @@ class CmjSearchForm(ModelSearchForm):
                 Q(at__in=self.workspaces.values_list('id', flat=True)))
         else:
             sqs = sqs.filter(at=0)
+
+        a = self.cleaned_data.get('ano', None)
+
+        if a and a[0] and a[1]:
+            sqs = sqs.filter(ano__range=a)
+        elif a and a[0]:
+            sqs = sqs.filter(ano__gte=a[0])
+        elif a and a[1]:
+            sqs = sqs.filter(ano__lte=a[1])
+
         kwargs = {
             'hl.simple.pre': '<span class="highlighted">',
             'hl.simple.post': '</span>',

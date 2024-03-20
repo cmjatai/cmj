@@ -9,8 +9,8 @@ from sapl.protocoloadm.models import DocumentoAdministrativo
 class DocumentoAdministrativoIndex(CelerySearchIndex, Indexable):
     model = DocumentoAdministrativo
     data = DateTimeField(model_attr='data', null=True)
-    at = IntegerField(model_attr='workspace_id', null=True)
     ano = IntegerField(model_attr='ano', null=True)
+    at = IntegerField(model_attr='workspace_id', null=True)
     text = TextExtractField(
         document=True, use_template=True,
         model_attr=(

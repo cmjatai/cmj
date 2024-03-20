@@ -386,6 +386,39 @@ class RangeWidgetOverride(forms.MultiWidget):
         return '<div class="row">%s</div>' % html
 
 
+class RangeWidgetNumber(forms.MultiWidget):
+
+    def __init__(self, attrs=None):
+        widgets = (forms.NumberInput(
+            attrs={'class': 'numberinput form-control',
+                   'placeholder': 'Inicial'}),
+                   forms.NumberInput(
+            attrs={'class': 'numberinput form-control',
+                   'placeholder': 'Final'}))
+        super(RangeWidgetNumber, self).__init__(widgets, attrs)
+
+    def decompress(self, value):
+        if value:
+            return [value.start, value.stop]
+        return [None, None]
+
+    def render(self, name, value, attrs=None, renderer=None):
+        rendered_widgets = []
+        for i, x in enumerate(self.widgets):
+            rendered_widgets.append(
+                x.render(
+                    '%s_%d' % (name, i), value[i] if value else ''
+                )
+            )
+
+        html = '<div class="col-sm-6">%s</div><div class="col-sm-6">%s</div>'\
+            % tuple(rendered_widgets)
+        return '<div class="row">%s</div>' % html
+
+    def value_from_datadict(self, data, files, name):
+        return forms.MultiWidget.value_from_datadict(self, data, files, name)
+
+
 class CustomSplitDateTimeWidget(SplitDateTimeWidget):
 
     def render(self, name, value, attrs=None, renderer=None):

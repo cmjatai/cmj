@@ -37,6 +37,7 @@ from cmj.core.models import Municipio, Trecho, ImpressoEnderecamento,\
 from cmj.utils import normalize, YES_NO_CHOICES
 from sapl.crispy_layout_mixin import to_column, SaplFormLayout, to_fieldsets,\
     form_actions, to_row, SaplFormHelper
+from sapl.utils import RangeWidgetNumber
 
 
 class ListTextWidget(forms.TextInput):
@@ -584,36 +585,6 @@ class ContatoFragmentSearchForm(forms.Form):
                 'controls-radio-checkbox'))
         self.helper.form_tag = False
         self.helper.disable_csrf = True
-
-
-class RangeWidgetNumber(forms.MultiWidget):
-
-    def __init__(self, attrs=None):
-        widgets = (forms.NumberInput(
-            attrs={'class': 'numberinput form-control',
-                   'placeholder': 'Inicial'}),
-                   forms.NumberInput(
-            attrs={'class': 'numberinput form-control',
-                   'placeholder': 'Final'}))
-        super(RangeWidgetNumber, self).__init__(widgets, attrs)
-
-    def decompress(self, value):
-        if value:
-            return [value.start, value.stop]
-        return [None, None]
-
-    def render(self, name, value, attrs=None, renderer=None):
-        rendered_widgets = []
-        for i, x in enumerate(self.widgets):
-            rendered_widgets.append(
-                x.render(
-                    '%s_%d' % (name, i), value[i] if value else ''
-                )
-            )
-
-        html = '<div class="col-sm-6">%s</div><div class="col-sm-6">%s</div>'\
-            % tuple(rendered_widgets)
-        return '<div class="row">%s</div>' % html
 
 
 class RangeWidgetOverride(forms.MultiWidget):

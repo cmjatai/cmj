@@ -10,7 +10,7 @@
       <div class="container-search">
         <div class="form-group">
           <div>
-            <div class="input-group">
+            <div class="input-group div-search">
               {% csrf_token %}
               <input type="hidden" class="custom-control-input" name="models" id="id_models_4" value="{{view.model|meta_model_value:'label_lower'}}">
               <input type="hidden" class="custom-control-input" name="fix_model" id="fix_model" value="1">

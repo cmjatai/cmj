@@ -203,9 +203,9 @@ class NormaJuridicaIndex(DocumentoAcessorioIndex):
 
 class MateriaLegislativaIndex(DocumentoAcessorioIndex):
     model = MateriaLegislativa
+    data = DateTimeField(model_attr='data_apresentacao')
     tipo = CharField(model_attr='tipo__sigla')
     ano = IntegerField(model_attr='ano')
-    data = DateTimeField(model_attr='data_apresentacao')
     text = TextExtractField(
         document=True, use_template=True,
         model_attr=(
