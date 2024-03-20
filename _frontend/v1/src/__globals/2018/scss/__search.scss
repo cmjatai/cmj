@@ -1,14 +1,16 @@
 .container-search {
+  .div-search {
+    input {
+      font-size: 2em;
+      line-height: 1em;
+    }
+    label {
+      font-size: 1.3em;
+      line-height: 1.5em;
+    }
+  }
   ul {
     list-style: none;
-  }
-  input {
-    font-size: 2em;
-    line-height: 1em;
-  }
-  label {
-    font-size: 1.3em;
-    line-height: 1.5em;
   }
   button {
     padding-left: 2em;
@@ -32,7 +34,7 @@
 
 
 .google-search {
-  background:  url(~@/assets/img/search_box_icon36.png) no-repeat 2px 3px; 
+  background:  url(~@/assets/img/search_box_icon36.png) no-repeat 2px 3px;
   position: fixed;
   padding: 10px;
   top: 0px;
@@ -102,7 +104,7 @@
       padding-right: 2em;
       color: rgba(0, 101, 86, 0.7);
     }
-  
+
     .collapse {
       margin: 10px 0;
     }
@@ -110,7 +112,7 @@
       position: relative;
     }
   }
-  
+
 }
 
 @media screen and (max-width: 480px) {
