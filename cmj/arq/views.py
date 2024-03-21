@@ -2,10 +2,13 @@ from operator import attrgetter
 
 from braces.views._forms import FormMessagesMixin
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.aggregates import Max
+from django.http.response import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls.base import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
+from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
 from haystack.views import SearchView
@@ -286,6 +289,12 @@ class ArqDocUpdateView(ArqDocMixin, FormMessagesMixin,
         return initial
 
 
+class ArqDocDetailView(ArqDocMixin, PermissionRequiredMixin, DetailView):
+    permission_required = 'arq.detail_arqdoc'
+    template_name = 'crud/detail.html'
+    model = ArqDoc
+
+
 class ArqDocCreateView(ArqDocMixin, FormMessagesMixin,
                        PermissionRequiredMixin,
                        CreateView):
@@ -295,6 +304,16 @@ class ArqDocCreateView(ArqDocMixin, FormMessagesMixin,
     template_name = 'crud/form.html'
     form_class = forms.ArqDocForm
     model = ArqDoc
+
+    def is_checkcheck(self):
+        # check check da classe
+
+        try:
+            ac = ArqClasse.objects.get(pk=self.kwargs['classe_id'])
+        except ObjectDoesNotExist:
+            raise Http404()
+
+        return ac.checkcheck
 
     def get_initial(self):
 
