@@ -35,7 +35,9 @@ class ArqSearchForm(ModelSearchForm):
                 StrictButton(
                     '<i class="fas fa-2x fa-search"></i>',
                     css_class='btn-outline-primary',
-                    type='submit')
+                    type='submit'),
+                css_class='div-search'
+
             ),
 
         )

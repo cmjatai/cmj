@@ -1,0 +1,9 @@
+{% load i18n %}
+ArqDocDetail:
+  {% trans 'ArqDocumento' %}:
+  - conta:3 data:2 arquivo
+  - descricao
+  - owner created modifier modified
+  - classe_estrutural
+  - classe_logica
+  - pagina1

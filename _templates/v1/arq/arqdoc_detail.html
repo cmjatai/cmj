@@ -1,0 +1,25 @@
+{% extends "crud/detail.html" %}
+{% load i18n common_cmj_tags %}
+
+{% block title %}
+  <h1 class="page-header d-flex justify-content-between">
+    <span>
+      {% if title %}
+        {{ title|safe|linebreaksbr }}
+      {% elif view.title %}
+        {{ view.title|safe|linebreaksbr }}
+      {% elif object %}
+        {{ object|safe|linebreaksbr }}
+      {% endif %}
+    </span>
+    {% if object %}
+      <a href="?toggle_padlock">
+        {% if object.checkcheck %}
+          <i class="fas fa-lock text-red" title="ArqDoc Arquivado. Remover Arquivamento?"></i>
+        {% else %}
+          <i class="fas fa-lock-open" title="Arquivar ArqDoc"></i>
+        {% endif %}
+      </a>
+    {% endif %}
+  </h1>
+{% endblock %}

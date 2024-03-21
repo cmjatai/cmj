@@ -443,5 +443,28 @@ class ArqDoc(Parent, CmjAuditoriaModelMixin):
         verbose_name = _('ArqDoc')
         verbose_name_plural = _('ArcDocs')
 
+    @property
+    def conta(self):
+        ct = [self.classe_estrutural.conta, ]
+        ct.append(str(self.codigo))
+        return '.'.join(ct)
+
     def __str__(self):
         return self.titulo or ''
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+
+        if not self.pk and self.arquivo:
+            arquivo = self.arquivo
+            self.arquivo = None
+            models.Model.save(self, force_insert=force_insert,
+                              force_update=force_update,
+                              using=using,
+                              update_fields=update_fields)
+            self.arquivo = arquivo
+
+        return models.Model.save(self, force_insert=force_insert,
+                                 force_update=force_update,
+                                 using=using,
+                                 update_fields=update_fields)

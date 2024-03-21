@@ -7,6 +7,7 @@ from django.db.models.aggregates import Max
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls.base import reverse_lazy
+from django.utils import formats, timezone
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -16,6 +17,7 @@ from haystack.views import SearchView
 from cmj.arq import forms
 from cmj.arq.models import ArqClasse, ArqDoc
 from cmj.mixins import CheckCheckMixin
+from sapl.crud.base import CrudDetailView, CrudBaseMixin
 
 
 class ArqClasseParentMixin(CheckCheckMixin):
@@ -289,10 +291,92 @@ class ArqDocUpdateView(ArqDocMixin, FormMessagesMixin,
         return initial
 
 
-class ArqDocDetailView(ArqDocMixin, PermissionRequiredMixin, DetailView):
+class ArqDocDetailView(CrudBaseMixin, CrudDetailView, ArqDocMixin, ):
     permission_required = 'arq.detail_arqdoc'
-    template_name = 'crud/detail.html'
+    template_name = 'arq/arqdoc_detail.html'
     model = ArqDoc
+    layout_key = 'ArqDocDetail'
+
+    @property
+    def list_url(self):
+        return self.cancel_url
+
+    @property
+    def create_url(self):
+        return reverse_lazy(
+            'cmj.arq:arqdoc_create',
+            kwargs={'classe_id': self.kwargs['classe_id']})
+
+    @property
+    def update_url(self):
+        return reverse_lazy(
+            'cmj.arq:arqdoc_edit',
+            kwargs={
+                'pk': self.object.pk,
+                'classe_id': self.kwargs['classe_id']
+            })
+
+    @property
+    def delete_url(self):
+        return reverse_lazy(
+            'cmj.arq:arqdoc_delete',
+            kwargs={
+                'pk': self.object.pk,
+                'classe_id': self.kwargs['classe_id']
+            })
+
+    @property
+    def title(self):
+        o = self.object
+        return '%s<br><small>%s%s<br>%s%s</small>' % (
+            o.titulo,
+            _('ArqClasse Estrutural -> '),
+            o.classe_estrutural,
+            (_('ArqClasse Lógica -> ') if o.classe_logica else ''),
+            o.classe_logica or ''
+        )
+
+    def hook_conta(self, obj):
+        return 'Conta', str(obj.conta)
+
+    def hook_owner(self, obj):
+        return 'Criado Por', str(obj.owner)
+
+    def hook_created(self, obj):
+        return 'Em', formats.date_format(timezone.localtime(obj.created), "d/m/Y - H:i:s")
+
+    def hook_modifier(self, obj):
+        return 'Última Alteração', str(obj.modifier)
+
+    def hook_modified(self, obj):
+        return 'Em', formats.date_format(timezone.localtime(obj.modified), "d/m/Y - H:i:s")
+
+    def hook_pagina1(self, obj):
+        return 'Primeira Página do Docuemnto', f'''
+            <div class="d-flex justify-content-center p-2">
+                <img class="img-fluid w-50" src="/api/arq/arqdoc/{obj.id}/arquivo/?page=1&dpi=300"
+            </div>
+        '''
+
+    def get(self, request, *args, **kwargs):
+
+        toggle_padlock = request.GET.get('toggle_padlock', None)
+
+        if toggle_padlock is not None and request.user.is_superuser:
+            if 'pk' in self.kwargs:
+                self.object = self.get_object()
+                self.object.checkcheck = not self.object.checkcheck
+                self.object.save()
+                return redirect(
+                    reverse_lazy(
+                        'cmj.arq:arqdoc_detail',
+                        kwargs={
+                            'pk': self.object.pk,
+                            'classe_id': self.kwargs['classe_id']
+                        })
+                )
+
+        return super().get(request, *args, **kwargs)
 
 
 class ArqDocCreateView(ArqDocMixin, FormMessagesMixin,
