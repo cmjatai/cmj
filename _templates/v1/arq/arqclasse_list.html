@@ -73,6 +73,8 @@
     </table>
   {% endif %}
   {% if object %}
+    {% with object as classe %}
       {% include "arq/arqdoc_widget_list.html" %}
+    {% endwith %}
   {% endif %}
 {% endblock %}

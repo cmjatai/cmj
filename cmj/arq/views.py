@@ -328,7 +328,7 @@ class ArqDocDetailView(CrudBaseMixin, CrudDetailView, ArqDocMixin, ):
     @property
     def title(self):
         o = self.object
-        return '%s<br><small>%s%s<br>%s%s</small>' % (
+        return '%s<br><small><small>%s%s<br>%s%s</small></small>' % (
             o.titulo,
             _('ArqClasse Estrutural -> '),
             o.classe_estrutural,

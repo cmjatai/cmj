@@ -22,26 +22,59 @@
     </tr>
   </thead>
   <tbody>
-    {% for doc in arqdoc_set.all %}
+    {% for arqdoc in arqdoc_set.all %}
     <tr>
       <td align=center>
-        {% if doc.checkcheck %}
+        {% if arqdoc.checkcheck %}
           <i class="fas fa-xs fa-lock text-red" title="Documento Arquivado."></i><br>
         {% endif %}
-        {{ doc.data|date:"d/m/Y" }}
+        {{ arqdoc.data|date:"d/m/Y" }}
       </td>
       <td>
         <div class="d-flex w-100 justify-content-between">
           <div class="d-block">
-            <a name="{{doc.pk }}" href="{% url 'cmj.arq:arqdoc_detail' doc.classe_estrutural_id doc.pk %}">{{ doc.titulo }}</a>
+            <a name="{{arqdoc.pk }}" href="{% url 'cmj.arq:arqdoc_detail' arqdoc.classe_estrutural_id arqdoc.pk %}">{{ arqdoc.titulo }}</a>
             <br>
             <small>
-              {{doc.descricao}}
+              {{arqdoc.descricao}}
             </small>
+
+
+            {% if classe.perfil == 100 %}
+              <small>
+                <nav aria-label="breadcrumb" class="verbose_name text-black-50">
+                  <ol class="breadcrumb bg-transparent">
+                    {% for p in arqdoc.classe_logica.parents_and_me %}
+                      <li class="breadcrumb-item" aria-current="page" title="{{p.conta}}">
+                        <a href="{% url 'cmj.arq:subarqclasse_list' p.id %}">
+                          {{ p.titulo }}
+                        </a>
+                      </li>
+                    {% endfor %}
+                  </ol>
+                </nav>
+              </small>
+            {% else %}
+              <small>
+
+                <nav aria-label="breadcrumb" class="verbose_name text-black-50">
+                  <ol class="breadcrumb bg-transparent">
+                    {% for p in arqdoc.classe_estrutural.parents_and_me %}
+                      <li class="breadcrumb-item" aria-current="page" title="{{p.conta}}">
+                        <a href="{% url 'cmj.arq:subarqclasse_list' p.id %}">
+                          {{ p.titulo }}
+                        </a>
+                      </li>
+                    {% endfor %}
+                    </ol>
+                  </nav>
+              </small>
+            {% endif %}
+
           </div>
-          {% if not doc.checkcheck %}
+          {% if not arqdoc.checkcheck %}
             <div class="d-block">
-              <a href="{% url 'cmj.arq:arqdoc_delete' doc.classe_estrutural_id doc.pk %}" class="btn btn-outline-primary btn-excluir btn-sm">Excluir</a>
+              <a href="{% url 'cmj.arq:arqdoc_delete' arqdoc.classe_estrutural_id arqdoc.pk %}" class="btn btn-outline-primary btn-excluir btn-sm">Excluir</a>
             </div>
           {% endif %}
         </div>
