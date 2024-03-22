@@ -7,11 +7,8 @@
   url: ''
   children:
   {% yaml_render "navbar/restrict/navbar_saap.yaml" 2 %}
-  
-- title: {% trans "ARQ" %}
-  url: ''
-  children:
-  {% yaml_render "navbar/restrict/navbar_arq.yaml" 2 %}
+
+{% yaml_render "navbar/restrict/navbar_arq.yaml" 0 %}
 
 - title: {% trans "Ouvidoria" %}
   url: ''
