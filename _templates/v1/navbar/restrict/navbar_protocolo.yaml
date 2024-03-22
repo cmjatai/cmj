@@ -4,7 +4,7 @@
   url: sapl.protocoloadm:protocolo
   check_permission: protocoloadm.list_protocolo
 
-{%comment %}
+{% comment %}
   children:
   - title: {% trans 'Protocolo Geral' %}
     url: sapl.protocoloadm:protocolo
@@ -12,7 +12,7 @@
     url: sapl.protocoloadm:protocolar_mat
   - title: {% trans 'Protocolo de Documento' %}
     url: sapl.protocoloadm:protocolar_doc
-{%endcomment%}
+{% endcomment %}
 
 - title: {% trans 'Receber Proposições' %}
   url: sapl.materia:proposicao-pendente

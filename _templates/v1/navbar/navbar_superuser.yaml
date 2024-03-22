@@ -3,6 +3,7 @@
   url: ''
   children:
   {% yaml_render "navbar/navbar_public.yaml" 2 %}
+  
 - title: {% trans "SAAP" %}
   url: ''
   children:
