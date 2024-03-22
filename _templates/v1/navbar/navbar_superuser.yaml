@@ -3,11 +3,20 @@
   url: ''
   children:
   {% yaml_render "navbar/navbar_public.yaml" 2 %}
-
 - title: {% trans "SAAP" %}
   url: ''
   children:
   {% yaml_render "navbar/restrict/navbar_saap.yaml" 2 %}
+  
+- title: {% trans "ARQ" %}
+  url: ''
+  children:
+  {% yaml_render "navbar/restrict/navbar_arq.yaml" 2 %}
+
+- title: {% trans "Ouvidoria" %}
+  url: ''
+  children:
+  {% yaml_render "navbar/public/navbar_esic.yaml" 2 %}
 
 - title: {% trans 'Protocolo' %}
   url: sapl.protocoloadm:protocolo

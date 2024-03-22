@@ -39,7 +39,6 @@
               {{arqdoc.descricao}}
             </small>
 
-
             {% if classe.perfil == 100 %}
               <small>
                 <nav aria-label="breadcrumb" class="verbose_name text-black-50">
@@ -56,7 +55,6 @@
               </small>
             {% else %}
               <small>
-
                 <nav aria-label="breadcrumb" class="verbose_name text-black-50">
                   <ol class="breadcrumb bg-transparent">
                     {% for p in arqdoc.classe_estrutural.parents_and_me %}

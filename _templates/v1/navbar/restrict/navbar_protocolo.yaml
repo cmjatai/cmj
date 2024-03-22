@@ -1,7 +1,9 @@
 {% load i18n common_cmj_tags %}
+
 - title: {% trans 'Protocolo' %}
   url: sapl.protocoloadm:protocolo
-  check_permission: protocoloadm.list_protocolo 
+  check_permission: protocoloadm.list_protocolo
+
 {%comment %}
   children:
   - title: {% trans 'Protocolo Geral' %}
@@ -11,15 +13,15 @@
   - title: {% trans 'Protocolo de Documento' %}
     url: sapl.protocoloadm:protocolar_doc
 {%endcomment%}
-    
+
 - title: {% trans 'Receber Proposições' %}
   url: sapl.materia:proposicao-pendente
-  check_permission: protocoloadm.add_protocolo 
+  check_permission: protocoloadm.add_protocolo
 
 - title: {% trans 'Documentos' %}
   url: sapl.protocoloadm:documentoadministrativo_list
-  check_permission: protocoloadm.list_documentoadministrativo 
-  
+  check_permission: protocoloadm.list_documentoadministrativo
+
 - title: {% trans 'Matérias Legislativas' %}
   url: sapl.materia:pesquisar_materia
-  check_permission: protocoloadm.add_protocolo 
+  check_permission: protocoloadm.add_protocolo

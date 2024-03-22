@@ -1,0 +1,22 @@
+{% load i18n %}
+- title: {% trans "ARQ" %}
+  url: ''
+  check_permission: arq.view_arqclasse
+  children:
+  - title: {% trans "Pesquisa por Documentos" %}
+    url: cmj.arq:haystack_arqsearch
+    check_permission: arq.view_arqclasse
+  - title:
+  - title: {% trans "ArqView" %}
+    url: /arq/root
+    check_permission: arq.view_arqclasse
+  - title: {% trans "Cadastro de ArqClasses" %}
+    url: /arqadmin/classe
+    check_permission: arq.view_arqclasse
+  - title: {% trans "Mapa da Sala de Arquivo" %}
+    url: /arqadmin/classe?view=tree2
+    check_permission: arq.view_arqclasse
+  - title:
+  - title: {% trans "Draft" %}
+    url: /arq/draft
+    check_permission: arq.list_draft

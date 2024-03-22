@@ -25,13 +25,13 @@
         <tr>
           <td class="item-listas">
             <div class="item-raiz">
-              {% with result.object as arqdoc %} 
+              {% with result.object as arqdoc %}
 
                   {% comment %}
                     {% if not result.model_name == 'documento' %}{{result.verbose_name}}{%else%}{{result.object.classe}}{% endif %}
                   {% endcomment %}
 
-
+                <small>
                   <nav aria-label="breadcrumb" class="verbose_name">
                     <ol class="breadcrumb bg-transparent">
                       {% for p in arqdoc.classe_estrutural.parents_and_me %}
@@ -41,7 +41,16 @@
                       {% endfor %}
                     </ol>
                   </nav>
-
+                  <nav aria-label="breadcrumb" class="verbose_name">
+                    <ol class="breadcrumb bg-transparent">
+                      {% for p in arqdoc.classe_logica.parents_and_me %}
+                        <li class="breadcrumb-item" aria-current="page">
+                          {{ p.titulo }}
+                        </li>
+                      {% endfor %}
+                    </ol>
+                  </nav>
+                </small>
 
                 {% if user.is_superuser %}
                   <div class="parent-right">
@@ -56,7 +65,7 @@
                     </a>
                   {% endif %}
                 </div>
-                <a href="{% url 'cmj.arq:subarqclasse_list' arqdoc.classe_estrutural_id %}#{{arqdoc.id}}">{{ arqdoc }}</a>
+                <a href="{% url 'cmj.arq:arqdoc_detail' arqdoc.classe_estrutural_id arqdoc.id %}">{{ arqdoc }}</a>
                 <br><strong>Data:</strong> {{arqdoc.data}}
                 <div class="text-ementa">{{ arqdoc.descricao|safe }}</div>
               {% endwith %}

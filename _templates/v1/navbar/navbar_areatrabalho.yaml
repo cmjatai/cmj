@@ -9,23 +9,11 @@
   {% yaml_render "navbar/public/navbar_atividadelegislativa.yaml" 0 %}
 {% endif %}
 
-{% if user.is_superuser %}
-- title: {% trans "SAAP" %}
-  url: ''
-  children:
-  {% yaml_render "navbar/restrict/navbar_saap.yaml" 2 %}
-- title: {% trans "Ouvidoria" %}
-  url: ''
-  children:
-  {% yaml_render "navbar/public/navbar_esic.yaml" 2 %}
-{% else %}
-  {% yaml_render "navbar/restrict/navbar_saap.yaml" 0 %}
-- title: {% trans "Registro de Entrada" %}
-  url: cmj.cerimonial:visita_list
-  check_permission: core.menu_recepcao
-  {% if perms.ouvidoria.list_solicitacao %}
-    {% yaml_render "navbar/public/navbar_esic.yaml" 0 %}
-  {% endif %}
+{% yaml_render "navbar/restrict/navbar_saap.yaml" 0 %}
+{% yaml_render "navbar/restrict/navbar_arq.yaml" 0 %}
+
+{% if perms.ouvidoria.list_solicitacao %}
+  {% yaml_render "navbar/public/navbar_esic.yaml" 0 %}
 {% endif %}
 
 {% if perms.sigad.view_documento %}
@@ -33,4 +21,6 @@
   url: '/noticias'
 {% endif %}
 
-{% yaml_render "navbar/restrict/navbar_protocolo.yaml" 0 %}
+{% if perms.protocoloadm.add_protocolo %}
+  {% yaml_render "navbar/restrict/navbar_protocolo.yaml" 0 %}
+{% endif %}

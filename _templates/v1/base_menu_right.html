@@ -1,7 +1,7 @@
 {% load i18n staticfiles menus common_cmj_tags cropping %}
 {% load webpack_static from webpack_loader %}
 <ul class="navbar-nav justify-content-end">
-  {% if perms.cerimonial.list_visita %}
+  {% if perms.cerimonial.list_visita and not user.is_superuser %}
     <li><a class="text-yellow" style="font-weight: bold;" href="{% url 'cmj.cerimonial:visita_list'  %}">Registro de Entrada</a></li>
   {% endif %}
   {% if perms.arq.list_draft %}
