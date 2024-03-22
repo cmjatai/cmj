@@ -10,6 +10,7 @@
 {% endif %}
 
 {% yaml_render "navbar/restrict/navbar_saap.yaml" 0 %}
+
 {% yaml_render "navbar/restrict/navbar_arq.yaml" 0 %}
 
 {% if perms.ouvidoria.list_solicitacao %}

@@ -6,6 +6,7 @@ from crispy_forms.layout import Div, Field, Layout
 from django import forms
 from django.db.models import Q
 from django.http.request import QueryDict
+from django.urls.base import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 from haystack.forms import ModelSearchForm, SearchForm, model_choices
 from haystack.query import SearchQuerySet
@@ -37,9 +38,7 @@ class ArqSearchForm(ModelSearchForm):
                     css_class='btn-outline-primary',
                     type='submit'),
                 css_class='div-search'
-
             ),
-
         )
 
         row = to_row([(Div(), 2), (q_field, 8), ])
