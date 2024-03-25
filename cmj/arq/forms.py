@@ -34,6 +34,7 @@ class ArqClasseForm(ModelForm):
             'perfil',
             'descricao',
             'parent',
+            'render_tree2'
 
         ]
 
