@@ -28,7 +28,8 @@ from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from cmj.api.serializers import DraftMidiaSerializer, ArqClasseSerializer
+from cmj.api.serializers import DraftMidiaSerializer, ArqClasseSerializer,\
+    ArqDocSerializer
 from cmj.arq import tasks
 from cmj.arq.models import DraftMidia, Draft, ArqClasse, ArqDoc
 from cmj.settings.project import DEBUG
@@ -515,9 +516,14 @@ class _DraftMidia(ResponseFileMixin):
 class _ArqClasse:
     serializer_class = ArqClasseSerializer
 
+    def dispatch(self, request, *args, **kwargs):
+        print(request.path)
+        return super().dispatch(request, *args, **kwargs)
+
 
 @customize(ArqDoc)
 class _ArqDoc(ResponseFileMixin):
+    serializer_class = ArqDocSerializer
 
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)

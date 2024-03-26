@@ -2,6 +2,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Fieldset
 from django import forms
 from django.core.files.base import File
+from django.forms import widgets
 from django.forms.models import ModelForm
 from django.utils.translation import ugettext_lazy as _
 
@@ -26,6 +27,11 @@ class ArqClasseForm(ModelForm):
         widget=forms.HiddenInput(),
         required=False)
 
+    render_tree2 = forms.TypedChoiceField(
+        label=_('Renderização Tree2'),
+        required=False,
+        choices=YES_NO_CHOICES)
+
     class Meta:
         model = ArqClasse
         fields = [
@@ -39,11 +45,15 @@ class ArqClasseForm(ModelForm):
         ]
 
     def __init__(self, *args, **kwargs):
+        parent = None
+        if 'initial' in kwargs:
+            parent = kwargs['initial'].get('parent', None)
 
         row1 = to_row([
             ('codigo', 2),
-            ('titulo', 7),
+            ('titulo', 'col-md'),
             ('perfil', 3),
+            ('render_tree2', f'col-md-{0 if parent else 2}'),
         ])
 
         row2 = to_row([
@@ -56,6 +66,11 @@ class ArqClasseForm(ModelForm):
                      row1, row2,))
 
         super(ArqClasseForm, self).__init__(*args, **kwargs)
+
+        if parent:
+            self.fields['render_tree2'].widget = forms.HiddenInput()
+        else:
+            self.fields['render_tree2'].widget = widgets.CheckboxInput()
 
 
 class ArqDocForm(ModelForm):

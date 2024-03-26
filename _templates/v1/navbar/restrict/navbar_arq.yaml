@@ -3,7 +3,7 @@
   url: ''
   check_permission: arq.view_arqclasse
   children:
-  - title: {% trans "Pesquisa por Documentos" %}
+  - title: {% trans "Pesquisa por ArqDocumentos" %}
     url: cmj.arq:haystack_arqsearch
     check_permission: arq.view_arqclasse
   - title: ''

@@ -3,7 +3,7 @@
     <div class="inner">
       <div class="titulo">
         <i v-if="arqdoc.checkcheck" class="fas fa-xs fa-lock text-red" title="ArqClasse Arquivada."></i>&nbsp;
-        <a :href="arqdoc.arquivo" target="_blank">{{ arqdoc.titulo }}</a>
+        <a :href="arqdoc.link_detail_backend" target="_blank">{{ arqdoc.titulo }}</a>
       </div>
       <div class="descricao" v-html="arqdoc.descricao"></div>
       <div class="rodape">
@@ -15,7 +15,7 @@
         </span>
       </div>
       <div class="rodape">
-        <span class="text-info">TODO: se acessado via <strong>localização física</strong>, mostrar aqui a <strong>localização lógica</strong> e viceversa</span>
+        <bread-crumb-classe v-if="contra_classe" :parents="contra_classe.parents" :me="contra_classe"></bread-crumb-classe>
       </div>
       <div class="inner-preview" ref="preview">
         <img v-if="imgdisplay" ref="imgpreview" @error="errorPreview" @load="loadPreview">
@@ -33,16 +33,21 @@
 </template>
 <script>
 import axios from 'axios'
+import BreadCrumbClasse from './BreadCrumbClasse.vue'
 
 export default {
   name: 'arq-doc-item',
+  components: { BreadCrumbClasse },
   props: [ 'arqdoc', 'classe' ],
   data () {
     return {
       imgdisplay: false,
       img_src: null,
       dpi: 72,
-      page: 1
+      page: 1,
+      contra_classe: null,
+      ARQCLASSE_FISICA: 100,
+      ARQCLASSE_LOGICA: 200
     }
   },
   watch: {
@@ -136,6 +141,22 @@ export default {
     }
   },
   mounted: function () {
+    const t = this
+    t.$nextTick()
+      .then(function () {
+        return t.getObject({
+          action: '',
+          app: 'arq',
+          model: 'arqclasse',
+          id: t.classe.perfil === t.ARQCLASSE_FISICA ? t.arqdoc.classe_logica : t.arqdoc.classe_estrutural
+        })
+          .then((classe) => {
+            t.contra_classe = classe
+            return classe
+          })
+          .catch((response) => t.sendMessage(
+            { alert: 'danger', message: 'Não foi possível recuperar classe selecionada...', time: 5 }))
+      })
   }
 }
 </script>

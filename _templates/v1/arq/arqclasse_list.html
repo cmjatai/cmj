@@ -12,8 +12,10 @@
     {% if not object %}
       <a  class="btn btn-outline-primary" href="{{request.path}}?view=tree2">Tree2View</a>
     {% else %}
-      <a  class="btn btn-outline-primary" href="/arq/{{object.parent.id}}/{{object.id}}">ArqView</a>
+      <a  class="btn btn-outline-primary" href="/arq/{{object.id}}/{{object.id}}">ArqView</a>
     {% endif %}
+
+
   </div>
   <div class="actions btn-group-sm" role="group">
     {% if object and object.parent%}

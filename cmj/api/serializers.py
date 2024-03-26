@@ -3,6 +3,7 @@ import os
 
 from django.db.models import Max
 from django.forms.models import model_to_dict
+from django.urls.base import reverse
 from django.utils import timezone
 from model_utils.choices import Choices
 from rest_framework import serializers
@@ -12,7 +13,7 @@ from rest_framework.fields import empty, JSONField, ChoiceField,\
 from rest_framework.relations import RelatedField, ManyRelatedField,\
     MANY_RELATION_KWARGS
 
-from cmj.arq.models import DraftMidia, ArqClasse
+from cmj.arq.models import DraftMidia, ArqClasse, ArqDoc
 from cmj.core.models import Bi
 from cmj.sigad.models import Documento, ReferenciaEntreDocumentos,\
     DOC_TEMPLATES_CHOICE, CMSMixin
@@ -323,3 +324,19 @@ class ArqClasseSerializer(SaplSerializerMixin):
 
     class Meta(SaplSerializerMixin.Meta):
         model = ArqClasse
+
+
+class ArqDocSerializer(SaplSerializerMixin):
+
+    def get_link_detail_backend(self, obj) -> str:
+        try:
+            return reverse(f'{self.Meta.model._meta.app_config.name}:{self.Meta.model._meta.model_name}_detail',
+                           kwargs={
+                               'classe_id': obj.classe_estrutural_id,
+                               'pk': obj.pk
+                           })
+        except:
+            return ''
+
+    class Meta(SaplSerializerMixin.Meta):
+        model = ArqDoc

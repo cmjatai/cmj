@@ -1,15 +1,6 @@
 <template>
   <div class="doclist-layout container-fluid" v-if="classe">
-    <nav aria-label="breadcrumb" v-if="classe.parents">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item" v-for="parent, k in classe.parents" :key="`cp-${k}`">
-          <router-link :to="{ name: 'arqchildroute', params: { node: k > 0 ? classe.parents[k-1].id : 'root', nodechild: parent.id } }"
-            @click.native="clickItemBreadCrumb">
-            {{ parent.titulo }}
-          </router-link>
-        </li>
-      </ol>
-    </nav>
+    <bread-crumb-classe :parents="classe.parents"></bread-crumb-classe>
     <div class="row-fluid">
       <div class="col">
         <h2>{{ classe.titulo }}</h2>
@@ -34,10 +25,11 @@
 </template>
 <script>
 import ArqDocItem from './ArqDocItem.vue'
+import BreadCrumbClasse from './BreadCrumbClasse.vue'
 
 export default {
   name: 'doc-list-layout',
-  components: { ArqDocItem },
+  components: { ArqDocItem, BreadCrumbClasse },
   data () {
     return {
       params_node: this.$route.params.node,
@@ -75,10 +67,6 @@ export default {
     }
   },
   methods: {
-    clickItemBreadCrumb () {
-      this.$refs.noderoot.reload()
-    },
-
     fetch (page = 1, query_string = '') {
       const _this = this
       _this.$set(_this, 'arqdocs', {})
@@ -100,10 +88,15 @@ export default {
         return null
       }
 
-      return _this.utils.getModel('arq', 'arqclasse', _this.params_nodechild)
-        .then((response) => {
-          _this.classe = response.data
-          return response
+      return _this.getObject({
+        action: '',
+        app: 'arq',
+        model: 'arqclasse',
+        id: _this.params_nodechild
+      })
+        .then((classe) => {
+          _this.classe = classe
+          return classe
         })
         .catch((response) => _this.sendMessage(
           { alert: 'danger', message: 'Não foi possível recuperar classe selecionada...', time: 5 }))
