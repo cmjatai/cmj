@@ -2,6 +2,8 @@
 import logging
 
 from celery_haystack.signals import CelerySignalProcessor
+from django.core import serializers
+from django.db.models.base import Model
 from haystack.constants import DEFAULT_ALIAS
 from haystack.routers import DefaultRouter
 
@@ -56,6 +58,7 @@ class CmjDefaultRouter(DefaultRouter):
         return self.for_rw(**hints)
 
     def for_rw(self, **hints):
+        # logger.debug(hints)
         if not hints:
             return DEFAULT_ALIAS
 
@@ -67,6 +70,14 @@ class CmjDefaultRouter(DefaultRouter):
                 return None
         elif 'index' in hints:
             m = hints['index'].model
+            if m in MODELS_SOLR_CMJARQ:
+                return CMJARQ_ALIAS
+            elif m not in MODELS_SOLR_DEFAULT:
+                return None
+        elif 'models' in hints:
+            m = hints['models']
+            if m and not isinstance(m, Model):
+                m = m[0]
             if m in MODELS_SOLR_CMJARQ:
                 return CMJARQ_ALIAS
             elif m not in MODELS_SOLR_DEFAULT:
