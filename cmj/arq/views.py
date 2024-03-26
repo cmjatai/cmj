@@ -269,8 +269,11 @@ class ArqDocMixin(CheckCheckMixin):
 
     def get_success_url(self):
         return reverse_lazy(
-            'cmj.arq:subarqclasse_list',
-            kwargs={'pk': self.object.classe_estrutural_id})
+            'cmj.arq:arqdoc_detail',
+            kwargs={
+                'classe_id': self.kwargs['classe_id'],
+                'pk': self.object.id
+            })
 
 
 class ArqDocUpdateView(ArqDocMixin, FormMessagesMixin,

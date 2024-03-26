@@ -75,11 +75,16 @@ class TextExtractField(CharField):
                 return ''
 
             # manter limite maximo alinhado ao commando ocrmypdf
-            if arquivo.size > 40 * 1024 * 1024:
-                return ''
+            # if arquivo.size > 40 * 1024 * 1024:
+            #    return ''
 
+            self.logger.debug(
+                f'Extraindo arquivo: {arquivo.name} - tamanho: {(arquivo.size/1024/1024):.5}MB')
             if SOLR_URL:
-                return self.solr_extraction(arquivo)
+                dados_extraidos = self.solr_extraction(arquivo)
+                self.logger.debug(
+                    f'Tamanho dos Dados Extraídos: {(len(dados_extraidos)/1024/1024):.5}MB')
+                return dados_extraidos
         except Exception as err:
             print(str(err))
             self.print_error(arquivo, err)
