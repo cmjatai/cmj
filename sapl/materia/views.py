@@ -2488,7 +2488,7 @@ class MultiFormatOutputMixin:
 
     def render_to_response(self, context, **response_kwargs):
 
-        format_result = getattr(self.request, self.request.scope['method']).get(
+        format_result = getattr(self.request, self.request.method).get(
             'format', None)
 
         if format_result:
@@ -2513,7 +2513,10 @@ class MultiFormatOutputMixin:
         writer = csv.writer(response, delimiter=";",
                             quoting=csv.QUOTE_NONNUMERIC)
 
-        object_list = context['object_list']
+        object_list = context['object_list'].prefetch_related(
+            "autores",
+            "tipo"
+        )
         #.values(*self.fields_report['csv'])
 
         writer.writerow(self._headers('csv'))
