@@ -1,4 +1,5 @@
 
+import csv
 from datetime import datetime, timedelta, date
 import logging
 import os
@@ -2481,10 +2482,117 @@ class AcompanhamentoExcluirView(TemplateView):
         return HttpResponseRedirect(self.get_success_url())
 
 
-class MateriaLegislativaPesquisaView(FilterView):
+class MultiFormatOutputMixin:
+
+    formats_impl = 'csv',
+
+    def render_to_response(self, context, **response_kwargs):
+
+        format_result = getattr(self.request, self.request.scope['method']).get(
+            'format', None)
+
+        if format_result:
+            if format_result not in self.formats_impl:
+                raise ValidationError(
+                    'Formato Inválido e/ou não implementado!')
+
+            object_list = context['object_list']
+            object_list.query.low_mark = 0
+            object_list.query.high_mark = 0
+
+            return getattr(self, f'render_to_{format_result}')(context)
+
+        return super().render_to_response(context, **response_kwargs)
+
+    def render_to_csv(self, context):
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="portalcmj_materias.csv"'
+        response['Cache-Control'] = 'no-cache'
+        response['Pragma'] = 'no-cache'
+        response['Expires'] = 0
+        writer = csv.writer(response, delimiter=";",
+                            quoting=csv.QUOTE_NONNUMERIC)
+
+        object_list = context['object_list']
+        #.values(*self.fields_report['csv'])
+
+        writer.writerow(self._headers('csv'))
+
+        for obj in object_list:
+            writer.writerow(self._write_row(obj, 'csv'))
+
+        return response
+
+    def _write_row(self, obj, format_result):
+
+        for fname in self.fields_report[format_result]:
+
+            if isinstance(obj, dict):
+                yield obj[fname]
+                continue
+
+            if hasattr(self, f'hook_{fname}'):
+                v = getattr(self, f'hook_{fname}')(obj)
+                yield v
+                continue
+
+            fname = fname.split('__')
+
+            v = obj
+            for fp in fname:
+                v = getattr(v, fp)
+
+            if hasattr(v, 'all'):
+                v = ' - '.join(map(lambda x: str(x), v.all()))
+
+            yield v
+
+    def _headers(self, format_result):
+
+        for fname in self.fields_report[format_result]:
+
+            verbose_name = []
+
+            if hasattr(self, f'hook_header_{fname}'):
+                h = getattr(self, f'hook_header_{fname}')()
+                yield h
+                continue
+
+            fname = fname.split('__')
+
+            m = self.model
+            for fp in fname:
+
+                f = m._meta.get_field(fp)
+
+                vn = str(f.verbose_name)
+                if f.is_relation:
+                    m = f.related_model
+
+                    if vn == fp:
+                        vn = str(m._meta.verbose_name_plural)
+                verbose_name.append(vn.strip())
+
+            verbose_name = '/'.join(verbose_name).strip()
+            yield f'{verbose_name}'
+
+
+class MateriaLegislativaPesquisaView(MultiFormatOutputMixin, FilterView):
     model = MateriaLegislativa
     filterset_class = MateriaLegislativaFilterSet
     paginate_by = 50
+
+    fields_report = {
+        'csv': [
+            'id', 'ano', 'numero', 'tipo__sigla', 'tipo__descricao', 'autores', 'texto_original', 'ementa'
+        ]
+    }
+
+    def hook_header_texto_original(self):
+        return _('Link para Arquivo Digital')
+
+    def hook_texto_original(self, obj):
+        return f'{settings.SITE_URL}{obj.texto_original.url}'
 
     def get_filterset_kwargs(self, filterset_class):
         super().get_filterset_kwargs(filterset_class)
@@ -2543,6 +2651,7 @@ class MateriaLegislativaPesquisaView(FilterView):
         return kwargs
 
     def get_context_data(self, **kwargs):
+
         context = super().get_context_data(**kwargs)
 
         classe_mascara = self.request.session.get('classe_mascara', None)
