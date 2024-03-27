@@ -24,6 +24,7 @@ from django.http.response import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.urls.base import reverse
 from django.utils import formats, timezone
+from django.utils.encoding import force_text
 from django.utils.text import slugify
 from django.utils.timezone import get_default_timezone
 from django.utils.translation import ugettext_lazy as _
@@ -31,6 +32,7 @@ from django.views.generic import ListView, TemplateView, CreateView, UpdateView
 from django.views.generic.base import RedirectView
 from django.views.generic.edit import FormView
 from django_filters.views import FilterView
+from openpyxl.workbook.workbook import Workbook
 import weasyprint
 
 from cmj import celery
@@ -2484,7 +2486,7 @@ class AcompanhamentoExcluirView(TemplateView):
 
 class MultiFormatOutputMixin:
 
-    formats_impl = 'csv',
+    formats_impl = 'csv', 'xlsx'
 
     def render_to_response(self, context, **response_kwargs):
 
@@ -2503,6 +2505,30 @@ class MultiFormatOutputMixin:
             return getattr(self, f'render_to_{format_result}')(context)
 
         return super().render_to_response(context, **response_kwargs)
+
+    def render_to_xlsx(self, context):
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="portalcmj_materias.xlsx"'
+        response['Cache-Control'] = 'no-cache'
+        response['Pragma'] = 'no-cache'
+        response['Expires'] = 0
+
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "PortalCMJ - Matérias Legislativas"
+
+        ws.append(self._headers('xlsx'))
+
+        object_list = context['object_list'].prefetch_related(
+            "autores",
+            "tipo"
+        )
+
+        for obj in object_list:
+            ws.append(self._write_row(obj, 'xlsx'))
+        wb.save(response)
+
+        return response
 
     def render_to_csv(self, context):
         response = HttpResponse(content_type='text/csv')
@@ -2588,11 +2614,14 @@ class MateriaLegislativaPesquisaView(MultiFormatOutputMixin, FilterView):
     fields_report = {
         'csv': [
             'id', 'ano', 'numero', 'tipo__sigla', 'tipo__descricao', 'autores', 'texto_original', 'ementa'
+        ],
+        'xlsx': [
+            'id', 'ano', 'numero', 'tipo__sigla', 'tipo__descricao', 'autores', 'texto_original', 'ementa'
         ]
     }
 
     def hook_header_texto_original(self):
-        return _('Link para Arquivo Digital')
+        return force_text(_('Link para Arquivo Digital'))
 
     def hook_texto_original(self, obj):
         return f'{settings.SITE_URL}{obj.texto_original.url}'

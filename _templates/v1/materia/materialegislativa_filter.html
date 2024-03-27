@@ -64,6 +64,12 @@
 {% block table_content %}
 
     {% if show_results %}
+      <div class="container d-flex justify-content-end">
+        <div class="actions btn-group" role="group">
+          <a class="btn btn-outline-info" href="{% url 'sapl.materia:pesquisar_materia' %}?format=xlsx{{ filter_url }}" title="Download do resultado da pesquisa em XLSX."><i class="fas fa-2x fa-file-excel"></i></a>
+          <a class="btn btn-outline-info" href="{% url 'sapl.materia:pesquisar_materia' %}?format=csv{{ filter_url }}" title="Download do resultado da pesquisa em CSV."><i class="fas fa-2x fa-file-csv"></i></a>
+        </div>
+      </div>
         <div class="container-table">
           <div class="result-count">Total de Matérias: <strong>{{paginator.count}}</strong></div>
             {% if paginator.count %}
