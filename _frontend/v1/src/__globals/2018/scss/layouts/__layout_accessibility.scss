@@ -1,51 +1,103 @@
 .header-accessibility {
   background: darken($color_primary,15) $url_bg_png;
   position: relative;
-  .links-to-content {
+  .container {
     position: relative;
     display: flex;
+    justify-content: space-between;
+  }
+  .links-to-content, .links-accessibility {
+    position: relative;
+    display: flex;
+  }
+  span {
+    color:white;
+    padding: 0 0.3rem;
+    line-height: 1;
+  }
+  .btn {
+    //color: #ca7d18;
+    color: white;
+    font-size: 85%;
+    padding: 0.4rem 0.3rem;
+    .badge {
+      margin-left: 3px;
+      opacity: 0.7;
+      padding: 0.1rem 0.2rem;
+    }
+    &:hover {
+      box-shadow: 0 0 0 0;
+    }
+  }
+  .group-font {
+    display: flex;
+    gap: 0.3rem;
+    align-items: center;
+    .btn {
+      line-height: 1rem;
+      text-decoration: none;
+      margin: 0;
+      padding: 0.2rem 0.3rem;
+      //margin: 0.2rem 0;
+      //padding: 0rem 0.2rem;
+      background-color: #fff3;
+    }
+  }
+}
 
+@media screen and (max-width: 1199.98px) {
+  .header-accessibility {
+    font-size: 90%;
     span {
-      color:white;
-      padding: 0 0.2rem;
-      line-height: 1;
+      padding: 0 0.1rem;
     }
     .btn {
-      color: rgb(202, 125, 24);
-      font-size: 70%;
-      color: white;
-      padding: 0.1rem 0.3rem;
-      .badge {
-        margin-left: 3px;
-        opacity: 0.7;
-        padding: 0.1rem 0.2rem;
-      }
-      &:hover {
-        box-shadow: 0 0 0 0;
-      }
+      //font-size: 85%;
+      padding: 0.4rem 0.2rem;
+    }
+  }
+}
+
+@media screen and (max-width: 991.98px) {
+  .header-accessibility {
+    .container {
+      justify-content: end;
+    }
+    .links-to-content {
+      display: none;
+    }
+    .btn {
+      //font-size: 85%;
+      padding: 0.3rem 0.4rem;
     }
     .group-font {
-      display: flex;
-      gap: 0.3rem;
-      align-items: center;
       .btn {
-        line-height: 1rem;
-        text-decoration: none;
-        margin: 0;
-        padding: 0 0.2rem;
-        //margin: 0.2rem 0;
-        //padding: 0rem 0.2rem;
-        background-color: #fff3;
+        padding: 0rem 0.3rem;
       }
     }
   }
 }
 
-@media screen and (max-width: 991px) {
+@media screen and (max-width: 599.98px) {
   .header-accessibility {
-    .links-to-content {
-      overflow: hidden;
-      height: 0px;
+    font-size: 85%;
+    span {
+      padding: 0 0.1rem;
     }
+    .btn {
+      //font-size: 85%;
+      padding: 0.2rem 0.1rem;
+    }
+    .group-font {
+      .btn {
+        padding: 0rem 0.2rem;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .header-accessibility {
+    display: none;
   }
 }

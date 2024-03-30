@@ -6,18 +6,22 @@
 {% block sections_nav %} {% endblock %}
 
 {% block actions %}
-  <div class="actions btn-group" role="group">
-    {% if show_results %}
+  {% if show_results %}
+    <div class="actions btn-group" role="group">
       <a href="{% url 'sapl.protocoloadm:documentoadministrativo_list' %}" class="btn btn-outline-primary">{% trans 'Fazer nova pesquisa' %}</a>
-    {% endif %}
-  </div>
-  <div class="actions btn-group btn-group-lg" role="group">
-    {% if perms.protocoloadm.add_documentoadministrativo %}
+    </div>
+    {% with 'sapl.protocoloadm:documentoadministrativo_list' as url_reverse %}
+      {% include "crud/format_options.html" %}
+    {% endwith %}
+  {% endif %}
+
+  {% if perms.protocoloadm.add_documentoadministrativo %}
+    <div class="actions btn-group btn-group-lg" role="group">
       <a href="{% url 'sapl.protocoloadm:documentoadministrativo_create' %}" class="btn btn-outline-primary">
         {% blocktrans with verbose_name=view.verbose_name %}Adicionar Documento Administrativo {% endblocktrans %}
       </a>
-    {% endif %}
-  </div>
+    </div>
+  {% endif %}
 {% endblock actions %}
 
 {% block detail_content %}

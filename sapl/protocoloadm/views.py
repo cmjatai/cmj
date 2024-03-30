@@ -25,6 +25,7 @@ from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.urls.base import reverse
 from django.utils import timezone, formats
+from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import ListView, CreateView, UpdateView
 from django.views.generic.base import RedirectView, TemplateView, ContextMixin
@@ -33,7 +34,7 @@ from django.views.generic.edit import FormView
 from django_filters.views import FilterView
 
 from cmj.core.models import AreaTrabalho
-from cmj.mixins import BtnCertMixin, PluginSignMixin
+from cmj.mixins import BtnCertMixin, PluginSignMixin, MultiFormatOutputMixin
 from sapl.base.email_utils import do_envia_email_confirmacao
 from sapl.base.models import Autor, CasaLegislativa, AppConfig
 from sapl.base.signals import tramitacao_signal
@@ -438,10 +439,38 @@ class DocumentoAdministrativoCrud(Crud):
 
                 return response
 
-    class ListView(QuerySetContainerPrivPubMixin, FilterView):
+    class ListView(MultiFormatOutputMixin, QuerySetContainerPrivPubMixin, FilterView):
         filterset_class = DocumentoAdministrativoFilterSet
         paginate_by = 30
         permission_required = ('protocoloadm.list_documentoadministrativo',)
+
+        fields_base_report = [
+            'id', 'ano', 'numero', 'tipo__sigla', 'tipo__descricao', 'texto_integral', 'epigrafe', 'assunto'
+        ]
+        fields_report = {
+            'csv': fields_base_report,
+            'xlsx': fields_base_report,
+            'json': fields_base_report,
+        }
+
+        def hook_assunto(self, obj):
+            if isinstance(obj, dict):
+                a = obj['assunto'].replace('<br>', '\n').replace(
+                    '\r\n', '\n').replace('\n\n', '\n')
+                return a
+
+            a = obj.assunto.replace('<br>', '\n').replace(
+                '\r\n', '\n').replace('\n\n', '\n')
+            return a
+
+        def hook_header_texto_integral(self):
+            return force_text(_('Link para o Processo/Documento'))
+
+        def hook_texto_integral(self, obj):
+            if isinstance(obj, dict):
+                return f'{settings.SITE_URL}/doc/{obj["id"]}'
+
+            return f'{settings.SITE_URL}{obj.texto_integral.url}'
 
         @classmethod
         def get_url_regex(cls):

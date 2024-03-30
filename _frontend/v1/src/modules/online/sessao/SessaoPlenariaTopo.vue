@@ -41,18 +41,18 @@ export default {
       let sessao = this.sessao
       let tipo = this.tipo
       let data_inicio = this.data_inicio
-      return `${sessao.numero}ª ${tipo.nome} da 
-              ${data_inicio.getDate() > 15 ? 2 : 1}ª Quizena do Mês de 
-              ${this.month_text(data_inicio.getMonth())} de 
+      return `${sessao.numero}ª ${tipo.nome} da
+              ${data_inicio.getDate() > 15 ? 2 : 1}ª Quinzena do Mês de
+              ${this.month_text(data_inicio.getMonth())} de
               ${data_inicio.getFullYear()}
               `
     },
     subtitulo: function () {
-      return `${this.sessao_legislativa.numero}ª Sessão Legislativa da 
+      return `${this.sessao_legislativa.numero}ª Sessão Legislativa da
               ${this.legislatura.numero}ª Legislatura`
     },
     date_text: function () {
-      return `${this.data_inicio.getDate()} de 
+      return `${this.data_inicio.getDate()} de
               ${this.month_text(this.data_inicio.getMonth())} de
               ${this.data_inicio.getFullYear()} – ${this.sessao.hora_inicio}`
     }

@@ -14,6 +14,7 @@ from django.urls.base import reverse
 from django.utils import timezone, formats
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import method_decorator
+from django.utils.encoding import force_text
 from django.utils.html import strip_tags
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
@@ -23,7 +24,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormMixin
 from django_filters.views import FilterView
 
-from cmj.mixins import BtnCertMixin, PluginSignMixin
+from cmj.mixins import BtnCertMixin, PluginSignMixin, MultiFormatOutputMixin
 from sapl.base.models import AppConfig as AppsAppConfig
 from sapl.crud.base import (RP_DETAIL, RP_LIST, Crud, CrudAux,
                             MasterDetailCrud,
@@ -3896,7 +3897,7 @@ class PautaSessaoDetailView(DetailView):
         return self.render_to_response(context)
 
 
-class PesquisarSessaoPlenariaView(FilterView):
+class PesquisarSessaoPlenariaView(MultiFormatOutputMixin, FilterView):
     model = SessaoPlenaria
     filterset_class = SessaoPlenariaFilterSet
     paginate_by = 12
@@ -3904,6 +3905,29 @@ class PesquisarSessaoPlenariaView(FilterView):
     logger = logging.getLogger(__name__)
 
     viewname = 'sapl.sessao:pesquisar_sessao'
+
+    queryset_values_for_formats = False
+
+    fields_base_report = [
+        'id', 'data_inicio', 'hora_inicio', 'data_fim', 'hora_fim', '',
+    ]
+    fields_report = {
+        'csv': fields_base_report,
+        'xlsx': fields_base_report,
+        'json': fields_base_report,
+    }
+
+    def hook_header_(self):
+        return force_text(_('Título'))
+
+    def hook_(self, obj):
+        return str(obj)
+
+    def hook_data_inicio(self, obj):
+        return str(obj.data_inicio or '')
+
+    def hook_data_fim(self, obj):
+        return str(obj.data_fim or '')
 
     def get_queryset(self):
         qs = FilterView.get_queryset(self)

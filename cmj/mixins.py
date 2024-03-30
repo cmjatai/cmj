@@ -1,3 +1,7 @@
+
+import csv
+import io
+
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Div, Fieldset
 from django.conf import settings
@@ -5,11 +9,13 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.db import models
 from django.db.models.deletion import PROTECT
+from django.http.response import HttpResponse, JsonResponse
 from django.urls.base import reverse
 from django.utils.translation import ugettext_lazy as _
 from model_utils.choices import Choices
 from pdfminer.high_level import extract_text
 from pdfrw.pdfreader import PdfReader
+from xlsxwriter.workbook import Workbook as XlsxWorkbook
 
 from cmj.utils import run_sql, get_settings_auth_user_model, ProcessoExterno
 from sapl.crispy_layout_mixin import to_row, SaplFormLayout, \
@@ -409,3 +415,217 @@ class GoogleRecapthaMixin:
                 _('Ocorreu um erro na validação do reCAPTCHA.'))
 
         return cd
+
+
+class MultiFormatOutputMixin:
+
+    formats_impl = 'csv', 'xlsx', 'json'
+
+    queryset_values_for_formats = True
+
+    def render_to_response(self, context, **response_kwargs):
+
+        format_result = getattr(self.request, self.request.method).get(
+            'format', None)
+
+        if format_result:
+            if format_result not in self.formats_impl:
+                raise ValidationError(
+                    'Formato Inválido e/ou não implementado!')
+
+            object_list = context['object_list']
+            object_list.query.low_mark = 0
+            object_list.query.high_mark = 0
+
+            return getattr(self, f'render_to_{format_result}')(context)
+
+        return super().render_to_response(context, **response_kwargs)
+
+    def render_to_json(self, context):
+
+        object_list = context['object_list']
+
+        if self.queryset_values_for_formats:
+            object_list = object_list.values(
+                *self.fields_report['json'])
+
+        data = []
+        for obj in object_list:
+            wr = list(self._write_row(obj, 'json'))
+
+            if not data:
+                data.append([wr])
+                continue
+
+            if wr[0] != data[-1][0][0]:
+                data.append([wr])
+            else:
+                data[-1].append(wr)
+
+        for mri, multirows in enumerate(data):
+            if len(multirows) == 1:
+                v = multirows[0]
+            else:
+                v = multirows[0]
+                for ri, cols in enumerate(multirows[1:]):
+                    for rc, cell in enumerate(cols):
+                        if v[rc] != cell:
+                            v[rc] = f'{v[rc]}\r\n{cell}'
+
+            data[mri] = dict(
+                map(lambda i, j: (i, j), self.fields_report['json'], v))
+
+        json_metadata = {
+            'headers': dict(
+                map(lambda i, j: (i, j), self.fields_report['json'], self._headers('json'))),
+            'results': data
+        }
+        response = JsonResponse(json_metadata)
+        response['Content-Disposition'] = f'attachment; filename="portalcmj_{self.request.resolver_match.url_name}.json"'
+        response['Cache-Control'] = 'no-cache'
+        response['Pragma'] = 'no-cache'
+        response['Expires'] = 0
+
+        return response
+
+    def render_to_csv(self, context):
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="portalcmj_{self.request.resolver_match.url_name}.csv"'
+        response['Cache-Control'] = 'no-cache'
+        response['Pragma'] = 'no-cache'
+        response['Expires'] = 0
+        writer = csv.writer(response, delimiter=";",
+                            quoting=csv.QUOTE_NONNUMERIC)
+
+        object_list = context['object_list']
+
+        if self.queryset_values_for_formats:
+            object_list = object_list.values(
+                *self.fields_report['csv'])
+
+        data = [[list(self._headers('csv'))], ]
+        for obj in object_list:
+            wr = list(self._write_row(obj, 'csv'))
+            if wr[0] != data[-1][0][0]:
+                data.append([wr])
+            else:
+                data[-1].append(wr)
+
+        for mri, multirows in enumerate(data):
+            if len(multirows) == 1:
+                writer.writerow(multirows[0])
+            else:
+                v = multirows[0]
+                for ri, cols in enumerate(multirows[1:]):
+                    for rc, cell in enumerate(cols):
+                        if v[rc] != cell:
+                            v[rc] = f'{v[rc]}\r\n{cell}'
+
+                writer.writerow(v)
+
+        return response
+
+    def render_to_xlsx(self, context):
+
+        object_list = context['object_list']
+
+        if self.queryset_values_for_formats:
+            object_list = object_list.values(
+                *self.fields_report['xlsx'])
+
+        data = [[list(self._headers('xlsx'))], ]
+        for obj in object_list:
+            wr = list(self._write_row(obj, 'xlsx'))
+            if wr[0] != data[-1][0][0]:
+                data.append([wr])
+            else:
+                data[-1].append(wr)
+
+        output = io.BytesIO()
+        wb = XlsxWorkbook(output, {'in_memory': True})
+
+        ws = wb.add_worksheet()
+
+        for mri, multirows in enumerate(data):
+            if len(multirows) == 1:
+                for rc, cell in enumerate(multirows[0]):
+                    ws.write(mri, rc, cell)
+            else:
+                v = multirows[0]
+                for ri, cols in enumerate(multirows[1:]):
+                    for rc, cell in enumerate(cols):
+                        if v[rc] != cell:
+                            v[rc] = f'{v[rc]}\r\n{cell}'
+
+                for rc, cell in enumerate(v):
+                    ws.write(mri, rc, cell)
+        ws.autofit()
+        wb.close()
+
+        output.seek(0)
+
+        response = HttpResponse(output.read(
+        ), content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        response['Content-Disposition'] = f'attachment; filename="portalcmj_{self.request.resolver_match.url_name}.xlsx"'
+        response['Cache-Control'] = 'no-cache'
+        response['Pragma'] = 'no-cache'
+        response['Expires'] = 0
+
+        output.close()
+
+        return response
+
+    def _write_row(self, obj, format_result):
+
+        for fname in self.fields_report[format_result]:
+
+            if hasattr(self, f'hook_{fname}'):
+                v = getattr(self, f'hook_{fname}')(obj)
+                yield v
+                continue
+
+            if isinstance(obj, dict):
+                yield obj[fname]
+                continue
+
+            fname = fname.split('__')
+
+            v = obj
+            for fp in fname:
+                v = getattr(v, fp)
+
+            if hasattr(v, 'all'):
+                v = ' - '.join(map(lambda x: str(x), v.all()))
+
+            yield v
+
+    def _headers(self, format_result):
+
+        for fname in self.fields_report[format_result]:
+
+            verbose_name = []
+
+            if hasattr(self, f'hook_header_{fname}'):
+                h = getattr(self, f'hook_header_{fname}')()
+                yield h
+                continue
+
+            fname = fname.split('__')
+
+            m = self.model
+            for fp in fname:
+
+                f = m._meta.get_field(fp)
+
+                vn = str(f.verbose_name) if hasattr(f, 'verbose_name') else fp
+                if f.is_relation:
+                    m = f.related_model
+                    if m == self.model:
+                        m = f.field.model
+
+                    if vn == fp:
+                        vn = str(m._meta.verbose_name_plural)
+                verbose_name.append(vn.strip())
+
+            verbose_name = '/'.join(verbose_name).strip()
+            yield f'{verbose_name}'

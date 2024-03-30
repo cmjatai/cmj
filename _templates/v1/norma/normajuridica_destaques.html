@@ -2,12 +2,19 @@
 {% load i18n %}
 
 {% block container_actions %}
+<div class="p-3">
+  {% with 'sapl.norma:norma_de_destaque' as url_reverse %}
+    {% include "crud/format_options.html" %}
+  {% endwith %}
+</div>
+
 {% endblock container_actions %}
 
 {% block detail_content %}
 {% endblock detail_content %}
 
 {% block table_content %}
+
   <div class="container-table mt-0">
       <table class="table table-striped">
         {% for n in page_obj %}

@@ -17,7 +17,7 @@ from django.views.generic import TemplateView, UpdateView, ListView
 from django.views.generic.edit import FormView
 from django_filters.views import FilterView
 
-from cmj.mixins import BtnCertMixin
+from cmj.mixins import BtnCertMixin, MultiFormatOutputMixin
 from sapl import settings
 import sapl
 from sapl.base.models import AppConfig
@@ -73,10 +73,29 @@ class NormaRelacionadaCrud(MasterDetailCrud):
         layout_key = 'NormaRelacionadaDetail'
 
 
-class NormaDestaquesView(ListView):
+class NormaDestaquesView(MultiFormatOutputMixin, ListView):
     model = NormaJuridica
     template_name = 'norma/normajuridica_destaques.html'
     paginate_by = 1000
+
+    fields_base_report = [
+        'id', 'ano', 'numero', 'tipo__sigla', 'tipo__descricao', 'texto_integral', 'apelido', 'ementa',
+    ]
+    fields_report = {
+        'csv': fields_base_report,
+        'xlsx': fields_base_report,
+        'json': fields_base_report,
+    }
+
+    def hook_header_apelido(self):
+        return force_text(_('Título'))
+
+    def hook_header_texto_integral(self):
+        return force_text(_('Link para Norma'))
+
+    def hook_texto_integral(self, obj):
+        id = obj["id"] if isinstance(obj, dict) else obj.id
+        return f'{settings.SITE_URL}/norma/{id}'
 
     def get_queryset(self):
         return NormaJuridica.objects.filter(norma_de_destaque=True).order_by('tipo__relevancia', '-data')
@@ -86,10 +105,26 @@ class NormaDestaquesView(ListView):
         return 'Normas e Códigos de Destaque'
 
 
-class NormaPesquisaView(FilterView):
+class NormaPesquisaView(MultiFormatOutputMixin, FilterView):
     model = NormaJuridica
     filterset_class = NormaFilterSet
     paginate_by = 50
+
+    fields_base_report = [
+        'id', 'ano', 'numero', 'tipo__sigla', 'tipo__descricao', 'texto_integral', 'ementa'
+    ]
+    fields_report = {
+        'csv': fields_base_report,
+        'xlsx': fields_base_report,
+        'json': fields_base_report,
+    }
+
+    def hook_header_texto_integral(self):
+        return force_text(_('Link para Norma'))
+
+    def hook_texto_integral(self, obj):
+        id = obj["id"] if isinstance(obj, dict) else obj.id
+        return f'{settings.SITE_URL}/norma/{id}'
 
     def get_queryset(self):
         qs = super().get_queryset()

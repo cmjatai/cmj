@@ -20,6 +20,14 @@
     </button >
   {% endblock more_buttons %}
   </div>
+
+  {% if show_results %}
+    {% with 'sapl.sessao:pesquisar_sessao' as url_reverse %}
+      {% include "crud/format_options.html" %}
+    {% endwith %}
+  {% endif %}
+
+
   <div class="actions btn-group btn-group-lg" role="group">
     {% if perms.sessao %}
       <a href="{% url 'sapl.sessao:sessaoplenaria_create' %}" class="btn btn-outline-primary">

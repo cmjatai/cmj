@@ -499,8 +499,11 @@ class OcorrenciaSessao(models.Model):  # OcorrenciaSessaoPlenaria
 
 
 class IntegranteMesa(models.Model):  # MesaSessaoPlenaria
-    sessao_plenaria = models.ForeignKey(SessaoPlenaria,
-                                        on_delete=models.CASCADE)
+    sessao_plenaria = models.ForeignKey(
+        SessaoPlenaria,
+        related_name='integrantemesa',
+        on_delete=models.CASCADE
+    )
     cargo = models.ForeignKey(CargoMesa, on_delete=models.PROTECT)
     parlamentar = models.ForeignKey(Parlamentar, on_delete=models.PROTECT)
 

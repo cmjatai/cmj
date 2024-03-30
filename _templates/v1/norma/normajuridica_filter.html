@@ -3,11 +3,16 @@
 {% load crispy_forms_tags common_cmj_tags %}
 
 {% block actions %}
-  <div class="actions btn-group" role="group">
-    {% if show_results %}
-        <a href="{% url 'sapl.norma:norma_pesquisa' %}" class="btn btn-outline-primary">{% trans 'Fazer nova pesquisa' %}</a>
-    {% endif %}
-  </div>
+
+  {% if show_results %}
+    <div class="actions btn-group" role="group">
+      <a href="{% url 'sapl.norma:norma_pesquisa' %}" class="btn btn-outline-primary">{% trans 'Fazer nova pesquisa' %}</a>
+    </div>
+    {% with 'sapl.norma:norma_pesquisa' as url_reverse %}
+      {% include "crud/format_options.html" %}
+    {% endwith %}
+  {% endif %}
+
   {% if False and not show_results %}
     <div class="actions btn-group-sm" role="group">
       <a href="{% url 'sapl.norma:norma_de_destaque' %}" class="btn btn-outline-primary">
@@ -16,13 +21,14 @@
     </div>
   {% endif %}
 
-  <div class="actions btn-group-lg" role="group">
-    {% if perms.norma.add_normajuridica %}
+  {% if perms.norma.add_normajuridica %}
+    <div class="actions btn-group-lg" role="group">
       <a href="{% url 'sapl.norma:normajuridica_create' %}" class="btn btn-outline-primary">
         {% blocktrans with verbose_name=view.verbose_name %} Adicionar Norma Jurídica {% endblocktrans %}
       </a>
-    {% endif %}
-  </div>
+    </div>
+  {% endif %}
+
 {% endblock %}
 
 
@@ -38,7 +44,9 @@
 {% block table_content %}
 
   {% if show_results %}
+
     {% if page_obj|length %}
+
       <div class="container-table">
       <div class="result-count">Total de Normas: <strong>{{paginator.count}}</strong></div>
       <table class="table table-striped table-hover table-link-ordering">

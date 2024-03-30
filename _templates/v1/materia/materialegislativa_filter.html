@@ -22,20 +22,24 @@
 {% endblock second_header %}
 
 
-  {% block actions %}
+{% block actions %}
+  {% if show_results %}
     <div class="actions btn-group" role="group">
-      {% if show_results %}
-          <a href="{% url 'sapl.materia:pesquisar_materia' %}" class="btn btn-outline-primary">{% trans 'Fazer nova pesquisa' %}</a>
-      {% endif %}
+      <a href="{% url 'sapl.materia:pesquisar_materia' %}" class="btn btn-outline-primary">{% trans 'Fazer nova pesquisa' %}</a>
     </div>
+    {% with 'sapl.materia:pesquisar_materia' as url_reverse %}
+      {% include "crud/format_options.html" %}
+    {% endwith %}
+  {% endif %}
+
+  {% if perms.materia.add_materialegislativa %}
     <div class="actions btn-group btn-group-lg" role="group">
-      {% if perms.materia.add_materialegislativa %}
       <a href="{% url 'sapl.materia:materialegislativa_create' %}" class="btn btn-outline-primary">
           {% blocktrans with verbose_name=view.verbose_name %}Adicionar Matéria Legislativa{% endblocktrans %}
       </a>
-      {% endif %}
     </div>
-  {% endblock %}
+  {% endif %}
+{% endblock %}
 
 {% block detail_content %}
   {% if not show_results %}
@@ -64,12 +68,6 @@
 {% block table_content %}
 
     {% if show_results %}
-      <div class="container d-flex justify-content-end">
-        <div class="actions btn-group" role="group">
-          <a class="btn btn-outline-info" href="{% url 'sapl.materia:pesquisar_materia' %}?format=xlsx{{ filter_url }}" title="Download do resultado da pesquisa em XLSX."><i class="fas fa-2x fa-file-excel"></i></a>
-          <a class="btn btn-outline-info" href="{% url 'sapl.materia:pesquisar_materia' %}?format=csv{{ filter_url }}" title="Download do resultado da pesquisa em CSV."><i class="fas fa-2x fa-file-csv"></i></a>
-        </div>
-      </div>
         <div class="container-table">
           <div class="result-count">Total de Matérias: <strong>{{paginator.count}}</strong></div>
             {% if paginator.count %}

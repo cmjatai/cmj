@@ -1,6 +1,7 @@
 
 import csv
 from datetime import datetime, timedelta, date
+import io
 import logging
 import os
 from random import choice
@@ -32,13 +33,12 @@ from django.views.generic import ListView, TemplateView, CreateView, UpdateView
 from django.views.generic.base import RedirectView
 from django.views.generic.edit import FormView
 from django_filters.views import FilterView
-from openpyxl.workbook.workbook import Workbook
 import weasyprint
 
 from cmj import celery
 from cmj.core.models import AreaTrabalho
 from cmj.globalrules import GROUP_MATERIA_WORKSPACE_VIEWER
-from cmj.mixins import BtnCertMixin, CheckCheckMixin
+from cmj.mixins import BtnCertMixin, CheckCheckMixin, MultiFormatOutputMixin
 import requests as rq
 import sapl
 from sapl.base.email_utils import do_envia_email_confirmacao
@@ -2484,147 +2484,26 @@ class AcompanhamentoExcluirView(TemplateView):
         return HttpResponseRedirect(self.get_success_url())
 
 
-class MultiFormatOutputMixin:
-
-    formats_impl = 'csv', 'xlsx'
-
-    def render_to_response(self, context, **response_kwargs):
-
-        format_result = getattr(self.request, self.request.method).get(
-            'format', None)
-
-        if format_result:
-            if format_result not in self.formats_impl:
-                raise ValidationError(
-                    'Formato Inválido e/ou não implementado!')
-
-            object_list = context['object_list']
-            object_list.query.low_mark = 0
-            object_list.query.high_mark = 0
-
-            return getattr(self, f'render_to_{format_result}')(context)
-
-        return super().render_to_response(context, **response_kwargs)
-
-    def render_to_xlsx(self, context):
-        response = HttpResponse(content_type='application/ms-excel')
-        response['Content-Disposition'] = 'attachment; filename="portalcmj_materias.xlsx"'
-        response['Cache-Control'] = 'no-cache'
-        response['Pragma'] = 'no-cache'
-        response['Expires'] = 0
-
-        wb = Workbook()
-        ws = wb.active
-        ws.title = "PortalCMJ - Matérias Legislativas"
-
-        ws.append(self._headers('xlsx'))
-
-        object_list = context['object_list'].prefetch_related(
-            "autores",
-            "tipo"
-        )
-
-        for obj in object_list:
-            ws.append(self._write_row(obj, 'xlsx'))
-        wb.save(response)
-
-        return response
-
-    def render_to_csv(self, context):
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="portalcmj_materias.csv"'
-        response['Cache-Control'] = 'no-cache'
-        response['Pragma'] = 'no-cache'
-        response['Expires'] = 0
-        writer = csv.writer(response, delimiter=";",
-                            quoting=csv.QUOTE_NONNUMERIC)
-
-        object_list = context['object_list'].prefetch_related(
-            "autores",
-            "tipo"
-        )
-        #.values(*self.fields_report['csv'])
-
-        writer.writerow(self._headers('csv'))
-
-        for obj in object_list:
-            writer.writerow(self._write_row(obj, 'csv'))
-
-        return response
-
-    def _write_row(self, obj, format_result):
-
-        for fname in self.fields_report[format_result]:
-
-            if isinstance(obj, dict):
-                yield obj[fname]
-                continue
-
-            if hasattr(self, f'hook_{fname}'):
-                v = getattr(self, f'hook_{fname}')(obj)
-                yield v
-                continue
-
-            fname = fname.split('__')
-
-            v = obj
-            for fp in fname:
-                v = getattr(v, fp)
-
-            if hasattr(v, 'all'):
-                v = ' - '.join(map(lambda x: str(x), v.all()))
-
-            yield v
-
-    def _headers(self, format_result):
-
-        for fname in self.fields_report[format_result]:
-
-            verbose_name = []
-
-            if hasattr(self, f'hook_header_{fname}'):
-                h = getattr(self, f'hook_header_{fname}')()
-                yield h
-                continue
-
-            fname = fname.split('__')
-
-            m = self.model
-            for fp in fname:
-
-                f = m._meta.get_field(fp)
-
-                vn = str(f.verbose_name)
-                if f.is_relation:
-                    m = f.related_model
-
-                    if vn == fp:
-                        vn = str(m._meta.verbose_name_plural)
-                verbose_name.append(vn.strip())
-
-            verbose_name = '/'.join(verbose_name).strip()
-            yield f'{verbose_name}'
-
-
 class MateriaLegislativaPesquisaView(MultiFormatOutputMixin, FilterView):
     model = MateriaLegislativa
     filterset_class = MateriaLegislativaFilterSet
     paginate_by = 50
 
+    fields_base_report = [
+        'id', 'ano', 'numero', 'tipo__sigla', 'tipo__descricao', 'autoria__autor__nome', 'texto_original', 'ementa'
+    ]
     fields_report = {
-        'csv': [
-            'id', 'ano', 'numero', 'tipo__sigla', 'tipo__descricao', 'autores', 'texto_original', 'ementa'
-        ],
-        'xlsx': [
-            'id', 'ano', 'numero', 'tipo__sigla', 'tipo__descricao', 'autores', 'texto_original', 'ementa'
-        ]
+        'csv': fields_base_report,
+        'xlsx': fields_base_report,
+        'json': fields_base_report,
     }
 
     def hook_header_texto_original(self):
-        return force_text(_('Link para Arquivo Digital'))
+        return force_text(_('Link para Matéria Legislativa'))
 
     def hook_texto_original(self, obj):
-        return f'{settings.SITE_URL}{obj.texto_original.url}'
+        id = obj["id"] if isinstance(obj, dict) else obj.id
+        return f'{settings.SITE_URL}/materia/{id}'
 
     def get_filterset_kwargs(self, filterset_class):
         super().get_filterset_kwargs(filterset_class)
