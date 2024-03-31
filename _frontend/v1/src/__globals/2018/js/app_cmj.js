@@ -786,6 +786,52 @@ window.TrechoSearch = function (opts) {
 }
 
 window.Acessibilidade = function () {
+  let VLibras = {
+    storage: 'vlibras',
+    currentState: null,
+    check: checkVLibras,
+    getState: getVLibrasState,
+    setState: setVLibrasState,
+    toogle: toogleVLibras,
+    updateView: updateViewVLibras
+  }
+
+  window.toogleVLibras = function () {
+    VLibras.toogle()
+  }
+
+  function checkVLibras () {
+    this.updateView()
+  }
+
+  function getVLibrasState () {
+    return localStorage.getItem(this.storage) === 'true'
+  }
+
+  function setVLibrasState (state) {
+    localStorage.setItem(this.storage, '' + state)
+    this.currentState = state
+    this.updateView()
+  }
+
+  function updateViewVLibras () {
+    let vw = document.querySelector('[vw]')
+    if (this.currentState === null) {
+      this.currentState = this.getState()
+    }
+    if (this.currentState) {
+      vw.classList.remove('disabled')
+      vw.classList.add('enabled')
+    } else {
+      vw.classList.remove('enabled')
+      vw.classList.add('disabled')
+    }
+  }
+
+  function toogleVLibras () {
+    this.setState(!this.currentState)
+  }
+
   let Contrast = {
     storage: 'contrastState',
     cssClass: 'contrast',
@@ -797,7 +843,7 @@ window.Acessibilidade = function () {
     updateView: updateViewContrast
   }
 
-  window.toggleContrast = function () {
+  window.toogleContrast = function () {
     Contrast.toogle()
   }
 
@@ -912,10 +958,10 @@ window.Acessibilidade = function () {
             window.location = '#'
             break
           case 55: // 7
-            window.location = '#'
+            window.toogleVLibras()
             break
           case 56: // 8
-            window.location = '#'
+            window.toogleContrast()
             break
           case 57: // 9
             window.location = '/informacao/sic-fisico'
@@ -938,7 +984,8 @@ window.Acessibilidade = function () {
     }
   }
 
-  FontSizeZoom.check()
+  VLibras.check()
   Contrast.check()
+  FontSizeZoom.check()
   KeysAcessibilidade.load()
 }

@@ -47,7 +47,7 @@
                 <ul class="navbar-nav" id="menu_content">
 
                   {% if user.is_superuser %}
-                    {% navbar 'navbar/navbar_superuser.yaml' %} 
+                    {% navbar 'navbar/navbar_superuser.yaml' %}
                   {% elif perms.materia.add_proposicao %}
                     {% navbar 'navbar/navbar_autor.yaml' %}
                   {% elif areatrabalho%}
@@ -190,18 +190,6 @@
   <script>
     $(function () {
       new window.VLibras.Widget('https://vlibras.gov.br/app');
-      document.querySelector('#btn_libras').onclick = function(e) {
-        let vw = document.querySelector('[vw]')
-
-        if (vw.classList.contains('disabled')) {
-          vw.classList.remove('disabled')
-          vw.classList.add('enabled')
-        }
-        else {
-          vw.classList.remove('enabled')
-          vw.classList.add('disabled')
-        }
-      }
     })
   </script>
 

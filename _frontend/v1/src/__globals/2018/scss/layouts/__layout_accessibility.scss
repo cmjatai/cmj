@@ -9,6 +9,10 @@
   .links-to-content, .links-accessibility {
     position: relative;
     display: flex;
+    align-items: center;
+  }
+  .btn-dropdown-accessibility {
+    display: none;
   }
   span {
     color:white;
@@ -16,10 +20,12 @@
     line-height: 1;
   }
   .btn {
-    //color: #ca7d18;
     color: white;
     font-size: 85%;
     padding: 0.4rem 0.3rem;
+  }
+  .btn-link {
+    //color: #ca7d18;
     .badge {
       margin-left: 3px;
       opacity: 0.7;
@@ -29,11 +35,18 @@
       box-shadow: 0 0 0 0;
     }
   }
+  .d-max-480 {
+    display: none;
+  }
   .group-font {
     display: flex;
     gap: 0.3rem;
     align-items: center;
-    .btn {
+    span {
+      padding: 0.2rem 0.3rem;
+      font-size: 85%;
+    }
+    .btn-link {
       line-height: 1rem;
       text-decoration: none;
       margin: 0;
@@ -51,7 +64,7 @@
     span {
       padding: 0 0.1rem;
     }
-    .btn {
+    .btn-link {
       //font-size: 85%;
       padding: 0.4rem 0.2rem;
     }
@@ -61,43 +74,87 @@
 @media screen and (max-width: 991.98px) {
   .header-accessibility {
     .container {
-      justify-content: end;
+      flex-direction: column;
     }
     .links-to-content {
       display: none;
     }
-    .btn {
+    .links-accessibility {
+      align-self: flex-end;
+    }
+    .btn-link {
       //font-size: 85%;
       padding: 0.3rem 0.4rem;
+      //flex: 0 1 30%;
+      //flex-wrap: nowrap;
     }
     .group-font {
-      .btn {
+      .btn-link {
         padding: 0rem 0.3rem;
       }
     }
   }
 }
 
-@media screen and (max-width: 599.98px) {
+@media screen and (max-width: 767.98px) {
   .header-accessibility {
-    font-size: 85%;
+    font-size: 15pt;
     span {
       padding: 0 0.1rem;
     }
-    .btn {
+    .btn-link {
       //font-size: 85%;
       padding: 0.2rem 0.1rem;
     }
     .group-font {
-      .btn {
-        padding: 0rem 0.2rem;
+      .btn-link {
+        padding: 0.2rem 0.2rem 0;
+        line-height: 1;
       }
     }
-  }
-}
+    .d-max-480 {
+      display: inline-block;
+    }
+    .d-min-480 {
+      display: none;
+    }
+    .dropdown-accessibility {
+      //min-height: 1rem;
+    }
+    .btn-dropdown-accessibility {
+      display: inline-block;
+      align-self: flex-end;
+      pointer-events: none;
+      color: #fffc;
+      //background-color: #9acd3255;
+      padding: 0 0.5rem 0rem;
+      border-radius: 0 0 1rem 1rem;
+    }
+    .links-accessibility {
+      display: none;
+      flex-direction: column;
+      align-self: center;
+      min-width: 60%;
+      padding-top: 0rem;
+      span {
+        display: none;
+      }
+      & > a, & > div {
+        &:not(:first-child) {
+          border-top: 1px solid #fff3;
+        }
+        text-align: left;
+        width: 100%;
+        padding-left: 1rem;
+      }
 
-@media screen and (max-width: 480px) {
-  .header-accessibility {
-    display: none;
+    }
+    .dropdown-accessibility {
+      &:hover {
+        .links-accessibility {
+          display: flex;
+        }
+      }
+    }
   }
 }

@@ -310,7 +310,7 @@
 }
 
 #portallogo {
-  padding: 0 10px;
+  padding: 5px 10px;
   .navbar-brand {
     display: flex;
     padding: 0;
@@ -349,7 +349,6 @@
     }
   }
 }
-
 .container-transparencia {
   display: flex;
   .link-e-sic, .link-radar {
@@ -747,6 +746,20 @@
       }
     }
   }
+  .body-initial {
+    #portallogo {
+      .navbar-brand {
+        img {
+          height: 56px;
+          padding: 0 10px;
+        }
+        .brand-name {
+          font-size: 0.55rem;
+        }
+      }
+    }
+  }
+
 }
 
 @media screen and (max-width: 480px) {
