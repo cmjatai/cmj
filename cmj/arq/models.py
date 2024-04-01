@@ -281,6 +281,9 @@ class ArqClasse(Parent):
     render_tree2 = models.BooleanField(
         verbose_name=_('Renderização em Tree2'), default=False)
 
+    can_arqdoc = models.BooleanField(
+        verbose_name=_('Permitir Adição de ArqDoc'), default=False)
+
     codigo = models.PositiveIntegerField(verbose_name=_('Código'), default=0)
 
     titulo = models.CharField(

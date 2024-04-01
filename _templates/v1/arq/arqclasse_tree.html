@@ -26,12 +26,12 @@
 
 {% block detail_content %}
 
-<i>{{object.descricao|linebreaksbr}}</i><br><br>
+<i>{{object.descricao|linebreaksbr}}</i>
 
 {% if object and object_list or not object and object_list%}
     <ul class="container-arqclasse-{{request.GET.view|default:view_format}}">
       {% for arqclasse in object_list %}
-        {% if arqclasse.render_tree2 %}
+        {% if arqclasse.parent or arqclasse.render_tree2 %}
           <li class="li-nivel0">
             <span class="inner">
               <div class="d-flex justify-content-between">
@@ -69,7 +69,7 @@
       {% endfor %}
     </ul>
   {% endif %}
-  {% if object %}
+  {% if object and object.can_arqdoc%}
     {% include "arq/arqdoc_widget_list.html" %}
   {% endif %}
 {% endblock %}
