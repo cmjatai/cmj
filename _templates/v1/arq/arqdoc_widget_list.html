@@ -26,7 +26,7 @@
     <tr>
       <td align=center>
         {% if arqdoc.checkcheck %}
-          <i class="fas fa-xs fa-lock text-red" title="Documento Arquivado."></i><br>
+          <i class="fas fa-xs fa-lock text-light-blue" title="Documento Arquivado."></i><br>
         {% endif %}
         {{ arqdoc.data|date:"d/m/Y" }}
       </td>
@@ -39,33 +39,21 @@
               {{arqdoc.descricao}}
             </small>
 
-            {% if classe.perfil == 100 %}
+            {% if object.perfil == 100 %}
               <small>
-                <nav aria-label="breadcrumb" class="verbose_name text-black-50">
-                  <ol class="breadcrumb bg-transparent">
-                    {% for p in arqdoc.classe_logica.parents_and_me %}
-                      <li class="breadcrumb-item" aria-current="page" title="{{p.conta}}">
-                        <a href="{% url 'cmj.arq:subarqclasse_list' p.id %}">
-                          {{ p.titulo }}
-                        </a>
-                      </li>
-                    {% endfor %}
-                  </ol>
-                </nav>
+                {% with arqdoc.classe_logica.parents_and_me as breadcrumb_classe_parents %}
+                  {% with 'verbose_name text-black-50' as css_class %}
+                    {% include "arq/breadcrumb_classe_parents.html" %}
+                  {% endwith %}
+                {% endwith %}
               </small>
             {% else %}
               <small>
-                <nav aria-label="breadcrumb" class="verbose_name text-black-50">
-                  <ol class="breadcrumb bg-transparent">
-                    {% for p in arqdoc.classe_estrutural.parents_and_me %}
-                      <li class="breadcrumb-item" aria-current="page" title="{{p.conta}}">
-                        <a href="{% url 'cmj.arq:subarqclasse_list' p.id %}">
-                          {{ p.titulo }}
-                        </a>
-                      </li>
-                    {% endfor %}
-                    </ol>
-                  </nav>
+                {% with arqdoc.classe_estrutural.parents_and_me as breadcrumb_classe_parents %}
+                  {% with 'verbose_name text-black-50' as css_class %}
+                    {% include "arq/breadcrumb_classe_parents.html" %}
+                  {% endwith %}
+                {% endwith %}
               </small>
             {% endif %}
 

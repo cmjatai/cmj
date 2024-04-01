@@ -4,12 +4,38 @@
   padding: 0rem 0.25rem;
   font-size: 0.9em;
   white-space: nowrap;
-
-  li:not(.active) {
-    a {
-      color: #794905;
+  z-index: 1;
+  ul {
+    display: none;
+    position: absolute;
+    list-style: none;
+    background: darken($color_main_bg, 10%) $url_bg_png;
+    left: 1rem;
+    padding: 0;
+    border: 1px solid #fffa;
+    min-width: 120%;
+    z-index: 1;
+    li {
+      padding: 0.5rem 1rem;
     }
   }
+
+  li {
+    position: relative;
+    background: darken($color_main_bg, 10%) $url_bg_png;
+    &:not(.active) {
+      a {
+        color: #794905;
+      }
+    }
+    &:hover {
+      background: darken($color_main_bg, 15%) $url_bg_png;
+      ul {
+        display: block;
+      }
+    }
+  }
+
 }
 
 @media screen and (max-width: 991.98px) {

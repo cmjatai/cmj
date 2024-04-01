@@ -1,6 +1,7 @@
 from operator import attrgetter
 
 from braces.views._forms import FormMessagesMixin
+from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.aggregates import Max
@@ -149,15 +150,25 @@ class ArqClasseListView(ArqClasseParentMixin, PermissionRequiredMixin, ListView)
 
         toggle_padlock = request.GET.get('toggle_padlock', None)
 
-        if toggle_padlock is not None and request.user.is_superuser:
+        if toggle_padlock is not None:
+            if not request.user.is_superuser:
+                messages.add_message(
+                    request,
+                    messages.ERROR,
+                    _('Seu usuário não possui permissão para Trancar/Destrancar ArqClasse')
+                )
+
             if 'pk' in self.kwargs:
-                self.object.checkcheck = not self.object.checkcheck
-                self.object.save()
+                if request.user.is_superuser:
+                    self.object.checkcheck = not self.object.checkcheck
+                    self.object.save()
+
                 return redirect('{}?view={}'.format(
                     reverse_lazy('cmj.arq:subarqclasse_list',
                                  kwargs={'pk': self.kwargs['pk']}),
                     self.view_format
                 ))
+
         if self.view_format == 'tree2':
             if 'pk' in self.kwargs:
                 return redirect('{}?view=tree'.format(reverse_lazy(

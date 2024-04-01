@@ -2,7 +2,7 @@
   <div class="arq-doc-item" @mousemove="mouseMove">
     <div class="inner">
       <div class="titulo">
-        <i v-if="arqdoc.checkcheck" class="fas fa-xs fa-lock text-red" title="ArqClasse Arquivada."></i>&nbsp;
+        <i v-if="arqdoc.checkcheck" class="fas fa-xs fa-lock text-light-blue" title="ArqClasse Arquivada."></i>&nbsp;
         <a :href="arqdoc.link_detail_backend" target="_blank">{{ arqdoc.titulo }}</a>
       </div>
       <div class="descricao" v-html="arqdoc.descricao"></div>

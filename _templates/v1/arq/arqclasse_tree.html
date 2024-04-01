@@ -37,7 +37,7 @@
               <div class="d-flex justify-content-between">
                 <a href="{% url 'cmj.arq:subarqclasse_list' arqclasse.pk %}?view={{request.GET.view|default:view_format}}">
                   {% if arqclasse.checkcheck %}
-                    <i class="fas fa-xs fa-lock text-red" title="SubArqClasse Arquivada."></i>
+                    <i class="fas fa-xs fa-lock text-light-blue" title="SubArqClasse Arquivada."></i>
                   {% endif %}
                   {{ arqclasse.conta }} - {{ arqclasse.titulo }}
                 </a>
@@ -69,7 +69,7 @@
       {% endfor %}
     </ul>
   {% endif %}
-  {% if object and object.can_arqdoc%}
+  {% if object and object.can_arqdoc %}
     {% include "arq/arqdoc_widget_list.html" %}
   {% endif %}
 {% endblock %}

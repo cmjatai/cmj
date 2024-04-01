@@ -3,19 +3,28 @@
 
 {% block title %}
   <h1 class="page-header d-flex justify-content-between">
-    <span>
-      {% if title %}
-        {{ title|safe|linebreaksbr }}
-      {% elif view.title %}
-        {{ view.title|safe|linebreaksbr }}
-      {% elif object %}
-        {{ object|safe|linebreaksbr }}
-      {% endif %}
-    </span>
+    <div>
+      {{object}}
+      <small>
+        {% with object.classe_estrutural.parents_and_me as breadcrumb_classe_parents %}
+          {% with 'small' as css_class %}
+            {% include "arq/breadcrumb_classe_parents.html" %}
+          {% endwith %}
+        {% endwith %}
+        {% with object.classe_logica.parents_and_me as breadcrumb_classe_parents %}
+          {% with 'small' as css_class %}
+            {% include "arq/breadcrumb_classe_parents.html" %}
+          {% endwith %}
+        {% endwith %}
+      </small>
+    </div>
+
+
+
     {% if object %}
       <a href="?toggle_padlock">
         {% if object.checkcheck %}
-          <i class="fas fa-lock text-red" title="ArqDoc Arquivado. Remover Arquivamento?"></i>
+          <i class="fas fa-lock text-light-blue" title="ArqDoc Arquivado. Remover Arquivamento?"></i>
         {% else %}
           <i class="fas fa-lock-open" title="Arquivar ArqDoc"></i>
         {% endif %}

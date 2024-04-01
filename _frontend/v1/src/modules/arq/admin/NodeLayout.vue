@@ -14,7 +14,7 @@
         <router-link :to="{ name: 'arqchildroute', params: { node: node_params, nodechild: node.id } }"
           @click.native="clickRoute">
           {{ node.titulo }}
-          <i v-if="node.checkcheck" class="fas fa-xs fa-lock text-red" title="ArqClasse Arquivada."></i>
+          <i v-if="node.checkcheck" class="fas fa-xs fa-lock text-light-blue" title="ArqClasse Arquivada."></i>
         </router-link>
         <div class="btn-group btn-group-sm el-actions">
           <a :href="`/arqadmin/classe/${node.id}`" target="_blank" class="btn btn-link">

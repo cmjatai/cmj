@@ -14,8 +14,6 @@
     {% else %}
       <a  class="btn btn-outline-primary" href="/arq/{{object.id}}/{{object.id}}">ArqView</a>
     {% endif %}
-
-
   </div>
   <div class="actions btn-group-sm" role="group">
     {% if object and object.parent%}
@@ -42,7 +40,7 @@
             <tr>
               <td width=15% align=center>
                 {% if arqclasse.checkcheck %}
-                  <i class="fas fa-xs fa-lock text-red" title="SubArqClasse Arquivada."></i><br>
+                  <i class="fas fa-xs fa-lock text-light-blue" title="SubArqClasse Arquivada."></i><br>
                 {% endif %}
                 <a href="{% url 'cmj.arq:subarqclasse_list' arqclasse.pk %}?view={{request.GET.view|default:view_format}}">
                 {{ arqclasse.conta }}
@@ -59,7 +57,7 @@
                     {% for c in arqclasse.childs.all %}
                       <li>
                         {% if c.checkcheck %}
-                          <i class="fas fa-xs fa-lock text-red" title="SubArqClasse Arquivada."></i>
+                          <i class="fas fa-xs fa-lock text-light-blue" title="SubArqClasse Arquivada."></i>
                         {% endif %}
                         {{c.titulo}}<br>
                         <i>{{c.descricao|linebreaksbr}}</i>
@@ -74,7 +72,7 @@
         </tbody>
     </table>
   {% endif %}
-  {% if object %}
+  {% if object and object.can_arqdoc %}
     {% with object as classe %}
       {% include "arq/arqdoc_widget_list.html" %}
     {% endwith %}
