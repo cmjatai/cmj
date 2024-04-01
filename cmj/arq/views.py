@@ -70,7 +70,7 @@ class ArqClasseCreateView(ArqClasseParentMixin,
                           FormMessagesMixin,
                           PermissionRequiredMixin,
                           CreateView):
-    permission_required = 'arq.add_arqclasse'
+    permission_required = 'arq.add_arqclasse',
     form_valid_message = _('ArqClasse criada com sucesso!')
     form_invalid_message = _('Existem erros no formulário de cadastro!')
     template_name = 'crud/form.html'
@@ -106,7 +106,7 @@ class ArqClasseUpdateView(ArqClasseParentMixin,
                           FormMessagesMixin,
                           PermissionRequiredMixin,
                           UpdateView):
-    permission_required = 'arq.change_arqclasse'
+    permission_required = 'arq.change_arqclasse',
     form_valid_message = _('ArqClasse Alterada com sucesso!')
     form_invalid_message = _('Existem erros no formulário!')
     template_name = 'crud/form.html'
@@ -122,7 +122,7 @@ class ArqClasseUpdateView(ArqClasseParentMixin,
 
 
 class ArqClasseDeleteView(PermissionRequiredMixin, DeleteView):
-    permission_required = 'arq.delete_arqclasse'
+    permission_required = 'arq.delete_arqclasse',
     template_name = 'crud/confirm_delete.html'
     model = ArqClasse
 
@@ -139,7 +139,7 @@ class ArqClasseDeleteView(PermissionRequiredMixin, DeleteView):
 
 
 class ArqClasseListView(ArqClasseParentMixin, PermissionRequiredMixin, ListView):
-    permission_required = 'arq.view_arqclasse'
+    permission_required = 'arq.view_arqclasse',
 
     model = ArqClasse
     template_name = 'arq/arqclasse_list.html'
@@ -279,7 +279,7 @@ class ArqDocMixin(CheckCheckMixin):
 class ArqDocUpdateView(ArqDocMixin, FormMessagesMixin,
                        PermissionRequiredMixin,
                        UpdateView):
-    permission_required = 'arq.change_arqdoc'
+    permission_required = 'arq.change_arqdoc',
     form_valid_message = _('ArqDoc alterado com sucesso!')
     form_invalid_message = _('Existem erros no formulário!')
     template_name = 'crud/form.html'
@@ -295,7 +295,7 @@ class ArqDocUpdateView(ArqDocMixin, FormMessagesMixin,
 
 
 class ArqDocDetailView(CrudBaseMixin, CrudDetailView, ArqDocMixin, ):
-    permission_required = 'arq.detail_arqdoc'
+    permission_required = 'arq.detail_arqdoc',
     template_name = 'arq/arqdoc_detail.html'
     model = ArqDoc
     layout_key = 'ArqDocDetail'
@@ -385,7 +385,7 @@ class ArqDocDetailView(CrudBaseMixin, CrudDetailView, ArqDocMixin, ):
 class ArqDocCreateView(ArqDocMixin, FormMessagesMixin,
                        PermissionRequiredMixin,
                        CreateView):
-    permission_required = 'arq.add_arqdoc'
+    permission_required = 'arq.add_arqdoc',
     form_valid_message = _('ArqDoc criado com sucesso!')
     form_invalid_message = _('Existem erros no formulário!')
     template_name = 'crud/form.html'
@@ -421,7 +421,7 @@ class ArqDocCreateView(ArqDocMixin, FormMessagesMixin,
 class ArqDocDeleteView(ArqDocMixin,
                        PermissionRequiredMixin,
                        DeleteView):
-    permission_required = 'arq.delete_arqdoc'
+    permission_required = 'arq.delete_arqdoc',
     model = ArqDoc
     template_name = 'crud/confirm_delete.html'
 
