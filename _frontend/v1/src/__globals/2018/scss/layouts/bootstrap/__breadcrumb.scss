@@ -16,7 +16,14 @@
     min-width: 120%;
     z-index: 1;
     li {
-      padding: 0.5rem 1rem;
+      &:not(:first-child) {
+        border-top: 1px solid #fffa;
+      }
+      a {
+        padding: 0.3rem 1rem;
+        width: 100%;
+        display: inline-block;
+      }
     }
   }
 

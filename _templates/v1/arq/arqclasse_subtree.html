@@ -4,17 +4,20 @@
     {% if forloop.counter0|divisibleby:"2" and object.nivel == 1 and request.GET.view == 'tree2' %}
       <li class="space-tree"></li>
     {% endif %}
-    <li class="li-nivel{{o.nivel}}{% if not o.descricao %} vazio{% endif %}{% if o.checkcheck and o.nivel > 4  and request.GET.view == 'tree2' %} bg-light-blue{% endif %}">
-      <span class="inner">
-        <div class="d-flex justify-content-between">
-          <a href="{% url 'cmj.arq:subarqclasse_list' o.pk %}?view={{request.GET.view|default:view_format}}">
-            {% if o.checkcheck and not request.GET.view == 'tree2' or o.checkcheck and o.nivel > 4 %}
-              <i class="fas fa-xs fa-lock text-light-blue" title="SubArqClasse Arquivada."></i>
-            {% endif %}
-            {{ o.conta }} - {{ o.titulo }}
-          </a>
-        </div>
-        <small class="text-black-50">
+    {% if o.checkcheck and view_format == 'tree' %}
+      &nbsp;
+    {% else %}
+      <li class="li-nivel{{o.nivel}}{% if not o.descricao %} vazio{% endif %}{% if o.checkcheck and o.nivel > 4  and request.GET.view == 'tree2' %} bg-light-blue{% endif %}">
+        <div class="inner">
+          <div class="d-flex justify-content-between">
+            <a href="{% url 'cmj.arq:subarqclasse_list' o.pk %}?view={{request.GET.view|default:view_format}}">
+                {% if o.checkcheck and not request.GET.view == 'tree2' or o.checkcheck and o.nivel > 4 %}
+                <i class="fas fa-xs fa-lock text-light-blue" title="SubArqClasse Arquivada."></i>
+                {% endif %}
+                {{ o.conta }} - {{ o.titulo }}
+            </a>
+          </div>
+          <small class="text-black-50">
             -
             <i>
               {{o.parent.titulo}}
@@ -28,17 +31,18 @@
             <i class="text-secondary">
               {{o.descricao|linebreaksbr}}
             </i>
-        </small>
-      </span>
-      {% with o as object %}
-        {% include 'arq/arqclasse_subtree.html' %}
-      {% endwith %}
+          </small>
+        </div>
+        {% with o as object %}
+          {% include 'arq/arqclasse_subtree.html' %}
+        {% endwith %}
 
-      {% if forloop.last and object.nivel == 1 %}
-        <li class="space-tree"></li>
-      {% elif forloop.last and object.nivel == 2 %}
-        <li class="space-tree"></li>
-      {% endif %}
-    </li>
+        {% if forloop.last and object.nivel == 1 %}
+          <li class="space-tree"></li>
+        {% elif forloop.last and object.nivel == 2 %}
+          <li class="space-tree"></li>
+        {% endif %}
+      </li>
+    {% endif %}
   {% endfor %}
 </ul>

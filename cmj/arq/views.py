@@ -229,7 +229,6 @@ class ArqClasseListView(ArqClasseParentMixin, PermissionRequiredMixin, ListView)
         else:
             qpub = ArqClasse.objects.filter(parent_id=self.kwargs['pk'])
 
-        # if self.has_permission():
         return qpub
 
         #qpub = qpub.filter(visibilidade=ArqClasse.STATUS_PUBLIC)

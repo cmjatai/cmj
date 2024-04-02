@@ -7,10 +7,10 @@
 
 {% block extra_actions %}
   <div class="actions btn-group-sm" role="group">
-    <a  class="btn btn-outline-primary" href="{{request.path}}?view=table">TabView</a>
-    <a  class="btn btn-outline-primary" href="{{request.path}}?view=tree">TreeView</a>
+    <a  class="btn btn-outline-primary {% if view_format == 'tree' %}active{% endif %}" href="{{request.path}}?view=tree">ArqClasses Abertas</a>
+    <a  class="btn btn-outline-primary {% if not view_format or view_format == 'table' %}active{% endif %}" href="{{request.path}}?view=table">Listagem Completa</a>
     {% if not object %}
-      <a  class="btn btn-outline-primary" href="{{request.path}}?view=tree2">Tree2View</a>
+      <a  class="btn btn-outline-primary {% if view_format == 'tree2' %}active{% endif %}" href="{{request.path}}?view=tree2">Mapa do Arquivo</a>
     {% else %}
       <a  class="btn btn-outline-primary" href="/arq/{{object.id}}/{{object.id}}">ArqView</a>
     {% endif %}
