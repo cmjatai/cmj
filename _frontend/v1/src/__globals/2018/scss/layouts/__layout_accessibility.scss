@@ -107,6 +107,7 @@
       padding: 0.2rem 0.1rem;
     }
     .group-font {
+      padding: 0.2rem 0;
       .btn-link {
         padding: 0.2rem 0.2rem 0;
         line-height: 1;
@@ -134,9 +135,9 @@
       display: none;
       flex-direction: column;
       align-self: center;
-      min-width: 60%;
+      min-width: 50%;
       padding-top: 0rem;
-      span {
+      & > span {
         display: none;
       }
       & > a, & > div {
@@ -155,6 +156,15 @@
           display: flex;
         }
       }
+    }
+  }
+}
+
+@media screen and (max-width: 575.98px) {
+  .header-accessibility {
+    font-size: 14pt;
+    .links-accessibility {
+      min-width: 80%;
     }
   }
 }
