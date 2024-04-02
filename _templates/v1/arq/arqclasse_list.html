@@ -30,36 +30,40 @@
     <table class="table table-hover" width="100%">
         <thead>
             <tr>
-              <th>{% fieldclass_verbose_name 'cmj.arq.models.ArqClasse' 'codigo' %}</th>
-              <th>{% fieldclass_verbose_name 'cmj.arq.models.ArqClasse' 'titulo' %}</th>
-              <th>{% fieldclass_verbose_name 'cmj.arq.models.ArqClasse' 'perfil' %}</th>
+              <th>{% if not object %}ArqClasses{% else %}SubArqClasses{% endif %}</th>
             </tr>
         </thead>
         <tbody>
             {% for arqclasse in object_list %}
             <tr>
-              <td width=15% align=center>
+              <td>
                 {% if arqclasse.checkcheck %}
-                  <i class="fas fa-xs fa-lock text-light-blue" title="SubArqClasse Arquivada."></i><br>
+                  <i class="fas fa-xs fa-lock text-light-blue" title="SubArqClasse Arquivada."></i> -
                 {% endif %}
                 <a href="{% url 'cmj.arq:subarqclasse_list' arqclasse.pk %}?view={{request.GET.view|default:view_format}}">
-                {{ arqclasse.conta }}
+                {{ arqclasse.conta }} -
+                {{ arqclasse.titulo }}
                 </a>
-              </td>
-              <td width=15%>{{ arqclasse.get_perfil_display }}</td>
-              <td>
-                {{ arqclasse.titulo }}<br>
-                <small>
+                <small><small>
+                  <i>({{ arqclasse.get_perfil_display }})</i><br>
+                </small></small>
+                {% if arqclasse.descricao %}
                   <i>
-                    {{arqclasse.descricao|linebreaksbr}}
+                  {{arqclasse.descricao|linebreaksbr}}<br>
                   </i>
+                {% endif %}
+                <small>
                   <ul>
                     {% for c in arqclasse.childs.all %}
                       <li>
                         {% if c.checkcheck %}
                           <i class="fas fa-xs fa-lock text-light-blue" title="SubArqClasse Arquivada."></i>
                         {% endif %}
-                        {{c.titulo}}<br>
+
+                        <a href="{% url 'cmj.arq:subarqclasse_list' c.pk %}?view={{request.GET.view|default:view_format}}">
+                          {{c.titulo}}<br>
+                        </a>
+
                         <i>{{c.descricao|linebreaksbr}}</i>
                       </li>
                     {% endfor %}
