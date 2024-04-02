@@ -26,5 +26,18 @@
 {% endif %}
 
 {% if perms.protocoloadm.add_protocolo %}
+
   {% yaml_render "navbar/restrict/navbar_protocolo.yaml" 0 %}
+
+{% else %}
+
+- title: {% trans 'Matérias Legislativas' %}
+  url: sapl.materia:pesquisar_materia
+  check_permission: protocoloadm.list_documentoadministrativo
+
+- title: {% trans 'Documentos' %}
+  url: sapl.protocoloadm:documentoadministrativo_list
+  check_permission: protocoloadm.list_documentoadministrativo
 {% endif %}
+
+

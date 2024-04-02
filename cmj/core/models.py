@@ -182,6 +182,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_display_name(self):
         return self.get_full_name() or self.email
 
+    def is_only_socialuser(self):
+        group_social_users_add_user(self)
+        return self.groups.count() == 1
+
     def get_absolute_url(self):
         return 'users_profile', [self.pk], {}
 
@@ -865,6 +869,7 @@ class OcrMyPDF(models.Model):
         _('Sucesso'),
         choices=YES_NO_CHOICES,
         default=True)
+
     class Meta:
         ordering = ['id']
 
