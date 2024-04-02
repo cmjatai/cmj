@@ -3,7 +3,9 @@
   url: ''
   children:
   {% yaml_render "navbar/navbar_public.yaml" 2 %}
-  
+
+{% yaml_render "navbar/public/navbar_atividadelegislativa.yaml" 0 %}
+
 - title: {% trans "SAAP" %}
   url: ''
   children:
@@ -28,4 +30,3 @@
   url: sapl.protocoloadm:documentoadministrativo_list
   check_permission: protocoloadm.list_documentoadministrativo
 
-{% yaml_render "navbar/public/navbar_atividadelegislativa.yaml" 0 %}

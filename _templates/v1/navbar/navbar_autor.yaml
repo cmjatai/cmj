@@ -1,6 +1,0 @@
-{% load i18n common_cmj_tags %}
-{% yaml_render "navbar/navbar_areatrabalho.yaml" 0 %}
-
-- title: {% trans 'Proposições' %}
-  url: sapl.materia:proposicao_list
-  check_permission: materia.add_proposicao

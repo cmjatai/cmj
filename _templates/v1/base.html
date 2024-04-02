@@ -45,20 +45,16 @@
             <div class="container{{fluid}}">
               <div class="navbar-collapse collapse" id="navbar-menu">
                 <ul class="navbar-nav" id="menu_content">
-
                   {% if user.is_superuser %}
                     {% navbar 'navbar/navbar_superuser.yaml' %}
-                  {% elif perms.materia.add_proposicao %}
-                    {% navbar 'navbar/navbar_autor.yaml' %}
-                  {% elif areatrabalho%}
-                    {% navbar 'navbar/navbar_areatrabalho.yaml' %}
+                  {% elif not user.is_anonymous %}
+                    {% navbar 'navbar/navbar_restrict.yaml' %}
                   {% else %}
                     {% navbar 'navbar/navbar_public.yaml' %}
                   {% endif %}
                 </ul>
 
                 {% include "base_menu_right.html" %}
-
 
                 {% if user.is_anonymous %}
                   <ul class="navbar-nav justify-content-end">
