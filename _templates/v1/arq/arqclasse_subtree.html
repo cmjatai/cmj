@@ -1,5 +1,7 @@
 {% load i18n common_cmj_tags %}
-<ul class="ul-nivel{{object.nivel}}" id="childs-from-{{object.id}}" data="{{ object.nivel }}">
+{% if object.childs.count %}
+  <ul class="ul-nivel{{object.nivel}}" id="childs-from-{{object.id}}" data="{{ object.nivel }}">
+{% endif %}
   {% for o in object.childs.all %}
     {% if forloop.counter0|divisibleby:"2" and object.nivel == 1 and request.GET.view == 'tree2' %}
       <li class="space-tree"></li>
@@ -10,11 +12,11 @@
       <li class="li-nivel{{o.nivel}}{% if not o.descricao %} vazio{% endif %}{% if o.checkcheck and o.nivel > 4  and request.GET.view == 'tree2' %} bg-light-blue{% endif %}">
         <div class="inner">
           <div class="d-flex justify-content-between">
-            <a href="{% url 'cmj.arq:subarqclasse_list' o.pk %}?view={{request.GET.view|default:view_format}}">
+            <a href="{% url 'cmj.arq:subarqclasse_list' o.pk %}">
+              {{ o.conta }} - {{ o.titulo }}
                 {% if o.checkcheck and not request.GET.view == 'tree2' or o.checkcheck and o.nivel > 4 %}
                 <i class="fas fa-xs fa-lock text-light-blue" title="SubArqClasse Arquivada."></i>
                 {% endif %}
-                {{ o.conta }} - {{ o.titulo }}
             </a>
           </div>
           <small class="text-black-50">
@@ -45,4 +47,6 @@
       </li>
     {% endif %}
   {% endfor %}
-</ul>
+{% if object.childs.count %}
+  </ul>
+{% endif %}

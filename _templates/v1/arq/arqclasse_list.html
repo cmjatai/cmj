@@ -7,7 +7,7 @@
 
 {% block extra_actions %}
   <div class="actions btn-group-sm" role="group">
-    <a  class="btn btn-outline-primary {% if view_format == 'tree' %}active{% endif %}" href="{{request.path}}?view=tree">ArqClasses Abertas</a>
+    <a  class="btn btn-outline-primary {% if view_format == 'tree' %}active{% endif %}" href="{% url 'cmj.arq:arqclasse_list' %}?view=tree">ArqClasses Abertas</a>
     <a  class="btn btn-outline-primary {% if not view_format or view_format == 'table' %}active{% endif %}" href="{{request.path}}?view=table">Listagem Completa</a>
     {% if not object %}
       <a  class="btn btn-outline-primary {% if view_format == 'tree2' %}active{% endif %}" href="{{request.path}}?view=tree2">Mapa do Arquivo</a>
@@ -37,20 +37,23 @@
             {% for arqclasse in object_list %}
             <tr>
               <td>
+                <a href="{% url 'cmj.arq:subarqclasse_list' arqclasse.pk %}?view={{request.GET.view|default:view_format}}">
+                  {{ arqclasse.conta }} -
+                  {{ arqclasse.titulo }}
+                  </a>
                 {% if arqclasse.checkcheck %}
                   <i class="fas fa-xs fa-lock text-light-blue" title="SubArqClasse Arquivada."></i> -
                 {% endif %}
-                <a href="{% url 'cmj.arq:subarqclasse_list' arqclasse.pk %}?view={{request.GET.view|default:view_format}}">
-                {{ arqclasse.conta }} -
-                {{ arqclasse.titulo }}
-                </a>
+
                 <small><small>
                   <i>({{ arqclasse.get_perfil_display }})</i><br>
                 </small></small>
                 {% if arqclasse.descricao %}
-                  <i>
-                  {{arqclasse.descricao|linebreaksbr}}<br>
-                  </i>
+                  <div class="pl-3">
+                    <i>
+                      {{arqclasse.descricao|linebreaksbr}}<br>
+                    </i>
+                  </div>
                 {% endif %}
                 <small>
                   <ul>

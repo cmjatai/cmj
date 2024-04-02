@@ -164,6 +164,7 @@
       background: transparentize($color_primary, 0.5) $url_bg_png;
     }
     &:hover {
+      background-color: #0005 !important;
       & > .inner {
         display: block;
         box-shadow: 3px 3px 10px #444f;
@@ -171,7 +172,7 @@
       }
 
       &:not(.vazio) {
-        background: transparentize(blue, 0.5) $url_bg_png;
+        background: #00fa $url_bg_png !important;
       }
     }
     & > .inner {

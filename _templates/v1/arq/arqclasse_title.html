@@ -1,7 +1,9 @@
 {% load i18n common_cmj_tags %}
 
 <h1 class="page-header d-flex justify-content-between">
-
+  {% if not object %}
+    {{view.title}}
+  {% endif %}
   {% with object.parents_and_me as breadcrumb_classe_parents %}
     {% with '' as css_class %}
       {% include "arq/breadcrumb_classe_parents.html" %}
