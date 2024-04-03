@@ -126,7 +126,7 @@ class DraftMidia(models.Model):
     # validators=[restringe_tipos_de_arquivo_midias])
 
     class Meta:
-        ordering = ('sequencia',)
+        ordering = ('draft', 'sequencia',)
 
         verbose_name = _('Mídia')
         verbose_name_plural = _('Mídias')
