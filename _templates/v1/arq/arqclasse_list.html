@@ -59,13 +59,14 @@
                   <ul>
                     {% for c in arqclasse.childs.all %}
                       <li>
+
+                        <a href="{% url 'cmj.arq:subarqclasse_list' c.pk %}?view={{request.GET.view|default:view_format}}">
+                          {{ c.conta }} -{{c.titulo}}
+                        </a>
                         {% if c.checkcheck %}
                           <i class="fas fa-xs fa-lock text-light-blue" title="SubArqClasse Arquivada."></i>
                         {% endif %}
-
-                        <a href="{% url 'cmj.arq:subarqclasse_list' c.pk %}?view={{request.GET.view|default:view_format}}">
-                          {{c.titulo}}<br>
-                        </a>
+                        <br>
 
                         <i>{{c.descricao|linebreaksbr}}</i>
                       </li>

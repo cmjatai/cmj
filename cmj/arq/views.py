@@ -372,7 +372,7 @@ class ArqDocDetailView(CrudBaseMixin, CrudDetailView, ArqDocMixin, ):
         '''
 
     def get(self, request, *args, **kwargs):
-
+        self.view_format = request.GET.get('view', 'table')
         toggle_padlock = request.GET.get('toggle_padlock', None)
 
         if toggle_padlock is not None and request.user.is_superuser:
@@ -390,6 +390,11 @@ class ArqDocDetailView(CrudBaseMixin, CrudDetailView, ArqDocMixin, ):
                 )
 
         return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = CrudDetailView.get_context_data(self, **kwargs)
+        context['view_format'] = self.view_format
+        return context
 
 
 class ArqDocCreateView(ArqDocMixin, FormMessagesMixin,

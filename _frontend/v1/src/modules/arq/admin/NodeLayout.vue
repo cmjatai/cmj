@@ -84,11 +84,12 @@ export default {
   },
   methods: {
     clickRoute () {
-      if (this.click_title) {
-        this.clickToggle()
+      this.clickToggle()
+      /* if (this.click_title) {
+
       } else {
         this.click_title = true
-      }
+      } */
     },
     clickToggle () {
       this.is_opened = !this.is_opened
