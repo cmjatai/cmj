@@ -146,7 +146,11 @@ class ArqDocForm(ModelForm):
 
         row_form = to_row([
             ([row1, row2, row3, row4, ], 7),
-            (HTML('<img id="img_preview_arqdoc_create" class="embed-responsive" />'), 5)
+            (HTML('''
+            <a id="link_open_draftmidia" target="_blank">
+                <img id="img_preview_arqdoc_create" class="embed-responsive" />
+            </a>
+            '''), 5)
         ])
 
         self.helper = FormHelper()
