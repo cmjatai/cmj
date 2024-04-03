@@ -124,6 +124,22 @@ class ArqDocForm(ModelForm):
 
         self._request_user = kwargs['initial'].get('request_user', None)
 
+        inst = kwargs['initial'].get('instance', None)
+
+        if not inst:
+
+            dmc = []
+            dmc.append(('', '--------------'))
+            for dm in DraftMidia.objects.filter(
+                draft__owner=self._request_user,
+                metadata__ocrmypdf__pdfa=DraftMidia.METADATA_PDFA_PDFA
+            ):
+                name_file_midia = dm.metadata['uploadedfile']['name']
+                dmc.append((dm.id, f'{str(dm.draft)} - {name_file_midia}'))
+
+            if len(dmc) > 1:
+                kwargs['initial']['draftmidia'] = dmc[1]
+
         row1 = to_row([
             ('codigo', 2),
             ('data', 3),
@@ -145,12 +161,12 @@ class ArqDocForm(ModelForm):
         ])
 
         row_form = to_row([
-            ([row1, row2, row3, row4, ], 7),
+            ([row1, row2, row3, row4, ], 8),
             (HTML('''
             <a id="link_open_draftmidia" target="_blank">
                 <img id="img_preview_arqdoc_create" class="embed-responsive" />
             </a>
-            '''), 5)
+            '''), 4)
         ])
 
         self.helper = FormHelper()
@@ -167,10 +183,16 @@ class ArqDocForm(ModelForm):
             if not nd:
                 pc.append(('', '--------------'))
                 childs = ArqClasse.objects.filter(
-                    parent__isnull=True)
+                    parent__isnull=True,
+                    checkcheck=False,
+                    perfil=100
+                )
             else:
                 pc.append((nd.id, str(nd)))
-                childs = nd.childs.all()
+                childs = nd.childs.filter(
+                    checkcheck=False,
+                    perfil=100
+                )
 
             for c in childs.order_by('codigo'):
                 get_pc_order_by(c)
@@ -178,16 +200,7 @@ class ArqDocForm(ModelForm):
         get_pc_order_by()
 
         self.fields['classe_estrutural'].choices = pc
-
         if not self.instance.pk:
-            dmc = []
-            dmc.append(('', '--------------'))
-            for dm in DraftMidia.objects.filter(
-                draft__owner=self._request_user,
-                metadata__ocrmypdf__pdfa=DraftMidia.METADATA_PDFA_PDFA
-            ):
-                name_file_midia = dm.metadata['uploadedfile']['name']
-                dmc.append((dm.id, f'{str(dm.draft)} - {name_file_midia}'))
             self.fields['draftmidia'].choices = dmc
         else:
             self.fields['draftmidia'].widget = forms.HiddenInput()

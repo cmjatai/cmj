@@ -13,6 +13,7 @@
         img_preview_arqdoc_create.src = `/api/arq/draftmidia/${event.target.value}/arquivo/?page=1&dpi=300`
         link_open_draftmidia.href = `/api/arq/draftmidia/${event.target.value}/arquivo/`
       })
+      id_draftmidia.dispatchEvent(new Event('change'))
     })
   </script>
 

@@ -425,7 +425,8 @@ class ArqDocCreateView(ArqDocMixin, FormMessagesMixin,
         initial['classe_estrutural'] = self.kwargs['classe_id']
 
         cod__max = ArqDoc.objects.filter(
-            classe_estrutural=self.kwargs['classe_id']).order_by('codigo').aggregate(Max('codigo'))
+            classe_estrutural=self.kwargs['classe_id']
+        ).order_by('codigo').aggregate(Max('codigo'))
 
         initial['codigo'] = cod__max['codigo__max'] + \
             1 if cod__max['codigo__max'] else 1
