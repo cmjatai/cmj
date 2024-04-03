@@ -47,7 +47,7 @@ python-dateutil==2.8.2
 
 jedi==0.17.2
 pdfrw
-Pillow==10.2.0
+Pillow==10.3.0
 psycopg2-binary==2.8.5
 pyoai==2.5.0
 pypdf4==1.27.0
