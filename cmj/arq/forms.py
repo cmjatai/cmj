@@ -1,6 +1,7 @@
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Fieldset
+from crispy_forms.layout import Fieldset, Div, HTML
 from django import forms
+from django.core.exceptions import ValidationError
 from django.core.files.base import File
 from django.forms import widgets
 from django.forms.models import ModelForm
@@ -47,7 +48,7 @@ class ArqClasseForm(ModelForm):
     def __init__(self, *args, **kwargs):
         parent = None
         if 'initial' in kwargs:
-            parent = kwargs['initial'].get('parent', None)
+            self.parent = kwargs['initial'].get('parent', None)
 
         row1 = to_row([
             ('codigo', 2),
@@ -67,10 +68,28 @@ class ArqClasseForm(ModelForm):
 
         super(ArqClasseForm, self).__init__(*args, **kwargs)
 
-        if parent:
+        if self.parent:
             self.fields['render_tree2'].widget = forms.HiddenInput()
         else:
             self.fields['render_tree2'].widget = widgets.CheckboxInput()
+
+    def clean_render_tree2(self):
+        rt = self.cleaned_data.get('render_tree2', False) or False
+        return rt
+
+    def clean_perfil(self):
+        perfil = self.cleaned_data.get('perfil', None)
+        if perfil != str(self.parent.perfil):
+            raise ValidationError(
+                f"""Os perfis das SubArqClasses devem ser iguais!""")
+        return perfil
+
+    def clean_parent(self):
+        parent = self.parent
+        if parent and parent.checkcheck:
+            raise ValidationError(
+                f"""Para criar/editar itens em {parent.titulo}, é necessário que ela não esteja trancada!""")
+        return parent
 
 
 class ArqDocForm(ModelForm):
@@ -125,10 +144,15 @@ class ArqDocForm(ModelForm):
             ('descricao', 12),
         ])
 
+        row_form = to_row([
+            ([row1, row2, row3, row4, ], 7),
+            (HTML('<img id="img_preview_arqdoc_create" class="embed-responsive" />'), 5)
+        ])
+
         self.helper = FormHelper()
         self.helper.layout = SaplFormLayout(
             Fieldset(_('Identificação Básica'),
-                     row1, row2, row3, row4,))
+                     row_form))
 
         super(ArqDocForm, self).__init__(*args, **kwargs)
 

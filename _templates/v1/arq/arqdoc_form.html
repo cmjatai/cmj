@@ -1,0 +1,22 @@
+{% extends "crud/form.html" %}
+{% load i18n common_cmj_tags %}
+
+{% block extra_js %}{{block.super}}
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      const img_preview_arqdoc_create = document.getElementById('img_preview_arqdoc_create')
+      const id_draftmidia = document.getElementById('id_draftmidia')
+
+      id_draftmidia.addEventListener('change', function (event) {
+
+        console.log(img_preview_arqdoc_create.src = `/api/arq/draftmidia/${event.target.value}/arquivo/?page=1&dpi=300`)
+        console.log()
+      })
+
+
+
+    })
+  </script>
+
+{% endblock extra_js %}

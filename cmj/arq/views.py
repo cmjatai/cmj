@@ -403,7 +403,7 @@ class ArqDocCreateView(ArqDocMixin, FormMessagesMixin,
     permission_required = 'arq.add_arqdoc',
     form_valid_message = _('ArqDoc criado com sucesso!')
     form_invalid_message = _('Existem erros no formulário!')
-    template_name = 'crud/form.html'
+    #template_name = 'crud/form.html'
     form_class = forms.ArqDocForm
     model = ArqDoc
 

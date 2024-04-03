@@ -176,6 +176,8 @@ PERFIL_ARQCLASSE = ((
 
 class Parent(models.Model):
 
+    mask_conta = ['{:03}', '{:02}', '{:02}', '{:02}']
+
     parent = models.ForeignKey(
         'self',
         blank=True, null=True, default=None,
