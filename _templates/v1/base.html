@@ -46,7 +46,9 @@
               <div class="navbar-collapse collapse" id="navbar-menu">
 
                 <ul class="navbar-nav" id="menu_content">
-                  {% if user.is_superuser %}
+                  {% if user.is_anonymous %}
+                    {% navbar 'navbar/navbar_public.yaml' %}
+                  {% elif user.is_superuser %}
                     {% navbar 'navbar/navbar_superuser.yaml' %}
                   {% elif not user.is_only_socialuser %}
                     {% navbar 'navbar/navbar_restrict.yaml' %}
