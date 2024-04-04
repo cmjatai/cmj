@@ -1,8 +1,8 @@
 <template>
   <div :class="['draft-midia', 'p-2',]" :id="`dm${elemento.id}`">
     <div class="inner">
-      <div :class="['inner-status', elemento.metadata.ocrmypdf.pdfa === 99 ? 'border-green': (elemento.metadata.ocrmypdf.pdfa === 10 ? 'border-yellow': 'border-red')]"
-      v-html="elemento.metadata.ocrmypdf.pdfa === 99 ? 'PDF/A-2b': (elemento.metadata.ocrmypdf.pdfa === 10 ? 'Conversão Agendada': 'Não PDF/A-2b')"></div>
+      <div :class="['inner-status', elemento.metadata.ocrmypdf.pdfa === 99 ? 'border-green': (elemento.metadata.ocrmypdf.pdfa >= 10 ? 'border-yellow': 'border-red')]"
+      v-html="elemento.metadata.ocrmypdf.pdfa === 99 ? 'PDF/A-2b': (elemento.metadata.ocrmypdf.pdfa >= 10 ? 'Conversão Agendada': 'Não PDF/A-2b')"></div>
       <div class="inner-action">
         <div class="dropleft" v-show="elemento.metadata.ocrmypdf.pdfa !== 10">
           <button class="btn btn-sm" type="button" data-toggle="dropdown" aria-expanded="true">
@@ -10,7 +10,7 @@
           </button>
           <div class="dropdown-menu">
             <a class="dropdown-item" v-show="elemento.metadata.ocrmypdf.pdfa !== 99" title="PDF -> PDF/A-2b" @click="clickDraftmidiaAction('pdf2pdfa')">PDF -> PDF/A-2b</a>
-            <a class="dropdown-item" v-show="elemento.metadata.ocrmypdf.pdfa == 99" title="PDF/A-2b Compact" @click="clickDraftmidiaAction('pdfacompact')">PDF/A-2b Compact</a>
+            <a class="dropdown-item" v-show="elemento.metadata.ocrmypdf.pdfa == 999" title="PDF/A-2b Compact" @click="clickDraftmidiaAction('pdfacompact')" aria-disabled="disabled">PDF/A-2b Compact</a>
             <a class="dropdown-item" title="Gerar um PDF para cada página" @click="clickDraftmidiaAction('decompor')">Decompor <i class="fas fa-expand"></i></a>
             <a class="dropdown-item" title="Apagar Mídia" @click="clickDel">Apagar <i class="fas fa-trash-alt"></i></a>
           </div>
@@ -53,13 +53,15 @@ export default {
   },
   watch: {
     elemento (nw, old) {
-      if (this.elemento.metadata.ocrmypdf.pdfa === 10) {
+      const estagio_execucao = this.elemento.metadata.ocrmypdf.pdfa
+      if (estagio_execucao >= 10 && estagio_execucao <= 20) {
         this.timeoutUpdate()
       }
     }
   },
   mounted () {
-    if (this.elemento.metadata.ocrmypdf.pdfa === 10) {
+    const estagio_execucao = this.elemento.metadata.ocrmypdf.pdfa
+    if (estagio_execucao >= 10 && estagio_execucao <= 20) {
       this.timeoutUpdate()
     }
   },
@@ -69,7 +71,8 @@ export default {
       setTimeout(() => {
         t.utils.getModel('arq', 'draftmidia', t.elemento.id)
           .then((response) => {
-            if (response.data.metadata.ocrmypdf.pdfa === 10) {
+            const estagio_execucao = response.data.metadata.ocrmypdf.pdfa
+            if (estagio_execucao >= 10 && estagio_execucao <= 20) {
               console.log('timeoutUpdate novamente')
               t.timeoutUpdate()
             } else {

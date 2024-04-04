@@ -16,6 +16,9 @@
           <a class="btn btn-danger" title="Excluir Draft Atual" @click="clickDel" :disabled="draftselected === null">
               <i class="fas fa-trash-alt"></i>
           </a>
+          <a class="btn btn-warning text-white ml-2"  @click="clickSupendeConversao" title="Cancela agendamentos de conversão de PDF -> PDF/A-2b">
+            <i class="fas fa-stop-circle"></i>
+          </a>
           <a class="btn btn-primary ml-2 btn-pdf2pdfa" @click="clickPdf2Pdfa"  title="Iniciar conversão para PDF/A-2b de todos os arquivos do Draft selecionado.">
             <span>
               PDF -><br>PDF/A-2b
@@ -82,6 +85,17 @@ export default {
     clickUnir () {
       const t = this
       t.utils.getModelAction('arq', 'draft', this.draftselected.id, 'unirmidias'
+      ).then((response) => {
+        this.fetchMidias(this.draftselected)
+      }).catch((error) => {
+        t.sendMessage(
+          { alert: 'danger', message: error.response.data.message, time: 10 }
+        )
+      })
+    },
+    clickSupendeConversao () {
+      const t = this
+      t.utils.getModelAction('arq', 'draft', this.draftselected.id, 'cancela_pdf2pdfa'
       ).then((response) => {
         this.fetchMidias(this.draftselected)
       }).catch((error) => {

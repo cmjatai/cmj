@@ -4,6 +4,7 @@ import os
 import pathlib
 import re
 import shutil
+from time import sleep
 
 from django.contrib.postgres.fields.jsonb import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
@@ -67,6 +68,7 @@ def remove_files_and_folders(directory):
             for name in files:
                 file_path = os.path.join(root, name)
                 os.remove(file_path)
+            sleep(2)
             os.rmdir(root)
     except Exception as e:
         logger.error(f'Erro na exclusão de: {directory}. {e}')
@@ -96,6 +98,7 @@ class DraftMidia(models.Model):
 
     METADATA_PDFA_NONE = 0
     METADATA_PDFA_AGND = 10
+    METADATA_PDFA_PROC = 20
     METADATA_PDFA_PDFA = 99
 
     FIELDFILE_NAME = ('arquivo',)
