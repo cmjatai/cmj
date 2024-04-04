@@ -296,11 +296,14 @@ class DraftMidiaSerializer(SaplSerializerMixin):
     arquivo_size = serializers.SerializerMethodField()
 
     def get_arquivo_size(self, obj):
-        if not obj.arquivo:
-            return 0
+        try:
+            if not obj.arquivo:
+                return 0
 
-        size = os.path.getsize(obj.arquivo.path)
-        return size, round(size / 1024 / 1024, 1)
+            size = os.path.getsize(obj.arquivo.path)
+            return size, round(size / 1024 / 1024, 1)
+        except Exception as e:
+            return 0
 
     class Meta(SaplSerializerMixin.Meta):
         model = DraftMidia

@@ -353,6 +353,9 @@ class _Draft:
 class _DraftMidia(ResponseFileMixin):
     serializer_class = DraftMidiaSerializer
 
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
 
