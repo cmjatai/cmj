@@ -104,7 +104,7 @@ class ArqDocForm(ModelForm):
 
     draftmidia = forms.ModelChoiceField(
         queryset=DraftMidia.objects.all(),
-        label=_('Utilizar arquivo do Draft'),
+        label=_('Arquivo do Draft a ser utilizado'),
         required=False)
 
     class Meta:
@@ -133,7 +133,7 @@ class ArqDocForm(ModelForm):
             for dm in DraftMidia.objects.filter(
                 draft__owner=self._request_user,
                 metadata__ocrmypdf__pdfa=DraftMidia.METADATA_PDFA_PDFA
-            ):
+            ).order_by('draft__descricao', 'sequencia'):
                 name_file_midia = dm.metadata['uploadedfile']['name']
                 dmc.append((dm.id, f'{str(dm.draft)} - {name_file_midia}'))
 
@@ -202,6 +202,8 @@ class ArqDocForm(ModelForm):
         self.fields['classe_estrutural'].choices = pc
         if not self.instance.pk:
             self.fields['draftmidia'].choices = dmc
+            if self._request_user.is_superuser:
+                self.fields['arquivo'].widget = forms.HiddenInput()
         else:
             self.fields['draftmidia'].widget = forms.HiddenInput()
 
@@ -214,6 +216,7 @@ class ArqDocForm(ModelForm):
 
         if not inst.pk:
             inst.owner = self._request_user
+
         inst.modifier = self._request_user
 
         inst = ModelForm.save(self, commit=commit)

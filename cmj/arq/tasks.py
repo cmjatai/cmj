@@ -30,8 +30,8 @@ def task_ocrmypdf_function(app_label, model_name, field_name, id_list, jobs):
     model = apps.get_model(app_label, model_name)
 
     for id_item in id_list:
-        instance = model.objects.get(pk=id_item)
         try:
+            instance = model.objects.get(pk=id_item)
             if instance.metadata['ocrmypdf']['pdfa'] != DraftMidia.METADATA_PDFA_AGND:
                 continue
         except:

@@ -3,7 +3,7 @@ services:
   cmjredis:
     image: redis:alpine
     container_name: cmjredis
-    restart: always
+    restart: no
     labels:
        NAME: "cmjredis"
     volumes:
@@ -14,7 +14,7 @@ services:
       - cmj-net
   cmjsolr:
     image: solr:8.11
-    restart: always
+    restart: no
     command: bin/solr start -c -f
     container_name: cmjsolr
     labels:
@@ -32,7 +32,7 @@ services:
       context: ../_frontend/v1/
       dockerfile: ../../docker/DockerfileFront.Dev
     #command: yarn build
-    restart: always
+    restart: no
     container_name: cmjfront
     labels:
        NAME: "cmjfront"
@@ -51,7 +51,7 @@ services:
     user: "root:root"
     labels:
        NAME: "cmj"
-    restart: always
+    restart: no
     environment:
       DEBUG: 'True'
       USE_SOLR: 'True'

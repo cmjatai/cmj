@@ -98,6 +98,7 @@ def upload_security_file(zk_host):
 
 class SolrClient:
     LIST_CONFIGSETS = "{}/solr/admin/configs?action=LIST&omitHeader=true&wt=json"
+    DELETE_CONFIGSET = "{}/solr/admin/configs?action=DELETE&name={}&wt=json"
     UPLOAD_CONFIGSET = "{}/solr/admin/configs?action=UPLOAD&name={}&wt=json"
     LIST_COLLECTIONS = "{}/solr/admin/collections?action=LIST&wt=json"
     STATUS_COLLECTION = "{}/solr/admin/collections?action=CLUSTERSTATUS" \
@@ -109,22 +110,32 @@ class SolrClient:
                         "&collection.configName={}&numShards={}" \
                         "&replicationFactor={}&maxShardsPerNode={}&wt=json"
     DELETE_COLLECTION = "{}/solr/admin/collections?action=DELETE&name={}&wt=json"
+
     DELETE_DATA = "{}/solr/{}/update?commitWithin=1000&overwrite=true&wt=json"
     QUERY_DATA = "{}/solr/{}/select?q=*:*"
 
     COLLECTIONS = []
 
-    def __init__(self, url, collections):
+    def __init__(self, url, collections, recreate_collections):
         self.url = url
 
         collections = map(lambda x: x.strip(), collections.split(','))
 
+        if recreate_collections:
+            recreate_collections = list(map(
+                lambda x: x.strip(), recreate_collections.split(',')))
+
+            for c in recreate_collections:
+                self.delete_collection(c)
+
         for c in collections:
+            force = True if recreate_collections and c in recreate_collections else False
             c = c.split('_')
             cd = {
                 'COLLECTION_NAME': f'{c[0]}_{c[1]}',
                 'CONFIGSET_NAME': f'{c[1]}_configset',
-                'CONFIGSET_PATH': f'./solr/{c[1]}_configset/conf'
+                'CONFIGSET_PATH': f'./solr/{c[1]}_configset/conf',
+                'FORCE': force
             }
             self.COLLECTIONS.append(cd)
 
@@ -171,7 +182,8 @@ class SolrClient:
             print(e)
             raise e
 
-    def maybe_upload_configset(self, collection_dict, force=False):
+    def maybe_upload_configset(self, collection_dict):
+        force = collection_dict.get('FORCE', False)
         req_url = self.LIST_CONFIGSETS.format(self.url)
         res = requests.get(req_url)
         try:
@@ -180,6 +192,13 @@ class SolrClient:
         except Exception as e:
             print(F"Erro ao configurar configsets. Erro: {e}")
             print(res.content)
+
+        if collection_dict['CONFIGSET_NAME'] in configsets and force:
+            req_url = self.DELETE_CONFIGSET.format(
+                self.url, collection_dict['CONFIGSET_NAME'])
+
+            resp = requests.post(req_url)
+            print(resp.content)
 
         # UPLOAD configset
         if not collection_dict['CONFIGSET_NAME'] in configsets or force:
@@ -202,7 +221,7 @@ class SolrClient:
 
         else:
             print('O %s já presente no servidor, NÃO enviando.' %
-                  self.CONFIGSET_NAME)
+                  collection_dict['CONFIGSET_NAME'])
 
     def create_collection(self, collection_dict, shards=1, replication_factor=1, max_shards_per_node=1):
         self.maybe_upload_configset(collection_dict)
@@ -289,6 +308,9 @@ if __name__ == '__main__':
                         required=True, help='Collections Solr a serem criadas')
 
     # optional arguments
+    parser.add_argument('-rc', type=str, metavar='RECREATE COLLECTIONS', dest='recreate_collections', nargs=1,
+                        help='Collections Solr a serem recriadas')
+
     parser.add_argument('-s', type=int, dest='shards', nargs='?',
                         help='Number of shards (default=1)', default=1)
     parser.add_argument('-rf', type=int, dest='replication_factor', nargs='?',
@@ -305,6 +327,10 @@ if __name__ == '__main__':
         parser.error(str(msg))
         sys.exit(-1)
 
+    recreate_collections = args.recreate_collections
+    if recreate_collections:
+        recreate_collections = recreate_collections.pop()
+
     collections = args.collections.pop()
     url = args.url.pop()
 
@@ -312,7 +338,8 @@ if __name__ == '__main__':
         print("Setup embedded ZooKeeper...")
         setup_embedded_zk(url)
 
-    client = SolrClient(url=url, collections=collections)
+    client = SolrClient(url=url, collections=collections,
+                        recreate_collections=recreate_collections)
     for collection in client.COLLECTIONS:
 
         if not client.exists_collection(collection):
