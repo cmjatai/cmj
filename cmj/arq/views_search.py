@@ -13,6 +13,7 @@ from haystack.query import SearchQuerySet
 from haystack.utils.app_loading import haystack_get_model
 from haystack.views import SearchView
 
+from cmj.arq.models import ArqClasse, ARQCLASSE_LOGICA
 from cmj.core.models import AreaTrabalho
 from cmj.haystack import CMJARQ_ALIAS
 from cmj.utils import make_pagination
@@ -22,6 +23,10 @@ from sapl.crispy_layout_mixin import to_row
 class ArqSearchForm(ModelSearchForm):
 
     conta_classe_logica = forms.CharField(
+        required=False, label=_('Conta'),
+        widget=forms.HiddenInput())
+
+    arqclasse = forms.CharField(
         required=False, label=_('Conta'),
         widget=forms.HiddenInput())
 
@@ -45,7 +50,11 @@ class ArqSearchForm(ModelSearchForm):
             ),
         )
 
-        row = to_row([('conta_classe_logica', 2), (q_field, 8), ])
+        row = to_row([
+            ('arqclasse', 1),
+            ('conta_classe_logica', 1),
+            (q_field, 8),
+        ])
 
         self.helper = FormHelper()
         self.helper.form_tag = False
@@ -69,7 +78,9 @@ class ArqSearchForm(ModelSearchForm):
         conta_classe_logica = self.cleaned_data.get(
             'conta_classe_logica', None)
 
-        if conta_classe_logica:
+        arqclasse = self.cleaned_data.get('arqclasse', None)
+
+        if conta_classe_logica and arqclasse:
             sqs = sqs.filter(
                 conta_classe_logica__startswith=conta_classe_logica)
 
@@ -135,6 +146,7 @@ class ArqSearchView(SearchView):
 
         data = data.copy()
         context['q'] = data.get('q', '')
+        arqclasse = data.get('arqclasse', '')
 
         if 'csrfmiddlewaretoken' in data:
             del data['csrfmiddlewaretoken']
@@ -146,6 +158,13 @@ class ArqSearchView(SearchView):
         paginator = context['paginator']
         context['page_range'] = make_pagination(
             page_obj.number, paginator.num_pages)
+
+        if arqclasse:
+            try:
+                arqclasse = ArqClasse.objects.get(id=arqclasse)
+                context['arqclasse'] = arqclasse
+            except:
+                pass
 
         if 'page' in data:
             del data['page']

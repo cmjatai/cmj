@@ -124,7 +124,7 @@ class ArqDocForm(ModelForm):
 
         self._request_user = kwargs['initial'].get('request_user', None)
 
-        inst = kwargs['initial'].get('instance', None)
+        inst = kwargs.get('instance', None)
 
         if not inst:
 
@@ -176,30 +176,35 @@ class ArqDocForm(ModelForm):
 
         super(ArqDocForm, self).__init__(*args, **kwargs)
 
-        pc = []
+        pc = {
+            100: [],
+            200: []
+        }
 
-        def get_pc_order_by(nd=None):
+        def get_pc_order_by(perfil, nd=None, opened=None):
+            params = {
+                'perfil': perfil
+            }
+
+            if opened:
+                params['checkcheck'] = False
 
             if not nd:
-                pc.append(('', '--------------'))
-                childs = ArqClasse.objects.filter(
-                    parent__isnull=True,
-                    checkcheck=False,
-                    perfil=100
-                )
+                pc[perfil].append(('', '--------------'))
+                params['parent__isnull'] = True
+                childs = ArqClasse.objects.filter(**params)
             else:
-                pc.append((nd.id, str(nd)))
-                childs = nd.childs.filter(
-                    checkcheck=False,
-                    perfil=100
-                )
+                pc[perfil].append((nd.id, str(nd)))
+                childs = nd.childs.filter(**params)
 
             for c in childs.order_by('codigo'):
-                get_pc_order_by(c)
+                get_pc_order_by(perfil, nd=c)
 
-        get_pc_order_by()
+        get_pc_order_by(100, opened=True)
+        get_pc_order_by(200)
 
-        self.fields['classe_estrutural'].choices = pc
+        self.fields['classe_estrutural'].choices = pc[100]
+        self.fields['classe_logica'].choices = pc[200]
         if not self.instance.pk:
             self.fields['draftmidia'].choices = dmc
             if self._request_user.is_superuser:

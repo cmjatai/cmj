@@ -15,6 +15,14 @@
       {% crispy form %}
     </div>
   </form>
+
+  <b>Filtro de Classe Aplicado:</b><br>
+  {% with arqclasse.parents_and_me as breadcrumb_classe_parents %}
+    {% with True as btn_clear %}
+      {% include "arq/breadcrumb_classe_parents_for_search.html" %}
+    {% endwith %}
+  {% endwith %}
+    <hr>
   <div class="container-table">
     <div class="result-count">Foram encontrados {{ page.paginator.count }} registros </div>
 

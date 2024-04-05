@@ -1,0 +1,17 @@
+
+{% for p in breadcrumb_classe_parents %}
+  <li class="breadcrumb-item" aria-current="page" title="{{p.conta}}">
+    <a href="{% url 'cmj.arq:haystack_arqsearch' %}?q={{q}}&conta_classe_logica={{p.conta}}">
+      {{ p.titulo }}
+    </a>
+    {% if p.childs.exists %}
+      <ul>
+        {% with p.childs.all as breadcrumb_classe_parents %}
+          {% with 'verbose_name text-black-50' as css_class %}
+            {% include "arq/breadcrumb_classe_parents_for_search_tree.html" %}
+          {% endwith %}
+        {% endwith %}
+      </ul>
+    {% endif %}
+  </li>
+{% endfor %}

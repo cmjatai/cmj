@@ -1,18 +1,21 @@
-  <ul class="breadcrumb {{css_class}} bg-transparent">
-    {% for p in breadcrumb_classe_parents %}
+<ul class="breadcrumb {{css_class}} bg-transparent">
+  {% for p in breadcrumb_classe_parents %}
       <li class="breadcrumb-item" aria-current="page" title="{{p.conta}}">
-        <a href="{% url 'cmj.arq:haystack_arqsearch' %}?q={{q}}&conta_classe_logica={{p.conta}}">
+        <a href="{% url 'cmj.arq:haystack_arqsearch' %}?q={{q}}&conta_classe_logica={{p.conta}}&arqclasse={{p.id}}">
           {{ p.titulo }}
         </a>
         <ul>
           {% for pc in p.childs.all %}
             <li>
-              <a href="{% url 'cmj.arq:haystack_arqsearch' %}?q={{q}}&conta_classe_logica={{pc.conta}}">
+              <a href="{% url 'cmj.arq:haystack_arqsearch' %}?q={{q}}&conta_classe_logica={{pc.conta}}&arqclasse={{pc.id}}">
                 {{ pc.titulo }}
               </a>
             </li>
           {% endfor %}
         </ul>
       </li>
+      {% if forloop.last and btn_clear %}
+        <a class="ml-2" href="{% url 'cmj.arq:haystack_arqsearch' %}" title="Limpar Filtro"><i class="fas fa-times-circle"></i></a>
+      {% endif %}
     {% endfor %}
   </ul>
