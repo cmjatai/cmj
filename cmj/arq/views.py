@@ -338,7 +338,7 @@ class ArqDocDetailView(CrudBaseMixin, CrudDetailView, ArqDocMixin, ):
                 'classe_id': self.kwargs['classe_id']
             })
 
-    @property
+    """ @property
     def title(self):
         o = self.object
         return '%s<br><small><small>%s%s<br>%s%s</small></small>' % (
@@ -347,10 +347,16 @@ class ArqDocDetailView(CrudBaseMixin, CrudDetailView, ArqDocMixin, ):
             o.classe_estrutural,
             (_('ArqClasse Lógica -> ') if o.classe_logica else ''),
             o.classe_logica or ''
-        )
+        )"""
+
+    def hook_classe_estrutural(self, obj):
+        return 'Classificação Estrutural', f'{obj.conta_estrutural} - {obj.classe_estrutural}'
+
+    def hook_classe_logica(self, obj):
+        return 'Classificação Lógica', f'{obj.conta_logica} - {obj.classe_logica}'
 
     def hook_conta(self, obj):
-        return 'Conta', str(obj.conta)
+        return 'Conta', str(obj.conta_logica)
 
     def hook_owner(self, obj):
         return 'Criado Por', str(obj.owner)

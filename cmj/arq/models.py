@@ -176,11 +176,10 @@ PERFIL_ARQCLASSE = ((
     ARQCLASSE_LOGICA, _('Classe de Organização Lógica')),
 )
 
+mask_conta = ['{:03}', '{:02}', '{:02}', '{:02}', '{:01}']
+
 
 class Parent(models.Model):
-
-    mask_conta = ['{:03}', '{:02}', '{:02}', '{:02}']
-
     parent = models.ForeignKey(
         'self',
         blank=True, null=True, default=None,
@@ -323,8 +322,12 @@ class ArqClasse(Parent):
     def conta(self):
         ct = [str(p.codigo) for p in self.parents]
         ct.append(str(self.codigo))
-        if len(ct[0]) < 3:
-            ct[0] = '{:03,d}'.format(int(ct[0]))
+
+        while len(mask_conta) < len(ct):
+            mask_conta.append(mask_conta[-1])
+
+        for i, c in enumerate(ct):
+            ct[i] = mask_conta[i].format(int(c))
         return '.'.join(ct)
 
     @property
@@ -455,8 +458,28 @@ class ArqDoc(Parent, CmjAuditoriaModelMixin):
         verbose_name_plural = _('ArcDocs')
 
     @property
-    def conta(self):
+    def conta_classe_logica(self):
+        return self.classe_logica.conta
+
+    @property
+    def conta_classe_estrutural(self):
+        return self.classe_estrutural.conta
+
+    @property
+    def conta_logica(self):
+        ct = [self.classe_logica.conta, ]
+        ct.append(str(self.codigo))
+        return '.'.join(ct)
+
+    @property
+    def conta_estrutural(self):
         ct = [self.classe_estrutural.conta, ]
+        ct.append(str(self.codigo))
+        return '.'.join(ct)
+
+    @property
+    def conta(self):
+        ct = [self.classe_logica.conta, ]
         ct.append(str(self.codigo))
         return '.'.join(ct)
 

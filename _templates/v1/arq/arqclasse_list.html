@@ -80,7 +80,7 @@
         </tbody>
     </table>
   {% endif %}
-  {% if object and object.can_arqdoc %}
+  {% if object and object.can_arqdoc or object and object.perfil == 200 %}
     {% with object as classe %}
       {% include "arq/arqdoc_widget_list.html" %}
     {% endwith %}

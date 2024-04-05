@@ -15,7 +15,8 @@ class ArqDocIndex(CelerySearchIndex, Indexable):
     model = ArqDoc
     data = DateTimeField(model_attr='data')
 
-    conta = CharField(model_attr='conta')
+    conta_classe_logica = CharField(model_attr='conta_classe_logica')
+    conta_classe_estrutural = CharField(model_attr='conta_classe_estrutural')
 
     text = ArqTextExtractField(
         document=True, use_template=True,

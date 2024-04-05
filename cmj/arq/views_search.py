@@ -21,6 +21,10 @@ from sapl.crispy_layout_mixin import to_row
 
 class ArqSearchForm(ModelSearchForm):
 
+    conta_classe_logica = forms.CharField(
+        required=False, label=_('Conta'),
+        widget=forms.HiddenInput())
+
     def no_query_found(self):
         return self.searchqueryset.all().order_by('-data')
 
@@ -41,7 +45,7 @@ class ArqSearchForm(ModelSearchForm):
             ),
         )
 
-        row = to_row([(Div(), 2), (q_field, 8), ])
+        row = to_row([('conta_classe_logica', 2), (q_field, 8), ])
 
         self.helper = FormHelper()
         self.helper.form_tag = False
@@ -61,11 +65,20 @@ class ArqSearchForm(ModelSearchForm):
 
     def search(self):
         sqs = super().search()
+
+        conta_classe_logica = self.cleaned_data.get(
+            'conta_classe_logica', None)
+
+        if conta_classe_logica:
+            sqs = sqs.filter(
+                conta_classe_logica__startswith=conta_classe_logica)
+
         kwargs = {
             'hl.simple.pre': '<span class="highlighted">',
             'hl.simple.post': '</span>',
             'hl.fragsize': 512
         }
+
         s = sqs.highlight(**kwargs).order_by('-data', '-last_update')
         return s
 
@@ -121,6 +134,8 @@ class ArqSearchView(SearchView):
         data = self.request.GET or self.request.POST
 
         data = data.copy()
+        context['q'] = data.get('q', '')
+
         if 'csrfmiddlewaretoken' in data:
             del data['csrfmiddlewaretoken']
 

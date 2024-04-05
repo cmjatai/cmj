@@ -2,7 +2,7 @@
 <hr>
 <div class="d-flex w-100 justify-content-between align-items-center">
   <h2>
-    ArqDocumentos da ArqClasse {{object.nome}}<br>Conta: {{object.conta}}
+    ArqDocumentos da ArqClasse: {{ object.titulo }}<br>Conta: {{object.conta}}
   </h2>
   <div class="btn-group-sm" role="group">
     {% if not object.checkcheck %}
@@ -33,7 +33,7 @@
       <td>
         <div class="d-flex w-100 justify-content-between">
           <div class="d-block">
-            <a name="{{arqdoc.pk }}" href="{% url 'cmj.arq:arqdoc_detail' arqdoc.classe_estrutural_id arqdoc.pk %}">{{ arqdoc.titulo }}</a>
+            <a name="{{arqdoc.pk }}" href="{% url 'cmj.arq:arqdoc_detail' arqdoc.classe_estrutural_id arqdoc.pk %}">{{ arqdoc.conta }} - {{ arqdoc.titulo }}</a>
             <br>
             <small>
               {{arqdoc.descricao}}

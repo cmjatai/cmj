@@ -7,9 +7,11 @@
   - title: {% trans "Pesquisa por ArqDocumentos" %}
     url: cmj.arq:haystack_arqsearch
     check_permission: arq.view_arqclasse
+{% comment %}
   - title: {% trans "ArqView" %}
     url: /arq/root
     check_permission: arq.view_arqclasse
+{% endcomment %}
   - title: ''
     url: ''
   - title: {% trans "Cadastro de ArqClasses" %}

@@ -69,7 +69,7 @@
       {% endfor %}
     </ul>
   {% endif %}
-  {% if object and object.can_arqdoc %}
+  {% if object and object.can_arqdoc or object and object.perfil == 200 %}
     {% include "arq/arqdoc_widget_list.html" %}
   {% endif %}
 {% endblock %}

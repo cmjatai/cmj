@@ -7,7 +7,7 @@
         <ul>
           {% for pc in p.childs.all %}
             <li>
-              <a href="{% url 'cmj.arq:subarqclasse_list' pc.id %}?view={{request.GET.view|default:view_format}}">
+              <a href="{% url 'cmj.arq:subarqclasse_list' pc.id %}?view={{request.GET.view|default:view_format}}" title="{{pc.conta}}">
                 {{ pc.titulo }}
               </a>
             </li>
