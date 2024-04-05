@@ -96,7 +96,7 @@ class ArqDocForm(ModelForm):
 
     classe_logica = forms.ModelChoiceField(
         queryset=ArqClasse.objects.filter(perfil=ARQCLASSE_LOGICA),
-        required=False)
+        required=True)
 
     classe_estrutural = forms.ModelChoiceField(
         queryset=ArqClasse.objects.filter(perfil=ARQCLASSE_FISICA),
