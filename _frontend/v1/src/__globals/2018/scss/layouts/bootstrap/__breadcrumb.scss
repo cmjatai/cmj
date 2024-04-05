@@ -40,10 +40,19 @@
         color: #794905;
       }
     }
+    li {
+      &::before {
+        display: none;
+      }
+    }
     &:hover {
       background: darken($color_main_bg, 15%) $url_bg_png;
-      ul {
+      & > ul {
         display: block;
+        ul {
+          left: 100%;
+          top: 0;
+        }
       }
     }
   }
