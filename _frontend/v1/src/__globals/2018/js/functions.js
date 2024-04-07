@@ -4,7 +4,7 @@ import dateFormat from 'dateformat'
 window.dateFormat = dateFormat
 
 window.removeTinymce = function () {
-  while (window.tinymce.editors.length > 0) {
+  while (window.tinymce.editors && window.tinymce.editors.length > 0) {
     window.tinymce.remove(window.tinymce.editors[0])
   }
 }
@@ -13,14 +13,18 @@ window.initTextRichEditor = function (elements, readonly = false) {
   window.removeTinymce()
   const configTinymce = {
     selector: elements === null || elements === undefined ? 'textarea' : elements,
-    force_br_newlines: false,
-    force_p_newlines: false,
-    forced_root_block: '',
+    /*
+    forced_root_block: 'div',
+    forced_root_block_attrs: {
+      class: 'd-inline-block'
+    },
+    */
+    plugins: 'lists table code',
     min_height: 500,
     language: 'pt_BR',
-    plugins: ['lists table code'],
     menubar: 'edit view format table tools',
-    toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent'
+    toolbar: 'undo redo | styles | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent',
+    license_key: 'gpl'
   }
   if (readonly) {
     configTinymce.readonly = 1

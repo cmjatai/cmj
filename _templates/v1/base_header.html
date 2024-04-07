@@ -115,20 +115,22 @@
               {% endif %}
           </div>
           <div class="row-2 d-flex justify-content-end">
-            <form class="form-search" method="get" action="{% url 'cmj.core:haystack_search'%}">
-              <div class="inner">
-                <div class="item-form">
-                  <input type="search" name="q" placeholder="O que você procura?" class="textinput textInput form-control" id="id_q" value="{{request|search_value}}" autocomplete="off" />
+            {% if request.path != '/arqadmin/pesquisa/' %}
+              <form class="form-search" method="get" action="{% url 'cmj.core:haystack_search'%}">
+                <div class="inner">
+                  <div class="item-form">
+                    <input type="search" name="q" placeholder="O que você procura?" class="textinput textInput form-control" id="id_q" value="{{request|search_value}}" autocomplete="off" />
+                  </div>
+                  <div class="item-form">
+                    <button class="button" type="submit"value="">
+                      <i class="fas fa-search"></i>
+                    </button>
+                  </div>
                 </div>
-                <div class="item-form">
-                  <button class="button" type="submit"value="">
-                    <i class="fas fa-search"></i>
-                  </button>
-                </div>
-              </div>
-            </form>
+              </form>
+            {% endif %}
 
-            {% if perms.sigad %}
+            {% if perms.sigad.add_documento %}
               {% include 'base_header_transparencia.html' %}
             {% else %}
               {% cache 600 cache_acesso_informacao %}
