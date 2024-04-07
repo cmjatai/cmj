@@ -181,12 +181,12 @@ class ArqDocForm(ModelForm):
             200: []
         }
 
-        def get_pc_order_by(perfil, nd=None, opened=None):
+        def get_pc_order_by(perfil, nd=None, only_opened=None):
             params = {
                 'perfil': perfil
             }
 
-            if opened:
+            if only_opened:
                 params['checkcheck'] = False
 
             if not nd:
@@ -200,7 +200,7 @@ class ArqDocForm(ModelForm):
             for c in childs.order_by('codigo'):
                 get_pc_order_by(perfil, nd=c)
 
-        get_pc_order_by(100, opened=True)
+        get_pc_order_by(100, only_opened=True)
         get_pc_order_by(200)
 
         self.fields['classe_estrutural'].choices = pc[100]
