@@ -3,8 +3,8 @@
    Autor Luciano De Fázio - 06/11/2012
    versão: 1.0
 """
-import time
 import os
+import time
 
 from trml2pdf import parseString
 
@@ -36,8 +36,8 @@ def rodape(lst_rodape):
     tmp_data = ''
     tmp_data += '\t\t\t\t<lines>2cm 3.2cm 19cm 3.2cm</lines>\n'
     tmp_data += '\t\t\t\t<setFont name="Helvetica" size="8"/>\n'
-    tmp_data += '\t\t\t\t<drawString x="2cm" y="3.3cm">' + \
-        lst_rodape[2] + '</drawString>\n'
+    # tmp_data += '\t\t\t\t<drawString x="2cm" y="3.3cm">' + \
+    #    lst_rodape[2] + '</drawString>\n'
     tmp_data += '\t\t\t\t<drawCentredString x="10.5cm" y="2.7cm">' + \
         lst_rodape[0] + '</drawCentredString>\n'
     tmp_data += '\t\t\t\t<drawCentredString x="10.5cm" y="2.3cm">' + \
@@ -112,15 +112,18 @@ def inf_basicas(inf_basicas_dic):
 
     return tmp
 
+
 def build_expedientes(expedientes):
     """
     """
     tmp = ""
     tmp += '\t\t<para style="P1">Expedientes</para>\n'
     for e in expedientes:
-        tmp += '\t\t\t<para style="P2" spaceAfter="5"><b>{}:</b></para>'.format(e['tipo'])
-        tmp += '\t\t\t  <para style="P2" spaceAfter="5"><p>{}</p></para>'.format(e['conteudo'])
-    
+        tmp += '\t\t\t<para style="P2" spaceAfter="5"><b>{}:</b></para>'.format(
+            e['tipo'])
+        tmp += '\t\t\t  <para style="P2" spaceAfter="5"><p>{}</p></para>'.format(
+            e['conteudo'])
+
     return tmp
 
 
@@ -142,7 +145,9 @@ def expediente_materia(lst_expediente_materia):
         txt_ementa = expediente_materia['txt_ementa'].replace('&', '&amp;')
         if len(txt_ementa) > 1000:
             txt_ementa = txt_ementa[:1000] + "..."
-        tmp += '<td><para style="P4">' + txt_ementa + '</para>' + '<para style="P4">' + expediente_materia['ordem_observacao'] + '</para></td>\n'
+        tmp += '<td><para style="P4">' + txt_ementa + '</para>' + \
+            '<para style="P4">' + \
+            expediente_materia['ordem_observacao'] + '</para></td>\n'
         tmp += '<td><para style="P3">' + \
             str(expediente_materia['des_situacao']) + '</para></td></tr>\n'
 
@@ -166,12 +171,14 @@ def votacao(lst_votacao):
                votacao["tipo_materia"] + ' No. ' + \
                str(votacao['id_materia']) + '</para>\n' + '<para style="P3"><b>Processo: </b>' + \
                str(votacao['des_numeracao']) + '</para>\n' + '<para style="P3"><b>Turno: </b>' + \
-               str(votacao['des_turno']) + '</para>\n' + '<para style="P3"><b>'+votacao['num_autores']+': </b>' + \
+               str(votacao['des_turno']) + '</para>\n' + '<para style="P3"><b>' + votacao['num_autores'] + ': </b>' + \
                str(votacao['nom_autor']) + '</para></td>\n'
         txt_ementa = votacao['txt_ementa'].replace('&', '&amp;')
         if len(txt_ementa) > 1000:
             txt_ementa = txt_ementa[:1000] + "..."
-        tmp += '<td><para style="P4">' + txt_ementa + '</para>' + '<para style="P4">' + votacao['ordem_observacao'] + '</para></td>\n'
+        tmp += '<td><para style="P4">' + txt_ementa + '</para>' + \
+            '<para style="P4">' + \
+            votacao['ordem_observacao'] + '</para></td>\n'
         tmp += '<td><para style="P3">' + \
             str(votacao['des_situacao']) + '</para></td></tr>\n'
 

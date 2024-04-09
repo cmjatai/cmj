@@ -3769,6 +3769,10 @@ class PautaSessaoDetailView(DetailView):
     template_name = "sessao/pauta_sessao_detail.html"
     model = SessaoPlenaria
 
+    @property
+    def search_url(self):
+        return reverse('sapl.sessao:pesquisar_pauta')
+
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         context = self.get_context_data(object=self.object)
@@ -3892,7 +3896,7 @@ class PautaSessaoDetailView(DetailView):
             materias_ordem.append(mat)
 
         context.update({'materias_ordem': materias_ordem})
-        context.update({'subnav_template_name': 'sessao/pauta_subnav.yaml'})
+        context.update({'subnav_template_name': ''})
 
         return self.render_to_response(context)
 
@@ -3992,6 +3996,7 @@ class PesquisarPautaSessaoView(PesquisarSessaoPlenariaView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = _('Pesquisar Pauta de Sessão')
+        context['bg_title'] = ''
         return context
 
 

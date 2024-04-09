@@ -42,7 +42,7 @@
 	                  <span class="caret top" title="{% trans 'Listado na Ordem Ascendente'%}"></span>
 	                {% elif 'o' in request.GET and forloop.counter == request.GET.o|str2intabs %}
 	                  <span class="caret" title="{% trans 'Listado na Ordem Descendente'%}"></span>
-	                {%endif%}
+	                {% endif %}
 	                </a>
                 {% else %}
                     {{ name }}

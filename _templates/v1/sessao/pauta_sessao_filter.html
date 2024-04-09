@@ -7,8 +7,10 @@
 {% block sections_nav %} {% endblock %}
 
 {% block base_content %}
+
+  {% crispy filter.form %}
+
   {% if not filter_url %}
-    {% crispy filter.form %}
   {% endif %}
 
   {% if filter_url %}

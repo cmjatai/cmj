@@ -5,7 +5,7 @@
     url: {% url 'sapl.materia:pesquisar_materia' %}
   - title: {% trans 'Pautas das Sessões' %}
     url: sapl.sessao:pauta_sessao
-    check_permission: sessao.add_sessaoplenaria
+    #check_permission: sessao.add_sessaoplenaria
   - title: {% trans 'Sessões Plenárias' %}
     url: {% url 'sapl.sessao:pesquisar_sessao' %}?data_inicio__year={% now 'Y' %}
   - title: {% trans 'Relatórios' %}

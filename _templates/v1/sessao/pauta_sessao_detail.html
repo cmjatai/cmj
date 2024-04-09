@@ -2,8 +2,12 @@
 {% load i18n %}
 {% load crispy_forms_tags %}
 
-{% block base_content %}
-<div align=right><a href="{% url 'sapl.relatorios:relatorio_pauta_sessao' object.pk %}"> Impressão PDF</a></li></div>
+{% block detail_content %}{% endblock detail_content %}
+
+{% block table_content %}
+
+<div align=right>
+	<a href="{% url 'sapl.relatorios:relatorio_pauta_sessao' object.pk %}"> Impressão PDF</a></li></div>
 <fieldset>
 	<legend>Identificação Básica</legend>
 	<table class="table">
@@ -17,7 +21,7 @@
   </table>
 </fieldset>
 
-<fieldset>
+<fieldset class="d-none">
 	<legend>Expedientes</legend>
 	<table class="table">
 	    <thead class="thead-default">
@@ -60,6 +64,8 @@
   </table>
   {% else %}
   <strong>Não existem Matérias de Expediente para essa Sessão Plenária</strong>
+	<br><br>
+
   {% endif %}
 
 </fieldset>
@@ -90,4 +96,4 @@
   <strong>Não existem Matérias de Ordem do Dia para essa Sessão Plenária</strong>
   {% endif %}
 </fieldset>
-{% endblock base_content %}
+{% endblock table_content %}
