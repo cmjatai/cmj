@@ -70,6 +70,30 @@ services:
       - "9000:9000"
     networks:
       - cmj-net
+
+  grafana:
+    image: grafana/grafana
+    environment:
+      GF_INSTALL_PLUGINS: "grafana-clock-panel,grafana-simple-json-datasource"
+    restart: 'no'
+    volumes:
+      - grafana_data:/var/lib/grafana
+    ports:
+      - 3000:3000
+    depends_on:
+      - prometheus
+    network_mode: host
+
+  prometheus:
+    image: prom/prometheus
+    restart: 'no'
+    volumes:
+      - prometheus_data:/prometheus
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+    network_mode: host
+
 networks:
   cmj-net:
     name: cmj-net
@@ -78,3 +102,5 @@ volumes:
   csolr_data:
   csolr_configsets:
   credis_data:
+  prometheus_data: {}
+  grafana_data: {}

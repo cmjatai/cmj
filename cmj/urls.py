@@ -94,6 +94,8 @@ urlpatterns_all = [
 
     url(r'', include(sapl.redireciona_urls.urls)),
 
+    url('prometheus-teste/', include('django_prometheus.urls'))
+
 ]
 
 admin.site.site_header = 'Cmj'

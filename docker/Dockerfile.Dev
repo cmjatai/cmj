@@ -64,6 +64,8 @@ WORKDIR /var/cmjatai/cmj/
 ADD requirements  /var/cmjatai/cmj_dev/requirements
 RUN pip install -r /var/cmjatai/cmj_dev/requirements/dev-requirements.txt
 
+RUN pip install django_prometheus
+
 ENV DEBIAN_FRONTEND teletype
 
 EXPOSE 9000/tcp

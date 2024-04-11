@@ -1,6 +1,5 @@
 
-#'reversion.middleware.RevisionMiddleware',
-MIDDLEWARE = (
+MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -10,4 +9,9 @@ MIDDLEWARE = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'social_django.middleware.SocialAuthExceptionMiddleware',
-)
+]
+
+MIDDLEWARE = \
+    ['django_prometheus.middleware.PrometheusBeforeMiddleware'] + \
+    MIDDLEWARE + \
+    ['django_prometheus.middleware.PrometheusAfterMiddleware']
