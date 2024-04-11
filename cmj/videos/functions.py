@@ -98,13 +98,13 @@ def pull_youtube_metadata_video(v):
                     d.extra_data = v.json
                     d.descricao = v.json['snippet']['description']
 
-                    d.public_date = dateutil.parser.parse(
-                        v.json['snippet']['publishedAt'])
+                    d.public_date = timezone.localtime(dateutil.parser.parse(
+                        v.json['snippet']['publishedAt']))
 
                     if 'liveStreamingDetails' in v.json and \
                             'actualStartTime' in v.json['liveStreamingDetails']:
-                        d.public_date = dateutil.parser.parse(
-                            v.json['liveStreamingDetails']['actualStartTime'])
+                        d.public_date = timezone.localtime(dateutil.parser.parse(
+                            v.json['liveStreamingDetails']['actualStartTime']))
 
                     d.save()
                 elif dp.tipo == Documento.TPD_VIDEO:
@@ -337,8 +337,8 @@ def video_documento_na_galeria():
         documento = Documento()
         documento.titulo = video_dict['title']
         documento.descricao = video_dict['description']
-        documento.public_date = dateutil.parser.parse(
-            video_dict['publishedAt'])
+        documento.public_date = timezone.localtime(dateutil.parser.parse(
+            video_dict['publishedAt']))
         documento.classe_id = 233
         documento.tipo = Documento.TD_VIDEO_NEWS
         documento.template_doc = 1

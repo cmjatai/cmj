@@ -4,6 +4,7 @@ from operator import attrgetter
 import zipfile
 
 from braces.views import FormMessagesMixin
+import dateutil.parser
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models import F, Q
@@ -181,14 +182,22 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
 
         docs = Documento.objects.qs_news()
 
+        try:
+            dini_la = timezone.localtime(
+                dateutil.parser.parse(
+                    f'{legislatura_atual["data_inicio"]} 00:00:00.000000-03:00'
+                )
+            )
+        except:
+            dini_la = legislatura_atual["data_inicio"]
+
         docs = docs.annotate(
             count_parlamentar=Count("parlamentares", distinct=True)
         ).filter(
             parlamentares__mandato__legislatura_id=legislatura_atual['id'],
             count_parlamentar=1,
             parlamentares__ativo=True,
-            public_date__gte=legislatura_atual['data_inicio'] -
-            timedelta(days=60)
+            public_date__gte=dini_la - timedelta(days=60)
         ).values_list('id', flat=True)
 
         docs = Documento.objects.filter(
