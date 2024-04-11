@@ -25,13 +25,14 @@ socials_connects = {
 }
 
 
-@app.task(queue='celery', bind=True)
+@app.task(queue='cq_core', bind=True)
 def task_send_rede_social(self, rede, app_label, model_name, pk):
     # print(args)
     # print(kwargs)
     # return
 
     send_func = f'send_{rede}_{app_label}_{model_name}'
+
     print(f'print, task_send_rede_social iniciou execução: {send_func}')
     logger.info(f'logger task_send_rede_social iniciou execução: {send_func}')
 
@@ -139,8 +140,8 @@ def send_telegram_materia_materialegislativa(pk):
         map(lambda a: '<i>{}</i>'.format(a), instance.autores.all()))
 
     text = f"""#{instance.tipo.sigla} #MatériaLegislativa
-<b>{str(instance).upper()}</b>   
-    
+<b>{str(instance).upper()}</b>
+
 <pre>{instance.ementa}</pre>
 
 Autoria:

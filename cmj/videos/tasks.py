@@ -51,7 +51,7 @@ def start_task(task_name, task, eta):
     return False
 
 
-@app.task(queue='celery', bind=True)
+@app.task(queue='cq_videos', bind=True)
 def task_pull_youtube_geral(*args, **kwargs):
 
     v = Video.objects.exclude(
@@ -59,11 +59,11 @@ def task_pull_youtube_geral(*args, **kwargs):
     ).order_by('execucao', '-created').first()
 
     if v:
+        print(f'TASK GERAL {v.id} {v.vid} {v.created} {v.modified}')
         try:
             v = pull_youtube_metadata_video(v)
             logger.info(
                 f'TASK GERAL {v.id} {v.vid} {v.created} {v.modified}')
-
         except:
             pass
 
@@ -72,7 +72,7 @@ def task_pull_youtube_geral(*args, **kwargs):
                    timezone.now() + timedelta(seconds=120))
 
 
-@app.task(queue='celery', bind=True)
+@app.task(queue='cq_videos', bind=True)
 def task_pull_youtube_live(*args, **kwargs):
 
     live = Video.objects.filter(
@@ -80,12 +80,10 @@ def task_pull_youtube_live(*args, **kwargs):
 
     if live.exists():
         for v in live:
-            print(v.id, v.vid, v.created, v.modified)
+            print(f'TASK LIVE {v.id} {v.vid} {v.created} {v.modified}')
             try:
                 v = pull_youtube_metadata_video(v)
-                logger.info(
-                    f'TASK LIVE {v.id} {v.vid} {v.created} {v.modified}')
-
+                logger.info(f'TASK LIVE {v.id} {v.vid} {v.created} {v.modified}')
             except:
                 pass
 
@@ -94,7 +92,7 @@ def task_pull_youtube_live(*args, **kwargs):
                    timezone.now() + timedelta(seconds=300))
 
 
-@app.task(queue='celery', bind=True)
+@app.task(queue='cq_videos', bind=True)
 def task_pull_youtube_upcoming(*args, **kwargs):
 
     upcoming = Video.objects.filter(
@@ -105,12 +103,15 @@ def task_pull_youtube_upcoming(*args, **kwargs):
         liveBroadcastContent = ''
         scheduledStartTime = None
         for v in upcoming:
+            print(f'TASK UPCOMING {v.id} {v.vid} {v.created} {v.modified}')
             try:
                 v = pull_youtube_metadata_video(v)
                 logger.info(
                     f'TASK UPCOMING {v.id} {v.vid} {v.created} {v.modified}')
                 liveBroadcastContent = v.json['snippet']['liveBroadcastContent']
             except Exception as e:
+                print(
+                    f'TASK UPCOMING ERROR {v.id} {v.vid} {v.created} {v.modified}')
                 logger.error(
                     f'TASK UPCOMING {v.id} {v.vid} {v.created} {v.modified}')
 
@@ -136,22 +137,22 @@ def task_pull_youtube_upcoming(*args, **kwargs):
                        scheduledStartTime)
 
 
-@app.task(queue='celery', bind=True)
+@app.task(queue='cq_videos', bind=True)
 def task_pull_youtube(self, *args, **kwargs):
 
     now = timezone.now()
 
     td = PullExec.objects.timedelta_quota_pull()
 
-    logger.debug(
-        f'RUNNING Task_pull_youtube - proximo em: {td.total_seconds()}')
+    print(f'RUNNING Task_pull_youtube - proximo em: {td.total_seconds()}')
+    logger.info(f'RUNNING Task_pull_youtube - proximo em: {td.total_seconds()}')
     new_started = start_task('task_pull_youtube',
                              task_pull_youtube,
                              now + td)
 
     if not new_started:
-        logger.debug(
-            f'NEW_STARTED FALSE Task_pull_youtube - proximo em: {td.total_seconds()}')
+        print(f'NEW_STARTED FALSE Task_pull_youtube - proximo em: {td.total_seconds()}')
+        logger.info(f'NEW_STARTED FALSE Task_pull_youtube - proximo em: {td.total_seconds()}')
         return
 
     try:
@@ -159,6 +160,7 @@ def task_pull_youtube(self, *args, **kwargs):
         vincular_sistema_aos_videos()
         video_documento_na_galeria()
     except Exception as e:
+        print('ERROR in Task_pull_youtube')
         logger.error('ERROR in Task_pull_youtube')
 
     now = timezone.now()

@@ -24,8 +24,8 @@ def console(cmd):
 
 
 def task_ocrmypdf_function(app_label, model_name, field_name, id_list, jobs):
-    logger.info(
-        f'task_ocrmypdf_function {app_label} {model_name} {field_name} {id_list}')
+    print(f'task_ocrmypdf_function {app_label} {model_name} {field_name} {id_list} {jobs}')
+    logger.info(f'task_ocrmypdf_function {app_label} {model_name} {field_name} {id_list} {jobs}')
 
     model = apps.get_model(app_label, model_name)
 
@@ -62,6 +62,7 @@ def task_ocrmypdf_function(app_label, model_name, field_name, id_list, jobs):
                f'"{f}"',
                f'"{f}"']
 
+        print(' '.join(cmd))
         logger.info(' '.join(cmd))
 
         md = instance.metadata or {}
@@ -70,12 +71,17 @@ def task_ocrmypdf_function(app_label, model_name, field_name, id_list, jobs):
                 'pdfa': DraftMidia.METADATA_PDFA_PROC,
             }
         })
+
         instance.save()
 
         r = console(' '.join(cmd))
-        logger.info(r[0])
-        logger.info(r[1].decode('utf-8'))
+
+        #logger.info(r[0])
+        #logger.info(r[1].decode('utf-8'))
+
+        print(r[2].decode('utf-8'))
         logger.info(r[2].decode('utf-8'))
+
 
         if not r[0]:
             md.update({
@@ -96,17 +102,18 @@ def task_ocrmypdf_function(app_label, model_name, field_name, id_list, jobs):
         instance.save()
 
 
-@app.task(queue='celery', bind=True)
-def task_ocrmypdf(self, app_label, model_name, field_name, pk, jobs, compact=False):
-    logger.info(
-        f'task_ocrmypdf {app_label} {model_name} {field_name} {pk}')
+@app.task(queue='cq_arq', bind=True)
+def task_ocrmypdf(self, app_label, model_name, field_name, id_list, jobs, compact=False):
+    print(f'task_ocrmypdf {app_label} {model_name} {field_name} {id_list} {jobs}')
+    logger.info(f'task_ocrmypdf {app_label} {model_name} {field_name} {id_list} {jobs}')
+
     task = task_ocrmypdf_compact_function if compact else task_ocrmypdf_function
     task(app_label, model_name, field_name, pk, jobs)
 
 
 def task_ocrmypdf_compact_function(app_label, model_name, field_name, id_list, jobs):
-    logger.info(
-        f'task_ocrmypdf_compact_function {app_label} {model_name} {field_name} {id_list}')
+    print(f'task_ocrmypdf_compact_function {app_label} {model_name} {field_name} {id_list} {jobs}')
+    logger.info(f'task_ocrmypdf_compact_function {app_label} {model_name} {field_name} {id_list} {jobs}')
 
     model = apps.get_model(app_label, model_name)
 
@@ -143,12 +150,16 @@ def task_ocrmypdf_compact_function(app_label, model_name, field_name, id_list, j
                f'"{f}"',
                f'"{f}"']
 
+        print(' '.join(cmd))
         logger.info(' '.join(cmd))
 
         r = console(' '.join(cmd))
-        logger.info(r[0])
-        logger.info(r[1].decode('utf-8'))
+        #logger.info(r[0])
+        #logger.info(r[1].decode('utf-8'))
+
+        print(r[2].decode('utf-8'))
         logger.info(r[2].decode('utf-8'))
+
         md = instance.metadata or {}
 
         if not r[0]:
