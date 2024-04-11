@@ -62,10 +62,7 @@ ADD libreoffice_entrypoint.sh /opt/libreoffice/libreoffice_entrypoint.sh
 RUN chmod +x /opt/libreoffice/libreoffice_entrypoint.sh
 
 RUN mkdir -p /var/cmjatai/cmj/run
-RUN mkdir -p /var/cmjatai/cmj/logs/celery/cq_arq
-RUN mkdir -p /var/cmjatai/cmj/logs/celery/cq_core
-RUN mkdir -p /var/cmjatai/cmj/logs/celery/cq_videos
-RUN mkdir -p /var/cmjatai/cmj/logs/celery/cq_base
+RUN mkdir -p /var/cmjatai/cmj/logs/celery
 RUN mkdir -p /var/cmjatai/cmj_data
 RUN mkdir -p /var/cmjatai/cmj_media
 RUN mkdir -p /var/cmjatai/BD_POSTGRESQL

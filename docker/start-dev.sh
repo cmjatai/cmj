@@ -49,15 +49,6 @@ else
 fi
 
 rm /var/cmjatai/cmj/logs/celery/*.pid
-#celery multi start 1 -A cmj -l INFO -Q:1 celery -c:1 1 --hostname=cmjredis --pidfile=./logs/celery/%n.pid --logfile=./logs/celery/%n%I.log
-
-#celery multi start cq_arq cq_core cq_videos cq_base -A cmj -l INFO -c:cq_arq 12 -c:cq_core 2 -c:cq_videos 1 -c:cq_base 1 --hostname=cmjredis --pidfile=./logs/celery/%n.pid --logfile=./logs/celery/%n%I.log
-
-#celery multi start 4 -A cmj -l INFO -Q:1 cq_arq -Q:2 cq_core -Q:3 cq_videos -Q:4 cq_base -c:1 12 -c:2 2 -c:3 1 -c:4 1 --hostname=cmjredis --pidfile=./logs/celery/%n.pid --logfile=./logs/celery/%n%I.log
-
-celery multi start cq_arq cq_core cq_videos cq_base -A cmj -l INFO -Q:cq_arq cq_arq -Q:cq_core cq_core -Q:cq_videos cq_videos -Q:cq_base cq_base -c:cq_arq 12 -c:cq_core 2 -c:cq_videos 1 -c:cq_base 1 --hostname=cmjredis --pidfile=./logs/celery/%n/%n.pid --logfile=./logs/celery/%n/%n%I.log
-
-#--hostname=cmjredis --pidfile=./logs/celery/%n.pid --logfile=./logs/celery/%n%I.log
-
+celery multi start 16 -A cmj -l INFO -Q:1-12 cq_arq -Q:13-14 cq_core -Q:15 cq_videos -Q:16 cq_base -c 2 --hostname=cmjredis --pidfile=./logs/celery/%n.pid --logfile=./logs/celery/%n%I.log
 
 yes yes | python3 manage.py runserver 0.0.0.0:9000

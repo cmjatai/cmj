@@ -108,7 +108,7 @@ def task_ocrmypdf(self, app_label, model_name, field_name, id_list, jobs, compac
     logger.info(f'task_ocrmypdf {app_label} {model_name} {field_name} {id_list} {jobs}')
 
     task = task_ocrmypdf_compact_function if compact else task_ocrmypdf_function
-    task(app_label, model_name, field_name, pk, jobs)
+    task(app_label, model_name, field_name, id_list, jobs)
 
 
 def task_ocrmypdf_compact_function(app_label, model_name, field_name, id_list, jobs):
