@@ -9,6 +9,7 @@ from django.http.request import QueryDict
 from django.urls.base import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 from haystack.forms import ModelSearchForm, SearchForm, model_choices
+from haystack.models import SearchResult
 from haystack.query import SearchQuerySet
 from haystack.utils.app_loading import haystack_get_model
 from haystack.views import SearchView
@@ -18,6 +19,17 @@ from cmj.core.models import AreaTrabalho
 from cmj.haystack import CMJARQ_ALIAS
 from cmj.utils import make_pagination
 from sapl.crispy_layout_mixin import to_row
+
+
+class ArqSearchResult(SearchResult):
+    def __init__(self, app_label, model_name, pk, score, **kwargs):
+        return SearchResult.__init__(self, app_label, model_name, pk, score, **kwargs)
+
+    def _get_searchindex(self):
+        from haystack import connections
+        return connections['cmjarq'].get_unified_index().get_index(self.model)
+
+    searchindex = property(_get_searchindex)
 
 
 class ArqSearchForm(ModelSearchForm):
@@ -73,7 +85,7 @@ class ArqSearchForm(ModelSearchForm):
         self.fields['q'].label = ''
 
     def search(self):
-        sqs = super().search()
+        sqs = super().search().result_class(ArqSearchResult)
 
         conta_classe_logica = self.cleaned_data.get(
             'conta_classe_logica', None)
