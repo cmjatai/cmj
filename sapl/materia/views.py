@@ -38,7 +38,8 @@ import weasyprint
 from cmj import celery
 from cmj.core.models import AreaTrabalho
 from cmj.globalrules import GROUP_MATERIA_WORKSPACE_VIEWER
-from cmj.mixins import BtnCertMixin, CheckCheckMixin, MultiFormatOutputMixin
+from cmj.mixins import BtnCertMixin, CheckCheckMixin, MultiFormatOutputMixin,\
+    AudigLogFilterMixin
 import requests as rq
 import sapl
 from sapl.base.email_utils import do_envia_email_confirmacao
@@ -2484,7 +2485,7 @@ class AcompanhamentoExcluirView(TemplateView):
         return HttpResponseRedirect(self.get_success_url())
 
 
-class MateriaLegislativaPesquisaView(MultiFormatOutputMixin, FilterView):
+class MateriaLegislativaPesquisaView(AudigLogFilterMixin, MultiFormatOutputMixin, FilterView):
     model = MateriaLegislativa
     filterset_class = MateriaLegislativaFilterSet
     paginate_by = 50

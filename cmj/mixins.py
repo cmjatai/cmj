@@ -1,9 +1,11 @@
 
 import csv
 import io
+import logging
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Div, Fieldset
+from django.apps import apps
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError, PermissionDenied
@@ -20,6 +22,9 @@ from xlsxwriter.workbook import Workbook as XlsxWorkbook
 from cmj.utils import run_sql, get_settings_auth_user_model, ProcessoExterno
 from sapl.crispy_layout_mixin import to_row, SaplFormLayout, \
     form_actions
+
+
+logger = logging.getLogger(__name__)
 
 
 class CmjChoices(Choices):
@@ -415,6 +420,54 @@ class GoogleRecapthaMixin:
                 _('Ocorreu um erro na validação do reCAPTCHA.'))
 
         return cd
+
+
+class AudigLogFilterMixin:
+
+    def dispatch(self, request, *args, **kwargs):
+        self.log(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
+
+    def log(self, request, *args, **kwargs):
+
+        try:
+            data = request.GET or request.POST
+            data = data.lists()
+            md = {}
+            for k, v in data:
+                v = list(filter(lambda i: i, v))
+                if not v or 'csrf' in k or 'salvar' in k:
+                    continue
+
+                md[k] = v[0] if len(v) == 1 else v
+
+            if md:
+                AuditLog = apps.get_model('core', 'auditlog')
+                al = AuditLog()
+                al.user = None if request.user.is_anonymous else request.user
+                al.email = '' if request.user.is_anonymous else request.user.email
+                al.operation = 'P'
+                al.obj_id = 0
+
+                if hasattr(self, 'model'):
+                    al.model_name = self.model._meta.model_name
+                    al.app_name = self.model._meta.app_label
+                else:
+                    if 'models'in md and isinstance(md['models'], str):
+                        md['models'] = [md['models'], ]
+
+                al.obj = {
+                    'params': md,
+                }
+                try:
+                    al.obj['REMOTE_HOST'] = request.META.get('REMOTE_HOST', '')
+                except:
+                    pass
+
+                al.save()
+        except Exception as e:
+            logger.error('Error saving auditing log object')
+            logger.error(e)
 
 
 class MultiFormatOutputMixin:

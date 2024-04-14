@@ -236,7 +236,7 @@ class AuditLog(models.Model):
         (STATUS_PUBLIC, _('Público')),
     )
 
-    operation_choice = ('C', 'D', 'U')
+    operation_choice = ('C', 'D', 'U', 'P')
 
     visibilidade = models.IntegerField(
         _('Visibilidade'),

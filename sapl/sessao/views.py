@@ -24,7 +24,8 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormMixin
 from django_filters.views import FilterView
 
-from cmj.mixins import BtnCertMixin, PluginSignMixin, MultiFormatOutputMixin
+from cmj.mixins import BtnCertMixin, PluginSignMixin, MultiFormatOutputMixin,\
+    AudigLogFilterMixin
 from sapl.base.models import AppConfig as AppsAppConfig
 from sapl.crud.base import (RP_DETAIL, RP_LIST, Crud, CrudAux,
                             MasterDetailCrud,
@@ -3901,7 +3902,7 @@ class PautaSessaoDetailView(DetailView):
         return self.render_to_response(context)
 
 
-class PesquisarSessaoPlenariaView(MultiFormatOutputMixin, FilterView):
+class PesquisarSessaoPlenariaView(AudigLogFilterMixin, MultiFormatOutputMixin, FilterView):
     model = SessaoPlenaria
     filterset_class = SessaoPlenariaFilterSet
     paginate_by = 12

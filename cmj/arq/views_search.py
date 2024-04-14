@@ -17,6 +17,7 @@ from haystack.views import SearchView
 from cmj.arq.models import ArqClasse, ARQCLASSE_LOGICA
 from cmj.core.models import AreaTrabalho
 from cmj.haystack import CMJARQ_ALIAS
+from cmj.mixins import AudigLogFilterMixin
 from cmj.utils import make_pagination
 from sapl.crispy_layout_mixin import to_row
 
@@ -118,9 +119,13 @@ class ArqSearchForm(ModelSearchForm):
         return ModelSearchForm.get_models(self)
 
 
-class ArqSearchView(SearchView):
+class ArqSearchView(AudigLogFilterMixin, SearchView):
     results_per_page = 50
     template = 'arq/search.html'
+
+    def __call__(self, request):
+        self.log(request)
+        return SearchView.__call__(self, request)
 
     def __init__(self, template=None, load_all=True, form_class=None, searchqueryset=None, results_per_page=None):
         super().__init__(

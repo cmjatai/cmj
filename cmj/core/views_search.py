@@ -13,6 +13,7 @@ from haystack.utils.app_loading import haystack_get_model
 from haystack.views import SearchView
 
 from cmj.core.models import AreaTrabalho
+from cmj.mixins import AudigLogFilterMixin
 from cmj.utils import make_pagination
 from sapl.crispy_layout_mixin import to_row
 from sapl.utils import RangeWidgetNumber
@@ -156,8 +157,12 @@ class CmjSearchForm(ModelSearchForm):
         return ModelSearchForm.get_models(self)
 
 
-class CmjSearchView(SearchView):
-    results_per_page = 10
+class CmjSearchView(AudigLogFilterMixin, SearchView):
+    results_per_page = 20
+
+    def __call__(self, request):
+        self.log(request)
+        return SearchView.__call__(self, request)
 
     def __init__(self, template=None, load_all=True, form_class=None, searchqueryset=None, results_per_page=None):
         super().__init__(

@@ -17,7 +17,7 @@ from django.views.generic import TemplateView, UpdateView, ListView
 from django.views.generic.edit import FormView
 from django_filters.views import FilterView
 
-from cmj.mixins import BtnCertMixin, MultiFormatOutputMixin
+from cmj.mixins import BtnCertMixin, MultiFormatOutputMixin, AudigLogFilterMixin
 from sapl import settings
 import sapl
 from sapl.base.models import AppConfig
@@ -105,7 +105,7 @@ class NormaDestaquesView(MultiFormatOutputMixin, ListView):
         return 'Normas e Códigos de Destaque'
 
 
-class NormaPesquisaView(MultiFormatOutputMixin, FilterView):
+class NormaPesquisaView(AudigLogFilterMixin, MultiFormatOutputMixin, FilterView):
     model = NormaJuridica
     filterset_class = NormaFilterSet
     paginate_by = 50
