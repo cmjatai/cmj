@@ -58,6 +58,18 @@
               <lib dir="./lib" />
     -->
 
+  <lib dir="${solr.install.dir:../../../..}/contrib/extraction/lib" regex=".*\.jar" />
+  <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-cell-\d.*\.jar" />
+
+  <lib dir="${solr.install.dir:../../../..}/contrib/clustering/lib/" regex=".*\.jar" />
+  <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-clustering-\d.*\.jar" />
+
+  <lib dir="${solr.install.dir:../../../..}/contrib/langid/lib/" regex=".*\.jar" />
+  <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-langid-\d.*\.jar" />
+
+  <lib dir="${solr.install.dir:../../../..}/contrib/velocity/lib" regex=".*\.jar" />
+  <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-velocity-\d.*\.jar" />
+
   <!-- A 'dir' option by itself adds any files found in the directory
        to the classpath, this is useful for including all jars in a
        directory.
@@ -1058,7 +1070,22 @@
       If you are using the QueryElevationComponent, you may wish to mark documents that get boosted.  The
       EditorialMarkerFactory will do exactly that:
      <transformer name="qecBooster" class="org.apache.solr.response.transform.EditorialMarkerFactory" />
+                  startup="lazy"
+      <str name="fmap.meta">ignored_</str>
+      <str name="fmap.content">text</str>
+      <str name="extractOnly">true</str>
+      <str name="extractFormat">text</str>
     -->
+  <requestHandler name="/update/extract"
+                  class="solr.extraction.ExtractingRequestHandler" >
+    <lst name="defaults">
+      <str name="lowernames">true</str>
+      <str name="fmap.meta">ignored_</str>
+      <str name="fmap.content">text</str>
+      <str name="extractOnly">true</str>
+      <str name="extractFormat">text</str>
+    </lst>
+  </requestHandler>
 
     <!-- Extras noted by users of DJangoHaystack -->
     <requestHandler name="/analysis/field"

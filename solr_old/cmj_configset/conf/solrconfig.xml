@@ -794,23 +794,17 @@
   <!-- Solr Cell Update Request Handler
 
        http://wiki.apache.org/solr/ExtractingRequestHandler
+                  startup="lazy"
+      <str name="fmap.meta">ignored_</str>
+      <str name="fmap.content">text</str>
 
     -->
   <requestHandler name="/update/extract"
-                  startup="lazy"
                   class="solr.extraction.ExtractingRequestHandler" >
     <lst name="defaults">
       <str name="lowernames">true</str>
-      <str name="fmap.meta">ignored_</str>
-      <str name="fmap.content">text</str>
+      <str name="extractOnly">true</str>
     </lst>
-
-    <!--
-      <str name="tika.config">/storage1/django-apps/cmj_www2/solr/cmj_configset/conf/tika-config.xml</str>
-      <str name="tika.config">/home/leandro/desenvolvimento/envs/cmj/solr/cmj_configset/conf/tika-config.xml</str>
-
-      <str name="tika.config">./tika-config.xml</str>
-    --> 
   </requestHandler>
 
   <!-- Search Components

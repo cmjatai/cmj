@@ -11,7 +11,7 @@ services:
     ports:
       - "6379:6379"
     networks:
-      - cmj-net 
+      - cmj-net
   cmjsolr:
     image: solr:9.5
     restart: no
