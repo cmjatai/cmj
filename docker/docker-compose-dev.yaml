@@ -11,9 +11,9 @@ services:
     ports:
       - "6379:6379"
     networks:
-      - cmj-net
+      - cmj-net 
   cmjsolr:
-    image: solr:8.11
+    image: solr:9.5
     restart: no
     command: bin/solr start -c -f
     container_name: cmjsolr

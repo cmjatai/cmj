@@ -35,7 +35,7 @@ class CmjSearchForm(ModelSearchForm):
     ano = RangeIntegerField(
         required=False,
         label=_('Incluir filtro por ano?'),
-        help_text=_('''É opcional limitar a busca em um período específico.<br> 
+        help_text=_('''É opcional limitar a busca em um período específico.<br>
         Você pode informar simultaneamente, formando um período específico, os campos Inicial e Final, ou apenas um, ou nenhum deles.'''),
         widget=RangeWidgetNumber()
     )

@@ -51,20 +51,24 @@ RUN apt-get install -y -q $LIBRE_PACKAGES
 RUN fc-cache -fv && \
     pip3 install --no-cache-dir --upgrade pip setuptools
 
-RUN adduser --home=/opt/libreoffice --disabled-password --gecos "" --shell=/bin/bash libreoffice
-ADD libreoffice_entrypoint.sh /opt/libreoffice/libreoffice_entrypoint.sh
-RUN chmod +x /opt/libreoffice/libreoffice_entrypoint.sh
-
+RUN adduser --home=/var/cmjatai/cmj --disabled-password --gecos "" --shell=/bin/bash cmj
 RUN mkdir -p /var/cmjatai/cmj
 RUN mkdir -p /var/cmjatai/cmj_dev
 RUN mkdir -p /var/cmjatai/cmj_media
+
+RUN adduser --home=/opt/libreoffice --disabled-password --gecos "" --shell=/bin/bash libreoffice
+ADD libreoffice_entrypoint.sh /opt/libreoffice/libreoffice_entrypoint.sh
+RUN chmod +x /opt/libreoffice/libreoffice_entrypoint.sh
 
 WORKDIR /var/cmjatai/cmj/
 
 ADD requirements  /var/cmjatai/cmj_dev/requirements
 RUN pip install -r /var/cmjatai/cmj_dev/requirements/dev-requirements.txt
 
+USER cmj
+
 ENV DEBIAN_FRONTEND teletype
+
 
 EXPOSE 9000/tcp
 

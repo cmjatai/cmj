@@ -72,7 +72,7 @@ REDIS_PORT = config('REDIS_PORT', cast=int, default=6379)
 
 if DEBUG:
     if FOLDER_DEBUG_CONTAINER != PROJECT_DIR:
-        HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+        #HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
         SOLR_URL = 'http://solr:solr@localhost:8983'
         REDIS_HOST = 'localhost'
 
