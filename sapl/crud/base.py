@@ -1015,8 +1015,8 @@ class Crud:
             CrudViewWithBase.__name__ = view.__name__
             return CrudViewWithBase
 
-        if 'ParticipacaoCrud' in str(cls):
-            print('ParticipacaoCrud')
+        # if 'ParticipacaoCrud' in str(cls):
+        #    print('ParticipacaoCrud')
 
         CrudListView = _add_base(cls.ListView)
         CrudCreateView = _add_base(cls.CreateView)

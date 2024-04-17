@@ -88,6 +88,7 @@
                       <a class="text-green" href="{% url 'cmj.diarios:diariooficial_detail' d.diariooficial.id %}">{{d.diariooficial}}</a> |
                     </small>
                     {% endif %}
+                    <br>
                     <small>
                       <span class="text-danger">Certidão de Publicação nº {{d.certidao.id|stringformat:"06d" }} de {{d.certidao.created}}</span>
                     </small>
