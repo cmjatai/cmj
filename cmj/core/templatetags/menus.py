@@ -155,9 +155,8 @@ def resolve_urls_inplace(menu, pk, rm, context):
                     """
                     if 'view' in context:
                         view = context['view']
-                        if hasattr(view, '__class__') and\
-                                hasattr(view.__class__, 'crud'):
-                            urls = view.__class__.crud.get_urls()
+                        if hasattr(view, 'crud'):
+                            urls = view.crud.get_urls()
                             for u in urls:
                                 if (u.name == url_name or
                                         'urls_extras' in menu and

@@ -3,7 +3,7 @@ import logging
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import F
-from django.http.response import HttpResponseRedirect, JsonResponse
+from django.http.response import HttpResponseRedirect, JsonResponse, Http404
 from django.urls.base import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.clickjacking import xframe_options_exempt
@@ -71,6 +71,13 @@ class ParticipacaoCrud(MasterDetailCrud):
     class BaseMixin(MasterDetailCrud.BaseMixin):
         list_field_names = ['composicao', 'parlamentar', 'cargo']
 
+        def redir_composicao(self):
+            composicao_comissao_id = self.object.composicao.comissao_id
+            composicao_pk = self.object.composicao.pk
+            return '{}?pk={}'.format(reverse('sapl.comissoes:composicao_list',
+                                             args=[composicao_comissao_id]),
+                                     composicao_pk)
+
     class CreateView(MasterDetailCrud.CreateView):
         form_class = ParticipacaoCreateForm
 
@@ -79,18 +86,36 @@ class ParticipacaoCrud(MasterDetailCrud):
             initial['parent_pk'] = self.kwargs['pk']
             return initial
 
+        @property
+        def cancel_url(self):
+            try:
+                composicao = Composicao.objects.get(pk=self.kwargs['pk'])
+            except Exception as e:
+                username = self.request.user
+                self.logger.error(
+                    'user=' + username + '. Erro ao obter composição.' + str(e))
+                raise Http404
+
+            composicao_comissao_id = composicao.comissao_id
+            composicao_pk = composicao.pk
+            return '{}?pk={}'.format(reverse('sapl.comissoes:composicao_list',
+                                             args=[composicao_comissao_id]),
+                                     composicao_pk)
+
     class UpdateView(MasterDetailCrud.UpdateView):
         layout_key = 'ParticipacaoEdit'
         form_class = ParticipacaoEditForm
 
+    class DetailView(MasterDetailCrud.DetailView):
+
+        @property
+        def detail_list_url(self):
+            return self.redir_composicao()
+
     class DeleteView(MasterDetailCrud.DeleteView):
 
         def get_success_url(self):
-            composicao_comissao_pk = self.object.composicao.comissao.pk
-            composicao_pk = self.object.composicao.pk
-            return '{}?pk={}'.format(reverse('sapl.comissoes:composicao_list',
-                                             args=[composicao_comissao_pk]),
-                                     composicao_pk)
+            return self.redir_composicao()
 
 
 class ComposicaoCrud(MasterDetailCrud):
@@ -117,7 +142,7 @@ class ComposicaoCrud(MasterDetailCrud):
             try:
                 self.logger.debug('user=' + username +
                                   '. Tentando obter pk da composição.')
-                return int(self.request.GET['pk'])
+                return int(self.request.GET.get('pk', 0))
             except Exception as e:
                 self.logger.error(
                     'user=' + username + '. Erro ao obter pk da composição. Retornado 0. ' + str(e))
