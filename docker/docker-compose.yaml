@@ -21,8 +21,8 @@ services:
     labels:
         NAME: "cmjsolr"
     volumes:
-      - csolr_data:/var/solr
-      - csolr_configsets:/opt/solr/server/solr/configsets
+      - csolr9_data:/var/solr
+      - csolr9_configsets:/opt/solr/server/solr/configsets
     #ports:
     #  - "8983:8983"
     networks:
@@ -81,6 +81,6 @@ volumes:
   cmj_data:
   cmj_media:
   cmj_logs:
-  csolr_data:
-  csolr_configsets:
+  csolr9_data:
+  csolr9_configsets:
   credis_data:
