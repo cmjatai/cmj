@@ -460,7 +460,7 @@ class AudigLogFilterMixin:
                     'params': md,
                 }
                 try:
-                    al.obj['REMOTE_HOST'] = request.META.get('REMOTE_HOST', '')
+                    al.obj['REMOTE_ADDR'] = request.META.get('REMOTE_ADDR', '')
                 except:
                     pass
 
