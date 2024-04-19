@@ -460,7 +460,9 @@ class AudigLogFilterMixin:
                     'params': md,
                 }
                 try:
-                    al.obj['REMOTE_ADDR'] = request.META.get('REMOTE_ADDR', '')
+                    al.obj['HTTP_X_REAL_IP'] = request.META.get(
+                        'HTTP_X_REAL_IP', '')
+                    # logger.info(dict(request.META))
                 except:
                     pass
 
