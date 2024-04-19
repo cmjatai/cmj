@@ -124,6 +124,7 @@ Bancada:
   - nome partido
   - data_criacao data_extincao
   - descricao
+  - filiados
 
 CargoBancada:
   {% trans 'Cargo de Bancada' %}:

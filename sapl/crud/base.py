@@ -1,3 +1,4 @@
+from abc import ABC
 import logging
 
 from braces.views import FormMessagesMixin
@@ -467,7 +468,7 @@ class CrudListView(PermissionRequiredContainerCrudMixin, ListView):
                 name = name,
 
             """ se elemento de list_field_name for uma tupla, constrói a
-            informação com ' - ' se os campos forem simples,
+            informação com ' / ' se os campos forem simples,
             ou com <br> se for m2m """
             if isinstance(name, tuple):
                 s = ''
@@ -488,7 +489,7 @@ class CrudListView(PermissionRequiredContainerCrudMixin, ListView):
                         if m:
                             ss = get_field_display(m, n[-1])[1]
                             ss = (
-                                ('<br>' if '<ul>' in ss else ' - ') + ss)\
+                                ('<br>' if '<ul>' in ss else ' / ') + ss)\
                                 if ss and j != 0 and s else ss
                     except:
                         pass
@@ -971,7 +972,7 @@ class CrudDeleteView(PermissionRequiredContainerCrudMixin,
 
 
 class Crud:
-    __abstract__ = True
+    __type__ = True
 
     BaseMixin = CrudBaseMixin
     ListView = CrudListView
@@ -992,7 +993,7 @@ class Crud:
             if not view:
                 return
 
-            if not cls.__abstract__:
+            if not cls.__type__:
                 return view
 
             pr = set()
@@ -1026,9 +1027,9 @@ class Crud:
 
         cruds = CrudListView, CrudCreateView, CrudDetailView, CrudUpdateView, CrudDeleteView
 
-        if cls.__abstract__:
+        if cls.__type__:
             class CRUD(cls):
-                __abstract__ = False
+                __type__ = False
                 ListView = CrudListView
                 CreateView = CrudCreateView
                 DetailView = CrudDetailView

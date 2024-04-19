@@ -13,7 +13,7 @@ from django.http.response import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.templatetags.static import static
 from django.urls.base import reverse_lazy, reverse
-from django.utils import timezone
+from django.utils import timezone, formats
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import classonlymethod
 from django.utils.translation import ugettext_lazy as _
@@ -60,6 +60,13 @@ class BancadaCrud(Crud):
     model = Bancada
     public = [RP_DETAIL, RP_LIST]
 
+    class BaseMixin(Crud.BaseMixin):
+        list_field_names = (
+            ('nome', 'partido'),
+            'data_criacao',
+            'data_extincao',
+            'legislatura')
+
     class DetailView(Crud.DetailView):
 
         def get_context_data(self, **kwargs):
@@ -67,6 +74,25 @@ class BancadaCrud(Crud):
 
             context['subnav_template_name'] = ''
             return context
+
+        def hook_filiados(self, bancada, **kwargs):
+            params = {}
+            if bancada.data_extincao:
+                #params['data_desfiliacao__lte'] = bancada.data_extincao
+                params['parlamentar__mandato__legislatura'] = bancada.legislatura
+            else:
+                params['data_desfiliacao__isnull'] = True
+                params['parlamentar__mandato__legislatura'] = bancada.legislatura
+
+            filiados = bancada.partido.filiacao_set.filter(
+                **params
+            ).values('parlamentar__nome_parlamentar', 'data').distinct()
+
+            filiados = map(
+                lambda x: f'<li>{x["parlamentar__nome_parlamentar"]} '
+                f'<small>(Filiado ao Partido em: {formats.date_format(x["data"], "d/m/Y")})</small></li>', filiados)
+            r = ''.join(filiados)
+            return 'Membros da Bancada', f'<ul>{r}</ul>'
 
     class UpdateView(CrudAux.UpdateView):
 

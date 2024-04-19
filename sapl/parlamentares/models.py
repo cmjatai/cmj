@@ -212,8 +212,6 @@ class HistoricoPartido(models.Model):
         }
 
 
-
-
 class ComposicaoColigacao(models.Model):
     # TODO M2M
     partido = models.ForeignKey(Partido,
@@ -498,7 +496,8 @@ class Filiacao(models.Model):
     parlamentar = models.ForeignKey(Parlamentar, on_delete=models.CASCADE)
     partido = models.ForeignKey(Partido,
                                 on_delete=models.PROTECT,
-                                verbose_name=_('Partido'))
+                                verbose_name=_('Partido'),
+                                related_name='filiacao_set')
     data_desfiliacao = models.DateField(
         blank=True, null=True, verbose_name=_('Data Desfiliação'))
 
@@ -541,7 +540,10 @@ class TipoAfastamento(models.Model):
 
 
 class Mandato(models.Model):
-    parlamentar = models.ForeignKey(Parlamentar, on_delete=models.CASCADE)
+    parlamentar = models.ForeignKey(
+        Parlamentar,
+        on_delete=models.CASCADE,
+    )
     tipo_afastamento = models.ForeignKey(TipoAfastamento,
                                          blank=True,
                                          null=True,
@@ -761,7 +763,8 @@ class Bancada(models.Model):
         db_table = 'parlamentares_bancada'
         verbose_name = _('Bancada Partidária')
         verbose_name_plural = _('Bancadas Partidárias')
-        ordering = ('-legislatura__numero', )
+        ordering = ('-legislatura__numero', '-data_extincao',
+                    'data_criacao', 'partido__nome')
 
     def __str__(self):
         return self.nome
