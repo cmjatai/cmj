@@ -6,6 +6,7 @@ from django.core.cache import cache
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models.deletion import CASCADE, PROTECT
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from cmj.mixins import CmjAuditoriaModelMixin
@@ -206,12 +207,13 @@ class AppConfig(models.Model):
              update_fields=None):
 
         if not self.disabled:
-            self.disabled = '''
+            now = timezone.localtime()
+            self.disabled = f'''
 - periodo:
-  start:  # ISOFORMAT datetime local
-  end:    # ISOFORMAT datetime local
+  start: {now.isoformat()} # ISOFORMAT datetime local
+  end: {now.isoformat()}   # ISOFORMAT datetime local
   urls:
-  - url: # path completo, relativo, regex
+  - url: ^$ # path completo, relativo, regex
 '''
 
         return models.Model.save(self, force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
