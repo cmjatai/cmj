@@ -8,7 +8,6 @@ import yaml
 
 from sapl.base.models import AppConfig
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -36,13 +35,13 @@ class DisabledMiddleware:
         # None - continua as midd
         # httpreponse responde
 
+        now = timezone.localtime()
+        path = request.path
         try:
-            path = request.path
 
             if path == '/login' or path.startswith('/sistema/app'):
                 return
 
-            now = timezone.localtime()
             self.periodos = yaml.full_load(AppConfig.attr('disabled'))
 
             for pdict in self.periodos:
@@ -71,17 +70,18 @@ class DisabledMiddleware:
                     m = r.findall(path)
 
                     if m:
-                        #print(path, 'BLOCK')
+                        # print(path, 'BLOCK')
                         if len(url) == 2:
                             return HttpResponseRedirect(url[1].strip())
                         else:
                             return HttpResponseForbidden()
 
-            # print(path)
         except:
             self.periodos = []
             logger.error(
                 'Erro na carga e avaliação dos períodos e suas urls desativadas')
+
+        # print(timezone.localtime() - now, path)
 
     def process_exception(self, request, exception):
         pass

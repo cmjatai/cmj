@@ -735,11 +735,8 @@ class BiView(ListView):
 class MediaPublicView(View):
 
     def get(self, request, *args, **kwargs):
+
         path = kwargs['path']
-
-        logger.info(
-            f'MediaPublicView init end method {path}')
-
         if settings.DEBUG:
             return view_static_server(
                 request,
@@ -769,6 +766,4 @@ class MediaPublicView(View):
             path
         )
 
-        logger.info(
-            f'MediaPublicView END end method {response["X-Accel-Redirect"]}')
         return response
