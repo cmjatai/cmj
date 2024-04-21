@@ -30,7 +30,6 @@ from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic.base import TemplateView
-from django.views.static import serve as view_static_server
 
 import cmj.agenda.urls
 import cmj.arq.urls
@@ -103,18 +102,8 @@ if settings.DEBUG_TOOLBAR_ACTIVE:
     urlpatterns_all.append(url('__debug__/', include(debug_toolbar.urls)))
 
 if settings.DEBUG:
-
-    # urlpatterns += static(settings.MEDIA_URL,
-    #                      document_root=settings.MEDIA_ROOT)
     urlpatterns_all += static(settings.STATIC_URL,
                               document_root=settings.STATIC_ROOT)
-
-    urlpatterns_all += [
-        url(r'^media/(?P<path>.*)$', view_static_server, {
-            'document_root': settings.MEDIA_ROOT,
-        })
-    ]
-
 
 urlpatterns_all += [
     url(r'', include(sapl.api.urls)),

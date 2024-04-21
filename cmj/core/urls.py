@@ -13,7 +13,8 @@ from cmj.core.views import CepCrud, RegiaoMunicipalCrud, DistritoCrud,\
     TrechoJsonSearchView, TrechoJsonView, AreaTrabalhoCrud,\
     OperadorAreaTrabalhoCrud, PartidoCrud, ImpressoEnderecamentoCrud,\
     NotificacaoRedirectView, chanel_index, chanel_room, time_refresh_log_test,\
-    app_vue_view, template_render, CertidaoPublicacaoCrud, BiView
+    app_vue_view, template_render, CertidaoPublicacaoCrud, BiView,\
+    MediaPublicView
 from cmj.core.views_auth import CmjUserChangeView, CmjLoginView,\
     UserCrud, CmjPasswordResetView, CmjPasswordResetEncaminhadoView,\
     CmjPasswordResetConfirmView, CmjPasswordResetCompleteView
@@ -73,6 +74,8 @@ if settings.DEBUG:
 
 urlpatterns = user_urlpatterns + [
 
+    url(r'^media/(?P<path>.*)$',
+        MediaPublicView.as_view(), name='mediapublic_view'),
 
     # url(r'^enderecos/', login_required(
     #    TrechoSearchView.as_view()), name='search_view'),
@@ -127,4 +130,5 @@ urlpatterns = user_urlpatterns + [
         'core.menu_tabelas_auxiliares', login_url='cmj.core:login')(
         TemplateView.as_view(template_name='cmj_sistema.html')),
         name="tabelas_auxiliares"),
+
 ]

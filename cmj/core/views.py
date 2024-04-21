@@ -2,6 +2,7 @@
 from builtins import property
 import collections
 import json
+import logging
 import re
 
 from django import template
@@ -19,9 +20,10 @@ from django.urls.base import reverse
 from django.utils import formats, timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic.base import RedirectView, TemplateView
+from django.views.generic.base import RedirectView, TemplateView, View
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
+from django.views.static import serve as view_static_server
 from django_filters.views import FilterView
 from rest_framework import viewsets, mixins
 from rest_framework.authentication import SessionAuthentication,\
@@ -37,8 +39,13 @@ from cmj.core.models import Cep, TipoLogradouro, Logradouro, RegiaoMunicipal,\
     CertidaoPublicacao, Bi
 from cmj.core.serializers import TrechoSearchSerializer, TrechoSerializer
 from cmj.utils import normalize
+from sapl.api.mixins import ResponseFileMixin
 from sapl.crud.base import Crud, CrudAux, MasterDetailCrud, RP_DETAIL, RP_LIST
 from sapl.parlamentares.models import Partido, Filiacao
+from sapl.utils import get_mime_type_from_file_extension
+
+
+logger = logging.getLogger(__name__)
 
 
 CepCrud = CrudAux.build(Cep, None, 'cep')
@@ -723,3 +730,45 @@ class BiView(ListView):
         pa.sort(key=lambda row: row[0])
         pa.reverse()
         return pa
+
+
+class MediaPublicView(View):
+
+    def get(self, request, *args, **kwargs):
+        path = kwargs['path']
+
+        logger.info(
+            f'MediaPublicView init end method {path}')
+
+        if settings.DEBUG:
+            return view_static_server(
+                request,
+                path,
+                document_root=settings.MEDIA_ROOT
+            )
+
+        file_path = f'{settings.MEDIA_ROOT}/{path}'
+        file_name = path.split('/')[-1]
+        ext = file_name.split('.')[-1]
+
+        mime = get_mime_type_from_file_extension(file_name)
+
+        # if mime.endswith('ext') and :
+
+        mime = 'image/png'
+
+        response = HttpResponse(content_type='')
+        response['Content-Disposition'] = (
+            'inline; filename="%s"' % file_name)
+
+        response['Cache-Control'] = 'no-cache'
+        response['Pragma'] = 'no-cache'
+        response['Expires'] = 0
+
+        response['X-Accel-Redirect'] = "/mediaredirect/{0}".format(
+            path
+        )
+
+        logger.info(
+            f'MediaPublicView END end method {response["X-Accel-Redirect"]}')
+        return response

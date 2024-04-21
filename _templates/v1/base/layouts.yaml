@@ -36,6 +36,9 @@ AppConfig:
   - cronometro_ordem cronometro_consideracoes
   - mostrar_brasao_painel mostrar_voto
 
+  {% trans 'URLs Desativadas' %}:
+  - disabled
+
 TipoAutor:
   {% trans 'Tipo Autor' %}:
   - descricao

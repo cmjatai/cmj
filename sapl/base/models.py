@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields.jsonb import JSONField
@@ -158,7 +159,6 @@ class AppConfig(models.Model):
 
     # MÓDULO PAINEL
 
-
     mostrar_brasao_painel = models.BooleanField(
         default=False,
         verbose_name=_('Mostrar brasão da Casa no painel?'))
@@ -167,7 +167,6 @@ class AppConfig(models.Model):
         verbose_name=_(
             'Exibir voto do Parlamentar antes de encerrar a votação?'),
         choices=YES_NO_CHOICES, default=False)
-
 
     cronometro_discurso = models.DurationField(
         verbose_name=_('Cronômetro do Discurso'),
@@ -189,6 +188,11 @@ class AppConfig(models.Model):
         blank=True,
         null=True)
 
+    disabled = models.TextField(
+        blank=True,
+        default='',
+        verbose_name=_('URLs Desativadas (urls completas / relativas / regex ignorecase ) - YAML Format'))
+
     class Meta:
         verbose_name = _('Configurações da Aplicação')
         verbose_name_plural = _('Configurações da Aplicação')
@@ -198,9 +202,23 @@ class AppConfig(models.Model):
         )
         ordering = ('-id',)
 
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+
+        if not self.disabled:
+            self.disabled = '''
+- periodo:
+  start:  # ISOFORMAT datetime local
+  end:    # ISOFORMAT datetime local
+  urls:
+  - url: # path completo, relativo, regex
+'''
+
+        return models.Model.save(self, force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+
     @classmethod
     def attr(cls, attr):
-        value = cache.get(f'sapl_{attr}')
+        value = cache.get(f'portalcmj_{attr}') if not settings.DEBUG else None
         if not value is None:
             return value
 
@@ -211,7 +229,8 @@ class AppConfig(models.Model):
             config.save()
 
         value = getattr(config, attr)
-        cache.set(f'sapl_{attr}', value, 600)
+        if not settings.DEBUG:
+            cache.set(f'portalcmj_{attr}', value, 600)
 
         return value
 

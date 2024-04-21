@@ -86,7 +86,7 @@ class ResponseFileMixin:
 
         original = 'original__' if 'original' in request.GET else ''
 
-        response['X-Accel-Redirect'] = "/media/{0}{1}".format(
+        response['X-Accel-Redirect'] = "/mediaredirect/{0}{1}".format(
             original,
             arquivo.name
         )
