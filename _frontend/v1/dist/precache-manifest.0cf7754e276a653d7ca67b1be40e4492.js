@@ -300,8 +300,16 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/pdf_cabec.jpg"
   },
   {
+    "revision": "e86d4f3790dcba9d471b7d6ece42e48c",
+    "url": "/static/img/pdf_cabec_margem.jpg"
+  },
+  {
     "revision": "c0e894ed8b441b6739133c2a7601150d",
     "url": "/static/img/pdf_rodape.jpg"
+  },
+  {
+    "revision": "64679dab3b056be7ac0c73409f963fcb",
+    "url": "/static/img/pdf_rodape_margem.jpg"
   },
   {
     "revision": "fb71e48b2330408afac41e0bcfbbd4c0",
