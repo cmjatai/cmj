@@ -43,7 +43,7 @@ class CelerySignalProcessor(CelerySignalProcessor):
             if instance.visibilidade != Documento.STATUS_PUBLIC:
                 action = 'delete'
 
-        update_fields = kwargs.get('update_fields', [])
+        update_fields = kwargs.get('update_fields', []) or []
         if 'checkcheck' in update_fields and len(update_fields) == 1:
             return
 
