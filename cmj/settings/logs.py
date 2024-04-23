@@ -9,7 +9,7 @@ import yaml
 
 
 config = AutoConfig()
-LOGGING_ROOT_LEVEL = config('LOGGING_ROOT_LEVEL', default='WARNING', cast=str)
+LOGGING_ROOT_LEVEL = config('LOGGING_ROOT_LEVEL', default='INFO', cast=str)
 
 logging.captureWarnings(True)
 yaml.warnings({'YAMLLoadWarning': False})
@@ -40,8 +40,7 @@ class MyFormatter(logging.Formatter):
 
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': True,
-
+    'disable_existing_loggers': False,
     'filters': {
         'require_debug_false': {
             '()': 'django.utils.log.RequireDebugFalse',
@@ -66,7 +65,6 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'verbose',
             'filters': ['require_debug_true'],
-
         },
         'cmj_logger_file': {
             'level': 'DEBUG',
@@ -78,8 +76,17 @@ LOGGING = {
             #'filters': ['require_debug_false'],
         },
     },
+    'root': {
+        'handlers': ['cmj_logger_file', 'console'],
+        'level': 'WARNING',
+    },
     'loggers': {
-        'sapl': {
+        'django': {
+            'handlers': ['cmj_logger_file', 'console'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        'haystack': {
             'handlers': ['cmj_logger_file', 'console'],
             'level': LOGGING_ROOT_LEVEL,
             'propagate': False,
@@ -89,20 +96,12 @@ LOGGING = {
             'level': LOGGING_ROOT_LEVEL,
             'propagate': False,
         },
-        'haystack': {
+        'sapl': {
             'handlers': ['cmj_logger_file', 'console'],
             'level': LOGGING_ROOT_LEVEL,
             'propagate': False,
         },
-        #'daphne': {
-        #    'handlers': ['console'],
-        #    'level': LOGGING_ROOT_LEVEL,
-        #},
     },
-    'root': {
-        'handlers': ['cmj_logger_file', 'console'],
-        'level': LOGGING_ROOT_LEVEL,
-    }
 }
 
 

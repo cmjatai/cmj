@@ -149,9 +149,10 @@ class TextExtractField(CharField):
         return data
 
     def prepare_template(self, obj):
-        app_label, model_name = get_model_ct_tuple(obj)
-        template_names = ['search/indexes/%s/%s_%s.txt' %
-                          (app_label, model_name, self.instance_name)]
+        #app_label, model_name = get_model_ct_tuple(obj)
+        template_names = ['search/indexes/default_text.txt']
+        # template_names = ['search/indexes/%s/%s_%s.txt' %
+        #                  (app_label, model_name, self.instance_name)]
 
         t = loader.select_template(template_names)
 

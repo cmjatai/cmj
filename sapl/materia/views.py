@@ -94,8 +94,12 @@ from .models import (AcompanhamentoMateria, Anexada, AssuntoMateria, Autoria,
                      TipoDocumento, TipoFimRelatoria, TipoMateriaLegislativa,
                      TipoProposicao, Tramitacao, UnidadeTramitacao)
 
+logger = logging.getLogger(__name__)
+
 
 def tipos_autores_materias(user, restricao_regimental=True):
+
+    logger.info('tipos_autores_materias')
 
     noww = timezone.localdate()
 

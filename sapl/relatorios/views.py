@@ -1199,7 +1199,7 @@ def get_pauta_sessao(sessao, casa):
     inf_basicas_dic["nom_camara"] = casa.nome
 
     lst_expediente_materia = []
-    for expediente_materia in ExpedienteMateria.objects.filter(sessao_plenaria=sessao):
+    for expediente_materia in ExpedienteMateria.objects.filter(sessao_plenaria=sessao).order_by('numero_ordem'):
 
         materia = MateriaLegislativa.objects.filter(
             id=expediente_materia.materia.id).first()
@@ -1243,7 +1243,7 @@ def get_pauta_sessao(sessao, casa):
 
     lst_votacao = []
     for votacao in OrdemDia.objects.filter(
-            sessao_plenaria=sessao):
+            sessao_plenaria=sessao).order_by('numero_ordem'):
         materia = MateriaLegislativa.objects.filter(
             id=votacao.materia.id).first()
         dic_votacao = {}

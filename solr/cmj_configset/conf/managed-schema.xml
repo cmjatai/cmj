@@ -36,7 +36,7 @@
   - for best index size and searching performance, set "index" to false
     for all general text fields, use copyField to copy them to the
     catchall "text" field, and use that for searching.
--->
+--> 
 
 <schema name="default-config" version="1.6">
     <!-- attribute "name" is the name of this schema and is only used for display purposes.
