@@ -161,7 +161,7 @@ class ArqClasseListView(ArqClasseParentMixin, PermissionRequiredMixin, ListView)
             if 'pk' in self.kwargs:
                 if request.user.is_superuser:
                     self.object.checkcheck = not self.object.checkcheck
-                    self.object.save()
+                    self.object.save(update_fields=('checkcheck', ))
 
                 return redirect('{}?view={}'.format(
                     reverse_lazy('cmj.arq:subarqclasse_list',

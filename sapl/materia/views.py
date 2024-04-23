@@ -3335,7 +3335,7 @@ class MateriaLegislativaCheckView(ListView):
                 raise Http404
             else:
                 m.checkcheck = True if check else False
-                m.save()
+                m.save(update_fields=('checkcheck', ))
                 return redirect('/materia/check')
 
         return super().get(request, *args, **kwargs)

@@ -363,7 +363,7 @@ class ArqClasse(Parent):
         elif self.perfil == ARQCLASSE_LOGICA:
             return self.arqdoc_logica_set
         else:
-            return []
+            return self.arqdoc_logica_set.none()
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
@@ -374,16 +374,11 @@ class ArqClasse(Parent):
         if self.checkcheck:
             for c in self.childs.all():
                 c.checkcheck = True
-                c.save()
+                c.save(update_fields=('checkcheck', ))
 
-            if self.perfil == ARQCLASSE_FISICA:
-                for d in self.arqdoc_estrutural_set.all():
-                    d.checkcheck = True
-                    d.save()
-            elif self.perfil == ARQCLASSE_LOGICA:
-                for d in self.arqdoc_logica_set.all():
-                    d.checkcheck = True
-                    d.save()
+            for d in self.arqdoc_set().all():
+                d.checkcheck = True
+                d.save(update_fields=('checkcheck', ))
         else:
             if self.parent:
                 self.parent.checkcheck = False

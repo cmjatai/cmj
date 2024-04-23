@@ -13,7 +13,7 @@ TipoMateriaLegislativa:
 
 RegimeTramitacao:
   {% trans 'Tipo de Documento' %}:
-  - descricao
+  - descricao sequencia_regimental:5
 
 TipoDocumento:
   {% trans 'Regime Tramitação' %}:

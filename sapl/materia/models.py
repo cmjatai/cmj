@@ -170,6 +170,13 @@ class TipoMateriaLegislativa(models.Model):
 class RegimeTramitacao(models.Model):
     descricao = models.CharField(max_length=50, verbose_name=_('Descrição'))
 
+    sequencia_regimental = models.PositiveIntegerField(
+        default=0,
+        verbose_name=_('Sequência Regimental'),
+        help_text=_('A sequência regimental diz respeito ao que define '
+                    'o regimento da Casa Legislativa sobre qual a ordem '
+                    'de entrada das proposições nas Sessões Plenárias.'))
+
     class Meta:
         verbose_name = _('Regime de Tramitação')
         verbose_name_plural = _('Regimes de Tramitação')

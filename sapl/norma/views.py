@@ -415,7 +415,7 @@ class NormaCrud(Crud):
                     raise Http404
                 else:
                     n.checkcheck = True if check else False
-                    n.save()
+                    n.save(update_fields=('checkcheck', ))
 
                     return redirect(f'/norma/check{kwargs.get("nivel","")}#{nn}')
 

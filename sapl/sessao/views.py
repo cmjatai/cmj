@@ -73,6 +73,7 @@ def reordernar_materias_expediente(request, pk):
     expedientes = ExpedienteMateria.objects.filter(
         sessao_plenaria_id=pk
     ).order_by(
+        '-materia__regime_tramitacao__sequencia_regimental',
         'materia__tipo__sequencia_regimental',
         'materia__ano',
         'materia__numero'
@@ -91,6 +92,7 @@ def reordernar_materias_ordem(request, pk):
         sessao_plenaria_id=pk,
         parent__isnull=True
     ).order_by(
+        '-materia__regime_tramitacao__sequencia_regimental',
         'materia__tipo__sequencia_regimental',
         'materia__ano',
         'materia__numero'

@@ -133,7 +133,7 @@ class ArqDocForm(ModelForm):
             for dm in DraftMidia.objects.filter(
                 draft__owner=self._request_user,
                 metadata__ocrmypdf__pdfa=DraftMidia.METADATA_PDFA_PDFA
-            ).order_by('draft__descricao', 'sequencia'):
+            ).order_by('draft__descricao', 'draft_id', 'sequencia'):
                 name_file_midia = dm.metadata['uploadedfile']['name']
                 dmc.append((dm.id, f'{str(dm.draft)} - {name_file_midia}'))
 
