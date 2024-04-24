@@ -99,8 +99,6 @@ logger = logging.getLogger(__name__)
 
 def tipos_autores_materias(user, restricao_regimental=True):
 
-    logger.info('tipos_autores_materias')
-
     noww = timezone.localdate()
 
     data_ini = noww - timedelta(

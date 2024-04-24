@@ -10,7 +10,7 @@ from django.core.exceptions import PermissionDenied
 from django.db.models import F, Q
 from django.db.models.aggregates import Max, Count
 from django.http.response import Http404, HttpResponse, HttpResponseForbidden, \
-    HttpResponseRedirect
+    HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.urls.base import reverse_lazy
 from django.utils import timezone
@@ -510,6 +510,13 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
 
         slug = kwargs.get('slug', '')
         # Localização do Objecto
+
+        if slug.startswith('portal'):
+            slug = slug.replace('portal', '')
+            if not slug.startswith('/'):
+                slug = f'/{slug}'
+            return redirect(slug, permanent=True)
+
         referente = None
         try:
             # verifica se o slug é uma classe
