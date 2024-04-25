@@ -9,7 +9,7 @@ services:
     volumes:
       - credis_data:/data
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
     networks:
       - cmj-net
   cmjsolr:
@@ -23,8 +23,8 @@ services:
       - csolr_data:/var/solr
       - csolr_configsets:/opt/solr/server/solr/configsets
     ports:
-      - "8983:8983"
-      - "9983:9983"
+      - "127.0.0.1:8983:8983"
+      - "127.0.0.1:9983:9983"
     networks:
       - cmj-net
   cmjfront:
@@ -41,7 +41,7 @@ services:
     networks:
       - cmj-net
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
   cmj:
     build:
       context: ../
@@ -67,7 +67,7 @@ services:
       - cmjfront
       - cmjsolr
     ports:
-      - "9000:9000"
+      - "127.0.0.1:9000:9000"
     networks:
       - cmj-net
 networks:

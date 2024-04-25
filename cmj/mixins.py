@@ -106,13 +106,14 @@ class PluginSignMixin:
 
     def run(self, cmd=""):
         try:
+            log = logger if not hasattr(self, 'logger') else self.logger
             print(cmd)
-            self.logger.info(cmd)
-            p = ProcessoExterno(cmd, self.logger)
+            log.info(cmd)
+            p = ProcessoExterno(cmd, log)
             r = p.run(timeout=300)
         except Exception as e:
-            print(e)
-            print(r)
+            log.error(e)
+            log.error(r)
 
 
 class CheckCheckMixin:

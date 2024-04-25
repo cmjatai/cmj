@@ -1,10 +1,15 @@
 <template>
-  <div class="btn-group ml-2 btn-group-sm nivel-detalhe" role="group" aria-label="First group">
-    <a
+  <div class="nivel-detalhe">
+    <span>
+      Visões da Pauta
+    </span>
+    <div class="btn-group ml-2 btn-group-sm" role="group" aria-label="First group">
+      <a
       @click="changeNivel(nivel.nivel)"
       v-for="(nivel, key) in niveis_filter"
       :class="['btn btn-outline-dark', nivel_detalhe === nivel.nivel ? 'active' : '']"
       :key="'nv'+key">{{nivel.text}}</a>
+    </div>
   </div>
 </template>
 
@@ -16,15 +21,15 @@ export default {
     return {
       niveis: [
         {
-          text: '|',
+          text: 'Resumida',
           nivel: 1
         },
         {
-          text: '||',
+          text: 'Detalhada',
           nivel: 2
         },
         {
-          text: '|||',
+          text: 'Rito',
           nivel: 3
         }
         // {
@@ -58,13 +63,23 @@ export default {
 
 <style lang="scss">
 .nivel-detalhe {
-  position: absolute;
-  right: 5px;
-  top: 25px;
-  z-index: 0;
+  position: sticky;
+  margin: -15px -5px 0 0;
+  top: 0px;
+  z-index: 1;
+  text-align: right;
+  height: 0;
+  opacity: 0.8;
   a.btn {
-    padding-left: 15px;
-    padding-right: 15px;
+    padding: 3px 15px;
+    line-height: 1;
+  }
+  span {
+    color: #444;
+    padding-right: 10px;
+    display: block;
+    background-color:#f0f0f0;
+    background-image: url("~@/assets/img/bg.png");
   }
 }
 </style>
