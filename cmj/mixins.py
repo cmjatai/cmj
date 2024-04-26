@@ -214,7 +214,7 @@ class CommonMixin(models.Model):
                     return None
 
                 path = getattr(self, field).path
-                text = extract_text(path)
+                text = extract_text(path, maxpages=1)
 
                 text = text.split('\n')
 

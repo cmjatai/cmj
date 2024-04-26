@@ -75,8 +75,8 @@ class TextExtractField(CharField):
                 return ''
 
             # manter limite maximo alinhado ao commando ocrmypdf
-            if arquivo.size > 40 * 1024 * 1024:
-                return ''
+            # if arquivo.size > 40 * 1024 * 1024:
+            #    return ''
 
             self.logger.debug(
                 f'Extraindo arquivo: {arquivo.name} - tamanho: {(arquivo.size/1024/1024):.5}MB')

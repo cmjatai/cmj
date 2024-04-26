@@ -952,6 +952,16 @@ class ProposicaoCrud(Crud):
                         msg_error = _('Proposição não possui nenhum tipo de '
                                       'Texto associado.')
                     elif p.tipo.exige_assinatura_digital and \
+                            p.metadata.get(
+                                'signs', {}
+                            ).get(
+                                'texto_original', {}
+                            ).get(
+                                'running_extraction', False
+                            ):
+                        msg_error = _(
+                            'Assinaturas Eletrônicas em processo de extração. Aguarde a conclusão para posterior envio...')
+                    elif p.tipo.exige_assinatura_digital and \
                             (
                                 not p.metadata.get('signs', {}) or
                                 not p.metadata.get(
