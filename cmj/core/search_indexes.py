@@ -177,21 +177,7 @@ class SigadTextExtractField(TextExtractField):
         return data
 
 
-class DocumentoAcessorioIndex(CelerySearchIndex, Indexable):
-    model = DocumentoAcessorio
-    data = DateTimeField(model_attr='data', null=True)
-    ano = IntegerField(model_attr='ano')
-
-    text = TextExtractField(
-        document=True, use_template=True,
-        model_attr=(
-            ('autor', 'string_extractor'),
-            ('ementa', 'string_extractor'),
-            ('indexacao', 'string_extractor'),
-            ('arquivo', 'file_extractor'),
-        )
-    )
-
+class BaseIndex(CelerySearchIndex, Indexable):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.text.search_index = self
@@ -206,7 +192,23 @@ class DocumentoAcessorioIndex(CelerySearchIndex, Indexable):
         return 'data_ultima_atualizacao'
 
 
-class NormaJuridicaIndex(DocumentoAcessorioIndex):
+class DocumentoAcessorioIndex(BaseIndex):
+    model = DocumentoAcessorio
+    data = DateTimeField(model_attr='data', null=True)
+    ano = IntegerField(model_attr='ano')
+
+    text = TextExtractField(
+        document=True, use_template=True,
+        model_attr=(
+            ('autor', 'string_extractor'),
+            ('ementa', 'string_extractor'),
+            ('indexacao', 'string_extractor'),
+            ('arquivo', 'file_extractor'),
+        )
+    )
+
+
+class NormaJuridicaIndex(BaseIndex):
     model = NormaJuridica
     data = DateTimeField(model_attr='data', null=True)
     tipo = CharField(model_attr='tipo__sigla')
@@ -224,7 +226,7 @@ class NormaJuridicaIndex(DocumentoAcessorioIndex):
     )
 
 
-class MateriaLegislativaIndex(DocumentoAcessorioIndex):
+class MateriaLegislativaIndex(BaseIndex):
     model = MateriaLegislativa
     data = DateTimeField(model_attr='data_apresentacao')
     tipo = CharField(model_attr='tipo__sigla')
@@ -242,11 +244,8 @@ class MateriaLegislativaIndex(DocumentoAcessorioIndex):
         )
     )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
-
-class SessaoPlenariaIndex(CelerySearchIndex, Indexable):
+class SessaoPlenariaIndex(BaseIndex):
     model = SessaoPlenaria
     data = DateTimeField(model_attr='data_inicio', null=True)
     ano = IntegerField(model_attr='ano')
@@ -258,26 +257,11 @@ class SessaoPlenariaIndex(CelerySearchIndex, Indexable):
             ('upload_ata', 'file_extractor'),
             ('upload_pauta', 'file_extractor'),
             ('upload_anexo', 'file_extractor'),
-
-
         )
     )
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.text.search_index = self
 
-    def get_model(self):
-        return self.model
-
-    def index_queryset(self, using=None):
-        return self.get_model().objects.all()
-
-    def get_updated_field(self):
-        return 'data_ultima_atualizacao'
-
-
-class DiarioOficialIndex(CelerySearchIndex, Indexable):
+class DiarioOficialIndex(BaseIndex):
     model = DiarioOficial
     data = DateTimeField(model_attr='data', null=True)
     ano = IntegerField(model_attr='ano')
@@ -290,21 +274,8 @@ class DiarioOficialIndex(CelerySearchIndex, Indexable):
         )
     )
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.text.search_index = self
 
-    def get_model(self):
-        return self.model
-
-    def index_queryset(self, using=None):
-        return self.get_model().objects.all()
-
-    def get_updated_field(self):
-        return 'data_ultima_atualizacao'
-
-
-class DocumentoIndex(CelerySearchIndex, Indexable):
+class DocumentoIndex(BaseIndex):
     model = Documento
     data = DateTimeField(model_attr='public_date')
     ano = IntegerField(model_attr='ano')
@@ -312,13 +283,6 @@ class DocumentoIndex(CelerySearchIndex, Indexable):
     text = SigadTextExtractField(
         document=True, use_template=True
     )
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.text.search_index = self
-
-    def get_model(self):
-        return self.model
 
     def index_queryset(self, using=None):
         qs = self.get_model().objects.public_all_docs()
@@ -331,7 +295,7 @@ class DocumentoIndex(CelerySearchIndex, Indexable):
         return instance.raiz is None
 
 
-class DocumentoAdministrativoIndex(CelerySearchIndex, Indexable):
+class DocumentoAdministrativoIndex(BaseIndex):
     model = DocumentoAdministrativo
     data = DateTimeField(model_attr='data', null=True)
     ano = IntegerField(model_attr='ano', null=True)
@@ -345,16 +309,3 @@ class DocumentoAdministrativoIndex(CelerySearchIndex, Indexable):
             ('observacao', 'string_extractor'),
         )
     )
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.text.search_index = self
-
-    def get_model(self):
-        return self.model
-
-    def index_queryset(self, using=None):
-        return self.get_model().objects.all()
-
-    def get_updated_field(self):
-        return 'data_ultima_atualizacao'
