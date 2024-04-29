@@ -1,6 +1,6 @@
 {% load i18n common_cmj_tags %}
 
-<form method="post" action="{% url 'cmj.core:haystack_search'%}">
+<form method="post" action="{% url 'cmj.search:haystack_search'%}">
   <div class="row mt-n{% if perms.materia or perms.norma %}4{% else %}5{% endif %}">
     <div class="col-md-2">
       <div>
