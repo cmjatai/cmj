@@ -2,7 +2,7 @@ from celery_haystack.indexes import CelerySearchIndex
 from haystack.constants import Indexable
 from haystack.fields import CharField, DateTimeField, IntegerField
 from cmj.arq.models import ArqDoc
-from sapl.base.search_indexes import TextExtractField
+from cmj.core.search_indexes import TextExtractField
 
 
 class ArqTextExtractField(TextExtractField):
