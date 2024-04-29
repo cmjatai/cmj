@@ -5,6 +5,14 @@
 {% block second_header %}{% endblock second_header %}
 {% block main_container_class %}container container-box container-path-parlamentar{% endblock main_container_class %}
 
+{% block actions %}
+<div class="context-actions m-0 w-100 d-flex justify-content-end">
+  {{ block.super }}
+</div>
+{% endblock actions %}
+{% block extra_actions %}
+&nbsp;&nbsp;
+{% endblock extra_actions %}
 
 {% block base_container_header %}
 
