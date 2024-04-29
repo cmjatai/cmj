@@ -22,7 +22,7 @@ from .views import (AppConfigCrud, CasaLegislativaCrud,
                     RelatorioMateriasPorAutorView,
                     RelatorioMateriasTramitacaoView,
                     RelatorioPresencaSessaoView,
-                    RelatorioReuniaoView, SaplSearchView,
+                    RelatorioReuniaoView,
                     RelatorioNormasPublicadasMesView,
                     RelatorioNormasVigenciaView,
                     EstatisticasAcessoNormas,
@@ -34,7 +34,7 @@ from .views import (AppConfigCrud, CasaLegislativaCrud,
                     ListarParlMandatosIntersecaoView, ListarParlFiliacoesIntersecaoView,
                     ListarAutoresDuplicadosView, ListarBancadaComissaoAutorExternoView,
                     ListarLegislaturaInfindavelView, ListarAnexadasCiclicasView,
-                    ListarAnexadosCiclicosView, pesquisa_textual,
+                    ListarAnexadosCiclicosView,
                     RelatorioHistoricoTramitacaoAdmView, RelatorioDocumentosAcessoriosView,
                     RelatorioNormasPorAutorView)
 
@@ -156,18 +156,12 @@ urlpatterns = [
         ListarAnexadosCiclicosView.as_view(),
         name='lista_anexados_ciclicos'),
 
-    url(r'^sistema/pesquisa-textual',
-        pesquisa_textual,
-        name='pesquisa_textual'),
-
     url(r'^sistema/estatisticas', get_estatistica),
 
     # todos os sublinks de sistema devem vir acima deste
     url(r'^sistema/$', permission_required('base.view_tabelas_auxiliares')
         (TemplateView.as_view(template_name='sistema.html')),
         name='sistema'),
-
-    url(r'^sistema/search/', SaplSearchView(), name='haystack_search'),
 
     # Folhas XSLT e extras referenciadas por documentos migrados do sapl 2.5
     url(r'^(sapl/)?XSLT/HTML/(?P<path>.*)$', RedirectView.as_view(

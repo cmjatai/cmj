@@ -76,6 +76,7 @@ CMJ_APPS = (
     'cmj.agenda',
     'cmj.videos',
     'cmj.sigad',
+    'cmj.search',
     'cmj.api',
 )
 

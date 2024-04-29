@@ -116,7 +116,7 @@
           </div>
           <div class="row-2 d-flex justify-content-end">
             {% if request.path != '/arqadmin/pesquisa/' %}
-              <form class="form-search" method="get" action="{% url 'cmj.core:haystack_search'%}">
+              <form class="form-search" method="get" action="{% url 'cmj.search:haystack_search'%}">
                 <div class="inner">
                   <div class="item-form">
                     <input type="search" name="q" placeholder="O que você procura?" class="textinput textInput form-control" id="id_q" value="{{request|search_value}}" autocomplete="off" />

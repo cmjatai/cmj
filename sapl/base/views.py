@@ -2095,24 +2095,6 @@ class AppConfigCrud(CrudAux):
             return HttpResponseRedirect(reverse('sapl.base:appconfig_create'))
 
 
-class SaplSearchView(SearchView):
-    results_per_page = 10
-
-    def get_context(self):
-        context = super(SaplSearchView, self).get_context()
-
-        if 'models' in self.request.GET:
-            models = self.request.GET.getlist('models')
-        else:
-            models = []
-
-        context['models'] = ''
-
-        for m in models:
-            context['models'] = context['models'] + '&models=' + m
-
-        return context
-
 
 STATIC_LOGO = os.path.join(settings.STATIC_URL, 'img/logo.png')
 
@@ -2146,39 +2128,6 @@ def filtro_campos(dicionario):
         del dicionario[key]
 
     return dicionario
-
-
-def pesquisa_textual(request):
-
-    if 'q' not in request.GET:
-        return JsonResponse({'total': 0,
-                             'resultados': []})
-
-    results = SearchQuerySet().filter(content=request.GET['q'])
-    json_dict = {
-        'total': results.count(),
-        'parametros': request.GET['q'],
-        'resultados': [],
-    }
-
-    for e in results:
-
-        sec_dict = {}
-        try:
-            sec_dict['pk'] = e.object.pk
-        except:
-            # Index and db are out of sync. Object has been deleted from
-            # database
-            continue
-        dici = filtro_campos(e.object.__dict__)
-        sec_dict['objeto'] = str(dici)
-        sec_dict['text'] = str(e.object.ementa)
-
-        sec_dict['model'] = str(type(e.object))
-
-        json_dict['resultados'].append(sec_dict)
-
-    return JsonResponse(json_dict)
 
 
 class RelatorioHistoricoTramitacaoAdmView(FilterView):
