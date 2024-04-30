@@ -425,6 +425,14 @@ def task_signed_files_extraction_function(app_label, model_name, pk):
     for fn in instance.FIELDFILE_NAME:  # fn -> field_name
         ff = getattr(instance, fn)  # ff -> file_field
 
+        try:
+            running_extraction = metadata['signs'][fn]['running_extraction']
+        except:
+            continue
+        else:
+            if not running_extraction:
+                continue
+
         if metadata and 'signs' in metadata and \
                         fn in metadata['signs'] and\
                         metadata['signs'][fn]:

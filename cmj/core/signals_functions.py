@@ -285,7 +285,7 @@ def signed_files_extraction_post_save_signal_function(sender, instance, **kwargs
             settings.DEBUG and settings.FOLDER_DEBUG_CONTAINER == settings.PROJECT_DIR):
         tasks.signed_files_extraction.apply_async(
             params_tasks,
-            countdown=5
+            countdown=3
         )
     else:
         tasks.task_signed_files_extraction_function(*params_tasks)

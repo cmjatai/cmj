@@ -9,6 +9,7 @@ from cmj.core.signals_functions import send_signal_for_websocket_time_refresh, \
     auditlog_signal_function, \
     notificacao_signal_function, redesocial_post_function, \
     signed_files_extraction_post_save_signal_function
+from sapl.materia.models import Proposicao
 
 
 logger = logging.getLogger(__name__)
@@ -51,6 +52,11 @@ def signed_files_extraction_pre_save_signal(sender, instance, **kwargs):
 
     if not hasattr(instance, 'FIELDFILE_NAME') or not hasattr(instance, 'metadata'):
         return
+
+    if sender == Proposicao:
+        # TODO: melhorar o tratamento de reinício de extração
+        if instance.data_envio:
+            return
 
     metadata = instance.metadata
     for fn in instance.FIELDFILE_NAME:  # fn -> field_name
