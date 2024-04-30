@@ -705,7 +705,7 @@
     <!-- a spellchecker built from a field of the main index -->
     <lst name="spellchecker">
       <str name="name">default</str>
-      <str name="field">_text_</str>
+      <str name="field">text</str>
       <str name="classname">solr.DirectSolrSpellChecker</str>
       <!-- the spellcheck distance measure used, the default is the internal levenshtein -->
       <str name="distanceMeasure">internal</str>
@@ -788,7 +788,7 @@
                   default="true"
                   class="solr.highlight.GapFragmenter">
         <lst name="defaults">
-          <int name="hl.fragsize">100</int>
+          <int name="hl.fragsize">512</int>
         </lst>
       </fragmenter>
 

@@ -31,7 +31,7 @@ class RangeIntegerField(forms.IntegerField):
 
 class CmjSearchForm(ModelSearchForm):
 
-    ano = RangeIntegerField(
+    ano_i = RangeIntegerField(
         required=False,
         label=_('Incluir filtro por ano?'),
         help_text=_('''É opcional limitar a busca em um período específico.<br>
@@ -68,7 +68,7 @@ class CmjSearchForm(ModelSearchForm):
         row = to_row([
             (Div(), 2),
             (q_field, 8),
-            ('ano', 4),
+            ('ano_i', 4),
             (Div(Field('models')), 8),
         ])
 
@@ -126,14 +126,14 @@ class CmjSearchForm(ModelSearchForm):
         else:
             sqs = sqs.filter(at=0)
 
-        a = self.cleaned_data.get('ano', None)
+        a = self.cleaned_data.get('ano_i', None)
 
         if a and a[0] and a[1]:
-            sqs = sqs.filter(ano__range=a)
+            sqs = sqs.filter(ano_i__range=a)
         elif a and a[0]:
-            sqs = sqs.filter(ano__gte=a[0])
+            sqs = sqs.filter(ano_i__gte=a[0])
         elif a and a[1]:
-            sqs = sqs.filter(ano__lte=a[1])
+            sqs = sqs.filter(ano_i__lte=a[1])
 
         kwargs = {
             'hl.simple.pre': '<span class="highlighted">',
