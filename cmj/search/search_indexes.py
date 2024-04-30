@@ -192,8 +192,9 @@ class BaseIndex:
 
 class DiarioOficialIndex(BaseIndex, CelerySearchIndex, Indexable):
     model = DiarioOficial
+    ano_i = IntegerField(model_attr='ano')
+
     data = DateTimeField(model_attr='data', null=True)
-    ano = IntegerField(model_attr='ano')
 
     text = TextExtractField(
         document=True, use_template=True,
@@ -206,9 +207,11 @@ class DiarioOficialIndex(BaseIndex, CelerySearchIndex, Indexable):
 
 class NormaJuridicaIndex(DiarioOficialIndex):
     model = NormaJuridica
+    ano_i = IntegerField(model_attr='ano')
+
     data = DateTimeField(model_attr='data', null=True)
+
     tipo = CharField(model_attr='tipo__sigla')
-    ano = IntegerField(model_attr='ano')
     text = TextExtractField(
         document=True, use_template=True,
         model_attr=(
@@ -224,8 +227,9 @@ class NormaJuridicaIndex(DiarioOficialIndex):
 
 class DocumentoAcessorioIndex(DiarioOficialIndex):
     model = DocumentoAcessorio
+    ano_i = IntegerField(model_attr='ano')
+
     data = DateTimeField(model_attr='data', null=True)
-    ano = IntegerField(model_attr='ano')
 
     text = TextExtractField(
         document=True, use_template=True,
@@ -240,9 +244,11 @@ class DocumentoAcessorioIndex(DiarioOficialIndex):
 
 class MateriaLegislativaIndex(DiarioOficialIndex):
     model = MateriaLegislativa
+    ano_i = IntegerField(model_attr='ano')
+
     data = DateTimeField(model_attr='data_apresentacao')
+
     tipo = CharField(model_attr='tipo__sigla')
-    ano = IntegerField(model_attr='ano')
     text = TextExtractField(
         document=True, use_template=True,
         model_attr=(
@@ -259,8 +265,9 @@ class MateriaLegislativaIndex(DiarioOficialIndex):
 
 class SessaoPlenariaIndex(DiarioOficialIndex):
     model = SessaoPlenaria
+    ano_i = IntegerField(model_attr='ano')
+
     data = DateTimeField(model_attr='data_inicio', null=True)
-    ano = IntegerField(model_attr='ano')
 
     text = TextExtractField(
         document=True, use_template=True,
@@ -275,8 +282,10 @@ class SessaoPlenariaIndex(DiarioOficialIndex):
 
 class DocumentoAdministrativoIndex(DiarioOficialIndex):
     model = DocumentoAdministrativo
+    ano_i = IntegerField(model_attr='ano', null=True)
+
     data = DateTimeField(model_attr='data', null=True)
-    ano = IntegerField(model_attr='ano', null=True)
+
     at = IntegerField(model_attr='workspace_id', null=True)
     text = TextExtractField(
         document=True, use_template=True,
@@ -291,8 +300,9 @@ class DocumentoAdministrativoIndex(DiarioOficialIndex):
 
 class DocumentoIndex(DiarioOficialIndex):
     model = Documento
+    ano_i = IntegerField(model_attr='ano')
+
     data = DateTimeField(model_attr='public_date')
-    ano = IntegerField(model_attr='ano')
 
     text = SigadTextExtractField(
         document=True, use_template=True
