@@ -199,7 +199,7 @@ class NormaJuridica(CommonMixin):
     class Meta:
         verbose_name = _('Norma Jurídica')
         verbose_name_plural = _('Normas Jurídicas')
-        ordering = ['-data', '-numero']
+        ordering = ['-data', '-id']
 
     def get_normas_relacionadas(self):
         principais = NormaRelacionada.objects.filter(
