@@ -129,10 +129,13 @@ class NormaPesquisaView(AudigLogFilterMixin, MultiFormatOutputMixin, FilterView)
     def get_queryset(self):
         qs = super().get_queryset()
 
-        qs = qs.extra({
-            'nm_i': "CAST(regexp_replace(numero,'[^0-9]','', 'g') AS INTEGER)",
-            'norma_letra': "regexp_replace(numero,'[^a-zA-Z]','', 'g')"
-        }).order_by('-data', '-nm_i', 'norma_letra')
+        # qs = qs.extra(
+        #    select={
+        #        'nm_i': "CAST(regexp_replace(numero,'[^0-9]','', 'g') AS INTEGER)",
+        #        'norma_letra': "regexp_replace(numero,'[^a-zA-Z]','', 'g')"
+        #    },
+        #    order_by=('-data', '-id', )  # '-nm_i', 'norma_letra')
+        #)
 
         return qs
 

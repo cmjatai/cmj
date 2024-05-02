@@ -767,7 +767,7 @@ class NormaPesquisaOrderingFilter(django_filters.OrderingFilter):
         if value:
             _value = self.order_by_mapping[value[0]] if value else value
         else:
-            _value = self.order_by_mapping['dataD']
+            _value = []
         return super().filter(qs, _value)
 
 

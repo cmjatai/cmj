@@ -143,7 +143,7 @@ class NormaFilterSet(django_filters.FilterSet):
 
         value = value.replace('.', '')
         value = value.replace(',', '')
-        if len(value) > 2:
+        if len(value) > 3:
             qs = qs.filter(numero__icontains=value)
         else:
             qs = qs.filter(numero=value)
