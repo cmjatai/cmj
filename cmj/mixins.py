@@ -463,6 +463,8 @@ class AudigLogFilterMixin:
                 try:
                     al.obj['HTTP_X_REAL_IP'] = request.META.get(
                         'HTTP_X_REAL_IP', '')
+                    al.obj['HTTP_USER_AGENT'] = request.META.get(
+                        'HTTP_USER_AGENT', '')
                     # logger.info(dict(request.META))
                 except:
                     pass
