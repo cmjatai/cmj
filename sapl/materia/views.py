@@ -2028,8 +2028,7 @@ class MateriaLegislativaCrud(Crud):
 
         @property
         def search_url(self):
-            namespace = self.model._meta.app_config.name
-            return reverse('%s:%s' % (namespace, 'pesquisar_materia'))
+            return reverse('cmj.search:materia_haystack_search')
 
         @property
         def sub_title(self):
@@ -2099,10 +2098,6 @@ class MateriaLegislativaCrud(Crud):
                     anexada.save()
 
             return super().form_valid(form)
-
-        @property
-        def cancel_url(self):
-            return self.search_url
 
     class DeleteView(CheckCheckMixin, Crud.DeleteView):
 
@@ -2380,8 +2375,7 @@ class MateriaLegislativaCrud(Crud):
     class ListView(Crud.ListView, RedirectView):
 
         def get_redirect_url(self, *args, **kwargs):
-            namespace = self.model._meta.app_config.name
-            return reverse('%s:%s' % (namespace, 'pesquisar_materia'))
+            return reverse('cmj.search:materia_haystack_search')
 
         def get(self, request, *args, **kwargs):
             return RedirectView.get(self, request, *args, **kwargs)

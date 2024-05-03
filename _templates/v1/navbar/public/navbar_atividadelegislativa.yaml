@@ -2,7 +2,7 @@
 - title: {% trans 'Atividade Legislativa' %}
   children:
   - title: {% trans 'Matérias Legislativas' %}
-    url: {% url 'sapl.materia:pesquisar_materia' %}
+    url: {% url 'cmj.search:materia_haystack_search' %}
   - title: {% trans 'Pautas das Sessões' %}
     url: sapl.sessao:pauta_sessao
     #check_permission: sessao.add_sessaoplenaria

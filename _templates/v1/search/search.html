@@ -5,9 +5,7 @@
 
 {% block title %}
   <h1 class="page-header container-search" >
-
-
-    Pesquisa Textual
+    Pesquisa Geral
         {% if request.GET.fix_model %}
           em {% model_verbose_name_plural request.GET.models %}
         {% endif %}

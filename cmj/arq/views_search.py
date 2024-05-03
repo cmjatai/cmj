@@ -157,7 +157,7 @@ class ArqSearchView(AudigLogFilterMixin, SearchView):
 
     def get_context(self):
         context = super().get_context()
-        #context['title'] = _('Pesquisa Textual')
+        #context['title'] = _('Pesquisa Geral')
 
         data = self.request.GET or self.request.POST
 

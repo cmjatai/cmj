@@ -80,7 +80,7 @@
   - title: Sessões Plenárias
     url: /sessao/pesquisar-sessao?data_inicio__year={% now 'Y' %}
   - title: Matérias em tramitação
-    url: /materia/pesquisar-materia?em_tramitacao=1
+    url: /pesquisar/materia?em_tramitacao_b=1
   - title: Diário Oficial
     css_class: head_title
     children:

@@ -3,18 +3,16 @@
 <form method="post" action="{% url 'cmj.search:haystack_search'%}">
   <div class="row mt-n{% if perms.materia or perms.norma %}4{% else %}5{% endif %}">
     <div class="col-md-2">
-      <div>
-      </div>
     </div>
     <div class="col-md-8">
       <div class="container-search">
         <div class="form-group">
           <div>
             <div class="input-group div-search">
+              <input type="search" name="q" placeholder="O que você procura?" class="textinput textInput form-control" id="id_q">
               {% csrf_token %}
               <input type="hidden" class="custom-control-input" name="models" id="id_models_4" value="{{view.model|meta_model_value:'label_lower'}}">
               <input type="hidden" class="custom-control-input" name="fix_model" id="fix_model" value="1">
-              <input type="search" name="q" placeholder="O que você procura?" class="textinput textInput form-control" id="id_q">
               <span class="input-group-append">
                 <button class="btn btn-outline-primary" type="submit">
                   <i class="fas fa-2x fa-search"></i>
