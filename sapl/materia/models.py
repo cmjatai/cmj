@@ -508,6 +508,17 @@ class MateriaLegislativa(CommonMixin):
                 norma_relacionada__tipo_id=27)
         return nr
 
+    @property
+    def ultima_tramitacao(self):
+        return self.tramitacao_set.first()
+
+    def ultima_tramitacao_id(self):
+        ultima = self.ultima_tramitacao
+        if ultima:
+            return ultima.id
+        else:
+            return None
+
 
 class Autoria(models.Model):
     autor = models.ForeignKey(Autor,

@@ -4,12 +4,12 @@
 {% cache 300 cache_materias_em_tramitacao %}
   {% for tipo, autores_materias in tipos_autores_materias %}
       <div>
-        <a class="text-black-50" href="{% url 'sapl.materia:pesquisar_materia'%}?tipo={{tipo.id}}&em_tramitacao=1">
+        <a class="text-black-50" href="{% url 'cmj.search:materia_haystack_search'%}?tipo_i={{tipo.id}}&em_tramitacao_b=1">
           {{tipo}}
         </a>
       </div>
       {% for autor, materias in autores_materias.items %}
-      <a href="{% url 'sapl.materia:pesquisar_materia'%}?tipo={{tipo.id}}&autoria__autor={{autor.id}}&em_tramitacao=1">
+      <a href="{% url 'cmj.search:materia_haystack_search'%}?tipo_i={{tipo.id}}&autoria_is={{autor.id}}&em_tramitacao_b=1">
           {% if autor.autor_related %}
           {{autor.autor_related}} <strong>({{materias|length}})</strong><br>
           {% else %}

@@ -96,17 +96,18 @@ def get_settings_auth_user_model():
 
 
 autor_label = '''
-    <div class="col-xs-12">
-       Autor: <span id="nome_autor" name="nome_autor">
+    <div class="col-xs-12 mb-1">
+       Autor:<br><strong class="bg-white px-1 d-block w-100" id="nome_autor" name="nome_autor">
                 {% if form.autor.value %}
                     {{form.autor.value}}
                 {% endif %}
-              </span>
+              </strong>
     </div>
 '''
 
 autor_modal = '''
    <div id="modal_autor" title="Selecione o Autor" align="center">
+       <small>Parlamentares, Comissões, Partidos, etc...</small>
        <form>
            <input id="q" type="text" />
            <input id="pesquisar" type="submit" value="Pesquisar"

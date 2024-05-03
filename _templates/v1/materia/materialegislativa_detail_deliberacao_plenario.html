@@ -50,7 +50,7 @@
               <div class="container-avatar">
             {% endif %}
                 <a class="avatar avatar7"
-                  href="{% url 'sapl.materia:pesquisar_materia'%}?autoria__autor={{subscricao.autor.first.id}}"
+                  href="{% url 'cmj.search:materia_haystack_search'%}?autoria_is={{subscricao.autor.first.id}}"
                   title="{{subscricao}}">
                   <img src="{% cropped_thumbnail subscricao "fotografia_cropping" %}" alt="{{subscricao}}">
                 </a>

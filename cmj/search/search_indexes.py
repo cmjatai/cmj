@@ -6,7 +6,8 @@ from django.db.models.fields import TextField
 from django.db.models.functions import Concat
 from django.template import loader
 from haystack.constants import Indexable
-from haystack.fields import CharField, DateTimeField, IntegerField
+from haystack.fields import CharField, DateTimeField, IntegerField, BooleanField,\
+    MultiValueField
 
 from cmj.diarios.models import DiarioOficial
 from cmj.sigad.models import Documento
@@ -192,9 +193,10 @@ class BaseIndex:
 
 class DiarioOficialIndex(BaseIndex, CelerySearchIndex, Indexable):
     model = DiarioOficial
-    ano_i = IntegerField(model_attr='ano')
 
-    data = DateTimeField(model_attr='data', null=True)
+    ano_i = IntegerField(model_attr='ano')
+    data_dt = DateTimeField(model_attr='data', null=True)
+    tipo_i = IntegerField(model_attr='tipo_id')
 
     text = TextExtractField(
         document=True, use_template=True,
@@ -205,13 +207,13 @@ class DiarioOficialIndex(BaseIndex, CelerySearchIndex, Indexable):
     )
 
 
-class NormaJuridicaIndex(DiarioOficialIndex):
+class NormaJuridicaIndex(BaseIndex, CelerySearchIndex, Indexable):
     model = NormaJuridica
+
     ano_i = IntegerField(model_attr='ano')
+    dat_dt = DateTimeField(model_attr='data', null=True)
+    tipo_i = IntegerField(model_attr='tipo_id')
 
-    data = DateTimeField(model_attr='data', null=True)
-
-    tipo = CharField(model_attr='tipo__sigla')
     text = TextExtractField(
         document=True, use_template=True,
         model_attr=(
@@ -225,11 +227,12 @@ class NormaJuridicaIndex(DiarioOficialIndex):
     )
 
 
-class DocumentoAcessorioIndex(DiarioOficialIndex):
+class DocumentoAcessorioIndex(BaseIndex, CelerySearchIndex, Indexable):
     model = DocumentoAcessorio
-    ano_i = IntegerField(model_attr='ano')
 
-    data = DateTimeField(model_attr='data', null=True)
+    ano_i = IntegerField(model_attr='ano')
+    data_dt = DateTimeField(model_attr='data', null=True)
+    tipo_i = IntegerField(model_attr='tipo_id')
 
     text = TextExtractField(
         document=True, use_template=True,
@@ -242,13 +245,24 @@ class DocumentoAcessorioIndex(DiarioOficialIndex):
     )
 
 
-class MateriaLegislativaIndex(DiarioOficialIndex):
+class MateriaLegislativaIndex(BaseIndex, CelerySearchIndex, Indexable):
     model = MateriaLegislativa
+
+    em_tramitacao_b = BooleanField(model_attr='em_tramitacao')
+    tipo_i = IntegerField(model_attr='tipo_id')
     ano_i = IntegerField(model_attr='ano')
+    numero_i = CharField(model_attr='numero')
+    data_dt = DateTimeField(model_attr='data_apresentacao')
 
-    data = DateTimeField(model_attr='data_apresentacao')
+    uta_i = IntegerField(
+        model_attr='ultima_tramitacao__unidade_tramitacao_destino_id')
 
-    tipo = CharField(model_attr='tipo__sigla')
+    sta_i = IntegerField(
+        model_attr='ultima_tramitacao__status_id')
+
+    autoria_is = MultiValueField(
+        model_attr='autores__id')
+
     text = TextExtractField(
         document=True, use_template=True,
         model_attr=(
@@ -263,11 +277,14 @@ class MateriaLegislativaIndex(DiarioOficialIndex):
     )
 
 
-class SessaoPlenariaIndex(DiarioOficialIndex):
+class SessaoPlenariaIndex(BaseIndex, CelerySearchIndex, Indexable):
     model = SessaoPlenaria
-    ano_i = IntegerField(model_attr='ano')
 
-    data = DateTimeField(model_attr='data_inicio', null=True)
+    ano_i = IntegerField(model_attr='ano')
+    data_dt = DateTimeField(model_attr='data_inicio', null=True)
+    tipo_i = IntegerField(model_attr='tipo_id')
+    sessao_legislativa_i = IntegerField(model_attr='sessao_legislativa_id')
+    legislatura_i = IntegerField(model_attr='legislatura_id')
 
     text = TextExtractField(
         document=True, use_template=True,
@@ -280,13 +297,13 @@ class SessaoPlenariaIndex(DiarioOficialIndex):
     )
 
 
-class DocumentoAdministrativoIndex(DiarioOficialIndex):
+class DocumentoAdministrativoIndex(BaseIndex, CelerySearchIndex, Indexable):
     model = DocumentoAdministrativo
+
     ano_i = IntegerField(model_attr='ano', null=True)
-
-    data = DateTimeField(model_attr='data', null=True)
-
+    data_dt = DateTimeField(model_attr='data', null=True)
     at = IntegerField(model_attr='workspace_id', null=True)
+
     text = TextExtractField(
         document=True, use_template=True,
         model_attr=(
@@ -298,11 +315,11 @@ class DocumentoAdministrativoIndex(DiarioOficialIndex):
     )
 
 
-class DocumentoIndex(DiarioOficialIndex):
+class DocumentoIndex(BaseIndex, CelerySearchIndex, Indexable):
     model = Documento
-    ano_i = IntegerField(model_attr='ano')
 
-    data = DateTimeField(model_attr='public_date')
+    ano_i = IntegerField(model_attr='ano')
+    data_dt = DateTimeField(model_attr='public_date')
 
     text = SigadTextExtractField(
         document=True, use_template=True
