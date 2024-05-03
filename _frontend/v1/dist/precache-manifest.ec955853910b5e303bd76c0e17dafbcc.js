@@ -28,7 +28,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/brasao/escola_1024.png"
   },
   {
-    "revision": "98e045a51f7f6f3fc1ca",
+    "revision": "61dccbfb5ddcd271737d",
     "url": "/static/css/app.849411f3.css"
   },
   {
@@ -36,8 +36,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/css/chunk-0ec9d5db.1c736b92.css"
   },
   {
-    "revision": "0a430f575895c0a65ac6",
-    "url": "/static/css/chunk-35a23a2b.c47654b7.css"
+    "revision": "3f237250b9457ec9e1c1",
+    "url": "/static/css/chunk-2366a104.3230b20b.css"
   },
   {
     "revision": "b87a1005b95c47e78323",
@@ -52,7 +52,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/css/chunk-763df01a.71109f00.css"
   },
   {
-    "revision": "2eb3b82632657e049a42",
+    "revision": "8e429fb44a7cdda57a48",
     "url": "/static/css/chunk-dfd0331c.91f17d17.css"
   },
   {
@@ -348,24 +348,24 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/user.png"
   },
   {
-    "revision": "81ab90da8846ce5b729e0c2ad584192c",
+    "revision": "64077e9fecce2cc1faff14817eb908f7",
     "url": "/static/index.html"
   },
   {
-    "revision": "98e045a51f7f6f3fc1ca",
-    "url": "/static/js/app.2cfeb356.js"
+    "revision": "61dccbfb5ddcd271737d",
+    "url": "/static/js/app.2b9e25b5.js"
   },
   {
     "revision": "9ed5a2a52ccce1d7b4c2",
     "url": "/static/js/chunk-0ec9d5db.6e6e980a.js"
   },
   {
-    "revision": "49482ccb5ca1dc86b975",
-    "url": "/static/js/chunk-2d0cb66a.cea9ab46.js"
+    "revision": "3f237250b9457ec9e1c1",
+    "url": "/static/js/chunk-2366a104.bbaedb59.js"
   },
   {
-    "revision": "0a430f575895c0a65ac6",
-    "url": "/static/js/chunk-35a23a2b.7f0e9f2f.js"
+    "revision": "49482ccb5ca1dc86b975",
+    "url": "/static/js/chunk-2d0cb66a.cea9ab46.js"
   },
   {
     "revision": "5b85fa29575dc29b5470",
@@ -388,8 +388,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/js/chunk-7a782422.f94be4b8.js"
   },
   {
-    "revision": "2eb3b82632657e049a42",
-    "url": "/static/js/chunk-dfd0331c.dc32fd31.js"
+    "revision": "8e429fb44a7cdda57a48",
+    "url": "/static/js/chunk-dfd0331c.d5f27e2e.js"
   },
   {
     "revision": "3792693ea23ad3ebfc98",
