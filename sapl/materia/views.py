@@ -21,7 +21,8 @@ from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, 
     PermissionDenied
 from django.db.models import Max, Q
 from django.http import HttpResponse, JsonResponse
-from django.http.response import Http404, HttpResponseRedirect
+from django.http.response import Http404, HttpResponseRedirect,\
+    HttpResponsePermanentRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.urls.base import reverse
 from django.utils import formats, timezone
@@ -2511,6 +2512,14 @@ class MateriaLegislativaPesquisaView(AudigLogFilterMixin, MultiFormatOutputMixin
     def hook_texto_original(self, obj):
         id = obj["id"] if isinstance(obj, dict) else obj.id
         return f'{settings.SITE_URL}/materia/{id}'
+
+    def render_to_response(self, context, **response_kwargs):
+
+        if not context['show_results'] and not self.request.user.is_superuser:
+            return HttpResponsePermanentRedirect(
+                reverse('cmj.search:materia_haystack_search'))
+
+        return MultiFormatOutputMixin.render_to_response(self, context, **response_kwargs)
 
     def get_filterset_kwargs(self, filterset_class):
         super().get_filterset_kwargs(filterset_class)
