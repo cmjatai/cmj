@@ -255,13 +255,13 @@ class MateriaLegislativaIndex(BaseIndex, CelerySearchIndex, Indexable):
     data_dt = DateTimeField(model_attr='data_apresentacao')
 
     uta_i = IntegerField(
-        model_attr='ultima_tramitacao__unidade_tramitacao_destino_id')
+        model_attr='ultima_tramitacao__unidade_tramitacao_destino_id', null=True)
 
     sta_i = IntegerField(
-        model_attr='ultima_tramitacao__status_id')
+        model_attr='ultima_tramitacao__status_id', null=True)
 
     autoria_is = MultiValueField(
-        model_attr='autores__id')
+        model_attr='autores__id', null=True)
 
     text = TextExtractField(
         document=True, use_template=True,
