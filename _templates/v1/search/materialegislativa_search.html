@@ -355,7 +355,13 @@
                     </div>
                   {% endif %}
 
-
+                  {% if result.highlighted.text %}
+                  <div class="highlight m-0">
+                    {% for hl in result.highlighted.text %}
+                    {{ hl|safe }}
+                    {% endfor %}
+                  </div>
+                {% endif %}
 
 
                   </div>
@@ -363,13 +369,7 @@
 
 
 
-                  {% if result.highlighted.text %}
-                  <div class="highlight">
-                    {% for hl in result.highlighted.text %}
-                    {{ hl|safe }}
-                    {% endfor %}
-                  </div>
-                {% endif %}
+
 
       {% endif %}
 
