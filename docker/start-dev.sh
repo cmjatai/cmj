@@ -2,9 +2,9 @@
 
 echo -e "\033[38;2;255;255;0;2m\033[1m====> StartDEV...\033[0m"
 
-/bin/bash docker/wait-for-pg.sh "postgresql://cmj:cmj@10.3.163.200:5432/cmj"
+#/bin/bash docker/wait-for-pg.sh "postgresql://cmj:cmj@10.3.163.200:5432/cmj"
 #/bin/bash docker/wait-for-pg.sh "postgresql://cmj:cmj@10.3.163.254:5432/cmj"
-#/bin/bash docker/wait-for-pg.sh "postgresql://cmj:cmj@192.168.15.8:5432/cmj"
+/bin/bash docker/wait-for-pg.sh "postgresql://cmj:cmj@192.168.15.8:5432/cmj"
 
 ## SOLR
 USE_SOLR="${USE_SOLR:=False}"
