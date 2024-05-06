@@ -1,5 +1,6 @@
 import re
 
+from braces.views._access import PermissionRequiredMixin
 from crispy_forms.bootstrap import FieldWithButtons, StrictButton
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Div, Field, Layout
@@ -119,12 +120,19 @@ class ArqSearchForm(ModelSearchForm):
         return ModelSearchForm.get_models(self)
 
 
-class ArqSearchView(AudigLogFilterMixin, SearchView):
+class ArqSearchView(PermissionRequiredMixin, AudigLogFilterMixin, SearchView):
     results_per_page = 50
     template = 'arq/search.html'
+    permission_required = 'arq.view_arqclasse',
 
     def __call__(self, request):
         self.log(request)
+
+        has_permission = self.check_permissions(request)
+
+        if not has_permission:
+            return self.handle_no_permission(request)
+
         return SearchView.__call__(self, request)
 
     def __init__(self, template=None, load_all=True, form_class=None, searchqueryset=None, results_per_page=None):
