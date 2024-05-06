@@ -95,13 +95,13 @@ HAYSTACK_CONNECTIONS = {
         'BATCH_SIZE': 1000,
         'TIMEOUT': 600,
         'EXCLUDED_INDEXES': [
-            'cmj.core.search_indexes.SessaoPlenariaIndex',
-            'cmj.diarios.search_indexes.DiarioOficialIndex',
-            'cmj.sigad.search_indexes.DocumentoIndex',
-            'sapl.protocoloadm.search_indexes.DocumentoAdministrativoIndex',
-            'sapl.base.search_indexes.DocumentoAcessorioIndex',
-            'sapl.base.search_indexes.NormaJuridicaIndex',
-            'sapl.base.search_indexes.MateriaLegislativaIndex',
+            'cmj.search.search_indexes.DiarioOficialIndex',
+            'cmj.search.search_indexes.NormaJuridicaIndex',
+            'cmj.search.search_indexes.DocumentoAcessorioIndex',
+            'cmj.search.search_indexes.MateriaLegislativaIndex',
+            'cmj.search.search_indexes.SessaoPlenariaIndex',
+            'cmj.search.search_indexes.DocumentoAdministrativoIndex',
+            'cmj.search.search_indexes.DocumentoIndex',
         ]
     },
 }
