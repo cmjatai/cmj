@@ -111,6 +111,7 @@ class PluginSignMixin:
             log.info(cmd)
             p = ProcessoExterno(cmd, log)
             r = p.run(timeout=300)
+            return r
         except Exception as e:
             log.error(e)
             log.error(r)
