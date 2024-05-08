@@ -89,18 +89,18 @@
       </div>
     </div>
     <div class="box box-norma">
-      <a onclick="return false;" class="d-none d-lg-block icon icon-norma-juridica" href="{% url 'sapl.norma:norma_pesquisa' %}" >
+      <a onclick="return false;" class="d-none d-lg-block icon icon-norma-juridica" href="{% url 'cmj.search:norma_haystack_search' %}" >
       </a>
-      <a class="d-lg-none icon icon-norma-juridica" href="{% url 'sapl.norma:norma_pesquisa' %}" >
+      <a class="d-lg-none icon icon-norma-juridica" href="{% url 'cmj.search:norma_haystack_search' %}" >
       </a>
       <div class="inner">
-        <a href="{% url 'sapl.norma:norma_pesquisa' %}" class="">Legislação Municipal</a>
+        <a href="{% url 'cmj.search:norma_haystack_search' %}" class="">Legislação Municipal</a>
 
         {% comment %}
         <ul>
           {% for tipo in ""|sidebar_tipos_de_normas %}
             <li>
-              <a href="{% url 'sapl.norma:norma_pesquisa' %}?tipo={{tipo.pk}}">{{tipo}}</a>
+              <a href="{% url 'cmj.search:norma_haystack_search' %}?tipo={{tipo.pk}}">{{tipo}}</a>
             </li>
           {% endfor %}
         </ul>

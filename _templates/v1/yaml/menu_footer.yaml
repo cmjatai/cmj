@@ -15,7 +15,7 @@
     url: /institucional/nossa-jatai
 
   - title: {% trans 'Legislação' %}
-    url: sapl.norma:norma_pesquisa
+    url: cmj.search:norma_haystack_search
   - title: {% trans 'Normas de Destaque' %}
     url: sapl.norma:norma_de_destaque
 - title: {% trans 'Parlamentares' %}

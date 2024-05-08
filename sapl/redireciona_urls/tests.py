@@ -167,7 +167,7 @@ class RedirecionaNormasJuridicasListTests(TestCase):
 
     def test_redireciona_norma_juridica_pesquisa_sem_parametros(self):
         url = reverse(self.url_pattern)
-        url_e = reverse('sapl.norma:norma_pesquisa')
+        url_e = reverse('cmj.search:norma_haystack_search')
 
         tipo_norma = EMPTY_STRING
         numero_norma = EMPTY_STRING
@@ -211,7 +211,7 @@ class RedirecionaNormasJuridicasListTests(TestCase):
 
     def test_redireciona_norma_juridica_pesquisa_por_tipo(self):
         url = reverse(self.url_pattern)
-        url_e = reverse('sapl.norma:norma_pesquisa')
+        url_e = reverse('cmj.search:norma_haystack_search')
 
         tipo_norma = '4'
         numero_norma = EMPTY_STRING
@@ -255,7 +255,7 @@ class RedirecionaNormasJuridicasListTests(TestCase):
 
     def test_redireciona_norma_juridica_pesquisa_por_ano(self):
         url = reverse(self.url_pattern)
-        url_e = reverse('sapl.norma:norma_pesquisa')
+        url_e = reverse('cmj.search:norma_haystack_search')
 
         tipo_norma = EMPTY_STRING
         numero_norma = EMPTY_STRING
@@ -329,7 +329,7 @@ class RedirecionaNormasJuridicasDetailTests(TestCase):
         args += "?cod_norma=%s" % (pk_norma)
         url = "%s%s" % (url, args)
 
-        url_e = reverse('sapl.norma:norma_pesquisa')
+        url_e = reverse('cmj.search:norma_haystack_search')
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, MovedPermanentlyHTTPStatusCode)

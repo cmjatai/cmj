@@ -18,8 +18,9 @@ from sapl.materia.forms import CHOICE_TRAMITACAO, MateriaLegislativaFilterSet,\
     CHOICE_TIPO_LISTAGEM
 from sapl.materia.models import TipoMateriaLegislativa, UnidadeTramitacao,\
     StatusTramitacao, MateriaLegislativa
+from sapl.norma.models import TipoNormaJuridica, NormaJuridica, AssuntoNorma
 from sapl.utils import RangeWidgetNumber, choice_anos_com_materias, autor_label,\
-    autor_modal
+    autor_modal, choice_anos_com_normas
 
 
 class RangeIntegerField(forms.IntegerField):
@@ -340,6 +341,144 @@ class MateriaSearchForm(SearchForm):
             'hl.simple.post': '</span>',
             'hl.fragsize': 512
         }
-        s = sqs.highlight(**kwargs).order_by('-data_dt',
-                                             '-numero_i', '-last_update')
+        s = sqs.highlight(**kwargs).order_by(
+            '-data_dt',
+            '-numero_i',
+            '-last_update'
+        )
+        return s
+
+
+class NormaSearchForm(SearchForm):
+
+    _errors = []
+
+    ano_i = forms.ChoiceField(
+        required=False,
+        label=_('Ano da Norma'),
+        choices=[(None, _('---------')), ] + choice_anos_com_normas())
+
+    numero_s = forms.CharField(
+        required=False,
+        label=_('Número'),
+    )
+
+    tipo_i = forms.ModelChoiceField(
+        required=False,
+        queryset=TipoNormaJuridica.objects.all(),
+        label=_('Tipo de Norma Jurídica'),
+    )
+
+    assunto_is = forms.ModelChoiceField(
+        required=False,
+        queryset=AssuntoNorma.objects.all(),
+        label=_('Assuntos'),
+    )
+
+    def no_query_found(self):
+        if not self.data:
+            return super().no_query_found()
+
+        return self.searchqueryset.order_by('-data_dt')
+
+    def __init__(self, *args, **kwargs):
+
+        q_field = Div(
+            FieldWithButtons(
+                Field('q',
+                      placeholder=_(
+                          'O que você procura? '),
+                      type='search',),
+                StrictButton(
+                    '<i class="fas fa-2x fa-search"></i>',
+                    css_class='btn-outline-primary',
+                    type='submit'),
+                css_class='div-search'
+            ),
+        )
+
+        row1 = to_row([
+            (HTML('''
+                <small class="text-blue">
+                  <strong>
+                    O PREENCHIMENTO DOS CAMPOS ABAIXO É OPCIONAL... &nbsp;&nbsp;
+                    Clique na lupa após definir seus critérios de pesquisa.
+                  </strong>
+                </small>'''), 12),
+
+            (Div(), 2),
+            (q_field, 8),
+            (Div(), 2),
+
+            ('tipo_i', 4),
+            ('numero_s', 2),
+            ('ano_i', 2),
+            ('assunto_is', 4),
+        ])
+
+        self.helper = FormHelper()
+        self.helper.form_method = 'get'
+        self.helper.layout = Layout(
+            Fieldset('',
+                     row1)
+        )
+
+        super().__init__(*args, **kwargs)
+
+        self.fields['q'].label = ''
+        #self.fields['models'].widget = forms.MultipleHiddenInput()
+
+    def clean_tipo_i(self, *args, **kwargs):
+        tipo_i = self.cleaned_data['tipo_i']
+
+        if tipo_i:
+            return tipo_i.id
+
+    def clean_numero_s(self, *args, **kwargs):
+        numero_s = self.cleaned_data['numero_s']
+
+        if numero_s:
+            return f'{numero_s:>06}'
+
+    def clean_assunto_is(self, *args, **kwargs):
+        assunto_is = self.cleaned_data['assunto_is']
+
+        if assunto_is:
+            return assunto_is.id
+
+    def clean_ano_i(self, *args, **kwargs):
+        a = self.cleaned_data['ano_i']
+        if not a:
+            return
+        try:
+            a = int(a)
+            return a
+        except:
+            raise ValidationError(
+                _('O campo "Ano da Norma" deve ser um número.'))
+
+    def search(self):
+        sqs = super().search().models(NormaJuridica)
+
+        remove = ('q',)
+
+        params = {
+            key: self.cleaned_data.get(key, None)
+            for key in self.changed_data if key not in remove
+        }
+
+        if params:
+            sqs = sqs.filter(**params)
+
+        kwargs = {
+            'hl.simple.pre': '<span class="highlighted">',
+            'hl.simple.post': '</span>',
+            'hl.fragsize': 512
+        }
+
+        s = sqs.highlight(**kwargs).order_by(
+            '-data_dt',
+            '-numero_s',
+            '-last_update'
+        )
         return s

@@ -211,8 +211,12 @@ class NormaJuridicaIndex(BaseIndex, CelerySearchIndex, Indexable):
     model = NormaJuridica
 
     ano_i = IntegerField(model_attr='ano')
-    dat_dt = DateTimeField(model_attr='data', null=True)
+    numero_s = CharField(model_attr='numero')
+    data_dt = DateTimeField(model_attr='data', null=True)
     tipo_i = IntegerField(model_attr='tipo_id')
+
+    assuntos_is = MultiValueField(
+        model_attr='assuntos__id', null=True)
 
     text = TextExtractField(
         document=True, use_template=True,
@@ -225,6 +229,9 @@ class NormaJuridicaIndex(BaseIndex, CelerySearchIndex, Indexable):
             ('texto_integral', 'file_extractor'),
         )
     )
+
+    def prepare_numero_s(self, obj):
+        return f'{obj.numero:>06}'
 
 
 class DocumentoAcessorioIndex(BaseIndex, CelerySearchIndex, Indexable):

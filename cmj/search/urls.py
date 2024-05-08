@@ -1,7 +1,7 @@
 from django.conf.urls import url
 from django.views.generic.base import RedirectView
 
-from cmj.search.views import CmjSearchView, MateriaSearchView
+from cmj.search.views import CmjSearchView, MateriaSearchView, NormaSearchView
 
 from .apps import AppConfig
 
@@ -18,5 +18,7 @@ urlpatterns = [
 
     url(r'^pesquisar/materia$', MateriaSearchView(),
         name='materia_haystack_search'),
+
+    url(r'^pesquisar/norma$', NormaSearchView(), name='norma_haystack_search'),
 
 ]
