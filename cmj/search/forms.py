@@ -369,7 +369,7 @@ class NormaSearchForm(SearchForm):
         label=_('Tipo de Norma Jurídica'),
     )
 
-    assunto_is = forms.ModelChoiceField(
+    assuntos_is = forms.ModelChoiceField(
         required=False,
         queryset=AssuntoNorma.objects.all(),
         label=_('Assuntos'),
@@ -413,7 +413,7 @@ class NormaSearchForm(SearchForm):
             ('tipo_i', 4),
             ('numero_s', 2),
             ('ano_i', 2),
-            ('assunto_is', 4),
+            ('assuntos_is', 4),
         ])
 
         self.helper = FormHelper()
@@ -440,11 +440,11 @@ class NormaSearchForm(SearchForm):
         if numero_s:
             return f'{numero_s:>06}'
 
-    def clean_assunto_is(self, *args, **kwargs):
-        assunto_is = self.cleaned_data['assunto_is']
+    def clean_assuntos_is(self, *args, **kwargs):
+        assuntos_is = self.cleaned_data['assuntos_is']
 
-        if assunto_is:
-            return assunto_is.id
+        if assuntos_is:
+            return assuntos_is.id
 
     def clean_ano_i(self, *args, **kwargs):
         a = self.cleaned_data['ano_i']
