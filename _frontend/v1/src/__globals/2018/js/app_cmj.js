@@ -957,7 +957,7 @@ window.Acessibilidade = function () {
             window.location = '/mapa-do-site'
             break
           case 52: // 4
-            window.location = '/sistema/search/'
+            window.location = '/pesquisar/'
             break
           case 53: // 5
             window.location = '#'
