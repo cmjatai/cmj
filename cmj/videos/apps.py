@@ -53,13 +53,24 @@ class AppConfig(apps.AppConfig):
 
 """
 from cmj.celery import app as celery_app
-    i = celery_app.control.inspect()
-    if i:
-        queues = i.scheduled()
-        if queues:
-            for k, tarefas_agendadas in queues.items():
-                for ta in tarefas_agendadas:
-                    print(ta['eta'], ta['request']['name'])
-    print('-----------------------------')
-    print(timezone.now())
+i = celery_app.control.inspect()
+if i:
+    queues = i.scheduled()
+    if queues:
+        for k, tarefas_agendadas in queues.items():
+            for ta in tarefas_agendadas:
+                print(ta['eta'], ta['request']['name'])
+print('-----------------------------')
+print(timezone.now())
+
+
+     from celery import current_app as cap
+    ...: from time import sleep
+    ...: i = cap.control.inspect()
+    ...: while True:
+    ...:     q = i.scheduled()
+    ...:     for k, v in q.items():
+    ...:         print(k, v)
+    ...:     break
+
 """

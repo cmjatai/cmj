@@ -126,7 +126,7 @@ def task_add_selo_votacao_function(pk):
         }
 
         cmd = cmd.format(**params)
-        psm.run(cmd)
+        result = psm.run(cmd)
 
         del params['plugin']
         del params['in_file']
