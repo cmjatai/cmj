@@ -21,7 +21,7 @@ test -d $RUNDIR || mkdir -p $RUNDIR
 # Programs meant to be run under supervisor should not daemonize themselves (do not use --daemon)
 exec gunicorn ${DJANGO_WSGI_MODULE}:application \
   --name $NAME \
-  --log-level debug \
+  --log-level info \
   --timeout $TIMEOUT \
   --workers $NUM_WORKERS \
   --max-requests $MAX_REQUESTS \
