@@ -215,7 +215,7 @@ class NormaSearchView(AudigLogFilterMixin, SearchView, ):
             'verbose_name': _('Norma Jurídica'),
             'create_url': '' if u.is_anonymous or
             not u.has_perm('add_normajuridica') else
-            reverse('sapl.norma:normajuri_create')
+            reverse('sapl.norma:normajuridica_create')
         }
 
     def get_context(self):
