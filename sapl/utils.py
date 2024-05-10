@@ -106,7 +106,7 @@ autor_label = '''
 '''
 
 autor_modal = '''
-   <div id="modal_autor" title="Selecione o Autor" align="center">
+   <div id="modal_autor" title="Selecione o Autor" align="center" style="display:none">
        <small>Parlamentares, Comissões, Partidos, etc...</small>
        <form>
            <input id="q" type="text" />

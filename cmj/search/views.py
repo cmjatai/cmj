@@ -90,7 +90,7 @@ class CmjSearchView(AudigLogFilterMixin, SearchView):
 
 
 class MateriaSearchView(AudigLogFilterMixin, SearchView, ):
-    results_per_page = 50
+    results_per_page = 20
     template = 'search/materialegislativa_search.html'
 
     def __call__(self, request):

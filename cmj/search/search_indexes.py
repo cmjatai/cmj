@@ -283,6 +283,29 @@ class MateriaLegislativaIndex(BaseIndex, CelerySearchIndex, Indexable):
         )
     )
 
+    def index_queryset(self, using=None):
+
+        qs = self.get_model()._default_manager.all()
+
+        # return qs
+        # prefetch_related
+        return qs.select_related(
+            "tipo",
+        ).prefetch_related(
+            "autoria_set",
+            "autoria_set__autor",
+            "anexadas",
+            "tramitacao_set",
+            "tramitacao_set__status",
+            #"tramitacao_set__unidade_tramitacao_local",
+            "tramitacao_set__unidade_tramitacao_destino",
+            "normajuridica_set",
+            "normajuridica_set__tipo",
+            "registrovotacao_set",
+            "registrovotacao_set__ordem__sessao_plenaria",
+            "registrovotacao_set__ordem__sessao_plenaria__tipo",
+            "documentoacessorio_set")
+
 
 class SessaoPlenariaIndex(BaseIndex, CelerySearchIndex, Indexable):
     model = SessaoPlenaria
