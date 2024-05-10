@@ -127,7 +127,7 @@ class MateriaSearchView(AudigLogFilterMixin, SearchView, ):
             'search_url': '?',
             'verbose_name': _('Materia Legislativa'),
             'create_url': '' if u.is_anonymous or
-            not u.has_perm('add_materialegislativa') else
+            not u.has_perm('materia.add_materialegislativa') else
             reverse('sapl.materia:materialegislativa_create')
         }
 
@@ -214,7 +214,7 @@ class NormaSearchView(AudigLogFilterMixin, SearchView, ):
             'search_url': '?',
             'verbose_name': _('Norma Jurídica'),
             'create_url': '' if u.is_anonymous or
-            not u.has_perm('add_normajuridica') else
+            not u.has_perm('norma.add_normajuridica') else
             reverse('sapl.norma:normajuridica_create')
         }
 
