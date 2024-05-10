@@ -35,9 +35,16 @@
     font-variant: small-caps;
     line-height: 1;
     padding: 5px 0;
+
+    span {
+      font-variant: normal;
+      font-size: 70%;
+      color: $color_primary;
+    }
+
     &:hover {
       text-decoration: none;
-    } 
+    }
   }
   .inner-topo {
     padding: $grid-gutter-width * 0.5 0;
