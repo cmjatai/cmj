@@ -12,6 +12,7 @@ from django.core.exceptions import ValidationError, PermissionDenied
 from django.db import models
 from django.db.models.deletion import PROTECT
 from django.http.response import HttpResponse, JsonResponse
+from django.shortcuts import render
 from django.urls.base import reverse
 from django.utils.translation import ugettext_lazy as _
 from model_utils.choices import Choices
@@ -482,6 +483,25 @@ class MultiFormatOutputMixin:
 
     queryset_values_for_formats = True
 
+    def create_response(self):
+        # response for SearchView
+
+        context = {}  # super().get_context()
+
+        format_result = getattr(self.request, self.request.method).get(
+            'format', None)
+
+        if format_result:
+            if format_result not in self.formats_impl:
+                raise ValidationError(
+                    'Formato Inválido e/ou não implementado!')
+
+            context['object_list'] = self.results
+
+            return getattr(self, f'render_to_{format_result}')(context)
+
+        return render(self.request, self.template, context)
+
     def render_to_response(self, context, **response_kwargs):
 
         format_result = getattr(self.request, self.request.method).get(
@@ -651,10 +671,12 @@ class MultiFormatOutputMixin:
 
             v = obj
             for fp in fname:
+                # print(fp)
+
                 v = getattr(v, fp)
 
-            if hasattr(v, 'all'):
-                v = ' - '.join(map(lambda x: str(x), v.all()))
+                if hasattr(v, 'all'):
+                    v = ' - '.join(map(lambda x: str(x), v.all()))
 
             yield v
 
@@ -670,6 +692,8 @@ class MultiFormatOutputMixin:
                 continue
 
             fname = fname.split('__')
+            if fname[0] == 'object':
+                fname = fname[1:]
 
             m = self.model
             for fp in fname:

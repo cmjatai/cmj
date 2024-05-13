@@ -1,12 +1,15 @@
 
+from django.conf import settings
 from django.urls.base import reverse
+from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 from haystack.views import SearchView
 
 from cmj.core.models import AreaTrabalho
-from cmj.mixins import AudigLogFilterMixin
+from cmj.mixins import AudigLogFilterMixin, MultiFormatOutputMixin
 from cmj.search.forms import CmjSearchForm, MateriaSearchForm, NormaSearchForm
 from cmj.utils import make_pagination
+from sapl.materia.models import MateriaLegislativa
 from sapl.materia.views import tipos_autores_materias
 from sapl.utils import show_results_filter_set
 
@@ -89,9 +92,34 @@ class CmjSearchView(AudigLogFilterMixin, SearchView):
         return context
 
 
-class MateriaSearchView(AudigLogFilterMixin, SearchView, ):
+class MateriaSearchView(AudigLogFilterMixin, MultiFormatOutputMixin, SearchView, ):
     results_per_page = 20
     template = 'search/materialegislativa_search.html'
+
+    model = MateriaLegislativa
+    queryset_values_for_formats = False
+    fields_base_report = [
+        'object__id',
+        'object__ano',
+        'object__numero',
+        'object__tipo__sigla',
+        'object__tipo__descricao',
+        'object__autores',
+        'object__texto_original',
+        'object__ementa'
+    ]
+    fields_report = {
+        'csv': fields_base_report,
+        'xlsx': fields_base_report,
+        'json': fields_base_report,
+    }
+
+    def hook_header_object__texto_original(self):
+        return force_text(_('Link para Matéria Legislativa'))
+
+    def hook_object__texto_original(self, obj):
+        id = obj["id"] if isinstance(obj, dict) else obj.id
+        return f'{settings.SITE_URL}/materia/{id}'
 
     def __call__(self, request):
         self.log(request)
