@@ -63,7 +63,7 @@ class TextExtractField(CharField):
         # if settings.DEBUG or not os.path.exists(arquivo.path) or \
         #        not os.path.splitext(arquivo.path)[1][:1]:
         #    return ''
-        return ''
+        # return ''
         try:
             if not arquivo or arquivo and not arquivo.name:
                 return ''
