@@ -63,7 +63,7 @@ class TextExtractField(CharField):
         # if settings.DEBUG or not os.path.exists(arquivo.path) or \
         #        not os.path.splitext(arquivo.path)[1][:1]:
         #    return ''
-
+        return ''
         try:
             if not arquivo or arquivo and not arquivo.name:
                 return ''
@@ -210,6 +210,8 @@ class DiarioOficialIndex(BaseIndex, CelerySearchIndex, Indexable):
 class NormaJuridicaIndex(BaseIndex, CelerySearchIndex, Indexable):
     model = NormaJuridica
 
+    pk_i = IntegerField(model_attr='pk')
+
     ano_i = IntegerField(model_attr='ano')
     numero_s = CharField(model_attr='numero')
     data_dt = DateTimeField(model_attr='data', null=True)
@@ -254,6 +256,8 @@ class DocumentoAcessorioIndex(BaseIndex, CelerySearchIndex, Indexable):
 
 class MateriaLegislativaIndex(BaseIndex, CelerySearchIndex, Indexable):
     model = MateriaLegislativa
+
+    pk_i = IntegerField(model_attr='pk')
 
     em_tramitacao_b = BooleanField(model_attr='em_tramitacao')
     tipo_i = IntegerField(model_attr='tipo_id')

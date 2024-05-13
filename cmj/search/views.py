@@ -11,6 +11,7 @@ from cmj.search.forms import CmjSearchForm, MateriaSearchForm, NormaSearchForm
 from cmj.utils import make_pagination
 from sapl.materia.models import MateriaLegislativa
 from sapl.materia.views import tipos_autores_materias
+from sapl.norma.models import NormaJuridica
 from sapl.utils import show_results_filter_set
 
 
@@ -97,16 +98,15 @@ class MateriaSearchView(AudigLogFilterMixin, MultiFormatOutputMixin, SearchView,
     template = 'search/materialegislativa_search.html'
 
     model = MateriaLegislativa
-    queryset_values_for_formats = False
     fields_base_report = [
-        'object__id',
-        'object__ano',
-        'object__numero',
-        'object__tipo__sigla',
-        'object__tipo__descricao',
-        'object__autores',
-        'object__texto_original',
-        'object__ementa'
+        'id',
+        'ano',
+        'numero',
+        'tipo__sigla',
+        'tipo__descricao',
+        'autoria__autor__nome',
+        'texto_original',
+        'ementa'
     ]
     fields_report = {
         'csv': fields_base_report,
@@ -114,10 +114,10 @@ class MateriaSearchView(AudigLogFilterMixin, MultiFormatOutputMixin, SearchView,
         'json': fields_base_report,
     }
 
-    def hook_header_object__texto_original(self):
+    def hook_header_texto_original(self):
         return force_text(_('Link para Matéria Legislativa'))
 
-    def hook_object__texto_original(self, obj):
+    def hook_texto_original(self, obj):
         id = obj["id"] if isinstance(obj, dict) else obj.id
         return f'{settings.SITE_URL}/materia/{id}'
 
@@ -204,9 +204,26 @@ class MateriaSearchView(AudigLogFilterMixin, MultiFormatOutputMixin, SearchView,
         return context
 
 
-class NormaSearchView(AudigLogFilterMixin, SearchView, ):
+class NormaSearchView(AudigLogFilterMixin,  MultiFormatOutputMixin, SearchView, ):
     results_per_page = 50
     template = 'search/normajuridica_search.html'
+
+    model = NormaJuridica
+    fields_base_report = [
+        'id', 'ano', 'numero', 'tipo__sigla', 'tipo__descricao', 'texto_integral', 'ementa'
+    ]
+    fields_report = {
+        'csv': fields_base_report,
+        'xlsx': fields_base_report,
+        'json': fields_base_report,
+    }
+
+    def hook_header_texto_integral(self):
+        return force_text(_('Link para Norma'))
+
+    def hook_texto_integral(self, obj):
+        id = obj["id"] if isinstance(obj, dict) else obj.id
+        return f'{settings.SITE_URL}/norma/{id}'
 
     def __call__(self, request):
         self.log(request)

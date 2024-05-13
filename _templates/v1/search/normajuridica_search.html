@@ -16,6 +16,14 @@
   </h1>
 {% endblock title %}
 
+{% block extra_actions %}
+  {% if show_results %}
+    {% with 'cmj.search:norma_haystack_search' as url_reverse %}
+      {% include "crud/format_options.html" %}
+    {% endwith %}
+  {% endif %}
+{% endblock %}
+
 {% block extra_content %} {% endblock %}
 {% block detail_content %} {% endblock %}
 

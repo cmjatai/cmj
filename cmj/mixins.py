@@ -14,7 +14,9 @@ from django.db.models.deletion import PROTECT
 from django.http.response import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.urls.base import reverse
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+from haystack.models import SearchResult
 from model_utils.choices import Choices
 from pdfminer.high_level import extract_text
 from pdfrw.pdfreader import PdfReader
@@ -483,6 +485,11 @@ class MultiFormatOutputMixin:
 
     queryset_values_for_formats = True
 
+    class ValueResult(SearchResult):
+        def _get_object(self):
+            return None
+        object = property(_get_object, SearchResult._set_object)
+
     def create_response(self):
         # response for SearchView
 
@@ -496,10 +503,24 @@ class MultiFormatOutputMixin:
                 raise ValidationError(
                     'Formato Inválido e/ou não implementado!')
 
-            context['object_list'] = self.results
+            items = self.results.result_class(
+                MultiFormatOutputMixin.ValueResult
+            ).values_list(
+                'pk_i', flat=True)
+            items.query.highlight = False
 
-            return getattr(self, f'render_to_{format_result}')(context)
+            objs = list(map(
+                lambda x: x,
+                items
+            ))
+            items = self.model.objects.filter(id__in=objs)
 
+            context['object_list'] = items
+
+            rendered = getattr(self, f'render_to_{format_result}')(context)
+            return rendered
+
+        context = self.get_context()
         return render(self.request, self.template, context)
 
     def render_to_response(self, context, **response_kwargs):

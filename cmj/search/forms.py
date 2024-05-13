@@ -9,6 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 from haystack.backends import SQ
 from haystack.forms import ModelSearchForm, SearchForm
 from haystack.inputs import Raw
+from haystack.models import SearchResult
 from haystack.utils.app_loading import haystack_get_model
 
 from cmj.core.models import AreaTrabalho
@@ -217,7 +218,7 @@ class MateriaSearchForm(SearchForm):
         if not self.data:
             return super().no_query_found()
 
-        return self.searchqueryset.order_by('-data_dt')
+        return self.searchqueryset.all()
 
     def __init__(self, *args, **kwargs):
 
@@ -343,7 +344,7 @@ class MateriaSearchForm(SearchForm):
         }
         s = sqs.highlight(**kwargs).order_by(
             '-data_dt',
-            '-numero_i',
+            '-pk_i',
             '-last_update'
         )
         return s

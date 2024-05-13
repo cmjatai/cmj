@@ -79,6 +79,7 @@ if DEBUG:
 SEARCH_BACKEND = 'haystack.backends.solr_backend.SolrEngine'
 SEARCH_URL = ('URL', '{}/solr/{}'.format(SOLR_URL, SOLR_COLLECTION))
 HAYSTACK_ROUTERS = ['cmj.haystack.CmjDefaultRouter']
+HAYSTACK_ITERATOR_LOAD_PER_QUERY = 100
 HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': SEARCH_BACKEND,
