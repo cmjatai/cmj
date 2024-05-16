@@ -18,7 +18,7 @@
 
 {% block extra_actions %}
   {% if show_results %}
-    {% with 'cmj.search:materia_haystack_search' as url_reverse %}
+    {% with url_reverse='cmj.search:materia_haystack_search' url_openapi='sapl.api:materialegislativa-list'  %}
       {% include "crud/format_options.html" %}
     {% endwith %}
   {% endif %}

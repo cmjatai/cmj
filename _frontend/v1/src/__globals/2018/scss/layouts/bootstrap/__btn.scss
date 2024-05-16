@@ -1,4 +1,6 @@
 .btn {
+  display: inline-flex;
+  align-items: center;
   &:hover {
     box-shadow: 0 0 30px #fff;
   }
