@@ -258,7 +258,7 @@ class CompMixin(PermissionRequiredMixin):
     def is_cached(self):
         return media_cache_storage.exists(self.get_path_cache())
 
-    def get_path_cache(self):
+    def get_path_cache(self, id=None, ano=None):
 
         sign_vigencia = self.kwargs.get('sign', '')
         sign_vigencia = slugify(sign_vigencia)
@@ -267,20 +267,23 @@ class CompMixin(PermissionRequiredMixin):
         path_cache = '{}/{}/{}/{}/{}'.format(
             opt.app_label,
             opt.model_name,
-            self.object.ano,
-            self.object.id,
+            ano or self.object.ano,
+            id or self.object.id,
             f'cache{sign_vigencia}.html'
         )
         return path_cache
 
-    def clear_cache(self):
-        path_cache = '/'.join(self.get_path_cache().split('/')[:-1])
-        directories, files = media_cache_storage.listdir(path_cache)
+    def clear_cache(self, id=None, ano=None):
+        path_cache = '/'.join(self.get_path_cache(id=id,
+                                                  ano=ano).split('/')[:-1])
+        try:
+            directories, files = media_cache_storage.listdir(path_cache)
+        except FileNotFoundError:
+            return
+
         for f in files:
             media_cache_storage.delete(f'{path_cache}/{f}')
         media_cache_storage.delete(path_cache)
-
-        print(path_cache)
 
     def get_notificacoes(self, object_list=None, type_notificacoes=None):
 
@@ -1319,6 +1322,12 @@ class TextEditView(CompMixin, TemplateView):
                     self.object.save()
                     messages.success(request, _(
                         'Texto Articulado publicado com sucesso.'))
+
+                    for ta in self.object.dispositivos_alterados_pelo_ta_set.values(
+                        'ta_id', 'ta__ano'
+                    ).order_by('ta_id').distinct('ta_id'):
+                        self.clear_cache(ta['ta_id'], ta['ta__ano'])
+
                 else:
                     self.object.temp_check_migrations = True
                     self.object.save()

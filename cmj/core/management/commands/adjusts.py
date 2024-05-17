@@ -8,6 +8,7 @@ import pathlib
 import re
 import subprocess
 import sys
+from time import sleep
 
 from PIL import Image, ImageEnhance, ImageDraw
 from PIL.Image import Resampling
@@ -21,11 +22,13 @@ import fitz
 import ocrmypdf
 from reportlab.pdfgen import canvas
 from reportlab.platypus.doctemplate import SimpleDocTemplate
+import requests
 
 from cmj.arq.models import ArqDoc
 from cmj.utils import Manutencao
 from cmj.videos.tasks import task_pull_youtube_upcoming
 import numpy as np
+from sapl.compilacao.models import TextoArticulado
 from sapl.materia.models import MateriaLegislativa
 from sapl.norma.models import NormaJuridica
 from sapl.rules.apps import reset_id_model
@@ -79,6 +82,19 @@ class Command(BaseCommand):
         m = Manutencao()
         m.desativa_auto_now()
         m.desativa_signals()
+
+        for ta in TextoArticulado.objects.all().order_by('id'):
+
+            url = f'https://www.jatai.go.leg.br/ta/{ta.id}/text'
+
+            try:
+                res = requests.get(url)
+                print(url, res.status_code)
+            except Exception as e:
+                print(f"Erro: {e}")
+                print(res.content)
+
+        return
 
         for app in apps.get_app_configs():
 
