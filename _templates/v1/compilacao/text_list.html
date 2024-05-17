@@ -4,6 +4,7 @@
 {% load common_tags common_cmj_tags %}
 {% block head_title %}{{object}}{% endblock head_title %}
 {% block meta_description%}{% if object.content_object %}{{object.content_object.ementa}}{% else %}{{object}}{% endif %}{% endblock meta_description %}
+
 {% block base_container_header %}
   {% if object.content_object and object.content_object|meta_model_value:'label' == 'norma.NormaJuridica' and not object.content_object|has_perm_change_instance:perms  %}
     {% with object.content_object as n %}
@@ -16,14 +17,21 @@
 
 {% block base_content %}
   {{ block.super }}
-  {% include 'compilacao/text_list__embedded.html'%}
+  {% if embedded_cache %}
+    {{ embedded_cache|safe }}
+  {% else %}
+    {% include 'compilacao/text_list__embedded.html'%}
+  {% endif %}
+
 
   {% if object.content_object and object.content_object|meta_model_value:'label' == 'norma.NormaJuridica'%}
     {% with object.content_object as n %}
       {% include 'compilacao/normajuridica_widget_bottom.html' %}
     {% endwith %}
   {% endif %}
-<div class="page-break"></div>
+
+  <div class="page-break"></div>
+
   {{object.tipo_ta.rodape_global|dont_break_out}}
 
 {% endblock base_content %}

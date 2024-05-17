@@ -16,10 +16,19 @@ from django.db import connection
 from django.db.models.signals import pre_init, post_init, pre_save, post_save,\
     pre_delete, post_delete, post_migrate, pre_migrate, m2m_changed
 from django.template.loaders.filesystem import Loader
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from easy_thumbnails import source_generators
 import magic
 from unipath.path import Path
+
+
+media_protected_storage = FileSystemStorage(
+    location=settings.MEDIA_PROTECTED_ROOT, base_url='DO_NOT_USE')
+
+
+media_cache_storage = FileSystemStorage(
+    location=settings.MEDIA_CACHE_ROOT, base_url='DO_NOT_USE')
 
 
 def pil_image(source, exif_orientation=False, **options):
@@ -285,10 +294,6 @@ def intervalos_tem_intersecao(a_inicio, a_fim, b_inicio, b_fim):
     return maior_inicio <= menor_fim
 
 
-media_protected_storage = FileSystemStorage(
-    location=settings.MEDIA_PROTECTED_ROOT, base_url='DO_NOT_USE')
-
-
 def texto_upload_path(instance, filename, subpath='', pk_first=False, _prefix='public'):
 
     filename = re.sub('\s', '_', normalize(filename.strip()).lower())
@@ -540,3 +545,19 @@ class DisableSignals(object):
         signal.receivers = self.stashed_signals.get(signal, [])
         del self.stashed_signals[signal]
         signal.sender_receivers_cache.clear()
+
+
+class TimeExecution(object):
+    def __init__(self, print_date=False):
+        self.print_date = print_date
+
+    def __enter__(self):
+        self.start = timezone.localtime()
+        if self.print_date:
+            print(self.start)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        end = timezone.localtime()
+        if self.print_date:
+            print(end)
+        print('TimeExecution:', end - self.start)

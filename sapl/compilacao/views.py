@@ -1,6 +1,8 @@
 from collections import OrderedDict
 from datetime import timedelta
+import io
 import logging
+import os
 import sys
 
 from braces.views import FormMessagesMixin
@@ -11,6 +13,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError, PermissionDenied
+from django.core.files.base import File
 from django.core.signing import Signer
 from django.db import transaction
 from django.db.models import Q
@@ -21,14 +24,15 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls.base import reverse_lazy, reverse
 from django.utils.dateparse import parse_date
 from django.utils.encoding import force_text
-from django.utils.text import format_lazy
+from django.utils.text import format_lazy, slugify
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic.base import TemplateView
+from django.views.generic.base import TemplateView, ContextMixin
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import (CreateView, DeleteView, FormView,
                                        UpdateView)
 from django.views.generic.list import ListView
 
+from cmj.utils import TimeExecution, media_cache_storage
 from sapl.compilacao.apps import AppConfig
 from sapl.compilacao.forms import (DispositivoDefinidorVigenciaForm,
                                    DispositivoEdicaoAlteracaoForm,
@@ -250,6 +254,33 @@ class CompMixin(PermissionRequiredMixin):
         if isinstance(self, ListView):
             context['NO_ENTRIES_MSG'] = CrudListView.no_entries_msg
         return context
+
+    def is_cached(self):
+        return media_cache_storage.exists(self.get_path_cache())
+
+    def get_path_cache(self):
+
+        sign_vigencia = self.kwargs.get('sign', '')
+        sign_vigencia = slugify(sign_vigencia)
+
+        opt = self.object._meta
+        path_cache = '{}/{}/{}/{}/{}'.format(
+            opt.app_label,
+            opt.model_name,
+            self.object.ano,
+            self.object.id,
+            f'cache{sign_vigencia}.html'
+        )
+        return path_cache
+
+    def clear_cache(self):
+        path_cache = '/'.join(self.get_path_cache().split('/')[:-1])
+        directories, files = media_cache_storage.listdir(path_cache)
+        for f in files:
+            media_cache_storage.delete(f'{path_cache}/{f}')
+        media_cache_storage.delete(path_cache)
+
+        print(path_cache)
 
     def get_notificacoes(self, object_list=None, type_notificacoes=None):
 
@@ -932,7 +963,59 @@ class TextView(CompMixin, ListView):
             self.template_name = 'compilacao/text_list__print_version.html'
         if 'embedded' in request.GET:
             self.template_name = 'compilacao/text_list__embedded.html'
+
+        if self.is_reader() and self.is_cached():
+            context = ContextMixin.get_context_data(self, **kwargs)
+            context['object'] = self.object
+
+            return self.render_to_response(context)
+
         return ListView.get(self, request, *args, **kwargs)
+
+    def is_reader(self):
+        if self.request.user.is_anonymous:
+            return True
+        not_reader_if_any_of_perms = (
+            'compilacao.change_dispositivo_edicao_dinamica',
+            'compilacao.add_nota',
+            'compilacao.add_vide'
+        )
+        for p in not_reader_if_any_of_perms:
+            if self.request.user.has_perm(p):
+                return False
+        return True
+
+    def render_to_response(self, context, **response_kwargs):
+
+        # with TimeExecution(print_date=True):
+
+        if self.is_reader() and not self.is_cached():
+            template_user = self.template_name
+            self.template_name = 'compilacao/text_list__embedded.html'
+
+            response = ListView.render_to_response(
+                self, context, **response_kwargs)
+
+            html = response.render()
+            embedded_cache = html.content
+
+            output = io.BytesIO(embedded_cache)
+            media_cache_storage.save(self.get_path_cache(), content=output)
+
+            self.template_name = template_user
+
+        if self.is_reader() and self.is_cached():
+            embedded_cache = media_cache_storage.open(
+                self.get_path_cache()).read()
+
+            context['embedded_cache'] = embedded_cache.decode()
+
+            self.object_list = self.object._meta.model.objects.none()
+
+        response = ListView.render_to_response(
+            self, context, **response_kwargs)
+
+        return response
 
     def get_context_data(self, **kwargs):
         context = super(TextView, self).get_context_data(**kwargs)
@@ -1199,6 +1282,7 @@ class TextEditView(CompMixin, TemplateView):
                     'sapl.compilacao:ta_text', kwargs={
                         'ta_id': self.object.id}))
             else:
+                self.clear_cache()
                 # TODO - implementar logging de ação de usuário
                 self.object.editing_locked = False
                 self.object.privacidade = STATUS_TA_EDITION
