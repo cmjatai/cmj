@@ -28,7 +28,7 @@ from cmj.arq.models import ArqDoc
 from cmj.utils import Manutencao
 from cmj.videos.tasks import task_pull_youtube_upcoming
 import numpy as np
-from sapl.compilacao.models import TextoArticulado
+from sapl.compilacao.models import TextoArticulado, Dispositivo
 from sapl.materia.models import MateriaLegislativa
 from sapl.norma.models import NormaJuridica
 from sapl.rules.apps import reset_id_model
@@ -83,6 +83,82 @@ class Command(BaseCommand):
         m.desativa_auto_now()
         m.desativa_signals()
 
+        q = Q(texto__icontains='lei')
+        q |= Q(texto__icontains='lom')
+        q |= Q(texto__icontains='decreto')
+        q |= Q(texto__icontains='resolução')
+
+        __base__ = (r'(LEI|DECRETO|RESOLUÇÃO) '
+                    r'(ORDINÁRIA|COMPLEMENTAR)? ?'
+                    r'(MUNICIPAL|ESTADUAL|FEDERAL)? ?'
+                    r'(ORDINÁRIA|COMPLEMENTAR)? ?'
+                    r'(N&DEG;|N&ordm;|N[o\u00B0\u00BA\u00AA])? ?'
+                    r'(\d*)(\.?)(\d+)')
+
+        patterns = [
+            #r'(LEI|RESOLUÇÃO|DECRETO) (MUNICIPAL)? \d{2,4}'
+            f'{__base__},? de (\d+) de ([abçdefghijlmnorstuvz&c;]+) de (\d+)',
+            f'{__base__}/(\d+)',
+        ]
+        for n, p in enumerate(patterns):
+            patterns[n] = re.compile(p, re.I)
+
+        ds = Dispositivo.objects.filter(q)
+        print(ds.count())
+
+        classificacao = {
+            'match': [],
+            'nomatch': []
+        }
+
+        for d in ds:
+            t = d.texto
+            m = None
+            for p in patterns:
+                m = p.search(t)
+                if m:
+                    break
+
+            if not m:
+                classificacao['nomatch'].append(d)
+                continue
+
+            classificacao['match'].append((m, d))
+
+            # print(d.ta_id, d.id, m.group())
+            # print('------------------------')
+
+        # for n, d in enumerate(classificacao['nomatch']):
+        #    print(d.texto)
+        #    if n % 100 == 0:
+        #        print('------------------------')
+
+        matchs = set()
+        for m, d in classificacao['match']:
+            matchs.add(m.group().lower())
+
+            mg = m.groups()
+            ta = None
+            if not mg[2] or mg[2].lower() == 'municipal':
+                ta = TextoArticulado.objects.filter(
+                    numero=f'{mg[5]}{mg[7]}',
+                    ano=mg[-1]
+                ).first()
+
+            print(d.ta_id, mg, ta)
+
+        print('Match    :', len(classificacao['match']))
+        print('No match :', len(classificacao['nomatch']))
+
+        print('Len SET:', len(matchs))
+
+        for m in matchs:
+            print(m)
+
+        return
+
+        # get em todos textos articulados para gerar cache
+
         for ta in TextoArticulado.objects.all().order_by('id'):
 
             url = f'https://www.jatai.go.leg.br/ta/{ta.id}/text'
@@ -95,6 +171,8 @@ class Command(BaseCommand):
                 print(res.content)
 
         return
+
+        # list todos os orderings dos models
 
         for app in apps.get_app_configs():
 

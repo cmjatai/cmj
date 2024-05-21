@@ -1,4 +1,5 @@
 from pickle import NONE
+import re
 
 from django.contrib import messages
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -9,6 +10,7 @@ from django.db.models.aggregates import Max
 from django.db.models.deletion import PROTECT
 from django.http.response import Http404
 from django.template import defaultfilters
+from django.urls.base import reverse
 from django.utils import timezone
 from django.utils.decorators import classonlymethod
 from django.utils.encoding import force_text
@@ -950,6 +952,97 @@ class Publicacao(TimestampedMixin):
             self.ta)
 
 
+class UrlizeReferencia(models.Model):
+
+    chave = models.CharField(
+        max_length=256,
+        verbose_name=_('Chave'),
+        db_index=True,
+        unique=True
+    )
+
+    url = models.CharField(
+        max_length=256,
+        default='',
+        verbose_name=_('Url'))
+
+    __base__ = (r'(LEI|DECRETO|RESOLUÇÃO)( )'
+                r'(ORDINÁRIA|COMPLEMENTAR)?( ?)'
+                r'(MUNICIPAL|ESTADUAL|FEDERAL)?( ?)'
+                r'(ORDINÁRIA|COMPLEMENTAR)?( ?)'
+                r'(N&DEG;|N&ordm;|N[o\u00B0\u00BA\u00AA])?(\.? ?)'
+                r'(\d*)(\.?)(\d+)')
+
+    patterns = [
+        #r'(LEI|RESOLUÇÃO|DECRETO) (MUNICIPAL)? \d{2,4}'
+        f'{__base__}(,?)( ?de ?)( ?\d+ ?)( ?de ?)([abçdefghijlmnorstuvz&c;]+)( ?de ?)(\d+)',
+        f'{__base__}( ?/ ?)(\d+)',
+        f'{__base__}(,?)( ?de ?)(\d+)(/)(\d+)(/)(\d+)',
+
+    ]
+    for n, p in enumerate(patterns):
+        patterns[n] = re.compile(p, re.I)
+
+    class Meta:
+        verbose_name = _('Link de Referência')
+        verbose_name_plural = _('Links de Referências')
+        ordering = ['chave']
+
+    @classmethod
+    def urlize(cls, texto):
+
+        def join(texto, chave_natural, url):
+
+            texto = texto.replace(
+                chave_natural,
+                f'<a href="{url}">{chave_natural}</a>'
+            )
+            return texto
+
+        ms_result = []
+        for p in cls.patterns:
+            ms = p.findall(texto)
+            if ms:
+                ms_result.extend(ms)
+
+        if not ms_result:
+            return texto
+
+        for m in ms_result:
+            chave_list = m
+            chave_natural = ''.join(chave_list)
+            #chave_natural = chave_natural.replace(' / ', '/')
+            #chave_natural = chave_natural.replace(' . ', '.')
+            #chave_natural = chave_natural.replace(' , ', ', ')
+            chave_lower = chave_natural.lower()
+
+            ur, created = cls.objects.get_or_create(chave=chave_lower)
+
+            if not created and ur.url:
+                texto = join(texto, chave_natural, ur.url)
+
+            if not created:
+                continue
+
+            try:
+                if not chave_list[4] or chave_list[4].lower() == 'municipal':
+                    ta = TextoArticulado.objects.filter(
+                        numero=f'{chave_list[10]}{chave_list[12]}',
+                        ano=chave_list[-1]
+                    ).first()
+                    if not ta:
+                        continue
+                    url = reverse('sapl.compilacao:ta_text',
+                                  kwargs={'ta_id': ta.id})
+                    ur.url = url
+                    ur.save()
+                    texto = join(texto, chave_natural, url)
+            except:
+                pass
+
+        return texto
+
+
 class Dispositivo(BaseModel, TimestampedMixin):
     TEXTO_PADRAO_DISPOSITIVO_REVOGADO = force_text(_('(Revogado)'))
     INTERVALO_ORDEM = 1000
@@ -1816,6 +1909,9 @@ class Dispositivo(BaseModel, TimestampedMixin):
             count += Dispositivo.INTERVALO_ORDEM
             Dispositivo.objects.filter(pk=d).update(
                 ordem_bloco_atualizador=count)
+
+    def render_texto(self):
+        return UrlizeReferencia.urlize(self.texto)
 
 
 class Vide(TimestampedMixin):

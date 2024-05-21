@@ -274,6 +274,8 @@ class CompMixin(PermissionRequiredMixin):
         return path_cache
 
     def clear_cache(self, id=None, ano=None):
+        # todo: Transferir métodos para model TA
+
         path_cache = '/'.join(self.get_path_cache(id=id,
                                                   ano=ano).split('/')[:-1])
         try:
