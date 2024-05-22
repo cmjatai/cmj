@@ -7,7 +7,51 @@
   {{item.content_object}}<br>
   {{item.content_object|to_descr|safe}}<br>
 
-  Jataí, {{item.content_object.certidao.created|date }}.<br>
+  {% if item.content_type.model == 'sessaoplenaria' %}
+    {% for od in item.content_object.ordemdia_set.order_by_numero_ordem %}
+      {% if forloop.first %}
+        <table border=1 style="border: 1px solid black" cellspacing=0>
+          <tr>
+            <th>Matérias da Ordem do dia</th>
+            <th>Deliberações</th>
+          </tr>
+      {% endif %}
+          {% if od.registrovotacao_set.exists %}
+          <tr>
+            <td>{{od.numero_ordem}} - {{od.materia}}</td>
+            <td align=center>
+              {{od.resultado}}<br>
+              {% for rv in od.registrovotacao_set.all %}
+                {{ rv.tipo_votacao }}
+                <strong>Sim: </strong>{{ rv.numero_votos_sim }}
+                - <strong>Não: </strong>{{ rv.numero_votos_nao }}
+                {% if rv.numero_abstencoes %}
+                  - <strong>Abstenções: </strong>{{ rv.numero_abstencoes }}
+                {% endif %}
+
+                {% if rv.ordem.tipo_votacao == 2 %}
+                  <br>-------------
+                  {% for vp in rv.votoparlamentar_set.all %}
+                    <br><strong>{{vp.voto}}</strong> - {{vp.parlamentar}}
+                  {% endfor %}
+                {% endif %}
+              {% endfor %}
+            </td>
+          </tr>
+          {% endif %}
+      {% if forloop.last %}
+        </table>
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+
+  Jataí,
+  {% if item.content_object.certidao.created %}
+    {{item.content_object.certidao.created|date }}.<br>
+  {% else %}
+    {{item.diario.data|date}}.<br>
+  {% endif %}
+
 
   {% if item.content_object.autores.exists %}
     {% for autor in item.content_object.autores.all %}

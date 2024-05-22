@@ -83,6 +83,27 @@ class Command(BaseCommand):
         m.desativa_auto_now()
         m.desativa_signals()
 
+        # get em todos textos articulados para gerar cache
+
+        for norma in NormaJuridica.objects.all().order_by(
+            '-norma_de_destaque',
+            '-id'
+        ):
+            ta = norma.texto_articulado.all().first()
+            if not ta:
+                continue
+
+            url = f'https://www.jatai.go.leg.br/ta/{ta.id}/text'
+
+            try:
+                res = requests.get(url)
+                print(url, res.status_code)
+            except Exception as e:
+                print(f"Erro: {e}")
+                print(res.content)
+
+        return
+
         q = Q(texto__icontains='lei')
         q |= Q(texto__icontains='lom')
         q |= Q(texto__icontains='decreto')
@@ -154,21 +175,6 @@ class Command(BaseCommand):
 
         for m in matchs:
             print(m)
-
-        return
-
-        # get em todos textos articulados para gerar cache
-
-        for ta in TextoArticulado.objects.all().order_by('id'):
-
-            url = f'https://www.jatai.go.leg.br/ta/{ta.id}/text'
-
-            try:
-                res = requests.get(url)
-                print(url, res.status_code)
-            except Exception as e:
-                print(f"Erro: {e}")
-                print(res.content)
 
         return
 

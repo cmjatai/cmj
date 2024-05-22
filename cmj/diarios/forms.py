@@ -62,10 +62,13 @@ class VinculoDocDiarioOficialForm(ModelForm):
         queryset=DiarioOficial.objects.all(),
         widget=HiddenInput(), required=False)
 
+    data_diario = forms.DateField(
+        widget=HiddenInput(), required=False)
+
     class Meta:
         model = VinculoDocDiarioOficial
         fields = ('content_type', 'tipo', 'ano',
-                  'numero', 'pagina', 'object_id', 'diario')
+                  'numero', 'pagina', 'object_id', 'diario', 'data_diario')
 
         error_messages = {
             NON_FIELD_ERRORS: {
@@ -85,6 +88,7 @@ class VinculoDocDiarioOficialForm(ModelForm):
                 to_column(('ano', 2)),
                 to_column(('pagina', 2)),
                 to_column(('diario', 0)),
+                to_column(('data_diario', 0)),
             ),
             Alert(
                 '',
@@ -109,10 +113,20 @@ class VinculoDocDiarioOficialForm(ModelForm):
     def clean(self):
         cd = self.cleaned_data
         inst = self.instance
+
         try:
-            inst.content_object = cd['content_type'].get_object_for_this_type(
-                numero=cd['numero'], ano=cd['ano'], tipo_id=cd['tipo'])
-        except:
+            ctype = cd['content_type']
+            params = {
+                'numero': cd['numero'],
+                'ano': cd['ano'],
+                'tipo_id': cd['tipo']
+            }
+            if ctype.model == 'sessaoplenaria':
+                params['data_inicio'] = cd['data_diario']
+                del params['ano']
+
+            inst.content_object = ctype.get_object_for_this_type(**params)
+        except Exception as e:
             raise ValidationError('Registro não encontrado!')
         cd['object_id'] = inst.object_id
         cd['diario'] = inst.diario

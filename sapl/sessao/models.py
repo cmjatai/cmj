@@ -575,7 +575,14 @@ class OradorOrdemDia(AbstractOrador):  # OradoresOrdemDia
         ordering = ['id']
 
 
+class OrdemDiaManager(models.Manager):
+    def order_by_numero_ordem(self):
+        return self.get_queryset().order_by('numero_ordem')
+
+
 class OrdemDia(AbstractOrdemDia):
+
+    objects = OrdemDiaManager()
 
     parent = models.ForeignKey('self',
                                blank=True, null=True, default=None,
