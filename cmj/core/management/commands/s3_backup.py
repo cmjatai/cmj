@@ -654,8 +654,13 @@ class Command(BaseCommand):
             if not app.name.startswith('cmj') and not app.name.startswith('sapl'):
                 continue
 
+            model_not_backup = (DraftMidia, )
+
             for m in app.get_models():
                 model_exec = False
+
+                if m in model_not_backup:
+                    continue
 
                 for f in m._meta.get_fields():
                     dua = f
