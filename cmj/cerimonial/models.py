@@ -858,6 +858,8 @@ class GrupoDeContatos(CmjAuditoriaModelMixin):
 
 class Visitante(CmjAuditoriaModelMixin):
 
+    FIELDFILE_NAME = ('',)
+
     nome = models.CharField(max_length=100, verbose_name=_('Nome'))
 
     documento = models.CharField(

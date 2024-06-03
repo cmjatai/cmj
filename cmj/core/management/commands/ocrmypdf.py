@@ -430,7 +430,7 @@ class Command(BaseCommand):
                "-l por",
                "-q",
                "-j {}".format(3 if self.execucao_noturna else 1),
-               "--output-type pdfa-1",
+               "--output-type pdfa-2",
                in_path, out_path]
 
         try:

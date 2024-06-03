@@ -101,8 +101,6 @@ class DraftMidia(models.Model):
     METADATA_PDFA_PROC = 20
     METADATA_PDFA_PDFA = 99
 
-    FIELDFILE_NAME = ('arquivo',)
-
     metadata = JSONField(
         verbose_name=_('Metadados'),
         blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
@@ -409,6 +407,8 @@ def arqdoc_path(instance, filename):
 
 
 class ArqDoc(Parent, CmjAuditoriaModelMixin):
+
+    FIELDFILE_NAME = ('arquivo',)
 
     checkcheck = models.BooleanField(
         verbose_name=_('Arquivado'), default=False)
