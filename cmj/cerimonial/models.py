@@ -863,7 +863,7 @@ class GrupoDeContatos(CmjAuditoriaModelMixin):
 
 class Visitante(CmjAuditoriaModelMixin):
 
-    FIELDFILE_NAME = ('',)
+    FIELDFILE_NAME = ('fotografia',)
 
     metadata = JSONField(
         verbose_name=_('Metadados'),
@@ -921,6 +921,12 @@ class Visitante(CmjAuditoriaModelMixin):
 
 
 class Visita(CmjAuditoriaModelMixin):
+
+    FIELDFILE_NAME = ('fotografia',)
+
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
 
     visitante = models.ForeignKey(
         Visitante,
