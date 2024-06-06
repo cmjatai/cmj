@@ -4,7 +4,8 @@ from sapl.compilacao import views
 from sapl.compilacao.views import (TipoDispositivoCrud, TipoNotaCrud,
                                    TipoPublicacaoCrud, TipoVideCrud,
                                    VeiculoPublicacaoCrud,
-                                   TipoTextoArticuladoCrud)
+                                   TipoTextoArticuladoCrud,
+                                   UrlizeReferenciaCrud)
 
 from .apps import AppConfig
 
@@ -116,5 +117,10 @@ urlpatterns = [
         include(VeiculoPublicacaoCrud.get_urls())),
     url(r'^sistema/ta/config/tipo',
         include(TipoTextoArticuladoCrud.get_urls())),
+    url(r'^sistema/ta/config/urlize',
+        include(UrlizeReferenciaCrud.get_urls())),
+
+
+
 
 ]

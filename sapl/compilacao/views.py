@@ -50,13 +50,12 @@ from sapl.compilacao.models import (STATUS_TA_EDITION, STATUS_TA_PRIVATE,
                                     Publicacao, TextoArticulado,
                                     TipoDispositivo, TipoNota, TipoPublicacao,
                                     TipoTextoArticulado, TipoVide,
-                                    VeiculoPublicacao, Vide)
+                                    VeiculoPublicacao, Vide, UrlizeReferencia)
 from sapl.compilacao.utils import (DISPOSITIVO_SELECT_RELATED,
                                    DISPOSITIVO_SELECT_RELATED_EDIT,
                                    get_integrations_view_names)
 from sapl.crud.base import RP_DETAIL, RP_LIST, Crud, CrudAux, CrudListView,\
     make_pagination
-from sapl.settings import BASE_DIR
 
 
 TipoNotaCrud = CrudAux.build(TipoNota, 'tipo_nota')
@@ -98,6 +97,37 @@ def choice_model_type_foreignkey_in_extenal_views(id_tipo_ta=None):
                     item.model._meta.app_label):
                 for i in item.model_type_foreignkey.objects.all():
                     yield i.pk, i
+
+
+class UrlizeReferenciaCrud(CrudAux):
+    model = UrlizeReferencia
+    ordered_list = False
+
+    class ListView(CrudAux.ListView):
+        paginate_by = 100
+        ordering = 'url', 'chave'
+
+        def hook_header_chave(self, *args, **kwargs):
+            count_without_url = self.object_list.filter(url='').count()
+            return f'Chave ({count_without_url} sem links)'
+
+    class DetailView(CrudAux.DetailView):
+        layout_key = 'UrlizeReferenciaDetail'
+
+        def hook_normas(self, obj, **kwargs):
+            ds = Dispositivo.objects.filter(
+                texto__icontains=obj.chave).order_by('ta', 'ordem')
+
+            items = ['<ul>']
+            for d in ds:
+                url = f'/ta/{d.ta_id}/text#{d.id}'
+                items.append(
+                    f'<li><a href="{url}">{d.ta} - {d.rotulo_padrao}</a></li>')
+
+            items.append('</ul>')
+            items = ''.join(items)
+
+            return 'Normas/Dispositivos', items
 
 
 class IntegracaoTaView(TemplateView):

@@ -13,5 +13,7 @@
     {% if perms.compilacao.list_tiponota %}<li class="dropdown-item"><a href="{% url 'sapl.compilacao:tiponota_list' %}">{%model_verbose_name_plural 'sapl.compilacao.models.TipoNota'%}</a></li>{% endif %}
     {% if perms.compilacao.list_tipovide %}<li class="dropdown-item"><a href="{% url 'sapl.compilacao:tipovide_list' %}">{%model_verbose_name_plural 'sapl.compilacao.models.TipoVide'%}</a></li>{% endif %}
 
+    {% if perms.norma.add_normajuridica %}<li class="dropdown-item"><a href="{% url 'sapl.compilacao:urlizereferencia_list' %}">{%model_verbose_name_plural 'sapl.compilacao.models.UrlizeReferencia'%}</a></li>{% endif %}
+
   </ul>
 {% endif %}

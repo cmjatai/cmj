@@ -970,14 +970,14 @@ class UrlizeReferencia(models.Model):
                 r'(ORDINÁRIA|COMPLEMENTAR)?( ?)'
                 r'(MUNICIPAL|ESTADUAL|FEDERAL)?( ?)'
                 r'(ORDINÁRIA|COMPLEMENTAR)?( ?)'
-                r'(N&DEG;|N&ordm;|N[o\u00B0\u00BA\u00AA.])?(\.? ?)'
+                r'(N&DEG;|N&ordm;|N[o\u00B0\u00BA\u00AA])?(\.? ?)'
                 r'(\d*)(\.?)(\d+)')
 
     patterns = [
         #r'(LEI|RESOLUÇÃO|DECRETO) (MUNICIPAL)? \d{2,4}'
-        f'{__base__}(,?)( ?de ?)( ?\d+ ?)( ?de ?)([abçdefghijlmnorstuvz&c;]+)( ?de ?)(\d+)',
-        f'{__base__}( ?/ ?)(\d+)',
-        f'{__base__}(,?)( ?de ?)(\d+)(/)(\d+)(/)(\d+)',
+        f'{__base__}(,?)( ?de ?)( ?\d+ ?)(&DEG;|&ordm;|[o\u00B0\u00BA\u00AA])?( ?de ?)([abçdefghijlmnorstuvz&c;]+)( ?de ?)(\d*)(\.?)(\d+)',
+        f'{__base__}( ?/ ?)(\d*)(\.?)(\d+)',
+        f'{__base__}(,?)( ?de ?)(\d+)(/)(\d+)(/)(\d*)(\.?)(\d+)',
     ]
 
     for n, p in enumerate(patterns):
@@ -1005,6 +1005,9 @@ class UrlizeReferencia(models.Model):
             if ms:
                 ms_result.extend(ms)
 
+        # if texto.startswith('Fica dispensada'):
+        #    print(texto)
+
         if not ms_result:
             return texto
 
@@ -1026,7 +1029,7 @@ class UrlizeReferencia(models.Model):
 
             try:
                 if not chave_list[4] or chave_list[4].lower() == 'municipal':
-                    ano = chave_list[-1]
+                    ano = f'{chave_list[-3]}{chave_list[-1]}'
                     try:
                         ano = int(ano)
                         if ano < 100:
