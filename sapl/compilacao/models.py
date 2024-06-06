@@ -966,11 +966,11 @@ class UrlizeReferencia(models.Model):
         default='',
         verbose_name=_('Url'))
 
-    __base__ = (r'(LEI|DECRETO|RESOLUÇÃO)( )'
+    __base__ = (r'(LEI|DECRETO|RESOLUÇÃO|LO)( )'
                 r'(ORDINÁRIA|COMPLEMENTAR)?( ?)'
                 r'(MUNICIPAL|ESTADUAL|FEDERAL)?( ?)'
                 r'(ORDINÁRIA|COMPLEMENTAR)?( ?)'
-                r'(N&DEG;|N&ordm;|N[o\u00B0\u00BA\u00AA])?(\.? ?)'
+                r'(N&DEG;|N&ordm;|N[o\u00B0\u00BA\u00AA.])?(\.? ?)'
                 r'(\d*)(\.?)(\d+)')
 
     patterns = [
@@ -978,8 +978,8 @@ class UrlizeReferencia(models.Model):
         f'{__base__}(,?)( ?de ?)( ?\d+ ?)( ?de ?)([abçdefghijlmnorstuvz&c;]+)( ?de ?)(\d+)',
         f'{__base__}( ?/ ?)(\d+)',
         f'{__base__}(,?)( ?de ?)(\d+)(/)(\d+)(/)(\d+)',
-
     ]
+
     for n, p in enumerate(patterns):
         patterns[n] = re.compile(p, re.I)
 
@@ -1026,9 +1026,20 @@ class UrlizeReferencia(models.Model):
 
             try:
                 if not chave_list[4] or chave_list[4].lower() == 'municipal':
+                    ano = chave_list[-1]
+                    try:
+                        ano = int(ano)
+                        if ano < 100:
+                            if ano <= timezone.localdate().year - 2000:
+                                ano += 2000
+                            else:
+                                ano += 1900
+
+                    except:
+                        pass
                     ta = TextoArticulado.objects.filter(
                         numero=f'{chave_list[10]}{chave_list[12]}',
-                        ano=chave_list[-1]
+                        ano=ano
                     ).first()
                     if not ta:
                         continue

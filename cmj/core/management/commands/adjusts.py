@@ -83,44 +83,27 @@ class Command(BaseCommand):
         m.desativa_auto_now()
         m.desativa_signals()
 
-        # get em todos textos articulados para gerar cache
-
-        for norma in NormaJuridica.objects.all().order_by(
-            '-norma_de_destaque',
-            '-id'
-        ):
-            ta = norma.texto_articulado.all().first()
-            if not ta:
-                continue
-
-            url = f'https://www.jatai.go.leg.br/ta/{ta.id}/text'
-
-            try:
-                res = requests.get(url)
-                print(url, res.status_code)
-            except Exception as e:
-                print(f"Erro: {e}")
-                print(res.content)
-
-        return
+        # self.get_all_tas()
 
         q = Q(texto__icontains='lei')
         q |= Q(texto__icontains='lom')
         q |= Q(texto__icontains='decreto')
         q |= Q(texto__icontains='resolução')
 
-        __base__ = (r'(LEI|DECRETO|RESOLUÇÃO) '
-                    r'(ORDINÁRIA|COMPLEMENTAR)? ?'
-                    r'(MUNICIPAL|ESTADUAL|FEDERAL)? ?'
-                    r'(ORDINÁRIA|COMPLEMENTAR)? ?'
-                    r'(N&DEG;|N&ordm;|N[o\u00B0\u00BA\u00AA])? ?'
+        __base__ = (r'(LEI|DECRETO|RESOLUÇÃO|LO)( )'
+                    r'(ORDINÁRIA|COMPLEMENTAR)?( ?)'
+                    r'(MUNICIPAL|ESTADUAL|FEDERAL)?( ?)'
+                    r'(ORDINÁRIA|COMPLEMENTAR)?( ?)'
+                    r'(N&DEG;|N&ordm;|N[o\u00B0\u00BA\u00AA.])?(\.? ?)'
                     r'(\d*)(\.?)(\d+)')
 
         patterns = [
             #r'(LEI|RESOLUÇÃO|DECRETO) (MUNICIPAL)? \d{2,4}'
-            f'{__base__},? de (\d+) de ([abçdefghijlmnorstuvz&c;]+) de (\d+)',
-            f'{__base__}/(\d+)',
+            f'{__base__}(,?)( ?de ?)( ?\d+ ?)( ?de ?)([abçdefghijlmnorstuvz&c;]+)( ?de ?)(\d+)',
+            f'{__base__}( ?/ ?)(\d+)',
+            f'{__base__}(,?)( ?de ?)(\d+)(/)(\d+)(/)(\d+)',
         ]
+
         for n, p in enumerate(patterns):
             patterns[n] = re.compile(p, re.I)
 
@@ -730,3 +713,26 @@ class Command(BaseCommand):
                 ' '.join(cmd), shell=True, stdout=subprocess.PIPE)
             p.wait()
             #subprocess.call(' '.join(cmd))
+
+    def get_all_tas(self):
+
+        # get em todos textos articulados para gerar cache
+
+        for norma in NormaJuridica.objects.all().order_by(
+            '-norma_de_destaque',
+            '-id'
+        ):
+            ta = norma.texto_articulado.all().first()
+            if not ta:
+                continue
+
+            url = f'https://www.jatai.go.leg.br/ta/{ta.id}/text'
+
+            try:
+                res = requests.get(url)
+                print(url, res.status_code)
+            except Exception as e:
+                print(f"Erro: {e}")
+                print(res.content)
+
+        return
