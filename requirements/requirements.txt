@@ -13,7 +13,8 @@ python-telegram-bot==20.1
 
 XlsxWriter==3.2.0
 
-ocrmypdf==14.4.0
+ocrmypdf==14.4.0 # versões acima precisam do ghostscript acima de 9.53.3
+pikepdf=8.15.1
 
 dj-database-url==0.5.0
 easy-thumbnails==2.8.5
