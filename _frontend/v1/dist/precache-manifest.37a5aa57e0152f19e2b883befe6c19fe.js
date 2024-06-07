@@ -28,7 +28,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/brasao/escola_1024.png"
   },
   {
-    "revision": "3715669ad9d6c522f29c",
+    "revision": "a22008721074c8ed1b7e",
     "url": "/static/css/app.b7395f40.css"
   },
   {
@@ -56,16 +56,16 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/css/chunk-dfd0331c.91f17d17.css"
   },
   {
-    "revision": "3792693ea23ad3ebfc98",
-    "url": "/static/css/chunk-e3b66cee.c11a91b4.css"
+    "revision": "589776bc08b14d3326c5",
+    "url": "/static/css/chunk-e3b66cee.1b9543cc.css"
   },
   {
     "revision": "3ab32d59b508dd6695a5",
     "url": "/static/css/chunk-vendors.b19a7823.css"
   },
   {
-    "revision": "9f6864ee7184cefed403",
-    "url": "/static/css/compilacao.97eefa6c.css"
+    "revision": "209bce533bd985766e9b",
+    "url": "/static/css/compilacao.78011719.css"
   },
   {
     "revision": "8230a0a3c0544cb3bb87",
@@ -348,12 +348,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/user.png"
   },
   {
-    "revision": "27d7efd621086a9a27f7ef3a174c6224",
+    "revision": "509522239af796d8a8c649b3111eb65b",
     "url": "/static/index.html"
   },
   {
-    "revision": "3715669ad9d6c522f29c",
-    "url": "/static/js/app.b2cb144a.js"
+    "revision": "a22008721074c8ed1b7e",
+    "url": "/static/js/app.f3607dd0.js"
   },
   {
     "revision": "9ed5a2a52ccce1d7b4c2",
@@ -392,7 +392,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/js/chunk-dfd0331c.d5f27e2e.js"
   },
   {
-    "revision": "3792693ea23ad3ebfc98",
+    "revision": "589776bc08b14d3326c5",
     "url": "/static/js/chunk-e3b66cee.1475ae01.js"
   },
   {
@@ -400,7 +400,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/js/chunk-vendors.5005b05d.js"
   },
   {
-    "revision": "9f6864ee7184cefed403",
+    "revision": "209bce533bd985766e9b",
     "url": "/static/js/compilacao.1a296406.js"
   },
   {

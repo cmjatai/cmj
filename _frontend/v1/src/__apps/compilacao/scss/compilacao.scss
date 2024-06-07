@@ -699,7 +699,14 @@ a:link:after, a:visited:after {
       text-decoration: none !important;
     }
   }
+  .urlize {
+    &:hover {
+      color: #27AE60;
+      text-decoration: underline !important;
 
+
+    }
+  }
 } /* end cp */
 
 .cp-print {

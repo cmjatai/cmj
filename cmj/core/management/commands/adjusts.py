@@ -83,8 +83,8 @@ class Command(BaseCommand):
         m.desativa_auto_now()
         m.desativa_signals()
 
-        # self.get_all_tas()
-        # return
+        self.get_all_tas()
+        return
 
         q = Q(texto__icontains='lei')
         q |= Q(texto__icontains='lom')

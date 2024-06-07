@@ -110,8 +110,9 @@ class UrlizeReferenciaCrud(CrudAux):
         def form_valid(self, form):
             r = super().form_valid(form)
 
-            ds = Dispositivo.objects.filter(
-                texto__icontains=self.object.chave).order_by('ta').distinct('ta')
+            ds = Dispositivo.objects.filter(texto__icontains=self.object.chave)
+            ds = ds.order_by('ta_id')
+            ds = ds.distinct('ta_id')
 
             for d in ds:
                 d.ta.clear_cache()

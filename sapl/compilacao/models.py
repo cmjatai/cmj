@@ -1028,7 +1028,7 @@ class UrlizeReferencia(models.Model):
 
             texto = texto.replace(
                 chave_natural,
-                f'<a href="{url}">{chave_natural}</a>'
+                f'<a class="urlize" href="{url}">{chave_natural}</a>'
             )
             return texto
 
