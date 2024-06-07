@@ -84,6 +84,7 @@ class Command(BaseCommand):
         m.desativa_signals()
 
         # self.get_all_tas()
+        # return
 
         q = Q(texto__icontains='lei')
         q |= Q(texto__icontains='lom')
@@ -146,7 +147,10 @@ class Command(BaseCommand):
             if not mg[2] or mg[2].lower() == 'municipal':
                 ta = TextoArticulado.objects.filter(
                     numero=f'{mg[5]}{mg[7]}',
-                    ano=mg[-1]
+                    ano=mg[-1],
+                    privacidade=0
+                ).exclude(
+                    original__isnull=False
                 ).first()
 
             print(d.ta_id, mg, ta)
@@ -730,7 +734,7 @@ class Command(BaseCommand):
 
             try:
                 res = requests.get(url)
-                print(url, res.status_code)
+                print(url, norma, res.status_code)
             except Exception as e:
                 print(f"Erro: {e}")
                 print(res.content)

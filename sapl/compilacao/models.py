@@ -14,8 +14,10 @@ from django.urls.base import reverse
 from django.utils import timezone
 from django.utils.decorators import classonlymethod
 from django.utils.encoding import force_text
+from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 
+from cmj.utils import media_cache_storage
 from sapl.compilacao.utils import (get_integrations_view_names, int_to_letter,
                                    int_to_roman)
 from sapl.utils import YES_NO_CHOICES, get_settings_auth_user_model
@@ -604,6 +606,37 @@ class TextoArticulado(TimestampedMixin):
         for dpk in raizes:
             update(dpk)
 
+    def get_path_cache(self, sign=''):
+
+        sign_vigencia = sign
+        sign_vigencia = slugify(sign_vigencia)
+
+        opt = self._meta
+        path_cache = '{}/{}/{}/{}/{}'.format(
+            opt.app_label,
+            opt.model_name,
+            self.ano,
+            self.id,
+            f'cache{sign_vigencia}.html'
+        )
+        return path_cache
+
+    def is_cached(self, sign=''):
+        return media_cache_storage.exists(self.get_path_cache(sign))
+
+    def clear_cache(self, sign=''):
+        # todo: Transferir métodos para model TA
+
+        path_cache = '/'.join(self.get_path_cache(sign=sign).split('/')[:-1])
+        try:
+            directories, files = media_cache_storage.listdir(path_cache)
+        except FileNotFoundError:
+            return
+
+        for f in files:
+            media_cache_storage.delete(f'{path_cache}/{f}')
+        media_cache_storage.delete(path_cache)
+
 
 class TipoNota(models.Model):
     sigla = models.CharField(
@@ -1005,9 +1038,6 @@ class UrlizeReferencia(models.Model):
             if ms:
                 ms_result.extend(ms)
 
-        # if texto.startswith('Fica dispensada'):
-        #    print(texto)
-
         if not ms_result:
             return texto
 
@@ -1042,8 +1072,12 @@ class UrlizeReferencia(models.Model):
                         pass
                     ta = TextoArticulado.objects.filter(
                         numero=f'{chave_list[10]}{chave_list[12]}',
-                        ano=ano
+                        ano=ano,
+                        privacidade=0
+                    ).exclude(
+                        original__isnull=False
                     ).first()
+
                     if not ta:
                         continue
                     url = reverse('sapl.compilacao:ta_text',

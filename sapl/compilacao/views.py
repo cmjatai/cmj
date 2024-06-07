@@ -32,7 +32,7 @@ from django.views.generic.edit import (CreateView, DeleteView, FormView,
                                        UpdateView)
 from django.views.generic.list import ListView
 
-from cmj.utils import TimeExecution, media_cache_storage
+from cmj.utils import media_cache_storage
 from sapl.compilacao.apps import AppConfig
 from sapl.compilacao.forms import (DispositivoDefinidorVigenciaForm,
                                    DispositivoEdicaoAlteracaoForm,
@@ -102,6 +102,21 @@ def choice_model_type_foreignkey_in_extenal_views(id_tipo_ta=None):
 class UrlizeReferenciaCrud(CrudAux):
     model = UrlizeReferencia
     ordered_list = False
+
+    class BaseMixin(CrudAux.BaseMixin):
+        def post(self, request, *args, **kwargs):
+            return super().post(request, *args, **kwargs)
+
+        def form_valid(self, form):
+            r = super().form_valid(form)
+
+            ds = Dispositivo.objects.filter(
+                texto__icontains=self.object.chave).order_by('ta').distinct('ta')
+
+            for d in ds:
+                d.ta.clear_cache()
+
+            return r
 
     class ListView(CrudAux.ListView):
         paginate_by = 100
@@ -284,38 +299,6 @@ class CompMixin(PermissionRequiredMixin):
         if isinstance(self, ListView):
             context['NO_ENTRIES_MSG'] = CrudListView.no_entries_msg
         return context
-
-    def is_cached(self):
-        return media_cache_storage.exists(self.get_path_cache())
-
-    def get_path_cache(self, id=None, ano=None):
-
-        sign_vigencia = self.kwargs.get('sign', '')
-        sign_vigencia = slugify(sign_vigencia)
-
-        opt = self.object._meta
-        path_cache = '{}/{}/{}/{}/{}'.format(
-            opt.app_label,
-            opt.model_name,
-            ano or self.object.ano,
-            id or self.object.id,
-            f'cache{sign_vigencia}.html'
-        )
-        return path_cache
-
-    def clear_cache(self, id=None, ano=None):
-        # todo: Transferir métodos para model TA
-
-        path_cache = '/'.join(self.get_path_cache(id=id,
-                                                  ano=ano).split('/')[:-1])
-        try:
-            directories, files = media_cache_storage.listdir(path_cache)
-        except FileNotFoundError:
-            return
-
-        for f in files:
-            media_cache_storage.delete(f'{path_cache}/{f}')
-        media_cache_storage.delete(path_cache)
 
     def get_notificacoes(self, object_list=None, type_notificacoes=None):
 
@@ -969,6 +952,10 @@ class TextView(CompMixin, ListView):
         perm = self.object.has_view_permission(self.request, message=False)
 
         if perm is None:
+            co = self.object.content_object
+            if not co:
+                raise Http404()
+
             messages.error(self.request, _(
                 '''<strong>O Texto Articulado desta {} está em edição
                         ou ainda não foi cadastrado.</strong><br>{}
@@ -980,7 +967,6 @@ class TextView(CompMixin, ListView):
                         ''' if self.object.content_object.texto_integral else ''
                 )))
 
-            co = self.object.content_object
             return redirect(
                 reverse(
                     '{}:{}_detail'.format(
@@ -999,7 +985,9 @@ class TextView(CompMixin, ListView):
         if 'embedded' in request.GET:
             self.template_name = 'compilacao/text_list__embedded.html'
 
-        if self.is_reader() and self.is_cached():
+        sign = self.kwargs.get('sign', '')
+
+        if self.is_reader() and self.object.is_cached(sign=sign):
             context = ContextMixin.get_context_data(self, **kwargs)
             context['object'] = self.object
 
@@ -1024,7 +1012,9 @@ class TextView(CompMixin, ListView):
 
         # with TimeExecution(print_date=True):
 
-        if self.is_reader() and not self.is_cached():
+        sign = self.kwargs.get('sign', '')
+
+        if self.is_reader() and not self.object.is_cached(sign=sign):
             template_user = self.template_name
             self.template_name = 'compilacao/text_list__embedded.html'
 
@@ -1035,13 +1025,14 @@ class TextView(CompMixin, ListView):
             embedded_cache = html.content
 
             output = io.BytesIO(embedded_cache)
-            media_cache_storage.save(self.get_path_cache(), content=output)
+            media_cache_storage.save(
+                self.object.get_path_cache(sign=sign), content=output)
 
             self.template_name = template_user
 
-        if self.is_reader() and self.is_cached():
+        if self.is_reader() and self.object.is_cached(sign=sign):
             embedded_cache = media_cache_storage.open(
-                self.get_path_cache()).read()
+                self.object.get_path_cache(sign=sign)).read()
 
             context['embedded_cache'] = embedded_cache.decode()
 
