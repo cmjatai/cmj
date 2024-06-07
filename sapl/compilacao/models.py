@@ -1022,7 +1022,7 @@ class UrlizeReferencia(models.Model):
         ordering = ['chave']
 
     @classmethod
-    def urlize(cls, texto):
+    def urlize(cls, texto, return_result_patterns=False):
 
         def join(texto, chave_natural, url):
 
@@ -1037,6 +1037,9 @@ class UrlizeReferencia(models.Model):
             ms = p.findall(texto)
             if ms:
                 ms_result.extend(ms)
+
+        if return_result_patterns:
+            return ms_result
 
         if not ms_result:
             return texto

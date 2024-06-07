@@ -1347,8 +1347,8 @@ class TextEditView(CompMixin, TemplateView):
                     messages.success(request, _(
                         'Texto Articulado publicado com sucesso.'))
 
-                    for ta in self.object.dispositivos_alterados_pelo_ta_set.order_by('ta_id').distinct('ta_id'):
-                        ta.clear_cache()
+                    for d in self.object.dispositivos_alterados_pelo_ta_set.order_by('ta_id').distinct('ta_id'):
+                        d.ta.clear_cache()
 
                 else:
                     self.object.temp_check_migrations = True

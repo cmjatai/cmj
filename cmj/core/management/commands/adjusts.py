@@ -1,4 +1,5 @@
 
+from collections import OrderedDict
 import glob
 import io
 import logging
@@ -28,7 +29,8 @@ from cmj.arq.models import ArqDoc
 from cmj.utils import Manutencao
 from cmj.videos.tasks import task_pull_youtube_upcoming
 import numpy as np
-from sapl.compilacao.models import TextoArticulado, Dispositivo
+from sapl.compilacao.models import TextoArticulado, Dispositivo,\
+    UrlizeReferencia
 from sapl.materia.models import MateriaLegislativa
 from sapl.norma.models import NormaJuridica
 from sapl.rules.apps import reset_id_model
@@ -83,86 +85,35 @@ class Command(BaseCommand):
         m.desativa_auto_now()
         m.desativa_signals()
 
-        self.get_all_tas()
-        return
+        # self.get_all_tas()
 
-        q = Q(texto__icontains='lei')
-        q |= Q(texto__icontains='lom')
-        q |= Q(texto__icontains='decreto')
-        q |= Q(texto__icontains='resolução')
+        num_chaves = {}
+        for u in UrlizeReferencia.objects.filter(url=''):
+            p = UrlizeReferencia.urlize(u.chave, return_result_patterns=True)
 
-        __base__ = (r'(LEI|DECRETO|RESOLUÇÃO|LO)( )'
-                    r'(ORDINÁRIA|COMPLEMENTAR)?( ?)'
-                    r'(MUNICIPAL|ESTADUAL|FEDERAL)?( ?)'
-                    r'(ORDINÁRIA|COMPLEMENTAR)?( ?)'
-                    r'(N&DEG;|N&ordm;|N[o\u00B0\u00BA\u00AA.])?(\.? ?)'
-                    r'(\d*)(\.?)(\d+)')
+            key = f'{p[0][10]}{p[0][12]}'
 
-        patterns = [
-            #r'(LEI|RESOLUÇÃO|DECRETO) (MUNICIPAL)? \d{2,4}'
-            f'{__base__}(,?)( ?de ?)( ?\d+ ?)( ?de ?)([abçdefghijlmnorstuvz&c;]+)( ?de ?)(\d+)',
-            f'{__base__}( ?/ ?)(\d+)',
-            f'{__base__}(,?)( ?de ?)(\d+)(/)(\d+)(/)(\d+)',
-        ]
+            if key not in num_chaves:
+                num_chaves[key] = []
 
-        for n, p in enumerate(patterns):
-            patterns[n] = re.compile(p, re.I)
+            num_chaves[key].append(u)
 
-        ds = Dispositivo.objects.filter(q)
-        print(ds.count())
+        num_chaves = list(num_chaves.items())
 
-        classificacao = {
-            'match': [],
-            'nomatch': []
-        }
+        num_chaves.sort(reverse=True, key=lambda i: len(i[1]))
 
-        for d in ds:
-            t = d.texto
-            m = None
-            for p in patterns:
-                m = p.search(t)
-                if m:
-                    break
+        for item in num_chaves:
+            for u in item[1]:
+                print(u.chave, u.url)
+                #u.url = 'https://www.planalto.gov.br/ccivil_03/leis/l8078compilado.htm'
+                # u.save()
+            print('--------------------')
+            print('--------------------')
 
-            if not m:
-                classificacao['nomatch'].append(d)
-                continue
-
-            classificacao['match'].append((m, d))
-
-            # print(d.ta_id, d.id, m.group())
-            # print('------------------------')
-
-        # for n, d in enumerate(classificacao['nomatch']):
-        #    print(d.texto)
-        #    if n % 100 == 0:
-        #        print('------------------------')
-
-        matchs = set()
-        for m, d in classificacao['match']:
-            matchs.add(m.group().lower())
-
-            mg = m.groups()
-            ta = None
-            if not mg[2] or mg[2].lower() == 'municipal':
-                ta = TextoArticulado.objects.filter(
-                    numero=f'{mg[5]}{mg[7]}',
-                    ano=mg[-1],
-                    privacidade=0
-                ).exclude(
-                    original__isnull=False
-                ).first()
-
-            print(d.ta_id, mg, ta)
-
-        print('Match    :', len(classificacao['match']))
-        print('No match :', len(classificacao['nomatch']))
-
-        print('Len SET:', len(matchs))
-
-        for m in matchs:
-            print(m)
-
+            # for u in item[1]:
+            ##    print(u.chave, u.url)
+            #    u.url = 'https://legisla.casacivil.go.gov.br/pesquisa_legislacao/87672/lei-8268'
+            #    u.save()
         return
 
         # list todos os orderings dos models
