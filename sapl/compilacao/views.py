@@ -1309,7 +1309,7 @@ class TextEditView(CompMixin, TemplateView):
                     'sapl.compilacao:ta_text', kwargs={
                         'ta_id': self.object.id}))
             else:
-                self.clear_cache()
+                self.object.clear_cache()
                 # TODO - implementar logging de ação de usuário
                 self.object.editing_locked = False
                 self.object.privacidade = STATUS_TA_EDITION
@@ -1347,10 +1347,8 @@ class TextEditView(CompMixin, TemplateView):
                     messages.success(request, _(
                         'Texto Articulado publicado com sucesso.'))
 
-                    for ta in self.object.dispositivos_alterados_pelo_ta_set.values(
-                        'ta_id', 'ta__ano'
-                    ).order_by('ta_id').distinct('ta_id'):
-                        self.clear_cache(ta['ta_id'], ta['ta__ano'])
+                    for ta in self.object.dispositivos_alterados_pelo_ta_set.order_by('ta_id').distinct('ta_id'):
+                        ta.clear_cache()
 
                 else:
                     self.object.temp_check_migrations = True
