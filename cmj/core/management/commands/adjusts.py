@@ -13,6 +13,7 @@ from time import sleep
 
 from PIL import Image, ImageEnhance, ImageDraw
 from PIL.Image import Resampling
+from bs4 import BeautifulSoup as bs
 import cv2
 from django.apps import apps
 from django.core.files.base import File
@@ -87,6 +88,139 @@ class Command(BaseCommand):
 
         # self.get_all_tas()
 
+        return
+        ds = Dispositivo.objects.filter(
+            ta_publicado_id=9665).order_by('ordem')
+
+        for d in ds:
+            d.visibilidade = False
+            d.save()
+            print(d)
+
+        return
+        # abre autografo 1193, captura tabelas do anexo iii e adiciona em seus
+        # dispositivos
+        html_file = open('/home/leandro/Downloads/702/aut.html', 'r').read()
+
+        soup = bs(html_file, "html.parser")
+
+        tables = list(soup.find_all("table"))[-5:]
+
+        # for t in tables:
+        #    print(t)
+
+        ds = Dispositivo.objects.filter(
+            ta_id=9665,
+            dispositivo_raiz_id=198029, id__gt=198030).order_by('ordem')
+
+        ti = 0
+        for d in ds:
+            if d.texto and 'table' not in d.texto:
+                continue
+
+            t = tables[ti]
+            ti += 1
+
+            str_t = str(t)
+            t = str_t.replace('<tr></tr>\n', '')
+
+            st = f'CDS-{ti}<br>{t}<br>'
+
+            d.texto = st
+            d.save()
+
+        return
+
+        # abre autografo 1193, captura textos do anexo ii e adiciona em seus
+        # dispositivos
+        html_file = open(
+            '/home/leandro/Downloads/702/aut_anexo2.html', 'r').read()
+
+        soup = bs(html_file, "html.parser")
+
+        tagsp = list(soup.find_all("p"))
+
+        # for t in tables:
+        #    print(t)
+
+        ds = Dispositivo.objects.filter(
+            ta_id=9665,
+            dispositivo_raiz_id=197312, id__gt=197313).order_by('ordem')
+
+        # for d in ds.filter(texto=''):
+        #    print(d)
+        # return
+
+        for p in tagsp:
+            tagb = p.contents[0]
+
+            if not hasattr(tagb, 'contents') or not tagb.contents or not len(tagb.contents):
+                continue
+
+            sb = str(tagb.contents[0]).split(' ')
+
+            if not len(sb):
+                continue
+
+            d = ds.filter(rotulo=sb[0]).first()
+            if not d:
+                continue
+
+            str_p = str(p)
+
+            str_p = str_p.replace(sb[0], '', 1)
+            str_p = str_p.replace('<p>', '')
+            str_p = str_p.replace('</p>', '')
+            str_p = str_p.replace('<b> ', '<b>')
+            str_p = str_p.replace('</b>\n', '</b><br>\n')
+
+            d.texto = str_p
+            d.save()
+            # print(str_p)
+
+        return
+        # abre autografo 1193, captura tabelas do anexo i e adiciona em seus
+        # dispositivos
+        html_file = open('/home/leandro/Downloads/702/aut.html', 'r').read()
+
+        soup = bs(html_file, "html.parser")
+
+        tables = list(soup.find_all("table"))
+
+        # for t in tables:
+        #    print(t)
+
+        ds = Dispositivo.objects.filter(
+            ta_id=9665,
+            dispositivo_raiz_id=197223, id__gt=197229).order_by('ordem')
+
+        ti = 0
+        for d in ds:
+            if d.texto and 'table' not in d.texto:
+                continue
+
+            t = tables[ti]
+            ti += 1
+
+            tag_b_prev = t.find_all_previous('b', {}, '', 1)
+
+            texto = ''
+            if len(tag_b_prev) == 1:
+                texto = str(tag_b_prev[0].contents[0])
+                texto = texto.replace('\n', ' ')
+                texto = texto.replace('&nbsp;', ' ')
+                texto = texto.replace(' – ', ' ')
+                texto = texto.strip()
+                texto = texto.split(' ')
+                texto = ' '.join(texto[1:])
+                print(texto)
+
+            st = f'{texto}\n{t}<br>'
+
+            d.texto = st
+            d.save()
+
+        return
         num_chaves = {}
         for u in UrlizeReferencia.objects.filter(url=''):
             p = UrlizeReferencia.urlize(u.chave, return_result_patterns=True)

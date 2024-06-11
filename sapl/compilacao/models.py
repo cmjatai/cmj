@@ -999,12 +999,19 @@ class UrlizeReferencia(models.Model):
         default='',
         verbose_name=_('Url'))
 
-    __base__ = (r'(LEI|DECRETO|RESOLUÇÃO|LO)( )'
+    # chave_automatica = models.BooleanField(
+    #    default=True,
+    #    choices=YES_NO_CHOICES,
+    #    verbose_name=_('Gerada Automaticamente?'))
+
+    __base__ = (r'(LEI|DECRETO|RESOLUÇÃO|LO|LC)( )'
                 r'(ORDINÁRIA|COMPLEMENTAR)?( ?)'
                 r'(MUNICIPAL|ESTADUAL|FEDERAL)?( ?)'
                 r'(ORDINÁRIA|COMPLEMENTAR)?( ?)'
                 r'(N&DEG;|N&ordm;|N[o\u00B0\u00BA\u00AA])?(\.? ?)'
                 r'(\d*)(\.?)(\d+)')
+
+    __base2__ = (r'')
 
     patterns = [
         #r'(LEI|RESOLUÇÃO|DECRETO) (MUNICIPAL)? \d{2,4}'

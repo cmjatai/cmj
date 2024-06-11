@@ -1,6 +1,6 @@
 -r test-requirements.txt
-autopep8==1.2.4
-beautifulsoup4==4.4.1
+autopep8==2.2.0
+beautifulsoup4==4.12.3
 django-debug-toolbar==2.2.1
 pygraphviz==1.10
 pipdeptree
