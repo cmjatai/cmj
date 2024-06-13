@@ -49,9 +49,10 @@ TipoTextoArticulado:
 
 UrlizeReferencia:
   {% trans 'Urlize Referência' %}:
-  - chave url
+  - chave url chave_automatica:3
 
 UrlizeReferenciaDetail:
   {% trans 'Urlize Referência' %}:
-  - chave url
+  - chave chave_automatica:3
+  - url
   - normas

@@ -104,6 +104,8 @@ class UrlizeReferenciaCrud(CrudAux):
     ordered_list = False
 
     class BaseMixin(CrudAux.BaseMixin):
+        list_field_names = ('id', ('chave', 'url'), 'chave_automatica')
+
         def post(self, request, *args, **kwargs):
             return super().post(request, *args, **kwargs)
 
@@ -121,7 +123,10 @@ class UrlizeReferenciaCrud(CrudAux):
 
     class ListView(CrudAux.ListView):
         paginate_by = 100
-        ordering = 'url', 'chave'
+        ordering = '-chave_automatica', 'url', 'chave'
+
+        def hook_url(self, *args, **kwargs):
+            return f'<br><small>{args[0].url}</small>', args[0].url
 
         def hook_header_chave(self, *args, **kwargs):
             count_without_url = self.object_list.filter(url='').count()

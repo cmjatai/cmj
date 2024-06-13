@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from pickle import NONE
 import re
 
@@ -999,10 +1000,10 @@ class UrlizeReferencia(models.Model):
         default='',
         verbose_name=_('Url'))
 
-    # chave_automatica = models.BooleanField(
-    #    default=True,
-    #    choices=YES_NO_CHOICES,
-    #    verbose_name=_('Gerada Automaticamente?'))
+    chave_automatica = models.BooleanField(
+        default=True,
+        choices=YES_NO_CHOICES,
+        verbose_name=_('Gerada Automaticamente?'))
 
     __base__ = (r'(LEI|DECRETO|RESOLUÇÃO|LO|LC)( )'
                 r'(ORDINÁRIA|COMPLEMENTAR)?( ?)'
@@ -1028,6 +1029,14 @@ class UrlizeReferencia(models.Model):
         verbose_name_plural = _('Links de Referências')
         ordering = ['chave']
 
+    def __str__(self):
+        return f'{self.chave} - <br><small>{self.url}</small>'
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        self.chave = self.chave.lower().strip()
+        return models.Model.save(self, force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+
     @classmethod
     def urlize(cls, texto, return_result_patterns=False):
 
@@ -1047,9 +1056,6 @@ class UrlizeReferencia(models.Model):
 
         if return_result_patterns:
             return ms_result
-
-        if not ms_result:
-            return texto
 
         for m in ms_result:
             chave_list = m
@@ -1097,6 +1103,41 @@ class UrlizeReferencia(models.Model):
                     texto = join(texto, chave_natural, url)
             except:
                 pass
+
+        urs = list(cls.objects.filter(
+            chave_automatica=False).values('chave', 'url'))
+
+        urs.sort(reverse=True, key=lambda u: len(u['chave']))
+
+        urs_dict = OrderedDict()
+        for u in urs:
+            urs_dict[u['chave']] = u
+
+        chaves_usadas = []
+
+        for c, ur in urs_dict.items():
+
+            tl = texto.lower()
+            tl = tl.split(ur['chave'])
+
+            if len(tl) == 1:
+                continue
+
+            chave = ur['chave']
+
+            for k in chaves_usadas:
+                if chave in k:
+                    chave = ''
+
+            if not chave:
+                continue
+            chaves_usadas.append(chave)
+
+            pi = len(tl[0])
+            pf = pi + len(chave)
+            chave_natural = texto[pi:pf]
+
+            texto = join(texto, chave_natural, ur['url'])
 
         return texto
 

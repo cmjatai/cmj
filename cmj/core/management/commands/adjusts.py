@@ -80,6 +80,21 @@ def increase_brightness(img, value):
 
 class Command(BaseCommand):
 
+    def str_intersection(self, str_left, str_right, ignore_order=False):
+        common_letters = set(str_left) & set(str_right)
+        str_intersected = ''
+        for c in str_left:
+            if (c in common_letters):  # and (c not in str_intersected):
+                str_intersected += c
+        if ignore_order:
+            pass
+        else:
+            if str_intersected in str_left and str_intersected in str_right:
+                return str_intersected
+            else:
+                return None
+        return str_intersected
+
     def handle(self, *args, **options):
         self.logger = logging.getLogger(__name__)
         m = Manutencao()
@@ -88,14 +103,25 @@ class Command(BaseCommand):
 
         # self.get_all_tas()
 
-        return
-        ds = Dispositivo.objects.filter(
-            ta_publicado_id=9665).order_by('ordem')
+        ds = Dispositivo.objects.exclude(
+            ta_id=281).filter(texto__icontains='Lei Org')
 
+        exclude = ('lei orgânica municipal',
+                   )
         for d in ds:
-            d.visibilidade = False
-            d.save()
-            print(d)
+            tl = d.texto.lower()
+
+            s = None
+            for e in exclude:
+                s = self.str_intersection(e, tl)
+                if s == e:
+                    break
+            if s == e:
+                continue
+
+            p = tl.index('lei')
+            st = d.texto[p:p + 50]
+            print(d.ta_id, st)
 
         return
         # abre autografo 1193, captura tabelas do anexo iii e adiciona em seus
