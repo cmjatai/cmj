@@ -1009,7 +1009,7 @@ class UrlizeReferencia(models.Model):
                 r'(ORDINÁRIA|COMPLEMENTAR)?( ?)'
                 r'(MUNICIPAL|ESTADUAL|FEDERAL)?( ?)'
                 r'(ORDINÁRIA|COMPLEMENTAR)?( ?)'
-                r'(N&DEG;|N&ordm;|N[o\u00B0\u00BA\u00AA])?(\.? ?)'
+                r'(N&DEG;|N.|N&ordm;|N[o\u00B0\u00BA\u00AA])?(\.? ?)'
                 r'(\d*)(\.?)(\d+)')
 
     __base2__ = (r'')

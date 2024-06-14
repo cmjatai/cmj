@@ -101,12 +101,18 @@ class Command(BaseCommand):
         m.desativa_auto_now()
         m.desativa_signals()
 
-        # self.get_all_tas()
+        self.get_all_tas()
 
         ds = Dispositivo.objects.exclude(
-            ta_id=281).filter(texto__icontains='Lei Org')
+            ta_id=281).filter(texto__icontains='Lei Org').order_by('ta_id')
 
         exclude = ('lei orgânica municipal',
+                   'lei orgânica do município',
+                   'lei orgânica de jataí',
+                   'lei org&acirc;nica do munic&iacute;pio',
+                   'lei orgânica 1/1900 do município de jataí',
+                   'lei orgânica 1/1990 do município de jataí'
+
                    )
         for d in ds:
             tl = d.texto.lower()
@@ -119,9 +125,9 @@ class Command(BaseCommand):
             if s == e:
                 continue
 
-            p = tl.index('lei')
+            p = tl.index('lei org')
             st = d.texto[p:p + 50]
-            print(d.ta_id, st)
+            print(d.ta_id, d.id, st)
 
         return
         # abre autografo 1193, captura tabelas do anexo iii e adiciona em seus

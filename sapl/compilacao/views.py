@@ -121,6 +121,12 @@ class UrlizeReferenciaCrud(CrudAux):
 
             return r
 
+    class CreateView(CrudAux.CreateView):
+        def get_initial(self):
+            initial = CrudAux.CreateView.get_initial(self)
+            initial.update({'chave_automatica': False})
+            return initial
+
     class ListView(CrudAux.ListView):
         paginate_by = 100
         ordering = '-chave_automatica', 'url', 'chave'
