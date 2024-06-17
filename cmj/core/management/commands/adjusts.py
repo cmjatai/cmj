@@ -102,6 +102,7 @@ class Command(BaseCommand):
         m.desativa_signals()
 
         self.get_all_tas()
+        return
 
         ds = Dispositivo.objects.exclude(
             ta_id=281).filter(texto__icontains='Lei Org').order_by('ta_id')

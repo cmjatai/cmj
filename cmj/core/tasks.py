@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 
 from PyPDF4.pdf import PdfFileReader
@@ -332,7 +332,7 @@ def task_signed_files_extraction_function(app_label, model_name, pk):
                 data2 = pdfdata[br[2]: br[2] + br[3]]
                 #signedData = data1 + data2
 
-                nome = 'Nome do assinante não localizado.'
+                not_nome = nome = 'Nome do assinante não localizado.'
                 oname = ''
                 try:
                     info = cms.ContentInfo.load(bcontents)
@@ -365,7 +365,8 @@ def task_signed_files_extraction_function(app_label, model_name, pk):
                     pass
 
                 fd = None
-                signs.append((nome, [fd, oname]))
+                if nome != not_nome:
+                    signs.append((nome, [fd, oname]))
         except Exception as e:
             pass
 
@@ -378,8 +379,15 @@ def task_signed_files_extraction_function(app_label, model_name, pk):
         except Exception as e:
             return {}
 
-        signs = sorted(signs, key=lambda sign: (
-            sign[0], sign[1][1], sign[1][0]))
+        data_min = datetime(1970, 1, 1, tzinfo=timezone.utc)
+
+        try:
+            signs = sorted(signs, key=lambda sign: (
+                sign[0], sign[1][1], sign[1][0] or data_min))
+        except Exception as e:
+            pass
+
+        signs.reverse()
 
         signs_dict = {}
 
