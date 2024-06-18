@@ -300,13 +300,18 @@ def task_signed_files_extraction_function(app_label, model_name, pk):
             return signs
 
         # tenta extrair via /Fields
+        fields_br = []
         try:
             pdf = PdfFileReader(file)
             fields = pdf.getFields()
+            fields_br = list(
+                map(lambda x: x.get('/V', {}).get('/ByteRange', []), fields.values()))
         except Exception as e:
             try:
                 pdf = PdfFileReader(file, strict=False)
                 fields = pdf.getFields()
+                fields_br = list(
+                    map(lambda x: x.get('/V', {}).get('/ByteRange', []), fields.values()))
             except Exception as ee:
                 fields = ee
 
@@ -326,6 +331,10 @@ def task_signed_files_extraction_function(app_label, model_name, pk):
                 n += 1
 
                 br = [int(i, 10) for i in pdfdata[start + 1: stop].split()]
+
+                if br in fields_br:
+                    continue
+
                 contents = pdfdata[br[0] + br[1] + 1: br[2] - 1]
                 bcontents = bytes.fromhex(contents.decode("utf8"))
                 data1 = pdfdata[br[0]: br[0] + br[1]]
