@@ -55,6 +55,7 @@ from sapl.crispy_layout_mixin import SaplFormLayout, form_actions
 from sapl.crud.base import (RP_DETAIL, RP_LIST, Crud, CrudAux,
                             MasterDetailCrud,
                             PermissionRequiredForAppCrudMixin, make_pagination)
+from sapl.materia.apps import AppConfig
 from sapl.materia.forms import (AnexadaForm, AutoriaForm,
                                 AutoriaMultiCreateForm,
                                 ConfirmarProposicaoForm,
@@ -94,6 +95,7 @@ from .models import (AcompanhamentoMateria, Anexada, AssuntoMateria, Autoria,
                      RegimeTramitacao, Relatoria, StatusTramitacao,
                      TipoDocumento, TipoFimRelatoria, TipoMateriaLegislativa,
                      TipoProposicao, Tramitacao, UnidadeTramitacao)
+
 
 logger = logging.getLogger(__name__)
 
@@ -2496,6 +2498,7 @@ class MateriaLegislativaPesquisaView(AudigLogFilterMixin, MultiFormatOutputMixin
     model = MateriaLegislativa
     filterset_class = MateriaLegislativaFilterSet
     paginate_by = 50
+    app_label = AppConfig.label
 
     fields_base_report = [
         'id', 'ano', 'numero', 'tipo__sigla', 'tipo__descricao', 'autoria__autor__nome', 'texto_original', 'ementa'
@@ -2515,7 +2518,9 @@ class MateriaLegislativaPesquisaView(AudigLogFilterMixin, MultiFormatOutputMixin
 
     def render_to_response(self, context, **response_kwargs):
 
-        if not context['show_results'] and not self.request.user.is_superuser:
+        if not context['show_results'] and \
+                not self.request.user.is_superuser and \
+                self.app_label in __name__:
             return HttpResponsePermanentRedirect(
                 reverse('cmj.search:materia_haystack_search'))
 
