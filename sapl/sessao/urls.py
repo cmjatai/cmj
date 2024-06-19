@@ -37,7 +37,8 @@ from sapl.sessao.views import (AdicionarVariasMateriasExpediente,
                                recuperar_nome_tipo_sessao,
                                voto_nominal_parlamentar,
                                ExpedienteLeituraView,
-                               OrdemDiaLeituraView, retirar_leitura)
+                               OrdemDiaLeituraView, retirar_leitura,
+                               recuperar_tramitacao)
 
 from .apps import AppConfig
 
@@ -69,6 +70,8 @@ urlpatterns = [
 
     url(r'^sessao/recuperar-materia/',
         recuperar_materia, name="recuperar_materia"),
+    url(r'^sessao/recuperar-tramitacao/', recuperar_tramitacao),
+
     url(r'^sessao/recuperar-numero-sessao/',
         recuperar_numero_sessao_view,
         name='recuperar_numero_sessao_view'

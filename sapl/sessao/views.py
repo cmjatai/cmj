@@ -682,11 +682,19 @@ class MateriaOrdemDiaCrud(MasterDetailCrud):
     class UpdateView(MasterDetailCrud.UpdateView):
         form_class = OrdemDiaForm
 
+        def get_context_data(self, **kwargs):
+            context = MasterDetailCrud.UpdateView.get_context_data(
+                self, **kwargs)
+            context["tramitacao_salvo"] = self.object.tramitacao.id if self.object.tramitacao is not None else ''
+            return context
+
         def get_initial(self):
             initial = super().get_initial()
             initial['tipo_materia'] = self.object.materia.tipo.id
             initial['numero_materia'] = self.object.materia.numero
             initial['ano_materia'] = self.object.materia.ano
+            initial['tramitacao'] = self.object.tramitacao.id if self.object.tramitacao is not None else ''
+
             return initial
 
     class DetailView(MasterDetailCrud.DetailView):
@@ -811,6 +819,33 @@ def recuperar_materia(request):
     return response
 
 
+def recuperar_tramitacao(request):
+    tipo = request.GET['tipo_materia']
+    numero = request.GET['numero_materia']
+    ano = request.GET['ano_materia']
+
+    try:
+        materia = MateriaLegislativa.objects.get(tipo_id=tipo,
+                                                 ano=ano,
+                                                 numero=numero)
+        tramitacao = {}
+        for obj in materia.tramitacao_set.all():
+            tramitacao[obj.id] = {
+                'status': obj.status.descricao,
+                'texto': obj.texto,
+                'data_tramitacao': obj.data_tramitacao.strftime('%d/%m/%Y'),
+                'unidade_tramitacao_local': str(obj.unidade_tramitacao_local),
+                'unidade_tramitacao_destino': str(obj.unidade_tramitacao_destino)
+
+            }
+
+        response = JsonResponse(tramitacao)
+    except ObjectDoesNotExist:
+        response = JsonResponse({'id': 0})
+
+    return response
+
+
 class ExpedienteMateriaCrud(MasterDetailCrud):
     model = ExpedienteMateria
     parent_field = 'sessao_plenaria'
@@ -864,11 +899,18 @@ class ExpedienteMateriaCrud(MasterDetailCrud):
     class UpdateView(MasterDetailCrud.UpdateView):
         form_class = ExpedienteMateriaForm
 
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            context["tramitacao_salvo"] = self.object.tramitacao.id if self.object.tramitacao is not None else ''
+            return context
+
         def get_initial(self):
             initial = super().get_initial()
             initial['tipo_materia'] = self.object.materia.tipo.id
             initial['numero_materia'] = self.object.materia.numero
             initial['ano_materia'] = self.object.materia.ano
+            initial['tramitacao_select'] = None if not self.object.tramitacao else self.object.tramitacao.id
+
             return initial
 
     class DetailView(MasterDetailCrud.DetailView):
@@ -3805,9 +3847,12 @@ class PautaSessaoDetailView(DetailView):
             titulo = m.materia
             numero = m.numero_ordem
 
-            ultima_tramitacao = m.materia.tramitacao_set.first()
-
-            situacao = ultima_tramitacao.status if ultima_tramitacao else None
+            tramitacao_item_sessao = m.tramitacao
+            if not tramitacao_item_sessao:
+                ultima_tramitacao = m.materia.tramitacao_set.first()
+                situacao = ultima_tramitacao.status if ultima_tramitacao else None
+            else:
+                situacao = tramitacao_item_sessao.status
 
             if situacao is None:
                 situacao = _("Não informada")
@@ -3866,9 +3911,12 @@ class PautaSessaoDetailView(DetailView):
             titulo = o.materia
             numero = o.numero_ordem
 
-            ultima_tramitacao = o.materia.tramitacao_set.first()
-
-            situacao = ultima_tramitacao.status if ultima_tramitacao else None
+            tramitacao_item_sessao = o.tramitacao
+            if not tramitacao_item_sessao:
+                ultima_tramitacao = o.materia.tramitacao_set.first()
+                situacao = ultima_tramitacao.status if ultima_tramitacao else None
+            else:
+                situacao = tramitacao_item_sessao.status
 
             if situacao is None:
                 situacao = _("Não informada")
@@ -4133,6 +4181,10 @@ class AdicionarVariasMateriasExpediente(PermissionRequiredForAppCrudMixin,
                     expediente.numero_ordem = 1
                 expediente.data_ordem = timezone.now()
                 expediente.tipo_votacao = request.POST['tipo_votacao_%s' % m]
+
+                ultima_tramitacao = materia.tramitacao_set.first()
+                expediente.tramitacao = ultima_tramitacao
+
                 expediente.save()
 
         pk = self.kwargs['pk']
@@ -4209,6 +4261,10 @@ class AdicionarVariasMateriasOrdemDia(AdicionarVariasMateriasExpediente):
                     ordem_dia.numero_ordem = 1
                 ordem_dia.data_ordem = timezone.now()
                 ordem_dia.tipo_votacao = tipo_votacao
+
+                ultima_tramitacao = materia.tramitacao_set.first()
+                ordem_dia.tramitacao = ultima_tramitacao
+
                 ordem_dia.save()
 
         return HttpResponseRedirect(
