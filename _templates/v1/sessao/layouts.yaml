@@ -75,15 +75,16 @@ ExpedienteMateria:
   {% trans 'Matéria do Expediente' %}:
   - data_ordem numero_ordem
   - tipo_materia numero_materia ano_materia
-  - tipo_votacao url_video:7
+  - tipo_votacao:3 tramitacao_select:5 url_video:4
   - apenas_leitura
+  - tramitacao_select
   - observacao
 
 OrdemDia:
   {% trans 'Matéria da Ordem do Dia' %}:
   - data_ordem numero_ordem
   - tipo_materia numero_materia ano_materia
-  - tipo_votacao url_video:7
+  - tipo_votacao:3 tramitacao_select:5 url_video:4
   - apenas_leitura
   - observacao
 
@@ -92,6 +93,7 @@ ExpedienteMateriaDetail:
   - materia
   - ementa
   - tipo_votacao
+  - tramitacao
   - observacao
   - url_video
 
@@ -100,6 +102,7 @@ OrdemDiaDetail:
   - materia
   - ementa
   - tipo_votacao
+  - tramitacao
   - observacao
   - url_video
   - childs

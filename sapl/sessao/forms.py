@@ -16,7 +16,7 @@ from sapl.crispy_layout_mixin import SaplFormHelper
 from sapl.crispy_layout_mixin import form_actions, to_row, SaplFormLayout
 from sapl.materia.forms import MateriaLegislativaFilterSet
 from sapl.materia.models import (MateriaLegislativa, StatusTramitacao,
-                                 TipoMateriaLegislativa)
+                                 TipoMateriaLegislativa, Tramitacao)
 from sapl.parlamentares.models import Parlamentar, Mandato
 from sapl.sessao.models import RegistroLeitura
 from sapl.settings import MAX_DOC_UPLOAD_SIZE
@@ -278,10 +278,22 @@ class RetiradaPautaForm(ModelForm):
         return retirada
 
 
+class DependentChoiceField(forms.ChoiceField):
+
+    def validate(self, value):
+        return True
+
+
 class ExpedienteMateriaForm(ModelForm):
 
     _model = ExpedienteMateria
     data_atual = timezone.now()
+
+    tramitacao_select = DependentChoiceField(
+        label=_('Situação quando pautada'),
+        widget=forms.Select())
+
+    # widget=forms.Select(attrs={'autocomplete': 'off'}))
 
     tipo_materia = forms.ModelChoiceField(
         label=_('Tipo Matéria'),
@@ -293,6 +305,9 @@ class ExpedienteMateriaForm(ModelForm):
     numero_materia = forms.CharField(
         label='Número Matéria', required=True,
         widget=forms.TextInput(attrs={'autocomplete': 'off'}))
+
+    url_video = forms.CharField(
+        label='URL Vídeo ', required=False)
 
     ano_materia = forms.CharField(
         label='Ano Matéria',
@@ -310,7 +325,7 @@ class ExpedienteMateriaForm(ModelForm):
     class Meta:
         model = ExpedienteMateria
         fields = ['data_ordem', 'numero_ordem', 'tipo_materia', 'observacao',
-                  'url_video',
+                  'url_video', 'tramitacao_select',
                   'numero_materia', 'ano_materia', 'tipo_votacao']
 
     def clean_numero_ordem(self):
@@ -356,11 +371,25 @@ class ExpedienteMateriaForm(ModelForm):
             msg = _('Essa matéria já foi cadastrada.')
             raise ValidationError(msg)
 
+        try:
+            if materia.tramitacao_set.exists() and self.cleaned_data['tramitacao_select']:
+                tramitacao = materia.tramitacao_set.get(
+                    pk=self.cleaned_data['tramitacao_select'])
+                cleaned_data['tramitacao'] = tramitacao
+        except ObjectDoesNotExist:
+            raise ValidationError(
+                _('Tramitação selecionada não existe para a Matéria: %(value)s'),
+                code='invalid',
+                params={'value': self.cleaned_data['tramitacao_select']},
+            )
+
         return cleaned_data
 
     def save(self, commit=False):
         expediente = super(ExpedienteMateriaForm, self).save(commit)
         expediente.materia = self.cleaned_data['materia']
+        if self.cleaned_data['tramitacao'] is not False:
+            expediente.tramitacao = self.cleaned_data['tramitacao']
         expediente.save()
         return expediente
 
@@ -375,7 +404,7 @@ class OrdemDiaForm(ExpedienteMateriaForm):
                   'numero_ordem',
                   'tipo_materia',
                   'observacao',
-                  'url_video',
+                  'url_video', 'tramitacao',
                   'numero_materia', 'ano_materia', 'tipo_votacao']
 
     def clean_data_ordem(self):

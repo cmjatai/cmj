@@ -1234,7 +1234,11 @@ def get_pauta_sessao(sessao, casa):
         else:
             dic_expediente_materia["nom_autor"] = 'Desconhecido'
 
+        tram_expediente = expediente_materia.tramitacao
         turno, tramitacao = get_turno(materia)
+        if tram_expediente:
+            turno = str(tram_expediente.get_turno_display())
+            tramitacao = str(tram_expediente.status)
 
         dic_expediente_materia["des_turno"] = turno
         dic_expediente_materia["des_situacao"] = tramitacao
@@ -1262,7 +1266,12 @@ def get_pauta_sessao(sessao, casa):
             dic_votacao["des_numeracao"] = str(
                 numeracao.numero_materia) + '/' + str(numeracao.ano_materia)
 
+        tram_ordem = votacao.tramitacao
         turno, tramitacao = get_turno(materia)
+        if tram_ordem:
+            turno = str(tram_ordem.get_turno_display())
+            tramitacao = str(tram_ordem.status)
+
         dic_votacao["des_turno"] = turno
         dic_votacao["des_situacao"] = tramitacao
 
