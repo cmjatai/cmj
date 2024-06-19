@@ -615,7 +615,9 @@ def get_sessao_plenaria(sessao, casa):
     # Lista das matérias do Expediente, incluindo o resultado das votacoes
     lst_expediente_materia = []
     for expediente_materia in ExpedienteMateria.objects.filter(
-            sessao_plenaria=sessao).order_by('numero_ordem'):
+        sessao_plenaria=sessao,
+        parent__isnull=True
+    ).order_by('numero_ordem', 'materia', 'resultado'):
         # seleciona os detalhes de uma matéria
         materia = expediente_materia.materia
         dic_expediente_materia = {}
@@ -737,8 +739,9 @@ def get_sessao_plenaria(sessao, casa):
     # Lista das matérias da Ordem do Dia, incluindo o resultado das votacoes
     lst_votacao = []
     for votacao in OrdemDia.objects.filter(
-            sessao_plenaria=sessao,
-            parent__isnull=True).order_by('numero_ordem'):
+        sessao_plenaria=sessao,
+        parent__isnull=True
+    ).order_by('numero_ordem', 'materia', 'resultado'):
         # seleciona os detalhes de uma matéria
         materia = votacao.materia
         dic_votacao = {}
@@ -1199,7 +1202,10 @@ def get_pauta_sessao(sessao, casa):
     inf_basicas_dic["nom_camara"] = casa.nome
 
     lst_expediente_materia = []
-    for expediente_materia in ExpedienteMateria.objects.filter(sessao_plenaria=sessao).order_by('numero_ordem'):
+    for expediente_materia in ExpedienteMateria.objects.filter(
+            sessao_plenaria=sessao,
+        parent__isnull=True
+    ).order_by('numero_ordem', 'materia', 'resultado'):
 
         materia = MateriaLegislativa.objects.filter(
             id=expediente_materia.materia.id).first()
@@ -1247,7 +1253,9 @@ def get_pauta_sessao(sessao, casa):
 
     lst_votacao = []
     for votacao in OrdemDia.objects.filter(
-            sessao_plenaria=sessao).order_by('numero_ordem'):
+        sessao_plenaria=sessao,
+        parent__isnull=True
+    ).order_by('numero_ordem', 'materia', 'resultado'):
         materia = MateriaLegislativa.objects.filter(
             id=votacao.materia.id).first()
         dic_votacao = {}
