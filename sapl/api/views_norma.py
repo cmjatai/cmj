@@ -1,5 +1,6 @@
 
 from django.apps.registry import apps
+from django.utils.text import slugify
 from rest_framework.decorators import action
 
 from drfautoapi.drfautoapi import ApiViewSetConstrutor, \
@@ -17,6 +18,15 @@ ApiViewSetConstrutor.build_class(
 
 @customize(NormaJuridica)
 class _NormaJuridicaViewset(ResponseFileMixin):
+
+    def custom_filename(self, item):
+        arcname = '{}-{}-{}-{}.{}'.format(
+            item.ano,
+            item.numero,
+            slugify(item.tipo.sigla),
+            slugify(item.tipo.descricao),
+            item.texto_integral.path.split('.')[-1])
+        return arcname
 
     @action(detail=False, methods=['GET'])
     def destaques(self, request, *args, **kwargs):
