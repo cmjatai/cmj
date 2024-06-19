@@ -3839,7 +3839,9 @@ class PautaSessaoDetailView(DetailView):
         # =====================================================================
         # Matérias Expediente
         materias = ExpedienteMateria.objects.filter(
-            sessao_plenaria_id=self.object.id)
+            sessao_plenaria_id=self.object.id,
+            parent__isnull=True
+        ).order_by('numero_ordem', 'materia', 'resultado')
 
         materias_expediente = []
         for m in materias:
@@ -3903,7 +3905,9 @@ class PautaSessaoDetailView(DetailView):
         # =====================================================================
         # Matérias Ordem do Dia
         ordem = OrdemDia.objects.filter(
-            sessao_plenaria_id=self.object.id).order_by('numero_ordem')
+            sessao_plenaria_id=self.object.id,
+            parent__isnull=True
+        ).order_by('numero_ordem', 'materia', 'resultado')
 
         materias_ordem = []
         for o in ordem:
