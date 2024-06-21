@@ -2,9 +2,11 @@ import '@fortawesome/fontawesome-free/css/all.css'
 // import '@fortawesome/fontawesome-free/js/all.js'
 
 import 'bootstrap'
+import 'bootstrap-select'
 
 import 'webpack-jquery-ui/dialog'
 import 'webpack-jquery-ui/sortable'
+// import 'webpack-jquery-ui/selectpicker'
 import 'webpack-jquery-ui/datepicker'
 import 'jquery-ui/ui/i18n/datepicker-pt-BR'
 
@@ -60,6 +62,7 @@ $(function () {
     window.autorModal()
     window.refreshMask()
     window.refreshDatePicker()
+    window.refreshSelectPicker()
 
     if (document.getElementById('texto-rico') !== null) {
       window.initTextRichEditor('#texto-rico')

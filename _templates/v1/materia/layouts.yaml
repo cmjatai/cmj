@@ -5,11 +5,12 @@ Origem:
 
 TipoMateriaLegislativaDetail:
   {% trans 'Tipo Matéria Legislativa' %}:
-  - sigla:2 descricao sequencia_numeracao:2 sequencia_regimental:2
+  - sigla:2 descricao nivel_agrupamento:2 sequencia_numeracao:2 sequencia_regimental:2
 
 TipoMateriaLegislativa:
   {% trans 'Tipo Matéria Legislativa' %}:
-  - sigla:2 descricao sequencia_numeracao:3 turnos_aprovacao:2
+  - sigla:3 descricao
+  - nivel_agrupamento sequencia_numeracao turnos_aprovacao
 
 RegimeTramitacao:
   {% trans 'Tipo de Documento' %}:

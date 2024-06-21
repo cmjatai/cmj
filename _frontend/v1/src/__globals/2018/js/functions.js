@@ -34,6 +34,10 @@ window.initTextRichEditor = function (elements, readonly = false) {
   window.tinymce.init(configTinymce)
 }
 
+window.refreshSelectPicker = function () {
+  // $('#id_tipo_i').selectpicker()
+}
+
 window.refreshDatePicker = function () {
   $.datepicker.setDefaults($.datepicker.regional['pt-BR'])
   $('.dateinput').datepicker({

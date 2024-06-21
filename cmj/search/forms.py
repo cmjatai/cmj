@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from crispy_forms.bootstrap import FieldWithButtons, StrictButton
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Div, Field, Layout, HTML, Button, Fieldset
@@ -184,18 +186,20 @@ class MateriaSearchForm(SearchForm):
         choices=CHOICE_TRAMITACAO
     )
 
-    tipo_i = forms.ModelChoiceField(
+    tipo_i = forms.ModelMultipleChoiceField(
         required=False,
         queryset=TipoMateriaLegislativa.objects.all(),
-        label=_('Tipo de Matéria Legislativa'),
-
+        label=_('Tipos de Matéria Legislativa'),
+        widget=forms.SelectMultiple(attrs={
+            'class': 'selectpicker',
+            'title': _('Tipos de Matéria Legislativa')
+        })
     )
 
     uta_i = forms.ModelChoiceField(
         required=False,
         queryset=UnidadeTramitacao.objects.all(),
         label=_('Unidade de tramitação atual'),
-
     )
 
     sta_i = forms.ModelChoiceField(
@@ -286,11 +290,32 @@ class MateriaSearchForm(SearchForm):
         super().__init__(*args, **kwargs)
 
         self.fields['q'].label = ''
-        #self.fields['models'].widget = forms.MultipleHiddenInput()
+
+        grupos_de_tipos = (
+            ('1', 'Mais Acessadas'),
+            ('3', ' '),
+            ('7', 'Matérias Acessórias'),
+            ('9', '  ')
+        )
+        gtd = {k: v for k, v in grupos_de_tipos}
+
+        grupo_choices = OrderedDict()
+        for nivel, valor in grupos_de_tipos:
+            if valor not in grupo_choices:
+                grupo_choices[valor] = []
+
+        for tml in TipoMateriaLegislativa.objects.order_by('nivel_agrupamento', 'sequencia_regimental'):
+            grupo_choices[gtd[tml.nivel_agrupamento]].append(
+                (tml.id, f'{tml.sigla}-{tml.descricao}'))
+
+        choices = []
+        for g, items in grupo_choices.items():
+            choices.append((' ', items,))
+        self.fields['tipo_i'].choices = choices
 
     def clean_tipo_i(self, *args, **kwargs):
         tipo_i = self.cleaned_data['tipo_i']
-
+        return tipo_i.values_list('id', flat=True)
         if tipo_i:
             return tipo_i.id
 
@@ -333,6 +358,10 @@ class MateriaSearchForm(SearchForm):
             key: self.cleaned_data.get(key, None)
             for key in self.changed_data if key not in remove
         }
+
+        if params and 'tipo_i' in params:
+            params['tipo_i__in'] = params['tipo_i']
+            del params['tipo_i']
 
         if params:
             sqs = sqs.filter(**params)

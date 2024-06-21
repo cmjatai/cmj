@@ -398,6 +398,7 @@
   .container-e-sic {
     font-size: 1em;
     .popup-sic {
+      z-index: $zindex-popup;
       position: absolute;
       margin-top: 0px;
       padding: 11px 10px 10px 10px;
