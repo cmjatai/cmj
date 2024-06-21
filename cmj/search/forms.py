@@ -191,22 +191,45 @@ class MateriaSearchForm(SearchForm):
         queryset=TipoMateriaLegislativa.objects.all(),
         label=_('Tipos de Matéria Legislativa'),
         widget=forms.SelectMultiple(attrs={
+            'title': _('Filtrar por um ou mais tipos de matéria?'),
             'class': 'selectpicker',
-            'title': _('Tipos de Matéria Legislativa')
+            'data-actions-box': 'true',
+            'data-select-all-text': 'Selecionar Todos',
+            'data-deselect-all-text': 'Desmarcar Todos',
+            'data-header': 'Tipos de Matéria Legislativa',
+            'data-dropup-auto': 'false'
         })
     )
 
-    uta_i = forms.ModelChoiceField(
+    uta_i = forms.ModelMultipleChoiceField(
         required=False,
         queryset=UnidadeTramitacao.objects.all(),
         label=_('Unidade de tramitação atual'),
+        widget=forms.SelectMultiple(attrs={
+            'title': _('Filtrar por uma ou mais unidades?'),
+            'class': 'selectpicker',
+            'data-actions-box': 'true',
+            'data-select-all-text': 'Selecionar Todos',
+            'data-deselect-all-text': 'Desmarcar Todos',
+            'data-header': 'Unidade de tramitação atual',
+            'data-dropup-auto': 'false'
+        })
     )
 
-    sta_i = forms.ModelChoiceField(
+    sta_i = forms.ModelMultipleChoiceField(
         required=False,
         queryset=StatusTramitacao.objects.all(),
         label=_('Status da tramitação atual'),
-
+        widget=forms.SelectMultiple(attrs={
+            'title': _('Filtrar por um ou mais Status?'),
+            'class': 'selectpicker',
+            'data-actions-box': 'true',
+            'data-select-all-text': 'Selecionar Todos',
+            'data-deselect-all-text': 'Desmarcar Todos',
+            'data-header': 'Status da tramitação atual',
+            'data-dropup-auto': 'false',
+            'data-dropdown-align-right': 'auto'
+        })
     )
 
     tipo_listagem = forms.ChoiceField(
@@ -306,12 +329,24 @@ class MateriaSearchForm(SearchForm):
 
         for tml in TipoMateriaLegislativa.objects.order_by('nivel_agrupamento', 'sequencia_regimental'):
             grupo_choices[gtd[tml.nivel_agrupamento]].append(
-                (tml.id, f'{tml.sigla}-{tml.descricao}'))
+                (tml.id, f'{tml.sigla} - {tml.descricao}'))
 
         choices = []
         for g, items in grupo_choices.items():
             choices.append((' ', items,))
         self.fields['tipo_i'].choices = choices
+
+        uta_choices = OrderedDict()
+        for uta in UnidadeTramitacao.objects.all():
+            uta_obj = uta.comissao or uta.orgao or uta.parlamentar
+
+            grupo = uta_obj._meta.verbose_name_plural
+            if grupo not in uta_choices:
+                uta_choices[grupo] = []
+
+            uta_choices[grupo].append((uta.id, str(uta)))
+
+        self.fields['uta_i'].choices = uta_choices.items()
 
     def clean_tipo_i(self, *args, **kwargs):
         tipo_i = self.cleaned_data['tipo_i']
@@ -328,12 +363,14 @@ class MateriaSearchForm(SearchForm):
 
     def clean_uta_i(self, *args, **kwargs):
         uta_i = self.cleaned_data['uta_i']
+        return uta_i.values_list('id', flat=True)
 
         if uta_i:
             return uta_i.id
 
     def clean_sta_i(self, *args, **kwargs):
         sta_i = self.cleaned_data['sta_i']
+        return sta_i.values_list('id', flat=True)
 
         if sta_i:
             return sta_i.id
@@ -362,6 +399,14 @@ class MateriaSearchForm(SearchForm):
         if params and 'tipo_i' in params:
             params['tipo_i__in'] = params['tipo_i']
             del params['tipo_i']
+
+        if params and 'uta_i' in params:
+            params['uta_i__in'] = params['uta_i']
+            del params['uta_i']
+
+        if params and 'sta_i' in params:
+            params['sta_i__in'] = params['sta_i']
+            del params['sta_i']
 
         if params:
             sqs = sqs.filter(**params)

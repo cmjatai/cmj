@@ -96,25 +96,3 @@ form {
     padding-left: $grid-gutter-width * 1.2;
   }
 }
-
-.bootstrap-select {
-  .selectpicker {
-
-  }
-  .dropdown-header {
-    padding: 0;
-  }
-  .dropdown-menu {
-    z-index: $zindex-selectbox;
-    li {
-      a.opt {
-        padding-left: 1em;
-      }
-    }
-  }
-  .btn {
-      border: 1px solid #ced4da;
-      background-color: white;
-      padding: 0.375rem 0.75rem;
-  }
-}

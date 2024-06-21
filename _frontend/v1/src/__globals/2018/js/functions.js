@@ -35,7 +35,16 @@ window.initTextRichEditor = function (elements, readonly = false) {
 }
 
 window.refreshSelectPicker = function () {
-  // $('#id_tipo_i').selectpicker()
+  $('.selectpicker').selectpicker()
+    .on('show.bs.select', function (event) {
+      $('html, body').animate(
+        {
+          scrollTop:
+            $('.div-search').offset().top // - window.innerHeight / 9
+        },
+        500
+      )
+    })
 }
 
 window.refreshDatePicker = function () {
