@@ -77,7 +77,6 @@ ExpedienteMateria:
   - tipo_materia numero_materia ano_materia
   - tipo_votacao:3 tramitacao_select:5 url_video:4
   - apenas_leitura
-  - tramitacao_select
   - observacao
 
 OrdemDia:
