@@ -1157,7 +1157,7 @@ def get_etiqueta_protocolos(prots):
     return protocolos
 
 
-def relatorio_pauta_sessao(request, pk):
+def relatorio_pauta_sessao_trml2pdf(request, pk):
     '''
         pdf__pauta_sessao_gerar.py
     '''
@@ -1215,8 +1215,11 @@ def get_pauta_sessao(sessao, casa):
             ' - ' + materia.tipo.descricao
         dic_expediente_materia["num_ordem"] = str(
             expediente_materia.numero_ordem)
-        dic_expediente_materia["id_materia"] = str(
-            materia.numero) + "/" + str(materia.ano)
+        dic_expediente_materia["id_materia"] = (materia.tipo.sigla + ' ' +
+                                                # materia.tipo.descricao + ' '
+                                                # +
+                                                str(materia.numero) + '/' +
+                                                str(materia.ano))
         dic_expediente_materia["txt_ementa"] = materia.ementa
         dic_expediente_materia["ordem_observacao"] = str(
             expediente_materia.observacao)
@@ -1481,6 +1484,72 @@ def relatorio_sessao_plenaria_pdf(request, pk):
         })
 
     info = "Resumo da {}ª Reunião {} \
+                da<br>{}ª Sessão Legislativa da {} \
+                Legislatura".format(inf_basicas_dic['num_sessao_plen'],
+                                    inf_basicas_dic['nom_sessao'],
+                                    inf_basicas_dic['num_sessao_leg'],
+                                    inf_basicas_dic['num_legislatura']
+                                    )
+
+    html_header = render_to_string(
+        'relatorios/header.html',
+        {
+            "casa": casa,
+            "MEDIA_URL": MEDIA_URL if not settings.DEBUG else '',
+            "logotipo": casa.logotipo,
+            "info": info
+        }
+    )
+
+    pdf_file = make_pdf(
+        base_url=base_url, main_template=html_template, header_template=html_header)
+
+    response = HttpResponse(content_type='application/pdf;')
+    response['Content-Disposition'] = 'inline; filename=relatorio.pdf'
+    response['Content-Transfer-Encoding'] = 'binary'
+    response.write(pdf_file)
+
+    return response
+
+
+def relatorio_pauta_sessao(request, pk):
+
+    base_url = settings.MEDIA_ROOT if settings.DEBUG else request.build_absolute_uri()
+    #base_url = request.build_absolute_uri()
+    logger = logging.getLogger(__name__)
+    username = request.user.username
+    casa = CasaLegislativa.objects.first()
+    if not casa:
+        raise Http404
+
+    rodape = get_rodape(casa)
+    rodape = ' - '.join(rodape)
+
+    try:
+        logger.debug("user=" + username +
+                     ". Tentando obter SessaoPlenaria com id={}.".format(pk))
+        sessao = SessaoPlenaria.objects.get(id=pk)
+    except ObjectDoesNotExist as e:
+        logger.error("user=" + username +
+                     ". Essa SessaoPlenaria não existe (pk={}). ".format(pk) + str(e))
+        raise Http404('Essa página não existe')
+
+    (lst_expediente_materia,
+     lst_votacao,
+     inf_basicas_dic,
+     expedientes) = get_pauta_sessao(sessao, casa)
+
+    html_template = render_to_string(
+        'relatorios/relatorio_pauta_sessao.html',
+        {
+            "inf_basicas_dic": inf_basicas_dic,
+            "lst_expediente_materia": lst_expediente_materia,
+            "lst_votacao": lst_votacao,
+            "rodape": rodape,
+            "data": dt.strftime(timezone.localtime(), "%d/%m/%Y %H:%M:%S")
+        })
+
+    info = "Pauta da {}ª Reunião {} \
                 da<br>{}ª Sessão Legislativa da {} \
                 Legislatura".format(inf_basicas_dic['num_sessao_plen'],
                                     inf_basicas_dic['nom_sessao'],

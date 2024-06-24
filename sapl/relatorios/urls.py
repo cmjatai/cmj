@@ -11,14 +11,27 @@ from .views import (relatorio_capa_processo,
 app_name = AppConfig.name
 
 urlpatterns = [
+    # weaseprint
+    url(r'^relatorios/(?P<pk>\d+)/sessao-plenaria-pdf$',
+        relatorio_sessao_plenaria_pdf, name='relatorio_sessao_plenaria_pdf'),
+    url(r'^relatorios/relatorio-documento-administrativo$',
+        relatorio_documento_administrativo,
+        name='relatorio_documento_administrativo'),
+    url(r'^relatorios/(?P<pk>\d+)/resumo_ata$',
+        resumo_ata_pdf, name='resumo_ata_pdf'),
+
+    url(r'^relatorios/pauta-sessao/(?P<pk>\d+)/$',
+        relatorio_pauta_sessao, name='relatorio_pauta_sessao'),
+
+    # url(r'^relatorios/pauta-sessao/(?P<pk>\d+)/$',
+    #    relatorio_pauta_sessao, name='relatorio_pauta_sessao'),
+
+    # trml2pdf
     url(r'^relatorios/materia$', relatorio_materia, name='relatorio_materia'),
     url(r'^relatorios/capa-processo$',
         relatorio_capa_processo, name='relatorio_capa_processo'),
     url(r'^relatorios/ordem-dia$', relatorio_ordem_dia,
         name='relatorio_ordem_dia'),
-    url(r'^relatorios/relatorio-documento-administrativo$',
-        relatorio_documento_administrativo,
-        name='relatorio_documento_administrativo'),
     url(r'^relatorios/espelho$', relatorio_espelho,
         name='relatorio_espelho'),
     url(r'^relatorios/(?P<pk>\d+)/sessao-plenaria$',
@@ -27,10 +40,4 @@ urlpatterns = [
         relatorio_protocolo, name='relatorio_protocolo'),
     url(r'^relatorios/(?P<nro>\d+)/(?P<ano>\d+)/etiqueta-protocolo$',
         relatorio_etiqueta_protocolo, name='relatorio_etiqueta_protocolo'),
-    url(r'^relatorios/pauta-sessao/(?P<pk>\d+)/$',
-        relatorio_pauta_sessao, name='relatorio_pauta_sessao'),
-    url(r'^relatorios/(?P<pk>\d+)/resumo_ata$',
-        resumo_ata_pdf, name='resumo_ata_pdf'),
-    url(r'^relatorios/(?P<pk>\d+)/sessao-plenaria-pdf$',
-        relatorio_sessao_plenaria_pdf, name='relatorio_sessao_plenaria_pdf'),
 ]
