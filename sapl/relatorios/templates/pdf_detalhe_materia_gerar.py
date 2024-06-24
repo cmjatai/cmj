@@ -8,7 +8,7 @@
 """
 import time
 
-from trml2pdf import parseString
+from sapl.utils import parseString
 
 
 def cabecalho(dic_inf_basicas, imagem):

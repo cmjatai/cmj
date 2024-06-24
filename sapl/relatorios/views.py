@@ -1301,8 +1301,13 @@ def get_pauta_sessao(sessao, casa):
     expedientes = []
     for e in expediente:
         tipo = e.tipo
+
+        conteudo = e.conteudo.replace('<br />', '\n')
+        conteudo = e.conteudo.replace('<br/>', '\n')
+        conteudo = conteudo.replace('<br>', '\n')
+
         conteudo = re.sub(
-            '&nbsp;', ' ', strip_tags(e.conteudo.replace('<br/>', '\n')))
+            '&nbsp;', ' ', strip_tags(conteudo))
         ex = {'tipo': tipo, 'conteudo': conteudo}
         expedientes.append(ex)
 

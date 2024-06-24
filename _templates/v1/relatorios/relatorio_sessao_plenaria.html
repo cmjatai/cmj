@@ -115,8 +115,7 @@
               <dt><b>{{materia.num_autores}}:</b> {{materia.nom_autor}}</dt>
             </dl>
           </td>
-          <td>{{materia.txt_ementa}}
-          </td>
+          <td>{{ materia.txt_ementa|safe }}</td>
           <td style="width: 4cm">
             <b><div style="text-align: center;">{{materia.nom_resultado}}</div></b>
           </td>

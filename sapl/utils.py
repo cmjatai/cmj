@@ -34,6 +34,7 @@ from easy_thumbnails import source_generators
 from floppyforms.widgets import ClearableFileInput
 from image_cropping.widgets import ImageCropWidget
 import magic
+from trml2pdf import parseString as trml2pdfParseString
 from unipath.path import Path
 import weasyprint
 
@@ -1273,3 +1274,8 @@ def gerar_pdf_impressos(request, context, template_name):
     response['Content-Transfer-Encoding'] = 'binary'
 
     return response
+
+
+def parseString(data, fout=None):
+    data = data.replace('<br>', '<br/>')
+    return trml2pdfParseString(data, fout)
