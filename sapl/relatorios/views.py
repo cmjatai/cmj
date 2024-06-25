@@ -1157,7 +1157,7 @@ def get_etiqueta_protocolos(prots):
     return protocolos
 
 
-def relatorio_pauta_sessao_trml2pdf(request, pk):
+def relatorio_pauta_sessao_trml2pdf__deprecated(request, pk):
     '''
         pdf__pauta_sessao_gerar.py
     '''
@@ -1247,7 +1247,7 @@ def get_pauta_sessao(sessao, casa):
         turno, tramitacao = get_turno(materia)
         if tram_expediente:
             turno = str(tram_expediente.get_turno_display())
-            tramitacao = str(tram_expediente.status)
+            tramitacao = f'<b>{tram_expediente.status}</b><br><em>{tram_expediente.texto}</em>'
 
         dic_expediente_materia["des_turno"] = turno
         dic_expediente_materia["des_situacao"] = tramitacao
@@ -1281,7 +1281,7 @@ def get_pauta_sessao(sessao, casa):
         turno, tramitacao = get_turno(materia)
         if tram_ordem:
             turno = str(tram_ordem.get_turno_display())
-            tramitacao = str(tram_ordem.status)
+            tramitacao = f'<b>{tram_ordem.status}</b><br><em>{tram_ordem.texto}</em>'
 
         dic_votacao["des_turno"] = turno
         dic_votacao["des_situacao"] = tramitacao

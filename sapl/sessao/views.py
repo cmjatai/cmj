@@ -1797,7 +1797,7 @@ class MesaView(FormMixin, DetailView):
 
             return self.render_to_response(context)
 
-        mesa = sessao.integrantemesa_set.all().order_by('cargo_id') if sessao else []
+        mesa = sessao.integrantemesa.all().order_by('cargo_id') if sessao else []
         cargos_ocupados = [m.cargo for m in mesa]
         cargos = CargoMesa.objects.all()
         cargos_vagos = list(set(cargos) - set(cargos_ocupados))
@@ -3801,7 +3801,9 @@ class PautaSessaoView(TemplateView):
     template_name = "sessao/pauta_inexistente.html"
 
     def get(self, request, *args, **kwargs):
-        sessao = SessaoPlenaria.objects.order_by("-data_inicio").first()
+        sessao = SessaoPlenaria.objects.filter(
+            tipo__tipogeral=TipoSessaoPlenaria.TIPOGERAL_SESSAO
+        ).order_by("-data_inicio", "-id").first()
 
         if not sessao:
             return self.render_to_response({})
@@ -3852,12 +3854,14 @@ class PautaSessaoDetailView(DetailView):
             tramitacao_item_sessao = m.tramitacao
             if not tramitacao_item_sessao:
                 ultima_tramitacao = m.materia.tramitacao_set.first()
-                situacao = ultima_tramitacao.status if ultima_tramitacao else None
+                situacao = ultima_tramitacao if ultima_tramitacao else None
             else:
-                situacao = tramitacao_item_sessao.status
+                situacao = tramitacao_item_sessao
 
             if situacao is None:
                 situacao = _("Não informada")
+            else:
+                situacao = f'{situacao.status}<br><em>{situacao.texto}</em>'
             rv = m.registrovotacao_set.all()
             if rv:
                 resultado = rv[0].tipo_resultado_votacao.nome

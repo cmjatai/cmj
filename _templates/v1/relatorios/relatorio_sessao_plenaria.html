@@ -6,44 +6,22 @@
 
 <head>
   <title>Resumo Sessão Plenária</title>
-
   <style>
     {% include "css/base.css" %}
     {% include "css/relatorio.css" %}
     @page {
       @bottom-right {
         content: "Página " counter(page);
-        height: 0.5cm;
-        font-size: 7pt;
       }
       @bottom-center {
-        border-top: 1px solid black;
-        font-size: 6pt;
-        height: 0.5cm;
         content: "{{rodape|safe}}";
-        font-style: italic;
       }
       @bottom-left {
         content: "{{data}}";
-        height: 0.5cm;
-        font-size: 7pt;
       }
     }
-      {% comment %}
-        @top-center {
-          content:  string(title);
-        }
-        header {
-          width: 0;
-          height: 0;
-          visibility: hidden;
-          string-set: title content();
-        }
-      {% endcomment %}
   </style>
-
 </head>
-
 <body>
     <h2 class="gray-title">Informações Básicas</h2>
     <p><b>Tipo da Sessão:</b> {{inf_basicas_dic.nom_sessao}}</p>
