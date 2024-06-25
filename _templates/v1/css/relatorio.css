@@ -16,13 +16,16 @@ h3 {
   padding: 0;
 }
 
-p, a {
+p {
   font-size: 10pt;
   text-align: justify;
   text-justify: inter-word;
   margin: 0 0 0 0.5cm;
   padding: 0;
-
+}
+a {
+  text-decoration: none;
+  color:black;
 }
 
 table.grayTable {

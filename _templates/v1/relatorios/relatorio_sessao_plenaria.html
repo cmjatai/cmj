@@ -1,4 +1,4 @@
-{% load static %}
+{% load static common_cmj_tags %}
 <!DOCTYPE html>
 <html lang="pt-br">
 <meta charset="utf-8">
@@ -88,14 +88,19 @@
         <tr>
           <td style="width: 5cm">
             <dl>
-              <dt><b>{{materia.num_ordem}} -</b> {{materia.id_materia}}</dt>
+              <dt>
+                <a href="{{"SITE_URL"|settings_key_filter}}{% url 'sapl.materia:materialegislativa_detail' materia.id_materia %}">
+                  <b>{{materia.num_ordem}} - {{materia.epigrafe_materia}}</b>
+                </a>
+              </dt>
               <dt><b>Turno:</b> {{materia.des_turno}}</dt>
               <dt><b>{{materia.num_autores}}:</b> {{materia.nom_autor}}</dt>
             </dl>
           </td>
           <td>{{ materia.txt_ementa|safe }}</td>
-          <td style="width: 4cm">
-            <b><div style="text-align: center;">{{materia.nom_resultado}}</div></b>
+          <td style="width: 5cm; text-align: center;">
+            <b>{{ materia.nom_resultado }}</b><br>
+            <em>{{ materia.votacao_observacao }}</em>
           </td>
         </tr>
       {% endfor %}
@@ -136,9 +141,13 @@
         <tbody>
           {% for materia in lst_votacao%}
             <tr>
-              <td style="width: 6cm">
+              <td style="width: 5cm">
                 <dl>
-                  <dt><b>{{materia.num_ordem}}</b> - {{materia.id_materia}}</dt>
+                  <dt>
+                    <a href="{{"SITE_URL"|settings_key_filter}}{% url 'sapl.materia:materialegislativa_detail' materia.id_materia %}">
+                      <b>{{materia.num_ordem}} - {{materia.epigrafe_materia}}</b>
+                    </a>
+                  </dt>
                   <dt><b>Turno:</b> {{materia.des_turno}}</dt>
                   <dt><b>{{materia.num_autores}}:</b> {{materia.nom_autor}}</dt>
                 </dl>
@@ -151,10 +160,10 @@
                     - {{anexada}}<br>
                 {% endfor %}
               </td>
-              <td style="width:4cm; text-align: center;">
+              <td style="width: 5cm; text-align: center;">
                 <b>{{materia.nom_resultado}}</b><br>
                 <em>{{materia.votacao_observacao}}</em>
-                </td>
+              </td>
             </tr>
           {% endfor %}
 

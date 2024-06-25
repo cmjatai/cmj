@@ -503,6 +503,7 @@ def remove_html_comments(text):
 def get_sessao_plenaria(sessao, casa):
 
     inf_basicas_dic = {}
+    inf_basicas_dic["sessao_str"] = str(sessao)
     inf_basicas_dic["num_sessao_plen"] = str(sessao.numero)
     inf_basicas_dic["nom_sessao"] = sessao.tipo.nome
     inf_basicas_dic["num_legislatura"] = str(sessao.legislatura)
@@ -622,11 +623,12 @@ def get_sessao_plenaria(sessao, casa):
         materia = expediente_materia.materia
         dic_expediente_materia = {}
         dic_expediente_materia["num_ordem"] = expediente_materia.numero_ordem
-        dic_expediente_materia["id_materia"] = (materia.tipo.sigla + ' ' +
-                                                # materia.tipo.descricao + ' '
-                                                # +
-                                                str(materia.numero) + '/' +
-                                                str(materia.ano))
+        dic_expediente_materia["id_materia"] = materia.id
+        dic_expediente_materia["epigrafe_materia"] = (materia.tipo.sigla + ' ' +
+                                                      # materia.tipo.descricao + ' '
+                                                      # +
+                                                      str(materia.numero) + '/' +
+                                                      str(materia.ano))
         dic_expediente_materia["des_numeracao"] = ' '
 
         numeracao = Numeracao.objects.filter(
@@ -671,8 +673,7 @@ def get_sessao_plenaria(sessao, casa):
                 else:
                     dic_expediente_materia["nom_resultado"] = (
                         i.tipo_resultado_votacao.nome)
-                    dic_expediente_materia["votacao_observacao"] = (
-                        i.observacao)
+                    dic_expediente_materia["votacao_observacao"] = i.observacao
         else:
             dic_expediente_materia["nom_resultado"] = 'Matéria não {}'.format(
                 'Lida' if expediente_materia.tipo_votacao == LEITURA else 'Votada')
@@ -748,7 +749,10 @@ def get_sessao_plenaria(sessao, casa):
         dic_votacao["nom_resultado"] = ''
         dic_votacao["num_ordem"] = votacao.numero_ordem
         dic_votacao["materia"] = votacao.materia
-        dic_votacao["id_materia"] = (
+
+        dic_votacao["id_materia"] = materia.id
+
+        dic_votacao["epigrafe_materia"] = (
             materia.tipo.sigla + ' ' +
             # materia.tipo.descricao + ' ' +
             str(materia.numero) + '/' +
@@ -1191,6 +1195,7 @@ def relatorio_pauta_sessao_trml2pdf__deprecated(request, pk):
 def get_pauta_sessao(sessao, casa):
 
     inf_basicas_dic = {}
+    inf_basicas_dic["sessao_str"] = str(sessao)
     inf_basicas_dic["nom_sessao"] = sessao.tipo.nome
     inf_basicas_dic["num_sessao_plen"] = sessao.numero
     inf_basicas_dic["num_legislatura"] = sessao.legislatura
@@ -1215,11 +1220,11 @@ def get_pauta_sessao(sessao, casa):
             ' - ' + materia.tipo.descricao
         dic_expediente_materia["num_ordem"] = str(
             expediente_materia.numero_ordem)
-        dic_expediente_materia["id_materia"] = (materia.tipo.sigla + ' ' +
-                                                # materia.tipo.descricao + ' '
-                                                # +
-                                                str(materia.numero) + '/' +
-                                                str(materia.ano))
+        dic_expediente_materia["id_materia"] = materia.id
+        dic_expediente_materia["epigrafe_materia"] = (materia.tipo.sigla + ' ' +
+                                                      str(materia.numero) + '/' +
+                                                      str(materia.ano))
+
         dic_expediente_materia["txt_ementa"] = materia.ementa
         dic_expediente_materia["ordem_observacao"] = str(
             expediente_materia.observacao)
@@ -1265,8 +1270,11 @@ def get_pauta_sessao(sessao, casa):
         dic_votacao["tipo_materia"] = materia.tipo.sigla + \
             ' - ' + materia.tipo.descricao
         dic_votacao["num_ordem"] = votacao.numero_ordem
-        dic_votacao["id_materia"] = str(
-            materia.numero) + "/" + str(materia.ano)
+        dic_votacao["id_materia"] = materia.id
+        dic_votacao["epigrafe_materia"] = (materia.tipo.sigla + ' ' +
+                                           str(materia.numero) + '/' +
+                                           str(materia.ano))
+
         dic_votacao["txt_ementa"] = materia.ementa
         dic_votacao["ordem_observacao"] = votacao.observacao
 
@@ -1483,13 +1491,7 @@ def relatorio_sessao_plenaria_pdf(request, pk):
             "data": dt.strftime(timezone.localtime(), "%d/%m/%Y %H:%M:%S")
         })
 
-    info = "Resumo da {}ª Reunião {} \
-                da<br>{}ª Sessão Legislativa da {} \
-                Legislatura".format(inf_basicas_dic['num_sessao_plen'],
-                                    inf_basicas_dic['nom_sessao'],
-                                    inf_basicas_dic['num_sessao_leg'],
-                                    inf_basicas_dic['num_legislatura']
-                                    )
+    info = f"Resumo da {inf_basicas_dic['sessao_str']}"
 
     html_header = render_to_string(
         'relatorios/header.html',
@@ -1549,13 +1551,7 @@ def relatorio_pauta_sessao(request, pk):
             "data": dt.strftime(timezone.localtime(), "%d/%m/%Y %H:%M:%S")
         })
 
-    info = "Pauta da {}ª Reunião {} \
-                da<br>{}ª Sessão Legislativa da {} \
-                Legislatura".format(inf_basicas_dic['num_sessao_plen'],
-                                    inf_basicas_dic['nom_sessao'],
-                                    inf_basicas_dic['num_sessao_leg'],
-                                    inf_basicas_dic['num_legislatura']
-                                    )
+    info = f"Pauta da {inf_basicas_dic['sessao_str']}"
 
     html_header = render_to_string(
         'relatorios/header.html',

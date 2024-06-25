@@ -1,4 +1,4 @@
-{% load static %}
+{% load static common_cmj_tags %}
 <!DOCTYPE html>
 <html lang="pt-br">
 <meta charset="utf-8"></meta>
@@ -40,7 +40,11 @@
         <tr>
           <td style="width: 5cm">
             <dl>
-              <dt><b>{{materia.num_ordem}} -</b> {{materia.id_materia}}</dt>
+              <dt>
+                <a href="{{"SITE_URL"|settings_key_filter}}{% url 'sapl.materia:materialegislativa_detail' materia.id_materia %}">
+                  <b>{{materia.num_ordem}} - {{materia.epigrafe_materia}}</b>
+                </a>
+              </dt>
               <dt><b>Turno:</b> {{materia.des_turno}}</dt>
               <dt><b>{{materia.num_autores}}:</b> {{materia.nom_autor}}</dt>
             </dl>
@@ -68,7 +72,11 @@
         <tr>
           <td style="width: 5cm">
             <dl>
-              <dt><b>{{materia.num_ordem}}</b> - {{materia.id_materia}}</dt>
+              <dt>
+                <a href="{{"SITE_URL"|settings_key_filter}}{% url 'sapl.materia:materialegislativa_detail' materia.id_materia %}">
+                  <b>{{materia.num_ordem}} - {{materia.epigrafe_materia}}</b>
+                </a>
+              </dt>
               <dt><b>Turno:</b> {{materia.des_turno}}</dt>
               <dt><b>{{materia.num_autores}}:</b> {{materia.nom_autor}}</dt>
             </dl>
