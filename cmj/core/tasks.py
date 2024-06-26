@@ -56,6 +56,9 @@ def send_telegram_sigad_documento(pk):
     if not instance:
         return
 
+    if 'banco-de-imagens' in instance.slug:
+        return
+
     md = instance.metadata
 
     if not md:
