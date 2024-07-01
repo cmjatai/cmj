@@ -1,0 +1,100 @@
+{% load static common_cmj_tags %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<meta charset="utf-8"></meta>
+<head>
+  <title>Pauta da Sessão Plenária</title>
+  <style>
+    {% include "css/base.css" %}
+    {% include "css/relatorio.css" %}
+    @page {
+      @bottom-right {
+        content: "Página " counter(page);
+      }
+      @bottom-center {
+        content: "{{rodape|safe}}";
+      }
+      @bottom-left {
+        content: "{{data}}";
+      }
+    }
+  </style>
+</head>
+<body>
+  <h2 class="gray-title">Informações Básicas</h2>
+  <p><b>Tipo da Sessão:</b> {{inf_basicas_dic.nom_sessao}}</p>
+  <p><b>Abertura:</b> {{inf_basicas_dic.dat_inicio_sessao}} - {{inf_basicas_dic.hr_inicio_sessao}}</p>
+  <p><b>Encerramento:</b> {{inf_basicas_dic.dat_fim_sessao}} - {{inf_basicas_dic.hr_fim_sessao}}</p>
+
+  <h2 class="gray-title">Matérias do Expediente</h2>
+  <table class="grayTable">
+    <thead>
+      <tr>
+        <th>Matéria</th>
+        <th>Ementa</th>
+        <th>Tramitação Pautada</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for materia in lst_expediente_materia%}
+        <tr>
+          <td style="width: 5cm">
+            <dl>
+              <dt>
+                <a href="{{"SITE_URL"|settings_key_filter}}{% url 'sapl.materia:materialegislativa_detail' materia.id_materia %}">
+                  <b>{{materia.num_ordem}} - {{materia.epigrafe_materia}}</b>
+                </a>
+              </dt>
+              <dt><b>Turno:</b> {{materia.des_turno}}</dt>
+              <dt><b>{{materia.num_autores}}:</b> {{materia.nom_autor}}</dt>
+            </dl>
+          </td>
+          <td>{{ materia.txt_ementa|safe }}</td>
+          <td style="width: 5cm">
+            {{materia.des_situacao|safe}}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h2 class="gray-title">Matérias da Ordem do Dia</h2>
+  <table class="grayTable">
+    <thead>
+      <tr>
+        <th>Matéria</th>
+        <th>Ementa</th>
+        <th>Tramitação Pautada</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for materia in lst_votacao%}
+        <tr>
+          <td style="width: 5cm">
+            <dl>
+              <dt>
+                <a href="{{"SITE_URL"|settings_key_filter}}{% url 'sapl.materia:materialegislativa_detail' materia.id_materia %}">
+                  <b>{{materia.num_ordem}} - {{materia.epigrafe_materia}}</b>
+                </a>
+              </dt>
+              <dt><b>Turno:</b> {{materia.des_turno}}</dt>
+              <dt><b>{{materia.num_autores}}:</b> {{materia.nom_autor}}</dt>
+            </dl>
+          </td>
+          <td><div>{{materia.txt_ementa|safe}}</div>
+            {% for anexada in materia.materia.anexadas.all %}
+                {% if forloop.first %}
+                  <strong>Matérias Anexadas:</strong><br>
+                {% endif %}
+                - {{anexada}}<br>
+            {% endfor %}
+          </td>
+          <td style="width:5cm; text-align: left;">
+            {{materia.des_situacao|safe}}
+            </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>

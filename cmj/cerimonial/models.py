@@ -1,5 +1,6 @@
-
 from django.contrib.auth.models import Group
+from django.contrib.postgres.fields.jsonb import JSONField
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models.deletion import SET_NULL, PROTECT, CASCADE
 from django.utils import timezone, formats
@@ -445,6 +446,7 @@ class EmailPerfil(Email):
         verbose_name_plural = _("Email's do Perfil")
         ordering = ['id']
 
+
 class Dependente(CmjAuditoriaModelMixin):
 
     parentesco = models.ForeignKey(Parentesco,
@@ -596,6 +598,7 @@ class LocalTrabalhoPerfil(LocalTrabalho):
         verbose_name_plural = _('Locais de Trabalho do Perfil')
         ordering = ['id']
 
+
 class Endereco(CmjAuditoriaModelMixin):
     contato = models.ForeignKey(Contato,
                                 verbose_name=_('Contato'),
@@ -685,6 +688,7 @@ class EnderecoPerfil(Endereco):
         verbose_name = _('Endereço do Perfil')
         verbose_name_plural = _('Endereços do Perfil')
         ordering = ['id']
+
 
 class FiliacaoPartidaria(CmjAuditoriaModelMixin):
     contato = models.ForeignKey(Contato,
@@ -830,6 +834,7 @@ class ProcessoContato(Processo):
         verbose_name_plural = _('Processos')
         ordering = ['id']
 
+
 class GrupoDeContatos(CmjAuditoriaModelMixin):
 
     nome = models.CharField(max_length=100,
@@ -857,6 +862,12 @@ class GrupoDeContatos(CmjAuditoriaModelMixin):
 
 
 class Visitante(CmjAuditoriaModelMixin):
+
+    FIELDFILE_NAME = ('fotografia',)
+
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
 
     nome = models.CharField(max_length=100, verbose_name=_('Nome'))
 
@@ -910,6 +921,12 @@ class Visitante(CmjAuditoriaModelMixin):
 
 
 class Visita(CmjAuditoriaModelMixin):
+
+    FIELDFILE_NAME = ('fotografia',)
+
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
 
     visitante = models.ForeignKey(
         Visitante,

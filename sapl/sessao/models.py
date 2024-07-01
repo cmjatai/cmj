@@ -16,7 +16,7 @@ from cmj.diarios.models import DiarioOficial, VinculoDocDiarioOficial
 from cmj.mixins import CmjChoices
 from cmj.videos.models import VideoParte
 from sapl.base.models import Autor
-from sapl.materia.models import MateriaLegislativa
+from sapl.materia.models import MateriaLegislativa, Tramitacao
 from sapl.parlamentares.models import (CargoMesa, Legislatura, Parlamentar,
                                        Partido, SessaoLegislativa)
 from sapl.utils import (YES_NO_CHOICES, SaplGenericRelation,
@@ -399,11 +399,20 @@ class AbstractOrdemDia(models.Model):
         (4, 'leitura', 'Leitura'),
     )
 
-    sessao_plenaria = models.ForeignKey(SessaoPlenaria,
-                                        on_delete=models.CASCADE)
-    materia = models.ForeignKey(MateriaLegislativa,
-                                on_delete=models.PROTECT,
-                                verbose_name=_('Matéria'))
+    sessao_plenaria = models.ForeignKey(
+        SessaoPlenaria,
+        on_delete=models.CASCADE)
+    materia = models.ForeignKey(
+        MateriaLegislativa,
+        on_delete=models.PROTECT,
+        verbose_name=_('Matéria'))
+    tramitacao = models.ForeignKey(
+        Tramitacao,
+        on_delete=models.PROTECT,
+        verbose_name=_('Situação quando pautada'),
+        blank=True,
+        default='',
+        null=True)
     data_ordem = models.DateField(verbose_name=_('Data da Sessão'))
     observacao = models.TextField(
         blank=True, verbose_name=_('Observação'))
@@ -575,7 +584,14 @@ class OradorOrdemDia(AbstractOrador):  # OradoresOrdemDia
         ordering = ['id']
 
 
+class OrdemDiaManager(models.Manager):
+    def order_by_numero_ordem(self):
+        return self.get_queryset().order_by('numero_ordem')
+
+
 class OrdemDia(AbstractOrdemDia):
+
+    objects = OrdemDiaManager()
 
     parent = models.ForeignKey('self',
                                blank=True, null=True, default=None,

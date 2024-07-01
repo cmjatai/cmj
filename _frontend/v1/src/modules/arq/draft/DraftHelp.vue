@@ -30,7 +30,7 @@
     que seria:
     <ul>
       <li>"PDF -> PDF/A-2b" - do PDF em específico.</li>
-      <li>"Docompor" - que decompõe um PDF de várias páginas em vários PDFs de uma página.</li>
+      <li>"Decompor" - que decompõe um PDF de várias páginas em vários PDFs de uma página.</li>
       <li>"Excluir" - que exclui apenas o PDF em edição.</li>
     </ul>
     <strong>

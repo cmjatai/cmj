@@ -21,7 +21,8 @@ from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, 
     PermissionDenied
 from django.db.models import Max, Q
 from django.http import HttpResponse, JsonResponse
-from django.http.response import Http404, HttpResponseRedirect
+from django.http.response import Http404, HttpResponseRedirect,\
+    HttpResponsePermanentRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.urls.base import reverse
 from django.utils import formats, timezone
@@ -54,6 +55,7 @@ from sapl.crispy_layout_mixin import SaplFormLayout, form_actions
 from sapl.crud.base import (RP_DETAIL, RP_LIST, Crud, CrudAux,
                             MasterDetailCrud,
                             PermissionRequiredForAppCrudMixin, make_pagination)
+from sapl.materia.apps import AppConfig
 from sapl.materia.forms import (AnexadaForm, AutoriaForm,
                                 AutoriaMultiCreateForm,
                                 ConfirmarProposicaoForm,
@@ -93,6 +95,7 @@ from .models import (AcompanhamentoMateria, Anexada, AssuntoMateria, Autoria,
                      RegimeTramitacao, Relatoria, StatusTramitacao,
                      TipoDocumento, TipoFimRelatoria, TipoMateriaLegislativa,
                      TipoProposicao, Tramitacao, UnidadeTramitacao)
+
 
 logger = logging.getLogger(__name__)
 
@@ -951,6 +954,16 @@ class ProposicaoCrud(Crud):
                             not p.texto_articulado.exists():
                         msg_error = _('Proposição não possui nenhum tipo de '
                                       'Texto associado.')
+                    elif p.tipo.exige_assinatura_digital and \
+                            p.metadata.get(
+                                'signs', {}
+                            ).get(
+                                'texto_original', {}
+                            ).get(
+                                'running_extraction', False
+                            ):
+                        msg_error = _(
+                            'Assinaturas Eletrônicas em processo de extração. Aguarde a conclusão para posterior envio...')
                     elif p.tipo.exige_assinatura_digital and \
                             (
                                 not p.metadata.get('signs', {}) or
@@ -2018,8 +2031,7 @@ class MateriaLegislativaCrud(Crud):
 
         @property
         def search_url(self):
-            namespace = self.model._meta.app_config.name
-            return reverse('%s:%s' % (namespace, 'pesquisar_materia'))
+            return reverse('cmj.search:materia_haystack_search')
 
         @property
         def sub_title(self):
@@ -2089,10 +2101,6 @@ class MateriaLegislativaCrud(Crud):
                     anexada.save()
 
             return super().form_valid(form)
-
-        @property
-        def cancel_url(self):
-            return self.search_url
 
     class DeleteView(CheckCheckMixin, Crud.DeleteView):
 
@@ -2370,8 +2378,7 @@ class MateriaLegislativaCrud(Crud):
     class ListView(Crud.ListView, RedirectView):
 
         def get_redirect_url(self, *args, **kwargs):
-            namespace = self.model._meta.app_config.name
-            return reverse('%s:%s' % (namespace, 'pesquisar_materia'))
+            return reverse('cmj.search:materia_haystack_search')
 
         def get(self, request, *args, **kwargs):
             return RedirectView.get(self, request, *args, **kwargs)
@@ -2491,6 +2498,7 @@ class MateriaLegislativaPesquisaView(AudigLogFilterMixin, MultiFormatOutputMixin
     model = MateriaLegislativa
     filterset_class = MateriaLegislativaFilterSet
     paginate_by = 50
+    app_label = AppConfig.label
 
     fields_base_report = [
         'id', 'ano', 'numero', 'tipo__sigla', 'tipo__descricao', 'autoria__autor__nome', 'texto_original', 'ementa'
@@ -2507,6 +2515,16 @@ class MateriaLegislativaPesquisaView(AudigLogFilterMixin, MultiFormatOutputMixin
     def hook_texto_original(self, obj):
         id = obj["id"] if isinstance(obj, dict) else obj.id
         return f'{settings.SITE_URL}/materia/{id}'
+
+    def render_to_response(self, context, **response_kwargs):
+
+        if not context['show_results'] and \
+                not self.request.user.is_superuser and \
+                self.app_label in __name__:
+            return HttpResponsePermanentRedirect(
+                reverse('cmj.search:materia_haystack_search'))
+
+        return MultiFormatOutputMixin.render_to_response(self, context, **response_kwargs)
 
     def get_filterset_kwargs(self, filterset_class):
         super().get_filterset_kwargs(filterset_class)

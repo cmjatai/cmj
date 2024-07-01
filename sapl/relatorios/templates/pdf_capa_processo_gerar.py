@@ -10,7 +10,7 @@ import time
 
 from sapl.utils import xstr
 
-from trml2pdf import parseString
+from sapl.utils import parseString
 
 
 def paraStyle():

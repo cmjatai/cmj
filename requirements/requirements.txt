@@ -8,12 +8,13 @@ django-image-cropping==1.2.0
 django-model-utils==4.0.0
 drf-spectacular==0.24.2
 django-webpack4-loader
-djangorestframework==3.12.4
+djangorestframework==3.15.2
 python-telegram-bot==20.1
 
 XlsxWriter==3.2.0
 
-ocrmypdf==14.4.0
+ocrmypdf==14.4.0 # versões acima precisam do ghostscript acima de 9.53.3
+pikepdf==8.15.1
 
 dj-database-url==0.5.0
 easy-thumbnails==2.8.5
@@ -40,14 +41,14 @@ daphne==3.0.2
 channels==3.0.5
 channels_redis==3.4.1
 redis==5.0.1
-gunicorn==21.2.0
+gunicorn==22.0.0
 
 python-dateutil==2.8.2
 
 
 jedi==0.17.2
 pdfrw
-Pillow==10.2.0
+Pillow==10.3.0
 psycopg2-binary==2.8.5
 pyoai==2.5.0
 pypdf4==1.27.0
@@ -56,18 +57,17 @@ python-decouple==3.1
 python-magic==0.4.18
 pytz==2021.3
 pyyaml==6.0.1
-requests==2.31.0
+requests==2.32.0
 social-auth-app-django==5.4.1
 unipath==1.1
 WeasyPrint==51
 qrcode
 reportlab==3.6.13
 trml2pdf
-#html5lib==0.999999
 kazoo==2.8.0
-
 pymupdf==1.22.5
 
+python-docx=1.1.2
 
 ipython
 

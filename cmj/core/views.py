@@ -737,6 +737,10 @@ class MediaPublicView(View):
     def get(self, request, *args, **kwargs):
 
         path = kwargs['path']
+
+        if 'private' in path:
+            raise Http404
+
         if settings.DEBUG:
             return view_static_server(
                 request,

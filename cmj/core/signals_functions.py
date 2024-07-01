@@ -3,14 +3,12 @@ import inspect
 import json
 import logging
 
-from PyPDF4.pdf import PdfFileReader
 from asgiref.sync import async_to_sync
 from asn1crypto import cms
 from channels.layers import get_channel_layer
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core import serializers
-from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.mail.message import EmailMultiAlternatives
 from django.template import loader
 from django.utils import timezone
@@ -266,257 +264,28 @@ def send_signal_for_websocket_time_refresh(inst, **kwargs):
                 }
             )
         except Exception as e:
-            logger.info(_("Erro na comunicação com o backend do redis. "
-                          "Certifique se possuir um servidor de redis "
-                          "ativo funcionando como configurado em "
-                          "CHANNEL_LAYERS"))
+            logger.error(_("Erro na comunicação com o backend do redis. "
+                           "Certifique se possuir um servidor de redis "
+                           "ativo funcionando como configurado em "
+                           "CHANNEL_LAYERS"))
 
 
-def signed_files_extraction_function(sender, instance, **kwargs):
-
-    def run_signed_name_and_date_via_fields(fields):
-        signs = []
-
-        for key, field in fields.items():
-
-            if '/FT' not in field and field['/FT'] != '/Sig':
-                continue
-            if '/V' not in field:
-                continue
-
-            content_sign = field['/V']['/Contents']
-            nome = 'Nome do assinante não localizado.'
-            oname = ''
-            try:
-                info = cms.ContentInfo.load(content_sign)
-                signed_data = info['content']
-                oun_old = []
-                for cert in signed_data['certificates']:
-                    subject = cert.native['tbs_certificate']['subject']
-                    issuer = cert.native['tbs_certificate']['issuer']
-                    oname = issuer.get('organization_name', '')
-
-                    if oname == 'Gov-Br':
-                        nome = subject['common_name'].split(':')[0]
-                        continue
-
-                    oun = subject['organizational_unit_name']
-
-                    if isinstance(oun, str):
-                        continue
-
-                    if len(oun) > len(oun_old):
-                        oun_old = oun
-                        nome = subject['common_name'].split(':')[0]
-
-                    if oun and isinstance(oun, list) and len(oun) == 4:
-                        oname += ' - ' + oun[3]
-                        break
-
-            except:
-                if '/Name' in field['/V']:
-                    nome = field['/V']['/Name']
-
-            fd = None
-            try:
-                data = str(field['/V']['/M'])
-
-                if 'D:' not in data:
-                    data = None
-                else:
-                    if not data.endswith('Z'):
-                        data = data.replace('Z', '+')
-                    data = data.replace("'", '')
-
-                    fd = datetime.strptime(data[2:], '%Y%m%d%H%M%S%z')
-            except:
-                pass
-
-            signs.append((nome, [fd, oname]))
-
-        return signs
-
-    def run_signed_name_and_date_extract(file):
-        signs = []
-        fields = {}
-        pdfdata = file.read()
-
-        # se não tem byterange então não é assinado
-        byterange = []
-        n = -1
-        while True:
-            n = pdfdata.find(b"/ByteRange", n + 1)
-            if n == -1:
-                break
-            byterange.append(n)
-
-        if not byterange:
-            return signs
-
-        # tenta extrair via /Fields
-        try:
-            pdf = PdfFileReader(file)
-            fields = pdf.getFields()
-        except Exception as e:
-            try:
-                pdf = PdfFileReader(file, strict=False)
-                fields = pdf.getFields()
-            except Exception as ee:
-                fields = ee
-
-        try:
-            # se a extração via /Fields ocorrer sem erros e forem capturadas
-            # tantas assinaturas quanto byteranges
-            if isinstance(fields, dict):
-                signs = run_signed_name_and_date_via_fields(fields)
-                if len(signs) == len(byterange):
-                    return signs
-
-            for n in byterange:
-
-                start = pdfdata.find(b"[", n)
-                stop = pdfdata.find(b"]", start)
-                assert n != -1 and start != -1 and stop != -1
-                n += 1
-
-                br = [int(i, 10) for i in pdfdata[start + 1: stop].split()]
-                contents = pdfdata[br[0] + br[1] + 1: br[2] - 1]
-                bcontents = bytes.fromhex(contents.decode("utf8"))
-                data1 = pdfdata[br[0]: br[0] + br[1]]
-                data2 = pdfdata[br[2]: br[2] + br[3]]
-                #signedData = data1 + data2
-
-                nome = 'Nome do assinante não localizado.'
-                oname = ''
-                try:
-                    info = cms.ContentInfo.load(bcontents)
-                    signed_data = info['content']
-
-                    oun_old = []
-                    for cert in signed_data['certificates']:
-                        subject = cert.native['tbs_certificate']['subject']
-                        issuer = cert.native['tbs_certificate']['issuer']
-                        oname = issuer.get('organization_name', '')
-
-                        if oname == 'Gov-Br':
-                            nome = subject['common_name'].split(':')[0]
-                            continue
-
-                        oun = subject['organizational_unit_name']
-
-                        if isinstance(oun, str):
-                            continue
-
-                        if len(oun) > len(oun_old):
-                            oun_old = oun
-                            nome = subject['common_name'].split(':')[0]
-
-                        if oun and isinstance(oun, list) and len(oun) == 4:
-                            oname += ' - ' + oun[3]
-                            break
-
-                except Exception as e:
-                    pass
-
-                fd = None
-                signs.append((nome, [fd, oname]))
-        except Exception as e:
-            pass
-
-        return signs
-
-    def signed_name_and_date_extract(file):
-
-        try:
-            signs = run_signed_name_and_date_extract(file)
-        except Exception as e:
-            return {}
-
-        signs = sorted(signs, key=lambda sign: (
-            sign[0], sign[1][1], sign[1][0]))
-
-        signs_dict = {}
-
-        for s in signs:
-            if s[0] not in signs_dict or 'ICP' in s[1][1] and 'ICP' not in signs_dict[s[0]][1]:
-                signs_dict[s[0]] = s[1]
-
-        signs = sorted(signs_dict.items(), key=lambda sign: (
-            sign[0], sign[1][1], sign[1][0]))
-
-        sr = []
-
-        for s in signs:
-            tt = s[0].title().split(' ')
-            for idx, t in enumerate(tt):
-                if t in ('Dos', 'De', 'Da', 'Do', 'Das', 'E'):
-                    tt[idx] = t.lower()
-            sr.append((' '.join(tt), s[1]))
-
-        signs = sr
-
-        meta_signs = {
-            'signs': [],
-            'hom': []
-        }
-
-        for s in signs:
-            cn = settings.CERT_PRIVATE_KEY_NAME
-            meta_signs['hom' if s[0] == cn else 'signs'].append(s)
-        return meta_signs
+def signed_files_extraction_post_save_signal_function(sender, instance, **kwargs):
 
     if not hasattr(instance, 'FIELDFILE_NAME') or not hasattr(instance, 'metadata'):
         return
 
-    metadata = instance.metadata
-    for fn in instance.FIELDFILE_NAME:  # fn -> field_name
-        ff = getattr(instance, fn)  # ff -> file_field
+    params_tasks = (
+        sender._meta.app_label,
+        sender._meta.model_name,
+        instance.pk
+    )
 
-        if metadata and 'signs' in metadata and \
-                        fn in metadata['signs'] and\
-                        metadata['signs'][fn]:
-            metadata['signs'][fn] = {}
-
-        if not ff:
-            continue
-
-        try:
-            file = ff.file.file
-            meta_signs = {}
-            if not isinstance(ff.file, InMemoryUploadedFile):
-                original_absolute_path = ff.original_path
-                with open(original_absolute_path, "rb") as file:
-                    meta_signs = signed_name_and_date_extract(
-                        file
-                    )
-                    file.close()
-
-                absolute_path = ff.path
-                with open(absolute_path, "rb") as file:
-                    sign_hom = signed_name_and_date_extract(
-                        file
-                    )
-                    file.close()
-                    meta_signs['hom'] = sign_hom['hom']
-
-            else:
-                file.seek(0)
-                meta_signs = signed_name_and_date_extract(
-                    file
-                )
-
-            if not meta_signs:
-                continue
-
-            if not metadata:
-                metadata = {'signs': {}}
-
-            if 'signs' not in metadata:
-                metadata['signs'] = {}
-
-            metadata['signs'][fn] = meta_signs
-        except Exception as e:
-            # print(e)
-            pass
-
-    instance.metadata = metadata
+    if not settings.DEBUG or (
+            settings.DEBUG and settings.FOLDER_DEBUG_CONTAINER == settings.PROJECT_DIR):
+        tasks.signed_files_extraction.apply_async(
+            params_tasks,
+            countdown=3
+        )
+    else:
+        tasks.task_signed_files_extraction_function(*params_tasks)

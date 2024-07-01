@@ -18,7 +18,6 @@ from cmj.core.views import CepCrud, RegiaoMunicipalCrud, DistritoCrud,\
 from cmj.core.views_auth import CmjUserChangeView, CmjLoginView,\
     UserCrud, CmjPasswordResetView, CmjPasswordResetEncaminhadoView,\
     CmjPasswordResetConfirmView, CmjPasswordResetCompleteView
-from cmj.core.views_search import CmjSearchView
 
 from .apps import AppConfig
 
@@ -55,9 +54,6 @@ user_urlpatterns = [
 
     url(r'^template/(?P<template_name>[^/]+)$',
         template_render, name='template_render'),
-
-    url(r'^sistema/search/', CmjSearchView(), name='haystack_search'),
-
 ]
 
 if settings.DEBUG:

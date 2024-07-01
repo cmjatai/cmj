@@ -503,6 +503,7 @@ def remove_html_comments(text):
 def get_sessao_plenaria(sessao, casa):
 
     inf_basicas_dic = {}
+    inf_basicas_dic["sessao_str"] = str(sessao)
     inf_basicas_dic["num_sessao_plen"] = str(sessao.numero)
     inf_basicas_dic["nom_sessao"] = sessao.tipo.nome
     inf_basicas_dic["num_legislatura"] = str(sessao.legislatura)
@@ -615,16 +616,19 @@ def get_sessao_plenaria(sessao, casa):
     # Lista das matérias do Expediente, incluindo o resultado das votacoes
     lst_expediente_materia = []
     for expediente_materia in ExpedienteMateria.objects.filter(
-            sessao_plenaria=sessao).order_by('numero_ordem'):
+        sessao_plenaria=sessao,
+        parent__isnull=True
+    ).order_by('numero_ordem', 'materia', 'resultado'):
         # seleciona os detalhes de uma matéria
         materia = expediente_materia.materia
         dic_expediente_materia = {}
         dic_expediente_materia["num_ordem"] = expediente_materia.numero_ordem
-        dic_expediente_materia["id_materia"] = (materia.tipo.sigla + ' ' +
-                                                # materia.tipo.descricao + ' '
-                                                # +
-                                                str(materia.numero) + '/' +
-                                                str(materia.ano))
+        dic_expediente_materia["id_materia"] = materia.id
+        dic_expediente_materia["epigrafe_materia"] = (materia.tipo.sigla + ' ' +
+                                                      # materia.tipo.descricao + ' '
+                                                      # +
+                                                      str(materia.numero) + '/' +
+                                                      str(materia.ano))
         dic_expediente_materia["des_numeracao"] = ' '
 
         numeracao = Numeracao.objects.filter(
@@ -669,8 +673,7 @@ def get_sessao_plenaria(sessao, casa):
                 else:
                     dic_expediente_materia["nom_resultado"] = (
                         i.tipo_resultado_votacao.nome)
-                    dic_expediente_materia["votacao_observacao"] = (
-                        i.observacao)
+                    dic_expediente_materia["votacao_observacao"] = i.observacao
         else:
             dic_expediente_materia["nom_resultado"] = 'Matéria não {}'.format(
                 'Lida' if expediente_materia.tipo_votacao == LEITURA else 'Votada')
@@ -737,15 +740,19 @@ def get_sessao_plenaria(sessao, casa):
     # Lista das matérias da Ordem do Dia, incluindo o resultado das votacoes
     lst_votacao = []
     for votacao in OrdemDia.objects.filter(
-            sessao_plenaria=sessao,
-            parent__isnull=True).order_by('numero_ordem'):
+        sessao_plenaria=sessao,
+        parent__isnull=True
+    ).order_by('numero_ordem', 'materia', 'resultado'):
         # seleciona os detalhes de uma matéria
         materia = votacao.materia
         dic_votacao = {}
         dic_votacao["nom_resultado"] = ''
         dic_votacao["num_ordem"] = votacao.numero_ordem
         dic_votacao["materia"] = votacao.materia
-        dic_votacao["id_materia"] = (
+
+        dic_votacao["id_materia"] = materia.id
+
+        dic_votacao["epigrafe_materia"] = (
             materia.tipo.sigla + ' ' +
             # materia.tipo.descricao + ' ' +
             str(materia.numero) + '/' +
@@ -1154,7 +1161,7 @@ def get_etiqueta_protocolos(prots):
     return protocolos
 
 
-def relatorio_pauta_sessao(request, pk):
+def relatorio_pauta_sessao_trml2pdf__deprecated(request, pk):
     '''
         pdf__pauta_sessao_gerar.py
     '''
@@ -1188,6 +1195,7 @@ def relatorio_pauta_sessao(request, pk):
 def get_pauta_sessao(sessao, casa):
 
     inf_basicas_dic = {}
+    inf_basicas_dic["sessao_str"] = str(sessao)
     inf_basicas_dic["nom_sessao"] = sessao.tipo.nome
     inf_basicas_dic["num_sessao_plen"] = sessao.numero
     inf_basicas_dic["num_legislatura"] = sessao.legislatura
@@ -1199,7 +1207,10 @@ def get_pauta_sessao(sessao, casa):
     inf_basicas_dic["nom_camara"] = casa.nome
 
     lst_expediente_materia = []
-    for expediente_materia in ExpedienteMateria.objects.filter(sessao_plenaria=sessao).order_by('numero_ordem'):
+    for expediente_materia in ExpedienteMateria.objects.filter(
+            sessao_plenaria=sessao,
+        parent__isnull=True
+    ).order_by('numero_ordem', 'materia', 'resultado'):
 
         materia = MateriaLegislativa.objects.filter(
             id=expediente_materia.materia.id).first()
@@ -1209,8 +1220,11 @@ def get_pauta_sessao(sessao, casa):
             ' - ' + materia.tipo.descricao
         dic_expediente_materia["num_ordem"] = str(
             expediente_materia.numero_ordem)
-        dic_expediente_materia["id_materia"] = str(
-            materia.numero) + "/" + str(materia.ano)
+        dic_expediente_materia["id_materia"] = materia.id
+        dic_expediente_materia["epigrafe_materia"] = (materia.tipo.sigla + ' ' +
+                                                      str(materia.numero) + '/' +
+                                                      str(materia.ano))
+
         dic_expediente_materia["txt_ementa"] = materia.ementa
         dic_expediente_materia["ordem_observacao"] = str(
             expediente_materia.observacao)
@@ -1234,7 +1248,11 @@ def get_pauta_sessao(sessao, casa):
         else:
             dic_expediente_materia["nom_autor"] = 'Desconhecido'
 
+        tram_expediente = expediente_materia.tramitacao
         turno, tramitacao = get_turno(materia)
+        if tram_expediente:
+            turno = str(tram_expediente.get_turno_display())
+            tramitacao = f'<b>{tram_expediente.status}</b><br><em>{tram_expediente.texto}</em>'
 
         dic_expediente_materia["des_turno"] = turno
         dic_expediente_materia["des_situacao"] = tramitacao
@@ -1243,15 +1261,20 @@ def get_pauta_sessao(sessao, casa):
 
     lst_votacao = []
     for votacao in OrdemDia.objects.filter(
-            sessao_plenaria=sessao).order_by('numero_ordem'):
+        sessao_plenaria=sessao,
+        parent__isnull=True
+    ).order_by('numero_ordem', 'materia', 'resultado'):
         materia = MateriaLegislativa.objects.filter(
             id=votacao.materia.id).first()
         dic_votacao = {}
         dic_votacao["tipo_materia"] = materia.tipo.sigla + \
             ' - ' + materia.tipo.descricao
         dic_votacao["num_ordem"] = votacao.numero_ordem
-        dic_votacao["id_materia"] = str(
-            materia.numero) + "/" + str(materia.ano)
+        dic_votacao["id_materia"] = materia.id
+        dic_votacao["epigrafe_materia"] = (materia.tipo.sigla + ' ' +
+                                           str(materia.numero) + '/' +
+                                           str(materia.ano))
+
         dic_votacao["txt_ementa"] = materia.ementa
         dic_votacao["ordem_observacao"] = votacao.observacao
 
@@ -1262,7 +1285,12 @@ def get_pauta_sessao(sessao, casa):
             dic_votacao["des_numeracao"] = str(
                 numeracao.numero_materia) + '/' + str(numeracao.ano_materia)
 
+        tram_ordem = votacao.tramitacao
         turno, tramitacao = get_turno(materia)
+        if tram_ordem:
+            turno = str(tram_ordem.get_turno_display())
+            tramitacao = f'<b>{tram_ordem.status}</b><br><em>{tram_ordem.texto}</em>'
+
         dic_votacao["des_turno"] = turno
         dic_votacao["des_situacao"] = tramitacao
 
@@ -1284,8 +1312,13 @@ def get_pauta_sessao(sessao, casa):
     expedientes = []
     for e in expediente:
         tipo = e.tipo
+
+        conteudo = e.conteudo.replace('<br />', '\n')
+        conteudo = e.conteudo.replace('<br/>', '\n')
+        conteudo = conteudo.replace('<br>', '\n')
+
         conteudo = re.sub(
-            '&nbsp;', ' ', strip_tags(e.conteudo.replace('<br/>', '\n')))
+            '&nbsp;', ' ', strip_tags(conteudo))
         ex = {'tipo': tipo, 'conteudo': conteudo}
         expedientes.append(ex)
 
@@ -1458,13 +1491,67 @@ def relatorio_sessao_plenaria_pdf(request, pk):
             "data": dt.strftime(timezone.localtime(), "%d/%m/%Y %H:%M:%S")
         })
 
-    info = "Resumo da {}ª Reunião {} \
-                da<br>{}ª Sessão Legislativa da {} \
-                Legislatura".format(inf_basicas_dic['num_sessao_plen'],
-                                    inf_basicas_dic['nom_sessao'],
-                                    inf_basicas_dic['num_sessao_leg'],
-                                    inf_basicas_dic['num_legislatura']
-                                    )
+    info = f"Resumo da {inf_basicas_dic['sessao_str']}"
+
+    html_header = render_to_string(
+        'relatorios/header.html',
+        {
+            "casa": casa,
+            "MEDIA_URL": MEDIA_URL if not settings.DEBUG else '',
+            "logotipo": casa.logotipo,
+            "info": info
+        }
+    )
+
+    pdf_file = make_pdf(
+        base_url=base_url, main_template=html_template, header_template=html_header)
+
+    response = HttpResponse(content_type='application/pdf;')
+    response['Content-Disposition'] = 'inline; filename=relatorio.pdf'
+    response['Content-Transfer-Encoding'] = 'binary'
+    response.write(pdf_file)
+
+    return response
+
+
+def relatorio_pauta_sessao(request, pk):
+
+    base_url = settings.MEDIA_ROOT if settings.DEBUG else request.build_absolute_uri()
+    #base_url = request.build_absolute_uri()
+    logger = logging.getLogger(__name__)
+    username = request.user.username
+    casa = CasaLegislativa.objects.first()
+    if not casa:
+        raise Http404
+
+    rodape = get_rodape(casa)
+    rodape = ' - '.join(rodape)
+
+    try:
+        logger.debug("user=" + username +
+                     ". Tentando obter SessaoPlenaria com id={}.".format(pk))
+        sessao = SessaoPlenaria.objects.get(id=pk)
+    except ObjectDoesNotExist as e:
+        logger.error("user=" + username +
+                     ". Essa SessaoPlenaria não existe (pk={}). ".format(pk) + str(e))
+        raise Http404('Essa página não existe')
+
+    (lst_expediente_materia,
+     lst_votacao,
+     inf_basicas_dic,
+     expedientes) = get_pauta_sessao(sessao, casa)
+
+    html_template = render_to_string(
+        'relatorios/relatorio_pauta_sessao.html',
+        {
+            "inf_basicas_dic": inf_basicas_dic,
+            "lst_expediente_materia": lst_expediente_materia,
+            "lst_votacao": lst_votacao,
+            "rodape": rodape,
+            "data": dt.strftime(timezone.localtime(), "%d/%m/%Y %H:%M:%S")
+        })
+
+    info = f"Pauta da {inf_basicas_dic['sessao_str']}"
 
     html_header = render_to_string(
         'relatorios/header.html',

@@ -1,12 +1,8 @@
-##parameters=rodape_dic, sessao='', imagem, inf_basicas_dic, lst_votacao, lst_expediente_materia
-"""Script para geração do PDF das pautas das sessoes plenarias
-   Autor Luciano De Fázio - 06/11/2012
-   versão: 1.0
-"""
 import os
 import time
 
-from trml2pdf import parseString
+from bs4 import BeautifulSoup
+from sapl.utils import parseString
 
 
 def cabecalho(inf_basicas_dic, imagem):
@@ -119,10 +115,15 @@ def build_expedientes(expedientes):
     tmp = ""
     tmp += '\t\t<para style="P1">Expedientes</para>\n'
     for e in expedientes:
+        soup = BeautifulSoup(e["conteudo"])
+        conteudo = soup.string
+
+        conteudo = conteudo.replace('\n', '<br/>')
+
         tmp += '\t\t\t<para style="P2" spaceAfter="5"><b>{}:</b></para>'.format(
             e['tipo'])
         tmp += '\t\t\t  <para style="P2" spaceAfter="5"><p>{}</p></para>'.format(
-            e['conteudo'])
+            conteudo)
 
     return tmp
 

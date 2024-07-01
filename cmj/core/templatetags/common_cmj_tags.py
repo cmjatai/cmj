@@ -62,6 +62,7 @@ def transmissao_ao_vivo(obj):
         json__snippet__liveBroadcastContent__exact='live'
     )
 
+
 def get_class(class_string):
     if not hasattr(class_string, '__bases__'):
         class_string = str(class_string)
@@ -460,3 +461,17 @@ def conteudo_protocolado_homologado(protocolo):
         if not homologado:
             return False
     return True
+
+
+@register.filter
+def params_search_to_api(items):
+    gd = {
+        k: v
+        for k, v in items if v and k not in ('tipo_listagem', )
+    }
+    furl = '&'.join(map(lambda kv: f'{kv[0]}={kv[1]}', gd.items()))
+    u = furl.replace('_b=', '=')
+    u = u.replace('_i=', '=')
+    u = u.replace('_is=', '=')
+    u = u.replace('autoria', 'autores')
+    return u

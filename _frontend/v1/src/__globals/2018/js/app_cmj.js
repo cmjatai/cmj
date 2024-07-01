@@ -486,7 +486,7 @@ window.autorModal = function () {
 
         if (data.pagination.total_pages > 1) {
           $('#div-resultado').prepend(
-            '<span><br/>Mostrando 10 primeiros autores relativos a sua busca.<br/></span>'
+            '<span>Mostrando 10 primeiros autores relativos a sua busca.</span>'
           )
         }
 
@@ -514,6 +514,14 @@ window.autorModal = function () {
         })
       })
     })
+
+    const id_autoria__autor__initial = $('#id_autoria__autor').val()
+
+    if (![null, undefined, ''].includes(id_autoria__autor__initial)) {
+      $.get(`/api/base/autor/${id_autoria__autor__initial}/`, function (data) {
+        $('#nome_autor').text(data.nome)
+      })
+    }
   })
 
   /* function get_nome_autor(fieldname) {
@@ -949,7 +957,7 @@ window.Acessibilidade = function () {
             window.location = '/mapa-do-site'
             break
           case 52: // 4
-            window.location = '/sistema/search/'
+            window.location = '/pesquisar/'
             break
           case 53: // 5
             window.location = '#'

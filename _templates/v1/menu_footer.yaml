@@ -15,7 +15,7 @@
     url: /institucional/nossa-jatai
 
   - title: {% trans 'Legislação' %}
-    url: sapl.norma:norma_pesquisa
+    url: cmj.search:norma_haystack_search
   - title: {% trans 'Normas e Códigos de Destaque' %}
     url: sapl.norma:norma_de_destaque
 - title: {% trans 'Parlamentares' %}
@@ -68,7 +68,7 @@
   - title: Sessões Plenárias
     url: /sessao/pesquisar-sessao?data_inicio__year={% now 'Y' %}
   - title: Matérias em tramitação
-    url: /materia/pesquisar-materia?em_tramitacao=1
+    url: /pesquisar/materia?em_tramitacao_b=1
   - title: Diário Oficial
     css_class: head_title
     children:

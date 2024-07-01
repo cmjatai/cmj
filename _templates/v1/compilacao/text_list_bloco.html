@@ -31,7 +31,7 @@
 
           {% endif %}
 
-          <span class="dtxt" id="d{% if not dpt.dispositivo_subsequente_id and dpt.dispositivo_substituido_id %}a{% endif %}{{dpt.pk}}" pks="{{dpt.dispositivo_substituido_id|default:''}}" pk="{{dpt.pk}}">{{ dpt.tipo_dispositivo.texto_prefixo_html|safe }}{%if dpt.texto %}{{ dpt.texto|safe }}{%else%}{%if not dpt.tipo_dispositivo.dispositivo_de_articulacao %}&nbsp;{% endif %}{% endif %}</span>
+          <span class="dtxt" id="d{% if not dpt.dispositivo_subsequente_id and dpt.dispositivo_substituido_id %}a{% endif %}{{dpt.pk}}" pks="{{dpt.dispositivo_substituido_id|default:''}}" pk="{{dpt.pk}}">{{ dpt.tipo_dispositivo.texto_prefixo_html|safe }}{%if dpt.texto %}{{ dpt.render_texto|safe }}{%else%}{%if not dpt.tipo_dispositivo.dispositivo_de_articulacao %}&nbsp;{% endif %}{% endif %}</span>
           {% if dpt.ta_publicado_id %}
             <a class="nota-alteracao" href="{%url 'sapl.compilacao:ta_text' dpt.ta_publicado.pk %}#{{dpt.dispositivo_atualizador_id}}">
               {{ dpt.tipo_dispositivo.nota_automatica_prefixo_html|safe }}
@@ -65,7 +65,7 @@
               {% if cita and cita|lookup:dpt.pk %}
                 {% for vide in cita|lookup:dpt.pk %}
 
-                  {%if not forloop.first %}
+                  {% if not forloop.first %}
                     <li class="bullet">&#8226;</li>
                   {% endif %}
                   <li class="dnli" id="nt{{vide.pk}}">
@@ -104,7 +104,7 @@
                 {% endif %}
 
                 {% for vide in citado|lookup:dpt.pk %}
-                  {%if not forloop.first %}
+                  {% if not forloop.first %}
                     <li class="bullet">&#8226;</li>
                   {% endif %}
                   <li class="dnli" id="nt{{vide.pk}}">
@@ -125,14 +125,14 @@
                   </li>
                 {% endfor %}
               {% endif %}
-              {%if notas and notas|lookup:dpt.pk and cita and cita|lookup:dpt.pk or notas and notas|lookup:dpt.pk and citado and citado|lookup:dpt.pk %}
+              {% if notas and notas|lookup:dpt.pk and cita and cita|lookup:dpt.pk or notas and notas|lookup:dpt.pk and citado and citado|lookup:dpt.pk %}
                 <li class="bullet">&#8226;</li>
               {% endif %}
               {% if notas and notas|lookup:dpt.pk %}
                 {% for nota in notas|lookup:dpt.pk  %}
 
                   {% if user.is_superuser or nota.publicidade == nota.NPUBL or nota.publicidade == nota.NINST and user.is_authenticated or nota.publicidade == nota.NPRIV and nota.owner == user %}
-                    {%if not forloop.first %}
+                    {% if not forloop.first %}
                       <li class="bullet">&#8226;</li>
                     {% endif %}
                     <li class="dnli" id="nt{{nota.pk}}">
@@ -148,30 +148,30 @@
                           {% endif %}
                         {% endif %}
                         <li class="ntipo">{{nota.tipo.nome}}</li>
-                        {% if  user == nota.owner or nota.publicidade != nota.NPUBL %}
+                        {% if user == nota.owner or nota.publicidade != nota.NPUBL %}
                           <li class="bullet">&#8226;</li>
-                          <li class="nowner" title="{% trans 'Criado Por' %}">{%if nota.owner.first_name%}{{nota.owner.first_name}}{%else%}{{nota.owner}}{% endif %}</li>
+                          <li class="nowner" title="{% trans 'Criado Por' %}">{% if nota.owner.first_name %}{{nota.owner.first_name}}{% else %}{{nota.owner}}{% endif %}</li>
                         {% endif %}
                         <li class="bullet">&#8226;</li>
                         <li class="npublicacao" title="{% trans 'Data de Publicação'%}">{{nota.publicacao|date:"d M Y"}}</li>
                       </ul>
 
-                      {%if nota.titulo %}
+                      {% if nota.titulo %}
                         <div class="ntitulo">
-                          {%if nota.url_externa %}<a target="_blank" href="{{nota.url_externa}}">{% endif %}{{nota.titulo}} - {%if nota.url_externa %}</a>{% endif %}
+                          {% if nota.url_externa %}<a target="_blank" href="{{nota.url_externa}}">{% endif %}{{nota.titulo}} - {% if nota.url_externa %}</a>{% endif %}
                         </div>
                       {% endif %}
                       <div class="ntexto">
-                        {%if nota.url_externa %}<a target="_blank" href="{{nota.url_externa}}">{% endif %}{{ nota.texto}}{%if nota.url_externa %}</a>{% endif %}
+                        {% if nota.url_externa %}<a target="_blank" href="{{nota.url_externa}}">{% endif %}{{ nota.texto}}{% if nota.url_externa %}</a>{% endif %}
                       </div>
 
-                      {%comment%}
+                      {% comment %}
                       <ul>
                         <li class="nefetividade" title="{% trans 'Data de Efetividade'%}">{{nota.efetividade|date:"d M Y"}}</li>
                         <li class="bullet">&#8226;</li>
                         <li class="npublicidade">{{nota.get_publicidade_display}}</li>
                       </ul>
-                      {%endcomment%}
+                      {% endcomment %}
                     </li>
                   {% endif %}
                 {% endfor %}
@@ -184,10 +184,10 @@
         <div class="clearfix"></div>
       {% endif%}
     {% endspaceless %}
-    {% if dpt.tipo_dispositivo.dispositivo_de_alteracao%}
-      {%with node=dpt template_name='compilacao/text_list_blocoalteracao.html' %}
-        {%include template_name%}
-      {%endwith%}
+    {% if dpt.tipo_dispositivo.dispositivo_de_alteracao %}
+      {% with node=dpt template_name='compilacao/text_list_blocoalteracao.html' %}
+        {% include template_name%}
+      {% endwith %}
     {% endif%}
     {% set_nivel_old view dpt.nivel %}
   {% endif %}

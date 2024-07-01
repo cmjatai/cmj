@@ -1,4 +1,4 @@
-{% load static %}
+{% load static common_cmj_tags %}
 <!DOCTYPE html>
 <html lang="pt-br">
 <meta charset="utf-8">
@@ -6,44 +6,22 @@
 
 <head>
   <title>Resumo Sessão Plenária</title>
-
   <style>
     {% include "css/base.css" %}
     {% include "css/relatorio.css" %}
     @page {
       @bottom-right {
         content: "Página " counter(page);
-        height: 0.5cm;
-        font-size: 7pt;
       }
       @bottom-center {
-        border-top: 1px solid black;
-        font-size: 6pt;
-        height: 0.5cm;
         content: "{{rodape|safe}}";
-        font-style: italic;
       }
       @bottom-left {
         content: "{{data}}";
-        height: 0.5cm;
-        font-size: 7pt;
       }
     }
-      {% comment %}
-        @top-center {
-          content:  string(title);
-        }
-        header {
-          width: 0;
-          height: 0;
-          visibility: hidden;
-          string-set: title content();
-        }
-      {% endcomment %}
   </style>
-
 </head>
-
 <body>
     <h2 class="gray-title">Informações Básicas</h2>
     <p><b>Tipo da Sessão:</b> {{inf_basicas_dic.nom_sessao}}</p>
@@ -110,15 +88,19 @@
         <tr>
           <td style="width: 5cm">
             <dl>
-              <dt><b>{{materia.num_ordem}} -</b> {{materia.id_materia}}</dt>
+              <dt>
+                <a href="{{"SITE_URL"|settings_key_filter}}{% url 'sapl.materia:materialegislativa_detail' materia.id_materia %}">
+                  <b>{{materia.num_ordem}} - {{materia.epigrafe_materia}}</b>
+                </a>
+              </dt>
               <dt><b>Turno:</b> {{materia.des_turno}}</dt>
               <dt><b>{{materia.num_autores}}:</b> {{materia.nom_autor}}</dt>
             </dl>
           </td>
-          <td>{{materia.txt_ementa}}
-          </td>
-          <td style="width: 4cm">
-            <b><div style="text-align: center;">{{materia.nom_resultado}}</div></b>
+          <td>{{ materia.txt_ementa|safe }}</td>
+          <td style="width: 5cm; text-align: center;">
+            <b>{{ materia.nom_resultado }}</b><br>
+            <em>{{ materia.votacao_observacao }}</em>
           </td>
         </tr>
       {% endfor %}
@@ -159,9 +141,13 @@
         <tbody>
           {% for materia in lst_votacao%}
             <tr>
-              <td style="width: 6cm">
+              <td style="width: 5cm">
                 <dl>
-                  <dt><b>{{materia.num_ordem}}</b> - {{materia.id_materia}}</dt>
+                  <dt>
+                    <a href="{{"SITE_URL"|settings_key_filter}}{% url 'sapl.materia:materialegislativa_detail' materia.id_materia %}">
+                      <b>{{materia.num_ordem}} - {{materia.epigrafe_materia}}</b>
+                    </a>
+                  </dt>
                   <dt><b>Turno:</b> {{materia.des_turno}}</dt>
                   <dt><b>{{materia.num_autores}}:</b> {{materia.nom_autor}}</dt>
                 </dl>
@@ -174,10 +160,10 @@
                     - {{anexada}}<br>
                 {% endfor %}
               </td>
-              <td style="width:4cm; text-align: center;">
+              <td style="width: 5cm; text-align: center;">
                 <b>{{materia.nom_resultado}}</b><br>
                 <em>{{materia.votacao_observacao}}</em>
-                </td>
+              </td>
             </tr>
           {% endfor %}
 

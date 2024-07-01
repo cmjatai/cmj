@@ -174,6 +174,7 @@ class VinculoDocDiarioOficialCrud(MasterDetailCrud):
             i = MasterDetailCrud.CreateView.get_initial(self)
             i.update({
                 'diario': DiarioOficial.objects.get(pk=self.kwargs['pk']),
+                'data_diario': DiarioOficial.objects.get(pk=self.kwargs['pk']).data,
             })
 
             return i
@@ -189,6 +190,7 @@ class VinculoDocDiarioOficialCrud(MasterDetailCrud):
                 'tipo': self.object.content_object.tipo_id,
                 'numero': self.object.content_object.numero,
                 'ano': self.object.content_object.ano,
-                'diario': self.object.diario
+                'diario': self.object.diario,
+                'data_diario': self.object.diario.data
             })
             return i

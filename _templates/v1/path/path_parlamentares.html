@@ -58,7 +58,7 @@
         </div>
       </div>
       <div class="row container-avatar inner-mesa">
-        <div class="tags w-100">Mesa Diretora</div>
+        <div class="tags w-100">Mesa Diretora<span><i> - Saiba mais sobre o parlamentar clicando em sua foto.</i></span></div>
         <div class="inner-parla w-100">
           {% for leg in legislaturas %}
             {% if leg.legislatura == legislatura_ativa %}
@@ -84,6 +84,7 @@
             {% endif %}
           {% endfor %}
         </div>
+
       </div>
     </div>
   </div>
@@ -95,7 +96,7 @@
             {% if sessao.sessao == sessaolegislativa_ativa %}
               {% for parlamentar in sessao.parlamentares.titular %}
                 {% if forloop.first %}
-                  <div class="tags w-100 pl-3">Parlamentares Titulares</div>
+                  <div class="tags w-100 pl-3">Parlamentares Titulares <span><i> - Saiba mais sobre o parlamentar clicando em sua foto.</i></span></div>
                 {% endif %}
                   {% comment %}
                   <a class="avatar avatar3" href="/{{parlamentar.classe_set.first.absolute_slug}}" class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">

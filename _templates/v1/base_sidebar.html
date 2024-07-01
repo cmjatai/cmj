@@ -4,12 +4,12 @@
 <aside>
   <div class="container-aside">
     <div class="box box-search">
-      <a onclick="return false;" class="d-none d-lg-block icon icon-busca-textual" href="{% url 'cmj.core:haystack_search'%}">
+      <a onclick="return false;" class="d-none d-lg-block icon icon-busca-textual" href="{% url 'cmj.search:haystack_search'%}">
       </a>
-      <a class="d-lg-none icon icon-busca-textual" href="{% url 'cmj.core:haystack_search'%}">
+      <a class="d-lg-none icon icon-busca-textual" href="{% url 'cmj.search:haystack_search'%}">
       </a>
       <div class="inner">
-        <a href="{% url 'cmj.core:haystack_search'%}" class="">Pesquisa Textual</a>
+        <a href="{% url 'cmj.search:haystack_search'%}" class="">Pesquisa Geral</a>
       </div>
     </div>
 
@@ -62,12 +62,12 @@
       </div>
     </div>
     <div class="box box-materia">
-      <a onclick="return false;" class="d-none d-lg-block icon icon-atividade-legislativa" href="{% url 'sapl.materia:pesquisar_materia' %}" >
+      <a onclick="return false;" class="d-none d-lg-block icon icon-atividade-legislativa" href="{% url 'cmj.search:materia_haystack_search' %}" >
       </a>
-      <a class="d-lg-none icon icon-atividade-legislativa" href="{% url 'sapl.materia:pesquisar_materia' %}" >
+      <a class="d-lg-none icon icon-atividade-legislativa" href="{% url 'cmj.search:materia_haystack_search' %}" >
       </a>
       <div class="inner">
-        <a href="{% url 'sapl.materia:pesquisar_materia' %}" class="">Matérias Legislativas</a>
+        <a href="{% url 'cmj.search:materia_haystack_search' %}" class="">Matérias Legislativas</a>
           {% comment %}
           <ul class="submenu submenu-materia">
             <li>
@@ -75,32 +75,32 @@
               <ul>
                 {% for tipo in ""|sidebar_tipos_de_materias %}
                   <li>
-                    <a href="{% url 'sapl.materia:pesquisar_materia' %}?tipo={{tipo.pk}}">{{tipo}}</a>
+                    <a href="{% url 'cmj.search:materia_haystack_search' %}?tipo={{tipo.pk}}">{{tipo}}</a>
                   </li>
                 {% endfor %}
 
               </ul>
             </li>
             <li>
-              <a href="{% url 'sapl.materia:pesquisar_materia' %}?em_tramitacao=1">Matérias em tramitação</a>
+              <a href="{% url 'cmj.search:materia_haystack_search' %}?em_tramitacao=1">Matérias em tramitação</a>
             </li>
           </ul>
           {% endcomment %}
       </div>
     </div>
     <div class="box box-norma">
-      <a onclick="return false;" class="d-none d-lg-block icon icon-norma-juridica" href="{% url 'sapl.norma:norma_pesquisa' %}" >
+      <a onclick="return false;" class="d-none d-lg-block icon icon-norma-juridica" href="{% url 'cmj.search:norma_haystack_search' %}" >
       </a>
-      <a class="d-lg-none icon icon-norma-juridica" href="{% url 'sapl.norma:norma_pesquisa' %}" >
+      <a class="d-lg-none icon icon-norma-juridica" href="{% url 'cmj.search:norma_haystack_search' %}" >
       </a>
       <div class="inner">
-        <a href="{% url 'sapl.norma:norma_pesquisa' %}" class="">Legislação Municipal</a>
+        <a href="{% url 'cmj.search:norma_haystack_search' %}" class="">Legislação Municipal</a>
 
         {% comment %}
         <ul>
           {% for tipo in ""|sidebar_tipos_de_normas %}
             <li>
-              <a href="{% url 'sapl.norma:norma_pesquisa' %}?tipo={{tipo.pk}}">{{tipo}}</a>
+              <a href="{% url 'cmj.search:norma_haystack_search' %}?tipo={{tipo.pk}}">{{tipo}}</a>
             </li>
           {% endfor %}
         </ul>

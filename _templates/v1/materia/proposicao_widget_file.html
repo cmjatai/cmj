@@ -31,16 +31,30 @@
       </a>
     </div>
     {% if p.tipo.exige_assinatura_digital %}
-      {% if p.metadata.signs and p.metadata.signs.texto_original.signs or not p.tipo.exige_assinatura_digital %}
-        {% with p.metadata.signs.texto_original.signs as signs %}
-          {% include 'core/sign_widget.html' %}
-        {% endwith %}
+      {% if p.metadata.signs and p.metadata.signs.texto_original.running_extraction  %}
+        <div class="col alert alert-danger running_extraction">
+          <strong>Atenção!!!</strong><br>
+          Assinaturas Eletrônicas em processo de extração. Aguarde a conclusão para posterior envio...
+          <br><small>A página atualizará automaticamente em <i>[ 10 ]</i> segundos.</small>
+        </div>
+      {% elif p.metadata.signs and p.metadata.signs.texto_original.signs  %}
+        &nbsp;
       {% else %}
         <div class="col alert alert-danger">
           <strong>Atenção!!!</strong><br>
           Arquivo não possui assinatura digital. Não é permitido o envio!!!
         </div>
       {% endif %}
+    {% elif not p.metadata.signs.texto_original.signs and not p.data_envio%}
+      <div class="col alert alert-info">
+        <strong>Atenção!!!</strong><br>
+        Assinaturas Eletrônicas em processo de extração. No entanto [{{p.tipo}}] não possui exigência de assinaturas e você já pode enviá-lo.
+      </div>
+    {% endif %}
+    {% if p.metadata.signs and p.metadata.signs.texto_original.signs  %}
+      {% with p.metadata.signs.texto_original.signs as signs %}
+        {% include 'core/sign_widget.html' %}
+      {% endwith %}
     {% endif %}
   </div>
 {% endif %}

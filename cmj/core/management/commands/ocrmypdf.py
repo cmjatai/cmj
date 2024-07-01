@@ -83,6 +83,7 @@ class Command(BaseCommand):
     execucao_noturna = False
 
     models = [
+
         {
             'model': DocumentoAdministrativo,
             'file_field': ('texto_integral',),
@@ -100,16 +101,16 @@ class Command(BaseCommand):
             'years_priority': 0
         },
         {
-            'model': DocumentoAcessorioAdministrativo,
-            'file_field': ('arquivo',),
+            'model': NormaJuridica,
+            'file_field': ('texto_integral',),
             'count': 0,
             'count_base': 2,
             'order_by': '-data',
             'years_priority': 0
         },
         {
-            'model': NormaJuridica,
-            'file_field': ('texto_integral',),
+            'model': DocumentoAcessorioAdministrativo,
+            'file_field': ('arquivo',),
             'count': 0,
             'count_base': 2,
             'order_by': '-data',
@@ -139,7 +140,6 @@ class Command(BaseCommand):
             'order_by': '-data_inicio',
             'years_priority': 0
         },
-
     ]
 
     def delete_itens_tmp_folder(self):
@@ -256,7 +256,7 @@ class Command(BaseCommand):
                     1 if model['order_by'].startswith('-') else 0:]
 
                 params = {
-                    '{}__year__gte'.format(data_field): init.year - model['years_priority']
+                    '{}__year__gte'.format(data_field): init.year - model['years_priority'],
                 }
                 items = model['model'].objects.filter(
                     **params).order_by(model['order_by'])
@@ -304,8 +304,10 @@ class Command(BaseCommand):
                         if hasattr(item, 'metadata'):
                             md = item.metadata
                             if md and 'signs' in md and ff in md['signs']:
-                                if 'hom' in md['signs'][ff] and\
-                                        md['signs'][ff]['hom']:
+                                if ('hom' in md['signs'][ff] and
+                                        md['signs'][ff]['hom']) or \
+                                        ('signs' in md['signs'][ff] and
+                                         md['signs'][ff]['signs']):
                                     continue
 
                         file = getattr(item, ff)
@@ -383,10 +385,10 @@ class Command(BaseCommand):
                                         str(now - init_item)
                                     )
 
-                                if result:
-                                    post_save.send(
-                                        model['model'],
-                                        instance=item, using='default')
+                                # if result:
+                                #    post_save.send(
+                                #        model['model'],
+                                #        instance=item, using='default')
 
                                 self.logger.info(
                                     str(now - init_item) + ' ' +
@@ -426,11 +428,12 @@ class Command(BaseCommand):
             out_path = out_path + '.pdf'
 
         cmd = ["{}/ocrmypdf".format('/'.join(sys.executable.split('/')[:-1])),
-               "--deskew",
+               #"--deskew",
+               "--redo-ocr",
                "-l por",
                "-q",
-               "-j {}".format(3 if self.execucao_noturna else 1),
-               "--output-type pdfa-1",
+               "-j {}".format(8 if self.execucao_noturna else 2),
+               "--output-type pdfa-2",
                in_path, out_path]
 
         try:
@@ -439,8 +442,9 @@ class Command(BaseCommand):
 
             if r is None:
                 return None
-            if not r or r in (2, 6):
+            if r[0] in (0, 2, 6):
                 return True
+            return None
         except:
             return False
 

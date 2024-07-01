@@ -5,7 +5,7 @@
 {% load webpack_static from webpack_loader %}
 
 <div class="d-flex justify-content-between pt-3 d-print-none">
-  <a href="{% url 'sapl.norma:norma_pesquisa' %}" class="btn btn-outline-primary">{% trans 'Fazer nova pesquisa' %}</a>
+  <a href="{% url 'cmj.search:norma_haystack_search' %}" class="btn btn-outline-primary">{% trans 'Fazer nova pesquisa' %}</a>
   <a class="btn btn-outline-primary" href="{% url object|urldetail_content_type:object.content_object object.content_object.pk %}?display" title="Dados Complementares">Dados Complementares</a>
 </div>
 

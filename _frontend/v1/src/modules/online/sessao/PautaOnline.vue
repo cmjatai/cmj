@@ -1,5 +1,6 @@
 <template>
   <div class="pauta-online">
+    <nivel-detalhe></nivel-detalhe>
     <div class="empty-list" v-if="itens.ordemdia_list.length === 0 && init">
         Não existem Itens na Ordem do Dia com seus critérios de busca!
     </div>
@@ -42,11 +43,13 @@
 
 <script>
 import ItemDePauta from './ItemDePauta'
+import NivelDetalhe from './NivelDetalhe'
 export default {
   name: 'pauta-online',
   props: ['sessao'],
   components: {
-    ItemDePauta
+    ItemDePauta,
+    NivelDetalhe
   },
   data () {
     return {

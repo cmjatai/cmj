@@ -5,6 +5,7 @@
    <script type="text/javascript">
     $(document).ready(function(){
 
+      const data_diario = "{{form.data_diario.value|date:"SHORT_DATE_FORMAT"}}"
       $("select[name=tipo], input[name=numero], input[name=ano]").change(function(event) {
         let opt_seleted = document.getElementById('id_content_type').selectedOptions[0]
         let url = `/api/${opt_seleted.getAttribute('app_label')}/${opt_seleted.getAttribute('model')}/`
@@ -14,6 +15,11 @@
               'ano'    : $("input[name=ano]").val(),
               'numero' : $("input[name=numero]").val(),
         }
+
+        if (opt_seleted.getAttribute('model') === 'sessaoplenaria') {
+          formData['data_inicio'] = data_diario
+        }
+
         let nulls = Array('', null, undefined)
         if (nulls.includes(formData.tipo) || nulls.includes(formData.ano) || nulls.includes(formData.numero)) {
           $(".doc_selected").html('').addClass('hidden');
@@ -26,7 +32,7 @@
               `<a target="_blank" href="${data.results[0].link_detail_backend}">
                   <strong>${data.results[0].__str__}</strong>
                   </a>
-                  <br>${data.results[0].ementa || data.results[0].assunto }`
+                  <br>${data.results[0].ementa || data.results[0].assunto  || ''}`
               ).removeClass('hidden');
           else
             $(".doc_selected").html('<strong>Atenção!!!</strong> Registro não localizado!').removeClass('hidden');
@@ -58,15 +64,15 @@
                     $("#id_tipo")
                       .append($("<option></option>")
                       .attr("value", obj.id)
-                      .text(obj.descricao));
-                });
+                      .text(obj.descricao || obj.__str__))
+                })
                 if (data.pagination.next_page > 0) {
                   formData.page = data.pagination.next_page
                   get_pages_recursive()
                 }
                 else {
                     $("#id_tipo").val(tipo_persistido)
-                    $("select[name=tipo]").trigger('change');
+                    $("select[name=tipo]").trigger('change')
                 }
               }
 

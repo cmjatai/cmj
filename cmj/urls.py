@@ -39,6 +39,7 @@ from cmj.core.views_short import ShortRedirectView
 import cmj.diarios.urls
 import cmj.globalrules.urls
 import cmj.ouvidoria.urls
+import cmj.search.urls
 import cmj.sigad.urls
 import cmj.videos.urls
 import sapl.api.urls
@@ -107,6 +108,8 @@ if settings.DEBUG:
 
 urlpatterns_all += [
     url(r'', include(sapl.api.urls)),
+
+    url(r'', include(cmj.search.urls)),
 
     # urls não tratadas até aqui será capturada por PathView de cmj.sigad
     url(r'', include(cmj.sigad.urls)),

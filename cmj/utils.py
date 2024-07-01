@@ -1,6 +1,7 @@
 from collections import defaultdict
 from datetime import date, datetime, timedelta
 from functools import wraps
+import logging
 import re
 import subprocess
 import threading
@@ -15,10 +16,19 @@ from django.db import connection
 from django.db.models.signals import pre_init, post_init, pre_save, post_save,\
     pre_delete, post_delete, post_migrate, pre_migrate, m2m_changed
 from django.template.loaders.filesystem import Loader
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from easy_thumbnails import source_generators
 import magic
 from unipath.path import Path
+
+
+media_protected_storage = FileSystemStorage(
+    location=settings.MEDIA_PROTECTED_ROOT, base_url='DO_NOT_USE')
+
+
+media_cache_storage = FileSystemStorage(
+    location=settings.MEDIA_CACHE_ROOT, base_url='DO_NOT_USE')
 
 
 def pil_image(source, exif_orientation=False, **options):
@@ -284,10 +294,6 @@ def intervalos_tem_intersecao(a_inicio, a_fim, b_inicio, b_fim):
     return maior_inicio <= menor_fim
 
 
-media_protected_storage = FileSystemStorage(
-    location=settings.MEDIA_PROTECTED_ROOT, base_url='DO_NOT_USE')
-
-
 def texto_upload_path(instance, filename, subpath='', pk_first=False, _prefix='public'):
 
     filename = re.sub('\s', '_', normalize(filename.strip()).lower())
@@ -386,6 +392,10 @@ def run_sql(sql):
 
 class ProcessoExterno(object):
 
+    returncode = None
+    stdout = None
+    stderr = None
+
     def __init__(self, cmd, logger):
         self.cmd = cmd
         self.process = None
@@ -396,8 +406,14 @@ class ProcessoExterno(object):
         def target():
             self.logger.info('Thread started')
             self.process = subprocess.Popen(
-                self.cmd, shell=True, stdout=subprocess.PIPE)
-            self.process.communicate()
+                self.cmd,
+                shell=True,
+                stdout=subprocess.PIPE)
+            self.stdout, self.stderr = self.process.communicate()
+            self.returncode = self.process.returncode
+            self.logger.info(self.returncode)
+            self.logger.info(self.stdout)
+            self.logger.info(self.stderr)
             self.logger.info('Thread finished:')
 
         thread = threading.Thread(target=target)
@@ -405,13 +421,18 @@ class ProcessoExterno(object):
 
         thread.join(timeout)
         if thread.is_alive():
-            self.logger.info('Terminating process')
-            self.process.terminate()
+            self.logger.info('Killed process')
+            self.process.kill()
             return None
             # thread.join()
 
-        self.logger.info(self.process.returncode)
-        return self.process.returncode
+        return self.returncode, self.stdout, self.stderr
+
+
+#logger = logging.getLogger(__name__)
+#cmd = "ls -la"
+#p = ProcessoExterno(cmd, logger)
+#r = p.run(60)
 
 
 class CmjLoader(Loader):
@@ -494,3 +515,49 @@ class Manutencao(object):
 
                     if hasattr(dua, '_auto_now_add'):
                         dua.auto_now_add = dua._auto_now_add
+
+
+class DisableSignals(object):
+    def __init__(self, disabled_signals=None):
+        self.stashed_signals = defaultdict(list)
+        self.disabled_signals = disabled_signals or [
+            pre_init, post_init,
+            pre_save, post_save,
+            pre_delete, post_delete,
+            pre_migrate, post_migrate,
+            m2m_changed
+        ]
+
+    def __enter__(self):
+        for signal in self.disabled_signals:
+            self.disconnect(signal)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        keys = list(self.stashed_signals.keys())
+        for signal in keys:
+            self.reconnect(signal)
+
+    def disconnect(self, signal):
+        self.stashed_signals[signal] = signal.receivers
+        signal.receivers = []
+
+    def reconnect(self, signal):
+        signal.receivers = self.stashed_signals.get(signal, [])
+        del self.stashed_signals[signal]
+        signal.sender_receivers_cache.clear()
+
+
+class TimeExecution(object):
+    def __init__(self, print_date=False):
+        self.print_date = print_date
+
+    def __enter__(self):
+        self.start = timezone.localtime()
+        if self.print_date:
+            print(self.start)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        end = timezone.localtime()
+        if self.print_date:
+            print(end)
+        print('TimeExecution:', end - self.start)

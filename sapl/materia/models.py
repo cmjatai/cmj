@@ -124,6 +124,17 @@ class TipoMateriaManager(models.Manager):
         )
 
 
+AGRUPAMENTO_TIPOS_MATERIAS = (('1', _('Nível 1')),
+                              ('2', _('Nível 2')),
+                              ('3', _('Nível 3')),
+                              ('4', _('Nível 4')),
+                              ('5', _('Nível 5')),
+                              ('6', _('Nível 6')),
+                              ('7', _('Nível 7')),
+                              ('8', _('Nível 8')),
+                              ('9', _('Nível 9')))
+
+
 class TipoMateriaLegislativa(models.Model):
     objects = TipoMateriaManager()
     sigla = models.CharField(max_length=5, verbose_name=_('Sigla'))
@@ -140,6 +151,12 @@ class TipoMateriaLegislativa(models.Model):
             ('descricao', '__icontains'),
             ('sigla', '__icontains')
         ))
+
+    nivel_agrupamento = models.CharField(
+        max_length=1,
+        blank=True,
+        verbose_name=_('Nível de Agrupamento'),
+        choices=AGRUPAMENTO_TIPOS_MATERIAS)
 
     sequencia_numeracao = models.CharField(
         max_length=1,
@@ -507,6 +524,17 @@ class MateriaLegislativa(CommonMixin):
             tipo_id=27).first().norma_principal.filter(
                 norma_relacionada__tipo_id=27)
         return nr
+
+    @property
+    def ultima_tramitacao(self):
+        return self.tramitacao_set.first()
+
+    def ultima_tramitacao_id(self):
+        ultima = self.ultima_tramitacao
+        if ultima:
+            return ultima.id
+        else:
+            return None
 
 
 class Autoria(models.Model):

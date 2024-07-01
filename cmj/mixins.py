@@ -12,8 +12,11 @@ from django.core.exceptions import ValidationError, PermissionDenied
 from django.db import models
 from django.db.models.deletion import PROTECT
 from django.http.response import HttpResponse, JsonResponse
+from django.shortcuts import render
 from django.urls.base import reverse
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+from haystack.models import SearchResult
 from model_utils.choices import Choices
 from pdfminer.high_level import extract_text
 from pdfrw.pdfreader import PdfReader
@@ -106,13 +109,15 @@ class PluginSignMixin:
 
     def run(self, cmd=""):
         try:
+            log = logger if not hasattr(self, 'logger') else self.logger
             print(cmd)
-            self.logger.info(cmd)
-            p = ProcessoExterno(cmd, self.logger)
+            log.info(cmd)
+            p = ProcessoExterno(cmd, log)
             r = p.run(timeout=300)
+            return r
         except Exception as e:
-            print(e)
-            print(r)
+            log.error(e)
+            log.error(r)
 
 
 class CheckCheckMixin:
@@ -213,7 +218,7 @@ class CommonMixin(models.Model):
                     return None
 
                 path = getattr(self, field).path
-                text = extract_text(path)
+                text = extract_text(path, maxpages=1)
 
                 text = text.split('\n')
 
@@ -462,6 +467,8 @@ class AudigLogFilterMixin:
                 try:
                     al.obj['HTTP_X_REAL_IP'] = request.META.get(
                         'HTTP_X_REAL_IP', '')
+                    al.obj['HTTP_USER_AGENT'] = request.META.get(
+                        'HTTP_USER_AGENT', '')
                     # logger.info(dict(request.META))
                 except:
                     pass
@@ -478,6 +485,44 @@ class MultiFormatOutputMixin:
 
     queryset_values_for_formats = True
 
+    class ValueResult(SearchResult):
+        def _get_object(self):
+            return None
+        object = property(_get_object, SearchResult._set_object)
+
+    def create_response(self):
+        # response for SearchView
+
+        context = {}  # super().get_context()
+
+        format_result = getattr(self.request, self.request.method).get(
+            'format', None)
+
+        if format_result:
+            if format_result not in self.formats_impl:
+                raise ValidationError(
+                    'Formato Inválido e/ou não implementado!')
+
+            items = self.results.result_class(
+                MultiFormatOutputMixin.ValueResult
+            ).values_list(
+                'pk_i', flat=True)
+            items.query.highlight = False
+
+            objs = list(map(
+                lambda x: x,
+                items
+            ))
+            items = self.model.objects.filter(id__in=objs)
+
+            context['object_list'] = items
+
+            rendered = getattr(self, f'render_to_{format_result}')(context)
+            return rendered
+
+        context = self.get_context()
+        return render(self.request, self.template, context)
+
     def render_to_response(self, context, **response_kwargs):
 
         format_result = getattr(self.request, self.request.method).get(
@@ -488,9 +533,12 @@ class MultiFormatOutputMixin:
                 raise ValidationError(
                     'Formato Inválido e/ou não implementado!')
 
-            object_list = context['object_list']
-            object_list.query.low_mark = 0
-            object_list.query.high_mark = 0
+            if 'multi_object_list' not in context:
+                context['multi_object_list'] = [('', context['object_list']), ]
+
+            for subtitulo, ol in context['multi_object_list']:
+                ol.query.low_mark = 0
+                ol.query.high_mark = 0
 
             return getattr(self, f'render_to_{format_result}')(context)
 
@@ -647,10 +695,12 @@ class MultiFormatOutputMixin:
 
             v = obj
             for fp in fname:
+                # print(fp)
+
                 v = getattr(v, fp)
 
-            if hasattr(v, 'all'):
-                v = ' - '.join(map(lambda x: str(x), v.all()))
+                if hasattr(v, 'all'):
+                    v = ' - '.join(map(lambda x: str(x), v.all()))
 
             yield v
 
@@ -666,6 +716,8 @@ class MultiFormatOutputMixin:
                 continue
 
             fname = fname.split('__')
+            if fname[0] == 'object':
+                fname = fname[1:]
 
             m = self.model
             for fp in fname:

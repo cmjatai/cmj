@@ -699,7 +699,16 @@ a:link:after, a:visited:after {
       text-decoration: none !important;
     }
   }
-
+  .urlize {
+    color: #006556;
+    &:visited, &:active, &:link {
+      text-decoration: none !important;
+    }
+    &:hover {
+      color: #27AE60;
+      text-decoration: underline !important;
+    }
+  }
 } /* end cp */
 
 .cp-print {

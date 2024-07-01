@@ -34,6 +34,7 @@ from easy_thumbnails import source_generators
 from floppyforms.widgets import ClearableFileInput
 from image_cropping.widgets import ImageCropWidget
 import magic
+from trml2pdf import parseString as trml2pdfParseString
 from unipath.path import Path
 import weasyprint
 
@@ -96,17 +97,18 @@ def get_settings_auth_user_model():
 
 
 autor_label = '''
-    <div class="col-xs-12">
-       Autor: <span id="nome_autor" name="nome_autor">
+    <div class="col-xs-12 mb-1">
+       Autor:<br><strong class="bg-white px-1 d-block w-100" id="nome_autor" name="nome_autor">
                 {% if form.autor.value %}
                     {{form.autor.value}}
                 {% endif %}
-              </span>
+              </strong>
     </div>
 '''
 
 autor_modal = '''
-   <div id="modal_autor" title="Selecione o Autor" align="center">
+   <div id="modal_autor" title="Selecione o Autor" align="center" style="display:none">
+       <small>Parlamentares, Comissões, Partidos, etc...</small>
        <form>
            <input id="q" type="text" />
            <input id="pesquisar" type="submit" value="Pesquisar"
@@ -767,7 +769,7 @@ class NormaPesquisaOrderingFilter(django_filters.OrderingFilter):
         if value:
             _value = self.order_by_mapping[value[0]] if value else value
         else:
-            _value = self.order_by_mapping['dataD']
+            _value = []
         return super().filter(qs, _value)
 
 
@@ -1272,3 +1274,8 @@ def gerar_pdf_impressos(request, context, template_name):
     response['Content-Transfer-Encoding'] = 'binary'
 
     return response
+
+
+def parseString(data, fout=None):
+    data = data.replace('<br>', '<br/>')
+    return trml2pdfParseString(data, fout)

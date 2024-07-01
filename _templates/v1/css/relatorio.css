@@ -4,7 +4,7 @@ h2.gray-title{
   font-size: 14pt;
   break-after: avoid-page;
   page-break-after: avoid;
-  margin: 0.7cm 0 0 0;
+  margin: 1cm 0 0.1cm 0;
   padding: 0;
 }
 
@@ -16,13 +16,16 @@ h3 {
   padding: 0;
 }
 
-p, a {
+p {
   font-size: 10pt;
   text-align: justify;
   text-justify: inter-word;
   margin: 0 0 0 0.5cm;
   padding: 0;
-
+}
+a {
+  text-decoration: none;
+  color:black;
 }
 
 table.grayTable {
@@ -39,7 +42,7 @@ table.grayTable tbody td {
   overflow-wrap: break-word;
   word-wrap: break-word;
   text-align: justify;
-  padding: 0.2cm;
+  padding: 0.15cm;
 }
 table.grayTable thead th {
   font-size: 10px;
@@ -47,61 +50,10 @@ table.grayTable thead th {
   text-align: center;
   padding: 0.3cm 0;
   font-variant: small-caps;
+  background-color: #f0f0f0;
 
 }
 
 fieldset {
   border: 0px solid black;
 }
-
-/*
-table {
-  /*max-width: 520px;
-}
-table.grayTable tr:nth-child(even) {
-  background: #dddddd;
-}
-table.grayTable thead {
-  background: #BBBBBB;
-  border-bottom: 2px solid #000000;
-}
-table.grayTable thead th:first-child {
-  border-left: none;
-}
-
-
-
-fieldset {
-  border: 0;
-}
-
-
-html body section dl {
-  display: flex;
-  flex-wrap: wrap;
-  columns: 5;
-}
-
-
-html body section dt{
-  width: 50px;
-}
-
-html body section dd {
-  text-align: center;
-}
-
-html body section dd ul li {
-  list-style-type: none;
-  margin-left: 50px;
-}
-
-fieldset {
-  page-break-after: avoid;
-  margin:5px;
-  padding:0px;
-}
-
-
-
-*/

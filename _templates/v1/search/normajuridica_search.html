@@ -1,0 +1,72 @@
+{% extends 'crud/detail.html' %}
+{% load crispy_forms_tags cropping thumbnail  %}
+{% load common_cmj_tags highlight %}
+{% load common_tags sigad_filters  %}
+
+
+{% block title %}
+  <h1 class="page-header bg-green text-white container-search" >
+    Pesquisar Normas Jurídicas
+
+  {% if not show_results %}
+      <a class="btn btn-warning btn-ajuda" data-toggle="collapse" href="#collapseAjudaBuscaTextual" role="button" aria-expanded="false" aria-controls="collapseAjudaBuscaTextual">
+        ?
+      </a>
+    {% endif %}
+  </h1>
+{% endblock title %}
+
+{% block extra_actions %}
+  {% if show_results %}
+    {% with 'cmj.search:norma_haystack_search' as url_reverse %}
+      {% include "crud/format_options.html" %}
+    {% endwith %}
+  {% endif %}
+{% endblock %}
+
+{% block extra_content %} {% endblock %}
+{% block detail_content %} {% endblock %}
+
+{% block table_content %}
+
+<div class="container-search">
+  {% if not show_results %}
+    {% include 'search/search_help_text.html' %}
+    {% crispy form %}
+
+    <small class="d-block text-red text-right">
+      O botão "Processar Pesquisa" foi removido. Pequisas de Normas, Textual e Parametrizada, foram unificadas.
+      <br> Clique na lupa para pesquisar.
+    </small>
+
+  {% else %}
+
+    <div class="container-table">
+
+      {% for result in page.object_list %}
+
+        {% if forloop.first %}
+          <div class="result-count">Foram encontrados {{ page.paginator.count }} registros </div>
+        {% endif %}
+
+        {% if result.object %}
+          <div class="item-listas p-2">
+            <div class="item-raiz">
+              {% with result.object as n %}
+                {% include 'norma/normajuridica_widget_list.html' %}
+              {% endwith %}
+            </div>
+          </div>
+        {% endif %}
+      {% empty %}
+        <h3 class="p-5">Nenhuma Norma encontrada com os critérios de busca acima!</h3>
+      {% endfor %}
+    </div>
+
+  {% if page.object_list  %}
+    {% include "paginacao.html" %}
+  {% endif %}
+
+{% endif %}
+</div>
+{% endblock %}

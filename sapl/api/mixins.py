@@ -65,16 +65,18 @@ class ResponseFileMixin:
         if mime == 'application/png':
             mime = 'image/png'
 
+        custom_filename = arquivo.name.split('/')[-1]
+        if hasattr(self, 'custom_filename'):
+            custom_filename = self.custom_filename(item)
+
         if settings.DEBUG:
             file_path = arquivo.original_path if 'original' in request.GET else arquivo.path
 
             with open(file_path, 'rb') as f:
                 response = HttpResponse(f, content_type=mime)
+            response['Content-Disposition'] = (
+                'inline; filename="%s"' % custom_filename)
             return response
-
-        custom_filename = arquivo.name.split('/')[-1]
-        if hasattr(self, 'custom_filename'):
-            custom_filename = self.custom_filename(item)
 
         response = HttpResponse(content_type='%s' % mime)
         response['Content-Disposition'] = (

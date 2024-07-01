@@ -79,6 +79,7 @@ if DEBUG:
 SEARCH_BACKEND = 'haystack.backends.solr_backend.SolrEngine'
 SEARCH_URL = ('URL', '{}/solr/{}'.format(SOLR_URL, SOLR_COLLECTION))
 HAYSTACK_ROUTERS = ['cmj.haystack.CmjDefaultRouter']
+HAYSTACK_ITERATOR_LOAD_PER_QUERY = 100
 HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': SEARCH_BACKEND,
@@ -95,13 +96,13 @@ HAYSTACK_CONNECTIONS = {
         'BATCH_SIZE': 1000,
         'TIMEOUT': 600,
         'EXCLUDED_INDEXES': [
-            'cmj.core.search_indexes.SessaoPlenariaIndex',
-            'cmj.diarios.search_indexes.DiarioOficialIndex',
-            'cmj.sigad.search_indexes.DocumentoIndex',
-            'sapl.protocoloadm.search_indexes.DocumentoAdministrativoIndex',
-            'sapl.base.search_indexes.DocumentoAcessorioIndex',
-            'sapl.base.search_indexes.NormaJuridicaIndex',
-            'sapl.base.search_indexes.MateriaLegislativaIndex',
+            'cmj.search.search_indexes.DiarioOficialIndex',
+            'cmj.search.search_indexes.NormaJuridicaIndex',
+            'cmj.search.search_indexes.DocumentoAcessorioIndex',
+            'cmj.search.search_indexes.MateriaLegislativaIndex',
+            'cmj.search.search_indexes.SessaoPlenariaIndex',
+            'cmj.search.search_indexes.DocumentoAdministrativoIndex',
+            'cmj.search.search_indexes.DocumentoIndex',
         ]
     },
 }

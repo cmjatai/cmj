@@ -677,3 +677,38 @@ class AcompanhamentoDocumento(models.Model):
                 'email': self.email,
                 'data': str(self.data_cadastro.strftime('%d/%m/%Y'))
             }
+
+
+"""
+
+
+Mais Acessadas
+    Projeto de Lei Ordinária do Executivo
+    Projeto de Lei Ordinária do Legislativo
+    Projeto de Decreto Legislativo
+    Projeto de Resolução
+    Requerimento
+    Moção
+
+Outras Matérias
+    Proposta do Executivo de Emenda à Lei Orgânica
+    Proposta do Legislativo de Emenda à Lei Orgânica
+    Projeto de Lei Complementar do Executivo
+    Projeto de Lei Complementar do Legislativo
+
+Matérias Acessórias
+    Veto
+    Substitutivo a Projeto
+    Projeto de Resolução Substitutivo
+    Emenda Impositiva
+    Emenda Aditiva
+    Emenda Modificativa
+    Emenda Modificativa/Supressiva
+    Emenda Substitutiva a Projetos de Lei
+    Emenda Supressiva
+    Sub-Emenda
+    Recurso Regimental
+    Registro de Chapa
+    Documentos Diversos para Leitura em Plenário
+    Projeto de Lei Jovem Vereador
+"""

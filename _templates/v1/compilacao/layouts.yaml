@@ -37,8 +37,8 @@ TipoDispositivo:
   - rotulo_separador_variacao23:5  formato_variacao3
   - rotulo_separador_variacao34:5  formato_variacao4
   - rotulo_separador_variacao45:5  formato_variacao5
-  
-  
+
+
 TipoTextoArticulado:
   {% trans 'Identificação Básica' %}:
   - sigla:3 descricao:5 content_type:4
@@ -46,3 +46,13 @@ TipoTextoArticulado:
   - participacao_social publicacao_func
   - perfis
   - rodape_global
+
+UrlizeReferencia:
+  {% trans 'Urlize Referência' %}:
+  - chave url chave_automatica:3
+
+UrlizeReferenciaDetail:
+  {% trans 'Urlize Referência' %}:
+  - chave chave_automatica:3
+  - url
+  - normas

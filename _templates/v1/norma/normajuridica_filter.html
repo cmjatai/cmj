@@ -2,11 +2,31 @@
 {% load i18n %}
 {% load crispy_forms_tags common_cmj_tags %}
 
+{% block second_header %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      {% for p in classe_mascara.classes_parents_and_me %}
+        {% if forloop.first %}
+        <li class="breadcrumb-item"><a href="/">Página Inicial</a></li>
+        {% endif %}
+        <li class="breadcrumb-item {% if p == object %}active{% endif %}">
+
+          <a href="/{{p.absolute_slug}}" {% if p == object %}aria-current="page"{% endif %}>
+            {% if p == object %}Esta Página{% else %}{{p.apelido|default:p.titulo}}{% endif %}
+          </a>
+        </li>
+      {% endfor %}
+    </ol>
+  </nav>
+  {{ block.super }}
+{% endblock second_header %}
+
+
 {% block actions %}
 
   {% if show_results %}
     <div class="actions btn-group" role="group">
-      <a href="{% url 'sapl.norma:norma_pesquisa' %}" class="btn btn-outline-primary">{% trans 'Fazer nova pesquisa' %}</a>
+      <a href="{% url 'cmj.search:norma_haystack_search' %}" class="btn btn-outline-primary">{% trans 'Fazer nova pesquisa' %}</a>
     </div>
     {% with 'sapl.norma:norma_pesquisa' as url_reverse %}
       {% include "crud/format_options.html" %}

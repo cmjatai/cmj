@@ -1,6 +1,8 @@
 from collections import OrderedDict
 from datetime import timedelta
+import io
 import logging
+import os
 import sys
 
 from braces.views import FormMessagesMixin
@@ -11,6 +13,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError, PermissionDenied
+from django.core.files.base import File
 from django.core.signing import Signer
 from django.db import transaction
 from django.db.models import Q
@@ -21,14 +24,15 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls.base import reverse_lazy, reverse
 from django.utils.dateparse import parse_date
 from django.utils.encoding import force_text
-from django.utils.text import format_lazy
+from django.utils.text import format_lazy, slugify
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic.base import TemplateView
+from django.views.generic.base import TemplateView, ContextMixin
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import (CreateView, DeleteView, FormView,
                                        UpdateView)
 from django.views.generic.list import ListView
 
+from cmj.utils import media_cache_storage
 from sapl.compilacao.apps import AppConfig
 from sapl.compilacao.forms import (DispositivoDefinidorVigenciaForm,
                                    DispositivoEdicaoAlteracaoForm,
@@ -46,13 +50,12 @@ from sapl.compilacao.models import (STATUS_TA_EDITION, STATUS_TA_PRIVATE,
                                     Publicacao, TextoArticulado,
                                     TipoDispositivo, TipoNota, TipoPublicacao,
                                     TipoTextoArticulado, TipoVide,
-                                    VeiculoPublicacao, Vide)
+                                    VeiculoPublicacao, Vide, UrlizeReferencia)
 from sapl.compilacao.utils import (DISPOSITIVO_SELECT_RELATED,
                                    DISPOSITIVO_SELECT_RELATED_EDIT,
                                    get_integrations_view_names)
 from sapl.crud.base import RP_DETAIL, RP_LIST, Crud, CrudAux, CrudListView,\
     make_pagination
-from sapl.settings import BASE_DIR
 
 
 TipoNotaCrud = CrudAux.build(TipoNota, 'tipo_nota')
@@ -94,6 +97,64 @@ def choice_model_type_foreignkey_in_extenal_views(id_tipo_ta=None):
                     item.model._meta.app_label):
                 for i in item.model_type_foreignkey.objects.all():
                     yield i.pk, i
+
+
+class UrlizeReferenciaCrud(CrudAux):
+    model = UrlizeReferencia
+    ordered_list = False
+
+    class BaseMixin(CrudAux.BaseMixin):
+        list_field_names = ('id', ('chave', 'url'), 'chave_automatica')
+
+        def post(self, request, *args, **kwargs):
+            return super().post(request, *args, **kwargs)
+
+        def form_valid(self, form):
+            r = super().form_valid(form)
+
+            ds = Dispositivo.objects.filter(texto__icontains=self.object.chave)
+            ds = ds.order_by('ta_id')
+            ds = ds.distinct('ta_id')
+
+            for d in ds:
+                d.ta.clear_cache()
+
+            return r
+
+    class CreateView(CrudAux.CreateView):
+        def get_initial(self):
+            initial = CrudAux.CreateView.get_initial(self)
+            initial.update({'chave_automatica': False})
+            return initial
+
+    class ListView(CrudAux.ListView):
+        paginate_by = 100
+        ordering = '-chave_automatica', 'url', 'chave'
+
+        def hook_url(self, *args, **kwargs):
+            return f'<br><small>{args[0].url}</small>', args[0].url
+
+        def hook_header_chave(self, *args, **kwargs):
+            count_without_url = self.object_list.filter(url='').count()
+            return f'Chave ({count_without_url} sem links)'
+
+    class DetailView(CrudAux.DetailView):
+        layout_key = 'UrlizeReferenciaDetail'
+
+        def hook_normas(self, obj, **kwargs):
+            ds = Dispositivo.objects.filter(
+                texto__icontains=obj.chave).order_by('ta', 'ordem')
+
+            items = ['<ul>']
+            for d in ds:
+                url = f'/ta/{d.ta_id}/text#{d.id}'
+                items.append(
+                    f'<li><a href="{url}">{d.ta} - {d.rotulo_padrao}</a></li>')
+
+            items.append('</ul>')
+            items = ''.join(items)
+
+            return 'Normas/Dispositivos', items
 
 
 class IntegracaoTaView(TemplateView):
@@ -903,6 +964,10 @@ class TextView(CompMixin, ListView):
         perm = self.object.has_view_permission(self.request, message=False)
 
         if perm is None:
+            co = self.object.content_object
+            if not co:
+                raise Http404()
+
             messages.error(self.request, _(
                 '''<strong>O Texto Articulado desta {} está em edição
                         ou ainda não foi cadastrado.</strong><br>{}
@@ -914,7 +979,6 @@ class TextView(CompMixin, ListView):
                         ''' if self.object.content_object.texto_integral else ''
                 )))
 
-            co = self.object.content_object
             return redirect(
                 reverse(
                     '{}:{}_detail'.format(
@@ -932,7 +996,64 @@ class TextView(CompMixin, ListView):
             self.template_name = 'compilacao/text_list__print_version.html'
         if 'embedded' in request.GET:
             self.template_name = 'compilacao/text_list__embedded.html'
+
+        sign = self.kwargs.get('sign', '')
+
+        if self.is_reader() and self.object.is_cached(sign=sign):
+            context = ContextMixin.get_context_data(self, **kwargs)
+            context['object'] = self.object
+
+            return self.render_to_response(context)
+
         return ListView.get(self, request, *args, **kwargs)
+
+    def is_reader(self):
+        if self.request.user.is_anonymous:
+            return True
+        not_reader_if_any_of_perms = (
+            'compilacao.change_dispositivo_edicao_dinamica',
+            'compilacao.add_nota',
+            'compilacao.add_vide'
+        )
+        for p in not_reader_if_any_of_perms:
+            if self.request.user.has_perm(p):
+                return False
+        return True
+
+    def render_to_response(self, context, **response_kwargs):
+
+        # with TimeExecution(print_date=True):
+
+        sign = self.kwargs.get('sign', '')
+
+        if self.is_reader() and not self.object.is_cached(sign=sign):
+            template_user = self.template_name
+            self.template_name = 'compilacao/text_list__embedded.html'
+
+            response = ListView.render_to_response(
+                self, context, **response_kwargs)
+
+            html = response.render()
+            embedded_cache = html.content
+
+            output = io.BytesIO(embedded_cache)
+            media_cache_storage.save(
+                self.object.get_path_cache(sign=sign), content=output)
+
+            self.template_name = template_user
+
+        if self.is_reader() and self.object.is_cached(sign=sign):
+            embedded_cache = media_cache_storage.open(
+                self.object.get_path_cache(sign=sign)).read()
+
+            context['embedded_cache'] = embedded_cache.decode()
+
+            self.object_list = self.object._meta.model.objects.none()
+
+        response = ListView.render_to_response(
+            self, context, **response_kwargs)
+
+        return response
 
     def get_context_data(self, **kwargs):
         context = super(TextView, self).get_context_data(**kwargs)
@@ -1199,6 +1320,7 @@ class TextEditView(CompMixin, TemplateView):
                     'sapl.compilacao:ta_text', kwargs={
                         'ta_id': self.object.id}))
             else:
+                self.object.clear_cache()
                 # TODO - implementar logging de ação de usuário
                 self.object.editing_locked = False
                 self.object.privacidade = STATUS_TA_EDITION
@@ -1235,6 +1357,10 @@ class TextEditView(CompMixin, TemplateView):
                     self.object.save()
                     messages.success(request, _(
                         'Texto Articulado publicado com sucesso.'))
+
+                    for d in self.object.dispositivos_alterados_pelo_ta_set.order_by('ta_id').distinct('ta_id'):
+                        d.ta.clear_cache()
+
                 else:
                     self.object.temp_check_migrations = True
                     self.object.save()

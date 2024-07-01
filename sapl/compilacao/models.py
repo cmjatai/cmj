@@ -1,4 +1,6 @@
+from collections import OrderedDict
 from pickle import NONE
+import re
 
 from django.contrib import messages
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -9,11 +11,14 @@ from django.db.models.aggregates import Max
 from django.db.models.deletion import PROTECT
 from django.http.response import Http404
 from django.template import defaultfilters
+from django.urls.base import reverse
 from django.utils import timezone
 from django.utils.decorators import classonlymethod
 from django.utils.encoding import force_text
+from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 
+from cmj.utils import media_cache_storage
 from sapl.compilacao.utils import (get_integrations_view_names, int_to_letter,
                                    int_to_roman)
 from sapl.utils import YES_NO_CHOICES, get_settings_auth_user_model
@@ -602,6 +607,37 @@ class TextoArticulado(TimestampedMixin):
         for dpk in raizes:
             update(dpk)
 
+    def get_path_cache(self, sign=''):
+
+        sign_vigencia = sign
+        sign_vigencia = slugify(sign_vigencia)
+
+        opt = self._meta
+        path_cache = '{}/{}/{}/{}/{}'.format(
+            opt.app_label,
+            opt.model_name,
+            self.ano,
+            self.id,
+            f'cache{sign_vigencia}.html'
+        )
+        return path_cache
+
+    def is_cached(self, sign=''):
+        return media_cache_storage.exists(self.get_path_cache(sign))
+
+    def clear_cache(self, sign=''):
+        # todo: Transferir métodos para model TA
+
+        path_cache = '/'.join(self.get_path_cache(sign=sign).split('/')[:-1])
+        try:
+            directories, files = media_cache_storage.listdir(path_cache)
+        except FileNotFoundError:
+            return
+
+        for f in files:
+            media_cache_storage.delete(f'{path_cache}/{f}')
+        media_cache_storage.delete(path_cache)
+
 
 class TipoNota(models.Model):
     sigla = models.CharField(
@@ -948,6 +984,162 @@ class Publicacao(TimestampedMixin):
             self.tipo_publicacao,
             defaultfilters.date(self.data, "d \d\e F \d\e Y"),
             self.ta)
+
+
+class UrlizeReferencia(models.Model):
+
+    chave = models.CharField(
+        max_length=256,
+        verbose_name=_('Chave'),
+        db_index=True,
+        unique=True
+    )
+
+    url = models.CharField(
+        max_length=256,
+        default='',
+        verbose_name=_('Url'))
+
+    chave_automatica = models.BooleanField(
+        default=True,
+        choices=YES_NO_CHOICES,
+        verbose_name=_('Gerada Automaticamente?'))
+
+    __base__ = (r'(LEI|DECRETO|RESOLUÇÃO|LO|LC)( )'
+                r'(ORDINÁRIA|COMPLEMENTAR)?( ?)'
+                r'(MUNICIPAL|ESTADUAL|FEDERAL)?( ?)'
+                r'(ORDINÁRIA|COMPLEMENTAR)?( ?)'
+                r'(N&DEG;|N.|N&ordm;|N[o\u00B0\u00BA\u00AA])?(\.? ?)'
+                r'(\d*)(\.?)(\d+)')
+
+    __base2__ = (r'')
+
+    patterns = [
+        #r'(LEI|RESOLUÇÃO|DECRETO) (MUNICIPAL)? \d{2,4}'
+        f'{__base__}(,?)( ?de ?)( ?\d+ ?)(&DEG;|&ordm;|[o\u00B0\u00BA\u00AA])?( ?de ?)([abçdefghijlmnorstuvz&c;]+)( ?de ?)(\d*)(\.?)(\d+)',
+        f'{__base__}( ?/ ?)(\d*)(\.?)(\d+)',
+        f'{__base__}(,?)( ?de ?)(\d+)(/)(\d+)(/)(\d*)(\.?)(\d+)',
+    ]
+
+    for n, p in enumerate(patterns):
+        patterns[n] = re.compile(p, re.I)
+
+    class Meta:
+        verbose_name = _('Link de Referência')
+        verbose_name_plural = _('Links de Referências')
+        ordering = ['chave']
+
+    def __str__(self):
+        return f'{self.chave} - <br><small>{self.url}</small>'
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        self.chave = self.chave.lower().strip()
+        return models.Model.save(self, force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+
+    @classmethod
+    def urlize(cls, texto, return_result_patterns=False):
+
+        def join(texto, chave_natural, url):
+
+            texto = texto.replace(
+                chave_natural,
+                f'<a class="urlize" href="{url}">{chave_natural}</a>'
+            )
+            return texto
+
+        ms_result = []
+        for p in cls.patterns:
+            ms = p.findall(texto)
+            if ms:
+                ms_result.extend(ms)
+
+        if return_result_patterns:
+            return ms_result
+
+        for m in ms_result:
+            chave_list = m
+            chave_natural = ''.join(chave_list)
+            #chave_natural = chave_natural.replace(' / ', '/')
+            #chave_natural = chave_natural.replace(' . ', '.')
+            #chave_natural = chave_natural.replace(' , ', ', ')
+            chave_lower = chave_natural.lower()
+
+            ur, created = cls.objects.get_or_create(chave=chave_lower)
+
+            if not created and ur.url:
+                texto = join(texto, chave_natural, ur.url)
+
+            if not created:
+                continue
+
+            try:
+                if not chave_list[4] or chave_list[4].lower() == 'municipal':
+                    ano = f'{chave_list[-3]}{chave_list[-1]}'
+                    try:
+                        ano = int(ano)
+                        if ano < 100:
+                            if ano <= timezone.localdate().year - 2000:
+                                ano += 2000
+                            else:
+                                ano += 1900
+
+                    except:
+                        pass
+                    ta = TextoArticulado.objects.filter(
+                        numero=f'{chave_list[10]}{chave_list[12]}',
+                        ano=ano,
+                        privacidade=0
+                    ).exclude(
+                        original__isnull=False
+                    ).first()
+
+                    if not ta:
+                        continue
+                    url = reverse('sapl.compilacao:ta_text',
+                                  kwargs={'ta_id': ta.id})
+                    ur.url = url
+                    ur.save()
+                    texto = join(texto, chave_natural, url)
+            except:
+                pass
+
+        urs = list(cls.objects.filter(
+            chave_automatica=False).values('chave', 'url'))
+
+        urs.sort(reverse=True, key=lambda u: len(u['chave']))
+
+        urs_dict = OrderedDict()
+        for u in urs:
+            urs_dict[u['chave']] = u
+
+        chaves_usadas = []
+
+        for c, ur in urs_dict.items():
+
+            tl = texto.lower()
+            tl = tl.split(ur['chave'])
+
+            if len(tl) == 1:
+                continue
+
+            chave = ur['chave']
+
+            for k in chaves_usadas:
+                if chave in k:
+                    chave = ''
+
+            if not chave:
+                continue
+            chaves_usadas.append(chave)
+
+            pi = len(tl[0])
+            pf = pi + len(chave)
+            chave_natural = texto[pi:pf]
+
+            texto = join(texto, chave_natural, ur['url'])
+
+        return texto
 
 
 class Dispositivo(BaseModel, TimestampedMixin):
@@ -1816,6 +2008,9 @@ class Dispositivo(BaseModel, TimestampedMixin):
             count += Dispositivo.INTERVALO_ORDEM
             Dispositivo.objects.filter(pk=d).update(
                 ordem_bloco_atualizador=count)
+
+    def render_texto(self):
+        return UrlizeReferencia.urlize(self.texto)
 
 
 class Vide(TimestampedMixin):

@@ -19,7 +19,7 @@
     {% if forloop.first %}
       <strong>Matérias em tramitação:</strong><br>
     {% endif %}
-    <a href="{% url 'sapl.materia:pesquisar_materia' %}?tipo={{tipo.id}}&em_tramitacao=1&autoria__autor={{user.autor_set.all.0.id}}">{{tipo}} <strong>({{autores_materias|length}})</strong></a><br>
+    <a href="{% url 'cmj.search:materia_haystack_search' %}?tipo_i={{tipo.id}}&em_tramitacao_b=1&autoria_is={{user.autor_set.all.0.id}}">{{tipo}} <strong>({{autores_materias|length}})</strong></a><br>
   {% endfor %}
   </div>
   {{ block.super }}

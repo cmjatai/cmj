@@ -7,7 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.db.models.aggregates import Count
 from django.http import JsonResponse
-from django.http.response import Http404
+from django.http.response import Http404, HttpResponsePermanentRedirect
 from django.shortcuts import redirect, get_object_or_404
 from django.urls.base import reverse
 from django.utils import timezone
@@ -129,15 +129,33 @@ class NormaPesquisaView(AudigLogFilterMixin, MultiFormatOutputMixin, FilterView)
     def get_queryset(self):
         qs = super().get_queryset()
 
-        qs = qs.extra({
-            'nm_i': "CAST(regexp_replace(numero,'[^0-9]','', 'g') AS INTEGER)",
-            'norma_letra': "regexp_replace(numero,'[^a-zA-Z]','', 'g')"
-        }).order_by('-data', '-nm_i', 'norma_letra')
+        # qs = qs.extra(
+        #    select={
+        #        'nm_i': "CAST(regexp_replace(numero,'[^0-9]','', 'g') AS INTEGER)",
+        #        'norma_letra': "regexp_replace(numero,'[^a-zA-Z]','', 'g')"
+        #    },
+        #    order_by=('-data', '-id', )  # '-nm_i', 'norma_letra')
+        #)
 
         return qs
 
+    def render_to_response(self, context, **response_kwargs):
+
+        if not context['show_results'] and not self.request.user.is_superuser:
+            return HttpResponsePermanentRedirect(
+                reverse('cmj.search:norma_haystack_search'))
+
+        return MultiFormatOutputMixin.render_to_response(self, context, **response_kwargs)
+
     def get_context_data(self, **kwargs):
         context = super(NormaPesquisaView, self).get_context_data(**kwargs)
+
+        classe_mascara = self.request.session.get('classe_mascara', None)
+
+        if classe_mascara:
+            context['classe_mascara'] = classe_mascara
+            classe_mascara = str(classe_mascara)
+            del self.request.session['classe_mascara']
 
         context['title'] = _('Pesquisa de Normas Jurídicas')
         context['bg_title'] = 'bg-green text-white'
@@ -388,8 +406,7 @@ class NormaCrud(Crud):
 
         @property
         def search_url(self):
-            namespace = self.model._meta.app_config.name
-            return reverse('%s:%s' % (namespace, 'norma_pesquisa'))
+            return reverse('cmj.search:norma_haystack_search')
 
     class ListView(Crud.ListView):  # , RedirectView):
         paginate_by = 100

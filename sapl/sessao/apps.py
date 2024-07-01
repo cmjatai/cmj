@@ -6,3 +6,6 @@ class AppConfig(apps.AppConfig):
     name = 'sapl.sessao'
     label = 'sessao'
     verbose_name = _('Sessão Plenária')
+
+    def ready(self):
+        from . import signals

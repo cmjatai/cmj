@@ -12,7 +12,7 @@
       </div>
     </div>
   {% endif %}
-  
+
   {% for key, values in view.get_vigencias.items %}
     {% if forloop.first %}
       <ul class="cp-linha-vigencias">
@@ -72,7 +72,7 @@
       </li>
     {% endif %}
   {% endfor %}
-  
+
   <div class="tipo-vigencias d-flex fixed-bottom justify-content-center">
     <div class="btn-group btn-group-sm">
       <a class="btn btn-primary active" onclick="textoMultiVigente(this, false);" title="{% trans 'Texto Multivigente Sequencial'%}">{% trans 'TMS'%}</a>
@@ -84,4 +84,5 @@
   </div>
 
   {% include 'compilacao/text_list_bloco.html'%}
+
 </div>

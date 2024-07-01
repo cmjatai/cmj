@@ -9,7 +9,7 @@
 import time
 import os
 
-from trml2pdf import parseString
+from sapl.utils import parseString
 
 
 def cabecalho(dic_cabecalho, dat_ordem, imagem):

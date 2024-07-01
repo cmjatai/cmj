@@ -11,6 +11,7 @@ from django.db.models.fields.files import FileField
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
+from cmj.arq.models import DraftMidia
 from cmj.utils import Manutencao
 from sapl.utils import hash_sha512
 
@@ -175,8 +176,13 @@ class Command(BaseCommand):
                 continue
             # print(app)
 
+            model_not_backup = (DraftMidia, )
+
             for m in app.get_models():
                 model_exec = False
+
+                if m in model_not_backup:
+                    continue
 
                 if model_name and m._meta.object_name != model_name:
                     continue
@@ -648,8 +654,13 @@ class Command(BaseCommand):
             if not app.name.startswith('cmj') and not app.name.startswith('sapl'):
                 continue
 
+            model_not_backup = (DraftMidia, )
+
             for m in app.get_models():
                 model_exec = False
+
+                if m in model_not_backup:
+                    continue
 
                 for f in m._meta.get_fields():
                     dua = f

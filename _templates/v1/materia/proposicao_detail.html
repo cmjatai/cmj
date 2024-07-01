@@ -253,3 +253,25 @@
     </div>
   {% endif %}
 {% endblock detail_content %}
+
+
+{% block extra_js %}
+
+<script language="Javascript">
+  $(document).ready(function() {
+    if( $('.running_extraction').length ) {
+      let count = 10
+      setInterval(function() {
+        if (count < 1 ) {
+          location.reload()
+        }
+        else {
+          $('.running_extraction i').last().html(`[ ${count} ]`)
+          count -= 1
+        }
+      }, 1000)
+    }
+  })
+</script>
+{% endblock extra_js %}
+
