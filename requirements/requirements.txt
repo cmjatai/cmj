@@ -67,6 +67,7 @@ trml2pdf
 kazoo==2.8.0
 pymupdf==1.22.5
 
+python-docx=1.1.2
 
 ipython
 

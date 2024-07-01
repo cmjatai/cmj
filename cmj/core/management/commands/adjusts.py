@@ -14,12 +14,12 @@ from time import sleep
 from PIL import Image, ImageEnhance, ImageDraw
 from PIL.Image import Resampling
 from bs4 import BeautifulSoup as bs
+from bs4.element import Tag
 import cv2
 from django.apps import apps
 from django.core.files.base import File
 from django.core.management.base import BaseCommand
 from django.db.models import Q
-from django.db.models.signals import post_delete, post_save
 import fitz
 import ocrmypdf
 from reportlab.pdfgen import canvas
@@ -28,10 +28,8 @@ import requests
 
 from cmj.arq.models import ArqDoc
 from cmj.utils import Manutencao
-from cmj.videos.tasks import task_pull_youtube_upcoming
 import numpy as np
-from sapl.compilacao.models import TextoArticulado, Dispositivo,\
-    UrlizeReferencia
+from sapl.compilacao.models import Dispositivo, UrlizeReferencia
 from sapl.materia.models import MateriaLegislativa
 from sapl.norma.models import NormaJuridica
 from sapl.rules.apps import reset_id_model
@@ -41,59 +39,7 @@ def _get_registration_key(model):
     return '%s_%s' % (model._meta.app_label, model._meta.model_name)
 
 
-def img_replace(page, xref, filename=None, stream=None, pixmap=None):
-
-    doc = page.parent
-    new_xref = page.insert_image(
-        page.rect, filename=filename, stream=stream, pixmap=pixmap
-    )
-    doc.xref_copy(new_xref, xref)
-    last_contents_xref = page.get_contents()[-1]
-    doc.update_stream(last_contents_xref, b" ")
-
-
-def unsharp_mask(image, kernel_size=(5, 5), sigma=1.0, amount=1.0, threshold=0):
-    """Return a sharpened version of the image, using an unsharp mask."""
-    blurred = cv2.GaussianBlur(image, kernel_size, sigma)
-    sharpened = float(amount + 1) * image - float(amount) * blurred
-    sharpened = np.maximum(sharpened, np.zeros(sharpened.shape))
-    sharpened = np.minimum(sharpened, 255 * np.ones(sharpened.shape))
-    sharpened = sharpened.round().astype(np.uint8)
-    if threshold > 0:
-        low_contrast_mask = np.absolute(image - blurred) < threshold
-        np.copyto(sharpened, image, where=low_contrast_mask)
-    return sharpened
-
-
-def increase_brightness(img, value):
-    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    h, s, v = cv2.split(hsv)
-
-    lim = 255 - value
-    v[v > lim] = 255
-    v[v <= lim] += value
-
-    final_hsv = cv2.merge((h, s, v))
-    img = cv2.cvtColor(final_hsv, cv2.COLOR_HSV2BGR)
-    return img
-
-
 class Command(BaseCommand):
-
-    def str_intersection(self, str_left, str_right, ignore_order=False):
-        common_letters = set(str_left) & set(str_right)
-        str_intersected = ''
-        for c in str_left:
-            if (c in common_letters):  # and (c not in str_intersected):
-                str_intersected += c
-        if ignore_order:
-            pass
-        else:
-            if str_intersected in str_left and str_intersected in str_right:
-                return str_intersected
-            else:
-                return None
-        return str_intersected
 
     def handle(self, *args, **options):
         self.logger = logging.getLogger(__name__)
@@ -101,186 +47,8 @@ class Command(BaseCommand):
         m.desativa_auto_now()
         m.desativa_signals()
 
-        self.get_all_tas()
-        return
-
-        ds = Dispositivo.objects.exclude(
-            ta_id=281).filter(texto__icontains='Lei Org').order_by('ta_id')
-
-        exclude = ('lei orgânica municipal',
-                   'lei orgânica do município',
-                   'lei orgânica de jataí',
-                   'lei org&acirc;nica do munic&iacute;pio',
-                   'lei orgânica 1/1900 do município de jataí',
-                   'lei orgânica 1/1990 do município de jataí'
-
-                   )
-        for d in ds:
-            tl = d.texto.lower()
-
-            s = None
-            for e in exclude:
-                s = self.str_intersection(e, tl)
-                if s == e:
-                    break
-            if s == e:
-                continue
-
-            p = tl.index('lei org')
-            st = d.texto[p:p + 50]
-            print(d.ta_id, d.id, st)
-
-        return
-        # abre autografo 1193, captura tabelas do anexo iii e adiciona em seus
-        # dispositivos
-        html_file = open('/home/leandro/Downloads/702/aut.html', 'r').read()
-
-        soup = bs(html_file, "html.parser")
-
-        tables = list(soup.find_all("table"))[-5:]
-
-        # for t in tables:
-        #    print(t)
-
-        ds = Dispositivo.objects.filter(
-            ta_id=9665,
-            dispositivo_raiz_id=198029, id__gt=198030).order_by('ordem')
-
-        ti = 0
-        for d in ds:
-            if d.texto and 'table' not in d.texto:
-                continue
-
-            t = tables[ti]
-            ti += 1
-
-            str_t = str(t)
-            t = str_t.replace('<tr></tr>\n', '')
-
-            st = f'CDS-{ti}<br>{t}<br>'
-
-            d.texto = st
-            d.save()
-
-        return
-
-        # abre autografo 1193, captura textos do anexo ii e adiciona em seus
-        # dispositivos
-        html_file = open(
-            '/home/leandro/Downloads/702/aut_anexo2.html', 'r').read()
-
-        soup = bs(html_file, "html.parser")
-
-        tagsp = list(soup.find_all("p"))
-
-        # for t in tables:
-        #    print(t)
-
-        ds = Dispositivo.objects.filter(
-            ta_id=9665,
-            dispositivo_raiz_id=197312, id__gt=197313).order_by('ordem')
-
-        # for d in ds.filter(texto=''):
-        #    print(d)
-        # return
-
-        for p in tagsp:
-            tagb = p.contents[0]
-
-            if not hasattr(tagb, 'contents') or not tagb.contents or not len(tagb.contents):
-                continue
-
-            sb = str(tagb.contents[0]).split(' ')
-
-            if not len(sb):
-                continue
-
-            d = ds.filter(rotulo=sb[0]).first()
-            if not d:
-                continue
-
-            str_p = str(p)
-
-            str_p = str_p.replace(sb[0], '', 1)
-            str_p = str_p.replace('<p>', '')
-            str_p = str_p.replace('</p>', '')
-            str_p = str_p.replace('<b> ', '<b>')
-            str_p = str_p.replace('</b>\n', '</b><br>\n')
-
-            d.texto = str_p
-            d.save()
-            # print(str_p)
-
-        return
-        # abre autografo 1193, captura tabelas do anexo i e adiciona em seus
-        # dispositivos
-        html_file = open('/home/leandro/Downloads/702/aut.html', 'r').read()
-
-        soup = bs(html_file, "html.parser")
-
-        tables = list(soup.find_all("table"))
-
-        # for t in tables:
-        #    print(t)
-
-        ds = Dispositivo.objects.filter(
-            ta_id=9665,
-            dispositivo_raiz_id=197223, id__gt=197229).order_by('ordem')
-
-        ti = 0
-        for d in ds:
-            if d.texto and 'table' not in d.texto:
-                continue
-
-            t = tables[ti]
-            ti += 1
-
-            tag_b_prev = t.find_all_previous('b', {}, '', 1)
-
-            texto = ''
-            if len(tag_b_prev) == 1:
-                texto = str(tag_b_prev[0].contents[0])
-                texto = texto.replace('\n', ' ')
-                texto = texto.replace('&nbsp;', ' ')
-                texto = texto.replace(' – ', ' ')
-                texto = texto.strip()
-                texto = texto.split(' ')
-                texto = ' '.join(texto[1:])
-                print(texto)
-
-            st = f'{texto}\n{t}<br>'
-
-            d.texto = st
-            d.save()
-
-        return
-        num_chaves = {}
-        for u in UrlizeReferencia.objects.filter(url=''):
-            p = UrlizeReferencia.urlize(u.chave, return_result_patterns=True)
-
-            key = f'{p[0][10]}{p[0][12]}'
-
-            if key not in num_chaves:
-                num_chaves[key] = []
-
-            num_chaves[key].append(u)
-
-        num_chaves = list(num_chaves.items())
-
-        num_chaves.sort(reverse=True, key=lambda i: len(i[1]))
-
-        for item in num_chaves:
-            for u in item[1]:
-                print(u.chave, u.url)
-                #u.url = 'https://www.planalto.gov.br/ccivil_03/leis/l8078compilado.htm'
-                # u.save()
-            print('--------------------')
-            print('--------------------')
-
-            # for u in item[1]:
-            ##    print(u.chave, u.url)
-            #    u.url = 'https://legisla.casacivil.go.gov.br/pesquisa_legislacao/87672/lei-8268'
-            #    u.save()
+        # self.get_all_tas()
+        # self.sanitize_dispositivos_compilacao()
         return
 
         # list todos os orderings dos models
@@ -858,3 +626,243 @@ class Command(BaseCommand):
                 print(res.content)
 
         return
+
+    def str_intersection(self, str_left, str_right, ignore_order=False):
+        common_letters = set(str_left) & set(str_right)
+        str_intersected = ''
+        for c in str_left:
+            if (c in common_letters):  # and (c not in str_intersected):
+                str_intersected += c
+        if ignore_order:
+            pass
+        else:
+            if str_intersected in str_left and str_intersected in str_right:
+                return str_intersected
+            else:
+                return None
+        return str_intersected
+
+    def clear_html_attrs(self, nd):
+        if not hasattr(nd, 'attrs'):
+            return
+
+        attr_items = list(nd.attrs.items())
+        for k, v in attr_items:
+            if k not in (
+                'colspan',
+                'rowspan',
+                'border',
+                'cellpadding',
+                'cellspacing',
+                #'width'
+            ):
+                del nd.attrs[k]
+
+            if k == 'cellpadding':
+                nd.attrs[k] = 4
+
+        childs = list(
+            filter(
+                lambda child: isinstance(child, Tag),
+                nd.children
+            )
+        )
+        for i, child in enumerate(childs):
+            self.clear_html_attrs(child)
+            if child.name == 'td' and i != 1:
+                child.attrs['align'] = 'center'
+
+    def sanitize_html_table(self, texto):
+
+        t = texto
+
+        soup = bs(t, "html.parser")
+        self.clear_html_attrs(soup)
+
+        t = str(soup)
+        t = t.replace('<tbody>', '')
+        t = t.replace('</tbody>', '')
+        t = t.replace('<colgroup>', '')
+        t = t.replace('</colgroup>', '')
+        t = t.replace('<col>', '')
+        t = t.replace('</col>', '')
+        t = t.replace('<col/>', '')
+        t = t.replace('<tr></tr>', '')
+
+        return self.sanitize_html(t)
+
+    def sanitize_html(self, t):
+
+        t = t.replace('<p>', '')
+        t = t.replace('</p>', '')
+        t = t.replace('<span>', '')
+        t = t.replace('</span>', '')
+        t = t.replace('<font>', '')
+        t = t.replace('</font>', '')
+        t = t.replace('<i>', '')
+        t = t.replace('</i>', '')
+        t = t.replace('<b>', '<strong>')
+        t = t.replace('</b>', '</strong>')
+
+        for o, n in (
+
+            ('\xa0', '\n'),
+            ('\xa0', '\n'),
+            (' \n', '\n'),
+            ('\n ', '\n'),
+            ('\n\n', '\n'),
+            ('\n \n', '\n'),
+            ('\n<br/>\n', '\n'),
+            ('\n</td>', '</td>'),
+            ('<td>\n', '<td>'),
+            ('\r\n', '\n'),
+            ('\n\t', '  '),
+            ('\t', ' '),
+            ('\n\xa0\n', '\n'),
+            (' \n', '\n'),
+            ('\n\n', '\n'),
+            ('  ', ' '),
+            ('\n<strong>', '<strong>'),
+            ('</tr><tr>', '</tr>\n<tr>'),
+            ('<td align="center">\n', '<td align="center">'),
+            #
+            #('', ''),
+        ):
+            try:
+                while t.index(o):
+                    t = t.replace(o, n)
+            except:
+                pass
+
+        if not 'border' in t:
+            t = t.replace('<table', '<table border="1"')
+
+        return t
+
+    def sanitize_dispositivos_compilacao(self):
+
+        aut = ''
+        with open('/home/leandro/Downloads/'
+                  '2quinzena junho parcial/2qJunho/'
+                  'aut1210.html', 'rb'
+                  ) as f:
+            aut = f.read()
+
+        soup = bs(aut, "html.parser")
+
+        aut_tables = list(soup.find_all('table'))
+
+        ds = Dispositivo.objects.filter(
+            ta_publicado_id=9693,
+            texto__icontains='<table'
+            # id=198676
+        ).order_by('ordem')
+
+        for i, d in enumerate(ds):
+
+            # if d.dispositivo_substituido:
+            #    if d.texto == d.dispositivo_substituido.texto:
+            #        print(d.rotulo)
+            # continue
+
+            init_table = d.texto.index('<table')
+
+            tdb = d.texto[init_table:]
+            tdb_sanitize = self.sanitize_html_table(tdb)
+            endd_table = tdb_sanitize.index('</table>')
+            tdb_sanitize = tdb_sanitize[:endd_table + 8]
+
+            #t = d.texto[:init_table] + tdb_sanitize
+            #d.texto = t
+            # d.save()
+
+            tfile_sanitize = self.sanitize_html_table(str(aut_tables[i]))
+            endd_table = tfile_sanitize.index('</table>')
+            tfile_sanitize = tfile_sanitize[:endd_table + 8]
+
+            # print(repr(tdb_sanitize[:100]))
+            # print(repr(tfile_sanitize[:100]))
+            # print(repr(tdb_sanitize))
+            # print(repr(tfile_sanitize))
+
+            min_len = min(len(tdb_sanitize), len(tfile_sanitize))
+
+            for j in range(min_len):
+                if tdb_sanitize[j] != tfile_sanitize[j]:
+                    break
+
+            if tdb_sanitize != tfile_sanitize:
+                print(d.rotulo)
+                print(repr(tdb_sanitize[j - 20:]))
+                print(repr(tfile_sanitize[j - 20:]))
+                print('', end='')
+                print('')
+
+        ds = Dispositivo.objects.filter(
+            ta_publicado_id=9693
+        ).exclude(
+            texto__icontains='<table'
+
+        ).order_by('ordem')
+
+        for i, d in enumerate(ds):
+
+            if i < 15:
+                continue
+
+            if d.dispositivo_substituido:
+                txt_atual_sanitize = self.sanitize_html(d.texto)
+                txt_alter_sanitize = self.sanitize_html(
+                    d.dispositivo_substituido.texto)
+
+                min_len = min(len(txt_atual_sanitize), len(txt_alter_sanitize))
+
+                for j in range(min_len):
+                    if txt_atual_sanitize[j] != txt_alter_sanitize[j]:
+                        break
+
+                if txt_atual_sanitize != txt_alter_sanitize:
+                    print(d.rotulo)
+                    print('Anterior:', d.dispositivo_substituido.id,
+                          repr(txt_alter_sanitize[(j - 20) if j >= 20 else 0:]))
+                    print('Atual...:', d.id,
+                          repr(txt_atual_sanitize[(j - 20) if j >= 20 else 0:]))
+                    print('', end='')
+                    print('')
+
+
+def img_replace(page, xref, filename=None, stream=None, pixmap=None):
+
+    doc = page.parent
+    new_xref = page.insert_image(
+        page.rect, filename=filename, stream=stream, pixmap=pixmap
+    )
+    doc.xref_copy(new_xref, xref)
+    last_contents_xref = page.get_contents()[-1]
+    doc.update_stream(last_contents_xref, b" ")
+
+
+def unsharp_mask(image, kernel_size=(5, 5), sigma=1.0, amount=1.0, threshold=0):
+    """Return a sharpened version of the image, using an unsharp mask."""
+    blurred = cv2.GaussianBlur(image, kernel_size, sigma)
+    sharpened = float(amount + 1) * image - float(amount) * blurred
+    sharpened = np.maximum(sharpened, np.zeros(sharpened.shape))
+    sharpened = np.minimum(sharpened, 255 * np.ones(sharpened.shape))
+    sharpened = sharpened.round().astype(np.uint8)
+    if threshold > 0:
+        low_contrast_mask = np.absolute(image - blurred) < threshold
+        np.copyto(sharpened, image, where=low_contrast_mask)
+    return sharpened
+
+
+def increase_brightness(img, value):
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    h, s, v = cv2.split(hsv)
+
+    lim = 255 - value
+    v[v > lim] = 255
+    v[v <= lim] += value
+
+    final_hsv = cv2.merge((h, s, v))
+    img = cv2.cvtColor(final_hsv, cv2.COLOR_HSV2BGR)
+    return img

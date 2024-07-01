@@ -1,5 +1,7 @@
 from django.conf.urls import url
 
+from sapl.relatorios.views_new import RelatorioPautaSessao
+
 from .apps import AppConfig
 from .views import (relatorio_capa_processo,
                     relatorio_documento_administrativo, relatorio_espelho,
@@ -8,9 +10,18 @@ from .views import (relatorio_capa_processo,
                     relatorio_protocolo, relatorio_sessao_plenaria,
                     resumo_ata_pdf, relatorio_sessao_plenaria_pdf)
 
+
 app_name = AppConfig.name
 
+
 urlpatterns = [
+
+
+    url(r'^relatorios/sessao/(?P<pk>\d+)/pauta$',
+        RelatorioPautaSessao.as_view(), name='rel_sessao_pauta'),
+
+
+
     # weaseprint
     url(r'^relatorios/(?P<pk>\d+)/sessao-plenaria-pdf$',
         relatorio_sessao_plenaria_pdf, name='relatorio_sessao_plenaria_pdf'),

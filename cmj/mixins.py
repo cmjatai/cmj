@@ -533,9 +533,12 @@ class MultiFormatOutputMixin:
                 raise ValidationError(
                     'Formato Inválido e/ou não implementado!')
 
-            object_list = context['object_list']
-            object_list.query.low_mark = 0
-            object_list.query.high_mark = 0
+            if 'multi_object_list' not in context:
+                context['multi_object_list'] = [('', context['object_list']), ]
+
+            for subtitulo, ol in context['multi_object_list']:
+                ol.query.low_mark = 0
+                ol.query.high_mark = 0
 
             return getattr(self, f'render_to_{format_result}')(context)
 
