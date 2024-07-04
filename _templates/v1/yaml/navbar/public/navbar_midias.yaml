@@ -6,7 +6,7 @@
   url: ''
   children:
   - title: {% trans 'Transmissão ao vivo' %}
-    url: http://www.jatai.go.leg.br/tv-cmj/ao-vivo
+    url: /tv-cmj/ao-vivo
   - title: {% trans 'Sessões Transmitidas' %}
     url: ''
     children:
@@ -41,7 +41,7 @@
   url: ''
   children:
   - title: {% trans 'Rádio ao vivo' %}
-    url: http://www.jatai.go.leg.br/radio-cmj/ao-vivo
+    url: /radio-cmj/ao-vivo
   - title: {% trans 'Galeria de Áudio' %}
     url: /radio-cmj
 - title: {% trans 'Galerias' %}

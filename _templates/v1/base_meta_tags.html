@@ -1,29 +1,29 @@
 {% load i18n staticfiles common_cmj_tags cropping%}
 {% load webpack_static from webpack_loader %}
+    <link rel="manifest" href="/manifest.json">
+    <link rel="canonical" href="{{site_url}}{{request.META.PATH_INFO}}{% if request.META.QUERY_STRING %}?{{request.META.QUERY_STRING}}{% endif %}" />
 
-<link rel="manifest" href="/manifest.json">
-<link rel=icon type=image/png sizes=32x32  href="{% webpack_static 'img/icons/favicon-32x32.png' %}" >
-<link rel=icon type=image/png sizes=16x16  href="{% webpack_static 'img/icons/favicon-16x16.png' %}" >
+    <link rel=icon type=image/png sizes=32x32  href="{% webpack_static 'img/icons/favicon-32x32.png' %}" >
+    <link rel=icon type=image/png sizes=16x16  href="{% webpack_static 'img/icons/favicon-16x16.png' %}" >
 
-
-<meta property="fb:app_id" content="150874375319738">
-<meta property="fb:admins" content="cmjatai">
-<meta property="og:locale" content="pt_BR">
-<meta property="og:site_name" content="Portal da Câmara Municipal de Jataí - Goiás">
+    <meta property="fb:app_id" content="150874375319738">
+    <meta property="fb:admins" content="cmjatai">
+    <meta property="og:locale" content="pt_BR">
+    <meta property="og:site_name" content="Portal da Câmara Municipal de Jataí - Goiás">
 
 {% if request.path == '/' %}
-  <meta property="og:url" content="https://{{request.get_host}}">
+  <meta property="og:url" content="{{ site_url }}">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Portal CMJ - Câmara Municipal de Jataí">
   <meta property="og:description" content="Portal CMJ - Fonte de informações a respeito dos atos do poder legislativo do município de Jataí, na microrregião Sudoeste do Estado de Goiás.">
 
-  <meta property="og:image" content="https://{{request.get_host}}{% webpack_static 'img/logo_cmj_redesocial.jpg' %}">
+  <meta property="og:image" content="{{ site_url }}{% webpack_static 'img/logo_cmj_redesocial.jpg' %}">
   <meta property="og:image:type" content="image/jpg">
   <meta property="og:image:width" content="1024">
   <meta property="og:image:height" content="740">
 
-  <meta name="twitter:image" content="https://{{request.get_host}}{% webpack_static 'img/logo_cmj_redesocial.jpg' %}">
-  <meta name="twitter:url" content="https://{{request.get_host}}">
+  <meta name="twitter:image" content="{{ site_url }}{% webpack_static 'img/logo_cmj_redesocial.jpg' %}">
+  <meta name="twitter:url" content="{{ site_url }}">
   <meta name="twitter:description" content="Portal CMJ - Fonte de informações a respeito dos atos do poder legislativo do município de Jataí, na microrregião Sudoeste do Estado de Goiás.">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@cmjatai">
@@ -31,12 +31,12 @@
   <meta name="twitter:title" content="Portal CMJ - Câmara Municipal de Jataí">
 {% elif path %}
 
-  <meta property="og:url" content="https://{{request.get_host}}{% if object.tipo == object.TPD_IMAGE %}/{{ object.absolute_slug }}.page{% else %}/{{ object.absolute_slug }}{% endif %}">
+  <meta property="og:url" content="{{ site_url }}{% if object.tipo == object.TPD_IMAGE %}/{{ object.absolute_slug }}.page{% else %}/{{ object.absolute_slug }}{% endif %}">
   <meta property="og:type" content="website">
   <meta property="og:title" content="{% if object.titulo %}{{object.titulo}}{% elif object.parents_and_me.0.titulo %}{{object.parents_and_me.0.titulo}}{% elif object.referente %}{{object.referente.parents_and_me.0.titulo}}{% else %}Câmara Municipal de Jataí{% endif %}">
   <meta property="og:description" content="{% if object.referente %}{{object.referente.parents_and_me.0.descricao|default:''|striptags|safe}}{% else %}{{object.parents_and_me.0.descricao|default:''|striptags|safe}}{%endif%}">
 
-  <meta name="twitter:url" content="https://{{request.get_host}}{% if object.tipo == object.TPD_IMAGE %}/{{ object.absolute_slug }}.page{% else %}/{{ object.absolute_slug }}{% endif %}">
+  <meta name="twitter:url" content="{{ site_url }}{% if object.tipo == object.TPD_IMAGE %}/{{ object.absolute_slug }}.page{% else %}/{{ object.absolute_slug }}{% endif %}">
   <meta name="twitter:description" content="{% if object.referente %}{{object.referente.parents_and_me.0.descricao|default:''|striptags|safe}}{% else %}{{object.parents_and_me.0.descricao|default:''|striptags|safe}}{%endif%}">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@cmjatai">
@@ -45,29 +45,29 @@
 
   {% with object.imagem_representativa_metatags as doc_imagem %}
     {% if doc_imagem and doc_imagem.referenciado %}
-      <meta property="og:image" content="https://{{request.get_host}}/{{doc_imagem.absolute_slug}}.768.jpg">
+      <meta property="og:image" content="{{ site_url }}/{{doc_imagem.absolute_slug}}.768.jpg">
       <meta property="og:image:type" content="{{doc_imagem.referenciado.midia.last.content_type}}">
-      <meta name="twitter:image" content="https://{{request.get_host}}/{{doc_imagem.absolute_slug}}.768.jpg">
+      <meta name="twitter:image" content="{{ site_url }}/{{doc_imagem.absolute_slug}}.768.jpg">
 
       <meta property="og:image:width" content="{{doc_imagem.referenciado.midia.last.width}}">
       <meta property="og:image:height" content="{{doc_imagem.referenciado.midia.last.height}}">
     {% elif doc_imagem and doc_imagem.absolute_slug%}
-      <meta property="og:image" content="https://{{request.get_host}}/{{doc_imagem.absolute_slug}}.768.jpg">
+      <meta property="og:image" content="{{ site_url }}/{{doc_imagem.absolute_slug}}.768.jpg">
       <meta property="og:image:type" content="{{doc_imagem.midia.last.content_type}}">
-      <meta name="twitter:image" content="https://{{request.get_host}}/{{doc_imagem.absolute_slug}}.768.jpg">
+      <meta name="twitter:image" content="{{ site_url }}/{{doc_imagem.absolute_slug}}.768.jpg">
 
       <meta property="og:image:width" content="{{doc_imagem.midia.last.width}}">
       <meta property="og:image:height" content="{{doc_imagem.midia.last.height}}">
 
     {% elif doc_imagem.fotografia %}
-      <meta property="og:image" content="https://{{request.get_host}}{{doc_imagem.fotografia.url}}">
+      <meta property="og:image" content="{{ site_url }}{{doc_imagem.fotografia.url}}">
       <meta property="og:image:type" content="image/jpeg">
-      <meta name="twitter:image" content="https://{{request.get_host}}{{doc_imagem.fotografia.url}}">
+      <meta name="twitter:image" content="{{ site_url }}{{doc_imagem.fotografia.url}}">
 
     {% elif object.referenciado %}
-      <meta property="og:image" content="https://{{request.get_host}}/{{object.absolute_slug}}.768.jpg">
+      <meta property="og:image" content="{{ site_url }}/{{object.absolute_slug}}.768.jpg">
       <meta property="og:image:type" content="{{object.midia.last.content_type}}">
-      <meta name="twitter:image" content="https://{{request.get_host}}/{{object.absolute_slug}}.768.jpg">
+      <meta name="twitter:image" content="{{ site_url }}/{{object.absolute_slug}}.768.jpg">
 
       <meta property="og:image:width" content="{{object.referenciado.midia.last.width}}">
       <meta property="og:image:height" content="{{object.referenciado.midia.last.height}}">
@@ -76,7 +76,7 @@
 {% endif %}
 
 {% if object|meta_model_value:'label' == 'materia.MateriaLegislativa' %}
-  <meta property="og:url" content="https://{{request.get_host}}{% url 'sapl.materia:materialegislativa_detail' object.id %}">
+  <meta property="og:url" content="{{ site_url }}{% url 'sapl.materia:materialegislativa_detail' object.id %}">
   <meta property="og:type" content="website">
   <meta property="og:title" content="{{object}} - Portal CMJ">
   <meta property="og:description" content="{{object.ementa}}">
@@ -84,7 +84,7 @@
     {% with object.autores.first.autor_related as autor %}
       {% if autor|meta_model_value:'label' == 'parlamentares.Parlamentar' %}
         <meta property="og:image:type" content="image/jpeg">
-        <meta property="og:image" content="https://{{request.get_host}}{% cropped_thumbnail autor "fotografia_cropping" width=128 %}">
+        <meta property="og:image" content="{{ site_url }}{% cropped_thumbnail autor "fotografia_cropping" width=128 %}">
         <meta property="og:image:width" content="128">
         <meta property="og:image:height" content="128">
       {% endif %}

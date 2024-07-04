@@ -4,7 +4,7 @@ config = AutoConfig()
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 AUTH_USER_MODEL = 'core.User'
-SOCIAL_AUTH_POSTGRES_JSONFIELD = True
+SOCIAL_AUTH_JSONFIELD_ENABLED = True
 
 str_pv = 'django.contrib.auth.password_validation'
 AUTH_PASSWORD_VALIDATORS = [
@@ -38,7 +38,7 @@ GOOGLE_RECAPTCHA_SITE_KEY = config(
 GOOGLE_RECAPTCHA_SECRET_KEY = config(
     'GOOGLE_RECAPTCHA_SECRET_KEY', cast=str, default='')
 
-SOCIAL_AUTH_POSTGRES_JSONFIELD = True
+SOCIAL_AUTH_JSONFIELD_ENABLED = True
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
