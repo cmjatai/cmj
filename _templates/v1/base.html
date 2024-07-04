@@ -186,6 +186,8 @@
   </script>
 
   {% if not DEBUG and not perms.materia and not perms.norma and not perms.sessao %}
+
+    {% comment %}
     <script>
       window.fbAsyncInit = function () {
         FB.init({
@@ -210,6 +212,7 @@
           fjs.parentNode.insertBefore(js, fjs);
         }(document, 'script', 'facebook-jssdk'));
     </script>
+    {% endcomment %}
 
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-0E9S41BRSL"></script>
