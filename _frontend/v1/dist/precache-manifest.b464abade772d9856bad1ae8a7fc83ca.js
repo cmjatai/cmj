@@ -676,7 +676,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/js/skins/ui/tinymce-5/skin.shadowdom.min.css"
   },
   {
-    "revision": "7516fc313b953a9501c3ae0c58933f63",
+    "revision": "a0f2247a0047149e2a62a059c7319a6e",
     "url": "/static/manifest.json"
   },
   {
@@ -684,7 +684,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/robots.txt"
   },
   {
-    "revision": "a6a54b44411ceaadc2a91e9cac8629dc",
+    "revision": "e440a1a1650656be0f1a734ad95ec8c2",
     "url": "/static/service-worker.js"
   }
 ]);
