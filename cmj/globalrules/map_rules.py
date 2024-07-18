@@ -43,16 +43,18 @@ from sapl.rules.map_rules import __base__
 __base__ = [RP_LIST, RP_DETAIL, RP_ADD, RP_CHANGE, RP_DELETE]
 __listdetailchange__ = [RP_LIST, RP_DETAIL, RP_CHANGE]
 
+__perms_publicas__ = {RP_LIST, RP_DETAIL}
+
 
 rules_group_social_users = {
     'group': GROUP_SOCIAL_USERS,
     'rules': [
-        (Perfil, __base__),
-        (EnderecoPerfil, __base__),
-        (EmailPerfil, __base__),
-        (TelefonePerfil, __base__),
-        (LocalTrabalhoPerfil, __base__),
-        (DependentePerfil, __base__),
+        (Perfil, __base__, set()),
+        (EnderecoPerfil, __base__, set()),
+        (EmailPerfil, __base__, set()),
+        (TelefonePerfil, __base__, set()),
+        (LocalTrabalhoPerfil, __base__, set()),
+        (DependentePerfil, __base__, set()),
     ]
 }
 
@@ -63,31 +65,31 @@ rules_group_admin = {
             menu_impresso_enderecamento,
             menu_tabelas_auxiliares,
             menu_administracao,
-        ]),
-        (Municipio, __base__),
-        (AreaTrabalho, __base__),
-        (OperadorAreaTrabalho, __base__),
-        (Cep, __base__),
-        (RegiaoMunicipal, __base__),
-        (Bairro, __base__),
-        (TipoLogradouro, __base__),
-        (Distrito, __base__),
-        (Logradouro, __base__),
-        (Trecho, __base__),
-        (ImpressoEnderecamento, __base__),
-        (TipoTelefone, __base__),
-        (TipoEndereco, __base__),
-        (TipoEmail, __base__),
-        (Parentesco, __base__),
-        (EstadoCivil, __base__),
-        (PronomeTratamento, __base__),
-        (TipoAutoridade, __base__),
-        (TipoLocalTrabalho, __base__),
-        (NivelInstrucao, __base__),
-        (OperadoraTelefonia, __base__),
-        (StatusProcesso, __base__),
-        (ClassificacaoProcesso, __base__),
-        (TopicoProcesso, __base__),
+        ], set()),
+        (Municipio, __base__, set()),
+        (AreaTrabalho, __base__, set()),
+        (OperadorAreaTrabalho, __base__, set()),
+        (Cep, __base__, set()),
+        (RegiaoMunicipal, __base__, set()),
+        (Bairro, __base__, set()),
+        (TipoLogradouro, __base__, set()),
+        (Distrito, __base__, set()),
+        (Logradouro, __base__, set()),
+        (Trecho, __base__, set()),
+        (ImpressoEnderecamento, __base__, set()),
+        (TipoTelefone, __base__, set()),
+        (TipoEndereco, __base__, set()),
+        (TipoEmail, __base__, set()),
+        (Parentesco, __base__, set()),
+        (EstadoCivil, __base__, set()),
+        (PronomeTratamento, __base__, set()),
+        (TipoAutoridade, __base__, set()),
+        (TipoLocalTrabalho, __base__, set()),
+        (NivelInstrucao, __base__, set()),
+        (OperadoraTelefonia, __base__, set()),
+        (StatusProcesso, __base__, set()),
+        (ClassificacaoProcesso, __base__, set()),
+        (TopicoProcesso, __base__, set()),
 
     ]
 }
@@ -105,22 +107,22 @@ rules_saap_group_workspace_oper_contatos = {
         (get_user_model(), [
             menu_contatos,
             menu_dados_auxiliares,
-            menu_relatorios]),
-        (Trecho, [RP_LIST, RP_DETAIL]),
-        (OperadoraTelefonia, [RP_LIST, RP_DETAIL]),
-        (NivelInstrucao, [RP_LIST, RP_DETAIL]),
-        (EstadoCivil, [RP_LIST, RP_DETAIL]),
-        (Partido, [RP_LIST, RP_DETAIL]),
+            menu_relatorios], set()),
+        (Trecho, [RP_LIST, RP_DETAIL], set()),
+        (OperadoraTelefonia, [RP_LIST, RP_DETAIL], set()),
+        (NivelInstrucao, [RP_LIST, RP_DETAIL], set()),
+        (EstadoCivil, [RP_LIST, RP_DETAIL], set()),
+        (Partido, [RP_LIST, RP_DETAIL], set()),
         (Contato, __base__ + [
             'print_impressoenderecamento',
             'print_rel_contato_agrupado_por_processo',
-            'print_rel_contato_agrupado_por_grupo']),
-        (Endereco, __base__),
-        (Email, __base__),
-        (Telefone, __base__),
-        (LocalTrabalho, __base__),
-        (Dependente, __base__),
-        (FiliacaoPartidaria, __base__),
+            'print_rel_contato_agrupado_por_grupo'], set()),
+        (Endereco, __base__, set()),
+        (Email, __base__, set()),
+        (Telefone, __base__, set()),
+        (LocalTrabalho, __base__, set()),
+        (Dependente, __base__, set()),
+        (FiliacaoPartidaria, __base__, set()),
     ]
 }
 
@@ -130,9 +132,9 @@ rules_saap_group_workspace_oper_grupo_contatos = {
     'rules': [
         (get_user_model(), [
             menu_contatos,
-            menu_grupocontatos, ]),
-        (GrupoDeContatos, __base__),
-        (Contato, [RP_LIST, RP_DETAIL, ]),
+            menu_grupocontatos, ], set()),
+        (GrupoDeContatos, __base__, set()),
+        (Contato, [RP_LIST, RP_DETAIL, ], set()),
     ]
 }
 
@@ -140,9 +142,9 @@ rules_saap_group_workspace_oper_recepcao = {
     'group': GROUP_SAAP_WORKSPACE_OPER_RECEPCAO,
     'rules': [
         (get_user_model(), [
-            menu_recepcao, ]),
-        (Visita, [RP_LIST, RP_DETAIL, RP_ADD, ]),
-        (Visitante, [RP_LIST, RP_DETAIL, RP_ADD, RP_CHANGE, ]),
+            menu_recepcao, ], set()),
+        (Visita, [RP_LIST, RP_DETAIL, RP_ADD, ], set()),
+        (Visitante, [RP_LIST, RP_DETAIL, RP_ADD, RP_CHANGE, ], set()),
     ]
 }
 
@@ -152,10 +154,10 @@ rules_saap_group_workspace_oper_processos = {
         (get_user_model(), [
             menu_processos,
             menu_dados_auxiliares,
-            menu_relatorios]),
-        (AssuntoProcesso, __base__),
-        (Processo, __base__),
-        (ProcessoContato, __base__),
+            menu_relatorios], set()),
+        (AssuntoProcesso, __base__, set()),
+        (Processo, __base__, set()),
+        (ProcessoContato, __base__, set()),
     ]
 }
 
@@ -170,8 +172,8 @@ rules_agenda_group_workspace = {
     'rules': [
         (get_user_model(), [
             menu_dados_auxiliares,
-            menu_agenda]),
-        (Evento, __base__)
+            menu_agenda], set()),
+        (Evento, __base__, set())
     ]
 }
 
@@ -179,16 +181,16 @@ rules_agenda_group_workspace = {
 rules_diarios_group_operador = {
     'group': GROUP_DIARIOS_OPERADOR,
     'rules': [
-        (DiarioOficial, __base__),
-        (VinculoDocDiarioOficial, __base__)
+        (DiarioOficial, __base__, __perms_publicas__),
+        (VinculoDocDiarioOficial, __base__, __perms_publicas__)
     ]
 }
 
 rules_draft_group_operador = {
     'group': GROUP_DRAFT_OPERADOR,
     'rules': [
-        (Draft, __base__),
-        (DraftMidia, __base__),
+        (Draft, __base__, set()),
+        (DraftMidia, __base__, set()),
     ]
 }
 
@@ -196,18 +198,18 @@ rules_draft_group_operador = {
 rules_arq_group_operador = {
     'group': GROUP_ARQ_OPERADOR,
     'rules': [
-        (Draft, __base__+ [
+        (Draft, __base__ + [
             'view_draft',
-        ]),
-        (DraftMidia, __base__+ [
+        ], set()),
+        (DraftMidia, __base__ + [
             'view_draftmidia',
-        ]),
-        (ArqClasse, __base__+ [
+        ], set()),
+        (ArqClasse, __base__ + [
             'view_arqclasse',
-        ]),
+        ], set()),
         (ArqDoc, __base__ + [
             'view_arqdoc',
-        ]),
+        ], set()),
     ]
 }
 
@@ -230,25 +232,25 @@ rules_group_anonymous = {
 rules_sigad_view_status_restritos = {
     'group': GROUP_SIGAD_VIEW_STATUS_RESTRITOS,
     'rules': [
-        (get_user_model(), ['menu_dados_auxiliares']),
-        (Midia, [RP_DETAIL]),
+        (get_user_model(), ['menu_dados_auxiliares'], set()),
+        (Midia, [RP_DETAIL], set()),
         (Classe, [
             'view_pathclasse',
             'view_subclasse',
-        ]),
+        ], set()),
 
         (Documento, [
             'view_documento_show'
-        ])]
+        ], set())]
 }
 
 rules_ouvidoria_visualizacao_respostas = {
     'group': GROUP_OUVIDORIA_VISUALIZACAO_RESPOSTAS,
     'rules': [
 
-        (Solicitacao, [RP_LIST, RP_DETAIL]),
-        (Notificacao, ['popup_notificacao']),
-        (MensagemSolicitacao, [RP_DETAIL])
+        (Solicitacao, [RP_LIST, RP_DETAIL], set()),
+        (Notificacao, ['popup_notificacao'], set()),
+        (MensagemSolicitacao, [RP_DETAIL], set())
     ]
 }
 
@@ -273,3 +275,25 @@ rules_patterns = [
 
     # rules_group_geral
 ]
+
+
+rules_patterns_public = {}
+
+
+def _get_registration_key(model):
+    return '%s:%s' % (model._meta.app_label, model._meta.model_name)
+
+
+for rules_group in rules_patterns:
+    # print(rules_group['group'])
+    for rules in rules_group['rules']:
+        # print(rules)
+        key = _get_registration_key(rules[0])
+        if key not in rules_patterns_public:
+            rules_patterns_public[key] = set()
+
+        r = set(map(lambda x, m=rules[0]: '{}{}{}'.format(
+            m._meta.app_label,
+            x,
+            m._meta.model_name), rules[2]))
+        rules_patterns_public[key] = rules_patterns_public[key] | r

@@ -1,5 +1,10 @@
 from rest_framework.permissions import DjangoModelPermissions
-from sapl.rules.map_rules import rules_patterns_public
+
+from cmj.globalrules.map_rules import rules_patterns_public as cmj_rpp
+from sapl.rules.map_rules import rules_patterns_public as sapl_rpp
+
+portalcmj_rpp = sapl_rpp.copy()
+portalcmj_rpp.update(cmj_rpp)
 
 
 class SaplModelPermissions(DjangoModelPermissions):
@@ -38,9 +43,9 @@ class SaplModelPermissions(DjangoModelPermissions):
             queryset.model._meta.app_label,
             queryset.model._meta.model_name)
 
-        if key in rules_patterns_public:
+        if key in portalcmj_rpp:
             perms = set(perms)
-            perms_publicas = rules_patterns_public[key]
+            perms_publicas = portalcmj_rpp[key]
 
             private_perms = perms - perms_publicas
             if not private_perms:
