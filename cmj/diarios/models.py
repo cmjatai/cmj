@@ -8,7 +8,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from cmj.mixins import CommonMixin, CmjCleanMixin
 from cmj.utils import texto_upload_path
-from sapl.utils import restringe_tipos_de_arquivo_txt, OverwriteStorage
+from sapl.utils import restringe_tipos_de_arquivo_txt, OverwriteStorage,\
+    PortalFileField
 
 
 class TipoDeDiario(models.Model):
@@ -49,7 +50,7 @@ class DiarioOficial(CommonMixin):
     data = models.DateField(
         blank=True, null=True, verbose_name=_('Data'))
 
-    arquivo = models.FileField(
+    arquivo = PortalFileField(
         blank=True,
         null=True,
         upload_to=diario_upload_path,
