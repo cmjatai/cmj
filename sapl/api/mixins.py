@@ -4,6 +4,8 @@ import os
 from django.conf import settings
 from django.http.response import HttpResponse, Http404
 import fitz
+from pymupdf import Point, Rect
+import pymupdf
 from rest_framework.exceptions import NotFound
 
 from cmj.core.models import AreaTrabalho
@@ -15,23 +17,64 @@ logger = logging.getLogger(__name__)
 
 class ResponseFileMixin:
 
-    def response_pagepdftoimage(self, arquivo, _page, _dpi):
+    def response_pagepdftoimage(self, arquivo, _page, _dpi, _grade='0'):
+
+        _rect = None
+        if _grade.isnumeric():
+            _grade = int(_grade)
+        else:
+            _rect = Rect(*tuple(map(lambda x: int(x), _grade.split(','))))
+            _grade = 25
+
+        def grade_for_page(p, grade):
+            w = int(p.rect.x1)
+            h = int(p.rect.y1)
+
+            if _rect:
+                p.draw_rect(
+                    _rect,
+                    width=0,
+                    fill=(0.5, 0, 0),
+                    fill_opacity=0.5
+                )
+
+            for x in range(grade, w, grade):
+                p.insert_text((x, 7), str(x), fontsize=7)
+                p.draw_line(
+                    (x, 0), (x, h),
+                    color=(0.5, 0, 0),
+                    width=0.5,
+                    dashes="[3]",
+                    stroke_opacity=0.5
+                )
+            for y in range(grade, h, grade):
+                p.insert_text((1, y + 5), str(y), fontsize=7)
+                p.draw_line(
+                    (0, y), (w, y),
+                    color=(0.5, 0, 0),
+                    width=0.5,
+                    dashes="[3]",
+                    stroke_opacity=0.5  # , fill_opacity=1,
+                )
 
         fcache_path = f'{arquivo.file}-p{_page:0>3}-d{_dpi:0>3}.png'
-
-        if os.path.exists(fcache_path):
-            with open(fcache_path, 'rb') as f:
-                response = HttpResponse(f, content_type='image/png')
-            return response
+        if _grade < 10:
+            if os.path.exists(fcache_path):
+                with open(fcache_path, 'rb') as f:
+                    response = HttpResponse(f, content_type='image/png')
+                return response
 
         doc = fitz.open(arquivo.file)
         for index, page in enumerate(doc, 1):
             if index == _page:
+                if _grade >= 10:
+                    grade_for_page(page, _grade)
                 png = page.get_pixmap(dpi=int(_dpi) if _dpi else 300)
                 bpng = png.tobytes()
 
-                with open(fcache_path, 'wb') as f:
-                    f.write(bpng)
+                if _grade < 10:
+                    with open(fcache_path, 'wb') as f:
+                        f.write(bpng)
 
                 doc.close()
                 response = HttpResponse(bpng, content_type='image/png')
@@ -39,10 +82,52 @@ class ResponseFileMixin:
 
         raise NotFound
 
+    def anon(self, arquivo, page, grade, anon):
+        try:
+            fin = arquivo.path
+            doc = pymupdf.open(fin)
+            pages = doc.pages() if not page else doc.pages(page - 1, page, 1)
+
+            grade = tuple(filter(lambda y: y, map(
+                lambda x: int(x), grade.split(','))))
+            excludes = tuple(filter(lambda y: y, map(
+                lambda x: x.strip(), anon.split(','))))
+
+            for p in pages:
+                r = Rect(*grade) if grade else p.rect
+                areas_all = []
+
+                for e in excludes:
+                    areas = p.search_for(e)
+                    areas_all.extend(areas)
+
+                for area in areas_all:
+                    if r.intersects(area):
+                        p.add_redact_annot(
+                            area, fill=(0, 0, 0))
+
+                p.apply_redactions()
+
+            if settings.DEBUG:
+                doc.save('/home/leandro/TEMP/pdf_anon.pdf')
+                doc.close()
+                return
+            fout = f'{fin}.new'
+            doc.save(fout)
+            doc.close()
+            os.remove(fin)
+            os.rename(fout, fin)
+
+        except Exception as e:
+            print(e)
+            pass
+
     def response_file(self, request, *args, **kwargs):
         item = self.get_queryset().filter(pk=kwargs['pk']).first()
-        page = request.GET.get('page', None)
+        page = request.GET.get('page', 0)
         dpi = request.GET.get('dpi', 72)
+        grade = request.GET.get('grade', '0')
+        anon = request.GET.get('anon', '')
 
         if not item:
             logger.info(f'response_file not item')
@@ -59,8 +144,11 @@ class ResponseFileMixin:
 
         mime = get_mime_type_from_file_extension(arquivo.name)
 
+        if request.user.is_superuser and anon and mime == 'application/pdf':
+            self.anon(arquivo, int(page), grade, anon)
+
         if page and mime == 'application/pdf':
-            return self.response_pagepdftoimage(arquivo, int(page), dpi)
+            return self.response_pagepdftoimage(arquivo, int(page), dpi, grade)
 
         if mime == 'application/png':
             mime = 'image/png'

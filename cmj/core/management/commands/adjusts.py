@@ -22,11 +22,14 @@ from django.core.management.base import BaseCommand
 from django.db.models import Q
 import fitz
 import ocrmypdf
+from pymupdf import Rect
+import pymupdf
 from reportlab.pdfgen import canvas
 from reportlab.platypus.doctemplate import SimpleDocTemplate
 import requests
 
 from cmj.arq.models import ArqDoc
+from cmj.diarios.models import DiarioOficial
 from cmj.utils import Manutencao
 import numpy as np
 from sapl.compilacao.models import Dispositivo, UrlizeReferencia
@@ -39,6 +42,43 @@ def _get_registration_key(model):
     return '%s_%s' % (model._meta.app_label, model._meta.model_name)
 
 
+def img_replace(page, xref, filename=None, stream=None, pixmap=None):
+
+    doc = page.parent
+    new_xref = page.insert_image(
+        page.rect, filename=filename, stream=stream, pixmap=pixmap
+    )
+    doc.xref_copy(new_xref, xref)
+    last_contents_xref = page.get_contents()[-1]
+    doc.update_stream(last_contents_xref, b" ")
+
+
+def unsharp_mask(image, kernel_size=(5, 5), sigma=1.0, amount=1.0, threshold=0):
+    """Return a sharpened version of the image, using an unsharp mask."""
+    blurred = cv2.GaussianBlur(image, kernel_size, sigma)
+    sharpened = float(amount + 1) * image - float(amount) * blurred
+    sharpened = np.maximum(sharpened, np.zeros(sharpened.shape))
+    sharpened = np.minimum(sharpened, 255 * np.ones(sharpened.shape))
+    sharpened = sharpened.round().astype(np.uint8)
+    if threshold > 0:
+        low_contrast_mask = np.absolute(image - blurred) < threshold
+        np.copyto(sharpened, image, where=low_contrast_mask)
+    return sharpened
+
+
+def increase_brightness(img, value):
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    h, s, v = cv2.split(hsv)
+
+    lim = 255 - value
+    v[v > lim] = 255
+    v[v <= lim] += value
+
+    final_hsv = cv2.merge((h, s, v))
+    img = cv2.cvtColor(final_hsv, cv2.COLOR_HSV2BGR)
+    return img
+
+
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
@@ -46,6 +86,8 @@ class Command(BaseCommand):
         m = Manutencao()
         m.desativa_auto_now()
         m.desativa_signals()
+
+        self.anonimizardiario()
 
         # self.get_all_tas()
         # self.sanitize_dispositivos_compilacao()
@@ -829,40 +871,3 @@ class Command(BaseCommand):
                           repr(txt_atual_sanitize[(j - 20) if j >= 20 else 0:]))
                     print('', end='')
                     print('')
-
-
-def img_replace(page, xref, filename=None, stream=None, pixmap=None):
-
-    doc = page.parent
-    new_xref = page.insert_image(
-        page.rect, filename=filename, stream=stream, pixmap=pixmap
-    )
-    doc.xref_copy(new_xref, xref)
-    last_contents_xref = page.get_contents()[-1]
-    doc.update_stream(last_contents_xref, b" ")
-
-
-def unsharp_mask(image, kernel_size=(5, 5), sigma=1.0, amount=1.0, threshold=0):
-    """Return a sharpened version of the image, using an unsharp mask."""
-    blurred = cv2.GaussianBlur(image, kernel_size, sigma)
-    sharpened = float(amount + 1) * image - float(amount) * blurred
-    sharpened = np.maximum(sharpened, np.zeros(sharpened.shape))
-    sharpened = np.minimum(sharpened, 255 * np.ones(sharpened.shape))
-    sharpened = sharpened.round().astype(np.uint8)
-    if threshold > 0:
-        low_contrast_mask = np.absolute(image - blurred) < threshold
-        np.copyto(sharpened, image, where=low_contrast_mask)
-    return sharpened
-
-
-def increase_brightness(img, value):
-    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    h, s, v = cv2.split(hsv)
-
-    lim = 255 - value
-    v[v > lim] = 255
-    v[v <= lim] += value
-
-    final_hsv = cv2.merge((h, s, v))
-    img = cv2.cvtColor(final_hsv, cv2.COLOR_HSV2BGR)
-    return img
