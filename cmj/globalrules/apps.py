@@ -52,7 +52,7 @@ def update_groups_cmj(app_config, verbosity=2, interactive=True,
 
             try:
                 print(' ', group_name)
-                for model, perms in rules_list:
+                for model, perms, perms_publicas in rules_list:
                     self.associar(group, model, perms)
             except Exception as e:
                 print(group_name, e)
