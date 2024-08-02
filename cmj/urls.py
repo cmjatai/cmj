@@ -37,6 +37,7 @@ import cmj.cerimonial.urls
 import cmj.core.urls
 from cmj.core.views_short import ShortRedirectView
 import cmj.diarios.urls
+import cmj.loa.urls
 import cmj.globalrules.urls
 import cmj.ouvidoria.urls
 import cmj.search.urls
@@ -73,6 +74,7 @@ urlpatterns_all = [
     url(r'', include(cmj.core.urls)),
     url(r'', include(cmj.cerimonial.urls)),
     url(r'', include(cmj.diarios.urls)),
+    url(r'', include(cmj.loa.urls)),
     url(r'', include(cmj.arq.urls)),
     url(r'', include(cmj.ouvidoria.urls)),
     url(r'', include(cmj.agenda.urls)),

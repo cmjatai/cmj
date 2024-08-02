@@ -31,6 +31,7 @@ from cmj.globalrules import (RP_ADD, RP_CHANGE, RP_DELETE, RP_DETAIL, RP_LIST,
                              GROUP_AGENDA_WORKSPACE, menu_agenda,
                              GROUP_MATERIA_WORKSPACE_VIEWER,
                              GROUP_DIARIOS_OPERADOR,
+                             GROUP_LOA_OPERADOR,
                              GROUP_SAAP_WORKSPACE_OPER_RECEPCAO, menu_recepcao,
                              GROUP_DRAFT_OPERADOR, GROUP_ARQ_OPERADOR)
 from cmj.ouvidoria.models import Solicitacao, MensagemSolicitacao
@@ -183,6 +184,12 @@ rules_diarios_group_operador = {
     'rules': [
         (DiarioOficial, __base__, __perms_publicas__),
         (VinculoDocDiarioOficial, __base__, __perms_publicas__)
+    ]
+}
+
+rules_loa_group_operador = {
+    'group': GROUP_LOA_OPERADOR,
+    'rules': [
     ]
 }
 

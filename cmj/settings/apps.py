@@ -70,6 +70,7 @@ CMJ_APPS = (
     'cmj.core',
 
     'cmj.diarios',
+    'cmj.loa',
     'cmj.cerimonial',
     'cmj.ouvidoria',
     'cmj.arq',
