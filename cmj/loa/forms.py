@@ -15,7 +15,55 @@ from sapl.parlamentares.models import Parlamentar
 logger = logging.getLogger(__name__)
 
 
-class LoaForm(ModelForm):
+def quantize(value, decimal_places='0.01', rounding=ROUND_HALF_DOWN) -> Decimal:
+    return value.quantize(
+        Decimal(decimal_places),
+        rounding=rounding
+    )
+
+
+class MateriaCheckFormMixin:
+
+    def clean(self):
+
+        cleaned_data = super(LoaForm, self).clean()
+        if not self.is_valid():
+            return cleaned_data
+
+        materia = cleaned_data['numero_materia']
+        ano_materia = cleaned_data['ano_materia']
+        tipo_materia = cleaned_data['tipo_materia']
+
+        if materia and ano_materia and tipo_materia:
+            try:
+                logger.debug("Tentando obter MateriaLegislativa %s nº %s/%s." %
+                             (tipo_materia, materia, ano_materia))
+                materia = MateriaLegislativa.objects.get(
+                    numero=materia,
+                    ano=ano_materia,
+                    tipo=tipo_materia)
+            except ObjectDoesNotExist:
+                msg = _('A matéria %s nº %s/%s não existe no cadastro'
+                        ' de matérias legislativas.' % (tipo_materia, materia, ano_materia))
+                logger.error('A MateriaLegislativa %s nº %s/%s não existe no cadastro'
+                             ' de matérias legislativas.' % (tipo_materia, materia, ano_materia))
+                raise ValidationError(msg)
+            else:
+                logger.info("MateriaLegislativa %s nº %s/%s obtida com sucesso." %
+                            (tipo_materia, materia, ano_materia))
+                cleaned_data['materia'] = materia
+
+        else:
+            campos = [materia, tipo_materia, ano_materia]
+            if campos.count(None) + campos.count('') < len(campos):
+                msg = _(
+                    'Preencha todos os campos relacionados à Matéria Legislativa')
+                logger.error('Algum campo relacionado à MatériaLegislativa %s nº %s/%s \
+                                não foi preenchido.' % (tipo_materia, materia, ano_materia))
+                raise ValidationError(msg)
+
+
+class LoaForm(MateriaCheckFormMixin, ModelForm):
 
     tipo_materia = forms.ModelChoiceField(
         label=_('Tipo Matéria'),
@@ -62,53 +110,9 @@ class LoaForm(ModelForm):
             (p.pk, p) for p in Parlamentar.objects.filter(ativo=True)
         ]
 
-    def clean(self):
-
-        cleaned_data = super(LoaForm, self).clean()
-        if not self.is_valid():
-            return cleaned_data
-
-        materia = cleaned_data['numero_materia']
-        ano_materia = cleaned_data['ano_materia']
-        tipo_materia = cleaned_data['tipo_materia']
-
-        if materia and ano_materia and tipo_materia:
-            try:
-                logger.debug("Tentando obter MateriaLegislativa %s nº %s/%s." %
-                             (tipo_materia, materia, ano_materia))
-                materia = MateriaLegislativa.objects.get(
-                    numero=materia,
-                    ano=ano_materia,
-                    tipo=tipo_materia)
-            except ObjectDoesNotExist:
-                msg = _('A matéria %s nº %s/%s não existe no cadastro'
-                        ' de matérias legislativas.' % (tipo_materia, materia, ano_materia))
-                logger.error('A MateriaLegislativa %s nº %s/%s não existe no cadastro'
-                             ' de matérias legislativas.' % (tipo_materia, materia, ano_materia))
-                raise ValidationError(msg)
-            else:
-                logger.info("MateriaLegislativa %s nº %s/%s obtida com sucesso." %
-                            (tipo_materia, materia, ano_materia))
-                cleaned_data['materia'] = materia
-
-        else:
-            campos = [materia, tipo_materia, ano_materia]
-            if campos.count(None) + campos.count('') < len(campos):
-                msg = _(
-                    'Preencha todos os campos relacionados à Matéria Legislativa')
-                logger.error('Algum campo relacionado à MatériaLegislativa %s nº %s/%s \
-                                não foi preenchido.' % (tipo_materia, materia, ano_materia))
-                raise ValidationError(msg)
-
     def save(self, commit=True):
 
         i = self.instance
-
-        def quantize(value, decimal_places='0.01', rounding=ROUND_HALF_DOWN) -> Decimal:
-            return value.quantize(
-                Decimal(decimal_places),
-                rounding=rounding
-            )
 
         i.disp_total = quantize(
             i.receita_corrente_liquida *

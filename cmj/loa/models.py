@@ -134,12 +134,29 @@ class EmendaLoa(models.Model):
 
     SAUDE = 10
     DIVERSOS = 99
-    TIPOEMENDALOA_CHOICE = ((SAUDE, _('Saúde')),
-                            (DIVERSOS, _('Áreas Diversas')))
+    TIPOEMENDALOA_CHOICE = (
+        (SAUDE, _('Saúde')),
+        (DIVERSOS, _('Áreas Diversas'))
+    )
+
+    PROPOSTA = 10
+    APROVACAO_LEGISLATIVA = 20
+    APROVACAO_LEGAL = 30
+    IMPEDIMENTO_TECNICO = 40
+    FASE_CHOICE = (
+        (PROPOSTA, _('Proposta Legislativa')),
+        (APROVACAO_LEGISLATIVA, _('Aprovada no Poder Legislativo')),
+        (APROVACAO_LEGAL, _('Aprovada')),
+        (IMPEDIMENTO_TECNICO, _('Impedimento Técnico'))
+    )
 
     tipo = models.PositiveSmallIntegerField(
         choices=TIPOEMENDALOA_CHOICE,
-        default=0, verbose_name=_('Área de aplicação'))
+        default=99, verbose_name=_('Área de aplicação'))
+
+    fase = models.PositiveSmallIntegerField(
+        choices=FASE_CHOICE,
+        default=10, verbose_name=_('Fase'))
 
     finalidade = models.TextField(_("Finalidade"))
 
