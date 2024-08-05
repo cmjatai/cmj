@@ -18,6 +18,8 @@ def front_version():
     elif FRONTEND_VERSION == 'v3':
         return ['_templates/v3', '_templates/v1']
 
+FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
+
 
 TEMPLATES = [
     {

@@ -2,12 +2,18 @@
 from decimal import Decimal, ROUND_DOWN, ROUND_HALF_DOWN
 import logging
 
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Fieldset
 from django import forms
+from django.contrib.postgres.forms.array import SplitArrayField,\
+    SplitArrayWidget
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.forms.fields import MultiValueField
 from django.forms.models import ModelForm
 from django.utils.translation import ugettext_lazy as _
 
-from cmj.loa.models import Loa, EmendaLoa
+from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar
+from sapl.crispy_layout_mixin import to_row, SaplFormLayout
 from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
 
@@ -152,6 +158,22 @@ class LoaForm(MateriaCheckFormMixin, ModelForm):
         return i
 
 
+class EmendaLoaValorWidget(SplitArrayWidget):
+    template_name = 'widget/parlamentares_valor_form.html'
+
+    def __init__(self, widget, parlamentares=[], **kwargs):
+        super().__init__(widget, size=len(parlamentares), **kwargs)
+        self.parlamentares = parlamentares
+
+    def get_context(self, name, value, attrs=None):
+        context = super().get_context(name, value, attrs)
+
+        pw = zip(self.parlamentares, context['widget']['subwidgets'])
+        for p, w in pw:
+            w['label'] = p.nome_parlamentar
+        return context
+
+
 class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
     tipo_materia = forms.ModelChoiceField(
@@ -173,13 +195,14 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         widget=forms.HiddenInput(),
         queryset=MateriaLegislativa.objects.all())
 
-    parlamentares = forms.ModelMultipleChoiceField(
-        required=True,
-        widget=forms.CheckboxSelectMultiple(),
-        queryset=Parlamentar.objects.all())
-
     finalidade = forms.CharField(
         label='Finalidade', required=True)
+
+    parlamentares__valor = SplitArrayField(
+        forms.DecimalField(required=False), 10,
+        label='Valores por Parlamentar',
+        required=False
+    )
 
     class Meta:
         model = EmendaLoa
@@ -189,14 +212,83 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
             'materia', 'tipo_materia', 'numero_materia', 'ano_materia',
             'valor',
             'finalidade',
-            'parlamentares'
+            'parlamentares__valor'
         ]
 
     def __init__(self, *args, **kwargs):
+
+        row1 = to_row([
+            ('tipo', 2),
+            ('fase', 2),
+            ('tipo_materia', 4),
+            ('numero_materia', 2),
+            ('ano_materia', 2),
+            ('materia', 0),
+        ])
+
+        row2 = to_row([
+            ('valor', 3),
+            ('finalidade', 9),
+        ])
+
+        row3 = to_row([
+            ('parlamentares__valor', 12),
+        ])
+
+        self.helper = FormHelper()
+        self.helper.layout = SaplFormLayout(
+            Fieldset(_('Dados Gerais'),
+                     row1, row2, row3,))
+
         super().__init__(*args, **kwargs)
 
-        self.fields['parlamentares'].choices = [
-            (p.pk, p) for p in kwargs['initial'][
-                'loa'
-            ].parlamentares.order_by('nome_parlamentar')
-        ]
+        self.loa = kwargs['initial']['loa']
+        self.parlamentares = self.loa.parlamentares.order_by(
+            'nome_parlamentar')
+
+        self.fields['parlamentares__valor'].max_length = self.parlamentares.count()
+
+        self.fields['parlamentares__valor'].widget = EmendaLoaValorWidget(
+            widget=self.fields['parlamentares__valor'].base_field.widget,
+            parlamentares=list(self.parlamentares)
+        )
+
+        # self.fields['parlamentares'].choices = [
+        #    (p.pk, p) for p in parlamentares
+        #]
+
+    def clean(self):
+        super().clean()
+        cleaned_data = self.cleaned_data
+
+        soma = sum(
+            list(
+                filter(
+                    lambda x: x, cleaned_data['parlamentares__valor']
+                )
+            )
+        )
+
+        if soma != cleaned_data['valor']:
+            msg = _('A Soma dos Valores Por Parlamentar não '
+                    'coincide com o Valor Global da emenda')
+            logger.error(msg)
+            raise ValidationError(msg)
+        return cleaned_data
+
+    def save(self, commit=True):
+        i = super().save(commit)
+        i.parlamentares.clear()
+
+        pv = zip(self.parlamentares, self.cleaned_data['parlamentares__valor'])
+
+        for p, v in pv:
+            if not v:
+                continue
+            elp = EmendaLoaParlamentar()
+            elp.emendaloa = i
+            elp.parlamentar = p
+            elp.valor = v
+            elp.save()
+
+        return i

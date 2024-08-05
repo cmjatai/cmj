@@ -12,12 +12,12 @@ LoaDetail:
 
 EmendaLoa:
   {% trans 'Dados Gerais' %}:
-  - tipo fase tipo_materia:3 numero_materia:2 ano_materia:2 materia:0
+  - tipo:2 fase:2 tipo_materia:4 numero_materia:2 ano_materia:2 materia:0
   - valor:3 finalidade
   - parlamentares
 
 EmendaLoaDetail:
   {% trans 'Dados Gerais' %}:
-  - tipo:2 fase:2 valor materia:5
+  - tipo:2 fase:2 valor:3 materia|fk_urlize_for_detail
   - finalidade
   - parlamentares

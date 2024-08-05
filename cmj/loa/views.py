@@ -87,6 +87,7 @@ class EmendaLoaCrud(MasterDetailCrud):
         ]
 
     class ListView(MasterDetailCrud.ListView):
+        paginate_by = 25
 
         def hook_materia(self, *args, **kwargs):
             return f'<small><strong>Matéria Legislativa:</strong> {args[0].materia}</small>', args[2]
@@ -96,13 +97,13 @@ class EmendaLoaCrud(MasterDetailCrud):
 
             for elp in args[0].emendaloaparlamentar_set.all():
                 pls.append(
-                    '<li>{} - R$ {}</li>'.format(
+                    '<tr><td class="py-1">{}</td><td class="py-1" align="right">R$ {}</td></tr>'.format(
                         elp.parlamentar.nome_parlamentar,
                         formats.number_format(elp.valor)
                     )
                 )
 
-            return f'<ul class="m-0 text-nowrap">{"".join(pls)}</ul>', ''
+            return f'<table class="w-100 m-0 text-nowrap">{"".join(pls)}</table>', ''
 
     class CreateView(MasterDetailCrud.CreateView):
         form_class = EmendaLoaForm
@@ -114,6 +115,7 @@ class EmendaLoaCrud(MasterDetailCrud):
             return initial
 
     class UpdateView(MasterDetailCrud.UpdateView):
+        layout_key = None
         form_class = EmendaLoaForm
 
         def get_initial(self):

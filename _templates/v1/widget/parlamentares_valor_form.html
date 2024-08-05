@@ -1,0 +1,12 @@
+{% spaceless %}
+<div class="row ">
+  {% for widget in widget.subwidgets %}
+    <div class="col-3 py-1">
+      {% include widget.template_name %}
+    </div>
+    <div class="col-9">
+      {{widget.label}}
+    </div>
+  {% endfor %}
+</div>
+{% endspaceless %}
