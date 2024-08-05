@@ -7,7 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.forms.models import ModelForm
 from django.utils.translation import ugettext_lazy as _
 
-from cmj.loa.models import Loa
+from cmj.loa.models import Loa, EmendaLoa
 from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
 
@@ -26,7 +26,7 @@ class MateriaCheckFormMixin:
 
     def clean(self):
 
-        cleaned_data = super(LoaForm, self).clean()
+        cleaned_data = super().clean()
         if not self.is_valid():
             return cleaned_data
 
@@ -150,3 +150,53 @@ class LoaForm(MateriaCheckFormMixin, ModelForm):
             lp.save()
 
         return i
+
+
+class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
+
+    tipo_materia = forms.ModelChoiceField(
+        label=_('Tipo Matéria'),
+        required=False,
+        queryset=TipoMateriaLegislativa.objects.all(),
+        empty_label='Selecione',
+    )
+
+    numero_materia = forms.CharField(
+        label='Número Matéria', required=False)
+
+    ano_materia = forms.CharField(
+        label='Ano Matéria',
+        required=False)
+
+    materia = forms.ModelChoiceField(
+        required=False,
+        widget=forms.HiddenInput(),
+        queryset=MateriaLegislativa.objects.all())
+
+    parlamentares = forms.ModelMultipleChoiceField(
+        required=True,
+        widget=forms.CheckboxSelectMultiple(),
+        queryset=Parlamentar.objects.all())
+
+    finalidade = forms.CharField(
+        label='Finalidade', required=True)
+
+    class Meta:
+        model = EmendaLoa
+        fields = [
+            'tipo',
+            'fase',
+            'materia', 'tipo_materia', 'numero_materia', 'ano_materia',
+            'valor',
+            'finalidade',
+            'parlamentares'
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['parlamentares'].choices = [
+            (p.pk, p) for p in kwargs['initial'][
+                'loa'
+            ].parlamentares.order_by('nome_parlamentar')
+        ]

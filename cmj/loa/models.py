@@ -145,7 +145,7 @@ class EmendaLoa(models.Model):
     IMPEDIMENTO_TECNICO = 40
     FASE_CHOICE = (
         (PROPOSTA, _('Proposta Legislativa')),
-        (APROVACAO_LEGISLATIVA, _('Aprovada no Poder Legislativo')),
+        (APROVACAO_LEGISLATIVA, _('Aprovada no Processo Legislativo')),
         (APROVACAO_LEGAL, _('Aprovada')),
         (IMPEDIMENTO_TECNICO, _('Impedimento Técnico'))
     )
@@ -158,7 +158,8 @@ class EmendaLoa(models.Model):
         choices=FASE_CHOICE,
         default=10, verbose_name=_('Fase'))
 
-    finalidade = models.TextField(_("Finalidade"))
+    finalidade = models.TextField(
+        verbose_name=_("Finalidade"))
 
     loa = models.ForeignKey(
         Loa,

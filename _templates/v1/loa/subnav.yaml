@@ -1,6 +1,5 @@
 {% load i18n common_tags%}
-
-#- title: {% trans 'Diário Oficial' %}
-#  url: diariooficial_detail
-#- title: {% trans 'Documentos Publicados no Diário' %}
-#  url: vinculodocdiariooficial_list
+- title: {% trans 'Loa' %}
+  url: loa_detail
+- title: {% trans 'Emendas Impositivas' %}
+  url: emendaloa_list

@@ -1,0 +1,35 @@
+<script language="Javascript">
+
+  function recuperar_materia() {
+    var tipo_materia = $("#id_tipo_materia").val()
+    var numero_materia = $("#id_numero_materia").val()
+    var ano_materia = $("#id_ano_materia").val()
+
+    if (tipo_materia && numero_materia && ano_materia) {
+      $.get("{% url 'sapl.sessao:recuperar_materia' %}", {
+          tipo_materia: tipo_materia,
+          numero_materia: numero_materia,
+          ano_materia: ano_materia
+        },
+        function(data, status) {
+          if ($(".ementa-materia").length === 0) {
+            $("#div_id_tipo_materia").closest('.row').after(
+              $('<div class="row"/>').append(
+                $('<div class="col-12"/>').append(
+                  $('<div class="alert alert-info ementa-materia"/>').html(data.ementa))))
+          }
+          else {
+            $('.ementa-materia').html(data.ementa)
+          }
+        });
+    }
+  }
+
+  var fields = ["#id_tipo_materia", "#id_numero_materia", "#id_ano_materia"]
+  for (i = 0; i < fields.length; i++) {
+    $(fields[i]).change(function() {
+      recuperar_materia()
+    });
+  }
+  recuperar_materia()
+</script>

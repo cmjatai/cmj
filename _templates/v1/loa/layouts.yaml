@@ -9,3 +9,15 @@ LoaDetail:
   - ano:2 receita_corrente_liquida:3 materia|fk_urlize_for_detail publicado:2
   - disp_total disp_saude disp_diversos
   - resumo_emendas_impositivas
+
+EmendaLoa:
+  {% trans 'Dados Gerais' %}:
+  - tipo fase tipo_materia:3 numero_materia:2 ano_materia:2 materia:0
+  - valor:3 finalidade
+  - parlamentares
+
+EmendaLoaDetail:
+  {% trans 'Dados Gerais' %}:
+  - tipo:2 fase:2 valor materia:5
+  - finalidade
+  - parlamentares
