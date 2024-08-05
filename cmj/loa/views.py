@@ -64,7 +64,8 @@ class LoaCrud(Crud):
             l = args[0]
             template = loader.get_template('loa/loaparlamentar_set_list.html')
             context = dict(
-                loaparlamentar_set=l.loaparlamentar_set.all(),
+                loaparlamentar_set=l.loaparlamentar_set.order_by(
+                    'parlamentar__nome_parlamentar'),
             )
             rendered = template.render(context, self.request)
 

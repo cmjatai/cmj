@@ -3,6 +3,7 @@ from decimal import Decimal
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.db.models.deletion import PROTECT, CASCADE
+from django.utils import formats
 from django.utils.translation import ugettext_lazy as _
 
 from sapl.materia.models import MateriaLegislativa
@@ -126,4 +127,85 @@ class LoaParlamentar(models.Model):
     class Meta:
         verbose_name = _('Valores do Parlamentar')
         verbose_name_plural = _('Valores dos Parlamentares')
+        ordering = ['id']
+
+
+class EmendaLoa(models.Model):
+
+    SAUDE = 10
+    DIVERSOS = 99
+    TIPOEMENDALOA_CHOICE = ((SAUDE, _('Saúde')),
+                            (DIVERSOS, _('Áreas Diversas')))
+
+    tipo = models.PositiveSmallIntegerField(
+        choices=TIPOEMENDALOA_CHOICE,
+        default=0, verbose_name=_('Área de aplicação'))
+
+    finalidade = models.TextField(_("Finalidade"))
+
+    loa = models.ForeignKey(
+        Loa,
+        verbose_name=_('Loa - Emendas Impositivas'),
+        related_name='emendaloa_set',
+        on_delete=CASCADE)
+
+    materia = models.OneToOneField(
+        MateriaLegislativa,
+        blank=True, null=True, default=None,
+        verbose_name=_('Matéria Legislativa'),
+        # related_name='emendaloa',
+        on_delete=PROTECT)
+
+    valor = models.DecimalField(
+        max_digits=14, decimal_places=2, default=Decimal('0.00'),
+        verbose_name=_('Valor Global da Emenda (R$)'),
+    )
+
+    parlamentares = models.ManyToManyField(
+        Parlamentar,
+        through='EmendaLoaParlamentar',
+        related_name='emendaloa_set',
+
+        verbose_name=_('Parlamentares'),
+        through_fields=(
+            'emendaloa',
+            'parlamentar'))
+
+    def __str__(self):
+        valor_str = formats.number_format(self.valor)
+        return f'R$ {valor_str} - {self.finalidade}'
+
+    class Meta:
+        verbose_name = _('Emenda Impositiva')
+        verbose_name_plural = _('Emendas Impositivas')
+        ordering = ['id']
+
+
+class EmendaLoaParlamentar(models.Model):
+
+    emendaloa = models.ForeignKey(
+        EmendaLoa,
+        verbose_name=_('Emenda Impositiva'),
+        related_name='emendaloaparlamentar_set',
+        on_delete=CASCADE)
+
+    parlamentar = models.ForeignKey(
+        Parlamentar,
+        related_name='emendaloaparlamentar_set',
+        verbose_name=_('Parlamentar'),
+        on_delete=CASCADE)
+
+    valor = models.DecimalField(
+        max_digits=14, decimal_places=2, default=Decimal('0.00'),
+        verbose_name=_('Valor por Parlamentar (R$)'),
+    )
+
+    def __str__(self):
+        valor_str = formats.number_format(self.valor)
+        return f'R$ {valor_str} - {self.parlamentar.nome_parlamentar}'
+
+    class Meta:
+        verbose_name = _('Participação Parlamentar na Emenda Impositiva')
+        verbose_name_plural = _(
+            'Participações Parlamentares na Emenda Impositiva')
         ordering = ['id']
