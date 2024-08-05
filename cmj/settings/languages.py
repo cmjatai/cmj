@@ -18,3 +18,7 @@ DATE_INPUT_FORMATS = ('%d/%m/%Y', '%m-%d-%Y', '%Y-%m-%d')
 LOCALE_PATHS = (
     BASE_DIR.child('locale'),
 )
+
+DECIMAL_SEPARATOR = ','
+THOUSAND_SEPARATOR = '.'
+USE_THOUSAND_SEPARATOR = True

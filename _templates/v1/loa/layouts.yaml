@@ -1,0 +1,11 @@
+{% load i18n %}
+Loa:
+  {% trans 'Dados Gerais' %}:
+  - ano:2 receita_corrente_liquida:3 tipo_materia:3 numero_materia:2 ano_materia:2 materia:0
+  - publicado perc_disp_total perc_disp_saude perc_disp_diversos
+  - parlamentares
+LoaDetail:
+  {% trans 'Dados Gerais' %}:
+  - ano:2 receita_corrente_liquida:3 materia:5 publicado:2
+  - disp_total disp_saude disp_diversos
+  - resumo_emendas_impositivas

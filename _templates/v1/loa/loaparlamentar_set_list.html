@@ -1,0 +1,10 @@
+{% load i18n %}
+
+
+{% for p in loaparlamentar_set %}
+
+  {{p.parlamentar}}
+
+  {% if not forloop.last %}<br>{% endif %}
+
+{% endfor %}
