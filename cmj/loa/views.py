@@ -1,11 +1,13 @@
+from decimal import Decimal
 import logging
 
+from django.db.models.aggregates import Sum
 from django.template import loader
 from django.utils import formats
 from django.utils.translation import ugettext_lazy as _
 
 from cmj.loa.forms import LoaForm, EmendaLoaForm
-from cmj.loa.models import Loa, EmendaLoa
+from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar
 from sapl.crud.base import Crud, MasterDetailCrud
 
 
@@ -65,10 +67,54 @@ class LoaCrud(Crud):
         def hook_resumo_emendas_impositivas(self, *args, **kwargs):
             l = args[0]
             template = loader.get_template('loa/loaparlamentar_set_list.html')
+
+            loaparlamentares = l.loaparlamentar_set.order_by(
+                'parlamentar__nome_parlamentar')
+
+            resumo_emendas_impositivas = []
+            for lp in loaparlamentares:
+
+                resumo_parlamentar = {'loaparlamentar': lp}
+                for k, v in EmendaLoa.TIPOEMENDALOA_CHOICE:
+                    resumo_parlamentar[k] = {
+                        'name': v
+                    }
+                    params = dict(
+                        parlamentar=lp.parlamentar,
+                        emendaloa__loa=self.object,
+                        emendaloa__tipo=k
+                    )
+
+                    ja_destinado = EmendaLoaParlamentar.objects.filter(
+                        **params).exclude(
+                            emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO
+                    ).aggregate(Sum('valor'))
+                    resumo_parlamentar[k]['ja_destinado'] = ja_destinado['valor__sum'] or Decimal(
+                        '0.00')
+
+                    params.update(dict(
+                        emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO
+                    ))
+
+                    impedimento_tecnico = EmendaLoaParlamentar.objects.filter(
+                        **params).aggregate(Sum('valor'))
+                    resumo_parlamentar[k]['impedimento_tecnico'] = impedimento_tecnico['valor__sum'] or Decimal(
+                        '0.00')
+
+                    if k == EmendaLoa.SAUDE:
+                        resumo_parlamentar[k]['sem_destinacao'] = lp.disp_saude
+                    elif k == EmendaLoa.DIVERSOS:
+                        resumo_parlamentar[k]['sem_destinacao'] = lp.disp_diversos
+
+                    resumo_parlamentar[k]['sem_destinacao'] -= \
+                        resumo_parlamentar[k]['ja_destinado'] + \
+                        resumo_parlamentar[k]['impedimento_tecnico']
+
+                resumo_emendas_impositivas.append(resumo_parlamentar)
             context = dict(
-                loaparlamentar_set=l.loaparlamentar_set.order_by(
-                    'parlamentar__nome_parlamentar'),
+                resumo_emendas_impositivas=resumo_emendas_impositivas,
             )
+
             rendered = template.render(context, self.request)
 
             return 'Resumo Geral das Emendas Impositivas Parlamentares', rendered

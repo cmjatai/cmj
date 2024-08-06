@@ -18,6 +18,6 @@ EmendaLoa:
 
 EmendaLoaDetail:
   {% trans 'Dados Gerais' %}:
-  - tipo:2 fase:2 valor:3 materia|fk_urlize_for_detail
+  - tipo:2 fase:3 valor:3 materia|fk_urlize_for_detail
   - finalidade
   - parlamentares

@@ -1,10 +1,34 @@
 {% load i18n %}
-
-
-{% for p in loaparlamentar_set %}
-
-  {{p.parlamentar}}
-
-  {% if not forloop.last %}<br>{% endif %}
-
-{% endfor %}
+<div class="py-3">
+  <table class="table table-form table-bordered table-hover w-100">
+    {% for lp in resumo_emendas_impositivas %}
+      {% if forloop.first %}
+        <tbody>
+          <tr>
+            <th rowspan=2>Parlamentares</th>
+            <th colspan=3>Emendas Destinadas à Saúde </th>
+            <th colspan=3>Emendas com Destinação Geral</th>
+          </tr>
+          <tr>
+            <th>Valores<br>Já Destinados</th>
+            <th>Impedimentos<br>Técnicos</th>
+            <th>Sem Destinação</th>
+            <th>Valores<br>Já Destinados</th>
+            <th>Impedimentos<br>Técnicos</th>
+            <th>Sem Destinação</th>
+          </tr>
+        </tbody>
+      {% endif %}
+      <tr>
+        <td>{{lp.loaparlamentar.parlamentar}}</td>
+        <td class="text-right">{{lp.10.ja_destinado}}</td>
+        <td class="text-right">{{lp.10.impedimento_tecnico}}</td>
+        <td class="text-right">{{lp.10.sem_destinacao}}</td>
+        
+        <td class="text-right">{{lp.99.ja_destinado}}</td>
+        <td class="text-right">{{lp.99.impedimento_tecnico}}</td>
+        <td class="text-right">{{lp.99.sem_destinacao}}</td>
+      </tr>
+    {% endfor %}
+  </table>
+</div>
