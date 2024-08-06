@@ -12,12 +12,21 @@ from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar
 from sapl.crud.base import Crud, MasterDetailCrud, RP_DETAIL, RP_LIST
 
 
+class LoaContextDataMixin:
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        path = context.get('path', '')
+        context['path'] = f'{path} container-loa'
+        return context
+
+
 class LoaCrud(Crud):
     model = Loa
     public = [RP_LIST, RP_DETAIL]
     ordered_list = False
 
-    class BaseMixin(Crud.BaseMixin):
+    class BaseMixin(LoaContextDataMixin, Crud.BaseMixin):
         list_field_names = [
             'ano',
             'receita_corrente_liquida',
@@ -27,19 +36,13 @@ class LoaCrud(Crud):
             'publicado'
         ]
 
-        def get_context_data(self, **kwargs):
-            context = super().get_context_data(**kwargs)
-            path = context.get('path', '')
-            context['path'] = f'{path} container-loa '
-            return context
-
     class ListView(Crud.ListView):
         ordered_list = False
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
             path = context.get('path', '')
-            context['path'] = f'{path} loa-list '
+            context['path'] = f'{path} loa-list'
             return context
 
         def hook_header_perc_disp_total(self):
@@ -90,7 +93,7 @@ class LoaCrud(Crud):
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
             path = context.get('path', '')
-            context['path'] = f'{path} loa-detail '
+            context['path'] = f'{path} loa-detail'
             return context
 
         def get(self, request, *args, **kwargs):
@@ -175,23 +178,40 @@ class EmendaLoaCrud(MasterDetailCrud):
     model = EmendaLoa
     parent_field = 'loa'
 
-    class BaseMixin(MasterDetailCrud.BaseMixin):
+    class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
         list_field_names = [
             ('finalidade', 'materia'),
-            ('tipo', 'fase'),
             'valor',
-            ('parlamentares')
+            ('tipo', 'fase'),
+            'parlamentares'
         ]
-
-        def get_context_data(self, **kwargs):
-            context = super().get_context_data(**kwargs)
-            context['path'] = ' container-loa'
-            return context
 
     class ListView(MasterDetailCrud.ListView):
         paginate_by = 25
-
         ordered_list = False
+
+        def get_queryset(self):
+            qs = super().get_queryset()
+
+            parl = self.request.GET.get('parlamentar', None)
+
+            if parl:
+                qs = qs.filter(parlamentares=parl)
+
+            return qs
+
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            path = context.get('path', '')
+            context['path'] = f'{path} emendaloa-list'
+
+            emendaloa = context['object_list'].first()
+
+            context['parlamentares'] = []
+            if emendaloa:
+                context['parlamentares'] = emendaloa.loa.parlamentares.all()
+
+            return context
 
         def hook_materia(self, *args, **kwargs):
             return f'<small><strong>Matéria Legislativa:</strong> {args[0].materia}</small>', args[2]
@@ -201,13 +221,16 @@ class EmendaLoaCrud(MasterDetailCrud):
 
             for elp in args[0].emendaloaparlamentar_set.all():
                 pls.append(
-                    '<tr><td class="py-1">{}</td><td class="py-1" align="right">R$ {}</td></tr>'.format(
+                    '<tr><td>{}</td><td align="right">R$ {}</td></tr>'.format(
                         elp.parlamentar.nome_parlamentar,
                         formats.number_format(elp.valor)
                     )
                 )
 
-            return f'<table class="w-100 m-0 text-nowrap">{"".join(pls)}</table>', ''
+            return f'<table class="w-100 text-nowrap">{"".join(pls)}</table>', ''
+
+        def hook_valor(self, *args, **kwargs):
+            return f'<div class="text-right font-weight-bold">{args[1]}</div>', None
 
     class CreateView(MasterDetailCrud.CreateView):
         form_class = EmendaLoaForm

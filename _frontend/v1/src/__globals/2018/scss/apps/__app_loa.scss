@@ -35,4 +35,36 @@
       font-size: 70%;
     }
   }
+  &.emendaloa-list {
+    table {
+      tr {
+        td:last-child {
+          padding: 0;
+        }
+      }
+      table {
+        border: 0;
+        td {
+          border: 0;
+          padding: 1px 5px !important;
+        }
+      }
+    }
+    .container-avatar {
+      .avatar {
+        position: relative;
+        opacity: 0.4;
+        &.active {
+          opacity: 1;
+        }
+      }
+    }
+    .btn-close {
+      position: absolute;
+      top: -5px;
+      right: 0;
+      color: green;
+    }
+
+  }
 }
