@@ -1,34 +1,33 @@
 {% load i18n %}
-<div class="py-3">
-  <table class="table table-form table-bordered table-hover w-100">
-    {% for lp in resumo_emendas_impositivas %}
-      {% if forloop.first %}
-        <tbody>
-          <tr>
-            <th rowspan=2>Parlamentares</th>
-            <th colspan=3>Emendas Destinadas à Saúde </th>
-            <th colspan=3>Emendas com Destinação Geral</th>
-          </tr>
-          <tr>
-            <th>Valores<br>Já Destinados</th>
-            <th>Impedimentos<br>Técnicos</th>
-            <th>Sem Destinação</th>
-            <th>Valores<br>Já Destinados</th>
-            <th>Impedimentos<br>Técnicos</th>
-            <th>Sem Destinação</th>
-          </tr>
-        </tbody>
-      {% endif %}
-      <tr>
-        <td>{{lp.loaparlamentar.parlamentar}}</td>
-        <td class="text-right">{{lp.10.ja_destinado}}</td>
-        <td class="text-right">{{lp.10.impedimento_tecnico}}</td>
-        <td class="text-right">{{lp.10.sem_destinacao}}</td>
-        
-        <td class="text-right">{{lp.99.ja_destinado}}</td>
-        <td class="text-right">{{lp.99.impedimento_tecnico}}</td>
-        <td class="text-right">{{lp.99.sem_destinacao}}</td>
-      </tr>
-    {% endfor %}
-  </table>
-</div>
+<table class="table table-form table-bordered table-hover w-100">
+  {% for lp in resumo_emendas_impositivas %}
+    {% if forloop.first %}
+      <tbody>
+        <tr>
+          <th rowspan=2>PARLAMENTARES</th>
+          <th colspan=3>EMENDAS DESTINADAS À SAÚDE</th>
+          <th colspan=3>EMENDAS COM DESTINAÇÃO GERAL</th>
+        </tr>
+        <tr>
+          <th class="text-blue">Valores<br>Já Destinados</th>
+          <th class="text-red">Impedimentos<br>Técnicos</th>
+          <th class="text-orange">Sem Destinação</th>
+
+          <th class="text-blue">Valores<br>Já Destinados</th>
+          <th class="text-red">Impedimentos<br>Técnicos</th>
+          <th class="text-orange">Sem Destinação</th>
+        </tr>
+      </tbody>
+    {% endif %}
+    <tr>
+      <th class="text-left font-weight-bold">{{lp.loaparlamentar.parlamentar}}</th>
+      <td class="text-right text-blue">{{lp.10.ja_destinado}}</td>
+      <td class="text-right text-red">{{lp.10.impedimento_tecnico}}</td>
+      <td class="text-right text-orange">{{lp.10.sem_destinacao}}</td>
+
+      <td class="text-right text-blue">{{lp.99.ja_destinado}}</td>
+      <td class="text-right text-red">{{lp.99.impedimento_tecnico}}</td>
+      <td class="text-right text-orange">{{lp.99.sem_destinacao}}</td>
+    </tr>
+  {% endfor %}
+</table>

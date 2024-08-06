@@ -1,0 +1,38 @@
+.container-loa {
+  &.loa-list {
+    th {
+      font-size: 85%;
+    }
+    td {
+      text-align: center;
+      font-weight: bold;
+      font-size: 130%;
+      i{
+        display: block;
+        font-weight: normal;
+        font-size: 70%;
+      }
+      &:nth-child(2) {
+        font-size: 170%;
+      }
+    }
+  }
+  &.loa-detail {
+    .form-control-static {
+      text-align: center;
+      font-size: 140%;
+      line-height: 1;
+      padding: 0.7rem;
+    }
+    table {
+      font-size: 0.9rem;
+      td {
+        font-size: 110%;
+      }
+    }
+    i {
+      display: block;
+      font-size: 70%;
+    }
+  }
+}

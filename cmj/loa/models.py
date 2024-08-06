@@ -26,7 +26,7 @@ class Loa(models.Model):
 
     receita_corrente_liquida = models.DecimalField(
         max_digits=14, decimal_places=2, default=Decimal('0.00'),
-        verbose_name=_('Receita Corrente Líquida'),
+        verbose_name=_('Receita Corrente Líquida - RCL (R$)'),
     )
 
     perc_disp_total = models.DecimalField(

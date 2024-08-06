@@ -2,17 +2,20 @@ from decimal import Decimal
 import logging
 
 from django.db.models.aggregates import Sum
+from django.http.response import Http404
 from django.template import loader
 from django.utils import formats
 from django.utils.translation import ugettext_lazy as _
 
 from cmj.loa.forms import LoaForm, EmendaLoaForm
 from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar
-from sapl.crud.base import Crud, MasterDetailCrud
+from sapl.crud.base import Crud, MasterDetailCrud, RP_DETAIL, RP_LIST
 
 
 class LoaCrud(Crud):
     model = Loa
+    public = [RP_LIST, RP_DETAIL]
+    ordered_list = False
 
     class BaseMixin(Crud.BaseMixin):
         list_field_names = [
@@ -24,7 +27,29 @@ class LoaCrud(Crud):
             'publicado'
         ]
 
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            path = context.get('path', '')
+            context['path'] = f'{path} container-loa '
+            return context
+
     class ListView(Crud.ListView):
+        ordered_list = False
+
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            path = context.get('path', '')
+            context['path'] = f'{path} loa-list '
+            return context
+
+        def hook_header_perc_disp_total(self):
+            return ''
+
+        def hook_header_perc_disp_saude(self):
+            return ''
+
+        def hook_header_perc_disp_diversos(self):
+            return ''
 
         def hook_perc_disp_total(self, *args, **kwargs):
             l = args[0]
@@ -37,6 +62,13 @@ class LoaCrud(Crud):
         def hook_perc_disp_diversos(self, *args, **kwargs):
             l = args[0]
             return f' <i>({l.perc_disp_diversos:3.1f}%)</i>', ''
+
+        def get_queryset(self):
+            queryset = super().get_queryset()
+            if self.request.user.is_anonymous:
+                queryset = queryset.filter(publicado=True)
+
+            return queryset
 
     class CreateView(Crud.CreateView):
         form_class = LoaForm
@@ -54,6 +86,25 @@ class LoaCrud(Crud):
 
     class DetailView(Crud.DetailView):
         layout_key = 'LoaDetail'
+
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            path = context.get('path', '')
+            context['path'] = f'{path} loa-detail '
+            return context
+
+        def get(self, request, *args, **kwargs):
+            response = super().get(request, *args, **kwargs)
+            if not self.object.publicado and request.user.is_anonymous:
+                raise Http404
+            return response
+
+        def hook_materia(self, l, verbose_name='', field_display=''):
+            if l.materia:
+                strm = str(l.materia)
+                field_display = field_display.replace(
+                    strm, l.materia.epigrafe_short)
+            return verbose_name, field_display
 
         def hook_disp_total(self, l, verbose_name='', field_display=''):
             return verbose_name, f'{field_display} <i>({l.perc_disp_total:3.1f}%)</i>'
@@ -132,8 +183,15 @@ class EmendaLoaCrud(MasterDetailCrud):
             ('parlamentares')
         ]
 
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            context['path'] = ' container-loa'
+            return context
+
     class ListView(MasterDetailCrud.ListView):
         paginate_by = 25
+
+        ordered_list = False
 
         def hook_materia(self, *args, **kwargs):
             return f'<small><strong>Matéria Legislativa:</strong> {args[0].materia}</small>', args[2]
