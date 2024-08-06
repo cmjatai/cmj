@@ -171,6 +171,8 @@ class EmendaLoaValorWidget(SplitArrayWidget):
         pw = zip(self.parlamentares, context['widget']['subwidgets'])
         for p, w in pw:
             w['label'] = p.nome_parlamentar
+            if 'class' in self.attrs:
+                w['attrs']['class'] += ' ' + self.attrs['class']
         return context
 
 
@@ -199,7 +201,8 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         label='Finalidade', required=True)
 
     parlamentares__valor = SplitArrayField(
-        forms.DecimalField(required=False), 10,
+        forms.DecimalField(required=False, max_digits=14,
+                           decimal_places=2,), 10,
         label='Valores por Parlamentar',
         required=False
     )
@@ -246,11 +249,23 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         self.parlamentares = self.loa.parlamentares.order_by(
             'nome_parlamentar')
 
-        self.fields['parlamentares__valor'].max_length = self.parlamentares.count()
+        initial_pv = []
+        if self.instance.pk:
+            initial_pv = [[p, Decimal('0.00')] for p in self.parlamentares]
+            for i, (p, v) in enumerate(initial_pv):
+                ipv = p.emendaloaparlamentar_set.filter(
+                    emendaloa=self.instance).first()
+                if ipv:
+                    initial_pv[i][1] = ipv.valor
+        self.initial['parlamentares__valor'] = list(
+            map(lambda x: x[1], initial_pv))
 
-        self.fields['parlamentares__valor'].widget = EmendaLoaValorWidget(
+        fpv = self.fields['parlamentares__valor']
+        fpv.max_length = self.parlamentares.count()
+        fpv.widget = EmendaLoaValorWidget(
             widget=self.fields['parlamentares__valor'].base_field.widget,
-            parlamentares=list(self.parlamentares)
+            parlamentares=list(self.parlamentares),
+            attrs={'class': 'text-right'}
         )
 
         # self.fields['parlamentares'].choices = [

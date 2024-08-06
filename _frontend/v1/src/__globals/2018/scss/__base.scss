@@ -182,6 +182,15 @@ a:hover {
   }
 }
 
+.table-form {
+  line-height: 1.1;
+  font-size: 75%;
+  border: 1px solid white;
+  th, td {
+    border: 1px solid white;
+  }
+}
+
 .alert {
   margin: $grid-gutter-width $grid-gutter-width*0.5 $grid-gutter-width;
 
