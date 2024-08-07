@@ -23,6 +23,7 @@
       font-size: 140%;
       line-height: 1;
       padding: 0.7rem;
+      font-weight: bold;
     }
     table {
       font-size: 0.9rem;
@@ -33,6 +34,7 @@
     i {
       display: block;
       font-size: 70%;
+      font-weight: normal;
     }
   }
   &.emendaloa-list {
@@ -54,6 +56,9 @@
       .avatar {
         position: relative;
         opacity: 0.4;
+        &:hover {
+          opacity: 1;
+        }
         &.active {
           opacity: 1;
         }

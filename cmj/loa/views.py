@@ -45,6 +45,13 @@ class LoaCrud(Crud):
             context['path'] = f'{path} loa-list'
             return context
 
+        def get_queryset(self):
+            queryset = super().get_queryset()
+            if self.request.user.is_anonymous:
+                queryset = queryset.filter(publicado=True)
+
+            return queryset
+
         def hook_header_perc_disp_total(self):
             return ''
 
@@ -65,13 +72,6 @@ class LoaCrud(Crud):
         def hook_perc_disp_diversos(self, *args, **kwargs):
             l = args[0]
             return f' <i>({l.perc_disp_diversos:3.1f}%)</i>', ''
-
-        def get_queryset(self):
-            queryset = super().get_queryset()
-            if self.request.user.is_anonymous:
-                queryset = queryset.filter(publicado=True)
-
-            return queryset
 
     class CreateView(Crud.CreateView):
         form_class = LoaForm
@@ -177,6 +177,7 @@ class LoaCrud(Crud):
 class EmendaLoaCrud(MasterDetailCrud):
     model = EmendaLoa
     parent_field = 'loa'
+    public = [RP_LIST, RP_DETAIL]
 
     class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
         list_field_names = [
@@ -193,10 +194,13 @@ class EmendaLoaCrud(MasterDetailCrud):
         def get_queryset(self):
             qs = super().get_queryset()
 
-            parl = self.request.GET.get('parlamentar', None)
+            p_id = self.request.GET.get('parlamentar', None)
 
-            if parl:
-                qs = qs.filter(parlamentares=parl)
+            if p_id:
+                qs = qs.filter(parlamentares=p_id)
+
+            if self.request.user.is_anonymous:
+                qs = qs.filter(loa__publicado=True)
 
             return qs
 
@@ -210,6 +214,13 @@ class EmendaLoaCrud(MasterDetailCrud):
             context['parlamentares'] = []
             if emendaloa:
                 context['parlamentares'] = emendaloa.loa.parlamentares.all()
+
+            p_id = self.request.GET.get('parlamentar', None)
+            if p_id:
+                p = emendaloa.loa.parlamentares.get(
+                    id=p_id
+                )
+                context['title'] = f'{context["title"]}<br>Autoria: {p.nome_parlamentar}'
 
             return context
 
@@ -237,7 +248,6 @@ class EmendaLoaCrud(MasterDetailCrud):
 
         def get_initial(self):
             initial = super().get_initial()
-
             initial['loa'] = Loa.objects.get(pk=self.kwargs['pk'])
             return initial
 
@@ -256,3 +266,22 @@ class EmendaLoaCrud(MasterDetailCrud):
 
     class DetailView(MasterDetailCrud.DetailView):
         layout_key = 'EmendaLoaDetail'
+
+        def hook_parlamentares(self, emendaloa, verbose_name='', field_display=''):
+            pls = []
+
+            for elp in emendaloa.emendaloaparlamentar_set.all():
+                pls.append(
+                    '<tr><td>{}</td><td align="right">R$ {}</td></tr>'.format(
+                        elp.parlamentar.nome_parlamentar,
+                        formats.number_format(elp.valor)
+                    )
+                )
+
+            return verbose_name, f'''
+                <div class="py-3">
+                    <table class="table table-form table-bordered table-hover w-100">
+                        {"".join(pls)}
+                    </table>
+                </div>
+                '''

@@ -4,21 +4,20 @@
 
 {% block actions %}
 
-<div class="container-avatar flex">
-  {% for p in parlamentares %}
-    <div class="avatar avatar6 {% if p.id|stringformat:"d" == request.GET.parlamentar %}active{% endif %}" >
-      {% if p.id|stringformat:"d" == request.GET.parlamentar %}
-          <a class="btn-close" href="?" title="Clique no Check para remover o filtro.">
-            <i class="far fa-check-square"></i>
-          </a>
-      {% endif %}
-      <a href="?parlamentar={{p.id}}">
-        <img src="{% cropped_thumbnail p "fotografia_cropping" %}" alt="{{p.nome_parlamentar}}" title="{{p.nome_parlamentar}}">
-      </a>
-    </div>
-  {% endfor %}
-</div>
-
+  <div class="container-avatar d-flex justify-content-center w-100">
+    {% for p in parlamentares %}
+      <div class="avatar avatar6 {% if p.id|stringformat:"d" == request.GET.parlamentar %}active{% endif %}" >
+        {% if p.id|stringformat:"d" == request.GET.parlamentar %}
+            <a class="btn-close" href="?" title="Clique no Check para remover o filtro.">
+              <i class="far fa-check-square"></i>
+            </a>
+        {% endif %}
+        <a href="?parlamentar={{p.id}}">
+          <img src="{% cropped_thumbnail p "fotografia_cropping" %}" alt="{{p.nome_parlamentar}}" title="{{p.nome_parlamentar}}">
+        </a>
+      </div>
+    {% endfor %}
+  </div>
 
   {{ block.super }}
 
