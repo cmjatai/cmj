@@ -224,6 +224,9 @@ class EmendaLoaCrud(MasterDetailCrud):
 
             return context
 
+        def hook_fase(self, *args, **kwargs):
+            return f'<br><small class="text-nowrap">({args[0].get_fase_display()})</small>', args[2]
+
         def hook_materia(self, *args, **kwargs):
             return f'<small><strong>Matéria Legislativa:</strong> {args[0].materia}</small>', args[2]
 
@@ -266,6 +269,18 @@ class EmendaLoaCrud(MasterDetailCrud):
 
     class DetailView(MasterDetailCrud.DetailView):
         layout_key = 'EmendaLoaDetail'
+
+        def get(self, request, *args, **kwargs):
+
+            self.object = self.get_object()
+
+            if self.object.emendaloaparlamentar_set.all().count() > 2:
+                self.layout_key = 'EmendaLoaDetail2'
+
+            if request.user.is_anonymous:
+                self.detail_list_url = ''
+
+            return MasterDetailCrud.DetailView.get(self, request, *args, **kwargs)
 
         def hook_parlamentares(self, emendaloa, verbose_name='', field_display=''):
             pls = []

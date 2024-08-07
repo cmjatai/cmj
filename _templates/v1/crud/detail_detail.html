@@ -27,55 +27,12 @@
       {% endif %}
     {% endblock actions %}
   </div>
-  {% block detail_content %}
-    {% for fieldset in view.layout_display %}
-    <h2 class="legend">{{ fieldset.legend }}</h2>
-    {% for row in fieldset.rows %}
-    <div class="row">
-      {% for column in row %}
-        {% if column.verbose_name or column.text %}
-          <div class="col-sm-{{ column.span }}">
-            <div id="div_id_{{ column.id }}" class="form-group">
-              <p class="control-label">{{ column.verbose_name }}</p>
-              <div class="controls">
-                {% if column.text|audio_url %}
-                  <div class="form-control-static">
-                      <audio controls>
-                          <source src="{{ column.text|safe }}" type="audio/{{ column.text|file_extension }}">
-                          <p>Este navegador não suporta o elemento áudio.</p>
-                      </audio>
-                  </div>
-                {% elif column.text|is_video_url %}
-                  <div class="form-control-static">
-                      <video width="420" height="230" controls>
-                          <source src="{{ column.text|safe }}" type="video/{{ column.text|file_extension }}">
-                          <p>Este navegador não suporta o elemento vídeo.</p>
-                      </video>
-                  </div>
-                {% elif column.text|youtube_url %}
-                  <div class="embed-responsive embed-responsive-16by9">
-                    <iframe id="ytplayer" type="text/html" allowfullscreen
-                    src="https://www.youtube.com/embed/{{ column.text|youtube_id }}"
-                    frameborder="0"></iframe>
-                  </div>
-                {% elif column.text|facebook_url %}
-                    <div class="fb-video" data-href="{{ column.text|safe }}"
-                      data-width="420" data-show-text="false">
-                    </div>
-                {% elif column.text|url %}
-                  <div class="form-control-static"><a href="{{ column.text|safe }}"> {{ column.text|safe|default:"" }} </a></div>
-                {% else %}
-                  <div class="form-control-static">{{ column.text|safe|default:"" }}</div>
-                {% endif %}
-              </div>
-            </div>
-          </div>
-        {% endif %}
-      {% endfor %}
-    </div>
-    {% endfor %}
-    {% endfor %}
-  {% endblock detail_content %}
+
+  <div class="container-detail clearfix">
+    {% block detail_content %}
+      {% include "crud/detail_content_widget.html" %}
+    {% endblock detail_content %}
+  </div>
 
   <div class="container-table">
     {% if not rows %}

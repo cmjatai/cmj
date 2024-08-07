@@ -43,6 +43,9 @@
         td:last-child {
           padding: 0;
         }
+        td:nth-child(3) {
+          text-align: center;
+        }
       }
       table {
         border: 0;

@@ -19,5 +19,31 @@ EmendaLoa:
 EmendaLoaDetail:
   {% trans 'Dados Gerais' %}:
   - tipo:2 fase:3 valor:3 materia|fk_urlize_for_detail
-  - finalidade
-  - parlamentares:4
+  - finalidade parlamentares:6
+
+EmendaLoaDetail2:
+  version: 2
+  col:
+    {% trans 'Dados Gerais' %}:
+      col-md-7:
+      - tipo:3 fase:3 valor:6
+      - materia|fk_urlize_for_detail
+      - finalidade
+      col-md-5:
+      - parlamentares:12
+
+{% comment %}
+  # exemplo de detail version 2 completo
+EmendaLoaDetail:
+  version: 2
+  col-md-8:
+    {% trans 'Dados Gerais' %}:
+      col-md-7:
+      - tipo:2 fase:3 valor:3 materia|fk_urlize_for_detail
+      col-md-5:
+      - finalidade
+  col-md-4:
+    {% trans 'Dados Gerais' %}:
+      col-md-12:
+      - parlamentares:12
+{% endcomment %}

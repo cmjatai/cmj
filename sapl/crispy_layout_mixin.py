@@ -16,11 +16,6 @@ from django.utils.translation import ugettext as _
 import yaml
 
 
-def heads_and_tails(list_of_lists):
-    for alist in list_of_lists:
-        yield alist[0], alist[1:]
-
-
 def to_column(name_span):
     fieldname, span = name_span
 
@@ -190,12 +185,21 @@ def get_field_display(obj, fieldname):
 
 class CrispyLayoutFormMixin:
 
+    _layout_key = ''
+
     @property
     def layout_key(self):
-        if hasattr(super(CrispyLayoutFormMixin, self), 'layout_key'):
+        if hasattr(super(CrispyLayoutFormMixin, self), 'layout_key') and not self._layout_key:
             return super(CrispyLayoutFormMixin, self).layout_key
-        else:
-            return self.model.__name__
+        return self._layout_key or self.model.__name__
+
+    @layout_key.setter
+    def layout_key(self, value):
+        self._layout_key = value
+
+        # if hasattr(super(CrispyLayoutFormMixin, self), 'layout_key'):
+        #    return super(CrispyLayoutFormMixin, self).layout_key
+        # else:
 
     @property
     def layout_key_set(self):
@@ -368,12 +372,45 @@ class CrispyLayoutFormMixin:
     @property
     def layout_display(self):
 
-        return [
-            {'legend': legend,
-             'rows': [[self.get_column(fieldname, span)
-                       for fieldname, span in row]
-                      for row in rows]
-             } for legend, rows in heads_and_tails(self.get_layout())]
+        layout = self.get_layout()
+        version = 1
+
+        if isinstance(layout, tuple):
+            layout, version = layout
+
+        if version == 1:
+            return [
+                {
+                    'legend': legend,
+                    'rows': [
+                        [
+                            self.get_column(fieldname, span)
+                            for fieldname, span in row
+                        ]
+                        for row in rows
+                    ]
+                } for legend, rows in heads_and_tails(layout)]
+
+        elif version == 2:
+            l = [{
+                'version': version,
+                'colgroups': [{
+                    'class_col': colg,
+                    'colfieldsets': [{
+                        'legend': legend,
+                        'class_col':  colf,
+                        'rows': [[self.get_column(fieldname, span)
+                                  for fieldname, span in row
+                                  ] for row in rows]
+                    } for colf, rows in heads_and_tails(cols)]
+                } for legend, cols in heads_and_tails(fieldsets)]
+            } for colg, fieldsets in heads_and_tails(layout)]
+            return l
+
+
+def heads_and_tails(list_of_lists):
+    for alist in list_of_lists:
+        yield alist[0], alist[1:]
 
 
 def read_yaml_from_file(yaml_layout):
@@ -386,9 +423,6 @@ def read_yaml_from_file(yaml_layout):
 
 
 def read_layout_from_yaml(yaml_layout, key):
-    # TODO cache this at application level
-    yaml = read_yaml_from_file(yaml_layout)
-    base = yaml[key]
 
     def line_to_namespans(line):
         split = [cell.split(':') for cell in line.split()]
@@ -402,5 +436,51 @@ def read_layout_from_yaml(yaml_layout, key):
             remaining = remaining - span
         return list(map(tuple, namespans))
 
-    return [[legend] + [line_to_namespans(l) for l in lines]
-            for legend, lines in base.items()]
+    try:
+
+        yaml = read_yaml_from_file(yaml_layout)
+        base = yaml[key]
+
+        version = base.pop('version', 1)
+
+        if version == 1:
+            return [[legend] + [line_to_namespans(l) for l in lines]
+                    for legend, lines in base.items()]
+        elif version == 2:
+
+            r = []
+
+            for col, fieldsets in base.items():
+
+                rcolb = []
+                for legend, colfs in fieldsets.items():
+
+                    rlcfs = []
+                    for colf, lines in colfs.items():
+
+                        rl = []
+                        for l in lines:
+                            rl.append(line_to_namespans(l))
+                        rl = [colf] + rl
+
+                        rlcfs.append(rl)
+                    rlcfs = [legend] + rlcfs
+
+                    rcolb.append(rlcfs)
+                rcolb = [col] + rcolb
+
+                r.append(rcolb)
+
+            return r, version
+    except Exception as e:
+        return []
+
+    """r = []
+    for legend, lines in base.items():
+        rl = []
+        for l in lines:
+            rl.append([line_to_namespans(l)])
+
+        r.append([legend] + rl)
+
+    return r"""
