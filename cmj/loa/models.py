@@ -81,8 +81,8 @@ class Loa(models.Model):
     #descricao = models.CharField(max_length=50, verbose_name=_('Descrição'))
 
     class Meta:
-        verbose_name = _('Loa - Emendas Impositivas')
-        verbose_name_plural = _('Loa - Emendas Impositivas')
+        verbose_name = _('LOA - Emendas Impositivas')
+        verbose_name_plural = _('LOA - Emendas Impositivas')
         ordering = ['-id']
 
     def __str__(self):
@@ -93,7 +93,7 @@ class LoaParlamentar(models.Model):
 
     loa = models.ForeignKey(
         Loa,
-        verbose_name=_('Loa - Emendas Impositivas'),
+        verbose_name=_('LOA - Emendas Impositivas'),
         related_name='loaparlamentar_set',
         on_delete=CASCADE)
 

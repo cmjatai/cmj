@@ -56,6 +56,7 @@
       }
     }
     .container-avatar {
+      align-items: center;
       .avatar {
         position: relative;
         opacity: 0.4;
@@ -64,6 +65,7 @@
         }
         &.active {
           opacity: 1;
+          width: 100px;
         }
       }
     }
@@ -74,5 +76,8 @@
       color: green;
     }
 
+  }
+  &.emendaloa-list {
+    
   }
 }

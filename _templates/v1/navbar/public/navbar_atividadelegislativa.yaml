@@ -3,6 +3,8 @@
   children:
   - title: {% trans 'Matérias Legislativas' %}
     url: {% url 'cmj.search:materia_haystack_search' %}
+  - title: {% trans 'LOAs - Emendas Impositivas' %}
+    url: {% url 'cmj.loa:loa_list' %}
   - title: {% trans 'Pautas das Sessões' %}
     url: sapl.sessao:pauta_sessao
     #check_permission: sessao.add_sessaoplenaria

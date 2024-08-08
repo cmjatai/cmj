@@ -22,7 +22,11 @@
       </tbody>
     {% endif %}
     <tr>
-      <th class="text-left font-weight-bold">{{lp.loaparlamentar.parlamentar}}</th>
+      <th class="text-left font-weight-bold">
+      <a href="{% url 'cmj.loa:emendaloa_list' lp.loaparlamentar.loa.id %}?parlamentar={{ lp.loaparlamentar.parlamentar.id }}">
+        {{lp.loaparlamentar.parlamentar}}
+      </a>
+      </th>
       <td class="text-right text-blue">{{lp.10.ja_destinado}}</td>
       <td class="text-right text-red">{{lp.10.impedimento_tecnico}}</td>
       <td class="text-right text-orange">{{lp.10.sem_destinacao}}</td>

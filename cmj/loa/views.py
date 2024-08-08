@@ -61,6 +61,10 @@ class LoaCrud(Crud):
         def hook_header_perc_disp_diversos(self):
             return ''
 
+        def hook_ano(self, *args, **kwargs):
+            l = args[0]
+            return f'LOA {args[1]}', args[2]
+
         def hook_perc_disp_total(self, *args, **kwargs):
             l = args[0]
             return f' <i>({l.perc_disp_total:3.1f}%)</i>', ''
@@ -283,9 +287,33 @@ class EmendaLoaCrud(MasterDetailCrud):
             else:
                 return 'EmendaLoaDetail'
 
-        def get(self, request, *args, **kwargs):
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            path = context.get('path', '')
+            context['path'] = f'{path} emendaloa-detail'
+            return context
 
-            return MasterDetailCrud.DetailView.get(self, request, *args, **kwargs)
+        def hook_documentos_acessorios(self, emendaloa, verbose_name='', field_display=''):
+            docs = []
+
+            for doc in emendaloa.materia.documentoacessorio_set.all():
+                doc_template = loader.get_template(
+                    'materia/documentoacessorio_widget_itemlist.html')
+                context = {}
+                context['object'] = doc
+                rendered = doc_template.render(context, self.request)
+
+                docs.append(
+                    f'<tr><td>{rendered}</td></tr>'
+                )
+
+            return verbose_name, f'''
+                <div class="container-table">
+                    <table class="table table-form table-bordered table-hover w-100">
+                        {"".join(docs)}
+                    </table>
+                </div>
+                '''
 
         def hook_parlamentares(self, emendaloa, verbose_name='', field_display=''):
             pls = []

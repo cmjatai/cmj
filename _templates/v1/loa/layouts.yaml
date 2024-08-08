@@ -20,10 +20,11 @@ EmendaLoaDetail:
   {% trans 'Dados Gerais' %}:
   - tipo:2 fase:3 valor:3 materia|fk_urlize_for_detail
   - finalidade parlamentares:6
+  - documentos_acessorios
 
 EmendaLoaDetail2:
   version: 2
-  col:
+  col-12 1:
     {% trans 'Dados Gerais' %}:
       col-md-7:
       - tipo:3 fase:3 valor:6
@@ -31,6 +32,10 @@ EmendaLoaDetail2:
       - finalidade
       col-md-5:
       - parlamentares:12
+  col-12 2:
+    {% trans 'Documentos da Emenda Impositiva' %}:
+      col-md-12:
+      - documentos_acessorios
 
 {% comment %}
   # exemplo de detail version 2 completo
