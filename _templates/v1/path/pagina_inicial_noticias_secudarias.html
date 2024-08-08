@@ -4,7 +4,7 @@
 <div class="inner-noticias">
 {% with 'noticias_secundarias'|caixa_publicacao:None as noticias_secundarias %}
   {% for d in  noticias_secundarias.docs%}
-    <div class="path-item-list">
+    <div class="path-item-list w-25">
       <div class="inner">
         <div class="path-imagem alinhamento-justify">
           <div class="imagem" style="background-image: url(/{{d.1.absolute_slug}}.512)"></div>
