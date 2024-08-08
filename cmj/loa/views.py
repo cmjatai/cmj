@@ -268,17 +268,22 @@ class EmendaLoaCrud(MasterDetailCrud):
             return initial
 
     class DetailView(MasterDetailCrud.DetailView):
-        layout_key = 'EmendaLoaDetail'
+
+        @property
+        def detail_list_url(self):
+            if self.request.user.is_anonymous:
+                return ''
+            else:
+                return super().detail_create_url
+
+        @property
+        def layout_key(self):
+            if self.object.emendaloaparlamentar_set.all().count() > 2:
+                return 'EmendaLoaDetail2'
+            else:
+                return 'EmendaLoaDetail'
 
         def get(self, request, *args, **kwargs):
-
-            self.object = self.get_object()
-
-            if self.object.emendaloaparlamentar_set.all().count() > 2:
-                self.layout_key = 'EmendaLoaDetail2'
-
-            if request.user.is_anonymous:
-                self.detail_list_url = ''
 
             return MasterDetailCrud.DetailView.get(self, request, *args, **kwargs)
 
