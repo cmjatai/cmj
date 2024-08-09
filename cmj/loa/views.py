@@ -27,14 +27,20 @@ class LoaCrud(Crud):
     ordered_list = False
 
     class BaseMixin(LoaContextDataMixin, Crud.BaseMixin):
-        list_field_names = [
-            'ano',
-            'receita_corrente_liquida',
-            ('disp_total', 'perc_disp_total'),
-            ('disp_saude', 'perc_disp_saude'),
-            ('disp_diversos', 'perc_disp_diversos'),
-            'publicado'
-        ]
+
+        @property
+        def list_field_names(self):
+            list_field_names = [
+                'ano',
+                'receita_corrente_liquida',
+                ('disp_total', 'perc_disp_total'),
+                ('disp_saude', 'perc_disp_saude'),
+                ('disp_diversos', 'perc_disp_diversos'),
+            ]
+
+            if not self.request.user.is_anonymous:
+                list_field_names.append('publicado')
+            return list_field_names
 
     class ListView(Crud.ListView):
         ordered_list = False
@@ -130,6 +136,9 @@ class LoaCrud(Crud):
                 'parlamentar__nome_parlamentar')
 
             resumo_emendas_impositivas = []
+
+            totais = {}
+
             for lp in loaparlamentares:
 
                 resumo_parlamentar = {'loaparlamentar': lp}
@@ -137,6 +146,14 @@ class LoaCrud(Crud):
                     resumo_parlamentar[k] = {
                         'name': v
                     }
+
+                    if k not in totais:
+                        totais[k] = dict(
+                            ja_destinado=Decimal('0.00'),
+                            impedimento_tecnico=Decimal('0.00'),
+                            sem_destinacao=Decimal('0.00'),
+                        )
+
                     params = dict(
                         parlamentar=lp.parlamentar,
                         emendaloa__loa=self.object,
@@ -168,9 +185,42 @@ class LoaCrud(Crud):
                         resumo_parlamentar[k]['ja_destinado'] + \
                         resumo_parlamentar[k]['impedimento_tecnico']
 
+                    totais[k]['ja_destinado'] += resumo_parlamentar[k]['ja_destinado']
+                    totais[k]['impedimento_tecnico'] += resumo_parlamentar[k]['impedimento_tecnico']
+                    totais[k]['sem_destinacao'] += resumo_parlamentar[k]['sem_destinacao']
+
                 resumo_emendas_impositivas.append(resumo_parlamentar)
+
+            t10 = EmendaLoa.SAUDE
+            t99 = EmendaLoa.DIVERSOS
+            # dsjd display_saude_ja_destinado
+            dsjd = 1 if totais[t10]['ja_destinado'] else 0
+            dsit = 0  # 1 if totais[t10]['impedimento_tecnico'] else 0
+            dssd = 0  # 1 if totais[t10]['sem_destinacao'] else 0
+
+            # ddjd display_diversos_ja_destinado
+            ddjd = 1 if totais[t99]['ja_destinado'] else 0
+            ddit = 0  # 1 if totais[t99]['impedimento_tecnico'] else 0
+            ddsd = 0  # 1 if totais[t99]['sem_destinacao'] else 0
+
             context = dict(
                 resumo_emendas_impositivas=resumo_emendas_impositivas,
+                columns=dict(
+                    saude=dict(
+                        num_columns=dsjd + dsit + dssd,
+                        ja_destinado='Valores<br>Já Destinados' if dsjd else '',
+                        impedimento_tecnico='Impedimentos<br>Técnicos' if dsit else '',
+                        sem_destinacao=(
+                            'Sem Destinação' if l.ano == l.materia.ano else 'Remanescente') if dssd else '',
+                    ),
+                    diversos=dict(
+                        num_columns=ddjd + ddit + ddsd,
+                        ja_destinado='Valores<br>Já Destinados' if ddjd else '',
+                        impedimento_tecnico='Impedimentos<br>Técnicos' if ddit else '',
+                        sem_destinacao=(
+                            'Sem Destinação' if l.ano == l.materia.ano else 'Remanescente') if ddsd else '',
+                    )
+                )
             )
 
             rendered = template.render(context, self.request)
@@ -258,6 +308,17 @@ class EmendaLoaCrud(MasterDetailCrud):
             initial['loa'] = Loa.objects.get(pk=self.kwargs['pk'])
             return initial
 
+        def form_invalid(self, form):
+            r = Crud.CreateView.form_invalid(self, form)
+
+            err_materia = form.errors.get('materia', None)
+            if err_materia:
+                err_materia = 'Já existe registro de valores para a Matéria Legislativa selecionada.'
+
+                self.messages.error(err_materia,
+                                    fail_silently=True)
+            return r
+
     class UpdateView(MasterDetailCrud.UpdateView):
         layout_key = None
         form_class = EmendaLoaForm
@@ -278,7 +339,7 @@ class EmendaLoaCrud(MasterDetailCrud):
             if self.request.user.is_anonymous:
                 return ''
             else:
-                return super().detail_create_url
+                return super().detail_list_url
 
         @property
         def layout_key(self):
@@ -293,10 +354,19 @@ class EmendaLoaCrud(MasterDetailCrud):
             context['path'] = f'{path} emendaloa-detail'
             return context
 
+        def hook_materia(self, l, verbose_name='', field_display=''):
+            if l.materia:
+                strm = str(l.materia)
+                field_display = field_display.replace(
+                    strm, l.materia.epigrafe_short)
+            return verbose_name, field_display
+
         def hook_documentos_acessorios(self, emendaloa, verbose_name='', field_display=''):
             docs = []
 
-            for doc in emendaloa.materia.documentoacessorio_set.all():
+            qs_docs = [
+            ] if not emendaloa.materia else emendaloa.materia.documentoacessorio_set.order_by('-id')
+            for doc in qs_docs:
                 doc_template = loader.get_template(
                     'materia/documentoacessorio_widget_itemlist.html')
                 context = {}

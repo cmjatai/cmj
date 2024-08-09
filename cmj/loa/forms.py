@@ -222,8 +222,8 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
         row1 = to_row([
             ('tipo', 2),
-            ('fase', 2),
-            ('tipo_materia', 4),
+            ('fase', 3),
+            ('tipo_materia', 3),
             ('numero_materia', 2),
             ('ano_materia', 2),
             ('materia', 0),
@@ -292,7 +292,10 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         return cleaned_data
 
     def save(self, commit=True):
-        i = super().save(commit)
+        try:
+            i = super().save(commit)
+        except Exception as e:
+            raise ValidationError('erro')
         i.parlamentares.clear()
 
         pv = zip(self.parlamentares, self.cleaned_data['parlamentares__valor'])

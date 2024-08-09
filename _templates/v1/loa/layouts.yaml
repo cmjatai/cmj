@@ -6,19 +6,19 @@ Loa:
   - parlamentares
 LoaDetail:
   {% trans 'Dados Gerais' %}:
-  - ano:2 receita_corrente_liquida:5 materia|fk_urlize_for_detail publicado:2
+  - ano:2 receita_corrente_liquida:5 materia|fk_urlize_for_detail
   - disp_total disp_saude disp_diversos
   - resumo_emendas_impositivas
 
 EmendaLoa:
   {% trans 'Dados Gerais' %}:
-  - tipo:2 fase:2 tipo_materia:4 numero_materia:2 ano_materia:2 materia:0
+  - tipo:2 fase:3 tipo_materia:3 numero_materia:2 ano_materia:2 materia:0
   - valor:3 finalidade
-  - parlamentares
+  - parlamentares__valor
 
 EmendaLoaDetail:
   {% trans 'Dados Gerais' %}:
-  - tipo:2 fase:3 valor:3 materia|fk_urlize_for_detail
+  - tipo:2 fase:4 valor:3 materia|fk_urlize_for_detail
   - finalidade parlamentares:6
   - documentos_acessorios
 

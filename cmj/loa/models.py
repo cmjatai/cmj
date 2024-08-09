@@ -8,6 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
+from sapl.utils import PortalFileField
 
 
 PERCENTAGE_VALIDATOR = [MinValueValidator(0), MaxValueValidator(100)]
@@ -143,11 +144,13 @@ class EmendaLoa(models.Model):
     APROVACAO_LEGISLATIVA = 20
     APROVACAO_LEGAL = 30
     IMPEDIMENTO_TECNICO = 40
+    IMPEDIMENTO_OFICIADO = 50
     FASE_CHOICE = (
         (PROPOSTA, _('Proposta Legislativa')),
         (APROVACAO_LEGISLATIVA, _('Aprovada no Processo Legislativo')),
         (APROVACAO_LEGAL, _('Aprovada')),
-        (IMPEDIMENTO_TECNICO, _('Impedimento Técnico'))
+        (IMPEDIMENTO_TECNICO, _('Impedimento Técnico')),
+        (IMPEDIMENTO_OFICIADO, _('Impedimento Técnico Oficiado'))
     )
 
     tipo = models.PositiveSmallIntegerField(

@@ -5,19 +5,19 @@
       <tbody>
         <tr>
           <th rowspan=2>PARLAMENTARES</th>
-          <th colspan=3>EMENDAS DESTINADAS À SAÚDE<br>
+          <th colspan={{columns.saude.num_columns}}>EMENDAS DESTINADAS À SAÚDE<br>
             <i>(por Parlamentar R$ {{lp.loaparlamentar.disp_saude}})</i></th>
-          <th colspan=3>EMENDAS COM DESTINAÇÃO DIVERSA<br>
+          <th colspan={{columns.diversos.num_columns}}>EMENDAS COM DESTINAÇÃO DIVERSA<br>
             <i>(por Parlamentar R$ {{lp.loaparlamentar.disp_diversos}})</i></th>
         </tr>
         <tr>
-          <th class="text-blue">Valores<br>Já Destinados</th>
-          <th class="text-red">Impedimentos<br>Técnicos</th>
-          <th class="text-orange">Sem Destinação</th>
+          {% if columns.saude.ja_destinado %}<th class="text-blue">{{columns.saude.ja_destinado|safe}}</th>{% endif %}
+          {% if columns.saude.impedimento_tecnico %}<th class="text-red">{{columns.saude.impedimento_tecnico|safe}}</th>{% endif %}
+          {% if columns.saude.sem_destinacao %}<th class="text-orange">{{columns.saude.sem_destinacao|safe}}</th>{% endif %}
 
-          <th class="text-blue">Valores<br>Já Destinados</th>
-          <th class="text-red">Impedimentos<br>Técnicos</th>
-          <th class="text-orange">Sem Destinação</th>
+          {% if columns.diversos.ja_destinado %}<th class="text-blue">{{columns.diversos.ja_destinado|safe}}</th>{% endif %}
+          {% if columns.diversos.impedimento_tecnico %}<th class="text-red">{{columns.diversos.impedimento_tecnico|safe}}</th>{% endif %}
+          {% if columns.diversos.sem_destinacao %}<th class="text-orange">{{columns.diversos.sem_destinacao|safe}}</th>{% endif %}
         </tr>
       </tbody>
     {% endif %}
@@ -27,13 +27,18 @@
         {{lp.loaparlamentar.parlamentar}}
       </a>
       </th>
-      <td class="text-right text-blue">{{lp.10.ja_destinado}}</td>
-      <td class="text-right text-red">{{lp.10.impedimento_tecnico}}</td>
-      <td class="text-right text-orange">{{lp.10.sem_destinacao}}</td>
 
-      <td class="text-right text-blue">{{lp.99.ja_destinado}}</td>
-      <td class="text-right text-red">{{lp.99.impedimento_tecnico}}</td>
-      <td class="text-right text-orange">{{lp.99.sem_destinacao}}</td>
+
+      {% if columns.saude.ja_destinado %}<td class="text-right text-blue">{{lp.10.ja_destinado}}</td>{% endif %}
+      {% if columns.saude.impedimento_tecnico %}<td class="text-right text-red">{{lp.10.impedimento_tecnico}}</td>{% endif %}
+      {% if columns.saude.sem_destinacao %}<td class="text-right text-orange">{{lp.10.sem_destinacao}}</td>{% endif %}
+
+
+      {% if columns.diversos.ja_destinado %}<td class="text-right text-blue">{{lp.99.ja_destinado}}</td>{% endif %}
+      {% if columns.diversos.impedimento_tecnico %}<td class="text-right text-red">{{lp.99.impedimento_tecnico}}</td>{% endif %}
+      {% if columns.diversos.sem_destinacao %}<td class="text-right text-orange">{{lp.99.sem_destinacao}}</td>{% endif %}
+
+
     </tr>
   {% endfor %}
 </table>
