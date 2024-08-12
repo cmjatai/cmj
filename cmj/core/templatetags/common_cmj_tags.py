@@ -11,6 +11,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.serializers import serialize
 from django.db.models.query import QuerySet
 from django.template.defaultfilters import stringfilter
+from django.utils import formats
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime as django_parse_datetime
 from django.utils.formats import date_format
@@ -30,6 +31,11 @@ logger = logging.getLogger(__name__)
 
 
 register = template.Library()
+
+
+@register.filter('decimal2str')
+def decimal2str(value):
+    return formats.number_format(value, force_grouping=True)
 
 
 @register.filter('startswith')

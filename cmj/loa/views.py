@@ -191,17 +191,19 @@ class LoaCrud(Crud):
 
                 resumo_emendas_impositivas.append(resumo_parlamentar)
 
+            is_us = self.request.user.is_superuser
+
             t10 = EmendaLoa.SAUDE
             t99 = EmendaLoa.DIVERSOS
             # dsjd display_saude_ja_destinado
-            dsjd = 1 if totais[t10]['ja_destinado'] else 0
-            dsit = 0  # 1 if totais[t10]['impedimento_tecnico'] else 0
-            dssd = 0  # 1 if totais[t10]['sem_destinacao'] else 0
+            dsjd = 1 if totais[t10]['ja_destinado'] or is_us else 0
+            dsit = 1 if totais[t10]['impedimento_tecnico'] or is_us else 0
+            dssd = 1 if totais[t10]['sem_destinacao'] or is_us else 0
 
             # ddjd display_diversos_ja_destinado
-            ddjd = 1 if totais[t99]['ja_destinado'] else 0
-            ddit = 0  # 1 if totais[t99]['impedimento_tecnico'] else 0
-            ddsd = 0  # 1 if totais[t99]['sem_destinacao'] else 0
+            ddjd = 1 if totais[t99]['ja_destinado'] or is_us else 0
+            ddit = 1 if totais[t99]['impedimento_tecnico'] or is_us else 0
+            ddsd = 1 if totais[t99]['sem_destinacao'] or is_us else 0
 
             context = dict(
                 resumo_emendas_impositivas=resumo_emendas_impositivas,
@@ -282,7 +284,7 @@ class EmendaLoaCrud(MasterDetailCrud):
             return f'<br><small class="text-nowrap">({args[0].get_fase_display()})</small>', args[2]
 
         def hook_materia(self, *args, **kwargs):
-            return f'<small><strong>Matéria Legislativa:</strong> {args[0].materia}</small>', args[2]
+            return f'<small class="text-gray"><strong>Matéria Legislativa:</strong> {args[0].materia}<br><i>{args[0].materia.ementa if not self.request.user.is_anonymous else ""}</i></small>', args[2]
 
         def hook_parlamentares(self, *args, **kwargs):
             pls = []
@@ -291,7 +293,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                 pls.append(
                     '<tr><td>{}</td><td align="right">R$ {}</td></tr>'.format(
                         elp.parlamentar.nome_parlamentar,
-                        formats.number_format(elp.valor)
+                        formats.number_format(elp.valor, force_grouping=True)
                     )
                 )
 

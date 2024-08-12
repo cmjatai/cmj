@@ -177,7 +177,7 @@ def get_field_display(obj, fieldname):
         display = value.replace('\n', '<br/>')
         display = '<div class="dont-break-out">{}</div>'.format(display)
     elif 'DecimalField' in str_type_from_field:
-        display = formats.number_format(value)
+        display = formats.number_format(value, force_grouping=True)
     else:
         display = str(value)
     return verbose_name, display

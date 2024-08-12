@@ -6,9 +6,11 @@ from django.db.models.deletion import PROTECT, CASCADE
 from django.utils import formats
 from django.utils.translation import ugettext_lazy as _
 
+from cmj.utils import texto_upload_path
 from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
-from sapl.utils import PortalFileField
+from sapl.utils import PortalFileField, OverwriteStorage,\
+    restringe_tipos_de_arquivo_txt
 
 
 PERCENTAGE_VALIDATOR = [MinValueValidator(0), MaxValueValidator(100)]
@@ -193,7 +195,7 @@ class EmendaLoa(models.Model):
             'parlamentar'))
 
     def __str__(self):
-        valor_str = formats.number_format(self.valor)
+        valor_str = formats.number_format(self.valor, force_grouping=True)
         return f'R$ {valor_str} - {self.finalidade}'
 
     class Meta:
@@ -222,11 +224,85 @@ class EmendaLoaParlamentar(models.Model):
     )
 
     def __str__(self):
-        valor_str = formats.number_format(self.valor)
+        valor_str = formats.number_format(self.valor, force_grouping=True)
         return f'R$ {valor_str} - {self.parlamentar.nome_parlamentar}'
 
     class Meta:
         verbose_name = _('Participação Parlamentar na Emenda Impositiva')
         verbose_name_plural = _(
             'Participações Parlamentares na Emenda Impositiva')
+        ordering = ['id']
+
+
+def ajuste_upload_path(instance, filename):
+    return texto_upload_path(instance, filename, subpath=instance.ano)
+
+
+class OficioAjusteLoa(models.Model):
+
+    loa = models.ForeignKey(
+        Loa,
+        verbose_name=_('Loa - Emendas Impositivas'),
+        related_name='ajusteloa_set',
+        on_delete=CASCADE)
+
+    parlamentar = models.ForeignKey(
+        Parlamentar,
+        related_name='ajusteloa_set',
+        verbose_name=_('Parlamentar'),
+        on_delete=CASCADE)
+
+    epigrafe = models.CharField(
+        max_length=100,
+        verbose_name=_("Epígrafe"))
+
+    arquivo = PortalFileField(
+        blank=True,
+        null=True,
+        upload_to=ajuste_upload_path,
+        verbose_name=_('Ofício'),
+        storage=OverwriteStorage(),
+        max_length=512)
+
+    def __str__(self):
+        return f'R$ {self.epigrafe} - {self.parlamentar.nome_parlamentar}'
+
+    class Meta:
+        verbose_name = _('Ofício de Ajuste Técnico')
+        verbose_name_plural = _(
+            'Ofícios de Ajuste Técnico')
+        ordering = ['id']
+
+
+class RegistroAjusteLoa(models.Model):
+
+    oficio_ajuste_loa = models.ForeignKey(
+        OficioAjusteLoa,
+        verbose_name=_('Ofício de Ajuste Técnico'),
+        related_name='registroajusteloa_set',
+        on_delete=CASCADE)
+
+    emendaloa = models.ForeignKey(
+        EmendaLoa,
+        blank=True, null=True, default=None,
+        verbose_name=_('Emenda Impositiva'),
+        related_name='registroajusteloa_set',
+        on_delete=CASCADE)
+
+    valor = models.DecimalField(
+        max_digits=14, decimal_places=2, default=Decimal('0.00'),
+        verbose_name=_('Valor (R$)'),
+    )
+
+    descricao = models.TextField(
+        verbose_name=_("Descrição"))
+
+    def __str__(self):
+        valor_str = formats.number_format(self.valor, force_grouping=True)
+        return f'R$ {valor_str} - {self.oficio_ajuste_loa}'
+
+    class Meta:
+        verbose_name = _('Registro do Ajuste Técnico')
+        verbose_name_plural = _(
+            'Registros do Ajuste Técnico')
         ordering = ['id']
