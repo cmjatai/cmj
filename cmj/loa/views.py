@@ -4,11 +4,14 @@ import logging
 from django.db.models.aggregates import Sum
 from django.http.response import Http404
 from django.template import loader
+from django.urls.base import reverse_lazy
 from django.utils import formats
 from django.utils.translation import ugettext_lazy as _
 
-from cmj.loa.forms import LoaForm, EmendaLoaForm
-from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar
+from cmj.loa.forms import LoaForm, EmendaLoaForm, OficioAjusteLoaForm,\
+    RegistroAjusteLoaForm
+from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa,\
+    RegistroAjusteLoa
 from sapl.crud.base import Crud, MasterDetailCrud, RP_DETAIL, RP_LIST
 
 
@@ -154,6 +157,11 @@ class LoaCrud(Crud):
                             sem_destinacao=Decimal('0.00'),
                         )
 
+                    if k == EmendaLoa.SAUDE:
+                        resumo_parlamentar[k]['sem_destinacao'] = lp.disp_saude
+                    elif k == EmendaLoa.DIVERSOS:
+                        resumo_parlamentar[k]['sem_destinacao'] = lp.disp_diversos
+
                     params = dict(
                         parlamentar=lp.parlamentar,
                         emendaloa__loa=self.object,
@@ -164,25 +172,43 @@ class LoaCrud(Crud):
                         **params).exclude(
                             emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO
                     ).aggregate(Sum('valor'))
-                    resumo_parlamentar[k]['ja_destinado'] = ja_destinado['valor__sum'] or Decimal(
-                        '0.00')
+                    resumo_parlamentar[k]['ja_destinado'] = (
+                        ja_destinado['valor__sum'] or Decimal('0.00')
+                    )
 
-                    params.update(dict(
-                        emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO
-                    ))
-
+                    params.update(
+                        dict(emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO))
                     impedimento_tecnico = EmendaLoaParlamentar.objects.filter(
                         **params).aggregate(Sum('valor'))
-                    resumo_parlamentar[k]['impedimento_tecnico'] = impedimento_tecnico['valor__sum'] or Decimal(
-                        '0.00')
 
-                    if k == EmendaLoa.SAUDE:
-                        resumo_parlamentar[k]['sem_destinacao'] = lp.disp_saude
-                    elif k == EmendaLoa.DIVERSOS:
-                        resumo_parlamentar[k]['sem_destinacao'] = lp.disp_diversos
+                    resumo_parlamentar[k]['impedimento_tecnico'] = (
+                        impedimento_tecnico['valor__sum'] or Decimal('0.00')
+                    )
 
-                    resumo_parlamentar[k]['sem_destinacao'] -= \
-                        resumo_parlamentar[k]['ja_destinado'] + \
+                    ajuste_remanescente = RegistroAjusteLoa.objects.filter(
+                        oficio_ajuste_loa__parlamentar=lp.parlamentar,
+                        tipo=k,
+                    ).exclude(
+                        emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO
+                    ).aggregate(Sum('valor'))
+
+                    ajuste_de_impedimento = RegistroAjusteLoa.objects.filter(
+                        oficio_ajuste_loa__parlamentar=lp.parlamentar,
+                        emendaloa__tipo=k,
+                        emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO
+                    ).aggregate(Sum('valor'))
+
+                    resumo_parlamentar[k]['impedimento_tecnico'] += (
+                        ajuste_de_impedimento['valor__sum'] or Decimal('0.00')
+                    )
+
+                    resumo_parlamentar[k]['ja_destinado'] += (
+                        ajuste_remanescente['valor__sum'] or Decimal('0.00')
+                    )
+
+                    resumo_parlamentar[k]['sem_destinacao'] = \
+                        resumo_parlamentar[k]['sem_destinacao'] - \
+                        resumo_parlamentar[k]['ja_destinado'] - \
                         resumo_parlamentar[k]['impedimento_tecnico']
 
                     totais[k]['ja_destinado'] += resumo_parlamentar[k]['ja_destinado']
@@ -363,6 +389,24 @@ class EmendaLoaCrud(MasterDetailCrud):
                     strm, l.materia.epigrafe_short)
             return verbose_name, field_display
 
+        def hook_registroajusteloa_set(self, obj, verbose_name='', field_display=''):
+
+            ajustes = []
+            for ajuste in obj.registroajusteloa_set.all():
+                url = reverse_lazy(
+                    'cmj.loa:registroajusteloa_detail',
+                    kwargs={'pk': ajuste.id})
+                a_str = f"""
+                    <li>
+                        <a href="{url}">
+                            {ajuste}
+                        </a>
+                    </li>
+                """
+                ajustes.append(a_str)
+
+            return verbose_name, f'<ul>{"".join(ajustes)}</ul>'
+
         def hook_documentos_acessorios(self, emendaloa, verbose_name='', field_display=''):
             docs = []
 
@@ -379,7 +423,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                     f'<tr><td>{rendered}</td></tr>'
                 )
 
-            return verbose_name, f'''
+            return 'Documentos da Adicionados à Emenda Impositiva', f'''
                 <div class="container-table">
                     <table class="table table-form table-bordered table-hover w-100">
                         {"".join(docs)}
@@ -394,7 +438,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                 pls.append(
                     '<tr><td>{}</td><td align="right">R$ {}</td></tr>'.format(
                         elp.parlamentar.nome_parlamentar,
-                        formats.number_format(elp.valor)
+                        formats.number_format(elp.valor, force_grouping=True)
                     )
                 )
 
@@ -405,3 +449,91 @@ class EmendaLoaCrud(MasterDetailCrud):
                     </table>
                 </div>
                 '''
+
+
+class OficioAjusteLoaCrud(MasterDetailCrud):
+    model = OficioAjusteLoa
+    parent_field = 'loa'
+    model_set = 'registroajusteloa_set'
+    public = [RP_LIST, RP_DETAIL]
+
+    class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
+        list_field_names = [
+            'epigrafe', 'parlamentar',
+        ]
+
+    class CreateView(MasterDetailCrud.CreateView):
+        form_class = OficioAjusteLoaForm
+
+        def get_initial(self):
+            initial = super().get_initial()
+            initial['loa'] = Loa.objects.get(pk=self.kwargs['pk'])
+            return initial
+
+    class ListView(MasterDetailCrud.ListView):
+        pass
+
+    class DetailView(MasterDetailCrud.DetailView):
+        template_name = 'loa/oficioajusteloa_detail.html'
+
+        paginate_by = 100
+
+        @property
+        def list_field_names_set(self):
+            return 'descricao', 'valor', 'tipo'  # , 'emendaloa'
+
+
+class RegistroAjusteLoaCrud(MasterDetailCrud):
+    model = RegistroAjusteLoa
+    parent_field = 'oficio_ajuste_loa__loa'
+    public = [RP_LIST]
+
+    class DetailView(MasterDetailCrud.DetailView):
+        layout_key = 'RegistroAjusteLoaDetail'
+
+        @property
+        def detail_list_url(self):
+            return reverse_lazy(
+                'cmj.loa:oficioajusteloa_detail',
+                kwargs={'pk': self.object.oficio_ajuste_loa_id})
+
+    class UpdateView(MasterDetailCrud.UpdateView):
+        form_class = RegistroAjusteLoaForm
+
+        def get_initial(self):
+            initial = super().get_initial()
+            initial['oficioajusteloa'] = self.object.oficio_ajuste_loa
+            return initial
+
+        @property
+        def cancel_url(self):
+            return reverse_lazy(
+                'cmj.loa:oficioajusteloa_detail',
+                kwargs={'pk': self.kwargs['pk']})
+
+    class CreateView(MasterDetailCrud.CreateView):
+        form_class = RegistroAjusteLoaForm
+
+        def get_initial(self):
+            initial = super().get_initial()
+            initial['oficioajusteloa'] = OficioAjusteLoa.objects.get(
+                pk=self.kwargs['pk'])
+            return initial
+
+        @property
+        def cancel_url(self):
+            return reverse_lazy(
+                'cmj.loa:oficioajusteloa_detail',
+                kwargs={'pk': self.kwargs['pk']})
+
+        def get_success_url(self):
+            return reverse_lazy(
+                'cmj.loa:oficioajusteloa_detail',
+                kwargs={'pk': self.kwargs['pk']})
+
+    class DeleteView(MasterDetailCrud.DeleteView):
+
+        def get_success_url(self):
+            return reverse_lazy(
+                'cmj.loa:oficioajusteloa_detail',
+                kwargs={'pk': self.object.oficio_ajuste_loa.id})

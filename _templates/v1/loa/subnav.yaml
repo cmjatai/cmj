@@ -3,3 +3,5 @@
   url: loa_detail
 - title: {% trans 'Emendas Impositivas' %}
   url: emendaloa_list
+- title: {% trans 'Ajustes Técnicos' %}
+  url: oficioajusteloa_list

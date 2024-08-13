@@ -12,7 +12,8 @@ from django.forms.fields import MultiValueField
 from django.forms.models import ModelForm
 from django.utils.translation import ugettext_lazy as _
 
-from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar
+from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa,\
+    RegistroAjusteLoa
 from sapl.crispy_layout_mixin import to_row, SaplFormLayout
 from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
@@ -310,3 +311,55 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
             elp.save()
 
         return i
+
+
+class OficioAjusteLoaForm(ModelForm):
+
+    class Meta:
+        model = OficioAjusteLoa
+        fields = [
+            'epigrafe',
+            'parlamentar',
+            'arquivo'
+        ]
+
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        self.loa = kwargs['initial']['loa']
+        self.parlamentares = self.loa.parlamentares.order_by(
+            'nome_parlamentar')
+
+        self.fields['parlamentar'].choices = [
+            (p.pk, p) for p in self.parlamentares
+        ]
+
+
+class RegistroAjusteLoaForm(ModelForm):
+
+    emendaloa = forms.ModelChoiceField(
+        required=False,
+        queryset=EmendaLoa.objects.all())
+
+    class Meta:
+        model = RegistroAjusteLoa
+        fields = [
+            'valor',
+            'tipo',
+            'emendaloa',
+            'descricao'
+        ]
+
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        self.oficioajusteloa = kwargs['initial']['oficioajusteloa']
+        self.emendas = self.oficioajusteloa.parlamentar.emendaloaparlamentar_set.filter(
+            emendaloa__loa=self.oficioajusteloa.loa
+        ).order_by('emendaloa__materia')
+
+        self.fields['emendaloa'].choices = [('', '---------')] + [
+            (e.emendaloa.pk, f'{e} - {e.emendaloa.materia.epigrafe_short}') for e in self.emendas
+        ]

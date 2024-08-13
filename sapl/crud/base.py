@@ -669,6 +669,10 @@ class CrudCreateView(PermissionRequiredContainerCrudMixin,
 
     @property
     def cancel_url(self):
+
+        if hasattr(super(), 'cancel_url'):
+            return super().cancel_url
+
         return self.list_url
 
     def get_success_url(self):
@@ -1369,6 +1373,10 @@ class MasterDetailCrud(Crud):
 
         @property
         def cancel_url(self):
+
+            if hasattr(super(), 'cancel_url'):
+                return super().cancel_url
+
             if self.list_url:
                 return self.list_url
             obj = self.crud if hasattr(self, 'crud') else self

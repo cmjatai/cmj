@@ -265,7 +265,7 @@ class OficioAjusteLoa(models.Model):
         max_length=512)
 
     def __str__(self):
-        return f'R$ {self.epigrafe} - {self.parlamentar.nome_parlamentar}'
+        return f'{self.epigrafe} - {self.parlamentar.nome_parlamentar}'
 
     class Meta:
         verbose_name = _('Ofício de Ajuste Técnico')
@@ -275,6 +275,17 @@ class OficioAjusteLoa(models.Model):
 
 
 class RegistroAjusteLoa(models.Model):
+
+    SAUDE = 10
+    DIVERSOS = 99
+    TIPOEMENDALOA_CHOICE = (
+        (SAUDE, _('Saúde')),
+        (DIVERSOS, _('Áreas Diversas'))
+    )
+
+    tipo = models.PositiveSmallIntegerField(
+        choices=TIPOEMENDALOA_CHOICE,
+        default=99, verbose_name=_('Área de aplicação'))
 
     oficio_ajuste_loa = models.ForeignKey(
         OficioAjusteLoa,

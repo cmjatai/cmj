@@ -20,6 +20,7 @@ EmendaLoaDetail:
   {% trans 'Dados Gerais' %}:
   - tipo:2 fase:4 valor:3 materia|fk_urlize_for_detail
   - finalidade parlamentares:6
+  - registroajusteloa_set
   - documentos_acessorios
 
 EmendaLoaDetail2:
@@ -35,7 +36,22 @@ EmendaLoaDetail2:
   col-12 2:
     {% trans 'Documentos da Emenda Impositiva' %}:
       col-md-12:
+      - registroajusteloa_set
       - documentos_acessorios
+
+OficioAjusteLoa:
+  {% trans 'Dados Gerais' %}:
+  - epigrafe parlamentar arquivo
+
+RegistroAjusteLoa:
+  {% trans 'Dados Gerais' %}:
+  - valor:3 tipo:2 emendaloa:7
+  - descricao
+
+RegistroAjusteLoaDetail:
+  {% trans 'Dados Gerais' %}:
+  - valor:3 tipo:2 emendaloa|fk_urlize_for_detail
+  - descricao
 
 {% comment %}
   # exemplo de detail version 2 completo
