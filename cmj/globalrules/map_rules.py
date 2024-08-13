@@ -193,11 +193,11 @@ rules_loa_group_operador = {
     'group': GROUP_LOA_OPERADOR,
     'rules': [
         (Loa, __base__, set()),
-        (LoaParlamentar, __base__, set()),
-        (EmendaLoa, __base__, set()),
-        (EmendaLoaParlamentar, __base__, set()),
-        (OficioAjusteLoa, __base__, set()),
-        (RegistroAjusteLoa, __base__, set()),
+        (LoaParlamentar, __base__, __perms_publicas__),
+        (EmendaLoa, __base__, __perms_publicas__),
+        (EmendaLoaParlamentar, __base__, __perms_publicas__),
+        (OficioAjusteLoa, __base__, __perms_publicas__),
+        (RegistroAjusteLoa, __base__, __perms_publicas__),
     ]
 }
 

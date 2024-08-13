@@ -494,7 +494,7 @@ class OficioAjusteLoaCrud(MasterDetailCrud):
 class RegistroAjusteLoaCrud(MasterDetailCrud):
     model = RegistroAjusteLoa
     parent_field = 'oficio_ajuste_loa__loa'
-    public = [RP_LIST]
+    public = [RP_LIST, RP_DETAIL]
 
     class DetailView(MasterDetailCrud.DetailView):
         layout_key = 'RegistroAjusteLoaDetail'
