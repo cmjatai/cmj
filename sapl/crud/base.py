@@ -770,12 +770,19 @@ class CrudDetailView(PermissionRequiredContainerCrudMixin,
                         self.object, obj.model_set).model._meta.get_field(
                         fieldname).verbose_name
                 else:
-                    fv = getattr(self.object, obj.model_set).model._meta.get_field(
-                        fieldname)
+                    try:
+                        fv = getattr(self.object, obj.model_set).model._meta.get_field(
+                            fieldname)
+                    except:
+                        fv = ''
                     if hasattr(fv, 'related_model') and fv.related_model:
                         fv = fv.related_model._meta.verbose_name_plural
-                    else:
+                    elif hasattr(fv, 'verbose_name') and fv.verbose_name:
                         fv = fv.verbose_name
+                    else:
+                        hook = f'hook_header_{fieldname}'
+                        if hasattr(self, hook):
+                            fv = getattr(self, hook)()
 
                 r.append(fv)
 

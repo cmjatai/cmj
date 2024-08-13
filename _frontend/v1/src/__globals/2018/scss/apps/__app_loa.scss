@@ -76,7 +76,13 @@
       color: green;
     }
   }
-  &.emendaloa-list {
-
+  &.oficioajusteloa-detail {
+    .table {
+      tr {
+        td:nth-child(n + 2) {
+          text-align: center;
+        }
+      }
+    }
   }
 }

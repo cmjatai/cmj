@@ -328,12 +328,18 @@ class RegistroAjusteLoa(models.Model):
     descricao = models.TextField(
         verbose_name=_("Descrição"))
 
-    def __str__(self):
-        valor_str = formats.number_format(self.valor, force_grouping=True)
-        return f'R$ {valor_str} - {self.oficio_ajuste_loa}'
-
     class Meta:
         verbose_name = _('Registro do Ajuste Técnico')
         verbose_name_plural = _(
             'Registros do Ajuste Técnico')
         ordering = ['id']
+
+    @property
+    def str_valor(self):
+        str_v = formats.number_format(self.valor, force_grouping=True)
+        if '-' in str_v:
+            str_v = f'({str_v[1:]})'
+        return str_v
+
+    def __str__(self):
+        return f'R$ {self.str_valor} - {self.oficio_ajuste_loa}'

@@ -3,6 +3,7 @@ import logging
 
 from django.db.models.aggregates import Sum
 from django.http.response import Http404
+from django.shortcuts import redirect
 from django.template import loader
 from django.urls.base import reverse_lazy
 from django.utils import formats
@@ -45,8 +46,25 @@ class LoaCrud(Crud):
                 list_field_names.append('publicado')
             return list_field_names
 
+        @property
+        def list_url(self):
+            url = super().list_url
+            if self.request.user.is_anonymous:
+                c = Loa.objects.filter(publicado=True).count()
+                return url if c > 1 else ''
+            return url
+
     class ListView(Crud.ListView):
         ordered_list = False
+
+        def get(self, request, *args, **kwargs):
+            response = super().get(request, *args, **kwargs)
+
+            if self.object_list.count() == 1:
+                loa = self.object_list.first()
+                return redirect(to=reverse_lazy('cmj.loa:loa_detail',
+                                                kwargs={'pk': loa.pk}))
+            return response
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
@@ -323,10 +341,45 @@ class EmendaLoaCrud(MasterDetailCrud):
                     )
                 )
 
-            return f'<table class="w-100 text-nowrap">{"".join(pls)}</table>', ''
+            ajustes = []
+            for ajuste in args[0].registroajusteloa_set.all():
+                url = reverse_lazy(
+                    'cmj.loa:oficioajusteloa_detail',
+                    kwargs={'pk': ajuste.oficio_ajuste_loa.id})
+
+                descr = ''
+                if ajuste.valor <= Decimal('0.00'):
+                    descr = ajuste.descricao
+
+                ajustes.append(
+                    f'<li><a href="{url}">{ajuste}</a><small class="text-gray"><br>{descr}</small></li>')
+
+            ajustes = "".join(ajustes)
+            if ajustes:
+                ajustes = f'''
+                    <hr class="my-1">
+                    <small class="px-2 d-block">
+                        <strong>Registros de Ajuste Técnico</strong>
+                        <ul class="pl-3  m-0">{ajustes}</ul>
+                    </small>
+                '''
+
+            return f'''
+                    <table class="w-100 text-nowrap">{"".join(pls)}</table>
+                    {ajustes}
+                    ''', ''
 
         def hook_valor(self, *args, **kwargs):
-            return f'<div class="text-right font-weight-bold">{args[1]}</div>', None
+
+            soma_ajustes = args[0].registroajusteloa_set.all(
+            ).aggregate(Sum('valor'))
+
+            valor = args[0].valor + (
+                soma_ajustes['valor__sum'] or Decimal('0.00'))
+
+            valor = formats.number_format(valor, force_grouping=True)
+
+            return f'<div class="text-right font-weight-bold">{valor}</div>', None
 
     class CreateView(MasterDetailCrud.CreateView):
         form_class = EmendaLoaForm
@@ -396,6 +449,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                 url = reverse_lazy(
                     'cmj.loa:registroajusteloa_detail',
                     kwargs={'pk': ajuste.id})
+
                 a_str = f"""
                     <li>
                         <a href="{url}">
@@ -459,7 +513,7 @@ class OficioAjusteLoaCrud(MasterDetailCrud):
 
     class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
         list_field_names = [
-            'epigrafe', 'parlamentar',
+            'epigrafe', 'parlamentar'
         ]
 
     class CreateView(MasterDetailCrud.CreateView):
@@ -488,7 +542,16 @@ class OficioAjusteLoaCrud(MasterDetailCrud):
 
         @property
         def list_field_names_set(self):
-            return 'descricao', 'valor', 'tipo'  # , 'emendaloa'
+            return 'descricao', 'str_valor', 'tipo'  # , 'emendaloa'
+
+        def hook_header_str_valor(self):
+            return 'Valor\n(R$)'
+
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            path = context.get('path', '')
+            context['path'] = f'{path} oficioajusteloa-detail'
+            return context
 
 
 class RegistroAjusteLoaCrud(MasterDetailCrud):
