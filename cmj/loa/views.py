@@ -470,6 +470,14 @@ class OficioAjusteLoaCrud(MasterDetailCrud):
             initial['loa'] = Loa.objects.get(pk=self.kwargs['pk'])
             return initial
 
+    class UpdateView(MasterDetailCrud.UpdateView):
+        form_class = OficioAjusteLoaForm
+
+        def get_initial(self):
+            initial = super().get_initial()
+            initial['loa'] = self.object.loa
+            return initial
+
     class ListView(MasterDetailCrud.ListView):
         pass
 

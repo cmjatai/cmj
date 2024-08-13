@@ -235,10 +235,12 @@ class EmendaLoaParlamentar(models.Model):
 
 
 def ajuste_upload_path(instance, filename):
-    return texto_upload_path(instance, filename, subpath=instance.ano)
+    return texto_upload_path(instance, filename, subpath=instance.loa.ano)
 
 
 class OficioAjusteLoa(models.Model):
+
+    FIELDFILE_NAME = ('arquivo',)
 
     loa = models.ForeignKey(
         Loa,
@@ -264,14 +266,32 @@ class OficioAjusteLoa(models.Model):
         storage=OverwriteStorage(),
         max_length=512)
 
-    def __str__(self):
-        return f'{self.epigrafe} - {self.parlamentar.nome_parlamentar}'
-
     class Meta:
         verbose_name = _('Ofício de Ajuste Técnico')
         verbose_name_plural = _(
             'Ofícios de Ajuste Técnico')
         ordering = ['id']
+
+    def __str__(self):
+        return f'{self.epigrafe} - {self.parlamentar.nome_parlamentar}'
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+
+        if not self.pk and self.arquivo:
+            arquivo = self.arquivo
+            self.arquivo = None
+            models.Model.save(self, force_insert=force_insert,
+                              force_update=force_update,
+                              using=using,
+                              update_fields=update_fields)
+            self.arquivo = arquivo
+            update_fields = ('arquivo', )
+
+        return models.Model.save(self, force_insert=force_insert,
+                                 force_update=force_update,
+                                 using=using,
+                                 update_fields=update_fields)
 
 
 class RegistroAjusteLoa(models.Model):
