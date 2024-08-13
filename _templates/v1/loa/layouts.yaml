@@ -41,7 +41,8 @@ EmendaLoaDetail2:
 
 OficioAjusteLoa:
   {% trans 'Dados Gerais' %}:
-  - epigrafe parlamentar arquivo
+  - epigrafe parlamentar
+  - arquivo
 
 RegistroAjusteLoa:
   {% trans 'Dados Gerais' %}:

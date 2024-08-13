@@ -17,6 +17,7 @@ from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa
 from sapl.crispy_layout_mixin import to_row, SaplFormLayout
 from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
+from sapl.utils import FileFieldCheckMixin
 
 
 logger = logging.getLogger(__name__)
@@ -313,7 +314,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         return i
 
 
-class OficioAjusteLoaForm(ModelForm):
+class OficioAjusteLoaForm(FileFieldCheckMixin, ModelForm):
 
     class Meta:
         model = OficioAjusteLoa
