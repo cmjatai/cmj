@@ -11,7 +11,7 @@ from django.utils import timezone
 from django_celery_results.models import TaskResult
 
 from cmj.core.models import AuditLog
-from cmj.utils import Manutencao
+from cmj.utils import Manutencao, run_sql
 
 
 class Array(Subquery):
@@ -26,8 +26,6 @@ class Command(BaseCommand):
 
         post_save.disconnect(dispatch_uid='timerefresh_post_signal')
 
-
-
         self.logger = logging.getLogger(__name__)
 
         self.clean_task_result()
@@ -40,6 +38,7 @@ class Command(BaseCommand):
         print('--------- CountRegisters ----------')
 
         for app in apps.get_app_configs():
+            print(app)
             for m in app.get_models():
                 count = m.objects.all().count()
                 if full or count > 10000:
@@ -54,6 +53,10 @@ class Command(BaseCommand):
             date_done__lt=data).order_by('-date_done').delete()
 
     def clean_blank_audit_log(self):
+
+        run_sql('delete from core_auditlog where obj_id=0;')
+        run_sql('delete from core_auditlog where content_type_id = 266;')
+        run_sql('delete from core_auditlog where content_type_id is null;')
 
         logs = AuditLog.objects.filter(
             email__exact='',

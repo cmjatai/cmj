@@ -545,7 +545,7 @@ class OficioAjusteLoaCrud(MasterDetailCrud):
             return 'descricao', 'str_valor', 'tipo'  # , 'emendaloa'
 
         def hook_header_str_valor(self):
-            return 'Valor\n(R$)'
+            return 'Valor (R$)'
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)

@@ -18,7 +18,7 @@ from cmj.core import tasks
 from cmj.core.models import AuditLog, OcrMyPDF, Bi
 from cmj.settings.email import EMAIL_SEND_USER
 from cmj.sigad.models import ShortRedirect
-from cmj.videos.models import VideoParte
+from cmj.videos.models import VideoParte, PullExec
 
 
 logger = logging.getLogger(__name__)
@@ -37,11 +37,12 @@ def auditlog_signal_function(sender, **kwargs):
 
     instance = kwargs.get('instance')
     if instance._meta.model in (
-        AuditLog,       # Causa recursividade
-        # Revisao,        # já é o log de notícias
-        ShortRedirect,  # já é o log de redirecionamento de short links
-        OcrMyPDF,       # já é o log de execução de ocr
+        AuditLog,        # Causa recursividade
+        # Revisao,       # já é o log de notícias
+        ShortRedirect,   # já é o log de redirecionamento de short links
+        OcrMyPDF,        # já é o log de execução de ocr
         Bi,              # Bi é um processo automático estatístico
+        PullExec,        # Conexão com youtube
         # Documento
     ):
         return
