@@ -205,6 +205,7 @@ class LoaCrud(Crud):
 
                     ajuste_remanescente = RegistroAjusteLoa.objects.filter(
                         oficio_ajuste_loa__parlamentar=lp.parlamentar,
+                        oficio_ajuste_loa__loa=l,
                         tipo=k,
                     ).exclude(
                         emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO
@@ -213,6 +214,7 @@ class LoaCrud(Crud):
                     ajuste_de_impedimento = RegistroAjusteLoa.objects.filter(
                         oficio_ajuste_loa__parlamentar=lp.parlamentar,
                         emendaloa__tipo=k,
+                        oficio_ajuste_loa__loa=l,
                         emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO
                     ).aggregate(Sum('valor'))
 
