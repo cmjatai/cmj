@@ -38,7 +38,6 @@ class Command(BaseCommand):
         print('--------- CountRegisters ----------')
 
         for app in apps.get_app_configs():
-            print(app)
             for m in app.get_models():
                 count = m.objects.all().count()
                 if full or count > 10000:

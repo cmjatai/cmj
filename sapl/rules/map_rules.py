@@ -310,9 +310,6 @@ rules_group_geral = {
         (sessao.ResumoOrdenacao, __base__, __perms_publicas__),
         (sessao.TipoRetiradaPauta, __base__, __perms_publicas__),
 
-        (lexml.LexmlProvedor, __base__, set()),
-        (lexml.LexmlPublicador, __base__, set()),
-
         (compilacao.VeiculoPublicacao, __base__, __perms_publicas__),
         (compilacao.TipoTextoArticulado, __base__, __perms_publicas__),
         (compilacao.TipoNota, __base__, __perms_publicas__),
