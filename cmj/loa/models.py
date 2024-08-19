@@ -1,5 +1,7 @@
 from decimal import Decimal
 
+from django.contrib.postgres.fields.jsonb import JSONField
+from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.db.models.deletion import PROTECT, CASCADE
@@ -9,8 +11,7 @@ from django.utils.translation import ugettext_lazy as _
 from cmj.utils import texto_upload_path
 from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
-from sapl.utils import PortalFileField, OverwriteStorage,\
-    restringe_tipos_de_arquivo_txt
+from sapl.utils import PortalFileField, OverwriteStorage
 
 
 PERCENTAGE_VALIDATOR = [MinValueValidator(0), MaxValueValidator(100)]
@@ -265,6 +266,10 @@ class OficioAjusteLoa(models.Model):
         verbose_name=_('Ofício'),
         storage=OverwriteStorage(),
         max_length=512)
+
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
 
     class Meta:
         verbose_name = _('Ofício de Ajuste Técnico')
