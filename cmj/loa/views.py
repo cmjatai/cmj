@@ -133,6 +133,22 @@ class LoaCrud(Crud):
                 raise Http404
             return response
 
+        def hook_materia_ou_norma(self, l, verbose_name='', field_display=''):
+            if l.materia:
+                nj = l.materia.normajuridica()
+                if not nj:
+                    get_column = self.get_column(
+                        'materia|fk_urlize_for_detail', '')
+                    return get_column['verbose_name'], get_column['text']
+
+                return 'Norma Jurídica', f'''
+                    <a href="{reverse_lazy(
+                    'sapl.norma:normajuridica_detail',
+                    kwargs={'pk': nj.id})}">{nj}</a>
+                '''
+
+            return verbose_name, field_display
+
         def hook_materia(self, l, verbose_name='', field_display=''):
             if l.materia:
                 strm = str(l.materia)

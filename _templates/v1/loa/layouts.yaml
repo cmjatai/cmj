@@ -6,7 +6,7 @@ Loa:
   - parlamentares
 LoaDetail:
   {% trans 'Dados Gerais' %}:
-  - ano:2 receita_corrente_liquida:5 materia|fk_urlize_for_detail
+  - ano:2 receita_corrente_liquida:4 materia_ou_norma
   - disp_total disp_saude disp_diversos
   - resumo_emendas_impositivas
 
