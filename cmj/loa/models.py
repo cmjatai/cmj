@@ -90,7 +90,9 @@ class Loa(models.Model):
         ordering = ['-id']
 
     def __str__(self):
-        return f'LOA {self.ano} - {self.materia}'
+        nj = self.materia.normajuridica() if self.materia else ''
+        descr = nj or self.materia
+        return f'LOA {self.ano} - {descr}'
 
 
 class LoaParlamentar(models.Model):
