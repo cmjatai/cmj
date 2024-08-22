@@ -275,14 +275,14 @@ class LoaCrud(Crud):
                         ja_destinado='Valores<br>Já Destinados' if dsjd else '',
                         impedimento_tecnico='Impedimentos<br>Técnicos' if dsit else '',
                         sem_destinacao=(
-                            'Sem Destinação' if l.ano == l.materia.ano else 'Remanescente') if dssd else '',
+                            'Sem Destinação' if l.materia and l.ano == l.materia.ano else 'Remanescente') if dssd else '',
                     ),
                     diversos=dict(
                         num_columns=ddjd + ddit + ddsd,
                         ja_destinado='Valores<br>Já Destinados' if ddjd else '',
                         impedimento_tecnico='Impedimentos<br>Técnicos' if ddit else '',
                         sem_destinacao=(
-                            'Sem Destinação' if l.ano == l.materia.ano else 'Remanescente') if ddsd else '',
+                            'Sem Destinação' if l.materia and l.ano == l.materia.ano else 'Remanescente') if ddsd else '',
                     )
                 )
             )
@@ -327,15 +327,13 @@ class EmendaLoaCrud(MasterDetailCrud):
             path = context.get('path', '')
             context['path'] = f'{path} emendaloa-list'
 
-            emendaloa = context['object_list'].first()
+            loa = Loa.objects.get(pk=kwargs['root_pk'])
 
-            context['parlamentares'] = []
-            if emendaloa:
-                context['parlamentares'] = emendaloa.loa.parlamentares.all()
+            context['parlamentares'] = loa.parlamentares.all()
 
             p_id = self.request.GET.get('parlamentar', None)
             if p_id:
-                p = emendaloa.loa.parlamentares.get(
+                p = loa.parlamentares.get(
                     id=p_id
                 )
                 context['title'] = f'{context["title"]}<br>Autoria: {p.nome_parlamentar}'

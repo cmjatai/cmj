@@ -91,7 +91,7 @@ class Loa(models.Model):
 
     def __str__(self):
         nj = self.materia.normajuridica() if self.materia else ''
-        descr = nj or self.materia
+        descr = nj or (self.materia or '')
         return f'LOA {self.ano} - {descr}'
 
 
