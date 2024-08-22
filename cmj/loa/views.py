@@ -535,7 +535,7 @@ class OficioAjusteLoaCrud(MasterDetailCrud):
             return initial
 
     class ListView(MasterDetailCrud.ListView):
-        pass
+        ordering = 'parlamentar'
 
     class DetailView(MasterDetailCrud.DetailView):
         template_name = 'loa/oficioajusteloa_detail.html'

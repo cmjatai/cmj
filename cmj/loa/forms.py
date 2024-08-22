@@ -124,32 +124,40 @@ class LoaForm(MateriaCheckFormMixin, ModelForm):
 
         i.disp_total = quantize(
             i.receita_corrente_liquida *
-            i.perc_disp_total / Decimal(100))
+            i.perc_disp_total / Decimal(100),
+            rounding=ROUND_DOWN
+        )
 
         i.disp_saude = quantize(
             i.receita_corrente_liquida *
-            i.perc_disp_saude / Decimal(100))
+            i.perc_disp_saude / Decimal(100),
+            rounding=ROUND_DOWN)
 
         i.disp_diversos = quantize(
             i.receita_corrente_liquida *
-            i.perc_disp_diversos / Decimal(100))
+            i.perc_disp_diversos / Decimal(100),
+            rounding=ROUND_DOWN)
 
-        if i.disp_diversos + i.disp_saude != i.disp_total:
-            i.disp_diversos = i.disp_total - i.disp_saude
-            i.perc_disp_diversos = quantize(
-                i.disp_diversos / i.receita_corrente_liquida * Decimal(100))
+        # if i.disp_diversos + i.disp_saude != i.disp_total:
+        #    i.disp_diversos = i.disp_total - i.disp_saude
+        #    i.perc_disp_diversos = quantize(
+        #        i.disp_diversos / i.receita_corrente_liquida * Decimal(100),
+        #        rounding=ROUND_DOWN)
 
         i = super().save(commit)
 
         lps = i.loaparlamentar_set.all()
         count_lps = lps.count()
 
-        idtp = quantize(i.disp_total / Decimal(count_lps))
-        idsp = quantize(i.disp_saude / Decimal(count_lps))
-        iddp = quantize(i.disp_diversos / Decimal(count_lps))
+        idtp = quantize(i.disp_total / Decimal(count_lps),
+                        rounding=ROUND_DOWN)
+        idsp = quantize(i.disp_saude / Decimal(count_lps),
+                        rounding=ROUND_DOWN)
+        iddp = quantize(i.disp_diversos / Decimal(count_lps),
+                        rounding=ROUND_DOWN)
 
-        if iddp + idsp != idtp:
-            iddp = idtp - idsp
+        # if iddp + idsp != idtp:
+        #    iddp = idtp - idsp
 
         for lp in lps:
             lp.disp_total = idtp

@@ -85,7 +85,7 @@ class ResponseFileMixin:
     def anon(self, arquivo, page, grade, anon):
         """?page=1  # opcional, se colocado mostrará o resultado em png
             &dpi=150 # opcional, útil se usar page
-            &grade=300,180,590,400, limita local na pagina a aplicar o ano.
+            &grade=300,180,590,400, limita local na pagina a aplicar o anon.
             &anon=elemento1, elemento2, elemento3, ...
         """
 
