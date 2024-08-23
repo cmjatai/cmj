@@ -62,13 +62,7 @@ class MateriaCheckFormMixin:
                 cleaned_data['materia'] = materia
 
         else:
-            campos = [materia, tipo_materia, ano_materia]
-            if campos.count(None) + campos.count('') < len(campos):
-                msg = _(
-                    'Preencha todos os campos relacionados à Matéria Legislativa')
-                logger.error('Algum campo relacionado à MatériaLegislativa %s nº %s/%s \
-                                não foi preenchido.' % (tipo_materia, materia, ano_materia))
-                raise ValidationError(msg)
+            cleaned_data['materia'] = None
 
 
 class LoaForm(MateriaCheckFormMixin, ModelForm):
@@ -111,7 +105,6 @@ class LoaForm(MateriaCheckFormMixin, ModelForm):
         ]
 
     def __init__(self, *args, **kwargs):
-
         super().__init__(*args, **kwargs)
 
         self.fields['parlamentares'].choices = [
@@ -171,9 +164,10 @@ class LoaForm(MateriaCheckFormMixin, ModelForm):
 class EmendaLoaValorWidget(SplitArrayWidget):
     template_name = 'widget/parlamentares_valor_form.html'
 
-    def __init__(self, widget, parlamentares=[], **kwargs):
+    def __init__(self, widget, parlamentares=[], user=None, **kwargs):
         super().__init__(widget, size=len(parlamentares), **kwargs)
         self.parlamentares = parlamentares
+        self.user = user
 
     def get_context(self, name, value, attrs=None):
         context = super().get_context(name, value, attrs)
@@ -183,6 +177,12 @@ class EmendaLoaValorWidget(SplitArrayWidget):
             w['label'] = p.nome_parlamentar
             if 'class' in self.attrs:
                 w['attrs']['class'] += ' ' + self.attrs['class']
+
+            if not self.user.is_superuser:
+                op = self.user.operadorautor_set.first()
+                if op and op.autor.autor_related != p:
+                    w['attrs']['readonly'] = 'readonly'
+
         return context
 
 
@@ -230,6 +230,8 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
     def __init__(self, *args, **kwargs):
 
+        self.user = kwargs['initial'].pop('user', None)
+
         row1 = to_row([
             ('tipo', 2),
             ('fase', 3),
@@ -259,6 +261,10 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         self.parlamentares = self.loa.parlamentares.order_by(
             'nome_parlamentar')
 
+        #self.fields['tipo_materia'].widget.attrs['readonly'] = True
+        #self.fields['numero_materia'].widget.attrs['readonly'] = True
+        #self.fields['ano_materia'].widget.attrs['readonly'] = True
+
         initial_pv = []
         if self.instance.pk:
             initial_pv = [[p, Decimal('0.00')] for p in self.parlamentares]
@@ -275,6 +281,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         fpv.widget = EmendaLoaValorWidget(
             widget=self.fields['parlamentares__valor'].base_field.widget,
             parlamentares=list(self.parlamentares),
+            user=self.user,
             attrs={'class': 'text-right'}
         )
 

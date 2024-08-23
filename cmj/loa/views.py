@@ -305,6 +305,11 @@ class EmendaLoaCrud(MasterDetailCrud):
             'parlamentares'
         ]
 
+        @property
+        def create_url(self):
+            url = super().create_url
+            return url
+
     class ListView(MasterDetailCrud.ListView):
         paginate_by = 25
         ordered_list = False
@@ -403,6 +408,7 @@ class EmendaLoaCrud(MasterDetailCrud):
         def get_initial(self):
             initial = super().get_initial()
             initial['loa'] = Loa.objects.get(pk=self.kwargs['pk'])
+            initial['user'] = self.request.user
             return initial
 
         def form_invalid(self, form):
@@ -423,6 +429,7 @@ class EmendaLoaCrud(MasterDetailCrud):
         def get_initial(self):
             initial = super().get_initial()
             initial['loa'] = self.object.loa
+            initial['user'] = self.request.user
             if self.object.materia:
                 initial['tipo_materia'] = self.object.materia.tipo.id
                 initial['numero_materia'] = self.object.materia.numero

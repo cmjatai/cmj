@@ -1,12 +1,17 @@
 {% spaceless %}
 <div class="row ">
   {% for widget in widget.subwidgets %}
-    <div class="col-3 py-1">
+    <div class="col-2 py-1">
       {% include widget.template_name %}
     </div>
-    <div class="col-9">
+    <div class="col-3">
       {{widget.label}}
     </div>
+
+    {% if forloop.counter|divisibleby:2 %}
+      <div class="col-2">
+      </div>
+    {% endif %}
   {% endfor %}
 </div>
 {% endspaceless %}
