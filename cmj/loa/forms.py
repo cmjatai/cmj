@@ -13,7 +13,7 @@ from django.forms.models import ModelForm
 from django.utils.translation import ugettext_lazy as _
 
 from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa,\
-    RegistroAjusteLoa
+    RegistroAjusteLoa, RegistroAjusteLoaParlamentar
 from sapl.crispy_layout_mixin import to_row, SaplFormLayout
 from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
@@ -287,6 +287,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
         fpv = self.fields['parlamentares__valor']
         fpv.max_length = self.parlamentares.count()
+        fpv.size = self.parlamentares.count()
         fpv.widget = EmendaLoaValorWidget(
             widget=self.fields['parlamentares__valor'].base_field.widget,
             parlamentares=list(self.parlamentares),
@@ -358,7 +359,7 @@ class OficioAjusteLoaForm(FileFieldCheckMixin, ModelForm):
         model = OficioAjusteLoa
         fields = [
             'epigrafe',
-            'parlamentar',
+            'parlamentares',
             'arquivo'
         ]
 
@@ -370,7 +371,7 @@ class OficioAjusteLoaForm(FileFieldCheckMixin, ModelForm):
         self.parlamentares = self.loa.parlamentares.order_by(
             'nome_parlamentar')
 
-        self.fields['parlamentar'].choices = [
+        self.fields['parlamentares'].choices = [
             (p.pk, p) for p in self.parlamentares
         ]
 
@@ -381,10 +382,17 @@ class RegistroAjusteLoaForm(ModelForm):
         required=False,
         queryset=EmendaLoa.objects.all())
 
+    parlamentares__valor = SplitArrayField(
+        forms.DecimalField(required=False, max_digits=14,
+                           decimal_places=2,), 10,
+        label='Valores por Parlamentar',
+        required=False
+    )
+
     class Meta:
         model = RegistroAjusteLoa
         fields = [
-            'valor',
+            'parlamentares__valor',
             'tipo',
             'emendaloa',
             'descricao'
@@ -395,10 +403,68 @@ class RegistroAjusteLoaForm(ModelForm):
         super().__init__(*args, **kwargs)
 
         self.oficioajusteloa = kwargs['initial']['oficioajusteloa']
-        self.emendas = self.oficioajusteloa.parlamentar.emendaloaparlamentar_set.filter(
-            emendaloa__loa=self.oficioajusteloa.loa
-        ).order_by('emendaloa__materia')
+        self.parlamentares = self.oficioajusteloa.parlamentares.all()
+
+        self.emendas = set()
+        for p in self.parlamentares:
+            emendas = p.emendaloaparlamentar_set.filter(
+                emendaloa__loa=self.oficioajusteloa.loa
+            ).order_by('emendaloa__materia')
+            self.emendas.update(map(lambda e: e.emendaloa, emendas))
 
         self.fields['emendaloa'].choices = [('', '---------')] + [
-            (e.emendaloa.pk, f'{e} - {e.emendaloa.materia.epigrafe_short}') for e in self.emendas
+            (e.pk, f'{e} - {e.materia.epigrafe_short if e.materia else ""}') for e in self.emendas
         ]
+
+        initial_pv = []
+        if self.instance.pk:
+            initial_pv = [[p, Decimal('0.00')] for p in self.parlamentares]
+            for i, (p, v) in enumerate(initial_pv):
+                ipv = p.registroajusteloaparlamentar_set.filter(
+                    registro=self.instance).first()
+                if ipv:
+                    initial_pv[i][1] = ipv.valor
+        self.initial['parlamentares__valor'] = list(
+            map(lambda x: x[1], initial_pv))
+
+        fpv = self.fields['parlamentares__valor']
+        fpv.max_length = self.parlamentares.count()
+        fpv.size = self.parlamentares.count()
+        fpv.widget = EmendaLoaValorWidget(
+            widget=self.fields['parlamentares__valor'].base_field.widget,
+            parlamentares=list(self.parlamentares),
+            user=None,
+            attrs={'class': 'text-right'}
+        )
+
+    def save(self, commit=True):
+
+        i_init = self.instance
+
+        soma = sum(
+            list(
+                filter(
+                    lambda x: x, self.cleaned_data['parlamentares__valor']
+                )
+            )
+        )
+
+        try:
+            i = super().save(commit)
+        except Exception as e:
+            raise ValidationError('Erro')
+
+        i.parlamentares_valor.clear()
+
+        pv = zip(self.parlamentares, self.cleaned_data['parlamentares__valor'])
+
+        for p, v in pv:
+            if not v:
+                continue
+            r = RegistroAjusteLoaParlamentar()
+            r.registro = i
+            r.parlamentar = p
+            r.valor = v
+            r.save()
+
+        return i

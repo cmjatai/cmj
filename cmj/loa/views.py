@@ -13,7 +13,7 @@ from django.utils.translation import ugettext_lazy as _
 from cmj.loa.forms import LoaForm, EmendaLoaForm, OficioAjusteLoaForm,\
     RegistroAjusteLoaForm
 from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa,\
-    RegistroAjusteLoa
+    RegistroAjusteLoa, RegistroAjusteLoaParlamentar
 from sapl.crud.base import Crud, MasterDetailCrud, RP_DETAIL, RP_LIST
 
 
@@ -233,19 +233,19 @@ class LoaCrud(Crud):
                         impedimento_tecnico['valor__sum'] or Decimal('0.00')
                     )
 
-                    ajuste_remanescente = RegistroAjusteLoa.objects.filter(
-                        oficio_ajuste_loa__parlamentar=lp.parlamentar,
-                        oficio_ajuste_loa__loa=l,
-                        tipo=k,
+                    ajuste_remanescente = RegistroAjusteLoaParlamentar.objects.filter(
+                        parlamentar=lp.parlamentar,
+                        registro__oficio_ajuste_loa__loa=l,
+                        registro__tipo=k,
                     ).exclude(
-                        emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO
+                        registro__emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO
                     ).aggregate(Sum('valor'))
 
-                    ajuste_de_impedimento = RegistroAjusteLoa.objects.filter(
-                        oficio_ajuste_loa__parlamentar=lp.parlamentar,
-                        emendaloa__tipo=k,
-                        oficio_ajuste_loa__loa=l,
-                        emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO
+                    ajuste_de_impedimento = RegistroAjusteLoaParlamentar.objects.filter(
+                        parlamentar=lp.parlamentar,
+                        registro__emendaloa__tipo=k,
+                        registro__oficio_ajuste_loa__loa=l,
+                        registro__emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO
                     ).aggregate(Sum('valor'))
 
                     resumo_parlamentar[k]['impedimento_tecnico'] += (
@@ -405,8 +405,8 @@ class EmendaLoaCrud(MasterDetailCrud):
                     kwargs={'pk': ajuste.oficio_ajuste_loa.id})
 
                 descr = ''
-                if ajuste.valor <= Decimal('0.00'):
-                    descr = ajuste.descricao
+                # if ajuste.valor <= Decimal('0.00'):
+                descr = ajuste.descricao
 
                 ajustes.append(
                     f'<li><a href="{url}">{ajuste}</a><small class="text-gray"><br>{descr}</small></li>')
@@ -426,14 +426,17 @@ class EmendaLoaCrud(MasterDetailCrud):
                     {ajustes}
                     ''', ''
 
-        def hook_valor(self, *args, **kwargs):
+        # def hook_valor(self, *args, **kwargs):
 
-            soma_ajustes = args[0].registroajusteloa_set.all(
-            ).aggregate(Sum('valor'))
-            valor = args[0].valor + \
-                (soma_ajustes['valor__sum'] or Decimal('0.00'))
-            valor = formats.number_format(valor, force_grouping=True)
-            return f'<div class="text-right font-weight-bold">{valor}</div>', None
+        #    soma_ajustes = RegistroAjusteLoaParlamentar.objects.filter(
+        #        registro__emendaloa=args[0]
+        #    ).aggregate(Sum('valor'))
+
+        #    valor = args[0].valor + \
+        #        (soma_ajustes['valor__sum'] or Decimal('0.00'))
+        #    valor = formats.number_format(valor, force_grouping=True)
+        # return f'<div class="text-right font-weight-bold">{valor}</div>',
+        # None
 
     class CreateView(MasterDetailCrud.CreateView):
         form_class = EmendaLoaForm
@@ -523,11 +526,8 @@ class EmendaLoaCrud(MasterDetailCrud):
             context['path'] = f'{path} emendaloa-detail'
             return context
 
-        def hook_valor(self, el, verbose_name='', field_display=''):
-            soma_ajustes = el.registroajusteloa_set.all().aggregate(Sum('valor'))
-            valor = el.valor + (soma_ajustes['valor__sum'] or Decimal('0.00'))
-            valor = formats.number_format(valor, force_grouping=True)
-            return verbose_name, valor
+        def hook_valor_computado(self, el, verbose_name='', field_display=''):
+            return 'Valor Final da Emenda (R$)', field_display
 
         def hook_materia(self, el, verbose_name='', field_display=''):
             if el.materia:
@@ -607,7 +607,7 @@ class OficioAjusteLoaCrud(MasterDetailCrud):
 
     class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
         list_field_names = [
-            'epigrafe', 'parlamentar'
+            'epigrafe', 'parlamentares'
         ]
 
     class CreateView(MasterDetailCrud.CreateView):
@@ -627,7 +627,10 @@ class OficioAjusteLoaCrud(MasterDetailCrud):
             return initial
 
     class ListView(MasterDetailCrud.ListView):
-        ordering = 'parlamentar'
+        ordering = 'epigrafe'
+
+        def get_queryset(self):
+            return MasterDetailCrud.ListView.get_queryset(self)
 
     class DetailView(MasterDetailCrud.DetailView):
         template_name = 'loa/oficioajusteloa_detail.html'

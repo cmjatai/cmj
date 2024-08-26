@@ -29,7 +29,7 @@ EmendaLoaDetail2:
     {% trans 'Dados Gerais' %}:
       col-md-7:
       - tipo:3 fase:5 valor:4
-      - materia|fk_urlize_for_detail
+      - materia|fk_urlize_for_detail valor_computado:4
       - finalidade
       col-md-5:
       - parlamentares:12
@@ -41,18 +41,19 @@ EmendaLoaDetail2:
 
 OficioAjusteLoa:
   {% trans 'Dados Gerais' %}:
-  - epigrafe parlamentar
+  - epigrafe parlamentares
   - arquivo
 
 RegistroAjusteLoa:
   {% trans 'Dados Gerais' %}:
-  - valor:3 tipo:2 emendaloa:7
+  - tipo:2 emendaloa:7
+  - parlamentares__valor
   - descricao
 
 RegistroAjusteLoaDetail:
   {% trans 'Dados Gerais' %}:
-  - valor:3 tipo:2 emendaloa|fk_urlize_for_detail
-  - descricao
+  - tipo:2 emendaloa|fk_urlize_for_detail
+  - registroajusteloaparlamentar_set:5 descricao
 
 {% comment %}
   # exemplo de detail version 2 completo
