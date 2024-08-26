@@ -374,15 +374,15 @@ class EmendaLoaCrud(MasterDetailCrud):
             url = super().update_url
             if not url and self.request.user.operadorautor_set.exists():
                 url = self.resolve_url(
-                    'update', args=(self.kwargs['pk'],))
+                    'update', args=(self.object.id,))
             return url
 
         @property
         def detail_url(self):
-            url = super().update_url
+            url = super().detail_url
             if not url and self.request.user.operadorautor_set.exists():
                 url = self.resolve_url(
-                    'detail', args=(self.kwargs['pk'],))
+                    'detail', args=(self.object.id,))
             return url
 
     class ListView(MasterDetailCrud.ListView):
@@ -489,6 +489,17 @@ class EmendaLoaCrud(MasterDetailCrud):
     class CreateView(MasterDetailCrud.CreateView):
         form_class = EmendaLoaForm
 
+        def get_success_url(self):
+            return self.detail_url
+
+        @property
+        def cancel_url(self):
+            url = super().cancel_url
+            if not url and self.request.user.operadorautor_set.exists():
+                url = self.resolve_url(
+                    'list', args=(self.kwargs['pk'],))
+            return url
+
         def has_permission(self):
 
             u = self.request.user
@@ -525,16 +536,14 @@ class EmendaLoaCrud(MasterDetailCrud):
         form_class = EmendaLoaForm
 
         def get_success_url(self):
-
             return MasterDetailCrud.UpdateView.get_success_url(self)
 
         def has_permission(self):
-
             u = self.request.user
             if u.is_anonymous:
                 return False
 
-            has_perm = MasterDetailCrud.CreateView.has_permission(self)
+            has_perm = MasterDetailCrud.UpdateView.has_permission(self)
 
             self.object = self.get_object() if not hasattr(self, 'object') else self.object
 
@@ -543,9 +552,10 @@ class EmendaLoaCrud(MasterDetailCrud):
                 # 2) é um usuário operador de autor
                 # 3) a emenda em edição está na fase de Proposta Legislativa
                 # 1 or 2 e 3
-                return u.has_perm('emendaloa_full_editor') or \
-                    u.operadorautor_set.exists() and \
-                    self.object.fase == self.model.PROPOSTA
+                return (
+                    u.has_perm('emendaloa_full_editor') or
+                    u.operadorautor_set.exists()
+                ) and not self.object.materia
 
             return has_perm
 
