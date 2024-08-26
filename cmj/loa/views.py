@@ -15,6 +15,7 @@ from cmj.loa.forms import LoaForm, EmendaLoaForm, OficioAjusteLoaForm,\
 from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa,\
     RegistroAjusteLoa, RegistroAjusteLoaParlamentar
 from sapl.crud.base import Crud, MasterDetailCrud, RP_DETAIL, RP_LIST
+from sapl.parlamentares.models import Parlamentar
 
 
 class LoaContextDataMixin:
@@ -403,11 +404,10 @@ class EmendaLoaCrud(MasterDetailCrud):
             return qs
 
         def get_context_data(self, **kwargs):
+            self.object = loa = Loa.objects.get(pk=kwargs['root_pk'])
             context = super().get_context_data(**kwargs)
             path = context.get('path', '')
             context['path'] = f'{path} emendaloa-list'
-
-            loa = Loa.objects.get(pk=kwargs['root_pk'])
 
             context['parlamentares'] = loa.parlamentares.all()
 
@@ -421,10 +421,10 @@ class EmendaLoaCrud(MasterDetailCrud):
             return context
 
         def hook_header_valor_computado(self, *args, **kwargs):
-            return 'Valor Final da Emenda'
+            return 'Valor Final da Emenda' if self.object.publicado else 'Valor da Emenda'
 
         def hook_valor_computado(self, *args, **kwargs):
-            return f'R$ {args[1]}', args[2]
+            return f'<div class="text-nowrap text-center">R$ {args[1]}</div>', args[2]
 
         def hook_fase(self, *args, **kwargs):
             return f'<br><small class="text-nowrap">({args[0].get_fase_display()})</small>', args[2]
@@ -551,11 +551,20 @@ class EmendaLoaCrud(MasterDetailCrud):
                 # 1) possui permissão: emendaloa_full_editor
                 # 2) é um usuário operador de autor
                 # 3) a emenda em edição está na fase de Proposta Legislativa
-                # 1 or 2 e 3
+                # 4) participa da emenda
+                # (1 or 2) e 3 e 4
+
+                participa = False
+                if u.operadorautor_set.exists():
+                    parlamentar = u.operadorautor_set.first().autor.autor_related
+                    if isinstance(parlamentar, Parlamentar):
+                        participa = self.object.emendaloaparlamentar_set.filter(
+                            parlamentar=parlamentar).exists()
+
                 return (
                     u.has_perm('emendaloa_full_editor') or
                     u.operadorautor_set.exists()
-                ) and not self.object.materia
+                ) and not self.object.materia and participa
 
             return has_perm
 
