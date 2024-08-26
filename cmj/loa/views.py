@@ -1,6 +1,7 @@
 from decimal import Decimal
 import logging
 
+from django.db.models import Q
 from django.db.models.aggregates import Sum
 from django.http.response import Http404
 from django.shortcuts import redirect
@@ -73,11 +74,24 @@ class LoaCrud(Crud):
             return context
 
         def get_queryset(self):
-            queryset = super().get_queryset()
-            if self.request.user.is_anonymous:
-                queryset = queryset.filter(publicado=True)
+            qs = super().get_queryset()
 
-            return queryset
+            u = self.request.user
+
+            qsp = qs.filter(publicado=True)
+            if u.is_anonymous:
+                return qsp
+
+            if u.has_perm('emendaloa_full_editor'):
+                return qs
+
+            if u.operadorautor_set.exists():
+                qs = qs.filter(
+                    Q(materia__normajuridica__isnull=True) | Q(publicado=True)
+                ).distinct()
+                return qs
+
+            return qs
 
         def hook_header_perc_disp_total(self):
             return ''
@@ -275,14 +289,14 @@ class LoaCrud(Crud):
                         ja_destinado='Valores<br>Já Destinados' if dsjd else '',
                         impedimento_tecnico='Impedimentos<br>Técnicos' if dsit else '',
                         sem_destinacao=(
-                            'Sem Destinação' if l.materia and l.ano == l.materia.ano else 'Remanescente') if dssd else '',
+                            'Sem Destinação' if not l.materia or l.materia and not l.materia.normajuridica else 'Remanescente') if dssd else '',
                     ),
                     diversos=dict(
                         num_columns=ddjd + ddit + ddsd,
                         ja_destinado='Valores<br>Já Destinados' if ddjd else '',
                         impedimento_tecnico='Impedimentos<br>Técnicos' if ddit else '',
                         sem_destinacao=(
-                            'Sem Destinação' if l.materia and l.ano == l.materia.ano else 'Remanescente') if ddsd else '',
+                            'Sem Destinação' if not l.materia or l.materia and not l.materia.normajuridica else 'Remanescente') if ddsd else '',
                     )
                 )
             )
@@ -308,6 +322,25 @@ class EmendaLoaCrud(MasterDetailCrud):
         @property
         def create_url(self):
             url = super().create_url
+            if not url and self.request.user.operadorautor_set.exists():
+                url = self.resolve_url(
+                    'create', args=(self.kwargs['pk'],))
+            return url
+
+        @property
+        def update_url(self):
+            url = super().update_url
+            if not url and self.request.user.operadorautor_set.exists():
+                url = self.resolve_url(
+                    'update', args=(self.kwargs['pk'],))
+            return url
+
+        @property
+        def detail_url(self):
+            url = super().update_url
+            if not url and self.request.user.operadorautor_set.exists():
+                url = self.resolve_url(
+                    'detail', args=(self.kwargs['pk'],))
             return url
 
     class ListView(MasterDetailCrud.ListView):
@@ -349,7 +382,10 @@ class EmendaLoaCrud(MasterDetailCrud):
             return f'<br><small class="text-nowrap">({args[0].get_fase_display()})</small>', args[2]
 
         def hook_materia(self, *args, **kwargs):
-            return f'<small class="text-gray"><strong>Matéria Legislativa:</strong> {args[0].materia}<br><i>{args[0].materia.ementa if not self.request.user.is_anonymous else ""}</i></small>', args[2]
+            if args[0].materia:
+                return f'<small class="text-gray"><strong>Matéria Legislativa:</strong> {args[0].materia}<br><i>{args[0].materia.ementa if not self.request.user.is_anonymous else ""}</i></small>', args[2]
+            else:
+                return '', args[2]
 
         def hook_parlamentares(self, *args, **kwargs):
             pls = []
@@ -394,20 +430,32 @@ class EmendaLoaCrud(MasterDetailCrud):
 
             soma_ajustes = args[0].registroajusteloa_set.all(
             ).aggregate(Sum('valor'))
-
-            valor = args[0].valor + (
-                soma_ajustes['valor__sum'] or Decimal('0.00'))
-
+            valor = args[0].valor + \
+                (soma_ajustes['valor__sum'] or Decimal('0.00'))
             valor = formats.number_format(valor, force_grouping=True)
-
             return f'<div class="text-right font-weight-bold">{valor}</div>', None
 
     class CreateView(MasterDetailCrud.CreateView):
         form_class = EmendaLoaForm
 
+        def has_permission(self):
+
+            u = self.request.user
+            if u.is_anonymous:
+                return False
+
+            has_perm = MasterDetailCrud.CreateView.has_permission(self)
+
+            self.loa = Loa.objects.get(pk=self.kwargs['pk'])
+
+            if not has_perm:
+                return u.operadorautor_set.exists() and not self.loa.publicado
+
+            return has_perm
+
         def get_initial(self):
             initial = super().get_initial()
-            initial['loa'] = Loa.objects.get(pk=self.kwargs['pk'])
+            initial['loa'] = self.loa
             initial['user'] = self.request.user
             return initial
 
@@ -418,13 +466,37 @@ class EmendaLoaCrud(MasterDetailCrud):
             if err_materia:
                 err_materia = 'Já existe registro de valores para a Matéria Legislativa selecionada.'
 
-                self.messages.error(err_materia,
-                                    fail_silently=True)
+                self.messages.error(err_materia, fail_silently=True)
             return r
 
     class UpdateView(MasterDetailCrud.UpdateView):
         layout_key = None
         form_class = EmendaLoaForm
+
+        def get_success_url(self):
+
+            return MasterDetailCrud.UpdateView.get_success_url(self)
+
+        def has_permission(self):
+
+            u = self.request.user
+            if u.is_anonymous:
+                return False
+
+            has_perm = MasterDetailCrud.CreateView.has_permission(self)
+
+            self.object = self.get_object() if not hasattr(self, 'object') else self.object
+
+            if not has_perm:
+                # 1) possui permissão: emendaloa_full_editor
+                # 2) é um usuário operador de autor
+                # 3) a emenda em edição está na fase de Proposta Legislativa
+                # 1 or 2 e 3
+                return u.has_perm('emendaloa_full_editor') or \
+                    u.operadorautor_set.exists() and \
+                    self.object.fase == self.model.PROPOSTA
+
+            return has_perm
 
         def get_initial(self):
             initial = super().get_initial()
@@ -439,13 +511,6 @@ class EmendaLoaCrud(MasterDetailCrud):
     class DetailView(MasterDetailCrud.DetailView):
 
         @property
-        def detail_list_url(self):
-            if self.request.user.is_anonymous:
-                return ''
-            else:
-                return super().detail_list_url
-
-        @property
         def layout_key(self):
             if self.object.emendaloaparlamentar_set.all().count() > 2:
                 return 'EmendaLoaDetail2'
@@ -458,11 +523,17 @@ class EmendaLoaCrud(MasterDetailCrud):
             context['path'] = f'{path} emendaloa-detail'
             return context
 
-        def hook_materia(self, l, verbose_name='', field_display=''):
-            if l.materia:
-                strm = str(l.materia)
+        def hook_valor(self, el, verbose_name='', field_display=''):
+            soma_ajustes = el.registroajusteloa_set.all().aggregate(Sum('valor'))
+            valor = el.valor + (soma_ajustes['valor__sum'] or Decimal('0.00'))
+            valor = formats.number_format(valor, force_grouping=True)
+            return verbose_name, valor
+
+        def hook_materia(self, el, verbose_name='', field_display=''):
+            if el.materia:
+                strm = str(el.materia)
                 field_display = field_display.replace(
-                    strm, l.materia.epigrafe_short)
+                    strm, el.materia.epigrafe_short)
             return verbose_name, field_display
 
         def hook_registroajusteloa_set(self, obj, verbose_name='', field_display=''):

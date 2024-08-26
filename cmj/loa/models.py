@@ -4,6 +4,7 @@ from django.contrib.postgres.fields.jsonb import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.db.models.aggregates import Sum
 from django.db.models.deletion import PROTECT, CASCADE
 from django.utils import formats
 from django.utils.translation import ugettext_lazy as _
@@ -198,13 +199,22 @@ class EmendaLoa(models.Model):
             'parlamentar'))
 
     def __str__(self):
-        valor_str = formats.number_format(self.valor, force_grouping=True)
+        soma_ajustes = self.registroajusteloa_set.all().aggregate(Sum('valor'))
+        valor = self.valor + (soma_ajustes['valor__sum'] or Decimal('0.00'))
+        valor_str = formats.number_format(valor, force_grouping=True)
         return f'R$ {valor_str} - {self.finalidade}'
 
     class Meta:
         verbose_name = _('Emenda Impositiva')
         verbose_name_plural = _('Emendas Impositivas')
         ordering = ['id']
+
+        permissions = (
+            (
+                'emendaloa_full_editor',
+                _('Edição completa de Emendas Impositivas.')
+            ),
+        )
 
 
 class EmendaLoaParlamentar(models.Model):

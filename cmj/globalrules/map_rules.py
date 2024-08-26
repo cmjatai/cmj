@@ -194,7 +194,7 @@ rules_loa_group_operador = {
     'rules': [
         (Loa, __base__, set()),
         (LoaParlamentar, __base__, __perms_publicas__),
-        (EmendaLoa, __base__, __perms_publicas__),
+        (EmendaLoa, __base__ + ['emendaloa_full_editor'], __perms_publicas__),
         (EmendaLoaParlamentar, __base__, __perms_publicas__),
         (OficioAjusteLoa, __base__, __perms_publicas__),
         (RegistroAjusteLoa, __base__, __perms_publicas__),

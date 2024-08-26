@@ -178,7 +178,7 @@ class EmendaLoaValorWidget(SplitArrayWidget):
             if 'class' in self.attrs:
                 w['attrs']['class'] += ' ' + self.attrs['class']
 
-            if not self.user.is_superuser:
+            if self.user and not self.user.is_superuser:
                 op = self.user.operadorautor_set.first()
                 if op and op.autor.autor_related != p:
                     w['attrs']['readonly'] = 'readonly'
@@ -261,9 +261,18 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         self.parlamentares = self.loa.parlamentares.order_by(
             'nome_parlamentar')
 
-        #self.fields['tipo_materia'].widget.attrs['readonly'] = True
-        #self.fields['numero_materia'].widget.attrs['readonly'] = True
-        #self.fields['ano_materia'].widget.attrs['readonly'] = True
+        # if not self.user.has_perm('emendaloa_full_editor'):
+
+        if self.user.operadorautor_set.exists():
+            self.fields['tipo_materia'].widget.attrs['disabled'] = True
+            self.fields['numero_materia'].widget.attrs['disabled'] = True
+            self.fields['ano_materia'].widget.attrs['disabled'] = True
+
+            self.fields['valor'].widget.attrs['readonly'] = True
+
+            self.fields['fase'].required = False
+            self.fields['fase'].initial = EmendaLoa.PROPOSTA
+            self.fields['fase'].widget.attrs['disabled'] = True
 
         initial_pv = []
         if self.instance.pk:
@@ -281,7 +290,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         fpv.widget = EmendaLoaValorWidget(
             widget=self.fields['parlamentares__valor'].base_field.widget,
             parlamentares=list(self.parlamentares),
-            user=self.user,
+            user=self.user if self.instance.pk else None,
             attrs={'class': 'text-right'}
         )
 
@@ -293,26 +302,40 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         super().clean()
         cleaned_data = self.cleaned_data
 
+        if not self.user.operadorautor_set.exists():
+            soma = sum(
+                list(
+                    filter(
+                        lambda x: x, cleaned_data['parlamentares__valor']
+                    )
+                )
+            )
+
+            if soma != cleaned_data['valor']:
+                msg = _('A Soma dos Valores Por Parlamentar não '
+                        'coincide com o Valor Global da emenda')
+                logger.error(msg)
+                raise ValidationError(msg)
+        return cleaned_data
+
+    def save(self, commit=True):
+
+        i_init = self.instance
+
         soma = sum(
             list(
                 filter(
-                    lambda x: x, cleaned_data['parlamentares__valor']
+                    lambda x: x, self.cleaned_data['parlamentares__valor']
                 )
             )
         )
 
-        if soma != cleaned_data['valor']:
-            msg = _('A Soma dos Valores Por Parlamentar não '
-                    'coincide com o Valor Global da emenda')
-            logger.error(msg)
-            raise ValidationError(msg)
-        return cleaned_data
-
-    def save(self, commit=True):
         try:
+            i_init.valor = soma
             i = super().save(commit)
         except Exception as e:
-            raise ValidationError('erro')
+            raise ValidationError('Erro')
+
         i.parlamentares.clear()
 
         pv = zip(self.parlamentares, self.cleaned_data['parlamentares__valor'])
