@@ -210,6 +210,9 @@ class LoaCrud(Crud):
                     elif k == EmendaLoa.DIVERSOS:
                         resumo_parlamentar[k]['sem_destinacao'] = lp.disp_diversos
 
+                    resumo_parlamentar[k]['impedimento_tecnico'] = 0
+                    resumo_parlamentar[k]['ja_destinado'] = 0
+
                     params = dict(
                         parlamentar=lp.parlamentar,
                         emendaloa__loa=self.object,
@@ -217,13 +220,52 @@ class LoaCrud(Crud):
                     )
 
                     ja_destinado = EmendaLoaParlamentar.objects.filter(
-                        **params).exclude(
-                            emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO
+                        **params
+                        #).exclude(
+                        #    emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO
                     ).aggregate(Sum('valor'))
+
                     resumo_parlamentar[k]['ja_destinado'] = (
                         ja_destinado['valor__sum'] or Decimal('0.00')
                     )
 
+                    ajustes = RegistroAjusteLoaParlamentar.objects.filter(
+                        parlamentar=lp.parlamentar,
+                        registro__tipo=k,
+                        registro__oficio_ajuste_loa__loa=l,
+                    ).aggregate(Sum('valor'))
+
+                    resumo_parlamentar[k]['ja_destinado'] += (
+                        ajustes['valor__sum'] or Decimal('0.00')
+                    )
+
+                    # ------------------------------------
+
+                    params.update(
+                        dict(emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO))
+                    impedimento_tecnico = EmendaLoaParlamentar.objects.filter(
+                        **params).aggregate(Sum('valor'))
+                    resumo_parlamentar[k]['impedimento_tecnico'] = (
+                        impedimento_tecnico['valor__sum'] or Decimal('0.00')
+                    )
+
+                    ajuste_de_impedimento = RegistroAjusteLoaParlamentar.objects.filter(
+                        parlamentar=lp.parlamentar,
+                        registro__emendaloa__tipo=k,
+                        registro__oficio_ajuste_loa__loa=l,
+                        registro__emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO
+                    ).aggregate(Sum('valor'))
+
+                    resumo_parlamentar[k]['impedimento_tecnico'] += (
+                        ajuste_de_impedimento['valor__sum'] or Decimal('0.00')
+                    )
+
+                    resumo_parlamentar[k]['sem_destinacao'] -= (
+                        resumo_parlamentar[k]['ja_destinado'] -
+                        resumo_parlamentar[k]['impedimento_tecnico']
+                    )
+
+                    '''
                     params.update(
                         dict(emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO))
                     impedimento_tecnico = EmendaLoaParlamentar.objects.filter(
@@ -260,7 +302,7 @@ class LoaCrud(Crud):
                         resumo_parlamentar[k]['sem_destinacao'] - \
                         resumo_parlamentar[k]['ja_destinado'] - \
                         resumo_parlamentar[k]['impedimento_tecnico']
-
+                    '''
                     totais[k]['ja_destinado'] += resumo_parlamentar[k]['ja_destinado']
                     totais[k]['impedimento_tecnico'] += resumo_parlamentar[k]['impedimento_tecnico']
                     totais[k]['sem_destinacao'] += resumo_parlamentar[k]['sem_destinacao']
@@ -314,7 +356,7 @@ class EmendaLoaCrud(MasterDetailCrud):
     class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
         list_field_names = [
             ('finalidade', 'materia'),
-            'valor',
+            'valor_computado',
             ('tipo', 'fase'),
             'parlamentares'
         ]
@@ -377,6 +419,12 @@ class EmendaLoaCrud(MasterDetailCrud):
                 context['title'] = f'{context["title"]}<br>Autoria: {p.nome_parlamentar}'
 
             return context
+
+        def hook_header_valor_computado(self, *args, **kwargs):
+            return 'Valor Final da Emenda'
+
+        def hook_valor_computado(self, *args, **kwargs):
+            return f'R$ {args[1]}', args[2]
 
         def hook_fase(self, *args, **kwargs):
             return f'<br><small class="text-nowrap">({args[0].get_fase_display()})</small>', args[2]

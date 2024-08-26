@@ -263,7 +263,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
         # if not self.user.has_perm('emendaloa_full_editor'):
 
-        if self.user.operadorautor_set.exists():
+        if self.user.operadorautor_set.exists() and not self.user.is_superuser:
             self.fields['tipo_materia'].widget.attrs['disabled'] = True
             self.fields['numero_materia'].widget.attrs['disabled'] = True
             self.fields['ano_materia'].widget.attrs['disabled'] = True
