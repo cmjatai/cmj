@@ -365,7 +365,7 @@ class EmendaLoaCrud(MasterDetailCrud):
         @property
         def create_url(self):
             url = super().create_url
-            if not url and self.request.user.operadorautor_set.exists():
+            if not url and not self.request.user.is_anonymous and self.request.user.operadorautor_set.exists():
                 url = self.resolve_url(
                     'create', args=(self.kwargs['pk'],))
             return url
@@ -373,7 +373,7 @@ class EmendaLoaCrud(MasterDetailCrud):
         @property
         def update_url(self):
             url = super().update_url
-            if not url and self.request.user.operadorautor_set.exists():
+            if not url and not self.request.user.is_anonymous and self.request.user.operadorautor_set.exists():
                 url = self.resolve_url(
                     'update', args=(self.object.id,))
             return url
@@ -381,7 +381,7 @@ class EmendaLoaCrud(MasterDetailCrud):
         @property
         def detail_url(self):
             url = super().detail_url
-            if not url and self.request.user.operadorautor_set.exists():
+            if not url and not self.request.user.is_anonymous and self.request.user.operadorautor_set.exists():
                 url = self.resolve_url(
                     'detail', args=(self.object.id,))
             return url
