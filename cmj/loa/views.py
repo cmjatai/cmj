@@ -431,7 +431,7 @@ class EmendaLoaCrud(MasterDetailCrud):
 
         def hook_materia(self, *args, **kwargs):
             if args[0].materia:
-                return f'<small class="text-gray"><strong>Matéria Legislativa:</strong> {args[0].materia}<br><i>{args[0].materia.ementa if not self.request.user.is_anonymous else ""}</i></small>', args[2]
+                return f'<small class="text-gray"><strong>Matéria Legislativa:</strong> {args[0].materia}<br><i>{args[0].materia.ementa}</i></small>', args[2]
             else:
                 return '', args[2]
 
@@ -487,6 +487,7 @@ class EmendaLoaCrud(MasterDetailCrud):
         # None
 
     class CreateView(MasterDetailCrud.CreateView):
+        layout_key = None
         form_class = EmendaLoaForm
 
         def get_success_url(self):
@@ -582,10 +583,7 @@ class EmendaLoaCrud(MasterDetailCrud):
 
         @property
         def layout_key(self):
-            if self.object.emendaloaparlamentar_set.all().count() > 2:
-                return 'EmendaLoaDetail2'
-            else:
-                return 'EmendaLoaDetail'
+            return 'EmendaLoaDetail'
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
@@ -594,6 +592,10 @@ class EmendaLoaCrud(MasterDetailCrud):
             return context
 
         def hook_valor_computado(self, el, verbose_name='', field_display=''):
+
+            if not el.materia:
+                return '', ''
+
             return 'Valor Final da Emenda (R$)', field_display
 
         def hook_materia(self, el, verbose_name='', field_display=''):
@@ -603,10 +605,13 @@ class EmendaLoaCrud(MasterDetailCrud):
                     strm, el.materia.epigrafe_short)
             return verbose_name, field_display
 
-        def hook_registroajusteloa_set(self, obj, verbose_name='', field_display=''):
+        def hook_registroajusteloa_set(self, el, verbose_name='', field_display=''):
+
+            if not el.materia:
+                return '', ''
 
             ajustes = []
-            for ajuste in obj.registroajusteloa_set.all():
+            for ajuste in el.registroajusteloa_set.all():
                 url = reverse_lazy(
                     'cmj.loa:registroajusteloa_detail',
                     kwargs={'pk': ajuste.id})
@@ -622,11 +627,15 @@ class EmendaLoaCrud(MasterDetailCrud):
 
             return verbose_name, f'<ul>{"".join(ajustes)}</ul>'
 
-        def hook_documentos_acessorios(self, emendaloa, verbose_name='', field_display=''):
+        def hook_documentos_acessorios(self, el, verbose_name='', field_display=''):
+
+            if not el.materia:
+                return '', ''
+
             docs = []
 
             qs_docs = [
-            ] if not emendaloa.materia else emendaloa.materia.documentoacessorio_set.order_by('-id')
+            ] if not el.materia else el.materia.documentoacessorio_set.order_by('-id')
             for doc in qs_docs:
                 doc_template = loader.get_template(
                     'materia/documentoacessorio_widget_itemlist.html')

@@ -13,23 +13,24 @@ LoaDetail:
 EmendaLoa:
   {% trans 'Dados Gerais' %}:
   - tipo:2 fase:3 tipo_materia:3 numero_materia:2 ano_materia:2 materia:0
-  - valor:3 finalidade
+  - indicacao finalidade
   - parlamentares__valor
 
-EmendaLoaDetail:
+EmendaLoaDetailOld:
   {% trans 'Dados Gerais' %}:
   - tipo:2 fase:4 valor:3 materia|fk_urlize_for_detail
-  - finalidade parlamentares:6
+  - indicacao finalidade parlamentares:6
   - registroajusteloa_set
   - documentos_acessorios
 
-EmendaLoaDetail2:
+EmendaLoaDetail:
   version: 2
   col-12 1:
     {% trans 'Dados Gerais' %}:
       col-md-7:
       - tipo:3 fase:5 valor:4
       - materia|fk_urlize_for_detail valor_computado:4
+      - indicacao
       - finalidade
       col-md-5:
       - parlamentares:12

@@ -10,6 +10,7 @@ from django.contrib.postgres.forms.array import SplitArrayField,\
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.forms.fields import MultiValueField
 from django.forms.models import ModelForm
+from django.forms.widgets import HiddenInput
 from django.utils.translation import ugettext_lazy as _
 
 from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa,\
@@ -208,7 +209,13 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         queryset=MateriaLegislativa.objects.all())
 
     finalidade = forms.CharField(
-        label='Finalidade', required=True)
+        label='Finalidade',
+        required=True,
+        widget=forms.Textarea(attrs={'rows': 3}))
+
+    indicacao = forms.CharField(
+        label='Indicação',
+        required=True)
 
     parlamentares__valor = SplitArrayField(
         forms.DecimalField(required=False, max_digits=14,
@@ -223,8 +230,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
             'tipo',
             'fase',
             'materia', 'tipo_materia', 'numero_materia', 'ano_materia',
-            'valor',
-            'finalidade',
+            'indicacao', 'finalidade',
             'parlamentares__valor'
         ]
 
@@ -235,18 +241,18 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         row1 = to_row([
             ('tipo', 2),
             ('fase', 3),
+            ('indicacao', 7),
+        ])
+
+        row2 = to_row([
             ('tipo_materia', 3),
             ('numero_materia', 2),
             ('ano_materia', 2),
             ('materia', 0),
         ])
 
-        row2 = to_row([
-            ('valor', 3),
-            ('finalidade', 9),
-        ])
-
         row3 = to_row([
+            ('finalidade', 12),
             ('parlamentares__valor', 12),
         ])
 
@@ -263,12 +269,12 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
         # if not self.user.has_perm('emendaloa_full_editor'):
 
-        if self.user.operadorautor_set.exists() and not self.user.is_superuser:
-            self.fields['tipo_materia'].widget.attrs['disabled'] = True
-            self.fields['numero_materia'].widget.attrs['disabled'] = True
-            self.fields['ano_materia'].widget.attrs['disabled'] = True
-
-            self.fields['valor'].widget.attrs['readonly'] = True
+        if self.user.operadorautor_set.exists() and not self.user.has_perms(
+            ('loa.add_emendaloa', 'loa.change_emendaloa')
+        ):
+            self.fields['tipo_materia'].widget = HiddenInput()
+            self.fields['numero_materia'].widget = HiddenInput()
+            self.fields['ano_materia'].widget = HiddenInput()
 
             self.fields['fase'].required = False
             self.fields['fase'].initial = EmendaLoa.PROPOSTA
@@ -303,20 +309,6 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         super().clean()
         cleaned_data = self.cleaned_data
 
-        if not self.user.operadorautor_set.exists():
-            soma = sum(
-                list(
-                    filter(
-                        lambda x: x, cleaned_data['parlamentares__valor']
-                    )
-                )
-            )
-
-            if soma != cleaned_data['valor']:
-                msg = _('A Soma dos Valores Por Parlamentar não '
-                        'coincide com o Valor Global da emenda')
-                logger.error(msg)
-                raise ValidationError(msg)
         return cleaned_data
 
     def save(self, commit=True):

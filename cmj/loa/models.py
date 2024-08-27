@@ -167,6 +167,10 @@ class EmendaLoa(models.Model):
         choices=FASE_CHOICE,
         default=10, verbose_name=_('Fase'))
 
+    indicacao = models.TextField(
+        verbose_name=_('Indicação'),
+        blank=True, null=True, default=None)
+
     finalidade = models.TextField(
         verbose_name=_("Finalidade"))
 
