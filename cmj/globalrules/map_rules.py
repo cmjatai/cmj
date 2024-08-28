@@ -35,7 +35,8 @@ from cmj.globalrules import (RP_ADD, RP_CHANGE, RP_DELETE, RP_DETAIL, RP_LIST,
                              GROUP_SAAP_WORKSPACE_OPER_RECEPCAO, menu_recepcao,
                              GROUP_DRAFT_OPERADOR, GROUP_ARQ_OPERADOR)
 from cmj.loa.models import Loa, LoaParlamentar, EmendaLoa, EmendaLoaParlamentar,\
-    OficioAjusteLoa, RegistroAjusteLoa
+    OficioAjusteLoa, RegistroAjusteLoa, DespesaConsulta, Orgao,\
+    UnidadeOrcamentaria
 from cmj.ouvidoria.models import Solicitacao, MensagemSolicitacao
 from cmj.sigad.models import Classe, Documento, Midia
 from sapl.parlamentares.models import Partido
@@ -198,6 +199,11 @@ rules_loa_group_operador = {
         (EmendaLoaParlamentar, __base__, __perms_publicas__),
         (OficioAjusteLoa, __base__, __perms_publicas__),
         (RegistroAjusteLoa, __base__, __perms_publicas__),
+
+        (DespesaConsulta, __base__, __perms_publicas__),
+
+        (Orgao, __base__, __perms_publicas__),
+        (UnidadeOrcamentaria, __base__, __perms_publicas__),
     ]
 }
 
@@ -285,6 +291,7 @@ rules_patterns = [
     rules_diarios_group_operador,
     rules_draft_group_operador,
     rules_arq_group_operador,
+    rules_loa_group_operador,
     rules_sigad_view_status_restritos,
     rules_ouvidoria_visualizacao_respostas,
 

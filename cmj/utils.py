@@ -379,15 +379,18 @@ def time_of_period(period):
 
 
 def run_sql(sql):
+    result = []
     with connection.cursor() as cursor:
 
-        cursor.execute(sql)
+        result = cursor.execute(sql)
 
         if sql.startswith('select'):
-            rows = cursor.fetchall()
+            result = cursor.fetchall()
 
-            if settings.DEBUG:
-                print(rows)
+    return result
+
+    # if settings.DEBUG:
+    #    print(rows)
 
 
 class ProcessoExterno(object):

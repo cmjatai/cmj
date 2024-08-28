@@ -30,6 +30,7 @@ import requests
 
 from cmj.arq.models import ArqDoc
 from cmj.diarios.models import DiarioOficial
+from cmj.loa.models import Despesa
 from cmj.utils import Manutencao
 import numpy as np
 from sapl.compilacao.models import Dispositivo, UrlizeReferencia
@@ -87,7 +88,22 @@ class Command(BaseCommand):
         m.desativa_auto_now()
         m.desativa_signals()
 
-        self.anonimizardiario()
+        """"d = Despesa()
+        ddict = {'loa_id': 2024,
+                 'orgao_id': 1,
+                 'unidade_id': 1,
+                 'funcao_id': 1,
+                 'subfuncao_id': 1,
+                 'programa_id': 1,
+                 'acao_id': 1,
+                 'fonte_id': None,
+                 'natureza_id': 1}
+
+        for k, v in ddict.items():
+            setattr(d, k, v)
+        d.save()"""
+
+        # self.anonimizardiario()
 
         # self.get_all_tas()
         # self.sanitize_dispositivos_compilacao()
