@@ -563,9 +563,13 @@ class EmendaLoaCrud(MasterDetailCrud):
                             parlamentar=parlamentar).exists()
 
                 return (
-                    u.has_perm('emendaloa_full_editor') or
-                    u.operadorautor_set.exists()
-                ) and not self.object.materia and participa
+                    u.has_perm('emendaloa_full_editor') and
+                    not self.object.materia
+                ) or (
+                    u.operadorautor_set.exists() and
+                    not self.object.materia and
+                    participa
+                )
 
             return has_perm
 
