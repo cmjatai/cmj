@@ -1,6 +1,7 @@
 from decimal import Decimal
 import logging
 
+from django.contrib.messages.context_processors import messages
 from django.db.models import Q
 from django.db.models.aggregates import Sum
 from django.http.response import Http404
@@ -83,7 +84,7 @@ class LoaCrud(Crud):
             if u.is_anonymous:
                 return qsp
 
-            if u.has_perm('emendaloa_full_editor'):
+            if u.has_perm('loa.emendaloa_full_editor'):
                 return qs
 
             if u.operadorautor_set.exists():
@@ -92,7 +93,7 @@ class LoaCrud(Crud):
                 ).distinct()
                 return qs
 
-            return qs
+            return qsp
 
         def hook_header_perc_disp_total(self):
             return ''
@@ -122,6 +123,16 @@ class LoaCrud(Crud):
     class CreateView(Crud.CreateView):
         form_class = LoaForm
 
+        def form_invalid(self, form):
+            r = Crud.CreateView.form_invalid(self, form)
+
+            err_materia = form.errors.get('materia', None)
+            if err_materia:
+                err_materia = 'Já existe Loa vinculada a Matéria Legislativa selecionada.'
+
+                self.messages.error(err_materia, fail_silently=True)
+            return r
+
     class UpdateView(Crud.UpdateView):
         form_class = LoaForm
 
@@ -132,6 +143,16 @@ class LoaCrud(Crud):
                 initial['numero_materia'] = self.object.materia.numero
                 initial['ano_materia'] = self.object.materia.ano
             return initial
+
+        def form_invalid(self, form):
+            r = Crud.UpdateView.form_invalid(self, form)
+
+            err_materia = form.errors.get('materia', None)
+            if err_materia:
+                err_materia = 'Já existe Loa vinculada a Matéria Legislativa selecionada.'
+
+                self.messages.error(err_materia, fail_silently=True)
+            return r
 
     class DetailView(Crud.DetailView):
         layout_key = 'LoaDetail'
@@ -372,19 +393,38 @@ class EmendaLoaCrud(MasterDetailCrud):
 
         @property
         def update_url(self):
+
             url = super().update_url
-            if not url and not self.request.user.is_anonymous and self.request.user.operadorautor_set.exists():
-                url = self.resolve_url(
-                    'update', args=(self.object.id,))
+            if url or self.request.user.is_anonymous:
+                return url
+
+            if self.request.user.has_perm('loa.emendaloa_full_editor') or \
+                    self.request.user.operadorautor_set.exists():
+                url = self.resolve_url('update', args=(self.object.id,))
+
             return url
 
         @property
         def detail_url(self):
-            url = super().detail_url
-            if not url and not self.request.user.is_anonymous and self.request.user.operadorautor_set.exists():
-                url = self.resolve_url(
-                    'detail', args=(self.object.id,))
+
+            url = super().update_url
+            if url or self.request.user.is_anonymous:
+                return url
+
+            if self.request.user.has_perm('loa.emendaloa_full_editor') or \
+                    self.request.user.operadorautor_set.exists():
+                url = self.resolve_url('detail', args=(self.object.id,))
+
             return url
+
+        @property
+        def layout_display(self):
+            l = super().layout_display
+
+            if not self.object.materia:
+                l.pop()
+
+            return l
 
     class ListView(MasterDetailCrud.ListView):
         paginate_by = 25
@@ -523,7 +563,7 @@ class EmendaLoaCrud(MasterDetailCrud):
             return initial
 
         def form_invalid(self, form):
-            r = Crud.CreateView.form_invalid(self, form)
+            r = MasterDetailCrud.CreateView.form_invalid(self, form)
 
             err_materia = form.errors.get('materia', None)
             if err_materia:
@@ -535,6 +575,14 @@ class EmendaLoaCrud(MasterDetailCrud):
     class UpdateView(MasterDetailCrud.UpdateView):
         layout_key = None
         form_class = EmendaLoaForm
+        permission_required = ('loa.emendaloa_full_editor', )
+
+        def get_context_data(self, **kwargs):
+            self.loa = Loa.objects.get(pk=kwargs['root_pk'])
+            context = super().get_context_data(**kwargs)
+            path = context.get('path', '')
+            context['path'] = f'{path} emendaloa-update'
+            return context
 
         def get_success_url(self):
             return MasterDetailCrud.UpdateView.get_success_url(self)
@@ -563,7 +611,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                             parlamentar=parlamentar).exists()
 
                 return (
-                    u.has_perm('emendaloa_full_editor') and
+                    u.has_perm('loa.emendaloa_full_editor') and
                     not self.object.materia
                 ) or (
                     u.operadorautor_set.exists() and

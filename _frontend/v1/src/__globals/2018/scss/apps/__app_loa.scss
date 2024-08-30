@@ -79,6 +79,18 @@
       color: green;
     }
   }
+  &.emendaloa-update {
+    .container-preview {
+      margin: 10px 0;
+      background-color: white;
+      width: 100%;
+      img {
+        width: 100%;
+      }
+
+
+    }
+  }
   &.oficioajusteloa-detail {
     .table {
       tr {

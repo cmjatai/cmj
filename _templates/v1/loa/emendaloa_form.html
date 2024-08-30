@@ -4,9 +4,13 @@
 {% block extra_js %}
   {{ block.super }}
 
-$(function () {
+<script language="javascript">
+  $(function () {
 
-
-})
+    $('#id_tipo').closest('form').change(function(event) {
+      $('.container-preview').html(event.target.value)
+    });
+  })
+</script>
 
 {% endblock %}

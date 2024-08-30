@@ -27,12 +27,12 @@ EmendaLoaDetail:
   version: 2
   col-12 1:
     {% trans 'Dados Gerais' %}:
-      col-md-7:
+      col-md-8:
       - tipo:3 fase:5 valor:4
       - materia|fk_urlize_for_detail valor_computado:4
       - indicacao
       - finalidade
-      col-md-5:
+      col-md-4:
       - parlamentares:12
   col-12 2:
     {% trans 'Documentos da Emenda Impositiva' %}:
