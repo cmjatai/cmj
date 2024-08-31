@@ -5,11 +5,20 @@
   {{ block.super }}
 
 <script language="javascript">
-  $(function () {
+  const loadPreview = function() {
+    $('.container-preview').html(`
+    <a class="w-100" target="_blank" href="{% url "sapl.api:emendaloa-preview" object.pk %}">
+    <img src="{% url "sapl.api:emendaloa-preview" object.pk %}?page=1&u=${Date.now()}"/>
+    </a>
+    `)
+  }
 
+  $(function () {
     $('#id_tipo').closest('form').change(function(event) {
-      $('.container-preview').html(event.target.value)
-    });
+      loadPreview()
+      console.log('event change')
+    })
+    loadPreview()
   })
 </script>
 

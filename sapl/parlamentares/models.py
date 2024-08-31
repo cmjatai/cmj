@@ -273,7 +273,19 @@ def true_false_none(x):
         return None
 
 
+class ParlamentarManager(models.Manager):
+
+    use_for_related_fields = True
+
+    def isonly_sexo_feminino(self):
+        qs = self.get_queryset()
+        sexos = qs.values_list('sexo', flat=True).order_by('sexo').distinct()
+        return len(sexos) == 1 and sexos[0] == 'F'
+
+
 class Parlamentar(models.Model):
+
+    objects = ParlamentarManager()
 
     FIELDFILE_NAME = ('capa', 'fotografia', )
 

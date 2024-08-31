@@ -11,6 +11,8 @@ django-webpack4-loader
 djangorestframework==3.12.4
 python-telegram-bot==20.1
 
+num2words==0.5.13
+
 XlsxWriter==3.2.0
 
 ocrmypdf==14.4.0 # versões acima precisam do ghostscript acima de 9.53.3

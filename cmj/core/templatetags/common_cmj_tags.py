@@ -17,6 +17,7 @@ from django.utils.dateparse import parse_datetime as django_parse_datetime
 from django.utils.formats import date_format
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
+from num2words import num2words
 from webpack_loader import utils
 from webpack_loader.utils import _get_bundle
 
@@ -481,3 +482,13 @@ def params_search_to_api(items):
     u = u.replace('_is=', '=')
     u = u.replace('autoria', 'autores')
     return u
+
+
+@register.filter
+def valor_por_extenso(valor):
+    return num2words(valor,  to='currency', lang='pt_BR')
+
+
+@register.filter
+def valor_str(valor):
+    return formats.number_format(valor, force_grouping=True)
