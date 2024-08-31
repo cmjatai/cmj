@@ -1,6 +1,20 @@
 {% extends "base.html" %}
 {% load i18n %}
 
+{% load render_bundle from webpack_loader %}
+{% block webpack_loader_css %}
+    {{ block.super }}
+    {% if view.crud.frontend %}
+      {% render_bundle view.crud.frontend 'css' %}
+    {% endif %}
+{% endblock %}
+{% block webpack_loader_js %}
+    {{ block.super }}
+    {% if view.crud.frontend %}
+      {% render_bundle view.crud.frontend 'js' %}
+    {% endif %}
+{% endblock %}
+
 {% block base_content %}
   <form action="" method="post">{% csrf_token %}
     <br>

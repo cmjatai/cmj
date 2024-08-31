@@ -992,6 +992,7 @@ class Crud:
     UpdateView = CrudUpdateView
     DeleteView = CrudDeleteView
     help_topic = ''
+    frontend = ''
 
     class PublicMixin:
         permission_required = []

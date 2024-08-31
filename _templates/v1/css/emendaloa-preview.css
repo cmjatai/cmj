@@ -1,0 +1,55 @@
+@page {
+  margin-left: 2cm;
+  margin-right: 2cm;
+}
+html {
+  line-height: 1.5;
+}
+header {
+  left: -1.3cm;
+  right: -1.3cm;
+}
+
+footer {
+  left: -1.3cm;
+  right: -1.3cm;
+}
+
+.ementa, .preambulo, .art {
+  text-align: justify;
+}
+
+.rotulo {
+  font-weight: bold;
+}
+
+.ementa {
+  margin-left: 7cm;
+}
+.data {
+  text-align: right;
+}
+
+h3, h4 {
+  margin: 0;
+  padding: 0;
+}
+
+.assinaturas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+
+}
+.assinatura {
+  flex: 1 1 33%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-top: 1in;
+  text-align: center;
+  font-weight: bold;
+}
+.assinatura small {
+  font-style: italic;
+}

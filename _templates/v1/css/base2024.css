@@ -1,0 +1,29 @@
+@page {
+  size: A4 portrait;
+  margin-top: 3.5cm;
+  margin-left: 0.7cm;
+  margin-right: 0.7cm;
+  margin-bottom: 2cm;
+}
+
+html {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+header {
+  position: fixed;
+  top: -3cm;
+  left: 0cm;
+  right: 0cm;
+}
+
+footer {
+  position: fixed;
+  bottom: -1.5cm;
+  left: 0cm;
+  right: 0cm;
+}
+
+header img, footer img {
+  width: 100%;
+}

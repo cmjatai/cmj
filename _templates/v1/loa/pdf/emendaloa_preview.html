@@ -1,0 +1,250 @@
+{% load static common_cmj_tags %}
+{% load render_bundle from webpack_loader %}
+{% load webpack_static from webpack_loader %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<meta charset="utf-8"></meta>
+<head>
+  <title>LOA </title>
+  <style>
+    {% include "css/base2024.css" %}
+    {% include "css/emendaloa-preview.css" %}
+    @page {}
+  </style>
+</head>
+<body>
+
+  <header>
+    <img src="{% webpack_static 'img/pdf_cabec.jpg' %}">
+  </header>
+
+  <h3>EMENDA IMPOSITIVA, de
+  {% if object.materia %}
+    {{ object.materia.data_apresentacao|date:"d \d\e F \d\e Y" }}.
+  {% else %}
+    {% now "d \d\e F \d\e Y" %}.
+  {% endif %}
+  </h3>
+
+  {% with object.loa.materia as mat_loa %}
+    <small>
+      Ao {{mat_loa}}, de {{ mat_loa.data_apresentacao|date:"d \d\e F \d\e Y" }},
+      que {{mat_loa.ementa}}
+    </small>
+
+  {% endwith %}
+
+  <h5>
+    Autoria:
+    {% for parl in object.parlamentares.all %}
+      {% if forloop.first %}
+          Vereador{% if object.parlamentares.isonly_sexo_feminino %}a{% else %}e{% endif %}{% if object.parlamentares.count > 1 %}s{% endif %}
+      {% endif %}
+      {{parl.nome_parlamentar}}{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  </h5>
+
+  <p class="ementa">
+    Altera destinação de recursos orçamentários, indicando o {{object.indicacao}},
+    para a recepção do valor de
+    <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}}),</strong>
+    que será {{ object.finalidade }}.
+  </p>
+
+  <p class="preambulo">
+    {% if object.parlamentares.isonly_sexo_feminino %}A{% else %}O{% endif %}{% if object.parlamentares.count > 1 %}s{% endif %}
+    subscritor{% if object.parlamentares.isonly_sexo_feminino %}a{% else %}e{% endif %}{% if object.parlamentares.count > 1 %}s{% endif %}
+    da presente Emenda Impositiva, propõem a seguinte modificação no Projeto de Lei Orçamentária Anual supracitada:
+  </p>
+
+  <p class="art">
+    <span class="rotulo">Art 1º - </span>Deduz-se ...
+  </p>
+
+  <p class="art">
+    <span class="rotulo">Art 2º - </span>O valor deduzido de
+    <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}}),</strong>
+    será...
+  </p>
+
+  {% if object.parlamentares.count > 1 %}
+    <p class="art">
+      <span class="rotulo">Art 3º - </span>O valor de
+      <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}}),</strong>
+      será divido entre os vereadores subscritores, sendo utilizado:
+
+
+
+        {% for elp in object.emendaloaparlamentar_set.all %}
+
+
+            <strong> R$ {{ elp.valor|valor_str }} ({{elp.valor|valor_por_extenso}}),</strong>
+
+            do Vereador {{elp.parlamentar.nome_parlamentar}}{% if not forloop.last %};{% endif %}
+
+        {% endfor %}
+
+
+    </p>
+  {% endif %}
+
+  <p class="art">
+    <span class="rotulo">Art 4º - </span>Os demais artigos e dispositivos da matéria acima
+    permanecem inalterados.
+  </p>
+
+
+  <p class="art">
+    <span class="rotulo">Art 5º - </span>A presente emenda fará parte integrante do Projeto
+    de Lei em referência.
+  </p>
+<br>
+<p class="data">
+  Câmara Municipal de Jataí, em
+  {% if object.materia %}
+    {{ object.materia.data_apresentacao|date:"d \d\e F \d\e Y" }}.
+  {% else %}
+    {% now "d \d\e F \d\e Y" %}.
+  {% endif %}
+</p>
+
+<div class="assinaturas">
+
+  {% for parl in object.parlamentares.all %}
+    <div class="assinatura">
+      {{parl.nome_parlamentar}}
+      <small>
+        Vereador{% if object.parlamentares.isonly_sexo_feminino %}a{% endif %}
+      </small>
+    </div>
+  {% if forloop.first %}
+  {% endif %}
+{% endfor %}
+</div>
+
+
+
+  <br><br><br><br><br><br><br><br><br><br>
+  <table>
+    <thead>
+      <tr>
+        <th></th>
+        <th></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+      <tr><td>1</td><td>2</td><td>3</td></tr>
+    </tbody>
+  </table>
+
+  <footer>
+    <img src="{% webpack_static 'img/pdf_rodape.jpg' %}">
+  </footer>
+</body>
+</html>

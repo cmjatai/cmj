@@ -161,6 +161,10 @@ module.exports = {
       .add('./src/__apps/painel/main.js')
       .end()
 
+      config.entry('loa')
+      .add('./src/__apps/loa/main.js')
+      .end()
+
     /*
     config.entryPoints.delete('app')
      config.entry('app')

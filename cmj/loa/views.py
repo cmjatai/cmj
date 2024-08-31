@@ -374,6 +374,7 @@ class EmendaLoaCrud(MasterDetailCrud):
     model = EmendaLoa
     parent_field = 'loa'
     public = [RP_LIST, RP_DETAIL]
+    frontend = EmendaLoa._meta.app_label
 
     class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
         list_field_names = [
