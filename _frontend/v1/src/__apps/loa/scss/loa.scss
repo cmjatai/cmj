@@ -1,43 +1,103 @@
-
-.painel-principal {
-  background: #1c1b1b;
-  font-family: Verdana;
-  font-size: x-large;
-  .text-title {
-    color: #4fa64d;
-    margin: 0.5rem;
-	font-weight: bold;
+.container-loa {
+  &.loa-list {
+    th {
+      font-size: 85%;
+    }
+    td {
+      text-align: center;
+      font-weight: bold;
+      font-size: 130%;
+      i{
+        display: block;
+        font-weight: normal;
+        font-size: 70%;
+      }
+      &:nth-child(2) {
+        font-size: 170%;
+      }
+    }
   }
-  .text-subtitle {
-    color: #459170;
-	font-weight: bold;
-  }
-  .data-hora {
-    font-size: 180%;
-  }
-
-  .text-value {
-    color: white;
-  }
-
-  .logo-painel {
-    max-width: 100%;
-  }
-  .painels {
-    flex-wrap: wrap;
-  }
-  .painel{
-    margin-top: 1rem;
+  &.loa-detail {
+    .form-control-static {
+      text-align: center;
+      font-size: 140%;
+      line-height: 1;
+      padding: 0.7rem;
+      font-weight: bold;
+    }
     table {
+      font-size: 0.9rem;
+      td {
+        font-size: 110%;
+      }
+    }
+    i {
+      display: block;
+      font-size: 70%;
+      font-weight: normal;
+    }
+  }
+  &.emendaloa-list {
+    table {
+      tr {
+        td:last-child {
+          padding: 0;
+        }
+        td:nth-child(3) {
+          text-align: center;
+        }
+        td:nth-child(4) {
+          width: 40%;
+        }
+      }
+      table {
+        border: 0;
+        td {
+          border: 0;
+          padding: 1px 5px !important;
+        }
+      }
+    }
+    .container-avatar {
+      align-items: center;
+      .avatar {
+        position: relative;
+        opacity: 0.4;
+        &:hover {
+          opacity: 1;
+        }
+        &.active {
+          opacity: 1;
+          width: 100px;
+        }
+      }
+    }
+    .btn-close {
+      position: absolute;
+      top: -5px;
+      right: 0;
+      color: green;
+    }
+  }
+  &.emendaloa-update {
+    .container-preview {
+      margin: 10px 0;
+      background-color: white;
       width: 100%;
+      img {
+        width: 100%;
+      }
+
+
     }
-    h2 {
-      margin-bottom: 0.5rem;
-    }
-    #votacao, #oradores_list {
-      text-align: left;
-      display: inline-block;
-      margin-bottom: 1rem;
+  }
+  &.oficioajusteloa-detail {
+    .table {
+      tr {
+        td:nth-child(n + 2) {
+          text-align: center;
+        }
+      }
     }
   }
 }

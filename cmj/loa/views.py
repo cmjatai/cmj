@@ -32,6 +32,7 @@ class LoaCrud(Crud):
     model = Loa
     public = [RP_LIST, RP_DETAIL]
     ordered_list = False
+    frontend = Loa._meta.app_label
 
     class BaseMixin(LoaContextDataMixin, Crud.BaseMixin):
 
@@ -733,6 +734,7 @@ class OficioAjusteLoaCrud(MasterDetailCrud):
     parent_field = 'loa'
     model_set = 'registroajusteloa_set'
     public = [RP_LIST, RP_DETAIL]
+    frontend = OficioAjusteLoa._meta.app_label
 
     class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
         list_field_names = [
@@ -784,6 +786,7 @@ class RegistroAjusteLoaCrud(MasterDetailCrud):
     model = RegistroAjusteLoa
     parent_field = 'oficio_ajuste_loa__loa'
     public = [RP_LIST, RP_DETAIL]
+    frontend = RegistroAjusteLoa._meta.app_label
 
     class DetailView(MasterDetailCrud.DetailView):
         layout_key = 'RegistroAjusteLoaDetail'
