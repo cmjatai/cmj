@@ -183,6 +183,7 @@ class EmendaLoaValorWidget(SplitArrayWidget):
         for p, w in pw:
 
             w['label'] = p.nome_parlamentar
+            w['attrs']['parlamentar_id'] = p.id
 
             if 'class' in self.attrs and 'class' in w['attrs']:
                 w['attrs']['class'] = 'decimalinput numberinput form-control text-right'
@@ -191,9 +192,7 @@ class EmendaLoaValorWidget(SplitArrayWidget):
             if self.user and not self.user.has_perms(
                     ('loa.add_emendaloa', 'loa.change_emendaloa')):
                 op = self.user.operadorautor_set.first()
-                if op and op.autor.autor_related != p:
-                    w['attrs']['readonly'] = 'readonly'
-                else:
+                if not op or op and op.autor.autor_related != p:
                     w['attrs']['readonly'] = 'readonly'
 
         return context
@@ -253,6 +252,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
     def __init__(self, *args, **kwargs):
 
+        self.creating = kwargs['initial'].pop('creating', None)
         self.user = kwargs['initial'].pop('user', None)
         self.loa = kwargs['initial']['loa']
         self.parls = list(self.loa.parlamentares.order_by('nome_parlamentar'))
@@ -282,9 +282,13 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         row3 = to_row(row3)
 
         row_form = to_row([
-            ([row1, row2, row3, ], 7),
-            (Div(css_class='container-preview'), 5)
+            ([row1, row2, row3, ], 12)
         ])
+        if not self.creating:
+            row_form = to_row([
+                ([row1, row2, row3, ], 7),
+                (Div(css_class='container-preview'), 5)
+            ])
 
         self.helper = FormHelper()
         self.helper.layout = SaplFormLayout(

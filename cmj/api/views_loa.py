@@ -1,3 +1,4 @@
+from decimal import Decimal
 import logging
 
 from django.apps.registry import apps
@@ -8,12 +9,16 @@ from django.template.loader import render_to_string
 from django.utils.text import slugify
 import pymupdf
 from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.viewsets import ViewSet
 
-from cmj.loa.models import OficioAjusteLoa, EmendaLoa
+from cmj.loa.models import OficioAjusteLoa, EmendaLoa, Loa, EmendaLoaParlamentar
 from cmj.settings.medias import MEDIA_URL
 from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize
 from sapl.api.mixins import ResponseFileMixin
+from sapl.api.permissions import SaplModelPermissions
 from sapl.base.models import CasaLegislativa
+from sapl.parlamentares.models import Parlamentar
 from sapl.relatorios.views import make_pdf
 
 
@@ -44,6 +49,82 @@ class _OficioAjusteLoaViewSet(ResponseFileMixin):
 @customize(EmendaLoa)
 class _EmendaLoaViewSet:
 
+    class EmendaLoaPermission(SaplModelPermissions):
+        def has_permission(self, request, view):
+            has_perm = super().has_permission(request, view)
+
+            if request.method == 'POST':
+
+                u = request.user
+                if u.is_anonymous:
+                    return False
+
+                loa = Loa.objects.get(pk=view.kwargs['pk'])
+
+                if not has_perm:
+                    return u.operadorautor_set.exists() and not loa.publicado
+
+                return has_perm
+
+            elif request.method == 'PATCH':
+
+                if not has_perm:
+
+                    u = request.user
+                    if u.is_anonymous:
+                        return False
+
+                    el = EmendaLoa.objects.get(pk=view.kwargs['pk'])
+
+                    participa = False
+                    if u.operadorautor_set.exists():
+                        parlamentar = u.operadorautor_set.first().autor.autor_related
+                        if isinstance(parlamentar, Parlamentar):
+                            participa = el.emendaloaparlamentar_set.filter(
+                                parlamentar=parlamentar).exists()
+
+                    return (
+                        u.has_perm('loa.emendaloa_full_editor') and
+                        not el.materia
+                    ) or (
+                        u.operadorautor_set.exists() and
+                        not el.materia and
+                        participa
+                    )
+
+                return has_perm
+
+            return has_perm
+
+    permission_classes = (EmendaLoaPermission, )
+
+    @action(methods=['patch', ], detail=True)
+    def updatevalorparlamentar(self, request, *args, **kwargs):
+
+        #instance = self.get_object()
+
+        data = request.data
+        data['emendaloa_id'] = kwargs['pk']
+        dvalor = data.pop('valor')
+        try:
+            valor = Decimal(dvalor)
+        except:
+            valor = Decimal('0.00')
+
+        elp, created = EmendaLoaParlamentar.objects.get_or_create(**data)
+        elp.valor = valor
+        elp.save()
+        el = elp.emendaloa
+
+        if not elp.valor:
+            elp.delete()
+
+        el.atualiza_valor().save()
+
+        serializer = self.get_serializer(el)
+
+        return Response(serializer.data)
+
     @action(detail=True)
     def preview(self, request, *args, **kwargs):
         #base_url = settings.MEDIA_ROOT if settings.DEBUG else request.build_absolute_uri()
@@ -51,8 +132,23 @@ class _EmendaLoaViewSet:
 
         el = self.get_object()
 
+        if 'style' not in el.metadata:
+            el.metadata['style'] = {'lineHeight': 150}
+            el.save()
+
+        if 'lineHeight' in request.GET:
+            lineHeight = float(el.metadata['style']['lineHeight'])
+            lineHeight = min(
+                300, int(request.GET.get('lineHeight', lineHeight)))
+            lineHeight = max(100, lineHeight)
+
+            if lineHeight != el.metadata['style']['lineHeight']:
+                el.metadata['style']['lineHeight'] = lineHeight
+                el.save()
+
         context = {
-            'object': el
+            'object': el,
+            'lineHeight': str(el.metadata['style']['lineHeight'] / 100.0)
         }
 
         template = render_to_string('loa/pdf/emendaloa_preview.html', context)

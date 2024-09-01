@@ -159,6 +159,10 @@ class EmendaLoa(models.Model):
         (IMPEDIMENTO_OFICIADO, _('Impedimento Técnico Oficiado'))
     )
 
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=dict, encoder=DjangoJSONEncoder)
+
     tipo = models.PositiveSmallIntegerField(
         choices=TIPOEMENDALOA_CHOICE,
         default=99, verbose_name=_('Área de aplicação'))
@@ -227,6 +231,11 @@ class EmendaLoa(models.Model):
                 _('Edição completa de Emendas Impositivas.')
             ),
         )
+
+    def atualiza_valor(self):
+        soma_dict = self.emendaloaparlamentar_set.aggregate(Sum('valor'))
+        self.valor = soma_dict['valor__sum'] or Decimal('0.00')
+        return self
 
 
 class EmendaLoaParlamentar(models.Model):

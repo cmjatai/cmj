@@ -388,9 +388,12 @@ class EmendaLoaCrud(MasterDetailCrud):
         @property
         def create_url(self):
             url = super().create_url
-            if not url and not self.request.user.is_anonymous and self.request.user.operadorautor_set.exists():
-                url = self.resolve_url(
-                    'create', args=(self.kwargs['pk'],))
+            if not url and \
+                    not self.request.user.is_anonymous and (
+                    self.request.user.operadorautor_set.exists() or
+                    self.request.user.is_superuser
+                    ):
+                url = self.resolve_url('create', args=(self.kwargs['pk'],))
             return url
 
         @property
@@ -533,7 +536,7 @@ class EmendaLoaCrud(MasterDetailCrud):
         form_class = EmendaLoaForm
 
         def get_success_url(self):
-            return self.detail_url
+            return self.update_url
 
         @property
         def cancel_url(self):
@@ -562,6 +565,7 @@ class EmendaLoaCrud(MasterDetailCrud):
             initial = super().get_initial()
             initial['loa'] = self.loa
             initial['user'] = self.request.user
+            initial['creating'] = True
             return initial
 
         def form_invalid(self, form):
@@ -627,11 +631,17 @@ class EmendaLoaCrud(MasterDetailCrud):
             initial = super().get_initial()
             initial['loa'] = self.object.loa
             initial['user'] = self.request.user
+            initial['creating'] = False
             if self.object.materia:
                 initial['tipo_materia'] = self.object.materia.tipo.id
                 initial['numero_materia'] = self.object.materia.numero
                 initial['ano_materia'] = self.object.materia.ano
             return initial
+
+        @property
+        def cancel_url(self):
+            url = self.resolve_url('detail', args=(self.kwargs['pk'],))
+            return url
 
     class DetailView(MasterDetailCrud.DetailView):
 

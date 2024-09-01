@@ -10,6 +10,10 @@
     {% include "css/base2024.css" %}
     {% include "css/emendaloa-preview.css" %}
     @page {}
+
+    html {
+      line-height: {{lineHeight}};
+    }
   </style>
 </head>
 <body>
@@ -80,7 +84,7 @@
 
             <strong> R$ {{ elp.valor|valor_str }} ({{elp.valor|valor_por_extenso}}),</strong>
 
-            do Vereador {{elp.parlamentar.nome_parlamentar}}{% if not forloop.last %};{% endif %}
+            do Vereador {{elp.parlamentar.nome_parlamentar}}{% if not forloop.last %};{% else %}.{% endif %}
 
         {% endfor %}
 
@@ -108,19 +112,29 @@
   {% endif %}
 </p>
 
-<div class="assinaturas">
 
-  {% for parl in object.parlamentares.all %}
+{% for parl in object.parlamentares.all %}
+  {% if forloop.first %}
+    <div class="assinaturas">
+  {% endif %}
+
+
+  {% if forloop.counter0|divisibleby:3 %}
+    </div>
+    <div class="assinaturas">
+  {% endif %}
+
     <div class="assinatura">
       {{parl.nome_parlamentar}}
       <small>
-        Vereador{% if object.parlamentares.isonly_sexo_feminino %}a{% endif %}
+        Vereador{% if parl.sexo == 'F' %}a{% endif %}
       </small>
     </div>
-  {% if forloop.first %}
+
+  {% if forloop.last %}
+    </div>
   {% endif %}
 {% endfor %}
-</div>
 
 
 
