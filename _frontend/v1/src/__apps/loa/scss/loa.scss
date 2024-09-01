@@ -92,8 +92,12 @@
       .inner-preview {
         background-color: white;
       }
-
-
+    }
+    .render-busca {
+      .item {
+        padding: 5px;
+        cursor: pointer;
+      }
     }
   }
   &.oficioajusteloa-detail {

@@ -12,7 +12,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
-from cmj.loa.models import OficioAjusteLoa, EmendaLoa, Loa, EmendaLoaParlamentar
+from cmj.loa.models import OficioAjusteLoa, EmendaLoa, Loa, EmendaLoaParlamentar,\
+    DespesaConsulta, EmendaLoaRegistroContabil
 from cmj.settings.medias import MEDIA_URL
 from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize
 from sapl.api.mixins import ResponseFileMixin
@@ -53,48 +54,46 @@ class _EmendaLoaViewSet:
         def has_permission(self, request, view):
             has_perm = super().has_permission(request, view)
 
+            if has_perm:
+                return has_perm
+
+            u = request.user
+            if u.is_anonymous:
+                return False
+
             if request.method == 'POST':
+                if hasattr(self, 'has_permission_post'):
+                    return self.has_permission_post(has_perm, u)
 
-                u = request.user
-                if u.is_anonymous:
-                    return False
+                data = request.data
 
-                loa = Loa.objects.get(pk=view.kwargs['pk'])
+                if 'loa' in data:
+                    loa = Loa.objects.get(pk=data['loa'])
 
                 if not has_perm:
                     return u.operadorautor_set.exists() and not loa.publicado
 
-                return has_perm
-
             elif request.method == 'PATCH':
 
-                if not has_perm:
+                el = EmendaLoa.objects.get(pk=view.kwargs['pk'])
 
-                    u = request.user
-                    if u.is_anonymous:
-                        return False
+                participa = False
+                if u.operadorautor_set.exists():
+                    parlamentar = u.operadorautor_set.first().autor.autor_related
+                    if isinstance(parlamentar, Parlamentar):
+                        participa = el.emendaloaparlamentar_set.filter(
+                            parlamentar=parlamentar).exists()
 
-                    el = EmendaLoa.objects.get(pk=view.kwargs['pk'])
+                return (
+                    u.has_perm('loa.emendaloa_full_editor') and
+                    not el.materia
+                ) or (
+                    u.operadorautor_set.exists() and
+                    not el.materia and
+                    participa
+                )
 
-                    participa = False
-                    if u.operadorautor_set.exists():
-                        parlamentar = u.operadorautor_set.first().autor.autor_related
-                        if isinstance(parlamentar, Parlamentar):
-                            participa = el.emendaloaparlamentar_set.filter(
-                                parlamentar=parlamentar).exists()
-
-                    return (
-                        u.has_perm('loa.emendaloa_full_editor') and
-                        not el.materia
-                    ) or (
-                        u.operadorautor_set.exists() and
-                        not el.materia and
-                        participa
-                    )
-
-                return has_perm
-
-            return has_perm
+            return False
 
     permission_classes = (EmendaLoaPermission, )
 
@@ -125,6 +124,14 @@ class _EmendaLoaViewSet:
 
         return Response(serializer.data)
 
+    @property
+    def art(self):
+        if not hasattr(self, '_art'):
+            self._art = 0
+
+        self._art += 1
+        return self._art
+
     @action(detail=True)
     def preview(self, request, *args, **kwargs):
         #base_url = settings.MEDIA_ROOT if settings.DEBUG else request.build_absolute_uri()
@@ -147,6 +154,7 @@ class _EmendaLoaViewSet:
                 el.save()
 
         context = {
+            'view': self,
             'object': el,
             'lineHeight': str(el.metadata['style']['lineHeight'] / 100.0)
         }
@@ -172,3 +180,46 @@ class _EmendaLoaViewSet:
         response = HttpResponse(
             bresponse, content_type='image/png' if p else 'application/pdf')
         return response
+
+
+@customize(DespesaConsulta)
+class _DespesaConsulta:
+
+    @action(detail=False)
+    def search(self, request, *args, **kwargs):
+
+        def filter_queryset(qs):
+            ano = request.GET.get('ano', None)
+            query = request.GET.get('q', '')
+            query = query.split(' ')
+
+            q = Q()
+
+            for termo in query:
+                q &= (Q(codigo__icontains=termo) |
+                      Q(especificacao__icontains=termo) |
+                      Q(esp_orgao__icontains=termo) |
+                      Q(esp_unidade__icontains=termo) |
+                      Q(cod_natureza__icontains=termo))
+
+            qs = qs.filter(loa__ano=ano)
+            if query:
+                qs = qs.filter(q)
+
+            return qs
+        self.filter_queryset = filter_queryset
+
+        return self.list(request, *args, **kwargs)
+
+
+@customize(EmendaLoaRegistroContabil)
+class _EmendaLoaRegistroContabilViewSet:
+
+    class EmendaLoaRegistroContabilPermission(_EmendaLoaViewSet.EmendaLoaPermission):
+        def has_permission_post(self, has_perm, user):
+            if has_perm:
+                return has_perm
+
+            return user.has_perm('loa.emendaloa_full_editor')
+
+    permission_classes = (EmendaLoaRegistroContabilPermission, )

@@ -56,10 +56,68 @@ window.AppLOA = function () {
 
     const img = $('.container-preview .inner-preview img')[0]
     const form = container.find('form')
+    const ano_loa = form.find('input[name="ano_loa"')[0].value
+
+    const busca_despesa = form.find('input[name="busca_despesa"')
 
     img.onload = function (event) {
       img.style.opacity = 1
     }
+
+    const render_busca = form.find('.render-busca')
+    busca_despesa.keyup((event) => {
+      if (event.target.value === '') {
+        render_busca.html('')
+        return
+      }
+      axios.get(`/api/loa/despesaconsulta/search/?page_size=5&ano=${ano_loa}&q=${event.target.value}`)
+        .then((response) => {
+          render_busca.html('')
+          const inner = $('<div class="inner"></div>')
+          inner.appendTo(render_busca)
+          if (_.isEmpty(response.data.results)) {
+            $(`<div class="alert alert-warning">
+              Nenhuma despesa encontrada nos anexos da LOA com esta informação. Você pode ainda fazer o registro manualmente no formulário abaixo.
+            </div>`).appendTo(inner)
+          }
+          let parts = event.target.value.trim().split(' ')
+
+          _.each(response.data.results, (value, idx) => {
+            let html = `<div class="small item hover_background_05p" pk="${value.id}">
+                Órgão: ${value.cod_orgao} - ${value.esp_orgao}<br>
+                Und Orç: ${value.cod_unidade} - ${value.esp_unidade}<br>
+                Código: ${value.codigo} - ${value.especificacao}<br>
+                Natureza: ${value.cod_natureza}
+              </div>`
+
+            _.each(parts, (p, idx) => {
+              html = html.replaceAll(p.toUpperCase(), `<strong class="text-blue">${p.toUpperCase()}</strong>`)
+            })
+
+            let item = $(html).appendTo(inner)
+
+            item.click((event) => {
+              let pk_despesa = event.currentTarget.getAttribute('pk')
+              let formData = {}
+              formData.emendaloa = pk
+              formData.despesa = pk_despesa
+              axios.post(`/api/loa/emendaloaregistrocontabil/`, formData)
+                .then((response) => {
+                  console.log(response)
+                })
+            })
+          })
+        })
+        .catch(() => {
+        })
+    })
+
+    form.keydown((event) => {
+      if (event.keyCode === 13) {
+        event.preventDefault()
+        return false
+      }
+    })
 
     form.change(function (event) {
       let formData = {}
@@ -91,7 +149,7 @@ window.AppLOA = function () {
         .catch(() => {
         })
     })
-    form.find('input[name="valor"]').trigger('change')
+    form.trigger('change')
   }
 
   instance.init = function () {

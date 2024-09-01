@@ -49,10 +49,10 @@
   </h5>
 
   <p class="ementa">
-    Altera destinação de recursos orçamentários, indicando o {{object.indicacao}},
+    Altera destinação de recursos orçamentários, indicando o {{object.indicacao|default:"XXXXXXX"}},
     para a recepção do valor de
     <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}}),</strong>
-    que será {{ object.finalidade }}.
+    que será {{ object.finalidade|default:"XXXXXXX" }}.
   </p>
 
   <p class="preambulo">
@@ -62,18 +62,25 @@
   </p>
 
   <p class="art">
-    <span class="rotulo">Art 1º - </span>Deduz-se ...
+    <span class="rotulo">Art {{ view.art }}º - </span>Deduz-se da
+    {% for rc in object.registrocontabil_set.all %}
+        Unidade Orçamentária {{rc.despesa.unidade.especificacao}} /
+        Código: {{rc.despesa.consulta.codigo}} - {{rc.despesa.consulta.especificacao}} /
+        Natureza da Despesa: {{rc.despesa.consulta.cod_natureza}} -
+        Valor: R$ {{rc.valor|valor_str }}{% if not forloop.last %} // {% endif %}{% endfor %}, o valor de <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}}),</strong>
   </p>
 
   <p class="art">
-    <span class="rotulo">Art 2º - </span>O valor deduzido de
+    <span class="rotulo">Art {{ view.art }}º - </span>O valor deduzido de
     <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}}),</strong>
     será...
   </p>
 
+
+
   {% if object.parlamentares.count > 1 %}
     <p class="art">
-      <span class="rotulo">Art 3º - </span>O valor de
+      <span class="rotulo">Art {{ view.art }}º - </span>O valor de
       <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}}),</strong>
       será divido entre os vereadores subscritores, sendo utilizado:
 
@@ -93,13 +100,13 @@
   {% endif %}
 
   <p class="art">
-    <span class="rotulo">Art 4º - </span>Os demais artigos e dispositivos da matéria acima
+    <span class="rotulo">Art {{ view.art }}º - </span>Os demais artigos e dispositivos da matéria acima
     permanecem inalterados.
   </p>
 
 
   <p class="art">
-    <span class="rotulo">Art 5º - </span>A presente emenda fará parte integrante do Projeto
+    <span class="rotulo">Art {{ view.art }}º - </span>A presente emenda fará parte integrante do Projeto
     de Lei em referência.
   </p>
 <br>
@@ -135,127 +142,6 @@
     </div>
   {% endif %}
 {% endfor %}
-
-
-
-  <br><br><br><br><br><br><br><br><br><br>
-  <table>
-    <thead>
-      <tr>
-        <th></th>
-        <th></th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-      <tr><td>1</td><td>2</td><td>3</td></tr>
-    </tbody>
-  </table>
 
   <footer>
     <img src="{% webpack_static 'img/pdf_rodape.jpg' %}">

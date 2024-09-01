@@ -602,6 +602,14 @@ class Despesa(models.Model):
             ),
         )
 
+    def __str__(self):
+        dc = DespesaConsulta.objects.get(pk=self.id)
+        return str(dc)
+
+    @property
+    def consulta(self):
+        return DespesaConsulta.objects.get(pk=self.id)
+
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
 
@@ -667,3 +675,59 @@ class DespesaConsulta(models.Model):
 
     def __str__(self):
         return f'{self.codigo}:{self.cod_natureza} - {self.especificacao}'
+
+
+class EmendaLoaRegistroContabil(models.Model):
+
+    emendaloa = models.ForeignKey(
+        EmendaLoa,
+        verbose_name=_('Emenda Impositiva'),
+        related_name='registrocontabil_set',
+        on_delete=CASCADE)
+
+    despesa = models.ForeignKey(
+        Despesa,
+        blank=True, null=True, default=None,
+        related_name='registrocontabil_set',
+        verbose_name=_('Despesa'),
+        on_delete=CASCADE)
+
+    valor = models.DecimalField(
+        max_digits=14, decimal_places=2, default=Decimal('0.00'),
+        verbose_name=_('Valor (R$)'),
+    )
+
+    orgao = models.ForeignKey(
+        Orgao,
+        blank=True, null=True, default=None,
+        verbose_name=_('Órgão'),
+        related_name='registrocontabil_set',
+        on_delete=CASCADE)
+
+    unidade = models.ForeignKey(
+        UnidadeOrcamentaria,
+        blank=True, null=True, default=None,
+        verbose_name=_('Unidade Orçamentária'),
+        related_name='registrocontabil_set',
+        on_delete=CASCADE)
+
+    natureza = models.ForeignKey(
+        Natureza,
+        blank=True, null=True, default=None,
+        verbose_name=_('Natureza'),
+        related_name='registrocontabil_set',
+        on_delete=CASCADE)
+
+    def __str__(self):
+        valor_str = formats.number_format(self.valor, force_grouping=True)
+        return f'R$ {valor_str} - {self.despesa}'
+
+    @property
+    def str_valor(self):
+        return formats.number_format(self.valor, force_grouping=True)
+
+    class Meta:
+        verbose_name = _('Registro Contábeis de Dedução e Inserção em Emendas')
+        verbose_name_plural = _(
+            'Registro Contábeis de Dedução e Inserção em Emendas')
+        ordering = ['id']
