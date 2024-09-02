@@ -127,6 +127,12 @@ def lookup(d, key):
 
 
 @register.filter
+def map_field_from_queryset(qs, field):
+
+    return map(lambda obj: getattr(obj, field), qs)
+
+
+@register.filter
 def search_value(request):
     try:
         q = getattr(request, request.method).get('q', '')

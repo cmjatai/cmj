@@ -1,5 +1,5 @@
 {% extends "crud/detail.html" %}
-{% load i18n sigad_filters cropping%}
+{% load i18n sigad_filters cropping common_cmj_tags %}
 
 {% block head_title %}{{object}}{% endblock head_title %}
 {% block meta_description%}{{object.ementa}}{% endblock meta_description %}
@@ -144,8 +144,13 @@
     {{ block.super }}
   </div>
 
-  {% if object.documentoadministrativo_set.exists %}
+  {% if object.documentoadministrativo_set.exists or object.vinculodocadminmateria_set.exists%}
     <p class="control-label">Documentos Administrativos Vinculados a Matéria</p>
+    <div class="bg-white p-3">
+        {% with object.vinculodocadminmateria_set.all|map_field_from_queryset:'documento' as doc_list %}
+          {% include 'protocoloadm/documentoadministrativo_widget_materia.html' %}
+        {% endwith %}
+    </div>
     <div class="bg-white p-3">
         {% with object.documentoadministrativo_set.all as doc_list %}
           {% include 'protocoloadm/documentoadministrativo_widget_materia.html' %}

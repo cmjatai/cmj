@@ -351,6 +351,17 @@ class DocumentoAdministrativo(CommonMixin):
         )
     )
 
+    materiasvinculadas = models.ManyToManyField(
+        MateriaLegislativa,
+        blank=True,
+        through='VinculoDocAdminMateria',
+        related_name='docadmvinculados',
+        through_fields=(
+            'documento',
+            'materia'
+        )
+    )
+
     workspace = models.ForeignKey(
         AreaTrabalho,
         verbose_name=_('Área de Trabalho'),
@@ -648,6 +659,36 @@ class Anexado(models.Model):
                      'documento_anexado_numero': self.documento_anexado.numero,
                      'documento_anexado_ano': self.documento_anexado.ano
         }
+
+
+class VinculoDocAdminMateria(models.Model):
+    documento = models.ForeignKey(
+        DocumentoAdministrativo, related_name='vinculodocadminmateria_set',
+        on_delete=models.CASCADE,
+        verbose_name=_('Documento Administrativo')
+    )
+    materia = models.ForeignKey(
+        MateriaLegislativa, related_name='vinculodocadminmateria_set',
+        on_delete=models.CASCADE,
+        verbose_name=_('Matéria Legislativa')
+    )
+    data_anexacao = models.DateField(verbose_name=_('Data Anexação'))
+    data_desanexacao = models.DateField(
+        blank=True, null=True, verbose_name=_('Data Desanexação')
+    )
+
+    class Meta:
+        verbose_name = _(
+            'Vinculo entre Documento Administrativo e Matéria Legislativa')
+        verbose_name_plural = _(
+            'Vinculos entre Documento Administrativo e Matéria Legislativa')
+        ordering = ('id',)
+        unique_together = (
+            ('documento', 'materia'),
+        )
+
+    def __str__(self):
+        return f'Vinculo: {self.documento} - {self.materia}'
 
 
 class AcompanhamentoDocumento(models.Model):

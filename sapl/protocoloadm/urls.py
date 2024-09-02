@@ -22,7 +22,8 @@ from sapl.protocoloadm.views import (
     TramitacaoEmLoteAdmView, AcompanhamentoExcluirView,
     AcompanhamentoConfirmarView, AcompanhamentoDocumentoView,
     ProtocoloRedirectConteudoView, ProtocoloDocumentoAcessorioView,
-    ProtocoloDocumentoView, ProtocoloHomologarView)
+    ProtocoloDocumentoView, ProtocoloHomologarView, VinculoDocAdminMateriaCrud,
+    VinculoDocAdminMateriaEmLoteView)
 
 from .apps import AppConfig
 
@@ -33,10 +34,15 @@ urlpatterns_documento_administrativo = [
         include(DocumentoAdministrativoCrud.get_urls() +
                 AnexadoCrud.get_urls() +
                 TramitacaoAdmCrud.get_urls() +
-                DocumentoAcessorioAdministrativoCrud.get_urls())),
+                DocumentoAcessorioAdministrativoCrud.get_urls() +
+                VinculoDocAdminMateriaCrud.get_urls())),
 
     url(r'^doc/(?P<pk>\d+)/anexado_em_lote', DocumentoAnexadoEmLoteView.as_view(),
         name='anexado_em_lote'),
+
+    url(r'^docadm/(?P<pk>\d+)/vinculo-em-lote', VinculoDocAdminMateriaEmLoteView.as_view(),
+        name='vinculodocadminmateria_em_lote'),
+
 ]
 
 urlpatterns_protocolo = [

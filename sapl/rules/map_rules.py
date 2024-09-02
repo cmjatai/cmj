@@ -71,6 +71,7 @@ rules_group_administrativo = {
         (protocoloadm.DocumentoAcessorioAdministrativo, __base__, set()),
         (protocoloadm.TramitacaoAdministrativo, __base__, set()),
         (protocoloadm.TipoDocumentoAdministrativo, __base__, set()),
+
     ]
 }
 
