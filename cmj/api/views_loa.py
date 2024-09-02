@@ -2,27 +2,21 @@ from decimal import Decimal
 import logging
 
 from django.apps.registry import apps
-from django.conf import settings
 from django.db.models import Q
 from django.http.response import HttpResponse
 from django.template.loader import render_to_string
 from django.utils.text import slugify
 import pymupdf
-from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
-from rest_framework.serializers import ModelSerializer
-from rest_framework.viewsets import ViewSet
 
 from cmj.loa.models import OficioAjusteLoa, EmendaLoa, Loa, EmendaLoaParlamentar,\
     DespesaConsulta, EmendaLoaRegistroContabil
-from cmj.settings.medias import MEDIA_URL
 from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize
 from sapl.api.mixins import ResponseFileMixin
 from sapl.api.permissions import SaplModelPermissions
 from sapl.api.serializers import SaplSerializerMixin
-from sapl.base.models import CasaLegislativa
 from sapl.parlamentares.models import Parlamentar
 from sapl.relatorios.views import make_pdf
 
@@ -139,7 +133,7 @@ class _EmendaLoaViewSet:
         return self._art
 
     @action(detail=True)
-    def preview(self, request, *args, **kwargs):
+    def view(self, request, *args, **kwargs):
         #base_url = settings.MEDIA_ROOT if settings.DEBUG else request.build_absolute_uri()
         base_url = request.build_absolute_uri()
 
@@ -175,7 +169,9 @@ class _EmendaLoaViewSet:
             p = 0
 
         d2b = doc
+        ext = 'pdf'
         if p:
+            ext = 'png'
             p -= 1
             page = doc[p % len(doc)]
             d2b = page.get_pixmap(dpi=300)
@@ -184,8 +180,22 @@ class _EmendaLoaViewSet:
         doc.close()
 
         response = HttpResponse(
-            bresponse, content_type='image/png' if p else 'application/pdf')
+            bresponse,
+            content_type='image/png' if p else 'application/pdf'
+        )
+        response['Content-Disposition'] = f'inline; filename="emenda_{el.id}.{ext}"'
+        response['Cache-Control'] = 'no-cache'
+        response['Pragma'] = 'no-cache'
+        response['Expires'] = 0
         return response
+
+        # if 'docx' in request.GET:
+        #    cv = Converter(stream=bresponse)
+        #    output = io.BytesIO()
+        #    br = cv.convert(output)
+        #    cv.close()
+        #    output.seek(0)
+        # return HttpResponse(output.read(), content_type='application/docx')
 
 
 @customize(DespesaConsulta)
