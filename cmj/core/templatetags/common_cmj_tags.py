@@ -498,3 +498,8 @@ def valor_por_extenso(valor):
 @register.filter
 def valor_str(valor):
     return formats.number_format(valor, force_grouping=True)
+
+
+@register.filter
+def valor_abs_str(valor):
+    return formats.number_format(valor.copy_abs(), force_grouping=True)

@@ -179,6 +179,14 @@ class EmendaLoa(models.Model):
     finalidade = models.TextField(
         verbose_name=_("Finalidade"))
 
+    prefixo_indicacao = models.CharField(
+        verbose_name=_('Prefixo Ind.'), max_length=30,
+        blank=True, default='o(a)')
+
+    prefixo_finalidade = models.CharField(
+        verbose_name=_("Prefixo Fin."), max_length=30,
+        blank=True, default='destinado a')
+
     loa = models.ForeignKey(
         Loa,
         verbose_name=_('Loa - Emendas Impositivas'),

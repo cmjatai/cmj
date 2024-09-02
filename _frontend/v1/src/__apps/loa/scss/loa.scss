@@ -80,6 +80,18 @@
     }
   }
   &.emendaloa-update {
+    form {
+      $mp: 8px;
+      .row {
+        margin-left: $mp * -1;
+        margin-right: $mp * -1;;
+
+        [class^=col] {
+          padding-left: $mp;
+          padding-right: $mp;
+        }
+      }
+    }
     .container-preview {
       margin: 10px 0;
       width: 100%;

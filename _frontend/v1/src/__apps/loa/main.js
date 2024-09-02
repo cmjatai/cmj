@@ -35,6 +35,11 @@ window.AppLOA = function () {
 
     const loadPreview = function () {
       $('.container-preview').html(`
+        <div class="inner-preview">
+          <a class="w-100" target="_blank" href="${urlBase}/view/">
+            <img src="${urlBase}/view/?page=1&u=${Date.now()}"/>
+          </a>
+        </div>
         <div class="btn-toolbar justify-content-between">
           <div class="btn-group btn-group-sm">
             <label for="id_lineHeight">
@@ -48,11 +53,6 @@ window.AppLOA = function () {
                 id="id_lineHeight">
             </label>
           </div>
-        </div>
-        <div class="inner-preview">
-          <a class="w-100" target="_blank" href="${urlBase}/preview/">
-            <img src="${urlBase}/preview/?page=1&u=${Date.now()}"/>
-          </a>
         </div>
       `)
     }
@@ -224,7 +224,7 @@ window.AppLOA = function () {
         formData['parlamentar_id'] = parlamentar_id
         action = '/updatevalorparlamentar/'
       } else if (field === 'lineHeight') {
-        preview.src = `${urlBase}/preview/?page=1&lineHeight=${value}&u=${Date.now()}`
+        preview.src = `${urlBase}/view/?page=1&lineHeight=${value}&u=${Date.now()}`
         return
       } else {
         formData[field] = value
@@ -234,7 +234,7 @@ window.AppLOA = function () {
         .then((response) => {
           form.find('input[name="lineHeight"]').val(response.data.metadata.style.lineHeight)
           form.find('input[name="valor"]').val(response.data.valor)
-          preview.src = `${urlBase}/preview/?page=1&u=${Date.now()}`
+          preview.src = `${urlBase}/view/?page=1&u=${Date.now()}`
         })
         .catch(() => {
         })

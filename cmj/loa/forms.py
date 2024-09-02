@@ -276,8 +276,8 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         fields = [
             'tipo', 'fase', 'valor',
             'materia', 'tipo_materia', 'numero_materia', 'ano_materia',
-            'indicacao',
-            'finalidade',
+            'prefixo_indicacao', 'indicacao',
+            'prefixo_finalidade', 'finalidade',
             'parlamentares__valor',
             'busca_despesa', 'ano_loa', 'registrocontabil_set'
         ]
@@ -307,8 +307,10 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         ])
 
         row3 = [
-            ('indicacao', 12),
-            ('finalidade', 12),
+            ('prefixo_indicacao', 3),
+            ('indicacao', 9),
+            ('prefixo_finalidade', 3),
+            ('finalidade', 9),
         ]
         if not full_editor:
             row3.append(('parlamentares__valor', 12))
