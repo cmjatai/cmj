@@ -262,6 +262,8 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
     despesa_codigo = forms.CharField(
         label='Código', required=False,)
 
+    despesa_orgao = forms.CharField(
+        label='Orgão', required=False,)
     despesa_unidade = forms.CharField(
         label='Unidade', required=False,)
 
@@ -323,9 +325,10 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
             row4_1 = to_row([
                 ('busca_despesa', 3),
 
+                ('despesa_orgao', 2),
                 ('despesa_unidade', 2),
-                ('despesa_codigo', 4),
-                ('despesa_natureza', 3),
+                ('despesa_codigo', 3),
+                ('despesa_natureza', 2),
                 ('valor_despesa', 3),
                 ('despesa_especificacao', 'col'),
                 (HTML('''

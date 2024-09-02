@@ -2,17 +2,22 @@ from decimal import Decimal
 import logging
 
 from django.apps.registry import apps
+from django.core.validators import RegexValidator
 from django.db.models import Q
+from django.forms.models import model_to_dict
 from django.http.response import HttpResponse
 from django.template.loader import render_to_string
 from django.utils.text import slugify
+from django.utils.translation import gettext_lazy as _
 import pymupdf
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
+from rest_framework.fields import RegexField, DecimalField, CharField
 from rest_framework.response import Response
 
 from cmj.loa.models import OficioAjusteLoa, EmendaLoa, Loa, EmendaLoaParlamentar,\
-    DespesaConsulta, EmendaLoaRegistroContabil
+    DespesaConsulta, EmendaLoaRegistroContabil, UnidadeOrcamentaria, Despesa,\
+    Orgao, Funcao, SubFuncao, Programa, Acao, Natureza
 from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize
 from sapl.api.mixins import ResponseFileMixin
 from sapl.api.permissions import SaplModelPermissions
@@ -230,10 +235,31 @@ class _DespesaConsulta:
 
 class EmendaLoaRegistroContabilSerializer(SaplSerializerMixin):
 
-    #unidade = serializers.SerializerMethodField()
-    #natureza = serializers.SerializerMethodField()
-    #codigo = serializers.SerializerMethodField()
-    #especificacao = serializers.SerializerMethodField()
+    class RegexLocalField(CharField):
+        def __init__(self, regex, **kwargs):
+            super().__init__(**kwargs)
+            self.validator = RegexValidator(
+                regex, message=self.error_messages['invalid'])
+            self.validators.append(self.validator)
+
+    codigo = RegexLocalField(
+        r'(?P<funcao>\d{2})\.(?P<subfuncao>\d{3})'
+        r'\.(?P<programa>\d{4})\.(?P<acao>\d\.\d{3})$', error_messages={
+            'invalid': _('O campo "Código" deve serguir o padrão "99.999.9999.9.999".')})
+
+    natureza = RegexLocalField(r'^(\d{1,2}\.\d{1,2}\.\d{2}\.\d{2}\.\d{2})$', error_messages={
+        'invalid': _('O campo "Natureza" deve serguir o padrão "x9.x9.99.99.99". Sendo "x" numérico e opcional.')})
+
+    unidade = RegexLocalField(r'^(\d{2})$', error_messages={
+        'invalid': _('O campo "Unidade Orçamentária" deve serguir o padrão "99".')})
+
+    orgao = RegexLocalField(r'^(\d{2})$', error_messages={
+        'invalid': _('O campo "Órgão" deve serguir o padrão "99".')})
+
+    valor = DecimalField(14, 2, error_messages={
+        'invalid': _('O campo "Valor da Despesa" deve ser prenchido e seguir o formado 999999,99. Valores negativos serão direcionados ao Art. 1º, valores positivos ao Art. 2º.')})
+
+    especificacao = CharField()
 
     class Meta:
         model = EmendaLoaRegistroContabil
@@ -242,44 +268,128 @@ class EmendaLoaRegistroContabilSerializer(SaplSerializerMixin):
             'id',
             'emendaloa',
             'despesa',
-            #'codigo',
-            # 'unidade',
-            #'especificacao',
-            #'natureza',
+            'codigo',
+            'orgao',
+            'unidade',
+            'especificacao',
+            'natureza',
             'valor'
         )
 
     def __init__(self, *args, **kwargs):
         return super().__init__(*args, **kwargs)
 
+    def validate(self, attrs):
+        loa_id = attrs['emendaloa'].loa_id
+
+        codigo = self.fields.fields['codigo'].validator.regex.match(
+            attrs['codigo']).groupdict()
+
+        if not Orgao.objects.filter(codigo=attrs['orgao'], loa_id=loa_id).exists():
+            raise ValidationError('Órgão não encontrado nos anexos da LOA.')
+
+        if not UnidadeOrcamentaria.objects.filter(
+                codigo=attrs['unidade'],
+                orgao__codigo=attrs['orgao'],
+                loa_id=loa_id
+        ).exists():
+            raise ValidationError(
+                'Unidade Orçamentária no Órgão informado não encontrada '
+                'nos anexos da LOA.')
+
+        if not Funcao.objects.filter(codigo=codigo['funcao'], loa_id=loa_id).exists():
+            raise ValidationError(
+                'Função não encontrada na base de funções.'
+            )
+
+        if not SubFuncao.objects.filter(
+                codigo=codigo['subfuncao'],
+                loa_id=loa_id
+        ).exists():
+            raise ValidationError(
+                'SubFunção não encontrada na base de subfunções.'
+            )
+
+        return attrs
+
     def validate_valor(self, obj, *args, **kwargs):
         if obj == Decimal('0.00'):
             raise ValidationError(
                 'Valor da Despesa deve ser preenchido. '
-                'Valores negativos para dedução a ser lançada o Art. 1º, '
-                'ou valores positivos que serão registrados no Art. 2º.')
+                'Valores negativos serão lançados no Art. 1º, '
+                'e valores positivos no Art. 2º.')
 
         return obj
-
-    # def get_codigo(self, obj):
-    #    return obj.unidade.codigo
-
-    # def get_especificao(self, obj):
-    #    return obj.unidade.codigo
-
-    # def get_unidade(self, obj):
-    #    return obj.unidade.codigo
-
-    # def get_natureza(self, obj):
-    #    return obj.natureza.codigo
 
     def create(self, validated_data):
         despesa = validated_data.get('despesa', None)
 
+        v = validated_data
         if not despesa:
-            pass
+            loa_id = v['emendaloa'].loa_id
 
-        return SaplSerializerMixin.create(self, validated_data)
+            codigo = self.fields.fields['codigo'].validator.regex.match(
+                v['codigo']).groupdict()
+
+            unidade = UnidadeOrcamentaria.objects.filter(
+                codigo=v['unidade'], orgao__codigo=v['orgao'], loa_id=loa_id
+            ).first()
+
+            funcao = Funcao.objects.filter(
+                codigo=codigo['funcao'], loa_id=loa_id
+            ).first()
+
+            subfuncao = SubFuncao.objects.filter(
+                codigo=codigo['subfuncao'], loa_id=loa_id
+            ).first()
+
+            programa, created = Programa.objects.get_or_create(
+                codigo=codigo['programa'], loa_id=loa_id
+            )
+
+            acao, created = Acao.objects.get_or_create(
+                codigo=codigo['acao'], loa_id=loa_id
+            )
+            if created:
+                acao.especificacao = v['especificacao']
+                acao.save()
+
+            natureza, created = Natureza.objects.get_or_create(
+                codigo=v['natureza'], loa_id=loa_id
+            )
+
+            d = Despesa()
+            d.loa = v['emendaloa'].loa
+            d.orgao = unidade.orgao
+            d.unidade = unidade
+            d.funcao = funcao
+            d.subfuncao = subfuncao
+            d.programa = programa
+            d.acao = acao
+            d.natureza = natureza
+
+            ddict = d.__dict__
+            ddict.pop('id')
+            ddict.pop('_state')
+            despesa, created = Despesa.objects.get_or_create(**ddict)
+
+        validated_data = {
+            'despesa': despesa,
+            'emendaloa': v['emendaloa'],
+            'valor': v['valor']
+        }
+
+        elrc = EmendaLoaRegistroContabil()
+        elrc.emendaloa = validated_data['emendaloa']
+        elrc.despesa = validated_data['despesa']
+        elrc.valor = validated_data['valor']
+        elrc.save()
+
+        vkeys_clear = set(v.keys()) - set(validated_data.keys())
+        for k in vkeys_clear:
+            setattr(elrc, k, v[k])
+
+        return elrc
 
 
 @customize(EmendaLoaRegistroContabil)

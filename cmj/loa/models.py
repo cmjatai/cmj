@@ -180,11 +180,11 @@ class EmendaLoa(models.Model):
         verbose_name=_("Finalidade"))
 
     prefixo_indicacao = models.CharField(
-        verbose_name=_('Prefixo Ind.'), max_length=30,
+        verbose_name=_('Prefixo da Indicação'), max_length=30,
         blank=True, default='o(a)')
 
     prefixo_finalidade = models.CharField(
-        verbose_name=_("Prefixo Fin."), max_length=30,
+        verbose_name=_("Prefixo da Finalidade"), max_length=30,
         blank=True, default='destinado a')
 
     loa = models.ForeignKey(
@@ -449,7 +449,7 @@ class ElementoBase(models.Model):
 
     especificacao = models.CharField(
         max_length=256,
-        verbose_name=_("Especificação"))
+        verbose_name=_("Especificação"), default='', blank=True)
 
     # metadata = JSONField(
     #    verbose_name=_('Metadados'),
@@ -457,6 +457,9 @@ class ElementoBase(models.Model):
 
     class Meta:
         abstract = True
+
+    def __str__(self):
+        return f'{self.codigo} - {self.especificacao}'
 
 
 class Orgao(ElementoBase):
@@ -723,7 +726,7 @@ class EmendaLoaRegistroContabil(models.Model):
         verbose_name=_('Valor (R$)'),
     )
 
-    orgao = models.ForeignKey(
+    """orgao = models.ForeignKey(
         Orgao,
         blank=True, null=True, default=None,
         verbose_name=_('Órgão'),
@@ -742,7 +745,7 @@ class EmendaLoaRegistroContabil(models.Model):
         blank=True, null=True, default=None,
         verbose_name=_('Natureza'),
         related_name='registrocontabil_set',
-        on_delete=CASCADE)
+        on_delete=CASCADE)"""
 
     def __str__(self):
         valor_str = formats.number_format(self.valor, force_grouping=True)

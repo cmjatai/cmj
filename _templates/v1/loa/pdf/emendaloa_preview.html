@@ -32,7 +32,7 @@
 
   {% with object.loa.materia as mat_loa %}
     <small>
-      Ao {{mat_loa.tipo}} nº {{mat_loa.numero}}, de {{ mat_loa.data_apresentacao|date:"d \d\e F \d\e Y" }},
+      Ao {{mat_loa.tipo|default:"PROJETO"}} nº {{mat_loa.numero}}, de {{ mat_loa.data_apresentacao|date:"d \d\e F \d\e Y" }},
       que {{mat_loa.ementa}}
     </small>
   {% endwith %}
@@ -76,32 +76,27 @@
     {% for rc in object.registrocontabil_set.all_insercoes %}
         Unidade Orçamentária {{rc.despesa.unidade.especificacao}} /
         Código: {{rc.despesa.consulta.codigo}} - {{rc.despesa.consulta.especificacao}} /
-        Natureza da Despesa: {{rc.despesa.consulta.cod_natureza}}
-          {% if object.registrocontabil_set.all_insercoes.count > 1 %}
+        Natureza da Despesa: {{rc.despesa.consulta.cod_natureza}}{% if object.registrocontabil_set.all_insercoes.count > 1 %}
           - Valor: R$ {{rc.valor|valor_str }}{% endif %}{% if not forloop.last %} // {% endif %}{% empty %}XXXXXXXXXX{% endfor %},
           {{object.prefixo_finalidade}} {{object.finalidade}}.
   </p>
-
-
 
   {% if object.parlamentares.count > 1 %}
     <p class="art">
       <span class="rotulo">Art {{ view.art }}º - </span>O valor de
       <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}}),</strong>
-      será divido entre os vereadores subscritores, sendo utilizado:
-
-
-
+      será divido entre
+      {% if object.parlamentares.isonly_sexo_feminino %}as{% else %}os{% endif %}
+      vereador{% if object.parlamentares.isonly_sexo_feminino %}as{% else %}es{% endif %}
+      subscritor{% if object.parlamentares.isonly_sexo_feminino %}as{% else %}es{% endif %},
+      sendo utilizado:
         {% for elp in object.emendaloaparlamentar_set.all %}
+          <strong> R$ {{ elp.valor|valor_str }} ({{elp.valor|valor_por_extenso}}),</strong>
 
-
-            <strong> R$ {{ elp.valor|valor_str }} ({{elp.valor|valor_por_extenso}}),</strong>
-
-            do Vereador {{elp.parlamentar.nome_parlamentar}}{% if not forloop.last %};{% else %}.{% endif %}
-
+          d{% if elp.parlamentar.sexo == 'F' %}a{% else %}o{% endif %}
+          Vereador{% if elp.parlamentar.sexo == 'F' %}a{% endif %}
+          {{elp.parlamentar.nome_parlamentar}}{% if not forloop.last %};{% else %}.{% endif %}
         {% endfor %}
-
-
     </p>
   {% endif %}
 

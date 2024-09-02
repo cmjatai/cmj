@@ -88,6 +88,7 @@ window.AppLOA = function () {
       formData.emendaloa = pk
       formData.despesa = pk_despesa
       formData.codigo = form.find('input[name="despesa_codigo"]').val()
+      formData.orgao = form.find('input[name="despesa_orgao"]').val()
       formData.unidade = form.find('input[name="despesa_unidade"]').val()
       formData.especificacao = form.find('input[name="despesa_especificacao"]').val()
       formData.natureza = form.find('input[name="despesa_natureza"]').val()
@@ -97,7 +98,11 @@ window.AppLOA = function () {
       axios.post(`/api/loa/emendaloaregistrocontabil/create_for_emendaloa_update/`, formData)
         .then((response) => {
           add_registro[0].data = null
-          form.find('input[name^="despesa_"], input[name$="_despesa"]').val('').attr('readonly', false)
+          form.find('input[name^="despesa_"], input[name$="_despesa"]')
+            .val('')
+            .attr('readonly', false)
+            .removeClass('is-invalid')
+
           $('<div class="alert alert-info>Registro de Despesa Adicionado com sucesso.</div>'
           ).appendTo(inner)
 
@@ -121,7 +126,7 @@ window.AppLOA = function () {
           form.trigger('change')
         })
         .catch((error) => {
-          if (_.isString(error.response.data)) {
+          if (_.isString(error.response) || _.isString(error.response.data)) {
             $(`<div class="alert alert-danger">
               ${error.message}
               </div>`
@@ -129,6 +134,8 @@ window.AppLOA = function () {
             return
           }
           _.forOwn(error.response.data, function (value, key) {
+            form.find(`input[name=despesa_${key}], input[name=${key}_despesa]`).addClass('is-invalid')
+
             $(`<div class="alert alert-danger">
               ${_.isString(value) ? value : value[0]}
               </div>`
@@ -144,6 +151,7 @@ window.AppLOA = function () {
       if (event.target.value.trim() === '') {
         add_registro[0].data = null
         form.find('input[name^="despesa_"]').attr('readonly', false)
+        form.find('input[name^="despesa_"], input[name$="_despesa"]').removeClass('is-invalid')
         busca_render.html('')
         return
       }
@@ -177,6 +185,7 @@ window.AppLOA = function () {
 
             item.click((event) => {
               form.find('input[name="despesa_codigo"]').val(value.codigo)
+              form.find('input[name="despesa_orgao"]').val(value.cod_orgao)
               form.find('input[name="despesa_unidade"]').val(value.cod_unidade)
               form.find('input[name="despesa_especificacao"]').val(value.especificacao)
               form.find('input[name="despesa_natureza"]').val(value.cod_natureza)
