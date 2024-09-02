@@ -97,9 +97,8 @@ window.AppLOA = function () {
       axios.post(`/api/loa/emendaloaregistrocontabil/create_for_emendaloa_update/`, formData)
         .then((response) => {
           add_registro[0].data = null
-          form.find('input[name^="despesa_"]').attr('readonly', false)
-          form.find('input[name^="despesa_"], input[name="valor_despesa"]').val('')
-          $('<div class="alert alert-info">Registro de Despesa Adicionado com sucesso.</div>'
+          form.find('input[name^="despesa_"], input[name$="_despesa"]').val('').attr('readonly', false)
+          $('<div class="alert alert-info>Registro de Despesa Adicionado com sucesso.</div>'
           ).appendTo(inner)
 
           let rcs = form.find('input[name="registrocontabil_set"]')
@@ -118,8 +117,8 @@ window.AppLOA = function () {
           } else {
             checkboxRc.appendTo(form.find('#div_id_registrocontabil_set > div'))
           }
-
           refreshChangeRegistroDespesa()
+          form.trigger('change')
         })
         .catch((error) => {
           if (_.isString(error.response.data)) {
@@ -142,7 +141,7 @@ window.AppLOA = function () {
     })
 
     busca_despesa.keyup((event) => {
-      if (event.target.value === '') {
+      if (event.target.value.trim() === '') {
         add_registro[0].data = null
         form.find('input[name^="despesa_"]').attr('readonly', false)
         busca_render.html('')
@@ -194,9 +193,18 @@ window.AppLOA = function () {
         })
     })
 
-    form.keydown((event) => {
+    form.keypress((event) => {
       if (event.keyCode === 13) {
         event.preventDefault()
+
+        if (event.target === busca_despesa[0]) {
+          const items = busca_render.find('.inner')
+          const children = items.children()
+          if (children.length === 1) {
+            children.trigger('click')
+          }
+        }
+
         return false
       }
     })

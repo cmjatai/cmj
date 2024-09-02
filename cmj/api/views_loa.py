@@ -67,7 +67,7 @@ class _EmendaLoaViewSet:
 
             method = request.method.lower()
             if hasattr(self, f'has_permission_{method}'):
-                return getattr(self, f'has_permission_{method}')(has_perm, u)
+                return getattr(self, f'has_permission_{method}')(u)
 
             if request.method == 'POST':
 
@@ -276,10 +276,7 @@ class EmendaLoaRegistroContabilSerializer(SaplSerializerMixin):
 class _EmendaLoaRegistroContabilViewSet:
 
     class EmendaLoaRegistroContabilPermission(_EmendaLoaViewSet.EmendaLoaPermission):
-        def has_permission_post(self, has_perm, user):
-            if has_perm:
-                return has_perm
-
+        def has_permission_post(self, user):
             return user.has_perm('loa.emendaloa_full_editor')
 
         has_permission_delete = has_permission_post
@@ -291,6 +288,7 @@ class _EmendaLoaRegistroContabilViewSet:
         self.serializer_class = EmendaLoaRegistroContabilSerializer
         try:
             return super().create(request, *args, **kwargs)
+
         except ValidationError as verror:
             if "code='unique'" in str(verror):
                 raise ValidationError(
@@ -298,5 +296,4 @@ class _EmendaLoaRegistroContabilViewSet:
             raise ValidationError(verror.detail)
 
         except Exception as exc:
-
             raise Exception(exc)

@@ -354,14 +354,14 @@ class LoaCrud(Crud):
                         ja_destinado='Valores<br>Já Destinados' if dsjd else '',
                         impedimento_tecnico='Impedimentos<br>Técnicos' if dsit else '',
                         sem_destinacao=(
-                            'Sem Destinação' if not l.materia or l.materia and not l.materia.normajuridica else 'Remanescente') if dssd else '',
+                            'Sem Destinação' if not l.materia or l.materia and not l.materia.normajuridica() else 'Remanescente') if dssd else '',
                     ),
                     diversos=dict(
                         num_columns=ddjd + ddit + ddsd,
                         ja_destinado='Valores<br>Já Destinados' if ddjd else '',
                         impedimento_tecnico='Impedimentos<br>Técnicos' if ddit else '',
                         sem_destinacao=(
-                            'Sem Destinação' if not l.materia or l.materia and not l.materia.normajuridica else 'Remanescente') if ddsd else '',
+                            'Sem Destinação' if not l.materia or l.materia and not l.materia.normajuridica() else 'Remanescente') if ddsd else '',
                     )
                 )
             )

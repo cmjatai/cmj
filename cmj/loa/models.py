@@ -4,6 +4,7 @@ from django.contrib.postgres.fields.jsonb import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.db.models import manager
 from django.db.models.aggregates import Sum
 from django.db.models.deletion import PROTECT, CASCADE
 from django.utils import formats
@@ -677,7 +678,24 @@ class DespesaConsulta(models.Model):
         return f'{self.codigo}:{self.cod_natureza} - {self.especificacao}'
 
 
+class EmendaLoaRegistroContabilManager(manager.Manager):
+
+    use_for_related_fields = True
+
+    def all_deducoes(self):
+        qs = self.get_queryset()
+        qs = qs.filter(valor__lt=Decimal('0.00'))
+        return qs
+
+    def all_insercoes(self):
+        qs = self.get_queryset()
+        qs = qs.filter(valor__gt=Decimal('0.00'))
+        return qs
+
+
 class EmendaLoaRegistroContabil(models.Model):
+
+    objects = EmendaLoaRegistroContabilManager()
 
     emendaloa = models.ForeignKey(
         EmendaLoa,

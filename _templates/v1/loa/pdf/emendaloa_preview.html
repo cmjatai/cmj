@@ -32,10 +32,9 @@
 
   {% with object.loa.materia as mat_loa %}
     <small>
-      Ao {{mat_loa}}, de {{ mat_loa.data_apresentacao|date:"d \d\e F \d\e Y" }},
+      Ao {{mat_loa.tipo}} nº {{mat_loa.numero}}, de {{ mat_loa.data_apresentacao|date:"d \d\e F \d\e Y" }},
       que {{mat_loa.ementa}}
     </small>
-
   {% endwith %}
 
   <h5>
@@ -63,17 +62,24 @@
 
   <p class="art">
     <span class="rotulo">Art {{ view.art }}º - </span>Deduz-se da
-    {% for rc in object.registrocontabil_set.all %}
+    {% for rc in object.registrocontabil_set.all_deducoes %}
         Unidade Orçamentária {{rc.despesa.unidade.especificacao}} /
         Código: {{rc.despesa.consulta.codigo}} - {{rc.despesa.consulta.especificacao}} /
         Natureza da Despesa: {{rc.despesa.consulta.cod_natureza}} -
-        Valor: R$ {{rc.valor|valor_str }}{% if not forloop.last %} // {% endif %}{% endfor %}, o valor de <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}}),</strong>
+        Valor: R$ {{rc.valor|valor_str }}{% if not forloop.last %} // {% endif %}{% empty %}XXXXXXXXXX{% endfor %}, o valor de <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}}),</strong>
   </p>
 
   <p class="art">
     <span class="rotulo">Art {{ view.art }}º - </span>O valor deduzido de
     <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}}),</strong>
-    será...
+    será inserido na
+    {% for rc in object.registrocontabil_set.all_insercoes %}
+        Unidade Orçamentária {{rc.despesa.unidade.especificacao}} /
+        Código: {{rc.despesa.consulta.codigo}} - {{rc.despesa.consulta.especificacao}} /
+        Natureza da Despesa: {{rc.despesa.consulta.cod_natureza}}
+          {% if object.registrocontabil_set.all_insercoes.count > 1 %}
+          - Valor: R$ {{rc.valor|valor_str }}{% endif %}{% if not forloop.last %} // {% endif %}{% empty %}XXXXXXXXXX{% endfor %},
+    para a {{object.finalidade}}.
   </p>
 
 

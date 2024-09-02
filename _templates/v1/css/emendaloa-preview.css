@@ -21,7 +21,7 @@ footer {
 }
 
 .ementa {
-  margin-left: 7cm;
+  margin: 1cm 0cm 1cm 6cm;
 }
 .data {
   text-align: right;
@@ -46,6 +46,7 @@ h3, h4 {
   padding-top: 1in;
   text-align: center;
   font-weight: bold;
+  line-height: 1.15;
 }
 .assinatura small {
   font-style: italic;
