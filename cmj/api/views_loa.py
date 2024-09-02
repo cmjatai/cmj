@@ -8,8 +8,11 @@ from django.http.response import HttpResponse
 from django.template.loader import render_to_string
 from django.utils.text import slugify
 import pymupdf
+from rest_framework import serializers
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
+from rest_framework.serializers import ModelSerializer
 from rest_framework.viewsets import ViewSet
 
 from cmj.loa.models import OficioAjusteLoa, EmendaLoa, Loa, EmendaLoaParlamentar,\
@@ -18,6 +21,7 @@ from cmj.settings.medias import MEDIA_URL
 from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize
 from sapl.api.mixins import ResponseFileMixin
 from sapl.api.permissions import SaplModelPermissions
+from sapl.api.serializers import SaplSerializerMixin
 from sapl.base.models import CasaLegislativa
 from sapl.parlamentares.models import Parlamentar
 from sapl.relatorios.views import make_pdf
@@ -61,9 +65,11 @@ class _EmendaLoaViewSet:
             if u.is_anonymous:
                 return False
 
+            method = request.method.lower()
+            if hasattr(self, f'has_permission_{method}'):
+                return getattr(self, f'has_permission_{method}')(has_perm, u)
+
             if request.method == 'POST':
-                if hasattr(self, 'has_permission_post'):
-                    return self.has_permission_post(has_perm, u)
 
                 data = request.data
 
@@ -212,6 +218,60 @@ class _DespesaConsulta:
         return self.list(request, *args, **kwargs)
 
 
+class EmendaLoaRegistroContabilSerializer(SaplSerializerMixin):
+
+    #unidade = serializers.SerializerMethodField()
+    #natureza = serializers.SerializerMethodField()
+    #codigo = serializers.SerializerMethodField()
+    #especificacao = serializers.SerializerMethodField()
+
+    class Meta:
+        model = EmendaLoaRegistroContabil
+        fields = (
+            '__str__',
+            'id',
+            'emendaloa',
+            'despesa',
+            #'codigo',
+            # 'unidade',
+            #'especificacao',
+            #'natureza',
+            'valor'
+        )
+
+    def __init__(self, *args, **kwargs):
+        return super().__init__(*args, **kwargs)
+
+    def validate_valor(self, obj, *args, **kwargs):
+        if obj == Decimal('0.00'):
+            raise ValidationError(
+                'Valor da Despesa deve ser preenchido. '
+                'Valores negativos para dedução a ser lançada o Art. 1º, '
+                'ou valores positivos que serão registrados no Art. 2º.')
+
+        return obj
+
+    # def get_codigo(self, obj):
+    #    return obj.unidade.codigo
+
+    # def get_especificao(self, obj):
+    #    return obj.unidade.codigo
+
+    # def get_unidade(self, obj):
+    #    return obj.unidade.codigo
+
+    # def get_natureza(self, obj):
+    #    return obj.natureza.codigo
+
+    def create(self, validated_data):
+        despesa = validated_data.get('despesa', None)
+
+        if not despesa:
+            pass
+
+        return SaplSerializerMixin.create(self, validated_data)
+
+
 @customize(EmendaLoaRegistroContabil)
 class _EmendaLoaRegistroContabilViewSet:
 
@@ -222,4 +282,21 @@ class _EmendaLoaRegistroContabilViewSet:
 
             return user.has_perm('loa.emendaloa_full_editor')
 
+        has_permission_delete = has_permission_post
+
     permission_classes = (EmendaLoaRegistroContabilPermission, )
+
+    @action(methods=['post', ], detail=False)
+    def create_for_emendaloa_update(self, request, *args, **kwargs):
+        self.serializer_class = EmendaLoaRegistroContabilSerializer
+        try:
+            return super().create(request, *args, **kwargs)
+        except ValidationError as verror:
+            if "code='unique'" in str(verror):
+                raise ValidationError(
+                    'Já existe Registro desta Despesa nesta Emenda.')
+            raise ValidationError(verror.detail)
+
+        except Exception as exc:
+
+            raise Exception(exc)

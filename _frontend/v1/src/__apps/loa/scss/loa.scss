@@ -93,11 +93,15 @@
         background-color: white;
       }
     }
-    .render-busca {
+    .busca-render {
       .item {
         padding: 5px;
         cursor: pointer;
       }
+    }
+    #div_id_registrocontabil_set {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 70%;
     }
   }
   &.oficioajusteloa-detail {

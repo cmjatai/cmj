@@ -3,7 +3,7 @@ from decimal import Decimal, ROUND_DOWN, ROUND_HALF_DOWN
 import logging
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Fieldset, HTML, Div
+from crispy_forms.layout import Fieldset, HTML, Div, Button
 from django import forms
 from django.contrib.postgres.forms.array import SplitArrayField,\
     SplitArrayWidget
@@ -241,21 +241,35 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         required=False
     )
 
-    busca_despesa = forms.CharField(
-        label='', required=False,
-        help_text='Experimente buscar por partes de códigos (como por exemplo o código da ação) e/ou descrições existentes nos anexos da LOA.')
-
-    ano_loa = forms.CharField(
-        label='',
-        widget=forms.HiddenInput(),
-        required=False)
-
     registrocontabil_set = forms.ModelChoiceField(
         label='',
         required=False,
         queryset=EmendaLoaRegistroContabil.objects.all(),
         widget=forms.CheckboxSelectMultiple,
     )
+
+    ano_loa = forms.CharField(
+        label='',
+        widget=forms.HiddenInput(),
+        required=False)
+
+    busca_despesa = forms.CharField(
+        label='Buscar', required=False,)
+
+    valor_despesa = forms.DecimalField(
+        label='Valor da Despesa', required=False, max_digits=14, decimal_places=2,)
+
+    despesa_codigo = forms.CharField(
+        label='Código', required=False,)
+
+    despesa_unidade = forms.CharField(
+        label='Unidade', required=False,)
+
+    despesa_especificacao = forms.CharField(
+        label='Descrição da Ação', required=False,)
+
+    despesa_natureza = forms.CharField(
+        label='Natureza', required=False,)
 
     class Meta:
         model = EmendaLoa
@@ -306,7 +320,18 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         if full_editor or self.user.is_superuser:
             row4_1 = to_row([
                 ('busca_despesa', 3),
-                (Div(css_class='render-busca'), 9)
+
+                ('despesa_unidade', 2),
+                ('despesa_codigo', 4),
+                ('despesa_natureza', 3),
+                ('valor_despesa', 3),
+                ('despesa_especificacao', 'col'),
+                (HTML('''
+                    <button type="button" id="add_registro" class="btn btn-primary">+</button>
+                '''), 'col-1'),
+
+
+                (Div(css_class='busca-render'), 12)
 
             ])
             row4_2 = to_row([
@@ -315,7 +340,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
             ])
 
             row4 = to_row([
-                (Fieldset(_('Busca por registros de despesa'), row4_1), 12),
+                (Fieldset(_('Registrar Deduções e Inserções'), row4_1), 12),
                 (Fieldset(_('Registros das Despesas Orçamentárias'), row4_2), 12)
             ])
 
@@ -356,6 +381,8 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
         if full_editor or self.user.is_superuser:
             if self.instance.pk:
+                self.initial['valor_despesa'] = Decimal('0.00')
+
                 rclist = self.instance.registrocontabil_set.all()
                 self.fields['registrocontabil_set'].choices = [
                     (rc.id, str(rc)) for rc in rclist]

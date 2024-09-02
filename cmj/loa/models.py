@@ -727,7 +727,15 @@ class EmendaLoaRegistroContabil(models.Model):
         return formats.number_format(self.valor, force_grouping=True)
 
     class Meta:
-        verbose_name = _('Registro Contábeis de Dedução e Inserção em Emendas')
+        verbose_name = _('Registro Contábil de Dedução e Inserção em Emendas')
         verbose_name_plural = _(
-            'Registro Contábeis de Dedução e Inserção em Emendas')
+            'Registros Contábeis de Dedução e Inserção em Emendas')
         ordering = ['id']
+
+        unique_together = (
+            (
+                'emendaloa',
+                'despesa',
+            ),
+
+        )

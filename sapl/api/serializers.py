@@ -62,7 +62,7 @@ class ModelChoiceSerializer(ChoiceSerializer):
 
     def get_text(self, obj):
         return str(obj)
-
+ 
     def get_value(self, obj):
         return obj.id
 

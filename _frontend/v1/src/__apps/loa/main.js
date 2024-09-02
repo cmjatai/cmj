@@ -22,12 +22,17 @@ window.AppLOA = function () {
   instance.LoaCRUD = function () {}
 
   instance.EmendaLoaCRUD = function () {
-    const container = $('.container-loa.emendaloa-update, .container-loa.emendaloa-create')
+    const container = $('.container-loa.emendaloa-update')
+
     if (container.length === 0) {
       return
     }
+
+    const form = container.find('form')
+
     const pk = window.location.href.matchAll(/emendaloa\/(\d+)\//g).next().value[1]
     const urlBase = `/api/loa/emendaloa/${pk}`
+
     const loadPreview = function () {
       $('.container-preview').html(`
         <div class="btn-toolbar justify-content-between">
@@ -50,34 +55,109 @@ window.AppLOA = function () {
           </a>
         </div>
       `)
-      return this
     }
+
     loadPreview()
-
-    const img = $('.container-preview .inner-preview img')[0]
-    const form = container.find('form')
-    const ano_loa = form.find('input[name="ano_loa"')[0].value
-
-    const busca_despesa = form.find('input[name="busca_despesa"')
-
-    img.onload = function (event) {
-      img.style.opacity = 1
+    const preview = $('.container-preview .inner-preview img')[0]
+    preview.onload = function (event) {
+      preview.style.opacity = 1
     }
 
-    const render_busca = form.find('.render-busca')
+    const refreshChangeRegistroDespesa = () => {
+      const rcs = form.find('input[name="registrocontabil_set"]')
+      rcs.off('change')
+      rcs.change((event) => {
+        const pk = event.target.value
+        axios.delete(`/api/loa/emendaloaregistrocontabil/${pk}/`)
+          .then((response) => {
+            event.target.parentElement.remove()
+          })
+      })
+    }
+    refreshChangeRegistroDespesa()
+
+    const ano_loa = form.find('input[name="ano_loa"')[0].value
+    const busca_render = form.find('.busca-render')
+    const busca_despesa = form.find('input[name="busca_despesa"]')
+
+    const add_registro = form.find('#add_registro')
+    add_registro.click((event) => {
+      let pk_despesa = add_registro[0].data
+      console.log(pk_despesa)
+      let formData = {}
+      formData.emendaloa = pk
+      formData.despesa = pk_despesa
+      formData.codigo = form.find('input[name="despesa_codigo"]').val()
+      formData.unidade = form.find('input[name="despesa_unidade"]').val()
+      formData.especificacao = form.find('input[name="despesa_especificacao"]').val()
+      formData.natureza = form.find('input[name="despesa_natureza"]').val()
+      formData.valor = form.find('input[name="valor_despesa"]').val()
+      busca_render.html('')
+      const inner = $('<div class="inner"></div>')
+      axios.post(`/api/loa/emendaloaregistrocontabil/create_for_emendaloa_update/`, formData)
+        .then((response) => {
+          add_registro[0].data = null
+          form.find('input[name^="despesa_"]').attr('readonly', false)
+          form.find('input[name^="despesa_"], input[name="valor_despesa"]').val('')
+          $('<div class="alert alert-info">Registro de Despesa Adicionado com sucesso.</div>'
+          ).appendTo(inner)
+
+          let rcs = form.find('input[name="registrocontabil_set"]')
+
+          let checkboxRc = $(`
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" checked="checked" name="registrocontabil_set" id="id_registrocontabil_set_${rcs.length + 1}" value="${response.data.id}">
+              <label class="custom-control-label" for="id_registrocontabil_set_${rcs.length + 1}">
+                ${response.data.__str__}
+              </label>
+            </div>
+          `)
+
+          if (rcs.length > 0) {
+            checkboxRc.appendTo(rcs.last().parent().parent())
+          } else {
+            checkboxRc.appendTo(form.find('#div_id_registrocontabil_set > div'))
+          }
+
+          refreshChangeRegistroDespesa()
+        })
+        .catch((error) => {
+          if (_.isString(error.response.data)) {
+            $(`<div class="alert alert-danger">
+              ${error.message}
+              </div>`
+            ).appendTo(inner)
+            return
+          }
+          _.forOwn(error.response.data, function (value, key) {
+            $(`<div class="alert alert-danger">
+              ${_.isString(value) ? value : value[0]}
+              </div>`
+            ).appendTo(inner)
+          })
+        })
+        .finally(() => {
+          inner.appendTo(busca_render)
+        })
+    })
+
     busca_despesa.keyup((event) => {
       if (event.target.value === '') {
-        render_busca.html('')
+        add_registro[0].data = null
+        form.find('input[name^="despesa_"]').attr('readonly', false)
+        busca_render.html('')
         return
       }
       axios.get(`/api/loa/despesaconsulta/search/?page_size=5&ano=${ano_loa}&q=${event.target.value}`)
         .then((response) => {
-          render_busca.html('')
+          busca_render.html('')
           const inner = $('<div class="inner"></div>')
-          inner.appendTo(render_busca)
+          inner.appendTo(busca_render)
           if (_.isEmpty(response.data.results)) {
+            add_registro[0].data = null
+            form.find('input[name^="despesa_"]').attr('readonly', false)
             $(`<div class="alert alert-warning">
-              Nenhuma despesa encontrada nos anexos da LOA com esta informação. Você pode ainda fazer o registro manualmente no formulário abaixo.
+              Nenhuma despesa encontrada nos anexos da LOA com esta informação. Você pode ainda fazer o registro manualmente no formulário acima.
             </div>`).appendTo(inner)
           }
           let parts = event.target.value.trim().split(' ')
@@ -97,14 +177,16 @@ window.AppLOA = function () {
             let item = $(html).appendTo(inner)
 
             item.click((event) => {
+              form.find('input[name="despesa_codigo"]').val(value.codigo)
+              form.find('input[name="despesa_unidade"]').val(value.cod_unidade)
+              form.find('input[name="despesa_especificacao"]').val(value.especificacao)
+              form.find('input[name="despesa_natureza"]').val(value.cod_natureza)
+
+              form.find('input[name^="despesa_"]').attr('readonly', true)
               let pk_despesa = event.currentTarget.getAttribute('pk')
-              let formData = {}
-              formData.emendaloa = pk
-              formData.despesa = pk_despesa
-              axios.post(`/api/loa/emendaloaregistrocontabil/`, formData)
-                .then((response) => {
-                  console.log(response)
-                })
+
+              add_registro[0].data = pk_despesa
+              busca_render.html('')
             })
           })
         })
@@ -121,30 +203,30 @@ window.AppLOA = function () {
 
     form.change(function (event) {
       let formData = {}
-      let key = event.target.name
+      let field = event.target.name
       let value = event.target.value
 
       let action = '/'
 
-      img.style.opacity = 0.35
+      preview.style.opacity = 0.35
 
       let parlamentar_id = event.target.getAttribute('parlamentar_id')
       if (parlamentar_id !== null) {
         formData['valor'] = value
         formData['parlamentar_id'] = parlamentar_id
         action = '/updatevalorparlamentar/'
-      } else if (key === 'lineHeight') {
-        img.src = `${urlBase}/preview/?page=1&lineHeight=${value}&u=${Date.now()}`
+      } else if (field === 'lineHeight') {
+        preview.src = `${urlBase}/preview/?page=1&lineHeight=${value}&u=${Date.now()}`
         return
       } else {
-        formData[key] = value
+        formData[field] = value
       }
 
       axios.patch(`${urlBase}${action}`, formData)
         .then((response) => {
           form.find('input[name="lineHeight"]').val(response.data.metadata.style.lineHeight)
           form.find('input[name="valor"]').val(response.data.valor)
-          img.src = `${urlBase}/preview/?page=1&u=${Date.now()}`
+          preview.src = `${urlBase}/preview/?page=1&u=${Date.now()}`
         })
         .catch(() => {
         })
