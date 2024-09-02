@@ -496,39 +496,51 @@ window.DispositivoEdit = function () {
   }
 
   instance.reloadFunctionsDraggables = function () {
-    _$('.dpt-alts').sortable({
-      revert: true,
-      distance: 15,
-      start: function (event, ui) {
-      },
-      stop: function (event, ui) {
-        let pk = ui.item.attr('pk')
-        let bloco_pk = ui.item.closest('.dpt-alts').closest('.dpt').attr('pk')
+    const dptAlts = _$('.dpt-alts')
 
-        let url = pk + '/refresh?action=json_drag_move_dpt_alterado&index=' + ui.item.index() + '&bloco_pk=' + bloco_pk
-        _$.get(url).done(function (data) {
-          // console.log(pk + ' - ' + bloco_pk)
-          // reloadFunctionsForObjectsOfCompilacao();
-        })
-      }
-    })
+    if (dptAlts.length > 0 ) {
+      dptAlts.sortable({
+        connectWith: '.dpt-alts',
+        items: '.sorting-initialize',
+        revert: true,
+        distance: 15,
+        start: function (event, ui) {
+        },
+        stop: function (event, ui) {
+          let pk = ui.item.attr('pk')
+          let bloco_pk = ui.item.closest('.dpt-alts').closest('.dpt').attr('pk')
 
-    _$('.dpt-alts .dpt').draggable({
-      connectToSortable: '.dpt-alts',
-      revert: 'invalid',
-      zIndex: 1,
-      distance: 15,
-      drag: function (event, ui) {
-        // _$('.dpt-comp-selected').removeClass('dpt-comp-selected');
-        _$('.dpt-alts').addClass('drag')
-      },
-      stop: function (event, ui) {
-        _$('.dpt-alts').removeClass('drag')
-      }
-    })
+          let url = pk + '/refresh?action=json_drag_move_dpt_alterado&index=' + ui.item.index() + '&bloco_pk=' + bloco_pk
+          _$.get(url).done(function (data) {
+            // console.log(pk + ' - ' + bloco_pk)
+            // reloadFunctionsForObjectsOfCompilacao();
+          })
+        }
+      })
+      dptAlts.find('.dpt').one('mouseenter', function () {
+        $(this).addClass('sorting-initialize')
+        dptAlts.sortable('refresh')
+      })
 
-    _$('.dpt-alts').disableSelection()
+      _$('.dpt-alts .dpt').draggable({
+        connectToSortable: '.dpt-alts',
+        revert: 'invalid',
+        zIndex: 1,
+        distance: 15,
+        drag: function (event, ui) {
+          // _$('.dpt-comp-selected').removeClass('dpt-comp-selected');
+          _$('.dpt-alts').addClass('drag')
+        },
+        stop: function (event, ui) {
+          _$('.dpt-alts').removeClass('drag')
+        }
+      })
+      dptAlts.disableSelection()
+    } else {
+      console.warn("No '.dpt-alts' elements found to make sortable/draggable.")
+    }
   }
+
   instance.scrollTo = function (dpt) {
     try {
       _$('html, body').animate({
@@ -566,7 +578,9 @@ window.DispositivoEdit = function () {
       instance.triggerBtnDptEdit(href[1])
     }
     _$('main').click(function (event) {
-      if (event.target === this || event.target === this.firstElementChild) { instance.clearEditSelected() }
+      if (event.target === this || event.target === this.firstElementChild) {
+        instance.clearEditSelected()
+      }
     })
     instance.waitHide()
   }
