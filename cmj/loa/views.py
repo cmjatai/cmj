@@ -446,7 +446,7 @@ class EmendaLoaCrud(MasterDetailCrud):
             if self.request.user.is_anonymous:
                 qs = qs.filter(loa__publicado=True)
 
-            return qs.order_by('-fase', 'id')
+            return qs.order_by('fase', 'id')
 
         def get_context_data(self, **kwargs):
             self.object = loa = Loa.objects.get(pk=kwargs['root_pk'])
