@@ -218,6 +218,15 @@ window.AppLOA = function () {
       }
     })
 
+    form.find('select[name="fase"]').change((event) => {
+      const select = event.target
+      if (select.value === '10') {
+        select.classList.add('is-invalid')
+      } else {
+        select.classList.remove('is-invalid')
+      }
+    })
+
     form.change(function (event) {
       let formData = {}
       let field = event.target.name
@@ -243,6 +252,7 @@ window.AppLOA = function () {
         .then((response) => {
           form.find('input[name="lineHeight"]').val(response.data.metadata.style.lineHeight)
           form.find('input[name="valor"]').val(response.data.valor)
+
           preview.src = `${urlBase}/view/?page=1&u=${Date.now()}`
         })
         .catch(() => {

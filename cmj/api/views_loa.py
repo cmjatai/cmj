@@ -244,11 +244,11 @@ class EmendaLoaRegistroContabilSerializer(SaplSerializerMixin):
 
     codigo = RegexLocalField(
         r'(?P<funcao>\d{2})\.(?P<subfuncao>\d{3})'
-        r'\.(?P<programa>\d{4})\.(?P<acao>\d\.\d{3})$', error_messages={
-            'invalid': _('O campo "Código" deve serguir o padrão "99.999.9999.9.999".')})
+        r'\.(?P<programa>\d{4})\.(?P<acao>\d\.[X0-9]{3})$', error_messages={
+            'invalid': _('O campo "Código" deve serguir o padrão "99.999.9999.9.XXX". Onde, em "XXX" pode ser utilizado números ou a letra X')})
 
-    natureza = RegexLocalField(r'^(\d{1,2}\.\d{1,2}\.\d{2}\.\d{2}\.\d{2})$', error_messages={
-        'invalid': _('O campo "Natureza" deve serguir o padrão "x9.x9.99.99.99". Sendo "x" numérico e opcional.')})
+    natureza = RegexLocalField(r'^(\d{1,2}\.\d{1,2}\.\d{2}\.\d{2}\.[X0-9]{2})$', error_messages={
+        'invalid': _('O campo "Natureza" deve serguir o padrão "x9.x9.99.99.XX". Sendo "x" numérico e opcional. Em "XX" pode ser utilizado números ou a letra X.')})
 
     unidade = RegexLocalField(r'^(\d{2})$', error_messages={
         'invalid': _('O campo "Unidade Orçamentária" deve serguir o padrão "99".')})

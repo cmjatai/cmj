@@ -1,7 +1,7 @@
 from decimal import Decimal
 import logging
 
-from django.contrib.messages.context_processors import messages
+from django.contrib import messages
 from django.db.models import Q
 from django.db.models.aggregates import Sum
 from django.http.response import Http404
@@ -446,7 +446,7 @@ class EmendaLoaCrud(MasterDetailCrud):
             if self.request.user.is_anonymous:
                 qs = qs.filter(loa__publicado=True)
 
-            return qs
+            return qs.order_by('-fase', 'id')
 
         def get_context_data(self, **kwargs):
             self.object = loa = Loa.objects.get(pk=kwargs['root_pk'])
@@ -592,6 +592,16 @@ class EmendaLoaCrud(MasterDetailCrud):
 
         def get_success_url(self):
             return MasterDetailCrud.UpdateView.get_success_url(self)
+
+        def get(self, request, *args, **kwargs):
+            u = request.user
+            if not u.is_anonymous and not u.is_superuser and u.operadorautor_set.exists():
+                if self.object.fase > EmendaLoa.PROPOSTA:
+                    messages.warning(
+                        request, f'A Emenda está na fase de "{self.object.get_fase_display()}". Não pode ser editada por usuário de autoria.')
+                    return redirect(self.detail_url)
+
+            return MasterDetailCrud.UpdateView.get(self, request, *args, **kwargs)
 
         def has_permission(self):
             u = self.request.user
@@ -769,13 +779,13 @@ class OficioAjusteLoaCrud(MasterDetailCrud):
 
     class ListView(MasterDetailCrud.ListView):
         ordering = 'epigrafe'
+        paginate_by = 25
 
         def get_queryset(self):
             return MasterDetailCrud.ListView.get_queryset(self)
 
     class DetailView(MasterDetailCrud.DetailView):
         template_name = 'loa/oficioajusteloa_detail.html'
-
         paginate_by = 100
 
         @property

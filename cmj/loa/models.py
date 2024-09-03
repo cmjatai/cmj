@@ -148,12 +148,16 @@ class EmendaLoa(models.Model):
     )
 
     PROPOSTA = 10
+    EDICAO_CONTABIL = 15
+    LIBERACAO_CONTABIL = 17
     APROVACAO_LEGISLATIVA = 20
     APROVACAO_LEGAL = 30
     IMPEDIMENTO_TECNICO = 40
     IMPEDIMENTO_OFICIADO = 50
     FASE_CHOICE = (
         (PROPOSTA, _('Proposta Legislativa')),
+        (EDICAO_CONTABIL, _('Em edição pela Contabilidade')),
+        (LIBERACAO_CONTABIL, _('Liberado pela Contabilidade')),
         (APROVACAO_LEGISLATIVA, _('Aprovada no Processo Legislativo')),
         (APROVACAO_LEGAL, _('Aprovada')),
         (IMPEDIMENTO_TECNICO, _('Impedimento Técnico')),

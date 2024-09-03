@@ -295,8 +295,8 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
         row1 = to_row([
             ('tipo', 3),
-            ('fase', 4),
-            ('valor', 5),
+            ('fase', 5),
+            ('valor', 4),
 
             ('ano_loa', 0),
         ])
@@ -371,9 +371,13 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         if self.user.operadorautor_set.exists() or not self.user.has_perms(
             ('loa.add_emendaloa', 'loa.change_emendaloa')
         ):
-            self.fields['fase'].widget.attrs['disabled'] = True
-            self.fields['fase'].initial = EmendaLoa.PROPOSTA
             self.fields['fase'].required = False
+            self.fields['fase'].initial = EmendaLoa.PROPOSTA
+            if not full_editor:
+                self.fields['fase'].widget.attrs['disabled'] = True
+            elif self.instance.pk and self.instance.fase < EmendaLoa.APROVACAO_LEGISLATIVA:
+                self.fields['fase'].widget.attrs['class'] = 'is-invalid'
+                self.fields['fase'].choices = EmendaLoa.FASE_CHOICE[:3]
 
             self.fields['valor'].widget.attrs['disabled'] = 'disabled'
             self.fields['valor'].widget.attrs['readonly'] = 'readonly'
