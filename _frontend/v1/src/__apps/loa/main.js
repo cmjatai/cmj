@@ -23,18 +23,15 @@ window.AppLOA = function () {
 
   instance.EmendaLoaCRUD = function () {
     const container = $('.container-loa.emendaloa-update')
-
     if (container.length === 0) {
       return
     }
-
-    const form = container.find('form')
-
     const pk = window.location.href.matchAll(/emendaloa\/(\d+)\//g).next().value[1]
+    const form = container.find('form')
     const urlBase = `/api/loa/emendaloa/${pk}`
 
-    const loadPreview = function () {
-      $('.container-preview').html(`
+    const createPreview = function () {
+      return $('.container-preview').html(`
         <div class="inner-preview">
           <a class="w-100" target="_blank" href="${urlBase}/view/">
             <img src="${urlBase}/view/?page=1&u=${Date.now()}"/>
@@ -56,23 +53,85 @@ window.AppLOA = function () {
         </div>
       `)
     }
-
-    loadPreview()
-    const preview = $('.container-preview .inner-preview img')[0]
+    const preview = createPreview().find('img')[0]
     preview.onload = function (event) {
       preview.style.opacity = 1
     }
 
-    const refreshChangeRegistroDespesa = () => {
-      const rcs = form.find('input[name="registrocontabil_set"]')
-      rcs.off('change')
-      rcs.change((event) => {
-        const pk = event.target.value
-        axios.delete(`/api/loa/emendaloaregistrocontabil/${pk}/`)
-          .then((response) => {
-            event.target.parentElement.remove()
+    const rcs = form.find('.registro-render')
+    const createRegistroRender = function () {
+      rcs.html('')
+      $('<div class="inner"></div>').appendTo(rcs)
+      $('<div class="footer"></div>').appendTo(rcs)
+    }
+    createRegistroRender()
+
+    const refreshChangeRegistroDespesa = function () {
+      const inner = rcs.find('.inner')
+      const footer = rcs.find('.footer')
+      axios.get(`/api/loa/emendaloa/${pk}/totais/`)
+        .then((response) => {
+          footer.html('')
+          $(`
+            <div class="row">
+              <div class="col-12 totais">
+              TOTAIS:
+              </div>
+              <div class="col">
+                <span class="key">Inserções</span>
+                <span class="value">${response.data.soma_insercoes}</span>
+              </div>
+              <div class="col">
+                <span class="key">Deduções</span>
+                <span class="value">${response.data.soma_deducoes}</span>
+              </div>
+              <div class="col text-${response.data.divergencia_registros === '0,00' ? 'blue' : 'red'}">
+                <span class="key">Inserções + Deduções</span>
+                <span class="value">${response.data.divergencia_registros}</span>
+              </div>
+              <div class="col text-${response.data.divergencia_emenda === '0,00' ? 'blue' : 'red'}">
+                <span class="key">Emenda - Inserções</span>
+                <span class="value">${response.data.divergencia_emenda}</span>
+              </div>
+            </div>
+            `).appendTo(footer)
+        })
+      axios.get(`/api/loa/emendaloaregistrocontabil/?emendaloa=${pk}&get_all=true`)
+        .then((response) => {
+          _.each(response.data, (value, idx) => {
+            if (inner.find(`.item-rc[pk="${value.id}"]`).length > 0) {
+              return
+            }
+            const item = $(`<div class="item-rc" pk="${value.id}"></div>`)
+            item.appendTo(inner)
+
+            let texto = value.__str__
+            let pos = texto.search(/(\d) /g)
+            let i = 0
+            while (pos > 0 && pos < 15 && i < 20) {
+              texto = texto.replace(/^R\$/g, 'R$ ')
+              pos = texto.search(/(\d) /g)
+              i += 1
+            }
+            texto = texto.split(' - ')
+            texto[0] = `<strong>${texto[0]}</strong>`
+            texto = texto.join(' - ')
+            texto = texto.replaceAll(' ', '&nbsp;')
+            $(`<span class="texto">${texto}</span>`)
+              .appendTo(item)
+
+            $(`<span class="btn btn-sm btn-delete text-danger"><i class="far fa-trash-alt"></i></span>`)
+              .appendTo(item).click((event) => {
+                const pk = event.target.closest('.item-rc').getAttribute('pk')
+                axios.delete(`/api/loa/emendaloaregistrocontabil/${pk}/`)
+                  .then((response) => {
+                    form.trigger('change')
+                    event.target.closest('.item-rc').remove()
+                    refreshChangeRegistroDespesa()
+                  })
+              })
           })
-      })
+        })
     }
     refreshChangeRegistroDespesa()
 
@@ -106,22 +165,6 @@ window.AppLOA = function () {
           $('<div class="alert alert-info>Registro de Despesa Adicionado com sucesso.</div>'
           ).appendTo(inner)
 
-          let rcs = form.find('input[name="registrocontabil_set"]')
-
-          let checkboxRc = $(`
-            <div class="custom-control custom-checkbox">
-              <input type="checkbox" class="custom-control-input" checked="checked" name="registrocontabil_set" id="id_registrocontabil_set_${rcs.length + 1}" value="${response.data.id}">
-              <label class="custom-control-label" for="id_registrocontabil_set_${rcs.length + 1}">
-                ${response.data.__str__}
-              </label>
-            </div>
-          `)
-
-          if (rcs.length > 0) {
-            checkboxRc.appendTo(rcs.last().parent().parent())
-          } else {
-            checkboxRc.appendTo(form.find('#div_id_registrocontabil_set > div'))
-          }
           refreshChangeRegistroDespesa()
           form.trigger('change')
         })
@@ -170,11 +213,11 @@ window.AppLOA = function () {
           let parts = event.target.value.trim().split(' ')
 
           _.each(response.data.results, (value, idx) => {
-            let html = `<div class="small item hover_background_05p" pk="${value.id}">
-                Órgão: ${value.cod_orgao} - ${value.esp_orgao}<br>
-                Und Orç: ${value.cod_unidade} - ${value.esp_unidade}<br>
-                Código: ${value.codigo} - ${value.especificacao}<br>
-                Natureza: ${value.cod_natureza}
+            let html = `<div class="small item" pk="${value.id}">
+                Órgão...: ${value.cod_orgao} - ${value.esp_orgao}<br>
+                Und Orç.: ${value.cod_unidade} - ${value.esp_unidade}<br>
+                Código..: ${value.codigo} - ${value.especificacao}<br>
+                Natureza: ${value.cod_natureza} - ${value.esp_natureza}
               </div>`
 
             _.each(parts, (p, idx) => {
@@ -184,6 +227,7 @@ window.AppLOA = function () {
             let item = $(html).appendTo(inner)
 
             item.click((event) => {
+              form.find('input[name="indicacao"]').val(value.esp_unidade)
               form.find('input[name="despesa_codigo"]').val(value.codigo)
               form.find('input[name="despesa_orgao"]').val(value.cod_orgao)
               form.find('input[name="despesa_unidade"]').val(value.cod_unidade)

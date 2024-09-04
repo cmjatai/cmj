@@ -11,6 +11,28 @@ footer {
   left: -1.3cm;
   right: -1.3cm;
 }
+section {
+  position: fixed;
+  width: 5cm;
+  text-align: center;
+  font-weight: bold;
+  font-size: 16pt;
+  transform: rotate(45deg);
+  right: -2cm;
+  top: 0.5cm;
+  line-height: 1.2;
+  padding: 0.4cm
+}
+
+section.red {
+  color:red;
+  border: 4px dashed red;
+}
+
+section.blue {
+  color:#0073b7;
+  border: 4px dashed #0073b7;
+}
 
 .ementa, .preambulo, .art {
   text-align: justify;

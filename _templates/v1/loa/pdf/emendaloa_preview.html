@@ -1,4 +1,4 @@
-{% load static common_cmj_tags %}
+{% load static common_cmj_tags common_tags %}
 {% load render_bundle from webpack_loader %}
 {% load webpack_static from webpack_loader %}
 <!DOCTYPE html>
@@ -22,6 +22,18 @@
     <img src="{% webpack_static 'img/pdf_cabec.jpg' %}">
   </header>
 
+  {% define object.totais_contabeis as otc %}
+
+  {% if object.fase < object.LIBERACAO_CONTABIL %}
+    <section class="{% if otc.divergencia_emenda == 0 %}blue{%else%}red{% endif %}">
+      EM EDIÇÃO
+    </section>
+  {% elif otc.divergencia_emenda != 0 %}
+    <section class="red">
+      DIVERGÊNCIA DE VALORES
+    </section>
+  {% endif %}
+
   <h3>EMENDA IMPOSITIVA, de
   {% if object.materia %}
     {{ object.materia.data_apresentacao|date:"d \d\e F \d\e Y" }}.
@@ -41,7 +53,7 @@
     Autoria:
     {% for parl in object.parlamentares.all %}
       {% if forloop.first %}
-          Vereador{% if object.parlamentares.isonly_sexo_feminino %}a{% else %}e{% endif %}{% if object.parlamentares.count > 1 %}s{% endif %}
+          Vereador{% if object.parlamentares.isonly_sexo_feminino %}a{% if object.parlamentares.count > 1 %}s{% endif %}{% else %}{% if object.parlamentares.count > 1 %}s{% endif %}{% endif %}
       {% endif %}
       {{parl.nome_parlamentar}}{% if not forloop.last %},{% endif %}
     {% endfor %}

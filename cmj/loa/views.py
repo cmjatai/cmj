@@ -595,11 +595,18 @@ class EmendaLoaCrud(MasterDetailCrud):
 
         def get(self, request, *args, **kwargs):
             u = request.user
-            if not u.is_anonymous and not u.is_superuser and u.operadorautor_set.exists():
-                if self.object.fase > EmendaLoa.PROPOSTA:
-                    messages.warning(
-                        request, f'A Emenda está na fase de "{self.object.get_fase_display()}". Não pode ser editada por usuário de autoria.')
-                    return redirect(self.detail_url)
+            if not u.is_superuser and not u.is_anonymous:
+                if u.operadorautor_set.exists():
+                    if self.object.fase > EmendaLoa.PROPOSTA_LIBERADA:
+                        messages.warning(
+                            request, f'A Emenda está na fase de "{self.object.get_fase_display()}". Não pode ser editada por usuário de autoria.')
+                        return redirect(self.detail_url)
+
+                # if u.has_perm('loa.emendaloa_full_editor'):
+                #    if self.object.fase < EmendaLoa.PROPOSTA_LIBERADA:
+                #        messages.warning(
+                #            request, f'A Emenda está na fase de "{self.object.get_fase_display()}". Não liberada para edição contábil.')
+                #        return redirect(self.detail_url)
 
             return MasterDetailCrud.UpdateView.get(self, request, *args, **kwargs)
 
@@ -666,7 +673,6 @@ class EmendaLoaCrud(MasterDetailCrud):
             return context
 
         def hook_valor_computado(self, el, verbose_name='', field_display=''):
-
             if not el.materia:
                 return '', ''
 

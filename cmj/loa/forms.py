@@ -222,8 +222,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
     finalidade = forms.CharField(
         label='Finalidade',
-        required=True,
-        widget=forms.Textarea(attrs={'rows': 2}))
+        required=True)
 
     indicacao = forms.CharField(
         label='Indicação',
@@ -241,12 +240,12 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         required=False
     )
 
-    registrocontabil_set = forms.ModelChoiceField(
-        label='',
-        required=False,
-        queryset=EmendaLoaRegistroContabil.objects.all(),
-        widget=forms.CheckboxSelectMultiple,
-    )
+    # registrocontabil_set = forms.ModelChoiceField(
+    #    label='',
+    # required=False,
+    #    queryset=EmendaLoaRegistroContabil.objects.all(),
+    #    widget=forms.CheckboxSelectMultiple,
+    #)
 
     ano_loa = forms.CharField(
         label='',
@@ -281,7 +280,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
             'prefixo_indicacao', 'indicacao',
             'prefixo_finalidade', 'finalidade',
             'parlamentares__valor',
-            'busca_despesa', 'ano_loa', 'registrocontabil_set'
+            'busca_despesa', 'ano_loa',  # 'registrocontabil_set'
         ]
 
     def __init__(self, *args, **kwargs):
@@ -314,6 +313,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
             ('prefixo_finalidade', 3),
             ('finalidade', 9),
         ]
+
         if not full_editor:
             row3.append(('parlamentares__valor', 12))
 
@@ -340,8 +340,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
             ])
             row4_2 = to_row([
-                ('registrocontabil_set', 12),
-
+                (Div(css_class='registro-render'), 12),
             ])
 
             row4 = to_row([
@@ -361,8 +360,12 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
             ])
 
         self.helper = FormHelper()
+        btns = {
+            'cancel_label': None,
+            'save_label': 'Encerrar Edição'
+        } if full_editor else {}
         self.helper.layout = SaplFormLayout(
-            Fieldset(_('Dados Gerais'), row_form))
+            Fieldset(_('Dados Gerais'), row_form), **btns)
 
         super().__init__(*args, **kwargs)
 
@@ -371,13 +374,15 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         if self.user.operadorautor_set.exists() or not self.user.has_perms(
             ('loa.add_emendaloa', 'loa.change_emendaloa')
         ):
-            self.fields['fase'].required = False
-            self.fields['fase'].initial = EmendaLoa.PROPOSTA
-            if not full_editor:
-                self.fields['fase'].widget.attrs['disabled'] = True
-            elif self.instance.pk and self.instance.fase < EmendaLoa.APROVACAO_LEGISLATIVA:
+            #self.fields['fase'].required = False
+            self.fields['fase'].choices = EmendaLoa.FASE_CHOICE[:2]
+
+            if full_editor and self.instance.pk and self.instance.fase < EmendaLoa.APROVACAO_LEGISLATIVA:
                 self.fields['fase'].widget.attrs['class'] = 'is-invalid'
-                self.fields['fase'].choices = EmendaLoa.FASE_CHOICE[:3]
+                self.fields['fase'].choices = EmendaLoa.FASE_CHOICE[:4]
+
+            if self.instance.pk and self.instance.fase >= EmendaLoa.APROVACAO_LEGISLATIVA:
+                self.fields['fase'].choices = EmendaLoa.FASE_CHOICE
 
             self.fields['valor'].widget.attrs['disabled'] = 'disabled'
             self.fields['valor'].widget.attrs['readonly'] = 'readonly'
@@ -392,11 +397,11 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
             if self.instance.pk:
                 self.initial['valor_despesa'] = Decimal('0.00')
 
-                rclist = self.instance.registrocontabil_set.all()
-                self.fields['registrocontabil_set'].choices = [
-                    (rc.id, str(rc)) for rc in rclist]
-                self.initial['registrocontabil_set'] = rclist.values_list(
-                    'id', flat=True)
+                #rclist = self.instance.registrocontabil_set.all()
+                # self.fields['registrocontabil_set'].choices = [
+                #    (rc.id, str(rc)) for rc in rclist]
+                # self.initial['registrocontabil_set'] = rclist.values_list(
+                #    'id', flat=True)
 
         if full_editor:
             self.fields.pop('parlamentares__valor')

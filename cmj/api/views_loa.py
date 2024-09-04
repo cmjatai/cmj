@@ -4,9 +4,11 @@ import logging
 from django.apps.registry import apps
 from django.core.validators import RegexValidator
 from django.db.models import Q
+from django.db.models.aggregates import Sum
 from django.forms.models import model_to_dict
 from django.http.response import HttpResponse
 from django.template.loader import render_to_string
+from django.utils import formats
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 import pymupdf
@@ -201,6 +203,14 @@ class _EmendaLoaViewSet:
         #    cv.close()
         #    output.seek(0)
         # return HttpResponse(output.read(), content_type='application/docx')
+
+    @action(methods=['get', ], detail=True)
+    def totais(self, request, *args, **kwargs):
+        r = self.get_object().totais_contabeis
+        r = {k: formats.number_format(v, force_grouping=True)
+             for k, v in r.items()}
+
+        return Response(r)
 
 
 @customize(DespesaConsulta)

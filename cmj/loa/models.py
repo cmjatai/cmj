@@ -148,6 +148,7 @@ class EmendaLoa(models.Model):
     )
 
     PROPOSTA = 10
+    PROPOSTA_LIBERADA = 12
     EDICAO_CONTABIL = 15
     LIBERACAO_CONTABIL = 17
     APROVACAO_LEGISLATIVA = 20
@@ -156,6 +157,7 @@ class EmendaLoa(models.Model):
     IMPEDIMENTO_OFICIADO = 50
     FASE_CHOICE = (
         (PROPOSTA, _('Proposta Legislativa')),
+        (PROPOSTA_LIBERADA, _('Proposta Liberada para Edição Contábil')),
         (EDICAO_CONTABIL, _('Em edição pela Contabilidade')),
         (LIBERACAO_CONTABIL, _('Liberado pela Contabilidade')),
         (APROVACAO_LEGISLATIVA, _('Aprovada no Processo Legislativo')),
@@ -249,6 +251,30 @@ class EmendaLoa(models.Model):
         soma_dict = self.emendaloaparlamentar_set.aggregate(Sum('valor'))
         self.valor = soma_dict['valor__sum'] or Decimal('0.00')
         return self
+
+    @property
+    def totais_contabeis(self):
+        deducoes = self.registrocontabil_set.filter(
+            valor__lt=Decimal('0.00')
+        ).aggregate(deducoes=Sum('valor'))
+
+        insercoes = self.registrocontabil_set.filter(
+            valor__gt=Decimal('0.00')
+        ).aggregate(insercoes=Sum('valor'))
+
+        deducoes = deducoes['deducoes'] or Decimal('0.00')
+        insercoes = insercoes['insercoes'] or Decimal('0.00')
+
+        divergencia_registros = insercoes + deducoes
+        divergencia_emenda = self.valor - insercoes
+
+        return {
+            'soma_deducoes': deducoes,
+            'soma_insercoes': insercoes,
+            'divergencia_registros': divergencia_registros,
+            'divergencia_emenda': divergencia_emenda,
+            'valor_emendaloa': self.valor
+        }
 
 
 class EmendaLoaParlamentar(models.Model):
@@ -681,7 +707,8 @@ class DespesaConsulta(models.Model):
     cod_unidade = models.TextField(verbose_name=_("Código da Unidade"))
     esp_unidade = models.TextField(verbose_name=_("Unidade Orçamentária"))
 
-    cod_natureza = models.TextField(verbose_name=_("Natureza da Despesa"))
+    cod_natureza = models.TextField(verbose_name=_("Código Natureza"))
+    esp_natureza = models.TextField(verbose_name=_("Natureza da Despesa"))
     cod_fonte = models.TextField(verbose_name=_("Fonte"))
 
     class Meta:
