@@ -188,7 +188,6 @@ class EmendaLoaValorWidget(SplitArrayWidget):
 
             if 'class' in self.attrs and 'class' in w['attrs']:
                 w['attrs']['class'] = 'decimalinput numberinput form-control text-right'
-                #w['attrs']['class'] + ' ' + self.attrs['class']
 
             if self.user and not self.user.has_perms(
                     ('loa.add_emendaloa', 'loa.change_emendaloa')):
@@ -231,6 +230,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
     parlamentares__valor = SplitArrayField(
         forms.DecimalField(
             required=False,
+            min_value=Decimal('0.00'),
             max_digits=14,
             decimal_places=2,
             widget=DecimalInput
@@ -371,11 +371,11 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
         self.initial['ano_loa'] = self.loa.ano
 
-        if self.user.operadorautor_set.exists() or not self.user.has_perms(
-            ('loa.add_emendaloa', 'loa.change_emendaloa')
-        ):
-            #self.fields['fase'].required = False
-            self.fields['fase'].choices = EmendaLoa.FASE_CHOICE[:2]
+        if not self.user.is_superuser and (
+            self.user.operadorautor_set.exists() or not self.user.has_perms(
+                ('loa.add_emendaloa', 'loa.change_emendaloa'))):
+            self.fields['fase'].choices = EmendaLoa.FASE_CHOICE[
+                :1 if self.creating else 2]
 
             if full_editor and self.instance.pk and self.instance.fase < EmendaLoa.APROVACAO_LEGISLATIVA:
                 self.fields['fase'].widget.attrs['class'] = 'is-invalid'
@@ -436,21 +436,32 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         super().clean()
         cleaned_data = self.cleaned_data
 
+        if 'parlamentares__valor'in cleaned_data:
+            if not self.user.is_superuser and self.user.operadorautor_set.exists():
+                pv = {k: v for k, v in zip(
+                    self.parls, self.cleaned_data['parlamentares__valor'])}
+
+                p = self.user.operadorautor_set.first().autor.autor_related
+                if not pv[p]:
+                    raise ValidationError(
+                        f'É obrigatório o preenchimento do valor ligado a seu Parlamentar: {p}.')
+
         return cleaned_data
 
     def save(self, commit=True):
 
         i_init = self.instance
 
-        if not self.full_editor:
-            soma = sum(
-                list(
-                    filter(
-                        lambda x: x, self.cleaned_data['parlamentares__valor']
+        if 'parlamentares__valor' in self.cleaned_data:
+            if not self.full_editor:
+                soma = sum(
+                    list(
+                        filter(
+                            lambda x: x, self.cleaned_data['parlamentares__valor']
+                        )
                     )
                 )
-            )
-            i_init.valor = soma
+                i_init.valor = soma
 
         try:
             i = super().save(commit)
@@ -458,18 +469,19 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
             raise ValidationError('Erro')
 
         if not self.full_editor:
-            i.parlamentares.clear()
+            if 'parlamentares__valor' in self.cleaned_data:
+                i.parlamentares.clear()
 
-            pv = zip(self.parls, self.cleaned_data['parlamentares__valor'])
+                pv = zip(self.parls, self.cleaned_data['parlamentares__valor'])
 
-            for p, v in pv:
-                if not v:
-                    continue
-                elp = EmendaLoaParlamentar()
-                elp.emendaloa = i
-                elp.parlamentar = p
-                elp.valor = v
-                elp.save()
+                for p, v in pv:
+                    if not v:
+                        continue
+                    elp = EmendaLoaParlamentar()
+                    elp.emendaloa = i
+                    elp.parlamentar = p
+                    elp.valor = v
+                    elp.save()
 
         return i
 

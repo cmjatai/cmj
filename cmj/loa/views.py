@@ -434,14 +434,27 @@ class EmendaLoaCrud(MasterDetailCrud):
     class ListView(MasterDetailCrud.ListView):
         paginate_by = 25
         ordered_list = False
+        parls_selecionados = []
+
+        @property
+        def qparlss(self):
+            qp = map(lambda x: f'p={x}', self.parls_selecionados)
+            return '&'.join(qp)
+
+        def get(self, request, *args, **kwargs):
+            try:
+                p = list(set(map(lambda x: int(x), request.GET.getlist('p', []))))
+                pr = int(self.request.GET.get('pr', '0'))
+                if pr in p:
+                    p.remove(pr)
+                self.parls_selecionados = p
+            except:
+                pass
+            return MasterDetailCrud.ListView.get(self, request, *args, **kwargs)
 
         def get_queryset(self):
             qs = super().get_queryset()
-
-            p_id = self.request.GET.get('parlamentar', None)
-
-            if p_id:
-                qs = qs.filter(parlamentares=p_id)
+            qs = qs.filter(parlamentares__in=self.parls_selecionados)
 
             if self.request.user.is_anonymous:
                 qs = qs.filter(loa__publicado=True)
@@ -456,12 +469,11 @@ class EmendaLoaCrud(MasterDetailCrud):
 
             context['parlamentares'] = loa.parlamentares.all()
 
-            p_id = self.request.GET.get('parlamentar', None)
-            if p_id:
-                p = loa.parlamentares.get(
-                    id=p_id
-                )
-                context['title'] = f'{context["title"]}<br>Autoria: {p.nome_parlamentar}'
+            if self.parls_selecionados:
+                p = loa.parlamentares.filter(id__in=self.parls_selecionados)
+                if p.count() == 1:
+                    p = p.first()
+                    context['title'] = f'{context["title"]}<br>Autoria: {p.nome_parlamentar}'
 
             return context
 
@@ -592,6 +604,17 @@ class EmendaLoaCrud(MasterDetailCrud):
 
         def get_success_url(self):
             return MasterDetailCrud.UpdateView.get_success_url(self)
+
+        def post(self, request, *args, **kwargs):
+            u = request.user
+            if not u.is_superuser and not u.is_anonymous:
+                if u.operadorautor_set.exists():
+                    if self.object.fase > EmendaLoa.PROPOSTA_LIBERADA:
+                        messages.warning(
+                            request, f'A Emenda está na fase de "{self.object.get_fase_display()}". Não pode ser editada por usuário de autoria.')
+                        return redirect(self.detail_url)
+
+            return MasterDetailCrud.UpdateView.post(self, request, *args, **kwargs)
 
         def get(self, request, *args, **kwargs):
             u = request.user

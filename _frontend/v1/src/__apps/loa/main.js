@@ -22,10 +22,12 @@ window.AppLOA = function () {
   instance.LoaCRUD = function () {}
 
   instance.EmendaLoaCRUD = function () {
-    const container = $('.container-loa.emendaloa-update')
-    if (container.length === 0) {
-      return
+    const container = $('.container-loa')
+    if (container.hasClass('emendaloa-update')) {
+      instance.EmendaLoaCrudUPDATE(container)
     }
+  }
+  instance.EmendaLoaCrudUPDATE = function (container) {
     const pk = window.location.href.matchAll(/emendaloa\/(\d+)\//g).next().value[1]
     const form = container.find('form')
     const urlBase = `/api/loa/emendaloa/${pk}`
@@ -227,7 +229,7 @@ window.AppLOA = function () {
             let item = $(html).appendTo(inner)
 
             item.click((event) => {
-              form.find('input[name="indicacao"]').val(value.esp_unidade)
+              form.find('input[name="indicacao"]').val(value.esp_unidade).trigger('change')
               form.find('input[name="despesa_codigo"]').val(value.codigo)
               form.find('input[name="despesa_orgao"]').val(value.cod_orgao)
               form.find('input[name="despesa_unidade"]').val(value.cod_unidade)
@@ -296,10 +298,12 @@ window.AppLOA = function () {
         .then((response) => {
           form.find('input[name="lineHeight"]').val(response.data.metadata.style.lineHeight)
           form.find('input[name="valor"]').val(response.data.valor)
+          refreshChangeRegistroDespesa()
 
           preview.src = `${urlBase}/view/?page=1&u=${Date.now()}`
         })
-        .catch(() => {
+        .catch((event) => {
+          // console.log(event)
         })
     })
     form.trigger('change')

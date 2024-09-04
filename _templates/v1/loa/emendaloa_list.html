@@ -6,19 +6,32 @@
 
   <div class="container-avatar d-flex justify-content-center w-100">
     {% for p in parlamentares %}
-      <div class="avatar avatar6 {% if p.id|stringformat:"d" == request.GET.parlamentar %}active{% endif %}" >
-        {% if p.id|stringformat:"d" == request.GET.parlamentar %}
-            <a class="btn-close" href="?" title="Clique no Check para remover o filtro.">
-              <i class="far fa-check-square"></i>
-            </a>
-        {% endif %}
-        <a href="?parlamentar={{p.id}}">
-          <img src="{% cropped_thumbnail p "fotografia_cropping" %}" alt="{{p.nome_parlamentar}}" title="{{p.nome_parlamentar}}">
-        </a>
-      </div>
+      {% if not view.parls_selecionados %}
+        <div class="avatar avatar6" >
+          <a href="?p={{p.id}}">
+            <img src="{% cropped_thumbnail p "fotografia_cropping" %}" alt="{{p.nome_parlamentar}}" title="{{p.nome_parlamentar}}">
+          </a>
+        </div>
+      {% else %}
+        <div class="avatar avatar6 {% if p.id in view.parls_selecionados %}active{% endif %}" >
+          {% if p.id in view.parls_selecionados %}
+          <a class="btn-close" href="?{{ view.qparlss }}&pr={{p.id}}" title="Clique no Check para remover o filtro.">
+            <i class="far fa-check-square"></i>
+          </a>
+          {% endif %}
+          <a href="?{{ view.qparlss }}{% if not p.id in view.parls_selecionados %}&p={{p.id}}{% endif %}">
+            <img src="{% cropped_thumbnail p "fotografia_cropping" %}" alt="{{p.nome_parlamentar}}" title="{{p.nome_parlamentar}}">
+          </a>
+        </div>
+      {% endif %}
     {% endfor %}
   </div>
-
   {{ block.super }}
 
 {% endblock actions %}
+{% block extra_content %}
+
+
+{{view.crud.model.FASE_CHOICE}}
+
+{% endblock %}

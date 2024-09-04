@@ -85,11 +85,15 @@ class _EmendaLoaViewSet:
                 el = EmendaLoa.objects.get(pk=view.kwargs['pk'])
 
                 participa = False
+                fase = True
                 if u.operadorautor_set.exists():
                     parlamentar = u.operadorautor_set.first().autor.autor_related
                     if isinstance(parlamentar, Parlamentar):
                         participa = el.emendaloaparlamentar_set.filter(
                             parlamentar=parlamentar).exists()
+
+                        if el.fase > EmendaLoa.PROPOSTA_LIBERADA:
+                            fase = False
 
                 return (
                     u.has_perm('loa.emendaloa_full_editor') and
@@ -97,7 +101,8 @@ class _EmendaLoaViewSet:
                 ) or (
                     u.operadorautor_set.exists() and
                     not el.materia and
-                    participa
+                    participa and
+                    fase
                 )
 
             return False
@@ -106,7 +111,6 @@ class _EmendaLoaViewSet:
 
     @action(methods=['patch', ], detail=True)
     def updatevalorparlamentar(self, request, *args, **kwargs):
-
         #instance = self.get_object()
 
         data = request.data
@@ -116,6 +120,17 @@ class _EmendaLoaViewSet:
             valor = Decimal(dvalor)
         except:
             valor = Decimal('0.00')
+
+        u = request.user
+        if not u.is_superuser and u.operadorautor_set.exists():
+            p = u.operadorautor_set.first().autor.autor_related
+
+            if p.id == int(data['parlamentar_id']) and valor <= Decimal('0.00'):
+                raise ValidationError(
+                    'Você não pode zerar o Valor do Parlamentar '
+                    'ao qual seu usuário está ligado. '
+                    'Caso queira, você pode excluir esse registro '
+                    'clicando em excluir na tela de consulta.')
 
         elp, created = EmendaLoaParlamentar.objects.get_or_create(**data)
         elp.valor = valor
