@@ -10,9 +10,10 @@ from django.template import loader
 from django.urls.base import reverse_lazy
 from django.utils import formats
 from django.utils.translation import ugettext_lazy as _
+from django_filters.views import FilterView
 
 from cmj.loa.forms import LoaForm, EmendaLoaForm, OficioAjusteLoaForm,\
-    RegistroAjusteLoaForm
+    RegistroAjusteLoaForm, EmendaLoaFilterSet
 from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa,\
     RegistroAjusteLoa, RegistroAjusteLoaParlamentar
 from sapl.crud.base import Crud, MasterDetailCrud, RP_DETAIL, RP_LIST
@@ -431,7 +432,102 @@ class EmendaLoaCrud(MasterDetailCrud):
 
             return l
 
-    class ListView(MasterDetailCrud.ListView):
+    class ListViewFilter(LoaContextDataMixin, FilterView):
+        filterset_class = EmendaLoaFilterSet
+
+        def get_filterset_kwargs(self, filterset_class):
+            kwargs = super().get_filterset_kwargs(filterset_class)
+            return kwargs
+
+        @classmethod
+        def get_url_regex(cls):
+            return r'^/(?P<pk>\d+)/%s$' % cls.model._meta.model_name
+
+        def get(self, request, *args, **kwargs):
+            self.loa = Loa.objects.get(pk=kwargs['pk'])
+            r = super().get(request, *args, **kwargs)
+            return r
+            #context = self.get_context_data(filter=self.filterset)
+            # return self.render_to_response(context)
+
+    class ListView(FilterView, MasterDetailCrud.ListView):
+        filterset_class = EmendaLoaFilterSet
+        paginate_by = 25
+        ordered_list = False
+
+        def get(self, request, *args, **kwargs):
+            self.loa = Loa.objects.get(pk=kwargs['pk'])
+            return FilterView.get(self, request, *args, **kwargs)
+
+        def get_queryset(self):
+            qs = super().get_queryset()
+            if self.request.user.is_anonymous:
+                qs = qs.filter(loa__publicado=True)
+            return qs.order_by('fase', 'id')
+
+        def get_context_data(self, **kwargs):
+            context = MasterDetailCrud.ListView.get_context_data(
+                self, **kwargs)
+            path = context.get('path', '')
+            context['path'] = f'{path} emendaloa-list'
+
+            return context
+
+        def hook_header_valor_computado(self, *args, **kwargs):
+            return 'Valor Final da Emenda' if self.loa.publicado else 'Valor da Emenda'
+
+        def hook_valor_computado(self, *args, **kwargs):
+            return f'<div class="text-nowrap text-center">R$ {args[1]}</div>', args[2]
+
+        def hook_fase(self, *args, **kwargs):
+            return f'<br><small class="text-nowrap">({args[0].get_fase_display()})</small>', args[2]
+
+        def hook_materia(self, *args, **kwargs):
+            if args[0].materia:
+                return f'<small class="text-gray"><strong>Matéria Legislativa:</strong> {args[0].materia}<br><i>{args[0].materia.ementa}</i></small>', args[2]
+            else:
+                return '', args[2]
+
+        def hook_parlamentares(self, *args, **kwargs):
+            pls = []
+
+            for elp in args[0].emendaloaparlamentar_set.all():
+                pls.append(
+                    '<tr><td>{}</td><td align="right">R$ {}</td></tr>'.format(
+                        elp.parlamentar.nome_parlamentar,
+                        formats.number_format(elp.valor, force_grouping=True)
+                    )
+                )
+
+            ajustes = []
+            for ajuste in args[0].registroajusteloa_set.all():
+                url = reverse_lazy(
+                    'cmj.loa:oficioajusteloa_detail',
+                    kwargs={'pk': ajuste.oficio_ajuste_loa.id})
+
+                descr = ''
+                # if ajuste.valor <= Decimal('0.00'):
+                descr = ajuste.descricao
+
+                ajustes.append(
+                    f'<li><a href="{url}">{ajuste}</a><small class="text-gray"><br>{descr}</small></li>')
+
+            ajustes = "".join(ajustes)
+            if ajustes:
+                ajustes = f'''
+                    <hr class="my-1">
+                    <small class="px-2 d-block">
+                        <strong>Registros de Ajuste Técnico</strong>
+                        <ul class="pl-3  m-0">{ajustes}</ul>
+                    </small>
+                '''
+
+            return f'''
+                    <table class="w-100 text-nowrap">{"".join(pls)}</table>
+                    {ajustes}
+                    ''', ''
+
+    class ListViewOld(MasterDetailCrud.ListView):
         paginate_by = 25
         ordered_list = False
         parls_selecionados = []

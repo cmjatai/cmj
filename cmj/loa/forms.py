@@ -2,8 +2,9 @@
 from decimal import Decimal, ROUND_DOWN, ROUND_HALF_DOWN
 import logging
 
+from crispy_forms.bootstrap import FormActions
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Fieldset, HTML, Div, Button
+from crispy_forms.layout import Fieldset, HTML, Div, Button, Submit, Layout
 from django import forms
 from django.contrib.postgres.forms.array import SplitArrayField,\
     SplitArrayWidget
@@ -11,10 +12,13 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.forms.models import ModelForm
 from django.forms.widgets import HiddenInput, NumberInput
 from django.utils.translation import ugettext_lazy as _
+from django_filters.filters import ChoiceFilter, MultipleChoiceFilter,\
+    ModelMultipleChoiceFilter
+from django_filters.filterset import FilterSet
 
 from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa,\
     RegistroAjusteLoa, RegistroAjusteLoaParlamentar, EmendaLoaRegistroContabil
-from sapl.crispy_layout_mixin import to_row, SaplFormLayout
+from sapl.crispy_layout_mixin import to_row, SaplFormLayout, SaplFormHelper
 from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
 from sapl.utils import FileFieldCheckMixin
@@ -601,3 +605,43 @@ class RegistroAjusteLoaForm(ModelForm):
             r.save()
 
         return i
+
+
+class EmendaLoaFilterSet(FilterSet):
+
+    fases = MultipleChoiceFilter(
+        required=False,
+        choices=EmendaLoa.FASE_CHOICE,
+        label=_('Fases?'),)
+
+    parlamentares = ModelMultipleChoiceFilter(
+        queryset=Parlamentar.objects.all(),
+    )
+
+    class Meta:
+        model = EmendaLoa
+        fields = ['fase', 'parlamentares']
+
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        row = to_row(
+            [
+                ('parlamentares', 4),
+                ('fase', 4),
+            ]
+        )
+
+        buttons = FormActions(
+            Submit('pesquisar', _('Pesquisar'), css_class='float-right',
+                   onclick='return true;'),
+            css_class='form-group row justify-content-between',
+        )
+
+        fields = [row, ]
+        fields += buttons
+
+        self.form.helper = SaplFormHelper()
+        self.form.helper.form_method = 'GET'
+        self.form.helper.layout = Layout(*fields)

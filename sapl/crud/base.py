@@ -1030,8 +1030,8 @@ class Crud:
             CrudViewWithBase.__name__ = view.__name__
             return CrudViewWithBase
 
-        # if 'DocumentoAdministrativoCrud' in str(cls):
-        #    print('DocumentoAdministrativoCrud')
+        if 'EmendaLoaCrud' in str(cls):
+            print('EmendaLoaCrud')
 
         CrudListView = _add_base(cls.ListView)
         CrudCreateView = _add_base(cls.CreateView)
