@@ -1,6 +1,7 @@
 
 from decimal import Decimal, ROUND_DOWN, ROUND_HALF_DOWN
 import logging
+import re
 
 from crispy_forms.bootstrap import FormActions
 from crispy_forms.helper import FormHelper
@@ -11,9 +12,12 @@ from django.contrib.postgres.forms.array import SplitArrayField,\
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.forms.models import ModelForm
 from django.forms.widgets import HiddenInput, NumberInput
+from django.template.base import Template
+from django.template.context import Context
+from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from django_filters.filters import ChoiceFilter, MultipleChoiceFilter,\
-    ModelMultipleChoiceFilter
+    ModelMultipleChoiceFilter, CharFilter
 from django_filters.filterset import FilterSet
 
 from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa,\
@@ -173,7 +177,7 @@ class DecimalInput(NumberInput):
 
 
 class EmendaLoaValorWidget(SplitArrayWidget):
-    template_name = 'widget/parlamentares_valor_form.html'
+    template_name = 'loa/widget/parlamentares_valor_form.html'
 
     def __init__(self, widget, parlamentares=[], elps=[], user=None, **kwargs):
         super().__init__(widget, size=len(parlamentares), **kwargs)
@@ -609,39 +613,95 @@ class RegistroAjusteLoaForm(ModelForm):
 
 class EmendaLoaFilterSet(FilterSet):
 
-    fases = MultipleChoiceFilter(
+    class LoaParlModelMultipleChoiceFilter(ModelMultipleChoiceFilter):
+        def get_queryset(self, request):
+            return self.parent.loa.parlamentares.all()
+
+    fase = MultipleChoiceFilter(
         required=False,
         choices=EmendaLoa.FASE_CHOICE,
-        label=_('Fases?'),)
+        label=_('Fases'),
+        widget=forms.CheckboxSelectMultiple
+    )
 
-    parlamentares = ModelMultipleChoiceFilter(
+    parlamentares = LoaParlModelMultipleChoiceFilter(
         queryset=Parlamentar.objects.all(),
+        widget=forms.CheckboxSelectMultiple
     )
 
     class Meta:
+        class Form(forms.Form):
+            crispy_field_template = 'fase', 'parlamentares'
         model = EmendaLoa
-        fields = ['fase', 'parlamentares']
+        fields = ['fase', 'parlamentares', 'indicacao']
+        form = Form
+
+    class ELSaplFormHelper(SaplFormHelper):
+
+        def render_layout(self, form, context, template_pack=None):
+            html = super().render_layout(form, context)
+            html = html.replace('\n', ' ')
+            while '  ' in html:
+                html = html.replace('  ', ' ')
+            html = html.replace(' > ', '>')
+            html = html.replace('> ', '>')
+            html = html.replace(' <', '<')
+            html = re.sub(r'(</)(\w*)(>)', '\\1\\2\\3\n', html)
+
+            html = re.sub(
+                '<div class="">',
+                '<div class="container-avatar d-flex justify-content-center w-100">',
+                html, count=1)
+
+            html_parts = []
+            for n in re.finditer(r'<input.+name="(\w+)".+value="(\d+)"><label.*>(.*)</label>', html):
+                html_parts.append([n.start(), n.end(), list(n.groups())])
+
+            html_parts.reverse()
+            label_layout = """{% load cropping common_tags %}
+            <span class="avatar avatar6 {{active}}" >
+                <img src="{% cropped_thumbnail p "fotografia_cropping" %}" alt="{{p.nome_parlamentar}}" title="{{p.nome_parlamentar}}">
+            </span>
+            """
+            template = Template(label_layout)
+
+            for x1, x2, (key, idp, nome) in html_parts:
+                if key == 'fase':
+                    continue
+                lp = len(nome)
+
+                p = Parlamentar.objects.get(pk=idp)
+                ctx = {'p': p,
+                       'active': 'active' if 'checked' in html[x1:x2] else ''}
+                context = Context()
+                context.update(ctx)
+                trendered = template.render(context=context)
+                html = html[:x2 - 8 - lp] + trendered + html[x2 - 8:]
+            return mark_safe(html)
 
     def __init__(self, *args, **kwargs):
 
+        self.loa = kwargs.pop('loa')
         super().__init__(*args, **kwargs)
 
         row = to_row(
             [
-                ('parlamentares', 4),
-                ('fase', 4),
+                ('parlamentares', 12),
+                ('fase', 12),
             ]
         )
 
-        buttons = FormActions(
-            Submit('pesquisar', _('Pesquisar'), css_class='float-right',
-                   onclick='return true;'),
-            css_class='form-group row justify-content-between',
+        fields = [row, ]
+        self.form.helper = EmendaLoaFilterSet.ELSaplFormHelper()
+        self.form.helper.form_method = 'GET'
+        self.form.helper.form_class = 'container'
+        self.form.helper.layout = SaplFormLayout(
+            *fields,
+            cancel_label=None,
+            save_label=_('Filtrar')
         )
 
-        fields = [row, ]
-        fields += buttons
-
-        self.form.helper = SaplFormHelper()
-        self.form.helper.form_method = 'GET'
-        self.form.helper.layout = Layout(*fields)
+        if self.loa.materia and self.loa.materia.normajuridica():
+            self.form.fields['fase'].choices = EmendaLoa.FASE_CHOICE[4:]
+        else:
+            self.form.fields['fase'].choices = EmendaLoa.FASE_CHOICE[:4]

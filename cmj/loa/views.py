@@ -459,6 +459,11 @@ class EmendaLoaCrud(MasterDetailCrud):
             self.loa = Loa.objects.get(pk=kwargs['pk'])
             return FilterView.get(self, request, *args, **kwargs)
 
+        def get_filterset_kwargs(self, filterset_class):
+            kw = FilterView.get_filterset_kwargs(self, filterset_class)
+            kw['loa'] = self.loa
+            return kw
+
         def get_queryset(self):
             qs = super().get_queryset()
             if self.request.user.is_anonymous:

@@ -25,7 +25,17 @@ window.AppLOA = function () {
     const container = $('.container-loa')
     if (container.hasClass('emendaloa-update')) {
       instance.EmendaLoaCrudUPDATE(container)
+    } else if (container.hasClass('emendaloa-list')) {
+      instance.EmendaLoaCrudLIST(container)
     }
+  }
+  instance.EmendaLoaCrudLIST = function (container) {
+    const form = container.find('form')
+    form
+      .find('input[type="checkbox"]')
+      .change((event) => {
+        form.submit()
+      })
   }
   instance.EmendaLoaCrudUPDATE = function (container) {
     const pk = window.location.href.matchAll(/emendaloa\/(\d+)\//g).next().value[1]
