@@ -625,6 +625,16 @@ class Despesa(models.Model):
         related_name='despesa_set',
         on_delete=CASCADE)
 
+    valor_materia = models.DecimalField(
+        max_digits=14, decimal_places=2, default=Decimal('0.00'),
+        verbose_name=_('Valor Despesa Matéria (R$)'),
+    )
+
+    valor_norma = models.DecimalField(
+        max_digits=14, decimal_places=2, default=Decimal('0.00'),
+        verbose_name=_('Valor Despesa Norma (R$)'),
+    )
+
     class Meta:
         verbose_name = _('Despesa')
         verbose_name_plural = _('Despesas')
@@ -697,6 +707,16 @@ class DespesaConsulta(models.Model):
         verbose_name=_('Loa'),
         related_name='+',
         on_delete=CASCADE)
+
+    valor_materia = models.DecimalField(
+        max_digits=14, decimal_places=2, default=Decimal('0.00'),
+        verbose_name=_('Valor Despesa Matéria (R$)'),
+    )
+
+    valor_norma = models.DecimalField(
+        max_digits=14, decimal_places=2, default=Decimal('0.00'),
+        verbose_name=_('Valor Despesa Norma (R$)'),
+    )
 
     codigo = models.TextField(verbose_name=_("Código"))
     especificacao = models.TextField(verbose_name=_("Especificação"))
