@@ -32,7 +32,7 @@ export const routes = [
     name: 'loa_route',
     children: [
       {
-        path: ':pk',
+        path: ':pkloa',
         name: 'loadetail_route',
         component: () => import('@/modules/loa/LoaDetail')
       }

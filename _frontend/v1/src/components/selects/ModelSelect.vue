@@ -8,7 +8,7 @@
 
 export default {
   name: 'model-select',
-  props: ['app', 'model', 'label', 'limit', 'ordering', 'choice', 'height'],
+  props: ['app', 'model', 'label', 'limit', 'ordering', 'choice', 'height', 'extra_query', 'required'],
   data () {
     return {
       selected: null,
@@ -38,10 +38,18 @@ export default {
           ]
         } else {
           _this.options = []
+          if (!_this.required) {
+            _this.selected = Object()
+            _this.options.push({ value: _this.selected, text: '---------------' })
+          }
         }
       }
-      _this.utils.getModelOrderedList(_this.app, _this.model, _this.ordering, next_page)
+
+      let query_string = _this.isString(_this.extra_query) ? _this.extra_query : ''
+
+      _this.utils.getModelOrderedList(_this.app, _this.model, _this.ordering, next_page, query_string)
         .then((response) => {
+          console.log(response.request.responseURL)
           _.each(response.data.results, function (item, idx) {
             _this.options.push({ value: item, text: item[_this.choice] })
             _this.refreshState({
