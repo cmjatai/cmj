@@ -148,3 +148,8 @@ if DEBUG_TOOLBAR_ACTIVE:
     MIDDLEWARE = MIDDLEWARE + \
         ('debug_toolbar.middleware.DebugToolbarMiddleware', )
     INTERNAL_IPS = ('127.0.0.1',)
+
+if DEBUG:
+    NOTEBOOK_ARGUMENTS = [
+        '--notebook-dir', 'notebooks',
+    ]

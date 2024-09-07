@@ -5,7 +5,7 @@ Loa:
   - publicado perc_disp_total perc_disp_saude perc_disp_diversos
   - parlamentares
 LoaDetail:
-  {% trans 'Dados Gerais' %}:
+  {% trans 'Resumo Geral das Emendas Impositivas' %}:
   - ano:2 receita_corrente_liquida:4 materia_ou_norma
   - disp_total disp_saude disp_diversos
   - resumo_emendas_impositivas

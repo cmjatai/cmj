@@ -498,7 +498,7 @@ window.DispositivoEdit = function () {
   instance.reloadFunctionsDraggables = function () {
     const dptAlts = _$('.dpt-alts')
 
-    if (dptAlts.length > 0 ) {
+    if (dptAlts.length > 0) {
       dptAlts.sortable({
         connectWith: '.dpt-alts',
         items: '.sorting-initialize',
