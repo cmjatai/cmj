@@ -36,6 +36,11 @@
       font-size: 70%;
       font-weight: normal;
     }
+    .container-chart {
+      canvas {
+        height: 80vh;
+      }
+    }
   }
   &.emendaloa-list {
     .context-actions {
