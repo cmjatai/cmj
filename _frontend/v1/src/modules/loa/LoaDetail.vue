@@ -1,18 +1,25 @@
 <template>
   <div>
-    <DoughnutChart v-if="chartData" :height="800" :chartDataUser="chartData"/>
+    <resize-observer @notify="handleResize" />
+    <DoughnutChart v-if="chartData" :height="height" :chartDataUser="chartData"/>
   </div>
 </template>
 
 <script>
-import DoughnutChart from './DoughnutChart'
+import DoughnutChart from '@/components/charts/DoughnutChart'
 
 export default {
   name: 'LoaDetail',
   components: { DoughnutChart },
   data () {
     return {
-      chartData: null
+      chartData: null,
+      height: 600
+    }
+  },
+  methods: {
+    handleResize () {
+      this.height = window.innerHeight * 0.7
     }
   },
   mounted: function () {

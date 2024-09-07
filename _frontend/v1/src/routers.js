@@ -27,6 +27,18 @@ export const routes = [
     ]
   },
   {
+    path: '/loa/',
+    component: () => import('@/modules/loa/LoaLayout'),
+    name: 'loa_route',
+    children: [
+      {
+        path: ':pk',
+        name: 'loadetail_route',
+        component: () => import('@/modules/loa/LoaDetail')
+      }
+    ]
+  },
+  {
     path: '/online',
     component: () => import('@/modules/online/OnlineLayout'),
     children: [

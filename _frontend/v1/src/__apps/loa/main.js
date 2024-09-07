@@ -1,15 +1,8 @@
 import './scss/loa.scss'
 import axios from 'axios'
 
-import Vue from 'vue'
-import LoaDetail from './vue/loa/LoaDetail'
-
 axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
-
-Vue.config.productionTip = false
-
-// Vue.http.headers.common['Access-Control-Allow-Origin'] = '*'
 
 window.AppLOA = function () {
   // Função única - Singleton pattern - operador new sempre devolve o mesmo objeto
@@ -31,13 +24,7 @@ window.AppLOA = function () {
       instance.LoaCrudDETAIL(container)
     }
   }
-  instance.LoaCrudDETAIL = function (container) {
-    const app = new Vue({ // eslint-disable-line
-      el: '#app-loa',
-      components: { LoaDetail },
-      template: '<LoaDetail/>'
-    })
-  }
+  instance.LoaCrudDETAIL = function (container) {}
   instance.EmendaLoaCRUD = function () {
     const container = $('.container-loa')
     if (container.hasClass('emendaloa-update')) {

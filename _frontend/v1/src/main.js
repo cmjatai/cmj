@@ -2,6 +2,7 @@
 import './__globals'
 import Vue from 'vue'
 import Vuex from 'vuex'
+import VueResize from 'vue-resize'
 import BootstrapVue from 'bootstrap-vue'
 import VueNativeSock from 'vue-native-websocket'
 import Router from 'vue-router'
@@ -12,7 +13,9 @@ import axios from 'axios'
 
 import { sync } from 'vuex-router-sync'
 import { loadProgressBar } from 'axios-progress-bar'
+
 import 'axios-progress-bar/dist/nprogress.css'
+import 'vue-resize/dist/vue-resize.css'
 
 import 'popper.js'
 
@@ -27,6 +30,7 @@ axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 
 Vue.use(Vuex)
 Vue.use(Router)
+Vue.use(VueResize)
 Vue.use(BootstrapVue)
 
 /*

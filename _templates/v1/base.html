@@ -140,7 +140,10 @@
                 </div>
               {% endfor %}
 
-              <div id="app"></div>
+              {% block appvue_content %}
+                <div id="app"></div>
+              {% endblock appvue_content %}
+
               {% block base_content %}{% endblock %}
             </div>
 
