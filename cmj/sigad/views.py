@@ -79,6 +79,7 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
         inserir_programa_diario = {
             'manhã cmj': True,
             'doação de corpos': True,
+            'nada se perde': True,
             'sessão ordinária': True
         }
 
