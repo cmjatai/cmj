@@ -56,6 +56,23 @@ class _SubFuncaoViewSet:
 @customize(Loa)
 class _LoaViewSet:
 
+    class LoaPermission(SaplModelPermissions):
+        def has_permission(self, request, view):
+            has_perm = super().has_permission(request, view)
+
+            if has_perm:
+                return has_perm
+
+            u = request.user
+            if u.is_anonymous:
+
+                if request.method == 'POST' and view.action == 'despesas_agrupadas':
+                    return True
+
+            return False
+
+    permission_classes = (LoaPermission, )
+
     @action(methods=['post', ], detail=True)
     def despesas_agrupadas(self, request, *args, **kwargs):
         loa_id = kwargs['pk']
