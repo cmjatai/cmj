@@ -14,6 +14,7 @@
 
 <script>
 import { Doughnut } from 'vue-chartjs/legacy'
+import ChartDataLabels from 'chartjs-plugin-datalabels'
 
 import {
   Chart as ChartJS,
@@ -24,7 +25,7 @@ import {
   CategoryScale
 } from 'chart.js'
 
-ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale)
+ChartJS.register(Title, Tooltip, Legend, ChartDataLabels, ArcElement, CategoryScale)
 
 export default {
   name: 'DoughnutChart',
@@ -42,7 +43,7 @@ export default {
     },
     width: {
       type: Number,
-      default: 800
+      default: 1000
     },
     height: {
       type: Number,
@@ -70,8 +71,41 @@ export default {
       chartData: null,
       chartOptions: {
         responsive: true,
-        maintainAspectRatio: false
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'right',
+            onHover: this.handleHover,
+            onLeave: this.handleLeave
+          },
+          datalabels: {
+            formatter: (value, ctx) => {
+              let dataset = ctx.dataset.data
+              let sum = 0
+              dataset.map(ds => {
+                sum += ds
+              })
+              let percentage = ((value / sum) * 100).toFixed(2) + '%'
+              return percentage
+            },
+            color: '#fff'
+          }
+        }
       }
+    }
+  },
+  methods: {
+    handleHover (evt, item, legend) {
+      legend.chart.data.datasets[0].backgroundColor.forEach((color, index, colors) => {
+        colors[index] = index === item.index || color.length === 9 ? color : color + '77'
+      })
+      legend.chart.update()
+    },
+    handleLeave (evt, item, legend) {
+      legend.chart.data.datasets[0].backgroundColor.forEach((color, index, colors) => {
+        colors[index] = color.length === 9 ? color.slice(0, -2) : color
+      })
+      legend.chart.update()
     }
   },
   mounted: function () {

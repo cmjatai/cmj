@@ -3,7 +3,7 @@ import logging
 
 from django.apps.registry import apps
 from django.core.validators import RegexValidator
-from django.db.models import Q
+from django.db.models import Q, F
 from django.db.models.aggregates import Sum
 from django.forms.models import model_to_dict
 from django.http.response import HttpResponse
@@ -35,6 +35,67 @@ ApiViewSetConstrutor.build_class(
         apps.get_app_config('loa')
     ]
 )
+
+
+@customize(SubFuncao)
+class _SubFuncaoViewSet:
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+
+        qp = self.request.query_params
+        if 'despesa_set__isnull' in qp:
+            dsisnull = qp['despesa_set__isnull'] == 'true'
+            qs = qs.filter(despesa_set__isnull=dsisnull).order_by(
+                'codigo').distinct()
+
+        return qs
+
+
+@customize(Loa)
+class _LoaViewSet:
+
+    @action(methods=['post', ], detail=True)
+    def despesas_agrupadas(self, request, *args, **kwargs):
+        loa_id = kwargs['pk']
+
+        filters_base = [
+            'orgao',
+            'unidade',
+            'funcao',
+            'subfuncao',
+            'programa',
+        ]
+
+        filters = request.data
+
+        agrup = filters.pop('agrupamento')
+        agrup = [f'{agrup}__codigo', f'{agrup}__especificacao']
+
+        filters = {
+            f'{k}_id': v
+            for k, v in filters.items() if v and k in filters_base
+        }
+        filters['loa_id'] = loa_id
+
+        r = list(Despesa.objects.filter(**filters).values(
+            codigo=F(agrup[0]), especificacao=F(agrup[1])
+        ).order_by(
+            agrup[0]
+        ).annotate(
+            vm=Sum('valor_materia'),
+            vn=Sum('valor_norma'),
+            alt=Sum('registrocontabil_set__valor')))
+
+        soma = sum(map(lambda x: x['vm'], r))
+
+        for idx, item in enumerate(r):
+            esp = item['especificacao']
+            vm = formats.number_format(item['vm'], force_grouping=True)
+            item['especificacao'] = f'R$ {vm} - {esp}'
+            r[idx]['vp'] = int((item['vm'] / soma) * 100)
+
+        return Response(r)
 
 
 @customize(OficioAjusteLoa)

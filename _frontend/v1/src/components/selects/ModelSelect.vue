@@ -39,7 +39,7 @@ export default {
         } else {
           _this.options = []
           if (!_this.required) {
-            _this.selected = Object()
+            _this.selected = null
             _this.options.push({ value: _this.selected, text: '---------------' })
           }
         }
@@ -49,7 +49,6 @@ export default {
 
       _this.utils.getModelOrderedList(_this.app, _this.model, _this.ordering, next_page, query_string)
         .then((response) => {
-          console.log(response.request.responseURL)
           _.each(response.data.results, function (item, idx) {
             _this.options.push({ value: item, text: item[_this.choice] })
             _this.refreshState({
