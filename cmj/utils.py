@@ -384,7 +384,7 @@ def run_sql(sql):
 
         result = cursor.execute(sql)
 
-        if sql.startswith('select'):
+        if sql.lower().startswith('select'):
             result = cursor.fetchall()
 
     return result

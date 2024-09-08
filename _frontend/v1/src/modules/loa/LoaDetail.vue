@@ -1,8 +1,9 @@
 <template>
-  <div>
+  <div class="loa-detail">
     <div class="container">
       <div class="row">
-        <div class="col-md-3">
+        <div class="col-md-3 mt-2">
+          Órgãos
           <model-select @change="value => despesa.orgaoselected=value"
             class="form-opacity d-flex w-100"
             app="loa"
@@ -14,7 +15,8 @@
             :extra_query="`&loa=${loa}`"
             ></model-select>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 mt-2">
+          Unidades Orçamentárias
           <model-select @change="value => despesa.unidadeselected=value"
             class="form-opacity d-flex w-100"
             app="loa"
@@ -26,7 +28,8 @@
             :extra_query="`${qs_loa}${qs_orgao}`"
             ></model-select>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 mt-2">
+          Funções
           <model-select @change="value => despesa.funcaoselected=value"
             class="form-opacity d-flex w-100"
             app="loa"
@@ -38,7 +41,8 @@
             :extra_query="`${qs_loa}`"
             ></model-select>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 mt-2">
+          Subfunções
           <model-select @change="value => despesa.subfuncaoselected=value"
             class="form-opacity d-flex w-100"
             app="loa"
@@ -50,7 +54,8 @@
             :extra_query="`${qs_loa}`"
             ></model-select>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 mt-2">
+          Programas
           <model-select @change="value => despesa.programaselected=value"
             class="form-opacity d-flex w-100"
             app="loa"
@@ -62,13 +67,33 @@
             :extra_query="`${qs_loa}`"
             ></model-select>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 mt-2">
+          Ações
+          <model-select @change="value => despesa.acaoselected=value"
+            class="form-opacity d-flex w-100"
+            app="loa"
+            model="acao"
+            choice="__str__"
+            ordering="codigo"
+            ref="acaoSelect"
+            :required="false"
+            :extra_query="`${qs_loa}`"
+            ></model-select>
+        </div>
+        <div class="col-md-2 mt-2">
+        </div>
+        <div class="col-md-2 mt-2 small">
+          Agrupamento dos Valores
           <b-form-select v-model="despesa.agrupamentoselected" :options="agrupamentos" :select-size="1"/>
+        </div>
+        <div class="col-md-2 mt-2 small">
+          Máximo de Itens
+          <b-form-select v-model="despesa.itensselected" :options="itens" :select-size="1"/>
         </div>
       </div>
       <div class="row">
         <div class="col-12 mt-3 bg-white p-3">
-          <DoughnutChart v-if="chartData" :height="height" :chartDataUser="chartData"/>
+          <DoughnutChart v-if="chartData" :height="height" :plugins="plugins" :chartDataUser="chartData"/>
         </div>
       </div>
     </div>
@@ -90,21 +115,43 @@ export default {
     return {
       loa: this.$route.params.pkloa,
       chartData: null,
-      height: 600,
+      height: 500,
+      plugins: [{
+        title: {
+          display: true,
+          text: ''
+        }
+      }],
       despesa: {
         orgaoselected: null,
         unidadeselected: null,
         funcaoselected: null,
         subfuncaoselected: null,
         programaselected: null,
-        agrupamentoselected: 'orgao'
+        acaoselected: null,
+        agrupamentoselected: 'funcao',
+        itensselected: 20
       },
       agrupamentos: {
         orgao: 'Órgãos',
         unidade: 'Unidades Orçamentárias',
         funcao: 'Funções',
         subfuncao: 'SubFunções',
-        programa: 'Programas'
+        programa: 'Programas',
+        acao: 'Ações',
+        natureza_1: 'Natureza - Nível 1',
+        natureza_2: 'Natureza - Nível 2',
+        natureza_3: 'Natureza - Nível 3',
+        natureza_4: 'Natureza - Nível 4',
+        natureza_5: 'Natureza - Nível 5'
+      },
+      itens: {
+        5: '05 Maiores',
+        10: '10 Maiores',
+        15: '15 Maiores',
+        20: '20 Maiores',
+        25: '25 Maiores',
+        0: 'Todos os Itens'
       }
     }
   },
@@ -185,7 +232,33 @@ export default {
           })
       }
     },
+    'despesa.acaoselected': {
+      deep: true,
+      immediate: true,
+      handler (nv, ov) {
+        const t = this
+        t.$nextTick()
+          .then(function () {
+            if ((ov || nv) && ov !== nv) {
+              t.fetch()
+            }
+          })
+      }
+    },
     'despesa.agrupamentoselected': {
+      deep: true,
+      immediate: true,
+      handler (nv, ov) {
+        const t = this
+        t.$nextTick()
+          .then(function () {
+            if ((ov || nv) && ov !== nv) {
+              t.fetch()
+            }
+          })
+      }
+    },
+    'despesa.itensselected': {
       deep: true,
       immediate: true,
       handler (nv, ov) {
@@ -201,11 +274,11 @@ export default {
   },
   methods: {
     handleResize () {
-      const h = window.innerHeight * 0.85
+      /* const h = window.innerHeight * 0.65
       if (h !== this.height) {
         this.height = h
       }
-      /* if (this.chartData && this.chartData.labels.length > 0) {
+      if (this.chartData && this.chartData.labels.length > 0) {
         let hlabels = h / this.chartData.labels.length
         if (hlabels < 50) {
           this.height = this.chartData.labels.length * 50
@@ -220,7 +293,9 @@ export default {
         funcao: t.despesa.funcaoselected ? t.despesa.funcaoselected.id : null,
         subfuncao: t.despesa.subfuncaoselected ? t.despesa.subfuncaoselected.id : null,
         programa: t.despesa.programaselected ? t.despesa.programaselected.id : null,
-        agrupamento: t.despesa.agrupamentoselected
+        acao: t.despesa.acaoselected ? t.despesa.acaoselected.id : null,
+        agrupamento: t.despesa.agrupamentoselected,
+        itens: t.despesa.itensselected
       }
       t.$nextTick()
         .then(() => {
@@ -230,15 +305,16 @@ export default {
               let cor = t.build_colors(response.data.length)
               let data = []
               _.each(response.data, function (item, idx) {
-                labels.push(item.especificacao)
+                labels.push(`${item.vm_str} / ${item.codigo}-${item.especificacao}`)
                 data.push(item.vm)
               })
               let chartData = {
                 labels,
                 datasets: [
                   {
+                    data,
                     backgroundColor: cor,
-                    data
+                    hoverOffset: 50
                   }
                 ]
               }
@@ -248,8 +324,15 @@ export default {
               }
               t.$set(t.chartData, 'labels', labels)
               t.$set(t.chartData.datasets, 0, {
+                data,
                 backgroundColor: cor,
-                data
+                hoverOffset: 50
+              })
+              t.$set(t.plugins, 0, {
+                title: {
+                  display: true,
+                  text: `ORÇAMENTO NO PROJETO ORIGINAL: R$ ${response.data.length > 0 ? response.data[0].vm_soma : '0,00'}. Despesas agrupadas por: ${t.agrupamentos[formFilter.agrupamento]}`
+                }
               })
             })
             .then((response) => {
@@ -260,13 +343,51 @@ export default {
         })
     },
     build_colors (n) {
+      const colors = []
+      if (n < 1) {
+        return colors
+      }
+
+      let hue = Math.floor(Math.random() * 360)
+      let delta = 0
+
+      let hsl2rgb = (h, s, l, a = s * Math.min(l, 1 - l), f = (n, k = (n + h / 30) % 12) => l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1)) => [f(0), f(8), f(4)]
+      let rgb2hex = (r, g, b) => '#' + [r, g, b].map(x => Math.round(x * 255).toString(16).padStart(2, 0)).join('')
+
+      for (let x = 0; x < n; x++) {
+        let hex = `${rgb2hex(...hsl2rgb(hue, Math.max(0.8, Math.random()), 0.4))}`
+        delta = Math.random() * 30 + (hue < 150 ? 50 : 25)
+        // console.log('Delta', delta, 'Hue:', hue)
+        hue = (hue + delta) % 360
+        colors.push(hex)
+      }
+      return colors
+    },
+    build_colors_hsl (n) {
+      const colors = []
+      if (n < 1) {
+        return colors
+      }
+      let hue = Math.floor(Math.random() * 360)
+      let delta = 0
+      for (let x = 0; x < n; x++) {
+        let color = 'hsl( ' + hue + ', 100%, 40%)'
+
+        delta = Math.random() * 30 + (hue < 150 ? 50 : 25)
+        // console.log('Delta', delta, 'Hue:', hue)
+        hue = (hue + delta) % 360
+        colors.push(color)
+      }
+      return colors
+    },
+    build_colors_random (n) {
       const letters = '0123456789ABCDEF'
 
       const colors = []
       for (let x = 0; x < n; x++) {
         let color = '#'
         for (let y = 0; y < 6; y++) {
-          color += letters[Math.floor(Math.random() * 16)]
+          color += letters[Math.floor(Math.random() * (y % 2 === 0 ? 14 : 16))]
         }
         colors.push(color)
       }
@@ -278,3 +399,10 @@ export default {
   }
 }
 </script>
+<style lang="scss" scoped>
+$mp: 3px;
+[class^=col] {
+  padding-left: $mp;
+  padding-right: $mp;
+}
+</style>

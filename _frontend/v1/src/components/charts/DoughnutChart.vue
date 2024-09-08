@@ -37,6 +37,10 @@ export default {
       type: String,
       default: 'doughnut-chart'
     },
+    chartDataUser: {
+      type: Object,
+      default: () => {}
+    },
     datasetIdKey: {
       type: String,
       default: 'label'
@@ -47,7 +51,7 @@ export default {
     },
     height: {
       type: Number,
-      default: 600
+      default: 500
     },
     cssClasses: {
       default: '',
@@ -60,10 +64,6 @@ export default {
     plugins: {
       type: Array,
       default: () => []
-    },
-    chartDataUser: {
-      type: Object,
-      default: () => {}
     }
   },
   data () {
@@ -72,11 +72,29 @@ export default {
       chartOptions: {
         responsive: true,
         maintainAspectRatio: false,
+        layout: {
+          padding: 15
+        },
         plugins: {
+          title: {
+            display: true,
+            text: '',
+            padding: {
+              top: -15,
+              bottom: 20
+            }
+          },
           legend: {
-            position: 'right',
+            position: 'left',
             onHover: this.handleHover,
-            onLeave: this.handleLeave
+            onLeave: this.handleLeave,
+            labels: {
+              font: {
+                family: "'Courier New', Courier, monospace",
+                size: 15
+              },
+              padding: 2
+            }
           },
           datalabels: {
             formatter: (value, ctx) => {
@@ -85,7 +103,7 @@ export default {
               dataset.map(ds => {
                 sum += ds
               })
-              let percentage = ((value / sum) * 100).toFixed(2) + '%'
+              let percentage = ((value / sum) * 100).toFixed(1) + '%'
               return percentage
             },
             color: '#fff'
@@ -94,10 +112,15 @@ export default {
       }
     }
   },
+  watch: {
+    plugins: function (nv, ov) {
+      this.chartOptions.plugins.title.text = nv[0].title.text
+    }
+  },
   methods: {
     handleHover (evt, item, legend) {
       legend.chart.data.datasets[0].backgroundColor.forEach((color, index, colors) => {
-        colors[index] = index === item.index || color.length === 9 ? color : color + '77'
+        colors[index] = index === item.index || color.length === 9 ? color : color + '3d'
       })
       legend.chart.update()
     },
@@ -109,6 +132,7 @@ export default {
     }
   },
   mounted: function () {
+    this.chartOptions.plugins.title.text = this.plugins[0].title.text
     this.chartData = this.chartDataUser
   }
 }

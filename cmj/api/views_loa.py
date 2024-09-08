@@ -5,6 +5,7 @@ from django.apps.registry import apps
 from django.core.validators import RegexValidator
 from django.db.models import Q, F
 from django.db.models.aggregates import Sum
+from django.db.models.functions import Substr
 from django.forms.models import model_to_dict
 from django.http.response import HttpResponse
 from django.template.loader import render_to_string
@@ -65,12 +66,41 @@ class _LoaViewSet:
             'funcao',
             'subfuncao',
             'programa',
+            'acao',
+            'natureza_1',
+            'natureza_2',
+            'natureza_3',
+            'natureza_4',
+            'natureza_5'
         ]
 
         filters = request.data
 
-        agrup = filters.pop('agrupamento')
-        agrup = [f'{agrup}__codigo', f'{agrup}__especificacao']
+        try:
+            itens = filters.pop('itens')
+            itens = min(25, int(itens))
+        except:
+            itens = 20
+
+        grup_str = filters.pop('agrupamento')
+        agrup = {}
+
+        if 'natureza' not in grup_str:
+            agrup['codigo'] = F(f'{grup_str}__codigo')
+            agrup['especificacao'] = F(f'{grup_str}__especificacao')
+            order_by = f'{grup_str}__codigo'
+        else:
+            ndict = {
+                1: 1,
+                2: 3,
+                3: 6,
+                4: 9,
+                5: 12
+            }
+            nivel = int(grup_str.split('_')[1])
+
+            agrup['codigo'] = Substr(f'natureza__codigo', 1, ndict[nivel])
+            order_by = 'natureza__codigo'
 
         filters = {
             f'{k}_id': v
@@ -78,22 +108,76 @@ class _LoaViewSet:
         }
         filters['loa_id'] = loa_id
 
-        r = list(Despesa.objects.filter(**filters).values(
-            codigo=F(agrup[0]), especificacao=F(agrup[1])
+        rs = list(Despesa.objects.filter(**filters).values(
+            **agrup
         ).order_by(
-            agrup[0]
+            order_by
         ).annotate(
             vm=Sum('valor_materia'),
             vn=Sum('valor_norma'),
             alt=Sum('registrocontabil_set__valor')))
 
+        if 'natureza' not in grup_str:
+            r = rs
+        else:
+            r = {}
+            for i in rs:
+                nat = i['codigo']
+                if nat not in r:
+                    r[nat] = i
+                    r[nat]['vm'] = i['vm'] or Decimal('0.00')
+                    r[nat]['vn'] = i['vn'] or Decimal('0.00')
+                    r[nat]['alt'] = i['alt'] or Decimal('0.00')
+                    continue
+
+                r[nat]['vm'] += i['vm'] or Decimal('0.00')
+                r[nat]['vn'] += i['vn'] or Decimal('0.00')
+                r[nat]['alt'] += i['alt'] or Decimal('0.00')
+            r = r.values()
+
+            for i in r:
+                cod = i['codigo']
+                cod = cod.split('.')
+                while len(cod) < 5:
+                    cod.append('0' * 2 if len(cod) > 1 else '0')
+                cod = '.'.join(cod)
+                nat = Natureza.objects.filter(
+                    loa_id=loa_id, codigo=cod).first()
+                i['especificacao'] = nat.especificacao if nat else ''
+
         soma = sum(map(lambda x: x['vm'], r))
+
+        r = sorted(r, key=lambda x: -x['vm'])
+
+        outros = r[itens:] if itens else []
+        r = r[:itens] if itens else r
+
+        if outros:
+            outros[0]['vm'] = outros[0]['vm'] or Decimal('0.00')
+            outros[0]['vn'] = outros[0]['vn'] or Decimal('0.00')
+            outros[0]['alt'] = outros[0]['alt'] or Decimal('0.00')
+
+            for idx, item in enumerate(outros):
+                if idx:
+                    outros[0]['vm'] += item['vm'] or Decimal('0.00')
+                    outros[0]['vn'] += item['vn'] or Decimal('0.00')
+                    outros[0]['alt'] += item['alt'] or Decimal('0.00')
+
+            outros[0]['codigo'] = ' ' * len(outros[0]['codigo'])
+            outros[0]['especificacao'] = 'OUTROS'
+            r.append(outros[0])
 
         for idx, item in enumerate(r):
             esp = item['especificacao']
             vm = formats.number_format(item['vm'], force_grouping=True)
-            item['especificacao'] = f'R$ {vm} - {esp}'
+            while len(vm) < 14:
+                vm = f' {vm}'
+            item['especificacao'] = f'{esp}'
+            r[idx]['vm_str'] = vm
             r[idx]['vp'] = int((item['vm'] / soma) * 100)
+
+            r[idx]['vm_soma'] = formats.number_format(
+                soma, force_grouping=True)
 
         return Response(r)
 
