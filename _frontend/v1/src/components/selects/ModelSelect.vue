@@ -8,16 +8,25 @@
 
 export default {
   name: 'model-select',
-  props: ['app', 'model', 'label', 'limit', 'ordering', 'choice', 'height', 'extra_query', 'required'],
+  props: ['value',
+    'app', 'model',
+    'label',
+    'limit',
+    'ordering',
+    'choice', 'height', 'extra_query', 'required'
+  ],
   data () {
     return {
-      selected: null,
+      selected: this.value,
       options: []
     }
   },
   watch: {
     selected: function (nv, ov) {
       this.$emit('change', nv)
+    },
+    value: function (nv, ov) {
+      this.selected = nv
     }
   },
   methods: {
@@ -32,15 +41,12 @@ export default {
        */
       let _this = this
       if (next_page === 1) {
-        if (_this.height === 1) {
-          _this.options = [
-            { value: null, text: this.label }
-          ]
-        } else {
-          _this.options = []
-          if (!_this.required) {
-            _this.selected = null
-            _this.options.push({ value: _this.selected, text: '---------------' })
+        if (!_this.height || this.height === 1) {
+          if (_this.required === undefined || !_this.required) {
+            _this.selected = _this.value ? _this.value : null
+            _this.options = [
+              { value: _this.selected, text: this.label ? this.label : '---------------' }
+            ]
           }
         }
       }

@@ -1,11 +1,12 @@
 <template>
   <div class="loa-detail">
     <div class="container">
-      <div class="row">
-        <div class="col-md-3 mt-2">
+      <strong class="d-block mx-3 my-2">Utilize os filtros abaixo e/ou aplique agrupamentos para visões diferentes</strong>
+      <div class="row c-fields">
+        <div class="col-md-3">
           Órgãos
           <model-select @change="value => despesa.orgaoselected=value"
-            class="form-opacity d-flex w-100"
+            v-model="despesa.orgaoselected"
             app="loa"
             model="orgao"
             choice="__str__"
@@ -14,11 +15,9 @@
             :required="false"
             :extra_query="`&loa=${loa}`"
             ></model-select>
-        </div>
-        <div class="col-md-3 mt-2">
           Unidades Orçamentárias
           <model-select @change="value => despesa.unidadeselected=value"
-            class="form-opacity d-flex w-100"
+            v-model="despesa.unidadeselected"
             app="loa"
             model="unidadeorcamentaria"
             choice="__str__"
@@ -28,10 +27,10 @@
             :extra_query="`${qs_loa}${qs_orgao}`"
             ></model-select>
         </div>
-        <div class="col-md-3 mt-2">
+        <div class="col-md-3">
           Funções
           <model-select @change="value => despesa.funcaoselected=value"
-            class="form-opacity d-flex w-100"
+            v-model="despesa.funcaoselected"
             app="loa"
             model="funcao"
             choice="__str__"
@@ -40,11 +39,9 @@
             :required="false"
             :extra_query="`${qs_loa}`"
             ></model-select>
-        </div>
-        <div class="col-md-3 mt-2">
           Subfunções
           <model-select @change="value => despesa.subfuncaoselected=value"
-            class="form-opacity d-flex w-100"
+            v-model="despesa.subfuncaoselected"
             app="loa"
             model="subfuncao"
             choice="__str__"
@@ -54,10 +51,10 @@
             :extra_query="`${qs_loa}`"
             ></model-select>
         </div>
-        <div class="col-md-3 mt-2">
+        <div class="col-md-3">
           Programas
           <model-select @change="value => despesa.programaselected=value"
-            class="form-opacity d-flex w-100"
+            v-model="despesa.programaselected"
             app="loa"
             model="programa"
             choice="__str__"
@@ -66,11 +63,9 @@
             :required="false"
             :extra_query="`${qs_loa}`"
             ></model-select>
-        </div>
-        <div class="col-md-3 mt-2">
           Ações
           <model-select @change="value => despesa.acaoselected=value"
-            class="form-opacity d-flex w-100"
+            v-model="despesa.acaoselected"
             app="loa"
             model="acao"
             choice="__str__"
@@ -80,15 +75,20 @@
             :extra_query="`${qs_loa}`"
             ></model-select>
         </div>
-        <div class="col-md-2 mt-2">
+        <div class="col-md-1">
         </div>
-        <div class="col-md-2 mt-2 small">
-          Agrupamento dos Valores
-          <b-form-select v-model="despesa.agrupamentoselected" :options="agrupamentos" :select-size="1"/>
-        </div>
-        <div class="col-md-2 mt-2 small">
-          Máximo de Itens
-          <b-form-select v-model="despesa.itensselected" :options="itens" :select-size="1"/>
+        <div class="col-md-2 c-groups">
+          <div class="">
+            <strong>Agrupamentos</strong>
+            <b-form-select v-model="despesa.agrupamentoselected" :options="agrupamentos" :select-size="1"/>
+          </div>
+          <div class="">
+            <strong>Máximo de Itens</strong>
+            <b-form-select v-model="despesa.itensselected" :options="itens" :select-size="1"/>
+          </div>
+          <div class="col mt-1 text-right">
+            <b-button class="bg-secondary" size="sm" @click="clearFilters(event)">Limpar Pesquisa</b-button>
+          </div>
         </div>
       </div>
       <div class="row">
@@ -115,7 +115,7 @@ export default {
     return {
       loa: this.$route.params.pkloa,
       chartData: null,
-      height: 500,
+      height: 400,
       plugins: [{
         title: {
           display: true,
@@ -273,6 +273,19 @@ export default {
     }
   },
   methods: {
+    clearFilters (event) {
+      const t = this
+      t.despesa = {
+        orgaoselected: null,
+        unidadeselected: null,
+        funcaoselected: null,
+        subfuncaoselected: null,
+        programaselected: null,
+        acaoselected: null,
+        agrupamentoselected: 'funcao',
+        itensselected: 20
+      }
+    },
     handleResize () {
       /* const h = window.innerHeight * 0.65
       if (h !== this.height) {
@@ -400,9 +413,37 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-$mp: 3px;
-[class^=col] {
-  padding-left: $mp;
-  padding-right: $mp;
-}
+  .loa-detail {
+    margin-bottom: 2em;
+  }
+  $mp: 3px;
+  [class^=col] {
+    padding-left: $mp;
+    padding-right: $mp;
+  }
+  .colwithbuttonclean {
+    margin-left: -$mp;
+    margin-right: -$mp;
+    align-items: center;
+    .acaoselected {
+      flex: 1 2 auto;
+    }
+    button {
+      text-wrap: nowrap;
+    }
+  }
+  .c-fields {
+  }
+  .c-groups {
+    font-size: 80%;
+    .custom-select {
+      font-size: 100%;
+      padding: $mp;
+      height: auto;
+    }
+    .btn {
+      padding: $mp $mp * 2;
+      line-height: 1;
+    }
+  }
 </style>
