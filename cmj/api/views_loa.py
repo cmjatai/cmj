@@ -64,10 +64,9 @@ class _LoaViewSet:
                 return has_perm
 
             u = request.user
-            if u.is_anonymous:
 
-                if request.method == 'POST' and view.action == 'despesas_agrupadas':
-                    return True
+            if request.method == 'POST' and view.action == 'despesas_agrupadas':
+                return True
 
             return False
 
