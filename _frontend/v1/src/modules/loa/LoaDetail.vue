@@ -150,6 +150,19 @@ export default {
         natureza_4: 'Natureza - Nível 4',
         natureza_5: 'Natureza - Nível 5'
       },
+      tipos_agrups: [
+        'orgao',
+        'unidade',
+        'funcao',
+        'subfuncao',
+        'programa',
+        'acao',
+        'natureza_1',
+        'natureza_2',
+        'natureza_3',
+        'natureza_4',
+        'natureza_5'
+      ],
       itens: {
         5: '05 Maiores',
         10: '10 Maiores',
@@ -176,13 +189,15 @@ export default {
       immediate: true,
       handler (nv, ov) {
         const t = this
-        t.$nextTick()
-          .then(function () {
-            if ((ov || nv) && ov !== nv) {
-              t.$refs.unidadeSelect.fetch()
+        if ((ov || nv) && ov !== nv) {
+          t.$nextTick()
+            .then(function () {
+              if (t.tipos_agrups.indexOf(t.despesa.agrupamentoselected) < t.tipos_agrups.indexOf('unidade')) {
+                t.despesa.agrupamentoselected = 'unidade'
+              }
               t.fetch()
-            }
-          })
+            })
+        }
       }
     },
     'despesa.unidadeselected': {
@@ -190,12 +205,15 @@ export default {
       immediate: true,
       handler (nv, ov) {
         const t = this
-        t.$nextTick()
-          .then(function () {
-            if ((ov || nv) && ov !== nv) {
+        if ((ov || nv) && ov !== nv) {
+          t.$nextTick()
+            .then(function () {
+              if (t.tipos_agrups.indexOf(t.despesa.agrupamentoselected) < t.tipos_agrups.indexOf('funcao')) {
+                t.despesa.agrupamentoselected = 'funcao'
+              }
               t.fetch()
-            }
-          })
+            })
+        }
       }
     },
     'despesa.funcaoselected': {
@@ -203,12 +221,15 @@ export default {
       immediate: true,
       handler (nv, ov) {
         const t = this
-        t.$nextTick()
-          .then(function () {
-            if ((ov || nv) && ov !== nv) {
+        if ((ov || nv) && ov !== nv) {
+          t.$nextTick()
+            .then(function () {
+              if (t.tipos_agrups.indexOf(t.despesa.agrupamentoselected) < t.tipos_agrups.indexOf('subfuncao')) {
+                t.despesa.agrupamentoselected = 'subfuncao'
+              }
               t.fetch()
-            }
-          })
+            })
+        }
       }
     },
     'despesa.subfuncaoselected': {
@@ -216,12 +237,15 @@ export default {
       immediate: true,
       handler (nv, ov) {
         const t = this
-        t.$nextTick()
-          .then(function () {
-            if ((ov || nv) && ov !== nv) {
+        if ((ov || nv) && ov !== nv) {
+          t.$nextTick()
+            .then(function () {
+              if (t.tipos_agrups.indexOf(t.despesa.agrupamentoselected) < t.tipos_agrups.indexOf('programa')) {
+                t.despesa.agrupamentoselected = 'programa'
+              }
               t.fetch()
-            }
-          })
+            })
+        }
       }
     },
     'despesa.programaselected': {
@@ -229,12 +253,15 @@ export default {
       immediate: true,
       handler (nv, ov) {
         const t = this
-        t.$nextTick()
-          .then(function () {
-            if ((ov || nv) && ov !== nv) {
+        if ((ov || nv) && ov !== nv) {
+          t.$nextTick()
+            .then(function () {
+              if (t.tipos_agrups.indexOf(t.despesa.agrupamentoselected) < t.tipos_agrups.indexOf('acao')) {
+                t.despesa.agrupamentoselected = 'acao'
+              }
               t.fetch()
-            }
-          })
+            })
+        }
       }
     },
     'despesa.acaoselected': {
@@ -242,12 +269,15 @@ export default {
       immediate: true,
       handler (nv, ov) {
         const t = this
-        t.$nextTick()
-          .then(function () {
-            if ((ov || nv) && ov !== nv) {
+        if ((ov || nv) && ov !== nv) {
+          t.$nextTick()
+            .then(function () {
+              if (t.tipos_agrups.indexOf(t.despesa.agrupamentoselected) < t.tipos_agrups.indexOf('natureza_1')) {
+                t.despesa.agrupamentoselected = 'natureza_5'
+              }
               t.fetch()
-            }
-          })
+            })
+        }
       }
     },
     'despesa.agrupamentoselected': {
@@ -255,12 +285,12 @@ export default {
       immediate: true,
       handler (nv, ov) {
         const t = this
-        t.$nextTick()
-          .then(function () {
-            if ((ov || nv) && ov !== nv) {
+        if ((ov || nv) && ov !== nv) {
+          t.$nextTick()
+            .then(function () {
               t.fetch()
-            }
-          })
+            })
+        }
       }
     },
     'despesa.itensselected': {
@@ -349,7 +379,7 @@ export default {
               t.$set(t.plugins, 0, {
                 title: {
                   display: true,
-                  text: `ORÇAMENTO NO PROJETO ORIGINAL: R$ ${response.data.length > 0 ? response.data[0].vm_soma : '0,00'}. Despesas agrupadas por: ${t.agrupamentos[formFilter.agrupamento]}`
+                  text: `ORÇAMENTO COM BASE NOS FILTROS APLICADOS: R$ ${response.data.length > 0 ? response.data[0].vm_soma : '0,00'}. Despesas agrupadas por: ${t.agrupamentos[formFilter.agrupamento]}`
                 }
               })
             })

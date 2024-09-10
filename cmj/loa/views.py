@@ -174,7 +174,7 @@ class LoaCrud(Crud):
 
             pk = int(kwargs['pk'])
             if pk <= 2022:
-                self.layout_key = '_'
+                self.layout_key = 'LoaDetailATE2022'
 
             response = super().get(request, *args, **kwargs)
             if not self.object.publicado and request.user.is_anonymous:

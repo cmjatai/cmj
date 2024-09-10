@@ -10,6 +10,9 @@ LoaDetail:
   - ano:2 receita_corrente_liquida:4 materia_ou_norma
   - disp_total disp_saude disp_diversos
   - resumo_emendas_impositivas
+LoaDetailATE2022:
+  {% trans 'Dados Gerais da LOA' %}:
+  - ano:3 materia_ou_norma
 
 EmendaLoa:
   {% trans 'Dados Gerais' %}:
