@@ -48,6 +48,8 @@ export default {
               { value: _this.selected, text: this.label ? this.label : '---------------' }
             ]
           }
+        } else {
+          _this.options = []
         }
       }
 
