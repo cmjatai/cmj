@@ -106,6 +106,11 @@ class LoaCrud(Crud):
         def hook_header_perc_disp_diversos(self):
             return ''
 
+        def hook_receita_corrente_liquida(self, *args, **kwargs):
+            l = args[0]
+
+            return args[1] if l.ano >= 2023 else '', args[2]
+
         def hook_ano(self, *args, **kwargs):
             l = args[0]
             return f'LOA {args[1]}', args[2]
@@ -166,6 +171,11 @@ class LoaCrud(Crud):
             return context
 
         def get(self, request, *args, **kwargs):
+
+            pk = int(kwargs['pk'])
+            if pk <= 2022:
+                self.layout_key = '_'
+
             response = super().get(request, *args, **kwargs)
             if not self.object.publicado and request.user.is_anonymous:
                 raise Http404
@@ -205,6 +215,7 @@ class LoaCrud(Crud):
 
         def hook_resumo_emendas_impositivas(self, *args, **kwargs):
             l = args[0]
+
             template = loader.get_template('loa/loaparlamentar_set_list.html')
 
             loaparlamentares = l.loaparlamentar_set.order_by(

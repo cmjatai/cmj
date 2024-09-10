@@ -19,6 +19,7 @@ from django.utils.translation import ugettext_lazy as _
 from django_filters.filters import ChoiceFilter, MultipleChoiceFilter,\
     ModelMultipleChoiceFilter, CharFilter
 from django_filters.filterset import FilterSet
+import yaml
 
 from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa,\
     RegistroAjusteLoa, RegistroAjusteLoaParlamentar, EmendaLoaRegistroContabil
@@ -95,7 +96,7 @@ class LoaForm(MateriaCheckFormMixin, ModelForm):
         queryset=MateriaLegislativa.objects.all())
 
     parlamentares = forms.ModelMultipleChoiceField(
-        required=True,
+        required=False,
         widget=forms.CheckboxSelectMultiple(),
         queryset=Parlamentar.objects.all())
 
@@ -109,7 +110,8 @@ class LoaForm(MateriaCheckFormMixin, ModelForm):
             'perc_disp_total',
             'perc_disp_saude',
             'perc_disp_diversos',
-            'parlamentares'
+            'parlamentares',
+            'yaml_obs'
         ]
 
     def __init__(self, *args, **kwargs):
@@ -118,6 +120,21 @@ class LoaForm(MateriaCheckFormMixin, ModelForm):
         self.fields['parlamentares'].choices = [
             (p.pk, p) for p in Parlamentar.objects.filter(ativo=True)
         ]
+
+    def clean(self):
+        cd = super().clean()
+
+        if not cd:
+            cd = self.cleaned_data
+
+        try:
+            yo = yaml.full_load(cd['yaml_obs'])
+            print(yo)
+        except Exception as e:
+            raise ValidationError(
+                'Erro na validação das observações de Rodapé.')
+
+        return cd
 
     def save(self, commit=True):
 
@@ -150,21 +167,22 @@ class LoaForm(MateriaCheckFormMixin, ModelForm):
         lps = i.loaparlamentar_set.all()
         count_lps = lps.count()
 
-        idtp = quantize(i.disp_total / Decimal(count_lps),
-                        rounding=ROUND_DOWN)
-        idsp = quantize(i.disp_saude / Decimal(count_lps),
-                        rounding=ROUND_DOWN)
-        iddp = quantize(i.disp_diversos / Decimal(count_lps),
-                        rounding=ROUND_DOWN)
+        if count_lps:
+            idtp = quantize(i.disp_total / Decimal(count_lps),
+                            rounding=ROUND_DOWN)
+            idsp = quantize(i.disp_saude / Decimal(count_lps),
+                            rounding=ROUND_DOWN)
+            iddp = quantize(i.disp_diversos / Decimal(count_lps),
+                            rounding=ROUND_DOWN)
 
-        # if iddp + idsp != idtp:
-        #    iddp = idtp - idsp
+            # if iddp + idsp != idtp:
+            #    iddp = idtp - idsp
 
-        for lp in lps:
-            lp.disp_total = idtp
-            lp.disp_saude = idsp
-            lp.disp_diversos = iddp
-            lp.save()
+            for lp in lps:
+                lp.disp_total = idtp
+                lp.disp_saude = idsp
+                lp.disp_diversos = iddp
+                lp.save()
 
         return i
 

@@ -13,7 +13,7 @@
             ordering="codigo"
             ref="orgaoSelect"
             :required="false"
-            :extra_query="`&loa=${loa}`"
+            :extra_query="`&loa=${qs_loa}`"
             ></model-select>
           Unidades Orçamentárias
           <model-select @change="value => despesa.unidadeselected=value"
@@ -95,6 +95,7 @@
         <div class="col-12 mt-3 bg-white p-3">
           <DoughnutChart v-if="chartData" :height="height" :plugins="plugins" :chartDataUser="chartData"/>
         </div>
+        <div class="col-12 mt-3 " v-html="loa.yaml_obs && loa.yaml_obs.GRAFICO_DESPESAS_MATERIA ? loa.yaml_obs.GRAFICO_DESPESAS_MATERIA : ''"></div>
       </div>
     </div>
     <resize-observer @notify="handleResize" />
@@ -104,6 +105,8 @@
 <script>
 import ModelSelect from '@/components/selects/ModelSelect.vue'
 import DoughnutChart from '@/components/charts/DoughnutChart'
+import YAML from 'js-yaml' // eslint-disable-line
+// import { parse, stringify } from 'yaml' // eslint-disable-line
 
 export default {
   name: 'LoaDetail',
@@ -113,7 +116,9 @@ export default {
   },
   data () {
     return {
-      loa: this.$route.params.pkloa,
+      loa: {
+        id: this.$route.params.pkloa
+      },
       chartData: null,
       height: 400,
       plugins: [{
@@ -157,7 +162,7 @@ export default {
   },
   computed: {
     qs_loa: function () {
-      const value = this.loa
+      const value = this.loa.id
       return value ? `&loa=${value}&despesa_set__isnull=False` : ''
     },
     qs_orgao: function () {
@@ -312,7 +317,7 @@ export default {
       }
       t.$nextTick()
         .then(() => {
-          t.utils.postModelAction('loa', 'loa', t.loa, 'despesas_agrupadas', formFilter)
+          t.utils.postModelAction('loa', 'loa', t.loa.id, 'despesas_agrupadas', formFilter)
             .then((response) => {
               let labels = []
               let cor = t.build_colors(response.data.length)
@@ -408,7 +413,18 @@ export default {
     }
   },
   mounted: function () {
-    this.fetch()
+    const t = this
+    t.fetch()
+
+    t.$nextTick()
+      .then(() => {
+        t.utils.getModel('loa', 'loa', t.loa.id)
+          .then((response) => {
+            const yaml_obs = YAML.load(response.data.yaml_obs)
+            response.data.yaml_obs = yaml_obs
+            t.loa = response.data
+          })
+      })
   }
 }
 </script>

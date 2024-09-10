@@ -81,6 +81,10 @@ class Loa(models.Model):
             'loa',
             'parlamentar'))
 
+    yaml_obs = models.TextField(
+        verbose_name=_('Observações de Rodapé (yaml format)'),
+        blank=True, null=True, default='')
+
     publicado = models.BooleanField(
         default=False, verbose_name=_('Publicado?'))
 
