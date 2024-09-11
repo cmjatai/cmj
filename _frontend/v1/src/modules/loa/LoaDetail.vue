@@ -514,8 +514,6 @@ export default {
   },
   mounted: function () {
     const t = this
-    t.fetch()
-
     t.$nextTick()
       .then(() => {
         t.utils.getModel('loa', 'loa', t.loa.id)
@@ -524,6 +522,9 @@ export default {
             response.data.yaml_obs = yaml_obs
             t.loa = response.data
           })
+      })
+      .then(() => {
+        t.fetch()
       })
   }
 }
