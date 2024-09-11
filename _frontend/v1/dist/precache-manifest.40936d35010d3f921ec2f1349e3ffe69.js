@@ -28,7 +28,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/brasao/escola_1024.png"
   },
   {
-    "revision": "3b276d0ec3eb19fef338",
+    "revision": "45bd3dd2214d96d5544c",
     "url": "/static/css/app.c54359d1.css"
   },
   {
@@ -48,12 +48,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/css/chunk-6f0ff250.707facdf.css"
   },
   {
-    "revision": "9907627aeb440344a6f9",
-    "url": "/static/css/chunk-763df01a.71109f00.css"
+    "revision": "8eb5f0804dae84a22738",
+    "url": "/static/css/chunk-7209e459.bd7705e9.css"
   },
   {
-    "revision": "4a9e3274a33867c58e38",
-    "url": "/static/css/chunk-b97be54c.f91e01dc.css"
+    "revision": "9907627aeb440344a6f9",
+    "url": "/static/css/chunk-763df01a.71109f00.css"
   },
   {
     "revision": "519858490f199729b073",
@@ -356,12 +356,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/user.png"
   },
   {
-    "revision": "0d8bd7aa09f8ac01addf027dc5351df4",
+    "revision": "f778060e79794f9e18381fc3f3fc875b",
     "url": "/static/index.html"
   },
   {
-    "revision": "3b276d0ec3eb19fef338",
-    "url": "/static/js/app.c07794e8.js"
+    "revision": "45bd3dd2214d96d5544c",
+    "url": "/static/js/app.ab5ed677.js"
   },
   {
     "revision": "4b9dced28f19d62d459f",
@@ -388,6 +388,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/js/chunk-6f0ff250.e5d8a1ef.js"
   },
   {
+    "revision": "8eb5f0804dae84a22738",
+    "url": "/static/js/chunk-7209e459.865f870c.js"
+  },
+  {
     "revision": "9907627aeb440344a6f9",
     "url": "/static/js/chunk-763df01a.04802b2c.js"
   },
@@ -398,10 +402,6 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "e6a1c347ff0c1140f137",
     "url": "/static/js/chunk-8a7d5ae8.93e9089c.js"
-  },
-  {
-    "revision": "4a9e3274a33867c58e38",
-    "url": "/static/js/chunk-b97be54c.d3a1ff42.js"
   },
   {
     "revision": "519858490f199729b073",

@@ -76,11 +76,7 @@ export default {
         plugins: {
           title: {
             display: true,
-            text: 'teste',
-            padding: {
-              top: -15,
-              bottom: 20
-            }
+            text: 'teste'
           },
           datalabels: {
             formatter: (value, ctx) => {

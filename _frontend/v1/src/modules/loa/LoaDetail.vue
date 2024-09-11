@@ -1,6 +1,9 @@
 <template>
   <div class="loa-detail">
-    <div class="container">
+    <div class="container" v-if="!loa.ano || !chartDataLoa">
+      <strong class="d-block mx-5 my-5">Carregando Dados Gráficos...</strong>
+    </div>
+    <div class="container" v-if="loa.ano && chartDataLoa">
       <strong class="d-block mx-3 my-2">Utilize os filtros abaixo e/ou aplique agrupamentos para visões diferentes</strong>
       <div class="row c-fields">
         <div class="col-md-3">
@@ -82,9 +85,15 @@
             <strong>Agrupamentos</strong>
             <b-form-select v-model="despesa.agrupamentoselected" :options="agrupamentos" :select-size="1"/>
           </div>
-          <div class="">
-            <strong>Máximo de Itens</strong>
-            <b-form-select v-model="despesa.itensselected" :options="itens" :select-size="1"/>
+          <div class="row">
+            <div class="col-6">
+              <strong>Máximo de Itens</strong>
+              <b-form-select v-model="despesa.itensselected" :options="itens" :select-size="1"/>
+            </div>
+            <div class="col-6">
+              <strong>Histograma</strong>
+              <b-form-select v-model="barchart_max_items__select" :options="itens_hist" :select-size="1"/>
+            </div>
           </div>
           <div class="col mt-1 text-right">
             <b-button class="bg-secondary" size="sm" @click="clearFilters(event)">Limpar Pesquisa</b-button>
@@ -93,15 +102,15 @@
       </div>
       <div class="row">
         <div class="col-12 container-doughnut p-3 mt-3">
-          <DoughnutChart v-if="chartDataLoa" :height="height" :plugins="plugins" :chartDataUser="chartDataLoa"/>
+          <DoughnutChart v-if="chartDataLoa" :height="height" :plugins="pluginsDun" :chartDataUser="chartDataLoa"/>
         </div>
 
         <div class="col-12 mt-3" v-html="loa.yaml_obs && loa.yaml_obs.GRAFICO_DESPESAS_MATERIA ? loa.yaml_obs.GRAFICO_DESPESAS_MATERIA : ''"></div>
 
-        <div class="col-12 container-barchart p-3 mt-3">
+        <div class="col-12 container-barchart p-3 mt-3" v-if="chartDataHist">
           <div class="btn-barchart-left" @click="clickSlice(-1)"><i class="fa fa-chevron-left"></i></div>
           <div class="btn-barchart-right" @click="clickSlice(1)"><i class="fa fa-chevron-right"></i></div>
-          <BarChart v-if="chartDataHist" :plugins="plugins" :chartDataUser="chartDataHist"/>
+          <BarChart :plugins="pluginsBar" :chartDataUser="chartDataHist"/>
         </div>
       </div>
     </div>
@@ -131,7 +140,13 @@ export default {
       chartDataLoa: null,
       chartDataHist: null,
       height: 450,
-      plugins: [{
+      pluginsBar: [{
+        title: {
+          display: true,
+          text: ''
+        }
+      }],
+      pluginsDun: [{
         title: {
           display: true,
           text: ''
@@ -181,10 +196,16 @@ export default {
         25: '25 Maiores',
         0: 'Todos os Itens'
       },
+      itens_hist: {
+        5: '05 Itens',
+        10: '10 Itens',
+        15: '15 Itens'
+      },
       barchart_offset: 0,
       barchart_length: 0,
-      barchart_max_items: 10,
-      barchart_colors: this.build_colors(10, 'aa')
+      barchart_max_items__select: 5,
+      barchart_max_items: 5,
+      barchart_colors: this.build_colors(20, 'a0')
     }
   },
   computed: {
@@ -198,6 +219,13 @@ export default {
     }
   },
   watch: {
+    barchart_max_items__select: {
+      handler (nv, ov) {
+        this.barchart_offset = 0
+        this.barchart_max_items = Number(nv)
+        this.fetch('', 1)
+      }
+    },
     'despesa.orgaoselected': {
       deep: true,
       immediate: true,
@@ -405,10 +433,10 @@ export default {
                 backgroundColor: cor,
                 hoverOffset: 50
               })
-              t.$set(t.plugins, 0, {
+              t.$set(t.pluginsDun, 0, {
                 title: {
                   display: true,
-                  text: `ORÇAMENTO DE ${t.loa.ano} COM BASE NOS FILTROS APLICADOS: R$ ${response.data.length > 0 ? response.data[0].vm_soma : '0,00'}. Despesas agrupadas por: ${t.agrupamentos[formFilter.agrupamento]}`
+                  text: `ORÇAMENTO DE ${t.loa.ano} COM BASE NOS FILTROS APLICADOS: R$ ${response.data.length > 0 ? response.data[0].vm_soma : '0,00'}. Orçamento das despesas agrupadas por: ${t.agrupamentos[formFilter.agrupamento]}`
                 }
               })
               if (recursive === '') {
@@ -452,6 +480,12 @@ export default {
               }
               t.$set(t.chartDataHist, 'labels', labels)
               t.$set(t.chartDataHist, 'datasets', datasets)
+              t.$set(t.pluginsBar, 0, {
+                title: {
+                  display: true,
+                  text: `HISTOGRAMA COM BASE NOS FILTROS APLICADOS. Orçamento das despesas agrupadas por: ${t.agrupamentos[formFilter.agrupamento]}`
+                }
+              })
             })
             .then((response) => {
               this.handleResize()
@@ -582,8 +616,7 @@ export default {
       z-index: 1;
       left: 0;
       font-size: 300%;
-      top: 0;
-      bottom: 0;
+      top: 40%;
       padding: 0.5rem;
       opacity: 0.4;
       display: flex;

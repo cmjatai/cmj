@@ -120,7 +120,12 @@ class _LoaViewSet:
         if 'natureza' not in grup_str:
             agrup['codigo'] = F(f'{grup_str}__codigo')
             # agrup['especificacao'] = F(f'{grup_str}__especificacao')
-            order_by = f'{grup_str}__codigo'
+            order_by = [f'{grup_str}__codigo']
+
+            if grup_str == 'unidade':
+                agrup['orgao__codigo'] = F('orgao__codigo')
+                order_by.insert(0, 'orgao__codigo')
+                pass
         else:
             ndict = {
                 1: 1,
@@ -132,10 +137,10 @@ class _LoaViewSet:
             nivel = int(grup_str.split('_')[1])
 
             agrup['codigo'] = Substr(f'natureza__codigo', 1, ndict[nivel])
-            order_by = 'natureza__codigo'
+            order_by = ['natureza__codigo']
 
         agrup['ano'] = F('loa__ano')
-        order_by = ['-loa__ano', order_by]
+        order_by.insert(0, '-loa__ano')
 
         filters = {
             f'{k}__codigo': v
@@ -164,15 +169,19 @@ class _LoaViewSet:
 
             i.pop('ano')
             try:
-                if i['codigo'] not in labels:
+                codigo_unico = f'{i["codigo"]}/{i["orgao__codigo"] if "orgao__codigo" in i else ""}'
+                if codigo_unico not in labels:
                     params = {
                         'loa__ano': ano,
                         f'codigo{"__startswith" if "natureza" in grup_str else ""}': i['codigo']
                     }
+                    if 'orgao__codigo' in i:
+                        params['orgao__codigo'] = i['orgao__codigo']
+
                     i['especificacao'] = dict_filter_base[grup_str].objects.filter(
                         **params
                     ).values_list('especificacao', flat=True).first()
-                    labels[i['codigo']] = i['especificacao']
+                    labels[codigo_unico] = i['especificacao']
                 else:
                     i['especificacao'] = labels[i['codigo']]
 
@@ -250,10 +259,12 @@ class _LoaViewSet:
         if hist:
             os_esp = OrderedSet()
             new_r_anual = {}
+
             for ano, items in r_anual.items():
                 new_r_anual[ano] = []
                 codigos = map(
-                    lambda x: f"{x['codigo']}", items)
+                    lambda i: f'{i["codigo"]}/{i["orgao__codigo"] if "orgao__codigo" in i else ""}',
+                    items)
                 os_esp = os_esp.union(codigos)
             #os_esp = os_esp - {'  '}
             #os_esp = os_esp.union(['  '])
@@ -266,10 +277,11 @@ class _LoaViewSet:
 
             for ano, items in r_anual.items():
                 for item in items:
-                    new_r_anual[ano][ks_esp[f"{item['codigo']}"]] = item
+                    codigo_unico = f'{item["codigo"]}/{item["orgao__codigo"] if "orgao__codigo" in item else ""}'
+                    new_r_anual[ano][ks_esp[codigo_unico]] = item
             anos = list(new_r_anual.keys())
             anos.reverse()
-            labels = [f'{c}-{labels[c]}' for c in list(os_esp)]
+            labels = [f'{c.split("/")[0]}-{labels[c]}' for c in list(os_esp)]
             r_anual = {
                 'labels': labels,
                 'anos': anos,
