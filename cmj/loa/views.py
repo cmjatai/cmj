@@ -205,13 +205,13 @@ class LoaCrud(Crud):
             return verbose_name, field_display
 
         def hook_disp_total(self, l, verbose_name='', field_display=''):
-            return verbose_name, f'{field_display} <i>({l.perc_disp_total:3.1f}%)</i>'
+            return verbose_name, f'{field_display} <em>({l.perc_disp_total:3.1f}%)</em>'
 
         def hook_disp_saude(self, l, verbose_name='', field_display=''):
-            return verbose_name, f'{field_display} <i>({l.perc_disp_saude:3.1f}%)</i>'
+            return verbose_name, f'{field_display} <em>({l.perc_disp_saude:3.1f}%)</em>'
 
         def hook_disp_diversos(self, l, verbose_name='', field_display=''):
-            return verbose_name, f'{field_display} <i>({l.perc_disp_diversos:3.1f}%)</i>'
+            return verbose_name, f'{field_display} <em>({l.perc_disp_diversos:3.1f}%)</em>'
 
         def hook_resumo_emendas_impositivas(self, *args, **kwargs):
             l = args[0]

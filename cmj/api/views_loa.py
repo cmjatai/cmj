@@ -1,3 +1,4 @@
+from _collections import OrderedDict
 from decimal import Decimal
 import logging
 
@@ -17,7 +18,9 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import RegexField, DecimalField, CharField
 from rest_framework.response import Response
+from setuptools._vendor.ordered_set import OrderedSet
 
+from cmj import loa
 from cmj.loa.models import OficioAjusteLoa, EmendaLoa, Loa, EmendaLoaParlamentar,\
     DespesaConsulta, EmendaLoaRegistroContabil, UnidadeOrcamentaria, Despesa,\
     Orgao, Funcao, SubFuncao, Programa, Acao, Natureza
@@ -53,6 +56,22 @@ class _SubFuncaoViewSet:
         return qs
 
 
+filters_base = [
+    ('orgao', Orgao),
+    ('unidade', UnidadeOrcamentaria),
+    ('funcao', Funcao),
+    ('subfuncao', SubFuncao),
+    ('programa', Programa),
+    ('acao', Acao),
+    ('natureza_1', Natureza),
+    ('natureza_2', Natureza),
+    ('natureza_3', Natureza),
+    ('natureza_4', Natureza),
+    ('natureza_5', Natureza),
+]
+dict_filter_base = dict(filters_base)
+
+
 @customize(Loa)
 class _LoaViewSet:
 
@@ -68,6 +87,13 @@ class _LoaViewSet:
             if request.method == 'POST' and view.action == 'despesas_agrupadas':
                 return True
 
+            if request.method == 'GET' and view.action == 'retrieve':
+                self.object = view.get_object()
+                if not self.object.publicado and u.is_anonymous:
+                    return False
+
+                return True
+
             return False
 
     permission_classes = (LoaPermission, )
@@ -76,34 +102,24 @@ class _LoaViewSet:
     def despesas_agrupadas(self, request, *args, **kwargs):
         loa_id = kwargs['pk']
 
-        filters_base = [
-            'orgao',
-            'unidade',
-            'funcao',
-            'subfuncao',
-            'programa',
-            'acao',
-            'natureza_1',
-            'natureza_2',
-            'natureza_3',
-            'natureza_4',
-            'natureza_5'
-        ]
-
         filters = request.data
 
         try:
             itens = filters.pop('itens')
             itens = min(25, int(itens))
+
+            hist = filters.pop('hist')
+            hist = int(hist)
         except:
             itens = 20
+            hist = 0
 
         grup_str = filters.pop('agrupamento')
         agrup = {}
 
         if 'natureza' not in grup_str:
             agrup['codigo'] = F(f'{grup_str}__codigo')
-            agrup['especificacao'] = F(f'{grup_str}__especificacao')
+            # agrup['especificacao'] = F(f'{grup_str}__especificacao')
             order_by = f'{grup_str}__codigo'
         else:
             ndict = {
@@ -118,84 +134,149 @@ class _LoaViewSet:
             agrup['codigo'] = Substr(f'natureza__codigo', 1, ndict[nivel])
             order_by = 'natureza__codigo'
 
+        agrup['ano'] = F('loa__ano')
+        order_by = ['-loa__ano', order_by]
+
         filters = {
-            f'{k}_id': v
-            for k, v in filters.items() if v and k in filters_base
+            f'{k}__codigo': v
+            for k, v in filters.items() if v and k in dict_filter_base
         }
         filters['loa_id'] = loa_id
+
+        if hist:
+            filters.pop('loa_id')
 
         rs = list(Despesa.objects.filter(**filters).values(
             **agrup
         ).order_by(
-            order_by
+            *order_by
         ).annotate(
             vm=Sum('valor_materia'),
             vn=Sum('valor_norma'),
             alt=Sum('registrocontabil_set__valor')))
 
-        if 'natureza' not in grup_str:
-            r = rs
-        else:
-            r = {}
-            for i in rs:
-                nat = i['codigo']
-                if nat not in r:
-                    r[nat] = i
-                    r[nat]['vm'] = i['vm'] or Decimal('0.00')
-                    r[nat]['vn'] = i['vn'] or Decimal('0.00')
-                    r[nat]['alt'] = i['alt'] or Decimal('0.00')
-                    continue
+        r_anual = OrderedDict()
+        labels = {}
+        for i in rs:
+            ano = i['ano']
+            if ano not in r_anual:
+                r_anual[ano] = []
 
-                r[nat]['vm'] += i['vm'] or Decimal('0.00')
-                r[nat]['vn'] += i['vn'] or Decimal('0.00')
-                r[nat]['alt'] += i['alt'] or Decimal('0.00')
-            r = r.values()
+            i.pop('ano')
+            try:
+                if i['codigo'] not in labels:
+                    params = {
+                        'loa__ano': ano,
+                        f'codigo{"__startswith" if "natureza" in grup_str else ""}': i['codigo']
+                    }
+                    i['especificacao'] = dict_filter_base[grup_str].objects.filter(
+                        **params
+                    ).values_list('especificacao', flat=True).first()
+                    labels[i['codigo']] = i['especificacao']
+                else:
+                    i['especificacao'] = labels[i['codigo']]
 
-            for i in r:
-                cod = i['codigo']
-                cod = cod.split('.')
-                while len(cod) < 5:
-                    cod.append('0' * 2 if len(cod) > 1 else '0')
-                cod = '.'.join(cod)
-                nat = Natureza.objects.filter(
-                    loa_id=loa_id, codigo=cod).first()
-                i['especificacao'] = nat.especificacao if nat else ''
+            except:
+                i['especificacao'] = ''
+            r_anual[ano].append(i)
 
-        soma = sum(map(lambda x: x['vm'], r))
+        for ano, rs in r_anual.items():
 
-        r = sorted(r, key=lambda x: -x['vm'])
+            if 'natureza' not in grup_str:
+                r = rs
+            else:
+                r = {}
+                for i in rs:
+                    nat = i['codigo']
+                    if nat not in r:
+                        r[nat] = i
+                        r[nat]['vm'] = i['vm'] or Decimal('0.00')
+                        r[nat]['vn'] = i['vn'] or Decimal('0.00')
+                        r[nat]['alt'] = i['alt'] or Decimal('0.00')
+                        continue
 
-        outros = r[itens:] if itens else []
-        r = r[:itens] if itens else r
+                    r[nat]['vm'] += i['vm'] or Decimal('0.00')
+                    r[nat]['vn'] += i['vn'] or Decimal('0.00')
+                    r[nat]['alt'] += i['alt'] or Decimal('0.00')
+                r = r.values()
 
-        if outros:
-            outros[0]['vm'] = outros[0]['vm'] or Decimal('0.00')
-            outros[0]['vn'] = outros[0]['vn'] or Decimal('0.00')
-            outros[0]['alt'] = outros[0]['alt'] or Decimal('0.00')
+                for i in r:
+                    cod = i['codigo']
+                    cod = cod.split('.')
+                    while len(cod) < 5:
+                        cod.append('0' * 2 if len(cod) > 1 else '0')
+                    cod = '.'.join(cod)
+                    nat = Natureza.objects.filter(
+                        loa_id=loa_id, codigo=cod).first()
+                    i['especificacao'] = nat.especificacao if nat else ''
 
-            for idx, item in enumerate(outros):
-                if idx:
-                    outros[0]['vm'] += item['vm'] or Decimal('0.00')
-                    outros[0]['vn'] += item['vn'] or Decimal('0.00')
-                    outros[0]['alt'] += item['alt'] or Decimal('0.00')
+            soma = sum(map(lambda x: x['vm'], r))
 
-            outros[0]['codigo'] = ' ' * len(outros[0]['codigo'])
-            outros[0]['especificacao'] = 'OUTROS'
-            r.append(outros[0])
+            r = sorted(r, key=lambda x: -x['vm'])
 
-        for idx, item in enumerate(r):
-            esp = item['especificacao']
-            vm = formats.number_format(item['vm'], force_grouping=True)
-            while len(vm) < 14:
-                vm = f' {vm}'
-            item['especificacao'] = f'{esp}'
-            r[idx]['vm_str'] = vm
-            r[idx]['vp'] = int((item['vm'] / soma) * 100)
+            if not hist:
+                outros = r[itens:] if itens else []
+                r = r[:itens] if itens else r
 
-            r[idx]['vm_soma'] = formats.number_format(
-                soma, force_grouping=True)
+                if outros:
+                    outros[0]['vm'] = outros[0]['vm'] or Decimal('0.00')
+                    outros[0]['vn'] = outros[0]['vn'] or Decimal('0.00')
+                    outros[0]['alt'] = outros[0]['alt'] or Decimal('0.00')
 
-        return Response(r)
+                    for idx, item in enumerate(outros):
+                        if idx:
+                            outros[0]['vm'] += item['vm'] or Decimal('0.00')
+                            outros[0]['vn'] += item['vn'] or Decimal('0.00')
+                            outros[0]['alt'] += item['alt'] or Decimal('0.00')
+
+                    outros[0]['codigo'] = ' ' * len(outros[0]['codigo'])
+                    outros[0]['especificacao'] = 'OUTROS'
+                    r.append(outros[0])
+
+                for idx, item in enumerate(r):
+                    esp = item['especificacao']
+                    vm = formats.number_format(item['vm'], force_grouping=True)
+                    while len(vm) < 14:
+                        vm = f' {vm}'
+                    item['especificacao'] = f'{esp}'
+                    r[idx]['vm_str'] = vm
+                    r[idx]['vp'] = int((item['vm'] / soma) * 100)
+
+                    r[idx]['vm_soma'] = formats.number_format(
+                        soma, force_grouping=True)
+
+            r_anual[ano] = r
+
+        if hist:
+            os_esp = OrderedSet()
+            new_r_anual = {}
+            for ano, items in r_anual.items():
+                new_r_anual[ano] = []
+                codigos = map(
+                    lambda x: f"{x['codigo']}", items)
+                os_esp = os_esp.union(codigos)
+            #os_esp = os_esp - {'  '}
+            #os_esp = os_esp.union(['  '])
+            len_osesp = len(os_esp)
+
+            ks_esp = dict(zip(os_esp, range(len_osesp)))
+
+            for ano in r_anual.keys():
+                new_r_anual[ano] = [{}] * len_osesp
+
+            for ano, items in r_anual.items():
+                for item in items:
+                    new_r_anual[ano][ks_esp[f"{item['codigo']}"]] = item
+            anos = list(new_r_anual.keys())
+            anos.reverse()
+            labels = [f'{c}-{labels[c]}' for c in list(os_esp)]
+            r_anual = {
+                'labels': labels,
+                'anos': anos,
+                'pre_datasets': new_r_anual
+            }
+
+        return Response(r_anual if hist else r)
 
 
 @customize(OficioAjusteLoa)

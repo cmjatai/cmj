@@ -1,5 +1,5 @@
 <template>
-  <Bar
+  <Bar v-if="chartData"
     :chart-options="chartOptions"
     :chart-data="chartData"
     :chart-id="chartId"
@@ -14,6 +14,7 @@
 
 <script>
 import { Bar } from 'vue-chartjs/legacy'
+import ChartDataLabels from 'chartjs-plugin-datalabels'
 
 import {
   Chart as ChartJS,
@@ -25,7 +26,7 @@ import {
   LinearScale
 } from 'chart.js'
 
-ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
+ChartJS.register(Title, Tooltip, Legend, ChartDataLabels, BarElement, CategoryScale, LinearScale)
 
 export default {
   name: 'BarChart',
@@ -37,17 +38,21 @@ export default {
       type: String,
       default: 'bar-chart'
     },
+    chartDataUser: {
+      type: Object,
+      default: () => {}
+    },
     datasetIdKey: {
       type: String,
-      default: 'label'
+      default: 'label1'
     },
     width: {
       type: Number,
-      default: 400
+      default: 1140
     },
     height: {
       type: Number,
-      default: 400
+      default: 600
     },
     cssClasses: {
       default: '',
@@ -64,34 +69,45 @@ export default {
   },
   data () {
     return {
-      chartData: {
-        labels: [
-          'January',
-          'February',
-          'March',
-          'April',
-          'May',
-          'June',
-          'July',
-          'August',
-          'September',
-          'October',
-          'November',
-          'December'
-        ],
-        datasets: [
-          {
-            label: 'Data One',
-            backgroundColor: '#f87979',
-            data: [40, 20, 12, 39, 10, 40, 39, 80, 40, 20, 12, 11]
-          }
-        ]
-      },
+      chartData: null,
       chartOptions: {
         responsive: true,
-        maintainAspectRatio: false
+        maintainAspectRatio: false,
+        plugins: {
+          title: {
+            display: true,
+            text: 'teste',
+            padding: {
+              top: -15,
+              bottom: 20
+            }
+          },
+          datalabels: {
+            formatter: (value, ctx) => {
+              let dataset = ctx.dataset.data
+              let sum = 0
+              dataset.map(ds => {
+                sum += ds
+              })
+              let percentage = ((value / sum) * 100).toFixed(0) + '%'
+              return percentage
+            },
+            color: '#0000',
+            rotation: -60,
+            align: 'top'
+          }
+        }
       }
     }
+  },
+  watch: {
+    plugins: function (nv, ov) {
+      this.chartOptions.plugins.title.text = nv[0].title.text
+    }
+  },
+  mounted: function () {
+    this.chartOptions.plugins.title.text = this.plugins[0].title.text
+    this.chartData = this.chartDataUser
   }
 }
 </script>

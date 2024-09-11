@@ -92,10 +92,17 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-12 mt-3 bg-white p-3">
-          <DoughnutChart v-if="chartData" :height="height" :plugins="plugins" :chartDataUser="chartData"/>
+        <div class="col-12 container-doughnut p-3 mt-3">
+          <DoughnutChart v-if="chartDataLoa" :height="height" :plugins="plugins" :chartDataUser="chartDataLoa"/>
         </div>
-        <div class="col-12 mt-3 " v-html="loa.yaml_obs && loa.yaml_obs.GRAFICO_DESPESAS_MATERIA ? loa.yaml_obs.GRAFICO_DESPESAS_MATERIA : ''"></div>
+
+        <div class="col-12 mt-3" v-html="loa.yaml_obs && loa.yaml_obs.GRAFICO_DESPESAS_MATERIA ? loa.yaml_obs.GRAFICO_DESPESAS_MATERIA : ''"></div>
+
+        <div class="col-12 container-barchart p-3 mt-3">
+          <div class="btn-barchart-left" @click="clickSlice(-1)"><i class="fa fa-chevron-left"></i></div>
+          <div class="btn-barchart-right" @click="clickSlice(1)"><i class="fa fa-chevron-right"></i></div>
+          <BarChart v-if="chartDataHist" :plugins="plugins" :chartDataUser="chartDataHist"/>
+        </div>
       </div>
     </div>
     <resize-observer @notify="handleResize" />
@@ -105,12 +112,14 @@
 <script>
 import ModelSelect from '@/components/selects/ModelSelect.vue'
 import DoughnutChart from '@/components/charts/DoughnutChart'
+import BarChart from '@/components/charts/BarChart'
 import YAML from 'js-yaml' // eslint-disable-line
 // import { parse, stringify } from 'yaml' // eslint-disable-line
 
 export default {
   name: 'LoaDetail',
   components: {
+    BarChart,
     DoughnutChart,
     ModelSelect
   },
@@ -119,8 +128,9 @@ export default {
       loa: {
         id: this.$route.params.pkloa
       },
-      chartData: null,
-      height: 400,
+      chartDataLoa: null,
+      chartDataHist: null,
+      height: 450,
       plugins: [{
         title: {
           display: true,
@@ -170,7 +180,11 @@ export default {
         20: '20 Maiores',
         25: '25 Maiores',
         0: 'Todos os Itens'
-      }
+      },
+      barchart_offset: 0,
+      barchart_length: 0,
+      barchart_max_items: 10,
+      barchart_colors: this.build_colors(10, 'aa')
     }
   },
   computed: {
@@ -321,32 +335,47 @@ export default {
         itensselected: 20
       }
     },
+    clickSlice (value) {
+      if (
+        (value === -1 && this.barchart_offset > 0) ||
+        (value === 1 && this.barchart_offset + this.barchart_max_items < this.barchart_length)
+      ) {
+        this.barchart_offset += value
+        this.fetch('', 1)
+      }
+    },
     handleResize () {
       /* const h = window.innerHeight * 0.65
       if (h !== this.height) {
         this.height = h
       }
-      if (this.chartData && this.chartData.labels.length > 0) {
-        let hlabels = h / this.chartData.labels.length
+      if (this.chartDataLoa && this.chartDataLoa.labels.length > 0) {
+        let hlabels = h / this.chartDataLoa.labels.length
         if (hlabels < 50) {
-          this.height = this.chartData.labels.length * 50
+          this.height = this.chartDataLoa.labels.length * 50
         }
       } */
     },
-    fetch () {
+    fetch (recursive = '', hist = 0) {
       const t = this
       const formFilter = {
-        orgao: t.despesa.orgaoselected ? t.despesa.orgaoselected.id : null,
-        unidade: t.despesa.unidadeselected ? t.despesa.unidadeselected.id : null,
-        funcao: t.despesa.funcaoselected ? t.despesa.funcaoselected.id : null,
-        subfuncao: t.despesa.subfuncaoselected ? t.despesa.subfuncaoselected.id : null,
-        programa: t.despesa.programaselected ? t.despesa.programaselected.id : null,
-        acao: t.despesa.acaoselected ? t.despesa.acaoselected.id : null,
-        agrupamento: t.despesa.agrupamentoselected,
+        orgao: t.despesa.orgaoselected ? t.despesa.orgaoselected.codigo : null,
+        unidade: t.despesa.unidadeselected ? t.despesa.unidadeselected.codigo : null,
+        funcao: t.despesa.funcaoselected ? t.despesa.funcaoselected.codigo : null,
+        subfuncao: t.despesa.subfuncaoselected ? t.despesa.subfuncaoselected.codigo : null,
+        programa: t.despesa.programaselected ? t.despesa.programaselected.codigo : null,
+        acao: t.despesa.acaoselected ? t.despesa.acaoselected.codigo : null,
+        agrupamento: recursive === '' ? t.despesa.agrupamentoselected : recursive,
         itens: t.despesa.itensselected
       }
       t.$nextTick()
         .then(() => {
+          if (hist !== 0) {
+            return this
+          }
+          // t.barchart_max_items = formFilter.itens
+          t.barchart_offset = 0
+          formFilter.hist = hist
           t.utils.postModelAction('loa', 'loa', t.loa.id, 'despesas_agrupadas', formFilter)
             .then((response) => {
               let labels = []
@@ -356,7 +385,7 @@ export default {
                 labels.push(`${item.vm_str} / ${item.codigo}-${item.especificacao}`)
                 data.push(item.vm)
               })
-              let chartData = {
+              let chartDataLoa = {
                 labels,
                 datasets: [
                   {
@@ -366,12 +395,12 @@ export default {
                   }
                 ]
               }
-              if (t.chartData === null) {
-                t.chartData = chartData
+              if (t.chartDataLoa === null) {
+                t.chartDataLoa = chartDataLoa
                 return
               }
-              t.$set(t.chartData, 'labels', labels)
-              t.$set(t.chartData.datasets, 0, {
+              t.$set(t.chartDataLoa, 'labels', labels)
+              t.$set(t.chartDataLoa.datasets, recursive === '' ? 0 : 1, {
                 data,
                 backgroundColor: cor,
                 hoverOffset: 50
@@ -379,9 +408,50 @@ export default {
               t.$set(t.plugins, 0, {
                 title: {
                   display: true,
-                  text: `ORÇAMENTO COM BASE NOS FILTROS APLICADOS: R$ ${response.data.length > 0 ? response.data[0].vm_soma : '0,00'}. Despesas agrupadas por: ${t.agrupamentos[formFilter.agrupamento]}`
+                  text: `ORÇAMENTO DE ${t.loa.ano} COM BASE NOS FILTROS APLICADOS: R$ ${response.data.length > 0 ? response.data[0].vm_soma : '0,00'}. Despesas agrupadas por: ${t.agrupamentos[formFilter.agrupamento]}`
                 }
               })
+              if (recursive === '') {
+                // t.fetch('orgao')
+              }
+            })
+            .then((response) => {
+              this.handleResize()
+            })
+            .catch((response) => t.sendMessage(
+              { alert: 'danger', message: 'Não foi possível recuperar a lista...', time: 5 }))
+        })
+        .then(() => {
+          formFilter.hist = 1
+          t.utils.postModelAction('loa', 'loa', t.loa.id, 'despesas_agrupadas', formFilter)
+            .then((response) => {
+              let labels = response.data.labels.slice(t.barchart_offset, t.barchart_offset + t.barchart_max_items)
+              let cor = t.barchart_colors // t.build_colors(response.data.anos.length, 'a0')
+              let datasets = []
+              _.each(response.data.anos, function (label, idx) {
+                let data = []
+                if (idx === 0 && t.barchart_offset === 0) {
+                  t.barchart_length = response.data.pre_datasets[label].length
+                }
+                _.each(response.data.pre_datasets[label].slice(t.barchart_offset, t.barchart_offset + t.barchart_max_items), function (itemD, idd) {
+                  data.push(itemD.vm)
+                })
+                datasets.push({
+                  label,
+                  data,
+                  backgroundColor: cor[idx]
+                })
+              })
+              let chartDataHist = {
+                labels,
+                datasets
+              }
+              if (t.chartDataHist === null) {
+                t.chartDataHist = chartDataHist
+                return
+              }
+              t.$set(t.chartDataHist, 'labels', labels)
+              t.$set(t.chartDataHist, 'datasets', datasets)
             })
             .then((response) => {
               this.handleResize()
@@ -390,7 +460,7 @@ export default {
               { alert: 'danger', message: 'Não foi possível recuperar a lista...', time: 5 }))
         })
     },
-    build_colors (n) {
+    build_colors (n, alpha = '') {
       const colors = []
       if (n < 1) {
         return colors
@@ -407,7 +477,7 @@ export default {
         delta = Math.random() * 30 + (hue < 150 ? 50 : 25)
         // console.log('Delta', delta, 'Hue:', hue)
         hue = (hue + delta) % 360
-        colors.push(hex)
+        colors.push(`${hex}${alpha}`)
       }
       return colors
     },
@@ -482,6 +552,16 @@ export default {
   }
   .c-groups {
     font-size: 80%;
+    /*position: fixed;
+    bottom: 0;
+    right: 0;
+    background-color: #00ff00;
+    z-index: 1;
+    padding: 10px;
+    opacity: 0.6;
+    &:hover {
+      opacity: 1;
+    }*/
     .custom-select {
       font-size: 100%;
       padding: $mp;
@@ -491,5 +571,34 @@ export default {
       padding: $mp $mp * 2;
       line-height: 1;
     }
+  }
+  .container-doughnut, .container-barchart {
+    position: relative;
+    background-color: #fffc;
+    .btn-barchart-left, .btn-barchart-right {
+      color: #44a;
+      position:absolute;
+      z-index: 1;
+      left: 0;
+      font-size: 300%;
+      top: 0;
+      bottom: 0;
+      padding: 0.5rem;
+      opacity: 0.4;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      &:hover {
+        transition: all 0.4s ease;
+        opacity: 1;
+        font-size: 350%;
+      }
+    }
+    .btn-barchart-right {
+      left: auto;
+      right: 0;
+
+    }
+
   }
 </style>
