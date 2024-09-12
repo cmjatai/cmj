@@ -162,6 +162,14 @@ export default {
         agrupamentoselected: 'funcao',
         itensselected: 20
       },
+      filters: [
+        'orgaoselected',
+        'unidadeselected',
+        'funcaoselected',
+        'subfuncaoselected',
+        'programaselected',
+        'acaoselected'
+      ],
       agrupamentos: {
         orgao: 'Órgãos',
         unidade: 'Unidades Orçamentárias',
@@ -388,7 +396,7 @@ export default {
       const t = this
       const formFilter = {
         orgao: t.despesa.orgaoselected ? t.despesa.orgaoselected.codigo : null,
-        unidade: t.despesa.unidadeselected ? t.despesa.unidadeselected.codigo : null,
+        unidade: t.despesa.unidadeselected ? `${t.despesa.unidadeselected.codigo}/${t.despesa.unidadeselected.orgao}` : null,
         funcao: t.despesa.funcaoselected ? t.despesa.funcaoselected.codigo : null,
         subfuncao: t.despesa.subfuncaoselected ? t.despesa.subfuncaoselected.codigo : null,
         programa: t.despesa.programaselected ? t.despesa.programaselected.codigo : null,
@@ -413,7 +421,7 @@ export default {
                 labels.push(`${item.vm_str} / ${item.codigo}-${item.especificacao}`)
                 data.push(item.vm)
               })
-              let chartDataLoa = {
+              const chartDataLoa = {
                 labels,
                 datasets: [
                   {
@@ -433,12 +441,33 @@ export default {
                 backgroundColor: cor,
                 hoverOffset: 50
               })
+
+              const text = [
+                `ORÇAMENTO DE ${t.loa.ano} DO MUNICÍPIO DE JATAÍ`
+              ]
+              const filters = []
+              _.forOwn(t.despesa, function (value, key) {
+                if (t.filters.includes(key) && value !== null) {
+                  filters.push(value.especificacao)
+                }
+              })
+              if (!_.isEmpty(filters)) {
+                text.push(`FILTRADO POR: ${filters.join(' / ')}`)
+              }
+              text.push(`Orçamento das despesas agrupadas por: ${t.agrupamentos[formFilter.agrupamento]}`)
+              if (_.isEmpty(data)) {
+                text.push('Sem dados para mostrar')
+              } else {
+                text.push(`R$ ${response.data.length > 0 ? response.data[0].vm_soma : '0,00'}.`)
+              }
+
               t.$set(t.pluginsDun, 0, {
                 title: {
                   display: true,
-                  text: `ORÇAMENTO DE ${t.loa.ano} COM BASE NOS FILTROS APLICADOS: R$ ${response.data.length > 0 ? response.data[0].vm_soma : '0,00'}. Orçamento das despesas agrupadas por: ${t.agrupamentos[formFilter.agrupamento]}`
+                  text: text
                 }
               })
+
               if (recursive === '') {
                 // t.fetch('orgao')
               }
@@ -478,12 +507,26 @@ export default {
                 t.chartDataHist = chartDataHist
                 return
               }
+              const text = [
+                'HISTOGRAMA DO ORÇAMENTO DO MUNICÍPIO DE JATAÍ'
+              ]
+              const filters = []
+              _.forOwn(t.despesa, function (value, key) {
+                if (t.filters.includes(key) && value !== null) {
+                  filters.push(value.especificacao)
+                }
+              })
+              if (!_.isEmpty(filters)) {
+                text.push(`FILTRADO POR: ${filters.join(' / ')}`)
+              }
+              text.push(`Orçamento das despesas agrupadas por: ${t.agrupamentos[formFilter.agrupamento]}`)
+
               t.$set(t.chartDataHist, 'labels', labels)
               t.$set(t.chartDataHist, 'datasets', datasets)
               t.$set(t.pluginsBar, 0, {
                 title: {
                   display: true,
-                  text: `HISTOGRAMA COM BASE NOS FILTROS APLICADOS. Orçamento das despesas agrupadas por: ${t.agrupamentos[formFilter.agrupamento]}`
+                  text
                 }
               })
             })
@@ -611,7 +654,7 @@ export default {
     position: relative;
     background-color: #fffc;
     .btn-barchart-left, .btn-barchart-right {
-      color: #44a;
+      color: #3232c0;
       position:absolute;
       z-index: 1;
       left: 0;

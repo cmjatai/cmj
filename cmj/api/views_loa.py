@@ -102,19 +102,19 @@ class _LoaViewSet:
     def despesas_agrupadas(self, request, *args, **kwargs):
         loa_id = kwargs['pk']
 
-        filters = request.data
+        filters_data = request.data
 
         try:
-            itens = filters.pop('itens')
+            itens = filters_data.pop('itens')
             itens = min(25, int(itens))
 
-            hist = filters.pop('hist')
+            hist = filters_data.pop('hist')
             hist = int(hist)
         except:
             itens = 20
             hist = 0
 
-        grup_str = filters.pop('agrupamento')
+        grup_str = filters_data.pop('agrupamento')
         agrup = {}
 
         if 'natureza' not in grup_str:
@@ -142,11 +142,19 @@ class _LoaViewSet:
         agrup['ano'] = F('loa__ano')
         order_by.insert(0, '-loa__ano')
 
+        f_unidade = filters_data.get('unidade', None)
+        if f_unidade:
+            ucod = f_unidade.split('/')
+            filters_data['unidade'] = ucod[0]
+
         filters = {
             f'{k}__codigo': v
-            for k, v in filters.items() if v and k in dict_filter_base
+            for k, v in filters_data.items() if v and k in dict_filter_base
         }
         filters['loa_id'] = loa_id
+
+        if f_unidade:
+            filters['unidade__orgao_id'] = ucod[1]
 
         if hist:
             filters.pop('loa_id')
@@ -160,6 +168,7 @@ class _LoaViewSet:
             vn=Sum('valor_norma'),
             alt=Sum('registrocontabil_set__valor')))
 
+        r = []
         r_anual = OrderedDict()
         labels = {}
         for i in rs:
@@ -287,6 +296,8 @@ class _LoaViewSet:
                 'anos': anos,
                 'pre_datasets': new_r_anual
             }
+
+        r_anual = dict(r_anual)
 
         return Response(r_anual if hist else r)
 

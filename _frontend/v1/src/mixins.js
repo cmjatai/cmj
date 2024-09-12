@@ -21,7 +21,8 @@ Vue.mixin({
       NIVEL1: 1,
       NIVEL2: 2,
       NIVEL3: 3,
-      NIVEL4: 4
+      NIVEL4: 4,
+      nulls: ['', null, undefined]
     }
   },
   methods: {
