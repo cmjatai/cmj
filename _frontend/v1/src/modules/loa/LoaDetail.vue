@@ -83,7 +83,7 @@
         <div class="col-md-2 c-groups">
           <div class="">
             <strong>Agrupamentos</strong>
-            <b-form-select v-model="despesa.agrupamentoselected" :options="agrupamentos" :select-size="1"/>
+            <b-form-select v-model="despesa.agrupamentoselected" :options="agrupamentos__options" :select-size="1"/>
           </div>
           <div class="row">
             <div class="col-6">
@@ -110,7 +110,7 @@
         <div class="col-12 container-barchart p-3 mt-3" v-if="chartDataHist">
           <div class="btn-barchart-left" @click="clickSlice(-1)"><i class="fa fa-chevron-left"></i></div>
           <div class="btn-barchart-right" @click="clickSlice(1)"><i class="fa fa-chevron-right"></i></div>
-          <BarChart :plugins="pluginsBar" :chartDataUser="chartDataHist"/>
+          <BarChart :plugins="pluginsBar" :chartDataUser="chartDataHist" cssClasses="barchart-component"/>
         </div>
       </div>
     </div>
@@ -139,7 +139,7 @@ export default {
       },
       chartDataLoa: null,
       chartDataHist: null,
-      height: 450,
+      height: 550,
       pluginsBar: [{
         title: {
           display: true,
@@ -196,19 +196,20 @@ export default {
         'natureza_4',
         'natureza_5'
       ],
-      itens: {
-        5: '05 Maiores',
-        10: '10 Maiores',
-        15: '15 Maiores',
-        20: '20 Maiores',
-        25: '25 Maiores',
-        0: 'Todos os Itens'
-      },
-      itens_hist: {
-        5: '05 Itens',
-        10: '10 Itens',
-        15: '15 Itens'
-      },
+      itens: [
+        { value: 5, text: '05 Maiores' },
+        { value: 10, text: '10 Maiores' },
+        { value: 15, text: '15 Maiores' },
+        { value: 20, text: '20 Maiores' },
+        { value: 25, text: '25 Maiores' },
+        { value: 0, text: 'Todos os Itens' }
+      ],
+      itens_hist: [
+        { value: 5, text: '05 Itens' },
+        { value: 10, text: '10 Itens' },
+        { value: 15, text: '15 Itens' },
+        { value: 20, text: '20 Itens' }
+      ],
       barchart_offset: 0,
       barchart_length: 0,
       barchart_max_items__select: 5,
@@ -224,6 +225,14 @@ export default {
     qs_orgao: function () {
       const value = this.despesa.orgaoselected
       return value && value.id ? `&orgao=${value.id}` : ''
+    },
+    agrupamentos__options: function () {
+      const t = this
+      const groups = []
+      _.forOwn(t.agrupamentos, function (text, value) {
+        groups.push({ text, value })
+      })
+      return groups
     }
   },
   watch: {
@@ -672,7 +681,6 @@ export default {
     .btn-barchart-right {
       left: auto;
       right: 0;
-
     }
 
   }

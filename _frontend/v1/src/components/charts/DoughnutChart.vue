@@ -75,6 +75,9 @@ export default {
         layout: {
           padding: 15
         },
+        onHover: (a) => {
+          // console.log(a)
+        },
         plugins: {
           title: {
             display: true,
@@ -88,6 +91,7 @@ export default {
             position: 'left',
             onHover: this.handleHover,
             onLeave: this.handleLeave,
+            onClick: this.handleClick,
             labels: {
               font: {
                 family: "'Courier New', Courier, monospace",
@@ -118,6 +122,9 @@ export default {
     }
   },
   methods: {
+    handleClick (evt, item, legend) {
+      // console.log(evt, item, legend)
+    },
     handleHover (evt, item, legend) {
       legend.chart.data.datasets[0].backgroundColor.forEach((color, index, colors) => {
         colors[index] = index === item.index || color.length === 9 ? color : color + '3d'
