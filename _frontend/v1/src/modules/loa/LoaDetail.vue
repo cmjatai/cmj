@@ -598,10 +598,8 @@ export default {
             const yaml_obs = YAML.load(response.data.yaml_obs)
             response.data.yaml_obs = yaml_obs
             t.loa = response.data
+            t.fetch()
           })
-      })
-      .then(() => {
-        t.fetch()
       })
   }
 }
