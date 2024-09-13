@@ -104,7 +104,22 @@ window.refreshMask = function () {
   $('.timeinput').mask('00:00:00', { placeholder: 'hh:mm:ss' })
   $('.cronometro').mask('00:00:00', { placeholder: 'hh:mm:ss' })
   $('.datetimeinput').mask('00/00/0000 00:00:00', { placeholder: '__/__/____ hh:mm:ss' })
-  $('.decimalinput').mask('###.###.##0,00', { reverse: true })
+  $('.decimalinput').mask('#.##0,00', {
+    reverse: true,
+    translation: {
+      '#': {
+        pattern: /-|\d/,
+        recursive: true
+      },
+      '0': {
+        pattern: /[\d-]/,
+        optional: false
+      }
+    },
+    onChange: function (value, e) {
+      e.target.value = value.replace(/(?!^)-/g, '').replace(/^\./, '').replace(/^-\./, '-')
+    }
+  })
 }
 
 window.isElementInViewport = function (el) {

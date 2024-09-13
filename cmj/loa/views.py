@@ -495,6 +495,18 @@ class EmendaLoaCrud(MasterDetailCrud):
         def hook_valor_computado(self, *args, **kwargs):
             return f'<div class="text-nowrap text-center">R$ {args[1]}</div>', args[2]
 
+        def hook_tipo(self, *args, **kwargs):
+            el = args[0]
+            link_pdf = ''
+            if el.fase == EmendaLoa.LIBERACAO_CONTABIL and not el.materia:
+                url = reverse_lazy(
+                    'sapl.api:emendaloa-view',
+                    kwargs={'pk': el.id})
+
+                link_pdf = f'<a href="{url}"><i class="far fa-2x fa-file-pdf"></i></a>'
+
+            return f'{link_pdf}<br>{args[1]}', args[2]
+
         def hook_fase(self, *args, **kwargs):
             return f'<br><small class="text-nowrap">({args[0].get_fase_display()})</small>', args[2]
 

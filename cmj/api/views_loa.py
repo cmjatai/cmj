@@ -16,7 +16,8 @@ from django.utils.translation import gettext_lazy as _
 import pymupdf
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
-from rest_framework.fields import RegexField, DecimalField, CharField
+from rest_framework.fields import RegexField, DecimalField, CharField,\
+    SerializerMethodField
 from rest_framework.response import Response
 from setuptools._vendor.ordered_set import OrderedSet
 
@@ -493,8 +494,31 @@ class _EmendaLoaViewSet:
         return Response(r)
 
 
+class DespesaConsultaSerializer(SaplSerializerMixin):
+
+    str_valor = SerializerMethodField()
+    str_saldo = SerializerMethodField()
+
+    class Meta(SaplSerializerMixin.Meta):
+        model = DespesaConsulta
+
+    def get_str_valor(self, obj):
+        return formats.number_format(obj.valor_materia, force_grouping=True)
+
+    def get_str_saldo(self, obj):
+        valor = obj.valor_materia or Decimal('0.00')
+
+        regs = EmendaLoaRegistroContabil.objects.filter(
+            despesa_id=obj.id).aggregate(soma=Sum('valor'))
+        saldo = valor + (regs['soma'] or Decimal('0.00'))
+
+        return formats.number_format(saldo, force_grouping=True)
+
+
 @customize(DespesaConsulta)
 class _DespesaConsulta:
+
+    serializer_class = DespesaConsultaSerializer
 
     @action(detail=False)
     def search(self, request, *args, **kwargs):
@@ -546,8 +570,9 @@ class EmendaLoaRegistroContabilSerializer(SaplSerializerMixin):
     orgao = RegexLocalField(r'^(\d{2})$', error_messages={
         'invalid': _('O campo "Órgão" deve serguir o padrão "99".')})
 
-    valor = DecimalField(14, 2, error_messages={
-        'invalid': _('O campo "Valor da Despesa" deve ser prenchido e seguir o formado 999999,99. Valores negativos serão direcionados ao Art. 1º, valores positivos ao Art. 2º.')})
+    valor = CharField(required=False, error_messages={
+        'blank': _('O campo "Valor da Despesa" deve ser prenchido e seguir o formado 999.999.999,99. Valores negativos serão direcionados ao Art. 1º, valores positivos ao Art. 2º.'),
+    })
 
     especificacao = CharField()
 
@@ -603,6 +628,19 @@ class EmendaLoaRegistroContabilSerializer(SaplSerializerMixin):
         return attrs
 
     def validate_valor(self, obj, *args, **kwargs):
+
+        obj = obj or ''
+        obj = obj.replace('.', '').replace(',', '.')
+        try:
+            obj = Decimal(obj)
+        except:
+            raise ValidationError(
+                _('O campo "Valor da Despesa" deve ser prenchido e '
+                  'seguir o formado 999.999.999,99. '
+                  'Valores negativos serão direcionados ao Art. 1º, '
+                  'valores positivos ao Art. 2º.')
+            )
+
         if obj == Decimal('0.00'):
             raise ValidationError(
                 'Valor da Despesa deve ser preenchido. '

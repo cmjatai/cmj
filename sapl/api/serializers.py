@@ -18,7 +18,7 @@ from sapl.sessao.models import OrdemDia, SessaoPlenaria
 
 class SaplSerializerMixin(serializers.ModelSerializer):
     __str__ = SerializerMethodField()
-    #metadata = SerializerMethodField()
+    # metadata = SerializerMethodField()
     link_detail_backend = SerializerMethodField()
 
     class Meta:
@@ -62,7 +62,7 @@ class ModelChoiceSerializer(ChoiceSerializer):
 
     def get_text(self, obj):
         return str(obj)
- 
+
     def get_value(self, obj):
         return obj.id
 

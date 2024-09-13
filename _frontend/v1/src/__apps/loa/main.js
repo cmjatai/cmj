@@ -233,7 +233,8 @@ window.AppLOA = function () {
                 Órgão...: ${value.cod_orgao} - ${value.esp_orgao}<br>
                 Und Orç.: ${value.cod_unidade} - ${value.esp_unidade}<br>
                 Código..: ${value.codigo} - ${value.especificacao}<br>
-                Natureza: ${value.cod_natureza} - ${value.esp_natureza}
+                Natureza: ${value.cod_natureza} - ${value.esp_natureza}<br>
+                Val.Orç.: ${value.str_valor} | Saldo: ${value.str_saldo}
               </div>`
 
             _.each(parts, (p, idx) => {
@@ -312,6 +313,7 @@ window.AppLOA = function () {
         .then((response) => {
           form.find('input[name="lineHeight"]').val(response.data.metadata.style.lineHeight)
           form.find('input[name="valor"]').val(response.data.valor)
+          // $('.decimalinput').mask('###.###.##0,00', { reverse: true })
           refreshChangeRegistroDespesa()
 
           preview.src = `${urlBase}/view/?page=1&u=${Date.now()}`
