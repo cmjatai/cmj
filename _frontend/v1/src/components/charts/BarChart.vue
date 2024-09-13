@@ -78,6 +78,16 @@ export default {
             display: true,
             text: 'teste'
           },
+          legend: {
+            position: 'bottom',
+            onClick: this.handleClick,
+            labels: {
+              font: {
+                family: "'Courier New', Courier, monospace",
+                size: 15
+              }
+            }
+          },
           datalabels: {
             formatter: (value, ctx) => {
               let dataset = ctx.dataset.data
@@ -99,6 +109,11 @@ export default {
   watch: {
     plugins: function (nv, ov) {
       this.chartOptions.plugins.title.text = nv[0].title.text
+    }
+  },
+  methods: {
+    handleClick (evt, item, legend) {
+      // console.log(evt, item, legend)
     }
   },
   mounted: function () {
