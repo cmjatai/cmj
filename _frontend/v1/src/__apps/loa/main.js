@@ -62,7 +62,7 @@ window.AppLOA = function () {
                 step="5"
                 min="100"
                 max="350"
-                class="decimalinput numberinput form-control text-right"
+                class="numberinput form-control text-center"
                 id="id_lineHeight">
             </label>
           </div>

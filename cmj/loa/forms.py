@@ -1,28 +1,26 @@
-
 from decimal import Decimal, ROUND_DOWN, ROUND_HALF_DOWN
 import logging
 import re
 
-from crispy_forms.bootstrap import FormActions
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Fieldset, HTML, Div, Button, Submit, Layout
+from crispy_forms.layout import Fieldset, HTML, Div
 from django import forms
 from django.contrib.postgres.forms.array import SplitArrayField,\
     SplitArrayWidget
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.forms.models import ModelForm
-from django.forms.widgets import HiddenInput, NumberInput
+from django.forms.widgets import HiddenInput, NumberInput, TextInput
 from django.template.base import Template
 from django.template.context import Context
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
-from django_filters.filters import ChoiceFilter, MultipleChoiceFilter,\
-    ModelMultipleChoiceFilter, CharFilter
+from django_filters.filters import MultipleChoiceFilter,\
+    ModelMultipleChoiceFilter
 from django_filters.filterset import FilterSet
 import yaml
 
 from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa,\
-    RegistroAjusteLoa, RegistroAjusteLoaParlamentar, EmendaLoaRegistroContabil
+    RegistroAjusteLoa, RegistroAjusteLoaParlamentar
 from sapl.crispy_layout_mixin import to_row, SaplFormLayout, SaplFormHelper
 from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
@@ -37,6 +35,29 @@ def quantize(value, decimal_places='0.01', rounding=ROUND_HALF_DOWN) -> Decimal:
         Decimal(decimal_places),
         rounding=rounding
     )
+
+
+class DecimalInput(TextInput):
+    def get_context(self, name, value, attrs):
+        context = TextInput.get_context(self, name, value, attrs)
+        widget = context.get('widget', None)
+        attrs = widget.get('attrs', None) if widget else None
+        if attrs:
+            css_class = attrs.get('class', '')
+            attrs.update({
+                'class': f'{css_class} text-right'
+            })
+        return context
+
+
+class DecimalField(forms.DecimalField):
+    widget = DecimalInput
+
+    def to_python(self, value):
+        if value:
+            value = value.replace('.', '').replace(',', '.')
+        value = forms.DecimalField.to_python(self, value)
+        return value
 
 
 class MateriaCheckFormMixin:
@@ -187,13 +208,6 @@ class LoaForm(MateriaCheckFormMixin, ModelForm):
         return i
 
 
-class DecimalInput(NumberInput):
-
-    def get_context(self, name, value, attrs):
-        context = NumberInput.get_context(self, name, value, attrs)
-        return context
-
-
 class EmendaLoaValorWidget(SplitArrayWidget):
     template_name = 'loa/widget/parlamentares_valor_form.html'
 
@@ -212,8 +226,8 @@ class EmendaLoaValorWidget(SplitArrayWidget):
             w['label'] = p.nome_parlamentar
             w['attrs']['parlamentar_id'] = p.id
 
-            if 'class' in self.attrs and 'class' in w['attrs']:
-                w['attrs']['class'] = 'decimalinput numberinput form-control text-right'
+            # if 'class' in self.attrs and 'class' in w['attrs']:
+            #    w['attrs']['class'] = 'decimalinput form-control text-right'
 
             if self.user and not self.user.has_perms(
                     ('loa.add_emendaloa', 'loa.change_emendaloa')):
@@ -254,13 +268,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         required=False)
 
     parlamentares__valor = SplitArrayField(
-        forms.DecimalField(
-            required=False,
-            min_value=Decimal('0.00'),
-            max_digits=14,
-            decimal_places=2,
-            widget=DecimalInput
-        ),
+        DecimalField(required=False,),
         10,
         label='Valores por Parlamentar',
         required=False
@@ -281,7 +289,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
     busca_despesa = forms.CharField(
         label='Buscar', required=False,)
 
-    valor_despesa = forms.DecimalField(
+    valor_despesa = DecimalField(
         label='Valor da Despesa', required=False, max_digits=14, decimal_places=2,)
 
     despesa_codigo = forms.CharField(
@@ -297,6 +305,9 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
     despesa_natureza = forms.CharField(
         label='Natureza', required=False,)
+
+    valor = DecimalField(
+        label=_('Valor Global da Emenda (R$)'), required=False)
 
     class Meta:
         model = EmendaLoa
@@ -410,9 +421,9 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
             if self.instance.pk and self.instance.fase >= EmendaLoa.APROVACAO_LEGISLATIVA:
                 self.fields['fase'].choices = EmendaLoa.FASE_CHOICE
 
-            self.fields['valor'].widget.attrs['disabled'] = 'disabled'
+            #self.fields['valor'].widget.attrs['disabled'] = 'disabled'
             self.fields['valor'].widget.attrs['readonly'] = 'readonly'
-            self.fields['valor'].widget.attrs['class'] = 'text-right'
+            #self.fields['valor'].widget.attrs['class'] = 'text-right'
             self.fields['valor'].required = False
 
             self.fields['tipo_materia'].widget = HiddenInput()
@@ -542,8 +553,7 @@ class RegistroAjusteLoaForm(ModelForm):
         queryset=EmendaLoa.objects.all())
 
     parlamentares__valor = SplitArrayField(
-        forms.DecimalField(required=False, max_digits=14,
-                           decimal_places=2,), 10,
+        DecimalField(required=False, max_digits=14, decimal_places=2,), 10,
         label='Valores por Parlamentar',
         required=False
     )
