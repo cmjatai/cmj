@@ -1,6 +1,7 @@
 from copy import deepcopy
 import csv
 from io import StringIO
+import json
 import logging
 import sys
 from time import sleep
@@ -18,7 +19,7 @@ from cmj.utils import Manutencao
 urls = [
     {
         'name': 'despesa_paga_list_exportacao',
-        'url': 'http://prefeituradejatai.sigepnet.com.br/transparencia/exportacao/'
+        'url': 'http://{subdomain}.sigepnet.com.br/transparencia/exportacao/'
         'despesa_paga.php?extensao=CSV&orgao={orgao}&ano={ano}&mes={mes}&fornecedor=&cpfcnpj=&acao=true',
         'type': 'list',
         'format': 'csv',
@@ -26,7 +27,7 @@ urls = [
         'childs': [
             {
                 'name': 'despesa_paga_detalhes_exportacao',
-                'url': 'http://prefeituradejatai.sigepnet.com.br/transparencia/exportacao/'
+                'url': 'http://{subdomain}.sigepnet.com.br/transparencia/exportacao/'
                 'depesa_paga_detalhes.php?extensao=CSV&codigo={codigo}',
                 'type': 'detail',
                 'format': 'csv',
@@ -34,7 +35,7 @@ urls = [
             },
             {
                 'name': 'despesa_paga_detalhes',
-                'url': 'http://prefeituradejatai.sigepnet.com.br/transparencia/'
+                'url': 'http://{subdomain}.sigepnet.com.br/transparencia/'
                 'despesa_paga_detalhes.php?codigo={codigo}',
                 'type': 'detail',
                 'format': 'html',
@@ -44,7 +45,7 @@ urls = [
     },
     {
         'name': 'receita_list_exportacao',
-        'url': 'http://prefeituradejatai.sigepnet.com.br/transparencia/exportacao/'
+        'url': 'http://{subdomain}.sigepnet.com.br/transparencia/exportacao/'
         'receitas.php?extensao=CSV&orgao={orgao}&ano={ano}&mes={mes}&elementoreceita=&categoria=&origem=&especie=&acao=true',
         'type': 'list',
         'params': ('orgao', 'mes', 'ano'),
@@ -52,7 +53,7 @@ urls = [
         'childs': [
             {
                 'name': 'receita_detail_exportacao',
-                'url': 'http://prefeituradejatai.sigepnet.com.br/transparencia/exportacao/'
+                'url': 'http://{subdomain}.sigepnet.com.br/transparencia/exportacao/'
                 'receitas_detalhes.php?extensao=CSV&codigo={codigo}&orgao={orgao}&ano={ano}&mes={mes}',
                 'type': 'list',
                 'format': 'csv',
@@ -60,7 +61,7 @@ urls = [
             },
             {
                 'name': 'receita_detail',
-                'url': 'http://prefeituradejatai.sigepnet.com.br/transparencia/'
+                'url': 'http://{subdomain}.sigepnet.com.br/transparencia/'
                 'receitas_detalhes.php?codigo={codigo}&orgao={orgao}&ano={ano}&mes={mes}',
                 'type': 'list',
                 'format': 'html',
@@ -75,6 +76,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--deep', action='store_true', default=False)
+        parser.add_argument('--onlychilds', action='store_true', default=False)
 
     def handle(self, *args, **options):
         self.logger = logging.getLogger(__name__)
@@ -82,74 +84,102 @@ class Command(BaseCommand):
         # m.desativa_auto_now()
         m.desativa_signals()
 
-        deep = options['deep']
+        self.deep = deep = options['deep']
+        self.onlychilds = onlychilds = options['onlychilds']
+
+        if onlychilds:
+            self.deep = deep = True
 
         file_path = settings.PROJECT_DIR.child(
             'logs').child('scrap_running.txt')
-        sys.stdout = open(file_path, "w")
+        sys.stdout = open(file_path, 'r+' if file_path.exists() else 'w')
+
         self.time_start = timezone.localtime()
+
+        print(f'START scrap: {self.time_start}')
+        sys.stdout.flush()
 
         self.ano_atual = self.time_start.year
         self.mes_atual = self.time_start.month
 
-        orgaos = models.Orgao.objects.order_by('codigo', '-loa__ano')
-        for url_dict in urls:
-            orgao_atual = None
-            interromper_orgao = False
-            for orgao in orgaos:
-                if orgao.loa.ano > self.ano_atual or orgao.codigo == '01':
-                    continue
+        order_by = (
+            'codigo', '-loa__ano') if not onlychilds else ('-loa__ano', 'codigo')
 
-                if interromper_orgao and orgao.codigo == orgao_atual.codigo:
-                    continue
+        subdomains = [
+            {
+                'subdomain': 'camaradejatai',
+                'orgaos': models.Orgao.objects.filter(codigo='01').order_by(*order_by),
+            },
+            {
+                'subdomain': 'prefeituradejatai',
+                'orgaos': models.Orgao.objects.exclude(codigo='01').order_by(*order_by),
+            }
+        ]
+
+        # ScrapRecord.objects.all().delete()
+
+        for sd in subdomains:
+            for url_dict in urls:
+                udj = json.dumps(url_dict)
+                udj = udj.replace('{subdomain}', sd['subdomain'])
+                ud = json.loads(udj)
+
+                orgao_atual = None
                 interromper_orgao = False
-                orgao_atual = orgao
-
-                for mes in range(12, 0, -1):
-                    if orgao.loa.ano == self.ano_atual and mes > self.mes_atual:
+                for orgao in sd['orgaos']:
+                    if orgao.loa.ano > self.ano_atual:
                         continue
 
-                    params = {
-                        'orgao': orgao.codigo,
-                        'ano': orgao.loa.ano,
-                        'mes': f'{mes:>02}'
-                    }
+                    if interromper_orgao and orgao.codigo == orgao_atual.codigo:
+                        continue
+                    interromper_orgao = False
+                    orgao_atual = orgao
 
-                    try:
-                        print(
-                            f'START: {timezone.localtime()}, Órgão: {orgao}, Ano: {orgao.loa.ano}, Mês: {mes}, Url_dict: {url_dict["name"]}')
-                        interromper_orgao = self.scrap_node(
-                            url_dict, params=params, deep=deep)
-                        print('END: ok')
-                        sys.stdout.flush()
-                    except:
-                        print('END: error')
+                    for mes in range(12, 0, -1):
+                        if orgao.loa.ano == self.ano_atual and mes > self.mes_atual:
+                            continue
 
-                    if interromper_orgao:
-                        break
+                        params = {
+                            'orgao': orgao.codigo,
+                            'ano': orgao.loa.ano,
+                            'mes': f'{mes:>02}'
+                        }
+
+                        try:
+                            print(
+                                f'START: {timezone.localtime()}, Órgão: {orgao}, Ano: {orgao.loa.ano}, Mês: {mes}, Url_dict: {url_dict["name"]}')
+                            interromper_orgao = self.scrap_node(
+                                ud, params=params, deep=deep)
+                            print('END: ok')
+                            sys.stdout.flush()
+                        except:
+                            print('END: error')
+
+                        if interromper_orgao:
+                            break
 
     def scrap_node(self, url_dict, params={}, item_list=[], parent=None, deep=True):
-        sleep(1)
         try:
             url = url_dict['url'].format(**params)
         except:
             url = url_dict['url'].format(codigo=params['codigo'])
 
-        try:
-            get = requests.get(url)
-            print(f'... url: {url}')
-            sys.stdout.flush()
-        except:
-            print(f'ERRO get: {url}')
-            return True
-
-        content = get.content
-
         scrap = ScrapRecord.objects.filter(url=url).first()
+        content = b''
+
+        if (self.onlychilds and parent and not scrap) or not self.onlychilds:
+            try:
+                get = requests.get(url)
+                print(f'... url: {url}')
+                sys.stdout.flush()
+            except:
+                print(f'ERRO get: {url}')
+                return True
+            content = get.content
 
         childs = url_dict.get('childs', [])
-        if scrap:
 
+        if scrap:
             if url_dict['format'] == 'html':
                 if scrap.content.tobytes() == content:
                     return True
@@ -158,8 +188,9 @@ class Command(BaseCommand):
                     scrap.content.tobytes(), content)
                 if is_equals:
                     return True
-            scrap.content = content
-            scrap.save()
+            if not self.onlychilds:
+                scrap.content = content
+                scrap.save()
 
             if childs and deep:
                 self.scrap_run_childs(scrap, childs, params, deep)
@@ -184,7 +215,11 @@ class Command(BaseCommand):
         return False
 
     def scrap_run_childs(self, scrap, url_childs, params, deep):
-        content = scrap.content.decode('utf-8-sig')
+        content = scrap.content
+        if isinstance(content, memoryview):
+            content = content.tobytes()
+
+        content = content.decode('utf-8-sig')
         file = StringIO(content)
         csv_data = csv.reader(file, delimiter=";")
 
