@@ -79,9 +79,9 @@ class Command(BaseCommand):
         # m.desativa_auto_now()
         m.desativa_signals()
 
-        # file_path = settings.PROJECT_DIR.child(
-        #    'logs').child('scrap_running.txt')
-        #sys.stdout = open(file_path, "w")
+        file_path = settings.PROJECT_DIR.child(
+            'logs').child('scrap_running.txt')
+        sys.stdout = open(file_path, "w")
         self.time_start = timezone.localtime()
 
         self.ano_atual = self.time_start.year
@@ -116,6 +116,7 @@ class Command(BaseCommand):
                         interromper_orgao = self.scrap_node(
                             url_dict, params=params)
                         print('END: ok')
+                        sys.stdout.flush()
                     except:
                         print('END: error')
 
@@ -132,6 +133,7 @@ class Command(BaseCommand):
         try:
             get = requests.get(url)
             print(f'... url: {url}')
+            sys.stdout.flush()
         except:
             print(f'ERRO get: {url}')
             return True
