@@ -43,7 +43,7 @@ def auditlog_signal_function(sender, **kwargs):
         OcrMyPDF,        # já é o log de execução de ocr
         Bi,              # Bi é um processo automático estatístico
         PullExec,        # Conexão com youtube
-        # Documento
+        ScrapRecord      # Extração Automática das Despesas e Receitas
     ):
         return
 

@@ -823,3 +823,34 @@ class EmendaLoaRegistroContabil(models.Model):
             ),
 
         )
+
+
+class ScrapRecord(models.Model):
+
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+
+    mes = models.PositiveSmallIntegerField(verbose_name=_('Mes'))
+    ano = models.PositiveSmallIntegerField(verbose_name=_('Ano'))
+    orgao = models.TextField(verbose_name=_("Órgão"))
+
+    codigo = models.TextField(verbose_name=_("Código"), default='')
+
+    url = models.TextField(verbose_name=_("Órgão"), unique=True)
+
+    content = models.BinaryField(editable=True, default=b'')
+
+    modified = models.DateTimeField(
+        verbose_name=_('modified'), editable=False, auto_now=True)
+
+    parent = models.ForeignKey(
+        'self',
+        blank=True, null=True, default=None,
+        related_name='scrap_set',
+        on_delete=CASCADE)
+
+    class Meta:
+        verbose_name = 'ScrapRecord'
+        verbose_name_plural = 'ScrapRecord'
+        ordering = ['id']
