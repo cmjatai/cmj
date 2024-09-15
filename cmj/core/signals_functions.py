@@ -16,6 +16,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from cmj.core import tasks
 from cmj.core.models import AuditLog, OcrMyPDF, Bi
+from cmj.loa.models import ScrapRecord
 from cmj.settings.email import EMAIL_SEND_USER
 from cmj.sigad.models import ShortRedirect
 from cmj.videos.models import VideoParte, PullExec
