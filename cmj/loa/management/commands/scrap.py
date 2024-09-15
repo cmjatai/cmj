@@ -77,6 +77,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('--deep', action='store_true', default=False)
         parser.add_argument('--onlychilds', action='store_true', default=False)
+        parser.add_argument('--outfile', action='store_true', default=False)
 
     def handle(self, *args, **options):
         self.logger = logging.getLogger(__name__)
@@ -86,13 +87,15 @@ class Command(BaseCommand):
 
         self.deep = deep = options['deep']
         self.onlychilds = onlychilds = options['onlychilds']
+        outfile = options['outfile']
 
         if onlychilds:
             self.deep = deep = True
 
-        file_path = settings.PROJECT_DIR.child(
-            'logs').child('scrap_running.txt')
-        sys.stdout = open(file_path, 'r+' if file_path.exists() else 'w')
+        if outfile:
+            file_path = settings.PROJECT_DIR.child(
+                'logs').child('scrap_running.txt')
+            sys.stdout = open(file_path, 'r+' if file_path.exists() else 'w')
 
         self.time_start = timezone.localtime()
 
