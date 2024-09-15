@@ -73,11 +73,16 @@ urls = [
 
 class Command(BaseCommand):
 
+    def add_arguments(self, parser):
+        parser.add_argument('--deep', action='store_true', default=False)
+
     def handle(self, *args, **options):
         self.logger = logging.getLogger(__name__)
         m = Manutencao()
         # m.desativa_auto_now()
         m.desativa_signals()
+
+        deep = options['deep']
 
         file_path = settings.PROJECT_DIR.child(
             'logs').child('scrap_running.txt')
@@ -87,7 +92,7 @@ class Command(BaseCommand):
         self.ano_atual = self.time_start.year
         self.mes_atual = self.time_start.month
 
-        orgaos = models.Orgao.objects.order_by('-codigo', '-loa__ano')
+        orgaos = models.Orgao.objects.order_by('codigo', '-loa__ano')
         for url_dict in urls:
             orgao_atual = None
             interromper_orgao = False
@@ -114,7 +119,7 @@ class Command(BaseCommand):
                         print(
                             f'START: {timezone.localtime()}, Órgão: {orgao}, Ano: {orgao.loa.ano}, Mês: {mes}, Url_dict: {url_dict["name"]}')
                         interromper_orgao = self.scrap_node(
-                            url_dict, params=params)
+                            url_dict, params=params, deep=deep)
                         print('END: ok')
                         sys.stdout.flush()
                     except:
@@ -123,7 +128,7 @@ class Command(BaseCommand):
                     if interromper_orgao:
                         break
 
-    def scrap_node(self, url_dict, params={}, item_list=[], parent=None):
+    def scrap_node(self, url_dict, params={}, item_list=[], parent=None, deep=True):
         sleep(1)
         try:
             url = url_dict['url'].format(**params)
@@ -156,8 +161,8 @@ class Command(BaseCommand):
             scrap.content = content
             scrap.save()
 
-            if childs:
-                self.scrap_run_childs(scrap, childs, params)
+            if childs and deep:
+                self.scrap_run_childs(scrap, childs, params, deep)
             return False
 
         scrap = ScrapRecord()
@@ -174,11 +179,11 @@ class Command(BaseCommand):
         scrap.content = content
         scrap.save()
 
-        if childs:
-            self.scrap_run_childs(scrap, childs, params)
+        if childs and deep:
+            self.scrap_run_childs(scrap, childs, params, deep)
         return False
 
-    def scrap_run_childs(self, scrap, url_childs, params):
+    def scrap_run_childs(self, scrap, url_childs, params, deep):
         content = scrap.content.decode('utf-8-sig')
         file = StringIO(content)
         csv_data = csv.reader(file, delimiter=";")
@@ -201,7 +206,7 @@ class Command(BaseCommand):
                 pms['codigo'] = row[idx_codigo]
 
                 self.scrap_node(url_dict, params=pms,
-                                item_list=row, parent=scrap)
+                                item_list=row, parent=scrap, deep=deep)
 
     def compare_bytes_csv(self, c1, c2):
         str1_csv = c1.decode('utf-8-sig')
