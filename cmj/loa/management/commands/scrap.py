@@ -89,6 +89,11 @@ class Command(BaseCommand):
         self.onlychilds = onlychilds = options['onlychilds']
         outfile = options['outfile']
 
+        # deep=True buscas as listas e a partir das listas, busca os registros
+        # deep=False buscas apenas as listas
+        # onlychilds=True ignora deep e, a partir das listas já baixadas, busca
+        # os registros individuais
+
         if onlychilds:
             self.deep = deep = True
 
@@ -116,10 +121,15 @@ class Command(BaseCommand):
             {
                 'subdomain': 'prefeituradejatai',
                 'orgaos': models.Orgao.objects.exclude(codigo='01').order_by(*order_by),
-            }
+            },
         ]
 
         # ScrapRecord.objects.all().delete()
+        # urls.reverse()
+
+        # for scrap in ScrapRecord.objects.all():
+        #    scrap.get_despesa_paga()
+        # return
 
         for sd in subdomains:
             for url_dict in urls:
@@ -139,6 +149,10 @@ class Command(BaseCommand):
                     orgao_atual = orgao
 
                     for mes in range(12, 0, -1):
+
+                        if (timezone.localtime() - self.time_start).seconds > 36000:
+                            return
+
                         if orgao.loa.ano == self.ano_atual and mes > self.mes_atual:
                             continue
 
@@ -155,8 +169,8 @@ class Command(BaseCommand):
                                 ud, params=params, deep=deep)
                             print('END: ok')
                             sys.stdout.flush()
-                        except:
-                            print('END: error')
+                        except Exception as e:
+                            print('END: error', e)
 
                         if interromper_orgao:
                             break
@@ -213,6 +227,8 @@ class Command(BaseCommand):
         scrap.content = content
         scrap.save()
 
+        scrap.get_despesa_paga()
+
         if childs and deep:
             self.scrap_run_childs(scrap, childs, params, deep)
         return False
@@ -227,17 +243,21 @@ class Command(BaseCommand):
         csv_data = csv.reader(file, delimiter=";")
 
         idx_codigo = -1
-        for idx, row in enumerate(csv_data):
+        lista = list(enumerate(csv_data))
+        if not lista:
+            return
+        rows = lista[1:-1]
+        rows.reverse()
 
-            if not idx:
-                try:
-                    idx_codigo = row.index("CÓDIGO")
-                except:
-                    try:
-                        idx_codigo = row.index("RECEITA")
-                    except:
-                        return
-                continue
+        try:
+            idx_codigo = lista[0][1].index("CÓDIGO")
+        except:
+            try:
+                idx_codigo = lista[0][1].index("RECEITA")
+            except:
+                return
+
+        for idx, row in rows:
 
             for url_dict in url_childs:
                 pms = deepcopy(params)

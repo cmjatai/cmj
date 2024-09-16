@@ -1,5 +1,9 @@
+import csv
+from datetime import datetime
 from decimal import Decimal
+from io import StringIO
 
+from bs4 import BeautifulSoup as bs
 from django.contrib.postgres.fields.jsonb import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -825,6 +829,65 @@ class EmendaLoaRegistroContabil(models.Model):
         )
 
 
+class DespesaPaga(models.Model):
+
+    mapeamento = {
+        'Código:': 'codigo',
+        'Código': 'codigo',
+        'Data:': 'data',
+        'Data': 'data',
+        'Banco:': 'banco',
+        'Banco': 'banco',
+        'Agência:': 'agencia',
+        'Agência': 'agencia',
+        'Conta Bancária:': 'conta',
+        'Conta': 'conta',
+        'Tipo do Documento:': 'tipo',
+        'Tipo do Documento': 'tipo',
+        'Nº do Documento:': 'numero_documento',
+        'Número do Documento': 'numero_documento',
+        'Número da Licitação:': 'numero_licitacao',
+        'Código Empenho:': 'empenho',
+        'Elemento:': 'elemento',
+        'Sub Elemento:': 'subelemento',
+        'Unidade Financeira:': 'unidade',
+        'Unidade Financeira': 'unidade',
+        'Fonte de Recursos:': 'fonte',
+        'Fonte de Recursos': 'fonte',
+        'Historico:': 'historico',
+        'Número': 'numero_emissao',
+        'Série': 'serie',
+        'Data de Emissão': 'data_emissao',
+        'Tipo': 'tipo_emissao',
+        'Valor': 'valor'
+    }
+
+    codigo = models.TextField(verbose_name=_("Código"))
+    data = models.DateField(verbose_name=_('Data'))
+
+    orgao = models.ForeignKey(
+        Orgao,
+        related_name='despesapaga_set',
+        verbose_name=_('Órgão'),
+        on_delete=CASCADE)
+
+    unidade = models.ForeignKey(
+        UnidadeOrcamentaria,
+        related_name='despesapaga_set',
+        verbose_name=_('Unidade Financeira'),
+        on_delete=CASCADE)
+
+    valor = models.DecimalField(
+        max_digits=14, decimal_places=2, default=Decimal('0.00'),
+        verbose_name=_('Valor (R$)'),
+    )
+
+    class Meta:
+        verbose_name = _('Despesa Paga')
+        verbose_name_plural = _('Despesas Pagas')
+        ordering = ['id']
+
+
 class ScrapRecord(models.Model):
 
     metadata = JSONField(
@@ -854,3 +917,78 @@ class ScrapRecord(models.Model):
         verbose_name = 'ScrapRecord'
         verbose_name_plural = 'ScrapRecord'
         ordering = ['id']
+
+    def get_despesa_paga(self):
+
+        def clean_text(text):
+            while '  ' in text:
+                text = text.replace('  ', ' ')
+            while ' \n' in text:
+                text = text.replace(' \n', '\n')
+            while '\n ' in text:
+                text = text.replace('\n ', '\n')
+            while '\r\n' in text:
+                text = text.replace('\r\n', '\n')
+            while '\n\n' in text:
+                text = text.replace('\n\n', '\n')
+            while '<td> ' in text:
+                text = text.replace('<td> ', '<td>')
+            while ' :</td>' in text:
+                text = text.replace(' :</td>', ':</td>')
+            while '\n</td>' in text:
+                text = text.replace('\n</td>', '</td>')
+            while ' </td>' in text:
+                text = text.replace(' </td>', '</td>')
+            while '<td>R$ ' in text:
+                text = text.replace('<td>R$ ', '<td>')
+            return text
+
+        # if self.scrap_set.exists():
+        # return [scrap.get_despesa_paga() for scrap in self.scrap_set.all()]
+
+        if not self.codigo or self.codigo == 'TOTAL:':
+            return None
+
+        if not self.metadata['url_dict']['format'] == 'html':
+            return None
+
+        if 'despesa' not in self.metadata['url_dict']['name']:
+            return None
+
+        content = self.content
+        if not isinstance(content, bytes):
+            content = content.tobytes()
+        content = content.decode('utf-8-sig')
+        content = clean_text(clean_text(clean_text(content)))
+        tables = bs(content).findAll('table')
+        if not tables:
+            return None
+        try:
+            values = {}
+            for row in tables[0].findAll('tr'):
+                cols = row.findAll('td')
+                values[cols[0].text] = cols[1].text
+
+            item_list = self.metadata['item_list']
+
+            orgao = Orgao.objects.get(codigo=self.orgao, loa__ano=self.ano)
+            unidade = UnidadeOrcamentaria.objects.get(
+                orgao=orgao,
+                loa__ano=self.ano,
+                codigo=values['Unidade Financeira:'][:2]
+            )
+            dt = datetime.strptime(values['Data:'], "%d/%m/%Y").date()
+
+            dp = DespesaPaga.objects.get_or_create(
+                codigo=self.codigo,
+                orgao=orgao,
+                unidade=unidade,
+            )
+            dp.valor = Decimal(
+                item_list[-1].replace('.', '').replace(',', '.'))
+            dp.data = dt
+            dp.valor
+            dp.save()
+            return dp
+        except Exception as e:
+            return None
