@@ -100,6 +100,7 @@ whoosh_index/
 .ipynb_checkpoints
 *.ipynb
 notebooks
+notebooks/*.ipynb
 scripts_local/
 cmj/legacy/scripts/
 run/
