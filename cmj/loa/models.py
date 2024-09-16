@@ -987,7 +987,6 @@ class ScrapRecord(models.Model):
             dp.valor = Decimal(
                 item_list[-1].replace('.', '').replace(',', '.'))
             dp.data = dt
-            dp.valor
             dp.save()
             return dp
         except Exception as e:

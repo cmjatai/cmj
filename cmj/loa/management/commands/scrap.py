@@ -208,6 +208,7 @@ class Command(BaseCommand):
             if not self.onlychilds:
                 scrap.content = content
                 scrap.save()
+                scrap.get_despesa_paga()
 
             if childs and deep:
                 self.scrap_run_childs(scrap, childs, params, deep)

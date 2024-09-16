@@ -98,7 +98,8 @@ media
 media_protected
 whoosh_index/
 .ipynb_checkpoints
-#*.ipynb
+*.ipynb
+notebooks
 scripts_local/
 cmj/legacy/scripts/
 run/
