@@ -863,7 +863,8 @@ class DespesaPaga(models.Model):
     }
 
     codigo = models.TextField(verbose_name=_("Código"))
-    data = models.DateField(verbose_name=_('Data'))
+    data = models.DateField(
+        blank=True, null=True, verbose_name=_('Data'))
 
     orgao = models.ForeignKey(
         Orgao,
@@ -918,7 +919,7 @@ class ScrapRecord(models.Model):
         verbose_name_plural = 'ScrapRecord'
         ordering = ['id']
 
-    def get_despesa_paga(self):
+    def update_despesa_paga(self):
 
         def clean_text(text):
             while '  ' in text:
@@ -960,7 +961,7 @@ class ScrapRecord(models.Model):
             content = content.tobytes()
         content = content.decode('utf-8-sig')
         content = clean_text(clean_text(clean_text(content)))
-        tables = bs(content).findAll('table')
+        tables = bs(content, 'html.parser').findAll('table')
         if not tables:
             return None
         try:
@@ -979,7 +980,7 @@ class ScrapRecord(models.Model):
             )
             dt = datetime.strptime(values['Data:'], "%d/%m/%Y").date()
 
-            dp = DespesaPaga.objects.get_or_create(
+            dp, created = DespesaPaga.objects.get_or_create(
                 codigo=self.codigo,
                 orgao=orgao,
                 unidade=unidade,
@@ -990,4 +991,4 @@ class ScrapRecord(models.Model):
             dp.save()
             return dp
         except Exception as e:
-            return None
+            self.delete()

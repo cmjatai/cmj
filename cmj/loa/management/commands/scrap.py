@@ -78,6 +78,7 @@ class Command(BaseCommand):
         parser.add_argument('--deep', action='store_true', default=False)
         parser.add_argument('--onlychilds', action='store_true', default=False)
         parser.add_argument('--outfile', action='store_true', default=False)
+        parser.add_argument('--force', action='store_true', default=False)
 
     def handle(self, *args, **options):
         self.logger = logging.getLogger(__name__)
@@ -85,6 +86,7 @@ class Command(BaseCommand):
         # m.desativa_auto_now()
         m.desativa_signals()
 
+        self.force = force = options['force']
         self.deep = deep = options['deep']
         self.onlychilds = onlychilds = options['onlychilds']
         outfile = options['outfile']
@@ -128,7 +130,7 @@ class Command(BaseCommand):
         # urls.reverse()
 
         # for scrap in ScrapRecord.objects.all():
-        #    scrap.get_despesa_paga()
+        #    scrap.update_despesa_paga()
         # return
 
         for sd in subdomains:
@@ -176,6 +178,18 @@ class Command(BaseCommand):
                             break
 
     def scrap_node(self, url_dict, params={}, item_list=[], parent=None, deep=True):
+
+        def get_content(url):
+            try:
+                get = requests.get(url)
+                print(f'... url: {url}')
+                sys.stdout.flush()
+            except:
+                print(f'ERRO get: {url}')
+                return False
+            content = get.content
+            return content
+
         try:
             url = url_dict['url'].format(**params)
         except:
@@ -184,31 +198,39 @@ class Command(BaseCommand):
         scrap = ScrapRecord.objects.filter(url=url).first()
         content = b''
 
-        if (self.onlychilds and parent and not scrap) or not self.onlychilds:
-            try:
-                get = requests.get(url)
-                print(f'... url: {url}')
-                sys.stdout.flush()
-            except:
-                print(f'ERRO get: {url}')
-                return True
-            content = get.content
+        if not scrap:
+            content = get_content(url)
+        elif self.force:
+            if self.onlychilds and parent:
+                content = get_content(url)
+            elif not self.onlychilds:
+                content = get_content(url)
+        else:
+            content = scrap.content.tobytes()
+            if not self.onlychilds and not parent:
+                content = get_content(url)
+
+        if isinstance(content, bool):
+            return True
 
         childs = url_dict.get('childs', [])
 
         if scrap:
+            scrap.update_despesa_paga()
             if url_dict['format'] == 'html':
                 if scrap.content.tobytes() == content:
                     return True
             elif url_dict['format'] == 'csv':
                 is_equals = self.compare_bytes_csv(
                     scrap.content.tobytes(), content)
-                if is_equals:
+                is_equals = self.compare_bytes_csv(
+                    scrap.content.tobytes(), content)
+                if is_equals and not self.onlychilds:
                     return True
-            if not self.onlychilds:
+            if not self.onlychilds and content:
                 scrap.content = content
                 scrap.save()
-                scrap.get_despesa_paga()
+                scrap.update_despesa_paga()
 
             if childs and deep:
                 self.scrap_run_childs(scrap, childs, params, deep)
@@ -228,7 +250,7 @@ class Command(BaseCommand):
         scrap.content = content
         scrap.save()
 
-        scrap.get_despesa_paga()
+        scrap.update_despesa_paga()
 
         if childs and deep:
             self.scrap_run_childs(scrap, childs, params, deep)
