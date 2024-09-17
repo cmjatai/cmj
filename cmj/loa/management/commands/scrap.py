@@ -117,12 +117,12 @@ class Command(BaseCommand):
 
         subdomains = [
             {
-                'subdomain': 'camaradejatai',
-                'orgaos': models.Orgao.objects.filter(codigo='01').order_by(*order_by),
-            },
-            {
                 'subdomain': 'prefeituradejatai',
                 'orgaos': models.Orgao.objects.exclude(codigo='01').order_by(*order_by),
+            },
+            {
+                'subdomain': 'camaradejatai',
+                'orgaos': models.Orgao.objects.filter(codigo='01').order_by(*order_by),
             },
         ]
 
@@ -134,7 +134,7 @@ class Command(BaseCommand):
         # return
 
         for sd in subdomains:
-            for url_dict in urls:
+            for url_dict in urls[:1]:
                 udj = json.dumps(url_dict)
                 udj = udj.replace('{subdomain}', sd['subdomain'])
                 ud = json.loads(udj)
