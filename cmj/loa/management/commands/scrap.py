@@ -196,39 +196,42 @@ class Command(BaseCommand):
             url = url_dict['url'].format(codigo=params['codigo'])
 
         scrap = ScrapRecord.objects.filter(url=url).first()
-        content = b''
+        content_scrap = b''
+        content_download = b''
 
         if not scrap:
-            content = get_content(url)
+            content_download = get_content(url)
         elif self.force:
             if self.onlychilds and parent:
-                content = get_content(url)
+                content_download = get_content(url)
             elif not self.onlychilds:
-                content = get_content(url)
+                content_download = get_content(url)
         else:
-            content = scrap.content.tobytes()
             if not self.onlychilds and not parent:
-                content = get_content(url)
+                content_download = get_content(url)
 
-        if isinstance(content, bool):
-            return True
+        if isinstance(content_download, bool):
+            return True  # para o scrap para o órgão atual
 
         childs = url_dict.get('childs', [])
 
         if scrap:
-            scrap.update_despesa_paga()
+
+            if not self.force:
+                content_scrap = scrap.content.tobytes()
+                scrap.update_despesa_paga()
+
             if url_dict['format'] == 'html':
-                if scrap.content.tobytes() == content:
+                if content_scrap == content_download:
                     return True
             elif url_dict['format'] == 'csv':
                 is_equals = self.compare_bytes_csv(
-                    scrap.content.tobytes(), content)
-                is_equals = self.compare_bytes_csv(
-                    scrap.content.tobytes(), content)
+                    content_scrap, content_download)
                 if is_equals and not self.onlychilds:
                     return True
-            if not self.onlychilds and content:
-                scrap.content = content
+
+            if not self.onlychilds or content_download:
+                scrap.content = content_download
                 scrap.save()
                 scrap.update_despesa_paga()
 
@@ -247,7 +250,7 @@ class Command(BaseCommand):
             'item_list': item_list
         }
         scrap.parent = parent
-        scrap.content = content
+        scrap.content = content_download
         scrap.save()
 
         scrap.update_despesa_paga()
