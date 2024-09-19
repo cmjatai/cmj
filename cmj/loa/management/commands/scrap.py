@@ -112,9 +112,9 @@ class Command(BaseCommand):
         self.ano_atual = self.time_start.year
         self.mes_atual = self.time_start.month
 
-        # order_by = (
-        #    'codigo', '-loa__ano') if not onlychilds else ('-loa__ano', 'codigo')
-        order_by = ('-loa__ano', 'codigo')
+        order_by = (
+            '-loa__ano', 'codigo') if onlychilds else ('codigo', '-loa__ano')
+        #order_by = ('-loa__ano', 'codigo')
 
         subdomains = [
             {
@@ -153,7 +153,7 @@ class Command(BaseCommand):
 
                     for mes in range(12, 0, -1):
 
-                        if (timezone.localtime() - self.time_start).seconds > 25200:
+                        if (timezone.localtime() - self.time_start).seconds > 80000:
                             return
 
                         if orgao.loa.ano == self.ano_atual and mes > self.mes_atual:
@@ -166,6 +166,7 @@ class Command(BaseCommand):
                         }
 
                         try:
+                            self.hora_atual = timezone.localtime().hour
                             print(
                                 f'START: {timezone.localtime()}, Órgão: {orgao}, Ano: {orgao.loa.ano}, Mês: {mes}, Url_dict: {url_dict["name"]}')
                             interromper_orgao = self.scrap_node(
@@ -179,6 +180,9 @@ class Command(BaseCommand):
                             break
 
     def scrap_node(self, url_dict, params={}, item_list=[], parent=None, deep=True):
+
+        if 7 < self.hora_atual < 22:
+            sleep(10)
 
         def get_content(url):
             try:
