@@ -108,9 +108,33 @@
         <div class="col-12 mt-3" v-html="loa.yaml_obs && loa.yaml_obs.GRAFICO_DESPESAS_MATERIA ? loa.yaml_obs.GRAFICO_DESPESAS_MATERIA : ''"></div>
 
         <div class="col-12 container-barchart p-3 mt-3" v-if="chartDataHist">
-          <div class="btn-barchart-left" @click="clickSlice(-1)"><i class="fa fa-chevron-left"></i></div>
-          <div class="btn-barchart-right" @click="clickSlice(1)"><i class="fa fa-chevron-right"></i></div>
+          <div class="btn-barchart-left" @click="clickSlice(-1, 'hist')"><i class="fa fa-chevron-left"></i></div>
+          <div class="btn-barchart-right" @click="clickSlice(1, 'hist')"><i class="fa fa-chevron-right"></i></div>
           <BarChart :plugins="pluginsBar" :chartDataUser="chartDataHist" cssClasses="barchart-component"/>
+        </div>
+        <div class="col-12 container-barchart p-3 mt-3" v-if="chartDataExec">
+          <div class="btn-barchart-left" @click="clickSlice(-1, 'exec')"><i class="fa fa-chevron-left"></i></div>
+          <div class="btn-barchart-right" @click="clickSlice(1, 'exec')"><i class="fa fa-chevron-right"></i></div>
+          <BarChart :plugins="pluginsExec" :chartDataUser="chartDataExec" cssClasses="barchart-2"/>
+          <div class="fonte small pt-5">
+            FONTE: Os dados são extraídos no período noturno dos
+              portais de transparência do
+              <a href="http://prefeituradejatai.sigepnet.com.br/transparencia/despesa_paga.php">
+                Poder Executivo</a> e do
+              <a href="http://camaradejatai.sigepnet.com.br/transparencia/despesa_paga.php">
+                Poder Legislativo</a>, portanto, os valores se referem a movimentação do dia anterior.
+              Os valores extraídos são sempre os divulgados como "Valor Bruto",
+              não sendo possível atualmente, possuir uma coluna com o "Valor Líquido"
+              por esta, apesar de estar presente nos dados humanamente visíveis,
+              não está nos dados abertos no format CSV.
+              A totalização dos valores pode possuir variações de 1 a 2% com o mostrado nos portais de transparência.
+              Abaixo uma listagem de cada Órgão, com sua última data e último código de despesa extraída.
+              <ul>
+                <li v-for="(data, key) in data_exec" :key="key" >
+                  {{ data[5] }} - {{ data[4] }} - {{ data[0] }}-{{ data[1] }}
+                </li>
+              </ul>
+          </div>
         </div>
       </div>
     </div>
@@ -139,7 +163,15 @@ export default {
       },
       chartDataLoa: null,
       chartDataHist: null,
+      chartDataExec: null,
+      data_exec: null,
       height: 550,
+      pluginsExec: [{
+        title: {
+          display: true,
+          text: ''
+        }
+      }],
       pluginsBar: [{
         title: {
           display: true,
@@ -202,7 +234,7 @@ export default {
         { value: 15, text: '15 Maiores' },
         { value: 20, text: '20 Maiores' },
         { value: 25, text: '25 Maiores' },
-        { value: 0, text: 'Todos os Itens' }
+        { value: 999, text: 'Todos os Itens' }
       ],
       itens_hist: [
         { value: 5, text: '05 Itens' },
@@ -210,6 +242,9 @@ export default {
         { value: 15, text: '15 Itens' },
         { value: 20, text: '20 Itens' }
       ],
+      barchart_exec_offset: 0,
+      barchart_exec_length: 0,
+
       barchart_offset: 0,
       barchart_length: 0,
       barchart_max_items__select: 5,
@@ -238,6 +273,8 @@ export default {
   watch: {
     barchart_max_items__select: {
       handler (nv, ov) {
+        this.barchart_exec_offset = 0
+
         this.barchart_offset = 0
         this.barchart_max_items = Number(nv)
         this.fetch('', 1)
@@ -380,13 +417,23 @@ export default {
         itensselected: 20
       }
     },
-    clickSlice (value) {
-      if (
-        (value === -1 && this.barchart_offset > 0) ||
-        (value === 1 && this.barchart_offset + this.barchart_max_items < this.barchart_length)
-      ) {
-        this.barchart_offset += value
-        this.fetch('', 1)
+    clickSlice (value, grafico) {
+      if (grafico === 'hist') {
+        if (
+          (value === -1 && this.barchart_offset > 0) ||
+          (value === 1 && this.barchart_offset + this.barchart_max_items < this.barchart_length)
+        ) {
+          this.barchart_offset += value
+          this.fetch('', 1)
+        }
+      } else {
+        if (
+          (value === -1 && this.barchart_exec_offset > 0) ||
+          (value === 1 && this.barchart_exec_offset + this.barchart_max_items < this.barchart_exec_length)
+        ) {
+          this.barchart_exec_offset += value
+          this.fetch('', 1)
+        }
       }
     },
     handleResize () {
@@ -420,6 +467,7 @@ export default {
           }
           // t.barchart_max_items = formFilter.itens
           t.barchart_offset = 0
+          t.barchart_exec_offset = 0
           formFilter.hist = hist
           t.utils.postModelAction('loa', 'loa', t.loa.id, 'despesas_agrupadas', formFilter)
             .then((response) => {
@@ -545,6 +593,61 @@ export default {
             .catch((response) => t.sendMessage(
               { alert: 'danger', message: 'Não foi possível recuperar a lista...', time: 5 }))
         })
+        .then(() => {
+          t.utils.getModelAction('loa', 'loa', t.loa.id, 'despesas_executadas')
+            .then((response) => {
+              t.data_exec = response.data
+              let cor = t.barchart_colors // t.build_colors(response.data.anos.length, 'a0')
+              let labels = []
+              let data_orc = []
+              let data_exe = []
+              _.each(response.data, function (item, idx) {
+                labels.push(`${item[0]} - ${item[1]}`)
+                data_orc.push(item[2])
+                data_exe.push(item[3])
+              })
+              t.barchart_exec_length = labels.length
+              labels = labels.slice(t.barchart_exec_offset, t.barchart_exec_offset + t.barchart_max_items)
+              let datasets = [
+                {
+                  label: 'Despesas Orçamentárias',
+                  data: data_orc.slice(t.barchart_exec_offset, t.barchart_exec_offset + t.barchart_max_items),
+                  backgroundColor: cor[0]
+                },
+                {
+                  label: 'Despesas Executadas',
+                  data: data_exe.slice(t.barchart_exec_offset, t.barchart_exec_offset + t.barchart_max_items),
+                  backgroundColor: cor[1]
+                }
+              ]
+              let chartDataExec = {
+                labels,
+                datasets
+              }
+              if (t.chartDataExec === null) {
+                t.chartDataExec = chartDataExec
+                return
+              }
+              const text = [
+                `ORÇAMENTO vs EXECUÇÃO - ${t.loa.ano}`
+              ]
+              t.$set(t.chartDataExec, 'labels', labels)
+              t.$set(t.chartDataExec, 'datasets', datasets)
+              t.$set(t.pluginsExec, 0, {
+                title: {
+                  display: true,
+                  text
+                }
+              })
+            })
+            .then((response) => {
+              this.handleResize()
+            })
+            .catch((response) => {
+              // t.sendMessage(
+              // { alert: 'danger', message: 'Não foi possível recuperar a lista...', time: 5 })
+            })
+        })
     },
     build_colors (n, alpha = '') {
       const colors = []
@@ -607,7 +710,7 @@ export default {
             const yaml_obs = YAML.load(response.data.yaml_obs)
             response.data.yaml_obs = yaml_obs
             t.loa = response.data
-            t.fetch()
+            // t.fetch()
           })
       })
   }
@@ -682,6 +785,12 @@ export default {
       left: auto;
       right: 0;
     }
-
+    .fonte {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 80%;
+      a {
+        text-decoration: underline;
+      }
+    }
   }
 </style>

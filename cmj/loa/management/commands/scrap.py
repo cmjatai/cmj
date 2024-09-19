@@ -112,8 +112,9 @@ class Command(BaseCommand):
         self.ano_atual = self.time_start.year
         self.mes_atual = self.time_start.month
 
-        order_by = (
-            'codigo', '-loa__ano') if not onlychilds else ('-loa__ano', 'codigo')
+        # order_by = (
+        #    'codigo', '-loa__ano') if not onlychilds else ('-loa__ano', 'codigo')
+        order_by = ('-loa__ano', 'codigo')
 
         subdomains = [
             {
@@ -129,7 +130,7 @@ class Command(BaseCommand):
         # ScrapRecord.objects.all().delete()
         # urls.reverse()
 
-        # for scrap in ScrapRecord.objects.all():
+        # for scrap in ScrapRecord.objects.filter(codigo='558404'):
         #    scrap.update_despesa_paga()
         # return
 
@@ -152,7 +153,7 @@ class Command(BaseCommand):
 
                     for mes in range(12, 0, -1):
 
-                        if (timezone.localtime() - self.time_start).seconds > 36000:
+                        if (timezone.localtime() - self.time_start).seconds > 25200:
                             return
 
                         if orgao.loa.ano == self.ano_atual and mes > self.mes_atual:

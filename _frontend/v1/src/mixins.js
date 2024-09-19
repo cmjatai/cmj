@@ -22,7 +22,7 @@ Vue.mixin({
       NIVEL2: 2,
       NIVEL3: 3,
       NIVEL4: 4,
-      nulls: ['', null, undefined]
+      nulls: [0, '', null, undefined]
     }
   },
   methods: {

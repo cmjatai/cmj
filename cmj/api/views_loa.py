@@ -25,6 +25,7 @@ from cmj import loa
 from cmj.loa.models import OficioAjusteLoa, EmendaLoa, Loa, EmendaLoaParlamentar,\
     DespesaConsulta, EmendaLoaRegistroContabil, UnidadeOrcamentaria, Despesa,\
     Orgao, Funcao, SubFuncao, Programa, Acao, Natureza
+from cmj.utils import run_sql
 from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize
 from sapl.api.mixins import ResponseFileMixin
 from sapl.api.permissions import SaplModelPermissions
@@ -85,19 +86,64 @@ class _LoaViewSet:
 
             u = request.user
 
-            if request.method == 'POST' and view.action == 'despesas_agrupadas':
+            if request.method == 'POST' and view.action in (
+                'despesas_agrupadas',
+            ):
                 return True
 
             if request.method == 'GET' and view.action == 'retrieve':
                 self.object = view.get_object()
                 if not self.object.publicado and u.is_anonymous:
                     return False
-
                 return True
+            # elif request.method == 'GET' and view.action == 'despesas_executadas':
+            #    return True
 
             return False
 
     permission_classes = (LoaPermission, )
+
+    @action(methods=['get', ], detail=True)
+    def despesas_executadas(self, request, *args, **kwargs):
+        ano = kwargs['pk']
+        result = run_sql(f"""SELECT 
+                q1.cod as orgao,
+                q1.especificacao,
+                q1.valor as val_orc,
+                q2.valor as val_exe,
+                to_char(q2.data_max, 'DD/MM/YYYY') as data_max,
+                q2.codigo_max
+                
+            FROM (
+                SELECT
+                    lo.codigo as cod,
+                    lo.especificacao as especificacao,
+                    SUM(ldo.valor_materia) as valor
+                FROM loa_orgao lo
+                    LEFT JOIN loa_despesa ldo ON (ldo.orgao_id = lo.id)
+                    INNER JOIN loa_loa ll ON (lo.loa_id = ll.id) 
+                WHERE ll.ano = {ano}
+                    group by cod, especificacao
+                    ORDER BY cod, especificacao
+                ) q1
+                LEFT JOIN (
+                    SELECT
+                        lo.codigo as cod,
+                        lo.especificacao as especificacao,
+                        SUM(ldp.valor) as valor, 
+                        MAX(ldp.data) as data_max, 
+                        MAX(ldp.codigo) as codigo_max
+                    FROM loa_orgao lo
+                        LEFT JOIN loa_despesapaga ldp ON (ldp.orgao_id = lo.id)
+                        INNER JOIN loa_loa ll ON (lo.loa_id = ll.id)
+                    WHERE ll.ano = {ano}
+                        group by cod, especificacao
+                        ORDER BY cod, especificacao
+                ) q2 on (q1.cod = q2.cod)
+                order by q2.valor desc nulls last;
+        """)
+
+        return Response(result)
 
     @action(methods=['post', ], detail=True)
     def despesas_agrupadas(self, request, *args, **kwargs):
