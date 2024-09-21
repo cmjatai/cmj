@@ -85,24 +85,24 @@ class PluginSignMixin:
 
     _cmd_mask = [
         'java -jar "{plugin}"',
-        '{comando}',
-        '"{in_file}"',
-        '"{certificado}"',
-        '"{password}"',
-        '"{data_ocorrencia}"',
-        '"{hora_ocorrencia}"',
-        '"{data_comando}"',
-        '"{hora_comando}"',
-        '"{titulopre}"',
-        '"{titulo}"',
-        '"{titulopos}"',
-        '{x}',
-        '{y}',
-        '{w}',
-        '{h}',
-        '"{cor}"',
-        '{compression}',
-        '{debug}',
+        '{comando}',                # 0
+        '"{in_file}"',              # 1
+        '"{certificado}"',          # 2
+        '"{password}"',             # 3
+        '"{data_ocorrencia}"',      # 4
+        '"{hora_ocorrencia}"',      # 5
+        '"{data_comando}"',         # 6
+        '"{hora_comando}"',         # 7
+        '"{titulopre}"',            # 8
+        '"{titulo}"',               # 9
+        '"{titulopos}"',            # 10
+        '{x}',                      # 11
+        '{y}',                      # 12
+        '{w}',                      # 13
+        '{h}',                      # 14
+        '"{cor}"',                  # 15
+        '{compression}',            # 16
+        '{debug}',                  # 17
     ]
 
     cmd_mask = ' '.join(_cmd_mask)
@@ -157,7 +157,7 @@ class BtnCertMixin:
 
     @property
     def extras_url(self):
-        r = [self.btn_certidao('texto_integral')]
+        r = self.btn_certidao('texto_integral')
         r = list(filter(None, r))
         return r
 
@@ -167,29 +167,59 @@ class BtnCertMixin:
                      ):
 
         btn = []
-        if self.object.certidao:
+        if self.object.certidao and not self.request.user.has_perm(
+                'core.add_certidaopublicacao'):
 
             btn = [
-                reverse('cmj.core:certidaopublicacao_detail',
-                        kwargs={'pk': self.object.certidao.pk}),
-                'btn-success',
-                btn_title_public
+                [
+                    reverse('cmj.core:certidaopublicacao_detail',
+                            kwargs={'pk': self.object.certidao.pk}),
+                    'btn-success',
+                    btn_title_public
+                ]
             ]
 
         elif self.request.user.has_perm('core.add_certidaopublicacao'):
 
-            btn = [
-                reverse(
-                    'cmj.core:certidaopublicacao_create',
-                    kwargs={
-                        'pk': self.kwargs['pk'],
-                        'content_type': ContentType.objects.get_for_model(
-                            self.object._meta.model).id,
-                        'field_name': field_name
-                    }),
-                'btn-primary',
-                _('Gerar Certidão de Publicação')
-            ]
+            if not self.object.certidao:
+                btn = [
+                    [
+                        reverse(
+                            'cmj.core:certidaopublicacao_create',
+                            kwargs={
+                                'pk': self.kwargs['pk'],
+                                'content_type': ContentType.objects.get_for_model(
+                                    self.object._meta.model).id,
+                                'field_name': field_name
+                            }),
+                        'btn-primary',
+                        _('Gerar Certidão de Publicação')
+                    ]
+                ]
+            else:
+                btn = [
+                    [
+                        reverse('cmj.core:certidaopublicacao_detail',
+                                kwargs={'pk': self.object.certidao.pk}),
+                        'btn-success',
+                        btn_title_public,
+                    ],
+                ]
+                if self.request.user.is_superuser:
+                    btn.append(
+                        [
+                            reverse(
+                                'cmj.core:certidaopublicacao_create',
+                                kwargs={
+                                    'pk': self.kwargs['pk'],
+                                    'content_type': ContentType.objects.get_for_model(
+                                        self.object._meta.model).id,
+                                    'field_name': field_name
+                                }),
+                            'btn-warning',
+                            _('GERAR NOVA Certidão de Publicação')
+                        ]
+                    )
         return btn
 
 

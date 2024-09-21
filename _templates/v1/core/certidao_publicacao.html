@@ -9,7 +9,7 @@
     {% include "css/base.css" %}
     @page {
       {% if print %}margin-top: {{print}};{% endif %}
-      margin-left: {% if print %}1cm;{% else %}3.5cm;{% endif %}
+      margin-left: {% if print %}1cm;{% else %}3cm;{% endif %}
     }
     html {
       line-height: 1;
@@ -20,7 +20,7 @@
       padding: 5px;
       font-size: 10pt;
       font-family: courier;
-      width: 13cm;
+      width: 14cm;
     }
     .title {
       display: flex;
@@ -53,7 +53,7 @@
       overflow-wrap: break-word;
       word-wrap: break-word;
 
-      font-size: 0.7em;
+      font-size: 1em;
     }
     .url {
       font-size: 5pt;
@@ -77,7 +77,7 @@
       </div>
         <div class="hash">
           <div class="hash">
-            1) Original tal como digitalizado e com o hash abaixo, e 2) em OCR para sistemas de indexação e busca.
+            1) Original tal como digitalizado e com o hash abaixo, e<BR> 2) em OCR para sistemas de indexação e busca.
           </div>
         </div>
         <div class="url">

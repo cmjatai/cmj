@@ -1,6 +1,7 @@
 
 from builtins import property
 import collections
+import io
 import json
 import logging
 import re
@@ -11,6 +12,7 @@ from django.conf.locale import ru
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.contenttypes.models import ContentType
+from django.core.files.base import ContentFile
 from django.db.models import Q
 from django.forms.utils import ErrorList
 from django.http.response import Http404, HttpResponse
@@ -38,6 +40,7 @@ from cmj.core.models import Cep, TipoLogradouro, Logradouro, RegiaoMunicipal,\
     ImpressoEnderecamento, groups_remove_user, groups_add_user, Notificacao,\
     CertidaoPublicacao, Bi
 from cmj.core.serializers import TrechoSearchSerializer, TrechoSerializer
+from cmj.mixins import PluginSignMixin
 from cmj.utils import normalize
 from sapl.api.mixins import ResponseFileMixin
 from sapl.crud.base import Crud, CrudAux, MasterDetailCrud, RP_DETAIL, RP_LIST
@@ -403,6 +406,74 @@ class NotificacaoRedirectView(RedirectView):
         return url
 
 
+class SeloCertidaoMixin(PluginSignMixin):
+
+    def add_selo_certidao(self, original2copia=False):
+
+        cert = self.object
+
+        compression = False
+        #compression = False if not autor else autor.tipo.descricao == 'Executivo'
+
+        for field_file in cert.FIELDFILE_NAME:
+            if original2copia:
+                paths = '{},{}'.format(
+                    getattr(cert, field_file).original_path,
+                    getattr(cert, field_file).path,
+                )
+
+            else:
+                paths = getattr(cert, field_file).path
+
+            cmd = self.cmd_mask
+
+            params = {
+                'plugin': self.plugin_path,
+                'comando': 'selo_certidao',
+                'in_file': paths,
+                'certificado': settings.CERT_PRIVATE_KEY_ID,
+                'password': settings.CERT_PRIVATE_KEY_ACCESS,
+                'data_ocorrencia': formats.date_format(
+                    timezone.localtime(cert.created),
+                    'd/m/Y'
+                ),
+                'hora_ocorrencia': formats.date_format(
+                    timezone.localtime(cert.created),
+                    'H:i'
+                ),
+                'data_comando': formats.date_format(timezone.localtime(), 'd/m/Y'),
+                'hora_comando': formats.date_format(timezone.localtime(), 'H:i'),
+                'titulopre': 'Câmara Municipal de Jataí - Estado de Goiás',
+                'titulo': '___',
+                'titulopos': '___',
+                'x': int(self.request.GET.get('x', 80)),
+                'y': int(self.request.GET.get('y', 86)),
+                'w': 80,
+                'h': 20,
+                'cor': "0, 76, 64, 255",
+                'compression': compression,
+                'debug': False  # settings.DEBUG
+            }
+            cmd = cmd.format(
+                **params
+            )
+
+            self.run(cmd)
+
+            del params['plugin']
+            del params['in_file']
+            del params['certificado']
+            del params['password']
+            del params['debug']
+            del params['comando']
+            cert.metadata['selos'] = {'selo_certidao': params}
+
+            # print(cmd)
+            # return
+
+        cert.save()
+
+
 class CertidaoPublicacaoCrud(Crud):
     model = CertidaoPublicacao
     public = [RP_DETAIL, RP_LIST]
@@ -493,7 +564,19 @@ class CertidaoPublicacaoCrud(Crud):
             return 'Certidão'
 
         def hook_id(self, *args, **kwargs):
-            return '%06d' % int(args[1]), args[2]
+            cert = '%06d' % int(args[1])
+            if args[0].cancelado:
+                return f'''{cert}<br>
+                    Certidão Cancelada<br>
+                    <small>Documento Substituído</small>
+                    ''', ''
+            if not self.request.user.is_superuser or args[0].certificado:
+                return cert, args[2]
+
+            return f'''
+                <a href="{args[2]}">{cert}</a>
+                <a href="{args[2]}?certificar" class="btn btn-link">Certificar</a>
+            ''', ''
 
         def hook_header_created(self, **kwargs):
             return 'Data/Hora'
@@ -504,7 +587,7 @@ class CertidaoPublicacaoCrud(Crud):
                     timezone.template_localtime(args[0].created), 'd/m/Y \à\s H:i')
             ), args[2]
 
-    class DetailView(DetailView):
+    class DetailView(DetailView, SeloCertidaoMixin):
         slug_field = 'hash_code'
 
         @classmethod
@@ -513,10 +596,35 @@ class CertidaoPublicacaoCrud(Crud):
 
         def get(self, request, *args, **kwargs):
             self.object = self.get_object()
+            if self.object.cancelado:
+                messages.add_message(
+                    self.request,
+                    messages.ERROR,
+                    _('Certidão Cancelada!'))
+                return redirect(
+                    reverse('cmj.core:certidaopublicacao_list',
+                            kwargs={})
+                )
 
             context = self.get_context_data(object=self.object)
 
+            if 'certificar' in request.GET and request.user.is_superuser:
+                return self.certidao_digital_de_publicacao(request, context)
+
             return self.certidao_publicacao(request, context)
+
+        @property
+        def vinculo(self):
+
+            # self.split_bylen(args[0].hash_code, 64)
+            hash = self.object.hash_code
+
+            if hasattr(self.object.content_object, 'anexo_de') and\
+                    self.object.content_object.anexo_de.exists():
+                vinculo = f'Vínculo com: {self.object.content_object.anexo_de.first()}'
+            else:
+                vinculo = ''
+            return vinculo
 
         def get_context_data(self, **kwargs):
             context = DetailView.get_context_data(self, **kwargs)
@@ -529,20 +637,51 @@ class CertidaoPublicacaoCrud(Crud):
             context['content_object_url'] = self.content_object_url()
             return context
 
-        def certidao_publicacao(self, request, context):
-            base_url = request.build_absolute_uri()
+        def certidao_digital_de_publicacao(self, request, context):
+            self.certidao_publicacao(
+                request,
+                context,
+                template='core/certidao_digital_publicacao.html',
+                only_persist=True
+            )
 
-            html_template = render_to_string(
-                'core/certidao_publicacao.html', context)
+            self.add_selo_certidao()
 
-            html = HTML(base_url=base_url, string=html_template)
-            main_doc = html.render(stylesheets=[])
-            pdf_file = main_doc.write_pdf()
-
-            response = HttpResponse(content_type='application/pdf;')
+            response = HttpResponse(
+                self.object.certificado, content_type='application/pdf;')
             response['Content-Disposition'] = f'inline; filename=cert-cmj-{self.object.id}.pdf'
             response['Content-Transfer-Encoding'] = 'binary'
-            response.write(pdf_file)
+
+            return response
+
+        def certidao_publicacao(self, request, context, template='', only_persist=False):
+
+            if self.object.certificado and \
+                    not 'certificar' in request.GET and \
+                    not request.user.is_superuser:
+                with open(self.object.certificado.path, 'rb') as f:
+                    fpdf = f.read()
+                if only_persist:
+                    return
+            else:
+                base_url = request.build_absolute_uri()
+                html_template = render_to_string(
+                    template if template else 'core/certidao_publicacao.html',
+                    context)
+                html = HTML(base_url=base_url, string=html_template)
+                main_doc = html.render(stylesheets=[])
+                fpdf = main_doc.write_pdf()
+
+                if only_persist:
+                    self.object.certificado = ContentFile(
+                        fpdf, name=f'cert-cmj-{self.object.id}.pdf')
+
+                    self.object.save()
+                    return
+
+            response = HttpResponse(fpdf, content_type='application/pdf;')
+            response['Content-Disposition'] = f'inline; filename=cert-cmj-{self.object.id}.pdf'
+            response['Content-Transfer-Encoding'] = 'binary'
 
             return response
 
@@ -560,7 +699,7 @@ class CertidaoPublicacaoCrud(Crud):
 
             urls = {
                 'original': '%s%s?original' % (settings.SITE_URL, link),
-                'ocr': '%s%s?ocr' % (settings.SITE_URL, link),
+                'ocr': '%s%s' % (settings.SITE_URL, link),
             }
 
             return urls
@@ -600,7 +739,9 @@ class CertidaoPublicacaoCrud(Crud):
             object = self.content_object = model.objects.get(
                 pk=self.kwargs['pk'])
 
-            if object.certidao:
+            certidao = object.certidao
+
+            if certidao and not self.request.user.is_superuser:
                 return True
 
             if not getattr(object, self.kwargs['field_name']):
@@ -613,6 +754,9 @@ class CertidaoPublicacaoCrud(Crud):
             u = self.request.user
 
             try:
+                certidao.cancelado = True
+                certidao.certificado = None
+                certidao.save()
                 CertidaoPublicacao.gerar_certidao(
                     u, object, self.kwargs['field_name'])
             except Exception as e:

@@ -2114,7 +2114,7 @@ class MateriaLegislativaCrud(Crud):
 
         @property
         def extras_url(self):
-            btns = [self.btn_certidao('texto_original'), ]
+            btns = self.btn_certidao('texto_original')
 
             if self.request.user.has_perm('compilacao.add_textoarticulado'):
                 if not self.object.texto_articulado.exists():

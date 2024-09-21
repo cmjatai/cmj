@@ -398,7 +398,11 @@ class DocumentoAdministrativo(CommonMixin):
 
     @property
     def certidao(self):
-        return self._certidao.all().first()
+        return self._certidao.order_by('-id').first()
+
+    @property
+    def render_description(self):
+        return str(self.assunto)
 
     @property
     def diariooficial(self):

@@ -1388,19 +1388,24 @@ class SessaoCrud(Crud):
 
         @property
         def extras_url(self):
-            btns = [
+            btns = []
+            btns.extend(
                 self.btn_certidao(
                     'upload_pauta',
                     btn_title_public=_('Certidão de Publicação da Pauta'),
                     btn_title_admin=_('Gerar Certidão de Publicação da Pauta'),
-                ) if self.object.upload_pauta else None,
+                ) if self.object.upload_pauta else [])
+
+            btns.extend(
                 self.btn_certidao(
                     'upload_ata',
                     btn_title_public=_(
                         'Certidão de Publicação da Ata'),
                     btn_title_admin=_('Gerar Certidão de Publicação da Ata'),
-                ) if self.object.upload_ata else None,
-                self.btn_selo_votacao() if self.object.tipo.gera_selo_votacao else None]
+                ) if self.object.upload_ata else [])
+
+            btns.extend([self.btn_selo_votacao()]
+                        if self.object.tipo.gera_selo_votacao else [])
             btns = list(filter(lambda x: x, btns))
             return btns
 

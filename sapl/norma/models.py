@@ -226,7 +226,11 @@ class NormaJuridica(CommonMixin):
 
     @property
     def certidao(self):
-        return self._certidao.all().first()
+        return self._certidao.order_by('-id').first()
+
+    @property
+    def render_description(self):
+        return str(self.ementa)
 
     @property
     def diariooficial(self):

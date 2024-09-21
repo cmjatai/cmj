@@ -282,10 +282,7 @@ class DocumentoAdministrativoCrud(Crud):
 
         @property
         def extras_url(self):
-            r = [
-                self.btn_certidao('texto_integral'),
-                self.btn_link_share_create()
-            ]
+            r = self.btn_certidao('texto_integral') + [self.btn_link_share_create()]
             r = list(filter(None, r))
             return r
 

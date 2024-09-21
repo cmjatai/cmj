@@ -874,6 +874,7 @@ class DespesaPaga(models.Model):
 
     unidade = models.ForeignKey(
         UnidadeOrcamentaria,
+        blank=True, null=True, default=None,
         related_name='despesapaga_set',
         verbose_name=_('Unidade Financeira'),
         on_delete=CASCADE)
@@ -950,43 +951,49 @@ class ScrapRecord(models.Model):
         if not self.codigo or self.codigo == 'TOTAL:':
             return None
 
-        if not self.metadata['url_dict']['format'] == 'html':
-            return None
-
         if 'despesa' not in self.metadata['url_dict']['name']:
             return None
 
-        content = self.content
-        if not isinstance(content, bytes):
-            content = content.tobytes()
-        content = content.decode('utf-8-sig')
-        content = clean_text(clean_text(clean_text(content)))
-        tables = bs(content, 'html.parser').findAll('table')
-        if not tables:
-            return None
-        try:
+        unidade = None
+        org = Orgao.objects.get(codigo=self.orgao, loa__ano=self.ano)
+        dp = DespesaPaga.objects.filter(codigo=self.codigo, orgao=org).first()
+
+        item_list = self.metadata['item_list']
+        dt = datetime.strptime(item_list[1], "%d/%m/%Y").date()
+        valor = Decimal(item_list[-1].replace('.', '').replace(',', '.'))
+
+        if dp and dp.valor == valor and dp.data == dt:
+            return dp
+
+        if dp and self.metadata['url_dict']['format'] == 'csv':
+            return dp
+
+        if self.metadata['url_dict']['format'] == 'html':
+            content = self.content
+            if not isinstance(content, bytes):
+                content = content.tobytes()
+            content = content.decode('utf-8-sig')
+            content = clean_text(clean_text(clean_text(content)))
+            tables = bs(content, 'html.parser').findAll('table')
+            if not tables:
+                return None
             values = {}
             for row in tables[0].findAll('tr'):
                 cols = row.findAll('td')
                 values[cols[0].text] = cols[1].text
-
-            item_list = self.metadata['item_list']
-
-            orgao = Orgao.objects.get(codigo=self.orgao, loa__ano=self.ano)
-            unidade = UnidadeOrcamentaria.objects.get(
-                orgao=orgao,
+            unidade = UnidadeOrcamentaria.objects.filter(
+                orgao=org,
                 loa__ano=self.ano,
                 codigo=values['Unidade Financeira:'][:2]
-            )
-            dt = datetime.strptime(values['Data:'], "%d/%m/%Y").date()
+            ).first()
 
+        try:
             dp, created = DespesaPaga.objects.get_or_create(
                 codigo=self.codigo,
-                orgao=orgao,
+                orgao=org,
                 unidade=unidade,
             )
-            dp.valor = Decimal(
-                item_list[-1].replace('.', '').replace(',', '.'))
+            dp.valor = valor
             dp.data = dt
             dp.save()
             return dp

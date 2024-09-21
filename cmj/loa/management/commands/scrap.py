@@ -1,6 +1,7 @@
 from copy import deepcopy
 import csv
 from io import StringIO
+import io
 import json
 import logging
 import sys
@@ -103,6 +104,8 @@ class Command(BaseCommand):
             file_path = settings.PROJECT_DIR.child(
                 'logs').child('scrap_running.txt')
             sys.stdout = open(file_path, 'r+' if file_path.exists() else 'w')
+            if file_path.exists():
+                sys.stdout.seek(0, io.SEEK_END)
 
         self.time_start = timezone.localtime()
 
@@ -113,29 +116,29 @@ class Command(BaseCommand):
         self.mes_atual = self.time_start.month
 
         order_by = (
-            '-loa__ano', 'codigo') if onlychilds else ('codigo', '-loa__ano')
+            '-loa__ano', '-codigo') if onlychilds else ('codigo', '-loa__ano')
         #order_by = ('-loa__ano', 'codigo')
 
         subdomains = [
             {
-                'subdomain': 'prefeituradejatai',
-                'orgaos': models.Orgao.objects.exclude(codigo='01').order_by(*order_by),
-            },
-            {
                 'subdomain': 'camaradejatai',
                 'orgaos': models.Orgao.objects.filter(codigo='01').order_by(*order_by),
+            },
+            {
+                'subdomain': 'prefeituradejatai',
+                'orgaos': models.Orgao.objects.exclude(codigo='01').order_by(*order_by),
             },
         ]
 
         # ScrapRecord.objects.all().delete()
         # urls.reverse()
 
-        # for scrap in ScrapRecord.objects.filter(codigo='558404'):
-        #    scrap.update_despesa_paga()
+        # for scrap in ScrapRecord.objects.order_by('-codigo'):  # 558404
+        # scrap.update_despesa_paga()
         # return
 
         for sd in subdomains:
-            for url_dict in urls[:1]:
+            for url_dict in urls:
                 udj = json.dumps(url_dict)
                 udj = udj.replace('{subdomain}', sd['subdomain'])
                 ud = json.loads(udj)
@@ -181,10 +184,11 @@ class Command(BaseCommand):
 
     def scrap_node(self, url_dict, params={}, item_list=[], parent=None, deep=True):
 
-        if 7 < self.hora_atual < 22:
-            sleep(10)
-
         def get_content(url):
+
+            if 6 < self.hora_atual < 22 and self.time_start.weekday() < 4:
+                sleep(10)
+
             try:
                 get = requests.get(url)
                 print(f'... url: {url}')
@@ -224,6 +228,9 @@ class Command(BaseCommand):
 
             if not self.force:
                 content_scrap = scrap.content.tobytes()
+                if scrap.metadata['item_list'] != item_list:
+                    scrap.metadata['item_list'] = item_list
+                    scrap.save()
                 scrap.update_despesa_paga()
 
             if url_dict['format'] == 'html':
@@ -237,6 +244,7 @@ class Command(BaseCommand):
 
             if not self.onlychilds or content_download:
                 scrap.content = content_download
+                scrap.metadata['item_list'] = item_list
                 scrap.save()
                 scrap.update_despesa_paga()
 
@@ -278,6 +286,7 @@ class Command(BaseCommand):
         if not lista:
             return
         rows = lista[1:-1]
+        rows = sorted(rows, key=lambda x: x[1][0])
         rows.reverse()
 
         try:

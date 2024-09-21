@@ -16,7 +16,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from cmj.core import tasks
 from cmj.core.models import AuditLog, OcrMyPDF, Bi
-from cmj.loa.models import ScrapRecord
+from cmj.loa.models import ScrapRecord, DespesaPaga
 from cmj.settings.email import EMAIL_SEND_USER
 from cmj.sigad.models import ShortRedirect
 from cmj.videos.models import VideoParte, PullExec
@@ -44,7 +44,8 @@ def auditlog_signal_function(sender, **kwargs):
         OcrMyPDF,        # já é o log de execução de ocr
         Bi,              # Bi é um processo automático estatístico
         PullExec,        # Conexão com youtube
-        ScrapRecord      # Extração Automática das Despesas e Receitas
+        ScrapRecord,      # Extração Automática das Despesas e Receitas
+        DespesaPaga,
     ):
         return
 

@@ -1,0 +1,127 @@
+{% load webpack_static from webpack_loader %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+  <meta charset="utf-8"></meta>
+<head>
+  <style>
+    {% include "css/base.css" %}
+    @page {
+      margin-left: 3cm;
+    }
+    html {
+      line-height: 1.15;
+    }
+    .container-cert-pub {
+      border: 1px solid black;
+      padding: 5px;
+      font-size: 10pt;
+      font-family: courier;
+      width: 14cm;
+    }
+    .title {
+      display: flex;
+      justify-content: space-between;
+      font-variant: small-caps;
+      font-size: 1em;
+      font-weight: bold;
+    }
+    .inner {
+      text-align: justify;
+      border-bottom:1px solid black;
+    }
+    .inner-text {
+      padding-right: 20px;
+    }
+    .inner-body img {
+      padding-top: 0.6cm;
+      width: 128px;
+    }
+    .inner-body {
+      display: flex;
+    }
+    .inner-body .col1 {
+      flex: 1 0 25%;
+    }
+    .inner-body .col2 {
+      flex: 1 0 75%;
+      margin-left: 0.5cm;
+    }
+    .hash {
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+
+      font-size: 0.9em;
+    }
+    .url {
+      font-size: 6pt;
+    }
+    .assinatura {
+      text-align: center;
+      border-top: 1px solid black;
+    }
+  </style>
+</head>
+<body>
+  <div class="container-cert-pub">
+    <div class="inner">
+      <div class="title">
+        <span>CERTIDÃO DIGITAL DE PUBLICAÇÃO</span>
+        <span>nº {{object.id|stringformat:"06d" }}</span>
+        <span>{{object.created|date:"d/m/Y H:i:s"}}</span>
+      </div>
+      <div class="inner-text">
+        Certifico para os devidos fins, nos termos do §1º art. 81
+        da Lei Orgânica do Município de Jataí,
+        que o documento conforme descrito abaixo foi publicado eletronicamente no
+        Portal Transparência Pública do Legislativo Municipal de Jataí
+        e está disponível para acesso em dois formatos:
+      </div>
+        <div class="hash">
+          <div class="hash">
+            1) Original tal como encaminhado para publicação e com o hash abaixo:
+            <div class="url">
+              <strong>{{ content_object_url.original }}</strong>
+            </div>
+          </div>
+          <div class="hash">
+            2) Com carimbos de protocolo e votação, quando couber:
+            <div class="url">
+              {{ content_object_url.ocr }}
+            </div>
+          </div>
+        </div>
+        <div class="url">
+          <div class="hash">
+            <strong>Original com hash512:</strong><br>{{object.hash_code}}
+          </div>
+        </div>
+    </div>
+    <div class="inner-body">
+      <div class="col1">
+        <img src="{% webpack_static 'brasao/brasao_256.png' %}">
+      </div>
+      <div class="col2">
+        <div class="body"><br><br><br><br><br><br><br><br>
+        </div>
+        <div class="assinatura">
+        Departamento de Documentação Eletrônica
+        </div>
+      </div>
+    </div>
+    <hr>
+    <div class="doc">
+      <strong>{{ object.content_object.epigrafe }}</strong><br>
+      {{ object.content_object.render_description }}<br>
+      <small>
+        {% with view.vinculo as vinculo%}
+          {% if vinculo %}
+            {{ vinculo }}
+          {% endif %}
+        {% endwith %}
+      </small>
+    </div>
+  </div>
+</body>
+</html>

@@ -309,7 +309,7 @@ class NormaCrud(Crud):
 
         @property
         def extras_url(self):
-            btns = [self.btn_check(), self.btn_certidao('texto_integral'), ]
+            btns = [self.btn_check()] + self.btn_certidao('texto_integral')
 
             if self.request.user.has_perm('compilacao.add_textoarticulado'):
                 if not self.object.texto_articulado.exists():

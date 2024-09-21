@@ -18,8 +18,8 @@ from image_cropping import ImageCropField, ImageRatioField
 from cmj.globalrules import MENU_PERMS_FOR_USERS, GROUP_SOCIAL_USERS
 from cmj.mixins import CmjChoices, CmjModelMixin, CmjAuditoriaModelMixin
 from cmj.utils import get_settings_auth_user_model, normalize, YES_NO_CHOICES,\
-    UF
-from sapl.utils import hash_sha512
+    UF, texto_upload_path
+from sapl.utils import hash_sha512, PortalFileField, OverwriteStorage
 
 
 def group_social_users_add_user(user):
@@ -897,7 +897,17 @@ class Bi(models.Model):
         unique_together = (("ano", "content_type"),)
 
 
+def certidao_create_path(instance, filename):
+    return texto_upload_path(instance, filename, subpath='')
+
+
 class CertidaoPublicacao(CmjAuditoriaModelMixin):
+
+    FIELDFILE_NAME = ('certificado',)
+
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
 
     content_type = models.ForeignKey(
         ContentType,
@@ -919,6 +929,14 @@ class CertidaoPublicacao(CmjAuditoriaModelMixin):
         _('Cancelado '),
         choices=YES_NO_CHOICES,
         default=False)
+
+    certificado = PortalFileField(
+        blank=True,
+        null=True,
+        upload_to=certidao_create_path,
+        # storage=OverwriteStorage(),
+        verbose_name=_('Certificado'),
+        max_length=512)
 
     class Meta:
         verbose_name = _('Certidão de Publicação')
@@ -944,6 +962,7 @@ class CertidaoPublicacao(CmjAuditoriaModelMixin):
         cp.owner = user
         cp.modifier = user
         cp.field_name = file_field_name
+        cp.certifidado = None
 
         if not pk:
             cp.save()

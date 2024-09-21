@@ -234,7 +234,7 @@ class SessaoPlenaria(models.Model):
         return f"""
             Abertura: {o.data_inicio.strftime("%d/%m/%Y")} às {o.hora_inicio}<br>
             Encerramento: {o.data_fim.strftime("%d/%m/%Y")} às {o.hora_fim}<br>
-            
+
         """
 
     @property
@@ -243,7 +243,15 @@ class SessaoPlenaria(models.Model):
 
     @property
     def certidao(self):
-        return self._certidao.all().first()
+        return self._certidao.order_by('-id').first()
+
+    @property
+    def epigrafe(self):
+        return self.str_short()
+
+    @property
+    def render_description(self):
+        return self.str_subtitle
 
     @property
     def diariooficial(self):
