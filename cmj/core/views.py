@@ -658,11 +658,11 @@ class CertidaoPublicacaoCrud(Crud):
 
             if self.object.certificado and \
                     not 'certificar' in request.GET and \
-                    not request.user.is_superuser:
+                    not request.user.is_superuser and \
+                    not only_persist:
+
                 with open(self.object.certificado.path, 'rb') as f:
                     fpdf = f.read()
-                if only_persist:
-                    return
             else:
                 base_url = request.build_absolute_uri()
                 html_template = render_to_string(
