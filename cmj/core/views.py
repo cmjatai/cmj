@@ -656,14 +656,14 @@ class CertidaoPublicacaoCrud(Crud):
 
         def certidao_publicacao(self, request, context, template='', only_persist=False):
 
-            if self.object.certificado and \
-                    not 'certificar' in request.GET and \
-                    not request.user.is_superuser and \
-                    not only_persist:
+            if self.object.certificado:
+                if not only_persist:
+                    with open(self.object.certificado.path, 'rb') as f:
+                        fpdf = f.read()
+                elif request.user.is_superuser and 'certificar' in request.GET:
+                    self.object.certificado = None
 
-                with open(self.object.certificado.path, 'rb') as f:
-                    fpdf = f.read()
-            else:
+            if not self.object.certificado:
                 base_url = request.build_absolute_uri()
                 html_template = render_to_string(
                     template if template else 'core/certidao_publicacao.html',
