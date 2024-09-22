@@ -863,8 +863,21 @@ class DespesaPaga(models.Model):
     }
 
     codigo = models.TextField(verbose_name=_("Código"))
-    data = models.DateField(
-        blank=True, null=True, verbose_name=_('Data'))
+
+    cpfcnpj = models.TextField(
+        verbose_name=_("CpfCNPJ"),
+        blank=True, null=True, default=None)
+    nome = models.TextField(
+        verbose_name=_("Nome"),
+        blank=True, null=True, default=None)
+    historico = models.TextField(
+        verbose_name=_("Histórico"),
+        blank=True, null=True, default=None)
+    tipo = models.TextField(
+        verbose_name=_("Tipo"),
+        blank=True, null=True, default=None)
+
+    data = models.DateField(blank=True, null=True, verbose_name=_('Data'))
 
     orgao = models.ForeignKey(
         Orgao,
@@ -877,6 +890,20 @@ class DespesaPaga(models.Model):
         blank=True, null=True, default=None,
         related_name='despesapaga_set',
         verbose_name=_('Unidade Financeira'),
+        on_delete=CASCADE)
+
+    natureza = models.ForeignKey(
+        Natureza,
+        blank=True, null=True, default=None,
+        verbose_name=_('Natureza'),
+        related_name='despesapaga_set',
+        on_delete=CASCADE)
+
+    fonte = models.ForeignKey(
+        Fonte,
+        blank=True, null=True, default=None,
+        verbose_name=_('Fonte'),
+        related_name='despesapaga_set',
         on_delete=CASCADE)
 
     valor = models.DecimalField(
@@ -908,6 +935,8 @@ class ScrapRecord(models.Model):
 
     modified = models.DateTimeField(
         verbose_name=_('modified'), editable=False, auto_now=True)
+
+    erro = models.BooleanField(default=False)
 
     parent = models.ForeignKey(
         'self',
@@ -962,7 +991,7 @@ class ScrapRecord(models.Model):
         dt = datetime.strptime(item_list[1], "%d/%m/%Y").date()
         valor = Decimal(item_list[-1].replace('.', '').replace(',', '.'))
 
-        if dp and dp.valor == valor and dp.data == dt:
+        if dp and dp.valor == valor and dp.data == dt and dp.natureza:
             return dp
 
         if dp and self.metadata['url_dict']['format'] == 'csv':
@@ -987,15 +1016,45 @@ class ScrapRecord(models.Model):
                 codigo=values['Unidade Financeira:'][:2]
             ).first()
 
+            try:
+                nat = values['Elemento:']
+                natureza = Natureza.objects.filter(
+                    loa__ano=self.ano,
+                    codigo=f'{nat[0]}.{nat[1]}.{nat[2:4]}.{nat[4:6]}.00'
+                ).first()
+            except:
+                natureza = None
+
+            try:
+                fontestr = values['Fonte de Recursos:']
+                fonte, created = Fonte.objects.get_or_create(
+                    loa_id=self.ano,
+                    codigo=fontestr[0:3]
+                )
+                if fonte.especificacao != fontestr[6:]:
+                    fonte.especificacao = fontestr[6:]
+                    fonte.save()
+            except:
+                fonte = None
+
         try:
             dp, created = DespesaPaga.objects.get_or_create(
                 codigo=self.codigo,
                 orgao=org,
                 unidade=unidade,
             )
+            dp.cpfcnpj = item_list[3]
+            dp.nome = item_list[2]
+            dp.tipo = item_list[4]
+            dp.historico = values.get('Historico:', None)
+
+            dp.natureza = natureza
+            dp.fonte = fonte
+
             dp.valor = valor
             dp.data = dt
             dp.save()
             return dp
         except Exception as e:
-            self.delete()
+            self.erro = True
+            self.save()

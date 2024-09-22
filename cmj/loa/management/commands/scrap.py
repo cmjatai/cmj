@@ -80,6 +80,7 @@ class Command(BaseCommand):
         parser.add_argument('--onlychilds', action='store_true', default=False)
         parser.add_argument('--outfile', action='store_true', default=False)
         parser.add_argument('--force', action='store_true', default=False)
+        parser.add_argument('--timeexec', type=int, default=80000)
 
     def handle(self, *args, **options):
         self.logger = logging.getLogger(__name__)
@@ -91,6 +92,7 @@ class Command(BaseCommand):
         self.deep = deep = options['deep']
         self.onlychilds = onlychilds = options['onlychilds']
         outfile = options['outfile']
+        timeexec = options['timeexec']
 
         # deep=True buscas as listas e a partir das listas, busca os registros
         # deep=False buscas apenas as listas
@@ -133,8 +135,9 @@ class Command(BaseCommand):
         # ScrapRecord.objects.all().delete()
         # urls.reverse()
 
-        # for scrap in ScrapRecord.objects.order_by('-codigo'):  # 558404
-        # scrap.update_despesa_paga()
+        # 558404
+        # for scrap in ScrapRecord.objects.filter(codigo='558062').order_by('-codigo'):
+        #    scrap.update_despesa_paga()
         # return
 
         for sd in subdomains:
@@ -156,7 +159,7 @@ class Command(BaseCommand):
 
                     for mes in range(12, 0, -1):
 
-                        if (timezone.localtime() - self.time_start).seconds > 80000:
+                        if (timezone.localtime() - self.time_start).seconds > timeexec:
                             return
 
                         if orgao.loa.ano == self.ano_atual and mes > self.mes_atual:
@@ -170,6 +173,7 @@ class Command(BaseCommand):
 
                         try:
                             self.hora_atual = timezone.localtime().hour
+                            self.weekday = timezone.localtime().weekday()
                             print(
                                 f'START: {timezone.localtime()}, Órgão: {orgao}, Ano: {orgao.loa.ano}, Mês: {mes}, Url_dict: {url_dict["name"]}')
                             interromper_orgao = self.scrap_node(
@@ -186,7 +190,7 @@ class Command(BaseCommand):
 
         def get_content(url):
 
-            if 6 < self.hora_atual < 22 and self.time_start.weekday() < 4:
+            if 6 < self.hora_atual < 22 and self.weekday < 4:
                 sleep(10)
 
             try:
