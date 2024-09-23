@@ -754,9 +754,10 @@ class CertidaoPublicacaoCrud(Crud):
             u = self.request.user
 
             try:
-                certidao.cancelado = True
-                certidao.certificado = None
-                certidao.save()
+                if certidao:
+                    certidao.cancelado = True
+                    certidao.certificado = None
+                    certidao.save()
                 CertidaoPublicacao.gerar_certidao(
                     u, object, self.kwargs['field_name'])
             except Exception as e:
