@@ -700,6 +700,7 @@ class CertidaoPublicacaoCrud(Crud):
             urls = {
                 'original': '%s%s?original' % (settings.SITE_URL, link),
                 'ocr': '%s%s' % (settings.SITE_URL, link),
+                'cert': '%s%s' % (settings.SITE_URL, f'/cert/{cert.id}'),
             }
 
             return urls

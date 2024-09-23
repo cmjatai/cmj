@@ -36,7 +36,6 @@
       padding-right: 20px;
     }
     .inner-body img {
-      padding-top: 0.6cm;
       width: 128px;
     }
     .inner-body {
@@ -57,10 +56,18 @@
     }
     .url {
       font-size: 6pt;
+      color: black;
+      text-decoration: none;
     }
     .assinatura {
+      padding-top: 2px;
       text-align: center;
       border-top: 1px solid black;
+    }
+    .doc {
+      font-size: 70%;
+      border-top: 1px solid black;
+      padding-top: 5px;
     }
   </style>
 </head>
@@ -83,13 +90,13 @@
           <div class="hash">
             1) Original tal como encaminhado para publicação e com o hash abaixo:
             <div class="url">
-              <strong>{{ content_object_url.original }}</strong>
+              <strong><a class="url" href="{{ content_object_url.original }}">{{ content_object_url.original }}</a></strong>
             </div>
           </div>
           <div class="hash">
             2) Com carimbos de protocolo e votação, quando couber:
             <div class="url">
-              {{ content_object_url.ocr }}
+              <a class="url" href="{{ content_object_url.ocr }}">{{ content_object_url.ocr }}</a>
             </div>
           </div>
         </div>
@@ -99,19 +106,20 @@
           </div>
         </div>
     </div>
+    <a class="url" href="{{ content_object_url.cert }}">{{ content_object_url.cert }}</a>
     <div class="inner-body">
       <div class="col1">
         <img src="{% webpack_static 'brasao/brasao_256.png' %}">
       </div>
       <div class="col2">
-        <div class="body"><br><br><br><br><br><br><br><br>
+        <div class="body"><br><br><br><br><br><br><br>
         </div>
         <div class="assinatura">
         Departamento de Documentação Eletrônica
         </div>
       </div>
     </div>
-    <hr>
+
     <div class="doc">
       <strong>{{ object.content_object.epigrafe }}</strong><br>
       {{ object.content_object.render_description }}<br>

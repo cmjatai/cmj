@@ -53,15 +53,21 @@
     .hash {
       overflow-wrap: break-word;
       word-wrap: break-word;
-
       font-size: 1em;
     }
     .url {
       font-size: 5pt;
+      color: black;
+      text-decoration: none;
     }
     .assinatura {
       text-align: center;
       border-top: 1px solid black;
+    }
+    .doc {
+      font-size: 70%;
+      border-top: 1px solid black;
+      padding-top: 5px;
     }
   </style>
 </head>
@@ -82,13 +88,14 @@
           </div>
         </div>
         <div class="url">
-          <strong>1){{ content_object_url.original }}</strong><br>
-          2){{ content_object_url.ocr }}
+          <strong>1) <a class="url" href="{{ content_object_url.original }}">{{ content_object_url.original }}</a></strong><br>
+          2) <a class="url" href="{{ content_object_url.ocr }}">{{ content_object_url.ocr }}</a>
           <div class="hash">
             <strong>Original com hash512:</strong><br>{{object.hash_code}}
           </div>
         </div>
     </div>
+    <a class="url" href="{{ content_object_url.cert }}">{{ content_object_url.cert }}</a>
     <div class="inner-body">
       <div class="col1">
         <img src="{% webpack_static 'img/logo_128.png' %}">
@@ -100,6 +107,17 @@
         Departamento de Documentação Eletrônica
         </div>
       </div>
+    </div>
+    <div class="doc">
+      <strong>{{ object.content_object.epigrafe }}</strong><br>
+      {{ object.content_object.render_description }}<br>
+      <small>
+        {% with view.vinculo as vinculo%}
+          {% if vinculo %}
+            {{ vinculo }}
+          {% endif %}
+        {% endwith %}
+      </small>
     </div>
   </div>
 </body>
