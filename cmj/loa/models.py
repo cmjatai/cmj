@@ -983,7 +983,6 @@ class ScrapRecord(models.Model):
         if 'despesa' not in self.metadata['url_dict']['name']:
             return None
 
-        unidade = None
         org = Orgao.objects.get(codigo=self.orgao, loa__ano=self.ano)
         dp = DespesaPaga.objects.filter(codigo=self.codigo, orgao=org).first()
 
@@ -997,6 +996,11 @@ class ScrapRecord(models.Model):
         if dp and self.metadata['url_dict']['format'] == 'csv':
             return dp
 
+        values = {}
+        unidade = None
+        natureza = None
+        fonte = None
+
         if self.metadata['url_dict']['format'] == 'html':
             content = self.content
             if not isinstance(content, bytes):
@@ -1006,7 +1010,6 @@ class ScrapRecord(models.Model):
             tables = bs(content, 'html.parser').findAll('table')
             if not tables:
                 return None
-            values = {}
             for row in tables[0].findAll('tr'):
                 cols = row.findAll('td')
                 values[cols[0].text] = cols[1].text
@@ -1041,19 +1044,23 @@ class ScrapRecord(models.Model):
             dp, created = DespesaPaga.objects.get_or_create(
                 codigo=self.codigo,
                 orgao=org,
-                unidade=unidade,
             )
             dp.cpfcnpj = item_list[3]
             dp.nome = item_list[2]
             dp.tipo = item_list[4]
             dp.historico = values.get('Historico:', None)
 
+            dp.unidade = unidade
             dp.natureza = natureza
             dp.fonte = fonte
 
             dp.valor = valor
             dp.data = dt
             dp.save()
+
+            self.erro = False
+            self.save()
+
             return dp
         except Exception as e:
             self.erro = True

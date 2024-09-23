@@ -136,7 +136,7 @@ class Command(BaseCommand):
         # urls.reverse()
 
         # 558404
-        # for scrap in ScrapRecord.objects.filter(codigo='558062').order_by('-codigo'):
+        # for scrap in ScrapRecord.objects.filter(codigo='477275').order_by('-codigo'):
         #    scrap.update_despesa_paga()
         # return
 
