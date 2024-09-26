@@ -601,10 +601,12 @@ export default {
               let labels = []
               let data_orc = []
               let data_exe = []
+              let data_recorc = []
               _.each(response.data, function (item, idx) {
                 labels.push(`${item[0]} - ${item[1]}`)
                 data_orc.push(item[2])
                 data_exe.push(item[3])
+                data_recorc.push(item[4])
               })
               t.barchart_exec_length = labels.length
               labels = labels.slice(t.barchart_exec_offset, t.barchart_exec_offset + t.barchart_max_items)
@@ -618,6 +620,11 @@ export default {
                   label: 'Despesas Executadas',
                   data: data_exe.slice(t.barchart_exec_offset, t.barchart_exec_offset + t.barchart_max_items),
                   backgroundColor: cor[1]
+                },
+                {
+                  label: 'Receita Arrecadada',
+                  data: data_recorc.slice(t.barchart_exec_offset, t.barchart_exec_offset + t.barchart_max_items),
+                  backgroundColor: cor[2]
                 }
               ]
               let chartDataExec = {

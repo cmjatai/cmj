@@ -111,6 +111,7 @@ class _LoaViewSet:
                 q1.especificacao,
                 q1.valor as val_orc,
                 q2.valor as val_exe,
+                q3.valor as val_rec_orc,
                 to_char(q2.data_max, 'DD/MM/YYYY') as data_max,
                 q2.codigo_max
                 
@@ -140,6 +141,21 @@ class _LoaViewSet:
                         group by cod, especificacao
                         ORDER BY cod, especificacao
                 ) q2 on (q1.cod = q2.cod)
+                LEFT JOIN (
+                    SELECT
+                        lo.codigo as cod,
+                        lo.especificacao as especificacao,
+                        SUM(
+                            CASE WHEN lro.codigo like '9%' then -lra.valor else lra.valor end                            
+                            ) as valor
+                    FROM loa_orgao lo
+                        LEFT JOIN loa_receitaorcamentaria lro ON (lro.orgao_id = lo.id)
+                        LEFT JOIN loa_receitaarrecadada lra ON (lra.receita_id = lro.id)
+                        INNER JOIN loa_loa ll ON (lo.loa_id = ll.id)
+                    WHERE ll.ano = {ano}
+                        group by cod, especificacao
+                        ORDER BY cod, especificacao
+                ) q3 on (q1.cod = q3.cod)
                 order by q2.valor desc nulls last;
         """)
 
