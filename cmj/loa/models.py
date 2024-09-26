@@ -4,10 +4,11 @@ from decimal import Decimal
 from io import StringIO
 
 from bs4 import BeautifulSoup as bs
+from django.conf.locale import ro
 from django.contrib.postgres.fields.jsonb import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.db import models
+from django.db import models, transaction
 from django.db.models import manager
 from django.db.models.aggregates import Sum
 from django.db.models.deletion import PROTECT, CASCADE
@@ -917,6 +918,60 @@ class DespesaPaga(models.Model):
         ordering = ['id']
 
 
+class ReceitaOrcamentaria(models.Model):
+
+    codigo = models.TextField(verbose_name=_("Código"))
+
+    historico = models.TextField(
+        verbose_name=_("Histórico"),
+        blank=True, null=True, default=None)
+
+    orgao = models.ForeignKey(
+        Orgao,
+        related_name='receitaorcamentaria_set',
+        verbose_name=_('Órgão'),
+        on_delete=CASCADE)
+
+    valor = models.DecimalField(
+        max_digits=14, decimal_places=2, default=Decimal('0.00'),
+        verbose_name=_('Valor (R$)'),
+    )
+
+    class Meta:
+        verbose_name = _('Receita Orçamentária')
+        verbose_name_plural = _('Receitas Orçamentárias')
+        ordering = ['id']
+
+
+class ReceitaArrecadada(models.Model):
+
+    data = models.DateField(blank=True, null=True, verbose_name=_('Data'))
+
+    tipo = models.TextField(
+        verbose_name=_("Tipo"),
+        blank=True, null=True, default=None)
+
+    historico = models.TextField(
+        verbose_name=_("Histórico"),
+        blank=True, null=True, default=None)
+
+    receita = models.ForeignKey(
+        ReceitaOrcamentaria,
+        related_name='receitaarrecadada_set',
+        verbose_name=_('Receita Orçamentária'),
+        on_delete=CASCADE)
+
+    valor = models.DecimalField(
+        max_digits=14, decimal_places=2, default=Decimal('0.00'),
+        verbose_name=_('Valor (R$)'),
+    )
+
+    class Meta:
+        verbose_name = _('Receita Arrecadada')
+        verbose_name_plural = _('Receitas Arrecadadas')
+        ordering = ['id']
+
+
 class ScrapRecord(models.Model):
 
     metadata = JSONField(
@@ -949,39 +1004,135 @@ class ScrapRecord(models.Model):
         verbose_name_plural = 'ScrapRecord'
         ordering = ['id']
 
-    def update_despesa_paga(self):
+    def clean_text(self, text):
+        while '  ' in text:
+            text = text.replace('  ', ' ')
+        while ' \n' in text:
+            text = text.replace(' \n', '\n')
+        while '\n ' in text:
+            text = text.replace('\n ', '\n')
+        while '\r\n' in text:
+            text = text.replace('\r\n', '\n')
+        while '\n\n' in text:
+            text = text.replace('\n\n', '\n')
+        while '<td> ' in text:
+            text = text.replace('<td> ', '<td>')
+        while ' :</td>' in text:
+            text = text.replace(' :</td>', ':</td>')
+        while '\n</td>' in text:
+            text = text.replace('\n</td>', '</td>')
+        while ' </td>' in text:
+            text = text.replace(' </td>', '</td>')
+        while '<td>R$ ' in text:
+            text = text.replace('<td>R$ ', '<td>')
+        return text
 
-        def clean_text(text):
-            while '  ' in text:
-                text = text.replace('  ', ' ')
-            while ' \n' in text:
-                text = text.replace(' \n', '\n')
-            while '\n ' in text:
-                text = text.replace('\n ', '\n')
-            while '\r\n' in text:
-                text = text.replace('\r\n', '\n')
-            while '\n\n' in text:
-                text = text.replace('\n\n', '\n')
-            while '<td> ' in text:
-                text = text.replace('<td> ', '<td>')
-            while ' :</td>' in text:
-                text = text.replace(' :</td>', ':</td>')
-            while '\n</td>' in text:
-                text = text.replace('\n</td>', '</td>')
-            while ' </td>' in text:
-                text = text.replace(' </td>', '</td>')
-            while '<td>R$ ' in text:
-                text = text.replace('<td>R$ ', '<td>')
-            return text
-
-        # if self.scrap_set.exists():
-        # return [scrap.get_despesa_paga() for scrap in self.scrap_set.all()]
+    def update_data_models(self):
 
         if not self.codigo or self.codigo == 'TOTAL:':
             return None
 
-        if 'despesa' not in self.metadata['url_dict']['name']:
+        try:
+            # with transaction.atomic():
+            if 'despesa' in self.metadata['url_dict']['name']:
+                self._update_despesa_paga()
+            elif 'receita' in self.metadata['url_dict']['name']:
+                self._update_receita_arrecadada()
+            if self.erro:
+                self.erro = False
+                self.save(update_fields=('erro', ))
+        except Exception as e:
+            self.erro = True
+            self.save(update_fields=('erro', ))
+
+    def _update_receita_arrecadada(self):
+        if self.metadata['url_dict']['format'] != 'csv':
             return None
+        org = Orgao.objects.get(codigo=self.orgao, loa__ano=self.ano)
+
+        ro, created = ReceitaOrcamentaria.objects.get_or_create(
+            codigo=self.codigo, orgao=org
+        )
+
+        # if self.codigo != '11130311' or org.codigo != '03':
+        #    return
+
+        item_list = self.metadata['item_list']
+        ro.historico = item_list[1]
+        ro.valor = Decimal(item_list[2].replace('.', '').replace(',', '.'))
+        ro.save()
+
+        content = self.content
+        if isinstance(content, memoryview):
+            content = content.tobytes()
+        content = content.decode('utf-8-sig')
+        file = StringIO(content)
+        csv_data = csv.reader(file, delimiter=";")
+
+        lista = list(csv_data)
+        idx_init = 0
+        for idx_init, row in enumerate(lista):
+            if not row[0]:
+                break
+
+        idx_init += 2
+        rows = lista[idx_init:]
+
+        rows = sorted(
+            rows, key=lambda x:
+            [
+                tuple(map(int, x[0].split('/')[::-1])),
+                x[1],
+                x[3]
+            ]
+        )
+
+        rows_filtered = []
+        rows = list(enumerate(rows))
+        for idx, row in rows:
+            # rows_filtered.append(row)
+            # continue
+
+            if not idx or 'RETENÇÃO' not in row[2]:
+                rows_filtered.append(row)
+                continue
+
+            if rows[idx][1] == rows[idx - 1][1]:
+                continue
+
+            rows_filtered.append(row)
+
+        rows = rows_filtered
+
+        if ro.receitaarrecadada_set.count() >= len(rows):
+            return
+        ro.receitaarrecadada_set.filter().delete()
+
+        for row in rows:
+            dt = datetime.strptime(row[0], "%d/%m/%Y").date()
+            #print(self.codigo, row)
+
+            valor = Decimal(row[3].replace('.', '').replace(',', '.'))
+
+            # if row[2] == 'RETENÇÃO DE EMPENHO':
+            #    ra = ReceitaArrecadada.objects.filter(
+            #        receita=ro,
+            #        historico=row[1],
+            #        data=dt,
+            #        valor=valor
+            #    ).first()
+            #    if ra:
+            #        continue
+
+            ra = ReceitaArrecadada()
+            ra.receita = ro
+            ra.data = dt
+            ra.historico = row[1]
+            ra.tipo = row[2]
+            ra.valor = valor
+            ra.save()
+
+    def _update_despesa_paga(self):
 
         org = Orgao.objects.get(codigo=self.orgao, loa__ano=self.ano)
         dp = DespesaPaga.objects.filter(codigo=self.codigo, orgao=org).first()
@@ -1006,7 +1157,8 @@ class ScrapRecord(models.Model):
             if not isinstance(content, bytes):
                 content = content.tobytes()
             content = content.decode('utf-8-sig')
-            content = clean_text(clean_text(clean_text(content)))
+            content = self.clean_text(
+                self.clean_text(self.clean_text(content)))
             tables = bs(content, 'html.parser').findAll('table')
             if not tables:
                 return None
@@ -1040,28 +1192,21 @@ class ScrapRecord(models.Model):
             except:
                 fonte = None
 
-        try:
-            dp, created = DespesaPaga.objects.get_or_create(
-                codigo=self.codigo,
-                orgao=org,
-            )
-            dp.cpfcnpj = item_list[3]
-            dp.nome = item_list[2]
-            dp.tipo = item_list[4]
-            dp.historico = values.get('Historico:', None)
+        dp, created = DespesaPaga.objects.get_or_create(
+            codigo=self.codigo,
+            orgao=org,
+        )
+        dp.cpfcnpj = item_list[3]
+        dp.nome = item_list[2]
+        dp.tipo = item_list[4]
+        dp.historico = values.get('Historico:', None)
 
-            dp.unidade = unidade
-            dp.natureza = natureza
-            dp.fonte = fonte
+        dp.unidade = unidade
+        dp.natureza = natureza
+        dp.fonte = fonte
 
-            dp.valor = valor
-            dp.data = dt
-            dp.save()
+        dp.valor = valor
+        dp.data = dt
+        dp.save()
 
-            self.erro = False
-            self.save()
-
-            return dp
-        except Exception as e:
-            self.erro = True
-            self.save()
+        return dp
