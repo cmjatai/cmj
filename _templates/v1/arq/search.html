@@ -20,9 +20,18 @@
     {% if breadcrumb_classe_parents %}
       <b>Filtro de Classe Aplicado:</b><br>
     {% endif %}
-
     {% with True as btn_clear %}
-      {% include "arq/breadcrumb_classe_parents_for_search.html" %}
+      {% if arqclasse.perfil == 200 %}
+        {% with 'conta_classe_logica' as field_classe %}
+          {% include "arq/breadcrumb_classe_parents_for_search.html" %}
+        {% endwith %}
+      {% else %}
+        {% with 'conta_classe_estrutural' as field_classe %}
+          {% include "arq/breadcrumb_classe_parents_for_search.html" %}
+        {% endwith %}
+      {% endif %}
+
+
     {% endwith %}
 
     {% if breadcrumb_classe_parents %}
@@ -47,18 +56,20 @@
                   {% endcomment %}
 
                 <small>
-                    {% comment %}
-                      {% with arqdoc.classe_estrutural.parents_and_me as breadcrumb_classe_parents %}
-                        {% with 'verbose_name text-black-50' as css_class %}
-                          {% include "arq/breadcrumb_classe_parents_for_search.html" %}
-                        {% endwith %}
-                      {% endwith %}
-                    {% endcomment %}
-                    {% with arqdoc.classe_logica.parents_and_me as breadcrumb_classe_parents %}
-                      {% with 'verbose_name text-black-50' as css_class %}
+                  {% with arqdoc.classe_logica.parents_and_me as breadcrumb_classe_parents %}
+                    {% with 'verbose_name text-black-50' as css_class %}
+                      {% with 'conta_classe_logica' as field_classe %}
                         {% include "arq/breadcrumb_classe_parents_for_search.html" %}
                       {% endwith %}
                     {% endwith %}
+                  {% endwith %}
+                  {% with arqdoc.classe_estrutural.parents_and_me as breadcrumb_classe_parents %}
+                    {% with 'verbose_name text-black-50' as css_class %}
+                      {% with 'conta_classe_estrutural' as field_classe %}
+                        {% include "arq/breadcrumb_classe_parents_for_search.html" %}
+                      {% endwith %}
+                    {% endwith %}
+                  {% endwith %}
                 </small>
 
                 {% if user.is_superuser %}

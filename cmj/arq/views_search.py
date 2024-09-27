@@ -40,6 +40,10 @@ class ArqSearchForm(ModelSearchForm):
         required=False, label=_('Conta'),
         widget=forms.HiddenInput())
 
+    conta_classe_estrutural = forms.CharField(
+        required=False, label=_('Conta'),
+        widget=forms.HiddenInput())
+
     arqclasse = forms.CharField(
         required=False, label=_('Conta'),
         widget=forms.HiddenInput())
@@ -65,8 +69,9 @@ class ArqSearchForm(ModelSearchForm):
         )
 
         row = to_row([
-            ('arqclasse', 1),
-            ('conta_classe_logica', 1),
+            ('arqclasse', 2),
+            ('conta_classe_logica', 0),
+            ('conta_classe_estrutural', 0),
             (q_field, 8),
         ])
 
@@ -92,11 +97,17 @@ class ArqSearchForm(ModelSearchForm):
         conta_classe_logica = self.cleaned_data.get(
             'conta_classe_logica', None)
 
+        conta_classe_estrutural = self.cleaned_data.get(
+            'conta_classe_estrutural', None)
+
         arqclasse = self.cleaned_data.get('arqclasse', None)
 
-        if conta_classe_logica and arqclasse:
+        if conta_classe_logica:
             sqs = sqs.filter(
                 conta_classe_logica__startswith=conta_classe_logica)
+        if conta_classe_estrutural:
+            sqs = sqs.filter(
+                conta_classe_estrutural__startswith=conta_classe_estrutural)
 
         kwargs = {
             'hl.simple.pre': '<span class="highlighted">',

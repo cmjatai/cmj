@@ -3,4 +3,14 @@
 
 {% block extra_js %}{{block.super}}
 
+<script language="JavaScript">
+  function checkAll(elem){
+      let checkboxes = document.getElementsByName('draftmidia');
+      for(let i=0; i<checkboxes.length; i++){
+          if(checkboxes[i].type == 'checkbox')
+              checkboxes[i].checked = elem.checked
+      }
+  }
+</script>
+
 {% endblock extra_js %}

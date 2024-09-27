@@ -256,7 +256,7 @@ class ArqDocBulkCreateForm(ModelForm):
 
     draftmidia = forms.ModelMultipleChoiceField(
         queryset=DraftMidia.objects.all(),
-        label=_('Arquivos do Draft a ser utilizado'),
+        label=_('Arquivos do Draft a serem utilizados'),
         required=False,
         widget=forms.CheckboxSelectMultiple)
 
@@ -288,6 +288,17 @@ class ArqDocBulkCreateForm(ModelForm):
         ])
 
         row3 = to_row([
+            (
+                HTML('''
+                <div class="controls">
+                    <div class="checkbox">
+                        <label for="id_check_all">
+                            <input type="checkbox" id="id_check_all" onchange="checkAll(this)" /> Marcar/Desmarcar Todos
+                        </label>
+                    </div>
+                </div>
+            '''),
+                12),
             ('draftmidia', 12),
         ])
 

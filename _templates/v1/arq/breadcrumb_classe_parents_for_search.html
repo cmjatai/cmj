@@ -1,13 +1,13 @@
 <ul class="breadcrumb {{css_class}} bg-transparent">
   {% for p in breadcrumb_classe_parents %}
       <li class="breadcrumb-item" aria-current="page" title="{{p.conta}}">
-        <a href="{% url 'cmj.arq:haystack_arqsearch' %}?q={{q}}&conta_classe_logica={{p.conta}}&arqclasse={{p.id}}">
+        <a href="{% url 'cmj.arq:haystack_arqsearch' %}?q={{q}}&{{field_classe}}={{p.conta}}&arqclasse={{p.id}}">
           {{ p.titulo }}
         </a>
         <ul>
           {% for pc in p.childs.all %}
-            <li>
-              <a href="{% url 'cmj.arq:haystack_arqsearch' %}?q={{q}}&conta_classe_logica={{pc.conta}}&arqclasse={{pc.id}}">
+            <li title="{{pc.conta}} - {{pc.descricao}}">
+              <a href="{% url 'cmj.arq:haystack_arqsearch' %}?q={{q}}&{{field_classe}}={{pc.conta}}&arqclasse={{pc.id}}">
                 {{ pc.titulo }}
               </a>
             </li>
