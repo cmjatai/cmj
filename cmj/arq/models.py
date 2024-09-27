@@ -411,7 +411,10 @@ class ArqDoc(Parent, CmjAuditoriaModelMixin):
     FIELDFILE_NAME = ('arquivo',)
 
     checkcheck = models.BooleanField(
-        verbose_name=_('Arquivado'), default=False)
+        verbose_name=_('Arquivado?'), default=False)
+
+    editado = models.BooleanField(
+        verbose_name=_('Editado Manualmente?'), default=False)
 
     codigo = models.PositiveIntegerField(verbose_name=_('Código'), default=0)
 

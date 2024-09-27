@@ -1,9 +1,12 @@
+import logging
+
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Fieldset, Div, HTML
 from django import forms
 from django.core.exceptions import ValidationError
 from django.core.files.base import File
 from django.forms import widgets
+from django.forms.forms import Form
 from django.forms.models import ModelForm
 from django.utils.translation import ugettext_lazy as _
 
@@ -11,6 +14,9 @@ from cmj.arq.models import ArqClasse, PERFIL_ARQCLASSE, ArqDoc, ARQCLASSE_FISICA
     ARQCLASSE_LOGICA, DraftMidia
 from cmj.utils import YES_NO_CHOICES
 from sapl.crispy_layout_mixin import to_row, SaplFormLayout
+
+
+logger = logging.getLogger(__name__)
 
 
 class ArqClasseForm(ModelForm):
@@ -224,6 +230,7 @@ class ArqDocForm(ModelForm):
 
         inst.modifier = self._request_user
 
+        inst.editado = True
         inst = ModelForm.save(self, commit=commit)
 
         if dm:
@@ -233,5 +240,122 @@ class ArqDocForm(ModelForm):
             inst.arquivo.save(path.split('/')[-1], f)
             inst.save()
             dm.delete()
+
+        return inst
+
+
+class ArqDocBulkCreateForm(ModelForm):
+
+    classe_logica = forms.ModelChoiceField(
+        queryset=ArqClasse.objects.filter(perfil=ARQCLASSE_LOGICA),
+        required=True)
+
+    classe_estrutural = forms.ModelChoiceField(
+        queryset=ArqClasse.objects.filter(perfil=ARQCLASSE_FISICA),
+        required=True)
+
+    draftmidia = forms.ModelMultipleChoiceField(
+        queryset=DraftMidia.objects.all(),
+        label=_('Arquivos do Draft a ser utilizado'),
+        required=False,
+        widget=forms.CheckboxSelectMultiple)
+
+    class Meta:
+        model = ArqDoc
+        fields = [
+            'data',
+            'classe_logica',
+            'classe_estrutural',
+            'draftmidia'
+        ]
+
+    def __init__(self, *args, **kwargs):
+
+        self._request_user = kwargs['initial'].get('request_user', None)
+
+        dmc = []
+        for dm in DraftMidia.objects.filter(
+            draft__owner=self._request_user,
+            metadata__ocrmypdf__pdfa=DraftMidia.METADATA_PDFA_PDFA
+        ).order_by('draft__descricao', 'draft_id', 'sequencia'):
+            name_file_midia = dm.metadata['uploadedfile']['name']
+            dmc.append((dm.id, f'{str(dm.draft)} - {name_file_midia}'))
+
+        row1 = to_row([
+            ('data', 3),
+            ('classe_logica', 9),
+            ('classe_estrutural', 12),
+        ])
+
+        row3 = to_row([
+            ('draftmidia', 12),
+        ])
+
+        self.helper = FormHelper()
+        self.helper.layout = SaplFormLayout(
+            Fieldset(_('Geração de ArqDocumentos em série '), row1, row3))
+
+        super(ArqDocBulkCreateForm, self).__init__(*args, **kwargs)
+
+        pc = {
+            100: [],
+            200: []
+        }
+
+        def get_pc_order_by(perfil, nd=None, only_opened=None):
+            params = {
+                'perfil': perfil
+            }
+
+            if only_opened:
+                params['checkcheck'] = False
+
+            if not nd:
+                pc[perfil].append(('', '--------------'))
+                params['parent__isnull'] = True
+                childs = ArqClasse.objects.filter(**params)
+            else:
+                pc[perfil].append((nd.id, str(nd)))
+                childs = nd.childs.filter(**params)
+
+            for c in childs.order_by('codigo'):
+                get_pc_order_by(perfil, nd=c)
+
+        get_pc_order_by(100, only_opened=True)
+        get_pc_order_by(200)
+
+        self.fields['classe_estrutural'].choices = pc[100]
+        self.fields['classe_logica'].choices = pc[200]
+        self.fields['draftmidia'].choices = dmc
+
+    def save(self, commit=True):
+
+        codigo_init = self.initial['codigo']
+
+        cd = self.cleaned_data
+        dm_qs = cd['draftmidia']
+
+        inst = self.instance
+        inst.owner = self._request_user
+        inst.modifier = self._request_user
+        inst.editado = False
+        inst.checkcheck = True
+
+        for dm in dm_qs.all():
+            try:
+                inst.id = None
+                inst.codigo = codigo_init
+                inst.titulo = f'{dm.draft.descricao} - {dm.metadata["uploadedfile"]["name"]}'
+                inst.descricao = 'Documento digitalizado, aplicado OCR, transformado em PDF/A e incluído automaticamente para indexação e pesquisas.'
+
+                inst.save()
+                path = dm.arquivo.path
+                f = open(path, 'rb')
+                f = File(f)
+                inst.arquivo.save(path.split('/')[-1], f)
+                dm.delete()
+                codigo_init += 1
+            except Exception as e:
+                logger.ERROR(e)
 
         return inst

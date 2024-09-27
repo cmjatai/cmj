@@ -41,6 +41,9 @@ urlpatterns_arq = [
     url(r'^classe/(?P<classe_id>[0-9]+)/doc/create$',
         views.ArqDocCreateView.as_view(), name='arqdoc_create'),
 
+    url(r'^classe/(?P<classe_id>[0-9]+)/doc/bulk_create$',
+        views.ArqDocBulkCreateView.as_view(), name='arqdoc_bulk_create'),
+
     url(r'^pesquisa/$', ArqSearchView(), name='haystack_arqsearch'),
 
 

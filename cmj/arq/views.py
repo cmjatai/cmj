@@ -440,6 +440,48 @@ class ArqDocCreateView(ArqDocMixin, FormMessagesMixin,
         return initial
 
 
+class ArqDocBulkCreateView(ArqDocMixin, FormMessagesMixin,
+                           PermissionRequiredMixin,
+                           CreateView):
+    permission_required = 'arq.add_arqdoc',
+    form_valid_message = _('ArqDoc criado com sucesso!')
+    form_invalid_message = _('Existem erros no formulário!')
+    template_name = 'arq/arqdoc_bulkform.html'
+    form_class = forms.ArqDocBulkCreateForm
+    model = ArqDoc
+
+    def get_success_url(self):
+        return reverse_lazy(
+            'cmj.arq:subarqclasse_list',
+            kwargs={'pk': self.kwargs['classe_id']})
+
+    def is_checkcheck(self):
+        # check check da classe
+
+        try:
+            ac = ArqClasse.objects.get(pk=self.kwargs['classe_id'])
+        except ObjectDoesNotExist:
+            raise Http404()
+
+        return ac.checkcheck
+
+    def get_initial(self):
+
+        initial = super().get_initial()
+        initial['request_user'] = self.request.user
+
+        initial['classe_estrutural'] = self.kwargs['classe_id']
+
+        cod__max = ArqDoc.objects.filter(
+            classe_estrutural=self.kwargs['classe_id']
+        ).order_by('codigo').aggregate(Max('codigo'))
+
+        initial['codigo'] = cod__max['codigo__max'] + \
+            1 if cod__max['codigo__max'] else 1
+
+        return initial
+
+
 class ArqDocDeleteView(ArqDocMixin,
                        PermissionRequiredMixin,
                        DeleteView):
