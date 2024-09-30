@@ -6,11 +6,33 @@
 <script language="JavaScript">
   function checkAll(elem){
       let checkboxes = document.getElementsByName('draftmidia');
-      for(let i=0; i<checkboxes.length; i++){
+      for(let i=0; i < checkboxes.length; i++){
           if(checkboxes[i].type == 'checkbox')
               checkboxes[i].checked = elem.checked
       }
   }
-</script>
+  $(document).ready(function () {
+    const link_open_draftmidia = document.getElementById('link_open_draftmidia')
+    const img_preview_arqdoc_create = document.getElementById('img_preview_arqdoc_create')
 
+
+    const draftmidias = $('input[name="draftmidia"]').closest('div')
+
+    draftmidias.on('mouseover', function (event) {
+      let id_dm = null
+      if (event.target.tagName.toLowerCase() === 'label') {
+        const forlabel = event.target.getAttribute('for')
+        const input = document.getElementById(forlabel)
+        id_dm = input.value
+      } else if (event.target.tagName.toLowerCase() === 'input') {
+        id_dm = event.target.value
+      } else if (event.target.tagName.toLowerCase() === 'div') {
+        id_dm = event.target.querySelector('input').value
+      }
+
+      img_preview_arqdoc_create.src = `/api/arq/draftmidia/${id_dm}/arquivo/?page=1&dpi=300`
+      link_open_draftmidia.href = `/api/arq/draftmidia/${id_dm}/arquivo/`
+    })
+  })
+</script>
 {% endblock extra_js %}

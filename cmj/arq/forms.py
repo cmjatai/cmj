@@ -274,7 +274,15 @@ class ArqDocBulkCreateForm(ModelForm):
         self._request_user = kwargs['initial'].get('request_user', None)
 
         dmc = []
+        dm = DraftMidia.objects.filter(
+            draft__owner=self._request_user,
+            metadata__ocrmypdf__pdfa=DraftMidia.METADATA_PDFA_PDFA
+        ).order_by('draft__descricao', 'draft_id', 'sequencia').first()
+
+        draft = dm.draft if dm else None
+
         for dm in DraftMidia.objects.filter(
+            draft=draft,
             draft__owner=self._request_user,
             metadata__ocrmypdf__pdfa=DraftMidia.METADATA_PDFA_PDFA
         ).order_by('draft__descricao', 'draft_id', 'sequencia'):
@@ -289,17 +297,22 @@ class ArqDocBulkCreateForm(ModelForm):
 
         row3 = to_row([
             (
-                HTML('''
+                HTML(f'''
                 <div class="controls">
                     <div class="checkbox">
                         <label for="id_check_all">
-                            <input type="checkbox" id="id_check_all" onchange="checkAll(this)" /> Marcar/Desmarcar Todos
+                            <input type="checkbox" id="id_check_all" onchange="checkAll(this)" /> Marcar/Desmarcar Todos 
+                            // <em>Draft a Importar: {draft}</em> 
                         </label>
                     </div>
                 </div>
             '''),
                 12),
-            ('draftmidia', 12),
+            ('draftmidia', 7), (HTML('''
+            <a id="link_open_draftmidia" target="_blank">
+                <img id="img_preview_arqdoc_create" class="embed-responsive" />
+            </a>
+            '''), 5)
         ])
 
         self.helper = FormHelper()
@@ -352,8 +365,10 @@ class ArqDocBulkCreateForm(ModelForm):
         inst.editado = False
         inst.checkcheck = True
 
+        draft = None
         for dm in dm_qs.all():
             try:
+                draft = dm.draft
                 inst.id = None
                 inst.codigo = codigo_init
                 inst.titulo = f'{dm.draft.descricao} - {dm.metadata["uploadedfile"]["name"]}'
@@ -368,5 +383,8 @@ class ArqDocBulkCreateForm(ModelForm):
                 codigo_init += 1
             except Exception as e:
                 logger.ERROR(e)
+
+        if not draft.draftmidia_set.exists():
+            draft.delete()
 
         return inst

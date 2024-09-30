@@ -117,12 +117,10 @@
           <div class="btn-barchart-right" @click="clickSlice(1, 'exec')"><i class="fa fa-chevron-right"></i></div>
           <BarChart :plugins="pluginsExec" :chartDataUser="chartDataExec" cssClasses="barchart-2"/>
           <div class="fonte small pt-5">
-            FONTE: Os dados são extraídos no período noturno dos
-              portais de transparência do
-              <a href="http://prefeituradejatai.sigepnet.com.br/transparencia/despesa_paga.php">
-                Poder Executivo</a> e do
-              <a href="http://camaradejatai.sigepnet.com.br/transparencia/despesa_paga.php">
-                Poder Legislativo</a>, portanto, os valores se referem a movimentação do dia anterior.
+            FONTE: Os dados são extraídos no período noturno dos portais de transparência do
+              <a href="http://prefeituradejatai.sigepnet.com.br">Poder Executivo</a> e do
+              <a href="http://camaradejatai.sigepnet.com.br">Poder Legislativo</a>, portanto,
+              os valores se referem a movimentação do dia anterior.
               Os valores extraídos são sempre os divulgados como "Valor Bruto",
               não sendo possível atualmente, possuir uma coluna com o "Valor Líquido"
               por esta, apesar de estar presente nos dados humanamente visíveis,
@@ -131,7 +129,7 @@
               Abaixo uma listagem de cada Órgão, com sua última data e último código de despesa extraída.
               <ul>
                 <li v-for="(data, key) in data_exec" :key="key" >
-                  {{ data[5] }} - {{ data[4] }} - {{ data[0] }}-{{ data[1] }}
+                  {{ data[6] }} - {{ data[5] }} - {{ data[0] }}-{{ data[1] }}
                 </li>
               </ul>
           </div>

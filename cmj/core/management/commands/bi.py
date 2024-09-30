@@ -7,6 +7,7 @@ from django.db.models.signals import post_delete, post_save
 from django.utils.translation import ugettext_lazy as _
 from pdfrw.pdfreader import PdfReader
 
+from cmj.arq.models import ArqDoc
 from cmj.core.models import Bi
 from cmj.diarios.models import DiarioOficial
 from cmj.sigad.models import VersaoDeMidia, Documento, Midia
@@ -23,8 +24,6 @@ class Command(BaseCommand):
 
         post_save.disconnect(dispatch_uid='timerefresh_post_signal')
 
-
-
         self.logger = logging.getLogger(__name__)
 
         self.run_bi()
@@ -35,6 +34,12 @@ class Command(BaseCommand):
     def run_bi_files(self):
         reset_errors_count_page = False
         models = [
+            {
+                'model': ArqDoc,
+                'hook': 'run_bi_arqdoc',
+                'reset_errors_count_page': reset_errors_count_page,
+                'results': {},
+            },
             {
                 'model': MateriaLegislativa,
                 'file_field': 'texto_original',
@@ -429,6 +434,47 @@ class Command(BaseCommand):
                     ru['Diários Oficiais'][d.ano]['paginas'] += d.paginas
                 except:
                     ru['Diários Oficiais'][d.ano]['ep'].append(
+                        d.id)
+
+    def run_bi_arqdoc(self, mt):
+        arqdocs = ArqDoc.objects.order_by('id')
+
+        ano_cadastro = 2023
+        r = {ano_cadastro: []}
+
+        for d in arqdocs:
+            if d.data.year <= ano_cadastro:
+                r[ano_cadastro].append(d)
+                continue
+            ano_cadastro = d.data.year
+            r[ano_cadastro] = [d, ]
+
+        total = 0
+        results = mt['results']
+        for k, v in r.items():  # ano, lista de diarios cadastrados no ano
+            if k not in results:
+                results[k] = {}
+
+            for d in v:
+                # print(n)
+                ano = d.data.year
+                u = 0
+                if u not in results[k]:
+                    results[k][u] = {}
+                    results[k][u]['ArqDocumentos'] = {}
+
+                ru = results[k][u]
+
+                if d.ano not in ru['ArqDocumentos']:
+                    ru['ArqDocumentos'][ano] = {
+                        'total': 0, 'paginas': 0, 'ep': []}
+
+                ru['ArqDocumentos'][ano]['total'] += 1
+
+                try:
+                    ru['ArqDocumentos'][ano]['paginas'] += 0  # d.paginas
+                except:
+                    ru['ArqDocumentos'][ano]['ep'].append(
                         d.id)
 
     def run_bi_normajuridica(self, mt):
