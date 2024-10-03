@@ -11,7 +11,7 @@ from django.db.models.base import Model
 from django.http.response import Http404
 from django.shortcuts import redirect
 from django.urls.base import reverse
-from django.utils import six
+import six
 from django.utils.datastructures import OrderedSet
 from django.utils.decorators import classonlymethod
 from django.utils.encoding import force_text

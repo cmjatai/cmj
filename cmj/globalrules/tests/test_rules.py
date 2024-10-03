@@ -3,10 +3,10 @@ from django.conf import settings
 from django.contrib.auth.management import _get_all_permissions
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-from django.utils import six
 from django.utils.text import format_lazy
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
 import pytest
+import six
 
 from cmj.core.models import User
 from cmj.globalrules import CMJ_GROUPS, map_rules

@@ -26,7 +26,7 @@ from django.forms.widgets import SplitDateTimeWidget, ClearableFileInput
 from django.http.response import HttpResponse
 from django.template import loader
 from django.urls.base import reverse
-from django.utils import six, timezone
+from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 import django_filters
