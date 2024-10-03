@@ -3,6 +3,7 @@ django-image-cropping==1.7.0
 django-crispy-forms==2.2
 django-haystack==3.2.1
 django-extensions==3.2.3
+djangorestframework==3.15.2
 
 
 
@@ -11,7 +12,6 @@ django-filter==2.4.0
 django-model-utils==4.0.0
 drf-spectacular==0.24.2
 django-webpack4-loader
-djangorestframework==3.12.4
 python-telegram-bot==20.1
 
 num2words==0.5.13
