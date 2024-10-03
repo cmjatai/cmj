@@ -197,11 +197,11 @@ class TextoArticulado(TimestampedMixin):
         blank=True, null=True, default=None,
         verbose_name=_('Tipo de Texto Articulado'),
         on_delete=PROTECT)
-    participacao_social = models.NullBooleanField(
-        default=None,
-        blank=True, null=True,
-        choices=PARTICIPACAO_SOCIAL_CHOICES,
-        verbose_name=_('Participação Social'))
+    participacao_social = models.BooleanField(null=True,
+                                              default=None,
+                                              blank=True,
+                                              choices=PARTICIPACAO_SOCIAL_CHOICES,
+                                              verbose_name=_('Participação Social'))
 
     content_type = models.ForeignKey(
         ContentType,

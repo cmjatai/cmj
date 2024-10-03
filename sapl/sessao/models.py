@@ -185,20 +185,20 @@ class SessaoPlenaria(models.Model):
         storage=OverwriteStorage(),
         upload_to=anexo_upload_path,
         verbose_name=_('Anexo da Sessão'))
-    iniciada = models.NullBooleanField(blank=True,
+    iniciada = models.BooleanField(null=True, blank=True,
                                        choices=YES_NO_CHOICES,
                                        verbose_name=_('Sessão iniciada?'),
                                        default=True)
-    finalizada = models.NullBooleanField(blank=True,
+    finalizada = models.BooleanField(null=True, blank=True,
                                          choices=YES_NO_CHOICES,
                                          verbose_name=_('Sessão finalizada?'),
                                          default=False)
-    selo_votacao_adicionado = models.NullBooleanField(blank=True,
+    selo_votacao_adicionado = models.BooleanField(null=True, blank=True,
                                                       choices=YES_NO_CHOICES,
                                                       verbose_name=_(
                                                           'Selo de Votação Adicionado?'),
                                                       default=False)
-    interativa = models.NullBooleanField(blank=True,
+    interativa = models.BooleanField(null=True, blank=True,
                                          choices=YES_NO_CHOICES,
                                          verbose_name=_('Sessão interativa'))
     tema_solene = models.TextField(
@@ -428,11 +428,11 @@ class AbstractOrdemDia(models.Model):
     resultado = models.TextField(blank=True, verbose_name=_('Resultado'))
     tipo_votacao = models.PositiveIntegerField(
         verbose_name=_('Tipo de votação'), choices=TIPO_VOTACAO_CHOICES, default=1)
-    votacao_aberta = models.NullBooleanField(
+    votacao_aberta = models.BooleanField(null=True,
         blank=True,
         choices=YES_NO_CHOICES,
         verbose_name=_('Votação iniciada?'))
-    registro_aberto = models.NullBooleanField(
+    registro_aberto = models.BooleanField(null=True,
         blank=True,
         choices=YES_NO_CHOICES,
         verbose_name=_('Registro de Votação Iniciado?'))
@@ -690,7 +690,7 @@ class RegistroVotacao(models.Model):
         blank=True,
         null=True)
 
-    selo_votacao = models.NullBooleanField(
+    selo_votacao = models.BooleanField(null=True,
         blank=True,
         default=False,
         choices=YES_NO_CHOICES,

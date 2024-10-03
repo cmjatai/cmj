@@ -310,11 +310,11 @@ class MateriaLegislativa(CommonMixin):
         verbose_name=_('Em Tramitação?'),
         default=False,
         choices=YES_NO_CHOICES)
-    polemica = models.NullBooleanField(
+    polemica = models.BooleanField(null=True,
         blank=True, verbose_name=_('Matéria Polêmica?'))
     objeto = models.CharField(
         max_length=150, blank=True, verbose_name=_('Objeto'))
-    complementar = models.NullBooleanField(
+    complementar = models.BooleanField(null=True,
         blank=True, verbose_name=_('É Complementar?'))
     ementa = models.TextField(verbose_name=_('Ementa'))
     indexacao = models.TextField(

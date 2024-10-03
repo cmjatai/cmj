@@ -65,7 +65,7 @@ class TipoNormaJuridica(models.Model):
         default=0,
         verbose_name=_('Relevância'),)
 
-    origem_processo_legislativo = models.NullBooleanField(
+    origem_processo_legislativo = models.BooleanField(null=True,
         blank=True, default=True, verbose_name=_('Possui Origem no Processo Legislativo?'),
         choices=YES_NO_CHOICES)
 
@@ -134,7 +134,7 @@ class NormaJuridica(CommonMixin):
         blank=True, verbose_name=_('Indexação'))
     observacao = models.TextField(
         blank=True, verbose_name=_('Observação'))
-    complemento = models.NullBooleanField(
+    complemento = models.BooleanField(null=True,
         blank=True, verbose_name=_('Complementar ?'),
         choices=YES_NO_CHOICES)
 
