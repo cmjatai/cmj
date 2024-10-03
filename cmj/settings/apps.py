@@ -22,6 +22,7 @@ INSTALLED_APPS = (
     'social_django',
 
     'crispy_forms',
+    'crispy_bootstrap4',
 
     'easy_thumbnails',
     'image_cropping',
