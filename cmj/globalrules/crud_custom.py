@@ -14,7 +14,7 @@ from django.urls.base import reverse
 import six
 from django.utils.datastructures import OrderedSet
 from django.utils.decorators import classonlymethod
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import ContextMixin
 from django.views.generic.list import MultipleObjectMixin

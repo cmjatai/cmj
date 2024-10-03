@@ -1,7 +1,7 @@
 
 from django.conf import settings
 from django.urls.base import reverse
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
 from haystack.views import SearchView
 
@@ -115,7 +115,7 @@ class MateriaSearchView(AudigLogFilterMixin, MultiFormatOutputMixin, SearchView,
     }
 
     def hook_header_texto_original(self):
-        return force_text(_('Link para Matéria Legislativa'))
+        return force_str(_('Link para Matéria Legislativa'))
 
     def hook_texto_original(self, obj):
         id = obj["id"] if isinstance(obj, dict) else obj.id
@@ -219,7 +219,7 @@ class NormaSearchView(AudigLogFilterMixin,  MultiFormatOutputMixin, SearchView, 
     }
 
     def hook_header_texto_integral(self):
-        return force_text(_('Link para Norma'))
+        return force_str(_('Link para Norma'))
 
     def hook_texto_integral(self, obj):
         id = obj["id"] if isinstance(obj, dict) else obj.id

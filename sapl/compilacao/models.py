@@ -14,7 +14,7 @@ from django.template import defaultfilters
 from django.urls.base import reverse
 from django.utils import timezone
 from django.utils.decorators import classonlymethod
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
@@ -1143,7 +1143,7 @@ class UrlizeReferencia(models.Model):
 
 
 class Dispositivo(BaseModel, TimestampedMixin):
-    TEXTO_PADRAO_DISPOSITIVO_REVOGADO = force_text(_('(Revogado)'))
+    TEXTO_PADRAO_DISPOSITIVO_REVOGADO = force_str(_('(Revogado)'))
     INTERVALO_ORDEM = 1000
     ordem = models.PositiveIntegerField(
         default=0,

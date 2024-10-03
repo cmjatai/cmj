@@ -14,7 +14,7 @@ from django.urls.base import reverse
 from django.utils import timezone, formats
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import method_decorator
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.html import strip_tags
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
@@ -3986,7 +3986,7 @@ class PesquisarSessaoPlenariaView(AudigLogFilterMixin, MultiFormatOutputMixin, F
     }
 
     def hook_header_(self):
-        return force_text(_('Título'))
+        return force_str(_('Título'))
 
     def hook_(self, obj):
         return str(obj)

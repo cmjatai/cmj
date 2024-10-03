@@ -25,7 +25,7 @@ from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.urls.base import reverse
 from django.utils import timezone, formats
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView, CreateView, UpdateView
 from django.views.generic.base import RedirectView, TemplateView, ContextMixin
@@ -463,7 +463,7 @@ class DocumentoAdministrativoCrud(Crud):
             return a
 
         def hook_header_texto_integral(self):
-            return force_text(_('Link para o Processo/Documento'))
+            return force_str(_('Link para o Processo/Documento'))
 
         def hook_texto_integral(self, obj):
             if isinstance(obj, dict):

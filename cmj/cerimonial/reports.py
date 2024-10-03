@@ -10,7 +10,7 @@ from django.db.models import Q
 from django.forms.utils import ErrorList
 from django.http.response import HttpResponse
 from django.template.defaultfilters import lower
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
 from django_filters.views import FilterView
 from reportlab.lib import colors
@@ -644,15 +644,15 @@ class RelatorioContatoAgrupadoPorProcessoView(
             if not p or isinstance(p, str):
                 label_agrupamento = dict(
                     ContatoAgrupadoPorProcessoFilterSet.AGRUPAMENTO_CHOICE)
-                label_agrupamento = force_text(
+                label_agrupamento = force_str(
                     label_agrupamento[agrupamento])
 
             if not data:
                 tit_relatorio = _('Relatório de Contatos e Processos')
-                tit_relatorio = force_text(tit_relatorio) + ' ' + ((
-                    force_text(_('Agrupados')) + ' ' +
+                tit_relatorio = force_str(tit_relatorio) + ' ' + ((
+                    force_str(_('Agrupados')) + ' ' +
                     label_agrupamento) if label_agrupamento else (
-                    force_text(_('Sem Agrupamento')) +
+                    force_str(_('Sem Agrupamento')) +
                     ' ' + label_agrupamento))
 
                 data.append([Paragraph(tit_relatorio, h3)])
@@ -665,7 +665,7 @@ class RelatorioContatoAgrupadoPorProcessoView(
 
                 data.append([Paragraph((
                     label_agrupamento + ' - ' + str(p)) if p
-                    else (force_text(_('Sem Agrupamento')) +
+                    else (force_str(_('Sem Agrupamento')) +
                           ' ' + label_agrupamento), h4)])
 
                 data.append(cabec)
@@ -705,7 +705,7 @@ class RelatorioContatoAgrupadoPorProcessoView(
                     Paragraph(
                         str(p.titulo) if len(p.titulo) < MAX_TITULO
                         else p.titulo[:MAX_TITULO] +
-                        force_text(_(' (Continua...)')), s if len(p.titulo) < MAX_TITULO else s_min)]
+                        force_str(_(' (Continua...)')), s if len(p.titulo) < MAX_TITULO else s_min)]
 
                 contatos_query = p.contatos.all()
 
@@ -781,7 +781,7 @@ class RelatorioContatoAgrupadoPorProcessoView(
                                     str(ps.titulo)
                                     if len(ps.titulo) < MAX_TITULO
                                     else ps.titulo[:MAX_TITULO] +
-                                    force_text(_(' (Continua...)')),
+                                    force_str(_(' (Continua...)')),
                                     s if len(ps.titulo) < MAX_TITULO
                                     else s_min))
                     if not ps:

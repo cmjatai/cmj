@@ -5,7 +5,7 @@ from braces.views._forms import FormMessagesMixin
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 from django.urls.base import reverse
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
 
 from cmj.core.models import CertidaoPublicacao
@@ -73,9 +73,9 @@ class DiarioOficialCrud(Crud):
             return c
 
         def hook_vinculodocdiariooficial_set(self, obj):
-            v = force_text(
+            v = force_str(
                 _('Documentos Públicados no PortalCMJ')
-            ) if self.object.tipo.principal else force_text(
+            ) if self.object.tipo.principal else force_str(
                 _('Republicação de documentos no PortalCMJ')
             )
             text = []
@@ -155,8 +155,8 @@ class VinculoDocDiarioOficialCrud(MasterDetailCrud):
 
         def hook_header_object_id(self, *args, **kwargs):
             if self.parent_object.tipo.principal:
-                return force_text(_('Documentos Públicados no PortalCMJ'))
-            return force_text(_('Republicação de documentos no PortalCMJ'))
+                return force_str(_('Documentos Públicados no PortalCMJ'))
+            return force_str(_('Republicação de documentos no PortalCMJ'))
 
         def hook_object_id(self, *args, **kwargs):
             ct = args[0].content_type

@@ -26,7 +26,7 @@ from django.http.response import Http404, HttpResponseRedirect,\
 from django.shortcuts import get_object_or_404, redirect
 from django.urls.base import reverse
 from django.utils import formats, timezone
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.text import slugify
 from django.utils.timezone import get_default_timezone
 from django.utils.translation import gettext_lazy as _
@@ -2510,7 +2510,7 @@ class MateriaLegislativaPesquisaView(AudigLogFilterMixin, MultiFormatOutputMixin
     }
 
     def hook_header_texto_original(self):
-        return force_text(_('Link para Matéria Legislativa'))
+        return force_str(_('Link para Matéria Legislativa'))
 
     def hook_texto_original(self, obj):
         id = obj["id"] if isinstance(obj, dict) else obj.id
