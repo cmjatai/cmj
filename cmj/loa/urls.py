@@ -1,4 +1,4 @@
-from django.conf.urls import url, include
+from django.urls.conf import re_path, include
 
 from cmj.loa.views import LoaCrud, EmendaLoaCrud, OficioAjusteLoaCrud,\
     RegistroAjusteLoaCrud
@@ -10,7 +10,7 @@ app_name = AppConfig.name
 
 
 urlpatterns = [
-    url(r'^loa',
+    re_path(r'^loa',
         include(
             LoaCrud.get_urls() +
             EmendaLoaCrud.get_urls() +

@@ -1,4 +1,4 @@
-from django.conf.urls import url, include
+from django.urls.conf import re_path, include
 
 from cmj.diarios.views import TipoDeDiarioCrud, DiarioOficialCrud,\
     VinculoDocDiarioOficialCrud
@@ -10,11 +10,11 @@ app_name = AppConfig.name
 
 
 urlpatterns = [
-    url(r'^diariooficial',
+    re_path(r'^diariooficial',
         include(
             DiarioOficialCrud.get_urls() +
             VinculoDocDiarioOficialCrud.get_urls()
         )),
-    url(r'^sistema/diarios/tipodediario',
+    re_path(r'^sistema/diarios/tipodediario',
         include(TipoDeDiarioCrud.get_urls())),
 ]

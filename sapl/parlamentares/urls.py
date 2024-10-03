@@ -1,4 +1,4 @@
-from django.conf.urls import include, url
+from django.urls.conf import re_path, include
 
 from sapl.parlamentares.views import (CargoMesaCrud, ColigacaoCrud,
                                       ComposicaoColigacaoCrud, DependenteCrud,
@@ -37,7 +37,7 @@ from .apps import AppConfig
 app_name = AppConfig.name
 
 urlpatterns = [
-    url(r'^parl', include(
+    re_path(r'^parl', include(
         ParlamentarCrud.get_urls() + DependenteCrud.get_urls() +
         FiliacaoCrud.get_urls() + MandatoCrud.get_urls() +
         ParticipacaoParlamentarCrud.get_urls() +
@@ -47,89 +47,89 @@ urlpatterns = [
         BancadaCrud.get_urls()
     )),
 
-    url(r'^parlamentar/bancada', include(
+    re_path(r'^parlamentar/bancada', include(
         BancadaCrud.get_urls()
     )),
 
-    url(r'^parlamentar/bloco', include(
+    re_path(r'^parlamentar/bloco', include(
         BlocoCrud.get_urls()
     )),
 
-    url(r'^parlamentar/lista$', lista_parlamentares, name='lista_parlamentares'),
+    re_path(r'^parlamentar/lista$', lista_parlamentares, name='lista_parlamentares'),
 
-    url(r'^parlamentar/pesquisar-parlamentar/',
+    re_path(r'^parlamentar/pesquisar-parlamentar/',
         PesquisarParlamentarView.as_view(), name='pesquisar_parlamentar'),
 
-    url(r'^parlamentar/deleta_partido/(?P<pk>\d+)/$',
+    re_path(r'^parlamentar/deleta_partido/(?P<pk>\d+)/$',
         deleta_historico_partido, name='deleta_historico_partido'),
 
-    url(r'^parlamentar/(?P<pk>\d+)/materias$',
+    re_path(r'^parlamentar/(?P<pk>\d+)/materias$',
         ParlamentarMateriasView.as_view(), name='parlamentar_materias'),
 
-    url(r'^parlamentar/vincular-parlamentar/$',
+    re_path(r'^parlamentar/vincular-parlamentar/$',
         VincularParlamentarView.as_view(), name='vincular_parlamentar'),
 
-    url(r'^sistema/coligacao',
+    re_path(r'^sistema/coligacao',
         include(ColigacaoCrud.get_urls() +
                 ComposicaoColigacaoCrud.get_urls())),
 
-    url(r'^sistema/cargo-bancada',
+    re_path(r'^sistema/cargo-bancada',
         include(CargoBancadaCrud.get_urls())),
 
-    url(r'^sistema/cargo-bloco',
+    re_path(r'^sistema/cargo-bloco',
         include(CargoBlocoCrud.get_urls())),
-    url(r'^sistema/vincula-parlamentar-ao-bloco/(?P<pk>\d+)/',
+    re_path(r'^sistema/vincula-parlamentar-ao-bloco/(?P<pk>\d+)/',
         vincula_parlamentar_ao_bloco, name='vincula_parlamentar_ao_bloco'),
-    url(r'^sistema/edita-vinculo-parlamentar-bloco/(?P<pk>\d+)/',
+    re_path(r'^sistema/edita-vinculo-parlamentar-bloco/(?P<pk>\d+)/',
         edita_vinculo_parlamentar_bloco, name='edita-vinculo-parlamentar-bloco'),
-    url(r'^sistema/deleta-vinculo-parlamentar-bloco/(?P<pk>\d+)/',
+    re_path(r'^sistema/deleta-vinculo-parlamentar-bloco/(?P<pk>\d+)/',
         deleta_vinculo_parlamentar_bloco, name='deleta-vinculo-parlamentar-bloco'),
 
-    url(r'^sistema/frente',
+    re_path(r'^sistema/frente',
         include(FrenteCrud.get_urls())),
-    url(r'^sistema/frente/atualiza-lista-parlamentares',
+    re_path(r'^sistema/frente/atualiza-lista-parlamentares',
         frente_atualiza_lista_parlamentares,
         name='atualiza_lista_parlamentares'),
-    url(r'^sistema/frente/parlamentares-frente-selected',
+    re_path(r'^sistema/frente/parlamentares-frente-selected',
         parlamentares_frente_selected,
         name='parlamentares_frente_selected'),
 
-    url(r'^sistema/parlamentar/legislatura',
+    re_path(r'^sistema/parlamentar/legislatura',
         include(LegislaturaCrud.get_urls())),
-    url(r'^sistema/parlamentar/tipo-dependente',
+    re_path(r'^sistema/parlamentar/tipo-dependente',
         include(TipoDependenteCrud.get_urls())),
-    url(r'^sistema/parlamentar/nivel-instrucao',
+    re_path(r'^sistema/parlamentar/nivel-instrucao',
         include(NivelInstrucaoCrud.get_urls())),
-    url(r'^sistema/parlamentar/tipo-afastamento',
+    re_path(r'^sistema/parlamentar/tipo-afastamento',
         include(TipoAfastamentoCrud.get_urls())),
-    url(r'^sistema/parlamentar/tipo-militar',
+    re_path(r'^sistema/parlamentar/tipo-militar',
         include(TipoMilitarCrud.get_urls())),
-    url(r'^sistema/parlamentar/partido', include(PartidoCrud.get_urls())),
+    re_path(r'^sistema/parlamentar/partido', include(PartidoCrud.get_urls())),
 
-    url(r'^sistema/parlamentar/partido/(?P<pk>\d+)/filiados$',
+    re_path(r'^sistema/parlamentar/partido/(?P<pk>\d+)/filiados$',
         parlamentares_filiados, name='parlamentares_filiados'),
 
-    url(r'^sistema/mesa-diretora/sessao-legislativa',
+    re_path(r'^sistema/mesa-diretora/sessao-legislativa',
         include(SessaoLegislativaCrud.get_urls())),
-    url(r'^sistema/mesa-diretora/cargo-mesa',
+    re_path(r'^sistema/mesa-diretora/cargo-mesa',
         include(CargoMesaCrud.get_urls())),
 
-    url(r'^mesa-diretora/$',
+    re_path(r'^mesa-diretora/$',
         MesaDiretoraView.as_view(), name='mesa_diretora'),
 
-    url(r'^mesa-diretora/altera-field-mesa/$',
+    re_path(r'^mesa-diretora/altera-field-mesa/$',
         altera_field_mesa, name='altera_field_mesa'),
 
-    url(r'^mesa-diretora/altera-field-mesa-public-view/$',
+    re_path(r'^mesa-diretora/altera-field-mesa-public-view/$',
         altera_field_mesa_public_view, name='altera_field_mesa_public_view'),
 
-    url(r'^mesa-diretora/insere-parlamentar-composicao/$',
+    re_path(r'^mesa-diretora/insere-parlamentar-composicao/$',
         insere_parlamentar_composicao, name='insere_parlamentar_composicao'),
 
-    url(r'^mesa-diretora/remove-parlamentar-composicao/$',
+    re_path(r'^mesa-diretora/remove-parlamentar-composicao/$',
         remove_parlamentar_composicao, name='remove_parlamentar_composicao'),
 
-    url(r'^parlamentar/get-sessoes-legislatura/$',
+    re_path(r'^parlamentar/get-sessoes-legislatura/$',
         get_sessoes_legislatura, name='get_sessoes_legislatura'),
 
 ]

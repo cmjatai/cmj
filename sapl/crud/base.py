@@ -6,7 +6,6 @@ from crispy_forms.bootstrap import FieldWithButtons, StrictButton
 from crispy_forms.layout import Field, Layout
 from django import forms
 from django.conf import settings
-from django.conf.urls import url
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
@@ -15,6 +14,7 @@ from django.db.models.fields.related import ForeignKey, ManyToManyField
 from django.http.response import Http404
 from django.shortcuts import redirect
 from django.urls.base import reverse
+from django.urls.conf import re_path
 from django.utils.decorators import classonlymethod
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
@@ -1077,8 +1077,8 @@ class Crud:
         for regex_list, view, suffix in cruds:
             for regex, suf in regex_list:
                 suf = f'{suffix}_{suf}' if suf else suffix
-                u = url(regex, view.as_view(),
-                        name=view.url_name(suf))
+                u = re_path(regex, view.as_view(),
+                            name=view.url_name(suf))
                 urls.append(u)
 
         return urls

@@ -2,7 +2,7 @@ from crispy_forms.bootstrap import FieldWithButtons, StrictButton
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field
 from django import forms
-from django.conf.urls import url
+from django.urls.conf import re_path
 from django.contrib.auth import logout
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
@@ -190,7 +190,7 @@ class PerfilAbstractCrud(Crud):
         CrudDeleteView = _add_base(cls.DeleteView)
 
         return [
-            url(regex, view.as_view(), name=view.url_name(suffix))
+            re_path(regex, view.as_view(), name=view.url_name(suffix))
             for regex, view, suffix in [
                 (CrudListView.get_url_regex(),
                  CrudDetailView, base.ACTION_DETAIL),
@@ -352,7 +352,7 @@ class PerfilDetailCrudPermission(MasterDetailCrud):
         CrudDeleteView = _add_base(cls.DeleteView)
 
         return [
-            url(regex, view.as_view(), name=view.url_name(suffix))
+            re_path(regex, view.as_view(), name=view.url_name(suffix))
             for regex, view, suffix in [
                 (CrudListView.get_url_regex(),
                  CrudListView, base.ACTION_LIST),
