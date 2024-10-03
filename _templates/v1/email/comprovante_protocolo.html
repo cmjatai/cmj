@@ -1,5 +1,5 @@
 {% extends "base_email.html" %}
-{% load i18n staticfiles %}
+{% load i18n static %}
 
 {% block email_content_table %}
 
@@ -8,7 +8,7 @@
    <b>COMPROVANTE DE PROTOCOLO</b>
     <br>
     Autenticação: {{ autenticacao }}
-    <br>  
+    <br>
   </td>
   <td colspan=4>
     <img src="{{barcode}}" height="50px" width="170px">
@@ -17,7 +17,7 @@
 <tr>
    <td colspan=12 style="text-align: left; padding: 10px;">
 	   <strong>Número / Ano:</strong>
-{{ protocolo.numero|stringformat:'06d' }}/{{ protocolo.ano }} | 
+{{ protocolo.numero|stringformat:'06d' }}/{{ protocolo.ano }} |
 <strong>Data / Horário:</strong>
 {% if protocolo.timestamp %}
   {{ protocolo.timestamp|date:"d/m/Y" }} - {{ protocolo.timestamp|date:"H:i:s" }}
@@ -44,7 +44,7 @@
 <br><strong>Assunto:</strong> {{ protocolo.assunto_ementa }}
 <br><strong>Interessado:</strong> {{ protocolo.interessado }}
 
-<br><strong>Natureza:</strong>  
+<br><strong>Natureza:</strong>
 {% if protocolo.tipo_processo == 0 %} Administrativo {% elif protocolo.tipo_processo == 1 %} Legislativo {% endif %}
 
 {% endif %}

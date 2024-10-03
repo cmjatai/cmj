@@ -1,4 +1,4 @@
-{% load i18n staticfiles common_cmj_tags cropping%}
+{% load i18n static common_cmj_tags cropping%}
 {% load webpack_static from webpack_loader %}
     <link rel="manifest" href="/manifest.json">
     <link rel="canonical" href="{{site_url}}{{request.META.PATH_INFO}}{% if request.META.QUERY_STRING %}?{{request.META.QUERY_STRING}}{% endif %}" />

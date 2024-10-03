@@ -1,16 +1,16 @@
 {% extends "base_email.html" %}
-{% load i18n staticfiles %}
+{% load i18n static %}
 {% load webpack_static from webpack_loader %}
 
 {% block email_content %}
   <div style="padding: 30px 20px 40px;">
-    <p>Registramos seu pedido para acompanhamento por e-mail 
+    <p>Registramos seu pedido para acompanhamento por e-mail
     {% if tipo == 'materia' %}
       da matéria legislativa identificada a seguir:</p>
     {% else %}
       do documento administrativo identificado a seguir:</p>
     {% endif %}
-    
+
     <a href="{{base_url}}{{materia_url}}">
       {{materia}}<br>
       <b>{{descricao_materia}}</b>
@@ -18,7 +18,7 @@
     <br/>
     {{ementa}}
     <br/>
-    
+
     <p>Para garantia de sua privacidade, solicitamos que ative o recebimento das futuras mensagens clicando no link:</p>
 
 <h4>
