@@ -22,7 +22,7 @@ from django.db import models
 from django.db.models import Q
 from django.db.models.fields.files import FieldFile, ImageFieldFile
 from django.forms import BaseForm
-from django.forms.widgets import SplitDateTimeWidget
+from django.forms.widgets import SplitDateTimeWidget, ClearableFileInput
 from django.http.response import HttpResponse
 from django.template import loader
 from django.urls.base import reverse
@@ -31,7 +31,6 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 import django_filters
 from easy_thumbnails import source_generators
-from floppyforms.widgets import ClearableFileInput
 from image_cropping.widgets import ImageCropWidget
 import magic
 from trml2pdf import parseString as trml2pdfParseString
@@ -343,7 +342,7 @@ class PortalImageField(models.ImageField):
 
 
 class ImageThumbnailFileInput(ClearableFileInput):
-    template_name = 'floppyforms/image_thumbnail.html'
+    template_name = 'widgets/image_thumbnail.html'
 
 
 class CustomImageCropWidget(ImageCropWidget):
