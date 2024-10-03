@@ -25,7 +25,7 @@ from django.urls.base import reverse_lazy, reverse
 from django.utils.dateparse import parse_date
 from django.utils.encoding import force_text
 from django.utils.text import format_lazy, slugify
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import TemplateView, ContextMixin
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import (CreateView, DeleteView, FormView,
@@ -975,7 +975,7 @@ class TextView(CompMixin, ListView):
                     self.object.content_object._meta.verbose_name,
                     '''
                         No entanto, sua consulta é possível da forma trivial através
-                        do Arquivo Digitalizado abaixo. 
+                        do Arquivo Digitalizado abaixo.
                         ''' if self.object.content_object.texto_integral else ''
                 )))
 
@@ -2095,7 +2095,7 @@ class ActionDeleteDispositivoMixin(ActionsCommonsMixin):
                     continua internos extra bloco.
                     Depois do bloco limpo, a função é chamada novamente para
                     excluir realmente a escolha do usuário
-                    e religar seus irmaos  
+                    e religar seus irmaos
                     """
                     self.remover_dispositivo(base, False)
 
@@ -2977,7 +2977,7 @@ class ActionsEditMixin(ActionDragAndMoveDispositivoAlteradoMixin,
             pk=dsp_a_alterar)
 
         """print(', '.join(
-            
+
             list(
                 map(str, dsp_a_alterar.get_parents_asc())
                 )+ [dsp_a_alterar.rotulo, ]
@@ -3356,13 +3356,13 @@ class DispositivoSearchFragmentFormView(ListView):
                 AND_CONTROLS = 'AND td.dispositivo_de_alteracao = false'
             else:
                 if df == 'alterador':
-                    AND_CONTROLS = '''AND td.dispositivo_de_alteracao = true 
+                    AND_CONTROLS = '''AND td.dispositivo_de_alteracao = true
                                     AND td.dispositivo_de_articulacao = true'''
 
             texto = list(map("d.texto ~* '{}'".format, texto))
             if str_texto and rotulo:
                 AND_TEXTO_ROTULO = '''AND (  ({BUSCA_TEXTO} AND d.rotulo ~* '{BUSCA_ROTULO}')  OR
-                                         ({BUSCA_TEXTO} AND d.rotulo = '' AND dp.rotulo ~* '{BUSCA_ROTULO}')  
+                                         ({BUSCA_TEXTO} AND d.rotulo = '' AND dp.rotulo ~* '{BUSCA_ROTULO}')
                                       )'''.format(
                     BUSCA_TEXTO=' AND '.join(texto),
                     BUSCA_ROTULO=rotulo
@@ -3389,31 +3389,31 @@ class DispositivoSearchFragmentFormView(ListView):
             if ta:
                 AND_EDIT_CLONE = 'AND ta.object_id != 0' if ta.object_id else 'AND ta.object_id = 0'
 
-            sql = ''' 
-                SELECT d.* FROM compilacao_dispositivo d 
+            sql = '''
+                SELECT d.* FROM compilacao_dispositivo d
                     JOIN compilacao_dispositivo dp on (d.dispositivo_pai_id = dp.id)
                     JOIN compilacao_tipodispositivo td on (d.tipo_dispositivo_id = td.id)
-                    JOIN compilacao_textoarticulado ta on (d.ta_id = ta.id) 
-                    
+                    JOIN compilacao_textoarticulado ta on (d.ta_id = ta.id)
+
                     {JOIN_TYPE_MODEL_SELECTED}
-                    
+
                     where d.nivel > 0
-                    
+
                     {AND_TYPE_MODEL_SELECTED}
-                    
+
                     {AND_TEXTO_ROTULO}
                     {AND1_NUMERO}
                     {AND2_ANO}
                     {AND3_TIPO_TA}
                     {AND_CONTROLS}
-                   
+
                     {AND_EDIT_CLONE}
-                   
-                    order by ta.data desc, 
-                            ta.numero desc, 
-                            ta.id desc, 
-                            d.ordem 
-                    {limit}; 
+
+                    order by ta.data desc,
+                            ta.numero desc,
+                            ta.id desc,
+                            d.ordem
+                    {limit};
                 '''.format(
 
                 limit='limit {}'.format(limit) if limit else '',

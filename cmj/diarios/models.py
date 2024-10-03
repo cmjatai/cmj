@@ -4,7 +4,7 @@ from django.contrib.postgres.fields.jsonb import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.urls.base import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from cmj.mixins import CommonMixin, CmjCleanMixin
 from cmj.utils import texto_upload_path

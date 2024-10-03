@@ -2,7 +2,7 @@ import pytest
 from model_mommy import mommy
 import datetime
 from django.core.urlresolvers import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from model_mommy import mommy
 
 from sapl.base.models import Autor, TipoAutor
@@ -429,7 +429,7 @@ def test_lista_anexados_ciclicas():
                 sigla="TT",
                 descricao="Tipo_Teste"
         )
-        
+
         documento_a = mommy.make(
                 DocumentoAdministrativo,
                 tipo=tipo_documento,
@@ -575,7 +575,7 @@ def test_lista_anexados_ciclicas():
                 data_apresentacao="2019-05-08",
                 regime_tramitacao=regime_tramitacao,
                 tipo=tipo_materia
-        ) 
+        )
 
         mommy.make(
                 Anexada,

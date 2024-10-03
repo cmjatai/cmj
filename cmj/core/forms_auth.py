@@ -12,7 +12,7 @@ from django.contrib.auth.forms import \
 from django.contrib.auth.models import Group, Permission
 from django.core.exceptions import ValidationError
 from django.forms.models import ModelForm
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from image_cropping.widgets import ImageCropWidget,\
     get_attrs, CropWidget
 

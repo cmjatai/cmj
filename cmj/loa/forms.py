@@ -13,7 +13,7 @@ from django.forms.widgets import HiddenInput, NumberInput, TextInput
 from django.template.base import Template
 from django.template.context import Context
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django_filters.filters import MultipleChoiceFilter,\
     ModelMultipleChoiceFilter
 from django_filters.filterset import FilterSet

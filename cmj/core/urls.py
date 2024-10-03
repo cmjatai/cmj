@@ -4,7 +4,7 @@ from django.contrib.auth import views as v_auth
 from django.contrib.auth.decorators import permission_required, login_required
 from django.contrib.auth.views import PasswordResetDoneView,\
     PasswordResetConfirmView, PasswordResetCompleteView, LogoutView
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import TemplateView
 
 from cmj.core.forms_auth import NovaSenhaForm

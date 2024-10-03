@@ -5,7 +5,7 @@ from django import forms
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.forms.models import ModelForm
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from cmj.context_processors import areatrabalho
 from cmj.core.models import AreaTrabalho, Notificacao
@@ -53,10 +53,10 @@ class DenunciaForm(ModelForm):
                             Só será
                             possível acompanhar e interagir com a ouvidoria
                             através deste link.<br>
-                            Veja que este link será como um código 
-                            privativo seu sem sua identificação, 
-                            no entanto, se você compartilhar esse link, 
-                            quem possuí-lo verá sua denúncia 
+                            Veja que este link será como um código
+                            privativo seu sem sua identificação,
+                            no entanto, se você compartilhar esse link,
+                            quem possuí-lo verá sua denúncia
                             e poderá interagir também.
                             """),
                         css_class="alert-warning",

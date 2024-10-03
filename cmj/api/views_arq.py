@@ -20,7 +20,7 @@ from django.db.models.deletion import ProtectedError
 from django.http.response import HttpResponse
 from django.utils import timezone
 from django.utils.text import slugify
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 import fitz
 from rest_framework import status
 from rest_framework.decorators import action

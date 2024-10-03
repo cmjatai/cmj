@@ -2,7 +2,7 @@ from django.conf import settings
 from django.db import transaction
 from django.db.models.signals import post_save
 from django.dispatch.dispatcher import receiver
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from rest_framework import viewsets, status
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes

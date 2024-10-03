@@ -28,7 +28,7 @@ from django.template import loader
 from django.urls.base import reverse
 from django.utils import six, timezone
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 import django_filters
 from easy_thumbnails import source_generators
 from image_cropping.widgets import ImageCropWidget

@@ -12,7 +12,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.urls.base import reverse
 from django.utils import timezone
 from django.utils.encoding import force_text
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView, UpdateView, ListView
 from django.views.generic.edit import FormView
 from django_filters.views import FilterView

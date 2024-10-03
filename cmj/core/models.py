@@ -12,7 +12,7 @@ from django.db import models
 from django.db.models.deletion import PROTECT, CASCADE, SET_NULL
 from django.utils import timezone
 from django.utils.decorators import classonlymethod
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from image_cropping import ImageCropField, ImageRatioField
 
 from cmj.globalrules import MENU_PERMS_FOR_USERS, GROUP_SOCIAL_USERS

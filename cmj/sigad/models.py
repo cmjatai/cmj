@@ -24,7 +24,7 @@ from django.http.response import HttpResponse
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.text import slugify
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django_extensions.db.fields.json import JSONField as django_extensions_JSONField
 import qrcode
 from reportlab.lib.pagesizes import A4, landscape

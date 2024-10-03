@@ -26,7 +26,7 @@ from django.template.loader import render_to_string
 from django.urls.base import reverse
 from django.utils import timezone, formats
 from django.utils.encoding import force_text
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView, CreateView, UpdateView
 from django.views.generic.base import RedirectView, TemplateView, ContextMixin
 from django.views.generic.detail import DetailView

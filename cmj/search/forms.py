@@ -7,7 +7,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.http.request import QueryDict
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from haystack.backends import SQ
 from haystack.forms import ModelSearchForm, SearchForm
 from haystack.inputs import Raw

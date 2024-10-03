@@ -4,7 +4,7 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models.aggregates import Max
 from django.http.response import HttpResponse
 from django.utils import formats, timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.generic.edit import FormView
 
 from cmj.cerimonial.forms import LocalTrabalhoForm, EnderecoForm,\

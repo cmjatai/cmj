@@ -12,7 +12,7 @@ from django.forms import widgets
 from django.forms.forms import Form
 from django.forms.models import ModelForm
 from django.template import defaultfilters
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from model_utils.choices import Choices
 
 from sapl import utils

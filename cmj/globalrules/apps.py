@@ -3,7 +3,7 @@ from django.db.models.signals import post_save, post_delete, post_migrate
 from django.db.utils import DEFAULT_DB_ALIAS
 from django.dispatch.dispatcher import receiver
 from django.utils.text import format_lazy
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 class AppConfig(apps.AppConfig):

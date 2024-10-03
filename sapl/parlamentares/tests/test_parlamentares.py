@@ -1,6 +1,6 @@
 import pytest
 from django.core.urlresolvers import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from model_mommy import mommy
 from datetime import datetime
 
@@ -311,7 +311,7 @@ def test_legislatura_form_numeros_invalidos():
                                  data_inicio='2002-02-01',
                                  data_fim='2005-12-31',
                                  data_eleicao='2001-11-01')
-        
+
         legislatura2 = mommy.make(Legislatura, pk=3,
                                  numero=3,
                                  data_inicio='2008-02-01',
@@ -419,8 +419,8 @@ def test_afastamentos_form_datas_invalidas():
                          parlamentar = parlamentar,
                          data_inicio_mandato='2017-01-01',
                          data_fim_mandato='2021-12-31')
-    tipo_afastamento = mommy.make(TipoAfastamento, 
-                                  indicador= 'A', 
+    tipo_afastamento = mommy.make(TipoAfastamento,
+                                  indicador= 'A',
                                   pk=1)
 
     form = AfastamentoParlamentarForm(data={
@@ -507,8 +507,8 @@ def test_afastamentos_form_campos_invalidos():
                          parlamentar = parlamentar,
                          data_inicio_mandato='2017-01-01',
                          data_fim_mandato='2021-12-31')
-    tipo_afastamento = mommy.make(TipoAfastamento, 
-                                  indicador= 'A', 
+    tipo_afastamento = mommy.make(TipoAfastamento,
+                                  indicador= 'A',
                                   pk=1)
 
     form = AfastamentoParlamentarForm(data={}, initial={'parlamentar': parlamentar.pk})
@@ -527,7 +527,7 @@ def test_parlamentar_esta_afastado():
                          parlamentar = parlamentar,
                          data_inicio_mandato='2017-01-01',
                          data_fim_mandato='2021-12-31')
-    afastamento = AfastamentoParlamentar.objects.create(mandato=mandato, 
+    afastamento = AfastamentoParlamentar.objects.create(mandato=mandato,
                                                         parlamentar=parlamentar,
                                                         data_inicio='2017-12-05',
                                                         data_fim='2017-12-12')
@@ -541,7 +541,7 @@ def test_parlamentar_esta_afastado():
     assert not verifica_afastamento_parlamentar(parlamentar, '2017-12-13', '2017-12-15')
     assert not verifica_afastamento_parlamentar(parlamentar, '2017-12-15', '2017-12-15')
 
-    afastamento = AfastamentoParlamentar.objects.create(mandato=mandato, 
+    afastamento = AfastamentoParlamentar.objects.create(mandato=mandato,
                                                         parlamentar=parlamentar,
                                                         data_inicio='2017-12-05')
 

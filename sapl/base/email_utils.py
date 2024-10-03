@@ -5,7 +5,7 @@ from django.core.mail import EmailMultiAlternatives, get_connection, send_mail
 from django.template import Context, loader
 from django.urls.base import reverse
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from sapl.base.models import CasaLegislativa
 from sapl.materia.models import AcompanhamentoMateria

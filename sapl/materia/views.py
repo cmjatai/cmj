@@ -29,7 +29,7 @@ from django.utils import formats, timezone
 from django.utils.encoding import force_text
 from django.utils.text import slugify
 from django.utils.timezone import get_default_timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView, TemplateView, CreateView, UpdateView
 from django.views.generic.base import RedirectView
 from django.views.generic.edit import FormView

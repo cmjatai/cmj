@@ -2,7 +2,7 @@
 from django.conf import settings
 from django.urls.base import reverse
 from django.utils.encoding import force_text
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from haystack.views import SearchView
 
 from cmj.core.models import AreaTrabalho

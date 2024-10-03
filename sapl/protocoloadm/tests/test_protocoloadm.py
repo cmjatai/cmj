@@ -3,7 +3,7 @@ from datetime import date, timedelta
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.utils.encoding import force_text
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from model_mommy import mommy
 from urllib.parse import urlencode
 import pytest
@@ -170,7 +170,7 @@ def test_create_tramitacao(admin_client):
 
     msg = force_text(_('A origem da nova tramitação deve ser igual ao '
                        'destino  da última adicionada!'))
-                       
+
     # Verifica se a origem da nova tramitacao é igual ao destino da última
     assert msg in response.context_data[
         'form'].errors['__all__']
@@ -505,7 +505,7 @@ def test_lista_documentos_anexados():
     )
 
     lista = lista_anexados(documento_principal, False)
-    
+
     assert len(lista) == 2
     assert lista[0] == documento_anexado
     assert lista[1] == documento_anexado_anexado
@@ -531,7 +531,7 @@ def make_unidade_tramitacao(descricao):
 
     return unidade
 
-        
+
 @pytest.mark.django_db(transaction=False)
 def test_tramitacoes_documentos_anexados(admin_client):
 
@@ -633,14 +633,14 @@ def test_tramitacoes_documentos_anexados(admin_client):
 
 
     # Teste Remoção de Tramitacao
-    url = reverse('sapl.protocoloadm:tramitacaoadministrativo_delete', 
+    url = reverse('sapl.protocoloadm:tramitacaoadministrativo_delete',
                     kwargs={'pk': tramitacao_principal.pk})
     response = admin_client.post(url, {'confirmar':'confirmar'} ,follow=True)
     assert TramitacaoAdministrativo.objects.filter(id=tramitacao_principal.pk).count() == 0
     assert TramitacaoAdministrativo.objects.filter(id=tramitacao_anexada.pk).count() == 0
     assert TramitacaoAdministrativo.objects.filter(id=tramitacao_anexada_anexada.pk).count() == 0
-    
-    
+
+
     # Testes para quando as tramitações das anexadas divergem
     form = TramitacaoAdmForm(data={})
     form.data = {'data_tramitacao':date(2019, 5, 6),
@@ -695,7 +695,7 @@ def test_tramitacoes_documentos_anexados(admin_client):
     assert not tramitacao_anexada_anexada.texto == "Testando a alteração"
 
     # Removendo a tramitação pricipal, as tramitações anexadas não devem ser removidas, pois divergiram
-    url = reverse('sapl.protocoloadm:tramitacaoadministrativo_delete', 
+    url = reverse('sapl.protocoloadm:tramitacaoadministrativo_delete',
                     kwargs={'pk': tramitacao_principal.pk})
     response = admin_client.post(url, {'confirmar':'confirmar'} ,follow=True)
     assert TramitacaoAdministrativo.objects.filter(id=tramitacao_principal.pk).count() == 0
@@ -703,7 +703,7 @@ def test_tramitacoes_documentos_anexados(admin_client):
     assert TramitacaoAdministrativo.objects.filter(id=tramitacao_anexada_anexada.pk).count() == 1
 
     # Removendo a tramitação anexada, a tramitação anexada à anexada deve ser removida
-    url = reverse('sapl.protocoloadm:tramitacaoadministrativo_delete', 
+    url = reverse('sapl.protocoloadm:tramitacaoadministrativo_delete',
                     kwargs={'pk': tramitacao_anexada.pk})
     response = admin_client.post(url, {'confirmar':'confirmar'} ,follow=True)
     assert TramitacaoAdministrativo.objects.filter(id=tramitacao_anexada.pk).count() == 0
@@ -749,7 +749,7 @@ def test_tramitacoes_documentos_anexados(admin_client):
 
     assert form.is_valid()
     tramitacao_anexada = form.save()
-    tramitacao_principal = documento_principal.tramitacaoadministrativo_set.last() 
+    tramitacao_principal = documento_principal.tramitacaoadministrativo_set.last()
     tramitacao_anexada_anexada = documento_anexado_anexado.tramitacaoadministrativo_set.last()
 
     assert documento_principal.tramitacaoadministrativo_set.all().count() == 1
@@ -757,7 +757,7 @@ def test_tramitacoes_documentos_anexados(admin_client):
     assert not tramitacao_anexada_anexada
 
     form = TramitacaoAdmEditForm(data={})
-    # Alterando unidade_tramitacao_destino da matéria principal, 
+    # Alterando unidade_tramitacao_destino da matéria principal,
     # as anexadas não devem ser alteradas
     form.data = {'data_tramitacao':tramitacao_principal.data_tramitacao,
                 'unidade_tramitacao_local':tramitacao_principal.unidade_tramitacao_local.pk,
@@ -788,7 +788,7 @@ def test_tramitacoes_documentos_anexados(admin_client):
     form.instance = tramitacao_anexada
 
     assert form.is_valid()
-    tramitacao_anexada = form.save() 
+    tramitacao_anexada = form.save()
     tramitacao_principal = documento_principal.tramitacaoadministrativo_set.last()
     tramitacao_anexada_anexada = documento_anexado_anexado.tramitacaoadministrativo_set.last()
 
@@ -798,7 +798,7 @@ def test_tramitacoes_documentos_anexados(admin_client):
     assert compara_tramitacoes_doc(tramitacao_anexada, tramitacao_principal)
 
     # Removendo a tramitação principal, a tramitação anexada não deve ser removida
-    url = reverse('sapl.protocoloadm:tramitacaoadministrativo_delete', 
+    url = reverse('sapl.protocoloadm:tramitacaoadministrativo_delete',
                     kwargs={'pk': tramitacao_principal.pk})
     response = admin_client.post(url, {'confirmar':'confirmar'} ,follow=True)
     assert TramitacaoAdministrativo.objects.filter(id=tramitacao_principal.pk).count() == 0
@@ -977,7 +977,7 @@ def test_tramitacao_lote_documentos_views(admin_client):
 
     # Primeira tramitação em lote
 
-    response = admin_client.post(url, 
+    response = admin_client.post(url,
                                     {'documentos': documentos,
                                     'data_tramitacao': date(2019, 5, 15),
                                     'unidade_tramitacao_local': unidade_tramitacao_local_1.id,
@@ -985,9 +985,9 @@ def test_tramitacao_lote_documentos_views(admin_client):
                                     'status': status.id,
                                     'urgente': False,
                                     'texto': 'aaaa',
-                                    'salvar':'salvar'}, 
+                                    'salvar':'salvar'},
                                 follow=True)
-    
+
     assert response.status_code == 200
 
     assert TramitacaoAdministrativo.objects.all().count() == 2
@@ -998,10 +998,10 @@ def test_tramitacao_lote_documentos_views(admin_client):
 
     url_lote = reverse('sapl.protocoloadm:tramitacao_em_lote_docadm')
     url_lote = url_lote + '?' + urlencode(
-                                    {'tipo':tipo_documento.id, 
+                                    {'tipo':tipo_documento.id,
                                     'tramitacaoadministrativo__unidade_tramitacao_destino':unidade_tramitacao_destino_1.id,
                                     'tramitacaoadministrativo__status': status.id,
-                                    'data_0':'', 
+                                    'data_0':'',
                                     'data_1':''})
 
     response = admin_client.post(url_lote, {'salvar':'salvar'}, follow=True)
@@ -1023,7 +1023,7 @@ def test_tramitacao_lote_documentos_views(admin_client):
     assert 'Status: Este campo é obrigatório.' in msgs
     assert 'Unidade Destino: Este campo é obrigatório.' in msgs
     assert 'Texto da Ação: Este campo é obrigatório.' in msgs
-    
+
     response = admin_client.post(url_lote,
                                 {'documentos': documentos,
                                 'data_tramitacao': date(2019, 5, 15),
@@ -1032,7 +1032,7 @@ def test_tramitacao_lote_documentos_views(admin_client):
                                 'status': status.id,
                                 'urgente': False,
                                 'texto': 'aaaa',
-                                'salvar':'salvar'}, 
+                                'salvar':'salvar'},
                                 follow=True)
     assert response.status_code == 200
 
@@ -1048,7 +1048,7 @@ def test_tramitacao_lote_documentos_views(admin_client):
     # O documento anexado ao anexado não deve tramitar junto porque já está com tramitação diferente
     documentos = [documento_principal.id]
 
-    response = admin_client.post(url, 
+    response = admin_client.post(url,
                                     {'documentos': documentos,
                                     'data_tramitacao': date(2019, 5, 15),
                                     'unidade_tramitacao_local': unidade_tramitacao_local_1.id,
@@ -1056,9 +1056,9 @@ def test_tramitacao_lote_documentos_views(admin_client):
                                     'status': status.id,
                                     'urgente': False,
                                     'texto': 'aaaa',
-                                    'salvar':'salvar'}, 
+                                    'salvar':'salvar'},
                                 follow=True)
-    
+
     assert response.status_code == 200
 
     assert TramitacaoAdministrativo.objects.all().count() == 6
@@ -1074,7 +1074,7 @@ def test_tramitacao_lote_documentos_views(admin_client):
                                 'status': status.id,
                                 'urgente': False,
                                 'texto': 'aaaa',
-                                'salvar':'salvar'}, 
+                                'salvar':'salvar'},
                                 follow=True)
     assert response.status_code == 200
 
@@ -1087,7 +1087,7 @@ def test_tramitacao_lote_documentos_views(admin_client):
     assert documento_anexado.tramitacaoadministrativo_set.all().count() == 2
 
     # Terceira tramitação em lote
-    # Agora, o documento anexado ao anexado deve tramitar junto com o documento principal, 
+    # Agora, o documento anexado ao anexado deve tramitar junto com o documento principal,
     # pois suas tramitações convergiram
 
     response = admin_client.post(url_lote,
@@ -1098,7 +1098,7 @@ def test_tramitacao_lote_documentos_views(admin_client):
                                 'status': status.id,
                                 'urgente': False,
                                 'texto': 'aaaa',
-                                'salvar':'salvar'}, 
+                                'salvar':'salvar'},
                                 follow=True)
     assert response.status_code == 200
 
@@ -1125,7 +1125,7 @@ def test_tramitacao_lote_documentos_views(admin_client):
     # O documento anexado não deve tramitar junto com o prinicpal
     documentos = [documento_principal.id]
 
-    response = admin_client.post(url, 
+    response = admin_client.post(url,
                                 {'documentos': documentos,
                                 'data_tramitacao': date(2019, 5, 15),
                                 'unidade_tramitacao_local': unidade_tramitacao_local_1.id,
@@ -1133,9 +1133,9 @@ def test_tramitacao_lote_documentos_views(admin_client):
                                 'status': status.id,
                                 'urgente': False,
                                 'texto': 'aaaa',
-                                'salvar':'salvar'}, 
+                                'salvar':'salvar'},
                                 follow=True)
-    
+
     assert response.status_code == 200
 
     assert TramitacaoAdministrativo.objects.all().count() == 1
@@ -1146,7 +1146,7 @@ def test_tramitacao_lote_documentos_views(admin_client):
     # Tramitar o doc anexado ao principal para testar a segunda tramitação em lote
     documentos = [documento_anexado.id]
 
-    response = admin_client.post(url, 
+    response = admin_client.post(url,
                                 {'documentos': documentos,
                                 'data_tramitacao': date(2019, 5, 15),
                                 'unidade_tramitacao_local': unidade_tramitacao_local_1.id,
@@ -1154,9 +1154,9 @@ def test_tramitacao_lote_documentos_views(admin_client):
                                 'status': status.id,
                                 'urgente': False,
                                 'texto': 'aaaa',
-                                'salvar':'salvar'}, 
+                                'salvar':'salvar'},
                                 follow=True)
-    
+
     assert response.status_code == 200
 
     assert TramitacaoAdministrativo.objects.all().count() == 2
@@ -1178,7 +1178,7 @@ def test_tramitacao_lote_documentos_views(admin_client):
                                 'status': status.id,
                                 'urgente': False,
                                 'texto': 'aaaa',
-                                'salvar':'salvar'}, 
+                                'salvar':'salvar'},
                                 follow=True)
     assert response.status_code == 200
 

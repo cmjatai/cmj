@@ -11,7 +11,7 @@ from django.forms.utils import ErrorList
 from django.http.response import HttpResponse
 from django.template.defaultfilters import lower
 from django.utils.encoding import force_text
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django_filters.views import FilterView
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_RIGHT

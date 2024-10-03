@@ -20,7 +20,7 @@ from django.db.models.expressions import Func
 from django.forms import widgets
 from django.forms.models import ModelForm, ModelMultipleChoiceField
 from django.http.request import QueryDict
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django_filters.filters import CharFilter, ChoiceFilter, NumberFilter,\
     ModelChoiceFilter, RangeFilter,\
     MultipleChoiceFilter, ModelMultipleChoiceFilter, Filter

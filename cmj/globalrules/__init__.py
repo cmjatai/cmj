@@ -1,4 +1,4 @@
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from sapl.rules import SAPL_GROUP_ADMINISTRATIVO, SAPL_GROUP_PROTOCOLO
 
 default_app_config = 'cmj.globalrules.apps.AppConfig'

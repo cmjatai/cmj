@@ -4,7 +4,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models.deletion import SET_NULL, PROTECT, CASCADE
 from django.utils import timezone, formats
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from cmj.core.models import CmjModelMixin, Trecho, Distrito, RegiaoMunicipal,\
     CmjAuditoriaModelMixin, CmjSearchMixin, AreaTrabalho, Bairro, Municipio

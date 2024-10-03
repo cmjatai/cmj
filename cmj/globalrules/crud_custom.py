@@ -15,7 +15,7 @@ from django.utils import six
 from django.utils.datastructures import OrderedSet
 from django.utils.decorators import classonlymethod
 from django.utils.encoding import force_text
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import ContextMixin
 from django.views.generic.list import MultipleObjectMixin
 
