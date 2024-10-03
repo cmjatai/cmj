@@ -7,6 +7,7 @@ from django.core.management.base import BaseCommand
 from django.db.models.aggregates import Count
 from django.db.models.expressions import OuterRef, Subquery
 from django.db.models.signals import post_delete, post_save
+from django.forms.models import model_to_dict
 from django.utils import timezone
 from django_celery_results.models import TaskResult
 
@@ -53,8 +54,25 @@ class Command(BaseCommand):
 
     def clean_blank_audit_log(self):
 
+        # 1) apaga auditlog de bots de buscas que nada foi filtrado,
+        # senão apenas páginas variadas
+        run_sql('''delete from core_auditlog where id in (select id from (select id, count(p) 
+                from core_auditlog
+                    left join lateral jsonb_object_keys(obj->'params') p on true
+            where
+                operation = 'P' and
+                obj->'params'->'page' is not null
+            group by id
+                having count(p) = 1
+            order by id desc) as auditlog_bots_get_only_pages)
+            ;
+        ''')
+        return
+        # refatorar algoritmo abaixo para remover exclusões que não devem
+        # acontecer
+
         run_sql('delete from core_auditlog where obj_id=0;')
-        run_sql('delete from core_auditlog where content_type_id = 266;')
+        #run_sql('delete from core_auditlog where content_type_id = 266;')
         run_sql('delete from core_auditlog where content_type_id is null;')
 
         logs = AuditLog.objects.filter(

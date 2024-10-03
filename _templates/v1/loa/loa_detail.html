@@ -2,7 +2,6 @@
 {% block appvue_content %}{% endblock appvue_content %}
 {% block table_content %}
 <div class="bg-white mb-5 p-2">
-
   {% if object.materia and not object.materia.normajuridica %}
     Obs: O <a href="{% url 'sapl.materia:materialegislativa_detail' object.materia.id %}">
       {{object.materia.epigrafe_short}}</a>
@@ -14,7 +13,6 @@
       e na aba <a href="/loa/{{object.id}}/emendaloa">Emendas Impositivas</a>,
       as destinações e seus valores.
   {% endif %}
-
 </div>
 <h2 class="legend">Resumo Gráfico das Despesas da LOA</h2>
 <div id="app"></div>

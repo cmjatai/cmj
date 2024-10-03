@@ -43,6 +43,10 @@ EmendaLoaDetail:
       col-md-12:
       - registroajusteloa_set
       - documentos_acessorios
+    {% trans 'Registro de Alterações' %}:
+      col-md-12:
+      - auditlog
+
 
 OficioAjusteLoa:
   {% trans 'Dados Gerais' %}:

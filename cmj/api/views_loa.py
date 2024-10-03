@@ -445,7 +445,7 @@ class _EmendaLoaViewSet:
         data['emendaloa_id'] = kwargs['pk']
         dvalor = data.pop('valor')
         try:
-            valor = Decimal(dvalor)
+            valor = Decimal(dvalor.replace('.', '').replace(',', '.'))
         except:
             valor = Decimal('0.00')
 
