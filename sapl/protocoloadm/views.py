@@ -37,7 +37,6 @@ from cmj.core.models import AreaTrabalho
 from cmj.mixins import BtnCertMixin, PluginSignMixin, MultiFormatOutputMixin
 from sapl.base.email_utils import do_envia_email_confirmacao
 from sapl.base.models import Autor, CasaLegislativa, AppConfig
-from sapl.base.signals import tramitacao_signal
 from sapl.comissoes.models import Comissao
 from sapl.crud.base import (Crud, CrudAux, MasterDetailCrud, make_pagination,
                             RP_LIST, RP_DETAIL,
@@ -1106,9 +1105,7 @@ class TramitacaoAdmCrud(MasterDetailCrud):
             self.object = form.save()
             username = self.request.user.username
             try:
-                tramitacao_signal.send(sender=TramitacaoAdministrativo,
-                                       post=self.object,
-                                       request=self.request)
+                pass
             except Exception as e:
                 self.logger.error('user=' + username + '. Tramitação criada, mas e-mail de acompanhamento de documento '
                                   'não enviado. A não configuração do servidor de e-mail '
@@ -1138,9 +1135,7 @@ class TramitacaoAdmCrud(MasterDetailCrud):
             self.object = form.save()
             username = self.request.user.username
             try:
-                tramitacao_signal.send(sender=TramitacaoAdministrativo,
-                                       post=self.object,
-                                       request=self.request)
+                pass
             except Exception as e:
                 self.logger.error('user=' + username + '. Tramitação criada, mas e-mail de acompanhamento de documento '
                                   'não enviado. A não configuração do servidor de e-mail '

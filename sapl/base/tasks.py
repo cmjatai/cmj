@@ -6,10 +6,11 @@ from sapl.protocoloadm.models import StatusTramitacaoAdministrativo, DocumentoAd
 
 logger = logging.getLogger(__name__)
 
+
 @app.task(queue='cq_base')
 def task_envia_email_tramitacao(kwargs):
     print(f'task_envia_email_tramitacao: {kwargs}')
-    log.info(f'task_envia_email_tramitacao: {kwargs}')
+    logger.info(f'task_envia_email_tramitacao: {kwargs}')
 
     tipo = kwargs.get("tipo")
     doc_mat_id = kwargs.get("doc_mat_id")

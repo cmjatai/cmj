@@ -45,7 +45,6 @@ import requests as rq
 import sapl
 from sapl.base.email_utils import do_envia_email_confirmacao
 from sapl.base.models import Autor, CasaLegislativa, AppConfig as BaseAppConfig
-from sapl.base.signals import tramitacao_signal
 from sapl.comissoes.models import Comissao, Participacao, Composicao
 from sapl.compilacao.models import (STATUS_TA_IMMUTABLE_RESTRICT,
                                     STATUS_TA_PRIVATE)
@@ -1575,9 +1574,6 @@ class TramitacaoCrud(MasterDetailCrud):
             try:
                 self.logger.debug("user=" + username + ". Tentando enviar Tramitacao (sender={}, post={}, request={})."
                                   .format(Tramitacao, self.object, self.request))
-                tramitacao_signal.send(sender=Tramitacao,
-                                       post=self.object,
-                                       request=self.request)
             except Exception as e:
                 msg = _('Tramitação criada, mas e-mail de acompanhamento '
                         'de matéria não enviado. Há problemas na configuração '
@@ -1621,9 +1617,7 @@ class TramitacaoCrud(MasterDetailCrud):
             try:
                 self.logger.debug("user=" + user.username + ". Tentando enviar Tramitacao (sender={}, post={}, request={}"
                                   .format(Tramitacao, self.object, self.request))
-                tramitacao_signal.send(sender=Tramitacao,
-                                       post=self.object,
-                                       request=self.request)
+                pass
             except Exception:
                 msg = _('Tramitação atualizada, mas e-mail de acompanhamento '
                         'de matéria não enviado. Há problemas na configuração '

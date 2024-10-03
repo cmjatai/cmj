@@ -1,8 +1,11 @@
+import inspect
+import logging
+
 from django.contrib.contenttypes.models import ContentType
-from django.db.models.signals import post_delete
+from django.db.models.signals import post_delete, post_save
 from django.db.models.signals import post_migrate
 from django.db.utils import DEFAULT_DB_ALIAS
-from django.dispatch import Signal, receiver
+from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 
 from sapl.base.models import Autor, TipoAutor as modelTipoAutor
@@ -14,19 +17,31 @@ from sapl.utils import models_with_gr_for_model
 from .tasks import task_envia_email_tramitacao
 
 
-tramitacao_signal = Signal(providing_args=['post', 'request'])
-
-
-@receiver(tramitacao_signal)
+@receiver(post_save, sender=Tramitacao)
+@receiver(post_save, sender=TramitacaoAdministrativo)
 def handle_tramitacao_signal(sender, **kwargs):
-    tramitacao = kwargs.get("post")
-    request = kwargs.get("request")
-    if 'protocoloadm' in str(sender):
-        doc_mat = tramitacao.documento
-        tipo = "documento"
-    elif 'materia' in str(sender):
+    logger = logging.getLogger(__name__)
+
+    tramitacao = kwargs.get('instance')
+
+    if isinstance(tramitacao, Tramitacao):
         tipo = "materia"
         doc_mat = tramitacao.materia
+    else:
+        tipo = "documento"
+        doc_mat = tramitacao.documento
+
+    pilha_de_execucao = inspect.stack()
+    for i in pilha_de_execucao:
+        if i.function == 'migrate':
+            return
+        request = i.frame.f_locals.get('request', None)
+        if request:
+            break
+
+    if not request:
+        logger.warning("Email não enviado, objeto request é None.")
+        return
 
     kwargs = {'base_url': get_base_url(request), 'tipo': tipo, 'doc_mat_id': doc_mat.id,
               'tramitacao_status_id': tramitacao.status.id,
