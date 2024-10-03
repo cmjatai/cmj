@@ -5,7 +5,7 @@ from io import StringIO
 
 from bs4 import BeautifulSoup as bs
 from django.conf.locale import ro
-from django.contrib.postgres.fields.jsonb import JSONField
+from django.db.models.fields.json import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models, transaction

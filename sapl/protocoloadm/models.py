@@ -3,7 +3,7 @@ import hashlib
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.postgres.fields.jsonb import JSONField
+from django.db.models.fields.json import JSONField
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models

@@ -1,5 +1,5 @@
 from django.contrib.contenttypes.fields import GenericRelation
-from django.contrib.postgres.fields.jsonb import JSONField
+from django.db.models.fields.json import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.template import defaultfilters

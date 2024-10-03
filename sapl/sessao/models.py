@@ -1,7 +1,7 @@
 from operator import xor
 
 from django.contrib.contenttypes.fields import GenericRelation
-from django.contrib.postgres.fields.jsonb import JSONField
+from django.db.models.fields.json import JSONField
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models

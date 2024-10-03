@@ -1,5 +1,5 @@
 from django.contrib.auth.models import Group
-from django.contrib.postgres.fields.jsonb import JSONField
+from django.db.models.fields.json import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models.deletion import SET_NULL, PROTECT, CASCADE
