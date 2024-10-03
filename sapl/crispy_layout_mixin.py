@@ -12,7 +12,7 @@ from django.db.models.query import QuerySet
 from django.urls.base import reverse
 from django.utils import formats
 from django.utils.encoding import force_text
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 import yaml
 
 
