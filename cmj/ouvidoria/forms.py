@@ -5,6 +5,7 @@ from django import forms
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.forms.models import ModelForm
+from django.utils.safestring import SafeString
 from django.utils.translation import gettext_lazy as _
 
 from cmj.context_processors import areatrabalho
@@ -46,8 +47,7 @@ class DenunciaForm(ModelForm):
                         data_sitekey=settings.GOOGLE_RECAPTCHA_SITE_KEY
                     ), 4),
                     ('descricao', 12),
-                    (Alert(_(
-                        """<strong>Aviso</strong><br>
+                    (Alert(content=SafeString("""<strong>Aviso!</strong><br>
                             Ao enviar uma Denúncia Anônima, você receberá
                             um link para acompanhar sua denúncia.<br>
                             Só será
@@ -59,8 +59,8 @@ class DenunciaForm(ModelForm):
                             quem possuí-lo verá sua denúncia
                             e poderá interagir também.
                             """),
-                        css_class="alert-warning",
-                        dismiss=False), 12)
+                           css_class="alert-warning",
+                           dismiss=False), 12)
                 ]),
                 12)),
 

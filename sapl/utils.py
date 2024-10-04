@@ -33,6 +33,7 @@ import django_filters
 from easy_thumbnails import source_generators
 from image_cropping.widgets import ImageCropWidget
 import magic
+import six
 from trml2pdf import parseString as trml2pdfParseString
 from unipath.path import Path
 import weasyprint
