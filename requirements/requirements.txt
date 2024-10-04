@@ -9,24 +9,30 @@ social-auth-app-django==5.4.2
 django-crispy-forms==2.3
 crispy-bootstrap4==2024.1
 
-celery==5.4.0
-django-celery-results==2.5.1
-git+https://github.com/LeandroJatai/celery-haystack.git
-#celery-haystack==0.10
+pytz==2024.2
+num2words==0.5.13
 
 gunicorn==23.0.0
 daphne==4.1.2
 channels==4.1.0
 channels_redis==4.2.0
 redis==5.1.1
+celery==5.4.0
+django-celery-results==2.5.1
+git+https://github.com/LeandroJatai/celery-haystack.git
+#celery-haystack==0.10
 
 
-
-
-
-
-
-
+pymupdf==1.24.11
+ocrmypdf==14.4.0 # versões acima precisam do ghostscript acima de 9.53.3
+pikepdf==9.3.0
+reportlab==4.2.5
+trml2pdf
+pypdf4==1.27.0
+pdfrw
+WeasyPrint==62.3
+python-docx==1.1.2
+XlsxWriter==3.2.0
 
 
 django-braces==1.14.0
@@ -36,12 +42,7 @@ drf-spectacular==0.24.2
 django-webpack4-loader
 python-telegram-bot==20.1
 
-num2words==0.5.13
 
-XlsxWriter==3.2.0
-
-ocrmypdf==14.4.0 # versões acima precisam do ghostscript acima de 9.53.3
-pikepdf==8.15.1
 
 dj-database-url==0.5.0
 easy-thumbnails==2.8.5
@@ -56,34 +57,21 @@ beautifulsoup4==4.12.3
 #celery==5.1.2
 #kombu==4.6.8
 
-
-
-
-
 python-dateutil==2.8.2
 
-
 jedi==0.17.2
-pdfrw
 Pillow==10.3.0
 psycopg2-binary==2.8.5
 pyoai==2.5.0
-pypdf4==1.27.0
 pysolr==3.9.0
 python-decouple==3.1
 python-magic==0.4.18
-pytz==2021.3
 pyyaml==6.0.1
 requests==2.32.0
 unipath==1.1
-WeasyPrint==51
 qrcode
-reportlab==3.6.13
-trml2pdf
 kazoo==2.8.0
-pymupdf==1.24.7
 
-python-docx==1.1.2
 
 ipython
 
