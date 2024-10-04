@@ -38,8 +38,8 @@ boto3==1.26.95
 
 
 
-celery==5.3.6
-django-celery-results==2.3.1
+celery==5.4.0
+django-celery-results==2.5.1
 git+https://github.com/LeandroJatai/celery-haystack.git
 #celery-haystack==0.10
 
@@ -76,7 +76,7 @@ python-docx==1.1.2
 
 ipython
 
-git+https://github.com/interlegis/django-admin-bootstrapped.git
+#git+https://github.com/interlegis/django-admin-bootstrapped.git
 #git+https://github.com/interlegis/trml2pdf.git
 #git+git://github.com/cmjatai/sapl.git@master.para.portal.cmj
 

@@ -11,6 +11,7 @@ from django.forms.models import model_to_dict
 from django.http.response import HttpResponse
 from django.template.loader import render_to_string
 from django.utils import formats
+from django.utils.datastructures import OrderedSet
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 import pymupdf
@@ -19,7 +20,6 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.fields import RegexField, DecimalField, CharField,\
     SerializerMethodField
 from rest_framework.response import Response
-from setuptools._vendor.ordered_set import OrderedSet
 
 from cmj import loa
 from cmj.loa.models import OficioAjusteLoa, EmendaLoa, Loa, EmendaLoaParlamentar,\
@@ -106,7 +106,7 @@ class _LoaViewSet:
     @action(methods=['get', ], detail=True)
     def despesas_executadas(self, request, *args, **kwargs):
         ano = kwargs['pk']
-        result = run_sql(f"""SELECT 
+        result = run_sql(f"""SELECT
                 q1.cod as orgao,
                 q1.especificacao,
                 q1.valor as val_orc,
@@ -114,7 +114,7 @@ class _LoaViewSet:
                 q3.valor as val_rec_orc,
                 to_char(q2.data_max, 'DD/MM/YYYY') as data_max,
                 q2.codigo_max
-                
+
             FROM (
                 SELECT
                     lo.codigo as cod,
@@ -122,7 +122,7 @@ class _LoaViewSet:
                     SUM(ldo.valor_materia) as valor
                 FROM loa_orgao lo
                     LEFT JOIN loa_despesa ldo ON (ldo.orgao_id = lo.id)
-                    INNER JOIN loa_loa ll ON (lo.loa_id = ll.id) 
+                    INNER JOIN loa_loa ll ON (lo.loa_id = ll.id)
                 WHERE ll.ano = {ano}
                     group by cod, especificacao
                     ORDER BY cod, especificacao
@@ -131,8 +131,8 @@ class _LoaViewSet:
                     SELECT
                         lo.codigo as cod,
                         lo.especificacao as especificacao,
-                        SUM(ldp.valor) as valor, 
-                        MAX(ldp.data) as data_max, 
+                        SUM(ldp.valor) as valor,
+                        MAX(ldp.data) as data_max,
                         MAX(ldp.codigo) as codigo_max
                     FROM loa_orgao lo
                         LEFT JOIN loa_despesapaga ldp ON (ldp.orgao_id = lo.id)
@@ -146,7 +146,7 @@ class _LoaViewSet:
                         lo.codigo as cod,
                         lo.especificacao as especificacao,
                         SUM(
-                            CASE WHEN lro.codigo like '9%' then -lra.valor else lra.valor end                            
+                            CASE WHEN lro.codigo like '9%' then -lra.valor else lra.valor end
                             ) as valor
                     FROM loa_orgao lo
                         LEFT JOIN loa_receitaorcamentaria lro ON (lro.orgao_id = lo.id)

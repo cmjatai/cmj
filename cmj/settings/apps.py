@@ -8,7 +8,7 @@ INSTALLED_APPS = (
     'daphne',
     'channels',
 
-    'django_admin_bootstrapped',  # must come before django.contrib.admin
+    #'django_admin_bootstrapped',  # must come before django.contrib.admin
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
