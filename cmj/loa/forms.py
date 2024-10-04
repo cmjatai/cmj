@@ -677,12 +677,12 @@ class EmendaLoaFilterSet(FilterSet):
             html = re.sub(r'(</)(\w*)(>)', '\\1\\2\\3\n', html)
 
             html = re.sub(
-                '<div class="">',
-                '<div class="container-avatar d-flex justify-content-center w-100">',
+                '<div><div class="custom-control custom-checkbox">',
+                '<div class="container-avatar d-flex justify-content-center w-100"><div class="custom-control custom-checkbox">',
                 html, count=1)
 
             html_parts = []
-            for n in re.finditer(r'<input.+name="(\w+)".+value="(\d+)"><label.*>(.*)</label>', html):
+            for n in re.finditer(r'<input.+name="(\w+)".+value="(\d+)".*><label.*>(.*)</label>', html):
                 html_parts.append([n.start(), n.end(), list(n.groups())])
 
             html_parts.reverse()

@@ -75,7 +75,7 @@
       margin: 0;
       padding: 1rem;
       border-radius: 5px;
-      .controls {
+      .custom-control-input, input[name=salvar] {
         display: none;
       }
       .form-group {
