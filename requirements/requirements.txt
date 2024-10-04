@@ -9,6 +9,26 @@ social-auth-app-django==5.4.2
 django-crispy-forms==2.3
 crispy-bootstrap4==2024.1
 
+celery==5.4.0
+django-celery-results==2.5.1
+git+https://github.com/LeandroJatai/celery-haystack.git
+#celery-haystack==0.10
+
+gunicorn==23.0.0
+daphne==4.1.2
+channels==4.1.0
+channels_redis==4.2.0
+redis==5.1.1
+
+
+
+
+
+
+
+
+
+
 django-braces==1.14.0
 django-filter==2.4.0
 django-model-utils==4.0.0
@@ -38,16 +58,7 @@ beautifulsoup4==4.12.3
 
 
 
-celery==5.4.0
-django-celery-results==2.5.1
-git+https://github.com/LeandroJatai/celery-haystack.git
-#celery-haystack==0.10
 
-daphne==3.0.2
-channels==3.0.5
-channels_redis==3.4.1
-redis==5.0.1
-gunicorn==22.0.0
 
 python-dateutil==2.8.2
 

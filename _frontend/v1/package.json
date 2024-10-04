@@ -13,7 +13,7 @@
     "@fortawesome/fontawesome-free": "^5.14.0",
     "@tinymce/tinymce-vue": "^3.2.0",
     "autosize": "^4.0.2",
-    "axios": "^1.6.7",
+    "axios": "^1.7.7",
     "axios-progress-bar": "^1.2.0",
     "bootstrap": "^4.5.2",
     "bootstrap-select": "^1.13.18",
@@ -36,7 +36,7 @@
     "register-service-worker": "^1.7.1",
     "split.js": "^1.6.5",
     "tinymce": "^7.0.0",
-    "vue": "^2.6.12",
+    "vue": "^2.7.16",
     "vue-chartjs": "^4",
     "vue-cookie": "^1.1.4",
     "vue-loader": "^15.9.3",
@@ -73,7 +73,7 @@
     "sass-loader": "^10.0.2",
     "shelljs": "^0.8.4",
     "terser-webpack-plugin": "^1.2.3",
-    "vue-template-compiler": "^2.6.12",
+    "vue-template-compiler": "^2.7.16",
     "webpack-bundle-tracker": "^0.4.3",
     "webpack-cli": "^3.3.0"
   }
