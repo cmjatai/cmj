@@ -1,10 +1,10 @@
+import six
 import pytest
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-from django.utils import six
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from sapl.base.models import CasaLegislativa
 from sapl.compilacao.models import (PerfilEstruturalTextoArticulado,

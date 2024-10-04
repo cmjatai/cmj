@@ -25,8 +25,8 @@ from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.urls.base import reverse
 from django.utils import timezone, formats
-from django.utils.encoding import force_text
-from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import force_str
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView, CreateView, UpdateView
 from django.views.generic.base import RedirectView, TemplateView, ContextMixin
 from django.views.generic.detail import DetailView
@@ -37,7 +37,6 @@ from cmj.core.models import AreaTrabalho
 from cmj.mixins import BtnCertMixin, PluginSignMixin, MultiFormatOutputMixin
 from sapl.base.email_utils import do_envia_email_confirmacao
 from sapl.base.models import Autor, CasaLegislativa, AppConfig
-from sapl.base.signals import tramitacao_signal
 from sapl.comissoes.models import Comissao
 from sapl.crud.base import (Crud, CrudAux, MasterDetailCrud, make_pagination,
                             RP_LIST, RP_DETAIL,
@@ -463,7 +462,7 @@ class DocumentoAdministrativoCrud(Crud):
             return a
 
         def hook_header_texto_integral(self):
-            return force_text(_('Link para o Processo/Documento'))
+            return force_str(_('Link para o Processo/Documento'))
 
         def hook_texto_integral(self, obj):
             if isinstance(obj, dict):
@@ -1106,9 +1105,7 @@ class TramitacaoAdmCrud(MasterDetailCrud):
             self.object = form.save()
             username = self.request.user.username
             try:
-                tramitacao_signal.send(sender=TramitacaoAdministrativo,
-                                       post=self.object,
-                                       request=self.request)
+                pass
             except Exception as e:
                 self.logger.error('user=' + username + '. Tramitação criada, mas e-mail de acompanhamento de documento '
                                   'não enviado. A não configuração do servidor de e-mail '
@@ -1138,9 +1135,7 @@ class TramitacaoAdmCrud(MasterDetailCrud):
             self.object = form.save()
             username = self.request.user.username
             try:
-                tramitacao_signal.send(sender=TramitacaoAdministrativo,
-                                       post=self.object,
-                                       request=self.request)
+                pass
             except Exception as e:
                 self.logger.error('user=' + username + '. Tramitação criada, mas e-mail de acompanhamento de documento '
                                   'não enviado. A não configuração do servidor de e-mail '

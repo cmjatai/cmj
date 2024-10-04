@@ -1,4 +1,4 @@
-{% load i18n staticfiles menus common_cmj_tags cropping %}
+{% load i18n static menus common_cmj_tags cropping %}
 {% load webpack_static from webpack_loader %}
 <ul class="navbar-nav justify-content-end">
   {% if perms.cerimonial.list_visita and not user.is_superuser %}

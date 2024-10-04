@@ -1,10 +1,10 @@
 from django.contrib.contenttypes.fields import GenericRelation
-from django.contrib.postgres.fields.jsonb import JSONField
+from django.db.models.fields.json import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.template import defaultfilters
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from model_utils import Choices
 
 from cmj.core.models import CertidaoPublicacao
@@ -65,7 +65,7 @@ class TipoNormaJuridica(models.Model):
         default=0,
         verbose_name=_('Relevância'),)
 
-    origem_processo_legislativo = models.NullBooleanField(
+    origem_processo_legislativo = models.BooleanField(null=True,
         blank=True, default=True, verbose_name=_('Possui Origem no Processo Legislativo?'),
         choices=YES_NO_CHOICES)
 
@@ -134,7 +134,7 @@ class NormaJuridica(CommonMixin):
         blank=True, verbose_name=_('Indexação'))
     observacao = models.TextField(
         blank=True, verbose_name=_('Observação'))
-    complemento = models.NullBooleanField(
+    complemento = models.BooleanField(null=True,
         blank=True, verbose_name=_('Complementar ?'),
         choices=YES_NO_CHOICES)
 

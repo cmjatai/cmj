@@ -49,6 +49,8 @@ ROOT_URLCONF = 'cmj.urls'
 WSGI_APPLICATION = 'cmj.wsgi.application'
 ASGI_APPLICATION = "cmj.asgi.application"
 
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
 DATABASES = {
     'default': config(
         'DATABASE_URL_DEV' if DEBUG else 'DATABASE_URL_PRD',

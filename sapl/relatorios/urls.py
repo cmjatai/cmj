@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls.conf import re_path
 
 from sapl.relatorios.views_new import RelatorioPautaSessao
 
@@ -17,38 +17,38 @@ app_name = AppConfig.name
 urlpatterns = [
 
 
-    url(r'^relatorios/sessao/(?P<pk>\d+)/pauta$',
+    re_path(r'^relatorios/sessao/(?P<pk>\d+)/pauta$',
         RelatorioPautaSessao.as_view(), name='rel_sessao_pauta'),
 
 
 
     # weaseprint
-    url(r'^relatorios/(?P<pk>\d+)/sessao-plenaria-pdf$',
+    re_path(r'^relatorios/(?P<pk>\d+)/sessao-plenaria-pdf$',
         relatorio_sessao_plenaria_pdf, name='relatorio_sessao_plenaria_pdf'),
-    url(r'^relatorios/relatorio-documento-administrativo$',
+    re_path(r'^relatorios/relatorio-documento-administrativo$',
         relatorio_documento_administrativo,
         name='relatorio_documento_administrativo'),
-    url(r'^relatorios/(?P<pk>\d+)/resumo_ata$',
+    re_path(r'^relatorios/(?P<pk>\d+)/resumo_ata$',
         resumo_ata_pdf, name='resumo_ata_pdf'),
 
-    url(r'^relatorios/pauta-sessao/(?P<pk>\d+)/$',
+    re_path(r'^relatorios/pauta-sessao/(?P<pk>\d+)/$',
         relatorio_pauta_sessao, name='relatorio_pauta_sessao'),
 
     # url(r'^relatorios/pauta-sessao/(?P<pk>\d+)/$',
     #    relatorio_pauta_sessao, name='relatorio_pauta_sessao'),
 
     # trml2pdf
-    url(r'^relatorios/materia$', relatorio_materia, name='relatorio_materia'),
-    url(r'^relatorios/capa-processo$',
+    re_path(r'^relatorios/materia$', relatorio_materia, name='relatorio_materia'),
+    re_path(r'^relatorios/capa-processo$',
         relatorio_capa_processo, name='relatorio_capa_processo'),
-    url(r'^relatorios/ordem-dia$', relatorio_ordem_dia,
+    re_path(r'^relatorios/ordem-dia$', relatorio_ordem_dia,
         name='relatorio_ordem_dia'),
-    url(r'^relatorios/espelho$', relatorio_espelho,
+    re_path(r'^relatorios/espelho$', relatorio_espelho,
         name='relatorio_espelho'),
-    url(r'^relatorios/(?P<pk>\d+)/sessao-plenaria$',
+    re_path(r'^relatorios/(?P<pk>\d+)/sessao-plenaria$',
         relatorio_sessao_plenaria, name='relatorio_sessao_plenaria'),
-    url(r'^relatorios/protocolo$',
+    re_path(r'^relatorios/protocolo$',
         relatorio_protocolo, name='relatorio_protocolo'),
-    url(r'^relatorios/(?P<nro>\d+)/(?P<ano>\d+)/etiqueta-protocolo$',
+    re_path(r'^relatorios/(?P<nro>\d+)/(?P<ano>\d+)/etiqueta-protocolo$',
         relatorio_etiqueta_protocolo, name='relatorio_etiqueta_protocolo'),
 ]

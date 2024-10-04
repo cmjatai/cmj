@@ -4,7 +4,7 @@ from django import template
 from django.shortcuts import render
 from django.urls.base import reverse
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 import yaml
 
 logger = logging.getLogger(__name__)

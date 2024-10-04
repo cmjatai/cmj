@@ -3,14 +3,14 @@ import hashlib
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.postgres.fields.jsonb import JSONField
+from django.db.models.fields.json import JSONField
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models.deletion import PROTECT
 from django.urls.base import reverse
 from django.utils import timezone, formats
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from model_utils import Choices
 
 from cmj.core.models import AreaTrabalho, CertidaoPublicacao

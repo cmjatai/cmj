@@ -16,7 +16,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.forms import Form, ModelForm
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 import django_filters
 
 from sapl.audiencia.models import AudienciaPublica

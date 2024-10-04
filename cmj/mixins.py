@@ -15,7 +15,7 @@ from django.http.response import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.urls.base import reverse
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from haystack.models import SearchResult
 from model_utils.choices import Choices
 from pdfminer.high_level import extract_text

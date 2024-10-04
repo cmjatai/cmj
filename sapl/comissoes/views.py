@@ -5,7 +5,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import F
 from django.http.response import HttpResponseRedirect, JsonResponse, Http404
 from django.urls.base import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.generic import ListView, CreateView, DeleteView
 from django.views.generic.base import RedirectView

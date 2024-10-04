@@ -5,7 +5,7 @@ from io import StringIO
 
 from bs4 import BeautifulSoup as bs
 from django.conf.locale import ro
-from django.contrib.postgres.fields.jsonb import JSONField
+from django.db.models.fields.json import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models, transaction
@@ -13,7 +13,7 @@ from django.db.models import manager
 from django.db.models.aggregates import Sum
 from django.db.models.deletion import PROTECT, CASCADE
 from django.utils import formats
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from cmj.utils import texto_upload_path
 from sapl.materia.models import MateriaLegislativa

@@ -4,7 +4,7 @@ from django import forms
 from django.forms import widgets
 from django.forms.models import ModelForm, ModelMultipleChoiceField
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from cmj.sigad import models
 from cmj.sigad.models import Classe, Documento, CaixaPublicacaoRelationship, \

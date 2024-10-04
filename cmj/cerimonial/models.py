@@ -1,10 +1,10 @@
 from django.contrib.auth.models import Group
-from django.contrib.postgres.fields.jsonb import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models.deletion import SET_NULL, PROTECT, CASCADE
+from django.db.models.fields.json import JSONField
 from django.utils import timezone, formats
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from cmj.core.models import CmjModelMixin, Trecho, Distrito, RegiaoMunicipal,\
     CmjAuditoriaModelMixin, CmjSearchMixin, AreaTrabalho, Bairro, Municipio
@@ -226,9 +226,9 @@ class Contato(CmjSearchMixin, CmjAuditoriaModelMixin):
         blank=True, default='',
         max_length=100, verbose_name=_('Como se reconhece?'))
 
-    tem_filhos = models.NullBooleanField(
-        choices=NONE_YES_NO_CHOICES,
-        default=None, verbose_name=_('Tem Filhos?'))
+    tem_filhos = models.BooleanField(null=True,
+                                     choices=NONE_YES_NO_CHOICES,
+                                     default=None, verbose_name=_('Tem Filhos?'))
 
     quantos_filhos = models.PositiveSmallIntegerField(
         default=0,  blank=True, verbose_name=_('Quantos Filhos?'))
@@ -366,9 +366,9 @@ class Telefone(CmjAuditoriaModelMixin):
     telefone = models.CharField(max_length=100,
                                 verbose_name='Número do Telefone')
 
-    proprio = models.NullBooleanField(
-        choices=NONE_YES_NO_CHOICES,
-        blank=True, null=True, verbose_name=_('Próprio?'))
+    proprio = models.BooleanField(null=True,
+                                  choices=NONE_YES_NO_CHOICES,
+                                  blank=True, verbose_name=_('Próprio?'))
 
     de_quem_e = models.CharField(
         max_length=40, verbose_name='De quem é?', blank=True,

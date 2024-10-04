@@ -19,10 +19,10 @@ from django.forms.models import ModelMultipleChoiceField
 from django.forms.widgets import CheckboxSelectMultiple, HiddenInput, Select
 from django.urls.base import reverse
 from django.utils import timezone
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 import django_filters
 from django_filters.filters import ModelMultipleChoiceFilter
 from django_filters.widgets import CSVWidget
@@ -2318,7 +2318,7 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
             *models_with_gr_for_model(TipoProposicao))
 
         self.fields['especie'].choices = [
-            (ct.pk, ct) for k, ct in content_types.items()]
+            (ct.pk, ct.name) for k, ct in content_types.items()]
         # Ordena por id
         self.fields['especie'].choices.sort(key=lambda x: x[0])
 

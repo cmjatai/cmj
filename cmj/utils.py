@@ -17,7 +17,7 @@ from django.db.models.signals import pre_init, post_init, pre_save, post_save,\
     pre_delete, post_delete, post_migrate, pre_migrate, m2m_changed
 from django.template.loaders.filesystem import Loader
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from easy_thumbnails import source_generators
 import magic
 from unipath.path import Path

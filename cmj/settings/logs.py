@@ -15,10 +15,6 @@ logging.captureWarnings(True)
 yaml.warnings({'YAMLLoadWarning': False})
 
 
-warnings.filterwarnings('ignore', module='floppyforms',
-                        message='Unable to import floppyforms.gis')
-
-
 class MyFormatter(logging.Formatter):
 
     def __init__(self, fmt=None, datefmt=None, style='%'):

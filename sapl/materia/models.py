@@ -2,7 +2,7 @@
 from django.contrib.auth.models import Group
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.postgres.fields.jsonb import JSONField
+from django.db.models.fields.json import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models import Q, F
@@ -10,7 +10,7 @@ from django.db.models.deletion import PROTECT
 from django.db.models.functions import Concat
 from django.template import defaultfilters
 from django.utils import formats, timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from model_utils import Choices
 
 from cmj.core.models import CertidaoPublicacao
@@ -310,11 +310,11 @@ class MateriaLegislativa(CommonMixin):
         verbose_name=_('Em Tramitação?'),
         default=False,
         choices=YES_NO_CHOICES)
-    polemica = models.NullBooleanField(
+    polemica = models.BooleanField(null=True,
         blank=True, verbose_name=_('Matéria Polêmica?'))
     objeto = models.CharField(
         max_length=150, blank=True, verbose_name=_('Objeto'))
-    complementar = models.NullBooleanField(
+    complementar = models.BooleanField(null=True,
         blank=True, verbose_name=_('É Complementar?'))
     ementa = models.TextField(verbose_name=_('Ementa'))
     indexacao = models.TextField(

@@ -16,7 +16,7 @@ from django.utils import timezone
 from django.utils.dateparse import parse_datetime as django_parse_datetime
 from django.utils.formats import date_format
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from num2words import num2words
 from webpack_loader import utils
 from webpack_loader.utils import _get_bundle

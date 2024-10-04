@@ -5,8 +5,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 from django.forms.models import ModelForm
 from django.forms.widgets import HiddenInput
-from django.utils.encoding import force_text
-from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import force_str
+from django.utils.translation import gettext_lazy as _
 
 from cmj.diarios.models import VinculoDocDiarioOficial, DiarioOficial
 from sapl.crispy_layout_mixin import SaplFormHelper, SaplFormLayout,\

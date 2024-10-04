@@ -1,5 +1,5 @@
 from django.core.urlresolvers import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from model_mommy import mommy
 import pytest
 

@@ -17,7 +17,7 @@
       var ementa = $('#id_ementa').val();
       if (tipo_materia && numero_materia && ano_materia) {
 
-        var url = '{% url 'sapl.api:materialegislativa-list'%}'
+        var url = '{% url 'sapl.api:materia_materialegislativa-list'%}'
         var formData = {
                 'tipo'   : tipo_materia,
                 'ano'    : ano_materia,

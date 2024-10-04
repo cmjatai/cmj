@@ -24,7 +24,7 @@
   {% endif %}
 
   $("select[name=tipo_materia], input[name=numero_materia], input[name=ano_materia]").change(function(event) {
-    var url = '{% url 'sapl.api:materialegislativa-list'%}'
+    var url = '{% url 'sapl.api:materia_materialegislativa-list'%}'
 
     var formData = {
           'tipo'   : $("select[name=tipo_materia]").val(),
@@ -45,14 +45,14 @@
         $(".ementa_materia").removeClass('hidden').removeClass('alert-info').addClass('alert-danger');
 
       }
-        
+
     });
   });
   $("select[name=tipo_materia]").trigger('change');
 
 
   $("select[name=tipo_anexador], input[name=numero_anexador], input[name=ano_anexador]").change(function(event) {
-    var url = '{% url 'sapl.api:documentoadministrativo-list'%}'
+    var url = '{% url 'sapl.api:protocoloadm_documentoadministrativo-list'%}'
 
     var formData = {
           'tipo'   : $("select[name=tipo_anexador]").val(),
@@ -77,6 +77,6 @@
   $("select[name=tipo_anexador]").trigger('change');
 
 
-  
+
 </script>
 {% endblock %}

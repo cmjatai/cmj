@@ -8,7 +8,7 @@ from django.core.files.base import File
 from django.forms import widgets
 from django.forms.forms import Form
 from django.forms.models import ModelForm
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from cmj.arq.models import ArqClasse, PERFIL_ARQCLASSE, ArqDoc, ARQCLASSE_FISICA,\
     ARQCLASSE_LOGICA, DraftMidia
@@ -301,8 +301,8 @@ class ArqDocBulkCreateForm(ModelForm):
                 <div class="controls">
                     <div class="checkbox">
                         <label for="id_check_all">
-                            <input type="checkbox" id="id_check_all" onchange="checkAll(this)" /> Marcar/Desmarcar Todos 
-                            // <em>Draft a Importar: {draft}</em> 
+                            <input type="checkbox" id="id_check_all" onchange="checkAll(this)" /> Marcar/Desmarcar Todos
+                            // <em>Draft a Importar: {draft}</em>
                         </label>
                     </div>
                 </div>

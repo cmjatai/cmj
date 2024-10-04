@@ -1,7 +1,7 @@
-from django.conf.urls import url
+from django.urls.conf import re_path
 
 from . import consumers
 
 websocket_urlpatterns = [
-    url(r'^ws/time-refresh/$', consumers.TimeRefreshConsumer.as_asgi()),
+    re_path(r'^ws/time-refresh/$', consumers.TimeRefreshConsumer.as_asgi()),
 ]

@@ -5,7 +5,8 @@ from django import forms
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.forms.models import ModelForm
-from django.utils.translation import ugettext_lazy as _
+from django.utils.safestring import SafeString
+from django.utils.translation import gettext_lazy as _
 
 from cmj.context_processors import areatrabalho
 from cmj.core.models import AreaTrabalho, Notificacao
@@ -46,21 +47,20 @@ class DenunciaForm(ModelForm):
                         data_sitekey=settings.GOOGLE_RECAPTCHA_SITE_KEY
                     ), 4),
                     ('descricao', 12),
-                    (Alert(_(
-                        """<strong>Aviso</strong><br>
+                    (Alert(content=SafeString("""<strong>Aviso!</strong><br>
                             Ao enviar uma Denúncia Anônima, você receberá
                             um link para acompanhar sua denúncia.<br>
                             Só será
                             possível acompanhar e interagir com a ouvidoria
                             através deste link.<br>
-                            Veja que este link será como um código 
-                            privativo seu sem sua identificação, 
-                            no entanto, se você compartilhar esse link, 
-                            quem possuí-lo verá sua denúncia 
+                            Veja que este link será como um código
+                            privativo seu sem sua identificação,
+                            no entanto, se você compartilhar esse link,
+                            quem possuí-lo verá sua denúncia
                             e poderá interagir também.
                             """),
-                        css_class="alert-warning",
-                        dismiss=False), 12)
+                           css_class="alert-warning",
+                           dismiss=False), 12)
                 ]),
                 12)),
 

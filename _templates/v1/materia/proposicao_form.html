@@ -41,7 +41,7 @@
     $(document).ready(function(){
 
       $("select[name=tipo_materia], input[name=numero_materia], input[name=ano_materia]").change(function(event) {
-        var url = '{% url 'sapl.api:materialegislativa-list'%}'
+        var url = '{% url 'sapl.api:materia_materialegislativa-list'%}'
 
         var formData = {
               'tipo'   : $("select[name=tipo_materia]").val(),
@@ -69,7 +69,7 @@
   		});
 
       $("input[name=vinculo_numero], input[name=vinculo_ano]").change(function(event) {
-        var url = '{% url 'sapl.api:proposicao-list'%}'
+        var url = '{% url 'sapl.api:materia_proposicao-list'%}'
         var proposicao_id = {% if object %}{{object.id}}{% else %}0{% endif %};
 
         var formData = {
@@ -106,7 +106,7 @@
 
       $("select[name=especie]").change(function(event) {
         $("#id_tipo option").remove()
-        var url = '{% url 'sapl.api:tipoproposicao-tipos-do-autor-contectado'%}'
+        var url = '{% url 'sapl.api:materia_tipoproposicao-tipos-do-autor-contectado'%}'
         var especie_persistida = '{% if object %}{{object.tipo.content_type_id}}{% else %}0{% endif %}'
         var tipo_persistido = '{% if object %}{{object.tipo_id}}{% else %}0{% endif %}'
 

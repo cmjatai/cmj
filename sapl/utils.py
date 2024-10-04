@@ -22,18 +22,18 @@ from django.db import models
 from django.db.models import Q
 from django.db.models.fields.files import FieldFile, ImageFieldFile
 from django.forms import BaseForm
-from django.forms.widgets import SplitDateTimeWidget
+from django.forms.widgets import SplitDateTimeWidget, ClearableFileInput
 from django.http.response import HttpResponse
 from django.template import loader
 from django.urls.base import reverse
-from django.utils import six, timezone
+from django.utils import timezone
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 import django_filters
 from easy_thumbnails import source_generators
-from floppyforms.widgets import ClearableFileInput
 from image_cropping.widgets import ImageCropWidget
 import magic
+import six
 from trml2pdf import parseString as trml2pdfParseString
 from unipath.path import Path
 import weasyprint
@@ -262,8 +262,11 @@ class PortalFieldFile(FieldFile):
 
             field_name_action = self.field.name.replace('_', '-')
             return '%s' % reverse(
-                'sapl.api:%s-%s' % (self.instance._meta.model_name,
-                                    field_name_action),
+                'sapl.api:%s_%s-%s' % (
+                    self.instance._meta.app_label,
+                    self.instance._meta.model_name,
+                    field_name_action
+                ),
                 kwargs={'pk': self.instance.pk})
         except:
             return ''
@@ -331,8 +334,11 @@ class PortalFieldImage(ImageFieldFile):
 
             field_name_action = self.field.name.replace('_', '-')
             return '%s' % reverse(
-                'sapl.api:%s-%s' % (self.instance._meta.model_name,
-                                    field_name_action),
+                'sapl.api:%s_%s-%s' % (
+                    self.instance._meta.app_label,
+                    self.instance._meta.model_name,
+                    field_name_action
+                ),
                 kwargs={'pk': self.instance.pk})
         except:
             return ''
@@ -343,7 +349,7 @@ class PortalImageField(models.ImageField):
 
 
 class ImageThumbnailFileInput(ClearableFileInput):
-    template_name = 'floppyforms/image_thumbnail.html'
+    template_name = 'widgets/image_thumbnail.html'
 
 
 class CustomImageCropWidget(ImageCropWidget):

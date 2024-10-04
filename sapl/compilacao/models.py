@@ -14,9 +14,9 @@ from django.template import defaultfilters
 from django.urls.base import reverse
 from django.utils import timezone
 from django.utils.decorators import classonlymethod
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.text import slugify
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from cmj.utils import media_cache_storage
 from sapl.compilacao.utils import (get_integrations_view_names, int_to_letter,
@@ -197,11 +197,11 @@ class TextoArticulado(TimestampedMixin):
         blank=True, null=True, default=None,
         verbose_name=_('Tipo de Texto Articulado'),
         on_delete=PROTECT)
-    participacao_social = models.NullBooleanField(
-        default=None,
-        blank=True, null=True,
-        choices=PARTICIPACAO_SOCIAL_CHOICES,
-        verbose_name=_('Participação Social'))
+    participacao_social = models.BooleanField(null=True,
+                                              default=None,
+                                              blank=True,
+                                              choices=PARTICIPACAO_SOCIAL_CHOICES,
+                                              verbose_name=_('Participação Social'))
 
     content_type = models.ForeignKey(
         ContentType,
@@ -1143,7 +1143,7 @@ class UrlizeReferencia(models.Model):
 
 
 class Dispositivo(BaseModel, TimestampedMixin):
-    TEXTO_PADRAO_DISPOSITIVO_REVOGADO = force_text(_('(Revogado)'))
+    TEXTO_PADRAO_DISPOSITIVO_REVOGADO = force_str(_('(Revogado)'))
     INTERVALO_ORDEM = 1000
     ordem = models.PositiveIntegerField(
         default=0,

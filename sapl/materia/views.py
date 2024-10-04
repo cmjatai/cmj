@@ -26,10 +26,10 @@ from django.http.response import Http404, HttpResponseRedirect,\
 from django.shortcuts import get_object_or_404, redirect
 from django.urls.base import reverse
 from django.utils import formats, timezone
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.text import slugify
 from django.utils.timezone import get_default_timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView, TemplateView, CreateView, UpdateView
 from django.views.generic.base import RedirectView
 from django.views.generic.edit import FormView
@@ -45,7 +45,6 @@ import requests as rq
 import sapl
 from sapl.base.email_utils import do_envia_email_confirmacao
 from sapl.base.models import Autor, CasaLegislativa, AppConfig as BaseAppConfig
-from sapl.base.signals import tramitacao_signal
 from sapl.comissoes.models import Comissao, Participacao, Composicao
 from sapl.compilacao.models import (STATUS_TA_IMMUTABLE_RESTRICT,
                                     STATUS_TA_PRIVATE)
@@ -1139,13 +1138,11 @@ class ProposicaoCrud(Crud):
             initial['user'] = self.request.user
             initial['ip'] = get_client_ip(self.request)
 
-            tz = timezone.get_current_timezone()
-            initial['ultima_edicao'] = tz.localize(datetime.now())
+            initial['ultima_edicao'] = timezone.localtime()
 
             return initial
 
         def form_valid(self, form):
-            tz = timezone.get_current_timezone()
 
             objeto_antigo = Proposicao.objects.get(
                 pk=self.kwargs['pk']
@@ -1156,7 +1153,7 @@ class ProposicaoCrud(Crud):
             if tipo_texto == 'D' and objeto_antigo.texto_articulado.exists() or tipo_texto == 'T' and not objeto_antigo.texto_articulado.exists():
                 self.object.user = self.request.user
                 self.object.ip = get_client_ip(self.request)
-                self.object.ultima_edicao = tz.localize(datetime.now())
+                self.object.ultima_edicao = timezone.localtime()
                 self.object.save()
 
             self.object = form.save()
@@ -1171,7 +1168,7 @@ class ProposicaoCrud(Crud):
                 if dict_objeto_antigo[atributo] != dict_objeto_novo[atributo]:
                     self.object.user = self.request.user
                     self.object.ip = get_client_ip(self.request)
-                    self.object.ultima_edicao = tz.localize(datetime.now())
+                    self.object.ultima_edicao = timezone.localtime()
                     self.object.save()
                     break
 
@@ -1236,8 +1233,7 @@ class ProposicaoCrud(Crud):
             initial['user'] = self.request.user
             initial['ip'] = get_client_ip(self.request)
 
-            tz = timezone.get_current_timezone()
-            initial['ultima_edicao'] = tz.localize(datetime.now())
+            initial['ultima_edicao'] = timezone.localtime()
 
             return initial
 
@@ -1575,9 +1571,6 @@ class TramitacaoCrud(MasterDetailCrud):
             try:
                 self.logger.debug("user=" + username + ". Tentando enviar Tramitacao (sender={}, post={}, request={})."
                                   .format(Tramitacao, self.object, self.request))
-                tramitacao_signal.send(sender=Tramitacao,
-                                       post=self.object,
-                                       request=self.request)
             except Exception as e:
                 msg = _('Tramitação criada, mas e-mail de acompanhamento '
                         'de matéria não enviado. Há problemas na configuração '
@@ -1621,9 +1614,7 @@ class TramitacaoCrud(MasterDetailCrud):
             try:
                 self.logger.debug("user=" + user.username + ". Tentando enviar Tramitacao (sender={}, post={}, request={}"
                                   .format(Tramitacao, self.object, self.request))
-                tramitacao_signal.send(sender=Tramitacao,
-                                       post=self.object,
-                                       request=self.request)
+                pass
             except Exception:
                 msg = _('Tramitação atualizada, mas e-mail de acompanhamento '
                         'de matéria não enviado. Há problemas na configuração '
@@ -2510,7 +2501,7 @@ class MateriaLegislativaPesquisaView(AudigLogFilterMixin, MultiFormatOutputMixin
     }
 
     def hook_header_texto_original(self):
-        return force_text(_('Link para Matéria Legislativa'))
+        return force_str(_('Link para Matéria Legislativa'))
 
     def hook_texto_original(self, obj):
         id = obj["id"] if isinstance(obj, dict) else obj.id
@@ -2795,8 +2786,6 @@ class DocumentoAcessorioEmLoteView(PermissionRequiredMixin, FilterView):
             return self.get(request, self.kwargs)
 
         tipo = TipoDocumento.objects.get(descricao=request.POST['tipo'])
-
-        tz = timezone.get_current_timezone()
 
         if len(request.POST['autor']) > 50:
             msg = _('Autor tem que ter menos do que 50 caracteres.')

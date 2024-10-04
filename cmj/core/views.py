@@ -21,7 +21,7 @@ from django.template.loader import render_to_string
 from django.urls.base import reverse
 from django.utils import formats, timezone
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import RedirectView, TemplateView, View
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
@@ -690,7 +690,8 @@ class CertidaoPublicacaoCrud(Crud):
             co = cert.content_object
 
             link = reverse(
-                'sapl.api:%s-%s' % (
+                'sapl.api:%s_%s-%s' % (
+                    co._meta.app_label,
                     co._meta.model_name,
                     cert.field_name.replace('_', '-')
                 ),

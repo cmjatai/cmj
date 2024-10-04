@@ -11,8 +11,8 @@ from django.http.response import Http404, HttpResponsePermanentRedirect
 from django.shortcuts import redirect, get_object_or_404
 from django.urls.base import reverse
 from django.utils import timezone
-from django.utils.encoding import force_text
-from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import force_str
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView, UpdateView, ListView
 from django.views.generic.edit import FormView
 from django_filters.views import FilterView
@@ -88,10 +88,10 @@ class NormaDestaquesView(MultiFormatOutputMixin, ListView):
     }
 
     def hook_header_apelido(self):
-        return force_text(_('Título'))
+        return force_str(_('Título'))
 
     def hook_header_texto_integral(self):
-        return force_text(_('Link para Norma'))
+        return force_str(_('Link para Norma'))
 
     def hook_texto_integral(self, obj):
         id = obj["id"] if isinstance(obj, dict) else obj.id
@@ -120,7 +120,7 @@ class NormaPesquisaView(AudigLogFilterMixin, MultiFormatOutputMixin, FilterView)
     }
 
     def hook_header_texto_integral(self):
-        return force_text(_('Link para Norma'))
+        return force_str(_('Link para Norma'))
 
     def hook_texto_integral(self, obj):
         id = obj["id"] if isinstance(obj, dict) else obj.id
@@ -474,10 +474,10 @@ class NormaCrud(Crud):
             return 'uncheck' if obj.checkcheck else 'check', f'/norma/check{self.kwargs.get("nivel","")}?{"un" if obj.checkcheck else ""}check={obj.id}'
 
         def hook_header_checkcheck(self):
-            return force_text(_('Check'))
+            return force_str(_('Check'))
 
         def hook_header_epigrafe(self):
-            return force_text(_('Epigrafe'))
+            return force_str(_('Epigrafe'))
 
         def get_context_data(self, **kwargs):
             context = Crud.ListView.get_context_data(self, **kwargs)

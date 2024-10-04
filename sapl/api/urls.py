@@ -1,5 +1,5 @@
 
-from django.conf.urls import include, url
+from django.urls.conf import re_path, include
 from drf_spectacular.views import SpectacularSwaggerView, SpectacularRedocView,\
     SpectacularAPIView
 from rest_framework.authtoken.views import obtain_auth_token
@@ -22,20 +22,20 @@ router_cmj.register(r'documento', DocumentoViewSet)
 urlpatterns_router = router_sapl.urls + router_cmj.urls
 
 urlpatterns_api_doc = [
-    url('^schema/swagger-ui/',
+    re_path('^schema/swagger-ui/',
         SpectacularSwaggerView.as_view(url_name='sapl.api:schema_api'),
         name='swagger_ui_schema_api'),
-    url('^schema/redoc/',
+    re_path('^schema/redoc/',
         SpectacularRedocView.as_view(url_name='sapl.api:schema_api'),
         name='redoc_schema_api'),
-    url('^schema/', SpectacularAPIView.as_view(), name='schema_api'),
+    re_path('^schema/', SpectacularAPIView.as_view(), name='schema_api'),
 ]
 
 urlpatterns = [
-    url(r'^api/', include(urlpatterns_api_doc)),
-    url(r'^api/', include(urlpatterns_router)),
+    re_path(r'^api/', include(urlpatterns_api_doc)),
+    re_path(r'^api/', include(urlpatterns_router)),
 
-    url(r'^api/version', AppVersionView.as_view()),
-    url(r'^api/auth/token$', obtain_auth_token),
-    url(r'^api/recriar-token/(?P<pk>\d*)$', recria_token, name="recria_token"),
+    re_path(r'^api/version', AppVersionView.as_view()),
+    re_path(r'^api/auth/token$', obtain_auth_token),
+    re_path(r'^api/recriar-token/(?P<pk>\d*)$', recria_token, name="recria_token"),
 ]

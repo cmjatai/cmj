@@ -1,6 +1,6 @@
 import pytest
 from django.core.urlresolvers import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from model_mommy import mommy
 
 from sapl.comissoes.models import Comissao, Composicao, Periodo

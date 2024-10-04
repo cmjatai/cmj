@@ -11,7 +11,7 @@ from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.postgres.fields.jsonb import JSONField
+from django.db.models.fields.json import JSONField
 from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.base import File
@@ -24,7 +24,7 @@ from django.http.response import HttpResponse
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.text import slugify
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django_extensions.db.fields.json import JSONField as django_extensions_JSONField
 import qrcode
 from reportlab.lib.pagesizes import A4, landscape

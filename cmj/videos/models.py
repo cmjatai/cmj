@@ -3,14 +3,14 @@ from random import random
 
 import dateutil.parser
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.postgres.fields.jsonb import JSONField
+from django.db.models.fields.json import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models import manager
 from django.db.models.aggregates import Sum
 from django.db.models.deletion import PROTECT, CASCADE
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 import pytz
 
 from cmj.mixins import CmjAuditoriaModelMixin

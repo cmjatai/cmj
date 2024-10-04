@@ -5,7 +5,7 @@ import logging
 from django.conf import settings
 from django.http.response import HttpResponse
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import TemplateView
 from docx import Document
 from docx.enum.text import WD_TAB_ALIGNMENT

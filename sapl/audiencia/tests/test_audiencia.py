@@ -1,7 +1,7 @@
 import pytest
 import datetime
 from model_mommy import mommy
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from sapl.audiencia import forms
 from sapl.audiencia.models import AnexoAudienciaPublica

@@ -10,23 +10,23 @@ Class-based views
     1. Add an import:  from other_app.views import Home
     2. Add a URL to urlpatterns:  url(r'^$', Home.as_view(), name='home')
 Including another URLconf
-    1. Import the include() function: from django.conf.urls import url, include
+    1. Import the include() function: from django.urls.conf import re_path, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 
-url(r'^sapl/', include(sapl.comissoes.urls)),
-url(r'^sapl/', include(sapl.sessao.urls)),
-url(r'^sapl/', include(sapl.parlamentares.urls)),
-url(r'^sapl/', include(sapl.materia.urls)),
-url(r'^sapl/', include(sapl.norma.urls)),
-url(r'^sapl/', include(sapl.lexml.urls)),
-url(r'^sapl/', include(sapl.painel.urls)),
-url(r'^sapl/', include(sapl.protocoloadm.urls)),
-url(r'^sapl/', include(sapl.compilacao.urls)),
-url(r'^sapl/', include(sapl.relatorios.urls)),
-url(r'^sapl/', include(sapl.base.urls)),"""
+re_path(r'^sapl/', include(sapl.comissoes.urls)),
+re_path(r'^sapl/', include(sapl.sessao.urls)),
+re_path(r'^sapl/', include(sapl.parlamentares.urls)),
+re_path(r'^sapl/', include(sapl.materia.urls)),
+re_path(r'^sapl/', include(sapl.norma.urls)),
+re_path(r'^sapl/', include(sapl.lexml.urls)),
+re_path(r'^sapl/', include(sapl.painel.urls)),
+re_path(r'^sapl/', include(sapl.protocoloadm.urls)),
+re_path(r'^sapl/', include(sapl.compilacao.urls)),
+re_path(r'^sapl/', include(sapl.relatorios.urls)),
+re_path(r'^sapl/', include(sapl.base.urls)),"""
 
 from django.conf import settings
-from django.conf.urls import include, url
+from django.urls.conf import re_path, include
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic.base import TemplateView
@@ -60,41 +60,41 @@ import sapl.sessao.urls
 
 
 urlpatterns_all = [
-    url(r'^j(?P<short>[0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]*)$',
+    re_path(r'^j(?P<short>[0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]*)$',
         ShortRedirectView.as_view(), name='short_view'),
 
-    url(r'^admin/', admin.site.urls),
+    re_path(r'^admin/', admin.site.urls),
 
-    url(r'^message$', TemplateView.as_view(template_name='base.html')),
-    url('', include('social_django.urls', namespace='social')),
-
-
-    url(r'', include(cmj.globalrules.urls)),
-
-    url(r'', include(cmj.core.urls)),
-    url(r'', include(cmj.cerimonial.urls)),
-    url(r'', include(cmj.diarios.urls)),
-    url(r'', include(cmj.loa.urls)),
-    url(r'', include(cmj.arq.urls)),
-    url(r'', include(cmj.ouvidoria.urls)),
-    url(r'', include(cmj.agenda.urls)),
-    url(r'', include(cmj.videos.urls)),
+    re_path(r'^message$', TemplateView.as_view(template_name='base.html')),
+    re_path('', include('social_django.urls', namespace='social')),
 
 
-    url(r'', include(sapl.audiencia.urls)),
-    url(r'', include(sapl.comissoes.urls)),
-    url(r'', include(sapl.sessao.urls)),
-    url(r'', include(sapl.parlamentares.urls)),
-    url(r'', include(sapl.materia.urls)),
-    url(r'', include(sapl.norma.urls)),
-    url(r'', include(sapl.lexml.urls)),
-    url(r'', include(sapl.painel.urls)),
-    url(r'', include(sapl.protocoloadm.urls)),
-    url(r'', include(sapl.compilacao.urls)),
-    url(r'', include(sapl.relatorios.urls)),
-    url(r'', include(sapl.base.urls)),
+    re_path(r'', include(cmj.globalrules.urls)),
 
-    url(r'', include(sapl.redireciona_urls.urls)),
+    re_path(r'', include(cmj.core.urls)),
+    re_path(r'', include(cmj.cerimonial.urls)),
+    re_path(r'', include(cmj.diarios.urls)),
+    re_path(r'', include(cmj.loa.urls)),
+    re_path(r'', include(cmj.arq.urls)),
+    re_path(r'', include(cmj.ouvidoria.urls)),
+    re_path(r'', include(cmj.agenda.urls)),
+    re_path(r'', include(cmj.videos.urls)),
+
+
+    re_path(r'', include(sapl.audiencia.urls)),
+    re_path(r'', include(sapl.comissoes.urls)),
+    re_path(r'', include(sapl.sessao.urls)),
+    re_path(r'', include(sapl.parlamentares.urls)),
+    re_path(r'', include(sapl.materia.urls)),
+    re_path(r'', include(sapl.norma.urls)),
+    re_path(r'', include(sapl.lexml.urls)),
+    re_path(r'', include(sapl.painel.urls)),
+    re_path(r'', include(sapl.protocoloadm.urls)),
+    re_path(r'', include(sapl.compilacao.urls)),
+    re_path(r'', include(sapl.relatorios.urls)),
+    re_path(r'', include(sapl.base.urls)),
+
+    re_path(r'', include(sapl.redireciona_urls.urls)),
 
 ]
 
@@ -109,12 +109,12 @@ if settings.DEBUG:
                               document_root=settings.STATIC_ROOT)
 
 urlpatterns_all += [
-    url(r'', include(sapl.api.urls)),
+    re_path(r'', include(sapl.api.urls)),
 
-    url(r'', include(cmj.search.urls)),
+    re_path(r'', include(cmj.search.urls)),
 
     # urls não tratadas até aqui será capturada por PathView de cmj.sigad
-    url(r'', include(cmj.sigad.urls)),
+    re_path(r'', include(cmj.sigad.urls)),
 ]
 
 urlpatterns = urlpatterns_all

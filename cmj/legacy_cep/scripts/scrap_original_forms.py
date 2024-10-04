@@ -176,11 +176,11 @@ def print_app_with_verbose_names(app):
     header = '# -*- coding: utf-8 -*-\n'
     for line in getsourcelines(app.models_module):
         if line in ['# -*- coding: utf-8 -*-',
-                    'from django.utils.translation import ugettext as _', ]:
+                    'from django.utils.translation import gettext as _', ]:
             continue
         elif line == 'from django.db import models':
             header += '''from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 '''
         elif 'class' in line:
             break

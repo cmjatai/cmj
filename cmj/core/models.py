@@ -5,14 +5,14 @@ from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin, Group
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.postgres.fields.jsonb import JSONField
+from django.db.models.fields.json import JSONField
 from django.core.exceptions import PermissionDenied
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models.deletion import PROTECT, CASCADE, SET_NULL
 from django.utils import timezone
 from django.utils.decorators import classonlymethod
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from image_cropping import ImageCropField, ImageRatioField
 
 from cmj.globalrules import MENU_PERMS_FOR_USERS, GROUP_SOCIAL_USERS
