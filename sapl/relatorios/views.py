@@ -1370,7 +1370,7 @@ def make_pdf(base_url,
 
         page_body = get_page_body(page._page_box.all_children())
 
-        if footer_template:
+        if header_template:
             page_body.children += header_body.all_children()
 
         if footer_template:
