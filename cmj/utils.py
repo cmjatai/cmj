@@ -3,6 +3,7 @@ from datetime import date, datetime, timedelta
 from functools import wraps
 import logging
 import re
+import ssl
 import subprocess
 import threading
 from unicodedata import normalize as unicodedata_normalize
@@ -12,11 +13,13 @@ from django.conf import settings
 from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
+from django.core.mail.backends.smtp import EmailBackend
 from django.db import connection
 from django.db.models.signals import pre_init, post_init, pre_save, post_save,\
     pre_delete, post_delete, post_migrate, pre_migrate, m2m_changed
 from django.template.loaders.filesystem import Loader
 from django.utils import timezone
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from easy_thumbnails import source_generators
 import magic
@@ -564,3 +567,17 @@ class TimeExecution(object):
         if self.print_date:
             print(end)
         print('TimeExecution:', end - self.start)
+
+
+class CmjEmailBackend(EmailBackend):
+
+    @cached_property
+    def ssl_context(self):
+        if self.ssl_certfile or self.ssl_keyfile:
+            ssl_context = ssl.SSLContext(protocol=ssl.PROTOCOL_TLS_CLIENT)
+            ssl_context.load_cert_chain(self.ssl_certfile, self.ssl_keyfile)
+            return ssl_context
+        else:
+            ssl_context = ssl.create_default_context()
+            ssl_context.check_hostname = False
+            ssl_context.verify_mode
