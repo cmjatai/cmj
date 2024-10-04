@@ -10,7 +10,6 @@ from django.shortcuts import redirect
 from django.template import loader
 from django.urls.base import reverse_lazy
 from django.utils import formats
-from django.utils.datastructures import OrderedSet
 from django.utils.translation import gettext_lazy as _
 from django_filters.views import FilterView
 

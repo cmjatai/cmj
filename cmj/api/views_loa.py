@@ -6,7 +6,6 @@ from django.apps.registry import apps
 from django.core.validators import RegexValidator
 from django.db.models import Q, F
 from django.db.models.aggregates import Sum
-from django.db.models.functions import Substr
 from django.forms.models import model_to_dict
 from django.http.response import HttpResponse
 from django.template.loader import render_to_string
@@ -26,6 +25,7 @@ from cmj.loa.models import OficioAjusteLoa, EmendaLoa, Loa, EmendaLoaParlamentar
     DespesaConsulta, EmendaLoaRegistroContabil, UnidadeOrcamentaria, Despesa,\
     Orgao, Funcao, SubFuncao, Programa, Acao, Natureza
 from cmj.utils import run_sql
+from django.db.models.functions import Substr
 from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize
 from sapl.api.mixins import ResponseFileMixin
 from sapl.api.permissions import SaplModelPermissions
@@ -337,7 +337,8 @@ class _LoaViewSet:
                 codigos = map(
                     lambda i: f'{i["codigo"]}/{i["orgao__codigo"] if "orgao__codigo" in i else ""}',
                     items)
-                os_esp = os_esp.union(codigos)
+                for cod in codigos:
+                    os_esp.add(cod)
             #os_esp = os_esp - {'  '}
             #os_esp = os_esp.union(['  '])
             len_osesp = len(os_esp)

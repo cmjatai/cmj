@@ -29,7 +29,7 @@ easy-thumbnails==2.8.5
 asn1crypto
 boto3==1.26.95
 
-
+beautifulsoup4==4.12.3
 #billiard==3.6.3.0
 
 #billiard<4.0,>=3.6.4.0
