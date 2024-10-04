@@ -15,7 +15,7 @@ def parliament_info(request):
         return {}
 
 
-def mail_service_configured(request):
+def mail_service_configured(request): 
 
     if not mail_service_configured_utils(request):
         logger = logging.getLogger(__name__)

@@ -690,7 +690,8 @@ class CertidaoPublicacaoCrud(Crud):
             co = cert.content_object
 
             link = reverse(
-                'sapl.api:%s-%s' % (
+                'sapl.api:%s_%s-%s' % (
+                    co._meta.app_label,
                     co._meta.model_name,
                     cert.field_name.replace('_', '-')
                 ),

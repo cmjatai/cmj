@@ -1235,8 +1235,7 @@ class ProposicaoCrud(Crud):
             initial['user'] = self.request.user
             initial['ip'] = get_client_ip(self.request)
 
-            tz = timezone.get_current_timezone()
-            initial['ultima_edicao'] = tz.localize(datetime.now())
+            initial['ultima_edicao'] = timezone.localtime()
 
             return initial
 

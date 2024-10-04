@@ -33,6 +33,12 @@
 }
 
 .bootstrap-select {
+  width: 100% !important;
+  border: 0;
+  padding: 0;
+  .dropdown-toggle {
+
+  }
   .selectpicker {
   }
   .dropdown-header  {

@@ -18,9 +18,9 @@
             $("#protocolo_data_hora_manual").hide();
         });
         $("input[name=data_hora_manual]").trigger('change')
-        
+
       $("select[name=tipo_materia], input[name=numero_materia], input[name=ano_materia]").change(function(event) {
-        var url = '{% url 'sapl.api:materialegislativa-list'%}'
+        var url = '{% url 'sapl.api:materia_materialegislativa-list'%}'
 
         var formData = {
               'tipo'   : $("select[name=tipo_materia]").val(),

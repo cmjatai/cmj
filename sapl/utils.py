@@ -261,8 +261,11 @@ class PortalFieldFile(FieldFile):
 
             field_name_action = self.field.name.replace('_', '-')
             return '%s' % reverse(
-                'sapl.api:%s-%s' % (self.instance._meta.model_name,
-                                    field_name_action),
+                'sapl.api:%s_%s-%s' % (
+                    self.instance._meta.app_label,
+                    self.instance._meta.model_name,
+                    field_name_action
+                ),
                 kwargs={'pk': self.instance.pk})
         except:
             return ''
@@ -330,8 +333,11 @@ class PortalFieldImage(ImageFieldFile):
 
             field_name_action = self.field.name.replace('_', '-')
             return '%s' % reverse(
-                'sapl.api:%s-%s' % (self.instance._meta.model_name,
-                                    field_name_action),
+                'sapl.api:%s_%s-%s' % (
+                    self.instance._meta.app_label,
+                    self.instance._meta.model_name,
+                    field_name_action
+                ),
                 kwargs={'pk': self.instance.pk})
         except:
             return ''

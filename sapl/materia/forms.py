@@ -2318,7 +2318,7 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
             *models_with_gr_for_model(TipoProposicao))
 
         self.fields['especie'].choices = [
-            (ct.pk, ct) for k, ct in content_types.items()]
+            (ct.pk, ct.name) for k, ct in content_types.items()]
         # Ordena por id
         self.fields['especie'].choices.sort(key=lambda x: x[0])
 
