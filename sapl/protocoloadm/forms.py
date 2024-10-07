@@ -1,15 +1,15 @@
 
 import logging
 
-from crispy_forms.bootstrap import InlineRadios, Alert, FormActions
-from crispy_forms.layout import HTML, Button, Column, Fieldset, Layout, Div, Submit
+from crispy_forms.bootstrap import Alert, FormActions, InlineRadios
+from crispy_forms.layout import (HTML, Button, Column, Div, Fieldset, Layout,
+                                 Submit)
 from django import forms
 from django.conf import settings
 from django.core.exceptions import (MultipleObjectsReturned,
                                     ObjectDoesNotExist, ValidationError)
 from django.db import models, transaction
-from django.db.models import Max
-from django.db.models import Q
+from django.db.models import Max, Q
 from django.forms import ModelForm
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -18,28 +18,28 @@ import django_filters
 from cmj.core.models import AreaTrabalho
 from cmj.mixins import GoogleRecapthaMixin
 from cmj.utils import CHOICE_SIGNEDS
-from sapl.base.models import Autor, TipoAutor, AppConfig
-from sapl.crispy_layout_mixin import SaplFormHelper, to_column
-from sapl.crispy_layout_mixin import SaplFormLayout, form_actions, to_row
-from sapl.materia.models import (MateriaLegislativa, TipoMateriaLegislativa,
-                                 UnidadeTramitacao, TipoDocumento)
-from sapl.protocoloadm.models import Protocolo, StatusTramitacaoAdministrativo,\
-    VinculoDocAdminMateria
+from sapl.base.models import AppConfig, Autor, TipoAutor
+from sapl.crispy_layout_mixin import (SaplFormHelper, SaplFormLayout,
+                                      form_actions, to_column, to_row)
+from sapl.materia.models import (MateriaLegislativa, TipoDocumento,
+                                 TipoMateriaLegislativa, UnidadeTramitacao)
+from sapl.protocoloadm.models import (Protocolo,
+                                      StatusTramitacaoAdministrativo,
+                                      VinculoDocAdminMateria)
 from sapl.settings import MAX_DOC_UPLOAD_SIZE
 from sapl.utils import (RANGE_ANOS, YES_NO_CHOICES, AnoNumeroOrderingFilter,
-                        RangeWidgetOverride, autor_label, autor_modal,
-                        choice_anos_com_protocolo, choice_force_optional,
-                        choice_anos_com_documentoadministrativo,
-                        FilterOverridesMetaMixin, choice_anos_com_materias,
-                        FileFieldCheckMixin, lista_anexados,
                         DocumentoAdministrativoOrderingFilter,
+                        FileFieldCheckMixin, FilterOverridesMetaMixin,
+                        RangeWidgetOverride, autor_label, autor_modal,
+                        choice_anos_com_documentoadministrativo,
+                        choice_anos_com_materias, choice_anos_com_protocolo,
+                        choice_force_optional, lista_anexados,
                         qs_override_django_filter)
 
-from .models import (AcompanhamentoDocumento, DocumentoAcessorioAdministrativo,
-                     DocumentoAdministrativo,
+from .models import (AcompanhamentoDocumento, Anexado,
+                     DocumentoAcessorioAdministrativo, DocumentoAdministrativo,
                      Protocolo, TipoDocumentoAdministrativo,
-                     TramitacaoAdministrativo, Anexado)
-
+                     TramitacaoAdministrativo)
 
 TIPOS_PROTOCOLO = [('0', 'Recebido'), ('1', 'Enviado'),
                    ('2', 'Interno')]
@@ -521,7 +521,7 @@ class ProtocoloDocumentForm(ModelForm):
                   'assunto',
                   'interessado',
                   'observacao',
-                  #'numero',
+                  # 'numero',
                   'data',
                   'hora',
                   'email'
@@ -642,7 +642,7 @@ class ProtocoloDocumentoAcessorioForm(ModelForm):
             'assunto',
             'interessado',
             'observacao',
-            #'numero',
+            # 'numero',
             'data',
             'hora',
             'email'
@@ -771,7 +771,7 @@ class ProtocoloMateriaForm(ModelForm):
                   'observacao',
                   'numero_materia',
                   'ano_materia',
-                  #'vincular_materia',
+                  # 'vincular_materia',
                   'numero',
                   'data',
                   'hora',
