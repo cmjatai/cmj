@@ -26,9 +26,9 @@ re_path(r'^sapl/', include(sapl.relatorios.urls)),
 re_path(r'^sapl/', include(sapl.base.urls)),"""
 
 from django.conf import settings
-from django.urls.conf import re_path, include
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.urls.conf import re_path, include
 from django.views.generic.base import TemplateView
 
 import cmj.agenda.urls
@@ -37,8 +37,8 @@ import cmj.cerimonial.urls
 import cmj.core.urls
 from cmj.core.views_short import ShortRedirectView
 import cmj.diarios.urls
-import cmj.loa.urls
 import cmj.globalrules.urls
+import cmj.loa.urls
 import cmj.ouvidoria.urls
 import cmj.search.urls
 import cmj.sigad.urls
@@ -61,7 +61,7 @@ import sapl.sessao.urls
 
 urlpatterns_all = [
     re_path(r'^j(?P<short>[0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]*)$',
-        ShortRedirectView.as_view(), name='short_view'),
+            ShortRedirectView.as_view(), name='short_view'),
 
     re_path(r'^admin/', admin.site.urls),
 
@@ -102,7 +102,7 @@ admin.site.site_header = 'Cmj'
 
 if settings.DEBUG_TOOLBAR_ACTIVE:
     import debug_toolbar
-    urlpatterns_all.append(url('__debug__/', include(debug_toolbar.urls)))
+    urlpatterns_all.append(re_path('__debug__/', include(debug_toolbar.urls)))
 
 if settings.DEBUG:
     urlpatterns_all += static(settings.STATIC_URL,

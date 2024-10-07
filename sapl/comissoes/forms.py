@@ -127,7 +127,7 @@ class ParticipacaoCreateForm(forms.ModelForm):
     def __init__(self, user=None, **kwargs):
         super(ParticipacaoCreateForm, self).__init__(**kwargs)
 
-        if self.instance:
+        if self.instance and self.instance.pk:
             comissao = kwargs['initial']
             comissao_pk = int(comissao['parent_pk'])
             composicao = Composicao.objects.get(id=comissao_pk)
@@ -434,7 +434,7 @@ class DocumentoAcessorioCreateForm(FileFieldCheckMixin, forms.ModelForm):
     def __init__(self, user=None, **kwargs):
         super(DocumentoAcessorioCreateForm, self).__init__(**kwargs)
 
-        if self.instance:
+        if self.instance and self.instance.pk:
             reuniao = Reuniao.objects.get(id=self.initial['parent_pk'])
             comissao = reuniao.comissao
             comissao_pk = comissao.id

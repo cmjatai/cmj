@@ -1681,7 +1681,7 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
             self.fields['numero_materia'].initial = inst.materia.numero
             self.fields['ano_materia'].initial = inst.materia.ano
 
-        if inst:
+        if inst and inst.pk:
             anexador = inst.documento_anexado_set.first()
             if anexador:
                 anexador = anexador.documento_principal
