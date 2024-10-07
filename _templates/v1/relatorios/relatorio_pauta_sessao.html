@@ -24,7 +24,7 @@
   <h2 class="gray-title">Informações Básicas</h2>
   <p><b>Tipo da Sessão:</b> {{inf_basicas_dic.nom_sessao}}</p>
   <p><b>Abertura:</b> {{inf_basicas_dic.dat_inicio_sessao}} - {{inf_basicas_dic.hr_inicio_sessao}}</p>
-  <p><b>Encerramento:</b> {{inf_basicas_dic.dat_fim_sessao}} - {{inf_basicas_dic.hr_fim_sessao}}</p>
+  <p><b>Encerramento:</b> {{inf_basicas_dic.dat_fim_sessao|default:''}} - {{inf_basicas_dic.hr_fim_sessao|default:''}}</p>
 
   <h2 class="gray-title">Matérias do Expediente</h2>
   <table class="grayTable">
@@ -38,7 +38,7 @@
     <tbody>
       {% for materia in lst_expediente_materia%}
         <tr>
-          <td style="width: 5cm">
+          <td style="width: 4cm">
             <dl>
               <dt>
                 <a href="{{"SITE_URL"|settings_key_filter}}{% url 'sapl.materia:materialegislativa_detail' materia.id_materia %}">
@@ -46,11 +46,11 @@
                 </a>
               </dt>
               <dt><b>Turno:</b> {{materia.des_turno}}</dt>
-              <dt><b>{{materia.num_autores}}:</b> {{materia.nom_autor}}</dt>
+              <dt><b>{{materia.num_autores}}:</b><br>{{materia.nom_autor}}</dt>
             </dl>
           </td>
           <td>{{ materia.txt_ementa|safe }}</td>
-          <td style="width: 5cm">
+          <td style="width: 7cm; text-align: left;">
             {{materia.des_situacao|safe}}
           </td>
         </tr>
@@ -70,7 +70,7 @@
     <tbody>
       {% for materia in lst_votacao%}
         <tr>
-          <td style="width: 5cm">
+          <td style="width: 4cm">
             <dl>
               <dt>
                 <a href="{{"SITE_URL"|settings_key_filter}}{% url 'sapl.materia:materialegislativa_detail' materia.id_materia %}">
@@ -78,7 +78,7 @@
                 </a>
               </dt>
               <dt><b>Turno:</b> {{materia.des_turno}}</dt>
-              <dt><b>{{materia.num_autores}}:</b> {{materia.nom_autor}}</dt>
+              <dt><b>{{materia.num_autores}}:</b><br>{{materia.nom_autor}}</dt>
             </dl>
           </td>
           <td><div>{{materia.txt_ementa|safe}}</div>
@@ -89,7 +89,7 @@
                 - {{anexada}}<br>
             {% endfor %}
           </td>
-          <td style="width:5cm; text-align: left;">
+          <td style="width: 7cm; text-align: left;">
             {{materia.des_situacao|safe}}
             </td>
         </tr>
