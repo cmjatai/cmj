@@ -28,7 +28,7 @@ from django_filters.filters import ModelMultipleChoiceFilter
 from django_filters.widgets import CSVWidget
 
 from cmj.mixins import GoogleRecapthaMixin
-from cmj.utils import CHOICE_SIGNEDS
+from cmj.utils import CHOICE_SIGNEDS, AlertSafe
 import sapl
 from sapl.base.models import AppConfig, Autor, TipoAutor
 from sapl.comissoes.models import Comissao, Participacao, Composicao
@@ -553,7 +553,7 @@ class DocumentoAcessorioProtocoloForm(FileFieldCheckMixin, ModelForm):
         fields.append(
             Fieldset(_('Vincular a Matéria Legislativa'), row0,
                      to_column(
-                (Alert('<strong></strong><br><span></span>',
+                (AlertSafe('<strong></strong><br><span></span>',
                        css_class="ementa_materia hidden alert-info",
 
                        dismiss=False), 12)))

@@ -17,7 +17,7 @@ import django_filters
 
 from cmj.core.models import AreaTrabalho
 from cmj.mixins import GoogleRecapthaMixin
-from cmj.utils import CHOICE_SIGNEDS
+from cmj.utils import CHOICE_SIGNEDS, AlertSafe
 from sapl.base.models import AppConfig, Autor, TipoAutor
 from sapl.crispy_layout_mixin import (SaplFormHelper, SaplFormLayout,
                                       form_actions, to_column, to_row)
@@ -537,7 +537,7 @@ class ProtocoloDocumentForm(ModelForm):
              ])
         row3 = to_row([
             (Div(), 1),
-            (Alert(
+            (AlertSafe(
                 """
                 Usuário: <strong>{}</strong> - {}<br>
                 IP: <strong>{}</strong> - {}<br>
@@ -659,7 +659,7 @@ class ProtocoloDocumentoAcessorioForm(ModelForm):
             ])
         row3 = to_row([
             (Div(), 1),
-            (Alert(
+            (AlertSafe(
                 """
                 Usuário: <strong>{}</strong> - {}<br>
                 IP: <strong>{}</strong> - {}<br>
@@ -850,7 +850,7 @@ class ProtocoloMateriaForm(ModelForm):
 
         row3 = to_row([
             (Div(), 2),
-            (Alert(
+            (AlertSafe(
                 """
                 Usuário: <strong>{}</strong> - {}<br>
                 IP: <strong>{}</strong> - {}<br>
@@ -1649,7 +1649,7 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
             fieldset.append(
                 Fieldset(_('Vincular a Matéria Legislativa'), row5_5,
                          to_column(
-                    (Alert('<strong></strong><br><span></span>',
+                    (AlertSafe('<strong></strong><br><span></span>',
                            css_class="ementa_materia hidden alert-info",
 
                            dismiss=False), 12)))
@@ -1658,7 +1658,7 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
         fieldset.append(
             Fieldset(_('Anexar a outro Documento'), row0,
                      to_column(
-                (Alert('<strong></strong><br><span></span>',
+                (AlertSafe('<strong></strong><br><span></span>',
                        css_class="assunto_anexador hidden alert-info",
                        dismiss=False), 12)))
         )

@@ -1,13 +1,14 @@
 from collections import defaultdict
 from datetime import date, datetime, timedelta
 from functools import wraps
+from unicodedata import normalize as unicodedata_normalize
 import logging
 import re
 import ssl
 import subprocess
 import threading
-from unicodedata import normalize as unicodedata_normalize
 
+from crispy_forms.bootstrap import Alert
 from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
@@ -15,15 +16,16 @@ from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.core.mail.backends.smtp import EmailBackend
 from django.db import connection
-from django.db.models.signals import pre_init, post_init, pre_save, post_save,\
+from django.db.models.signals import pre_init, post_init, pre_save, post_save, \
     pre_delete, post_delete, post_migrate, pre_migrate, m2m_changed
 from django.template.loaders.filesystem import Loader
 from django.utils import timezone
 from django.utils.functional import cached_property
+from django.utils.safestring import SafeString
 from django.utils.translation import gettext_lazy as _
 from easy_thumbnails import source_generators
-import magic
 from unipath.path import Path
+import magic
 
 
 media_protected_storage = FileSystemStorage(
@@ -581,3 +583,10 @@ class CmjEmailBackend(EmailBackend):
             ssl_context = ssl.create_default_context()
             ssl_context.check_hostname = False
             ssl_context.verify_mode
+
+
+class AlertSafe(Alert):
+
+    def __init__(self, content, dismiss = True, block = False, css_id = None, css_class = None, template = None, **kwargs):
+        super().__init__(SafeString(content), dismiss, block, css_id, css_class, template, **kwargs)
+

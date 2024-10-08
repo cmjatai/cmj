@@ -74,7 +74,7 @@ class DenunciaForm(ModelForm):
         if 'logged_user' in kwargs['initial'] and \
                 kwargs['initial']['logged_user']:
             rows.insert(
-                0, Alert(
+                0, AlertSafe(
                     _('<strong>Atenção, você foi desconectado!!!</strong><br>'
                       'Ao escolher fazer uma denúncia anônima, '
                       'o Portal da Câmara Municipal de Jataí desconectou seu '

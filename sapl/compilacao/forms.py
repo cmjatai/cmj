@@ -14,7 +14,7 @@ from django.forms.models import ModelForm
 from django.template import defaultfilters
 from django.utils.translation import gettext_lazy as _
 from model_utils.choices import Choices
-
+from cmj.utils import AlertSafe
 from sapl import utils
 from sapl.compilacao.models import (NOTAS_PUBLICIDADE_CHOICES,
                                     PARTICIPACAO_SOCIAL_CHOICES, Dispositivo,
@@ -904,7 +904,7 @@ class DispositivoEdicaoVigenciaForm(ModelForm):
             ('publicacao', 6),
             (InlineRadios('inconstitucionalidade'), 3), ])
         row_publicacao.fields.append(
-            Alert(
+            AlertSafe(
                 css_class='alert-info col-md-3',
                 content='<strong>%s</strong> %s' % (
                     _('Dica!'), _('Inclua uma Nota de Dispositivo informando '
@@ -926,7 +926,7 @@ class DispositivoEdicaoVigenciaForm(ModelForm):
 
         if (inst.dispositivos_vigencias_set.exists()):
             row_datas.fields.append(
-                Alert(
+                AlertSafe(
                     css_class='alert-info col-md-12',
                     content='<strong>%s</strong> %s' % (
                         _('Atenção!'),
