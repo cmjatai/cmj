@@ -465,14 +465,14 @@ class Command(BaseCommand):
 
                 ru = results[k][u]
 
-                if d.ano not in ru['ArqDocumentos']:
+                if d.data.year not in ru['ArqDocumentos']:
                     ru['ArqDocumentos'][ano] = {
                         'total': 0, 'paginas': 0, 'ep': []}
 
                 ru['ArqDocumentos'][ano]['total'] += 1
 
                 try:
-                    ru['ArqDocumentos'][ano]['paginas'] += 0  # d.paginas
+                    ru['ArqDocumentos'][ano]['paginas'] += d.paginas
                 except:
                     ru['ArqDocumentos'][ano]['ep'].append(
                         d.id)

@@ -676,6 +676,7 @@ class CertidaoPublicacaoCrud(Crud):
                     self.object.certificado = ContentFile(
                         fpdf, name=f'cert-cmj-{self.object.id}.pdf')
 
+                    self.object.modifier = request.user
                     self.object.save()
                     return
 

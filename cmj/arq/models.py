@@ -1,18 +1,18 @@
+from time import sleep
 import glob
 import logging
 import os
 import pathlib
 import re
 import shutil
-from time import sleep
 
-from django.db.models.fields.json import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models.deletion import PROTECT, CASCADE
+from django.db.models.fields.json import JSONField
 from django.utils.translation import gettext_lazy as _
 
-from cmj.mixins import CmjAuditoriaModelMixin
+from cmj.mixins import CmjAuditoriaModelMixin, CommonMixin
 from cmj.utils import get_settings_auth_user_model, texto_upload_path, normalize
 from sapl.utils import PortalFileField
 
@@ -406,7 +406,7 @@ def arqdoc_path(instance, filename):
     return path
 
 
-class ArqDoc(Parent, CmjAuditoriaModelMixin):
+class ArqDoc(CommonMixin, Parent, CmjAuditoriaModelMixin):
 
     FIELDFILE_NAME = ('arquivo',)
 
