@@ -246,6 +246,7 @@ class RelatoriaParlamentarCrud(CrudBaseForListAndDetailExternalAppView):
     parent_field = 'parlamentar'
     help_topic = 'tramitacao_relatoria'
     namespace = AppConfig.name
+    public = [RP_LIST]
 
     class BaseMixin(CrudBaseForListAndDetailExternalAppView.BaseMixin):
 
@@ -363,6 +364,7 @@ class ParticipacaoParlamentarCrud(CrudBaseForListAndDetailExternalAppView):
     model = Participacao
     parent_field = 'parlamentar'
     namespace = AppConfig.name
+    public = [RP_LIST]
     list_field_names = ['composicao__comissao__nome', 'cargo__nome', (
         'composicao__periodo__data_inicio', 'composicao__periodo__data_fim')]
 
