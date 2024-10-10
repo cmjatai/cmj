@@ -164,7 +164,7 @@ def age(data, max_age=0):
     if max_age:
         td = today - data
         if td.total_seconds() > max_age * 86400:
-            return date_format(data, 'd \d\e M \d\e Y')
+            return date_format(data, r'd \d\e M \d\e Y')
 
     if idade.years or idade.months or idade.days > 2:
         years = '%s %s%s' % (

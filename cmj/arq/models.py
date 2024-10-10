@@ -76,7 +76,7 @@ def remove_files_and_folders(directory):
 
 def draftmidia_path(instance, filename):
 
-    filename = re.sub('\s', '_', normalize(filename.strip()).lower())
+    filename = re.sub(r'\s', '_', normalize(filename.strip()).lower())
     filename = filename.split('.')
 
     filename = '' if len(filename[-1]) > 4 else f'.{filename[-1]}'
@@ -387,7 +387,7 @@ class ArqClasse(Parent):
 
 def arqdoc_path(instance, filename):
 
-    filename = re.sub('\s', '_', normalize(filename.strip()).lower())
+    filename = re.sub(r'\s', '_', normalize(filename.strip()).lower())
     filename = filename.split('.')
 
     filename = '' if len(filename[-1]) > 4 else f'.{filename[-1]}'

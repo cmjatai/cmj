@@ -585,7 +585,7 @@ class CertidaoPublicacaoCrud(Crud):
         def hook_created(self, *args, **kwargs):
             return '{}'.format(
                 formats.date_format(
-                    timezone.template_localtime(args[0].created), 'd/m/Y \à\s H:i')
+                    timezone.template_localtime(args[0].created), r'd/m/Y \à\s H:i')
             ), args[2]
 
     class DetailView(DetailView, SeloCertidaoMixin):
@@ -805,7 +805,7 @@ class BiView(ListView):
                     if model not in g:
                         g[model] = {
                             'count': 0,
-                            'color': re.sub('\s', '', normalize(model.lower()))
+                            'color': re.sub(r'\s', '', normalize(model.lower()))
                         }
                     for ano, ra in rm.items():  # rm -> result anos
                         try:

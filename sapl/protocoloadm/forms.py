@@ -2006,7 +2006,7 @@ class TramitacaoEmLoteAdmForm(ModelForm):
         ])
 
         documentos_checkbox_HTML = '''
-            <br\><br\><br\>
+            <br><br><br>
             <fieldset>
                 <legend style="font-size: 24px;">Selecione os documentos para tramitação:</legend>
                 <table class="table table-striped table-hover">

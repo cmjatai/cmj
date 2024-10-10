@@ -143,8 +143,7 @@ urlpatterns_proposicao = [
         name='proposicao-recebida'),
     re_path(r'^proposicao/devolvida/', ProposicaoDevolvida.as_view(),
         name='proposicao-devolvida'),
-    re_path(r'^proposicao/confirmar/P(?P<hash>[0-9A-Fa-f]+)/'
-        '(?P<pk>\d+)', ConfirmarProposicao.as_view(),
+    re_path(r'^proposicao/confirmar/P(?P<hash>[0-9A-Fa-f]+)/(?P<pk>\d+)', ConfirmarProposicao.as_view(),
         name='proposicao-confirmar'),
     re_path(r'^sistema/proposicao/tipo',
         include(TipoProposicaoCrud.get_urls())),

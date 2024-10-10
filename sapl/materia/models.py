@@ -457,7 +457,7 @@ class MateriaLegislativa(CommonMixin):
             'numero': self.numero,
             'data': defaultfilters.date(
                 self.data_apresentacao,
-                "d \d\e F \d\e Y"
+                r"d \d\e F \d\e Y"
             )}
 
     @property
@@ -1100,7 +1100,7 @@ class Proposicao(CommonMixin):
         return '%s nº _____ %s' % (
             self.tipo, formats.date_format(
                 self.data_envio if self.data_envio else timezone.now(),
-                "\d\e d \d\e F \d\e Y"))
+                r"\d\e d \d\e F \d\e Y"))
 
     class Meta:
         ordering = ['-data_recebimento']
@@ -1138,7 +1138,7 @@ class Proposicao(CommonMixin):
             'numero': self.numero_proposicao,
             'data': defaultfilters.date(
                 self.data_envio if self.data_envio else timezone.now(),
-                "d \d\e F \d\e Y"
+                r"d \d\e F \d\e Y"
             )}
 
     def delete(self, using=None, keep_parents=False):

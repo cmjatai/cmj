@@ -264,7 +264,7 @@ class TextoArticulado(TimestampedMixin):
             return _('%(tipo)s nº %(numero)s de %(data)s') % {
                 'tipo': self.tipo_ta,
                 'numero': self.numero,
-                'data': defaultfilters.date(self.data, "d \d\e F \d\e Y")}
+                'data': defaultfilters.date(self.data, r"d \d\e F \d\e Y")}
 
     def delete(self, using=None, keep_parents=False):
 
@@ -982,7 +982,7 @@ class Publicacao(TimestampedMixin):
     def __str__(self):
         return _('%s realizada em %s \n <small>%s</small>') % (
             self.tipo_publicacao,
-            defaultfilters.date(self.data, "d \d\e F \d\e Y"),
+            defaultfilters.date(self.data, r"d \d\e F \d\e Y"),
             self.ta)
 
 
@@ -1016,9 +1016,9 @@ class UrlizeReferencia(models.Model):
 
     patterns = [
         #r'(LEI|RESOLUÇÃO|DECRETO) (MUNICIPAL)? \d{2,4}'
-        f'{__base__}(,?)( ?de ?)( ?\d+ ?)(&DEG;|&ordm;|[o\u00B0\u00BA\u00AA])?( ?de ?)([abçdefghijlmnorstuvz&c;]+)( ?de ?)(\d*)(\.?)(\d+)',
-        f'{__base__}( ?/ ?)(\d*)(\.?)(\d+)',
-        f'{__base__}(,?)( ?de ?)(\d+)(/)(\d+)(/)(\d*)(\.?)(\d+)',
+        rf'{__base__}(,?)( ?de ?)( ?\d+ ?)(&DEG;|&ordm;|[o\u00B0\u00BA\u00AA])?( ?de ?)([abçdefghijlmnorstuvz&c;]+)( ?de ?)(\d*)(\.?)(\d+)',
+        rf'{__base__}( ?/ ?)(\d*)(\.?)(\d+)',
+        rf'{__base__}(,?)( ?de ?)(\d+)(/)(\d+)(/)(\d*)(\.?)(\d+)',
     ]
 
     for n, p in enumerate(patterns):

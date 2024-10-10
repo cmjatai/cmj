@@ -153,13 +153,11 @@ urlpatterns = [
         PesquisarSessaoPlenariaView.as_view(), name='pesquisar_sessao'),
     re_path(r'^sessao/(?P<pk>\d+)/matordemdia/votnom/(?P<oid>\d+)/(?P<mid>\d+)$',
         VotacaoNominalView.as_view(), name='votacaonominal'),
-    re_path(r'^sessao/(?P<pk>\d+)/matordemdia/votnom'
-        '/edit/(?P<oid>\d+)/(?P<mid>\d+)$',
+    re_path(r'^sessao/(?P<pk>\d+)/matordemdia/votnom/edit/(?P<oid>\d+)/(?P<mid>\d+)$',
         VotacaoNominalEditView.as_view(), name='votacaonominaledit'),
     re_path(r'^sessao/(?P<pk>\d+)/matordemdia/votsec/(?P<oid>\d+)/(?P<mid>\d+)$',
         VotacaoView.as_view(), name='votacaosecreta'),
-    re_path(r'^sessao/(?P<pk>\d+)/matordemdia/votsec'
-        '/view/(?P<oid>\d+)/(?P<mid>\d+)$',
+    re_path(r'^sessao/(?P<pk>\d+)/matordemdia/votsec/view/(?P<oid>\d+)/(?P<mid>\d+)$',
         VotacaoEditView.as_view(), name='votacaosecretaedit'),
     re_path(r'^sessao/(?P<pk>\d+)/matordemdia/votsimb/(?P<oid>\d+)/(?P<mid>\d+)$',
         VotacaoView.as_view(), name='votacaosimbolica'),
@@ -167,8 +165,7 @@ urlpatterns = [
     re_path(r'^sessao/(?P<pk>\d+)/matordemdia/votsimbbloco/$',
         VotacaoView.as_view(), name='votacaosimbolicabloco'),
 
-    re_path(r'^sessao/(?P<pk>\d+)/matordemdia/votsimb'
-        '/view/(?P<oid>\d+)/(?P<mid>\d+)$',
+    re_path(r'^sessao/(?P<pk>\d+)/matordemdia/votsimb/view/(?P<oid>\d+)/(?P<mid>\d+)$',
         VotacaoEditView.as_view(), name='votacaosimbolicaedit'),
     re_path(r'^sessao/(?P<pk>\d+)/matexp/votnom/(?P<oid>\d+)/(?P<mid>\d+)$',
         VotacaoNominalExpedienteView.as_view(), name='votacaonominalexp'),

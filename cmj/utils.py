@@ -301,7 +301,7 @@ def intervalos_tem_intersecao(a_inicio, a_fim, b_inicio, b_fim):
 
 def texto_upload_path(instance, filename, subpath='', pk_first=False, _prefix='public'):
 
-    filename = re.sub('\s', '_', normalize(filename.strip()).lower())
+    filename = re.sub(r'\s', '_', normalize(filename.strip()).lower())
 
     prefix = _prefix
 

@@ -247,14 +247,14 @@ class NormaJuridica(CommonMixin):
         return _('%(tipo)s nº %(numero)s de %(data)s') % {
             'tipo': self.tipo,
             'numero': self.numero,
-            'data': defaultfilters.date(self.data, "d \d\e F \d\e Y")}
+            'data': defaultfilters.date(self.data, r"d \d\e F \d\e Y")}
 
     @property
     def epigrafe(self):
         return _('%(tipo)s nº %(numero)s de %(data)s') % {
             'tipo': self.tipo,
             'numero': self.numero,
-            'data': defaultfilters.date(self.data, "d \d\e F \d\e Y")}
+            'data': defaultfilters.date(self.data, r"d \d\e F \d\e Y")}
 
     def delete(self, using=None, keep_parents=False):
         if self.texto_integral:
