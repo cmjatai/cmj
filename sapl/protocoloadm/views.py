@@ -1,10 +1,10 @@
 from datetime import datetime
 from distutils.util import strtobool
+from random import choice
+from string import ascii_letters, digits
 import hashlib
 import io
 import logging
-from random import choice
-from string import ascii_letters, digits
 import tempfile
 import zipfile
 
@@ -46,9 +46,9 @@ from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa, Unid
     DocumentoAcessorio
 from sapl.materia.views import gerar_pdf_impressos
 from sapl.parlamentares.models import Legislatura, Parlamentar
-from sapl.protocoloadm.forms import ProtocoloDocumentoAcessorioForm,\
+from sapl.protocoloadm.forms import ProtocoloDocumentoAcessorioForm, \
     VinculoDocAdminMateriaEmLoteFilterSet, VinculoDocAdminMateriaForm
-from sapl.protocoloadm.models import Protocolo, DocumentoAdministrativo,\
+from sapl.protocoloadm.models import Protocolo, DocumentoAdministrativo, \
     VinculoDocAdminMateria
 from sapl.relatorios.views import relatorio_doc_administrativos, get_rodape, \
     make_pdf
@@ -2550,10 +2550,6 @@ class VinculoDocAdminMateriaCrud(MasterDetailCrud):
         def layout_key(self):
             return 'VinculoDocAdminMateriaDetail'
 
-        def get_context_data(self, **kwargs):
-            context = super().get_context_data(**kwargs)
-            context['title'] = self.object.documento.epigrafe
-            return context
 
         def get(self, request, *args, **kwargs):
             try:
@@ -2600,9 +2596,7 @@ class VinculoDocAdminMateriaCrud(MasterDetailCrud):
             context = super(MasterDetailCrud.DetailView,
                             self).get_context_data(**kwargs)
 
-            context[
-                'title'] = 'Documento Principal: <small>(%s)</small>' % (
-                    dp)
+            context['title'] = self.object.documento.epigrafe
             return context
 
     class ListView(
