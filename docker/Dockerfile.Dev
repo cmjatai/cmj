@@ -1,4 +1,4 @@
-FROM python:3.10.12-bullseye
+FROM python:3.12.7-bookworm
 #FROM python:3.10-slim-buster
 
 ENV LANG C.UTF-8
@@ -15,14 +15,14 @@ RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y --no-install-recommends $BUILD_PACKAGES
 
-ENV RUN1_PACKAGES git graphviz python3-lxml python3-magic postgresql-client python3-psycopg2 \
-                 poppler-utils curl jq bash vim python3-venv tzdata nodejs python
+ENV RUN1_PACKAGES git graphviz python3-lxml python3-magic postgresql-client \
+                 poppler-utils curl jq bash vim python3-venv tzdata nodejs
 RUN apt-get install -y --no-install-recommends $RUN1_PACKAGES
 
-ENV RUN2_PACKAGES fontconfig openjdk-11-jdk-headless fonts-liberation
+ENV RUN2_PACKAGES fontconfig fonts-liberation openjdk-17-jdk-headless
 RUN apt-get install -y --no-install-recommends $RUN2_PACKAGES
 
-ENV RUN3_PACKAGES tesseract-ocr tesseract-ocr-por ghostscript
+ENV RUN3_PACKAGES tesseract-ocr tesseract-ocr-por ghostscript python3-psycopg
 RUN apt-get install -y --no-install-recommends $RUN3_PACKAGES
 
 ENV LIBRE_PACKAGES libreoffice \
@@ -64,7 +64,6 @@ WORKDIR /var/cmjatai/cmj/
 
 ADD requirements  /var/cmjatai/cmj_dev/requirements
 RUN pip install -r /var/cmjatai/cmj_dev/requirements/dev-requirements.txt
-
 USER cmj
 
 ENV DEBIAN_FRONTEND teletype
