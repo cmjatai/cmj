@@ -130,7 +130,7 @@ def video_duration(jdata):
 
     d = j['contentDetails']['duration']
 
-    return time_of_period(d)
+    return time_of_period(d)[0]
 
 
 @register.filter

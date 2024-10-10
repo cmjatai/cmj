@@ -366,13 +366,13 @@ def time_of_period(period):
         8760 if 'years' in pd and pd['years'] else 0
 
     pd['hours'] += int(pd['months']) * \
-        730 if 'months' in pd and pd['months'] else 0
+        720 if 'months' in pd and pd['months'] else 0
 
     pd['hours'] += int(pd['weeks']) * \
         168 if 'weeks' in pd and pd['weeks'] else 0
 
     pd['hours'] += int(pd['days']) * \
-        168 if 'days' in pd and pd['days'] else 0
+        24 if 'days' in pd and pd['days'] else 0
 
     r = '{hours}{separator1}{minutes:02d}:{seconds:02d}'.format(
         hours=pd['hours'] if pd['hours'] else '',
@@ -380,7 +380,8 @@ def time_of_period(period):
         minutes=pd['minutes'],
         seconds=pd['seconds'],
     )
-    return r
+    seconds = pd['hours'] * 3600 + pd['minutes'] * 60 + pd['seconds']
+    return r, seconds
 
 
 def run_sql(sql):
