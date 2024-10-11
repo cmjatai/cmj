@@ -65,7 +65,7 @@ urlpatterns_all = [
 
     re_path(r'^admin/', admin.site.urls),
 
-    re_path(r'^index.html$', TemplateView.as_view(template_name='index.html')),
+    #re_path(r'^index.html$', TemplateView.as_view(template_name='index.html')),
 
     re_path(r'^message$', TemplateView.as_view(template_name='base.html')),
     re_path('', include('social_django.urls', namespace='social')),
