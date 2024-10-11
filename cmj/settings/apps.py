@@ -1,8 +1,13 @@
 import sys
+from decouple import AutoConfig
+from unipath import Path
+
+config = AutoConfig()
+DEBUG = config('DEBUG', default=False, cast=bool)
+FRONTEND_VERSION = config('FRONTEND_VERSION', default='v1', cast=str)
 
 PYTHON_VERSION = sys.version_info[0:3]
 PYTHON_VERSION_MIN_FOR_JWT = 3, 7, 0
-
 
 INSTALLED_APPS = (
     'daphne',
@@ -39,15 +44,15 @@ INSTALLED_APPS = (
     'django_celery_results',
     'celery_haystack',
 
-    'webpack_loader',
-
-
     # 'whoosh',
     # 'speedinfo',
     # 'taggit',
 
     'sapl',  # não retire, é necessário para os templates centralizados do sapl
 )
+
+if FRONTEND_VERSION == 'v1':
+    INSTALLED_APPS = INSTALLED_APPS + ('webpack_loader', )
 
 SAPL_APPS = (
     'sapl.audiencia',
@@ -64,7 +69,6 @@ SAPL_APPS = (
     'sapl.redireciona_urls',
     'sapl.compilacao',
     'sapl.api',
-
 )
 
 # CMJ_APPS business apps in dependency order

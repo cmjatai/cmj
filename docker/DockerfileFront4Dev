@@ -1,0 +1,30 @@
+FROM node:20.18.0-bookworm
+
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
+
+#ENV RUN1_PACKAGES bash vim
+#RUN apt-get install -y --no-install-recommends $RUN1_PACKAGES
+
+# Define environment variables
+ENV USER_NAME=leandro
+ENV GROUP_NAME=leandro
+ENV USER_ID=$USER_ID
+ENV GROUP_ID=$GROUP_ID
+ENV USER_ID=${USER_ID:-1001}
+ENV GROUP_ID=${GROUP_ID:-1001}
+
+RUN addgroup --gid ${GROUP_ID} ${GROUP_NAME}
+RUN adduser --disabled-password --gecos '' --uid ${USER_ID} --ingroup ${GROUP_NAME} ${USER_NAME}
+
+RUN mkdir -p /var/cmjatai/cmj/_frontend/v4
+RUN chown -R leandro:leandro /var/cmjatai/cmj/_frontend/v4
+
+
+WORKDIR /var/cmjatai/cmj/_frontend/v4
+
+EXPOSE 5173/tcp
+
+VOLUME ["/var/cmjatai/cmj"]
+
+CMD ["/var/cmjatai/cmj/_frontend/v4/startfront-dev.sh"]

@@ -42,6 +42,20 @@ services:
       - cmj-net
     ports:
       - "127.0.0.1:8080:8080"
+  cmj4front:
+    build:
+      context: ../_frontend/v4/
+      dockerfile: ../../docker/DockerfileFront4Dev
+    restart: no
+    container_name: cmj4front
+    labels:
+       NAME: "cmj4front"
+    volumes:
+      - ../:/var/cmjatai/cmj
+    networks:
+      - cmj-net
+    ports:
+      - "127.0.0.1:5173:5173"
   cmj:
     build:
       context: ../
