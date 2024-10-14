@@ -29,7 +29,6 @@ git+https://github.com/LeandroJatai/celery-haystack.git
 pymupdf==1.24.11
 ocrmypdf==16.5.0 # versões acima precisam do ghostscript acima de 9.53.3
 #pikepdf>=5.0.0,<6.0.0
-reportlab==4.2.5
 trml2pdf
 pypdf4==1.27.0
 pdfrw
@@ -38,6 +37,9 @@ python-docx==1.1.2
 XlsxWriter==3.2.0
 Pillow==10.4.0
 markdown==3.7
+
+reportlab==4.2.5
+rl-renderPM==4.0.3
 
 django-braces==1.14.0
 django-model-utils==4.0.0
