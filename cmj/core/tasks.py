@@ -224,7 +224,7 @@ def signed_files_extraction(self, app_label, model_name, pk):
 def task_signed_files_extraction_function(app_label, model_name, pk):
 
     def run_signed_name_and_date_via_fields(fields):
-        signs = []
+        signs = {}
 
         for key, field in fields.items():
 
@@ -233,10 +233,10 @@ def task_signed_files_extraction_function(app_label, model_name, pk):
             if '/V' not in field:
                 continue
 
-            content_sign = field['/V']['/Contents']
-            nome = 'Nome do assinante não localizado.'
-            oname = ''
             try:
+                content_sign = field['/V']['/Contents']
+                nome = 'Nome do assinante não localizado.'
+                oname = ''
                 info = cms.ContentInfo.load(content_sign)
                 signed_data = info['content']
                 oun_old = []
@@ -281,9 +281,10 @@ def task_signed_files_extraction_function(app_label, model_name, pk):
             except:
                 pass
 
-            signs.append((nome, [fd, oname]))
+            if nome and nome not in signs:
+                signs[nome] = [fd, oname]
 
-        return signs
+        return list(signs.items())
 
     def run_signed_name_and_date_extract(file):
         signs = []
