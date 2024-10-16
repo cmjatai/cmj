@@ -1,4 +1,4 @@
-{% load i18n static common_cmj_tags cropping%}
+{% load i18n static common_cmj_tags cropping thumbnail %}
 {% load webpack_static from webpack_loader %}
     <link rel="manifest" href="/manifest.json">
     <link rel="canonical" href="{{site_url}}{{request.META.PATH_INFO}}{% if request.META.QUERY_STRING %}?{{request.META.QUERY_STRING}}{% endif %}" />
@@ -60,9 +60,9 @@
       <meta property="og:image:height" content="{{doc_imagem.midia.last.height}}">
 
     {% elif doc_imagem.fotografia %}
-      <meta property="og:image" content="{{ site_url }}{{doc_imagem.fotografia.url}}">
+      <meta property="og:image" content="{{ site_url }}{% thumbnail doc_imagem.fotografia 9000x9000 box=doc_imagem.fotografia_cropping crop detail %}">
       <meta property="og:image:type" content="image/jpeg">
-      <meta name="twitter:image" content="{{ site_url }}{{doc_imagem.fotografia.url}}">
+      <meta name="twitter:image" content="{{ site_url }}{% thumbnail doc_imagem.fotografia 9000x9000 box=doc_imagem.fotografia_cropping crop detail %}">
 
     {% elif object.referenciado %}
       <meta property="og:image" content="{{ site_url }}/{{object.absolute_slug}}.768.jpg">
