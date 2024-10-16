@@ -28,8 +28,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/brasao/escola_1024.png"
   },
   {
-    "revision": "d2e06385de87132cfed8",
-    "url": "/static/css/app.0054659d.css"
+    "revision": "002b38ffd085b0f81d40",
+    "url": "/static/css/app.9c336205.css"
   },
   {
     "revision": "be7be6c246877f96e6aa",
@@ -272,6 +272,14 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/icon_whatsapp64x64.png"
   },
   {
+    "revision": "014534399a6fb8befff55baa41e88f40",
+    "url": "/static/img/icon_x_twitter.png"
+  },
+  {
+    "revision": "f8e6bc697c257aa4fb5240c7dcbc97c4",
+    "url": "/static/img/icon_x_twitter.svg"
+  },
+  {
     "revision": "c2e9627ea8ba42292971f91003af2490",
     "url": "/static/img/lexml.gif"
   },
@@ -356,11 +364,11 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/user.png"
   },
   {
-    "revision": "220a1bbaa1f0115e883da500c86097d9",
+    "revision": "8fbbaf17cd7541943ec7c69d74a8a84f",
     "url": "/static/index.html"
   },
   {
-    "revision": "d2e06385de87132cfed8",
+    "revision": "002b38ffd085b0f81d40",
     "url": "/static/js/app.14caec33.js"
   },
   {

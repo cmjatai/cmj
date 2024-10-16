@@ -61,6 +61,11 @@
       background-image: url(~@/assets/img/icon_twitter64x64.png);
       }
     }
+    &.x-twitter {
+      &::after {
+      background-image: url(~@/assets/img/icon_x_twitter.png);
+      }
+    }
     &.youtube {
       &::after {
       background-image: url(~@/assets/img/icon_youtube64x64.png);
@@ -81,6 +86,7 @@
     &.facebook,
     &.whatsapp,
     &.twitter,
+    &.x-twitter,
     &.youtube,
     &.instagram,
     &.telegram {
