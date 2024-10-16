@@ -19,11 +19,11 @@ window.initTextRichEditor = function (elements, readonly = false) {
       class: 'd-inline-block'
     },
     */
-    plugins: 'lists table code',
+    plugins: 'lists table code link',
     min_height: 500,
     language: 'pt_BR',
     menubar: 'edit view format table tools',
-    toolbar: 'undo redo | styles | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent',
+    toolbar: 'undo redo | styles | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link',
     license_key: 'gpl'
   }
   if (readonly) {

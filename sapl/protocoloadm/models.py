@@ -3,11 +3,11 @@ import hashlib
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
-from django.db.models.fields.json import JSONField
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models.deletion import PROTECT
+from django.db.models.fields.json import JSONField
 from django.urls.base import reverse
 from django.utils import timezone, formats
 from django.utils.translation import gettext_lazy as _
@@ -17,7 +17,7 @@ from cmj.core.models import AreaTrabalho, CertidaoPublicacao
 from cmj.diarios.models import VinculoDocDiarioOficial, DiarioOficial
 from cmj.mixins import CommonMixin
 from sapl.base.models import Autor
-from sapl.materia.models import TipoMateriaLegislativa, UnidadeTramitacao,\
+from sapl.materia.models import TipoMateriaLegislativa, UnidadeTramitacao, \
     MateriaLegislativa
 from sapl.utils import (RANGE_ANOS, YES_NO_CHOICES, texto_upload_path,
                         get_settings_auth_user_model,
@@ -330,7 +330,7 @@ class DocumentoAdministrativo(CommonMixin):
         null=True,
         verbose_name=_('Número Externo'))
     observacao = models.TextField(
-        blank=True, verbose_name=_('Resumo'))
+        blank = True, verbose_name = _('Outras Informações'))
     texto_integral = PortalFileField(
         blank=True,
         null=True,

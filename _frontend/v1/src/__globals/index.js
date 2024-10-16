@@ -20,6 +20,7 @@ import 'tinymce/icons/default'
 import 'tinymce/plugins/table'
 import 'tinymce/plugins/lists'
 import 'tinymce/plugins/code'
+import 'tinymce/plugins/link'
 import 'tinymce/models/dom'
 
 import 'jquery-mask-plugin'
