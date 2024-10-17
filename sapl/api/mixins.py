@@ -164,6 +164,9 @@ class ResponseFileMixin:
         if mime == 'application/jpg':
             mime = 'image/jpg'
 
+        if mime == 'application/jpeg':
+            mime = 'image/jpeg'
+
         custom_filename = arquivo.name.split('/')[-1]
         if hasattr(self, 'custom_filename'):
             custom_filename = self.custom_filename(item)
@@ -194,7 +197,7 @@ class ResponseFileMixin:
 
         if thumbnail:
             original = ''
-            arquivo = thumbnail.name
+            arquivo = thumbnail
 
         response['X-Accel-Redirect'] = "/mediaredirect/{0}{1}".format(
             original,
