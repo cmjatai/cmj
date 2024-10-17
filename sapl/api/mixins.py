@@ -3,10 +3,12 @@ import os
 
 from django.conf import settings
 from django.http.response import HttpResponse, Http404
-import fitz
+from easy_thumbnails.files import get_thumbnailer
+from image_cropping.utils import get_backend
 from pymupdf import Point, Rect
-import pymupdf
 from rest_framework.exceptions import NotFound
+import fitz
+import pymupdf
 
 from cmj.core.models import AreaTrabalho
 from sapl.utils import get_mime_type_from_file_extension
@@ -129,7 +131,7 @@ class ResponseFileMixin:
             pass
 
     def response_file(self, request, *args, **kwargs):
-        item = self.get_queryset().filter(pk=kwargs['pk']).first()
+        self.item = item = self.get_queryset().filter(pk = kwargs['pk']).first()
         page = request.GET.get('page', 0)
         dpi = request.GET.get('dpi', 72)
         grade = request.GET.get('grade', '0')
@@ -159,12 +161,20 @@ class ResponseFileMixin:
         if mime == 'application/png':
             mime = 'image/png'
 
+        if mime == 'application/jpg':
+            mime = 'image/jpg'
+
         custom_filename = arquivo.name.split('/')[-1]
         if hasattr(self, 'custom_filename'):
             custom_filename = self.custom_filename(item)
 
+        thumbnail = self.thumbnail() if self.format_kwarg and mime.startswith('image') else None
+
         if settings.DEBUG:
             file_path = arquivo.original_path if 'original' in request.GET else arquivo.path
+
+            if thumbnail:
+                file_path = thumbnail.path
 
             with open(file_path, 'rb') as f:
                 response = HttpResponse(f, content_type=mime)
@@ -182,6 +192,10 @@ class ResponseFileMixin:
 
         original = 'original__' if 'original' in request.GET else ''
 
+        if thumbnail:
+            original = ''
+            arquivo = thumbnail.name
+
         response['X-Accel-Redirect'] = "/mediaredirect/{0}{1}".format(
             original,
             arquivo.name
@@ -189,6 +203,40 @@ class ResponseFileMixin:
 
         logger.debug(f'response_file end method')
         return response
+
+    def thumbnail(self):
+
+        format = self.format_kwarg
+        ext = format
+
+        if '.' in format:
+            format, ext = format.split('.')
+        else:
+            format = None
+
+        arquivo = getattr(self.item, self.action)
+
+        if not format:
+            return arquivo
+
+        if format[0] != 'c':
+            thumbnail = get_thumbnailer(arquivo).get_thumbnail({
+                    'size': (int(format), int(format)),
+                    'box': None,
+                    'crop': False,
+                    'detail': True,
+                }
+            )
+        else:
+            size = format[1:]
+            thumbnail = get_thumbnailer(arquivo).get_thumbnail({
+                    'size': (int(size), int(size)),
+                    'box': getattr(self.item, f'{self.action}_cropping'),
+                    'crop': True,
+                    'detail': True,
+                }
+            )
+        return thumbnail
 
 
 class ControlAccessFileForContainerMixin(ResponseFileMixin):

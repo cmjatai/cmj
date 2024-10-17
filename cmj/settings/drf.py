@@ -8,8 +8,11 @@ REST_FRAMEWORK = {
 
     "DEFAULT_RENDERER_CLASSES": (
         "rest_framework.renderers.JSONRenderer",
+        "drfautoapi.JpgRenderer",
+        "drfautoapi.PngRenderer",
+        "drfautoapi.PDFRenderer",
     ),
-
+    "DEFAULT_CONTENT_NEGOTIATION_CLASS": "drfautoapi.DrfautoapiNegotiation",
     "DEFAULT_PERMISSION_CLASSES": (
         "sapl.api.permissions.SaplModelPermissions",
     ),

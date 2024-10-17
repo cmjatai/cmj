@@ -1,10 +1,10 @@
 from functools import wraps
+from operator import itemgetter
+from unicodedata import normalize as unicodedata_normalize
 import hashlib
 import logging
-from operator import itemgetter
 import os
 import re
-from unicodedata import normalize as unicodedata_normalize
 import unicodedata
 
 from crispy_forms.layout import HTML, Button
@@ -29,13 +29,14 @@ from django.urls.base import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
-import django_filters
 from easy_thumbnails import source_generators
+from image_cropping.fields import ImageCropField
 from image_cropping.widgets import ImageCropWidget
-import magic
-import six
 from trml2pdf import parseString as trml2pdfParseString
 from unipath.path import Path
+import django_filters
+import magic
+import six
 import weasyprint
 
 from sapl.crispy_layout_mixin import SaplFormHelper
@@ -343,8 +344,22 @@ class PortalFieldImage(ImageFieldFile):
         except:
             return ''
 
+    @property
+    def url_cropping(self):
+        url = self.url
+
+        if url[-1] == '/':
+            url = url[:-1]
+            url = f'{url}.c1024.png'
+
+        return url
+
 
 class PortalImageField(models.ImageField):
+    attr_class = PortalFieldImage
+
+
+class PortalImageCropField(ImageCropField):
     attr_class = PortalFieldImage
 
 

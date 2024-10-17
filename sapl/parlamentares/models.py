@@ -1,8 +1,8 @@
 
-from django.db.models.fields.json import JSONField
 from django.core.cache import cache
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
+from django.db.models.fields.json import JSONField
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from image_cropping.fields import ImageCropField, ImageRatioField
@@ -13,7 +13,8 @@ from sapl.decorators import vigencia_atual
 from sapl.utils import (LISTA_DE_UFS, YES_NO_CHOICES, SaplGenericRelation,
                         get_settings_auth_user_model,
                         intervalos_tem_intersecao,
-                        restringe_tipos_de_arquivo_img, texto_upload_path)
+                        restringe_tipos_de_arquivo_img, texto_upload_path,
+    PortalImageField, PortalImageCropField)
 
 
 class Legislatura(models.Model):
@@ -370,7 +371,7 @@ class Parlamentar(models.Model):
         verbose_name=_('Ativo na Casa?'))
     biografia = models.TextField(
         blank=True, verbose_name=_('Biografia'))
-    fotografia = ImageCropField(
+    fotografia = PortalImageCropField(
         verbose_name=_('Fotografia'), upload_to=foto_upload_path, null=True, blank=True)  # validators=[restringe_tipos_de_arquivo_img],
     fotografia_cropping = ImageRatioField(
         'fotografia', '128x128', verbose_name=_('Avatar'), size_warning=True,

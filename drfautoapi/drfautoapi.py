@@ -12,8 +12,8 @@ from django.db.models.fields import TextField, CharField
 from django.db.models.fields.files import FileField
 from django.db.models.fields.json import JSONField
 from django.template.defaultfilters import capfirst
+from django.urls.conf import path
 from django.utils.translation import gettext_lazy as _
-import django_filters
 from django_filters.constants import ALL_FIELDS, EMPTY_VALUES
 from django_filters.filters import CharFilter
 from django_filters.filterset import FilterSet
@@ -21,8 +21,10 @@ from django_filters.rest_framework.backends import DjangoFilterBackend
 from django_filters.utils import resolve_field, get_all_model_fields
 from rest_framework import serializers as rest_serializers
 from rest_framework.response import Response
-from rest_framework.routers import DefaultRouter
+from rest_framework.routers import DefaultRouter, SimpleRouter
+from rest_framework.urlpatterns import format_suffix_patterns
 from rest_framework.viewsets import ModelViewSet
+import django_filters
 
 
 logger = logging.getLogger(__name__)
@@ -187,6 +189,26 @@ class BusinessRulesNotImplementedMixin:
         raise Exception(_("DELETE Delete não implementado"))
 
 
+class DrfautoapiRouter(DefaultRouter):
+
+    def get_urls(self):
+        """
+        Generate the list of URL patterns, including a default root view
+        for the API, and appending `.json` style format suffixes.
+        """
+        urls = super(DefaultRouter, self).get_urls()
+
+        if self.include_root_view:
+            view = self.get_api_root_view(api_urls = urls)
+            root_url = path('', view, name = self.root_view_name)
+            urls.append(root_url)
+
+        if self.include_format_suffixes:
+            urls = format_suffix_patterns(urls, allowed = ['[a-zA-Z.0-9]+'])
+
+        return urls
+
+
 class ApiViewSetConstrutor():
 
     _built_sets = {}
@@ -208,7 +230,7 @@ class ApiViewSetConstrutor():
             importlib.import_module(m)
 
     @classmethod
-    def router(cls, router_class=DefaultRouter):
+    def router(cls, router_class = DrfautoapiRouter):
         router = router_class()
         for app, built_sets in cls._built_sets.items():
             for model, viewset in built_sets.items():
@@ -409,3 +431,5 @@ class customize(object):
         ApiViewSetConstrutor._built_sets[
             self.model._meta.app_config][self.model] = _ApiViewSet
         return _ApiViewSet
+    
+    

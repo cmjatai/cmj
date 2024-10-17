@@ -7,7 +7,7 @@ from rest_framework.response import Response
 
 from drfautoapi.drfautoapi import customize, ApiViewSetConstrutor, \
     wrapper_queryset_response_for_drf_action
-
+from sapl.api.mixins import ResponseFileMixin
 from sapl.api.permissions import SaplModelPermissions
 from sapl.api.serializers import ParlamentarSerializerVerbose, \
     ParlamentarSerializerPublic
@@ -23,7 +23,7 @@ ApiViewSetConstrutor.build_class(
 
 
 @customize(Parlamentar)
-class _ParlamentarViewSet:
+class _ParlamentarViewSet(ResponseFileMixin):
 
     class ParlamentarPermission(SaplModelPermissions):
 
@@ -35,6 +35,10 @@ class _ParlamentarViewSet:
                 return perm
 
     permission_classes = (ParlamentarPermission,)
+
+    @action(detail = True)
+    def fotografia(self, request, *args, **kwargs):
+        return self.response_file(request, *args, **kwargs)
 
     def get_serializer(self, *args, **kwargs):
         if not self.request.user.has_perm('parlamentares.add_parlamentar'):
