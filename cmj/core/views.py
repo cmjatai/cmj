@@ -7,9 +7,7 @@ import re
 
 from django import template
 from django.conf import settings
-from django.conf.locale import ru
 from django.contrib import messages
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.base import ContentFile
 from django.db.models import Q
@@ -21,11 +19,10 @@ from django.urls.base import reverse
 from django.utils import formats, timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
-from django.views.generic.base import RedirectView, TemplateView, View
+from django.views.generic.base import RedirectView, View
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.views.static import serve as view_static_server
-from django_filters.views import FilterView
 from rest_framework import viewsets, mixins
 from rest_framework.authentication import SessionAuthentication, \
     BasicAuthentication
@@ -39,15 +36,14 @@ from cmj.core.models import Cep, TipoLogradouro, Logradouro, RegiaoMunicipal, \
     ImpressoEnderecamento, groups_remove_user, groups_add_user, Notificacao, \
     CertidaoPublicacao, Bi
 from cmj.core.serializers import TrechoSearchSerializer, TrechoSerializer
+from cmj.core.views_estatisticas import get_numeros
 from cmj.mixins import PluginSignMixin
 from cmj.utils import normalize, run_sql
-from sapl.api.mixins import ResponseFileMixin
 from sapl.compilacao.models import Dispositivo
 from sapl.crud.base import Crud, CrudAux, MasterDetailCrud, RP_DETAIL, RP_LIST
 from sapl.norma.models import NormaJuridica, AnexoNormaJuridica
 from sapl.parlamentares.models import Partido, Filiacao
 from sapl.utils import get_mime_type_from_file_extension
-import markdown as md
 
 logger = logging.getLogger(__name__)
 
@@ -784,7 +780,7 @@ class BiView(ListView):
         context['global'] = self.get_global()
         context['producao_anual'] = self.get_producao_anual()
 
-        # context['numeros'] = self.get_numeros()
+        context['numeros'] = get_numeros()
         return context
 
     def get_global(self):
@@ -880,100 +876,6 @@ class BiView(ListView):
         pa.sort(key=lambda row: row[0])
         pa.reverse()
         return pa
-
-    def get_numeros(self):
-        markstyles = '''<style>
-        .container-show{
-            padding-bottom: 4em;
-            min-height: 50vh;
-            h1 {
-                color: #00a;
-                font-size: 36pt;
-                margin: 0.5em 0 0;
-            }
-            li {
-                color: #045;
-                font-size: 24pt;
-                li {
-                    font-style: italic;
-                    color: #049;
-                }
-            }
-        }
-        </style>
-        '''
-
-        def get_fields_name(model):
-            return tuple(
-                map(
-                    lambda f: f.name,
-                    filter(
-                        lambda f: hasattr(f, 'name'), model._meta.get_fields()
-                    )
-                )
-            )
-
-        def get_size_models(models = [], s3 = 's3_aws'):
-            size_total = {}
-            for model, extra_sql in models:
-                size = 0
-                count_regs = 0
-                sum_pages = 0
-                FIELDFILE_NAME = getattr(model, 'FIELDFILE_NAME', tuple())
-
-                sum__paginas = ', sum(_paginas)' if '_paginas' in get_fields_name(model) else ''
-
-                for ffn in FIELDFILE_NAME:
-                    sql = f'''SELECT
-                            count(id),
-                            sum((metadata->'{s3}'->'{ffn}'->'size')::integer) + sum((metadata->'{s3}'->'{ffn}'->'original_size')::integer)
-                            {sum__paginas}
-                        FROM {model._meta.db_table}
-                        { extra_sql if extra_sql else '' }
-                        ;'''
-                    # print(sql)
-                    r = run_sql(sql)
-                    if not count_regs:
-                        count_regs = r[0][0]
-                    size += r[0][1]
-                    if len(r[0]) > 2:
-                        sum_pages += r[0][2]
-                else:
-                    count_regs = model.objects.count()
-
-                size_total[model] = {
-                    'size': size,
-                    'count': count_regs,
-                    'paginas': sum_pages
-                }
-            return size_total
-
-        size_models = get_size_models(
-        models = [
-            (NormaJuridica, ''),
-            (AnexoNormaJuridica, ''),
-            ]
-        )
-
-        mark = f'''
-# Legislação Municipal
-- **Normas**
-    - **{ size_models[NormaJuridica]['count'] }** itens.
-    - **{ int(size_models[NormaJuridica]['size']/1024/1024/1024) } GB**.
-    - **{ size_models[NormaJuridica]['paginas']}** páginas.
--------------------
-- **Dispostivos**
-    - **{ Dispositivo.objects.filter(ta__privacidade=0, ta__clone__isnull=True).count()- Dispositivo.objects.filter(ta__privacidade=0, ta__clone__isnull=False).count() }** itens.
--------------------
-- **Anexos de Normas**
-    - **{ size_models[AnexoNormaJuridica]['count'] }** itens.
-    - **{ int(size_models[AnexoNormaJuridica]['size']/1024/1024/1024) } GB**.
-    - **{ size_models[AnexoNormaJuridica]['paginas']}** páginas.
-'''
-        mark = md.markdown(mark)
-        mdr = f'<div class="container container-box container-show">{mark}</div>'
-
-        return mdr
 
 
 class MediaPublicView(View):

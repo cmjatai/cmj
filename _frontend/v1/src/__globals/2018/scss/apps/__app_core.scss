@@ -84,7 +84,7 @@
 
 
   }
-  
+
   .btns-login {
     margin: 1em 0;
     .btn-login {
@@ -112,14 +112,14 @@
         vertical-align: middle;
         font-size: 2.4rem;
       }
-      
-      
+
+
       &[name="facebook"]  {
         background-color:  #4267B2;
       }
       &[name="google-oauth2"] {
         background-color: #e55;
-        i { 
+        i {
           font-size: 2rem;
         }
       }
@@ -132,8 +132,8 @@
       padding: 1em 2em;
       border: 1px solid #ddd;
     }
-    
-  } 
+
+  }
 
 }
 
@@ -159,7 +159,7 @@
 
 .bi-app {
   padding-top: 1em;
-  background: $hover_background_10p $url_bg_png;
+  //background: $hover_background_10p $url_bg_png;
   .container-bi {
     padding: 1em;
     margin-bottom: 1em;
@@ -171,11 +171,11 @@
 
   .bi-footer {
     padding-top: 1em;
-    display: none;
+    //display: none;
   }
 
   .container-bi-global {
-    .inner { 
+    .inner {
       background-color: white;
       padding: 5px;
       text-align: center;
@@ -198,7 +198,7 @@
     .col {
       padding-right: 5px;
       padding-left: 5px;
-      margin-bottom: 10px; 
+      margin-bottom: 10px;
     }
     .row {
       padding: 0 10px;
@@ -206,16 +206,22 @@
     }
   }
 
+  .legend-global {
+    border-bottom: 1px solid green;
+    font-size: 5em;
+    color: #004c40aa;
+  }
   .legend {
     border-bottom: 1px solid green;
+    font-size: 2em;
   }
   .bi-graph {
 
-    .inner {      
+    .inner {
       display: grid;
-      grid-template-areas: 
+      grid-template-areas:
         "unset lx lx2 lx3"
-        "ly graph graph2 graph3"; 
+        "ly graph graph2 graph3";
       grid-template-columns: auto 1fr 1fr 1fr;
       line-height: 1.2;
     }
@@ -224,7 +230,7 @@
       display: flex;
       flex-direction: column;
       justify-content: space-around;
-      color: #777;       
+      color: #777;
       .ly-item {
         border-bottom: 1px dashed #ddd;
         display: inline-block;
@@ -264,7 +270,7 @@
       margin-left: -0.5em;
     }
 
-    
+
   }
   .bi-graph-barra-horizontal {
     .graph, .graph2, .graph3 {
@@ -272,7 +278,7 @@
       flex-direction: column;
       .group-row {
         display: flex;
-        flex-direction: column;     
+        flex-direction: column;
         padding: 5px 0;
         border-bottom: 1px dashed #ddd;
         padding-right: 1em;
@@ -328,8 +334,8 @@
 
   .bi-app {
     .bi-graph {
-      .inner {      
-        grid-template-areas: 
+      .inner {
+        grid-template-areas:
           "lx lx"
           "ly graph"
           "lx2 lx2"
@@ -436,7 +442,7 @@
         padding: 15px;
       }
     }
-    
+
   }
   .container-login-inner {
     .container-login {

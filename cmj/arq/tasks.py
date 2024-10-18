@@ -7,6 +7,7 @@ import sys
 
 from django.apps import apps
 from django.utils import timezone
+import fitz
 
 from cmj.arq.models import DraftMidia
 from cmj.celery import app
@@ -38,6 +39,25 @@ def task_ocrmypdf_function(app_label, model_name, field_name, id_list, jobs):
             continue
 
         f = getattr(instance, field_name).file
+        
+        try:
+            d_new = fitz.open()
+            doc = fitz.open(f)
+            d_new.insert_pdf(doc, from_page = 0, to_page = len(doc))
+            doc.close()
+
+            d_new.metadata['title'] = doc.metadata['title']
+            d_new.metadata['producer'] = 'PortalCMJ'
+            d_new.set_metadata(d_new.metadata)
+
+            fn = f'{f}.tmp'
+            d_new.save(fn, garbage = 3, clean = True, deflate = True)
+        except:
+            pass
+        else:
+            fpath = f.name
+            os.remove(fpath)
+            os.rename(fn, fpath)
 
         cmd = ["{}/ocrmypdf".format('/'.join(sys.executable.split('/')[:-1])),
                #"-q",                  # Execução silenciosa

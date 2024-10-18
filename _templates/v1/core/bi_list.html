@@ -4,11 +4,11 @@
 {% block second_header %}{% endblock second_header %}
 
 {% block content_container %}
-  <div class="container-fluid bi-app">
+  <div class="container bi-app">
 
     <div class="container-bi-global">
-      <h2 class="legend">
-            Portal CMJ em números
+      <h2 class="legend-global px-5 pt-5">
+            Portal CMJ em Números
       </h2>
       <div class="row justify-content-between">
         {% for key, value in global %}
@@ -128,18 +128,11 @@
             </div>
           </div>
         <div class="bi-footer">
-          BI: v0.1<br>
-          <small><i>
-            O BI do Portal CMJ está em sua versão beta.<br>
-            Neste gráfico sintético são monitorados o registro de:
-            Matérias,
-            Normas,
-            Documentos Administrativos,
-            Diários Oficiais,
-            Notícias,
-            Galerias de Imagens, Vídeos e Áudios.<br>
+          <i>
+            Os dados acima podem divergir dos dados abaixo por não contar com as inserções do dia de hoje,
+            vez que são consolidados na madrugada, uma vez ao dia.<br>
+            Já os dados abaixo são calculados em tempo real.
           </i>
-          </small>
         </div>
         </div>
       </div>
