@@ -7,12 +7,12 @@
   <div class="container bi-app">
 
     <div class="container-bi-global">
-      <h2 class="legend-global px-5 pt-5">
+      <h2 class="legend-global">
             Portal CMJ em Números
       </h2>
       <div class="row justify-content-between">
         {% for key, value in global %}
-          <div class="col">
+          <div class="col-3 col-sm-2 col-lg-1">
             <div class="inner">
               <div class="value text-{{value.color}}">
               {{value.count}}

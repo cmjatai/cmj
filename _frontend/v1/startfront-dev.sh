@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-rm yarn.lock
+#rm yarn.lock
 yarn install
 yarn serve
