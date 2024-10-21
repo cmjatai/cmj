@@ -305,7 +305,20 @@
   }
 }
 
-
+@media screen and (max-width: 1399.98px) {
+  .bi-app {
+    .container-bi-global {
+      .inner {
+        .key {
+          font-size: 0.7em;
+        }
+        .value {
+          font-size: 1.3em;
+        }
+      }
+    }
+  }
+}
 
 @media screen and (max-width: 1199px) {
   .container-login {
@@ -316,6 +329,16 @@
       }
       .btn-login {
         margin-top: 10px;
+      }
+    }
+  }
+  .bi-app {
+    .container-bi-global {
+      .col {
+        flex: 1 1 12%;
+      }
+      .inner {
+        padding: 3px;
       }
     }
   }
