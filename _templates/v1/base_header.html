@@ -65,11 +65,11 @@
             {% notificacoes_unread %}
             {% block social_links %}
               <div class="navbar-social-links justify-content-end">
-                <a href="/estatisticas" class="icon-estatisticas"  title="Estatisticas de Dados do Portal"><i class="far fa-chart-bar"></i></a>
+                <a href="/estatisticas" class="icon-estatisticas {% if not ''|sessaoplenaria_hoje %}animation-pulse{% endif %}"  title="Estatisticas de Dados do Portal"><i class="far fa-chart-bar"></i></a>
                 {% comment %}
                   <a href="https://soundcloud.com/camara-de-jatai"><i class="fab fa-soundcloud" aria-hidden="true"></i><span>SoundCloud</span></i></a>
                 {% endcomment %}
-                <a href="/online/" class="icon-sessoes-online" title="Sessão Plenária Online - Atualização em tempo real"><span>Sessões Online</span></a>
+                <a href="/online/" class="icon-sessoes-online {% if ''|sessaoplenaria_hoje %}animation-pulse{% endif %}" title="Sessão Plenária Online - Atualização em tempo real"><span>Sessões Online</span></a>
                 <a class="instagram" href="https://www.instagram.com/cmjatai"><i class="fab fa-instagram" aria-hidden="true"><span>Instagram</span></i></a>
                 <a class="facebook" href="https://www.facebook.com/cmjatai"><i class="fab fa-facebook-f" aria-hidden="true"><span>Facebook</span></i></a>
                 <a class="x-twitter" href="https://x.com/cmjatai"><span>X</span></a>

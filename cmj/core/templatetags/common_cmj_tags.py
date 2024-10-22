@@ -26,7 +26,7 @@ from sapl.base.models import AppConfig
 from sapl.materia.models import TipoMateriaLegislativa
 from sapl.norma.models import NormaJuridica, TipoNormaJuridica
 from sapl.parlamentares.models import Filiacao
-
+from sapl.sessao.models import SessaoPlenaria
 
 logger = logging.getLogger(__name__)
 
@@ -503,3 +503,11 @@ def valor_str(valor):
 @register.filter
 def valor_abs_str(valor):
     return formats.number_format(valor.copy_abs(), force_grouping=True)
+
+
+@register.filter
+def sessaoplenaria_hoje(obj):
+    hoje = timezone.localdate()
+    return SessaoPlenaria.objects.filter(
+        data_inicio = hoje
+        ).exists()

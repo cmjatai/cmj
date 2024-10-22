@@ -325,6 +325,13 @@ def get_materialegislativa():
             (DocumentoAdministrativo, 'where workspace_id = 21 and tipo_id = 150'),
         ]
     )
+
+    size_outros_pareceres = get_size_models(
+        models = [
+            (DocumentoAdministrativo, 'where workspace_id = 21 and tipo_id in (120, 180, 170)'),
+        ]
+    )
+
     mark1 = f'''
 # Processo Legislativo
 
@@ -357,9 +364,10 @@ sem a necessidade de impressão.
 
     mark3 = f'''
 - **Pareceres Jurídicos**
-    - **{ size_models[DocumentoAdministrativo]['count'] }** itens.
-    - **{ int(size_models[DocumentoAdministrativo]['size']/1024/1024/1024) } GB**.
-    - **{ size_models[DocumentoAdministrativo]['paginas']}** páginas.
+    - **{ size_models[DocumentoAdministrativo]['count'] }** Legislativos.
+    - **{ size_outros_pareceres[DocumentoAdministrativo]['count'] }** Administrativos.
+    - **{ int((size_models[DocumentoAdministrativo]['size'] + size_outros_pareceres[DocumentoAdministrativo]['size'])/1024/1024/1024) } GB**.
+    - **{ size_models[DocumentoAdministrativo]['paginas'] + size_outros_pareceres[DocumentoAdministrativo]['paginas'] }** páginas.
 -------------------
 - **Sessões Plenárias**
     - **{ size_models[SessaoPlenaria]['count'] }** itens.
