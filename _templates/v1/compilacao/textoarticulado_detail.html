@@ -8,7 +8,7 @@
 {% block sections_nav %}
   {% include 'compilacao/subnav.html'%}
 {% endblock %}
-{% block main_container_class %}container{{fluid}}{{path}} container-box" {% if object and object.object_id == 0 %}style="border-left: 5px solid #c3780e;{% endif %}
+{% block main_container_class %}container{{fluid}}{{path}} container-{% if view.print %}print{%else%}box{%endif%}" {% if object and object.object_id == 0 %}style="border-left: 5px solid #c3780e;{% endif %}
 {% endblock %}
 {% block base_content %}
 
@@ -30,7 +30,7 @@
                 <a href="{% url 'sapl.compilacao:ta_text_edit' object.pk %}?{% if object.editing_locked %}unlock{%else%}lock{% endif %}"
                 class="btn {% if object.editing_locked %}btn-danger{%else%}btn-outline-primary{% endif %}">
                     {% trans 'Desbloquear Edição' %}
-                </a>      &nbsp;      
+                </a>      &nbsp;
                 {% endif %}
                 {% else %}
                 {% if perms.compilacao.lock_textoarticulado and not object.editable_only_by_owners%}
@@ -50,7 +50,7 @@
             </div>
           {% endif %}
 
-        {% else %}    
+        {% else %}
           {% if perms.compilacao.unlock_textoarticulado and not object.editable_only_by_owners%}
             <div class="actions btn-group" role="group">
               <a href="{% url 'sapl.compilacao:ta_text_edit' object.pk %}"
@@ -67,8 +67,8 @@
                 class="btn btn-danger">
                 Substituir Original Pelo Clone
               </a>
-            </div>        
-          {% endif %}    
+            </div>
+          {% endif %}
         {% endif %}
       </div>
     {% endif %}

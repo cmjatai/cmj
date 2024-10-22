@@ -28,9 +28,10 @@
     {% include "popups.html" %}
     <div class="page fadein" id="{% block id_wrapper %}wrapper{% endblock %}">
 
-      {% include 'base_accessibility.html' %}
-
-      {% include 'base_header.html' %}
+      {% block base_header_block %}
+        {% include 'base_accessibility.html' %}
+        {% include 'base_header.html' %}
+      {% endblock base_header_block %}
 
       {% block global_container %}
         {% block navigation %}

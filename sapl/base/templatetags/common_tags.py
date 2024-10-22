@@ -8,10 +8,8 @@ from django.utils.safestring import mark_safe
 from webpack_loader import utils
 
 from sapl.base.models import AppConfig
-from sapl.materia.models import DocumentoAcessorio, MateriaLegislativa, Proposicao
-from sapl.norma.models import NormaJuridica
+from sapl.materia.models import Proposicao
 from sapl.parlamentares.models import Filiacao
-from sapl.sessao.models import SessaoPlenaria
 from sapl.utils import filiacao_data, SEPARADOR_HASH_PROPOSICAO
 
 

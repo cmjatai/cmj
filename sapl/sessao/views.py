@@ -1,6 +1,6 @@
+from re import sub
 import ast
 import logging
-from re import sub
 
 from django.conf import settings
 from django.contrib import messages
@@ -24,7 +24,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormMixin
 from django_filters.views import FilterView
 
-from cmj.mixins import BtnCertMixin, PluginSignMixin, MultiFormatOutputMixin,\
+from cmj.mixins import BtnCertMixin, PluginSignMixin, MultiFormatOutputMixin, \
     AudigLogFilterMixin
 from sapl.base.models import AppConfig as AppsAppConfig
 from sapl.crud.base import (RP_DETAIL, RP_LIST, Crud, CrudAux,

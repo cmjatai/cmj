@@ -1,9 +1,17 @@
 
-body,
-html {
-  background: $color_main_bg $url_bg_png;
+body, html {
   font-size: 1rem;
 }
+body {
+  background: $color_main_bg $url_bg_png;
+  &.body-print {
+    background: #fff;
+    #wrapper {
+      padding: 0;
+    }
+  }
+}
+
 main {
   &.appvue:hover {
     position: relative;

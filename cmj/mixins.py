@@ -20,6 +20,7 @@ from haystack.models import SearchResult
 from model_utils.choices import Choices
 from pdfminer.high_level import extract_text
 from pdfrw.pdfreader import PdfReader
+from weasyprint import HTML
 from xlsxwriter.workbook import Workbook as XlsxWorkbook
 
 from cmj.utils import run_sql, get_settings_auth_user_model, ProcessoExterno
@@ -766,3 +767,5 @@ class MultiFormatOutputMixin:
 
             verbose_name = '/'.join(verbose_name).strip()
             yield f'{verbose_name}'
+
+
