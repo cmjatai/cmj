@@ -100,14 +100,12 @@ urlpatterns_compilacao = [
     re_path(r'^(?P<ta_id>[0-9]+)/publicacao/(?P<pk>[0-9]+)/delete$',
         views.PublicacaoDeleteView.as_view(), name='ta_pub_delete'),
 
-
-
 ]
 
 urlpatterns = [
     re_path(r'^ta/', include(urlpatterns_compilacao)),
 
-    re_path(r'^(?P<tipo_norma>(L|ATG|DL|ELO|LC|LEI|LOM|LE|PLE|PR|RI|RES)?)(?P<numero_norma>[0-9]*)$',
+    re_path(r'^(?P<tipo_norma>(L|ATG|DL|ELO|LC|LEI|LOM|LE|PLE|PR|RI|RES))(?P<numero_norma>[0-9]*)$',
         views.TextView.as_view(), name = 'slug_ta_text'),
 
     re_path(r'^sistema/ta/config/tipo-nota',
