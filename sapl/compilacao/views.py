@@ -316,7 +316,7 @@ class CompMixin(PermissionRequiredMixin):
             else:
                 ta = TextoArticulado.objects.get(pk = 281 if tipo_norma == 'LOM' else 2222)
 
-        except TextoArticulado.DoesNotExist:
+        except:
             raise Http404()
 
         return ta
