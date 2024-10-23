@@ -35,9 +35,36 @@ window.AppLOA = function () {
   }
   instance.EmendaLoaCrudLIST = function (container) {
     const form = container.find('form')
+    const formData = new FormData(form[0])
+    const formProps = Object.fromEntries(formData)
+    const formJson = JSON.stringify(formProps)
+
+    if (formJson === '{}') {
+      const lsJson = localStorage.getItem('portalcmj_emendaloa_filter')
+      const lsData = JSON.parse(lsJson)
+
+      if (lsData) {
+        _.forOwn(lsData, (value, key) => {
+          _.forEach(form.find(`input[name="${key}"]`), (item) => {
+            if (value.includes(item.value)) {
+              item.checked = true
+              $(`label[for="${item.id}"] span`).addClass('active')
+            }
+          })
+        })
+      }
+    }
+
     form
       .find('input[type="checkbox"]')
       .change((event) => {
+        const formData = new FormData(form[0])
+        const parlamentares = formData.getAll('parlamentares')
+        const fase = formData.getAll('fase')
+        const formProps = { fase, parlamentares }
+        const formJson = JSON.stringify(formProps)
+        localStorage.setItem('portalcmj_emendaloa_filter', formJson)
+
         form.submit()
       })
   }
