@@ -29,11 +29,10 @@
   16% {
     opacity: 0.3;
   }
-  100% {
-    opacity: 0.3;
-  }
+  // 100% {
+  //  opacity: 0.3;
+  // }
 }
-
 .animation-pulse {
   animation: 10s ease-in-out infinite keyframe_pulse;
   text-shadow: 0 0 15px #fff;

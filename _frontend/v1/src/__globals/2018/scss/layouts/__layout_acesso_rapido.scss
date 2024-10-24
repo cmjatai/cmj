@@ -144,6 +144,12 @@
       background: radial-gradient(#794905 1%, transparent 60%);
       &::before {
         opacity: 1;
+      }
+    }
+  }
+  &:hover {
+    .favo {
+      &::before {
         animation: none;
       }
     }
