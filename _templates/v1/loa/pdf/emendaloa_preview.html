@@ -69,16 +69,19 @@
   <p class="preambulo">
     {% if object.parlamentares.isonly_sexo_feminino %}A{% else %}O{% endif %}{% if object.parlamentares.count > 1 %}s{% endif %}
     subscritor{% if object.parlamentares.isonly_sexo_feminino %}a{% else %}e{% endif %}{% if object.parlamentares.count > 1 %}s{% endif %}
-    da presente Emenda Impositiva, propõem a seguinte modificação no Projeto de Lei Orçamentária Anual supracitada:
+    da presente Emenda Impositiva, propõem a seguinte modificação no Projeto de Lei Orçamentária Anual supracitado:
   </p>
 
   <p class="art">
+    {% spaceless %}
     <span class="rotulo">Art {{ view.art }}º - </span>Deduz-se da
     {% for rc in object.registrocontabil_set.all_deducoes %}
         Unidade Orçamentária {{rc.despesa.unidade.especificacao}} /
         Código: {{rc.despesa.consulta.codigo}} - {{rc.despesa.consulta.especificacao}} /
-        Natureza da Despesa: {{rc.despesa.consulta.cod_natureza}} -
-        Valor: R$ {{rc.valor|valor_abs_str }}{% if not forloop.last %} // {% endif %}{% empty %}XXXXXXXXXX{% endfor %}, o valor de <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}}),</strong>
+        Natureza da Despesa: {{rc.despesa.consulta.cod_natureza}}{% if object.registrocontabil_set.all_deducoes.count > 1 %}
+          - Valor: R$ {{rc.valor|valor_abs_str }}{% endif %}{% if not forloop.last %} // {% endif %}{% empty %}XXXXXXXXXX{% endfor %},
+        o valor de <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}})</strong>.
+    {% endspaceless %}
   </p>
 
   <p class="art">

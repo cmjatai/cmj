@@ -217,7 +217,7 @@
     font-size: 2em;
   }
   .bi-graph {
-
+    font-size: 0.9rem;
     .inner {
       display: grid;
       grid-template-areas:
@@ -236,7 +236,6 @@
         border-bottom: 1px dashed #ddd;
         display: inline-block;
         border-right: 1px dashed #ddd;
-        padding: 5px 5px 6px;
         margin-right: 2px;
       }
     }
@@ -271,6 +270,9 @@
       margin-left: -0.5em;
     }
 
+    .ly-item {
+      padding: 0px 5px 0px;
+    }
 
   }
   .bi-graph-barra-horizontal {
@@ -280,18 +282,17 @@
       .group-row {
         display: flex;
         flex-direction: column;
-        padding: 5px 0;
+        padding: 0px 0;
         border-bottom: 1px dashed #ddd;
         padding-right: 1em;
       }
       .g-row {
         display: inline-block;
-        font-size: 11pt;
         color: #555;
         span {
           display: inline-block;
           text-align: right;
-          padding: 2px 0px 1px;
+          padding-top: 1px;
           span {
             padding: 0 5px;
           }

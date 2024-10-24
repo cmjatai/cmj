@@ -198,6 +198,12 @@
       margin-bottom: 15px;
       font-family: 'Courier New', Courier, monospace;
       font-size: 70%;
+
+      &.btn-delete-d-none {
+        .btn-delete {
+          display: none;
+        }
+      }
       .item-rc {
         margin-bottom: 2px;
         background-color: white;

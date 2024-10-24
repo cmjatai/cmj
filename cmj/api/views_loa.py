@@ -3,9 +3,11 @@ from decimal import Decimal
 import logging
 
 from django.apps.registry import apps
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.core.validators import RegexValidator
 from django.db.models import Q, F
 from django.db.models.aggregates import Sum
+from django.db.models.functions import Substr
 from django.forms.models import model_to_dict
 from django.http.response import HttpResponse
 from django.template.loader import render_to_string
@@ -13,19 +15,18 @@ from django.utils import formats
 from django.utils.datastructures import OrderedSet
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
-import pymupdf
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
-from rest_framework.fields import RegexField, DecimalField, CharField,\
+from rest_framework.exceptions import ValidationError as DRFValidationError
+from rest_framework.fields import RegexField, DecimalField, CharField, \
     SerializerMethodField
 from rest_framework.response import Response
+import pymupdf
 
 from cmj import loa
-from cmj.loa.models import OficioAjusteLoa, EmendaLoa, Loa, EmendaLoaParlamentar,\
-    DespesaConsulta, EmendaLoaRegistroContabil, UnidadeOrcamentaria, Despesa,\
+from cmj.loa.models import OficioAjusteLoa, EmendaLoa, Loa, EmendaLoaParlamentar, \
+    DespesaConsulta, EmendaLoaRegistroContabil, UnidadeOrcamentaria, Despesa, \
     Orgao, Funcao, SubFuncao, Programa, Acao, Natureza
 from cmj.utils import run_sql
-from django.db.models.functions import Substr
 from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize
 from sapl.api.mixins import ResponseFileMixin
 from sapl.api.permissions import SaplModelPermissions
@@ -455,7 +456,7 @@ class _EmendaLoaViewSet:
             p = u.operadorautor_set.first().autor.autor_related
 
             if p.id == int(data['parlamentar_id']) and valor <= Decimal('0.00'):
-                raise ValidationError(
+                raise DRFValidationError(
                     'Você não pode zerar o Valor do Parlamentar '
                     'ao qual seu usuário está ligado. '
                     'Caso queira, você pode excluir esse registro '
@@ -664,19 +665,19 @@ class EmendaLoaRegistroContabilSerializer(SaplSerializerMixin):
             attrs['codigo']).groupdict()
 
         if not Orgao.objects.filter(codigo=attrs['orgao'], loa_id=loa_id).exists():
-            raise ValidationError('Órgão não encontrado nos anexos da LOA.')
+            raise DRFValidationError('Órgão não encontrado nos anexos da LOA.')
 
         if not UnidadeOrcamentaria.objects.filter(
                 codigo=attrs['unidade'],
                 orgao__codigo=attrs['orgao'],
                 loa_id=loa_id
         ).exists():
-            raise ValidationError(
+            raise DRFValidationError(
                 'Unidade Orçamentária no Órgão informado não encontrada '
                 'nos anexos da LOA.')
 
         if not Funcao.objects.filter(codigo=codigo['funcao'], loa_id=loa_id).exists():
-            raise ValidationError(
+            raise DRFValidationError(
                 'Função não encontrada na base de funções.'
             )
 
@@ -684,7 +685,7 @@ class EmendaLoaRegistroContabilSerializer(SaplSerializerMixin):
                 codigo=codigo['subfuncao'],
                 loa_id=loa_id
         ).exists():
-            raise ValidationError(
+            raise DRFValidationError(
                 'SubFunção não encontrada na base de subfunções.'
             )
 
@@ -697,7 +698,7 @@ class EmendaLoaRegistroContabilSerializer(SaplSerializerMixin):
         try:
             obj = Decimal(obj)
         except:
-            raise ValidationError(
+            raise DRFValidationError(
                 _('O campo "Valor da Despesa" deve ser prenchido e '
                   'seguir o formado 999.999.999,99. '
                   'Valores negativos serão direcionados ao Art. 1º, '
@@ -705,7 +706,7 @@ class EmendaLoaRegistroContabilSerializer(SaplSerializerMixin):
             )
 
         if obj == Decimal('0.00'):
-            raise ValidationError(
+            raise DRFValidationError(
                 'Valor da Despesa deve ser preenchido. '
                 'Valores negativos serão lançados no Art. 1º, '
                 'e valores positivos no Art. 2º.')
@@ -800,11 +801,16 @@ class _EmendaLoaRegistroContabilViewSet:
         try:
             return super().create(request, *args, **kwargs)
 
-        except ValidationError as verror:
+        except DRFValidationError as verror:
             if "code='unique'" in str(verror):
-                raise ValidationError(
+                raise DRFValidationError(
                     'Já existe Registro desta Despesa nesta Emenda.')
-            raise ValidationError(verror.detail)
+            raise DRFValidationError(verror.detail)
+
+        except DjangoValidationError as verror:
+            raise DRFValidationError(
+                'Já Existe uma Despesa Orçamentária cadastrada com os dados acima. '
+                'Faça uma busca com o código informado.')
 
         except Exception as exc:
-            raise Exception(exc)
+            raise DRFValidationError('\n'.join(exc.messages))

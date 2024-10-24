@@ -5,7 +5,7 @@ import re
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Fieldset, HTML, Div
 from django import forms
-from django.contrib.postgres.forms.array import SplitArrayField,\
+from django.contrib.postgres.forms.array import SplitArrayField, \
     SplitArrayWidget
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.forms.models import ModelForm
@@ -14,30 +14,30 @@ from django.template.base import Template
 from django.template.context import Context
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
-from django_filters.filters import MultipleChoiceFilter,\
+from django_filters.filters import MultipleChoiceFilter, \
     ModelMultipleChoiceFilter
 from django_filters.filterset import FilterSet
 import yaml
 
-from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa,\
+from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa, \
     RegistroAjusteLoa, RegistroAjusteLoaParlamentar
 from sapl.crispy_layout_mixin import to_row, SaplFormLayout, SaplFormHelper
 from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
 from sapl.utils import FileFieldCheckMixin
 
-
 logger = logging.getLogger(__name__)
 
 
-def quantize(value, decimal_places='0.01', rounding=ROUND_HALF_DOWN) -> Decimal:
+def quantize(value, decimal_places = '0.01', rounding = ROUND_HALF_DOWN) -> Decimal:
     return value.quantize(
         Decimal(decimal_places),
-        rounding=rounding
+        rounding = rounding
     )
 
 
 class DecimalInput(TextInput):
+
     def get_context(self, name, value, attrs):
         context = TextInput.get_context(self, name, value, attrs)
         widget = context.get('widget', None)
@@ -77,9 +77,9 @@ class MateriaCheckFormMixin:
                 logger.debug("Tentando obter MateriaLegislativa %s nº %s/%s." %
                              (tipo_materia, materia, ano_materia))
                 materia = MateriaLegislativa.objects.get(
-                    numero=materia,
-                    ano=ano_materia,
-                    tipo=tipo_materia)
+                    numero = materia,
+                    ano = ano_materia,
+                    tipo = tipo_materia)
             except ObjectDoesNotExist:
                 msg = _('A matéria %s nº %s/%s não existe no cadastro'
                         ' de matérias legislativas.' % (tipo_materia, materia, ano_materia))
@@ -98,28 +98,28 @@ class MateriaCheckFormMixin:
 class LoaForm(MateriaCheckFormMixin, ModelForm):
 
     tipo_materia = forms.ModelChoiceField(
-        label=_('Tipo Matéria'),
-        required=False,
-        queryset=TipoMateriaLegislativa.objects.all(),
-        empty_label='Selecione',
+        label = _('Tipo Matéria'),
+        required = False,
+        queryset = TipoMateriaLegislativa.objects.all(),
+        empty_label = 'Selecione',
     )
 
     numero_materia = forms.CharField(
-        label='Número Matéria', required=False)
+        label = 'Número Matéria', required = False)
 
     ano_materia = forms.CharField(
-        label='Ano Matéria',
-        required=False)
+        label = 'Ano Matéria',
+        required = False)
 
     materia = forms.ModelChoiceField(
-        required=False,
-        widget=forms.HiddenInput(),
-        queryset=MateriaLegislativa.objects.all())
+        required = False,
+        widget = forms.HiddenInput(),
+        queryset = MateriaLegislativa.objects.all())
 
     parlamentares = forms.ModelMultipleChoiceField(
-        required=False,
-        widget=forms.CheckboxSelectMultiple(),
-        queryset=Parlamentar.objects.all())
+        required = False,
+        widget = forms.CheckboxSelectMultiple(),
+        queryset = Parlamentar.objects.all())
 
     class Meta:
         model = Loa
@@ -139,7 +139,7 @@ class LoaForm(MateriaCheckFormMixin, ModelForm):
         super().__init__(*args, **kwargs)
 
         self.fields['parlamentares'].choices = [
-            (p.pk, p) for p in Parlamentar.objects.filter(ativo=True)
+            (p.pk, p) for p in Parlamentar.objects.filter(ativo = True)
         ]
 
     def clean(self):
@@ -157,25 +157,25 @@ class LoaForm(MateriaCheckFormMixin, ModelForm):
 
         return cd
 
-    def save(self, commit=True):
+    def save(self, commit = True):
 
         i = self.instance
 
         i.disp_total = quantize(
             i.receita_corrente_liquida *
             i.perc_disp_total / Decimal(100),
-            rounding=ROUND_DOWN
+            rounding = ROUND_DOWN
         )
 
         i.disp_saude = quantize(
             i.receita_corrente_liquida *
             i.perc_disp_saude / Decimal(100),
-            rounding=ROUND_DOWN)
+            rounding = ROUND_DOWN)
 
         i.disp_diversos = quantize(
             i.receita_corrente_liquida *
             i.perc_disp_diversos / Decimal(100),
-            rounding=ROUND_DOWN)
+            rounding = ROUND_DOWN)
 
         # if i.disp_diversos + i.disp_saude != i.disp_total:
         #    i.disp_diversos = i.disp_total - i.disp_saude
@@ -190,11 +190,11 @@ class LoaForm(MateriaCheckFormMixin, ModelForm):
 
         if count_lps:
             idtp = quantize(i.disp_total / Decimal(count_lps),
-                            rounding=ROUND_DOWN)
+                            rounding = ROUND_DOWN)
             idsp = quantize(i.disp_saude / Decimal(count_lps),
-                            rounding=ROUND_DOWN)
+                            rounding = ROUND_DOWN)
             iddp = quantize(i.disp_diversos / Decimal(count_lps),
-                            rounding=ROUND_DOWN)
+                            rounding = ROUND_DOWN)
 
             # if iddp + idsp != idtp:
             #    iddp = idtp - idsp
@@ -211,13 +211,14 @@ class LoaForm(MateriaCheckFormMixin, ModelForm):
 class EmendaLoaValorWidget(SplitArrayWidget):
     template_name = 'loa/widget/parlamentares_valor_form.html'
 
-    def __init__(self, widget, parlamentares=[], elps=[], user=None, **kwargs):
-        super().__init__(widget, size=len(parlamentares), **kwargs)
+    def __init__(self, widget, parlamentares = [], elps = [], user = None, **kwargs):
+        self.instance = kwargs.pop('instance')
+        super().__init__(widget, size = len(parlamentares), **kwargs)
         self.parlamentares = parlamentares
         self.elps = elps
         self.user = user
 
-    def get_context(self, name, value, attrs=None):
+    def get_context(self, name, value, attrs = None):
         context = super().get_context(name, value, attrs)
 
         pw = zip(self.parlamentares, context['widget']['subwidgets'])
@@ -235,43 +236,46 @@ class EmendaLoaValorWidget(SplitArrayWidget):
                 if not op or op and p not in self.elps:
                     w['attrs']['readonly'] = 'readonly'
 
+                if self.instance.pk and self.instance.fase == EmendaLoa.LIBERACAO_CONTABIL:
+                    w['attrs']['readonly'] = 'readonly'
+
         return context
 
 
 class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
     tipo_materia = forms.ModelChoiceField(
-        label=_('Tipo Matéria'),
-        required=False,
-        queryset=TipoMateriaLegislativa.objects.all(),
-        empty_label='Selecione',
+        label = _('Tipo Matéria'),
+        required = False,
+        queryset = TipoMateriaLegislativa.objects.all(),
+        empty_label = 'Selecione',
     )
 
     numero_materia = forms.CharField(
-        label='Número Matéria', required=False)
+        label = 'Número Matéria', required = False)
 
     ano_materia = forms.CharField(
-        label='Ano Matéria',
-        required=False)
+        label = 'Ano Matéria',
+        required = False)
 
     materia = forms.ModelChoiceField(
-        required=False,
-        widget=forms.HiddenInput(),
-        queryset=MateriaLegislativa.objects.all())
+        required = False,
+        widget = forms.HiddenInput(),
+        queryset = MateriaLegislativa.objects.all())
 
     finalidade = forms.CharField(
-        label='Finalidade',
-        required=True)
+        label = 'Finalidade',
+        required = True)
 
     indicacao = forms.CharField(
-        label='Indicação',
-        required=False)
+        label = 'Indicação',
+        required = False)
 
     parlamentares__valor = SplitArrayField(
-        DecimalField(required=False,),
+        DecimalField(required = False,),
         10,
-        label='Valores por Parlamentar',
-        required=False
+        label = 'Valores por Parlamentar',
+        required = False
     )
 
     # registrocontabil_set = forms.ModelChoiceField(
@@ -279,35 +283,35 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
     # required=False,
     #    queryset=EmendaLoaRegistroContabil.objects.all(),
     #    widget=forms.CheckboxSelectMultiple,
-    #)
+    # )
 
     ano_loa = forms.CharField(
-        label='',
-        widget=forms.HiddenInput(),
-        required=False)
+        label = '',
+        widget = forms.HiddenInput(),
+        required = False)
 
     busca_despesa = forms.CharField(
-        label='Buscar', required=False,)
+        label = 'Buscar', required = False,)
 
     valor_despesa = DecimalField(
-        label='Valor da Despesa', required=False, max_digits=14, decimal_places=2,)
+        label = 'Valor da Despesa', required = False, max_digits = 14, decimal_places = 2,)
 
     despesa_codigo = forms.CharField(
-        label='Código', required=False,)
+        label = 'Código', required = False,)
 
     despesa_orgao = forms.CharField(
-        label='Orgão', required=False,)
+        label = 'Orgão', required = False,)
     despesa_unidade = forms.CharField(
-        label='Unidade', required=False,)
+        label = 'Unidade', required = False,)
 
     despesa_especificacao = forms.CharField(
-        label='Descrição da Ação', required=False,)
+        label = 'Descrição da Ação', required = False,)
 
     despesa_natureza = forms.CharField(
-        label='Natureza', required=False,)
+        label = 'Natureza', required = False,)
 
     valor = DecimalField(
-        label=_('Valor Global da Emenda (R$)'), required=False)
+        label = _('Valor Global da Emenda (R$)'), required = False)
 
     class Meta:
         model = EmendaLoa
@@ -372,47 +376,59 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
                     <button type="button" id="add_registro" class="btn btn-primary">+</button>
                 '''), 'col-1'),
 
-
-                (Div(css_class='busca-render'), 12)
+                (Div(css_class = 'busca-render'), 12)
 
             ])
+
             row4_2 = to_row([
-                (Div(css_class='registro-render'), 12),
+                (Div(css_class = 'registro-render'), 12),
             ])
-
             row4 = to_row([
                 (Fieldset(_('Registrar Deduções e Inserções'), row4_1), 12),
                 (Fieldset(_('Registros das Despesas Orçamentárias'), row4_2), 12)
             ])
+        else:
+            row4_2 = to_row([
+                (Div(css_class = 'registro-render btn-delete-d-none'), 12),
+            ])
+            row4 = to_row([
+                (Fieldset(_('Registros das Despesas Orçamentárias'), row4_2), 12)
+            ])
 
-            rows_base.append(row4)
+        rows_base.append(row4)
 
         row_form = to_row([
             (rows_base, 12)
         ])
+
         if not self.creating:
             row_form = to_row([
                 (rows_base, 7),
-                (Div(css_class='container-preview'), 5)
+                (Div(css_class = 'container-preview'), 5)
             ])
 
+        super().__init__(*args, **kwargs)
+
         self.helper = FormHelper()
-        btns = {
-            'cancel_label': None,
-            'save_label': 'Encerrar Edição'
-        } if full_editor else {}
+
+        btns = {}
+        if full_editor or self.instance.pk and self.instance.fase == EmendaLoa.LIBERACAO_CONTABIL:
+            btns = {
+                'cancel_label': '',
+                'save_label': 'Encerrar Edição'
+            }
+
         self.helper.layout = SaplFormLayout(
             Fieldset(_('Dados Gerais'), row_form), **btns)
-
-        super().__init__(*args, **kwargs)
 
         self.initial['ano_loa'] = self.loa.ano
 
         if not self.user.is_superuser and (
             self.user.operadorautor_set.exists() or not self.user.has_perms(
                 ('loa.add_emendaloa', 'loa.change_emendaloa'))):
-            self.fields['fase'].choices = EmendaLoa.FASE_CHOICE[
-                :1 if self.creating else 2]
+
+            if self.instance.pk and self.instance.fase != EmendaLoa.LIBERACAO_CONTABIL:
+                self.fields['fase'].choices = EmendaLoa.FASE_CHOICE[:1 if self.creating else 2]
 
             if full_editor and self.instance.pk and self.instance.fase < EmendaLoa.APROVACAO_LEGISLATIVA:
                 self.fields['fase'].widget.attrs['class'] = 'is-invalid'
@@ -421,20 +437,27 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
             if self.instance.pk and self.instance.fase >= EmendaLoa.APROVACAO_LEGISLATIVA:
                 self.fields['fase'].choices = EmendaLoa.FASE_CHOICE
 
-            #self.fields['valor'].widget.attrs['disabled'] = 'disabled'
+            # self.fields['valor'].widget.attrs['disabled'] = 'disabled'
             self.fields['valor'].widget.attrs['readonly'] = 'readonly'
-            #self.fields['valor'].widget.attrs['class'] = 'text-right'
+            # self.fields['valor'].widget.attrs['class'] = 'text-right'
             self.fields['valor'].required = False
 
             self.fields['tipo_materia'].widget = HiddenInput()
             self.fields['numero_materia'].widget = HiddenInput()
             self.fields['ano_materia'].widget = HiddenInput()
+            if self.instance.pk and self.instance.fase == EmendaLoa.LIBERACAO_CONTABIL:
+                self.fields['tipo'].widget.attrs['disabled'] = 'disabled'
+                self.fields['fase'].widget.attrs['disabled'] = 'disabled'
+                self.fields['prefixo_indicacao'].widget.attrs['readonly'] = 'readonly'
+                self.fields['prefixo_finalidade'].widget.attrs['readonly'] = 'readonly'
+                self.fields['finalidade'].widget.attrs['readonly'] = 'readonly'
+                self.fields['indicacao'].widget.attrs['readonly'] = 'readonly'
 
         if full_editor or self.user.is_superuser:
             if self.instance.pk:
                 self.initial['valor_despesa'] = Decimal('0.00')
 
-                #rclist = self.instance.registrocontabil_set.all()
+                # rclist = self.instance.registrocontabil_set.all()
                 # self.fields['registrocontabil_set'].choices = [
                 #    (rc.id, str(rc)) for rc in rclist]
                 # self.initial['registrocontabil_set'] = rclist.values_list(
@@ -449,7 +472,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
             initial_pv = [[p, Decimal('0.00')] for p in self.parls]
             for i, (p, v) in enumerate(initial_pv):
                 ipv = p.emendaloaparlamentar_set.filter(
-                    emendaloa=self.instance).first()
+                    emendaloa = self.instance).first()
                 if ipv:
                     initial_pv[i][1] = ipv.valor
 
@@ -462,11 +485,12 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         fpv.max_length = len(self.parls)
         fpv.size = fpv.max_length
         fpv.widget = EmendaLoaValorWidget(
-            widget=self.fields['parlamentares__valor'].base_field.widget,
-            parlamentares=self.parls,
-            user=self.user if self.instance.pk else None,
-            elps=elps,
-            attrs={'class': 'text-right'}
+            widget = self.fields['parlamentares__valor'].base_field.widget,
+            parlamentares = self.parls,
+            user = self.user if self.instance.pk else None,
+            elps = elps,
+            attrs = {'class': 'text-right'},
+            instance = self.instance
         )
 
     def clean(self):
@@ -485,7 +509,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
         return cleaned_data
 
-    def save(self, commit=True):
+    def save(self, commit = True):
 
         i_init = self.instance
 
@@ -549,13 +573,13 @@ class OficioAjusteLoaForm(FileFieldCheckMixin, ModelForm):
 class RegistroAjusteLoaForm(ModelForm):
 
     emendaloa = forms.ModelChoiceField(
-        required=False,
-        queryset=EmendaLoa.objects.all())
+        required = False,
+        queryset = EmendaLoa.objects.all())
 
     parlamentares__valor = SplitArrayField(
-        DecimalField(required=False, max_digits=14, decimal_places=2,), 10,
-        label='Valores por Parlamentar',
-        required=False
+        DecimalField(required = False, max_digits = 14, decimal_places = 2,), 10,
+        label = 'Valores por Parlamentar',
+        required = False
     )
 
     class Meta:
@@ -577,7 +601,7 @@ class RegistroAjusteLoaForm(ModelForm):
         self.emendas = set()
         for p in self.parlamentares:
             emendas = p.emendaloaparlamentar_set.filter(
-                emendaloa__loa=self.oficioajusteloa.loa
+                emendaloa__loa = self.oficioajusteloa.loa
             ).order_by('emendaloa__materia')
             self.emendas.update(map(lambda e: e.emendaloa, emendas))
 
@@ -590,7 +614,7 @@ class RegistroAjusteLoaForm(ModelForm):
             initial_pv = [[p, Decimal('0.00')] for p in self.parlamentares]
             for i, (p, v) in enumerate(initial_pv):
                 ipv = p.registroajusteloaparlamentar_set.filter(
-                    registro=self.instance).first()
+                    registro = self.instance).first()
                 if ipv:
                     initial_pv[i][1] = ipv.valor
         self.initial['parlamentares__valor'] = list(
@@ -600,13 +624,13 @@ class RegistroAjusteLoaForm(ModelForm):
         fpv.max_length = self.parlamentares.count()
         fpv.size = self.parlamentares.count()
         fpv.widget = EmendaLoaValorWidget(
-            widget=self.fields['parlamentares__valor'].base_field.widget,
-            parlamentares=list(self.parlamentares),
-            user=None,
-            attrs={'class': 'text-right'}
+            widget = self.fields['parlamentares__valor'].base_field.widget,
+            parlamentares = list(self.parlamentares),
+            user = None,
+            attrs = {'class': 'text-right'}
         )
 
-    def save(self, commit=True):
+    def save(self, commit = True):
 
         i_init = self.instance
 
@@ -642,31 +666,34 @@ class RegistroAjusteLoaForm(ModelForm):
 class EmendaLoaFilterSet(FilterSet):
 
     class LoaParlModelMultipleChoiceFilter(ModelMultipleChoiceFilter):
+
         def get_queryset(self, request):
             return self.parent.loa.parlamentares.all()
 
     fase = MultipleChoiceFilter(
-        required=False,
-        choices=EmendaLoa.FASE_CHOICE,
-        label=_('Fases'),
-        widget=forms.CheckboxSelectMultiple
+        required = False,
+        choices = EmendaLoa.FASE_CHOICE,
+        label = _('Fases'),
+        widget = forms.CheckboxSelectMultiple
     )
 
     parlamentares = LoaParlModelMultipleChoiceFilter(
-        queryset=Parlamentar.objects.all(),
-        widget=forms.CheckboxSelectMultiple
+        queryset = Parlamentar.objects.all(),
+        widget = forms.CheckboxSelectMultiple
     )
 
     class Meta:
+
         class Form(forms.Form):
             crispy_field_template = 'fase', 'parlamentares'
+
         model = EmendaLoa
         fields = ['fase', 'parlamentares', 'indicacao']
         form = Form
 
     class ELSaplFormHelper(SaplFormHelper):
 
-        def render_layout(self, form, context, template_pack=None):
+        def render_layout(self, form, context, template_pack = None):
             html = super().render_layout(form, context)
             html = html.replace('\n', ' ')
             while '  ' in html:
@@ -679,7 +706,7 @@ class EmendaLoaFilterSet(FilterSet):
             html = re.sub(
                 '<div><div class="custom-control custom-checkbox">',
                 '<div class="container-avatar d-flex justify-content-center w-100"><div class="custom-control custom-checkbox">',
-                html, count=1)
+                html, count = 1)
 
             html_parts = []
             for n in re.finditer(r'<input.+name="(\w+)".+value="(\d+)".*><label.*>(.*)</label>', html):
@@ -698,12 +725,12 @@ class EmendaLoaFilterSet(FilterSet):
                     continue
                 lp = len(nome)
 
-                p = Parlamentar.objects.get(pk=idp)
+                p = Parlamentar.objects.get(pk = idp)
                 ctx = {'p': p,
                        'active': 'active' if 'checked' in html[x1:x2] else ''}
                 context = Context()
                 context.update(ctx)
-                trendered = template.render(context=context)
+                trendered = template.render(context = context)
                 html = html[:x2 - 8 - lp] + trendered + html[x2 - 8:]
             return mark_safe(html)
 
@@ -725,8 +752,8 @@ class EmendaLoaFilterSet(FilterSet):
         self.form.helper.form_class = 'container'
         self.form.helper.layout = SaplFormLayout(
             *fields,
-            cancel_label=None,
-            save_label=_('Filtrar')
+            cancel_label = None,
+            save_label = _('Filtrar')
         )
 
         if self.loa.materia and self.loa.materia.normajuridica():

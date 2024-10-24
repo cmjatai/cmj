@@ -484,7 +484,7 @@ class EmendaLoaCrud(MasterDetailCrud):
             link_pdf = ''
             if el.fase == EmendaLoa.LIBERACAO_CONTABIL and not el.materia:
                 url = reverse_lazy(
-                    'sapl.api:emendaloa-view',
+                    'sapl.api:loa_emendaloa-view',
                     kwargs={'pk': el.id})
 
                 link_pdf = f'<a href="{url}"><i class="far fa-2x fa-file-pdf"></i></a>'
@@ -605,7 +605,8 @@ class EmendaLoaCrud(MasterDetailCrud):
             u = request.user
             if not u.is_superuser and not u.is_anonymous:
                 if u.operadorautor_set.exists():
-                    if self.object.fase > EmendaLoa.PROPOSTA_LIBERADA:
+                    if self.object.fase > EmendaLoa.PROPOSTA_LIBERADA and \
+                    self.object.fase != EmendaLoa.LIBERACAO_CONTABIL:
                         messages.warning(
                             request, f'A Emenda está na fase de "{self.object.get_fase_display()}". Não pode ser editada por usuário de autoria.')
                         return redirect(self.detail_url)
@@ -616,7 +617,8 @@ class EmendaLoaCrud(MasterDetailCrud):
             u = request.user
             if not u.is_superuser and not u.is_anonymous:
                 if u.operadorautor_set.exists():
-                    if self.object.fase > EmendaLoa.PROPOSTA_LIBERADA:
+                    if self.object.fase > EmendaLoa.PROPOSTA_LIBERADA and \
+                    self.object.fase != EmendaLoa.LIBERACAO_CONTABIL:
                         messages.warning(
                             request, f'A Emenda está na fase de "{self.object.get_fase_display()}". Não pode ser editada por usuário de autoria.')
                         return redirect(self.detail_url)
