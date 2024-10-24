@@ -463,12 +463,12 @@ def get_numeros():
     
     mark = []
 
+    mark.append(get_redessociais())
     mark.append(get_legislacao_municipal())
     mark.append(get_materialegislativa())
     mark.append(get_diarios_oficiais())
     mark.append(get_documentos_administrativos())
     mark.append(get_arqdocs())
-    mark.append(get_redessociais())
     mark.append(get_estrutura_armazenamento())
     html = []
     for mt in mark:
