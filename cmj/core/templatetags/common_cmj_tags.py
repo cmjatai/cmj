@@ -326,8 +326,14 @@ def notificacoes_unread_count(user):
 
 
 @register.filter
-def objeto_lido(obj, user):
-    return not obj.notificacoes.unread().filter(user=user).exists()
+def notificacoes_unread_in_obj(obj, user):
+
+    notificacoes = [obj.notificacoes.unread().filter(user = user).exists(), ]
+    for ms in obj.mensagemsolicitacao_set.all():
+        notificacoes.append(ms.notificacoes.unread().filter(user = user).exists())
+    notificacoes = filter(lambda n: n, notificacoes)
+
+    return len(list(notificacoes)) > 0
 
 
 @register.filter

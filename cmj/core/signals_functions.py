@@ -101,6 +101,9 @@ def notificacao_signal_function(sender, instance, **kwargs):
     if hasattr(instance, 'not_send_mail') and instance.not_send_mail:
         return
 
+    if settings.DEBUG:
+        return
+
     if instance.user.be_notified_by_email:
 
         send_mail(

@@ -11,7 +11,8 @@ from django.utils.translation import gettext_lazy as _
 from cmj.context_processors import areatrabalho
 from cmj.core.models import AreaTrabalho, Notificacao
 from cmj.ouvidoria.models import Solicitacao, MensagemSolicitacao
-from sapl.crispy_layout_mixin import SaplFormLayout, to_row, form_actions,\
+from cmj.utils import AlertSafe
+from sapl.crispy_layout_mixin import SaplFormLayout, to_row, form_actions, \
     to_column
 
 
@@ -47,7 +48,7 @@ class DenunciaForm(ModelForm):
                         data_sitekey=settings.GOOGLE_RECAPTCHA_SITE_KEY
                     ), 4),
                     ('descricao', 12),
-                    (Alert(content=SafeString("""<strong>Aviso!</strong><br>
+                    (AlertSafe(content = SafeString("""<strong>Aviso!</strong><br>
                             Ao enviar uma Denúncia Anônima, você receberá
                             um link para acompanhar sua denúncia.<br>
                             Só será
@@ -247,16 +248,26 @@ class MensagemSolicitacaoForm(ModelForm):
         label='',
         widget=forms.Textarea())
 
+    status = forms.ChoiceField(
+        label = Solicitacao._meta.get_field('status').verbose_name,
+        required = False,
+        choices = Solicitacao.TIPO_STATUS)
+
     class Meta:
         model = MensagemSolicitacao
         fields = ('descricao', 'anexo')
 
     def __init__(self, *args, **kwargs):
 
+        self.is_operador = kwargs['initial'].pop('is_operador')
+
         rows = [('descricao', 12), ]
 
         if kwargs['initial']['owner']:
-            rows.append(('anexo', 12))
+            rows.append(('anexo', 9))
+
+        if self.is_operador:
+            rows.append(('status', 3))
 
         rows = to_row(rows)
 
@@ -264,15 +275,24 @@ class MensagemSolicitacaoForm(ModelForm):
 
         self.helper = FormHelper()
         self.helper.layout = SaplFormLayout(
-            *rows,
+            rows,
             actions=form_actions(label=_('Enviar'))
         )
+
+        self.fields['status'].initial = kwargs['initial']['status']
 
         self.instance.owner = kwargs['initial']['owner']
         self.instance.solicitacao = kwargs['initial']['solicitacao']
 
     def save(self, commit=True):
         inst = super().save(commit)
+
+        if self.is_operador:
+            inst.solicitacao.status = self.cleaned_data.get('status', Solicitacao.STATUS_A_RECEBER)
+        elif inst.solicitacao.status == Solicitacao.STATUS_CONCLUIDA:
+            inst.solicitacao.status = Solicitacao.STATUS_PENDENTE
+
+        inst.solicitacao.save()
 
         # o dono da solicitação é notificado se ele não é o dono da mensagem
         if inst.owner != inst.solicitacao.owner and \

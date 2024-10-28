@@ -29,19 +29,19 @@ from sapl.crud.base import CrudAux, Crud, MasterDetailCrud
 
 
 # ---- Details Master Crud build ---------------------------
-TipoTelefoneCrud = CrudAux.build(TipoTelefone, None, 'tipotelefone')
-TipoEnderecoCrud = CrudAux.build(TipoEndereco, None, 'tipoendereco')
-TipoEmailCrud = CrudAux.build(TipoEmail, None, 'tipoemail')
-ParentescoCrud = CrudAux.build(Parentesco, None, 'parentesco')
+TipoTelefoneCrud = CrudAux.build(TipoTelefone, 'tipotelefone')
+TipoEnderecoCrud = CrudAux.build(TipoEndereco, 'tipoendereco')
+TipoEmailCrud = CrudAux.build(TipoEmail, 'tipoemail')
+ParentescoCrud = CrudAux.build(Parentesco, 'parentesco')
 
 TipoLocalTrabalhoCrud = CrudAux.build(
-    TipoLocalTrabalho, None, 'tipolocaltrabalho')
+    TipoLocalTrabalho, 'tipolocaltrabalho')
 StatusProcessoCrud = CrudAux.build(
-    StatusProcesso, None, 'statusprocesso')
+    StatusProcesso, 'statusprocesso')
 ClassificacaoProcessoCrud = CrudAux.build(
-    ClassificacaoProcesso, None, 'classificacaoprocesso')
+    ClassificacaoProcesso, 'classificacaoprocesso')
 TopicoProcessoCrud = CrudAux.build(
-    TopicoProcesso, None, 'topicoprocesso')
+    TopicoProcesso, 'topicoprocesso')
 
 
 # ---- Details Master Crud herança ---------------------------

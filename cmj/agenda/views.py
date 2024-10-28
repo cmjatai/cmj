@@ -10,7 +10,7 @@ from cmj.core.models import AreaTrabalho
 from sapl.crud.base import Crud, CrudAux
 
 
-TipoEventoCrud = CrudAux.build(TipoEvento, None)
+TipoEventoCrud = CrudAux.build(TipoEvento, '')
 
 
 class EventoCrud(Crud):

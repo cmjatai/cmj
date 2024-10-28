@@ -2,19 +2,19 @@
 import hashlib
 
 from django.contrib.contenttypes.fields import GenericRelation
-from django.db.models.fields.json import JSONField
 from django.core.files.base import File
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models import Q, F
 from django.db.models.deletion import PROTECT
+from django.db.models.fields.json import JSONField
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from cmj.core.models import AreaTrabalho, Notificacao
 from cmj.mixins import CmjChoices
-from cmj.utils import get_settings_auth_user_model,\
-    restringe_tipos_de_arquivo_midias, TIPOS_MIDIAS_PERMITIDOS,\
+from cmj.utils import get_settings_auth_user_model, \
+    restringe_tipos_de_arquivo_midias, TIPOS_MIDIAS_PERMITIDOS, \
     media_protected_storage
 
 
@@ -23,9 +23,21 @@ class Solicitacao(models.Model):
     STATUS_RESTRICT = 1
     STATUS_PUBLIC = 0
 
+    STATUS_A_RECEBER = '00'
+    STATUS_RECEBIDA = '10'
+    STATUS_PENDENTE = '20'
+    STATUS_CONCLUIDA = '30'
+
     VISIBILIDADE_STATUS = CmjChoices(
         (STATUS_RESTRICT, 'status_restrict', _('Restrito')),
         (STATUS_PUBLIC, 'status_public', _('Público')),
+    )
+
+    TIPO_STATUS = CmjChoices(
+        (STATUS_A_RECEBER, 'a_receber', _('A Receber')),
+        (STATUS_RECEBIDA, 'recebidas', _('Recebida')),
+        (STATUS_PENDENTE, 'pendentes', _('Pendente')),
+        (STATUS_CONCLUIDA, 'concluida', _('Concluída')),
     )
 
     TIPO_ACESSO_INFORMACAO = 10
@@ -44,6 +56,9 @@ class Solicitacao(models.Model):
 
     created = models.DateTimeField(
         verbose_name=_('created'), editable=False, auto_now_add=True)
+
+    modified = models.DateTimeField(
+        verbose_name = _('modified'), editable = False, auto_now = True)
 
     owner = models.ForeignKey(
         get_settings_auth_user_model(),
@@ -71,6 +86,11 @@ class Solicitacao(models.Model):
         _('Tipo de Solicitação'),
         choices=TIPO_SOLICITACAO_CHOICE,
         default=TIPO_ACESSO_INFORMACAO)
+
+    status = models.CharField(
+        max_length = 2, blank = True,
+        default = STATUS_A_RECEBER,
+        verbose_name = _('Status'), choices = TIPO_STATUS)
 
     hash_code = models.TextField(
         verbose_name=_('Hash de Acesso Anônimo'),

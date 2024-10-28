@@ -26,20 +26,21 @@
             <th>Usuário</th>
             <th>Encaminhamento</th>
             <th>Data de Leitura</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody>
         {% for solicitacao in object_list %}
-          <tr class="{% if not solicitacao|objeto_lido:user %}row-unread{%endif%}">
+          <tr class="{% if solicitacao|notificacoes_unread_in_obj:user %}row-unread{%endif%}">
             <td>
               {% if solicitacao.hash_code %}
-              <a href="{% url 'cmj.ouvidoria:solicitacao_interact' solicitacao.pk%}">
-                {{solicitacao.titulo}}
-              </a>
+                <a href="{% url 'cmj.ouvidoria:solicitacao_interact' solicitacao.pk%}">
+                  {{solicitacao.titulo}}
+                </a>
               {% else %}
-              <a href="{% url 'cmj.ouvidoria:solicitacao_detail' solicitacao.pk%}">
-                {{solicitacao.titulo}}
-              </a>
+                <a href="{% url 'cmj.ouvidoria:solicitacao_detail' solicitacao.pk%}">
+                  {{solicitacao.titulo}}
+                </a>
               {% endif %}
             </td>
             <td>
@@ -52,6 +53,9 @@
             </td>
             <td>
               {{ solicitacao|data_de_leitura:user|default:''}}
+            </td>
+            <td>
+              {{ solicitacao.get_status_display }}
             </td>
           </tr>
         {% endfor %}

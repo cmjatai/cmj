@@ -80,7 +80,7 @@ class SolicitacaoDetailView(PermissionRequiredMixin,
     @property
     def extras_url(self):
         return [
-            (reverse('cmj.ouvidoria:solicitacao_manage_list'),
+            (reverse_lazy('cmj.ouvidoria:solicitacao_manage_list'),
              'btn-outline-primary',
              _('Listar outras Solicitações')
              )
@@ -153,7 +153,7 @@ class SolicitacaoManageListView(SolicitacaoListMixin,
 
         qs = qs.filter(
             notificacoes__user=self.request.user
-        ).order_by('notificacoes__read', '-created')
+        ).order_by('notificacoes__read', '-modified', '-created')
         return qs
 
 
@@ -302,6 +302,8 @@ class SolicitacaoInteractionView(PermissionRequiredMixin, FormView):
         initial = FormView.get_initial(self)
         initial.update({'owner': None if u.is_anonymous else u})
         initial.update({'solicitacao': self.object})
+        initial.update({'status': self.object.status})
+        initial.update({'is_operador': self.object.areatrabalho.operadores.filter(pk = self.request.user.pk).exists()})
 
         return initial
 

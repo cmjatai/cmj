@@ -48,14 +48,14 @@ from sapl.utils import get_mime_type_from_file_extension
 logger = logging.getLogger(__name__)
 
 
-CepCrud = CrudAux.build(Cep, None, 'cep')
+CepCrud = CrudAux.build(Cep, 'cep')
 RegiaoMunicipalCrud = CrudAux.build(
-    RegiaoMunicipal, None,  'regiao_municipal')
-DistritoCrud = CrudAux.build(Distrito, None, 'distrito')
-BairroCrud = CrudAux.build(Bairro, None)
+    RegiaoMunicipal, 'regiao_municipal')
+DistritoCrud = CrudAux.build(Distrito, 'distrito')
+BairroCrud = CrudAux.build(Bairro, '')
 TipoLogradouroCrud = CrudAux.build(
-    TipoLogradouro, None, 'tipo_logradouro')
-LogradouroCrud = CrudAux.build(Logradouro, None, 'logradouro')
+    TipoLogradouro, 'tipo_logradouro')
+LogradouroCrud = CrudAux.build(Logradouro, 'logradouro')
 
 
 def template_render(request, template_name):

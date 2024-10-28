@@ -44,7 +44,7 @@
         </thead>
         <tbody>
         {% for solicitacao in object_list %}
-          <tr class="{% if not solicitacao|objeto_lido:user %}row-unread{%endif%}">
+          <tr class="{% if not solicitacao|notificacoes_unread_in_obj:user %}row-unread{%endif%}">
             <td>
               <a href="{% url 'cmj.ouvidoria:solicitacao_interact' solicitacao.pk%}">
                 {{solicitacao.titulo}}
