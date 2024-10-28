@@ -29,7 +29,7 @@
 
       var pks_exclude = $(".form-group-contatos input:checkbox[name=contatos]:checked").map(function (){return $(this).val()}).get()
 
-      var _this = $("#id_q");
+      var _this = $(event.target).closest('form').find('#id_q');
       var url_get_contatos = '{% url "cmj.cerimonial:ajax_search_contatos" %}';
       var q = _this.val()
       updateBindChange();

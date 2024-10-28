@@ -30,11 +30,11 @@ from cmj import settings
 from cmj.cerimonial.models import LocalTrabalho, Endereco,\
     TipoAutoridade, PronomeTratamento, Contato, Perfil, Processo,\
     IMPORTANCIA_CHOICE, AssuntoProcesso, StatusProcesso, ProcessoContato,\
-    GrupoDeContatos, TopicoProcesso, Visita, Visitante
+    GrupoDeContatos, TopicoProcesso, Visita, Visitante, ClassificacaoProcesso
 from cmj.core.forms import ListWithSearchForm
 from cmj.core.models import Municipio, Trecho, ImpressoEnderecamento,\
     AreaTrabalho, Bairro
-from cmj.utils import normalize, YES_NO_CHOICES
+from cmj.utils import normalize, YES_NO_CHOICES, NONE_YES_NO_CHOICES
 from sapl.crispy_layout_mixin import to_column, SaplFormLayout, to_fieldsets,\
     form_actions, to_row, SaplFormHelper
 from sapl.utils import RangeWidgetNumber
@@ -106,6 +106,12 @@ class LocalTrabalhoPerfilForm(ModelForm):
 
 class LocalTrabalhoForm(ModelForm):
 
+    preferencial = forms.ChoiceField(
+        required=True,
+        widget=forms.RadioSelect,
+        choices=YES_NO_CHOICES,
+    )
+
     class Meta:
         model = LocalTrabalho
         fields = ['nome',
@@ -144,10 +150,6 @@ class LocalTrabalhoForm(ModelForm):
         self.fields['endereco'].widget.attrs['autocomplete'] = 'off'
         self.fields['trecho'].queryset = Trecho.objects.all()
         self.fields['trecho'].widget = forms.HiddenInput()
-
-        # Utilizando template bootstrap3 customizado
-        self.fields['preferencial'].widget = forms.RadioSelect()
-        self.fields['preferencial'].inline_class = True
 
 
 class ContatoForm(ModelForm):
@@ -317,6 +319,12 @@ class ContatoFragmentPronomesForm(forms.Form):
 
 class EnderecoForm(ModelForm):
 
+    preferencial = forms.ChoiceField(
+        required=True,
+        widget=forms.RadioSelect,
+        choices=YES_NO_CHOICES,
+    )
+
     class Meta:
         model = Endereco
         fields = ['tipo',
@@ -348,10 +356,6 @@ class EnderecoForm(ModelForm):
 
         self.fields['trecho'].queryset = Trecho.objects.all()
         self.fields['trecho'].widget = forms.HiddenInput()
-
-        # Utilizando template bootstrap3 customizado
-        self.fields['preferencial'].widget = forms.RadioSelect()
-        self.fields['preferencial'].inline_class = True
 
 
 class TipoAutoridadeForm(ModelForm):
@@ -461,7 +465,6 @@ class ProcessoForm(ModelForm):
         self.fields['assuntos'].queryset = AssuntoProcesso.objects.filter(
             workspace=self.initial['workspace'])
 
-        # Utilizando template bootstrap3 customizado
         self.fields['importancia'].widget = forms.RadioSelect()
         self.fields['importancia'].choices = IMPORTANCIA_CHOICE
 
@@ -471,7 +474,8 @@ class ProcessoForm(ModelForm):
             (ass.pk, ass) for ass in StatusProcesso.objects.order_by('id')]
 
         self.fields['classificacoes'].widget = forms.CheckboxSelectMultiple()
-        # self.fields['classificacoes'].inline_class = True
+        self.fields['classificacoes'].choices = [
+            (ass.pk, ass) for ass in ClassificacaoProcesso.objects.order_by('id')]
 
         self.fields['contatos'].widget = forms.CheckboxSelectMultiple()
         self.fields['contatos'].queryset = Contato.objects.all()
