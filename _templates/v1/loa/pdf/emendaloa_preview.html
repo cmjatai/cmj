@@ -68,7 +68,7 @@
 
   <p class="preambulo">
     {% if object.parlamentares.isonly_sexo_feminino %}A{% else %}O{% endif %}{% if object.parlamentares.count > 1 %}s{% endif %}
-    subscritor{% if object.parlamentares.isonly_sexo_feminino %}a{% else %}e{% endif %}{% if object.parlamentares.count > 1 %}s{% endif %}
+    subscritor{% if object.parlamentares.isonly_sexo_feminino %}a{% else %}{% if object.parlamentares.count > 1 %}e{% endif %}{% endif %}{% if object.parlamentares.count > 1 %}s{% endif %}
     da presente Emenda Impositiva, propõem a seguinte modificação no Projeto de Lei Orçamentária Anual supracitado:
   </p>
 
