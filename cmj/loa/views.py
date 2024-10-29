@@ -258,7 +258,7 @@ class LoaCrud(Crud):
 
                     ja_destinado = EmendaLoaParlamentar.objects.filter(
                         **params
-                        #).exclude(
+                        # ).exclude(
                         #    emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO
                     ).aggregate(Sum('valor'))
 
@@ -565,7 +565,7 @@ class EmendaLoaCrud(MasterDetailCrud):
             self.loa = Loa.objects.get(pk=self.kwargs['pk'])
 
             if not has_perm:
-                return u.operadorautor_set.exists() and not self.loa.publicado
+                return u.operadorautor_set.exists() and self.loa.publicado
 
             return has_perm
 
@@ -606,7 +606,7 @@ class EmendaLoaCrud(MasterDetailCrud):
             if not u.is_superuser and not u.is_anonymous:
                 if u.operadorautor_set.exists():
                     if self.object.fase > EmendaLoa.PROPOSTA_LIBERADA and \
-                    self.object.fase != EmendaLoa.LIBERACAO_CONTABIL:
+                            self.object.fase != EmendaLoa.LIBERACAO_CONTABIL:
                         messages.warning(
                             request, f'A Emenda está na fase de "{self.object.get_fase_display()}". Não pode ser editada por usuário de autoria.')
                         return redirect(self.detail_url)
@@ -618,7 +618,7 @@ class EmendaLoaCrud(MasterDetailCrud):
             if not u.is_superuser and not u.is_anonymous:
                 if u.operadorautor_set.exists():
                     if self.object.fase > EmendaLoa.PROPOSTA_LIBERADA and \
-                    self.object.fase != EmendaLoa.LIBERACAO_CONTABIL:
+                            self.object.fase != EmendaLoa.LIBERACAO_CONTABIL:
                         messages.warning(
                             request, f'A Emenda está na fase de "{self.object.get_fase_display()}". Não pode ser editada por usuário de autoria.')
                         return redirect(self.detail_url)
