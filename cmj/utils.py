@@ -28,6 +28,7 @@ from unipath.path import Path
 from weasyprint import HTML
 import magic
 
+from cmj.celery import app as celery_app
 
 media_protected_storage = FileSystemStorage(
     location=settings.MEDIA_PROTECTED_ROOT, base_url='DO_NOT_USE')
@@ -35,6 +36,23 @@ media_protected_storage = FileSystemStorage(
 
 media_cache_storage = FileSystemStorage(
     location=settings.MEDIA_CACHE_ROOT, base_url='DO_NOT_USE')
+
+
+def get_celery_worker_status():
+    i = celery_app.control.inspect()
+    availability = i.ping()
+    stats = i.stats()
+    registered_tasks = i.registered()
+    active_tasks = i.active()
+    scheduled_tasks = i.scheduled()
+    result = {
+        'availability': availability,
+        'stats': stats,
+        'registered_tasks': registered_tasks,
+        'active_tasks': active_tasks,
+        'scheduled_tasks': scheduled_tasks
+    }
+    return result
 
 
 def pil_image(source, exif_orientation=False, **options):
@@ -402,15 +420,15 @@ def run_sql(sql):
 
 def make_pdf(base_url,
              main_template,
-             header_template = '',
-             footer_template = '',
-             main_css = '',
-             header_css = ''
+             header_template='',
+             footer_template='',
+             main_css='',
+             header_css=''
              ):
 
-    html = HTML(base_url = base_url, string = main_template)
+    html = HTML(base_url=base_url, string=main_template)
 
-    main_doc = html.render(stylesheets = [])
+    main_doc = html.render(stylesheets=[])
 
     def get_page_body(boxes):
         for box in boxes:
@@ -419,9 +437,9 @@ def make_pdf(base_url,
             return get_page_body(box.all_children())
 
     if header_template:
-        html = HTML(base_url = base_url, string = header_template)
+        html = HTML(base_url=base_url, string=header_template)
         header = html.render(
-            stylesheets = [])
+            stylesheets=[])
 
         header_page = header.pages[0]
         header_body = get_page_body(header_page._page_box.all_children())
@@ -429,9 +447,9 @@ def make_pdf(base_url,
             header_body.all_children())
 
     if footer_template:
-        html = HTML(base_url = base_url, string = footer_template)
+        html = HTML(base_url=base_url, string=footer_template)
         footer = html.render(
-            stylesheets = [])
+            stylesheets=[])
 
         footer_page = footer.pages[0]
         footer_body = get_page_body(footer_page._page_box.all_children())
@@ -642,6 +660,6 @@ class CmjEmailBackend(EmailBackend):
 
 class AlertSafe(Alert):
 
-    def __init__(self, content, dismiss = True, block = False, css_id = None, css_class = None, template = None, **kwargs):
-        super().__init__(SafeString(content), dismiss, block, css_id, css_class, template, **kwargs)
-
+    def __init__(self, content, dismiss=True, block=False, css_id=None, css_class=None, template=None, **kwargs):
+        super().__init__(SafeString(content), dismiss,
+                         block, css_id, css_class, template, **kwargs)

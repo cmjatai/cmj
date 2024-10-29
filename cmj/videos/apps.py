@@ -4,6 +4,7 @@ import random
 from django import apps
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+from cmj.utils import get_celery_worker_status
 
 
 class AppConfig(apps.AppConfig):
@@ -16,14 +17,17 @@ class AppConfig(apps.AppConfig):
         from . import signals
 
         from . import tasks
+
         from cmj.celery import app as celery_app
 
         for i in inspect.stack():
             try:
                 if i.frame.f_locals['subcommand'] == 'migrate':
                     return
-            except:
+            except Exception as e:
                 pass
+
+        #status_celery = get_celery_worker_status()
 
         if settings.DEBUG:
             return
