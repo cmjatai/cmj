@@ -1,13 +1,13 @@
 
 from datetime import datetime, timedelta
+from pwd import getpwuid
+from time import sleep
 import logging
 import os
-from pwd import getpwuid
 import shutil
 import stat
 import subprocess
 import sys
-from time import sleep
 import time
 
 from django.conf import settings
@@ -90,7 +90,7 @@ class Command(BaseCommand):
             'count': 0,
             'count_base': 9,
             'order_by': '-data',
-            'years_priority': 0
+            'years_priority': 1
         },
         {
             'model': MateriaLegislativa,
@@ -98,7 +98,7 @@ class Command(BaseCommand):
             'count': 0,
             'count_base': 2,
             'order_by': '-data_apresentacao',
-            'years_priority': 0
+            'years_priority': 1
         },
         {
             'model': NormaJuridica,
@@ -106,7 +106,7 @@ class Command(BaseCommand):
             'count': 0,
             'count_base': 2,
             'order_by': '-data',
-            'years_priority': 0
+            'years_priority': 1
         },
         {
             'model': DocumentoAcessorioAdministrativo,
@@ -114,7 +114,7 @@ class Command(BaseCommand):
             'count': 0,
             'count_base': 2,
             'order_by': '-data',
-            'years_priority': 0
+            'years_priority': 1
         },
         {
             'model': DocumentoAcessorio,
@@ -122,7 +122,7 @@ class Command(BaseCommand):
             'count': 0,
             'count_base': 2,
             'order_by': '-data',
-            'years_priority': 0
+            'years_priority': 1
         },
         {
             'model': DiarioOficial,
@@ -130,7 +130,7 @@ class Command(BaseCommand):
             'count': 0,
             'count_base': 2,
             'order_by': '-data',
-            'years_priority': 0
+            'years_priority': 1
         },
         {
             'model': SessaoPlenaria,
@@ -138,7 +138,7 @@ class Command(BaseCommand):
             'count': 0,
             'count_base': 2,
             'order_by': '-data_inicio',
-            'years_priority': 0
+            'years_priority': 1
         },
     ]
 
@@ -207,7 +207,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.logger = logging.getLogger(__name__)
 
-        init = datetime.now()
+        init = timezone.localtime()
         if not settings.DEBUG and self.is_running():
             print(init, 'Command OcrMyPdf já está sendo executado por outro processo')
             return
@@ -219,10 +219,6 @@ class Command(BaseCommand):
 
         self.delete_itens_tmp_folder()
 
-        # execução depende do crontab executado em:
-        #  9,18,27,36,45,54 0-22 * * * djangoapps
-        # /storage1/django-apps/cmj/run__commands__9min.sh
-
         self.execucao_noturna = init.hour < 6 or init.hour >= 22
 
         # só faz limpeza em execução norturna
@@ -230,7 +226,7 @@ class Command(BaseCommand):
             # Refaz tudo que foi feito a mais de tres anos
 
             OcrMyPDF.objects.filter(
-                created__lt=init - timedelta(days=1095)).delete()
+                created__lt=init - timedelta(days=360)).delete()
 
             # Refaz tudo que foi feito a mais de tres mêses e nao teve sucesso
             OcrMyPDF.objects.filter(
@@ -264,7 +260,7 @@ class Command(BaseCommand):
                 # se não existir nenhum registro pra processar do último ano
                 # ou ano atual, e a execução é de madrugada,
                 # então faz do passado.
-                if self.execucao_noturna and not items.exists():
+                if self.execucao_noturna:  # and not items.exists():
                     items = model['model'].objects.order_by(model['order_by'])
 
                 # items = items.filter(pk=3559)
@@ -295,7 +291,7 @@ class Command(BaseCommand):
                         if paginas > self.max_paginas_diurno and not self.execucao_noturna:
                             continue
 
-                    if count >= model['count_base']:
+                    if count >= model['count_base'] and not self.execucao_noturna:
                         break
 
                     for ff in model['file_field']:
@@ -341,6 +337,8 @@ class Command(BaseCommand):
                                     continue
                             except Exception as e:
                                 print(e)
+                                if settings.DEBUG:
+                                    continue
 
                             # se arq é mais novo, apaga o meta ocr p fazer
                             # novamente
@@ -359,6 +357,7 @@ class Command(BaseCommand):
 
                             self.logger.info(
                                 str(item.id) + ' ' + str(model['model']))
+
                             model['count'] += 1
                             print(item.id, model['model'])
                             count += 1
@@ -368,14 +367,14 @@ class Command(BaseCommand):
                             o.sucesso = False
                             o.save()
                             try:
-                                init_item = datetime.now()
+                                init_item = timezone.localtime()
                                 result = self.run(item, ff)
                                 if result is None:
                                     break
 
                                 o.sucesso = result
                                 o.save()
-                                now = datetime.now()
+                                now = timezone.localtime()
 
                                 if hasattr(item, '_paginas'):
                                     print(
@@ -395,7 +394,7 @@ class Command(BaseCommand):
                                     str(item.id) + ' ' +
                                     str(model['model']))
 
-                                if now - init > timedelta(minutes=9):
+                                if now - init > timedelta(minutes=50):
                                     return
 
                             except Exception as e:
@@ -428,7 +427,7 @@ class Command(BaseCommand):
             out_path = out_path + '.pdf'
 
         cmd = ["{}/ocrmypdf".format('/'.join(sys.executable.split('/')[:-1])),
-               #"--deskew",
+               # "--deskew",
                "--redo-ocr",
                "-l por",
                "-q",

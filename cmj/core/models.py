@@ -5,11 +5,11 @@ from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin, Group
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.db.models.fields.json import JSONField
 from django.core.exceptions import PermissionDenied
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models.deletion import PROTECT, CASCADE, SET_NULL
+from django.db.models.fields.json import JSONField
 from django.utils import timezone
 from django.utils.decorators import classonlymethod
 from django.utils.translation import gettext_lazy as _
@@ -156,7 +156,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     class Meta(AbstractBaseUser.Meta):
         abstract = False
         permissions = MENU_PERMS_FOR_USERS
-        ordering = ('first_name', 'last_name')
+        ordering = ('-is_superuser', 'first_name', 'last_name')
         verbose_name = _('Usuário')
         verbose_name_plural = _('Usuários')
 

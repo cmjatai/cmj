@@ -41,6 +41,7 @@ function textoMultiVigente (item, diff) {
   _$('.nota-alteracao').removeClass('displaynone')
 
   if (diff) {
+    // _$('.dptt.desativado').addClass('displaynone')
     _$('.dtxt[id^="da"').each(function () {
       if (_$(this)
         .html()
