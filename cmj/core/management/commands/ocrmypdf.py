@@ -13,7 +13,7 @@ import time
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.management.base import BaseCommand
-from django.db.models.signals import post_delete, post_save
+from django.db.models.signals import post_save
 from django.utils import timezone
 
 from cmj.core.models import OcrMyPDF
@@ -239,7 +239,9 @@ class Command(BaseCommand):
         """if settings.DEBUG:
             OcrMyPDF.objects.all().delete()"""
 
-        while self.models:
+        years_updated = set()
+        break_while = False
+        while self.models and not break_while:
 
             for model in self.models:
                 model['count'] = 0
@@ -374,6 +376,15 @@ class Command(BaseCommand):
 
                                 o.sucesso = result
                                 o.save()
+
+                                if result:
+                                    if hasattr(item, data_field):
+                                        item_data = getattr(item, data_field)
+                                        if item_data and hasattr(item_data, 'year'):
+                                            years_updated.add(
+                                                item_data.year
+                                            )
+
                                 now = timezone.localtime()
 
                                 if hasattr(item, '_paginas'):
@@ -395,7 +406,8 @@ class Command(BaseCommand):
                                     str(model['model']))
 
                                 if now - init > timedelta(minutes=50):
-                                    return
+                                    break_while = True
+                                    break
 
                             except Exception as e:
                                 print(e)
@@ -405,7 +417,17 @@ class Command(BaseCommand):
                             print('Seguindo...')
                             self.logger.info('Seguindo...')
 
+                        if break_while:
+                            break
+                    if break_while:
+                        break
+                if break_while:
+                    break
+
             self.models = list(filter(lambda x: x['count'] != 0, self.models))
+
+        for y in years_updated:
+            print(y)
 
     def run(self, item, fstr):
 
