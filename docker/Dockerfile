@@ -1,5 +1,9 @@
 FROM python:3.12.7-bookworm
-#FROM python:3.10-slim-buster
+
+# TODO:
+#    A imagem gerada a partir deste dockerfile
+#    não pode ser compartilhada por conter o .env, portanto,
+#    uma refatoração seria necessária.
 
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
@@ -7,32 +11,28 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED=1
 ENV DEBIAN_FRONTEND noninteractive
 
-ENV BUILD_PACKAGES apt-utils apt-file libpq-dev graphviz-dev build-essential pkg-config \
-                   python3-dev libxml2-dev libjpeg-dev libssl-dev libffi-dev libxslt1-dev \
-                   libcairo2-dev software-properties-common python3-setuptools python3-pip \
-                   procps nmap
+ENV RUN0_PACKAGES apt-utils apt-file libpq-dev build-essential pkg-config \
+                    libxml2-dev libjpeg-dev libssl-dev libffi-dev libxslt1-dev \
+                    libcairo2-dev software-properties-common graphviz graphviz-dev \
+                    procps nmap git vim bash curl curl jq bash
+
 RUN apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y --no-install-recommends $BUILD_PACKAGES
+    apt-get install -y --no-install-recommends $RUN0_PACKAGES
 
-ENV RUN1_PACKAGES git graphviz python3-lxml python3-magic postgresql-client  \
-                 poppler-utils curl jq bash vim python3-venv tzdata nodejs nginx
+ENV RUN1_PACKAGES python3-dev python3-lxml python3-magic postgresql-client  \
+                    python3-psycopg python3-setuptools python3-pip \
+                    poppler-utils python3-venv tzdata nodejs nginx
 RUN apt-get install -y --no-install-recommends $RUN1_PACKAGES
-
-ENV RUN2_PACKAGES fontconfig fonts-liberation openjdk-17-jdk-headless
-RUN apt-get install -y --no-install-recommends $RUN2_PACKAGES
-
-ENV RUN3_PACKAGES tesseract-ocr tesseract-ocr-por ghostscript python3-psycopg
-RUN apt-get install -y --no-install-recommends $RUN3_PACKAGES
 
 ENV LIBRE_PACKAGES libreoffice \
                     libreoffice-writer \
-                    ure \
                     libreoffice-java-common \
                     libreoffice-core \
                     libreoffice-common \
-                    fonts-opensymbol \
+                    ure \
                     hyphen-pt-br \
+                    fonts-opensymbol \
                     fonts-dejavu \
                     fonts-dejavu-core \
                     fonts-dejavu-extra \
@@ -45,8 +45,20 @@ ENV LIBRE_PACKAGES libreoffice \
                     fonts-lyx \
                     fonts-sil-gentium \
                     fonts-texgyre \
-                    fonts-tlwg-purisa
+                    fonts-tlwg-purisa \
+                    fonts-liberation \
+                    fontconfig
 RUN apt-get install -y -q $LIBRE_PACKAGES
+
+ENV RUN2_PACKAGES openjdk-17-jdk-headless tesseract-ocr tesseract-ocr-por ghostscript
+RUN apt-get install -y --no-install-recommends $RUN2_PACKAGES
+
+RUN mkdir /ghostscript
+WORKDIR /ghostscript
+RUN wget https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs10040/ghostscript-10.04.0.tar.gz
+RUN tar vzxfp ghostscript-10.04.0.tar.gz
+WORKDIR /ghostscript/ghostscript-10.04.0
+RUN ./configure && make && make install
 
 RUN fc-cache -fv && \
     pip3 install --no-cache-dir --upgrade pip setuptools
@@ -117,3 +129,5 @@ EXPOSE 80/tcp 443/tcp
 VOLUME ["/var/cmjatai/cmj/data", "/var/cmjatai/cmj_media", "/var/cmjatai/cmj/logs"]
 
 CMD ["/var/cmjatai/cmj/start.sh"]
+
+#CMD ["sleep", "infinity"]

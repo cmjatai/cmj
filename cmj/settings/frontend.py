@@ -76,7 +76,7 @@ FRONTEND_BRASAO_PATH = {
     '256': PROJECT_DIR_FRONTEND.child('public').child('brasao').child('brasao_256.png'),
     '512': PROJECT_DIR_FRONTEND.child('public').child('brasao').child('brasao_512.png'),
     '1024': PROJECT_DIR_FRONTEND.child('public').child('brasao').child('brasao_1024.png')
-}
+} 
 
 FRONTEND_ESCOLA_PATH = {
     '1024': PROJECT_DIR_FRONTEND.child('public').child('brasao').child('escola_1024.png')
