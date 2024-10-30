@@ -12,6 +12,7 @@ import time
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
+from django.core import management
 from django.core.management.base import BaseCommand
 from django.db.models.signals import post_save
 from django.utils import timezone
@@ -382,7 +383,8 @@ class Command(BaseCommand):
                                         item_data = getattr(item, data_field)
                                         if item_data and hasattr(item_data, 'year'):
                                             years_updated.add(
-                                                item_data.year
+                                                (item_data.year,
+                                                 model['model'])
                                             )
 
                                 now = timezone.localtime()
@@ -426,8 +428,22 @@ class Command(BaseCommand):
 
             self.models = list(filter(lambda x: x['count'] != 0, self.models))
 
-        for y in years_updated:
-            print(y)
+        for y, m in years_updated:
+            try:
+                self.logger.info(
+                    f'Ano Executado: {y} chamando update_index...')
+                management.call_command(
+                    'update_index',
+                    f"{m._meta.app_label}.{m._meta.object_name}",
+                    f"--start={y}-01-01T00:00:00'",
+                    f"--end='{y}-12-31T23:59:59'",
+                    '--verbosity=3',
+                    '--batch-size=100',
+                    "--using=default"
+                )
+
+            except Exception as e:
+                self.logger.error(e)
 
     def run(self, item, fstr):
 
@@ -453,7 +469,7 @@ class Command(BaseCommand):
                "--redo-ocr",
                "-l por",
                "-q",
-               "-j {}".format(8 if self.execucao_noturna else 2),
+               "-j {}".format(12 if self.execucao_noturna else 4),
                "--output-type pdfa-2",
                in_path, out_path]
 
