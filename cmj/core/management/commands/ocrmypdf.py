@@ -126,20 +126,20 @@ class Command(BaseCommand):
             'years_priority': 1
         },
         {
-            'model': DiarioOficial,
-            'file_field': ('arquivo',),
-            'count': 0,
-            'count_base': 2,
-            'order_by': '-data',
-            'years_priority': 1
-        },
-        {
             'model': SessaoPlenaria,
             'file_field': ('upload_pauta', 'upload_ata', 'upload_anexo'),
             'count': 0,
             'count_base': 2,
             'order_by': '-data_inicio',
             'years_priority': 1
+        },
+        {
+            'model': DiarioOficial,
+            'file_field': ('arquivo',),
+            'count': 0,
+            'count_base': 1,
+            'order_by': '-data',
+            'years_priority': 0
         },
     ]
 
@@ -205,7 +205,18 @@ class Command(BaseCommand):
 
             d = d + timedelta(seconds=i)
 
+    def tem_sessaoplenaria_aberta(self):
+        return SessaoPlenaria.objects.filter(
+            data_inicio=timezone.localdate(),
+            iniciada=True,
+            finalizada=False
+        ).exists()
+
     def handle(self, *args, **options):
+
+        if self.tem_sessaoplenaria_aberta():
+            return
+
         self.logger = logging.getLogger(__name__)
 
         init = timezone.localtime()
@@ -263,11 +274,14 @@ class Command(BaseCommand):
                 # se não existir nenhum registro pra processar do último ano
                 # ou ano atual, e a execução é de madrugada,
                 # então faz do passado.
-                if self.execucao_noturna:  # and not items.exists():
-                    items = model['model'].objects.order_by(model['order_by'])
+                # if self.execucao_noturna:  # and not items.exists():
+                items = model['model'].objects.order_by(model['order_by'])
 
                 # items = items.filter(pk=3559)
                 for item in items:
+
+                    if self.tem_sessaoplenaria_aberta():
+                        return
 
                     # item.save()
                     paginas = 0
@@ -407,7 +421,7 @@ class Command(BaseCommand):
                                     str(item.id) + ' ' +
                                     str(model['model']))
 
-                                if now - init > timedelta(minutes=50):
+                                if now - init > timedelta(minutes=2):
                                     break_while = True
                                     break
 
@@ -425,6 +439,10 @@ class Command(BaseCommand):
                         break
                 if break_while:
                     break
+
+            # for m in self.models:
+            #    if not self.execucao_noturna and not m['count'] and m['years_priority'] < 10:
+            #        m['years_priority'] += 1
 
             self.models = list(filter(lambda x: x['count'] != 0, self.models))
 

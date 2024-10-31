@@ -348,7 +348,7 @@ class PortalFieldImage(ImageFieldFile):
     def url_cropping(self):
         url = self.url
 
-        if url[-1] == '/':
+        if url and url[-1] == '/':
             url = url[:-1]
             url = f'{url}.c1024.png'
 
