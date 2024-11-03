@@ -3,10 +3,28 @@
     <div :class="['empty-list', materia.id === undefined ? '' : 'd-none']">
       Carregando Matéria...
     </div>
+    <voto-parlamentar v-if="votacaoAberta && false"></voto-parlamentar>
 
-    <div :class="[resultadoVotacao]">
-      <span v-if="item.resultado">{{ item.resultado }}</span>
-      <span v-else>Tramitando</span>
+    <div class="status-votacao">
+      <div class="votos" v-if="registro">
+        <div class="voto-abs" v-if="registro.numero_abstencoes">
+          <span class="valor">{{ registro.numero_abstencoes }}</span>
+          <span class="titulo">ABS</span>
+        </div>
+        <div class="voto-nao">
+          <span class="valor">{{ registro.numero_votos_nao }}</span>
+          <span class="titulo">NÃO</span>
+        </div>
+        <div class="voto-sim">
+          <span class="valor">{{ registro.numero_votos_sim }}</span>
+          <span class="titulo">SIM</span>
+        </div>
+      </div>
+      <div :class="[statusVotacao]">
+        <span v-if="votacaoAberta">VOTAÇÃO ABERTA</span>
+        <span v-else-if="item.resultado">{{ item.resultado }}</span>
+        <span v-else>Tramitando</span>
+      </div>
     </div>
 
     <materia-pauta :materia="materia" :type="type"></materia-pauta>
@@ -104,6 +122,7 @@
 </template>
 <script>
 import MateriaPauta from './MateriaPauta'
+import VotoParlamentar from './VotoParlamentar'
 import NormaSimpleModalView from '@/components/norma/NormaSimpleModalView'
 
 export default {
@@ -111,12 +130,27 @@ export default {
   props: ['item', 'type'],
   components: {
     MateriaPauta,
+    VotoParlamentar,
     NormaSimpleModalView
   },
   data () {
     return {
-      app: ['materia', 'norma'],
-      model: ['materialegislativa', 'tramitacao', 'anexada', 'autoria', 'legislacaocitada', 'documentoacessorio'],
+      app: [
+        'materia',
+        'norma',
+        'sessao'
+      ],
+      model: [
+        'materialegislativa',
+        'tramitacao',
+        'anexada',
+        'autoria',
+        'legislacaocitada',
+        'documentoacessorio',
+        'registrovotacao',
+        'registroleitura',
+        'votoparlamentar'
+      ],
       materia: {},
       tramitacao: {
         ultima: {},
@@ -125,7 +159,8 @@ export default {
       anexadas: {},
       legislacaocitada: {},
       documentoacessorio: {},
-      modal_legis_citada: null
+      modal_legis_citada: null,
+      registro: null
     }
   },
   watch: {
@@ -174,21 +209,28 @@ export default {
         return _.orderBy(this.documentoacessorio, 'data')
       }
     },
-    resultadoVotacao: {
+    votacaoAberta: {
+      get () {
+        return this.item.votacao_aberta && this.item.tipo_votacao <= 2
+      }
+    },
+    statusVotacao: {
       get () {
         let tipo = ''
         let r = this.item.resultado
         if (r === 'Aprovado') {
-          tipo = 'status-votacao result-aprovado'
+          tipo = 'result-aprovado'
         } else if (r === 'Rejeitado') {
-          tipo = 'status-votacao result-rejeitado'
+          tipo = 'result-rejeitado'
         } else if (r === 'Pedido de Vista') {
-          tipo = 'status-votacao result-vista'
+          tipo = 'result-vista'
         } else if (r === 'Prazo Regimental') {
-          tipo = 'status-votacao result-prazo'
+          tipo = 'result-prazo'
+        } else if (this.item.votacao_aberta) {
+          tipo = 'votacao-aberta'
         }
 
-        return tipo !== '' ? tipo : 'status-votacao'
+        return tipo
       }
     }
   },
@@ -211,6 +253,7 @@ export default {
         })
       t.$nextTick()
         .then(() => {
+          // TODO: trocar ultima tramitacao pela fixada na ordem do dia.
           // t.fetchUltimaTramitacao()
         })
         .then(() => {
@@ -219,8 +262,12 @@ export default {
         .then(() => {
           t.fetchDocumentoAcessorio()
         })
+        .then(() => {
+          t.fetchRegistroDeVoto()
+        })
     },
     fetch (metadata) {
+      // chamado pelo push do servidor
       const t = this
 
       if (metadata === undefined) {
@@ -258,6 +305,44 @@ export default {
         t.fetchLegislacaoCitada()
       } else if (metadata.app === 'materia' && metadata.model === 'documentoacessorio') {
         t.fetchDocumentoAcessorio()
+      } else if (metadata.app === 'sessao' && ['registrovotacao', 'registroleitura', 'votoparlamentar'].includes(metadata.model)) {
+        t.fetchRegistroDeVoto(metadata)
+      }
+    },
+    fetchRegistroDeVoto (metadata) {
+      const t = this
+      const model = t.item.tipo_votacao === 4 ? 'registroleitura' : 'registrovotacao'
+      const field = t.type === 'expedientemateria' ? 'expediente' : 'ordem'
+
+      if (t.item.resultado.length > 0 && t.registro === null) {
+        const query_string = `&${field}=${t.item.id}&o=-id`
+        t.utils
+          .getModelList('sessao', model, 1, query_string)
+          .then((response) => {
+            _.each(response.data.results.slice(0, 1), value => {
+              t.registro = value
+              t.refreshState({
+                app: 'sessao',
+                model: model,
+                value: value,
+                id: value.id
+              })
+            })
+          })
+          .catch((response) => {
+            t.sendMessage(
+              { alert: 'danger', message: 'Não foi possível recuperar o Registro de Votos/Leitura.', time: 5 })
+          })
+      }
+      if (!t.nulls.includes(metadata) && !t.nulls.includes(t.registro) && t.registro.id === metadata.id) {
+        t.getObject(metadata)
+          .then(obj => {
+            if (t.nulls.includes(obj)) {
+              t.registro = null
+            } else if (obj.materia === t.item.materia) {
+              t.registro = obj
+            }
+          })
       }
     },
     fetchDocumentoAcessorio (page = 1) {
@@ -385,26 +470,64 @@ export default {
   }
   .status-votacao {
     position: absolute;
-    top: 0;
-    right: 0;
-    display: inline-block;
-    margin-left: -15px;
-    padding: 5px;
+    display: flex;
+    top: -0.7em;
+    right: 0.5em;
     font-weight: bold;
     color: #fff;
-    background-color: #e6bc02;
+    line-height: 1;
 
-    &.result-aprovado {
+    & > div  {
+      background-color: #e6bc02;
+      display: flex;
+      padding: 5px;
+      align-items: center;
+    }
+    .votos {
+      background-color: #fff;
+      padding: 0;
+      div {
+        padding: 5px 10px 1px;
+        display: flex;
+        gap: 2px;
+        .titulo {
+          font-size: 60%;
+        }
+        .valor {
+          font-size: 130%;
+          padding-right: 5px;
+        }
+      }
+      .voto-sim {
+        background-color: #00800099;
+        .titulo, .valor {
+        }
+      }
+      .voto-nao {
+        background-color: #ff000099;
+        .titulo, .valor {
+        }
+      }
+      .voto-abs {
+        background-color: #e6bc0299;
+        .titulo, .valor {
+        }
+      }
+    }
+    .result-aprovado {
       background-color: green;
     }
-    &.result-prazo {
+    .result-prazo {
       background-color: #2580f7;
     }
-    &.result-vista {
+    .result-vista {
       background-color: #2580f7;
     }
-    &.result-rejeitado {
+    .result-rejeitado {
       background-color: red;
+    }
+    .votacao-aberta {
+      background-color: #000;
     }
   }
 

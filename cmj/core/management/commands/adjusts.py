@@ -1,42 +1,42 @@
 
 from collections import OrderedDict
+from pathlib import Path
+from time import sleep
 import glob
 import io
 import logging
 import os
-from pathlib import Path
 import pathlib
 import re
 import subprocess
 import sys
-from time import sleep
 
 from PIL import Image, ImageEnhance, ImageDraw
 from PIL.Image import Resampling
 from bs4 import BeautifulSoup as bs
 from bs4.element import Tag
-import cv2
 from django.apps import apps
 from django.core.files.base import File
 from django.core.management.base import BaseCommand
 from django.db.models import Q
-import fitz
-import ocrmypdf
 from pymupdf import Rect
-import pymupdf
 from reportlab.pdfgen import canvas
 from reportlab.platypus.doctemplate import SimpleDocTemplate
+import cv2
+import fitz
+import ocrmypdf
+import pymupdf
 import requests
 
 from cmj.arq.models import ArqDoc
 from cmj.diarios.models import DiarioOficial
 from cmj.loa.models import Despesa
 from cmj.utils import Manutencao
-import numpy as np
 from sapl.compilacao.models import Dispositivo, UrlizeReferencia
-from sapl.materia.models import MateriaLegislativa
+from sapl.materia.models import MateriaLegislativa, DocumentoAcessorio
 from sapl.norma.models import NormaJuridica
 from sapl.rules.apps import reset_id_model
+import numpy as np
 
 
 def _get_registration_key(model):
@@ -297,6 +297,32 @@ class Command(BaseCommand):
             ad.save()
 
         return
+        d = DocumentoAcessorio.objects.get(pk=3446)
+        path = d.arquivo.original_path
+        for m in MateriaLegislativa.objects.filter(
+            tipo_id=27, ano=2023,
+            numero__in=list({
+                2, 3, 5, 7, 8, 9, 10, 11, 12, 13, 14,
+                15, 16, 17, 18, 19, 20, 21, 22, 23, 25, 26, 27, 28, 29, 38, 39,
+                87, 104, 107, 63, 71,
+                80, 106, 37, 62, 67, 70, 94, 108,
+                117, 31, 41, 45,
+                46, 47, 55, 95, 113, 115,
+                52, 56, 69, 72, 75, 83, 84, 85, 96, 97,
+                98, 100, 101, 111, 114, 119, 120, 121, 122,
+                30,
+                32, 34, 48, 58, 81, 88, 99, 36, 92, 112, 43, 49, 61, 89, 103, 118, 44, 51, 57, 66, 76, 102,
+                79, 110, 93, 96,
+            })
+        ).order_by('numero'):
+            f = open(path, 'rb')
+            f = File(f)
+            d.id = None
+            d.arquivo = None
+            d.materia = m
+            d.save()
+            d.arquivo.save(path.split('/')[-1], f)
+            d.save()
 
         # post_save.disconnect(dispatch_uid='timerefresh_post_signal')
 
@@ -567,21 +593,21 @@ class Command(BaseCommand):
                 append_images=flist_out_img_obj)"""
 
             cmd = ["{}/ocrmypdf".format('/'.join(sys.executable.split('/')[:-1])),
-                   #"-q",                  # Execução silenciosa
+                   # "-q",                  # Execução silenciosa
                    "-l por",              # tesseract portugues
                    "-j 8",     # oito threads
                    "--fast-web-view 10000000",   # não inclui fast web view
                    "--image-dpi 300",
-                   #"--rotate-pages",
-                   #"--remove-background",
+                   # "--rotate-pages",
+                   # "--remove-background",
 
                    "--optimize 0",
                    "--jpeg-quality 100",
                    "--png-quality 100",
-                   #"--jbig2-lossy",
+                   # "--jbig2-lossy",
 
                    # "--deskew",
-                   #"--clean-final",
+                   # "--clean-final",
                    "--pdfa-image-compression jpeg",  # jpeg  lossless
                    "--output-type pdfa-1",
                    #"--tesseract-timeout 0",
@@ -635,22 +661,22 @@ class Command(BaseCommand):
                 continue
 
             cmd = ["{}/ocrmypdf".format('/'.join(sys.executable.split('/')[:-1])),
-                   #"-q",                  # Execução silenciosa
+                   # "-q",                  # Execução silenciosa
                    "-l por",              # tesseract portugues
                    "-j 8",     # oito threads
-                   #"--fast-web-view 10000000",   # não inclui fast web view
+                   # "--fast-web-view 10000000",   # não inclui fast web view
                    #"--image-dpi 300",
-                   #"--rotate-pages",
-                   #"--remove-background",
+                   # "--rotate-pages",
+                   # "--remove-background",
                    "--force-ocr",
                    #"--optimize 0",
                    #"--jpeg-quality 100",
                    #"--png-quality 100",
-                   #"--jbig2-lossy",
+                   # "--jbig2-lossy",
 
                    # "--deskew",
-                   #"--clean-final",
-                   #"--pdfa-image-compression jpeg",  # jpeg  lossless
+                   # "--clean-final",
+                   # "--pdfa-image-compression jpeg",  # jpeg  lossless
                    "--output-type pdfa-2",
                    #"--tesseract-timeout 0",
                    f'"{f}"',
@@ -712,7 +738,7 @@ class Command(BaseCommand):
                 'border',
                 'cellpadding',
                 'cellspacing',
-                #'width'
+                # 'width'
             ):
                 del nd.attrs[k]
 
@@ -883,7 +909,7 @@ class Command(BaseCommand):
                     print(d.rotulo)
                     print('Anterior:', d.dispositivo_substituido.id,
                           repr(txt_alter_sanitize[(j - 20) if j >= 20 else 0:]))
-                    print('Atual...:', d.id,
+                    print('Atual', d.id,
                           repr(txt_atual_sanitize[(j - 20) if j >= 20 else 0:]))
                     print('', end='')
                     print('')

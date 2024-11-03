@@ -720,7 +720,7 @@ class MateriaOrdemDiaCrud(MasterDetailCrud):
             # OrdemDia.objects.filter(
             #    sessao_plenaria=obj.sessao_plenaria,
             #    id__gt=13288
-            #).delete()
+            # ).delete()
             # OrdemDia.objects.filter(
             #    materia__in=list(materias_ja_adicionadas)).delete()
 
@@ -736,7 +736,7 @@ class MateriaOrdemDiaCrud(MasterDetailCrud):
             # OrdemDia.objects.filter(
             #    sessao_plenaria=obj.sessao_plenaria,
             #    numero_ordem__gt=obj.numero_ordem
-            #).update(numero_ordem=F('numero_ordem') + len(materias_a_adicionar))
+            # ).update(numero_ordem=F('numero_ordem') + len(materias_a_adicionar))
 
             for m in materias_a_adicionar:
                 oc = OrdemDia()
@@ -1361,7 +1361,10 @@ class SessaoCrud(Crud):
                     }
 
                     cmd = cmd.format(**params)
+
+                    # if not settings.DEBUG:
                     self.run(cmd)
+                    # print(cmd)
 
                     del params['plugin']
                     del params['in_file']

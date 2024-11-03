@@ -122,7 +122,7 @@ def task_add_selo_votacao_function(pk):
             'h': 50,
             'cor': "0, 76, {}, 255".format(170 - count * 20) if v.tipo_resultado_votacao.natureza == 'A' else "150, 20, 0, 255",
             'compression': compression,
-            'debug': False  # settings.DEBUG
+            'debug': settings.DEBUG
         }
 
         cmd = cmd.format(**params)
