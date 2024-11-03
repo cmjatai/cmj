@@ -3,10 +3,10 @@
     <div :class="['empty-list', materia.id === undefined ? '' : 'd-none']">
       Carregando Matéria...
     </div>
-    <voto-parlamentar v-if="votacaoAberta && false"></voto-parlamentar>
+    <voto-parlamentar v-if="votacaoAberta"></voto-parlamentar>
 
     <div class="status-votacao">
-      <div class="votos" v-if="registro">
+      <div class="votos" v-if="registro && !votacaoAberta">
         <div class="voto-abs" v-if="registro.numero_abstencoes">
           <span class="valor">{{ registro.numero_abstencoes }}</span>
           <span class="titulo">ABS</span>
@@ -21,7 +21,8 @@
         </div>
       </div>
       <div :class="[statusVotacao]">
-        <span v-if="votacaoAberta">VOTAÇÃO ABERTA</span>
+        <span v-if="votacaoPedidoPrazoAberta">VOTAÇÃO ABERTA PARA PEDIDO DE ADIAMENTO</span>
+        <span v-else-if="votacaoAberta">VOTAÇÃO ABERTA</span>
         <span v-else-if="item.resultado">{{ item.resultado }}</span>
         <span v-else>Tramitando</span>
       </div>
@@ -175,6 +176,15 @@ export default {
             })
           })
       }
+    },
+    item: function (nv, ov) {
+      this.$nextTick()
+        .then(() => {
+          this.registro = null
+        })
+        .then(() => {
+          this.fetchRegistroDeVoto()
+        })
     }
   },
   computed: {
@@ -214,11 +224,18 @@ export default {
         return this.item.votacao_aberta && this.item.tipo_votacao <= 2
       }
     },
+    votacaoPedidoPrazoAberta: {
+      get () {
+        return this.item.votacao_aberta_pedido_prazo && this.item.tipo_votacao <= 2
+      }
+    },
     statusVotacao: {
       get () {
         let tipo = ''
         let r = this.item.resultado
-        if (r === 'Aprovado') {
+        if (this.votacaoAberta) {
+          tipo = 'votacao-aberta'
+        } else if (r === 'Aprovado') {
           tipo = 'result-aprovado'
         } else if (r === 'Rejeitado') {
           tipo = 'result-rejeitado'
@@ -226,8 +243,6 @@ export default {
           tipo = 'result-vista'
         } else if (r === 'Prazo Regimental') {
           tipo = 'result-prazo'
-        } else if (this.item.votacao_aberta) {
-          tipo = 'votacao-aberta'
         }
 
         return tipo
@@ -309,7 +324,7 @@ export default {
         t.fetchRegistroDeVoto(metadata)
       }
     },
-    fetchRegistroDeVoto (metadata) {
+    async fetchRegistroDeVoto (metadata) {
       const t = this
       const model = t.item.tipo_votacao === 4 ? 'registroleitura' : 'registrovotacao'
       const field = t.type === 'expedientemateria' ? 'expediente' : 'ordem'

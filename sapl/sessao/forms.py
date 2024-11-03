@@ -268,11 +268,13 @@ class RetiradaPautaForm(ModelForm):
             ordem = retirada.ordem
             retirada.materia = ordem.materia
             ordem.votacao_aberta = False
+            ordem.votacao_aberta_pedido_prazo = False
             ordem.save()
         elif retirada.expediente:
             expediente = retirada.expediente
             retirada.materia = expediente.materia
             expediente.votacao_aberta = False
+            expediente.votacao_aberta_pedido_prazo = False
             expediente.save()
         retirada.save()
         return retirada

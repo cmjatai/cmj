@@ -1,11 +1,11 @@
 from operator import xor
 
 from django.contrib.contenttypes.fields import GenericRelation
-from django.db.models.fields.json import JSONField
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models import Q, F
+from django.db.models.fields.json import JSONField
 from django.db.models.fields.related import ManyToManyField
 from django.utils import timezone, formats
 from django.utils.translation import gettext_lazy as _
@@ -186,21 +186,21 @@ class SessaoPlenaria(models.Model):
         upload_to=anexo_upload_path,
         verbose_name=_('Anexo da Sessão'))
     iniciada = models.BooleanField(null=True, blank=True,
-                                       choices=YES_NO_CHOICES,
-                                       verbose_name=_('Sessão iniciada?'),
-                                       default=True)
+                                   choices=YES_NO_CHOICES,
+                                   verbose_name=_('Sessão iniciada?'),
+                                   default=True)
     finalizada = models.BooleanField(null=True, blank=True,
-                                         choices=YES_NO_CHOICES,
-                                         verbose_name=_('Sessão finalizada?'),
-                                         default=False)
+                                     choices=YES_NO_CHOICES,
+                                     verbose_name=_('Sessão finalizada?'),
+                                     default=False)
     selo_votacao_adicionado = models.BooleanField(null=True, blank=True,
-                                                      choices=YES_NO_CHOICES,
-                                                      verbose_name=_(
-                                                          'Selo de Votação Adicionado?'),
-                                                      default=False)
+                                                  choices=YES_NO_CHOICES,
+                                                  verbose_name=_(
+                                                      'Selo de Votação Adicionado?'),
+                                                  default=False)
     interativa = models.BooleanField(null=True, blank=True,
-                                         choices=YES_NO_CHOICES,
-                                         verbose_name=_('Sessão interativa'))
+                                     choices=YES_NO_CHOICES,
+                                     verbose_name=_('Sessão interativa'))
     tema_solene = models.TextField(
         blank=True, max_length=500, verbose_name=_('Tema da Sessão Solene'))
 
@@ -429,13 +429,18 @@ class AbstractOrdemDia(models.Model):
     tipo_votacao = models.PositiveIntegerField(
         verbose_name=_('Tipo de votação'), choices=TIPO_VOTACAO_CHOICES, default=1)
     votacao_aberta = models.BooleanField(null=True,
-        blank=True,
-        choices=YES_NO_CHOICES,
-        verbose_name=_('Votação iniciada?'))
+                                         blank=True,
+                                         choices=YES_NO_CHOICES,
+                                         verbose_name=_('Votação iniciada?'))
+
+    votacao_aberta_pedido_prazo = models.BooleanField(null=True,
+                                                      blank=True,
+                                                      choices=YES_NO_CHOICES,
+                                                      verbose_name=_('Votação de Pedido de Prazo?'))
     registro_aberto = models.BooleanField(null=True,
-        blank=True,
-        choices=YES_NO_CHOICES,
-        verbose_name=_('Registro de Votação Iniciado?'))
+                                          blank=True,
+                                          choices=YES_NO_CHOICES,
+                                          verbose_name=_('Registro de Votação Iniciado?'))
 
     url_video = models.URLField(
         max_length=150, blank=True,
@@ -691,10 +696,10 @@ class RegistroVotacao(models.Model):
         null=True)
 
     selo_votacao = models.BooleanField(null=True,
-        blank=True,
-        default=False,
-        choices=YES_NO_CHOICES,
-        verbose_name=_('Selo de Votação Adicionado'))
+                                       blank=True,
+                                       default=False,
+                                       choices=YES_NO_CHOICES,
+                                       verbose_name=_('Selo de Votação Adicionado'))
 
     class Meta:
         verbose_name = _('Votação')
