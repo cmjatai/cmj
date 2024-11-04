@@ -14,7 +14,7 @@ from sapl.utils import (LISTA_DE_UFS, YES_NO_CHOICES, SaplGenericRelation,
                         get_settings_auth_user_model,
                         intervalos_tem_intersecao,
                         restringe_tipos_de_arquivo_img, texto_upload_path,
-    PortalImageField, PortalImageCropField)
+                        PortalImageField, PortalImageCropField)
 
 
 class Legislatura(models.Model):
@@ -693,7 +693,7 @@ class Votante(models.Model):
         on_delete=models.PROTECT, related_name='parlamentar')
     user = models.ForeignKey(
         get_settings_auth_user_model(), on_delete=models.PROTECT,
-        verbose_name=_('User'), related_name='user')
+        verbose_name=_('User'), related_name='votante')
     data = models.DateTimeField(
         verbose_name=_('Data'), auto_now_add=True,
         max_length=30, null=True, blank=True)

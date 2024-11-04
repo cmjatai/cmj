@@ -11,7 +11,7 @@
         </div>
     </template>
     <template slot="header-right">
-      <i class="fas fa-sign-out-alt hover-circle" @click="close" title="Sair da Interface Online"></i>
+      <portalcmj-connect></portalcmj-connect>
     </template>
 
     <template slot="sideleft">
@@ -30,6 +30,7 @@
 </template>
 
 <script>
+import PortalcmjConnect from '@/components/auth/PortalcmjConnect'
 import SideRight from './fragments/SideRight'
 import SideLeft from './fragments/SideLeft'
 import Brand from './fragments/Brand'
@@ -38,18 +39,13 @@ import BaseLayout from './fragments/BaseLayout'
 export default {
   name: 'online',
   components: {
+    PortalcmjConnect,
     BaseLayout,
     SideRight,
     SideLeft,
     Brand
   },
-  beforeDestroy: function () {
-    this.$disconnect()
-  },
   methods: {
-    close () {
-      window.location.href = '/'
-    },
     diminuirFonte () {
       $('.base-layout .main').css('font-size', '-=1')
     },
@@ -63,8 +59,9 @@ export default {
 <style lang="scss">
 .header-right {
   display: grid;
-  align-items: center;
-  justify-items: center;
+  align-items: stretch;
+  justify-items: stretch;
+  z-index: 2;
   i {
     color: rgba(black, 0.5);
     padding: 8px;

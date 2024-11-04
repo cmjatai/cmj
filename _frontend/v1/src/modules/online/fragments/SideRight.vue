@@ -94,6 +94,7 @@ export default {
 <style lang="scss">
 .inner-sideright .menu {
   // display: none;
+  z-index: 1;
   button {
     padding: 0.5rem 1rem;
     white-space: nowrap;

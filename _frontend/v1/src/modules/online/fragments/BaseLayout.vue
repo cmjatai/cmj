@@ -191,6 +191,7 @@ export default {
     grid-column-start: 4;
     grid-column-end: 5;
     border-left: 1px #ddd solid;
+    z-index: 1;
   }
 
   &.left-expand {

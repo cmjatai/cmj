@@ -116,6 +116,7 @@ export default {
 
 .norma-simple-modal-view {
   background-color: #000b;
+  z-index: 10000;
   .cp {
      font-size: 1.2em;
      line-height: 1.5em;

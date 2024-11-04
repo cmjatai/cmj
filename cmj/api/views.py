@@ -1,14 +1,18 @@
 from django.conf import settings
+from django.contrib.auth import login, logout
 from django.db import transaction
 from django.db.models.signals import post_save
 from django.dispatch.dispatcher import receiver
 from django.utils.translation import gettext_lazy as _
+from image_cropping.utils import get_backend
 from rest_framework import viewsets, status
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated,\
-    IsAuthenticatedOrReadOnly, IsAdminUser
+    IsAuthenticatedOrReadOnly, IsAdminUser, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -21,17 +25,51 @@ from drfautoapi.drfautoapi import ApiViewSetConstrutor
 
 
 class AppVersionView(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
 
     def get(self, request):
+
         content = {
             'name': 'PortalCMJ',
-            'description': 'Câmara Municipal de Jataí - Estado de Goiás',
+            'description': 'PortalCMJ',
             'version': settings.PORTALCMJ_VERSION,
-            'user': request.user.email,
-            'is_authenticated': request.user.is_authenticated,
         }
+
+        if request.user.is_authenticated:
+            #token = Token.objects.filter(user=request.user).first()
+            #    'token': token.key,
+            user = {
+                'username': request.user.username,
+                'fullname': request.user.get_full_name(),
+                'avatar': request.user.avatar.url
+            }
+            votante = request.user.votante.first()
+            if votante:
+                user.update({
+                    'votante': {
+                        'parlamentar_id': votante.parlamentar_id,
+                        'nome_parlamentar': votante.parlamentar.nome_parlamentar
+                    }
+                })
+            content.update({
+                'user': user
+            })
+
         return Response(content)
+
+
+class AppSessionAuthView(ObtainAuthToken):
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        login(request, user)
+        return Response({'detail': _('Autenticação efetuada com sucesso!')})
+
+    def delete(self, request):
+        logout(request)
+        return Response({'detail': _('Desconexão efetuada com sucesso!')})
 
 
 CmjApiViewSetConstrutor = ApiViewSetConstrutor

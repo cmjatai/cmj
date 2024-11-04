@@ -2,8 +2,13 @@
 {% load compilacao_filters %}
 {% load common_tags %}
 
-<div class="cp">
+{% if embedded_cache %}
+  {{ embedded_cache|safe }}
 
+{% else %}
+
+
+<div class="cp">
   {% if object_list %}
     <div class="clearfix">
       <div class="actions btn-group float-right" role="group">
@@ -86,3 +91,5 @@
   {% include 'compilacao/text_list_bloco.html'%}
 
 </div>
+
+{% endif %}

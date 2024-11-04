@@ -13,6 +13,9 @@ export default {
   components: {
     Message
   },
+  created: function () {
+    this.loginStatus()
+  },
   mounted: function () {
     this.$options.sockets.onmessage = (event) => {
       /**

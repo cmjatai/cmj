@@ -12,7 +12,8 @@ Vue.mixin({
     ...Vuex.mapGetters([
       'getCache',
       'cache',
-      'nivel_detalhe'
+      'nivel_detalhe',
+      'user'
     ])
   },
   data () {
@@ -29,7 +30,10 @@ Vue.mixin({
     ...Vuex.mapActions([
       'sendMessage',
       'refreshState',
-      'getObject'
+      'getObject',
+      'loginPortalCMJ',
+      'logoutPortalCMJ',
+      'loginStatus'
     ]),
     nivel (value, teste_local) {
       return this.nivel_detalhe >= value && teste_local ? '' : 'd-none'

@@ -6,6 +6,22 @@ axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 
 export default {
   Utils: {
+    login: (username, password) => axios.post(
+      `${basePath}/auth/session`, {
+        username,
+        password
+      },
+      {
+        withCredentials: true
+      }
+    ),
+    logout: () => axios.delete(
+      `${basePath}/auth/session`
+    ),
+    getVersion: () => axios({
+      url: `${basePath}/version`,
+      method: 'GET'
+    }),
     getYearsChoiceList: (app, model) => axios({
       url: `${basePath}/${app}/${model}/years/`,
       method: 'GET'

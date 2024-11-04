@@ -21,20 +21,6 @@ def recria_token(request, pk):
     return Response({"message": "Token recriado com sucesso!", "token": token.key})
 
 
-class AppVersionView(APIView):
-    permission_classes = (IsAuthenticated,)
-
-    def get(self, request):
-        content = {
-            'name': 'SAPL',
-            'description': 'Sistema de Apoio ao Processo Legislativo',
-            'version': settings.SAPL_VERSION,
-            'user': request.user.username,
-            'is_authenticated': request.user.is_authenticated,
-        }
-        return Response(content)
-
-
 SaplApiViewSetConstrutor = ApiViewSetConstrutor
 SaplApiViewSetConstrutor.import_modules([
     'sapl.api.views_audiencia',
