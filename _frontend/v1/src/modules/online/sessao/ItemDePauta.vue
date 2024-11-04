@@ -6,7 +6,7 @@
     <voto-parlamentar v-if="votacaoAberta"></voto-parlamentar>
 
     <div class="status-votacao">
-      <div class="votos" v-if="registro && !votacaoAberta">
+      <div class="votos" v-if="registro && !votacaoAberta && item.tipo_votacao != 4">
         <div class="voto-abs" v-if="registro.numero_abstencoes">
           <span class="valor">{{ registro.numero_abstencoes }}</span>
           <span class="titulo">ABS</span>

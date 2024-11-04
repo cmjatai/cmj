@@ -16,9 +16,10 @@
         <i :class="[`fas fa-sign-out-alt hover-circle`]" title="Desconectar usuário"></i>
       </div>
     </div>
-    <div v-if="!user" :class="['portalcmj-login', is_expanded ? 'expand' : '']">
-      <div class="header" v-if="!is_expanded" @click="clickToggle">
-        <i :class="[`fas fa-sign-in-alt hover-circle`]" title="Autenticar-se PortalCMJ"></i>
+    <div v-if="!user" :class="['portalcmj-login', is_expanded ? 'expand' : '']" @click.self="clickToggle">
+      <div class="header"  @click="clickToggle">
+        <i :class="[`fas fa-sign-in-alt hover-circle`]" v-if="!is_expanded" title="Autenticar-se PortalCMJ"></i>
+        <i :class="[`fas fa-times`]" v-if="is_expanded" title="Autenticar-se PortalCMJ"></i>
       </div>
       <div class="inner" v-if="is_expanded">
         <form class="inner-content"  v-on:submit.prevent="submit">
@@ -136,6 +137,14 @@ export default {
   }
   .portalcmj-login {
     &.expand{
+      .header {
+        position: relative;
+        .fa-times {
+          position: absolute;
+          top: 0;
+          right: 1.5em;
+        }
+      }
       justify-content: center;
       .inner {
         display: flex;
@@ -166,4 +175,13 @@ export default {
     }
   }
 }
+
+@media screen and (max-width: 991.98px) {
+  .portalcmj-connect {
+    .expand {
+      left: 30%;
+    }
+  }
+}
+
 </style>
