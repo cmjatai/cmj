@@ -88,6 +88,10 @@ export default {
           success: function (res) {
             var text = res
             t.$set(nv, 'html', text)
+            t.$nextTick()
+              .then(() => {
+                $('.cp a').attr('target', '_blank')
+              })
           }
         })
       }
@@ -125,14 +129,12 @@ export default {
      .dptt .dne,
      .btns-action,
      .btn-group,
-     .nota-alteracao,
      .tipo-vigencias{
        display: none !important;
      }
      a {
        text-decoration: none !important;
-       pointer-events: none;
-       cursor: default;
+       //cursor: default;
      }
   }
 }
