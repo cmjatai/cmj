@@ -522,6 +522,9 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
         i_init = self.instance
 
+        if not i_init.pk:
+            i_init.owner = self.user
+
         if 'parlamentares__valor' in self.cleaned_data:
             if not self.full_editor:
                 soma = sum(
@@ -534,6 +537,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
                 i_init.valor = soma
 
         try:
+
             i = super().save(commit)
         except Exception as e:
             raise ValidationError('Erro')
