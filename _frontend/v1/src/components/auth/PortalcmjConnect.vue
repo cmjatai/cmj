@@ -1,6 +1,6 @@
 <template>
   <div class="portalcmj-connect">
-    <div v-if="user" :class="['portalcmj-connected', is_expanded ? 'expand' : '']">
+    <div v-if="user" :class="['portalcmj-connected', is_expanded ? 'expand' : '']" @click.self="clickToggle">
       <div class="header">
         <div class="avatar" @click="clickToggle">
           <img v-if="user.votante" :src="`/api/parlamentares/parlamentar/${user.votante.parlamentar_id}/fotografia.c256.png`" :title="user.votante.nome_parlamentar"/>
@@ -19,13 +19,12 @@
     <div v-if="!user" :class="['portalcmj-login', is_expanded ? 'expand' : '']" @click.self="clickToggle">
       <div class="header"  @click="clickToggle">
         <i :class="[`fas fa-sign-in-alt hover-circle`]" v-if="!is_expanded" title="Autenticar-se PortalCMJ"></i>
-        <i :class="[`fas fa-times`]" v-if="is_expanded" title="Autenticar-se PortalCMJ"></i>
       </div>
       <div class="inner" v-if="is_expanded">
+        <i :class="[`fas fa-times`]" @click="clickToggle" v-if="is_expanded" title="Fechar Janela de Autenticação"></i>
         <form class="inner-content"  v-on:submit.prevent="submit">
           <h4>Entre com seu usuário e senha:</h4>
           <div class="alert alert-danger" v-if="error_message">Usuário e/ou Senha inválidos.</div>
-
           <div class="input-icon input_username">
             <span class="fa fa-user fa-2x "></span>
             <input type="text" name="username" class="form-control" placeholder="Digite seu Endereço de email" autocomplete="username" maxlength="254" required="" id="id_username">
@@ -34,7 +33,9 @@
             <span class="fa fa-key fa-2x "></span>
             <input type="password" name="password" class="form-control" placeholder="Digite sua Senha" autocomplete="current-password" maxlength="30" required="" id="id_password">
           </div>
-          <button class="btn btn-primary btn-login" type="submit" value="login">Conectar</button>
+          <div class="rodape-login">
+            <button class="btn btn-primary btn-login" type="submit" value="login">Conectar</button>
+          </div>
         </form>
       </div>
     </div>
@@ -137,23 +138,27 @@ export default {
   }
   .portalcmj-login {
     &.expand{
+      justify-content: center;
       .header {
         position: relative;
+      }
+      .rodape-login {
+        text-align: right;
+      }
+      .inner {
+        position: relative;
+        display: flex;
+        padding: 1em;
+        width: 100%;
         .fa-times {
           position: absolute;
-          top: 0;
-          right: 1.5em;
+          top: 1.8em;
+          right: 1em;
         }
-      }
-      justify-content: center;
-      .inner {
-        display: flex;
-        background-color: #fff;
-        padding: 2em;
-        width: 90%;
         .inner-content {
+          background-color: #fff;
           width: 100%;
-          text-align: center;
+          padding: 1em;
         }
         .input-icon {
           position: relative;
@@ -162,12 +167,12 @@ export default {
         }
         span {
           position: absolute;
-          top: 0.3em;
+          top: 0.4em;
           left: 10px;
-          opacity: 0.6;
+          opacity: 0.5;
         }
         .form-control {
-          padding: 1em 3em;
+          padding: 1em 1em 1em 3em;
           width: 100%;
           height: auto;
         }
@@ -177,6 +182,22 @@ export default {
 }
 
 @media screen and (max-width: 991.98px) {
+  .portalcmj-connect {
+    .expand {
+      left: 60%;
+    }
+  }
+}
+
+@media screen and (max-width: 767.98px) {
+  .portalcmj-connect {
+    .expand {
+      left: 50%;
+    }
+  }
+}
+
+@media screen and (max-width: 575.98px) {
   .portalcmj-connect {
     .expand {
       left: 30%;

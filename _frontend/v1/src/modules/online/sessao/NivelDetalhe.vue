@@ -63,23 +63,19 @@ export default {
 
 <style lang="scss">
 .nivel-detalhe {
-  position: sticky;
-  margin: -15px -5px 0 0;
-  top: 0px;
-  z-index: 1;
   text-align: right;
-  height: 0;
   opacity: 0.8;
   a.btn {
-    padding: 3px 15px;
+    padding: 3px 10px;
     line-height: 1;
+    font-size: 100%;
   }
   span {
-    color: #444;
+    color: #44f;
     padding-right: 10px;
     display: block;
-    background-color:#f0f0f0;
-    background-image: url("~@/assets/img/bg.png");
+    // background-color:#f0f0f0;
+    // background-image: url("~@/assets/img/bg.png");
   }
 }
 </style>

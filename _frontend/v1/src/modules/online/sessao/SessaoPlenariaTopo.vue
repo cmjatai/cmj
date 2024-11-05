@@ -120,6 +120,9 @@ export default {
 @media screen and (max-width:480px) {
   .sessao-plenaria-topo {
     font-size: 82%;
+    span {
+      display: block;
+    }
   }
 }
 

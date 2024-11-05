@@ -1,7 +1,8 @@
 import {
   STATE_UPDATE,
   STATE_DELETE,
-  SET_NIVEL_DETALHE
+  SET_NIVEL_DETALHE,
+  SET_NIVEL_DETALHE_VISIVEL
 } from './mutation-types'
 
 import Resources from '@/resources'
@@ -32,12 +33,17 @@ const mutations = {
 
   [SET_NIVEL_DETALHE] (state, nivel) {
     state.nivel_detalhe = nivel
+  },
+
+  [SET_NIVEL_DETALHE_VISIVEL] (state, visivel) {
+    state.nivel_detalhe_visivel = visivel
   }
 }
 
 const state = {
   cache: {},
-  nivel_detalhe: 1
+  nivel_detalhe: 1,
+  nivel_detalhe_visivel: false
 }
 
 const getters = {
@@ -46,6 +52,9 @@ const getters = {
   },
   nivel_detalhe: (state) => {
     return state.nivel_detalhe
+  },
+  nivel_detalhe_visivel: (state) => {
+    return state.nivel_detalhe_visivel
   },
   getCache: (state) => (metadata) => {
     if (!state.cache.hasOwnProperty(metadata.app)) {
@@ -64,6 +73,9 @@ const getters = {
 const actions = {
   setNivelDetalhe: ({ commit }, nivel) => {
     commit(SET_NIVEL_DETALHE, nivel)
+  },
+  setNivelDetalheVisivel: ({ commit }, visivel) => {
+    commit(SET_NIVEL_DETALHE_VISIVEL, visivel)
   },
   getObject: ({ commit, getters, dispatch }, metadata) => {
     let model = getters.getCache(metadata)

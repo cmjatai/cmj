@@ -5,10 +5,11 @@
       <brand></brand>
     </template>
     <template slot="header-detail">
-        <div class="btn-group ml-2 btn-group-sm accessibility" role="group" aria-label="First group">
-          <a class="btn btn-outline-dark" @click="diminuirFonte">a</a>
-          <a class="btn btn-outline-dark" @click="aumentarFonte">A</a>
-        </div>
+      <nivel-detalhe v-if="nivel_detalhe_visivel"></nivel-detalhe>
+      <div class="btn-group btn-group-sm accessibility" role="group" aria-label="First group">
+        <a class="btn btn-outline-dark" @click="diminuirFonte">a</a>
+        <a class="btn btn-outline-dark" @click="aumentarFonte">A</a>
+      </div>
     </template>
     <template slot="header-right">
       <portalcmj-connect></portalcmj-connect>
@@ -35,6 +36,8 @@ import SideRight from './fragments/SideRight'
 import SideLeft from './fragments/SideLeft'
 import Brand from './fragments/Brand'
 import BaseLayout from './fragments/BaseLayout'
+import NivelDetalhe from './sessao/NivelDetalhe'
+import Vuex from 'vuex'
 
 export default {
   name: 'online',
@@ -43,7 +46,13 @@ export default {
     BaseLayout,
     SideRight,
     SideLeft,
-    Brand
+    Brand,
+    NivelDetalhe
+  },
+  computed: {
+    ...Vuex.mapGetters([
+      'nivel_detalhe_visivel'
+    ])
   },
   methods: {
     diminuirFonte () {

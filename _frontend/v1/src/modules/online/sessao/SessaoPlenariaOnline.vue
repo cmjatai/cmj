@@ -9,6 +9,7 @@
 <script>
 import SessaoPlenariaTopo from './SessaoPlenariaTopo'
 import PautaOnline from './PautaOnline'
+import Vuex from 'vuex'
 
 export default {
   name: 'sessao-plenaria-online',
@@ -24,8 +25,12 @@ export default {
       model: ['sessaoplenaria']
     }
   },
+  beforeDestroy: function () {
+    this.setNivelDetalheVisivel(false)
+  },
   mounted () {
     let t = this
+    t.setNivelDetalheVisivel(true)
     t.$nextTick(() => {
       t
         .getObject({
@@ -45,6 +50,9 @@ export default {
     })
   },
   methods: {
+    ...Vuex.mapActions([
+      'setNivelDetalheVisivel'
+    ]),
     fetch (data) {
       let t = this
       if (data.id === this.idd &&

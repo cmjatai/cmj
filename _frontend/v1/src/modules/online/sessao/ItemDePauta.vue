@@ -459,35 +459,11 @@ export default {
   margin-bottom: 1em;
   border-top: 1px solid #ccc;
 
-  &:hover {
-    background-color: #d6e6fd;
-  }
-
-  &::before {
-    content: "Ordem do Dia";
-    position: absolute;
-    bottom: 1px;
-    right: 5px;
-    color: rgba(#000, 0.1);
-    font-size: 200%;
-    display: inline-block;
-    line-height: 1;
-  }
-
-  &.expedientemateria {
-    background-color: #ffffe3;
-    &:hover {
-      background-color: #f5d576;
-    }
-    &::before {
-      content: "Grande Expediente";
-    }
-  }
   .status-votacao {
     position: absolute;
     display: flex;
     top: -0.7em;
-    right: 0.5em;
+    right: 0;
     font-weight: bold;
     color: #fff;
     line-height: 1;
@@ -495,14 +471,15 @@ export default {
     & > div  {
       background-color: #e6bc02;
       display: flex;
-      padding: 5px;
+      padding: 2px 10px 1px;
       align-items: center;
     }
     .votos {
-      background-color: #fff;
+      opacity: 0.3;
+      background-color: transparent;
       padding: 0;
       div {
-        padding: 5px 10px 1px;
+        padding: 2px 10px 1px;
         display: flex;
         gap: 2px;
         .titulo {
@@ -543,6 +520,35 @@ export default {
     }
     .votacao-aberta {
       background-color: #000;
+    }
+  }
+
+  &:hover {
+    background-color: #d6e6fd;
+    .votos {
+      opacity: 1;
+      background-color: #fff;
+    }
+  }
+
+  &::before {
+    content: "Ordem do Dia";
+    position: absolute;
+    bottom: 1px;
+    right: 5px;
+    color: rgba(#000, 0.1);
+    font-size: 200%;
+    display: inline-block;
+    line-height: 1;
+  }
+
+  &.expedientemateria {
+    background-color: #ffffe3;
+    &:hover {
+      background-color: #f5d576;
+    }
+    &::before {
+      content: "Grande Expediente";
     }
   }
 
@@ -635,7 +641,6 @@ export default {
 @media screen and (max-width: 600px) {
   .item-de-pauta {
     .status-votacao {
-      padding: 2px 5px;
       line-height: 1;
     }
   }
@@ -643,7 +648,7 @@ export default {
 
 @media screen and (max-width: 480px) {
   .item-de-pauta {
-    font-size: 85%;
+    font-size: 75%;
     padding: 15px 5px 0;
     .item-header {
       .epigrafe {

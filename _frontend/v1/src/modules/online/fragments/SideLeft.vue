@@ -150,25 +150,31 @@ export default {
   }
 }
 
+@media screen and (max-width: 800px) {
+  $width-sideleft: 48px;
+  .inner-sideleft {
+    a {
+      grid-template-columns: 48px 0px;
+      .icon {
+        margin: 0 5px;
+      }
+    }
+  }
+}
+
 @media screen and (max-width: 480px) {
   $width-sideleft: 40px;
   .inner-sideleft {
     a {
-      //height: $width-sideleft * 0.7;
       grid-template-columns: 40px 0px;
       .icon {
         margin: 0 2px;
-        padding: 5px 0;
       }
     }
   }
 }
 
 @media screen and (min-width: 481px) {
-
-  .sideleft  {
-    //grid-template-columns: 1px 1px;
-  }
 
   .base-layout.left-expand {
     .sideleft {
