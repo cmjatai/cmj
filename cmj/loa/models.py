@@ -1,21 +1,21 @@
-import csv
 from datetime import datetime
 from decimal import Decimal
 from io import StringIO
+import csv
 
 from bs4 import BeautifulSoup as bs
 from django.conf.locale import ro
-from django.db.models.fields.json import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models, transaction
 from django.db.models import manager
 from django.db.models.aggregates import Sum
 from django.db.models.deletion import PROTECT, CASCADE
+from django.db.models.fields.json import JSONField
 from django.utils import formats
 from django.utils.translation import gettext_lazy as _
 
-from cmj.utils import texto_upload_path
+from cmj.utils import texto_upload_path, get_settings_auth_user_model
 from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
 from sapl.utils import PortalFileField, OverwriteStorage
@@ -229,6 +229,13 @@ class EmendaLoa(models.Model):
         through_fields=(
             'emendaloa',
             'parlamentar'))
+
+    owner = models.ForeignKey(
+        get_settings_auth_user_model(),
+        blank=True, null=True, default=None,
+        verbose_name=_('Cadastrado Por'),
+        related_name='+',
+        on_delete=PROTECT)
 
     @property
     def valor_computado(self):

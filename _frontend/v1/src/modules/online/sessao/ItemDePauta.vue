@@ -471,7 +471,7 @@ export default {
     & > div  {
       background-color: #e6bc02;
       display: flex;
-      padding: 2px 10px 1px;
+      padding: 2px 10px 3px;
       align-items: center;
     }
     .votos {

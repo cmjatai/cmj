@@ -232,11 +232,16 @@ class EmendaLoaValorWidget(SplitArrayWidget):
 
             if self.user and not self.user.has_perms(
                     ('loa.add_emendaloa', 'loa.change_emendaloa')):
-                op = self.user.operadorautor_set.first()
-                if not op or op and p not in self.elps:
-                    w['attrs']['readonly'] = 'readonly'
 
                 if self.instance.pk and self.instance.fase == EmendaLoa.LIBERACAO_CONTABIL:
+                    w['attrs']['readonly'] = 'readonly'
+                    continue
+
+                if self.user == self.instance.owner:
+                    continue
+
+                op = self.user.operadorautor_set.first()
+                if not op or op and p not in self.elps:
                     w['attrs']['readonly'] = 'readonly'
 
         return context

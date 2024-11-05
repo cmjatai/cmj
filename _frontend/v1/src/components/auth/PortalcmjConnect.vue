@@ -47,7 +47,15 @@ export default {
   data () {
     return {
       is_expanded: false,
-      error_message: false
+      error_message: false,
+      app: [
+        'core',
+        'parlamentares'
+      ],
+      model: [
+        'votante',
+        'user'
+      ]
     }
   },
   beforeDestroy: function () {
@@ -56,6 +64,15 @@ export default {
   computed: {
   },
   methods: {
+    fetch (metadata) {
+      // chamado pelo push do servidor
+      // if (metadata === undefined) {
+      //   return
+      // }
+      // if (metadata.app === 'parlamentares' && metadata.model === 'votante') {
+      //   if (metadata.id === t.item.materia || metadata.id in t.materia.anexadas) {
+      //   }
+    },
     clickToggle () {
       this.is_expanded = !this.is_expanded
     },

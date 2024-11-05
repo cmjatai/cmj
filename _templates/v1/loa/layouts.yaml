@@ -36,6 +36,7 @@ EmendaLoaDetail:
       - materia|fk_urlize_for_detail valor_computado:4
       - indicacao
       - finalidade
+      - owner
       col-md-4:
       - parlamentares:12
   col-12 2:
