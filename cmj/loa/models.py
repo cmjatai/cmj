@@ -812,27 +812,6 @@ class EmendaLoaRegistroContabil(models.Model):
         verbose_name=_('Valor (R$)'),
     )
 
-    """orgao = models.ForeignKey(
-        Orgao,
-        blank=True, null=True, default=None,
-        verbose_name=_('Órgão'),
-        related_name='registrocontabil_set',
-        on_delete=CASCADE)
-
-    unidade = models.ForeignKey(
-        UnidadeOrcamentaria,
-        blank=True, null=True, default=None,
-        verbose_name=_('Unidade Orçamentária'),
-        related_name='registrocontabil_set',
-        on_delete=CASCADE)
-
-    natureza = models.ForeignKey(
-        Natureza,
-        blank=True, null=True, default=None,
-        verbose_name=_('Natureza'),
-        related_name='registrocontabil_set',
-        on_delete=CASCADE)"""
-
     def __str__(self):
         valor_str = formats.number_format(self.valor, force_grouping=True)
         return f'R$ {valor_str} - {self.despesa}'
@@ -852,7 +831,118 @@ class EmendaLoaRegistroContabil(models.Model):
                 'emendaloa',
                 'despesa',
             ),
+        )
 
+
+class Agrupamento(models.Model):
+
+    loa = models.ForeignKey(
+        Loa,
+        verbose_name=_('LOA - Emendas Impositivas'),
+        related_name='agrupamento_set',
+        on_delete=PROTECT)
+
+    nome = models.CharField(
+        verbose_name=_('Nome do Agrupamento'), max_length=256)
+
+    observacoes = models.TextField(verbose_name=_("Observações"))
+
+    emendas = models.ManyToManyField(
+        EmendaLoa,
+        through='AgrupamentoEmendaLoa',
+        related_name='agrupamento_set',
+        verbose_name=_('Emendas Impositivas'),
+        through_fields=(
+            'agrupamento',
+            'emendaloa'))
+
+    class Meta:
+        verbose_name = _('Agrupamento de Emenda Impositiva')
+        verbose_name_plural = _('Agrupamentos de Emendas Impositivas')
+        ordering = ['id']
+
+
+class AgrupamentoEmendaLoa(models.Model):
+
+    agrupamento = models.ForeignKey(
+        Agrupamento,
+        verbose_name=_('Agrupamento de Emenda Impositiva'),
+        related_name='agrupamentoemendaloa_set',
+        on_delete=CASCADE)
+
+    emendaloa = models.ForeignKey(
+        EmendaLoa,
+        verbose_name=_('Emenda Impositiva'),
+        related_name='agrupamentoemendaloa_set',
+        on_delete=CASCADE)
+
+    class Meta:
+        verbose_name = _('Agrupamento de Emenda Impositiva')
+        verbose_name_plural = _('Agrupamentos de Emendas Impositivas')
+        ordering = ['id']
+
+
+class AgrupamentoRegistroContabilManager(manager.Manager):
+
+    DEDUCAO = 10
+    INSERCAO = 20
+
+    use_for_related_fields = True
+
+    def all_deducoes(self):
+        qs = self.get_queryset()
+        qs = qs.filter(operacao=self.DEDUCAO)
+        return qs
+
+    def all_insercoes(self):
+        qs = self.get_queryset()
+        qs = qs.filter(operacao=self.INSERCAO)
+        return qs
+
+
+class AgrupamentoRegistroContabil(models.Model):
+
+    OPERACAO_CHOICE = (
+        (AgrupamentoRegistroContabilManager.DEDUCAO, _('Dedução')),
+        (AgrupamentoRegistroContabilManager.INSERCAO, _('Inserção'))
+    )
+
+    objects = AgrupamentoRegistroContabilManager()
+
+    agrupamento = models.ForeignKey(
+        Agrupamento,
+        verbose_name=_('Agrupamento de Emenda Impositiva'),
+        related_name='agrupamentoregistrocontabil_set',
+        on_delete=CASCADE)
+
+    despesa = models.ForeignKey(
+        Despesa,
+        blank=True, null=True, default=None,
+        related_name='agrupamentoregistrocontabil_set',
+        verbose_name=_('Despesa'),
+        on_delete=CASCADE)
+
+    operacao = models.PositiveSmallIntegerField(
+        choices=OPERACAO_CHOICE,
+        default=10, verbose_name=_('Operação'))
+
+    percentual = models.DecimalField(
+        max_digits=5, decimal_places=2, default=Decimal('100.00'),
+        validators=PERCENTAGE_VALIDATOR,
+        verbose_name=_('Percentual do Valor da Emenda'),
+    )
+
+    class Meta:
+        verbose_name = _('Registro Contábil de Dedução e Inserção em Emendas')
+        verbose_name_plural = _(
+            'Registros Contábeis de Dedução e Inserção em Emendas')
+        ordering = ['id']
+
+        unique_together = (
+            (
+                'agrupamento',
+                'despesa',
+            ),
         )
 
 

@@ -65,6 +65,14 @@ RegistroAjusteLoaDetail:
   - tipo:2 emendaloa|fk_urlize_for_detail
   - registroajusteloaparlamentar_set:5 descricao
 
+Agrupamento:
+  {% trans 'Agrupamento' %}:
+  - nome
+  - observacoes
+  - emendas
+
+
+
 {% comment %}
   # exemplo de detail version 2 completo
 EmendaLoaDetail:

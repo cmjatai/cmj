@@ -37,7 +37,8 @@ from cmj.globalrules import (RP_ADD, RP_CHANGE, RP_DELETE, RP_DETAIL, RP_LIST,
 from cmj.loa.models import Loa, LoaParlamentar, EmendaLoa, EmendaLoaParlamentar,\
     OficioAjusteLoa, RegistroAjusteLoa, DespesaConsulta, Orgao,\
     UnidadeOrcamentaria, EmendaLoaRegistroContabil, Funcao, SubFuncao, Programa,\
-    Acao, Natureza
+    Acao, Natureza, Agrupamento, AgrupamentoEmendaLoa,\
+    AgrupamentoRegistroContabil
 from cmj.ouvidoria.models import Solicitacao, MensagemSolicitacao
 from cmj.sigad.models import Classe, Documento, Midia
 from sapl.parlamentares.models import Partido
@@ -211,6 +212,13 @@ rules_loa_group_operador = {
         (Acao, __base__, __perms_publicas__),
         (Natureza, __base__, __perms_publicas__),
         (EmendaLoaRegistroContabil, __base__ +
+         ['emendaloa_full_editor'], __perms_publicas__),
+
+        (Agrupamento, __base__ +
+         ['emendaloa_full_editor'], __perms_publicas__),
+        (AgrupamentoEmendaLoa, __base__ +
+         ['emendaloa_full_editor'], __perms_publicas__),
+        (AgrupamentoRegistroContabil, __base__ +
          ['emendaloa_full_editor'], __perms_publicas__),
 
     ]
