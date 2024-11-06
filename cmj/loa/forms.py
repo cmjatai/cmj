@@ -20,7 +20,7 @@ from django_filters.filterset import FilterSet
 import yaml
 
 from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa, \
-    RegistroAjusteLoa, RegistroAjusteLoaParlamentar
+    RegistroAjusteLoa, RegistroAjusteLoaParlamentar, UnidadeOrcamentaria
 from sapl.crispy_layout_mixin import to_row, SaplFormLayout, SaplFormHelper
 from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
@@ -326,7 +326,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
             'prefixo_indicacao', 'indicacao',
             'prefixo_finalidade', 'finalidade',
             'parlamentares__valor',
-            'busca_despesa', 'ano_loa',  # 'registrocontabil_set'
+            'busca_despesa', 'ano_loa', 'unidade'  # 'registrocontabil_set'
         ]
 
     def __init__(self, *args, **kwargs):
@@ -355,7 +355,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
         row3 = [
             ('prefixo_indicacao', 3),
-            ('indicacao', 9),
+            ('unidade', 9),
             ('prefixo_finalidade', 3),
             ('finalidade', 9),
         ]
@@ -419,6 +419,13 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         super().__init__(*args, **kwargs)
 
         self.helper = FormHelper()
+
+        self.fields['unidade'].choices = [
+            (u.id, str(u)) for u in
+            UnidadeOrcamentaria.objects.filter(
+                loa=self.loa,
+                recebe_emenda_impositiva=True
+            ).order_by('especificacao')]
 
         btns = {}
         if full_editor or self.instance.pk and self.instance.fase == EmendaLoa.LIBERACAO_CONTABIL:

@@ -191,6 +191,13 @@ class EmendaLoa(models.Model):
         verbose_name=_('Indicação'),
         blank=True, null=True, default=None)
 
+    unidade = models.ForeignKey(
+        'UnidadeOrcamentaria',
+        verbose_name=_('Unidade Orçamentária'),
+        related_name='emendaloa_set',
+        blank=True, null=True, default=None,
+        on_delete=CASCADE)
+
     finalidade = models.TextField(
         verbose_name=_("Finalidade"))
 
@@ -291,6 +298,13 @@ class EmendaLoa(models.Model):
             'divergencia_emenda': divergencia_emenda,
             'valor_emendaloa': self.valor
         }
+
+    def save(
+            self, force_insert=False, force_update=False, using=None, update_fields=None):
+        if self.unidade:
+            self.indicacao = self.unidade.especificacao
+
+        return models.Model.save(self, force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
 
 
 class EmendaLoaParlamentar(models.Model):
@@ -523,6 +537,11 @@ class UnidadeOrcamentaria(ElementoBase):
         verbose_name=_('Órgão'),
         related_name='unidadeorcamentaria_set',
         on_delete=CASCADE)
+
+    recebe_emenda_impositiva = models.BooleanField(
+        default=False,
+        verbose_name=_('Elegível'),
+    )
 
     class Meta:
         verbose_name = _('Unidade Orçamentária')

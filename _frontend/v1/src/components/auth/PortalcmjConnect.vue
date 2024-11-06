@@ -7,7 +7,8 @@
           <img v-else :src="user.avatar" :title="user.fullname"/>
         </div>
         <div class="inner" v-if="is_expanded">
-          <span v-html="user.votante.nome_parlamentar"></span><br>
+          <span v-if="user.votante" v-html="user.votante.nome_parlamentar"></span>
+          <span v-if="!user.votante" v-html="user.fullname"></span><br>
           <small v-html="user.username"></small>
         </div>
       </div>

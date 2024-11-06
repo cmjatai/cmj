@@ -1,20 +1,16 @@
 from django.conf import settings
 from django.contrib.auth import login, logout
 from django.db import transaction
-from django.db.models.signals import post_save
-from django.dispatch.dispatcher import receiver
 from django.utils.translation import gettext_lazy as _
 from image_cropping.utils import get_backend
 from rest_framework import viewsets, status
-from rest_framework.authentication import SessionAuthentication
-from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.decorators import api_view, permission_classes
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated,\
-    IsAuthenticatedOrReadOnly, IsAdminUser, AllowAny
+    IsAuthenticatedOrReadOnly, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from webpack_loader.utils import get_static
 
 from cmj.api.serializers import DocumentoSerializer,\
     DocumentoUserAnonymousSerializer, DocumentoChoiceSerializer
@@ -41,7 +37,16 @@ class AppVersionView(APIView):
             user = {
                 'username': request.user.username,
                 'fullname': request.user.get_full_name(),
-                'avatar': request.user.avatar.url
+                'avatar': get_static('img/perfil.jpg') if not request.user.avatar else
+                get_backend().get_thumbnail_url(
+                    request.user.avatar,
+                    {
+                        'size': (128, 128),
+                        'box': request.user.cropping,
+                        'crop': True,
+                        'detail': True,
+                    })
+
             }
             votante = request.user.votante.first()
             if votante:

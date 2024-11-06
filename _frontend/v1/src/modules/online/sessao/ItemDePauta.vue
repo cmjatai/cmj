@@ -3,7 +3,7 @@
     <div :class="['empty-list', materia.id === undefined ? '' : 'd-none']">
       Carregando Matéria...
     </div>
-    <voto-parlamentar v-if="votacaoAberta"></voto-parlamentar>
+    <voto-parlamentar v-if="votacaoAberta && user && user.votante"></voto-parlamentar>
 
     <div class="status-votacao">
       <div class="votos" v-if="registro && !votacaoAberta && item.tipo_votacao != 4">
@@ -475,10 +475,10 @@ export default {
       align-items: center;
     }
     .votos {
-      opacity: 0.3;
-      background-color: transparent;
+      background-color: #fff;
       padding: 0;
       div {
+        opacity: 0.3;
         padding: 2px 10px 1px;
         display: flex;
         gap: 2px;
@@ -526,8 +526,9 @@ export default {
   &:hover {
     background-color: #d6e6fd;
     .votos {
-      opacity: 1;
-      background-color: #fff;
+      div {
+        opacity: 1;
+      }
     }
   }
 
