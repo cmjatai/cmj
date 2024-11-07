@@ -43,9 +43,8 @@ window.AppLOA = function () {
       const lsJson = localStorage.getItem('portalcmj_emendaloa_filter')
       const lsData = JSON.parse(lsJson)
 
-      if (lsJson !== '{}') {
+      if (lsJson !== null && lsJson !== '{}') {
         _.forOwn(lsData, (value, key) => {
-          console.log(lsData)
           _.forEach(form.find(`input[name="${key}"]`), (item) => {
             if ((Array.isArray(value) && value.includes(item.value)) || value === item.value) {
               item.checked = true
