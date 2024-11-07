@@ -20,7 +20,8 @@ from django_filters.filterset import FilterSet
 import yaml
 
 from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa, \
-    RegistroAjusteLoa, RegistroAjusteLoaParlamentar, UnidadeOrcamentaria
+    RegistroAjusteLoa, RegistroAjusteLoaParlamentar, UnidadeOrcamentaria,\
+    Agrupamento
 from sapl.crispy_layout_mixin import to_row, SaplFormLayout, SaplFormHelper
 from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
@@ -245,6 +246,103 @@ class EmendaLoaValorWidget(SplitArrayWidget):
                     w['attrs']['readonly'] = 'readonly'
 
         return context
+
+
+class AgrupamentoForm(ModelForm):
+
+    busca_emendaloa = forms.CharField(
+        label='Procurar por emendas cadastradas', required=False,)
+
+    busca_despesa = forms.CharField(
+        label='Buscar', required=False,)
+
+    perc_despesa = DecimalField(
+        label='Perc da Despesa', required=False, max_digits=5, decimal_places=2,)
+
+    despesa_codigo = forms.CharField(
+        label='Código', required=False,)
+
+    despesa_orgao = forms.CharField(
+        label='Orgão', required=False,)
+    despesa_unidade = forms.CharField(
+        label='Unidade', required=False,)
+
+    despesa_especificacao = forms.CharField(
+        label='Descrição da Ação', required=False,)
+
+    despesa_natureza = forms.CharField(
+        label='Natureza', required=False,)
+
+    ano_loa = forms.CharField(
+        label='',
+        widget=forms.HiddenInput(),
+        required=False)
+
+    class Meta:
+        model = Agrupamento
+        fields = [
+            'nome',
+        ]
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs['initial'].pop('user', None)
+        self.loa = kwargs['initial']['loa']
+        self.full_editor = full_editor = self.user.has_perm(
+            'loa.emendaloa_full_editor') and not self.user.is_superuser
+
+        row1 = to_row([
+            ('nome', 12),
+            ('ano_loa', 0),
+        ])
+
+        row4_1 = to_row([
+            ('busca_despesa', 3),
+
+            ('despesa_orgao', 2),
+            ('despesa_unidade', 2),
+            ('despesa_codigo', 3),
+            ('despesa_natureza', 2),
+            ('perc_despesa', 3),
+            ('despesa_especificacao', 'col'),
+            (HTML('''
+                <button type="button" id="add_registro" class="btn btn-primary">+</button>
+            '''), 'col-1'),
+
+            (Div(css_class='busca-render'), 12)
+
+        ])
+
+        row4_2 = to_row([
+            (Div(css_class='registro-render'), 12),
+        ])
+
+        row4 = to_row([
+            (Fieldset(_('Registrar Deduções e Inserções'), row4_1), 6),
+            (Fieldset(_('Registros das Despesas Orçamentárias'), row4_2), 6)
+        ])
+
+        row5_1 = to_row([
+            ('busca_emendaloa', 12),
+            (Div(css_class='busca-render-emendaloa'), 12),
+        ])
+
+        row5_2 = to_row([
+            (Div(css_class='emendaloa-selecteds'), 12),
+        ])
+
+        row5 = to_row([
+            (Fieldset(_('Busca por Emendas Impositivas'), row5_1), 5),
+            (Fieldset(_('Emendas Impositivas Selecionadas'), row5_2), 7)
+        ])
+
+        super().__init__(*args, **kwargs)
+
+        self.helper = FormHelper()
+        self.helper.layout = SaplFormLayout(
+            Fieldset(_('Dados Gerais'), row1), row4, row5)
+
+        self.initial['ano_loa'] = self.loa.ano
+        self.initial['perc_despesa'] = Decimal('100.00')
 
 
 class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):

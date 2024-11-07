@@ -142,7 +142,57 @@
       color: green;
     }
   }
-  &.emendaloa-update {
+  &.emendaloa-update, &.agrupamento-update {
+    .busca-render-emendaloa, .emendaloa-selecteds {
+      background-color: #0001;
+      min-height: 30vh;
+      margin-bottom: 2em;
+      .inner {
+        // padding: 1px;
+      }
+      .inner-item {
+        position: relative;
+        display: flex;
+        gap: 1px;
+        margin-bottom: 7px;
+        flex: 1 1 100%;
+        justify-content: stretch;
+        .fase {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0px;
+          padding-right: 2px;
+          text-align: right;
+          font-size: 80%;
+          line-height: 1;
+        }
+      }
+      .item-emendaloa {
+        background-color: #fff;
+        padding: 0.5em 0.5em 1em;
+        width: 100%;
+        &:hover {
+          background-color: #ddf5;
+        }
+      }
+      .inner-actions {
+        background-color: #fff;
+      }
+      .inner-item {
+        &:hover {
+          .inner-actions {
+            background-color: #fff9;
+          }
+          .item-emendaloa {
+            background-color: #fff9;
+          }
+        }
+      }
+    }
+    .emendaloa-selecteds {
+      background-color: transparent;
+    }
     form {
       $mp: 8px;
       .row {

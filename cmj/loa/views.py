@@ -15,7 +15,7 @@ from django_filters.views import FilterView
 
 from cmj.core.models import AuditLog
 from cmj.loa.forms import LoaForm, EmendaLoaForm, OficioAjusteLoaForm,\
-    RegistroAjusteLoaForm, EmendaLoaFilterSet
+    RegistroAjusteLoaForm, EmendaLoaFilterSet, AgrupamentoForm
 from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa,\
     RegistroAjusteLoa, RegistroAjusteLoaParlamentar, EmendaLoaRegistroContabil,\
     Agrupamento
@@ -392,6 +392,32 @@ class AgrupamentoCrud(MasterDetailCrud):
     public = [RP_LIST, RP_DETAIL]
     frontend = Agrupamento._meta.app_label
 
+    class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
+        pass
+
+    class CreateView(MasterDetailCrud.CreateView):
+        layout_key = 'AgrupamentoCreate'
+
+        def get_success_url(self):
+            return self.update_url
+
+    class UpdateView(MasterDetailCrud.UpdateView):
+        layout_key = None
+        form_class = AgrupamentoForm
+
+        def get_context_data(self, **kwargs):
+            self.loa = Loa.objects.get(pk=kwargs['root_pk'])
+            context = super().get_context_data(**kwargs)
+            path = context.get('path', '')
+            context['path'] = f'{path} agrupamento-update'
+            return context
+
+        def get_initial(self):
+            initial = super().get_initial()
+            initial['loa'] = self.object.loa
+            initial['user'] = self.request.user
+            return initial
+
 
 class EmendaLoaCrud(MasterDetailCrud):
     model = EmendaLoa
@@ -497,7 +523,8 @@ class EmendaLoaCrud(MasterDetailCrud):
 
                 link_pdf = f'<a href="{url}"><i class="far fa-2x fa-file-pdf"></i></a>'
 
-            return f'{link_pdf}<br>{args[1]}', args[2]
+            tipo = args[1] if args[1] else 'EMENDA MODIFICATIVA'
+            return f'{link_pdf}<br>{tipo}', args[2]
 
         def hook_fase(self, *args, **kwargs):
             return f'<br><small class="text-nowrap">({args[0].get_fase_display()})</small>', args[2]
@@ -706,6 +733,15 @@ class EmendaLoaCrud(MasterDetailCrud):
                 return '', ''
 
             return 'Valor Final da Emenda (R$)', field_display
+
+        def hook_tipo(self, el, verbose_name='', field_display=''):
+            if el.tipo:
+                return verbose_name, field_display
+
+            return 'Emenda Modificativa', 'Emenda Modificativa'
+
+        def hook_indicacao(self, el, verbose_name='', field_display=''):
+            return f'{verbose_name} (Unidade Orçamentária)', field_display
 
         def hook_materia(self, el, verbose_name='', field_display=''):
             if el.materia:

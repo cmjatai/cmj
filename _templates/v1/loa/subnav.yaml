@@ -5,7 +5,6 @@
   url: emendaloa_list
 - title: {% trans 'Ajustes Técnicos' %}
   url: oficioajusteloa_list
-
 {% if perms.loa.emendaloa_full_editor %}
 - title: {% trans 'Agrupamentos' %}
   url: agrupamento_list

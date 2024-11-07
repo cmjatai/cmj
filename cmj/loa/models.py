@@ -181,7 +181,7 @@ class EmendaLoa(models.Model):
 
     tipo = models.PositiveSmallIntegerField(
         choices=TIPOEMENDALOA_CHOICE,
-        default=99, verbose_name=_('Área de aplicação'))
+        blank=True, null=True, verbose_name=_('Área de aplicação'))
 
     fase = models.PositiveSmallIntegerField(
         choices=FASE_CHOICE,
@@ -845,8 +845,6 @@ class Agrupamento(models.Model):
     nome = models.CharField(
         verbose_name=_('Nome do Agrupamento'), max_length=256)
 
-    observacoes = models.TextField(verbose_name=_("Observações"))
-
     emendas = models.ManyToManyField(
         EmendaLoa,
         through='AgrupamentoEmendaLoa',
@@ -860,6 +858,9 @@ class Agrupamento(models.Model):
         verbose_name = _('Agrupamento de Emenda Impositiva')
         verbose_name_plural = _('Agrupamentos de Emendas Impositivas')
         ordering = ['id']
+
+    def __str__(self):
+        return self.nome
 
 
 class AgrupamentoEmendaLoa(models.Model):
@@ -880,6 +881,13 @@ class AgrupamentoEmendaLoa(models.Model):
         verbose_name = _('Agrupamento de Emenda Impositiva')
         verbose_name_plural = _('Agrupamentos de Emendas Impositivas')
         ordering = ['id']
+
+        unique_together = (
+            (
+                'agrupamento',
+                'emendaloa',
+            ),
+        )
 
 
 class AgrupamentoRegistroContabilManager(manager.Manager):
@@ -927,7 +935,7 @@ class AgrupamentoRegistroContabil(models.Model):
         default=10, verbose_name=_('Operação'))
 
     percentual = models.DecimalField(
-        max_digits=5, decimal_places=2, default=Decimal('100.00'),
+        max_digits=6, decimal_places=2, default=Decimal('100.00'),
         validators=PERCENTAGE_VALIDATOR,
         verbose_name=_('Percentual do Valor da Emenda'),
     )
@@ -944,6 +952,15 @@ class AgrupamentoRegistroContabil(models.Model):
                 'despesa',
             ),
         )
+
+    def __str__(self):
+        percentual_str = formats.number_format(
+            self.percentual, force_grouping=True)
+        return f'{percentual_str}% - {self.despesa}'
+
+    @property
+    def str_percentual(self):
+        return formats.number_format(self.percentual, force_grouping=True)
 
 
 class DespesaPaga(models.Model):

@@ -25,9 +25,11 @@ import pymupdf
 from cmj import loa
 from cmj.loa.models import OficioAjusteLoa, EmendaLoa, Loa, EmendaLoaParlamentar, \
     DespesaConsulta, EmendaLoaRegistroContabil, UnidadeOrcamentaria, Despesa, \
-    Orgao, Funcao, SubFuncao, Programa, Acao, Natureza
+    Orgao, Funcao, SubFuncao, Programa, Acao, Natureza,\
+    AgrupamentoRegistroContabil, AgrupamentoEmendaLoa, Agrupamento
 from cmj.utils import run_sql
-from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize
+from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize,\
+    wrapper_queryset_response_for_drf_action
 from sapl.api.mixins import ResponseFileMixin
 from sapl.api.permissions import SaplModelPermissions
 from sapl.api.serializers import SaplSerializerMixin
@@ -382,6 +384,31 @@ class _OficioAjusteLoaViewSet(ResponseFileMixin):
         return self.response_file(request, *args, **kwargs)
 
 
+class EmendaLoaSearchSerializer(SaplSerializerMixin):
+
+    str_valor = SerializerMethodField()
+    str_parlamentares = SerializerMethodField()
+
+    str_fase = SerializerMethodField()
+
+    class Meta(SaplSerializerMixin.Meta):
+        model = EmendaLoa
+
+    def get_str_fase(self, obj):
+        return obj.get_fase_display()
+
+    def get_str_valor(self, obj):
+        return formats.number_format(obj.valor, force_grouping=True)
+
+    def get_str_parlamentares(self, obj):
+        elps = obj.emendaloaparlamentar_set.all()
+
+        r = []
+        for elp in elps:
+            r.append(str(elp))
+        return r
+
+
 @customize(EmendaLoa)
 class _EmendaLoaViewSet:
 
@@ -556,6 +583,30 @@ class _EmendaLoaViewSet:
              for k, v in r.items()}
 
         return Response(r)
+
+    @action(detail=False)
+    def search(self, request, *args, **kwargs):
+
+        def filter_queryset(qs):
+            ano = request.GET.get('ano', None)
+            query = request.GET.get('q', '')
+            query = query.split(' ')
+
+            q = Q()
+
+            for termo in query:
+                q &= (Q(unidade__especificacao__icontains=termo) |
+                      Q(finalidade__icontains=termo))
+
+            qs = qs.filter(loa__ano=ano)
+            if query:
+                qs = qs.filter(q)
+
+            return qs.order_by('-fase')
+        self.serializer_class = EmendaLoaSearchSerializer
+        self.filter_queryset = filter_queryset
+
+        return self.list(request, *args, **kwargs)
 
 
 class DespesaConsultaSerializer(SaplSerializerMixin):
@@ -805,6 +856,240 @@ class _EmendaLoaRegistroContabilViewSet:
             if "code='unique'" in str(verror):
                 raise DRFValidationError(
                     'Já existe Registro desta Despesa nesta Emenda.')
+            raise DRFValidationError(verror.detail)
+
+        except DjangoValidationError as verror:
+            raise DRFValidationError(
+                'Já Existe uma Despesa Orçamentária cadastrada com os dados acima. '
+                'Faça uma busca com o código informado.')
+
+        except Exception as exc:
+            raise DRFValidationError('\n'.join(exc.messages))
+
+
+@customize(AgrupamentoEmendaLoa)
+class _AgrupamentoEmendaLoaViewSet:
+
+    @action(methods=['post', ], detail=False)
+    def delete(self, request, *args, **kwargs):
+
+        AgrupamentoEmendaLoa.objects.filter(
+            agrupamento=int(request.data['agrupamento']),
+            emendaloa=int(request.data['emendaloa'])).delete()
+
+        return Response({'detail': 'Registro removido com Sucesso.'})
+
+
+@customize(Agrupamento)
+class _Agrupamento:
+
+    @action(methods=['get', ], detail=True)
+    def emendas(self, request, *args, **kwargs):
+        return self.get_emendas(**kwargs)
+
+    @wrapper_queryset_response_for_drf_action(model=EmendaLoa)
+    def get_emendas(self, **kwargs):
+        self.serializer_class = EmendaLoaSearchSerializer
+        qs = self.get_queryset()
+        return qs.filter(
+            agrupamentoemendaloa_set__agrupamento_id=kwargs['pk']
+        )
+
+
+class AgrupamentoRegistroContabilSerializer(SaplSerializerMixin):
+
+    class RegexLocalField(CharField):
+        def __init__(self, regex, **kwargs):
+            super().__init__(**kwargs)
+            self.validator = RegexValidator(
+                regex, message=self.error_messages['invalid'])
+            self.validators.append(self.validator)
+
+    codigo = RegexLocalField(
+        r'(?P<funcao>\d{2})\.(?P<subfuncao>\d{3})'
+        r'\.(?P<programa>\d{4})\.(?P<acao>\d\.[X0-9]{3})$', error_messages={
+            'invalid': _('O campo "Código" deve serguir o padrão "99.999.9999.9.XXX". Onde, em "XXX" pode ser utilizado números ou a letra X')})
+
+    natureza = RegexLocalField(r'^(\d{1,2}\.\d{1,2}\.\d{2}\.\d{2}\.[X0-9]{2})$', error_messages={
+        'invalid': _('O campo "Natureza" deve serguir o padrão "x9.x9.99.99.XX". Sendo "x" numérico e opcional. Em "XX" pode ser utilizado números ou a letra X.')})
+
+    unidade = RegexLocalField(r'^(\d{2})$', error_messages={
+        'invalid': _('O campo "Unidade Orçamentária" deve serguir o padrão "99".')})
+
+    orgao = RegexLocalField(r'^(\d{2})$', error_messages={
+        'invalid': _('O campo "Órgão" deve serguir o padrão "99".')})
+
+    percentual = CharField(required=False, error_messages={
+        'blank': _('O campo "Perc da Despesa" deve ser prenchido e seguir o formado 999,99. Valores negativos serão direcionados ao Art. 1º, valores positivos ao Art. 2º.'),
+    })
+
+    especificacao = CharField()
+
+    class Meta:
+        model = AgrupamentoRegistroContabil
+        fields = (
+            '__str__',
+            'id',
+            'agrupamento',
+            'despesa',
+            'codigo',
+            'orgao',
+            'unidade',
+            'especificacao',
+            'natureza',
+            'percentual'
+        )
+
+    def __init__(self, *args, **kwargs):
+        return super().__init__(*args, **kwargs)
+
+    def validate(self, attrs):
+        loa_id = attrs['agrupamento'].loa_id
+
+        codigo = self.fields.fields['codigo'].validator.regex.match(
+            attrs['codigo']).groupdict()
+
+        if not Orgao.objects.filter(codigo=attrs['orgao'], loa_id=loa_id).exists():
+            raise DRFValidationError('Órgão não encontrado nos anexos da LOA.')
+
+        if not UnidadeOrcamentaria.objects.filter(
+                codigo=attrs['unidade'],
+                orgao__codigo=attrs['orgao'],
+                loa_id=loa_id
+        ).exists():
+            raise DRFValidationError(
+                'Unidade Orçamentária no Órgão informado não encontrada '
+                'nos anexos da LOA.')
+
+        if not Funcao.objects.filter(codigo=codigo['funcao'], loa_id=loa_id).exists():
+            raise DRFValidationError(
+                'Função não encontrada na base de funções.'
+            )
+
+        if not SubFuncao.objects.filter(
+                codigo=codigo['subfuncao'],
+                loa_id=loa_id
+        ).exists():
+            raise DRFValidationError(
+                'SubFunção não encontrada na base de subfunções.'
+            )
+
+        return attrs
+
+    def validate_percentual(self, obj, *args, **kwargs):
+
+        obj = obj or ''
+        obj = obj.replace('.', '').replace(',', '.')
+        try:
+            obj = Decimal(obj)
+        except:
+            raise DRFValidationError(
+                _('O campo "Perc da Despesa" deve ser prenchido e '
+                  'seguir o formado 999,99. '
+                  'Valores negativos serão direcionados ao Art. 1º, '
+                  'valores positivos ao Art. 2º.')
+            )
+
+        if obj == Decimal('0.00'):
+            raise DRFValidationError(
+                'Valor da Despesa deve ser preenchido. '
+                'Valores negativos serão lançados no Art. 1º, '
+                'e valores positivos no Art. 2º.')
+
+        return obj
+
+    def create(self, validated_data):
+        despesa = validated_data.get('despesa', None)
+
+        v = validated_data
+        if not despesa:
+            loa_id = v['agrupamento'].loa_id
+
+            codigo = self.fields.fields['codigo'].validator.regex.match(
+                v['codigo']).groupdict()
+
+            unidade = UnidadeOrcamentaria.objects.filter(
+                codigo=v['unidade'], orgao__codigo=v['orgao'], loa_id=loa_id
+            ).first()
+
+            funcao = Funcao.objects.filter(
+                codigo=codigo['funcao'], loa_id=loa_id
+            ).first()
+
+            subfuncao = SubFuncao.objects.filter(
+                codigo=codigo['subfuncao'], loa_id=loa_id
+            ).first()
+
+            programa, created = Programa.objects.get_or_create(
+                codigo=codigo['programa'], loa_id=loa_id
+            )
+
+            acao, created = Acao.objects.get_or_create(
+                codigo=codigo['acao'], loa_id=loa_id
+            )
+            if created:
+                acao.especificacao = v['especificacao']
+                acao.save()
+
+            natureza, created = Natureza.objects.get_or_create(
+                codigo=v['natureza'], loa_id=loa_id
+            )
+
+            d = Despesa()
+            d.loa = v['agrupamento'].loa
+            d.orgao = unidade.orgao
+            d.unidade = unidade
+            d.funcao = funcao
+            d.subfuncao = subfuncao
+            d.programa = programa
+            d.acao = acao
+            d.natureza = natureza
+
+            ddict = d.__dict__
+            ddict.pop('id')
+            ddict.pop('_state')
+            despesa, created = Despesa.objects.get_or_create(**ddict)
+
+        validated_data = {
+            'despesa': despesa,
+            'agrupamento': v['agrupamento'],
+            'percentual': v['percentual']
+        }
+
+        elrc = AgrupamentoRegistroContabil()
+        elrc.agrupamento = validated_data['agrupamento']
+        elrc.despesa = validated_data['despesa']
+        elrc.percentual = validated_data['percentual']
+        elrc.save()
+
+        vkeys_clear = set(v.keys()) - set(validated_data.keys())
+        for k in vkeys_clear:
+            setattr(elrc, k, v[k])
+
+        return elrc
+
+
+@customize(AgrupamentoRegistroContabil)
+class _AgrupamentoRegistroContabilViewSet:
+
+    class AgrupamentoRegistroContabilPermission(_EmendaLoaViewSet.EmendaLoaPermission):
+        def has_permission_post(self, user):
+            return user.has_perm('loa.emendaloa_full_editor')
+
+        has_permission_delete = has_permission_post
+
+    permission_classes = (AgrupamentoRegistroContabilPermission, )
+
+    @action(methods=['post', ], detail=False)
+    def create_for_agrupamento_update(self, request, *args, **kwargs):
+        self.serializer_class = AgrupamentoRegistroContabilSerializer
+        try:
+            return super().create(request, *args, **kwargs)
+
+        except DRFValidationError as verror:
+            if "code='unique'" in str(verror):
+                raise DRFValidationError(
+                    'Já existe Registro desta Despesa neste Agrupamento.')
             raise DRFValidationError(verror.detail)
 
         except DjangoValidationError as verror:

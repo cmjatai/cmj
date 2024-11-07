@@ -65,10 +65,13 @@ RegistroAjusteLoaDetail:
   - tipo:2 emendaloa|fk_urlize_for_detail
   - registroajusteloaparlamentar_set:5 descricao
 
+AgrupamentoCreate:
+  {% trans 'Agrupamento' %}:
+  - nome
+
 Agrupamento:
   {% trans 'Agrupamento' %}:
   - nome
-  - observacoes
   - emendas
 
 
