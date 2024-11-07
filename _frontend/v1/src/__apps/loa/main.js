@@ -256,17 +256,19 @@ window.AppLOA = function () {
           let parts = event.target.value.trim().split(' ')
 
           _.each(response.data.results, (value, idx) => {
-            let html = `<div class="small item" pk="${value.id}">
+            let text_html = `
                 Órgão...: ${value.cod_orgao} - ${value.esp_orgao}<br>
                 Und Orç.: ${value.cod_unidade} - ${value.esp_unidade}<br>
                 Código..: ${value.codigo} - ${value.especificacao}<br>
                 Natureza: ${value.cod_natureza} - ${value.esp_natureza}<br>
-                Val.Orç.: ${value.str_valor} | Saldo: ${value.str_saldo}
-              </div>`
+                Val.Orç.: ${value.str_valor} | Saldo: ${value.str_saldo}`
 
             _.each(parts, (p, idx) => {
-              html = html.replaceAll(p.toUpperCase(), `<strong class="text-blue">${p.toUpperCase()}</strong>`)
+              text_html = text_html.replaceAll(p.toUpperCase(), `<strong class="text-blue">${p.toUpperCase()}</strong>`)
             })
+            let html = `<div class="small item" pk="${value.id}">
+                ${text_html}
+              </div>`
 
             let item = $(html).appendTo(inner)
 
@@ -492,17 +494,19 @@ window.AppLOA = function () {
           let parts = event.target.value.trim().split(' ')
 
           _.each(response.data.results, (value, idx) => {
-            let html = `<div class="small item" pk="${value.id}">
+            let text_html = `
                 Órgão...: ${value.cod_orgao} - ${value.esp_orgao}<br>
                 Und Orç.: ${value.cod_unidade} - ${value.esp_unidade}<br>
                 Código..: ${value.codigo} - ${value.especificacao}<br>
                 Natureza: ${value.cod_natureza} - ${value.esp_natureza}<br>
-                Val.Orç.: ${value.str_valor} | Saldo: ${value.str_saldo}
-              </div>`
+                Val.Orç.: ${value.str_valor} | Saldo: ${value.str_saldo}`
 
             _.each(parts, (p, idx) => {
-              html = html.replaceAll(p.toUpperCase(), `<strong class="text-blue">${p.toUpperCase()}</strong>`)
+              text_html = text_html.replaceAll(p.toUpperCase(), `<strong class="text-blue">${p.toUpperCase()}</strong>`)
             })
+            let html = `<div class="small item" pk="${value.id}">
+                ${text_html}
+              </div>`
 
             let item = $(html).appendTo(inner)
 
@@ -546,6 +550,7 @@ window.AppLOA = function () {
               <strong>${value.indicacao}</strong><br>
               <a href="${value.link_detail_backend}/edit" target="_blank">${value.finalidade}</a><br>
               ${value.str_parlamentares.join('<br>')}
+              <span class="fase ${value.fase === 10 ? 'bg-danger' : value.fase === 12 ? 'bg-warning' : 'bg-green'}">${value.str_fase}</span>
               </div>`
             ).appendTo(inner_item)
 
@@ -619,6 +624,7 @@ window.AppLOA = function () {
               let formData = {}
               formData.agrupamento = pk
               formData.emendaloa = pk_emendaloa
+              formData.emendaloa__fase = 15
               axios.post(`/api/loa/agrupamentoemendaloa/`, formData)
                 .then((response) => {
                   busca_render_emendaloa.find(`.item-emendaloa[pk="${response.data.emendaloa}"]`).parent().remove()
@@ -626,9 +632,9 @@ window.AppLOA = function () {
                 })
                 .catch((error) => {
                   busca_render_emendaloa.find('.alert').remove()
-                  inner.prepend($(`<div class="alert alert-danger">
-                    ${error.message}
-                    </div>`
+                  inner.prepend($(`<div class="pt-2"><div class="alert alert-danger">
+                    ${error.response.data[0]}
+                    </div></div>`
                   ))
                 })
             })

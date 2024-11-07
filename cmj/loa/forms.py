@@ -21,20 +21,13 @@ import yaml
 
 from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa, \
     RegistroAjusteLoa, RegistroAjusteLoaParlamentar, UnidadeOrcamentaria,\
-    Agrupamento
+    Agrupamento, quantize
 from sapl.crispy_layout_mixin import to_row, SaplFormLayout, SaplFormHelper
 from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
 from sapl.utils import FileFieldCheckMixin
 
 logger = logging.getLogger(__name__)
-
-
-def quantize(value, decimal_places='0.01', rounding=ROUND_HALF_DOWN) -> Decimal:
-    return value.quantize(
-        Decimal(decimal_places),
-        rounding=rounding
-    )
 
 
 class DecimalInput(TextInput):
@@ -337,12 +330,29 @@ class AgrupamentoForm(ModelForm):
 
         super().__init__(*args, **kwargs)
 
+        btns = {}
+        if self.instance.pk:
+            btns = {
+                'cancel_label': 'Encerrar Edição',
+                'save_label': 'Encerrar Edição e Concluir Registro Contábil'
+            }
+
         self.helper = FormHelper()
         self.helper.layout = SaplFormLayout(
-            Fieldset(_('Dados Gerais'), row1), row4, row5)
+            Fieldset(_('Dados Gerais'), row1), row4, row5, **btns)
 
         self.initial['ano_loa'] = self.loa.ano
         self.initial['perc_despesa'] = Decimal('100.00')
+
+    def save(self, commit=False):
+        if not self.instance.pk:
+            return ModelForm.save(self, commit=commit)
+
+        for e in self.instance.emendas.all():
+            e.fase = 17
+            e.save()
+
+        return self.instance
 
 
 class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
@@ -365,6 +375,11 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         required=False,
         widget=forms.HiddenInput(),
         queryset=MateriaLegislativa.objects.all())
+
+    tipo = forms.ChoiceField(
+        required=True,
+        choices=EmendaLoa.TIPOEMENDALOA_CHOICE
+    )
 
     finalidade = forms.CharField(
         label='Finalidade',

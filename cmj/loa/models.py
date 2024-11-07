@@ -1,3 +1,4 @@
+from _decimal import ROUND_HALF_DOWN, ROUND_DOWN
 from datetime import datetime
 from decimal import Decimal
 from io import StringIO
@@ -22,6 +23,13 @@ from sapl.utils import PortalFileField, OverwriteStorage
 
 
 PERCENTAGE_VALIDATOR = [MinValueValidator(0), MaxValueValidator(100)]
+
+
+def quantize(value, decimal_places='0.01', rounding=ROUND_HALF_DOWN) -> Decimal:
+    return value.quantize(
+        Decimal(decimal_places),
+        rounding=rounding
+    )
 
 
 class Loa(models.Model):
@@ -153,7 +161,8 @@ class EmendaLoa(models.Model):
     DIVERSOS = 99
     TIPOEMENDALOA_CHOICE = (
         (SAUDE, _('Saúde')),
-        (DIVERSOS, _('Áreas Diversas'))
+        (DIVERSOS, _('Áreas Diversas')),
+        (0, _('Emenda Modificativa')),
     )
 
     PROPOSTA = 10
@@ -180,8 +189,7 @@ class EmendaLoa(models.Model):
         blank=True, null=True, default=dict, encoder=DjangoJSONEncoder)
 
     tipo = models.PositiveSmallIntegerField(
-        choices=TIPOEMENDALOA_CHOICE,
-        blank=True, null=True, verbose_name=_('Área de aplicação'))
+        choices=TIPOEMENDALOA_CHOICE, verbose_name=_('Área de aplicação'))
 
     fase = models.PositiveSmallIntegerField(
         choices=FASE_CHOICE,
@@ -862,19 +870,58 @@ class Agrupamento(models.Model):
     def __str__(self):
         return self.nome
 
+    def sync(self):
+        registros = self.agrupamentoregistrocontabil_set.all()
+
+        deducoes = []
+        insercoes = []
+        soma_zero = Decimal('0.00')
+        for emenda in self.emendas.all():
+            emenda.registrocontabil_set.all().delete()
+
+            for r in registros:
+                elrc = EmendaLoaRegistroContabil()
+                elrc.emendaloa = emenda
+                elrc.despesa = r.despesa
+                elrc.valor = quantize(
+                    emenda.valor * r.percentual / Decimal(100))
+                elrc.save()
+
+                soma_zero += r.percentual
+
+                if r.percentual < Decimal('0.00'):
+                    deducoes.append(elrc)
+                else:
+                    insercoes.append(elrc)
+
+            if soma_zero == Decimal('0.00'):
+                sum_deducoes = sum(map(lambda x: x.valor, deducoes))
+                sum_insercoes = sum(map(lambda x: x.valor, insercoes))
+
+                if abs(sum_deducoes) != emenda.valor and deducoes:
+                    resto = emenda.valor + sum_deducoes
+                    deducoes[-1].valor = deducoes[-1].valor - resto
+                    deducoes[-1].save()
+
+                if abs(sum_insercoes) != emenda.valor and insercoes:
+                    resto = emenda.valor - sum_insercoes
+                    insercoes[-1].valor = insercoes[-1].valor + resto
+                    insercoes[-1].save()
+
+            print()
+
 
 class AgrupamentoEmendaLoa(models.Model):
-
     agrupamento = models.ForeignKey(
         Agrupamento,
         verbose_name=_('Agrupamento de Emenda Impositiva'),
         related_name='agrupamentoemendaloa_set',
         on_delete=CASCADE)
 
-    emendaloa = models.ForeignKey(
+    emendaloa = models.OneToOneField(
         EmendaLoa,
         verbose_name=_('Emenda Impositiva'),
-        related_name='agrupamentoemendaloa_set',
+        related_name='agrupamentoemendaloa',
         on_delete=CASCADE)
 
     class Meta:
@@ -892,27 +939,27 @@ class AgrupamentoEmendaLoa(models.Model):
 
 class AgrupamentoRegistroContabilManager(manager.Manager):
 
-    DEDUCAO = 10
-    INSERCAO = 20
-
     use_for_related_fields = True
 
     def all_deducoes(self):
         qs = self.get_queryset()
-        qs = qs.filter(operacao=self.DEDUCAO)
+        qs = qs.filter(percentual__lt=Decimal('0.00'))
         return qs
 
     def all_insercoes(self):
         qs = self.get_queryset()
-        qs = qs.filter(operacao=self.INSERCAO)
+        qs = qs.filter(percentual__gt=Decimal('0.00'))
         return qs
 
 
 class AgrupamentoRegistroContabil(models.Model):
 
+    DEDUCAO = 10
+    INSERCAO = 20
+
     OPERACAO_CHOICE = (
-        (AgrupamentoRegistroContabilManager.DEDUCAO, _('Dedução')),
-        (AgrupamentoRegistroContabilManager.INSERCAO, _('Inserção'))
+        (DEDUCAO, _('Dedução')),
+        (INSERCAO, _('Inserção'))
     )
 
     objects = AgrupamentoRegistroContabilManager()

@@ -6,3 +6,6 @@ class AppConfig(apps.AppConfig):
     name = 'cmj.loa'
     label = 'loa'
     verbose_name = _('Loa')
+
+    def ready(self):
+        from . import signals

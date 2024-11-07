@@ -231,7 +231,7 @@ class LoaCrud(Crud):
             for lp in loaparlamentares:
 
                 resumo_parlamentar = {'loaparlamentar': lp}
-                for k, v in EmendaLoa.TIPOEMENDALOA_CHOICE:
+                for k, v in EmendaLoa.TIPOEMENDALOA_CHOICE[:2]:
                     resumo_parlamentar[k] = {
                         'name': v
                     }
@@ -395,13 +395,43 @@ class AgrupamentoCrud(MasterDetailCrud):
     class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
         pass
 
+        @property
+        def create_url(self):
+            url = super().create_url
+            if self.request.user.has_perm('loa.emendaloa_full_editor'):
+                url = self.resolve_url('create', args=(self.kwargs['pk'],))
+            return url
+
+        @property
+        def update_url(self):
+
+            url = super().update_url
+            if self.request.user.has_perm('loa.emendaloa_full_editor'):
+                url = self.resolve_url('update', args=(self.object.id,))
+
+            return url
+
+        @property
+        def delete_url(self):
+
+            url = super().delete_url
+            if self.request.user.has_perm('loa.emendaloa_full_editor'):
+                url = self.resolve_url('delete', args=(self.object.id,))
+
+            return url
+
+    class DeleteView(MasterDetailCrud.DeleteView):
+        permission_required = ('loa.emendaloa_full_editor', )
+
     class CreateView(MasterDetailCrud.CreateView):
+        permission_required = ('loa.emendaloa_full_editor', )
         layout_key = 'AgrupamentoCreate'
 
         def get_success_url(self):
             return self.update_url
 
     class UpdateView(MasterDetailCrud.UpdateView):
+        permission_required = ('loa.emendaloa_full_editor', )
         layout_key = None
         form_class = AgrupamentoForm
 

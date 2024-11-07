@@ -20,6 +20,7 @@ from rest_framework.exceptions import ValidationError as DRFValidationError
 from rest_framework.fields import RegexField, DecimalField, CharField, \
     SerializerMethodField
 from rest_framework.response import Response
+from rest_framework.viewsets import ViewSet
 import pymupdf
 
 from cmj import loa
@@ -843,6 +844,7 @@ class _EmendaLoaRegistroContabilViewSet:
             return user.has_perm('loa.emendaloa_full_editor')
 
         has_permission_delete = has_permission_post
+        has_permission_patch = has_permission_post
 
     permission_classes = (EmendaLoaRegistroContabilPermission, )
 
@@ -870,6 +872,15 @@ class _EmendaLoaRegistroContabilViewSet:
 @customize(AgrupamentoEmendaLoa)
 class _AgrupamentoEmendaLoaViewSet:
 
+    class AgrupamentoEmendaLoaPermission(_EmendaLoaViewSet.EmendaLoaPermission):
+        def has_permission_post(self, user):
+            return user.has_perm('loa.emendaloa_full_editor')
+
+        has_permission_delete = has_permission_post
+        has_permission_patch = has_permission_post
+
+    permission_classes = (AgrupamentoEmendaLoaPermission, )
+
     @action(methods=['post', ], detail=False)
     def delete(self, request, *args, **kwargs):
 
@@ -879,9 +890,35 @@ class _AgrupamentoEmendaLoaViewSet:
 
         return Response({'detail': 'Registro removido com Sucesso.'})
 
+    def create(self, request, *args, **kwargs):
+        try:
+            r = super().create(request, *args, **kwargs)
+
+            emendaloa__fase = request.data.get('emendaloa__fase', None)
+            if emendaloa__fase:
+                el = EmendaLoa.objects.get(pk=r.data['emendaloa'])
+                el.fase = emendaloa__fase
+                el.save()
+
+            return r
+        except Exception as e:
+            if "code='unique'" in str(e):
+                raise DRFValidationError(
+                    'Esta Emenda impositiva já está adicionada em outro Agrupamento.')
+            raise DRFValidationError(e)
+
 
 @customize(Agrupamento)
 class _Agrupamento:
+
+    class AgrupamentoPermission(_EmendaLoaViewSet.EmendaLoaPermission):
+        def has_permission_post(self, user):
+            return user.has_perm('loa.emendaloa_full_editor')
+
+        has_permission_delete = has_permission_post
+        has_permission_patch = has_permission_post
+
+    permission_classes = (AgrupamentoPermission, )
 
     @action(methods=['get', ], detail=True)
     def emendas(self, request, *args, **kwargs):
@@ -892,7 +929,7 @@ class _Agrupamento:
         self.serializer_class = EmendaLoaSearchSerializer
         qs = self.get_queryset()
         return qs.filter(
-            agrupamentoemendaloa_set__agrupamento_id=kwargs['pk']
+            agrupamentoemendaloa__agrupamento_id=kwargs['pk']
         )
 
 
@@ -1077,6 +1114,7 @@ class _AgrupamentoRegistroContabilViewSet:
             return user.has_perm('loa.emendaloa_full_editor')
 
         has_permission_delete = has_permission_post
+        has_permission_patch = has_permission_post
 
     permission_classes = (AgrupamentoRegistroContabilPermission, )
 
