@@ -43,25 +43,29 @@ window.AppLOA = function () {
       const lsJson = localStorage.getItem('portalcmj_emendaloa_filter')
       const lsData = JSON.parse(lsJson)
 
-      if (lsData) {
+      if (lsJson !== '{}') {
         _.forOwn(lsData, (value, key) => {
+          console.log(lsData)
           _.forEach(form.find(`input[name="${key}"]`), (item) => {
-            if (value.includes(item.value)) {
+            if ((Array.isArray(value) && value.includes(item.value)) || value === item.value) {
               item.checked = true
               $(`label[for="${item.id}"] span`).addClass('active')
             }
           })
         })
+        form.submit()
       }
+    } else {
+      localStorage.setItem('portalcmj_emendaloa_filter', formJson)
     }
-
     form
       .find('input[type="checkbox"]')
       .change((event) => {
         const formData = new FormData(form[0])
         const parlamentares = formData.getAll('parlamentares')
         const fase = formData.getAll('fase')
-        const formProps = { fase, parlamentares }
+        const tipo = formData.getAll('tipo')
+        const formProps = tipo.length > 0 || fase.length > 0 || parlamentares.length > 0 ? { fase, parlamentares, tipo } : {}
         const formJson = JSON.stringify(formProps)
         localStorage.setItem('portalcmj_emendaloa_filter', formJson)
 

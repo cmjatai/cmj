@@ -803,6 +803,13 @@ class EmendaLoaFilterSet(FilterSet):
         def get_queryset(self, request):
             return self.parent.loa.parlamentares.all()
 
+    tipo = MultipleChoiceFilter(
+        required=False,
+        choices=EmendaLoa.TIPOEMENDALOA_CHOICE,
+        label=_('Tipos'),
+        widget=forms.CheckboxSelectMultiple
+    )
+
     fase = MultipleChoiceFilter(
         required=False,
         choices=EmendaLoa.FASE_CHOICE,
@@ -818,10 +825,10 @@ class EmendaLoaFilterSet(FilterSet):
     class Meta:
 
         class Form(forms.Form):
-            crispy_field_template = 'fase', 'parlamentares'
+            crispy_field_template = 'fase', 'parlamentares', 'tipo'
 
         model = EmendaLoa
-        fields = ['fase', 'parlamentares', 'indicacao']
+        fields = ['fase', 'parlamentares', 'tipo', 'indicacao']
         form = Form
 
     class ELSaplFormHelper(SaplFormHelper):
@@ -854,7 +861,7 @@ class EmendaLoaFilterSet(FilterSet):
             template = Template(label_layout)
 
             for x1, x2, (key, idp, nome) in html_parts:
-                if key == 'fase':
+                if key in ('fase', 'tipo'):
                     continue
                 lp = len(nome)
 
@@ -875,7 +882,8 @@ class EmendaLoaFilterSet(FilterSet):
         row = to_row(
             [
                 ('parlamentares', 12),
-                ('fase', 12),
+                ('fase', 8),
+                ('tipo', 4),
             ]
         )
 
@@ -893,3 +901,4 @@ class EmendaLoaFilterSet(FilterSet):
             self.form.fields['fase'].choices = EmendaLoa.FASE_CHOICE[4:]
         else:
             self.form.fields['fase'].choices = EmendaLoa.FASE_CHOICE[:4]
+        self.form.fields['tipo'].choices = EmendaLoa.TIPOEMENDALOA_CHOICE
