@@ -80,20 +80,22 @@
       }
       .form-group {
         margin: 0;
-        & > label {
-          display: none;
-        }
       }
-      #div_id_fase, #div_id_tipo {
+      #div_id_fase, #div_id_tipo, #div_id_finalidade {
         margin-top: 1rem;
         padding-top: 1rem;
         border-top: 1px solid #ddd;
         & > div {
-          display: flex;
+          // display: flex;
           gap: 1rem;
           padding: 5px 15px 3px;
           font-size: 85%;
           align-items: center;
+        }
+      }
+      #div_id_parlamentares {
+        & > label {
+          display: none;
         }
       }
     }

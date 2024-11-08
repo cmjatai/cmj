@@ -57,18 +57,26 @@ window.AppLOA = function () {
     } else {
       localStorage.setItem('portalcmj_emendaloa_filter', formJson)
     }
+    let changeAction = function (event) {
+      const formData = new FormData(form[0])
+      const parlamentares = formData.getAll('parlamentares')
+      const fase = formData.getAll('fase')
+      const finalidade = formData.getAll('finalidade')
+      const tipo = formData.getAll('tipo')
+      const formProps = finalidade.length > 0 || tipo.length > 0 || fase.length > 0 || parlamentares.length > 0 ? { fase, parlamentares, tipo } : {}
+      const formJson = JSON.stringify(formProps)
+      localStorage.setItem('portalcmj_emendaloa_filter', formJson)
+      form.submit()
+    }
     form
       .find('input[type="checkbox"]')
       .change((event) => {
-        const formData = new FormData(form[0])
-        const parlamentares = formData.getAll('parlamentares')
-        const fase = formData.getAll('fase')
-        const tipo = formData.getAll('tipo')
-        const formProps = tipo.length > 0 || fase.length > 0 || parlamentares.length > 0 ? { fase, parlamentares, tipo } : {}
-        const formJson = JSON.stringify(formProps)
-        localStorage.setItem('portalcmj_emendaloa_filter', formJson)
-
-        form.submit()
+        changeAction()
+      })
+    form
+      .find('input[type="text"]')
+      .change((event) => {
+        changeAction()
       })
   }
   instance.EmendaLoaCrudUPDATE = function (container) {

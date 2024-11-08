@@ -8,6 +8,7 @@ from django import forms
 from django.contrib.postgres.forms.array import SplitArrayField, \
     SplitArrayWidget
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.db.models import Q
 from django.forms.models import ModelForm
 from django.forms.widgets import HiddenInput, NumberInput, TextInput
 from django.template.base import Template
@@ -15,17 +16,19 @@ from django.template.context import Context
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from django_filters.filters import MultipleChoiceFilter, \
-    ModelMultipleChoiceFilter
+    ModelMultipleChoiceFilter, CharFilter
 from django_filters.filterset import FilterSet
 import yaml
 
 from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa, \
     RegistroAjusteLoa, RegistroAjusteLoaParlamentar, UnidadeOrcamentaria,\
     Agrupamento, quantize
+from cmj.utils import normalize
 from sapl.crispy_layout_mixin import to_row, SaplFormLayout, SaplFormHelper
 from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
 from sapl.utils import FileFieldCheckMixin
+
 
 logger = logging.getLogger(__name__)
 
@@ -822,13 +825,17 @@ class EmendaLoaFilterSet(FilterSet):
         widget=forms.CheckboxSelectMultiple
     )
 
+    finalidade = CharFilter(label='Busca por termos',
+                            help_text='Filtra os termos acima nos campos finalidade e Unidade Orçamentária',
+                            method='filter_finalidade')
+
     class Meta:
 
         class Form(forms.Form):
-            crispy_field_template = 'fase', 'parlamentares', 'tipo'
+            crispy_field_template = 'fase', 'parlamentares', 'tipo', 'finalidade'
 
         model = EmendaLoa
-        fields = ['fase', 'parlamentares', 'tipo', 'indicacao']
+        fields = ['fase', 'parlamentares', 'tipo', 'indicacao',  'finalidade']
         form = Form
 
     class ELSaplFormHelper(SaplFormHelper):
@@ -861,7 +868,7 @@ class EmendaLoaFilterSet(FilterSet):
             template = Template(label_layout)
 
             for x1, x2, (key, idp, nome) in html_parts:
-                if key in ('fase', 'tipo'):
+                if key in ('fase', 'tipo', 'finalidade'):
                     continue
                 lp = len(nome)
 
@@ -874,6 +881,23 @@ class EmendaLoaFilterSet(FilterSet):
                 html = html[:x2 - 8 - lp] + trendered + html[x2 - 8:]
             return mark_safe(html)
 
+    def filter_finalidade(self, queryset, field_name, value):
+
+        query = normalize(value)
+
+        query = query.split(' ')
+        if query:
+            q = Q()
+            for item in query:
+                if not item:
+                    continue
+                q &= (Q(unidade__especificacao__icontains=item) |
+                      Q(finalidade__icontains=item))
+
+            if q:
+                queryset = queryset.filter(q)
+        return queryset
+
     def __init__(self, *args, **kwargs):
 
         self.loa = kwargs.pop('loa')
@@ -882,7 +906,8 @@ class EmendaLoaFilterSet(FilterSet):
         row = to_row(
             [
                 ('parlamentares', 12),
-                ('fase', 8),
+                ('finalidade', 4),
+                ('fase', 4),
                 ('tipo', 4),
             ]
         )
