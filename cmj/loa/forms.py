@@ -883,7 +883,7 @@ class EmendaLoaFilterSet(FilterSet):
 
     def filter_finalidade(self, queryset, field_name, value):
 
-        query = normalize(value)
+        query = value
 
         query = query.split(' ')
         if query:
