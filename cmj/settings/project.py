@@ -118,8 +118,8 @@ CHANNEL_LAYERS = {
 }
 
 CELERY_BROKER_URL = 'redis://{}:{}'.format(REDIS_HOST, REDIS_PORT)
-CELERY_RESULT_BACKEND = 'django-db'
-CELERY_CACHE_BACKEND = 'django-cache'
+#CELERY_RESULT_BACKEND = 'django-db'
+#CELERY_CACHE_BACKEND = 'django-cache'
 
 #CELERY_ACCEPT_CONTENT = ['application/json']
 #CELERY_RESULT_SERIALIZER = 'json'
