@@ -67,6 +67,7 @@ USE_SOLR = True
 SOLR_URL = 'http://solr:solr@cmjsolr:8983'
 SOLR_COLLECTION = 'portalcmj_cmj'
 HAYSTACK_SIGNAL_PROCESSOR = 'cmj.haystack.CelerySignalProcessor'
+CELERY_HAYSTACK_DEFAULT_TASK = 'cmj.haystack.haystack_signal'
 
 REDIS_HOST = config('REDIS_HOST', cast=str, default='cmjredis')
 REDIS_PORT = config('REDIS_PORT', cast=int, default=6379)
@@ -118,8 +119,8 @@ CHANNEL_LAYERS = {
 }
 
 CELERY_BROKER_URL = 'redis://{}:{}'.format(REDIS_HOST, REDIS_PORT)
-#CELERY_RESULT_BACKEND = 'django-db'
-#CELERY_CACHE_BACKEND = 'django-cache'
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_CACHE_BACKEND = 'default'
 
 #CELERY_ACCEPT_CONTENT = ['application/json']
 #CELERY_RESULT_SERIALIZER = 'json'
@@ -127,18 +128,18 @@ CELERY_BROKER_URL = 'redis://{}:{}'.format(REDIS_HOST, REDIS_PORT)
 
 
 CACHES = {
-    #'default': {
+    # 'default': {
     #    'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
     #    'LOCATION': '/var/tmp/django_cache',
-    #}
+    # }
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache' if not DEBUG else 'django.core.cache.backends.dummy.DummyCache',
         'LOCATION': 'unique-snowflake',
     }
-    #"default": {
+    # "default": {
     #    "BACKEND": "django.core.cache.backends.redis.RedisCache",
     #    "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}",
-    #}
+    # }
 }
 
 
