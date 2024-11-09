@@ -29,6 +29,8 @@ window.AppLOA = function () {
     const container = $('.container-loa')
     if (container.hasClass('emendaloa-update')) {
       instance.EmendaLoaCrudUPDATE(container)
+    } else if (container.hasClass('emendaloa-create')) {
+      instance.EmendaLoaCrudCREATE(container)
     } else if (container.hasClass('emendaloa-list')) {
       instance.EmendaLoaCrudLIST(container)
     }
@@ -79,10 +81,57 @@ window.AppLOA = function () {
         changeAction()
       })
   }
+  instance.EmendaLoaCRUDToggleTipo = function (form) {
+    const select_tipo = form.find('select[name="tipo"]')[0]
+    const div_id_parl_assinantes = form.find('#div_id_parl_assinantes')
+    const div_id_parlamentares__valor = form.find('#div_id_parlamentares__valor')
+    const input_valor = form.find('input[name="valor"]')[0]
+
+    if (select_tipo.value !== '0') {
+      if (div_id_parl_assinantes.length > 0) {
+        input_valor.setAttribute('readonly', 'readonly')
+        div_id_parl_assinantes.find('input').prop('disabled', true)
+        div_id_parl_assinantes[0].classList.add('d-none')
+      }
+    } else {
+      if (div_id_parlamentares__valor.length > 0) {
+        input_valor.removeAttribute('readonly')
+        div_id_parlamentares__valor.find('input').prop('disabled', true)
+        div_id_parlamentares__valor[0].classList.add('d-none')
+      }
+    }
+
+    form.find('select[name="tipo"]').change((event) => {
+      const select = event.target
+      if (select.value === '0') {
+        div_id_parlamentares__valor.find('input').prop('disabled', true)
+        div_id_parlamentares__valor[0].classList.add('d-none')
+
+        div_id_parl_assinantes[0].classList.remove('d-none')
+        div_id_parl_assinantes.find('input').prop('disabled', false)
+
+        input_valor.removeAttribute('readonly')
+      } else {
+        div_id_parl_assinantes.find('input').prop('disabled', true)
+        div_id_parl_assinantes[0].classList.add('d-none')
+
+        div_id_parlamentares__valor[0].classList.remove('d-none')
+        div_id_parlamentares__valor.find('input').prop('disabled', false)
+
+        input_valor.setAttribute('readonly', 'readonly')
+      }
+    })
+  }
+  instance.EmendaLoaCrudCREATE = function (container) {
+    const form = container.find('form')
+    instance.EmendaLoaCRUDToggleTipo(form)
+  }
   instance.EmendaLoaCrudUPDATE = function (container) {
     const pk = window.location.href.matchAll(/emendaloa\/(\d+)\//g).next().value[1]
     const form = container.find('form')
     const urlBase = `/api/loa/emendaloa/${pk}`
+
+    instance.EmendaLoaCRUDToggleTipo(form)
 
     const createPreview = function () {
       return $('.container-preview').html(`
@@ -333,6 +382,10 @@ window.AppLOA = function () {
       let field = event.target.name
       let value = event.target.value
 
+      if (field === '') {
+        return
+      }
+
       let action = '/'
 
       preview.style.opacity = 0.35
@@ -345,6 +398,10 @@ window.AppLOA = function () {
       } else if (field === 'lineHeight') {
         preview.src = `${urlBase}/view/?page=1&lineHeight=${value}&u=${Date.now()}`
         return
+      } else if (field === 'parl_assinantes') {
+        action = '/update_parlassinantes/'
+        formData['parlamentar_id'] = value
+        formData['checked'] = event.target.checked
       } else {
         formData[field] = value
       }
@@ -354,6 +411,11 @@ window.AppLOA = function () {
           form.find('input[name="lineHeight"]').val(response.data.metadata.style.lineHeight)
           form.find('input[name="valor"]').val(response.data.valor)
           // $('.decimalinput').mask('###.###.##0,00', { reverse: true })
+
+          if (field === 'tipo') {
+            window.location.reload()
+          }
+
           refreshChangeRegistroDespesa()
 
           preview.src = `${urlBase}/view/?page=1&u=${Date.now()}`

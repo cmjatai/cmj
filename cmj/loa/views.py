@@ -569,12 +569,17 @@ class EmendaLoaCrud(MasterDetailCrud):
             pls = []
 
             for elp in args[0].emendaloaparlamentar_set.all():
-                pls.append(
-                    '<tr><td>{}</td><td align="right">R$ {}</td></tr>'.format(
-                        elp.parlamentar.nome_parlamentar,
-                        formats.number_format(elp.valor, force_grouping=True)
+                if elp.emendaloa.tipo:
+                    pls.append(
+                        '<tr><td>{}</td><td align="right">R$ {}</td></tr>'.format(
+                            elp.parlamentar.nome_parlamentar,
+                            formats.number_format(
+                                elp.valor, force_grouping=True)
+                        )
                     )
-                )
+                else:
+                    pls.append(
+                        f'<tr><td>{elp.parlamentar.nome_parlamentar}</td>')
 
             ajustes = []
             for ajuste in args[0].registroajusteloa_set.all():
@@ -607,6 +612,13 @@ class EmendaLoaCrud(MasterDetailCrud):
     class CreateView(MasterDetailCrud.CreateView):
         layout_key = None
         form_class = EmendaLoaForm
+
+        def get_context_data(self, **kwargs):
+            self.loa = Loa.objects.get(pk=kwargs['root_pk'])
+            context = super().get_context_data(**kwargs)
+            path = context.get('path', '')
+            context['path'] = f'{path} emendaloa-create'
+            return context
 
         def get_success_url(self):
             return self.update_url
@@ -834,12 +846,17 @@ class EmendaLoaCrud(MasterDetailCrud):
             pls = []
 
             for elp in emendaloa.emendaloaparlamentar_set.all():
-                pls.append(
-                    '<tr><td>{}</td><td align="right">R$ {}</td></tr>'.format(
-                        elp.parlamentar.nome_parlamentar,
-                        formats.number_format(elp.valor, force_grouping=True)
+                if elp.emendaloa.tipo:
+                    pls.append(
+                        '<tr><td>{}</td><td align="right">R$ {}</td></tr>'.format(
+                            elp.parlamentar.nome_parlamentar,
+                            formats.number_format(
+                                elp.valor, force_grouping=True)
+                        )
                     )
-                )
+                else:
+                    pls.append(
+                        f'<tr><td>{elp.parlamentar.nome_parlamentar}</td>')
 
             return verbose_name, f'''
                 <div class="py-3">

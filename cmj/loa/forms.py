@@ -92,6 +92,12 @@ class MateriaCheckFormMixin:
             cleaned_data['materia'] = None
 
 
+class LoaParlModelMultipleChoiceFilter(ModelMultipleChoiceFilter):
+
+    def get_queryset(self, request):
+        return self.parent.loa.parlamentares.all()
+
+
 class LoaForm(MateriaCheckFormMixin, ModelForm):
 
     tipo_materia = forms.ModelChoiceField(
@@ -399,6 +405,12 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         required=False
     )
 
+    parl_assinantes = forms.ModelMultipleChoiceField(
+        queryset=Parlamentar.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        label='Parlamentares que Assinarão',
+    )
+
     # registrocontabil_set = forms.ModelChoiceField(
     #    label='',
     # required=False,
@@ -441,7 +453,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
             'materia', 'tipo_materia', 'numero_materia', 'ano_materia',
             'prefixo_indicacao', 'indicacao',
             'prefixo_finalidade', 'finalidade',
-            'parlamentares__valor',
+            'parlamentares__valor', 'parl_assinantes',
             'busca_despesa', 'ano_loa', 'unidade'  # 'registrocontabil_set'
         ]
 
@@ -477,6 +489,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         ]
 
         if not full_editor:
+            row3.append(('parl_assinantes', 12))
             row3.append(('parlamentares__valor', 12))
 
         row3 = to_row(row3)
@@ -535,6 +548,10 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         super().__init__(*args, **kwargs)
 
         self.helper = FormHelper()
+
+        self.fields['parl_assinantes'].choices = [
+            (p.id, str(p)) for p in
+            self.loa.parlamentares.all()]
 
         self.fields['unidade'].choices = [
             (u.id, str(u)) for u in
@@ -597,8 +614,10 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
         if full_editor:
             self.fields.pop('parlamentares__valor')
+            self.fields.pop('parl_assinantes')
             return
 
+        initial_pa = []
         initial_pv = []
         if self.instance.pk:
             initial_pv = [[p, Decimal('0.00')] for p in self.parls]
@@ -607,9 +626,12 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
                     emendaloa=self.instance).first()
                 if ipv:
                     initial_pv[i][1] = ipv.valor
+                    initial_pa.append(p)
 
         self.initial['parlamentares__valor'] = list(
             map(lambda x: x[1], initial_pv))
+
+        self.initial['parl_assinantes'] = initial_pa
 
         elps = list(map(lambda x: x[0], filter(lambda y: y[1], initial_pv)))
 
@@ -629,15 +651,29 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         super().clean()
         cleaned_data = self.cleaned_data
 
-        if 'parlamentares__valor'in cleaned_data:
-            if not self.user.is_superuser and self.user.operadorautor_set.exists():
-                pv = {k: v for k, v in zip(
-                    self.parls, self.cleaned_data['parlamentares__valor'])}
+        if cleaned_data['tipo'] != '0':
+            if 'parlamentares__valor'in cleaned_data:
+                if not self.user.is_superuser and self.user.operadorautor_set.exists():
+                    pv = {k: v for k, v in zip(
+                        self.parls, self.cleaned_data['parlamentares__valor'])}
 
-                p = self.user.operadorautor_set.first().autor.autor_related
-                if not pv[p]:
+                    p = self.user.operadorautor_set.first().autor.autor_related
+                    if not pv[p]:
+                        raise ValidationError(
+                            f'É obrigatório o preenchimento do valor ligado a seu Parlamentar: {p}.')
+        else:
+            if not 'parl_assinantes' in cleaned_data:
+                if not self.user.is_superuser and self.user.operadorautor_set.exists():
                     raise ValidationError(
-                        f'É obrigatório o preenchimento do valor ligado a seu Parlamentar: {p}.')
+                        f'Você deve selecionar ao menos o seu parlamentar')
+            else:
+                if not self.user.is_superuser and self.user.operadorautor_set.exists():
+                    pv = self.cleaned_data['parl_assinantes']
+
+                    p = self.user.operadorautor_set.first().autor.autor_related
+                    if not p in pv:
+                        raise ValidationError(
+                            f'É obrigatório selecionar ao menos o seu parlamentar: {p}.')
 
         return cleaned_data
 
@@ -648,7 +684,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         if not i_init.pk:
             i_init.owner = self.user
 
-        if 'parlamentares__valor' in self.cleaned_data:
+        if 'parlamentares__valor' in self.cleaned_data and self.cleaned_data['tipo'] != '0':
             if not self.full_editor:
                 soma = sum(
                     list(
@@ -660,13 +696,12 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
                 i_init.valor = soma
 
         try:
-
             i = super().save(commit)
         except Exception as e:
             raise ValidationError('Erro')
 
         if not self.full_editor:
-            if 'parlamentares__valor' in self.cleaned_data:
+            if 'parlamentares__valor' in self.cleaned_data and self.cleaned_data['tipo'] != '0':
                 i.parlamentares.clear()
 
                 pv = zip(self.parls, self.cleaned_data['parlamentares__valor'])
@@ -679,6 +714,15 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
                     elp.parlamentar = p
                     elp.valor = v
                     elp.save()
+            elif 'parl_assinantes' in self.cleaned_data:
+                i.parlamentares.clear()
+                for p in self.cleaned_data['parl_assinantes']:
+                    elp = EmendaLoaParlamentar()
+                    elp.emendaloa = i
+                    elp.parlamentar = p
+                    elp.valor = Decimal('1.00')
+                    elp.save()
+                i.atualiza_valor()
 
         return i
 
@@ -800,11 +844,6 @@ class RegistroAjusteLoaForm(ModelForm):
 
 
 class EmendaLoaFilterSet(FilterSet):
-
-    class LoaParlModelMultipleChoiceFilter(ModelMultipleChoiceFilter):
-
-        def get_queryset(self, request):
-            return self.parent.loa.parlamentares.all()
 
     tipo = MultipleChoiceFilter(
         required=False,

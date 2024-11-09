@@ -96,7 +96,7 @@
           {{object.prefixo_finalidade}} {{object.finalidade}}.
   </p>
 
-  {% if object.parlamentares.count > 1 %}
+  {% if object.parlamentares.count > 1 and object.tipo %}
     <p class="art">
       <span class="rotulo">Art {{ view.art }}º - </span>O valor de
       <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}}),</strong>

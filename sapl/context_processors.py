@@ -15,10 +15,11 @@ def parliament_info(request):
         return {}
 
 
-def mail_service_configured(request): 
+def mail_service_configured(request):
 
     if not mail_service_configured_utils(request):
-        logger = logging.getLogger(__name__)
-        logger.warning(_('Servidor de email não configurado.'))
+        if not settings.DEBUG:
+            logger = logging.getLogger(__name__)
+            logger.warning(_('Servidor de email não configurado.'))
         return {'mail_service_configured': False}
     return {'mail_service_configured': True}

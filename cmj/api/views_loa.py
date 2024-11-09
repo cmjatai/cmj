@@ -27,7 +27,7 @@ from cmj import loa
 from cmj.loa.models import OficioAjusteLoa, EmendaLoa, Loa, EmendaLoaParlamentar, \
     DespesaConsulta, EmendaLoaRegistroContabil, UnidadeOrcamentaria, Despesa, \
     Orgao, Funcao, SubFuncao, Programa, Acao, Natureza,\
-    AgrupamentoRegistroContabil, AgrupamentoEmendaLoa, Agrupamento
+    AgrupamentoRegistroContabil, AgrupamentoEmendaLoa, Agrupamento, quantize
 from cmj.utils import run_sql
 from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize,\
     wrapper_queryset_response_for_drf_action
@@ -466,6 +466,36 @@ class _EmendaLoaViewSet:
             return False
 
     permission_classes = (EmendaLoaPermission, )
+
+    @action(methods=['patch', ], detail=True)
+    def update_parlassinantes(self, request, *args, **kwargs):
+
+        data = request.data
+        data['emendaloa_id'] = kwargs['pk']
+        dchecked = data.pop('checked')
+
+        el = EmendaLoa.objects.get(pk=kwargs['pk'])
+
+        pselected = el.loa.parlamentares.filter(
+            id=data['parlamentar_id']).first()
+        if not dchecked:
+            u = request.user
+            if not u.is_superuser and u.operadorautor_set.exists():
+                puser = u.operadorautor_set.first().autor.autor_related
+
+                if puser == pselected:
+                    raise DRFValidationError(
+                        'Você não pode remover o Parlamentar '
+                        'ao qual seu usuário está ligado. '
+                        'Caso queira, você pode excluir esse registro '
+                        'clicando em excluir na tela de consulta.')
+            el.parlamentares.remove(pselected)
+        else:
+            el.parlamentares.add(pselected)
+        el.atualiza_valor()
+
+        serializer = self.get_serializer(el)
+        return Response(serializer.data)
 
     @action(methods=['patch', ], detail=True)
     def updatevalorparlamentar(self, request, *args, **kwargs):

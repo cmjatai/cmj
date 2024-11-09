@@ -160,8 +160,8 @@ class EmendaLoa(models.Model):
     SAUDE = 10
     DIVERSOS = 99
     TIPOEMENDALOA_CHOICE = (
-        (SAUDE, _('Saúde')),
-        (DIVERSOS, _('Áreas Diversas')),
+        (SAUDE, _('Em.Imp. Saúde')),
+        (DIVERSOS, _('Em.Imp. Áreas Diversas')),
         (0, _('Emenda Modificativa')),
     )
 
@@ -267,8 +267,8 @@ class EmendaLoa(models.Model):
         return f'R$ {valor_str} - {self.finalidade}'
 
     class Meta:
-        verbose_name = _('Emenda Impositiva')
-        verbose_name_plural = _('Emendas Impositivas')
+        verbose_name = _('Emenda Impositiva/Modificativa')
+        verbose_name_plural = _('Emendas Impositivas/Modificativas')
         ordering = ['id']
 
         permissions = (
@@ -279,8 +279,23 @@ class EmendaLoa(models.Model):
         )
 
     def atualiza_valor(self):
-        soma_dict = self.emendaloaparlamentar_set.aggregate(Sum('valor'))
-        self.valor = soma_dict['valor__sum'] or Decimal('0.00')
+        if self.tipo:
+            soma_dict = self.emendaloaparlamentar_set.aggregate(Sum('valor'))
+            self.valor = soma_dict['valor__sum'] or Decimal('0.00')
+        else:
+            qspa = self.emendaloaparlamentar_set.all()
+            valores = [quantize(self.valor / qspa.count())] * qspa.count()
+            sum_valores = sum(valores)
+            resto = self.valor - sum_valores
+            if resto:
+                valores[-1] = valores[-1] + resto
+
+            elpv = zip(qspa, valores)
+
+            for elp, v in elpv:
+                elp.valor = v
+                elp.save()
+
         return self
 
     @property
