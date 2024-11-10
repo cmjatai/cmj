@@ -559,6 +559,17 @@ class EmendaLoaCrud(MasterDetailCrud):
         def hook_fase(self, *args, **kwargs):
             return f'<br><small class="text-nowrap">({args[0].get_fase_display()})</small>', args[2]
 
+        def hook_finalidade(self, *args, **kwargs):
+            o = args[0].indicacao or ''
+            if o:
+                o = f'<small class="text-gray">{o}</small><br>'
+
+            f = args[1]
+            f = f'{f[0].upper()}{f[1:]}'
+            f = f'{o}{f}'
+
+            return f, args[2]
+
         def hook_materia(self, *args, **kwargs):
             if args[0].materia:
                 return f'<small class="text-gray"><strong>Matéria Legislativa:</strong> {args[0].materia}<br><i>{args[0].materia.ementa}</i></small>', args[2]

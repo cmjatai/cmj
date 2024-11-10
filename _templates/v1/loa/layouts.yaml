@@ -32,13 +32,15 @@ EmendaLoaDetail:
   col-12 1:
     {% trans 'Dados Gerais' %}:
       col-md-8:
-      - tipo:3 fase:5 valor:4
-      - materia|fk_urlize_for_detail valor_computado:4
+      - tipo:5 fase:7
+      - materia|fk_urlize_for_detail
       - indicacao
       - finalidade
-      - owner
       col-md-4:
-      - parlamentares:12
+      - valor
+      - valor_computado
+      - parlamentares
+      - owner
   col-12 2:
     {% trans 'Documentos da Emenda Impositiva' %}:
       col-md-12:

@@ -18,6 +18,9 @@
     }
   }
   &.loa-detail {
+    .container-table {
+      margin: 0;
+    }
     .form-control-static {
       text-align: center;
       font-size: 140%;
@@ -26,6 +29,7 @@
       font-weight: bold;
     }
     table {
+      display: table;
       font-size: 0.9rem;
       td {
         font-size: 110%;
@@ -51,6 +55,9 @@
     }
     table {
       tr {
+        td:nth-child(1) {
+          width: 40%;
+        }
         td:last-child {
           padding: 0;
         }
@@ -58,7 +65,7 @@
           text-align: center;
         }
         td:nth-child(4) {
-          width: 40%;
+          width: 30%;
         }
       }
       table {
@@ -102,9 +109,14 @@
 
     .container-avatar {
       align-items: center;
+      .custom-control:first-of-type {
+        .avatar {
+          margin: 0
+        }
+      }
       .avatar {
         position: relative;
-        opacity: 0.4;
+        opacity: 0.5;
         cursor: pointer;
         &:hover {
           opacity: 1;
@@ -315,6 +327,70 @@
       tr {
         td:nth-child(n + 2) {
           text-align: center;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 991.98px) {
+  .container-loa {
+    .container-table {
+      overflow: hidden;
+      overflow-x: auto;
+      .table {
+        display: table;
+        overflow:auto;
+        min-width: 880px;
+        th, td {
+          //width: 25%;
+        }
+        tbody {
+          th {
+            width: 200px;
+          }
+          td {
+            width: 170px;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 599.98px) {
+  .container-loa {
+    &.loa-detail {
+    }
+    &.emendaloa-list {
+      .container-avatar {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr 1fr 1fr 1fr ;
+        grid-template-rows: auto;
+        grid-template-areas:
+          "div div div div div"
+          "div div div div div";
+        .custom-control {
+          text-align: center;
+        }
+        .avatar {
+          margin-left: 0px;
+        }
+        .avatar6 {
+          width: auto;
+          padding: 1em;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .container-loa {
+    &.emendaloa-list {
+      .container-avatar {
+        .avatar6 {
+          padding: 0.3em;
         }
       }
     }

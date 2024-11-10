@@ -1,8 +1,9 @@
 {% load i18n common_cmj_tags %}
-<table class="table table-form table-bordered table-hover w-100">
-  {% for lp in resumo_emendas_impositivas %}
+<div class="container-table">
+  <table class="table table-form table-bordered table-hover">
+    {% for lp in resumo_emendas_impositivas %}
     {% if forloop.first %}
-      <tbody>
+      <thead>
         <tr>
           <th rowspan=2>PARLAMENTARES</th>
           <th colspan={{columns.saude.num_columns}}>EMENDAS DESTINADAS À SAÚDE<br>
@@ -19,26 +20,22 @@
           {% if columns.diversos.impedimento_tecnico %}<th class="text-red">{{columns.diversos.impedimento_tecnico|safe}}</th>{% endif %}
           {% if columns.diversos.sem_destinacao %}<th class="text-orange">{{columns.diversos.sem_destinacao|safe}}</th>{% endif %}
         </tr>
-      </tbody>
+      </thead>
     {% endif %}
     <tr>
       <th class="text-left font-weight-bold">
-      <a href="{% url 'cmj.loa:emendaloa_list' lp.loaparlamentar.loa.id %}?parlamentares={{ lp.loaparlamentar.parlamentar.id }}">
-        {{lp.loaparlamentar.parlamentar}}
-      </a>
+        <a href="{% url 'cmj.loa:emendaloa_list' lp.loaparlamentar.loa.id %}?parlamentares={{ lp.loaparlamentar.parlamentar.id }}">
+          {{lp.loaparlamentar.parlamentar}}
+        </a>
       </th>
-
-
       {% if columns.saude.ja_destinado %}<td class="text-right text-blue">{{lp.10.ja_destinado|decimal2str}}</td>{% endif %}
       {% if columns.saude.impedimento_tecnico %}<td class="text-right text-red">{{lp.10.impedimento_tecnico|decimal2str}}</td>{% endif %}
       {% if columns.saude.sem_destinacao %}<td class="text-right text-orange">{{lp.10.sem_destinacao|decimal2str}}</td>{% endif %}
 
-
       {% if columns.diversos.ja_destinado %}<td class="text-right text-blue">{{lp.99.ja_destinado|decimal2str}}</td>{% endif %}
       {% if columns.diversos.impedimento_tecnico %}<td class="text-right text-red">{{lp.99.impedimento_tecnico|decimal2str}}</td>{% endif %}
       {% if columns.diversos.sem_destinacao %}<td class="text-right text-orange">{{lp.99.sem_destinacao|decimal2str}}</td>{% endif %}
-
-
     </tr>
-  {% endfor %}
-</table>
+    {% endfor %}
+  </table>
+</div>
