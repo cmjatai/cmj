@@ -189,7 +189,7 @@ class EmendaLoa(models.Model):
         blank=True, null=True, default=dict, encoder=DjangoJSONEncoder)
 
     tipo = models.PositiveSmallIntegerField(
-        choices=TIPOEMENDALOA_CHOICE, verbose_name=_('Área de aplicação'))
+        choices=TIPOEMENDALOA_CHOICE, default=99, verbose_name=_('Área de aplicação'))
 
     fase = models.PositiveSmallIntegerField(
         choices=FASE_CHOICE,
@@ -204,7 +204,7 @@ class EmendaLoa(models.Model):
         verbose_name=_('Unidade Orçamentária'),
         related_name='emendaloa_set',
         blank=True, null=True, default=None,
-        on_delete=CASCADE)
+        on_delete=PROTECT)
 
     finalidade = models.TextField(
         verbose_name=_("Finalidade"))
@@ -372,7 +372,7 @@ class OficioAjusteLoa(models.Model):
         Loa,
         verbose_name=_('Loa - Emendas Impositivas'),
         related_name='ajusteloa_set',
-        on_delete=CASCADE)
+        on_delete=PROTECT)
 
     epigrafe = models.CharField(
         max_length=100,
@@ -442,14 +442,14 @@ class RegistroAjusteLoa(models.Model):
         OficioAjusteLoa,
         verbose_name=_('Ofício de Ajuste Técnico'),
         related_name='registroajusteloa_set',
-        on_delete=CASCADE)
+        on_delete=PROTECT)
 
     emendaloa = models.ForeignKey(
         EmendaLoa,
         blank=True, null=True, default=None,
         verbose_name=_('Emenda Impositiva'),
         related_name='registroajusteloa_set',
-        on_delete=CASCADE)
+        on_delete=PROTECT)
 
     descricao = models.TextField(
         verbose_name=_("Descrição"))
@@ -495,13 +495,13 @@ class RegistroAjusteLoaParlamentar(models.Model):
         RegistroAjusteLoa,
         verbose_name=_('Registro de Ajuste'),
         related_name='registroajusteloaparlamentar_set',
-        on_delete=CASCADE)
+        on_delete=PROTECT)
 
     parlamentar = models.ForeignKey(
         Parlamentar,
         related_name='registroajusteloaparlamentar_set',
         verbose_name=_('Parlamentar'),
-        on_delete=CASCADE)
+        on_delete=PROTECT)
 
     valor = models.DecimalField(
         max_digits=14, decimal_places=2, default=Decimal('0.00'),
@@ -526,7 +526,7 @@ class ElementoBase(models.Model):
         Loa,
         verbose_name=_('Loa'),
         related_name='+',
-        on_delete=CASCADE)
+        on_delete=PROTECT)
 
     codigo = models.TextField(verbose_name=_("Código"))
 
@@ -828,7 +828,7 @@ class EmendaLoaRegistroContabil(models.Model):
         blank=True, null=True, default=None,
         related_name='registrocontabil_set',
         verbose_name=_('Despesa'),
-        on_delete=CASCADE)
+        on_delete=PROTECT)
 
     valor = models.DecimalField(
         max_digits=14, decimal_places=2, default=Decimal('0.00'),

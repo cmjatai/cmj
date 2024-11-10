@@ -41,8 +41,9 @@ services:
     networks:
       - cmj-net
     ports:
-      - "127.0.0.1:8080:8080"
-      # - "192.168.15.8:8080:8080"
+      - "8080:8080"
+      #- "127.0.0.1:8080:8080"
+      #- "192.168.15.8:8080:8080"
   cmj:
     build:
       context: ../
@@ -67,7 +68,7 @@ services:
       - cmjfront
       - cmjsolr
     ports:
-      - "127.0.0.1:9000:9000"
+      - "9000:9000"
     networks:
       - cmj-net
 networks:

@@ -61,9 +61,10 @@ ADD libreoffice_entrypoint.sh /opt/libreoffice/libreoffice_entrypoint.sh
 RUN chmod +x /opt/libreoffice/libreoffice_entrypoint.sh
 
 WORKDIR /var/cmjatai/cmj/
+WORKDIR /var/cmjatai/cmj/
 
 ADD requirements  /var/cmjatai/cmj_dev/requirements
-RUN pip install -r /var/cmjatai/cmj_dev/requirements/dev-requirements.txt
+RUN pip install -r /var/cmjatai/cmj_dev/requirements/requirements.txt
 USER cmj
 
 ENV DEBIAN_FRONTEND teletype
