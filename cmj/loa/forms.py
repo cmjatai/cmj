@@ -409,6 +409,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         queryset=Parlamentar.objects.all(),
         widget=forms.CheckboxSelectMultiple,
         label='Parlamentares que Assinarão',
+        required=False
     )
 
     # registrocontabil_set = forms.ModelChoiceField(
