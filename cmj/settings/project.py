@@ -67,7 +67,7 @@ USE_SOLR = True
 SOLR_URL = 'http://solr:solr@cmjsolr:8983'
 SOLR_COLLECTION = 'portalcmj_cmj'
 HAYSTACK_SIGNAL_PROCESSOR = 'cmj.haystack.CelerySignalProcessor'
-CELERY_HAYSTACK_DEFAULT_TASK = 'cmj.haystack.haystack_signal'
+CELERY_HAYSTACK_DEFAULT_TASK = 'celery_haystack.tasks.haystack_signal'
 
 REDIS_HOST = config('REDIS_HOST', cast=str, default='cmjredis')
 REDIS_PORT = config('REDIS_PORT', cast=int, default=6379)
