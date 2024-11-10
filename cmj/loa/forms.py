@@ -663,6 +663,9 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
                         raise ValidationError(
                             f'É obrigatório o preenchimento do valor ligado a seu Parlamentar: {p}.')
         else:
+            if not 'valor' in cleaned_data or not cleaned_data['valor'] or cleaned_data['valor'] <= Decimal('0.00'):
+                raise ValidationError(
+                    f'Em Emendas Modificativas você deve informar o Valor Global da Emenda.')
             if not 'parl_assinantes' in cleaned_data:
                 if not self.user.is_superuser and self.user.operadorautor_set.exists():
                     raise ValidationError(
