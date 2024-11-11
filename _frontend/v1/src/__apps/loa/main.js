@@ -622,15 +622,26 @@ window.AppLOA = function () {
           _.each(response.data, (value, idx) => {
             const inner_item = $('<div class="inner-item"></div>').appendTo(inner)
 
-            $(
-              `<div class="item-emendaloa" pk="${value.id}">
-              <strong>Valor da Emenda: R$ ${value.str_valor}</strong><br>
-              <strong>${value.indicacao}</strong><br>
-              <a href="${value.link_detail_backend}/edit" target="_blank">${value.finalidade}</a><br>
-              ${value.str_parlamentares.join('<br>')}
-              <span class="fase ${value.fase === 10 ? 'bg-danger' : value.fase === 12 ? 'bg-warning' : 'bg-green'}">${value.str_fase}</span>
+            let str_parlamentares = []
+            if (value.tipo === 0) {
+              _.each(value.str_parlamentares, (p, idx) => {
+                p = p.split(' - ')
+                str_parlamentares.push(p[1])
+              })
+            } else {
+              str_parlamentares = value.str_parlamentares
+            }
+            str_parlamentares = str_parlamentares.join('<br>')
+
+            let text_html = `<div class="item-emendaloa" pk="${value.id}">
+                Valor da Emenda ${value.tipo !== 0 ? 'Impositiva' : 'Modificativa'}: <strong>R$ ${value.str_valor}</strong><br>
+                <strong>${value.indicacao}</strong><br>
+                <a href="${value.link_detail_backend}/edit" target="_blank">${value.finalidade}</a><br>
+                <small>${str_parlamentares}</small><br>
+                <span class="fase ${value.fase === 10 ? 'bg-danger' : value.fase === 12 ? 'bg-warning' : 'bg-green'}">${value.str_fase}</span>
               </div>`
-            ).appendTo(inner_item)
+
+            $(text_html).appendTo(inner_item)
 
             const inner_actions = $('<div class="inner-actions"></div>').appendTo(inner_item)
             $(
@@ -685,11 +696,22 @@ window.AppLOA = function () {
             }
             const inner_item = $('<div class="inner-item"></div>').appendTo(inner)
 
+            let str_parlamentares = []
+            if (value.tipo === 0) {
+              _.each(value.str_parlamentares, (p, idx) => {
+                p = p.split(' - ')
+                str_parlamentares.push(p[1])
+              })
+            } else {
+              str_parlamentares = value.str_parlamentares
+            }
+            str_parlamentares = str_parlamentares.join('<br>')
+
             let text_html = `<div class="item-emendaloa" pk="${value.id}">
-                <strong>Valor da Emenda ${value.tipo !== '0' ? 'Impositiva' : 'Modificativa'}: R$ ${value.str_valor}</strong><br>
+                Valor da Emenda ${value.tipo !== 0 ? 'Impositiva' : 'Modificativa'}: <strong>R$ ${value.str_valor}</strong><br>
                 <strong>${value.indicacao}</strong><br>
                 <a href="${value.link_detail_backend}/edit" target="_blank">${value.finalidade}</a><br>
-                ${value.str_parlamentares.join('<br>')}<br>
+                <small>${str_parlamentares}</small><br>
                 <span class="fase ${value.fase === 10 ? 'bg-danger' : value.fase === 12 ? 'bg-warning' : 'bg-green'}">${value.str_fase}</span>
               </div>`
 
