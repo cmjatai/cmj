@@ -877,6 +877,15 @@ class Agrupamento(models.Model):
             'agrupamento',
             'emendaloa'))
 
+    despesas = models.ManyToManyField(
+        Despesa,
+        through='AgrupamentoRegistroContabil',
+        related_name='agrupamento_set',
+        verbose_name=_('Registro Contabeis Agrupamento'),
+        through_fields=(
+            'agrupamento',
+            'despesa'))
+
     class Meta:
         verbose_name = _('Agrupamento de Emenda Impositiva/Modificativas')
         verbose_name_plural = _(

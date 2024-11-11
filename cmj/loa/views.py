@@ -435,6 +435,16 @@ class AgrupamentoCrud(MasterDetailCrud):
         def get_success_url(self):
             return self.update_url
 
+    class ListView(MasterDetailCrud.ListView):
+        def hook_despesas(self, obj, ss, url):
+            str_regs = []
+            for rc in obj.agrupamentoregistrocontabil_set.order_by('-percentual'):
+                src = f'{rc.str_percentual}% - {rc.despesa}'
+                str_regs.append(src)
+            src = ''.join(map(lambda x: f'<li>{x}</li>', str_regs))
+
+            return f'<ul>{src}</ul>', ''
+
     class UpdateView(MasterDetailCrud.UpdateView):
         permission_required = ('loa.emendaloa_full_editor', )
         layout_key = None
@@ -745,7 +755,12 @@ class EmendaLoaCrud(MasterDetailCrud):
                     parlamentar = u.operadorautor_set.first().autor.autor_related
                     if isinstance(parlamentar, Parlamentar):
                         participa = self.object.emendaloaparlamentar_set.filter(
-                            parlamentar=parlamentar).exists()
+                            parlamentar=parlamentar,
+                            emendaloa__tipo__gt=0
+                        ).exists() or self.object.emendaloaparlamentar_set.filter(
+                            emendaloa__owner=u,
+                            emendaloa__tipo=0
+                        ).exists()
 
                 return (
                     u.has_perm('loa.emendaloa_full_editor') and

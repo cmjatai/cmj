@@ -80,6 +80,7 @@ Agrupamento:
   {% trans 'Agrupamento' %}:
   - nome
   - emendas
+  - despesas
 
 
 

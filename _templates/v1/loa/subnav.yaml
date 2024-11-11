@@ -1,7 +1,7 @@
 {% load i18n common_tags%}
 - title: {% trans 'Loa' %}
   url: loa_detail
-- title: {% trans 'Emendas Impositivas' %}
+- title: {% trans 'Emendas Impositivas/Modificativas' %}
   url: emendaloa_list
 - title: {% trans 'Ajustes Técnicos' %}
   url: oficioajusteloa_list
