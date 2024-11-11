@@ -403,6 +403,9 @@ window.AppLOA = function () {
         action = '/update_parlassinantes/'
         formData['parlamentar_id'] = value
         formData['checked'] = event.target.checked
+      } else if (field === 'valor') {
+        action = '/updatevaloremenda/'
+        formData['valor'] = value
       } else {
         formData[field] = value
       }
@@ -422,7 +425,7 @@ window.AppLOA = function () {
           preview.src = `${urlBase}/view/?page=1&u=${Date.now()}`
         })
         .catch((event) => {
-          // console.log(event)
+          console.log(event)
         })
     })
     form.trigger('change')
@@ -666,14 +669,15 @@ window.AppLOA = function () {
         busca_render_emendaloa.html('Digite ao menos três letras')
         return
       }
-      axios.get(`/api/loa/emendaloa/search/?&get_all=true&ano=${ano_loa}&q=${event.target.value}`)
+
+      let parts = event.target.value.trim().split(' ').filter((p) => p.length >= 3)
+
+      axios.get(`/api/loa/emendaloa/search/?&get_all=true&ano=${ano_loa}&q=${parts.join(' ')}`)
         .then((response) => {
           busca_render_emendaloa.html('')
           const inner = $('<div class="inner"></div>')
 
           inner.appendTo(busca_render_emendaloa)
-
-          let parts = event.target.value.trim().split(' ')
 
           _.each(response.data, (value, idx) => {
             if (emendaloa_selecteds.find(`.item-emendaloa[pk="${value.id}"]`).length > 0) {
@@ -682,7 +686,7 @@ window.AppLOA = function () {
             const inner_item = $('<div class="inner-item"></div>').appendTo(inner)
 
             let text_html = `<div class="item-emendaloa" pk="${value.id}">
-                <strong>Valor da Emenda: R$ ${value.str_valor}</strong><br>
+                <strong>Valor da Emenda ${value.tipo !== '0' ? 'Impositiva' : 'Modificativa'}: R$ ${value.str_valor}</strong><br>
                 <strong>${value.indicacao}</strong><br>
                 <a href="${value.link_detail_backend}/edit" target="_blank">${value.finalidade}</a><br>
                 ${value.str_parlamentares.join('<br>')}<br>

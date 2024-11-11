@@ -410,6 +410,34 @@ class EmendaLoaSearchSerializer(SaplSerializerMixin):
         return r
 
 
+class EmendaLoaSerializer(SaplSerializerMixin):
+
+    class Meta(SaplSerializerMixin.Meta):
+        model = EmendaLoa
+
+    def validate_valor(self, obj, *args, **kwargs):
+
+        obj = obj or ''
+
+        try:
+            if ',' in obj:
+                obj = Decimal(obj.replace('.', '').replace(',', '.'))
+            else:
+                obj = Decimal(obj)
+        except:
+            raise DRFValidationError(
+                _('O campo "Valor Global da Emenda" deve ser prenchido e '
+                  'seguir o formado 999.999.999,99. ')
+            )
+
+        if obj == Decimal('0.00'):
+            raise DRFValidationError(
+                _('O campo "Valor Global da Emenda" deve ser prenchido e '
+                  'seguir o formado 999.999.999,99. '))
+
+        return obj
+
+
 @customize(EmendaLoa)
 class _EmendaLoaViewSet:
 
@@ -498,6 +526,28 @@ class _EmendaLoaViewSet:
         return Response(serializer.data)
 
     @action(methods=['patch', ], detail=True)
+    def updatevaloremenda(self, request, *args, **kwargs):
+        #instance = self.get_object()
+
+        data = request.data
+        dvalor = data.pop('valor')
+        try:
+            if ',' in dvalor:
+                valor = Decimal(dvalor.replace('.', '').replace(',', '.'))
+            else:
+                valor = Decimal(dvalor)
+        except:
+            valor = Decimal('0.01')
+
+        el = EmendaLoa.objects.get(pk=kwargs['pk'])
+        el.valor = valor
+        el.save()
+        el.atualiza_valor()
+
+        serializer = self.get_serializer(el)
+        return Response(serializer.data)
+
+    @action(methods=['patch', ], detail=True)
     def updatevalorparlamentar(self, request, *args, **kwargs):
         #instance = self.get_object()
 
@@ -505,7 +555,10 @@ class _EmendaLoaViewSet:
         data['emendaloa_id'] = kwargs['pk']
         dvalor = data.pop('valor')
         try:
-            valor = Decimal(dvalor.replace('.', '').replace(',', '.'))
+            if ',' in dvalor:
+                valor = Decimal(dvalor.replace('.', '').replace(',', '.'))
+            else:
+                valor = Decimal(dvalor)
         except:
             valor = Decimal('0.00')
 
@@ -528,7 +581,7 @@ class _EmendaLoaViewSet:
         if not elp.valor:
             elp.delete()
 
-        el.atualiza_valor().save()
+        el.atualiza_valor()
 
         serializer = self.get_serializer(el)
 
@@ -776,9 +829,12 @@ class EmendaLoaRegistroContabilSerializer(SaplSerializerMixin):
     def validate_valor(self, obj, *args, **kwargs):
 
         obj = obj or ''
-        obj = obj.replace('.', '').replace(',', '.')
+
         try:
-            obj = Decimal(obj)
+            if ',' in obj:
+                obj = Decimal(obj.replace('.', '').replace(',', '.'))
+            else:
+                obj = Decimal(obj)
         except:
             raise DRFValidationError(
                 _('O campo "Valor da Despesa" deve ser prenchido e '
@@ -1046,9 +1102,12 @@ class AgrupamentoRegistroContabilSerializer(SaplSerializerMixin):
     def validate_percentual(self, obj, *args, **kwargs):
 
         obj = obj or ''
-        obj = obj.replace('.', '').replace(',', '.')
+
         try:
-            obj = Decimal(obj)
+            if ',' in obj:
+                obj = Decimal(obj.replace('.', '').replace(',', '.'))
+            else:
+                obj = Decimal(obj)
         except:
             raise DRFValidationError(
                 _('O campo "Perc da Despesa" deve ser prenchido e '
