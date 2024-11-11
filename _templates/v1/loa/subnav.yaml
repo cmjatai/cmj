@@ -9,3 +9,7 @@
 - title: {% trans 'Agrupamentos' %}
   url: agrupamento_list
 {% endif %}
+{% if perms.loa.unidadeorcamentaria_list %}
+- title: {% trans 'Unidades Orçamentárias' %}
+  url: unidadeorcamentaria_list
+{% endif %}

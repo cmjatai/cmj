@@ -18,7 +18,7 @@ from cmj.loa.forms import LoaForm, EmendaLoaForm, OficioAjusteLoaForm,\
     RegistroAjusteLoaForm, EmendaLoaFilterSet, AgrupamentoForm
 from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa,\
     RegistroAjusteLoa, RegistroAjusteLoaParlamentar, EmendaLoaRegistroContabil,\
-    Agrupamento
+    Agrupamento, UnidadeOrcamentaria
 from sapl.crud.base import Crud, MasterDetailCrud, RP_DETAIL, RP_LIST
 from sapl.parlamentares.models import Parlamentar
 
@@ -384,6 +384,11 @@ class LoaCrud(Crud):
             rendered = template.render(context, self.request)
 
             return 'Resumo Geral das Emendas Impositivas Parlamentares', rendered
+
+
+class UnidadeOrcamentariaCrud(MasterDetailCrud):
+    model = UnidadeOrcamentaria
+    parent_field = 'loa'
 
 
 class AgrupamentoCrud(MasterDetailCrud):

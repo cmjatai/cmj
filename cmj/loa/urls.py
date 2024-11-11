@@ -1,7 +1,7 @@
 from django.urls.conf import re_path, include
 
 from cmj.loa.views import LoaCrud, EmendaLoaCrud, OficioAjusteLoaCrud,\
-    RegistroAjusteLoaCrud, AgrupamentoCrud
+    RegistroAjusteLoaCrud, AgrupamentoCrud, UnidadeOrcamentariaCrud
 
 from .apps import AppConfig
 
@@ -17,7 +17,8 @@ urlpatterns = [
             EmendaLoaCrud.get_urls() +
             OficioAjusteLoaCrud.get_urls() +
             RegistroAjusteLoaCrud.get_urls() +
-            AgrupamentoCrud.get_urls()
+            AgrupamentoCrud.get_urls() +
+            UnidadeOrcamentariaCrud.get_urls()
         )
     ),
 ]

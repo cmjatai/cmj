@@ -14,6 +14,11 @@ LoaDetailATE2022:
   {% trans 'Dados Gerais da LOA' %}:
   - ano:3 materia_ou_norma
 
+UnidadeOrcamentaria:
+  {% trans 'Dados Gerais' %}:
+  - codigo:4 especificacao:8
+  - orgao:7 recebe_emenda_impositiva
+
 EmendaLoa:
   {% trans 'Dados Gerais' %}:
   - tipo:2 fase:3 tipo_materia:3 numero_materia:2 ano_materia:2 materia:0

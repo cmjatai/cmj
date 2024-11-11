@@ -324,7 +324,8 @@ window.AppLOA = function () {
                 Val.Orç.: ${value.str_valor} | Saldo: ${value.str_saldo}`
 
             _.each(parts, (p, idx) => {
-              text_html = text_html.replaceAll(p.toUpperCase(), `<strong class="text-blue">${p.toUpperCase()}</strong>`)
+              const re = new RegExp(`(${p})`, 'ig')
+              text_html = text_html.replace(re, '<strong class="highlight">$1</strong>')
             })
             let html = `<div class="small item" pk="${value.id}">
                 ${text_html}
@@ -575,7 +576,8 @@ window.AppLOA = function () {
                 Val.Orç.: ${value.str_valor} | Saldo: ${value.str_saldo}`
 
             _.each(parts, (p, idx) => {
-              text_html = text_html.replaceAll(p.toUpperCase(), `<strong class="text-blue">${p.toUpperCase()}</strong>`)
+              const re = new RegExp(`(${p})`, 'ig')
+              text_html = text_html.replace(re, '<strong class="highlight">$1</strong>')
             })
             let html = `<div class="small item" pk="${value.id}">
                 ${text_html}
@@ -619,7 +621,7 @@ window.AppLOA = function () {
 
             $(
               `<div class="item-emendaloa" pk="${value.id}">
-              <strong>Valor da Emenda Impositiva: R$ ${value.str_valor}</strong><br>
+              <strong>Valor da Emenda: R$ ${value.str_valor}</strong><br>
               <strong>${value.indicacao}</strong><br>
               <a href="${value.link_detail_backend}/edit" target="_blank">${value.finalidade}</a><br>
               ${value.str_parlamentares.join('<br>')}
@@ -671,19 +673,28 @@ window.AppLOA = function () {
 
           inner.appendTo(busca_render_emendaloa)
 
+          let parts = event.target.value.trim().split(' ')
+
           _.each(response.data, (value, idx) => {
             if (emendaloa_selecteds.find(`.item-emendaloa[pk="${value.id}"]`).length > 0) {
               return
             }
             const inner_item = $('<div class="inner-item"></div>').appendTo(inner)
 
-            $(`<div class="item-emendaloa" pk="${value.id}">
-                <strong>Valor da Emenda Impositiva: R$ ${value.str_valor}</strong><br>
+            let text_html = `<div class="item-emendaloa" pk="${value.id}">
+                <strong>Valor da Emenda: R$ ${value.str_valor}</strong><br>
                 <strong>${value.indicacao}</strong><br>
                 <a href="${value.link_detail_backend}/edit" target="_blank">${value.finalidade}</a><br>
                 ${value.str_parlamentares.join('<br>')}<br>
                 <span class="fase ${value.fase === 10 ? 'bg-danger' : value.fase === 12 ? 'bg-warning' : 'bg-green'}">${value.str_fase}</span>
-              </div>`).appendTo(inner_item)
+              </div>`
+
+            _.each(parts, (p, idx) => {
+              const re = new RegExp(`(${p})`, 'ig')
+              text_html = text_html.replace(re, '<strong class="highlight">$1</strong>')
+            })
+
+            $(text_html).appendTo(inner_item)
 
             if (value.fase === 10) {
               return

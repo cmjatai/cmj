@@ -333,8 +333,8 @@ class AgrupamentoForm(ModelForm):
         ])
 
         row5 = to_row([
-            (Fieldset(_('Busca por Emendas Impositivas'), row5_1), 5),
-            (Fieldset(_('Emendas Impositivas Selecionadas'), row5_2), 7)
+            (Fieldset(_('Busca por Emendas '), row5_1), 5),
+            (Fieldset(_('Emendas Selecionadas'), row5_2), 7)
         ])
 
         super().__init__(*args, **kwargs)

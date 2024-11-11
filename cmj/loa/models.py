@@ -563,7 +563,7 @@ class UnidadeOrcamentaria(ElementoBase):
 
     recebe_emenda_impositiva = models.BooleanField(
         default=False,
-        verbose_name=_('Elegível'),
+        verbose_name=_('Recebe Verbas Emenda Impositiva'),
     )
 
     class Meta:
@@ -872,14 +872,15 @@ class Agrupamento(models.Model):
         EmendaLoa,
         through='AgrupamentoEmendaLoa',
         related_name='agrupamento_set',
-        verbose_name=_('Emendas Impositivas'),
+        verbose_name=_('Emendas Impositivas/Modificativas'),
         through_fields=(
             'agrupamento',
             'emendaloa'))
 
     class Meta:
-        verbose_name = _('Agrupamento de Emenda Impositiva')
-        verbose_name_plural = _('Agrupamentos de Emendas Impositivas')
+        verbose_name = _('Agrupamento de Emenda Impositiva/Modificativas')
+        verbose_name_plural = _(
+            'Agrupamentos de Emendas Impositivas/Modificativas')
         ordering = ['id']
 
     def __str__(self):
