@@ -407,7 +407,7 @@ def customize_link_materia(context, pk, has_permission, user=None):
 
                 if has_permission:
                     if obj.tipo_votacao == LEITURA:
-                        btn_abrir = f'''
+                        btns_abrir = f'''
                                 Matéria não lida<br />
                                 <a href="{url}"
                                 class="btn btn-primary"
