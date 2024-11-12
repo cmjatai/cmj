@@ -282,6 +282,7 @@ class EmendaLoa(models.Model):
         if self.tipo:
             soma_dict = self.emendaloaparlamentar_set.aggregate(Sum('valor'))
             self.valor = soma_dict['valor__sum'] or Decimal('0.00')
+            self.save()
         else:
             qspa = self.emendaloaparlamentar_set.all()
             valores = [quantize(self.valor / qspa.count())] * qspa.count()
