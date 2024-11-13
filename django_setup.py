@@ -1,5 +1,5 @@
-import os
 from pathlib import Path
+import os
 import sys
 
 import django
@@ -22,3 +22,6 @@ def django_setup() -> None:
 
     # This is for setting up django
     django.setup()
+
+
+django_setup()

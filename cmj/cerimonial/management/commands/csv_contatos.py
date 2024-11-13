@@ -11,8 +11,8 @@ from cmj.core.models import AreaTrabalho
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-
-        p = 'Mauro Bento Filho'
+        return
+        p = ''
         at = AreaTrabalho.objects.filter(nome__icontains=p).first()
 
         with open('/home/leandro/TEMP/AT-{}.csv'.format(p), 'w', newline='', encoding='utf-8') as cf:

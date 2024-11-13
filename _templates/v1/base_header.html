@@ -31,20 +31,21 @@
         </div>
 
         {% cache 300 cache_transmissao_ao_vivo %}
-        <div>
-          {% if ""|transmissao_ao_vivo %}
-          <a class="btn bg-danger text-white p-0 px-1" href="/tv-cmj/ao-vivo">
-              <i class="fas fa-tv"></i> AoVivo
-          </a>
-          {% comment %}
-            {% else %}
-            <a class="btn bg-danger text-white p-0 px-1" href="/galerias/videos">
-              <i class="fas fa-tv"></i>TvCMJ
+          <div>
+            {% if ""|transmissao_ao_vivo %}
+            <a class="btn bg-danger text-white p-0 px-1" href="/tv-cmj/ao-vivo">
+                <i class="fas fa-tv"></i> AoVivo
             </a>
-          {% endcomment %}
-          {% endif %}
-        </div>
+            {% comment %}
+              {% else %}
+              <a class="btn bg-danger text-white p-0 px-1" href="/galerias/videos">
+                <i class="fas fa-tv"></i>TvCMJ
+              </a>
+            {% endcomment %}
+            {% endif %}
+          </div>
         {% endcache %}
+
 
       </div>
 
@@ -60,7 +61,8 @@
         <div class="d-flex w-100 flex-column justify-content-end">
 
 
-          <div class="row-1 d-flex justify-content-end align-items-center  container-notificacoes">
+          <div class="row-1 container-notificacoes">
+
             {% notificacoes_unread %}
             {% block social_links %}
               <div class="navbar-social-links justify-content-end">
@@ -114,6 +116,7 @@
               {% endif %}
           </div>
           <div class="row-2 d-flex justify-content-end">
+
             {% if request.path != '/arqadmin/pesquisa/' %}
               <form class="form-search" method="get" action="{% url 'cmj.search:haystack_search'%}">
                 <div class="inner">
@@ -154,13 +157,10 @@
                       <li class="text-right"><a href="http://gestaopublica.camara.jatai.bsit-br.com.br">{% trans "Gestão Pública" %}</a></li>
                     </ul>
                   </li>
-
                 </li>
             </ul>
           {% endif %}
-
         </div>
-
       </div>
     </div>
 </nav>

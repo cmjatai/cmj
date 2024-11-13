@@ -253,9 +253,54 @@
     }
   }
 
+  .row-1 {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+
+  }
+
   .row-2 {
     margin: 7px 0 20px 0;
     align-items: stretch;
+
+    .icon_selo_atricon {
+      $size_selo: 5.5em;
+      display: flex;
+      position: relative;
+      width: $size_selo - 0.5em;
+      height: 100%;
+      opacity: 0.5;
+      transition: all 1s ease-in-out;
+      &::after {
+        content: " ";
+        transition: all 1s ease-in-out;
+        // background-color: white;
+        position: absolute;
+        background-repeat: no-repeat;
+        background-size: $size_selo $size_selo;
+        background-position: 0em 0em;
+        background-image: url(~@/assets/img/icon_transparencia_prata.png);
+
+        top: -0.5em;
+        right: -0.9em;
+        width: $size_selo;
+        height: $size_selo;
+        z-index: 1;
+      }
+      &:hover {
+        opacity: 1;
+        transition: all 1s ease-in-out;
+        &::after {
+          top: -1.8em;
+          $size_selo: 15em;
+          width: $size_selo;
+          height: $size_selo;
+          background-size: $size_selo $size_selo;
+        }
+      }
+    }
   }
 
   .navbar-collapse {
@@ -318,6 +363,7 @@
       }
     }
   }
+
 }
 
 #portallogo {
