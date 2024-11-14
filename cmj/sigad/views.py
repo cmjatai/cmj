@@ -1,10 +1,9 @@
 from datetime import timedelta
-import io
 from operator import attrgetter
+import io
 import zipfile
 
 from braces.views import FormMessagesMixin
-import dateutil.parser
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models import F, Q
@@ -22,6 +21,7 @@ from django.views.generic.list import ListView, MultipleObjectMixin
 from haystack.forms import model_choices
 from haystack.query import SearchQuerySet
 from haystack.utils.app_loading import haystack_get_models
+import dateutil.parser
 
 from cmj import globalrules
 from cmj.core.models import AreaTrabalho, CertidaoPublicacao
@@ -807,8 +807,8 @@ class PathParlamentarView(PathView):
             context = TemplateView.get_context_data(self, **kwargs)
             context['object'] = self.classe
 
-            legislatura_ativa = int(self.request.GET.get('l', '0'))
-            sl_ativa = int(self.request.GET.get('sl', '0'))
+            legislatura_selecionada = int(self.request.GET.get('l', '0'))
+            sl_selecionada = int(self.request.GET.get('sl', '0'))
             # parlamentar_ativo = int(self.request.GET.get('p', '0'))
 
             legs = Legislatura.objects
@@ -818,17 +818,17 @@ class PathParlamentarView(PathView):
             #    context['parlamentar_ativo'] = pms.get(pk=parlamentar_ativo)
 
             legislaturas = []
-            context['legislatura_ativa'] = 0
-            context['sessaolegislativa_ativa'] = 0
+            context['legislatura_selecionada'] = legislatura_selecionada
+            context['sessaolegislativa_selecionada'] = sl_selecionada
             for l in legs.all():
 
                 # if l.numero < 17:
                 #    continue
                 l_atual = l.atual()
 
-                if not legislatura_ativa and l.atual() or \
-                        l.pk == legislatura_ativa:
-                    context['legislatura_ativa'] = l
+                if not context['legislatura_selecionada'] and l.atual() \
+                        or l.pk == context['legislatura_selecionada']:
+                    context['legislatura_selecionada'] = l
 
                 leg = {
                     'legislatura': l,
@@ -836,16 +836,22 @@ class PathParlamentarView(PathView):
                     'parlamentares': []
                 }
 
-                fs = l.sessaolegislativa_set.first()
-                for s in l.sessaolegislativa_set.all():
+                sl_atual = list(filter(lambda y: 'Atual' in y[1],
+                                       map(lambda x: (x.id, str(x)), l.sessaolegislativa_set.all())))
 
-                    if s.pk == sl_ativa or not sl_ativa and s == fs and \
-                            s.legislatura == context['legislatura_ativa']:
-                        context['sessaolegislativa_ativa'] = s
-                        if s.pk == sl_ativa:
-                            context['legislatura_ativa'] = l
+                if sl_atual:
+                    fs = l.sessaolegislativa_set.get(pk=sl_atual[0][0])
+                else:
+                    fs = l.sessaolegislativa_set.order_by('numero').first()
+                for s in l.sessaolegislativa_set.order_by('numero').all():
 
-                    # if s.legislatura != context['legislatura_ativa']:
+                    if s.pk == sl_selecionada or \
+                            not sl_selecionada and s == fs and s.legislatura == context['legislatura_selecionada']:
+                        context['sessaolegislativa_selecionada'] = s
+                        if s.pk == sl_selecionada:
+                            context['legislatura_selecionada'] = l
+
+                    # if s.legislatura != context['legislatura_selecionada']:
                     #    continue
 
                     sessao = {
@@ -853,7 +859,7 @@ class PathParlamentarView(PathView):
                         'comissoes': []
                     }
 
-                    if s == context['sessaolegislativa_ativa']:
+                    if s == context['sessaolegislativa_selecionada']:
                         sessao.update({
                             'mesa': [
                                 p for p in pms.filter(
@@ -946,7 +952,7 @@ class PathParlamentarView(PathView):
 
                     leg['sessoes'].append(sessao)
 
-                if not leg['sessoes'] and l == context['legislatura_ativa']:
+                if not leg['sessoes'] and l == context['legislatura_selecionada']:
                     for p in pms.filter(mandato__legislatura=l):
                         leg['parlamentares'].append(p)
 
