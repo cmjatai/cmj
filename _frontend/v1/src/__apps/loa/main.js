@@ -45,7 +45,7 @@ window.AppLOA = function () {
       const lsJson = localStorage.getItem('portalcmj_emendaloa_filter')
       const lsData = JSON.parse(lsJson)
 
-      if (lsJson !== null && lsJson !== '{"finalidade":""}') {
+      if (lsJson !== null && lsJson !== '{"finalidade":""}' && lsJson !== '{"fase":[],"parlamentares":[],"tipo":[]}') {
         _.forOwn(lsData, (value, key) => {
           _.forEach(form.find(`input[name="${key}"]`), (item) => {
             if ((Array.isArray(value) && value.includes(item.value)) || value === item.value) {
