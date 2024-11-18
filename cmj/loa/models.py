@@ -899,12 +899,12 @@ class Agrupamento(models.Model):
     def sync(self):
         registros = self.agrupamentoregistrocontabil_set.all()
 
-        deducoes = []
-        insercoes = []
-        soma_zero = Decimal('0.00')
         for emenda in self.emendas.all():
             emenda.registrocontabil_set.all().delete()
 
+            deducoes = []
+            insercoes = []
+            soma_zero = Decimal('0.00')
             for r in registros:
                 elrc = EmendaLoaRegistroContabil()
                 elrc.emendaloa = emenda
