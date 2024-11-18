@@ -169,7 +169,8 @@ class EmendaLoa(models.Model):
     PROPOSTA_LIBERADA = 12
     EDICAO_CONTABIL = 15
     LIBERACAO_CONTABIL = 17
-    APROVACAO_LEGISLATIVA = 20
+    EM_TRAMITACAO = 20
+    APROVACAO_LEGISLATIVA = 25
     APROVACAO_LEGAL = 30
     IMPEDIMENTO_TECNICO = 40
     IMPEDIMENTO_OFICIADO = 50
@@ -178,6 +179,7 @@ class EmendaLoa(models.Model):
         (PROPOSTA_LIBERADA, _('Proposta Liberada para Edição Contábil')),
         (EDICAO_CONTABIL, _('Em edição pela Contabilidade')),
         (LIBERACAO_CONTABIL, _('Liberado pela Contabilidade')),
+        (EM_TRAMITACAO, _('Em Tramitação')),
         (APROVACAO_LEGISLATIVA, _('Aprovada no Processo Legislativo')),
         (APROVACAO_LEGAL, _('Aprovada')),
         (IMPEDIMENTO_TECNICO, _('Impedimento Técnico')),

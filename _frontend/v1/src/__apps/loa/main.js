@@ -231,6 +231,7 @@ window.AppLOA = function () {
                     form.trigger('change')
                     event.target.closest('.item-rc').remove()
                     refreshChangeRegistroDespesa()
+                    preview.src = `${urlBase}/view/?page=1&u=${Date.now()}`
                   })
               })
           })

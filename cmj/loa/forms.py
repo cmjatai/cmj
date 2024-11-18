@@ -580,11 +580,11 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
             if self.creating or self.instance.pk and self.instance.fase != EmendaLoa.LIBERACAO_CONTABIL:
                 self.fields['fase'].choices = EmendaLoa.FASE_CHOICE[:1 if self.creating else 2]
 
-            if full_editor and self.instance.pk and self.instance.fase < EmendaLoa.APROVACAO_LEGISLATIVA:
+            if full_editor and self.instance.pk and self.instance.fase < EmendaLoa.EM_TRAMITACAO:
                 self.fields['fase'].widget.attrs['class'] = 'is-invalid'
                 self.fields['fase'].choices = EmendaLoa.FASE_CHOICE[:4]
 
-            if self.instance.pk and self.instance.fase >= EmendaLoa.APROVACAO_LEGISLATIVA:
+            if self.instance.pk and self.instance.fase >= EmendaLoa.EM_TRAMITACAO:
                 self.fields['fase'].choices = EmendaLoa.FASE_CHOICE
 
             # self.fields['valor'].widget.attrs['disabled'] = 'disabled'
@@ -966,7 +966,7 @@ class EmendaLoaFilterSet(FilterSet):
         )
 
         if self.loa.materia and self.loa.materia.normajuridica():
-            self.form.fields['fase'].choices = EmendaLoa.FASE_CHOICE[4:]
+            self.form.fields['fase'].choices = EmendaLoa.FASE_CHOICE[5:]
         else:
-            self.form.fields['fase'].choices = EmendaLoa.FASE_CHOICE[:4]
+            self.form.fields['fase'].choices = EmendaLoa.FASE_CHOICE[:5]
         self.form.fields['tipo'].choices = EmendaLoa.TIPOEMENDALOA_CHOICE
