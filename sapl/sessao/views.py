@@ -1154,7 +1154,7 @@ class SessaoCrud(Crud):
             return {'sessao_legislativa': self.object.sessao_legislativa}
 
     class CreateView(Crud.CreateView):
-
+        layout_key = 'SessaoPlenariaCreate'
         form_class = SessaoPlenariaForm
         logger = logging.getLogger(__name__)
 
@@ -1163,7 +1163,9 @@ class SessaoCrud(Crud):
             return self.search_url
 
         def get_initial(self):
-            legislatura = Legislatura.objects.order_by('-data_inicio').first()
+            legislatura = Legislatura.objects.filter(
+                data_inicio__lte=timezone.localdate()
+            ).order_by('-data_inicio').first()
 
             if legislatura:
                 return {

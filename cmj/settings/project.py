@@ -60,6 +60,7 @@ DATABASES = {
 PORTALCMJ_VERSION = 'master'
 
 SITE_URL = 'https://www.jatai.go.leg.br'
+# https, colocar no nginx-> proxy_set_header X-Forwarded-Proto $scheme;
 # if DEBUG:
 #    SITE_URL = ''
 

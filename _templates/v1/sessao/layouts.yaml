@@ -12,6 +12,15 @@ SessaoPlenaria:
   - url_video
   - url_audio
 
+SessaoPlenariaCreate:
+  {% trans 'Dados Básicos' %}:
+  - legislatura sessao_legislativa tipo numero:2
+  - data_inicio:5 hora_inicio:5 iniciada
+  - data_fim:5 hora_fim:5 finalizada
+  - upload_pauta:4 upload_ata:4 upload_anexo:4
+  - url_video
+  - url_audio
+
 SessaoPlenariaSessaoEdit:
   {% trans 'Dados Básicos' %}:
   - legislatura  sessao_legislativa tipo:3  numero:1
