@@ -179,7 +179,7 @@ class EmendaLoa(models.Model):
         (PROPOSTA_LIBERADA, _('Proposta Liberada para Edição Contábil')),
         (EDICAO_CONTABIL, _('Em edição pela Contabilidade')),
         (LIBERACAO_CONTABIL, _('Liberado pela Contabilidade')),
-        (EM_TRAMITACAO, _('Em Tramitação')),
+        (EM_TRAMITACAO, _('Matéria protocolada, em tramitação')),
         (APROVACAO_LEGISLATIVA, _('Aprovada no Processo Legislativo')),
         (APROVACAO_LEGAL, _('Aprovada')),
         (IMPEDIMENTO_TECNICO, _('Impedimento Técnico')),
