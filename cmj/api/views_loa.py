@@ -417,13 +417,16 @@ class EmendaLoaSerializer(SaplSerializerMixin):
 
     def validate_valor(self, obj, *args, **kwargs):
 
-        obj = obj or ''
+        obj = obj or '0.00'
 
         try:
-            if ',' in obj:
-                obj = Decimal(obj.replace('.', '').replace(',', '.'))
-            else:
-                obj = Decimal(obj)
+            if obj and '.' in obj and ',' in obj:
+                if obj.rindex(',') > obj.rindex('.'):
+                    obj = obj.replace('.', '').replace(',', '.')
+                else:
+                    obj = obj.replace(',', '')
+
+            obj = Decimal(obj)
         except:
             raise DRFValidationError(
                 _('O campo "Valor Global da Emenda" deve ser prenchido e '
@@ -530,17 +533,20 @@ class _EmendaLoaViewSet:
         #instance = self.get_object()
 
         data = request.data
-        dvalor = data.pop('valor')
+        obj = data.pop('valor')
         try:
-            if ',' in dvalor:
-                valor = Decimal(dvalor.replace('.', '').replace(',', '.'))
-            else:
-                valor = Decimal(dvalor)
+            if obj and '.' in obj and ',' in obj:
+                if obj.rindex(',') > obj.rindex('.'):
+                    obj = obj.replace('.', '').replace(',', '.')
+                else:
+                    obj = obj.replace(',', '')
+
+            obj = Decimal(obj)
         except:
-            valor = Decimal('0.01')
+            obj = Decimal('0.01')
 
         el = EmendaLoa.objects.get(pk=kwargs['pk'])
-        el.valor = valor
+        el.valor = obj
         el.save()
         el.atualiza_valor()
 
@@ -553,20 +559,23 @@ class _EmendaLoaViewSet:
 
         data = request.data
         data['emendaloa_id'] = kwargs['pk']
-        dvalor = data.pop('valor')
+        obj = data.pop('valor')
         try:
-            if ',' in dvalor:
-                valor = Decimal(dvalor.replace('.', '').replace(',', '.'))
-            else:
-                valor = Decimal(dvalor)
+            if obj and '.' in obj and ',' in obj:
+                if obj.rindex(',') > obj.rindex('.'):
+                    obj = obj.replace('.', '').replace(',', '.')
+                else:
+                    obj = obj.replace(',', '')
+
+            obj = Decimal(obj)
         except:
-            valor = Decimal('0.00')
+            obj = Decimal('0.00')
 
         u = request.user
         if not u.is_superuser and u.operadorautor_set.exists():
             p = u.operadorautor_set.first().autor.autor_related
 
-            if p.id == int(data['parlamentar_id']) and valor <= Decimal('0.00'):
+            if p.id == int(data['parlamentar_id']) and obj <= Decimal('0.00'):
                 raise DRFValidationError(
                     'Você não pode zerar o Valor do Parlamentar '
                     'ao qual seu usuário está ligado. '
@@ -574,7 +583,7 @@ class _EmendaLoaViewSet:
                     'clicando em excluir na tela de consulta.')
 
         elp, created = EmendaLoaParlamentar.objects.get_or_create(**data)
-        elp.valor = valor
+        elp.valor = obj
         elp.save()
         el = elp.emendaloa
 
@@ -828,13 +837,16 @@ class EmendaLoaRegistroContabilSerializer(SaplSerializerMixin):
 
     def validate_valor(self, obj, *args, **kwargs):
 
-        obj = obj or ''
+        obj = obj or '0.00'
 
         try:
-            if ',' in obj:
-                obj = Decimal(obj.replace('.', '').replace(',', '.'))
-            else:
-                obj = Decimal(obj)
+            if obj and '.' in obj and ',' in obj:
+                if obj.rindex(',') > obj.rindex('.'):
+                    obj = obj.replace('.', '').replace(',', '.')
+                else:
+                    obj = obj.replace(',', '')
+
+            obj = Decimal(obj)
         except:
             raise DRFValidationError(
                 _('O campo "Valor da Despesa" deve ser prenchido e '
@@ -1101,13 +1113,16 @@ class AgrupamentoRegistroContabilSerializer(SaplSerializerMixin):
 
     def validate_percentual(self, obj, *args, **kwargs):
 
-        obj = obj or ''
+        obj = obj or '0.00'
 
         try:
-            if ',' in obj:
-                obj = Decimal(obj.replace('.', '').replace(',', '.'))
-            else:
-                obj = Decimal(obj)
+            if obj and '.' in obj and ',' in obj:
+                if obj.rindex(',') > obj.rindex('.'):
+                    obj = obj.replace('.', '').replace(',', '.')
+                else:
+                    obj = obj.replace(',', '')
+
+            obj = Decimal(obj)
         except:
             raise DRFValidationError(
                 _('O campo "Perc da Despesa" deve ser prenchido e '

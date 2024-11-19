@@ -51,8 +51,12 @@ class DecimalField(forms.DecimalField):
     widget = DecimalInput
 
     def to_python(self, value):
-        if value:
-            value = value.replace('.', '').replace(',', '.')
+        if value and '.' in value and ',' in value:
+            if value.rindex(',') > value.rindex('.'):
+                value = value.replace('.', '').replace(',', '.')
+            else:
+                value = value.replace(',', '')
+
         value = forms.DecimalField.to_python(self, value)
         return value
 
