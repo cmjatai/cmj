@@ -23,13 +23,13 @@ from django.utils.encoding import force_str
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
-import django_filters
 from django_filters.filters import ModelMultipleChoiceFilter
 from django_filters.widgets import CSVWidget
+import django_filters
 
+from cmj.loa.models import EmendaLoa
 from cmj.mixins import GoogleRecapthaMixin
 from cmj.utils import CHOICE_SIGNEDS, AlertSafe
-import sapl
 from sapl.base.models import AppConfig, Autor, TipoAutor
 from sapl.comissoes.models import Comissao, Participacao, Composicao
 from sapl.compilacao.models import (STATUS_TA_IMMUTABLE_PUBLIC,
@@ -53,6 +53,7 @@ from sapl.utils import (YES_NO_CHOICES, SEPARADOR_HASH_PROPOSICAO,
                         models_with_gr_for_model, qs_override_django_filter,
                         choice_anos_com_materias, FilterOverridesMetaMixin, FileFieldCheckMixin,
                         lista_anexados)
+import sapl
 
 from .models import (AcompanhamentoMateria, Anexada, Autoria, DespachoInicial,
                      DocumentoAcessorio, Numeracao, Proposicao, Relatoria,
@@ -554,9 +555,9 @@ class DocumentoAcessorioProtocoloForm(FileFieldCheckMixin, ModelForm):
             Fieldset(_('Vincular a Matéria Legislativa'), row0,
                      to_column(
                 (AlertSafe('<strong></strong><br><span></span>',
-                       css_class="ementa_materia hidden alert-info",
+                           css_class="ementa_materia hidden alert-info",
 
-                       dismiss=False), 12)))
+                           dismiss=False), 12)))
         )
 
         self.helper = SaplFormHelper()
@@ -1315,7 +1316,7 @@ class MateriaLegislativaFilterSet(django_filters.FilterSet):
         #        ('numeracao__numero_materia', 3),
         #        ('numero_protocolo', 3),
         #    ]
-        #)
+        # )
 
         row3 = to_row(
             [('data_apresentacao', 6),
@@ -2594,6 +2595,15 @@ class ConfirmarProposicaoForm(ProposicaoForm):
     numero_de_paginas = forms.IntegerField(required=False, min_value=0,
                                            label=_('Número de Páginas'),)
 
+    emendaloa = forms.ModelChoiceField(
+        label="Vincular a um Registro de Emenda da LOA",
+        required=False, queryset=EmendaLoa.objects.all())
+
+    observacao = forms.CharField(
+        label='Observação',
+        required=False
+    )
+
     class Meta:
         model = Proposicao
         fields = [
@@ -2632,7 +2642,7 @@ class ConfirmarProposicaoForm(ProposicaoForm):
                 self._meta.fields.append('numero_de_paginas')
 
         self.instance = kwargs.get('instance', None)
-        if not self.instance:
+        if not self.instance or not self.instance.pk:
             self.logger.error("Erro na Busca por proposição a incorporar")
             raise ValueError(_('Erro na Busca por proposição a incorporar'))
 
@@ -2670,7 +2680,8 @@ class ConfirmarProposicaoForm(ProposicaoForm):
                             ), 12
                         ),
                         ('descricao', 12),
-                        ('observacao', 12)
+                        ('emendaloa', 6),
+                        ('observacao', 6)
                     ]
                 ),
             )
@@ -2776,6 +2787,12 @@ class ConfirmarProposicaoForm(ProposicaoForm):
 
         if self.proposicao_incorporacao_obrigatoria == 'C':
             self.fields['gerar_protocolo'].initial = True
+
+        self.fields['emendaloa'].choices = [('', '---------')]+[
+            (e.id, str(e)) for e in EmendaLoa.objects.filter(
+                fase=17, owner__in=self.instance.autor.operadorautor_set.values('user')
+            )
+        ]
 
     def clean(self):
         super(ConfirmarProposicaoForm, self).clean()
@@ -2921,6 +2938,12 @@ class ConfirmarProposicaoForm(ProposicaoForm):
             materia.save()
             materia.save()
             conteudo_gerado = materia
+
+            if cd['emendaloa']:
+                el = cd['emendaloa']
+                el.materia = materia
+                el.fase = EmendaLoa.EM_TRAMITACAO
+                el.save()
 
             if proposicao.texto_articulado.exists():
                 ta = proposicao.texto_articulado.first()

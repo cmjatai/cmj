@@ -688,7 +688,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         if not i_init.pk:
             i_init.owner = self.user
 
-        if 'parlamentares__valor' in self.cleaned_data and self.cleaned_data['tipo'] != '0':
+        if 'parlamentares__valor' in self.cleaned_data and self.cleaned_data['tipo'] not in ('0', 0):
             if not self.full_editor:
                 soma = sum(
                     list(
@@ -705,7 +705,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
             raise ValidationError('Erro')
 
         if not self.full_editor:
-            if 'parlamentares__valor' in self.cleaned_data and self.cleaned_data['tipo'] != '0':
+            if 'parlamentares__valor' in self.cleaned_data and self.cleaned_data['tipo'] not in ('0', 0):
                 i.parlamentares.clear()
 
                 pv = zip(self.parls, self.cleaned_data['parlamentares__valor'])
