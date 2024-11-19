@@ -270,6 +270,8 @@ window.AppLOA = function () {
           ).appendTo(inner)
 
           refreshChangeRegistroDespesa()
+          preview.src = `${urlBase}/view/?page=1&u=${Date.now()}`
+
           form.trigger('change')
         })
         .catch((error) => {
