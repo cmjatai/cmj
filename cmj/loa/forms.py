@@ -56,6 +56,8 @@ class DecimalField(forms.DecimalField):
                 value = value.replace('.', '').replace(',', '.')
             else:
                 value = value.replace(',', '')
+        elif value and ',' in value:
+            value = value.replace(',', '.')
 
         value = forms.DecimalField.to_python(self, value)
         return value

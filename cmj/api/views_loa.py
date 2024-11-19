@@ -425,6 +425,8 @@ class EmendaLoaSerializer(SaplSerializerMixin):
                     obj = obj.replace('.', '').replace(',', '.')
                 else:
                     obj = obj.replace(',', '')
+            elif obj and ',' in obj:
+                obj = obj.replace(',', '.')
 
             obj = Decimal(obj)
         except:
@@ -540,6 +542,8 @@ class _EmendaLoaViewSet:
                     obj = obj.replace('.', '').replace(',', '.')
                 else:
                     obj = obj.replace(',', '')
+            elif obj and ',' in obj:
+                obj = obj.replace(',', '.')
 
             obj = Decimal(obj)
         except:
@@ -566,6 +570,8 @@ class _EmendaLoaViewSet:
                     obj = obj.replace('.', '').replace(',', '.')
                 else:
                     obj = obj.replace(',', '')
+            elif obj and ',' in obj:
+                obj = obj.replace(',', '.')
 
             obj = Decimal(obj)
         except:
@@ -691,7 +697,7 @@ class _EmendaLoaViewSet:
                 q &= (Q(unidade__especificacao__icontains=termo) |
                       Q(finalidade__icontains=termo))
 
-            qs = qs.filter(loa__ano=ano)
+            qs = qs.filter(fase__lt=EmendaLoa.LIBERACAO_CONTABIL, loa__ano=ano)
             if query:
                 qs = qs.filter(q)
 
@@ -845,6 +851,8 @@ class EmendaLoaRegistroContabilSerializer(SaplSerializerMixin):
                     obj = obj.replace('.', '').replace(',', '.')
                 else:
                     obj = obj.replace(',', '')
+            elif obj and ',' in obj:
+                obj = obj.replace(',', '.')
 
             obj = Decimal(obj)
         except:
@@ -1121,6 +1129,8 @@ class AgrupamentoRegistroContabilSerializer(SaplSerializerMixin):
                     obj = obj.replace('.', '').replace(',', '.')
                 else:
                     obj = obj.replace(',', '')
+            elif obj and ',' in obj:
+                obj = obj.replace(',', '.')
 
             obj = Decimal(obj)
         except:
