@@ -8,7 +8,6 @@ from django.core.validators import RegexValidator
 from django.db.models import Q, F
 from django.db.models.aggregates import Sum
 from django.db.models.functions import Substr
-from django.forms.models import model_to_dict
 from django.http.response import HttpResponse
 from django.template.loader import render_to_string
 from django.utils import formats

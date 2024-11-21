@@ -236,7 +236,12 @@ class AuditLog(models.Model):
         (STATUS_PUBLIC, _('Público')),
     )
 
-    operation_choice = ('C', 'D', 'U', 'P')
+    OPERATION_CHOICES = (
+        ('U', 'Atualizado'),
+        ('C', 'Criado'),
+        ('D', 'Excluído'),
+        ('P', 'Pesquisa'),
+    )
 
     visibilidade = models.IntegerField(
         _('Visibilidade'),
@@ -255,9 +260,11 @@ class AuditLog(models.Model):
                              blank=True,
                              db_index=True)
 
-    operation = models.CharField(max_length=1,
-                                 verbose_name=_('operation'),
-                                 db_index=True)
+    operation = models.CharField(
+        max_length=1,
+        verbose_name=_('operation'),
+        choices=OPERATION_CHOICES,
+        db_index=True)
 
     timestamp = models.DateTimeField(
         verbose_name=_('timestamp'),

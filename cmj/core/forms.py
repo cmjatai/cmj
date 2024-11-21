@@ -1,22 +1,23 @@
 
 from crispy_forms.bootstrap import FieldWithButtons, StrictButton
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Field
+from crispy_forms.layout import Layout, Field, Fieldset
 from django import forms
+from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.forms import UserCreationForm as BaseUserCreationForm, UserChangeForm as BaseUserChangeForm
 from django.core.exceptions import ValidationError
 from django.forms.models import ModelForm
 from django.utils.translation import gettext_lazy as _
-import django_filters
 from django_filters.filterset import FilterSet
 from image_cropping.widgets import ImageCropWidget, CropWidget
+import django_filters
 
 from cmj.core.models import Trecho, TipoLogradouro, User, OperadorAreaTrabalho,\
-    ImpressoEnderecamento
+    ImpressoEnderecamento, AuditLog
 from cmj.globalrules import WORKSPACE_GROUPS
 from cmj.sigad.models import UrlShortener
-from sapl.crispy_layout_mixin import to_row
+from sapl.crispy_layout_mixin import to_row, SaplFormHelper, form_actions
 
 
 class UrlShortenerForm(ModelForm):
@@ -121,3 +122,55 @@ class ListWithSearchForm(forms.Form):
                     _('Filtrar'), css_class='btn-outline-primary btn-lg',
                     type='submit'))
         )
+
+
+def get_username():
+    try:
+        return [(u.pk, f'{u.get_full_name()} ({u.email})') for u in
+                get_user_model().objects.all()]
+    except:
+        return []
+
+
+def get_models():
+    return [(m, m) for m in
+            AuditLog.objects.distinct('model_name').order_by('model_name').values_list('model_name', flat=True)]
+
+
+class AuditLogFilterSet(django_filters.FilterSet):
+    OPERATION_CHOICES = (
+        ('U', 'Atualizado'),
+        ('C', 'Criado'),
+        ('D', 'Excluído'),
+        ('P', 'Pesquisa'),
+    )
+
+    user = django_filters.ChoiceFilter(
+        choices=get_username(), label=_('Usuário'))
+    object_id = django_filters.NumberFilter(label=_('Id'))
+    operation = django_filters.ChoiceFilter(
+        choices=OPERATION_CHOICES, label=_('Operação'))
+    model_name = django_filters.ChoiceFilter(
+        choices=get_models, label=_('Tipo de Registro'))
+    timestamp = django_filters.DateRangeFilter(label=_('Período'))
+
+    class Meta:
+        model = AuditLog
+        fields = ['user', 'operation',
+                  'model_name', 'timestamp', 'object_id']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        row0 = to_row([('user', 2),
+                       ('operation', 2),
+                       ('model_name', 4),
+                       ('object_id', 2),
+                       ('timestamp', 2)])
+
+        self.form.helper = SaplFormHelper()
+        self.form.helper.form_method = 'GET'
+        self.form.helper.layout = Layout(
+            Fieldset(_('Filtros'),
+                     row0,
+                     form_actions(label='Aplicar Filtro')))

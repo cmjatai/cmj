@@ -8,6 +8,7 @@ import re
 from django import template
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.base import ContentFile
 from django.db.models import Q
@@ -23,6 +24,7 @@ from django.views.generic.base import RedirectView, View
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.views.static import serve as view_static_server
+from django_filters.views import FilterView
 from rest_framework import viewsets, mixins
 from rest_framework.authentication import SessionAuthentication, \
     BasicAuthentication
@@ -30,20 +32,22 @@ from rest_framework.permissions import IsAuthenticated
 from weasyprint import HTML
 
 from cmj.core.forms import OperadorAreaTrabalhoForm, ImpressoEnderecamentoForm, \
-    ListWithSearchForm
+    ListWithSearchForm, AuditLogFilterSet
 from cmj.core.models import Cep, TipoLogradouro, Logradouro, RegiaoMunicipal, \
     Distrito, Bairro, Trecho, AreaTrabalho, OperadorAreaTrabalho, \
     ImpressoEnderecamento, groups_remove_user, groups_add_user, Notificacao, \
-    CertidaoPublicacao, Bi
+    CertidaoPublicacao, Bi, AuditLog
 from cmj.core.serializers import TrechoSearchSerializer, TrechoSerializer
 from cmj.core.views_estatisticas import get_numeros
 from cmj.mixins import PluginSignMixin
-from cmj.utils import normalize, run_sql
+from cmj.utils import normalize, run_sql, make_pagination
 from sapl.compilacao.models import Dispositivo
 from sapl.crud.base import Crud, CrudAux, MasterDetailCrud, RP_DETAIL, RP_LIST
 from sapl.norma.models import NormaJuridica, AnexoNormaJuridica
 from sapl.parlamentares.models import Partido, Filiacao
-from sapl.utils import get_mime_type_from_file_extension
+from sapl.utils import get_mime_type_from_file_extension,\
+    show_results_filter_set
+
 
 logger = logging.getLogger(__name__)
 
@@ -917,3 +921,81 @@ class MediaPublicView(View):
         )
 
         return response
+
+
+class PesquisarAuditLogView(PermissionRequiredMixin, FilterView):
+    model = AuditLog
+    filterset_class = AuditLogFilterSet
+    paginate_by = 20
+
+    permission_required = ('base.list_appconfig',)
+
+    def get_filterset_kwargs(self, filterset_class):
+        super(PesquisarAuditLogView, self).get_filterset_kwargs(
+            filterset_class
+        )
+
+        return ({
+            "data": self.request.GET or None,
+            "queryset": self.get_queryset().order_by("-id")
+        })
+
+    def get_context_data(self, **kwargs):
+        context = super(PesquisarAuditLogView, self).get_context_data(
+            **kwargs
+        )
+
+        paginator = context["paginator"]
+        page_obj = context["page_obj"]
+
+        qr = self.request.GET.copy()
+        if 'page' in qr:
+            del qr['page']
+        context['filter_url'] = ('&' + qr.urlencode()) if len(qr) > 0 else ''
+        context['show_results'] = show_results_filter_set(qr)
+
+        context.update({
+            "page_range": make_pagination(
+                page_obj.number, paginator.num_pages
+            ),
+            "NO_ENTRIES_MSG": "Nenhum registro de log encontrado!",
+            "title": _("Pesquisar Logs de Auditoria")
+        })
+
+        return context
+
+    def get(self, request, *args, **kwargs):
+        timefilter = request.GET.get('timestamp', None)
+
+        if not timefilter:
+            newgetrequest = request.GET.copy()
+            newgetrequest['timestamp'] = 'week'
+            request.GET = newgetrequest
+
+        super(PesquisarAuditLogView, self).get(request)
+
+        data = self.filterset.data
+
+        url = ''
+
+        if data:
+            url = '&' + str(self.request.META["QUERY_STRING"])
+            if url.startswith("&page"):
+                url = ''
+
+        resultados = self.object_list
+        # if 'page' in self.request.META['QUERY_STRING']:
+        #      resultados = self.object_list
+        # else:
+        #     resultados = []
+
+        context = self.get_context_data(filter=self.filterset,
+                                        object_list=resultados,
+                                        filter_url=url,
+                                        numero_res=len(resultados)
+                                        )
+
+        context['show_results'] = show_results_filter_set(
+            self.request.GET.copy())
+
+        return self.render_to_response(context)

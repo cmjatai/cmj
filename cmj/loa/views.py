@@ -542,7 +542,7 @@ class EmendaLoaCrud(MasterDetailCrud):
             qs = super().get_queryset()
             if self.request.user.is_anonymous:
                 qs = qs.filter(loa__publicado=True)
-            return qs.order_by('fase', '-id')
+            return qs.order_by('fase', 'materia__numero', '-id')
 
         def get_context_data(self, **kwargs):
             context = MasterDetailCrud.ListView.get_context_data(

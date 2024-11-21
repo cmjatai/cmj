@@ -379,3 +379,9 @@ def dont_break_out(value):
     _safe = mark_safe(_safe)
     return _safe
 
+
+@register.filter
+def obfuscate_value(value, key):
+    if key in ["hash", "google_recaptcha_secret_key", "password", "google_recaptcha_site_key", "hash_code"]:
+        return "***************"
+    return value
