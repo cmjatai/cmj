@@ -41,6 +41,7 @@ EmendaLoaDetail:
       - materia|fk_urlize_for_detail
       - indicacao
       - finalidade
+      - registrocontabil_set
       col-md-4:
       - valor
       - valor_computado

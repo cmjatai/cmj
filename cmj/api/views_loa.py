@@ -232,7 +232,9 @@ class _LoaViewSet:
         ).annotate(
             vm=Sum('valor_materia'),
             vn=Sum('valor_norma'),
-            alt=Sum('registrocontabil_set__valor')))
+            # alt=Sum('registrocontabil_set__valor')
+        )
+        )
 
         r = []
         r_anual = OrderedDict()
@@ -276,12 +278,12 @@ class _LoaViewSet:
                         r[nat] = i
                         r[nat]['vm'] = i['vm'] or Decimal('0.00')
                         r[nat]['vn'] = i['vn'] or Decimal('0.00')
-                        r[nat]['alt'] = i['alt'] or Decimal('0.00')
+                        #r[nat]['alt'] = i['alt'] or Decimal('0.00')
                         continue
 
                     r[nat]['vm'] += i['vm'] or Decimal('0.00')
                     r[nat]['vn'] += i['vn'] or Decimal('0.00')
-                    r[nat]['alt'] += i['alt'] or Decimal('0.00')
+                    #r[nat]['alt'] += i['alt'] or Decimal('0.00')
                 r = r.values()
 
                 for i in r:
@@ -305,13 +307,13 @@ class _LoaViewSet:
                 if outros:
                     outros[0]['vm'] = outros[0]['vm'] or Decimal('0.00')
                     outros[0]['vn'] = outros[0]['vn'] or Decimal('0.00')
-                    outros[0]['alt'] = outros[0]['alt'] or Decimal('0.00')
+                    #outros[0]['alt'] = outros[0]['alt'] or Decimal('0.00')
 
                     for idx, item in enumerate(outros):
                         if idx:
                             outros[0]['vm'] += item['vm'] or Decimal('0.00')
                             outros[0]['vn'] += item['vn'] or Decimal('0.00')
-                            outros[0]['alt'] += item['alt'] or Decimal('0.00')
+                            #outros[0]['alt'] += item['alt'] or Decimal('0.00')
 
                     outros[0]['codigo'] = ' ' * len(outros[0]['codigo'])
                     outros[0]['especificacao'] = 'OUTROS'
