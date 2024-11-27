@@ -59,12 +59,21 @@
     {% endfor %}
   </h5>
 
-  <p class="ementa">
-    Altera destinação de recursos orçamentários, indicando {{object.prefixo_indicacao}} {{object.indicacao|default:"XXXXXXX"}},
-    para a recepção do valor de
-    <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}}),</strong>
-    que será {{ object.prefixo_finalidade}} {{ object.finalidade|default:"XXXXXXX" }}.
-  </p>
+  {% if object.tipo %}
+    <p class="ementa">
+      Altera destinação de recursos orçamentários, indicando {{object.prefixo_indicacao}} {{object.indicacao|default:"XXXXXXX"}},
+      para a recepção do valor de
+      <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}}),</strong>
+      que será {{ object.prefixo_finalidade}} {{ object.finalidade|default:"XXXXXXX" }}.
+    </p>
+  {% else %}
+    <p class="ementa">
+      Altera destinação de recursos orçamentários, indicando {{object.prefixo_indicacao}} {{object.indicacao|default:"XXXXXXX"}},
+      para a recepção do valor de
+      <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}}),</strong>
+      que será {{ object.prefixo_finalidade}} {{ object.finalidade|default:"XXXXXXX" }}.
+    </p>
+  {% endif %}
 
   <p class="preambulo">
     {% if object.parlamentares.isonly_sexo_feminino %}A{% else %}O{% endif %}{% if object.parlamentares.count > 1 %}s{% endif %}
@@ -118,7 +127,7 @@
   {% else %}
     <p class="art">
       <span class="rotulo">Art {{ view.art }}º - </span>Altera-se o Orçamento de {{object.loa.ano}},
-      para incluir a destinação do valor de <strong>R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}}),</strong>
+      incluíndo o valor de <strong>R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}}),</strong>
       {{object.prefixo_finalidade}} {{object.finalidade}}.
     </p>
   {% endif %}
