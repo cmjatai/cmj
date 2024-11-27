@@ -24,11 +24,11 @@
 
   {% define object.totais_contabeis as otc %}
 
-  {% if object.fase < object.LIBERACAO_CONTABIL %}
+  {% if object.tipo and object.fase < object.LIBERACAO_CONTABIL %}
     <section class="{% if otc.divergencia_emenda == 0 %}blue{%else%}red{% endif %}">
       EM EDIÇÃO
     </section>
-  {% elif otc.divergencia_emenda != 0 %}
+  {% elif object.tipo and otc.divergencia_emenda != 0 %}
     <section class="red">
       DIVERGÊNCIA DE VALORES
     </section>
@@ -72,46 +72,54 @@
     da presente Emenda {% if object.tipo %}Impositiva{% else %}Modificativa{% endif %}, propõem a seguinte modificação no Projeto de Lei Orçamentária Anual supracitado:
   </p>
 
-  <p class="art">
-    {% spaceless %}
-    <span class="rotulo">Art {{ view.art }}º - </span>Deduz-se da
-    {% for rc in object.registrocontabil_set.all_deducoes %}
-        Unidade Orçamentária {{rc.despesa.unidade.especificacao}} /
-        Código: {{rc.despesa.consulta.codigo}} - {{rc.despesa.consulta.especificacao}} /
-        Natureza da Despesa: {{rc.despesa.consulta.cod_natureza}}{% if object.registrocontabil_set.all_deducoes.count > 1 %}
-          - Valor: R$ {{rc.valor|valor_abs_str }}{% endif %}{% if not forloop.last %} // {% endif %}{% empty %}XXXXXXXXXX{% endfor %},
-        o valor de <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}})</strong>.
-    {% endspaceless %}
-  </p>
-
-  <p class="art">
-    <span class="rotulo">Art {{ view.art }}º - </span>O valor deduzido de
-    <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}}),</strong>
-    será inserido na
-    {% for rc in object.registrocontabil_set.all_insercoes %}
-        Unidade Orçamentária {{rc.despesa.unidade.especificacao}} /
-        Código: {{rc.despesa.consulta.codigo}} - {{rc.despesa.consulta.especificacao}} /
-        Natureza da Despesa: {{rc.despesa.consulta.cod_natureza}}{% if object.registrocontabil_set.all_insercoes.count > 1 %}
-          - Valor: R$ {{rc.valor|valor_str }}{% endif %}{% if not forloop.last %} // {% endif %}{% empty %}XXXXXXXXXX{% endfor %},
-          {{object.prefixo_finalidade}} {{object.finalidade}}.
-  </p>
-
-  {% if object.parlamentares.count > 1 and object.tipo %}
+  {% if object.tipo %}
     <p class="art">
-      <span class="rotulo">Art {{ view.art }}º - </span>O valor de
-      <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}}),</strong>
-      será divido entre
-      {% if object.parlamentares.isonly_sexo_feminino %}as{% else %}os{% endif %}
-      vereador{% if object.parlamentares.isonly_sexo_feminino %}as{% else %}es{% endif %}
-      subscritor{% if object.parlamentares.isonly_sexo_feminino %}as{% else %}es{% endif %},
-      sendo utilizado:
-        {% for elp in object.emendaloaparlamentar_set.all %}
-          <strong> R$ {{ elp.valor|valor_str }} ({{elp.valor|valor_por_extenso}}),</strong>
+      {% spaceless %}
+      <span class="rotulo">Art {{ view.art }}º - </span>Deduz-se da
+      {% for rc in object.registrocontabil_set.all_deducoes %}
+          Unidade Orçamentária {{rc.despesa.unidade.especificacao}} /
+          Código: {{rc.despesa.consulta.codigo}} - {{rc.despesa.consulta.especificacao}} /
+          Natureza da Despesa: {{rc.despesa.consulta.cod_natureza}}{% if object.registrocontabil_set.all_deducoes.count > 1 %}
+            - Valor: R$ {{rc.valor|valor_abs_str }}{% endif %}{% if not forloop.last %} // {% endif %}{% empty %}XXXXXXXXXX{% endfor %},
+          o valor de <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}})</strong>.
+      {% endspaceless %}
+    </p>
 
-          d{% if elp.parlamentar.sexo == 'F' %}a{% else %}o{% endif %}
-          Vereador{% if elp.parlamentar.sexo == 'F' %}a{% endif %}
-          {{elp.parlamentar.nome_parlamentar}}{% if not forloop.last %};{% else %}.{% endif %}
-        {% endfor %}
+    <p class="art">
+      <span class="rotulo">Art {{ view.art }}º - </span>O valor deduzido de
+      <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}}),</strong>
+      será inserido na
+      {% for rc in object.registrocontabil_set.all_insercoes %}
+          Unidade Orçamentária {{rc.despesa.unidade.especificacao}} /
+          Código: {{rc.despesa.consulta.codigo}} - {{rc.despesa.consulta.especificacao}} /
+          Natureza da Despesa: {{rc.despesa.consulta.cod_natureza}}{% if object.registrocontabil_set.all_insercoes.count > 1 %}
+            - Valor: R$ {{rc.valor|valor_str }}{% endif %}{% if not forloop.last %} // {% endif %}{% empty %}XXXXXXXXXX{% endfor %},
+            {{object.prefixo_finalidade}} {{object.finalidade}}.
+    </p>
+
+    {% if object.parlamentares.count > 1 and object.tipo %}
+      <p class="art">
+        <span class="rotulo">Art {{ view.art }}º - </span>O valor de
+        <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}}),</strong>
+        será divido entre
+        {% if object.parlamentares.isonly_sexo_feminino %}as{% else %}os{% endif %}
+        vereador{% if object.parlamentares.isonly_sexo_feminino %}as{% else %}es{% endif %}
+        subscritor{% if object.parlamentares.isonly_sexo_feminino %}as{% else %}es{% endif %},
+        sendo utilizado:
+          {% for elp in object.emendaloaparlamentar_set.all %}
+            <strong> R$ {{ elp.valor|valor_str }} ({{elp.valor|valor_por_extenso}}),</strong>
+
+            d{% if elp.parlamentar.sexo == 'F' %}a{% else %}o{% endif %}
+            Vereador{% if elp.parlamentar.sexo == 'F' %}a{% endif %}
+            {{elp.parlamentar.nome_parlamentar}}{% if not forloop.last %};{% else %}.{% endif %}
+          {% endfor %}
+      </p>
+    {% endif %}
+  {% else %}
+    <p class="art">
+      <span class="rotulo">Art {{ view.art }}º - </span>Altera-se o Orçamento de {{object.loa.ano}},
+      para incluir a destinação do valor de <strong>R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}}),</strong>
+      {{object.prefixo_finalidade}} {{object.finalidade}}.
     </p>
   {% endif %}
 
