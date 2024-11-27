@@ -28,16 +28,16 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/brasao/escola_1024.png"
   },
   {
-    "revision": "a07a3a4615775fda790a",
+    "revision": "b216e6cf72a145a1dd90",
     "url": "/static/css/app.d0f7f3d3.css"
-  },
-  {
-    "revision": "1d31b6f8b89584b92a2f",
-    "url": "/static/css/chunk-05c9a37c.9fa2ca27.css"
   },
   {
     "revision": "a1f9bd32e727a18ec6cb",
     "url": "/static/css/chunk-0ec9d5db.1c736b92.css"
+  },
+  {
+    "revision": "ae8dfeeb6df4ea5130ab",
+    "url": "/static/css/chunk-190fcec0.41e80f01.css"
   },
   {
     "revision": "4bd59f666da546c6724c",
@@ -76,8 +76,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/css/construct.475dffe8.css"
   },
   {
-    "revision": "c9fdd7daefe24b185fe0",
-    "url": "/static/css/loa.a79ae900.css"
+    "revision": "c4ff087fa201ebe2e07e",
+    "url": "/static/css/loa.b600392c.css"
   },
   {
     "revision": "c7b4fcace31ea4c393e4",
@@ -368,20 +368,20 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/user.png"
   },
   {
-    "revision": "30f22ecb12fd4b08f61a8beee92f8202",
+    "revision": "2078bf5024a1c5c7c79f82a8685e10b5",
     "url": "/static/index.html"
   },
   {
-    "revision": "a07a3a4615775fda790a",
-    "url": "/static/js/app.d1f02ac4.js"
-  },
-  {
-    "revision": "1d31b6f8b89584b92a2f",
-    "url": "/static/js/chunk-05c9a37c.548e71c4.js"
+    "revision": "b216e6cf72a145a1dd90",
+    "url": "/static/js/app.c6358c9e.js"
   },
   {
     "revision": "a1f9bd32e727a18ec6cb",
     "url": "/static/js/chunk-0ec9d5db.6859fa43.js"
+  },
+  {
+    "revision": "ae8dfeeb6df4ea5130ab",
+    "url": "/static/js/chunk-190fcec0.cfa2714e.js"
   },
   {
     "revision": "4bd59f666da546c6724c",
@@ -436,8 +436,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/js/construct.10e62310.js"
   },
   {
-    "revision": "c9fdd7daefe24b185fe0",
-    "url": "/static/js/loa.3ead7a3b.js"
+    "revision": "c4ff087fa201ebe2e07e",
+    "url": "/static/js/loa.bca48d96.js"
   },
   {
     "revision": "c7b4fcace31ea4c393e4",
