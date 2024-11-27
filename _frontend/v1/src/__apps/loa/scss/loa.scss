@@ -78,19 +78,41 @@
     }
 
     form {
+
+      $mp: 0.5em;
       background-color: white;
       margin: 0;
-      padding: 1rem;
+      padding: $mp;
       border-radius: 5px;
+
       .custom-control-input, input[name=salvar] {
         display: none;
       }
+
+      [class^=row] {
+        margin-left: -$mp;
+        margin-right: -$mp;
+      }
+      [class^=col] {
+        padding-left: $mp;
+        padding-right: $mp;
+      }
+
       .form-group {
         margin: 0;
+        label {
+          margin: 0;
+        }
       }
+
+      .relatorio-select {
+        border-left: 5px solid #025d2b;
+        padding-left: $mp;
+        height: 100%;
+      }
+
       #div_id_fase, #div_id_tipo, #div_id_finalidade {
-        margin-top: 1rem;
-        padding-top: 1rem;
+        margin-top: 0.7rem;
         border-top: 1px solid #ddd;
         & > div {
           // display: flex;
@@ -102,7 +124,13 @@
       }
       #div_id_parlamentares {
         & > label {
-          display: none;
+          //display: none;
+        }
+      }
+      #div_id_tipo {
+        .custom-control {
+          display: inline-block;
+          padding-right: 0.5em;
         }
       }
     }

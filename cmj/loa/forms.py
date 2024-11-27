@@ -3,7 +3,7 @@ import logging
 import re
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Fieldset, HTML, Div
+from crispy_forms.layout import Fieldset, HTML, Div, Submit
 from django import forms
 from django.contrib.postgres.forms.array import SplitArrayField, \
     SplitArrayWidget
@@ -16,7 +16,7 @@ from django.template.context import Context
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from django_filters.filters import MultipleChoiceFilter, \
-    ModelMultipleChoiceFilter, CharFilter
+    ModelMultipleChoiceFilter, CharFilter, ChoiceFilter
 from django_filters.filterset import FilterSet
 import yaml
 
@@ -869,6 +869,36 @@ class EmendaLoaFilterSet(FilterSet):
         widget=forms.CheckboxSelectMultiple
     )
 
+    agrupamento = ChoiceFilter(
+        required=False,
+        label=_('Agrupar emendas por:'),
+        choices=list(
+            {
+                # 'model_orgao': 'Órgãos',
+                'model_unidadeorcamentaria': 'Unidades Orçamentárias',
+                # 'model_funcao': 'Funções',
+                # 'model_subfuncao': 'SubFunções',
+                # 'model_programa': 'Programas',
+                # 'model_acao': 'Ações',
+                # 'choice_tipo': 'Tipo de Emenda',
+                # 'choice_fase': 'Fase de Emenda'
+            }.items()),
+        method='filter_agrupamento'
+
+    )
+
+    # tipo_agrupamento = ChoiceFilter(
+    #    required=False,
+    #    label=_('Dedução/Inserção no Agrupamento'),
+    #    widget=forms.RadioSelect,
+    #    empty_label=None,
+    #    choices=list(
+    #        {
+    #            'insercao': 'Inserção',
+    #            'deducao': 'Dedução',
+    #        }.items()),
+    #    method='filter_tipo_agrupamento')
+
     parlamentares = LoaParlModelMultipleChoiceFilter(
         queryset=Parlamentar.objects.all(),
         widget=forms.CheckboxSelectMultiple
@@ -881,10 +911,19 @@ class EmendaLoaFilterSet(FilterSet):
     class Meta:
 
         class Form(forms.Form):
-            crispy_field_template = 'fase', 'parlamentares', 'tipo', 'finalidade'
+            crispy_field_template = (
+                'fase',
+                'parlamentares',
+                'tipo',
+                'finalidade',
+                # 'tipo_agrupamento',
+                'agrupamento'
+            )
 
         model = EmendaLoa
-        fields = ['fase', 'parlamentares', 'tipo', 'indicacao',  'finalidade']
+        fields = ['fase', 'parlamentares', 'tipo', 'indicacao',  'finalidade',
+                  # 'tipo_agrupamento',
+                  'agrupamento']
         form = Form
 
     class ELSaplFormHelper(SaplFormHelper):
@@ -930,6 +969,12 @@ class EmendaLoaFilterSet(FilterSet):
                 html = html[:x2 - 8 - lp] + trendered + html[x2 - 8:]
             return mark_safe(html)
 
+    def filter_agrupamento(self, queryset, field_name, value):
+        return queryset
+
+    def filter_tipo_agrupamento(self, queryset, field_name, value):
+        return queryset
+
     def filter_finalidade(self, queryset, field_name, value):
 
         query = value
@@ -954,10 +999,50 @@ class EmendaLoaFilterSet(FilterSet):
 
         row = to_row(
             [
-                ('parlamentares', 12),
-                ('finalidade', 4),
-                ('fase', 4),
-                ('tipo', 4),
+                (
+                    to_row(
+                        [
+                            ('parlamentares', 12),
+                            (
+                                to_row([
+                                    ('finalidade', 12),
+                                    ('tipo', 12),
+                                ]),
+                                7
+                            ),
+                            ('fase', 5),
+                        ]
+                    ),
+                    8
+                ),
+                (
+                    Div(
+                        to_row(
+                            [
+                                (Fieldset(_('Listagem em PDF')), 12),
+                                ('agrupamento', 12),
+                                #('tipo_agrupamento', 12),
+                                (HTML(
+                                    '''<small class="text-info font-italic">
+                                            Primeiro filtre como preferir 
+                                            nos controles à esquerda, 
+                                            depois selecione como agrupar e, 
+                                            aí sim, clique em "Gerar PDF".
+                                            (Outras formas de agrupamento 
+                                            serão inseridos em breve.)
+                                        </small>
+                                    '''), 7),
+                                (
+                                    Submit('pdf', 'Gerar PDF',
+                                           css_class='mt-5 btn btn-primary'),
+                                    5
+                                )
+                            ]
+                        ),
+                        css_class="relatorio-select form-group",
+                    ),
+                    4
+                ),
             ]
         )
 
@@ -970,6 +1055,9 @@ class EmendaLoaFilterSet(FilterSet):
             cancel_label=None,
             save_label=_('Filtrar')
         )
+
+        #self.form.initial['tipo_agrupamento'] = 'insercao'
+        #self.form.fields['tipo_agrupamento'].initial = 'insercao'
 
         if self.loa.materia and self.loa.materia.normajuridica():
             self.form.fields['fase'].choices = EmendaLoa.FASE_CHOICE[5:]

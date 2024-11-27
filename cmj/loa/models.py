@@ -268,6 +268,10 @@ class EmendaLoa(models.Model):
         valor_str = formats.number_format(self.valor, force_grouping=True)
         return f'R$ {valor_str} - {self.finalidade}'
 
+    @property
+    def str_valor(self):
+        return formats.number_format(self.valor, force_grouping=True)
+
     class Meta:
         verbose_name = _('Emenda Impositiva/Modificativa')
         verbose_name_plural = _('Emendas Impositivas/Modificativas')

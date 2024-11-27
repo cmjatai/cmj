@@ -1,0 +1,75 @@
+{% load static common_cmj_tags common_tags %}
+{% load render_bundle from webpack_loader %}
+{% load webpack_static from webpack_loader %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<meta charset="utf-8"></meta>
+<head>
+  <title>LOA 2025 - Emendas Impositivas</title>
+  <style>
+    {% include "css/base2024.css" %}
+    {% include "css/emendaloa-list.css" %}
+  </style>
+</head>
+<body>
+
+  <header>
+    <img src="{% webpack_static 'img/pdf_cabec.jpg' %}">
+  </header>
+
+  <h2>{{title}}</h2>
+  {% if filters %}
+    <small>{{filters|safe}}</small><br><br>
+  {% endif %}
+
+  {% for group in groups %}
+    {% if group.title %}
+      <h3>{{group.title}}</h3>
+    {% endif %}
+
+    <table>
+      <thead>
+        <tr>
+          {% for col in group.columns %}
+            <th>{{col}}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in group.rows %}
+          <tr>
+            {% for col in row %}
+              <td class="{{col.1}}">{{col.0|safe}}</td>
+            {% endfor %}
+          </tr>
+
+          {% if forloop.last %}
+                <tr>
+                  <td class="text-right sub-total" colspan={{row|length}}>
+                    <strong>
+                      {% if group.title %}{{group.title}} - {% endif %}SubTotal: {{group.sub_total}}</td>
+                    </strong>
+                </tr>
+          {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+    {% if forloop.last %}
+      <hr>
+      <div class="text-right">
+        Total: {{total}}
+      </div>
+    {% endif %}
+  {% empty %}
+    <h4>
+      Nenhuma Emenda encontrada a partir dos filtros aplicados.
+    </h4>
+  {% endfor %}
+
+
+
+  <footer>
+    <img src="{% webpack_static 'img/pdf_rodape.jpg' %}">
+  </footer>
+</body>
+</html>

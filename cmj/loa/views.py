@@ -5,9 +5,10 @@ from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 from django.db.models.aggregates import Sum
-from django.http.response import Http404
+from django.http.response import Http404, HttpResponse
 from django.shortcuts import redirect
 from django.template import loader
+from django.template.loader import render_to_string
 from django.urls.base import reverse_lazy
 from django.utils import formats
 from django.utils.translation import gettext_lazy as _
@@ -19,6 +20,7 @@ from cmj.loa.forms import LoaForm, EmendaLoaForm, OficioAjusteLoaForm,\
 from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa,\
     RegistroAjusteLoa, RegistroAjusteLoaParlamentar, EmendaLoaRegistroContabil,\
     Agrupamento, UnidadeOrcamentaria
+from cmj.utils import make_pdf
 from sapl.crud.base import Crud, MasterDetailCrud, RP_DETAIL, RP_LIST
 from sapl.parlamentares.models import Parlamentar
 
@@ -531,7 +533,169 @@ class EmendaLoaCrud(MasterDetailCrud):
 
         def get(self, request, *args, **kwargs):
             self.loa = Loa.objects.get(pk=kwargs['pk'])
-            return FilterView.get(self, request, *args, **kwargs)
+
+            if 'pdf' not in request.GET:
+                return FilterView.get(self, request, *args, **kwargs)
+
+            return self.makepdf(request, *args, **kwargs)
+
+        def makepdf(self, request, *args, **kwargs):
+            self.paginate_by = 0
+            base_url = request.build_absolute_uri()
+            response_html = FilterView.get(self, request, *args, **kwargs)
+
+            context = self.get_context_data_makepdf()
+
+            template = render_to_string('loa/pdf/emendaloa_list.html', context)
+            pdf_file = make_pdf(base_url=base_url, main_template=template)
+
+            response = HttpResponse(
+                pdf_file,
+                content_type='application/pdf'
+            )
+            response['Content-Disposition'] = f'inline; filename="emendaloa_{self.loa.ano}.pdf"'
+            response['Cache-Control'] = 'no-cache'
+            response['Pragma'] = 'no-cache'
+            response['Expires'] = 0
+            return response
+
+        def get_context_data_makepdf(self):
+
+            cd = self.filterset.form.cleaned_data
+
+            title = 'Listagem Geral das Emendas'
+
+            filters = []
+            if cd['parlamentares']:
+                filtro = f'<strong>Parlamentares:</strong> {" / ".join(map(lambda x: str(x), cd["parlamentares"]))}'
+                filters.append(filtro)
+
+            if cd['finalidade']:
+                filtro = f'<strong>Finalidade:</strong> {cd["finalidade"]}'
+                filters.append(filtro)
+
+            if cd['tipo']:
+                dt = dict(map(lambda x: (str(x[0]), x[1]),
+                          EmendaLoa.TIPOEMENDALOA_CHOICE))
+                filtro = f'<strong>Tipos de Emenda:</strong> {" / ".join(map(lambda x: str(dt[x]), cd["tipo"]))}'
+                filters.append(filtro)
+
+            if cd['fase']:
+                dt = dict(map(lambda x: (str(x[0]), x[1]),
+                          EmendaLoa.FASE_CHOICE))
+                filtro = f'<strong>Fases de Emenda:</strong> {" / ".join(map(lambda x: str(dt[x]), cd["fase"]))}'
+                filters.append(filtro)
+
+            if filters:
+                filters.insert(0, '<strong>FILTROS APLICADOS</strong>')
+
+            context = {
+                'title': title,
+                'filters': '<br>'.join(filters),
+                'groups': []
+            }
+
+            total = Decimal('0.00')
+            if not cd['agrupamento']:
+
+                if not self.object_list.exists():
+                    return context
+
+                sub_total = self.object_list.aggregate(Sum('valor'))
+
+                total += sub_total['valor__sum']
+
+                columns = ['Emendas', 'Valores']
+
+                if not cd['tipo'] or len(cd['tipo']) > 1:
+                    columns.insert(1, 'Tipos')
+
+                rows = []
+
+                for item in self.object_list:
+                    row = []
+
+                    row.append((f'''
+                        <span>{item.indicacao}</span><br>
+                        <small>
+                            <strong>Autoria:</strong> {' - '.join(map(lambda x: str(x), item.parlamentares.all()))}
+                        </small>
+                        <div>
+                            {item.finalidade}
+                        </div>
+                    ''', ''))
+
+                    if not cd['tipo'] or len(cd['tipo']) > 1:
+                        row.append((item.get_tipo_display(), 'text-center'))
+
+                    row.append((item.str_valor, 'text-right'))
+
+                    rows.append(row)
+
+                group = {
+                    'title': '',
+                    'columns': columns,
+                    'rows': rows,
+                    'sub_total': formats.number_format(sub_total['valor__sum'], force_grouping=True)
+                }
+                context['groups'].append(group)
+
+            if cd['agrupamento']:
+                agrup = cd['agrupamento'].split('_')
+
+                if agrup[0] == 'model':
+
+                    ct = ContentType.objects.get_by_natural_key(
+                        'loa', agrup[1])
+                    model = ct.model_class()
+
+                    columns = ['Emendas', 'Valores']
+
+                    if not cd['tipo'] or len(cd['tipo']) > 1:
+                        columns.insert(1, 'Tipos')
+
+                    for uo in model.objects.filter(loa=self.loa):
+                        object_list = self.object_list.filter(unidade=uo)
+
+                        if not object_list.exists():
+                            continue
+
+                        sub_total = object_list.aggregate(Sum('valor'))
+
+                        total += sub_total['valor__sum']
+
+                        rows = []
+                        for item in object_list:
+                            cols = []
+
+                            cols.append((f'''
+                                <small>
+                                    <strong>Autoria:</strong> {' - '.join(map(lambda x: str(x), item.parlamentares.all()))}
+                                </small>
+                                <div>
+                                    {item.finalidade}
+                                </div>
+                            ''', ''))
+
+                            if not cd['tipo'] or len(cd['tipo']) > 1:
+                                cols.append(
+                                    (item.get_tipo_display(), 'text-center'))
+
+                            cols.append((item.str_valor, 'text-right'))
+
+                            rows.append(cols)
+
+                        group = {
+                            'title': str(uo),
+                            'columns': columns,
+                            'rows': rows,
+                            'sub_total': formats.number_format(sub_total['valor__sum'], force_grouping=True)
+                        }
+                        context['groups'].append(group)
+            context['total'] = formats.number_format(
+                total, force_grouping=True)
+
+            return context
 
         def get_filterset_kwargs(self, filterset_class):
             kw = FilterView.get_filterset_kwargs(self, filterset_class)

@@ -35,22 +35,39 @@ window.AppLOA = function () {
       instance.EmendaLoaCrudLIST(container)
     }
   }
+  instance.isObjectEmpty = function (obj) {
+    let isEmpty = true
+    _.forOwn(obj, (value, key) => {
+      if ((Array.isArray(value) && value.length > 0)) {
+        isEmpty = false
+      } else if (!Array.isArray(value) && !['', null, undefined].includes(value)) {
+        isEmpty = false
+      }
+    })
+    return isEmpty
+  }
   instance.EmendaLoaCrudLIST = function (container) {
     const form = container.find('form')
     const formData = new FormData(form[0])
     const formProps = Object.fromEntries(formData)
     const formJson = JSON.stringify(formProps)
 
-    if (formJson === '{"finalidade":""}') {
+    delete formProps.agrupamento
+    delete formProps.tipo_agrupamento
+    delete formProps.pdf
+
+    if (instance.isObjectEmpty(formProps)) {
       const lsJson = localStorage.getItem('portalcmj_emendaloa_filter')
       const lsData = JSON.parse(lsJson)
 
-      if (lsJson !== null && lsJson !== '{"finalidade":""}' && lsJson !== '{"fase":[],"parlamentares":[],"tipo":[]}') {
+      if (!instance.isObjectEmpty(lsData)) {
         _.forOwn(lsData, (value, key) => {
           _.forEach(form.find(`input[name="${key}"]`), (item) => {
             if ((Array.isArray(value) && value.includes(item.value)) || value === item.value) {
               item.checked = true
               $(`label[for="${item.id}"] span`).addClass('active')
+            } else {
+              item.value = value
             }
           })
         })
