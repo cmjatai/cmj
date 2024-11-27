@@ -103,6 +103,9 @@
       <div class="row">
         <div class="col-12 container-doughnut p-3 mt-3">
           <DoughnutChart v-if="chartDataLoa" :height="height" :plugins="pluginsDun" :chartDataUser="chartDataLoa"/>
+
+          <b-table striped hover class="local_table" :items="despesas_agrupadas_table"></b-table>
+
         </div>
 
         <div class="col-12 mt-3" v-html="loa.yaml_obs && loa.yaml_obs.GRAFICO_DESPESAS_MATERIA ? loa.yaml_obs.GRAFICO_DESPESAS_MATERIA : ''"></div>
@@ -182,6 +185,8 @@ export default {
           text: ''
         }
       }],
+      despesas_agrupadas: [
+      ],
       despesa: {
         orgaoselected: null,
         unidadeselected: null,
@@ -266,6 +271,22 @@ export default {
         groups.push({ text, value })
       })
       return groups
+    },
+    despesas_agrupadas_table: function () {
+      const t = this
+      const table = []
+      let table_base = _.orderBy(_.filter(t.despesas_agrupadas, (o) => o.alt), ['codigo'])
+
+      _.each(table_base, function (item, idx) {
+        table.push({
+          'Código': item.codigo,
+          'Especificação': item.especificacao,
+          'Valor no Orçamento': item.vm_str,
+          'Emendas Imposititivas': item.alt_str,
+          'Saldo Final': item.saldo_str
+        })
+      })
+      return table
     }
   },
   watch: {
@@ -592,6 +613,14 @@ export default {
               { alert: 'danger', message: 'Não foi possível recuperar a lista...', time: 5 }))
         })
         .then(() => {
+          /* formFilter.itens = 1000
+          formFilter.hist = 0
+          t.utils.postModelAction('loa', 'loa', t.loa.id, 'despesas_agrupadas', formFilter)
+            .then((response) => {
+              t.despesas_agrupadas = response.data
+            }) */
+        })
+        .then(() => {
           t.utils.getModelAction('loa', 'loa', t.loa.id, 'despesas_executadas')
             .then((response) => {
               t.data_exec = response.data
@@ -722,10 +751,10 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+  $mp: 3px;
   .loa-detail {
     margin-bottom: 2em;
   }
-  $mp: 3px;
   [class^=col] {
     padding-left: $mp;
     padding-right: $mp;
@@ -796,6 +825,13 @@ export default {
       a {
         text-decoration: underline;
       }
+    }
+  }
+</style>
+<style lang="scss">
+  .local_table {
+    td:nth-child(n + 3) {
+      text-align: right;
     }
   }
 </style>

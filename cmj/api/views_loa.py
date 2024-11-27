@@ -7,7 +7,9 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 from django.core.validators import RegexValidator
 from django.db.models import Q, F
 from django.db.models.aggregates import Sum
+from django.db.models.expressions import OuterRef, Subquery, Func
 from django.db.models.functions import Substr
+from django.db.models.functions.comparison import Coalesce
 from django.http.response import HttpResponse
 from django.template.loader import render_to_string
 from django.utils import formats
@@ -172,7 +174,8 @@ class _LoaViewSet:
 
         try:
             itens = filters_data.pop('itens')
-            itens = min(25, int(itens))
+            if itens != 1000:
+                itens = min(25, int(itens))
 
             hist = filters_data.pop('hist')
             hist = int(hist)
@@ -225,16 +228,34 @@ class _LoaViewSet:
         if hist:
             filters.pop('loa_id')
 
-        rs = list(Despesa.objects.filter(**filters).values(
+        if 'natureza' not in grup_str:
+            filter_sum_rc = {
+                f'despesa__{grup_str}': OuterRef(grup_str)
+            }
+        else:
+            filter_sum_rc = {
+                f'despesa__natureza': OuterRef('natureza')
+            }
+
+        sum_registros = EmendaLoaRegistroContabil.objects.filter(
+            **filter_sum_rc
+        ).annotate(sum_registros=Coalesce(Func('valor', function='Sum'), Decimal(0))
+                   ).values('sum_registros')
+        sum_registros.query.clear_ordering()
+
+        rs = Despesa.objects.filter(**filters).values(
             **agrup
         ).order_by(
             *order_by
         ).annotate(
             vm=Sum('valor_materia'),
             vn=Sum('valor_norma'),
-            # alt=Sum('registrocontabil_set__valor')
+            alt=Subquery(sum_registros)
         )
-        )
+        if itens == 1000:
+            print(str(rs.query))
+            print(str(rs.query))
+        rs = list(rs)
 
         r = []
         r_anual = OrderedDict()
@@ -278,12 +299,12 @@ class _LoaViewSet:
                         r[nat] = i
                         r[nat]['vm'] = i['vm'] or Decimal('0.00')
                         r[nat]['vn'] = i['vn'] or Decimal('0.00')
-                        #r[nat]['alt'] = i['alt'] or Decimal('0.00')
+                        r[nat]['alt'] = i['alt'] or Decimal('0.00')
                         continue
 
                     r[nat]['vm'] += i['vm'] or Decimal('0.00')
                     r[nat]['vn'] += i['vn'] or Decimal('0.00')
-                    #r[nat]['alt'] += i['alt'] or Decimal('0.00')
+                    r[nat]['alt'] += i['alt'] or Decimal('0.00')
                 r = r.values()
 
                 for i in r:
@@ -307,13 +328,13 @@ class _LoaViewSet:
                 if outros:
                     outros[0]['vm'] = outros[0]['vm'] or Decimal('0.00')
                     outros[0]['vn'] = outros[0]['vn'] or Decimal('0.00')
-                    #outros[0]['alt'] = outros[0]['alt'] or Decimal('0.00')
+                    outros[0]['alt'] = outros[0]['alt'] or Decimal('0.00')
 
                     for idx, item in enumerate(outros):
                         if idx:
                             outros[0]['vm'] += item['vm'] or Decimal('0.00')
                             outros[0]['vn'] += item['vn'] or Decimal('0.00')
-                            #outros[0]['alt'] += item['alt'] or Decimal('0.00')
+                            outros[0]['alt'] += item['alt'] or Decimal('0.00')
 
                     outros[0]['codigo'] = ' ' * len(outros[0]['codigo'])
                     outros[0]['especificacao'] = 'OUTROS'
@@ -321,15 +342,27 @@ class _LoaViewSet:
 
                 for idx, item in enumerate(r):
                     esp = item['especificacao']
+                    item['especificacao'] = f'{esp}'
+                    r[idx]['vp'] = int((item['vm'] / soma) * 100)
+                    r[idx]['vm_soma'] = formats.number_format(
+                        soma, force_grouping=True)
+
                     vm = formats.number_format(item['vm'], force_grouping=True)
                     while len(vm) < 14:
                         vm = f' {vm}'
-                    item['especificacao'] = f'{esp}'
                     r[idx]['vm_str'] = vm
-                    r[idx]['vp'] = int((item['vm'] / soma) * 100)
 
-                    r[idx]['vm_soma'] = formats.number_format(
-                        soma, force_grouping=True)
+                    a = formats.number_format(item['alt'], force_grouping=True)
+                    while len(a) < 14:
+                        a = f' {a}'
+                    r[idx]['alt_str'] = a
+
+                    r[idx]['saldo'] = item['vm'] + item['alt']
+                    s = formats.number_format(
+                        r[idx]['saldo'], force_grouping=True)
+                    while len(s) < 14:
+                        s = f' {s}'
+                    r[idx]['saldo_str'] = s
 
             r_anual[ano] = r
 
