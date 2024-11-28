@@ -28,7 +28,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/brasao/escola_1024.png"
   },
   {
-    "revision": "b216e6cf72a145a1dd90",
+    "revision": "3ebecda9e183671d4c8d",
     "url": "/static/css/app.d0f7f3d3.css"
   },
   {
@@ -38,10 +38,6 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "ae8dfeeb6df4ea5130ab",
     "url": "/static/css/chunk-190fcec0.41e80f01.css"
-  },
-  {
-    "revision": "4bd59f666da546c6724c",
-    "url": "/static/css/chunk-23723acf.e0c63c90.css"
   },
   {
     "revision": "ad54f445741328d703d3",
@@ -54,6 +50,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "fb31d123e6248139a5e5",
     "url": "/static/css/chunk-6f0ff250.55478430.css"
+  },
+  {
+    "revision": "6a606d3a656818c1288a",
+    "url": "/static/css/chunk-858bd182.e0c63c90.css"
   },
   {
     "revision": "71145a7fc8e1ac5a22b8",
@@ -368,12 +368,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/user.png"
   },
   {
-    "revision": "2078bf5024a1c5c7c79f82a8685e10b5",
+    "revision": "741552ad41202f0fa2d83a9d4bb3824e",
     "url": "/static/index.html"
   },
   {
-    "revision": "b216e6cf72a145a1dd90",
-    "url": "/static/js/app.c6358c9e.js"
+    "revision": "3ebecda9e183671d4c8d",
+    "url": "/static/js/app.c8a1ddaf.js"
   },
   {
     "revision": "a1f9bd32e727a18ec6cb",
@@ -382,10 +382,6 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "ae8dfeeb6df4ea5130ab",
     "url": "/static/js/chunk-190fcec0.cfa2714e.js"
-  },
-  {
-    "revision": "4bd59f666da546c6724c",
-    "url": "/static/js/chunk-23723acf.362f081a.js"
   },
   {
     "revision": "f18b293c4d57aba896c3",
@@ -410,6 +406,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "7ef5d1df159a661dfbac",
     "url": "/static/js/chunk-7a782422.5fad472b.js"
+  },
+  {
+    "revision": "6a606d3a656818c1288a",
+    "url": "/static/js/chunk-858bd182.0749aa57.js"
   },
   {
     "revision": "e6a1c347ff0c1140f137",
