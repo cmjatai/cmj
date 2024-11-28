@@ -2788,11 +2788,18 @@ class ConfirmarProposicaoForm(ProposicaoForm):
         if self.proposicao_incorporacao_obrigatoria == 'C':
             self.fields['gerar_protocolo'].initial = True
 
-        self.fields['emendaloa'].choices = [('', '---------')]+[
-            (e.id, str(e)) for e in EmendaLoa.objects.filter(
-                fase=17, owner__in=self.instance.autor.operadorautor_set.values('user')
-            )
-        ]
+        if self.instance.tipo and self.instance.tipo.id != 5:
+            self.fields['emendaloa'].choices = [('', '---------')]+[
+                (e.id, str(e)) for e in EmendaLoa.objects.filter(
+                    fase=17, owner__in=self.instance.autor.operadorautor_set.values('user')
+                )
+            ]
+        else:
+            self.fields['emendaloa'].choices = [('', '---------')]+[
+                (e.id, str(e)) for e in EmendaLoa.objects.filter(
+                    fase=17, tipo=0, materia__isnull=True
+                )
+            ]
 
     def clean(self):
         super(ConfirmarProposicaoForm, self).clean()

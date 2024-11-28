@@ -671,25 +671,27 @@ class _EmendaLoaViewSet:
             'lineHeight': str(el.metadata['style']['lineHeight'] / 100.0)
         }
 
-        template = render_to_string('loa/pdf/emendaloa_preview.html', context)
-        pdf_file = make_pdf(base_url=base_url, main_template=template)
-        doc = pymupdf.Document(stream=pdf_file)
-
         try:
             p = int(request.GET.get('page', 0))
         except:
             p = 0
 
-        d2b = doc
+        template = render_to_string('loa/pdf/emendaloa_preview.html', context)
+        pdf_file = make_pdf(base_url=base_url, main_template=template)
         ext = 'pdf'
         if p:
+            doc = pymupdf.Document(stream=pdf_file)
+
+            d2b = doc
             ext = 'png'
             p -= 1
             page = doc[p % len(doc)]
             d2b = page.get_pixmap(dpi=300)
 
-        bresponse = d2b.tobytes()
-        doc.close()
+            bresponse = d2b.tobytes()
+            doc.close()
+        else:
+            bresponse = pdf_file
 
         response = HttpResponse(
             bresponse,
