@@ -2788,7 +2788,7 @@ class ConfirmarProposicaoForm(ProposicaoForm):
         if self.proposicao_incorporacao_obrigatoria == 'C':
             self.fields['gerar_protocolo'].initial = True
 
-        if self.instance.tipo and self.instance.tipo.id != 5:
+        if self.instance.tipo and 'impositiva' in self.instance.tipo.descricao.lower():
             self.fields['emendaloa'].choices = [('', '---------')]+[
                 (e.id, str(e)) for e in EmendaLoa.objects.filter(
                     fase=17, owner__in=self.instance.autor.operadorautor_set.values('user')

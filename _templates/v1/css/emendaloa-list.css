@@ -12,7 +12,12 @@ footer {
   left: 0cm;
   right: 0cm;
 }
-
+hr {
+  border: 0.5px solid #777;
+}
+h5 {
+  margin-bottom: 0.1cm;
+}
 table {
   /* font-family: 'Courier New', Courier, monospace;*/
   font-size: 8pt;
@@ -36,21 +41,52 @@ table td.text-center {
 table tbody tr:nth-child(even) {
   background-color: #f5f5f5;
 }
-table span {
-  color: #777;
+
+.d-flex {
 }
-table small {
+
+.loa-mat {
+  div {
+    padding: 2px 7px ;
+  }
+}
+span.materia {
+  a {
+    font-family: 'Courier New', Courier, monospace;
+    text-decoration: none;
+  }
+}
+ul {
+  font-family: 'Courier New', Courier, monospace;
+  padding-left: 2em;
+  margin: 0;
+  li {
+    font-size: 5pt;
+    color: #444;
+  }
+}
+
+span.indicacao {
+  color: #777;
+  padding-top: 5px;
+  display: inline-block;
+}
+small {
   color: #444;
   font-style: italic;
 }
 
-table div {
-  padding: 10px;
-}
+
 
 .text-right {
   text-align: right;
 }
 .sub-total {
-  padding: 20px;
+  padding: 10px 5px 10px 10px;
+  font-family: 'Courier New', Courier, monospace;
+
+}
+
+.courier {
+  font-family: 'Courier New', Courier, monospace;
 }

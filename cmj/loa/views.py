@@ -3,12 +3,14 @@ import logging
 
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.db.models.aggregates import Sum
 from django.http.response import Http404, HttpResponse
 from django.shortcuts import redirect
 from django.template import loader
 from django.template.loader import render_to_string
+from django.urls.base import reverse
 from django.urls.base import reverse_lazy
 from django.utils import formats
 from django.utils.translation import gettext_lazy as _
@@ -544,7 +546,11 @@ class EmendaLoaCrud(MasterDetailCrud):
             base_url = request.build_absolute_uri()
             response_html = FilterView.get(self, request, *args, **kwargs)
 
-            context = self.get_context_data_makepdf()
+            try:
+                context = self.get_context_data_makepdf()
+            except:
+                raise ValidationError(
+                    'Ocorreu um erro ao processar seus filtros e agrupamentos.')
 
             template = render_to_string('loa/pdf/emendaloa_list.html', context)
             pdf_file = make_pdf(base_url=base_url, main_template=template)
@@ -563,24 +569,24 @@ class EmendaLoaCrud(MasterDetailCrud):
 
             cd = self.filterset.form.cleaned_data
 
-            title = 'Listagem Geral das Emendas'
+            title = 'Listagem Geral das Emendas <small>{}</small>'
 
             filters = []
-            if cd['parlamentares']:
+            if cd.get('parlamentares', ''):
                 filtro = f'<strong>Parlamentares:</strong> {" / ".join(map(lambda x: str(x), cd["parlamentares"]))}'
                 filters.append(filtro)
 
-            if cd['finalidade']:
+            if cd.get('finalidade', ''):
                 filtro = f'<strong>Finalidade:</strong> {cd["finalidade"]}'
                 filters.append(filtro)
 
-            if cd['tipo']:
+            if cd.get('tipo', ''):
                 dt = dict(map(lambda x: (str(x[0]), x[1]),
                           EmendaLoa.TIPOEMENDALOA_CHOICE))
                 filtro = f'<strong>Tipos de Emenda:</strong> {" / ".join(map(lambda x: str(dt[x]), cd["tipo"]))}'
                 filters.append(filtro)
 
-            if cd['fase']:
+            if cd.get('fase', ''):
                 dt = dict(map(lambda x: (str(x[0]), x[1]),
                           EmendaLoa.FASE_CHOICE))
                 filtro = f'<strong>Fases de Emenda:</strong> {" / ".join(map(lambda x: str(dt[x]), cd["fase"]))}'
@@ -590,16 +596,47 @@ class EmendaLoaCrud(MasterDetailCrud):
                 filters.insert(0, '<strong>FILTROS APLICADOS</strong>')
 
             context = {
+                'tipo_agrupamento': cd.get('tipo_agrupamento', ''),
                 'title': title,
                 'filters': '<br>'.join(filters),
                 'groups': []
             }
+
+            def render_col_emenda(item):
+
+                materia = ''
+                if item.materia:
+                    materia = f'''
+                            <span class="materia">
+                                <a href="{reverse('sapl.materia:materialegislativa_detail',kwargs={'pk': item.materia.id})}">
+                                {item.materia.epigrafe_short}
+                                </a>
+                            </span> - 
+                    '''
+
+                col_emenda = f'''
+                    
+                    <div class="loa-mat">
+                        {materia}
+                        <small>
+                            <strong>Autoria:</strong> {' - '.join(map(lambda x: str(x), item.parlamentares.all()))}
+                        </small><br>
+                        <span class="indicacao">{item.indicacao}</span>
+                        <div>
+                            {item.finalidade}
+                        </div>
+                        <ul></ul>
+                    </div>
+                '''
+                return col_emenda
 
             total = Decimal('0.00')
             if not cd['agrupamento']:
 
                 if not self.object_list.exists():
                     return context
+
+                context['title'] = context['title'].replace('{}', '')
 
                 sub_total = self.object_list.aggregate(Sum('valor'))
 
@@ -613,34 +650,28 @@ class EmendaLoaCrud(MasterDetailCrud):
                 rows = []
 
                 for item in self.object_list:
-                    row = []
-
-                    row.append((f'''
-                        <span>{item.indicacao}</span><br>
-                        <small>
-                            <strong>Autoria:</strong> {' - '.join(map(lambda x: str(x), item.parlamentares.all()))}
-                        </small>
-                        <div>
-                            {item.finalidade}
-                        </div>
-                    ''', ''))
+                    cols = []
+                    col_emenda = render_col_emenda(item)
+                    cols.append((col_emenda, ''))
 
                     if not cd['tipo'] or len(cd['tipo']) > 1:
-                        row.append((item.get_tipo_display(), 'text-center'))
+                        cols.append((item.get_tipo_display(), 'text-center'))
 
-                    row.append((item.str_valor, 'text-right'))
+                    cols.append((item.str_valor, 'text-right'))
 
-                    rows.append(row)
+                    rows.append(cols)
 
                 group = {
                     'title': '',
                     'columns': columns,
+                    'ncols_menos2': len(columns) - 2,
+                    'ncols_menos1': len(columns) - 1,
                     'rows': rows,
-                    'sub_total': formats.number_format(sub_total['valor__sum'], force_grouping=True)
+                    'sub_total_emendas': formats.number_format(sub_total['valor__sum'], force_grouping=True)
                 }
                 context['groups'].append(group)
 
-            if cd['agrupamento']:
+            else:
                 agrup = cd['agrupamento'].split('_')
 
                 if agrup[0] == 'model':
@@ -649,33 +680,57 @@ class EmendaLoaCrud(MasterDetailCrud):
                         'loa', agrup[1])
                     model = ct.model_class()
 
+                    if agrup[1] == 'unidadeorcamentaria':
+                        agrup[1] = 'unidade'
+
+                    via = ''
+                    if cd['tipo_agrupamento'] == 'insercao':
+                        via = '- Via dotação de inserção.'
+                    elif cd['tipo_agrupamento'] == 'deducao':
+                        via = ' - Via dotação de dedução.'
+
+                    context['title'] = context['title'].format(
+                        f'<br>* Agrupado por: {model._meta.verbose_name}{via}'
+                    )
+
                     columns = ['Emendas', 'Valores']
 
                     if not cd['tipo'] or len(cd['tipo']) > 1:
                         columns.insert(1, 'Tipos')
 
-                    for uo in model.objects.filter(loa=self.loa):
-                        object_list = self.object_list.filter(unidade=uo)
+                    lookup_ta = 'gt' if cd['tipo_agrupamento'] == 'insercao' else 'lt'
+                    for im in model.objects.filter(loa=self.loa):
+                        columns = columns[:]
+
+                        if 'sem_registro' in cd['tipo_agrupamento']:
+                            object_list = self.object_list.filter(
+                                unidade=im
+                            )
+                        else:
+                            try:
+                                object_list = self.object_list.filter(
+                                    **{f'registrocontabil_set__valor__{lookup_ta}': Decimal('0.00'),
+                                        f'registrocontabil_set__despesa__{agrup[1]}': im,
+                                       }
+                                )
+                            except Exception as e:
+                                print(e)
 
                         if not object_list.exists():
                             continue
 
-                        sub_total = object_list.aggregate(Sum('valor'))
+                        sub_total_agrupamento = Decimal('0.00')
+                        sub_total_emendas = object_list.aggregate(Sum('valor'))
 
-                        total += sub_total['valor__sum']
+                        total += sub_total_emendas['valor__sum']
 
                         rows = []
                         for item in object_list:
                             cols = []
+                            rows.append(cols)
 
-                            cols.append((f'''
-                                <small>
-                                    <strong>Autoria:</strong> {' - '.join(map(lambda x: str(x), item.parlamentares.all()))}
-                                </small>
-                                <div>
-                                    {item.finalidade}
-                                </div>
-                            ''', ''))
+                            col_emenda = render_col_emenda(item, )
+                            cols.append([col_emenda, ''])
 
                             if not cd['tipo'] or len(cd['tipo']) > 1:
                                 cols.append(
@@ -683,13 +738,52 @@ class EmendaLoaCrud(MasterDetailCrud):
 
                             cols.append((item.str_valor, 'text-right'))
 
-                            rows.append(cols)
+                            if 'sem_registro' in cd['tipo_agrupamento']:
+                                continue
+
+                            soma_rc = item.registrocontabil_set.all()
+
+                            registros = []
+                            for rc in soma_rc:
+                                rc = str(rc).split(' - ')
+                                while len(rc[0]) < 17:
+                                    rc[0] = rc[0].replace(' ', '  ', 1)
+                                rc[0] = rc[0].replace(' ', '&nbsp;')
+                                registros.append(f'<li>{" - ".join(rc)}</li>')
+                            cols[0][0] = cols[0][0].replace(
+                                '<ul></ul>', f'<ul>{"".join(registros)}</ul>')
+
+                            q = Q(**{  # f'valor__{lookup_ta}': Decimal('0.00'),
+                                f'despesa__{agrup[1]}': im
+                            })
+
+                            soma_rc = soma_rc.filter(q)
+                            if soma_rc.exists():
+                                soma_rc = soma_rc.aggregate(Sum('valor'))
+                                sub_total_agrupamento += soma_rc['valor__sum']
+                                # cols.append(
+                                #    (
+                                #        formats.number_format(
+                                #            soma_rc['valor__sum'], force_grouping=True),
+                                #        'text-right'
+                                #    )
+                                # )
+
+                        soma_valor_orcamento = im.despesa_set.aggregate(
+                            Sum('valor_materia'))
+                        soma_valor_orcamento = soma_valor_orcamento.get(
+                            'valor_materia__sum') or Decimal('0.00')
 
                         group = {
-                            'title': str(uo),
+                            'title': str(im),
                             'columns': columns,
+                            'ncols_menos2': len(columns) - 2,
+                            'ncols_menos1': len(columns) - 1,
                             'rows': rows,
-                            'sub_total': formats.number_format(sub_total['valor__sum'], force_grouping=True)
+                            'soma_valor_orcamento':  formats.number_format(soma_valor_orcamento, force_grouping=True),
+                            'saldo_orcamento': formats.number_format(soma_valor_orcamento + sub_total_agrupamento, force_grouping=True),
+                            'sub_total_agrupamento': formats.number_format(sub_total_agrupamento, force_grouping=True),
+                            'sub_total_emendas': formats.number_format(sub_total_emendas['valor__sum'], force_grouping=True)
                         }
                         context['groups'].append(group)
             context['total'] = formats.number_format(
@@ -706,7 +800,7 @@ class EmendaLoaCrud(MasterDetailCrud):
             qs = super().get_queryset()
             if self.request.user.is_anonymous:
                 qs = qs.filter(loa__publicado=True)
-            return qs.order_by('fase', 'materia__numero', '-id')
+            return qs.order_by('fase', '-tipo', 'materia__numero', '-id')
 
         def get_context_data(self, **kwargs):
             context = MasterDetailCrud.ListView.get_context_data(

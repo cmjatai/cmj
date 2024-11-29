@@ -874,12 +874,12 @@ class EmendaLoaFilterSet(FilterSet):
         label=_('Agrupar emendas por:'),
         choices=list(
             {
-                # 'model_orgao': 'Órgãos',
+                'model_orgao': 'Órgãos',
                 'model_unidadeorcamentaria': 'Unidades Orçamentárias',
-                # 'model_funcao': 'Funções',
-                # 'model_subfuncao': 'SubFunções',
-                # 'model_programa': 'Programas',
-                # 'model_acao': 'Ações',
+                'model_funcao': 'Funções',
+                'model_subfuncao': 'SubFunções',
+                'model_programa': 'Programas',
+                'model_acao': 'Ações',
                 # 'choice_tipo': 'Tipo de Emenda',
                 # 'choice_fase': 'Fase de Emenda'
             }.items()),
@@ -887,17 +887,18 @@ class EmendaLoaFilterSet(FilterSet):
 
     )
 
-    # tipo_agrupamento = ChoiceFilter(
-    #    required=False,
-    #    label=_('Dedução/Inserção no Agrupamento'),
-    #    widget=forms.RadioSelect,
-    #    empty_label=None,
-    #    choices=list(
-    #        {
-    #            'insercao': 'Inserção',
-    #            'deducao': 'Dedução',
-    #        }.items()),
-    #    method='filter_tipo_agrupamento')
+    tipo_agrupamento = ChoiceFilter(
+        required=False,
+        label=_('Dedução/Inserção no Agrupamento'),
+        widget=forms.RadioSelect,
+        empty_label=None,
+        choices=list(
+            {
+                'insercao': 'Dotação de Inserção',
+                'deducao': 'Dotação de Dedução',
+                'sem_registro': 'Ambos ou sem Dotação',
+            }.items()),
+        method='filter_tipo_agrupamento')
 
     parlamentares = LoaParlModelMultipleChoiceFilter(
         queryset=Parlamentar.objects.all(),
@@ -916,13 +917,13 @@ class EmendaLoaFilterSet(FilterSet):
                 'parlamentares',
                 'tipo',
                 'finalidade',
-                # 'tipo_agrupamento',
+                'tipo_agrupamento',
                 'agrupamento'
             )
 
         model = EmendaLoa
         fields = ['fase', 'parlamentares', 'tipo', 'indicacao',  'finalidade',
-                  # 'tipo_agrupamento',
+                  'tipo_agrupamento',
                   'agrupamento']
         form = Form
 
@@ -1021,7 +1022,7 @@ class EmendaLoaFilterSet(FilterSet):
                             [
                                 (Fieldset(_('Listagem em PDF')), 12),
                                 ('agrupamento', 12),
-                                #('tipo_agrupamento', 12),
+                                ('tipo_agrupamento', 12),
                                 (HTML(
                                     '''<small class="text-info font-italic">
                                             Primeiro filtre como preferir 
@@ -1031,11 +1032,11 @@ class EmendaLoaFilterSet(FilterSet):
                                             (Outras formas de agrupamento 
                                             serão inseridos em breve.)
                                         </small>
-                                    '''), 7),
+                                    '''), 8),
                                 (
                                     Submit('pdf', 'Gerar PDF',
                                            css_class='mt-5 btn btn-primary'),
-                                    5
+                                    4
                                 )
                             ]
                         ),
@@ -1056,8 +1057,8 @@ class EmendaLoaFilterSet(FilterSet):
             save_label=_('Filtrar')
         )
 
-        #self.form.initial['tipo_agrupamento'] = 'insercao'
-        #self.form.fields['tipo_agrupamento'].initial = 'insercao'
+        self.form.initial['tipo_agrupamento'] = 'insercao'
+        self.form.fields['tipo_agrupamento'].initial = 'insercao'
 
         if self.loa.materia and self.loa.materia.normajuridica():
             self.form.fields['fase'].choices = EmendaLoa.FASE_CHOICE[5:]

@@ -9,6 +9,14 @@
   <style>
     {% include "css/base2024.css" %}
     {% include "css/emendaloa-list.css" %}
+    @page {
+      @bottom-center{
+          content: "Página " counter(page) " de " counter(pages);
+          padding-top: 0.5cm;
+          font-style: italic;
+          color: #444;
+      }
+    }
   </style>
 </head>
 <body>
@@ -17,21 +25,29 @@
     <img src="{% webpack_static 'img/pdf_cabec.jpg' %}">
   </header>
 
-  <h2>{{title}}</h2>
+  <h2>{{title|safe}}</h2>
   {% if filters %}
-    <small>{{filters|safe}}</small><br><br>
+    <small>{{filters|safe}}</small><br>
   {% endif %}
 
   {% for group in groups %}
     {% if group.title %}
-      <h3>{{group.title}}</h3>
+      <h5>{{group.title}}</h5>
+    {% else %}
+      <br>
     {% endif %}
+
+    <div class="courier">
+      {% if tipo_agrupamento and tipo_agrupamento != 'sem_registro' %}
+      <small><small><em>Orçamento Original: {{group.soma_valor_orcamento}} | Saldo: {{group.saldo_orcamento}}</em></small></small>
+      {% endif %}
+    </div>
 
     <table>
       <thead>
         <tr>
           {% for col in group.columns %}
-            <th>{{col}}</th>
+            <th>{{col|safe}}</th>
           {% endfor %}
         </tr>
       </thead>
@@ -45,20 +61,41 @@
 
           {% if forloop.last %}
                 <tr>
-                  <td class="text-right sub-total" colspan={{row|length}}>
-                    <strong>
-                      {% if group.title %}{{group.title}} - {% endif %}SubTotal: {{group.sub_total}}</td>
-                    </strong>
+
+                  <td class="text-right sub-total" {% if group.ncols_menos2 > 0 %}colspan="{{group.ncols_menos1}}"{% endif %}>
+                    <strong>SubTotais:</strong>
+                  </td>
+
+                  <td class="text-right sub-total">
+                    <strong>{{group.sub_total_emendas}}</strong>
+                  </td>
+
+                  {% if False and group.title  %}
+                    <td class="text-right sub-total">
+                      <strong>{{group.sub_total_agrupamento}}</strong>
+                    </td>
+                  {% endif %}
                 </tr>
           {% endif %}
         {% endfor %}
       </tbody>
     </table>
     {% if forloop.last %}
-      <hr>
-      <div class="text-right">
-        Total: {{total}}
-      </div>
+      {% if not tipo_agrupamento or tipo_agrupamento == 'sem_registro' %}
+          <hr>
+          <div class="text-right">
+            Total: {{total}}
+          </div>
+      {% else %}
+          <hr>
+          <div class="text-right">
+            <small><em>TOTAL: A soma dos subtotais só faz sentido quando o tipo de agrupamento é "Ambos ou Sem Dotação"</em></small>
+          </div>
+          <hr>
+          <div class="text-left">
+            <small><em>OBS: Saldos Orçamentários com base no filtro aplicado. Para Saldo Real afetado por todas as Emendas registradas para o ano, o Filtro para gerar este relatório deve estar zerado, sem qualquer seleção de Parlamentar, Finalidade, Tipo e/ou Fase.</em></small>
+          </div>
+      {% endif %}
     {% endif %}
   {% empty %}
     <h4>

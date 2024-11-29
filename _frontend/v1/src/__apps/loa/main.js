@@ -97,6 +97,13 @@ window.AppLOA = function () {
       .change((event) => {
         changeAction()
       })
+
+    form.keypress((event) => {
+      if (event.keyCode === 13) {
+        event.preventDefault()
+        return false
+      }
+    })
   }
   instance.EmendaLoaCRUDToggleTipo = function (form) {
     const select_tipo = form.find('select[name="tipo"]')[0]
