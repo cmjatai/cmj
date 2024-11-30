@@ -50,7 +50,6 @@ window.AppLOA = function () {
     const form = container.find('form')
     const formData = new FormData(form[0])
     const formProps = Object.fromEntries(formData)
-    const formJson = JSON.stringify(formProps)
 
     delete formProps.agrupamento
     delete formProps.tipo_agrupamento
@@ -74,7 +73,7 @@ window.AppLOA = function () {
         form.submit()
       }
     } else {
-      localStorage.setItem('portalcmj_emendaloa_filter', formJson)
+      localStorage.setItem('portalcmj_emendaloa_filter', JSON.stringify(formProps))
     }
     let changeAction = function (event) {
       const formData = new FormData(form[0])
@@ -87,6 +86,44 @@ window.AppLOA = function () {
       localStorage.setItem('portalcmj_emendaloa_filter', formJson)
       form.submit()
     }
+    const sAgrup = form.find('select[name="agrupamento"]')
+    const rTipoAgrup = form.find('input[type="radio"][name="tipo_agrupamento"]')
+    sAgrup.change((event) => {
+      if (event.target.value === '') {
+        rTipoAgrup.filter('[value=sem_registro]').prop('checked', true)
+      }
+    }).change()
+
+    rTipoAgrup
+      .change((event) => {
+        const piscarSAgrup = () => {
+          sAgrup.addClass('bg-yellow')
+          setTimeout(() => {
+            sAgrup.removeClass('bg-yellow')
+            setTimeout(() => {
+              sAgrup.addClass('bg-yellow')
+              setTimeout(() => {
+                sAgrup.removeClass('bg-yellow')
+              }, 400)
+            }, 400)
+          }, 400)
+        }
+        if (event.target.checked && event.target.value === 'sem_registro') {
+          sAgrup.find('option:not([value="model_unidadeorcamentaria"])').attr('disabled', 'disabled').addClass('d-none')
+          sAgrup.find('option[value=""]').removeAttr('disabled').removeClass('d-none')
+          sAgrup.val('').change()
+          piscarSAgrup()
+        } else if (event.target.checked) {
+          sAgrup.find('option').removeAttr('disabled').removeClass('d-none')
+          sAgrup.find('option[value=""]').removeAttr('disabled').addClass('d-none')
+          if (!sAgrup[0].selectedIndex) {
+            sAgrup[0].selectedIndex = 2
+            piscarSAgrup()
+          }
+        } else {
+          sAgrup.find('option').removeAttr('disabled').removeClass('d-none')
+        }
+      }).change()
     form
       .find('input[type="checkbox"]')
       .change((event) => {

@@ -685,15 +685,15 @@ class EmendaLoaCrud(MasterDetailCrud):
 
                     via = ''
                     if cd['tipo_agrupamento'] == 'insercao':
-                        via = '- Via dotação de inserção.'
+                        via = '- Via dotações de inserção.'
                     elif cd['tipo_agrupamento'] == 'deducao':
-                        via = ' - Via dotação de dedução.'
+                        via = ' - Via dotações de dedução.'
 
                     context['title'] = context['title'].format(
                         f'<br>* Agrupado por: {model._meta.verbose_name}{via}'
                     )
 
-                    columns = ['Emendas', 'Valores']
+                    columns = ['Emendas', 'Valores das Emendas']
 
                     if not cd['tipo'] or len(cd['tipo']) > 1:
                         columns.insert(1, 'Tipos')
@@ -736,43 +736,49 @@ class EmendaLoaCrud(MasterDetailCrud):
                                 cols.append(
                                     (item.get_tipo_display(), 'text-center'))
 
-                            cols.append((item.str_valor, 'text-right'))
+                            cols.append([item.str_valor, 'text-right'])
 
                             if 'sem_registro' in cd['tipo_agrupamento']:
                                 continue
 
-                            soma_rc = item.registrocontabil_set.all()
+                            qs_rc = item.registrocontabil_set.all()
 
                             registros = []
-                            for rc in soma_rc:
+                            for rc in qs_rc:
+
                                 rc = str(rc).split(' - ')
                                 while len(rc[0]) < 17:
                                     rc[0] = rc[0].replace(' ', '  ', 1)
                                 rc[0] = rc[0].replace(' ', '&nbsp;')
                                 registros.append(f'<li>{" - ".join(rc)}</li>')
+
                             cols[0][0] = cols[0][0].replace(
-                                '<ul></ul>', f'<ul>{"".join(registros)}</ul>')
+                                '<ul></ul>', f'<small class="courier">Deduções e Inserções:</small><ul>{"".join(registros)}</ul>')
 
-                            q = Q(**{  # f'valor__{lookup_ta}': Decimal('0.00'),
-                                f'despesa__{agrup[1]}': im
-                            })
+                            sub_total_agrupamento += qs_rc.filter(
+                                **{f'despesa__{agrup[1]}': im}
+                            ).aggregate(
+                                Sum('valor')
+                            ).get('valor__sum', Decimal('0.00'))
 
-                            soma_rc = soma_rc.filter(q)
-                            if soma_rc.exists():
-                                soma_rc = soma_rc.aggregate(Sum('valor'))
-                                sub_total_agrupamento += soma_rc['valor__sum']
-                                # cols.append(
-                                #    (
-                                #        formats.number_format(
-                                #            soma_rc['valor__sum'], force_grouping=True),
-                                #        'text-right'
-                                #    )
-                                # )
+                            """deducao_insercao = qs_rc.filter(
+                                **{
+                                    f'valor__{lookup_ta}': Decimal('0.00'),
+                                    f'despesa__{agrup[1]}': im
+                                }
+                            ).aggregate(
+                                Sum('valor')
+                            ).get('valor__sum', Decimal('0.00'))
+
+                            deducao_insercao = formats.number_format(
+                                deducao_insercao, force_grouping=True)
+                            cols[-1][0] = f'{cols[-1][0]}<hr>{deducao_insercao}'"""
 
                         soma_valor_orcamento = im.despesa_set.aggregate(
                             Sum('valor_materia'))
                         soma_valor_orcamento = soma_valor_orcamento.get(
-                            'valor_materia__sum') or Decimal('0.00')
+                            'valor_materia__sum', Decimal('0.00')
+                        )
 
                         group = {
                             'title': str(im),

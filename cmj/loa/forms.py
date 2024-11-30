@@ -871,7 +871,7 @@ class EmendaLoaFilterSet(FilterSet):
 
     agrupamento = ChoiceFilter(
         required=False,
-        label=_('Agrupar emendas por:'),
+        label=_('Totalizar listagem por:'),
         choices=list(
             {
                 'model_orgao': 'Órgãos',
@@ -889,14 +889,14 @@ class EmendaLoaFilterSet(FilterSet):
 
     tipo_agrupamento = ChoiceFilter(
         required=False,
-        label=_('Dedução/Inserção no Agrupamento'),
+        label=_('Dedução/Inserção na Totalização'),
         widget=forms.RadioSelect,
         empty_label=None,
         choices=list(
             {
-                'insercao': 'Dotação de Inserção',
-                'deducao': 'Dotação de Dedução',
-                'sem_registro': 'Ambos ou sem Dotação',
+                'insercao': 'Via Dotações de Inserção',
+                # 'deducao': 'Via Dotações de Dedução',
+                'sem_registro': 'Via Valor da Emenda',
             }.items()),
         method='filter_tipo_agrupamento')
 
@@ -1025,17 +1025,15 @@ class EmendaLoaFilterSet(FilterSet):
                                 ('tipo_agrupamento', 12),
                                 (HTML(
                                     '''<small class="text-info font-italic">
-                                            Primeiro filtre como preferir 
-                                            nos controles à esquerda, 
-                                            depois selecione como agrupar e, 
+                                            Primeiro filtre como preferir
+                                            nos controles à esquerda,
+                                            depois selecione como totalizar e,
                                             aí sim, clique em "Gerar PDF".
-                                            (Outras formas de agrupamento 
-                                            serão inseridos em breve.)
                                         </small>
                                     '''), 8),
                                 (
                                     Submit('pdf', 'Gerar PDF',
-                                           css_class='mt-5 btn btn-primary'),
+                                           css_class='btn btn-primary'),
                                     4
                                 )
                             ]
@@ -1057,8 +1055,8 @@ class EmendaLoaFilterSet(FilterSet):
             save_label=_('Filtrar')
         )
 
-        self.form.initial['tipo_agrupamento'] = 'insercao'
-        self.form.fields['tipo_agrupamento'].initial = 'insercao'
+        #self.form.initial['tipo_agrupamento'] = 'insercao'
+        #self.form.fields['tipo_agrupamento'].initial = 'insercao'
 
         if self.loa.materia and self.loa.materia.normajuridica():
             self.form.fields['fase'].choices = EmendaLoa.FASE_CHOICE[5:]
