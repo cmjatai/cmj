@@ -32,6 +32,12 @@ FOLDER_DEBUG_CONTAINER = Path(
     config('FOLDER_DEBUG_CONTAINER', default=__file__, cast=str))
 
 ALLOWED_HOSTS = ['*']
+#SITE_URL = 'http://localhost'
+SITE_URL = 'https://www.jatai.go.leg.br'
+# https, colocar no nginx-> proxy_set_header X-Forwarded-Proto $scheme;
+# if DEBUG:
+#    SITE_URL = ''
+
 
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/login/?next='
@@ -59,10 +65,6 @@ DATABASES = {
 
 PORTALCMJ_VERSION = 'master'
 
-SITE_URL = 'https://www.jatai.go.leg.br'
-# https, colocar no nginx-> proxy_set_header X-Forwarded-Proto $scheme;
-# if DEBUG:
-#    SITE_URL = ''
 
 USE_SOLR = True
 SOLR_URL = 'http://solr:solr@cmjsolr:8983'
