@@ -895,7 +895,7 @@ class EmendaLoaFilterSet(FilterSet):
         choices=list(
             {
                 'insercao': 'Via Dotações de Inserção',
-                'deducao': 'Via Dotações de Dedução',
+                # 'deducao': 'Via Dotações de Dedução',
                 'sem_registro': 'Via Valor da Emenda',
             }.items()),
         method='filter_tipo_agrupamento')
