@@ -129,5 +129,3 @@ EXPOSE 80/tcp 443/tcp
 VOLUME ["/var/cmjatai/cmj/data", "/var/cmjatai/cmj_media", "/var/cmjatai/cmj/logs"]
 
 CMD ["/var/cmjatai/cmj/start.sh"]
-
-#CMD ["sleep", "infinity"]
