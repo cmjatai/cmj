@@ -2109,23 +2109,30 @@ class MateriaLegislativaCrud(Crud):
 
             if self.request.user.has_perm('compilacao.add_textoarticulado'):
                 if not self.object.texto_articulado.exists():
-                    btns += [(
-                        reverse('sapl.materia:materia_ta',
-                                kwargs={'pk': self.kwargs['pk']}),
-                        'btn-primary',
-                        _('Criar Texto Articulado')
+                    btns.extend(
+                        [
+                            (
+                                reverse('sapl.materia:materia_ta',
+                                        kwargs={'pk': self.kwargs['pk']}),
+                                'btn-primary',
+                                _('Criar Texto Articulado')
+                            )
+                        ]
                     )
-                    ]
                     return btns
                 elif self.request.user.is_superuser:
-                    btns += [(
-                        reverse('sapl.compilacao:ta_delete',
-                                kwargs={'pk': self.object.texto_articulado.first().pk}),
-                        'btn-danger',
-                        _('Excluir Texto Articulado')
+                    btns.extend(
+                        [
+                            (
+                                reverse('sapl.compilacao:ta_delete',
+                                        kwargs={'pk': self.object.texto_articulado.first().pk}),
+                                'btn-danger',
+                                _('Excluir Texto Articulado')
+                            )
+                        ]
                     )
-                    ]
                     return btns
+
             btns = list(filter(None, btns))
             return btns
 
@@ -2226,6 +2233,13 @@ class MateriaLegislativaCrud(Crud):
 
             return response
 
+        def cabec_autografo(self, cabec_autografo):
+            self.template_name = "materia/materialegislativa_cabec_autografo.html"
+
+            self.object = self.get_object()
+            context = self.get_context_data(object=self.object)
+            return self.render_to_response(context)
+
         def get(self, request, *args, **kwargs):
             # celery.debug_task.apply_async(
             #    (kwargs['pk'], ),
@@ -2233,6 +2247,8 @@ class MateriaLegislativaCrud(Crud):
             # )
             if 'download' in request.GET:
                 return self.download(request.GET.get('download'))
+            elif 'cabec_autografo' in request.GET:
+                return self.cabec_autografo(request.GET.get('cabec_autografo'))
             return Crud.DetailView.get(self, request, *args, **kwargs)
 
         def hook_documentoadministrativo_set__deprecated(self, obj):

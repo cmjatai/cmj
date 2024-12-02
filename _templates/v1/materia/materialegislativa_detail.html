@@ -16,6 +16,12 @@
   </div>
 
   <div>
+    {% if not object.anexo_de.exists and perms.materia.add_materialegislativa %}
+      <a href="{% url 'sapl.materia:materialegislativa_detail' object.id %}?cabec_autografo" title="Cabeçalho do Autógrafo.">
+        <i class="fas fa-sticky-note"></i>
+      </a>
+    {% endif %}
+
     <a href="{% url 'sapl.api:materia_materialegislativa-detail' object.id %}" target="_blank" rel="noopener noreferrer" title="Dados Abertos">
       <i class="far fa-file-code"></i>
     </a>
@@ -25,7 +31,6 @@
         <i class="fas fa-download"></i>
       </a>
     {% endif %}
-
   </div>
 </h3>
 
@@ -50,7 +55,7 @@
 
 {% block sub_actions %}
     {{ block.super }}
-    {% if object.em_tramitacao and mail_service_configured or user.is_superuser %}
+    {% if object.em_tramitacao and mail_service_configured %}
       <div class="actions btn-group btn-group-sm" role="group">
         <a href="{% url 'sapl.materia:acompanhar_materia' object.id %}" class="btn btn-outline-primary"  data-toggle="tooltip" data-placement="top" title="Registre seu email para acompanhamento desta matéria. Você receberá um email sempre que está materia tramitar.">Acompanhar Matéria</a>
       </div>
