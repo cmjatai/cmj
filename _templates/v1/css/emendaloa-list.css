@@ -75,7 +75,9 @@ small {
   color: #444;
   font-style: italic;
 }
-
+.text-center {
+  text-align: center;
+}
 
 
 .text-right {
