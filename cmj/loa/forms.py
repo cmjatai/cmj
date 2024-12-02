@@ -889,7 +889,7 @@ class EmendaLoaFilterSet(FilterSet):
 
     tipo_agrupamento = ChoiceFilter(
         required=False,
-        label=_('Via de Totalização'),
+        label=_('Via de Totalização:'),
         widget=forms.RadioSelect,
         empty_label=None,
         choices=list(
