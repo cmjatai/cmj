@@ -1,12 +1,12 @@
 
-import csv
 from datetime import datetime, timedelta, date
+from random import choice
+from string import ascii_letters, digits
+import csv
 import io
 import logging
 import os
-from random import choice
 import shutil
-from string import ascii_letters, digits
 import tempfile
 import traceback
 import zipfile
@@ -41,8 +41,6 @@ from cmj.core.models import AreaTrabalho
 from cmj.globalrules import GROUP_MATERIA_WORKSPACE_VIEWER
 from cmj.mixins import BtnCertMixin, CheckCheckMixin, MultiFormatOutputMixin,\
     AudigLogFilterMixin
-import requests as rq
-import sapl
 from sapl.base.email_utils import do_envia_email_confirmacao
 from sapl.base.models import Autor, CasaLegislativa, AppConfig as BaseAppConfig
 from sapl.comissoes.models import Comissao, Participacao, Composicao
@@ -73,6 +71,8 @@ from sapl.utils import (YES_NO_CHOICES, autor_label, autor_modal, SEPARADOR_HASH
                         get_mime_type_from_file_extension, montar_row_autor,
                         show_results_filter_set, mail_service_configured, lista_anexados,
                         gerar_pdf_impressos)
+import requests as rq
+import sapl
 
 from .forms import (AcessorioEmLoteFilterSet, AcompanhamentoMateriaForm,
                     AnexadaEmLoteFilterSet,
@@ -2144,7 +2144,7 @@ class MateriaLegislativaCrud(Crud):
                     data_desanexacao__isnull=True
                 ).order_by('materia_anexada__tipo', 'data_anexacao'):
                     manex = a.materia_anexada
-                    p2 = 'MatAnexadas/{}/{}-{:03d}-{}'.format(
+                    p2 = 'MatAnexadas-{}-{}-{:03d}-{}'.format(
                         slugify(manex.tipo.descricao),
                         manex.ano,
                         manex.numero,
@@ -2185,7 +2185,7 @@ class MateriaLegislativaCrud(Crud):
                     for i, prefixo, path in m_paths:
 
                         if isinstance(i, DocumentoAcessorio):
-                            arcname = '{}/DA-{}-{}-{}-{}.{}'.format(
+                            arcname = '{}-DA-{}-{}-{}-{}.{}'.format(
                                 prefixo,
                                 i.ano,
                                 slugify(i.tipo.descricao),
@@ -2194,7 +2194,7 @@ class MateriaLegislativaCrud(Crud):
                                 path.split('.')[-1]
                             )
                         else:
-                            arcname = '{}/{}-{}-{}-{}-{}-{:02d}.{}'.format(
+                            arcname = '{}-{}-{}-{}-{}-{}-{:02d}.{}'.format(
                                 prefixo,
                                 'ML' if isinstance(
                                     i, MateriaLegislativa) else 'DA',
@@ -2230,7 +2230,7 @@ class MateriaLegislativaCrud(Crud):
             # celery.debug_task.apply_async(
             #    (kwargs['pk'], ),
             #    countdown=10
-            #)
+            # )
             if 'download' in request.GET:
                 return self.download(request.GET.get('download'))
             return Crud.DetailView.get(self, request, *args, **kwargs)
@@ -3378,7 +3378,7 @@ class CriarDocumentoAcessorioProtocolo(PermissionRequiredMixin, CreateView):
 
         # numero_max = DocumentoAcessorio.objects.filter(
         #    tipo=protocolo.tipo_conteudo_protocolado, ano=curr_year
-        #).aggregate(Max('numero'))['numero__max']
+        # ).aggregate(Max('numero'))['numero__max']
 
         doc = {}
         doc['tipo'] = protocolo.tipo_conteudo_protocolado

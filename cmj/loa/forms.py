@@ -889,13 +889,13 @@ class EmendaLoaFilterSet(FilterSet):
 
     tipo_agrupamento = ChoiceFilter(
         required=False,
-        label=_('Dedução/Inserção na Totalização'),
+        label=_('Via de Totalização'),
         widget=forms.RadioSelect,
         empty_label=None,
         choices=list(
             {
                 'insercao': 'Via Dotações de Inserção',
-                # 'deducao': 'Via Dotações de Dedução',
+                'deducao': 'Via Dotações de Dedução',
                 'sem_registro': 'Via Valor da Emenda',
             }.items()),
         method='filter_tipo_agrupamento')

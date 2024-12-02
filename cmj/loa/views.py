@@ -685,7 +685,7 @@ class EmendaLoaCrud(MasterDetailCrud):
 
                     via = ''
                     if cd['tipo_agrupamento'] == 'insercao':
-                        via = '- Via dotações de inserção.'
+                        via = ' - Via dotações de inserção.'
                     elif cd['tipo_agrupamento'] == 'deducao':
                         via = ' - Via dotações de dedução.'
 
