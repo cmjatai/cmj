@@ -216,7 +216,8 @@ export default {
         natureza_2: 'Natureza - Nível 2',
         natureza_3: 'Natureza - Nível 3',
         natureza_4: 'Natureza - Nível 4',
-        natureza_5: 'Natureza - Nível 5'
+        natureza_5: 'Natureza - Nível 5',
+        fonte: 'Fonte de Recurso'
       },
       tipos_agrups: [
         'orgao',
@@ -229,7 +230,8 @@ export default {
         'natureza_2',
         'natureza_3',
         'natureza_4',
-        'natureza_5'
+        'natureza_5',
+        'fonte'
       ],
       itens: [
         { value: 5, text: '05 Maiores' },

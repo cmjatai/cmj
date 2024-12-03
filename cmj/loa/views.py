@@ -719,7 +719,6 @@ class EmendaLoaCrud(MasterDetailCrud):
                         if not object_list.exists():
                             continue
 
-                        sub_total_agrupamento = Decimal('0.00')
                         sub_total_emendas = object_list.aggregate(Sum('valor'))
 
                         total += sub_total_emendas['valor__sum']
@@ -755,12 +754,6 @@ class EmendaLoaCrud(MasterDetailCrud):
                             cols[0][0] = cols[0][0].replace(
                                 '<ul></ul>', f'<small class="courier">Deduções e Inserções:</small><ul>{"".join(registros)}</ul>')
 
-                            sub_total_agrupamento += qs_rc.filter(
-                                **{f'despesa__{agrup[1]}': im}
-                            ).aggregate(
-                                Sum('valor')
-                            ).get('valor__sum', Decimal('0.00'))
-
                             """deducao_insercao = qs_rc.filter(
                                 **{
                                     f'valor__{lookup_ta}': Decimal('0.00'),
@@ -780,6 +773,12 @@ class EmendaLoaCrud(MasterDetailCrud):
                             'valor_materia__sum', Decimal('0.00')
                         )
 
+                        movimentacao_valores = EmendaLoaRegistroContabil.objects.filter(
+                            **{f'despesa__{agrup[1]}': im}
+                        ).aggregate(
+                            Sum('valor')
+                        ).get('valor__sum', Decimal('0.00'))
+
                         group = {
                             'title': str(im),
                             'columns': columns,
@@ -787,8 +786,8 @@ class EmendaLoaCrud(MasterDetailCrud):
                             'ncols_menos1': len(columns) - 1,
                             'rows': rows,
                             'soma_valor_orcamento':  formats.number_format(soma_valor_orcamento, force_grouping=True),
-                            'saldo_orcamento': formats.number_format(soma_valor_orcamento + sub_total_agrupamento, force_grouping=True),
-                            'sub_total_agrupamento': formats.number_format(sub_total_agrupamento, force_grouping=True),
+                            'saldo_orcamento': formats.number_format(soma_valor_orcamento + movimentacao_valores, force_grouping=True),
+                            'movimentacao_valores': formats.number_format(movimentacao_valores, force_grouping=True),
                             'sub_total_emendas': formats.number_format(sub_total_emendas['valor__sum'], force_grouping=True)
                         }
                         context['groups'].append(group)

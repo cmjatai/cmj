@@ -880,6 +880,7 @@ class EmendaLoaFilterSet(FilterSet):
                 'model_subfuncao': 'SubFunções',
                 'model_programa': 'Programas',
                 'model_acao': 'Ações',
+                'model_fonte': 'Fonte de Recursos',
                 # 'choice_tipo': 'Tipo de Emenda',
                 # 'choice_fase': 'Fase de Emenda'
             }.items()),

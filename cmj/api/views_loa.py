@@ -28,7 +28,8 @@ from cmj import loa
 from cmj.loa.models import OficioAjusteLoa, EmendaLoa, Loa, EmendaLoaParlamentar, \
     DespesaConsulta, EmendaLoaRegistroContabil, UnidadeOrcamentaria, Despesa, \
     Orgao, Funcao, SubFuncao, Programa, Acao, Natureza,\
-    AgrupamentoRegistroContabil, AgrupamentoEmendaLoa, Agrupamento, quantize
+    AgrupamentoRegistroContabil, AgrupamentoEmendaLoa, Agrupamento, quantize,\
+    Fonte
 from cmj.utils import run_sql
 from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize,\
     wrapper_queryset_response_for_drf_action
@@ -75,6 +76,7 @@ filters_base = [
     ('natureza_3', Natureza),
     ('natureza_4', Natureza),
     ('natureza_5', Natureza),
+    ('fonte', Fonte),
 ]
 dict_filter_base = dict(filters_base)
 

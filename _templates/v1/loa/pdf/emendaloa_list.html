@@ -39,7 +39,7 @@
 
     <div class="courier">
       {% if tipo_agrupamento and tipo_agrupamento != 'sem_registro' %}
-      <small><small><em>Orçamento Original: {{group.soma_valor_orcamento}} | Valor {% if  tipo_agrupamento == 'insercao'  %}Inserido{% else %}Deduzido{% endif %} {{group.sub_total_agrupamento}} | Saldo: {{group.saldo_orcamento}}</em></small></small>
+      <small><small><em>Orçamento Original: {{group.soma_valor_orcamento}} | Movimentação Geral: {{group.movimentacao_valores}} | Saldo: {{group.saldo_orcamento}}</em></small></small>
       {% endif %}
     </div>
 
