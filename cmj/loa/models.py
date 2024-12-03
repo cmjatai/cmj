@@ -802,7 +802,7 @@ class DespesaConsulta(models.Model):
         ordering = ('cod_orgao', 'cod_unidade', 'codigo', 'cod_natureza')
 
     def __str__(self):
-        return f'{self.codigo}:{self.cod_natureza} - {self.especificacao}'
+        return f'{self.codigo}:{self.cod_natureza}/{self.cod_fonte} - {self.especificacao}'
 
 
 class EmendaLoaRegistroContabilManager(manager.Manager):
