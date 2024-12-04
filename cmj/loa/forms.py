@@ -450,6 +450,9 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
     despesa_natureza = forms.CharField(
         label='Natureza', required=False,)
 
+    despesa_fonte = forms.CharField(
+        label='Fonte', required=False,)
+
     valor = DecimalField(
         label=_('Valor Global da Emenda (R$)'), required=False)
 
@@ -505,13 +508,15 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
         if full_editor or self.user.is_superuser:
             row4_1 = to_row([
-                ('busca_despesa', 3),
+                ('busca_despesa', 4),
 
                 ('despesa_orgao', 2),
                 ('despesa_unidade', 2),
-                ('despesa_codigo', 3),
                 ('despesa_natureza', 2),
+                ('despesa_fonte', 2),
+
                 ('valor_despesa', 3),
+                ('despesa_codigo', 3),
                 ('despesa_especificacao', 'col'),
                 (HTML('''
                     <button type="button" id="add_registro" class="btn btn-primary">+</button>

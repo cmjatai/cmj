@@ -787,13 +787,14 @@ class _DespesaConsulta:
                       Q(especificacao__icontains=termo) |
                       Q(esp_orgao__icontains=termo) |
                       Q(esp_unidade__icontains=termo) |
-                      Q(cod_natureza__icontains=termo))
+                      Q(cod_natureza__icontains=termo) |
+                      Q(cod_fonte__icontains=termo))
 
             qs = qs.filter(loa__ano=ano)
             if query:
                 qs = qs.filter(q)
 
-            return qs
+            return qs.order_by('cod_orgao', 'cod_unidade', 'codigo', 'cod_natureza', 'cod_fonte')
         self.filter_queryset = filter_queryset
 
         return self.list(request, *args, **kwargs)
@@ -822,6 +823,9 @@ class EmendaLoaRegistroContabilSerializer(SaplSerializerMixin):
     orgao = RegexLocalField(r'^(\d{2})$', error_messages={
         'invalid': _('O campo "Órgão" deve serguir o padrão "99".')})
 
+    fonte = RegexLocalField(r'^(\d{3})$', error_messages={
+        'invalid': _('O campo "Fonte" deve serguir o padrão "999".')})
+
     valor = CharField(required=False, error_messages={
         'blank': _('O campo "Valor da Despesa" deve ser prenchido e seguir o formado 999.999.999,99. Valores negativos serão direcionados ao Art. 1º, valores positivos ao Art. 2º.'),
     })
@@ -840,6 +844,7 @@ class EmendaLoaRegistroContabilSerializer(SaplSerializerMixin):
             'unidade',
             'especificacao',
             'natureza',
+            'fonte',
             'valor'
         )
 
@@ -875,6 +880,14 @@ class EmendaLoaRegistroContabilSerializer(SaplSerializerMixin):
         ).exists():
             raise DRFValidationError(
                 'SubFunção não encontrada na base de subfunções.'
+            )
+
+        if not Fonte.objects.filter(
+                codigo=attrs['fonte'],
+                loa_id=loa_id
+        ).exists():
+            raise DRFValidationError(
+                'Fonte não encontrada na base de fontes.'
             )
 
         return attrs
@@ -931,6 +944,10 @@ class EmendaLoaRegistroContabilSerializer(SaplSerializerMixin):
                 codigo=codigo['subfuncao'], loa_id=loa_id
             ).first()
 
+            fonte = Fonte.objects.filter(
+                codigo=v['fonte'], loa_id=loa_id
+            ).first()
+
             programa, created = Programa.objects.get_or_create(
                 codigo=codigo['programa'], loa_id=loa_id
             )
@@ -955,6 +972,7 @@ class EmendaLoaRegistroContabilSerializer(SaplSerializerMixin):
             d.programa = programa
             d.acao = acao
             d.natureza = natureza
+            d.fonte = fonte
 
             ddict = d.__dict__
             ddict.pop('id')
@@ -1100,6 +1118,9 @@ class AgrupamentoRegistroContabilSerializer(SaplSerializerMixin):
     orgao = RegexLocalField(r'^(\d{2})$', error_messages={
         'invalid': _('O campo "Órgão" deve serguir o padrão "99".')})
 
+    fonte = RegexLocalField(r'^(\d{3})$', error_messages={
+        'invalid': _('O campo "Fonte" deve serguir o padrão "999".')})
+
     percentual = CharField(required=False, error_messages={
         'blank': _('O campo "Perc da Despesa" deve ser prenchido e seguir o formado 999,99. Valores negativos serão direcionados ao Art. 1º, valores positivos ao Art. 2º.'),
     })
@@ -1118,6 +1139,7 @@ class AgrupamentoRegistroContabilSerializer(SaplSerializerMixin):
             'unidade',
             'especificacao',
             'natureza',
+            'fonte',
             'percentual'
         )
 
@@ -1153,6 +1175,14 @@ class AgrupamentoRegistroContabilSerializer(SaplSerializerMixin):
         ).exists():
             raise DRFValidationError(
                 'SubFunção não encontrada na base de subfunções.'
+            )
+
+        if not Fonte.objects.filter(
+                codigo=attrs['fonte'],
+                loa_id=loa_id
+        ).exists():
+            raise DRFValidationError(
+                'Fonte não encontrada na base de fontes.'
             )
 
         return attrs
@@ -1209,6 +1239,10 @@ class AgrupamentoRegistroContabilSerializer(SaplSerializerMixin):
                 codigo=codigo['subfuncao'], loa_id=loa_id
             ).first()
 
+            fonte = Fonte.objects.filter(
+                codigo=v['fonte'], loa_id=loa_id
+            ).first()
+
             programa, created = Programa.objects.get_or_create(
                 codigo=codigo['programa'], loa_id=loa_id
             )
@@ -1233,6 +1267,7 @@ class AgrupamentoRegistroContabilSerializer(SaplSerializerMixin):
             d.programa = programa
             d.acao = acao
             d.natureza = natureza
+            d.fonte = fonte
 
             ddict = d.__dict__
             ddict.pop('id')

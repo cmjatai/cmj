@@ -316,6 +316,7 @@ window.AppLOA = function () {
       formData.unidade = form.find('input[name="despesa_unidade"]').val()
       formData.especificacao = form.find('input[name="despesa_especificacao"]').val()
       formData.natureza = form.find('input[name="despesa_natureza"]').val()
+      formData.fonte = form.find('input[name="despesa_fonte"]').val()
       formData.valor = form.find('input[name="valor_despesa"]').val()
       busca_render.html('')
       const inner = $('<div class="inner"></div>')
@@ -376,7 +377,13 @@ window.AppLOA = function () {
             $(`<div class="alert alert-warning">
               Nenhuma despesa encontrada nos anexos da LOA com esta informação. Você pode ainda fazer o registro manualmente no formulário acima.
             </div>`).appendTo(inner)
+          } else if (response.data.pagination.total_entries > 5) {
+            let msg_rodape = `<div class="alert alert-warning">
+              <em>Mostrando 5 primeiros resultados de ${response.data.pagination.total_entries}.<br>Informe mais termos no campo de busca para reduzir os resultados.</em>
+            </div>`
+            $(msg_rodape).appendTo(inner)
           }
+
           let parts = event.target.value.trim().split(' ')
 
           _.each(response.data.results, (value, idx) => {
@@ -384,7 +391,7 @@ window.AppLOA = function () {
                 Órgão...: ${value.cod_orgao} - ${value.esp_orgao}<br>
                 Und Orç.: ${value.cod_unidade} - ${value.esp_unidade}<br>
                 Código..: ${value.codigo} - ${value.especificacao}<br>
-                Natureza: ${value.cod_natureza} - ${value.esp_natureza}<br>
+                Natureza: ${value.cod_natureza} - ${value.esp_natureza} // Fonte: ${value.cod_fonte}<br>
                 Val.Orç.: ${value.str_valor} | Saldo: ${value.str_saldo}`
 
             _.each(parts, (p, idx) => {
@@ -404,6 +411,7 @@ window.AppLOA = function () {
               form.find('input[name="despesa_unidade"]').val(value.cod_unidade)
               form.find('input[name="despesa_especificacao"]').val(value.especificacao)
               form.find('input[name="despesa_natureza"]').val(value.cod_natureza)
+              form.find('input[name="despesa_fonte"]').val(value.cod_fonte)
 
               form.find('input[name^="despesa_"]').attr('readonly', true)
               let pk_despesa = event.currentTarget.getAttribute('pk')
@@ -572,6 +580,7 @@ window.AppLOA = function () {
       formData.unidade = form.find('input[name="despesa_unidade"]').val()
       formData.especificacao = form.find('input[name="despesa_especificacao"]').val()
       formData.natureza = form.find('input[name="despesa_natureza"]').val()
+      formData.fonte = form.find('input[name="despesa_fonte"]').val()
       formData.percentual = form.find('input[name="perc_despesa"]').val()
       busca_render.html('')
       const inner = $('<div class="inner"></div>')
@@ -639,7 +648,7 @@ window.AppLOA = function () {
                 Órgão...: ${value.cod_orgao} - ${value.esp_orgao}<br>
                 Und Orç.: ${value.cod_unidade} - ${value.esp_unidade}<br>
                 Código..: ${value.codigo} - ${value.especificacao}<br>
-                Natureza: ${value.cod_natureza} - ${value.esp_natureza}<br>
+                Natureza: ${value.cod_natureza} - ${value.esp_natureza} // Fonte: ${value.cod_fonte}<br>
                 Val.Orç.: ${value.str_valor} | Saldo: ${value.str_saldo}`
 
             _.each(parts, (p, idx) => {
@@ -659,6 +668,7 @@ window.AppLOA = function () {
               form.find('input[name="despesa_unidade"]').val(value.cod_unidade)
               form.find('input[name="despesa_especificacao"]').val(value.especificacao)
               form.find('input[name="despesa_natureza"]').val(value.cod_natureza)
+              form.find('input[name="despesa_fonte"]').val(value.cod_fonte)
 
               form.find('input[name^="despesa_"]').attr('readonly', true)
               let pk_despesa = event.currentTarget.getAttribute('pk')
