@@ -722,7 +722,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                         sub_total_emendas = object_list.aggregate(Sum('valor'))
 
                         total += sub_total_emendas['valor__sum']
-
+                        movimentacao_valores = Decimal('0.00')
                         rows = []
                         for item in object_list:
                             cols = []
@@ -770,14 +770,12 @@ class EmendaLoaCrud(MasterDetailCrud):
                         soma_valor_orcamento = im.despesa_set.aggregate(
                             Sum('valor_materia'))
                         soma_valor_orcamento = soma_valor_orcamento.get(
-                            'valor_materia__sum', Decimal('0.00')
-                        )
+                            'valor_materia__sum'
+                        ) or Decimal('0.00')
 
                         movimentacao_valores = EmendaLoaRegistroContabil.objects.filter(
                             **{f'despesa__{agrup[1]}': im}
-                        ).aggregate(
-                            Sum('valor')
-                        ).get('valor__sum', Decimal('0.00'))
+                        ).aggregate(Sum('valor')).get('valor__sum') or Decimal('0.00')
 
                         group = {
                             'title': str(im),

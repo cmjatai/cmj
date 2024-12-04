@@ -82,19 +82,32 @@
           </div>
       {% else %}
           <hr>
-          <div class="text-right">
-            <small><em>SUBTOTAIS: Uma linha com subtotais no fim de cada tabela
-              listada acima é colocada apenas quando feito a listagem
-              "Via Valor da Emenda".
-              Pelas outras vias, a soma vem no início de cada tabela,
-              a depender da Via de Totalização escolhida.</em>
-            </small><br>
-            <small><em>TOTAL: A soma dos subtotais só faz sentido quando o tipo
-              de agrupamento é "Via Valor da Emenda"</em></small>
+          <div>
+            <small>
+              <small>
+                <em>
+                  OBS 1: Uma linha com subtotais ao fim de cada tabela
+                    listada acima é colocada apenas quando feito a listagem
+                    "Via Valor da Emenda" pois, a depender dos lançamentos
+                    de contábeis de dedução e inserção, <b>em outra via de totalização</b>,
+                    uma mesma Emenda pode aparecer em mais de um Agrupamento/Totalizador.
+                    Do mesmo modo, uma linha de "TOTAL:" ao final com a soma geral
+                    só faz sentido quando o tipo de agrupamento é "Via Valor da Emenda"
+                </em>
+              </small>
+            </small>
           </div>
           <hr>
-          <div class="text-left">
-            <small><em>OBS: Saldos Orçamentários com base no filtro aplicado. Para Saldo Real afetado por todas as Emendas registradas para o ano, o Filtro para gerar este relatório deve estar zerado, sem qualquer seleção de Parlamentar, Finalidade, Tipo e/ou Fase.</em></small>
+          <div>
+            <small>
+              <small>
+                <em>
+                  OBS 2: Os valores de "Orçamento Original", "Movimentação Geral" e "Saldo"
+                  mostrados no inicio de cada tabela são a totalização da base inteira
+                  de emendas com registros contábeis e não particularizados pelos filtros aplicados.
+                </em>
+              </small>
+            </small>
           </div>
       {% endif %}
     {% endif %}
