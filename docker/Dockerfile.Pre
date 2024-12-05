@@ -11,13 +11,14 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
+RUN apt-get update && \
+    apt-get upgrade -y
+
 ENV RUN0_PACKAGES="apt-utils apt-file libpq-dev build-essential pkg-config \
     libxml2-dev libjpeg-dev libssl-dev libffi-dev libxslt1-dev \
     libcairo2-dev software-properties-common graphviz graphviz-dev \
     procps nmap git vim bash curl curl jq bash"
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y --no-install-recommends $RUN0_PACKAGES
+RUN apt-get install -y --no-install-recommends $RUN0_PACKAGES
 
 ENV RUN1_PACKAGES="python3-dev python3-lxml python3-magic postgresql-client\
     python3-psycopg python3-setuptools python3-pip \
@@ -59,18 +60,20 @@ RUN tar vzxfp ghostscript-10.04.0.tar.gz
 WORKDIR /ghostscript/ghostscript-10.04.0
 RUN ./configure && make && make install
 
+WORKDIR /root
+
 RUN fc-cache -fv && \
-pip3 install --no-cache-dir --upgrade pip setuptools
+    pip3 install --no-cache-dir --upgrade pip setuptools
 
 RUN rm -f /etc/nginx/conf.d/* && \
-rm -f /etc/nginx/sites-enabled/*
+    rm -f /etc/nginx/sites-enabled/*
 #&& \
 #SUDO_FORCE_REMOVE=yes apt-get purge -y --auto-remove $BUILD_PACKAGES && \
 #apt-get -y autoremove && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN adduser --home=/opt/libreoffice --disabled-password --gecos "" --shell=/bin/bash libreoffice
-ADD libreoffice_entrypoint.sh /opt/libreoffice/libreoffice_entrypoint.sh
-RUN chmod +x /opt/libreoffice/libreoffice_entrypoint.sh
+#RUN adduser --home=/opt/libreoffice --disabled-password --comment "" --shell=/bin/bash libreoffice
+#ADD libreoffice_entrypoint.sh /opt/libreoffice/libreoffice_entrypoint.sh
+#RUN chmod +x /opt/libreoffice/libreoffice_entrypoint.sh
 
 COPY requirements/requirements.txt $HOME
 RUN pip install -r requirements.txt
