@@ -997,3 +997,11 @@ window.Acessibilidade = function () {
   FontSizeZoom.check()
   KeysAcessibilidade.load()
 }
+
+window.loadingCMJ = function (msg) {
+  const html = `<div class="loading">
+  <div class="loader"></div>
+  <div class="message">${msg}</div>
+  </div>`
+  $(html).appendTo($('body'))
+}

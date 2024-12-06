@@ -70,6 +70,7 @@ window.AppLOA = function () {
             }
           })
         })
+        window.loadingCMJ('Atualizando listagem...')
         form.submit()
       }
     } else {
@@ -84,6 +85,7 @@ window.AppLOA = function () {
       const formProps = finalidade.length > 0 || tipo.length > 0 || fase.length > 0 || parlamentares.length > 0 ? { fase, parlamentares, tipo } : {}
       const formJson = JSON.stringify(formProps)
       localStorage.setItem('portalcmj_emendaloa_filter', formJson)
+      window.loadingCMJ('Atualizando listagem...')
       form.submit()
     }
     const sAgrup = form.find('select[name="agrupamento"]')
@@ -134,7 +136,11 @@ window.AppLOA = function () {
       .change((event) => {
         changeAction()
       })
-
+    form
+      .find('input[type="submit"]')
+      .click((event) => {
+        window.loadingCMJ('Gerando Listagem em PDF...')
+      })
     form.keypress((event) => {
       if (event.keyCode === 13) {
         event.preventDefault()

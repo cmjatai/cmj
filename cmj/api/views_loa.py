@@ -681,9 +681,10 @@ class _EmendaLoaViewSet:
         template = render_to_string('loa/pdf/emendaloa_preview.html', context)
         pdf_file = make_pdf(base_url=base_url, main_template=template)
         ext = 'pdf'
-        if p:
-            doc = pymupdf.Document(stream=pdf_file)
 
+        doc = pymupdf.Document(stream=pdf_file)
+
+        if p:
             d2b = doc
             ext = 'png'
             p -= 1
@@ -693,7 +694,7 @@ class _EmendaLoaViewSet:
             bresponse = d2b.tobytes()
             doc.close()
         else:
-            bresponse = pdf_file
+            bresponse = doc.tobytes()
 
         response = HttpResponse(
             bresponse,
