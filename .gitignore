@@ -106,6 +106,9 @@ cmj/legacy/scripts/
 run/
 bundle/
 dev-webpack-stats.json
+uupdev.sh
+rdev.sh
+ddev.sh
 
 # Dependency directories
 node_modules
