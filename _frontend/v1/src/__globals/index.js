@@ -48,6 +48,12 @@ window.moment = moment
 // initTinymce
 // import './2018/themes/dezembrolaranja/app.scss'
 
+window.onpageshow = event => {
+  if (event.persisted) {
+    $('body .loading').remove()
+  }
+}
+
 $(function () {
   if (!localStorage.portalcmj_primeiro_acesso) {
     document.getElementById('container-lgpd').style.display = 'block'
