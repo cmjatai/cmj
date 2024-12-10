@@ -206,7 +206,7 @@ export default {
     },
     itensAnexados: {
       get () {
-        return _.orderBy(_.filter(this.anexadas, (o) => o.em_tramitacao), ['data_apresentacao', 'id'])
+        return _.orderBy(this.anexadas, ['-tipo', 'data_apresentacao', 'id'])
       }
     },
     itensLegislacaoCitada: {

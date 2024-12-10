@@ -901,7 +901,7 @@ class EmendaLoaFilterSet(FilterSet):
         choices=list(
             {
                 'insercao': 'Via Dotações de Inserção',
-                # 'deducao': 'Via Dotações de Dedução',
+                'deducao': 'Via Dotações de Dedução',
                 'sem_registro': 'Via Valor da Emenda',
             }.items()),
         method='filter_tipo_agrupamento')
@@ -1064,7 +1064,7 @@ class EmendaLoaFilterSet(FilterSet):
         #self.form.initial['tipo_agrupamento'] = 'insercao'
         #self.form.fields['tipo_agrupamento'].initial = 'insercao'
 
-        if self.loa.materia and self.loa.materia.normajuridica():
+        if not self.loa.materia.em_tramitacao:
             self.form.fields['fase'].choices = EmendaLoa.FASE_CHOICE[5:]
         else:
             self.form.fields['fase'].choices = EmendaLoa.FASE_CHOICE[:5]

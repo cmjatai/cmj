@@ -72,7 +72,7 @@
 <div class="item-listas container-table">
   <div class="item-raiz px-4">
     {% with object.autores.all.count as count_parlamentares %}
-      {% for autor in object.autores.all %}
+      {% for autor in object.autores_coautores %}
         {% if forloop.counter0 > 0 and forloop.counter0|organize_direction_horizontal_avatars:count_parlamentares %}
           </div>
         {% endif %}

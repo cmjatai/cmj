@@ -2,11 +2,11 @@
 from django.contrib.auth.models import Group
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
-from django.db.models.fields.json import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models import Q, F
 from django.db.models.deletion import PROTECT
+from django.db.models.fields.json import JSONField
 from django.db.models.functions import Concat
 from django.template import defaultfilters
 from django.utils import formats, timezone
@@ -26,6 +26,7 @@ from sapl.utils import (RANGE_ANOS, YES_NO_CHOICES, SaplGenericForeignKey,
                         SaplGenericRelation, restringe_tipos_de_arquivo_txt,
                         texto_upload_path, get_settings_auth_user_model,
                         OverwriteStorage, PortalFileField)
+
 
 EM_TRAMITACAO = [(1, 'Sim'),
                  (0, 'Não')]
@@ -311,11 +312,11 @@ class MateriaLegislativa(CommonMixin):
         default=False,
         choices=YES_NO_CHOICES)
     polemica = models.BooleanField(null=True,
-        blank=True, verbose_name=_('Matéria Polêmica?'))
+                                   blank=True, verbose_name=_('Matéria Polêmica?'))
     objeto = models.CharField(
         max_length=150, blank=True, verbose_name=_('Objeto'))
     complementar = models.BooleanField(null=True,
-        blank=True, verbose_name=_('É Complementar?'))
+                                       blank=True, verbose_name=_('É Complementar?'))
     ementa = models.TextField(verbose_name=_('Ementa'))
     indexacao = models.TextField(
         blank=True, verbose_name=_('Indexação'))
@@ -540,8 +541,24 @@ class MateriaLegislativa(CommonMixin):
         else:
             return None
 
+    def autores_coautores(self):
+        autorias = [
+            autoria.autor for autoria in Autoria.objects.autores_coautores().filter(materia=self)]
+        return autorias
+
+
+class AutoriaManager(models.Manager):
+
+    use_for_related_fields = True
+
+    def autores_coautores(self):
+        return self.get_queryset().order_by('-primeiro_autor', 'autor__nome')
+
 
 class Autoria(models.Model):
+
+    objects = AutoriaManager()
+
     autor = models.ForeignKey(Autor,
                               verbose_name=_('Autor'),
                               on_delete=models.PROTECT)
