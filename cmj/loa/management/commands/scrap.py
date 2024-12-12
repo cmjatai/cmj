@@ -1,11 +1,11 @@
 from copy import deepcopy
-import csv
 from io import StringIO
+from time import sleep
+import csv
 import io
 import json
 import logging
 import sys
-from time import sleep
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -25,6 +25,7 @@ urls = [
         'type': 'list',
         'format': 'csv',
         'params': ('orgao', 'mes', 'ano'),
+        'subdomain': ('prefeituradejatai', 'camaradejatai'),
         'childs': [
             {
                 'name': 'despesa_paga_detalhes_exportacao',
@@ -33,6 +34,7 @@ urls = [
                 'type': 'detail',
                 'format': 'csv',
                 'params': ('codigo', ),
+                'subdomain': ('prefeituradejatai', 'camaradejatai'),
             },
             {
                 'name': 'despesa_paga_detalhes',
@@ -41,6 +43,7 @@ urls = [
                 'type': 'detail',
                 'format': 'html',
                 'params': ('codigo', ),
+                'subdomain': ('prefeituradejatai', 'camaradejatai'),
             },
         ]
     },
@@ -51,6 +54,7 @@ urls = [
         'type': 'list',
         'params': ('orgao', 'mes', 'ano'),
         'format': 'csv',
+        'subdomain': ('prefeituradejatai', ),
         'childs': [
             {
                 'name': 'receita_detail_exportacao',
@@ -58,7 +62,8 @@ urls = [
                 'receitas_detalhes.php?extensao=CSV&codigo={codigo}&orgao={orgao}&ano={ano}&mes={mes}',
                 'type': 'list',
                 'format': 'csv',
-                'params': ('codigo', 'orgao', 'mes', 'ano')
+                'params': ('codigo', 'orgao', 'mes', 'ano'),
+                'subdomain': ('prefeituradejatai', ),
             },
             {
                 'name': 'receita_detail',
@@ -66,9 +71,19 @@ urls = [
                 'receitas_detalhes.php?codigo={codigo}&orgao={orgao}&ano={ano}&mes={mes}',
                 'type': 'list',
                 'format': 'html',
-                'params': ('codigo', 'orgao', 'mes', 'ano')
+                'params': ('codigo', 'orgao', 'mes', 'ano'),
+                'subdomain': ('prefeituradejatai', ),
             },
         ]
+    },
+    {
+        'name': 'transferencia_recursos_list_exportacao',
+        'url': 'http://{subdomain}.sigepnet.com.br/transparencia/exportacao/'
+        'transferencia_de_recursos.php?extensao=CSV&orgao={orgao}&ano={ano}&mes={mes}&receita_despesa=&acao=true',
+        'type': 'list',
+        'params': ('orgao', 'mes', 'ano'),
+        'format': 'csv',
+        'subdomain': ('camaradejatai', ),
     }
 ]
 
@@ -123,12 +138,12 @@ class Command(BaseCommand):
 
         subdomains = [
             {
-                'subdomain': 'prefeituradejatai',
-                'orgaos': models.Orgao.objects.exclude(codigo='01').order_by(*order_by),
-            },
-            {
                 'subdomain': 'camaradejatai',
                 'orgaos': models.Orgao.objects.filter(codigo='01').order_by(*order_by),
+            },
+            {
+                'subdomain': 'prefeituradejatai',
+                'orgaos': models.Orgao.objects.exclude(codigo='01').order_by(*order_by),
             },
         ]
 
@@ -142,6 +157,10 @@ class Command(BaseCommand):
 
         for sd in subdomains:
             for url_dict in urls:
+
+                if sd['subdomain'] not in url_dict['subdomain']:
+                    continue
+
                 udj = json.dumps(url_dict)
                 udj = udj.replace('{subdomain}', sd['subdomain'])
                 ud = json.loads(udj)

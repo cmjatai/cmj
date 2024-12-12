@@ -1241,21 +1241,60 @@ class ScrapRecord(models.Model):
 
     def update_data_models(self):
 
-        if not self.codigo or self.codigo == 'TOTAL:':
-            return None
-
         try:
             # with transaction.atomic():
             if 'despesa' in self.metadata['url_dict']['name']:
+                if not self.codigo or self.codigo == 'TOTAL:':
+                    return None
                 self._update_despesa_paga()
             elif 'receita' in self.metadata['url_dict']['name']:
+                if not self.codigo or self.codigo == 'TOTAL:':
+                    return None
                 self._update_receita_arrecadada()
+            elif 'transferencia' in self.metadata['url_dict']['name']:
+                self._update_transferencia_recursos()
             if self.erro:
                 self.erro = False
                 self.save(update_fields=('erro', ))
         except Exception as e:
             self.erro = True
             self.save(update_fields=('erro', ))
+
+    def _update_transferencia_recursos(self):
+
+        if self.metadata['url_dict']['format'] != 'csv':
+            return None
+        org = Orgao.objects.get(codigo=self.orgao, loa__ano=self.ano)
+
+        content = self.content
+        if isinstance(content, memoryview):
+            content = content.tobytes()
+        content = content.decode('utf-8-sig')
+        file = StringIO(content)
+        csv_data = csv.reader(file, delimiter=";")
+
+        lista = list(csv_data)[1:]
+
+        for row in lista:
+
+            dt = datetime.strptime(row[0], "%d/%m/%Y").date()
+
+            valor = Decimal(row[4].replace('.', '').replace(',', '.'))
+
+            ro, created = ReceitaOrcamentaria.objects.get_or_create(
+                codigo=row[1], orgao=org
+            )
+
+            if row[2] == 'Despesa':
+                valor = quantize(valor * Decimal(-1))
+
+            ra = ReceitaArrecadada()
+            ra.receita = ro
+            ra.data = dt
+            ra.historico = row[1]
+            ra.tipo = row[2]
+            ra.valor = valor
+            ra.save()
 
     def _update_receita_arrecadada(self):
         if self.metadata['url_dict']['format'] != 'csv':
