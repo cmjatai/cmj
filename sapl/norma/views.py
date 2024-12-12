@@ -19,13 +19,13 @@ from django_filters.views import FilterView
 
 from cmj.mixins import BtnCertMixin, MultiFormatOutputMixin, AudigLogFilterMixin
 from sapl import settings
-import sapl
 from sapl.base.models import AppConfig
 from sapl.compilacao.views import IntegracaoTaView
 from sapl.crud.base import (RP_DETAIL, RP_LIST, Crud, CrudAux,
                             MasterDetailCrud, make_pagination)
 from sapl.utils import show_results_filter_set, get_client_ip,\
     gerar_pdf_impressos
+import sapl
 
 from .forms import (AnexoNormaJuridicaForm, NormaFilterSet, NormaJuridicaForm,
                     NormaPesquisaSimplesForm, NormaRelacionadaForm, AutoriaNormaForm)
@@ -135,7 +135,7 @@ class NormaPesquisaView(AudigLogFilterMixin, MultiFormatOutputMixin, FilterView)
         #        'norma_letra': "regexp_replace(numero,'[^a-zA-Z]','', 'g')"
         #    },
         #    order_by=('-data', '-id', )  # '-nm_i', 'norma_letra')
-        #)
+        # )
 
         return qs
 
@@ -416,9 +416,9 @@ class NormaCrud(Crud):
             check = request.GET.get('check', '')
             uncheck = request.GET.get('uncheck', '')
             if request.user.is_superuser and (check or uncheck):
-                try:
-                    n = NormaJuridica.objects.get(pk=check or uncheck)
+                n = NormaJuridica.objects.get(pk=check or uncheck)
 
+                try:
                     qs = self.get_queryset()
                     nn = None
 
@@ -429,7 +429,7 @@ class NormaCrud(Crud):
                     nn = qs[nn].id
 
                 except:
-                    raise Http404
+                    nn = ''
                 else:
                     n.checkcheck = True if check else False
                     n.save(update_fields=('checkcheck', ))
