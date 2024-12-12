@@ -147,7 +147,11 @@ class AuditLogFilterSet(django_filters.FilterSet):
 
     user = django_filters.ChoiceFilter(
         choices=get_username(), label=_('Usuário'))
-    object_id = django_filters.NumberFilter(label=_('Id'))
+    busca = django_filters.CharFilter(
+        label=_('Filtrar Campo'),
+        method='filter_busca'
+
+    )
     operation = django_filters.ChoiceFilter(
         choices=OPERATION_CHOICES, label=_('Operação'))
     model_name = django_filters.ChoiceFilter(
@@ -157,7 +161,32 @@ class AuditLogFilterSet(django_filters.FilterSet):
     class Meta:
         model = AuditLog
         fields = ['user', 'operation',
-                  'model_name', 'timestamp', 'object_id']
+                  'model_name', 'timestamp', 'busca']
+
+    def filter_busca(self, qs, field, value):
+        value = value.split(',')
+        value = list(map(lambda x: x.strip().split('='), value))
+
+        params = {}
+        for k, v in value:
+            try:
+                v = int(v)
+                params[f'obj__0__fields__{k}'] = v
+            except:
+                params[f'obj__0__fields__{k}'] = v
+
+        qsf = qs.filter(**params)
+        if not qsf:
+            params = {}
+            for k, v in value:
+                try:
+                    v = int(v)
+                    params[f'obj__0__fields__{k}'] = v
+                except:
+                    params[f'obj__0__fields__{k}__icontains'] = v
+
+            qsf = qs.filter(**params)
+        return qsf
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -165,7 +194,7 @@ class AuditLogFilterSet(django_filters.FilterSet):
         row0 = to_row([('user', 2),
                        ('operation', 2),
                        ('model_name', 4),
-                       ('object_id', 2),
+                       ('busca', 2),
                        ('timestamp', 2)])
 
         self.form.helper = SaplFormHelper()
