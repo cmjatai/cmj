@@ -1288,13 +1288,12 @@ class ScrapRecord(models.Model):
             if row[2] == 'Despesa':
                 valor = quantize(valor * Decimal(-1))
 
-            ra = ReceitaArrecadada()
-            ra.receita = ro
-            ra.data = dt
-            ra.historico = row[1]
-            ra.tipo = row[2]
-            ra.valor = valor
-            ra.save()
+            ra = ReceitaArrecadada.objects.get_or_create(
+                receita=ro,
+                data=dt,
+                historico=row[1],
+                tipo=row[2],
+                valor=valor)
 
     def _update_receita_arrecadada(self):
         if self.metadata['url_dict']['format'] != 'csv':
