@@ -231,7 +231,7 @@ class Command(BaseCommand):
         content_scrap = b''
         content_download = b''
 
-        if not scrap:
+        if not scrap or not scrap.content:
             content_download = get_content(url)
         elif self.force:
             if self.onlychilds and parent:
