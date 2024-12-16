@@ -15,19 +15,22 @@
     {% endwith %}
   {% endif %}
 
-  {% if perms.protocoloadm.add_documentoadministrativo %}
-    <div class="actions btn-group btn-group-lg" role="group">
+  <div class="actions btn-group btn-group-lg" role="group">
+    {% if perms.protocoloadm.add_documentoadministrativo %}
       <a href="{% url 'sapl.protocoloadm:documentoadministrativo_create' %}" class="btn btn-outline-primary">
         {% blocktrans with verbose_name=view.verbose_name %}Adicionar Documento Administrativo {% endblocktrans %}
       </a>
-    </div>
-  {% endif %}
+    {% endif %}
+    <a href="{% url 'cmj.search:haystack_search' %}?q=&models=protocoloadm.documentoadministrativo" class="btn btn-outline-primary">{% trans 'Mudar para Pesquisa Textual' %}</a>
+  </div>
 {% endblock actions %}
 
 {% block detail_content %}
   {% if not show_results %}
-    {% include 'search/search_widget.html' %}
-    <hr>
+    {% comment %}
+      {% include 'search/search_widget.html' %}
+      <hr>
+    {% endcomment %}
     {% crispy filter.form %}
   {% endif %}
 {% endblock detail_content %}
