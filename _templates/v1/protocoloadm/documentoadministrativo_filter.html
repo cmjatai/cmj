@@ -13,16 +13,18 @@
     {% with 'sapl.protocoloadm:documentoadministrativo_list' as url_reverse %}
       {% include "crud/format_options.html" %}
     {% endwith %}
+  {% else %}
+    <div class="actions btn-group btn-group-sm" role="group">
+      <a href="{% url 'cmj.search:haystack_search' %}?q=&models=protocoloadm.documentoadministrativo" class="btn btn-outline-primary btn-sm">{% trans 'Mudar para Pesquisa Textual' %}</a>
+    </div>
   {% endif %}
-
-  <div class="actions btn-group btn-group-lg" role="group">
-    {% if perms.protocoloadm.add_documentoadministrativo %}
+  {% if perms.protocoloadm.add_documentoadministrativo %}
+    <div class="actions btn-group btn-group-lg" role="group">
       <a href="{% url 'sapl.protocoloadm:documentoadministrativo_create' %}" class="btn btn-outline-primary">
         {% blocktrans with verbose_name=view.verbose_name %}Adicionar Documento Administrativo {% endblocktrans %}
       </a>
-    {% endif %}
-    <a href="{% url 'cmj.search:haystack_search' %}?q=&models=protocoloadm.documentoadministrativo" class="btn btn-outline-primary">{% trans 'Mudar para Pesquisa Textual' %}</a>
-  </div>
+    </div>
+  {% endif %}
 {% endblock actions %}
 
 {% block detail_content %}
