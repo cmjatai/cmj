@@ -88,6 +88,12 @@ class Command(BaseCommand):
         m.desativa_auto_now()
         m.desativa_signals()
 
+        d = Dispositivo.objects.get(pk=4684)
+
+        chunk = d.render_relative_chunk(nivel=119)
+
+        return
+
         """"d = Despesa()
         ddict = {'loa_id': 2024,
                  'orgao_id': 1,
