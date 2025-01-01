@@ -9,6 +9,9 @@ ENV PYTHONUNBUFFERED=1
 #COPY requirements/* $HOME
 #RUN pip install -r dev-requirements.txt
 
+#RUN pip install pgvector
+#RUN pip install sentence-transformers
+
 RUN adduser --home=/var/cmjatai/cmj --disabled-password --comment "" --shell=/bin/bash cmj
 RUN mkdir -p /var/cmjatai/cmj
 RUN mkdir -p /var/cmjatai/cmj_media

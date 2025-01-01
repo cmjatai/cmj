@@ -63,6 +63,11 @@ DATABASES = {
     )
 }
 
+if DEBUG and FOLDER_DEBUG_CONTAINER != PROJECT_DIR:
+    host = DATABASES['default']['HOST']
+    DATABASES['default']['HOST'] = 'localhost' if host == 'cmjdb' else host
+    DATABASES['default']['PORT'] = 5433 if host == 'cmjdb' else host
+
 PORTALCMJ_VERSION = 'master'
 
 
