@@ -1127,6 +1127,13 @@ class ProposicaoCrud(Crud):
                     return False
             return True
 
+        def post(self, request, *args, **kwargs):
+
+            if not self._action_is_valid(request, *args, **kwargs):
+                return redirect(reverse('sapl.materia:proposicao_detail',
+                                        kwargs={'pk': kwargs['pk']}))
+            return super().delete(self, request, *args, **kwargs)
+
     class UpdateView(BaseLocalMixin, Crud.UpdateView):
 
         logger = logging.getLogger(__name__)
