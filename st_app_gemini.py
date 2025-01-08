@@ -12,11 +12,6 @@ import chromadb
 
 load_dotenv()
 
-#pip install google-generativeai
-#pip install pypdf
-#pip install chromadb
-#pip install grpcio-status==1.67.1 grpcio==1.67.1
-
 gemini_api_key = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=gemini_api_key)
 
@@ -71,7 +66,7 @@ def load_pdf(file_path):
     return text
 
 # replace the path with your file path
-pdf_text = load_pdf(file_path="data/ed_814.pdf")
+pdf_text = load_pdf(file_path="/home/leandrojatai/Downloads/ed_814.pdf")
 
 def split_text(text: str, chunk_size: int = 1000, chunk_overlap: int = 200):
     chunks = []
@@ -153,9 +148,9 @@ def make_rag_prompt(query, relevant_passage):
               Se a passagem for irrelevante para a resposta, \
               você pode ignorá-la.
 
-    PERGUNTA: '{query}'
-
     CONTEXTO: '{relevant_passage}'
+
+    PERGUNTA: '{query}'
 
     ANSWER:
     """).format(query=query, relevant_passage=escaped)
