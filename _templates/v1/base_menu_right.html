@@ -13,8 +13,10 @@
       <ul class="dropdown-menu">
         <li class="dropdown-header">{% trans "Contatos" %}</li>
         {% if perms.cerimonial.print_impressoenderecamento %}<li><a href="{% url 'cmj.cerimonial:print_impressoenderecamento' %}">{% trans "Etiquetas e Envelopes" %}</a></li>{% endif %}
-        <li class="dropdown-header">{% trans "Processos" %}</li>
-        {% if perms.cerimonial.print_rel_contato_agrupado_por_processo %}<li><a href="{% url 'cmj.cerimonial:print_rel_contato_agrupado_por_processo' %}">{% trans "Contatos Agrupados Por Processo" %}</a></li>{% endif %}
+        {% if False and perms.cerimonial.print_rel_contato_agrupado_por_processo %}
+          <li class="dropdown-header">{% trans "Processos" %}</li>
+          <li><a href="{% url 'cmj.cerimonial:print_rel_contato_agrupado_por_processo' %}">{% trans "Contatos Agrupados Por Processo" %}</a></li>
+        {% endif %}
         <li class="dropdown-header">{% trans "Grupos" %}</li>
         {% if perms.cerimonial.print_rel_contato_agrupado_por_grupo %}<li><a href="{% url 'cmj.cerimonial:print_rel_contato_agrupado_por_grupo' %}">{% trans "Contatos Agrupados Por Grupos" %}</a></li>{% endif %}
         <li class="dropdown-header">{% trans "Atividade Legislativa" %}</li>

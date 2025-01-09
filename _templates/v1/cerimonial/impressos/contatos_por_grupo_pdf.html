@@ -31,6 +31,17 @@
       th {
         text-align: center;
       }
+      td:nth-child(2), th:nth-child(2)  {
+        width: 2cm;
+        text-align: center;
+      }
+      td:nth-child(3), th:nth-child(3)  {
+        width: 2cm;
+        text-align: center;
+      }
+      td:nth-child(4), th:nth-child(4)  {
+        width: 8cm;
+      }
       img {
         width: 100%;
       }
@@ -58,6 +69,7 @@
       <thead>
         <tr>
           <th>Nome</th>
+          <th>Data Nascimento</th>
           <th>Telefones</th>
           <th>Endereços</th>
         </tr>
@@ -65,7 +77,8 @@
       <tbody>
         {% for contato in contatos %}
           <tr>
-              <td>{{ contato.nome }}</td>
+            <td>{{ contato.nome }}</td>
+            <td>{{ contato.data_nascimento|date:"SHORT_DATE_FORMAT" }}</td>
               <td>
                 {% for tel in contato.telefone_set.all %}
                   {{ tel }}
