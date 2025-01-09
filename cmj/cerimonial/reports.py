@@ -326,8 +326,7 @@ class RelatorioContatoAgrupadoPorGrupoView(
 
         if 'print' in request.GET and self.object_list.exists():
             response = HttpResponse(content_type='application/pdf')
-            response['Content-Disposition'] = \
-                'inline; filename="relatorio.pdf"'
+            response['Content-Disposition'] = 'inline; filename="relatorio.pdf"'
             return self.build_pdf(response)
 
         context = self.get_context_data(filter=self.filterset,
