@@ -1818,12 +1818,10 @@ class SeloProtocoloMixin(PluginSignMixin):
         item = self.object.conteudo_protocolado
         p = self.object
 
-        compression = False
+        compression = self.request.GET.get('compression', True)
+
         if isinstance(item, MateriaLegislativa):
             item.registrovotacao_set.all().update(selo_votacao=False)
-
-            autor = item.autores.all().first()
-            compression = False if not autor else autor.tipo.descricao == 'Executivo'
 
         for field_file in item.FIELDFILE_NAME:
             if original2copia:

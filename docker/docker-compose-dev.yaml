@@ -45,23 +45,6 @@ services:
       #- "10.3.163.200:8080:8080"
       #- "192.168.15.8:8080:8080"
       #- "127.0.0.1:8080:8080"
-  cmjdb:
-    image: pgvector/pgvector:0.8.0-pg15
-    restart: always
-    container_name: cmjpostgres
-    labels:
-        NAME: "cmjpostgres"
-    environment:
-      POSTGRES_PASSWORD: cmj
-      POSTGRES_USER: cmj
-      POSTGRES_DB: cmj
-      PGDATA : /var/lib/postgresql/data/
-    volumes:
-      - cmjdb_data:/var/lib/postgresql/data/
-    ports:
-      - "5433:5432"
-    networks:
-      - cmj-net
   cmj:
     build:
       context: ../
@@ -94,7 +77,6 @@ networks:
     name: cmj-net
     driver: bridge
 volumes:
-  cmjdb_data:
   csolr_data:
   csolr_configsets:
   credis_data:

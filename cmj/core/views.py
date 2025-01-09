@@ -413,8 +413,7 @@ class SeloCertidaoMixin(PluginSignMixin):
 
         cert = self.object
 
-        compression = False
-        #compression = False if not autor else autor.tipo.descricao == 'Executivo'
+        compression = self.request.GET.get('compression', True)
 
         for field_file in cert.FIELDFILE_NAME:
             if original2copia:

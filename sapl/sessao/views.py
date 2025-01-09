@@ -1272,9 +1272,8 @@ class SessaoCrud(Crud):
                     )
 
                     paths = m.texto_original.path
-
-                    autor = m.autores.all().first()
-                    compression = False if not autor else autor.tipo.descricao == 'Executivo'
+                    
+                    compression = self.request.GET.get('compression', True)
 
                     try:
                         x = m.metadata['selos']['cert_protocolo']['x']
