@@ -8,7 +8,8 @@ from cmj.cerimonial.models import Perfil, EnderecoPerfil, EmailPerfil,\
     LocalTrabalho, Telefone, Email, Endereco, GrupoDeContatos, ProcessoContato,\
     Processo, AssuntoProcesso, TipoTelefone, TipoEmail, Parentesco,\
     PronomeTratamento, TipoAutoridade, TipoEndereco, TipoLocalTrabalho,\
-    StatusProcesso, ClassificacaoProcesso, TopicoProcesso, Visita, Visitante
+    StatusProcesso, ClassificacaoProcesso, TopicoProcesso, Visita, Visitante, \
+    AnexoProcesso
 from cmj.core.models import Trecho, Municipio, AreaTrabalho,\
     OperadorAreaTrabalho, Cep, RegiaoMunicipal, Bairro, TipoLogradouro,\
     Distrito, Logradouro, ImpressoEnderecamento, Notificacao
@@ -162,6 +163,7 @@ rules_saap_group_workspace_oper_processos = {
             menu_dados_auxiliares,
             menu_relatorios], set()),
         (AssuntoProcesso, __base__, set()),
+        (AnexoProcesso, __base__, set()),
         (Processo, __base__, set()),
         (ProcessoContato, __base__, set()),
     ]
