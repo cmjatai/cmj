@@ -5,28 +5,27 @@ from django.db.models.aggregates import Max
 from django.http.response import HttpResponse
 from django.utils import formats, timezone
 from django.utils.translation import gettext_lazy as _
-from django.views.generic.edit import FormView
+from django.views.generic.edit import FormView, UpdateView
 
-from cmj.cerimonial.forms import LocalTrabalhoForm, EnderecoForm,\
-    TipoAutoridadeForm, LocalTrabalhoPerfilForm,\
-    ContatoFragmentPronomesForm, ContatoForm, ProcessoForm,\
-    ContatoFragmentSearchForm, ProcessoContatoForm, ListWithSearchProcessoForm,\
-    GrupoDeContatosForm, VisitaForm
-from cmj.cerimonial.models import TipoTelefone, TipoEndereco,\
-    TipoEmail, Parentesco, EstadoCivil, TipoAutoridade, TipoLocalTrabalho,\
-    NivelInstrucao, Contato, Telefone, OperadoraTelefonia, Email,\
-    PronomeTratamento, Dependente, LocalTrabalho, Endereco,\
-    DependentePerfil, LocalTrabalhoPerfil,\
-    EmailPerfil, TelefonePerfil, EnderecoPerfil, FiliacaoPartidaria,\
-    StatusProcesso, ClassificacaoProcesso, TopicoProcesso, Processo,\
-    AssuntoProcesso, ProcessoContato, GrupoDeContatos, Visita
+from cmj.cerimonial.forms import LocalTrabalhoForm, EnderecoForm, \
+    TipoAutoridadeForm, LocalTrabalhoPerfilForm, \
+    ContatoFragmentPronomesForm, ContatoForm, ProcessoForm, \
+    ContatoFragmentSearchForm, ProcessoContatoForm, ListWithSearchProcessoForm, \
+    GrupoDeContatosForm, VisitaForm, AnexoProcessoForm
+from cmj.cerimonial.models import TipoTelefone, TipoEndereco, \
+    TipoEmail, Parentesco, EstadoCivil, TipoAutoridade, TipoLocalTrabalho, \
+    NivelInstrucao, Contato, Telefone, OperadoraTelefonia, Email, \
+    PronomeTratamento, Dependente, LocalTrabalho, Endereco, \
+    DependentePerfil, LocalTrabalhoPerfil, \
+    EmailPerfil, TelefonePerfil, EnderecoPerfil, FiliacaoPartidaria, \
+    StatusProcesso, ClassificacaoProcesso, TopicoProcesso, Processo, \
+    AssuntoProcesso, ProcessoContato, GrupoDeContatos, Visita, AnexoProcesso
 from cmj.core.forms import ListWithSearchForm
 from cmj.core.models import AreaTrabalho
-from cmj.globalrules.crud_custom import PerfilAbstractCrud,\
+from cmj.globalrules.crud_custom import PerfilAbstractCrud, \
     PerfilDetailCrudPermission
 from sapl.crispy_layout_mixin import CrispyLayoutFormMixin
 from sapl.crud.base import CrudAux, Crud, MasterDetailCrud
-
 
 # ---- Details Master Crud build ---------------------------
 TipoTelefoneCrud = CrudAux.build(TipoTelefone, 'tipotelefone')
@@ -43,8 +42,8 @@ ClassificacaoProcessoCrud = CrudAux.build(
 TopicoProcessoCrud = CrudAux.build(
     TopicoProcesso, 'topicoprocesso')
 
-
 # ---- Details Master Crud herança ---------------------------
+
 
 class VisitaCrud(Crud):
     model = Visita
@@ -53,9 +52,10 @@ class VisitaCrud(Crud):
         list_field_names = [
             "created",
             "visitante__nome",
-            "setores",  'fotografia', ]
+            "setores", 'fotografia', ]
 
     class DetailView(Crud.DetailView):
+
         def get_context_data(self, **kwargs):
             ctx = Crud.DetailView.get_context_data(self, **kwargs)
             ctx['subnav_template_name'] = ''
@@ -84,7 +84,7 @@ class VisitaCrud(Crud):
         def get_context_data(self, **kwargs):
             ctx = Crud.CreateView.get_context_data(self, **kwargs)
             ctx['path'] = ' app-registro-entrada'
-            #ctx['title'] = 'Registo de Entradas - PortalCMJ'
+            # ctx['title'] = 'Registo de Entradas - PortalCMJ'
             return ctx
 
     class ListView(Crud.ListView):
@@ -92,7 +92,7 @@ class VisitaCrud(Crud):
         def get_context_data(self, **kwargs):
             ctx = Crud.ListView.get_context_data(self, **kwargs)
             ctx['path'] = ' app-registro-entrada'
-            #ctx['title'] = 'Registo de Entradas - PortalCMJ'
+            # ctx['title'] = 'Registo de Entradas - PortalCMJ'
             return ctx
 
         def hook_header_created(self, *args, **kwargs):
@@ -169,8 +169,8 @@ class TipoAutoridadeCrud(Crud):
         list_field_names = ['descricao']
         form_class = TipoAutoridadeForm
 
-
 # ---- Contato Master e Details ----------------------------
+
 
 class ContatoCrud(Crud):
     model_set = None
@@ -448,7 +448,6 @@ class DependentePerfilCrud(PerfilDetailCrudPermission):
         list_field_names = ['parentesco', 'nome', 'nome_social',
                             'data_nascimento', 'sexo', 'identidade_genero', ]
 
-
 """
 
     class CreateView11(Crud.CreateView):
@@ -510,8 +509,8 @@ class DependentePerfilCrud(PerfilDetailCrudPermission):
                 self, request, *args, **kwargs)
 """
 
-
 # ---- Processo Master e Details ----------------------------
+
 
 class AssuntoProcessoCrud(Crud):
     model = AssuntoProcesso
@@ -544,11 +543,6 @@ class ProcessoMasterCrud(Crud):
                             ('status',
                              'classificacoes',)
                             ]
-
-        def get_context_data(self, **kwargs):
-            context = super().get_context_data(**kwargs)
-            context['subnav_template_name'] = 'cerimonial/subnav_processo.yaml'
-            return context
 
         def get_form(self, form_class=None):
             try:
@@ -595,6 +589,13 @@ class ProcessoMasterCrud(Crud):
     class UpdateView(Crud.UpdateView):
         form_class = ProcessoForm
         layout_key = 'ProcessoLayoutForForm'
+
+    class DetailView(Crud.DetailView):
+
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            context['subnav_template_name'] = 'cerimonial/subnav_processo.yaml'
+            return context
 
 
 class ContatoFragmentFormSearchView(FormView):
@@ -715,3 +716,41 @@ class GrupoDeContatosMasterCrud(Crud):
     class UpdateView(Crud.UpdateView):
         template_name = 'cerimonial/crispy_form_with_contato_search.html'
         form_class = GrupoDeContatosForm
+
+
+class AnexoProcessoCrud(MasterDetailCrud):
+    model = AnexoProcesso
+    parent_field = 'processo'
+    help_topic = 'anexoprocesso'
+
+    class BaseMixin(MasterDetailCrud.BaseMixin):
+        list_field_names = ['id', 'arquivo']
+
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            context['subnav_template_name'] = 'cerimonial/subnav_processo.yaml'
+            return context
+
+    class CreateView(MasterDetailCrud.CreateView):
+        form_class = AnexoProcessoForm
+        layout_key = 'AnexoProcesso'
+
+        def get_initial(self):
+            initial = super(MasterDetailCrud.CreateView, self).get_initial()
+            initial['processo'] = Processo.objects.get(id=self.kwargs['pk'])
+            return initial
+
+    class UpdateView(MasterDetailCrud.UpdateView):
+        form_class = AnexoProcessoForm
+        layout_key = 'AnexoProcesso'
+
+        def get_initial(self):
+            initial = super(UpdateView, self).get_initial()
+            initial['processo'] = self.object.processo
+            initial['arquivo'] = self.object.arquivo
+            return initial
+
+    class DetailView(MasterDetailCrud.DetailView):
+        form_class = AnexoProcessoForm
+        layout_key = 'AnexoProcesso'
+

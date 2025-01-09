@@ -2,11 +2,12 @@ from _functools import reduce
 from datetime import date, timedelta
 import datetime
 import decimal
+import logging
 import operator
 
 from crispy_forms.bootstrap import InlineRadios, FieldWithButtons, StrictButton
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Field, Row, Layout, Fieldset, Div, Button,\
+from crispy_forms.layout import Field, Row, Layout, Fieldset, Div, Button, \
     Submit, BaseInput, HTML
 from crispy_forms.templatetags.crispy_forms_field import css_class
 from crispy_forms.utils import get_template_pack
@@ -21,23 +22,25 @@ from django.forms import widgets
 from django.forms.models import ModelForm, ModelMultipleChoiceField
 from django.http.request import QueryDict
 from django.utils.translation import gettext_lazy as _
-from django_filters.filters import CharFilter, ChoiceFilter, NumberFilter,\
-    ModelChoiceFilter, RangeFilter,\
+from django_filters.filters import CharFilter, ChoiceFilter, NumberFilter, \
+    ModelChoiceFilter, RangeFilter, \
     MultipleChoiceFilter, ModelMultipleChoiceFilter, Filter
 from django_filters.filterset import FilterSet
 
 from cmj import settings
-from cmj.cerimonial.models import LocalTrabalho, Endereco,\
-    TipoAutoridade, PronomeTratamento, Contato, Perfil, Processo,\
-    IMPORTANCIA_CHOICE, AssuntoProcesso, StatusProcesso, ProcessoContato,\
-    GrupoDeContatos, TopicoProcesso, Visita, Visitante, ClassificacaoProcesso
+from cmj.cerimonial.models import LocalTrabalho, Endereco, \
+    TipoAutoridade, PronomeTratamento, Contato, Perfil, Processo, \
+    IMPORTANCIA_CHOICE, AssuntoProcesso, StatusProcesso, ProcessoContato, \
+    GrupoDeContatos, TopicoProcesso, Visita, Visitante, ClassificacaoProcesso, \
+    AnexoProcesso
 from cmj.core.forms import ListWithSearchForm
-from cmj.core.models import Municipio, Trecho, ImpressoEnderecamento,\
+from cmj.core.models import Municipio, Trecho, ImpressoEnderecamento, \
     AreaTrabalho, Bairro
+from cmj.settings.medias import MAX_DOC_UPLOAD_SIZE
 from cmj.utils import normalize, YES_NO_CHOICES, NONE_YES_NO_CHOICES
-from sapl.crispy_layout_mixin import to_column, SaplFormLayout, to_fieldsets,\
+from sapl.crispy_layout_mixin import to_column, SaplFormLayout, to_fieldsets, \
     form_actions, to_row, SaplFormHelper
-from sapl.utils import RangeWidgetNumber
+from sapl.utils import RangeWidgetNumber, FileFieldCheckMixin
 
 
 class ListTextWidget(forms.TextInput):
@@ -1381,3 +1384,36 @@ class VisitaForm(ModelForm):
         self.instance.visitante = visitante
 
         return ModelForm.save(self, commit=commit)
+
+
+class AnexoProcessoForm(FileFieldCheckMixin, ModelForm):
+
+    class Meta:
+        model = AnexoProcesso
+        fields = ['processo', 'arquivo', ]
+        widgets = {
+            'processo': forms.HiddenInput(),
+        }
+
+    logger = logging.getLogger(__name__)
+
+    def clean(self):
+        cleaned_data = super(AnexoProcessoForm, self).clean()
+
+        if not self.is_valid():
+            return cleaned_data
+
+        arquivo = self.cleaned_data.get('arquivo', False)
+
+        if arquivo and arquivo.size > MAX_DOC_UPLOAD_SIZE:
+            raise ValidationError("O Arquivo Anexo deve ser menor que {0:.1f} mb, o tamanho atual desse arquivo é {1:.1f} mb"
+                                  .format((MAX_DOC_UPLOAD_SIZE / 1024) / 1024, (arquivo.size / 1024) / 1024))
+
+        return cleaned_data
+
+    def save(self, commit=False):
+        anexo = self.instance
+        anexo.processo = self.cleaned_data['processo']
+        anexo.arquivo = self.cleaned_data['arquivo']
+        anexo = super(AnexoProcessoForm, self).save(commit=True)
+        return anexo

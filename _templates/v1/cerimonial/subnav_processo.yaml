@@ -1,3 +1,5 @@
 {% load i18n %}
 - title: {% trans 'Processo' %}
-  url: processo_list
+  url: processo_detail
+- title: {% trans 'Anexos do Processo' %}
+  url: anexoprocesso_list

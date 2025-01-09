@@ -173,3 +173,7 @@ Visita:
   - visitante created owner
   - setores
   - fotografia
+
+AnexoProcesso:
+  {% trans 'Adicionar Anexos ao Processo' %}:
+  - arquivo

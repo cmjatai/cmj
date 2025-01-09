@@ -1,0 +1,20 @@
+{% extends "crud/detail.html" %}
+{% load i18n common_tags %}
+{% load render_bundle from webpack_loader %}
+{% block head_title %}{{object}}{% endblock head_title %}
+{% block meta_description%}{{object.titulo}}{% endblock meta_description %}
+
+{% block table_content %}
+
+    {% if object.anexoprocesso_set.exists %}
+      <p class="control-label">Anexos do Processo</p>
+        <ul class="">
+          {% for p in object.anexoprocesso_set.all %}
+            <li>
+              <a href="/media/{{p.arquivo}}">
+                {{ p.arquivo | to_str | split:"/" | get_last_item_from_list:-1 }}</a>{% if not forloop.last %}<br>{% endif %}
+              </li>
+          {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock table_content %}

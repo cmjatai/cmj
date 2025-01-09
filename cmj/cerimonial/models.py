@@ -6,13 +6,14 @@ from django.db.models.fields.json import JSONField
 from django.utils import timezone, formats
 from django.utils.translation import gettext_lazy as _
 
-from cmj.core.models import CmjModelMixin, Trecho, Distrito, RegiaoMunicipal,\
+from cmj.core.models import CmjModelMixin, Trecho, Distrito, RegiaoMunicipal, \
     CmjAuditoriaModelMixin, CmjSearchMixin, AreaTrabalho, Bairro, Municipio
-from cmj.utils import YES_NO_CHOICES, NONE_YES_NO_CHOICES,\
-    get_settings_auth_user_model
+from cmj.mixins import CommonMixin
+from cmj.utils import YES_NO_CHOICES, NONE_YES_NO_CHOICES, \
+    get_settings_auth_user_model, restringe_tipos_de_arquivo_midias
 from sapl.parlamentares.models import Parlamentar, Partido
-from sapl.utils import LISTA_DE_UFS, texto_upload_path, PortalImageField
-
+from sapl.utils import LISTA_DE_UFS, texto_upload_path, PortalImageField, \
+    PortalFileField
 
 FEMININO = 'F'
 MASCULINO = 'M'
@@ -826,6 +827,56 @@ class Processo(CmjSearchMixin, CmjAuditoriaModelMixin):
                 'descricao']
 
 
+def anexoprocesso_upload_path(instance, filename):
+    return texto_upload_path(instance, filename)
+
+
+class AnexoProcesso(CommonMixin):
+    FIELDFILE_NAME = ('arquivo',)
+
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+
+    processo = models.ForeignKey(
+        Processo,
+        related_name='anexoprocesso_set',
+        on_delete=models.PROTECT,
+        verbose_name=_('Processo'))
+
+    arquivo = PortalFileField(
+        blank=True,
+        null=True,
+        upload_to=anexoprocesso_upload_path,
+        verbose_name=_('Arquivo Anexo'),
+        # storage=OverwriteStorage(),
+        # validators=[restringe_tipos_de_arquivo_midias]
+        )
+
+    class Meta:
+        verbose_name = _('Anexo do Processo')
+        verbose_name_plural = _('Anexos do Processo')
+
+    def __str__(self):
+        return _('Anexo: %(anexo)s do processo %(processo)s') % {
+            'anexo': self.arquivo, 'processo': self.processo}
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+
+        if not self.pk and self.arquivo:
+            arquivo = self.arquivo
+            self.arquivo = None
+            models.Model.save(self, force_insert=force_insert,
+                              force_update=force_update,
+                              using=using,
+                              update_fields=update_fields)
+            self.arquivo = arquivo
+
+        return models.Model.save(self, force_insert=force_insert,
+                                 force_update=force_update,
+                                 using=using,
+                                 update_fields=update_fields)
 class ProcessoContato(Processo):
 
     class Meta:

@@ -14,7 +14,7 @@ from cmj.cerimonial.views import ContatoCrud, TelefoneCrud, EmailCrud,\
     ContatoFragmentFormPronomesView, StatusProcessoCrud, TopicoProcessoCrud,\
     ClassificacaoProcessoCrud, ProcessoMasterCrud, AssuntoProcessoCrud,\
     ContatoFragmentFormSearchView, ProcessoContatoCrud,\
-    GrupoDeContatosMasterCrud, VisitaCrud
+    GrupoDeContatosMasterCrud, VisitaCrud, AnexoProcessoCrud
 
 from .apps import AppConfig
 
@@ -54,7 +54,8 @@ urlpatterns = [
     )),
 
     re_path(r'^processo', include(
-        ProcessoMasterCrud.get_urls()
+        ProcessoMasterCrud.get_urls() +
+        AnexoProcessoCrud.get_urls()
     )),
     re_path(r'^assuntoprocesso', include(
         AssuntoProcessoCrud.get_urls()
