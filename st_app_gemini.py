@@ -1,3 +1,6 @@
+
+import streamlit as st
+import sys
 import os
 import re
 import google.generativeai as genai
@@ -68,7 +71,7 @@ def load_pdf(file_path):
 # replace the path with your file path
 pdf_text = load_pdf(file_path="/home/leandrojatai/Downloads/ed_814.pdf")
 
-def split_text(text: str, chunk_size: int = 1000, chunk_overlap: int = 200):
+def split_text(text: str, chunk_size: int = 1200, chunk_overlap: int = 300):
     chunks = []
     i = 0
     while i < len(text):
@@ -142,6 +145,7 @@ def make_rag_prompt(query, relevant_passage):
               incluída abaixo. Certifique-se de responder em uma \
               frase completa, sendo abrangente, \
               incluindo todas as informações de contexto relevantes. \
+              Seja altamente organizado e forneça marcação visual (markdown) \
               No entanto, você está falando para um público não técnico, \
               então certifique-se de quebrar conceitos complicados e \
               adotar um tom amigável e coloquial. \
@@ -152,8 +156,10 @@ def make_rag_prompt(query, relevant_passage):
 
     PERGUNTA: '{query}'
 
-    ANSWER:
     """).format(query=query, relevant_passage=escaped)
+
+    while '  ' in prompt:
+        prompt = prompt.replace('  ', ' ')
 
     return prompt
 
@@ -172,15 +178,29 @@ def generate_answer(db, query):
       generation_config=generation_config,
     )
 
-    relevant_text = get_relevant_passage(query, db, n_results=5)
+    relevant_text = get_relevant_passage(query, db, n_results=20)
     prompt = make_rag_prompt(query,
                              relevant_passage="".join(relevant_text))
 
     answer = model.generate_content(prompt)
-    return answer.text
+    return answer.text, relevant_text
 
 
-query = "quais representantes eclisiásticos e/ou pastores estiveram na posse?"
+#query = "quais representantes eclisiásticos e/ou pastores estiveram na posse?"
 
-response = generate_answer(db, query)
-print(response)
+if __name__ == "__main__":
+
+    st.set_page_config(
+        page_title="Chat PortalCMJ", layout="wide"
+    )
+    st.title("Chat PortalCMJ")
+
+    st.header('Converse com o Diário 814.')
+    user_question = st.text_input("Faça uma pergunta...")
+
+    if(user_question):
+
+        response, relevant_text = generate_answer(db, user_question)
+
+        st.markdown(response)
+        st.write(relevant_text)
