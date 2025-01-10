@@ -6,11 +6,12 @@ from django.db.models.fields import TextField
 from django.db.models.functions import Concat
 from django.template import loader
 from haystack.constants import Indexable
-from haystack.fields import CharField, DateTimeField, IntegerField, BooleanField,\
+from haystack.fields import CharField, DateTimeField, IntegerField, BooleanField, \
     MultiValueField
 
 from cmj.diarios.models import DiarioOficial
 from cmj.sigad.models import Documento
+from cmj.utils import clean_text
 from sapl.compilacao.models import (STATUS_TA_IMMUTABLE_PUBLIC,
                                     STATUS_TA_PUBLIC, Dispositivo)
 from sapl.materia.models import DocumentoAcessorio, MateriaLegislativa
@@ -51,7 +52,9 @@ class TextExtractField(CharField):
             self.logger.error(arquivo.path)
             self.logger.error('erro processando arquivo: ' % arquivo.path)
             data = ''
-        return data
+
+        # data = clean_text(data)
+        return clean_text(data)
 
     def print_error(self, arquivo, error):
         msg = 'Erro inesperado processando arquivo %s erro: %s' % (

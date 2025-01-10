@@ -139,7 +139,7 @@
                   </a>
                 </strong>
                 <div class="text-ementa">
-                {{ m.ementa|safe }}
+                  {{ m.ementa|safe }}
                 </div>
                     {% if m.url_video %}
                       <div class="container-youtube ">
@@ -355,6 +355,9 @@
                       Homologação: {{m.metadata.signs.texto_original.hom.0}}
                       </small>
                     {% endif %}
+                    <small>
+                      Score: {{result.score|floatformat:"4"}}
+                    </small>
                     </div>
                   {% endif %}
 

@@ -166,6 +166,13 @@ class CmjSearchForm(ModelSearchForm):
         return ModelSearchForm.get_models(self)
 
 
+def CHOICE_ORDENACAO():
+    return [
+            ('D', 'Mais Recentes'),
+            ('R', 'Relevância'),
+            ]
+
+
 class MateriaSearchForm(SearchForm):
 
     _errors = []
@@ -184,6 +191,12 @@ class MateriaSearchForm(SearchForm):
         required=False,
         label=_('Em tramitação'),
         choices=CHOICE_TRAMITACAO
+    )
+
+    ordenacao = forms.TypedChoiceField(
+        required=False,
+        label=_('Ordenação'),
+        choices=CHOICE_ORDENACAO
     )
 
     tipo_i = forms.ModelMultipleChoiceField(
@@ -298,8 +311,9 @@ class MateriaSearchForm(SearchForm):
                 ]),
                 css_class="form-group"
             ), 3),
-            ('uta_i', 4),
-            ('sta_i', 5),
+            ('uta_i', 3),
+            ('sta_i', 4),
+            ('ordenacao', 2),
         ])
 
         self.helper = FormHelper()
@@ -375,6 +389,10 @@ class MateriaSearchForm(SearchForm):
         if sta_i:
             return sta_i.id
 
+    def clean_ordenacao(self, *args, **kwargs):
+        o = self.cleaned_data['ordenacao']
+        return o
+
     def clean_ano_i(self, *args, **kwargs):
         a = self.cleaned_data['ano_i']
         if not a:
@@ -408,6 +426,12 @@ class MateriaSearchForm(SearchForm):
             params['sta_i__in'] = params['sta_i']
             del params['sta_i']
 
+        ord = '-data_dt'
+        if params and 'ordenacao' in params:
+            ord = self.cleaned_data.get('ordenacao', 'D')
+            ord = '-data_dt' if ord == 'D' else '-score'
+            del params['ordenacao']
+
         if params:
             sqs = sqs.filter(**params)
 
@@ -416,8 +440,9 @@ class MateriaSearchForm(SearchForm):
             'hl.simple.post': '</span>',
             'hl.fragsize': 512
         }
+
         s = sqs.highlight(**kwargs).order_by(
-            '-data_dt',
+            ord,
             '-pk_i',
             '-last_update'
         )
@@ -448,6 +473,12 @@ class NormaSearchForm(SearchForm):
         required=False,
         queryset=AssuntoNorma.objects.all(),
         label=_('Assuntos'),
+    )
+
+    ordenacao = forms.TypedChoiceField(
+        required=False,
+        label=_('Ordenação'),
+        choices=CHOICE_ORDENACAO
     )
 
     def no_query_found(self):
@@ -485,10 +516,11 @@ class NormaSearchForm(SearchForm):
             (q_field, 8),
             (Div(), 2),
 
-            ('tipo_i', 4),
+            ('tipo_i', 3),
             ('numero_s', 2),
             ('ano_i', 2),
-            ('assuntos_is', 4),
+            ('assuntos_is', 3),
+            ('ordenacao', 2),
         ])
 
         self.helper = FormHelper()
@@ -542,6 +574,12 @@ class NormaSearchForm(SearchForm):
             for key in self.changed_data if key not in remove
         }
 
+        ord = '-data_dt'
+        if params and 'ordenacao' in params:
+            ord = self.cleaned_data.get('ordenacao', 'D')
+            ord = '-data_dt' if ord == 'D' else '-score'
+            del params['ordenacao']
+
         if params:
             sqs = sqs.filter(**params)
 
@@ -552,7 +590,7 @@ class NormaSearchForm(SearchForm):
         }
 
         s = sqs.highlight(**kwargs).order_by(
-            '-data_dt',
+            ord,
             '-numero_s',
             '-last_update'
         )

@@ -55,6 +55,11 @@
               {% with result.object as n %}
                 {% include 'norma/normajuridica_widget_list.html' %}
               {% endwith %}
+              {% if perms.norma.change_normajuridica %}
+              <small>
+                Score: {{result.score|floatformat:"4"}}
+              </small>
+              {% endif %}
             </div>
           </div>
         {% endif %}

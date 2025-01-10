@@ -84,30 +84,38 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.logger = logging.getLogger(__name__)
-        m = Manutencao()
-        m.desativa_auto_now()
-        m.desativa_signals()
+        mnt = Manutencao()
+        mnt.desativa_auto_now()
+        mnt.desativa_signals()
 
-        """"d = Despesa()
-        ddict = {'loa_id': 2024,
-                 'orgao_id': 1,
-                 'unidade_id': 1,
-                 'funcao_id': 1,
-                 'subfuncao_id': 1,
-                 'programa_id': 1,
-                 'acao_id': 1,
-                 'fonte_id': None,
-                 'natureza_id': 1}
+        m = MateriaLegislativa.objects.get(pk=21501)
 
-        for k, v in ddict.items():
-            setattr(d, k, v)
-        d.save()"""
+        fin = m.texto_original.path
+        doc = pymupdf.open(fin)
+        text = '\n'.join([page.get_text() for page in doc])
 
+        normalizes = (
+            ('\n ?\d+ ?/ ?\d+ ?\n', '\n'),
+            ('[ ]{2,}', ' '),
+            (' \\n', '\n'),
+            ('([\w–,•])\\n(\w)', r'\1 \2'),
+            ('\n\n', '\n'),
+            )
+
+        for regex, new in normalizes:
+            search = re.search(regex, text)
+            while search:
+                text = re.sub(regex, new, text)
+                search = re.search(regex, text)
+                print(repr(text))
+
+        print(text)
+
+        return
         # self.anonimizardiario()
 
         # self.get_all_tas()
         # self.sanitize_dispositivos_compilacao()
-        return
 
         # list todos os orderings dos models
 
