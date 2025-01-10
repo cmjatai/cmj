@@ -11,8 +11,8 @@ import fitz
 import pymupdf
 
 from cmj.core.models import AreaTrabalho
+from cmj.utils import clean_text
 from sapl.utils import get_mime_type_from_file_extension
-
 
 logger = logging.getLogger(__name__)
 
@@ -130,8 +130,19 @@ class ResponseFileMixin:
             print(e)
             pass
 
+    def response_pdftotext(self, arquivo):
+
+        fin = arquivo.path
+        doc = pymupdf.open(fin)
+        text = '\n'.join([page.get_text() for page in doc])
+        text = clean_text(text)
+
+        response = HttpResponse(text, content_type='text/plain; charset=utf-8')
+        return response
+
     def response_file(self, request, *args, **kwargs):
-        self.item = item = self.get_queryset().filter(pk = kwargs['pk']).first()
+        self.item = item = self.get_queryset().filter(pk=kwargs['pk']).first()
+        text = request.GET.get('text', '')
         page = request.GET.get('page', 0)
         dpi = request.GET.get('dpi', 72)
         grade = request.GET.get('grade', '0')
@@ -154,6 +165,9 @@ class ResponseFileMixin:
 
         if request.user.is_superuser and anon and mime == 'application/pdf':
             self.anon(arquivo, int(page), grade, anon)
+
+        if text and mime == 'application/pdf':
+            return self.response_pdftotext(arquivo)
 
         if page and mime == 'application/pdf':
             return self.response_pagepdftoimage(arquivo, int(page), dpi, grade)
