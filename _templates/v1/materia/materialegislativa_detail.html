@@ -42,16 +42,22 @@
 
 {% endblock title %}
 
-  {% block container_actions %}
-    {% if not user.is_anonymous %}
-      {{ block.super }}
-    {% else %}
-      <div class="pt-2">
-      {% block actions %}{{ block.super }}
+{% block container_actions %}
+  {% if not user.is_anonymous %}
+    {{ block.super }}
+  {% else %}
+    <div class="pt-2 ">
+      {% block actions %}
+        {{ block.super }}
       {% endblock actions %}
-      </div>
-    {% endif %}
-  {% endblock container_actions %}
+      {% block extra_actions %}
+        {{ block.super }}
+      {% endblock extra_actions %}
+    </div>
+  {% endif %}
+
+
+{% endblock container_actions %}
 
 {% block sub_actions %}
     {{ block.super }}
@@ -60,6 +66,7 @@
         <a href="{% url 'sapl.materia:acompanhar_materia' object.id %}" class="btn btn-outline-primary"  data-toggle="tooltip" data-placement="top" title="Registre seu email para acompanhamento desta matéria. Você receberá um email sempre que está materia tramitar.">Acompanhar Matéria</a>
       </div>
     {% endif %}
+
 {% endblock sub_actions %}
 
 {% block detail_content %}

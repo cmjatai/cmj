@@ -69,7 +69,7 @@ services:
       - cmjfront
       - cmjsolr
     ports:
-      - "9000:9000"
+      - "9099:9000"
     networks:
       - cmj-net
 networks:
