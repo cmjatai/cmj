@@ -161,5 +161,5 @@ if DEBUG_TOOLBAR_ACTIVE:
 
 if DEBUG:
     NOTEBOOK_ARGUMENTS = [
-        '--notebook-dir', 'notebooks',
+        '--notebook-dir', '__notebooks',
     ]
