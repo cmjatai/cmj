@@ -23,6 +23,9 @@ WORKDIR /var/cmjatai/cmj/
 #COPY requirements/requirements.txt $HOME
 #RUN pip install -r /var/cmjatai/cmj/requirements.txt
 
+COPY requirements/* $HOME
+RUN pip install -r ia-requirements.txt
+
 ADD drfautoapi  /var/cmjatai/cmj/drfautoapi
 ADD fonts       /var/cmjatai/cmj/fonts
 ADD scripts     /var/cmjatai/cmj/scripts

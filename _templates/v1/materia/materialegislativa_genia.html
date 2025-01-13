@@ -1,0 +1,123 @@
+<br>
+<table class="table table-striped table-hover table-link-ordering">
+  <tr>
+      <th colspan=4>
+        {% if user.is_superuser %}
+          <div class="float-right">
+            <a href="?ia_run=delete" class="btn btn-excluir" title="Excluir Análise">X</a>
+          </div>
+        {% endif %}
+        <strong>
+          Análise Gerada por I.A.
+        </strong>
+        <br>
+        <small class="text-red">
+          <strong>
+            <em>(Experimental. Gerado com: "{{md.metadata.genia.model_name}}")</em>
+          </strong>
+        </small>
+      </th>
+    </tr>
+
+    {% if md.metadata.genia.analise %}
+      <tr>
+        <th>Análise Geral</th>
+        <td colspan=3>
+          {{ md.metadata.genia.analise }}
+        </td>
+      </tr>
+    {% endif %}
+    <tr>
+      <th>Temas Relacionados</th>
+      <td>
+        <ul class="m-0">
+          {% for tema in md.metadata.genia.temas %}
+            <li>{{ tema|capfirst }}</li>
+          {% endfor %}
+        </ul>
+      </td>
+      <th>Localidades Envolvidas</th>
+      <td width="40%">
+        <ul class="m-0">
+          {% for localidade in md.metadata.genia.localidades %}
+            <li>
+              {% if localidade.local %}
+              <Strong>{{ localidade.local|capfirst }}</Strong>
+              {% endif %}
+              {% if localidade.nome %}
+              <Strong>{{ localidade.nome|capfirst }}</Strong>
+              {% endif %}
+              <small><em>({{localidade.tipo}})</em></small>
+            </li>
+          {% endfor %}
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <th>Destinatários</th>
+      <td colspan=3>
+        <ul class="m-0">
+          {% for destinatario in md.metadata.genia.destinatarios %}
+          <li>
+            {% if destinatario.nome %}
+              <strong>Nome: </strong>{{ destinatario.nome }}
+            {% endif %}
+          </li>
+          <li>
+            {% if destinatario.cargo %}
+              <strong>Cargo: </strong>{{ destinatario.cargo }}
+            {% endif %}
+          </li>
+          <li>
+            {% if destinatario.instituicao %}
+              <strong>Instituição: </strong>{{ destinatario.instituicao }}
+            {% endif %}
+          </li>
+          <li>
+            {% if destinatario.importancia %}
+              <strong>Importância: </strong>{{ destinatario.importancia }}
+            {% else %}
+              <strong>Importância: </strong>{{ destinatario.justificativa }}
+            {% endif %}
+          </li>
+          <div class="divider p-2"></div>
+          {% endfor %}
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <th>Outros Possíveis Destinatários</th>
+      <td colspan=3>
+        <ul class="m-0">
+          {% for destinatario in md.metadata.genia.possiveis_destinatarios %}
+          {% if destinatario.nome %}
+            <li>
+              <strong>Nome: </strong>{{ destinatario.nome }}
+            </li>
+            {% endif %}
+            {% if destinatario.cargo %}
+              <li>
+                <strong>Cargo: </strong>{{ destinatario.cargo }}
+              </li>
+            {% endif %}
+            {% if destinatario.instituicao %}
+              <li>
+                <strong>Instituição: </strong>{{ destinatario.instituicao }}
+              </li>
+            {% endif %}
+            {% if destinatario.importancia %}
+              <li>
+                <strong>Importância: </strong>{{ destinatario.importancia }}
+              </li>
+            {% endif %}
+            {% if destinatario.justificativa %}
+              <li>
+                <strong>Importância: </strong>{{ destinatario.justificativa }}
+              </li>
+            {% endif %}
+          <div class="divider p-2"></div>
+          {% endfor %}
+        </ul>
+      </td>
+    </tr>
+</table>

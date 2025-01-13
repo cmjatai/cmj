@@ -17,11 +17,11 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, ValidationError,\
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, ValidationError, \
     PermissionDenied
 from django.db.models import Max, Q
 from django.http import HttpResponse, JsonResponse
-from django.http.response import Http404, HttpResponseRedirect,\
+from django.http.response import Http404, HttpResponseRedirect, \
     HttpResponsePermanentRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.urls.base import reverse
@@ -38,8 +38,9 @@ import weasyprint
 
 from cmj import celery
 from cmj.core.models import AreaTrabalho
+from cmj.genia import GoogleGenerativeIA
 from cmj.globalrules import GROUP_MATERIA_WORKSPACE_VIEWER
-from cmj.mixins import BtnCertMixin, CheckCheckMixin, MultiFormatOutputMixin,\
+from cmj.mixins import BtnCertMixin, CheckCheckMixin, MultiFormatOutputMixin, \
     AudigLogFilterMixin
 from sapl.base.email_utils import do_envia_email_confirmacao
 from sapl.base.models import Autor, CasaLegislativa, AppConfig as BaseAppConfig
@@ -2105,7 +2106,7 @@ class MateriaLegislativaCrud(Crud):
         def get_success_url(self):
             return self.search_url
 
-    class DetailView(BtnCertMixin, Crud.DetailView):
+    class DetailView(GoogleGenerativeIA, BtnCertMixin, Crud.DetailView):
 
         layout_key = 'MateriaLegislativaDetail'
         template_name = "materia/materialegislativa_detail.html"
@@ -2126,7 +2127,6 @@ class MateriaLegislativaCrud(Crud):
                             )
                         ]
                     )
-                    return btns
                 elif self.request.user.is_superuser:
                     btns.extend(
                         [
@@ -2138,7 +2138,11 @@ class MateriaLegislativaCrud(Crud):
                             )
                         ]
                     )
-                    return btns
+
+            if self.request.user.is_superuser:
+                btns.extend(
+                    self.get_btn_generate('sapl.materia:materialegislativa_detail')
+                    )
 
             btns = list(filter(None, btns))
             return btns
@@ -2254,6 +2258,12 @@ class MateriaLegislativaCrud(Crud):
             # )
             if 'download' in request.GET:
                 return self.download(request.GET.get('download'))
+            if 'ia_run' in request.GET and request.user.is_superuser:
+                self.ia_run()
+                return  HttpResponseRedirect(reverse(
+                'sapl.materia:materialegislativa_detail',
+                kwargs={'pk': self.kwargs['pk']}
+                ))
             elif 'cabec_autografo' in request.GET:
                 return self.cabec_autografo(request.GET.get('cabec_autografo'))
             return Crud.DetailView.get(self, request, *args, **kwargs)

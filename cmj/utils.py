@@ -88,6 +88,7 @@ def normalize(txt):
     return unicodedata_normalize(
         'NFKD', txt).encode('ASCII', 'ignore').decode('ASCII')
 
+
 def clean_text(text, _normalizes=None):
     txt = text
     try:
@@ -95,10 +96,23 @@ def clean_text(text, _normalizes=None):
             ('\n ?\d+ ?/ ?\d+ ?\n', '\n'),
             ('[ ]{2,}', ' '),
             (' \\n', '\n'),
-            ('([\w–,•])\\n(\w)', r'\1 \2'),
+            #('([^\.]|\S)\n(\S)', r'\1 \2'),
+            ('(\w)\n(.)', r'\1 \2'),
+            ('(,)\n(.)', r'\1 \2'),
+            #('()\n()', r'\1 \2'),
             ('\n\n', '\n'),
+            ('-\n', '-'),
+            ('^\n', ''),
+            ('–', '-'),
+            ('•', '*'),
+            ('[“”]', '"'),
+            #('', ''),
+            #('', ''),
+            #('', ''),
+            #('', ''),
+            #('', ''),
         )
-    
+
         for regex, new in normalizes:
             search = re.search(regex, text)
             while search:
@@ -107,6 +121,7 @@ def clean_text(text, _normalizes=None):
         return text
     except:
         return txt
+
 
 
 def get_settings_auth_user_model():

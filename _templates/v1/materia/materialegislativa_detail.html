@@ -193,6 +193,12 @@
     {% include "materia/tramitacao_list_container.html" %}
   {% endwith %}
 
+  {% if object.metadata_model %}
+    {% with object.metadata_model as md %}
+      {% include "materia/materialegislativa_genia.html" %}
+    {% endwith %}
+  {% endif %}
+
   {% if user.is_superuser %}
     <div class="container pt-5">
     <div class="row">

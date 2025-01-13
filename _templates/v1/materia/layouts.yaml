@@ -11,6 +11,7 @@ TipoMateriaLegislativa:
   {% trans 'Tipo Matéria Legislativa' %}:
   - sigla:3 descricao
   - nivel_agrupamento sequencia_numeracao turnos_aprovacao
+  - prompt
 
 RegimeTramitacao:
   {% trans 'Tipo de Documento' %}:

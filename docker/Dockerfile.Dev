@@ -9,6 +9,9 @@ ENV PYTHONUNBUFFERED=1
 #COPY requirements/* $HOME
 #RUN pip install -r dev-requirements.txt
 
+COPY requirements/* $HOME
+RUN pip install -r ia-requirements.txt
+
 #RUN pip install pgvector
 #RUN pip install sentence-transformers
 

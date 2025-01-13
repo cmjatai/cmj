@@ -156,12 +156,6 @@ class CheckCheckMixin:
 
 class BtnCertMixin:
 
-    @property
-    def extras_url(self):
-        r = self.btn_certidao('texto_integral')
-        r = list(filter(None, r))
-        return r
-
     def btn_certidao(self, field_name,
                      btn_title_public=_('Certidão de Publicação'),
                      btn_title_admin=_('Gerar Certidão de Publicação'),
@@ -767,5 +761,4 @@ class MultiFormatOutputMixin:
 
             verbose_name = '/'.join(verbose_name).strip()
             yield f'{verbose_name}'
-
 

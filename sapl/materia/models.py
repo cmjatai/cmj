@@ -17,7 +17,7 @@ from cmj.core.models import CertidaoPublicacao
 from cmj.diarios.models import VinculoDocDiarioOficial, DiarioOficial
 from cmj.mixins import CommonMixin
 from sapl.base.models import SEQUENCIA_NUMERACAO_PROTOCOLO, Autor, \
-    TipoAutor
+    TipoAutor, Metadata
 from sapl.comissoes.models import Comissao, Reuniao
 from sapl.compilacao.models import (PerfilEstruturalTextoArticulado,
                                     TextoArticulado)
@@ -176,6 +176,11 @@ class TipoMateriaLegislativa(models.Model):
         default=1,
         verbose_name=_('Turnos para aprovação.'),)
 
+    prompt = models.TextField(
+        blank=True,
+        verbose_name=_('Prompt para Análise de IA.')
+        )
+        
     class Meta:
         verbose_name = _('Tipo de Matéria Legislativa')
         verbose_name_plural = _('Tipos de Matérias Legislativas')
@@ -400,6 +405,9 @@ class MateriaLegislativa(CommonMixin):
     _certidao = GenericRelation(
         CertidaoPublicacao, related_query_name='materialegislativa_cert')
 
+    _metadata_model = GenericRelation(
+        Metadata, related_query_name='materialegislativa_metadata')
+
     _diario = GenericRelation(
         VinculoDocDiarioOficial, related_query_name='materialegislativa_diario')
 
@@ -430,6 +438,10 @@ class MateriaLegislativa(CommonMixin):
     @property
     def certidao(self):
         return self._certidao.order_by('-id').first()
+
+    @property
+    def metadata_model(self):
+        return self._metadata_model.order_by('-id').first()
 
     @property
     def diariooficial(self):
