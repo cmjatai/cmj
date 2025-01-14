@@ -37,11 +37,12 @@ class GoogleGenerativeIA:
         ]
 
     def ia_run(self):
-        action = self.request.GET.get('ia_run', 'generate')
+        self.action = self.request.GET.get('ia_run', 'generate')
 
-        if action == 'generate':
+        if self.action.startswith('generate'):
+            self.delete()
             self.generate()
-        elif action == 'delete':
+        elif self.action == 'delete':
             self.delete()
 
     def delete(self):
@@ -87,9 +88,14 @@ class GoogleGenerativeIA:
         if not status:
             return ''
 
-        self.temperature = prompt_object.get('temperature', self.temperature)
-        self.top_k = prompt_object.get('top_k', self.top_k)
-        self.top_p = prompt_object.get('top_p', self.top_p)
+        if self.action == 'generate':
+            self.temperature = prompt_object.get('temperature', self.temperature)
+            self.top_k = prompt_object.get('top_k', self.top_k)
+            self.top_p = prompt_object.get('top_p', self.top_p)
+        elif self.action == 'generate_custom':
+            self.temperature = float(self.request.GET.get('temperature', self.temperature))
+            self.top_p = float(self.request.GET.get('top_p', self.top_p))
+            self.top_k = int(self.request.GET.get('top_k', self.top_k))
 
         prompt_mask = prompt_object.get('mask', '')
 
