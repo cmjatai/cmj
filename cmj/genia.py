@@ -2,6 +2,7 @@ import json
 import logging
 
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
@@ -44,6 +45,9 @@ class GoogleGenerativeIA:
             self.generate()
         elif self.action == 'delete':
             self.delete()
+            messages.add_message(
+                self.request, messages.SUCCESS,
+                _('Análise removida com sucesso!'))
 
     def delete(self):
             obj = self.get_object()
@@ -144,6 +148,14 @@ class GoogleGenerativeIA:
             md.metadata = metadata
             md.save()
 
+            messages.add_message(
+                self.request, messages.SUCCESS,
+                _('Análise gerada com sucesso!'))
+
         except Exception as e:
             logger.error(e)
+
+            messages.add_message(
+                self.request, messages.ERROR,
+                _('Ocorreu erro na geração da análise!'))
 
