@@ -6,6 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 import pymupdf
+import yaml
 
 from cmj.utils import clean_text
 from sapl.base.models import Metadata
@@ -16,6 +17,10 @@ logger = logging.getLogger(__name__)
 class GoogleGenerativeIA:
     
     ia_model_name = "gemini-2.0-flash-exp"
+
+    temperature = 0.1
+    top_k = 40
+    top_p = 0.95
 
     def get_btn_generate(self, viewname):
         return [
@@ -48,9 +53,9 @@ class GoogleGenerativeIA:
 
     def get_model_configured(self):
         generation_config = {
-          "temperature": 0.1,
-          "top_p": 0.95,
-          "top_k": 40,
+          "temperature": self.temperature,
+          "top_p": self.top_p,
+          "top_k": self.top_k,
           # "max_output_tokens": 8192,
           "response_mime_type": "application/json",
         }
@@ -68,6 +73,26 @@ class GoogleGenerativeIA:
         obj = self.get_object()
 
         prompt_mask = obj.tipo.prompt
+        if not prompt_mask:
+            return ''
+
+        yaml_data = yaml.load(prompt_mask, Loader=yaml.FullLoader)
+
+        status = False
+        for prompt_object in yaml_data['PROMPTs']:
+            status = prompt_object['status']
+            if status:
+                break
+
+        if not status:
+            return ''
+
+        self.temperature = prompt_object.get('temperature', self.temperature)
+        self.top_k = prompt_object.get('top_k', self.top_k)
+        self.top_p = prompt_object.get('top_p', self.top_p)
+
+        prompt_mask = prompt_object.get('mask', '')
+
         if not prompt_mask:
             return ''
 
