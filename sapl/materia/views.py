@@ -61,7 +61,8 @@ from sapl.materia.forms import (AnexadaForm, AutoriaForm,
                                 OrgaoForm, ProposicaoForm, TipoProposicaoForm,
                                 TramitacaoForm, TramitacaoUpdateForm, MateriaPesquisaSimplesForm,
                                 DespachoInicialCreateForm,
-                                DocumentoAcessorioProtocoloForm)
+                                DocumentoAcessorioProtocoloForm,
+    AssuntoMateriaForm)
 from sapl.norma.models import LegislacaoCitada
 from sapl.parlamentares.models import Legislatura
 from sapl.protocoloadm.models import Protocolo
@@ -162,8 +163,6 @@ def tipos_autores_materias(user, restricao_regimental=True):
 
     return r
 
-
-AssuntoMateriaCrud = CrudAux.build(AssuntoMateria, 'assunto_materia')
 
 OrigemCrud = CrudAux.build(Origem, '')
 
@@ -461,6 +460,18 @@ def recuperar_materia(request):
 
 
 StatusTramitacaoCrud = CrudAux.build(StatusTramitacao, 'status_tramitacao')
+
+
+class AssuntoMateriaCrud(CrudAux):
+    model = AssuntoMateria
+
+    class CreateView(CrudAux.CreateView):
+        layout_key = None
+        form_class = AssuntoMateriaForm
+
+    class UpdateView(CrudAux.UpdateView):
+        layout_key = None
+        form_class = AssuntoMateriaForm
 
 
 class OrgaoCrud(CrudAux):

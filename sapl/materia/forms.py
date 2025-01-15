@@ -14,9 +14,11 @@ from django.core.files.base import File
 from django.db import models, transaction
 from django.db.models import Max, Q, F
 from django.forms import ModelChoiceField, ModelForm, widgets
+from django.forms.fields import MultipleChoiceField
 from django.forms.forms import Form
 from django.forms.models import ModelMultipleChoiceField
-from django.forms.widgets import CheckboxSelectMultiple, HiddenInput, Select
+from django.forms.widgets import CheckboxSelectMultiple, HiddenInput, Select, \
+    CheckboxInput
 from django.urls.base import reverse
 from django.utils import timezone
 from django.utils.encoding import force_str
@@ -30,7 +32,7 @@ import django_filters
 from cmj.loa.models import EmendaLoa
 from cmj.mixins import GoogleRecapthaMixin
 from cmj.utils import CHOICE_SIGNEDS, AlertSafe
-from sapl.base.models import AppConfig, Autor, TipoAutor
+from sapl.base.models import AppConfig, Autor, TipoAutor, Metadata
 from sapl.comissoes.models import Comissao, Participacao, Composicao
 from sapl.compilacao.models import (STATUS_TA_IMMUTABLE_PUBLIC,
                                     STATUS_TA_PRIVATE)
@@ -90,6 +92,69 @@ class AdicionarVariasAutoriasFilterSet(django_filters.FilterSet):
             Fieldset(_('Filtrar Autores'),
                      row1, form_actions(label='Filtrar'))
         )
+
+
+class AssuntoMateriaForm(ModelForm):
+
+    temas = MultipleChoiceField(
+        required=False,
+        label='Temas',
+        widget=forms.CheckboxSelectMultiple)
+
+    class Meta:
+        model = AssuntoMateria
+        fields = ['assunto', 'dispositivo', 'temas']
+
+    def __init__(self, *args, **kwargs):
+
+        row1 = to_row([('assunto', 5), ('dispositivo', 7), ])
+        row2 = to_row([('temas', 12), ])
+
+        self.helper = SaplFormHelper()
+        self.helper.layout = Layout(
+            Fieldset(
+                _('Assunto de Matéria Legislativa'),
+                row1, row2,
+                form_actions(label='Salvar')
+            )
+        )
+        super(AssuntoMateriaForm, self).__init__(*args, **kwargs)
+
+        self.fields['temas'].choices = self.extrair_temas_dos_metadados()
+
+    def extrair_temas_dos_metadados(self):
+        temas_global = set()
+        mds = Metadata.objects.all()
+
+        for md in mds:
+            temas = md.metadata.get('genia', {}).get('temas', [])
+            for tema in temas:
+                if tema not in temas_global:
+                    temas_global.add(tema)
+
+        assuntos_usados = set(AssuntoMateria.objects.values_list('assunto', flat=True))
+
+        assuntos_a_usar = temas_global - assuntos_usados
+
+        temas_global = [
+            (k, k) for k in sorted(assuntos_a_usar)
+        ]
+        return temas_global
+
+    def save(self, commit=True):
+        assunto = super(AssuntoMateriaForm, self).save(commit)
+        temas = self.cleaned_data['temas']
+        for tema_select in temas:
+            mds = Metadata.objects.filter(
+                metadata__genia__temas__icontains=tema_select
+                )
+            for md in mds:
+                for i, tema_ia in enumerate(md.metadata['genia']['temas']):
+                    if tema_select == tema_ia:
+                        md.metadata['genia']['temas'][i] = assunto.assunto
+                md.save()
+                print(md.content_object)
+        return assunto
 
 
 class OrgaoForm(ModelForm):
