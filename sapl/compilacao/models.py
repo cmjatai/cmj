@@ -2012,6 +2012,42 @@ class Dispositivo(BaseModel, TimestampedMixin):
     def render_texto(self):
         return UrlizeReferencia.urlize(self.texto)
 
+    def render_relative_chunk(self, initial=True, nivel=None):
+        chunk_parents = []
+        parents = self.get_parents_asc() if initial else []
+        parents.append(self)
+        for p in parents:
+            if nivel:
+                if p.tipo_dispositivo_id < nivel:
+                    continue
+
+            if p.tipo_dispositivo_id == 120:
+                continue
+
+            s = ' ' * p.nivel
+            c = f'{s}{p.rotulo} - {p.render_texto()}'
+            c = c.rstrip()
+            if not c:
+                continue
+
+            if p.tipo_dispositivo_id == 119:
+                caput = p.dispositivos_filhos_set.filter(
+                    tipo_dispositivo__id=120,
+                    dispositivo_subsequente__isnull=True
+                ).last()
+                c += ' ' + caput.texto
+
+            if p.auto_inserido and chunk_parents:
+                chunk_parents[-1] += ' ' + c
+            else:
+                chunk_parents.append(c)
+
+        for c in self.dispositivos_filhos_set.all():
+            chunk_parents.extend(c.render_relative_chunk(
+                initial=False, nivel=nivel))
+
+        return chunk_parents if not initial else '\n'.join(chunk_parents)
+
 
 class Vide(TimestampedMixin):
     texto = models.TextField(verbose_name=_('Texto do Vide'))
