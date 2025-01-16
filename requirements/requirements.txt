@@ -1,4 +1,4 @@
-django==4.2.17
+django==4.2.18
 django-image-cropping==1.7.0
 django-haystack==3.2.1
 django-extensions==3.2.3
@@ -27,8 +27,8 @@ django-celery-results==2.5.1
 
 git+https://github.com/LeandroJatai/celery-haystack.git
 
-pymupdf==1.24.11
-ocrmypdf==16.5.0
+pymupdf==1.25.1
+ocrmypdf==16.8.0
 #pikepdf>=5.0.0,<6.0.0
 trml2pdf
 pypdf4==1.27.0

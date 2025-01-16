@@ -1,10 +1,5 @@
 FROM python:3.12.7-bookworm
 
-# TODO:
-#    A imagem gerada a partir deste dockerfile
-#    não pode ser compartilhada por conter o .env, portanto,
-#    uma refatoração seria necessária.
-
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
 ENV DEBIAN_FRONTEND=noninteractive
@@ -50,7 +45,7 @@ ENV LIBRE_PACKAGES="libreoffice \
     fontconfig"
 RUN apt-get install -y -q $LIBRE_PACKAGES
 
-ENV RUN2_PACKAGES openjdk-17-jdk-headless tesseract-ocr tesseract-ocr-por ghostscript
+ENV RUN2_PACKAGES="openjdk-17-jdk-headless tesseract-ocr tesseract-ocr-por ghostscript"
 RUN apt-get install -y --no-install-recommends $RUN2_PACKAGES
 
 RUN mkdir /ghostscript
