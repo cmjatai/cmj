@@ -2021,10 +2021,10 @@ class Dispositivo(BaseModel, TimestampedMixin):
                 if p.tipo_dispositivo_id < nivel:
                     continue
 
-            if p.tipo_dispositivo_id == 120:
+            if self.auto_inserido or p.auto_inserido:
                 continue
 
-            s = ' ' * p.nivel
+            s = '' # * p.nivel
             c = f'{s}{p.rotulo} - {p.render_texto()}'
             c = c.rstrip()
             if not c:
@@ -2037,14 +2037,14 @@ class Dispositivo(BaseModel, TimestampedMixin):
                 ).last()
                 c += ' ' + caput.texto
 
-            if p.auto_inserido and chunk_parents:
-                chunk_parents[-1] += ' ' + c
-            else:
-                chunk_parents.append(c)
+            chunk_parents.append(c)
 
-        for c in self.dispositivos_filhos_set.all():
-            chunk_parents.extend(c.render_relative_chunk(
-                initial=False, nivel=nivel))
+        if not initial or not self.auto_inserido:
+            for c in self.dispositivos_filhos_set.filter(
+                dispositivo_subsequente__isnull=True,
+            ):
+                chunk_parents.extend(c.render_relative_chunk(
+                    initial=False, nivel=nivel))
 
         return chunk_parents if not initial else '\n'.join(chunk_parents)
 
