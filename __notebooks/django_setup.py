@@ -16,5 +16,5 @@ django.setup()
 
 from cmj.utils import Manutencao
 m = Manutencao()
-m.desativa_auto_now()
+#m.desativa_auto_now()
 m.desativa_signals()

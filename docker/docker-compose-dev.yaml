@@ -23,7 +23,7 @@ services:
       - csolr_data:/var/solr
       - csolr_configsets:/opt/solr/server/solr/configsets
     ports:
-      - "127.0.0.1:8983:8983"
+      - "127.0.0.1:8983:8983" 
       - "127.0.0.1:9983:9983"
     networks:
       - cmj-net
