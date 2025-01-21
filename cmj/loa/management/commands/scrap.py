@@ -138,17 +138,17 @@ class Command(BaseCommand):
 
         subdomains = [
             {
-                'subdomain': 'camaradejatai',
-                'orgaos': models.Orgao.objects.filter(codigo='01').order_by(*order_by),
-            },
-            {
                 'subdomain': 'prefeituradejatai',
                 'orgaos': models.Orgao.objects.exclude(codigo='01').order_by(*order_by),
+            },
+            {
+                'subdomain': 'camaradejatai',
+                'orgaos': models.Orgao.objects.filter(codigo='01').order_by(*order_by),
             },
         ]
 
         # ScrapRecord.objects.all().delete()
-        urls.reverse()
+        # urls.reverse()
 
         # 558404
         # for scrap in ScrapRecord.objects.filter(codigo='477275').order_by('-codigo'):
