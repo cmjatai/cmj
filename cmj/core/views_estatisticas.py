@@ -243,8 +243,6 @@ Esses procedimentos foram adotados para cumprir o que rege a Lei 4178/2020.
 - **LOCAL 05:**
     Em um dia da semana, aleatoriamente, é conectado manualmente um HD externo e rodado uma ordem de cópia de todo o conteúdo de LOCAL 04 para esse HD externo, que é imediatamente desligado após o término da cópia. Portanto um HD muito pouco utilizado, conectado apenas uma vez por semana, por algumas horas.
 
-- **LOCAL 06:**
-    Apenas uma vez a cada semestre, é conectado manualmente outro HD externo, e feito o mesmo procedimento do LOCAL 05. Igualmente, um HD muito pouco utilizado, conectado apenas ao servidor principal duas vezes ao ano para a realização desta cópia semestral.
 '''
     return mark,
 
@@ -460,7 +458,7 @@ def get_():
 
 
 def get_numeros():
-    
+
     mark = []
 
     mark.append(get_redessociais())
