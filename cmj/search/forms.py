@@ -20,7 +20,7 @@ from sapl.crispy_layout_mixin import to_row
 from sapl.materia.forms import CHOICE_TRAMITACAO, MateriaLegislativaFilterSet,\
     CHOICE_TIPO_LISTAGEM
 from sapl.materia.models import TipoMateriaLegislativa, UnidadeTramitacao,\
-    StatusTramitacao, MateriaLegislativa
+    StatusTramitacao, MateriaLegislativa, AssuntoMateria
 from sapl.norma.models import TipoNormaJuridica, NormaJuridica, AssuntoNorma
 from sapl.utils import RangeWidgetNumber, choice_anos_com_materias, autor_label,\
     autor_modal, choice_anos_com_normas
@@ -245,6 +245,22 @@ class MateriaSearchForm(SearchForm):
         })
     )
 
+    assuntos_is = forms.ModelMultipleChoiceField(
+        required=False,
+        queryset=AssuntoMateria.objects.all(),
+        label=_('Assuntos'),
+        widget=forms.SelectMultiple(attrs={
+            'title': _('Filtrar por um ou mais Assuntos?'),
+            'class': 'selectpicker',
+            'data-actions-box': 'true',
+            'data-select-all-text': 'Selecionar Todos',
+            'data-deselect-all-text': 'Desmarcar Todos',
+            'data-header': 'Assuntos',
+            'data-dropup-auto': 'false',
+            'data-dropdown-align-right': 'auto'
+        })
+    )
+
     tipo_listagem = forms.ChoiceField(
         required=False,
         choices=CHOICE_TIPO_LISTAGEM,
@@ -310,9 +326,10 @@ class MateriaSearchForm(SearchForm):
                             css_class='btn btn-secondary btn-sm mt-1'), 6),
                 ]),
                 css_class="form-group"
-            ), 3),
+            ), 2),
             ('uta_i', 3),
-            ('sta_i', 4),
+            ('sta_i', 3),
+            ('assuntos_is', 2),
             ('ordenacao', 2),
         ])
 
@@ -404,6 +421,14 @@ class MateriaSearchForm(SearchForm):
             raise ValidationError(
                 _('O campo "ano da matéria" deve ser um número.'))
 
+    def clean_assuntos_is(self, *args, **kwargs):
+        assuntos_is = self.cleaned_data['assuntos_is']
+
+        return assuntos_is.values_list('id', flat=True)
+
+        if assuntos_is:
+            return assuntos_is.id
+
     def search(self):
         sqs = super().search().models(MateriaLegislativa)
 
@@ -425,6 +450,10 @@ class MateriaSearchForm(SearchForm):
         if params and 'sta_i' in params:
             params['sta_i__in'] = params['sta_i']
             del params['sta_i']
+
+        if params and 'assuntos_is' in params:
+            params['assuntos_is__in'] = params['assuntos_is']
+            del params['assuntos_is']
 
         ord = '-data_dt'
         if params and 'ordenacao' in params:

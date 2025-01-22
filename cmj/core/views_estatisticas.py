@@ -214,7 +214,7 @@ mencionados acima, totalizam em torno de 40% em uso da capacidade total.
 
 Como são armazenados os dados, matérias legislativas,
 normas e documentos administrativos dentro do PortalCMJ?
-Todo documento e/ou imagem adicionado são armazenados em seis locais diferentes.
+Todo documento e/ou imagem adicionado são armazenados em cinco locais diferentes.
 Esses procedimentos foram adotados para cumprir o que rege a Lei 4178/2020.
 
 

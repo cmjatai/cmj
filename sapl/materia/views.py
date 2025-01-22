@@ -2262,6 +2262,29 @@ class MateriaLegislativaCrud(Crud):
             context = self.get_context_data(object=self.object)
             return self.render_to_response(context)
 
+        def is_run(self):
+            md = super().ia_run()
+
+            if md and md.metadata:
+                temas = md.metadata.get('genia', {}).get('temas', [])
+
+                obj = md.content_object
+
+                for tema in temas:
+                    assunto, created = AssuntoMateria.objects.get_or_create(
+                        assunto=tema
+                        )
+
+                    mass, created = MateriaAssunto.objects.get_or_create(
+                        assunto=assunto,
+                        materia=obj
+                        )
+
+            return  HttpResponseRedirect(reverse(
+            'sapl.materia:materialegislativa_detail',
+            kwargs={'pk': self.kwargs['pk']}
+            ))
+
         def get(self, request, *args, **kwargs):
             # celery.debug_task.apply_async(
             #    (kwargs['pk'], ),
@@ -2270,11 +2293,7 @@ class MateriaLegislativaCrud(Crud):
             if 'download' in request.GET:
                 return self.download(request.GET.get('download'))
             if 'ia_run' in request.GET and request.user.is_superuser:
-                self.ia_run()
-                return  HttpResponseRedirect(reverse(
-                'sapl.materia:materialegislativa_detail',
-                kwargs={'pk': self.kwargs['pk']}
-                ))
+                return self.is_run()
             elif 'cabec_autografo' in request.GET:
                 return self.cabec_autografo(request.GET.get('cabec_autografo'))
             return Crud.DetailView.get(self, request, *args, **kwargs)

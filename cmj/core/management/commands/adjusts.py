@@ -586,13 +586,13 @@ class Command(BaseCommand):
 
             """
             cria pdf através da pillow
-    
+
             flist_out_img_obj = []
             for f in flist_out:
                 flist_out_img_obj.append(Image.open(f))
-    
+
             f = flist_out_img_obj.pop(0)
-    
+
             f.save(
                 folder_out + 'out.pdf',
                 "PDF",

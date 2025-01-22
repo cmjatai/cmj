@@ -42,6 +42,7 @@ MateriaLegislativa:
   - ementa
   - indexacao
   - observacao
+  - assuntos
 
 AssuntoMateria:
   {% trans 'Assunto de Matéria Legislativa' %}:

@@ -181,6 +181,11 @@
                       <strong>Ultima Ação:</strong> {{m.tramitacao_set.first.texto}}</br>
                     {% endif %}
 
+                    {% if m.assuntos.exists %}
+                      <small>
+                        <strong>Assuntos:</strong> {{ m.assuntos.all|join:" - "}}<br>
+                      </small>
+                    {% endif %}
                   </div>
                   <div class="mt-2">
                     {% if m.documentoacessorio_set.all.exists %}

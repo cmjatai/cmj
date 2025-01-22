@@ -243,6 +243,12 @@ class MateriaLegislativaForm(FileFieldCheckMixin, ModelForm):
                                    queryset=Autor.objects.all()
                                    )
 
+    assuntos = forms.ModelMultipleChoiceField(
+        required=False,
+        queryset=AssuntoMateria.objects.all(),
+        label=_('Assuntos'),
+        widget=widgets.CheckboxSelectMultiple
+        )
     class Meta:
         model = MateriaLegislativa
         exclude = ['texto_articulado',
@@ -253,7 +259,7 @@ class MateriaLegislativaForm(FileFieldCheckMixin, ModelForm):
                    '_paginas',
                    'checkcheck',
                    'arquivado',
-                   'metadata']
+                   'metadata',]
         widgets = {
             'user': forms.HiddenInput(),
             'ip': forms.HiddenInput(),
@@ -377,6 +383,9 @@ class MateriaLegislativaForm(FileFieldCheckMixin, ModelForm):
             autoria.materia = materia
             autoria.autor = self.cleaned_data['autor']
             autoria.save()
+
+        materia.assuntos.clear()
+        materia.assuntos.add(*list(self.cleaned_data['assuntos']))
 
         return materia
 
@@ -1470,10 +1479,10 @@ class MateriaLegislativaFilterSet(django_filters.FilterSet):
                 row3,
                 row7,
                 row8,
+                row9,
                 css_class='pesquisa_avancada',
-                style="display: none;"
+                style="display: none;",
                 # row6,
-                # row9,
             )
         )
 

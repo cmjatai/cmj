@@ -160,7 +160,6 @@
                       {% endif %}
 
                       <br><strong>Autoria:</strong> {{ m.autores.all|join:", "}}
-
                       {% if m.data_fim_prazo %}
                         <strong>Data Fim Prazo (Matéria): </strong>{{ m.data_fim_prazo|default_if_none:"" }}
                         </br>
@@ -190,7 +189,11 @@
                           {% if m.tramitacao_set.first.data_tramitacao %}
                           <strong>Ultima Ação:</strong> {{m.tramitacao_set.first.texto}}</br>
                         {% endif %}
-
+                        {% if m.assuntos.exists %}
+                        <small>
+                          <strong>Assuntos:</strong> {{ m.assuntos.all|join:" - "}}<br>
+                        </small>
+                      {% endif %}
                       </div>
                       <div class="mt-2">
                         {% if m.documentoacessorio_set.all.exists %}

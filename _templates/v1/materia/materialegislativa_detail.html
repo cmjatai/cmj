@@ -156,6 +156,23 @@
     {{ block.super }}
   </div>
 
+
+  {% if object.assuntos.exists %}
+
+    <div class="container">
+      <p class="control-label">Assuntos</p>
+      <div class="form-control-static mb-3">
+        {% for assunto in object.assuntos.all %}
+          <a href="{% url 'cmj.search:materia_haystack_search'%}?assuntos_is={{assunto.id}}">
+            {{assunto.assunto}}
+          </a>
+          {% if not forloop.last %} - {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+
   {% if object.documentoadministrativo_set.exists or object.vinculodocadminmateria_set.exists%}
     <p class="control-label">Documentos Administrativos Vinculados a Matéria</p>
     <div class="bg-white p-3">

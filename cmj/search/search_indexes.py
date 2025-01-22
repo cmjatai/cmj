@@ -277,6 +277,9 @@ class MateriaLegislativaIndex(BaseIndex, CelerySearchIndex, Indexable):
     autoria_is = MultiValueField(
         model_attr='autores__id', null=True)
 
+    assuntos_is = MultiValueField(
+        model_attr='assuntos__id', null=True)
+
     text = TextExtractField(
         document=True, use_template=True,
         model_attr=(

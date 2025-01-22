@@ -16,7 +16,7 @@ import google.generativeai as genai
 logger = logging.getLogger(__name__)
 
 class GoogleGenerativeIA:
-    
+
     ia_model_name = "gemini-2.0-flash-exp"
 
     temperature = 0.1
@@ -42,7 +42,7 @@ class GoogleGenerativeIA:
 
         if self.action.startswith('generate'):
             self.delete()
-            self.generate()
+            return self.generate()
         elif self.action == 'delete':
             self.delete()
             messages.add_message(
@@ -50,11 +50,11 @@ class GoogleGenerativeIA:
                 _('Análise removida com sucesso!'))
 
     def delete(self):
-            obj = self.get_object()
-            Metadata.objects.filter(
-                object_id=obj.id,
-                content_type=ContentType.objects.get_for_model(obj)
-                ).delete()
+        obj = self.get_object()
+        Metadata.objects.filter(
+            object_id=obj.id,
+            content_type=ContentType.objects.get_for_model(obj)
+            ).delete()
 
     def get_model_configured(self):
         generation_config = {
@@ -151,6 +151,8 @@ class GoogleGenerativeIA:
             messages.add_message(
                 self.request, messages.SUCCESS,
                 _('Análise gerada com sucesso!'))
+
+            return md
 
         except Exception as e:
             logger.error(e)

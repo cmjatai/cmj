@@ -180,7 +180,7 @@ class TipoMateriaLegislativa(models.Model):
         blank=True,
         verbose_name=_('Prompt para Análise de IA.')
         )
-        
+
     class Meta:
         verbose_name = _('Tipo de Matéria Legislativa')
         verbose_name_plural = _('Tipos de Matérias Legislativas')
@@ -338,6 +338,15 @@ class MateriaLegislativa(CommonMixin):
         through_fields=(
             'materia_principal',
             'materia_anexada'))
+
+    assuntos = models.ManyToManyField(
+        'AssuntoMateria',
+        blank=True,
+        through='MateriaAssunto',
+        symmetrical=False,
+        through_fields=(
+            'materia',
+            'assunto'))
     texto_original = PortalFileField(
         blank=True,
         null=True,
@@ -681,7 +690,7 @@ class AssuntoMateria(models.Model):
     class Meta:
         verbose_name = _('Assunto de Matéria')
         verbose_name_plural = _('Assuntos de Matéria')
-        ordering = ['id']
+        ordering = ['assunto']
 
     def __str__(self):
         return self.assunto
@@ -843,7 +852,6 @@ class DocumentoAcessorio(CommonMixin):
 
 
 class MateriaAssunto(models.Model):
-    # TODO M2M ??
     assunto = models.ForeignKey(
         AssuntoMateria,
         on_delete=models.CASCADE,
@@ -856,7 +864,7 @@ class MateriaAssunto(models.Model):
     class Meta:
         verbose_name = _('Relação Matéria - Assunto')
         verbose_name_plural = _('Relações Matéria - Assunto')
-        ordering = ['id']
+        ordering = ['assunto__assunto']
 
     def __str__(self):
         return _('%(materia)s - %(assunto)s') % {
