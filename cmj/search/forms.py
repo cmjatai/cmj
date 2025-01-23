@@ -7,6 +7,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.http.request import QueryDict
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from haystack.backends import SQ
 from haystack.forms import ModelSearchForm, SearchForm
@@ -17,12 +18,12 @@ from haystack.utils.app_loading import haystack_get_model
 from cmj.core.models import AreaTrabalho
 from cmj.utils import NONE_YES_NO_CHOICES
 from sapl.crispy_layout_mixin import to_row
-from sapl.materia.forms import CHOICE_TRAMITACAO, MateriaLegislativaFilterSet,\
+from sapl.materia.forms import CHOICE_TRAMITACAO, MateriaLegislativaFilterSet, \
     CHOICE_TIPO_LISTAGEM
-from sapl.materia.models import TipoMateriaLegislativa, UnidadeTramitacao,\
+from sapl.materia.models import TipoMateriaLegislativa, UnidadeTramitacao, \
     StatusTramitacao, MateriaLegislativa, AssuntoMateria
 from sapl.norma.models import TipoNormaJuridica, NormaJuridica, AssuntoNorma
-from sapl.utils import RangeWidgetNumber, choice_anos_com_materias, autor_label,\
+from sapl.utils import RangeWidgetNumber, choice_anos_com_materias, autor_label, \
     autor_modal, choice_anos_com_normas
 
 
@@ -320,11 +321,11 @@ class MateriaSearchForm(SearchForm):
                     ('autoria_is', 0),
                     (Button('pesquisar',
                             'Selecionar Autor',
-                            css_class='btn btn-secondary btn-sm mt-1'), 'pl-4'),
+                            css_class='btn btn-secondary btn-sm mt-1 w-100'), 12),
                     (Button('limpar',
-                            'limpar Autor',
-                            css_class='btn btn-secondary btn-sm mt-1'), 6),
-                ]),
+                            'Limpar Autor',
+                            css_class='btn btn-secondary btn-sm mt-1 p-0 w-100'), 12),
+                ], css_class='row flex-column'),
                 css_class="form-group"
             ), 2),
             ('uta_i', 3),

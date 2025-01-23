@@ -28,8 +28,8 @@ def to_column(name_span):
         return Div(*fieldname, css_class=span)
 
 
-def to_row(names_spans):
-    return Div(*map(to_column, names_spans), css_class='row')
+def to_row(names_spans, css_class='row'):
+    return Div(*map(to_column, names_spans), css_class=css_class)
 
 
 def to_fieldsets(fields):
