@@ -622,6 +622,10 @@ class TextoArticulado(TimestampedMixin):
         )
         return path_cache
 
+    def get_absolute_path_cache(self, sign=''):
+        path = self.get_path_cache(sign=sign)
+        return media_cache_storage.path(path)
+
     def is_cached(self, sign=''):
         return media_cache_storage.exists(self.get_path_cache(sign))
 
