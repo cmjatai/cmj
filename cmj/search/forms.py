@@ -352,7 +352,7 @@ class MateriaSearchForm(SearchForm):
             ('7', 'Matérias Acessórias'),
             ('9', '  ')
         )
-        gtd = {k: v for k, v in grupos_de_tipos}
+        gtd = dict(grupos_de_tipos)  # {k: v for k, v in grupos_de_tipos}
 
         grupo_choices = OrderedDict()
         for nivel, valor in grupos_de_tipos:
@@ -369,7 +369,11 @@ class MateriaSearchForm(SearchForm):
         self.fields['tipo_i'].choices = choices
 
         uta_choices = OrderedDict()
-        for uta in UnidadeTramitacao.objects.all():
+        for uta in UnidadeTramitacao.objects.filter(
+            ativo=True,
+            # tramitacoes_destino__isnull=False
+            materiasemtramitacao_set__isnull=False
+            ).order_by('comissao', 'orgao', 'parlamentar').distinct():
             uta_obj = uta.comissao or uta.orgao or uta.parlamentar
 
             grupo = uta_obj._meta.verbose_name_plural

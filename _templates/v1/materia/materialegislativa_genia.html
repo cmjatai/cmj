@@ -1,32 +1,33 @@
 <br>
 <table class="table table-striped table-hover table-link-ordering">
   <tr>
-      <th colspan=4>
-        {% if user.is_superuser %}
-          <div class="float-right">
-            <a href="?ia_run=delete" class="btn btn-excluir" title="Excluir Análise">X</a>
-          </div>
-        {% endif %}
+    <th colspan=4>
+      {% if user.is_superuser %}
+        <div class="float-right">
+          <a href="?ia_run=delete" class="btn btn-excluir" title="Excluir Análise">X</a>
+        </div>
+      {% endif %}
+      <strong>
+        Análise Gerada por I.A.
+      </strong>
+      <br>
+      <small class="text-red">
         <strong>
-          Análise Gerada por I.A.
+          <em>Experimental. Gerado por "{{md.metadata.genia.model_name}}" com revisão Humana.</em>
         </strong>
-        <br>
-        <small class="text-red">
-          <strong>
-            <em>Experimental. Gerado por "{{md.metadata.genia.model_name}}" com revisão Humana.</em>
-          </strong>
-        </small>
-      </th>
-    </tr>
+      </small>
+    </th>
+  </tr>
 
-    {% if md.metadata.genia.analise %}
-      <tr>
-        <th>Análise Geral</th>
-        <td colspan=3>
-          {{ md.metadata.genia.analise }}
-        </td>
-      </tr>
-    {% endif %}
+  {% if md.metadata.genia.analise %}
+    <tr>
+      <th>Análise Geral</th>
+      <td colspan=3>
+        {{ md.metadata.genia.analise }}
+      </td>
+    </tr>
+  {% endif %}
+  
     <tr>
       <th>Temas Relacionados</th>
       <td>

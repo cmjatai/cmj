@@ -396,7 +396,7 @@ class UnidadeTramitacaoForm(ModelForm):
 
     class Meta:
         model = UnidadeTramitacao
-        fields = ['comissao', 'orgao', 'parlamentar']
+        fields = ['comissao', 'orgao', 'parlamentar', 'ativo']
 
     def clean(self):
         super(UnidadeTramitacaoForm, self).clean()
@@ -410,7 +410,7 @@ class UnidadeTramitacaoForm(ModelForm):
             if cleaned_data[key] is None:
                 del cleaned_data[key]
 
-        if len(cleaned_data) != 1:
+        if len(cleaned_data) != 2:
             msg = _('Somente um campo deve ser preenchido!')
             self.logger.error("Somente um campo deve ser preenchido!")
             raise ValidationError(msg)

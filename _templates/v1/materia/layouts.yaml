@@ -120,7 +120,7 @@ StatusTramitacao:
 
 UnidadeTramitacao:
   {% trans 'Unidade Tramitação' %}:
-  - orgao
+  - orgao ativo:3
   - comissao
   - parlamentar
 

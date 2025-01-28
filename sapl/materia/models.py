@@ -1251,6 +1251,10 @@ class UnidadeTramitacao(models.Model):
 
     objects = UnidadeTramitacaoManager()
 
+    ativo = models.BooleanField(verbose_name=_('Ativo ?'),
+                                  choices=YES_NO_CHOICES,
+                                  default=True)
+
     class Meta:
         verbose_name = _('Unidade de Tramitação')
         verbose_name_plural = _('Unidades de Tramitação')
@@ -1339,3 +1343,24 @@ class Tramitacao(models.Model):
             'materia': self.materia,
             'status': self.status,
             'data': self.data_tramitacao.strftime("%d/%m/%Y")}
+
+
+class MateriaEmTramitacao(models.Model):
+    materia = models.ForeignKey(
+        MateriaLegislativa, on_delete=models.DO_NOTHING)
+    tramitacao = models.ForeignKey(Tramitacao, on_delete=models.DO_NOTHING)
+
+    unidade_tramitacao_atual = models.ForeignKey(
+        UnidadeTramitacao,
+        null=True,
+        related_name='materiasemtramitacao_set',
+        on_delete=models.PROTECT,
+        verbose_name=_('Unidade Atual'))
+
+    class Meta:
+        managed = False
+        db_table = "materia_materiaemtramitacao"
+        ordering = ('-id',)
+
+    def __str__(self):
+        return '{}/{}'.format(self.materia, self.tramitacao)
