@@ -1,34 +1,36 @@
 
+from pathlib import Path
 import glob
 import io
 import logging
 import os
-from pathlib import Path
 import pathlib
 import re
 import shutil
 import subprocess
 import sys
 
-from PIL import Image, ImageEnhance, ImageDraw
-from PIL.Image import Resampling
-import cv2
+from PIL import Image, ImageEnhance, ImageDraw, ImageFilter
+from PIL.Image import LANCZOS, Resampling
 from django.core.files.base import File
 from django.core.management.base import BaseCommand
 from django.db.models import Q
 from django.db.models.signals import post_delete, post_save
-import fitz
-import ocrmypdf
+from pytesseract.pytesseract import Output
 from reportlab.pdfgen import canvas
 from reportlab.platypus.doctemplate import SimpleDocTemplate
+import cv2
+import fitz
+import ocrmypdf
 
 from cmj.arq.models import ArqDoc
 from cmj.arq.tasks import console
 from cmj.utils import Manutencao
-import numpy as np
 from sapl.materia.models import MateriaLegislativa
 from sapl.norma.models import NormaJuridica
 from sapl.rules.apps import reset_id_model
+import numpy as np
+import pytesseract as tess
 
 
 def _get_registration_key(model):
@@ -80,37 +82,66 @@ class Command(BaseCommand):
         m.desativa_auto_now()
         m.desativa_signals()
 
-        self.folder_raiz = '/home/leandro/TEMP/CI/'
+        self.folder_raiz = '/home/leandrojatai/TEMP/oficio/'
 
-        # self.process0()
-        # self.pdf2png()
-        # self.process1()
-        # self.process2()
-        self.out()
+        # self.process0() # renomeia meses por extenso para formato yy-mm
+        # self.pdf2png()  # converte todas as páginas de todos pdfs para pgn em in_images
+        self.process1()  # cria copia de in_images em in1_images aplic brilho e contraste e convertendo para '1'
+        # self.process2()  # monta pdf com imagens de in_images
+        # self.process3(f'"{self.folder_raiz}out.pdf"', f'"{self.folder_raiz}out_ocr_1.pdf"')  # executa ocrmypdf no pdf grande gerado em processo2
+        self.process4()  # remonta pdf com imagens geradas em processo1
 
-    def out(self, *args, **options):
+        self.process3(f'"{self.folder_raiz}out_ocr_2.pdf"', f'"{self.folder_raiz}out_ocr_3.pdf"')  # executa ocrmypdf no pdf gerado em processo4
+
+    def process4(self, *args, **options):
+
+        f_images = self.folder_raiz + 'in1_images/'
+
+        imgs = glob.glob(glob.escape(f_images) + '**', recursive=True)
+        imgs.sort()
+
+        doc_out = self.folder_raiz + 'out_ocr_2.pdf'
+        doc_in = fitz.open(self.folder_raiz + 'out_ocr_1.pdf')
+
+        ipage = 0
+        for i, f in enumerate(imgs):
+
+            if not f.endswith('.png'):
+                continue
+
+            page = doc_in[ipage]
+            ipage += 1
+
+            xref = page.get_image_info(xrefs=True)[0]['xref']
+            page.delete_image(xref)
+            page.replace_image(xref=xref, filename=f)
+
+        doc_in.save(doc_out)
+        doc_in.close()
+
+    def process3(self, fin, fout):
 
         cmd = ["{}/ocrmypdf".format('/'.join(sys.executable.split('/')[:-1])),
                #"-q",                  # Execução silenciosa
                "-l por",              # tesseract portugues
-               "-j 8",     # oito threads
+               "-j 20",  # 20 threads
                #"--fast-web-view 10000000",   # não inclui fast web view
                #"--image-dpi 300",
-               #"--rotate-pages",
-               #"--remove-background",
+               # "--rotate-pages",
+               # "--remove-background",
 
-               #"--optimize 0",
+               "--optimize 3",
                #"--jpeg-quality 100",
                #"--png-quality 100",
                #"--jbig2-lossy",
-
+               # "--skip-text",
                # "--deskew",
                #"--clean-final",
                #"--pdfa-image-compression jpeg",  # jpeg  lossless
                "--output-type pdfa-2",
                #"--tesseract-timeout 0",
-               f'"{self.folder_raiz}out.pdf"',
-               f'"{self.folder_raiz}out_ocr.pdf"']
+               fin,
+               fout]
 
         print(' '.join(cmd))
         return
@@ -124,7 +155,7 @@ class Command(BaseCommand):
 
     def process2(self, *args, **options):
 
-        f_images = self.folder_raiz + 'in1_images/'
+        f_images = self.folder_raiz + 'in_images/'
 
         imgs = glob.glob(glob.escape(f_images) + '**', recursive=True)
         imgs.sort()
@@ -141,8 +172,15 @@ class Command(BaseCommand):
             pdfbytes = img.convert_to_pdf()  # make a PDF stream
             img.close()  # no longer needed
             imgPDF = fitz.open("pdf", pdfbytes)  # open stream as PDF
-            page = doc_out.new_page(width=rect.width,  # new page with ...
-                                    height=rect.height)  # pic dimension
+
+            # w = 595
+            # h = 842
+            # if rect.width > rect.height:
+            #    h = w
+            #    w = 842
+            # page = doc_out.new_page(width=w,  height=h)
+            page = doc_out.new_page(width=rect.width, height=rect.height)
+
             page.show_pdf_page(rect, imgPDF, 0)  # image fills the page
 
         doc_out.save(self.folder_raiz + 'out.pdf', garbage=4, pretty=True,
@@ -166,14 +204,22 @@ class Command(BaseCommand):
 
             img = Image.open(f)
 
+            # enhancer = ImageEnhance.Sharpness(img)
+            # img = enhancer.enhance(1.5)
+
+            # img = img.convert('L')
+
             enhancer = ImageEnhance.Brightness(img)
-            img = enhancer.enhance(1.2)
+            img = enhancer.enhance(1.05)
 
             enhancer = ImageEnhance.Contrast(img)
-            img = enhancer.enhance(1.5)
+            img = enhancer.enhance(1.3)
+
             img = img.convert('1')
 
+            # img = img.filter(ImageFilter.EDGE_ENHANCE)
             img.save(fimg_out)
+
 
     def pdf2png(self, *args, **options):
 
@@ -195,7 +241,7 @@ class Command(BaseCommand):
 
             for index, page in enumerate(doc):
 
-                page.set_rotation(180)
+                # page.set_rotation(180)
                 out_img = f'{fimg_out}-{index:0>6}.png'
 
                 if os.path.exists(out_img):
@@ -203,6 +249,19 @@ class Command(BaseCommand):
 
                 pix = page.get_pixmap(dpi=300, colorspace=fitz.csGRAY)
                 pix.save(out_img)
+
+                continue
+
+                im = Image.open(out_img)
+
+                im_meta = tess.image_to_osd(im, output_type=Output.DICT)
+
+                if not im_meta['rotate']:
+                    continue
+
+                im = im.rotate(360 - im_meta['rotate'], resample=LANCZOS, expand=True)
+                im.save(out_img, dpi=(300, 300))
+
 
     def process0(self, *args, **options):
         # possui erro em renomeação de subpastas
@@ -212,6 +271,23 @@ class Command(BaseCommand):
         scanners = glob.glob(glob.escape(f_in_pdfs) + '**', recursive=True)
         scanners.sort()
 
+        meses = {
+            'JANEIRO': '24-01',
+            'FEVEREIRO': '24-02',
+            'MARÇO': '24-03',
+            'ABRIL': '24-04',
+            'MAIO': '24-05',
+            'JUNHO': '24-06',
+            'JULHO': '24-07',
+            'AGOSTO': '24-08',
+            'SETEMBRO': '24-09',
+            'OUTUBRO': '24-10',
+            'NOVEMBRO': '24-11',
+            'DEZEMBRO': '24-12',
+        }
+
+        errors = []
+
         for i, f in enumerate(scanners):
 
             if f.endswith('.pdf'):
@@ -219,27 +295,18 @@ class Command(BaseCommand):
 
             print(i, f)
             fn = f
-            meses = {
-                'JANEIRO': '23-01',
-                'FEVEREIRO': '23-02',
-                'MARÇO': '23-03',
-                'ABRIL': '23-04',
-                'MAIO': '23-05',
-                'JUNHO': '23-06',
-                'JULHO': '23-07',
-                'AGOSTO': '23-08',
-                'SETEMBRO': '23-09',
-                'OUTUBRO': '23-10',
-                'NOVEMBRO': '23-11',
-                'DEZEMBRO': '23-12',
-            }
-
             for k, v in meses.items():
                 fn = fn.replace(k, v)
 
             if f == fn:
                 continue
 
+            try:
+                os.rename(f, fn)
+            except:
+                errors.append((f, fn))
+
+        for f, fn in errors:
             os.rename(f, fn)
 
     def criar_pdfs__simone(self, *args, **options):

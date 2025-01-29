@@ -11,6 +11,7 @@ TipoMateriaLegislativa:
   {% trans 'Tipo Matéria Legislativa' %}:
   - sigla:3 descricao
   - nivel_agrupamento sequencia_numeracao turnos_aprovacao
+  - limite_por_autor_tramitando limite_minimo_coletivo
   - prompt
 
 RegimeTramitacao:

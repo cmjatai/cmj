@@ -139,11 +139,23 @@ def tipos_autores_materias(user, restricao_regimental=True):
 
     materias_em_tramitacao = MateriaLegislativa.objects.filter(q).distinct()
 
+    q = Q(
+        data_envio__isnull=False,
+        data_recebimento__isnull=True
+        )
+
+    if user:
+        q &= Q(autor__operadores=user)
+
+    proposicoes_enviadas_sem_recebimento = Proposicao.objects.filter(
+        q
+        )
+
     r = {}
     for m in materias_em_tramitacao:
 
-        if restricao_regimental and m.tipo_id == 3:
-            if m.autores.count() >= 5:
+        if restricao_regimental and m.tipo.limite_minimo_coletivo:
+            if m.autores.count() >= m.tipo.limite_minimo_coletivo:
                 continue
 
         if user:
@@ -160,6 +172,16 @@ def tipos_autores_materias(user, restricao_regimental=True):
                     r[m.tipo][a] = {m}
                 else:
                     r[m.tipo][a] = r[m.tipo][a].union({m})
+
+    if restricao_regimental:
+        for p in proposicoes_enviadas_sem_recebimento:
+
+            tipo_correspondente = p.tipo.tipo_conteudo_related
+            if user:
+                if tipo_correspondente not in r:
+                    r[tipo_correspondente] = {p}
+                else:
+                    r[tipo_correspondente] = r[tipo_correspondente].union({p})
 
     return r
 
@@ -989,12 +1011,13 @@ class ProposicaoCrud(Crud):
 
                         tam = tipos_autores_materias(self.request.user)
                         tcr = p.tipo.tipo_conteudo_related
-                        if tcr in tam:
-                            if tcr.id == 3:
-                                if len(tam[tcr]) >= 10:
-
-                                    msg_error = _(
-                                        'Limite Regimental atingido. O envio só será possível quando a quantidade de Requerimentos em tramitação do Vereador for inferior a 10 Requerimentos.')
+                        if tcr.limite_por_autor_tramitando and tcr in tam:
+                            if len(tam[tcr]) >= tcr.limite_por_autor_tramitando:
+                                msg_error = _(
+                                    f'''Limite Regimental atingido.
+                                    O envio só será possível quando a quantidade
+                                    de Requerimentos em tramitação do Vereador
+                                    for inferior a {tcr.limite_por_autor_tramitando} Requerimentos.''')
 
                         if not msg_error:
 
@@ -1322,27 +1345,15 @@ class ProposicaoCrud(Crud):
             tam = tipos_autores_materias(self.request.user)
             for obj in object_list:
 
-                # TODO: GENERALIZAR INFORMAÇÃO DE ENVIO
-
-                if obj.data_recebimento is None:
-                    obj.data_recebimento = 'Não recebida'\
-                        if obj.data_envio else 'Não enviada'
-
-                    tcr = obj.tipo.tipo_conteudo_related
-                    if tcr in tam:
-                        if tcr.id == 3:
-                            if len(tam[tcr]) >= 10:
-                                obj.data_envio = """
-                                <strong class="text-red">Limite Regimental atingido.</strong>
-                                """
-                                continue
-                else:
-                    obj.data_recebimento = timezone.localtime(
-                        obj.data_recebimento)
-                    obj.data_recebimento = formats.date_format(
-                        obj.data_recebimento, "DATETIME_FORMAT")
-
                 if obj.data_envio is None:
+                    tcr = obj.tipo.tipo_conteudo_related
+                    if tcr.limite_por_autor_tramitando and tcr in tam:
+                        if len(tam[tcr]) >= tcr.limite_por_autor_tramitando:
+                            obj.data_envio = """
+                            <strong class="text-red">Limite Regimental atingido.</strong>
+                            """
+                            continue
+
                     obj.data_envio = 'Em elaboração...'
                     if obj.justificativa_devolucao:
                         obj.data_envio = f"""
@@ -1351,10 +1362,21 @@ class ProposicaoCrud(Crud):
                         {obj.justificativa_devolucao}
                         </div>
                         """
+
                 else:
                     obj.data_envio = timezone.localtime(obj.data_envio)
                     obj.data_envio = formats.date_format(
                         obj.data_envio, "DATETIME_FORMAT")
+
+                if obj.data_recebimento is None:
+                    obj.data_recebimento = 'Não recebida'\
+                        if obj.data_envio else 'Não enviada'
+
+                else:
+                    obj.data_recebimento = timezone.localtime(
+                        obj.data_recebimento)
+                    obj.data_recebimento = formats.date_format(
+                        obj.data_recebimento, "DATETIME_FORMAT")
 
             return [self._as_row(obj) for obj in object_list]
 

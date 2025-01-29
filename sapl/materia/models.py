@@ -145,6 +145,18 @@ class TipoMateriaLegislativa(models.Model):
     # XXX o que é isso ?
     quorum_minimo_votacao = models.PositiveIntegerField(blank=True, null=True)
 
+    limite_por_autor_tramitando = models.PositiveIntegerField(
+        blank=True, null=True,
+        default=0,
+        verbose_name=_('Limitar Protocolo por Autor'),
+        )
+
+    limite_minimo_coletivo = models.PositiveIntegerField(
+        blank=True, null=True,
+        default=0,
+        verbose_name=_('Não Impõe Limites de Protocolo acima deste valor'),
+        )
+
     tipo_proposicao = SaplGenericRelation(
         TipoProposicao,
         related_query_name='tipomaterialegislativa_set',

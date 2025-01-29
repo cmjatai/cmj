@@ -212,7 +212,9 @@
 
   {% if object.metadata_model %}
     {% with object.metadata_model as md %}
-      {% include "materia/materialegislativa_genia.html" %}
+      {% if md.metadata.genia.template == 'table1' %}
+        {% include "materia/materialegislativa_genia_table1.html" %}
+      {% endif %}
     {% endwith %}
   {% endif %}
 

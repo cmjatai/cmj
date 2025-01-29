@@ -145,6 +145,7 @@ class GoogleGenerativeIA:
             md.content_object = obj
             metadata = {'genia': json.loads(answer.text)}
             metadata['genia']['model_name'] = self.ia_model_name
+            metadata['genia']['template'] = 'table1'
             md.metadata = metadata
             md.save()
 
