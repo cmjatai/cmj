@@ -1,22 +1,39 @@
 {% load i18n cache tz %}
 {% load common_tags %}
 
+{% for tipo, autores in tipos_autores_materias %}
+  <div>
+    <a class="text-black-50" href="{% url 'cmj.search:materia_haystack_search'%}?tipo_i={{tipo.id}}&em_tramitacao_b=1">
+      {{tipo}}
+    </a>
+  </div>
+
+  {% for autor, formatos in autores.items %}
+
+    <a href="{% url 'cmj.search:materia_haystack_search' %}?tipo_i={{tipo.id}}&em_tramitacao_b=1&autoria_is={{autor.id}}">
+      {% if tipo.limite_minimo_coletivo %}
+        {% if autor.autor_related %}
+        {{autor.autor_related}}
+        {% else %}
+        {{autor.nome}}
+        {% endif %}
+        &nbsp; - &nbsp;<em class="text-light-blue"><small title="A contagem individual é feita de acordo com o que rege o R.I.">Contagem Individual: <strong>({{formatos.individual|length}})</strong> - Contagem Coletiva: <strong>({{formatos.coletivo|length}})</strong></small></em>
+      {% else %}
+        {% if autor.autor_related %}
+        {{autor.autor_related}} <strong>({{formatos.individual|length}})</strong>
+        {% else %}
+        {{autor.nome}} <strong>({{formatos.individual|length}})</strong>
+        {% endif %}
+      {% endif %}
+    </a>
+    <br>
+{% endfor %}
+<br>
+{% endfor %}
+
+
+
+{% comment %}
 {% cache 300 cache_materias_em_tramitacao %}
-  {% for tipo, autores_materias in tipos_autores_materias %}
-      <div>
-        <a class="text-black-50" href="{% url 'cmj.search:materia_haystack_search'%}?tipo_i={{tipo.id}}&em_tramitacao_b=1">
-          {{tipo}}
-        </a>
-      </div>
-      {% for autor, materias in autores_materias.items %}
-      <a href="{% url 'cmj.search:materia_haystack_search'%}?tipo_i={{tipo.id}}&autoria_is={{autor.id}}&em_tramitacao_b=1">
-          {% if autor.autor_related %}
-          {{autor.autor_related}} <strong>({{materias|length}})</strong><br>
-          {% else %}
-          {{autor.nome}} <strong>({{materias|length}})</strong><br>
-          {% endif %}
-        </a>
-        {% endfor %}
-        <br>
-  {% endfor %}
 {% endcache %}
+ {% endcomment %}

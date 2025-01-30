@@ -7,7 +7,7 @@
   {% if view.is_contained %}
     <div class="box-area-trabalho">
           <a>
-          Autor de Documentos e Proposições: <strong>{{user.autor_set.all.0}}</strong></a>
+          Autor de Documentos e Proposições: <strong>{{user.autor_set.all.first}}</strong></a>
     </div>
   {% endif %}
 {% endblock base_workspace %}
@@ -15,11 +15,24 @@
 
 {% block actions %}
   <div>
-  {% for tipo, autores_materias in view.tipos_autores_materias %}
+  {% for tipo, autores in view.tipos_autores_materias %}
     {% if forloop.first %}
       <strong>Matérias em tramitação:</strong><br>
     {% endif %}
-    <a href="{% url 'cmj.search:materia_haystack_search' %}?tipo_i={{tipo.id}}&em_tramitacao_b=1&autoria_is={{user.autor_set.all.0.id}}">{{tipo}} <strong>({{autores_materias|length}})</strong></a><br>
+    {% for autor, formatos in autores.items %}
+      {% if user.autor_set.all.first == autor %}
+        <a href="{% url 'cmj.search:materia_haystack_search' %}?tipo_i={{tipo.id}}&em_tramitacao_b=1&autoria_is={{autor.id}}">
+          {% if tipo.limite_minimo_coletivo %}
+          {{tipo}} -
+          <em class="text-light-blue"><small title="A contagem individual é feita de acordo com o que rege o R.I.">Contagem Individual: <strong>({{formatos.individual|length}})</strong> - Contagem Coletiva: <strong>({{formatos.coletivo|length}})</strong></small></em>
+          {% else %}
+            {{tipo}} <strong>({{formatos.individual|length}})</strong>
+          {% endif %}
+
+        </a>
+        <br>
+      {% endif %}
+    {% endfor %}
   {% endfor %}
   </div>
   {{ block.super }}

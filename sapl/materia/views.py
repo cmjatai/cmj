@@ -62,7 +62,7 @@ from sapl.materia.forms import (AnexadaForm, AutoriaForm,
                                 TramitacaoForm, TramitacaoUpdateForm, MateriaPesquisaSimplesForm,
                                 DespachoInicialCreateForm,
                                 DocumentoAcessorioProtocoloForm,
-    AssuntoMateriaForm)
+                                AssuntoMateriaForm)
 from sapl.norma.models import LegislacaoCitada
 from sapl.parlamentares.models import Legislatura
 from sapl.protocoloadm.models import Protocolo
@@ -137,51 +137,55 @@ def tipos_autores_materias(user, restricao_regimental=True):
     if user:
         q &= Q(autores__operadores=user)
 
-    materias_em_tramitacao = MateriaLegislativa.objects.filter(q).distinct()
+    materias_em_tramitacao = MateriaLegislativa.objects.filter(q).order_by(
+        '-tipo__limite_minimo_coletivo').distinct()
 
-    q = Q(
-        data_envio__isnull=False,
-        data_recebimento__isnull=True
-        )
-
+    proposicoes_enviadas_sem_recebimento = []
     if user:
-        q &= Q(autor__operadores=user)
-
-    proposicoes_enviadas_sem_recebimento = Proposicao.objects.filter(
-        q
+        q = Q(
+            data_envio__isnull=False,
+            data_recebimento__isnull=True
         )
+
+        q &= Q(autor__operadores=user)
+        proposicoes_enviadas_sem_recebimento = Proposicao.objects.filter(
+            q).distinct()
 
     r = {}
     for m in materias_em_tramitacao:
 
-        if restricao_regimental and m.tipo.limite_minimo_coletivo:
-            if m.autores.count() >= m.tipo.limite_minimo_coletivo:
-                continue
+        if m.tipo not in r:
+            r[m.tipo] = {}
 
-        if user:
-            if m.tipo not in r:
-                r[m.tipo] = {m}
-            else:
-                r[m.tipo] = r[m.tipo].union({m})
-        else:
-            if m.tipo not in r:
-                r[m.tipo] = {}
+        coletivo = m.tipo.limite_minimo_coletivo and m.autores.count(
+        ) >= m.tipo.limite_minimo_coletivo
 
-            for a in m.autores.all():
-                if a not in r[m.tipo]:
-                    r[m.tipo][a] = {m}
-                else:
-                    r[m.tipo][a] = r[m.tipo][a].union({m})
+        for a in m.autores.all():
+            if a not in r[m.tipo]:
+                r[m.tipo][a] = {'individual': set(), 'coletivo': set()}
+
+            key = 'coletivo' if coletivo else 'individual'
+
+            r[m.tipo][a][key].add(m)
 
     if restricao_regimental:
         for p in proposicoes_enviadas_sem_recebimento:
 
             tipo_correspondente = p.tipo.tipo_conteudo_related
-            if user:
-                if tipo_correspondente not in r:
-                    r[tipo_correspondente] = {p}
-                else:
-                    r[tipo_correspondente] = r[tipo_correspondente].union({p})
+
+            coletivo = tipo_correspondente.limite_minimo_coletivo and m.autores.count(
+            ) >= tipo_correspondente.limite_minimo_coletivo
+
+            if tipo_correspondente not in r:
+                r[tipo_correspondente] = {}
+
+            if p.autor not in r[tipo_correspondente]:
+                r[tipo_correspondente][p.autor] = {
+                    'individual': set(), 'coletivo': set()
+                }
+
+            key = 'coletivo' if coletivo else 'individual'
+            r[tipo_correspondente][p.autor][key].add(p)
 
     return r
 
@@ -719,7 +723,7 @@ class RetornarProposicao(UpdateView):
             self.logger.info(
                 "user=" + username + ". Tentando obter objeto Proposicao com id={}.".format(kwargs['pk']))
             p = Proposicao.objects.get(id=kwargs['pk'])
-        except:
+        except BaseException:
             self.logger.error(
                 "user=" + username + ". Objeto Proposicao com id={} não encontrado.".format(kwargs['pk']))
             raise Http404()
@@ -808,7 +812,8 @@ class ConfirmarProposicao(PermissionRequiredForAppCrudMixin, UpdateView):
                     proposicao.texto_original.path,
                     str(proposicao.pk)) if proposicao.texto_original else None
 
-            if hasher == 'P%s%s%s' % (self.kwargs['hash'], SEPARADOR_HASH_PROPOSICAO, proposicao.pk):
+            if hasher == 'P%s%s%s' % (
+                    self.kwargs['hash'], SEPARADOR_HASH_PROPOSICAO, proposicao.pk):
                 self.object = proposicao
         except Exception as e:
             self.logger.error("user=" + username + ". Objeto Proposicao com atributos (pk={}, data_envio=Not Null, "
@@ -1011,13 +1016,22 @@ class ProposicaoCrud(Crud):
 
                         tam = tipos_autores_materias(self.request.user)
                         tcr = p.tipo.tipo_conteudo_related
+
                         if tcr.limite_por_autor_tramitando and tcr in tam:
-                            if len(tam[tcr]) >= tcr.limite_por_autor_tramitando:
+                            fmt_individual = tam.get(
+                                tcr, {}
+                            ).get(
+                                p.autor, {}
+                            ).get(
+                                'individual', set()
+                            )
+                            if len(fmt_individual) >= tcr.limite_por_autor_tramitando:
                                 msg_error = _(
                                     f'''Limite Regimental atingido.
                                     O envio só será possível quando a quantidade
-                                    de Requerimentos em tramitação do Vereador
-                                    for inferior a {tcr.limite_por_autor_tramitando} Requerimentos.''')
+                                    de Requerimentos em tramitação for inferior 
+                                    a {tcr.limite_por_autor_tramitando}
+                                    Requerimentos.''')
 
                         if not msg_error:
 
@@ -1192,7 +1206,8 @@ class ProposicaoCrud(Crud):
             dict_objeto_antigo = objeto_antigo.__dict__
 
             tipo_texto = self.request.POST.get('tipo_texto', '')
-            if tipo_texto == 'D' and objeto_antigo.texto_articulado.exists() or tipo_texto == 'T' and not objeto_antigo.texto_articulado.exists():
+            if tipo_texto == 'D' and objeto_antigo.texto_articulado.exists(
+            ) or tipo_texto == 'T' and not objeto_antigo.texto_articulado.exists():
                 self.object.user = self.request.user
                 self.object.ip = get_client_ip(self.request)
                 self.object.ultima_edicao = timezone.localtime()
@@ -1348,7 +1363,13 @@ class ProposicaoCrud(Crud):
                 if obj.data_envio is None:
                     tcr = obj.tipo.tipo_conteudo_related
                     if tcr.limite_por_autor_tramitando and tcr in tam:
-                        if len(tam[tcr]) >= tcr.limite_por_autor_tramitando:
+                        fmt_individual = tam.get(
+                            tcr, {}
+                        ).get(
+                            obj.autor, {}
+                        ).get('individual', set())
+
+                        if len(fmt_individual) >= tcr.limite_por_autor_tramitando:
                             obj.data_envio = """
                             <strong class="text-red">Limite Regimental atingido.</strong>
                             """
@@ -1838,7 +1859,8 @@ class AutoriaCrud(MasterDetailCrud):
             initial['materia'] = materia
             return initial
 
-    class UpdateView(CheckCheckMixin, LocalBaseMixin, MasterDetailCrud.UpdateView):
+    class UpdateView(CheckCheckMixin, LocalBaseMixin,
+                     MasterDetailCrud.UpdateView):
 
         def get_initial(self):
             initial = super().get_initial()
@@ -1896,7 +1918,8 @@ class AutoriaMultiCreateView(PermissionRequiredForAppCrudMixin, FormView):
         return FormView.form_valid(self, form)
 
 
-class DespachoInicialMultiCreateView(PermissionRequiredForAppCrudMixin, FormView):
+class DespachoInicialMultiCreateView(
+        PermissionRequiredForAppCrudMixin, FormView):
     app_label = sapl.materia.apps.AppConfig.label
     form_class = DespachoInicialCreateForm
     template_name = 'materia/despachoinicial_multicreate_form.html'
@@ -2069,7 +2092,7 @@ class MateriaLegislativaCrud(Crud):
         def sub_title(self):
             try:
                 return self.object.ementa
-            except:
+            except BaseException:
                 return ''
 
     class CreateView(Crud.CreateView):
@@ -2124,7 +2147,8 @@ class MateriaLegislativaCrud(Crud):
                     self.object.save()
                     break
 
-            if Anexada.objects.filter(materia_principal=self.kwargs['pk']).exists():
+            if Anexada.objects.filter(
+                    materia_principal=self.kwargs['pk']).exists():
                 materia = MateriaLegislativa.objects.get(pk=self.kwargs['pk'])
                 anexadas = lista_anexados(materia)
 
@@ -2174,8 +2198,9 @@ class MateriaLegislativaCrud(Crud):
 
             if self.request.user.is_superuser:
                 btns.extend(
-                    self.get_btn_generate('sapl.materia:materialegislativa_detail')
-                    )
+                    self.get_btn_generate(
+                        'sapl.materia:materialegislativa_detail')
+                )
 
             btns = list(filter(None, btns))
             return btns
@@ -2295,16 +2320,16 @@ class MateriaLegislativaCrud(Crud):
                 for tema in temas:
                     assunto, created = AssuntoMateria.objects.get_or_create(
                         assunto=tema
-                        )
+                    )
 
                     mass, created = MateriaAssunto.objects.get_or_create(
                         assunto=assunto,
                         materia=obj
-                        )
+                    )
 
-            return  HttpResponseRedirect(reverse(
-            'sapl.materia:materialegislativa_detail',
-            kwargs={'pk': self.kwargs['pk']}
+            return HttpResponseRedirect(reverse(
+                'sapl.materia:materialegislativa_detail',
+                kwargs={'pk': self.kwargs['pk']}
             ))
 
         def get(self, request, *args, **kwargs):
@@ -2412,7 +2437,7 @@ class MateriaLegislativaCrud(Crud):
             if not normas.exists():
                 return '', ''
 
-            return _('Norma Jurídica Vinculada'),  '<br>'.join(['<a href="{}">{}</a>'.format(
+            return _('Norma Jurídica Vinculada'), '<br>'.join(['<a href="{}">{}</a>'.format(
                 reverse('sapl.norma:normajuridica_detail',
                         kwargs={'pk': n.id}), n
             ) for n in normas]
@@ -2570,7 +2595,8 @@ class AcompanhamentoExcluirView(TemplateView):
         return HttpResponseRedirect(self.get_success_url())
 
 
-class MateriaLegislativaPesquisaView(AudigLogFilterMixin, MultiFormatOutputMixin, FilterView):
+class MateriaLegislativaPesquisaView(
+        AudigLogFilterMixin, MultiFormatOutputMixin, FilterView):
     model = MateriaLegislativa
     filterset_class = MateriaLegislativaFilterSet
     paginate_by = 50
@@ -2600,7 +2626,8 @@ class MateriaLegislativaPesquisaView(AudigLogFilterMixin, MultiFormatOutputMixin
             return HttpResponsePermanentRedirect(
                 reverse('cmj.search:materia_haystack_search'))
 
-        return MultiFormatOutputMixin.render_to_response(self, context, **response_kwargs)
+        return MultiFormatOutputMixin.render_to_response(
+            self, context, **response_kwargs)
 
     def get_filterset_kwargs(self, filterset_class):
         super().get_filterset_kwargs(filterset_class)
@@ -2961,13 +2988,15 @@ class MateriaAnexadaEmLoteView(PermissionRequiredMixin, FilterView):
             msg = _('Por favor, selecione um tipo de matéria.')
             messages.add_message(self.request, messages.ERROR, msg)
 
-            if not self.request.GET.get('data_apresentacao_0', " ") or not self.request.GET.get('data_apresentacao_1', " "):
+            if not self.request.GET.get('data_apresentacao_0', " ") or not self.request.GET.get(
+                    'data_apresentacao_1', " "):
                 msg = _('Por favor, preencha as datas.')
                 messages.add_message(self.request, messages.ERROR, msg)
 
             return context
 
-        if not self.request.GET.get('data_apresentacao_0', " ") or not self.request.GET.get('data_apresentacao_1', " "):
+        if not self.request.GET.get('data_apresentacao_0', " ") or not self.request.GET.get(
+                'data_apresentacao_1', " "):
             msg = _('Por favor, preencha as datas.')
             messages.add_message(self.request, messages.ERROR, msg)
             return context
@@ -2999,7 +3028,8 @@ class MateriaAnexadaEmLoteView(PermissionRequiredMixin, FilterView):
                     if principal == anexa.materia_anexada:
                         ciclico = True
                     else:
-                        for a in Anexada.objects.filter(materia_principal=anexa.materia_anexada):
+                        for a in Anexada.objects.filter(
+                                materia_principal=anexa.materia_anexada):
                             anexadas.append(a)
 
                 anexadas_anexada = anexadas
@@ -3131,7 +3161,8 @@ class PrimeiraTramitacaoEmLoteView(PermissionRequiredMixin, FilterView):
         return self.form_invalid(form)
 
     def get_success_url(self):
-        return HttpResponseRedirect(reverse('sapl.materia:primeira_tramitacao_em_lote'))
+        return HttpResponseRedirect(
+            reverse('sapl.materia:primeira_tramitacao_em_lote'))
 
     def form_invalid(self, form, *args, **kwargs):
         for key, erros in form.errors.items():
@@ -3422,10 +3453,11 @@ class MateriaLegislativaCheckView(ListView):
 
         check = request.GET.get('check', '')
         uncheck = request.GET.get('uncheck', '')
-        if request.user.has_perm('materia.can_check_complete') and (check or uncheck):
+        if request.user.has_perm(
+                'materia.can_check_complete') and (check or uncheck):
             try:
                 m = MateriaLegislativa.objects.get(pk=check or uncheck)
-            except:
+            except BaseException:
                 raise Http404
             else:
                 m.checkcheck = True if check else False
