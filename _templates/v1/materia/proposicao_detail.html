@@ -39,9 +39,11 @@
   {% else %}
     {% block editions_actions_send %}
       {% if object.metadata.signs and object.metadata.signs.texto_original.signs or not object.tipo.exige_assinatura_digital %}
-        <div class="actions btn-group" role="group">
-          <a href="{{ view.detail_url }}?action=send" class="btn btn-primary">{% trans 'Enviar' %}</a>
-        </div>
+        {% if not impedimentos_de_envio %}
+          <div class="actions btn-group" role="group">
+            <a href="{{ view.detail_url }}?action=send" class="btn btn-primary">{% trans 'Enviar' %}</a>
+          </div>
+        {% endif %}
       {% endif %}
       <div class="actions btn-group" role="group">
         <a href="{{ view.update_url }}" class="btn btn-outline-primary">{% trans 'Editar' %}</a>
@@ -58,9 +60,30 @@
     </div>
   {% endif %}
 
-  {% with object as p %}
-    {% include 'materia/proposicao_widget_file.html' %}
-  {% endwith %}
+  <div class="row">
+    <div class="col-sm-6">
+      {% with object as p %}
+        {% include 'materia/proposicao_widget_file.html' %}
+      {% endwith %}
+    </div>
+
+    {% if impedimentos_de_envio %}
+      <div class="col-sm-6">
+        <div id="div_id_impedimento" class="form-group">
+          <p class="control-label text-red">Impedimentos de envio devido a contagem individual</p>
+          <div class="controls">
+            <div class="form-control-static">
+              <ul>
+                {% for autor, nome_completo, length_fmt_individual in impedimentos_de_envio %}
+                  <li>{{ autor }} ({{length_fmt_individual}})</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  </div>
 
   <h2 class="legend">{% model_verbose_name 'sapl.materia.models.Proposicao' %}</h2>
   <div class="row">
@@ -72,6 +95,22 @@
         </div>
       </div>
     </div>
+
+
+    {% if object.conteudo_gerado_related %}
+      <div class="col-sm-8">
+        <p class="control-label">{% trans "Conteúdo Gerado" %}</p>
+        <div id="div_id_conteudo_gerado_related" class="form-group">
+          <div class="controls form-control-static">
+            <a href="{% url object|urldetail_content_type:object.conteudo_gerado_related object.conteudo_gerado_related.id%}">
+              {{object.conteudo_gerado_related}}
+            </a>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+
     {% if object.data_devolucao %}
       <div class="col-sm-8">
         <div class="alert alert-danger alert-dismissible " role="alert">
@@ -81,7 +120,7 @@
       </div>
     {% else %}
       {% if object.data_envio %}
-        <div class="col-sm-4 small">
+        <div class="col-sm-3 small">
           <div id="div_id_data_envio" class="form-group">
             <p class="control-label">{%field_verbose_name object 'data_envio' %}</p>
             <div class="controls">
@@ -91,7 +130,7 @@
         </div>
       {% endif %}
       {% if object.data_recebimento %}
-        <div class="col-sm-4 small">
+        <div class="col-sm-3 small">
           <div id="div_id_data_envio" class="form-group">
             <p class="control-label">{%field_verbose_name object 'data_recebimento'%}</p>
             <div class="controls">
@@ -101,7 +140,22 @@
         </div>
       {% endif %}
     {% endif %}
+
+    {% if not AppConfig.receber_recibo_proposicao %}
+      {% if object.hash_code %}
+        <div class="col-sm-6 small">
+          <div id="div_id_hash_code" class="form-group">
+            <p class="control-label">{%field_verbose_name object 'hash_code'%}</p>
+            <div class="controls">
+              <div class="form-control-static">{{object.hash_code}}</div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    {% endif %}
+
   </div>
+
   <div class="row">
     <div class="col-sm-12">
       <div id="div_id_descricao" class="form-group">
@@ -125,32 +179,6 @@
     </div>
   {% endif %}
   <div class="row">
-
-    {% if not AppConfig.receber_recibo_proposicao %}
-      {% if object.hash_code %}
-        <div class="col-sm-6">
-          <div id="div_id_hash_code" class="form-group">
-            <p class="control-label">{%field_verbose_name object 'hash_code'%}</p>
-            <div class="controls">
-              <div class="form-control-static">{{object.hash_code}}</div>
-            </div>
-          </div>
-        </div>
-      {% endif %}
-    {% endif %}
-    {% if object.conteudo_gerado_related %}
-      <div class="col-sm-6">
-        <p class="control-label">{% trans "Conteúdo Gerado" %}</p>
-        <div id="div_id_conteudo_gerado_related" class="form-group">
-          <div class="controls form-control-static">
-            <a href="{% url object|urldetail_content_type:object.conteudo_gerado_related object.conteudo_gerado_related.id%}">
-              {{object.conteudo_gerado_related}}
-            </a>
-          </div>
-        </div>
-      </div>
-    {% endif %}
-
 
     {% if object.materia_de_vinculo %}
       <div class="col-sm-12">

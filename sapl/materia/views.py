@@ -101,7 +101,7 @@ from .models import (AcompanhamentoMateria, Anexada, AssuntoMateria, Autoria,
 logger = logging.getLogger(__name__)
 
 
-def tipos_autores_materias(user, restricao_regimental=True):
+def tipos_autores_materias(user=None, restricao_regimental=True):
 
     noww = timezone.localdate()
 
@@ -949,6 +949,56 @@ class ProposicaoCrud(Crud):
 
         logger = logging.getLogger(__name__)
 
+        def impedimentos_de_envio(self):
+            imp = []
+
+            if not self.object.metadata or not self.object.tipo.tipo_conteudo_related.limite_minimo_coletivo:
+                return imp
+
+            signs = self.object.metadata.get(
+                'signs', {}
+            ).get(
+                'texto_original', {}
+            ).get('signs', [])
+
+            signs = set(map(lambda x: x[0], signs))
+
+            if not signs:
+                return imp
+
+            if len(signs) >= self.object.tipo.tipo_conteudo_related.limite_minimo_coletivo:
+                return imp
+
+            tam = tipos_autores_materias()
+
+            autores_com_materias_em_tramitacao = tam.get(
+                self.object.tipo.tipo_conteudo_related, {})
+
+            autores_key_nome_completo = dict(
+                map(
+                    lambda el: (
+                        (el[0], el[0].autor_related.nome_completo), el[1]),
+                    autores_com_materias_em_tramitacao.items())
+            )
+
+            assinantes_com_mat_em_tramitacao = signs.intersection(
+                set(dict(autores_key_nome_completo.keys()).values())
+            )
+
+            autores_key_nome_completo = filter(
+                lambda el: el[0][1] in assinantes_com_mat_em_tramitacao,
+                autores_key_nome_completo.items()
+            )
+
+            for registro in autores_key_nome_completo:
+                autor, formatos = registro
+                fmt_individual = formatos['individual']
+
+                if len(fmt_individual) >= self.object.tipo.tipo_conteudo_related.limite_por_autor_tramitando:
+                    imp.append((autor[0], autor[1], len(fmt_individual)))
+
+            return imp
+
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
             context['subnav_template_name'] = ''
@@ -958,9 +1008,8 @@ class ProposicaoCrud(Crud):
                 self.object, self.object.autor)
 
             context['user'] = self.request.user
-            context['proposicao'] = Proposicao.objects.get(
-                pk=self.kwargs['pk']
-            )
+            context['proposicao'] = self.object
+            context['impedimentos_de_envio'] = self.impedimentos_de_envio()
             return context
 
         def get(self, request, *args, **kwargs):
@@ -968,7 +1017,7 @@ class ProposicaoCrud(Crud):
             action = request.GET.get('action', '')
             username = request.user.username
 
-            p = Proposicao.objects.get(id=kwargs['pk'])
+            p = self.object
 
             if not action:
                 u = request.user
@@ -1014,24 +1063,31 @@ class ProposicaoCrud(Crud):
                             'Documento não possui assinatura digital.')
                     else:
 
-                        tam = tipos_autores_materias(self.request.user)
                         tcr = p.tipo.tipo_conteudo_related
+                        msg_pre_error = _(
+                            f'''Limite Regimental atingido.
+                            O envio só será possível quando a quantidade
+                            de Requerimentos em tramitação for inferior 
+                            a {tcr.limite_por_autor_tramitando}
+                            Requerimentos.''')
 
-                        if tcr.limite_por_autor_tramitando and tcr in tam:
-                            fmt_individual = tam.get(
-                                tcr, {}
-                            ).get(
-                                p.autor, {}
-                            ).get(
-                                'individual', set()
-                            )
-                            if len(fmt_individual) >= tcr.limite_por_autor_tramitando:
-                                msg_error = _(
-                                    f'''Limite Regimental atingido.
-                                    O envio só será possível quando a quantidade
-                                    de Requerimentos em tramitação for inferior 
-                                    a {tcr.limite_por_autor_tramitando}
-                                    Requerimentos.''')
+                        impedimentos = self.impedimentos_de_envio()
+
+                        if not impedimentos:
+                            tam = tipos_autores_materias(self.request.user)
+
+                            if tcr.limite_por_autor_tramitando and tcr in tam:
+                                fmt_individual = tam.get(
+                                    tcr, {}
+                                ).get(
+                                    p.autor, {}
+                                ).get(
+                                    'individual', set()
+                                )
+                                if len(fmt_individual) >= tcr.limite_por_autor_tramitando:
+                                    msg_error = msg_pre_error
+                        else:
+                            msg_error = msg_pre_error
 
                         if not msg_error:
 
@@ -1116,7 +1172,7 @@ class ProposicaoCrud(Crud):
             try:
                 self.logger.debug(
                     "user=" + username + ". Tentando obter objeto Proposicao com pk={}".format(kwargs['pk']))
-                p = Proposicao.objects.get(id=kwargs['pk'])
+                self.object = p = Proposicao.objects.get(id=kwargs['pk'])
             except Exception as e:
                 self.logger.error(
                     "user=" + username + ". Erro ao obter proposicao com pk={}. Retornando 404. ".format(kwargs['pk']) + str(e))
