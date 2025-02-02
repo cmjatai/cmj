@@ -301,20 +301,28 @@ class CompMixin(PermissionRequiredMixin):
             pk = self.kwargs.get('ta_id', self.kwargs.get('pk', 0))
 
             if pk:
-                ta = TextoArticulado.objects.get(pk = pk)
+                ta = TextoArticulado.objects.get(pk=pk)
                 return ta
 
             tipo_norma = self.kwargs.get('tipo_norma', '').upper()
             numero_norma = self.kwargs.get('numero_norma', '')
+            ano_norma = self.kwargs.get('ano_norma', '')
 
             tipo_norma = 'LEI' if tipo_norma == 'L' else tipo_norma
-            
+
+            params = dict(filter(lambda kv: kv[1], {
+                'tipo__sigla': tipo_norma,
+                'numero': numero_norma,
+                'ano': ano_norma
+            }.items()))
+
             if tipo_norma not in ('LOM', 'RI'):
                 nj = NormaJuridica.objects.filter(
-                    tipo__sigla = tipo_norma, numero = numero_norma).order_by('-ano').first()
+                    **params).order_by('-ano').first()
                 ta = nj.texto_articulado.first()
             else:
-                ta = TextoArticulado.objects.get(pk = 281 if tipo_norma == 'LOM' else 2222)
+                ta = TextoArticulado.objects.get(
+                    pk=281 if tipo_norma == 'LOM' else 2222)
 
         except:
             raise Http404()
@@ -1083,7 +1091,7 @@ class TextView(CompMixin, ListView):
         context['object'] = self.object
 
         cita = Vide.objects.filter(
-            Q(dispositivo_base__ta_id = self.object.id)).\
+            Q(dispositivo_base__ta_id=self.object.id)).\
             select_related(
             'dispositivo_ref',
             'dispositivo_ref__ta',
@@ -1097,7 +1105,7 @@ class TextView(CompMixin, ListView):
             context['cita'][c.dispositivo_base_id].append(c)
 
         citado = Vide.objects.filter(
-            Q(dispositivo_ref__ta_id = self.object.id)).\
+            Q(dispositivo_ref__ta_id=self.object.id)).\
             select_related(
             'dispositivo_base',
             'dispositivo_base__ta',
@@ -1111,7 +1119,7 @@ class TextView(CompMixin, ListView):
             context['citado'][c.dispositivo_ref_id].append(c)
 
         notas = Nota.objects.filter(
-            dispositivo__ta_id = self.object.id).select_related('owner', 'tipo')
+            dispositivo__ta_id=self.object.id).select_related('owner', 'tipo')
 
         context['notas'] = {}
         for n in notas:
@@ -1148,26 +1156,26 @@ class TextView(CompMixin, ListView):
             except:
                 return Dispositivo.objects.filter(
                     ordem__gt=0,
-                    ta_id = self.object.id,
+                    ta_id=self.object.id,
                 ).select_related(*DISPOSITIVO_SELECT_RELATED)
 
             return Dispositivo.objects.filter(
                 inicio_vigencia__lte=self.fim_vigencia,
                 ordem__gt=0,
-                ta_id = self.object.id,
+                ta_id=self.object.id,
             ).select_related(*DISPOSITIVO_SELECT_RELATED)
         else:
 
             r = Dispositivo.objects.filter(
                 ordem__gt=0,
-                ta_id = self.object.id,
+                ta_id=self.object.id,
             ).select_related(*DISPOSITIVO_SELECT_RELATED)
 
             return r
 
     def get_vigencias(self):
         itens = Dispositivo.objects.filter(
-            ta_id = self.object.id,
+            ta_id=self.object.id,
         ).order_by(
             'inicio_vigencia'
         ).distinct(
@@ -1224,7 +1232,7 @@ class TextView(CompMixin, ListView):
         if self.flag_alteradora == -1:
             self.flag_alteradora = Dispositivo.objects.select_related(
                 'dispositivos_alterados_pelo_texto_articulado_set'
-            ).filter(ta_id = self.object.id).count()
+            ).filter(ta_id=self.object.id).count()
         return self.flag_alteradora > 0
 
 
