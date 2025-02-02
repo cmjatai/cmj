@@ -748,7 +748,7 @@ class Bancada(models.Model):
     legislatura = models.ForeignKey(Legislatura,
                                     on_delete=models.PROTECT,
                                     verbose_name=_('Legislatura'))
-    nome = models.CharField(
+    nome = models.CharField( 
         max_length=80,
         verbose_name=_('Nome da Bancada'))
     partido = models.ForeignKey(Partido,

@@ -24,13 +24,13 @@
   - title: {% trans 'Nossa Jataí' %}
     url: /institucional/nossa-jatai
 
+
+{% comment %}
   - title: {% trans 'História' %}
     url: ''
     children:
     - title: {% trans 'Prefeitos de Nossa História' %}
       url: /institucional/historia/prefeitos-de-nossa-historia
-
-{% comment %}
   - title: {% trans 'Agenda Pública' %}
     url: /evento
   - title: {% trans 'EGEL' %}

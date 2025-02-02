@@ -118,13 +118,20 @@ ComposicaoColigacao:
   {% trans 'Nome do Partido' %}:
   - partido
 
-Bancada:
+BancadaDetail:
   {% trans 'Bancada' %}:
   - legislatura
   - nome partido
   - data_criacao data_extincao
   - descricao
   - filiados
+
+Bancada:
+  {% trans 'Bancada' %}:
+  - legislatura
+  - nome partido
+  - data_criacao data_extincao
+  - descricao
 
 CargoBancada:
   {% trans 'Cargo de Bancada' %}:

@@ -69,6 +69,8 @@ class BancadaCrud(Crud):
 
     class DetailView(Crud.DetailView):
 
+        layout_key = 'BancadaDetail'
+        
         def get_context_data(self, **kwargs):
             context = Crud.DetailView.get_context_data(self, **kwargs)
 
@@ -95,7 +97,6 @@ class BancadaCrud(Crud):
             return 'Membros da Bancada', f'<ul>{r}</ul>'
 
     class UpdateView(CrudAux.UpdateView):
-
         def get_context_data(self, **kwargs):
             context = Crud.UpdateView.get_context_data(self, **kwargs)
 
