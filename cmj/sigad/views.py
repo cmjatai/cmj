@@ -1200,8 +1200,11 @@ class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
                 childs = childs.filter(parent=None)
 
             childs = childs.order_by('codigo', 'titulo')
+
             for i, c in enumerate(childs, 1):
-                c.codigo = i
+                mult = 2 - c.nivel
+                mult = 0 if mult < 0 else mult
+                c.codigo = i * 10**mult
                 c.save()
 
         return ListView.get(self, request, *args, **kwargs)
