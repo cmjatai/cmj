@@ -10,7 +10,7 @@ def transfere_parlamantar_FK2M2M(apps, schema_editor):
         oficio.parlamentares.add(oficio.parlamentar)
 
 
-class Migration(migrations.Migration):
+class Migration(migrations.Migration): 
 
     dependencies = [
         ('parlamentares', '0045_auto_20240420_1344'),

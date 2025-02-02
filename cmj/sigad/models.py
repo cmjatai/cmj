@@ -11,7 +11,6 @@ from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.db.models.fields.json import JSONField
 from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.base import File
@@ -20,16 +19,17 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models import Q, F
 from django.db.models.deletion import PROTECT, CASCADE
+from django.db.models.fields.json import JSONField
 from django.http.response import HttpResponse
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from django_extensions.db.fields.json import JSONField as django_extensions_JSONField
-import qrcode
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.pdfgen import canvas
 from reportlab.platypus.doctemplate import SimpleDocTemplate
+import qrcode
 
 from cmj import globalrules
 from cmj.core.models import AuditLog
@@ -44,13 +44,20 @@ from sapl.parlamentares.models import Parlamentar
 CLASSE_ESTRUTURAL = 0
 CLASSE_DOCUMENTAL = 1
 CLASSE_MISTA = 2
+CLASSE_REDIRECT = 98
+CLASSE_REDIRECT_VIEWS = 99
 
-PERFIL_CLASSE = ((
-    CLASSE_ESTRUTURAL, _('Classe Estrutural')),
+PERFIL_CLASSE = (
     (
-    CLASSE_DOCUMENTAL, _('Classe de Conteúdo')),
+        CLASSE_ESTRUTURAL, _('Classe Estrutural')),
     (
-    CLASSE_MISTA, _('Classe Mista'))
+        CLASSE_DOCUMENTAL, _('Classe de Conteúdo')),
+    (
+        CLASSE_MISTA, _('Classe Mista')),
+    (
+        CLASSE_REDIRECT, _('Classe de Redirecionamento via URL')),
+    (
+        CLASSE_REDIRECT_VIEWS, _('Classe de Redirecionamento via Views'))
 )
 
 DOC_TEMPLATES_CHOICE_FILES = {
@@ -1419,6 +1426,7 @@ class PermissionsUserDocumento(CMSMixin):
         verbose_name_plural = _('Permissões de Usuários para Documentos')
         ordering = ['id']
 
+
 class Midia(models.Model):
 
     documento = models.OneToOneField(
@@ -1643,6 +1651,7 @@ class CaixaPublicacao(models.Model):
         verbose_name_plural = _('Caixas de Publicação')
         ordering = ['id']
 
+
 class CaixaPublicacaoClasse(CaixaPublicacao):
 
     class Meta:
@@ -1650,6 +1659,7 @@ class CaixaPublicacaoClasse(CaixaPublicacao):
         verbose_name = _('Caixa de Publicação')
         verbose_name_plural = _('Caixas de Publicação')
         ordering = ['id']
+
 
 class CaixaPublicacaoRelationship(models.Model):
 

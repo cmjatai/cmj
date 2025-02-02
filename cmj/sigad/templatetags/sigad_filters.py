@@ -141,16 +141,15 @@ def list_in_informacao(node):
         classes = classes.filter(
             parent=node
         )
-        # classes.update(visibilidade=1)
     else:
-        classes = classes.filter(
+        classe_first = classes.filter(
             list_in_inf=True,
             parent__isnull=True
-        )
+        ).order_by('codigo').first()
 
         classes = Classe.objects.filter(
             list_in_inf=True,
-            parent=classes.first()
+            parent=classe_first
         ).order_by('codigo')
 
         max = classes.last().codigo // 10

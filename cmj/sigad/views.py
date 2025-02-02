@@ -30,7 +30,7 @@ from cmj.sigad.forms import DocumentoForm, CaixaPublicacaoForm
 from cmj.sigad.models import Documento, Classe, ReferenciaEntreDocumentos, \
     PermissionsUserClasse, PermissionsUserDocumento, CMSMixin, \
     CLASSE_TEMPLATES_CHOICE, CaixaPublicacao, CaixaPublicacaoClasse, \
-    CaixaPublicacaoRelationship, UrlShortener
+    CaixaPublicacaoRelationship, UrlShortener, CLASSE_REDIRECT_VIEWS
 from cmj.utils import make_pagination
 from sapl.comissoes.models import Comissao
 from sapl.crud.base import MasterDetailCrud, Crud
@@ -294,9 +294,8 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
             elif self.documento.tipo == Documento.TPD_GALLERY and \
                     request.META['REQUEST_METHOD'] == 'GET':
                 return HttpResponseForbidden()
-        elif self.classe and self.classe.url_redirect:
-            if self.classe.url_redirect.startswith('/'):
-                request.session['classe_mascara'] = self.classe
+
+        elif self.classe and self.classe.perfil != CLASSE_REDIRECT_VIEWS and self.classe.url_redirect:
             return redirect(self.classe.url_redirect)
 
         return TemplateView.get(self, request, *args, **kwargs)
@@ -421,8 +420,7 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
             kwargs['object_list'] = Documento.objects.qs_news().filter(
                 parlamentares__isnull=True)[:4]
         elif template == models.CLASSE_TEMPLATES_CHOICE.mapa_site:
-            kwargs['object_list'] = Classe.objects.qs_mapa_site(
-                self.request.user)
+            kwargs['object_list'] = None
             self.paginate_by = None
 
         else:
@@ -1195,7 +1193,13 @@ class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
         renumere = request.GET.get('renumere', None)
 
         if not renumere is None:
-            childs = self.object.childs.order_by('codigo', 'titulo')
+
+            childs = self.object.childs if self.object else self.model.objects
+
+            if not self.object:
+                childs = childs.filter(parent=None)
+
+            childs = childs.order_by('codigo', 'titulo')
             for i, c in enumerate(childs, 1):
                 c.codigo = i
                 c.save()

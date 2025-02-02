@@ -16,9 +16,11 @@ from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.core.mail.backends.smtp import EmailBackend
 from django.db import connection
+from django.db.models import Q
 from django.db.models.signals import pre_init, post_init, pre_save, post_save, \
     pre_delete, post_delete, post_migrate, pre_migrate, m2m_changed
 from django.template.loaders.filesystem import Loader
+from django.urls.base import resolve
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeString
@@ -29,6 +31,7 @@ from weasyprint import HTML
 import magic
 
 from cmj.celery import app as celery_app
+
 
 media_protected_storage = FileSystemStorage(
     location=settings.MEDIA_PROTECTED_ROOT, base_url='DO_NOT_USE')
@@ -121,7 +124,6 @@ def clean_text(text, _normalizes=None):
         return text
     except:
         return txt
-
 
 
 def get_settings_auth_user_model():
@@ -505,6 +507,65 @@ def make_pdf(base_url,
     main_doc
 
     return pdf_file
+
+
+def get_breadcrumb_classes(context, request=None, response=None):
+
+    if not context or not request or request.path == '/':
+        return response
+
+    from cmj.sigad.models import Documento, Classe
+
+    obj = context.get('object', None)
+
+    if obj and (isinstance(obj, Classe) or isinstance(obj, Documento)):
+        context.update(
+            {
+                'title': obj,
+                'breadcrumb_classes': obj.classes_parents_and_me
+            })
+        return response
+
+    path = request.path
+    fpath = request.get_full_path()
+
+    paths = []
+    try:
+        resolve_match = resolve(path)
+        view_name = str(resolve_match.view_name)
+    except:
+        view_name = ''
+    else:
+        paths.append(view_name)
+
+    paths.append(fpath)
+    if path != paths[-1]:
+        paths.append(path)
+
+    for i, path in enumerate(paths):
+        q = Q(url_redirect=path) | Q(slug=path[1:])
+        classe_redirect = Classe.objects.filter(q).first()
+        if classe_redirect:
+            breads = classe_redirect.classes_parents_and_me
+            if obj:
+                breads.extend([obj])
+            context.update({'breadcrumb_classes': breads})
+            if not obj and path != view_name:
+                context.update({
+                    'title': classe_redirect
+                })
+            return response
+
+    documento = Documento.objects.filter(slug=path[1:]).first()
+    if documento:
+        context.update(
+            {
+                'title': documento,
+                'breadcrumb_classes': documento.classes_parents_and_me
+            })
+        return response
+
+    return response
 
 
 class ProcessoExterno(object):

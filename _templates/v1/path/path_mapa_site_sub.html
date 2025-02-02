@@ -1,4 +1,4 @@
-{% load i18n sigad_filters social_utils  cropping thumbnail %}
+{% load i18n sigad_filters common_cmj_tags%}
 
 <ul class="{% if not obj_list.first.parent %}col-12{%else%}submapa{% endif %}">
 {% for item in obj_list %}

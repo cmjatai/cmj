@@ -1067,7 +1067,7 @@ class ProposicaoCrud(Crud):
                         msg_pre_error = _(
                             f'''Limite Regimental atingido.
                             O envio só será possível quando a quantidade
-                            de Requerimentos em tramitação for inferior 
+                            de Requerimentos em tramitação for inferior
                             a {tcr.limite_por_autor_tramitando}
                             Requerimentos.''')
 
@@ -2744,16 +2744,7 @@ class MateriaLegislativaPesquisaView(
     def get_context_data(self, **kwargs):
 
         context = super().get_context_data(**kwargs)
-
-        classe_mascara = self.request.session.get('classe_mascara', None)
-
-        if classe_mascara:
-            context['classe_mascara'] = classe_mascara
-            classe_mascara = str(classe_mascara)
-            del self.request.session['classe_mascara']
-
-        context['title'] = _(
-            classe_mascara or 'Pesquisar Matérias Legislativas')
+        context['title'] = _('Matérias Legislativas')
 
         context['bg_title'] = 'bg-red text-white'
 

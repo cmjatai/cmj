@@ -1,0 +1,30 @@
+{% for p in classes %}
+  {% if forloop.first %}
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Página Inicial</a></li>
+  {% endif %}
+  {% if forloop.last %}
+    <li class="breadcrumb-item {% if p == object %}active{% endif %}">
+      <a href="#" aria-current="page">
+        {% if p.titulo %}
+          {{p.apelido|default:p.titulo}}
+        {% else %}
+          {{p}}
+        {% endif %}
+      </a>
+    </li>
+    </ol>
+    </nav>
+  {% else %}
+    <li class="breadcrumb-item {% if p == object %}active{% endif %}">
+      <a href="/{{p.absolute_slug}}" {% if p == object %}aria-current="page"{% endif %}>
+        {% if p.titulo %}
+          {{p.apelido|default:p.titulo}}
+        {% else %}
+          {{p}}
+        {% endif %}
+      </a>
+    </li>
+  {% endif %}
+{% endfor %}

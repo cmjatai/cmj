@@ -537,6 +537,14 @@
                   {% endif %}
 
 
+                  {% if m.metadata_model %}
+                    {% with m.metadata_model as md %}
+                      {% if md.metadata.genia.template == 'table1' %}
+                        {% include "materia/materialegislativa_genia_table1.html" %}
+                      {% endif %}
+                    {% endwith %}
+                  {% endif %}
+
 
                 </div>
               </td>

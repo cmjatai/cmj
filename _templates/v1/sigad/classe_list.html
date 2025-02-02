@@ -10,7 +10,10 @@
     {% endif %}
     <a  class="btn btn-outline-primary" href="/{{object.slug}}">Slug</a>
     {% if object %}
-      <a  class="btn btn-outline-primary" href="{% url 'cmj.sigad:subclasse_list' object.pk %}?renumere">Renumere SubClasses</a>
+      <a  class="btn btn-outline-primary" href="{% url 'cmj.sigad:subclasse_list' object.pk %}?renumere">Renumerar SubClasses</a>
+    {% else %}
+    <a  class="btn btn-outline-primary" href="{% url 'cmj.sigad:classe_list'%}?renumere">Renumerar Classes</a>
+
     {% endif %}
   </div>
 {% endblock extra_actions %}

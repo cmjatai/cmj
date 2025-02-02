@@ -11,6 +11,9 @@
       </div>
     {% endcomment %}
     <div class="container">
+      {% if user.is_superuser and request.path != '' %}
+        {{ request.resolver_match.url_name }} - {{ request.resolver_match.view_name }}
+      {% endif %}
       <div class="row p-4">
 
 

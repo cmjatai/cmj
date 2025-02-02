@@ -11,4 +11,5 @@ MIDDLEWARE = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'social_django.middleware.SocialAuthExceptionMiddleware',
+    'cmj.middleware.BreadCrumbMiddleware',
 )

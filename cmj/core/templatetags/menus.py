@@ -1,15 +1,61 @@
 import logging
 
 from django import template
+from django.core.handlers.asgi import ASGIRequest
+from django.db.models import Q
 from django.shortcuts import render
 from django.urls.base import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 import yaml
 
+from cmj.sigad.models import Classe, Documento, CLASSE_REDIRECT_VIEWS
+from cmj.utils import get_breadcrumb_classes
+
 logger = logging.getLogger(__name__)
 
 register = template.Library()
+
+
+@register.inclusion_tag('base_breadcrumb.html', takes_context=True)
+def breadcrumb(context):
+    if 'breadcrumb_classes' in context:
+        breadcrumb_classes = context.get('breadcrumb_classes', [])
+        if breadcrumb_classes:
+            last = breadcrumb_classes[-1]
+            breadcrumb_classes = list(filter(
+                lambda x: not hasattr(x, 'perfil') or hasattr(
+                    x, 'perfil') and x.perfil != CLASSE_REDIRECT_VIEWS,
+                breadcrumb_classes[:-1]))
+            breadcrumb_classes.append(last)
+        return {'classes': breadcrumb_classes}
+
+    get_breadcrumb_classes(context, request=context['request'])
+    return {'classes': context.get('breadcrumb_classes', [])}
+
+
+@register.inclusion_tag('menus/sigad/menu.html', takes_context=True)
+def sigad_menu(context, path=None, pk=None):
+    return sigad_run(context, path, pk)
+
+
+def sigad_run(context, field, parent=None):
+    now = timezone.localtime()
+
+    params = {
+        str(field): True,
+        'parent': parent,
+        'visibilidade': Classe.STATUS_PUBLIC,
+    }
+
+    q = Q(**params)
+
+    q &= (Q(public_end_date__isnull=True) | Q(public_end_date__gte=now))
+
+    q &= (Q(public_date__isnull=True) | Q(public_date__lte=now))
+
+    classes = Classe.objects.filter(q)
+    return {'classes': classes, 'field_name': field}
 
 
 @register.inclusion_tag('menus/menu.html', takes_context=True)

@@ -1,0 +1,12 @@
+{% load i18n menus %}
+
+{% if classes %}
+  <ul>
+    {% for classe in classes %}
+      <li>
+        <a href="/{{classe.absolute_slug}}">{{classe.apelido|default:classe.titulo}}
+        {% sigad_menu field_name classe %}
+      </li>
+      {% endfor %}
+  </ul>
+{% endif %}

@@ -149,14 +149,6 @@ class NormaPesquisaView(AudigLogFilterMixin, MultiFormatOutputMixin, FilterView)
 
     def get_context_data(self, **kwargs):
         context = super(NormaPesquisaView, self).get_context_data(**kwargs)
-
-        classe_mascara = self.request.session.get('classe_mascara', None)
-
-        if classe_mascara:
-            context['classe_mascara'] = classe_mascara
-            classe_mascara = str(classe_mascara)
-            del self.request.session['classe_mascara']
-
         context['title'] = _('Pesquisa de Normas Jurídicas')
         context['bg_title'] = 'bg-green text-white'
 

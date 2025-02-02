@@ -119,7 +119,7 @@ class ClasseForm(ModelForm):
         def get_pc_order_by(nd=None):
 
             if not nd:
-                pc.append(('0', '--------------'))
+                pc.append(('', '--------------'))
                 childs = Classe.objects.filter(
                     parent__isnull=True)
             else:

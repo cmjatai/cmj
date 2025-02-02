@@ -90,6 +90,11 @@
           {% include "base_banner.html" %}
         {% endblock banner %}
 
+        {# Breadcrumb #}
+        {% block breadcrumb %}
+          {% breadcrumb %}
+        {% endblock  %}
+
         {# Header #}
         {% block second_header %}
           <header class="masthead">
@@ -165,6 +170,7 @@
     </div>
 
     {% include 'base_footer.html' %}
+
 
   {% endblock root_body %}
 

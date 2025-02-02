@@ -4,27 +4,6 @@
 {% block html_class %}html{{path}}{%endblock%}
 {% block body_class %}body{{path}}{%endblock%}
 
-{% block second_header %}
-
-  <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-      {% for p in object.classes_parents_and_me %}
-        {% if forloop.first %}
-        <li class="breadcrumb-item"><a href="/">Página Inicial</a></li>
-        {% endif %}
-        <li class="breadcrumb-item {% if p == object %}active{% endif %}">
-
-          <a href="/{{p.absolute_slug}}" {% if p == object %}aria-current="page"{% endif %}>
-            {% if p == object %}Esta Página{% else %}{{p.apelido|default:p.titulo}}{% endif %}
-          </a>
-        </li>
-      {% endfor %}
-    </ol>
-  </nav>
-
-
-{% endblock second_header %}
-
 {% block base_functions %}
   <div class="container">
       <div class="btn-toolbar">
