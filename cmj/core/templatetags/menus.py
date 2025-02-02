@@ -40,22 +40,12 @@ def sigad_menu(context, path=None, pk=None):
 
 
 def sigad_run(context, field, parent=None):
-    now = timezone.localtime()
-
     params = {
         str(field): True,
         'parent': parent,
-        'visibilidade': Classe.STATUS_PUBLIC,
     }
-
-    q = Q(**params)
-
-    q &= (Q(public_end_date__isnull=True) | Q(public_end_date__gte=now))
-
-    q &= (Q(public_date__isnull=True) | Q(public_date__lte=now))
-
-    classes = Classe.objects.filter(q)
-    return {'classes': classes, 'field_name': field}
+    classes_publicas = Classe.objects.qs_classes_publicas().filter(**params)
+    return {'classes': classes_publicas, 'field_name': field}
 
 
 @register.inclusion_tag('menus/menu.html', takes_context=True)

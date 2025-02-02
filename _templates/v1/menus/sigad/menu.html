@@ -4,7 +4,12 @@
   <ul>
     {% for classe in classes %}
       <li>
-        <a href="/{{classe.absolute_slug}}">{{classe.apelido|default:classe.titulo}}
+        {% if classe.url_redirect == '#' %}
+          <a name="{{classe.id}}" href="{{classe.url_redirect}}{{classe.id}}">{{classe.apelido|default:classe.titulo}}</a>
+        {% else %}
+          <a href="/{{classe.absolute_slug}}">{{classe.apelido|default:classe.titulo}}</a>
+        {% endif %}
+
         {% sigad_menu field_name classe %}
       </li>
       {% endfor %}

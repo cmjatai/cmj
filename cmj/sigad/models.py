@@ -723,6 +723,19 @@ class ClasseManager(models.Manager):
 
         return qs.order_by('-parent', 'parent__codigo', 'codigo')
 
+    def qs_classes_publicas(self):
+
+        now = timezone.localtime()
+
+        qs = self.get_queryset()
+
+        q = Q(visibilidade=Classe.STATUS_PUBLIC)
+        q &= (Q(public_end_date__isnull=True) | Q(public_end_date__gte=now))
+        q &= (Q(public_date__isnull=True) | Q(public_date__lte=now))
+
+        return qs.filter(q)
+
+
 
 class Classe(ShortUrl, CMSMixin):
     objects = ClasseManager()
