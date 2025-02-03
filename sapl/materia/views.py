@@ -187,7 +187,20 @@ def tipos_autores_materias(user=None, restricao_regimental=True):
             key = 'coletivo' if coletivo else 'individual'
             r[tipo_correspondente][p.autor][key].add(p)
 
-    return r
+    sorted_r = dict(
+        map(
+            lambda x: (
+                    x[0],
+                    dict(sorted(
+                        x[1].items(),
+                        key=lambda y: y[0].nome
+                    ))
+                ),
+                sorted(r.items(), key=lambda x: x[0].sequencia_regimental)
+        )
+    )
+
+    return sorted_r
 
 
 OrigemCrud = CrudAux.build(Origem, '')
