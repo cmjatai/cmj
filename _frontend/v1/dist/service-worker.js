@@ -1,11 +1,11 @@
-importScripts("/static/precache-manifest.f2e9fa89e83adc8e1999a4298b7cc038.js", "https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
+importScripts("/static/precache-manifest.124bfec68ce099c329b177c8d19ca9fc.js", "https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 /* eslint-disable no-undef */
 if (workbox) {
   workbox.core.setCacheNameDetails({ prefix: 'frontend' })
   self.__precacheManifest = [{
     url: '/offline/',
-    revision: '000005'
+    revision: '000006'
   }].concat(self.__precacheManifest || [])
 
   workbox.precaching.precacheAndRoute(self.__precacheManifest, {})
