@@ -92,8 +92,12 @@ export default {
 </script>
 
 <style lang="scss">
+.inner-sideright {
+  height: 100%;
+}
 .inner-sideright .menu {
   // display: none;
+  height: 100%;
   z-index: 1;
   button {
     padding: 0.5rem 1rem;
@@ -108,19 +112,24 @@ export default {
     padding: 0;
     margin: 0;
     list-style-type: none;
+    position: relative;
+    height: 100%;
     ul {
      display: none;
+     top: 5px;
+     bottom: 45px;
+     position: absolute;
+     overflow-y: auto;
+     right: 95%;
     }
     li {
-      position: relative;
+      //position: relative;
       padding: 0;
       &:hover {
         background-color:  #ddd;
         ul {
-          display: flex;
+          display: block;
           position: absolute;
-          right: 80%;
-          top: 50%;
         }
       }
     }

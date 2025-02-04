@@ -225,7 +225,7 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
         local_atual = 'tramitacaoadministrativo__unidade_tramitacao_destino'
         self.filters['tipo'].label = 'Tipo de Documento'
         self.filters['protocolo__numero'].label = 'Núm. Protocolo'
-        self.filters['tas'].label = 'Status de Processos'
+        self.filters['tas'].label = 'Status de Processos Licitatórios'
         self.filters[local_atual].label = 'Localização Atual'
         self.form.fields[
             'data_vencimento'

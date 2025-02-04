@@ -138,7 +138,7 @@ def tipos_autores_materias(user=None, restricao_regimental=True):
         q &= Q(autores__operadores=user)
 
     materias_em_tramitacao = MateriaLegislativa.objects.filter(q).order_by(
-        '-tipo__limite_minimo_coletivo').distinct()
+        '-tipo__limite_minimo_coletivo', 'id').distinct()
 
     proposicoes_enviadas_sem_recebimento = []
     if user:

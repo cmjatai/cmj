@@ -30,7 +30,9 @@ class _NormaJuridicaViewset(ResponseFileMixin):
 
     @action(detail=False, methods=['GET'])
     def destaques(self, request, *args, **kwargs):
-        self.queryset = self.get_queryset().filter(norma_de_destaque=True)
+        self.queryset = self.get_queryset().filter(
+            norma_de_destaque=True).order_by('tipo__relevancia', '-data')
+
         return self.list(request, *args, **kwargs)
 
     @action(detail=True)
