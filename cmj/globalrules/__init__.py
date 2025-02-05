@@ -87,8 +87,9 @@ menu_impresso_enderecamento = "menu_impresso_enderecamento"
 menu_relatorios = "menu_relatorios"
 menu_administracao = "menu_administracao"
 menu_agenda = "menu_agenda"
+generate_analise_genia = "generate_analise_genia"
 
-MENU_PERMS_FOR_USERS = (
+PERMS_FOR_USERS = (
     (menu_dados_auxiliares, _('Mostrar Menu Dados Auxiliares')),
     (menu_tabelas_auxiliares, _('Mostrar Menu de Tabelas Auxiliares')),
     (menu_recepcao, _('Mostrar Menu de Registro de Entradas')),
@@ -102,4 +103,5 @@ MENU_PERMS_FOR_USERS = (
      _('Mostrar Menu de Relatórios')),
     (menu_administracao, _('Mostrar Menu de Administração')),
     (menu_agenda, _('Mostrar Menu da Agenda de Eventos')),
+    (generate_analise_genia, _('Gerar Análise I.A.')),
 )

@@ -28,9 +28,9 @@
 
     $(document).on('keyup', (e) => {
       if (e.keyCode == 86){
-        window.open("{% url 'sapl.painel:voto_individual' %}",'Voto Individual','width=1000, height=800, scrollbars=yes');
-      };
-    });
+        window.open("{% url 'sapl.painel:voto_individual' %}", 'Voto Individual', 'width=1000, height=800, scrollbars=yes');
+      }
+    })
 
     {% if user.is_superuser %} {# DJANGO template perms.sessao.add_ordemdia #}
       $('tbody').sortable({
@@ -57,7 +57,7 @@
     {% endif %}
     $(window).on('beforeunload', function () {
       $('tbody').sortable('disable');
-      $("input[type=submit], input[type=button]").prop("disabled", "disabled");
+      $("input[type=submit], input[type=button]").prop("disabled", "disabled")
     });
   </script>
 {% endblock %}

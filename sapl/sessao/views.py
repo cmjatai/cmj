@@ -308,14 +308,17 @@ def customize_link_materia(context, pk, has_permission, user=None):
 
         data_inicio_sessao = SessaoPlenaria.objects.get(id=pk).data_inicio
 
-        tramitacao = Tramitacao.objects.filter(materia=materia,
-                                               turno__isnull=False,
-                                               data_tramitacao__lte=data_inicio_sessao
-                                               ).exclude(turno__exact=''
-                                                         ).select_related(
+        tramitacao = Tramitacao.objects.filter(
+            materia=materia,
+            turno__isnull=False,
+            data_tramitacao__lte=data_inicio_sessao
+        ).exclude(
+            turno__exact=''
+        ).select_related(
             'materia',
             'status',
-            'materia__tipo').order_by(
+            'materia__tipo'
+        ).order_by(
             '-data_tramitacao'
         ).first()
 
@@ -330,12 +333,13 @@ def customize_link_materia(context, pk, has_permission, user=None):
                     break
 
         #                   <b>Processo:</b> %s </br>
-        title_materia = '''<a name="id%s" href=%s>%s</a> </br>
+        title_materia = '''<a name="id%s" id="id_mat_%s" href=%s>%s</a> </br>
                            <b>Autoria:</b> %s </br>
                            <b>Protocolo:</b> %s </br>
                            <b>Turno:</b> %s </br>
 
                         ''' % (obj.materia.id,
+                               obj.materia.id,
                                url_materia,
                                row[1][0],
                                #numeracao if numeracao else '',
@@ -1272,7 +1276,7 @@ class SessaoCrud(Crud):
                     )
 
                     paths = m.texto_original.path
-                    
+
                     compression = self.request.GET.get('compression', True)
 
                     try:

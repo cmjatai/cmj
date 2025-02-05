@@ -15,7 +15,7 @@ from django.utils.decorators import classonlymethod
 from django.utils.translation import gettext_lazy as _
 from image_cropping import ImageCropField, ImageRatioField
 
-from cmj.globalrules import MENU_PERMS_FOR_USERS, GROUP_SOCIAL_USERS
+from cmj.globalrules import PERMS_FOR_USERS, GROUP_SOCIAL_USERS
 from cmj.mixins import CmjChoices, CmjModelMixin, CmjAuditoriaModelMixin
 from cmj.utils import get_settings_auth_user_model, normalize, YES_NO_CHOICES,\
     UF, texto_upload_path
@@ -155,7 +155,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     class Meta(AbstractBaseUser.Meta):
         abstract = False
-        permissions = MENU_PERMS_FOR_USERS
+        permissions = PERMS_FOR_USERS
         ordering = ('-is_superuser', 'first_name', 'last_name')
         verbose_name = _('Usuário')
         verbose_name_plural = _('Usuários')

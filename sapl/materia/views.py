@@ -2265,7 +2265,7 @@ class MateriaLegislativaCrud(Crud):
                         ]
                     )
 
-            if self.request.user.is_superuser:
+            if self.request.user.has_perm('core.generate_analise_genia'):
                 btns.extend(
                     self.get_btn_generate(
                         'sapl.materia:materialegislativa_detail')
@@ -2408,7 +2408,7 @@ class MateriaLegislativaCrud(Crud):
             # )
             if 'download' in request.GET:
                 return self.download(request.GET.get('download'))
-            if 'ia_run' in request.GET and request.user.is_superuser:
+            if 'ia_run' in request.GET and request.user.has_perm('core.generate_analise_genia'):
                 return self.is_run()
             elif 'cabec_autografo' in request.GET:
                 return self.cabec_autografo(request.GET.get('cabec_autografo'))

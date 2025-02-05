@@ -2,7 +2,7 @@
 <table class="table table-striped table-hover table-link-ordering">
   <tr>
     <th colspan=4>
-      {% if user.is_superuser %}
+      {% if perms.core.generate_analise_genia %}
         <div class="float-right">
           <a href="?ia_run=delete" class="btn btn-excluir" title="Excluir Análise">X</a>
         </div>
@@ -27,7 +27,7 @@
       </td>
     </tr>
   {% endif %}
-  
+
     <tr>
       <th>Temas Relacionados</th>
       <td>
