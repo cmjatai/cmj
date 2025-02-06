@@ -15,7 +15,12 @@
     </span>
 
     <div class="construct" v-if="usartinymce" >
-      <editor v-if="usartinymce" inline  v-model.lazy="elemento.texto"></editor>
+      <editor v-if="usartinymce" inline  v-model.lazy="elemento.texto"
+        :init="{
+          plugins: 'lists',
+          toolbar: 'undo redo | styles | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | indent outdent | bullist numlist',
+          }">
+      </editor>
     </div>
 
     <textarea-autosize  v-if="!usartinymce" v-model.lazy="elemento.texto" placeholder="Fragmento de Texto" :align="'text-left'"/>

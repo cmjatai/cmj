@@ -333,19 +333,35 @@ def customize_link_materia(context, pk, has_permission, user=None):
                     break
 
         #                   <b>Processo:</b> %s </br>
-        title_materia = '''<a name="id%s" id="id_mat_%s" href=%s>%s</a> </br>
-                           <b>Autoria:</b> %s </br>
-                           <b>Protocolo:</b> %s </br>
-                           <b>Turno:</b> %s </br>
 
-                        ''' % (obj.materia.id,
-                               obj.materia.id,
-                               url_materia,
-                               row[1][0],
-                               #numeracao if numeracao else '',
-                               autores if autores else '',
-                               num_protocolo if num_protocolo else '',
-                               turno)
+        url_prot_mostrar = reverse('sapl.protocoloadm:protocolo_mostrar',
+                kwargs={'pk': obj.materia.protocolo_gr.first().pk}) + ''
+
+        url_sessao_detail = reverse('sapl.sessao:sessaoplenaria_detail',
+                kwargs={'pk': pk}) + '?add_selo_votacao'
+
+        title_materia = f'''
+        <div class="d-flex ordemdia_materia justify-content-between align-items-center" id="mat_od_%s">
+            <div>
+                <a name="id{obj.materia.id}"
+                    data-pk="{obj.materia.id}"
+                    class="link_materia_ordemdia"
+                    href={url_materia}>
+                    {row[1][0]}
+                </a> </br>
+                <b>Autoria:</b> {autores if autores else ''} </br>
+                <b>Protocolo:</b> {num_protocolo if num_protocolo else ''} </br>
+                <b>Turno:</b> {turno} </br>
+            </div>
+            <div class="d-none actions-signs">
+                <div class="preview"></div>
+                <div class="d-flex actions flex-column justify-content-center">
+                    <a class="btn btn-link" target="blank" href="{url_prot_mostrar}">S.P.</a>
+                    <a class="btn btn-link" target="blank" href="{url_sessao_detail}">S.V.</a>
+                </div>
+            </div>
+        </div>'''
+
 
         if isinstance(obj, OrdemDia) and materia.anexadas.exists() and user and user.has_perm('sessao.add_ordemdia'):
             title_materia += '''
@@ -1277,7 +1293,7 @@ class SessaoCrud(Crud):
 
                     paths = m.texto_original.path
 
-                    compression = self.request.GET.get('compression', True)
+                    compression = self.request.GET.get('compression', 'True')
 
                     try:
                         x = m.metadata['selos']['cert_protocolo']['x']

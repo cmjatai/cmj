@@ -100,7 +100,7 @@
 
   {% if perms.protocoloadm.action_homologar_protocolo and not protocolo|conteudo_protocolado_homologado %}
     <a
-      href="{% url 'sapl.protocoloadm:protocolo_homologar' protocolo.pk %}?recreate&x=193&y=50"
+      href="{% url 'sapl.protocoloadm:protocolo_homologar' protocolo.pk %}?recreate&x=193&y=50&compression=True"
       class="btn btn-primary float-right">
         Homologar
     </a>
@@ -108,7 +108,7 @@
 
   {% if user.is_superuser %}
       <a
-      href="{% url 'sapl.protocoloadm:protocolo_homologar' protocolo.pk %}?recreate&x=193&y=50"
+      href="{% url 'sapl.protocoloadm:protocolo_homologar' protocolo.pk %}?recreate&x=193&y=50&compression=True"
       class="btn btn-primary float-right">
         Homologar do Original
     </a>

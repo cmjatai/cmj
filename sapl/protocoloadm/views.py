@@ -1818,7 +1818,7 @@ class SeloProtocoloMixin(PluginSignMixin):
         item = self.object.conteudo_protocolado
         p = self.object
 
-        compression = self.request.GET.get('compression', True)
+        compression = self.request.GET.get('compression', 'True')
 
         if isinstance(item, MateriaLegislativa):
             item.registrovotacao_set.all().update(selo_votacao=False)

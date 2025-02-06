@@ -26,11 +26,53 @@
     var pk_sessao = {{root_pk}};
     var pk_list = {{ object_list|to_list_pk|safe }};
 
-    $(document).on('keyup', (e) => {
-      if (e.keyCode == 86){
-        window.open("{% url 'sapl.painel:voto_individual' %}", 'Voto Individual', 'width=1000, height=800, scrollbars=yes');
-      }
-    })
+    $(document)
+      .on('keyup', (e) => {
+        if (e.keyCode == 86){
+          window.open("{% url 'sapl.painel:voto_individual' %}", 'Voto Individual', 'width=1000, height=800, scrollbars=yes');
+        }
+      })
+
+      {% if perms.sessao.add_ordemdia %}
+      $(document)
+      .ready(() => {
+        $('.ordemdia_materia').on('mouseenter', (e) => {
+          let heightTd = $(e.currentTarget).closest('td').css('height')
+          let pk = $(e.currentTarget).find('.link_materia_ordemdia').data('pk');
+          let url = "{% url 'sapl.api:materia_materialegislativa-detail' 0 %}texto_original/?page=1&dpi=100".replace('/0/', `/${pk}/`)
+
+          let actions_signs = $(e.currentTarget).find('.actions-signs')
+          actions_signs.find('.preview').html('')
+          actions_signs.removeClass('d-none').addClass('d-flex')
+
+          let img = new Image() // $(`<img src="${url}" alt="Imagem da matéria" class="img-thumbnail">`)
+          img.src = `${url}&u=${Math.random()}`
+          img.onload = (eImg) => {
+            let wi = eImg.target.width
+            let hi = eImg.target.height
+            let ratio = wi / hi
+
+            let regex = /^(\d+(\.\d+)?)([a-zA-Z%]+)$/;
+            let match = heightTd.match(regex);
+
+            if (match) {
+              let heightValue = parseFloat(match[1]) * 0.9;
+              let unit = match[3];
+              $(actions_signs.find('.preview').append(img))
+                .find('img')
+                .css('height', `${heightValue}${unit}`)
+                .css('width', `${heightValue * ratio}${unit}`)
+            }
+          }
+
+          }).on('mouseleave', (e) => {
+            let actions_signs = $(e.currentTarget).find('.actions-signs')
+            actions_signs.find('.preview').html('')
+            actions_signs.removeClass('d-flex').addClass('d-none')
+          })
+      });
+
+    {% endif %}
 
     {% if user.is_superuser %} {# DJANGO template perms.sessao.add_ordemdia #}
       $('tbody').sortable({
