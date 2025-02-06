@@ -736,6 +736,18 @@ class TipoDocumento(models.Model):
             ('descricao', '__icontains'),
         ))
 
+    limite_por_autor_tramitando = models.PositiveIntegerField(
+        blank=True, null=True,
+        default=0,
+        verbose_name=_('Limitar Protocolo por Autor'),
+        )
+
+    limite_minimo_coletivo = models.PositiveIntegerField(
+        blank=True, null=True,
+        default=0,
+        verbose_name=_('Não Impõe Limites de Protocolo acima deste valor'),
+        )
+
     class Meta:
         verbose_name = _('Tipo de Documento')
         verbose_name_plural = _('Tipos de Documento')
