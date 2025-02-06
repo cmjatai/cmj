@@ -334,11 +334,11 @@ def customize_link_materia(context, pk, has_permission, user=None):
 
         #                   <b>Processo:</b> %s </br>
 
-        url_prot_mostrar = reverse('sapl.protocoloadm:protocolo_mostrar',
-                kwargs={'pk': obj.materia.protocolo_gr.first().pk}) + ''
+        url_prot_mostrar = reverse('sapl.protocoloadm:protocolo_homologar',
+                kwargs={'pk': obj.materia.protocolo_gr.first().pk})
 
         url_sessao_detail = reverse('sapl.sessao:sessaoplenaria_detail',
-                kwargs={'pk': pk}) + '?add_selo_votacao'
+                kwargs={'pk': pk}) + f'?add_selo_votacao&materia_unica={obj.materia.id}'
 
         title_materia = f'''
         <div class="d-flex ordemdia_materia justify-content-between align-items-center" id="mat_od_%s">
@@ -356,8 +356,11 @@ def customize_link_materia(context, pk, has_permission, user=None):
             <div class="d-none actions-signs">
                 <div class="preview"></div>
                 <div class="d-flex actions flex-column justify-content-center">
-                    <a class="btn btn-link" target="blank" href="{url_prot_mostrar}">S.P.</a>
-                    <a class="btn btn-link" target="blank" href="{url_sessao_detail}">S.V.</a>
+                    <a class="btn btn-link" target="blank" href="{url_prot_mostrar}?recreate&compression=True">SPcc</a>
+                    <a class="btn btn-link" target="blank" href="{url_prot_mostrar}?recreate&compression=False">SPsc</a>
+
+                    <a class="btn btn-link" target="blank" href="{url_sessao_detail}&compression=True">SVcc</a>
+                    <a class="btn btn-link" target="blank" href="{url_sessao_detail}&compression=False">SVsc</a>
                 </div>
             </div>
         </div>'''
@@ -1233,6 +1236,8 @@ class SessaoCrud(Crud):
 
             item = self.object
 
+            materia_unica = self.request.GET.get('materia_unica', None)
+
             q = Q(registrovotacao__ordem__sessao_plenaria=item) | Q(
                 registrovotacao__expediente__sessao_plenaria=item)
 
@@ -1243,6 +1248,9 @@ class SessaoCrud(Crud):
                 ),
                 registrovotacao__selo_votacao=False
             ).order_by('id')
+
+            if materia_unica:
+                materias_votadas = materias_votadas.filter(id=materia_unica)
 
             for m in materias_votadas:
 
@@ -1293,7 +1301,7 @@ class SessaoCrud(Crud):
 
                     paths = m.texto_original.path
 
-                    compression = self.request.GET.get('compression', 'True')
+                    compression = self.request.GET.get('compression', 'False')
 
                     try:
                         x = m.metadata['selos']['cert_protocolo']['x']
@@ -1328,7 +1336,7 @@ class SessaoCrud(Crud):
                         'h': 50,
                         'cor': "0, 76, {}, 255".format(170 - count * 20) if v.tipo_resultado_votacao.natureza == 'A' else "150, 20, 0, 255",
                         'compression': compression,
-                        'debug': settings.DEBUG
+                        'debug': False #settings.DEBUG
                     }
 
                     cmd = cmd.format(**params)

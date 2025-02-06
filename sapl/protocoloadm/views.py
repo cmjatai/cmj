@@ -1862,7 +1862,7 @@ class SeloProtocoloMixin(PluginSignMixin):
                 'h': 60,
                 'cor': "0, 76, 64, 255",
                 'compression': compression,
-                'debug': settings.DEBUG
+                'debug': False # settings.DEBUG
             }
             cmd = cmd.format(
                 **params

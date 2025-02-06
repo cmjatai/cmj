@@ -46,7 +46,7 @@
           actions_signs.removeClass('d-none').addClass('d-flex')
 
           let img = new Image() // $(`<img src="${url}" alt="Imagem da matéria" class="img-thumbnail">`)
-          img.src = `${url}&u=${Math.random()}`
+          img.src = `${url}&nocache=${Math.random()}`
           img.onload = (eImg) => {
             let wi = eImg.target.width
             let hi = eImg.target.height

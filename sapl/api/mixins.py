@@ -21,6 +21,8 @@ class ResponseFileMixin:
 
     def response_pagepdftoimage(self, arquivo, _page, _dpi, _grade='0'):
 
+        nocache = self.request.GET.get('nocache', False)
+
         _rect = None
         if _grade.isnumeric():
             _grade = int(_grade)
@@ -61,7 +63,7 @@ class ResponseFileMixin:
 
         fcache_path = f'{arquivo.file}-p{_page:0>3}-d{_dpi:0>3}.png'
         if _grade < 10:
-            if os.path.exists(fcache_path):
+            if not nocache and os.path.exists(fcache_path):
                 with open(fcache_path, 'rb') as f:
                     response = HttpResponse(f, content_type='image/png')
                 return response
@@ -74,7 +76,7 @@ class ResponseFileMixin:
                 png = page.get_pixmap(dpi=int(_dpi) if _dpi else 300)
                 bpng = png.tobytes()
 
-                if _grade < 10:
+                if not nocache and _grade < 10:
                     with open(fcache_path, 'wb') as f:
                         f.write(bpng)
 
