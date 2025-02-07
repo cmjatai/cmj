@@ -606,6 +606,20 @@ class DispositivoEdicaoBasicaForm(ModelForm):
             layout.append(Fieldset(_('Construção do Rótulo'), rotulo_fieldset,
                                    css_class="col-md-12"))
 
+
+        if editor_type == 'get_form_base':
+            if 'custom_text_link' in DispositivoEdicaoBasicaForm.Meta.fields:
+                DispositivoEdicaoBasicaForm.Meta.fields.remove('custom_text_link')
+        else:
+            DispositivoEdicaoBasicaForm.Meta.fields.append('custom_text_link')
+            self.custom_text_link = forms.CharField(required=False, label='',)
+            custom_text_link = to_row([
+                ('custom_text_link', 12),
+                ])
+
+            layout.append(Fieldset(_('Texto customizado para o Link de Compilação'), custom_text_link,
+                                    css_class="col-md-12"))
+
         if inst and inst.tipo_dispositivo.dispositivo_de_articulacao:
             if 'texto' in DispositivoEdicaoBasicaForm.Meta.fields:
                 DispositivoEdicaoBasicaForm.Meta.fields.remove('texto')
@@ -678,16 +692,18 @@ class DispositivoEdicaoBasicaForm(ModelForm):
                 DispositivoEdicaoBasicaForm.Meta.fields.remove(
                     'visibilidade')
 
-        fields = DispositivoEdicaoBasicaForm.Meta.fields
+        fields = set(DispositivoEdicaoBasicaForm.Meta.fields)
         if fields:
             self.base_fields.clear()
             for f in fields:
-                self.base_fields.update({f: getattr(self, f)})
+                if hasattr(self, f):
+                    self.base_fields.update({f: getattr(self, f)})
 
         self.helper = SaplFormHelper()
 
         if not editor_type:
             cancel_label = _('Ir para o Editor Sequencial')
+
             self.helper.layout = SaplFormLayout(
                 *layout, cancel_label=cancel_label)
 

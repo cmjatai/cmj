@@ -1298,6 +1298,12 @@ class Dispositivo(BaseModel, TimestampedMixin):
         default=False,
         choices=YES_NO_CHOICES, verbose_name=_('Contagem contínua'))
 
+    custom_text_link = models.CharField(
+        verbose_name=_('Texto Customizado do Link de Referência'),
+        max_length=256,
+        default='',
+        blank=True)
+
     class Meta:
         verbose_name = _('Dispositivo')
         verbose_name_plural = _('Dispositivos')

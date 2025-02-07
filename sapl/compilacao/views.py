@@ -1568,7 +1568,9 @@ class TextEditView(CompMixin, TemplateView):
             ta_publicado = lista_ta_publicado[dispositivo.ta_publicado_id] if\
                 lista_ta_publicado else dispositivo.ta_publicado
 
-            if dispositivo.dispositivo_de_revogacao:
+            if dispositivo.custom_text_link:
+                return dispositivo.custom_text_link
+            elif dispositivo.dispositivo_de_revogacao:
                 return _('Revogado pelo %s - %s.') % (
                     d, ta_publicado)
             elif not dispositivo.dispositivo_substituido_id:
