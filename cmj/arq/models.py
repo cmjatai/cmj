@@ -6,12 +6,14 @@ import pathlib
 import re
 import shutil
 
+from unipath import Path
+
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models.deletion import PROTECT, CASCADE
 from django.db.models.fields.json import JSONField
 from django.utils.translation import gettext_lazy as _
-
+from django.conf import settings
 from cmj.mixins import CmjAuditoriaModelMixin, CommonMixin
 from cmj.utils import get_settings_auth_user_model, texto_upload_path, normalize
 from sapl.utils import PortalFileField
@@ -48,30 +50,34 @@ class Draft(models.Model):
         return self.descricao
 
     def delete(self, using=None, keep_parents=False):
-        dm = self.draftmidia_set.first()
-
-        if dm and dm.arquivo:
-            path = dm.arquivo.path
-            i = path.rfind('/')
-            path = path[0:i]
-            remove_files_and_folders(path)
-
+        root_path = Path(
+            settings.MEDIA_ROOT,
+            f'cmj/private/draftmidia/{self.owner.id}/{self.id}/'
+            )
+        remove_files_and_folders(os.path.dirname(root_path))
         return models.Model.delete(self, using=using, keep_parents=keep_parents)
 
 
 def remove_files_and_folders(directory):
+
+    list_elements = []
     try:
-        for root, dirs, files in os.walk(directory, topdown=False):
-            for name in dirs:
-                folder_path = os.path.join(root, name)
-                os.rmdir(folder_path)
-            for name in files:
-                file_path = os.path.join(root, name)
-                os.remove(file_path)
-            sleep(2)
-            os.rmdir(root)
+        list_elements = glob.glob(f'{directory}/**', recursive=True)
+        list_elements_ocult = glob.glob(f'{directory}/.*', recursive=True)
+        list_elements.extend(list_elements_ocult)
+        list_elements.sort(reverse=True)
     except Exception as e:
-        logger.error(f'Erro na exclusão de: {directory}. {e}')
+        logger.error(f'Erro ao listar elementos de: {directory}. {e}')
+        return
+
+    for f in list_elements:
+        try:
+            if os.path.isfile(f):
+                os.remove(f)
+            elif os.path.isdir(f):
+                os.rmdir(f)
+        except Exception as e:
+            logger.error(f'Erro na exclusão de: {f}. {e}')
 
 
 def draftmidia_path(instance, filename):
@@ -143,6 +149,7 @@ class DraftMidia(models.Model):
              update_fields=None):
 
         if not self.pk and self.arquivo:
+            self.clear_cache()
             arquivo = self.arquivo
             self.arquivo = None
             models.Model.save(self, force_insert=force_insert,
@@ -157,13 +164,16 @@ class DraftMidia(models.Model):
                                  update_fields=update_fields)
 
     def clear_cache(self, page=None):
-        fcache = glob.glob(
-            f'{self.arquivo.path}-p{page:0>3}*'
-            if page else f'{self.arquivo.path}*.png'
-        )
+        try:
+            fcache = glob.glob(
+                f'{self.arquivo.path}-p{page:0>3}*'
+                if page else f'{self.arquivo.path}*.png'
+            )
 
-        for f in fcache:
-            os.remove(f)
+            for f in fcache:
+                os.remove(f)
+        except Exception as e:
+            logger.error(f'Erro ao limpar cache de: {self.arquivo.path}. {e}')
 
 
 ARQCLASSE_FISICA = 100

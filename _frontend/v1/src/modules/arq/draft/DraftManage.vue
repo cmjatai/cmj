@@ -18,7 +18,12 @@
             ref="draftSelect"
             :height="8"
             ></model-select>
-          <div v-if="draftselected" class="d-flex">
+          <div v-if="draftselected" class="d-flex flex-column">
+            <span>Título do Draft:
+              <small>
+                <em>(edição do draft selecionado acima)</em>
+              </small>
+            </span>
             <b-form-input v-model="draftselected.descricao" @change="changeDescricao($event)"></b-form-input>
           </div>
           <div class="drop-area">

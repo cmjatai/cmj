@@ -67,6 +67,8 @@ class ResponseFileMixin:
                 with open(fcache_path, 'rb') as f:
                     response = HttpResponse(f, content_type='image/png')
                 return response
+            elif os.path.exists(fcache_path):
+                os.remove(fcache_path)
 
         doc = fitz.open(arquivo.file)
         for index, page in enumerate(doc, 1):
@@ -79,6 +81,8 @@ class ResponseFileMixin:
                 if not nocache and _grade < 10:
                     with open(fcache_path, 'wb') as f:
                         f.write(bpng)
+                elif os.path.exists(fcache_path):
+                    os.remove(fcache_path)
 
                 doc.close()
                 response = HttpResponse(bpng, content_type='image/png')

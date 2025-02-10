@@ -19,7 +19,7 @@
           <a class="btn btn-warning text-white ml-2"  @click="clickSupendeConversao" title="Cancela agendamentos de conversão de PDF -> PDF/A-2b">
             <i class="fas fa-stop-circle"></i>
           </a>
-          <a class="btn btn-primary ml-2 btn-pdf2pdfa" @click="clickPdf2Pdfa"  title="Iniciar conversão para PDF/A-2b de todos os arquivos do Draft selecionado.">
+          <a class="btn btn-primary ml-2 btn-pdf2pdfa" @click="clickPdf2Pdfa"  title="Iniciar conversão Básica para PDF/A-2b de todos os arquivos do Draft selecionado.">
             <span>
               PDF -><br>PDF/A-2b
             </span>

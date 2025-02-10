@@ -6,12 +6,11 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-#COPY requirements/* $HOME
-#RUN pip install -r dev-requirements.txt
+RUN apt-get install -y --no-install-recommends pngquant
 
 COPY requirements/* $HOME
 RUN pip install -r ia-requirements.txt
-
+RUN pip install opencv-python
 #RUN pip install pgvector
 #RUN pip install sentence-transformers
 

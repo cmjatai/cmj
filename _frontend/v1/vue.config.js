@@ -41,6 +41,8 @@ module.exports = {
   outputDir: 'dist',
 
   chainWebpack: config => {
+
+
     config
       .plugin('RelativeBundleTrackerPlugin')
       .use(RelativeBundleTrackerPlugin, [{
@@ -80,8 +82,7 @@ module.exports = {
       shell
         .rm('./dev-webpack-stats.json')
     } else {
-      config
-        .devtool('source-map')
+      config.devtool('#eval-source-map')
     }
 
     config.module

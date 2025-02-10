@@ -85,7 +85,7 @@ class Command(BaseCommand):
         self.folder_raiz = '/home/leandrojatai/TEMP/oficio/'
 
         # self.process0() # renomeia meses por extenso para formato yy-mm
-        # self.pdf2png()  # converte todas as páginas de todos pdfs para pgn em in_images
+        self.pdf2png()  # converte todas as páginas de todos pdfs para pgn em in_images
         self.process1()  # cria copia de in_images em in1_images aplic brilho e contraste e convertendo para '1'
         # self.process2()  # monta pdf com imagens de in_images
         # self.process3(f'"{self.folder_raiz}out.pdf"', f'"{self.folder_raiz}out_ocr_1.pdf"')  # executa ocrmypdf no pdf grande gerado em processo2
@@ -420,13 +420,13 @@ class Command(BaseCommand):
 
             """
             cria pdf através da pillow
-    
+
             flist_out_img_obj = []
             for f in flist_out:
                 flist_out_img_obj.append(Image.open(f))
-    
+
             f = flist_out_img_obj.pop(0)
-    
+
             f.save(
                 folder_out + 'out.pdf',
                 "PDF",

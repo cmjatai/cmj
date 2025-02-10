@@ -19,6 +19,11 @@ register = template.Library()
 
 @register.inclusion_tag('base_breadcrumb.html', takes_context=True)
 def breadcrumb(context):
+    rcontext = {
+        'classes': [],
+        'request': context['request'],
+        'user': context['user']
+    }
     if 'breadcrumb_classes' in context:
         breadcrumb_classes = context.get('breadcrumb_classes', [])
         if breadcrumb_classes:
@@ -28,10 +33,10 @@ def breadcrumb(context):
                     x, 'perfil') and x.perfil != CLASSE_REDIRECT_VIEWS,
                 breadcrumb_classes[:-1]))
             breadcrumb_classes.append(last)
-        return {'classes': breadcrumb_classes}
-
-    get_breadcrumb_classes(context, request=context['request'])
-    return {'classes': context.get('breadcrumb_classes', [])}
+    else:
+        breadcrumb_classes = get_breadcrumb_classes(context, request=context['request'])
+    rcontext['classes'] = breadcrumb_classes
+    return rcontext
 
 
 @register.inclusion_tag('menus/sigad/menu.html', takes_context=True)

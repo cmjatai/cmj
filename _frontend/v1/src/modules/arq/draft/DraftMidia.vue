@@ -1,16 +1,34 @@
 <template>
   <div :class="['draft-midia', 'p-2',]" :id="`dm${elemento.id}`">
-    <div class="inner">
+    <div class="inner" @mouseenter="enterInner" @mouseleave="leaveInner">
       <div :class="['inner-status', elemento.metadata.ocrmypdf.pdfa === 99 ? 'border-green': (elemento.metadata.ocrmypdf.pdfa >= 10 ? 'border-yellow': 'border-red')]"
       v-html="elemento.metadata.ocrmypdf.pdfa === 99 ? 'PDF/A-2b': (elemento.metadata.ocrmypdf.pdfa >= 10 ? 'Conversão Agendada': 'Não PDF/A-2b')"></div>
-      <div class="inner-action">
-        <div class="dropleft" v-show="elemento.metadata.ocrmypdf.pdfa !== 10">
-          <button class="btn btn-sm" type="button" data-toggle="dropdown" aria-expanded="true">
+      <div class="inner-action" ref="inneraction">
+        <div class="dropleft" ref="dropleft" v-show="elemento.metadata.ocrmypdf.pdfa !== 10">
+          <button class="btn btn-sm" type="button" data-toggle="dropdown" aria-expanded="true" ref="btnDropDownActions">
             <i class="fas fa-ellipsis-v"></i>
           </button>
-          <div class="dropdown-menu">
-            <a class="dropdown-item" v-show="elemento.metadata.ocrmypdf.pdfa !== 99" title="PDF -> PDF/A-2b" @click="clickDraftmidiaAction('pdf2pdfa')">PDF -> PDF/A-2b</a>
-            <a class="dropdown-item" v-show="elemento.metadata.ocrmypdf.pdfa == 999" title="PDF/A-2b Compact" @click="clickDraftmidiaAction('pdfacompact')" aria-disabled="disabled">PDF/A-2b Compact</a>
+          <div class="dropdown-menu" ref="dropdown">
+            <a
+            class="dropdown-item"
+            title="PDF -> PDF/A-2b - Conversão rápida, pode não ser feita devido a erros no arquivo."
+            @click="clickDraftmidiaAction('pdf2pdfa_rapida')">
+            PDF -> PDF/A-2b (Conversão Rápida)</a>
+            <a
+            class="dropdown-item"
+            title="PDF -> PDF/A-2b - Conversão básica, pode demorar um pouco mais que a rápida por aplicar correção de possíveis erros no arquivo. Utilize caso a rápida tenha falhado."
+            @click="clickDraftmidiaAction('pdf2pdfa_basica')">
+            PDF -> PDF/A-2b (Conversão Básica)</a>
+            <a
+            class="dropdown-item"
+            title="PDF -> PDF/A-2b - Conversão forçada, faz OCR e é mais lenta que a básica. (útil para arquivos digitalizados.)"
+            @click="clickDraftmidiaAction('pdf2pdfa_forcada')">
+            PDF -> PDF/A-2b (Conversão Forçada)</a>
+            <a
+            class="dropdown-item"
+            title="PDF -> PDF/A-2b - Conversão Compacta, faz OCR, converte para preto e branco e aplica alta compactação no arquivo (ultra lenta e útil para arquivos digitalizados)."
+            @click="clickDraftmidiaAction('pdf2pdfa_compacta')">
+            PDF -> PDF/A-2b (Conversão de Alta Compactação)</a>
             <a class="dropdown-item" title="Gerar um PDF para cada página" @click="clickDraftmidiaAction('decompor')">Decompor <i class="fas fa-expand"></i></a>
             <a class="dropdown-item" title="Apagar Mídia" @click="clickDel">Apagar <i class="fas fa-trash-alt"></i></a>
           </div>
@@ -18,7 +36,7 @@
       </div>
       <div class="innerimg">
         <a :href="elemento.arquivo" target="_blank">
-          <img :src="`${elemento.arquivo}?page=${page}&dpi=48&u=${data}`"/>
+          <img :src="`${elemento.arquivo}?page=${page}&dpi=48&nocache=${nocache}&u=${data}`" ref="imgView"/>
         </a>
         <div class="img-actions">
           <div v-show="elemento.metadata.uploadedfile.paginas > 1">
@@ -48,7 +66,8 @@ export default {
   data () {
     return {
       page: 1,
-      data: (new Date()).getTime()
+      data: (new Date()).getTime(),
+      nocache: ''
     }
   },
   watch: {
@@ -60,6 +79,7 @@ export default {
     }
   },
   mounted () {
+    this.nocache = ''
     const estagio_execucao = this.elemento.metadata.ocrmypdf.pdfa
     if (estagio_execucao >= 10 && estagio_execucao <= 20) {
       this.timeoutUpdate()
@@ -82,6 +102,20 @@ export default {
           })
       }, 5000)
     },
+    enterInner (ev) {
+      const t = this
+      const inneraction = t.$refs.inneraction
+      const btnDropDownActions = t.$refs.btnDropDownActions
+      const rect = ev.currentTarget.getBoundingClientRect()
+      inneraction.style.left = `${rect.left + rect.width - btnDropDownActions.offsetWidth - 2}px`
+      inneraction.style.top = `${rect.top + 2}px`
+    },
+    leaveInner (ev) {
+      const t = this
+      const dropleft = t.$refs.dropleft
+      $(dropleft).dropdown('hide')
+      // dropleft.classList.remove('show')
+    },
     clickDel () {
       const t = this
       t.utils.deleteModel('arq', 'draftmidia', t.elemento.id)
@@ -97,7 +131,12 @@ export default {
       const t = this
       t.utils.getModelAction('arq', 'draftmidia', t.elemento.id, action)
         .then((response) => {
-          t.$emit('redrawDraftMidia')
+          t.data = (new Date()).getTime()
+          t.nocache = (new Date()).getTime()
+          t.$nextTick(() => {
+            t.$refs.imgView.src = `${t.elemento.arquivo}?page=${t.page}&dpi=48&nocache=${t.nocache}&u=${t.data}`
+            t.$emit('redrawDraftMidia')
+          })
         }).catch((error) => {
           t.sendMessage(
             { alert: 'danger', message: error.response.data.message, time: 10 }
@@ -192,11 +231,11 @@ export default {
     }
     .inner-action {
       background-color: #fff;
-      position: absolute;
+      position: fixed;
       color: #444;
       border-radius: 3px;
-      right: 4px;
-      top: 4px;
+      // right: 4px;
+      // top: 4px;
       opacity: 0;
       z-index: 1;
       .btn {
@@ -211,6 +250,9 @@ export default {
       }
       .dropdown-item {
         cursor: pointer;
+      }
+      .dropdown-menu {
+        position: fixed;
       }
     }
     .innerimg {

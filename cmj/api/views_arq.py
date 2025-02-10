@@ -137,8 +137,7 @@ class _Draft:
                 fname = f.name + '.pdf'
                 doc = fitz.open()
 
-                # open pic as document
-                img = fitz.open(dm.arquivo.path)
+                img = fitz.open(dm.arquivo.path)# open pic as document
                 rect = img[0].rect  # pic dimension
                 pdfbytes = img.convert_to_pdf()  # make a PDF stream
                 img.close()  # no longer needed
@@ -353,13 +352,14 @@ class _Draft:
         if request.user.groups.filter(name=GROUP_ARQ_OPERADOR).exists():
             jobs = 8
 
+
         params_task = (
             DraftMidia._meta.app_label,
             DraftMidia._meta.model_name,
             'arquivo',
             dms_id,
             jobs,
-            False
+            'pdf2pdfa_basica'
         )
 
         if not DEBUG or (DEBUG and settings.FOLDER_DEBUG_CONTAINER == settings.PROJECT_DIR):
@@ -368,7 +368,7 @@ class _Draft:
                 countdown=5
             )
         else:
-            tasks.task_ocrmypdf_function(*params_task[:-1])
+            tasks.task_ocrmypdf_function(*params_task)
 
         serializer = self.get_serializer(draft)
         return Response(serializer.data)
@@ -438,8 +438,26 @@ class _DraftMidia(ResponseFileMixin):
         serializer = self.get_serializer(dm_new)
         return Response(serializer.data)
 
+
     @action(detail=True)
-    def pdf2pdfa(self, request, *args, **kwargs):
+    def pdf2pdfa_rapida(self, request, *args, **kwargs):
+        return self.pdf2pdfa(request, task_name='pdf2pdfa_rapida', *args, **kwargs)
+
+    @action(detail=True)
+    def pdf2pdfa_basica(self, request, *args, **kwargs):
+        return self.pdf2pdfa(request, task_name='pdf2pdfa_basica', *args, **kwargs)
+
+    @action(detail=True)
+    def pdf2pdfa_forcada(self, request, *args, **kwargs):
+        return self.pdf2pdfa(request, task_name='pdf2pdfa_forcada', *args, **kwargs)
+
+    @action(detail=True)
+    def pdf2pdfa_compacta(self, request, *args, **kwargs):
+        return self.pdf2pdfa(request, task_name='pdf2pdfa_compacta', *args, **kwargs)
+
+
+    @action(detail=True)
+    def pdf2pdfa(self, request, task_name='pdf2pdfa_basica', *args, **kwargs):
         dm = self.get_queryset().filter(pk=kwargs['pk']).first()
         dm.metadata['ocrmypdf'] = {'pdfa': DraftMidia.METADATA_PDFA_AGND}
         dm.save()
@@ -449,8 +467,8 @@ class _DraftMidia(ResponseFileMixin):
             DraftMidia._meta.model_name,
             'arquivo',
             [dm.id, ],
-            4,
-            False
+            4 if not settings.DEBUG else 16,
+            task_name
         )
 
         if not DEBUG or (DEBUG and settings.FOLDER_DEBUG_CONTAINER == settings.PROJECT_DIR):
@@ -459,33 +477,7 @@ class _DraftMidia(ResponseFileMixin):
                 countdown=5
             )
         else:
-            tasks.task_ocrmypdf_function(*params_task[:-1])
-
-        serializer = self.get_serializer(dm)
-        return Response(serializer.data)
-
-    @action(detail=True)
-    def pdfacompact(self, request, *args, **kwargs):
-        dm = self.get_queryset().filter(pk=kwargs['pk']).first()
-        dm.metadata['ocrmypdf'] = {'pdfa': DraftMidia.METADATA_PDFA_AGND}
-        dm.save()
-
-        params_task = (
-            DraftMidia._meta.app_label,
-            DraftMidia._meta.model_name,
-            'arquivo',
-            [dm.id, ],
-            2,
-            True
-        )
-
-        if not DEBUG or (DEBUG and settings.FOLDER_DEBUG_CONTAINER == settings.PROJECT_DIR):
-            tasks.task_ocrmypdf.apply_async(
-                params_task,
-                countdown=5
-            )
-        else:
-            tasks.task_ocrmypdf_compact_function(*params_task[:-1])
+            tasks.task_ocrmypdf_function(*params_task)
 
         serializer = self.get_serializer(dm)
         return Response(serializer.data)
