@@ -26,13 +26,13 @@ def breadcrumb(context):
     }
     if 'breadcrumb_classes' in context:
         breadcrumb_classes = context.get('breadcrumb_classes', [])
-        if breadcrumb_classes:
-            last = breadcrumb_classes[-1]
-            breadcrumb_classes = list(filter(
-                lambda x: not hasattr(x, 'perfil') or hasattr(
-                    x, 'perfil') and x.perfil != CLASSE_REDIRECT_VIEWS,
-                breadcrumb_classes[:-1]))
-            breadcrumb_classes.append(last)
+        #if breadcrumb_classes:
+        #    last = breadcrumb_classes[-1]
+        #    breadcrumb_classes = list(filter(
+        #        lambda x: not hasattr(x, 'perfil') or hasattr(
+        #            x, 'perfil') and x.perfil != CLASSE_REDIRECT_VIEWS,
+        #        breadcrumb_classes[:-1]))
+        #    breadcrumb_classes.append(last)
     else:
         breadcrumb_classes = get_breadcrumb_classes(context, request=context['request'])
     rcontext['classes'] = breadcrumb_classes

@@ -44,7 +44,8 @@ from sapl.utils import (show_results_filter_set, remover_acentos, get_client_ip,
 
 from .forms import (AdicionarVariasMateriasFilterSet, ExpedienteForm,
                     JustificativaAusenciaForm, OcorrenciaSessaoForm, ListMateriaForm,
-                    MesaForm, OradorExpedienteForm, OradorForm, PautaSessaoFilterSet,
+                    MesaForm, OradorExpedienteForm, OradorForm,
+                    PautaSessaoFilterSet, PautaComissaoFilterSet,
                     PresencaForm, SessaoPlenariaFilterSet,
                     SessaoPlenariaForm, VotacaoEditForm, VotacaoForm,
                     VotacaoNominalForm, RetiradaPautaForm, OradorOrdemDiaForm)
@@ -3797,175 +3798,10 @@ class SessaoListView(ListView):
 
         return context
 
-
-class PautaSessaoView(TemplateView):
-    model = SessaoPlenaria
-    template_name = "sessao/pauta_inexistente.html"
-
-    def get(self, request, *args, **kwargs):
-        sessao = SessaoPlenaria.objects.filter(
-            tipo__tipogeral=TipoSessaoPlenaria.TIPOGERAL_SESSAO
-        ).order_by("-data_inicio", "-id").first()
-
-        if not sessao:
-            return self.render_to_response({})
-
-        return HttpResponseRedirect(
-            reverse('sapl.sessao:pauta_sessao_detail', kwargs={'pk': sessao.pk}))
-
-
-class PautaSessaoDetailView(DetailView):
-    template_name = "sessao/pauta_sessao_detail.html"
-    model = SessaoPlenaria
-
-    @property
-    def search_url(self):
-        return reverse('sapl.sessao:pesquisar_pauta')
-
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        context = self.get_context_data(object=self.object)
-
-        # =====================================================================
-        # Identificação Básica
-        abertura = self.object.data_inicio.strftime('%d/%m/%Y')
-        if self.object.data_fim:
-            encerramento = self.object.data_fim.strftime('%d/%m/%Y')
-        else:
-            encerramento = ""
-
-        context.update({'basica': [
-            _('Tipo de Sessão: %(tipo)s') % {'tipo': self.object.tipo},
-            _('Abertura: %(abertura)s') % {'abertura': abertura},
-            _('Encerramento: %(encerramento)s') % {
-                'encerramento': encerramento},
-        ]})
-        # =====================================================================
-        # Matérias Expediente
-        materias = ExpedienteMateria.objects.filter(
-            sessao_plenaria_id=self.object.id,
-            parent__isnull=True
-        ).order_by('numero_ordem', 'materia', 'resultado')
-
-        materias_expediente = []
-        for m in materias:
-            ementa = m.materia.ementa
-            titulo = m.materia
-            numero = m.numero_ordem
-
-            tramitacao_item_sessao = m.tramitacao
-            if not tramitacao_item_sessao:
-                ultima_tramitacao = m.materia.tramitacao_set.first()
-                situacao = ultima_tramitacao if ultima_tramitacao else None
-            else:
-                situacao = tramitacao_item_sessao
-
-            if situacao is None:
-                situacao = _("Não informada")
-            else:
-                situacao = f'{situacao.status}<br><em>{situacao.texto}</em>'
-            rv = m.registrovotacao_set.all()
-            if rv:
-                resultado = rv[0].tipo_resultado_votacao.nome
-                resultado_observacao = rv[0].observacao
-            else:
-                resultado = _('Matéria não votada')
-                resultado_observacao = _(' ')
-
-            autoria = Autoria.objects.filter(materia_id=m.materia_id)
-            autor = [str(x.autor) for x in autoria]
-
-            mat = {'id': m.materia_id,
-                   'ementa': ementa,
-                   'observacao': m.observacao,
-                   'titulo': titulo,
-                   'numero': numero,
-                   'resultado': resultado,
-                   'resultado_observacao': resultado_observacao,
-                   'situacao': situacao,
-                   'autor': autor
-                   }
-            materias_expediente.append(mat)
-
-        context.update({'materia_expediente': materias_expediente})
-        # =====================================================================
-        # Expedientes
-        expediente = ExpedienteSessao.objects.filter(
-            sessao_plenaria_id=self.object.id)
-
-        expedientes = []
-        for e in expediente:
-            tipo = e.tipo
-            conteudo = sub(
-                '&nbsp;', ' ', strip_tags(e.conteudo.replace('<br/>', '\n')))
-
-            ex = {'tipo': tipo, 'conteudo': conteudo}
-            expedientes.append(ex)
-
-        context.update({'expedientes': expedientes})
-        # =====================================================================
-        # Orador Expediente
-        oradores = OradorExpediente.objects.filter(
-            sessao_plenaria_id=self.object.id).order_by('numero_ordem')
-        context.update({'oradores': oradores})
-        # =====================================================================
-        # Matérias Ordem do Dia
-        ordem = OrdemDia.objects.filter(
-            sessao_plenaria_id=self.object.id,
-            parent__isnull=True
-        ).order_by('numero_ordem', 'materia', 'resultado')
-
-        materias_ordem = []
-        for o in ordem:
-            ementa = o.materia.ementa
-            titulo = o.materia
-            numero = o.numero_ordem
-
-            tramitacao_item_sessao = o.tramitacao
-            if not tramitacao_item_sessao:
-                ultima_tramitacao = o.materia.tramitacao_set.first()
-                situacao = ultima_tramitacao.status if ultima_tramitacao else None
-            else:
-                situacao = tramitacao_item_sessao.status
-
-            if situacao is None:
-                situacao = _("Não informada")
-            # Verificar resultado
-            rv = o.registrovotacao_set.all()
-            if rv:
-                resultado = rv[0].tipo_resultado_votacao.nome
-                resultado_observacao = rv[0].observacao
-            else:
-                resultado = _('Matéria não votada')
-                resultado_observacao = _(' ')
-
-            autoria = Autoria.objects.filter(
-                materia_id=o.materia_id)
-            autor = [str(x.autor) for x in autoria]
-
-            mat = {'id': o.materia_id,
-                   'ementa': ementa,
-                   'observacao': o.observacao,
-                   'titulo': titulo,
-                   'numero': numero,
-                   'resultado': resultado,
-                   'resultado_observacao': resultado_observacao,
-                   'situacao': situacao,
-                   'autor': autor,
-                   'materia': o.materia
-                   }
-            materias_ordem.append(mat)
-
-        context.update({'materias_ordem': materias_ordem})
-        context.update({'subnav_template_name': ''})
-
-        return self.render_to_response(context)
-
-
 class PesquisarSessaoPlenariaView(AudigLogFilterMixin, MultiFormatOutputMixin, FilterView):
     model = SessaoPlenaria
     filterset_class = SessaoPlenariaFilterSet
-    paginate_by = 12
+    paginate_by = 20
 
     logger = logging.getLogger(__name__)
 
@@ -4042,23 +3878,11 @@ class PesquisarSessaoPlenariaView(AudigLogFilterMixin, MultiFormatOutputMixin, F
             return HttpResponseRedirect(
                 reverse(
                     self.viewname
-                ) + f'?data_inicio__year={timezone.now().year}'
+                ) + f'?pesquisar='
             )
 
         return r
 
-
-class PesquisarPautaSessaoView(PesquisarSessaoPlenariaView):
-    filterset_class = PautaSessaoFilterSet
-    template_name = 'sessao/pauta_sessao_filter.html'
-
-    viewname = 'sapl.sessao:pesquisar_pauta'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = _('Pesquisar Pauta de Sessão')
-        context['bg_title'] = ''
-        return context
 
 
 class PesquisarSessaoPlenariaView__(FilterView):

@@ -6,7 +6,8 @@
   {% endif %}
   {% if forloop.last %}
     <li class="breadcrumb-item {% if p == object %}active{% endif %}">
-      <a href="#" aria-current="page">
+
+      <a href="{% if p.absolute_slug %}/{{p.absolute_slug}}{% endif %}" aria-current="page">
         {% if p.titulo %}
           {{p.apelido|default:p.titulo}}
         {% else %}
@@ -21,7 +22,7 @@
     </nav>
   {% else %}
     <li class="breadcrumb-item {% if p == object %}active{% endif %}">
-      <a href="/{{p.absolute_slug}}" {% if p == object %}aria-current="page"{% endif %}>
+      <a href="{% if not p.visibilidade %}/{{p.absolute_slug}}{% endif %}" {% if p == object %}aria-current="page"{% endif %}>
         {% if p.titulo %}
           {{p.apelido|default:p.titulo}}
         {% else %}

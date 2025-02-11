@@ -524,7 +524,8 @@ def get_breadcrumb_classes(context, request=None, response=None):
                 'title': obj,
                 'breadcrumb_classes': obj.classes_parents_and_me
             })
-        return response
+        if isinstance(obj, Classe) and not obj.url_redirect:
+            return response
 
     path = request.path
     fpath = request.get_full_path()
@@ -538,12 +539,15 @@ def get_breadcrumb_classes(context, request=None, response=None):
     else:
         paths.append(view_name)
 
-    paths.append(fpath)
-    if path != paths[-1]:
-        paths.append(path)
+    if not view_name:
+        paths.append(fpath)
+        if path != paths[-1]:
+            paths.append(path)
 
     for i, path in enumerate(paths):
-        q = Q(url_redirect=path) | Q(slug=path[1:])
+        q = Q(url_redirect__istartswith=path)
+        if not view_name:
+            q = q | Q(slug=path[1:])
         classe_redirect = Classe.objects.filter(q).first()
         if classe_redirect:
             breads = classe_redirect.classes_parents_and_me

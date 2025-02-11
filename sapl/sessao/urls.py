@@ -6,8 +6,6 @@ from sapl.sessao.views import (AdicionarVariasMateriasExpediente,
                                OcorrenciaSessaoView, MateriaOrdemDiaCrud, OradorOrdemDiaCrud,
                                MesaView, OradorCrud,
                                OradorExpedienteCrud, PainelView,
-                               PautaSessaoDetailView, PautaSessaoView,
-                               PesquisarPautaSessaoView,
                                PesquisarSessaoPlenariaView,
                                PresencaOrdemDiaView, PresencaView,
                                ResumoView, ResumoAtaView, RetiradaPautaCrud, SessaoCrud,
@@ -39,6 +37,7 @@ from sapl.sessao.views import (AdicionarVariasMateriasExpediente,
                                ExpedienteLeituraView,
                                OrdemDiaLeituraView, retirar_leitura,
                                recuperar_tramitacao)
+from sapl.sessao.views_pautas import PautaComissaoDetailView, PautaComissaoView, PautaSessaoDetailView, PautaSessaoView, PesquisarPautaComissaoView, PesquisarPautaSessaoView
 
 from .apps import AppConfig
 
@@ -122,6 +121,14 @@ urlpatterns = [
             PesquisarPautaSessaoView.as_view(), name='pesquisar_pauta'),
     re_path(r'^sessao/pauta-sessao/(?P<pk>\d+)$',
             PautaSessaoDetailView.as_view(), name='pauta_sessao_detail'),
+
+    # PAUTA COMISSÃO
+    re_path(r'^sessao/pauta-comissao$',
+            PautaComissaoView.as_view(), name='pauta_comissao'),
+    re_path(r'^sessao/pauta-comissoes/pesquisar-pauta$',
+            PesquisarPautaComissaoView.as_view(), name='pesquisar_comissao_pauta'),
+    re_path(r'^sessao/pauta-comissao/(?P<pk>\d+)$',
+            PautaComissaoDetailView.as_view(), name='pauta_comissao_detail'),
 
     # Subnav sessão
     re_path(r'^sessao/(?P<pk>\d+)/expediente$',

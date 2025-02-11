@@ -30,7 +30,7 @@ from .models import (ExpedienteMateria, JustificativaAusencia,
                      Orador, OradorExpediente, OrdemDia, PresencaOrdemDia, SessaoPlenaria,
                      SessaoPlenariaPresenca, TipoResultadoVotacao,
                      OcorrenciaSessao, RetiradaPauta, TipoRetiradaPauta, OradorOrdemDia, ORDENACAO_RESUMO,
-                     ResumoOrdenacao)
+                     ResumoOrdenacao, TipoSessaoPlenaria)
 
 
 MES_CHOICES = RANGE_MESES
@@ -553,9 +553,6 @@ class SessaoPlenariaFilterSet(django_filters.FilterSet):
     def __init__(self, *args, **kwargs):
         super(SessaoPlenariaFilterSet, self).__init__(*args, **kwargs)
 
-        # pré-popula o campo do formulário com o ano corrente
-        self.form.fields['data_inicio__year'].initial = timezone.now().year
-
         row1 = to_row(
             [('data_inicio__year', 3),
              ('data_inicio__month', 3),
@@ -567,7 +564,7 @@ class SessaoPlenariaFilterSet(django_filters.FilterSet):
         self.form.helper.layout = Layout(
             Fieldset(self.titulo,
                      row1,
-                     form_actions(label='Pesquisar'))
+                     form_actions(label='Pesquisar', name='pesquisar'))
         )
 
 
@@ -782,6 +779,26 @@ class OradorOrdemDiaForm(ModelForm):
 
 class PautaSessaoFilterSet(SessaoPlenariaFilterSet):
     titulo = _('Pesquisa de Pauta de Sessão')
+
+    @property
+    def qs(self):
+        qs = super(PautaSessaoFilterSet, self).qs
+        return qs.exclude(tipo__tipogeral=TipoSessaoPlenaria.TIPOGERAL_REUNIAO)
+
+class PautaComissaoFilterSet(SessaoPlenariaFilterSet):
+    titulo = _('Pesquisa de Pauta das Comissões')
+
+    @property
+    def qs(self):
+        qs = super(PautaComissaoFilterSet, self).qs
+        return qs.filter(tipo__tipogeral=TipoSessaoPlenaria.TIPOGERAL_REUNIAO)
+
+    def __init__(self, *args, **kwargs):
+        super(PautaComissaoFilterSet, self).__init__(*args, **kwargs)
+
+        self.form.fields['tipo'].queryset = TipoSessaoPlenaria.objects.filter(
+            tipogeral=TipoSessaoPlenaria.TIPOGERAL_REUNIAO)
+
 
 
 class JustificativaAusenciaForm(ModelForm):
