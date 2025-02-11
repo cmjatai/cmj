@@ -26,6 +26,9 @@ WORKDIR /var/cmjatai/cmj/
 COPY requirements/* $HOME
 RUN pip install -r ia-requirements.txt
 
+RUN apt-get install -y --no-install-recommends pngquant
+RUN pip install opencv-python
+
 ADD drfautoapi  /var/cmjatai/cmj/drfautoapi
 ADD fonts       /var/cmjatai/cmj/fonts
 ADD scripts     /var/cmjatai/cmj/scripts
