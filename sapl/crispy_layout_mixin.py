@@ -1,20 +1,19 @@
-from builtins import classmethod
-from dis import dis
+import dis
 from math import ceil
-import types
+import re
 
 from crispy_forms.bootstrap import FormActions
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import HTML, Div, Fieldset, Layout, Submit
 from django import template
 from django.db import models
-from django.db.models.query import QuerySet
 from django.urls.base import reverse
 from django.utils import formats
 from django.utils.encoding import force_str
 from django.utils.translation import gettext as _
 import yaml
 
+re_start_tag = re.compile('<[^>]*>')
 
 def to_column(name_span):
     fieldname, span = name_span
@@ -174,7 +173,10 @@ def get_field_display(obj, fieldname):
                 args=(value.id,)),
             value)
     elif 'TextField' in str_type_from_field:
-        display = value.replace('\n', '<br/>')
+        display = value
+        has_html = re_start_tag.search(display)
+        if not has_html:
+            display = display.replace('\n', '<br/>')
         display = '<div class="dont-break-out">{}</div>'.format(display)
     elif 'DecimalField' in str_type_from_field:
         display = formats.number_format(value, force_grouping=True)
